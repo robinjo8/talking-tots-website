@@ -11,7 +11,8 @@ const Index = () => {
     setIsVisible(true);
   }, []);
 
-  return <div className="min-h-screen overflow-x-hidden">
+  return (
+    <div className="min-h-screen overflow-x-hidden">
       <Header />
       
       {/* Hero Section */}
@@ -111,6 +112,8 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>;
+    </div>
+  );
 };
+
 export default Index;

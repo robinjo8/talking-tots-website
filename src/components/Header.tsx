@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { UserProfile } from "@/components/auth/UserProfile";
 
 export default function Header() {
   const { user, signOut } = useAuth();
@@ -27,27 +28,12 @@ export default function Header() {
           </nav>
           
           {user ? (
-            <div className="flex items-center gap-3">
-              <span className="text-sm hidden md:inline-block">{user.email}</span>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleSignOut}
-                className="text-sm"
-              >
-                Odjava
-              </Button>
-            </div>
+            <UserProfile />
           ) : (
             <div className="flex items-center gap-2">
               <Link to="/login">
                 <Button variant="outline" size="sm" className="text-sm">
                   Prijava
-                </Button>
-              </Link>
-              <Link to="/register">
-                <Button className="bg-dragon-green hover:bg-dragon-green/90 text-white text-sm">
-                  Registracija
                 </Button>
               </Link>
             </div>
