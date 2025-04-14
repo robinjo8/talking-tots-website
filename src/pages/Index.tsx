@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import FeatureCard from "@/components/FeatureCard";
@@ -25,8 +24,7 @@ const Index = () => {
               Naredimo govor <span className="rainbow-text">zabaven</span> – za male junake!
             </h1>
             <p className="text-xl mb-8 text-muted-foreground max-w-xl">
-              Tomi Talk helps children develop speech skills through playful interaction
-              with our friendly dragon buddy. Learning to speak has never been more fun!
+              Tomi Talk otrokom pomaga pri učenju govora skozi igro z našim prijaznim zmajčkom Tomijem. Govorjenje še nikoli ni bilo tako zabavno!
             </p>
             <div className="flex flex-wrap gap-4">
               <Button size="lg" className="bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full">
