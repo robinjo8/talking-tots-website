@@ -1,7 +1,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "light" | "dark";
+type Theme = "light";
 
 type ThemeProviderProps = {
   children: React.ReactNode;
@@ -27,22 +27,20 @@ export function ThemeProvider({
   storageKey = "tomi-talk-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
-  );
+  const [theme] = useState<Theme>("light");
 
   useEffect(() => {
     const root = window.document.documentElement;
     
-    root.classList.remove("light", "dark");
-    root.classList.add(theme);
+    root.classList.remove("dark");
+    root.classList.add("light");
     
     localStorage.setItem(storageKey, theme);
   }, [theme, storageKey]);
 
   const value = {
     theme,
-    setTheme: (theme: Theme) => setTheme(theme),
+    setTheme: () => {}, // No-op since we only use light mode
   };
 
   return (

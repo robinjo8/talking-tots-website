@@ -1,5 +1,4 @@
 
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 export default function Header() {
   return <header className="py-4 px-6 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
@@ -14,8 +13,6 @@ export default function Header() {
             <a href="#features" className="font-medium hover:text-dragon-green transition-colors">Funkcije</a>
             <a href="#cta" className="font-medium hover:text-dragon-green transition-colors">Začni</a>
           </nav>
-          
-          <ThemeToggle />
           
           <Button className="bg-dragon-green hover:bg-dragon-green/90 text-white">Prenesi aplikacijo</Button>
         </div>

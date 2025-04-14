@@ -47,7 +47,7 @@ const Index = () => {
       </section>
       
       {/* Features Section */}
-      <section id="features" className="py-20 px-6 md:px-10 bg-light-cloud dark:bg-dark-cloud/20">
+      <section id="features" className="py-20 px-6 md:px-10 bg-light-cloud">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Kako Tomi Talk pomaga</h2>
@@ -76,7 +76,7 @@ const Index = () => {
         <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-app-teal/20 rounded-full blur-3xl"></div>
         <div className="absolute -top-10 -right-10 w-40 h-40 bg-app-orange/20 rounded-full blur-3xl"></div>
         
-        <div className="max-w-3xl mx-auto bg-white dark:bg-dark-cloud/60 shadow-xl rounded-3xl p-8 md:p-12 text-center relative z-10">
+        <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-3xl p-8 md:p-12 text-center relative z-10">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Ste pripravljeni na govorno avanturo?</h2>
           <p className="text-xl text-muted-foreground mb-8">
             Prenesite Tomi Talk danes in opazujte, kako komunikacijske veščine vašega otroka cvetijo!
@@ -93,7 +93,7 @@ const Index = () => {
       </section>
       
       {/* Footer */}
-      <footer className="py-10 px-6 md:px-10 bg-light-cloud dark:bg-dark-cloud/20">
+      <footer className="py-10 px-6 md:px-10 bg-light-cloud">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center gap-2 mb-4 md:mb-0">
             <span className="text-xl font-extrabold text-dragon-green">Tomi</span>
