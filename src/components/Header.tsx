@@ -7,8 +7,8 @@ export default function Header() {
     <header className="py-4 px-6 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <span className="text-2xl font-extrabold text-dragon-green">Talking</span>
-          <span className="text-2xl font-extrabold text-app-orange">Tots</span>
+          <span className="text-2xl font-extrabold text-dragon-green">Tomi</span>
+          <span className="text-2xl font-extrabold text-app-orange">Talk</span>
         </div>
         
         <div className="flex items-center gap-4">
