@@ -1,5 +1,6 @@
 
 import { ReactNode } from "react";
+import { Link } from "react-router-dom";
 
 type AuthLayoutProps = {
   children: ReactNode;
@@ -10,7 +11,23 @@ type AuthLayoutProps = {
 export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
   return (
     <div className="min-h-screen flex flex-col justify-center items-center p-4 bg-gradient-to-b from-sky-50 to-white">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-xl shadow-md">
+      <header className="py-4 px-6 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <Link to="/" className="flex items-center gap-2">
+            <img 
+              src="/lovable-uploads/ef9acb7f-a16f-4737-ac7b-fe4bc68c21cd.png" 
+              alt="Tomi the Dragon" 
+              className="h-8 md:h-10"
+            />
+            <div className="flex items-center">
+              <span className="text-2xl font-extrabold text-dragon-green">Tomi</span>
+              <span className="text-2xl font-extrabold text-app-orange">Talk</span>
+            </div>
+          </Link>
+        </div>
+      </header>
+      
+      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-xl shadow-md mt-16">
         <div className="text-center">
           <div className="flex items-center justify-center gap-2 mb-6">
             <span className="text-3xl font-extrabold text-dragon-green">Tomi</span>
