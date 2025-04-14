@@ -1,19 +1,14 @@
-
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import FeatureCard from "@/components/FeatureCard";
 import { Button } from "@/components/ui/button";
 import { Mic, Play, Book, Stars, MessageSquare, Zap, Volume2, Award } from "lucide-react";
-
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
-  
   useEffect(() => {
     setIsVisible(true);
   }, []);
-  
-  return (
-    <div className="min-h-screen overflow-x-hidden">
+  return <div className="min-h-screen overflow-x-hidden">
       <Header />
       
       {/* Hero Section */}
@@ -43,11 +38,7 @@ const Index = () => {
           <div className={`relative ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'} transition-all duration-700 ease-out delay-300`}>
             <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
             <div className="animate-float relative">
-              <img 
-                src="/lovable-uploads/8994865a-8d06-464a-a608-35a33edceb33.png" 
-                alt="Talking Tots Dragon Mascot" 
-                className="w-full max-w-md mx-auto"
-              />
+              <img alt="Talking Tots Dragon Mascot" className="w-full max-w-md mx-auto" src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" />
             </div>
           </div>
         </div>
@@ -64,54 +55,16 @@ const Index = () => {
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <FeatureCard
-              icon={<Mic className="h-10 w-10 text-app-blue" />}
-              title="Voice Recognition"
-              description="Listens to your child's speech and provides helpful feedback"
-              delay={1}
-            />
-            <FeatureCard
-              icon={<Stars className="h-10 w-10 text-app-purple" />}
-              title="Fun Activities"
-              description="Engaging games that make learning to speak enjoyable"
-              delay={2}
-            />
-            <FeatureCard
-              icon={<Volume2 className="h-10 w-10 text-app-teal" />}
-              title="Pronunciation Guide"
-              description="Clear audio examples of proper word pronunciation"
-              delay={3}
-            />
-            <FeatureCard
-              icon={<MessageSquare className="h-10 w-10 text-app-orange" />}
-              title="Interactive Chat"
-              description="Chat with our friendly dragon to practice conversations"
-              delay={4}
-            />
+            <FeatureCard icon={<Mic className="h-10 w-10 text-app-blue" />} title="Voice Recognition" description="Listens to your child's speech and provides helpful feedback" delay={1} />
+            <FeatureCard icon={<Stars className="h-10 w-10 text-app-purple" />} title="Fun Activities" description="Engaging games that make learning to speak enjoyable" delay={2} />
+            <FeatureCard icon={<Volume2 className="h-10 w-10 text-app-teal" />} title="Pronunciation Guide" description="Clear audio examples of proper word pronunciation" delay={3} />
+            <FeatureCard icon={<MessageSquare className="h-10 w-10 text-app-orange" />} title="Interactive Chat" description="Chat with our friendly dragon to practice conversations" delay={4} />
           </div>
           
           <div className="mt-16 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <FeatureCard
-              icon={<Zap className="h-10 w-10 text-app-yellow" />}
-              title="Progress Tracking"
-              description="Monitor your child's improvement over time"
-              className="lg:col-span-1"
-              delay={5}
-            />
-            <FeatureCard
-              icon={<Book className="h-10 w-10 text-dragon-green" />}
-              title="Speech Therapist Approved"
-              description="Developed with professional speech therapists"
-              className="lg:col-span-1"
-              delay={6}
-            />
-            <FeatureCard
-              icon={<Award className="h-10 w-10 text-app-blue" />}
-              title="Reward System"
-              description="Earn badges and unlock new dragon friends"
-              className="lg:col-span-1"
-              delay={7}
-            />
+            <FeatureCard icon={<Zap className="h-10 w-10 text-app-yellow" />} title="Progress Tracking" description="Monitor your child's improvement over time" className="lg:col-span-1" delay={5} />
+            <FeatureCard icon={<Book className="h-10 w-10 text-dragon-green" />} title="Speech Therapist Approved" description="Developed with professional speech therapists" className="lg:col-span-1" delay={6} />
+            <FeatureCard icon={<Award className="h-10 w-10 text-app-blue" />} title="Reward System" description="Earn badges and unlock new dragon friends" className="lg:col-span-1" delay={7} />
           </div>
         </div>
       </section>
@@ -156,8 +109,6 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
