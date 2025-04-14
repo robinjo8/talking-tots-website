@@ -3,13 +3,11 @@ import Header from "@/components/Header";
 import FeatureCard from "@/components/FeatureCard";
 import { Button } from "@/components/ui/button";
 import { Mic, Play, Book, Stars, MessageSquare, Zap, Volume2, Award } from "lucide-react";
-
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
   useEffect(() => {
     setIsVisible(true);
   }, []);
-
   return <div className="min-h-screen overflow-x-hidden">
       <Header />
       
@@ -21,7 +19,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-10 items-center">
           <div className={`${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'} transition-all duration-700 ease-out`}>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6">
-              Skupaj do boljšega govora – za male junake
+              Making Speech <span className="rainbow-text">Fun</span> for Little Ones!
             </h1>
             <p className="text-xl mb-8 text-muted-foreground max-w-xl">
               Talking Tots helps children develop speech skills through playful interaction
@@ -113,5 +111,4 @@ const Index = () => {
       </footer>
     </div>;
 };
-
 export default Index;
