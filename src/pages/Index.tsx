@@ -1,16 +1,13 @@
-
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import FeatureCard from "@/components/FeatureCard";
 import { Button } from "@/components/ui/button";
 import { Mic, Play, Book, Stars, MessageSquare, Zap, Volume2, Award } from "lucide-react";
-
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
   useEffect(() => {
     setIsVisible(true);
   }, []);
-
   return <div className="min-h-screen overflow-x-hidden">
       <Header />
       
@@ -22,10 +19,10 @@ const Index = () => {
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-10 items-center">
           <div className={`${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'} transition-all duration-700 ease-out`}>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6">
-              Naredimo govor <span className="rainbow-text">zabaven</span> – za male junake!
+              Making Speech <span className="rainbow-text">Tomi Talk otrokom pomaga pri učenju govora skozi igro z našim prijaznim zmajčkom Tomijem. Govorjenje še nikoli ni bilo tako zabavno!</span> for Little Ones!
             </h1>
             <p className="text-xl mb-8 text-muted-foreground max-w-xl">
-              Tomi Talk helps children develop speech skills through playful interaction
+              Talking Tots helps children develop speech skills through playful interaction
               with our friendly dragon buddy. Learning to speak has never been more fun!
             </p>
             <div className="flex flex-wrap gap-4">
@@ -41,7 +38,7 @@ const Index = () => {
           <div className={`relative ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'} transition-all duration-700 ease-out delay-300`}>
             <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
             <div className="animate-float relative">
-              <img alt="Tomi Talk Dragon Mascot" className="w-full max-w-md mx-auto" src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" />
+              <img src="/lovable-uploads/8994865a-8d06-464a-a608-35a33edceb33.png" alt="Talking Tots Dragon Mascot" className="w-full max-w-md mx-auto" />
             </div>
           </div>
         </div>
@@ -51,7 +48,7 @@ const Index = () => {
       <section id="features" className="py-20 px-6 md:px-10 bg-light-cloud dark:bg-dark-cloud/20">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">How Tomi Talk Helps</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">How Talking Tots Helps</h2>
             <p className="text-xl text-muted-foreground max-w-xl mx-auto">
               Our app makes speech development engaging and effective through interactive features
             </p>
@@ -80,7 +77,7 @@ const Index = () => {
         <div className="max-w-3xl mx-auto bg-white dark:bg-dark-cloud/60 shadow-xl rounded-3xl p-8 md:p-12 text-center relative z-10">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Start the Speech Adventure?</h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Download Tomi Talk today and watch your child's communication skills flourish!
+            Download Talking Tots today and watch your child's communication skills flourish!
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" className="bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full">
@@ -97,8 +94,8 @@ const Index = () => {
       <footer className="py-10 px-6 md:px-10 bg-light-cloud dark:bg-dark-cloud/20">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center gap-2 mb-4 md:mb-0">
-            <span className="text-xl font-extrabold text-dragon-green">Tomi</span>
-            <span className="text-xl font-extrabold text-app-orange">Talk</span>
+            <span className="text-xl font-extrabold text-dragon-green">Talking</span>
+            <span className="text-xl font-extrabold text-app-orange">Tots</span>
           </div>
           
           <div className="flex flex-wrap gap-6 justify-center">
@@ -108,7 +105,7 @@ const Index = () => {
           </div>
           
           <div className="mt-4 md:mt-0 text-sm text-muted-foreground">
-            © 2025 Tomi Talk. All rights reserved.
+            © 2025 Talking Tots. All rights reserved.
           </div>
         </div>
       </footer>
