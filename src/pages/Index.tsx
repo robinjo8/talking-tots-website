@@ -1,12 +1,15 @@
-
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import FeatureCard from "@/components/FeatureCard";
 import { Button } from "@/components/ui/button";
 import { Mic, Play, Book, Stars, MessageSquare, Zap, Volume2, Award } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { UserWelcome } from "@/components/auth/UserWelcome";
 
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const { user } = useAuth();
+  
   useEffect(() => {
     setIsVisible(true);
   }, []);
@@ -28,6 +31,9 @@ const Index = () => {
             <p className="text-xl mb-8 text-muted-foreground max-w-xl">
               Tomi Talk otrokom pomaga pri učenju govora skozi igro z našim prijaznim zmajčkom Tomijem. Govorjenje še nikoli ni bilo tako zabavno!
             </p>
+            
+            {user && <div className="mb-6"><UserWelcome /></div>}
+            
             <div className="flex flex-wrap gap-4">
               <Button size="lg" className="bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full">
                 Začni brezplačno

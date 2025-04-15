@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
 export function UserProfile() {
-  const { user, profile } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -19,7 +19,12 @@ export function UserProfile() {
   return (
     <div className="flex items-center gap-4">
       <div className="text-sm">
-        <span className="block font-medium">{profile?.username || user.email}</span>
+        <span 
+          className="block font-medium cursor-pointer hover:text-dragon-green transition-colors"
+          onClick={() => navigate("/profile")}
+        >
+          {profile?.username || user.email}
+        </span>
       </div>
       <Button 
         variant="outline" 
@@ -32,4 +37,3 @@ export function UserProfile() {
     </div>
   );
 }
-
