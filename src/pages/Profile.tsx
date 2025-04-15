@@ -39,7 +39,7 @@ export default function Profile() {
       try {
         const { data, error } = await supabase
           .from('profiles')
-          .select('username, first_name, last_name')
+          .select('username')
           .eq('id', user.id)
           .single();
 
@@ -47,8 +47,6 @@ export default function Profile() {
         
         if (data) {
           setUsername(data.username || "");
-          setFirstName(data.first_name || "");
-          setLastName(data.last_name || "");
         }
       } catch (error) {
         console.error("Napaka pri pridobivanju profila:", error);
@@ -71,8 +69,6 @@ export default function Profile() {
         .from('profiles')
         .update({
           username,
-          first_name: firstName,
-          last_name: lastName,
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
