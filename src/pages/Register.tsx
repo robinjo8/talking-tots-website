@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export default function Register() {
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -21,8 +22,13 @@ export default function Register() {
     e.preventDefault();
     setError(null);
     
-    if (!email || !password || !confirmPassword) {
+    if (!username || !email || !password || !confirmPassword) {
       setError("Prosimo, izpolnite vsa polja.");
+      return;
+    }
+    
+    if (username.length < 3) {
+      setError("Uporabniško ime mora vsebovati vsaj 3 znake.");
       return;
     }
     
@@ -41,6 +47,11 @@ export default function Register() {
       const { error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            username: username
+          }
+        }
       });
       
       if (error) throw error;
@@ -72,6 +83,19 @@ export default function Register() {
         )}
         
         <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="username">Uporabniško ime</Label>
+            <Input
+              id="username"
+              type="text"
+              placeholder="Izberite uporabniško ime"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="rounded-md text-base"
+              required
+            />
+          </div>
+          
           <div className="space-y-2">
             <Label htmlFor="email">E-pošta</Label>
             <Input
@@ -130,3 +154,4 @@ export default function Register() {
     </AuthLayout>
   );
 }
+
