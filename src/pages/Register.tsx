@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Trash2, UserX } from "lucide-react";
+import { Trash2, UserX, ArrowLeft } from "lucide-react";
 import { SpeechDifficultiesStep } from "@/components/SpeechDifficultiesStep";
 import { SpeechDifficultiesList } from "@/components/SpeechDifficultiesList";
 
