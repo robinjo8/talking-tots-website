@@ -88,7 +88,7 @@ export function ProfileSection({
             <div className="mt-6">
               <h3 className="text-xl font-medium mb-4">Otroci</h3>
               
-              <div className="grid grid-cols-1 gap-4 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 {profile?.children && profile.children.length > 0 ? (
                   profile.children.map((child, index) => (
                     <div key={index} className="w-full">
@@ -102,7 +102,7 @@ export function ProfileSection({
                       />
                       
                       {editingChildIndex === index && (
-                        <Card className="mt-2 border-dashed border-app-blue/30 bg-app-blue/5">
+                        <Card className="mt-4 border-dashed border-app-blue/30 bg-app-blue/5">
                           <CardContent className="p-4">
                             <EditChildForm 
                               childIndex={index}

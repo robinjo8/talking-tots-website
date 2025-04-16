@@ -73,109 +73,115 @@ export function ChildProfileCard({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <CardContent className="p-5 flex flex-col gap-5">
-        <div className="flex flex-col md:flex-row md:items-center gap-4">
-          <div className="flex items-center gap-4 flex-grow">
-            {child.avatarId === 0 ? (
-              <div className={`h-20 w-20 rounded-full flex items-center justify-center bg-gray-100 border-2 transition-all duration-300 ${
-                isSelected ? "border-dragon-green animate-pulse" : "border-gray-200"
-              }`}>
-                <UserRound className="h-10 w-10 text-gray-400" />
-              </div>
-            ) : (
-              <Avatar className={`h-20 w-20 border-2 transition-all duration-300 ${
-                isSelected ? "border-dragon-green animate-bounce-gentle" : "border-dragon-green/20"
-              }`}>
-                <AvatarImage 
-                  src={avatarSrc} 
-                  alt={`Avatar za ${child.name}`} 
-                  className="object-contain" 
-                />
-                <AvatarFallback 
-                  className="bg-gradient-to-br from-app-blue/20 to-app-purple/20 text-lg font-bold"
-                >
-                  {child.name[0]}
-                </AvatarFallback>
-              </Avatar>
-            )}
-            
-            <div className="flex-grow">
-              <h4 className={`text-xl font-medium transition-all duration-300 ${
-                isSelected ? "text-dragon-green" : ""
-              }`}>
-                {child.name}
-              </h4>
-              <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
-                <span className={`inline-block w-2 h-2 rounded-full ${
-                  child.gender === "M" ? "bg-app-blue" : 
-                  child.gender === "Ž" ? "bg-app-orange" : 
-                  "bg-gray-400"
-                }`}></span>
-                {formatGender(child.gender)}
-              </p>
+      <CardContent className="p-5 flex flex-col gap-4">
+        {/* Header with avatar, name and gender */}
+        <div className="flex items-center gap-4">
+          {child.avatarId === 0 ? (
+            <div className={`h-20 w-20 rounded-full flex items-center justify-center bg-gray-100 border-2 transition-all duration-300 ${
+              isSelected ? "border-dragon-green animate-pulse" : "border-gray-200"
+            }`}>
+              <UserRound className="h-10 w-10 text-gray-400" />
             </div>
+          ) : (
+            <Avatar className={`h-20 w-20 border-2 transition-all duration-300 ${
+              isSelected ? "border-dragon-green animate-bounce-gentle" : "border-dragon-green/20"
+            }`}>
+              <AvatarImage 
+                src={avatarSrc} 
+                alt={`Avatar za ${child.name}`} 
+                className="object-contain" 
+              />
+              <AvatarFallback 
+                className="bg-gradient-to-br from-app-blue/20 to-app-purple/20 text-lg font-bold"
+              >
+                {child.name[0]}
+              </AvatarFallback>
+            </Avatar>
+          )}
+          
+          <div>
+            <h4 className={`text-xl font-medium transition-all duration-300 ${
+              isSelected ? "text-dragon-green" : ""
+            }`}>
+              {child.name}
+            </h4>
+            <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
+              <span className={`inline-block w-2 h-2 rounded-full ${
+                child.gender === "M" ? "bg-app-blue" : 
+                child.gender === "Ž" ? "bg-app-orange" : 
+                "bg-gray-400"
+              }`}></span>
+              {formatGender(child.gender)}
+            </p>
           </div>
           
-          <div className={`flex items-center gap-2 mt-2 md:mt-0 transition-all duration-300 ${
-            isHovered ? "opacity-100" : "opacity-90"
-          }`}>
-            {isSelected ? (
-              <div className="bg-dragon-green text-white rounded-full p-1.5 animate-scale-in">
-                <Check className="h-5 w-5" />
-              </div>
-            ) : (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={onSelect}
-                className="border-dragon-green text-dragon-green hover:bg-dragon-green/10 hover:text-dragon-green transition-all duration-300 hover:scale-105"
-              >
-                Izberi
-              </Button>
-            )}
-            
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={onEdit}
-              className="border-app-blue text-app-blue hover:bg-app-blue/10 hover:text-app-blue transition-all duration-300 hover:scale-105"
-            >
-              <Pencil className="h-4 w-4 mr-1" />
-              Uredi
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={onDelete}
-              className="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive transition-all duration-300 hover:scale-105"
-            >
-              <Trash2 className="h-4 w-4 mr-1" />
-              Izbriši
-            </Button>
-          </div>
+          {isSelected && (
+            <div className="ml-auto bg-dragon-green text-white rounded-full p-1.5 animate-scale-in">
+              <Check className="h-5 w-5" />
+            </div>
+          )}
         </div>
         
-        <div className="pt-3 border-t border-gray-100">
-          <div className="flex flex-wrap gap-2 mb-3 animate-fade-in">
-            {child.speechDifficulties && child.speechDifficulties.length > 0 ? (
-              <SpeechDifficultiesList difficultiesIds={child.speechDifficulties} />
-            ) : (
-              <Badge variant="outline" className="bg-gray-50 text-gray-600">
-                Ni zabeleženih govornih motenj
-              </Badge>
-            )}
-          </div>
+        {/* Action buttons - vertical layout */}
+        <div className="flex flex-col space-y-2 animate-fade-in">
+          {!isSelected && (
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={onSelect}
+              className="w-full border-dragon-green text-dragon-green hover:bg-dragon-green/10 hover:text-dragon-green transition-all duration-300"
+            >
+              <Check className="h-4 w-4 mr-2" />
+              Izberi
+            </Button>
+          )}
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={onEdit}
+            className="w-full border-app-blue text-app-blue hover:bg-app-blue/10 hover:text-app-blue transition-all duration-300"
+          >
+            <Pencil className="h-4 w-4 mr-2" />
+            Uredi
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={onDelete}
+            className="w-full border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive transition-all duration-300"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Izbriši
+          </Button>
           
           <Button 
             variant="outline" 
             size="sm" 
             onClick={onEditDifficulties}
-            className="w-full mt-2 border-app-purple text-app-purple hover:bg-app-purple/10 hover:text-app-purple transition-all duration-300 hover:scale-105"
+            className="w-full border-app-purple text-app-purple hover:bg-app-purple/10 hover:text-app-purple transition-all duration-300"
           >
             <FileEdit className="h-4 w-4 mr-2" />
-            Uredi govorne motnje
+            Uredi govorne težave
           </Button>
+        </div>
+        
+        {/* Speech difficulties section */}
+        <div className="pt-3 border-t border-gray-100">
+          <h5 className="font-medium text-gray-700 mb-2">Govorne težave</h5>
+          
+          {child.speechDifficulties && child.speechDifficulties.length > 0 ? (
+            <SpeechDifficultiesList 
+              difficultiesIds={child.speechDifficulties} 
+              className="pl-2"
+              showDescription={true}
+            />
+          ) : (
+            <p className="text-gray-500 text-sm italic pl-2">
+              Ni zabeleženih govornih motenj
+            </p>
+          )}
         </div>
       </CardContent>
     </Card>
