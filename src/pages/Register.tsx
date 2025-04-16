@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
@@ -10,10 +9,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Trash2 } from "lucide-react";
+import { Trash2, UserX } from "lucide-react";
 
-// Avatar options for children - updated with new images
 const avatarOptions = [
+  { id: 0, src: "", alt: "Brez avatarja" },
   { id: 1, src: "/lovable-uploads/39972aa5-2794-48d3-b767-cdab94ecc722.png", alt: "Zmajček s srčastimi očali" },
   { id: 2, src: "/lovable-uploads/fa81df29-e699-4465-a715-5a1fad6e4f15.png", alt: "Zmajček s knjigo" },
   { id: 3, src: "/lovable-uploads/f39a5340-2f93-4a66-b538-f734e037b293.png", alt: "Zmajček s slušalkami" },
@@ -31,7 +30,6 @@ const avatarOptions = [
   { id: 15, src: "/lovable-uploads/b701f301-1a69-4474-bfe7-fd2735224aee.png", alt: "Zmajček z žogo" },
 ];
 
-// Child profile interface
 interface ChildProfile {
   id: string;
   name: string;
@@ -48,7 +46,6 @@ export default function Register() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   
-  // State for children profiles
   const [children, setChildren] = useState<ChildProfile[]>([
     { id: crypto.randomUUID(), name: "", gender: "M", avatarId: 1 }
   ]);
@@ -77,7 +74,6 @@ export default function Register() {
       return;
     }
     
-    // Validate children data
     const validChildren = children.filter(child => child.name.trim() !== "");
     if (validChildren.length === 0) {
       setError("Dodajte vsaj enega otroka s podatki.");
@@ -260,21 +256,30 @@ export default function Register() {
                   
                   <div>
                     <Label>Izberi avatarja</Label>
-                    <div className="grid grid-cols-5 gap-3 mt-2">
+                    <div className="grid grid-cols-4 gap-4 mt-3">
                       {avatarOptions.map(avatar => (
                         <div 
                           key={avatar.id}
                           onClick={() => updateChildField(child.id, "avatarId", avatar.id)}
-                          className={`cursor-pointer rounded-lg p-1 transition-all ${
+                          className={`cursor-pointer rounded-lg p-2 transition-all flex items-center justify-center ${
                             child.avatarId === avatar.id 
                               ? 'bg-dragon-green/20 ring-2 ring-dragon-green' 
                               : 'hover:bg-gray-100'
                           }`}
                         >
-                          <Avatar className="h-14 w-14 mx-auto">
-                            <AvatarImage src={avatar.src} alt={avatar.alt} />
-                            <AvatarFallback>{avatar.alt[0]}</AvatarFallback>
-                          </Avatar>
+                          {avatar.id === 0 ? (
+                            <div className="h-[120px] w-[120px] rounded-full flex items-center justify-center bg-gray-100 border border-gray-200">
+                              <UserX className="h-10 w-10 text-gray-400" />
+                              <span className="sr-only">{avatar.alt}</span>
+                            </div>
+                          ) : (
+                            <Avatar className="h-[120px] w-[120px]">
+                              <AvatarImage src={avatar.src} alt={avatar.alt} className="object-contain" />
+                              <AvatarFallback className="text-xs text-center p-1">
+                                {avatar.alt.substring(0, 10)}...
+                              </AvatarFallback>
+                            </Avatar>
+                          )}
                         </div>
                       ))}
                     </div>
