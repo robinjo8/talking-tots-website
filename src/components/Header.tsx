@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -35,9 +34,12 @@ export default function Header() {
       setSelectedChildIndex(index);
       localStorage.setItem('selectedChildIndex', index.toString());
       
-      // If we're on the Moja Stran page, refresh the page to update content
+      // If we're already on the Moja Stran page, refresh the page to update content
       if (location.pathname === '/moja-stran') {
         navigate(0); // This refreshes the current page
+      } else {
+        // Otherwise, navigate to the Moja Stran page
+        navigate('/moja-stran');
       }
     } catch (error) {
       console.error("Napaka pri izbiri otroka:", error);
