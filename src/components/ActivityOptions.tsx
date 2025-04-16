@@ -1,7 +1,16 @@
+
 import { Card, CardHeader, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookText, Gamepad, Zap, Video } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
 export function ActivityOptions() {
+  const navigate = useNavigate();
+  
+  const handleGoToExercises = () => {
+    navigate("/govorno-jezikovne-vaje");
+  };
+  
   return <>
       <h2 className="text-2xl font-bold mb-6 mt-12">Izberi možnost:</h2>
       
@@ -18,7 +27,10 @@ export function ActivityOptions() {
             <p className="mt-2 my-0">Prilagojene aktivnosti za izboljšanje otrokove izgovorjave.</p>
           </CardContent>
           <CardFooter>
-            <Button className="w-full bg-app-blue hover:bg-app-blue/90">
+            <Button 
+              className="w-full bg-app-blue hover:bg-app-blue/90"
+              onClick={handleGoToExercises}
+            >
               Pojdi na vaje
             </Button>
           </CardFooter>

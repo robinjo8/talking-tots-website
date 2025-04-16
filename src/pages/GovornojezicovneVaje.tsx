@@ -5,7 +5,17 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { 
+  ArrowLeft, 
+  Speech, 
+  Clock, 
+  BookText, 
+  Blocks, 
+  Gauge, 
+  RotateCcw, 
+  MessageSquare, 
+  Ear 
+} from "lucide-react";
 import { SPEECH_DIFFICULTIES } from "@/models/SpeechDifficulties";
 
 const GovornojezicovneVaje = () => {
@@ -21,6 +31,18 @@ const GovornojezicovneVaje = () => {
       navigate("/login");
     }
   }, [user, navigate]);
+
+  // Map of difficulty IDs to their corresponding Lucide icons
+  const difficultyIcons = {
+    articulation: <Speech className="h-6 w-6 text-app-blue" />,
+    stuttering: <Clock className="h-6 w-6 text-app-purple" />,
+    vocabulary: <BookText className="h-6 w-6 text-app-orange" />,
+    structure: <Blocks className="h-6 w-6 text-app-teal" />,
+    grammar: <Gauge className="h-6 w-6 text-app-purple" />,
+    endings: <RotateCcw className="h-6 w-6 text-app-yellow" />,
+    word_usage: <MessageSquare className="h-6 w-6 text-app-orange" />,
+    phonological: <Ear className="h-6 w-6 text-dragon-green" />
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -52,7 +74,7 @@ const GovornojezicovneVaje = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           {SPEECH_DIFFICULTIES.map((difficulty) => (
-            <Card key={difficulty.id} className="transition-all duration-300 hover:shadow-md">
+            <Card key={difficulty.id} className="transition-all duration-300 hover:shadow-md cursor-pointer">
               <CardHeader className={`
                 ${difficulty.id === 'articulation' && 'bg-gradient-to-r from-app-blue/10 to-app-teal/10'}
                 ${difficulty.id === 'stuttering' && 'bg-gradient-to-r from-app-purple/10 to-app-blue/10'}
@@ -64,11 +86,11 @@ const GovornojezicovneVaje = () => {
                 ${difficulty.id === 'phonological' && 'bg-gradient-to-r from-dragon-green/10 to-app-teal/10'}
               `}>
                 <CardTitle className="text-xl flex items-start gap-3">
-                  <span className="text-2xl" role="img" aria-label={difficulty.title}>
-                    {difficulty.icon}
+                  <span className="flex items-center justify-center" aria-label={difficulty.title}>
+                    {difficultyIcons[difficulty.id as keyof typeof difficultyIcons]}
                   </span>
                   <div>
-                    {difficulty.title}
+                    {difficulty.title.split('–')[0].trim()}
                   </div>
                 </CardTitle>
               </CardHeader>
