@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
@@ -33,7 +32,6 @@ const MojaStran = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isProfileExpanded, setIsProfileExpanded] = useState(false);
   
-  // If there's no selected child but we have children, select the first one
   useEffect(() => {
     if (profile?.children && profile.children.length > 0 && selectedChildIndex === null) {
       setSelectedChildIndex(0);
@@ -46,7 +44,7 @@ const MojaStran = () => {
 
   const handleEditChild = (index: number) => {
     setEditingChildIndex(index);
-    setIsProfileExpanded(true); // Expand the profile section when editing
+    setIsProfileExpanded(true);
   };
 
   const handleCancelEdit = () => {
@@ -67,11 +65,9 @@ const MojaStran = () => {
       const currentMetadata = currentUser.user_metadata || {};
       const currentChildren = [...(currentMetadata.children || [])];
       
-      // Remove the child at the specified index
       if (deletingChildIndex >= 0 && deletingChildIndex < currentChildren.length) {
         const removedChild = currentChildren.splice(deletingChildIndex, 1);
         
-        // Update user metadata
         const { error: updateError } = await supabase.auth.updateUser({
           data: { children: currentChildren }
         });
@@ -80,11 +76,9 @@ const MojaStran = () => {
         
         toast.success(`Otrok "${removedChild[0]?.name}" je bil uspešno izbrisan.`);
         
-        // If we deleted the selected child, reset selection
         if (selectedChildIndex === deletingChildIndex) {
           setSelectedChildIndex(currentChildren.length > 0 ? 0 : null);
         } 
-        // If we deleted a child before the selected child, adjust the index
         else if (selectedChildIndex !== null && selectedChildIndex > deletingChildIndex) {
           setSelectedChildIndex(selectedChildIndex - 1);
         }
@@ -125,7 +119,6 @@ const MojaStran = () => {
           </h1>
         </div>
         
-        {/* Profile Overview */}
         <Collapsible 
           open={isProfileExpanded} 
           onOpenChange={setIsProfileExpanded}
@@ -171,11 +164,9 @@ const MojaStran = () => {
                   Spremljaj napredek svojega govornega razvoja. Prilagodi vaje glede na starost, težave in cilje.
                 </p>
                 
-                {/* Children Profiles Section */}
                 <div className="mt-6">
                   <h3 className="text-xl font-medium mb-4">Otroci</h3>
                   
-                  {/* Display children profiles */}
                   <div className="grid grid-cols-1 gap-4 mb-6">
                     {profile?.children && profile.children.length > 0 ? (
                       profile.children.map((child, index) => (
@@ -211,7 +202,6 @@ const MojaStran = () => {
                     )}
                   </div>
                   
-                  {/* Add Child Collapsible Section */}
                   <Collapsible
                     open={isAddChildOpen}
                     onOpenChange={setIsAddChildOpen}
@@ -238,7 +228,6 @@ const MojaStran = () => {
           </Card>
         </Collapsible>
         
-        {/* Delete Confirmation Dialog */}
         <AlertDialog open={deletingChildIndex !== null} onOpenChange={(open) => !open && setDeletingChildIndex(null)}>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -264,17 +253,8 @@ const MojaStran = () => {
           </AlertDialogContent>
         </AlertDialog>
         
-        {/* Content for the selected child */}
         {selectedChild ? (
           <>
-            {/* Selected Child Banner */}
-            <div className="bg-dragon-green/10 p-3 rounded-lg mb-8 text-center">
-              <p className="text-dragon-green font-medium">
-                Aktivni profil: <span className="font-bold">{selectedChild.name}</span>
-              </p>
-            </div>
-            
-            {/* My Progress */}
             <Card className="mb-8">
               <CardHeader className="bg-gradient-to-r from-app-yellow/10 to-app-orange/10">
                 <CardTitle className="flex items-center gap-2">
@@ -291,10 +271,7 @@ const MojaStran = () => {
             
             <h2 className="text-2xl font-bold mb-6 mt-12">Izberi možnost:</h2>
             
-            {/* Activity Cards - Now arranged in two rows with proper alignment */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-              {/* First Row */}
-              {/* Speech Exercises Card */}
               <Card className="transition-all duration-300 hover:shadow-md">
                 <CardHeader className="bg-gradient-to-r from-app-blue/10 to-app-teal/10">
                   <CardTitle className="text-xl flex items-center gap-2">
@@ -314,7 +291,6 @@ const MojaStran = () => {
                 </CardFooter>
               </Card>
               
-              {/* Speech Games Card */}
               <Card className="transition-all duration-300 hover:shadow-md">
                 <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-blue/10">
                   <CardTitle className="text-xl flex items-center gap-2">
@@ -334,8 +310,6 @@ const MojaStran = () => {
                 </CardFooter>
               </Card>
               
-              {/* Second Row */}
-              {/* Challenges Card */}
               <Card className="transition-all duration-300 hover:shadow-md h-full flex flex-col">
                 <CardHeader className="bg-gradient-to-r from-app-orange/10 to-app-yellow/10">
                   <CardTitle className="text-xl flex items-center gap-2">
@@ -355,7 +329,6 @@ const MojaStran = () => {
                 </CardFooter>
               </Card>
               
-              {/* Video Instructions Card */}
               <Card className="transition-all duration-300 hover:shadow-md h-full flex flex-col">
                 <CardHeader className="bg-gradient-to-r from-app-teal/10 to-dragon-green/10">
                   <CardTitle className="text-xl flex items-center gap-2">
@@ -376,7 +349,6 @@ const MojaStran = () => {
               </Card>
             </div>
             
-            {/* Dragon Tip */}
             <Card className="mb-8 border-dragon-green/30 bg-gradient-to-r from-dragon-green/5 to-app-blue/5">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -408,7 +380,6 @@ const MojaStran = () => {
           </div>
         )}
         
-        {/* Logout Button */}
         <div className="mt-12 flex flex-col items-center">
           <Button 
             variant="outline" 
@@ -420,7 +391,6 @@ const MojaStran = () => {
           </Button>
         </div>
         
-        {/* Note */}
         <div className="mt-8 text-center text-sm text-muted-foreground">
           <p className="mb-1">Opomba:</p>
           <p>Vse vsebine so prilagojene starosti in težavam otroka.</p>
