@@ -3,8 +3,15 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
+type ChildProfile = {
+  name: string;
+  gender: string;
+  avatarId: number;
+};
+
 type Profile = {
   username: string | null;
+  children?: ChildProfile[];
 };
 
 type AuthContextType = {
@@ -24,7 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUserProfile = async (userId: string) => {
+    const fetchUserProfile = async (userId: string, metadata: any) => {
       try {
         const { data, error } = await supabase
           .from('profiles')
@@ -33,7 +40,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .single();
 
         if (error) throw error;
-        setProfile(data);
+        
+        // Combine database profile with user metadata (which contains children)
+        setProfile({
+          username: data.username,
+          children: metadata?.children || []
+        });
       } catch (error) {
         console.error("Napaka pri pridobivanju profila:", error);
       }
@@ -50,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          fetchUserProfile(session.user.id);
+          fetchUserProfile(session.user.id, session.user.user_metadata);
         }
       } catch (error) {
         console.error("Napaka pri pridobivanju seje:", error);
@@ -64,7 +76,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        fetchUserProfile(session.user.id);
+        fetchUserProfile(session.user.id, session.user.user_metadata);
+      } else {
+        setProfile(null);
       }
       
       setIsLoading(false);
@@ -103,4 +117,3 @@ export const useAuth = () => {
   }
   return context;
 };
-

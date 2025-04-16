@@ -4,12 +4,16 @@ import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookText, Gamepad, Zap, Video, Star, LogOut, MessageSquare } from "lucide-react";
+import { BookText, Gamepad, Zap, Video, Star, LogOut, MessageSquare, Plus, UserRound } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChildProfileCard } from "@/components/ChildProfileCard";
+import { AddChildForm } from "@/components/AddChildForm";
 
 const MojaStran = () => {
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
+  const [isAddChildOpen, setIsAddChildOpen] = useState(false);
   
   const handleSignOut = async () => {
     await signOut();
@@ -36,14 +40,54 @@ const MojaStran = () => {
         <Card className="mb-8">
           <CardHeader className="bg-gradient-to-r from-dragon-green/10 to-app-blue/10">
             <CardTitle className="flex items-center gap-2">
-              <BookText className="h-6 w-6 text-dragon-green" />
+              <UserRound className="h-6 w-6 text-dragon-green" />
               Tvoj profil
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-4">
-            <p className="text-lg">
+            <p className="text-lg mb-6">
               Spremljaj napredek svojega govornega razvoja. Prilagodi vaje glede na starost, težave in cilje.
             </p>
+            
+            {/* Children Profiles Section */}
+            <div className="mt-6">
+              <h3 className="text-xl font-medium mb-4">Otroci</h3>
+              
+              {/* Display children profiles */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                {profile?.children && profile.children.length > 0 ? (
+                  profile.children.map((child, index) => (
+                    <ChildProfileCard key={index} child={child} />
+                  ))
+                ) : (
+                  <p className="col-span-full text-muted-foreground italic">
+                    Trenutno nimate dodanih otrok. Dodajte prvega otroka spodaj.
+                  </p>
+                )}
+              </div>
+              
+              {/* Add Child Collapsible Section */}
+              <Collapsible
+                open={isAddChildOpen}
+                onOpenChange={setIsAddChildOpen}
+                className="w-full border rounded-lg overflow-hidden mt-4"
+              >
+                <CollapsibleTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    className="w-full flex items-center justify-center gap-2 py-2 border-dragon-green text-dragon-green hover:bg-dragon-green/10"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Dodaj otroka
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="p-4 bg-sky-50/50">
+                    <AddChildForm onSuccess={() => setIsAddChildOpen(false)} />
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            </div>
           </CardContent>
         </Card>
         
