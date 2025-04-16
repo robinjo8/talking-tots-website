@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserProfile } from "@/components/auth/UserProfile";
+import { BookText } from "lucide-react";
 
 export default function Header() {
   const { user, signOut } = useAuth();
@@ -32,6 +33,12 @@ export default function Header() {
           <nav className="hidden md:flex gap-6">
             <a href="#features" className="font-medium hover:text-dragon-green transition-colors">Funkcije</a>
             <a href="#cta" className="font-medium hover:text-dragon-green transition-colors">Začni</a>
+            {user && (
+              <Link to="/moja-stran" className="font-medium hover:text-dragon-green transition-colors flex items-center gap-1">
+                <BookText className="h-4 w-4" />
+                Moja stran
+              </Link>
+            )}
           </nav>
           
           {user ? (

@@ -14,6 +14,7 @@ import ResetPassword from "./pages/ResetPassword";
 import UpdatePassword from "./pages/UpdatePassword";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
+import MojaStran from "./pages/MojaStran";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Profile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route 
+                path="/moja-stran" 
+                element={
+                  <ProtectedRoute>
+                    <MojaStran />
                   </ProtectedRoute>
                 }
               />
