@@ -10,6 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserX } from "lucide-react";
 import { SpeechDifficultiesStep } from "./SpeechDifficultiesStep";
+import { SpeechDifficultiesList } from "./SpeechDifficultiesList";
 
 // Avatar options for children
 const avatarOptions = [
@@ -33,7 +34,15 @@ const avatarOptions = [
 
 enum AddChildStep {
   BASIC_INFO,
-  SPEECH_DIFFICULTIES
+  SPEECH_DIFFICULTIES,
+  COMPLETED
+}
+
+interface SavedChild {
+  name: string;
+  gender: string;
+  avatarId: number;
+  speechDifficulties: string[];
 }
 
 export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
@@ -44,6 +53,7 @@ export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
   const [speechDifficulties, setSpeechDifficulties] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState<AddChildStep>(AddChildStep.BASIC_INFO);
+  const [savedChildren, setSavedChildren] = useState<SavedChild[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +75,16 @@ export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
     try {
       setIsSubmitting(true);
       
+      // Save the child's information temporarily
+      const newChild = {
+        name: name.trim(),
+        gender,
+        avatarId,
+        speechDifficulties: difficulties
+      };
+      
+      setSavedChildren(prev => [...prev, newChild]);
+      
       // Get current user metadata
       const { data: userData, error: userError } = await supabase.auth.getUser();
       
@@ -75,13 +95,6 @@ export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
       const currentChildren = currentMetadata.children || [];
       
       // Add new child
-      const newChild = {
-        name: name.trim(),
-        gender,
-        avatarId,
-        speechDifficulties: difficulties
-      };
-      
       const updatedChildren = [...currentChildren, newChild];
       
       // Update user metadata
@@ -92,11 +105,9 @@ export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
       if (updateError) throw updateError;
       
       toast.success("Otrok uspešno dodan!");
-      setName("");
-      setGender("M");
-      setAvatarId(1);
-      setSpeechDifficulties([]);
-      setCurrentStep(AddChildStep.BASIC_INFO);
+      
+      // Reset form and move to completed step
+      setCurrentStep(AddChildStep.COMPLETED);
       
       if (onSuccess) onSuccess();
       
@@ -112,6 +123,74 @@ export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
     setCurrentStep(AddChildStep.BASIC_INFO);
   };
 
+  const startNewChild = () => {
+    setName("");
+    setGender("M");
+    setAvatarId(1);
+    setSpeechDifficulties([]);
+    setCurrentStep(AddChildStep.BASIC_INFO);
+  };
+
+  if (currentStep === AddChildStep.COMPLETED) {
+    const lastChild = savedChildren[savedChildren.length - 1];
+    
+    return (
+      <div className="space-y-6">
+        <h3 className="text-lg font-medium mb-2">Otrok uspešno dodan</h3>
+        
+        <div className="bg-sky-50 p-4 rounded-lg border border-sky-100">
+          <div className="flex items-center gap-3 mb-3">
+            {lastChild.avatarId === 0 ? (
+              <div className="h-16 w-16 rounded-full flex items-center justify-center bg-gray-100">
+                <UserX className="h-8 w-8 text-gray-400" />
+              </div>
+            ) : (
+              <Avatar className="h-16 w-16">
+                <AvatarImage 
+                  src={avatarOptions.find(a => a.id === lastChild.avatarId)?.src} 
+                  alt="Avatar otroka" 
+                />
+                <AvatarFallback>{lastChild.name.charAt(0)}</AvatarFallback>
+              </Avatar>
+            )}
+            <div>
+              <h4 className="font-medium">{lastChild.name}</h4>
+              <p className="text-sm text-gray-600">
+                Spol: {lastChild.gender === "M" ? "Deček" : lastChild.gender === "Ž" ? "Deklica" : "Ni izbrano"}
+              </p>
+            </div>
+          </div>
+          
+          <div className="mt-4">
+            <h5 className="text-sm font-medium mb-2">Izbrane govorne težave:</h5>
+            <SpeechDifficultiesList difficultiesIds={lastChild.speechDifficulties} />
+          </div>
+        </div>
+        
+        <div className="space-y-3 pt-4">
+          <Button
+            type="button"
+            onClick={startNewChild}
+            className="w-full bg-dragon-green hover:bg-dragon-green/90"
+          >
+            Dodaj otroka
+          </Button>
+          
+          {onSuccess && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onSuccess}
+              className="w-full"
+            >
+              Zaključi
+            </Button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   if (currentStep === AddChildStep.SPEECH_DIFFICULTIES) {
     return (
       <SpeechDifficultiesStep
@@ -119,6 +198,7 @@ export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
         onSubmit={handleSpeechDifficultiesSubmit}
         childName={name}
         initialDifficulties={speechDifficulties}
+        submitButtonText="Shrani"
       />
     );
   }

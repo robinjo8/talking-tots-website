@@ -11,13 +11,15 @@ interface SpeechDifficultiesStepProps {
   onSubmit: (selectedDifficulties: string[]) => void;
   childName: string;
   initialDifficulties?: string[];
+  submitButtonText?: string;
 }
 
 export function SpeechDifficultiesStep({ 
   onBack, 
   onSubmit, 
   childName,
-  initialDifficulties = [] 
+  initialDifficulties = [],
+  submitButtonText = "Zaključi registracijo"
 }: SpeechDifficultiesStepProps) {
   const [selectedDifficulties, setSelectedDifficulties] = useState<string[]>(initialDifficulties);
 
@@ -100,7 +102,7 @@ export function SpeechDifficultiesStep({
         onClick={handleSubmit}
         className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6"
       >
-        Zaključi registracijo
+        {submitButtonText}
       </Button>
     </div>
   );
