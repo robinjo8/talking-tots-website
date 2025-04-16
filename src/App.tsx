@@ -15,6 +15,7 @@ import UpdatePassword from "./pages/UpdatePassword";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import MojaStran from "./pages/MojaStran";
+import GovornojezicovneVaje from "./pages/GovornojezicovneVaje";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +57,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <MojaStran />
+                  </ProtectedRoute>
+                }
+              />
+              <Route 
+                path="/govorno-jezikovne-vaje" 
+                element={
+                  <ProtectedRoute>
+                    <GovornojezicovneVaje />
                   </ProtectedRoute>
                 }
               />
