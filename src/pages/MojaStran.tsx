@@ -79,6 +79,11 @@ const MojaStran = () => {
                 Izberi črko, ki jo želiš vaditi (C, Č, K, L, R, S, Š, Z, Ž,...).
               </p>
             </CardContent>
+            <CardFooter>
+              <Button className="w-full bg-app-blue hover:bg-app-blue/90">
+                Pojdi na vaje
+              </Button>
+            </CardFooter>
           </Card>
           
           {/* Speech Games Card */}
@@ -94,6 +99,11 @@ const MojaStran = () => {
                 Zabavne igre za izboljšanje izgovorjave skozi igro.
               </p>
             </CardContent>
+            <CardFooter>
+              <Button className="w-full bg-app-purple hover:bg-app-purple/90">
+                Začni igro
+              </Button>
+            </CardFooter>
           </Card>
           
           {/* Challenges Card */}
@@ -109,6 +119,11 @@ const MojaStran = () => {
                 Izberi, s katero izgovorjavo imaš težave in prejmi prilagojene vaje.
               </p>
             </CardContent>
+            <CardFooter>
+              <Button className="w-full bg-app-orange hover:bg-app-orange/90">
+                Izberi težavo
+              </Button>
+            </CardFooter>
           </Card>
           
           {/* Video Instructions Card */}
@@ -124,23 +139,12 @@ const MojaStran = () => {
                 Poglej, kako logoped pravilno izgovori posamezne črke.
               </p>
             </CardContent>
+            <CardFooter>
+              <Button className="w-full bg-app-teal hover:bg-app-teal/90">
+                Poglej video
+              </Button>
+            </CardFooter>
           </Card>
-        </div>
-        
-        {/* Buttons in horizontal row with adjusted alignment */}
-        <div className="flex flex-wrap justify-between gap-4 mb-12">
-          <Button className="flex-1 bg-app-blue hover:bg-app-blue/90">
-            Pojdi na vaje
-          </Button>
-          <Button className="flex-1 bg-app-purple hover:bg-app-purple/90">
-            Začni igro
-          </Button>
-          <Button className="flex-1 bg-app-orange hover:bg-app-orange/90">
-            Izberi težavo
-          </Button>
-          <Button className="flex-1 bg-app-teal hover:bg-app-teal/90">
-            Poglej video
-          </Button>
         </div>
         
         {/* Dragon Tip */}
@@ -154,7 +158,7 @@ const MojaStran = () => {
           <CardContent className="pt-0 flex items-center gap-6">
             <div className="hidden md:block w-24 h-24">
               <img 
-                src="/lovable-uploads/86cc6967-7553-40e9-955c-92b34053e76a.png" 
+                src="/lovable-uploads/ef9acb7f-a16f-4737-ac7b-fe4bc68c21cd.png" 
                 alt="Tomi the Dragon" 
                 className="w-full h-full object-contain"
               />
