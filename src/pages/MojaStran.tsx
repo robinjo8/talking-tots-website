@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
@@ -9,6 +10,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { ChildProfileCard } from "@/components/ChildProfileCard";
 import { AddChildForm } from "@/components/AddChildForm";
 import { EditChildForm } from "@/components/EditChildForm";
+import { SpeechDifficultyEditor } from "@/components/SpeechDifficultyEditor";
 import { toast } from "sonner";
 import { 
   AlertDialog,
@@ -19,7 +21,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -28,6 +29,7 @@ const MojaStran = () => {
   const navigate = useNavigate();
   const [isAddChildOpen, setIsAddChildOpen] = useState(false);
   const [editingChildIndex, setEditingChildIndex] = useState<number | null>(null);
+  const [editingDifficultiesIndex, setEditingDifficultiesIndex] = useState<number | null>(null);
   const [deletingChildIndex, setDeletingChildIndex] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isProfileExpanded, setIsProfileExpanded] = useState(false);
@@ -44,6 +46,11 @@ const MojaStran = () => {
 
   const handleEditChild = (index: number) => {
     setEditingChildIndex(index);
+    setIsProfileExpanded(true);
+  };
+
+  const handleEditDifficulties = (index: number) => {
+    setEditingDifficultiesIndex(index);
     setIsProfileExpanded(true);
   };
 
@@ -177,6 +184,7 @@ const MojaStran = () => {
                             onSelect={() => handleSelectChild(index)}
                             onEdit={() => handleEditChild(index)}
                             onDelete={() => setDeletingChildIndex(index)}
+                            onEditDifficulties={() => handleEditDifficulties(index)}
                           />
                           
                           {editingChildIndex === index && (
@@ -252,6 +260,17 @@ const MojaStran = () => {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+        
+        {/* Speech Difficulties Editor Dialog */}
+        {editingDifficultiesIndex !== null && profile?.children && (
+          <SpeechDifficultyEditor
+            open={editingDifficultiesIndex !== null}
+            onClose={() => setEditingDifficultiesIndex(null)}
+            childName={profile.children[editingDifficultiesIndex].name}
+            childIndex={editingDifficultiesIndex}
+            initialDifficulties={profile.children[editingDifficultiesIndex].speechDifficulties || []}
+          />
+        )}
         
         {selectedChild ? (
           <>

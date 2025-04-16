@@ -1,5 +1,6 @@
 
 import { SPEECH_DIFFICULTIES } from "@/models/SpeechDifficulties";
+import { Badge } from "@/components/ui/badge";
 
 interface SpeechDifficultiesListProps {
   difficultiesIds: string[];
@@ -25,12 +26,14 @@ export function SpeechDifficultiesList({
   return (
     <div className={`space-y-2 ${className}`}>
       {selectedDifficulties.map(difficulty => (
-        <div key={difficulty.id} className="flex items-start gap-2">
-          <span className="text-xl leading-none">{difficulty.icon}</span>
-          <div>
-            <p className="font-medium text-sm">{difficulty.title}</p>
-          </div>
-        </div>
+        <Badge 
+          key={difficulty.id} 
+          variant="outline" 
+          className="bg-app-purple/10 border-app-purple/30 text-app-purple py-1.5 px-3"
+        >
+          <span className="text-lg mr-1.5">{difficulty.icon}</span>
+          <span>{difficulty.title.split('–')[0].trim()}</span>
+        </Badge>
       ))}
     </div>
   );
