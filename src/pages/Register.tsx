@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
@@ -9,8 +10,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Trash2, Circle } from "lucide-react";
+import { Trash2 } from "lucide-react";
 
+// Avatar options for children - updated with new images
 const avatarOptions = [
   { id: 1, src: "/lovable-uploads/39972aa5-2794-48d3-b767-cdab94ecc722.png", alt: "Zmajček s srčastimi očali" },
   { id: 2, src: "/lovable-uploads/fa81df29-e699-4465-a715-5a1fad6e4f15.png", alt: "Zmajček s knjigo" },
@@ -27,9 +29,9 @@ const avatarOptions = [
   { id: 13, src: "/lovable-uploads/21507abd-a4f2-4d04-b9a8-ffd09a2915d9.png", alt: "Zmajček z očali" },
   { id: 14, src: "/lovable-uploads/f31ff28b-da6d-4077-8763-fe9d77c8dc47.png", alt: "Zmajček z rdečo kapo" },
   { id: 15, src: "/lovable-uploads/b701f301-1a69-4474-bfe7-fd2735224aee.png", alt: "Zmajček z žogo" },
-  { id: 16, src: "", alt: "Ne želim izbrati" },
 ];
 
+// Child profile interface
 interface ChildProfile {
   id: string;
   name: string;
@@ -46,6 +48,7 @@ export default function Register() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   
+  // State for children profiles
   const [children, setChildren] = useState<ChildProfile[]>([
     { id: crypto.randomUUID(), name: "", gender: "M", avatarId: 1 }
   ]);
@@ -74,6 +77,7 @@ export default function Register() {
       return;
     }
     
+    // Validate children data
     const validChildren = children.filter(child => child.name.trim() !== "");
     if (validChildren.length === 0) {
       setError("Dodajte vsaj enega otroka s podatki.");
@@ -249,51 +253,28 @@ export default function Register() {
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="N" id={`gender-n-${child.id}`} />
-                        <Label htmlFor={`gender-n-${child.id}`} className="cursor-pointer">Ne želim izbirati</Label>
+                        <Label htmlFor={`gender-n-${child.id}`} className="cursor-pointer">Ne želim izbrati</Label>
                       </div>
                     </RadioGroup>
                   </div>
                   
                   <div>
-                    <Label className="block mb-2">Izberi avatarja</Label>
-                    <div className="grid grid-cols-4 gap-3">
+                    <Label>Izberi avatarja</Label>
+                    <div className="grid grid-cols-5 gap-3 mt-2">
                       {avatarOptions.map(avatar => (
                         <div 
                           key={avatar.id}
                           onClick={() => updateChildField(child.id, "avatarId", avatar.id)}
-                          className={`relative flex items-center justify-center p-2 cursor-pointer transition-all ${
+                          className={`cursor-pointer rounded-lg p-1 transition-all ${
                             child.avatarId === avatar.id 
-                              ? 'bg-purple-100 scale-105' 
-                              : 'hover:bg-gray-50'
+                              ? 'bg-dragon-green/20 ring-2 ring-dragon-green' 
+                              : 'hover:bg-gray-100'
                           }`}
                         >
-                          <div 
-                            className={`relative rounded-full overflow-hidden border-2 ${
-                              child.avatarId === avatar.id
-                                ? 'border-purple-500 shadow-md'
-                                : 'border-transparent'
-                            }`}
-                          >
-                            {avatar.id === 16 ? (
-                              <div className="flex items-center justify-center h-20 w-20 rounded-full border-2 border-dashed border-gray-300 bg-gray-50">
-                                <Circle className="h-8 w-8 text-gray-400" />
-                              </div>
-                            ) : (
-                              <Avatar className="h-20 w-20">
-                                <AvatarImage 
-                                  src={avatar.src} 
-                                  alt={avatar.alt} 
-                                  className="object-contain aspect-ratio-1/1" 
-                                />
-                                <AvatarFallback>{avatar.alt[0]}</AvatarFallback>
-                              </Avatar>
-                            )}
-                          </div>
-                          {avatar.id === 16 && (
-                            <span className="block text-xs text-center w-full mt-1 text-gray-500">
-                              Ne želim izbrati
-                            </span>
-                          )}
+                          <Avatar className="h-14 w-14 mx-auto">
+                            <AvatarImage src={avatar.src} alt={avatar.alt} />
+                            <AvatarFallback>{avatar.alt[0]}</AvatarFallback>
+                          </Avatar>
                         </div>
                       ))}
                     </div>
