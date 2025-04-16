@@ -1,14 +1,6 @@
 
-import { 
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { Trash2 } from "lucide-react";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 type DeleteChildDialogProps = {
   open: boolean;
@@ -26,27 +18,16 @@ export function DeleteChildDialog({
   onConfirm
 }: DeleteChildDialogProps) {
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Potrdite brisanje otroka</AlertDialogTitle>
-          <AlertDialogDescription>
-            Ali ste prepričani, da želite izbrisati profil otroka
-            {childName ? ` "${childName}"` : ""}? 
-            Tega dejanja ni mogoče razveljaviti.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>Prekliči</AlertDialogCancel>
-          <AlertDialogAction 
-            onClick={onConfirm}
-            disabled={isDeleting}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-          >
-            {isDeleting ? "Brisanje..." : "Izbriši"}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <ConfirmDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Potrdite brisanje otroka"
+      description={`Ali ste prepričani, da želite izbrisati profil otroka${childName ? ` "${childName}"` : ""}? Tega dejanja ni mogoče razveljaviti.`}
+      confirmText={isDeleting ? "Brisanje..." : "Izbriši"}
+      confirmVariant="destructive"
+      confirmIcon={<Trash2 className="h-4 w-4" />}
+      isLoading={isDeleting}
+      onConfirm={onConfirm}
+    />
   );
 }
