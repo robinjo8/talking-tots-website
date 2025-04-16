@@ -13,11 +13,14 @@ export function ActivityOptions() {
           <CardHeader className="bg-gradient-to-r from-app-blue/10 to-app-teal/10">
             <CardTitle className="text-xl flex items-center gap-2">
               <BookText className="h-5 w-5 text-app-blue" />
-              Vaje za govor
+              Govorno-jezikovne vaje
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-4">
-            <p>
+            <p className="text-sm text-muted-foreground italic">
+              Prilagojene aktivnosti za izboljšanje otrokove izgovorjave.
+            </p>
+            <p className="mt-2">
               Izberi črko, ki jo želiš vaditi (C, Č, K, L, R, S, Š, Z, Ž,...).
             </p>
           </CardContent>
