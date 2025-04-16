@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserX } from "lucide-react";
+import { SpeechDifficultiesStep } from "./SpeechDifficultiesStep";
 
 // Avatar options for children
 const avatarOptions = [
@@ -30,12 +31,19 @@ const avatarOptions = [
   { id: 15, src: "/lovable-uploads/b701f301-1a69-4474-bfe7-fd2735224aee.png", alt: "Zmajček z žogo" },
 ];
 
+enum AddChildStep {
+  BASIC_INFO,
+  SPEECH_DIFFICULTIES
+}
+
 export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
   const { user } = useAuth();
   const [name, setName] = useState("");
   const [gender, setGender] = useState("M");
   const [avatarId, setAvatarId] = useState(1);
+  const [speechDifficulties, setSpeechDifficulties] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentStep, setCurrentStep] = useState<AddChildStep>(AddChildStep.BASIC_INFO);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,6 +53,10 @@ export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
       return;
     }
     
+    setCurrentStep(AddChildStep.SPEECH_DIFFICULTIES);
+  };
+
+  const handleSpeechDifficultiesSubmit = async (difficulties: string[]) => {
     if (!user) {
       toast.error("Morate biti prijavljeni za dodajanje otroka.");
       return;
@@ -66,7 +78,8 @@ export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
       const newChild = {
         name: name.trim(),
         gender,
-        avatarId
+        avatarId,
+        speechDifficulties: difficulties
       };
       
       const updatedChildren = [...currentChildren, newChild];
@@ -82,6 +95,8 @@ export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
       setName("");
       setGender("M");
       setAvatarId(1);
+      setSpeechDifficulties([]);
+      setCurrentStep(AddChildStep.BASIC_INFO);
       
       if (onSuccess) onSuccess();
       
@@ -92,6 +107,21 @@ export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
       setIsSubmitting(false);
     }
   };
+
+  const goBackToBasicInfo = () => {
+    setCurrentStep(AddChildStep.BASIC_INFO);
+  };
+
+  if (currentStep === AddChildStep.SPEECH_DIFFICULTIES) {
+    return (
+      <SpeechDifficultiesStep
+        onBack={goBackToBasicInfo}
+        onSubmit={handleSpeechDifficultiesSubmit}
+        childName={name}
+        initialDifficulties={speechDifficulties}
+      />
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -168,9 +198,8 @@ export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
         <Button
           type="submit"
           className="w-full bg-dragon-green hover:bg-dragon-green/90"
-          disabled={isSubmitting}
         >
-          {isSubmitting ? "Shranjevanje..." : "Shrani otroka"}
+          Naprej
         </Button>
       </div>
     </form>

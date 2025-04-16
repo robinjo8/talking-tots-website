@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
@@ -10,6 +11,7 @@ import { toast } from "sonner";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Trash2, UserX } from "lucide-react";
+import { SpeechDifficultiesStep } from "@/components/SpeechDifficultiesStep";
 
 const avatarOptions = [
   { id: 0, src: "", alt: "Brez avatarja" },
@@ -35,6 +37,12 @@ interface ChildProfile {
   name: string;
   gender: string;
   avatarId: number;
+  speechDifficulties?: string[];
+}
+
+enum RegistrationStep {
+  ACCOUNT_INFO,
+  SPEECH_DIFFICULTIES
 }
 
 export default function Register() {
@@ -50,8 +58,10 @@ export default function Register() {
     { id: crypto.randomUUID(), name: "", gender: "M", avatarId: 1 }
   ]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const [currentStep, setCurrentStep] = useState<RegistrationStep>(RegistrationStep.ACCOUNT_INFO);
+  const [selectedChildIndex, setSelectedChildIndex] = useState(0);
+
+  const handleSubmit = async () => {
     setError(null);
     
     if (!username || !email || !password || !confirmPassword) {
@@ -91,7 +101,8 @@ export default function Register() {
             children: validChildren.map(child => ({
               name: child.name,
               gender: child.gender,
-              avatarId: child.avatarId
+              avatarId: child.avatarId,
+              speechDifficulties: child.speechDifficulties || []
             }))
           }
         }
@@ -110,6 +121,67 @@ export default function Register() {
       }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const goToNextStep = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate current step
+    if (currentStep === RegistrationStep.ACCOUNT_INFO) {
+      if (!username || !email || !password || !confirmPassword) {
+        setError("Prosimo, izpolnite vsa obvezna polja.");
+        return;
+      }
+      
+      if (username.length < 3) {
+        setError("Uporabniško ime mora vsebovati vsaj 3 znake.");
+        return;
+      }
+      
+      if (password !== confirmPassword) {
+        setError("Gesli se ne ujemata.");
+        return;
+      }
+      
+      if (password.length < 6) {
+        setError("Geslo mora vsebovati vsaj 6 znakov.");
+        return;
+      }
+      
+      const validChildren = children.filter(child => child.name.trim() !== "");
+      if (validChildren.length === 0) {
+        setError("Dodajte vsaj enega otroka s podatki.");
+        return;
+      }
+      
+      setCurrentStep(RegistrationStep.SPEECH_DIFFICULTIES);
+      setError(null);
+    }
+  };
+
+  const goBack = () => {
+    if (currentStep === RegistrationStep.SPEECH_DIFFICULTIES) {
+      setCurrentStep(RegistrationStep.ACCOUNT_INFO);
+    }
+  };
+
+  const handleSpeechDifficultiesSubmit = (difficulties: string[]) => {
+    // Update the current child's speech difficulties
+    setChildren(prev => 
+      prev.map((child, index) => 
+        index === selectedChildIndex 
+          ? { ...child, speechDifficulties: difficulties } 
+          : child
+      )
+    );
+
+    // If there are more children to process
+    if (selectedChildIndex < children.length - 1) {
+      setSelectedChildIndex(selectedChildIndex + 1);
+    } else {
+      // All children have been processed, register the user
+      handleSubmit();
     }
   };
 
@@ -139,181 +211,193 @@ export default function Register() {
       title="Ustvarite račun" 
       subtitle="Registrirajte se in začnite uporabljati aplikacijo."
     >
-      <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-        {error && (
-          <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-        
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="username">Uporabniško ime</Label>
-            <Input
-              id="username"
-              type="text"
-              placeholder="Izberite uporabniško ime"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="rounded-md text-base"
-              required
-            />
+      {currentStep === RegistrationStep.ACCOUNT_INFO && (
+        <form onSubmit={goToNextStep} className="mt-8 space-y-6">
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">Uporabniško ime</Label>
+              <Input
+                id="username"
+                type="text"
+                placeholder="Izberite uporabniško ime"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="rounded-md text-base"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="email">E-pošta</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="vnesite@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="rounded-md text-base"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password">Geslo</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Ustvarite geslo"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="rounded-md text-base"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Ponovite geslo</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="Potrdite geslo"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="rounded-md text-base"
+                required
+              />
+            </div>
           </div>
           
-          <div className="space-y-2">
-            <Label htmlFor="email">E-pošta</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="vnesite@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="rounded-md text-base"
-              required
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="password">Geslo</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Ustvarite geslo"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="rounded-md text-base"
-              required
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Ponovite geslo</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              placeholder="Potrdite geslo"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="rounded-md text-base"
-              required
-            />
-          </div>
-        </div>
-        
-        <div className="pt-4 border-t">
-          <h3 className="text-lg font-medium mb-4">Podatki o otrocih</h3>
-          
-          <div className="space-y-6">
-            {children.map((child, index) => (
-              <div key={child.id} className="p-4 border rounded-lg bg-sky-50/50">
-                <div className="flex justify-between items-center mb-3">
-                  <h4 className="font-medium">Otrok {index + 1}</h4>
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => removeChild(child.id)}
-                    className="h-8 px-2 text-red-500 hover:text-red-600 hover:bg-red-50"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-                
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor={`child-name-${child.id}`}>Ime otroka</Label>
-                    <Input
-                      id={`child-name-${child.id}`}
-                      value={child.name}
-                      onChange={(e) => updateChildField(child.id, "name", e.target.value)}
-                      placeholder="Vnesite ime otroka"
-                      className="mt-1"
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label>Spol</Label>
-                    <RadioGroup 
-                      value={child.gender} 
-                      onValueChange={(value) => updateChildField(child.id, "gender", value)}
-                      className="flex space-x-4 mt-1"
+          <div className="pt-4 border-t">
+            <h3 className="text-lg font-medium mb-4">Podatki o otrocih</h3>
+            
+            <div className="space-y-6">
+              {children.map((child, index) => (
+                <div key={child.id} className="p-4 border rounded-lg bg-sky-50/50">
+                  <div className="flex justify-between items-center mb-3">
+                    <h4 className="font-medium">Otrok {index + 1}</h4>
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => removeChild(child.id)}
+                      className="h-8 px-2 text-red-500 hover:text-red-600 hover:bg-red-50"
                     >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="M" id={`gender-m-${child.id}`} />
-                        <Label htmlFor={`gender-m-${child.id}`} className="cursor-pointer">M</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="Ž" id={`gender-f-${child.id}`} />
-                        <Label htmlFor={`gender-f-${child.id}`} className="cursor-pointer">Ž</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="N" id={`gender-n-${child.id}`} />
-                        <Label htmlFor={`gender-n-${child.id}`} className="cursor-pointer">Ne želim izbrati</Label>
-                      </div>
-                    </RadioGroup>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                   
-                  <div>
-                    <Label>Izberi avatarja</Label>
-                    <div className="grid grid-cols-4 gap-4 mt-3">
-                      {avatarOptions.map(avatar => (
-                        <div 
-                          key={avatar.id}
-                          onClick={() => updateChildField(child.id, "avatarId", avatar.id)}
-                          className={`cursor-pointer rounded-lg p-2 transition-all flex items-center justify-center ${
-                            child.avatarId === avatar.id 
-                              ? 'bg-dragon-green/20 ring-2 ring-dragon-green' 
-                              : 'hover:bg-gray-100'
-                          }`}
-                        >
-                          {avatar.id === 0 ? (
-                            <div className="h-[120px] w-[120px] rounded-full flex items-center justify-center bg-gray-100 border border-gray-200">
-                              <UserX className="h-10 w-10 text-gray-400" />
-                              <span className="sr-only">{avatar.alt}</span>
-                            </div>
-                          ) : (
-                            <Avatar className="h-[120px] w-[120px]">
-                              <AvatarImage src={avatar.src} alt={avatar.alt} className="object-contain" />
-                              <AvatarFallback className="text-xs text-center p-1">
-                                {avatar.alt.substring(0, 10)}...
-                              </AvatarFallback>
-                            </Avatar>
-                          )}
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor={`child-name-${child.id}`}>Ime otroka</Label>
+                      <Input
+                        id={`child-name-${child.id}`}
+                        value={child.name}
+                        onChange={(e) => updateChildField(child.id, "name", e.target.value)}
+                        placeholder="Vnesite ime otroka"
+                        className="mt-1"
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label>Spol</Label>
+                      <RadioGroup 
+                        value={child.gender} 
+                        onValueChange={(value) => updateChildField(child.id, "gender", value)}
+                        className="flex space-x-4 mt-1"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="M" id={`gender-m-${child.id}`} />
+                          <Label htmlFor={`gender-m-${child.id}`} className="cursor-pointer">M</Label>
                         </div>
-                      ))}
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="Ž" id={`gender-f-${child.id}`} />
+                          <Label htmlFor={`gender-f-${child.id}`} className="cursor-pointer">Ž</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="N" id={`gender-n-${child.id}`} />
+                          <Label htmlFor={`gender-n-${child.id}`} className="cursor-pointer">Ne želim izbrati</Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+                    
+                    <div>
+                      <Label>Izberi avatarja</Label>
+                      <div className="grid grid-cols-4 gap-4 mt-3">
+                        {avatarOptions.map(avatar => (
+                          <div 
+                            key={avatar.id}
+                            onClick={() => updateChildField(child.id, "avatarId", avatar.id)}
+                            className={`cursor-pointer rounded-lg p-2 transition-all flex items-center justify-center ${
+                              child.avatarId === avatar.id 
+                                ? 'bg-dragon-green/20 ring-2 ring-dragon-green' 
+                                : 'hover:bg-gray-100'
+                            }`}
+                          >
+                            {avatar.id === 0 ? (
+                              <div className="h-[120px] w-[120px] rounded-full flex items-center justify-center bg-gray-100 border border-gray-200">
+                                <UserX className="h-10 w-10 text-gray-400" />
+                                <span className="sr-only">{avatar.alt}</span>
+                              </div>
+                            ) : (
+                              <Avatar className="h-[120px] w-[120px]">
+                                <AvatarImage src={avatar.src} alt={avatar.alt} className="object-contain" />
+                                <AvatarFallback className="text-xs text-center p-1">
+                                  {avatar.alt.substring(0, 10)}...
+                                </AvatarFallback>
+                              </Avatar>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            
+            <Button
+              type="button"
+              variant="outline"
+              onClick={addChild}
+              className="mt-4 border-dragon-green text-dragon-green hover:bg-dragon-green/10 w-full"
+            >
+              Dodaj otroka
+            </Button>
           </div>
           
           <Button
-            type="button"
-            variant="outline"
-            onClick={addChild}
-            className="mt-4 border-dragon-green text-dragon-green hover:bg-dragon-green/10 w-full"
+            type="submit"
+            className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6"
           >
-            Dodaj otroka
+            Naprej
           </Button>
+          
+          <div className="text-sm text-center">
+            Že imate račun?{" "}
+            <Link to="/login" className="text-dragon-green hover:underline font-medium">
+              Prijavite se
+            </Link>
+          </div>
+        </form>
+      )}
+
+      {currentStep === RegistrationStep.SPEECH_DIFFICULTIES && (
+        <div className="mt-8">
+          <SpeechDifficultiesStep
+            onBack={goBack}
+            onSubmit={handleSpeechDifficultiesSubmit}
+            childName={children[selectedChildIndex].name}
+            initialDifficulties={children[selectedChildIndex].speechDifficulties}
+          />
         </div>
-        
-        <Button
-          type="submit"
-          className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6"
-          disabled={isLoading}
-        >
-          {isLoading ? "Ustvarjanje računa..." : "Registracija"}
-        </Button>
-        
-        <div className="text-sm text-center">
-          Že imate račun?{" "}
-          <Link to="/login" className="text-dragon-green hover:underline font-medium">
-            Prijavite se
-          </Link>
-        </div>
-      </form>
+      )}
     </AuthLayout>
   );
 }
