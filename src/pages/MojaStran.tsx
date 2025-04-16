@@ -25,20 +25,19 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 
 const MojaStran = () => {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut, selectedChildIndex, setSelectedChildIndex } = useAuth();
   const navigate = useNavigate();
   const [isAddChildOpen, setIsAddChildOpen] = useState(false);
-  const [selectedChildIndex, setSelectedChildIndex] = useState<number | null>(null);
   const [editingChildIndex, setEditingChildIndex] = useState<number | null>(null);
   const [deletingChildIndex, setDeletingChildIndex] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   
-  // Select the first child by default if there are any children
+  // If there's no selected child but we have children, select the first one
   useEffect(() => {
     if (profile?.children && profile.children.length > 0 && selectedChildIndex === null) {
       setSelectedChildIndex(0);
     }
-  }, [profile?.children, selectedChildIndex]);
+  }, [profile?.children, selectedChildIndex, setSelectedChildIndex]);
   
   const selectedChild = selectedChildIndex !== null && profile?.children 
     ? profile.children[selectedChildIndex] 
@@ -98,6 +97,11 @@ const MojaStran = () => {
     }
   };
   
+  const handleSelectChild = (index: number) => {
+    setSelectedChildIndex(index);
+    localStorage.setItem('selectedChildIndex', index.toString());
+  };
+  
   const handleSignOut = async () => {
     await signOut();
     navigate("/login");
@@ -144,7 +148,7 @@ const MojaStran = () => {
                       <ChildProfileCard 
                         child={child} 
                         isSelected={selectedChildIndex === index}
-                        onSelect={() => setSelectedChildIndex(index)}
+                        onSelect={() => handleSelectChild(index)}
                         onEdit={() => handleEditChild(index)}
                         onDelete={() => setDeletingChildIndex(index)}
                       />
@@ -391,4 +395,3 @@ const MojaStran = () => {
 };
 
 export default MojaStran;
-

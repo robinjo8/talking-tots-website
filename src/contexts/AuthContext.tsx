@@ -20,6 +20,8 @@ type AuthContextType = {
   profile: Profile | null;
   isLoading: boolean;
   signOut: () => Promise<void>;
+  selectedChildIndex: number | null;
+  setSelectedChildIndex: (index: number | null) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,6 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedChildIndex, setSelectedChildIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchUserProfile = async (userId: string, metadata: any) => {
@@ -94,6 +97,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
+      setSelectedChildIndex(null);
+      localStorage.removeItem('selectedChildIndex');
     } catch (error) {
       console.error("Napaka pri odjavi:", error);
     }
@@ -105,6 +110,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     profile,
     isLoading,
     signOut,
+    selectedChildIndex,
+    setSelectedChildIndex,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

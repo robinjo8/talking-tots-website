@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -10,35 +11,33 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 
 export default function Header() {
-  const { user, signOut, profile } = useAuth();
+  const { user, signOut, profile, setSelectedChildIndex, selectedChildIndex } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [selectedChildIndex, setSelectedChildIndex] = useState<number | null>(null);
 
-  // Effect to get the selected child from localStorage
+  // Effect to get the selected child from localStorage on initial load
   useEffect(() => {
-    const storedIndex = localStorage.getItem('selectedChildIndex');
-    if (storedIndex !== null) {
-      setSelectedChildIndex(parseInt(storedIndex, 10));
-    } else if (profile?.children && profile.children.length > 0) {
-      setSelectedChildIndex(0);
+    // Only run this if we don't have a selected child index yet
+    if (selectedChildIndex === null && profile?.children && profile.children.length > 0) {
+      const storedIndex = localStorage.getItem('selectedChildIndex');
+      if (storedIndex !== null) {
+        setSelectedChildIndex(parseInt(storedIndex, 10));
+      } else {
+        setSelectedChildIndex(0);
+      }
     }
-  }, [profile?.children]);
-
+  }, [profile?.children, selectedChildIndex, setSelectedChildIndex]);
+  
   // Select active child
   const handleChildSelect = async (index: number) => {
     try {
       setSelectedChildIndex(index);
       localStorage.setItem('selectedChildIndex', index.toString());
       
-      // If we're already on the Moja Stran page, refresh the page to update content
-      if (location.pathname === '/moja-stran') {
-        navigate(0); // This refreshes the current page
-      } else {
-        // Otherwise, navigate to the Moja Stran page
+      // Navigate to Moja Stran if not already there
+      if (location.pathname !== '/moja-stran') {
         navigate('/moja-stran');
       }
     } catch (error) {
