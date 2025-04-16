@@ -15,7 +15,7 @@ export function SpeechDifficultiesList({
 }: SpeechDifficultiesListProps) {
   if (!difficultiesIds || difficultiesIds.length === 0) {
     return showEmpty ? (
-      <p className="text-gray-500 text-sm italic">Ni zabeleženih govornih težav</p>
+      <p className="text-gray-500 text-sm italic">Ni zabeleženih govornih motenj</p>
     ) : null;
   }
 

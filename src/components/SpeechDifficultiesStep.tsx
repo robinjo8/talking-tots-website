@@ -50,7 +50,7 @@ export function SpeechDifficultiesStep({
           <ArrowLeft className="h-4 w-4" />
           Nazaj
         </Button>
-        <h3 className="text-lg font-medium">Izberi govorne težave za {childName}</h3>
+        <h3 className="text-lg font-medium">Izberi govorne motnje za {childName}</h3>
       </div>
 
       <div className="space-y-4">
@@ -92,7 +92,7 @@ export function SpeechDifficultiesStep({
           <p className="font-medium text-amber-800">💡 Opomba za starše:</p>
           <p className="text-sm text-amber-700">
             Če opazite katerega od teh znakov, je priporočljivo posvetovanje z logopedom. 
-            Zgodnje odkrivanje težav omogoča lažje in hitrejše odpravljanje.
+            Zgodnje odkrivanje motenj omogoča lažje in hitrejše odpravljanje.
           </p>
         </div>
       </div>

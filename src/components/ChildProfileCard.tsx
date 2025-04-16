@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -20,7 +19,6 @@ type ChildProfileProps = {
   onEditDifficulties?: () => void;
 };
 
-// Get avatar src by avatarId
 const getAvatarSrc = (avatarId: number): string => {
   const avatarImages = [
     "",
@@ -54,7 +52,6 @@ export function ChildProfileCard({
 }: ChildProfileProps) {
   const avatarSrc = getAvatarSrc(child.avatarId);
   
-  // Format gender display
   const formatGender = (gender: string) => {
     switch (gender) {
       case "M": return "Deček";
@@ -127,15 +124,14 @@ export function ChildProfileCard({
           </div>
         </div>
         
-        {/* Speech difficulties section */}
         {child.speechDifficulties && (
           <div className="pt-2 border-t border-gray-100">
             <div className="flex flex-wrap gap-2 mb-3">
-              {child.speechDifficulties.length > 0 ? (
+              {child.speechDifficulties && child.speechDifficulties.length > 0 ? (
                 <SpeechDifficultiesList difficultiesIds={child.speechDifficulties} />
               ) : (
                 <Badge variant="outline" className="bg-gray-50 text-gray-600">
-                  Ni zabeleženih govornih težav
+                  Ni zabeleženih govornih motenj
                 </Badge>
               )}
             </div>
@@ -148,7 +144,7 @@ export function ChildProfileCard({
                 className="w-full mt-1 border-app-purple text-app-purple hover:bg-app-purple/10 hover:text-app-purple"
               >
                 <FileEdit className="h-4 w-4 mr-2" />
-                Uredi težave
+                Uredi
               </Button>
             )}
           </div>

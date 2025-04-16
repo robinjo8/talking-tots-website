@@ -28,7 +28,7 @@ export function SpeechDifficultyEditor({
   
   const handleSaveDifficulties = async (selectedDifficulties: string[]) => {
     if (!user) {
-      toast.error("Morate biti prijavljeni za urejanje težav.");
+      toast.error("Morate biti prijavljeni za urejanje motenj.");
       return;
     }
     
@@ -58,15 +58,15 @@ export function SpeechDifficultyEditor({
         
         if (updateError) throw updateError;
         
-        toast.success("Govorne težave uspešno posodobljene!");
+        toast.success("Govorne motnje uspešno posodobljene!");
         onClose();
       } else {
-        toast.error("Napaka pri posodobitvi težav. Indeks ni veljaven.");
+        toast.error("Napaka pri posodobitvi motenj. Indeks ni veljaven.");
       }
       
     } catch (error: any) {
-      console.error("Napaka pri posodobitvi težav:", error);
-      toast.error("Napaka pri posodobitvi težav. Poskusite znova.");
+      console.error("Napaka pri posodobitvi motenj:", error);
+      toast.error("Napaka pri posodobitvi motenj. Poskusite znova.");
     } finally {
       setIsSubmitting(false);
     }
@@ -80,7 +80,7 @@ export function SpeechDifficultyEditor({
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">Urejanje govornih težav</DialogTitle>
+          <DialogTitle className="text-xl font-semibold">Urejanje govornih motenj</DialogTitle>
         </DialogHeader>
         
         <div className="py-4">
