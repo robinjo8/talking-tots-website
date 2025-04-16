@@ -44,6 +44,16 @@ const GovornojezicovneVaje = () => {
     phonological: <Ear className="h-6 w-6 text-dragon-green" />
   };
 
+  const handleDifficultySelect = (difficultyId: string) => {
+    // For now, only articulation has exercises implemented
+    if (difficultyId === 'articulation') {
+      navigate('/artikulacija');
+    } else {
+      // For other difficulties, we could show a "coming soon" message
+      alert('Vaje za to težavo bodo na voljo kmalu!');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -74,7 +84,11 @@ const GovornojezicovneVaje = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           {SPEECH_DIFFICULTIES.map((difficulty) => (
-            <Card key={difficulty.id} className="transition-all duration-300 hover:shadow-md cursor-pointer">
+            <Card 
+              key={difficulty.id} 
+              className="transition-all duration-300 hover:shadow-md cursor-pointer"
+              onClick={() => handleDifficultySelect(difficulty.id)}
+            >
               <CardHeader className={`
                 ${difficulty.id === 'articulation' && 'bg-gradient-to-r from-app-blue/10 to-app-teal/10'}
                 ${difficulty.id === 'stuttering' && 'bg-gradient-to-r from-app-purple/10 to-app-blue/10'}

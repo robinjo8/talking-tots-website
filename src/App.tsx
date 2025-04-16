@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import MojaStran from "./pages/MojaStran";
 import GovornojezicovneVaje from "./pages/GovornojezicovneVaje";
+import ArtIzgovorjavaPage from "./pages/ArtIzgovorjavaPage";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +66,22 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <GovornojezicovneVaje />
+                  </ProtectedRoute>
+                }
+              />
+              <Route 
+                path="/artikulacija" 
+                element={
+                  <ProtectedRoute>
+                    <ArtIzgovorjavaPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route 
+                path="/artikulacija/:letter" 
+                element={
+                  <ProtectedRoute>
+                    <ArtIzgovorjavaPage />
                   </ProtectedRoute>
                 }
               />
