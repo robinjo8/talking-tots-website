@@ -1,11 +1,8 @@
-
 import { Card, CardHeader, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookText, Gamepad, Zap, Video } from "lucide-react";
-
 export function ActivityOptions() {
-  return (
-    <>
+  return <>
       <h2 className="text-2xl font-bold mb-6 mt-12">Izberi možnost:</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
@@ -17,12 +14,8 @@ export function ActivityOptions() {
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-4">
-            <p className="text-sm text-muted-foreground italic">
-              Prilagojene aktivnosti za izboljšanje otrokove izgovorjave.
-            </p>
-            <p className="mt-2">
-              Izberi črko, ki jo želiš vaditi (C, Č, K, L, R, S, Š, Z, Ž,...).
-            </p>
+            <p className="text-sm text-muted-foreground italic"></p>
+            <p className="mt-2 my-0">Prilagojene aktivnosti za izboljšanje otrokove izgovorjave.</p>
           </CardContent>
           <CardFooter>
             <Button className="w-full bg-app-blue hover:bg-app-blue/90">
@@ -88,6 +81,5 @@ export function ActivityOptions() {
           </CardFooter>
         </Card>
       </div>
-    </>
-  );
+    </>;
 }
