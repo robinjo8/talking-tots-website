@@ -7,6 +7,7 @@ type ChildProfile = {
   name: string;
   gender: string;
   avatarId: number;
+  speechDifficulties?: string[];
 };
 
 type Profile = {
