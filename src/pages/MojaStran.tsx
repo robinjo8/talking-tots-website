@@ -127,7 +127,7 @@ const MojaStran = () => {
           </Card>
         </div>
         
-        {/* Buttons in horizontal row */}
+        {/* Buttons in horizontal row with adjusted alignment */}
         <div className="flex flex-wrap justify-between gap-4 mb-12">
           <Button className="flex-1 bg-app-blue hover:bg-app-blue/90">
             Pojdi na vaje
@@ -154,7 +154,7 @@ const MojaStran = () => {
           <CardContent className="pt-0 flex items-center gap-6">
             <div className="hidden md:block w-24 h-24">
               <img 
-                src="/lovable-uploads/461b7ed1-89dc-4dac-addb-203752fe6b14.png" 
+                src="/lovable-uploads/de487280-6806-4f96-b5de-8c4e8c59c129.png" 
                 alt="Tomi the Dragon" 
                 className="w-full h-full object-contain"
               />
