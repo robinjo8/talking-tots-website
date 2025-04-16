@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
@@ -119,6 +118,8 @@ const ArtIzgovorjavaPage = () => {
   const currentWords = selectedLetter ? letterPracticeWords[selectedLetter] : [];
   const currentWord = currentWords[currentWordIndex];
   
+  const audioRef = useRef<HTMLAudioElement>(null);
+  
   useEffect(() => {
     if (!user) {
       navigate("/login");
@@ -181,6 +182,17 @@ const ArtIzgovorjavaPage = () => {
       // Exercise complete
       alert("Čestitamo! Zaključil si vse vaje za to črko!");
       // Could navigate to a completion page or back to main page
+    }
+  };
+
+  const handlePlayRozaAudio = () => {
+    const audioUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/audio-besede//Roza.mp3";
+    
+    if (audioRef.current) {
+      audioRef.current.src = audioUrl;
+      audioRef.current.play().catch(error => {
+        console.error("Error playing audio:", error);
+      });
     }
   };
   
@@ -277,6 +289,16 @@ const ArtIzgovorjavaPage = () => {
                     Poslušaj besedo
                   </Button>
                   
+                  {selectedLetter === "R" && (
+                    <Button 
+                      className="bg-dragon-green hover:bg-dragon-green/90 h-14 text-lg"
+                      onClick={handlePlayRozaAudio}
+                    >
+                      <Volume2 className="mr-2 h-5 w-5" />
+                      Poslušaj besedo Roza
+                    </Button>
+                  )}
+                  
                   <Button 
                     className={cn(
                       "bg-app-orange hover:bg-app-orange/90 h-14 text-lg",
@@ -289,6 +311,8 @@ const ArtIzgovorjavaPage = () => {
                     {isRecording ? "Snemam..." : "Ponovi besedo"}
                   </Button>
                 </div>
+                
+                <audio ref={audioRef} />
                 
                 {feedbackMessage && (
                   <div className={cn(
