@@ -154,7 +154,7 @@ const MojaStran = () => {
           <CardContent className="pt-0 flex items-center gap-6">
             <div className="hidden md:block w-24 h-24">
               <img 
-                src="/lovable-uploads/de487280-6806-4f96-b5de-8c4e8c59c129.png" 
+                src="/lovable-uploads/86cc6967-7553-40e9-955c-92b34053e76a.png" 
                 alt="Tomi the Dragon" 
                 className="w-full h-full object-contain"
               />
