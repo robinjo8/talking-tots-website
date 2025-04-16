@@ -64,8 +64,9 @@ const MojaStran = () => {
         
         <h2 className="text-2xl font-bold mb-6 mt-12">Izberi možnost:</h2>
         
-        {/* Activity Cards */}
+        {/* Activity Cards - Now arranged in two rows with proper alignment */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+          {/* First Row */}
           {/* Speech Exercises Card */}
           <Card className="transition-all duration-300 hover:shadow-md">
             <CardHeader className="bg-gradient-to-r from-app-blue/10 to-app-teal/10">
@@ -106,15 +107,16 @@ const MojaStran = () => {
             </CardFooter>
           </Card>
           
+          {/* Second Row */}
           {/* Challenges Card */}
-          <Card className="transition-all duration-300 hover:shadow-md">
+          <Card className="transition-all duration-300 hover:shadow-md h-full flex flex-col">
             <CardHeader className="bg-gradient-to-r from-app-orange/10 to-app-yellow/10">
               <CardTitle className="text-xl flex items-center gap-2">
                 <Zap className="h-5 w-5 text-app-orange" />
                 Moji izzivi
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-4">
+            <CardContent className="pt-4 flex-grow">
               <p>
                 Izberi, s katero izgovorjavo imaš težave in prejmi prilagojene vaje.
               </p>
@@ -127,14 +129,14 @@ const MojaStran = () => {
           </Card>
           
           {/* Video Instructions Card */}
-          <Card className="transition-all duration-300 hover:shadow-md">
+          <Card className="transition-all duration-300 hover:shadow-md h-full flex flex-col">
             <CardHeader className="bg-gradient-to-r from-app-teal/10 to-dragon-green/10">
               <CardTitle className="text-xl flex items-center gap-2">
                 <Video className="h-5 w-5 text-app-teal" />
                 Video navodila
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-4">
+            <CardContent className="pt-4 flex-grow">
               <p>
                 Poglej, kako logoped pravilno izgovori posamezne črke.
               </p>
@@ -158,7 +160,7 @@ const MojaStran = () => {
           <CardContent className="pt-0 flex items-center gap-6">
             <div className="hidden md:block w-24 h-24">
               <img 
-                src="/lovable-uploads/ef9acb7f-a16f-4737-ac7b-fe4bc68c21cd.png" 
+                src="/lovable-uploads/f775878a-4811-4b45-86d5-d27531771d0d.png" 
                 alt="Tomi the Dragon" 
                 className="w-full h-full object-contain"
               />
