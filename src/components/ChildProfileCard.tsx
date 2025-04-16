@@ -1,7 +1,8 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { UserRound } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Check, UserRound } from "lucide-react";
 
 type ChildProfileProps = {
   child: {
@@ -9,6 +10,8 @@ type ChildProfileProps = {
     gender: string;
     avatarId: number;
   };
+  isSelected: boolean;
+  onSelect: () => void;
 };
 
 // Get avatar src by avatarId
@@ -35,7 +38,7 @@ const getAvatarSrc = (avatarId: number): string => {
   return avatarImages[avatarId] || "";
 };
 
-export function ChildProfileCard({ child }: ChildProfileProps) {
+export function ChildProfileCard({ child, isSelected, onSelect }: ChildProfileProps) {
   const avatarSrc = getAvatarSrc(child.avatarId);
   
   // Format gender display
@@ -48,22 +51,43 @@ export function ChildProfileCard({ child }: ChildProfileProps) {
   };
 
   return (
-    <Card className="overflow-hidden border-dragon-green/20 hover:border-dragon-green/50 transition-colors">
+    <Card className={`overflow-hidden transition-colors ${
+      isSelected 
+        ? "border-dragon-green bg-dragon-green/5" 
+        : "border-dragon-green/20 hover:border-dragon-green/50"
+    }`}>
       <CardContent className="p-4 flex items-center gap-4">
         {child.avatarId === 0 ? (
           <div className="h-16 w-16 rounded-full flex items-center justify-center bg-gray-100 border border-gray-200">
             <UserRound className="h-8 w-8 text-gray-400" />
           </div>
         ) : (
-          <Avatar className="h-16 w-16 border border-dragon-green/20">
+          <Avatar className={`h-16 w-16 border ${isSelected ? "border-dragon-green" : "border-dragon-green/20"}`}>
             <AvatarImage src={avatarSrc} alt={`Avatar za ${child.name}`} className="object-contain" />
             <AvatarFallback>{child.name[0]}</AvatarFallback>
           </Avatar>
         )}
         
-        <div>
+        <div className="flex-grow">
           <h4 className="text-lg font-medium">{child.name}</h4>
           <p className="text-sm text-muted-foreground">{formatGender(child.gender)}</p>
+        </div>
+        
+        <div>
+          {isSelected ? (
+            <div className="bg-dragon-green text-white rounded-full p-1">
+              <Check className="h-5 w-5" />
+            </div>
+          ) : (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={onSelect}
+              className="border-dragon-green text-dragon-green hover:bg-dragon-green/10 hover:text-dragon-green"
+            >
+              Izberi
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>
