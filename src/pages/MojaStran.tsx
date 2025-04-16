@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookText, Gamepad, Zap, Video, Star, LogOut, MessageSquare, Plus, UserRound } from "lucide-react";
+import { BookText, Gamepad, Zap, Video, Star, LogOut, MessageSquare, Plus, UserRound, ChevronDown, ChevronUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChildProfileCard } from "@/components/ChildProfileCard";
@@ -31,6 +31,7 @@ const MojaStran = () => {
   const [editingChildIndex, setEditingChildIndex] = useState<number | null>(null);
   const [deletingChildIndex, setDeletingChildIndex] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isProfileExpanded, setIsProfileExpanded] = useState(false);
   
   // If there's no selected child but we have children, select the first one
   useEffect(() => {
@@ -45,6 +46,7 @@ const MojaStran = () => {
 
   const handleEditChild = (index: number) => {
     setEditingChildIndex(index);
+    setIsProfileExpanded(true); // Expand the profile section when editing
   };
 
   const handleCancelEdit = () => {
@@ -124,82 +126,117 @@ const MojaStran = () => {
         </div>
         
         {/* Profile Overview */}
-        <Card className="mb-8">
-          <CardHeader className="bg-gradient-to-r from-dragon-green/10 to-app-blue/10">
-            <CardTitle className="flex items-center gap-2">
-              <UserRound className="h-6 w-6 text-dragon-green" />
-              Tvoj profil
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <p className="text-lg mb-6">
-              Spremljaj napredek svojega govornega razvoja. Prilagodi vaje glede na starost, težave in cilje.
-            </p>
-            
-            {/* Children Profiles Section */}
-            <div className="mt-6">
-              <h3 className="text-xl font-medium mb-4">Otroci</h3>
-              
-              {/* Display children profiles */}
-              <div className="grid grid-cols-1 gap-4 mb-6">
-                {profile?.children && profile.children.length > 0 ? (
-                  profile.children.map((child, index) => (
-                    <div key={index} className="w-full">
-                      <ChildProfileCard 
-                        child={child} 
-                        isSelected={selectedChildIndex === index}
-                        onSelect={() => handleSelectChild(index)}
-                        onEdit={() => handleEditChild(index)}
-                        onDelete={() => setDeletingChildIndex(index)}
-                      />
-                      
-                      {editingChildIndex === index && (
-                        <Card className="mt-2 border-dashed border-app-blue/30 bg-app-blue/5">
-                          <CardContent className="p-4">
-                            <EditChildForm 
-                              childIndex={index}
-                              initialData={child}
-                              onSuccess={() => {
-                                setEditingChildIndex(null);
-                              }}
-                              onCancel={handleCancelEdit}
-                            />
-                          </CardContent>
-                        </Card>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <p className="col-span-full text-muted-foreground italic">
-                    Trenutno nimate dodanih otrok. Dodajte prvega otroka spodaj.
-                  </p>
-                )}
+        <Collapsible 
+          open={isProfileExpanded} 
+          onOpenChange={setIsProfileExpanded}
+          className="mb-8"
+        >
+          <Card>
+            <CardHeader className="bg-gradient-to-r from-dragon-green/10 to-app-blue/10 flex flex-row items-center justify-between">
+              <div className="flex items-center gap-2">
+                <UserRound className="h-6 w-6 text-dragon-green" />
+                <CardTitle>Tvoj profil</CardTitle>
               </div>
-              
-              {/* Add Child Collapsible Section */}
-              <Collapsible
-                open={isAddChildOpen}
-                onOpenChange={setIsAddChildOpen}
-                className="w-full border rounded-lg overflow-hidden mt-4"
-              >
+              <div className="flex items-center gap-4">
+                {selectedChild && (
+                  <div className="text-sm md:text-base font-medium text-dragon-green">
+                    Izbran otrok: <span className="font-bold">{selectedChild.name}</span>
+                  </div>
+                )}
                 <CollapsibleTrigger asChild>
                   <Button 
-                    variant="outline" 
-                    className="w-full flex items-center justify-center gap-2 py-2 border-dragon-green text-dragon-green hover:bg-dragon-green/10"
+                    variant="ghost" 
+                    size="sm" 
+                    className="flex items-center gap-1 text-dragon-green hover:bg-dragon-green/10"
                   >
-                    <Plus className="h-4 w-4" />
-                    Dodaj otroka
+                    {isProfileExpanded ? (
+                      <>
+                        <ChevronUp className="h-4 w-4" />
+                        <span className="hidden md:inline">Skrij podrobnosti</span>
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="h-4 w-4" />
+                        <span className="hidden md:inline">Prikaži podrobnosti</span>
+                      </>
+                    )}
                   </Button>
                 </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <div className="p-4 bg-sky-50/50">
-                    <AddChildForm onSuccess={() => setIsAddChildOpen(false)} />
+              </div>
+            </CardHeader>
+            
+            <CollapsibleContent>
+              <CardContent className="pt-4">
+                <p className="text-lg mb-6">
+                  Spremljaj napredek svojega govornega razvoja. Prilagodi vaje glede na starost, težave in cilje.
+                </p>
+                
+                {/* Children Profiles Section */}
+                <div className="mt-6">
+                  <h3 className="text-xl font-medium mb-4">Otroci</h3>
+                  
+                  {/* Display children profiles */}
+                  <div className="grid grid-cols-1 gap-4 mb-6">
+                    {profile?.children && profile.children.length > 0 ? (
+                      profile.children.map((child, index) => (
+                        <div key={index} className="w-full">
+                          <ChildProfileCard 
+                            child={child} 
+                            isSelected={selectedChildIndex === index}
+                            onSelect={() => handleSelectChild(index)}
+                            onEdit={() => handleEditChild(index)}
+                            onDelete={() => setDeletingChildIndex(index)}
+                          />
+                          
+                          {editingChildIndex === index && (
+                            <Card className="mt-2 border-dashed border-app-blue/30 bg-app-blue/5">
+                              <CardContent className="p-4">
+                                <EditChildForm 
+                                  childIndex={index}
+                                  initialData={child}
+                                  onSuccess={() => {
+                                    setEditingChildIndex(null);
+                                  }}
+                                  onCancel={handleCancelEdit}
+                                />
+                              </CardContent>
+                            </Card>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <p className="col-span-full text-muted-foreground italic">
+                        Trenutno nimate dodanih otrok. Dodajte prvega otroka spodaj.
+                      </p>
+                    )}
                   </div>
-                </CollapsibleContent>
-              </Collapsible>
-            </div>
-          </CardContent>
-        </Card>
+                  
+                  {/* Add Child Collapsible Section */}
+                  <Collapsible
+                    open={isAddChildOpen}
+                    onOpenChange={setIsAddChildOpen}
+                    className="w-full border rounded-lg overflow-hidden mt-4"
+                  >
+                    <CollapsibleTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        className="w-full flex items-center justify-center gap-2 py-2 border-dragon-green text-dragon-green hover:bg-dragon-green/10"
+                      >
+                        <Plus className="h-4 w-4" />
+                        Dodaj otroka
+                      </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="p-4 bg-sky-50/50">
+                        <AddChildForm onSuccess={() => setIsAddChildOpen(false)} />
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
         
         {/* Delete Confirmation Dialog */}
         <AlertDialog open={deletingChildIndex !== null} onOpenChange={(open) => !open && setDeletingChildIndex(null)}>
