@@ -2,7 +2,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Check, UserRound } from "lucide-react";
+import { Check, UserRound, Pencil, Trash2 } from "lucide-react";
 
 type ChildProfileProps = {
   child: {
@@ -12,6 +12,8 @@ type ChildProfileProps = {
   };
   isSelected: boolean;
   onSelect: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
 };
 
 // Get avatar src by avatarId
@@ -38,7 +40,7 @@ const getAvatarSrc = (avatarId: number): string => {
   return avatarImages[avatarId] || "";
 };
 
-export function ChildProfileCard({ child, isSelected, onSelect }: ChildProfileProps) {
+export function ChildProfileCard({ child, isSelected, onSelect, onEdit, onDelete }: ChildProfileProps) {
   const avatarSrc = getAvatarSrc(child.avatarId);
   
   // Format gender display
@@ -56,24 +58,26 @@ export function ChildProfileCard({ child, isSelected, onSelect }: ChildProfilePr
         ? "border-dragon-green bg-dragon-green/5" 
         : "border-dragon-green/20 hover:border-dragon-green/50"
     }`}>
-      <CardContent className="p-4 flex items-center gap-4">
-        {child.avatarId === 0 ? (
-          <div className="h-16 w-16 rounded-full flex items-center justify-center bg-gray-100 border border-gray-200">
-            <UserRound className="h-8 w-8 text-gray-400" />
+      <CardContent className="p-4 flex flex-col md:flex-row md:items-center gap-4">
+        <div className="flex items-center gap-4 flex-grow">
+          {child.avatarId === 0 ? (
+            <div className="h-16 w-16 rounded-full flex items-center justify-center bg-gray-100 border border-gray-200">
+              <UserRound className="h-8 w-8 text-gray-400" />
+            </div>
+          ) : (
+            <Avatar className={`h-16 w-16 border ${isSelected ? "border-dragon-green" : "border-dragon-green/20"}`}>
+              <AvatarImage src={avatarSrc} alt={`Avatar za ${child.name}`} className="object-contain" />
+              <AvatarFallback>{child.name[0]}</AvatarFallback>
+            </Avatar>
+          )}
+          
+          <div className="flex-grow">
+            <h4 className="text-lg font-medium">{child.name}</h4>
+            <p className="text-sm text-muted-foreground">{formatGender(child.gender)}</p>
           </div>
-        ) : (
-          <Avatar className={`h-16 w-16 border ${isSelected ? "border-dragon-green" : "border-dragon-green/20"}`}>
-            <AvatarImage src={avatarSrc} alt={`Avatar za ${child.name}`} className="object-contain" />
-            <AvatarFallback>{child.name[0]}</AvatarFallback>
-          </Avatar>
-        )}
-        
-        <div className="flex-grow">
-          <h4 className="text-lg font-medium">{child.name}</h4>
-          <p className="text-sm text-muted-foreground">{formatGender(child.gender)}</p>
         </div>
         
-        <div>
+        <div className="flex items-center gap-2 mt-2 md:mt-0">
           {isSelected ? (
             <div className="bg-dragon-green text-white rounded-full p-1">
               <Check className="h-5 w-5" />
@@ -88,6 +92,26 @@ export function ChildProfileCard({ child, isSelected, onSelect }: ChildProfilePr
               Izberi
             </Button>
           )}
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={onEdit}
+            className="border-app-blue text-app-blue hover:bg-app-blue/10 hover:text-app-blue"
+          >
+            <Pencil className="h-4 w-4 mr-1" />
+            Uredi
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={onDelete}
+            className="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive"
+          >
+            <Trash2 className="h-4 w-4 mr-1" />
+            Izbriši
+          </Button>
         </div>
       </CardContent>
     </Card>

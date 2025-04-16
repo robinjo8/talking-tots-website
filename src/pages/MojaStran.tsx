@@ -9,13 +9,29 @@ import { useNavigate } from "react-router-dom";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChildProfileCard } from "@/components/ChildProfileCard";
 import { AddChildForm } from "@/components/AddChildForm";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { EditChildForm } from "@/components/EditChildForm";
+import { toast } from "sonner";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { supabase } from "@/integrations/supabase/client";
 
 const MojaStran = () => {
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
   const [isAddChildOpen, setIsAddChildOpen] = useState(false);
   const [selectedChildIndex, setSelectedChildIndex] = useState<number | null>(null);
+  const [editingChildIndex, setEditingChildIndex] = useState<number | null>(null);
+  const [deletingChildIndex, setDeletingChildIndex] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   
   // Select the first child by default if there are any children
   useEffect(() => {
@@ -27,6 +43,60 @@ const MojaStran = () => {
   const selectedChild = selectedChildIndex !== null && profile?.children 
     ? profile.children[selectedChildIndex] 
     : null;
+
+  const handleEditChild = (index: number) => {
+    setEditingChildIndex(index);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingChildIndex(null);
+  };
+
+  const handleDeleteChild = async () => {
+    if (deletingChildIndex === null || !user) return;
+    
+    try {
+      setIsDeleting(true);
+      
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      
+      if (userError) throw userError;
+      
+      const currentUser = userData.user;
+      const currentMetadata = currentUser.user_metadata || {};
+      const currentChildren = [...(currentMetadata.children || [])];
+      
+      // Remove the child at the specified index
+      if (deletingChildIndex >= 0 && deletingChildIndex < currentChildren.length) {
+        const removedChild = currentChildren.splice(deletingChildIndex, 1);
+        
+        // Update user metadata
+        const { error: updateError } = await supabase.auth.updateUser({
+          data: { children: currentChildren }
+        });
+        
+        if (updateError) throw updateError;
+        
+        toast.success(`Otrok "${removedChild[0]?.name}" je bil uspešno izbrisan.`);
+        
+        // If we deleted the selected child, reset selection
+        if (selectedChildIndex === deletingChildIndex) {
+          setSelectedChildIndex(currentChildren.length > 0 ? 0 : null);
+        } 
+        // If we deleted a child before the selected child, adjust the index
+        else if (selectedChildIndex !== null && selectedChildIndex > deletingChildIndex) {
+          setSelectedChildIndex(selectedChildIndex - 1);
+        }
+      }
+      
+    } catch (error: any) {
+      console.error("Napaka pri brisanju otroka:", error);
+      toast.error("Napaka pri brisanju otroka. Poskusite znova.");
+    } finally {
+      setIsDeleting(false);
+      setDeletingChildIndex(null);
+    }
+  };
   
   const handleSignOut = async () => {
     await signOut();
@@ -67,15 +137,33 @@ const MojaStran = () => {
               <h3 className="text-xl font-medium mb-4">Otroci</h3>
               
               {/* Display children profiles */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div className="grid grid-cols-1 gap-4 mb-6">
                 {profile?.children && profile.children.length > 0 ? (
                   profile.children.map((child, index) => (
-                    <ChildProfileCard 
-                      key={index} 
-                      child={child} 
-                      isSelected={selectedChildIndex === index}
-                      onSelect={() => setSelectedChildIndex(index)}
-                    />
+                    <div key={index} className="w-full">
+                      <ChildProfileCard 
+                        child={child} 
+                        isSelected={selectedChildIndex === index}
+                        onSelect={() => setSelectedChildIndex(index)}
+                        onEdit={() => handleEditChild(index)}
+                        onDelete={() => setDeletingChildIndex(index)}
+                      />
+                      
+                      {editingChildIndex === index && (
+                        <Card className="mt-2 border-dashed border-app-blue/30 bg-app-blue/5">
+                          <CardContent className="p-4">
+                            <EditChildForm 
+                              childIndex={index}
+                              initialData={child}
+                              onSuccess={() => {
+                                setEditingChildIndex(null);
+                              }}
+                              onCancel={handleCancelEdit}
+                            />
+                          </CardContent>
+                        </Card>
+                      )}
+                    </div>
                   ))
                 ) : (
                   <p className="col-span-full text-muted-foreground italic">
@@ -108,6 +196,32 @@ const MojaStran = () => {
             </div>
           </CardContent>
         </Card>
+        
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={deletingChildIndex !== null} onOpenChange={(open) => !open && setDeletingChildIndex(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Potrdite brisanje otroka</AlertDialogTitle>
+              <AlertDialogDescription>
+                Ali ste prepričani, da želite izbrisati profil otroka
+                {deletingChildIndex !== null && profile?.children && profile.children[deletingChildIndex] 
+                  ? ` "${profile.children[deletingChildIndex].name}"` 
+                  : ""}? 
+                Tega dejanja ni mogoče razveljaviti.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isDeleting}>Prekliči</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={handleDeleteChild}
+                disabled={isDeleting}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isDeleting ? "Brisanje..." : "Izbriši"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
         
         {/* Content for the selected child */}
         {selectedChild ? (
