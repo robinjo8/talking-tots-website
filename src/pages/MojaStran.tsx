@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
-import { ChildProfileCard } from "@/components/ChildProfileCard";
 import { SpeechDifficultyEditor } from "@/components/SpeechDifficultyEditor";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,6 +13,7 @@ import { TipSection } from "@/components/TipSection";
 import { NoChildSelected } from "@/components/NoChildSelected";
 import { FooterSection } from "@/components/FooterSection";
 import { DeleteChildDialog } from "@/components/DeleteChildDialog";
+import { EditChildModal } from "@/components/EditChildModal";
 
 const MojaStran = () => {
   const { user, profile, signOut, selectedChildIndex, setSelectedChildIndex } = useAuth();
@@ -37,12 +37,10 @@ const MojaStran = () => {
 
   const handleEditChild = (index: number) => {
     setEditingChildIndex(index);
-    setIsProfileExpanded(true);
   };
 
   const handleEditDifficulties = (index: number) => {
     setEditingDifficultiesIndex(index);
-    setIsProfileExpanded(true);
   };
 
   const handleCancelEdit = () => {
@@ -110,6 +108,10 @@ const MojaStran = () => {
     ? profile.children[deletingChildIndex] 
     : undefined;
 
+  const childBeingEdited = editingChildIndex !== null && profile?.children 
+    ? profile.children[editingChildIndex] 
+    : undefined;
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -130,8 +132,6 @@ const MojaStran = () => {
           handleEditChild={handleEditChild}
           handleEditDifficulties={handleEditDifficulties}
           setDeletingChildIndex={setDeletingChildIndex}
-          editingChildIndex={editingChildIndex}
-          handleCancelEdit={handleCancelEdit}
           isAddChildOpen={isAddChildOpen}
           setIsAddChildOpen={setIsAddChildOpen}
           selectedChild={selectedChild}
@@ -144,6 +144,18 @@ const MojaStran = () => {
           isDeleting={isDeleting}
           onConfirm={handleDeleteChild}
         />
+        
+        {/* Edit Child Modal */}
+        {childBeingEdited && (
+          <EditChildModal
+            open={editingChildIndex !== null}
+            onOpenChange={(open) => !open && setEditingChildIndex(null)}
+            childName={childBeingEdited.name}
+            childIndex={editingChildIndex}
+            initialData={childBeingEdited}
+            onSuccess={handleCancelEdit}
+          />
+        )}
         
         {/* Speech Difficulties Editor Dialog */}
         {editingDifficultiesIndex !== null && profile?.children && (

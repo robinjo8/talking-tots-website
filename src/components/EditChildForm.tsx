@@ -92,8 +92,6 @@ export function EditChildForm({ childIndex, initialData, onSuccess, onCancel }: 
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h3 className="text-lg font-medium mb-2">Uredi podatke otroka</h3>
-      
       <div className="space-y-4">
         <div>
           <Label htmlFor="child-name">Ime otroka</Label>

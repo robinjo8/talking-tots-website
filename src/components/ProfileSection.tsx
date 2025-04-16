@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { UserRound, ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChildProfileCard } from "@/components/ChildProfileCard";
-import { EditChildForm } from "@/components/EditChildForm";
 import { AddChildForm } from "@/components/AddChildForm";
 
 type ProfileSectionProps = {
@@ -17,8 +16,6 @@ type ProfileSectionProps = {
   handleEditChild: (index: number) => void;
   handleEditDifficulties: (index: number) => void;
   setDeletingChildIndex: (index: number | null) => void;
-  editingChildIndex: number | null;
-  handleCancelEdit: () => void;
   isAddChildOpen: boolean;
   setIsAddChildOpen: (open: boolean) => void;
   selectedChild: any;
@@ -33,8 +30,6 @@ export function ProfileSection({
   handleEditChild,
   handleEditDifficulties,
   setDeletingChildIndex,
-  editingChildIndex,
-  handleCancelEdit,
   isAddChildOpen,
   setIsAddChildOpen,
   selectedChild,
@@ -100,21 +95,6 @@ export function ProfileSection({
                         onDelete={() => setDeletingChildIndex(index)}
                         onEditDifficulties={() => handleEditDifficulties(index)}
                       />
-                      
-                      {editingChildIndex === index && (
-                        <Card className="mt-4 border-dashed border-app-blue/30 bg-app-blue/5">
-                          <CardContent className="p-4">
-                            <EditChildForm 
-                              childIndex={index}
-                              initialData={child}
-                              onSuccess={() => {
-                                handleCancelEdit();
-                              }}
-                              onCancel={handleCancelEdit}
-                            />
-                          </CardContent>
-                        </Card>
-                      )}
                     </div>
                   ))
                 ) : (
