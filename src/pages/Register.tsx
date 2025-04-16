@@ -256,30 +256,43 @@ export default function Register() {
                   
                   <div>
                     <Label className="block mb-2">Izberi avatarja</Label>
-                    <div className="grid grid-cols-5 gap-4">
+                    <div className="grid grid-cols-4 gap-3">
                       {avatarOptions.map(avatar => (
                         <div 
                           key={avatar.id}
                           onClick={() => updateChildField(child.id, "avatarId", avatar.id)}
-                          className={`cursor-pointer rounded-full p-2 transition-all ${
+                          className={`relative flex items-center justify-center p-2 cursor-pointer transition-all ${
                             child.avatarId === avatar.id 
-                              ? 'bg-purple-100 ring-2 ring-purple-500' 
-                              : 'hover:bg-gray-100'
+                              ? 'bg-purple-100 scale-105' 
+                              : 'hover:bg-gray-50'
                           }`}
                         >
-                          {avatar.id === 16 ? (
-                            <div className="flex items-center justify-center h-24 w-24 rounded-full border-2 border-dashed border-gray-300 bg-gray-50">
-                              <Circle className="h-8 w-8 text-gray-400" />
-                              <span className="sr-only">Ne želim izbrati</span>
-                            </div>
-                          ) : (
-                            <Avatar className="h-24 w-24 mx-auto">
-                              <AvatarImage src={avatar.src} alt={avatar.alt} className="object-cover" />
-                              <AvatarFallback>{avatar.alt[0]}</AvatarFallback>
-                            </Avatar>
-                          )}
+                          <div 
+                            className={`relative rounded-full overflow-hidden border-2 ${
+                              child.avatarId === avatar.id
+                                ? 'border-purple-500 shadow-md'
+                                : 'border-transparent'
+                            }`}
+                          >
+                            {avatar.id === 16 ? (
+                              <div className="flex items-center justify-center h-20 w-20 rounded-full border-2 border-dashed border-gray-300 bg-gray-50">
+                                <Circle className="h-8 w-8 text-gray-400" />
+                              </div>
+                            ) : (
+                              <Avatar className="h-20 w-20">
+                                <AvatarImage 
+                                  src={avatar.src} 
+                                  alt={avatar.alt} 
+                                  className="object-contain aspect-ratio-1/1" 
+                                />
+                                <AvatarFallback>{avatar.alt[0]}</AvatarFallback>
+                              </Avatar>
+                            )}
+                          </div>
                           {avatar.id === 16 && (
-                            <p className="text-xs text-center mt-1 text-gray-500">Ne želim izbrati</p>
+                            <span className="block text-xs text-center w-full mt-1 text-gray-500">
+                              Ne želim izbrati
+                            </span>
                           )}
                         </div>
                       ))}
