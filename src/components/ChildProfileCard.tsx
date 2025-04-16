@@ -16,7 +16,7 @@ type ChildProfileProps = {
   onSelect: () => void;
   onEdit: () => void;
   onDelete: () => void;
-  onEditDifficulties?: () => void;
+  onEditDifficulties: () => void;
 };
 
 const getAvatarSrc = (avatarId: number): string => {
@@ -124,31 +124,27 @@ export function ChildProfileCard({
           </div>
         </div>
         
-        {child.speechDifficulties && (
-          <div className="pt-2 border-t border-gray-100">
-            <div className="flex flex-wrap gap-2 mb-3">
-              {child.speechDifficulties && child.speechDifficulties.length > 0 ? (
-                <SpeechDifficultiesList difficultiesIds={child.speechDifficulties} />
-              ) : (
-                <Badge variant="outline" className="bg-gray-50 text-gray-600">
-                  Ni zabeleženih govornih motenj
-                </Badge>
-              )}
-            </div>
-            
-            {onEditDifficulties && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={onEditDifficulties}
-                className="w-full mt-1 border-app-purple text-app-purple hover:bg-app-purple/10 hover:text-app-purple"
-              >
-                <FileEdit className="h-4 w-4 mr-2" />
-                Uredi
-              </Button>
+        <div className="pt-2 border-t border-gray-100">
+          <div className="flex flex-wrap gap-2 mb-3">
+            {child.speechDifficulties && child.speechDifficulties.length > 0 ? (
+              <SpeechDifficultiesList difficultiesIds={child.speechDifficulties} />
+            ) : (
+              <Badge variant="outline" className="bg-gray-50 text-gray-600">
+                Ni zabeleženih govornih motenj
+              </Badge>
             )}
           </div>
-        )}
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={onEditDifficulties}
+            className="w-full mt-1 border-app-purple text-app-purple hover:bg-app-purple/10 hover:text-app-purple"
+          >
+            <FileEdit className="h-4 w-4 mr-2" />
+            Uredi
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
