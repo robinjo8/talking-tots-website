@@ -226,22 +226,29 @@ const MojaStran = () => {
         {/* Content for the selected child */}
         {selectedChild ? (
           <>
+            {/* Selected Child Banner */}
+            <div className="bg-dragon-green/10 p-3 rounded-lg mb-8 text-center">
+              <p className="text-dragon-green font-medium">
+                Aktivni profil: <span className="font-bold">{selectedChild.name}</span>
+              </p>
+            </div>
+            
             {/* My Progress */}
             <Card className="mb-8">
               <CardHeader className="bg-gradient-to-r from-app-yellow/10 to-app-orange/10">
                 <CardTitle className="flex items-center gap-2">
                   <Star className="h-6 w-6 text-app-orange" />
-                  Moj napredek za {selectedChild.name}
+                  Moj napredek
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
                 <p className="text-lg">
-                  Preglej, kaj je {selectedChild.name} že opravil, koliko zvezdic je zbral in kaj ga še čaka.
+                  Preglej, kaj je že opravljeno, koliko zvezdic je zbranih in kaj še čaka.
                 </p>
               </CardContent>
             </Card>
             
-            <h2 className="text-2xl font-bold mb-6 mt-12">Izberi možnost za {selectedChild.name}:</h2>
+            <h2 className="text-2xl font-bold mb-6 mt-12">Izberi možnost:</h2>
             
             {/* Activity Cards - Now arranged in two rows with proper alignment */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
@@ -256,7 +263,7 @@ const MojaStran = () => {
                 </CardHeader>
                 <CardContent className="pt-4">
                   <p>
-                    Izberi črko, ki jo želi {selectedChild.name} vaditi (C, Č, K, L, R, S, Š, Z, Ž,...).
+                    Izberi črko, ki jo želiš vaditi (C, Č, K, L, R, S, Š, Z, Ž,...).
                   </p>
                 </CardContent>
                 <CardFooter>
@@ -276,7 +283,7 @@ const MojaStran = () => {
                 </CardHeader>
                 <CardContent className="pt-4">
                   <p>
-                    Zabavne igre za izboljšanje izgovorjave za {selectedChild.name}.
+                    Zabavne igre za izboljšanje izgovorjave.
                   </p>
                 </CardContent>
                 <CardFooter>
@@ -297,7 +304,7 @@ const MojaStran = () => {
                 </CardHeader>
                 <CardContent className="pt-4 flex-grow">
                   <p>
-                    Izberi, s katero izgovorjavo ima {selectedChild.name} težave in prejmi prilagojene vaje.
+                    Izberi, s katero izgovorjavo imaš težave in prejmi prilagojene vaje.
                   </p>
                 </CardContent>
                 <CardFooter>
@@ -317,7 +324,7 @@ const MojaStran = () => {
                 </CardHeader>
                 <CardContent className="pt-4 flex-grow">
                   <p>
-                    Pokaži {selectedChild.name}, kako logoped pravilno izgovori posamezne črke.
+                    Poglej kako logoped pravilno izgovori posamezne črke.
                   </p>
                 </CardContent>
                 <CardFooter>
@@ -333,7 +340,7 @@ const MojaStran = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <MessageSquare className="h-5 w-5 text-dragon-green" />
-                  Nasvet zmajčka Tomija za {selectedChild.name}:
+                  Nasvet zmajčka Tomija:
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0 flex items-center gap-6">
@@ -345,7 +352,7 @@ const MojaStran = () => {
                   />
                 </div>
                 <div>
-                  <p className="text-lg mb-2">"Danes poskusi ponoviti črko R vsaj 3-krat! Zmoreš!"</p>
+                  <p className="text-lg mb-2">"{selectedChild.name}, danes poskusi ponoviti črko R vsaj 3-krat! Zmoreš!"</p>
                   <p className="text-sm text-muted-foreground">Vsaka vaja ti prinese točke in zvezdice.</p>
                 </div>
               </CardContent>
@@ -384,3 +391,4 @@ const MojaStran = () => {
 };
 
 export default MojaStran;
+
