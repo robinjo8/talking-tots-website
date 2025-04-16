@@ -1,9 +1,11 @@
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Check, UserRound, Pencil, Trash2, FileEdit } from "lucide-react";
 import { SpeechDifficultiesList } from "@/components/SpeechDifficultiesList";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
 
 type ChildProfileProps = {
   child: {
@@ -51,6 +53,7 @@ export function ChildProfileCard({
   onEditDifficulties 
 }: ChildProfileProps) {
   const avatarSrc = getAvatarSrc(child.avatarId);
+  const [isHovered, setIsHovered] = useState(false);
   
   const formatGender = (gender: string) => {
     switch (gender) {
@@ -61,34 +64,63 @@ export function ChildProfileCard({
   };
 
   return (
-    <Card className={`overflow-hidden transition-colors ${
-      isSelected 
-        ? "border-dragon-green bg-dragon-green/5" 
-        : "border-dragon-green/20 hover:border-dragon-green/50"
-    }`}>
-      <CardContent className="p-4 flex flex-col gap-4">
+    <Card 
+      className={`overflow-hidden transition-all duration-300 shadow-md hover:shadow-lg ${
+        isSelected 
+          ? "border-dragon-green bg-gradient-to-br from-dragon-green/5 to-dragon-green/10" 
+          : "border-dragon-green/20 hover:border-dragon-green/60 bg-white"
+      } rounded-xl`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <CardContent className="p-5 flex flex-col gap-5">
         <div className="flex flex-col md:flex-row md:items-center gap-4">
           <div className="flex items-center gap-4 flex-grow">
             {child.avatarId === 0 ? (
-              <div className="h-16 w-16 rounded-full flex items-center justify-center bg-gray-100 border border-gray-200">
-                <UserRound className="h-8 w-8 text-gray-400" />
+              <div className={`h-20 w-20 rounded-full flex items-center justify-center bg-gray-100 border-2 transition-all duration-300 ${
+                isSelected ? "border-dragon-green animate-pulse" : "border-gray-200"
+              }`}>
+                <UserRound className="h-10 w-10 text-gray-400" />
               </div>
             ) : (
-              <Avatar className={`h-16 w-16 border ${isSelected ? "border-dragon-green" : "border-dragon-green/20"}`}>
-                <AvatarImage src={avatarSrc} alt={`Avatar za ${child.name}`} className="object-contain" />
-                <AvatarFallback>{child.name[0]}</AvatarFallback>
+              <Avatar className={`h-20 w-20 border-2 transition-all duration-300 ${
+                isSelected ? "border-dragon-green animate-bounce-gentle" : "border-dragon-green/20"
+              }`}>
+                <AvatarImage 
+                  src={avatarSrc} 
+                  alt={`Avatar za ${child.name}`} 
+                  className="object-contain" 
+                />
+                <AvatarFallback 
+                  className="bg-gradient-to-br from-app-blue/20 to-app-purple/20 text-lg font-bold"
+                >
+                  {child.name[0]}
+                </AvatarFallback>
               </Avatar>
             )}
             
             <div className="flex-grow">
-              <h4 className="text-lg font-medium">{child.name}</h4>
-              <p className="text-sm text-muted-foreground">{formatGender(child.gender)}</p>
+              <h4 className={`text-xl font-medium transition-all duration-300 ${
+                isSelected ? "text-dragon-green" : ""
+              }`}>
+                {child.name}
+              </h4>
+              <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
+                <span className={`inline-block w-2 h-2 rounded-full ${
+                  child.gender === "M" ? "bg-app-blue" : 
+                  child.gender === "Ž" ? "bg-app-orange" : 
+                  "bg-gray-400"
+                }`}></span>
+                {formatGender(child.gender)}
+              </p>
             </div>
           </div>
           
-          <div className="flex items-center gap-2 mt-2 md:mt-0">
+          <div className={`flex items-center gap-2 mt-2 md:mt-0 transition-all duration-300 ${
+            isHovered ? "opacity-100" : "opacity-90"
+          }`}>
             {isSelected ? (
-              <div className="bg-dragon-green text-white rounded-full p-1">
+              <div className="bg-dragon-green text-white rounded-full p-1.5 animate-scale-in">
                 <Check className="h-5 w-5" />
               </div>
             ) : (
@@ -96,7 +128,7 @@ export function ChildProfileCard({
                 variant="outline" 
                 size="sm" 
                 onClick={onSelect}
-                className="border-dragon-green text-dragon-green hover:bg-dragon-green/10 hover:text-dragon-green"
+                className="border-dragon-green text-dragon-green hover:bg-dragon-green/10 hover:text-dragon-green transition-all duration-300 hover:scale-105"
               >
                 Izberi
               </Button>
@@ -106,7 +138,7 @@ export function ChildProfileCard({
               variant="outline" 
               size="sm" 
               onClick={onEdit}
-              className="border-app-blue text-app-blue hover:bg-app-blue/10 hover:text-app-blue"
+              className="border-app-blue text-app-blue hover:bg-app-blue/10 hover:text-app-blue transition-all duration-300 hover:scale-105"
             >
               <Pencil className="h-4 w-4 mr-1" />
               Uredi
@@ -116,7 +148,7 @@ export function ChildProfileCard({
               variant="outline" 
               size="sm" 
               onClick={onDelete}
-              className="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive"
+              className="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive transition-all duration-300 hover:scale-105"
             >
               <Trash2 className="h-4 w-4 mr-1" />
               Izbriši
@@ -124,8 +156,8 @@ export function ChildProfileCard({
           </div>
         </div>
         
-        <div className="pt-2 border-t border-gray-100">
-          <div className="flex flex-wrap gap-2 mb-3">
+        <div className="pt-3 border-t border-gray-100">
+          <div className="flex flex-wrap gap-2 mb-3 animate-fade-in">
             {child.speechDifficulties && child.speechDifficulties.length > 0 ? (
               <SpeechDifficultiesList difficultiesIds={child.speechDifficulties} />
             ) : (
@@ -139,10 +171,10 @@ export function ChildProfileCard({
             variant="outline" 
             size="sm" 
             onClick={onEditDifficulties}
-            className="w-full mt-1 border-app-purple text-app-purple hover:bg-app-purple/10 hover:text-app-purple"
+            className="w-full mt-2 border-app-purple text-app-purple hover:bg-app-purple/10 hover:text-app-purple transition-all duration-300 hover:scale-105"
           >
             <FileEdit className="h-4 w-4 mr-2" />
-            Uredi
+            Uredi govorne motnje
           </Button>
         </div>
       </CardContent>
