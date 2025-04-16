@@ -8,6 +8,25 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Trash2 } from "lucide-react";
+
+// Avatar options for children
+const avatarOptions = [
+  { id: 1, src: "/lovable-uploads/f775878a-4811-4b45-86d5-d27531771d0d.png", alt: "Zmajček Tomi" },
+  { id: 2, src: "/lovable-uploads/ef9acb7f-a16f-4737-ac7b-fe4bc68c21cd.png", alt: "Modri zmajček" },
+  { id: 3, src: "/lovable-uploads/75eadf45-be56-4374-99dd-e6fbb91bd104.png", alt: "Veseli medvedek" },
+  { id: 4, src: "/lovable-uploads/279957d7-f1bb-45a7-be7c-9e931039eb2c.png", alt: "Panda" },
+];
+
+// Child profile interface
+interface ChildProfile {
+  id: string;
+  name: string;
+  gender: string;
+  avatarId: number;
+}
 
 export default function Register() {
   const [username, setUsername] = useState("");
@@ -17,13 +36,18 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  
+  // State for children profiles
+  const [children, setChildren] = useState<ChildProfile[]>([
+    { id: crypto.randomUUID(), name: "", gender: "M", avatarId: 1 }
+  ]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     
     if (!username || !email || !password || !confirmPassword) {
-      setError("Prosimo, izpolnite vsa polja.");
+      setError("Prosimo, izpolnite vsa obvezna polja.");
       return;
     }
     
@@ -42,6 +66,13 @@ export default function Register() {
       return;
     }
     
+    // Validate children data
+    const validChildren = children.filter(child => child.name.trim() !== "");
+    if (validChildren.length === 0) {
+      setError("Dodajte vsaj enega otroka s podatki.");
+      return;
+    }
+    
     try {
       setIsLoading(true);
       const { error } = await supabase.auth.signUp({
@@ -49,7 +80,12 @@ export default function Register() {
         password,
         options: {
           data: {
-            username: username
+            username: username,
+            children: validChildren.map(child => ({
+              name: child.name,
+              gender: child.gender,
+              avatarId: child.avatarId
+            }))
           }
         }
       });
@@ -68,6 +104,27 @@ export default function Register() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const addChild = () => {
+    setChildren([
+      ...children,
+      { id: crypto.randomUUID(), name: "", gender: "M", avatarId: 1 }
+    ]);
+  };
+
+  const removeChild = (id: string) => {
+    if (children.length > 1) {
+      setChildren(children.filter(child => child.id !== id));
+    } else {
+      toast.error("Potreben je vsaj en otrok.");
+    }
+  };
+
+  const updateChildField = (id: string, field: keyof ChildProfile, value: any) => {
+    setChildren(children.map(child => 
+      child.id === id ? { ...child, [field]: value } : child
+    ));
   };
 
   return (
@@ -136,6 +193,96 @@ export default function Register() {
           </div>
         </div>
         
+        <div className="pt-4 border-t">
+          <h3 className="text-lg font-medium mb-4">Podatki o otrocih</h3>
+          
+          <div className="space-y-6">
+            {children.map((child, index) => (
+              <div key={child.id} className="p-4 border rounded-lg bg-sky-50/50">
+                <div className="flex justify-between items-center mb-3">
+                  <h4 className="font-medium">Otrok {index + 1}</h4>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => removeChild(child.id)}
+                    className="h-8 px-2 text-red-500 hover:text-red-600 hover:bg-red-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor={`child-name-${child.id}`}>Ime otroka</Label>
+                    <Input
+                      id={`child-name-${child.id}`}
+                      value={child.name}
+                      onChange={(e) => updateChildField(child.id, "name", e.target.value)}
+                      placeholder="Vnesite ime otroka"
+                      className="mt-1"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label>Spol</Label>
+                    <RadioGroup 
+                      value={child.gender} 
+                      onValueChange={(value) => updateChildField(child.id, "gender", value)}
+                      className="flex space-x-4 mt-1"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="M" id={`gender-m-${child.id}`} />
+                        <Label htmlFor={`gender-m-${child.id}`} className="cursor-pointer">M</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Ž" id={`gender-f-${child.id}`} />
+                        <Label htmlFor={`gender-f-${child.id}`} className="cursor-pointer">Ž</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="N" id={`gender-n-${child.id}`} />
+                        <Label htmlFor={`gender-n-${child.id}`} className="cursor-pointer">Ne želim izbrati</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                  
+                  <div>
+                    <Label>Izberi avatarja</Label>
+                    <div className="grid grid-cols-4 gap-3 mt-2">
+                      {avatarOptions.map(avatar => (
+                        <div 
+                          key={avatar.id}
+                          onClick={() => updateChildField(child.id, "avatarId", avatar.id)}
+                          className={`cursor-pointer rounded-lg p-1 transition-all ${
+                            child.avatarId === avatar.id 
+                              ? 'bg-dragon-green/20 ring-2 ring-dragon-green' 
+                              : 'hover:bg-gray-100'
+                          }`}
+                        >
+                          <Avatar className="h-16 w-16 mx-auto">
+                            <AvatarImage src={avatar.src} alt={avatar.alt} />
+                            <AvatarFallback>{avatar.alt[0]}</AvatarFallback>
+                          </Avatar>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <Button
+            type="button"
+            variant="outline"
+            onClick={addChild}
+            className="mt-4 border-dragon-green text-dragon-green hover:bg-dragon-green/10 w-full"
+          >
+            Dodaj otroka
+          </Button>
+        </div>
+        
         <Button
           type="submit"
           className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6"
@@ -154,4 +301,3 @@ export default function Register() {
     </AuthLayout>
   );
 }
-
