@@ -1,18 +1,57 @@
 
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserProfile } from "@/components/auth/UserProfile";
-import { BookText } from "lucide-react";
+import { BookText, ChevronDown, UserRound } from "lucide-react";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Header() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, profile } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [selectedChildIndex, setSelectedChildIndex] = useState<number | null>(null);
+
+  // Effect to get the selected child from localStorage
+  useEffect(() => {
+    const storedIndex = localStorage.getItem('selectedChildIndex');
+    if (storedIndex !== null) {
+      setSelectedChildIndex(parseInt(storedIndex, 10));
+    } else if (profile?.children && profile.children.length > 0) {
+      setSelectedChildIndex(0);
+    }
+  }, [profile?.children]);
+
+  // Select active child
+  const handleChildSelect = async (index: number) => {
+    try {
+      setSelectedChildIndex(index);
+      localStorage.setItem('selectedChildIndex', index.toString());
+      
+      // If we're on the Moja Stran page, refresh the page to update content
+      if (location.pathname === '/moja-stran') {
+        navigate(0); // This refreshes the current page
+      }
+    } catch (error) {
+      console.error("Napaka pri izbiri otroka:", error);
+    }
+  };
 
   const handleSignOut = async () => {
     await signOut();
     navigate("/login");
   };
+
+  const selectedChild = selectedChildIndex !== null && profile?.children 
+    ? profile.children[selectedChildIndex] 
+    : null;
 
   return (
     <header className="py-4 px-6 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
@@ -40,6 +79,33 @@ export default function Header() {
               </Link>
             )}
           </nav>
+          
+          {user && profile?.children && profile.children.length > 0 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="mr-2 text-sm border-dragon-green/30 bg-dragon-green/5 text-dragon-green hover:bg-dragon-green/10 hover:text-dragon-green flex items-center gap-1"
+                >
+                  <UserRound className="h-3.5 w-3.5 mr-1" />
+                  {selectedChild ? selectedChild.name : "Izberi otroka"}
+                  <ChevronDown className="h-3.5 w-3.5 ml-1 opacity-70" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 bg-white">
+                {profile.children.map((child, index) => (
+                  <DropdownMenuItem 
+                    key={index}
+                    className={`cursor-pointer ${selectedChildIndex === index ? 'bg-dragon-green/10 font-medium text-dragon-green' : ''}`}
+                    onClick={() => handleChildSelect(index)}
+                  >
+                    {child.name}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
           
           {user ? (
             <UserProfile />
