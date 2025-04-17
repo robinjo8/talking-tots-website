@@ -20,7 +20,7 @@ import {
   LogOut, 
   BookText, 
   Play, 
-  Function, 
+  Sparkles, 
   ChevronDown, 
   ChevronUp 
 } from "lucide-react";
@@ -75,7 +75,7 @@ export function AppSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <a href="#features" className="flex items-center gap-2">
-                    <Function className="h-4 w-4" />
+                    <Sparkles className="h-4 w-4" />
                     <span>Funkcije</span>
                   </a>
                 </SidebarMenuButton>
