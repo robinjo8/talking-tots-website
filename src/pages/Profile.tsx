@@ -12,6 +12,7 @@ import { SpeechDifficultyEditor } from "@/components/SpeechDifficultyEditor";
 import { UserProfileSection } from "@/components/profile/UserProfileSection";
 import { PasswordChangeSection } from "@/components/profile/PasswordChangeSection";
 import { ChildrenProfilesSection } from "@/components/profile/ChildrenProfilesSection";
+import { PersonalDataSection } from "@/components/profile/PersonalDataSection";
 
 export default function Profile() {
   const { user, profile, selectedChildIndex, setSelectedChildIndex } = useAuth();
@@ -19,6 +20,7 @@ export default function Profile() {
   
   // Section UI state
   const [isUserProfileExpanded, setIsUserProfileExpanded] = useState(false);
+  const [isPersonalDataExpanded, setIsPersonalDataExpanded] = useState(true);
   const [isChildrenSectionExpanded, setIsChildrenSectionExpanded] = useState(false);
   
   // Child profile management state
@@ -107,6 +109,12 @@ export default function Profile() {
           <UserProfileSection 
             isExpanded={isUserProfileExpanded}
             setIsExpanded={setIsUserProfileExpanded}
+          />
+          
+          {/* Personal Data Section (NEW) */}
+          <PersonalDataSection
+            isExpanded={isPersonalDataExpanded}
+            setIsExpanded={setIsPersonalDataExpanded}
           />
           
           {/* Password Change Section */}
