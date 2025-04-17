@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -43,8 +44,8 @@ export default function Header() {
           {isMobile ? (
             <div className="flex items-center gap-4">
               {selectedChild && (
-                <div className="text-sm text-muted-foreground">
-                  Aktivni profil: <span className="font-medium text-dragon-green">{selectedChild.name}</span>
+                <div className="text-xs text-muted-foreground bg-light-cloud dark:bg-dark-cloud px-3 py-1 rounded-full truncate max-w-[150px]">
+                  Aktivni profil: <span className="font-medium text-dragon-green ml-1">{selectedChild.name}</span>
                 </div>
               )}
               
@@ -90,3 +91,4 @@ export default function Header() {
     </header>
   );
 }
+
