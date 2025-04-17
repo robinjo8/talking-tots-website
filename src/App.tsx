@@ -7,7 +7,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { AppLayout } from "@/components/AppLayout";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -31,7 +30,7 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               {/* Public routes */}
-              <Route path="/" element={<AppLayout><Index /></AppLayout>} />
+              <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/reset-password" element={<ResetPassword />} />
@@ -42,7 +41,7 @@ const App = () => (
                 path="/dashboard" 
                 element={
                   <ProtectedRoute>
-                    <AppLayout><Index /></AppLayout>
+                    <Index />
                   </ProtectedRoute>
                 }
               />
@@ -50,7 +49,7 @@ const App = () => (
                 path="/profile" 
                 element={
                   <ProtectedRoute>
-                    <AppLayout><Profile /></AppLayout>
+                    <Profile />
                   </ProtectedRoute>
                 }
               />
@@ -58,7 +57,7 @@ const App = () => (
                 path="/moja-stran" 
                 element={
                   <ProtectedRoute>
-                    <AppLayout><MojaStran /></AppLayout>
+                    <MojaStran />
                   </ProtectedRoute>
                 }
               />
@@ -66,7 +65,7 @@ const App = () => (
                 path="/govorno-jezikovne-vaje" 
                 element={
                   <ProtectedRoute>
-                    <AppLayout><GovornojezicovneVaje /></AppLayout>
+                    <GovornojezicovneVaje />
                   </ProtectedRoute>
                 }
               />
@@ -74,7 +73,7 @@ const App = () => (
                 path="/artikulacija" 
                 element={
                   <ProtectedRoute>
-                    <AppLayout><ArtIzgovorjavaPage /></AppLayout>
+                    <ArtIzgovorjavaPage />
                   </ProtectedRoute>
                 }
               />
@@ -82,7 +81,7 @@ const App = () => (
                 path="/artikulacija/:letter" 
                 element={
                   <ProtectedRoute>
-                    <AppLayout><ArtIzgovorjavaPage /></AppLayout>
+                    <ArtIzgovorjavaPage />
                   </ProtectedRoute>
                 }
               />
