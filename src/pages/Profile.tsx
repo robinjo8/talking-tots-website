@@ -12,15 +12,13 @@ import { SpeechDifficultyEditor } from "@/components/SpeechDifficultyEditor";
 import { UserProfileSection } from "@/components/profile/UserProfileSection";
 import { PasswordChangeSection } from "@/components/profile/PasswordChangeSection";
 import { ChildrenProfilesSection } from "@/components/profile/ChildrenProfilesSection";
-import { PersonalDataSection } from "@/components/profile/PersonalDataSection";
 
 export default function Profile() {
   const { user, profile, selectedChildIndex, setSelectedChildIndex } = useAuth();
   const navigate = useNavigate();
   
   // Section UI state
-  const [isUserProfileExpanded, setIsUserProfileExpanded] = useState(false);
-  const [isPersonalDataExpanded, setIsPersonalDataExpanded] = useState(true);
+  const [isUserProfileExpanded, setIsUserProfileExpanded] = useState(true);
   const [isChildrenSectionExpanded, setIsChildrenSectionExpanded] = useState(false);
   
   // Child profile management state
@@ -105,16 +103,10 @@ export default function Profile() {
         </h1>
         
         <div className="grid gap-8">
-          {/* User Profile Section */}
+          {/* User Profile Section (now combined with Personal Data) */}
           <UserProfileSection 
             isExpanded={isUserProfileExpanded}
             setIsExpanded={setIsUserProfileExpanded}
-          />
-          
-          {/* Personal Data Section (NEW) */}
-          <PersonalDataSection
-            isExpanded={isPersonalDataExpanded}
-            setIsExpanded={setIsPersonalDataExpanded}
           />
           
           {/* Password Change Section */}
