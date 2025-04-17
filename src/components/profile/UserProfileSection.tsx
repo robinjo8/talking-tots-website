@@ -139,7 +139,7 @@ export function UserProfileSection({ isExpanded, setIsExpanded }: UserProfileSec
         <CardHeader className="bg-gradient-to-r from-dragon-green/10 to-app-blue/10 flex flex-row items-center justify-between">
           <div className="flex items-center gap-2">
             <User className="h-5 w-5 text-dragon-green" />
-            <CardTitle>Moj profil</CardTitle>
+            <CardTitle>Nastavitve</CardTitle>
           </div>
           <CollapsibleTrigger asChild>
             <Button 

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -98,7 +97,6 @@ export function SubscriptionSection() {
                   <h3 className="text-xl font-bold text-center">Letna naročnina</h3>
                   <div className="text-center mt-4">
                     <p className="text-2xl font-bold text-dragon-green">9,90 € <span className="text-sm font-normal">/ mesec</span></p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">(skupaj 118,80 €)</p>
                   </div>
                 </div>
                 <CardContent className="p-4">
@@ -135,7 +133,6 @@ export function SubscriptionSection() {
                   <h3 className="text-xl font-bold text-center">Mesečna naročnina</h3>
                   <div className="text-center mt-4">
                     <p className="text-2xl font-bold">19,90 € <span className="text-sm font-normal">/ mesec</span></p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">&nbsp;</p>
                   </div>
                 </div>
                 <CardContent className="p-4">

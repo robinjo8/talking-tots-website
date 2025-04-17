@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,6 +12,7 @@ import { UserProfileSection } from "@/components/profile/UserProfileSection";
 import { PasswordChangeSection } from "@/components/profile/PasswordChangeSection";
 import { ChildrenProfilesSection } from "@/components/profile/ChildrenProfilesSection";
 import { SubscriptionSection } from "@/components/profile/SubscriptionSection";
+import { PaymentMethodsSection } from "@/components/profile/PaymentMethodsSection";
 
 export default function Profile() {
   const { user, profile, selectedChildIndex, setSelectedChildIndex } = useAuth();
@@ -104,17 +104,11 @@ export default function Profile() {
         </h1>
         
         <div className="grid gap-8">
-          {/* User Profile Section */}
+          {/* User Profile Section (renamed to Nastavitve) */}
           <UserProfileSection 
             isExpanded={isUserProfileExpanded}
             setIsExpanded={setIsUserProfileExpanded}
           />
-          
-          {/* Password Change Section */}
-          <PasswordChangeSection />
-          
-          {/* Subscription Section */}
-          <SubscriptionSection />
           
           {/* Children Profiles Section */}
           <ChildrenProfilesSection 
@@ -124,6 +118,15 @@ export default function Profile() {
             setDeletingChildIndex={setDeletingChildIndex}
             setEditingDifficultiesIndex={setEditingDifficultiesIndex}
           />
+          
+          {/* Subscription Section */}
+          <SubscriptionSection />
+          
+          {/* Payment Methods Section (new) */}
+          <PaymentMethodsSection />
+          
+          {/* Password Change Section */}
+          <PasswordChangeSection />
         </div>
         
         {/* Dialogs and Modals */}
