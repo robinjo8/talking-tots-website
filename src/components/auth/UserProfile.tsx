@@ -44,6 +44,10 @@ export function UserProfile() {
     localStorage.removeItem('selectedChildIndex');
   };
 
+  const handleGoToProfile = () => {
+    navigate("/profile");
+  };
+
   if (!user) {
     return null;
   }
@@ -79,7 +83,7 @@ export function UserProfile() {
               className={`flex items-center gap-2 p-2 rounded-md cursor-pointer ${
                 selectedChildIndex === null ? 'bg-dragon-green/10 text-dragon-green' : 'hover:bg-muted'
               }`}
-              onClick={handleSelectParent}
+              onClick={handleGoToProfile}
             >
               <User className="h-4 w-4" />
               <div className="flex-1">
