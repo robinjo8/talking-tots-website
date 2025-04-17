@@ -1,6 +1,6 @@
 
 import { ReactNode, useEffect } from "react";
-import { SidebarProvider, SidebarInset, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarInset, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useLocation } from "react-router-dom";
@@ -23,7 +23,9 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
   return (
     <div className="flex min-h-screen w-full">
-      <AppSidebar />
+      {/* Only render the sidebar component on mobile */}
+      {isMobile && <AppSidebar />}
+      
       <SidebarInset>
         <div className="relative flex-1 flex flex-col">
           {children}

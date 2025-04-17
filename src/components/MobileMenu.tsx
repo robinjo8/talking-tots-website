@@ -8,7 +8,7 @@ interface MobileMenuProps {
 export function MobileMenu({ onItemClick }: MobileMenuProps) {
   return (
     <div className="px-4 py-6 h-[80vh] flex flex-col">
-      <AppSidebar />
+      <AppSidebar isMobileMenu={true} />
     </div>
   );
 }

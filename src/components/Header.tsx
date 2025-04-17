@@ -4,7 +4,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserProfile } from "@/components/auth/UserProfile";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+import { useSidebar } from "@/components/ui/sidebar";
 
 export default function Header() {
   const { user, profile, selectedChildIndex } = useAuth();
@@ -51,7 +51,7 @@ export default function Header() {
             </div>
           ) : (
             <>
-              <nav className="flex gap-6">
+              <nav className="flex items-center gap-6">
                 <a href="#features" className="font-medium hover:text-dragon-green transition-colors">Funkcije</a>
                 <a href="#cta" className="font-medium hover:text-dragon-green transition-colors">Začni</a>
                 {user && (
@@ -59,19 +59,19 @@ export default function Header() {
                     Moja stran
                   </Link>
                 )}
+                
+                {user ? (
+                  <UserProfile />
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Link to="/login">
+                      <Button variant="outline" size="sm" className="text-sm">
+                        Prijava
+                      </Button>
+                    </Link>
+                  </div>
+                )}
               </nav>
-              
-              {user ? (
-                <UserProfile />
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Link to="/login">
-                    <Button variant="outline" size="sm" className="text-sm">
-                      Prijava
-                    </Button>
-                  </Link>
-                </div>
-              )}
             </>
           )}
         </div>
