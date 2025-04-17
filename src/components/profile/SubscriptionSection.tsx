@@ -1,20 +1,18 @@
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CircleDollarSign, ChevronDown, ChevronUp } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { 
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from "@/components/ui/table";
-import { useState } from "react";
+import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
 
 export function SubscriptionSection() {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const handleSubscribe = (plan: string) => {
+    toast.info(`Izbran paket: ${plan}. Funkcionalnost naročanja še ni implementirana.`);
+  };
 
   return (
     <Collapsible open={isExpanded} onOpenChange={setIsExpanded} className="w-full">
@@ -46,101 +44,108 @@ export function SubscriptionSection() {
         </CardHeader>
         
         <CollapsibleContent>
-          <CardContent className="p-4">
-            <p className="text-lg mb-6">
-              Izberite paket, ki najbolj ustreza vašim potrebam. Primerjajte funkcije in cene naših paketov.
-            </p>
+          <CardContent className="p-6">
+            <h2 className="text-2xl font-bold text-center mb-8">Naročniški paketi</h2>
             
             <div className="overflow-x-auto">
-              <Table className="border-collapse w-full">
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-1/4">Lastnost</TableHead>
-                    <TableHead className="w-1/4 text-center">
-                      <div className="flex flex-col items-center">
-                        <span className="flex items-center gap-1 text-dragon-green font-bold">
-                          <span className="inline-block w-4 h-4 bg-dragon-green rounded-full mr-1"></span>
-                          Tomi MINI
-                        </span>
-                      </div>
-                    </TableHead>
-                    <TableHead className="w-1/4 text-center">
-                      <div className="flex flex-col items-center">
-                        <span className="flex items-center gap-1 text-app-yellow font-bold">
-                          <span className="inline-block w-4 h-4 bg-app-yellow rounded-full mr-1"></span>
-                          Tomi MAXI
-                        </span>
-                      </div>
-                    </TableHead>
-                    <TableHead className="w-1/4 text-center">
-                      <div className="flex flex-col items-center">
-                        <span className="flex items-center gap-1 text-app-blue font-bold">
-                          <span className="inline-block w-4 h-4 bg-app-blue rounded-full mr-1"></span>
-                          Tomi ULTRA
-                        </span>
-                      </div>
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow className="border-t">
-                    <TableCell className="font-medium">Cena (mesečno)</TableCell>
-                    <TableCell className="text-center font-semibold text-dragon-green">14,90 €</TableCell>
-                    <TableCell className="text-center font-semibold text-app-yellow">19,90 €</TableCell>
-                    <TableCell className="text-center font-semibold text-app-blue">29,90 €</TableCell>
-                  </TableRow>
-                  <TableRow className="border-t">
-                    <TableCell className="font-medium">Cena (letno -30%)</TableCell>
-                    <TableCell className="text-center font-semibold text-dragon-green">125 €</TableCell>
-                    <TableCell className="text-center font-semibold text-app-yellow">167 €</TableCell>
-                    <TableCell className="text-center font-semibold text-app-blue">251 €</TableCell>
-                  </TableRow>
-                  <TableRow className="border-t">
-                    <TableCell className="font-medium">Število otrok</TableCell>
-                    <TableCell className="text-center">2</TableCell>
-                    <TableCell className="text-center">2</TableCell>
-                    <TableCell className="text-center">2</TableCell>
-                  </TableRow>
-                  <TableRow className="border-t">
-                    <TableCell className="font-medium">Vključuje</TableCell>
-                    <TableCell className="text-sm p-4">
-                      Osnovne govorne vaje, video navodila, napredek, 1–2 profila
-                    </TableCell>
-                    <TableCell className="text-sm p-4">
-                      Vse iz MINI + personalizirani program, PDF poročila
-                    </TableCell>
-                    <TableCell className="text-sm p-4">
-                      Vse iz MAXI + napredna analiza, AI mentor, igre, prioriteta
-                    </TableCell>
-                  </TableRow>
-                  <TableRow className="border-t">
-                    <TableCell className="font-medium">Dodatni otrok</TableCell>
-                    <TableCell className="text-center">+3,90 €/mesec</TableCell>
-                    <TableCell className="text-center">+3,90 €/mesec</TableCell>
-                    <TableCell className="text-center">+3,90 €/mesec</TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 min-w-[600px]">
+                {/* First column - Titles */}
+                <div className="space-y-8 pt-12">
+                  <p className="font-semibold">Cena</p>
+                  <p className="font-semibold">Plačilo</p>
+                  <div>
+                    <p className="font-semibold">Vključuje <span className="italic font-normal">(za oba paketa)</span></p>
+                  </div>
+                </div>
+                
+                {/* Annual subscription */}
+                <div className="rounded-lg border border-app-yellow bg-app-yellow/5 p-4">
+                  <div className="text-center font-bold text-lg py-2 mb-6">Letna naročnina</div>
+                  <div className="space-y-8">
+                    <p className="font-medium">9,90 € / mesec <span className="italic">(skupaj 118,80 €)</span></p>
+                    <p>Enkratno letno plačilo</p>
+                    <div className="invisible">placeholder</div>
+                  </div>
+                </div>
+                
+                {/* Monthly subscription */}
+                <div className="rounded-lg border border-app-blue bg-app-blue/5 p-4">
+                  <div className="text-center font-bold text-lg py-2 mb-6">Mesečna naročnina</div>
+                  <div className="space-y-8">
+                    <p className="font-medium">19,90 € / mesec</p>
+                    <p>Mesečno plačilo</p>
+                    <div className="invisible">placeholder</div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Features list that applies to both */}
+              <div className="mt-4 pl-[33%] md:pl-[calc(33.333%+1rem)] py-4">
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2">
+                    <span className="text-lg">🎯</span> 
+                    <span>Govorne vaje (po črkah)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-lg">📊</span>
+                    <span>Govorno jezikovne vaje</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-lg">🎮</span>
+                    <span>Govorne igre</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-lg">🏆</span>
+                    <span>Izzivi za dodatno izboljšanje govora</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-lg">📹</span>
+                    <span>Video navodila logopeda</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-lg">🎤</span>
+                    <span>Snemanje in primerjava z AI</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-lg">📈</span>
+                    <span>Sledenje napredku</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-lg">👶</span>
+                    <span>2 otroka vključena (v osnovi)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-lg">🐲</span>
+                    <span>Motivacija z zmajčkom Tomijem</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            
+            <div className="mt-10 bg-gray-50 dark:bg-gray-800/30 rounded-lg p-4">
+              <p className="font-semibold mb-2">Opomba:</p>
+              <ul className="space-y-2">
+                <li>Vsak dodatni otrok: +3,90 € / mesec</li>
+                <li className="font-medium text-app-yellow">
+                  Letna naročnina ti prihrani več kot 50 % v primerjavi z mesečno
+                </li>
+              </ul>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-              <Button 
-                className="bg-dragon-green hover:bg-dragon-green/90 text-white"
-                variant="default"
-              >
-                Izberi MINI
-              </Button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
               <Button 
                 className="bg-app-yellow hover:bg-app-yellow/90 text-white"
                 variant="default"
+                onClick={() => handleSubscribe('Letna naročnina')}
               >
-                Izberi MAXI
+                Izberi letno naročnino
               </Button>
               <Button 
                 className="bg-app-blue hover:bg-app-blue/90 text-white"
                 variant="default"
+                onClick={() => handleSubscribe('Mesečna naročnina')}
               >
-                Izberi ULTRA
+                Izberi mesečno naročnino
               </Button>
             </div>
           </CardContent>
