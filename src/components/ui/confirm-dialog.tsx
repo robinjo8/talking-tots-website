@@ -81,6 +81,11 @@ export function ConfirmDialog({
     onOpenChange(false);
   };
 
+  const handleConfirm = (e: React.MouseEvent) => {
+    e.preventDefault();
+    onConfirm();
+  };
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent className="max-w-md">
@@ -105,10 +110,7 @@ export function ConfirmDialog({
           </AlertDialogCancel>
           <AlertDialogAction
             asChild
-            onClick={(e) => {
-              e.preventDefault();
-              onConfirm();
-            }}
+            onClick={handleConfirm}
           >
             <Button 
               variant={confirmVariant}
