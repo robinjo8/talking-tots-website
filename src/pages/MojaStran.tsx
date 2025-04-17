@@ -4,17 +4,16 @@ import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { ProfileSection } from "@/components/ProfileSection";
 import { ProgressSection } from "@/components/ProgressSection";
 import { ActivityOptions } from "@/components/ActivityOptions";
 import { TipSection } from "@/components/TipSection";
 import { NoChildSelected } from "@/components/NoChildSelected";
 import { FooterSection } from "@/components/FooterSection";
+import { MotivationalMessage } from "@/components/MotivationalMessage";
 
 const MojaStran = () => {
   const { user, profile, signOut, selectedChildIndex } = useAuth();
   const navigate = useNavigate();
-  const [isProfileExpanded, setIsProfileExpanded] = useState(false);
   
   const selectedChild = selectedChildIndex !== null && profile?.children 
     ? profile.children[selectedChildIndex] 
@@ -45,15 +44,10 @@ const MojaStran = () => {
           </h1>
         </div>
         
-        <ProfileSection 
-          isProfileExpanded={isProfileExpanded}
-          setIsProfileExpanded={setIsProfileExpanded}
-          profile={profile}
-          selectedChild={selectedChild}
-        />
-        
         {selectedChild ? (
           <>
+            <MotivationalMessage />
+            
             <ProgressSection />
             
             <ActivityOptions />
