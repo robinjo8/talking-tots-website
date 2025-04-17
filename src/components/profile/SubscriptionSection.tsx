@@ -2,17 +2,35 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CircleDollarSign, ChevronDown, ChevronUp } from "lucide-react";
+import { CircleDollarSign, ChevronDown, ChevronUp, Check } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export function SubscriptionSection() {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<'yearly' | 'monthly' | null>(null);
 
   const handleSubscribe = (plan: string) => {
     toast.info(`Izbran paket: ${plan}. Funkcionalnost naročanja še ni implementirana.`);
   };
+
+  const handleSelectPlan = (plan: 'yearly' | 'monthly') => {
+    setSelectedPlan(plan);
+  };
+
+  const features = [
+    { icon: "🎯", text: "Govorne vaje (po črkah)" },
+    { icon: "📊", text: "Govorno jezikovne vaje" },
+    { icon: "🎮", text: "Govorne igre" },
+    { icon: "🏆", text: "Izzivi za dodatno izboljšanje govora" },
+    { icon: "📹", text: "Video navodila logopeda" },
+    { icon: "🎤", text: "Snemanje in primerjava z AI" },
+    { icon: "📈", text: "Sledenje napredku" },
+    { icon: "👶", text: "2 otroka vključena (v osnovi)" },
+    { icon: "🐲", text: "Motivacija z zmajčkom Tomijem" }
+  ];
 
   return (
     <Collapsible open={isExpanded} onOpenChange={setIsExpanded} className="w-full">
@@ -47,106 +65,102 @@ export function SubscriptionSection() {
           <CardContent className="p-6">
             <h2 className="text-2xl font-bold text-center mb-8">Naročniški paketi</h2>
             
-            <div className="overflow-x-auto">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 min-w-[600px]">
-                {/* First column - Titles */}
-                <div className="space-y-8 pt-12">
-                  <p className="font-semibold">Cena</p>
-                  <p className="font-semibold">Plačilo</p>
-                  <div>
-                    <p className="font-semibold">Vključuje <span className="italic font-normal">(za oba paketa)</span></p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Yearly subscription card */}
+              <Card 
+                className={cn(
+                  "border border-app-yellow overflow-hidden transition-all duration-300 hover:shadow-md",
+                  selectedPlan === 'yearly' ? "ring-2 ring-app-yellow shadow-lg" : ""
+                )}
+                onClick={() => handleSelectPlan('yearly')}
+              >
+                <div className="bg-app-yellow/10 p-4 relative">
+                  <span className="absolute top-0 right-0 mr-4 mt-4">
+                    {selectedPlan === 'yearly' && <Check className="h-6 w-6 text-app-yellow" />}
+                  </span>
+                  <div className="text-center mb-2">
+                    <span className="bg-app-yellow text-white text-xs px-3 py-1 rounded-full">Priporočeno</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-center">Letna naročnina</h3>
+                  <div className="text-center mt-4">
+                    <p className="text-2xl font-bold">9,90 € <span className="text-sm font-normal">/ mesec</span></p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">(skupaj 118,80 €)</p>
                   </div>
                 </div>
-                
-                {/* Annual subscription */}
-                <div className="rounded-lg border border-app-yellow bg-app-yellow/5 p-4">
-                  <div className="text-center font-bold text-lg py-2 mb-6">Letna naročnina</div>
-                  <div className="space-y-8">
-                    <p className="font-medium">9,90 € / mesec <span className="italic">(skupaj 118,80 €)</span></p>
-                    <p>Enkratno letno plačilo</p>
-                    <div className="invisible">placeholder</div>
+                <CardContent className="p-4">
+                  <div className="space-y-3">
+                    <p><strong>Plačilo:</strong> Enkratno letno plačilo</p>
+                    <p className="text-app-yellow font-medium">Prihranite več kot 50 % v primerjavi z mesečno naročnino</p>
+                    
+                    <Separator className="my-4" />
+                    
+                    <div className="mt-4">
+                      <Button 
+                        className="w-full bg-app-yellow hover:bg-app-yellow/90 text-white"
+                        onClick={() => handleSubscribe('Letna naročnina')}
+                      >
+                        Izberi letno naročnino
+                      </Button>
+                    </div>
                   </div>
-                </div>
-                
-                {/* Monthly subscription */}
-                <div className="rounded-lg border border-app-blue bg-app-blue/5 p-4">
-                  <div className="text-center font-bold text-lg py-2 mb-6">Mesečna naročnina</div>
-                  <div className="space-y-8">
-                    <p className="font-medium">19,90 € / mesec</p>
-                    <p>Mesečno plačilo</p>
-                    <div className="invisible">placeholder</div>
-                  </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
               
-              {/* Features list that applies to both */}
-              <div className="mt-4 pl-[33%] md:pl-[calc(33.333%+1rem)] py-4">
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-2">
-                    <span className="text-lg">🎯</span> 
-                    <span>Govorne vaje (po črkah)</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-lg">📊</span>
-                    <span>Govorno jezikovne vaje</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-lg">🎮</span>
-                    <span>Govorne igre</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-lg">🏆</span>
-                    <span>Izzivi za dodatno izboljšanje govora</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-lg">📹</span>
-                    <span>Video navodila logopeda</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-lg">🎤</span>
-                    <span>Snemanje in primerjava z AI</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-lg">📈</span>
-                    <span>Sledenje napredku</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-lg">👶</span>
-                    <span>2 otroka vključena (v osnovi)</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-lg">🐲</span>
-                    <span>Motivacija z zmajčkom Tomijem</span>
-                  </li>
-                </ul>
+              {/* Monthly subscription card */}
+              <Card 
+                className={cn(
+                  "border border-app-blue overflow-hidden transition-all duration-300 hover:shadow-md",
+                  selectedPlan === 'monthly' ? "ring-2 ring-app-blue shadow-lg" : ""
+                )}
+                onClick={() => handleSelectPlan('monthly')}
+              >
+                <div className="bg-app-blue/10 p-4 relative">
+                  <span className="absolute top-0 right-0 mr-4 mt-4">
+                    {selectedPlan === 'monthly' && <Check className="h-6 w-6 text-app-blue" />}
+                  </span>
+                  <h3 className="text-xl font-bold text-center">Mesečna naročnina</h3>
+                  <div className="text-center mt-4">
+                    <p className="text-2xl font-bold">19,90 € <span className="text-sm font-normal">/ mesec</span></p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">&nbsp;</p>
+                  </div>
+                </div>
+                <CardContent className="p-4">
+                  <div className="space-y-3">
+                    <p><strong>Plačilo:</strong> Mesečno plačilo</p>
+                    <p className="text-gray-500 dark:text-gray-400">Brez dolgoročne obveznosti</p>
+                    
+                    <Separator className="my-4" />
+                    
+                    <div className="mt-4">
+                      <Button 
+                        className="w-full bg-app-blue hover:bg-app-blue/90 text-white"
+                        onClick={() => handleSubscribe('Mesečna naročnina')}
+                      >
+                        Izberi mesečno naročnino
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            
+            {/* Features section */}
+            <div className="mt-8 bg-gray-50 dark:bg-gray-800/30 rounded-lg p-6">
+              <h3 className="font-bold text-lg mb-4">Vključeno v oba paketa:</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-6">
+                {features.map((feature, index) => (
+                  <div key={index} className="flex items-start gap-2">
+                    <span className="text-lg">{feature.icon}</span> 
+                    <span>{feature.text}</span>
+                  </div>
+                ))}
               </div>
             </div>
             
-            <div className="mt-10 bg-gray-50 dark:bg-gray-800/30 rounded-lg p-4">
+            {/* Additional note */}
+            <div className="mt-6 text-sm bg-gray-50 dark:bg-gray-800/30 rounded-lg p-4">
               <p className="font-semibold mb-2">Opomba:</p>
-              <ul className="space-y-2">
-                <li>Vsak dodatni otrok: +3,90 € / mesec</li>
-                <li className="font-medium text-app-yellow">
-                  Letna naročnina ti prihrani več kot 50 % v primerjavi z mesečno
-                </li>
-              </ul>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
-              <Button 
-                className="bg-app-yellow hover:bg-app-yellow/90 text-white"
-                variant="default"
-                onClick={() => handleSubscribe('Letna naročnina')}
-              >
-                Izberi letno naročnino
-              </Button>
-              <Button 
-                className="bg-app-blue hover:bg-app-blue/90 text-white"
-                variant="default"
-                onClick={() => handleSubscribe('Mesečna naročnina')}
-              >
-                Izberi mesečno naročnino
-              </Button>
+              <p>Vsak dodatni otrok: <strong>+3,90 € / mesec</strong></p>
             </div>
           </CardContent>
         </CollapsibleContent>
