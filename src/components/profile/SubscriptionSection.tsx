@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -82,7 +83,7 @@ export function SubscriptionSection() {
               {/* Yearly subscription card */}
               <Card 
                 className={cn(
-                  "border border-dragon-green overflow-hidden transition-all duration-300 hover:shadow-md",
+                  "border border-dragon-green overflow-hidden transition-all duration-300 hover:shadow-md h-full flex flex-col",
                   selectedPlan === 'yearly' ? "ring-2 ring-dragon-green shadow-lg" : ""
                 )}
                 onClick={() => handleSelectPlan('yearly')}
@@ -99,21 +100,21 @@ export function SubscriptionSection() {
                     <p className="text-2xl font-bold text-dragon-green">9,90 € <span className="text-sm font-normal">/ mesec</span></p>
                   </div>
                 </div>
-                <CardContent className="p-4">
-                  <div className="space-y-3">
+                <CardContent className="p-4 flex-1 flex flex-col">
+                  <div className="space-y-3 flex-1">
                     <p><strong>Plačilo:</strong> Enkratno letno plačilo</p>
                     <p className="text-dragon-green font-medium">Prihranite več kot 50 % v primerjavi z mesečno naročnino</p>
                     
                     <Separator className="my-4" />
-                    
-                    <div className="mt-4">
-                      <Button 
-                        className="w-full bg-dragon-green hover:bg-dragon-green/90 text-white"
-                        onClick={() => handleSubscribe('Letna naročnina')}
-                      >
-                        Izberi letno naročnino
-                      </Button>
-                    </div>
+                  </div>
+                  
+                  <div className="mt-auto">
+                    <Button 
+                      className="w-full bg-dragon-green hover:bg-dragon-green/90 text-white"
+                      onClick={() => handleSubscribe('Letna naročnina')}
+                    >
+                      Izberi letno naročnino
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -121,7 +122,7 @@ export function SubscriptionSection() {
               {/* Monthly subscription card */}
               <Card 
                 className={cn(
-                  "border border-app-blue overflow-hidden transition-all duration-300 hover:shadow-md",
+                  "border border-app-blue overflow-hidden transition-all duration-300 hover:shadow-md h-full flex flex-col",
                   selectedPlan === 'monthly' ? "ring-2 ring-app-blue shadow-lg" : ""
                 )}
                 onClick={() => handleSelectPlan('monthly')}
@@ -135,21 +136,21 @@ export function SubscriptionSection() {
                     <p className="text-2xl font-bold">19,90 € <span className="text-sm font-normal">/ mesec</span></p>
                   </div>
                 </div>
-                <CardContent className="p-4">
-                  <div className="space-y-3">
+                <CardContent className="p-4 flex-1 flex flex-col">
+                  <div className="space-y-3 flex-1">
                     <p><strong>Plačilo:</strong> Mesečno plačilo</p>
                     <p className="text-gray-500 dark:text-gray-400">Brez dolgoročne obveznosti</p>
                     
                     <Separator className="my-4" />
-                    
-                    <div className="mt-4">
-                      <Button 
-                        className="w-full bg-app-blue hover:bg-app-blue/90 text-white"
-                        onClick={() => handleSubscribe('Mesečna naročnina')}
-                      >
-                        Izberi mesečno naročnino
-                      </Button>
-                    </div>
+                  </div>
+                  
+                  <div className="mt-auto">
+                    <Button 
+                      className="w-full bg-app-blue hover:bg-app-blue/90 text-white"
+                      onClick={() => handleSubscribe('Mesečna naročnina')}
+                    >
+                      Izberi mesečno naročnino
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
