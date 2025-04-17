@@ -1,7 +1,7 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { UserRound, ChevronDown, User, Users } from "lucide-react";
 import { 
   Popover,
@@ -18,6 +18,7 @@ import {
 export function UserProfile() {
   const { user, profile, signOut, selectedChildIndex, setSelectedChildIndex } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSignOut = async () => {
     await signOut();
@@ -25,8 +26,22 @@ export function UserProfile() {
   };
 
   const handleSelectChild = (index: number) => {
-    setSelectedChildIndex(index);
-    localStorage.setItem('selectedChildIndex', index.toString());
+    try {
+      setSelectedChildIndex(index);
+      localStorage.setItem('selectedChildIndex', index.toString());
+      
+      // Navigate to Moja Stran if not already there
+      if (location.pathname !== '/moja-stran') {
+        navigate('/moja-stran');
+      }
+    } catch (error) {
+      console.error("Napaka pri izbiri otroka:", error);
+    }
+  };
+
+  const handleSelectParent = () => {
+    setSelectedChildIndex(null);
+    localStorage.removeItem('selectedChildIndex');
   };
 
   if (!user) {
@@ -64,10 +79,7 @@ export function UserProfile() {
               className={`flex items-center gap-2 p-2 rounded-md cursor-pointer ${
                 selectedChildIndex === null ? 'bg-dragon-green/10 text-dragon-green' : 'hover:bg-muted'
               }`}
-              onClick={() => {
-                setSelectedChildIndex(null);
-                localStorage.removeItem('selectedChildIndex');
-              }}
+              onClick={handleSelectParent}
             >
               <User className="h-4 w-4" />
               <div className="flex-1">
@@ -80,7 +92,7 @@ export function UserProfile() {
             </div>
             
             {profile?.children && profile.children.length > 0 && (
-              <Accordion type="single" collapsible className="mt-2">
+              <Accordion type="single" collapsible defaultValue="children" className="mt-2">
                 <AccordionItem value="children" className="border-none">
                   <AccordionTrigger className="py-2 hover:no-underline">
                     <div className="flex items-center gap-2">
