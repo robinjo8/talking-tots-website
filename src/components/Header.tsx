@@ -5,6 +5,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { UserProfile } from "@/components/auth/UserProfile";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSidebar } from "@/components/ui/sidebar";
+import { Menu } from "lucide-react";
+import { 
+  Sheet, 
+  SheetContent, 
+  SheetTrigger 
+} from "@/components/ui/sheet";
+import { MobileMenu } from "@/components/MobileMenu";
 
 export default function Header() {
   const { user, profile, selectedChildIndex } = useAuth();
@@ -40,14 +47,18 @@ export default function Header() {
                   Aktivni profil: <span className="font-medium text-dragon-green">{selectedChild.name}</span>
                 </div>
               )}
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="flex items-center gap-1"
-                onClick={() => setOpenMobile(true)}
-              >
-                Meni
-              </Button>
+              
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                    <Menu className="h-4 w-4" />
+                    <span>Meni</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="p-0">
+                  <MobileMenu onItemClick={() => {}} />
+                </SheetContent>
+              </Sheet>
             </div>
           ) : (
             <>
