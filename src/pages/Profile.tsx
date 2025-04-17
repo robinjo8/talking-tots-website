@@ -18,8 +18,8 @@ export default function Profile() {
   const { user, profile, selectedChildIndex, setSelectedChildIndex } = useAuth();
   const navigate = useNavigate();
   
-  // Section UI state
-  const [isUserProfileExpanded, setIsUserProfileExpanded] = useState(true);
+  // Section UI state - set UserProfileSection to false by default
+  const [isUserProfileExpanded, setIsUserProfileExpanded] = useState(false);
   const [isChildrenSectionExpanded, setIsChildrenSectionExpanded] = useState(false);
   
   // Child profile management state
@@ -100,11 +100,11 @@ export default function Profile() {
       <div className="container max-w-4xl mx-auto pt-28 pb-20 px-4">
         <h1 className="text-3xl font-bold mb-8 flex items-center gap-2">
           <User className="h-6 w-6 text-dragon-green" />
-          Moj profil
+          Nastavitve
         </h1>
         
         <div className="grid gap-8">
-          {/* User Profile Section (renamed to Nastavitve) */}
+          {/* User Profile Section (collapsed by default) */}
           <UserProfileSection 
             isExpanded={isUserProfileExpanded}
             setIsExpanded={setIsUserProfileExpanded}
