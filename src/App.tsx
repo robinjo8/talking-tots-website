@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { AppLayout } from "@/components/AppLayout";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -28,67 +29,69 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
-              {/* Public routes */}
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/update-password" element={<UpdatePassword />} />
-              
-              {/* Protected routes */}
-              <Route 
-                path="/dashboard" 
-                element={
-                  <ProtectedRoute>
-                    <Index />
-                  </ProtectedRoute>
-                }
-              />
-              <Route 
-                path="/profile" 
-                element={
-                  <ProtectedRoute>
-                    <Profile />
-                  </ProtectedRoute>
-                }
-              />
-              <Route 
-                path="/moja-stran" 
-                element={
-                  <ProtectedRoute>
-                    <MojaStran />
-                  </ProtectedRoute>
-                }
-              />
-              <Route 
-                path="/govorno-jezikovne-vaje" 
-                element={
-                  <ProtectedRoute>
-                    <GovornojezicovneVaje />
-                  </ProtectedRoute>
-                }
-              />
-              <Route 
-                path="/artikulacija" 
-                element={
-                  <ProtectedRoute>
-                    <ArtIzgovorjavaPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route 
-                path="/artikulacija/:letter" 
-                element={
-                  <ProtectedRoute>
-                    <ArtIzgovorjavaPage />
-                  </ProtectedRoute>
-                }
-              />
-              
-              {/* Catch-all route */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <AppLayout>
+              <Routes>
+                {/* Public routes */}
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/update-password" element={<UpdatePassword />} />
+                
+                {/* Protected routes */}
+                <Route 
+                  path="/dashboard" 
+                  element={
+                    <ProtectedRoute>
+                      <Index />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route 
+                  path="/profile" 
+                  element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route 
+                  path="/moja-stran" 
+                  element={
+                    <ProtectedRoute>
+                      <MojaStran />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route 
+                  path="/govorno-jezikovne-vaje" 
+                  element={
+                    <ProtectedRoute>
+                      <GovornojezicovneVaje />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route 
+                  path="/artikulacija" 
+                  element={
+                    <ProtectedRoute>
+                      <ArtIzgovorjavaPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route 
+                  path="/artikulacija/:letter" 
+                  element={
+                    <ProtectedRoute>
+                      <ArtIzgovorjavaPage />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                {/* Catch-all route */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </AppLayout>
           </BrowserRouter>
         </AuthProvider>
       </TooltipProvider>
