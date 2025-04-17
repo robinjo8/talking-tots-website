@@ -12,6 +12,7 @@ import { SpeechDifficultyEditor } from "@/components/SpeechDifficultyEditor";
 import { UserProfileSection } from "@/components/profile/UserProfileSection";
 import { PasswordChangeSection } from "@/components/profile/PasswordChangeSection";
 import { ChildrenProfilesSection } from "@/components/profile/ChildrenProfilesSection";
+import { SubscriptionSection } from "@/components/profile/SubscriptionSection";
 
 export default function Profile() {
   const { user, profile, selectedChildIndex, setSelectedChildIndex } = useAuth();
@@ -103,7 +104,7 @@ export default function Profile() {
         </h1>
         
         <div className="grid gap-8">
-          {/* User Profile Section (now combined with Personal Data) */}
+          {/* User Profile Section */}
           <UserProfileSection 
             isExpanded={isUserProfileExpanded}
             setIsExpanded={setIsUserProfileExpanded}
@@ -111,6 +112,9 @@ export default function Profile() {
           
           {/* Password Change Section */}
           <PasswordChangeSection />
+          
+          {/* Subscription Section */}
+          <SubscriptionSection />
           
           {/* Children Profiles Section */}
           <ChildrenProfilesSection 
