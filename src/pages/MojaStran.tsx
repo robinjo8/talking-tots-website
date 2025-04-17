@@ -1,6 +1,5 @@
 
 import { useAuth } from "@/contexts/AuthContext";
-import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { ProgressSection } from "@/components/ProgressSection";
@@ -30,8 +29,6 @@ const MojaStran = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      
       <div className="container max-w-5xl mx-auto pt-32 pb-20 px-4">
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
