@@ -2,7 +2,21 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CircleDollarSign, ChevronDown, ChevronUp, Check } from "lucide-react";
+import { 
+  CircleDollarSign, 
+  ChevronDown, 
+  ChevronUp, 
+  Check,
+  Target,
+  BarChart2,
+  Gamepad2,
+  Trophy,
+  Video,
+  Mic,
+  LineChart,
+  Users,
+  Sparkles
+} from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
@@ -21,15 +35,15 @@ export function SubscriptionSection() {
   };
 
   const features = [
-    { icon: "🎯", text: "Govorne vaje (po črkah)" },
-    { icon: "📊", text: "Govorno jezikovne vaje" },
-    { icon: "🎮", text: "Govorne igre" },
-    { icon: "🏆", text: "Izzivi za dodatno izboljšanje govora" },
-    { icon: "📹", text: "Video navodila logopeda" },
-    { icon: "🎤", text: "Snemanje in primerjava z AI" },
-    { icon: "📈", text: "Sledenje napredku" },
-    { icon: "👶", text: "2 otroka vključena (v osnovi)" },
-    { icon: "🐲", text: "Motivacija z zmajčkom Tomijem" }
+    { icon: <Target className="h-5 w-5 text-dragon-green" />, text: "Govorne vaje (po črkah)" },
+    { icon: <BarChart2 className="h-5 w-5 text-app-blue" />, text: "Govorno jezikovne vaje" },
+    { icon: <Gamepad2 className="h-5 w-5 text-app-purple" />, text: "Govorne igre" },
+    { icon: <Trophy className="h-5 w-5 text-app-orange" />, text: "Izzivi za dodatno izboljšanje govora" },
+    { icon: <Video className="h-5 w-5 text-app-teal" />, text: "Video navodila logopeda" },
+    { icon: <Mic className="h-5 w-5 text-app-purple" />, text: "Snemanje in primerjava z AI" },
+    { icon: <LineChart className="h-5 w-5 text-dragon-green" />, text: "Sledenje napredku" },
+    { icon: <Users className="h-5 w-5 text-app-blue" />, text: "2 otroka vključena (v osnovi)" },
+    { icon: <Sparkles className="h-5 w-5 text-app-yellow" />, text: "Motivacija z zmajčkom Tomijem" }
   ];
 
   return (
@@ -69,34 +83,34 @@ export function SubscriptionSection() {
               {/* Yearly subscription card */}
               <Card 
                 className={cn(
-                  "border border-app-yellow overflow-hidden transition-all duration-300 hover:shadow-md",
-                  selectedPlan === 'yearly' ? "ring-2 ring-app-yellow shadow-lg" : ""
+                  "border border-dragon-green overflow-hidden transition-all duration-300 hover:shadow-md",
+                  selectedPlan === 'yearly' ? "ring-2 ring-dragon-green shadow-lg" : ""
                 )}
                 onClick={() => handleSelectPlan('yearly')}
               >
-                <div className="bg-app-yellow/10 p-4 relative">
+                <div className="bg-dragon-green/10 p-4 relative">
                   <span className="absolute top-0 right-0 mr-4 mt-4">
-                    {selectedPlan === 'yearly' && <Check className="h-6 w-6 text-app-yellow" />}
+                    {selectedPlan === 'yearly' && <Check className="h-6 w-6 text-dragon-green" />}
                   </span>
                   <div className="text-center mb-2">
-                    <span className="bg-app-yellow text-white text-xs px-3 py-1 rounded-full">Priporočeno</span>
+                    <span className="bg-dragon-green text-white text-xs px-3 py-1 rounded-full">Priporočeno</span>
                   </div>
                   <h3 className="text-xl font-bold text-center">Letna naročnina</h3>
                   <div className="text-center mt-4">
-                    <p className="text-2xl font-bold">9,90 € <span className="text-sm font-normal">/ mesec</span></p>
+                    <p className="text-2xl font-bold text-dragon-green">9,90 € <span className="text-sm font-normal">/ mesec</span></p>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">(skupaj 118,80 €)</p>
                   </div>
                 </div>
                 <CardContent className="p-4">
                   <div className="space-y-3">
                     <p><strong>Plačilo:</strong> Enkratno letno plačilo</p>
-                    <p className="text-app-yellow font-medium">Prihranite več kot 50 % v primerjavi z mesečno naročnino</p>
+                    <p className="text-dragon-green font-medium">Prihranite več kot 50 % v primerjavi z mesečno naročnino</p>
                     
                     <Separator className="my-4" />
                     
                     <div className="mt-4">
                       <Button 
-                        className="w-full bg-app-yellow hover:bg-app-yellow/90 text-white"
+                        className="w-full bg-dragon-green hover:bg-dragon-green/90 text-white"
                         onClick={() => handleSubscribe('Letna naročnina')}
                       >
                         Izberi letno naročnino
@@ -150,7 +164,7 @@ export function SubscriptionSection() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-6">
                 {features.map((feature, index) => (
                   <div key={index} className="flex items-start gap-2">
-                    <span className="text-lg">{feature.icon}</span> 
+                    {feature.icon}
                     <span>{feature.text}</span>
                   </div>
                 ))}
