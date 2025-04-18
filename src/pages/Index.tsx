@@ -18,30 +18,30 @@ const Index = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="pt-32 pb-16 px-6 md:px-10 relative">
+      <section className="pt-20 md:pt-32 pb-16 px-6 md:px-10 relative">
         <div className="absolute -top-10 -left-10 w-32 h-32 bg-app-yellow/20 rounded-full blur-3xl"></div>
         <div className="absolute top-40 -right-10 w-60 h-60 bg-app-blue/20 rounded-full blur-3xl"></div>
         
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-10 items-center">
           <div className={`${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'} transition-all duration-700 ease-out`}>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold mb-6">
               Naredimo govor <span className="rainbow-text">zabaven</span> – za male junake!
             </h1>
             <p className="text-xl mb-8 text-muted-foreground max-w-xl">
               Tomi Talk otrokom pomaga pri učenju govora skozi igro z našim prijaznim zmajčkom Tomijem. Govorjenje še nikoli ni bilo tako zabavno!
             </p>
             
-            <div className="flex flex-wrap gap-4">
-              <Button size="lg" className="bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full">
+            <div className="flex flex-row gap-4 w-full justify-stretch">
+              <Button size="lg" className="flex-1 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full">
                 Začni brezplačno
               </Button>
-              <Button size="lg" variant="outline" className="rounded-full">
+              <Button size="lg" variant="outline" className="flex-1 rounded-full">
                 <Play className="mr-2 h-4 w-4" /> Oglej si demo
               </Button>
             </div>
           </div>
           
-          <div className={`relative ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'} transition-all duration-700 ease-out delay-300`}>
+          <div className={`relative -mt-8 md:mt-0 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'} transition-all duration-700 ease-out delay-300`}>
             <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
             <div className="animate-float relative">
               <img alt="Tomi Talk Dragon Mascot" className="w-full max-w-md mx-auto" src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" />
