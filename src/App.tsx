@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,6 +17,9 @@ import Profile from "./pages/Profile";
 import MojaStran from "./pages/MojaStran";
 import GovornojezicovneVaje from "./pages/GovornojezicovneVaje";
 import ArtIzgovorjavaPage from "./pages/ArtIzgovorjavaPage";
+import GovorneIgre from "./pages/GovorneIgre";
+import MojiIzzivi from "./pages/MojiIzzivi";
+import VideoNavodila from "./pages/VideoNavodila";
 
 const queryClient = new QueryClient();
 
@@ -31,14 +33,12 @@ const App = () => (
           <BrowserRouter>
             <AppLayout>
               <Routes>
-                {/* Public routes */}
                 <Route path="/" element={<Index />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/update-password" element={<UpdatePassword />} />
                 
-                {/* Protected routes */}
                 <Route 
                   path="/dashboard" 
                   element={
@@ -88,7 +88,31 @@ const App = () => (
                   }
                 />
                 
-                {/* Catch-all route */}
+                <Route 
+                  path="/govorne-igre" 
+                  element={
+                    <ProtectedRoute>
+                      <GovorneIgre />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route 
+                  path="/moji-izzivi" 
+                  element={
+                    <ProtectedRoute>
+                      <MojiIzzivi />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route 
+                  path="/video-navodila" 
+                  element={
+                    <ProtectedRoute>
+                      <VideoNavodila />
+                    </ProtectedRoute>
+                  }
+                />
+                
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </AppLayout>
