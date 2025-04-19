@@ -1,15 +1,12 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Volume2, Mic, CheckCircle, Smile } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
+import { ArrowLeft } from "lucide-react";
+import LetterSelector from "@/components/articulation/LetterSelector";
+import WordPracticeCard from "@/components/articulation/WordPracticeCard";
+import PracticeProgress from "@/components/articulation/PracticeProgress";
 
 interface PracticeWord {
   id: number;
@@ -18,7 +15,6 @@ interface PracticeWord {
   audioUrl?: string;
 }
 
-// Map of letters to their practice words
 const letterPracticeWords: Record<string, PracticeWord[]> = {
   "R": [
     { id: 1, word: "Riba", translation: "fish" },
@@ -78,7 +74,6 @@ const letterPracticeWords: Record<string, PracticeWord[]> = {
   ]
 };
 
-// Feedback messages
 const positiveFeedback = [
   "Odlično!",
   "Super!",
@@ -111,11 +106,7 @@ const ArtIzgovorjavaPage = () => {
   const selectedChild = selectedChildIndex !== null && profile?.children 
     ? profile.children[selectedChildIndex] 
     : null;
-  
-  // Letters for selection
-  const problematicLetters = ["R", "L", "S", "Š", "Č", "Ž", "C", "Z"];
-  
-  // Current word being practiced - Add null checks
+    
   const currentWords = selectedLetter && letterPracticeWords[selectedLetter] 
     ? letterPracticeWords[selectedLetter] 
     : [];
@@ -128,7 +119,6 @@ const ArtIzgovorjavaPage = () => {
       navigate("/login");
     }
     
-    // Reset exercise state when letter changes
     if (selectedLetter) {
       setCurrentWordIndex(0);
       setScore(0);
@@ -137,7 +127,6 @@ const ArtIzgovorjavaPage = () => {
     }
   }, [user, navigate, selectedLetter]);
   
-  // Update progress when word changes
   useEffect(() => {
     if (selectedLetter && currentWords.length > 0) {
       setProgress(((currentWordIndex + 1) / currentWords.length) * 100);
@@ -150,18 +139,14 @@ const ArtIzgovorjavaPage = () => {
   };
   
   const handlePlayAudio = () => {
-    // Placeholder for audio playback functionality
     console.log(`Playing audio for word: ${currentWord?.word}`);
-    // Will integrate actual audio playback in future
   };
   
   const handleMicRecord = () => {
     setIsRecording(true);
     
-    // Placeholder for speech recognition - simulate recording for 2 seconds
     setTimeout(() => {
       setIsRecording(false);
-      // Random success (80% chance of success for demo purposes)
       const isSuccess = Math.random() > 0.2;
       
       if (isSuccess) {
@@ -182,9 +167,7 @@ const ArtIzgovorjavaPage = () => {
       setCurrentWordIndex(prev => prev + 1);
       setFeedbackMessage(null);
     } else {
-      // Exercise complete
       alert("Čestitamo! Zaključil si vse vaje za to črko!");
-      // Could navigate to a completion page or back to main page
     }
   };
 
@@ -223,117 +206,30 @@ const ArtIzgovorjavaPage = () => {
           </h1>
         </div>
         
-        <div className="bg-gray-50 p-4 mb-6 rounded-lg">
-          <h2 className="text-lg font-semibold mb-4">Izberi glas za vajo:</h2>
-          <div className="flex flex-wrap gap-3 justify-center">
-            {problematicLetters.map((letter) => (
-              <Button
-                key={letter}
-                onClick={() => handleLetterSelect(letter)}
-                variant={selectedLetter === letter ? "default" : "outline"}
-                className={cn(
-                  "text-lg font-bold min-w-14 h-14",
-                  selectedLetter === letter && "bg-app-blue hover:bg-app-blue/90"
-                )}
-              >
-                {letter}
-              </Button>
-            ))}
-          </div>
-        </div>
+        <LetterSelector 
+          selectedLetter={selectedLetter}
+          onLetterSelect={handleLetterSelect}
+        />
         
         {selectedLetter && currentWord && (
           <>
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium">Napredek</span>
-              <span className="text-sm font-medium">{currentWordIndex + 1}/{currentWords.length}</span>
-            </div>
-            <Progress value={progress} className="mb-6 h-3" />
+            <PracticeProgress 
+              currentWordIndex={currentWordIndex}
+              totalWords={currentWords.length}
+              progress={progress}
+            />
             
-            <Card className="mb-6 overflow-hidden border-2 border-app-blue/20">
-              <CardContent className="p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <div className="flex items-center gap-3">
-                    <span className="text-3xl font-bold text-app-blue">
-                      {selectedLetter}
-                    </span>
-                    <span className="text-xl font-semibold">
-                      v besedi:
-                    </span>
-                  </div>
-                  <div className="text-md text-dragon-green font-medium">
-                    Točke: {score}
-                  </div>
-                </div>
-                
-                <div className="flex flex-col items-center mb-6 py-6">
-                  <h2 className="text-4xl font-bold mb-3 text-center min-h-16 animate-scale-in">
-                    {currentWord.word}
-                  </h2>
-                  {currentWord.translation && (
-                    <p className="text-muted-foreground italic">
-                      ({currentWord.translation})
-                    </p>
-                  )}
-                </div>
-                
-                <div className="p-4 bg-light-cloud rounded-lg mb-6">
-                  <p className="text-center text-sm font-medium">
-                    Pri izgovorjavi glasu <strong>{selectedLetter}</strong> pravilno postavi jezik in ustnice.
-                  </p>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <Button 
-                    className="bg-app-purple hover:bg-app-purple/90 h-14 text-lg"
-                    onClick={handlePlayAudio}
-                  >
-                    <Volume2 className="mr-2 h-5 w-5" />
-                    Poslušaj besedo
-                  </Button>
-                  
-                  {selectedLetter === "R" && (
-                    <Button 
-                      className="bg-dragon-green hover:bg-dragon-green/90 h-14 text-lg"
-                      onClick={handlePlayRozaAudio}
-                    >
-                      <Volume2 className="mr-2 h-5 w-5" />
-                      Poslušaj besedo Roza
-                    </Button>
-                  )}
-                  
-                  <Button 
-                    className={cn(
-                      "bg-app-orange hover:bg-app-orange/90 h-14 text-lg",
-                      isRecording && "animate-pulse bg-red-500"
-                    )}
-                    onClick={handleMicRecord}
-                    disabled={isRecording}
-                  >
-                    <Mic className="mr-2 h-5 w-5" />
-                    {isRecording ? "Snemam..." : "Ponovi besedo"}
-                  </Button>
-                </div>
-                
-                <audio ref={audioRef} />
-                
-                {feedbackMessage && (
-                  <div className={cn(
-                    "p-4 rounded-lg text-center animate-scale-in mb-4",
-                    showPositiveFeedback ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-800"
-                  )}>
-                    <div className="flex items-center justify-center gap-2">
-                      {showPositiveFeedback ? (
-                        <CheckCircle className="h-5 w-5" />
-                      ) : (
-                        <Smile className="h-5 w-5" />
-                      )}
-                      <span className="font-bold text-lg">{feedbackMessage}</span>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <WordPracticeCard
+              currentWord={currentWord}
+              selectedLetter={selectedLetter}
+              isRecording={isRecording}
+              showPositiveFeedback={showPositiveFeedback}
+              feedbackMessage={feedbackMessage}
+              score={score}
+              onPlayAudio={handlePlayAudio}
+              onMicRecord={handleMicRecord}
+              onPlayCustomAudio={selectedLetter === "R" ? handlePlayRozaAudio : undefined}
+            />
             
             <div className="flex justify-end">
               <Button 
@@ -360,6 +256,8 @@ const ArtIzgovorjavaPage = () => {
             </p>
           </div>
         )}
+        
+        <audio ref={audioRef} />
       </div>
     </div>
   );
