@@ -133,7 +133,7 @@ export function UserProfile() {
               onClick={() => navigate("/profile")}
             >
               <User className="h-4 w-4 mr-2" />
-              Uredi profil
+              Nastavitve
             </Button>
             <Button 
               variant="outline" 

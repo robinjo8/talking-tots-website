@@ -16,6 +16,7 @@ export default function Header() {
   const isMobile = useIsMobile();
   const { setOpenMobile } = useSidebar();
   const selectedChild = selectedChildIndex !== null && profile?.children ? profile.children[selectedChildIndex] : null;
+
   return (
     <header className="py-4 px-4 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
@@ -27,11 +28,16 @@ export default function Header() {
           </div>
         </Link>
         
-        <div className="flex items-center">
+        <div className="flex items-center gap-3">
+          {isMobile && selectedChild && (
+            <span className="text-sm font-medium text-muted-foreground">
+              {selectedChild.name}
+            </span>
+          )}
           {isMobile ? (
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex items-center -mr-2">
+                <Button variant="ghost" size="sm" className="flex items-center">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
@@ -40,23 +46,21 @@ export default function Header() {
               </SheetContent>
             </Sheet>
           ) : (
-            <>
-              <nav className="flex items-center gap-6">
-                <a href="#features" className="font-medium hover:text-dragon-green transition-colors">Funkcije</a>
-                <a href="#cta" className="font-medium hover:text-dragon-green transition-colors">Začni</a>
-                {user && <Link to="/moja-stran" className="font-medium hover:text-dragon-green transition-colors flex items-center gap-1">
-                    Moja stran
-                  </Link>}
+            <nav className="flex items-center gap-6">
+              <a href="#features" className="font-medium hover:text-dragon-green transition-colors">Funkcije</a>
+              <a href="#cta" className="font-medium hover:text-dragon-green transition-colors">Začni</a>
+              {user && <Link to="/moja-stran" className="font-medium hover:text-dragon-green transition-colors flex items-center gap-1">
+                  Moja stran
+                </Link>}
                 
-                {user ? <UserProfile /> : <div className="flex items-center gap-2">
-                    <Link to="/login">
-                      <Button variant="outline" size="sm" className="text-sm">
-                        Prijava
-                      </Button>
-                    </Link>
-                  </div>}
-              </nav>
-            </>
+              {user ? <UserProfile /> : <div className="flex items-center gap-2">
+                  <Link to="/login">
+                    <Button variant="outline" size="sm" className="text-sm">
+                      Prijava
+                    </Button>
+                  </Link>
+                </div>}
+            </nav>
           )}
         </div>
       </div>
