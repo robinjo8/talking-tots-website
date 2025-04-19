@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { UserProfile } from "@/components/auth/UserProfile";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSidebar } from "@/components/ui/sidebar";
-import { Menu, Bell, Smartphone, CreditCard, BookOpen } from "lucide-react";
+import { Menu, BookOpen, ChevronDown } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { MobileMenu } from "@/components/MobileMenu";
 import {
@@ -14,7 +14,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
 export default function Header() {
@@ -73,10 +72,16 @@ export default function Header() {
             <nav className="flex items-center gap-6">
               {user && (
                 <>
+                  <Button variant="ghost" className="font-medium opacity-50 cursor-not-allowed">
+                    <BookOpen className="h-4 w-4 mr-2" />
+                    Logopedski kotiček
+                  </Button>
+
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="font-medium">
-                        Moja stran
+                        Moj profil
+                        <ChevronDown className="ml-1 h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48">
@@ -87,39 +92,12 @@ export default function Header() {
                       ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
-
-                  <Button variant="ghost" className="font-medium opacity-50 cursor-not-allowed">
-                    <BookOpen className="h-4 w-4 mr-2" />
-                    Logopedski kotiček
-                  </Button>
                 </>
               )}
 
               {user ? (
                 <div className="flex items-center gap-2">
                   <UserProfile />
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm">
-                        <Bell className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
-                      <DropdownMenuItem className="opacity-50 cursor-not-allowed">
-                        <Bell className="h-4 w-4 mr-2" />
-                        Obvestila
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="opacity-50 cursor-not-allowed">
-                        <Smartphone className="h-4 w-4 mr-2" />
-                        Mobilna aplikacija
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => handleNavigate("/profile", { expandSection: "subscription" })}>
-                        <CreditCard className="h-4 w-4 mr-2" />
-                        Moja naročnina
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
                 </div>
               ) : (
                 <Link to="/login">
