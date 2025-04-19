@@ -1,8 +1,7 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
-import { UserRound, ChevronDown, User, Users } from "lucide-react";
+import { UserRound, ChevronDown, User, Users, bell, smartphone, wallet } from "lucide-react";
 import { 
   Popover,
   PopoverContent,
@@ -44,8 +43,11 @@ export function UserProfile() {
     localStorage.removeItem('selectedChildIndex');
   };
 
-  const handleGoToProfile = () => {
-    navigate("/profile");
+  const handleGoToProfile = (options?: { expandSection?: string }) => {
+    navigate("/profile", { state: options });
+    if (options?.expandSection) {
+      localStorage.setItem('expandSection', options.expandSection);
+    }
   };
 
   if (!user) {
@@ -83,7 +85,7 @@ export function UserProfile() {
               className={`flex items-center gap-2 p-2 rounded-md cursor-pointer ${
                 selectedChildIndex === null ? 'bg-dragon-green/10 text-dragon-green' : 'hover:bg-muted'
               }`}
-              onClick={handleGoToProfile}
+              onClick={() => handleGoToProfile()}
             >
               <User className="h-4 w-4" />
               <div className="flex-1">
@@ -129,8 +131,36 @@ export function UserProfile() {
             <Button 
               variant="outline" 
               size="sm" 
-              className="w-full justify-start text-left"
-              onClick={() => navigate("/profile")}
+              className="w-full justify-start text-left opacity-50 cursor-not-allowed"
+            >
+              <bell className="h-4 w-4 mr-2" />
+              Obvestila
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-full justify-start text-left mt-1 opacity-50 cursor-not-allowed"
+            >
+              <smartphone className="h-4 w-4 mr-2" />
+              Mobilna aplikacija
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-full justify-start text-left mt-1"
+              onClick={() => handleGoToProfile({ expandSection: "subscription" })}
+            >
+              <wallet className="h-4 w-4 mr-2" />
+              Moja naročnina
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-full justify-start text-left mt-1"
+              onClick={() => handleGoToProfile()}
             >
               <User className="h-4 w-4 mr-2" />
               Nastavitve
