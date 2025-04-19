@@ -1,7 +1,8 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
-import { UserRound, ChevronDown, User, Users, bell, smartphone, wallet } from "lucide-react";
+import { UserRound, ChevronDown, User, Users, Bell, Smartphone, Wallet } from "lucide-react";
 import { 
   Popover,
   PopoverContent,
@@ -133,7 +134,7 @@ export function UserProfile() {
               size="sm" 
               className="w-full justify-start text-left opacity-50 cursor-not-allowed"
             >
-              <bell className="h-4 w-4 mr-2" />
+              <Bell className="h-4 w-4 mr-2" />
               Obvestila
             </Button>
             
@@ -142,7 +143,7 @@ export function UserProfile() {
               size="sm" 
               className="w-full justify-start text-left mt-1 opacity-50 cursor-not-allowed"
             >
-              <smartphone className="h-4 w-4 mr-2" />
+              <Smartphone className="h-4 w-4 mr-2" />
               Mobilna aplikacija
             </Button>
             
@@ -152,7 +153,7 @@ export function UserProfile() {
               className="w-full justify-start text-left mt-1"
               onClick={() => handleGoToProfile({ expandSection: "subscription" })}
             >
-              <wallet className="h-4 w-4 mr-2" />
+              <Wallet className="h-4 w-4 mr-2" />
               Moja naročnina
             </Button>
             
