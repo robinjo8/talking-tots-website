@@ -1,21 +1,44 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserProfile } from "@/components/auth/UserProfile";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSidebar } from "@/components/ui/sidebar";
-import { Menu } from "lucide-react";
+import { Menu, Bell, Smartphone, CreditCard, BookOpen } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { MobileMenu } from "@/components/MobileMenu";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 export default function Header() {
   const { user, profile, selectedChildIndex } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const isMobile = useIsMobile();
   const { setOpenMobile } = useSidebar();
   const selectedChild = selectedChildIndex !== null && profile?.children ? profile.children[selectedChildIndex] : null;
+
+  const handleNavigate = (path: string, options?: { expandSection?: string }) => {
+    navigate(path);
+    
+    if (options?.expandSection) {
+      localStorage.setItem('expandSection', options.expandSection);
+    }
+  };
+
+  const navigationItems = [
+    { label: "Moja stran", path: "/moja-stran" },
+    { label: "Vaje", path: "/govorno-jezikovne-vaje" },
+    { label: "Govorne igre", path: "/govorne-igre" },
+    { label: "Izzivi", path: "/moji-izzivi" },
+    { label: "Video navodila", path: "/video-navodila" },
+  ];
 
   return (
     <header className="py-4 px-4 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
@@ -34,6 +57,7 @@ export default function Header() {
               {selectedChild.name}
             </span>
           )}
+          
           {isMobile ? (
             <Sheet>
               <SheetTrigger asChild>
@@ -47,19 +71,63 @@ export default function Header() {
             </Sheet>
           ) : (
             <nav className="flex items-center gap-6">
-              <a href="#features" className="font-medium hover:text-dragon-green transition-colors">Funkcije</a>
-              <a href="#cta" className="font-medium hover:text-dragon-green transition-colors">Začni</a>
-              {user && <Link to="/moja-stran" className="font-medium hover:text-dragon-green transition-colors flex items-center gap-1">
-                  Moja stran
-                </Link>}
-                
-              {user ? <UserProfile /> : <div className="flex items-center gap-2">
-                  <Link to="/login">
-                    <Button variant="outline" size="sm" className="text-sm">
-                      Prijava
-                    </Button>
-                  </Link>
-                </div>}
+              {user && (
+                <>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="font-medium">
+                        Moja stran
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      {navigationItems.map((item) => (
+                        <DropdownMenuItem key={item.label} onClick={() => handleNavigate(item.path)}>
+                          {item.label}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  <Button variant="ghost" className="font-medium opacity-50 cursor-not-allowed">
+                    <BookOpen className="h-4 w-4 mr-2" />
+                    Logopedski kotiček
+                  </Button>
+                </>
+              )}
+
+              {user ? (
+                <div className="flex items-center gap-2">
+                  <UserProfile />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm">
+                        <Bell className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuItem className="opacity-50 cursor-not-allowed">
+                        <Bell className="h-4 w-4 mr-2" />
+                        Obvestila
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="opacity-50 cursor-not-allowed">
+                        <Smartphone className="h-4 w-4 mr-2" />
+                        Mobilna aplikacija
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => handleNavigate("/profile", { expandSection: "subscription" })}>
+                        <CreditCard className="h-4 w-4 mr-2" />
+                        Moja naročnina
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              ) : (
+                <Link to="/login">
+                  <Button variant="outline" size="sm" className="text-sm">
+                    Prijava
+                  </Button>
+                </Link>
+              )}
             </nav>
           )}
         </div>
