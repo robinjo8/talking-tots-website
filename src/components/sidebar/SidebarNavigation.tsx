@@ -7,7 +7,8 @@ import {
   Video,
   BookOpen,
   Bell,
-  Smartphone
+  Smartphone,
+  CreditCard
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -28,9 +29,14 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
   const navigate = useNavigate();
   const { setOpenMobile } = useSidebar();
   
-  const handleNavigate = (path: string) => {
+  const handleNavigate = (path: string, options?: { expandSection?: string }) => {
     navigate(path);
     setOpenMobile(false);
+    
+    // If we need to expand a specific section, store it in localStorage
+    if (options?.expandSection) {
+      localStorage.setItem('expandSection', options.expandSection);
+    }
   };
 
   // Menu items configuration
@@ -79,6 +85,13 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
       label: "Mobilna aplikacija",
       icon: Smartphone,
       active: false
+    },
+    {
+      label: "Moja naročnina",
+      path: "/profile",
+      icon: CreditCard,
+      active: true,
+      onClick: () => handleNavigate("/profile", { expandSection: "subscription" })
     }
   ];
 
@@ -91,7 +104,7 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
             key={index}
             variant="ghost" 
             className={`w-full justify-start text-left ${!item.active ? 'opacity-50 cursor-not-allowed' : ''}`}
-            onClick={() => item.active && item.path ? handleNavigate(item.path) : null}
+            onClick={() => item.active && (item.onClick ? item.onClick() : item.path ? handleNavigate(item.path) : null)}
             disabled={!item.active}
           >
             <item.icon className="h-4 w-4 mr-2" />
@@ -108,7 +121,7 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
       {menuItems.map((item, index) => (
         <SidebarMenuItem key={index}>
           <SidebarMenuButton 
-            onClick={() => item.active && item.path ? handleNavigate(item.path) : null}
+            onClick={() => item.active && (item.onClick ? item.onClick() : item.path ? handleNavigate(item.path) : null)}
             disabled={!item.active}
             className={!item.active ? 'opacity-50 cursor-not-allowed' : ''}
             tooltip={item.label}

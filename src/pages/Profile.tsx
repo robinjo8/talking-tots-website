@@ -18,7 +18,7 @@ export default function Profile() {
   const { user, profile, selectedChildIndex, setSelectedChildIndex } = useAuth();
   const navigate = useNavigate();
   
-  // Section UI state - set UserProfileSection to false by default
+  // Section UI state - check localStorage for expandSection
   const [isUserProfileExpanded, setIsUserProfileExpanded] = useState(false);
   const [isChildrenSectionExpanded, setIsChildrenSectionExpanded] = useState(false);
   
@@ -40,6 +40,17 @@ export default function Profile() {
       setSelectedChildIndex(0);
     }
   }, [profile?.children, selectedChildIndex, setSelectedChildIndex]);
+
+  useEffect(() => {
+    const sectionToExpand = localStorage.getItem('expandSection');
+    if (sectionToExpand === 'subscription') {
+      const subscriptionSection = document.querySelector('[data-section="subscription"]');
+      if (subscriptionSection) {
+        subscriptionSection.scrollIntoView({ behavior: 'smooth' });
+        localStorage.removeItem('expandSection');
+      }
+    }
+  }, []);
 
   const handleDeleteChild = async () => {
     if (deletingChildIndex === null || !user) return;
@@ -120,7 +131,9 @@ export default function Profile() {
           />
           
           {/* Subscription Section */}
-          <SubscriptionSection />
+          <div data-section="subscription">
+            <SubscriptionSection />
+          </div>
           
           {/* Payment Methods Section (new) */}
           <PaymentMethodsSection />

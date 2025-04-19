@@ -11,10 +11,7 @@ export function SidebarContent({ isMobileMenu = false }: SidebarContentProps) {
   return (
     <div className={isMobileMenu ? "w-full" : ""}>
       <div className="space-y-6">
-        <div className="space-y-2">
-          <h2 className="font-bold text-sm px-2">Profil uporabnika</h2>
-          <SidebarUserProfile isMobileMenu={isMobileMenu} />
-        </div>
+        <SidebarUserProfile isMobileMenu={isMobileMenu} />
         
         <div>
           <h2 className="font-bold text-sm px-2 mb-2">Meni</h2>
