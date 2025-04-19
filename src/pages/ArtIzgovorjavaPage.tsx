@@ -1,5 +1,4 @@
 
-import { useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
@@ -10,13 +9,14 @@ import WordPracticeCard from "@/components/articulation/WordPracticeCard";
 import PracticeProgress from "@/components/articulation/PracticeProgress";
 import { letterPracticeWords } from "@/data/letterPracticeWords";
 import { useWordPractice } from "@/hooks/useWordPractice";
+import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { handlePlayRozaAudio } from "@/utils/audioUtils";
 
 const ArtIzgovorjavaPage = () => {
   const { user, profile, selectedChildIndex } = useAuth();
   const navigate = useNavigate();
   const { letter: urlLetter } = useParams();
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const { audioRef, playAudio } = useAudioPlayback();
   
   const selectedChild = selectedChildIndex !== null && profile?.children 
     ? profile.children[selectedChildIndex] 
@@ -41,7 +41,9 @@ const ArtIzgovorjavaPage = () => {
   const currentWord = currentWords.length > currentWordIndex ? currentWords[currentWordIndex] : null;
   
   const handlePlayAudio = () => {
-    console.log(`Playing audio for word: ${currentWord?.word}`);
+    if (currentWord?.audioUrl) {
+      playAudio(currentWord.audioUrl);
+    }
   };
   
   if (!user) {

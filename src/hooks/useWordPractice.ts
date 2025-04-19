@@ -1,15 +1,12 @@
 
 import { useState, useEffect } from "react";
 import { PracticeWord } from "@/data/letterPracticeWords";
-import { positiveFeedback, tryAgainFeedback } from "@/data/feedbackMessages";
 import { useNavigate } from "react-router-dom";
+import { useSpeechRecording } from "./useSpeechRecording";
 
 interface WordPracticeState {
   currentWordIndex: number;
   score: number;
-  feedbackMessage: string | null;
-  showPositiveFeedback: boolean;
-  isRecording: boolean;
   progress: number;
 }
 
@@ -21,11 +18,16 @@ export const useWordPractice = (
   const [state, setState] = useState<WordPracticeState>({
     currentWordIndex: 0,
     score: 0,
-    feedbackMessage: null,
-    showPositiveFeedback: false,
-    isRecording: false,
     progress: 0,
   });
+
+  const { isRecording, feedbackMessage, showPositiveFeedback, startRecording } = 
+    useSpeechRecording((points) => {
+      setState(prev => ({
+        ...prev,
+        score: prev.score + points,
+      }));
+    });
 
   useEffect(() => {
     if (selectedLetter) {
@@ -33,7 +35,6 @@ export const useWordPractice = (
         ...prev,
         currentWordIndex: 0,
         score: 0,
-        feedbackMessage: null,
         progress: 0,
       }));
     }
@@ -52,30 +53,11 @@ export const useWordPractice = (
     navigate(`/artikulacija/${letter}`, { replace: true });
   };
 
-  const handleMicRecord = () => {
-    setState(prev => ({ ...prev, isRecording: true }));
-    
-    setTimeout(() => {
-      const isSuccess = Math.random() > 0.2;
-      
-      setState(prev => ({
-        ...prev,
-        isRecording: false,
-        feedbackMessage: isSuccess 
-          ? positiveFeedback[Math.floor(Math.random() * positiveFeedback.length)]
-          : tryAgainFeedback[Math.floor(Math.random() * tryAgainFeedback.length)],
-        showPositiveFeedback: isSuccess,
-        score: isSuccess ? prev.score + 10 : prev.score,
-      }));
-    }, 2000);
-  };
-
   const handleNextWord = () => {
     if (state.currentWordIndex < currentWords.length - 1) {
       setState(prev => ({
         ...prev,
         currentWordIndex: prev.currentWordIndex + 1,
-        feedbackMessage: null,
       }));
     } else {
       alert("Čestitamo! Zaključil si vse vaje za to črko!");
@@ -84,8 +66,11 @@ export const useWordPractice = (
 
   return {
     ...state,
+    isRecording,
+    feedbackMessage,
+    showPositiveFeedback,
     handleLetterSelect,
-    handleMicRecord,
+    handleMicRecord: startRecording,
     handleNextWord,
   };
 };
