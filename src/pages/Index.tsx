@@ -10,58 +10,72 @@ const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
   const { user } = useAuth();
   const isMobile = useIsMobile();
-  
+
   useEffect(() => {
     setIsVisible(true);
   }, []);
+
+  const scrollToFeatures = () => {
+    const featuresSection = document.getElementById('features');
+    if (featuresSection) {
+      featuresSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden">
       <Header />
       
       {/* Hero Section */}
-      <section className="pt-20 md:pt-32 pb-16 px-4 md:px-10 relative w-full">
+      <section className="pt-16 md:pt-32 pb-8 md:pb-16 px-4 md:px-10 relative w-full">
         <div className="absolute -top-10 -left-10 w-32 h-32 bg-app-yellow/20 rounded-full blur-3xl"></div>
         <div className="absolute top-40 -right-10 w-60 h-60 bg-app-blue/20 rounded-full blur-3xl"></div>
         
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-6 md:gap-10 items-center">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-4 md:gap-10 items-center">
           <div className={`${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'} transition-all duration-700 ease-out`}>
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold mb-6">
+            <h1 className="text-2xl md:text-5xl lg:text-6xl font-extrabold mb-4 md:mb-6">
               Naredimo govor <span className="rainbow-text">zabaven</span> – za male junake!
             </h1>
-            <p className="text-xl mb-8 text-muted-foreground max-w-xl">
+            <p className="text-lg md:text-xl mb-6 md:mb-8 text-muted-foreground max-w-xl">
               Tomi Talk otrokom pomaga pri učenju govora skozi igro z našim prijaznim zmajčkom Tomijem. Govorjenje še nikoli ni bilo tako zabavno!
             </p>
-            
-            {!isMobile && (
-              <div className="flex flex-row gap-4 w-full justify-stretch">
-                <Button size="lg" className="flex-1 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full">
-                  Začni brezplačno
-                </Button>
-                <Button size="lg" variant="outline" className="flex-1 rounded-full">
-                  <Play className="mr-2 h-4 w-4" /> Oglej si demo
-                </Button>
-              </div>
-            )}
           </div>
           
           <div className={`relative ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'} transition-all duration-700 ease-out delay-300`}>
             <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
             <div className="animate-float relative">
-              <img alt="Tomi Talk Dragon Mascot" className="w-full max-w-md mx-auto" src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" />
+              <img 
+                alt="Tomi Talk Dragon Mascot" 
+                className="w-3/4 md:w-full max-w-md mx-auto" 
+                src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" 
+              />
             </div>
-            
-            {isMobile && (
-              <div className="flex flex-col gap-4 mt-8 px-4 w-full">
-                <Button size="lg" className="w-full bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full">
-                  Začni brezplačno
-                </Button>
-                <Button size="lg" variant="outline" className="w-full rounded-full">
-                  <Play className="mr-2 h-4 w-4" /> Oglej si demo
-                </Button>
-              </div>
-            )}
           </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="mt-6 md:mt-8 flex flex-col md:flex-row gap-3 justify-center items-center px-4">
+          <Button 
+            size="lg" 
+            className="w-full md:w-auto bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full min-w-[200px]"
+          >
+            Začni zdaj
+          </Button>
+          <Button 
+            size="lg" 
+            variant="outline" 
+            className="w-full md:w-auto rounded-full min-w-[200px]"
+          >
+            <Play className="mr-2 h-4 w-4" /> Poglej demo
+          </Button>
+          <Button 
+            size="lg" 
+            variant="outline" 
+            className="w-full md:w-auto rounded-full min-w-[200px]"
+            onClick={scrollToFeatures}
+          >
+            Poglej kako zmajček Tomi pomaga
+          </Button>
         </div>
       </section>
 
