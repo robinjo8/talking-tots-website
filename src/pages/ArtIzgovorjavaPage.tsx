@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -114,9 +115,11 @@ const ArtIzgovorjavaPage = () => {
   // Letters for selection
   const problematicLetters = ["R", "L", "S", "Š", "Č", "Ž", "C", "Z"];
   
-  // Current word being practiced
-  const currentWords = selectedLetter ? letterPracticeWords[selectedLetter] : [];
-  const currentWord = currentWords[currentWordIndex];
+  // Current word being practiced - Add null checks
+  const currentWords = selectedLetter && letterPracticeWords[selectedLetter] 
+    ? letterPracticeWords[selectedLetter] 
+    : [];
+  const currentWord = currentWords.length > currentWordIndex ? currentWords[currentWordIndex] : null;
   
   const audioRef = useRef<HTMLAudioElement>(null);
   
