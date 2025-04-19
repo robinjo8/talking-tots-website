@@ -10,20 +10,14 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { MobileMenu } from "@/components/MobileMenu";
 
 export default function Header() {
-  const {
-    user,
-    profile,
-    selectedChildIndex
-  } = useAuth();
+  const { user, profile, selectedChildIndex } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
-  const {
-    setOpenMobile
-  } = useSidebar();
+  const { setOpenMobile } = useSidebar();
   const selectedChild = selectedChildIndex !== null && profile?.children ? profile.children[selectedChildIndex] : null;
   return (
-    <header className="py-4 px-6 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
+    <header className="py-4 px-4 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <Link to="/" className="flex items-center gap-2">
           <img src="/lovable-uploads/ef9acb7f-a16f-4737-ac7b-fe4bc68c21cd.png" alt="Tomi the Dragon" className="h-8 md:h-10" />
@@ -33,11 +27,11 @@ export default function Header() {
           </div>
         </Link>
         
-        <div className="flex items-center gap-4">
+        <div className="flex items-center">
           {isMobile ? (
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex items-center gap-1 -mr-2">
+                <Button variant="ghost" size="sm" className="flex items-center -mr-2">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
