@@ -1,3 +1,4 @@
+
 import { Card, CardHeader, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookText, Gamepad, Zap, Video } from "lucide-react";
@@ -15,7 +16,8 @@ export function ActivityOptions() {
   };
   
   return (
-    <h2 className="text-2xl font-bold mb-6 mt-12">Izberi možnost:</h2>
+    <>
+      <h2 className="text-2xl font-bold mb-6 mt-12">Izberi možnost:</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
         <Card className="transition-all duration-300 hover:shadow-md">
@@ -99,5 +101,6 @@ export function ActivityOptions() {
           </CardFooter>
         </Card>
       </div>
-    </>;
+    </>
+  );
 }
