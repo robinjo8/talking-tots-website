@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { MemoryGame } from "@/components/memory/MemoryGame";
 
 export default function GovorneIgre() {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ export default function GovorneIgre() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container max-w-5xl mx-auto pt-32 pb-20 px-4">
+      <div className="container max-w-7xl mx-auto pt-32 pb-20 px-4">
         <div className="flex items-center gap-3 mb-8">
           <Button 
             variant="ghost" 
@@ -29,13 +30,16 @@ export default function GovorneIgre() {
           </h1>
         </div>
         
-        <Card className="bg-dragon-green/5">
-          <CardContent className="p-8 text-center">
-            <p className="text-lg text-muted-foreground">
-              Zabavne igre za izboljšanje izgovorjave skozi igro.
+        <Card className="bg-dragon-green/5 mb-8">
+          <CardContent className="p-8">
+            <h2 className="text-xl font-bold mb-2">Igra Spomin</h2>
+            <p className="text-muted-foreground">
+              Poišči pare med slikami in besedami, ki se začnejo na črko R. Klikni na kartico, da jo obrneš.
             </p>
           </CardContent>
         </Card>
+
+        <MemoryGame />
       </div>
     </div>
   );

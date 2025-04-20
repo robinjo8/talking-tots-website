@@ -1,4 +1,3 @@
-
 import { Card, CardHeader, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookText, Gamepad, Zap, Video } from "lucide-react";
@@ -11,8 +10,12 @@ export function ActivityOptions() {
     navigate("/govorno-jezikovne-vaje");
   };
   
-  return <>
-      <h2 className="text-2xl font-bold mb-6 mt-12">Izberi možnost:</h2>
+  const handleGoToGames = () => {
+    navigate("/govorne-igre");
+  };
+  
+  return (
+    <h2 className="text-2xl font-bold mb-6 mt-12">Izberi možnost:</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
         <Card className="transition-all duration-300 hover:shadow-md">
@@ -49,7 +52,10 @@ export function ActivityOptions() {
             </p>
           </CardContent>
           <CardFooter>
-            <Button className="w-full bg-app-purple hover:bg-app-purple/90">
+            <Button 
+              className="w-full bg-app-purple hover:bg-app-purple/90"
+              onClick={handleGoToGames}
+            >
               Začni igro
             </Button>
           </CardFooter>
