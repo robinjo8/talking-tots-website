@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useMemoryGame } from "@/hooks/useMemoryGame";
@@ -8,7 +7,7 @@ export function MemoryGame() {
   const { cards, matchedPairs, totalPairs, handleCardClick, initializeGame } = useMemoryGame();
   
   return (
-    <div className="w-full">
+    <div className="w-full max-w-5xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <div className="text-lg font-medium">
           Najdenih parov: {matchedPairs} / {totalPairs}
@@ -22,7 +21,7 @@ export function MemoryGame() {
         </Button>
       </div>
       
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-3 md:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3 md:gap-4">
         {cards.map((card, index) => (
           <MemoryCard
             key={card.id}

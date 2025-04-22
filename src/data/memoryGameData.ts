@@ -1,4 +1,3 @@
-
 export type MemoryCard = {
   id: number;
   word: string;
@@ -19,10 +18,4 @@ export const memoryPairs = [
   { word: 'račka', image: 'https://images.unsplash.com/photo-1441057206919-63d19fac2369' },
   { word: 'radio', image: 'https://images.unsplash.com/photo-1487252665478-49b61b47f302' },
   { word: 'ravnilo', image: 'https://images.unsplash.com/photo-1482938289607-e9573fc25ebb' },
-  { word: 'rokavica', image: 'https://images.unsplash.com/photo-1485833077593-4278bba3f11f' },
-  { word: 'ring', image: 'https://images.unsplash.com/photo-1487252665478-49b61b47f302' },
-  { word: 'ruleta', image: 'https://images.unsplash.com/photo-1487252665478-49b61b47f302' },
-  { word: 'rogač', image: 'https://images.unsplash.com/photo-1485833077593-4278bba3f11f' },
-  { word: 'riž', image: 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9' },
 ];
-

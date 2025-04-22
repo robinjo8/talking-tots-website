@@ -15,7 +15,7 @@ export function MemoryCard({ word, type, image, isFlipped, isMatched, onClick }:
   return (
     <Card
       className={cn(
-        "w-full aspect-[3/4] cursor-pointer perspective-1000 transition-transform duration-500 transform-style-preserve-3d",
+        "w-full aspect-[4/5] cursor-pointer perspective-1000 transition-transform duration-500 transform-style-preserve-3d",
         (isFlipped || isMatched) && "rotate-y-180"
       )}
       onClick={onClick}

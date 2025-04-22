@@ -9,6 +9,27 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      "memory-cards": {
+        Row: {
+          audio_url: string | null
+          id: string
+          image_url: string | null
+          word: string
+        }
+        Insert: {
+          audio_url?: string | null
+          id?: string
+          image_url?: string | null
+          word: string
+        }
+        Update: {
+          audio_url?: string | null
+          id?: string
+          image_url?: string | null
+          word?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           address: string | null
