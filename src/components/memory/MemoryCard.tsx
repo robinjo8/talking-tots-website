@@ -34,11 +34,11 @@ export function MemoryCard({ word, type, image, isFlipped, isMatched, onClick }:
           "absolute w-full h-full backface-hidden bg-white rounded-lg flex items-center justify-center p-4 rotate-y-180",
           isMatched && "bg-dragon-green/10"
         )}>
-          {type === 'image' ? (
+          {type === 'image' && image ? (
             <img 
               src={image} 
               alt={word}
-              className="w-full h-full object-cover rounded"
+              className="w-full h-full object-contain rounded"
             />
           ) : (
             <span className="text-xl md:text-2xl font-bold text-center break-words">

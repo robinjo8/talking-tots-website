@@ -7,9 +7,11 @@ export function useMemoryGame() {
   const [cards, setCards] = useState<MemoryCard[]>([]);
   const [flippedIndices, setFlippedIndices] = useState<number[]>([]);
   const [matchedPairs, setMatchedPairs] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState(true);
   const audioRef = useRef<HTMLAudioElement>(null);
   
   const initializeGame = async () => {
+    setIsLoading(true);
     try {
       // Fetch 10 random cards from Supabase
       const { data: memoryCards, error } = await supabase
@@ -17,12 +19,19 @@ export function useMemoryGame() {
         .select('*')
         .limit(10);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching memory cards:', error);
+        return;
+      }
 
-      if (!memoryCards) return;
+      if (!memoryCards || memoryCards.length === 0) {
+        console.error('No memory cards found');
+        return;
+      }
 
       const gameCards: MemoryCard[] = [];
       
+      // Create card pairs (image and text) for each item
       memoryCards.forEach((card) => {
         // Add image card
         gameCards.push({
@@ -37,7 +46,7 @@ export function useMemoryGame() {
         
         // Add text card
         gameCards.push({
-          id: gameCards.length + 1,
+          id: gameCards.length,
           word: card.word,
           type: 'text',
           audioUrl: card.audio_url,
@@ -52,7 +61,9 @@ export function useMemoryGame() {
       setFlippedIndices([]);
       setMatchedPairs(0);
     } catch (error) {
-      console.error('Error fetching memory cards:', error);
+      console.error('Error initializing game:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -76,7 +87,7 @@ export function useMemoryGame() {
     newCards[index].flipped = true;
     setCards(newCards);
 
-    // Play audio if available (only for word cards to avoid double playback)
+    // Play audio if available (only for text cards to avoid double playback)
     if (cards[index].type === 'text' && cards[index].audioUrl) {
       playAudio(cards[index].audioUrl);
     }
@@ -124,5 +135,6 @@ export function useMemoryGame() {
     handleCardClick,
     initializeGame,
     audioRef,
+    isLoading,
   };
 }
