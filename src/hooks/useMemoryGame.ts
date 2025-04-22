@@ -1,45 +1,68 @@
 
-import { useState, useEffect } from 'react';
-import { MemoryCard, memoryPairs } from '@/data/memoryGameData';
+import { useState, useEffect, useRef } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import type { MemoryCard } from '@/data/memoryGameData';
 
 export function useMemoryGame() {
   const [cards, setCards] = useState<MemoryCard[]>([]);
   const [flippedIndices, setFlippedIndices] = useState<number[]>([]);
   const [matchedPairs, setMatchedPairs] = useState<number>(0);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  
+  const initializeGame = async () => {
+    try {
+      // Fetch 10 random cards from Supabase
+      const { data: memoryCards, error } = await supabase
+        .from('memory-cards')
+        .select('*')
+        .limit(10);
 
-  useEffect(() => {
-    initializeGame();
-  }, []);
+      if (error) throw error;
 
-  const initializeGame = () => {
-    const gameCards: MemoryCard[] = [];
-    
-    memoryPairs.forEach((pair, index) => {
-      // Add image card
-      gameCards.push({
-        id: index * 2,
-        word: pair.word,
-        type: 'image',
-        image: pair.image,
-        matched: false,
-        flipped: false,
-      });
+      if (!memoryCards) return;
+
+      const gameCards: MemoryCard[] = [];
       
-      // Add text card
-      gameCards.push({
-        id: index * 2 + 1,
-        word: pair.word,
-        type: 'text',
-        matched: false,
-        flipped: false,
+      memoryCards.forEach((card) => {
+        // Add image card
+        gameCards.push({
+          id: gameCards.length,
+          word: card.word,
+          type: 'image',
+          image: card.image_url,
+          audioUrl: card.audio_url,
+          matched: false,
+          flipped: false,
+        });
+        
+        // Add text card
+        gameCards.push({
+          id: gameCards.length + 1,
+          word: card.word,
+          type: 'text',
+          audioUrl: card.audio_url,
+          matched: false,
+          flipped: false,
+        });
       });
-    });
 
-    // Shuffle cards
-    const shuffledCards = [...gameCards].sort(() => Math.random() - 0.5);
-    setCards(shuffledCards);
-    setFlippedIndices([]);
-    setMatchedPairs(0);
+      // Shuffle cards
+      const shuffledCards = [...gameCards].sort(() => Math.random() - 0.5);
+      setCards(shuffledCards);
+      setFlippedIndices([]);
+      setMatchedPairs(0);
+    } catch (error) {
+      console.error('Error fetching memory cards:', error);
+    }
+  };
+
+  const playAudio = (audioUrl: string | null) => {
+    if (audioUrl && audioRef.current) {
+      audioRef.current.src = audioUrl;
+      audioRef.current.play().catch(error => {
+        console.error("Error playing audio:", error);
+      });
+    }
   };
 
   const handleCardClick = (index: number) => {
@@ -52,6 +75,11 @@ export function useMemoryGame() {
     const newCards = [...cards];
     newCards[index].flipped = true;
     setCards(newCards);
+
+    // Play audio if available (only for word cards to avoid double playback)
+    if (cards[index].type === 'text' && cards[index].audioUrl) {
+      playAudio(cards[index].audioUrl);
+    }
 
     const newFlippedIndices = [...flippedIndices, index];
     setFlippedIndices(newFlippedIndices);
@@ -85,11 +113,16 @@ export function useMemoryGame() {
     }
   };
 
+  useEffect(() => {
+    initializeGame();
+  }, []);
+
   return {
     cards,
     matchedPairs,
-    totalPairs: memoryPairs.length,
+    totalPairs: cards.length / 2,
     handleCardClick,
     initializeGame,
+    audioRef,
   };
 }

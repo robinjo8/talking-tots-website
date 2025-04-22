@@ -1,20 +1,23 @@
-import { Card, CardContent } from "@/components/ui/card";
+
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useMemoryGame } from "@/hooks/useMemoryGame";
 import { MemoryCard } from "./MemoryCard";
 
 export function MemoryGame() {
-  const { cards, matchedPairs, totalPairs, handleCardClick, initializeGame } = useMemoryGame();
+  const { cards, matchedPairs, totalPairs, handleCardClick, initializeGame, audioRef } = useMemoryGame();
   
   return (
     <div className="w-full max-w-5xl mx-auto">
+      <audio ref={audioRef} className="hidden" />
+      
       <div className="flex justify-between items-center mb-6">
         <div className="text-lg font-medium">
           Najdenih parov: {matchedPairs} / {totalPairs}
         </div>
         <Button 
           variant="outline" 
-          onClick={initializeGame}
+          onClick={() => initializeGame()}
           className="bg-dragon-green/10 border-dragon-green/30 text-dragon-green hover:bg-dragon-green/20"
         >
           Nova igra
