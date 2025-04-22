@@ -31,8 +31,8 @@ export function MemoryCard({ word, type, image, isFlipped, isMatched, onClick }:
 
         {/* Back face (content) */}
         <div className={cn(
-          "absolute w-full h-full backface-hidden bg-white rounded-lg flex items-center justify-center p-4 rotate-y-180",
-          isMatched && "bg-dragon-green/10"
+          "absolute w-full h-full backface-hidden rounded-lg flex items-center justify-center p-4 rotate-y-180",
+          isMatched ? "bg-dragon-green/20" : "bg-white"
         )}>
           {type === 'image' && image ? (
             <img 
@@ -41,7 +41,7 @@ export function MemoryCard({ word, type, image, isFlipped, isMatched, onClick }:
               className="w-full h-full object-contain rounded"
             />
           ) : (
-            <span className="text-xl md:text-2xl font-bold text-center break-words">
+            <span className="text-xl md:text-2xl font-bold text-center break-words text-dragon-green">
               {word}
             </span>
           )}

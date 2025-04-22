@@ -29,6 +29,8 @@ export function useMemoryGame() {
         return;
       }
 
+      console.log('Fetched memory cards:', memoryCards);
+      
       const gameCards: MemoryCard[] = [];
       
       // Create card pairs (image and text) for each item
@@ -57,6 +59,8 @@ export function useMemoryGame() {
 
       // Shuffle cards
       const shuffledCards = [...gameCards].sort(() => Math.random() - 0.5);
+      console.log('Shuffled cards:', shuffledCards);
+      
       setCards(shuffledCards);
       setFlippedIndices([]);
       setMatchedPairs(0);
