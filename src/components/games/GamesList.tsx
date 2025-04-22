@@ -1,6 +1,6 @@
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Memory, Puzzle, Gamepad, SquareDashed } from "lucide-react";
+import { Brain, Puzzle, Gamepad, SquareDashed } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const games = [
@@ -8,7 +8,7 @@ const games = [
     id: "spomin",
     title: "Igra spomin",
     description: "Poišči pare med slikami in besedami.",
-    icon: Memory,
+    icon: Brain,
     path: "/govorne-igre/igra-spomin",
     color: "text-dragon-green",
     gradient: "from-dragon-green/10 to-app-blue/10"
