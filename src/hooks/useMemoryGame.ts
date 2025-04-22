@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { MemoryCard } from '@/data/memoryGameData';
@@ -13,7 +12,6 @@ export function useMemoryGame() {
   const initializeGame = async () => {
     setIsLoading(true);
     try {
-      // Fetch 10 random cards from Supabase
       const { data: memoryCards, error } = await supabase
         .from('memory-cards')
         .select('*')
@@ -33,8 +31,14 @@ export function useMemoryGame() {
       
       const gameCards: MemoryCard[] = [];
       
-      // Create card pairs (image and text) for each item
       memoryCards.forEach((card) => {
+        if (!card.word) {
+          console.error('Card missing word:', card);
+          return;
+        }
+
+        console.log(`Creating card pair for word: ${card.word}, image URL: ${card.image_url}`);
+
         // Add image card
         gameCards.push({
           id: gameCards.length,
@@ -57,9 +61,8 @@ export function useMemoryGame() {
         });
       });
 
-      // Shuffle cards
       const shuffledCards = [...gameCards].sort(() => Math.random() - 0.5);
-      console.log('Shuffled cards:', shuffledCards);
+      console.log('Initialized shuffled cards:', shuffledCards);
       
       setCards(shuffledCards);
       setFlippedIndices([]);
@@ -81,17 +84,13 @@ export function useMemoryGame() {
   };
 
   const handleCardClick = (index: number) => {
-    // Ignore if card is already flipped or matched
     if (cards[index].flipped || cards[index].matched) return;
-    
-    // Ignore if two cards are already flipped
     if (flippedIndices.length === 2) return;
 
     const newCards = [...cards];
     newCards[index].flipped = true;
     setCards(newCards);
 
-    // Play audio if available (only for text cards to avoid double playback)
     if (cards[index].type === 'text' && cards[index].audioUrl) {
       playAudio(cards[index].audioUrl);
     }
@@ -99,14 +98,12 @@ export function useMemoryGame() {
     const newFlippedIndices = [...flippedIndices, index];
     setFlippedIndices(newFlippedIndices);
 
-    // Check for match if two cards are flipped
     if (newFlippedIndices.length === 2) {
       const [firstIndex, secondIndex] = newFlippedIndices;
       const firstCard = cards[firstIndex];
       const secondCard = cards[secondIndex];
 
       if (firstCard.word === secondCard.word && firstCard.type !== secondCard.type) {
-        // Match found
         setTimeout(() => {
           const matchedCards = [...cards];
           matchedCards[firstIndex].matched = true;
@@ -116,7 +113,6 @@ export function useMemoryGame() {
           setFlippedIndices([]);
         }, 500);
       } else {
-        // No match
         setTimeout(() => {
           const unflippedCards = [...cards];
           unflippedCards[firstIndex].flipped = false;

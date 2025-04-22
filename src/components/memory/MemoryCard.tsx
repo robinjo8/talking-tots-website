@@ -1,6 +1,7 @@
 
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
+import { useState } from "react";
 
 interface MemoryCardProps {
   word: string;
@@ -12,6 +13,17 @@ interface MemoryCardProps {
 }
 
 export function MemoryCard({ word, type, image, isFlipped, isMatched, onClick }: MemoryCardProps) {
+  const [imageError, setImageError] = useState(false);
+
+  const handleImageError = () => {
+    console.error(`Failed to load image for word: ${word}`);
+    setImageError(true);
+  };
+
+  const handleImageLoad = () => {
+    console.log(`Successfully loaded image for word: ${word}`);
+  };
+
   return (
     <Card
       className={cn(
@@ -21,7 +33,7 @@ export function MemoryCard({ word, type, image, isFlipped, isMatched, onClick }:
       onClick={onClick}
     >
       <div className="w-full h-full relative">
-        {/* Front face (hidden) */}
+        {/* Front face (hidden when flipped) */}
         <div className={cn(
           "absolute w-full h-full backface-hidden bg-gradient-to-br from-dragon-green/20 to-app-blue/20 rounded-lg flex items-center justify-center",
           (isFlipped || isMatched) && "invisible"
@@ -29,20 +41,22 @@ export function MemoryCard({ word, type, image, isFlipped, isMatched, onClick }:
           <span className="text-4xl font-bold text-dragon-green">?</span>
         </div>
 
-        {/* Back face (content) */}
+        {/* Back face (visible when flipped) */}
         <div className={cn(
           "absolute w-full h-full backface-hidden rounded-lg flex items-center justify-center p-4 rotate-y-180",
           isMatched ? "bg-dragon-green/20" : "bg-white"
         )}>
-          {type === 'image' && image ? (
+          {type === 'image' && image && !imageError ? (
             <img 
               src={image} 
               alt={word}
               className="w-full h-full object-contain rounded"
+              onError={handleImageError}
+              onLoad={handleImageLoad}
             />
           ) : (
             <span className="text-xl md:text-2xl font-bold text-center break-words text-dragon-green">
-              {word}
+              {type === 'image' && imageError ? '❌' : word}
             </span>
           )}
         </div>
