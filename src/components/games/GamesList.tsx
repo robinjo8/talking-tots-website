@@ -9,7 +9,7 @@ const memoryGames = [
     id: "spomin-r",
     title: "Spomin (besede na črko R)",
     description: "Igra spomin za vajo izgovorjave črke R",
-    path: "/govorne-igre/igra-spomin/spomin-r",
+    path: "/govorne-igre/spomin-r",
     available: true
   },
   {

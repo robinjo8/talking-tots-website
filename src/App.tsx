@@ -98,9 +98,17 @@ const App = () => (
                     </ProtectedRoute>
                   }
                 />
+                <Route 
+                  path="/govorne-igre/spomin" 
+                  element={
+                    <ProtectedRoute>
+                      <SpominIgra />
+                    </ProtectedRoute>
+                  }
+                />
                 
                 <Route 
-                  path="/govorne-igre/igra-spomin/:gameId" 
+                  path="/govorne-igre/spomin-r" 
                   element={
                     <ProtectedRoute>
                       <SpominR />
