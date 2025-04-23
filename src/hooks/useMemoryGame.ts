@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { MemoryCard } from '@/data/memoryGameData';
@@ -13,7 +14,7 @@ export function useMemoryGame() {
     setIsLoading(true);
     try {
       const { data: memoryCards, error } = await supabase
-        .from('memory-cards')
+        .from('memory_cards')
         .select('*')
         .limit(10);
 
@@ -27,17 +28,10 @@ export function useMemoryGame() {
         return;
       }
 
-      console.log('Fetched memory cards:', memoryCards);
-      
       const gameCards: MemoryCard[] = [];
       
       memoryCards.forEach((card) => {
-        if (!card.word) {
-          console.error('Card missing word:', card);
-          return;
-        }
-
-        console.log(`Creating card pair for word: ${card.word}, image URL: ${card.image_url}`);
+        if (!card.word) return;
 
         // Add image card
         gameCards.push({
@@ -62,8 +56,6 @@ export function useMemoryGame() {
       });
 
       const shuffledCards = [...gameCards].sort(() => Math.random() - 0.5);
-      console.log('Initialized shuffled cards:', shuffledCards);
-      
       setCards(shuffledCards);
       setFlippedIndices([]);
       setMatchedPairs(0);
@@ -72,6 +64,16 @@ export function useMemoryGame() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const updateCard = async (index: number, updates: Partial<MemoryCard>) => {
+    const newCards = [...cards];
+    newCards[index] = { ...newCards[index], ...updates };
+    setCards(newCards);
+
+    // Here we would also update Supabase
+    // This is a placeholder for the actual implementation
+    console.log('Card updated:', { index, updates });
   };
 
   const playAudio = (audioUrl: string | null) => {
@@ -134,6 +136,7 @@ export function useMemoryGame() {
     totalPairs: cards.length / 2,
     handleCardClick,
     initializeGame,
+    updateCard,
     audioRef,
     isLoading,
   };
