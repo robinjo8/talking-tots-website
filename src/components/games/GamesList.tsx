@@ -56,15 +56,14 @@ const memoryGames = [
   }
 ];
 
-const games = [
+const otherGames = [
   {
     id: "spomin",
     title: "Spomin",
-    description: "Vaja izgovorjave preko igre spomin",
+    description: "Kmalu na voljo",
     icon: Gamepad,
     color: "text-app-purple",
-    gradient: "from-app-purple/10 to-app-blue/10",
-    subgames: memoryGames
+    gradient: "from-app-purple/10 to-app-blue/10"
   },
   {
     id: "igra2",
@@ -90,11 +89,36 @@ export function GamesList() {
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {games.map((game) => (
+        {memoryGames.map((game) => (
           <Card 
             key={game.id}
-            className="transition-all duration-300 hover:shadow-md cursor-pointer"
-            onClick={() => game.subgames ? undefined : null}
+            className={cn(
+              "transition-all duration-300 hover:shadow-md",
+              game.available ? "cursor-pointer" : "opacity-50"
+            )}
+            onClick={() => game.available && game.path && navigate(game.path)}
+          >
+            <CardContent className="p-6">
+              <div className="bg-gradient-to-br from-app-purple/10 to-app-blue/10 rounded-lg p-4 mb-4 flex items-center justify-center">
+                <Puzzle className="h-8 w-8 text-app-purple" />
+              </div>
+              <h3 className="font-bold text-lg mb-2">{game.title}</h3>
+              <p className="text-sm text-muted-foreground">{game.description}</p>
+              {!game.available && (
+                <div className="mt-3 text-sm text-muted-foreground italic">
+                  Kmalu na voljo
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {otherGames.map((game) => (
+          <Card 
+            key={game.id}
+            className="transition-all duration-300 hover:shadow-md opacity-50"
           >
             <CardContent className="p-6">
               <div className={`bg-gradient-to-br ${game.gradient} rounded-lg p-4 mb-4 flex items-center justify-center`}>
@@ -102,34 +126,6 @@ export function GamesList() {
               </div>
               <h3 className="font-bold text-lg mb-2">{game.title}</h3>
               <p className="text-sm text-muted-foreground">{game.description}</p>
-              
-              {game.subgames && (
-                <div className="mt-4 space-y-3">
-                  {game.subgames.map((subgame) => (
-                    <div
-                      key={subgame.id}
-                      className={cn(
-                        "p-3 rounded-md border transition-all hover:bg-accent",
-                        subgame.available ? "cursor-pointer" : "opacity-50"
-                      )}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (subgame.available && subgame.path) {
-                          navigate(subgame.path);
-                        }
-                      }}
-                    >
-                      <div className="font-medium text-sm">{subgame.title}</div>
-                      <div className="text-xs text-muted-foreground">{subgame.description}</div>
-                      {!subgame.available && (
-                        <div className="mt-1 text-xs text-muted-foreground italic">
-                          Kmalu na voljo
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
             </CardContent>
           </Card>
         ))}
