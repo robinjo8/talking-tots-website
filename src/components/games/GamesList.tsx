@@ -9,7 +9,7 @@ const games = [
     title: "Igra spomin",
     description: "Poišči pare med slikami in besedami.",
     icon: Brain,
-    path: "/govorne-igre/igra-spomin",
+    path: "/govorne-igre/spomin",
     color: "text-dragon-green",
     gradient: "from-dragon-green/10 to-app-blue/10"
   },
