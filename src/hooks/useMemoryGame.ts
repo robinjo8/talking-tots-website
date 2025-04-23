@@ -31,6 +31,8 @@ export const useMemoryGame = () => {
         throw new Error('Ni najdenih kartic za igro.');
       }
 
+      console.log("Loaded cards from Supabase:", data);
+
       // Create pairs and add game state properties
       const cardPairs = data.flatMap((card, index) => [
         { ...card, isFlipped: false, isMatched: false, pairId: index },
@@ -41,6 +43,7 @@ export const useMemoryGame = () => {
       const shuffledCards = cardPairs.sort(() => Math.random() - 0.5);
       setCards(shuffledCards);
     } catch (err) {
+      console.error("Error loading cards:", err);
       setError(err instanceof Error ? err.message : 'Napaka pri nalaganju kartic.');
     } finally {
       setLoading(false);
@@ -77,7 +80,7 @@ export const useMemoryGame = () => {
         // No match - flip cards back after delay
         setTimeout(() => {
           setCards(cards => cards.map(card => 
-            card === firstCard || card === secondCard 
+            (card === firstCard || card === secondCard) 
               ? { ...card, isFlipped: false }
               : card
           ));

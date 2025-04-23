@@ -25,15 +25,24 @@ export function MemoryGrid() {
     );
   }
 
+  if (!cards || cards.length === 0) {
+    return (
+      <div className="text-center p-8">
+        <p className="text-red-500 mb-4">Ni najdenih kartic za igro.</p>
+        <Button onClick={resetGame}>Poskusi znova</Button>
+      </div>
+    );
+  }
+
   const allCardsMatched = cards.every(card => card.isMatched);
 
   return (
     <div className="space-y-4">
       <Card className="w-full p-4 bg-white/50 backdrop-blur-sm border-dragon-green/20">
-        <div className="grid grid-cols-5 gap-3 aspect-[5/4]">
+        <div className="grid grid-cols-4 md:grid-cols-5 gap-2 md:gap-3 aspect-[5/4]">
           {cards.map((card, index) => (
             <MemoryCard 
-              key={`${card.id}-${card.pairId}-${index}`}
+              key={`${card.id}-${index}`}
               index={index}
               imageUrl={card.image_url}
               audioUrl={card.audio_url}
