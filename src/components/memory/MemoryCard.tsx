@@ -16,12 +16,8 @@ export function MemoryCard({ index }: MemoryCardProps) {
         "border-2 border-dragon-green/20"
       )}
     >
-      <div className="w-full h-full flex items-center justify-center p-6">
-        <img 
-          src="/placeholder.svg"
-          alt="Memory card"
-          className="w-full h-full object-contain"
-        />
+      <div className="w-full h-full flex items-center justify-center">
+        <span className="text-4xl font-bold text-dragon-green">?</span>
       </div>
     </Card>
   );
