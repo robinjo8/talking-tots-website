@@ -21,6 +21,7 @@ import GovorneIgre from "./pages/GovorneIgre";
 import MojiIzzivi from "./pages/MojiIzzivi";
 import VideoNavodila from "./pages/VideoNavodila";
 import SpominR from "./pages/SpominR";
+import SpominGames from "./pages/SpominGames";
 
 const queryClient = new QueryClient();
 
@@ -126,6 +127,16 @@ const App = () => (
                 />
                 
                 <Route path="*" element={<NotFound />} />
+                
+                <Route 
+                  path="/govorne-igre/spomin" 
+                  element={
+                    <ProtectedRoute>
+                      <SpominGames />
+                    </ProtectedRoute>
+                  }
+                />
+                
               </Routes>
             </AppLayout>
           </BrowserRouter>
