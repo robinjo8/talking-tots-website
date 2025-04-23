@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -107,6 +106,20 @@ export default {
 			},
 			fontFamily: {
 				'rounded': ['"Nunito"', 'sans-serif'],
+			},
+			utilities: {
+				'.perspective-1000': {
+					perspective: '1000px',
+				},
+				'.transform-style-preserve-3d': {
+					transformStyle: 'preserve-3d',
+				},
+				'.backface-hidden': {
+					backfaceVisibility: 'hidden',
+				},
+				'.rotate-y-180': {
+					transform: 'rotateY(180deg)',
+				},
 			}
 		}
 	},
