@@ -124,6 +124,14 @@ export function useMemoryGame() {
     }
   };
 
+  const updateCard = (index: number, updatedCard: MemoryCard) => {
+    setCards(prevCards => {
+      const newCards = [...prevCards];
+      newCards[index] = { ...updatedCard };
+      return newCards;
+    });
+  };
+
   useEffect(() => {
     initializeGame();
   }, []);
@@ -136,5 +144,6 @@ export function useMemoryGame() {
     initializeGame,
     audioRef,
     isLoading,
+    updateCard,
   };
 }
