@@ -1,9 +1,10 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import FeatureCard from "@/components/FeatureCard";
 import { Button } from "@/components/ui/button";
-import { Play } from "lucide-react";
+import { Mic, Play, Book, Stars, MessageSquare, Zap, Volume2, Award } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 
