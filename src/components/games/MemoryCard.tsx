@@ -42,43 +42,15 @@ export function MemoryCard({
   };
 
   return (
-    <div
-      className="perspective-1000 h-full w-full"
-      onClick={handleCardClick}
-    >
-      <div
-        className={cn(
-          "relative w-full h-full transition-all duration-500 transform-style-preserve-3d",
-          flipped || matched ? "rotate-y-180" : ""
-        )}
-        style={{ 
-          transformStyle: "preserve-3d",
-          perspective: "1000px"
-        }}
-      >
+    <div className="flip-card" onClick={handleCardClick}>
+      <div className={cn("flip-card-inner", flipped || matched ? "flipped" : "")}>
         {/* Front of card (hidden when flipped) */}
-        <div
-          className={cn(
-            "absolute w-full h-full backface-hidden bg-gradient-to-br from-app-purple/10 to-app-blue/10 rounded-md border-2 border-app-purple/30 flex items-center justify-center",
-            flipped || matched ? "invisible" : ""
-          )}
-          style={{ backfaceVisibility: "hidden" }}
-        >
-          <div className="text-4xl font-bold text-app-purple/50">?</div>
+        <div className="flip-card-front">
+          <div className="text-4xl font-bold text-dragon-green">?</div>
         </div>
 
         {/* Back of card (shown when flipped) */}
-        <div
-          className={cn(
-            "absolute w-full h-full backface-hidden bg-white rounded-md border-2",
-            matched ? "border-dragon-green/50" : "border-app-purple/30",
-            "flex items-center justify-center overflow-hidden"
-          )}
-          style={{ 
-            backfaceVisibility: "hidden", 
-            transform: "rotateY(180deg)"
-          }}
-        >
+        <div className={cn("flip-card-back", matched && "matched")}>
           {isLoading && <div className="animate-pulse bg-gray-200 w-full h-full" />}
           
           {imageUrl && (

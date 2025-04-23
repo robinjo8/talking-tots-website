@@ -24,19 +24,28 @@ export const useMemoryGame = () => {
   const { data: memoryCardsData, isLoading, error } = useQuery({
     queryKey: ["memoryCards"],
     queryFn: async () => {
+      console.log("Fetching memory cards from Supabase...");
       const { data, error } = await supabase
         .from("memory_cards")
         .select("*");
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching memory cards:", error);
+        throw error;
+      }
+      
+      console.log("Fetched memory cards:", data);
       return data || [];
     }
   });
 
   // Initialize the game when data is loaded
   useEffect(() => {
-    if (memoryCardsData) {
+    if (memoryCardsData && memoryCardsData.length > 0) {
+      console.log("Initializing game with memory cards data:", memoryCardsData);
       initializeGame(memoryCardsData);
+    } else {
+      console.log("No memory cards data available yet or empty array");
     }
   }, [memoryCardsData]);
 
@@ -67,6 +76,7 @@ export const useMemoryGame = () => {
 
     // Shuffle cards
     const shuffledCards = shuffleArray([...cardPairs]);
+    console.log("Initialized game with shuffled cards:", shuffledCards);
     setCards(shuffledCards);
     setFlippedCards([]);
     setMatchedPairs([]);
@@ -89,56 +99,58 @@ export const useMemoryGame = () => {
     if (
       isCheckingMatch || 
       flippedCards.includes(index) || 
-      cards[index].matched
+      cards[index]?.matched
     ) {
       return;
     }
 
     // Update the card to be flipped
     const updatedCards = [...cards];
-    updatedCards[index].flipped = true;
-    setCards(updatedCards);
-
-    // Add to flipped cards
-    const newFlippedCards = [...flippedCards, index];
-    setFlippedCards(newFlippedCards);
-
-    // Check for match if we have two flipped cards
-    if (newFlippedCards.length === 2) {
-      setIsCheckingMatch(true);
+    if (updatedCards[index]) {
+      updatedCards[index].flipped = true;
+      setCards(updatedCards);
       
-      const [firstIndex, secondIndex] = newFlippedCards;
-      const firstCard = cards[firstIndex];
-      const secondCard = cards[secondIndex];
-
-      if (firstCard.pairId === secondCard.pairId) {
-        // Cards match
-        setTimeout(() => {
-          const updatedCards = [...cards];
-          updatedCards[firstIndex].matched = true;
-          updatedCards[secondIndex].matched = true;
-          setCards(updatedCards);
-          setMatchedPairs([...matchedPairs, firstCard.pairId]);
-          setFlippedCards([]);
-          setIsCheckingMatch(false);
-        }, 1000);
-      } else {
-        // Cards don't match
-        setTimeout(() => {
-          const updatedCards = [...cards];
-          updatedCards[firstIndex].flipped = false;
-          updatedCards[secondIndex].flipped = false;
-          setCards(updatedCards);
-          setFlippedCards([]);
-          setIsCheckingMatch(false);
-        }, 1500);
+      // Add to flipped cards
+      const newFlippedCards = [...flippedCards, index];
+      setFlippedCards(newFlippedCards);
+      
+      // Check for match if we have two flipped cards
+      if (newFlippedCards.length === 2) {
+        setIsCheckingMatch(true);
+        
+        const [firstIndex, secondIndex] = newFlippedCards;
+        const firstCard = cards[firstIndex];
+        const secondCard = cards[secondIndex];
+        
+        if (firstCard && secondCard && firstCard.pairId === secondCard.pairId) {
+          // Cards match
+          setTimeout(() => {
+            const updatedCards = [...cards];
+            updatedCards[firstIndex].matched = true;
+            updatedCards[secondIndex].matched = true;
+            setCards(updatedCards);
+            setMatchedPairs([...matchedPairs, firstCard.pairId]);
+            setFlippedCards([]);
+            setIsCheckingMatch(false);
+          }, 1000);
+        } else {
+          // Cards don't match
+          setTimeout(() => {
+            const updatedCards = [...cards];
+            if (updatedCards[firstIndex]) updatedCards[firstIndex].flipped = false;
+            if (updatedCards[secondIndex]) updatedCards[secondIndex].flipped = false;
+            setCards(updatedCards);
+            setFlippedCards([]);
+            setIsCheckingMatch(false);
+          }, 1500);
+        }
       }
     }
   };
 
   // Reset the game
   const resetGame = () => {
-    if (memoryCardsData) {
+    if (memoryCardsData && memoryCardsData.length > 0) {
       initializeGame(memoryCardsData);
     }
   };
@@ -151,6 +163,7 @@ export const useMemoryGame = () => {
     resetGame,
     gameCompleted,
     matchedPairs,
-    totalPairs: cards.length / 2
+    totalPairs: cards.length / 2,
+    isCheckingMatch
   };
 };

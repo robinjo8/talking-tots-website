@@ -21,9 +21,9 @@ export default function SpominIgra() {
     resetGame, 
     gameCompleted,
     matchedPairs,
-    totalPairs
+    totalPairs,
+    isCheckingMatch
   } = useMemoryGame();
-  const [isCheckingMatch, setIsCheckingMatch] = useState(false);
   const gameStartTimeRef = useRef<number | null>(null);
   const [gameTime, setGameTime] = useState<number | null>(null);
 
@@ -34,13 +34,7 @@ export default function SpominIgra() {
       gameStartTimeRef.current = Date.now();
     }
     
-    setIsCheckingMatch(true);
     flipCard(index);
-    
-    // Reset checking state after a short delay
-    setTimeout(() => {
-      setIsCheckingMatch(false);
-    }, 1600);
   };
 
   // Handle game reset
