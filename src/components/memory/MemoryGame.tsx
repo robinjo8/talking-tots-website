@@ -1,62 +1,39 @@
 
-import { useState } from 'react';
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useMemoryGame } from "@/hooks/useMemoryGame";
-import { MemoryCard as MemoryCardComponent } from "./MemoryCard";
-import { MemoryGameEditor } from "./MemoryGameEditor";
+import { MemoryCard } from "./MemoryCard";
+import { Loader2 } from "lucide-react";
 
 export function MemoryGame() {
-  const [isEditMode, setIsEditMode] = useState(false);
-  const { 
-    cards, 
-    matchedPairs, 
-    totalPairs, 
-    handleCardClick, 
-    initializeGame, 
-    audioRef,
-    isLoading,
-    updateCard 
-  } = useMemoryGame();
-
+  const { cards, matchedPairs, totalPairs, handleCardClick, initializeGame, audioRef, isLoading } = useMemoryGame();
+  
   return (
     <div className="w-full max-w-5xl mx-auto">
       <audio ref={audioRef} className="hidden" />
       
       <div className="flex justify-between items-center mb-6">
         <div className="text-lg font-medium">
-          {!isEditMode && `Najdenih parov: ${matchedPairs} / ${totalPairs}`}
+          Najdenih parov: {matchedPairs} / {totalPairs}
         </div>
-        <div className="flex gap-2">
-          <Button 
-            variant="outline"
-            onClick={() => setIsEditMode(!isEditMode)}
-            className="bg-dragon-green/10 border-dragon-green/30 text-dragon-green hover:bg-dragon-green/20"
-          >
-            {isEditMode ? 'Končaj urejanje' : 'Uredi kartice'}
-          </Button>
-          {!isEditMode && (
-            <Button 
-              variant="outline" 
-              onClick={() => initializeGame()}
-              className="bg-dragon-green/10 border-dragon-green/30 text-dragon-green hover:bg-dragon-green/20"
-            >
-              Nova igra
-            </Button>
-          )}
-        </div>
+        <Button 
+          variant="outline" 
+          onClick={() => initializeGame()}
+          className="bg-dragon-green/10 border-dragon-green/30 text-dragon-green hover:bg-dragon-green/20"
+        >
+          Nova igra
+        </Button>
       </div>
       
       {isLoading ? (
         <div className="flex justify-center items-center h-96">
-          <div className="h-12 w-12 text-dragon-green animate-spin" />
+          <Loader2 className="h-12 w-12 text-dragon-green animate-spin" />
           <span className="ml-4 text-lg">Nalaganje igre...</span>
         </div>
-      ) : isEditMode ? (
-        <MemoryGameEditor cards={cards} onUpdateCard={updateCard} />
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3 md:gap-4">
           {cards.map((card, index) => (
-            <MemoryCardComponent
+            <MemoryCard
               key={card.id}
               word={card.word}
               type={card.type}
