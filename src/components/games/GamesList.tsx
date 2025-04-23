@@ -39,7 +39,6 @@ export function GamesList() {
         <Card 
           key={game.id}
           className="transition-all duration-300 hover:shadow-md cursor-pointer"
-          onClick={() => game.path && navigate(game.path)}
         >
           <CardContent className="p-6">
             <div className={`bg-gradient-to-br ${game.gradient} rounded-lg p-4 mb-4 flex items-center justify-center`}>
