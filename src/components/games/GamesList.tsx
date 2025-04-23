@@ -1,5 +1,6 @@
+
 import { Card, CardContent } from "@/components/ui/card";
-import { Puzzle, Gamepad, SquareDashed } from "lucide-react";
+import { Puzzle, Gamepad, SquareDashed, GameController } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -56,6 +57,14 @@ const memoryGames = [
 ];
 
 const otherGames = [
+  {
+    id: "spomin",
+    title: "Spomin",
+    description: "Kmalu na voljo",
+    icon: Gamepad,
+    color: "text-app-purple",
+    gradient: "from-app-purple/10 to-app-blue/10"
+  },
   {
     id: "igra2",
     title: "Igra 2",
