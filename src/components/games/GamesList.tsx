@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Puzzle, Gamepad, SquareDashed } from "lucide-react";
 import { useNavigate } from "react-router-dom";

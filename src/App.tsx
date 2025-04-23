@@ -20,7 +20,6 @@ import ArtIzgovorjavaPage from "./pages/ArtIzgovorjavaPage";
 import GovorneIgre from "./pages/GovorneIgre";
 import MojiIzzivi from "./pages/MojiIzzivi";
 import VideoNavodila from "./pages/VideoNavodila";
-import SpominIgra from "./pages/SpominIgra";
 import SpominR from "./pages/SpominR";
 
 const queryClient = new QueryClient();
@@ -98,14 +97,7 @@ const App = () => (
                     </ProtectedRoute>
                   }
                 />
-                <Route 
-                  path="/govorne-igre/spomin" 
-                  element={
-                    <ProtectedRoute>
-                      <SpominIgra />
-                    </ProtectedRoute>
-                  }
-                />
+                
                 
                 <Route 
                   path="/govorne-igre/spomin/spomin-r" 
