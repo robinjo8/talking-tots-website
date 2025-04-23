@@ -29,13 +29,19 @@ export function MemoryCard({
   const handleCardClick = () => {
     if (!disabled && !flipped && !matched) {
       onClick();
-      
-      // Play audio when card is flipped
-      if (audioUrl) {
-        playAudio(audioUrl);
-      }
     }
   };
+  
+  // Play audio when card is flipped - move to an effect that runs when flipped changes
+  // This ensures audio plays even when the card is flipped programmatically
+  useState(() => {
+    if (flipped && audioUrl && !matched) {
+      // Small delay to ensure this happens after the card flip animation starts
+      setTimeout(() => {
+        playAudio(audioUrl);
+      }, 100);
+    }
+  });
 
   const handleImageLoad = () => {
     setIsLoading(false);

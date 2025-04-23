@@ -11,6 +11,7 @@ export interface MemoryCard {
   flipped: boolean;
   matched: boolean;
   pairId: number;
+  uniqueId?: string; // Added to distinguish between two identical cards
 }
 
 export const useMemoryGame = () => {
@@ -27,7 +28,8 @@ export const useMemoryGame = () => {
       console.log("Fetching memory cards from Supabase...");
       const { data, error } = await supabase
         .from("memory_cards")
-        .select("*");
+        .select("*")
+        .limit(10); // Ensure we get only 10 cards to create 10 pairs
       
       if (error) {
         console.error("Error fetching memory cards:", error);
@@ -64,13 +66,15 @@ export const useMemoryGame = () => {
         ...card,
         flipped: false,
         matched: false,
-        pairId: index
+        pairId: index,
+        uniqueId: `${card.id}-1`
       },
       {
         ...card,
         flipped: false,
         matched: false,
-        pairId: index
+        pairId: index,
+        uniqueId: `${card.id}-2`
       }
     ]);
 

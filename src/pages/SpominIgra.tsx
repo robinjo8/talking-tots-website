@@ -1,5 +1,5 @@
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -46,18 +46,20 @@ export default function SpominIgra() {
   };
 
   // Update game time when completed
-  if (gameCompleted && gameStartTimeRef.current && gameTime === null) {
-    const endTime = Date.now();
-    const timeTaken = Math.floor((endTime - gameStartTimeRef.current) / 1000);
-    setGameTime(timeTaken);
-    
-    // Show completion message
-    setTimeout(() => {
-      toast.success(`Čestitamo! Igra je končana v ${timeTaken} sekundah!`, {
-        duration: 5000
-      });
-    }, 500);
-  }
+  useEffect(() => {
+    if (gameCompleted && gameStartTimeRef.current && gameTime === null) {
+      const endTime = Date.now();
+      const timeTaken = Math.floor((endTime - gameStartTimeRef.current) / 1000);
+      setGameTime(timeTaken);
+      
+      // Show completion message
+      setTimeout(() => {
+        toast.success(`Čestitamo! Igra je končana v ${timeTaken} sekundah!`, {
+          duration: 5000
+        });
+      }, 500);
+    }
+  }, [gameCompleted, gameStartTimeRef, gameTime]);
 
   return (
     <div className="min-h-screen bg-background">

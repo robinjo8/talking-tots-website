@@ -14,7 +14,7 @@ export function MemoryGrid({ cards, onCardClick, isCheckingMatch }: MemoryGridPr
     <div className="grid grid-cols-4 sm:grid-cols-5 gap-3 md:gap-4 w-full">
       {cards.map((card, index) => (
         <div 
-          key={`${card.id}-${index}`} 
+          key={card.uniqueId || `${card.id}-${index}`} 
           className={cn(
             "aspect-square",
             "transform transition-transform duration-200",
