@@ -39,7 +39,12 @@ export default function GovorneIgre() {
           </CardContent>
         </Card>
 
-        <GamesList />
+        <div className="space-y-12">
+          <div>
+            <h2 className="text-2xl font-semibold mb-6">Spomin</h2>
+            <GamesList />
+          </div>
+        </div>
       </div>
     </div>
   );
