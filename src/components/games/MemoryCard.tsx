@@ -28,16 +28,13 @@ export function MemoryCard({
   const handleCardClick = () => {
     if (!disabled && !flipped && !matched) {
       onClick();
-      // Play audio immediately when card is flipped
-      if (audioUrl) {
-        playAudio(audioUrl);
-      }
     }
   };
 
-  // Play audio when card is matched
+  // Play audio only when card is matched
   useEffect(() => {
     if (matched && audioUrl) {
+      console.log("Playing audio for matched card:", audioUrl);
       // Small delay to ensure visual feedback happens first
       setTimeout(() => {
         playAudio(audioUrl);

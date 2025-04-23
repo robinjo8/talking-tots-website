@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -47,6 +48,7 @@ export const useMemoryGame = () => {
   }, [memoryCardsData]);
 
   const initializeGame = (cardData: any[]) => {
+    // Create pairs using the Supabase row ID as the pair identifier
     const cardPairs = cardData.flatMap((card) => [
       {
         ...card,
@@ -102,6 +104,7 @@ export const useMemoryGame = () => {
       const secondCard = cards[secondIndex];
       
       if (firstCard && secondCard && firstCard.pairId === secondCard.pairId) {
+        console.log("Match found! Card pair ID:", firstCard.pairId);
         setTimeout(() => {
           const updatedCards = [...cards];
           updatedCards[firstIndex].matched = true;
@@ -112,6 +115,7 @@ export const useMemoryGame = () => {
           setIsCheckingMatch(false);
         }, 500);
       } else {
+        console.log("No match. Flipping cards back.");
         setTimeout(() => {
           const updatedCards = [...cards];
           updatedCards[firstIndex].flipped = false;
@@ -126,6 +130,7 @@ export const useMemoryGame = () => {
 
   useEffect(() => {
     if (cards.length > 0 && matchedPairs.length === cards.length / 2) {
+      console.log("Game completed!");
       setGameCompleted(true);
     }
   }, [matchedPairs, cards]);
