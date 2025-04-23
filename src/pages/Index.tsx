@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import FeatureCard from "@/components/FeatureCard";
 import { Button } from "@/components/ui/button";
-import { Mic, Play, Book, Stars, MessageSquare, Zap, Volume2, Award } from "lucide-react";
+import { Play } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -22,7 +21,6 @@ const Index = () => {
     if (selectedChildIndex !== null && profile?.children) {
       navigate("/moja-stran");
     } else {
-      // If no child is selected, you might want to redirect to child selection or profile setup
       navigate("/profile");
     }
   };
@@ -76,15 +74,13 @@ const Index = () => {
           </Button>
           <Button 
             size="lg" 
-            variant="outline" 
-            className="w-full md:w-auto bg-white border-dragon-green text-dragon-green hover:bg-dragon-green/10 rounded-full min-w-[200px]"
+            className="w-full md:w-auto bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full min-w-[200px]"
           >
             <Play className="mr-2 h-4 w-4" /> Poglej demo
           </Button>
           <Button 
             size="lg" 
-            variant="outline" 
-            className="w-full md:w-auto bg-white border-dragon-green text-dragon-green hover:bg-dragon-green/10 rounded-full min-w-[200px]"
+            className="w-full md:w-auto bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full min-w-[200px]"
             onClick={scrollToFeatures}
           >
             Poglej kako zmajček Tomi pomaga
