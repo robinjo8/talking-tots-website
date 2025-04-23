@@ -2,7 +2,7 @@
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, RefreshCw } from "lucide-react";
 import { MemoryGrid } from "@/components/memory/MemoryGrid";
 
 export default function Spomin() {
@@ -27,6 +27,18 @@ export default function Spomin() {
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">
             Spomin
           </h1>
+          
+          <div className="ml-auto">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2"
+              onClick={() => window.location.reload()}
+            >
+              <RefreshCw className="h-4 w-4" />
+              Nova igra
+            </Button>
+          </div>
         </div>
         
         <div className="w-full max-w-4xl mx-auto">
