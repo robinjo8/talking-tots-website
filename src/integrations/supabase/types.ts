@@ -9,24 +9,24 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      memory_cards: {
+      "memory-cards": {
         Row: {
           audio_url: string | null
           id: string
           image_url: string | null
-          word: string | null
+          word: string
         }
         Insert: {
           audio_url?: string | null
           id?: string
           image_url?: string | null
-          word?: string | null
+          word: string
         }
         Update: {
           audio_url?: string | null
           id?: string
           image_url?: string | null
-          word?: string | null
+          word?: string
         }
         Relationships: []
       }
