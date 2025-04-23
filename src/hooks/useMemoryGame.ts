@@ -1,6 +1,10 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { MemoryCard } from '@/data/memoryGameData';
+import type { Database } from '@/integrations/supabase/types';
+
+type MemoryCardFromDB = Database['public']['Tables']['memory_cards']['Row'];
 
 export function useMemoryGame() {
   const [cards, setCards] = useState<MemoryCard[]>([]);
@@ -13,7 +17,7 @@ export function useMemoryGame() {
     setIsLoading(true);
     try {
       const { data: memoryCards, error } = await supabase
-        .from('memory-cards')
+        .from('memory_cards') // Use underscore instead of hyphen
         .select('*')
         .limit(10);
 
@@ -31,7 +35,8 @@ export function useMemoryGame() {
       
       const gameCards: MemoryCard[] = [];
       
-      memoryCards.forEach((card) => {
+      // Use a type assertion to help TypeScript understand we're dealing with memory cards
+      (memoryCards as MemoryCardFromDB[]).forEach((card) => {
         if (!card.word) {
           console.error('Card missing word:', card);
           return;
@@ -44,7 +49,7 @@ export function useMemoryGame() {
           id: gameCards.length,
           word: card.word,
           type: 'image',
-          image: card.image_url,
+          image: card.image_url || undefined,
           audioUrl: card.audio_url,
           matched: false,
           flipped: false,
