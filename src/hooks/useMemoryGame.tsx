@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,18 +9,17 @@ export interface MemoryCard {
   audio_url: string | null;
   flipped: boolean;
   matched: boolean;
-  pairId: number;
+  pairId: string;
   uniqueId?: string;
 }
 
 export const useMemoryGame = () => {
   const [cards, setCards] = useState<MemoryCard[]>([]);
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
-  const [matchedPairs, setMatchedPairs] = useState<number[]>([]);
+  const [matchedPairs, setMatchedPairs] = useState<string[]>([]);
   const [isCheckingMatch, setIsCheckingMatch] = useState(false);
   const [gameCompleted, setGameCompleted] = useState(false);
 
-  // Fetch memory card data from Supabase
   const { data: memoryCardsData, isLoading, error } = useQuery({
     queryKey: ["memoryCards"],
     queryFn: async () => {
@@ -29,7 +27,7 @@ export const useMemoryGame = () => {
       const { data, error } = await supabase
         .from("memory_cards")
         .select("*")
-        .limit(10); // Ensure we get only 10 cards to create 10 pairs
+        .limit(10);
       
       if (error) {
         console.error("Error fetching memory cards:", error);
@@ -41,7 +39,6 @@ export const useMemoryGame = () => {
     }
   });
 
-  // Initialize the game when data is loaded
   useEffect(() => {
     if (memoryCardsData && memoryCardsData.length > 0) {
       console.log("Initializing game with memory cards data:", memoryCardsData);
@@ -49,35 +46,33 @@ export const useMemoryGame = () => {
     }
   }, [memoryCardsData]);
 
-  // Initialize game by creating pairs and shuffling
   const initializeGame = (cardData: any[]) => {
-    // Create two cards for each data item
-    const cardPairs = cardData.flatMap((card, index) => [
+    const cardPairs = cardData.flatMap((card) => [
       {
         ...card,
         flipped: false,
         matched: false,
-        pairId: index,
+        pairId: card.id,
         uniqueId: `${card.id}-1`
       },
       {
         ...card,
         flipped: false,
         matched: false,
-        pairId: index,
+        pairId: card.id,
         uniqueId: `${card.id}-2`
       }
     ]);
 
-    // Shuffle cards
     const shuffledCards = shuffleArray([...cardPairs]);
     setCards(shuffledCards);
     setFlippedCards([]);
     setMatchedPairs([]);
     setGameCompleted(false);
+    
+    console.log("Game initialized with shuffled cards:", shuffledCards);
   };
 
-  // Shuffle an array using Fisher-Yates algorithm
   const shuffleArray = <T,>(array: T[]): T[] => {
     const newArray = [...array];
     for (let i = newArray.length - 1; i > 0; i--) {
@@ -87,7 +82,6 @@ export const useMemoryGame = () => {
     return newArray;
   };
 
-  // Handle card flip
   const flipCard = (index: number) => {
     if (isCheckingMatch || flippedCards.includes(index) || cards[index]?.matched) {
       return;
@@ -108,7 +102,6 @@ export const useMemoryGame = () => {
       const secondCard = cards[secondIndex];
       
       if (firstCard && secondCard && firstCard.pairId === secondCard.pairId) {
-        // Cards match - update after a short delay
         setTimeout(() => {
           const updatedCards = [...cards];
           updatedCards[firstIndex].matched = true;
@@ -119,7 +112,6 @@ export const useMemoryGame = () => {
           setIsCheckingMatch(false);
         }, 500);
       } else {
-        // Cards don't match - flip back after delay
         setTimeout(() => {
           const updatedCards = [...cards];
           updatedCards[firstIndex].flipped = false;
@@ -132,14 +124,12 @@ export const useMemoryGame = () => {
     }
   };
 
-  // Check if the game is completed
   useEffect(() => {
     if (cards.length > 0 && matchedPairs.length === cards.length / 2) {
       setGameCompleted(true);
     }
   }, [matchedPairs, cards]);
 
-  // Reset the game
   const resetGame = () => {
     if (memoryCardsData && memoryCardsData.length > 0) {
       initializeGame(memoryCardsData);

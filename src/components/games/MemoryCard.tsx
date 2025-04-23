@@ -28,6 +28,10 @@ export function MemoryCard({
   const handleCardClick = () => {
     if (!disabled && !flipped && !matched) {
       onClick();
+      // Play audio immediately when card is flipped
+      if (audioUrl) {
+        playAudio(audioUrl);
+      }
     }
   };
 
