@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,7 +21,6 @@ import ArtIzgovorjavaPage from "./pages/ArtIzgovorjavaPage";
 import GovorneIgre from "./pages/GovorneIgre";
 import MojiIzzivi from "./pages/MojiIzzivi";
 import VideoNavodila from "./pages/VideoNavodila";
-import Spomin from "./pages/Spomin";
 
 const queryClient = new QueryClient();
 
@@ -94,14 +94,6 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <GovorneIgre />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route 
-                  path="/govorne-igre/spomin" 
-                  element={
-                    <ProtectedRoute>
-                      <Spomin />
                     </ProtectedRoute>
                   }
                 />

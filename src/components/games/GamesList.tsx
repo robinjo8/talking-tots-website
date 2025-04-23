@@ -1,24 +1,14 @@
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Brain, Puzzle, Gamepad, SquareDashed } from "lucide-react";
+import { Puzzle, Gamepad, SquareDashed } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const games = [
-  {
-    id: "spomin",
-    title: "Igra spomin",
-    description: "Poišči pare med slikami in besedami.",
-    icon: Brain,
-    path: "/govorne-igre/spomin",
-    color: "text-dragon-green",
-    gradient: "from-dragon-green/10 to-app-blue/10"
-  },
   {
     id: "igra1",
     title: "Igra 1",
     description: "Kmalu na voljo",
     icon: Puzzle,
-    path: "/govorne-igre/igra-1",
     color: "text-app-purple",
     gradient: "from-app-purple/10 to-app-blue/10"
   },
@@ -44,7 +34,7 @@ export function GamesList() {
   const navigate = useNavigate();
   
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {games.map((game) => (
         <Card 
           key={game.id}
