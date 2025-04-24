@@ -30,6 +30,69 @@ export type Database = {
         }
         Relationships: []
       }
+      memory_cards_K: {
+        Row: {
+          audio_url: string | null
+          id: string
+          image_url: string | null
+          word: string | null
+        }
+        Insert: {
+          audio_url?: string | null
+          id?: string
+          image_url?: string | null
+          word?: string | null
+        }
+        Update: {
+          audio_url?: string | null
+          id?: string
+          image_url?: string | null
+          word?: string | null
+        }
+        Relationships: []
+      }
+      memory_cards_S: {
+        Row: {
+          audio_url: string | null
+          id: string
+          image_url: string | null
+          word: string | null
+        }
+        Insert: {
+          audio_url?: string | null
+          id?: string
+          image_url?: string | null
+          word?: string | null
+        }
+        Update: {
+          audio_url?: string | null
+          id?: string
+          image_url?: string | null
+          word?: string | null
+        }
+        Relationships: []
+      }
+      memory_cards_Š_duplicate: {
+        Row: {
+          audio_url: string | null
+          id: string
+          image_url: string | null
+          word: string | null
+        }
+        Insert: {
+          audio_url?: string | null
+          id?: string
+          image_url?: string | null
+          word?: string | null
+        }
+        Update: {
+          audio_url?: string | null
+          id?: string
+          image_url?: string | null
+          word?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           address: string | null

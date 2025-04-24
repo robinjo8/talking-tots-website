@@ -22,6 +22,9 @@ import MojiIzzivi from "./pages/MojiIzzivi";
 import VideoNavodila from "./pages/VideoNavodila";
 import SpominR from "./pages/SpominR";
 import SpominGames from "./pages/SpominGames";
+import SpominK from "./pages/SpominK";
+import SpominS from "./pages/SpominS";
+import SpominŠ from "./pages/SpominŠ";
 
 const queryClient = new QueryClient();
 
@@ -122,6 +125,33 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <VideoNavodila />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                <Route 
+                  path="/govorne-igre/spomin/spomin-k" 
+                  element={
+                    <ProtectedRoute>
+                      <SpominK />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                <Route 
+                  path="/govorne-igre/spomin/spomin-s" 
+                  element={
+                    <ProtectedRoute>
+                      <SpominS />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                <Route 
+                  path="/govorne-igre/spomin/spomin-š" 
+                  element={
+                    <ProtectedRoute>
+                      <SpominŠ />
                     </ProtectedRoute>
                   }
                 />
