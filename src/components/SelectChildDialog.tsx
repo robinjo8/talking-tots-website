@@ -37,13 +37,13 @@ export function SelectChildDialog({ open, onOpenChange }: SelectChildDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] flex flex-col">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] flex flex-col gap-4">
         <DialogHeader>
           <DialogTitle>Izberi profil otroka</DialogTitle>
         </DialogHeader>
         
         <ScrollArea className="flex-grow">
-          <div className="grid grid-cols-1 gap-4 my-4 px-1">
+          <div className="grid grid-cols-1 gap-4 px-1 py-2">
             {profile?.children?.map((child, index) => (
               <div 
                 key={index} 
@@ -55,13 +55,14 @@ export function SelectChildDialog({ open, onOpenChange }: SelectChildDialogProps
                   isSelected={selectedIndex === index}
                   onSelect={() => handleSelectChild(index)}
                   hideActions={true}
+                  minimal={true}
                 />
               </div>
             ))}
           </div>
         </ScrollArea>
         
-        <div className="flex justify-end gap-3 mt-4 pt-4 border-t">
+        <div className="flex justify-end border-t pt-4">
           <Button
             onClick={handleConfirm}
             disabled={selectedIndex === null}
