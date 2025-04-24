@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -7,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Mic, Play, Book, Stars, MessageSquare, Zap, Volume2, Award } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { SelectChildDialog } from "@/components/SelectChildDialog";
 
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [showChildSelector, setShowChildSelector] = useState(false);
   const { user, profile, selectedChildIndex } = useAuth();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
@@ -21,8 +22,10 @@ const Index = () => {
   const handleStartNow = () => {
     if (selectedChildIndex !== null && profile?.children) {
       navigate("/moja-stran");
-    } else {
+    } else if (profile?.children?.length === 0) {
       navigate("/profile");
+    } else {
+      setShowChildSelector(true);
     }
   };
 
@@ -154,6 +157,11 @@ const Index = () => {
           </div>
         </div>
       </footer>
+      
+      <SelectChildDialog
+        open={showChildSelector}
+        onOpenChange={setShowChildSelector}
+      />
     </div>
   );
 };
