@@ -47,12 +47,16 @@ export function SelectChildDialog({ open, onOpenChange }: SelectChildDialogProps
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
           {profile?.children?.map((child, index) => (
-            <div key={index} className="w-full">
+            <div 
+              key={index} 
+              className="w-full cursor-pointer" 
+              onClick={() => handleSelectChild(index)}
+            >
               <ChildProfileCard
                 child={child}
                 isSelected={selectedIndex === index}
                 onSelect={() => handleSelectChild(index)}
-                hideActions
+                hideActions={true}
               />
             </div>
           ))}
