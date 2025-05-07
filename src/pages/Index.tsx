@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -20,6 +21,13 @@ const Index = () => {
   }, []);
 
   const handleStartNow = () => {
+    // First check if user is logged in
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    
+    // Then check if a child profile is selected
     if (selectedChildIndex !== null && profile?.children) {
       navigate("/moja-stran");
     } else if (profile?.children?.length === 0) {
