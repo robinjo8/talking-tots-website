@@ -9,6 +9,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
+type UserData = {
+  id: string;
+  email: string;
+};
+
 export function CreateInitialAdmin() {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,7 +39,7 @@ export function CreateInitialAdmin() {
       
       if (getUserError) throw getUserError;
       
-      const userToPromote = getUserData.users.find(u => u.email === email);
+      const userToPromote = (getUserData?.users as UserData[])?.find(u => u.email === email);
       
       if (!userToPromote) {
         setError("Uporabnik s to e-pošto ne obstaja.");
