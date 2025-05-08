@@ -1,15 +1,14 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserProfile } from "@/components/auth/UserProfile";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSidebar } from "@/components/ui/sidebar";
-import { Menu, BookOpen, ChevronDown, Shield } from "lucide-react";
+import { Menu, BookOpen, ChevronDown } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { MobileMenu } from "@/components/MobileMenu";
-import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -22,34 +21,7 @@ export default function Header() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { setOpenMobile } = useSidebar();
-  const [isAdmin, setIsAdmin] = useState(false);
   const selectedChild = selectedChildIndex !== null && profile?.children ? profile.children[selectedChildIndex] : null;
-
-  // Check if the user is an admin
-  useEffect(() => {
-    const checkAdminStatus = async () => {
-      if (!user) {
-        setIsAdmin(false);
-        return;
-      }
-
-      try {
-        const { data, error } = await supabase.rpc('has_role', { role_name: 'admin' });
-        
-        if (error) {
-          console.error("Napaka pri preverjanju administratorskih pravic:", error);
-          setIsAdmin(false);
-        } else {
-          setIsAdmin(data === true);
-        }
-      } catch (error) {
-        console.error("Napaka:", error);
-        setIsAdmin(false);
-      }
-    };
-
-    checkAdminStatus();
-  }, [user]);
 
   const handleNavigate = (path: string, options?: { expandSection?: string }) => {
     navigate(path);
@@ -121,15 +93,6 @@ export default function Header() {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </>
-              )}
-
-              {user && isAdmin && (
-                <Link to="/admin">
-                  <Button variant="ghost" className="font-medium text-dragon-green flex items-center gap-1">
-                    <Shield className="h-4 w-4" />
-                    Admin
-                  </Button>
-                </Link>
               )}
 
               {user ? (
