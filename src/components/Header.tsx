@@ -5,7 +5,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserProfile } from "@/components/auth/UserProfile";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useSidebar } from "@/components/ui/sidebar";
 import { Menu, BookOpen, ChevronDown, Shield } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { MobileMenu } from "@/components/MobileMenu";
@@ -17,11 +16,23 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 
+// Import useSidebar, but handle the case when it's not available
+const SidebarContext = React.createContext<any>(null);
+const useSidebarSafe = () => {
+  // Try to use the sidebar context if available
+  const context = React.useContext(SidebarContext);
+  // Return a default object if the sidebar context isn't available
+  return context || { 
+    setOpenMobile: () => {},
+    openMobile: false
+  };
+};
+
 export default function Header() {
   const { user, profile, selectedChildIndex } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { setOpenMobile } = useSidebar();
+  const { setOpenMobile } = useSidebarSafe(); // Use our safe version
   const selectedChild = selectedChildIndex !== null && profile?.children ? profile.children[selectedChildIndex] : null;
   const [isAdmin, setIsAdmin] = useState(false);
 

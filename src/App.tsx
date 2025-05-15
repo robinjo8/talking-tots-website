@@ -10,6 +10,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AdminRoute } from "@/components/auth/AdminRoute";
 import { AppLayout } from "@/components/AppLayout";
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -47,10 +48,10 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<AppLayout><Index /></AppLayout>} />
-              <Route path="/login" element={<AppLayout><Login /></AppLayout>} />
-              <Route path="/register" element={<AppLayout><Register /></AppLayout>} />
-              <Route path="/reset-password" element={<AppLayout><ResetPassword /></AppLayout>} />
-              <Route path="/update-password" element={<AppLayout><UpdatePassword /></AppLayout>} />
+              <Route path="/login" element={<SidebarProvider><Login /></SidebarProvider>} />
+              <Route path="/register" element={<SidebarProvider><Register /></SidebarProvider>} />
+              <Route path="/reset-password" element={<SidebarProvider><ResetPassword /></SidebarProvider>} />
+              <Route path="/update-password" element={<SidebarProvider><UpdatePassword /></SidebarProvider>} />
               
               <Route 
                 path="/dashboard" 
