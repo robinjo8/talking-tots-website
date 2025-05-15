@@ -48,10 +48,10 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<AppLayout><Index /></AppLayout>} />
-              <Route path="/login" element={<SidebarProvider><Login /></SidebarProvider>} />
-              <Route path="/register" element={<SidebarProvider><Register /></SidebarProvider>} />
-              <Route path="/reset-password" element={<SidebarProvider><ResetPassword /></SidebarProvider>} />
-              <Route path="/update-password" element={<SidebarProvider><UpdatePassword /></SidebarProvider>} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/update-password" element={<UpdatePassword />} />
               
               <Route 
                 path="/dashboard" 
@@ -167,17 +167,11 @@ const App = () => (
               />
               
               {/* Admin Routes */}
-              <Route path="/admin" element={
+              <Route path="/admin/*" element={
                 <AdminRoute>
                   <AdminLayout />
                 </AdminRoute>
-              }>
-                <Route index element={<AdminDashboard />} />
-                <Route path="dashboard" element={<AdminDashboard />} />
-                <Route path="users" element={<UsersAdmin />} />
-                <Route path="content" element={<ContentAdmin />} />
-                <Route path="settings" element={<SettingsAdmin />} />
-              </Route>
+              } />
               
               <Route path="*" element={<NotFound />} />
             </Routes>
