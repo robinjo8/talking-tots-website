@@ -90,7 +90,7 @@ export default function UpdatePassword() {
         <div className="flex-1 flex items-center justify-center pt-16">
           <AuthLayout
             title="Posodobi geslo"
-            subTitle="Vnesite svoje novo geslo"
+            subtitle="Vnesite svoje novo geslo"
           >
             <div className="grid gap-6">
               <form onSubmit={handleSubmit}>

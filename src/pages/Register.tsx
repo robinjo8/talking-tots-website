@@ -97,7 +97,7 @@ export default function Register() {
         <div className="flex-1 flex items-center justify-center pt-16">
           <AuthLayout
             title="Registracija"
-            subTitle="Ustvarite nov uporabniški račun"
+            subtitle="Ustvarite nov uporabniški račun"
           >
             <div className="grid gap-6">
               <form onSubmit={handleSubmit}>

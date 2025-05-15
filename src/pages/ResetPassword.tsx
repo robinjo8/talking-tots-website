@@ -58,7 +58,7 @@ export default function ResetPassword() {
         <div className="flex-1 flex items-center justify-center pt-16">
           <AuthLayout
             title="Ponastavitev gesla"
-            subTitle="Vnesite svoj e-poštni naslov za ponastavitev gesla"
+            subtitle="Vnesite svoj e-poštni naslov za ponastavitev gesla"
           >
             {!isSubmitted ? (
               <div className="grid gap-6">
