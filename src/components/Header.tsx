@@ -58,11 +58,10 @@ export default function Header() {
     checkAdminRole();
   }, [user]);
 
-  const handleNavigate = (path: string, options?: { expandSection?: string }) => {
+  const handleNavigate = (path: string) => {
     navigate(path);
-    
-    if (options?.expandSection) {
-      localStorage.setItem('expandSection', options.expandSection);
+    if (openMobile) {
+      setOpenMobile(false);
     }
   };
 
@@ -111,7 +110,7 @@ export default function Header() {
                     <Button
                       variant="ghost"
                       className="font-medium flex items-center"
-                      onClick={() => navigate('/admin/dashboard')}
+                      onClick={() => handleNavigate('/admin/dashboard')}
                     >
                       <Shield className="h-4 w-4 mr-2 text-dragon-green" />
                       Admin

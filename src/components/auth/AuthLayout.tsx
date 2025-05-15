@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 type AuthLayoutProps = {
   children: ReactNode;
   title: string;
-  subtitle?: string;
+  subtitle?: string;  // Changed from "subTitle" to "subtitle" to fix the type errors
 };
 
 export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {

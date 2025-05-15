@@ -1,11 +1,11 @@
 
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
-import { ChevronDown } from "lucide-react";
-import { useState, useEffect } from "react";
+import { ChevronDown, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface MobileMenuProps {
@@ -16,14 +16,11 @@ export function MobileMenu({ onItemClick }: MobileMenuProps) {
   const { user } = useAuth();
   const location = useLocation();
   const [isAdmin, setIsAdmin] = useState(false);
-  
-  // Load the expanded section from localStorage
   const [openSection, setOpenSection] = useState(() => {
     return localStorage.getItem('expandSection') || '';
   });
   
   useEffect(() => {
-    // Check if the current user has admin role
     async function checkAdminRole() {
       if (!user) {
         setIsAdmin(false);
@@ -31,7 +28,6 @@ export function MobileMenu({ onItemClick }: MobileMenuProps) {
       }
       
       try {
-        console.log("MobileMenu - Checking admin status for user:", user.id);
         const { data, error } = await supabase
           .from('user_roles')
           .select('*')
@@ -39,11 +35,11 @@ export function MobileMenu({ onItemClick }: MobileMenuProps) {
           .eq('role', 'admin')
           .single();
           
+        setIsAdmin(!!data);
+        
         if (error && error.code !== 'PGRST116') {
           console.error("Error checking admin role:", error);
         }
-        
-        setIsAdmin(!!data);
       } catch (error) {
         console.error("Error checking admin status:", error);
         setIsAdmin(false);
@@ -53,7 +49,6 @@ export function MobileMenu({ onItemClick }: MobileMenuProps) {
     checkAdminRole();
   }, [user]);
   
-  // Store the expanded section in localStorage
   useEffect(() => {
     if (openSection) {
       localStorage.setItem('expandSection', openSection);
@@ -67,14 +62,6 @@ export function MobileMenu({ onItemClick }: MobileMenuProps) {
   };
   
   const isActive = (path: string) => location.pathname === path;
-  
-  const links = [
-    { to: "/moja-stran", label: "Moja stran" },
-    { to: "/govorno-jezikovne-vaje", label: "Govorno-jezikovne vaje" },
-    { to: "/govorne-igre", label: "Govorne igre" },
-    { to: "/moji-izzivi", label: "Izzivi" },
-    { to: "/video-navodila", label: "Video navodila" },
-  ];
   
   return (
     <div className="p-4 space-y-4">
@@ -90,101 +77,152 @@ export function MobileMenu({ onItemClick }: MobileMenuProps) {
       
       <div className="space-y-2">
         {/* Admin Link - Only visible to admin users */}
-        {isAdmin && (
-          <Link to="/admin" onClick={handleClick}>
+        {user && isAdmin && (
+          <Link to="/admin/dashboard" onClick={handleClick}>
             <Button
-              variant={isActive("/admin") ? "default" : "ghost"}
+              variant={location.pathname.includes("/admin") ? "default" : "ghost"}
               className={cn(
                 "w-full justify-start",
-                isActive("/admin") ? "bg-dragon-green text-white" : ""
+                location.pathname.includes("/admin") ? "bg-dragon-green text-white" : ""
               )}
             >
+              <Shield className="h-4 w-4 mr-2" />
               Admin portal
             </Button>
           </Link>
         )}
         
-        {/* Regular navigation links */}
-        {links.map((link) => (
-          <Link key={link.to} to={link.to} onClick={handleClick}>
-            <Button
-              variant={isActive(link.to) ? "default" : "ghost"}
-              className={cn(
-                "w-full justify-start",
-                isActive(link.to) ? "bg-dragon-green text-white" : ""
-              )}
-            >
-              {link.label}
-            </Button>
-          </Link>
-        ))}
-        
-        {/* Spomin games collapsible section */}
-        <Collapsible open={openSection === 'spomin'} onOpenChange={() => setOpenSection(openSection === 'spomin' ? '' : 'spomin')}>
-          <CollapsibleTrigger asChild>
-            <Button variant="ghost" className="w-full justify-between">
-              <span>Spomin igre</span>
-              <ChevronDown 
-                className={cn("h-4 w-4 transition-transform", 
-                  openSection === 'spomin' ? "transform rotate-180" : ""
-                )} 
-              />
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="pl-2 space-y-2 mt-2">
-            <Link to="/govorne-igre/spomin/spomin-r" onClick={handleClick}>
+        {/* Main navigation links */}
+        {user && (
+          <>
+            <Link to="/moja-stran" onClick={handleClick}>
               <Button
-                variant={isActive("/govorne-igre/spomin/spomin-r") ? "default" : "ghost"}
+                variant={isActive("/moja-stran") ? "default" : "ghost"}
                 className={cn(
-                  "w-full justify-start text-sm",
-                  isActive("/govorne-igre/spomin/spomin-r") ? "bg-dragon-green text-white" : ""
+                  "w-full justify-start",
+                  isActive("/moja-stran") ? "bg-dragon-green text-white" : ""
                 )}
-                size="sm"
               >
-                Spomin R
+                Moja stran
               </Button>
             </Link>
             
-            <Link to="/govorne-igre/spomin/spomin-k" onClick={handleClick}>
+            <Link to="/govorno-jezikovne-vaje" onClick={handleClick}>
               <Button
-                variant={isActive("/govorne-igre/spomin/spomin-k") ? "default" : "ghost"}
+                variant={isActive("/govorno-jezikovne-vaje") ? "default" : "ghost"}
                 className={cn(
-                  "w-full justify-start text-sm",
-                  isActive("/govorne-igre/spomin/spomin-k") ? "bg-dragon-green text-white" : ""
+                  "w-full justify-start",
+                  isActive("/govorno-jezikovne-vaje") ? "bg-dragon-green text-white" : ""
                 )}
-                size="sm"
               >
-                Spomin K
+                Govorno-jezikovne vaje
               </Button>
             </Link>
             
-            <Link to="/govorne-igre/spomin/spomin-s" onClick={handleClick}>
+            <Link to="/govorne-igre" onClick={handleClick}>
               <Button
-                variant={isActive("/govorne-igre/spomin/spomin-s") ? "default" : "ghost"}
+                variant={isActive("/govorne-igre") ? "default" : "ghost"}
                 className={cn(
-                  "w-full justify-start text-sm",
-                  isActive("/govorne-igre/spomin/spomin-s") ? "bg-dragon-green text-white" : ""
+                  "w-full justify-start",
+                  isActive("/govorne-igre") ? "bg-dragon-green text-white" : ""
                 )}
-                size="sm"
               >
-                Spomin S
+                Govorne igre
               </Button>
             </Link>
             
-            <Link to="/govorne-igre/spomin/spomin-š" onClick={handleClick}>
+            <Link to="/moji-izzivi" onClick={handleClick}>
               <Button
-                variant={isActive("/govorne-igre/spomin/spomin-š") ? "default" : "ghost"}
+                variant={isActive("/moji-izzivi") ? "default" : "ghost"}
                 className={cn(
-                  "w-full justify-start text-sm",
-                  isActive("/govorne-igre/spomin/spomin-š") ? "bg-dragon-green text-white" : ""
+                  "w-full justify-start",
+                  isActive("/moji-izzivi") ? "bg-dragon-green text-white" : ""
                 )}
-                size="sm"
               >
-                Spomin Š
+                Izzivi
               </Button>
             </Link>
-          </CollapsibleContent>
-        </Collapsible>
+            
+            <Link to="/video-navodila" onClick={handleClick}>
+              <Button
+                variant={isActive("/video-navodila") ? "default" : "ghost"}
+                className={cn(
+                  "w-full justify-start",
+                  isActive("/video-navodila") ? "bg-dragon-green text-white" : ""
+                )}
+              >
+                Video navodila
+              </Button>
+            </Link>
+            
+            {/* Spomin games collapsible section */}
+            <Collapsible open={openSection === 'spomin'} onOpenChange={() => setOpenSection(openSection === 'spomin' ? '' : 'spomin')}>
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" className="w-full justify-between">
+                  <span>Spomin igre</span>
+                  <ChevronDown 
+                    className={cn("h-4 w-4 transition-transform", 
+                      openSection === 'spomin' ? "transform rotate-180" : ""
+                    )} 
+                  />
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="pl-2 space-y-2 mt-2">
+                <Link to="/govorne-igre/spomin/spomin-r" onClick={handleClick}>
+                  <Button
+                    variant={isActive("/govorne-igre/spomin/spomin-r") ? "default" : "ghost"}
+                    className={cn(
+                      "w-full justify-start text-sm",
+                      isActive("/govorne-igre/spomin/spomin-r") ? "bg-dragon-green text-white" : ""
+                    )}
+                    size="sm"
+                  >
+                    Spomin R
+                  </Button>
+                </Link>
+                
+                <Link to="/govorne-igre/spomin/spomin-k" onClick={handleClick}>
+                  <Button
+                    variant={isActive("/govorne-igre/spomin/spomin-k") ? "default" : "ghost"}
+                    className={cn(
+                      "w-full justify-start text-sm",
+                      isActive("/govorne-igre/spomin/spomin-k") ? "bg-dragon-green text-white" : ""
+                    )}
+                    size="sm"
+                  >
+                    Spomin K
+                  </Button>
+                </Link>
+                
+                <Link to="/govorne-igre/spomin/spomin-s" onClick={handleClick}>
+                  <Button
+                    variant={isActive("/govorne-igre/spomin/spomin-s") ? "default" : "ghost"}
+                    className={cn(
+                      "w-full justify-start text-sm",
+                      isActive("/govorne-igre/spomin/spomin-s") ? "bg-dragon-green text-white" : ""
+                    )}
+                    size="sm"
+                  >
+                    Spomin S
+                  </Button>
+                </Link>
+                
+                <Link to="/govorne-igre/spomin/spomin-š" onClick={handleClick}>
+                  <Button
+                    variant={isActive("/govorne-igre/spomin/spomin-š") ? "default" : "ghost"}
+                    className={cn(
+                      "w-full justify-start text-sm",
+                      isActive("/govorne-igre/spomin/spomin-š") ? "bg-dragon-green text-white" : ""
+                    )}
+                    size="sm"
+                  >
+                    Spomin Š
+                  </Button>
+                </Link>
+              </CollapsibleContent>
+            </Collapsible>
+          </>
+        )}
       </div>
       
       {!user && (

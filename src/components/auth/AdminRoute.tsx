@@ -6,22 +6,21 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export function AdminRoute({ children }: { children: ReactNode }) {
-  const { user, isLoading } = useAuth();
+  const { user } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
-  const [adminCheckLoading, setAdminCheckLoading] = useState(true);
+  const [checkingAdmin, setCheckingAdmin] = useState(true);
   const location = useLocation();
   
   useEffect(() => {
-    async function checkIsAdmin() {
+    async function checkAdminStatus() {
       if (!user) {
-        console.log("AdminRoute - No user");
-        setAdminCheckLoading(false);
+        setIsAdmin(false);
+        setCheckingAdmin(false);
         return;
       }
       
       try {
-        console.log("Checking admin status for user:", user.id);
-        // Check if the user has an admin role
+        // Check if user has admin role
         const { data, error } = await supabase
           .from('user_roles')
           .select('role')
@@ -29,41 +28,22 @@ export function AdminRoute({ children }: { children: ReactNode }) {
           .eq('role', 'admin')
           .single();
         
-        console.log("Admin check result:", { data, error });
+        setIsAdmin(!!data);
         
         if (error && error.code !== 'PGRST116') {
           console.error("Error checking admin status:", error);
-          setIsAdmin(false);
-        } else {
-          setIsAdmin(!!data);
-          if (!data) {
-            console.log("User is not an admin");
-          } else {
-            console.log("User is an admin");
-          }
         }
       } catch (error) {
         console.error("Failed to check admin status:", error);
-        setIsAdmin(false);
       } finally {
-        setAdminCheckLoading(false);
+        setCheckingAdmin(false);
       }
     }
     
-    checkIsAdmin();
+    checkAdminStatus();
   }, [user]);
   
-  useEffect(() => {
-    console.log("AdminRoute - Auth state:", { 
-      user: !!user, 
-      isLoading, 
-      adminCheckLoading, 
-      isAdmin,
-      path: location.pathname 
-    });
-  }, [user, isLoading, adminCheckLoading, isAdmin, location]);
-  
-  if (isLoading || adminCheckLoading) {
+  if (checkingAdmin) {
     return (
       <div className="h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-dragon-green"></div>
@@ -72,17 +52,13 @@ export function AdminRoute({ children }: { children: ReactNode }) {
   }
   
   if (!user) {
-    console.log("AdminRoute - No user, redirecting to login from:", location.pathname);
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
   
   if (!isAdmin) {
-    // If not admin but authenticated, navigate to home instead of login
-    console.log("AdminRoute - Not admin, redirecting to home");
     toast.error("Nimate administratorskih pravic");
     return <Navigate to="/" replace />;
   }
   
-  console.log("AdminRoute - Admin access granted, rendering children");
   return <>{children}</>;
 }

@@ -72,7 +72,7 @@ export default function Login() {
         <div className="flex-1 flex items-center justify-center pt-16">
           <AuthLayout
             title="Prijava"
-            subTitle="Vnesite svoje podatke za prijavo"
+            subtitle="Vnesite svoje podatke za prijavo"
           >
             <div className="grid gap-6">
               <form onSubmit={handleSubmit}>

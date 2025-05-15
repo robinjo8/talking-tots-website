@@ -1,9 +1,9 @@
 
-import { useEffect } from "react";
-import { Routes, Route, Link, useLocation, useNavigate } from "react-router-dom";
-import Header from "@/components/Header";
+import { ReactNode } from "react";
+import { Routes, Route, Link, useLocation } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import Header from "@/components/Header";
 
 // Admin pages
 import AdminDashboard from "@/pages/admin/Dashboard";
@@ -13,23 +13,13 @@ import SettingsAdmin from "@/pages/admin/Settings";
 
 export function AdminLayout() {
   const location = useLocation();
-  const navigate = useNavigate();
   const path = location.pathname.split('/').pop() || 'dashboard';
-  
-  useEffect(() => {
-    console.log("AdminLayout rendered, current path:", path);
-    
-    // Redirect to dashboard if on /admin root
-    if (location.pathname === '/admin') {
-      navigate('/admin/dashboard', { replace: true });
-    }
-  }, [location.pathname, navigate, path]);
   
   return (
     <SidebarProvider>
-      <div className="min-h-screen bg-gray-50 w-full">
+      <div className="min-h-screen bg-gray-50 w-full flex flex-col">
         <Header />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 flex-1">
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-dragon-green">Admin Portal</h1>
             <p className="text-muted-foreground mt-2">
