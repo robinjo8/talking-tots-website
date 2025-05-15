@@ -5,7 +5,7 @@ import { UserWelcome } from "@/components/auth/UserWelcome";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Shield } from "lucide-react";
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -86,14 +86,15 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
       
       {/* Admin Link - Only visible to admin users */}
       {isAdmin && (
-        <Link to="/admin" onClick={handleLinkClick}>
+        <Link to="/admin/dashboard" onClick={handleLinkClick}>
           <Button
-            variant={isActive("/admin") ? "default" : "ghost"}
+            variant={location.pathname.includes("/admin") ? "default" : "ghost"}
             className={cn(
               "w-full justify-start",
-              isActive("/admin") ? "bg-dragon-green text-white" : ""
+              location.pathname.includes("/admin") ? "bg-dragon-green text-white" : ""
             )}
           >
+            <Shield className="h-4 w-4 mr-2 text-dragon-green" />
             Admin portal
           </Button>
         </Link>
