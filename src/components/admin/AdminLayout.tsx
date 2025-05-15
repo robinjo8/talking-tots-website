@@ -1,9 +1,14 @@
 
-import { ReactNode } from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Routes, Route, Link, useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SidebarProvider } from "@/components/ui/sidebar";
+
+// Admin pages
+import AdminDashboard from "@/pages/admin/Dashboard";
+import UsersAdmin from "@/pages/admin/Users";
+import ContentAdmin from "@/pages/admin/Content";
+import SettingsAdmin from "@/pages/admin/Settings";
 
 export function AdminLayout() {
   const location = useLocation();
@@ -39,7 +44,13 @@ export function AdminLayout() {
           </Tabs>
           
           <div className="bg-white shadow rounded-lg p-6">
-            <Outlet />
+            <Routes>
+              <Route index element={<AdminDashboard />} />
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="users" element={<UsersAdmin />} />
+              <Route path="content" element={<ContentAdmin />} />
+              <Route path="settings" element={<SettingsAdmin />} />
+            </Routes>
           </div>
         </div>
       </div>

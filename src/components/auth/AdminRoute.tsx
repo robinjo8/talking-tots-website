@@ -1,13 +1,15 @@
 
 import { ReactNode, useState, useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export function AdminRoute({ children }: { children: ReactNode }) {
   const { user, isLoading } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminCheckLoading, setAdminCheckLoading] = useState(true);
+  const navigate = useNavigate();
   
   useEffect(() => {
     async function checkIsAdmin() {
@@ -25,11 +27,16 @@ export function AdminRoute({ children }: { children: ReactNode }) {
           .eq('role', 'admin')
           .single();
         
-        if (error) {
+        if (error && error.code !== 'PGRST116') {
           console.error("Error checking admin status:", error);
           setIsAdmin(false);
+          toast.error("Error verifying admin access");
         } else {
-          setIsAdmin(data !== null);
+          setIsAdmin(!!data);
+          if (!data) {
+            toast.error("You do not have admin access");
+            navigate("/");
+          }
         }
       } catch (error) {
         console.error("Failed to check admin status:", error);
@@ -40,7 +47,7 @@ export function AdminRoute({ children }: { children: ReactNode }) {
     }
     
     checkIsAdmin();
-  }, [user]);
+  }, [user, navigate]);
   
   if (isLoading || adminCheckLoading) {
     return (
@@ -50,8 +57,13 @@ export function AdminRoute({ children }: { children: ReactNode }) {
     );
   }
   
-  if (!user || !isAdmin) {
+  if (!user) {
     return <Navigate to="/login" replace />;
+  }
+  
+  if (!isAdmin) {
+    // If not admin but authenticated, navigate to home instead of login
+    return <Navigate to="/" replace />;
   }
   
   return <>{children}</>;
