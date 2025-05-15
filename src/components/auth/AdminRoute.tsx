@@ -19,6 +19,7 @@ export function AdminRoute({ children }: { children: ReactNode }) {
       }
       
       try {
+        console.log("Checking admin status for user:", user.id);
         // Check if the user has an admin role
         const { data, error } = await supabase
           .from('user_roles')
@@ -26,6 +27,8 @@ export function AdminRoute({ children }: { children: ReactNode }) {
           .eq('user_id', user.id)
           .eq('role', 'admin')
           .single();
+        
+        console.log("Admin check result:", { data, error });
         
         if (error && error.code !== 'PGRST116') {
           console.error("Error checking admin status:", error);
@@ -35,7 +38,6 @@ export function AdminRoute({ children }: { children: ReactNode }) {
           setIsAdmin(!!data);
           if (!data) {
             toast.error("You do not have admin access");
-            navigate("/");
           }
         }
       } catch (error) {
@@ -47,7 +49,7 @@ export function AdminRoute({ children }: { children: ReactNode }) {
     }
     
     checkIsAdmin();
-  }, [user, navigate]);
+  }, [user]);
   
   if (isLoading || adminCheckLoading) {
     return (
