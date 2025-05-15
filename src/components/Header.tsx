@@ -1,14 +1,15 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserProfile } from "@/components/auth/UserProfile";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSidebar } from "@/components/ui/sidebar";
-import { Menu, BookOpen, ChevronDown } from "lucide-react";
+import { Menu, BookOpen, ChevronDown, Shield } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { MobileMenu } from "@/components/MobileMenu";
+import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -22,6 +23,37 @@ export default function Header() {
   const isMobile = useIsMobile();
   const { setOpenMobile } = useSidebar();
   const selectedChild = selectedChildIndex !== null && profile?.children ? profile.children[selectedChildIndex] : null;
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    // Check if the current user has admin role
+    async function checkAdminRole() {
+      if (!user) {
+        setIsAdmin(false);
+        return;
+      }
+      
+      try {
+        const { data, error } = await supabase
+          .from('user_roles')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('role', 'admin')
+          .single();
+          
+        if (error && error.code !== 'PGRST116') {
+          console.error("Error checking admin role:", error);
+        }
+        
+        setIsAdmin(!!data);
+      } catch (error) {
+        console.error("Error checking admin status:", error);
+        setIsAdmin(false);
+      }
+    }
+    
+    checkAdminRole();
+  }, [user]);
 
   const handleNavigate = (path: string, options?: { expandSection?: string }) => {
     navigate(path);
@@ -72,6 +104,17 @@ export default function Header() {
             <nav className="flex items-center gap-6">
               {user && (
                 <>
+                  {isAdmin && (
+                    <Button
+                      variant="ghost"
+                      className="font-medium flex items-center"
+                      onClick={() => navigate('/admin')}
+                    >
+                      <Shield className="h-4 w-4 mr-2 text-dragon-green" />
+                      Admin
+                    </Button>
+                  )}
+                
                   <Button variant="ghost" className="font-medium opacity-50 cursor-not-allowed">
                     <BookOpen className="h-4 w-4 mr-2" />
                     Logopedski kotiček
