@@ -15,15 +15,16 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { useSidebar } from "@/components/ui/sidebar";
 
 export default function Header() {
   const { user, profile, selectedChildIndex } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { setOpenMobile } = useSidebar();
   const selectedChild = selectedChildIndex !== null && profile?.children ? profile.children[selectedChildIndex] : null;
   const [isAdmin, setIsAdmin] = useState(false);
+  
+  // Create a safe version of setOpenMobile that won't throw errors
+  const [openMobile, setOpenMobile] = useState(false);
 
   useEffect(() => {
     // Check if the current user has admin role
@@ -92,14 +93,14 @@ export default function Header() {
           )}
           
           {isMobile ? (
-            <Sheet>
+            <Sheet open={openMobile} onOpenChange={setOpenMobile}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="sm" className="flex items-center">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="p-0">
-                <MobileMenu onItemClick={() => {}} />
+                <MobileMenu onItemClick={() => setOpenMobile(false)} />
               </SheetContent>
             </Sheet>
           ) : (

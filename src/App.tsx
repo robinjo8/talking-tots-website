@@ -71,11 +71,7 @@ const App = () => (
               <Route path="/govorne-igre/spomin" element={<ProtectedRoute><AppLayout><SpominGames /></AppLayout></ProtectedRoute>} />
               
               {/* Admin routes */}
-              <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>} />
-              <Route path="/admin/dashboard" element={<AdminRoute><AdminLayout /></AdminRoute>} />
-              <Route path="/admin/users" element={<AdminRoute><AdminLayout /></AdminRoute>} />
-              <Route path="/admin/content" element={<AdminRoute><AdminLayout /></AdminRoute>} />
-              <Route path="/admin/settings" element={<AdminRoute><AdminLayout /></AdminRoute>} />
+              <Route path="/admin/*" element={<AdminRoute><AdminLayout /></AdminRoute>} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>

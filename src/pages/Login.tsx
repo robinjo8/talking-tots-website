@@ -1,130 +1,130 @@
 
 import { useState, useEffect } from "react";
-import { useNavigate, Link, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
+import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import Header from "@/components/Header";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
   const navigate = useNavigate();
-  const { user, profile } = useAuth();
-  const location = useLocation();
+  const { user } = useAuth();
 
-  // Get the redirect path from location state or default to home
-  const from = location.state?.from || "/";
-
+  // If already logged in, redirect to home
   useEffect(() => {
-    // If the user is already logged in, redirect to the intended page
     if (user) {
-      console.log("User already authenticated, redirecting to:", from);
-      navigate(from, { replace: true });
+      console.log("User already authenticated, redirecting to: /");
+      navigate('/');
     }
-  }, [user, navigate, from]);
+  }, [user, navigate]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null);
-    
-    if (!email || !password) {
-      setError("Prosimo, vnesite e-pošto in geslo.");
-      return;
-    }
-    
+    setIsLoading(true);
+
     try {
-      setIsLoading(true);
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
+
+      if (error) {
+        toast({
+          title: "Napaka pri prijavi",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Uspešna prijava",
+        description: "Dobrodošli nazaj!",
+      });
       
-      if (error) throw error;
-      
-      toast.success("Prijava uspešna!");
-      
-      // Navigate to the page they were trying to access or home
-      navigate(from, { replace: true });
-    } catch (error: any) {
-      console.error("Napaka pri prijavi:", error);
-      setError(error.message === "Invalid login credentials" 
-        ? "Napačna e-pošta ali geslo." 
-        : "Prišlo je do napake pri prijavi. Poskusite znova.");
+      // Redirect to homepage after successful login
+      navigate("/");
+    } catch (error) {
+      console.error("Login error:", error);
+      toast({
+        title: "Napaka pri prijavi",
+        description: "Preverite podatke in poskusite znova.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <AuthLayout 
-      title="Prijava" 
-      subtitle="Dobrodošli nazaj! Vpišite se z vašim računom."
-    >
-      <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-        {error && (
-          <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-        
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">E-pošta</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="vnesite@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="rounded-md text-base"
-              required
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password">Geslo</Label>
-              <Link 
-                to="/reset-password" 
-                className="text-xs text-dragon-green hover:underline"
-              >
-                Ste pozabili geslo?
-              </Link>
+    <SidebarProvider>
+      <div className="min-h-screen w-full flex flex-col">
+        <Header />
+        <div className="flex-1 flex items-center justify-center pt-16">
+          <AuthLayout
+            title="Prijava"
+            subTitle="Vnesite svoje podatke za prijavo"
+          >
+            <div className="grid gap-6">
+              <form onSubmit={handleSubmit}>
+                <div className="grid gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      placeholder="name@example.com"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      autoComplete="email"
+                      disabled={isLoading}
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="password">Geslo</Label>
+                      <Link
+                        to="/reset-password"
+                        className="text-sm text-muted-foreground hover:underline"
+                      >
+                        Ste pozabili geslo?
+                      </Link>
+                    </div>
+                    <Input
+                      id="password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      autoComplete="current-password"
+                      disabled={isLoading}
+                      required
+                    />
+                  </div>
+                  <Button disabled={isLoading}>
+                    {isLoading ? "Prijavljanje..." : "Prijava"}
+                  </Button>
+                </div>
+              </form>
+              <div className="mt-4 text-center text-sm">
+                Nimate računa?{" "}
+                <Link to="/register" className="underline">
+                  Registracija
+                </Link>
+              </div>
             </div>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Vnesite geslo"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="rounded-md text-base"
-              required
-            />
-          </div>
+          </AuthLayout>
         </div>
-        
-        <Button
-          type="submit"
-          className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6"
-          disabled={isLoading}
-        >
-          {isLoading ? "Prijavljanje..." : "Prijava"}
-        </Button>
-        
-        <div className="text-sm text-center">
-          Nimate računa?{" "}
-          <Link to="/register" className="text-dragon-green hover:underline font-medium">
-            Ustvarite ga zdaj
-          </Link>
-        </div>
-      </form>
-    </AuthLayout>
+      </div>
+    </SidebarProvider>
   );
 }
