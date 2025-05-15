@@ -30,7 +30,7 @@ import SpominK from "./pages/SpominK";
 import SpominS from "./pages/SpominS";
 import SpominŠ from "./pages/SpominŠ";
 
-// Admin pages - we'll still import these but use them in AdminLayout instead
+// Admin pages
 import AdminDashboard from "./pages/admin/Dashboard";
 import UsersAdmin from "./pages/admin/Users";
 import ContentAdmin from "./pages/admin/Content";
@@ -47,22 +47,15 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
+              {/* Public routes */}
               <Route path="/" element={<AppLayout><Index /></AppLayout>} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/update-password" element={<UpdatePassword />} />
               
-              <Route 
-                path="/dashboard" 
-                element={
-                  <ProtectedRoute>
-                    <AppLayout><Index /></AppLayout>
-                  </ProtectedRoute>
-                }
-              />
-              
               {/* Protected routes */}
+              <Route path="/dashboard" element={<ProtectedRoute><AppLayout><Index /></AppLayout></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><AppLayout><Profile /></AppLayout></ProtectedRoute>} />
               <Route path="/moja-stran" element={<ProtectedRoute><AppLayout><MojaStran /></AppLayout></ProtectedRoute>} />
               <Route path="/govorno-jezikovne-vaje" element={<ProtectedRoute><AppLayout><GovornojezicovneVaje /></AppLayout></ProtectedRoute>} />
@@ -77,23 +70,12 @@ const App = () => (
               <Route path="/govorne-igre/spomin/spomin-š" element={<ProtectedRoute><AppLayout><SpominŠ /></AppLayout></ProtectedRoute>} />
               <Route path="/govorne-igre/spomin" element={<ProtectedRoute><AppLayout><SpominGames /></AppLayout></ProtectedRoute>} />
               
-              {/* Admin Routes - Use a consistent route structure */}
-              <Route 
-                path="/admin" 
-                element={
-                  <AdminRoute>
-                    <AdminLayout />
-                  </AdminRoute>
-                }
-              />
-              <Route 
-                path="/admin/*" 
-                element={
-                  <AdminRoute>
-                    <AdminLayout />
-                  </AdminRoute>
-                }
-              />
+              {/* Admin routes */}
+              <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>} />
+              <Route path="/admin/dashboard" element={<AdminRoute><AdminLayout /></AdminRoute>} />
+              <Route path="/admin/users" element={<AdminRoute><AdminLayout /></AdminRoute>} />
+              <Route path="/admin/content" element={<AdminRoute><AdminLayout /></AdminRoute>} />
+              <Route path="/admin/settings" element={<AdminRoute><AdminLayout /></AdminRoute>} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>

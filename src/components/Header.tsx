@@ -15,24 +15,13 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-
-// Import useSidebar, but handle the case when it's not available
-const SidebarContext = React.createContext<any>(null);
-const useSidebarSafe = () => {
-  // Try to use the sidebar context if available
-  const context = React.useContext(SidebarContext);
-  // Return a default object if the sidebar context isn't available
-  return context || { 
-    setOpenMobile: () => {},
-    openMobile: false
-  };
-};
+import { useSidebar } from "@/components/ui/sidebar";
 
 export default function Header() {
   const { user, profile, selectedChildIndex } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { setOpenMobile } = useSidebarSafe(); // Use our safe version
+  const { setOpenMobile } = useSidebar();
   const selectedChild = selectedChildIndex !== null && profile?.children ? profile.children[selectedChildIndex] : null;
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -45,6 +34,7 @@ export default function Header() {
       }
       
       try {
+        console.log("Header - Checking admin status for user:", user.id);
         const { data, error } = await supabase
           .from('user_roles')
           .select('*')
@@ -57,6 +47,7 @@ export default function Header() {
         }
         
         setIsAdmin(!!data);
+        console.log("Header - Admin check result:", !!data);
       } catch (error) {
         console.error("Error checking admin status:", error);
         setIsAdmin(false);
@@ -119,7 +110,7 @@ export default function Header() {
                     <Button
                       variant="ghost"
                       className="font-medium flex items-center"
-                      onClick={() => navigate('/admin')}
+                      onClick={() => navigate('/admin/dashboard')}
                     >
                       <Shield className="h-4 w-4 mr-2 text-dragon-green" />
                       Admin

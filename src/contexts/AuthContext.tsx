@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 type ChildProfile = {
   name: string;
@@ -32,7 +33,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedChildIndex, setSelectedChildIndex] = useState<number | null>(null);
+  const [selectedChildIndex, setSelectedChildIndex] = useState<number | null>(() => {
+    const savedIndex = localStorage.getItem('selectedChildIndex');
+    return savedIndex ? parseInt(savedIndex) : null;
+  });
 
   useEffect(() => {
     const fetchUserProfile = async (userId: string, metadata: any) => {
@@ -66,7 +70,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null);
         
         if (session?.user) {
+          console.log("User authenticated:", session.user.id);
           fetchUserProfile(session.user.id, session.user.user_metadata);
+        } else {
+          console.log("No authenticated user");
         }
       } catch (error) {
         console.error("Napaka pri pridobivanju seje:", error);
@@ -75,7 +82,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("Auth state changed:", _event, session ? "user exists" : "no user");
       setSession(session);
       setUser(session?.user ?? null);
       
@@ -88,6 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     });
 
+    // Initial session check
     setData();
 
     return () => {
@@ -100,8 +110,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await supabase.auth.signOut();
       setSelectedChildIndex(null);
       localStorage.removeItem('selectedChildIndex');
+      toast.success("Uspešno ste se odjavili");
     } catch (error) {
       console.error("Napaka pri odjavi:", error);
+      toast.error("Napaka pri odjavi");
     }
   };
 

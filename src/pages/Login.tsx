@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
@@ -16,8 +16,19 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { profile } = useAuth();
+  const { user, profile } = useAuth();
   const location = useLocation();
+
+  // Get the redirect path from location state or default to home
+  const from = location.state?.from || "/";
+
+  useEffect(() => {
+    // If the user is already logged in, redirect to the intended page
+    if (user) {
+      console.log("User already authenticated, redirecting to:", from);
+      navigate(from, { replace: true });
+    }
+  }, [user, navigate, from]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,10 +50,8 @@ export default function Login() {
       
       toast.success("Prijava uspešna!");
       
-      // Check if the user has any children profiles
-      // We navigate to the homepage after successful login,
-      // and the child selection logic will be handled there
-      navigate("/");
+      // Navigate to the page they were trying to access or home
+      navigate(from, { replace: true });
     } catch (error: any) {
       console.error("Napaka pri prijavi:", error);
       setError(error.message === "Invalid login credentials" 

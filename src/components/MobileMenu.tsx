@@ -1,7 +1,6 @@
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Link } from "react-router-dom";
-import { AppSidebar } from "./AppSidebar";
 import { Button } from "./ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
@@ -24,6 +23,7 @@ export function MobileMenu({ onItemClick }: MobileMenuProps) {
       }
       
       try {
+        console.log("MobileMenu - Checking admin status for user:", user.id);
         const { data, error } = await supabase
           .from('user_roles')
           .select('*')
@@ -36,6 +36,7 @@ export function MobileMenu({ onItemClick }: MobileMenuProps) {
         }
         
         setIsAdmin(!!data);
+        console.log("MobileMenu - Admin check result:", !!data);
       } catch (error) {
         console.error("Error checking admin status:", error);
         setIsAdmin(false);
@@ -54,7 +55,7 @@ export function MobileMenu({ onItemClick }: MobileMenuProps) {
             {user && (
               <>
                 {isAdmin && (
-                  <Link to="/admin" className="block px-2 py-1 hover:text-dragon-green" onClick={onItemClick}>
+                  <Link to="/admin/dashboard" className="block px-2 py-1 hover:text-dragon-green" onClick={onItemClick}>
                     Admin Portal
                   </Link>
                 )}

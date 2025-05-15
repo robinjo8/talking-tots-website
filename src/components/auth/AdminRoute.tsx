@@ -1,6 +1,6 @@
 
 import { ReactNode, useState, useEffect } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -9,11 +9,12 @@ export function AdminRoute({ children }: { children: ReactNode }) {
   const { user, isLoading } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminCheckLoading, setAdminCheckLoading] = useState(true);
-  const navigate = useNavigate();
+  const location = useLocation();
   
   useEffect(() => {
     async function checkIsAdmin() {
       if (!user) {
+        console.log("AdminRoute - No user");
         setAdminCheckLoading(false);
         return;
       }
@@ -33,11 +34,12 @@ export function AdminRoute({ children }: { children: ReactNode }) {
         if (error && error.code !== 'PGRST116') {
           console.error("Error checking admin status:", error);
           setIsAdmin(false);
-          toast.error("Error verifying admin access");
         } else {
           setIsAdmin(!!data);
           if (!data) {
-            toast.error("You do not have admin access");
+            console.log("User is not an admin");
+          } else {
+            console.log("User is an admin");
           }
         }
       } catch (error) {
@@ -51,6 +53,16 @@ export function AdminRoute({ children }: { children: ReactNode }) {
     checkIsAdmin();
   }, [user]);
   
+  useEffect(() => {
+    console.log("AdminRoute - Auth state:", { 
+      user: !!user, 
+      isLoading, 
+      adminCheckLoading, 
+      isAdmin,
+      path: location.pathname 
+    });
+  }, [user, isLoading, adminCheckLoading, isAdmin, location]);
+  
   if (isLoading || adminCheckLoading) {
     return (
       <div className="h-screen flex items-center justify-center">
@@ -60,13 +72,17 @@ export function AdminRoute({ children }: { children: ReactNode }) {
   }
   
   if (!user) {
-    return <Navigate to="/login" replace />;
+    console.log("AdminRoute - No user, redirecting to login from:", location.pathname);
+    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
   
   if (!isAdmin) {
     // If not admin but authenticated, navigate to home instead of login
+    console.log("AdminRoute - Not admin, redirecting to home");
+    toast.error("Nimate administratorskih pravic");
     return <Navigate to="/" replace />;
   }
   
+  console.log("AdminRoute - Admin access granted, rendering children");
   return <>{children}</>;
 }

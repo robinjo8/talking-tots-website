@@ -1,5 +1,6 @@
 
-import { Routes, Route, Link, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { Routes, Route, Link, useLocation, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -12,7 +13,17 @@ import SettingsAdmin from "@/pages/admin/Settings";
 
 export function AdminLayout() {
   const location = useLocation();
-  const currentPath = location.pathname.split('/').pop() || 'dashboard';
+  const navigate = useNavigate();
+  const path = location.pathname.split('/').pop() || 'dashboard';
+  
+  useEffect(() => {
+    console.log("AdminLayout rendered, current path:", path);
+    
+    // Redirect to dashboard if on /admin root
+    if (location.pathname === '/admin') {
+      navigate('/admin/dashboard', { replace: true });
+    }
+  }, [location.pathname, navigate, path]);
   
   return (
     <div className="min-h-screen bg-gray-50">
@@ -25,7 +36,7 @@ export function AdminLayout() {
           </p>
         </div>
         
-        <Tabs value={currentPath} className="mb-8">
+        <Tabs value={path} className="mb-8">
           <TabsList className="bg-white border">
             <TabsTrigger value="dashboard" asChild>
               <Link to="/admin/dashboard">Nadzorna plošča</Link>
