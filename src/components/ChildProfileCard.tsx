@@ -16,10 +16,9 @@ type ChildProfileProps = {
   };
   isSelected: boolean;
   onSelect: () => void;
-  onEdit?: () => void;
-  onDelete?: () => void;
-  onEditDifficulties?: () => void;
-  hideActions?: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+  onEditDifficulties: () => void;
 };
 
 const getAvatarSrc = (avatarId: number): string => {
@@ -51,8 +50,7 @@ export function ChildProfileCard({
   onSelect, 
   onEdit, 
   onDelete,
-  onEditDifficulties,
-  hideActions = false
+  onEditDifficulties 
 }: ChildProfileProps) {
   const avatarSrc = getAvatarSrc(child.avatarId);
   const [isHovered, setIsHovered] = useState(false);
@@ -125,57 +123,49 @@ export function ChildProfileCard({
         </div>
         
         {/* Action buttons - vertical layout */}
-        {!hideActions && (
-          <div className="flex flex-col space-y-2 animate-fade-in">
-            {!isSelected && (
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={onSelect}
-                className="w-full border-dragon-green text-dragon-green hover:bg-dragon-green/10 hover:text-dragon-green transition-all duration-300"
-              >
-                <Check className="h-4 w-4 mr-2" />
-                Izberi
-              </Button>
-            )}
-            
-            {onEdit && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={onEdit}
-                className="w-full border-app-blue text-app-blue hover:bg-app-blue/10 hover:text-app-blue transition-all duration-300"
-              >
-                <Pencil className="h-4 w-4 mr-2" />
-                Uredi
-              </Button>
-            )}
-            
-            {onDelete && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={onDelete}
-                className="w-full border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive transition-all duration-300"
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Izbriši
-              </Button>
-            )}
-            
-            {onEditDifficulties && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={onEditDifficulties}
-                className="w-full border-app-purple text-app-purple hover:bg-app-purple/10 hover:text-app-purple transition-all duration-300"
-              >
-                <FileEdit className="h-4 w-4 mr-2" />
-                Uredi govorne težave
-              </Button>
-            )}
-          </div>
-        )}
+        <div className="flex flex-col space-y-2 animate-fade-in">
+          {!isSelected && (
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={onSelect}
+              className="w-full border-dragon-green text-dragon-green hover:bg-dragon-green/10 hover:text-dragon-green transition-all duration-300"
+            >
+              <Check className="h-4 w-4 mr-2" />
+              Izberi
+            </Button>
+          )}
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={onEdit}
+            className="w-full border-app-blue text-app-blue hover:bg-app-blue/10 hover:text-app-blue transition-all duration-300"
+          >
+            <Pencil className="h-4 w-4 mr-2" />
+            Uredi
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={onDelete}
+            className="w-full border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive transition-all duration-300"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Izbriši
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={onEditDifficulties}
+            className="w-full border-app-purple text-app-purple hover:bg-app-purple/10 hover:text-app-purple transition-all duration-300"
+          >
+            <FileEdit className="h-4 w-4 mr-2" />
+            Uredi govorne težave
+          </Button>
+        </div>
         
         {/* Speech difficulties section */}
         <div className="pt-3 border-t border-gray-100">

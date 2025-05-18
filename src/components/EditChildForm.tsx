@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -50,25 +51,24 @@ export function EditChildForm({ childIndex, initialData, onSuccess, onCancel }: 
     try {
       setIsSubmitting(true);
       
+      // Get current user metadata
       const { data: userData, error: userError } = await supabase.auth.getUser();
       
       if (userError) throw userError;
       
       const currentUser = userData.user;
       const currentMetadata = currentUser.user_metadata || {};
-      const currentChildren = [...(currentMetadata.children || [])];
+      const currentChildren = currentMetadata.children || [];
       
+      // Update child at the specific index
       if (childIndex >= 0 && childIndex < currentChildren.length) {
-        const existingDifficulties = currentChildren[childIndex].speechDifficulties || [];
-        
         currentChildren[childIndex] = {
-          ...currentChildren[childIndex],
           name: name.trim(),
           gender,
-          avatarId,
-          speechDifficulties: existingDifficulties
+          avatarId
         };
         
+        // Update user metadata
         const { error: updateError } = await supabase.auth.updateUser({
           data: { children: currentChildren }
         });
