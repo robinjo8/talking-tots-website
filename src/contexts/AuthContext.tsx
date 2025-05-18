@@ -59,19 +59,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
+    // First set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, currentSession) => {
+      console.log("Auth state changed:", _event, currentSession ? "user exists" : "no user");
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
+      
+      if (currentSession?.user) {
+        setTimeout(() => {
+          fetchUserProfile(currentSession.user.id, currentSession.user.user_metadata);
+        }, 0);
+      } else {
+        setProfile(null);
+      }
+      
+      setIsLoading(false);
+    });
+
+    // Then check for existing session
     const setData = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
+        const { data: { session: currentSession }, error } = await supabase.auth.getSession();
         if (error) {
           throw error;
         }
         
-        setSession(session);
-        setUser(session?.user ?? null);
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
         
-        if (session?.user) {
-          console.log("User authenticated:", session.user.id);
-          fetchUserProfile(session.user.id, session.user.user_metadata);
+        if (currentSession?.user) {
+          console.log("User authenticated:", currentSession.user.id);
+          fetchUserProfile(currentSession.user.id, currentSession.user.user_metadata);
         } else {
           console.log("No authenticated user");
         }
@@ -82,22 +100,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log("Auth state changed:", _event, session ? "user exists" : "no user");
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        fetchUserProfile(session.user.id, session.user.user_metadata);
-      } else {
-        setProfile(null);
-      }
-      
-      setIsLoading(false);
-    });
-
-    // Initial session check
     setData();
 
     return () => {
@@ -107,13 +109,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
       setSelectedChildIndex(null);
       localStorage.removeItem('selectedChildIndex');
-      toast.success("Uspešno ste se odjavili");
     } catch (error) {
       console.error("Napaka pri odjavi:", error);
-      toast.error("Napaka pri odjavi");
+      throw error;
     }
   };
 
