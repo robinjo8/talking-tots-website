@@ -15,22 +15,25 @@ const memoryGames = [
     available: true
   },
   {
-    id: "spomin-l",
-    title: "Spomin (besede na črko L)",
-    description: "Igra spomin za vajo izgovorjave črke L",
-    available: false
+    id: "spomin-k",
+    title: "Spomin (besede na črko K)",
+    description: "Igra spomin za vajo izgovorjave črke K",
+    path: "/govorne-igre/spomin/spomin-k",
+    available: true
   },
   {
     id: "spomin-s",
     title: "Spomin (besede na črko S)",
     description: "Igra spomin za vajo izgovorjave črke S",
-    available: false
+    path: "/govorne-igre/spomin/spomin-s",
+    available: true
   },
   {
     id: "spomin-š",
     title: "Spomin (besede na črko Š)",
     description: "Igra spomin za vajo izgovorjave črke Š",
-    available: false
+    path: "/govorne-igre/spomin/spomin-š",
+    available: true
   },
   {
     id: "spomin-c",
