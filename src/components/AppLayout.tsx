@@ -1,6 +1,5 @@
 
-import { ReactNode, useEffect } from "react";
-import { SidebarInset } from "@/components/ui/sidebar";
+import { ReactNode } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,9 +17,9 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                      location.pathname === "/update-password";
 
   return (
-    <div className="flex min-h-screen w-full">
-      <div className="relative flex-1 flex flex-col">
-        <Header />
+    <div className="flex min-h-screen w-full flex-col">
+      <Header />
+      <div className="flex-1 pt-20">
         {children}
       </div>
     </div>
