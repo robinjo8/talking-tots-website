@@ -78,6 +78,11 @@
   }
 }
 
+/* New rainbow text gradient class */
+.text-gradient-rainbow {
+  @apply bg-gradient-to-r from-app-blue via-dragon-green to-app-orange bg-clip-text text-transparent;
+}
+
 /* Card Flip Animation Styles */
 .flip-card {
   background-color: transparent;
