@@ -3,6 +3,8 @@ import { ReactNode, useEffect } from "react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { useLocation } from "react-router-dom";
+import Header from "@/components/Header";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -10,11 +12,21 @@ interface AppLayoutProps {
 
 function AppLayoutContent({ children }: AppLayoutProps) {
   const location = useLocation();
+  const { user } = useAuth();
+  const isAuthPage = location.pathname === "/login" || 
+                     location.pathname === "/register" || 
+                     location.pathname === "/reset-password" || 
+                     location.pathname === "/update-password";
+
+  // Only show sidebar for authenticated users and non-auth pages
+  const showSidebar = !!user && !isAuthPage;
 
   return (
     <div className="flex min-h-screen w-full">
       <SidebarInset>
+        {showSidebar && <AppSidebar />}
         <div className="relative flex-1 flex flex-col">
+          <Header />
           {children}
         </div>
       </SidebarInset>

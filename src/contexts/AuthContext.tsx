@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 type ChildProfile = {
   name: string;
@@ -32,7 +33,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedChildIndex, setSelectedChildIndex] = useState<number | null>(null);
+  const [selectedChildIndex, setSelectedChildIndex] = useState<number | null>(
+    () => {
+      const storedIndex = localStorage.getItem('selectedChildIndex');
+      return storedIndex ? parseInt(storedIndex) : null;
+    }
+  );
+
+  useEffect(() => {
+    // Save selected child index to localStorage
+    if (selectedChildIndex !== null) {
+      localStorage.setItem('selectedChildIndex', selectedChildIndex.toString());
+    } else {
+      localStorage.removeItem('selectedChildIndex');
+    }
+  }, [selectedChildIndex]);
 
   useEffect(() => {
     const fetchUserProfile = async (userId: string, metadata: any) => {
@@ -50,32 +65,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           username: data.username,
           children: metadata?.children || []
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error("Napaka pri pridobivanju profila:", error);
       }
     };
 
-    const setData = async () => {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) {
-          throw error;
-        }
-        
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          fetchUserProfile(session.user.id, session.user.user_metadata);
-        }
-      } catch (error) {
-        console.error("Napaka pri pridobivanju seje:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
+    // Listen for auth state changes first
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("Auth state changed:", { hasSession: !!session, userId: session?.user?.id });
       setSession(session);
       setUser(session?.user ?? null);
       
@@ -88,7 +85,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     });
 
-    setData();
+    // Then check current session
+    const initializeAuth = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error("Error getting session:", error);
+          throw error;
+        }
+        
+        console.log("Initial session check:", { hasSession: !!session, userId: session?.user?.id });
+        
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          await fetchUserProfile(session.user.id, session.user.user_metadata);
+        }
+      } catch (error) {
+        console.error("Session initialization error:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeAuth();
 
     return () => {
       subscription.unsubscribe();
@@ -97,11 +118,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut();
+      console.log("Signing out...");
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
       setSelectedChildIndex(null);
       localStorage.removeItem('selectedChildIndex');
-    } catch (error) {
+      toast.success("Uspešno ste se odjavili");
+      console.log("Sign out successful");
+    } catch (error: any) {
       console.error("Napaka pri odjavi:", error);
+      toast.error("Napaka pri odjavi: " + error.message);
     }
   };
 
