@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { User, Lock, EyeOff, Eye } from "lucide-react";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -17,8 +16,6 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -93,43 +90,20 @@ export default function Register() {
     }
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword);
-  };
-
   return (
     <SidebarProvider>
       <div className="min-h-screen w-full flex flex-col">
         <Header />
-        <div className="flex-1 flex items-center justify-center pt-16 px-4">
-          <div className="w-full max-w-md">
-            <div className="bg-white shadow-lg rounded-3xl p-8 border border-gray-100">
-              <div className="text-center mb-8">
-                <div className="flex items-center justify-center gap-2 mb-4">
-                  <img 
-                    src="/lovable-uploads/ef9acb7f-a16f-4737-ac7b-fe4bc68c21cd.png" 
-                    alt="Tomi the Dragon" 
-                    className="h-16 w-16 animate-bounce-gentle" 
-                  />
-                </div>
-                <h1 className="text-3xl font-bold mb-2">
-                  <span className="text-dragon-green">Ustvari</span> 
-                  <span className="text-app-orange"> račun</span>
-                </h1>
-                <p className="text-lg text-muted-foreground">Ustvarite nov uporabniški račun</p>
-              </div>
-              
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="username" className="text-base font-medium">Uporabniško ime</Label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                      <User className="h-5 w-5 text-muted-foreground" />
-                    </div>
+        <div className="flex-1 flex items-center justify-center pt-16">
+          <AuthLayout
+            title="Registracija"
+            subtitle="Ustvarite nov uporabniški račun"
+          >
+            <div className="grid gap-6">
+              <form onSubmit={handleSubmit}>
+                <div className="grid gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="username">Uporabniško ime</Label>
                     <Input
                       id="username"
                       placeholder="uporabniško ime"
@@ -137,17 +111,10 @@ export default function Register() {
                       onChange={(e) => setUsername(e.target.value)}
                       disabled={isLoading}
                       required
-                      className="pl-10 rounded-xl h-12 border-2 border-gray-200 focus:border-dragon-green"
                     />
                   </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-base font-medium">E-pošta</Label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                      <User className="h-5 w-5 text-muted-foreground" />
-                    </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="email">E-pošta</Label>
                     <Input
                       id="email"
                       placeholder="name@example.com"
@@ -157,90 +124,45 @@ export default function Register() {
                       autoComplete="email"
                       disabled={isLoading}
                       required
-                      className="pl-10 rounded-xl h-12 border-2 border-gray-200 focus:border-dragon-green"
                     />
                   </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-base font-medium">Geslo</Label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                      <Lock className="h-5 w-5 text-muted-foreground" />
-                    </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="password">Geslo</Label>
                     <Input
                       id="password"
-                      type={showPassword ? "text" : "password"}
+                      type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       autoComplete="new-password"
                       disabled={isLoading}
                       required
-                      className="pl-10 pr-12 rounded-xl h-12 border-2 border-gray-200 focus:border-dragon-green"
                     />
-                    <button
-                      type="button"
-                      onClick={togglePasswordVisibility}
-                      className="absolute inset-y-0 right-3 flex items-center"
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-5 w-5 text-muted-foreground" />
-                      ) : (
-                        <Eye className="h-5 w-5 text-muted-foreground" />
-                      )}
-                    </button>
                   </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="confirm-password" className="text-base font-medium">Potrdite geslo</Label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                      <Lock className="h-5 w-5 text-muted-foreground" />
-                    </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="confirm-password">Potrdite geslo</Label>
                     <Input
                       id="confirm-password"
-                      type={showConfirmPassword ? "text" : "password"}
+                      type="password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       autoComplete="new-password"
                       disabled={isLoading}
                       required
-                      className="pl-10 pr-12 rounded-xl h-12 border-2 border-gray-200 focus:border-dragon-green"
                     />
-                    <button
-                      type="button"
-                      onClick={toggleConfirmPasswordVisibility}
-                      className="absolute inset-y-0 right-3 flex items-center"
-                    >
-                      {showConfirmPassword ? (
-                        <EyeOff className="h-5 w-5 text-muted-foreground" />
-                      ) : (
-                        <Eye className="h-5 w-5 text-muted-foreground" />
-                      )}
-                    </button>
                   </div>
-                </div>
-                
-                <Button 
-                  disabled={isLoading}
-                  type="submit"
-                  className="w-full h-12 mt-2 text-base font-medium rounded-xl bg-gradient-to-r from-dragon-green to-app-blue hover:opacity-90 transition-all"
-                >
-                  {isLoading ? "Registracija..." : "Registracija"}
-                </Button>
-                
-                <div className="mt-4 text-center">
-                  <p className="text-base text-muted-foreground">
-                    Že imate račun?{" "}
-                    <Link to="/login" className="text-app-orange font-medium hover:underline">
-                      Prijava
-                    </Link>
-                  </p>
+                  <Button disabled={isLoading}>
+                    {isLoading ? "Registracija..." : "Registracija"}
+                  </Button>
                 </div>
               </form>
+              <div className="mt-4 text-center text-sm">
+                Že imate račun?{" "}
+                <Link to="/login" className="underline">
+                  Prijava
+                </Link>
+              </div>
             </div>
-          </div>
+          </AuthLayout>
         </div>
       </div>
     </SidebarProvider>

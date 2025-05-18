@@ -39,14 +39,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   useEffect(() => {
-    if (selectedChildIndex !== null) {
-      localStorage.setItem('selectedChildIndex', selectedChildIndex.toString());
-    } else {
-      localStorage.removeItem('selectedChildIndex');
-    }
-  }, [selectedChildIndex]);
-
-  useEffect(() => {
     const fetchUserProfile = async (userId: string, metadata: any) => {
       try {
         const { data, error } = await supabase
@@ -59,7 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         // Combine database profile with user metadata (which contains children)
         setProfile({
-          username: data?.username,
+          username: data.username,
           children: metadata?.children || []
         });
       } catch (error) {
@@ -67,24 +59,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    // First check for existing session
-    const checkSession = async () => {
+    const setData = async () => {
       try {
-        const { data: { session: currentSession }, error } = await supabase.auth.getSession();
-        
+        const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
           throw error;
         }
         
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
+        setSession(session);
+        setUser(session?.user ?? null);
         
-        if (currentSession?.user) {
-          console.log("User authenticated:", currentSession.user.id);
-          await fetchUserProfile(currentSession.user.id, currentSession.user.user_metadata);
+        if (session?.user) {
+          console.log("User authenticated:", session.user.id);
+          fetchUserProfile(session.user.id, session.user.user_metadata);
         } else {
           console.log("No authenticated user");
-          setProfile(null);
         }
       } catch (error) {
         console.error("Napaka pri pridobivanju seje:", error);
@@ -94,28 +83,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, currentSession) => {
-      console.log("Auth state changed:", event, currentSession ? "user exists" : "no user");
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("Auth state changed:", _event, session ? "user exists" : "no user");
+      setSession(session);
+      setUser(session?.user ?? null);
       
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-      
-      if (currentSession?.user) {
-        fetchUserProfile(currentSession.user.id, currentSession.user.user_metadata);
+      if (session?.user) {
+        fetchUserProfile(session.user.id, session.user.user_metadata);
       } else {
         setProfile(null);
-      }
-      
-      if (event === 'SIGNED_OUT') {
-        setSelectedChildIndex(null);
-        console.log("User signed out, cleared selected child index");
       }
       
       setIsLoading(false);
     });
 
-    // Call checkSession right away
-    checkSession();
+    // Initial session check
+    setData();
 
     return () => {
       subscription.unsubscribe();
@@ -124,28 +107,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     try {
-      console.log("Attempting to sign out...");
-      const { error } = await supabase.auth.signOut();
-      
-      if (error) {
-        console.error("Error in signOut function:", error);
-        toast.error("Napaka pri odjavi: " + error.message);
-        throw error;
-      }
-      
-      // Clear local state regardless of the result from supabase
-      setProfile(null);
-      setSession(null);
-      setUser(null);
+      await supabase.auth.signOut();
       setSelectedChildIndex(null);
       localStorage.removeItem('selectedChildIndex');
-      
       toast.success("Uspešno ste se odjavili");
-      console.log("Sign out completed successfully");
-    } catch (error: any) {
-      console.error("Caught error during sign out:", error);
+    } catch (error) {
+      console.error("Napaka pri odjavi:", error);
       toast.error("Napaka pri odjavi");
-      throw error;
     }
   };
 

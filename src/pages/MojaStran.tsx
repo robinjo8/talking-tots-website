@@ -29,37 +29,35 @@ const MojaStran = () => {
   }
 
   return (
-    <div className="min-h-screen w-full bg-background">
+    <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="w-full pt-32 pb-20">
-        <div className="container mx-auto px-4 max-w-7xl">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">
-              {selectedChild ? (
-                <>Živjo, <span className="text-dragon-green">{selectedChild.name}</span>!</>
-              ) : (
-                <>Pozdravljen, <span className="text-dragon-green">{profile?.username || user.email}</span>!</>
-              )}
-            </h1>
-          </div>
-          
-          {selectedChild ? (
-            <>
-              <MotivationalMessage />
-              
-              <ProgressSection />
-              
-              <ActivityOptions />
-              
-              <TipSection childName={selectedChild.name} />
-            </>
-          ) : (
-            <NoChildSelected />
-          )}
-          
-          <FooterSection handleSignOut={handleSignOut} />
+      <div className="container max-w-5xl mx-auto pt-32 pb-20 px-4">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">
+            {selectedChild ? (
+              <>Živjo, <span className="text-dragon-green">{selectedChild.name}</span>!</>
+            ) : (
+              <>Pozdravljen, <span className="text-dragon-green">{profile?.username || user.email}</span>!</>
+            )}
+          </h1>
         </div>
+        
+        {selectedChild ? (
+          <>
+            <MotivationalMessage />
+            
+            <ProgressSection />
+            
+            <ActivityOptions />
+            
+            <TipSection childName={selectedChild.name} />
+          </>
+        ) : (
+          <NoChildSelected />
+        )}
+        
+        <FooterSection handleSignOut={handleSignOut} />
       </div>
     </div>
   );

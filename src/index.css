@@ -78,20 +78,6 @@
   }
 }
 
-/* New rainbow text gradient class */
-.text-gradient-rainbow {
-  @apply bg-gradient-to-r from-app-blue via-dragon-green to-app-orange bg-clip-text text-transparent;
-}
-
-/* Auth form specific styles */
-.auth-input {
-  @apply rounded-xl h-12 border-2 border-gray-200 focus:border-dragon-green;
-}
-
-.auth-button {
-  @apply h-12 text-base font-medium rounded-xl bg-gradient-to-r from-dragon-green to-app-blue hover:opacity-90 transition-all;
-}
-
 /* Card Flip Animation Styles */
 .flip-card {
   background-color: transparent;

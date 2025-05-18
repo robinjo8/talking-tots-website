@@ -1,5 +1,5 @@
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { useLocation } from "react-router-dom";
@@ -13,9 +13,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
   return (
     <div className="flex min-h-screen w-full">
-      <AppSidebar />
       <SidebarInset>
-        <div className="relative flex-1 flex flex-col w-full">
+        <div className="relative flex-1 flex flex-col">
           {children}
         </div>
       </SidebarInset>
