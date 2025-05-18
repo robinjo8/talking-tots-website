@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { UserProfile } from "@/components/auth/UserProfile";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSidebar } from "@/components/ui/sidebar";
-import { Menu, BookOpen, ChevronDown, Users } from "lucide-react";
+import { Menu, BookOpen, ChevronDown } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { MobileMenu } from "@/components/MobileMenu";
 import {
@@ -14,18 +14,10 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 export default function Header() {
-  const { user, profile, selectedChildIndex, setSelectedChildIndex } = useAuth();
+  const { user, profile, selectedChildIndex } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { setOpenMobile } = useSidebar();
@@ -37,12 +29,6 @@ export default function Header() {
     if (options?.expandSection) {
       localStorage.setItem('expandSection', options.expandSection);
     }
-  };
-
-  const handleSelectChild = (childIndex: string) => {
-    const index = parseInt(childIndex);
-    setSelectedChildIndex(index);
-    localStorage.setItem('selectedChildIndex', index.toString());
   };
 
   const navigationItems = [
@@ -65,24 +51,6 @@ export default function Header() {
         </Link>
         
         <div className="flex items-center gap-3">
-          {/* Child Profile Selector */}
-          {user && profile?.children && profile.children.length > 0 && (
-            <div className="mr-2">
-              <Select value={selectedChildIndex !== null ? selectedChildIndex.toString() : ""} onValueChange={handleSelectChild}>
-                <SelectTrigger className="w-[180px] border-dragon-green text-dragon-green">
-                  <SelectValue placeholder="Izberi otroka" />
-                </SelectTrigger>
-                <SelectContent>
-                  {profile.children.map((child, index) => (
-                    <SelectItem key={index} value={index.toString()}>
-                      {child.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-          
           {isMobile && selectedChild && (
             <span className="text-sm font-medium text-muted-foreground">
               {selectedChild.name}
