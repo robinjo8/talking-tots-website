@@ -1,4 +1,3 @@
-
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -71,59 +70,61 @@ export default function SpominGames() {
   const navigate = useNavigate();
   
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen w-full bg-background">
       <Header />
       
-      <div className="container max-w-7xl mx-auto pt-32 pb-20 px-4">
-        <div className="flex items-center gap-3 mb-8">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="gap-2" 
-            onClick={() => navigate("/govorne-igre")}
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Nazaj
-          </Button>
-          
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-            Spomin
-          </h1>
-        </div>
-        
-        <Card className="bg-dragon-green/5 mb-8">
-          <CardContent className="p-8">
-            <h2 className="text-xl font-bold mb-2">Izberi igro spomin</h2>
-            <p className="text-muted-foreground">
-              Izberi eno izmed iger spomin in začni vaditi izgovorjavo določene črke na zabaven način.
-            </p>
-          </CardContent>
-        </Card>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {memoryGames.map((game) => (
-            <Card 
-              key={game.id}
-              className={cn(
-                "transition-all duration-300 hover:shadow-md",
-                game.available ? "cursor-pointer" : "opacity-50"
-              )}
-              onClick={() => game.available && game.path && navigate(game.path)}
+      <div className="w-full pt-32 pb-20">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="flex items-center gap-3 mb-8">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="gap-2" 
+              onClick={() => navigate("/govorne-igre")}
             >
-              <CardContent className="p-6">
-                <div className="bg-gradient-to-br from-app-purple/10 to-app-blue/10 rounded-lg p-4 mb-4 flex items-center justify-center">
-                  <Puzzle className="h-8 w-8 text-app-purple" />
-                </div>
-                <h3 className="font-bold text-lg mb-2">{game.title}</h3>
-                <p className="text-sm text-muted-foreground">{game.description}</p>
-                {!game.available && (
-                  <div className="mt-3 text-sm text-muted-foreground italic">
-                    Kmalu na voljo
-                  </div>
+              <ArrowLeft className="h-4 w-4" />
+              Nazaj
+            </Button>
+            
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+              Spomin
+            </h1>
+          </div>
+          
+          <Card className="bg-dragon-green/5 mb-8">
+            <CardContent className="p-8">
+              <h2 className="text-xl font-bold mb-2">Izberi igro spomin</h2>
+              <p className="text-muted-foreground">
+                Izberi eno izmed iger spomin in začni vaditi izgovorjavo določene črke na zabaven način.
+              </p>
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {memoryGames.map((game) => (
+              <Card 
+                key={game.id}
+                className={cn(
+                  "transition-all duration-300 hover:shadow-md",
+                  game.available ? "cursor-pointer" : "opacity-50"
                 )}
-              </CardContent>
-            </Card>
-          ))}
+                onClick={() => game.available && game.path && navigate(game.path)}
+              >
+                <CardContent className="p-6">
+                  <div className="bg-gradient-to-br from-app-purple/10 to-app-blue/10 rounded-lg p-4 mb-4 flex items-center justify-center">
+                    <Puzzle className="h-8 w-8 text-app-purple" />
+                  </div>
+                  <h3 className="font-bold text-lg mb-2">{game.title}</h3>
+                  <p className="text-sm text-muted-foreground">{game.description}</p>
+                  {!game.available && (
+                    <div className="mt-3 text-sm text-muted-foreground italic">
+                      Kmalu na voljo
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
     </div>

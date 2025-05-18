@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
@@ -55,50 +54,52 @@ export default function ResetPassword() {
     <SidebarProvider>
       <div className="min-h-screen w-full flex flex-col">
         <Header />
-        <div className="flex-1 flex items-center justify-center pt-16">
-          <AuthLayout
-            title="Ponastavitev gesla"
-            subtitle="Vnesite svoj e-poštni naslov za ponastavitev gesla"
-          >
-            {!isSubmitted ? (
-              <div className="grid gap-6">
-                <form onSubmit={handleSubmit}>
-                  <div className="grid gap-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="email">E-pošta</Label>
-                      <Input
-                        id="email"
-                        placeholder="name@example.com"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        autoComplete="email"
-                        disabled={isLoading}
-                        required
-                      />
+        <div className="w-full flex-1 flex items-center justify-center pt-16">
+          <div className="container mx-auto px-4 max-w-7xl">
+            <AuthLayout
+              title="Ponastavitev gesla"
+              subtitle="Vnesite svoj e-poštni naslov za ponastavitev gesla"
+            >
+              {!isSubmitted ? (
+                <div className="grid gap-6">
+                  <form onSubmit={handleSubmit}>
+                    <div className="grid gap-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="email">E-pošta</Label>
+                        <Input
+                          id="email"
+                          placeholder="name@example.com"
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          autoComplete="email"
+                          disabled={isLoading}
+                          required
+                        />
+                      </div>
+                      <Button disabled={isLoading}>
+                        {isLoading ? "Pošiljanje..." : "Ponastavi geslo"}
+                      </Button>
                     </div>
-                    <Button disabled={isLoading}>
-                      {isLoading ? "Pošiljanje..." : "Ponastavi geslo"}
-                    </Button>
+                  </form>
+                  <div className="mt-4 text-center text-sm">
+                    <Link to="/login" className="underline">
+                      Nazaj na prijavo
+                    </Link>
                   </div>
-                </form>
-                <div className="mt-4 text-center text-sm">
-                  <Link to="/login" className="underline">
-                    Nazaj na prijavo
+                </div>
+              ) : (
+                <div className="text-center">
+                  <p className="mb-4">
+                    Na vaš e-poštni naslov smo poslali navodila za ponastavitev gesla.
+                  </p>
+                  <Link to="/login">
+                    <Button>Nazaj na prijavo</Button>
                   </Link>
                 </div>
-              </div>
-            ) : (
-              <div className="text-center">
-                <p className="mb-4">
-                  Na vaš e-poštni naslov smo poslali navodila za ponastavitev gesla.
-                </p>
-                <Link to="/login">
-                  <Button>Nazaj na prijavo</Button>
-                </Link>
-              </div>
-            )}
-          </AuthLayout>
+              )}
+            </AuthLayout>
+          </div>
         </div>
       </div>
     </SidebarProvider>

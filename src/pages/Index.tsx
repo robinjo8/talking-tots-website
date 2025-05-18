@@ -49,8 +49,8 @@ const Index = () => {
       <SidebarProvider>
         <Header />
         
-        <div className="pt-20 md:pt-24">
-          <main className="container mx-auto px-4 max-w-6xl flex flex-col">
+        <div className="pt-20 md:pt-24 w-full">
+          <main className="container mx-auto px-4 max-w-7xl flex flex-col">
             <HeroSection 
               isVisible={isVisible}
               onStartNow={handleStartNow}

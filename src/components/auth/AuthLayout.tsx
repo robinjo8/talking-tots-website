@@ -10,9 +10,9 @@ type AuthLayoutProps = {
 
 export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-sky-50 to-white">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center p-4 bg-gradient-to-b from-sky-50 to-white">
       <header className="py-4 px-6 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
+        <div className="container mx-auto max-w-7xl flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2">
             <img 
               src="/lovable-uploads/ef9acb7f-a16f-4737-ac7b-fe4bc68c21cd.png" 
