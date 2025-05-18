@@ -16,11 +16,22 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 
+// Helper function to safely use sidebar
+const useSafeSetOpenMobile = () => {
+  try {
+    const sidebar = useSidebar();
+    return sidebar.setOpenMobile;
+  } catch (e) {
+    // Return a no-op function if sidebar is not available
+    return () => {};
+  }
+};
+
 export default function Header() {
   const { user, profile, selectedChildIndex } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { setOpenMobile } = useSidebar();
+  const setOpenMobile = useSafeSetOpenMobile();
   const selectedChild = selectedChildIndex !== null && profile?.children ? profile.children[selectedChildIndex] : null;
 
   const handleNavigate = (path: string, options?: { expandSection?: string }) => {
