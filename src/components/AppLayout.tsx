@@ -1,5 +1,5 @@
 
-import { ReactNode, useEffect } from "react";
+import { ReactNode } from "react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { useLocation } from "react-router-dom";
