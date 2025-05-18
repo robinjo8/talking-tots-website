@@ -39,6 +39,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   useEffect(() => {
+    if (selectedChildIndex !== null) {
+      localStorage.setItem('selectedChildIndex', selectedChildIndex.toString());
+    } else {
+      localStorage.removeItem('selectedChildIndex');
+    }
+  }, [selectedChildIndex]);
+
+  useEffect(() => {
     const fetchUserProfile = async (userId: string, metadata: any) => {
       try {
         const { data, error } = await supabase
@@ -51,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         // Combine database profile with user metadata (which contains children)
         setProfile({
-          username: data.username,
+          username: data?.username,
           children: metadata?.children || []
         });
       } catch (error) {
@@ -59,27 +67,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    // First set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, currentSession) => {
-      console.log("Auth state changed:", _event, currentSession ? "user exists" : "no user");
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-      
-      if (currentSession?.user) {
-        setTimeout(() => {
-          fetchUserProfile(currentSession.user.id, currentSession.user.user_metadata);
-        }, 0);
-      } else {
-        setProfile(null);
-      }
-      
-      setIsLoading(false);
-    });
-
-    // Then check for existing session
-    const setData = async () => {
+    // First check for existing session
+    const checkSession = async () => {
       try {
         const { data: { session: currentSession }, error } = await supabase.auth.getSession();
+        
         if (error) {
           throw error;
         }
@@ -89,9 +81,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         if (currentSession?.user) {
           console.log("User authenticated:", currentSession.user.id);
-          fetchUserProfile(currentSession.user.id, currentSession.user.user_metadata);
+          await fetchUserProfile(currentSession.user.id, currentSession.user.user_metadata);
         } else {
           console.log("No authenticated user");
+          setProfile(null);
         }
       } catch (error) {
         console.error("Napaka pri pridobivanju seje:", error);
@@ -100,7 +93,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    setData();
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, currentSession) => {
+      console.log("Auth state changed:", event, currentSession ? "user exists" : "no user");
+      
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
+      
+      if (currentSession?.user) {
+        fetchUserProfile(currentSession.user.id, currentSession.user.user_metadata);
+      } else {
+        setProfile(null);
+      }
+      
+      if (event === 'SIGNED_OUT') {
+        setSelectedChildIndex(null);
+        console.log("User signed out, cleared selected child index");
+      }
+      
+      setIsLoading(false);
+    });
+
+    // Call checkSession right away
+    checkSession();
 
     return () => {
       subscription.unsubscribe();
@@ -109,13 +124,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     try {
+      console.log("Attempting to sign out...");
       const { error } = await supabase.auth.signOut();
-      if (error) throw error;
       
+      if (error) {
+        console.error("Error in signOut function:", error);
+        toast.error("Napaka pri odjavi: " + error.message);
+        throw error;
+      }
+      
+      // Clear local state regardless of the result from supabase
+      setProfile(null);
+      setSession(null);
+      setUser(null);
       setSelectedChildIndex(null);
       localStorage.removeItem('selectedChildIndex');
-    } catch (error) {
-      console.error("Napaka pri odjavi:", error);
+      
+      toast.success("Uspešno ste se odjavili");
+      console.log("Sign out completed successfully");
+    } catch (error: any) {
+      console.error("Caught error during sign out:", error);
+      toast.error("Napaka pri odjavi");
       throw error;
     }
   };
