@@ -59,7 +59,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    const setData = async () => {
+    // Set up auth state listener first
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("Auth state changed:", _event, session ? "user exists" : "no user");
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        fetchUserProfile(session.user.id, session.user.user_metadata);
+      } else {
+        setProfile(null);
+      }
+      
+      setIsLoading(false);
+    });
+
+    // Then check for existing session
+    const checkSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
@@ -82,23 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log("Auth state changed:", _event, session ? "user exists" : "no user");
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        fetchUserProfile(session.user.id, session.user.user_metadata);
-      } else {
-        setProfile(null);
-      }
-      
-      setIsLoading(false);
-    });
-
-    // Initial session check
-    setData();
+    checkSession();
 
     return () => {
       subscription.unsubscribe();
@@ -106,14 +106,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = async () => {
+    console.log("Attempting to sign out...");
     try {
-      await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
       setSelectedChildIndex(null);
       localStorage.removeItem('selectedChildIndex');
-      toast.success("Uspešno ste se odjavili");
+      console.log("Sign out successful");
     } catch (error) {
       console.error("Napaka pri odjavi:", error);
-      toast.error("Napaka pri odjavi");
+      throw error; // Re-throw to handle in the UI component
     }
   };
 
