@@ -49,15 +49,17 @@ const Index = () => {
       <SidebarProvider>
         <Header />
         
-        <HeroSection 
-          isVisible={isVisible}
-          onStartNow={handleStartNow}
-          onScrollToFeatures={scrollToFeatures}
-        />
-        
-        <FeaturesSection />
-        
-        <CallToActionSection />
+        <main className="mx-auto max-w-6xl px-4 sm:px-6 md:px-10 flex flex-col">
+          <HeroSection 
+            isVisible={isVisible}
+            onStartNow={handleStartNow}
+            onScrollToFeatures={scrollToFeatures}
+          />
+          
+          <FeaturesSection />
+          
+          <CallToActionSection />
+        </main>
         
         <FooterSection />
         

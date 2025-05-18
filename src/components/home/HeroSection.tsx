@@ -13,20 +13,20 @@ type HeroSectionProps = {
 
 export function HeroSection({ isVisible, onStartNow, onScrollToFeatures }: HeroSectionProps) {
   return (
-    <section className="pt-24 md:pt-32 pb-12 md:pb-20 px-4 sm:px-6 md:px-10 relative w-full overflow-hidden">
+    <section className="pt-16 pb-16 relative w-full overflow-hidden">
       <div className="absolute -top-20 -left-20 w-60 h-60 bg-app-yellow/20 rounded-full blur-3xl"></div>
       <div className="absolute top-40 -right-20 w-80 h-80 bg-app-blue/20 rounded-full blur-3xl"></div>
       
-      <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-        <div className={`${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'} transition-all duration-700 ease-out`}>
+      <div className="mx-auto grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+        <div className={`${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'} transition-all duration-700 ease-out max-w-2xl mx-auto md:mx-0 text-center md:text-left`}>
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6">
             Naredimo govor <span className="text-gradient-rainbow">zabaven</span> – za male junake!
           </h1>
-          <p className="text-lg md:text-xl mb-8 text-muted-foreground max-w-xl">
+          <p className="text-lg md:text-xl mb-8 text-muted-foreground max-w-xl mx-auto md:mx-0">
             Tomi Talk otrokom pomaga pri učenju govora skozi igro z našim prijaznim zmajčkom Tomijem. Govorjenje še nikoli ni bilo tako zabavno!
           </p>
           
-          <div className="flex flex-col sm:flex-row flex-wrap gap-4">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-4 justify-center md:justify-start">
             <Button 
               size="lg" 
               className="bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full px-8"
