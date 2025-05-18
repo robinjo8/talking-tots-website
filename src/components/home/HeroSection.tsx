@@ -13,11 +13,12 @@ type HeroSectionProps = {
 
 export function HeroSection({ isVisible, onStartNow, onScrollToFeatures }: HeroSectionProps) {
   return (
-    <section className="pt-16 pb-16 relative w-full overflow-hidden">
+    <section className="py-16 md:py-24 relative w-full overflow-hidden">
+      {/* Background decorative elements */}
       <div className="absolute -top-20 -left-20 w-60 h-60 bg-app-yellow/20 rounded-full blur-3xl"></div>
       <div className="absolute top-40 -right-20 w-80 h-80 bg-app-blue/20 rounded-full blur-3xl"></div>
       
-      <div className="mx-auto grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+      <div className="mx-auto grid md:grid-cols-2 gap-12 items-center">
         <div className={`${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'} transition-all duration-700 ease-out max-w-2xl mx-auto md:mx-0 text-center md:text-left`}>
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6">
             Naredimo govor <span className="text-gradient-rainbow">zabaven</span> – za male junake!
@@ -55,7 +56,7 @@ export function HeroSection({ isVisible, onStartNow, onScrollToFeatures }: HeroS
           <div className="animate-float relative">
             <img 
               alt="Tomi Talk Dragon Mascot" 
-              className="w-4/5 md:w-full max-w-md mx-auto drop-shadow-xl" 
+              className="w-full max-w-md mx-auto drop-shadow-xl" 
               src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" 
             />
           </div>

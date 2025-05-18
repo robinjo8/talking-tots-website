@@ -4,9 +4,9 @@ import { Mic, Stars, Volume2, MessageSquare, Zap, Book, Award } from "lucide-rea
 
 export function FeaturesSection() {
   return (
-    <section id="features" className="py-16 px-4 sm:px-6 md:px-10 bg-light-cloud rounded-3xl my-8">
+    <section id="features" className="py-16 md:py-24 px-4 sm:px-6 md:px-8 bg-light-cloud rounded-3xl my-16">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
+        <div className="text-center mb-12 md:mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Kako Tomi Talk pomaga</h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
             Naša aplikacija omogoča razvoj govora na zabaven in učinkovit način s pomočjo interaktivnih funkcij

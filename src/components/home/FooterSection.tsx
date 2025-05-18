@@ -7,9 +7,9 @@ export function FooterSection() {
   const currentYear = new Date().getFullYear();
   
   return (
-    <footer className="py-8 md:py-12 px-4 sm:px-6 md:px-10 bg-light-cloud">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <footer className="py-12 md:py-16 px-4 sm:px-6 lg:px-8 bg-light-cloud">
+      <div className="max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
           {/* Logo and copyright section */}
           <div className="flex flex-col items-center md:items-start">
             <div className="flex items-center gap-2 mb-4">

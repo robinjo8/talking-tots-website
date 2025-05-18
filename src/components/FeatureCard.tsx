@@ -24,7 +24,7 @@ export default function FeatureCard({
       className={cn(
         "group p-6 rounded-2xl flex flex-col items-center text-center transform transition-all duration-300",
         "hover:scale-105 animate-fade-in bg-white dark:bg-dark-cloud/60",
-        "shadow-md hover:shadow-xl",
+        "shadow-md hover:shadow-xl h-full",
         className
       )}
       style={{ animationDelay }}

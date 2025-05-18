@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 
 export function CallToActionSection() {
   return (
-    <section id="cta" className="py-16 px-4 sm:px-6 md:px-10 relative overflow-hidden mb-16">
+    <section id="cta" className="py-16 md:py-20 px-4 sm:px-6 md:px-8 relative overflow-hidden mb-16">
       <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-app-teal/20 rounded-full blur-3xl"></div>
       <div className="absolute -top-20 -right-20 w-60 h-60 bg-app-orange/20 rounded-full blur-3xl"></div>
       
