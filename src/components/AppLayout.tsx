@@ -13,6 +13,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
   return (
     <div className="flex min-h-screen w-full">
+      <AppSidebar />
       <SidebarInset>
         <div className="relative flex-1 flex flex-col w-full">
           {children}
