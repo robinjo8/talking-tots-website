@@ -5,12 +5,12 @@ import { Link } from "react-router-dom";
 type AuthLayoutProps = {
   children: ReactNode;
   title: string;
-  subtitle?: string;  // Changed from "subTitle" to "subtitle" to fix the type errors
+  subtitle?: string;
 };
 
 export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-sky-50 to-white">
+    <div className="min-h-screen flex flex-col justify-center items-center p-4 bg-gradient-to-b from-sky-50 to-white">
       <header className="py-4 px-6 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2">

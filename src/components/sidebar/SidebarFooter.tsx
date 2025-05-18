@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 
 interface SidebarFooterProps {
   isMobileMenu?: boolean;
@@ -16,15 +15,9 @@ export function SidebarFooter({ isMobileMenu = false }: SidebarFooterProps) {
   const { setOpenMobile } = useSidebar();
 
   const handleSignOut = async () => {
-    try {
-      await signOut();
-      setOpenMobile(false);
-      navigate("/login");
-      toast.success("Uspešno ste se odjavili");
-    } catch (error) {
-      console.error("Error during sign out:", error);
-      toast.error("Napaka pri odjavi");
-    }
+    await signOut();
+    setOpenMobile(false);
+    navigate("/login");
   };
 
   if (!user) return null;

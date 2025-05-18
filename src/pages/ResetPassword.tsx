@@ -2,105 +2,103 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
-import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
-import Header from "@/components/Header";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { toast } from "sonner";
 
 export default function ResetPassword() {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
+    setError(null);
+    
+    if (!email) {
+      setError("Prosimo, vnesite vaš e-poštni naslov.");
+      return;
+    }
+    
     try {
+      setIsLoading(true);
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/update-password`,
       });
-
-      if (error) {
-        toast({
-          title: "Napaka",
-          description: error.message,
-          variant: "destructive",
-        });
-        return;
-      }
-
+      
+      if (error) throw error;
+      
       setIsSubmitted(true);
-      toast({
-        title: "Email poslan",
-        description: "Preverite svojo e-pošto za navodila za ponastavitev gesla.",
-      });
-    } catch (error) {
-      console.error("Reset password error:", error);
-      toast({
-        title: "Napaka",
-        description: "Prišlo je do napake. Poskusite znova.",
-        variant: "destructive",
-      });
+      toast.success("E-pošta za ponastavitev gesla je bila poslana!");
+    } catch (error: any) {
+      console.error("Napaka pri ponastavitvi gesla:", error);
+      setError("Prišlo je do napake. Prosimo, poskusite znova.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  return (
-    <SidebarProvider>
-      <div className="min-h-screen w-full flex flex-col">
-        <Header />
-        <div className="flex-1 flex items-center justify-center pt-16">
-          <AuthLayout
-            title="Ponastavitev gesla"
-            subtitle="Vnesite svoj e-poštni naslov za ponastavitev gesla"
-          >
-            {!isSubmitted ? (
-              <div className="grid gap-6">
-                <form onSubmit={handleSubmit}>
-                  <div className="grid gap-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="email">E-pošta</Label>
-                      <Input
-                        id="email"
-                        placeholder="name@example.com"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        autoComplete="email"
-                        disabled={isLoading}
-                        required
-                      />
-                    </div>
-                    <Button disabled={isLoading}>
-                      {isLoading ? "Pošiljanje..." : "Ponastavi geslo"}
-                    </Button>
-                  </div>
-                </form>
-                <div className="mt-4 text-center text-sm">
-                  <Link to="/login" className="underline">
-                    Nazaj na prijavo
-                  </Link>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center">
-                <p className="mb-4">
-                  Na vaš e-poštni naslov smo poslali navodila za ponastavitev gesla.
-                </p>
-                <Link to="/login">
-                  <Button>Nazaj na prijavo</Button>
-                </Link>
-              </div>
-            )}
-          </AuthLayout>
+  if (isSubmitted) {
+    return (
+      <AuthLayout title="E-pošta poslana">
+        <div className="text-center space-y-4">
+          <p className="text-gray-600">
+            Poslali smo vam e-pošto z navodili za ponastavitev gesla. 
+            Prosimo, preverite vaš e-poštni predal.
+          </p>
+          <Link to="/login">
+            <Button variant="outline" className="mt-4">
+              Nazaj na prijavo
+            </Button>
+          </Link>
         </div>
-      </div>
-    </SidebarProvider>
+      </AuthLayout>
+    );
+  }
+
+  return (
+    <AuthLayout 
+      title="Ponastavite geslo" 
+      subtitle="Vnesite vaš e-poštni naslov in poslali vam bomo navodila za ponastavitev gesla."
+    >
+      <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        
+        <div className="space-y-2">
+          <Label htmlFor="email">E-pošta</Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="vnesite@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="rounded-md text-base"
+            required
+          />
+        </div>
+        
+        <Button
+          type="submit"
+          className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6"
+          disabled={isLoading}
+        >
+          {isLoading ? "Pošiljanje..." : "Pošlji navodila za ponastavitev"}
+        </Button>
+        
+        <div className="text-sm text-center">
+          <Link to="/login" className="text-dragon-green hover:underline font-medium">
+            Nazaj na prijavo
+          </Link>
+        </div>
+      </form>
+    </AuthLayout>
   );
 }

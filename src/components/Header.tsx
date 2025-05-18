@@ -1,77 +1,33 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserProfile } from "@/components/auth/UserProfile";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Menu, BookOpen, ChevronDown, Shield } from "lucide-react";
+import { useSidebar } from "@/components/ui/sidebar";
+import { Menu, BookOpen, ChevronDown } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { MobileMenu } from "@/components/MobileMenu";
-import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { useSidebar } from "@/components/ui/sidebar";
 
 export default function Header() {
   const { user, profile, selectedChildIndex } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const selectedChild = selectedChildIndex !== null && profile?.children ? profile.children[selectedChildIndex] : null;
-  const [isAdmin, setIsAdmin] = useState(false);
-  
-  // Create a safe version of setOpenMobile that won't throw errors
   const { setOpenMobile } = useSidebar();
-  const [openMobile, setOpenMobileState] = useState(false);
-  
-  // Safe setter function for mobile menu state
-  const handleSetOpenMobile = (value: boolean) => {
-    setOpenMobileState(value);
-    if (typeof setOpenMobile === 'function') {
-      setOpenMobile(value);
-    }
-  };
+  const selectedChild = selectedChildIndex !== null && profile?.children ? profile.children[selectedChildIndex] : null;
 
-  useEffect(() => {
-    // Check if the current user has admin role
-    async function checkAdminRole() {
-      if (!user) {
-        setIsAdmin(false);
-        return;
-      }
-      
-      try {
-        console.log("Header - Checking admin status for user:", user.id);
-        const { data, error } = await supabase
-          .from('user_roles')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('role', 'admin')
-          .single();
-          
-        if (error && error.code !== 'PGRST116') {
-          console.error("Error checking admin role:", error);
-        }
-        
-        setIsAdmin(!!data);
-        console.log("Header - Admin check result:", !!data);
-      } catch (error) {
-        console.error("Error checking admin status:", error);
-        setIsAdmin(false);
-      }
-    }
-    
-    checkAdminRole();
-  }, [user]);
-
-  const handleNavigate = (path: string) => {
+  const handleNavigate = (path: string, options?: { expandSection?: string }) => {
     navigate(path);
-    if (openMobile) {
-      handleSetOpenMobile(false);
+    
+    if (options?.expandSection) {
+      localStorage.setItem('expandSection', options.expandSection);
     }
   };
 
@@ -102,31 +58,20 @@ export default function Header() {
           )}
           
           {isMobile ? (
-            <Sheet open={openMobile} onOpenChange={handleSetOpenMobile}>
+            <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="sm" className="flex items-center">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="p-0">
-                <MobileMenu onItemClick={() => handleSetOpenMobile(false)} />
+                <MobileMenu onItemClick={() => {}} />
               </SheetContent>
             </Sheet>
           ) : (
             <nav className="flex items-center gap-6">
               {user && (
                 <>
-                  {isAdmin && (
-                    <Button
-                      variant="ghost"
-                      className="font-medium flex items-center"
-                      onClick={() => handleNavigate('/admin/dashboard')}
-                    >
-                      <Shield className="h-4 w-4 mr-2 text-dragon-green" />
-                      Admin
-                    </Button>
-                  )}
-                
                   <Button variant="ghost" className="font-medium opacity-50 cursor-not-allowed">
                     <BookOpen className="h-4 w-4 mr-2" />
                     Logopedski kotiček

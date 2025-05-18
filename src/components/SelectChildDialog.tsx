@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChildProfileCard } from "@/components/ChildProfileCard";
 
 type SelectChildDialogProps = {
@@ -37,32 +37,41 @@ export function SelectChildDialog({ open, onOpenChange }: SelectChildDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] flex flex-col gap-4">
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Izberi profil otroka</DialogTitle>
+          <DialogDescription>
+            Za nadaljevanje izberi profil otroka.
+          </DialogDescription>
         </DialogHeader>
         
-        <ScrollArea className="flex-grow">
-          <div className="grid grid-cols-1 gap-4 px-1 py-2">
-            {profile?.children?.map((child, index) => (
-              <div 
-                key={index} 
-                className="w-full cursor-pointer" 
-                onClick={() => handleSelectChild(index)}
-              >
-                <ChildProfileCard
-                  child={child}
-                  isSelected={selectedIndex === index}
-                  onSelect={() => handleSelectChild(index)}
-                  hideActions={true}
-                  minimal={true}
-                />
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+          {profile?.children?.map((child, index) => (
+            <div 
+              key={index} 
+              className="w-full cursor-pointer" 
+              onClick={() => handleSelectChild(index)}
+            >
+              <ChildProfileCard
+                child={child}
+                isSelected={selectedIndex === index}
+                onSelect={() => handleSelectChild(index)}
+                hideActions={true}
+              />
+            </div>
+          ))}
+        </div>
         
-        <div className="flex justify-end border-t pt-4">
+        <div className="flex justify-end gap-3 mt-4">
+          <Button
+            variant="outline"
+            onClick={() => {
+              onOpenChange(false);
+              navigate("/profile");
+            }}
+          >
+            Ustvari nov profil
+          </Button>
           <Button
             onClick={handleConfirm}
             disabled={selectedIndex === null}
