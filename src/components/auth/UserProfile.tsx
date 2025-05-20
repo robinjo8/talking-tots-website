@@ -2,18 +2,12 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
-import { User, ChevronDown, Users, Bell, Smartphone, Wallet, LogOut } from "lucide-react";
+import { User, ChevronDown, Users, Bell, Wallet, LogOut } from "lucide-react";
 import { 
   Popover,
   PopoverContent,
   PopoverTrigger
 } from "@/components/ui/popover";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export function UserProfile() {
@@ -79,12 +73,8 @@ export function UserProfile() {
     return avatarImages[avatarId] || "";
   };
 
+  // Updated navigation items - removed the main navigation items
   const navigationItems = [
-    { label: "Moja stran", path: "/moja-stran", icon: User },
-    { label: "Vaje", path: "/govorno-jezikovne-vaje", icon: Users },
-    { label: "Govorne igre", path: "/govorne-igre", icon: Users },
-    { label: "Izzivi", path: "/moji-izzivi", icon: Users },
-    { label: "Video navodila", path: "/video-navodila", icon: Users },
     { label: "Obvestila", path: "#", icon: Bell, disabled: true },
     { label: "Moja naročnina", path: "/profile", icon: Wallet, options: { expandSection: "subscription" } },
     { label: "Nastavitve", path: "/profile", icon: User },
@@ -185,7 +175,7 @@ export function UserProfile() {
             )}
           </div>
           
-          {/* Navigation items */}
+          {/* Navigation items - removed the main navigation items */}
           <div className="border-t border-gray-200">
             <div className="p-2 grid grid-cols-1 gap-1">
               {navigationItems.map((item, index) => (
