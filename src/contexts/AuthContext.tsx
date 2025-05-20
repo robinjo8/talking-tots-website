@@ -35,6 +35,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [selectedChildIndex, setSelectedChildIndex] = useState<number | null>(null);
 
   useEffect(() => {
+    // Check if there's a selectedChildIndex in localStorage during initialization
+    const storedChildIndex = localStorage.getItem('selectedChildIndex');
+    if (storedChildIndex) {
+      setSelectedChildIndex(parseInt(storedChildIndex));
+    }
+
     const fetchUserProfile = async (userId: string, metadata: any) => {
       try {
         const { data, error } = await supabase
