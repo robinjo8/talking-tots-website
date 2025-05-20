@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -26,7 +25,6 @@ import SpominGames from "./pages/SpominGames";
 import SpominK from "./pages/SpominK";
 import SpominS from "./pages/SpominS";
 import SpominŠ from "./pages/SpominŠ";
-import ArtikuacijskiTest from "./pages/ArtikuacijskiTest";
 
 const queryClient = new QueryClient();
 
@@ -96,15 +94,6 @@ const App = () => (
                 />
                 
                 <Route 
-                  path="/artikulacijski-test" 
-                  element={
-                    <ProtectedRoute>
-                      <ArtikuacijskiTest />
-                    </ProtectedRoute>
-                  }
-                />
-                
-                <Route 
                   path="/govorne-igre" 
                   element={
                     <ProtectedRoute>
@@ -112,6 +101,7 @@ const App = () => (
                     </ProtectedRoute>
                   }
                 />
+                
                 
                 <Route 
                   path="/govorne-igre/spomin/spomin-r" 
