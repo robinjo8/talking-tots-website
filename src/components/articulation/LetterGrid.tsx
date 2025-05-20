@@ -7,13 +7,14 @@ interface LetterGridProps {
 }
 
 const LetterGrid = ({ letters, currentLetter }: LetterGridProps) => {
+  // For desktop: Split into 2 rows (10, 10)
   // For mobile: Split into 3 rows (7, 7, 6)
   const firstRow = letters.slice(0, 7);
   const secondRow = letters.slice(7, 14);
   const thirdRow = letters.slice(14);
   
   return (
-    <div className="w-full max-w-4xl mx-auto mb-8">
+    <div className="w-full max-w-4xl mx-auto mb-6">
       {/* First row */}
       <div className="flex flex-wrap justify-center gap-2 mb-2">
         {firstRow.map((letter) => (
@@ -48,7 +49,7 @@ const LetterGrid = ({ letters, currentLetter }: LetterGridProps) => {
         ))}
       </div>
       
-      {/* Third row (mobile only) */}
+      {/* Third row (always visible on mobile, hidden on desktop) */}
       <div className="flex flex-wrap justify-center gap-2">
         {thirdRow.map((letter) => (
           <div
