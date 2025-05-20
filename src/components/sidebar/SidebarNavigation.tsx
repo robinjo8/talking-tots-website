@@ -19,6 +19,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton
 } from "@/components/ui/sidebar";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface SidebarNavigationProps {
   isMobileMenu?: boolean;
@@ -28,6 +29,8 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
   const { user } = useAuth();
   const navigate = useNavigate();
   const { setOpenMobile } = useSidebar();
+  const location = useLocation();
+  const isMobile = useIsMobile();
   
   const handleNavigate = (path: string, options?: { expandSection?: string }) => {
     navigate(path);
@@ -40,60 +43,82 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
   };
 
   // Menu items configuration
+  // For mobile, show all items. For desktop, only show non-header items
   const menuItems = [
+    // These items will be shown in mobile only, and hidden on desktop
     {
       label: "Moja stran",
       path: "/moja-stran",
       icon: Home,
-      active: true
+      active: true,
+      showOnMobileOnly: !isMobileMenu ? true : false
     },
     {
       label: "Vaje",
       path: "/govorno-jezikovne-vaje",
       icon: Activity,
-      active: true
+      active: true,
+      showOnMobileOnly: !isMobileMenu ? true : false
     },
     {
       label: "Govorne igre",
       path: "/govorne-igre",
       icon: Gamepad,
-      active: true
+      active: true,
+      showOnMobileOnly: !isMobileMenu ? true : false
     },
     {
       label: "Izzivi",
       path: "/moji-izzivi",
       icon: Award,
-      active: true
+      active: true,
+      showOnMobileOnly: !isMobileMenu ? true : false
     },
     {
       label: "Video navodila",
       path: "/video-navodila",
       icon: Video,
-      active: true
+      active: true,
+      showOnMobileOnly: !isMobileMenu ? true : false
     },
     {
       label: "Logopedski kotiček",
       icon: BookOpen,
-      active: false
+      active: false,
+      showOnMobileOnly: !isMobileMenu ? true : false
     },
+    // These items will always be shown in both mobile and desktop
     {
       label: "Obvestila",
       icon: Bell,
-      active: false
+      active: false,
+      showOnMobileOnly: false
     },
     {
       label: "Mobilna aplikacija",
       icon: Smartphone,
-      active: false
+      active: false,
+      showOnMobileOnly: false
     },
     {
       label: "Moja naročnina",
       path: "/profile",
       icon: CreditCard,
       active: true,
-      onClick: () => handleNavigate("/profile", { expandSection: "subscription" })
+      onClick: () => handleNavigate("/profile", { expandSection: "subscription" }),
+      showOnMobileOnly: false
     }
   ];
+
+  // Helper function to check if a path is active
+  const isActivePath = (path?: string) => {
+    return path && location.pathname === path;
+  };
+
+  // Filter items based on whether we're in mobile view or not
+  const filteredItems = isMobile 
+    ? menuItems 
+    : menuItems.filter(item => !item.showOnMobileOnly);
 
   // Render different UI based on if it's a mobile menu or sidebar
   if (isMobileMenu) {
@@ -103,7 +128,7 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
           <Button 
             key={index}
             variant="ghost" 
-            className={`w-full justify-start text-left ${!item.active ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`w-full justify-start text-left ${!item.active ? 'opacity-50 cursor-not-allowed' : isActivePath(item.path) ? 'bg-accent' : ''}`}
             onClick={() => item.active && (item.onClick ? item.onClick() : item.path ? handleNavigate(item.path) : null)}
             disabled={!item.active}
           >
@@ -118,11 +143,12 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
   // For sidebar UI
   return (
     <SidebarMenu>
-      {menuItems.map((item, index) => (
+      {filteredItems.map((item, index) => (
         <SidebarMenuItem key={index}>
           <SidebarMenuButton 
             onClick={() => item.active && (item.onClick ? item.onClick() : item.path ? handleNavigate(item.path) : null)}
             disabled={!item.active}
+            isActive={isActivePath(item.path)}
             className={!item.active ? 'opacity-50 cursor-not-allowed' : ''}
             tooltip={item.label}
           >

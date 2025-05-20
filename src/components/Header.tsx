@@ -1,24 +1,19 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserProfile } from "@/components/auth/UserProfile";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSidebar } from "@/components/ui/sidebar";
-import { Menu, BookOpen, ChevronDown } from "lucide-react";
+import { Menu, BookOpen } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { MobileMenu } from "@/components/MobileMenu";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
 
 export default function Header() {
   const { user, profile, selectedChildIndex } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const isMobile = useIsMobile();
   const { setOpenMobile } = useSidebar();
   const selectedChild = selectedChildIndex !== null && profile?.children ? profile.children[selectedChildIndex] : null;
@@ -29,6 +24,21 @@ export default function Header() {
     if (options?.expandSection) {
       localStorage.setItem('expandSection', options.expandSection);
     }
+  };
+
+  // Navigation links for desktop header
+  const navigationLinks = [
+    { label: "Moja stran", path: "/moja-stran" },
+    { label: "Vaje", path: "/govorno-jezikovne-vaje" },
+    { label: "Govorne igre", path: "/govorne-igre" },
+    { label: "Izzivi", path: "/moji-izzivi" },
+    { label: "Video navodila", path: "/video-navodila" },
+    { label: "Logopedski kotiček", path: "#", disabled: true }
+  ];
+  
+  // Helper function to check if a path is active
+  const isActivePath = (path: string) => {
+    return location.pathname === path;
   };
 
   return (
@@ -64,36 +74,19 @@ export default function Header() {
             <nav className="flex items-center gap-6">
               {user && (
                 <>
-                  <Button variant="ghost" className="font-medium opacity-50 cursor-not-allowed">
-                    <BookOpen className="h-4 w-4 mr-2" />
-                    Logopedski kotiček
-                  </Button>
-
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="font-medium">
-                        Moj profil
-                        <ChevronDown className="ml-1 h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
-                      <DropdownMenuItem onClick={() => handleNavigate("/moja-stran")}>
-                        Moja stran
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleNavigate("/govorno-jezikovne-vaje")}>
-                        Vaje
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleNavigate("/govorne-igre")}>
-                        Govorne igre
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleNavigate("/moji-izzivi")}>
-                        Izzivi
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleNavigate("/video-navodila")}>
-                        Video navodila
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  {/* Desktop Navigation Links */}
+                  {navigationLinks.map((link, index) => (
+                    <Button 
+                      key={index}
+                      variant="ghost" 
+                      className={`font-medium ${link.disabled ? 'opacity-50 cursor-not-allowed' : isActivePath(link.path) ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                      onClick={() => !link.disabled && handleNavigate(link.path)}
+                      disabled={link.disabled}
+                    >
+                      {link.label === "Logopedski kotiček" && <BookOpen className="h-4 w-4 mr-2" />}
+                      {link.label}
+                    </Button>
+                  ))}
                 </>
               )}
 
