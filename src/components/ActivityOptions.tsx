@@ -1,7 +1,7 @@
 
 import { Card, CardHeader, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookText, Gamepad, Zap, Video } from "lucide-react";
+import { BookText, Gamepad, Zap, Video, TestTube } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export function ActivityOptions() {
@@ -13,6 +13,10 @@ export function ActivityOptions() {
   
   const handleGoToGames = () => {
     navigate("/govorne-igre");
+  };
+  
+  const handleGoToArticulationTest = () => {
+    navigate("/artikulacijski-test");
   };
   
   return (
@@ -59,6 +63,28 @@ export function ActivityOptions() {
               onClick={handleGoToGames}
             >
               Začni igro
+            </Button>
+          </CardFooter>
+        </Card>
+        
+        <Card className="transition-all duration-300 hover:shadow-md h-full flex flex-col">
+          <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-teal/10">
+            <CardTitle className="text-xl flex items-center gap-2">
+              <TestTube className="h-5 w-5 text-app-purple" />
+              Artikulacijski test
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4 flex-grow">
+            <p>
+              Test izgovorjave za vse slovenske soglasnike.
+            </p>
+          </CardContent>
+          <CardFooter>
+            <Button 
+              className="w-full bg-[#9b87f5] hover:bg-[#8B5CF6]"
+              onClick={handleGoToArticulationTest}
+            >
+              Začni test
             </Button>
           </CardFooter>
         </Card>
