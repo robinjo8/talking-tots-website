@@ -2,9 +2,9 @@
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import { ProgressSection } from "@/components/ProgressSection";
 import { ActivityOptions } from "@/components/ActivityOptions";
+import { ArticulationTest } from "@/components/ArticulationTest";
 import { TipSection } from "@/components/TipSection";
 import { NoChildSelected } from "@/components/NoChildSelected";
 import { FooterSection } from "@/components/FooterSection";
@@ -50,6 +50,8 @@ const MojaStran = () => {
             <ProgressSection />
             
             <ActivityOptions />
+            
+            <ArticulationTest />
             
             <TipSection childName={selectedChild.name} />
           </>
