@@ -1,14 +1,23 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserProfile } from "@/components/auth/UserProfile";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSidebar } from "@/components/ui/sidebar";
-import { Menu, BookOpen, ChevronDown } from "lucide-react";
+import { Menu, ChevronDown } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { MobileMenu } from "@/components/MobileMenu";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle
+} from "@/components/ui/navigation-menu";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -19,6 +28,7 @@ import {
 export default function Header() {
   const { user, profile, selectedChildIndex } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const isMobile = useIsMobile();
   const { setOpenMobile } = useSidebar();
   const selectedChild = selectedChildIndex !== null && profile?.children ? profile.children[selectedChildIndex] : null;
@@ -30,6 +40,21 @@ export default function Header() {
       localStorage.setItem('expandSection', options.expandSection);
     }
   };
+
+  // Check if the current path matches the navigation item
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
+
+  // Main navigation items
+  const mainNavItems = [
+    { label: "Moja stran", path: "/moja-stran" },
+    { label: "Vaje", path: "/govorno-jezikovne-vaje" },
+    { label: "Govorne igre", path: "/govorne-igre" },
+    { label: "Izzivi", path: "/moji-izzivi" },
+    { label: "Video navodila", path: "/video-navodila" },
+    { label: "Logopedski kotiček", path: "#", disabled: true }
+  ];
 
   return (
     <header className="py-4 px-4 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
@@ -63,38 +88,20 @@ export default function Header() {
           ) : (
             <nav className="flex items-center gap-6">
               {user && (
-                <>
-                  <Button variant="ghost" className="font-medium opacity-50 cursor-not-allowed">
-                    <BookOpen className="h-4 w-4 mr-2" />
-                    Logopedski kotiček
-                  </Button>
-
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="font-medium">
-                        Moj profil
-                        <ChevronDown className="ml-1 h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
-                      <DropdownMenuItem onClick={() => handleNavigate("/moja-stran")}>
-                        Moja stran
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleNavigate("/govorno-jezikovne-vaje")}>
-                        Vaje
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleNavigate("/govorne-igre")}>
-                        Govorne igre
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleNavigate("/moji-izzivi")}>
-                        Izzivi
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleNavigate("/video-navodila")}>
-                        Video navodila
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </>
+                <NavigationMenu>
+                  <NavigationMenuList className="gap-1">
+                    {mainNavItems.map((item) => (
+                      <NavigationMenuItem key={item.label}>
+                        <NavigationMenuLink
+                          className={navigationMenuTriggerStyle() + (isActive(item.path) ? " bg-accent text-accent-foreground" : "") + (item.disabled ? " opacity-50 cursor-not-allowed" : "")}
+                          onClick={!item.disabled ? () => handleNavigate(item.path) : undefined}
+                        >
+                          {item.label}
+                        </NavigationMenuLink>
+                      </NavigationMenuItem>
+                    ))}
+                  </NavigationMenuList>
+                </NavigationMenu>
               )}
 
               {user ? (

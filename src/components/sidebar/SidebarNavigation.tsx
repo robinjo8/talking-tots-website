@@ -1,11 +1,5 @@
 
 import { 
-  Home, 
-  Activity,
-  Gamepad,
-  Award,
-  Video,
-  BookOpen,
   Bell,
   Smartphone,
   CreditCard
@@ -39,43 +33,8 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
     }
   };
 
-  // Menu items configuration
+  // Menu items configuration - removed the items that are now in the header
   const menuItems = [
-    {
-      label: "Moja stran",
-      path: "/moja-stran",
-      icon: Home,
-      active: true
-    },
-    {
-      label: "Vaje",
-      path: "/govorno-jezikovne-vaje",
-      icon: Activity,
-      active: true
-    },
-    {
-      label: "Govorne igre",
-      path: "/govorne-igre",
-      icon: Gamepad,
-      active: true
-    },
-    {
-      label: "Izzivi",
-      path: "/moji-izzivi",
-      icon: Award,
-      active: true
-    },
-    {
-      label: "Video navodila",
-      path: "/video-navodila",
-      icon: Video,
-      active: true
-    },
-    {
-      label: "Logopedski kotiček",
-      icon: BookOpen,
-      active: false
-    },
     {
       label: "Obvestila",
       icon: Bell,
