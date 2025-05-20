@@ -42,63 +42,70 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
     }
   };
 
-  // Menu items configuration
-  // For mobile, show all items. For desktop, only show non-header items
+  // Menu items configuration with visibility control
   const menuItems = [
-    // These items will be shown in mobile only, and hidden on desktop
+    // These items will only be shown in mobile view
     {
       label: "Moja stran",
       path: "/moja-stran",
       icon: Home,
       active: true,
-      showOnMobileOnly: !isMobileMenu ? true : false
+      showOnDesktop: false,
+      showOnMobile: true
     },
     {
       label: "Vaje",
       path: "/govorno-jezikovne-vaje",
       icon: Activity,
       active: true,
-      showOnMobileOnly: !isMobileMenu ? true : false
+      showOnDesktop: false,
+      showOnMobile: true
     },
     {
       label: "Govorne igre",
       path: "/govorne-igre",
       icon: Gamepad,
       active: true,
-      showOnMobileOnly: !isMobileMenu ? true : false
+      showOnDesktop: false,
+      showOnMobile: true
     },
     {
       label: "Izzivi",
       path: "/moji-izzivi",
       icon: Award,
       active: true,
-      showOnMobileOnly: !isMobileMenu ? true : false
+      showOnDesktop: false,
+      showOnMobile: true
     },
     {
       label: "Video navodila",
       path: "/video-navodila",
       icon: Video,
       active: true,
-      showOnMobileOnly: !isMobileMenu ? true : false
+      showOnDesktop: false,
+      showOnMobile: true
     },
+    // These items will always be shown on both mobile and desktop
     {
       label: "Logopedski kotiček",
       icon: BookOpen,
       active: false,
-      showOnMobileOnly: !isMobileMenu ? true : false
+      showOnDesktop: true,
+      showOnMobile: true
     },
-    // These items will always be shown in both mobile and desktop
     {
       label: "Obvestila",
       icon: Bell,
       active: false,
-      showOnMobileOnly: false
+      showOnDesktop: true,
+      showOnMobile: true
     },
     {
       label: "Mobilna aplikacija",
       icon: Smartphone,
       active: false,
-      showOnMobileOnly: false
+      showOnDesktop: true,
+      showOnMobile: true
     },
     {
       label: "Moja naročnina",
@@ -106,7 +113,8 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
       icon: CreditCard,
       active: true,
       onClick: () => handleNavigate("/profile", { expandSection: "subscription" }),
-      showOnMobileOnly: false
+      showOnDesktop: true,
+      showOnMobile: true
     }
   ];
 
@@ -115,16 +123,16 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
     return path && location.pathname === path;
   };
 
-  // Filter items based on whether we're in mobile view or not
-  const filteredItems = isMobile 
-    ? menuItems 
-    : menuItems.filter(item => !item.showOnMobileOnly);
+  // Filter items based on device type
+  const filteredItems = isMobile || isMobileMenu
+    ? menuItems.filter(item => item.showOnMobile)
+    : menuItems.filter(item => item.showOnDesktop);
 
   // Render different UI based on if it's a mobile menu or sidebar
   if (isMobileMenu) {
     return (
       <div className="space-y-1">
-        {menuItems.map((item, index) => (
+        {menuItems.filter(item => item.showOnMobile).map((item, index) => (
           <Button 
             key={index}
             variant="ghost" 
