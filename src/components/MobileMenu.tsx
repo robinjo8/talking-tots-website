@@ -1,9 +1,9 @@
 
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Link } from "react-router-dom";
 import { AppSidebar } from "./AppSidebar";
 import { Button } from "./ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { Link } from "react-router-dom";
 
 interface MobileMenuProps {
   onItemClick: () => void;
