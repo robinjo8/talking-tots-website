@@ -1,10 +1,18 @@
 
-import { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+import { ReactNode, useEffect } from "react";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user, isLoading } = useAuth();
+  const location = useLocation();
+  
+  // Store the attempted URL for redirection after login
+  useEffect(() => {
+    if (!user && !isLoading) {
+      sessionStorage.setItem("redirectAfterLogin", location.pathname);
+    }
+  }, [user, isLoading, location.pathname]);
 
   if (isLoading) {
     return (
