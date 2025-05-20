@@ -9,6 +9,8 @@ import { TipSection } from "@/components/TipSection";
 import { NoChildSelected } from "@/components/NoChildSelected";
 import { FooterSection } from "@/components/FooterSection";
 import { MotivationalMessage } from "@/components/MotivationalMessage";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Scissors } from "lucide-react";
 
 const MojaStran = () => {
   const { user, profile, signOut, selectedChildIndex } = useAuth();
@@ -50,6 +52,24 @@ const MojaStran = () => {
             <ProgressSection />
             
             <ActivityOptions />
+            
+            {/* Artikulacijski test section */}
+            <Card 
+              className="mb-8 cursor-pointer hover:shadow-md transition-all"
+              onClick={() => navigate("/artikulacijski-test")}
+            >
+              <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-teal/10">
+                <CardTitle className="flex items-center gap-2">
+                  <Scissors className="h-6 w-6 text-app-purple" />
+                  Artikulacijski test
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <p className="text-lg">
+                  Pregled artikulacije slovenskih soglasnikov za prepoznavanje težav z izgovorjavo.
+                </p>
+              </CardContent>
+            </Card>
             
             <ArticulationTest />
             
