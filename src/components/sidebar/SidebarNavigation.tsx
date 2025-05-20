@@ -27,11 +27,9 @@ interface SidebarNavigationProps {
 export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const { setOpenMobile } = useSidebar();
   
   const handleNavigate = (path: string, options?: { expandSection?: string }) => {
-    console.log(`Navigating to: ${path}`, { user: !!user });
     navigate(path);
     setOpenMobile(false);
     
@@ -125,7 +123,7 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
           <SidebarMenuButton 
             onClick={() => item.active && (item.onClick ? item.onClick() : item.path ? handleNavigate(item.path) : null)}
             disabled={!item.active}
-            className={`${!item.active ? 'opacity-50 cursor-not-allowed' : ''} ${location.pathname === item.path ? 'bg-accent' : ''}`}
+            className={!item.active ? 'opacity-50 cursor-not-allowed' : ''}
             tooltip={item.label}
           >
             <item.icon />

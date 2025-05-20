@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserProfile } from "@/components/auth/UserProfile";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useSidebar } from "@/components/ui/sidebar";
 import { Menu, BookOpen, ChevronDown } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { MobileMenu } from "@/components/MobileMenu";
@@ -19,6 +20,7 @@ export default function Header() {
   const { user, profile, selectedChildIndex } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { setOpenMobile } = useSidebar();
   const selectedChild = selectedChildIndex !== null && profile?.children ? profile.children[selectedChildIndex] : null;
 
   const handleNavigate = (path: string, options?: { expandSection?: string }) => {
@@ -70,10 +72,7 @@ export default function Header() {
             <nav className="flex items-center gap-6">
               {user && (
                 <>
-                  <Button 
-                    variant="ghost" 
-                    className="font-medium opacity-50 cursor-not-allowed"
-                  >
+                  <Button variant="ghost" className="font-medium opacity-50 cursor-not-allowed">
                     <BookOpen className="h-4 w-4 mr-2" />
                     Logopedski kotiček
                   </Button>
@@ -87,7 +86,7 @@ export default function Header() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48">
                       {navigationItems.map((item) => (
-                        <DropdownMenuItem key={item.label} onClick={() => navigate(item.path)}>
+                        <DropdownMenuItem key={item.label} onClick={() => handleNavigate(item.path)}>
                           {item.label}
                         </DropdownMenuItem>
                       ))}

@@ -9,125 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      children: {
-        Row: {
-          age: number
-          avatar_url: string | null
-          created_at: string
-          id: string
-          name: string
-          parent_id: string
-        }
-        Insert: {
-          age: number
-          avatar_url?: string | null
-          created_at?: string
-          id?: string
-          name: string
-          parent_id: string
-        }
-        Update: {
-          age?: number
-          avatar_url?: string | null
-          created_at?: string
-          id?: string
-          name?: string
-          parent_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "children_parent_id_fkey"
-            columns: ["parent_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      exercises: {
-        Row: {
-          age_range_max: number
-          age_range_min: number
-          category: string
-          created_at: string
-          description: string
-          difficulty_level: number
-          id: string
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          age_range_max: number
-          age_range_min: number
-          category: string
-          created_at?: string
-          description: string
-          difficulty_level?: number
-          id?: string
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          age_range_max?: number
-          age_range_min?: number
-          category?: string
-          created_at?: string
-          description?: string
-          difficulty_level?: number
-          id?: string
-          title?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      media_files: {
-        Row: {
-          created_at: string
-          exercise_id: string | null
-          file_path: string
-          file_type: string
-          id: string
-          name: string
-          size: number
-          word_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          exercise_id?: string | null
-          file_path: string
-          file_type: string
-          id?: string
-          name: string
-          size: number
-          word_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          exercise_id?: string | null
-          file_path?: string
-          file_type?: string
-          id?: string
-          name?: string
-          size?: number
-          word_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "media_files_exercise_id_fkey"
-            columns: ["exercise_id"]
-            isOneToOne: false
-            referencedRelation: "exercises"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "media_files_word_id_fkey"
-            columns: ["word_id"]
-            isOneToOne: false
-            referencedRelation: "words"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       memory_cards: {
         Row: {
           audio_url: string | null
@@ -257,147 +138,15 @@ export type Database = {
         }
         Relationships: []
       }
-      progress: {
-        Row: {
-          child_id: string
-          completed_at: string
-          correct_answers: number
-          duration: number
-          exercise_id: string
-          id: string
-          score: number
-          total_questions: number
-        }
-        Insert: {
-          child_id: string
-          completed_at?: string
-          correct_answers: number
-          duration: number
-          exercise_id: string
-          id?: string
-          score: number
-          total_questions: number
-        }
-        Update: {
-          child_id?: string
-          completed_at?: string
-          correct_answers?: number
-          duration?: number
-          exercise_id?: string
-          id?: string
-          score?: number
-          total_questions?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "progress_child_id_fkey"
-            columns: ["child_id"]
-            isOneToOne: false
-            referencedRelation: "children"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "progress_exercise_id_fkey"
-            columns: ["exercise_id"]
-            isOneToOne: false
-            referencedRelation: "exercises"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      user_roles: {
-        Row: {
-          created_at: string
-          id: string
-          role: Database["public"]["Enums"]["user_role"]
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["user_role"]
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["user_role"]
-          user_id?: string
-        }
-        Relationships: []
-      }
-      users: {
-        Row: {
-          avatar_url: string | null
-          created_at: string
-          email: string
-          id: string
-          name: string | null
-          role: string
-        }
-        Insert: {
-          avatar_url?: string | null
-          created_at?: string
-          email: string
-          id: string
-          name?: string | null
-          role?: string
-        }
-        Update: {
-          avatar_url?: string | null
-          created_at?: string
-          email?: string
-          id?: string
-          name?: string | null
-          role?: string
-        }
-        Relationships: []
-      }
-      words: {
-        Row: {
-          audio_url: string | null
-          category: string | null
-          created_at: string
-          difficulty_level: number
-          id: string
-          image_url: string | null
-          phonemes: string[]
-          word: string
-        }
-        Insert: {
-          audio_url?: string | null
-          category?: string | null
-          created_at?: string
-          difficulty_level?: number
-          id?: string
-          image_url?: string | null
-          phonemes: string[]
-          word: string
-        }
-        Update: {
-          audio_url?: string | null
-          category?: string | null
-          created_at?: string
-          difficulty_level?: number
-          id?: string
-          image_url?: string | null
-          phonemes?: string[]
-          word?: string
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      has_role: {
-        Args: { role_name: Database["public"]["Enums"]["user_role"] }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
-      user_role: "admin" | "user"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -512,8 +261,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      user_role: ["admin", "user"],
-    },
+    Enums: {},
   },
 } as const

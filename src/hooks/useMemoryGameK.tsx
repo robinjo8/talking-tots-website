@@ -1,8 +1,17 @@
-
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { MemoryCard } from "@/hooks/useMemoryGame";
+
+export interface MemoryCard {
+  id: string;
+  word: string | null;
+  image_url: string | null;
+  audio_url: string | null;
+  flipped: boolean;
+  matched: boolean;
+  pairId: string;
+  uniqueId?: string;
+}
 
 export const useMemoryGameK = () => {
   const [cards, setCards] = useState<MemoryCard[]>([]);
@@ -21,21 +30,14 @@ export const useMemoryGameK = () => {
         .limit(10);
       
       if (error) {
-        console.error("Error fetching memory cards K:", error);
+        console.error("Error fetching memory cards:", error);
         throw error;
       }
       
-      console.log("Fetched memory cards K:", data);
+      console.log("Fetched memory cards:", data);
       return data || [];
     }
   });
-
-  useEffect(() => {
-    if (memoryCardsData && memoryCardsData.length > 0) {
-      console.log("Initializing game with memory cards K data:", memoryCardsData);
-      initializeGame(memoryCardsData);
-    }
-  }, [memoryCardsData]);
 
   const initializeGame = (cardData: any[]) => {
     // Create pairs using the Supabase row ID as the pair identifier
@@ -62,7 +64,7 @@ export const useMemoryGameK = () => {
     setMatchedPairs([]);
     setGameCompleted(false);
     
-    console.log("Game initialized with shuffled K cards:", shuffledCards);
+    console.log("Game initialized with shuffled cards:", shuffledCards);
   };
 
   const shuffleArray = <T,>(array: T[]): T[] => {
@@ -117,6 +119,13 @@ export const useMemoryGameK = () => {
       }
     }
   };
+
+  useEffect(() => {
+    if (memoryCardsData && memoryCardsData.length > 0) {
+      console.log("Initializing game K with memory cards data:", memoryCardsData);
+      initializeGame(memoryCardsData);
+    }
+  }, [memoryCardsData]);
 
   useEffect(() => {
     if (cards.length > 0 && matchedPairs.length === cards.length / 2) {

@@ -27,17 +27,13 @@ export default function SpominS() {
   const gameStartTimeRef = useRef<number | null>(null);
   const [gameTime, setGameTime] = useState<number | null>(null);
 
-  // Handle card click
   const handleCardClick = (index: number) => {
-    // Start tracking time on first card flip
     if (!gameStartTimeRef.current && cards.length > 0) {
       gameStartTimeRef.current = Date.now();
     }
-    
     flipCard(index);
   };
 
-  // Handle game reset
   const handleReset = () => {
     resetGame();
     gameStartTimeRef.current = null;
@@ -45,14 +41,12 @@ export default function SpominS() {
     toast.success("Igra je bila ponovno nastavljena!");
   };
 
-  // Update game time when completed
   useEffect(() => {
     if (gameCompleted && gameStartTimeRef.current && gameTime === null) {
       const endTime = Date.now();
       const timeTaken = Math.floor((endTime - gameStartTimeRef.current) / 1000);
       setGameTime(timeTaken);
       
-      // Show completion message
       setTimeout(() => {
         toast.success(`Čestitamo! Igra je končana v ${timeTaken} sekundah!`, {
           duration: 5000
@@ -73,7 +67,7 @@ export default function SpominS() {
               variant="ghost" 
               size="sm" 
               className="gap-2" 
-              onClick={() => navigate("/govorne-igre/spomin")}
+              onClick={() => navigate("/govorne-igre")}
             >
               <ArrowLeft className="h-4 w-4" />
               Nazaj

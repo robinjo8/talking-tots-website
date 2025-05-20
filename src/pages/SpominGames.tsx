@@ -36,6 +36,12 @@ const memoryGames = [
     available: true
   },
   {
+    id: "spomin-l",
+    title: "Spomin (besede na črko L)",
+    description: "Igra spomin za vajo izgovorjave črke L",
+    available: false
+  },
+  {
     id: "spomin-c",
     title: "Spomin (besede na črko C)",
     description: "Igra spomin za vajo izgovorjave črke C",
