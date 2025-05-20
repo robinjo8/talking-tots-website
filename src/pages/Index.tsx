@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -48,7 +49,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-4 md:gap-10 items-center">
           <div className={`${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'} transition-all duration-700 ease-out`}>
             <h1 className="text-2xl md:text-5xl lg:text-6xl font-extrabold mb-4 md:mb-6">
-              Naredimo govor <span className="rainbow-text">zabaven</span> – za male junake!
+              Naredimo govor <span className="bg-gradient-rainbow text-transparent bg-clip-text">zabaven</span> – za male junake!
             </h1>
             <p className="text-lg md:text-xl mb-6 md:mb-8 text-muted-foreground max-w-xl">
               Tomi Talk otrokom pomaga pri učenju govora skozi igro z našim prijaznim zmajčkom Tomijem. Govorjenje še nikoli ni bilo tako zabavno!
