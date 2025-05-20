@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
@@ -199,15 +200,17 @@ const ArtikuacijskiTest = () => {
       // Load image from Supabase
       const word = articulation_data[letterIndex].words[wordIndex];
       try {
-        const { data, error } = await supabase.storage
+        // Fix: The getPublicUrl method returns an object with a data property that contains the publicUrl
+        // It doesn't return an error property
+        const { data } = await supabase.storage
           .from('artikulacijski-test')
           .getPublicUrl(word.image);
           
-        if (error) {
-          console.error("Error fetching image:", error);
-          setImageUrl(null);
-        } else {
+        if (data) {
           setImageUrl(data.publicUrl);
+        } else {
+          console.error("No data returned when fetching image URL");
+          setImageUrl(null);
         }
       } catch (error) {
         console.error("Error loading image:", error);
