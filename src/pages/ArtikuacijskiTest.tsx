@@ -1,13 +1,15 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, Volume2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { supabase } from "@/integrations/supabase/client";
-import { cn } from "@/lib/utils";
+import LetterGrid from "@/components/articulation/LetterGrid";
+import WordDisplay from "@/components/articulation/WordDisplay";
+import TestNavigation from "@/components/articulation/TestNavigation";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Word {
   text: string;
@@ -24,6 +26,7 @@ const ArtikuacijskiTest = () => {
   const { selectedChildIndex, profile } = useAuth();
   const navigate = useNavigate();
   const { playAudio } = useAudioPlayback();
+  const isMobile = useIsMobile();
   
   const selectedChild = selectedChildIndex !== null && profile?.children 
     ? profile.children[selectedChildIndex] 
@@ -200,8 +203,6 @@ const ArtikuacijskiTest = () => {
       // Load image from Supabase
       const word = articulation_data[letterIndex].words[wordIndex];
       try {
-        // Fix: The getPublicUrl method returns an object with a data property that contains the publicUrl
-        // It doesn't return an error property
         const { data } = await supabase.storage
           .from('artikulacijski-test')
           .getPublicUrl(word.image);
@@ -223,14 +224,14 @@ const ArtikuacijskiTest = () => {
   const handleNext = () => {
     setOverallIndex((current) => {
       const next = current + 1;
-      return next < totalWords ? next : 0; // Loop back to start when reaching the end
+      return next < totalWords ? next : 0;
     });
   };
   
   const handlePrevious = () => {
     setOverallIndex((current) => {
       const prev = current - 1;
-      return prev >= 0 ? prev : totalWords - 1; // Loop to end when at start
+      return prev >= 0 ? prev : totalWords - 1;
     });
   };
   
@@ -240,7 +241,6 @@ const ArtikuacijskiTest = () => {
       playAudio(currentWord.audio);
     } else {
       console.log("No audio available for this word");
-      // In a real implementation, you might want to synthesize speech here
     }
   };
 
@@ -251,12 +251,16 @@ const ArtikuacijskiTest = () => {
     }
     return "";
   };
+  
+  // Extract all unique letters for the letter grid
+  const allLetters = articulation_data.map(group => group.letter);
+  const currentLetter = articulation_data[currentLetterIndex]?.letter || "";
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container max-w-5xl mx-auto pt-32 pb-20 px-4">
+      <div className="container mx-auto pt-24 pb-20 px-4">
         <div className="mb-6 flex items-center">
           <Button 
             variant="ghost" 
@@ -271,80 +275,62 @@ const ArtikuacijskiTest = () => {
           </h1>
         </div>
         
-        {/* Letter selection bar */}
-        <div className="mb-8 overflow-x-auto">
-          <div className="flex space-x-2 pb-2 min-w-max">
-            {articulation_data.map((item, index) => (
-              <button
-                key={index}
-                className={cn(
-                  "py-2 px-4 rounded-lg text-lg font-semibold transition-colors",
-                  index === currentLetterIndex 
-                    ? "bg-app-purple text-white" 
-                    : "bg-gray-100 hover:bg-gray-200"
-                )}
-              >
-                ČRKA {item.letter}
-              </button>
-            ))}
-          </div>
-        </div>
+        {/* Letter grid component */}
+        <LetterGrid 
+          letters={allLetters}
+          currentLetter={currentLetter}
+        />
         
         {/* Main content area */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
           {/* Left column (empty on mobile, visible on md+) */}
-          <div className="hidden md:block">
+          <div className="hidden md:block md:col-span-1">
             {/* Placeholder for additional content if needed */}
           </div>
           
           {/* Center column - Word and Image */}
-          <div className="md:col-span-1 flex flex-col items-center">
-            <div className="text-center mb-4">
-              <h2 className="text-2xl font-bold text-app-purple mb-2">
-                {getCurrentWord()}
-              </h2>
-              <p className="text-muted-foreground">
-                Beseda {overallIndex + 1} od {totalWords}
-              </p>
-            </div>
-            
-            <div className="bg-white rounded-lg shadow-md p-6 mb-4 w-full aspect-square flex items-center justify-center">
-              {loading ? (
-                <div className="animate-pulse bg-gray-200 w-full h-full rounded"></div>
-              ) : imageUrl ? (
-                <img 
-                  src={imageUrl} 
-                  alt={getCurrentWord()} 
-                  className="max-w-full max-h-full object-contain"
-                />
-              ) : (
-                <div className="text-muted-foreground">Ni slike</div>
-              )}
-            </div>
-            
-            <Button 
-              onClick={handlePlayAudio}
-              className="bg-app-teal hover:bg-app-teal/90 mt-2"
-            >
-              <Volume2 className="mr-2 h-5 w-5" />
-              Izgovori besedo
-            </Button>
+          <div className="md:col-span-1">
+            <WordDisplay 
+              word={getCurrentWord()}
+              imageUrl={imageUrl}
+              loading={loading}
+              currentIndex={overallIndex}
+              totalWords={totalWords}
+              onPlayAudio={handlePlayAudio}
+            />
           </div>
           
           {/* Right column - Navigation */}
-          <div className="md:col-span-1 flex items-center justify-center">
-            <div className="flex flex-col items-center space-y-6">
-              <Button 
-                onClick={handleNext}
-                size="lg"
-                className="bg-app-blue hover:bg-app-blue/90 rounded-full h-16 w-16 p-0"
-              >
-                <ArrowRight className="h-8 w-8" />
-              </Button>
-              <p className="text-sm text-muted-foreground">Naslednja beseda</p>
-            </div>
+          <div className="md:col-span-1 flex justify-center mt-8 md:mt-0">
+            <TestNavigation 
+              onNext={handleNext} 
+              onPrevious={handlePrevious} 
+            />
           </div>
         </div>
+        
+        {/* Mobile navigation - only visible on small screens */}
+        {isMobile && (
+          <div className="flex justify-between mt-8 px-8">
+            <Button 
+              onClick={handlePrevious}
+              variant="outline"
+              size="icon"
+              className="rounded-full h-14 w-14 border-2"
+            >
+              <ArrowLeft className="h-6 w-6" />
+            </Button>
+            
+            <Button 
+              onClick={handleNext}
+              variant="outline"
+              size="icon" 
+              className="rounded-full h-14 w-14 border-2"
+            >
+              <ArrowRight className="h-6 w-6" />
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
