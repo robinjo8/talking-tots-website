@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { UserProfile } from "@/components/auth/UserProfile";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSidebar } from "@/components/ui/sidebar";
-import { Menu, ChevronDown } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { MobileMenu } from "@/components/MobileMenu";
 import {
@@ -18,12 +18,6 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle
 } from "@/components/ui/navigation-menu";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
 
 export default function Header() {
   const { user, profile, selectedChildIndex } = useAuth();

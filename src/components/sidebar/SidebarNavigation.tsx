@@ -2,12 +2,17 @@
 import { 
   Bell,
   Smartphone,
-  CreditCard
+  CreditCard,
+  Settings,
+  LogOut,
+  User,
+  UserCircle
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -22,6 +27,8 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
   const { user } = useAuth();
   const navigate = useNavigate();
   const { setOpenMobile } = useSidebar();
+  const isMobile = useIsMobile();
+  const location = useLocation();
   
   const handleNavigate = (path: string, options?: { expandSection?: string }) => {
     navigate(path);
@@ -33,16 +40,75 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
     }
   };
 
-  // Menu items configuration - removed the items that are now in the header
-  const menuItems = [
+  // Check if the current path matches the navigation item
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
+
+  // Main navigation items that should only show in mobile sidebar (duplicated from header in mobile view)
+  const mainNavItems = isMobile || isMobileMenu ? [
+    {
+      label: "Profil starša",
+      path: "/profile",
+      icon: User,
+      active: true,
+      onClick: () => handleNavigate("/profile", { expandSection: "personal" })
+    },
+    {
+      label: "Profil otroka",
+      path: "/profile",
+      icon: UserCircle,
+      active: true,
+      onClick: () => handleNavigate("/profile", { expandSection: "children" })
+    },
+    {
+      label: "Moja stran",
+      path: "/moja-stran",
+      icon: User,
+      active: true,
+      onClick: () => handleNavigate("/moja-stran")
+    },
+    {
+      label: "Vaje",
+      path: "/govorno-jezikovne-vaje",
+      icon: User,
+      active: true,
+      onClick: () => handleNavigate("/govorno-jezikovne-vaje")
+    },
+    {
+      label: "Govorne igre",
+      path: "/govorne-igre",
+      icon: User,
+      active: true,
+      onClick: () => handleNavigate("/govorne-igre")
+    },
+    {
+      label: "Izzivi",
+      path: "/moji-izzivi",
+      icon: User,
+      active: true,
+      onClick: () => handleNavigate("/moji-izzivi")
+    },
+    {
+      label: "Video navodila",
+      path: "/video-navodila",
+      icon: User,
+      active: true,
+      onClick: () => handleNavigate("/video-navodila")
+    },
+    {
+      label: "Logopedski kotiček",
+      path: "#",
+      icon: User,
+      active: false
+    }
+  ] : [];
+
+  // Sidebar-specific items that are always shown in sidebar
+  const sidebarItems = [
     {
       label: "Obvestila",
       icon: Bell,
-      active: false
-    },
-    {
-      label: "Mobilna aplikacija",
-      icon: Smartphone,
       active: false
     },
     {
@@ -51,8 +117,27 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
       icon: CreditCard,
       active: true,
       onClick: () => handleNavigate("/profile", { expandSection: "subscription" })
+    },
+    {
+      label: "Nastavitve",
+      path: "/profile",
+      icon: Settings,
+      active: true,
+      onClick: () => handleNavigate("/profile", { expandSection: "settings" })
+    },
+    {
+      label: "Odjava",
+      icon: LogOut,
+      active: true,
+      onClick: () => {
+        // Handle logout logic
+        console.log("Logout clicked");
+      }
     }
   ];
+
+  // Combine items based on whether it's mobile or desktop view
+  const menuItems = [...mainNavItems, ...sidebarItems];
 
   // Render different UI based on if it's a mobile menu or sidebar
   if (isMobileMenu) {
@@ -62,7 +147,7 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
           <Button 
             key={index}
             variant="ghost" 
-            className={`w-full justify-start text-left ${!item.active ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`w-full justify-start text-left ${!item.active ? 'opacity-50 cursor-not-allowed' : ''} ${item.path && isActive(item.path) ? 'bg-accent text-accent-foreground' : ''}`}
             onClick={() => item.active && (item.onClick ? item.onClick() : item.path ? handleNavigate(item.path) : null)}
             disabled={!item.active}
           >
@@ -82,7 +167,7 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
           <SidebarMenuButton 
             onClick={() => item.active && (item.onClick ? item.onClick() : item.path ? handleNavigate(item.path) : null)}
             disabled={!item.active}
-            className={!item.active ? 'opacity-50 cursor-not-allowed' : ''}
+            className={`${!item.active ? 'opacity-50 cursor-not-allowed' : ''} ${item.path && isActive(item.path) ? 'bg-accent text-accent-foreground' : ''}`}
             tooltip={item.label}
           >
             <item.icon />
