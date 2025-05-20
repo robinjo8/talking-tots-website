@@ -1,7 +1,7 @@
 
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
-import { Volume2 } from "lucide-react";
+import { Speaker } from "lucide-react";
 
 interface WordDisplayProps {
   word: string;
@@ -53,13 +53,13 @@ const WordDisplay = ({
         </AspectRatio>
       </div>
       
-      {/* Audio button */}
+      {/* Audio button - larger, more playful for children */}
       <Button 
         onClick={onPlayAudio}
         size="lg"
-        className="bg-app-teal hover:bg-app-teal/90 text-white px-8 py-6 h-auto text-lg"
+        className="bg-app-teal hover:bg-app-teal/90 text-white px-8 py-6 h-auto text-lg rounded-full shadow-md hover:shadow-lg transform transition-transform hover:scale-105"
       >
-        <Volume2 className="mr-2 h-5 w-5" />
+        <Speaker className="mr-2 h-6 w-6" />
         Izgovori besedo
       </Button>
     </div>

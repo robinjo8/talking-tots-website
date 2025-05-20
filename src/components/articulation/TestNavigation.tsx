@@ -15,7 +15,7 @@ const TestNavigation = ({ onNext, onPrevious }: TestNavigationProps) => {
           onClick={onPrevious}
           variant="outline"
           size="icon"
-          className="rounded-full h-14 w-14 border-2 hidden sm:flex"
+          className="rounded-full h-14 w-14 border-2"
         >
           <ArrowLeft className="h-6 w-6" />
         </Button>
@@ -23,7 +23,7 @@ const TestNavigation = ({ onNext, onPrevious }: TestNavigationProps) => {
         <Button 
           onClick={onNext}
           size="icon"
-          className="bg-app-blue hover:bg-app-blue/90 rounded-full h-16 w-16"
+          className="bg-app-blue hover:bg-app-blue/90 rounded-full h-16 w-16 shadow-md"
         >
           <ArrowRight className="h-8 w-8" />
         </Button>
