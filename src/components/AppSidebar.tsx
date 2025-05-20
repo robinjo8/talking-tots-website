@@ -10,6 +10,7 @@ import {
   useSidebar 
 } from "@/components/ui/sidebar";
 import { SidebarContent } from "@/components/sidebar/SidebarContent";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface AppSidebarProps {
   isMobileMenu?: boolean;
@@ -17,6 +18,7 @@ interface AppSidebarProps {
 
 export function AppSidebar({ isMobileMenu = false }: AppSidebarProps) {
   const { setOpenMobile } = useSidebar();
+  const isMobile = useIsMobile();
   
   // For mobile menu display full content
   if (isMobileMenu) {
@@ -46,7 +48,7 @@ export function AppSidebar({ isMobileMenu = false }: AppSidebarProps) {
             Profil uporabnika
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarContent />
+            <SidebarContent isMobileMenu={false} />
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContainer>

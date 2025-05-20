@@ -123,12 +123,7 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
     return path && location.pathname === path;
   };
 
-  // Filter items based on device type
-  const filteredItems = isMobile || isMobileMenu
-    ? menuItems.filter(item => item.showOnMobile)
-    : menuItems.filter(item => item.showOnDesktop);
-
-  // Render different UI based on if it's a mobile menu or sidebar
+  // For mobile menu UI
   if (isMobileMenu) {
     return (
       <div className="space-y-1">
@@ -148,23 +143,25 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
     );
   }
   
-  // For sidebar UI
+  // For sidebar UI - for desktop, we'll strictly use the showOnDesktop flag
   return (
     <SidebarMenu>
-      {filteredItems.map((item, index) => (
-        <SidebarMenuItem key={index}>
-          <SidebarMenuButton 
-            onClick={() => item.active && (item.onClick ? item.onClick() : item.path ? handleNavigate(item.path) : null)}
-            disabled={!item.active}
-            isActive={isActivePath(item.path)}
-            className={!item.active ? 'opacity-50 cursor-not-allowed' : ''}
-            tooltip={item.label}
-          >
-            <item.icon />
-            <span>{item.label}</span>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      ))}
+      {menuItems
+        .filter(item => isMobile ? item.showOnMobile : item.showOnDesktop)
+        .map((item, index) => (
+          <SidebarMenuItem key={index}>
+            <SidebarMenuButton 
+              onClick={() => item.active && (item.onClick ? item.onClick() : item.path ? handleNavigate(item.path) : null)}
+              disabled={!item.active}
+              isActive={isActivePath(item.path)}
+              className={!item.active ? 'opacity-50 cursor-not-allowed' : ''}
+              tooltip={item.label}
+            >
+              <item.icon />
+              <span>{item.label}</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        ))}
     </SidebarMenu>
   );
 }
