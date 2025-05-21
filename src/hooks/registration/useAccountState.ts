@@ -14,7 +14,7 @@ export function useAccountState() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [selectedPlan, setSelectedPlan] = useState("Mesečna naročnina - 9,99 € / mesec");
+  const [selectedPlan, setSelectedPlan] = useState("Mesečna naročnina - 19,90 € / mesec");
   const [isCheckingEmail, setIsCheckingEmail] = useState(false);
 
   const checkEmailExists = async (email: string): Promise<boolean> => {
@@ -22,31 +22,19 @@ export function useAccountState() {
     
     setIsCheckingEmail(true);
     try {
-      // Using a more reliable method to check if an email exists
-      const { data, error } = await supabase.auth.admin.listUsers();
+      // Try a sign-in attempt with a dummy password
+      // If we get "Invalid login credentials", the email exists
+      // If we get another error or no error, the email doesn't exist
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password: "dummy_password_for_check_only"
+      });
       
-      // If we can't access admin functions, fall back to a sign-in attempt
-      // which will tell us if the user exists
-      if (error) {
-        console.log("Falling back to signIn method for email check");
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password: "dummy_password_for_check_only"
-        });
-        
-        // If error message contains "Invalid login credentials" then the email exists
-        // but password is wrong, which means the email is registered
-        return signInError?.message?.includes("Invalid login credentials") || false;
-      }
+      // Check for the specific error that indicates the email exists
+      const emailExists = error?.message?.includes("Invalid login credentials") || false;
       
-      // If we can access admin functions, check if the email exists in the list
-      if (data?.users) {
-        // Cast data.users to an array of SupabaseUser to satisfy TypeScript
-        const users = data.users as SupabaseUser[];
-        return users.some(user => user && user.email === email);
-      }
-      
-      return false;
+      console.log("Email check result:", emailExists, "for email:", email);
+      return emailExists;
     } catch (error) {
       console.error("Error checking email:", error);
       return false;
