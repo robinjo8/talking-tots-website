@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -9,7 +8,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SelectChildDialog } from "@/components/SelectChildDialog";
 import { FeaturesCarousel } from "@/components/FeaturesCarousel";
-
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showChildSelector, setShowChildSelector] = useState(false);
@@ -20,11 +18,9 @@ const Index = () => {
   } = useAuth();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
-  
   useEffect(() => {
     setIsVisible(true);
   }, []);
-  
   const handleStartNow = () => {
     // If not logged in, redirect to login page
     if (!user) {
@@ -41,7 +37,6 @@ const Index = () => {
       setShowChildSelector(true);
     }
   };
-  
   const scrollToFeatures = () => {
     const featuresSection = document.getElementById('features');
     if (featuresSection) {
@@ -50,7 +45,6 @@ const Index = () => {
       });
     }
   };
-  
   return <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden">
       <Header />
       
@@ -95,7 +89,7 @@ const Index = () => {
       <section id="features" className="py-20 px-4 md:px-10 bg-light-cloud w-full">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Kako Tomi Talk dela?</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Kako TomiTalk deluje?</h2>
             <p className="text-xl text-muted-foreground max-w-xl mx-auto">
               Naša aplikacija omogoča razvoj govora na zabaven in učinkovit način s pomočjo interaktivnih funkcij
             </p>
