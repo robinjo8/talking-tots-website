@@ -57,7 +57,7 @@ export function SpeechDevelopmentQuestions({
         onClick={handleSubmit}
         className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6"
       >
-        Zaključi registracijo
+        Naprej
       </Button>
     </div>
   );

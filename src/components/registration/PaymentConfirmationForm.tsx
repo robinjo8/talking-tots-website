@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -5,9 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Check } from "lucide-react";
+
 type PaymentConfirmationFormProps = {
   selectedPlan: string;
 };
+
 export function PaymentConfirmationForm({
   selectedPlan
 }: PaymentConfirmationFormProps) {
@@ -34,6 +37,7 @@ export function PaymentConfirmationForm({
     }
   };
   const planDetails = getPlanDetails();
+  
   const formatCardNumber = (value: string) => {
     // Remove all non-digits
     const digits = value.replace(/\D/g, "");
@@ -50,6 +54,7 @@ export function PaymentConfirmationForm({
     // Limit to 19 characters (16 digits + 3 spaces)
     return formatted.substring(0, 19);
   };
+  
   const formatExpiryDate = (value: string) => {
     // Remove all non-digits
     const digits = value.replace(/\D/g, "");
@@ -60,17 +65,21 @@ export function PaymentConfirmationForm({
     }
     return `${digits.substring(0, 2)}/${digits.substring(2, 4)}`;
   };
+  
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCardNumber(formatCardNumber(e.target.value));
   };
+  
   const handleExpiryDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setExpiryDate(formatExpiryDate(e.target.value));
   };
+  
   const handleCvcChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Only allow digits and limit to 4 characters
     const value = e.target.value.replace(/\D/g, "").substring(0, 4);
     setCvc(value);
   };
+  
   return <div className="space-y-6">
       <div className="text-center mb-6">
         

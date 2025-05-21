@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, ArrowLeft } from "lucide-react";
 import { SpeechHeader } from "./SpeechHeader";
 import { SpeechDifficultyList } from "./SpeechDifficultyList";
 
@@ -42,6 +42,7 @@ export function SpeechDifficultiesStep({
         onBack={onBack} 
         childName={childName}
         title="Izberi govorne motnje za"
+        showBackButton={false}
       />
 
       <SpeechDifficultyList
@@ -66,6 +67,17 @@ export function SpeechDifficultiesStep({
         className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6"
       >
         {submitButtonText}
+      </Button>
+      
+      <Button 
+        type="button" 
+        variant="outline" 
+        size="sm" 
+        onClick={onBack}
+        className="w-full flex items-center gap-1"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Nazaj
       </Button>
     </div>
   );

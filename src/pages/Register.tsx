@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
@@ -107,14 +108,6 @@ export default function Register() {
         </div>}
 
       {currentStep === RegistrationStep.PAYMENT_CONFIRMATION && <div className="mt-6 space-y-6">
-          <div className="flex justify-between items-center">
-            <Button type="button" variant="outline" size="sm" onClick={goBack} className="flex items-center gap-1">
-              <ArrowLeft className="h-4 w-4" />
-              Nazaj
-            </Button>
-            
-          </div>
-          
           <div>
             <h3 className="text-2xl font-bold font-extrabold text-dragon-green mb-4 text-center">Začnite 7-dnevni brezplačni preizkus</h3>
             
@@ -139,6 +132,11 @@ export default function Register() {
           
           <Button type="button" onClick={handleSubmit} className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6" disabled={isLoading}>
             {isLoading ? "Ustvarjam račun..." : "Zaključi registracijo"}
+          </Button>
+          
+          <Button type="button" variant="outline" size="sm" onClick={goBack} className="flex items-center gap-1 w-full mt-4">
+            <ArrowLeft className="h-4 w-4" />
+            Nazaj
           </Button>
         </div>}
     </AuthLayout>;
