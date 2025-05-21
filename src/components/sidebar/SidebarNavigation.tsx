@@ -44,14 +44,15 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
 
   // Menu items configuration with visibility control
   const menuItems = [
-    // These items will only be shown in mobile view
+    // These items will only be shown in mobile view when user is logged in
     {
       label: "Moja stran",
       path: "/moja-stran",
       icon: Home,
       active: true,
       showOnDesktop: false,
-      showOnMobile: true
+      showOnMobile: true,
+      showWhenLoggedIn: true,
     },
     {
       label: "Vaje",
@@ -59,7 +60,8 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
       icon: Activity,
       active: true,
       showOnDesktop: false,
-      showOnMobile: true
+      showOnMobile: true,
+      showWhenLoggedIn: true,
     },
     {
       label: "Govorne igre",
@@ -67,7 +69,8 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
       icon: Gamepad,
       active: true,
       showOnDesktop: false,
-      showOnMobile: true
+      showOnMobile: true,
+      showWhenLoggedIn: true,
     },
     {
       label: "Izzivi",
@@ -75,7 +78,8 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
       icon: Award,
       active: true,
       showOnDesktop: false,
-      showOnMobile: true
+      showOnMobile: true,
+      showWhenLoggedIn: true,
     },
     {
       label: "Video navodila",
@@ -83,29 +87,33 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
       icon: Video,
       active: true,
       showOnDesktop: false,
-      showOnMobile: true
+      showOnMobile: true,
+      showWhenLoggedIn: true,
     },
-    // These items will always be shown on both mobile and desktop
+    // These items will always be shown on desktop, but hidden in mobile
     {
       label: "Logopedski kotiček",
       icon: BookOpen,
       active: false,
       showOnDesktop: true,
-      showOnMobile: true
+      showOnMobile: false,
+      showWhenLoggedIn: true,
     },
     {
       label: "Obvestila",
       icon: Bell,
       active: false,
       showOnDesktop: true,
-      showOnMobile: true
+      showOnMobile: false,
+      showWhenLoggedIn: true,
     },
     {
       label: "Mobilna aplikacija",
       icon: Smartphone,
       active: false,
       showOnDesktop: true,
-      showOnMobile: true
+      showOnMobile: false,
+      showWhenLoggedIn: true,
     },
     {
       label: "Moja naročnina",
@@ -114,7 +122,8 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
       active: true,
       onClick: () => handleNavigate("/profile", { expandSection: "subscription" }),
       showOnDesktop: true,
-      showOnMobile: true
+      showOnMobile: false,
+      showWhenLoggedIn: true,
     }
   ];
 
@@ -123,27 +132,32 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
     return path && location.pathname === path;
   };
 
-  // For mobile menu UI
-  if (isMobileMenu) {
+  // For mobile menu UI - only show items if user is logged in for mobile view
+  if (isMobileMenu && user) {
     return (
       <div className="space-y-1">
-        {menuItems.filter(item => item.showOnMobile).map((item, index) => (
-          <Button 
-            key={index}
-            variant="ghost" 
-            className={`w-full justify-start text-left ${!item.active ? 'opacity-50 cursor-not-allowed' : isActivePath(item.path) ? 'bg-accent' : ''}`}
-            onClick={() => item.active && (item.onClick ? item.onClick() : item.path ? handleNavigate(item.path) : null)}
-            disabled={!item.active}
-          >
-            <item.icon className="h-4 w-4 mr-2" />
-            {item.label}
-          </Button>
-        ))}
+        {menuItems
+          .filter(item => item.showOnMobile && item.showWhenLoggedIn)
+          .map((item, index) => (
+            <Button 
+              key={index}
+              variant="ghost" 
+              className={`w-full justify-start text-left ${!item.active ? 'opacity-50 cursor-not-allowed' : isActivePath(item.path) ? 'bg-accent' : ''}`}
+              onClick={() => item.active && (item.onClick ? item.onClick() : item.path ? handleNavigate(item.path) : null)}
+              disabled={!item.active}
+            >
+              <item.icon className="h-4 w-4 mr-2" />
+              {item.label}
+            </Button>
+          ))}
       </div>
     );
+  } else if (isMobileMenu) {
+    // If not logged in on mobile, don't show any sidebar navigation items
+    return null;
   }
   
-  // For sidebar UI - for desktop, we'll strictly use the showOnDesktop flag
+  // For sidebar UI - for desktop
   return (
     <SidebarMenu>
       {menuItems

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -5,10 +6,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { UserProfile } from "@/components/auth/UserProfile";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSidebar } from "@/components/ui/sidebar";
-import { Menu, BookOpen, UserPlus } from "lucide-react";
+import { Menu, BookOpen, UserPlus, Play } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { MobileMenu } from "@/components/MobileMenu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+
 export default function Header() {
   const {
     user,
@@ -22,6 +24,7 @@ export default function Header() {
     setOpenMobile
   } = useSidebar();
   const selectedChild = selectedChildIndex !== null && profile?.children ? profile.children[selectedChildIndex] : null;
+  
   const handleNavigate = (path: string, options?: {
     expandSection?: string;
   }) => {
@@ -30,6 +33,7 @@ export default function Header() {
       localStorage.setItem('expandSection', options.expandSection);
     }
   };
+  
   const handleStartNow = () => {
     // If not logged in, redirect to login page
     if (!user) {
@@ -81,6 +85,7 @@ export default function Header() {
   const isActivePath = (path: string) => {
     return location.pathname === path;
   };
+  
   return <header className="py-4 px-4 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <Link to="/" className="flex items-center gap-2">
@@ -91,56 +96,75 @@ export default function Header() {
         </Link>
         
         <div className="flex items-center gap-3">
-          {isMobile && selectedChild && <div className="flex items-center gap-2">
-              {selectedChild.avatarId > 0 && <Avatar className="h-6 w-6 border border-green-200">
+          {/* Mobile-specific buttons */}
+          {isMobile && (
+            <>
+              {/* Add Začni zdaj button for mobile only */}
+              <Button 
+                onClick={handleStartNow} 
+                size="sm" 
+                className="bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full"
+              >
+                Začni zdaj
+              </Button>
+
+              {/* Selected child display */}
+              {selectedChild && <div className="flex items-center gap-2">
+                {selectedChild.avatarId > 0 && <Avatar className="h-6 w-6 border border-green-200">
                   <AvatarImage src={getAvatarSrc(selectedChild.avatarId)} alt={selectedChild.name} className="object-contain" />
                   <AvatarFallback className="bg-green-100 text-green-800">
                     {selectedChild.name[0]}
                   </AvatarFallback>
                 </Avatar>}
-              <span className="text-sm font-medium text-muted-foreground">
-                {selectedChild.name}
-              </span>
-            </div>}
-          
-          {isMobile ? <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex items-center">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="p-0">
-                <MobileMenu onItemClick={() => {}} />
-              </SheetContent>
-            </Sheet> : <nav className="flex items-center gap-6">
-              {user && <>
-                  {/* Desktop Navigation Links */}
-                  {navigationLinks.map((link, index) => <Button key={index} variant="ghost" onClick={() => !link.disabled && handleNavigate(link.path)} disabled={link.disabled}>
-                      {link.label === "Logopedski kotiček" && <BookOpen className="h-4 w-4 mr-2" />}
-                      {link.label}
-                    </Button>)}
-                </>}
-
-              {user ? <div className="flex items-center gap-2">
-                  <UserProfile />
-                </div> : <div className="flex items-center gap-3">
-                  {/* New orange "Začni zdaj" button */}
-                  <Button onClick={handleStartNow} size="sm" className="w-full sm:w-auto bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full min-w-[180px]">
-                    Začni zdaj
+                <span className="text-sm font-medium text-muted-foreground">
+                  {selectedChild.name}
+                </span>
+              </div>}
+              
+              {/* Mobile menu sheet */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="sm" className="flex items-center">
+                    <Menu className="h-5 w-5" />
                   </Button>
-                  <Link to="/register">
-                    <Button variant="outline" size="sm" className="text-sm">
-                      <UserPlus className="h-4 w-4 mr-1" />
-                      Registracija
-                    </Button>
-                  </Link>
-                  <Link to="/login">
-                    <Button variant="outline" size="sm" className="text-sm">
-                      Prijava
-                    </Button>
-                  </Link>
-                </div>}
-            </nav>}
+                </SheetTrigger>
+                <SheetContent side="right" className="p-0">
+                  <MobileMenu onItemClick={() => {}} />
+                </SheetContent>
+              </Sheet>
+            </>
+          )}
+          
+          {/* Desktop navigation */}
+          {!isMobile && <nav className="flex items-center gap-6">
+            {user && <>
+              {/* Desktop Navigation Links */}
+              {navigationLinks.map((link, index) => <Button key={index} variant="ghost" onClick={() => !link.disabled && handleNavigate(link.path)} disabled={link.disabled}>
+                {link.label === "Logopedski kotiček" && <BookOpen className="h-4 w-4 mr-2" />}
+                {link.label}
+              </Button>)}
+            </>}
+
+            {user ? <div className="flex items-center gap-2">
+              <UserProfile />
+            </div> : <div className="flex items-center gap-3">
+              {/* New orange "Začni zdaj" button */}
+              <Button onClick={handleStartNow} size="sm" className="w-full sm:w-auto bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full min-w-[180px]">
+                Začni zdaj
+              </Button>
+              <Link to="/register">
+                <Button variant="outline" size="sm" className="text-sm">
+                  <UserPlus className="h-4 w-4 mr-1" />
+                  Registracija
+                </Button>
+              </Link>
+              <Link to="/login">
+                <Button variant="outline" size="sm" className="text-sm">
+                  Prijava
+                </Button>
+              </Link>
+            </div>}
+          </nav>}
         </div>
       </div>
     </header>;

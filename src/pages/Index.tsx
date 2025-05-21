@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -55,14 +56,24 @@ const Index = () => {
         <div className="absolute top-40 -right-10 w-60 h-60 bg-app-blue/20 rounded-full blur-3xl"></div>
         
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-          <div className={`${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'} transition-all duration-700 ease-out`}>
+          {/* Mobile layout: Dragon above, then text */}
+          {isMobile && (
+            <div className={`relative mx-auto ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out mb-6 order-first w-3/4`}>
+              <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
+              <div className="animate-float relative">
+                <img alt="Tomi Talk Dragon Mascot" className="w-full mx-auto" src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" />
+              </div>
+            </div>
+          )}
+          
+          <div className={`${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'} transition-all duration-700 ease-out ${isMobile ? 'text-center' : ''}`}>
             <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold mb-4 md:mb-6">
               Naredimo govor <span className="rainbow-text">zabaven</span> – za male junake!
             </h1>
-            <p className="text-lg md:text-xl mb-6 md:mb-8 text-muted-foreground max-w-xl font-normal">Tomi Talk pomaga otroku razvijati govor s preprostimi in zabavnimi vajami ter igrami, ki jih priporočajo strokovnjaki.</p>
+            <p className="text-lg md:text-xl mb-6 md:mb-8 text-muted-foreground max-w-xl font-normal mx-auto">Tomi Talk pomaga otroku razvijati govor s preprostimi in zabavnimi vajami ter igrami, ki jih priporočajo strokovnjaki.</p>
             
             {/* Action Buttons - Moved to hero text section */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
               <Button size="lg" onClick={handleStartNow} className="w-full sm:w-auto bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full min-w-[180px]">
                 Začni zdaj
               </Button>
@@ -75,12 +86,15 @@ const Index = () => {
             </div>
           </div>
           
-          <div className={`relative ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'} transition-all duration-700 ease-out delay-300`}>
-            <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
-            <div className="animate-float relative">
-              <img alt="Tomi Talk Dragon Mascot" className="w-full max-w-md mx-auto" src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" />
+          {/* Desktop layout: Dragon on right */}
+          {!isMobile && (
+            <div className={`relative ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'} transition-all duration-700 ease-out delay-300`}>
+              <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
+              <div className="animate-float relative">
+                <img alt="Tomi Talk Dragon Mascot" className="w-full max-w-md mx-auto" src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
