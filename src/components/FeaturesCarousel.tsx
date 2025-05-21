@@ -90,11 +90,18 @@ export const FeaturesCarousel = () => {
   }
 
   return (
-    <div className="relative">
-      <Carousel setApi={setApi} className="w-full">
-        <CarouselContent>
+    <div className="relative w-full overflow-hidden">
+      <Carousel 
+        setApi={setApi} 
+        className="w-full"
+        opts={{
+          align: "start",
+          containScroll: "trimSnaps"
+        }}
+      >
+        <CarouselContent className="-ml-2 md:-ml-4">
           {features.map((feature, index) => (
-            <CarouselItem key={index} className="pl-2 md:basis-1/2 lg:basis-1/3">
+            <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3 min-w-0">
               <FeatureCard
                 icon={feature.icon}
                 title={feature.title}
@@ -104,8 +111,8 @@ export const FeaturesCarousel = () => {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="left-0" />
-        <CarouselNext className="right-0" />
+        <CarouselPrevious className="left-0 md:-left-4" />
+        <CarouselNext className="right-0 md:-right-4" />
       </Carousel>
 
       {/* Pagination dots */}
