@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
@@ -12,12 +11,12 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Trash2, UserX, ArrowLeft } from "lucide-react";
 import { SpeechDifficultiesStep } from "@/components/SpeechDifficultiesStep";
-import { SpeechDifficultiesList } from "@/components/SpeechDifficultiesList";
 import { SpeechDevelopmentQuestions } from "@/components/SpeechDevelopmentQuestions";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { ChildCompletedView } from "@/components/children";
 
 const avatarOptions = [
   { id: 0, src: "", alt: "Brez avatarja" },
@@ -551,58 +550,11 @@ export default function Register() {
             <h3 className="text-lg font-medium">Pregled profila za {children[selectedChildIndex].name}</h3>
           </div>
           
-          <div className="bg-sky-50 p-4 rounded-lg border border-sky-100">
-            <div className="flex items-center gap-3 mb-4">
-              {children[selectedChildIndex].avatarId === 0 ? (
-                <div className="h-16 w-16 rounded-full flex items-center justify-center bg-gray-100">
-                  <UserX className="h-8 w-8 text-gray-400" />
-                </div>
-              ) : (
-                <Avatar className="h-16 w-16">
-                  <AvatarImage 
-                    src={avatarOptions.find(a => a.id === children[selectedChildIndex].avatarId)?.src} 
-                    alt="Avatar otroka" 
-                  />
-                  <AvatarFallback>{children[selectedChildIndex].name.charAt(0)}</AvatarFallback>
-                </Avatar>
-              )}
-              <div>
-                <h4 className="font-medium">{children[selectedChildIndex].name}</h4>
-                <p className="text-sm text-gray-600">
-                  Spol: {children[selectedChildIndex].gender === "M" ? "Deček" : children[selectedChildIndex].gender === "Ž" ? "Deklica" : "Ni izbrano"}
-                </p>
-                {children[selectedChildIndex].birthDate && (
-                  <p className="text-sm text-gray-600">
-                    Datum rojstva: {format(children[selectedChildIndex].birthDate as Date, "dd.MM.yyyy")}
-                  </p>
-                )}
-              </div>
-            </div>
-            
-            <div className="mt-4">
-              <h5 className="text-sm font-medium mb-2">Izbrane govorne težave:</h5>
-              <SpeechDifficultiesList difficultiesIds={children[selectedChildIndex].speechDifficulties || []} />
-            </div>
-          </div>
-          
-          <div className="space-y-3 pt-4">
-            <Button
-              type="button"
-              onClick={addChild}
-              className="w-full bg-dragon-green hover:bg-dragon-green/90"
-            >
-              Dodaj otroka
-            </Button>
-            
-            <Button
-              type="button"
-              variant="outline"
-              onClick={continueRegistration}
-              className="w-full"
-            >
-              Zaključi registracijo
-            </Button>
-          </div>
+          <ChildCompletedView 
+            child={children[selectedChildIndex]} 
+            onAddNewChild={addChild} 
+            onClose={continueRegistration} 
+          />
         </div>
       )}
     </AuthLayout>
