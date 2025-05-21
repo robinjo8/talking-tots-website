@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Mic, Stars, Volume2, MessageSquare, Zap, Book, Award } from "lucide-react";
 import FeatureCard from "@/components/FeatureCard";
 import {
@@ -15,7 +15,9 @@ export const FeaturesCarousel = () => {
   const [api, setApi] = useState<any>(null);
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
-
+  const [autoPlay, setAutoPlay] = useState(true);
+  const [direction, setDirection] = useState<'right' | 'left'>('right');
+  
   const features = [
     {
       icon: <Book className="h-10 w-10 text-dragon-green" />,
@@ -53,6 +55,48 @@ export const FeaturesCarousel = () => {
       description: "Pridobivajte značke in odklepajte nove zmajčke",
     },
   ];
+  
+  // Function to handle automatic scrolling
+  const autoScroll = useCallback(() => {
+    if (!api || !autoPlay) return;
+    
+    // Handle direction changes
+    if (direction === 'right') {
+      // If we're at the last item, change direction
+      if (current === count - 1) {
+        setDirection('left');
+        api.scrollPrev();
+      } else {
+        api.scrollNext();
+      }
+    } else {
+      // If we're at the first item, change direction
+      if (current === 0) {
+        setDirection('right');
+        api.scrollNext();
+      } else {
+        api.scrollPrev();
+      }
+    }
+  }, [api, autoPlay, current, count, direction]);
+
+  // Setup auto-scrolling with interval
+  useEffect(() => {
+    const interval = setInterval(autoScroll, 5000); // 5 seconds interval
+    return () => clearInterval(interval);
+  }, [autoScroll]);
+
+  // Pause auto-scroll when user interacts with carousel
+  const handleManualNavigation = () => {
+    setAutoPlay(false);
+    
+    // Resume auto-scroll after a period of inactivity
+    const timeout = setTimeout(() => {
+      setAutoPlay(true);
+    }, 10000); // Resume after 10 seconds of inactivity
+    
+    return () => clearTimeout(timeout);
+  };
 
   useEffect(() => {
     if (!api) return;
@@ -77,6 +121,7 @@ export const FeaturesCarousel = () => {
         className="w-full"
         opts={{
           align: "start",
+          loop: true,
           containScroll: "trimSnaps"
         }}
       >
@@ -92,8 +137,16 @@ export const FeaturesCarousel = () => {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="left-0 md:-left-4" />
-        <CarouselNext className="right-0 md:-right-4" />
+        <CarouselPrevious 
+          className="left-0 md:-left-4" 
+          onClick={() => handleManualNavigation()}
+          aria-label="Prejšnja funkcija"
+        />
+        <CarouselNext 
+          className="right-0 md:-right-4" 
+          onClick={() => handleManualNavigation()}
+          aria-label="Naslednja funkcija"
+        />
       </Carousel>
 
       {/* Pagination dots */}
@@ -105,8 +158,11 @@ export const FeaturesCarousel = () => {
               "w-2 h-2 rounded-full transition-colors",
               i === current ? "bg-dragon-green" : "bg-gray-300"
             )}
-            onClick={() => api?.scrollTo(i)}
-            aria-label={`Go to slide ${i + 1}`}
+            onClick={() => {
+              api?.scrollTo(i);
+              handleManualNavigation();
+            }}
+            aria-label={`Pojdi na predstavitev ${i + 1}`}
           />
         ))}
       </div>
