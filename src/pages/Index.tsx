@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -8,25 +7,26 @@ import { Mic, Play, Book, Stars, MessageSquare, Zap, Volume2, Award } from "luci
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SelectChildDialog } from "@/components/SelectChildDialog";
-
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showChildSelector, setShowChildSelector] = useState(false);
-  const { user, profile, selectedChildIndex } = useAuth();
+  const {
+    user,
+    profile,
+    selectedChildIndex
+  } = useAuth();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
-
   useEffect(() => {
     setIsVisible(true);
   }, []);
-
   const handleStartNow = () => {
     // If not logged in, redirect to login page
     if (!user) {
       navigate("/login");
       return;
     }
-    
+
     // If logged in, continue with existing behavior
     if (selectedChildIndex !== null && profile?.children) {
       navigate("/moja-stran");
@@ -36,16 +36,15 @@ const Index = () => {
       setShowChildSelector(true);
     }
   };
-
   const scrollToFeatures = () => {
     const featuresSection = document.getElementById('features');
     if (featuresSection) {
-      featuresSection.scrollIntoView({ behavior: 'smooth' });
+      featuresSection.scrollIntoView({
+        behavior: 'smooth'
+      });
     }
   };
-
-  return (
-    <div className="min-h-screen w-full overflow-x-hidden">
+  return <div className="min-h-screen w-full overflow-x-hidden">
       <Header />
       
       {/* Hero Section - Improved layout */}
@@ -64,25 +63,13 @@ const Index = () => {
             
             {/* Action Buttons - Moved to hero text section */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button 
-                size="lg" 
-                className="w-full sm:w-auto bg-app-orange hover:bg-app-orange/90 text-white rounded-full min-w-[180px]"
-                onClick={handleStartNow}
-              >
+              <Button size="lg" onClick={handleStartNow} className="w-full sm:w-auto bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full min-w-[180px]">
                 Začni zdaj
               </Button>
-              <Button 
-                size="lg" 
-                className="w-full sm:w-auto bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full min-w-[180px]"
-              >
+              <Button size="lg" className="bg-app-blue hover:bg-app-blue/90 text-white rounded-full">
                 <Play className="mr-2 h-4 w-4" /> Poglej demo
               </Button>
-              <Button 
-                size="lg" 
-                className="w-full sm:w-auto bg-transparent hover:bg-gray-100 text-gray-700 border border-gray-300 rounded-full min-w-[180px]"
-                variant="outline"
-                onClick={scrollToFeatures}
-              >
+              <Button size="lg" variant="outline" onClick={scrollToFeatures} className="bg-app-blue hover:bg-app-blue/90 text-white rounded-full">
                 Več info
               </Button>
             </div>
@@ -91,11 +78,7 @@ const Index = () => {
           <div className={`relative ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'} transition-all duration-700 ease-out delay-300`}>
             <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
             <div className="animate-float relative">
-              <img 
-                alt="Tomi Talk Dragon Mascot" 
-                className="w-full max-w-md mx-auto" 
-                src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" 
-              />
+              <img alt="Tomi Talk Dragon Mascot" className="w-full max-w-md mx-auto" src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" />
             </div>
           </div>
         </div>
@@ -167,12 +150,7 @@ const Index = () => {
         </div>
       </footer>
       
-      <SelectChildDialog
-        open={showChildSelector}
-        onOpenChange={setShowChildSelector}
-      />
-    </div>
-  );
+      <SelectChildDialog open={showChildSelector} onOpenChange={setShowChildSelector} />
+    </div>;
 };
-
 export default Index;
