@@ -1,18 +1,28 @@
 
 import { Badge } from "@/components/ui/badge";
-import { SpeechDifficulty } from "@/models/SpeechDifficulties";
+import { SPEECH_DIFFICULTIES, SpeechDifficulty } from "@/models/SpeechDifficulties";
 
 interface SpeechDifficultyBadgeProps {
-  difficulty: SpeechDifficulty;
+  difficulty?: SpeechDifficulty;
+  difficultyId?: string;
   showDescription?: boolean;
   className?: string;
 }
 
 export function SpeechDifficultyBadge({ 
-  difficulty, 
+  difficulty: propDifficulty, 
+  difficultyId,
   showDescription = false,
   className = ""
 }: SpeechDifficultyBadgeProps) {
+  // If we receive a difficultyId, find the corresponding difficulty
+  const difficulty = propDifficulty || (difficultyId ? 
+    SPEECH_DIFFICULTIES.find(d => d.id === difficultyId) : undefined);
+  
+  if (!difficulty) {
+    return null;
+  }
+  
   // Extract just the first part of the title if it contains a dash
   const displayTitle = difficulty.title.split('–')[0].trim();
 

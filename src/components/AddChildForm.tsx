@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -14,6 +15,7 @@ enum AddChildStep {
 }
 
 interface SavedChild {
+  id: string; // Adding the required id property
   name: string;
   gender: string;
   avatarId: number;
@@ -59,8 +61,10 @@ export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
     try {
       setIsSubmitting(true);
       
-      // Save the child's information temporarily
-      const newChild = {
+      // Save the child's information temporarily with an id
+      const newChildId = crypto.randomUUID();
+      const newChild: SavedChild = {
+        id: newChildId,
         name: name.trim(),
         gender,
         avatarId,
@@ -82,6 +86,7 @@ export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
       
       // Add new child
       const updatedChildren = [...currentChildren, {
+        id: newChildId,
         name: name.trim(),
         gender,
         avatarId,
