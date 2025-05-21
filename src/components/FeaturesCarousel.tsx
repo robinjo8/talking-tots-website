@@ -1,0 +1,127 @@
+
+import { useState, useEffect } from "react";
+import { Mic, Stars, Volume2, MessageSquare, Zap, Book, Award } from "lucide-react";
+import FeatureCard from "@/components/FeatureCard";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
+
+export const FeaturesCarousel = () => {
+  const [api, setApi] = useState<any>(null);
+  const [current, setCurrent] = useState(0);
+  const [count, setCount] = useState(0);
+  const isMobile = useIsMobile();
+
+  const features = [
+    {
+      icon: <Book className="h-10 w-10 text-dragon-green" />,
+      title: "Odobreno s strani logopedov",
+      description: "Razvito v sodelovanju s profesionalnimi logopedi",
+    },
+    {
+      icon: <Mic className="h-10 w-10 text-app-blue" />, 
+      title: "Prepoznavanje glasu",
+      description: "Posluša govor vašega otroka in nudi koristne povratne informacije",
+    },
+    {
+      icon: <Stars className="h-10 w-10 text-app-purple" />,
+      title: "Zabavne aktivnosti",
+      description: "Privlačne igre, ki naredijo učenje govora prijetno",
+    },
+    {
+      icon: <Volume2 className="h-10 w-10 text-app-teal" />,
+      title: "Vodnik za izgovorjavo",
+      description: "Jasni avdio primeri pravilne izgovorjave besed",
+    },
+    {
+      icon: <MessageSquare className="h-10 w-10 text-app-orange" />,
+      title: "Interaktivni pogovor",
+      description: "Pogovarjajte se z našim prijaznim zmajčkom za vajo v pogovorih",
+    },
+    {
+      icon: <Zap className="h-10 w-10 text-app-yellow" />,
+      title: "Sledenje napredku",
+      description: "Spremljajte izboljšanje vašega otroka skozi čas",
+    },
+    {
+      icon: <Award className="h-10 w-10 text-app-blue" />,
+      title: "Sistem nagrajevanja",
+      description: "Pridobivajte značke in odklepajte nove zmajčke",
+    },
+  ];
+
+  useEffect(() => {
+    if (!api) return;
+    
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap());
+
+    const onSelect = () => {
+      setCurrent(api.selectedScrollSnap());
+    };
+
+    api.on("select", onSelect);
+    return () => {
+      api.off("select", onSelect);
+    };
+  }, [api]);
+
+  // Desktop view shows grid, mobile view shows carousel
+  if (!isMobile) {
+    return (
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {features.map((feature, index) => (
+          <FeatureCard
+            key={index}
+            icon={feature.icon}
+            title={feature.title}
+            description={feature.description}
+            delay={index + 1}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative">
+      <Carousel setApi={setApi} className="w-full">
+        <CarouselContent>
+          {features.map((feature, index) => (
+            <CarouselItem key={index} className="pl-2 md:basis-1/2 lg:basis-1/3">
+              <FeatureCard
+                icon={feature.icon}
+                title={feature.title}
+                description={feature.description}
+                delay={0}
+              />
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious className="left-0" />
+        <CarouselNext className="right-0" />
+      </Carousel>
+
+      {/* Pagination dots */}
+      <div className="flex justify-center gap-2 mt-4">
+        {Array.from({ length: count }).map((_, i) => (
+          <button
+            key={i}
+            className={cn(
+              "w-2 h-2 rounded-full transition-colors",
+              i === current ? "bg-dragon-green" : "bg-gray-300"
+            )}
+            onClick={() => api?.scrollTo(i)}
+            aria-label={`Go to slide ${i + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
