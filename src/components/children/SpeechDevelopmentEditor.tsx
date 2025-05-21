@@ -3,30 +3,31 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { SpeechDifficultiesStep } from "@/components/SpeechDifficultiesStep";
+import { Button } from "@/components/ui/button";
+import { SpeechDevelopmentQuestions } from "@/components/SpeechDevelopmentQuestions";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-type SpeechDifficultyEditorProps = {
+type SpeechDevelopmentEditorProps = {
   open: boolean;
   onClose: () => void;
   childName: string;
   childIndex: number;
-  initialDifficulties: string[];
+  initialAnswers: Record<string, string>;
 };
 
-export function SpeechDifficultyEditor({ 
-  open, 
-  onClose, 
-  childName, 
-  childIndex, 
-  initialDifficulties 
-}: SpeechDifficultyEditorProps) {
+export function SpeechDevelopmentEditor({
+  open,
+  onClose,
+  childName,
+  childIndex,
+  initialAnswers
+}: SpeechDevelopmentEditorProps) {
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const handleSaveDifficulties = async (selectedDifficulties: string[]) => {
+  const handleSaveDevelopment = async (answers: Record<string, string>) => {
     if (!user) {
-      toast.error("Morate biti prijavljeni za urejanje motenj.");
+      toast.error("Morate biti prijavljeni za urejanje podatkov o razvoju.");
       return;
     }
     
@@ -42,11 +43,11 @@ export function SpeechDifficultyEditor({
       const currentMetadata = currentUser.user_metadata || {};
       const currentChildren = [...(currentMetadata.children || [])];
       
-      // Update difficulties for the specific child
+      // Update development data for the specific child
       if (childIndex >= 0 && childIndex < currentChildren.length) {
         currentChildren[childIndex] = {
           ...currentChildren[childIndex],
-          speechDifficulties: selectedDifficulties
+          speechDevelopment: answers
         };
         
         // Update user metadata
@@ -56,38 +57,33 @@ export function SpeechDifficultyEditor({
         
         if (updateError) throw updateError;
         
-        toast.success("Govorne motnje uspešno posodobljene!");
+        toast.success("Podatki o razvoju uspešno posodobljeni!");
         onClose();
       } else {
-        toast.error("Napaka pri posodobitvi motenj. Indeks ni veljaven.");
+        toast.error("Napaka pri posodobitvi. Indeks ni veljaven.");
       }
       
     } catch (error: any) {
-      console.error("Napaka pri posodobitvi motenj:", error);
-      toast.error("Napaka pri posodobitvi motenj. Poskusite znova.");
+      console.error("Napaka pri posodobitvi podatkov o razvoju:", error);
+      toast.error("Napaka pri posodobitvi. Poskusite znova.");
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleGoBack = () => {
-    onClose();
   };
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">Urejanje govornih motenj</DialogTitle>
+          <DialogTitle className="text-xl font-semibold">Urejanje govornega razvoja</DialogTitle>
         </DialogHeader>
         
         <div className="py-4">
-          <SpeechDifficultiesStep
+          <SpeechDevelopmentQuestions
             childName={childName}
-            onBack={handleGoBack}
-            onSubmit={handleSaveDifficulties}
-            initialDifficulties={initialDifficulties}
-            submitButtonText={isSubmitting ? "Shranjevanje..." : "Shrani spremembe"}
+            onBack={onClose}
+            onSubmit={handleSaveDevelopment}
+            initialAnswers={initialAnswers}
           />
         </div>
       </DialogContent>
