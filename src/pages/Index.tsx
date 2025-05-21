@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -8,8 +7,6 @@ import { Mic, Play, Book, Stars, MessageSquare, Zap, Volume2, Award } from "luci
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SelectChildDialog } from "@/components/SelectChildDialog";
-import { FeaturesCarousel } from "@/components/FeaturesCarousel";
-
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showChildSelector, setShowChildSelector] = useState(false);
@@ -20,11 +17,9 @@ const Index = () => {
   } = useAuth();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
-  
   useEffect(() => {
     setIsVisible(true);
   }, []);
-  
   const handleStartNow = () => {
     // If not logged in, redirect to login page
     if (!user) {
@@ -41,7 +36,6 @@ const Index = () => {
       setShowChildSelector(true);
     }
   };
-  
   const scrollToFeatures = () => {
     const featuresSection = document.getElementById('features');
     if (featuresSection) {
@@ -50,7 +44,6 @@ const Index = () => {
       });
     }
   };
-  
   return <div className="min-h-screen w-full overflow-x-hidden">
       <Header />
       
@@ -101,7 +94,18 @@ const Index = () => {
             </p>
           </div>
           
-          <FeaturesCarousel />
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <FeatureCard icon={<Mic className="h-10 w-10 text-app-blue" />} title="Prepoznavanje glasu" description="Posluša govor vašega otroka in nudi koristne povratne informacije" delay={1} />
+            <FeatureCard icon={<Stars className="h-10 w-10 text-app-purple" />} title="Zabavne aktivnosti" description="Privlačne igre, ki naredijo učenje govora prijetno" delay={2} />
+            <FeatureCard icon={<Volume2 className="h-10 w-10 text-app-teal" />} title="Vodnik za izgovorjavo" description="Jasni avdio primeri pravilne izgovorjave besed" delay={3} />
+            <FeatureCard icon={<MessageSquare className="h-10 w-10 text-app-orange" />} title="Interaktivni pogovor" description="Pogovarjajte se z našim prijaznim zmajčkom za vajo v pogovorih" delay={4} />
+          </div>
+          
+          <div className="mt-16 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <FeatureCard icon={<Zap className="h-10 w-10 text-app-yellow" />} title="Sledenje napredku" description="Spremljajte izboljšanje vašega otroka skozi čas" className="lg:col-span-1" delay={5} />
+            <FeatureCard icon={<Book className="h-10 w-10 text-dragon-green" />} title="Odobreno s strani logopedov" description="Razvito v sodelovanju s profesionalnimi logopedi" className="lg:col-span-1" delay={6} />
+            <FeatureCard icon={<Award className="h-10 w-10 text-app-blue" />} title="Sistem nagrajevanja" description="Pridobivajte značke in odklepajte nove zmajčke" className="lg:col-span-1" delay={7} />
+          </div>
         </div>
       </section>
       
