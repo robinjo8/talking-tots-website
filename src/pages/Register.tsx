@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
@@ -7,15 +6,14 @@ import { ArrowLeft } from "lucide-react";
 import { SpeechDifficultiesStep, SpeechDevelopmentQuestions } from "@/components/speech";
 import { ChildCompletedView } from "@/components/children";
 import { useRegistration, RegistrationStep } from "@/hooks/useRegistration";
-import { AccountInfoForm, SubscriptionOptions, ProgressBar } from "@/components/registration";
+import { AccountInfoForm, ChildInformationForm } from "@/components/registration";
 
 export default function Register() {
   const { 
-    fullName, setFullName,
+    username, setUsername,
     email, setEmail,
     password, setPassword,
     confirmPassword, setConfirmPassword,
-    subscriptionType, setSubscriptionType,
     error, isLoading,
     children, currentStep, 
     selectedChildIndex, setSelectedChildIndex,
@@ -23,37 +21,25 @@ export default function Register() {
     handleSpeechDifficultiesSubmit,
     handleSpeechDevelopmentSubmit,
     addChild, removeChild, updateChildField,
-    handleSubmit, currentChild,
-    totalSteps
+    handleSubmit, currentChild
   } = useRegistration();
 
   return (
     <AuthLayout 
-      title="Registracija" 
-      subtitle="Ustvarite račun in začnite uporabljati aplikacijo."
-      className="max-w-3xl"
+      title="Ustvarite račun" 
+      subtitle="Registrirajte se in začnite uporabljati aplikacijo."
     >
-      <ProgressBar currentStep={currentStep + 1} totalSteps={totalSteps} />
-      
-      {/* Step 1: Subscription and Account Info */}
-      {currentStep === RegistrationStep.SUBSCRIPTION_ACCOUNT_INFO && (
-        <form onSubmit={goToNextStep} className="space-y-8">
+      {currentStep === RegistrationStep.ACCOUNT_INFO && (
+        <form onSubmit={goToNextStep} className="mt-8 space-y-6">
           {error && !error.includes("otrok") && (
             <Alert variant="destructive">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
           
-          {/* Subscription Options */}
-          <SubscriptionOptions 
-            selectedOption={subscriptionType}
-            onOptionChange={setSubscriptionType}
-          />
-          
-          {/* Account Info */}
           <AccountInfoForm 
-            fullName={fullName}
-            setFullName={setFullName}
+            username={username}
+            setUsername={setUsername}
             email={email}
             setEmail={setEmail}
             password={password}
@@ -61,6 +47,26 @@ export default function Register() {
             confirmPassword={confirmPassword}
             setConfirmPassword={setConfirmPassword}
           />
+          
+          <ChildInformationForm 
+            children={children}
+            selectedChildIndex={selectedChildIndex}
+            setSelectedChildIndex={setSelectedChildIndex}
+            removeChild={removeChild}
+            updateChildField={updateChildField}
+            error={error}
+          />
+          
+          {children.some(child => child.isComplete) && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={addChild}
+              className="mt-4 border-dragon-green text-dragon-green hover:bg-dragon-green/10 w-full"
+            >
+              Dodaj otroka
+            </Button>
+          )}
           
           <Button
             type="submit"
@@ -79,116 +85,20 @@ export default function Register() {
         </form>
       )}
 
-      {/* Step 2: Child Information */}
-      {currentStep === RegistrationStep.CHILD_INFO && (
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={goBack}
-              className="flex items-center gap-1"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Nazaj
-            </Button>
-            <h3 className="text-lg font-medium">Podatki o otrocih</h3>
-          </div>
-          
-          <form onSubmit={goToNextStep} className="space-y-6">
-            {error && error.includes("otrok") && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            
-            <div className="p-6 border rounded-lg">
-              <div className="space-y-6">
-                <div>
-                  <label htmlFor="child-name" className="block text-sm font-medium">
-                    Ime otroka
-                  </label>
-                  <input
-                    id="child-name"
-                    value={currentChild.name}
-                    onChange={(e) => updateChildField(currentChild.id, "name", e.target.value)}
-                    placeholder="Vnesite ime otroka"
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <label htmlFor="birth-date" className="block text-sm font-medium">
-                    Datum rojstva otroka
-                  </label>
-                  <Button
-                    id="birth-date"
-                    variant="outline"
-                    onClick={() => {}}
-                    className="w-full justify-start text-left font-normal"
-                  >
-                    {currentChild.birthDate 
-                      ? new Date(currentChild.birthDate).toLocaleDateString('sl-SI') 
-                      : "Izberite datum rojstva"}
-                  </Button>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-2">Spol</label>
-                  <div className="flex space-x-4">
-                    {["M", "Ž", "N"].map(gender => (
-                      <label key={gender} className="flex items-center space-x-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          checked={currentChild.gender === gender}
-                          onChange={() => updateChildField(currentChild.id, "gender", gender)}
-                          className="rounded-full"
-                        />
-                        <span>{gender === "N" ? "Ne želim izbrati" : gender}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-2">Izberi avatarja</label>
-                  <div className="grid grid-cols-4 gap-4 mt-3">
-                    {/* Avatar selection grid here */}
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <Button
-              type="submit"
-              className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6"
-              disabled={isLoading}
-            >
-              Naprej
-            </Button>
-          </form>
-        </div>
-      )}
-
-      {/* Step 3: Speech Difficulties */}
       {currentStep === RegistrationStep.SPEECH_DIFFICULTIES && (
-        <div className="mt-4">
+        <div className="mt-8">
           <SpeechDifficultiesStep
             onBack={goBack}
             onSubmit={handleSpeechDifficultiesSubmit}
             childName={currentChild.name}
             initialDifficulties={currentChild.speechDifficulties}
             submitButtonText="Naprej"
-            showDetailToggle={true}
           />
         </div>
       )}
 
-      {/* Step 4: Speech Development Questions */}
       {currentStep === RegistrationStep.SPEECH_DEVELOPMENT && (
-        <div className="mt-4">
+        <div className="mt-8">
           <SpeechDevelopmentQuestions
             onBack={goBack}
             onSubmit={handleSpeechDevelopmentSubmit}
@@ -198,9 +108,8 @@ export default function Register() {
         </div>
       )}
 
-      {/* Step 5: Review Child */}
       {currentStep === RegistrationStep.REVIEW_CHILD && (
-        <div className="mt-4 space-y-6">
+        <div className="mt-8 space-y-6">
           <div className="flex justify-between items-center">
             <Button
               type="button"
