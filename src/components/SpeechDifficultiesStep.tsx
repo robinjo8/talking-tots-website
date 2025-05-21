@@ -4,7 +4,7 @@ import { SPEECH_DIFFICULTIES } from "@/models/SpeechDifficulties";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, AlertCircle } from "lucide-react";
+import { ArrowLeft, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
 
 interface SpeechDifficultiesStepProps {
   onBack: () => void;
@@ -22,9 +22,20 @@ export function SpeechDifficultiesStep({
   submitButtonText = "Zaključi registracijo"
 }: SpeechDifficultiesStepProps) {
   const [selectedDifficulties, setSelectedDifficulties] = useState<string[]>(initialDifficulties);
+  const [expandedDifficulties, setExpandedDifficulties] = useState<string[]>([]);
 
   const toggleDifficulty = (difficultyId: string) => {
     setSelectedDifficulties(prev => {
+      if (prev.includes(difficultyId)) {
+        return prev.filter(id => id !== difficultyId);
+      } else {
+        return [...prev, difficultyId];
+      }
+    });
+  };
+
+  const toggleExpand = (difficultyId: string) => {
+    setExpandedDifficulties(prev => {
       if (prev.includes(difficultyId)) {
         return prev.filter(id => id !== difficultyId);
       } else {
@@ -57,30 +68,51 @@ export function SpeechDifficultiesStep({
         {SPEECH_DIFFICULTIES.map((difficulty) => (
           <div
             key={difficulty.id}
-            className="flex gap-3 p-4 rounded-lg border border-gray-200 hover:border-dragon-green/50 hover:bg-sky-50/30 transition-colors"
+            className="flex flex-col p-4 rounded-lg border border-gray-200 hover:border-dragon-green/50 hover:bg-sky-50/30 transition-colors"
           >
-            <div className="pt-0.5">
-              <Checkbox
-                id={difficulty.id}
-                checked={selectedDifficulties.includes(difficulty.id)}
-                onCheckedChange={() => toggleDifficulty(difficulty.id)}
-                className="mt-1"
-              />
-            </div>
-            <div className="space-y-1 flex-1">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">{difficulty.icon}</span>
-                <Label
-                  htmlFor={difficulty.id}
-                  className="text-base font-medium cursor-pointer hover:text-dragon-green"
-                >
-                  {difficulty.title}
-                </Label>
+            <div className="flex gap-3">
+              <div className="pt-0.5">
+                <Checkbox
+                  id={difficulty.id}
+                  checked={selectedDifficulties.includes(difficulty.id)}
+                  onCheckedChange={() => toggleDifficulty(difficulty.id)}
+                  className="mt-1"
+                />
               </div>
-              <p className="text-sm text-gray-600">{difficulty.description}</p>
-              {difficulty.example && (
-                <p className="text-sm text-gray-500 italic">{difficulty.example}</p>
-              )}
+              <div className="space-y-1 flex-1">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">{difficulty.icon}</span>
+                    <Label
+                      htmlFor={difficulty.id}
+                      className="text-base font-medium cursor-pointer hover:text-dragon-green"
+                    >
+                      {difficulty.title}
+                    </Label>
+                  </div>
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-6 w-6 p-0" 
+                    onClick={() => toggleExpand(difficulty.id)}
+                  >
+                    {expandedDifficulties.includes(difficulty.id) ? 
+                      <ChevronUp className="h-4 w-4" /> : 
+                      <ChevronDown className="h-4 w-4" />
+                    }
+                  </Button>
+                </div>
+                
+                {expandedDifficulties.includes(difficulty.id) && (
+                  <div className="pt-2 space-y-2">
+                    <p className="text-sm text-gray-600">{difficulty.description}</p>
+                    {difficulty.example && (
+                      <p className="text-sm text-gray-500 italic">{difficulty.example}</p>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         ))}

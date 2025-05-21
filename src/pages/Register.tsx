@@ -13,6 +13,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Trash2, UserX, ArrowLeft } from "lucide-react";
 import { SpeechDifficultiesStep } from "@/components/SpeechDifficultiesStep";
 import { SpeechDifficultiesList } from "@/components/SpeechDifficultiesList";
+import { SpeechDevelopmentQuestions } from "@/components/SpeechDevelopmentQuestions";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 const avatarOptions = [
   { id: 0, src: "", alt: "Brez avatarja" },
@@ -37,14 +42,17 @@ interface ChildProfile {
   id: string;
   name: string;
   gender: string;
+  birthDate: Date | null;
   avatarId: number;
   speechDifficulties?: string[];
+  speechDevelopment?: Record<string, string>;
   isComplete?: boolean;
 }
 
 enum RegistrationStep {
   ACCOUNT_INFO,
   SPEECH_DIFFICULTIES,
+  SPEECH_DEVELOPMENT,
   REVIEW_CHILD
 }
 
@@ -58,7 +66,7 @@ export default function Register() {
   const navigate = useNavigate();
   
   const [children, setChildren] = useState<ChildProfile[]>([
-    { id: crypto.randomUUID(), name: "", gender: "M", avatarId: 1 }
+    { id: crypto.randomUUID(), name: "", gender: "M", birthDate: null, avatarId: 1 }
   ]);
 
   const [currentStep, setCurrentStep] = useState<RegistrationStep>(RegistrationStep.ACCOUNT_INFO);
@@ -108,8 +116,10 @@ export default function Register() {
             children: validChildren.map(child => ({
               name: child.name,
               gender: child.gender,
+              birthDate: child.birthDate ? child.birthDate.toISOString() : null,
               avatarId: child.avatarId,
-              speechDifficulties: child.speechDifficulties || []
+              speechDifficulties: child.speechDifficulties || [],
+              speechDevelopment: child.speechDevelopment || {}
             }))
           }
         }
@@ -171,17 +181,33 @@ export default function Register() {
   const goBack = () => {
     if (currentStep === RegistrationStep.SPEECH_DIFFICULTIES) {
       setCurrentStep(RegistrationStep.ACCOUNT_INFO);
-    } else if (currentStep === RegistrationStep.REVIEW_CHILD) {
+    } else if (currentStep === RegistrationStep.SPEECH_DEVELOPMENT) {
       setCurrentStep(RegistrationStep.SPEECH_DIFFICULTIES);
+    } else if (currentStep === RegistrationStep.REVIEW_CHILD) {
+      setCurrentStep(RegistrationStep.SPEECH_DEVELOPMENT);
     }
   };
 
   const handleSpeechDifficultiesSubmit = (difficulties: string[]) => {
-    // Update the current child's speech difficulties and mark as complete
+    // Update the current child's speech difficulties
     setChildren(prev => 
       prev.map((child, index) => 
         index === selectedChildIndex 
-          ? { ...child, speechDifficulties: difficulties, isComplete: true } 
+          ? { ...child, speechDifficulties: difficulties } 
+          : child
+      )
+    );
+
+    // Move to the speech development step
+    setCurrentStep(RegistrationStep.SPEECH_DEVELOPMENT);
+  };
+
+  const handleSpeechDevelopmentSubmit = (answers: Record<string, string>) => {
+    // Update the current child's speech development answers and mark as complete
+    setChildren(prev => 
+      prev.map((child, index) => 
+        index === selectedChildIndex 
+          ? { ...child, speechDevelopment: answers, isComplete: true } 
           : child
       )
     );
@@ -193,7 +219,7 @@ export default function Register() {
   const addChild = () => {
     setChildren([
       ...children,
-      { id: crypto.randomUUID(), name: "", gender: "M", avatarId: 1 }
+      { id: crypto.randomUUID(), name: "", gender: "M", birthDate: null, avatarId: 1 }
     ]);
     setSelectedChildIndex(children.length);
     setCurrentStep(RegistrationStep.ACCOUNT_INFO);
@@ -338,6 +364,32 @@ export default function Register() {
                         />
                       </div>
                       
+                      <div className="space-y-2">
+                        <Label htmlFor={`birth-date-${child.id}`}>Datum rojstva otroka</Label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              id={`birth-date-${child.id}`}
+                              variant="outline"
+                              className={cn(
+                                "w-full justify-start text-left font-normal",
+                                !child.birthDate && "text-muted-foreground"
+                              )}
+                            >
+                              {child.birthDate ? format(child.birthDate, "dd.MM.yyyy") : "Izberite datum rojstva"}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={child.birthDate || undefined}
+                              onSelect={(date) => updateChildField(child.id, "birthDate", date)}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                      
                       <div>
                         <Label>Spol</Label>
                         <RadioGroup 
@@ -411,6 +463,11 @@ export default function Register() {
                         <p className="text-sm text-gray-600">
                           Spol: {child.gender === "M" ? "Deček" : child.gender === "Ž" ? "Deklica" : "Ni izbrano"}
                         </p>
+                        {child.birthDate && (
+                          <p className="text-sm text-gray-600">
+                            Datum rojstva: {format(child.birthDate, "dd.MM.yyyy")}
+                          </p>
+                        )}
                       </div>
                       <Button
                         type="button"
@@ -462,7 +519,18 @@ export default function Register() {
             onSubmit={handleSpeechDifficultiesSubmit}
             childName={children[selectedChildIndex].name}
             initialDifficulties={children[selectedChildIndex].speechDifficulties}
-            submitButtonText="Shrani"
+            submitButtonText="Naprej"
+          />
+        </div>
+      )}
+
+      {currentStep === RegistrationStep.SPEECH_DEVELOPMENT && (
+        <div className="mt-8">
+          <SpeechDevelopmentQuestions
+            onBack={goBack}
+            onSubmit={handleSpeechDevelopmentSubmit}
+            childName={children[selectedChildIndex].name}
+            initialAnswers={children[selectedChildIndex].speechDevelopment}
           />
         </div>
       )}
@@ -503,6 +571,11 @@ export default function Register() {
                 <p className="text-sm text-gray-600">
                   Spol: {children[selectedChildIndex].gender === "M" ? "Deček" : children[selectedChildIndex].gender === "Ž" ? "Deklica" : "Ni izbrano"}
                 </p>
+                {children[selectedChildIndex].birthDate && (
+                  <p className="text-sm text-gray-600">
+                    Datum rojstva: {format(children[selectedChildIndex].birthDate as Date, "dd.MM.yyyy")}
+                  </p>
+                )}
               </div>
             </div>
             

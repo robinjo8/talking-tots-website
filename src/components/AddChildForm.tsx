@@ -11,6 +11,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserX } from "lucide-react";
 import { SpeechDifficultiesStep } from "./SpeechDifficultiesStep";
 import { SpeechDifficultiesList } from "./SpeechDifficultiesList";
+import { SpeechDevelopmentQuestions } from "./SpeechDevelopmentQuestions";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 // Avatar options for children
 const avatarOptions = [
@@ -35,6 +40,7 @@ const avatarOptions = [
 enum AddChildStep {
   BASIC_INFO,
   SPEECH_DIFFICULTIES,
+  SPEECH_DEVELOPMENT,
   COMPLETED
 }
 
@@ -42,7 +48,9 @@ interface SavedChild {
   name: string;
   gender: string;
   avatarId: number;
+  birthDate: Date | null;
   speechDifficulties: string[];
+  speechDevelopment: Record<string, string>;
 }
 
 export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
@@ -50,7 +58,9 @@ export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
   const [name, setName] = useState("");
   const [gender, setGender] = useState("M");
   const [avatarId, setAvatarId] = useState(1);
+  const [birthDate, setBirthDate] = useState<Date | null>(null);
   const [speechDifficulties, setSpeechDifficulties] = useState<string[]>([]);
+  const [speechDevelopment, setSpeechDevelopment] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState<AddChildStep>(AddChildStep.BASIC_INFO);
   const [savedChildren, setSavedChildren] = useState<SavedChild[]>([]);
@@ -67,6 +77,11 @@ export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
   };
 
   const handleSpeechDifficultiesSubmit = async (difficulties: string[]) => {
+    setSpeechDifficulties(difficulties);
+    setCurrentStep(AddChildStep.SPEECH_DEVELOPMENT);
+  };
+
+  const handleSpeechDevelopmentSubmit = async (developmentAnswers: Record<string, string>) => {
     if (!user) {
       toast.error("Morate biti prijavljeni za dodajanje otroka.");
       return;
@@ -80,7 +95,9 @@ export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
         name: name.trim(),
         gender,
         avatarId,
-        speechDifficulties: difficulties
+        birthDate,
+        speechDifficulties,
+        speechDevelopment: developmentAnswers
       };
       
       setSavedChildren(prev => [...prev, newChild]);
@@ -95,7 +112,14 @@ export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
       const currentChildren = currentMetadata.children || [];
       
       // Add new child
-      const updatedChildren = [...currentChildren, newChild];
+      const updatedChildren = [...currentChildren, {
+        name: name.trim(),
+        gender,
+        avatarId,
+        birthDate: birthDate ? birthDate.toISOString() : null,
+        speechDifficulties,
+        speechDevelopment: developmentAnswers
+      }];
       
       // Update user metadata
       const { error: updateError } = await supabase.auth.updateUser({
@@ -123,11 +147,17 @@ export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
     setCurrentStep(AddChildStep.BASIC_INFO);
   };
 
+  const goBackToSpeechDifficulties = () => {
+    setCurrentStep(AddChildStep.SPEECH_DIFFICULTIES);
+  };
+
   const startNewChild = () => {
     setName("");
     setGender("M");
     setAvatarId(1);
+    setBirthDate(null);
     setSpeechDifficulties([]);
+    setSpeechDevelopment({});
     setCurrentStep(AddChildStep.BASIC_INFO);
   };
 
@@ -158,6 +188,11 @@ export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
               <p className="text-sm text-gray-600">
                 Spol: {lastChild.gender === "M" ? "Deček" : lastChild.gender === "Ž" ? "Deklica" : "Ni izbrano"}
               </p>
+              {lastChild.birthDate && (
+                <p className="text-sm text-gray-600">
+                  Datum rojstva: {format(lastChild.birthDate, "dd.MM.yyyy")}
+                </p>
+              )}
             </div>
           </div>
           
@@ -191,6 +226,17 @@ export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
     );
   }
 
+  if (currentStep === AddChildStep.SPEECH_DEVELOPMENT) {
+    return (
+      <SpeechDevelopmentQuestions
+        onBack={goBackToSpeechDifficulties}
+        onSubmit={handleSpeechDevelopmentSubmit}
+        childName={name}
+        initialAnswers={speechDevelopment}
+      />
+    );
+  }
+
   if (currentStep === AddChildStep.SPEECH_DIFFICULTIES) {
     return (
       <SpeechDifficultiesStep
@@ -198,7 +244,7 @@ export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
         onSubmit={handleSpeechDifficultiesSubmit}
         childName={name}
         initialDifficulties={speechDifficulties}
-        submitButtonText="Shrani"
+        submitButtonText="Naprej"
       />
     );
   }
@@ -218,6 +264,32 @@ export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
             className="mt-1"
             required
           />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="birth-date">Datum rojstva otroka</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                id="birth-date"
+                variant="outline"
+                className={cn(
+                  "w-full justify-start text-left font-normal",
+                  !birthDate && "text-muted-foreground"
+                )}
+              >
+                {birthDate ? format(birthDate, "dd.MM.yyyy") : "Izberite datum rojstva"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={birthDate}
+                onSelect={setBirthDate}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
         </div>
         
         <div>
