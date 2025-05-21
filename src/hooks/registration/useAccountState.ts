@@ -15,19 +15,30 @@ export function useAccountState() {
     
     setIsCheckingEmail(true);
     try {
-      // Use a more reliable method to check if the email exists
+      // Use a more reliable approach to check if email exists
       const { data, error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          shouldCreateUser: false, // Only check if user exists, don't create or send OTP
+          shouldCreateUser: false, // Don't create a new user, just check if it exists
         }
       });
       
-      // If there's no error about user not existing, it means the user exists
-      const userExists = !error || !error.message.includes("not found");
+      // If there's an error with "otp_disabled", the login was not rejected due to a missing user
+      // This implies that the user exists but OTP is disabled (normal case for password accounts)
+      if (error && error.message.includes("otp_disabled")) {
+        console.log("Email check result: true for email:", email);
+        return true;
+      }
       
-      console.log("Email check result:", userExists, "for email:", email);
-      return userExists;
+      // If we got a "Signups not allowed for otp" error, this means the account doesn't exist
+      if (error && error.message.includes("not allowed for otp")) {
+        console.log("Email check result: false for email:", email);
+        return false;
+      }
+      
+      // Default to assuming user exists if we get an unexpected response
+      console.log("Email check result: false for email:", email);
+      return false;
     } catch (error) {
       console.error("Error checking email:", error);
       return false;
