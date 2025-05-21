@@ -112,11 +112,11 @@ export default function Register() {
               <ArrowLeft className="h-4 w-4" />
               Nazaj
             </Button>
-            <h3 className="text-lg font-medium">Izbira naročnine</h3>
+            
           </div>
           
           <div>
-            <h3 className="text-xl font-extrabold text-dragon-green mb-4">Začnite 7-dnevni brezplačni preizkus</h3>
+            <h3 className="text-2xl font-bold font-extrabold text-dragon-green mb-4 text-center">Začnite 7-dnevni brezplačni preizkus</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               {subscriptionOptions.map(option => <div key={option.id} className={`border rounded-lg p-4 cursor-pointer ${selectedPlan === option.fullName ? "border-dragon-green bg-green-50" : "hover:bg-gray-50"}`} onClick={() => setSelectedPlan(option.fullName)}>
