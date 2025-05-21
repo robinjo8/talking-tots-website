@@ -5,3 +5,4 @@ export { SpeechDifficultyList } from "./SpeechDifficultyList";
 export { SpeechDifficultyItem } from "./SpeechDifficultyItem";
 export { DevelopmentQuestionItem } from "./DevelopmentQuestionItem";
 export { SpeechHeader } from "./SpeechHeader";
+export { SpeechDifficultyBadge } from "./SpeechDifficultyBadge";
