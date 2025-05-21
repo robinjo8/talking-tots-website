@@ -29,12 +29,15 @@ export function useAccountState() {
         
         // If error message contains "Invalid login credentials" then the email exists
         // but password is wrong, which means the email is registered
-        return signInError?.message.includes("Invalid login credentials");
+        return signInError?.message?.includes("Invalid login credentials") || false;
       }
       
       // If we can access admin functions, check if the email exists in the list
       if (data?.users) {
-        return data.users.some(user => user.email === email);
+        return data.users.some(user => {
+          // Safely check if user has an email property before comparing
+          return user && typeof user === 'object' && 'email' in user && user.email === email;
+        });
       }
       
       return false;
