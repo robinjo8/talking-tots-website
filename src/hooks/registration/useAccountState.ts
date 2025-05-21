@@ -15,17 +15,29 @@ export function useAccountState() {
     
     setIsCheckingEmail(true);
     try {
-      const { data, error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          shouldCreateUser: false
-        }
-      });
+      // Using a more reliable method to check if an email exists
+      const { data, error } = await supabase.auth.admin.listUsers();
       
-      // If no error is returned when attempting to sign in, the email exists
-      // The API doesn't give us a clean way to check just for existence
-      // If error.message includes "User already registered", then the email exists
-      return !error?.message.includes("not found");
+      // If we can't access admin functions, fall back to a sign-in attempt
+      // which will tell us if the user exists
+      if (error) {
+        console.log("Falling back to signIn method for email check");
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password: "dummy_password_for_check_only"
+        });
+        
+        // If error message contains "Invalid login credentials" then the email exists
+        // but password is wrong, which means the email is registered
+        return signInError?.message.includes("Invalid login credentials");
+      }
+      
+      // If we can access admin functions, check if the email exists in the list
+      if (data?.users) {
+        return data.users.some(user => user.email === email);
+      }
+      
+      return false;
     } catch (error) {
       console.error("Error checking email:", error);
       return false;

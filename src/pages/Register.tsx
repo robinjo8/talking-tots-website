@@ -29,6 +29,29 @@ export default function Register() {
     getTotalSteps, getCurrentStep
   } = useRegistration();
 
+  // Define consistent subscription options
+  const subscriptionOptions = [
+    {
+      id: "monthly",
+      name: "Mesečna naročnina",
+      fullName: "Mesečna naročnina - 19,90 € / mesec",
+      price: "19,90 €",
+      period: "mesec",
+      billing: "Zaračunano mesečno po koncu preizkusa",
+      discount: false
+    },
+    {
+      id: "yearly",
+      name: "Letna naročnina",
+      fullName: "Letna naročnina - 9,90 € / mesec (plačilo letno)",
+      price: "9,90 €",
+      period: "mesec",
+      billing: "Zaračunano letno po koncu preizkusa",
+      discount: true,
+      discountPercent: "PRIHRANEK 50%"
+    }
+  ];
+
   return (
     <AuthLayout 
       title="Ustvarite račun" 
@@ -57,40 +80,29 @@ export default function Register() {
               <h3 className="font-medium mb-4">Začnite 7-dnevni brezplačni preizkus</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div 
-                  className={`border rounded-lg p-4 cursor-pointer ${selectedPlan === "Mesečna naročnina - 9,99 € / mesec" ? "border-dragon-green bg-green-50" : "hover:bg-gray-50"}`}
-                  onClick={() => setSelectedPlan("Mesečna naročnina - 9,99 € / mesec")}
-                >
-                  <div className="flex justify-between items-center mb-2">
-                    <h4 className="font-medium">Mesečno</h4>
-                    <div className="h-4 w-4 rounded-full border border-dragon-green flex items-center justify-center">
-                      {selectedPlan === "Mesečna naročnina - 9,99 € / mesec" && (
-                        <div className="h-2 w-2 rounded-full bg-dragon-green"></div>
-                      )}
+                {subscriptionOptions.map(option => (
+                  <div 
+                    key={option.id}
+                    className={`border rounded-lg p-4 cursor-pointer ${selectedPlan === option.fullName ? "border-dragon-green bg-green-50" : "hover:bg-gray-50"}`}
+                    onClick={() => setSelectedPlan(option.fullName)}
+                  >
+                    <div className="flex justify-between items-center mb-2">
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-medium">{option.name}</h4>
+                        {option.discount && (
+                          <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded">{option.discountPercent}</span>
+                        )}
+                      </div>
+                      <div className="h-4 w-4 rounded-full border border-dragon-green flex items-center justify-center">
+                        {selectedPlan === option.fullName && (
+                          <div className="h-2 w-2 rounded-full bg-dragon-green"></div>
+                        )}
+                      </div>
                     </div>
+                    <p className="font-bold text-xl">{option.price} <span className="text-gray-500 text-sm font-normal">/ {option.period}</span></p>
+                    <p className="text-sm text-gray-600 mt-1">{option.billing}</p>
                   </div>
-                  <p className="font-bold text-xl">9,99 € <span className="text-gray-500 text-sm font-normal">/ mesec</span></p>
-                  <p className="text-sm text-gray-600 mt-1">Zaračunano mesečno po koncu preizkusa</p>
-                </div>
-                
-                <div 
-                  className={`border rounded-lg p-4 cursor-pointer ${selectedPlan === "Letna naročnina - 99,00 € / leto" ? "border-dragon-green bg-green-50" : "hover:bg-gray-50"}`}
-                  onClick={() => setSelectedPlan("Letna naročnina - 99,00 € / leto")}
-                >
-                  <div className="flex justify-between items-center mb-2">
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-medium">Letno</h4>
-                      <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded">PRIHRANEK 17%</span>
-                    </div>
-                    <div className="h-4 w-4 rounded-full border border-dragon-green flex items-center justify-center">
-                      {selectedPlan === "Letna naročnina - 99,00 € / leto" && (
-                        <div className="h-2 w-2 rounded-full bg-dragon-green"></div>
-                      )}
-                    </div>
-                  </div>
-                  <p className="font-bold text-xl">99,00 € <span className="text-gray-500 text-sm font-normal">/ leto</span></p>
-                  <p className="text-sm text-gray-600 mt-1">Zaračunano letno po koncu preizkusa</p>
-                </div>
+                ))}
               </div>
             </div>
             

@@ -18,6 +18,25 @@ export function PaymentConfirmationForm({ selectedPlan }: PaymentConfirmationFor
   const [cvc, setCvc] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  // Format the price and billing frequency based on the selected plan
+  const getPlanDetails = () => {
+    if (selectedPlan.includes("Letna naročnina")) {
+      return {
+        name: "Letna naročnina",
+        price: "9,90 €",
+        frequency: "mesec (plačilo letno)"
+      };
+    } else {
+      return {
+        name: "Mesečna naročnina",
+        price: "19,90 €",
+        frequency: "mesec (plačilo mesečno)"
+      };
+    }
+  };
+
+  const planDetails = getPlanDetails();
+
   const formatCardNumber = (value: string) => {
     // Remove all non-digits
     const digits = value.replace(/\D/g, "");
@@ -72,7 +91,10 @@ export function PaymentConfirmationForm({ selectedPlan }: PaymentConfirmationFor
             <Check className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="font-semibold text-lg">Izbrani paket: {selectedPlan}</h3>
+            <h3 className="font-semibold text-lg">Izbrani paket: {planDetails.name}</h3>
+            <p className="text-gray-600 mt-1">
+              <span className="font-medium">{planDetails.price} / {planDetails.frequency}</span>
+            </p>
             <p className="text-gray-600 mt-1">
               Vaš 7-dnevni brezplačni preizkus se začne danes. Po tem obdobju bo zaračunana izbrana naročnina.
             </p>
