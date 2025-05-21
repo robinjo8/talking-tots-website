@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -9,6 +10,7 @@ import { Menu, BookOpen, UserPlus } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { MobileMenu } from "@/components/MobileMenu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+
 export default function Header() {
   const {
     user,
@@ -21,13 +23,34 @@ export default function Header() {
   const {
     setOpenMobile
   } = useSidebar();
+  
   const selectedChild = selectedChildIndex !== null && profile?.children ? profile.children[selectedChildIndex] : null;
+  
   const handleNavigate = (path: string, options?: {
     expandSection?: string;
   }) => {
     navigate(path);
     if (options?.expandSection) {
       localStorage.setItem('expandSection', options.expandSection);
+    }
+  };
+
+  const handleStartNow = () => {
+    // If not logged in, redirect to login page
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    
+    // If logged in, continue with existing behavior
+    if (selectedChildIndex !== null && profile?.children) {
+      navigate("/moja-stran");
+    } else if (profile?.children?.length === 0) {
+      navigate("/profile");
+    } else {
+      // We'll need to show the child selector dialog
+      // For now, just navigate to the profile page
+      navigate("/profile");
     }
   };
 
@@ -63,7 +86,9 @@ export default function Header() {
   const isActivePath = (path: string) => {
     return location.pathname === path;
   };
-  return <header className="py-4 px-4 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
+  
+  return (
+    <header className="py-4 px-4 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <Link to="/" className="flex items-center gap-2">
           <div className="flex items-center">
@@ -73,19 +98,24 @@ export default function Header() {
         </Link>
         
         <div className="flex items-center gap-3">
-          {isMobile && selectedChild && <div className="flex items-center gap-2">
-              {selectedChild.avatarId > 0 && <Avatar className="h-6 w-6 border border-green-200">
+          {isMobile && selectedChild && (
+            <div className="flex items-center gap-2">
+              {selectedChild.avatarId > 0 && (
+                <Avatar className="h-6 w-6 border border-green-200">
                   <AvatarImage src={getAvatarSrc(selectedChild.avatarId)} alt={selectedChild.name} className="object-contain" />
                   <AvatarFallback className="bg-green-100 text-green-800">
                     {selectedChild.name[0]}
                   </AvatarFallback>
-                </Avatar>}
+                </Avatar>
+              )}
               <span className="text-sm font-medium text-muted-foreground">
                 {selectedChild.name}
               </span>
-            </div>}
+            </div>
+          )}
           
-          {isMobile ? <Sheet>
+          {isMobile ? (
+            <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="sm" className="flex items-center">
                   <Menu className="h-5 w-5" />
@@ -94,18 +124,40 @@ export default function Header() {
               <SheetContent side="right" className="p-0">
                 <MobileMenu onItemClick={() => {}} />
               </SheetContent>
-            </Sheet> : <nav className="flex items-center gap-6">
-              {user && <>
+            </Sheet>
+          ) : (
+            <nav className="flex items-center gap-6">
+              {user && (
+                <>
                   {/* Desktop Navigation Links */}
-                  {navigationLinks.map((link, index) => <Button key={index} variant="ghost" onClick={() => !link.disabled && handleNavigate(link.path)} disabled={link.disabled} className="">
+                  {navigationLinks.map((link, index) => (
+                    <Button 
+                      key={index} 
+                      variant="ghost" 
+                      onClick={() => !link.disabled && handleNavigate(link.path)} 
+                      disabled={link.disabled}
+                    >
                       {link.label === "Logopedski kotiček" && <BookOpen className="h-4 w-4 mr-2" />}
                       {link.label}
-                    </Button>)}
-                </>}
+                    </Button>
+                  ))}
+                </>
+              )}
 
-              {user ? <div className="flex items-center gap-2">
+              {user ? (
+                <div className="flex items-center gap-2">
                   <UserProfile />
-                </div> : <div className="flex items-center gap-3">
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  {/* New orange "Začni zdaj" button */}
+                  <Button 
+                    onClick={handleStartNow}
+                    className="bg-app-orange hover:bg-app-orange/90 text-white rounded-full"
+                    size="sm"
+                  >
+                    Začni zdaj
+                  </Button>
                   <Link to="/register">
                     <Button variant="outline" size="sm" className="text-sm">
                       <UserPlus className="h-4 w-4 mr-1" />
@@ -117,9 +169,12 @@ export default function Header() {
                       Prijava
                     </Button>
                   </Link>
-                </div>}
-            </nav>}
+                </div>
+              )}
+            </nav>
+          )}
         </div>
       </div>
-    </header>;
+    </header>
+  );
 }

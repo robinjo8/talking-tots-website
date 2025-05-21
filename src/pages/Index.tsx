@@ -48,12 +48,12 @@ const Index = () => {
     <div className="min-h-screen w-full overflow-x-hidden">
       <Header />
       
-      {/* Hero Section - Moved closer to header */}
-      <section className="pt-10 md:pt-24 pb-6 md:pb-12 px-4 md:px-10 relative w-full">
+      {/* Hero Section - Improved layout */}
+      <section className="pt-16 md:pt-28 pb-10 md:pb-16 px-4 md:px-10 relative w-full">
         <div className="absolute -top-10 -left-10 w-32 h-32 bg-app-yellow/20 rounded-full blur-3xl"></div>
         <div className="absolute top-40 -right-10 w-60 h-60 bg-app-blue/20 rounded-full blur-3xl"></div>
         
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-4 md:gap-10 items-center">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 md:gap-12 items-center">
           <div className={`${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'} transition-all duration-700 ease-out`}>
             <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold mb-4 md:mb-6">
               Naredimo govor <span className="rainbow-text">zabaven</span> – za male junake!
@@ -61,6 +61,31 @@ const Index = () => {
             <p className="text-lg md:text-xl mb-6 md:mb-8 text-muted-foreground max-w-xl">
               Tomi Talk otrokom pomaga pri učenju govora skozi igro z našim prijaznim zmajčkom Tomijem. Govorjenje še nikoli ni bilo tako zabavno!
             </p>
+            
+            {/* Action Buttons - Moved to hero text section */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button 
+                size="lg" 
+                className="w-full sm:w-auto bg-app-orange hover:bg-app-orange/90 text-white rounded-full min-w-[180px]"
+                onClick={handleStartNow}
+              >
+                Začni zdaj
+              </Button>
+              <Button 
+                size="lg" 
+                className="w-full sm:w-auto bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full min-w-[180px]"
+              >
+                <Play className="mr-2 h-4 w-4" /> Poglej demo
+              </Button>
+              <Button 
+                size="lg" 
+                className="w-full sm:w-auto bg-transparent hover:bg-gray-100 text-gray-700 border border-gray-300 rounded-full min-w-[180px]"
+                variant="outline"
+                onClick={scrollToFeatures}
+              >
+                Več info
+              </Button>
+            </div>
           </div>
           
           <div className={`relative ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'} transition-all duration-700 ease-out delay-300`}>
@@ -68,35 +93,11 @@ const Index = () => {
             <div className="animate-float relative">
               <img 
                 alt="Tomi Talk Dragon Mascot" 
-                className="w-3/4 md:w-full max-w-md mx-auto" 
+                className="w-full max-w-md mx-auto" 
                 src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" 
               />
             </div>
           </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="mt-4 md:mt-6 flex flex-col md:flex-row gap-3 justify-center items-center px-4">
-          <Button 
-            size="lg" 
-            className="w-full md:w-auto bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full min-w-[200px]"
-            onClick={handleStartNow}
-          >
-            Začni zdaj
-          </Button>
-          <Button 
-            size="lg" 
-            className="w-full md:w-auto bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full min-w-[200px]"
-          >
-            <Play className="mr-2 h-4 w-4" /> Poglej demo
-          </Button>
-          <Button 
-            size="lg" 
-            className="w-full md:w-auto bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full min-w-[200px]"
-            onClick={scrollToFeatures}
-          >
-            Poglej kako zmajček Tomi pomaga
-          </Button>
         </div>
       </section>
 
