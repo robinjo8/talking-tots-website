@@ -10,13 +10,11 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 export const FeaturesCarousel = () => {
   const [api, setApi] = useState<any>(null);
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
-  const isMobile = useIsMobile();
 
   const features = [
     {
@@ -72,23 +70,6 @@ export const FeaturesCarousel = () => {
     };
   }, [api]);
 
-  // Desktop view shows grid, mobile view shows carousel
-  if (!isMobile) {
-    return (
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {features.map((feature, index) => (
-          <FeatureCard
-            key={index}
-            icon={feature.icon}
-            title={feature.title}
-            description={feature.description}
-            delay={index + 1}
-          />
-        ))}
-      </div>
-    );
-  }
-
   return (
     <div className="relative w-full overflow-hidden">
       <Carousel 
@@ -101,7 +82,7 @@ export const FeaturesCarousel = () => {
       >
         <CarouselContent className="-ml-2 md:-ml-4">
           {features.map((feature, index) => (
-            <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3 min-w-0">
+            <CarouselItem key={index} className="pl-2 md:pl-4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 min-w-0">
               <FeatureCard
                 icon={feature.icon}
                 title={feature.title}
