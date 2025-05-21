@@ -16,17 +16,23 @@ export interface ChildProfile {
 }
 
 export enum RegistrationStep {
-  ACCOUNT_INFO,
-  SPEECH_DIFFICULTIES,
-  SPEECH_DEVELOPMENT,
-  REVIEW_CHILD
+  SUBSCRIPTION_ACCOUNT_INFO = 0,
+  CHILD_INFO = 1,
+  SPEECH_DIFFICULTIES = 2,
+  SPEECH_DEVELOPMENT = 3,
+  REVIEW_CHILD = 4
 }
 
 export function useRegistration() {
-  const [username, setUsername] = useState("");
+  // Account information
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  
+  // Subscription option
+  const [subscriptionType, setSubscriptionType] = useState("monthly");
+  
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -35,19 +41,19 @@ export function useRegistration() {
     { id: crypto.randomUUID(), name: "", gender: "M", birthDate: null, avatarId: 1 }
   ]);
 
-  const [currentStep, setCurrentStep] = useState<RegistrationStep>(RegistrationStep.ACCOUNT_INFO);
+  const [currentStep, setCurrentStep] = useState<RegistrationStep>(RegistrationStep.SUBSCRIPTION_ACCOUNT_INFO);
   const [selectedChildIndex, setSelectedChildIndex] = useState(0);
 
   const currentChild = children[selectedChildIndex];
 
   const validateAccountInfo = (): boolean => {
-    if (!username || !email || !password || !confirmPassword) {
+    if (!fullName || !email || !password || !confirmPassword) {
       setError("Prosimo, izpolnite vsa obvezna polja.");
       return false;
     }
     
-    if (username.length < 3) {
-      setError("Uporabniško ime mora vsebovati vsaj 3 znake.");
+    if (fullName.length < 3) {
+      setError("Ime in priimek morata vsebovati vsaj 3 znake.");
       return false;
     }
     
@@ -61,9 +67,18 @@ export function useRegistration() {
       return false;
     }
     
+    return true;
+  };
+
+  const validateChildInfo = (): boolean => {
     // Check if current child has name
     if (!currentChild.name.trim()) {
       setError("Prosimo, vnesite ime otroka.");
+      return false;
+    }
+
+    if (!currentChild.birthDate) {
+      setError("Prosimo, izberite datum rojstva otroka.");
       return false;
     }
 
@@ -73,16 +88,22 @@ export function useRegistration() {
   const goToNextStep = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (currentStep === RegistrationStep.ACCOUNT_INFO) {
+    if (currentStep === RegistrationStep.SUBSCRIPTION_ACCOUNT_INFO) {
       if (!validateAccountInfo()) return;
+      setCurrentStep(RegistrationStep.CHILD_INFO);
+      setError(null);
+    } else if (currentStep === RegistrationStep.CHILD_INFO) {
+      if (!validateChildInfo()) return;
       setCurrentStep(RegistrationStep.SPEECH_DIFFICULTIES);
       setError(null);
     }
   };
 
   const goBack = () => {
-    if (currentStep === RegistrationStep.SPEECH_DIFFICULTIES) {
-      setCurrentStep(RegistrationStep.ACCOUNT_INFO);
+    if (currentStep === RegistrationStep.CHILD_INFO) {
+      setCurrentStep(RegistrationStep.SUBSCRIPTION_ACCOUNT_INFO);
+    } else if (currentStep === RegistrationStep.SPEECH_DIFFICULTIES) {
+      setCurrentStep(RegistrationStep.CHILD_INFO);
     } else if (currentStep === RegistrationStep.SPEECH_DEVELOPMENT) {
       setCurrentStep(RegistrationStep.SPEECH_DIFFICULTIES);
     } else if (currentStep === RegistrationStep.REVIEW_CHILD) {
@@ -118,7 +139,7 @@ export function useRegistration() {
       { id: crypto.randomUUID(), name: "", gender: "M", birthDate: null, avatarId: 1 }
     ]);
     setSelectedChildIndex(children.length);
-    setCurrentStep(RegistrationStep.ACCOUNT_INFO);
+    setCurrentStep(RegistrationStep.CHILD_INFO);
   };
 
   const removeChild = (id: string) => {
@@ -164,7 +185,8 @@ export function useRegistration() {
         password,
         options: {
           data: {
-            username: username,
+            fullName: fullName,
+            subscriptionType: subscriptionType,
             children: validChildren.map(child => ({
               name: child.name,
               gender: child.gender,
@@ -194,14 +216,16 @@ export function useRegistration() {
   };
 
   return {
-    username,
-    setUsername,
+    fullName,
+    setFullName,
     email,
     setEmail,
     password,
     setPassword,
     confirmPassword,
     setConfirmPassword,
+    subscriptionType,
+    setSubscriptionType,
     isLoading,
     error,
     setError,
@@ -217,6 +241,7 @@ export function useRegistration() {
     removeChild,
     updateChildField,
     handleSubmit,
-    currentChild
+    currentChild,
+    totalSteps: Object.keys(RegistrationStep).length / 2
   };
 }

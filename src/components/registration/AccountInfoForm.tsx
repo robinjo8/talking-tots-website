@@ -4,8 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 type AccountInfoFormProps = {
-  username: string;
-  setUsername: (value: string) => void;
+  fullName: string;
+  setFullName: (value: string) => void;
   email: string;
   setEmail: (value: string) => void;
   password: string;
@@ -15,8 +15,8 @@ type AccountInfoFormProps = {
 };
 
 export function AccountInfoForm({
-  username,
-  setUsername,
+  fullName,
+  setFullName,
   email,
   setEmail,
   password,
@@ -26,14 +26,16 @@ export function AccountInfoForm({
 }: AccountInfoFormProps) {
   return (
     <div className="space-y-4">
+      <h3 className="text-xl font-medium mb-3">Uporabniški podatki</h3>
+      
       <div className="space-y-2">
-        <Label htmlFor="username">Uporabniško ime</Label>
+        <Label htmlFor="fullName">Ime in priimek</Label>
         <Input
-          id="username"
+          id="fullName"
           type="text"
-          placeholder="Izberite uporabniško ime"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Vnesite vaše ime in priimek"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
           className="rounded-md text-base"
           required
         />
@@ -76,6 +78,15 @@ export function AccountInfoForm({
           className="rounded-md text-base"
           required
         />
+      </div>
+      
+      <div className="mt-6 pt-4 border-t border-gray-200">
+        <h3 className="text-xl font-medium mb-3">Plačilni podatki</h3>
+        <div className="bg-amber-50 border border-amber-100 rounded-lg p-4 text-sm">
+          <p className="text-amber-800">
+            Na voljo imate 7-dnevni brezplačni preizkus. Po tem obdobju bo zaračunana izbrana naročnina.
+          </p>
+        </div>
       </div>
     </div>
   );
