@@ -78,7 +78,7 @@ export function PaymentConfirmationForm({
       
       <Card className="p-6 border-blue-200 bg-blue-50">
         <div className="flex items-start gap-4">
-          <div className="bg-green-100 p-1.5 rounded-full text-green-700 mt-1">
+          <div className="bg-blue-100 p-1.5 rounded-full text-black-700 mt-1">
             <Check className="h-5 w-5" />
           </div>
           <div>
