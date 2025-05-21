@@ -38,7 +38,7 @@ export function useRegistrationValidation() {
       return false;
     }
 
-    // Check if email already exists
+    // Check if email already exists - this is a critical check
     const emailExists = await checkEmailExists(email);
     if (emailExists) {
       setError("Uporabnik s tem e-poštnim naslovom že obstaja.");
