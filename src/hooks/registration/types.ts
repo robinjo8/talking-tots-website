@@ -9,7 +9,7 @@ export enum RegistrationStep {
 export interface ChildProfile {
   id: string;
   name: string;
-  gender: "M" | "F";
+  gender: "M" | "F" | "N";  // Updated to include "N" option
   birthDate: Date | null;
   avatarId?: number;
   speechDifficulties?: string[];

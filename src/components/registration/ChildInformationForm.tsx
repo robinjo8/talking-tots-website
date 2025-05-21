@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +9,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { ChildProfile } from "@/hooks/useRegistration";
+import { ChildProfile } from "@/hooks/registration/types";
 import { avatarOptions } from "@/components/AvatarSelector";
 
 type ChildInformationFormProps = {
@@ -30,6 +29,17 @@ export function ChildInformationForm({
   updateChildField,
   error
 }: ChildInformationFormProps) {
+  // Function to get gender display text
+  const getGenderDisplayText = (gender: string): string => {
+    switch(gender) {
+      case "M": return "Deček";
+      case "Ž": return "Deklica";
+      case "F": return "Deklica"; // Handle old format "F" as "Deklica"
+      case "N": return "Ni izbrano";
+      default: return "Ni izbrano";
+    }
+  };
+  
   return (
     <div className="pt-4 border-t">
       <h3 className="text-lg font-medium mb-4">Podatki o otrocih</h3>
@@ -177,7 +187,7 @@ export function ChildInformationForm({
                 <div>
                   <p className="font-medium">{child.name || "Brez imena"}</p>
                   <p className="text-sm text-gray-600">
-                    Spol: {child.gender === "M" ? "Deček" : child.gender === "Ž" ? "Deklica" : "Ni izbrano"}
+                    Spol: {getGenderDisplayText(child.gender)}
                   </p>
                   {child.birthDate && (
                     <p className="text-sm text-gray-600">

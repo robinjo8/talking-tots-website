@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { SpeechDifficultiesStep, SpeechDevelopmentQuestions } from "@/components/speech";
 import { ChildBasicInfoForm } from "./children/ChildBasicInfoForm";
 import { ChildCompletedView } from "./children/ChildCompletedView";
+import { ChildProfile } from "@/hooks/registration/types";
 
 enum AddChildStep {
   BASIC_INFO,
@@ -15,9 +16,9 @@ enum AddChildStep {
 }
 
 interface SavedChild {
-  id: string; // Adding the required id property
+  id: string;
   name: string;
-  gender: string;
+  gender: "M" | "F" | "N"; // Update to match supported gender values
   avatarId: number;
   birthDate: Date | null;
   speechDifficulties: string[];
@@ -66,7 +67,7 @@ export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
       const newChild: SavedChild = {
         id: newChildId,
         name: name.trim(),
-        gender,
+        gender: gender as "M" | "F" | "N", // Cast to appropriate type
         avatarId,
         birthDate,
         speechDifficulties,
