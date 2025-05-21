@@ -22,16 +22,24 @@ export function useAccountState() {
     
     setIsCheckingEmail(true);
     try {
-      // Try a sign-in attempt with a dummy password
-      // If we get "Invalid login credentials", the email exists
-      // If we get another error or no error, the email doesn't exist
-      const { error } = await supabase.auth.signInWithPassword({
+      // Try to sign up with the email and a temporary password
+      // If we get "User already registered", the email exists
+      const { error } = await supabase.auth.signUp({
         email,
-        password: "dummy_password_for_check_only"
+        password: "TempPassword123!", // Temporary password for checking only
+        options: {
+          emailRedirectTo: window.location.origin + "/register",
+        }
       });
       
-      // Check for the specific error that indicates the email exists
-      const emailExists = error?.message?.includes("Invalid login credentials") || false;
+      // Log the full error for debugging
+      console.log("Email check full error:", error);
+      
+      // If error contains "User already registered" or "Email already in use",
+      // then the email exists in the system
+      const emailExists = error?.message?.includes("already registered") || 
+                         error?.message?.includes("already in use") || 
+                         false;
       
       console.log("Email check result:", emailExists, "for email:", email);
       return emailExists;
