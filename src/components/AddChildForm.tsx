@@ -1,10 +1,8 @@
-
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { SpeechDifficultiesStep } from "./SpeechDifficultiesStep";
-import { SpeechDevelopmentQuestions } from "./SpeechDevelopmentQuestions";
+import { SpeechDifficultiesStep, SpeechDevelopmentQuestions } from "@/components/speech";
 import { ChildBasicInfoForm } from "./children/ChildBasicInfoForm";
 import { ChildCompletedView } from "./children/ChildCompletedView";
 

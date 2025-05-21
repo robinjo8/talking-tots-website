@@ -1,9 +1,8 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ArrowLeft } from "lucide-react";
+import { SpeechHeader } from "./SpeechHeader";
+import { DevelopmentQuestionItem } from "./DevelopmentQuestionItem";
 
 interface SpeechDevelopmentQuestion {
   id: string;
@@ -105,41 +104,22 @@ export function SpeechDevelopmentQuestions({
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={onBack}
-          className="flex items-center gap-1"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Nazaj
-        </Button>
-        <h3 className="text-lg font-medium">Govorni razvoj za {childName}</h3>
-      </div>
+      <SpeechHeader 
+        onBack={onBack} 
+        childName={childName}
+        title="Govorni razvoj za"
+      />
 
       <div className="space-y-6">
         {SPEECH_DEVELOPMENT_QUESTIONS.map((question) => (
-          <div key={question.id} className="border border-gray-200 rounded-lg p-4">
-            <Label className="text-base font-medium mb-3 block">
-              {question.question}
-            </Label>
-            <RadioGroup
-              value={answers[question.id] || ""}
-              onValueChange={(value) => handleAnswer(question.id, value)}
-              className="space-y-2"
-            >
-              {question.options.map((option) => (
-                <div key={option.value} className="flex items-center space-x-2">
-                  <RadioGroupItem value={option.value} id={`${question.id}-${option.value}`} />
-                  <Label htmlFor={`${question.id}-${option.value}`} className="cursor-pointer">
-                    {option.label}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
-          </div>
+          <DevelopmentQuestionItem
+            key={question.id}
+            id={question.id}
+            question={question.question}
+            options={question.options}
+            selectedValue={answers[question.id] || ""}
+            onValueChange={handleAnswer}
+          />
         ))}
       </div>
 

@@ -1,11 +1,9 @@
-
 import { Link } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ArrowLeft } from "lucide-react";
-import { SpeechDifficultiesStep } from "@/components/SpeechDifficultiesStep";
-import { SpeechDevelopmentQuestions } from "@/components/SpeechDevelopmentQuestions";
+import { SpeechDifficultiesStep, SpeechDevelopmentQuestions } from "@/components/speech";
 import { ChildCompletedView } from "@/components/children";
 import { useRegistration, RegistrationStep } from "@/hooks/useRegistration";
 import { AccountInfoForm, ChildInformationForm } from "@/components/registration";
