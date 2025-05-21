@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from "react";
-import { Mic, Stars, Volume2, MessageSquare, Zap, Book, Award } from "lucide-react";
+import { Mic, Stars, Volume2, MessageSquare, Zap, Book, Award, ChevronLeft, ChevronRight } from "lucide-react";
 import FeatureCard from "@/components/FeatureCard";
 import {
   Carousel,
@@ -138,15 +138,19 @@ export const FeaturesCarousel = () => {
           ))}
         </CarouselContent>
         <CarouselPrevious 
-          className="left-0 md:-left-4" 
+          className="left-0 md:-left-4 h-10 w-10 md:h-12 md:w-12 bg-white shadow-lg hover:bg-light-cloud border-2 border-gray-100" 
           onClick={() => handleManualNavigation()}
           aria-label="Prejšnja funkcija"
-        />
+        >
+          <ChevronLeft className="h-6 w-6 md:h-7 md:w-7 text-dragon-green" />
+        </CarouselPrevious>
         <CarouselNext 
-          className="right-0 md:-right-4" 
+          className="right-0 md:-right-4 h-10 w-10 md:h-12 md:w-12 bg-white shadow-lg hover:bg-light-cloud border-2 border-gray-100" 
           onClick={() => handleManualNavigation()}
           aria-label="Naslednja funkcija"
-        />
+        >
+          <ChevronRight className="h-6 w-6 md:h-7 md:w-7 text-dragon-green" />
+        </CarouselNext>
       </Carousel>
 
       {/* Pagination dots */}
