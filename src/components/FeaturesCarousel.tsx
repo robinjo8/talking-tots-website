@@ -98,6 +98,22 @@ export const FeaturesCarousel = () => {
     return () => clearTimeout(timeout);
   };
 
+  // Handle manual navigation with left arrow
+  const handlePrevClick = () => {
+    if (api) {
+      api.scrollPrev();
+      handleManualNavigation();
+    }
+  };
+
+  // Handle manual navigation with right arrow
+  const handleNextClick = () => {
+    if (api) {
+      api.scrollNext();
+      handleManualNavigation();
+    }
+  };
+
   useEffect(() => {
     if (!api) return;
     
@@ -137,20 +153,20 @@ export const FeaturesCarousel = () => {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious 
-          className="left-0 md:-left-4 h-10 w-10 md:h-12 md:w-12 bg-white shadow-lg hover:bg-light-cloud border-2 border-gray-100" 
-          onClick={() => handleManualNavigation()}
+        <button 
+          onClick={handlePrevClick}
+          className="absolute left-0 md:-left-4 h-10 w-10 md:h-12 md:w-12 bg-white shadow-lg hover:bg-light-cloud border-2 border-gray-100 rounded-full flex items-center justify-center top-1/2 -translate-y-1/2 z-10"
           aria-label="Prejšnja funkcija"
         >
           <ChevronLeft className="h-6 w-6 md:h-7 md:w-7 text-dragon-green" />
-        </CarouselPrevious>
-        <CarouselNext 
-          className="right-0 md:-right-4 h-10 w-10 md:h-12 md:w-12 bg-white shadow-lg hover:bg-light-cloud border-2 border-gray-100" 
-          onClick={() => handleManualNavigation()}
+        </button>
+        <button 
+          onClick={handleNextClick}
+          className="absolute right-0 md:-right-4 h-10 w-10 md:h-12 md:w-12 bg-white shadow-lg hover:bg-light-cloud border-2 border-gray-100 rounded-full flex items-center justify-center top-1/2 -translate-y-1/2 z-10"
           aria-label="Naslednja funkcija"
         >
           <ChevronRight className="h-6 w-6 md:h-7 md:w-7 text-dragon-green" />
-        </CarouselNext>
+        </button>
       </Carousel>
 
       {/* Pagination dots */}
