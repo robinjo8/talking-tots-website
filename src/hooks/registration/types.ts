@@ -6,13 +6,13 @@ export enum RegistrationStep {
   PAYMENT_CONFIRMATION = 3
 }
 
-export interface ChildProfile {
+export type ChildProfile = {
   id: string;
   name: string;
-  gender: "M" | "F" | "N";  // Updated to include "N" option
+  gender: string;
   birthDate: Date | null;
-  avatarId?: number;
+  avatarId: number;
   speechDifficulties?: string[];
   speechDevelopment?: Record<string, string>;
   isComplete?: boolean;
-}
+};

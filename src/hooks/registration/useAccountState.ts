@@ -2,13 +2,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-// Define a type for the user object returned from Supabase
-interface SupabaseUser {
-  id: string;
-  email?: string;
-  [key: string]: any; // Allow for other properties
-}
-
 export function useAccountState() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -22,27 +15,19 @@ export function useAccountState() {
     
     setIsCheckingEmail(true);
     try {
-      // Try to sign up with the email and a temporary password
-      // If we get "User already registered", the email exists
-      const { error } = await supabase.auth.signUp({
+      // Use a more reliable method to check if the email exists
+      const { data, error } = await supabase.auth.signInWithOtp({
         email,
-        password: "TempPassword123!", // Temporary password for checking only
         options: {
-          emailRedirectTo: window.location.origin + "/register",
+          shouldCreateUser: false, // Only check if user exists, don't create or send OTP
         }
       });
       
-      // Log the full error for debugging
-      console.log("Email check full error:", error);
+      // If there's no error about user not existing, it means the user exists
+      const userExists = !error || !error.message.includes("not found");
       
-      // If error contains "User already registered" or "Email already in use",
-      // then the email exists in the system
-      const emailExists = error?.message?.includes("already registered") || 
-                         error?.message?.includes("already in use") || 
-                         false;
-      
-      console.log("Email check result:", emailExists, "for email:", email);
-      return emailExists;
+      console.log("Email check result:", userExists, "for email:", email);
+      return userExists;
     } catch (error) {
       console.error("Error checking email:", error);
       return false;

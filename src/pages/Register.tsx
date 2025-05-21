@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { SpeechDifficultiesStep, SpeechDevelopmentQuestions } from "@/components
 import { useRegistration, RegistrationStep } from "@/hooks/useRegistration";
 import { AccountInfoForm, ChildInformationForm, PaymentConfirmationForm } from "@/components/registration";
 import { Progress } from "@/components/ui/progress";
+
 export default function Register() {
   const {
     username,
@@ -58,12 +60,12 @@ export default function Register() {
     discount: true,
     discountPercent: "PRIHRANEK 50%"
   }];
+
   return <AuthLayout title="Ustvarite račun" subtitle="Registrirajte se in začnite uporabljati aplikacijo.">
       {/* Progress Tracker */}
       <div className="mb-6 mt-4">
         <div className="flex justify-between text-sm text-gray-500 mb-2">
           <span>Korak {getCurrentStep()} od {getTotalSteps()}</span>
-          
         </div>
         <Progress value={getCurrentStep() / getTotalSteps() * 100} className="h-2" />
       </div>
@@ -73,39 +75,9 @@ export default function Register() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>}
           
-          <div className="space-y-6">
-            <div>
-              <h2 className="font-semibold text-lg mb-4">Naročnina</h2>
-              <h3 className="text-xl font-extrabold text-dragon-green">Začnite 7-dnevni brezplačni preizkus</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                {subscriptionOptions.map(option => <div key={option.id} className={`border rounded-lg p-4 cursor-pointer ${selectedPlan === option.fullName ? "border-dragon-green bg-green-50" : "hover:bg-gray-50"}`} onClick={() => setSelectedPlan(option.fullName)}>
-                    <div className="flex justify-between items-center mb-2">
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-medium">{option.name}</h4>
-                        {option.discount && <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded">{option.discountPercent}</span>}
-                      </div>
-                      <div className="h-4 w-4 rounded-full border border-dragon-green flex items-center justify-center">
-                        {selectedPlan === option.fullName && <div className="h-2 w-2 rounded-full bg-dragon-green"></div>}
-                      </div>
-                    </div>
-                    <p className="font-bold text-xl">{option.price} <span className="text-gray-500 text-sm font-normal">/ {option.period}</span></p>
-                    <p className="text-sm text-gray-600 mt-1">{option.billing}</p>
-                  </div>)}
-              </div>
-            </div>
-            
-            <div>
-              <h2 className="font-semibold text-lg mb-4">Uporabniški podatki</h2>
-              <AccountInfoForm username={username} setUsername={setUsername} email={email} setEmail={setEmail} password={password} setPassword={setPassword} confirmPassword={confirmPassword} setConfirmPassword={setConfirmPassword} />
-            </div>
-            
-            <div>
-              <h2 className="font-semibold text-lg mb-4">Plačilni podatki</h2>
-              <p className="text-sm text-gray-600 mb-4">
-                Na voljo imate 7-dnevni brezplačni preizkus. Po tem obdobju bo zaračunana izbrana naročnina.
-              </p>
-            </div>
+          <div>
+            <h2 className="font-semibold text-lg mb-4">Uporabniški podatki</h2>
+            <AccountInfoForm username={username} setUsername={setUsername} email={email} setEmail={setEmail} password={password} setPassword={setPassword} confirmPassword={confirmPassword} setConfirmPassword={setConfirmPassword} />
           </div>
           
           <div>
@@ -143,7 +115,27 @@ export default function Register() {
               <ArrowLeft className="h-4 w-4" />
               Nazaj
             </Button>
-            <h3 className="text-lg font-medium">Zaključi registracijo</h3>
+            <h3 className="text-lg font-medium">Izbira naročnine</h3>
+          </div>
+          
+          <div>
+            <h3 className="text-xl font-extrabold text-dragon-green mb-4">Začnite 7-dnevni brezplačni preizkus</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              {subscriptionOptions.map(option => <div key={option.id} className={`border rounded-lg p-4 cursor-pointer ${selectedPlan === option.fullName ? "border-dragon-green bg-green-50" : "hover:bg-gray-50"}`} onClick={() => setSelectedPlan(option.fullName)}>
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-medium">{option.name}</h4>
+                      {option.discount && <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded">{option.discountPercent}</span>}
+                    </div>
+                    <div className="h-4 w-4 rounded-full border border-dragon-green flex items-center justify-center">
+                      {selectedPlan === option.fullName && <div className="h-2 w-2 rounded-full bg-dragon-green"></div>}
+                    </div>
+                  </div>
+                  <p className="font-bold text-xl">{option.price} <span className="text-gray-500 text-sm font-normal">/ {option.period}</span></p>
+                  <p className="text-sm text-gray-600 mt-1">{option.billing}</p>
+                </div>)}
+            </div>
           </div>
           
           <PaymentConfirmationForm selectedPlan={selectedPlan} />
