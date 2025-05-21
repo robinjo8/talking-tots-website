@@ -58,7 +58,7 @@ const Index = () => {
             <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold mb-4 md:mb-6">
               Naredimo govor <span className="rainbow-text">zabaven</span> – za male junake!
             </h1>
-            <p className="text-lg md:text-xl mb-6 md:mb-8 text-muted-foreground max-w-xl">Tomi Talk pomaga otroku razvijati govor s preprostimi in zabavnimi vajami ter igrami, ki jih priporočajo strokovnjaki.</p>
+            <p className="text-lg md:text-xl mb-6 md:mb-8 text-muted-foreground max-w-xl font-normal">Tomi Talk pomaga otroku razvijati govor s preprostimi in zabavnimi vajami ter igrami, ki jih priporočajo strokovnjaki.</p>
             
             {/* Action Buttons - Moved to hero text section */}
             <div className="flex flex-col sm:flex-row gap-4">
