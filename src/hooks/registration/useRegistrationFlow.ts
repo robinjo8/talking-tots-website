@@ -11,15 +11,13 @@ export function useRegistrationFlow() {
       setCurrentStep(RegistrationStep.ACCOUNT_INFO);
     } else if (currentStep === RegistrationStep.SPEECH_DEVELOPMENT) {
       setCurrentStep(RegistrationStep.SPEECH_DIFFICULTIES);
-    } else if (currentStep === RegistrationStep.REVIEW_CHILD) {
-      setCurrentStep(RegistrationStep.SPEECH_DEVELOPMENT);
     } else if (currentStep === RegistrationStep.PAYMENT_CONFIRMATION) {
-      setCurrentStep(RegistrationStep.REVIEW_CHILD);
+      setCurrentStep(RegistrationStep.SPEECH_DEVELOPMENT);
     }
   };
   
   const getTotalSteps = () => {
-    return 5; // Account info, speech difficulties, speech development, child review, payment confirmation
+    return 4; // Account info, speech difficulties, speech development, payment confirmation
   };
   
   const getCurrentStep = () => {

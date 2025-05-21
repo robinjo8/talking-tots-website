@@ -63,10 +63,7 @@ export function useRegistration() {
 
   const handleSpeechDevelopmentSubmit = (answers: Record<string, string>) => {
     updateSpeechDevelopment(answers);
-    setCurrentStep(RegistrationStep.REVIEW_CHILD);
-  };
-
-  const handleChildReviewComplete = () => {
+    // Skip the REVIEW_CHILD step and go directly to PAYMENT_CONFIRMATION
     setCurrentStep(RegistrationStep.PAYMENT_CONFIRMATION);
   };
 
@@ -161,7 +158,6 @@ export function useRegistration() {
     // Handlers
     handleSpeechDifficultiesSubmit,
     handleSpeechDevelopmentSubmit,
-    handleChildReviewComplete,
     handleSubmit
   };
 }

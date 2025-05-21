@@ -1,10 +1,10 @@
+
 import { Link } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ArrowLeft } from "lucide-react";
 import { SpeechDifficultiesStep, SpeechDevelopmentQuestions } from "@/components/speech";
-import { ChildCompletedView } from "@/components/children";
 import { useRegistration, RegistrationStep } from "@/hooks/useRegistration";
 import { AccountInfoForm, ChildInformationForm, PaymentConfirmationForm } from "@/components/registration";
 import { Progress } from "@/components/ui/progress";
@@ -31,7 +31,6 @@ export default function Register() {
     goBack,
     handleSpeechDifficultiesSubmit,
     handleSpeechDevelopmentSubmit,
-    handleChildReviewComplete,
     addChild,
     removeChild,
     updateChildField,
@@ -137,18 +136,6 @@ export default function Register() {
 
       {currentStep === RegistrationStep.SPEECH_DEVELOPMENT && <div className="mt-6">
           <SpeechDevelopmentQuestions onBack={goBack} onSubmit={handleSpeechDevelopmentSubmit} childName={currentChild.name} initialAnswers={currentChild.speechDevelopment} />
-        </div>}
-
-      {currentStep === RegistrationStep.REVIEW_CHILD && <div className="mt-6 space-y-6">
-          <div className="flex justify-between items-center">
-            <Button type="button" variant="outline" size="sm" onClick={goBack} className="flex items-center gap-1">
-              <ArrowLeft className="h-4 w-4" />
-              Nazaj
-            </Button>
-            <h3 className="text-lg font-medium">Pregled profila za {currentChild.name}</h3>
-          </div>
-          
-          <ChildCompletedView child={currentChild} onAddNewChild={addChild} onClose={handleChildReviewComplete} closeButtonText="Naprej na plačilo" />
         </div>}
 
       {currentStep === RegistrationStep.PAYMENT_CONFIRMATION && <div className="mt-6 space-y-6">
