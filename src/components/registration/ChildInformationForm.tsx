@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -140,7 +141,7 @@ export function ChildInformationForm({
                 
                 <div>
                   <Label>Izberi avatarja</Label>
-                  <div className="grid grid-cols-4 gap-4 mt-3">
+                  <div className="grid grid-cols-3 gap-3 mt-3">
                     {avatarOptions.map(avatar => (
                       <div 
                         key={avatar.id}
@@ -152,12 +153,12 @@ export function ChildInformationForm({
                         }`}
                       >
                         {avatar.id === 0 ? (
-                          <div className="h-[120px] w-[120px] rounded-full flex items-center justify-center bg-gray-100 border border-gray-200">
-                            <UserX className="h-10 w-10 text-gray-400" />
+                          <div className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-full flex items-center justify-center bg-gray-100 border border-gray-200">
+                            <UserX className="h-8 w-8 text-gray-400" />
                             <span className="sr-only">{avatar.alt}</span>
                           </div>
                         ) : (
-                          <Avatar className="h-[120px] w-[120px]">
+                          <Avatar className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24">
                             <AvatarImage src={avatar.src} alt={avatar.alt} className="object-contain" />
                             <AvatarFallback className="text-xs text-center p-1">
                               {avatar.alt.substring(0, 10)}...
@@ -166,6 +167,17 @@ export function ChildInformationForm({
                         )}
                       </div>
                     ))}
+                  </div>
+                  <div className="mt-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => updateChildField(child.id, "avatarId", 0)}
+                      className="w-full"
+                    >
+                      Ne želim izbrati avatarja
+                    </Button>
                   </div>
                 </div>
               </div>

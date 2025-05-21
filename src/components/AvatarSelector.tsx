@@ -34,7 +34,7 @@ export function AvatarSelector({ selectedAvatarId, onAvatarSelect }: AvatarSelec
   return (
     <div>
       <Label>Izberi avatarja</Label>
-      <div className="grid grid-cols-3 md:grid-cols-4 gap-3 mt-3">
+      <div className="grid grid-cols-3 gap-3 mt-3">
         {avatarOptions.map(avatar => (
           <div 
             key={avatar.id}
@@ -46,12 +46,12 @@ export function AvatarSelector({ selectedAvatarId, onAvatarSelect }: AvatarSelec
             }`}
           >
             {avatar.id === 0 ? (
-              <div className="h-[80px] w-[80px] md:h-[120px] md:w-[120px] rounded-full flex items-center justify-center bg-gray-100 border border-gray-200">
-                <UserX className="h-8 w-8 md:h-10 md:w-10 text-gray-400" />
+              <div className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-full flex items-center justify-center bg-gray-100 border border-gray-200">
+                <UserX className="h-8 w-8 text-gray-400" />
                 <span className="sr-only">{avatar.alt}</span>
               </div>
             ) : (
-              <Avatar className="h-[80px] w-[80px] md:h-[120px] md:w-[120px]">
+              <Avatar className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24">
                 <AvatarImage src={avatar.src} alt={avatar.alt} className="object-contain" />
                 <AvatarFallback className="text-xs text-center p-1">
                   {avatar.alt.substring(0, 10)}...
