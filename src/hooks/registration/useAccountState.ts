@@ -15,16 +15,7 @@ export function useAccountState() {
     
     setIsCheckingEmail(true);
     try {
-      // First, try to get user by email - this is the most reliable way to check
-      const { data: userData, error: userError } = await supabase.auth.admin.getUserByEmail(email);
-      
-      // If we got user data back, the email exists
-      if (userData && userData.user) {
-        console.log("Email exists (admin method):", email);
-        return true;
-      }
-      
-      // If we can't use the admin method, try sign-in without creating a user
+      // Try sign-in without creating a user - this is the most reliable approach
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
@@ -61,8 +52,22 @@ export function useAccountState() {
         return false;
       }
       
+      // We can also try to use the signIn method with a dummy password
+      // This can also help determine if an email exists
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password: "dummy_password_for_checking"
+      });
+      
+      // If we get an "Invalid login credentials" error, it means the email exists
+      // but the password is wrong (which is expected)
+      if (signInError && signInError.message.includes("Invalid login credentials")) {
+        console.log("Email exists (password method):", email);
+        return true;
+      }
+      
       // Default to false if we're unsure
-      console.log("Email check inconclusive, assuming doesn't exist:", email, error?.message);
+      console.log("Email check inconclusive, assuming doesn't exist:", email);
       return false;
     } catch (error) {
       console.error("Error checking email:", error);
