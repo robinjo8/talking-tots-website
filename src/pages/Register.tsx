@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
@@ -8,7 +7,6 @@ import { SpeechDifficultiesStep, SpeechDevelopmentQuestions } from "@/components
 import { useRegistration, RegistrationStep } from "@/hooks/useRegistration";
 import { AccountInfoForm, ChildInformationForm, PaymentConfirmationForm } from "@/components/registration";
 import { Progress } from "@/components/ui/progress";
-
 export default function Register() {
   const {
     username,
@@ -60,7 +58,6 @@ export default function Register() {
     discount: true,
     discountPercent: "PRIHRANEK 50%"
   }];
-
   return <AuthLayout title="Ustvarite račun" subtitle="Registrirajte se in začnite uporabljati aplikacijo.">
       {/* Progress Tracker */}
       <div className="mb-6 mt-4">
@@ -81,7 +78,7 @@ export default function Register() {
           </div>
           
           <div>
-            <h2 className="font-semibold text-lg mb-4">Podatki o otrocih</h2>
+            
             <ChildInformationForm children={children} selectedChildIndex={selectedChildIndex} setSelectedChildIndex={setSelectedChildIndex} removeChild={removeChild} updateChildField={updateChildField} error={error} />
           </div>
           
