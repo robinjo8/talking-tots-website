@@ -1,84 +1,131 @@
 
+import React from "react";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { UserX } from "lucide-react";
-import { SpeechDifficultiesList } from "@/components/SpeechDifficultiesList";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
-import { avatarOptions } from "@/components/AvatarSelector";
+import { Check, CheckCircle2 } from "lucide-react";
 
-interface SavedChild {
-  id?: string;
-  name: string;
-  gender: string;
-  avatarId: number;
-  birthDate: Date | null;
-  speechDifficulties?: string[];
-  speechDevelopment?: Record<string, string>;
-  isComplete?: boolean;
+import type { ChildProfile } from "@/hooks/useRegistration";
+import { SpeechDifficultyBadge } from "@/components/speech";
+
+interface ChildCompletedViewProps {
+  child: ChildProfile;
+  onAddNewChild?: () => void;
+  onClose: () => void;
+  closeButtonText?: string;
 }
 
-type ChildCompletedViewProps = {
-  child: SavedChild;
-  onAddNewChild: () => void;
-  onClose?: () => void;
-};
+export function ChildCompletedView({ 
+  child, 
+  onAddNewChild, 
+  onClose,
+  closeButtonText = "Zaključi registracijo" 
+}: ChildCompletedViewProps) {
+  const getAnswerLabels = (answers: Record<string, string> = {}) => {
+    const labelMap: Record<string, string> = {
+      yes: "Da",
+      no: "Ne",
+      sometimes: "Včasih",
+      often: "Pogosto",
+      rarely: "Redko"
+    };
+    
+    return Object.entries(answers).map(([key, value]) => ({
+      id: key,
+      answer: labelMap[value] || value
+    }));
+  };
+  
+  const answerItems = child.speechDevelopment ? getAnswerLabels(child.speechDevelopment) : [];
 
-export function ChildCompletedView({ child, onAddNewChild, onClose }: ChildCompletedViewProps) {
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-medium mb-2">Otrok uspešno dodan</h3>
-      
-      <div className="bg-sky-50 p-4 rounded-lg border border-sky-100">
-        <div className="flex items-center gap-3 mb-3">
-          {child.avatarId === 0 ? (
-            <div className="h-16 w-16 rounded-full flex items-center justify-center bg-gray-100">
-              <UserX className="h-8 w-8 text-gray-400" />
-            </div>
-          ) : (
-            <Avatar className="h-16 w-16">
-              <AvatarImage 
-                src={avatarOptions.find(a => a.id === child.avatarId)?.src} 
-                alt="Avatar otroka" 
-              />
-              <AvatarFallback>{child.name.charAt(0)}</AvatarFallback>
-            </Avatar>
-          )}
+      <Card className="p-6 border-green-200 bg-green-50">
+        <div className="flex items-center gap-4">
+          <div className="bg-green-100 rounded-full p-1.5">
+            <CheckCircle2 className="h-6 w-6 text-green-600" />
+          </div>
           <div>
-            <h4 className="font-medium">{child.name}</h4>
+            <h3 className="font-semibold text-lg">Profil uspešno zaključen</h3>
             <p className="text-sm text-gray-600">
-              Spol: {child.gender === "M" ? "Deček" : child.gender === "Ž" ? "Deklica" : "Ni izbrano"}
+              Profil otroka je zdaj pripravljen za uporabo v aplikaciji.
             </p>
-            {child.birthDate && (
-              <p className="text-sm text-gray-600">
-                Datum rojstva: {format(child.birthDate, "dd.MM.yyyy")}
-              </p>
-            )}
           </div>
         </div>
-        
-        <div className="mt-4">
-          <h5 className="text-sm font-medium mb-2">Izbrane govorne težave:</h5>
-          <SpeechDifficultiesList difficultiesIds={child.speechDifficulties || []} />
+      </Card>
+      
+      <div>
+        <h3 className="font-semibold text-lg mb-4">Osnovni podatki</h3>
+        <div className="bg-white rounded-lg border p-4 space-y-2">
+          <div className="flex justify-between">
+            <span className="text-gray-500">Ime</span>
+            <span className="font-medium">{child.name}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-500">Spol</span>
+            <span className="font-medium">{child.gender === "M" ? "Deček" : "Deklica"}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-500">Datum rojstva</span>
+            <span className="font-medium">
+              {child.birthDate 
+                ? format(child.birthDate, "dd.MM.yyyy")
+                : "Ni podan"}
+            </span>
+          </div>
         </div>
       </div>
       
-      <div className="space-y-3 pt-4">
+      <div>
+        <h3 className="font-semibold text-lg mb-4">Govorne težave</h3>
+        {child.speechDifficulties && child.speechDifficulties.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {child.speechDifficulties.map(diffId => (
+              <SpeechDifficultyBadge 
+                key={diffId} 
+                difficultyId={diffId}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500 italic">Ni izbranih govornih težav</p>
+        )}
+      </div>
+      
+      <div>
+        <h3 className="font-semibold text-lg mb-4">Odgovori na vprašalnik</h3>
+        <div className="bg-white rounded-lg border divide-y">
+          {answerItems.map((item, index) => (
+            <div key={item.id} className="p-4 flex items-center justify-between">
+              <span className="text-gray-700">Vprašanje {index + 1}</span>
+              <Badge 
+                variant={item.answer === "Da" ? "success" : 
+                       item.answer === "Ne" ? "outline" : "secondary"}
+              >
+                {item.answer}
+              </Badge>
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      <div className="flex flex-col space-y-4 pt-4">
         <Button
-          type="button"
-          onClick={onAddNewChild}
-          className="w-full bg-dragon-green hover:bg-dragon-green/90"
+          onClick={onClose}
+          className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6"
         >
-          Dodaj otroka
+          {closeButtonText}
         </Button>
         
-        {onClose && (
+        {onAddNewChild && (
           <Button
-            type="button"
             variant="outline"
-            onClick={onClose}
-            className="w-full"
+            onClick={onAddNewChild}
+            className="w-full border-dragon-green text-dragon-green hover:bg-dragon-green/10"
           >
-            Zaključi
+            Dodaj novega otroka
           </Button>
         )}
       </div>

@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
@@ -6,7 +7,8 @@ import { ArrowLeft } from "lucide-react";
 import { SpeechDifficultiesStep, SpeechDevelopmentQuestions } from "@/components/speech";
 import { ChildCompletedView } from "@/components/children";
 import { useRegistration, RegistrationStep } from "@/hooks/useRegistration";
-import { AccountInfoForm, ChildInformationForm } from "@/components/registration";
+import { AccountInfoForm, ChildInformationForm, PaymentConfirmationForm } from "@/components/registration";
+import { Progress } from "@/components/ui/progress";
 
 export default function Register() {
   const { 
@@ -14,14 +16,17 @@ export default function Register() {
     email, setEmail,
     password, setPassword,
     confirmPassword, setConfirmPassword,
-    error, isLoading,
+    error, isLoading, isCheckingEmail,
+    selectedPlan, setSelectedPlan,
     children, currentStep, 
     selectedChildIndex, setSelectedChildIndex,
     goToNextStep, goBack,
     handleSpeechDifficultiesSubmit,
     handleSpeechDevelopmentSubmit,
+    handleChildReviewComplete,
     addChild, removeChild, updateChildField,
-    handleSubmit, currentChild
+    handleSubmit, currentChild,
+    getTotalSteps, getCurrentStep
   } = useRegistration();
 
   return (
@@ -29,33 +34,99 @@ export default function Register() {
       title="Ustvarite račun" 
       subtitle="Registrirajte se in začnite uporabljati aplikacijo."
     >
+      {/* Progress Tracker */}
+      <div className="mb-6 mt-4">
+        <div className="flex justify-between text-sm text-gray-500 mb-2">
+          <span>Korak {getCurrentStep()} od {getTotalSteps()}</span>
+          <span>{Math.round((getCurrentStep() / getTotalSteps()) * 100)}%</span>
+        </div>
+        <Progress value={(getCurrentStep() / getTotalSteps()) * 100} className="h-2" />
+      </div>
+
       {currentStep === RegistrationStep.ACCOUNT_INFO && (
-        <form onSubmit={goToNextStep} className="mt-8 space-y-6">
+        <form onSubmit={goToNextStep} className="mt-6 space-y-6">
           {error && !error.includes("otrok") && (
             <Alert variant="destructive">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
           
-          <AccountInfoForm 
-            username={username}
-            setUsername={setUsername}
-            email={email}
-            setEmail={setEmail}
-            password={password}
-            setPassword={setPassword}
-            confirmPassword={confirmPassword}
-            setConfirmPassword={setConfirmPassword}
-          />
+          <div className="space-y-6">
+            <div>
+              <h2 className="font-semibold text-lg mb-4">Naročnina</h2>
+              <h3 className="font-medium mb-4">Začnite 7-dnevni brezplačni preizkus</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div 
+                  className={`border rounded-lg p-4 cursor-pointer ${selectedPlan === "Mesečna naročnina - 9,99 € / mesec" ? "border-dragon-green bg-green-50" : "hover:bg-gray-50"}`}
+                  onClick={() => setSelectedPlan("Mesečna naročnina - 9,99 € / mesec")}
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="font-medium">Mesečno</h4>
+                    <div className="h-4 w-4 rounded-full border border-dragon-green flex items-center justify-center">
+                      {selectedPlan === "Mesečna naročnina - 9,99 € / mesec" && (
+                        <div className="h-2 w-2 rounded-full bg-dragon-green"></div>
+                      )}
+                    </div>
+                  </div>
+                  <p className="font-bold text-xl">9,99 € <span className="text-gray-500 text-sm font-normal">/ mesec</span></p>
+                  <p className="text-sm text-gray-600 mt-1">Zaračunano mesečno po koncu preizkusa</p>
+                </div>
+                
+                <div 
+                  className={`border rounded-lg p-4 cursor-pointer ${selectedPlan === "Letna naročnina - 99,00 € / leto" ? "border-dragon-green bg-green-50" : "hover:bg-gray-50"}`}
+                  onClick={() => setSelectedPlan("Letna naročnina - 99,00 € / leto")}
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-medium">Letno</h4>
+                      <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded">PRIHRANEK 17%</span>
+                    </div>
+                    <div className="h-4 w-4 rounded-full border border-dragon-green flex items-center justify-center">
+                      {selectedPlan === "Letna naročnina - 99,00 € / leto" && (
+                        <div className="h-2 w-2 rounded-full bg-dragon-green"></div>
+                      )}
+                    </div>
+                  </div>
+                  <p className="font-bold text-xl">99,00 € <span className="text-gray-500 text-sm font-normal">/ leto</span></p>
+                  <p className="text-sm text-gray-600 mt-1">Zaračunano letno po koncu preizkusa</p>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h2 className="font-semibold text-lg mb-4">Uporabniški podatki</h2>
+              <AccountInfoForm 
+                username={username}
+                setUsername={setUsername}
+                email={email}
+                setEmail={setEmail}
+                password={password}
+                setPassword={setPassword}
+                confirmPassword={confirmPassword}
+                setConfirmPassword={setConfirmPassword}
+              />
+            </div>
+            
+            <div>
+              <h2 className="font-semibold text-lg mb-4">Plačilni podatki</h2>
+              <p className="text-sm text-gray-600 mb-4">
+                Na voljo imate 7-dnevni brezplačni preizkus. Po tem obdobju bo zaračunana izbrana naročnina.
+              </p>
+            </div>
+          </div>
           
-          <ChildInformationForm 
-            children={children}
-            selectedChildIndex={selectedChildIndex}
-            setSelectedChildIndex={setSelectedChildIndex}
-            removeChild={removeChild}
-            updateChildField={updateChildField}
-            error={error}
-          />
+          <div>
+            <h2 className="font-semibold text-lg mb-4">Podatki o otrocih</h2>
+            <ChildInformationForm 
+              children={children}
+              selectedChildIndex={selectedChildIndex}
+              setSelectedChildIndex={setSelectedChildIndex}
+              removeChild={removeChild}
+              updateChildField={updateChildField}
+              error={error}
+            />
+          </div>
           
           {children.some(child => child.isComplete) && (
             <Button
@@ -71,9 +142,9 @@ export default function Register() {
           <Button
             type="submit"
             className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6"
-            disabled={isLoading}
+            disabled={isLoading || isCheckingEmail}
           >
-            Naprej
+            {isCheckingEmail ? "Preverjanje..." : "Naprej"}
           </Button>
           
           <div className="text-sm text-center">
@@ -86,7 +157,7 @@ export default function Register() {
       )}
 
       {currentStep === RegistrationStep.SPEECH_DIFFICULTIES && (
-        <div className="mt-8">
+        <div className="mt-6">
           <SpeechDifficultiesStep
             onBack={goBack}
             onSubmit={handleSpeechDifficultiesSubmit}
@@ -98,7 +169,7 @@ export default function Register() {
       )}
 
       {currentStep === RegistrationStep.SPEECH_DEVELOPMENT && (
-        <div className="mt-8">
+        <div className="mt-6">
           <SpeechDevelopmentQuestions
             onBack={goBack}
             onSubmit={handleSpeechDevelopmentSubmit}
@@ -109,7 +180,7 @@ export default function Register() {
       )}
 
       {currentStep === RegistrationStep.REVIEW_CHILD && (
-        <div className="mt-8 space-y-6">
+        <div className="mt-6 space-y-6">
           <div className="flex justify-between items-center">
             <Button
               type="button"
@@ -127,8 +198,38 @@ export default function Register() {
           <ChildCompletedView 
             child={currentChild} 
             onAddNewChild={addChild} 
-            onClose={handleSubmit} 
+            onClose={handleChildReviewComplete} 
+            closeButtonText="Naprej na plačilo"
           />
+        </div>
+      )}
+
+      {currentStep === RegistrationStep.PAYMENT_CONFIRMATION && (
+        <div className="mt-6 space-y-6">
+          <div className="flex justify-between items-center">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={goBack}
+              className="flex items-center gap-1"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Nazaj
+            </Button>
+            <h3 className="text-lg font-medium">Zaključi registracijo</h3>
+          </div>
+          
+          <PaymentConfirmationForm selectedPlan={selectedPlan} />
+          
+          <Button
+            type="button"
+            onClick={handleSubmit}
+            className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6"
+            disabled={isLoading}
+          >
+            {isLoading ? "Ustvarjam račun..." : "Zaključi registracijo"}
+          </Button>
         </div>
       )}
     </AuthLayout>

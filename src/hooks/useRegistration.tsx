@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -19,7 +19,8 @@ export enum RegistrationStep {
   ACCOUNT_INFO,
   SPEECH_DIFFICULTIES,
   SPEECH_DEVELOPMENT,
-  REVIEW_CHILD
+  REVIEW_CHILD,
+  PAYMENT_CONFIRMATION
 }
 
 export function useRegistration() {
@@ -28,7 +29,9 @@ export function useRegistration() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState("Mesečna naročnina - 9,99 € / mesec");
   const navigate = useNavigate();
   
   const [children, setChildren] = useState<ChildProfile[]>([
@@ -40,7 +43,31 @@ export function useRegistration() {
 
   const currentChild = children[selectedChildIndex];
 
-  const validateAccountInfo = (): boolean => {
+  const checkEmailExists = async (email: string): Promise<boolean> => {
+    if (!email) return false;
+    
+    setIsCheckingEmail(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          shouldCreateUser: false
+        }
+      });
+      
+      // If no error is returned when attempting to sign in, the email exists
+      // The API doesn't give us a clean way to check just for existence
+      // If error.message includes "User already registered", then the email exists
+      return !error?.message.includes("not found");
+    } catch (error) {
+      console.error("Error checking email:", error);
+      return false;
+    } finally {
+      setIsCheckingEmail(false);
+    }
+  };
+
+  const validateAccountInfo = async (): Promise<boolean> => {
     if (!username || !email || !password || !confirmPassword) {
       setError("Prosimo, izpolnite vsa obvezna polja.");
       return false;
@@ -67,14 +94,22 @@ export function useRegistration() {
       return false;
     }
 
+    // Check if email already exists
+    const emailExists = await checkEmailExists(email);
+    if (emailExists) {
+      setError("Uporabnik s tem e-poštnim naslovom že obstaja.");
+      return false;
+    }
+
     return true;
   };
 
-  const goToNextStep = (e: React.FormEvent) => {
+  const goToNextStep = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (currentStep === RegistrationStep.ACCOUNT_INFO) {
-      if (!validateAccountInfo()) return;
+      const isValid = await validateAccountInfo();
+      if (!isValid) return;
       setCurrentStep(RegistrationStep.SPEECH_DIFFICULTIES);
       setError(null);
     }
@@ -87,6 +122,8 @@ export function useRegistration() {
       setCurrentStep(RegistrationStep.SPEECH_DIFFICULTIES);
     } else if (currentStep === RegistrationStep.REVIEW_CHILD) {
       setCurrentStep(RegistrationStep.SPEECH_DEVELOPMENT);
+    } else if (currentStep === RegistrationStep.PAYMENT_CONFIRMATION) {
+      setCurrentStep(RegistrationStep.REVIEW_CHILD);
     }
   };
 
@@ -110,6 +147,10 @@ export function useRegistration() {
       )
     );
     setCurrentStep(RegistrationStep.REVIEW_CHILD);
+  };
+
+  const handleChildReviewComplete = () => {
+    setCurrentStep(RegistrationStep.PAYMENT_CONFIRMATION);
   };
 
   const addChild = () => {
@@ -143,7 +184,7 @@ export function useRegistration() {
   const handleSubmit = async () => {
     setError(null);
     
-    if (!validateAccountInfo()) {
+    if (!validateAccountInfo) {
       return;
     }
     
@@ -192,6 +233,14 @@ export function useRegistration() {
       setIsLoading(false);
     }
   };
+  
+  const getTotalSteps = () => {
+    return 5; // Account info, speech difficulties, speech development, child review, payment confirmation
+  };
+  
+  const getCurrentStep = () => {
+    return currentStep + 1;
+  };
 
   return {
     username,
@@ -203,8 +252,11 @@ export function useRegistration() {
     confirmPassword,
     setConfirmPassword,
     isLoading,
+    isCheckingEmail,
     error,
     setError,
+    selectedPlan,
+    setSelectedPlan,
     children,
     currentStep,
     selectedChildIndex,
@@ -213,10 +265,13 @@ export function useRegistration() {
     goBack,
     handleSpeechDifficultiesSubmit,
     handleSpeechDevelopmentSubmit,
+    handleChildReviewComplete,
     addChild,
     removeChild,
     updateChildField,
     handleSubmit,
-    currentChild
+    currentChild,
+    getTotalSteps,
+    getCurrentStep
   };
 }

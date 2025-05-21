@@ -27,11 +27,11 @@ export function AccountInfoForm({
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="username">Uporabniško ime</Label>
+        <Label htmlFor="username">Ime in priimek</Label>
         <Input
           id="username"
           type="text"
-          placeholder="Izberite uporabniško ime"
+          placeholder="Vnesite vaše ime in priimek"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           className="rounded-md text-base"
