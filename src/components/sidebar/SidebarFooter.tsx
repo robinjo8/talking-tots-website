@@ -15,9 +15,13 @@ export function SidebarFooter({ isMobileMenu = false }: SidebarFooterProps) {
   const { setOpenMobile } = useSidebar();
 
   const handleSignOut = async () => {
-    await signOut();
-    setOpenMobile(false);
-    navigate("/login");
+    try {
+      await signOut();
+      setOpenMobile(false);
+      navigate("/login");
+    } catch (error) {
+      console.error("Error in SidebarFooter handleSignOut:", error);
+    }
   };
 
   if (!user) return null;

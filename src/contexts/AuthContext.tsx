@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 type ChildProfile = {
   name: string;
@@ -103,11 +104,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut();
+      console.log("Attempting to sign out...");
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error("Error during sign out:", error);
+        toast.error("Napaka pri odjavi: " + error.message);
+        return;
+      }
+      
+      // Clear local state regardless of whether there was a session
+      setUser(null);
+      setSession(null);
+      setProfile(null);
       setSelectedChildIndex(null);
       localStorage.removeItem('selectedChildIndex');
+      
+      console.log("Sign out successful");
+      toast.success("Uspešno ste se odjavili");
     } catch (error) {
-      console.error("Napaka pri odjavi:", error);
+      console.error("Unexpected error during sign out:", error);
+      toast.error("Nepričakovana napaka pri odjavi");
     }
   };
 

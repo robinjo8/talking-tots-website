@@ -19,8 +19,13 @@ const MojaStran = () => {
     : null;
 
   const handleSignOut = async () => {
-    await signOut();
-    navigate("/login");
+    try {
+      await signOut();
+      navigate("/login");
+    } catch (error) {
+      console.error("Error in MojaStran handleSignOut:", error);
+      toast.error("Napaka pri odjavi");
+    }
   };
 
   if (!user) {
