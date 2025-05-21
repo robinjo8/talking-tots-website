@@ -20,6 +20,7 @@ type ChildBasicInfoFormProps = {
   onGenderChange: (gender: string) => void;
   onAvatarChange: (id: number) => void;
   onSubmit: (e: React.FormEvent) => void;
+  title?: string;
 };
 
 export function ChildBasicInfoForm({
@@ -31,11 +32,12 @@ export function ChildBasicInfoForm({
   onBirthDateChange,
   onGenderChange,
   onAvatarChange,
-  onSubmit
+  onSubmit,
+  title = "Dodaj novega otroka"
 }: ChildBasicInfoFormProps) {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      <h3 className="text-lg font-medium mb-2">Dodaj novega otroka</h3>
+      <h3 className="text-lg font-medium mb-2">{title}</h3>
       
       <div className="space-y-4">
         <div>

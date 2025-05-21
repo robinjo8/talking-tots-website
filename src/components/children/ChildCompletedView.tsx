@@ -7,12 +7,14 @@ import { format } from "date-fns";
 import { avatarOptions } from "@/components/AvatarSelector";
 
 interface SavedChild {
+  id?: string;
   name: string;
   gender: string;
   avatarId: number;
   birthDate: Date | null;
-  speechDifficulties: string[];
-  speechDevelopment: Record<string, string>;
+  speechDifficulties?: string[];
+  speechDevelopment?: Record<string, string>;
+  isComplete?: boolean;
 }
 
 type ChildCompletedViewProps = {
@@ -56,7 +58,7 @@ export function ChildCompletedView({ child, onAddNewChild, onClose }: ChildCompl
         
         <div className="mt-4">
           <h5 className="text-sm font-medium mb-2">Izbrane govorne težave:</h5>
-          <SpeechDifficultiesList difficultiesIds={child.speechDifficulties} />
+          <SpeechDifficultiesList difficultiesIds={child.speechDifficulties || []} />
         </div>
       </div>
       
