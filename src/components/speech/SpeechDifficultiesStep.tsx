@@ -18,7 +18,7 @@ export function SpeechDifficultiesStep({
   onSubmit, 
   childName,
   initialDifficulties = [],
-  submitButtonText = "Zaključi registracijo"
+  submitButtonText = "Naprej"
 }: SpeechDifficultiesStepProps) {
   const [selectedDifficulties, setSelectedDifficulties] = useState<string[]>(initialDifficulties);
 

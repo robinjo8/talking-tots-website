@@ -5,14 +5,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Check } from "lucide-react";
+import { ArrowLeft, Check } from "lucide-react";
 
 type PaymentConfirmationFormProps = {
   selectedPlan: string;
+  onBack: () => void;
 };
 
 export function PaymentConfirmationForm({
-  selectedPlan
+  selectedPlan,
+  onBack
 }: PaymentConfirmationFormProps) {
   const [cardNumber, setCardNumber] = useState("");
   const [cardName, setCardName] = useState("");

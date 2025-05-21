@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { SpeechHeader } from "./SpeechHeader";
 import { DevelopmentQuestionItem } from "./DevelopmentQuestionItem";
 import { SPEECH_DEVELOPMENT_QUESTIONS } from "@/models/SpeechDevelopment";
+import { ArrowLeft } from "lucide-react";
 
 interface SpeechDevelopmentQuestionsProps {
   onBack: () => void;
@@ -58,6 +59,17 @@ export function SpeechDevelopmentQuestions({
         className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6"
       >
         Naprej
+      </Button>
+      
+      <Button 
+        type="button" 
+        variant="outline" 
+        size="sm" 
+        onClick={onBack}
+        className="w-full flex items-center gap-1"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Nazaj
       </Button>
     </div>
   );

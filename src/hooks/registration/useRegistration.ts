@@ -48,6 +48,7 @@ export function useRegistration() {
         password, 
         confirmPassword, 
         currentChild.name,
+        currentChild.birthDate,
         checkEmailExists
       );
       if (!isValid) return;
@@ -76,6 +77,7 @@ export function useRegistration() {
       password, 
       confirmPassword, 
       currentChild.name,
+      currentChild.birthDate,
       checkEmailExists
     );
     
@@ -85,7 +87,7 @@ export function useRegistration() {
     
     // Filter for completed children
     const validChildren = children.filter(child => 
-      child.name.trim() !== "" && child.isComplete
+      child.name.trim() !== "" && child.isComplete && child.birthDate !== null
     );
     
     if (validChildren.length === 0) {

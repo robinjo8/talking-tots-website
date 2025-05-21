@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -67,17 +68,28 @@ export function ChildInformationForm({
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor={`birth-date-${child.id}`}>Datum rojstva otroka</Label>
+                  <Label htmlFor={`birth-date-${child.id}`}>Datum rojstva otroka <span className="text-red-500">*</span></Label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button id={`birth-date-${child.id}`} variant="outline" className={cn("w-full justify-start text-left font-normal", !child.birthDate && "text-muted-foreground")}>
+                      <Button id={`birth-date-${child.id}`} variant="outline" className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !child.birthDate && "text-muted-foreground"
+                        )}>
                         {child.birthDate ? format(child.birthDate, "dd.MM.yyyy") : "Izberite datum rojstva"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar mode="single" selected={child.birthDate || undefined} onSelect={date => updateChildField(child.id, "birthDate", date)} initialFocus />
+                      <Calendar 
+                        mode="single" 
+                        selected={child.birthDate || undefined} 
+                        onSelect={date => updateChildField(child.id, "birthDate", date)} 
+                        disabled={(date) => date > new Date()} 
+                        initialFocus 
+                        className={cn("p-3 pointer-events-auto")} 
+                      />
                     </PopoverContent>
                   </Popover>
+                  {!child.birthDate && <p className="text-sm text-red-500">Datum rojstva je obvezen.</p>}
                 </div>
                 
                 <div>
@@ -112,9 +124,6 @@ export function ChildInformationForm({
                             </AvatarFallback>
                           </Avatar>}
                       </div>)}
-                  </div>
-                  <div className="mt-4">
-                    
                   </div>
                 </div>
               </div> : <div className="flex items-center gap-3">

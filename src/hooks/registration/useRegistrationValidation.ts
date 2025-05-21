@@ -10,6 +10,7 @@ export function useRegistrationValidation() {
     password: string, 
     confirmPassword: string, 
     childName: string,
+    childBirthDate: Date | null,
     checkEmailExists: (email: string) => Promise<boolean>
   ): Promise<boolean> => {
     if (!username || !email || !password || !confirmPassword) {
@@ -35,6 +36,12 @@ export function useRegistrationValidation() {
     // Check if current child has name
     if (!childName.trim()) {
       setError("Prosimo, vnesite ime otroka.");
+      return false;
+    }
+    
+    // Check if child birth date is provided
+    if (!childBirthDate) {
+      setError("Prosimo, vnesite datum rojstva otroka.");
       return false;
     }
 
