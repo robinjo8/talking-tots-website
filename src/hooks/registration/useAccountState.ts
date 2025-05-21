@@ -2,6 +2,13 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+// Define a type for the user object returned from Supabase
+interface SupabaseUser {
+  id: string;
+  email?: string;
+  [key: string]: any; // Allow for other properties
+}
+
 export function useAccountState() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -34,10 +41,9 @@ export function useAccountState() {
       
       // If we can access admin functions, check if the email exists in the list
       if (data?.users) {
-        return data.users.some(user => {
-          // Safely check if user has an email property before comparing
-          return user && typeof user === 'object' && 'email' in user && user.email === email;
-        });
+        // Cast data.users to an array of SupabaseUser to satisfy TypeScript
+        const users = data.users as SupabaseUser[];
+        return users.some(user => user && user.email === email);
       }
       
       return false;
