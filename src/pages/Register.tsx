@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
@@ -64,7 +63,7 @@ export default function Register() {
       <div className="mb-6 mt-4">
         <div className="flex justify-between text-sm text-gray-500 mb-2">
           <span>Korak {getCurrentStep()} od {getTotalSteps()}</span>
-          <span>{Math.round(getCurrentStep() / getTotalSteps() * 100)}%</span>
+          
         </div>
         <Progress value={getCurrentStep() / getTotalSteps() * 100} className="h-2" />
       </div>
