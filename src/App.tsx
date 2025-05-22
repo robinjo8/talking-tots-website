@@ -27,7 +27,6 @@ import SpominK from "./pages/SpominK";
 import SpominS from "./pages/SpominS";
 import SpominŠ from "./pages/SpominŠ";
 import ArtikuacijskiTest from "./pages/ArtikuacijskiTest";
-import ZivaliGame from "./pages/ZivaliGame";
 
 const queryClient = new QueryClient();
 
@@ -113,14 +112,6 @@ const App = () => (
                   }
                 />
                 
-                <Route 
-                  path="/govorne-igre/zivali" 
-                  element={
-                    <ProtectedRoute>
-                      <ZivaliGame />
-                    </ProtectedRoute>
-                  }
-                />
                 
                 <Route 
                   path="/govorne-igre/spomin/spomin-r" 
