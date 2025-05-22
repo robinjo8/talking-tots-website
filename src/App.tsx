@@ -27,6 +27,7 @@ import SpominK from "./pages/SpominK";
 import SpominS from "./pages/SpominS";
 import SpominŠ from "./pages/SpominŠ";
 import ArtikuacijskiTest from "./pages/ArtikuacijskiTest";
+import DrsneStevike from "./pages/DrsneStevike";
 
 const queryClient = new QueryClient();
 
@@ -112,6 +113,14 @@ const App = () => (
                   }
                 />
                 
+                <Route 
+                  path="/govorne-igre/drsne-stevilke" 
+                  element={
+                    <ProtectedRoute>
+                      <DrsneStevike />
+                    </ProtectedRoute>
+                  }
+                />
                 
                 <Route 
                   path="/govorne-igre/spomin/spomin-r" 

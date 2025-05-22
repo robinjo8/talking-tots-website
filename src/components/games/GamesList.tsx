@@ -16,13 +16,14 @@ const otherGames = [
     available: true
   },
   {
-    id: "igra2",
-    title: "Igra 2",
-    description: "Kmalu na voljo",
+    id: "drsne-stevilke",
+    title: "Drsne številke",
+    description: "Igraj drsne številke in vadi logično razmišljanje",
     icon: Gamepad,
     color: "text-app-orange",
     gradient: "from-app-orange/10 to-app-yellow/10",
-    available: false
+    path: "/govorne-igre/drsne-stevilke",
+    available: true
   },
   {
     id: "igra3",
