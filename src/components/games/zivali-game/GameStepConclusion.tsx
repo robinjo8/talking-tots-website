@@ -30,7 +30,7 @@ export function GameStepConclusion({ score, onRestart }: GameStepConclusionProps
     const interval = setInterval(launchConfetti, 2000);
     
     return () => clearInterval(interval);
-  }, []);
+  }, [playAudio]);
   
   return (
     <div className="bg-gradient-to-b from-yellow-100 to-blue-100 rounded-xl p-8 min-h-[60vh] flex flex-col items-center justify-center">
