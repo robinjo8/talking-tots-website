@@ -12,7 +12,7 @@ export default function DrsneStevilke() {
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
       <div className="flex-1 flex flex-col pt-16">
-        <div className="container mx-auto px-4 flex items-center gap-3 py-3">
+        <div className="container mx-auto px-4 flex items-center gap-3 py-2 md:py-3">
           <Button variant="ghost" size="sm" onClick={() => navigate("/govorne-igre")}>
             <ArrowLeft className="h-4 w-4" /> Nazaj
           </Button>
@@ -21,7 +21,7 @@ export default function DrsneStevilke() {
           </h1>
         </div>
         
-        <div className="flex-1 flex flex-col p-4 min-h-0">
+        <div className="flex-1 flex flex-col p-2 md:p-4 min-h-0">
           <SlidePuzzle className="w-full h-full" />
         </div>
       </div>
