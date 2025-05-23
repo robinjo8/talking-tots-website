@@ -155,3 +155,21 @@
   transform: rotateY(180deg);
   -webkit-transform: rotateY(180deg);
 }
+
+/* Puzzle specific styles */
+.puzzle-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius);
+  background-color: white;
+  overflow: hidden;
+  padding: 1rem;
+}
+
+.puzzle-root {
+  touch-action: manipulation;
+  user-select: none;
+}
