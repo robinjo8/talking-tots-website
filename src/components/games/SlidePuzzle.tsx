@@ -236,7 +236,7 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
   return (
     <div className={cn("h-full w-full flex flex-col max-w-2xl mx-auto", className)}>
       {/* Header Controls */}
-      <div className="flex-shrink-0 p-3 bg-background/80 backdrop-blur-sm rounded-lg mb-4">
+      <div className="flex-shrink-0 p-3 bg-background/80 backdrop-blur-sm rounded-lg mb-2">
         <GameControls
           size={size}
           canUndo={moveHistory.length > 0}
