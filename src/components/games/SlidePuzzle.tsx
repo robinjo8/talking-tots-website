@@ -1,10 +1,11 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Undo, Lightbulb, HelpCircle, Play, RotateCcw } from 'lucide-react';
+import GameBoard from './slide-puzzle/GameBoard';
+import GameControls from './slide-puzzle/GameControls';
+import GameStats from './slide-puzzle/GameStats';
+import WinMessage from './slide-puzzle/WinMessage';
+import InstructionsDialog from './slide-puzzle/InstructionsDialog';
 
 interface SlidePuzzleProps {
   className?: string;
@@ -68,31 +69,6 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
     }
   }, [bestTimes]);
 
-  // Initialize puzzle
-  const initializePuzzle = useCallback(() => {
-    const totalTiles = size * size;
-    const initialTiles = Array.from({ length: totalTiles - 1 }, (_, i) => i + 1);
-    initialTiles.push(0); // 0 represents empty space
-    
-    // Shuffle tiles
-    const shuffled = shuffleTiles([...initialTiles]);
-    
-    setGameState({
-      tiles: shuffled,
-      emptyIndex: shuffled.indexOf(0),
-      moves: 0,
-      time: 0,
-      isWon: false,
-      isPlaying: false
-    });
-    setMoveHistory([]);
-  }, [size]);
-
-  // Initialize when size changes
-  useEffect(() => {
-    initializePuzzle();
-  }, [initializePuzzle]);
-
   const shuffleTiles = (array: number[]): number[] => {
     const shuffled = [...array];
     // Fisher-Yates shuffle
@@ -127,6 +103,31 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
     
     return inversions % 2 === 0;
   };
+
+  // Initialize puzzle
+  const initializePuzzle = useCallback(() => {
+    const totalTiles = size * size;
+    const initialTiles = Array.from({ length: totalTiles - 1 }, (_, i) => i + 1);
+    initialTiles.push(0); // 0 represents empty space
+    
+    // Shuffle tiles
+    const shuffled = shuffleTiles([...initialTiles]);
+    
+    setGameState({
+      tiles: shuffled,
+      emptyIndex: shuffled.indexOf(0),
+      moves: 0,
+      time: 0,
+      isWon: false,
+      isPlaying: false
+    });
+    setMoveHistory([]);
+  }, [size]);
+
+  // Initialize when size changes
+  useEffect(() => {
+    initializePuzzle();
+  }, [initializePuzzle]);
 
   const checkWin = useCallback((tiles: number[]) => {
     if (tiles.length === 0) return false;
@@ -230,144 +231,58 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
     }
   };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const handleNewGame = () => {
-    initializePuzzle();
-  };
+  const isNewRecord = gameState.isWon && bestTimes[size] === gameState.time;
 
   return (
     <div className={cn("h-full w-full flex flex-col", className)}>
       {/* Header Controls */}
       <div className="flex-shrink-0 p-2 bg-background/80 backdrop-blur-sm">
-        <div className="flex flex-wrap items-center justify-between gap-2 max-w-2xl mx-auto">
-          {/* Size Selector */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium whitespace-nowrap">Velikost:</span>
-            <Select value={size.toString()} onValueChange={(value) => setSize(parseInt(value))}>
-              <SelectTrigger className="w-20 h-8">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="3">3×3</SelectItem>
-                <SelectItem value="4">4×4</SelectItem>
-                <SelectItem value="5">5×5</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Game Stats */}
-          <div className="flex items-center gap-4 text-sm">
-            <span>Čas: {formatTime(gameState.time)}</span>
-            <span>Poteze: {gameState.moves}</span>
-            {bestTimes[size] && (
-              <span className="text-green-600">
-                Rekord: {formatTime(bestTimes[size])}
-              </span>
-            )}
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-1">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleUndo}
-              disabled={moveHistory.length === 0}
-              className="h-8 px-2"
-            >
-              <Undo className="h-3 w-3" />
-              <span className="hidden sm:inline ml-1">Razveljavi</span>
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleHint}
-              disabled={gameState.isWon}
-              className="h-8 px-2"
-            >
-              <Lightbulb className="h-3 w-3" />
-              <span className="hidden sm:inline ml-1">Namig</span>
-            </Button>
-            
-            <Dialog open={showInstructions} onOpenChange={setShowInstructions}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 px-2">
-                  <HelpCircle className="h-3 w-3" />
-                  <span className="hidden sm:inline ml-1">Kako igrati</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Kako igrati drsne številke</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-3 text-sm">
-                  <p><strong>Cilj:</strong> Razvrstite številke v pravilnem vrstnem redu od 1 do {size * size - 1}.</p>
-                  <p><strong>Kako:</strong> Kliknite na ploščico, ki se dotika praznega prostora, da jo premaknete.</p>
-                  <p><strong>Zmaga:</strong> Ko so vse številke urejene in je prazen prostor v spodnjem desnem kotu.</p>
-                  <p><strong>Namigi:</strong> Uporabite gumb "Namig" za pomoč ali "Razveljavi" za razveljavitev zadnje poteze.</p>
-                </div>
-              </DialogContent>
-            </Dialog>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleNewGame}
-              className="h-8 px-2"
-            >
-              <RotateCcw className="h-3 w-3" />
-              <span className="hidden sm:inline ml-1">Nova igra</span>
-            </Button>
-          </div>
+        <GameControls
+          size={size}
+          canUndo={moveHistory.length > 0}
+          isWon={gameState.isWon}
+          onSizeChange={setSize}
+          onUndo={handleUndo}
+          onHint={handleHint}
+          onShowInstructions={() => setShowInstructions(true)}
+          onNewGame={initializePuzzle}
+        />
+        
+        {/* Game Stats */}
+        <div className="flex justify-center mt-2">
+          <GameStats
+            time={gameState.time}
+            moves={gameState.moves}
+            bestTime={bestTimes[size]}
+          />
         </div>
       </div>
 
       {/* Game Board */}
       <div className="flex-1 flex items-center justify-center p-2 min-h-0">
-        <div 
-          className="grid gap-1 bg-slate-200 p-3 rounded-lg shadow-lg aspect-square w-full max-w-[min(90vmin,600px)] max-h-[min(90vmin,600px)]"
-          style={{ gridTemplateColumns: `repeat(${size}, 1fr)` }}
-        >
-          {gameState.tiles.map((tile, index) => (
-            <button
-              key={index}
-              data-tile-index={index}
-              className={cn(
-                "aspect-square flex items-center justify-center font-bold rounded transition-all duration-200 border-2",
-                tile === 0
-                  ? "invisible"
-                  : "bg-white hover:bg-blue-50 border-blue-200 hover:border-blue-300 shadow-sm hover:shadow-md active:scale-95 cursor-pointer text-blue-900",
-                "text-lg sm:text-xl md:text-2xl"
-              )}
-              onClick={() => handleTileClick(index)}
-              disabled={tile === 0 || gameState.isWon}
-            >
-              {tile !== 0 && tile}
-            </button>
-          ))}
-        </div>
+        <GameBoard
+          tiles={gameState.tiles}
+          size={size}
+          isWon={gameState.isWon}
+          onTileClick={handleTileClick}
+        />
       </div>
 
       {/* Win Message */}
       {gameState.isWon && (
-        <div className="flex-shrink-0 p-4 text-center bg-green-50 border-t border-green-200">
-          <div className="text-lg font-bold text-green-700 mb-1">
-            Čestitamo! 🎉
-          </div>
-          <div className="text-sm text-green-600">
-            Rešili ste sestavljanko v {gameState.moves} potezah in {formatTime(gameState.time)}!
-            {bestTimes[size] === gameState.time && (
-              <span className="block font-semibold text-yellow-600">🏆 Nov rekord!</span>
-            )}
-          </div>
-        </div>
+        <WinMessage
+          moves={gameState.moves}
+          time={gameState.time}
+          isNewRecord={isNewRecord}
+        />
       )}
+
+      {/* Instructions Dialog */}
+      <InstructionsDialog
+        isOpen={showInstructions}
+        onOpenChange={setShowInstructions}
+        size={size}
+      />
     </div>
   );
 };
