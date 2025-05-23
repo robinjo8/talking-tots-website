@@ -85,7 +85,7 @@ export default function DrsneStevike() {
             <iframe 
               src="https://slide-puzzle-dttb.onrender.com" 
               title="Drsne številke" 
-              className="w-full max-w-full h-[90vh] overflow-hidden border-none"
+              className="w-full h-full border-none"
               loading="lazy"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
             ></iframe>
