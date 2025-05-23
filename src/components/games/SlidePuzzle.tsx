@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import GameBoard from './slide-puzzle/GameBoard';
@@ -258,7 +259,7 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
       </div>
 
       {/* Game Board */}
-      <div className="flex-1 flex justify-center min-h-0 px-2">
+      <div className="flex-1 flex items-center justify-center min-h-0 px-2">
         <div className="w-full max-w-[min(80vw,70vh,500px)] aspect-square">
           <GameBoard
             tiles={gameState.tiles}
