@@ -3,21 +3,10 @@ import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useRef } from "react";
-
-// Uvozi našo igro
-import createSlidePuzzle from "../slide-puzzle/app.js";
-import "../slide-puzzle/style.css";
+import SlidePuzzle from "@/components/games/SlidePuzzle";
 
 export default function DrsneStevilke() {
   const navigate = useNavigate();
-  const puzzleRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (puzzleRef.current) {
-      createSlidePuzzle(puzzleRef.current);
-    }
-  }, []);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -32,23 +21,15 @@ export default function DrsneStevilke() {
           </h1>
         </div>
         
-        <div className="flex-1 flex flex-col items-center justify-center overflow-hidden">
-          <div className="relative w-full h-full flex items-center justify-center">
-            <div 
-              className="puzzle-container aspect-square" 
-              style={{
-                maxWidth: "min(90vw, 90vh, 600px)",
-                width: "min(90vw, 90vh, 600px)",
-                height: "min(90vw, 90vh, 600px)"
-              }}
-            >
-              <div ref={puzzleRef} className="puzzle-root w-full h-full" />
-              
-              <div className="text-center text-muted-foreground mt-4 px-4">
-                <p className="text-sm">Cilj igre je urediti ploščice v pravilnem zaporedju.</p>
-                <p className="text-sm">Premikaj ploščice tako, da klikneš tisto, ki jo želiš premakniti.</p>
-              </div>
-            </div>
+        <div className="flex-1 flex flex-col items-center justify-center overflow-hidden p-4">
+          <div 
+            className="w-full h-full flex items-center justify-center"
+            style={{
+              maxWidth: "min(90vw, 90vh, 600px)",
+              maxHeight: "min(90vw, 90vh, 600px)"
+            }}
+          >
+            <SlidePuzzle size={4} className="w-full h-full" />
           </div>
         </div>
       </div>
