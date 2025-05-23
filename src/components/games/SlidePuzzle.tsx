@@ -234,9 +234,9 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
   const isNewRecord = gameState.isWon && bestTimes[size] === gameState.time;
 
   return (
-    <div className={cn("h-full w-full flex flex-col", className)}>
+    <div className={cn("h-full w-full flex flex-col max-w-2xl mx-auto", className)}>
       {/* Header Controls */}
-      <div className="flex-shrink-0 p-2 bg-background/80 backdrop-blur-sm">
+      <div className="flex-shrink-0 p-3 bg-background/80 backdrop-blur-sm rounded-lg mb-4">
         <GameControls
           size={size}
           canUndo={moveHistory.length > 0}
@@ -249,7 +249,7 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
         />
         
         {/* Game Stats */}
-        <div className="flex justify-center mt-2">
+        <div className="flex justify-center mt-3">
           <GameStats
             time={gameState.time}
             moves={gameState.moves}
@@ -259,22 +259,26 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
       </div>
 
       {/* Game Board */}
-      <div className="flex-1 flex items-center justify-center p-2 min-h-0">
-        <GameBoard
-          tiles={gameState.tiles}
-          size={size}
-          isWon={gameState.isWon}
-          onTileClick={handleTileClick}
-        />
+      <div className="flex-1 flex items-center justify-center min-h-0 px-2">
+        <div className="w-full max-w-[min(80vw,70vh,500px)] aspect-square">
+          <GameBoard
+            tiles={gameState.tiles}
+            size={size}
+            isWon={gameState.isWon}
+            onTileClick={handleTileClick}
+          />
+        </div>
       </div>
 
       {/* Win Message */}
       {gameState.isWon && (
-        <WinMessage
-          moves={gameState.moves}
-          time={gameState.time}
-          isNewRecord={isNewRecord}
-        />
+        <div className="flex-shrink-0 mt-4">
+          <WinMessage
+            moves={gameState.moves}
+            time={gameState.time}
+            isNewRecord={isNewRecord}
+          />
+        </div>
       )}
 
       {/* Instructions Dialog */}

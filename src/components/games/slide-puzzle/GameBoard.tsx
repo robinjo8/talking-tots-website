@@ -12,7 +12,7 @@ interface GameBoardProps {
 const GameBoard: React.FC<GameBoardProps> = ({ tiles, size, isWon, onTileClick }) => {
   return (
     <div 
-      className="grid gap-1 bg-slate-200 p-3 rounded-lg shadow-lg aspect-square w-full max-w-[min(90vmin,600px)] max-h-[min(90vmin,600px)]"
+      className="grid gap-2 bg-slate-200 p-4 rounded-lg shadow-lg aspect-square w-full h-full"
       style={{ gridTemplateColumns: `repeat(${size}, 1fr)` }}
     >
       {tiles.map((tile, index) => (
