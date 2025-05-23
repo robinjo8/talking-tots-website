@@ -1,4 +1,3 @@
-
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -9,53 +8,39 @@ import { useEffect, useState, useRef } from "react";
 export default function DrsneStevike() {
   const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
-  const [containerHeight, setContainerHeight] = useState("500px");
-  const [containerWidth, setContainerWidth] = useState("100%");
+  const [sizePx, setSizePx] = useState({ width: "100%", height: "500px" });
 
-  // Calculate optimal container dimensions based on viewport
   useEffect(() => {
     const calculateOptimalDimensions = () => {
-      // Get viewport dimensions
-      const viewportHeight = window.innerHeight;
-      const viewportWidth = window.innerWidth;
-      
-      // Calculate available space (accounting for header and padding)
-      const headerOffset = 130; // Estimated header height + padding
-      const footerOffset = 80;  // Space for bottom content and padding
-      const sideMargin = 30;    // Side margins
-      
-      // Calculate available dimensions
-      const availableHeight = viewportHeight - headerOffset - footerOffset;
-      const availableWidth = viewportWidth - (sideMargin * 2);
-      
-      // Determine if mobile or desktop
-      const isMobile = viewportWidth < 768;
-      
-      // Set optimal size (95% of available space to avoid any scrolling)
-      let optimalHeight = Math.min(availableHeight * 0.95, 600); // Cap at 600px height
-      let optimalWidth = isMobile ? availableWidth * 0.95 : Math.min(availableWidth * 0.95, 600); // Cap width on desktop
-      
-      // Ensure square aspect ratio for the game container (game is square)
-      const finalSize = Math.min(optimalHeight, optimalWidth);
-      
-      // Set dimensions
-      setContainerHeight(`${finalSize}px`);
-      setContainerWidth(`${finalSize}px`);
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const headerOffset = 130; // višina header + padding
+      const footerOffset = 80;  // spodnji padding
+      const sideMargin = 30;    // stranski robovi
+
+      const availH = vh - headerOffset - footerOffset;
+      const availW = vw - sideMargin * 2;
+      const isMobile = vw < 768;
+
+      // 95% razpoložljivega prostora, omejeno na max 90vh/90vw
+      let optH = Math.min(availH * 0.95, vh * 0.9);
+      let optW = isMobile ? availW * 0.95 : Math.min(availW * 0.95, vw * 0.9);
+
+      // zagotovimo kvadrat
+      const final = Math.min(optH, optW);
+      setSizePx({ width: `${final}px`, height: `${final}px` });
     };
 
-    // Calculate on initial load
     calculateOptimalDimensions();
-    
-    // Recalculate on resize
-    window.addEventListener('resize', calculateOptimalDimensions);
-    return () => window.removeEventListener('resize', calculateOptimalDimensions);
+    window.addEventListener("resize", calculateOptimalDimensions);
+    return () => window.removeEventListener("resize", calculateOptimalDimensions);
   }, []);
-  
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Header />
-      
-      <div className="container max-w-7xl mx-auto pt-20 pb-8 px-4">
+
+      <div className="container max-w-7xl mx-auto pt-20 pb-8 px-4 flex-1">
         <div className="flex items-center gap-3 mb-4">
           <Button 
             variant="ghost" 
@@ -63,37 +48,40 @@ export default function DrsneStevike() {
             className="gap-2" 
             onClick={() => navigate("/govorne-igre")}
           >
-            <ArrowLeft className="h-4 w-4" />
-            Nazaj
+            <ArrowLeft className="h-4 w-4" /> Nazaj
           </Button>
-          
           <h1 className="text-xl md:text-2xl font-bold text-foreground">
             Drsne številke
           </h1>
         </div>
-        
+
         <div className="flex flex-col items-center">
           <Card 
-            className="overflow-hidden bg-white mb-4" 
-            ref={containerRef} 
-            style={{ 
-              width: containerWidth,
-              height: containerHeight,
-              margin: "0 auto"
+            className="overflow-hidden bg-white mb-4 relative" 
+            ref={containerRef}
+            style={{
+              width:  sizePx.width,
+              height: sizePx.height,
+              margin: "0 auto",
             }}
           >
-            <iframe 
-              src="https://slide-puzzle-dttb.onrender.com" 
-              title="Drsne številke" 
-              className="w-full h-full border-none"
+            {/* Responsive iframe */}
+            <iframe
+              src="https://slide-puzzle-dttb.onrender.com"
+              title="Drsne številke"
+              className="absolute top-0 left-0 w-full h-full border-none"
+              style={{ aspectRatio: "1 / 1" }}
               loading="lazy"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
-            ></iframe>
+            />
           </Card>
 
           <div className="text-center text-muted-foreground mt-2 max-w-lg">
-            <p className="text-sm">Cilj igre je urediti ploščice v pravilnem zaporedju.</p>
-            <p className="text-sm">Premikaj ploščice tako, da klikneš na tisto, ki jo želiš premakniti na prazno mesto.</p>
+            <p className="text-sm">
+              Cilj igre je urediti ploščice v pravilnem zaporedju.
+            </p>
+            <p className="text-sm">
+              Premikaj ploščice tako, da klikneš na tisto, ki jo želiš premakniti.
+            </p>
           </div>
         </div>
       </div>
