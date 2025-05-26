@@ -73,9 +73,9 @@ const Index = () => {
           <div className="relative flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12">
             {/* Left Content Column */}
             <div className="flex-1 text-center lg:text-left max-w-3xl">
-              {/* Main Headline - Split at dash */}
+              {/* Main Headline - Responsive text size for desktop */}
               <div className={`mb-6 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-100`}>
-                <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight font-bold">
+                <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl leading-tight font-bold">
                   <span className="block text-neutral-950">
                     Odpravite govorne težave brez čakalnih vrst pri logopedu –
                   </span>
@@ -122,10 +122,10 @@ const Index = () => {
               </div>
             </div>
             
-            {/* Right Dragon Column - Desktop */}
+            {/* Right Dragon Column - Desktop with restored larger size */}
             {!isMobile && (
               <div className={`flex-shrink-0 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'} transition-all duration-700 ease-out delay-300`}>
-                <div className="relative w-64 h-64">
+                <div className="relative w-80 h-80 xl:w-96 xl:h-96">
                   <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
                   <div className="animate-float relative">
                     <img 
