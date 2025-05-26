@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import GameBoard from './slide-puzzle/GameBoard';
@@ -26,7 +27,7 @@ interface Move {
 }
 
 const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
-  const [size, setSize] = useState<number>(4);
+  const [size, setSize] = useState<number>(3);
   const [gameState, setGameState] = useState<GameState>({
     tiles: [],
     emptyIndex: 0,
@@ -70,13 +71,11 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
 
   const shuffleTiles = (array: number[]): number[] => {
     const shuffled = [...array];
-    // Fisher-Yates shuffle
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
     
-    // Ensure puzzle is solvable
     if (!isSolvable(shuffled)) {
       if (shuffled[0] !== 0 && shuffled[1] !== 0) {
         [shuffled[0], shuffled[1]] = [shuffled[1], shuffled[0]];
@@ -103,13 +102,11 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
     return inversions % 2 === 0;
   };
 
-  // Initialize puzzle
   const initializePuzzle = useCallback(() => {
     const totalTiles = size * size;
     const initialTiles = Array.from({ length: totalTiles - 1 }, (_, i) => i + 1);
-    initialTiles.push(0); // 0 represents empty space
+    initialTiles.push(0);
     
-    // Shuffle tiles
     const shuffled = shuffleTiles([...initialTiles]);
     
     setGameState({
@@ -123,7 +120,6 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
     setMoveHistory([]);
   }, [size]);
 
-  // Initialize when size changes
   useEffect(() => {
     initializePuzzle();
   }, [initializePuzzle]);
@@ -150,7 +146,6 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
       (Math.abs(col - emptyCol) === 1 && row === emptyRow);
 
     if (isAdjacent) {
-      // Save current state to history before making move
       setMoveHistory(prev => [...prev, {
         tiles: [...gameState.tiles],
         emptyIndex: gameState.emptyIndex,
@@ -172,7 +167,6 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
         isPlaying: !isWon && (prev.isPlaying || newMoves === 1)
       }));
 
-      // Save best time if won
       if (isWon && gameState.time > 0) {
         saveBestTime(size, gameState.time);
       }
@@ -196,7 +190,6 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
   const handleHint = () => {
     if (gameState.isWon) return;
     
-    // Find a tile that can move towards correct position
     for (let i = 0; i < gameState.tiles.length; i++) {
       const tile = gameState.tiles[i];
       if (tile === 0) continue;
@@ -207,7 +200,6 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
       const targetCol = (tile - 1) % size;
       
       if (currentRow !== targetRow || currentCol !== targetCol) {
-        // Check if this tile can move (is adjacent to empty space)
         const emptyRow = Math.floor(gameState.emptyIndex / size);
         const emptyCol = gameState.emptyIndex % size;
         
@@ -216,7 +208,6 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
           (Math.abs(currentCol - emptyCol) === 1 && currentRow === emptyRow);
         
         if (isAdjacent) {
-          // Highlight this tile briefly
           const tileElement = document.querySelector(`[data-tile-index="${i}"]`);
           if (tileElement) {
             tileElement.classList.add('animate-pulse', 'ring-2', 'ring-yellow-400');
@@ -233,9 +224,9 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
   const isNewRecord = gameState.isWon && bestTimes[size] === gameState.time;
 
   return (
-    <div className={cn("h-full w-full flex flex-col max-w-2xl mx-auto", className)}>
-      {/* Header Controls */}
-      <div className="flex-shrink-0 p-3 md:p-3 bg-background/80 backdrop-blur-sm rounded-lg mb-2 md:mb-4">
+    <div className={cn("h-full w-full flex flex-col overflow-hidden bg-gray-50", className)}>
+      {/* Top Controls Bar */}
+      <div className="flex-shrink-0 px-3 py-2 bg-white border-b">
         <GameControls
           size={size}
           canUndo={moveHistory.length > 0}
@@ -247,8 +238,8 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
           onNewGame={initializePuzzle}
         />
         
-        {/* Game Stats */}
-        <div className="flex justify-center mt-2 md:mt-3">
+        {/* Stats Bar */}
+        <div className="flex justify-center mt-2">
           <GameStats
             time={gameState.time}
             moves={gameState.moves}
@@ -257,9 +248,9 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
         </div>
       </div>
 
-      {/* Game Board */}
-      <div className="flex-1 flex justify-center min-h-0 px-2">
-        <div className="w-full max-w-[min(80vw,70vh,500px)] aspect-square">
+      {/* Game Board Container - Takes remaining space */}
+      <div className="flex-1 flex items-center justify-center p-4 min-h-0">
+        <div className="w-full h-full max-w-[min(90vw,90vh)] max-h-[min(90vw,90vh)] aspect-square">
           <GameBoard
             tiles={gameState.tiles}
             size={size}
@@ -271,7 +262,7 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
 
       {/* Win Message */}
       {gameState.isWon && (
-        <div className="flex-shrink-0 mt-2 md:mt-4">
+        <div className="flex-shrink-0">
           <WinMessage
             moves={gameState.moves}
             time={gameState.time}

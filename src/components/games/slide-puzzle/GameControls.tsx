@@ -26,12 +26,12 @@ const GameControls: React.FC<GameControlsProps> = ({
   onNewGame
 }) => {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 max-w-2xl mx-auto">
+    <div className="flex flex-wrap items-center justify-between gap-2">
       {/* Size Selector */}
       <div className="flex items-center gap-2">
         <span className="text-sm font-medium whitespace-nowrap">Velikost:</span>
         <Select value={size.toString()} onValueChange={(value) => onSizeChange(parseInt(value))}>
-          <SelectTrigger className="w-20 h-8">
+          <SelectTrigger className="w-16 h-8 text-xs">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -49,7 +49,7 @@ const GameControls: React.FC<GameControlsProps> = ({
           size="sm"
           onClick={onUndo}
           disabled={!canUndo}
-          className="h-8 px-2"
+          className="h-8 px-2 text-xs"
         >
           <Undo className="h-3 w-3" />
           <span className="hidden sm:inline ml-1">Razveljavi</span>
@@ -60,13 +60,13 @@ const GameControls: React.FC<GameControlsProps> = ({
           size="sm"
           onClick={onHint}
           disabled={isWon}
-          className="h-8 px-2"
+          className="h-8 px-2 text-xs"
         >
           <Lightbulb className="h-3 w-3" />
           <span className="hidden sm:inline ml-1">Namig</span>
         </Button>
         
-        <Button variant="outline" size="sm" onClick={onShowInstructions} className="h-8 px-2">
+        <Button variant="outline" size="sm" onClick={onShowInstructions} className="h-8 px-2 text-xs">
           <HelpCircle className="h-3 w-3" />
           <span className="hidden sm:inline ml-1">Kako igrati</span>
         </Button>
@@ -75,7 +75,7 @@ const GameControls: React.FC<GameControlsProps> = ({
           variant="outline"
           size="sm"
           onClick={onNewGame}
-          className="h-8 px-2"
+          className="h-8 px-2 text-xs"
         >
           <RotateCcw className="h-3 w-3" />
           <span className="hidden sm:inline ml-1">Nova igra</span>

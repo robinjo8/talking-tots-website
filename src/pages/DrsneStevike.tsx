@@ -9,21 +9,22 @@ export default function DrsneStevilke() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-screen w-screen overflow-hidden bg-background flex flex-col">
       <Header />
-      <div className="flex-1 flex flex-col pt-16">
-        <div className="container mx-auto px-4 flex items-center gap-3 py-2 md:py-3">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/govorne-igre")}>
-            <ArrowLeft className="h-4 w-4" /> Nazaj
-          </Button>
-          <h1 className="text-xl md:text-2xl font-bold text-foreground">
-            Drsne številke
-          </h1>
-        </div>
-        
-        <div className="flex-1 flex flex-col p-2 md:p-4 min-h-0">
-          <SlidePuzzle className="w-full h-full" />
-        </div>
+      
+      {/* Header bar with back button and title */}
+      <div className="flex-shrink-0 flex items-center gap-3 px-4 py-2 bg-background border-b">
+        <Button variant="ghost" size="sm" onClick={() => navigate("/govorne-igre")}>
+          <ArrowLeft className="h-4 w-4" /> Nazaj
+        </Button>
+        <h1 className="text-lg md:text-xl font-bold text-foreground">
+          Drsne številke
+        </h1>
+      </div>
+      
+      {/* Game container - fills remaining screen space */}
+      <div className="flex-1 w-full overflow-hidden">
+        <SlidePuzzle className="w-full h-full" />
       </div>
     </div>
   );
