@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SelectChildDialog } from "@/components/SelectChildDialog";
 import { FeaturesCarousel } from "@/components/FeaturesCarousel";
+
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showChildSelector, setShowChildSelector] = useState(false);
@@ -55,11 +56,13 @@ const Index = () => {
         <div className="absolute top-40 -right-10 w-60 h-60 bg-app-blue/20 rounded-full blur-3xl"></div>
         
         <div className="max-w-6xl mx-auto">
-          {/* Top Badge */}
+          {/* Top Badge - Centered on desktop */}
           <div className={`text-center mb-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
-            <Badge variant="secondary" className="bg-light-cloud text-dragon-green font-semibold px-4 py-2 text-sm">
-              Vodilni AI govorni pomočnik za otroke
-            </Badge>
+            <div className="flex justify-center lg:justify-center">
+              <Badge variant="secondary" className="bg-light-cloud text-dragon-green font-semibold px-4 py-2 text-sm">
+                Vodilni AI govorni pomočnik za otroke
+              </Badge>
+            </div>
           </div>
           
           {/* Main Content Container */}
@@ -96,25 +99,25 @@ const Index = () => {
                 </Button>
               </div>
               
-              {/* Trust Badges */}
+              {/* Trust Badges - Icons above text, single line */}
               <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 lg:mb-0 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-400`}>
-                <div className="flex items-center justify-center lg:justify-start gap-3 p-4 bg-white rounded-lg shadow-sm">
-                  <CheckCircle className="h-5 w-5 text-dragon-green flex-shrink-0" />
-                  <span className="font-medium text-gray-700 text-center lg:text-center text-sm px-0 mx-0 py-0 my-0">Temelji na logopedskih smernicah</span>
+                <div className="flex flex-col items-center justify-center lg:justify-center p-4 bg-white rounded-lg shadow-sm">
+                  <CheckCircle className="h-5 w-5 text-dragon-green flex-shrink-0 mb-2" />
+                  <span className="font-medium text-gray-700 text-center text-sm whitespace-nowrap">Temelji na logopedskih smernicah</span>
                 </div>
-                <div className="flex items-center justify-center lg:justify-start gap-3 p-4 bg-white rounded-lg shadow-sm">
-                  <Shield className="h-5 w-5 text-dragon-green flex-shrink-0" />
-                  <span className="text-sm font-medium text-gray-700 text-center lg:text-center">Varno in enostavno za uporabo</span>
+                <div className="flex flex-col items-center justify-center lg:justify-center p-4 bg-white rounded-lg shadow-sm">
+                  <Shield className="h-5 w-5 text-dragon-green flex-shrink-0 mb-2" />
+                  <span className="text-sm font-medium text-gray-700 text-center whitespace-nowrap">Varno in enostavno za uporabo</span>
                 </div>
-                <div className="flex items-center justify-center lg:justify-start gap-3 p-4 bg-white rounded-lg shadow-sm px-[16px]">
-                  <Users className="h-5 w-5 text-dragon-green flex-shrink-0" />
-                  <span className="text-sm font-medium text-gray-700 text-center lg:text-center">Prilagojen otrokom od 3 – 12 leta</span>
+                <div className="flex flex-col items-center justify-center lg:justify-center p-4 bg-white rounded-lg shadow-sm">
+                  <Users className="h-5 w-5 text-dragon-green flex-shrink-0 mb-2" />
+                  <span className="text-sm font-medium text-gray-700 text-center whitespace-nowrap">Prilagojen otrokom od 3 – 12 leta</span>
                 </div>
               </div>
             </div>
             
             {/* Right Dragon Column - Desktop with restored larger size and top alignment */}
-            {!isMobile && <div className={`flex-shrink-0 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'} transition-all duration-700 ease-out delay-300`}>
+            {!isMobile && <div className={`flex-shrink-0 self-start ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'} transition-all duration-700 ease-out delay-300`}>
                 <div className="relative w-80 h-80 xl:w-96 xl:h-96">
                   <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
                   <div className="animate-float relative">
@@ -194,4 +197,5 @@ const Index = () => {
       <SelectChildDialog open={showChildSelector} onOpenChange={setShowChildSelector} />
     </div>;
 };
+
 export default Index;
