@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SelectChildDialog } from "@/components/SelectChildDialog";
 import { FeaturesCarousel } from "@/components/FeaturesCarousel";
+
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showChildSelector, setShowChildSelector] = useState(false);
@@ -19,9 +20,11 @@ const Index = () => {
   } = useAuth();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
+
   useEffect(() => {
     setIsVisible(true);
   }, []);
+
   const handleStartNow = () => {
     // If not logged in, redirect to login page
     if (!user) {
@@ -38,6 +41,7 @@ const Index = () => {
       setShowChildSelector(true);
     }
   };
+
   const scrollToFeatures = () => {
     const featuresSection = document.getElementById('features');
     if (featuresSection) {
@@ -46,6 +50,7 @@ const Index = () => {
       });
     }
   };
+
   return <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden">
       <Header />
       
@@ -54,7 +59,7 @@ const Index = () => {
         <div className="absolute -top-10 -left-10 w-32 h-32 bg-app-yellow/20 rounded-full blur-3xl"></div>
         <div className="absolute top-40 -right-10 w-60 h-60 bg-app-blue/20 rounded-full blur-3xl"></div>
         
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           {/* Top Badge */}
           <div className={`text-center mb-6 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
             <Badge variant="secondary" className="bg-light-cloud text-dragon-green font-semibold px-4 py-2 text-sm">
@@ -62,28 +67,19 @@ const Index = () => {
             </Badge>
           </div>
           
-          {/* Main Content Container */}
-          <div className="text-center">
-            {/* Desktop Dragon - positioned absolutely on the right */}
-            {!isMobile && <div className={`absolute right-0 top-20 w-80 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'} transition-all duration-700 ease-out delay-300`}>
-                <div className="relative">
-                  <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
-                  <div className="animate-float relative">
-                    <img alt="Tomi Talk Dragon Mascot" className="w-full max-w-sm mx-auto" src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" />
-                  </div>
-                </div>
-              </div>}
-            
+          {/* Main Content Container - Stack everything vertically */}
+          <div className="text-center space-y-8">
             {/* Main Headline */}
             <div className={`mb-6 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-100`}>
-              <h1 className="text-3xl md:text-5xl leading-tight max-w-4xl font-bold px-[74px] mx-0 lg:text-6xl">
-                Odpravite govorne težave brez čakalnih vrst pri logopedu – <span className="text-dragon-green">s pomočjo pametnega AI pomočnika</span>.
+              <h1 className="text-3xl md:text-5xl lg:text-6xl leading-tight max-w-5xl font-bold mx-auto">
+                <span className="block">Odpravite govorne težave brez čakalnih vrst pri logopedu –</span>
+                <span className="block text-dragon-green">s pomočjo pametnega AI pomočnika.</span>
               </h1>
             </div>
             
             {/* Subheadline */}
             <div className={`mb-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-200`}>
-              <p className="text-lg md:text-xl max-w-3xl mx-auto leading-relaxed text-neutral-950 font-medium">
+              <p className="text-lg md:text-xl max-w-4xl mx-auto leading-relaxed text-neutral-950 font-medium">
                 Pridruži se staršem, ki že vsak dan vadijo govorne vaje s svojimi otroki – personalizirano glede na starost, težavo in logopedske smernice.
               </p>
             </div>
@@ -102,7 +98,7 @@ const Index = () => {
             </div>
             
             {/* Trust Badges */}
-            <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-400`}>
+            <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-12 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-400`}>
               <div className="flex items-center justify-center gap-3 p-4 bg-white rounded-lg shadow-sm">
                 <CheckCircle className="h-5 w-5 text-dragon-green flex-shrink-0" />
                 <span className="text-sm font-medium text-gray-700">Temelji na logopedskih smernicah</span>
@@ -117,15 +113,15 @@ const Index = () => {
               </div>
             </div>
             
-            {/* Mobile Dragon - Below trust badges */}
-            {isMobile && <div className={`relative mx-auto w-3/4 max-w-sm ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-500`}>
-                <div className="relative">
-                  <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
-                  <div className="animate-float relative">
-                    <img alt="Tomi Talk Dragon Mascot" className="w-full mx-auto" src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" />
-                  </div>
+            {/* Dragon - Always below trust badges, centered */}
+            <div className={`relative mx-auto w-3/4 max-w-sm ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-500`}>
+              <div className="relative">
+                <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
+                <div className="animate-float relative">
+                  <img alt="Tomi Talk Dragon Mascot" className="w-full mx-auto" src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" />
                 </div>
-              </div>}
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -188,4 +184,5 @@ const Index = () => {
       <SelectChildDialog open={showChildSelector} onOpenChange={setShowChildSelector} />
     </div>;
 };
+
 export default Index;
