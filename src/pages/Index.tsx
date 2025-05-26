@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -63,14 +64,14 @@ const Index = () => {
           </div>
           
           {/* Main Content Container */}
-          <div className="relative flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12">
+          <div className="relative flex flex-col lg:flex-row lg:items-start items-center justify-between gap-8 lg:gap-12">
             {/* Left Content Column */}
             <div className="flex-1 text-center lg:text-left max-w-3xl">
               {/* Main Headline - Responsive text size for desktop */}
               <div className={`mb-6 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-100`}>
                 <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl leading-tight font-bold">
-                  <span className="block text-neutral-950 text-center">Odpravite govorne težave brez čakanja –</span>
-                  <span className="block text-dragon-green mt-2 text-center">
+                  <span className="block text-neutral-950 text-center lg:text-left">Odpravite govorne težave brez čakanja –</span>
+                  <span className="block text-dragon-green mt-2 text-center lg:text-left">
                     s pomočjo pametnega AI pomočnika!
                   </span>
                 </h1>
@@ -78,20 +79,20 @@ const Index = () => {
               
               {/* Subheadline */}
               <div className={`mb-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-200`}>
-                <p className="text-lg md:text-xl leading-relaxed text-neutral-950 font-medium text-center">
+                <p className="text-lg md:text-xl leading-relaxed text-neutral-950 font-medium text-center lg:text-left">
                   Pridruži se staršem, ki že vsak dan vadijo govorne vaje s svojimi otroki – personalizirano glede na starost, težavo in logopedske smernice.
                 </p>
               </div>
               
               {/* Action Buttons */}
-              <div className={`flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-10 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-300`}>
-                <Button size="lg" onClick={handleStartNow} className="w-full sm:w-auto bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full min-w-[180px]">
+              <div className={`flex flex-col sm:flex-row gap-4 justify-center mb-10 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-300`}>
+                <Button size="lg" onClick={handleStartNow} className="w-full sm:w-48 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full">
                   Začni zdaj
                 </Button>
-                <Button size="lg" className="bg-app-blue hover:bg-app-blue/90 text-white rounded-full">
+                <Button size="lg" className="w-full sm:w-48 bg-app-blue hover:bg-app-blue/90 text-white rounded-full">
                   <Play className="mr-2 h-4 w-4" /> Poglej demo
                 </Button>
-                <Button size="lg" variant="outline" onClick={scrollToFeatures} className="bg-app-blue hover:bg-app-blue/90 text-white rounded-full">
+                <Button size="lg" variant="outline" onClick={scrollToFeatures} className="w-full sm:w-48 bg-app-blue hover:bg-app-blue/90 text-white rounded-full">
                   Več info
                 </Button>
               </div>
@@ -113,7 +114,7 @@ const Index = () => {
               </div>
             </div>
             
-            {/* Right Dragon Column - Desktop with restored larger size */}
+            {/* Right Dragon Column - Desktop with restored larger size and top alignment */}
             {!isMobile && <div className={`flex-shrink-0 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'} transition-all duration-700 ease-out delay-300`}>
                 <div className="relative w-80 h-80 xl:w-96 xl:h-96">
                   <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
