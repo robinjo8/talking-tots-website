@@ -105,21 +105,21 @@ const Index = () => {
                 <div className="w-12 h-12 bg-app-blue/10 rounded-full flex items-center justify-center mb-3">
                   <Book className="h-6 w-6 text-app-blue" />
                 </div>
-                <p className="text-sm font-medium text-foreground">Temelji na znanstvenih logopedskih smernicah</p>
+                <p className="text-sm font-medium text-foreground">Temelji na logopedskih smernicah</p>
               </div>
               
               <div className="flex flex-col items-center text-center p-4">
                 <div className="w-12 h-12 bg-dragon-green/10 rounded-full flex items-center justify-center mb-3">
                   <Users className="h-6 w-6 text-dragon-green" />
                 </div>
-                <p className="text-sm font-medium text-foreground">Zasnovano s pomočjo slovenskih logopedov</p>
+                <p className="text-sm font-medium text-foreground px-0 mx-0">Zasnovano s pomočjo logopedov</p>
               </div>
               
               <div className="flex flex-col items-center text-center p-4">
                 <div className="w-12 h-12 bg-app-orange/10 rounded-full flex items-center justify-center mb-3">
                   <Shield className="h-6 w-6 text-app-orange" />
                 </div>
-                <p className="text-sm font-medium text-foreground">Varen in prilagojen otrokom od 3. do 12. leta</p>
+                <p className="text-sm font-medium text-foreground">Prilagojen otrokom od 3. do 12. leta</p>
               </div>
             </div>
           </div>
