@@ -21,6 +21,7 @@ import ArtIzgovorjavaPage from "./pages/ArtIzgovorjavaPage";
 import GovorneIgre from "./pages/GovorneIgre";
 import MojiIzzivi from "./pages/MojiIzzivi";
 import VideoNavodila from "./pages/VideoNavodila";
+import LogopedskiKoticek from "./pages/LogopedskiKoticek";
 import SpominR from "./pages/SpominR";
 import SpominGames from "./pages/SpominGames";
 import SpominK from "./pages/SpominK";
@@ -144,6 +145,14 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <VideoNavodila />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route 
+                  path="/logopedski-koticek" 
+                  element={
+                    <ProtectedRoute>
+                      <LogopedskiKoticek />
                     </ProtectedRoute>
                   }
                 />
