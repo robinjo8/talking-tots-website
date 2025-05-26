@@ -100,15 +100,15 @@ const Index = () => {
               <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 lg:mb-0 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-400`}>
                 <div className="flex items-center justify-center lg:justify-start gap-3 p-4 bg-white rounded-lg shadow-sm">
                   <CheckCircle className="h-5 w-5 text-dragon-green flex-shrink-0" />
-                  <span className="text-sm font-medium text-gray-700 text-center lg:text-left">Temelji na logopedskih smernicah</span>
+                  <span className="font-medium text-gray-700 text-center lg:text-center text-sm px-0 mx-0 py-0 my-0">Temelji na logopedskih smernicah</span>
                 </div>
                 <div className="flex items-center justify-center lg:justify-start gap-3 p-4 bg-white rounded-lg shadow-sm">
                   <Shield className="h-5 w-5 text-dragon-green flex-shrink-0" />
-                  <span className="text-sm font-medium text-gray-700 text-center lg:text-left">Varno in enostavno za uporabo</span>
+                  <span className="text-sm font-medium text-gray-700 text-center lg:text-center">Varno in enostavno za uporabo</span>
                 </div>
-                <div className="flex items-center justify-center lg:justify-start gap-3 p-4 bg-white rounded-lg shadow-sm">
+                <div className="flex items-center justify-center lg:justify-start gap-3 p-4 bg-white rounded-lg shadow-sm px-[16px]">
                   <Users className="h-5 w-5 text-dragon-green flex-shrink-0" />
-                  <span className="text-sm font-medium text-gray-700 text-center lg:text-left">Prilagojen otrokom od 3 – 12 leta</span>
+                  <span className="text-sm font-medium text-gray-700 text-center lg:text-center">Prilagojen otrokom od 3 – 12 leta</span>
                 </div>
               </div>
             </div>
