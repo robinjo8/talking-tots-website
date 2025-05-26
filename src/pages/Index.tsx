@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import FeatureCard from "@/components/FeatureCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Mic, Play, Book, Stars, MessageSquare, Zap, Volume2, Award, CheckCircle, Shield, Users } from "lucide-react";
+import { Mic, Play, Book, Stars, MessageSquare, Zap, Volume2, Award, CheckCircle, Shield, Users, CirclePlay, Info } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SelectChildDialog } from "@/components/SelectChildDialog";
@@ -88,13 +88,16 @@ const Index = () => {
               
               {/* Action Buttons */}
               <div className={`flex flex-col sm:flex-row gap-4 justify-center mb-10 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-300`}>
-                <Button size="lg" onClick={handleStartNow} className="w-full sm:w-48 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full">
+                <Button size="lg" onClick={handleStartNow} className="w-auto sm:w-48 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full">
+                  <Play className="mr-2 h-4 w-4" />
                   Začni zdaj
                 </Button>
-                <Button size="lg" className="w-full sm:w-48 bg-app-blue hover:bg-app-blue/90 text-white rounded-full">
-                  <Play className="mr-2 h-4 w-4" /> Poglej demo
+                <Button size="lg" className="w-auto sm:w-48 bg-app-blue hover:bg-app-blue/90 text-white rounded-full">
+                  <CirclePlay className="mr-2 h-4 w-4" />
+                  Poglej demo
                 </Button>
-                <Button size="lg" variant="outline" onClick={scrollToFeatures} className="w-full sm:w-48 bg-app-blue hover:bg-app-blue/90 text-white rounded-full">
+                <Button size="lg" variant="outline" onClick={scrollToFeatures} className="w-auto sm:w-48 bg-app-blue hover:bg-app-blue/90 text-white rounded-full">
+                  <Info className="mr-2 h-4 w-4" />
                   Več info
                 </Button>
               </div>
