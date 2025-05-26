@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -70,8 +69,8 @@ const Index = () => {
               {/* Main Headline - Responsive text size for desktop */}
               <div className={`mb-6 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-100`}>
                 <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl leading-tight font-bold">
-                  <span className="block text-neutral-950 text-center lg:text-left">Odpravite govorne težave brez čakanja –</span>
-                  <span className="block text-dragon-green mt-2 text-center lg:text-left">
+                  <span className="block text-neutral-950 text-center lg:text-center">Odpravite govorne težave brez čakanja –</span>
+                  <span className="block text-dragon-green mt-2 text-center lg:text-center">
                     s pomočjo pametnega AI pomočnika!
                   </span>
                 </h1>
@@ -79,7 +78,7 @@ const Index = () => {
               
               {/* Subheadline */}
               <div className={`mb-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-200`}>
-                <p className="text-lg md:text-xl leading-relaxed text-neutral-950 font-medium text-center lg:text-left">
+                <p className="text-lg md:text-xl leading-relaxed text-neutral-950 font-medium text-center lg:text-center">
                   Pridruži se staršem, ki že vsak dan vadijo govorne vaje s svojimi otroki – personalizirano glede na starost, težavo in logopedske smernice.
                 </p>
               </div>
