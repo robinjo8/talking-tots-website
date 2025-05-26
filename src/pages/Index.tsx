@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import FeatureCard from "@/components/FeatureCard";
 import { Button } from "@/components/ui/button";
-import { Mic, Play, Book, Stars, MessageSquare, Zap, Volume2, Award } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Mic, Play, Book, Stars, MessageSquare, Zap, Volume2, Award, CheckCircle, Shield, Users } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SelectChildDialog } from "@/components/SelectChildDialog";
@@ -20,9 +21,11 @@ const Index = () => {
   } = useAuth();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
+  
   useEffect(() => {
     setIsVisible(true);
   }, []);
+  
   const handleStartNow = () => {
     // If not logged in, redirect to login page
     if (!user) {
@@ -39,6 +42,7 @@ const Index = () => {
       setShowChildSelector(true);
     }
   };
+  
   const scrollToFeatures = () => {
     const featuresSection = document.getElementById('features');
     if (featuresSection) {
@@ -47,33 +51,54 @@ const Index = () => {
       });
     }
   };
-  return <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden">
+  
+  return (
+    <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden">
       <Header />
       
-      {/* Hero Section - Improved layout */}
+      {/* Hero Section - Redesigned */}
       <section className="pt-16 md:pt-28 pb-10 md:pb-16 px-4 md:px-10 relative w-full">
         <div className="absolute -top-10 -left-10 w-32 h-32 bg-app-yellow/20 rounded-full blur-3xl"></div>
         <div className="absolute top-40 -right-10 w-60 h-60 bg-app-blue/20 rounded-full blur-3xl"></div>
         
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-          {/* Mobile layout: Dragon above, then text */}
-          {isMobile && (
-            <div className={`relative mx-auto ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out mb-6 order-first w-3/4`}>
-              <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
-              <div className="animate-float relative">
-                <img alt="Tomi Talk Dragon Mascot" className="w-full mx-auto" src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" />
-              </div>
-            </div>
-          )}
+        <div className="max-w-5xl mx-auto">
+          {/* Top Badge */}
+          <div className={`text-center mb-6 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
+            <Badge variant="secondary" className="bg-light-cloud text-dragon-green font-semibold px-4 py-2 text-sm">
+              Vodilni AI govorni pomočnik za otroke
+            </Badge>
+          </div>
           
-          <div className={`${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'} transition-all duration-700 ease-out ${isMobile ? 'text-center' : ''}`}>
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold mb-4 md:mb-6">
-              Naredimo govor <span className="rainbow-text">zabaven</span> – za male junake!
-            </h1>
-            <p className="text-lg md:text-xl mb-6 md:mb-8 text-muted-foreground max-w-xl font-normal mx-auto">Tomi Talk pomaga otroku razvijati govor s preprostimi in zabavnimi vajami ter igrami, ki jih priporočajo strokovnjaki.</p>
+          {/* Main Content Container */}
+          <div className="text-center">
+            {/* Desktop Dragon - positioned absolutely on the right */}
+            {!isMobile && (
+              <div className={`absolute right-0 top-20 w-80 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'} transition-all duration-700 ease-out delay-300`}>
+                <div className="relative">
+                  <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
+                  <div className="animate-float relative">
+                    <img alt="Tomi Talk Dragon Mascot" className="w-full max-w-sm mx-auto" src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" />
+                  </div>
+                </div>
+              </div>
+            )}
             
-            {/* Action Buttons - Moved to hero text section */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+            {/* Main Headline */}
+            <div className={`mb-6 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-100`}>
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold leading-tight max-w-4xl mx-auto">
+                Odpravite govorne težave brez čakalnih vrst pri logopedu – <span className="text-dragon-green">s pomočjo pametnega AI pomočnika</span>.
+              </h1>
+            </div>
+            
+            {/* Subheadline */}
+            <div className={`mb-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-200`}>
+              <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto font-normal leading-relaxed">
+                Pridruži se staršem, ki že vsak dan vadijo govorne vaje s svojimi otroki – personalizirano glede na starost, težavo in logopedske smernice.
+              </p>
+            </div>
+            
+            {/* Action Buttons */}
+            <div className={`flex flex-col sm:flex-row gap-4 justify-center mb-12 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-300`}>
               <Button size="lg" onClick={handleStartNow} className="w-full sm:w-auto bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full min-w-[180px]">
                 Začni zdaj
               </Button>
@@ -84,17 +109,35 @@ const Index = () => {
                 Več info
               </Button>
             </div>
-          </div>
-          
-          {/* Desktop layout: Dragon on right */}
-          {!isMobile && (
-            <div className={`relative ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'} transition-all duration-700 ease-out delay-300`}>
-              <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
-              <div className="animate-float relative">
-                <img alt="Tomi Talk Dragon Mascot" className="w-full max-w-md mx-auto" src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" />
+            
+            {/* Trust Badges */}
+            <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-400`}>
+              <div className="flex items-center justify-center gap-3 p-4 bg-white rounded-lg shadow-sm">
+                <CheckCircle className="h-5 w-5 text-dragon-green flex-shrink-0" />
+                <span className="text-sm font-medium text-gray-700">Temelji na logopedskih smernicah</span>
+              </div>
+              <div className="flex items-center justify-center gap-3 p-4 bg-white rounded-lg shadow-sm">
+                <Shield className="h-5 w-5 text-dragon-green flex-shrink-0" />
+                <span className="text-sm font-medium text-gray-700">Varno in enostavno za uporabo</span>
+              </div>
+              <div className="flex items-center justify-center gap-3 p-4 bg-white rounded-lg shadow-sm">
+                <Users className="h-5 w-5 text-dragon-green flex-shrink-0" />
+                <span className="text-sm font-medium text-gray-700">Prilagojen otrokom od 3 – 12 leta</span>
               </div>
             </div>
-          )}
+            
+            {/* Mobile Dragon - Below trust badges */}
+            {isMobile && (
+              <div className={`relative mx-auto w-3/4 max-w-sm ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-500`}>
+                <div className="relative">
+                  <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
+                  <div className="animate-float relative">
+                    <img alt="Tomi Talk Dragon Mascot" className="w-full mx-auto" src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
@@ -154,7 +197,8 @@ const Index = () => {
       </footer>
       
       <SelectChildDialog open={showChildSelector} onOpenChange={setShowChildSelector} />
-    </div>;
+    </div>
+  );
 };
 
 export default Index;
