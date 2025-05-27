@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -103,21 +102,23 @@ const Index = () => {
                 </Button>
               </div>
               
-              {/* Trust Badges - Icons above text, single line */}
-              <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 lg:mb-0 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-400`}>
-                <div className="flex flex-col items-center justify-center lg:justify-center p-4 bg-white rounded-lg shadow-sm">
-                  <CheckCircle className="h-5 w-5 text-dragon-green flex-shrink-0 mb-2" />
-                  <span className="font-medium text-gray-700 text-center text-sm whitespace-nowrap">Temelji na logopedskih smernicah</span>
+              {/* Trust Badges - Desktop version (unchanged) */}
+              {!isMobile && (
+                <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 lg:mb-0 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-400`}>
+                  <div className="flex flex-col items-center justify-center lg:justify-center p-4 bg-white rounded-lg shadow-sm">
+                    <CheckCircle className="h-5 w-5 text-dragon-green flex-shrink-0 mb-2" />
+                    <span className="font-medium text-gray-700 text-center text-sm whitespace-nowrap">Temelji na logopedskih smernicah</span>
+                  </div>
+                  <div className="flex flex-col items-center justify-center lg:justify-center p-4 bg-white rounded-lg shadow-sm">
+                    <Shield className="h-5 w-5 text-dragon-green flex-shrink-0 mb-2" />
+                    <span className="text-sm font-medium text-gray-700 text-center whitespace-nowrap">Varno in enostavno za uporabo</span>
+                  </div>
+                  <div className="flex flex-col items-center justify-center lg:justify-center p-4 bg-white rounded-lg shadow-sm">
+                    <Users className="h-5 w-5 text-dragon-green flex-shrink-0 mb-2" />
+                    <span className="text-sm font-medium text-gray-700 text-center whitespace-nowrap">Prilagojen otrokom od 3 – 12 leta</span>
+                  </div>
                 </div>
-                <div className="flex flex-col items-center justify-center lg:justify-center p-4 bg-white rounded-lg shadow-sm">
-                  <Shield className="h-5 w-5 text-dragon-green flex-shrink-0 mb-2" />
-                  <span className="text-sm font-medium text-gray-700 text-center whitespace-nowrap">Varno in enostavno za uporabo</span>
-                </div>
-                <div className="flex flex-col items-center justify-center lg:justify-center p-4 bg-white rounded-lg shadow-sm">
-                  <Users className="h-5 w-5 text-dragon-green flex-shrink-0 mb-2" />
-                  <span className="text-sm font-medium text-gray-700 text-center whitespace-nowrap">Prilagojen otrokom od 3 – 12 leta</span>
-                </div>
-              </div>
+              )}
             </div>
             
             {/* Right Dragon Column - Desktop with restored larger size and top alignment */}
@@ -131,15 +132,36 @@ const Index = () => {
               </div>}
           </div>
           
-          {/* Mobile Dragon - Below trust badges */}
-          {isMobile && <div className={`relative mx-auto w-48 h-48 mt-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-500`}>
-              <div className="relative w-full h-full">
-                <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
-                <div className="animate-float relative">
-                  <img alt="Tomi Talk Dragon Mascot" className="w-full h-full object-contain" src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" />
+          {/* Mobile Trust Badges and Dragon - Horizontal layout */}
+          {isMobile && (
+            <div className={`flex items-center justify-between gap-4 mt-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-500`}>
+              {/* Left: Trust Badges */}
+              <div className="flex-1 space-y-3">
+                <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm">
+                  <CheckCircle className="h-4 w-4 text-dragon-green flex-shrink-0 mb-1" />
+                  <span className="font-medium text-gray-700 text-center text-xs">Temelji na logopedskih smernicah</span>
+                </div>
+                <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm">
+                  <Shield className="h-4 w-4 text-dragon-green flex-shrink-0 mb-1" />
+                  <span className="text-xs font-medium text-gray-700 text-center">Varno in enostavno za uporabo</span>
+                </div>
+                <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm">
+                  <Users className="h-4 w-4 text-dragon-green flex-shrink-0 mb-1" />
+                  <span className="text-xs font-medium text-gray-700 text-center">Prilagojen otrokom od 3 – 12 leta</span>
                 </div>
               </div>
-            </div>}
+              
+              {/* Right: Dragon */}
+              <div className="flex-shrink-0 w-32 h-32">
+                <div className="relative w-full h-full">
+                  <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
+                  <div className="animate-float relative">
+                    <img alt="Tomi Talk Dragon Mascot" className="w-full h-full object-contain" src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
