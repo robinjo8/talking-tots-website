@@ -143,7 +143,7 @@ const Index = () => {
                 </div>
                 <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm">
                   <Users className="h-4 w-4 text-dragon-green flex-shrink-0 mb-1" />
-                  <span className="text-xs font-medium text-gray-700 text-center mx-[26px]">Prilagojeno  otrokom od 3 do 12 leta</span>
+                  <span className="text-xs font-medium text-gray-700 text-center mx-[26px]">Letna naročnina za ceno dveh obiskov pri logopedu</span>
                 </div>
               </div>
               
