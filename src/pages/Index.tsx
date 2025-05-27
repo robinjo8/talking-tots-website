@@ -87,17 +87,17 @@ const Index = () => {
                 </p>
               </div>
               
-              {/* Action Buttons */}
-              <div className={`flex flex-col sm:flex-row gap-4 justify-center mb-10 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-300`}>
-                <Button size="lg" onClick={handleStartNow} className={`${isMobile ? 'w-auto max-w-fit px-6' : 'w-auto sm:w-48'} bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-2`}>
+              {/* Action Buttons - Updated mobile layout */}
+              <div className={`${isMobile ? 'flex flex-col items-center gap-3 mb-10' : 'flex flex-row gap-4 justify-center mb-10'} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-300`}>
+                <Button size="lg" onClick={handleStartNow} className={`${isMobile ? 'w-60 h-12' : 'w-auto sm:w-48'} bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-2`}>
                   <Play className="h-4 w-4" />
                   Začni zdaj
                 </Button>
-                <Button size="lg" className={`${isMobile ? 'w-auto max-w-fit px-6' : 'w-auto sm:w-48'} bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2`}>
+                <Button size="lg" className={`${isMobile ? 'w-60 h-12' : 'w-auto sm:w-48'} bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2`}>
                   <CirclePlay className="h-4 w-4" />
                   Poglej demo
                 </Button>
-                <Button size="lg" variant="outline" onClick={scrollToFeatures} className={`${isMobile ? 'w-auto max-w-fit px-6' : 'w-auto sm:w-48'} bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2`}>
+                <Button size="lg" variant="outline" onClick={scrollToFeatures} className={`${isMobile ? 'w-60 h-12' : 'w-auto sm:w-48'} bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2`}>
                   <Info className="h-4 w-4" />
                   Več info
                 </Button>
