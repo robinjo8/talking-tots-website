@@ -77,8 +77,8 @@ export default function Header() {
     path: "/video-navodila"
   }, {
     label: "Logopedski kotiček",
-    path: "#",
-    disabled: true
+    path: "/logopedski-koticek",
+    disabled: false
   }];
 
   // Helper function to check if a path is active

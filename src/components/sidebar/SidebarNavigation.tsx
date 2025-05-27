@@ -90,11 +90,21 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
       showOnMobile: true,
       showWhenLoggedIn: true,
     },
+    {
+      label: "Logopedski kotiček",
+      path: "/logopedski-koticek",
+      icon: BookOpen,
+      active: true,
+      showOnDesktop: false,
+      showOnMobile: true,
+      showWhenLoggedIn: true,
+    },
     // These items will always be shown on desktop, but hidden in mobile
     {
       label: "Logopedski kotiček",
+      path: "/logopedski-koticek",
       icon: BookOpen,
-      active: false,
+      active: true,
       showOnDesktop: true,
       showOnMobile: false,
       showWhenLoggedIn: true,
