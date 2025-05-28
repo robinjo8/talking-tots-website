@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -10,7 +9,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SelectChildDialog } from "@/components/SelectChildDialog";
 import { FeaturesCarousel } from "@/components/FeaturesCarousel";
-
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showChildSelector, setShowChildSelector] = useState(false);
@@ -21,11 +19,9 @@ const Index = () => {
   } = useAuth();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
-  
   useEffect(() => {
     setIsVisible(true);
   }, []);
-  
   const handleStartNow = () => {
     // If not logged in, redirect to login page
     if (!user) {
@@ -42,7 +38,6 @@ const Index = () => {
       setShowChildSelector(true);
     }
   };
-  
   const scrollToFeatures = () => {
     const featuresSection = document.getElementById('features');
     if (featuresSection) {
@@ -51,7 +46,6 @@ const Index = () => {
       });
     }
   };
-
   return <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden">
       <Header />
       
@@ -119,7 +113,7 @@ const Index = () => {
                   </div>
                   <div className="flex flex-col items-center text-center">
                     <Users className="h-8 w-8 text-dragon-green mb-3" />
-                    <span className="text-neutral-950 font-medium text-sm">Preizkušeno in priporočeno s strani staršev</span>
+                    <span className="text-neutral-950 font-medium text-sm">Priporočeno s strani staršev</span>
                   </div>
                 </div>}
             </div>
@@ -224,5 +218,4 @@ const Index = () => {
       <SelectChildDialog open={showChildSelector} onOpenChange={setShowChildSelector} />
     </div>;
 };
-
 export default Index;
