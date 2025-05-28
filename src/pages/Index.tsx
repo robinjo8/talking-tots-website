@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import FeatureCard from "@/components/FeatureCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Mic, Play, Book, Stars, MessageSquare, Zap, Volume2, Award, CheckCircle, Shield, Users, CirclePlay, Info, ArrowUp, PiggyBank } from "lucide-react";
+import { Mic, Play, Book, Stars, MessageSquare, Zap, Volume2, Award, CheckCircle, Shield, Users, CirclePlay, Info, ArrowUp, PiggyBank, Checklist } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SelectChildDialog } from "@/components/SelectChildDialog";
@@ -92,7 +91,7 @@ const Index = () => {
               </div>
               
               {/* Action Buttons - Updated mobile layout */}
-              <div className={`${isMobile ? 'flex flex-col items-center gap-3 mb-6' : 'flex flex-row gap-4 justify-center mb-10'} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-300`}>
+              <div className={`${isMobile ? 'flex flex-col items-center gap-3 mb-4' : 'flex flex-row gap-4 justify-center mb-10'} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-300`}>
                 <Button size="lg" onClick={handleStartNow} className={`${isMobile ? 'w-60 h-12' : 'w-auto sm:w-48'} bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-2`}>
                   <Play className="h-4 w-4" />
                   Začni zdaj
@@ -109,17 +108,17 @@ const Index = () => {
               
               {/* Trust Badges - Desktop version */}
               {!isMobile && <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 lg:mb-0 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-400`}>
-                  <div className="flex flex-col items-center justify-center lg:justify-center p-4 bg-white border border-app-blue rounded-lg shadow-sm">
-                    <CheckCircle className="h-5 w-5 text-app-blue flex-shrink-0 mb-2" />
-                    <span className="font-medium text-app-blue text-center text-sm whitespace-nowrap">Temelji na logopedskih smernicah</span>
+                  <div className="h-12 rounded-full border border-app-blue bg-white text-app-blue hover:bg-app-blue hover:text-white transition-colors cursor-default flex items-center justify-center gap-2 px-8">
+                    <Checklist className="h-4 w-4" />
+                    <span className="text-sm font-medium whitespace-nowrap">Temelji na logopedskih smernicah</span>
                   </div>
-                  <div className="flex flex-col items-center justify-center lg:justify-center p-4 bg-white border border-app-blue rounded-lg shadow-sm">
-                    <ArrowUp className="h-5 w-5 text-app-blue flex-shrink-0 mb-2" />
-                    <span className="text-sm font-medium text-app-blue text-center whitespace-nowrap">Hitrejši napredek pri izgovorjavi</span>
+                  <div className="h-12 rounded-full border border-app-blue bg-white text-app-blue hover:bg-app-blue hover:text-white transition-colors cursor-default flex items-center justify-center gap-2 px-8">
+                    <ArrowUp className="h-4 w-4" />
+                    <span className="text-sm font-medium whitespace-nowrap">Hitrejši napredek pri izgovorjavi</span>
                   </div>
-                  <div className="flex flex-col items-center justify-center lg:justify-center p-4 bg-white border border-app-blue rounded-lg shadow-sm">
-                    <PiggyBank className="h-5 w-5 text-app-blue flex-shrink-0 mb-2" />
-                    <span className="text-sm font-medium text-app-blue text-center whitespace-nowrap">Bistveno ceneje kot samoplačniški obiski</span>
+                  <div className="h-12 rounded-full border border-app-blue bg-white text-app-blue hover:bg-app-blue hover:text-white transition-colors cursor-default flex items-center justify-center gap-2 px-8">
+                    <PiggyBank className="h-4 w-4" />
+                    <span className="text-sm font-medium whitespace-nowrap">Bistveno ceneje kot samoplačniški obiski</span>
                   </div>
                 </div>}
             </div>
@@ -136,20 +135,20 @@ const Index = () => {
           </div>
           
           {/* Mobile Trust Badges and Dragon - Horizontal layout */}
-          {isMobile && <div className={`flex items-center justify-between gap-4 mt-4 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-500`}>
+          {isMobile && <div className={`flex items-center justify-between gap-4 mt-2 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-500`}>
               {/* Left: Trust Badges */}
               <div className="flex-1 space-y-2">
-                <div className="flex flex-col items-center justify-center p-3 bg-white border border-app-blue rounded-lg shadow-sm">
-                  <CheckCircle className="h-4 w-4 text-app-blue flex-shrink-0 mb-1" />
-                  <span className="font-medium text-app-blue text-center text-xs">Temelji na logopedskih smernicah</span>
+                <div className="h-12 rounded-full border border-app-blue bg-white text-app-blue hover:bg-app-blue hover:text-white transition-colors cursor-default flex items-center justify-center gap-2 px-4">
+                  <Checklist className="h-4 w-4 flex-shrink-0" />
+                  <span className="text-xs font-medium text-center">Temelji na logopedskih smernicah</span>
                 </div>
-                <div className="flex flex-col items-center justify-center p-3 bg-white border border-app-blue rounded-lg shadow-sm">
-                  <ArrowUp className="h-4 w-4 text-app-blue flex-shrink-0 mb-1" />
-                  <span className="text-xs font-medium text-app-blue text-center">Hitrejši napredek pri izgovorjavi</span>
+                <div className="h-12 rounded-full border border-app-blue bg-white text-app-blue hover:bg-app-blue hover:text-white transition-colors cursor-default flex items-center justify-center gap-2 px-4">
+                  <ArrowUp className="h-4 w-4 flex-shrink-0" />
+                  <span className="text-xs font-medium text-center">Hitrejši napredek pri izgovorjavi</span>
                 </div>
-                <div className="flex flex-col items-center justify-center p-3 bg-white border border-app-blue rounded-lg shadow-sm">
-                  <PiggyBank className="h-4 w-4 text-app-blue flex-shrink-0 mb-1" />
-                  <span className="text-xs font-medium text-app-blue text-center">Bistveno ceneje kot samoplačniški obiski</span>
+                <div className="h-12 rounded-full border border-app-blue bg-white text-app-blue hover:bg-app-blue hover:text-white transition-colors cursor-default flex items-center justify-center gap-2 px-4">
+                  <PiggyBank className="h-4 w-4 flex-shrink-0" />
+                  <span className="text-xs font-medium text-center">Bistveno ceneje kot samoplačniški obiski</span>
                 </div>
               </div>
               
