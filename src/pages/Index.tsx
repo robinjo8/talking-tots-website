@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SelectChildDialog } from "@/components/SelectChildDialog";
 import { FeaturesCarousel } from "@/components/FeaturesCarousel";
+
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showChildSelector, setShowChildSelector] = useState(false);
@@ -104,15 +105,21 @@ const Index = () => {
               {/* Trust Badges - Desktop version */}
               {!isMobile && <div className={`grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 lg:mb-0 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-400`}>
                   <div className="flex flex-col items-center text-center">
-                    <CheckCircle className="h-8 w-8 text-dragon-green mb-3" />
+                    <div className="w-20 h-20 mb-3 rounded-full bg-gradient-to-br from-dragon-green to-app-teal flex items-center justify-center shadow-lg border-4 border-white">
+                      <CheckCircle className="h-8 w-8 text-white" />
+                    </div>
                     <span className="text-neutral-950 font-medium text-sm">Temelji na logopedskih smernicah</span>
                   </div>
                   <div className="flex flex-col items-center text-center">
-                    <ArrowUp className="h-8 w-8 text-dragon-green mb-3" />
+                    <div className="w-20 h-20 mb-3 rounded-full bg-gradient-to-br from-app-blue to-app-purple flex items-center justify-center shadow-lg border-4 border-white">
+                      <ArrowUp className="h-8 w-8 text-white" />
+                    </div>
                     <span className="text-neutral-950 font-medium text-sm">Dokazan napredek pri izgovorjavi</span>
                   </div>
                   <div className="flex flex-col items-center text-center">
-                    <Users className="h-8 w-8 text-dragon-green mb-3" />
+                    <div className="w-20 h-20 mb-3 rounded-full bg-gradient-to-br from-app-orange to-app-yellow flex items-center justify-center shadow-lg border-4 border-white">
+                      <Users className="h-8 w-8 text-white" />
+                    </div>
                     <span className="text-neutral-950 font-medium text-sm">Priporočeno s strani staršev</span>
                   </div>
                 </div>}
@@ -134,15 +141,21 @@ const Index = () => {
               {/* Left: Trust Badges */}
               <div className="flex-1 space-y-3">
                 <div className="flex flex-col items-center text-center">
-                  <CheckCircle className="h-6 w-6 text-dragon-green mb-2" />
+                  <div className="w-12 h-12 mb-2 rounded-full bg-gradient-to-br from-dragon-green to-app-teal flex items-center justify-center shadow-lg border-2 border-white">
+                    <CheckCircle className="h-6 w-6 text-white" />
+                  </div>
                   <span className="text-neutral-950 font-medium text-xs">Temelji na logopedskih smernicah</span>
                 </div>
                 <div className="flex flex-col items-center text-center">
-                  <ArrowUp className="h-6 w-6 text-dragon-green mb-2" />
+                  <div className="w-12 h-12 mb-2 rounded-full bg-gradient-to-br from-app-blue to-app-purple flex items-center justify-center shadow-lg border-2 border-white">
+                    <ArrowUp className="h-6 w-6 text-white" />
+                  </div>
                   <span className="text-neutral-950 font-medium text-xs">Dokazan napredek pri izgovorjavi</span>
                 </div>
                 <div className="flex flex-col items-center text-center">
-                  <Users className="h-6 w-6 text-dragon-green mb-2" />
+                  <div className="w-12 h-12 mb-2 rounded-full bg-gradient-to-br from-app-orange to-app-yellow flex items-center justify-center shadow-lg border-2 border-white">
+                    <Users className="h-6 w-6 text-white" />
+                  </div>
                   <span className="text-neutral-950 font-medium text-xs">Priporočeno s strani staršev</span>
                 </div>
               </div>
@@ -218,4 +231,5 @@ const Index = () => {
       <SelectChildDialog open={showChildSelector} onOpenChange={setShowChildSelector} />
     </div>;
 };
+
 export default Index;
