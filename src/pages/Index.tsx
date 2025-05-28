@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -100,7 +101,7 @@ const Index = () => {
                   <CirclePlay className="h-4 w-4" />
                   Poglej demo
                 </Button>
-                <Button size="lg" variant="outline" onClick={scrollToFeatures} className={`${isMobile ? 'w-60 h-12' : 'w-auto sm:w-48'} border-app-blue text-app-blue hover:bg-app-blue hover:text-white rounded-full flex items-center justify-center gap-2`}>
+                <Button size="lg" onClick={scrollToFeatures} className={`${isMobile ? 'w-60 h-12' : 'w-auto sm:w-48'} bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2`}>
                   <Info className="h-4 w-4" />
                   Več info
                 </Button>
@@ -108,15 +109,15 @@ const Index = () => {
               
               {/* Trust Badges - Desktop version */}
               {!isMobile && <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 lg:mb-0 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-400`}>
-                  <div className="border border-app-blue bg-white text-app-blue hover:bg-app-blue hover:text-white rounded-full flex items-center justify-center gap-2 p-4 transition-colors cursor-default">
+                  <div className="border border-dragon-green bg-white text-dragon-green hover:bg-dragon-green hover:text-white rounded-full flex items-center justify-center gap-2 p-4 transition-colors cursor-default">
                     <CheckCircle className="h-4 w-4 flex-shrink-0" />
                     <span className="font-medium text-sm whitespace-nowrap">Temelji na logopedskih smernicah</span>
                   </div>
-                  <div className="border border-app-blue bg-white text-app-blue hover:bg-app-blue hover:text-white rounded-full flex items-center justify-center gap-2 p-4 transition-colors cursor-default">
+                  <div className="border border-dragon-green bg-white text-dragon-green hover:bg-dragon-green hover:text-white rounded-full flex items-center justify-center gap-2 p-4 transition-colors cursor-default">
                     <ArrowUp className="h-4 w-4 flex-shrink-0" />
                     <span className="font-medium text-sm whitespace-nowrap">Dokazan napredek pri izgovorjavi</span>
                   </div>
-                  <div className="border border-app-blue bg-white text-app-blue hover:bg-app-blue hover:text-white rounded-full flex items-center justify-center gap-2 p-4 transition-colors cursor-default">
+                  <div className="border border-dragon-green bg-white text-dragon-green hover:bg-dragon-green hover:text-white rounded-full flex items-center justify-center gap-2 p-4 transition-colors cursor-default">
                     <Users className="h-4 w-4 flex-shrink-0" />
                     <span className="font-medium text-sm whitespace-nowrap">Preizkušeno in priporočeno s strani staršev</span>
                   </div>
@@ -137,16 +138,16 @@ const Index = () => {
           {/* Mobile Trust Badges and Dragon - Horizontal layout */}
           {isMobile && <div className={`flex items-center justify-between gap-4 mt-6 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-500`}>
               {/* Left: Trust Badges */}
-              <div className="flex-1 space-y-3">
-                <div className="border border-app-blue bg-white text-app-blue hover:bg-app-blue hover:text-white rounded-full flex items-center justify-center gap-2 p-3 transition-colors cursor-default">
+              <div className="flex-1 space-y-2">
+                <div className="border border-dragon-green bg-white text-dragon-green hover:bg-dragon-green hover:text-white rounded-full flex items-center justify-center gap-2 p-3 transition-colors cursor-default">
                   <CheckCircle className="h-4 w-4 flex-shrink-0" />
                   <span className="font-medium text-xs text-center">Temelji na logopedskih smernicah</span>
                 </div>
-                <div className="border border-app-blue bg-white text-app-blue hover:bg-app-blue hover:text-white rounded-full flex items-center justify-center gap-2 p-3 transition-colors cursor-default">
+                <div className="border border-dragon-green bg-white text-dragon-green hover:bg-dragon-green hover:text-white rounded-full flex items-center justify-center gap-2 p-3 transition-colors cursor-default">
                   <ArrowUp className="h-4 w-4 flex-shrink-0" />
                   <span className="font-medium text-xs text-center">Dokazan napredek pri izgovorjavi</span>
                 </div>
-                <div className="border border-app-blue bg-white text-app-blue hover:bg-app-blue hover:text-white rounded-full flex items-center justify-center gap-2 p-3 transition-colors cursor-default">
+                <div className="border border-dragon-green bg-white text-dragon-green hover:bg-dragon-green hover:text-white rounded-full flex items-center justify-center gap-2 p-3 transition-colors cursor-default">
                   <Users className="h-4 w-4 flex-shrink-0" />
                   <span className="font-medium text-xs text-center">Preizkušeno in priporočeno s strani staršev</span>
                 </div>
