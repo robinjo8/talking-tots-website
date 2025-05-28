@@ -143,7 +143,7 @@ const Index = () => {
                 </div>
                 <div className="flex flex-col items-center text-center">
                   <Users className="h-6 w-6 text-dragon-green mb-2" />
-                  <span className="text-neutral-950 font-medium text-xs">Preizkušeno in priporočeno s strani staršev</span>
+                  <span className="text-neutral-950 font-medium text-xs">Priporočeno s strani staršev</span>
                 </div>
               </div>
               
