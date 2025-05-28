@@ -4,12 +4,11 @@ import Header from "@/components/Header";
 import FeatureCard from "@/components/FeatureCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Mic, Play, Book, Stars, MessageSquare, Zap, Volume2, Award, CheckCircle, Shield, Users, CirclePlay, Info, ArrowUp, PiggyBank, CheckSquare } from "lucide-react";
+import { Mic, Play, Book, Stars, MessageSquare, Zap, Volume2, Award, CheckCircle, Shield, Users, CirclePlay, Info } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SelectChildDialog } from "@/components/SelectChildDialog";
 import { FeaturesCarousel } from "@/components/FeaturesCarousel";
-
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showChildSelector, setShowChildSelector] = useState(false);
@@ -20,11 +19,9 @@ const Index = () => {
   } = useAuth();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
-  
   useEffect(() => {
     setIsVisible(true);
   }, []);
-  
   const handleStartNow = () => {
     // If not logged in, redirect to login page
     if (!user) {
@@ -41,7 +38,6 @@ const Index = () => {
       setShowChildSelector(true);
     }
   };
-  
   const scrollToFeatures = () => {
     const featuresSection = document.getElementById('features');
     if (featuresSection) {
@@ -50,7 +46,6 @@ const Index = () => {
       });
     }
   };
-  
   return <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden">
       <Header />
       
@@ -86,12 +81,12 @@ const Index = () => {
               {/* Subheadline */}
               <div className={`mb-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-200`}>
                 <p className="text-lg md:text-xl leading-relaxed text-neutral-950 font-medium text-center lg:text-center">
-                  Pridruži se staršem, ki že vsak dan vadijo govorne vaje s svojimi otroci – personalizirano glede na starost, težavo in logopedske smernice.
+                  Pridruži se staršem, ki že vsak dan vadijo govorne vaje s svojimi otroki – personalizirano glede na starost, težavo in logopedske smernice.
                 </p>
               </div>
               
               {/* Action Buttons - Updated mobile layout */}
-              <div className={`${isMobile ? 'flex flex-col items-center gap-3 mb-4' : 'flex flex-row gap-4 justify-center mb-10'} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-300`}>
+              <div className={`${isMobile ? 'flex flex-col items-center gap-3 mb-10' : 'flex flex-row gap-4 justify-center mb-10'} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-300`}>
                 <Button size="lg" onClick={handleStartNow} className={`${isMobile ? 'w-60 h-12' : 'w-auto sm:w-48'} bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-2`}>
                   <Play className="h-4 w-4" />
                   Začni zdaj
@@ -100,25 +95,25 @@ const Index = () => {
                   <CirclePlay className="h-4 w-4" />
                   Poglej demo
                 </Button>
-                <Button size="lg" variant="outline" onClick={scrollToFeatures} className={`${isMobile ? 'w-60 h-12' : 'w-auto sm:w-48'} border-app-blue text-app-blue hover:bg-app-blue hover:text-white rounded-full flex items-center justify-center gap-2`}>
+                <Button size="lg" variant="outline" onClick={scrollToFeatures} className={`${isMobile ? 'w-60 h-12' : 'w-auto sm:w-48'} bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2`}>
                   <Info className="h-4 w-4" />
                   Več info
                 </Button>
               </div>
               
-              {/* Trust Badges - Desktop version */}
+              {/* Trust Badges - Desktop version (unchanged) */}
               {!isMobile && <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 lg:mb-0 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-400`}>
-                  <div className="h-12 rounded-full border border-app-blue bg-white text-app-blue hover:bg-app-blue hover:text-white transition-colors cursor-default flex items-center justify-center gap-2 px-8">
-                    <CheckSquare className="h-4 w-4" />
-                    <span className="text-sm font-medium whitespace-nowrap">Temelji na logopedskih smernicah</span>
+                  <div className="flex flex-col items-center justify-center lg:justify-center p-4 bg-white rounded-lg shadow-sm">
+                    <CheckCircle className="h-5 w-5 text-dragon-green flex-shrink-0 mb-2" />
+                    <span className="font-medium text-gray-700 text-center text-sm whitespace-nowrap">Temelji na logopedskih smernicah</span>
                   </div>
-                  <div className="h-12 rounded-full border border-app-blue bg-white text-app-blue hover:bg-app-blue hover:text-white transition-colors cursor-default flex items-center justify-center gap-2 px-8">
-                    <ArrowUp className="h-4 w-4" />
-                    <span className="text-sm font-medium whitespace-nowrap">Hitrejši napredek pri izgovorjavi</span>
+                  <div className="flex flex-col items-center justify-center lg:justify-center p-4 bg-white rounded-lg shadow-sm">
+                    <Shield className="h-5 w-5 text-dragon-green flex-shrink-0 mb-2" />
+                    <span className="text-sm font-medium text-gray-700 text-center whitespace-nowrap">Varno in enostavno za uporabo</span>
                   </div>
-                  <div className="h-12 rounded-full border border-app-blue bg-white text-app-blue hover:bg-app-blue hover:text-white transition-colors cursor-default flex items-center justify-center gap-2 px-8">
-                    <PiggyBank className="h-4 w-4" />
-                    <span className="text-sm font-medium whitespace-nowrap">Bistveno ceneje kot samoplačniški obiski</span>
+                  <div className="flex flex-col items-center justify-center lg:justify-center p-4 bg-white rounded-lg shadow-sm">
+                    <Users className="h-5 w-5 text-dragon-green flex-shrink-0 mb-2" />
+                    <span className="text-sm font-medium text-gray-700 text-center whitespace-nowrap">Prilagojen otrokom od 3 – 12 leta</span>
                   </div>
                 </div>}
             </div>
@@ -135,20 +130,20 @@ const Index = () => {
           </div>
           
           {/* Mobile Trust Badges and Dragon - Horizontal layout */}
-          {isMobile && <div className={`flex items-center justify-between gap-4 mt-2 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-500`}>
+          {isMobile && <div className={`flex items-center justify-between gap-4 mt-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-500`}>
               {/* Left: Trust Badges */}
-              <div className="flex-1 space-y-2">
-                <div className="h-12 rounded-full border border-app-blue bg-white text-app-blue hover:bg-app-blue hover:text-white transition-colors cursor-default flex items-center justify-center gap-2 px-4">
-                  <CheckSquare className="h-4 w-4 flex-shrink-0" />
-                  <span className="text-xs font-medium text-center">Temelji na logopedskih smernicah</span>
+              <div className="flex-1 space-y-3">
+                <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm">
+                  <CheckCircle className="h-4 w-4 text-dragon-green flex-shrink-0 mb-1" />
+                  <span className="font-medium text-gray-700 text-center text-xs">Temelji na logopedskih smernicah</span>
                 </div>
-                <div className="h-12 rounded-full border border-app-blue bg-white text-app-blue hover:bg-app-blue hover:text-white transition-colors cursor-default flex items-center justify-center gap-2 px-4">
-                  <ArrowUp className="h-4 w-4 flex-shrink-0" />
-                  <span className="text-xs font-medium text-center">Hitrejši napredek pri izgovorjavi</span>
+                <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm">
+                  <Shield className="h-4 w-4 text-dragon-green flex-shrink-0 mb-1" />
+                  <span className="text-xs font-medium text-gray-700 text-center">Dokazan napredek pri izgovorjavi</span>
                 </div>
-                <div className="h-12 rounded-full border border-app-blue bg-white text-app-blue hover:bg-app-blue hover:text-white transition-colors cursor-default flex items-center justify-center gap-2 px-4">
-                  <PiggyBank className="h-4 w-4 flex-shrink-0" />
-                  <span className="text-xs font-medium text-center">Bistveno ceneje kot samoplačniški obiski</span>
+                <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm">
+                  <Users className="h-4 w-4 text-dragon-green flex-shrink-0 mb-1" />
+                  <span className="text-xs font-medium text-gray-700 text-center mx-[26px]">Letna naročnina za ceno dveh obiskov pri logopedu</span>
                 </div>
               </div>
               
@@ -223,5 +218,4 @@ const Index = () => {
       <SelectChildDialog open={showChildSelector} onOpenChange={setShowChildSelector} />
     </div>;
 };
-
 export default Index;
