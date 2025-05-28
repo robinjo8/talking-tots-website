@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import FeatureCard from "@/components/FeatureCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Mic, Play, Book, Stars, MessageSquare, Zap, Volume2, Award, CheckCircle, Shield, Users, CirclePlay, Info, ArrowUp, PiggyBank, Checklist } from "lucide-react";
+import { Mic, Play, Book, Stars, MessageSquare, Zap, Volume2, Award, CheckCircle, Shield, Users, CirclePlay, Info, ArrowUp, PiggyBank, CheckSquare } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SelectChildDialog } from "@/components/SelectChildDialog";
@@ -109,7 +109,7 @@ const Index = () => {
               {/* Trust Badges - Desktop version */}
               {!isMobile && <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 lg:mb-0 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-400`}>
                   <div className="h-12 rounded-full border border-app-blue bg-white text-app-blue hover:bg-app-blue hover:text-white transition-colors cursor-default flex items-center justify-center gap-2 px-8">
-                    <Checklist className="h-4 w-4" />
+                    <CheckSquare className="h-4 w-4" />
                     <span className="text-sm font-medium whitespace-nowrap">Temelji na logopedskih smernicah</span>
                   </div>
                   <div className="h-12 rounded-full border border-app-blue bg-white text-app-blue hover:bg-app-blue hover:text-white transition-colors cursor-default flex items-center justify-center gap-2 px-8">
@@ -139,7 +139,7 @@ const Index = () => {
               {/* Left: Trust Badges */}
               <div className="flex-1 space-y-2">
                 <div className="h-12 rounded-full border border-app-blue bg-white text-app-blue hover:bg-app-blue hover:text-white transition-colors cursor-default flex items-center justify-center gap-2 px-4">
-                  <Checklist className="h-4 w-4 flex-shrink-0" />
+                  <CheckSquare className="h-4 w-4 flex-shrink-0" />
                   <span className="text-xs font-medium text-center">Temelji na logopedskih smernicah</span>
                 </div>
                 <div className="h-12 rounded-full border border-app-blue bg-white text-app-blue hover:bg-app-blue hover:text-white transition-colors cursor-default flex items-center justify-center gap-2 px-4">
