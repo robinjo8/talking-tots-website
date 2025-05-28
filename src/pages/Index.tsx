@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -107,18 +108,18 @@ const Index = () => {
               </div>
               
               {/* Trust Badges - Desktop version */}
-              {!isMobile && <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 lg:mb-0 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-400`}>
-                  <div className="bg-dragon-green text-white rounded-full flex items-center justify-center gap-2 p-4 transition-colors cursor-default">
-                    <CheckCircle className="h-4 w-4 flex-shrink-0" />
-                    <span className="font-medium text-sm whitespace-nowrap">Temelji na logopedskih smernicah</span>
+              {!isMobile && <div className={`grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 lg:mb-0 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-400`}>
+                  <div className="flex flex-col items-center text-center">
+                    <CheckCircle className="h-8 w-8 text-dragon-green mb-3" />
+                    <span className="text-neutral-950 font-medium text-sm">Temelji na logopedskih smernicah</span>
                   </div>
-                  <div className="bg-dragon-green text-white rounded-full flex items-center justify-center gap-2 p-4 transition-colors cursor-default">
-                    <ArrowUp className="h-4 w-4 flex-shrink-0" />
-                    <span className="font-medium text-sm whitespace-nowrap">Dokazan napredek pri izgovorjavi</span>
+                  <div className="flex flex-col items-center text-center">
+                    <ArrowUp className="h-8 w-8 text-dragon-green mb-3" />
+                    <span className="text-neutral-950 font-medium text-sm">Dokazan napredek pri izgovorjavi</span>
                   </div>
-                  <div className="bg-dragon-green text-white rounded-full flex items-center justify-center gap-2 p-4 transition-colors cursor-default">
-                    <Users className="h-4 w-4 flex-shrink-0" />
-                    <span className="font-medium text-sm whitespace-nowrap">Preizkušeno in priporočeno s strani staršev</span>
+                  <div className="flex flex-col items-center text-center">
+                    <Users className="h-8 w-8 text-dragon-green mb-3" />
+                    <span className="text-neutral-950 font-medium text-sm">Preizkušeno in priporočeno s strani staršev</span>
                   </div>
                 </div>}
             </div>
@@ -137,18 +138,18 @@ const Index = () => {
           {/* Mobile Trust Badges and Dragon - Horizontal layout */}
           {isMobile && <div className={`flex items-center justify-between gap-4 mt-6 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-500`}>
               {/* Left: Trust Badges */}
-              <div className="flex-1 space-y-1">
-                <div className="bg-dragon-green text-white rounded-full flex items-center justify-center gap-2 p-3 transition-colors cursor-default">
-                  <CheckCircle className="h-4 w-4 flex-shrink-0" />
-                  <span className="font-medium text-xs text-center">Temelji na logopedskih smernicah</span>
+              <div className="flex-1 space-y-3">
+                <div className="flex flex-col items-center text-center">
+                  <CheckCircle className="h-6 w-6 text-dragon-green mb-2" />
+                  <span className="text-neutral-950 font-medium text-xs">Temelji na logopedskih smernicah</span>
                 </div>
-                <div className="bg-dragon-green text-white rounded-full flex items-center justify-center gap-2 p-3 transition-colors cursor-default">
-                  <ArrowUp className="h-4 w-4 flex-shrink-0" />
-                  <span className="font-medium text-xs text-center">Dokazan napredek pri izgovorjavi</span>
+                <div className="flex flex-col items-center text-center">
+                  <ArrowUp className="h-6 w-6 text-dragon-green mb-2" />
+                  <span className="text-neutral-950 font-medium text-xs">Dokazan napredek pri izgovorjavi</span>
                 </div>
-                <div className="bg-dragon-green text-white rounded-full flex items-center justify-center gap-2 p-3 transition-colors cursor-default">
-                  <Users className="h-4 w-4 flex-shrink-0" />
-                  <span className="font-medium text-xs text-center">Preizkušeno in priporočeno s strani staršev</span>
+                <div className="flex flex-col items-center text-center">
+                  <Users className="h-6 w-6 text-dragon-green mb-2" />
+                  <span className="text-neutral-950 font-medium text-xs">Preizkušeno in priporočeno s strani staršev</span>
                 </div>
               </div>
               
