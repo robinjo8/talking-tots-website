@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SelectChildDialog } from "@/components/SelectChildDialog";
 import { FeaturesCarousel } from "@/components/FeaturesCarousel";
+
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showChildSelector, setShowChildSelector] = useState(false);
@@ -19,9 +20,11 @@ const Index = () => {
   } = useAuth();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
+  
   useEffect(() => {
     setIsVisible(true);
   }, []);
+  
   const handleStartNow = () => {
     // If not logged in, redirect to login page
     if (!user) {
@@ -38,6 +41,7 @@ const Index = () => {
       setShowChildSelector(true);
     }
   };
+  
   const scrollToFeatures = () => {
     const featuresSection = document.getElementById('features');
     if (featuresSection) {
@@ -46,6 +50,7 @@ const Index = () => {
       });
     }
   };
+  
   return <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden">
       <Header />
       
@@ -57,13 +62,6 @@ const Index = () => {
         <div className="max-w-6xl mx-auto">
           {/* Mobile Layout */}
           {isMobile && <div className={`flex flex-col items-center text-center space-y-6 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
-              {/* Top Badge */}
-              <div className="mb-2">
-                <Badge variant="secondary" className="bg-light-cloud text-dragon-green font-semibold px-4 py-2 text-sm">
-                  Vodilni AI govorni pomočnik za otroke
-                </Badge>
-              </div>
-              
               {/* Main Headlines */}
               <div className="mb-4">
                 <h1 className="text-3xl leading-tight font-bold mb-4">
@@ -144,15 +142,6 @@ const Index = () => {
           
           {/* Desktop Layout - Keep existing desktop layout */}
           {!isMobile && <>
-              {/* Top Badge - Centered on desktop */}
-              <div className={`text-center mb-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
-                <div className="flex justify-center lg:justify-center">
-                  <Badge variant="secondary" className="bg-light-cloud text-dragon-green font-semibold px-4 py-2 text-sm">
-                    Vodilni AI govorni pomočnik za otroke
-                  </Badge>
-                </div>
-              </div>
-              
               {/* Main Content Container */}
               <div className="relative flex flex-col lg:flex-row lg:items-start items-center justify-between gap-8 lg:gap-12">
                 {/* Left Content Column */}
@@ -285,4 +274,5 @@ const Index = () => {
       <SelectChildDialog open={showChildSelector} onOpenChange={setShowChildSelector} />
     </div>;
 };
+
 export default Index;

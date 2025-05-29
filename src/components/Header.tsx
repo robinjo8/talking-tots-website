@@ -280,11 +280,11 @@ export default function Header() {
         </Link>
         
         <div className="flex items-center gap-3">
-          {/* Mobile hamburger menu - shows below lg breakpoint */}
-          <div className="lg:hidden">
-            {/* Selected child display for mobile */}
+          {/* Mobile layout - selected child name on left and hamburger on right */}
+          <div className="lg:hidden flex items-center w-full justify-between">
+            {/* Selected child display */}
             {selectedChild && (
-              <div className="flex items-center gap-2 mr-2">
+              <div className="flex items-center gap-2">
                 {selectedChild.avatarId > 0 && (
                   <Avatar className="h-6 w-6 border border-green-200">
                     <AvatarImage src={getAvatarSrc(selectedChild.avatarId)} alt={selectedChild.name} className="object-contain" />
@@ -299,9 +299,10 @@ export default function Header() {
               </div>
             )}
             
+            {/* Hamburger menu */}
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex items-center">
+                <Button variant="ghost" size="sm" className="flex items-center ml-auto">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
