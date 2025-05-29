@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import GameBoard from './slide-puzzle/GameBoard';
@@ -225,8 +224,8 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
 
   return (
     <div className={cn("h-full w-full flex flex-col overflow-hidden bg-gray-50", className)}>
-      {/* Top Controls Bar */}
-      <div className="flex-shrink-0 px-3 py-2 bg-white border-b">
+      {/* Top Controls Bar - Responsive padding and text sizes */}
+      <div className="flex-shrink-0 px-2 sm:px-3 py-1 sm:py-2 bg-white border-b">
         <GameControls
           size={size}
           canUndo={moveHistory.length > 0}
@@ -238,8 +237,8 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
           onNewGame={initializePuzzle}
         />
         
-        {/* Stats Bar */}
-        <div className="flex justify-center mt-2">
+        {/* Stats Bar - Responsive layout */}
+        <div className="flex justify-center mt-1 sm:mt-2">
           <GameStats
             time={gameState.time}
             moves={gameState.moves}
@@ -248,9 +247,9 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
         </div>
       </div>
 
-      {/* Game Board Container - Takes remaining space */}
-      <div className="flex-1 flex items-center justify-center p-4 min-h-0">
-        <div className="w-full h-full max-w-[min(90vw,90vh)] max-h-[min(90vw,90vh)] aspect-square">
+      {/* Game Board Container - Responsive sizing and proper aspect ratio */}
+      <div className="flex-1 flex items-center justify-center p-2 sm:p-4 min-h-0">
+        <div className="w-full h-full max-w-[min(95vw,85vh)] max-h-[min(95vw,85vh)] aspect-square">
           <GameBoard
             tiles={gameState.tiles}
             size={size}
@@ -260,9 +259,9 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
         </div>
       </div>
 
-      {/* Win Message */}
+      {/* Win Message - Responsive positioning */}
       {gameState.isWon && (
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 px-2 sm:px-4">
           <WinMessage
             moves={gameState.moves}
             time={gameState.time}
