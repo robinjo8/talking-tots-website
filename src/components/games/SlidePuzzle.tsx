@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import GameBoard from './slide-puzzle/GameBoard';
@@ -247,9 +248,9 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
         </div>
       </div>
 
-      {/* Game Board Container - Responsive sizing and proper aspect ratio */}
+      {/* Game Board Container - Updated responsive sizing to ensure full visibility */}
       <div className="flex-1 flex items-center justify-center p-2 sm:p-4 min-h-0">
-        <div className="w-full h-full max-w-[min(95vw,85vh)] max-h-[min(95vw,85vh)] aspect-square">
+        <div className="w-full h-full max-w-[min(90vw,75vh)] max-h-[min(90vw,75vh)] aspect-square">
           <GameBoard
             tiles={gameState.tiles}
             size={size}
