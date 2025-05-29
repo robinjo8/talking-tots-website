@@ -26,67 +26,67 @@ const GameControls: React.FC<GameControlsProps> = ({
   onNewGame
 }) => {
   return (
-    <div className="w-full space-y-3">
-      {/* Size Selector - Always prominently visible */}
-      <div className="flex items-center justify-center gap-2 px-2">
-        <span className="text-sm font-medium text-gray-700 min-w-fit">Velikost:</span>
+    <div className="w-full space-y-4">
+      {/* Size Selector - Modern clean design */}
+      <div className="flex items-center justify-center gap-3 px-4">
+        <span className="text-sm font-medium text-gray-700 whitespace-nowrap">Velikost:</span>
         <Select value={size.toString()} onValueChange={(value) => onSizeChange(parseInt(value))}>
-          <SelectTrigger className="w-24 h-9 text-sm font-medium">
+          <SelectTrigger className="w-20 h-10 text-sm font-medium border-gray-300 rounded-lg bg-white hover:border-gray-400 transition-colors">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="3">3×3</SelectItem>
-            <SelectItem value="4">4×4</SelectItem>
-            <SelectItem value="5">5×5</SelectItem>
+          <SelectContent className="rounded-lg border-gray-300">
+            <SelectItem value="3" className="text-sm font-medium">3×3</SelectItem>
+            <SelectItem value="4" className="text-sm font-medium">4×4</SelectItem>
+            <SelectItem value="5" className="text-sm font-medium">5×5</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      {/* Action Buttons - Fully responsive grid that adapts to screen size */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 px-2">
+      {/* Action Buttons - Modern grid layout */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 px-4">
         <Button
           variant="outline"
-          size="sm"
+          size="default"
           onClick={onUndo}
           disabled={!canUndo}
-          className="h-9 text-xs sm:text-sm flex items-center justify-center gap-1 min-w-0"
+          className="h-12 text-sm font-medium flex items-center justify-center gap-2 border-gray-300 rounded-lg bg-white hover:bg-gray-50 hover:border-gray-400 disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-200 transition-all duration-200"
         >
-          <Undo className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-          <span className="hidden sm:inline truncate">Razveljavi</span>
+          <Undo className="h-4 w-4 flex-shrink-0" />
+          <span className="hidden sm:inline">Razveljavi</span>
           <span className="sm:hidden">Razv.</span>
         </Button>
         
         <Button
           variant="outline"
-          size="sm"
+          size="default"
           onClick={onHint}
           disabled={isWon}
-          className="h-9 text-xs sm:text-sm flex items-center justify-center gap-1 min-w-0"
+          className="h-12 text-sm font-medium flex items-center justify-center gap-2 border-gray-300 rounded-lg bg-white hover:bg-gray-50 hover:border-gray-400 disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-200 transition-all duration-200"
         >
-          <Lightbulb className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-          <span className="hidden sm:inline truncate">Namig</span>
+          <Lightbulb className="h-4 w-4 flex-shrink-0" />
+          <span className="hidden sm:inline">Namig</span>
           <span className="sm:hidden">Nam.</span>
         </Button>
         
         <Button 
           variant="outline" 
-          size="sm" 
+          size="default" 
           onClick={onShowInstructions} 
-          className="h-9 text-xs sm:text-sm flex items-center justify-center gap-1 min-w-0"
+          className="h-12 text-sm font-medium flex items-center justify-center gap-2 border-gray-300 rounded-lg bg-white hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
         >
-          <HelpCircle className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-          <span className="hidden sm:inline truncate">Kako</span>
+          <HelpCircle className="h-4 w-4 flex-shrink-0" />
+          <span className="hidden sm:inline">Kako</span>
           <span className="sm:hidden">?</span>
         </Button>
         
         <Button
           variant="outline"
-          size="sm"
+          size="default"
           onClick={onNewGame}
-          className="h-9 text-xs sm:text-sm flex items-center justify-center gap-1 min-w-0"
+          className="h-12 text-sm font-medium flex items-center justify-center gap-2 border-gray-300 rounded-lg bg-white hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
         >
-          <RotateCcw className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-          <span className="hidden sm:inline truncate">Nova</span>
+          <RotateCcw className="h-4 w-4 flex-shrink-0" />
+          <span className="hidden sm:inline">Nova</span>
           <span className="sm:hidden">Nov.</span>
         </Button>
       </div>
