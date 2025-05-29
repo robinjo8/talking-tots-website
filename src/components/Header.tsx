@@ -6,10 +6,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { UserProfile } from "@/components/auth/UserProfile";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSidebar } from "@/components/ui/sidebar";
-import { Menu, BookOpen, UserPlus, Play } from "lucide-react";
+import { Menu, BookOpen, UserPlus, Play, Home, Activity, Gamepad, Award, Video } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { MobileMenu } from "@/components/MobileMenu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function Header() {
   const {
@@ -59,25 +59,31 @@ export default function Header() {
     return avatarImages[avatarId] || "";
   };
 
-  // Navigation links for desktop header
+  // Navigation links for both desktop and mobile
   const navigationLinks = [{
     label: "Moja stran",
-    path: "/moja-stran"
+    path: "/moja-stran",
+    icon: Home
   }, {
     label: "Vaje",
-    path: "/govorno-jezikovne-vaje"
+    path: "/govorno-jezikovne-vaje",
+    icon: Activity
   }, {
     label: "Govorne igre",
-    path: "/govorne-igre"
+    path: "/govorne-igre",
+    icon: Gamepad
   }, {
     label: "Izzivi",
-    path: "/moji-izzivi"
+    path: "/moji-izzivi",
+    icon: Award
   }, {
     label: "Video navodila",
-    path: "/video-navodila"
+    path: "/video-navodila",
+    icon: Video
   }, {
     label: "Logopedski kotiček",
     path: "/logopedski-koticek",
+    icon: BookOpen,
     disabled: false
   }];
 
@@ -85,8 +91,71 @@ export default function Header() {
   const isActivePath = (path: string) => {
     return location.pathname === path;
   };
+
+  // Mobile Menu Component
+  const MobileMenuContent = () => (
+    <ScrollArea className="h-[80vh]">
+      <div className="flex flex-col p-6 space-y-4">
+        {/* User info section */}
+        {user && selectedChild && (
+          <div className="flex items-center gap-3 pb-4 border-b">
+            {selectedChild.avatarId > 0 && (
+              <Avatar className="h-8 w-8 border border-green-200">
+                <AvatarImage src={getAvatarSrc(selectedChild.avatarId)} alt={selectedChild.name} className="object-contain" />
+                <AvatarFallback className="bg-green-100 text-green-800">
+                  {selectedChild.name[0]}
+                </AvatarFallback>
+              </Avatar>
+            )}
+            <span className="font-medium text-muted-foreground">
+              {selectedChild.name}
+            </span>
+          </div>
+        )}
+
+        {/* Navigation links for logged in users */}
+        {user && navigationLinks.map((link, index) => (
+          <Button 
+            key={index}
+            variant="ghost" 
+            className={`w-full justify-start text-left ${!link.disabled ? '' : 'opacity-50 cursor-not-allowed'} ${isActivePath(link.path) ? 'bg-accent' : ''}`}
+            onClick={() => !link.disabled && handleNavigate(link.path)}
+            disabled={link.disabled}
+          >
+            <link.icon className="h-4 w-4 mr-3" />
+            {link.label}
+          </Button>
+        ))}
+
+        {/* Auth buttons for non-logged in users */}
+        {!user && (
+          <div className="space-y-3 pt-4">
+            <Button onClick={handleStartNow} className="w-full bg-dragon-green hover:bg-dragon-green/90 text-white">
+              <Play className="h-4 w-4 mr-2" />
+              Začni zdaj
+            </Button>
+            <Button variant="outline" className="w-full" onClick={() => navigate("/login")}>
+              Prijava
+            </Button>
+            <Button variant="outline" className="w-full" onClick={() => navigate("/register")}>
+              <UserPlus className="h-4 w-4 mr-2" />
+              Registracija
+            </Button>
+          </div>
+        )}
+
+        {/* User profile for logged in users */}
+        {user && (
+          <div className="pt-4 border-t">
+            <UserProfile />
+          </div>
+        )}
+      </div>
+    </ScrollArea>
+  );
   
-  return <header className="py-4 px-4 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
+  return (
+    <header className="py-4 px-4 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <Link to="/" className="flex items-center gap-2">
           <div className="flex items-center">
@@ -96,76 +165,81 @@ export default function Header() {
         </Link>
         
         <div className="flex items-center gap-3">
-          {/* Mobile-specific buttons */}
-          {isMobile && (
-            <>
-              {/* Add Začni zdaj button for mobile only */}
-              <Button 
-                onClick={handleStartNow} 
-                size="sm" 
-                className="bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full"
-              >
-                Začni zdaj
-              </Button>
-
-              {/* Selected child display */}
-              {selectedChild && <div className="flex items-center gap-2">
-                {selectedChild.avatarId > 0 && <Avatar className="h-6 w-6 border border-green-200">
-                  <AvatarImage src={getAvatarSrc(selectedChild.avatarId)} alt={selectedChild.name} className="object-contain" />
-                  <AvatarFallback className="bg-green-100 text-green-800">
-                    {selectedChild.name[0]}
-                  </AvatarFallback>
-                </Avatar>}
+          {/* Mobile hamburger menu - shows below lg breakpoint */}
+          <div className="lg:hidden">
+            {/* Selected child display for mobile */}
+            {selectedChild && (
+              <div className="flex items-center gap-2 mr-2">
+                {selectedChild.avatarId > 0 && (
+                  <Avatar className="h-6 w-6 border border-green-200">
+                    <AvatarImage src={getAvatarSrc(selectedChild.avatarId)} alt={selectedChild.name} className="object-contain" />
+                    <AvatarFallback className="bg-green-100 text-green-800">
+                      {selectedChild.name[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                )}
                 <span className="text-sm font-medium text-muted-foreground">
                   {selectedChild.name}
                 </span>
-              </div>}
-              
-              {/* Mobile menu sheet */}
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="sm" className="flex items-center">
-                    <Menu className="h-5 w-5" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="right" className="p-0">
-                  <MobileMenu onItemClick={() => {}} />
-                </SheetContent>
-              </Sheet>
-            </>
-          )}
+              </div>
+            )}
+            
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="sm" className="flex items-center">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="p-0 w-80">
+                <MobileMenuContent />
+              </SheetContent>
+            </Sheet>
+          </div>
           
-          {/* Desktop navigation */}
-          {!isMobile && <nav className="flex items-center gap-6">
-            {user && <>
-              {/* Desktop Navigation Links */}
-              {navigationLinks.map((link, index) => <Button key={index} variant="ghost" onClick={() => !link.disabled && handleNavigate(link.path)} disabled={link.disabled}>
-                {link.label === "Logopedski kotiček" && <BookOpen className="h-4 w-4 mr-2" />}
-                {link.label}
-              </Button>)}
-            </>}
-
-            {user ? <div className="flex items-center gap-2">
-              <UserProfile />
-            </div> : <div className="flex items-center gap-3">
-              {/* New orange "Začni zdaj" button */}
-              <Button onClick={handleStartNow} size="sm" className="w-full sm:w-auto bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full min-w-[180px]">
-                Začni zdaj
-              </Button>
-              <Link to="/register">
-                <Button variant="outline" size="sm" className="text-sm">
-                  <UserPlus className="h-4 w-4 mr-1" />
-                  Registracija
+          {/* Desktop navigation - shows above lg breakpoint */}
+          <nav className="hidden lg:flex items-center gap-6">
+            {user ? (
+              <>
+                {/* Desktop Navigation Links */}
+                {navigationLinks.map((link, index) => (
+                  <Button 
+                    key={index} 
+                    variant="ghost" 
+                    onClick={() => !link.disabled && handleNavigate(link.path)} 
+                    disabled={link.disabled}
+                    className={isActivePath(link.path) ? 'bg-accent' : ''}
+                  >
+                    {link.label === "Logopedski kotiček" && <BookOpen className="h-4 w-4 mr-2" />}
+                    {link.label}
+                  </Button>
+                ))}
+                
+                <div className="flex items-center gap-2">
+                  <UserProfile />
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center gap-3">
+                {/* New orange "Začni zdaj" button */}
+                <Button onClick={handleStartNow} size="sm" className="w-full sm:w-auto bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full min-w-[180px]">
+                  Začni zdaj
                 </Button>
-              </Link>
-              <Link to="/login">
-                <Button variant="outline" size="sm" className="text-sm">
-                  Prijava
-                </Button>
-              </Link>
-            </div>}
-          </nav>}
+                <Link to="/register">
+                  <Button variant="outline" size="sm" className="text-sm">
+                    <UserPlus className="h-4 w-4 mr-1" />
+                    Registracija
+                  </Button>
+                </Link>
+                <Link to="/login">
+                  <Button variant="outline" size="sm" className="text-sm">
+                    Prijava
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </nav>
         </div>
       </div>
-    </header>;
+    </header>
+  );
 }
