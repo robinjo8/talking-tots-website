@@ -64,8 +64,8 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
       showWhenLoggedIn: true,
     },
     {
-      label: "Vaje za jezik",
-      path: "/vaje-za-jezik",
+      label: "Govorne igre",
+      path: "/govorne-igre",
       icon: Gamepad,
       active: true,
       showOnDesktop: false,

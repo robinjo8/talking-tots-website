@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -88,8 +89,8 @@ export default function Header() {
     path: "/govorno-jezikovne-vaje",
     icon: Activity
   }, {
-    label: "Vaje za jezik",
-    path: "/vaje-za-jezik",
+    label: "Govorne igre",
+    path: "/govorne-igre",
     icon: Gamepad
   }, {
     label: "Izzivi",
