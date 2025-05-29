@@ -90,20 +90,6 @@ const Index = () => {
                 </p>
               </div>
               
-              {/* Dragon Image - Mobile */}
-              <div className={`${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'} transition-all duration-700 ease-out delay-250`}>
-                <div className="relative w-48 h-48">
-                  <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
-                  <div className="animate-float relative">
-                    <img 
-                      alt="Tomi Talk Dragon Mascot" 
-                      className="w-full h-full object-contain" 
-                      src="/lovable-uploads/afbdd309-0550-437a-9afc-966c9a811062.png" 
-                    />
-                  </div>
-                </div>
-              </div>
-              
               {/* CTA Buttons - Mobile */}
               <div className={`flex flex-col items-center gap-3 w-full max-w-xs ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-300`}>
                 <Button 
@@ -136,22 +122,39 @@ const Index = () => {
               {/* Trust Badges - Mobile */}
               <div className={`grid grid-cols-3 gap-4 mt-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-400`}>
                 <div className="flex flex-col items-center text-center">
-                  <div className="w-12 h-12 mb-2 rounded-full bg-gradient-to-br from-dragon-green to-app-teal flex items-center justify-center shadow-lg border-2 border-white">
-                    <CheckCircle className="h-6 w-6 text-white" />
+                  <div className="w-16 h-16 mb-3 rounded-full bg-gradient-to-br from-emerald-400 via-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg border-4 border-white relative">
+                    <Award className="h-8 w-8 text-white" />
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-t from-black/10 to-transparent"></div>
                   </div>
-                  <span className="text-neutral-950 font-medium text-xs leading-tight">Temelji na logopedskih smernicah</span>
+                  <span className="text-neutral-950 font-semibold text-xs leading-tight">Temelji na logopedskih smernicah</span>
                 </div>
                 <div className="flex flex-col items-center text-center">
-                  <div className="w-12 h-12 mb-2 rounded-full bg-gradient-to-br from-app-blue to-app-purple flex items-center justify-center shadow-lg border-2 border-white">
-                    <ArrowUp className="h-6 w-6 text-white" />
+                  <div className="w-16 h-16 mb-3 rounded-full bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 flex items-center justify-center shadow-lg border-4 border-white relative">
+                    <ArrowUp className="h-8 w-8 text-white" />
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-t from-black/10 to-transparent"></div>
                   </div>
-                  <span className="text-neutral-950 font-medium text-xs leading-tight">Dokazan napredek pri izgovorjavi</span>
+                  <span className="text-neutral-950 font-semibold text-xs leading-tight">Dokazan napredek pri izgovorjavi</span>
                 </div>
                 <div className="flex flex-col items-center text-center">
-                  <div className="w-12 h-12 mb-2 rounded-full bg-gradient-to-br from-app-orange to-app-yellow flex items-center justify-center shadow-lg border-2 border-white">
-                    <Users className="h-6 w-6 text-white" />
+                  <div className="w-16 h-16 mb-3 rounded-full bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 flex items-center justify-center shadow-lg border-4 border-white relative">
+                    <Users className="h-8 w-8 text-white" />
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-t from-black/10 to-transparent"></div>
                   </div>
-                  <span className="text-neutral-950 font-medium text-xs leading-tight">Priporočeno s strani staršev</span>
+                  <span className="text-neutral-950 font-semibold text-xs leading-tight">Priporočeno s strani staršev</span>
+                </div>
+              </div>
+
+              {/* Dragon Image - Mobile (moved below badges) */}
+              <div className={`${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'} transition-all duration-700 ease-out delay-500 mt-8`}>
+                <div className="relative w-48 h-48">
+                  <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
+                  <div className="animate-float relative">
+                    <img 
+                      alt="Tomi Talk Dragon Mascot" 
+                      className="w-full h-full object-contain" 
+                      src="/lovable-uploads/afbdd309-0550-437a-9afc-966c9a811062.png" 
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -159,87 +162,10 @@ const Index = () => {
           
           {/* Desktop Layout */}
           {!isMobile && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-[calc(100vh-200px)]">
-              {/* Left Content Column */}
-              <div className="flex flex-col justify-center space-y-8">
-                {/* Top Badge */}
-                <div className={`${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
-                  <Badge variant="secondary" className="bg-light-cloud text-dragon-green font-semibold px-6 py-3 text-base w-fit">
-                    Vodilni AI govorni pomočnik za otroke
-                  </Badge>
-                </div>
-                
-                {/* Main Headline */}
-                <div className={`${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-100`}>
-                  <h1 className="text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl leading-tight font-bold">
-                    <span className="block text-neutral-950">Odpravite govorne težave brez čakanja –</span>
-                    <span className="block text-dragon-green mt-3">
-                      s pomočjo pametnega AI pomočnika!
-                    </span>
-                  </h1>
-                </div>
-                
-                {/* Subheadline */}
-                <div className={`${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-200`}>
-                  <p className="text-xl lg:text-2xl leading-relaxed text-neutral-950 font-medium max-w-2xl">
-                    Pridruži se staršem, ki že vsak dan vadijo govorne vaje s svojimi otroci – personalizirano glede na starost, težavo in logopedske smernice.
-                  </p>
-                </div>
-                
-                {/* CTA Buttons - Desktop */}
-                <div className={`flex flex-wrap gap-4 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-300`}>
-                  <Button 
-                    size="lg" 
-                    onClick={handleStartNow} 
-                    className="h-14 px-8 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-3 text-lg font-semibold min-w-[200px]"
-                  >
-                    <Play className="h-5 w-5" />
-                    Začni zdaj
-                  </Button>
-                  <Button 
-                    size="lg" 
-                    className="h-14 px-8 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-3 text-lg font-semibold min-w-[180px]"
-                  >
-                    <CirclePlay className="h-5 w-5" />
-                    Poglej demo
-                  </Button>
-                  <Button 
-                    size="lg" 
-                    onClick={scrollToFeatures} 
-                    variant="outline"
-                    className="h-14 px-8 border-2 border-dragon-green text-dragon-green hover:bg-dragon-green hover:text-white rounded-full flex items-center justify-center gap-3 text-lg font-semibold min-w-[160px]"
-                  >
-                    <Info className="h-5 w-5" />
-                    Več info
-                  </Button>
-                </div>
-                
-                {/* Trust Badges - Desktop */}
-                <div className={`grid grid-cols-3 gap-8 mt-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-400`}>
-                  <div className="flex flex-col items-center text-center">
-                    <div className="w-16 h-16 mb-3 rounded-full bg-gradient-to-br from-dragon-green to-app-teal flex items-center justify-center shadow-lg border-4 border-white">
-                      <CheckCircle className="h-8 w-8 text-white" />
-                    </div>
-                    <span className="text-neutral-950 font-medium text-sm">Temelji na logopedskih smernicah</span>
-                  </div>
-                  <div className="flex flex-col items-center text-center">
-                    <div className="w-16 h-16 mb-3 rounded-full bg-gradient-to-br from-app-blue to-app-purple flex items-center justify-center shadow-lg border-4 border-white">
-                      <ArrowUp className="h-8 w-8 text-white" />
-                    </div>
-                    <span className="text-neutral-950 font-medium text-sm">Dokazan napredek pri izgovorjavi</span>
-                  </div>
-                  <div className="flex flex-col items-center text-center">
-                    <div className="w-16 h-16 mb-3 rounded-full bg-gradient-to-br from-app-orange to-app-yellow flex items-center justify-center shadow-lg border-4 border-white">
-                      <Users className="h-8 w-8 text-white" />
-                    </div>
-                    <span className="text-neutral-950 font-medium text-sm">Priporočeno s strani staršev</span>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Right Dragon Column - Desktop */}
-              <div className={`flex justify-center items-center ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'} transition-all duration-700 ease-out delay-300`}>
-                <div className="relative w-96 h-96 xl:w-[450px] xl:h-[450px]">
+            <div className="flex flex-col items-center text-center space-y-clamp(2rem,4vw,4rem) min-h-[calc(100vh-200px)] justify-center">
+              {/* Dragon Image - Desktop (at the top) */}
+              <div className={`${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'} transition-all duration-700 ease-out`}>
+                <div className="relative w-clamp(16rem,20vw,24rem) h-clamp(16rem,20vw,24rem)">
                   <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
                   <div className="animate-float relative">
                     <img 
@@ -248,6 +174,83 @@ const Index = () => {
                       src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" 
                     />
                   </div>
+                </div>
+              </div>
+
+              {/* Top Badge - Desktop (centered) */}
+              <div className={`${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-100`}>
+                <Badge variant="secondary" className="bg-light-cloud text-dragon-green font-semibold px-clamp(1.5rem,3vw,2rem) py-clamp(0.75rem,1.5vw,1rem) text-clamp(1rem,2vw,1.25rem)">
+                  Vodilni AI govorni pomočnik za otroke
+                </Badge>
+              </div>
+              
+              {/* Main Headline - Desktop (centered) */}
+              <div className={`${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-200 max-w-5xl`}>
+                <h1 className="text-clamp(2.5rem,5vw,4rem) leading-tight font-bold">
+                  <span className="block text-neutral-950">Odpravite govorne težave brez čakanja –</span>
+                  <span className="block text-dragon-green mt-clamp(0.5rem,1vw,1rem)">
+                    s pomočjo pametnega AI pomočnika!
+                  </span>
+                </h1>
+              </div>
+              
+              {/* Subheadline - Desktop (centered) */}
+              <div className={`${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-300 max-w-3xl`}>
+                <p className="text-clamp(1.125rem,2.5vw,1.5rem) leading-relaxed text-neutral-950 font-medium">
+                  Pridruži se staršem, ki že vsak dan vadijo govorne vaje s svojimi otroci – personalizirano glede na starost, težavo in logopedske smernice.
+                </p>
+              </div>
+              
+              {/* CTA Buttons - Desktop */}
+              <div className={`flex flex-wrap justify-center gap-clamp(1rem,2vw,1.5rem) ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-400`}>
+                <Button 
+                  size="lg" 
+                  onClick={handleStartNow} 
+                  className="h-clamp(3rem,4vw,3.5rem) px-clamp(2rem,4vw,2.5rem) bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-3 text-clamp(1rem,2vw,1.125rem) font-semibold min-w-[200px]"
+                >
+                  <Play className="h-clamp(1.25rem,2vw,1.5rem) w-clamp(1.25rem,2vw,1.5rem)" />
+                  Začni zdaj
+                </Button>
+                <Button 
+                  size="lg" 
+                  className="h-clamp(3rem,4vw,3.5rem) px-clamp(2rem,4vw,2.5rem) bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-3 text-clamp(1rem,2vw,1.125rem) font-semibold min-w-[180px]"
+                >
+                  <CirclePlay className="h-clamp(1.25rem,2vw,1.5rem) w-clamp(1.25rem,2vw,1.5rem)" />
+                  Poglej demo
+                </Button>
+                <Button 
+                  size="lg" 
+                  onClick={scrollToFeatures} 
+                  variant="outline"
+                  className="h-clamp(3rem,4vw,3.5rem) px-clamp(2rem,4vw,2.5rem) border-2 border-dragon-green text-dragon-green hover:bg-dragon-green hover:text-white rounded-full flex items-center justify-center gap-3 text-clamp(1rem,2vw,1.125rem) font-semibold min-w-[160px]"
+                >
+                  <Info className="h-clamp(1.25rem,2vw,1.5rem) w-clamp(1.25rem,2vw,1.5rem)" />
+                  Več info
+                </Button>
+              </div>
+              
+              {/* Trust Badges - Desktop */}
+              <div className={`grid grid-cols-3 gap-clamp(2rem,4vw,3rem) mt-clamp(2rem,4vw,3rem) ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-500`}>
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-clamp(4rem,8vw,5rem) h-clamp(4rem,8vw,5rem) mb-clamp(0.75rem,1.5vw,1rem) rounded-full bg-gradient-to-br from-emerald-400 via-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg border-4 border-white relative">
+                    <Award className="h-clamp(2rem,4vw,2.5rem) w-clamp(2rem,4vw,2.5rem) text-white" />
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-t from-black/10 to-transparent"></div>
+                  </div>
+                  <span className="text-neutral-950 font-semibold text-clamp(0.875rem,1.5vw,1rem) max-w-[12rem] leading-tight">Temelji na logopedskih smernicah</span>
+                </div>
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-clamp(4rem,8vw,5rem) h-clamp(4rem,8vw,5rem) mb-clamp(0.75rem,1.5vw,1rem) rounded-full bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 flex items-center justify-center shadow-lg border-4 border-white relative">
+                    <ArrowUp className="h-clamp(2rem,4vw,2.5rem) w-clamp(2rem,4vw,2.5rem) text-white" />
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-t from-black/10 to-transparent"></div>
+                  </div>
+                  <span className="text-neutral-950 font-semibold text-clamp(0.875rem,1.5vw,1rem) max-w-[12rem] leading-tight">Dokazan napredek pri izgovorjavi</span>
+                </div>
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-clamp(4rem,8vw,5rem) h-clamp(4rem,8vw,5rem) mb-clamp(0.75rem,1.5vw,1rem) rounded-full bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 flex items-center justify-center shadow-lg border-4 border-white relative">
+                    <Users className="h-clamp(2rem,4vw,2.5rem) w-clamp(2rem,4vw,2.5rem) text-white" />
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-t from-black/10 to-transparent"></div>
+                  </div>
+                  <span className="text-neutral-950 font-semibold text-clamp(0.875rem,1.5vw,1rem) max-w-[12rem] leading-tight">Priporočeno s strani staršev</span>
                 </div>
               </div>
             </div>
