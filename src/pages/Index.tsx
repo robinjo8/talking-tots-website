@@ -118,24 +118,11 @@ const Index = () => {
                 </div>
               </div>
               
-              {/* Dragon Illustration */}
+              {/* Dragon Illustration - Clean version without background letters */}
               <div className="relative w-64 h-64">
                 <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
                 <div className="animate-float relative">
                   <img alt="Tomi Talk Dragon Mascot" className="w-full h-full object-contain" src="/lovable-uploads/afbdd309-0550-437a-9afc-966c9a811062.png" />
-                </div>
-                
-                {/* Colorful Letters around Dragon - matching the image */}
-                <div className="absolute inset-0 pointer-events-none">
-                  <span className="absolute top-2 left-8 text-2xl font-bold text-red-500 transform -rotate-12">S</span>
-                  <span className="absolute top-6 left-16 text-2xl font-bold text-orange-500 transform rotate-12">Š</span>
-                  <span className="absolute top-4 right-12 text-2xl font-bold text-yellow-500 transform rotate-6">C</span>
-                  <span className="absolute top-8 right-6 text-2xl font-bold text-purple-500 transform -rotate-6">Č</span>
-                  <span className="absolute top-12 right-2 text-2xl font-bold text-red-500 transform rotate-12">R</span>
-                  <span className="absolute bottom-16 left-4 text-2xl font-bold text-blue-500 transform -rotate-12">K</span>
-                  <span className="absolute bottom-12 left-12 text-2xl font-bold text-green-500 transform rotate-8">G</span>
-                  <span className="absolute bottom-8 right-8 text-2xl font-bold text-orange-500 transform -rotate-8">L</span>
-                  <span className="absolute bottom-4 right-16 text-2xl font-bold text-purple-500 transform rotate-15">K</span>
                 </div>
               </div>
             </div>}
