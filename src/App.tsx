@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import MojaStran from "./pages/MojaStran";
 import GovornojezicovneVaje from "./pages/GovornojezicovneVaje";
+import VajeZaJezik from "./pages/VajeZaJezik";
 import ArtIzgovorjavaPage from "./pages/ArtIzgovorjavaPage";
 import GovorneIgre from "./pages/GovorneIgre";
 import MojiIzzivi from "./pages/MojiIzzivi";
@@ -77,6 +78,14 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <GovornojezicovneVaje />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route 
+                  path="/govorno-jezikovne-vaje/vaje-za-jezik" 
+                  element={
+                    <ProtectedRoute>
+                      <VajeZaJezik />
                     </ProtectedRoute>
                   }
                 />

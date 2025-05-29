@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -14,7 +13,8 @@ import {
   Gauge, 
   RotateCcw, 
   MessageSquare, 
-  Ear 
+  Ear,
+  Target
 } from "lucide-react";
 import { SPEECH_DIFFICULTIES } from "@/models/SpeechDifficulties";
 
@@ -41,17 +41,28 @@ const GovornojezicovneVaje = () => {
     grammar: <Gauge className="h-6 w-6 text-app-purple" />,
     endings: <RotateCcw className="h-6 w-6 text-app-yellow" />,
     word_usage: <MessageSquare className="h-6 w-6 text-app-orange" />,
-    phonological: <Ear className="h-6 w-6 text-dragon-green" />
+    phonological: <Ear className="h-6 w-6 text-dragon-green" />,
+    tongue_exercises: <Target className="h-6 w-6 text-app-teal" />
   };
 
   const handleDifficultySelect = (difficultyId: string) => {
     // For now, only articulation has exercises implemented
     if (difficultyId === 'articulation') {
       navigate('/artikulacija');
+    } else if (difficultyId === 'tongue_exercises') {
+      navigate('/govorno-jezikovne-vaje/vaje-za-jezik');
     } else {
       // For other difficulties, we could show a "coming soon" message
       alert('Vaje za to težavo bodo na voljo kmalu!');
     }
+  };
+
+  // Add the new tongue exercises section
+  const tongueExercisesSection = {
+    id: 'tongue_exercises',
+    title: 'Vaje za jezik',
+    description: 'Gibalne vaje za jezik, ki pomagajo pri izboljšanju artikulacije in motorike govornih organov.',
+    example: 'Primeri: gibanje jezika gor-dol, stiskanje in raztegovanje'
   };
 
   return (
@@ -83,6 +94,33 @@ const GovornojezicovneVaje = () => {
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+          {/* Add the new tongue exercises section first */}
+          <Card 
+            className="transition-all duration-300 hover:shadow-md cursor-pointer"
+            onClick={() => handleDifficultySelect('tongue_exercises')}
+          >
+            <CardHeader className="bg-gradient-to-r from-app-teal/10 to-dragon-green/10">
+              <CardTitle className="text-xl flex items-start gap-3">
+                <span className="flex items-center justify-center" aria-label={tongueExercisesSection.title}>
+                  {difficultyIcons.tongue_exercises}
+                </span>
+                <div>
+                  {tongueExercisesSection.title}
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <p className="mb-3 text-sm text-muted-foreground">
+                {tongueExercisesSection.description}
+              </p>
+              <div className="bg-muted/50 p-3 rounded-md text-sm mt-2">
+                <p className="font-medium text-muted-foreground mb-1">Primer:</p>
+                <p>{tongueExercisesSection.example}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Existing difficulties */}
           {SPEECH_DIFFICULTIES.map((difficulty) => (
             <Card 
               key={difficulty.id} 
