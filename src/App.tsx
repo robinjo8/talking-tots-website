@@ -18,7 +18,7 @@ import Profile from "./pages/Profile";
 import MojaStran from "./pages/MojaStran";
 import GovornojezicovneVaje from "./pages/GovornojezicovneVaje";
 import ArtIzgovorjavaPage from "./pages/ArtIzgovorjavaPage";
-import GovorneIgre from "./pages/GovorneIgre";
+import VajeZaJezik from "./pages/VajeZaJezik";
 import MojiIzzivi from "./pages/MojiIzzivi";
 import VideoNavodila from "./pages/VideoNavodila";
 import LogopedskiKoticek from "./pages/LogopedskiKoticek";
@@ -106,10 +106,10 @@ const App = () => (
                 />
                 
                 <Route 
-                  path="/govorne-igre" 
+                  path="/vaje-za-jezik" 
                   element={
                     <ProtectedRoute>
-                      <GovorneIgre />
+                      <VajeZaJezik />
                     </ProtectedRoute>
                   }
                 />

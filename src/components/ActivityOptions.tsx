@@ -11,8 +11,8 @@ export function ActivityOptions() {
     navigate("/govorno-jezikovne-vaje");
   };
   
-  const handleGoToGames = () => {
-    navigate("/govorne-igre");
+  const handleGoToTongueGym = () => {
+    navigate("/vaje-za-jezik");
   };
   
   const handleGoToArticulationTest = () => {
@@ -49,20 +49,20 @@ export function ActivityOptions() {
           <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-blue/10">
             <CardTitle className="text-xl flex items-center gap-2">
               <Gamepad className="h-5 w-5 text-app-purple" />
-              Govorne igre
+              Vaje za jezik
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-4">
             <p>
-              Zabavne igre za izboljšanje izgovorjave.
+              Vadba za mišice jezika z zabavnimi vajami.
             </p>
           </CardContent>
           <CardFooter>
             <Button 
               className="w-full bg-app-purple hover:bg-app-purple/90"
-              onClick={handleGoToGames}
+              onClick={handleGoToTongueGym}
             >
-              Začni igro
+              Začni vaje
             </Button>
           </CardFooter>
         </Card>
