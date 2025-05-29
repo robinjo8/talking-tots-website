@@ -9,7 +9,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SelectChildDialog } from "@/components/SelectChildDialog";
 import { FeaturesCarousel } from "@/components/FeaturesCarousel";
-
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showChildSelector, setShowChildSelector] = useState(false);
@@ -20,11 +19,9 @@ const Index = () => {
   } = useAuth();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
-  
   useEffect(() => {
     setIsVisible(true);
   }, []);
-  
   const handleStartNow = () => {
     // If not logged in, redirect to login page
     if (!user) {
@@ -41,7 +38,6 @@ const Index = () => {
       setShowChildSelector(true);
     }
   };
-  
   const scrollToFeatures = () => {
     const featuresSection = document.getElementById('features');
     if (featuresSection) {
@@ -50,19 +46,17 @@ const Index = () => {
       });
     }
   };
-  
   return <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden">
       <Header />
       
       {/* Hero Section - Mobile-first design */}
-      <section className="pt-16 md:pt-28 pb-10 md:pb-16 px-4 relative w-full md:px-[40px] py-[84px]">
+      <section className="pt-16 md:pt-28 pb-10 md:pb-16 px-4 relative w-full md:px-[40px] py-[100px]">
         <div className="absolute -top-10 -left-10 w-32 h-32 bg-app-yellow/20 rounded-full blur-3xl"></div>
         <div className="absolute top-40 -right-10 w-60 h-60 bg-app-blue/20 rounded-full blur-3xl"></div>
         
         <div className="max-w-6xl mx-auto">
           {/* Mobile Layout */}
-          {isMobile && (
-            <div className={`flex flex-col items-center text-center space-y-6 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
+          {isMobile && <div className={`flex flex-col items-center text-center space-y-6 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
               {/* Top Badge */}
               <div className="mb-2">
                 <Badge variant="secondary" className="bg-light-cloud text-dragon-green font-semibold px-4 py-2 text-sm">
@@ -86,29 +80,18 @@ const Index = () => {
               {/* Action Buttons - Matching the image layout */}
               <div className="flex flex-col items-center gap-3 mb-6 w-full max-w-xs">
                 {/* Green Start Button */}
-                <Button 
-                  size="lg" 
-                  onClick={handleStartNow} 
-                  className="w-full h-12 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold"
-                >
+                <Button size="lg" onClick={handleStartNow} className="w-full h-12 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold">
                   <Play className="h-4 w-4" />
                   Začni zdaj
                 </Button>
                 
                 {/* Blue Buttons Row */}
                 <div className="flex gap-3 w-full">
-                  <Button 
-                    size="lg" 
-                    className="flex-1 h-12 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold"
-                  >
+                  <Button size="lg" className="flex-1 h-12 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold">
                     <CirclePlay className="h-4 w-4" />
                     Demo
                   </Button>
-                  <Button 
-                    size="lg" 
-                    onClick={scrollToFeatures} 
-                    className="flex-1 h-12 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold"
-                  >
+                  <Button size="lg" onClick={scrollToFeatures} className="flex-1 h-12 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold">
                     <Info className="h-4 w-4" />
                     Info
                   </Button>
@@ -157,12 +140,10 @@ const Index = () => {
                   <span className="absolute bottom-4 right-16 text-2xl font-bold text-purple-500 transform rotate-15">K</span>
                 </div>
               </div>
-            </div>
-          )}
+            </div>}
           
           {/* Desktop Layout - Keep existing desktop layout */}
-          {!isMobile && (
-            <>
+          {!isMobile && <>
               {/* Top Badge - Centered on desktop */}
               <div className={`text-center mb-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
                 <div className="flex justify-center lg:justify-center">
@@ -242,8 +223,7 @@ const Index = () => {
                   </div>
                 </div>
               </div>
-            </>
-          )}
+            </>}
         </div>
       </section>
 
@@ -305,5 +285,4 @@ const Index = () => {
       <SelectChildDialog open={showChildSelector} onOpenChange={setShowChildSelector} />
     </div>;
 };
-
 export default Index;
