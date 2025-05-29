@@ -20,9 +20,11 @@ const Index = () => {
   } = useAuth();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
+  
   useEffect(() => {
     setIsVisible(true);
   }, []);
+  
   const handleStartNow = () => {
     // If not logged in, redirect to login page
     if (!user) {
@@ -39,6 +41,7 @@ const Index = () => {
       setShowChildSelector(true);
     }
   };
+  
   const scrollToFeatures = () => {
     const featuresSection = document.getElementById('features');
     if (featuresSection) {
@@ -47,6 +50,7 @@ const Index = () => {
       });
     }
   };
+  
   return <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden">
       <Header />
       
@@ -228,8 +232,8 @@ const Index = () => {
                   </div>
                 </div>
                 
-                {/* Right Dragon Column - Desktop with restored larger size and top alignment */}
-                <div className={`flex-shrink-0 self-start ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'} transition-all duration-700 ease-out delay-300`}>
+                {/* Right Dragon Column - Desktop with centered horizontal alignment */}
+                <div className={`flex-shrink-0 self-start flex justify-center w-full lg:w-auto mx-auto lg:mx-0 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'} transition-all duration-700 ease-out delay-300`}>
                   <div className="relative w-80 h-80 xl:w-96 xl:h-96">
                     <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
                     <div className="animate-float relative">
