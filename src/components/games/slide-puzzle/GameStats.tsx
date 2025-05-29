@@ -15,13 +15,20 @@ const GameStats: React.FC<GameStatsProps> = ({ time, moves, bestTime }) => {
   };
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-xs sm:text-sm">
-      <span className="font-medium">Čas: {formatTime(time)}</span>
-      <span className="font-medium">Poteze: {moves}</span>
+    <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-sm">
+      <div className="flex items-center gap-1">
+        <span className="font-medium text-gray-600">Čas:</span>
+        <span className="font-bold text-blue-600">{formatTime(time)}</span>
+      </div>
+      <div className="flex items-center gap-1">
+        <span className="font-medium text-gray-600">Poteze:</span>
+        <span className="font-bold text-blue-600">{moves}</span>
+      </div>
       {bestTime && (
-        <span className="text-green-600 font-medium">
-          Rekord: {formatTime(bestTime)}
-        </span>
+        <div className="flex items-center gap-1">
+          <span className="font-medium text-gray-600">Rekord:</span>
+          <span className="font-bold text-green-600">{formatTime(bestTime)}</span>
+        </div>
       )}
     </div>
   );

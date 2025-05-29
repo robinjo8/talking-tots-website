@@ -10,13 +10,33 @@ interface GameBoardProps {
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({ tiles, size, isWon, onTileClick }) => {
+  const getTileTextSize = () => {
+    if (size === 3) return "text-lg sm:text-xl md:text-2xl lg:text-3xl";
+    if (size === 4) return "text-base sm:text-lg md:text-xl lg:text-2xl";
+    return "text-sm sm:text-base md:text-lg lg:text-xl";
+  };
+
+  const getGridGap = () => {
+    if (size === 3) return "gap-2";
+    if (size === 4) return "gap-1.5";
+    return "gap-1";
+  };
+
+  const getPadding = () => {
+    if (size === 3) return "p-2";
+    if (size === 4) return "p-1.5";
+    return "p-1";
+  };
+
   return (
     <div 
-      className="w-full h-full grid bg-gray-300 rounded-lg shadow-lg"
+      className={cn(
+        "w-full h-full grid bg-gray-300 rounded-lg shadow-lg",
+        getGridGap(),
+        getPadding()
+      )}
       style={{ 
         gridTemplateColumns: `repeat(${size}, 1fr)`,
-        gap: size === 3 ? '4px' : size === 4 ? '3px' : '2px',
-        padding: size === 3 ? '8px' : size === 4 ? '6px' : '4px'
       }}
     >
       {tiles.map((tile, index) => (
@@ -28,10 +48,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ tiles, size, isWon, onTileClick }
             tile === 0
               ? "invisible"
               : "bg-white hover:bg-blue-50 border-blue-200 hover:border-blue-300 shadow-sm hover:shadow-md active:scale-95 cursor-pointer",
-            // Responsive text sizing based on grid size and screen size
-            size === 3 && "text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl",
-            size === 4 && "text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl", 
-            size === 5 && "text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl"
+            getTileTextSize()
           )}
           onClick={() => onTileClick(index)}
           disabled={tile === 0 || isWon}

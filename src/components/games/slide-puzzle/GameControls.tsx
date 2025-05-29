@@ -26,12 +26,12 @@ const GameControls: React.FC<GameControlsProps> = ({
   onNewGame
 }) => {
   return (
-    <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-2">
-      {/* Size Selector */}
-      <div className="flex items-center gap-2 order-1 xs:order-1">
-        <span className="text-xs sm:text-sm font-medium whitespace-nowrap">Velikost:</span>
+    <div className="space-y-3">
+      {/* Size Selector - Always visible */}
+      <div className="flex items-center justify-center gap-2">
+        <span className="text-sm font-medium whitespace-nowrap">Velikost:</span>
         <Select value={size.toString()} onValueChange={(value) => onSizeChange(parseInt(value))}>
-          <SelectTrigger className="w-14 sm:w-16 h-7 sm:h-8 text-xs">
+          <SelectTrigger className="w-20 h-8 text-sm">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -42,17 +42,17 @@ const GameControls: React.FC<GameControlsProps> = ({
         </Select>
       </div>
 
-      {/* Action Buttons - Responsive grid layout */}
-      <div className="grid grid-cols-2 xs:flex gap-1 order-2 xs:order-2 w-full xs:w-auto">
+      {/* Action Buttons - Responsive grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <Button
           variant="outline"
           size="sm"
           onClick={onUndo}
           disabled={!canUndo}
-          className="h-7 sm:h-8 px-1 sm:px-2 text-xs min-w-0"
+          className="h-9 text-xs sm:text-sm flex items-center justify-center gap-1"
         >
-          <Undo className="h-3 w-3" />
-          <span className="hidden sm:inline ml-1">Razveljavi</span>
+          <Undo className="h-3 w-3 sm:h-4 sm:w-4" />
+          <span className="hidden xs:inline">Razveljavi</span>
         </Button>
         
         <Button
@@ -60,30 +60,30 @@ const GameControls: React.FC<GameControlsProps> = ({
           size="sm"
           onClick={onHint}
           disabled={isWon}
-          className="h-7 sm:h-8 px-1 sm:px-2 text-xs min-w-0"
+          className="h-9 text-xs sm:text-sm flex items-center justify-center gap-1"
         >
-          <Lightbulb className="h-3 w-3" />
-          <span className="hidden sm:inline ml-1">Namig</span>
+          <Lightbulb className="h-3 w-3 sm:h-4 sm:w-4" />
+          <span className="hidden xs:inline">Namig</span>
         </Button>
         
         <Button 
           variant="outline" 
           size="sm" 
           onClick={onShowInstructions} 
-          className="h-7 sm:h-8 px-1 sm:px-2 text-xs min-w-0"
+          className="h-9 text-xs sm:text-sm flex items-center justify-center gap-1"
         >
-          <HelpCircle className="h-3 w-3" />
-          <span className="hidden sm:inline ml-1">Kako</span>
+          <HelpCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+          <span className="hidden xs:inline">Kako</span>
         </Button>
         
         <Button
           variant="outline"
           size="sm"
           onClick={onNewGame}
-          className="h-7 sm:h-8 px-1 sm:px-2 text-xs min-w-0"
+          className="h-9 text-xs sm:text-sm flex items-center justify-center gap-1"
         >
-          <RotateCcw className="h-3 w-3" />
-          <span className="hidden sm:inline ml-1">Nova</span>
+          <RotateCcw className="h-3 w-3 sm:h-4 sm:w-4" />
+          <span className="hidden xs:inline">Nova</span>
         </Button>
       </div>
     </div>
