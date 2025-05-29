@@ -72,10 +72,10 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
   };
 
   return (
-    <div className={cn("h-full w-full flex flex-col bg-gray-50", className)}>
-      {/* Controls Section - Always visible at top */}
+    <div className={cn("h-full w-full flex flex-col bg-gray-50 min-h-0", className)}>
+      {/* Controls Section - Always visible at top with better spacing */}
       <div className="flex-shrink-0 bg-white border-b shadow-sm">
-        <div className="px-3 sm:px-4 py-2 sm:py-3">
+        <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 py-3">
           <GameControls
             size={size}
             canUndo={moveHistory.length > 0}
@@ -88,8 +88,8 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
           />
         </div>
         
-        {/* Stats Section */}
-        <div className="px-3 sm:px-4 pb-2 sm:pb-3">
+        {/* Stats Section - Always visible */}
+        <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 pb-3">
           <GameStats
             time={gameState.time}
             moves={gameState.moves}
@@ -98,14 +98,14 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
         </div>
       </div>
 
-      {/* Game Board Container - Responsive sizing */}
+      {/* Game Board Container - Adaptive sizing with better constraints */}
       <div className="flex-1 flex items-center justify-center p-2 sm:p-4 min-h-0">
-        <div className="w-full h-full flex items-center justify-center">
+        <div className="w-full h-full flex items-center justify-center max-w-4xl mx-auto">
           <div 
-            className="aspect-square w-full max-w-[min(90vw,90vh,500px)] max-h-[min(90vw,90vh,500px)]"
+            className="aspect-square w-full"
             style={{
-              maxWidth: `min(90vw, 90vh, ${size === 3 ? '400px' : size === 4 ? '450px' : '500px'})`,
-              maxHeight: `min(90vw, 90vh, ${size === 3 ? '400px' : size === 4 ? '450px' : '500px'})`
+              maxWidth: `min(100%, calc(100vh - 200px), ${size === 3 ? '400px' : size === 4 ? '450px' : '500px'})`,
+              maxHeight: `min(100%, calc(100vh - 200px), ${size === 3 ? '400px' : size === 4 ? '450px' : '500px'})`
             }}
           >
             <GameBoard
@@ -120,7 +120,7 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
 
       {/* Win Message - Positioned at bottom when game is won */}
       {gameState.isWon && (
-        <div className="flex-shrink-0 px-3 sm:px-4 pb-2 sm:pb-3">
+        <div className="flex-shrink-0 w-full max-w-4xl mx-auto px-3 sm:px-4 pb-3">
           <WinMessage
             moves={gameState.moves}
             time={gameState.time}
@@ -140,9 +140,9 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({ className }) => {
         open={showExitConfirm}
         onOpenChange={setShowExitConfirm}
         title="Zapusti igro"
-        description="Are you sure you want to leave the game?"
-        confirmText="Yes"
-        cancelText="No"
+        description="Ali res želite zapustiti igro?"
+        confirmText="Da"
+        cancelText="Ne"
         onConfirm={handleConfirmExit}
         onCancel={handleCancelExit}
       />

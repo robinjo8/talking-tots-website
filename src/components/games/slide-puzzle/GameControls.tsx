@@ -26,12 +26,12 @@ const GameControls: React.FC<GameControlsProps> = ({
   onNewGame
 }) => {
   return (
-    <div className="space-y-3">
-      {/* Size Selector - Always visible */}
-      <div className="flex items-center justify-center gap-2">
-        <span className="text-sm font-medium whitespace-nowrap">Velikost:</span>
+    <div className="w-full space-y-3">
+      {/* Size Selector - Always prominently visible */}
+      <div className="flex items-center justify-center gap-2 px-2">
+        <span className="text-sm font-medium text-gray-700 min-w-fit">Velikost:</span>
         <Select value={size.toString()} onValueChange={(value) => onSizeChange(parseInt(value))}>
-          <SelectTrigger className="w-20 h-8 text-sm">
+          <SelectTrigger className="w-24 h-9 text-sm font-medium">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -42,17 +42,18 @@ const GameControls: React.FC<GameControlsProps> = ({
         </Select>
       </div>
 
-      {/* Action Buttons - Responsive grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+      {/* Action Buttons - Fully responsive grid that adapts to screen size */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 px-2">
         <Button
           variant="outline"
           size="sm"
           onClick={onUndo}
           disabled={!canUndo}
-          className="h-9 text-xs sm:text-sm flex items-center justify-center gap-1"
+          className="h-9 text-xs sm:text-sm flex items-center justify-center gap-1 min-w-0"
         >
-          <Undo className="h-3 w-3 sm:h-4 sm:w-4" />
-          <span className="hidden xs:inline">Razveljavi</span>
+          <Undo className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+          <span className="hidden sm:inline truncate">Razveljavi</span>
+          <span className="sm:hidden">Razv.</span>
         </Button>
         
         <Button
@@ -60,30 +61,33 @@ const GameControls: React.FC<GameControlsProps> = ({
           size="sm"
           onClick={onHint}
           disabled={isWon}
-          className="h-9 text-xs sm:text-sm flex items-center justify-center gap-1"
+          className="h-9 text-xs sm:text-sm flex items-center justify-center gap-1 min-w-0"
         >
-          <Lightbulb className="h-3 w-3 sm:h-4 sm:w-4" />
-          <span className="hidden xs:inline">Namig</span>
+          <Lightbulb className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+          <span className="hidden sm:inline truncate">Namig</span>
+          <span className="sm:hidden">Nam.</span>
         </Button>
         
         <Button 
           variant="outline" 
           size="sm" 
           onClick={onShowInstructions} 
-          className="h-9 text-xs sm:text-sm flex items-center justify-center gap-1"
+          className="h-9 text-xs sm:text-sm flex items-center justify-center gap-1 min-w-0"
         >
-          <HelpCircle className="h-3 w-3 sm:h-4 sm:w-4" />
-          <span className="hidden xs:inline">Kako</span>
+          <HelpCircle className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+          <span className="hidden sm:inline truncate">Kako</span>
+          <span className="sm:hidden">?</span>
         </Button>
         
         <Button
           variant="outline"
           size="sm"
           onClick={onNewGame}
-          className="h-9 text-xs sm:text-sm flex items-center justify-center gap-1"
+          className="h-9 text-xs sm:text-sm flex items-center justify-center gap-1 min-w-0"
         >
-          <RotateCcw className="h-3 w-3 sm:h-4 sm:w-4" />
-          <span className="hidden xs:inline">Nova</span>
+          <RotateCcw className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+          <span className="hidden sm:inline truncate">Nova</span>
+          <span className="sm:hidden">Nov.</span>
         </Button>
       </div>
     </div>
