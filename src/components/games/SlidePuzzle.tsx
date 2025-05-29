@@ -65,7 +65,7 @@ const SlidePuzzle: React.FC<SlidePuzzleProps> = ({
   return <div className={cn("h-full w-full flex flex-col bg-gray-50 min-h-0", className)}>
       {/* Controls Section - Always visible at top with better spacing */}
       <div className="flex-shrink-0 bg-white border-b shadow-sm">
-        <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 py-[33px]">
+        <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 py-[33px] my-[15px]">
           <GameControls size={size} canUndo={moveHistory.length > 0} isWon={gameState.isWon} onSizeChange={setSize} onUndo={handleUndo} onHint={handleHint} onShowInstructions={() => setShowInstructions(true)} onNewGame={initializePuzzle} />
         </div>
         
