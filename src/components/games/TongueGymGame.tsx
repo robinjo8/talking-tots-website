@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -22,56 +22,63 @@ interface TongueExercise {
   description: string;
   illustration: string;
   audioUrl?: string;
+  duration: number; // in seconds
 }
 
 const tongueExercises: TongueExercise[] = [
   {
     id: 1,
-    title: "Jezik gor in dol",
-    instruction: "Odpri usta in premikaj jezik gor in dol.",
-    description: "Počasi dvigni jezik proti nebu in ga spusti nazaj. Ponovi 5-krat.",
-    illustration: "🔺",
-    audioUrl: ""
+    title: "Iztegnitev jezika",
+    instruction: "Iztegni jezik čim dlje iz ust in zadrži 5 sekund.",
+    description: "Počasi iztegni jezik iz ust kolikor se le da. Drži ga ravno in zadrži pozicijo.",
+    illustration: "👅",
+    audioUrl: "",
+    duration: 5
   },
   {
     id: 2,
+    title: "Jezik gor in dol",
+    instruction: "Premikaj jezik gor in dol 5-krat.",
+    description: "Odpri usta in počasi dvigni jezik proti nebu, nato ga spusti nazaj.",
+    illustration: "🔺",
+    audioUrl: "",
+    duration: 10
+  },
+  {
+    id: 3,
     title: "Jezik levo in desno",
     instruction: "Premikaj jezik iz leve strani v desno stran ust.",
     description: "Dotakni se levega kota ust z jezikom, nato desnega. Ponovi 5-krat.",
     illustration: "↔️",
-    audioUrl: ""
+    audioUrl: "",
+    duration: 10
   },
   {
-    id: 3,
+    id: 4,
     title: "Kroženje z jezikom",
     instruction: "Naredi krog z jezikom okoli ust.",
     description: "Počasi vodi jezik v krogu okoli notranjih strani ust. Enkrat v levo, enkrat v desno.",
     illustration: "🔄",
-    audioUrl: ""
+    audioUrl: "",
+    duration: 15
   },
   {
-    id: 4,
+    id: 5,
     title: "Jezik na nos",
     instruction: "Poskusi doseči nos z jezikom.",
     description: "Izvleci jezik in ga dvigni proti nosu. Drži 3 sekunde.",
     illustration: "👃",
-    audioUrl: ""
-  },
-  {
-    id: 5,
-    title: "Jezik na brado",
-    instruction: "Poskusi doseči brado z jezikom.",
-    description: "Izvleci jezik in ga spusti proti bradi. Drži 3 sekunde.",
-    illustration: "⬇️",
-    audioUrl: ""
+    audioUrl: "",
+    duration: 8
   },
   {
     id: 6,
     title: "Cmokanje z jezikom",
-    instruction: "Naredi cmokanje z jezikom.",
-    description: "Pritisni jezik na nebo in ga hitro spusti, da nastane cmokanje. Ponovi 5-krat.",
+    instruction: "Naredi cmokanje z jezikom 5-krat.",
+    description: "Pritisni jezik na nebo in ga hitro spusti, da nastane cmokanje.",
     illustration: "💋",
-    audioUrl: ""
+    audioUrl: "",
+    duration: 10
   }
 ];
 
@@ -80,6 +87,8 @@ export function TongueGymGame() {
   const [completedExercises, setCompletedExercises] = useState<Set<number>>(new Set());
   const [showReward, setShowReward] = useState(false);
   const [earnedStars, setEarnedStars] = useState(0);
+  const [isExerciseActive, setIsExerciseActive] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState(0);
   const { playAudio } = useAudioPlayback();
 
   const currentCard = tongueExercises[currentExercise];
@@ -87,16 +96,45 @@ export function TongueGymGame() {
   const isCompleted = completedExercises.has(currentCard.id);
   const allCompleted = completedExercises.size === tongueExercises.length;
 
+  // Timer effect
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    
+    if (isExerciseActive && timeRemaining > 0) {
+      interval = setInterval(() => {
+        setTimeRemaining(prev => {
+          if (prev <= 1) {
+            setIsExerciseActive(false);
+            handleComplete();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [isExerciseActive, timeRemaining]);
+
   const handleNext = () => {
     if (currentExercise < tongueExercises.length - 1) {
       setCurrentExercise(currentExercise + 1);
+      setIsExerciseActive(false);
+      setTimeRemaining(0);
     }
   };
 
   const handlePrevious = () => {
     if (currentExercise > 0) {
       setCurrentExercise(currentExercise - 1);
+      setIsExerciseActive(false);
+      setTimeRemaining(0);
     }
+  };
+
+  const handleStartExercise = () => {
+    setTimeRemaining(currentCard.duration);
+    setIsExerciseActive(true);
   };
 
   const handleComplete = () => {
@@ -117,16 +155,20 @@ export function TongueGymGame() {
     setCurrentExercise(0);
     setEarnedStars(0);
     setShowReward(false);
+    setIsExerciseActive(false);
+    setTimeRemaining(0);
   };
 
   const handlePlayAudio = () => {
-    // Placeholder for audio playback - audio files can be added later
     console.log(`Playing audio for exercise: ${currentCard.title}`);
-    // When audio files are available, use: playAudio(currentCard.audioUrl);
+  };
+
+  const formatTime = (seconds: number) => {
+    return `${seconds} sekund${seconds !== 1 ? '' : 'a'}`;
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6">
       {/* Progress Section */}
       <div className="text-center space-y-4">
         <div className="flex items-center justify-center gap-4">
@@ -136,8 +178,8 @@ export function TongueGymGame() {
         
         <div className="space-y-2">
           <div className="flex justify-between text-sm text-muted-foreground">
-            <span>Napredek</span>
-            <span>{completedExercises.size} od {tongueExercises.length}</span>
+            <span>Vaja {currentCard.id} od {tongueExercises.length}</span>
+            <span>{completedExercises.size} zaključenih</span>
           </div>
           <Progress value={progress} className="h-2" />
         </div>
@@ -157,8 +199,8 @@ export function TongueGymGame() {
         </div>
       </div>
 
-      {/* Exercise Card */}
-      <Card className="relative overflow-hidden">
+      {/* Main Exercise Card */}
+      <Card className="relative overflow-hidden bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200">
         {showReward && (
           <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-orange-400/20 flex items-center justify-center z-10 animate-fade-in">
             <div className="text-center space-y-2 animate-scale-in">
@@ -168,73 +210,70 @@ export function TongueGymGame() {
           </div>
         )}
 
-        <CardHeader className="bg-gradient-to-r from-app-teal/10 to-dragon-green/10">
-          <div className="flex items-start justify-between">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs">
-                  Vaja {currentCard.id}
-                </Badge>
-                {isCompleted && (
-                  <Badge className="bg-green-100 text-green-800 text-xs">
-                    Opravljeno
-                  </Badge>
-                )}
-              </div>
-              <CardTitle className="text-xl">{currentCard.title}</CardTitle>
-            </div>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handlePlayAudio}
-              className="shrink-0"
-            >
-              <Play className="h-4 w-4" />
-            </Button>
-          </div>
-        </CardHeader>
-
-        <CardContent className="pt-6 space-y-6">
-          {/* Illustration Placeholder */}
+        <CardContent className="p-8 space-y-6">
+          {/* Animation/Illustration Area */}
           <div className="flex justify-center">
-            <div className="w-32 h-32 bg-gradient-to-br from-app-teal/20 to-dragon-green/20 rounded-full flex items-center justify-center">
-              <span className="text-6xl" role="img" aria-label="Exercise illustration">
+            <div className="w-64 h-48 bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl border-2 border-dashed border-purple-300 flex flex-col items-center justify-center">
+              <span className="text-6xl mb-2" role="img" aria-label="Exercise illustration">
                 {currentCard.illustration}
               </span>
+              <span className="text-sm text-purple-600 font-medium">Animacija vaje</span>
             </div>
           </div>
 
-          {/* Instructions */}
-          <div className="space-y-4 text-center">
-            <p className="text-lg font-medium text-app-teal">
-              {currentCard.instruction}
-            </p>
-            <p className="text-muted-foreground">
-              {currentCard.description}
-            </p>
+          {/* Exercise Title */}
+          <div className="text-center space-y-2">
+            <h1 className="text-3xl font-bold text-gray-900">{currentCard.title}</h1>
+            <p className="text-lg text-gray-600">{currentCard.instruction}</p>
           </div>
 
-          {/* Action Button */}
-          <div className="flex justify-center">
+          {/* Timer Display */}
+          {(isExerciseActive || timeRemaining > 0) && (
+            <div className="text-center">
+              <div className="text-4xl font-bold text-purple-600 mb-2">
+                {formatTime(timeRemaining)}
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex justify-center gap-4">
             <Button
-              onClick={handleComplete}
-              disabled={isCompleted}
-              className={`px-8 ${
-                isCompleted 
-                  ? "bg-green-500 hover:bg-green-600" 
-                  : "bg-app-teal hover:bg-app-teal/90"
-              }`}
+              variant="outline"
+              onClick={handlePlayAudio}
+              className="gap-2"
             >
-              {isCompleted ? (
-                <>
-                  <Star className="h-4 w-4 mr-2" />
-                  Opravljeno
-                </>
-              ) : (
-                "Opravi vajo"
-              )}
+              <Play className="h-4 w-4" />
+              Predvajaj navodila
             </Button>
+
+            {!isExerciseActive && timeRemaining === 0 && !isCompleted && (
+              <Button
+                onClick={handleStartExercise}
+                className="bg-purple-600 hover:bg-purple-700 text-white px-8"
+              >
+                Začni vajo
+              </Button>
+            )}
+
+            {isExerciseActive && (
+              <Button
+                className="bg-purple-600 hover:bg-purple-700 text-white px-8"
+                disabled
+              >
+                Izvajam vajo...
+              </Button>
+            )}
+
+            {isCompleted && (
+              <Button
+                className="bg-green-500 hover:bg-green-600 text-white px-8"
+                disabled
+              >
+                <Star className="h-4 w-4 mr-2" />
+                Zaključeno
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -245,34 +284,26 @@ export function TongueGymGame() {
           variant="outline"
           onClick={handlePrevious}
           disabled={currentExercise === 0}
+          className="gap-2"
         >
-          <ChevronLeft className="h-4 w-4 mr-2" />
+          <ChevronLeft className="h-4 w-4" />
           Prejšnja
         </Button>
 
-        <div className="flex gap-2">
-          {tongueExercises.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentExercise(index)}
-              className={`w-3 h-3 rounded-full transition-colors ${
-                index === currentExercise
-                  ? "bg-app-teal"
-                  : completedExercises.has(tongueExercises[index].id)
-                  ? "bg-green-400"
-                  : "bg-gray-300"
-              }`}
-            />
-          ))}
+        <div className="text-center">
+          <p className="text-sm text-muted-foreground">
+            {completedExercises.size} / {tongueExercises.length} zaključenih
+          </p>
         </div>
 
         <Button
           variant="outline"
           onClick={handleNext}
           disabled={currentExercise === tongueExercises.length - 1}
+          className="gap-2"
         >
           Naslednja
-          <ChevronRight className="h-4 w-4 ml-2" />
+          <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
 
@@ -292,9 +323,9 @@ export function TongueGymGame() {
             <Button
               onClick={handleReset}
               variant="outline"
-              className="border-yellow-300 text-yellow-700 hover:bg-yellow-50"
+              className="border-yellow-300 text-yellow-700 hover:bg-yellow-50 gap-2"
             >
-              <RotateCcw className="h-4 w-4 mr-2" />
+              <RotateCcw className="h-4 w-4" />
               Začni znova
             </Button>
           </CardContent>
