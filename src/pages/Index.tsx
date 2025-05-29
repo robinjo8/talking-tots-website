@@ -50,126 +50,196 @@ const Index = () => {
   return <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden">
       <Header />
       
-      {/* Hero Section - Redesigned */}
+      {/* Hero Section - Mobile-first design */}
       <section className="pt-16 md:pt-28 pb-10 md:pb-16 px-4 relative w-full md:px-[40px] py-[84px]">
         <div className="absolute -top-10 -left-10 w-32 h-32 bg-app-yellow/20 rounded-full blur-3xl"></div>
         <div className="absolute top-40 -right-10 w-60 h-60 bg-app-blue/20 rounded-full blur-3xl"></div>
         
         <div className="max-w-6xl mx-auto">
-          {/* Top Badge - Centered on desktop */}
-          <div className={`text-center mb-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
-            <div className="flex justify-center lg:justify-center">
-              <Badge variant="secondary" className="bg-light-cloud text-dragon-green font-semibold px-4 py-2 text-sm">
-                Vodilni AI govorni pomočnik za otroke
-              </Badge>
-            </div>
-          </div>
-          
-          {/* Main Content Container */}
-          <div className="relative flex flex-col lg:flex-row lg:items-start items-center justify-between gap-8 lg:gap-12">
-            {/* Left Content Column */}
-            <div className="flex-1 text-center lg:text-left max-w-3xl">
-              {/* Main Headline - Responsive text size for desktop */}
-              <div className={`mb-6 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-100`}>
-                <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl leading-tight font-bold">
-                  <span className="block text-neutral-950 text-center lg:text-center">Odpravite govorne težave brez čakanja –</span>
-                  <span className="block text-dragon-green mt-2 text-center lg:text-center">
+          {/* Mobile Layout */}
+          {isMobile && (
+            <div className={`flex flex-col items-center text-center space-y-6 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
+              {/* Top Badge */}
+              <div className="mb-2">
+                <Badge variant="secondary" className="bg-light-cloud text-dragon-green font-semibold px-4 py-2 text-sm">
+                  Vodilni AI govorni pomočnik za otroke
+                </Badge>
+              </div>
+              
+              {/* Main Headlines */}
+              <div className="mb-4">
+                <h1 className="text-3xl leading-tight font-bold mb-4">
+                  <span className="block text-neutral-950">Odpravite govorne težave brez čakanja –</span>
+                  <span className="block text-dragon-green mt-2">
                     s pomočjo pametnega AI pomočnika!
                   </span>
                 </h1>
-              </div>
-              
-              {/* Subheadline */}
-              <div className={`mb-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-200`}>
-                <p className="text-lg md:text-xl leading-relaxed text-neutral-950 font-medium text-center lg:text-center">
+                <p className="text-lg leading-relaxed text-neutral-950 font-medium">
                   Pridruži se staršem, ki že vsak dan vadijo govorne vaje s svojimi otroki – personalizirano glede na starost, težavo in logopedske smernice.
                 </p>
               </div>
               
-              {/* Action Buttons - Updated mobile layout */}
-              <div className={`${isMobile ? 'flex flex-col items-center gap-3 mb-6' : 'flex flex-row gap-4 justify-center mb-10'} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-300`}>
-                <Button size="lg" onClick={handleStartNow} className={`${isMobile ? 'w-60 h-12' : 'w-auto sm:w-48'} bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-2`}>
+              {/* Action Buttons - Matching the image layout */}
+              <div className="flex flex-col items-center gap-3 mb-6 w-full max-w-xs">
+                {/* Green Start Button */}
+                <Button 
+                  size="lg" 
+                  onClick={handleStartNow} 
+                  className="w-full h-12 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold"
+                >
                   <Play className="h-4 w-4" />
                   Začni zdaj
                 </Button>
-                <Button size="lg" className={`${isMobile ? 'w-60 h-12' : 'w-auto sm:w-48'} bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2`}>
-                  <CirclePlay className="h-4 w-4" />
-                  Poglej demo
-                </Button>
-                <Button size="lg" onClick={scrollToFeatures} className={`${isMobile ? 'w-60 h-12' : 'w-auto sm:w-48'} bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2`}>
-                  <Info className="h-4 w-4" />
-                  Več info
-                </Button>
+                
+                {/* Blue Buttons Row */}
+                <div className="flex gap-3 w-full">
+                  <Button 
+                    size="lg" 
+                    className="flex-1 h-12 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold"
+                  >
+                    <CirclePlay className="h-4 w-4" />
+                    Demo
+                  </Button>
+                  <Button 
+                    size="lg" 
+                    onClick={scrollToFeatures} 
+                    className="flex-1 h-12 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold"
+                  >
+                    <Info className="h-4 w-4" />
+                    Info
+                  </Button>
+                </div>
               </div>
               
-              {/* Trust Badges - Desktop version */}
-              {!isMobile && <div className={`grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 lg:mb-0 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-400`}>
-                  <div className="flex flex-col items-center text-center">
-                    <div className="w-20 h-20 mb-3 rounded-full bg-gradient-to-br from-dragon-green to-app-teal flex items-center justify-center shadow-lg border-4 border-white">
-                      <CheckCircle className="h-8 w-8 text-white" />
-                    </div>
-                    <span className="text-neutral-950 font-medium text-sm">Temelji na logopedskih smernicah</span>
+              {/* Trust Badges - Horizontal row with circular icons */}
+              <div className="flex justify-center gap-8 mb-6">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-16 h-16 mb-2 rounded-full bg-gradient-to-br from-dragon-green to-app-teal flex items-center justify-center shadow-lg border-2 border-white">
+                    <CheckCircle className="h-8 w-8 text-white" />
                   </div>
-                  <div className="flex flex-col items-center text-center">
-                    <div className="w-20 h-20 mb-3 rounded-full bg-gradient-to-br from-app-blue to-app-purple flex items-center justify-center shadow-lg border-4 border-white">
-                      <ArrowUp className="h-8 w-8 text-white" />
-                    </div>
-                    <span className="text-neutral-950 font-medium text-sm">Dokazan napredek pri izgovorjavi</span>
+                  <span className="text-neutral-950 font-medium text-xs max-w-[70px] leading-tight">Temelji na logopedskih smernicah</span>
+                </div>
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-16 h-16 mb-2 rounded-full bg-gradient-to-br from-app-blue to-app-purple flex items-center justify-center shadow-lg border-2 border-white">
+                    <ArrowUp className="h-8 w-8 text-white" />
                   </div>
-                  <div className="flex flex-col items-center text-center">
-                    <div className="w-20 h-20 mb-3 rounded-full bg-gradient-to-br from-app-orange to-app-yellow flex items-center justify-center shadow-lg border-4 border-white">
-                      <Users className="h-8 w-8 text-white" />
-                    </div>
-                    <span className="text-neutral-950 font-medium text-sm">Priporočeno s strani staršev</span>
+                  <span className="text-neutral-950 font-medium text-xs max-w-[70px] leading-tight">Dokazan napredek pri izgovorjavi</span>
+                </div>
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-16 h-16 mb-2 rounded-full bg-gradient-to-br from-app-orange to-app-yellow flex items-center justify-center shadow-lg border-2 border-white">
+                    <Users className="h-8 w-8 text-white" />
                   </div>
-                </div>}
+                  <span className="text-neutral-950 font-medium text-xs max-w-[70px] leading-tight">Priporočeno s strani staršev</span>
+                </div>
+              </div>
+              
+              {/* Dragon Illustration */}
+              <div className="relative w-64 h-64">
+                <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
+                <div className="animate-float relative">
+                  <img alt="Tomi Talk Dragon Mascot" className="w-full h-full object-contain" src="/lovable-uploads/afbdd309-0550-437a-9afc-966c9a811062.png" />
+                </div>
+                
+                {/* Colorful Letters around Dragon - matching the image */}
+                <div className="absolute inset-0 pointer-events-none">
+                  <span className="absolute top-2 left-8 text-2xl font-bold text-red-500 transform -rotate-12">S</span>
+                  <span className="absolute top-6 left-16 text-2xl font-bold text-orange-500 transform rotate-12">Š</span>
+                  <span className="absolute top-4 right-12 text-2xl font-bold text-yellow-500 transform rotate-6">C</span>
+                  <span className="absolute top-8 right-6 text-2xl font-bold text-purple-500 transform -rotate-6">Č</span>
+                  <span className="absolute top-12 right-2 text-2xl font-bold text-red-500 transform rotate-12">R</span>
+                  <span className="absolute bottom-16 left-4 text-2xl font-bold text-blue-500 transform -rotate-12">K</span>
+                  <span className="absolute bottom-12 left-12 text-2xl font-bold text-green-500 transform rotate-8">G</span>
+                  <span className="absolute bottom-8 right-8 text-2xl font-bold text-orange-500 transform -rotate-8">L</span>
+                  <span className="absolute bottom-4 right-16 text-2xl font-bold text-purple-500 transform rotate-15">K</span>
+                </div>
+              </div>
             </div>
-            
-            {/* Right Dragon Column - Desktop with restored larger size and top alignment */}
-            {!isMobile && <div className={`flex-shrink-0 self-start ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'} transition-all duration-700 ease-out delay-300`}>
-                <div className="relative w-80 h-80 xl:w-96 xl:h-96">
-                  <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
-                  <div className="animate-float relative">
-                    <img alt="Tomi Talk Dragon Mascot" className="w-full h-full object-contain" src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" />
-                  </div>
-                </div>
-              </div>}
-          </div>
+          )}
           
-          {/* Mobile Trust Badges and Dragon - Horizontal layout */}
-          {isMobile && <div className={`flex items-center justify-between gap-4 mt-6 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-500`}>
-              {/* Left: Trust Badges */}
-              <div className="flex-1 space-y-3">
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-12 h-12 mb-2 rounded-full bg-gradient-to-br from-dragon-green to-app-teal flex items-center justify-center shadow-lg border-2 border-white">
-                    <CheckCircle className="h-6 w-6 text-white" />
-                  </div>
-                  <span className="text-neutral-950 font-medium text-xs">Temelji na logopedskih smernicah</span>
-                </div>
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-12 h-12 mb-2 rounded-full bg-gradient-to-br from-app-blue to-app-purple flex items-center justify-center shadow-lg border-2 border-white">
-                    <ArrowUp className="h-6 w-6 text-white" />
-                  </div>
-                  <span className="text-neutral-950 font-medium text-xs">Dokazan napredek pri izgovorjavi</span>
-                </div>
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-12 h-12 mb-2 rounded-full bg-gradient-to-br from-app-orange to-app-yellow flex items-center justify-center shadow-lg border-2 border-white">
-                    <Users className="h-6 w-6 text-white" />
-                  </div>
-                  <span className="text-neutral-950 font-medium text-xs">Priporočeno s strani staršev</span>
+          {/* Desktop Layout - Keep existing desktop layout */}
+          {!isMobile && (
+            <>
+              {/* Top Badge - Centered on desktop */}
+              <div className={`text-center mb-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
+                <div className="flex justify-center lg:justify-center">
+                  <Badge variant="secondary" className="bg-light-cloud text-dragon-green font-semibold px-4 py-2 text-sm">
+                    Vodilni AI govorni pomočnik za otroke
+                  </Badge>
                 </div>
               </div>
               
-              {/* Right: Dragon */}
-              <div className="flex-shrink-0 w-32 h-32">
-                <div className="relative w-full h-full">
-                  <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
-                  <div className="animate-float relative">
-                    <img alt="Tomi Talk Dragon Mascot" className="w-full h-full object-contain" src="/lovable-uploads/afbdd309-0550-437a-9afc-966c9a811062.png" />
+              {/* Main Content Container */}
+              <div className="relative flex flex-col lg:flex-row lg:items-start items-center justify-between gap-8 lg:gap-12">
+                {/* Left Content Column */}
+                <div className="flex-1 text-center lg:text-left max-w-3xl">
+                  {/* Main Headline - Responsive text size for desktop */}
+                  <div className={`mb-6 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-100`}>
+                    <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl leading-tight font-bold">
+                      <span className="block text-neutral-950 text-center lg:text-center">Odpravite govorne težave brez čakanja –</span>
+                      <span className="block text-dragon-green mt-2 text-center lg:text-center">
+                        s pomočjo pametnega AI pomočnika!
+                      </span>
+                    </h1>
+                  </div>
+                  
+                  {/* Subheadline */}
+                  <div className={`mb-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-200`}>
+                    <p className="text-lg md:text-xl leading-relaxed text-neutral-950 font-medium text-center lg:text-center">
+                      Pridruži se staršem, ki že vsak dan vadijo govorne vaje s svojimi otroki – personalizirano glede na starost, težavo in logopedske smernice.
+                    </p>
+                  </div>
+                  
+                  {/* Action Buttons - Desktop layout */}
+                  <div className={`flex flex-row gap-4 justify-center mb-10 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-300`}>
+                    <Button size="lg" onClick={handleStartNow} className="w-auto sm:w-48 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-2">
+                      <Play className="h-4 w-4" />
+                      Začni zdaj
+                    </Button>
+                    <Button size="lg" className="w-auto sm:w-48 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2">
+                      <CirclePlay className="h-4 w-4" />
+                      Poglej demo
+                    </Button>
+                    <Button size="lg" onClick={scrollToFeatures} className="w-auto sm:w-48 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2">
+                      <Info className="h-4 w-4" />
+                      Več info
+                    </Button>
+                  </div>
+                  
+                  {/* Trust Badges - Desktop version */}
+                  <div className={`grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 lg:mb-0 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-400`}>
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-20 h-20 mb-3 rounded-full bg-gradient-to-br from-dragon-green to-app-teal flex items-center justify-center shadow-lg border-4 border-white">
+                        <CheckCircle className="h-8 w-8 text-white" />
+                      </div>
+                      <span className="text-neutral-950 font-medium text-sm">Temelji na logopedskih smernicah</span>
+                    </div>
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-20 h-20 mb-3 rounded-full bg-gradient-to-br from-app-blue to-app-purple flex items-center justify-center shadow-lg border-4 border-white">
+                        <ArrowUp className="h-8 w-8 text-white" />
+                      </div>
+                      <span className="text-neutral-950 font-medium text-sm">Dokazan napredek pri izgovorjavi</span>
+                    </div>
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-20 h-20 mb-3 rounded-full bg-gradient-to-br from-app-orange to-app-yellow flex items-center justify-center shadow-lg border-4 border-white">
+                        <Users className="h-8 w-8 text-white" />
+                      </div>
+                      <span className="text-neutral-950 font-medium text-sm">Priporočeno s strani staršev</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Right Dragon Column - Desktop with restored larger size and top alignment */}
+                <div className={`flex-shrink-0 self-start ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'} transition-all duration-700 ease-out delay-300`}>
+                  <div className="relative w-80 h-80 xl:w-96 xl:h-96">
+                    <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
+                    <div className="animate-float relative">
+                      <img alt="Tomi Talk Dragon Mascot" className="w-full h-full object-contain" src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>}
+            </>
+          )}
         </div>
       </section>
 
