@@ -29,17 +29,17 @@ export function MotivationalMessage() {
   }, []);
   
   return (
-    <div className="mb-8 p-4 bg-white/60 backdrop-blur-sm border border-dragon-green/20 rounded-xl shadow-sm">
-      <div className="flex items-center gap-2 mb-3">
-        <div className="w-8 h-8 bg-dragon-green/10 rounded-full flex items-center justify-center">
+    <div className="mb-6 p-4 bg-gray-50/80 border border-gray-200/60 rounded-lg">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="w-7 h-7 bg-dragon-green/15 rounded-lg flex items-center justify-center">
           <MessageSquare className="h-4 w-4 text-dragon-green" />
         </div>
-        <h3 className="text-base font-semibold text-dragon-green">
+        <h3 className="text-sm font-medium text-dragon-green">
           Zmajček Tomi ti sporoča:
         </h3>
       </div>
-      <div className="flex items-center gap-4">
-        <div className="hidden sm:block w-12 h-12 flex-shrink-0">
+      <div className="flex items-start gap-3">
+        <div className="hidden sm:block w-10 h-10 flex-shrink-0">
           <img 
             src="/lovable-uploads/4377ec70-1996-47a9-bf05-8093cffcaf0b.png" 
             alt="Zmajček Tomi" 
@@ -47,8 +47,8 @@ export function MotivationalMessage() {
           />
         </div>
         <div className="flex-1">
-          <p className="text-sm font-medium italic text-gray-700 mb-1">{message}</p>
-          <p className="text-xs text-muted-foreground">Z vajami postajamo vedno boljši!</p>
+          <p className="text-sm italic text-gray-600 mb-1 leading-relaxed">{message}</p>
+          <p className="text-xs text-gray-500">Z vajami postajamo vedno boljši!</p>
         </div>
       </div>
     </div>
