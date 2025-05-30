@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from "react";
 import { MessageSquare } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const motivationalMessages = [
   "Tvoj glas je poseben – vadimo ga skupaj, korak za korakom!",
@@ -14,7 +13,7 @@ const motivationalMessages = [
   "Tvoj trud pri govorjenju je super moč – z njo rasteš vsak dan!",
   "Skupaj bova ujela vse črke – eno za drugo!",
   "Tudi, če gre počasi, greš naprej – in to je super!",
-  "Vadiva skupaj – črka po črko, počasi in lepo.",
+  "Vadiva skupaj – črka po črka, počasi in lepo.",
   "Ni ti treba znati vsega takoj – jaz sem tu, da ti pomagam.",
   "Vsaka vaja je lažja, ko jo delava skupaj.",
   "Z mojo pomočjo lahko najdeva vse črke!"
@@ -30,15 +29,15 @@ export function MotivationalMessage() {
   }, []);
   
   return (
-    <Card className="mb-8 bg-gradient-to-r from-sky-50 to-green-50 border-dragon-green/30 shadow-md">
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-xl md:text-2xl text-dragon-green">
-          <MessageSquare className="h-5 w-5 text-dragon-green" />
+    <div className="mb-8 p-6 bg-gradient-to-r from-sky-50/70 to-green-50/70 border border-dragon-green/20 rounded-xl">
+      <div className="flex items-center gap-2 mb-3">
+        <MessageSquare className="h-5 w-5 text-dragon-green" />
+        <h3 className="text-lg font-semibold text-dragon-green">
           Zmajček Tomi ti sporoča:
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-2 flex items-center gap-4">
-        <div className="hidden sm:block w-20 h-20">
+        </h3>
+      </div>
+      <div className="flex items-center gap-4">
+        <div className="hidden sm:block w-16 h-16 flex-shrink-0">
           <img 
             src="/lovable-uploads/4377ec70-1996-47a9-bf05-8093cffcaf0b.png" 
             alt="Zmajček Tomi" 
@@ -46,10 +45,10 @@ export function MotivationalMessage() {
           />
         </div>
         <div className="flex-1">
-          <p className="text-lg font-medium italic">{message}</p>
-          <p className="text-sm text-muted-foreground mt-2">Z vajami postajamo vedno boljši!</p>
+          <p className="text-base font-medium italic text-gray-700 mb-1">{message}</p>
+          <p className="text-sm text-muted-foreground">Z vajami postajamo vedno boljši!</p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
