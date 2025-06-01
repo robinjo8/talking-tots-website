@@ -40,7 +40,7 @@ export default function GovorneIgre() {
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6 pb-4 text-center">
-            <h3 className="text-lg font-semibold mb-3 text-dragon-green">Izberi igro</h3>
+            <h2 className="text-xl font-bold mb-2 text-dragon-green">Izberi igro</h2>
             <p className="text-muted-foreground">
               Izberi eno izmed govornih iger in začni vaditi izgovorjavo na zabaven način.
             </p>

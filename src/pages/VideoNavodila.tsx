@@ -80,18 +80,20 @@ export default function VideoNavodila() {
           {videoSections.map((section) => (
             <Card 
               key={section.id} 
-              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 cursor-pointer h-full flex flex-col"
+              className="transition-all duration-300 hover:shadow-md cursor-pointer"
               onClick={() => handleSectionSelect(section.id)}
             >
-              <CardHeader className={`${section.gradient} rounded-t-2xl pb-4`}>
-                <CardTitle className="flex items-center justify-center gap-2 text-center">
-                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
+              <CardHeader className={section.gradient}>
+                <CardTitle className="text-xl flex items-start gap-3">
+                  <span className="flex items-center justify-center" aria-label={section.title}>
                     {section.icon}
+                  </span>
+                  <div>
+                    {section.title}
                   </div>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-6 pb-4 flex-grow text-center">
-                <h3 className="text-lg font-semibold mb-3">{section.title}</h3>
+              <CardContent className="pt-4">
                 <p className="text-sm text-muted-foreground">
                   {section.description}
                 </p>
