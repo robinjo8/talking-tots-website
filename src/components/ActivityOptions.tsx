@@ -24,108 +24,107 @@ export function ActivityOptions() {
       <h2 className="text-2xl font-bold mb-6 mt-12">Izberi možnost:</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-        <Card className="overflow-hidden rounded-3xl shadow-lg border-0 bg-white">
-          <div className="bg-gradient-to-br from-app-blue to-app-blue/80 p-8 text-center">
-            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <BookText className="h-8 w-8 text-app-blue" />
-            </div>
-          </div>
-          <CardContent className="p-6 text-center">
-            <CardTitle className="text-xl mb-3 text-gray-800">
+        <Card className="transition-all duration-300 hover:shadow-md">
+          <CardHeader className="bg-gradient-to-r from-app-blue/10 to-app-teal/10">
+            <CardTitle className="text-xl flex items-center gap-2">
+              <BookText className="h-5 w-5 text-app-blue" />
               Govorno-jezikovne vaje
             </CardTitle>
-            <p className="text-gray-600 mb-6">
-              Prilagojene aktivnosti za izboljšanje otrokove izgovorjave.
-            </p>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <p className="text-sm text-muted-foreground italic"></p>
+            <p className="mt-2 my-0">Prilagojene aktivnosti za izboljšanje otrokove izgovorjave.</p>
+          </CardContent>
+          <CardFooter>
             <Button 
-              className="w-full bg-app-blue hover:bg-app-blue/90 rounded-xl"
+              className="w-full bg-app-blue hover:bg-app-blue/90"
               onClick={handleGoToExercises}
             >
               Pojdi na vaje
             </Button>
-          </CardContent>
+          </CardFooter>
         </Card>
         
-        <Card className="overflow-hidden rounded-3xl shadow-lg border-0 bg-white">
-          <div className="bg-gradient-to-br from-app-purple to-app-purple/80 p-8 text-center">
-            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Gamepad className="h-8 w-8 text-app-purple" />
-            </div>
-          </div>
-          <CardContent className="p-6 text-center">
-            <CardTitle className="text-xl mb-3 text-gray-800">
+        <Card className="transition-all duration-300 hover:shadow-md">
+          <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-blue/10">
+            <CardTitle className="text-xl flex items-center gap-2">
+              <Gamepad className="h-5 w-5 text-app-purple" />
               Govorne igre
             </CardTitle>
-            <p className="text-gray-600 mb-6">
+          </CardHeader>
+          <CardContent className="pt-4">
+            <p>
               Zabavne igre za izboljšanje izgovorjave.
             </p>
+          </CardContent>
+          <CardFooter>
             <Button 
-              className="w-full bg-app-purple hover:bg-app-purple/90 rounded-xl"
+              className="w-full bg-app-purple hover:bg-app-purple/90"
               onClick={handleGoToGames}
             >
               Začni igro
             </Button>
-          </CardContent>
+          </CardFooter>
         </Card>
         
-        <Card className="overflow-hidden rounded-3xl shadow-lg border-0 bg-white">
-          <div className="bg-gradient-to-br from-[#9b87f5] to-[#8B5CF6] p-8 text-center">
-            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <TestTube className="h-8 w-8 text-[#9b87f5]" />
-            </div>
-          </div>
-          <CardContent className="p-6 text-center">
-            <CardTitle className="text-xl mb-3 text-gray-800">
+        <Card className="transition-all duration-300 hover:shadow-md h-full flex flex-col">
+          <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-teal/10">
+            <CardTitle className="text-xl flex items-center gap-2">
+              <TestTube className="h-5 w-5 text-app-purple" />
               Artikulacijski test
             </CardTitle>
-            <p className="text-gray-600 mb-6">
+          </CardHeader>
+          <CardContent className="pt-4 flex-grow">
+            <p>
               Test izgovorjave za vse slovenske soglasnike.
             </p>
+          </CardContent>
+          <CardFooter>
             <Button 
-              className="w-full bg-[#9b87f5] hover:bg-[#8B5CF6] rounded-xl"
+              className="w-full bg-[#9b87f5] hover:bg-[#8B5CF6]"
               onClick={handleGoToArticulationTest}
             >
               Začni test
             </Button>
-          </CardContent>
+          </CardFooter>
         </Card>
         
-        <Card className="overflow-hidden rounded-3xl shadow-lg border-0 bg-white">
-          <div className="bg-gradient-to-br from-app-orange to-app-orange/80 p-8 text-center">
-            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Zap className="h-8 w-8 text-app-orange" />
-            </div>
-          </div>
-          <CardContent className="p-6 text-center">
-            <CardTitle className="text-xl mb-3 text-gray-800">
+        <Card className="transition-all duration-300 hover:shadow-md h-full flex flex-col">
+          <CardHeader className="bg-gradient-to-r from-app-orange/10 to-app-yellow/10">
+            <CardTitle className="text-xl flex items-center gap-2">
+              <Zap className="h-5 w-5 text-app-orange" />
               Moji izzivi
             </CardTitle>
-            <p className="text-gray-600 mb-6">
+          </CardHeader>
+          <CardContent className="pt-4 flex-grow">
+            <p>
               Izberi, s katero izgovorjavo imaš težave in prejmi prilagojene vaje.
             </p>
-            <Button className="w-full bg-app-orange hover:bg-app-orange/90 rounded-xl">
+          </CardContent>
+          <CardFooter>
+            <Button className="w-full bg-app-orange hover:bg-app-orange/90">
               Izberi težavo
             </Button>
-          </CardContent>
+          </CardFooter>
         </Card>
         
-        <Card className="overflow-hidden rounded-3xl shadow-lg border-0 bg-white md:col-span-2 max-w-md mx-auto">
-          <div className="bg-gradient-to-br from-app-teal to-app-teal/80 p-8 text-center">
-            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Video className="h-8 w-8 text-app-teal" />
-            </div>
-          </div>
-          <CardContent className="p-6 text-center">
-            <CardTitle className="text-xl mb-3 text-gray-800">
+        <Card className="transition-all duration-300 hover:shadow-md h-full flex flex-col">
+          <CardHeader className="bg-gradient-to-r from-app-teal/10 to-dragon-green/10">
+            <CardTitle className="text-xl flex items-center gap-2">
+              <Video className="h-5 w-5 text-app-teal" />
               Video navodila
             </CardTitle>
-            <p className="text-gray-600 mb-6">
+          </CardHeader>
+          <CardContent className="pt-4 flex-grow">
+            <p>
               Poglej kako logoped pravilno izgovori posamezne črke.
             </p>
-            <Button className="w-full bg-app-teal hover:bg-app-teal/90 rounded-xl">
+          </CardContent>
+          <CardFooter>
+            <Button className="w-full bg-app-teal hover:bg-app-teal/90">
               Poglej video
             </Button>
-          </CardContent>
+          </CardFooter>
         </Card>
       </div>
     </>
