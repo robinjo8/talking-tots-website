@@ -14,35 +14,30 @@ export default function VideoNavodila() {
       title: 'Pravilna izgovorjava posameznih glasov',
       description: 'Kako pravilno izgovoriti posamezne glasove (npr. R, L, S, Š, Č). Uporaba video modeliranja, kjer otroci posnemajo druge otroke pri izgovorjavi glasov.',
       icon: <Volume2 className="h-6 w-6 text-app-blue" />,
-      gradient: 'bg-gradient-to-r from-app-blue/10 to-app-teal/10'
     },
     {
       id: 'motor-exercises',
       title: 'Vaje za motoriko govoril',
       description: 'Praktični prikazi vaj za jezik, ustnice in čeljust, ki izboljšujejo artikulacijo.',
       icon: <Dumbbell className="h-6 w-6 text-app-orange" />,
-      gradient: 'bg-gradient-to-r from-app-orange/10 to-app-yellow/10'
     },
     {
       id: 'breathing-exercises',
       title: 'Dihalne vaje za govor',
       description: 'Videi, ki učijo otroke pravilnega dihanja med govorom, kar pomaga pri tekočnosti govora. Uporaba zabavnih tehnik, kot so pihanje milnih mehurčkov ali pihanje peres, za spodbujanje pravilnega dihanja.',
       icon: <Wind className="h-6 w-6 text-app-teal" />,
-      gradient: 'bg-gradient-to-r from-app-teal/10 to-dragon-green/10'
     },
     {
       id: 'rhythm-exercises',
       title: 'Vaje za ritmizacijo in poudarjanje zlogov',
       description: 'Uporaba pesmic in rim za učenje ritma in poudarkov v besedah. Prikazi, kako otroci lahko s pomočjo ritma izboljšajo svojo izgovorjavo.',
       icon: <Clock className="h-6 w-6 text-app-purple" />,
-      gradient: 'bg-gradient-to-r from-app-purple/10 to-app-blue/10'
     },
     {
       id: 'preparation',
       title: 'Priprava na govorno vajo',
       description: 'Videi, ki prikazujejo ogrevalne vaje pred začetkom govornih vaj, kot so masaža obraza ali raztezanje jezika. Poudarek na pomembnosti priprave za boljše rezultate pri govornih vajah.',
       icon: <Zap className="h-6 w-6 text-dragon-green" />,
-      gradient: 'bg-gradient-to-r from-dragon-green/10 to-app-teal/10'
     }
   ];
 
@@ -72,7 +67,7 @@ export default function VideoNavodila() {
           </h1>
         </div>
         
-        <p className="text-lg text-muted-foreground mb-8">
+        <p className="text-muted-foreground mb-8">
           Poglej, kako logoped pravilno izgovori posamezne glasove in se nauči pravilnih tehnik.
         </p>
         
@@ -80,21 +75,26 @@ export default function VideoNavodila() {
           {videoSections.map((section) => (
             <Card 
               key={section.id} 
-              className="transition-all duration-300 hover:shadow-md cursor-pointer"
+              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 cursor-pointer h-full flex flex-col"
               onClick={() => handleSectionSelect(section.id)}
             >
-              <CardHeader className={section.gradient}>
-                <CardTitle className="text-xl flex items-start gap-3">
-                  <span className="flex items-center justify-center" aria-label={section.title}>
+              <CardHeader className={`
+                rounded-t-2xl pb-4
+                ${section.id === 'pronunciation' && 'bg-gradient-to-r from-app-blue/10 to-app-teal/10'}
+                ${section.id === 'motor-exercises' && 'bg-gradient-to-r from-app-orange/10 to-app-yellow/10'}
+                ${section.id === 'breathing-exercises' && 'bg-gradient-to-r from-app-teal/10 to-dragon-green/10'}
+                ${section.id === 'rhythm-exercises' && 'bg-gradient-to-r from-app-purple/10 to-app-blue/10'}
+                ${section.id === 'preparation' && 'bg-gradient-to-r from-dragon-green/10 to-app-teal/10'}
+              `}>
+                <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
                     {section.icon}
-                  </span>
-                  <div>
-                    {section.title}
                   </div>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-4">
-                <p className="text-sm text-muted-foreground">
+              <CardContent className="pt-6 pb-4 flex-grow text-center">
+                <h3 className="text-lg font-semibold mb-2">{section.title}</h3>
+                <p className="text-sm text-gray-600">
                   {section.description}
                 </p>
               </CardContent>

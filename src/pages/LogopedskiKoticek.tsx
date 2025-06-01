@@ -43,49 +43,42 @@ const LogopedskiKoticek = () => {
       title: 'Govorni razvoj po starostnih obdobjih',
       description: 'Pregled tipičnega govornega razvoja otrok od 1. do 6. leta starosti. Mejniki v razvoju govora in jezika ter kdaj je priporočljivo poiskati pomoč logopeda.',
       icon: sectionIcons.development,
-      gradient: 'bg-gradient-to-r from-app-blue/10 to-app-teal/10'
     },
     {
       id: 'disorders',
       title: 'Najpogostejše govorne motnje',
       description: 'Opis in razlaga motenj, kot so: Dislalija, Fonološke motnje, Jecljanje, Zakasnitev v govoru. Vključitev primerov in nasvetov za prepoznavanje teh motenj.',
       icon: sectionIcons.disorders,
-      gradient: 'bg-gradient-to-r from-app-orange/10 to-app-yellow/10'
     },
     {
       id: 'parent_tips',
       title: 'Nasveti za starše',
       description: 'Kako doma spodbujati razvoj govora pri otroku. Vključitev vsakodnevnih dejavnosti, ki lahko pomagajo pri govornem razvoju. Pomembnost igre in interakcije pri učenju jezika.',
       icon: sectionIcons.parent_tips,
-      gradient: 'bg-gradient-to-r from-app-purple/10 to-app-blue/10'
     },
     {
       id: 'home_activities',
       title: 'Vaje in dejavnosti za domačo uporabo',
       description: 'Predlogi za enostavne vaje, ki jih starši lahko izvajajo z otroki doma. Uporaba pesmi, rim in zgodbic za spodbujanje govora. Ustvarjalne dejavnosti, kot so risanje in igranje vlog, ki spodbujajo jezikovni razvoj.',
       icon: sectionIcons.home_activities,
-      gradient: 'bg-gradient-to-r from-app-teal/10 to-dragon-green/10'
     },
     {
       id: 'faq',
       title: 'Pogosta vprašanja in odgovori',
       description: 'Odgovori na najpogostejša vprašanja staršev glede govornega razvoja. Nasveti, kako ravnati v določenih situacijah, npr. če otrok ne govori ali ima težave z izgovorjavo določenih glasov.',
       icon: sectionIcons.faq,
-      gradient: 'bg-gradient-to-r from-dragon-green/10 to-app-teal/10'
     },
     {
       id: 'articles',
       title: 'Strokovni članki in raziskave',
       description: 'Povzetki najnovejših raziskav na področju logopedije. Članki strokovnjakov o različnih vidikih govornega razvoja in terapije.',
       icon: sectionIcons.articles,
-      gradient: 'bg-gradient-to-r from-app-yellow/10 to-dragon-green/10'
     },
     {
       id: 'resources',
       title: 'Povezave do dodatnih virov',
       description: 'Seznam priporočenih knjig, spletnih strani in aplikacij za podporo govornemu razvoju. Informacije o lokalnih logopedskih storitvah in podpornih skupinah.',
       icon: sectionIcons.resources,
-      gradient: 'bg-gradient-to-r from-app-blue/10 to-app-purple/10'
     }
   ];
 
@@ -123,21 +116,28 @@ const LogopedskiKoticek = () => {
           {contentSections.map((section) => (
             <Card 
               key={section.id} 
-              className="transition-all duration-300 hover:shadow-md cursor-pointer"
+              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 cursor-pointer h-full flex flex-col"
               onClick={() => handleSectionSelect(section.id)}
             >
-              <CardHeader className={section.gradient}>
-                <CardTitle className="text-xl flex items-start gap-3">
-                  <span className="flex items-center justify-center" aria-label={section.title}>
+              <CardHeader className={`
+                rounded-t-2xl pb-4
+                ${section.id === 'development' && 'bg-gradient-to-r from-app-blue/10 to-app-teal/10'}
+                ${section.id === 'disorders' && 'bg-gradient-to-r from-app-orange/10 to-app-yellow/10'}
+                ${section.id === 'parent_tips' && 'bg-gradient-to-r from-app-purple/10 to-app-blue/10'}
+                ${section.id === 'home_activities' && 'bg-gradient-to-r from-app-teal/10 to-dragon-green/10'}
+                ${section.id === 'faq' && 'bg-gradient-to-r from-dragon-green/10 to-app-teal/10'}
+                ${section.id === 'articles' && 'bg-gradient-to-r from-app-yellow/10 to-dragon-green/10'}
+                ${section.id === 'resources' && 'bg-gradient-to-r from-app-blue/10 to-app-purple/10'}
+              `}>
+                <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
                     {section.icon}
-                  </span>
-                  <div>
-                    {section.title}
                   </div>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-4">
-                <p className="text-sm text-muted-foreground">
+              <CardContent className="pt-6 pb-4 flex-grow text-center">
+                <h3 className="text-lg font-semibold mb-2">{section.title}</h3>
+                <p className="text-sm text-gray-600">
                   {section.description}
                 </p>
               </CardContent>
