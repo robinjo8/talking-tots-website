@@ -15,16 +15,11 @@ import WordDisplay from "@/components/articulation/WordDisplay";
 import TestNavigation from "@/components/articulation/TestNavigation";
 
 const ArtikuacijskiTest = () => {
-  const {
-    selectedChildIndex,
-    profile
-  } = useAuth();
   const navigate = useNavigate();
   const {
     playAudio
   } = useAudioPlayback();
   const isMobile = useIsMobile();
-  const selectedChild = selectedChildIndex !== null && profile?.children ? profile.children[selectedChildIndex] : null;
   const {
     imageUrl,
     loading,
@@ -46,13 +41,19 @@ const ArtikuacijskiTest = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container mx-auto pt-20 pb-16 px-4 h-[calc(100vh-80px)] flex flex-col">
-        <div className="mb-4 flex items-center">
-          <Button variant="ghost" className="mr-4" onClick={() => navigate('/moja-stran')}>
-            <ArrowLeft className="h-5 w-5 mr-1" />
+      <div className="container max-w-5xl mx-auto pt-32 pb-20 px-4">
+        <div className="flex items-center gap-3 mb-8">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="gap-2" 
+            onClick={() => navigate("/moja-stran")}
+          >
+            <ArrowLeft className="h-4 w-4" />
             Nazaj
           </Button>
-          <h1 className="text-2xl md:text-3xl font-bold">
+          
+          <h1 className="text-2xl font-bold text-foreground">
             Artikulacijski test
           </h1>
         </div>

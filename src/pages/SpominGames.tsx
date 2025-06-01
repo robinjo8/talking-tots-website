@@ -74,7 +74,7 @@ export default function SpominGames() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container max-w-7xl mx-auto pt-32 pb-20 px-4">
+      <div className="container max-w-5xl mx-auto pt-32 pb-20 px-4">
         <div className="flex items-center gap-3 mb-8">
           <Button 
             variant="ghost" 
@@ -86,20 +86,15 @@ export default function SpominGames() {
             Nazaj
           </Button>
           
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+          <h1 className="text-2xl font-bold text-foreground">
             Spomin
           </h1>
         </div>
         
-        <Card className="bg-dragon-green/5 mb-8">
-          <CardContent className="p-8">
-            <h2 className="text-xl font-bold mb-2">Izberi igro spomin</h2>
-            <p className="text-muted-foreground">
-              Izberi eno izmed iger spomin in začni vaditi izgovorjavo določene črke na zabaven način.
-            </p>
-          </CardContent>
-        </Card>
-
+        <p className="text-muted-foreground mb-8">
+          Izberi eno izmed iger spomin in začni vaditi izgovorjavo določene črke na zabaven način.
+        </p>
+        
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {memoryGames.map((game) => (
             <Card 

@@ -13,14 +13,10 @@ import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { handlePlayRozaAudio } from "@/utils/audioUtils";
 
 const ArtIzgovorjavaPage = () => {
-  const { user, profile, selectedChildIndex } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { letter: urlLetter } = useParams();
   const { audioRef, playAudio } = useAudioPlayback();
-  
-  const selectedChild = selectedChildIndex !== null && profile?.children 
-    ? profile.children[selectedChildIndex] 
-    : null;
     
   const currentWords = urlLetter && letterPracticeWords[urlLetter] 
     ? letterPracticeWords[urlLetter] 
@@ -55,8 +51,8 @@ const ArtIzgovorjavaPage = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container max-w-3xl mx-auto pt-32 pb-20 px-4">
-        <div className="flex items-center justify-between mb-6">
+      <div className="container max-w-5xl mx-auto pt-32 pb-20 px-4">
+        <div className="flex items-center gap-3 mb-8">
           <Button 
             variant="ghost" 
             size="sm" 
@@ -67,13 +63,14 @@ const ArtIzgovorjavaPage = () => {
             Nazaj
           </Button>
           
-          <h1 className="text-2xl font-bold">
+          <h1 className="text-2xl font-bold text-foreground">
             Motnja izreke / artikulacije
-            {selectedChild && (
-              <span className="text-dragon-green ml-2">– {selectedChild.name}</span>
-            )}
           </h1>
         </div>
+        
+        <p className="text-muted-foreground mb-8">
+          Te vaje so namenjene pravilni izgovorjavi težavnih glasov kot so R, L, S, Š, ...
+        </p>
         
         <LetterSelector 
           selectedLetter={urlLetter || null}
@@ -120,9 +117,6 @@ const ArtIzgovorjavaPage = () => {
         {!urlLetter && (
           <div className="bg-light-cloud p-8 rounded-lg text-center animate-fade-in">
             <p className="text-lg mb-4">Izberi črko zgoraj za začetek vaje.</p>
-            <p className="text-muted-foreground">
-              Te vaje so namenjene pravilni izgovorjavi težavnih glasov kot so R, L, S, Š, ...
-            </p>
           </div>
         )}
         

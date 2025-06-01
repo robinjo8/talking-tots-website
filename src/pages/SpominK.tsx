@@ -60,8 +60,8 @@ export default function SpominK() {
       <Header />
       <audio ref={audioRef} className="hidden" />
       
-      <div className="container max-w-7xl mx-auto pt-28 pb-20 px-4">
-        <div className="flex items-center justify-between gap-3 mb-6">
+      <div className="container max-w-5xl mx-auto pt-32 pb-20 px-4">
+        <div className="flex items-center justify-between gap-3 mb-8">
           <div className="flex items-center gap-3">
             <Button 
               variant="ghost" 
@@ -73,7 +73,7 @@ export default function SpominK() {
               Nazaj
             </Button>
             
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+            <h1 className="text-2xl font-bold text-foreground">
               Spomin (besede na črko K)
             </h1>
           </div>
@@ -89,28 +89,24 @@ export default function SpominK() {
           </Button>
         </div>
         
+        <p className="text-muted-foreground mb-8">
+          Obračaj kartice in najdi pare. Ko obrneš kartico, boš slišal/a besedo in videl/a sliko. Ko najdeš vse pare, si uspešno zaključil/a igro!
+        </p>
+        
         <Card className="bg-dragon-green/5 mb-6">
           <CardContent className="p-6">
-            <div className="space-y-2">
-              <h2 className="text-xl font-bold">Igra spomin</h2>
-              <p className="text-muted-foreground">
-                Obračaj kartice in najdi pare. Ko obrneš kartico, boš slišal/a besedo in videl/a sliko.
-                Ko najdeš vse pare, si uspešno zaključil/a igro!
-              </p>
-              
-              <div className="flex items-center justify-between mt-4">
-                <div className="text-sm">
-                  <span className="font-medium">Najdeni pari: </span>
-                  <span className="text-dragon-green font-bold">{matchedPairs.length}</span>
-                  <span className="text-muted-foreground"> od {totalPairs}</span>
-                </div>
-                
-                {gameCompleted && gameTime !== null && (
-                  <div className="bg-dragon-green/10 text-dragon-green px-3 py-1 rounded-md text-sm font-medium">
-                    Čas: {gameTime} sekund
-                  </div>
-                )}
+            <div className="flex items-center justify-between">
+              <div className="text-sm">
+                <span className="font-medium">Najdeni pari: </span>
+                <span className="text-dragon-green font-bold">{matchedPairs.length}</span>
+                <span className="text-muted-foreground"> od {totalPairs}</span>
               </div>
+              
+              {gameCompleted && gameTime !== null && (
+                <div className="bg-dragon-green/10 text-dragon-green px-3 py-1 rounded-md text-sm font-medium">
+                  Čas: {gameTime} sekund
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
