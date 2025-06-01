@@ -8,12 +8,8 @@ import { ArrowLeft } from "lucide-react";
 import { TongueGymGame } from "@/components/games/TongueGymGame";
 
 const VajeZaJezik = () => {
-  const { user, profile, selectedChildIndex } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
-  
-  const selectedChild = selectedChildIndex !== null && profile?.children 
-    ? profile.children[selectedChildIndex] 
-    : null;
   
   useEffect(() => {
     if (!user) {
@@ -26,7 +22,7 @@ const VajeZaJezik = () => {
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-32 pb-20 px-4">
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-8">
           <Button 
             variant="ghost" 
             size="sm" 
@@ -37,11 +33,8 @@ const VajeZaJezik = () => {
             Nazaj na vaje
           </Button>
           
-          <h1 className="text-2xl font-bold">
+          <h1 className="text-2xl font-bold text-foreground">
             Vaje za jezik
-            {selectedChild && (
-              <span className="text-dragon-green ml-2">za {selectedChild.name}</span>
-            )}
           </h1>
         </div>
         

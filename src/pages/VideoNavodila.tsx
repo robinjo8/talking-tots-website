@@ -67,7 +67,7 @@ export default function VideoNavodila() {
             Nazaj
           </Button>
           
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+          <h1 className="text-2xl font-bold text-foreground">
             Video navodila
           </h1>
         </div>

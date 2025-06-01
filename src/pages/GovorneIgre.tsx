@@ -26,7 +26,7 @@ export default function GovorneIgre() {
             Nazaj
           </Button>
           
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+          <h1 className="text-2xl font-bold text-foreground">
             Govorne igre
           </h1>
         </div>

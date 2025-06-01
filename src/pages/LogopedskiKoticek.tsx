@@ -99,7 +99,7 @@ const LogopedskiKoticek = () => {
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-32 pb-20 px-4">
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-3 mb-8">
           <Button 
             variant="ghost" 
             size="sm" 
@@ -110,7 +110,7 @@ const LogopedskiKoticek = () => {
             Nazaj
           </Button>
           
-          <h1 className="text-2xl font-bold">
+          <h1 className="text-2xl font-bold text-foreground">
             Logopedski kotiček
           </h1>
         </div>

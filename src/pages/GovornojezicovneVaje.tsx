@@ -70,7 +70,7 @@ const GovornojezicovneVaje = () => {
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-32 pb-20 px-4">
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-3 mb-8">
           <Button 
             variant="ghost" 
             size="sm" 
@@ -81,11 +81,8 @@ const GovornojezicovneVaje = () => {
             Nazaj
           </Button>
           
-          <h1 className="text-2xl font-bold">
+          <h1 className="text-2xl font-bold text-foreground">
             Govorno-jezikovne vaje
-            {selectedChild && (
-              <span className="text-dragon-green ml-2">za {selectedChild.name}</span>
-            )}
           </h1>
         </div>
         
