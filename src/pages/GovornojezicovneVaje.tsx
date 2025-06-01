@@ -96,21 +96,19 @@ const GovornojezicovneVaje = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           {/* Add the new tongue exercises section first */}
           <Card 
-            className="transition-all duration-300 hover:shadow-md cursor-pointer"
+            className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 cursor-pointer h-full flex flex-col"
             onClick={() => handleDifficultySelect('tongue_exercises')}
           >
-            <CardHeader className="bg-gradient-to-r from-app-teal/10 to-dragon-green/10">
-              <CardTitle className="text-xl flex items-start gap-3">
-                <span className="flex items-center justify-center" aria-label={tongueExercisesSection.title}>
+            <CardHeader className="bg-gradient-to-r from-app-teal/10 to-dragon-green/10 rounded-t-2xl pb-4">
+              <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
+                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
                   {difficultyIcons.tongue_exercises}
-                </span>
-                <div>
-                  {tongueExercisesSection.title}
                 </div>
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-4">
-              <p className="mb-3 text-sm text-muted-foreground">
+            <CardContent className="pt-6 pb-4 flex-grow text-center">
+              <h3 className="text-lg font-semibold mb-2 text-app-teal">{tongueExercisesSection.title}</h3>
+              <p className="text-sm text-gray-600 mb-3">
                 {tongueExercisesSection.description}
               </p>
               <div className="bg-muted/50 p-3 rounded-md text-sm mt-2">
@@ -124,10 +122,11 @@ const GovornojezicovneVaje = () => {
           {SPEECH_DIFFICULTIES.map((difficulty) => (
             <Card 
               key={difficulty.id} 
-              className="transition-all duration-300 hover:shadow-md cursor-pointer"
+              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 cursor-pointer h-full flex flex-col"
               onClick={() => handleDifficultySelect(difficulty.id)}
             >
               <CardHeader className={`
+                rounded-t-2xl pb-4
                 ${difficulty.id === 'articulation' && 'bg-gradient-to-r from-app-blue/10 to-app-teal/10'}
                 ${difficulty.id === 'stuttering' && 'bg-gradient-to-r from-app-purple/10 to-app-blue/10'}
                 ${difficulty.id === 'vocabulary' && 'bg-gradient-to-r from-app-orange/10 to-app-yellow/10'}
@@ -137,17 +136,15 @@ const GovornojezicovneVaje = () => {
                 ${difficulty.id === 'word_usage' && 'bg-gradient-to-r from-app-orange/10 to-app-purple/10'}
                 ${difficulty.id === 'phonological' && 'bg-gradient-to-r from-dragon-green/10 to-app-teal/10'}
               `}>
-                <CardTitle className="text-xl flex items-start gap-3">
-                  <span className="flex items-center justify-center" aria-label={difficulty.title}>
+                <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
                     {difficultyIcons[difficulty.id as keyof typeof difficultyIcons]}
-                  </span>
-                  <div>
-                    {difficulty.title.split('–')[0].trim()}
                   </div>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-4">
-                <p className="mb-3 text-sm text-muted-foreground">
+              <CardContent className="pt-6 pb-4 flex-grow text-center">
+                <h3 className="text-lg font-semibold mb-2">{difficulty.title.split('–')[0].trim()}</h3>
+                <p className="text-sm text-gray-600 mb-3">
                   {difficulty.description}
                 </p>
                 {difficulty.example && (

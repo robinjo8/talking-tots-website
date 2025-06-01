@@ -22,18 +22,23 @@ export default function FeatureCard({
   return (
     <div 
       className={cn(
-        "group p-6 rounded-2xl flex flex-col items-center text-center transform transition-all duration-300",
+        "group transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col",
         "hover:scale-105 animate-fade-in bg-white dark:bg-dark-cloud/60",
-        "shadow-md hover:shadow-xl h-full",
         className
       )}
       style={{ animationDelay }}
     >
-      <div className="mb-4 bg-light-cloud dark:bg-dark-cloud/80 p-4 rounded-full">
-        {icon}
+      <div className="p-6 bg-gradient-to-r from-app-blue/10 to-app-teal/10 rounded-t-2xl pb-4">
+        <div className="flex items-center justify-center">
+          <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
+            {icon}
+          </div>
+        </div>
       </div>
-      <h3 className="text-xl font-bold mb-2">{title}</h3>
-      <p className="text-muted-foreground">{description}</p>
+      <div className="p-6 pt-6 flex-grow text-center">
+        <h3 className="text-xl font-bold mb-2">{title}</h3>
+        <p className="text-muted-foreground">{description}</p>
+      </div>
     </div>
   );
 }

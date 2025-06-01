@@ -3,8 +3,9 @@ import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GamesList } from "@/components/games/GamesList";
+import { Gamepad2 } from "lucide-react";
 
 export default function GovorneIgre() {
   const navigate = useNavigate();
@@ -30,9 +31,16 @@ export default function GovorneIgre() {
           </h1>
         </div>
         
-        <Card className="bg-dragon-green/5 mb-8">
-          <CardContent className="p-8">
-            <h2 className="text-xl font-bold mb-2">Izberi igro</h2>
+        <Card className="mb-8 rounded-2xl border-2 border-gray-200 transition-all duration-300 hover:shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-dragon-green/10 to-app-blue/10 rounded-t-2xl pb-4">
+            <CardTitle className="flex items-center justify-center gap-2 text-center">
+              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
+                <Gamepad2 className="h-6 w-6 text-dragon-green" />
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6 pb-4 text-center">
+            <h2 className="text-xl font-bold mb-2 text-dragon-green">Izberi igro</h2>
             <p className="text-muted-foreground">
               Izberi eno izmed govornih iger in začni vaditi izgovorjavo na zabaven način.
             </p>
