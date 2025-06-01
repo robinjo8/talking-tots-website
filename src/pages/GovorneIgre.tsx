@@ -14,7 +14,7 @@ export default function GovorneIgre() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container max-w-7xl mx-auto pt-32 pb-20 px-4">
+      <div className="container max-w-5xl mx-auto pt-32 pb-20 px-4">
         <div className="flex items-center gap-3 mb-8">
           <Button 
             variant="ghost" 
