@@ -16,53 +16,46 @@ export const FeaturesCarousel = () => {
   
   const features = [
     {
-      icon: <Book className="h-8 w-8 text-dragon-green" />,
+      icon: <Book className="h-6 w-6 text-white" />,
       title: "Odobreno s strani logopedov",
       description: "Razvito v sodelovanju s profesionalnimi logopedi",
-      gradient: "from-dragon-green/20 to-app-teal/20",
-      color: "text-dragon-green"
+      color: "bg-gradient-to-br from-dragon-green to-dragon-green/80"
     },
     {
-      icon: <Mic className="h-8 w-8 text-app-blue" />, 
+      icon: <Mic className="h-6 w-6 text-white" />, 
       title: "Prepoznavanje glasu",
       description: "Posluša govor vašega otroka in nudi koristne povratne informacije",
-      gradient: "from-app-blue/20 to-app-purple/20",
-      color: "text-app-blue"
+      color: "bg-gradient-to-br from-app-blue to-app-blue/80"
     },
     {
-      icon: <Stars className="h-8 w-8 text-app-purple" />,
+      icon: <Stars className="h-6 w-6 text-white" />,
       title: "Zabavne aktivnosti",
       description: "Privlačne igre, ki naredijo učenje govora prijetno",
-      gradient: "from-app-purple/20 to-app-blue/20",
-      color: "text-app-purple"
+      color: "bg-gradient-to-br from-app-purple to-app-purple/80"
     },
     {
-      icon: <Volume2 className="h-8 w-8 text-app-teal" />,
+      icon: <Volume2 className="h-6 w-6 text-white" />,
       title: "Vodnik za izgovorjavo",
       description: "Jasni avdio primeri pravilne izgovorjave besed",
-      gradient: "from-app-teal/20 to-dragon-green/20",
-      color: "text-app-teal"
+      color: "bg-gradient-to-br from-app-teal to-app-teal/80"
     },
     {
-      icon: <MessageSquare className="h-8 w-8 text-app-orange" />,
+      icon: <MessageSquare className="h-6 w-6 text-white" />,
       title: "Interaktivni pogovor",
       description: "Pogovarjajte se z našim prijaznim zmajčkom za vajo v pogovorih",
-      gradient: "from-app-orange/20 to-app-yellow/20",
-      color: "text-app-orange"
+      color: "bg-gradient-to-br from-app-orange to-app-orange/80"
     },
     {
-      icon: <Zap className="h-8 w-8 text-app-yellow" />,
+      icon: <Zap className="h-6 w-6 text-white" />,
       title: "Sledenje napredku",
       description: "Spremljajte izboljšanje vašega otroka skozi čas",
-      gradient: "from-app-yellow/20 to-app-orange/20",
-      color: "text-app-yellow"
+      color: "bg-gradient-to-br from-app-yellow to-app-yellow/80"
     },
     {
-      icon: <Award className="h-8 w-8 text-app-blue" />,
+      icon: <Award className="h-6 w-6 text-white" />,
       title: "Sistem nagrajevanja",
       description: "Pridobivajte značke in odklepajte nove zmajčke",
-      gradient: "from-app-blue/20 to-app-teal/20",
-      color: "text-app-blue"
+      color: "bg-gradient-to-br from-app-blue to-app-teal"
     },
   ];
   
@@ -141,9 +134,9 @@ export const FeaturesCarousel = () => {
   }, [api]);
 
   return (
-    <div className="w-full max-w-7xl mx-auto">
-      {/* Centered carousel container with proper spacing */}
-      <div className="relative px-4 sm:px-8 md:px-12 lg:px-16">
+    <div className="w-full max-w-6xl mx-auto px-4">
+      {/* Modern carousel container */}
+      <div className="relative">
         <Carousel 
           setApi={setApi} 
           className="w-full"
@@ -153,27 +146,27 @@ export const FeaturesCarousel = () => {
             containScroll: "trimSnaps"
           }}
         >
-          <CarouselContent className="ml-0">
+          <CarouselContent className="ml-0 gap-6">
             {features.map((feature, index) => (
-              <CarouselItem key={index} className="pl-4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 min-w-0">
+              <CarouselItem key={index} className="pl-0 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 min-w-0">
                 <div className="h-full">
-                  <div className="bg-white rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 p-6 h-full flex flex-col border border-gray-100/50">
-                    {/* Icon Section */}
-                    <div className="flex items-center justify-center mb-4">
+                  <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 p-8 h-full flex flex-col border border-gray-100/50 min-h-[280px]">
+                    {/* Icon Section - Modern circular design */}
+                    <div className="flex items-center justify-center mb-6">
                       <div className={cn(
-                        "w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br shadow-md",
-                        feature.gradient
+                        "w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg",
+                        feature.color
                       )}>
                         {feature.icon}
                       </div>
                     </div>
                     
-                    {/* Content Section */}
+                    {/* Content Section - Clean typography */}
                     <div className="text-center flex-grow">
-                      <h3 className={cn("text-lg font-bold mb-3 leading-tight", feature.color)}>
+                      <h3 className="text-xl font-bold mb-4 leading-tight text-gray-900">
                         {feature.title}
                       </h3>
-                      <p className="text-sm text-gray-600 leading-relaxed">
+                      <p className="text-gray-600 leading-relaxed text-sm">
                         {feature.description}
                       </p>
                     </div>
@@ -183,32 +176,34 @@ export const FeaturesCarousel = () => {
             ))}
           </CarouselContent>
           
-          {/* Navigation Buttons - Positioned outside the carousel content */}
+          {/* Modern Navigation Buttons */}
           <button 
             onClick={handlePrevClick}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 h-12 w-12 bg-white shadow-lg hover:shadow-xl hover:bg-gray-50 border border-gray-200 rounded-full flex items-center justify-center z-10 transition-all duration-200"
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 h-12 w-12 bg-white shadow-lg hover:shadow-xl hover:bg-gray-50 border border-gray-200/50 rounded-full flex items-center justify-center z-10 transition-all duration-300 hover:scale-105"
             aria-label="Prejšnja funkcija"
           >
-            <ChevronLeft className="h-6 w-6 text-gray-700" />
+            <ChevronLeft className="h-5 w-5 text-gray-700" />
           </button>
           <button 
             onClick={handleNextClick}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 h-12 w-12 bg-white shadow-lg hover:shadow-xl hover:bg-gray-50 border border-gray-200 rounded-full flex items-center justify-center z-10 transition-all duration-200"
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 h-12 w-12 bg-white shadow-lg hover:shadow-xl hover:bg-gray-50 border border-gray-200/50 rounded-full flex items-center justify-center z-10 transition-all duration-300 hover:scale-105"
             aria-label="Naslednja funkcija"
           >
-            <ChevronRight className="h-6 w-6 text-gray-700" />
+            <ChevronRight className="h-5 w-5 text-gray-700" />
           </button>
         </Carousel>
       </div>
 
-      {/* Pagination dots - Centered below carousel */}
+      {/* Modern Pagination dots */}
       <div className="flex justify-center gap-2 mt-8">
         {Array.from({ length: count }).map((_, i) => (
           <button
             key={i}
             className={cn(
-              "w-3 h-3 rounded-full transition-all duration-200",
-              i === current ? "bg-dragon-green scale-110" : "bg-gray-300 hover:bg-gray-400"
+              "w-2.5 h-2.5 rounded-full transition-all duration-300",
+              i === current 
+                ? "bg-dragon-green scale-125 shadow-sm" 
+                : "bg-gray-300 hover:bg-gray-400"
             )}
             onClick={() => {
               api?.scrollTo(i);
