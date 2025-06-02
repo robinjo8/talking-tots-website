@@ -1,12 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { Mic, Stars, Volume2, MessageSquare, Zap, Book, Award, ChevronLeft, ChevronRight } from "lucide-react";
-import FeatureCard from "@/components/FeatureCard";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
 
@@ -144,61 +141,68 @@ export const FeaturesCarousel = () => {
   }, [api]);
 
   return (
-    <div className="relative w-full overflow-hidden">
-      <Carousel 
-        setApi={setApi} 
-        className="w-full"
-        opts={{
-          align: "start",
-          loop: true,
-          containScroll: "trimSnaps"
-        }}
-      >
-        <CarouselContent className="-ml-2 md:-ml-4">
-          {features.map((feature, index) => (
-            <CarouselItem key={index} className="pl-2 md:pl-4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 min-w-0">
-              <div className="bg-white rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 p-6 h-full flex flex-col border border-gray-100">
-                {/* Icon Section */}
-                <div className="flex items-center justify-center mb-4">
-                  <div className={cn(
-                    "w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br shadow-md",
-                    feature.gradient
-                  )}>
-                    {feature.icon}
+    <div className="w-full max-w-7xl mx-auto">
+      {/* Centered carousel container with proper spacing */}
+      <div className="relative px-4 sm:px-8 md:px-12 lg:px-16">
+        <Carousel 
+          setApi={setApi} 
+          className="w-full"
+          opts={{
+            align: "start",
+            loop: true,
+            containScroll: "trimSnaps"
+          }}
+        >
+          <CarouselContent className="ml-0">
+            {features.map((feature, index) => (
+              <CarouselItem key={index} className="pl-4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 min-w-0">
+                <div className="h-full">
+                  <div className="bg-white rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 p-6 h-full flex flex-col border border-gray-100/50">
+                    {/* Icon Section */}
+                    <div className="flex items-center justify-center mb-4">
+                      <div className={cn(
+                        "w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br shadow-md",
+                        feature.gradient
+                      )}>
+                        {feature.icon}
+                      </div>
+                    </div>
+                    
+                    {/* Content Section */}
+                    <div className="text-center flex-grow">
+                      <h3 className={cn("text-lg font-bold mb-3 leading-tight", feature.color)}>
+                        {feature.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 leading-relaxed">
+                        {feature.description}
+                      </p>
+                    </div>
                   </div>
                 </div>
-                
-                {/* Content Section */}
-                <div className="text-center flex-grow">
-                  <h3 className={cn("text-lg font-bold mb-3 leading-tight", feature.color)}>
-                    {feature.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">
-                    {feature.description}
-                  </p>
-                </div>
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        <button 
-          onClick={handlePrevClick}
-          className="absolute left-0 md:-left-4 h-12 w-12 bg-white shadow-lg hover:shadow-xl hover:bg-gray-50 border border-gray-200 rounded-full flex items-center justify-center top-1/2 -translate-y-1/2 z-10 transition-all duration-200"
-          aria-label="Prejšnja funkcija"
-        >
-          <ChevronLeft className="h-6 w-6 text-gray-700" />
-        </button>
-        <button 
-          onClick={handleNextClick}
-          className="absolute right-0 md:-right-4 h-12 w-12 bg-white shadow-lg hover:shadow-xl hover:bg-gray-50 border border-gray-200 rounded-full flex items-center justify-center top-1/2 -translate-y-1/2 z-10 transition-all duration-200"
-          aria-label="Naslednja funkcija"
-        >
-          <ChevronRight className="h-6 w-6 text-gray-700" />
-        </button>
-      </Carousel>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          
+          {/* Navigation Buttons - Positioned outside the carousel content */}
+          <button 
+            onClick={handlePrevClick}
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 h-12 w-12 bg-white shadow-lg hover:shadow-xl hover:bg-gray-50 border border-gray-200 rounded-full flex items-center justify-center z-10 transition-all duration-200"
+            aria-label="Prejšnja funkcija"
+          >
+            <ChevronLeft className="h-6 w-6 text-gray-700" />
+          </button>
+          <button 
+            onClick={handleNextClick}
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 h-12 w-12 bg-white shadow-lg hover:shadow-xl hover:bg-gray-50 border border-gray-200 rounded-full flex items-center justify-center z-10 transition-all duration-200"
+            aria-label="Naslednja funkcija"
+          >
+            <ChevronRight className="h-6 w-6 text-gray-700" />
+          </button>
+        </Carousel>
+      </div>
 
-      {/* Pagination dots */}
-      <div className="flex justify-center gap-2 mt-6">
+      {/* Pagination dots - Centered below carousel */}
+      <div className="flex justify-center gap-2 mt-8">
         {Array.from({ length: count }).map((_, i) => (
           <button
             key={i}
