@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { Mic, Stars, Volume2, MessageSquare, Zap, Book, Award, ChevronLeft, ChevronRight } from "lucide-react";
 import FeatureCard from "@/components/FeatureCard";
@@ -20,39 +19,53 @@ export const FeaturesCarousel = () => {
   
   const features = [
     {
-      icon: <Book className="h-10 w-10 text-dragon-green" />,
+      icon: <Book className="h-8 w-8 text-dragon-green" />,
       title: "Odobreno s strani logopedov",
       description: "Razvito v sodelovanju s profesionalnimi logopedi",
+      gradient: "from-dragon-green/20 to-app-teal/20",
+      color: "text-dragon-green"
     },
     {
-      icon: <Mic className="h-10 w-10 text-app-blue" />, 
+      icon: <Mic className="h-8 w-8 text-app-blue" />, 
       title: "Prepoznavanje glasu",
       description: "Posluša govor vašega otroka in nudi koristne povratne informacije",
+      gradient: "from-app-blue/20 to-app-purple/20",
+      color: "text-app-blue"
     },
     {
-      icon: <Stars className="h-10 w-10 text-app-purple" />,
+      icon: <Stars className="h-8 w-8 text-app-purple" />,
       title: "Zabavne aktivnosti",
       description: "Privlačne igre, ki naredijo učenje govora prijetno",
+      gradient: "from-app-purple/20 to-app-blue/20",
+      color: "text-app-purple"
     },
     {
-      icon: <Volume2 className="h-10 w-10 text-app-teal" />,
+      icon: <Volume2 className="h-8 w-8 text-app-teal" />,
       title: "Vodnik za izgovorjavo",
       description: "Jasni avdio primeri pravilne izgovorjave besed",
+      gradient: "from-app-teal/20 to-dragon-green/20",
+      color: "text-app-teal"
     },
     {
-      icon: <MessageSquare className="h-10 w-10 text-app-orange" />,
+      icon: <MessageSquare className="h-8 w-8 text-app-orange" />,
       title: "Interaktivni pogovor",
       description: "Pogovarjajte se z našim prijaznim zmajčkom za vajo v pogovorih",
+      gradient: "from-app-orange/20 to-app-yellow/20",
+      color: "text-app-orange"
     },
     {
-      icon: <Zap className="h-10 w-10 text-app-yellow" />,
+      icon: <Zap className="h-8 w-8 text-app-yellow" />,
       title: "Sledenje napredku",
       description: "Spremljajte izboljšanje vašega otroka skozi čas",
+      gradient: "from-app-yellow/20 to-app-orange/20",
+      color: "text-app-yellow"
     },
     {
-      icon: <Award className="h-10 w-10 text-app-blue" />,
+      icon: <Award className="h-8 w-8 text-app-blue" />,
       title: "Sistem nagrajevanja",
       description: "Pridobivajte značke in odklepajte nove zmajčke",
+      gradient: "from-app-blue/20 to-app-teal/20",
+      color: "text-app-blue"
     },
   ];
   
@@ -144,39 +157,54 @@ export const FeaturesCarousel = () => {
         <CarouselContent className="-ml-2 md:-ml-4">
           {features.map((feature, index) => (
             <CarouselItem key={index} className="pl-2 md:pl-4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 min-w-0">
-              <FeatureCard
-                icon={feature.icon}
-                title={feature.title}
-                description={feature.description}
-                delay={0}
-              />
+              <div className="bg-white rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 p-6 h-full flex flex-col border border-gray-100">
+                {/* Icon Section */}
+                <div className="flex items-center justify-center mb-4">
+                  <div className={cn(
+                    "w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br shadow-md",
+                    feature.gradient
+                  )}>
+                    {feature.icon}
+                  </div>
+                </div>
+                
+                {/* Content Section */}
+                <div className="text-center flex-grow">
+                  <h3 className={cn("text-lg font-bold mb-3 leading-tight", feature.color)}>
+                    {feature.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {feature.description}
+                  </p>
+                </div>
+              </div>
             </CarouselItem>
           ))}
         </CarouselContent>
         <button 
           onClick={handlePrevClick}
-          className="absolute left-0 md:-left-4 h-10 w-10 md:h-12 md:w-12 bg-white shadow-lg hover:bg-light-cloud border-2 border-gray-100 rounded-full flex items-center justify-center top-1/2 -translate-y-1/2 z-10"
+          className="absolute left-0 md:-left-4 h-12 w-12 bg-white shadow-lg hover:shadow-xl hover:bg-gray-50 border border-gray-200 rounded-full flex items-center justify-center top-1/2 -translate-y-1/2 z-10 transition-all duration-200"
           aria-label="Prejšnja funkcija"
         >
-          <ChevronLeft className="h-6 w-6 md:h-7 md:w-7 text-dragon-green" />
+          <ChevronLeft className="h-6 w-6 text-gray-700" />
         </button>
         <button 
           onClick={handleNextClick}
-          className="absolute right-0 md:-right-4 h-10 w-10 md:h-12 md:w-12 bg-white shadow-lg hover:bg-light-cloud border-2 border-gray-100 rounded-full flex items-center justify-center top-1/2 -translate-y-1/2 z-10"
+          className="absolute right-0 md:-right-4 h-12 w-12 bg-white shadow-lg hover:shadow-xl hover:bg-gray-50 border border-gray-200 rounded-full flex items-center justify-center top-1/2 -translate-y-1/2 z-10 transition-all duration-200"
           aria-label="Naslednja funkcija"
         >
-          <ChevronRight className="h-6 w-6 md:h-7 md:w-7 text-dragon-green" />
+          <ChevronRight className="h-6 w-6 text-gray-700" />
         </button>
       </Carousel>
 
       {/* Pagination dots */}
-      <div className="flex justify-center gap-2 mt-4">
+      <div className="flex justify-center gap-2 mt-6">
         {Array.from({ length: count }).map((_, i) => (
           <button
             key={i}
             className={cn(
-              "w-2 h-2 rounded-full transition-colors",
-              i === current ? "bg-dragon-green" : "bg-gray-300"
+              "w-3 h-3 rounded-full transition-all duration-200",
+              i === current ? "bg-dragon-green scale-110" : "bg-gray-300 hover:bg-gray-400"
             )}
             onClick={() => {
               api?.scrollTo(i);
