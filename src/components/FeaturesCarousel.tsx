@@ -146,29 +146,31 @@ export const FeaturesCarousel = () => {
             containScroll: "trimSnaps"
           }}
         >
-          <CarouselContent className="ml-0 gap-6">
+          <CarouselContent className="ml-0">
             {features.map((feature, index) => (
-              <CarouselItem key={index} className="pl-0 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 min-w-0">
-                <div className="h-full">
-                  <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 p-8 h-full flex flex-col border border-gray-100/50 min-h-[280px]">
-                    {/* Icon Section - Modern circular design */}
+              <CarouselItem key={index} className="pl-4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
+                <div className="h-full p-1">
+                  <div className="bg-white rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 p-8 h-full flex flex-col border border-gray-100/50 min-h-[300px]">
+                    {/* Icon Section */}
                     <div className="flex items-center justify-center mb-6">
                       <div className={cn(
-                        "w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg",
+                        "w-16 h-16 rounded-2xl flex items-center justify-center shadow-md",
                         feature.color
                       )}>
                         {feature.icon}
                       </div>
                     </div>
                     
-                    {/* Content Section - Clean typography */}
-                    <div className="text-center flex-grow">
-                      <h3 className="text-xl font-bold mb-4 leading-tight text-gray-900">
-                        {feature.title}
-                      </h3>
-                      <p className="text-gray-600 leading-relaxed text-sm">
-                        {feature.description}
-                      </p>
+                    {/* Content Section */}
+                    <div className="text-center flex-grow flex flex-col justify-between">
+                      <div>
+                        <h3 className="text-xl font-bold mb-4 leading-tight text-gray-900 line-clamp-2">
+                          {feature.title}
+                        </h3>
+                        <p className="text-gray-600 leading-relaxed text-sm line-clamp-3">
+                          {feature.description}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
