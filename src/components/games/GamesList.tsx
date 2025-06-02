@@ -1,5 +1,5 @@
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Puzzle, Gamepad, SquareDashed } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -40,22 +40,26 @@ export function GamesList() {
   const navigate = useNavigate();
   
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
       {otherGames.map((game) => (
         <Card 
           key={game.id}
           className={cn(
-            "transition-all duration-300 hover:shadow-md",
+            "transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col",
             game.available ? "cursor-pointer" : "opacity-50"
           )}
           onClick={() => game.available && game.path && navigate(game.path)}
         >
-          <CardContent className="p-6">
-            <div className={`bg-gradient-to-br ${game.gradient} rounded-lg p-4 mb-4 flex items-center justify-center`}>
-              {game.icon && <game.icon className={`h-8 w-8 ${game.color}`} />}
-            </div>
-            <h3 className="font-bold text-lg mb-2">{game.title}</h3>
-            <p className="text-sm text-muted-foreground">{game.description}</p>
+          <CardHeader className={`bg-gradient-to-r ${game.gradient} rounded-t-2xl pb-4`}>
+            <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
+              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
+                {game.icon && <game.icon className={`h-6 w-6 ${game.color}`} />}
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6 pb-4 flex-grow text-center">
+            <h3 className={cn("text-lg font-semibold mb-2", game.color)}>{game.title}</h3>
+            <p className="text-sm text-gray-600">{game.description}</p>
             {!game.available && (
               <div className="mt-3 text-sm text-muted-foreground italic">
                 Kmalu na voljo
