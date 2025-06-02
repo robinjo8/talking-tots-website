@@ -135,21 +135,21 @@ export const FeaturesCarousel = () => {
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4">
-      {/* Modern carousel container */}
-      <div className="relative">
+      {/* Clean carousel container with no background elements */}
+      <div className="relative overflow-visible">
         <Carousel 
           setApi={setApi} 
-          className="w-full"
+          className="w-full overflow-visible"
           opts={{
             align: "start",
             loop: true,
             containScroll: "trimSnaps"
           }}
         >
-          <CarouselContent className="ml-0">
+          <CarouselContent className="-ml-2 md:-ml-4">
             {features.map((feature, index) => (
-              <CarouselItem key={index} className="pl-4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
-                <div className="h-full p-1">
+              <CarouselItem key={index} className="pl-2 md:pl-4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
+                <div className="h-full">
                   <div className="bg-white rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 p-8 h-full flex flex-col border border-gray-100/50 min-h-[300px]">
                     {/* Icon Section */}
                     <div className="flex items-center justify-center mb-6">
@@ -178,7 +178,7 @@ export const FeaturesCarousel = () => {
             ))}
           </CarouselContent>
           
-          {/* Modern Navigation Buttons */}
+          {/* Navigation Buttons - positioned outside container */}
           <button 
             onClick={handlePrevClick}
             className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 h-12 w-12 bg-white shadow-lg hover:shadow-xl hover:bg-gray-50 border border-gray-200/50 rounded-full flex items-center justify-center z-10 transition-all duration-300 hover:scale-105"
