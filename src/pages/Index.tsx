@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SelectChildDialog } from "@/components/SelectChildDialog";
 import { FeaturesCarousel } from "@/components/FeaturesCarousel";
+import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
 
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -51,7 +52,8 @@ const Index = () => {
     }
   };
   
-  return <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden">
+  return (
+    <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden">
       <Header />
       
       {/* Hero Section - Mobile-first design */}
@@ -203,6 +205,22 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Testimonials Section */}
+      <section className="py-16 px-4 md:px-10 bg-white w-full">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
+              What Parents Are Saying
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Pridružite se številnim družinam, ki so že odkrile moč TomiTalk aplikacije
+            </p>
+          </div>
+          
+          <TestimonialsCarousel />
+        </div>
+      </section>
+
       {/* Features Section */}
       <section id="features" className="py-20 px-4 md:px-10 bg-light-cloud w-full overflow-x-hidden">
         <div className="max-w-7xl mx-auto">
@@ -259,7 +277,8 @@ const Index = () => {
       </footer>
       
       <SelectChildDialog open={showChildSelector} onOpenChange={setShowChildSelector} />
-    </div>;
+    </div>
+  );
 };
 
 export default Index;
