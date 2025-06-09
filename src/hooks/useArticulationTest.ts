@@ -81,6 +81,19 @@ export const useArticulationTest = () => {
     });
   };
   
+  // Set current letter and navigate to first word of that letter
+  const setCurrentLetter = (letter: string) => {
+    const letterIndex = articulationData.findIndex(group => group.letter === letter);
+    if (letterIndex !== -1) {
+      // Calculate the overall index for the first word of this letter
+      let newOverallIndex = 0;
+      for (let i = 0; i < letterIndex; i++) {
+        newOverallIndex += articulationData[i].words.length;
+      }
+      setOverallIndex(newOverallIndex);
+    }
+  };
+  
   // Get the current word text
   const getCurrentWord = () => {
     if (currentLetterIndex < articulationData.length && 
@@ -104,5 +117,6 @@ export const useArticulationTest = () => {
     handleNext,
     handlePrevious,
     getCurrentWord,
+    setCurrentLetter
   };
 };
