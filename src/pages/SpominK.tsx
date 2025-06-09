@@ -81,7 +81,7 @@ export default function SpominK() {
               </Button>
               
               <h1 className="text-lg md:text-2xl lg:text-3xl font-bold text-foreground">
-                Spomin (besede na črko K)
+                Črka K
               </h1>
             </div>
             
