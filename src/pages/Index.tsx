@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -10,6 +11,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { SelectChildDialog } from "@/components/SelectChildDialog";
 import { FeaturesCarousel } from "@/components/FeaturesCarousel";
 import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
+
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showChildSelector, setShowChildSelector] = useState(false);
@@ -20,9 +22,39 @@ const Index = () => {
   } = useAuth();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
+
+  // Testimonials data with the new addition
+  const testimonials = [
+    {
+      quote: "Moj sin je imel težave z izgovorjavo črke R. Po enem mesecu vaj z zmajčkom Tomijem jo izgovarja brez težav! Toplo priporočam!",
+      author: "— Tanja, mama 6-letnika"
+    },
+    {
+      quote: "Končno nekaj, kar je narejeno za slovenske otroke! Govorne vaje so zabavne in hčerka komaj čaka, da jih dela vsak dan.",
+      author: "— Mateja, mama 5-letnice"
+    },
+    {
+      quote: "Čakalna doba za logopeda je bila več kot pol leta. TomiTalk nama je pomagal takoj. Napredek je očiten že po 10 dneh.",
+      author: "— Andrej, oče 4-letnika"
+    },
+    {
+      quote: "Najbolj všeč mi je, da lahko dodam oba otroka in vsak ima svoj profil. Vaje so res prilagojene posamezniku.",
+      author: "— Nina, mama 3- in 7-letnika"
+    },
+    {
+      quote: "Z aplikacijo smo govorjenje spremenili v igro. Sin se smeje, vadi in napreduje – brez joka in pregovarjanja.",
+      author: "— Maja, mama 5-letnika"
+    },
+    {
+      quote: "Z govornimi vajami se je mojemu otroku odprlo tudi na drugih področjih in ni več tako zaprt.",
+      author: "— Peter, oče 6-letnika"
+    }
+  ];
+
   useEffect(() => {
     setIsVisible(true);
   }, []);
+  
   const handleStartNow = () => {
     // If not logged in, redirect to login page
     if (!user) {
@@ -39,6 +71,7 @@ const Index = () => {
       setShowChildSelector(true);
     }
   };
+  
   const scrollToFeatures = () => {
     const featuresSection = document.getElementById('features');
     if (featuresSection) {
@@ -47,6 +80,7 @@ const Index = () => {
       });
     }
   };
+  
   return <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden">
       <Header />
       
@@ -92,7 +126,15 @@ const Index = () => {
                 </div>
               </div>
               
-              {/* Trust Badges - Horizontal row with circular icons */}
+              {/* Dragon Illustration - Clean version without background letters */}
+              <div className="relative w-64 h-64 mb-6">
+                <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
+                <div className="animate-float relative">
+                  <img alt="Tomi Talk Dragon Mascot" className="w-full h-full object-contain" src="/lovable-uploads/afbdd309-0550-437a-9afc-966c9a811062.png" />
+                </div>
+              </div>
+              
+              {/* Trust Badges - Horizontal row with circular icons - Moved under dragon on mobile */}
               <div className="flex justify-center gap-8 mb-6">
                 <div className="flex flex-col items-center text-center">
                   <div className="w-16 h-16 mb-2 rounded-full bg-gradient-to-br from-dragon-green to-app-teal flex items-center justify-center shadow-lg border-2 border-white">
@@ -111,14 +153,6 @@ const Index = () => {
                     <Users className="h-8 w-8 text-white" />
                   </div>
                   <span className="text-neutral-950 font-medium text-xs max-w-[70px] leading-tight">Priporočeno s strani staršev</span>
-                </div>
-              </div>
-              
-              {/* Dragon Illustration - Clean version without background letters */}
-              <div className="relative w-64 h-64">
-                <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
-                <div className="animate-float relative">
-                  <img alt="Tomi Talk Dragon Mascot" className="w-full h-full object-contain" src="/lovable-uploads/afbdd309-0550-437a-9afc-966c9a811062.png" />
                 </div>
               </div>
             </div>}
@@ -200,7 +234,7 @@ const Index = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-16 px-4 md:px-10 bg-white w-full">
+      <section className="py-16 px-4 md:px-10 bg-light-cloud w-full">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">Kaj o TomiTalk pravijo starši?</h2>
@@ -209,7 +243,40 @@ const Index = () => {
             </p>
           </div>
           
-          <TestimonialsCarousel />
+          {/* Desktop Grid Layout */}
+          {!isMobile && (
+            <div className="grid grid-cols-3 gap-6">
+              {testimonials.map((testimonial, index) => (
+                <div key={index} className="bg-background rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 md:p-8 h-full flex flex-col justify-between min-h-[280px] relative overflow-hidden border-0">
+                  {/* Quote Icon */}
+                  <div className="absolute top-4 left-4 text-dragon-green/20">
+                    <svg className="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M14,17H17L19,13V7H13V13H16M6,17H9L11,13V7H5V13H8L6,17Z" />
+                    </svg>
+                  </div>
+                  
+                  {/* Quote Content */}
+                  <div className="flex-grow flex flex-col justify-center pt-6">
+                    <blockquote className="text-foreground italic text-base md:text-lg leading-relaxed mb-6 text-center">
+                      "{testimonial.quote}"
+                    </blockquote>
+                  </div>
+                  
+                  {/* Author */}
+                  <div className="text-center">
+                    <p className="text-muted-foreground text-sm font-medium">
+                      {testimonial.author}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {/* Mobile Carousel Layout */}
+          {isMobile && (
+            <TestimonialsCarousel />
+          )}
         </div>
       </section>
 
@@ -271,4 +338,5 @@ const Index = () => {
       <SelectChildDialog open={showChildSelector} onOpenChange={setShowChildSelector} />
     </div>;
 };
+
 export default Index;

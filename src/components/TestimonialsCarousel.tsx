@@ -1,7 +1,9 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const TestimonialsCarousel = () => {
   const [api, setApi] = useState<any>(null);
@@ -9,6 +11,7 @@ export const TestimonialsCarousel = () => {
   const [count, setCount] = useState(0);
   const [autoPlay, setAutoPlay] = useState(true);
   const [direction, setDirection] = useState<'right' | 'left'>('right');
+  const isMobile = useIsMobile();
 
   const testimonials = [
     {
@@ -30,6 +33,10 @@ export const TestimonialsCarousel = () => {
     {
       quote: "Z aplikacijo smo govorjenje spremenili v igro. Sin se smeje, vadi in napreduje – brez joka in pregovarjanja.",
       author: "— Maja, mama 5-letnika"
+    },
+    {
+      quote: "Z govornimi vajami se je mojemu otroku odprlo tudi na drugih področjih in ni več tako zaprt.",
+      author: "— Peter, oče 6-letnika"
     }
   ];
 
@@ -118,7 +125,7 @@ export const TestimonialsCarousel = () => {
         >
           <CarouselContent className="-ml-2 md:-ml-4">
             {testimonials.map((testimonial, index) => (
-              <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+              <CarouselItem key={index} className="pl-2 md:pl-4 basis-full md:basis-1/2 lg:basis-1/3">
                 <div className="h-full p-1">
                   <div className="bg-background rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 md:p-8 h-full flex flex-col justify-between min-h-[280px] relative overflow-hidden border-0">
                     {/* Quote Icon */}
@@ -145,21 +152,25 @@ export const TestimonialsCarousel = () => {
             ))}
           </CarouselContent>
           
-          {/* Navigation Buttons */}
-          <button 
-            onClick={handlePrevClick} 
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 h-12 w-12 bg-background shadow-lg hover:shadow-xl hover:bg-muted border border-border rounded-full flex items-center justify-center z-10 transition-all duration-300 hover:scale-105" 
-            aria-label="Prejšnja ocena"
-          >
-            <ChevronLeft className="h-5 w-5 text-foreground" />
-          </button>
-          <button 
-            onClick={handleNextClick} 
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 h-12 w-12 bg-background shadow-lg hover:shadow-xl hover:bg-muted border border-border rounded-full flex items-center justify-center z-10 transition-all duration-300 hover:scale-105" 
-            aria-label="Naslednja ocena"
-          >
-            <ChevronRight className="h-5 w-5 text-foreground" />
-          </button>
+          {/* Navigation Buttons - Only show on desktop */}
+          {!isMobile && (
+            <>
+              <button 
+                onClick={handlePrevClick} 
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 h-12 w-12 bg-background shadow-lg hover:shadow-xl hover:bg-muted border border-border rounded-full flex items-center justify-center z-10 transition-all duration-300 hover:scale-105" 
+                aria-label="Prejšnja ocena"
+              >
+                <ChevronLeft className="h-5 w-5 text-foreground" />
+              </button>
+              <button 
+                onClick={handleNextClick} 
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 h-12 w-12 bg-background shadow-lg hover:shadow-xl hover:bg-muted border border-border rounded-full flex items-center justify-center z-10 transition-all duration-300 hover:scale-105" 
+                aria-label="Naslednja ocena"
+              >
+                <ChevronRight className="h-5 w-5 text-foreground" />
+              </button>
+            </>
+          )}
         </Carousel>
       </div>
 
