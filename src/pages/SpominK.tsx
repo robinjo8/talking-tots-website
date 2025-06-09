@@ -1,5 +1,5 @@
 
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -128,7 +128,7 @@ export default function SpominK() {
                 </div>
               </div>
             </CardContent>
-          </div>
+          </Card>
 
           {/* Game content - takes remaining space */}
           <div className="flex-1 flex justify-center items-center min-h-0">
