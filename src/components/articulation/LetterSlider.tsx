@@ -34,18 +34,18 @@ const LetterSlider = ({ letters, currentLetter, onLetterChange }: LetterSliderPr
   };
 
   return (
-    <div className="relative w-full max-w-2xl mx-auto mb-8">
+    <div className="relative w-full max-w-2xl mx-auto mb-6">
       {/* Main slider container */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-app-blue/10 to-app-purple/10 border-2 border-app-blue/20 shadow-lg">
-        <div className="relative h-32 flex items-center justify-center">
+        <div className="relative h-24 md:h-32 flex items-center justify-center">
           {/* Previous button */}
           <Button
             onClick={handlePrevious}
             variant="ghost"
             size="icon"
-            className="absolute left-4 z-10 h-12 w-12 rounded-full bg-white/80 hover:bg-white shadow-md border-2 border-app-blue/20 hover:border-app-blue/40 transition-all duration-200"
+            className="absolute left-2 md:left-4 z-10 h-10 w-10 md:h-12 md:w-12 rounded-full bg-white/80 hover:bg-white shadow-md border-2 border-app-blue/20 hover:border-app-blue/40 transition-all duration-200"
           >
-            <ChevronLeft className="h-6 w-6 text-app-blue" />
+            <ChevronLeft className="h-5 w-5 md:h-6 md:w-6 text-app-blue" />
           </Button>
 
           {/* Letter display */}
@@ -54,7 +54,7 @@ const LetterSlider = ({ letters, currentLetter, onLetterChange }: LetterSliderPr
               key={currentIndex}
               className="animate-scale-in flex items-center justify-center"
             >
-              <span className="text-6xl md:text-7xl font-bold text-app-blue drop-shadow-sm font-rounded">
+              <span className="text-4xl md:text-6xl lg:text-7xl font-bold text-app-blue drop-shadow-sm font-rounded">
                 {letters[currentIndex]?.toUpperCase()}
               </span>
             </div>
@@ -65,14 +65,14 @@ const LetterSlider = ({ letters, currentLetter, onLetterChange }: LetterSliderPr
             onClick={handleNext}
             variant="ghost"
             size="icon"
-            className="absolute right-4 z-10 h-12 w-12 rounded-full bg-white/80 hover:bg-white shadow-md border-2 border-app-blue/20 hover:border-app-blue/40 transition-all duration-200"
+            className="absolute right-2 md:right-4 z-10 h-10 w-10 md:h-12 md:w-12 rounded-full bg-white/80 hover:bg-white shadow-md border-2 border-app-blue/20 hover:border-app-blue/40 transition-all duration-200"
           >
-            <ChevronRight className="h-6 w-6 text-app-blue" />
+            <ChevronRight className="h-5 w-5 md:h-6 md:w-6 text-app-blue" />
           </Button>
         </div>
 
-        {/* Progress indicator */}
-        <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex gap-2">
+        {/* Progress indicator dots */}
+        <div className="absolute bottom-2 md:bottom-3 left-1/2 transform -translate-x-1/2 flex gap-1.5 md:gap-2">
           {letters.map((_, index) => (
             <button
               key={index}
@@ -81,7 +81,7 @@ const LetterSlider = ({ letters, currentLetter, onLetterChange }: LetterSliderPr
                 onLetterChange(letters[index]);
               }}
               className={cn(
-                "w-2.5 h-2.5 rounded-full transition-all duration-300",
+                "w-2 h-2 md:w-2.5 md:h-2.5 rounded-full transition-all duration-300",
                 index === currentIndex
                   ? "bg-app-blue scale-125 shadow-sm"
                   : "bg-app-blue/30 hover:bg-app-blue/50"
@@ -90,13 +90,6 @@ const LetterSlider = ({ letters, currentLetter, onLetterChange }: LetterSliderPr
             />
           ))}
         </div>
-      </div>
-
-      {/* Letter navigation info */}
-      <div className="text-center mt-4">
-        <p className="text-sm text-muted-foreground">
-          Črka {currentIndex + 1} od {letters.length}
-        </p>
       </div>
     </div>
   );
