@@ -3,7 +3,6 @@ import { useState, useEffect, useCallback } from "react";
 import { Mic, Stars, Volume2, MessageSquare, Zap, Book, Award, ChevronLeft, ChevronRight } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 export const FeaturesCarousel = () => {
   const [api, setApi] = useState<any>(null);
@@ -11,7 +10,6 @@ export const FeaturesCarousel = () => {
   const [count, setCount] = useState(0);
   const [autoPlay, setAutoPlay] = useState(true);
   const [direction, setDirection] = useState<'right' | 'left'>('right');
-  const isMobile = useIsMobile();
 
   const features = [
     {
@@ -170,25 +168,21 @@ export const FeaturesCarousel = () => {
             ))}
           </CarouselContent>
           
-          {/* Navigation Buttons - Only show on desktop */}
-          {!isMobile && (
-            <>
-              <button 
-                onClick={handlePrevClick} 
-                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 h-12 w-12 bg-background shadow-lg hover:shadow-xl hover:bg-muted border border-border rounded-full flex items-center justify-center z-10 transition-all duration-300 hover:scale-105" 
-                aria-label="Prejšnja funkcija"
-              >
-                <ChevronLeft className="h-5 w-5 text-foreground" />
-              </button>
-              <button 
-                onClick={handleNextClick} 
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 h-12 w-12 bg-background shadow-lg hover:shadow-xl hover:bg-muted border border-border rounded-full flex items-center justify-center z-10 transition-all duration-300 hover:scale-105" 
-                aria-label="Naslednja funkcija"
-              >
-                <ChevronRight className="h-5 w-5 text-foreground" />
-              </button>
-            </>
-          )}
+          {/* Navigation Buttons */}
+          <button 
+            onClick={handlePrevClick} 
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 h-12 w-12 bg-background shadow-lg hover:shadow-xl hover:bg-muted border border-border rounded-full flex items-center justify-center z-10 transition-all duration-300 hover:scale-105" 
+            aria-label="Prejšnja funkcija"
+          >
+            <ChevronLeft className="h-5 w-5 text-foreground" />
+          </button>
+          <button 
+            onClick={handleNextClick} 
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 h-12 w-12 bg-background shadow-lg hover:shadow-xl hover:bg-muted border border-border rounded-full flex items-center justify-center z-10 transition-all duration-300 hover:scale-105" 
+            aria-label="Naslednja funkcija"
+          >
+            <ChevronRight className="h-5 w-5 text-foreground" />
+          </button>
         </Carousel>
       </div>
 
