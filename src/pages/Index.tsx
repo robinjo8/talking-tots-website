@@ -10,7 +10,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { SelectChildDialog } from "@/components/SelectChildDialog";
 import { FeaturesCarousel } from "@/components/FeaturesCarousel";
 import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
-
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showChildSelector, setShowChildSelector] = useState(false);
@@ -21,11 +20,9 @@ const Index = () => {
   } = useAuth();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
-  
   useEffect(() => {
     setIsVisible(true);
   }, []);
-  
   const handleStartNow = () => {
     // If not logged in, redirect to login page
     if (!user) {
@@ -42,7 +39,6 @@ const Index = () => {
       setShowChildSelector(true);
     }
   };
-  
   const scrollToFeatures = () => {
     const featuresSection = document.getElementById('features');
     if (featuresSection) {
@@ -51,9 +47,7 @@ const Index = () => {
       });
     }
   };
-  
-  return (
-    <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden">
+  return <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden">
       <Header />
       
       {/* Hero Section - Mobile-first design */}
@@ -209,9 +203,7 @@ const Index = () => {
       <section className="py-16 px-4 md:px-10 bg-white w-full">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
-              What Parents Are Saying
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">Kaj o TomiTalk pravijo starši?</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Pridružite se številnim družinam, ki so že odkrile moč TomiTalk aplikacije
             </p>
@@ -277,8 +269,6 @@ const Index = () => {
       </footer>
       
       <SelectChildDialog open={showChildSelector} onOpenChange={setShowChildSelector} />
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
