@@ -127,14 +127,14 @@ const Index = () => {
               </div>
               
               {/* Dragon Illustration - Clean version without background letters */}
-              <div className="relative w-64 h-64 mb-6">
+              <div className="relative w-64 h-64 mb-8">
                 <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
                 <div className="animate-float relative">
                   <img alt="Tomi Talk Dragon Mascot" className="w-full h-full object-contain" src="/lovable-uploads/afbdd309-0550-437a-9afc-966c9a811062.png" />
                 </div>
               </div>
               
-              {/* Trust Badges - Horizontal row with circular icons - Moved under dragon on mobile */}
+              {/* Trust Badges - Horizontal row with circular icons - Moved under dragon on mobile with added spacing */}
               <div className="flex justify-center gap-8 mb-6">
                 <div className="flex flex-col items-center text-center">
                   <div className="w-16 h-16 mb-2 rounded-full bg-gradient-to-br from-dragon-green to-app-teal flex items-center justify-center shadow-lg border-2 border-white">
