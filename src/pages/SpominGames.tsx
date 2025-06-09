@@ -8,61 +8,143 @@ import { cn } from "@/lib/utils";
 
 const memoryGames = [
   {
-    id: "spomin-r",
-    title: "Spomin (besede na črko R)",
-    description: "Igra spomin za vajo izgovorjave črke R",
-    path: "/govorne-igre/spomin/spomin-r",
-    available: true
+    id: "spomin-b",
+    title: "Besede na črko B",
+    description: "Igra spomin za vajo izgovorjave črke B",
+    path: "/govorne-igre/spomin/spomin-b",
+    available: false
+  },
+  {
+    id: "spomin-c",
+    title: "Besede na črko C",
+    description: "Igra spomin za vajo izgovorjave črke C",
+    path: "/govorne-igre/spomin/spomin-c",
+    available: false
+  },
+  {
+    id: "spomin-č",
+    title: "Besede na črko Č",
+    description: "Igra spomin za vajo izgovorjave črke Č",
+    path: "/govorne-igre/spomin/spomin-č",
+    available: false
+  },
+  {
+    id: "spomin-d",
+    title: "Besede na črko D",
+    description: "Igra spomin za vajo izgovorjave črke D",
+    path: "/govorne-igre/spomin/spomin-d",
+    available: false
+  },
+  {
+    id: "spomin-f",
+    title: "Besede na črko F",
+    description: "Igra spomin za vajo izgovorjave črke F",
+    path: "/govorne-igre/spomin/spomin-f",
+    available: false
+  },
+  {
+    id: "spomin-g",
+    title: "Besede na črko G",
+    description: "Igra spomin za vajo izgovorjave črke G",
+    path: "/govorne-igre/spomin/spomin-g",
+    available: false
+  },
+  {
+    id: "spomin-h",
+    title: "Besede na črko H",
+    description: "Igra spomin za vajo izgovorjave črke H",
+    path: "/govorne-igre/spomin/spomin-h",
+    available: false
+  },
+  {
+    id: "spomin-j",
+    title: "Besede na črko J",
+    description: "Igra spomin za vajo izgovorjave črke J",
+    path: "/govorne-igre/spomin/spomin-j",
+    available: false
   },
   {
     id: "spomin-k",
-    title: "Spomin (besede na črko K)",
+    title: "Besede na črko K",
     description: "Igra spomin za vajo izgovorjave črke K",
     path: "/govorne-igre/spomin/spomin-k",
     available: true
   },
   {
+    id: "spomin-l",
+    title: "Besede na črko L",
+    description: "Igra spomin za vajo izgovorjave črke L",
+    path: "/govorne-igre/spomin/spomin-l",
+    available: false
+  },
+  {
+    id: "spomin-m",
+    title: "Besede na črko M",
+    description: "Igra spomin za vajo izgovorjave črke M",
+    path: "/govorne-igre/spomin/spomin-m",
+    available: false
+  },
+  {
+    id: "spomin-n",
+    title: "Besede na črko N",
+    description: "Igra spomin za vajo izgovorjave črke N",
+    path: "/govorne-igre/spomin/spomin-n",
+    available: false
+  },
+  {
+    id: "spomin-p",
+    title: "Besede na črko P",
+    description: "Igra spomin za vajo izgovorjave črke P",
+    path: "/govorne-igre/spomin/spomin-p",
+    available: false
+  },
+  {
+    id: "spomin-r",
+    title: "Besede na črko R",
+    description: "Igra spomin za vajo izgovorjave črke R",
+    path: "/govorne-igre/spomin/spomin-r",
+    available: true
+  },
+  {
     id: "spomin-s",
-    title: "Spomin (besede na črko S)",
+    title: "Besede na črko S",
     description: "Igra spomin za vajo izgovorjave črke S",
     path: "/govorne-igre/spomin/spomin-s",
     available: true
   },
   {
     id: "spomin-š",
-    title: "Spomin (besede na črko Š)",
+    title: "Besede na črko Š",
     description: "Igra spomin za vajo izgovorjave črke Š",
     path: "/govorne-igre/spomin/spomin-š",
     available: true
   },
   {
-    id: "spomin-l",
-    title: "Spomin (besede na črko L)",
-    description: "Igra spomin za vajo izgovorjave črke L",
+    id: "spomin-t",
+    title: "Besede na črko T",
+    description: "Igra spomin za vajo izgovorjave črke T",
+    path: "/govorne-igre/spomin/spomin-t",
     available: false
   },
   {
-    id: "spomin-c",
-    title: "Spomin (besede na črko C)",
-    description: "Igra spomin za vajo izgovorjave črke C",
-    available: false
-  },
-  {
-    id: "spomin-č",
-    title: "Spomin (besede na črko Č)",
-    description: "Igra spomin za vajo izgovorjave črke Č",
+    id: "spomin-v",
+    title: "Besede na črko V",
+    description: "Igra spomin za vajo izgovorjave črke V",
+    path: "/govorne-igre/spomin/spomin-v",
     available: false
   },
   {
     id: "spomin-z",
-    title: "Spomin (besede na črko Z)",
+    title: "Besede na črko Z",
     description: "Igra spomin za vajo izgovorjave črke Z",
+    path: "/govorne-igre/spomin/spomin-z",
     available: false
   },
   {
     id: "spomin-ž",
-    title: "Spomin (besede na črko Ž)",
+    title: "Besede na črko Ž",
     description: "Igra spomin za vajo izgovorjave črke Ž",
+    path: "/govorne-igre/spomin/spomin-ž",
     available: false
   }
 ];
