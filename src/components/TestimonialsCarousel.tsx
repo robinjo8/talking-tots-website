@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
@@ -107,10 +106,10 @@ export const TestimonialsCarousel = () => {
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4">
-      <div className="relative overflow-visible">
+      <div className="relative">
         <Carousel 
           setApi={setApi} 
-          className="w-full overflow-visible" 
+          className="w-full" 
           opts={{
             align: "center",
             loop: true,
@@ -120,8 +119,8 @@ export const TestimonialsCarousel = () => {
           <CarouselContent className="-ml-2 md:-ml-4">
             {testimonials.map((testimonial, index) => (
               <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
-                <div className="h-full">
-                  <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 md:p-8 h-full flex flex-col justify-between border border-gray-100/50 min-h-[280px] relative">
+                <div className="h-full p-1">
+                  <div className="bg-background rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 md:p-8 h-full flex flex-col justify-between min-h-[280px] relative overflow-hidden border-0">
                     {/* Quote Icon */}
                     <div className="absolute top-4 left-4 text-dragon-green/20">
                       <Quote className="h-8 w-8" />
@@ -129,14 +128,14 @@ export const TestimonialsCarousel = () => {
                     
                     {/* Quote Content */}
                     <div className="flex-grow flex flex-col justify-center pt-6">
-                      <blockquote className="text-gray-700 italic text-base md:text-lg leading-relaxed mb-6 text-center">
+                      <blockquote className="text-foreground italic text-base md:text-lg leading-relaxed mb-6 text-center">
                         "{testimonial.quote}"
                       </blockquote>
                     </div>
                     
                     {/* Author */}
                     <div className="text-center">
-                      <p className="text-gray-600 text-sm font-medium">
+                      <p className="text-muted-foreground text-sm font-medium">
                         {testimonial.author}
                       </p>
                     </div>
@@ -149,17 +148,17 @@ export const TestimonialsCarousel = () => {
           {/* Navigation Buttons */}
           <button 
             onClick={handlePrevClick} 
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 h-12 w-12 bg-white shadow-lg hover:shadow-xl hover:bg-gray-50 border border-gray-200/50 rounded-full flex items-center justify-center z-10 transition-all duration-300 hover:scale-105" 
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 h-12 w-12 bg-background shadow-lg hover:shadow-xl hover:bg-muted border border-border rounded-full flex items-center justify-center z-10 transition-all duration-300 hover:scale-105" 
             aria-label="Prejšnja ocena"
           >
-            <ChevronLeft className="h-5 w-5 text-gray-700" />
+            <ChevronLeft className="h-5 w-5 text-foreground" />
           </button>
           <button 
             onClick={handleNextClick} 
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 h-12 w-12 bg-white shadow-lg hover:shadow-xl hover:bg-gray-50 border border-gray-200/50 rounded-full flex items-center justify-center z-10 transition-all duration-300 hover:scale-105" 
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 h-12 w-12 bg-background shadow-lg hover:shadow-xl hover:bg-muted border border-border rounded-full flex items-center justify-center z-10 transition-all duration-300 hover:scale-105" 
             aria-label="Naslednja ocena"
           >
-            <ChevronRight className="h-5 w-5 text-gray-700" />
+            <ChevronRight className="h-5 w-5 text-foreground" />
           </button>
         </Carousel>
       </div>
@@ -173,7 +172,7 @@ export const TestimonialsCarousel = () => {
               "w-2.5 h-2.5 rounded-full transition-all duration-300",
               i === current 
                 ? "bg-dragon-green scale-125 shadow-sm" 
-                : "bg-gray-300 hover:bg-gray-400"
+                : "bg-muted-foreground/40 hover:bg-muted-foreground/60"
             )}
             onClick={() => {
               api?.scrollTo(i);
