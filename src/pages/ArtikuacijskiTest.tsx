@@ -10,9 +10,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useArticulationTest } from "@/hooks/useArticulationTest";
 
 // Import components
-import LetterGrid from "@/components/articulation/LetterGrid";
+import LetterSlider from "@/components/articulation/LetterSlider";
 import WordDisplay from "@/components/articulation/WordDisplay";
-import TestNavigation from "@/components/articulation/TestNavigation";
 
 const ArtikuacijskiTest = () => {
   const navigate = useNavigate();
@@ -29,12 +28,17 @@ const ArtikuacijskiTest = () => {
     totalWords,
     handleNext,
     handlePrevious,
-    getCurrentWord
+    getCurrentWord,
+    setCurrentLetter
   } = useArticulationTest();
 
   const handlePlayAudio = () => {
     // This function will be implemented later when audio files are available
     console.log("No audio available for this word");
+  };
+
+  const handleLetterChange = (letter: string) => {
+    setCurrentLetter(letter);
   };
 
   return (
@@ -58,8 +62,12 @@ const ArtikuacijskiTest = () => {
           </h1>
         </div>
         
-        {/* Letter grid component */}
-        <LetterGrid letters={allLetters} currentLetter={currentLetter} />
+        {/* Letter slider component */}
+        <LetterSlider 
+          letters={allLetters} 
+          currentLetter={currentLetter} 
+          onLetterChange={handleLetterChange}
+        />
         
         {/* Main content - different layout for mobile vs desktop */}
         <div className="flex-grow flex items-center justify-center">
@@ -88,7 +96,7 @@ const ArtikuacijskiTest = () => {
                 />
               </div>
               
-              {/* Right arrow (next) - already in TestNavigation but placed directly here for mobile */}
+              {/* Right arrow (next) */}
               <Button 
                 onClick={handleNext}
                 size="icon" 
