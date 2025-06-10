@@ -3,10 +3,10 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from "@/contexts/AuthContext";
 import { useArticulationTest } from "@/hooks/useArticulationTest";
-import { LetterSlider } from "@/components/articulation/LetterSlider";
-import { WordDisplay } from "@/components/articulation/WordDisplay";
-import { TestNavigation } from "@/components/articulation/TestNavigation";
-import { PracticeProgress } from "@/components/articulation/PracticeProgress";
+import LetterSlider from "@/components/articulation/LetterSlider";
+import WordDisplay from "@/components/articulation/WordDisplay";
+import TestNavigation from "@/components/articulation/TestNavigation";
+import PracticeProgress from "@/components/articulation/PracticeProgress";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
