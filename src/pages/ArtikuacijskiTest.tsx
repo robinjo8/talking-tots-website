@@ -8,12 +8,14 @@ import LetterSlider from "@/components/articulation/LetterSlider";
 import WordDisplay from "@/components/articulation/WordDisplay";
 import TestNavigation from "@/components/articulation/TestNavigation";
 import PracticeProgress from "@/components/articulation/PracticeProgress";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import Header from "@/components/Header";
+import { PageHeader } from "@/components/PageHeader";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const ArtikuacijskiTest = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const { playAudio } = useAudioPlayback();
   const {
     imageUrl,
@@ -51,23 +53,13 @@ const ArtikuacijskiTest = () => {
   const totalWordsPerLetter = 3;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-light-cloud to-white flex flex-col">
-      {/* Header with back button */}
-      <div className="absolute top-4 left-4 z-10">
-        <Button
-          onClick={() => navigate("/govorno-jezikovne-vaje")}
-          variant="ghost"
-          size="icon"
-          className="rounded-full bg-white/80 hover:bg-white shadow-md"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-      </div>
-
-      {/* Main content */}
-      <div className="flex-1 flex flex-col justify-center items-center px-4 py-8 max-w-4xl mx-auto w-full">
-        {/* Letter slider */}
-        <div className="w-full mb-6">
+    <div className="min-h-screen bg-background">
+      <Header />
+      <PageHeader title="Artikulacijski Test" backPath="/govorno-jezikovne-vaje" />
+      
+      <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
+        {/* Letter slider component */}
+        <div className={isMobile ? 'px-4' : ''}>
           <LetterSlider
             letters={allLetters}
             currentLetter={currentLetter}
@@ -76,13 +68,13 @@ const ArtikuacijskiTest = () => {
         </div>
 
         {/* Progress indicators */}
-        <div className="flex justify-center items-center gap-8 mb-8 text-sm font-medium text-gray-600">
+        <div className={`flex justify-center items-center gap-8 ${isMobile ? 'px-4 mb-4' : 'mb-6'} text-sm font-medium text-gray-600`}>
           <span>Črka {currentLetterIndex + 1} od {totalLetters}</span>
           <span>Beseda {currentWordIndex} od {totalWordsPerLetter}</span>
         </div>
 
         {/* Word image display */}
-        <div className="mb-8 w-full max-w-sm">
+        <div className={`${isMobile ? 'px-4 mb-6' : 'mb-8'} w-full max-w-sm mx-auto`}>
           <WordDisplay
             word={getCurrentWord()}
             imageUrl={imageUrl}
@@ -94,13 +86,15 @@ const ArtikuacijskiTest = () => {
         </div>
 
         {/* Navigation controls */}
-        <TestNavigation
-          onNext={handleNext}
-          onPrevious={handlePrevious}
-        />
+        <div className={`flex justify-center ${isMobile ? 'px-4 mb-6' : 'mb-8'}`}>
+          <TestNavigation
+            onNext={handleNext}
+            onPrevious={handlePrevious}
+          />
+        </div>
 
         {/* Overall progress */}
-        <div className="w-full max-w-md mt-8">
+        <div className={`w-full max-w-md mx-auto ${isMobile ? 'px-4' : ''}`}>
           <PracticeProgress
             currentWordIndex={overallIndex}
             totalWords={totalWords}
