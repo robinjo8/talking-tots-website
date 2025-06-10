@@ -1,16 +1,17 @@
+
 import Header from "@/components/Header";
 import { PageHeader } from "@/components/PageHeader";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BrainCircuit, LetterCaseR, LetterCaseK, LetterCaseS, LetterCaseŠ } from "lucide-react";
+import { BrainCircuit, Type, Volume2, Gamepad2 } from "lucide-react";
 
 const memoryGames = [
   {
     id: "spomin-r",
     title: "Spomin - R",
     description: "Poišči pare slik s črko R",
-    icon: LetterCaseR,
+    icon: Type,
     color: "text-app-purple",
     gradient: "from-app-purple/10 to-app-blue/10",
     path: "/govorne-igre/spomin/spomin-r",
@@ -20,7 +21,7 @@ const memoryGames = [
     id: "spomin-k",
     title: "Spomin - K",
     description: "Poišči pare slik s črko K",
-    icon: LetterCaseK,
+    icon: Volume2,
     color: "text-app-orange",
     gradient: "from-app-orange/10 to-app-yellow/10",
     path: "/govorne-igre/spomin/spomin-k",
@@ -30,7 +31,7 @@ const memoryGames = [
     id: "spomin-s",
     title: "Spomin - S",
     description: "Poišči pare slik s črko S",
-    icon: LetterCaseS,
+    icon: Gamepad2,
     color: "text-dragon-green",
     gradient: "from-dragon-green/10 to-app-teal/10",
     path: "/govorne-igre/spomin/spomin-s",
@@ -40,7 +41,7 @@ const memoryGames = [
     id: "spomin-š",
     title: "Spomin - Š",
     description: "Poišči pare slik s črko Š",
-    icon: LetterCaseŠ,
+    icon: BrainCircuit,
     color: "text-app-blue",
     gradient: "from-app-blue/10 to-app-purple/10",
     path: "/govorne-igre/spomin/spomin-š",

@@ -7,7 +7,7 @@ import { ArrowLeft, RotateCcw, Info } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { MemoryGrid } from "@/components/games/MemoryGrid";
 import { useMemoryGameŠ } from "@/hooks/useMemoryGameŠ";
-import { toast } from "@/components/ui/sonner";
+import { useToast } from "@/components/ui/use-toast";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { InfoModal } from "@/components/games/InfoModal";
 
@@ -15,6 +15,7 @@ export default function SpominŠ() {
   const navigate = useNavigate();
   const { audioRef } = useAudioPlayback();
   const [showInfo, setShowInfo] = useState(false);
+  const { toast } = useToast();
   const { 
     cards, 
     isLoading, 
@@ -40,7 +41,9 @@ export default function SpominŠ() {
     resetGame();
     gameStartTimeRef.current = null;
     setGameTime(null);
-    toast.success("Igra je bila ponovno nastavljena!");
+    toast({
+      title: "Igra je bila ponovno nastavljena!",
+    });
   };
 
   useEffect(() => {
@@ -50,12 +53,13 @@ export default function SpominŠ() {
       setGameTime(timeTaken);
       
       setTimeout(() => {
-        toast.success(`Čestitamo! Igra je končana v ${timeTaken} sekundah!`, {
-          duration: 5000
+        toast({
+          title: "Čestitamo!",
+          description: `Igra je končana v ${timeTaken} sekundah!`,
         });
       }, 500);
     }
-  }, [gameCompleted, gameStartTimeRef, gameTime]);
+  }, [gameCompleted, gameStartTimeRef, gameTime, toast]);
 
   return (
     <div className="min-h-screen bg-background">
