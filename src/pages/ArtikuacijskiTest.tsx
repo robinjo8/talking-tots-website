@@ -48,18 +48,15 @@ const ArtikuacijskiTest = () => {
   const currentLetterIndex = allLetters.indexOf(currentLetter);
   const totalLetters = allLetters.length;
 
-  // Calculate current word index within the letter group
-  const currentWordIndex = overallIndex % 3 + 1; // Assuming 3 words per letter
-  const totalWordsPerLetter = 3;
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <PageHeader title="Artikulacijski Test" backPath="/govorno-jezikovne-vaje" />
       
-      <div className="container max-w-5xl mx-auto px-4 pt-8 pb-20">
-        {/* Letter slider component */}
-        <div className={isMobile ? 'px-4 mb-6' : 'mb-8'}>
+      {/* Main container with responsive layout */}
+      <div className="container max-w-6xl mx-auto px-4 py-6 md:py-8">
+        {/* Letter slider - responsive positioning */}
+        <div className="w-full max-w-3xl mx-auto mb-6 md:mb-8">
           <LetterSlider
             letters={allLetters}
             currentLetter={currentLetter}
@@ -67,51 +64,88 @@ const ArtikuacijskiTest = () => {
           />
         </div>
 
-        {/* Progress display */}
-        <div className={`flex justify-center ${isMobile ? 'px-4 mb-4' : 'mb-6'}`}>
+        {/* Progress indicator - centered and responsive */}
+        <div className="flex justify-center mb-6 md:mb-8">
           <div className="text-center">
-            <p className="text-sm font-medium text-muted-foreground">
+            <p className="text-sm md:text-base font-medium text-muted-foreground">
               Črka {currentLetterIndex + 1} od {totalLetters}
             </p>
           </div>
         </div>
         
-        {/* Main content area with side navigation - centered and responsive */}
-        <div className={`flex-grow flex items-center justify-center ${isMobile ? 'px-4 pb-4' : ''}`}>
-          <div className="flex items-center justify-center gap-8 w-full max-w-4xl">
-            {/* Previous button - positioned to the left */}
-            <Button 
-              onClick={handlePrevious}
-              variant="outline"
-              size="icon"
-              className="rounded-full h-14 w-14 border-2 flex-shrink-0"
-            >
-              <ArrowLeft className="h-6 w-6" />
-            </Button>
-
-            {/* Word display - centered */}
-            <div className="flex-1 max-w-md mx-auto">
-              <div className="text-center space-y-6">
-                {/* Word and image display */}
-                <WordDisplay
-                  word={getCurrentWord()}
-                  imageUrl={imageUrl}
-                  loading={loading}
-                  currentIndex={overallIndex}
-                  totalWords={totalWords}
-                  onPlayAudio={handlePlayAudio}
-                />
+        {/* Main content area - responsive layout with side navigation */}
+        <div className="flex items-center justify-center min-h-[400px] md:min-h-[500px]">
+          <div className="w-full max-w-5xl mx-auto">
+            {/* Mobile layout - stacked */}
+            {isMobile ? (
+              <div className="flex flex-col items-center space-y-6">
+                {/* Word display */}
+                <div className="w-full max-w-sm">
+                  <WordDisplay
+                    word={getCurrentWord()}
+                    imageUrl={imageUrl}
+                    loading={loading}
+                    currentIndex={overallIndex}
+                    totalWords={totalWords}
+                    onPlayAudio={handlePlayAudio}
+                  />
+                </div>
+                
+                {/* Navigation buttons */}
+                <div className="flex items-center justify-between w-full max-w-xs gap-4">
+                  <Button 
+                    onClick={handlePrevious}
+                    variant="outline"
+                    size="icon"
+                    className="rounded-full h-12 w-12 border-2 flex-shrink-0"
+                  >
+                    <ArrowLeft className="h-5 w-5" />
+                  </Button>
+                  
+                  <Button 
+                    onClick={handleNext}
+                    size="icon"
+                    className="bg-app-blue hover:bg-app-blue/90 rounded-full h-14 w-14 shadow-md flex-shrink-0"
+                  >
+                    <ArrowRight className="h-6 w-6" />
+                  </Button>
+                </div>
               </div>
-            </div>
+            ) : (
+              /* Desktop layout - side by side */
+              <div className="flex items-center justify-center gap-6 lg:gap-12">
+                {/* Previous button */}
+                <Button 
+                  onClick={handlePrevious}
+                  variant="outline"
+                  size="icon"
+                  className="rounded-full h-14 w-14 lg:h-16 lg:w-16 border-2 flex-shrink-0"
+                >
+                  <ArrowLeft className="h-6 w-6 lg:h-7 lg:w-7" />
+                </Button>
 
-            {/* Next button - positioned to the right */}
-            <Button 
-              onClick={handleNext}
-              size="icon"
-              className="bg-app-blue hover:bg-app-blue/90 rounded-full h-16 w-16 shadow-md flex-shrink-0"
-            >
-              <ArrowRight className="h-8 w-8" />
-            </Button>
+                {/* Word display - centered */}
+                <div className="flex-1 max-w-md lg:max-w-lg">
+                  <WordDisplay
+                    word={getCurrentWord()}
+                    imageUrl={imageUrl}
+                    loading={loading}
+                    currentIndex={overallIndex}
+                    totalWords={totalWords}
+                    onPlayAudio={handlePlayAudio}
+                  />
+                </div>
+
+                {/* Next button */}
+                <Button 
+                  onClick={handleNext}
+                  size="icon"
+                  className="bg-app-blue hover:bg-app-blue/90 rounded-full h-16 w-16 lg:h-18 lg:w-18 shadow-md flex-shrink-0"
+                >
+                  <ArrowRight className="h-7 w-7 lg:h-8 lg:w-8" />
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
