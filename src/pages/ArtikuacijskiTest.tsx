@@ -3,7 +3,7 @@ import { useState } from "react";
 import Header from "@/components/Header";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import LetterSlider from "@/components/articulation/LetterSlider";
@@ -15,6 +15,7 @@ const ArtikuacijskiTest = () => {
   const {
     imageUrl,
     loading,
+    imageError,
     currentLetter,
     allLetters,
     overallIndex,
@@ -105,15 +106,64 @@ const ArtikuacijskiTest = () => {
               Črka {currentLetter}
             </h2>
             
-            {/* Image and word content - this is the red-marked area from the screenshot */}
+            {/* Image and word content */}
             <div className="bg-background/80 backdrop-blur-sm rounded-xl p-8 shadow-md border max-w-md mx-auto">
               {loading ? (
                 <div className="flex items-center justify-center h-64">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-app-purple"></div>
                 </div>
+              ) : imageError ? (
+                <div className="space-y-6">
+                  {/* Error state with placeholder */}
+                  <div className="w-full h-48 flex items-center justify-center bg-muted rounded-lg border-2 border-dashed border-muted-foreground/30">
+                    <div className="text-center space-y-3">
+                      <Upload className="h-12 w-12 mx-auto text-muted-foreground/50" />
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">
+                          Slika ni na voljo
+                        </p>
+                        <p className="text-xs text-muted-foreground/70">
+                          {imageError}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Word label */}
+                  <h3 className="text-2xl font-bold text-app-purple uppercase tracking-wide">
+                    {getCurrentWord()}
+                  </h3>
+                  
+                  {/* Navigation controls */}
+                  <div className="flex justify-between items-center mt-6">
+                    <Button
+                      onClick={handlePrevious}
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-2"
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                      Prejšnja
+                    </Button>
+                    
+                    <span className="text-sm text-muted-foreground">
+                      {overallIndex + 1} / {totalWords}
+                    </span>
+                    
+                    <Button
+                      onClick={handleNext}
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-2"
+                    >
+                      Naslednja
+                      <ArrowLeft className="h-4 w-4 rotate-180" />
+                    </Button>
+                  </div>
+                </div>
               ) : imageUrl ? (
                 <div className="space-y-6">
-                  {/* Image display - positioned exactly as shown in the red area */}
+                  {/* Image display */}
                   <div className="w-full h-48 flex items-center justify-center">
                     <img 
                       src={imageUrl} 
@@ -126,7 +176,7 @@ const ArtikuacijskiTest = () => {
                     />
                   </div>
                   
-                  {/* Word label directly below the image */}
+                  {/* Word label */}
                   <h3 className="text-2xl font-bold text-app-purple uppercase tracking-wide">
                     {getCurrentWord()}
                   </h3>

@@ -14,6 +14,7 @@ export const useArtikuacijskiTest = () => {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [imageError, setImageError] = useState<string | null>(null);
   const [overallIndex, setOverallIndex] = useState(0);
   const [allLettersData, setAllLettersData] = useState<{ letter: string; words: TestWord[] }[]>([]);
   
@@ -89,6 +90,7 @@ export const useArtikuacijskiTest = () => {
   // Fetch the image from Supabase storage
   const updateImage = async () => {
     setLoading(true);
+    setImageError(null);
     const currentItem = flatWordsList[overallIndex];
     if (currentItem) {
       const { letterIndex, wordIndex } = currentItem;
@@ -108,13 +110,26 @@ export const useArtikuacijskiTest = () => {
         console.log("Image URL:", data.publicUrl);
         
         if (data?.publicUrl) {
-          setImageUrl(data.publicUrl);
+          // Test if the image actually exists by trying to load it
+          const img = new Image();
+          img.onload = () => {
+            setImageUrl(data.publicUrl);
+            setImageError(null);
+          };
+          img.onerror = () => {
+            console.error("Image failed to load:", data.publicUrl);
+            setImageError(`Image file not found: ${word.image_path}`);
+            setImageUrl(null);
+          };
+          img.src = data.publicUrl;
         } else {
           console.error("No public URL returned for image");
+          setImageError("Failed to generate image URL");
           setImageUrl(null);
         }
       } catch (error) {
         console.error("Error loading image:", error);
+        setImageError("Error loading image");
         setImageUrl(null);
       }
     }
@@ -166,6 +181,7 @@ export const useArtikuacijskiTest = () => {
   return {
     imageUrl,
     loading,
+    imageError,
     currentLetter,
     allLetters,
     overallIndex,
