@@ -9,6 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      artikulacijski_test: {
+        Row: {
+          created_at: string
+          id: string
+          image_path: string
+          letter: string
+          order_index: number | null
+          word: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_path: string
+          letter: string
+          order_index?: number | null
+          word: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_path?: string
+          letter?: string
+          order_index?: number | null
+          word?: string
+        }
+        Relationships: []
+      }
       children: {
         Row: {
           age: number
