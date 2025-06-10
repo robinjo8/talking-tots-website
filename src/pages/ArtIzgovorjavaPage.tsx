@@ -1,7 +1,7 @@
-
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
+import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -25,13 +25,10 @@ const ArtIzgovorjavaPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header - hidden on mobile */}
-      <div className="hidden lg:block">
-        <Header />
-      </div>
+      <Header />
+      <PageHeader title="Artikulacija" backPath="/govorno-jezikovne-vaje" />
       
-      {/* Mobile full-screen container */}
-      <div className={`${isMobile ? 'h-screen flex flex-col' : 'container max-w-5xl mx-auto pt-32 pb-20 px-4'}`}>
+      <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
         {/* Back button and title - only visible on desktop */}
         <div className="hidden lg:flex items-center gap-3 mb-8">
           <Button 

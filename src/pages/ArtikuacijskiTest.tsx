@@ -1,193 +1,114 @@
-
-import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
+import { PageHeader } from "@/components/PageHeader";
+import React, { useState, useEffect } from 'react';
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from 'react-router-dom';
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useAudioPlayback } from "@/hooks/useAudioPlayback";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { useArticulationTest } from "@/hooks/useArticulationTest";
-
-// Import components
-import LetterSlider from "@/components/articulation/LetterSlider";
-import WordDisplay from "@/components/articulation/WordDisplay";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 const ArtikuacijskiTest = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const {
-    playAudio
-  } = useAudioPlayback();
-  const isMobile = useIsMobile();
-  const {
-    imageUrl,
-    loading,
-    currentLetter,
-    allLetters,
-    overallIndex,
-    totalWords,
-    handleNext,
-    handlePrevious,
-    getCurrentWord,
-    setCurrentLetter
-  } = useArticulationTest();
+  const [results, setResults] = useState<{ [key: string]: boolean }>({});
+  const [showResults, setShowResults] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isTestStarted, setIsTestStarted] = useState(false);
+  const [currentLetterIndex, setCurrentLetterIndex] = useState(0);
+  const letters = ['r', 's', 'š', 'k'];
 
-  const handlePlayAudio = () => {
-    // This function will be implemented later when audio files are available
-    console.log("No audio available for this word");
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
+
+  const handleResult = (letter: string, isCorrect: boolean) => {
+    setResults(prev => ({ ...prev, [letter]: isCorrect }));
   };
 
-  const handleLetterChange = (letter: string) => {
-    setCurrentLetter(letter);
+  const startTest = () => {
+    setResults({});
+    setShowResults(false);
+    setIsTestStarted(true);
+    setCurrentLetterIndex(0);
   };
 
-  // Calculate current letter index for progress display
-  const currentLetterIndex = allLetters.indexOf(currentLetter);
+  const nextLetter = () => {
+    if (currentLetterIndex < letters.length - 1) {
+      setCurrentLetterIndex(currentLetterIndex + 1);
+    } else {
+      setIsTestStarted(false);
+      setShowResults(true);
+    }
+  };
+
+  const currentLetter = letters[currentLetterIndex];
+
+  const getResultText = (letter: string) => {
+    if (results[letter] === undefined) return "Ni odgovora";
+    return results[letter] ? "Pravilno" : "Nepravilno";
+  };
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header - hidden on mobile */}
-      <div className="hidden lg:block">
-        <Header />
-      </div>
+      <Header />
+      <PageHeader title="Artikulacijski test" backPath="/govorno-jezikovne-vaje" />
       
-      {/* Mobile full-screen container */}
-      <div className={`${isMobile ? 'h-screen flex flex-col' : 'container max-w-5xl mx-auto pt-32 pb-20 px-4'}`}>
-        {/* Back button and title - only visible on desktop */}
-        <div className="hidden lg:flex items-center gap-3 mb-8">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="gap-2" 
-            onClick={() => navigate("/moja-stran")}
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Nazaj
-          </Button>
-          
-          <h1 className="text-2xl font-bold text-foreground">
-            Artikulacijski test
-          </h1>
-        </div>
-
-        {/* Mobile back button - positioned at top */}
-        {isMobile && (
-          <div className="flex items-center justify-between p-4 bg-background/95 backdrop-blur-sm">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="gap-2" 
-              onClick={() => navigate("/moja-stran")}
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Nazaj
+      <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
+        {!isTestStarted && !showResults && (
+          <div className="text-center">
+            <p className="text-muted-foreground mb-8">
+              Ta test bo preveril vašo izgovorjavo glasov R, S, Š in K.
+            </p>
+            <Button onClick={startTest} className="bg-dragon-green hover:bg-dragon-green/90 text-white">
+              Začni test
             </Button>
-            <h1 className="text-lg font-bold text-foreground">
-              Artikulacijski test
-            </h1>
-            <div className="w-16"></div> {/* Spacer for centering */}
           </div>
         )}
-        
-        {/* Letter slider component */}
-        <div className={isMobile ? 'px-4' : ''}>
-          <LetterSlider 
-            letters={allLetters} 
-            currentLetter={currentLetter} 
-            onLetterChange={handleLetterChange}
-          />
-        </div>
-        
-        {/* Progress display - horizontal layout */}
-        <div className={`flex justify-center gap-6 ${isMobile ? 'px-4 mb-4' : 'mb-6'}`}>
+
+        {isTestStarted && (
           <div className="text-center">
-            <p className="text-sm font-medium text-muted-foreground">
-              Črka {currentLetterIndex + 1} od {allLetters.length}
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="text-sm font-medium text-muted-foreground">
-              Beseda {overallIndex + 1} od {totalWords}
-            </p>
-          </div>
-        </div>
-        
-        {/* Main content - different layout for mobile vs desktop */}
-        <div className={`flex-grow flex items-center justify-center ${isMobile ? 'px-4 pb-4' : ''}`}>
-          {isMobile ? (
-            /* Mobile layout: Navigation buttons on sides of the image */
-            <div className="relative w-full max-w-md mx-auto">
-              {/* Left arrow (previous) */}
-              <Button 
-                onClick={handlePrevious}
-                variant="outline" 
-                size="icon" 
-                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/4 rounded-full h-12 w-12 border-2 shadow-md z-10"
-              >
-                <ArrowLeft className="h-5 w-5" />
+            <h2 className="text-2xl font-bold mb-4">Izgovorite črko: {currentLetter}</h2>
+            <div className="flex justify-center gap-4">
+              <Button onClick={() => handleResult(currentLetter, true)} className="bg-dragon-green hover:bg-dragon-green/90 text-white">
+                Pravilno
               </Button>
-              
-              {/* Center content */}
-              <div className="px-10">
-                <WordDisplay 
-                  word={getCurrentWord()} 
-                  imageUrl={imageUrl} 
-                  loading={loading} 
-                  currentIndex={overallIndex} 
-                  totalWords={totalWords} 
-                  onPlayAudio={handlePlayAudio} 
-                />
-              </div>
-              
-              {/* Right arrow (next) */}
-              <Button 
-                onClick={handleNext}
-                size="icon" 
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/4 rounded-full h-12 w-12 border-2 bg-app-blue text-white hover:bg-app-blue/90 shadow-md z-10"
-              >
-                <ArrowLeft className="h-5 w-5 rotate-180" />
+              <Button onClick={() => handleResult(currentLetter, false)} className="bg-app-orange hover:bg-app-orange/90 text-white">
+                Nepravilno
               </Button>
             </div>
-          ) : (
-            /* Desktop layout */
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center w-full max-w-5xl mx-auto">
-              {/* Left column - Previous button */}
-              <div className="hidden md:flex md:justify-end">
-                <Button 
-                  onClick={handlePrevious}
-                  variant="outline" 
-                  size="icon" 
-                  className="rounded-full h-14 w-14 border-2 shadow-md"
-                >
-                  <ArrowLeft className="h-6 w-6" />
-                </Button>
-              </div>
-              
-              {/* Center column - Word and Image */}
-              <div className="md:col-span-1">
-                <WordDisplay 
-                  word={getCurrentWord()} 
-                  imageUrl={imageUrl} 
-                  loading={loading} 
-                  currentIndex={overallIndex} 
-                  totalWords={totalWords} 
-                  onPlayAudio={handlePlayAudio} 
-                />
-              </div>
-              
-              {/* Right column - Next button */}
-              <div className="hidden md:flex md:justify-start">
-                <Button 
-                  onClick={handleNext}
-                  size="icon" 
-                  className="rounded-full h-14 w-14 bg-app-blue hover:bg-app-blue/90 text-white shadow-md"
-                >
-                  <ArrowLeft className="h-6 w-6 rotate-180" />
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
+            <Button onClick={nextLetter} className="mt-4 bg-app-blue hover:bg-app-blue/90 text-white">
+              Naslednja črka
+            </Button>
+          </div>
+        )}
+
+        {showResults && (
+          <div>
+            <h2 className="text-2xl font-bold mb-4">Rezultati testa:</h2>
+            <ul>
+              {letters.map(letter => (
+                <li key={letter} className="mb-2">
+                  Črka {letter}: {getResultText(letter)}
+                </li>
+              ))}
+            </ul>
+            <Button onClick={() => navigate("/artikulacija")} className="bg-dragon-green hover:bg-dragon-green/90 text-white">
+              Poglej vaje za artikulacijo
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,8 +1,8 @@
-
 import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
+import { PageHeader } from "@/components/PageHeader";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -65,7 +65,7 @@ const LogopedskiKoticek = () => {
     {
       id: 'faq',
       title: 'Pogosta vprašanja in odgovori',
-      description: 'Odgovori na najpogostejša vprašanja staršev glede govornega razvoja. Nasveti, kako ravnati v določenih situacijah, npr. če otrok ne govori ali ima težave z izgovorjavo določenih glasov.',
+      description: 'Odgovori na najpogostejše vprašanja staršev glede govornega razvoja. Nasveti, kako ravnati v določenih situacijah, npr. če otrok ne govori ali ima težave z izgovorjavo določenih glasov.',
       icon: sectionIcons.faq,
     },
     {
@@ -90,8 +90,9 @@ const LogopedskiKoticek = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <PageHeader title="Logopedski kotiček" backPath="/moja-stran" />
       
-      <div className="container max-w-5xl mx-auto pt-32 pb-20 px-4">
+      <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
         <div className="flex items-center gap-3 mb-8">
           <Button 
             variant="ghost" 

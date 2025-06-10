@@ -1,184 +1,152 @@
-
-import React, { useState, useRef, useEffect } from "react";
 import Header from "@/components/Header";
+import { PageHeader } from "@/components/PageHeader";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, RotateCcw, Info } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { MemoryGrid } from "@/components/games/MemoryGrid";
-import { useMemoryGameS } from "@/hooks/useMemoryGameS";
-import { toast } from "@/components/ui/sonner";
-import { useAudioPlayback } from "@/hooks/useAudioPlayback";
-import { InfoModal } from "@/components/games/InfoModal";
+import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { updatePoints } from "@/integrations/supabase/points";
+
+const images = [
+  "/images/spomin/s/sonce.png",
+  "/images/spomin/s/sova.png",
+  "/images/spomin/s/srce.png",
+  "/images/spomin/s/stol.png",
+  "/images/spomin/s/svinčnik.png",
+  "/images/spomin/s/škarje.png",
+];
 
 export default function SpominS() {
+  const [cards, setCards] = useState<any[]>([]);
+  const [flipped, setFlipped] = useState<number[]>([]);
+  const [matched, setMatched] = useState<number[]>([]);
+  const [moves, setMoves] = useState(0);
+  const [gameOver, setGameOver] = useState(false);
   const navigate = useNavigate();
-  const { audioRef } = useAudioPlayback();
-  const [showInfo, setShowInfo] = useState(false);
-  const { 
-    cards, 
-    isLoading, 
-    error, 
-    flipCard, 
-    resetGame, 
-    gameCompleted,
-    matchedPairs,
-    totalPairs,
-    isCheckingMatch
-  } = useMemoryGameS();
-  const gameStartTimeRef = useRef<number | null>(null);
-  const [gameTime, setGameTime] = useState<number | null>(null);
-
-  const handleCardClick = (index: number) => {
-    if (!gameStartTimeRef.current && cards.length > 0) {
-      gameStartTimeRef.current = Date.now();
-    }
-    flipCard(index);
-  };
-
-  const handleReset = () => {
-    resetGame();
-    gameStartTimeRef.current = null;
-    setGameTime(null);
-    toast.success("Igra je bila ponovno nastavljena!");
-  };
+  const { toast } = useToast();
+  const { user } = useAuth();
 
   useEffect(() => {
-    if (gameCompleted && gameStartTimeRef.current && gameTime === null) {
-      const endTime = Date.now();
-      const timeTaken = Math.floor((endTime - gameStartTimeRef.current) / 1000);
-      setGameTime(timeTaken);
-      
-      setTimeout(() => {
-        toast.success(`Čestitamo! Igra je končana v ${timeTaken} sekundah!`, {
-          duration: 5000
+    const initializeGame = () => {
+      const duplicatedImages = [...images, ...images];
+      const shuffledImages = duplicatedImages.sort(() => Math.random() - 0.5);
+      const initialCards = shuffledImages.map((image, index) => ({
+        id: index,
+        image,
+        isFlipped: false,
+        isMatched: false,
+      }));
+      setCards(initialCards);
+      setFlipped([]);
+      setMatched([]);
+      setMoves(0);
+      setGameOver(false);
+    };
+
+    initializeGame();
+  }, []);
+
+  useEffect(() => {
+    if (flipped.length === 2) {
+      const firstCard = cards[flipped[0]];
+      const secondCard = cards[flipped[1]];
+
+      if (firstCard.image === secondCard.image) {
+        setMatched([...matched, ...flipped]);
+        setFlipped([]);
+        setMoves(moves + 1);
+        toast({
+          title: "Bravo!",
+          description: "Našli ste par!",
         });
-      }, 500);
+      } else {
+        setTimeout(() => {
+          setFlipped([]);
+          setMoves(moves + 1);
+          toast({
+            title: "Žal ne!",
+            description: "Poskusite ponovno!",
+          });
+        }, 1000);
+      }
     }
-  }, [gameCompleted, gameStartTimeRef, gameTime]);
+
+    if (matched.length === cards.length && cards.length > 0) {
+      setGameOver(true);
+      updatePoints(user?.id, 10, "spomin-s");
+      toast({
+        title: "Čestitke!",
+        description: "Igra končana!",
+      });
+    }
+  }, [flipped, cards, matched, moves, toast, user?.id]);
+
+  const handleCardClick = (index: number) => {
+    if (flipped.length < 2 && !flipped.includes(index) && !matched.includes(index)) {
+      setFlipped([...flipped, index]);
+    }
+  };
+
+  const resetGame = () => {
+    const duplicatedImages = [...images, ...images];
+    const shuffledImages = duplicatedImages.sort(() => Math.random() - 0.5);
+    const initialCards = shuffledImages.map((image, index) => ({
+      id: index,
+      image,
+      isFlipped: false,
+      isMatched: false,
+    }));
+    setCards(initialCards);
+    setFlipped([]);
+    setMatched([]);
+    setMoves(0);
+    setGameOver(false);
+  };
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header - hidden on mobile for full-screen experience */}
-      <div className="hidden md:block">
-        <Header />
-      </div>
-      <audio ref={audioRef} className="hidden" />
+      <Header />
+      <PageHeader title="Spomin - črka S" backPath="/govorne-igre/spomin" />
       
-      <div className="h-screen md:h-auto md:min-h-screen flex flex-col">
-        <div className="container max-w-7xl mx-auto h-full md:h-auto md:pt-28 pt-4 pb-4 md:pb-20 px-4 flex flex-col">
-          {/* Header section with controls */}
-          <div className="flex items-center justify-between gap-3 mb-4 md:mb-6 flex-shrink-0">
-            <div className="flex items-center gap-3">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="gap-2" 
-                onClick={() => navigate("/govorne-igre")}
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Nazaj
-              </Button>
-              
-              <h1 className="text-lg md:text-2xl lg:text-3xl font-bold text-foreground">
-                Črka S
-              </h1>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowInfo(true)}
-                className="h-8 w-8 p-0"
-              >
-                <Info className="h-4 w-4" />
-              </Button>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleReset}
-                className="gap-2"
-              >
-                <RotateCcw className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Nova igra</span>
-              </Button>
-            </div>
-          </div>
-          
-          {/* Progress card */}
-          <Card className="bg-dragon-green/5 mb-4 md:mb-6 flex-shrink-0">
-            <CardContent className="p-4 md:p-6">
-              <div className="space-y-2">
-                <h2 className="text-lg md:text-xl font-bold">Igra spomin</h2>
-                
-                <div className="flex items-center justify-between">
-                  <div className="text-sm">
-                    <span className="font-medium">Najdeni pari: </span>
-                    <span className="text-dragon-green font-bold">{matchedPairs.length}</span>
-                    <span className="text-muted-foreground"> od {totalPairs}</span>
-                  </div>
-                  
-                  {gameCompleted && gameTime !== null && (
-                    <div className="bg-dragon-green/10 text-dragon-green px-3 py-1 rounded-md text-sm font-medium">
-                      Čas: {gameTime} sekund
-                    </div>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Game content - takes remaining space */}
-          <div className="flex-1 flex justify-center items-center min-h-0">
-            <div className="w-full max-w-4xl h-full flex items-center justify-center">
-              {isLoading && (
-                <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
-              )}
-              
-              {error && (
-                <div className="bg-red-50 p-6 rounded-lg border border-red-100 text-center">
-                  <h3 className="text-red-600 font-medium mb-2">Napaka pri nalaganju igre</h3>
-                  <p className="text-sm text-red-500">Poskusite znova kasneje.</p>
-                  <Button 
-                    variant="outline" 
-                    className="mt-4" 
-                    onClick={() => window.location.reload()}
-                  >
-                    Poskusi znova
-                  </Button>
-                </div>
-              )}
-              
-              {!isLoading && !error && cards.length > 0 && (
-                <div className={`transition-opacity duration-500 w-full h-full flex items-center justify-center ${cards.length ? 'opacity-100' : 'opacity-0'}`}>
-                  <MemoryGrid 
-                    cards={cards} 
-                    onCardClick={handleCardClick}
-                    isCheckingMatch={isCheckingMatch}
+      <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
+          {cards.map((card, index) => (
+            <Card
+              key={card.id}
+              className={`relative cursor-pointer rounded-md shadow-sm transition-transform duration-300 ${
+                flipped.includes(index) || matched.includes(index)
+                  ? "transform rotate-y-180"
+                  : ""
+              }`}
+              onClick={() => handleCardClick(index)}
+            >
+              <div className="absolute inset-0 flex items-center justify-center backface-hidden">
+                {!flipped.includes(index) && !matched.includes(index) ? (
+                  <div className="w-full h-full bg-gray-200 rounded-md" />
+                ) : (
+                  <img
+                    src={card.image}
+                    alt="Card"
+                    className="max-w-full max-h-full rounded-md"
                   />
-                </div>
-              )}
-              
-              {!isLoading && !error && cards.length === 0 && (
-                <div className="text-center p-10 border rounded-lg">
-                  <p className="text-muted-foreground">
-                    Ni kartic za prikaz. Prosim, preverite nastavitve igre.
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
+                )}
+              </div>
+            </Card>
+          ))}
+        </div>
+
+        <div className="mt-8 flex justify-between items-center">
+          <p className="text-sm text-muted-foreground">
+            Število potez: {moves}
+          </p>
+          {gameOver && (
+            <Button onClick={resetGame} className="bg-dragon-green text-white">
+              Igraj ponovno
+            </Button>
+          )}
         </div>
       </div>
-
-      <InfoModal 
-        isOpen={showInfo}
-        onClose={() => setShowInfo(false)}
-        title="Kako igrati spomin"
-        content="Obračaj kartice in najdi pare. Ko obrneš kartico, boš slišal/a besedo in videl/a sliko. Ko najdeš vse pare, si uspešno zaključil/a igro!"
-      />
     </div>
   );
 }
