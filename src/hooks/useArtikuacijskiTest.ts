@@ -101,18 +101,25 @@ export const useArtikuacijskiTest = () => {
       console.log("Loading image for word:", word.word, "from path:", word.image_path);
       
       try {
-        // Remove the bucket name prefix if it exists in the path
-        let cleanPath = word.image_path;
-        if (cleanPath.startsWith('artikulacijski-test/')) {
-          cleanPath = cleanPath.replace('artikulacijski-test/', '');
+        // Extract just the filename from the path
+        let filename = word.image_path;
+        
+        // Remove bucket prefix if it exists
+        if (filename.startsWith('artikulacijski-test/')) {
+          filename = filename.replace('artikulacijski-test/', '');
         }
         
-        console.log("Clean path after removing bucket prefix:", cleanPath);
+        // Extract just the filename (remove any folder structure)
+        if (filename.includes('/')) {
+          filename = filename.split('/').pop() || filename;
+        }
+        
+        console.log("Final filename for storage:", filename);
         
         // Get the public URL for the image
         const { data } = supabase.storage
           .from('artikulacijski-test')
-          .getPublicUrl(cleanPath);
+          .getPublicUrl(filename);
           
         console.log("Generated image URL:", data.publicUrl);
         
@@ -126,7 +133,7 @@ export const useArtikuacijskiTest = () => {
           };
           img.onerror = () => {
             console.error("Image failed to load:", data.publicUrl);
-            setImageError(`Image file not found: ${cleanPath}`);
+            setImageError(`Image file not found: ${filename}`);
             setImageUrl(null);
             setLoading(false);
           };
