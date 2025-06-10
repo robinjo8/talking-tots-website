@@ -20,16 +20,6 @@ const GovornojezicovneVaje = () => {
       example: "Primer: gibanje jezika gor, dol, lažkamo in razpiranje."
     },
     {
-      id: "artikulacijski-test",
-      title: "Artikulacijski test",
-      description: "Test za preverjanje izgovorjave glasov R, S, Š in K.",
-      icon: TestTube,
-      color: "text-app-blue",
-      gradient: "from-app-blue/10 to-app-purple/10",
-      path: "/artikulacijski-test",
-      example: "Primer: preverjanje pravilne izgovorjave posameznih glasov."
-    },
-    {
       id: "motnja-izreke", 
       title: "Motnja izreke / artikulacije",
       description: "Otroci se spopadajo z napačno izreko posebnih glasov, ki jih v vsakih osvojil samoli ali ob podporo.",
