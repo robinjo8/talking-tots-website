@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -98,49 +99,53 @@ export const useArtikuacijskiTest = () => {
       
       // Load image from Supabase storage
       const word = allLettersData[letterIndex].words[wordIndex];
-      console.log("Loading image for word:", word.word, "from path:", word.image_path);
+      console.log("Loading image for word:", word.word);
       
       try {
-        // Extract just the filename from the path
-        let filename = word.image_path;
+        // Create filename based on word name - try different extensions
+        const wordName = word.word.toLowerCase();
+        const possibleExtensions = ['png', 'jpg', 'jpeg', 'webp'];
         
-        // Remove bucket prefix if it exists
-        if (filename.startsWith('artikulacijski-test/')) {
-          filename = filename.replace('artikulacijski-test/', '');
-        }
+        let imageFound = false;
         
-        // Extract just the filename (remove any folder structure)
-        if (filename.includes('/')) {
-          filename = filename.split('/').pop() || filename;
-        }
-        
-        console.log("Final filename for storage:", filename);
-        
-        // Get the public URL for the image
-        const { data } = supabase.storage
-          .from('artikulacijski-test')
-          .getPublicUrl(filename);
+        for (const ext of possibleExtensions) {
+          const filename = `${wordName}.${ext}`;
+          console.log("Trying filename:", filename);
           
-        console.log("Generated image URL:", data.publicUrl);
+          // Get the public URL for the image
+          const { data } = supabase.storage
+            .from('artikulacijski-test')
+            .getPublicUrl(filename);
+            
+          if (data?.publicUrl) {
+            // Test if the image actually exists by trying to load it
+            const img = new Image();
+            img.onload = () => {
+              console.log("Successfully loaded image:", data.publicUrl);
+              setImageUrl(data.publicUrl);
+              setImageError(null);
+              setLoading(false);
+              imageFound = true;
+            };
+            img.onerror = () => {
+              console.log("Image not found with extension:", ext);
+              // Continue to next extension
+            };
+            
+            // Try to load the image
+            img.src = data.publicUrl;
+            
+            // Wait a bit to see if the image loads
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            if (imageFound) break;
+          }
+        }
         
-        if (data?.publicUrl) {
-          // Test if the image actually exists by trying to load it
-          const img = new Image();
-          img.onload = () => {
-            setImageUrl(data.publicUrl);
-            setImageError(null);
-            setLoading(false);
-          };
-          img.onerror = () => {
-            console.error("Image failed to load:", data.publicUrl);
-            setImageError(`Image file not found: ${filename}`);
-            setImageUrl(null);
-            setLoading(false);
-          };
-          img.src = data.publicUrl;
-        } else {
-          console.error("No public URL returned for image");
-          setImageError("Failed to generate image URL");
+        // If no image was found with any extension
+        if (!imageFound) {
+          console.error("No image found for word:", word.word);
+          setImageError(`Image not found for word: ${word.word}`);
           setImageUrl(null);
           setLoading(false);
         }
