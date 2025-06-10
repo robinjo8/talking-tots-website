@@ -1,3 +1,4 @@
+
 import { Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "@/pages/Index";
@@ -21,7 +22,6 @@ import SpominK from "@/pages/SpominK";
 import SpominS from "@/pages/SpominS";
 import SpominŠ from "@/pages/SpominŠ";
 import DrsneStevike from "@/pages/DrsneStevike";
-import ArtikuacijskiTest from "@/pages/ArtikuacijskiTest";
 
 export function AppRoutes() {
   return (
@@ -85,15 +85,6 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <ArtIzgovorjavaPage />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route 
-        path="/artikulacijski-test" 
-        element={
-          <ProtectedRoute>
-            <ArtikuacijskiTest />
           </ProtectedRoute>
         }
       />
