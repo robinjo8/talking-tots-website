@@ -85,137 +85,102 @@ const ArtikuacijskiTest = () => {
         </div>
         
         {/* Progress display */}
-        <div className={`flex justify-center ${isMobile ? 'px-4 mb-4' : 'mb-6'}`}>
-          <div className="text-center">
+        <div className={`flex justify-center ${isMobile ? 'px-4 mb-8' : 'mb-8'}`}>
+          <div className="text-center space-y-2">
             <p className="text-sm font-medium text-muted-foreground">
               Črka {currentLetterIndex + 1} od {allLetters.length}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Beseda {overallIndex + 1} od {totalWords}
             </p>
           </div>
         </div>
         
-        {/* Main content area */}
-        <div className={`flex-grow flex items-center justify-center ${isMobile ? 'px-4 pb-4' : ''}`}>
-          <div className="text-center space-y-6">
-            {/* Selected letter display */}
-            <div className="w-32 h-32 mx-auto bg-app-purple rounded-full flex items-center justify-center shadow-lg">
-              <span className="text-6xl font-bold text-white">{currentLetter}</span>
-            </div>
-            
-            {/* Letter name */}
-            <h2 className="text-3xl font-bold text-foreground">
-              Črka {currentLetter}
+        {/* New content area - clean design like PIPA example */}
+        <div className="max-w-md mx-auto text-center space-y-8">
+          {/* Word display */}
+          <div className="space-y-4">
+            <h2 className="text-4xl font-bold text-app-purple tracking-wider">
+              {getCurrentWord().toUpperCase()}
             </h2>
+          </div>
+          
+          {/* Image display */}
+          <div className="w-full">
+            {loading ? (
+              <div className="w-full h-64 flex items-center justify-center bg-muted rounded-xl">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-app-purple"></div>
+              </div>
+            ) : imageError ? (
+              <div className="w-full h-64 flex items-center justify-center bg-muted rounded-xl border-2 border-dashed border-muted-foreground/30">
+                <div className="text-center space-y-3">
+                  <Upload className="h-12 w-12 mx-auto text-muted-foreground/50" />
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Slika ni na voljo
+                    </p>
+                    <p className="text-xs text-muted-foreground/70">
+                      {imageError}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : imageUrl ? (
+              <div className="w-full h-64 flex items-center justify-center">
+                <img 
+                  src={imageUrl} 
+                  alt={getCurrentWord()}
+                  className="max-w-full max-h-full object-contain rounded-xl"
+                  onError={(e) => {
+                    console.error("Error loading image:", e);
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="w-full h-64 flex items-center justify-center bg-muted rounded-xl">
+                <p className="text-muted-foreground">
+                  Ni podatkov za črko {currentLetter}
+                </p>
+              </div>
+            )}
+          </div>
+          
+          {/* Navigation controls */}
+          <div className="flex justify-between items-center pt-6">
+            <Button
+              onClick={handlePrevious}
+              variant="outline"
+              size="icon"
+              className="h-12 w-12 rounded-full"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
             
-            {/* Image and word content */}
-            <div className="bg-background/80 backdrop-blur-sm rounded-xl p-8 shadow-md border max-w-md mx-auto">
-              {loading ? (
-                <div className="flex items-center justify-center h-64">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-app-purple"></div>
-                </div>
-              ) : imageError ? (
-                <div className="space-y-6">
-                  {/* Error state with placeholder */}
-                  <div className="w-full h-48 flex items-center justify-center bg-muted rounded-lg border-2 border-dashed border-muted-foreground/30">
-                    <div className="text-center space-y-3">
-                      <Upload className="h-12 w-12 mx-auto text-muted-foreground/50" />
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium text-muted-foreground">
-                          Slika ni na voljo
-                        </p>
-                        <p className="text-xs text-muted-foreground/70">
-                          {imageError}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Word label */}
-                  <h3 className="text-2xl font-bold text-app-purple uppercase tracking-wide">
-                    {getCurrentWord()}
-                  </h3>
-                  
-                  {/* Navigation controls */}
-                  <div className="flex justify-between items-center mt-6">
-                    <Button
-                      onClick={handlePrevious}
-                      variant="outline"
-                      size="sm"
-                      className="flex items-center gap-2"
-                    >
-                      <ArrowLeft className="h-4 w-4" />
-                      Prejšnja
-                    </Button>
-                    
-                    <span className="text-sm text-muted-foreground">
-                      {overallIndex + 1} / {totalWords}
-                    </span>
-                    
-                    <Button
-                      onClick={handleNext}
-                      variant="outline"
-                      size="sm"
-                      className="flex items-center gap-2"
-                    >
-                      Naslednja
-                      <ArrowLeft className="h-4 w-4 rotate-180" />
-                    </Button>
-                  </div>
-                </div>
-              ) : imageUrl ? (
-                <div className="space-y-6">
-                  {/* Image display */}
-                  <div className="w-full h-48 flex items-center justify-center">
-                    <img 
-                      src={imageUrl} 
-                      alt={getCurrentWord()}
-                      className="max-w-full max-h-full object-contain rounded-lg shadow-sm"
-                      onError={(e) => {
-                        console.error("Error loading image:", e);
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
-                  </div>
-                  
-                  {/* Word label */}
-                  <h3 className="text-2xl font-bold text-app-purple uppercase tracking-wide">
-                    {getCurrentWord()}
-                  </h3>
-                  
-                  {/* Navigation controls */}
-                  <div className="flex justify-between items-center mt-6">
-                    <Button
-                      onClick={handlePrevious}
-                      variant="outline"
-                      size="sm"
-                      className="flex items-center gap-2"
-                    >
-                      <ArrowLeft className="h-4 w-4" />
-                      Prejšnja
-                    </Button>
-                    
-                    <span className="text-sm text-muted-foreground">
-                      {overallIndex + 1} / {totalWords}
-                    </span>
-                    
-                    <Button
-                      onClick={handleNext}
-                      variant="outline"
-                      size="sm"
-                      className="flex items-center gap-2"
-                    >
-                      Naslednja
-                      <ArrowLeft className="h-4 w-4 rotate-180" />
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center h-64 flex items-center justify-center">
-                  <p className="text-muted-foreground">
-                    Ni podatkov za črko {currentLetter}
-                  </p>
-                </div>
-              )}
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">
+                {overallIndex + 1} / {totalWords}
+              </p>
             </div>
+            
+            <Button
+              onClick={handleNext}
+              variant="outline"
+              size="icon"
+              className="h-12 w-12 rounded-full"
+            >
+              <ArrowLeft className="h-5 w-5 rotate-180" />
+            </Button>
+          </div>
+          
+          {/* Speech recording button placeholder */}
+          <div className="pt-4">
+            <Button 
+              className="bg-app-teal hover:bg-app-teal/90 text-white px-8 py-3 rounded-full text-lg font-medium"
+              size="lg"
+            >
+              🎤 Izgovori besedo
+            </Button>
           </div>
         </div>
       </div>
