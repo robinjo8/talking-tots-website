@@ -57,9 +57,9 @@ const ArtikuacijskiTest = () => {
       <Header />
       <PageHeader title="Artikulacijski Test" backPath="/govorno-jezikovne-vaje" />
       
-      <div className="container max-w-5xl mx-auto px-4 flex flex-col justify-center min-h-[calc(100vh-160px)]">
+      <div className="container max-w-5xl mx-auto px-4 pt-8 pb-20">
         {/* Letter slider component */}
-        <div className="w-full max-w-2xl mx-auto mb-8">
+        <div className={isMobile ? 'px-4 mb-6' : 'mb-8'}>
           <LetterSlider
             letters={allLetters}
             currentLetter={currentLetter}
@@ -67,49 +67,52 @@ const ArtikuacijskiTest = () => {
           />
         </div>
 
-        {/* Progress indicators */}
-        <div className="flex justify-center items-center gap-8 mb-6 text-sm font-medium text-gray-600">
-          <span>Črka {currentLetterIndex + 1} od {totalLetters}</span>
-          <span>Beseda {currentWordIndex} od {totalWordsPerLetter}</span>
-        </div>
-
-        {/* Main content area with side navigation */}
-        <div className="flex items-center justify-center gap-8 mb-8">
-          {/* Previous button - positioned to the left */}
-          <Button 
-            onClick={handlePrevious}
-            variant="outline"
-            size="icon"
-            className="rounded-full h-14 w-14 border-2 flex-shrink-0"
-          >
-            <ArrowLeft className="h-6 w-6" />
-          </Button>
-
-          {/* Word display - centered */}
-          <div className="w-full max-w-sm">
-            <WordDisplay
-              word={getCurrentWord()}
-              imageUrl={imageUrl}
-              loading={loading}
-              currentIndex={overallIndex}
-              totalWords={totalWords}
-              onPlayAudio={handlePlayAudio}
-            />
+        {/* Progress display */}
+        <div className={`flex justify-center ${isMobile ? 'px-4 mb-4' : 'mb-6'}`}>
+          <div className="text-center">
+            <p className="text-sm font-medium text-muted-foreground">
+              Črka {currentLetterIndex + 1} od {totalLetters}
+            </p>
           </div>
-
-          {/* Next button - positioned to the right */}
-          <Button 
-            onClick={handleNext}
-            size="icon"
-            className="bg-app-blue hover:bg-app-blue/90 rounded-full h-16 w-16 shadow-md flex-shrink-0"
-          >
-            <ArrowRight className="h-8 w-8" />
-          </Button>
         </div>
+        
+        {/* Main content area with side navigation - centered and responsive */}
+        <div className={`flex-grow flex items-center justify-center ${isMobile ? 'px-4 pb-4' : ''}`}>
+          <div className="flex items-center justify-center gap-8 w-full max-w-4xl">
+            {/* Previous button - positioned to the left */}
+            <Button 
+              onClick={handlePrevious}
+              variant="outline"
+              size="icon"
+              className="rounded-full h-14 w-14 border-2 flex-shrink-0"
+            >
+              <ArrowLeft className="h-6 w-6" />
+            </Button>
 
-        {/* Bottom navigation text */}
-        <div className="text-center">
-          <p className="text-sm text-muted-foreground">Naslednja beseda</p>
+            {/* Word display - centered */}
+            <div className="flex-1 max-w-md mx-auto">
+              <div className="text-center space-y-6">
+                {/* Word and image display */}
+                <WordDisplay
+                  word={getCurrentWord()}
+                  imageUrl={imageUrl}
+                  loading={loading}
+                  currentIndex={overallIndex}
+                  totalWords={totalWords}
+                  onPlayAudio={handlePlayAudio}
+                />
+              </div>
+            </div>
+
+            {/* Next button - positioned to the right */}
+            <Button 
+              onClick={handleNext}
+              size="icon"
+              className="bg-app-blue hover:bg-app-blue/90 rounded-full h-16 w-16 shadow-md flex-shrink-0"
+            >
+              <ArrowRight className="h-8 w-8" />
+            </Button>
+          </div>
         </div>
       </div>
     </div>
