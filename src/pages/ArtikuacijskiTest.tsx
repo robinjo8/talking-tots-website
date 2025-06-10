@@ -3,6 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from "@/contexts/AuthContext";
 import { useArticulationTest } from "@/hooks/useArticulationTest";
+import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import LetterSlider from "@/components/articulation/LetterSlider";
 import WordDisplay from "@/components/articulation/WordDisplay";
 import TestNavigation from "@/components/articulation/TestNavigation";
@@ -13,6 +14,7 @@ import { ArrowLeft } from "lucide-react";
 const ArtikuacijskiTest = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { playAudio } = useAudioPlayback();
   const {
     imageUrl,
     loading,
@@ -31,6 +33,14 @@ const ArtikuacijskiTest = () => {
       navigate("/login");
     }
   }, [user, navigate]);
+
+  const handlePlayAudio = () => {
+    // For now, we'll use text-to-speech since we don't have audio files
+    const utterance = new SpeechSynthesisUtterance(getCurrentWord());
+    utterance.lang = 'sl-SI'; // Slovenian language
+    utterance.rate = 0.8; // Slightly slower for children
+    speechSynthesis.speak(utterance);
+  };
 
   // Calculate current letter progress
   const currentLetterIndex = allLetters.indexOf(currentLetter);
@@ -71,20 +81,15 @@ const ArtikuacijskiTest = () => {
           <span>Beseda {currentWordIndex} od {totalWordsPerLetter}</span>
         </div>
 
-        {/* Current word display */}
-        <div className="text-center mb-4">
-          <h1 className="text-4xl md:text-6xl font-bold text-app-purple mb-2 animate-scale-in">
-            {getCurrentWord()}
-          </h1>
-          <p className="text-gray-600">Beseda {overallIndex + 1} od {totalWords}</p>
-        </div>
-
         {/* Word image display */}
         <div className="mb-8 w-full max-w-sm">
           <WordDisplay
+            word={getCurrentWord()}
             imageUrl={imageUrl}
             loading={loading}
-            word={getCurrentWord()}
+            currentIndex={overallIndex}
+            totalWords={totalWords}
+            onPlayAudio={handlePlayAudio}
           />
         </div>
 
