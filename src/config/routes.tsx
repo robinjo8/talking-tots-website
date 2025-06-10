@@ -21,7 +21,6 @@ import SpominGames from "@/pages/SpominGames";
 import SpominK from "@/pages/SpominK";
 import SpominS from "@/pages/SpominS";
 import SpominŠ from "@/pages/SpominŠ";
-import ArtikuacijskiTest from "@/pages/ArtikuacijskiTest";
 import DrsneStevike from "@/pages/DrsneStevike";
 
 export function AppRoutes() {
@@ -70,14 +69,6 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <VajeZaJezik />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/artikulacijski-test" 
-        element={
-          <ProtectedRoute>
-            <ArtikuacijskiTest />
           </ProtectedRoute>
         }
       />
