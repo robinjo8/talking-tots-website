@@ -53,42 +53,69 @@ const ArtikuacijskiTest = () => {
       <Header />
       <PageHeader title="Artikulacijski Test" backPath="/govorno-jezikovne-vaje" />
       
-      {/* Main container with responsive layout */}
-      <div className="container max-w-6xl mx-auto px-4 py-6 md:py-8">
-        {/* Letter slider - responsive positioning */}
-        <div className="w-full max-w-3xl mx-auto mb-6 md:mb-8">
-          <LetterSlider
-            letters={allLetters}
-            currentLetter={currentLetter}
-            onLetterChange={setCurrentLetter}
-          />
-        </div>
-
-        {/* Progress indicator - centered and responsive */}
-        <div className="flex justify-center mb-6 md:mb-8">
-          <div className="text-center">
-            <p className="text-sm md:text-base font-medium text-muted-foreground">
-              Črka {currentLetterIndex + 1} od {totalLetters}
-            </p>
+      {/* Main container with proper spacing and responsive layout */}
+      <div className="container max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-8">
+        {/* Letter slider - with proper overflow handling */}
+        <div className="w-full mb-6 md:mb-8 overflow-x-auto">
+          <div className="min-w-full">
+            <LetterSlider
+              letters={allLetters}
+              currentLetter={currentLetter}
+              onLetterChange={setCurrentLetter}
+            />
           </div>
         </div>
-        
-        {/* Main content area - responsive layout with side navigation */}
-        <div className="flex items-center justify-center min-h-[400px] md:min-h-[500px]">
+
+        {/* Main content area - responsive layout with proper centering */}
+        <div className="flex items-center justify-center min-h-[400px] md:min-h-[500px] px-2 sm:px-4">
           <div className="w-full max-w-5xl mx-auto">
             {/* Mobile layout - stacked */}
             {isMobile ? (
               <div className="flex flex-col items-center space-y-6">
-                {/* Word display */}
+                {/* Word display with updated progress layout */}
                 <div className="w-full max-w-sm">
-                  <WordDisplay
-                    word={getCurrentWord()}
-                    imageUrl={imageUrl}
-                    loading={loading}
-                    currentIndex={overallIndex}
-                    totalWords={totalWords}
-                    onPlayAudio={handlePlayAudio}
-                  />
+                  <div className="flex flex-col items-center w-full">
+                    {/* Word title */}
+                    <h2 className="text-3xl font-bold text-app-purple mb-3">
+                      {getCurrentWord()}
+                    </h2>
+                    
+                    {/* Combined progress indicators on same row */}
+                    <div className="flex items-center justify-center gap-4 mb-4 text-sm text-muted-foreground">
+                      <span>Črka {currentLetterIndex + 1} od {totalLetters}</span>
+                      <span>•</span>
+                      <span>Beseda {overallIndex + 1} od {totalWords}</span>
+                    </div>
+                    
+                    {/* Image container */}
+                    <div className="w-full bg-white rounded-xl shadow-md overflow-hidden mb-6 aspect-square">
+                      {loading ? (
+                        <div className="w-full h-full animate-pulse bg-gray-200 rounded-xl flex items-center justify-center">
+                          <span className="text-gray-400">Nalaganje...</span>
+                        </div>
+                      ) : imageUrl ? (
+                        <img 
+                          src={imageUrl} 
+                          alt={getCurrentWord()} 
+                          className="w-full h-full object-contain p-4"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                          Ni slike
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Audio button */}
+                    <Button 
+                      onClick={handlePlayAudio}
+                      size="lg"
+                      className="bg-app-teal hover:bg-app-teal/90 text-white px-8 py-6 h-auto text-lg rounded-full shadow-md hover:shadow-lg transform transition-transform hover:scale-105 mb-6"
+                    >
+                      <span className="mr-2">🎵</span>
+                      Izgovori besedo
+                    </Button>
+                  </div>
                 </div>
                 
                 {/* Navigation buttons */}
@@ -112,7 +139,7 @@ const ArtikuacijskiTest = () => {
                 </div>
               </div>
             ) : (
-              /* Desktop layout - side by side */
+              /* Desktop layout - side by side with proper spacing */
               <div className="flex items-center justify-center gap-6 lg:gap-12">
                 {/* Previous button */}
                 <Button 
@@ -124,16 +151,50 @@ const ArtikuacijskiTest = () => {
                   <ArrowLeft className="h-6 w-6 lg:h-7 lg:w-7" />
                 </Button>
 
-                {/* Word display - centered */}
+                {/* Word display - centered with updated layout */}
                 <div className="flex-1 max-w-md lg:max-w-lg">
-                  <WordDisplay
-                    word={getCurrentWord()}
-                    imageUrl={imageUrl}
-                    loading={loading}
-                    currentIndex={overallIndex}
-                    totalWords={totalWords}
-                    onPlayAudio={handlePlayAudio}
-                  />
+                  <div className="flex flex-col items-center w-full">
+                    {/* Word title */}
+                    <h2 className="text-3xl lg:text-4xl font-bold text-app-purple mb-3">
+                      {getCurrentWord()}
+                    </h2>
+                    
+                    {/* Combined progress indicators on same row */}
+                    <div className="flex items-center justify-center gap-4 mb-4 text-sm lg:text-base text-muted-foreground">
+                      <span>Črka {currentLetterIndex + 1} od {totalLetters}</span>
+                      <span>•</span>
+                      <span>Beseda {overallIndex + 1} od {totalWords}</span>
+                    </div>
+                    
+                    {/* Image container */}
+                    <div className="w-full bg-white rounded-xl shadow-md overflow-hidden mb-6 aspect-square">
+                      {loading ? (
+                        <div className="w-full h-full animate-pulse bg-gray-200 rounded-xl flex items-center justify-center">
+                          <span className="text-gray-400">Nalaganje...</span>
+                        </div>
+                      ) : imageUrl ? (
+                        <img 
+                          src={imageUrl} 
+                          alt={getCurrentWord()} 
+                          className="w-full h-full object-contain p-4"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                          Ni slike
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Audio button */}
+                    <Button 
+                      onClick={handlePlayAudio}
+                      size="lg"
+                      className="bg-app-teal hover:bg-app-teal/90 text-white px-8 py-6 h-auto text-lg rounded-full shadow-md hover:shadow-lg transform transition-transform hover:scale-105"
+                    >
+                      <span className="mr-2">🎵</span>
+                      Izgovori besedo
+                    </Button>
+                  </div>
                 </div>
 
                 {/* Next button */}
