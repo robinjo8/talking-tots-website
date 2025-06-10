@@ -6,11 +6,11 @@ import { useArticulationTest } from "@/hooks/useArticulationTest";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import LetterSlider from "@/components/articulation/LetterSlider";
 import WordDisplay from "@/components/articulation/WordDisplay";
-import TestNavigation from "@/components/articulation/TestNavigation";
-import PracticeProgress from "@/components/articulation/PracticeProgress";
 import Header from "@/components/Header";
 import { PageHeader } from "@/components/PageHeader";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 const ArtikuacijskiTest = () => {
   const { user } = useAuth();
@@ -57,9 +57,9 @@ const ArtikuacijskiTest = () => {
       <Header />
       <PageHeader title="Artikulacijski Test" backPath="/govorno-jezikovne-vaje" />
       
-      <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
+      <div className="container max-w-5xl mx-auto px-4 flex flex-col justify-center min-h-[calc(100vh-160px)]">
         {/* Letter slider component */}
-        <div className={isMobile ? 'px-4' : ''}>
+        <div className="w-full max-w-2xl mx-auto mb-8">
           <LetterSlider
             letters={allLetters}
             currentLetter={currentLetter}
@@ -68,38 +68,48 @@ const ArtikuacijskiTest = () => {
         </div>
 
         {/* Progress indicators */}
-        <div className={`flex justify-center items-center gap-8 ${isMobile ? 'px-4 mb-4' : 'mb-6'} text-sm font-medium text-gray-600`}>
+        <div className="flex justify-center items-center gap-8 mb-6 text-sm font-medium text-gray-600">
           <span>Črka {currentLetterIndex + 1} od {totalLetters}</span>
           <span>Beseda {currentWordIndex} od {totalWordsPerLetter}</span>
         </div>
 
-        {/* Word image display */}
-        <div className={`${isMobile ? 'px-4 mb-6' : 'mb-8'} w-full max-w-sm mx-auto`}>
-          <WordDisplay
-            word={getCurrentWord()}
-            imageUrl={imageUrl}
-            loading={loading}
-            currentIndex={overallIndex}
-            totalWords={totalWords}
-            onPlayAudio={handlePlayAudio}
-          />
+        {/* Main content area with side navigation */}
+        <div className="flex items-center justify-center gap-8 mb-8">
+          {/* Previous button - positioned to the left */}
+          <Button 
+            onClick={handlePrevious}
+            variant="outline"
+            size="icon"
+            className="rounded-full h-14 w-14 border-2 flex-shrink-0"
+          >
+            <ArrowLeft className="h-6 w-6" />
+          </Button>
+
+          {/* Word display - centered */}
+          <div className="w-full max-w-sm">
+            <WordDisplay
+              word={getCurrentWord()}
+              imageUrl={imageUrl}
+              loading={loading}
+              currentIndex={overallIndex}
+              totalWords={totalWords}
+              onPlayAudio={handlePlayAudio}
+            />
+          </div>
+
+          {/* Next button - positioned to the right */}
+          <Button 
+            onClick={handleNext}
+            size="icon"
+            className="bg-app-blue hover:bg-app-blue/90 rounded-full h-16 w-16 shadow-md flex-shrink-0"
+          >
+            <ArrowRight className="h-8 w-8" />
+          </Button>
         </div>
 
-        {/* Navigation controls */}
-        <div className={`flex justify-center ${isMobile ? 'px-4 mb-6' : 'mb-8'}`}>
-          <TestNavigation
-            onNext={handleNext}
-            onPrevious={handlePrevious}
-          />
-        </div>
-
-        {/* Overall progress */}
-        <div className={`w-full max-w-md mx-auto ${isMobile ? 'px-4' : ''}`}>
-          <PracticeProgress
-            currentWordIndex={overallIndex}
-            totalWords={totalWords}
-            progress={(overallIndex + 1) / totalWords * 100}
-          />
+        {/* Bottom navigation text */}
+        <div className="text-center">
+          <p className="text-sm text-muted-foreground">Naslednja beseda</p>
         </div>
       </div>
     </div>
