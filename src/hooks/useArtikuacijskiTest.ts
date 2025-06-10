@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -102,12 +101,20 @@ export const useArtikuacijskiTest = () => {
       console.log("Loading image for word:", word.word, "from path:", word.image_path);
       
       try {
+        // Remove the bucket name prefix if it exists in the path
+        let cleanPath = word.image_path;
+        if (cleanPath.startsWith('artikulacijski-test/')) {
+          cleanPath = cleanPath.replace('artikulacijski-test/', '');
+        }
+        
+        console.log("Clean path after removing bucket prefix:", cleanPath);
+        
         // Get the public URL for the image
         const { data } = supabase.storage
           .from('artikulacijski-test')
-          .getPublicUrl(word.image_path);
+          .getPublicUrl(cleanPath);
           
-        console.log("Image URL:", data.publicUrl);
+        console.log("Generated image URL:", data.publicUrl);
         
         if (data?.publicUrl) {
           // Test if the image actually exists by trying to load it
@@ -115,25 +122,30 @@ export const useArtikuacijskiTest = () => {
           img.onload = () => {
             setImageUrl(data.publicUrl);
             setImageError(null);
+            setLoading(false);
           };
           img.onerror = () => {
             console.error("Image failed to load:", data.publicUrl);
-            setImageError(`Image file not found: ${word.image_path}`);
+            setImageError(`Image file not found: ${cleanPath}`);
             setImageUrl(null);
+            setLoading(false);
           };
           img.src = data.publicUrl;
         } else {
           console.error("No public URL returned for image");
           setImageError("Failed to generate image URL");
           setImageUrl(null);
+          setLoading(false);
         }
       } catch (error) {
         console.error("Error loading image:", error);
         setImageError("Error loading image");
         setImageUrl(null);
+        setLoading(false);
       }
+    } else {
+      setLoading(false);
     }
-    setLoading(false);
   };
   
   // Navigate to the next word
