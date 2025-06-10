@@ -1,114 +1,107 @@
-import Header from "@/components/Header";
-import { PageHeader } from "@/components/PageHeader";
-import React, { useState, useEffect } from 'react';
-import { useAuth } from "@/contexts/AuthContext";
+
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { useArticulationTest } from "@/hooks/useArticulationTest";
+import { LetterSlider } from "@/components/articulation/LetterSlider";
+import { WordDisplay } from "@/components/articulation/WordDisplay";
+import { TestNavigation } from "@/components/articulation/TestNavigation";
+import { PracticeProgress } from "@/components/articulation/PracticeProgress";
 import { Button } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+import { ArrowLeft } from "lucide-react";
 
 const ArtikuacijskiTest = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [results, setResults] = useState<{ [key: string]: boolean }>({});
-  const [showResults, setShowResults] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isTestStarted, setIsTestStarted] = useState(false);
-  const [currentLetterIndex, setCurrentLetterIndex] = useState(0);
-  const letters = ['r', 's', 'š', 'k'];
+  const {
+    imageUrl,
+    loading,
+    currentLetter,
+    allLetters,
+    overallIndex,
+    totalWords,
+    handleNext,
+    handlePrevious,
+    getCurrentWord,
+    setCurrentLetter
+  } = useArticulationTest();
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!user) {
       navigate("/login");
     }
   }, [user, navigate]);
 
-  const handleResult = (letter: string, isCorrect: boolean) => {
-    setResults(prev => ({ ...prev, [letter]: isCorrect }));
-  };
+  // Calculate current letter progress
+  const currentLetterIndex = allLetters.indexOf(currentLetter);
+  const totalLetters = allLetters.length;
 
-  const startTest = () => {
-    setResults({});
-    setShowResults(false);
-    setIsTestStarted(true);
-    setCurrentLetterIndex(0);
-  };
-
-  const nextLetter = () => {
-    if (currentLetterIndex < letters.length - 1) {
-      setCurrentLetterIndex(currentLetterIndex + 1);
-    } else {
-      setIsTestStarted(false);
-      setShowResults(true);
-    }
-  };
-
-  const currentLetter = letters[currentLetterIndex];
-
-  const getResultText = (letter: string) => {
-    if (results[letter] === undefined) return "Ni odgovora";
-    return results[letter] ? "Pravilno" : "Nepravilno";
-  };
+  // Calculate current word index within the letter group
+  const currentWordIndex = overallIndex % 3 + 1; // Assuming 3 words per letter
+  const totalWordsPerLetter = 3;
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <PageHeader title="Artikulacijski test" backPath="/govorno-jezikovne-vaje" />
-      
-      <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
-        {!isTestStarted && !showResults && (
-          <div className="text-center">
-            <p className="text-muted-foreground mb-8">
-              Ta test bo preveril vašo izgovorjavo glasov R, S, Š in K.
-            </p>
-            <Button onClick={startTest} className="bg-dragon-green hover:bg-dragon-green/90 text-white">
-              Začni test
-            </Button>
-          </div>
-        )}
+    <div className="min-h-screen bg-gradient-to-br from-light-cloud to-white flex flex-col">
+      {/* Header with back button */}
+      <div className="absolute top-4 left-4 z-10">
+        <Button
+          onClick={() => navigate("/govorno-jezikovne-vaje")}
+          variant="ghost"
+          size="icon"
+          className="rounded-full bg-white/80 hover:bg-white shadow-md"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+      </div>
 
-        {isTestStarted && (
-          <div className="text-center">
-            <h2 className="text-2xl font-bold mb-4">Izgovorite črko: {currentLetter}</h2>
-            <div className="flex justify-center gap-4">
-              <Button onClick={() => handleResult(currentLetter, true)} className="bg-dragon-green hover:bg-dragon-green/90 text-white">
-                Pravilno
-              </Button>
-              <Button onClick={() => handleResult(currentLetter, false)} className="bg-app-orange hover:bg-app-orange/90 text-white">
-                Nepravilno
-              </Button>
-            </div>
-            <Button onClick={nextLetter} className="mt-4 bg-app-blue hover:bg-app-blue/90 text-white">
-              Naslednja črka
-            </Button>
-          </div>
-        )}
+      {/* Main content */}
+      <div className="flex-1 flex flex-col justify-center items-center px-4 py-8 max-w-4xl mx-auto w-full">
+        {/* Letter slider */}
+        <div className="w-full mb-6">
+          <LetterSlider
+            letters={allLetters}
+            currentLetter={currentLetter}
+            onLetterChange={setCurrentLetter}
+          />
+        </div>
 
-        {showResults && (
-          <div>
-            <h2 className="text-2xl font-bold mb-4">Rezultati testa:</h2>
-            <ul>
-              {letters.map(letter => (
-                <li key={letter} className="mb-2">
-                  Črka {letter}: {getResultText(letter)}
-                </li>
-              ))}
-            </ul>
-            <Button onClick={() => navigate("/artikulacija")} className="bg-dragon-green hover:bg-dragon-green/90 text-white">
-              Poglej vaje za artikulacijo
-            </Button>
-          </div>
-        )}
+        {/* Progress indicators */}
+        <div className="flex justify-center items-center gap-8 mb-8 text-sm font-medium text-gray-600">
+          <span>Črka {currentLetterIndex + 1} od {totalLetters}</span>
+          <span>Beseda {currentWordIndex} od {totalWordsPerLetter}</span>
+        </div>
+
+        {/* Current word display */}
+        <div className="text-center mb-4">
+          <h1 className="text-4xl md:text-6xl font-bold text-app-purple mb-2 animate-scale-in">
+            {getCurrentWord()}
+          </h1>
+          <p className="text-gray-600">Beseda {overallIndex + 1} od {totalWords}</p>
+        </div>
+
+        {/* Word image display */}
+        <div className="mb-8 w-full max-w-sm">
+          <WordDisplay
+            imageUrl={imageUrl}
+            loading={loading}
+            word={getCurrentWord()}
+          />
+        </div>
+
+        {/* Navigation controls */}
+        <TestNavigation
+          onNext={handleNext}
+          onPrevious={handlePrevious}
+        />
+
+        {/* Overall progress */}
+        <div className="w-full max-w-md mt-8">
+          <PracticeProgress
+            currentWordIndex={overallIndex}
+            totalWords={totalWords}
+            progress={(overallIndex + 1) / totalWords * 100}
+          />
+        </div>
       </div>
     </div>
   );
