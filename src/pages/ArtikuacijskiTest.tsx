@@ -105,29 +105,34 @@ const ArtikuacijskiTest = () => {
               Črka {currentLetter}
             </h2>
             
-            {/* Test content with image and word */}
-            <div className="bg-background/80 backdrop-blur-sm rounded-xl p-6 shadow-md border max-w-md">
+            {/* Image and word content - this is the red-marked area from the screenshot */}
+            <div className="bg-background/80 backdrop-blur-sm rounded-xl p-8 shadow-md border max-w-md mx-auto">
               {loading ? (
-                <div className="flex items-center justify-center h-48">
+                <div className="flex items-center justify-center h-64">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-app-purple"></div>
                 </div>
               ) : imageUrl ? (
-                <div className="space-y-4">
-                  <img 
-                    src={imageUrl} 
-                    alt={getCurrentWord()}
-                    className="w-full h-48 object-cover rounded-lg"
-                    onError={(e) => {
-                      console.error("Error loading image:", e);
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                  <h3 className="text-2xl font-bold text-app-purple">
+                <div className="space-y-6">
+                  {/* Image display - positioned exactly as shown in the red area */}
+                  <div className="w-full h-48 flex items-center justify-center">
+                    <img 
+                      src={imageUrl} 
+                      alt={getCurrentWord()}
+                      className="max-w-full max-h-full object-contain rounded-lg shadow-sm"
+                      onError={(e) => {
+                        console.error("Error loading image:", e);
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Word label directly below the image */}
+                  <h3 className="text-2xl font-bold text-app-purple uppercase tracking-wide">
                     {getCurrentWord()}
                   </h3>
                   
                   {/* Navigation controls */}
-                  <div className="flex justify-between items-center mt-4">
+                  <div className="flex justify-between items-center mt-6">
                     <Button
                       onClick={handlePrevious}
                       variant="outline"
@@ -154,7 +159,7 @@ const ArtikuacijskiTest = () => {
                   </div>
                 </div>
               ) : (
-                <div className="text-center">
+                <div className="text-center h-64 flex items-center justify-center">
                   <p className="text-muted-foreground">
                     Ni podatkov za črko {currentLetter}
                   </p>
