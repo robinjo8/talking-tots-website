@@ -63,20 +63,19 @@ const ArtikuacijskiTest = () => {
           />
         </div>
         
-        {/* Progress display - same style as artikulacija page */}
+        {/* Progress display - matching artikulacija page style */}
         <div className={`flex justify-center ${isMobile ? 'px-4 mb-6' : 'mb-8'}`}>
-          <div className="text-center space-y-1">
-            <div className="flex items-center justify-center gap-3 text-sm md:text-base text-muted-foreground">
-              <span>Črka {currentLetterIndex + 1} od {totalLetters}</span>
-              <span>•</span>
-              <span>Beseda {overallIndex + 1} od {totalWords}</span>
+          <div className="text-center">
+            <div className="text-sm md:text-base text-muted-foreground space-y-1">
+              <p>Črka {currentLetterIndex + 1} od {totalLetters}</p>
+              <p>Beseda {overallIndex + 1} od {totalWords}</p>
             </div>
           </div>
         </div>
         
-        {/* Main content area - using flex-grow for proper centering like artikulacija page */}
-        <div className={`flex-grow flex items-center justify-center ${isMobile ? 'px-4 pb-4' : ''}`}>
-          <div className="text-center space-y-6 w-full max-w-md mx-auto">
+        {/* Main content area - using proper vertical flow like artikulacija */}
+        <div className={`${isMobile ? 'px-4' : ''} mb-8`}>
+          <div className="text-center space-y-8 max-w-md mx-auto">
             {/* Word title */}
             <h2 className="text-3xl md:text-4xl font-bold text-app-purple">
               {getCurrentWord()}
@@ -113,8 +112,8 @@ const ArtikuacijskiTest = () => {
           </div>
         </div>
 
-        {/* Navigation arrows - positioned at bottom like artikulacija page pattern */}
-        <div className="flex items-center justify-center gap-8 mt-8">
+        {/* Navigation arrows - positioned naturally at bottom */}
+        <div className={`flex items-center justify-center gap-8 ${isMobile ? 'px-4' : ''}`}>
           <Button 
             onClick={handlePrevious}
             variant="outline"
