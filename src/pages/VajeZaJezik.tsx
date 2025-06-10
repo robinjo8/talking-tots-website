@@ -3,8 +3,7 @@ import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { PageHeader } from "@/components/PageHeader";
 import { TongueGymGame } from "@/components/games/TongueGymGame";
 
 const VajeZaJezik = () => {
@@ -20,24 +19,9 @@ const VajeZaJezik = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <PageHeader title="Vaje za jezik" backPath="/govorno-jezikovne-vaje" />
       
-      <div className="container max-w-5xl mx-auto pt-32 pb-20 px-4">
-        <div className="flex items-center gap-3 mb-8">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="gap-2" 
-            onClick={() => navigate("/govorno-jezikovne-vaje")}
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Nazaj na vaje
-          </Button>
-          
-          <h1 className="text-2xl font-bold text-foreground">
-            Vaje za jezik
-          </h1>
-        </div>
-        
+      <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
         <p className="text-muted-foreground mb-8">
           Gibalne vaje za jezik, ki pomagajo pri izboljšanju artikulacije in motorike govornih organov.
         </p>
