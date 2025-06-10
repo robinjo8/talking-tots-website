@@ -32,6 +32,8 @@ export const useArtikuacijskiTest = () => {
           return;
         }
 
+        console.log("Fetched artikulacijski_test data:", data);
+
         // Group data by letter
         const groupedData: { letter: string; words: TestWord[] }[] = [];
         const letterMap = new Map<string, TestWord[]>();
@@ -95,15 +97,20 @@ export const useArtikuacijskiTest = () => {
       
       // Load image from Supabase storage
       const word = allLettersData[letterIndex].words[wordIndex];
+      console.log("Loading image for word:", word.word, "from path:", word.image_path);
+      
       try {
-        const { data } = await supabase.storage
+        // Get the public URL for the image
+        const { data } = supabase.storage
           .from('artikulacijski-test')
           .getPublicUrl(word.image_path);
           
-        if (data) {
+        console.log("Image URL:", data.publicUrl);
+        
+        if (data?.publicUrl) {
           setImageUrl(data.publicUrl);
         } else {
-          console.error("No data returned when fetching image URL");
+          console.error("No public URL returned for image");
           setImageUrl(null);
         }
       } catch (error) {
