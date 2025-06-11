@@ -5,9 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 type ChildProfile = {
+  id?: string;
   name: string;
   gender: string;
   avatarId: number;
+  age?: number;
   speechDifficulties?: string[];
 };
 
@@ -24,6 +26,7 @@ type AuthContextType = {
   signOut: () => Promise<void>;
   selectedChildIndex: number | null;
   setSelectedChildIndex: (index: number | null) => void;
+  refreshProfile: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,32 +38,68 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedChildIndex, setSelectedChildIndex] = useState<number | null>(null);
 
+  // Function to fetch user profile and children from database
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      // Fetch user profile from profiles table
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', userId)
+        .single();
+
+      if (profileError && profileError.code !== 'PGRST116') {
+        throw profileError;
+      }
+
+      // Fetch children from children table
+      const { data: childrenData, error: childrenError } = await supabase
+        .from('children')
+        .select('id, name, age, avatar_url')
+        .eq('parent_id', userId)
+        .order('created_at');
+
+      if (childrenError) {
+        throw childrenError;
+      }
+
+      // Convert children data to the expected format
+      const children: ChildProfile[] = childrenData?.map(child => ({
+        id: child.id,
+        name: child.name,
+        gender: 'other', // Default since we don't store gender in DB yet
+        avatarId: child.avatar_url ? parseInt(child.avatar_url) : 1,
+        age: child.age,
+        speechDifficulties: []
+      })) || [];
+
+      setProfile({
+        username: profileData?.username || null,
+        children
+      });
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      // Fallback to user metadata if database query fails
+      setProfile({
+        username: null,
+        children: []
+      });
+    }
+  };
+
+  // Function to refresh profile data
+  const refreshProfile = async () => {
+    if (user) {
+      await fetchUserProfile(user.id);
+    }
+  };
+
   useEffect(() => {
     // Check if there's a selectedChildIndex in localStorage during initialization
     const storedChildIndex = localStorage.getItem('selectedChildIndex');
     if (storedChildIndex) {
       setSelectedChildIndex(parseInt(storedChildIndex));
     }
-
-    const fetchUserProfile = async (userId: string, metadata: any) => {
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('username')
-          .eq('id', userId)
-          .single();
-
-        if (error) throw error;
-        
-        // Combine database profile with user metadata (which contains children)
-        setProfile({
-          username: data.username,
-          children: metadata?.children || []
-        });
-      } catch (error) {
-        console.error("Napaka pri pridobivanju profila:", error);
-      }
-    };
 
     const setData = async () => {
       try {
@@ -73,21 +112,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          fetchUserProfile(session.user.id, session.user.user_metadata);
+          await fetchUserProfile(session.user.id);
         }
       } catch (error) {
-        console.error("Napaka pri pridobivanju seje:", error);
+        console.error("Error getting session:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        fetchUserProfile(session.user.id, session.user.user_metadata);
+        await fetchUserProfile(session.user.id);
       } else {
         setProfile(null);
       }
@@ -136,6 +175,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signOut,
     selectedChildIndex,
     setSelectedChildIndex,
+    refreshProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
