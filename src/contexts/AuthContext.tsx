@@ -5,9 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 type ChildProfile = {
+  id?: string;
   name: string;
   gender: string;
   avatarId: number;
+  age?: number;
   speechDifficulties?: string[];
 };
 
@@ -24,6 +26,7 @@ type AuthContextType = {
   signOut: () => Promise<void>;
   selectedChildIndex: number | null;
   setSelectedChildIndex: (index: number | null) => void;
+  refreshProfile: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,69 +38,137 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedChildIndex, setSelectedChildIndex] = useState<number | null>(null);
 
-  useEffect(() => {
-    // Check if there's a selectedChildIndex in localStorage during initialization
-    const storedChildIndex = localStorage.getItem('selectedChildIndex');
-    if (storedChildIndex) {
-      setSelectedChildIndex(parseInt(storedChildIndex));
-    }
+  // Function to fetch user profile and children from database
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      console.log("Fetching profile for user:", userId);
+      
+      // Fetch user profile from profiles table
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', userId)
+        .single();
 
-    const fetchUserProfile = async (userId: string, metadata: any) => {
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('username')
-          .eq('id', userId)
-          .single();
-
-        if (error) throw error;
-        
-        // Combine database profile with user metadata (which contains children)
-        setProfile({
-          username: data.username,
-          children: metadata?.children || []
-        });
-      } catch (error) {
-        console.error("Napaka pri pridobivanju profila:", error);
+      if (profileError && profileError.code !== 'PGRST116') {
+        console.error("Profile error:", profileError);
+        throw profileError;
       }
-    };
 
-    const setData = async () => {
+      // Fetch children from children table
+      const { data: childrenData, error: childrenError } = await supabase
+        .from('children')
+        .select('id, name, age, avatar_url')
+        .eq('parent_id', userId)
+        .order('created_at');
+
+      if (childrenError) {
+        console.error("Children error:", childrenError);
+        throw childrenError;
+      }
+
+      // Convert children data to the expected format
+      const children: ChildProfile[] = childrenData?.map(child => ({
+        id: child.id,
+        name: child.name,
+        gender: 'other', // Default since we don't store gender in DB yet
+        avatarId: child.avatar_url ? parseInt(child.avatar_url) : 1,
+        age: child.age || undefined,
+        speechDifficulties: []
+      })) || [];
+
+      console.log("Profile loaded:", { username: profileData?.username, childrenCount: children.length });
+
+      setProfile({
+        username: profileData?.username || null,
+        children
+      });
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      // Set a basic profile even if there's an error to prevent infinite loading
+      setProfile({
+        username: null,
+        children: []
+      });
+    }
+  };
+
+  // Function to refresh profile data
+  const refreshProfile = async () => {
+    if (user) {
+      await fetchUserProfile(user.id);
+    }
+  };
+
+  useEffect(() => {
+    let mounted = true;
+
+    const initializeAuth = async () => {
       try {
+        console.log("Initializing auth...");
+        
+        // Check if there's a selectedChildIndex in localStorage during initialization
+        const storedChildIndex = localStorage.getItem('selectedChildIndex');
+        if (storedChildIndex && mounted) {
+          setSelectedChildIndex(parseInt(storedChildIndex));
+        }
+
+        // Get initial session
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
+          console.error("Session error:", error);
           throw error;
         }
         
+        if (mounted) {
+          setSession(session);
+          setUser(session?.user ?? null);
+          
+          if (session?.user) {
+            await fetchUserProfile(session.user.id);
+          } else {
+            setProfile(null);
+          }
+        }
+      } catch (error) {
+        console.error("Error initializing auth:", error);
+        if (mounted) {
+          setProfile(null);
+        }
+      } finally {
+        if (mounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    // Set up auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event);
+      
+      if (mounted) {
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          fetchUserProfile(session.user.id, session.user.user_metadata);
+          // Use setTimeout to avoid blocking the auth state change
+          setTimeout(() => {
+            if (mounted) {
+              fetchUserProfile(session.user.id);
+            }
+          }, 0);
+        } else {
+          setProfile(null);
         }
-      } catch (error) {
-        console.error("Napaka pri pridobivanju seje:", error);
-      } finally {
+        
         setIsLoading(false);
       }
-    };
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        fetchUserProfile(session.user.id, session.user.user_metadata);
-      } else {
-        setProfile(null);
-      }
-      
-      setIsLoading(false);
     });
 
-    setData();
+    initializeAuth();
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
@@ -113,7 +184,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
       
-      // Clear local state regardless of whether there was a session
+      // Clear local state
       setUser(null);
       setSession(null);
       setProfile(null);
@@ -136,6 +207,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signOut,
     selectedChildIndex,
     setSelectedChildIndex,
+    refreshProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
