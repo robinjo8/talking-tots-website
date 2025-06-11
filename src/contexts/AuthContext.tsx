@@ -41,6 +41,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Function to fetch user profile and children from database
   const fetchUserProfile = async (userId: string) => {
     try {
+      console.log("Fetching profile for user:", userId);
+      
       // Fetch user profile from profiles table
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
@@ -49,6 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .single();
 
       if (profileError && profileError.code !== 'PGRST116') {
+        console.error("Profile error:", profileError);
         throw profileError;
       }
 
@@ -60,6 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .order('created_at');
 
       if (childrenError) {
+        console.error("Children error:", childrenError);
         throw childrenError;
       }
 
@@ -69,9 +73,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         name: child.name,
         gender: 'other', // Default since we don't store gender in DB yet
         avatarId: child.avatar_url ? parseInt(child.avatar_url) : 1,
-        age: child.age,
+        age: child.age || undefined,
         speechDifficulties: []
       })) || [];
+
+      console.log("Profile loaded:", { username: profileData?.username, childrenCount: children.length });
 
       setProfile({
         username: profileData?.username || null,
@@ -79,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
     } catch (error) {
       console.error("Error fetching user profile:", error);
-      // Fallback to user metadata if database query fails
+      // Set a basic profile even if there's an error to prevent infinite loading
       setProfile({
         username: null,
         children: []
@@ -95,48 +101,74 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    // Check if there's a selectedChildIndex in localStorage during initialization
-    const storedChildIndex = localStorage.getItem('selectedChildIndex');
-    if (storedChildIndex) {
-      setSelectedChildIndex(parseInt(storedChildIndex));
-    }
+    let mounted = true;
 
-    const setData = async () => {
+    const initializeAuth = async () => {
       try {
+        console.log("Initializing auth...");
+        
+        // Check if there's a selectedChildIndex in localStorage during initialization
+        const storedChildIndex = localStorage.getItem('selectedChildIndex');
+        if (storedChildIndex && mounted) {
+          setSelectedChildIndex(parseInt(storedChildIndex));
+        }
+
+        // Get initial session
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
+          console.error("Session error:", error);
           throw error;
         }
         
+        if (mounted) {
+          setSession(session);
+          setUser(session?.user ?? null);
+          
+          if (session?.user) {
+            await fetchUserProfile(session.user.id);
+          } else {
+            setProfile(null);
+          }
+        }
+      } catch (error) {
+        console.error("Error initializing auth:", error);
+        if (mounted) {
+          setProfile(null);
+        }
+      } finally {
+        if (mounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    // Set up auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event);
+      
+      if (mounted) {
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          await fetchUserProfile(session.user.id);
+          // Use setTimeout to avoid blocking the auth state change
+          setTimeout(() => {
+            if (mounted) {
+              fetchUserProfile(session.user.id);
+            }
+          }, 0);
+        } else {
+          setProfile(null);
         }
-      } catch (error) {
-        console.error("Error getting session:", error);
-      } finally {
+        
         setIsLoading(false);
       }
-    };
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        await fetchUserProfile(session.user.id);
-      } else {
-        setProfile(null);
-      }
-      
-      setIsLoading(false);
     });
 
-    setData();
+    initializeAuth();
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
@@ -152,7 +184,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
       
-      // Clear local state regardless of whether there was a session
+      // Clear local state
       setUser(null);
       setSession(null);
       setProfile(null);
