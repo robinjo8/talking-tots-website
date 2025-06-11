@@ -81,7 +81,6 @@ export function ChildrenProfilesSection({
                     <ChildProfileCard
                       key={child.id || index}
                       child={child}
-                      index={index}
                       isSelected={selectedChildIndex === index}
                       onSelect={() => {
                         setSelectedChildIndex(index);
