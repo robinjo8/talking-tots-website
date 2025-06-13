@@ -120,7 +120,7 @@ export default function Header() {
   const unauthenticatedNavigationLinks = [
     { label: "Namen", path: "#", disabled: true },
     { label: "Cenik", path: "#", disabled: true },
-    { label: "Logopedski kotiček", path: "/logopedski-koticek" }
+    { label: "Logopedski kotiček", path: "/logopedski-koticek", icon: BookOpen }
   ];
 
   // Helper function to check if a path is active
@@ -273,17 +273,17 @@ export default function Header() {
   );
   
   return (
-    <header className="py-5 px-4 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-b border-border/50">
-      <div className="max-w-7xl mx-auto flex justify-between items-center h-12">
+    <header className="py-6 px-4 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-b border-border/50">
+      <div className="max-w-7xl mx-auto flex justify-between items-center h-14">
         <Link to="/" className="flex items-center gap-3">
-          <img 
-            src="/lovable-uploads/ef9acb7f-a16f-4737-ac7b-fe4bc68c21cd.png" 
-            alt="Tomi the Dragon" 
-            className="h-8 w-8"
-          />
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
             <span className="text-2xl font-extrabold text-dragon-green">Tomi</span>
             <span className="text-2xl font-extrabold text-app-orange">Talk</span>
+            <img 
+              src="/lovable-uploads/ef9acb7f-a16f-4737-ac7b-fe4bc68c21cd.png" 
+              alt="Tomi the Dragon" 
+              className="h-8 w-8 ml-1"
+            />
           </div>
         </Link>
         
@@ -310,7 +310,7 @@ export default function Header() {
             {/* Hamburger menu */}
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex items-center ml-auto h-10 w-10">
+                <Button variant="ghost" size="sm" className="flex items-center ml-auto h-12 w-12 rounded-lg">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
@@ -332,9 +332,9 @@ export default function Header() {
                     size="sm"
                     onClick={() => !link.disabled && handleNavigate(link.path)} 
                     disabled={link.disabled}
-                    className={`h-10 px-4 font-medium ${isActivePath(link.path) ? 'bg-accent' : ''}`}
+                    className={`h-12 px-4 font-medium rounded-lg ${isActivePath(link.path) ? 'bg-accent' : ''}`}
                   >
-                    {link.label === "Logopedski kotiček" && <BookOpen className="h-4 w-4 mr-2" />}
+                    {link.icon && <link.icon className="h-4 w-4 mr-2" />}
                     {link.label}
                   </Button>
                 ))}
@@ -353,26 +353,26 @@ export default function Header() {
                     size="sm"
                     onClick={() => !link.disabled && handleNavigate(link.path)} 
                     disabled={link.disabled}
-                    className={`h-10 px-4 font-medium ${isActivePath(link.path) ? 'bg-accent' : ''} ${link.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`h-12 px-4 font-medium rounded-lg ${isActivePath(link.path) ? 'bg-accent' : ''} ${link.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
-                    {link.label === "Logopedski kotiček" && <BookOpen className="h-4 w-4 mr-2" />}
+                    {link.icon && <link.icon className="h-4 w-4 mr-2" />}
                     {link.label}
                   </Button>
                 ))}
                 
                 <div className="flex items-center gap-2 ml-4">
                   {/* Auth buttons */}
-                  <Button onClick={handleStartNow} size="sm" className="h-10 px-6 bg-dragon-green hover:bg-dragon-green/90 text-white font-medium">
+                  <Button onClick={handleStartNow} size="sm" className="h-12 px-6 bg-dragon-green hover:bg-dragon-green/90 text-white font-medium rounded-lg">
                     Začni zdaj
                   </Button>
                   <Link to="/register">
-                    <Button variant="outline" size="sm" className="h-10 px-4 font-medium">
+                    <Button variant="outline" size="sm" className="h-12 px-4 font-medium rounded-lg">
                       <UserPlus className="h-4 w-4 mr-1" />
                       Registracija
                     </Button>
                   </Link>
                   <Link to="/login">
-                    <Button variant="outline" size="sm" className="h-10 px-4 font-medium">
+                    <Button variant="outline" size="sm" className="h-12 px-4 font-medium rounded-lg">
                       Prijava
                     </Button>
                   </Link>
