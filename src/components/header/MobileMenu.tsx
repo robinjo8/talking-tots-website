@@ -7,6 +7,7 @@ import { Check, Users, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import { NavigationLink } from "./types";
+import { getAvatarSrc } from "@/utils/avatarUtils";
 
 interface MobileMenuProps {
   authenticatedLinks: NavigationLink[];
