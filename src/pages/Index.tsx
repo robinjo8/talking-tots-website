@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -42,9 +43,11 @@ const Index = () => {
     quote: "Z govornimi vajami se je mojemu otroku odprlo tudi na drugih področjih in ni več tako zaprt.",
     author: "— Peter, oče 6-letnika"
   }];
+  
   useEffect(() => {
     setIsVisible(true);
   }, []);
+  
   const handleStartNow = () => {
     // If not logged in, redirect to login page
     if (!user) {
@@ -61,6 +64,7 @@ const Index = () => {
       setShowChildSelector(true);
     }
   };
+  
   const scrollToFeatures = () => {
     const featuresSection = document.getElementById('features');
     if (featuresSection) {
@@ -69,19 +73,20 @@ const Index = () => {
       });
     }
   };
-  return <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden">
+  
+  return <div className="min-h-screen w-full">
       <Header />
       
-      {/* Hero Section - Centered layout without dragon */}
-      <section className="pt-16 md:pt-28 pb-10 md:pb-16 px-4 relative w-full md:px-[40px] py-[100px]">
+      {/* Hero Section - Properly centered layout */}
+      <section className="pt-16 md:pt-28 pb-10 md:pb-16 px-4 md:px-6 lg:px-8 relative w-full">
         <div className="absolute -top-10 -left-10 w-32 h-32 bg-app-yellow/20 rounded-full blur-3xl"></div>
         <div className="absolute top-40 -right-10 w-60 h-60 bg-app-blue/20 rounded-full blur-3xl"></div>
         
         <div className="max-w-6xl mx-auto">
           {/* Mobile Layout - Centered */}
-          {isMobile && <div className={`flex flex-col items-center text-center space-y-6 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
+          {isMobile && <div className={`flex flex-col items-center text-center space-y-6 px-2 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
               {/* Main Headlines - Centered */}
-              <div className="mb-4">
+              <div className="mb-4 w-full">
                 <h1 className="text-3xl leading-tight font-bold mb-4">
                   <span className="block text-neutral-950">Odpravite govorne težave brez čakanja –</span>
                   <span className="block text-dragon-green mt-2">
@@ -94,7 +99,7 @@ const Index = () => {
               </div>
               
               {/* Action Buttons */}
-              <div className="flex flex-col items-center gap-3 mb-6 w-full max-w-xs">
+              <div className="flex flex-col items-center gap-3 mb-6 w-full max-w-xs mx-auto">
                 <Button size="lg" onClick={handleStartNow} className="w-full h-12 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold">
                   <Play className="h-4 w-4" />
                   Začni zdaj
@@ -112,8 +117,8 @@ const Index = () => {
                 </div>
               </div>
               
-              {/* Trust Badges - Horizontal row with circular icons */}
-              <div className="flex justify-center gap-8 mb-6 py-[20px]">
+              {/* Trust Badges - Properly centered */}
+              <div className="flex justify-center gap-6 mb-6 py-5 w-full">
                 <div className="flex flex-col items-center text-center">
                   <div className="w-16 h-16 mb-2 rounded-full bg-gradient-to-br from-dragon-green to-app-teal flex items-center justify-center shadow-lg border-2 border-white">
                     <CheckCircle className="h-8 w-8 text-white" />
@@ -135,7 +140,7 @@ const Index = () => {
               </div>
             </div>}
           
-          {/* Desktop Layout - Centered content */}
+          {/* Desktop Layout - Properly centered content */}
           {!isMobile && <>
               <div className="relative flex flex-col items-center justify-center text-center">
                 {/* Main Headline - Centered */}
@@ -198,7 +203,7 @@ const Index = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-16 px-4 md:px-10 bg-light-cloud w-full">
+      <section className="py-16 px-4 md:px-6 lg:px-8 bg-light-cloud w-full">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">Kaj o TomiTalk pravijo starši?</h2>
@@ -239,7 +244,7 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 px-4 md:px-10 bg-light-cloud w-full overflow-x-hidden">
+      <section id="features" className="py-20 px-4 md:px-6 lg:px-8 bg-light-cloud w-full">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Kako TomiTalk deluje?</h2>
@@ -253,14 +258,14 @@ const Index = () => {
       </section>
       
       {/* Call to Action with Dragon */}
-      <section id="cta" className="py-20 px-4 md:px-10 relative overflow-hidden w-full">
+      <section id="cta" className="py-20 px-4 md:px-6 lg:px-8 relative overflow-hidden w-full">
         <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-app-teal/20 rounded-full blur-3xl"></div>
         <div className="absolute -top-10 -right-10 w-40 h-40 bg-app-orange/20 rounded-full blur-3xl"></div>
         
         <div className="max-w-6xl mx-auto relative z-10">
           {/* Mobile Layout with Dragon */}
           {isMobile && (
-            <div className="bg-white shadow-xl rounded-3xl p-8 text-center relative overflow-hidden">
+            <div className="bg-white shadow-xl rounded-3xl p-8 text-center relative overflow-hidden mx-auto">
               <h2 className="text-3xl font-bold mb-4">Ste pripravljeni na govorno avanturo?</h2>
               <p className="text-xl text-muted-foreground mb-8">
                 Prenesite Tomi Talk danes in opazujte, kako komunikacijske veščine vašega otroka cvetijo!
@@ -321,7 +326,7 @@ const Index = () => {
       </section>
       
       {/* Footer */}
-      <footer className="py-10 px-4 md:px-10 bg-light-cloud w-full">
+      <footer className="py-10 px-4 md:px-6 lg:px-8 bg-light-cloud w-full">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center gap-2 mb-4 md:mb-0">
             <span className="text-xl font-extrabold text-dragon-green">Tomi</span>
