@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import FeatureCard from "@/components/FeatureCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Mic, Play, Book, Stars, MessageSquare, Zap, Volume2, Award, CheckCircle, Shield, Users, CirclePlay, Info, PiggyBank, ArrowUp, Check } from "lucide-react";
+import { Mic, Play, Book, Stars, MessageSquare, Zap, Volume2, Award, CheckCircle, Shield, Users, CirclePlay, Info, PiggyBank, ArrowUp, Check, Target, BarChart2, Gamepad2, Trophy, Video, LineChart, Sparkles } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SelectChildDialog } from "@/components/SelectChildDialog";
@@ -43,55 +43,47 @@ const Index = () => {
     author: "— Peter, oče 6-letnika"
   }];
 
-  // Pricing packages data
+  // Updated pricing packages to match subscription data
   const pricingPackages = [
     {
-      name: "Osnovni",
-      price: "9,99",
+      name: "Mesečna naročnina",
+      price: "19,90",
       period: "mesec",
-      description: "Popolno za začetek",
+      description: "Brez dolgoročne obveznosti",
       features: [
-        "Dostop do osnovnih govornih vaj",
-        "1 otroški profil",
-        "Napredek beleženja",
-        "Osnovne govorne igre",
-        "Email podpora"
+        "Govorne vaje (po črkah)",
+        "Govorno jezikovne vaje", 
+        "Govorne igre",
+        "Izzivi za dodatno izboljšanje govora",
+        "Video navodila logopeda",
+        "Snemanje in primerjava z AI",
+        "Sledenje napredku",
+        "2 otroka vključena (v osnovi)",
+        "Motivacija z zmajčkom Tomijem"
       ],
       recommended: false,
-      buttonText: "Začni zdaj"
+      buttonText: "Izberi mesečno naročnino"
     },
     {
-      name: "Premium",
-      price: "19,99",
+      name: "Letna naročnina",
+      price: "9,90",
       period: "mesec",
-      description: "Najboljši izbor za družine",
+      description: "Priporočeno - Prihrani več kot 50%",
+      originalPrice: "19,90",
       features: [
-        "Dostop do vseh govornih vaj",
-        "Neomejeno otroških profilov",
-        "Napredna analitika napredka",
-        "Vse govorne igre",
-        "Video navodila",
-        "Personalizirane vaje",
-        "Prednostna podpora"
+        "Govorne vaje (po črkah)",
+        "Govorno jezikovne vaje",
+        "Govorne igre", 
+        "Izzivi za dodatno izboljšanje govora",
+        "Video navodila logopeda",
+        "Snemanje in primerjava z AI",
+        "Sledenje napredku",
+        "2 otroka vključena (v osnovi)",
+        "Motivacija z zmajčkom Tomijem",
+        "Enkratno letno plačilo"
       ],
       recommended: true,
-      buttonText: "Izberi Premium"
-    },
-    {
-      name: "Letni Premium",
-      price: "199,99",
-      period: "leto",
-      description: "Prihrani 17% z letno naročnino",
-      originalPrice: "239,88",
-      features: [
-        "Vse iz Premium paketa",
-        "Prihranek 17%",
-        "Brezplačne posodobitve",
-        "Dodatni avatarji",
-        "Razširjena podpora"
-      ],
-      recommended: false,
-      buttonText: "Izberi letno"
+      buttonText: "Izberi letno naročnino"
     }
   ];
   
@@ -321,13 +313,13 @@ const Index = () => {
       <section id="pricing" className="py-20 px-4 md:px-10 bg-white w-full">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Izberite svoj paket</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Naročniški paketi</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Transparentno cenovanje brez skritih stroškov. Začnite z osnovnim paketom ali izberite premium za popolno izkušnjo.
+              Transparentno cenovanje brez skritih stroškov. Izberite paket, ki vam najbolj ustreza.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {pricingPackages.map((pkg, index) => (
               <div 
                 key={index} 
@@ -387,7 +379,7 @@ const Index = () => {
           
           <div className="text-center mt-12">
             <p className="text-gray-600 mb-4">
-              Vsi paketi vključujejo 7-dnevno brezplačno preizkusno obdobje
+              Vsak dodatni otrok: +3,90 € / mesec
             </p>
             <p className="text-sm text-gray-500">
               Naročnino lahko kadarkoli prekličete brez dodatnih stroškov

@@ -44,8 +44,8 @@ export function DesktopNavigation({
     <nav className="hidden lg:flex items-center gap-2">
       {user ? (
         <>
-          {/* Desktop Navigation Links for authenticated users - show first 3 */}
-          {authenticatedLinks.slice(0, 3).map((link, index) => (
+          {/* Desktop Navigation Links for authenticated users - show first 7 main navigation items */}
+          {authenticatedLinks.slice(0, 7).map((link, index) => (
             <Button 
               key={index} 
               variant="ghost" 

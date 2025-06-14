@@ -14,17 +14,12 @@ export const authenticatedNavigationLinks: NavigationLink[] = [
     icon: Euro
   },
   {
-    label: "Moja stran",
-    path: "/moja-stran",
-    icon: Home
-  },
-  {
     label: "Vaje",
     path: "/govorno-jezikovne-vaje",
     icon: Activity
   },
   {
-    label: "Govorne igre",
+    label: "Igre",
     path: "/govorne-igre",
     icon: Gamepad
   },
@@ -37,6 +32,11 @@ export const authenticatedNavigationLinks: NavigationLink[] = [
     label: "Logopedski kotiček",
     path: "/logopedski-koticek",
     icon: BookOpen
+  },
+  {
+    label: "Moja stran",
+    path: "/moja-stran",
+    icon: Home
   },
   {
     label: "Obvestila",
