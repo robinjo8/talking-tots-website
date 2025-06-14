@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
+// Define the interface for a subscription plan
 interface SubscriptionPlan {
   id: string;
   name: string;
@@ -20,13 +21,24 @@ export function PricingSection() {
   useEffect(() => {
     async function fetchPlans() {
       setLoading(true);
-      // Replace 'subscription_plans' with your actual table name and columns
+      // Query using any type fallback, since "subscription_plans" doesn't exist in supabase types
       const { data, error } = await supabase
-        .from("subscription_plans")
-        .select("id,name,price,description,features,order_index")
+        .from("subscription_plans" as any)
+        .select("*")
         .order("order_index", { ascending: true });
-      if (!error && data) {
-        setPlans(data as SubscriptionPlan[]);
+
+      if (!error && Array.isArray(data)) {
+        // Robustly decode features as array
+        setPlans(
+          data.map((item: any) => ({
+            id: String(item.id),
+            name: String(item.name),
+            price: String(item.price),
+            description: String(item.description),
+            features: Array.isArray(item.features) ? item.features : null,
+            order_index: item.order_index,
+          }))
+        );
       }
       setLoading(false);
     }
@@ -47,10 +59,11 @@ export function PricingSection() {
       {loading ? (
         <div className="text-center py-10 text-muted-foreground">Nalaganje cenikov...</div>
       ) : (
-        <div className="flex flex-row gap-4 justify-center items-stretch max-w-md mx-auto
-          [&>*]:flex-1
-          md:max-w-2xl
-        ">
+        <div
+          className="flex flex-row gap-4 justify-center items-stretch max-w-md mx-auto
+            [&>*]:flex-1
+            md:max-w-2xl"
+        >
           {plans.map((pkg) => (
             <Card
               key={pkg.id}
@@ -66,8 +79,8 @@ export function PricingSection() {
                 <div className="text-xs md:text-sm text-muted-foreground mb-2 text-center">{pkg.description}</div>
                 {pkg.features && pkg.features.length > 0 && (
                   <ul className="mb-3 w-full px-3 md:px-0">
-                    {pkg.features.map((f) => (
-                      <li key={f} className="text-[12px] md:text-base text-gray-800 mb-1 flex items-center">
+                    {pkg.features.map((f, i) => (
+                      <li key={f + i} className="text-[12px] md:text-base text-gray-800 mb-1 flex items-center">
                         <span className="inline-block w-2 h-2 bg-dragon-green rounded-full mr-2" /> {f}
                       </li>
                     ))}
@@ -86,4 +99,3 @@ export function PricingSection() {
 }
 
 export default PricingSection;
-
