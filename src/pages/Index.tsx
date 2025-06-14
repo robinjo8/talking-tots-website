@@ -23,25 +23,27 @@ const Index = () => {
   const navigate = useNavigate();
 
   // Testimonials data with the new addition
-  const testimonials = [{
-    quote: "Moj sin je imel težave z izgovorjavo črke R. Po enem mesecu vaj z zmajčkom Tomijem jo izgovarja brez težav! Toplo priporočam!",
-    author: "— Tanja, mama 6-letnika"
-  }, {
-    quote: "Končno nekaj, kar je narejeno za slovenske otroke! Govorne vaje so zabavne in hčerka komaj čaka, da jih dela vsak dan.",
-    author: "— Mateja, mama 5-letnice"
-  }, {
-    quote: "Čakalna doba za logopeda je bila več kot pol leta. TomiTalk nama je pomagal takoj. Napredek je očiten že po 10 dneh.",
-    author: "— Andrej, oče 4-letnika"
-  }, {
-    quote: "Najbolj všeč mi je, da lahko dodam oba otroka in vsak ima svoj profil. Vaje so res prilagojene posamezniku.",
-    author: "— Nina, mama 3- in 7-letnika"
-  }, {
-    quote: "Z aplikacijo smo govorjenje spremenili v igro. Sin se smeje, vadi in napreduje – brez joka in pregovarjanja.",
-    author: "— Maja, mama 5-letnika"
-  }, {
-    quote: "Z govornimi vajami se je mojemu otroku odprlo tudi na drugih področjih in ni več tako zaprt.",
-    author: "— Peter, oče 6-letnika"
-  }];
+  const testimonials = [
+    {
+      quote: "Moj sin je imel težave z izgovorjavo črke R. Po enem mesecu vaj z zmajčkom Tomijem jo izgovarja brez težav! Toplo priporočam!",
+      author: "— Tanja, mama 6-letnika"
+    }, {
+      quote: "Končno nekaj, kar je narejeno za slovenske otroke! Govorne vaje so zabavne in hčerka komaj čaka, da jih dela vsak dan.",
+      author: "— Mateja, mama 5-letnice"
+    }, {
+      quote: "Čakalna doba za logopeda je bila več kot pol leta. TomiTalk nama je pomagal takoj. Napredek je očiten že po 10 dneh.",
+      author: "— Andrej, oče 4-letnika"
+    }, {
+      quote: "Najbolj všeč mi je, da lahko dodam oba otroka in vsak ima svoj profil. Vaje so res prilagojene posamezniku.",
+      author: "— Nina, mama 3- in 7-letnika"
+    }, {
+      quote: "Z aplikacijo smo govorjenje spremenili v igro. Sin se smeje, vadi in napreduje – brez joka in pregovarjanja.",
+      author: "— Maja, mama 5-letnika"
+    }, {
+      quote: "Z govornimi vajami se je mojemu otroku odprlo tudi na drugih področjih in ni več tako zaprt.",
+      author: "— Peter, oče 6-letnika"
+    }
+  ];
 
   // Updated pricing packages to match subscription data
   const pricingPackages = [
@@ -129,19 +131,19 @@ const Index = () => {
   return <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden">
       <Header />
       
-      {/* Hero Section - Improved mobile layout */}
-      <section id="purpose" className="pt-16 md:pt-32 pb-16 md:pb-24 px-4 relative w-full">
+      {/* Hero Section - Fixed mobile layout with proper spacing */}
+      <section id="purpose" className="pt-20 md:pt-32 pb-16 md:pb-24 px-4 relative w-full">
         <div className="absolute -top-10 -left-10 w-32 h-32 bg-app-yellow/20 rounded-full blur-3xl"></div>
         <div className="absolute top-40 -right-10 w-60 h-60 bg-app-blue/20 rounded-full blur-3xl"></div>
         
         <div className="max-w-6xl mx-auto">
-          {/* Mobile Layout - Improved spacing and visibility */}
-          {isMobile && <div className={`flex flex-col items-center text-center space-y-6 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
-              {/* Main Headlines - Better mobile spacing */}
-              <div className="mb-4 px-2">
-                <h1 className="text-2xl sm:text-3xl leading-tight font-bold mb-4">
-                  <span className="block text-neutral-950">Odpravite govorne težave brez čakanja –</span>
-                  <span className="block text-dragon-green mt-2">
+          {/* Mobile Layout - Fixed visibility and spacing */}
+          {isMobile && <div className={`flex flex-col items-center text-center space-y-6 min-h-[80vh] justify-center ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
+              {/* Main Headlines - Improved mobile visibility and spacing */}
+              <div className="mb-6 px-4 w-full">
+                <h1 className="text-2xl sm:text-3xl leading-[1.2] font-bold mb-6">
+                  <span className="block text-neutral-950 mb-3">Odpravite govorne težave brez čakanja –</span>
+                  <span className="block text-dragon-green">
                     s pomočjo pametnega AI pomočnika!
                   </span>
                 </h1>
@@ -151,7 +153,7 @@ const Index = () => {
               </div>
               
               {/* Action Buttons - Improved mobile layout */}
-              <div className="flex flex-col items-center gap-3 mb-6 w-full max-w-sm px-4">
+              <div className="flex flex-col items-center gap-4 mb-8 w-full max-w-sm px-4">
                 <Button size="lg" onClick={handleStartNow} className="w-full h-12 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold">
                   <Play className="h-4 w-4" />
                   Začni zdaj
@@ -170,7 +172,7 @@ const Index = () => {
               </div>
               
               {/* Trust Badges - Improved mobile spacing */}
-              <div className="flex justify-center gap-6 py-2">
+              <div className="flex justify-center gap-6 py-4">
                 <div className="flex flex-col items-center text-center">
                   <div className="w-14 h-14 mb-2 rounded-full bg-gradient-to-br from-dragon-green to-app-teal flex items-center justify-center shadow-lg border-2 border-white">
                     <CheckCircle className="h-7 w-7 text-white" />
@@ -309,7 +311,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Pricing Section - Improved mobile layout */}
+      {/* Pricing Section - Fixed mobile layout */}
       <section id="pricing" className="py-16 md:py-20 px-4 md:px-10 bg-white w-full">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12 md:mb-16">
@@ -319,14 +321,14 @@ const Index = () => {
             </p>
           </div>
           
-          {/* Mobile: 2 cards side by side, Desktop: centered 2 cards */}
-          <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-8 max-w-4xl mx-auto">
+          {/* Mobile and Desktop: 2 cards side by side - Fixed mobile spacing */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8 max-w-5xl mx-auto">
             {pricingPackages.map((pkg, index) => (
               <div 
                 key={index} 
-                className={`relative bg-white rounded-xl md:rounded-2xl shadow-lg border-2 p-3 md:p-8 ${
+                className={`relative bg-white rounded-xl md:rounded-2xl shadow-lg border-2 p-4 md:p-8 ${
                   pkg.recommended 
-                    ? 'border-dragon-green md:scale-105 md:md:scale-110' 
+                    ? 'border-dragon-green md:scale-105' 
                     : 'border-gray-200'
                 } transition-all duration-300 hover:shadow-xl`}
               >
@@ -339,7 +341,7 @@ const Index = () => {
                 )}
                 
                 <div className="text-center mb-4 md:mb-8">
-                  <h3 className="text-sm md:text-2xl font-bold mb-2">{pkg.name}</h3>
+                  <h3 className="text-base md:text-2xl font-bold mb-2">{pkg.name}</h3>
                   <p className="text-xs md:text-base text-gray-600 mb-2 md:mb-4 leading-tight">{pkg.description}</p>
                   
                   <div className="mb-2 md:mb-4">
@@ -348,17 +350,17 @@ const Index = () => {
                         €{pkg.originalPrice}
                       </span>
                     )}
-                    <span className="text-xl md:text-4xl font-bold text-gray-900">
+                    <span className="text-2xl md:text-4xl font-bold text-gray-900">
                       €{pkg.price}
                     </span>
                     <span className="text-xs md:text-base text-gray-600">/{pkg.period}</span>
                   </div>
                 </div>
                 
-                <ul className="space-y-1 md:space-y-4 mb-4 md:mb-8">
+                <ul className="space-y-2 md:space-y-4 mb-4 md:mb-8">
                   {pkg.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-start gap-1 md:gap-3">
-                      <Check className="h-3 w-3 md:h-5 md:w-5 text-dragon-green mt-0.5 flex-shrink-0" />
+                    <li key={featureIndex} className="flex items-start gap-2 md:gap-3">
+                      <Check className="h-4 w-4 md:h-5 md:w-5 text-dragon-green mt-0.5 flex-shrink-0" />
                       <span className="text-xs md:text-base text-gray-700 leading-tight">{feature}</span>
                     </li>
                   ))}
@@ -395,7 +397,7 @@ const Index = () => {
         <div className="absolute -top-10 -right-10 w-40 h-40 bg-app-orange/20 rounded-full blur-3xl"></div>
         
         <div className="max-w-6xl mx-auto relative z-10">
-          {/* Mobile Layout with Dragon - better visibility */}
+          {/* Mobile Layout with Dragon - Fixed dragon visibility */}
           {isMobile && (
             <div className="bg-white shadow-xl rounded-2xl md:rounded-3xl p-6 md:p-8 text-center relative overflow-hidden">
               <h2 className="text-2xl md:text-3xl font-bold mb-3 md:mb-4">Ste pripravljeni na govorno avanturo?</h2>
@@ -403,11 +405,11 @@ const Index = () => {
                 Prenesite Tomi Talk danes in opazujte, kako komunikacijske veščine vašega otroka cvetijo!
               </p>
               
-              {/* Dragon for mobile - improved sizing and visibility */}
-              <div className="relative w-40 h-40 md:w-48 md:h-48 mx-auto mb-4 md:mb-6">
+              {/* Dragon for mobile - Fixed sizing and full visibility */}
+              <div className="relative w-48 h-48 mx-auto mb-6">
                 <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
                 <div className="animate-float relative">
-                  <img alt="Tomi Talk Dragon Mascot" className="w-full h-full object-contain" src="/lovable-uploads/afbdd309-0550-437a-9afc-966c9a811062.png" />
+                  <img alt="Tomi Talk Dragon Mascot" className="w-full h-full object-contain drop-shadow-lg" src="/lovable-uploads/afbdd309-0550-437a-9afc-966c9a811062.png" />
                 </div>
               </div>
               
