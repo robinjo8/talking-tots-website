@@ -36,7 +36,7 @@ export function PricingSection() {
       <div className="max-w-3xl mx-auto text-center mb-10">
         <h2 className="text-3xl md:text-4xl font-bold mb-2">Cenik</h2>
         <p className="text-lg text-muted-foreground">
-          Enostavna, pregledna in prilagodljiva naročnina za vašo družino.
+          Naši paketi so zasnovani posebej za starše in njihove otroke. Izberite paket, ki vam najbolj ustreza.
         </p>
       </div>
       
