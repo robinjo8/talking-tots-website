@@ -85,13 +85,13 @@ export function ProgressComparisonSection() {
       }}
     >
       <div className="max-w-7xl mx-auto md:rounded-3xl bg-white shadow-md px-4 md:px-8 py-8 md:py-14 relative overflow-hidden border border-green-200">
-        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#212121] mb-12 text-center">
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#212121] mb-8 text-center">
           <span className="font-bold text-dragon-green">3× hitrejši</span>{" "}
           <span className="text-app-orange">napredek z aplikacijo Tomi Talk</span>
         </h2>
 
         {/* Full-width graph container */}
-        <div ref={containerRef} className="w-full relative mb-8">
+        <div ref={containerRef} className="w-full relative mb-6">
           <svg
             className="w-full"
             width={dimensions.width}
@@ -115,11 +115,11 @@ export function ProgressComparisonSection() {
               </linearGradient>
               
               <filter id="glow">
-                <fegaussianblur stdDeviation="3" result="coloredBlur"/>
-                <femerge> 
-                  <femergenode in="coloredBlur"/>
-                  <femergenode in="SourceGraphic"/>
-                </femerge>
+                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                <feMerge> 
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
               </filter>
             </defs>
             
@@ -246,6 +246,48 @@ export function ProgressComparisonSection() {
               </g>
             )}
             
+            {/* TomiTalk Dragon Mascot - appears in the middle */}
+            {curveProgress > 0.6 && (
+              <g>
+                <foreignObject 
+                  x={dimensions.width / 2 - 30} 
+                  y={dimensions.height / 2 - 40} 
+                  width="60" 
+                  height="60"
+                  className="animate-bounce"
+                >
+                  <img
+                    src="/lovable-uploads/afbdd309-0550-437a-9afc-966c9a811062.png"
+                    alt="TomiTalk Dragon"
+                    className="w-full h-full object-contain"
+                  />
+                </foreignObject>
+                {/* Speech bubble */}
+                <g>
+                  <ellipse
+                    cx={dimensions.width / 2 + 40}
+                    cy={dimensions.height / 2 - 50}
+                    rx="25"
+                    ry="15"
+                    fill="white"
+                    stroke="#4CAF50"
+                    strokeWidth="2"
+                    className="animate-pulse"
+                  />
+                  <text
+                    x={dimensions.width / 2 + 40}
+                    y={dimensions.height / 2 - 45}
+                    textAnchor="middle"
+                    fontSize="12"
+                    fontWeight="bold"
+                    fill="#4CAF50"
+                  >
+                    Bravo!
+                  </text>
+                </g>
+              </g>
+            )}
+            
             {/* Progress indicators */}
             <g fontSize="12" fontWeight="600" fill="#666">
               {/* Traditional system label */}
@@ -263,33 +305,58 @@ export function ProgressComparisonSection() {
           </svg>
         </div>
 
-        {/* Bottom section with comparison */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mt-8">
-          {/* Left - Traditional System */}
-          <div className="flex flex-col items-center md:items-start">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="bg-orange-100 rounded-full p-2.5">
-                <Clock size={28} className="text-app-orange" />
-              </span>
-              <span className="text-lg font-bold text-gray-700">Javni sistem</span>
+        {/* Bottom section with system comparison and mascot */}
+        <div className="flex flex-col items-center gap-6 mt-6">
+          {/* System Headers */}
+          <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 text-center">
+            <div className="text-2xl md:text-3xl font-bold text-app-orange tracking-wide">
+              JAVNI SISTEM
             </div>
-            <div className="text-3xl md:text-4xl font-extrabold text-app-orange mb-1">+6 mesecev</div>
-            <div className="text-sm text-gray-500 font-medium text-center md:text-left max-w-[200px]">
-              Povprečen čas do prve obravnave v javnem zdravstvu
+            <div className="text-2xl md:text-3xl font-extrabold">
+              <span className="text-dragon-green">Tomi</span>
+              <span className="text-app-orange">Talk</span>
             </div>
           </div>
 
-          {/* Right - Tomi Talk */}
-          <div className="flex flex-col items-center md:items-end">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="bg-green-100 rounded-full p-2.5">
-                <Rocket size={28} className="text-dragon-green" />
-              </span>
-              <span className="text-lg font-bold text-gray-700">Tomi Talk</span>
+          {/* Dragon Mascot - centered */}
+          <div className="relative w-20 h-20 md:w-24 md:h-24">
+            <div className="animate-float">
+              <img
+                alt="TomiTalk Dragon Mascot"
+                className="w-full h-full object-contain"
+                src="/lovable-uploads/afbdd309-0550-437a-9afc-966c9a811062.png"
+              />
             </div>
-            <div className="text-3xl md:text-4xl font-extrabold text-dragon-green mb-1">Takoj</div>
-            <div className="text-sm text-gray-500 font-medium text-center md:text-right max-w-[200px]">
-              Govorne vaje na voljo takoj – brez čakanja
+          </div>
+
+          {/* Comparison descriptions */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 md:gap-12 w-full max-w-5xl">
+            {/* Left - Traditional System */}
+            <div className="flex flex-col items-center md:items-start flex-1">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="bg-orange-100 rounded-full p-2.5">
+                  <Clock size={28} className="text-app-orange" />
+                </span>
+                <span className="text-lg font-bold text-gray-700">Javni sistem</span>
+              </div>
+              <div className="text-3xl md:text-4xl font-extrabold text-app-orange mb-2">+6 mesecev</div>
+              <div className="text-sm md:text-base text-gray-600 font-medium text-center md:text-left">
+                Povprečno čakanje na logopeda v javnem zdravstvu
+              </div>
+            </div>
+
+            {/* Right - Tomi Talk */}
+            <div className="flex flex-col items-center md:items-end flex-1">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="bg-green-100 rounded-full p-2.5">
+                  <Rocket size={28} className="text-dragon-green" />
+                </span>
+                <span className="text-lg font-bold text-gray-700">Tomi Talk</span>
+              </div>
+              <div className="text-3xl md:text-4xl font-extrabold text-dragon-green mb-2">Takoj</div>
+              <div className="text-sm md:text-base text-gray-600 font-medium text-center md:text-right">
+                Govorne vaje brez čakalnih vrst – dostopne takoj z aplikacijo Tomi Talk
+              </div>
             </div>
           </div>
         </div>
