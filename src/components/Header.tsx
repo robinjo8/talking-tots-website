@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -54,6 +53,25 @@ export default function Header() {
       navigate("/profile");
     }
   };
+
+  // --- NEW: Cenik scroll handler ---
+  const handleCenikScroll = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    const cenikSection = document.getElementById("cenik");
+    if (cenikSection) {
+      cenikSection.scrollIntoView({ behavior: "smooth" });
+    } else {
+      // fallback: navigate to homepage and scroll after.
+      navigate("/", { replace: true });
+      setTimeout(() => {
+        const cenikSectionRetry = document.getElementById("cenik");
+        if (cenikSectionRetry) {
+          cenikSectionRetry.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 300);
+    }
+  };
+  // --- END NEW ---
 
   // Function to get child avatar source based on avatarId
   const getAvatarSrc = (avatarId: number): string => {
@@ -335,7 +353,22 @@ export default function Header() {
                 </div>
               </>
             ) : (
+              // --------- LOGGED OUT: Display "Logopedski kotiček" and Cenik ---------
               <div className="flex items-center gap-3">
+                <Button
+                  asChild
+                  variant="ghost"
+                  className="font-semibold px-4"
+                >
+                  <Link to="/logopedski-koticek">Logopedski kotiček</Link>
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="font-semibold px-4"
+                  onClick={handleCenikScroll}
+                >
+                  Cenik
+                </Button>
                 {/* New orange "Začni zdaj" button */}
                 <Button onClick={handleStartNow} size="sm" className="w-full sm:w-auto bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full min-w-[180px]">
                   Začni zdaj
