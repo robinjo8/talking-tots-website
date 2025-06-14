@@ -79,29 +79,19 @@ export function ProgressComparisonSection() {
 
   return (
     <section
-      className="w-full py-12 md:py-16 px-4 bg-light-cloud transition-colors duration-500"
+      className="w-full py-12 md:py-20 px-4 bg-light-cloud transition-colors duration-500"
       style={{
         fontFamily: "Nunito, sans-serif",
       }}
     >
-      <div className="max-w-7xl mx-auto md:rounded-3xl bg-white shadow-md px-4 md:px-8 py-8 md:py-12 relative overflow-hidden border border-green-200">
-        {/* Header Section */}
-        <div className="text-center mb-8">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-gray-800 mb-4 tracking-wider">
-            JAVNI SISTEM
-          </h2>
-          <div className="text-2xl md:text-3xl lg:text-4xl font-bold mb-6">
-            <span className="text-gray-600">vs</span>{" "}
-            <span className="font-bold text-dragon-green">Tomi Talk</span>
-          </div>
-          <p className="text-lg md:text-xl font-semibold text-gray-700">
-            <span className="font-bold text-dragon-green">3× hitrejši</span>{" "}
-            <span className="text-app-orange">napredek z aplikacijo Tomi Talk</span>
-          </p>
-        </div>
+      <div className="max-w-7xl mx-auto md:rounded-3xl bg-white shadow-md px-4 md:px-8 py-8 md:py-14 relative overflow-hidden border border-green-200">
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#212121] mb-12 text-center">
+          <span className="font-bold text-dragon-green">3× hitrejši</span>{" "}
+          <span className="text-app-orange">napredek z aplikacijo Tomi Talk</span>
+        </h2>
 
-        {/* Graph container */}
-        <div ref={containerRef} className="w-full relative mb-6">
+        {/* Full-width graph container */}
+        <div ref={containerRef} className="w-full relative mb-8">
           <svg
             className="w-full"
             width={dimensions.width}
@@ -125,11 +115,11 @@ export function ProgressComparisonSection() {
               </linearGradient>
               
               <filter id="glow">
-                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                <feMerge> 
-                  <feMergeNode in="coloredBlur"/>
-                  <feMergeNode in="SourceGraphic"/>
-                </feMerge>
+                <fegaussianblur stdDeviation="3" result="coloredBlur"/>
+                <femerge> 
+                  <femergenode in="coloredBlur"/>
+                  <femergenode in="SourceGraphic"/>
+                </femerge>
               </filter>
             </defs>
             
@@ -235,47 +225,6 @@ export function ProgressComparisonSection() {
               </foreignObject>
             </g>
             
-            {/* TomiTalk Dragon Mascot - appears in the middle */}
-            {curveProgress > 0.6 && (
-              <g>
-                <foreignObject 
-                  x={dimensions.width / 2 - 40} 
-                  y={dimensions.height / 2 - 60} 
-                  width="80" 
-                  height="80"
-                  className="animate-bounce-gentle"
-                >
-                  <img 
-                    src="/lovable-uploads/1bfd2e1b-3220-4dc8-a704-754899832bf5.png" 
-                    alt="TomiTalk Dragon" 
-                    className="w-full h-full object-contain"
-                  />
-                </foreignObject>
-                {/* Speech bubble */}
-                <g className="animate-fade-in">
-                  <ellipse 
-                    cx={dimensions.width / 2 + 50} 
-                    cy={dimensions.height / 2 - 80} 
-                    rx="25" 
-                    ry="15" 
-                    fill="#fff" 
-                    stroke="#4CAF50" 
-                    strokeWidth="2"
-                  />
-                  <text 
-                    x={dimensions.width / 2 + 50} 
-                    y={dimensions.height / 2 - 75} 
-                    textAnchor="middle" 
-                    fontSize="12" 
-                    fontWeight="bold" 
-                    fill="#4CAF50"
-                  >
-                    Bravo!
-                  </text>
-                </g>
-              </g>
-            )}
-            
             {/* End point (Tomi Talk) - appears when curve is nearly complete */}
             {curveProgress > 0.90 && (
               <g>
@@ -296,36 +245,51 @@ export function ProgressComparisonSection() {
                 </foreignObject>
               </g>
             )}
+            
+            {/* Progress indicators */}
+            <g fontSize="12" fontWeight="600" fill="#666">
+              {/* Traditional system label */}
+              <text x="80" y={dimensions.height - 15} textAnchor="middle" className="text-app-orange font-bold">
+                6+ mesecev čakanja
+              </text>
+              
+              {/* Tomi Talk label - appears with end point */}
+              {curveProgress > 0.90 && (
+                <text x={dimensions.width - 80} y="35" textAnchor="middle" className="text-dragon-green font-bold">
+                  Takoj!
+                </text>
+              )}
+            </g>
           </svg>
         </div>
 
         {/* Bottom section with comparison */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mt-8">
           {/* Left - Traditional System */}
-          <div className="flex flex-col items-center md:items-start flex-1">
-            <div className="flex items-center gap-3 mb-3">
+          <div className="flex flex-col items-center md:items-start">
+            <div className="flex items-center gap-3 mb-2">
               <span className="bg-orange-100 rounded-full p-2.5">
                 <Clock size={28} className="text-app-orange" />
               </span>
               <span className="text-lg font-bold text-gray-700">Javni sistem</span>
             </div>
-            <div className="text-3xl md:text-4xl font-extrabold text-app-orange mb-2">+6 mesecev</div>
-            <div className="text-sm text-gray-600 font-medium text-center md:text-left leading-relaxed">
-              Povprečno čakanje na logopeda v javnem zdravstvu
+            <div className="text-3xl md:text-4xl font-extrabold text-app-orange mb-1">+6 mesecev</div>
+            <div className="text-sm text-gray-500 font-medium text-center md:text-left max-w-[200px]">
+              Povprečen čas do prve obravnave v javnem zdravstvu
             </div>
           </div>
 
           {/* Right - Tomi Talk */}
-          <div className="flex flex-col items-center md:items-end flex-1">
-            <div className="flex items-center gap-3 mb-3">
+          <div className="flex flex-col items-center md:items-end">
+            <div className="flex items-center gap-3 mb-2">
               <span className="bg-green-100 rounded-full p-2.5">
                 <Rocket size={28} className="text-dragon-green" />
               </span>
               <span className="text-lg font-bold text-gray-700">Tomi Talk</span>
             </div>
-            <div className="text-3xl md:text-4xl font-extrabold text-dragon-green mb-2">Takoj</div>
-            <div className="text-sm text-gray-600 font-medium text-center md:text-right leading-relaxed">
-              Govorne vaje brez čakalnih vrst – dostopne takoj z aplikacijo Tomi Talk
+            <div className="text-3xl md:text-4xl font-extrabold text-dragon-green mb-1">Takoj</div>
+            <div className="text-sm text-gray-500 font-medium text-center md:text-right max-w-[200px]">
+              Govorne vaje na voljo takoj – brez čakanja
             </div>
           </div>
         </div>
