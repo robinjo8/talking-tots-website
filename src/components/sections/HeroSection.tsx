@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -49,18 +50,18 @@ export const HeroSection = () => {
 
   return (
     <>
-      <section id="purpose" className="pt-16 md:pt-32 pb-12 md:pb-24 px-4 relative w-full">
+      <section id="purpose" className="pt-20 pb-8 px-4 relative w-full">
         <div className="absolute -top-10 -left-10 w-32 h-32 bg-app-yellow/20 rounded-full blur-3xl"></div>
         <div className="absolute top-40 -right-10 w-60 h-60 bg-app-blue/20 rounded-full blur-3xl"></div>
         
         <div className="max-w-6xl mx-auto">
-          {/* Mobile Layout - Fixed spacing and centering */}
+          {/* Mobile Layout - Reduced spacing */}
           {isMobile && (
-            <div className={`flex flex-col items-center text-center space-y-4 min-h-[70vh] justify-center ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
-              {/* Main Headlines - Properly centered with reduced spacing */}
+            <div className={`flex flex-col items-center text-center space-y-4 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
+              {/* Main Headlines - Compact layout */}
               <div className="mb-4 px-2 w-full">
-                <h1 className="text-xl sm:text-2xl leading-tight font-bold mb-4">
-                  <span className="block text-neutral-950 mb-2">Odpravite govorne težave brez čakanja –</span>
+                <h1 className="text-xl sm:text-2xl leading-tight font-bold mb-3">
+                  <span className="block text-neutral-950 mb-1">Odpravite govorne težave brez čakanja –</span>
                   <span className="block text-dragon-green">
                     s pomočjo pametnega AI pomočnika!
                   </span>
@@ -70,8 +71,8 @@ export const HeroSection = () => {
                 </p>
               </div>
               
-              {/* Action Buttons - Reduced spacing */}
-              <div className="flex flex-col items-center gap-3 mb-6 w-full max-w-sm px-2">
+              {/* Action Buttons - Compact spacing */}
+              <div className="flex flex-col items-center gap-2 mb-4 w-full max-w-sm px-2">
                 <Button size="lg" onClick={handleStartNow} className="w-full h-11 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-2 text-sm font-semibold">
                   <Play className="h-4 w-4" />
                   Začni zdaj
@@ -89,25 +90,25 @@ export const HeroSection = () => {
                 </div>
               </div>
               
-              {/* Trust Badges - Reduced spacing */}
-              <div className="flex justify-center gap-4 py-2">
+              {/* Trust Badges - Compact layout */}
+              <div className="flex justify-center gap-3 py-2">
                 <div className="flex flex-col items-center text-center">
-                  <div className="w-12 h-12 mb-1 rounded-full bg-gradient-to-br from-dragon-green to-app-teal flex items-center justify-center shadow-lg border-2 border-white">
-                    <CheckCircle className="h-6 w-6 text-white" />
+                  <div className="w-10 h-10 mb-1 rounded-full bg-gradient-to-br from-dragon-green to-app-teal flex items-center justify-center shadow-lg border-2 border-white">
+                    <CheckCircle className="h-5 w-5 text-white" />
                   </div>
-                  <span className="text-neutral-950 font-medium text-xs max-w-[60px] leading-tight">Temelji na logopedskih smernicah</span>
+                  <span className="text-neutral-950 font-medium text-xs max-w-[55px] leading-tight">Temelji na logopedskih smernicah</span>
                 </div>
                 <div className="flex flex-col items-center text-center">
-                  <div className="w-12 h-12 mb-1 rounded-full bg-gradient-to-br from-app-blue to-app-purple flex items-center justify-center shadow-lg border-2 border-white">
-                    <ArrowUp className="h-6 w-6 text-white" />
+                  <div className="w-10 h-10 mb-1 rounded-full bg-gradient-to-br from-app-blue to-app-purple flex items-center justify-center shadow-lg border-2 border-white">
+                    <ArrowUp className="h-5 w-5 text-white" />
                   </div>
-                  <span className="text-neutral-950 font-medium text-xs max-w-[60px] leading-tight">Dokazan napredek pri izgovorjavi</span>
+                  <span className="text-neutral-950 font-medium text-xs max-w-[55px] leading-tight">Dokazan napredek pri izgovorjavi</span>
                 </div>
                 <div className="flex flex-col items-center text-center">
-                  <div className="w-12 h-12 mb-1 rounded-full bg-gradient-to-br from-app-orange to-app-yellow flex items-center justify-center shadow-lg border-2 border-white">
-                    <Users className="h-6 w-6 text-white" />
+                  <div className="w-10 h-10 mb-1 rounded-full bg-gradient-to-br from-app-orange to-app-yellow flex items-center justify-center shadow-lg border-2 border-white">
+                    <Users className="h-5 w-5 text-white" />
                   </div>
-                  <span className="text-neutral-950 font-medium text-xs max-w-[60px] leading-tight">Priporočeno s strani staršev</span>
+                  <span className="text-neutral-950 font-medium text-xs max-w-[55px] leading-tight">Priporočeno s strani staršev</span>
                 </div>
               </div>
             </div>

@@ -29,9 +29,9 @@ export const TestimonialsSection = () => {
   ];
 
   return (
-    <section className="py-16 px-4 md:px-10 bg-light-cloud w-full">
+    <section className="py-12 px-4 md:px-10 bg-light-cloud w-full">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">Kaj o TomiTalk pravijo starši?</h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Pridružite se številnim družinam, ki so že odkrile moč TomiTalk aplikacije
