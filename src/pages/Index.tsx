@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -132,64 +133,64 @@ const Index = () => {
       <Header />
       
       {/* Hero Section - Fixed mobile layout with proper spacing */}
-      <section id="purpose" className="pt-20 md:pt-32 pb-16 md:pb-24 px-4 relative w-full">
+      <section id="purpose" className="pt-16 md:pt-32 pb-12 md:pb-24 px-4 relative w-full">
         <div className="absolute -top-10 -left-10 w-32 h-32 bg-app-yellow/20 rounded-full blur-3xl"></div>
         <div className="absolute top-40 -right-10 w-60 h-60 bg-app-blue/20 rounded-full blur-3xl"></div>
         
         <div className="max-w-6xl mx-auto">
-          {/* Mobile Layout - Fixed visibility and spacing */}
-          {isMobile && <div className={`flex flex-col items-center text-center space-y-6 min-h-[80vh] justify-center ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
-              {/* Main Headlines - Improved mobile visibility and spacing */}
-              <div className="mb-6 px-4 w-full">
-                <h1 className="text-2xl sm:text-3xl leading-[1.2] font-bold mb-6">
-                  <span className="block text-neutral-950 mb-3">Odpravite govorne težave brez čakanja –</span>
+          {/* Mobile Layout - Fixed spacing and centering */}
+          {isMobile && <div className={`flex flex-col items-center text-center space-y-4 min-h-[70vh] justify-center ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
+              {/* Main Headlines - Properly centered with reduced spacing */}
+              <div className="mb-4 px-2 w-full">
+                <h1 className="text-xl sm:text-2xl leading-tight font-bold mb-4">
+                  <span className="block text-neutral-950 mb-2">Odpravite govorne težave brez čakanja –</span>
                   <span className="block text-dragon-green">
                     s pomočjo pametnega AI pomočnika!
                   </span>
                 </h1>
-                <p className="text-base sm:text-lg leading-relaxed text-neutral-950 font-medium max-w-2xl mx-auto">
+                <p className="text-sm sm:text-base leading-relaxed text-neutral-950 font-medium max-w-2xl mx-auto">
                   Pridruži se staršem, ki že vsak dan vadijo govorne vaje s svojimi otroki – personalizirano glede na starost, težavo in logopedske smernice.
                 </p>
               </div>
               
-              {/* Action Buttons - Improved mobile layout */}
-              <div className="flex flex-col items-center gap-4 mb-8 w-full max-w-sm px-4">
-                <Button size="lg" onClick={handleStartNow} className="w-full h-12 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold">
+              {/* Action Buttons - Reduced spacing */}
+              <div className="flex flex-col items-center gap-3 mb-6 w-full max-w-sm px-2">
+                <Button size="lg" onClick={handleStartNow} className="w-full h-11 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-2 text-sm font-semibold">
                   <Play className="h-4 w-4" />
                   Začni zdaj
                 </Button>
                 
                 <div className="flex gap-2 w-full">
-                  <Button size="lg" className="flex-1 h-12 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-sm font-semibold">
+                  <Button size="lg" className="flex-1 h-11 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-xs font-semibold">
                     <CirclePlay className="h-4 w-4" />
                     Demo
                   </Button>
-                  <Button size="lg" onClick={scrollToPricing} className="flex-1 h-12 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-sm font-semibold">
+                  <Button size="lg" onClick={scrollToPricing} className="flex-1 h-11 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-xs font-semibold">
                     <PiggyBank className="h-4 w-4" />
                     Cenik
                   </Button>
                 </div>
               </div>
               
-              {/* Trust Badges - Improved mobile spacing */}
-              <div className="flex justify-center gap-6 py-4">
+              {/* Trust Badges - Reduced spacing */}
+              <div className="flex justify-center gap-4 py-2">
                 <div className="flex flex-col items-center text-center">
-                  <div className="w-14 h-14 mb-2 rounded-full bg-gradient-to-br from-dragon-green to-app-teal flex items-center justify-center shadow-lg border-2 border-white">
-                    <CheckCircle className="h-7 w-7 text-white" />
+                  <div className="w-12 h-12 mb-1 rounded-full bg-gradient-to-br from-dragon-green to-app-teal flex items-center justify-center shadow-lg border-2 border-white">
+                    <CheckCircle className="h-6 w-6 text-white" />
                   </div>
-                  <span className="text-neutral-950 font-medium text-xs max-w-[65px] leading-tight">Temelji na logopedskih smernicah</span>
+                  <span className="text-neutral-950 font-medium text-xs max-w-[60px] leading-tight">Temelji na logopedskih smernicah</span>
                 </div>
                 <div className="flex flex-col items-center text-center">
-                  <div className="w-14 h-14 mb-2 rounded-full bg-gradient-to-br from-app-blue to-app-purple flex items-center justify-center shadow-lg border-2 border-white">
-                    <ArrowUp className="h-7 w-7 text-white" />
+                  <div className="w-12 h-12 mb-1 rounded-full bg-gradient-to-br from-app-blue to-app-purple flex items-center justify-center shadow-lg border-2 border-white">
+                    <ArrowUp className="h-6 w-6 text-white" />
                   </div>
-                  <span className="text-neutral-950 font-medium text-xs max-w-[65px] leading-tight">Dokazan napredek pri izgovorjavi</span>
+                  <span className="text-neutral-950 font-medium text-xs max-w-[60px] leading-tight">Dokazan napredek pri izgovorjavi</span>
                 </div>
                 <div className="flex flex-col items-center text-center">
-                  <div className="w-14 h-14 mb-2 rounded-full bg-gradient-to-br from-app-orange to-app-yellow flex items-center justify-center shadow-lg border-2 border-white">
-                    <Users className="h-7 w-7 text-white" />
+                  <div className="w-12 h-12 mb-1 rounded-full bg-gradient-to-br from-app-orange to-app-yellow flex items-center justify-center shadow-lg border-2 border-white">
+                    <Users className="h-6 w-6 text-white" />
                   </div>
-                  <span className="text-neutral-950 font-medium text-xs max-w-[65px] leading-tight">Priporočeno s strani staršev</span>
+                  <span className="text-neutral-950 font-medium text-xs max-w-[60px] leading-tight">Priporočeno s strani staršev</span>
                 </div>
               </div>
             </div>}
@@ -311,22 +312,22 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Pricing Section - Fixed mobile layout */}
+      {/* Pricing Section - Fixed mobile layout to show packages side by side */}
       <section id="pricing" className="py-16 md:py-20 px-4 md:px-10 bg-white w-full">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12 md:mb-16">
+          <div className="text-center mb-8 md:mb-16">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">Naročniški paketi</h2>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto">
               Transparentno cenovanje brez skritih stroškov. Izberite paket, ki vam najbolj ustreza.
             </p>
           </div>
           
-          {/* Mobile and Desktop: 2 cards side by side - Fixed mobile spacing */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8 max-w-5xl mx-auto">
+          {/* Mobile and Desktop: 2 cards side by side - Fixed for proper side-by-side layout */}
+          <div className="grid grid-cols-2 gap-2 md:gap-8 max-w-5xl mx-auto">
             {pricingPackages.map((pkg, index) => (
               <div 
                 key={index} 
-                className={`relative bg-white rounded-xl md:rounded-2xl shadow-lg border-2 p-4 md:p-8 ${
+                className={`relative bg-white rounded-lg md:rounded-2xl shadow-lg border-2 p-3 md:p-8 ${
                   pkg.recommended 
                     ? 'border-dragon-green md:scale-105' 
                     : 'border-gray-200'
@@ -340,34 +341,34 @@ const Index = () => {
                   </div>
                 )}
                 
-                <div className="text-center mb-4 md:mb-8">
-                  <h3 className="text-base md:text-2xl font-bold mb-2">{pkg.name}</h3>
+                <div className="text-center mb-3 md:mb-8">
+                  <h3 className="text-sm md:text-2xl font-bold mb-1 md:mb-2 leading-tight">{pkg.name}</h3>
                   <p className="text-xs md:text-base text-gray-600 mb-2 md:mb-4 leading-tight">{pkg.description}</p>
                   
                   <div className="mb-2 md:mb-4">
                     {pkg.originalPrice && (
-                      <span className="text-sm md:text-lg text-gray-400 line-through mr-1 md:mr-2">
+                      <span className="text-xs md:text-lg text-gray-400 line-through mr-1 md:mr-2">
                         €{pkg.originalPrice}
                       </span>
                     )}
-                    <span className="text-2xl md:text-4xl font-bold text-gray-900">
+                    <span className="text-lg md:text-4xl font-bold text-gray-900">
                       €{pkg.price}
                     </span>
                     <span className="text-xs md:text-base text-gray-600">/{pkg.period}</span>
                   </div>
                 </div>
                 
-                <ul className="space-y-2 md:space-y-4 mb-4 md:mb-8">
+                <ul className="space-y-1 md:space-y-4 mb-3 md:mb-8">
                   {pkg.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-start gap-2 md:gap-3">
-                      <Check className="h-4 w-4 md:h-5 md:w-5 text-dragon-green mt-0.5 flex-shrink-0" />
+                    <li key={featureIndex} className="flex items-start gap-1 md:gap-3">
+                      <Check className="h-3 w-3 md:h-5 md:w-5 text-dragon-green mt-0.5 flex-shrink-0" />
                       <span className="text-xs md:text-base text-gray-700 leading-tight">{feature}</span>
                     </li>
                   ))}
                 </ul>
                 
                 <Button 
-                  className={`w-full h-10 md:h-12 rounded-lg font-semibold text-xs md:text-base ${
+                  className={`w-full h-9 md:h-12 rounded-lg font-semibold text-xs md:text-base ${
                     pkg.recommended
                       ? 'bg-dragon-green hover:bg-dragon-green/90 text-white'
                       : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
@@ -380,7 +381,7 @@ const Index = () => {
             ))}
           </div>
           
-          <div className="text-center mt-8 md:mt-12">
+          <div className="text-center mt-6 md:mt-12">
             <p className="text-sm md:text-base text-gray-600 mb-2 md:mb-4">
               Vsak dodatni otrok: +3,90 € / mesec
             </p>
