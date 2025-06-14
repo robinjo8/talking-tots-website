@@ -63,21 +63,21 @@ export const PricingSection = () => {
   };
 
   return (
-    <section id="pricing" className={`w-full bg-white ${isMobile ? 'py-8 px-2' : 'py-16 md:py-20 px-4 md:px-10'}`}>
+    <section id="pricing" className={`w-full bg-white ${isMobile ? 'py-4 px-2' : 'py-16 md:py-20 px-4 md:px-10'}`}>
       <div className="max-w-7xl mx-auto">
-        <div className={`text-center ${isMobile ? 'mb-6' : 'mb-8 md:mb-16'}`}>
-          <h2 className={`font-bold ${isMobile ? 'text-lg mb-2' : 'text-2xl md:text-3xl lg:text-4xl mb-4'}`}>
+        <div className={`text-center ${isMobile ? 'mb-4' : 'mb-8 md:mb-16'}`}>
+          <h2 className={`font-bold ${isMobile ? 'text-base mb-1' : 'text-2xl md:text-3xl lg:text-4xl mb-4'}`}>
             Naročniški paketi
           </h2>
-          <p className={`${isMobile ? 'text-sm' : 'text-base md:text-xl'} text-muted-foreground max-w-2xl mx-auto`}>
+          <p className={`${isMobile ? 'text-xs' : 'text-base md:text-xl'} text-muted-foreground max-w-2xl mx-auto`}>
             Transparentno cenovanje brez skritih stroškov. Izberite paket, ki vam najbolj ustreza.
           </p>
         </div>
-        <div className={`${isMobile ? 'grid grid-cols-2 gap-4 max-w-xs mx-auto' : 'grid grid-cols-2 gap-2 md:gap-8 max-w-5xl mx-auto'}`}>
+        <div className={`${isMobile ? 'flex flex-col gap-4 w-full' : 'grid grid-cols-2 gap-2 md:gap-8 max-w-5xl mx-auto'}`}>
           {pricingPackages.map((pkg, index) => (
             <div
               key={index}
-              className={`relative bg-white rounded-lg md:rounded-2xl shadow-lg border-2 p-2 ${isMobile ? "min-w-0" : "md:p-8"} ${pkg.recommended ? 'border-dragon-green md:scale-105' : 'border-gray-200'} transition-all duration-300 hover:shadow-xl`}
+              className={`relative bg-white rounded-lg md:rounded-2xl shadow-lg border-2 px-3 py-2 ${isMobile ? "w-full" : "md:p-8"} ${pkg.recommended ? 'border-dragon-green md:scale-105' : 'border-gray-200'} transition-all duration-300 hover:shadow-xl`}
             >
               {pkg.recommended && (
                 <div className={`absolute -top-2 ${isMobile ? 'left-1/2 -translate-x-1/2' : 'md:-top-4 left-1/2 transform -translate-x-1/2'}`}>
@@ -86,8 +86,8 @@ export const PricingSection = () => {
                   </Badge>
                 </div>
               )}
-              <div className="text-center mb-3 md:mb-8">
-                <h3 className={`font-bold ${isMobile ? 'text-base mb-1 leading-tight' : 'text-sm md:text-2xl mb-1 md:mb-2 leading-tight'}`}>{pkg.name}</h3>
+              <div className="text-center mb-2 md:mb-8">
+                <h3 className={`font-bold ${isMobile ? 'text-sm mb-1 leading-tight' : 'text-sm md:text-2xl mb-1 md:mb-2 leading-tight'}`}>{pkg.name}</h3>
                 <p className={`${isMobile ? 'text-xs mb-1 leading-tight' : 'text-xs md:text-base mb-2 md:mb-4 leading-tight'} text-gray-600`}>{pkg.description}</p>
                 <div className={`${isMobile ? 'mb-1' : 'mb-2 md:mb-4'}`}>
                   {pkg.originalPrice && (
@@ -101,7 +101,7 @@ export const PricingSection = () => {
                   <span className={`${isMobile ? 'text-xs ml-1' : 'text-xs md:text-base ml-1'} text-gray-600`}>/{pkg.period}</span>
                 </div>
               </div>
-              <ul className={`${isMobile ? 'space-y-2 mb-3' : 'space-y-1 md:space-y-4 mb-3 md:mb-8'}`}>
+              <ul className={`${isMobile ? 'space-y-1 mb-2' : 'space-y-2 md:space-y-4 mb-3 md:mb-8'}`}>
                 {pkg.features.map((feature, featureIndex) => (
                   <li key={featureIndex} className={`flex items-start gap-1 ${isMobile ? "text-xs" : "md:gap-3 text-xs md:text-base"} text-gray-700 leading-tight`}>
                     <Check className={`flex-shrink-0 mt-0.5 ${isMobile ? "h-3 w-3" : "h-3 w-3 md:h-5 md:w-5"} text-dragon-green`} />
@@ -122,7 +122,7 @@ export const PricingSection = () => {
             </div>
           ))}
         </div>
-        <div className={`text-center ${isMobile ? 'mt-4' : 'mt-6 md:mt-12'}`}>
+        <div className={`text-center ${isMobile ? 'mt-2' : 'mt-6 md:mt-12'}`}>
           <p className={`${isMobile ? 'text-xs' : 'text-sm md:text-base'} text-gray-600 mb-1 md:mb-4`}>
             Vsak dodatni otrok: +3,90 € / mesec
           </p>
