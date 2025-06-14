@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -77,70 +76,70 @@ const Index = () => {
   return <div className="min-h-screen w-full overflow-x-hidden">
       <Header />
       
-      {/* Hero Section - Mobile optimized with better spacing and visibility */}
-      <section className="pt-20 pb-8 px-3 md:pt-28 md:pb-16 md:px-6 lg:px-8 relative w-full">
+      {/* Hero Section - Mobile optimized with proper text wrapping */}
+      <section className="pt-20 pb-8 px-4 md:pt-28 md:pb-16 md:px-6 lg:px-8 relative w-full">
         <div className="absolute -top-10 -left-10 w-32 h-32 bg-app-yellow/20 rounded-full blur-3xl"></div>
         <div className="absolute top-40 -right-10 w-60 h-60 bg-app-blue/20 rounded-full blur-3xl"></div>
         
         <div className="max-w-6xl mx-auto">
-          {/* Mobile Layout - Better spacing and sizing */}
-          {isMobile && <div className={`flex flex-col items-center text-center space-y-4 px-2 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
-              {/* Main Headlines - Optimized for mobile readability */}
-              <div className="mb-3 w-full">
-                <h1 className="text-2xl leading-tight font-bold mb-3">
-                  <span className="block text-neutral-950">Odpravite govorne težave brez čakanja –</span>
-                  <span className="block text-dragon-green mt-1">
+          {/* Mobile Layout - Optimized for proper visibility */}
+          {isMobile && <div className={`flex flex-col items-center text-center space-y-6 w-full ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
+              {/* Main Headlines - Better mobile text wrapping */}
+              <div className="mb-4 w-full max-w-sm mx-auto">
+                <h1 className="text-xl leading-tight font-bold mb-4">
+                  <span className="block text-neutral-950 px-2">Odpravite govorne težave brez čakanja –</span>
+                  <span className="block text-dragon-green mt-2 px-2">
                     s pomočjo pametnega AI pomočnika!
                   </span>
                 </h1>
-                <p className="text-base leading-relaxed text-neutral-950 font-medium px-2">
+                <p className="text-sm leading-relaxed text-neutral-950 font-medium px-4">
                   Pridruži se staršem, ki že vsak dan vadijo govorne vaje s svojimi otroki – personalizirano glede na starost, težavo in logopedske smernice.
                 </p>
               </div>
               
-              {/* Action Buttons - Better mobile sizing */}
-              <div className="flex flex-col items-center gap-3 mb-4 w-full max-w-sm mx-auto">
-                <Button size="lg" onClick={handleStartNow} className="w-full h-11 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-2 text-sm font-semibold">
+              {/* Action Buttons - Mobile optimized */}
+              <div className="flex flex-col items-center gap-3 mb-6 w-full max-w-xs mx-auto px-4">
+                <Button size="lg" onClick={handleStartNow} className="w-full h-12 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-2 text-sm font-semibold">
                   <Play className="h-4 w-4" />
                   Začni zdaj
                 </Button>
                 
                 <div className="flex gap-2 w-full">
-                  <Button size="lg" className="flex-1 h-11 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-sm font-semibold">
+                  <Button size="lg" className="flex-1 h-12 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-xs font-semibold">
                     <CirclePlay className="h-4 w-4" />
                     Demo
                   </Button>
-                  <Button size="lg" onClick={scrollToFeatures} className="flex-1 h-11 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-sm font-semibold">
+                  <Button size="lg" onClick={scrollToFeatures} className="flex-1 h-12 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-xs font-semibold">
                     <Info className="h-4 w-4" />
                     Info
                   </Button>
                 </div>
               </div>
               
-              {/* Trust Badges - Mobile optimized layout */}
-              <div className="flex justify-center gap-4 mb-4 py-3 w-full">
+              {/* Trust Badges - Mobile optimized with better spacing */}
+              <div className="flex justify-center gap-6 mb-6 py-4 w-full max-w-sm mx-auto">
                 <div className="flex flex-col items-center text-center">
                   <div className="w-12 h-12 mb-2 rounded-full bg-gradient-to-br from-dragon-green to-app-teal flex items-center justify-center shadow-lg border-2 border-white">
                     <CheckCircle className="h-6 w-6 text-white" />
                   </div>
-                  <span className="text-neutral-950 font-medium text-xs max-w-[60px] leading-tight">Temelji na logopedskih smernicah</span>
+                  <span className="text-neutral-950 font-medium text-xs max-w-[70px] leading-tight text-center">Temelji na logopedskih smernicah</span>
                 </div>
                 <div className="flex flex-col items-center text-center">
                   <div className="w-12 h-12 mb-2 rounded-full bg-gradient-to-br from-app-blue to-app-purple flex items-center justify-center shadow-lg border-2 border-white">
                     <ArrowUp className="h-6 w-6 text-white" />
                   </div>
-                  <span className="text-neutral-950 font-medium text-xs max-w-[60px] leading-tight">Dokazan napredek pri izgovorjavi</span>
+                  <span className="text-neutral-950 font-medium text-xs max-w-[70px] leading-tight text-center">Dokazan napredek pri izgovorjavi</span>
                 </div>
                 <div className="flex flex-col items-center text-center">
                   <div className="w-12 h-12 mb-2 rounded-full bg-gradient-to-br from-app-orange to-app-yellow flex items-center justify-center shadow-lg border-2 border-white">
                     <Users className="h-6 w-6 text-white" />
                   </div>
-                  <span className="text-neutral-950 font-medium text-xs max-w-[60px] leading-tight">Priporočeno s strani staršev</span>
+                  <span className="text-neutral-950 font-medium text-xs max-w-[70px] leading-tight text-center">Priporočeno s strani staršev</span>
                 </div>
               </div>
             </div>}
           
-          {/* Desktop Layout - Properly centered content */}
+          {/* Desktop Layout - Keep existing desktop layout */}
           {!isMobile && <>
               <div className="relative flex flex-col items-center justify-center text-center">
                 {/* Main Headline - Centered */}
@@ -203,7 +202,7 @@ const Index = () => {
       </section>
 
       {/* Testimonials Section - Mobile optimized */}
-      <section className="py-12 px-3 md:py-16 md:px-6 lg:px-8 bg-light-cloud w-full">
+      <section className="py-12 px-4 md:py-16 md:px-6 lg:px-8 bg-light-cloud w-full">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8 md:mb-12">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4 text-gray-900 px-2">Kaj o TomiTalk pravijo starši?</h2>
@@ -244,7 +243,7 @@ const Index = () => {
       </section>
 
       {/* Features Section - Mobile optimized */}
-      <section id="features" className="py-12 px-3 md:py-20 md:px-6 lg:px-8 bg-light-cloud w-full">
+      <section id="features" className="py-12 px-4 md:py-20 md:px-6 lg:px-8 bg-light-cloud w-full">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12 md:mb-16">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4 px-2">Kako TomiTalk deluje?</h2>
@@ -258,7 +257,7 @@ const Index = () => {
       </section>
       
       {/* Call to Action with Dragon - Mobile optimized */}
-      <section id="cta" className="py-12 px-3 md:py-20 md:px-6 lg:px-8 relative overflow-hidden w-full">
+      <section id="cta" className="py-12 px-4 md:py-20 md:px-6 lg:px-8 relative overflow-hidden w-full">
         <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-app-teal/20 rounded-full blur-3xl"></div>
         <div className="absolute -top-10 -right-10 w-40 h-40 bg-app-orange/20 rounded-full blur-3xl"></div>
         
@@ -266,13 +265,13 @@ const Index = () => {
           {/* Mobile Layout with Dragon - Better spacing */}
           {isMobile && (
             <div className="bg-white shadow-xl rounded-3xl p-6 text-center relative overflow-hidden mx-2">
-              <h2 className="text-2xl font-bold mb-3 px-2">Ste pripravljeni na govorno avanturo?</h2>
-              <p className="text-base text-muted-foreground mb-6 px-2">
+              <h2 className="text-xl font-bold mb-3 px-2">Ste pripravljeni na govorno avanturo?</h2>
+              <p className="text-sm text-muted-foreground mb-6 px-2">
                 Prenesite Tomi Talk danes in opazujte, kako komunikacijske veščine vašega otroka cvetijo!
               </p>
               
               {/* Dragon for mobile - Better sizing */}
-              <div className="relative w-32 h-32 mx-auto mb-6">
+              <div className="relative w-28 h-28 mx-auto mb-6">
                 <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
                 <div className="animate-float relative">
                   <img alt="Tomi Talk Dragon Mascot" className="w-full h-full object-contain" src="/lovable-uploads/afbdd309-0550-437a-9afc-966c9a811062.png" />
@@ -327,7 +326,7 @@ const Index = () => {
       </section>
       
       {/* Footer - Mobile optimized */}
-      <footer className="py-8 px-3 md:py-10 md:px-6 lg:px-8 bg-light-cloud w-full">
+      <footer className="py-8 px-4 md:py-10 md:px-6 lg:px-8 bg-light-cloud w-full">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center gap-2 mb-4 md:mb-0">
             <span className="text-xl font-extrabold text-dragon-green">Tomi</span>
