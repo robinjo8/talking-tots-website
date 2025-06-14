@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,20 +21,17 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { useSubscriptionPlans } from "@/hooks/useSubscriptionPlans";
 
 export function SubscriptionSection() {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-
-  const { plans, loading } = useSubscriptionPlans();
+  const [selectedPlan, setSelectedPlan] = useState<'yearly' | 'monthly' | null>(null);
 
   const handleSubscribe = (plan: string) => {
     toast.info(`Izbran paket: ${plan}. Funkcionalnost naročanja še ni implementirana.`);
   };
 
-  const handleSelectPlan = (planId: string) => {
-    setSelectedPlan(planId);
+  const handleSelectPlan = (plan: 'yearly' | 'monthly') => {
+    setSelectedPlan(plan);
   };
 
   const features = [
@@ -81,67 +79,83 @@ export function SubscriptionSection() {
           <CardContent className="p-6">
             <h2 className="text-2xl font-bold text-center mb-8">Naročniški paketi</h2>
             
-            {/* Subscription package cards */}
-            {loading ? (
-              <div className="text-center text-muted-foreground py-8">Nalaganje paketov...</div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {plans.map(pkg => (
-                  <Card
-                    key={pkg.id}
-                    className={cn(
-                      `overflow-hidden transition-all duration-300 hover:shadow-md h-full flex flex-col border 
-                      ${selectedPlan === pkg.id ? "ring-2 ring-dragon-green shadow-lg" : ""}
-                      `,
-                      pkg.order_index === 0 ? "border-dragon-green" : "border-app-blue"
-                    )}
-                    onClick={() => handleSelectPlan(pkg.id)}
-                  >
-                    <div className={`p-4 relative ${pkg.order_index === 0 ? "bg-dragon-green/10" : "bg-app-blue/10"}`}>
-                      <span className="absolute top-0 right-0 mr-4 mt-4">
-                        {selectedPlan === pkg.id && (
-                          <Check className="h-6 w-6 text-dragon-green" />
-                        )}
-                      </span>
-                      <div className="text-center mb-2">
-                        {pkg.order_index === 0 && (
-                          <span className="bg-dragon-green text-white text-xs px-3 py-1 rounded-full">Priporočeno</span>
-                        )}
-                      </div>
-                      <h3 className="text-xl font-bold text-center">{pkg.name}</h3>
-                      <div className="text-center mt-4">
-                        <p className={`text-2xl font-bold ${pkg.order_index === 0 ? "text-dragon-green" : "text-app-blue"}`}>{pkg.price}</p>
-                      </div>
-                    </div>
-                    <CardContent className="p-4 flex-1 flex flex-col">
-                      <div className="space-y-3 flex-1 text-muted-foreground mb-2">
-                        <p>{pkg.description}</p>
-                        <Separator className="my-4" />
-                        {pkg.features && pkg.features.length > 0 && (
-                          <div>
-                            <h4 className="font-semibold text-sm text-foreground mb-2">Vključuje:</h4>
-                            <ul className="list-disc pl-5 text-[13px] md:text-base text-foreground">
-                              {pkg.features.map((feat, i) => (
-                                <li key={feat + i}>{feat}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                      <div className="mt-auto">
-                        <Button 
-                          className={`w-full ${pkg.order_index === 0 ? "bg-dragon-green hover:bg-dragon-green/90" : "bg-app-blue hover:bg-app-blue/90"} text-white`}
-                          onClick={() => handleSubscribe(pkg.name)}
-                        >
-                          {pkg.order_index === 0 ? "Izberi letno naročnino" : "Izberi mesečno naročnino"}
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Yearly subscription card */}
+              <Card 
+                className={cn(
+                  "border border-dragon-green overflow-hidden transition-all duration-300 hover:shadow-md h-full flex flex-col",
+                  selectedPlan === 'yearly' ? "ring-2 ring-dragon-green shadow-lg" : ""
+                )}
+                onClick={() => handleSelectPlan('yearly')}
+              >
+                <div className="bg-dragon-green/10 p-4 relative">
+                  <span className="absolute top-0 right-0 mr-4 mt-4">
+                    {selectedPlan === 'yearly' && <Check className="h-6 w-6 text-dragon-green" />}
+                  </span>
+                  <div className="text-center mb-2">
+                    <span className="bg-dragon-green text-white text-xs px-3 py-1 rounded-full">Priporočeno</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-center">Letna naročnina</h3>
+                  <div className="text-center mt-4">
+                    <p className="text-2xl font-bold text-dragon-green">9,90 € <span className="text-sm font-normal">/ mesec</span></p>
+                  </div>
+                </div>
+                <CardContent className="p-4 flex-1 flex flex-col">
+                  <div className="space-y-3 flex-1">
+                    <p><strong>Plačilo:</strong> Enkratno letno plačilo</p>
+                    <p className="text-dragon-green font-medium">Prihranite več kot 50 % v primerjavi z mesečno naročnino</p>
+                    
+                    <Separator className="my-4" />
+                  </div>
+                  
+                  <div className="mt-auto">
+                    <Button 
+                      className="w-full bg-dragon-green hover:bg-dragon-green/90 text-white"
+                      onClick={() => handleSubscribe('Letna naročnina')}
+                    >
+                      Izberi letno naročnino
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              {/* Monthly subscription card */}
+              <Card 
+                className={cn(
+                  "border border-app-blue overflow-hidden transition-all duration-300 hover:shadow-md h-full flex flex-col",
+                  selectedPlan === 'monthly' ? "ring-2 ring-app-blue shadow-lg" : ""
+                )}
+                onClick={() => handleSelectPlan('monthly')}
+              >
+                <div className="bg-app-blue/10 p-4 relative">
+                  <span className="absolute top-0 right-0 mr-4 mt-4">
+                    {selectedPlan === 'monthly' && <Check className="h-6 w-6 text-app-blue" />}
+                  </span>
+                  <h3 className="text-xl font-bold text-center">Mesečna naročnina</h3>
+                  <div className="text-center mt-4">
+                    <p className="text-2xl font-bold">19,90 € <span className="text-sm font-normal">/ mesec</span></p>
+                  </div>
+                </div>
+                <CardContent className="p-4 flex-1 flex flex-col">
+                  <div className="space-y-3 flex-1">
+                    <p><strong>Plačilo:</strong> Mesečno plačilo</p>
+                    <p className="text-gray-500 dark:text-gray-400">Brez dolgoročne obveznosti</p>
+                    
+                    <Separator className="my-4" />
+                  </div>
+                  
+                  <div className="mt-auto">
+                    <Button 
+                      className="w-full bg-app-blue hover:bg-app-blue/90 text-white"
+                      onClick={() => handleSubscribe('Mesečna naročnina')}
+                    >
+                      Izberi mesečno naročnino
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            
             {/* Features section */}
             <div className="mt-8 bg-gray-50 dark:bg-gray-800/30 rounded-lg p-6">
               <h3 className="font-bold text-lg mb-4">Vključeno v oba paketa:</h3>
