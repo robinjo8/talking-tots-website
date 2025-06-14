@@ -28,29 +28,17 @@ export function DesktopNavigation({
     return location.pathname === path;
   };
 
-  const scrollToSection = (path: string) => {
-    if (path.startsWith('#')) {
-      const sectionId = path.substring(1);
-      const section = document.getElementById(sectionId);
-      if (section) {
-        section.scrollIntoView({ behavior: 'smooth' });
-      }
-    } else {
-      onNavigate(path);
-    }
-  };
-
   return (
     <nav className="hidden lg:flex items-center gap-2">
       {user ? (
         <>
-          {/* Desktop Navigation Links for authenticated users - show first 7 main navigation items */}
-          {authenticatedLinks.slice(0, 7).map((link, index) => (
+          {/* Desktop Navigation Links for authenticated users */}
+          {authenticatedLinks.slice(0, 5).map((link, index) => (
             <Button 
               key={index} 
               variant="ghost" 
               size="sm"
-              onClick={() => !link.disabled && scrollToSection(link.path)} 
+              onClick={() => !link.disabled && onNavigate(link.path)} 
               disabled={link.disabled}
               className={`h-12 px-4 font-medium rounded-lg ${isActivePath(link.path) ? 'bg-accent' : ''}`}
             >
@@ -71,7 +59,7 @@ export function DesktopNavigation({
               key={index} 
               variant="ghost" 
               size="sm"
-              onClick={() => !link.disabled && scrollToSection(link.path)} 
+              onClick={() => !link.disabled && onNavigate(link.path)} 
               disabled={link.disabled}
               className={`h-12 px-4 font-medium rounded-lg ${isActivePath(link.path) ? 'bg-accent' : ''} ${link.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
