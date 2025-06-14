@@ -1,4 +1,3 @@
-
 import { Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "@/pages/Index";
@@ -145,9 +144,7 @@ export function AppRoutes() {
       <Route 
         path="/logopedski-koticek" 
         element={
-          <ProtectedRoute>
-            <LogopedskiKoticek />
-          </ProtectedRoute>
+          <LogopedskiKoticek />
         }
       />
       
