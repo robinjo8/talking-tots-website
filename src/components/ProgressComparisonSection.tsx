@@ -10,15 +10,17 @@ function getAnimatedPath(progress: number, width: number, height: number) {
   const startY = height - 60;
   const endY = 80;
   
-  // Create points for a smooth exponential curve
+  // Create points for a smooth curve with steeper initial rise
   const steps = Math.floor(100 + progress * 100);
   let d = `M${startX} ${startY}`;
   
   for (let i = 1; i <= steps; i++) {
     const t = (i / steps) * progress;
     
-    // Exponential easing for dramatic acceleration effect
-    const eased = 1 - Math.exp(-3.5 * t);
+    // Modified easing for steeper initial rise
+    const eased = t < 0.3 ? 
+      Math.pow(t / 0.3, 0.5) * 0.7 : // Steeper start
+      0.7 + (1 - 0.7) * Math.pow((t - 0.3) / 0.7, 2); // Gentle curve after
     
     const x = startX + (endX - startX) * t;
     const y = startY - (startY - endY) * eased;
@@ -40,7 +42,7 @@ export function ProgressComparisonSection() {
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
         setDimensions({
-          width: Math.max(800, rect.width - 32), // Account for padding
+          width: Math.max(800, rect.width - 32),
           height: 400
         });
       }
@@ -69,7 +71,7 @@ export function ProgressComparisonSection() {
     
     const timeout = setTimeout(() => {
       reqRef.current = requestAnimationFrame(animateCurve);
-    }, 500); // Small delay before animation starts
+    }, 500);
 
     return () => {
       clearTimeout(timeout);
@@ -115,11 +117,11 @@ export function ProgressComparisonSection() {
               </linearGradient>
               
               <filter id="glow">
-                <fegaussianblur stdDeviation="3" result="coloredBlur"/>
-                <femerge> 
-                  <femergenode in="coloredBlur"/>
-                  <femergenode in="SourceGraphic"/>
-                </femerge>
+                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                <feMerge> 
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
               </filter>
             </defs>
             
@@ -246,24 +248,31 @@ export function ProgressComparisonSection() {
               </g>
             )}
             
-            {/* Progress indicators */}
-            <g fontSize="12" fontWeight="600" fill="#666">
-              {/* Traditional system label */}
-              <text x="80" y={dimensions.height - 15} textAnchor="middle" className="text-app-orange font-bold">
-                6+ mesecev čakanja
-              </text>
-              
-              {/* Tomi Talk label - appears with end point */}
-              {curveProgress > 0.90 && (
-                <text x={dimensions.width - 80} y="35" textAnchor="middle" className="text-dragon-green font-bold">
-                  Takoj!
-                </text>
-              )}
-            </g>
+            {/* Dragon mascot - appears when curve reaches about 80% */}
+            {curveProgress > 0.80 && (
+              <g>
+                <foreignObject 
+                  x={dimensions.width - 200} 
+                  y="20" 
+                  width="120" 
+                  height="120"
+                  className="animate-bounce"
+                  style={{ animationDuration: '2s' }}
+                >
+                  <div className="relative w-full h-full">
+                    <img
+                      src="/lovable-uploads/d722a0a7-2199-4ac9-b9fd-c808976066f8.png"
+                      alt="Tomi mascot celebrating progress"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                </foreignObject>
+              </g>
+            )}
           </svg>
         </div>
 
-        {/* Bottom section with comparison */}
+        {/* Bottom section with improved comparison text */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mt-8">
           {/* Left - Traditional System */}
           <div className="flex flex-col items-center md:items-start">
@@ -274,8 +283,8 @@ export function ProgressComparisonSection() {
               <span className="text-lg font-bold text-gray-700">Javni sistem</span>
             </div>
             <div className="text-3xl md:text-4xl font-extrabold text-app-orange mb-1">+6 mesecev</div>
-            <div className="text-sm text-gray-500 font-medium text-center md:text-left max-w-[200px]">
-              Povprečen čas do prve obravnave v javnem zdravstvu
+            <div className="text-sm text-gray-500 font-medium text-center md:text-left max-w-[250px]">
+              Povprečno čakanje na logopeda v javnem zdravstvu
             </div>
           </div>
 
@@ -288,8 +297,8 @@ export function ProgressComparisonSection() {
               <span className="text-lg font-bold text-gray-700">Tomi Talk</span>
             </div>
             <div className="text-3xl md:text-4xl font-extrabold text-dragon-green mb-1">Takoj</div>
-            <div className="text-sm text-gray-500 font-medium text-center md:text-right max-w-[200px]">
-              Govorne vaje na voljo takoj – brez čakanja
+            <div className="text-sm text-gray-500 font-medium text-center md:text-right max-w-[250px]">
+              Govorne vaje brez čakalnih vrst – dostopne takoj z aplikacijo Tomi Talk
             </div>
           </div>
         </div>
