@@ -297,12 +297,14 @@ export default function Header() {
           </div>
         </Link>
         
+        {/* Main navigation and action buttons */}
         <div className="flex items-center gap-3">
-          {/* Mobile layout - selected child name on left and hamburger on right */}
+          {/* MOBILE HEADER */}
           <div className="lg:hidden flex items-center w-full justify-between">
-            {/* Selected child display */}
+            {/* Conditionally show selected child for mobile if logged in */}
             {selectedChild && (
               <div className="flex items-center gap-2">
+                {/* Selected child avatar/name display */}
                 {selectedChild.avatarId > 0 && (
                   <Avatar className="h-6 w-6 border border-green-200">
                     <AvatarImage src={getAvatarSrc(selectedChild.avatarId)} alt={selectedChild.name} className="object-contain" />
@@ -316,8 +318,7 @@ export default function Header() {
                 </span>
               </div>
             )}
-            
-            {/* Hamburger menu */}
+            {/* Hamburger menu always on the right */}
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="sm" className="flex items-center ml-auto">
@@ -325,66 +326,225 @@ export default function Header() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="p-0 w-80">
-                <MobileMenuContent />
+                <ScrollArea className="h-[90vh]">
+                  <div className="flex flex-col p-6 space-y-6">
+                    {/* --- Always visible links on mobile drawer --- */}
+                    <div className="flex flex-row items-center gap-2 pb-3">
+                      <Button asChild variant="ghost" className="font-semibold flex-1 h-12 rounded-full text-base" >
+                        <Link to="/logopedski-koticek">Logopedski kotiček</Link>
+                      </Button>
+                      <Button 
+                        type="button"
+                        variant="ghost"
+                        className="font-semibold flex-1 h-12 rounded-full text-base"
+                        onClick={handleCenikScroll}
+                      >
+                        Cenik
+                      </Button>
+                    </div>
+                    {/* Profile/child selection, navigation/menus, auth buttons */}
+                    {user && (
+                      <>
+                        {/* Profile selection section - only if logged in */}
+                        <div className="space-y-4 pb-4 border-b border-gray-200">
+                          <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Profili</h3>
+                          
+                          {/* Parent profile */}
+                          <div 
+                            className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
+                              selectedChildIndex === null ? 'bg-blue-50 border border-blue-200' : 'hover:bg-gray-50'
+                            }`}
+                            onClick={() => handleSelectChild(null)}
+                          >
+                            <Avatar className="h-8 w-8 border border-blue-200">
+                              <AvatarFallback className="bg-blue-100 text-blue-800">
+                                {profile?.username?.[0] || user.email?.[0] || "U"}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1">
+                              <div className="font-medium text-gray-900">{profile?.username || user.email}</div>
+                              <div className="text-xs text-blue-600 font-medium">Starš</div>
+                            </div>
+                            {selectedChildIndex === null && (
+                              <Check className="h-5 w-5 text-blue-600" />
+                            )}
+                          </div>
+                          
+                          {/* Children profiles */}
+                          {profile?.children && profile.children.length > 0 && (
+                            <div className="space-y-2">
+                              {profile.children.map((child, index) => (
+                                <div 
+                                  key={index}
+                                  className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
+                                    selectedChildIndex === index ? 'bg-green-50 border border-green-200' : 'hover:bg-gray-50'
+                                  }`}
+                                  onClick={() => handleSelectChild(index)}
+                                >
+                                  <Avatar className="h-8 w-8 border border-green-200">
+                                    {child.avatarId > 0 ? (
+                                      <AvatarImage 
+                                        src={getAvatarSrc(child.avatarId)} 
+                                        alt={child.name} 
+                                        className="object-contain" 
+                                      />
+                                    ) : (
+                                      <AvatarFallback className="bg-green-100 text-green-800">
+                                        {child.name[0]}
+                                      </AvatarFallback>
+                                    )}
+                                  </Avatar>
+                                  <div className="flex-1">
+                                    <div className="font-medium text-gray-900">{child.name}</div>
+                                    <div className="text-xs text-green-600 font-medium">Otrok</div>
+                                  </div>
+                                  {selectedChildIndex === index && (
+                                    <Check className="h-5 w-5 text-green-600" />
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Main navigation - only if logged in */}
+                        <div className="space-y-3">
+                          <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Navigacija</h3>
+                          {navigationLinks.map((link, index) => (
+                            <Button 
+                              key={index}
+                              variant="ghost" 
+                              className={`w-full justify-start text-left h-12 ${
+                                !link.disabled ? '' : 'opacity-50 cursor-not-allowed'
+                              } ${isActivePath(link.path) ? 'bg-accent' : ''}`}
+                              onClick={() => {
+                                if (!link.disabled) {
+                                  if (link.options) {
+                                    handleNavigate(link.path, link.options);
+                                  } else {
+                                    handleNavigate(link.path);
+                                  }
+                                }
+                              }}
+                              disabled={link.disabled}
+                            >
+                              <link.icon className="h-5 w-5 mr-3" />
+                              <span className="font-medium">{link.label}</span>
+                            </Button>
+                          ))}
+                          
+                          {/* Logout button */}
+                          <Button 
+                            variant="ghost" 
+                            className="w-full justify-start text-left h-12 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            onClick={handleSignOut}
+                          >
+                            <LogOut className="h-5 w-5 mr-3" />
+                            <span className="font-medium">Odjava</span>
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                    {!user && (
+                      <div className="flex flex-col gap-3">
+                        <Button
+                          onClick={handleStartNow}
+                          className="w-full h-12 rounded-full text-base bg-dragon-green hover:bg-dragon-green/90 text-white font-semibold"
+                        >
+                          <Play className="h-4 w-4 mr-2" />
+                          Začni zdaj
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="w-full h-12 rounded-full text-base font-semibold"
+                          onClick={() => navigate("/login")}
+                        >
+                          Prijava
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="w-full h-12 rounded-full text-base font-semibold"
+                          onClick={() => navigate("/register")}
+                        >
+                          <UserPlus className="h-4 w-4 mr-2" />
+                          Registracija
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </ScrollArea>
               </SheetContent>
             </Sheet>
           </div>
-          
-          {/* Desktop navigation - shows above lg breakpoint */}
-          <nav className="hidden lg:flex items-center gap-6">
-            {user ? (
+
+          {/* DESKTOP HEADER */}
+          <nav className="hidden lg:flex items-center gap-4">
+            {/* Always show Logopedski kotiček and Cenik */}
+            <Button
+              asChild
+              variant="ghost"
+              className="font-semibold rounded-full h-12 text-base px-6"
+            >
+              <Link to="/logopedski-koticek">Logopedski kotiček</Link>
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              className="font-semibold rounded-full h-12 text-base px-6"
+              onClick={handleCenikScroll}
+            >
+              Cenik
+            </Button>
+            {/* --- When LOGGED IN, show main navigation left of user profile --- */}
+            {user && (
               <>
-                {/* Desktop Navigation Links */}
+                {/* Navigation links, slice excludes Logopedski kotiček */}
                 {navigationLinks.slice(0, 6).map((link, index) => (
                   <Button 
                     key={index} 
                     variant="ghost" 
                     onClick={() => !link.disabled && handleNavigate(link.path)} 
                     disabled={link.disabled}
-                    className={isActivePath(link.path) ? 'bg-accent' : ''}
+                    className={
+                      "rounded-full h-12 text-base px-6 font-semibold " +
+                      (isActivePath(link.path) ? 'bg-accent' : '')
+                    }
                   >
                     {link.label === "Logopedski kotiček" && <BookOpen className="h-4 w-4 mr-2" />}
                     {link.label}
                   </Button>
                 ))}
-                
-                <div className="flex items-center gap-2">
-                  <UserProfile />
-                </div>
+                <UserProfile />
               </>
-            ) : (
-              // --------- LOGGED OUT: Display "Logopedski kotiček" and Cenik ---------
-              <div className="flex items-center gap-3">
+            )}
+            {/* --- When LOGGED OUT, show consistent action buttons --- */}
+            {!user && (
+              <>
                 <Button
-                  asChild
-                  variant="ghost"
-                  className="font-semibold px-4"
+                  onClick={handleStartNow}
+                  className="rounded-full h-12 text-base px-6 bg-dragon-green hover:bg-dragon-green/90 font-semibold text-white min-w-[160px]"
                 >
-                  <Link to="/logopedski-koticek">Logopedski kotiček</Link>
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="font-semibold px-4"
-                  onClick={handleCenikScroll}
-                >
-                  Cenik
-                </Button>
-                {/* New orange "Začni zdaj" button */}
-                <Button onClick={handleStartNow} size="sm" className="w-full sm:w-auto bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full min-w-[180px]">
+                  <Play className="h-4 w-4 mr-2" />
                   Začni zdaj
                 </Button>
                 <Link to="/register">
-                  <Button variant="outline" size="sm" className="text-sm">
-                    <UserPlus className="h-4 w-4 mr-1" />
+                  <Button
+                    variant="outline"
+                    className="rounded-full h-12 text-base px-6 font-semibold min-w-[160px]"
+                  >
+                    <UserPlus className="h-4 w-4 mr-2" />
                     Registracija
                   </Button>
                 </Link>
                 <Link to="/login">
-                  <Button variant="outline" size="sm" className="text-sm">
+                  <Button
+                    variant="outline"
+                    className="rounded-full h-12 text-base px-6 font-semibold min-w-[160px]"
+                  >
                     Prijava
                   </Button>
                 </Link>
-              </div>
+              </>
             )}
           </nav>
         </div>
