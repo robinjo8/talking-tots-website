@@ -11,6 +11,7 @@ import { SelectChildDialog } from "@/components/SelectChildDialog";
 import { FeaturesCarousel } from "@/components/FeaturesCarousel";
 import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
 import PricingSection from "@/components/PricingSection";
+import ProgressComparisonSection from "@/components/ProgressComparisonSection";
 
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -266,6 +267,9 @@ const Index = () => {
           )}
         </div>
       </section>
+
+      {/* Progress Comparison Section */}
+      <ProgressComparisonSection />
 
       {/* Features Section */}
       <section id="features" className="py-14 px-4 md:px-10 bg-light-cloud w-full overflow-x-hidden">
