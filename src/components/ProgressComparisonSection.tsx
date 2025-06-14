@@ -91,7 +91,7 @@ export function ProgressComparisonSection() {
         </h2>
 
         {/* Full-width graph container */}
-        <div ref={containerRef} className="w-full relative mb-8">
+        <div ref={containerRef} className="w-full relative mb-6">
           <svg
             className="w-full"
             width={dimensions.width}
@@ -115,11 +115,11 @@ export function ProgressComparisonSection() {
               </linearGradient>
               
               <filter id="glow">
-                <fegaussianblur stdDeviation="3" result="coloredBlur"/>
-                <femerge> 
-                  <femergenode in="coloredBlur"/>
-                  <femergenode in="SourceGraphic"/>
-                </femerge>
+                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                <feMerge> 
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
               </filter>
             </defs>
             
@@ -245,6 +245,25 @@ export function ProgressComparisonSection() {
                 </foreignObject>
               </g>
             )}
+
+            {/* TomiTalk dragon mascot - appears in the middle of the curve */}
+            {curveProgress > 0.6 && (
+              <g>
+                <foreignObject 
+                  x={dimensions.width / 2 - 25} 
+                  y={dimensions.height / 2 - 40} 
+                  width="50" 
+                  height="50"
+                  className="animate-bounce"
+                >
+                  <img 
+                    src="/lovable-uploads/b7d640cd-ec64-4333-9f08-db00e8814bcc.png" 
+                    alt="TomiTalk dragon mascot" 
+                    className="w-full h-full object-contain"
+                  />
+                </foreignObject>
+              </g>
+            )}
             
             {/* Progress indicators */}
             <g fontSize="12" fontWeight="600" fill="#666">
@@ -263,8 +282,8 @@ export function ProgressComparisonSection() {
           </svg>
         </div>
 
-        {/* Bottom section with comparison */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mt-8">
+        {/* Bottom section with comparison - reduced spacing */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mt-4">
           {/* Left - Traditional System */}
           <div className="flex flex-col items-center md:items-start">
             <div className="flex items-center gap-3 mb-2">
@@ -274,8 +293,8 @@ export function ProgressComparisonSection() {
               <span className="text-lg font-bold text-gray-700">Javni sistem</span>
             </div>
             <div className="text-3xl md:text-4xl font-extrabold text-app-orange mb-1">+6 mesecev</div>
-            <div className="text-sm text-gray-500 font-medium text-center md:text-left max-w-[200px]">
-              Povprečen čas do prve obravnave v javnem zdravstvu
+            <div className="text-sm text-gray-600 font-medium text-center md:text-left max-w-[280px] leading-relaxed">
+              Povprečno čakanje na logopeda v javnem zdravstvu
             </div>
           </div>
 
@@ -288,8 +307,8 @@ export function ProgressComparisonSection() {
               <span className="text-lg font-bold text-gray-700">Tomi Talk</span>
             </div>
             <div className="text-3xl md:text-4xl font-extrabold text-dragon-green mb-1">Takoj</div>
-            <div className="text-sm text-gray-500 font-medium text-center md:text-right max-w-[200px]">
-              Govorne vaje na voljo takoj – brez čakanja
+            <div className="text-sm text-gray-600 font-medium text-center md:text-right max-w-[280px] leading-relaxed">
+              Govorne vaje brez čakalnih vrst – dostopne takoj z aplikacijo Tomi Talk
             </div>
           </div>
         </div>
