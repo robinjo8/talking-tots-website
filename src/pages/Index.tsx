@@ -75,7 +75,7 @@ const Index = () => {
       <Header />
       
       {/* Hero Section - Centered layout without dragon */}
-      <section className="pt-14 pb-10 px-4 md:px-[40px]"> {/* Unified vertical spacing */}
+      <section className="pt-24 md:pt-32 pb-10 px-4 md:px-[40px]"> {/* Increased top padding for visibility */}
         <div className="absolute -top-10 -left-10 w-32 h-32 bg-app-yellow/20 rounded-full blur-3xl"></div>
         <div className="absolute top-40 -right-10 w-60 h-60 bg-app-blue/20 rounded-full blur-3xl"></div>
         
