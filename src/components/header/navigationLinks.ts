@@ -1,8 +1,18 @@
 
-import { Home, Activity, Gamepad, Video, BookOpen, Bell, CreditCard, User } from "lucide-react";
+import { Home, Activity, Gamepad, Video, BookOpen, Bell, CreditCard, User, Target, Euro } from "lucide-react";
 import { NavigationLink } from "./types";
 
 export const authenticatedNavigationLinks: NavigationLink[] = [
+  {
+    label: "Namen",
+    path: "#purpose",
+    icon: Target
+  },
+  {
+    label: "Cenik",
+    path: "#pricing",
+    icon: Euro
+  },
   {
     label: "Moja stran",
     path: "/moja-stran",
@@ -48,7 +58,19 @@ export const authenticatedNavigationLinks: NavigationLink[] = [
 ];
 
 export const unauthenticatedNavigationLinks: NavigationLink[] = [
-  { label: "Namen", path: "#", disabled: true },
-  { label: "Cenik", path: "#", disabled: true },
-  { label: "Logopedski kotiček", path: "/logopedski-koticek", icon: BookOpen }
+  {
+    label: "Namen",
+    path: "#purpose",
+    icon: Target
+  },
+  {
+    label: "Cenik",
+    path: "#pricing",
+    icon: Euro
+  },
+  {
+    label: "Logopedski kotiček",
+    path: "/logopedski-koticek",
+    icon: BookOpen
+  }
 ];

@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import FeatureCard from "@/components/FeatureCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Mic, Play, Book, Stars, MessageSquare, Zap, Volume2, Award, CheckCircle, Shield, Users, CirclePlay, Info, PiggyBank, ArrowUp } from "lucide-react";
+import { Mic, Play, Book, Stars, MessageSquare, Zap, Volume2, Award, CheckCircle, Shield, Users, CirclePlay, Info, PiggyBank, ArrowUp, Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SelectChildDialog } from "@/components/SelectChildDialog";
@@ -43,6 +42,58 @@ const Index = () => {
     quote: "Z govornimi vajami se je mojemu otroku odprlo tudi na drugih področjih in ni več tako zaprt.",
     author: "— Peter, oče 6-letnika"
   }];
+
+  // Pricing packages data
+  const pricingPackages = [
+    {
+      name: "Osnovni",
+      price: "9,99",
+      period: "mesec",
+      description: "Popolno za začetek",
+      features: [
+        "Dostop do osnovnih govornih vaj",
+        "1 otroški profil",
+        "Napredek beleženja",
+        "Osnovne govorne igre",
+        "Email podpora"
+      ],
+      recommended: false,
+      buttonText: "Začni zdaj"
+    },
+    {
+      name: "Premium",
+      price: "19,99",
+      period: "mesec",
+      description: "Najboljši izbor za družine",
+      features: [
+        "Dostop do vseh govornih vaj",
+        "Neomejeno otroških profilov",
+        "Napredna analitika napredka",
+        "Vse govorne igre",
+        "Video navodila",
+        "Personalizirane vaje",
+        "Prednostna podpora"
+      ],
+      recommended: true,
+      buttonText: "Izberi Premium"
+    },
+    {
+      name: "Letni Premium",
+      price: "199,99",
+      period: "leto",
+      description: "Prihrani 17% z letno naročnino",
+      originalPrice: "239,88",
+      features: [
+        "Vse iz Premium paketa",
+        "Prihranek 17%",
+        "Brezplačne posodobitve",
+        "Dodatni avatarji",
+        "Razširjena podpora"
+      ],
+      recommended: false,
+      buttonText: "Izberi letno"
+    }
+  ];
   
   useEffect(() => {
     setIsVisible(true);
@@ -73,12 +124,21 @@ const Index = () => {
       });
     }
   };
+
+  const scrollToPricing = () => {
+    const pricingSection = document.getElementById('pricing');
+    if (pricingSection) {
+      pricingSection.scrollIntoView({
+        behavior: 'smooth'
+      });
+    }
+  };
   
   return <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden">
       <Header />
       
       {/* Hero Section - Centered layout */}
-      <section className="pt-16 md:pt-32 pb-16 md:pb-24 px-4 relative w-full">
+      <section id="purpose" className="pt-16 md:pt-32 pb-16 md:pb-24 px-4 relative w-full">
         <div className="absolute -top-10 -left-10 w-32 h-32 bg-app-yellow/20 rounded-full blur-3xl"></div>
         <div className="absolute top-40 -right-10 w-60 h-60 bg-app-blue/20 rounded-full blur-3xl"></div>
         
@@ -110,9 +170,9 @@ const Index = () => {
                     <CirclePlay className="h-4 w-4" />
                     Demo
                   </Button>
-                  <Button size="lg" onClick={scrollToFeatures} className="flex-1 h-12 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold">
-                    <Info className="h-4 w-4" />
-                    Info
+                  <Button size="lg" onClick={scrollToPricing} className="flex-1 h-12 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold">
+                    <PiggyBank className="h-4 w-4" />
+                    Cenik
                   </Button>
                 </div>
               </div>
@@ -170,9 +230,9 @@ const Index = () => {
                     <CirclePlay className="h-5 w-5" />
                     Poglej demo
                   </Button>
-                  <Button size="lg" onClick={scrollToFeatures} className="w-auto sm:w-48 h-14 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-lg font-semibold">
-                    <Info className="h-5 w-5" />
-                    Več info
+                  <Button size="lg" onClick={scrollToPricing} className="w-auto sm:w-48 h-14 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-lg font-semibold">
+                    <PiggyBank className="h-5 w-5" />
+                    Poglej cenik
                   </Button>
                 </div>
                 
@@ -256,6 +316,85 @@ const Index = () => {
           <FeaturesCarousel />
         </div>
       </section>
+
+      {/* Pricing Section */}
+      <section id="pricing" className="py-20 px-4 md:px-10 bg-white w-full">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Izberite svoj paket</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Transparentno cenovanje brez skritih stroškov. Začnite z osnovnim paketom ali izberite premium za popolno izkušnjo.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {pricingPackages.map((pkg, index) => (
+              <div 
+                key={index} 
+                className={`relative bg-white rounded-2xl shadow-lg border-2 p-8 ${
+                  pkg.recommended 
+                    ? 'border-dragon-green scale-105 md:scale-110' 
+                    : 'border-gray-200'
+                } transition-all duration-300 hover:shadow-xl`}
+              >
+                {pkg.recommended && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <Badge className="bg-dragon-green text-white px-4 py-1 text-sm font-semibold">
+                      Priporočeno
+                    </Badge>
+                  </div>
+                )}
+                
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold mb-2">{pkg.name}</h3>
+                  <p className="text-gray-600 mb-4">{pkg.description}</p>
+                  
+                  <div className="mb-4">
+                    {pkg.originalPrice && (
+                      <span className="text-lg text-gray-400 line-through mr-2">
+                        €{pkg.originalPrice}
+                      </span>
+                    )}
+                    <span className="text-4xl font-bold text-gray-900">
+                      €{pkg.price}
+                    </span>
+                    <span className="text-gray-600">/{pkg.period}</span>
+                  </div>
+                </div>
+                
+                <ul className="space-y-4 mb-8">
+                  {pkg.features.map((feature, featureIndex) => (
+                    <li key={featureIndex} className="flex items-start gap-3">
+                      <Check className="h-5 w-5 text-dragon-green mt-0.5 flex-shrink-0" />
+                      <span className="text-gray-700">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                
+                <Button 
+                  className={`w-full h-12 rounded-lg font-semibold ${
+                    pkg.recommended
+                      ? 'bg-dragon-green hover:bg-dragon-green/90 text-white'
+                      : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+                  }`}
+                  onClick={handleStartNow}
+                >
+                  {pkg.buttonText}
+                </Button>
+              </div>
+            ))}
+          </div>
+          
+          <div className="text-center mt-12">
+            <p className="text-gray-600 mb-4">
+              Vsi paketi vključujejo 7-dnevno brezplačno preizkusno obdobje
+            </p>
+            <p className="text-sm text-gray-500">
+              Naročnino lahko kadarkoli prekličete brez dodatnih stroškov
+            </p>
+          </div>
+        </div>
+      </section>
       
       {/* Call to Action with Dragon */}
       <section id="cta" className="py-20 px-4 md:px-10 relative overflow-hidden w-full">
@@ -271,7 +410,7 @@ const Index = () => {
                 Prenesite Tomi Talk danes in opazujte, kako komunikacijske veščine vašega otroka cvetijo!
               </p>
               
-              {/* Dragon for mobile */}
+              {/* Dragon for mobile - fixed visibility */}
               <div className="relative w-48 h-48 mx-auto mb-6">
                 <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
                 <div className="animate-float relative">
@@ -280,11 +419,11 @@ const Index = () => {
               </div>
               
               <div className="flex flex-wrap justify-center gap-4">
-                <Button size="lg" className="bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full">
-                  Prenos za iOS
+                <Button size="lg" className="bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full" onClick={handleStartNow}>
+                  Začni zdaj
                 </Button>
-                <Button size="lg" className="bg-app-blue hover:bg-app-blue/90 text-white rounded-full">
-                  Prenos za Android
+                <Button size="lg" onClick={scrollToPricing} className="bg-app-blue hover:bg-app-blue/90 text-white rounded-full">
+                  Poglej cenik
                 </Button>
               </div>
             </div>
@@ -298,24 +437,24 @@ const Index = () => {
                 <div className="flex-1 text-center lg:text-left">
                   <h2 className="text-3xl md:text-4xl font-bold mb-4">Ste pripravljeni na govorno avanturo?</h2>
                   <p className="text-xl text-muted-foreground mb-8">
-                    Prenesite Tomi Talk danes in opazujte, kako komunikacijske veščine vašega otroka cvetijo!
+                    Začnite z TomiTalk danes in opazujte, kako komunikacijske veščine vašega otroka cvetijo!
                   </p>
                   <div className="flex flex-wrap justify-center lg:justify-start gap-4">
-                    <Button size="lg" className="bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full">
-                      Prenos za iOS
+                    <Button size="lg" className="bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full" onClick={handleStartNow}>
+                      Začni zdaj
                     </Button>
-                    <Button size="lg" className="bg-app-blue hover:bg-app-blue/90 text-white rounded-full">
-                      Prenos za Android
+                    <Button size="lg" onClick={scrollToPricing} className="bg-app-blue hover:bg-app-blue/90 text-white rounded-full">
+                      Poglej cenik
                     </Button>
                   </div>
                 </div>
                 
-                {/* Right side - Dragon */}
+                {/* Right side - Dragon - improved positioning */}
                 <div className="flex-shrink-0">
                   <div className="relative w-64 h-64 xl:w-80 xl:h-80">
                     <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
                     <div className="animate-float relative">
-                      <img alt="Tomi Talk Dragon Mascot" className="w-full h-full object-contain" src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" />
+                      <img alt="Tomi Talk Dragon Mascot" className="w-full h-full object-contain drop-shadow-lg" src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png" />
                     </div>
                   </div>
                 </div>
