@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -42,9 +43,11 @@ const Index = () => {
     quote: "Z govornimi vajami se je mojemu otroku odprlo tudi na drugih področjih in ni več tako zaprt.",
     author: "— Peter, oče 6-letnika"
   }];
+  
   useEffect(() => {
     setIsVisible(true);
   }, []);
+  
   const handleStartNow = () => {
     // If not logged in, redirect to login page
     if (!user) {
@@ -61,6 +64,7 @@ const Index = () => {
       setShowChildSelector(true);
     }
   };
+  
   const scrollToFeatures = () => {
     const featuresSection = document.getElementById('features');
     if (featuresSection) {
@@ -69,32 +73,33 @@ const Index = () => {
       });
     }
   };
+  
   return <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden">
       <Header />
       
-      {/* Hero Section - Centered layout without dragon */}
-      <section className="pt-16 md:pt-28 pb-10 md:pb-16 px-4 relative w-full md:px-[40px] py-[100px]">
+      {/* Hero Section - Centered layout */}
+      <section className="pt-16 md:pt-32 pb-16 md:pb-24 px-4 relative w-full">
         <div className="absolute -top-10 -left-10 w-32 h-32 bg-app-yellow/20 rounded-full blur-3xl"></div>
         <div className="absolute top-40 -right-10 w-60 h-60 bg-app-blue/20 rounded-full blur-3xl"></div>
         
         <div className="max-w-6xl mx-auto">
           {/* Mobile Layout - Centered */}
-          {isMobile && <div className={`flex flex-col items-center text-center space-y-6 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
-              {/* Main Headlines - Centered */}
-              <div className="mb-4">
-                <h1 className="text-3xl leading-tight font-bold mb-4">
+          {isMobile && <div className={`flex flex-col items-center text-center space-y-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out`}>
+              {/* Main Headlines - Centered with improved spacing */}
+              <div className="mb-6">
+                <h1 className="text-3xl md:text-4xl leading-tight font-bold mb-6">
                   <span className="block text-neutral-950">Odpravite govorne težave brez čakanja –</span>
-                  <span className="block text-dragon-green mt-2">
+                  <span className="block text-dragon-green mt-3">
                     s pomočjo pametnega AI pomočnika!
                   </span>
                 </h1>
-                <p className="text-lg leading-relaxed text-neutral-950 font-medium">
+                <p className="text-lg md:text-xl leading-relaxed text-neutral-950 font-medium max-w-3xl mx-auto">
                   Pridruži se staršem, ki že vsak dan vadijo govorne vaje s svojimi otroki – personalizirano glede na starost, težavo in logopedske smernice.
                 </p>
               </div>
               
               {/* Action Buttons */}
-              <div className="flex flex-col items-center gap-3 mb-6 w-full max-w-xs">
+              <div className="flex flex-col items-center gap-3 mb-8 w-full max-w-xs">
                 <Button size="lg" onClick={handleStartNow} className="w-full h-12 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold">
                   <Play className="h-4 w-4" />
                   Začni zdaj
@@ -113,7 +118,7 @@ const Index = () => {
               </div>
               
               {/* Trust Badges - Horizontal row with circular icons */}
-              <div className="flex justify-center gap-8 mb-6 py-[20px]">
+              <div className="flex justify-center gap-8 py-4">
                 <div className="flex flex-col items-center text-center">
                   <div className="w-16 h-16 mb-2 rounded-full bg-gradient-to-br from-dragon-green to-app-teal flex items-center justify-center shadow-lg border-2 border-white">
                     <CheckCircle className="h-8 w-8 text-white" />
@@ -135,61 +140,61 @@ const Index = () => {
               </div>
             </div>}
           
-          {/* Desktop Layout - Centered content */}
+          {/* Desktop Layout - Centered content with improved spacing */}
           {!isMobile && <>
-              <div className="relative flex flex-col items-center justify-center text-center">
-                {/* Main Headline - Centered */}
-                <div className={`mb-6 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-100`}>
-                  <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl leading-tight font-bold">
-                    <span className="block text-neutral-950">Odpravite govorne težave brez čakanja –</span>
-                    <span className="block text-dragon-green mt-2">
+              <div className="relative flex flex-col items-center justify-center text-center min-h-[70vh]">
+                {/* Main Headline - Centered with better vertical spacing */}
+                <div className={`mb-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-100`}>
+                  <h1 className="text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl leading-tight font-bold">
+                    <span className="block text-neutral-950 mb-4">Odpravite govorne težave brez čakanja –</span>
+                    <span className="block text-dragon-green">
                       s pomočjo pametnega AI pomočnika!
                     </span>
                   </h1>
                 </div>
                 
-                {/* Subheadline - Centered */}
-                <div className={`mb-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-200`}>
-                  <p className="text-lg md:text-xl leading-relaxed text-neutral-950 font-medium max-w-4xl mx-auto">
+                {/* Subheadline - Centered with proper spacing */}
+                <div className={`mb-12 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-200`}>
+                  <p className="text-xl md:text-2xl leading-relaxed text-neutral-950 font-medium max-w-5xl mx-auto">
                     Pridruži se staršem, ki že vsak dan vadijo govorne vaje s svojimi otroki – personalizirano glede na starost, težavo in logopedske smernice.
                   </p>
                 </div>
                 
-                {/* Action Buttons - Centered */}
-                <div className={`flex flex-row gap-4 justify-center mb-10 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-300`}>
-                  <Button size="lg" onClick={handleStartNow} className="w-auto sm:w-48 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-2">
-                    <Play className="h-4 w-4" />
+                {/* Action Buttons - Centered with improved spacing */}
+                <div className={`flex flex-row gap-6 justify-center mb-16 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-300`}>
+                  <Button size="lg" onClick={handleStartNow} className="w-auto sm:w-48 h-14 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-2 text-lg font-semibold">
+                    <Play className="h-5 w-5" />
                     Začni zdaj
                   </Button>
-                  <Button size="lg" className="w-auto sm:w-48 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2">
-                    <CirclePlay className="h-4 w-4" />
+                  <Button size="lg" className="w-auto sm:w-48 h-14 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-lg font-semibold">
+                    <CirclePlay className="h-5 w-5" />
                     Poglej demo
                   </Button>
-                  <Button size="lg" onClick={scrollToFeatures} className="w-auto sm:w-48 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2">
-                    <Info className="h-4 w-4" />
+                  <Button size="lg" onClick={scrollToFeatures} className="w-auto sm:w-48 h-14 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-lg font-semibold">
+                    <Info className="h-5 w-5" />
                     Več info
                   </Button>
                 </div>
                 
-                {/* Trust Badges - Centered */}
-                <div className={`grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 lg:mb-0 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-400`}>
+                {/* Trust Badges - Centered with better spacing */}
+                <div className={`grid grid-cols-1 md:grid-cols-3 gap-12 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-400`}>
                   <div className="flex flex-col items-center text-center">
-                    <div className="w-20 h-20 mb-3 rounded-full bg-gradient-to-br from-dragon-green to-app-teal flex items-center justify-center shadow-lg border-4 border-white">
-                      <CheckCircle className="h-8 w-8 text-white" />
+                    <div className="w-24 h-24 mb-4 rounded-full bg-gradient-to-br from-dragon-green to-app-teal flex items-center justify-center shadow-lg border-4 border-white">
+                      <CheckCircle className="h-10 w-10 text-white" />
                     </div>
-                    <span className="text-neutral-950 font-medium text-sm">Temelji na logopedskih smernicah</span>
+                    <span className="text-neutral-950 font-medium text-base">Temelji na logopedskih smernicah</span>
                   </div>
                   <div className="flex flex-col items-center text-center">
-                    <div className="w-20 h-20 mb-3 rounded-full bg-gradient-to-br from-app-blue to-app-purple flex items-center justify-center shadow-lg border-4 border-white">
-                      <ArrowUp className="h-8 w-8 text-white" />
+                    <div className="w-24 h-24 mb-4 rounded-full bg-gradient-to-br from-app-blue to-app-purple flex items-center justify-center shadow-lg border-4 border-white">
+                      <ArrowUp className="h-10 w-10 text-white" />
                     </div>
-                    <span className="text-neutral-950 font-medium text-sm">Dokazan napredek pri izgovorjavi</span>
+                    <span className="text-neutral-950 font-medium text-base">Dokazan napredek pri izgovorjavi</span>
                   </div>
                   <div className="flex flex-col items-center text-center">
-                    <div className="w-20 h-20 mb-3 rounded-full bg-gradient-to-br from-app-orange to-app-yellow flex items-center justify-center shadow-lg border-4 border-white">
-                      <Users className="h-8 w-8 text-white" />
+                    <div className="w-24 h-24 mb-4 rounded-full bg-gradient-to-br from-app-orange to-app-yellow flex items-center justify-center shadow-lg border-4 border-white">
+                      <Users className="h-10 w-10 text-white" />
                     </div>
-                    <span className="text-neutral-950 font-medium text-sm">Priporočeno s strani staršev</span>
+                    <span className="text-neutral-950 font-medium text-base">Priporočeno s strani staršev</span>
                   </div>
                 </div>
               </div>
