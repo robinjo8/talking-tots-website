@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from "react";
 import { Clock, Rocket } from "lucide-react";
 
@@ -91,7 +90,7 @@ export function ProgressComparisonSection() {
         </h2>
 
         {/* Full-width graph container */}
-        <div ref={containerRef} className="w-full relative mb-8">
+        <div ref={containerRef} className="w-full relative mb-4">
           <svg
             className="w-full"
             width={dimensions.width}
@@ -102,24 +101,22 @@ export function ProgressComparisonSection() {
           >
             {/* Gradient definitions */}
             <defs>
-              <linearGradient id="progress-gradient" x1="0%" y1="100%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
-                <stop offset="0%" stopColor="#4CAF50" stopOpacity="0.9" />
-                <stop offset="40%" stopColor="#66BB6A" stopOpacity="0.95" />
-                <stop offset="80%" stopColor="#81C784" stopOpacity="1" />
-                <stop offset="100%" stopColor="#A5D6A7" stopOpacity="1" />
+              <linearGradient id="curve-gradient" x1="0%" y1="100%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
+                <stop offset="0%" stopColor="#B9F6CA" /> {/* Light green */}
+                <stop offset="33%" stopColor="#69F0AE" />
+                <stop offset="66%" stopColor="#00E676" />
+                <stop offset="100%" stopColor="#388E3C" /> {/* Darker green */}
               </linearGradient>
-              
               <linearGradient id="area-gradient" x1="0%" y1="100%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
                 <stop offset="0%" stopColor="#4CAF50" stopOpacity="0.1" />
                 <stop offset="100%" stopColor="#81C784" stopOpacity="0.05" />
               </linearGradient>
-              
               <filter id="glow">
-                <fegaussianblur stdDeviation="3" result="coloredBlur"/>
-                <femerge> 
-                  <femergenode in="coloredBlur"/>
-                  <femergenode in="SourceGraphic"/>
-                </femerge>
+                <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                <feMerge>
+                  <feMergeNode in="coloredBlur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
               </filter>
             </defs>
             
@@ -180,7 +177,7 @@ export function ProgressComparisonSection() {
               
               {/* X-axis label */}
               <text x={dimensions.width - 40} y={dimensions.height - 35} textAnchor="end" className="font-semibold">
-                Čas →
+                Čas
               </text>
             </g>
             
@@ -193,17 +190,18 @@ export function ProgressComparisonSection() {
               />
             )}
             
-            {/* Main animated curve */}
+            {/* Main animated curve (thicker, multi-green gradient) */}
             <path
               d={getAnimatedPath(curveProgress, dimensions.width, dimensions.height)}
               fill="none"
-              stroke="url(#progress-gradient)"
-              strokeWidth="5"
+              stroke="url(#curve-gradient)"
+              strokeWidth="8"
               strokeLinecap="round"
               strokeLinejoin="round"
               filter="url(#glow)"
               style={{
                 filter: "drop-shadow(0px 4px 12px rgba(76, 175, 80, 0.4))",
+                transition: 'stroke-width 0.3s'
               }}
             />
             
@@ -261,6 +259,40 @@ export function ProgressComparisonSection() {
               )}
             </g>
           </svg>
+        </div>
+
+        {/* Labels Below Graph */}
+        <div className="flex flex-col gap-2 md:gap-3 w-full max-w-3xl mx-auto pt-1 pb-2">
+          {/* Top row: system labels */}
+          <div className="flex flex-row items-center justify-between w-full">
+            {/* Left: JAVNI SISTEM */}
+            <span className="font-extrabold text-xl md:text-2xl uppercase text-zinc-800 tracking-wide">
+              JAVNI SISTEM
+            </span>
+            {/* Right: Tomi Talk with green-orange gradient */}
+            <span
+              className="font-extrabold text-xl md:text-2xl"
+              style={{
+                background: "linear-gradient(90deg, #4CAF50 10%, #FF9800 95%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text"
+              }}
+            >
+              Tomi Talk
+            </span>
+          </div>
+          {/* Bottom row: descriptions */}
+          <div className="flex flex-row items-center justify-between w-full mt-0">
+            {/* Left description */}
+            <span className="text-base md:text-lg font-medium text-gray-700 whitespace-nowrap">
+              Povprečno čakanje na logopeda v javnem zdravstvu
+            </span>
+            {/* Right description */}
+            <span className="text-base md:text-lg font-medium text-gray-700 text-right whitespace-nowrap">
+              Govorne vaje brez čakalnih vrst – dostopne takoj z aplikacijo Tomi Talk
+            </span>
+          </div>
         </div>
 
         {/* Bottom section with comparison */}
