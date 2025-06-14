@@ -2,29 +2,29 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Clock, Rocket } from "lucide-react";
 
-const CURVE_DURATION = 1600;
+const CURVE_DURATION = 2000;
 
 function getAnimatedPath(progress: number) {
-  // Animate a smooth, quadratic Bézier curve
-  const start = { x: 10, y: 110 };
-  const end = { x: 410, y: 30 };
-  const ctrl = { x: 180, y: 20 };
-
-  // Break curve into points from start up to current progress
-  const steps = Math.floor(80 + progress * 120);
+  // Create an exponential growth curve that matches the reference
+  const start = { x: 50, y: 250 };
+  const end = { x: 350, y: 50 };
+  
+  // Calculate points along an exponential curve
+  const steps = Math.floor(60 + progress * 80);
   let d = `M${start.x} ${start.y}`;
+  
   for (let i = 1; i <= steps; i++) {
-    const tt = (i / steps) * progress;
-    const xx =
-      Math.pow(1 - tt, 2) * start.x +
-      2 * (1 - tt) * tt * ctrl.x +
-      Math.pow(tt, 2) * end.x;
-    const yy =
-      Math.pow(1 - tt, 2) * start.y +
-      2 * (1 - tt) * tt * ctrl.y +
-      Math.pow(tt, 2) * end.y;
-    d += ` L${xx} ${yy}`;
+    const t = (i / steps) * progress;
+    
+    // Exponential easing function for steep initial growth then leveling off
+    const eased = 1 - Math.exp(-4 * t);
+    
+    const x = start.x + (end.x - start.x) * t;
+    const y = start.y - (start.y - end.y) * eased;
+    
+    d += ` L${x} ${y}`;
   }
+  
   return d;
 }
 
@@ -38,7 +38,8 @@ export function ProgressComparisonSection() {
       if (!start) start = ts;
       const elapsed = ts - start;
       const progress = Math.min(elapsed / CURVE_DURATION, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
+      // Smooth easing
+      const eased = 1 - Math.pow(1 - progress, 2);
       setCurveProgress(eased);
       if (progress < 1) {
         reqRef.current = requestAnimationFrame(animateCurve);
@@ -79,68 +80,82 @@ export function ProgressComparisonSection() {
           </div>
 
           {/* Graph and Curve (center) */}
-          <div className="relative flex-1 flex justify-center md:mx-2 w-full h-40 md:h-48">
+          <div className="relative flex-1 flex justify-center md:mx-2 w-full h-48 md:h-56">
             <svg
               className="absolute left-0 right-0 top-1/2 -translate-y-1/2"
               width="100%"
               height="100%"
-              viewBox="0 0 420 130"
-              preserveAspectRatio="none"
+              viewBox="0 0 400 300"
+              preserveAspectRatio="xMidYMid meet"
               aria-hidden="true"
             >
-              {/* Subtle grid lines & axes */}
-              <g>
-                {/* Y-axis */}
-                <line x1="35" y1="15" x2="35" y2="115" stroke="#d5e7d6" strokeWidth="2" />
-                {/* X-axis */}
-                <line x1="30" y1="112" x2="410" y2="112" stroke="#d5e7d6" strokeWidth="2" />
-                {/* Guide ticks (Y) */}
-                <line x1="35" y1="30" x2="45" y2="30" stroke="#74e191" strokeWidth="1" />
-                <line x1="35" y1="90" x2="45" y2="90" stroke="#90dfb5" strokeWidth="1" />
-              </g>
-              {/* Axis labels for clarity */}
-              <text x="11" y="30" fill="#53b982" fontSize="13" fontWeight="bold">
+              {/* Clean axes */}
+              <defs>
+                <linearGradient id="progress-gradient" x1="50" y1="250" x2="350" y2="50" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#4CAF50" />
+                  <stop offset="0.5" stopColor="#66BB6A" />
+                  <stop offset="1" stopColor="#81C784" />
+                </linearGradient>
+              </defs>
+              
+              {/* Y-axis (vertical) */}
+              <line x1="50" y1="50" x2="50" y2="250" stroke="#E0E0E0" strokeWidth="2" />
+              
+              {/* X-axis (horizontal) */}
+              <line x1="50" y1="250" x2="350" y2="250" stroke="#E0E0E0" strokeWidth="2" />
+              
+              {/* Y-axis label */}
+              <text x="25" y="45" fill="#666" fontSize="14" fontWeight="600" textAnchor="middle">
+                Napredek
+              </text>
+              <text x="25" y="58" fill="#666" fontSize="12" textAnchor="middle">
                 ↑
               </text>
-              <text x="2" y="61" fill="#62bb89" fontSize="13">Napredek</text>
-              <text x="385" y="126" fill="#62bb89" fontSize="14">Čas</text>
-              {/* Animated green curve */}
+              
+              {/* X-axis label */}
+              <text x="350" y="270" fill="#666" fontSize="14" fontWeight="600" textAnchor="end">
+                Čas →
+              </text>
+              
+              {/* Grid lines for reference */}
+              <line x1="50" y1="200" x2="55" y2="200" stroke="#E8E8E8" strokeWidth="1" />
+              <line x1="50" y1="150" x2="55" y2="150" stroke="#E8E8E8" strokeWidth="1" />
+              <line x1="50" y1="100" x2="55" y2="100" stroke="#E8E8E8" strokeWidth="1" />
+              
+              <line x1="100" y1="250" x2="100" y2="245" stroke="#E8E8E8" strokeWidth="1" />
+              <line x1="200" y1="250" x2="200" y2="245" stroke="#E8E8E8" strokeWidth="1" />
+              <line x1="300" y1="250" x2="300" y2="245" stroke="#E8E8E8" strokeWidth="1" />
+              
+              {/* Animated exponential curve */}
               <path
                 d={getAnimatedPath(curveProgress)}
                 fill="none"
-                stroke="url(#green-gradient)"
-                strokeWidth="6"
+                stroke="url(#progress-gradient)"
+                strokeWidth="4"
                 strokeLinecap="round"
                 style={{
-                  filter: "drop-shadow(0px 2px 10px #A9FBC380)",
-                  transition: "stroke 0.2s",
+                  filter: "drop-shadow(0px 2px 8px rgba(76, 175, 80, 0.3))",
                 }}
               />
-              {/* Green gradient for the curve */}
-              <defs>
-                <linearGradient id="green-gradient" x1="10" y1="110" x2="410" y2="30" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#55e89f" /> {/* bright accent */}
-                  <stop offset="0.25" stopColor="#43cb82" />
-                  <stop offset="0.7" stopColor="#09a77a" />
-                  <stop offset="1" stopColor="#0b9261" />
-                </linearGradient>
-              </defs>
-              {/* Left circle (start) */}
-              <circle cx="10" cy="110" r="10" fill="#d2fedb" stroke="#43cb82" strokeWidth="3" />
-              {/* Right circle (end, only if curve fully drawn) */}
+              
+              {/* Start point */}
+              <circle cx="50" cy="250" r="6" fill="#4CAF50" stroke="#fff" strokeWidth="2" />
+              
+              {/* End point (only when curve is complete) */}
               {curveProgress > 0.95 && (
-                <circle cx="410" cy="30" r="14" fill="#09a77a" stroke="#0b9261" strokeWidth="3" />
+                <circle cx="350" cy="50" r="8" fill="#4CAF50" stroke="#fff" strokeWidth="3" />
               )}
-              {/* Public system icon at start */}
+              
+              {/* Icons */}
               <g>
-                <foreignObject x="5" y="78" width="24" height="24">
+                <foreignObject x="20" y="260" width="24" height="24">
                   <Clock size={18} className="text-dragon-green" />
                 </foreignObject>
               </g>
-              {/* Tomi Talk icon at end */}
+              
               {curveProgress > 0.98 && (
                 <g>
-                  <foreignObject x="398" y="5" width="32" height="32">
+                  <foreignObject x="330" y="25" width="32" height="32">
                     <Rocket size={22} className="text-app-orange" />
                   </foreignObject>
                 </g>
@@ -180,4 +195,3 @@ export function ProgressComparisonSection() {
 }
 
 export default ProgressComparisonSection;
-
