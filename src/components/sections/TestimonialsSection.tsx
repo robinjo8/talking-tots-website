@@ -1,4 +1,3 @@
-
 import { useIsMobile } from "@/hooks/use-mobile";
 import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
 
@@ -29,11 +28,13 @@ export const TestimonialsSection = () => {
   ];
 
   return (
-    <section className="py-8 px-4 md:py-12 md:px-10 bg-light-cloud w-full">
+    <section className={`w-full bg-light-cloud ${isMobile ? 'py-5 px-2' : 'py-8 px-4 md:py-12 md:px-10'}`}>
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-6 md:mb-8">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4 text-gray-900">Kaj o TomiTalk pravijo starši?</h2>
-          <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
+        <div className={`text-center ${isMobile ? 'mb-5' : 'mb-6 md:mb-8'}`}>
+          <h2 className={`font-bold text-gray-900 ${isMobile ? 'text-lg mb-2' : 'text-2xl md:text-3xl lg:text-4xl mb-3 md:mb-4'}`}>
+            Kaj o TomiTalk pravijo starši?
+          </h2>
+          <p className={`${isMobile ? 'text-sm' : 'text-base md:text-lg'} text-gray-600 max-w-2xl mx-auto`}>
             Pridružite se številnim družinam, ki so že odkrile moč TomiTalk aplikacije
           </p>
         </div>
@@ -69,7 +70,11 @@ export const TestimonialsSection = () => {
         )}
         
         {/* Mobile Carousel Layout */}
-        {isMobile && <TestimonialsCarousel />}
+        {isMobile && (
+          <div className="mb-0">
+            <TestimonialsCarousel />
+          </div>
+        )}
       </div>
     </section>
   );
