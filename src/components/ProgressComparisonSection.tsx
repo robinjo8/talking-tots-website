@@ -10,15 +10,15 @@ function getAnimatedPath(progress: number, width: number, height: number) {
   const startY = height - 60;
   const endY = 80;
   
-  // Create points for a smooth exponential curve with steeper initial rise
+  // Create points for a smooth exponential curve
   const steps = Math.floor(100 + progress * 100);
   let d = `M${startX} ${startY}`;
   
   for (let i = 1; i <= steps; i++) {
     const t = (i / steps) * progress;
     
-    // More aggressive exponential easing for dramatic acceleration effect
-    const eased = 1 - Math.exp(-4.5 * t);
+    // Exponential easing for dramatic acceleration effect
+    const eased = 1 - Math.exp(-3.5 * t);
     
     const x = startX + (endX - startX) * t;
     const y = startY - (startY - endY) * eased;
@@ -115,11 +115,11 @@ export function ProgressComparisonSection() {
               </linearGradient>
               
               <filter id="glow">
-                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                <feMerge> 
-                  <feMergeNode in="coloredBlur"/>
-                  <feMergeNode in="SourceGraphic"/>
-                </feMerge>
+                <fegaussianblur stdDeviation="3" result="coloredBlur"/>
+                <femerge> 
+                  <femergenode in="coloredBlur"/>
+                  <femergenode in="SourceGraphic"/>
+                </femerge>
               </filter>
             </defs>
             
@@ -207,53 +207,6 @@ export function ProgressComparisonSection() {
               }}
             />
             
-            {/* TomiTalk Dragon Mascot - appears in the middle at 50% progress */}
-            {curveProgress > 0.5 && (
-              <g transform={`translate(${dimensions.width / 2 - 40}, ${dimensions.height / 2 - 60})`}>
-                <image
-                  href="/lovable-uploads/726e1ae6-b1a9-4d7e-98f6-a6aedd6922d8.png"
-                  width="80"
-                  height="80"
-                  className="animate-bounce"
-                  style={{
-                    filter: "drop-shadow(0px 4px 12px rgba(76, 175, 80, 0.3))",
-                  }}
-                />
-                {/* Speech bubble */}
-                <g transform="translate(85, 10)">
-                  <ellipse
-                    cx="40"
-                    cy="20"
-                    rx="35"
-                    ry="15"
-                    fill="white"
-                    stroke="#4CAF50"
-                    strokeWidth="2"
-                    style={{
-                      filter: "drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.1))",
-                    }}
-                  />
-                  <text
-                    x="40"
-                    y="25"
-                    textAnchor="middle"
-                    fontSize="10"
-                    fontWeight="bold"
-                    fill="#4CAF50"
-                  >
-                    Bravo!
-                  </text>
-                  {/* Speech bubble tail */}
-                  <polygon
-                    points="5,20 15,25 15,15"
-                    fill="white"
-                    stroke="#4CAF50"
-                    strokeWidth="2"
-                  />
-                </g>
-              </g>
-            )}
-            
             {/* Start point (traditional system) */}
             <g>
               <circle
@@ -297,22 +250,14 @@ export function ProgressComparisonSection() {
             <g fontSize="12" fontWeight="600" fill="#666">
               {/* Traditional system label */}
               <text x="80" y={dimensions.height - 15} textAnchor="middle" className="text-app-orange font-bold">
-                Povprečno čakanje na logopeda
-              </text>
-              <text x="80" y={dimensions.height - 5} textAnchor="middle" className="text-app-orange font-bold text-xs">
-                v javnem zdravstvu
+                6+ mesecev čakanja
               </text>
               
               {/* Tomi Talk label - appears with end point */}
               {curveProgress > 0.90 && (
-                <>
-                  <text x={dimensions.width - 80} y="35" textAnchor="middle" className="text-dragon-green font-bold">
-                    Govorne vaje brez čakalnih vrst
-                  </text>
-                  <text x={dimensions.width - 80} y="45" textAnchor="middle" className="text-dragon-green font-bold text-xs">
-                    dostopne takoj z aplikacijo Tomi Talk
-                  </text>
-                </>
+                <text x={dimensions.width - 80} y="35" textAnchor="middle" className="text-dragon-green font-bold">
+                  Takoj!
+                </text>
               )}
             </g>
           </svg>
