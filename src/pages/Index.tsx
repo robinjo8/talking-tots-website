@@ -31,14 +31,14 @@ const Index = () => {
       {/* Features Section */}
       <section
         id="features"
-        className={`w-full overflow-x-hidden ${isMobile ? 'py-6 px-2' : 'py-8 px-4 md:py-12 md:px-10 bg-light-cloud'}`}
+        className={`w-full overflow-x-hidden ${isMobile ? 'py-12 px-4' : 'py-16 px-6 md:py-20 md:px-10'} bg-gradient-to-b from-background to-light-cloud/30`}
       >
         <div className="max-w-7xl mx-auto">
-          <div className={`text-center ${isMobile ? 'mb-4' : 'mb-8 md:mb-12'}`}>
-            <h2 className={`font-bold mb-2 ${isMobile ? 'text-lg' : 'text-2xl md:text-3xl lg:text-4xl mb-3 md:mb-4'}`}>
+          <div className={`text-center ${isMobile ? 'mb-8' : 'mb-12 md:mb-16'}`}>
+            <h2 className={`font-bold text-gray-900 ${isMobile ? 'text-2xl mb-3' : 'text-3xl md:text-4xl lg:text-5xl mb-4 md:mb-6'}`}>
               Kako TomiTalk deluje?
             </h2>
-            <p className={`${isMobile ? 'text-sm' : 'text-lg md:text-xl'} text-muted-foreground max-w-xl mx-auto`}>
+            <p className={`${isMobile ? 'text-base' : 'text-lg md:text-xl'} text-gray-600 max-w-3xl mx-auto leading-relaxed`}>
               Naša aplikacija omogoča razvoj govora na zabaven in učinkovit način s pomočjo interaktivnih funkcij
             </p>
           </div>

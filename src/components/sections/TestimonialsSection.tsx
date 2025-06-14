@@ -1,3 +1,4 @@
+
 import { useIsMobile } from "@/hooks/use-mobile";
 import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
 
@@ -28,51 +29,85 @@ export const TestimonialsSection = () => {
   ];
 
   return (
-    <section className={`w-full bg-light-cloud ${isMobile ? 'py-5 px-2' : 'py-8 px-4 md:py-12 md:px-10'}`}>
+    <section className={`w-full bg-gradient-to-b from-light-cloud/30 to-background ${isMobile ? 'py-12 px-4' : 'py-16 px-6 md:py-20 md:px-10'}`}>
       <div className="max-w-7xl mx-auto">
-        <div className={`text-center ${isMobile ? 'mb-5' : 'mb-6 md:mb-8'}`}>
-          <h2 className={`font-bold text-gray-900 ${isMobile ? 'text-lg mb-2' : 'text-2xl md:text-3xl lg:text-4xl mb-3 md:mb-4'}`}>
+        <div className={`text-center ${isMobile ? 'mb-8' : 'mb-12 md:mb-16'}`}>
+          <h2 className={`font-bold text-gray-900 ${isMobile ? 'text-2xl mb-3' : 'text-3xl md:text-4xl lg:text-5xl mb-4 md:mb-6'}`}>
             Kaj o TomiTalk pravijo starši?
           </h2>
-          <p className={`${isMobile ? 'text-sm' : 'text-base md:text-lg'} text-gray-600 max-w-2xl mx-auto`}>
+          <p className={`${isMobile ? 'text-base' : 'text-lg md:text-xl'} text-gray-600 max-w-3xl mx-auto leading-relaxed`}>
             Pridružite se številnim družinam, ki so že odkrile moč TomiTalk aplikacije
           </p>
         </div>
-        
-        {/* Desktop Grid Layout */}
-        {!isMobile && (
-          <div className="grid grid-cols-3 gap-6">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-background rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 md:p-8 h-full flex flex-col justify-between min-h-[280px] relative overflow-hidden border-0">
-                {/* Quote Icon */}
-                <div className="absolute top-4 left-4 text-dragon-green/20">
-                  <svg className="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M14,17H17L19,13V7H13V13H16M6,17H9L11,13V7H5V13H8L6,17Z" />
-                  </svg>
-                </div>
-                
-                {/* Quote Content */}
-                <div className="flex-grow flex flex-col justify-center pt-6">
-                  <blockquote className="text-foreground italic text-base md:text-lg leading-relaxed mb-6 text-center">
-                    "{testimonial.quote}"
-                  </blockquote>
-                </div>
-                
-                {/* Author */}
-                <div className="text-center">
-                  <p className="text-muted-foreground text-sm font-medium">
-                    {testimonial.author}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
         
         {/* Mobile Carousel Layout */}
         {isMobile && (
           <div className="mb-0">
             <TestimonialsCarousel />
+          </div>
+        )}
+        
+        {/* Tablet Layout - 2 columns */}
+        {!isMobile && (
+          <div className="hidden md:block lg:hidden">
+            <div className="grid grid-cols-2 gap-6">
+              {testimonials.slice(0, 4).map((testimonial, index) => (
+                <div key={index} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 md:p-8 h-full flex flex-col justify-between min-h-[300px] relative overflow-hidden border border-gray-100 group hover:scale-105">
+                  {/* Quote Icon */}
+                  <div className="absolute top-6 left-6 text-dragon-green/20 group-hover:text-dragon-green/30 transition-colors duration-300">
+                    <svg className="h-10 w-10" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M14,17H17L19,13V7H13V13H16M6,17H9L11,13V7H5V13H8L6,17Z" />
+                    </svg>
+                  </div>
+                  
+                  {/* Quote Content */}
+                  <div className="flex-grow flex flex-col justify-center pt-8">
+                    <blockquote className="text-gray-700 italic text-lg leading-relaxed mb-6 text-center font-medium">
+                      "{testimonial.quote}"
+                    </blockquote>
+                  </div>
+                  
+                  {/* Author */}
+                  <div className="text-center pt-4 border-t border-gray-100">
+                    <p className="text-gray-600 text-base font-semibold">
+                      {testimonial.author}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {/* Desktop Layout - 3 columns */}
+        {!isMobile && (
+          <div className="hidden lg:block">
+            <div className="grid grid-cols-3 gap-8">
+              {testimonials.map((testimonial, index) => (
+                <div key={index} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-8 h-full flex flex-col justify-between min-h-[320px] relative overflow-hidden border border-gray-100 group hover:scale-105">
+                  {/* Quote Icon */}
+                  <div className="absolute top-6 left-6 text-dragon-green/20 group-hover:text-dragon-green/30 transition-colors duration-300">
+                    <svg className="h-12 w-12" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M14,17H17L19,13V7H13V13H16M6,17H9L11,13V7H5V13H8L6,17Z" />
+                    </svg>
+                  </div>
+                  
+                  {/* Quote Content */}
+                  <div className="flex-grow flex flex-col justify-center pt-10">
+                    <blockquote className="text-gray-700 italic text-lg leading-relaxed mb-8 text-center font-medium">
+                      "{testimonial.quote}"
+                    </blockquote>
+                  </div>
+                  
+                  {/* Author */}
+                  <div className="text-center pt-4 border-t border-gray-100">
+                    <p className="text-gray-600 text-base font-semibold">
+                      {testimonial.author}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
