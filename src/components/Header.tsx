@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { UserProfile } from "@/components/auth/UserProfile";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSidebar } from "@/components/ui/sidebar";
-import { Menu, BookOpen, UserPlus, Play, Home, Activity, Gamepad, Video, Bell, CreditCard, User, LogOut, Check } from "lucide-react";
+import { Menu, BookOpen, UserPlus, Play, Home, Activity, Gamepad, Award, Video, Bell, CreditCard, User, LogOut, Check } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -79,8 +79,8 @@ export default function Header() {
     navigate("/login");
   };
 
-  // Navigation links for authenticated users (removed Izzivi)
-  const authenticatedNavigationLinks = [{
+  // Navigation links
+  const navigationLinks = [{
     label: "Moja stran",
     path: "/moja-stran",
     icon: Home
@@ -92,6 +92,10 @@ export default function Header() {
     label: "Govorne igre",
     path: "/govorne-igre",
     icon: Gamepad
+  }, {
+    label: "Izzivi",
+    path: "/moji-izzivi",
+    icon: Award
   }, {
     label: "Video navodila",
     path: "/video-navodila",
@@ -115,13 +119,6 @@ export default function Header() {
     path: "/profile",
     icon: User
   }];
-
-  // Navigation links for unauthenticated users
-  const unauthenticatedNavigationLinks = [
-    { label: "Namen", path: "#", disabled: true },
-    { label: "Cenik", path: "#", disabled: true },
-    { label: "Logopedski kotiček", path: "/logopedski-koticek", icon: BookOpen }
-  ];
 
   // Helper function to check if a path is active
   const isActivePath = (path: string) => {
@@ -213,34 +210,34 @@ export default function Header() {
           </div>
         )}
 
-        {/* Main navigation */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Navigacija</h3>
-          {(user ? authenticatedNavigationLinks : unauthenticatedNavigationLinks).map((link, index) => (
-            <Button 
-              key={index}
-              variant="ghost" 
-              className={`w-full justify-start text-left h-12 ${
-                !link.disabled ? '' : 'opacity-50 cursor-not-allowed'
-              } ${isActivePath(link.path) ? 'bg-accent' : ''}`}
-              onClick={() => {
-                if (!link.disabled) {
-                  if (link.options) {
-                    handleNavigate(link.path, link.options);
-                  } else {
-                    handleNavigate(link.path);
+        {/* Main navigation - only if logged in */}
+        {user && (
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Navigacija</h3>
+            {navigationLinks.map((link, index) => (
+              <Button 
+                key={index}
+                variant="ghost" 
+                className={`w-full justify-start text-left h-12 ${
+                  !link.disabled ? '' : 'opacity-50 cursor-not-allowed'
+                } ${isActivePath(link.path) ? 'bg-accent' : ''}`}
+                onClick={() => {
+                  if (!link.disabled) {
+                    if (link.options) {
+                      handleNavigate(link.path, link.options);
+                    } else {
+                      handleNavigate(link.path);
+                    }
                   }
-                }
-              }}
-              disabled={link.disabled}
-            >
-              {link.icon && <link.icon className="h-5 w-5 mr-3" />}
-              <span className="font-medium">{link.label}</span>
-            </Button>
-          ))}
-          
-          {/* Logout button for authenticated users */}
-          {user && (
+                }}
+                disabled={link.disabled}
+              >
+                <link.icon className="h-5 w-5 mr-3" />
+                <span className="font-medium">{link.label}</span>
+              </Button>
+            ))}
+            
+            {/* Logout button */}
             <Button 
               variant="ghost" 
               className="w-full justify-start text-left h-12 text-red-600 hover:text-red-700 hover:bg-red-50"
@@ -249,8 +246,8 @@ export default function Header() {
               <LogOut className="h-5 w-5 mr-3" />
               <span className="font-medium">Odjava</span>
             </Button>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Auth buttons for non-logged in users */}
         {!user && (
@@ -273,17 +270,12 @@ export default function Header() {
   );
   
   return (
-    <header className="py-6 px-4 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-b border-border/50">
-      <div className="max-w-7xl mx-auto flex justify-between items-center h-14">
-        <Link to="/" className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
+    <header className="py-4 px-4 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
+      <div className="max-w-7xl mx-auto flex justify-between items-center">
+        <Link to="/" className="flex items-center gap-2">
+          <div className="flex items-center">
             <span className="text-2xl font-extrabold text-dragon-green">Tomi</span>
             <span className="text-2xl font-extrabold text-app-orange">Talk</span>
-            <img 
-              src="/lovable-uploads/ef9acb7f-a16f-4737-ac7b-fe4bc68c21cd.png" 
-              alt="Tomi the Dragon" 
-              className="h-8 w-8 ml-1"
-            />
           </div>
         </Link>
         
@@ -310,7 +302,7 @@ export default function Header() {
             {/* Hamburger menu */}
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex items-center ml-auto h-12 w-12 rounded-lg">
+                <Button variant="ghost" size="sm" className="flex items-center ml-auto">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
@@ -321,63 +313,45 @@ export default function Header() {
           </div>
           
           {/* Desktop navigation - shows above lg breakpoint */}
-          <nav className="hidden lg:flex items-center gap-2">
+          <nav className="hidden lg:flex items-center gap-6">
             {user ? (
               <>
-                {/* Desktop Navigation Links for authenticated users */}
-                {authenticatedNavigationLinks.slice(0, 5).map((link, index) => (
+                {/* Desktop Navigation Links */}
+                {navigationLinks.slice(0, 6).map((link, index) => (
                   <Button 
                     key={index} 
                     variant="ghost" 
-                    size="sm"
                     onClick={() => !link.disabled && handleNavigate(link.path)} 
                     disabled={link.disabled}
-                    className={`h-12 px-4 font-medium rounded-lg ${isActivePath(link.path) ? 'bg-accent' : ''}`}
+                    className={isActivePath(link.path) ? 'bg-accent' : ''}
                   >
-                    {link.icon && <link.icon className="h-4 w-4 mr-2" />}
+                    {link.label === "Logopedski kotiček" && <BookOpen className="h-4 w-4 mr-2" />}
                     {link.label}
                   </Button>
                 ))}
                 
-                <div className="flex items-center gap-2 ml-2">
+                <div className="flex items-center gap-2">
                   <UserProfile />
                 </div>
               </>
             ) : (
-              <>
-                {/* Desktop Navigation Links for unauthenticated users */}
-                {unauthenticatedNavigationLinks.map((link, index) => (
-                  <Button 
-                    key={index} 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => !link.disabled && handleNavigate(link.path)} 
-                    disabled={link.disabled}
-                    className={`h-12 px-4 font-medium rounded-lg ${isActivePath(link.path) ? 'bg-accent' : ''} ${link.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  >
-                    {link.icon && <link.icon className="h-4 w-4 mr-2" />}
-                    {link.label}
+              <div className="flex items-center gap-3">
+                {/* New orange "Začni zdaj" button */}
+                <Button onClick={handleStartNow} size="sm" className="w-full sm:w-auto bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full min-w-[180px]">
+                  Začni zdaj
+                </Button>
+                <Link to="/register">
+                  <Button variant="outline" size="sm" className="text-sm">
+                    <UserPlus className="h-4 w-4 mr-1" />
+                    Registracija
                   </Button>
-                ))}
-                
-                <div className="flex items-center gap-2 ml-4">
-                  {/* Auth buttons */}
-                  <Button onClick={handleStartNow} size="sm" className="h-12 px-6 bg-dragon-green hover:bg-dragon-green/90 text-white font-medium rounded-lg">
-                    Začni zdaj
+                </Link>
+                <Link to="/login">
+                  <Button variant="outline" size="sm" className="text-sm">
+                    Prijava
                   </Button>
-                  <Link to="/register">
-                    <Button variant="outline" size="sm" className="h-12 px-4 font-medium rounded-lg">
-                      <UserPlus className="h-4 w-4 mr-1" />
-                      Registracija
-                    </Button>
-                  </Link>
-                  <Link to="/login">
-                    <Button variant="outline" size="sm" className="h-12 px-4 font-medium rounded-lg">
-                      Prijava
-                    </Button>
-                  </Link>
-                </div>
-              </>
+                </Link>
+              </div>
             )}
           </nav>
         </div>
