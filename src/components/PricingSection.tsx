@@ -1,49 +1,11 @@
 
-import React, { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
-// Define the interface for a subscription plan
-interface SubscriptionPlan {
-  id: string;
-  name: string;
-  price: string;
-  description: string;
-  features: string[] | null;
-  order_index?: number;
-}
+import { useSubscriptionPlans } from "@/hooks/useSubscriptionPlans";
 
 export function PricingSection() {
-  const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchPlans() {
-      setLoading(true);
-      // Query using any type fallback, since "subscription_plans" doesn't exist in supabase types
-      const { data, error } = await supabase
-        .from("subscription_plans" as any)
-        .select("*")
-        .order("order_index", { ascending: true });
-
-      if (!error && Array.isArray(data)) {
-        // Robustly decode features as array
-        setPlans(
-          data.map((item: any) => ({
-            id: String(item.id),
-            name: String(item.name),
-            price: String(item.price),
-            description: String(item.description),
-            features: Array.isArray(item.features) ? item.features : null,
-            order_index: item.order_index,
-          }))
-        );
-      }
-      setLoading(false);
-    }
-    fetchPlans();
-  }, []);
+  const { plans, loading } = useSubscriptionPlans();
 
   return (
     <section
