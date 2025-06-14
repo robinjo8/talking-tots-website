@@ -10,6 +10,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { SelectChildDialog } from "@/components/SelectChildDialog";
 import { FeaturesCarousel } from "@/components/FeaturesCarousel";
 import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
+import PricingSection from "@/components/PricingSection";
 
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -74,7 +75,7 @@ const Index = () => {
       <Header />
       
       {/* Hero Section - Centered layout without dragon */}
-      <section className="pt-16 md:pt-28 pb-10 md:pb-16 px-4 md:px-[40px] py-[100px]">
+      <section className="pt-14 pb-10 px-4 md:px-[40px]"> {/* Unified vertical spacing */}
         <div className="absolute -top-10 -left-10 w-32 h-32 bg-app-yellow/20 rounded-full blur-3xl"></div>
         <div className="absolute top-40 -right-10 w-60 h-60 bg-app-blue/20 rounded-full blur-3xl"></div>
         
@@ -222,7 +223,7 @@ const Index = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-16 px-4 md:px-10 bg-light-cloud w-full">
+      <section className="py-14 px-4 md:px-10 bg-light-cloud w-full">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">Kaj o TomiTalk pravijo starši?</h2>
@@ -267,7 +268,7 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 px-4 md:px-10 bg-light-cloud w-full overflow-x-hidden">
+      <section id="features" className="py-14 px-4 md:px-10 bg-light-cloud w-full overflow-x-hidden">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Kako TomiTalk deluje?</h2>
@@ -281,7 +282,7 @@ const Index = () => {
       </section>
       
       {/* Call to Action with Dragon */}
-      <section id="cta" className="py-20 px-4 md:px-10 relative overflow-hidden w-full">
+      <section id="cta" className="py-14 px-4 md:px-10 relative overflow-hidden w-full">
         <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-app-teal/20 rounded-full blur-3xl"></div>
         <div className="absolute -top-10 -right-10 w-40 h-40 bg-app-orange/20 rounded-full blur-3xl"></div>
         
@@ -351,7 +352,10 @@ const Index = () => {
           )}
         </div>
       </section>
-      
+
+      {/* NEW CENIK SECTION (Pricing) */}
+      <PricingSection />
+
       {/* Footer */}
       <footer className="py-10 px-4 md:px-10 bg-light-cloud w-full">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
