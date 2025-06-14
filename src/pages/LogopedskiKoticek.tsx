@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import { PageHeader } from "@/components/PageHeader";
@@ -16,17 +15,13 @@ import {
   ExternalLink 
 } from "lucide-react";
 
-// Removed redirect-to-login useEffect
-
 const LogopedskiKoticek = () => {
-  const { user } = useAuth();
   const navigate = useNavigate();
-  
-  useEffect(() => {
-    if (!user) {
-      navigate("/login");
-    }
-  }, [user, navigate]);
+
+  // NOTE: We do NOT redirect or require auth here!
+  // Optionally allow guests and users.
+  // Use sessionStorage to optionally check redirectAfterLogin,
+  // but generally just show the page.
 
   // Map of section IDs to their corresponding Lucide icons
   const sectionIcons = {
@@ -89,17 +84,21 @@ const LogopedskiKoticek = () => {
     alert('Ta vsebina bo na voljo kmalu!');
   };
 
+  // Pick the backPath depending on if previous page is available.
+  // Fallback to "/" for logged-out users.
+  const backPath = "/moja-stran";
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <PageHeader title="Logopedski kotiček" backPath="/moja-stran" />
+      <PageHeader title="Logopedski kotiček" backPath={backPath} />
       <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
         <div className="flex items-center gap-3 mb-8">
           <Button 
             variant="ghost" 
             size="sm" 
             className="gap-2" 
-            onClick={() => navigate("/moja-stran")}
+            onClick={() => navigate(backPath)}
           >
             <ArrowLeft className="h-4 w-4" />
             Nazaj
