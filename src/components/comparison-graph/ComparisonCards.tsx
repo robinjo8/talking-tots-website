@@ -8,7 +8,7 @@ export function ComparisonCards() {
       <ComparisonCard
         title="JAVNI SISTEM"
         value="+6 mesecev"
-        description={<>Povprečen čas do prve<br />obravnave v javnem zdravstvu</>}
+        description={<>Povprečen čas do prve<br />obravnave v javnem sistemu</>}
         titleBgClass="bg-white"
         titleBorderClass="border-orange-300"
         cardBgClass="bg-orange-50/70"
