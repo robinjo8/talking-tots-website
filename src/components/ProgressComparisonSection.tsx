@@ -17,6 +17,24 @@ function getAnimatedPath(progress: number, width: number, height: number) {
   }
   return d;
 }
+function getSlowPublicPath(progress: number, width: number, height: number) {
+  // Public system line: moves slowly, stays low, almost horizontal.
+  // progress animates the line 'drawing in' from left to right (same as Tomi Talk curve)
+  const startX = 80;
+  const endX = width - 80;
+  const y = height - 115; // stays low, above x-axis (make this about 60-80px above, tweak for best look)
+  const steps = Math.floor(100 + progress * 100);
+
+  let d = `M${startX} ${y}`;
+  for (let i = 1; i <= steps; i++) {
+    const t = i / steps * progress; // progress draw
+    const x = startX + (endX - startX) * t;
+    // slight upward slope as it moves right, but not much
+    const yPoint = y - 18 * t; // subtle curve, tweak 18px max rise
+    d += ` L${x} ${yPoint}`;
+  }
+  return d;
+}
 export function ProgressComparisonSection() {
   const [curveProgress, setCurveProgress] = useState(0);
   const [dimensions, setDimensions] = useState({
@@ -106,6 +124,10 @@ export function ProgressComparisonSection() {
                   <stop offset="0%" stopColor="#4CAF50" stopOpacity="0.1" />
                   <stop offset="100%" stopColor="#81C784" stopOpacity="0.05" />
                 </linearGradient>
+                <linearGradient id="public-system-gradient" x1="0%" y1="100%" x2="100%" y2="100%" gradientUnits="objectBoundingBox">
+                  <stop offset="0%" stopColor="#FF9800" />
+                  <stop offset="100%" stopColor="#D32F2F" />
+                </linearGradient>
                 <filter id="glow">
                   <feGaussianBlur stdDeviation="3" result="coloredBlur" />
                   <feMerge>
@@ -181,6 +203,21 @@ export function ProgressComparisonSection() {
               }} />
                   {/* (Removed icon) */}
                 </g>}
+
+              {/* --- Add the new public system line BELOW the TomiTalk line --- */}
+              <path
+                d={getSlowPublicPath(curveProgress, dimensions.width, dimensions.height)}
+                fill="none"
+                stroke="url(#public-system-gradient)"
+                strokeWidth={7}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity={curveProgress > 0.05 ? 1 : 0}
+                style={{
+                  filter: "drop-shadow(0px 2px 8px rgba(255, 90, 0, 0.18))",
+                  transition: "stroke-width 0.3s"
+                }}
+              />
             </svg>
           </div>
 
