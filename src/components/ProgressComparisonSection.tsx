@@ -266,18 +266,23 @@ export function ProgressComparisonSection() {
           </div>
 
           {/* Comparison section below graph */}
-          <div className="flex flex-row items-start justify-center gap-4 md:gap-8 mt-4 w-full max-w-3xl mx-auto">
+          <div className="flex flex-row items-stretch justify-center gap-4 md:gap-8 mt-12 w-full max-w-3xl mx-auto px-4">
             {/* Left - Traditional System */}
-            <div className="flex flex-col items-center flex-1 max-w-[300px] text-center">
+            <div className="flex flex-col items-center flex-1 text-center p-4 pt-6 border-2 border-gray-800 rounded-2xl bg-white relative">
               {/* Label */}
-              <span style={{
-                letterSpacing: "0.02em",
-                fontFamily: "Nunito, sans-serif"
-              }} className="text-[#263146] font-extrabold text-lg md:text-2xl text-center uppercase tracking-tight mb-2 h-12 flex items-center justify-center">
-                JAVNI SISTEM
-              </span>
+              <div className="absolute -top-5 w-[calc(100%-2rem)]">
+                <div className="border-2 border-gray-800 rounded-xl py-1 px-1 bg-white">
+                  <h3 style={{
+                    letterSpacing: "0.02em",
+                    fontFamily: "Nunito, sans-serif"
+                  }} className="text-[#263146] font-extrabold text-lg md:text-2xl text-center uppercase tracking-tight">
+                    JAVNI SISTEM
+                  </h3>
+                </div>
+              </div>
+              
               {/* Value */}
-              <div className="font-extrabold text-app-orange leading-none mb-2">
+              <div className="font-extrabold text-app-orange leading-none mt-6 mb-2">
                 <div className="text-4xl md:text-5xl">+6</div>
                 <div className="text-xl md:text-2xl">mesecev</div>
               </div>
@@ -286,15 +291,21 @@ export function ProgressComparisonSection() {
                 Povprečen čas do prve<br />obravnave v javnem zdravstvu
               </div>
             </div>
+
             {/* Right - Tomi Talk */}
-            <div className="flex flex-col items-center flex-1 max-w-[300px] text-center">
-              {/* Label */}
-              <span style={{
-                letterSpacing: "0.02em",
-                fontFamily: "Nunito, sans-serif"
-              }} className="text-[#263146] font-extrabold text-lg md:text-2xl text-center uppercase tracking-tight mb-2 h-12 flex items-center justify-center">tomi talk</span>
+            <div className="flex flex-col items-center flex-1 text-center p-4 pt-6 border-2 border-dragon-green rounded-2xl bg-white relative">
+               {/* Label */}
+               <div className="absolute -top-5 w-[calc(100%-2rem)]">
+                <div className="border-2 border-dragon-green rounded-xl py-1 px-1 bg-white">
+                  <h3 style={{
+                    letterSpacing: "0.02em",
+                    fontFamily: "Nunito, sans-serif"
+                  }} className="text-[#263146] font-extrabold text-lg md:text-2xl text-center uppercase tracking-tight">tomi talk</h3>
+                </div>
+              </div>
+
               {/* Value */}
-              <div className="font-extrabold text-dragon-green leading-none mb-2">
+              <div className="font-extrabold text-dragon-green leading-none mt-6 mb-2">
                 <div className="text-4xl md:text-5xl">Takoj</div>
                 <div className="text-xl md:text-2xl invisible">.</div>
               </div>
