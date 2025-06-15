@@ -286,74 +286,41 @@ const Index = () => {
       </section>
       
       {/* Call to Action with Dragon */}
-      <section id="cta" className="py-14 px-4 md:px-10 relative overflow-hidden w-full">
+      <section id="cta" className="py-14 px-4 md:px-10 bg-light-cloud relative overflow-hidden w-full">
         <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-app-teal/20 rounded-full blur-3xl"></div>
         <div className="absolute -top-10 -right-10 w-40 h-40 bg-app-orange/20 rounded-full blur-3xl"></div>
         
         <div className="max-w-6xl mx-auto relative z-10">
-          {/* Mobile Layout with Dragon */}
-          {isMobile && (
-            <div className="bg-white shadow-xl rounded-3xl p-6 xs:p-8 text-center relative overflow-hidden w-full max-w-sm mx-auto px-4">
-              <h2 className="text-3xl font-bold mb-4">Ste pripravljeni na govorno avanturo?</h2>
-              <p className="text-xl text-muted-foreground mb-8">
-                Prenesite Tomi Talk danes in opazujte, kako komunikacijske veščine vašega otroka cvetijo!
-              </p>
-              <div className="relative w-40 h-40 xs:w-48 xs:h-48 mx-auto mb-6">
-                <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
-                <div className="animate-float relative">
+          <div className="flex flex-col lg:flex-row items-center justify-center text-center lg:text-left gap-8 lg:gap-16">
+            {/* Dragon Image - shown first on mobile, right on desktop */}
+            <div className="lg:order-last flex-shrink-0">
+              <div className="relative w-48 h-48 md:w-56 md:h-56">
+                <div className="animate-float relative w-full h-full">
                   <img
                     alt="Tomi Talk Dragon Mascot"
                     className="w-full h-full object-contain"
-                    src="/lovable-uploads/afbdd309-0550-437a-9afc-966c9a811062.png"
+                    src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png"
                   />
                 </div>
               </div>
-              <div className="flex flex-wrap justify-center gap-4 w-full">
-                <Button size="lg" className="bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full w-full max-w-[180px]">
+            </div>
+
+            {/* Text content */}
+            <div className="flex-1">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Ste pripravljeni na govorno avanturo?</h2>
+              <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto lg:mx-0">
+                Prenesite Tomi Talk danes in opazujte, kako komunikacijske veščine vašega otroka cvetijo!
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                <Button size="lg" className="bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full w-full sm:w-auto px-8">
                   Prenos za iOS
                 </Button>
-                <Button size="lg" className="bg-app-blue hover:bg-app-blue/90 text-white rounded-full w-full max-w-[180px]">
+                <Button size="lg" className="bg-app-blue hover:bg-app-blue/90 text-white rounded-full w-full sm:w-auto px-8">
                   Prenos za Android
                 </Button>
               </div>
             </div>
-          )}
-          {/* Desktop Layout with Dragon */}
-          {!isMobile && (
-            <div className="bg-white shadow-xl rounded-3xl p-12 relative overflow-hidden">
-              <div className="flex items-center justify-between gap-12">
-                {/* Left side - Text content */}
-                <div className="flex-1 text-center lg:text-left">
-                  <h2 className="text-3xl md:text-4xl font-bold mb-4">Ste pripravljeni na govorno avanturo?</h2>
-                  <p className="text-xl text-muted-foreground mb-8">
-                    Prenesite Tomi Talk danes in opazujte, kako komunikacijske veščine vašega otroka cvetijo!
-                  </p>
-                  <div className="flex flex-wrap justify-center lg:justify-start gap-4">
-                    <Button size="lg" className="bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full">
-                      Prenos za iOS
-                    </Button>
-                    <Button size="lg" className="bg-app-blue hover:bg-app-blue/90 text-white rounded-full">
-                      Prenos za Android
-                    </Button>
-                  </div>
-                </div>
-                
-                {/* Right side - Dragon */}
-                <div className="flex-shrink-0">
-                  <div className="relative w-64 h-64 xl:w-80 xl:h-80">
-                    <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
-                    <div className="animate-float relative">
-                      <img
-                        alt="Tomi Talk Dragon Mascot"
-                        className="w-full h-full object-contain"
-                        src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+          </div>
         </div>
       </section>
 
