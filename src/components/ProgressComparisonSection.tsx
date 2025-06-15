@@ -22,23 +22,28 @@ function getTomiTalkCurve(progress: number, width: number, height: number) {
   return d;
 }
 
-// --- New: Public System curve (gentle, slow, orange-to-red) ---
+// --- New: Public System curve (orange-to-red, more concave up, matches provided reference) ---
 function getPublicCurve(progress: number, width: number, height: number) {
   const startX = 80;
   const endX = width - 80;
   const startY = height - 60;
-  // Ends below TomiTalk to show “slower”, does not reach as high
-  const endY = height > 320 ? 160 : 120; // dynamically lower on smaller graphs
+  const endY = 100; // End higher than before, but still below TomiTalk for clarity
+
   const steps = Math.floor(120 + progress * 100);
   let d = `M${startX} ${startY}`;
   for (let i = 1; i <= steps; i++) {
-    // Slow progress rate, curve rises gently, always below TomiTalk
-    const t = i / steps * progress;
-    // Easing: much less aggressive than TomiTalk.
-    // Let's use a soft sigmoid shape, but flatten by reducing the strength (for smoother, gradual rise)
-    const eased = 0.45 * (1 - Math.exp(-2.1 * t)); // Flatter than green curve
+    // Use a more concave up function, matching visual reference:
+    // Strong curvature at the start, increasingly fast rise late (t^2.5)
+    const t = (i / steps) * progress;
+    // Power term gives "low, then fast up" progression (visually bending upwards more than linear)
+    // Adjust 0.6 multiplier for vertical range.
+    const eased = 0.60 * Math.pow(t, 2.3); // 2.2-2.5 matches the image well
+    // Optionally: Offset y upward near the end for a final "kick" to mimic ref shape
+    const curvatureKick = t > 0.85 ? (t - 0.85) * 1.2 : 0;
+    const totalEased = Math.min(eased + curvatureKick, 1);
+
     const x = startX + (endX - startX) * t;
-    const y = startY - (startY - endY) * eased;
+    const y = startY - (startY - endY) * totalEased;
     d += ` L${x} ${y}`;
   }
   return d;
@@ -205,7 +210,7 @@ export function ProgressComparisonSection() {
                 />
               )}
 
-              {/* --- Public System curve (below Tomi Talk, orange-red, gently rising, always animated) --- */}
+              {/* --- Public System curve (matches user image reference, orange-red, gently curving upward) --- */}
               <path
                 d={getPublicCurve(curveProgress, dimensions.width, dimensions.height)}
                 fill="none"
