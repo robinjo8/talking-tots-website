@@ -261,37 +261,6 @@ export function ProgressComparisonSection() {
           </svg>
         </div>
 
-        {/* Redesigned labels and descriptions below graph */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 md:gap-y-0 md:gap-x-8 w-full max-w-3xl mx-auto pt-2 pb-0 md:pb-2">
-          {/* Left Side: JAVNI SISTEM and its description */}
-          <div className="flex flex-col items-start text-left">
-            <span className="font-extrabold text-xl md:text-2xl uppercase text-zinc-800 tracking-wide mb-1">
-              JAVNI SISTEM
-            </span>
-            <span className="text-base md:text-lg font-medium text-gray-700 max-w-[320px]">
-              Povprečno čakanje na logopeda v javnem zdravstvu
-            </span>
-          </div>
-          {/* Right Side: Tomi Talk and its description */}
-          <div className="flex flex-col items-end text-right">
-            <span
-              className="font-extrabold text-xl md:text-2xl"
-              style={{
-                background: "linear-gradient(90deg, #4CAF50 10%, #FF9800 95%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-                fontFamily: "Nunito, sans-serif"
-              }}
-            >
-              Tomi Talk
-            </span>
-            <span className="text-base md:text-lg font-medium text-gray-700 max-w-[340px]">
-              Govorne vaje brez čakalnih vrst – dostopne takoj z aplikacijo Tomi Talk
-            </span>
-          </div>
-        </div>
-
         {/* Bottom section with comparison */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mt-8">
           {/* Left - Traditional System */}
