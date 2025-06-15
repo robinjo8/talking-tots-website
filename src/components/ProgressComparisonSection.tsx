@@ -233,7 +233,7 @@ export function ProgressComparisonSection() {
                 </div>
               </div>
               <div className="h-full bg-orange-50 border border-orange-200 rounded-2xl p-6 pt-12 shadow-sm transition-transform duration-300 hover:scale-[1.02] flex flex-col justify-center items-center">
-                <div className="font-extrabold text-app-orange text-4xl sm:text-5xl leading-none">
+                <div className="font-extrabold text-app-orange text-4xl sm:text-3xl leading-none">
                   +6 mesecev
                 </div>
                 <p className="text-sm sm:text-base text-gray-600 font-normal leading-snug mt-3">
@@ -252,7 +252,7 @@ export function ProgressComparisonSection() {
                 </div>
               </div>
               <div className="h-full bg-light-cloud border border-green-200 rounded-2xl p-6 pt-12 shadow-sm transition-transform duration-300 hover:scale-[1.02] flex flex-col justify-center items-center">
-                <div className="font-extrabold text-dragon-green text-4xl sm:text-5xl leading-none">
+                <div className="font-extrabold text-dragon-green text-4xl sm:text-3xl leading-none">
                   Takoj
                 </div>
                 <p className="text-sm sm:text-base text-gray-600 font-normal leading-snug mt-3">
