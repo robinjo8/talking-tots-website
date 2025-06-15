@@ -196,7 +196,7 @@ export function ProgressComparisonSection() {
                 JAVNI SISTEM
               </span>
               {/* Value */}
-              <div className="text-[1.7rem] font-extrabold text-app-orange leading-tight -mt-1 mb-1 md:text-2xl ">
+              <div className="text-[1.7rem] font-extrabold text-app-orange leading-tight -mt-1 mb-1 md:text-3xl ">
                 +6 mesecev
               </div>
               {/* Description */}
@@ -210,11 +210,11 @@ export function ProgressComparisonSection() {
               <span style={{
               letterSpacing: "0.02em",
               fontFamily: "Nunito, sans-serif"
-            }} className="text-[#263146] font-extrabold text-lg uppercase tracking-tight mt-4 mb-1 md:text-3xl">Tadsa</span>
+            }} className="text-[#263146] font-extrabold text-lg uppercase tracking-tight mt-4 mb-1 md:text-3xl">tomi talk</span>
               <div className="text-[1.7rem] font-extrabold text-dragon-green leading-tight -mt-1 mb-1 md:text-3xl ">
                 Takoj
               </div>
-              <div className="text-[.97rem] text-gray-500 font-normal text-center md:text-center leading-snug font-['Nunito']">
+              <div className="text-[.97rem] text-black-500 font-normal text-center md:text-center leading-snug font-['Nunito']">
                 Govorne vaje na voljo<br />takoj &ndash; brez čakanja
               </div>
             </div>
