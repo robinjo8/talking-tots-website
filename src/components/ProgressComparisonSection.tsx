@@ -212,7 +212,15 @@ export function ProgressComparisonSection() {
               <span className="bg-green-100 rounded-full p-2.5">
                 <Rocket size={28} className="text-dragon-green" />
               </span>
-              <span className="text-lg font-bold text-gray-700">Tomi Talk</span>
+              <span
+                className="text-lg font-extrabold font-rounded bg-gradient-to-r from-dragon-green to-app-orange bg-clip-text text-transparent"
+                style={{
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                Tomi Talk
+              </span>
             </div>
             <div className="text-3xl md:text-4xl font-extrabold text-dragon-green mb-1">Takoj</div>
             <div className="text-sm text-gray-500 font-medium text-center md:text-right max-w-[200px]">
