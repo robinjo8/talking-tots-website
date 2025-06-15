@@ -198,7 +198,7 @@ export function ProgressComparisonSection() {
               <span className="bg-orange-100 rounded-full p-2.5">
                 <Clock size={28} className="text-app-orange" />
               </span>
-              <span className="text-gray-700 font-extrabold text-3xl">JAVNI SISTEM</span>
+              <span className="text-gray-700 font-extrabold text-2xl">JAVNI SISTEM</span>
             </div>
             <div className="text-3xl md:text-4xl font-extrabold text-app-orange mb-1">+6 mesecev</div>
             <div className="text-sm text-gray-500 font-medium text-center md:text-left max-w-[200px]">
@@ -212,12 +212,17 @@ export function ProgressComparisonSection() {
               <span className="bg-green-100 rounded-full p-2.5">
                 <Rocket size={28} className="text-dragon-green" />
               </span>
-              <span style={{
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent"
-            }} className="font-extrabold font-rounded bg-gradient-to-r from-dragon-green to-app-orange bg-clip-text text-transparent text-3xl">TomiTalk</span>
+              <span
+                className="text-lg font-extrabold font-rounded bg-gradient-to-r from-dragon-green to-app-orange bg-clip-text text-transparent"
+                style={{
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                Tomi Talk
+              </span>
             </div>
-            <div className="-bottom-1/3 md:-bottom-1/3 text-4xl text-dragon-green mb-1">Takoj</div>
+            <div className="text-3xl md:text-4xl font-extrabold text-dragon-green mb-1">Takoj</div>
             <div className="text-sm text-gray-500 font-medium text-center md:text-right max-w-[200px]">
               Govorne vaje na voljo takoj – brez čakanja
             </div>
