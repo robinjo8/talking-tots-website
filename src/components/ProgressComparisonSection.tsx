@@ -221,54 +221,46 @@ export function ProgressComparisonSection() {
           </div>
 
           {/* Comparison section below graph */}
-          <div className="flex flex-row items-stretch justify-center gap-4 md:gap-8 mt-12 w-full max-w-3xl mx-auto px-4">
-            {/* Left - Traditional System */}
-            <div className="flex flex-col items-center flex-1 text-center p-4 pt-6 border-2 border-gray-800 rounded-2xl bg-white relative">
-              {/* Label */}
-              <div className="absolute -top-5 w-[calc(100%-2rem)]">
-                <div className="border-2 border-gray-800 rounded-xl py-1 px-1 bg-white">
-                  <h3 style={{
-                  letterSpacing: "0.02em",
-                  fontFamily: "Nunito, sans-serif"
-                }} className="text-[#263146] font-extrabold text-lg md:text-2xl text-center uppercase tracking-tight">
+          <div className="flex flex-col sm:flex-row items-stretch justify-center gap-6 md:gap-8 mt-12 w-full max-w-3xl mx-auto px-4">
+            
+            {/* Left - Traditional System Card */}
+            <div className="flex-1 relative text-center">
+              <div className="absolute -top-5 left-1/2 -translate-x-1/2 z-10 w-max max-w-[90%]">
+                <div className="bg-white border-2 border-orange-300 rounded-xl py-1.5 px-4 shadow-md">
+                  <h3 className="text-gray-800 font-extrabold text-base sm:text-lg uppercase tracking-wider whitespace-nowrap">
                     JAVNI SISTEM
                   </h3>
                 </div>
               </div>
-              
-              {/* Value */}
-              <div className="font-extrabold text-app-orange leading-none mt-6 mb-2">
-                <div className="text-4xl md:text-5xl">+6 mesecev</div>
-                
-              </div>
-              {/* Description */}
-              <div className="text-sm md:text-base text-gray-600 font-normal leading-snug font-['Nunito']">
-                Povprečen čas do prve<br />obravnave v javnem zdravstvu
+              <div className="h-full bg-orange-50 border border-orange-200 rounded-2xl p-6 pt-12 shadow-sm transition-transform duration-300 hover:scale-[1.02] flex flex-col justify-center items-center">
+                <div className="font-extrabold text-app-orange text-4xl sm:text-5xl leading-none">
+                  +6 mesecev
+                </div>
+                <p className="text-sm sm:text-base text-gray-600 font-normal leading-snug mt-3">
+                  Povprečen čas do prve<br />obravnave v javnem zdravstvu
+                </p>
               </div>
             </div>
 
-            {/* Right - Tomi Talk */}
-            <div className="flex flex-col items-center flex-1 text-center p-4 pt-6 border-2 border-dragon-green rounded-2xl bg-white relative">
-               {/* Label */}
-               <div className="absolute -top-5 w-[calc(100%-2rem)]">
-                <div className="border-2 border-dragon-green rounded-xl py-1 px-1 bg-white">
-                  <h3 style={{
-                  letterSpacing: "0.02em",
-                  fontFamily: "Nunito, sans-serif"
-                }} className="text-[#263146] font-extrabold text-lg md:text-2xl text-center uppercase tracking-tight">tomi talk</h3>
+            {/* Right - Tomi Talk Card */}
+            <div className="flex-1 relative text-center mt-10 sm:mt-0">
+              <div className="absolute -top-5 left-1/2 -translate-x-1/2 z-10 w-max max-w-[90%]">
+                <div className="bg-white border-2 border-dragon-green rounded-xl py-1.5 px-4 shadow-md">
+                  <h3 className="text-gray-800 font-extrabold text-base sm:text-lg uppercase tracking-wider whitespace-nowrap">
+                    TOMI TALK
+                  </h3>
                 </div>
               </div>
-
-              {/* Value */}
-              <div className="font-extrabold text-dragon-green leading-none mt-6 mb-2 my-[2px]">
-                <div className="text-4xl md:text-5xl">Takoj</div>
-                <div className="text-xl md:text-2xl invisible">.</div>
-              </div>
-              {/* Description */}
-              <div className="text-sm md:text-base text-gray-600 font-normal leading-snug font-['Nunito']">
-                Govorne vaje na voljo<br />takoj &ndash; brez čakanja
+              <div className="h-full bg-light-cloud border border-green-200 rounded-2xl p-6 pt-12 shadow-sm transition-transform duration-300 hover:scale-[1.02] flex flex-col justify-center items-center">
+                <div className="font-extrabold text-dragon-green text-4xl sm:text-5xl leading-none">
+                  Takoj
+                </div>
+                <p className="text-sm sm:text-base text-gray-600 font-normal leading-snug mt-3">
+                  Govorne vaje na voljo<br />takoj &ndash; brez čakanja
+                </p>
               </div>
             </div>
+
           </div>
         </div>
       </div>
