@@ -24,7 +24,6 @@ function getSlowPublicPath(progress: number, width: number, height: number) {
   const endX = width - 80;
   const y = height - 115; // stays low, above x-axis (make this about 60-80px above, tweak for best look)
   const steps = Math.floor(100 + progress * 100);
-
   let d = `M${startX} ${y}`;
   for (let i = 1; i <= steps; i++) {
     const t = i / steps * progress; // progress draw
@@ -205,19 +204,10 @@ export function ProgressComparisonSection() {
                 </g>}
 
               {/* --- Add the new public system line BELOW the TomiTalk line --- */}
-              <path
-                d={getSlowPublicPath(curveProgress, dimensions.width, dimensions.height)}
-                fill="none"
-                stroke="url(#public-system-gradient)"
-                strokeWidth={7}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                opacity={curveProgress > 0.05 ? 1 : 0}
-                style={{
-                  filter: "drop-shadow(0px 2px 8px rgba(255, 90, 0, 0.18))",
-                  transition: "stroke-width 0.3s"
-                }}
-              />
+              <path d={getSlowPublicPath(curveProgress, dimensions.width, dimensions.height)} fill="none" stroke="url(#public-system-gradient)" strokeWidth={7} strokeLinecap="round" strokeLinejoin="round" opacity={curveProgress > 0.05 ? 1 : 0} style={{
+              filter: "drop-shadow(0px 2px 8px rgba(255, 90, 0, 0.18))",
+              transition: "stroke-width 0.3s"
+            }} />
             </svg>
           </div>
 
@@ -229,7 +219,7 @@ export function ProgressComparisonSection() {
               <span style={{
               letterSpacing: "0.02em",
               fontFamily: "Nunito, sans-serif"
-            }} className="text-[#263146] font-extrabold text-lg uppercase tracking-tight mt-4 mb-1 md:text-3xl">
+            }} className="text-[#263146] font-extrabold text-orange uppercase tracking-tight mt-4 mb-1 md:text-3xl">
                 JAVNI SISTEM
               </span>
               {/* Value */}
