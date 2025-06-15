@@ -1,19 +1,16 @@
+
 import React, { useEffect, useRef, useState } from "react";
-import { Clock, Rocket } from "lucide-react";
+import { /* Clock, Rocket */ } from "lucide-react";
 const CURVE_DURATION = 3000;
 function getAnimatedPath(progress: number, width: number, height: number) {
   const startX = 80;
   const endX = width - 80;
   const startY = height - 60;
   const endY = 80;
-
-  // Create points for a smooth exponential curve
   const steps = Math.floor(100 + progress * 100);
   let d = `M${startX} ${startY}`;
   for (let i = 1; i <= steps; i++) {
     const t = i / steps * progress;
-
-    // Exponential easing for dramatic acceleration effect
     const eased = 1 - Math.exp(-3.5 * t);
     const x = startX + (endX - startX) * t;
     const y = startY - (startY - endY) * eased;
@@ -35,7 +32,6 @@ export function ProgressComparisonSection() {
         const rect = containerRef.current.getBoundingClientRect();
         setDimensions({
           width: Math.max(800, rect.width - 32),
-          // Account for padding
           height: 400,
         });
       }
@@ -50,8 +46,6 @@ export function ProgressComparisonSection() {
       if (!start) start = ts;
       const elapsed = ts - start;
       const progress = Math.min(elapsed / CURVE_DURATION, 1);
-
-      // Smooth easing with slight acceleration
       const eased = 1 - Math.pow(1 - progress, 2.5);
       setCurveProgress(eased);
       if (progress < 1) {
@@ -60,13 +54,21 @@ export function ProgressComparisonSection() {
     }
     const timeout = setTimeout(() => {
       reqRef.current = requestAnimationFrame(animateCurve);
-    }, 500); // Small delay before animation starts
-
+    }, 500);
     return () => {
       clearTimeout(timeout);
       if (reqRef.current) cancelAnimationFrame(reqRef.current);
     };
   }, []);
+  // Helper vars for responsive adjustments
+  const circleStartR = dimensions.width < 600 ? 7 : 8;
+  const circleEndR = dimensions.width < 600 ? 16 : 20; // larger, more visible
+  const labelFont = dimensions.width < 600 ? "text-base" : "text-lg";
+  const xAxisFont = dimensions.width < 450 ? 20 : 28;
+  const yAxisFont = dimensions.width < 450 ? 20 : 28;
+  // End point positioning
+  const endX = dimensions.width - 80;
+  const endY = 80;
   return (
     <section
       className="w-full min-h-screen flex items-center justify-center py-8 md:py-16 px-2 bg-light-cloud transition-colors duration-500"
@@ -77,14 +79,23 @@ export function ProgressComparisonSection() {
           {/* Headline: new formatting */}
           <div className="mb-10 w-full flex flex-col items-center justify-center">
             <h2 className="flex flex-col items-center w-full text-center">
-              <span className="block font-black text-[2rem] sm:text-3xl md:text-5xl lg:text-6xl text-[#212121] mb-1 leading-snug">
+              {/* Main line: very large, green */}
+              <span
+                className="block font-black text-[2.6rem] sm:text-5xl md:text-6xl lg:text-7xl text-dragon-green mb-1 leading-snug"
+                style={{
+                  letterSpacing: ".01em",
+                  textTransform: "none",
+                }}
+              >
                 3× hitrejši napredek
               </span>
-              <span className="block font-extrabold text-xl sm:text-2xl md:text-3xl lg:text-4xl text-app-orange">
+              {/* Subline: regular style, muted color */}
+              <span className="block font-extrabold text-xl sm:text-2xl md:text-3xl lg:text-4xl text-[#212121] opacity-85">
                 z aplikacijo Tomi Talk
               </span>
             </h2>
           </div>
+
           {/* Full-width graph container */}
           <div ref={containerRef} className="w-full flex justify-center mb-2 md:mb-4">
             <svg
@@ -98,10 +109,10 @@ export function ProgressComparisonSection() {
               <defs>
                 {/* Gradient definitions */}
                 <linearGradient id="curve-gradient" x1="0%" y1="100%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
-                  <stop offset="0%" stopColor="#B9F6CA" /> {/* Light green */}
+                  <stop offset="0%" stopColor="#B9F6CA" />
                   <stop offset="33%" stopColor="#69F0AE" />
                   <stop offset="66%" stopColor="#00E676" />
-                  <stop offset="100%" stopColor="#388E3C" /> {/* Darker green */}
+                  <stop offset="100%" stopColor="#388E3C" />
                 </linearGradient>
                 <linearGradient id="area-gradient" x1="0%" y1="100%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
                   <stop offset="0%" stopColor="#4CAF50" stopOpacity="0.1" />
@@ -125,7 +136,6 @@ export function ProgressComparisonSection() {
                   const x = 80 + i * (dimensions.width - 160) / 5;
                   return <line key={`v-${i}`} x1={x} y1="60" x2={x} y2={dimensions.height - 60} stroke="#4CAF50" strokeWidth="1" strokeDasharray="2,4" />;
                 })}
-
                 {/* Horizontal grid lines */}
                 {Array.from({
                   length: 5
@@ -146,13 +156,13 @@ export function ProgressComparisonSection() {
               {/* Y-axis label (vertical, left, black, large font) */}
               <g>
                 <text
-                  x="40"
+                  x="35"
                   y={dimensions.height / 2}
                   textAnchor="middle"
-                  className="font-black"
-                  fontSize={dimensions.width < 450 ? 20 : 28}
+                  fontWeight={900}
+                  fontSize={yAxisFont}
                   fill="#111"
-                  transform={`rotate(-90, 40, ${dimensions.height / 2})`}
+                  transform={`rotate(-90, 35, ${dimensions.height / 2})`}
                   style={{ letterSpacing: "0.04em" }}
                 >
                   Napredek
@@ -165,8 +175,8 @@ export function ProgressComparisonSection() {
                   x={dimensions.width / 2}
                   y={dimensions.height - 18}
                   textAnchor="middle"
-                  className="font-black"
-                  fontSize={dimensions.width < 450 ? 20 : 28}
+                  fontWeight={900}
+                  fontSize={xAxisFont}
                   fill="#111"
                 >
                   Čas
@@ -212,57 +222,33 @@ export function ProgressComparisonSection() {
                 <circle
                   cx="80"
                   cy={dimensions.height - 60}
-                  r="8"
+                  r={circleStartR}
                   fill="#FF9800"
                   stroke="#fff"
                   strokeWidth="3"
                   style={{
-                    filter:
-                      "drop-shadow(0px 2px 8px rgba(255, 152, 0, 0.4))",
+                    filter: "drop-shadow(0px 2px 8px rgba(255, 152, 0, 0.4))",
                   }}
                 />
-                {/* Icon above "Javni sistem" label */}
-                <foreignObject
-                  x="64"
-                  y={dimensions.height - 110}
-                  width="32"
-                  height="32"
-                  className="flex items-center justify-center"
-                >
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Clock size={24} className="text-app-orange" />
-                  </div>
-                </foreignObject>
+                {/* (Removed icon) */}
               </g>
 
               {/* End point (Tomi Talk) - appears when curve is nearly complete */}
               {curveProgress > 0.9 && (
                 <g>
                   <circle
-                    cx={dimensions.width - 80}
-                    cy="80"
-                    r="10"
+                    cx={endX}
+                    cy={endY}
+                    r={circleEndR}
                     fill="#4CAF50"
                     stroke="#fff"
                     strokeWidth="3"
                     className="animate-pulse"
                     style={{
-                      filter:
-                        "drop-shadow(0px 3px 12px rgba(76, 175, 80, 0.6))",
+                      filter: "drop-shadow(0px 3px 12px rgba(76, 175, 80, 0.6))",
                     }}
                   />
-                  {/* Icon above "Tomi Talk" label */}
-                  <foreignObject
-                    x={dimensions.width - 96}
-                    y={36}
-                    width="32"
-                    height="32"
-                    className="flex items-center justify-center"
-                  >
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Rocket size={26} className="text-dragon-green" />
-                    </div>
-                  </foreignObject>
+                  {/* (Removed icon) */}
                 </g>
               )}
             </svg>
@@ -272,11 +258,13 @@ export function ProgressComparisonSection() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mt-2 md:mt-5 w-full max-w-3xl mx-auto">
             {/* Left - Traditional System */}
             <div className="flex flex-col items-center md:items-center min-w-[160px] max-w-[300px]">
-              {/* Icon (already above inside SVG) - so skip here */}
               {/* Label */}
               <span
                 className="text-[#263146] font-extrabold text-lg md:text-xl uppercase tracking-tight mt-4 mb-1"
-                style={{ letterSpacing: "0.02em" }}
+                style={{
+                  letterSpacing: "0.02em",
+                  fontFamily: "Nunito, sans-serif"
+                }}
               >
                 JAVNI SISTEM
               </span>
@@ -293,14 +281,13 @@ export function ProgressComparisonSection() {
             <div className="flex flex-col items-center md:items-center min-w-[160px] max-w-[300px]">
               {/* Label */}
               <span
-                className="font-extrabold text-xl md:text-2xl bg-gradient-to-r from-dragon-green to-app-orange bg-clip-text text-transparent mt-4 mb-1"
+                className="text-[#263146] font-extrabold text-lg md:text-xl uppercase tracking-tight mt-4 mb-1"
                 style={{
-                  fontFamily: "Nunito, sans-serif",
-                  letterSpacing: "0.01em",
-                  lineHeight: "1.1",
+                  letterSpacing: "0.02em",
+                  fontFamily: "Nunito, sans-serif"
                 }}
               >
-                Tomi Talk
+                TOMI TALK
               </span>
               <div className="text-[1.7rem] font-extrabold text-dragon-green leading-tight -mt-1 mb-1 md:text-2xl">
                 Takoj
