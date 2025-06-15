@@ -28,25 +28,21 @@ function getPublicCurve(progress: number, width: number, height: number) {
   const endX = width - 80;
   const startY = height - 60;
   const endY = 100;
-
   const steps = Math.floor(120 + progress * 100);
   let d = `M${startX} ${startY}`;
-
   for (let i = 1; i <= steps; i++) {
     // Smooth concave-up progression, strictly increasing and continuously differentiable across [0,1]
     // Exponent between 2 and 3, visually matches "slow then faster" upward
-    const t = (i / steps) * progress;
+    const t = i / steps * progress;
     // Remove curvatureKick for full smoothness
     const eased = 0.60 * Math.pow(t, 2.35);
     const yEased = Math.min(eased, 1);
-
     const x = startX + (endX - startX) * t;
     const y = startY - (startY - endY) * yEased;
     d += ` L${x} ${y}`;
   }
   return d;
 }
-
 export function ProgressComparisonSection() {
   const [curveProgress, setCurveProgress] = useState(0);
   const [dimensions, setDimensions] = useState({
@@ -98,11 +94,9 @@ export function ProgressComparisonSection() {
   // End point location (same as TomiTalk curve)
   const endX = dimensions.width - 80;
   const endY = 80;
-
-  return (
-    <section className="w-full flex items-center justify-center py-0 md:py-2 px-1 bg-light-cloud transition-colors duration-500" style={{
-      fontFamily: "Nunito, sans-serif"
-    }}>
+  return <section className="w-full flex items-center justify-center py-0 md:py-2 px-1 bg-light-cloud transition-colors duration-500" style={{
+    fontFamily: "Nunito, sans-serif"
+  }}>
       <div className="w-full max-w-7xl flex flex-col items-center justify-center">
         <div className="w-full md:rounded-3xl bg-white shadow-md px-4 md:px-8 py-6 md:py-10 relative overflow-hidden border border-green-200 flex flex-col items-center">
 
@@ -110,13 +104,10 @@ export function ProgressComparisonSection() {
           <div className="mb-5 w-full flex flex-col items-center justify-center">
             <h2 className="flex flex-col items-center w-full text-center">
               {/* Main line */}
-              <span
-                style={{
-                  letterSpacing: ".01em",
-                  textTransform: "none"
-                }}
-                className="block font-black text-[2.6rem] sm:text-5xl md:text-6xl text-dragon-green mb-1 leading-snug lg:text-6xl"
-              >
+              <span style={{
+              letterSpacing: ".01em",
+              textTransform: "none"
+            }} className="block font-black text-[2.6rem] sm:text-5xl md:text-6xl text-dragon-green mb-1 leading-snug lg:text-6xl">
                 3× hitrejši napredek
               </span>
               {/* Subline */}
@@ -128,17 +119,10 @@ export function ProgressComparisonSection() {
 
           {/* Graph container */}
           <div ref={containerRef} className="w-full flex justify-center mb-1 md:mb-2">
-            <svg
-              className="w-full max-w-3xl"
-              width={dimensions.width}
-              height={dimensions.height}
-              viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
-              preserveAspectRatio="xMidYMid meet"
-              style={{
-                maxWidth: "100%",
-                height: "auto"
-              }}
-            >
+            <svg className="w-full max-w-3xl" width={dimensions.width} height={dimensions.height} viewBox={`0 0 ${dimensions.width} ${dimensions.height}`} preserveAspectRatio="xMidYMid meet" style={{
+            maxWidth: "100%",
+            height: "auto"
+          }}>
               <defs>
                 {/* Green (TomiTalk) line gradient */}
                 <linearGradient id="curve-gradient" x1="0%" y1="100%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
@@ -170,15 +154,19 @@ export function ProgressComparisonSection() {
               {/* Background grid */}
               <g opacity="0.11">
                 {/* Vertical grid lines */}
-                {Array.from({ length: 6 }).map((_, i) => {
-                  const x = 80 + i * (dimensions.width - 160) / 5;
-                  return <line key={`v-${i}`} x1={x} y1="60" x2={x} y2={dimensions.height - 60} stroke="#4CAF50" strokeWidth="1" strokeDasharray="2,4" />;
-                })}
+                {Array.from({
+                length: 6
+              }).map((_, i) => {
+                const x = 80 + i * (dimensions.width - 160) / 5;
+                return <line key={`v-${i}`} x1={x} y1="60" x2={x} y2={dimensions.height - 60} stroke="#4CAF50" strokeWidth="1" strokeDasharray="2,4" />;
+              })}
                 {/* Horizontal grid lines */}
-                {Array.from({ length: 5 }).map((_, i) => {
-                  const y = 80 + i * (dimensions.height - 140) / 4;
-                  return <line key={`h-${i}`} x1="80" y1={y} x2={dimensions.width - 80} y2={y} stroke="#4CAF50" strokeWidth="1" strokeDasharray="2,4" />;
-                })}
+                {Array.from({
+                length: 5
+              }).map((_, i) => {
+                const y = 80 + i * (dimensions.height - 140) / 4;
+                return <line key={`h-${i}`} x1="80" y1={y} x2={dimensions.width - 80} y2={y} stroke="#4CAF50" strokeWidth="1" strokeDasharray="2,4" />;
+              })}
               </g>
 
               {/* Axes */}
@@ -189,7 +177,9 @@ export function ProgressComparisonSection() {
 
               {/* Y and X axis labels */}
               <g>
-                <text x="35" y={dimensions.height / 2} textAnchor="middle" fontWeight={900} fontSize={24} fill="#111" transform={`rotate(-90, 35, ${dimensions.height / 2})`} style={{ letterSpacing: "0.04em" }}>
+                <text x="35" y={dimensions.height / 2} textAnchor="middle" fontWeight={900} fontSize={24} fill="#111" transform={`rotate(-90, 35, ${dimensions.height / 2})`} style={{
+                letterSpacing: "0.04em"
+              }}>
                   Napredek
                 </text>
               </g>
@@ -200,68 +190,33 @@ export function ProgressComparisonSection() {
               </g>
 
               {/* Area under Tomi Talk curve */}
-              {curveProgress > 0.1 && (
-                <path
-                  d={`${getTomiTalkCurve(curveProgress, dimensions.width, dimensions.height)} L${80 + (dimensions.width - 160) * curveProgress} ${dimensions.height - 60} L80 ${dimensions.height - 60} Z`}
-                  fill="url(#area-gradient)"
-                  opacity="0.28"
-                />
-              )}
+              {curveProgress > 0.1 && <path d={`${getTomiTalkCurve(curveProgress, dimensions.width, dimensions.height)} L${80 + (dimensions.width - 160) * curveProgress} ${dimensions.height - 60} L80 ${dimensions.height - 60} Z`} fill="url(#area-gradient)" opacity="0.28" />}
 
               {/* --- Public System curve (matches user image reference, orange-red, gently curving upward) --- */}
-              <path
-                d={getPublicCurve(curveProgress, dimensions.width, dimensions.height)}
-                fill="none"
-                stroke="url(#public-curve-gradient)"
-                strokeWidth={7}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                opacity={curveProgress > 0.025 ? 1 : 0}
-                style={{
-                  filter: "drop-shadow(0px 2px 12px rgba(243, 94, 35, 0.12))",
-                  transition: "stroke-width 0.3s"
-                }}
-              />
+              <path d={getPublicCurve(curveProgress, dimensions.width, dimensions.height)} fill="none" stroke="url(#public-curve-gradient)" strokeWidth={7} strokeLinecap="round" strokeLinejoin="round" opacity={curveProgress > 0.025 ? 1 : 0} style={{
+              filter: "drop-shadow(0px 2px 12px rgba(243, 94, 35, 0.12))",
+              transition: "stroke-width 0.3s"
+            }} />
 
               {/* Main TomiTalk curve (green, fast rising) */}
-              <path
-                d={getTomiTalkCurve(curveProgress, dimensions.width, dimensions.height)}
-                fill="none"
-                stroke="url(#curve-gradient)"
-                strokeWidth={8}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                filter="url(#glow)"
-                style={{
-                  filter: "drop-shadow(0px 6px 18px rgba(76, 175, 80, 0.4))",
-                  transition: "stroke-width 0.3s"
-                }}
-              />
+              <path d={getTomiTalkCurve(curveProgress, dimensions.width, dimensions.height)} fill="none" stroke="url(#curve-gradient)" strokeWidth={8} strokeLinecap="round" strokeLinejoin="round" filter="url(#glow)" style={{
+              filter: "drop-shadow(0px 6px 18px rgba(76, 175, 80, 0.4))",
+              transition: "stroke-width 0.3s"
+            }} />
 
               {/* Start point (left bottom, both curves origin) */}
               <g>
                 <circle cx="80" cy={dimensions.height - 60} r={circleStartR} fill="#FF9800" stroke="#fff" strokeWidth="3" style={{
-                  filter: "drop-shadow(0px 2px 8px rgba(255, 152, 0, 0.32))"
-                }} />
+                filter: "drop-shadow(0px 2px 8px rgba(255, 152, 0, 0.32))"
+              }} />
               </g>
 
               {/* End point (Tomi Talk, green pulsing) */}
-              {curveProgress > 0.9 && (
-                <g>
-                  <circle
-                    cx={endX}
-                    cy={endY}
-                    r={circleEndR}
-                    fill="#4CAF50"
-                    stroke="#fff"
-                    strokeWidth="3"
-                    className="animate-pulse"
-                    style={{
-                      filter: "drop-shadow(0px 6px 18px rgba(76, 175, 80, 0.45))"
-                    }}
-                  />
-                </g>
-              )}
+              {curveProgress > 0.9 && <g>
+                  <circle cx={endX} cy={endY} r={circleEndR} fill="#4CAF50" stroke="#fff" strokeWidth="3" className="animate-pulse" style={{
+                filter: "drop-shadow(0px 6px 18px rgba(76, 175, 80, 0.45))"
+              }} />
+                </g>}
             </svg>
           </div>
 
@@ -273,9 +228,9 @@ export function ProgressComparisonSection() {
               <div className="absolute -top-5 w-[calc(100%-2rem)]">
                 <div className="border-2 border-gray-800 rounded-xl py-1 px-1 bg-white">
                   <h3 style={{
-                    letterSpacing: "0.02em",
-                    fontFamily: "Nunito, sans-serif"
-                  }} className="text-[#263146] font-extrabold text-lg md:text-2xl text-center uppercase tracking-tight">
+                  letterSpacing: "0.02em",
+                  fontFamily: "Nunito, sans-serif"
+                }} className="text-[#263146] font-extrabold text-lg md:text-2xl text-center uppercase tracking-tight">
                     JAVNI SISTEM
                   </h3>
                 </div>
@@ -283,8 +238,8 @@ export function ProgressComparisonSection() {
               
               {/* Value */}
               <div className="font-extrabold text-app-orange leading-none mt-6 mb-2">
-                <div className="text-4xl md:text-5xl">+6</div>
-                <div className="text-xl md:text-2xl">mesecev</div>
+                <div className="text-4xl md:text-5xl">+6 mesecev</div>
+                
               </div>
               {/* Description */}
               <div className="text-sm md:text-base text-gray-600 font-normal leading-snug font-['Nunito']">
@@ -298,14 +253,14 @@ export function ProgressComparisonSection() {
                <div className="absolute -top-5 w-[calc(100%-2rem)]">
                 <div className="border-2 border-dragon-green rounded-xl py-1 px-1 bg-white">
                   <h3 style={{
-                    letterSpacing: "0.02em",
-                    fontFamily: "Nunito, sans-serif"
-                  }} className="text-[#263146] font-extrabold text-lg md:text-2xl text-center uppercase tracking-tight">tomi talk</h3>
+                  letterSpacing: "0.02em",
+                  fontFamily: "Nunito, sans-serif"
+                }} className="text-[#263146] font-extrabold text-lg md:text-2xl text-center uppercase tracking-tight">tomi talk</h3>
                 </div>
               </div>
 
               {/* Value */}
-              <div className="font-extrabold text-dragon-green leading-none mt-6 mb-2">
+              <div className="font-extrabold text-dragon-green leading-none mt-6 mb-2 my-[2px]">
                 <div className="text-4xl md:text-5xl">Takoj</div>
                 <div className="text-xl md:text-2xl invisible">.</div>
               </div>
@@ -317,7 +272,6 @@ export function ProgressComparisonSection() {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 }
 export default ProgressComparisonSection;
