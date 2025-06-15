@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from "react";
 import { /* Clock, Rocket */ } from "lucide-react";
 const CURVE_DURATION = 3000;
@@ -75,11 +76,12 @@ export function ProgressComparisonSection() {
     >
       <div className="w-full max-w-7xl flex flex-col items-center justify-center">
         <div className="w-full md:rounded-3xl bg-white shadow-md px-4 md:px-8 py-8 md:py-14 relative overflow-hidden border border-green-200 flex flex-col items-center">
-          {/* Headline: Two lines, colored, aligned and increased font */}
+          {/* Headline: new formatting */}
           <div className="mb-10 w-full flex flex-col items-center justify-center">
             <h2 className="flex flex-col items-center w-full text-center">
+              {/* Main line: very large, green */}
               <span
-                className="block font-black text-[2.8rem] sm:text-6xl md:text-7xl lg:text-8xl text-dragon-green mb-1 leading-snug"
+                className="block font-black text-[2.6rem] sm:text-5xl md:text-6xl lg:text-7xl text-dragon-green mb-1 leading-snug"
                 style={{
                   letterSpacing: ".01em",
                   textTransform: "none",
@@ -87,12 +89,8 @@ export function ProgressComparisonSection() {
               >
                 3× hitrejši napredek
               </span>
-              <span
-                className="block font-extrabold text-xl sm:text-2xl md:text-3xl lg:text-4xl text-app-orange"
-                style={{
-                  letterSpacing: ".01em",
-                  textTransform: "none",
-                }}>
+              {/* Subline: regular style, muted color */}
+              <span className="block font-extrabold text-xl sm:text-2xl md:text-3xl lg:text-4xl text-[#212121] opacity-85">
                 z aplikacijo Tomi Talk
               </span>
             </h2>
@@ -256,7 +254,7 @@ export function ProgressComparisonSection() {
             </svg>
           </div>
 
-          {/* Bottom section with comparison blocks */}
+          {/* Bottom section with comparison */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mt-2 md:mt-5 w-full max-w-3xl mx-auto">
             {/* Left - Traditional System */}
             <div className="flex flex-col items-center md:items-center min-w-[160px] max-w-[300px]">
@@ -275,11 +273,7 @@ export function ProgressComparisonSection() {
                 +6 mesecev
               </div>
               {/* Description */}
-              <div className="text-app-blue font-normal text-center md:text-center leading-snug font-['Nunito'] font-semibold
-                              text-xl sm:text-2xl md:text-3xl lg:text-4xl"
-                style={{
-                  lineHeight: "1.15"
-                }}>
+              <div className="text-[.97rem] text-gray-500 font-normal text-center md:text-center leading-snug font-['Nunito']">
                 Povprečen čas do prve<br />obravnave v javnem zdravstvu
               </div>
             </div>
@@ -298,11 +292,7 @@ export function ProgressComparisonSection() {
               <div className="text-[1.7rem] font-extrabold text-dragon-green leading-tight -mt-1 mb-1 md:text-2xl">
                 Takoj
               </div>
-              <div className="text-app-blue font-normal text-center md:text-center leading-snug font-['Nunito'] font-semibold
-                              text-xl sm:text-2xl md:text-3xl lg:text-4xl"
-                style={{
-                  lineHeight: "1.15"
-                }}>
+              <div className="text-[.97rem] text-gray-500 font-normal text-center md:text-center leading-snug font-['Nunito']">
                 Govorne vaje na voljo<br />takoj &ndash; brez čakanja
               </div>
             </div>
