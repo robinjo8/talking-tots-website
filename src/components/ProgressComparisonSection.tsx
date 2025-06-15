@@ -1,71 +1,63 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Clock, Rocket } from "lucide-react";
-
 const CURVE_DURATION = 3000;
-
 function getAnimatedPath(progress: number, width: number, height: number) {
   const startX = 80;
   const endX = width - 80;
   const startY = height - 60;
   const endY = 80;
-  
+
   // Create points for a smooth exponential curve
   const steps = Math.floor(100 + progress * 100);
   let d = `M${startX} ${startY}`;
-  
   for (let i = 1; i <= steps; i++) {
-    const t = (i / steps) * progress;
-    
+    const t = i / steps * progress;
+
     // Exponential easing for dramatic acceleration effect
     const eased = 1 - Math.exp(-3.5 * t);
-    
     const x = startX + (endX - startX) * t;
     const y = startY - (startY - endY) * eased;
-    
     d += ` L${x} ${y}`;
   }
-  
   return d;
 }
-
 export function ProgressComparisonSection() {
   const [curveProgress, setCurveProgress] = useState(0);
-  const [dimensions, setDimensions] = useState({ width: 800, height: 400 });
+  const [dimensions, setDimensions] = useState({
+    width: 800,
+    height: 400
+  });
   const containerRef = useRef<HTMLDivElement>(null);
   const reqRef = useRef<number>();
-
   useEffect(() => {
     const updateDimensions = () => {
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
         setDimensions({
-          width: Math.max(800, rect.width - 32), // Account for padding
+          width: Math.max(800, rect.width - 32),
+          // Account for padding
           height: 400
         });
       }
     };
-
     updateDimensions();
     window.addEventListener('resize', updateDimensions);
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
-
   useEffect(() => {
     let start: number;
     function animateCurve(ts: number) {
       if (!start) start = ts;
       const elapsed = ts - start;
       const progress = Math.min(elapsed / CURVE_DURATION, 1);
-      
+
       // Smooth easing with slight acceleration
       const eased = 1 - Math.pow(1 - progress, 2.5);
       setCurveProgress(eased);
-      
       if (progress < 1) {
         reqRef.current = requestAnimationFrame(animateCurve);
       }
     }
-    
     const timeout = setTimeout(() => {
       reqRef.current = requestAnimationFrame(animateCurve);
     }, 500); // Small delay before animation starts
@@ -75,14 +67,9 @@ export function ProgressComparisonSection() {
       if (reqRef.current) cancelAnimationFrame(reqRef.current);
     };
   }, []);
-
-  return (
-    <section
-      className="w-full py-12 md:py-20 px-4 bg-light-cloud transition-colors duration-500"
-      style={{
-        fontFamily: "Nunito, sans-serif",
-      }}
-    >
+  return <section className="w-full py-12 md:py-20 px-4 bg-light-cloud transition-colors duration-500" style={{
+    fontFamily: "Nunito, sans-serif"
+  }}>
       <div className="max-w-7xl mx-auto md:rounded-3xl bg-white shadow-md px-4 md:px-8 py-8 md:py-14 relative overflow-hidden border border-green-200">
         <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#212121] mb-12 text-center">
           <span className="font-bold text-dragon-green">3× hitrejši</span>{" "}
@@ -91,14 +78,10 @@ export function ProgressComparisonSection() {
 
         {/* Full-width graph container */}
         <div ref={containerRef} className="w-full relative mb-4">
-          <svg
-            className="w-full"
-            width={dimensions.width}
-            height={dimensions.height}
-            viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
-            preserveAspectRatio="xMidYMid meet"
-            style={{ maxWidth: '100%', height: 'auto' }}
-          >
+          <svg className="w-full" width={dimensions.width} height={dimensions.height} viewBox={`0 0 ${dimensions.width} ${dimensions.height}`} preserveAspectRatio="xMidYMid meet" style={{
+          maxWidth: '100%',
+          height: 'auto'
+        }}>
             {/* Gradient definitions */}
             <defs>
               <linearGradient id="curve-gradient" x1="0%" y1="100%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
@@ -123,38 +106,20 @@ export function ProgressComparisonSection() {
             {/* Background grid */}
             <g opacity="0.1">
               {/* Vertical grid lines */}
-              {Array.from({ length: 6 }).map((_, i) => {
-                const x = 80 + (i * (dimensions.width - 160) / 5);
-                return (
-                  <line
-                    key={`v-${i}`}
-                    x1={x}
-                    y1="60"
-                    x2={x}
-                    y2={dimensions.height - 60}
-                    stroke="#4CAF50"
-                    strokeWidth="1"
-                    strokeDasharray="2,4"
-                  />
-                );
-              })}
+              {Array.from({
+              length: 6
+            }).map((_, i) => {
+              const x = 80 + i * (dimensions.width - 160) / 5;
+              return <line key={`v-${i}`} x1={x} y1="60" x2={x} y2={dimensions.height - 60} stroke="#4CAF50" strokeWidth="1" strokeDasharray="2,4" />;
+            })}
               
               {/* Horizontal grid lines */}
-              {Array.from({ length: 5 }).map((_, i) => {
-                const y = 80 + (i * (dimensions.height - 140) / 4);
-                return (
-                  <line
-                    key={`h-${i}`}
-                    x1="80"
-                    y1={y}
-                    x2={dimensions.width - 80}
-                    y2={y}
-                    stroke="#4CAF50"
-                    strokeWidth="1"
-                    strokeDasharray="2,4"
-                  />
-                );
-              })}
+              {Array.from({
+              length: 5
+            }).map((_, i) => {
+              const y = 80 + i * (dimensions.height - 140) / 4;
+              return <line key={`h-${i}`} x1="80" y1={y} x2={dimensions.width - 80} y2={y} stroke="#4CAF50" strokeWidth="1" strokeDasharray="2,4" />;
+            })}
             </g>
             
             {/* Axes */}
@@ -182,67 +147,33 @@ export function ProgressComparisonSection() {
             </g>
             
             {/* Area under curve (subtle fill) */}
-            {curveProgress > 0.1 && (
-              <path
-                d={`${getAnimatedPath(curveProgress, dimensions.width, dimensions.height)} L${80 + (dimensions.width - 160) * curveProgress} ${dimensions.height - 60} L80 ${dimensions.height - 60} Z`}
-                fill="url(#area-gradient)"
-                opacity="0.3"
-              />
-            )}
+            {curveProgress > 0.1 && <path d={`${getAnimatedPath(curveProgress, dimensions.width, dimensions.height)} L${80 + (dimensions.width - 160) * curveProgress} ${dimensions.height - 60} L80 ${dimensions.height - 60} Z`} fill="url(#area-gradient)" opacity="0.3" />}
             
             {/* Main animated curve (thicker, multi-green gradient) */}
-            <path
-              d={getAnimatedPath(curveProgress, dimensions.width, dimensions.height)}
-              fill="none"
-              stroke="url(#curve-gradient)"
-              strokeWidth="8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              filter="url(#glow)"
-              style={{
-                filter: "drop-shadow(0px 4px 12px rgba(76, 175, 80, 0.4))",
-                transition: 'stroke-width 0.3s'
-              }}
-            />
+            <path d={getAnimatedPath(curveProgress, dimensions.width, dimensions.height)} fill="none" stroke="url(#curve-gradient)" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" filter="url(#glow)" style={{
+            filter: "drop-shadow(0px 4px 12px rgba(76, 175, 80, 0.4))",
+            transition: 'stroke-width 0.3s'
+          }} />
             
             {/* Start point (traditional system) */}
             <g>
-              <circle
-                cx="80"
-                cy={dimensions.height - 60}
-                r="8"
-                fill="#FF9800"
-                stroke="#fff"
-                strokeWidth="3"
-                style={{
-                  filter: "drop-shadow(0px 2px 8px rgba(255, 152, 0, 0.4))",
-                }}
-              />
+              <circle cx="80" cy={dimensions.height - 60} r="8" fill="#FF9800" stroke="#fff" strokeWidth="3" style={{
+              filter: "drop-shadow(0px 2px 8px rgba(255, 152, 0, 0.4))"
+            }} />
               <foreignObject x="45" y={dimensions.height - 35} width="32" height="32">
                 <Clock size={24} className="text-white" />
               </foreignObject>
             </g>
             
             {/* End point (Tomi Talk) - appears when curve is nearly complete */}
-            {curveProgress > 0.90 && (
-              <g>
-                <circle
-                  cx={dimensions.width - 80}
-                  cy="80"
-                  r="10"
-                  fill="#4CAF50"
-                  stroke="#fff"
-                  strokeWidth="3"
-                  className="animate-pulse"
-                  style={{
-                    filter: "drop-shadow(0px 3px 12px rgba(76, 175, 80, 0.6))",
-                  }}
-                />
+            {curveProgress > 0.90 && <g>
+                <circle cx={dimensions.width - 80} cy="80" r="10" fill="#4CAF50" stroke="#fff" strokeWidth="3" className="animate-pulse" style={{
+              filter: "drop-shadow(0px 3px 12px rgba(76, 175, 80, 0.6))"
+            }} />
                 <foreignObject x={dimensions.width - 105} y="55" width="32" height="32">
                   <Rocket size={26} className="text-white" />
                 </foreignObject>
-              </g>
-            )}
+              </g>}
             
             {/* Progress indicators */}
             <g fontSize="12" fontWeight="600" fill="#666">
@@ -252,11 +183,9 @@ export function ProgressComparisonSection() {
               </text>
               
               {/* Tomi Talk label - appears with end point */}
-              {curveProgress > 0.90 && (
-                <text x={dimensions.width - 80} y="35" textAnchor="middle" className="text-dragon-green font-bold">
+              {curveProgress > 0.90 && <text x={dimensions.width - 80} y="35" textAnchor="middle" className="text-dragon-green font-bold">
                   Takoj!
-                </text>
-              )}
+                </text>}
             </g>
           </svg>
         </div>
@@ -269,7 +198,7 @@ export function ProgressComparisonSection() {
               <span className="bg-orange-100 rounded-full p-2.5">
                 <Clock size={28} className="text-app-orange" />
               </span>
-              <span className="text-lg font-bold text-gray-700">Javni sistem</span>
+              <span className="text-gray-700 font-extrabold text-2xl">JAVNI SISTEM</span>
             </div>
             <div className="text-3xl md:text-4xl font-extrabold text-app-orange mb-1">+6 mesecev</div>
             <div className="text-sm text-gray-500 font-medium text-center md:text-left max-w-[200px]">
@@ -292,8 +221,6 @@ export function ProgressComparisonSection() {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 }
-
 export default ProgressComparisonSection;
