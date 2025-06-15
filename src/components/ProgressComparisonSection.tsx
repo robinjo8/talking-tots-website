@@ -262,38 +262,7 @@ export function ProgressComparisonSection() {
         </div>
 
         {/* Labels Below Graph */}
-        <div className="flex flex-col gap-2 md:gap-3 w-full max-w-3xl mx-auto pt-1 pb-2">
-          {/* Top row: system labels */}
-          <div className="flex flex-row items-center justify-between w-full">
-            {/* Left: JAVNI SISTEM */}
-            <span className="font-extrabold text-xl md:text-2xl uppercase text-zinc-800 tracking-wide">
-              JAVNI SISTEM
-            </span>
-            {/* Right: Tomi Talk with green-orange gradient */}
-            <span
-              className="font-extrabold text-xl md:text-2xl"
-              style={{
-                background: "linear-gradient(90deg, #4CAF50 10%, #FF9800 95%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text"
-              }}
-            >
-              Tomi Talk
-            </span>
-          </div>
-          {/* Bottom row: descriptions */}
-          <div className="flex flex-row items-center justify-between w-full mt-0">
-            {/* Left description */}
-            <span className="text-base md:text-lg font-medium text-gray-700 whitespace-nowrap">
-              Povprečno čakanje na logopeda v javnem zdravstvu
-            </span>
-            {/* Right description */}
-            <span className="text-base md:text-lg font-medium text-gray-700 text-right whitespace-nowrap">
-              Govorne vaje brez čakalnih vrst – dostopne takoj z aplikacijo Tomi Talk
-            </span>
-          </div>
-        </div>
+        
 
         {/* Bottom section with comparison */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mt-8">
