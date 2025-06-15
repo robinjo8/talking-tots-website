@@ -268,34 +268,38 @@ export function ProgressComparisonSection() {
           {/* Comparison section below graph */}
           <div className="flex flex-row items-start justify-center gap-4 md:gap-8 mt-4 w-full max-w-3xl mx-auto">
             {/* Left - Traditional System */}
-            <div className="flex flex-col items-center flex-1 max-w-[300px]">
+            <div className="flex flex-col items-center flex-1 max-w-[300px] text-center">
               {/* Label */}
               <span style={{
                 letterSpacing: "0.02em",
                 fontFamily: "Nunito, sans-serif"
-              }} className="text-[#263146] font-extrabold text-lg text-center uppercase tracking-tight mt-4 mb-1 md:text-3xl">
+              }} className="text-[#263146] font-extrabold text-lg md:text-2xl text-center uppercase tracking-tight mb-2 h-12 flex items-center justify-center">
                 JAVNI SISTEM
               </span>
               {/* Value */}
-              <div className="text-[1.7rem] font-extrabold text-app-orange leading-tight -mt-1 mb-1 md:text-3xl ">
-                +6 mesecev
+              <div className="font-extrabold text-app-orange leading-none mb-2">
+                <div className="text-4xl md:text-5xl">+6</div>
+                <div className="text-xl md:text-2xl">mesecev</div>
               </div>
               {/* Description */}
-              <div className="text-[.97rem] text-gray-600 font-normal text-center leading-snug font-['Nunito']">
+              <div className="text-sm md:text-base text-gray-600 font-normal leading-snug font-['Nunito']">
                 Povprečen čas do prve<br />obravnave v javnem zdravstvu
               </div>
             </div>
             {/* Right - Tomi Talk */}
-            <div className="flex flex-col items-center flex-1 max-w-[300px]">
+            <div className="flex flex-col items-center flex-1 max-w-[300px] text-center">
               {/* Label */}
               <span style={{
                 letterSpacing: "0.02em",
                 fontFamily: "Nunito, sans-serif"
-              }} className="text-[#263146] font-extrabold text-lg text-center uppercase tracking-tight mt-4 mb-1 md:text-3xl">tomi talk</span>
-              <div className="text-[1.7rem] font-extrabold text-dragon-green leading-tight -mt-1 mb-1 md:text-3xl ">
-                Takoj
+              }} className="text-[#263146] font-extrabold text-lg md:text-2xl text-center uppercase tracking-tight mb-2 h-12 flex items-center justify-center">tomi talk</span>
+              {/* Value */}
+              <div className="font-extrabold text-dragon-green leading-none mb-2">
+                <div className="text-4xl md:text-5xl">Takoj</div>
+                <div className="text-xl md:text-2xl invisible">.</div>
               </div>
-              <div className="text-[.97rem] text-gray-600 font-normal text-center leading-snug font-['Nunito']">
+              {/* Description */}
+              <div className="text-sm md:text-base text-gray-600 font-normal leading-snug font-['Nunito']">
                 Govorne vaje na voljo<br />takoj &ndash; brez čakanja
               </div>
             </div>
