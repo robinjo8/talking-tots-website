@@ -100,7 +100,7 @@ export function ProgressComparisonSection() {
   const endY = 80;
 
   return (
-    <section className="w-full min-h-screen flex items-center justify-center py-0 md:py-2 px-1 bg-light-cloud transition-colors duration-500" style={{
+    <section className="w-full flex items-center justify-center py-0 md:py-2 px-1 bg-light-cloud transition-colors duration-500" style={{
       fontFamily: "Nunito, sans-serif"
     }}>
       <div className="w-full max-w-7xl flex flex-col items-center justify-center">
