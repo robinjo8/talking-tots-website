@@ -100,14 +100,14 @@ export function ProgressComparisonSection() {
   const endY = 80;
 
   return (
-    <section className="w-full min-h-screen flex items-center justify-center py-8 md:py-16 px-2 bg-light-cloud transition-colors duration-500" style={{
+    <section className="w-full min-h-screen flex items-center justify-center py-4 md:py-8 px-1 bg-light-cloud transition-colors duration-500" style={{
       fontFamily: "Nunito, sans-serif"
     }}>
       <div className="w-full max-w-7xl flex flex-col items-center justify-center">
-        <div className="w-full md:rounded-3xl bg-white shadow-md px-4 md:px-8 py-8 md:py-14 relative overflow-hidden border border-green-200 flex flex-col items-center">
+        <div className="w-full md:rounded-3xl bg-white shadow-md px-4 md:px-8 py-6 md:py-10 relative overflow-hidden border border-green-200 flex flex-col items-center">
 
           {/* Headline */}
-          <div className="mb-10 w-full flex flex-col items-center justify-center">
+          <div className="mb-5 w-full flex flex-col items-center justify-center">
             <h2 className="flex flex-col items-center w-full text-center">
               {/* Main line */}
               <span
@@ -127,7 +127,7 @@ export function ProgressComparisonSection() {
           </div>
 
           {/* Graph container */}
-          <div ref={containerRef} className="w-full flex justify-center mb-2 md:mb-4">
+          <div ref={containerRef} className="w-full flex justify-center mb-1 md:mb-2">
             <svg
               className="w-full max-w-3xl"
               width={dimensions.width}
@@ -266,7 +266,7 @@ export function ProgressComparisonSection() {
           </div>
 
           {/* Comparison section below graph (unchanged) */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mt-2 md:mt-5 w-full max-w-3xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mt-1 md:mt-3 w-full max-w-3xl mx-auto">
             {/* Left - Traditional System */}
             <div className="flex flex-col items-center md:items-center min-w-[160px] max-w-[300px]">
               {/* Label */}
