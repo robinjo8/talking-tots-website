@@ -22,28 +22,26 @@ function getTomiTalkCurve(progress: number, width: number, height: number) {
   return d;
 }
 
-// --- New: Public System curve (orange-to-red, more concave up, matches provided reference) ---
+// --- New: Public System curve (orange-to-red, concave up, smooth/continuous from start to end) ---
 function getPublicCurve(progress: number, width: number, height: number) {
   const startX = 80;
   const endX = width - 80;
   const startY = height - 60;
-  const endY = 100; // End higher than before, but still below TomiTalk for clarity
+  const endY = 100;
 
   const steps = Math.floor(120 + progress * 100);
   let d = `M${startX} ${startY}`;
+
   for (let i = 1; i <= steps; i++) {
-    // Use a more concave up function, matching visual reference:
-    // Strong curvature at the start, increasingly fast rise late (t^2.5)
+    // Smooth concave-up progression, strictly increasing and continuously differentiable across [0,1]
+    // Exponent between 2 and 3, visually matches "slow then faster" upward
     const t = (i / steps) * progress;
-    // Power term gives "low, then fast up" progression (visually bending upwards more than linear)
-    // Adjust 0.6 multiplier for vertical range.
-    const eased = 0.60 * Math.pow(t, 2.3); // 2.2-2.5 matches the image well
-    // Optionally: Offset y upward near the end for a final "kick" to mimic ref shape
-    const curvatureKick = t > 0.85 ? (t - 0.85) * 1.2 : 0;
-    const totalEased = Math.min(eased + curvatureKick, 1);
+    // Remove curvatureKick for full smoothness
+    const eased = 0.60 * Math.pow(t, 2.35);
+    const yEased = Math.min(eased, 1);
 
     const x = startX + (endX - startX) * t;
-    const y = startY - (startY - endY) * totalEased;
+    const y = startY - (startY - endY) * yEased;
     d += ` L${x} ${y}`;
   }
   return d;
