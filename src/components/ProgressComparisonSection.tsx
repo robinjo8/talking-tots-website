@@ -200,7 +200,7 @@ export function ProgressComparisonSection() {
               </span>
               <span className="text-gray-700 font-extrabold text-2xl">JAVNI SISTEM</span>
             </div>
-            <div className="text-3xl md:text-4xl font-extrabold text-app-orange mb-1">+6 mesecev</div>
+            <div className="text-5xl md:text-4xl font-extrabold text-app-orange mb-1">+6 mesecev</div>
             <div className="text-sm text-gray-500 font-medium text-center md:text-left max-w-[200px]">
               Povprečen čas do prve obravnave v javnem zdravstvu
             </div>
@@ -212,18 +212,13 @@ export function ProgressComparisonSection() {
               <span className="bg-green-100 rounded-full p-2.5">
                 <Rocket size={28} className="text-dragon-green" />
               </span>
-              <span
-                className="text-lg font-extrabold font-rounded bg-gradient-to-r from-dragon-green to-app-orange bg-clip-text text-transparent"
-                style={{
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
-              >
-                Tomi Talk
-              </span>
+              <span style={{
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent"
+            }} className="font-extrabold font-rounded bg-gradient-to-r from-dragon-green to-app-orange bg-clip-text text-transparent text-3xl">TomiTalk</span>
             </div>
-            <div className="text-3xl md:text-4xl font-extrabold text-dragon-green mb-1">Takoj</div>
-            <div className="text-sm text-gray-500 font-medium text-center md:text-right max-w-[200px]">
+            <div className="text-5xl md:text-4xl font-extrabold text-dragon-green mb-1 px-0">Takoj</div>
+            <div className="text-sm text-gray-500 font-medium text-center md:text-right max-w-[200px] px-[16px] mx-0">
               Govorne vaje na voljo takoj – brez čakanja
             </div>
           </div>
