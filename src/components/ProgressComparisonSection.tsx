@@ -191,35 +191,48 @@ export function ProgressComparisonSection() {
         </div>
 
         {/* Bottom section with comparison */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mt-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8 mt-5 md:mt-8 px-2">
           {/* Left - Traditional System */}
-          <div className="flex flex-col items-center md:items-start">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="bg-orange-100 rounded-full p-2.5">
-                <Clock size={28} className="text-app-orange" />
+          <div className="flex flex-col items-center md:items-start min-w-[210px] max-w-[300px]">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="bg-orange-100 rounded-full p-2 shadow-sm">
+                <Clock size={22} className="text-app-orange" />
               </span>
-              <span className="text-gray-700 font-extrabold text-2xl">JAVNI SISTEM</span>
+              <span className="text-[#263146] font-extrabold text-lg md:text-xl uppercase tracking-tight" style={{
+                letterSpacing: "0.02em"
+              }}>
+                JAVNI SISTEM
+              </span>
             </div>
-            <div className="text-5xl md:text-4xl font-extrabold text-app-orange mb-1">+6 mesecev</div>
-            <div className="text-sm text-gray-500 font-medium text-center md:text-left max-w-[200px]">
-              Povprečen čas do prve obravnave v javnem zdravstvu
+            <div className="text-[2rem] font-extrabold text-app-orange leading-tight -mt-1 mb-0.5 md:text-3xl">
+              +6 mesecev
+            </div>
+            <div className="text-[0.98rem] text-gray-500 font-normal text-center md:text-left mb-0 leading-snug" style={{fontFamily: "Nunito, sans-serif"}}>
+              Povprečen čas do prve<br />
+              obravnave v javnem zdravstvu
             </div>
           </div>
 
           {/* Right - Tomi Talk */}
-          <div className="flex flex-col items-center md:items-end">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="bg-green-100 rounded-full p-2.5">
-                <Rocket size={28} className="text-dragon-green" />
+          <div className="flex flex-col items-center md:items-end min-w-[210px] max-w-[300px]">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="bg-green-100 rounded-full p-2 shadow-sm">
+                <Rocket size={22} className="text-dragon-green" />
               </span>
-              <span style={{
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent"
-            }} className="font-extrabold font-rounded bg-gradient-to-r from-dragon-green to-app-orange bg-clip-text text-transparent text-3xl">TomiTalk</span>
+              <span className="font-extrabold text-xl md:text-2xl bg-gradient-to-r from-dragon-green to-app-orange bg-clip-text text-transparent" style={{
+                fontFamily: "Nunito, sans-serif",
+                letterSpacing: "0.01em",
+                lineHeight: "1.1"
+              }}>
+                TomiTalk
+              </span>
             </div>
-            <div className="text-5xl md:text-4xl font-extrabold text-dragon-green mb-1 px-0">Takoj</div>
-            <div className="text-sm text-gray-500 font-medium text-center md:text-right max-w-[200px] px-[16px] mx-0">
-              Govorne vaje na voljo takoj – brez čakanja
+            <div className="text-[2rem] font-extrabold text-dragon-green leading-tight -mt-1 mb-0.5 md:text-3xl">
+              Takoj
+            </div>
+            <div className="text-[0.98rem] text-gray-500 font-normal text-center md:text-right mb-0 leading-snug" style={{fontFamily: "Nunito, sans-serif"}}>
+              Govorne vaje na voljo <br />
+              takoj &ndash; brez čakanja
             </div>
           </div>
         </div>
