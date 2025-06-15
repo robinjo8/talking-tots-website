@@ -298,13 +298,13 @@ const Index = () => {
               <p className="text-xl text-muted-foreground mb-8">
                 Prenesite Tomi Talk danes in opazujte, kako komunikacijske veščine vašega otroka cvetijo!
               </p>
-              <div className="relative w-48 h-48 xs:w-56 xs:h-56 mx-auto mb-6">
+              <div className="relative w-40 h-40 xs:w-48 xs:h-48 mx-auto mb-6">
                 <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
                 <div className="animate-float relative">
                   <img
                     alt="Tomi Talk Dragon Mascot"
                     className="w-full h-full object-contain"
-                    src="/lovable-uploads/0a65be75-55c7-4939-baa2-4309dbfdd7ea.png"
+                    src="/lovable-uploads/afbdd309-0550-437a-9afc-966c9a811062.png"
                   />
                 </div>
               </div>
@@ -340,13 +340,13 @@ const Index = () => {
                 
                 {/* Right side - Dragon */}
                 <div className="flex-shrink-0">
-                  <div className="relative w-72 h-72 xl:w-80 xl:h-80">
+                  <div className="relative w-64 h-64 xl:w-80 xl:h-80">
                     <div className="absolute w-full h-full bg-gradient-rainbow rounded-full blur-3xl opacity-20 scale-75"></div>
                     <div className="animate-float relative">
                       <img
                         alt="Tomi Talk Dragon Mascot"
                         className="w-full h-full object-contain"
-                        src="/lovable-uploads/0a65be75-55c7-4939-baa2-4309dbfdd7ea.png"
+                        src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png"
                       />
                     </div>
                   </div>
