@@ -1,0 +1,44 @@
+
+import { Button } from "@/components/ui/button";
+
+export const CallToActionSection = () => {
+  return (
+    <section id="cta" className="py-14 px-4 md:px-10 bg-light-cloud relative overflow-hidden w-full">
+      <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-app-teal/20 rounded-full blur-3xl"></div>
+      <div className="absolute -top-10 -right-10 w-40 h-40 bg-app-orange/20 rounded-full blur-3xl"></div>
+      
+      <div className="max-w-6xl mx-auto relative z-10">
+        <div className="flex flex-col lg:flex-row items-center justify-center text-center lg:text-left gap-8 lg:gap-16">
+          {/* Dragon Image - shown first on mobile, right on desktop */}
+          <div className="lg:order-last flex-shrink-0">
+            <div className="relative w-44 h-44 md:w-52 md:h-52">
+              <div className="animate-float relative w-full h-full">
+                <img
+                  alt="Tomi Talk Dragon Mascot"
+                  className="w-full h-full object-contain"
+                  src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Text content */}
+          <div className="flex-1">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Ste pripravljeni na govorno avanturo?</h2>
+            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto lg:mx-0">
+              Prenesite Tomi Talk danes in opazujte, kako komunikacijske veščine vašega otroka cvetijo!
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+              <Button size="lg" className="bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full w-full sm:w-auto px-8">
+                Prenos za iOS
+              </Button>
+              <Button size="lg" className="bg-app-blue hover:bg-app-blue/90 text-white rounded-full w-full sm:w-auto px-8">
+                Prenos za Android
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
