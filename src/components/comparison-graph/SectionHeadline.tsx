@@ -7,11 +7,11 @@ export function SectionHeadline() {
         <span style={{
         letterSpacing: '.01em',
         textTransform: 'none'
-      }} className="block font-black text-[2.6rem] sm:text-5xl md:text-3xl text-dragon-green mb-1 leading-snug lg:text-6xl whitespace-nowrap">
+      }} className="block font-black text-[2.2rem] sm:text-[2.6rem] md:text-3xl text-dragon-green mb-1 leading-snug lg:text-6xl whitespace-nowrap">
           Napreduj hitreje
         </span>
         {/* Subline */}
-        <span className="text-[1.7rem] font-extrabold text-app-orange leading-tight -mt-1 mb-1 md:text-4xl">
+        <span className="text-[1.4rem] sm:text-[1.7rem] font-extrabold text-app-orange leading-tight -mt-1 mb-1 md:text-4xl">
           z aplikacijo Tomi Talk
         </span>
       </h2>
