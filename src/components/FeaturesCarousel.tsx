@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { Mic, Stars, Volume2, MessageSquare, Zap, Book, Award, ChevronLeft, ChevronRight } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
@@ -130,7 +129,7 @@ export const FeaturesCarousel = () => {
   }, [api]);
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-4">
+    <div className="w-full max-w-7xl mx-auto px-0">
       <div className="relative">
         <Carousel 
           setApi={setApi} 
@@ -141,14 +140,14 @@ export const FeaturesCarousel = () => {
             containScroll: "trimSnaps"
           }}
         >
-          <CarouselContent className="-ml-2 md:-ml-4">
+          <CarouselContent className="-ml-3 md:-ml-6">
             {features.map((feature, index) => (
-              <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+              <CarouselItem key={index} className="pl-3 md:pl-6 md:basis-1/2 lg:basis-1/3">
                 <div className="h-full p-1">
-                  <div className="bg-background rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 md:p-8 h-full flex flex-col justify-between min-h-[300px] relative overflow-hidden border-0">
+                  <div className="bg-background rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-8 md:p-10 h-full flex flex-col justify-between min-h-[320px] relative overflow-hidden border-0">
                     {/* Icon Section */}
                     <div className="flex items-center justify-center mb-6">
-                      <div className={cn("w-16 h-16 rounded-2xl flex items-center justify-center shadow-md", feature.color)}>
+                      <div className={cn("w-18 h-18 rounded-2xl flex items-center justify-center shadow-md", feature.color)}>
                         {feature.icon}
                       </div>
                     </div>
@@ -156,10 +155,10 @@ export const FeaturesCarousel = () => {
                     {/* Content Section */}
                     <div className="text-center flex-grow flex flex-col justify-between">
                       <div>
-                        <h3 className="text-xl font-bold mb-4 leading-tight text-foreground line-clamp-2 py-[5px]">
+                        <h3 className="text-xl md:text-2xl font-bold mb-4 leading-tight text-foreground line-clamp-2 py-[5px]">
                           {feature.title}
                         </h3>
-                        <p className="text-muted-foreground leading-relaxed text-sm line-clamp-3">
+                        <p className="text-muted-foreground leading-relaxed text-base md:text-lg line-clamp-3">
                           {feature.description}
                         </p>
                       </div>
@@ -175,14 +174,14 @@ export const FeaturesCarousel = () => {
             <>
               <button 
                 onClick={handlePrevClick} 
-                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 h-12 w-12 bg-background shadow-lg hover:shadow-xl hover:bg-muted border border-border rounded-full flex items-center justify-center z-10 transition-all duration-300 hover:scale-105" 
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-6 h-12 w-12 bg-background shadow-lg hover:shadow-xl hover:bg-muted border border-border rounded-full flex items-center justify-center z-10 transition-all duration-300 hover:scale-105" 
                 aria-label="Prejšnja funkcija"
               >
                 <ChevronLeft className="h-5 w-5 text-foreground" />
               </button>
               <button 
                 onClick={handleNextClick} 
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 h-12 w-12 bg-background shadow-lg hover:shadow-xl hover:bg-muted border border-border rounded-full flex items-center justify-center z-10 transition-all duration-300 hover:scale-105" 
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 h-12 w-12 bg-background shadow-lg hover:shadow-xl hover:bg-muted border border-border rounded-full flex items-center justify-center z-10 transition-all duration-300 hover:scale-105" 
                 aria-label="Naslednja funkcija"
               >
                 <ChevronRight className="h-5 w-5 text-foreground" />
