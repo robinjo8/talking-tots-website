@@ -11,9 +11,20 @@ interface ComparisonGraphProps {
 }
 
 export function ComparisonGraph({ curveProgress, dimensions }: ComparisonGraphProps) {
+  // Responsive styling based on screen size
+  const isMobile = dimensions.width < 768;
+  
+  // Responsive stroke widths - thinner for desktop, slightly thicker for mobile visibility
+  const tomiStrokeWidth = isMobile ? 4 : 3;
+  const publicStrokeWidth = isMobile ? 3.5 : 2.5;
+  
   // Responsive circle sizes
-  const circleStartR = dimensions.width < 600 ? 8 : 10;
-  const circleEndR = dimensions.width < 600 ? 18 : 24;
+  const circleStartR = isMobile ? 6 : 8;
+  const circleEndR = isMobile ? 14 : 18;
+
+  // Responsive font sizes
+  const axisFontSize = isMobile ? 16 : 24;
+  const timeAxisFontSize = isMobile ? 20 : 28;
 
   // End point location (same as TomiTalk curve)
   const endX = dimensions.width - 80;
@@ -48,7 +59,7 @@ export function ComparisonGraph({ curveProgress, dimensions }: ComparisonGraphPr
           <stop offset="100%" stopColor="#D32F2F" />
         </linearGradient>
         <filter id="glow">
-          <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+          <feGaussianBlur stdDeviation="2" result="coloredBlur" />
           <feMerge>
             <feMergeNode in="coloredBlur" />
             <feMergeNode in="SourceGraphic" />
@@ -78,7 +89,7 @@ export function ComparisonGraph({ curveProgress, dimensions }: ComparisonGraphPr
           y={dimensions.height / 2}
           textAnchor="middle"
           fontWeight={900}
-          fontSize={24}
+          fontSize={axisFontSize}
           fill="#111"
           transform={`rotate(-90, 35, ${dimensions.height / 2})`}
           style={{ letterSpacing: '0.04em' }}
@@ -87,7 +98,7 @@ export function ComparisonGraph({ curveProgress, dimensions }: ComparisonGraphPr
         </text>
       </g>
       <g>
-        <text x={dimensions.width / 2} y={dimensions.height - 18} textAnchor="middle" fontWeight={900} fontSize={28} fill="#111">
+        <text x={dimensions.width / 2} y={dimensions.height - 18} textAnchor="middle" fontWeight={900} fontSize={timeAxisFontSize} fill="#111">
           Čas
         </text>
       </g>
@@ -98,12 +109,12 @@ export function ComparisonGraph({ curveProgress, dimensions }: ComparisonGraphPr
         d={getPublicCurve(curveProgress, dimensions.width, dimensions.height)}
         fill="none"
         stroke="url(#public-curve-gradient)"
-        strokeWidth={7}
+        strokeWidth={publicStrokeWidth}
         strokeLinecap="round"
         strokeLinejoin="round"
         opacity={curveProgress > 0.025 ? 1 : 0}
         style={{
-          filter: 'drop-shadow(0px 2px 12px rgba(243, 94, 35, 0.12))',
+          filter: 'drop-shadow(0px 1px 6px rgba(243, 94, 35, 0.08))',
           transition: 'stroke-width 0.3s',
         }}
       />
@@ -112,12 +123,12 @@ export function ComparisonGraph({ curveProgress, dimensions }: ComparisonGraphPr
         d={getTomiTalkCurve(curveProgress, dimensions.width, dimensions.height)}
         fill="none"
         stroke="url(#curve-gradient)"
-        strokeWidth={8}
+        strokeWidth={tomiStrokeWidth}
         strokeLinecap="round"
         strokeLinejoin="round"
         filter="url(#glow)"
         style={{
-          filter: 'drop-shadow(0px 6px 18px rgba(76, 175, 80, 0.4))',
+          filter: 'drop-shadow(0px 2px 8px rgba(76, 175, 80, 0.2))',
           transition: 'stroke-width 0.3s',
         }}
       />
@@ -129,8 +140,8 @@ export function ComparisonGraph({ curveProgress, dimensions }: ComparisonGraphPr
           r={circleStartR}
           fill="#FF9800"
           stroke="#fff"
-          strokeWidth="3"
-          style={{ filter: 'drop-shadow(0px 2px 8px rgba(255, 152, 0, 0.32))' }}
+          strokeWidth="2"
+          style={{ filter: 'drop-shadow(0px 1px 4px rgba(255, 152, 0, 0.24))' }}
         />
       </g>
 
@@ -142,9 +153,9 @@ export function ComparisonGraph({ curveProgress, dimensions }: ComparisonGraphPr
             r={circleEndR}
             fill="#4CAF50"
             stroke="#fff"
-            strokeWidth="3"
+            strokeWidth="2"
             className="animate-pulse"
-            style={{ filter: 'drop-shadow(0px 6px 18px rgba(76, 175, 80, 0.45))' }}
+            style={{ filter: 'drop-shadow(0px 3px 10px rgba(76, 175, 80, 0.35))' }}
           />
         </g>
       )}

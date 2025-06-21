@@ -4,7 +4,7 @@ import { ComparisonCard } from './ComparisonCard';
 
 export function ComparisonCards() {
   return (
-    <div className="flex flex-col sm:flex-row items-stretch justify-center gap-6 md:gap-8 mt-12 w-full max-w-3xl mx-auto px-4">
+    <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 md:gap-8 mt-8 md:mt-12 w-full max-w-3xl mx-auto px-2 md:px-4">
       <ComparisonCard
         title="JAVNI SISTEM"
         value="+6 mesecev"
