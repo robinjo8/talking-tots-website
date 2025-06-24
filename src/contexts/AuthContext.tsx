@@ -4,7 +4,7 @@ import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-type ChildProfile = {
+export type ChildProfile = {
   id?: string;
   name: string;
   gender: string;
@@ -13,7 +13,7 @@ type ChildProfile = {
   speechDifficulties?: string[];
 };
 
-type Profile = {
+export type Profile = {
   username: string | null;
   children?: ChildProfile[];
 };
