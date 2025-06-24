@@ -97,17 +97,13 @@ export default function Header() {
     navigate("/login");
   };
 
-  // Navigation links
+  // Navigation links - updated to rename "Govorne igre" to "Igre"
   const navigationLinks = [{
-    label: "Moja stran",
-    path: "/moja-stran",
-    icon: Home
-  }, {
     label: "Vaje",
     path: "/govorno-jezikovne-vaje",
     icon: Activity
   }, {
-    label: "Govorne igre",
+    label: "Igre",
     path: "/govorne-igre",
     icon: Gamepad
   }, {
@@ -118,10 +114,6 @@ export default function Header() {
     label: "Video navodila",
     path: "/video-navodila",
     icon: Video
-  }, {
-    label: "Logopedski kotiček",
-    path: "/logopedski-koticek",
-    icon: BookOpen
   }, {
     label: "Obvestila",
     path: "#",
@@ -232,6 +224,32 @@ export default function Header() {
         {user && (
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Navigacija</h3>
+            
+            {/* Moja stran button */}
+            <Button 
+              variant="ghost" 
+              className={`w-full justify-start text-left h-12 ${
+                isActivePath('/moja-stran') ? 'bg-accent' : ''
+              }`}
+              onClick={() => handleNavigate('/moja-stran')}
+            >
+              <Home className="h-5 w-5 mr-3" />
+              <span className="font-medium">Moja stran</span>
+            </Button>
+            
+            {/* Logopedski kotiček */}
+            <Button 
+              variant="ghost" 
+              className={`w-full justify-start text-left h-12 ${
+                isActivePath('/logopedski-koticek') ? 'bg-accent' : ''
+              }`}
+              onClick={() => handleNavigate('/logopedski-koticek')}
+            >
+              <BookOpen className="h-5 w-5 mr-3" />
+              <span className="font-medium">Logopedski kotiček</span>
+            </Button>
+            
+            {/* Other navigation links */}
             {navigationLinks.map((link, index) => (
               <Button 
                 key={index}
@@ -410,6 +428,32 @@ export default function Header() {
                         {/* Main navigation - only if logged in */}
                         <div className="space-y-3">
                           <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Navigacija</h3>
+                          
+                          {/* Moja stran button */}
+                          <Button 
+                            variant="ghost" 
+                            className={`w-full justify-start text-left h-12 ${
+                              isActivePath('/moja-stran') ? 'bg-accent' : ''
+                            }`}
+                            onClick={() => handleNavigate('/moja-stran')}
+                          >
+                            <Home className="h-5 w-5 mr-3" />
+                            <span className="font-medium">Moja stran</span>
+                          </Button>
+                          
+                          {/* Logopedski kotiček */}
+                          <Button 
+                            variant="ghost" 
+                            className={`w-full justify-start text-left h-12 ${
+                              isActivePath('/logopedski-koticek') ? 'bg-accent' : ''
+                            }`}
+                            onClick={() => handleNavigate('/logopedski-koticek')}
+                          >
+                            <BookOpen className="h-5 w-5 mr-3" />
+                            <span className="font-medium">Logopedski kotiček</span>
+                          </Button>
+                          
+                          {/* Other navigation links */}
                           {navigationLinks.map((link, index) => (
                             <Button 
                               key={index}
@@ -479,14 +523,7 @@ export default function Header() {
 
           {/* DESKTOP HEADER */}
           <nav className="hidden lg:flex items-center gap-4">
-            {/* Always show Logopedski kotiček and Cenik */}
-            <Button
-              asChild
-              variant="ghost"
-              className="font-semibold rounded-full h-12 text-base px-6"
-            >
-              <Link to="/logopedski-koticek">Logopedski kotiček</Link>
-            </Button>
+            {/* Always show Cenik */}
             <Button
               type="button"
               variant="ghost"
@@ -498,8 +535,8 @@ export default function Header() {
             {/* --- When LOGGED IN, show main navigation left of user profile --- */}
             {user && (
               <>
-                {/* Navigation links, slice excludes Logopedski kotiček */}
-                {navigationLinks.slice(0, 6).map((link, index) => (
+                {/* Navigation links - updated order */}
+                {navigationLinks.slice(0, 4).map((link, index) => (
                   <Button 
                     key={index} 
                     variant="ghost" 
@@ -510,10 +547,49 @@ export default function Header() {
                       (isActivePath(link.path) ? 'bg-accent' : '')
                     }
                   >
-                    {link.label === "Logopedski kotiček" && <BookOpen className="h-4 w-4 mr-2" />}
                     {link.label}
                   </Button>
                 ))}
+                
+                {/* Logopedski kotiček with icon */}
+                <Button
+                  asChild
+                  variant="ghost"
+                  className="font-semibold rounded-full h-12 text-base px-6"
+                >
+                  <Link to="/logopedski-koticek">
+                    <BookOpen className="h-4 w-4 mr-2" />
+                    Logopedski kotiček
+                  </Link>
+                </Button>
+                
+                {/* Moja stran */}
+                <Button 
+                  variant="ghost" 
+                  onClick={() => handleNavigate('/moja-stran')} 
+                  className={
+                    "rounded-full h-12 text-base px-6 font-semibold " +
+                    (isActivePath('/moja-stran') ? 'bg-accent' : '')
+                  }
+                >
+                  Moja stran
+                </Button>
+                
+                {navigationLinks.slice(4, 6).map((link, index) => (
+                  <Button 
+                    key={index} 
+                    variant="ghost" 
+                    onClick={() => !link.disabled && handleNavigate(link.path)} 
+                    disabled={link.disabled}
+                    className={
+                      "rounded-full h-12 text-base px-6 font-semibold " +
+                      (isActivePath(link.path) ? 'bg-accent' : '')
+                    }
+                  >
+                    {link.label}
+                  </Button>
+                ))}
+                
                 <UserProfile />
               </>
             )}
