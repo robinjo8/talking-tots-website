@@ -7,7 +7,6 @@ import {
   CircleDollarSign, 
   ChevronDown, 
   ChevronUp, 
-  Check,
   Target,
   Gamepad2,
   Video,
@@ -79,7 +78,7 @@ export function SubscriptionSection() {
                   <TabsTrigger value="yearly" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 relative">
                     Prihrani letno
                     <span className="absolute -top-2 -right-2 bg-app-orange text-white text-xs px-2 py-0.5 rounded-full font-medium">
-                      -58%
+                      -54%
                     </span>
                   </TabsTrigger>
                 </TabsList>
@@ -147,7 +146,6 @@ export function SubscriptionSection() {
                           <span className="text-gray-500">/mesec</span>
                         </div>
                         <p className="text-sm text-gray-600">zaračunano letno</p>
-                        <p className="text-xs text-dragon-green font-medium mt-1">120 €/leto</p>
                       </div>
 
                       <div className="text-center mb-6">
