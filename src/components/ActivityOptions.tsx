@@ -1,19 +1,26 @@
+
 import { Card, CardHeader, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookText, Gamepad, Zap, Video, TestTube } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+
 export function ActivityOptions() {
   const navigate = useNavigate();
+  
   const handleGoToExercises = () => {
     navigate("/govorno-jezikovne-vaje");
   };
+  
   const handleGoToGames = () => {
     navigate("/govorne-igre");
   };
+  
   const handleGoToArticulationTest = () => {
     navigate("/artikulacijski-test");
   };
-  return <>
+  
+  return (
+    <>
       <h2 className="text-2xl font-bold mb-6 mt-12">Izberi možnost:</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
@@ -26,11 +33,14 @@ export function ActivityOptions() {
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6 pb-4 text-center">
-            <h3 className="text-lg font-semibold mb-2 text-app-blue">Vaje</h3>
+            <h3 className="text-lg font-semibold mb-2 text-app-blue">Govorno-jezikovne vaje</h3>
             <p className="text-sm text-gray-600">Prilagojene aktivnosti za izboljšanje otrokove izgovorjave.</p>
           </CardContent>
           <CardFooter className="pb-6">
-            <Button className="w-full bg-app-blue hover:bg-app-blue/90 rounded-2xl" onClick={handleGoToExercises}>
+            <Button 
+              className="w-full bg-app-blue hover:bg-app-blue/90 rounded-2xl"
+              onClick={handleGoToExercises}
+            >
               Pojdi na vaje
             </Button>
           </CardFooter>
@@ -45,11 +55,14 @@ export function ActivityOptions() {
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6 pb-4 text-center">
-            <h3 className="text-lg font-semibold mb-2 text-app-purple">Igre</h3>
+            <h3 className="text-lg font-semibold mb-2 text-app-purple">Govorne igre</h3>
             <p className="text-sm text-gray-600">Zabavne igre za izboljšanje izgovorjave.</p>
           </CardContent>
           <CardFooter className="pb-6">
-            <Button className="w-full bg-app-purple hover:bg-app-purple/90 rounded-2xl" onClick={handleGoToGames}>
+            <Button 
+              className="w-full bg-app-purple hover:bg-app-purple/90 rounded-2xl"
+              onClick={handleGoToGames}
+            >
               Začni igro
             </Button>
           </CardFooter>
@@ -68,7 +81,10 @@ export function ActivityOptions() {
             <p className="text-sm text-gray-600">Test izgovorjave za vse slovenske soglasnike.</p>
           </CardContent>
           <CardFooter className="pb-6">
-            <Button className="w-full bg-[#9b87f5] hover:bg-[#8B5CF6] rounded-2xl" onClick={handleGoToArticulationTest}>
+            <Button 
+              className="w-full bg-[#9b87f5] hover:bg-[#8B5CF6] rounded-2xl"
+              onClick={handleGoToArticulationTest}
+            >
               Začni test
             </Button>
           </CardFooter>
@@ -112,5 +128,6 @@ export function ActivityOptions() {
           </CardFooter>
         </Card>
       </div>
-    </>;
+    </>
+  );
 }
