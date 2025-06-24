@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -97,17 +98,13 @@ export default function Header() {
     navigate("/login");
   };
 
-  // Navigation links
+  // Navigation links - updated with renamed "Igre" and reordered items
   const navigationLinks = [{
-    label: "Moja stran",
-    path: "/moja-stran",
-    icon: Home
-  }, {
     label: "Vaje",
     path: "/govorno-jezikovne-vaje",
     icon: Activity
   }, {
-    label: "Govorne igre",
+    label: "Igre",
     path: "/govorne-igre",
     icon: Gamepad
   }, {
@@ -122,6 +119,10 @@ export default function Header() {
     label: "Logopedski kotiček",
     path: "/logopedski-koticek",
     icon: BookOpen
+  }, {
+    label: "Moja stran",
+    path: "/moja-stran",
+    icon: Home
   }, {
     label: "Obvestila",
     path: "#",
@@ -330,9 +331,6 @@ export default function Header() {
                   <div className="flex flex-col p-6 space-y-6">
                     {/* --- Always visible links on mobile drawer --- */}
                     <div className="flex flex-row items-center gap-2 pb-3">
-                      <Button asChild variant="ghost" className="font-semibold flex-1 h-12 rounded-full text-base" >
-                        <Link to="/logopedski-koticek">Logopedski kotiček</Link>
-                      </Button>
                       <Button 
                         type="button"
                         variant="ghost"
@@ -479,14 +477,7 @@ export default function Header() {
 
           {/* DESKTOP HEADER */}
           <nav className="hidden lg:flex items-center gap-4">
-            {/* Always show Logopedski kotiček and Cenik */}
-            <Button
-              asChild
-              variant="ghost"
-              className="font-semibold rounded-full h-12 text-base px-6"
-            >
-              <Link to="/logopedski-koticek">Logopedski kotiček</Link>
-            </Button>
+            {/* Always show Cenik */}
             <Button
               type="button"
               variant="ghost"
@@ -498,7 +489,7 @@ export default function Header() {
             {/* --- When LOGGED IN, show main navigation left of user profile --- */}
             {user && (
               <>
-                {/* Navigation links, slice excludes Logopedski kotiček */}
+                {/* Navigation links in new order: Vaje, Igre, Izzivi, Video navodila, Logopedski kotiček, Moja stran */}
                 {navigationLinks.slice(0, 6).map((link, index) => (
                   <Button 
                     key={index} 
