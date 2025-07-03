@@ -34,6 +34,11 @@ const VajeMoториkeGovoril = () => {
               src={`${supabaseUrl}/storage/v1/object/public/${bucketName}/nasmeh.jpg`}
               alt="Nasmehni se"
               className="w-full max-w-2xl mx-auto rounded-2xl shadow-lg"
+              onError={(e) => {
+                console.error('Failed to load first image:', e.currentTarget.src);
+                e.currentTarget.style.border = '2px solid red';
+              }}
+              onLoad={() => console.log('First image loaded successfully')}
             />
             <p className="text-lg font-medium text-gray-700 mt-4">Nasmehni se</p>
           </div>
@@ -44,6 +49,11 @@ const VajeMoториkeGovoril = () => {
               src={`${supabaseUrl}/storage/v1/object/public/${bucketName}/nasmeh-zobje.jpg`}
               alt="Nasmehni se in pokaži zobe"
               className="w-full max-w-2xl mx-auto rounded-2xl shadow-lg"
+              onError={(e) => {
+                console.error('Failed to load second image:', e.currentTarget.src);
+                e.currentTarget.style.border = '2px solid red';
+              }}
+              onLoad={() => console.log('Second image loaded successfully')}
             />
             <p className="text-lg font-medium text-gray-700 mt-4">Nasmehni se in pokaži zobe</p>
           </div>
