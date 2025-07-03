@@ -77,22 +77,9 @@ export function VideoControls({
         
         <div className="relative">
           {showVolumeSlider && (
-            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-background border rounded-lg p-3 shadow-lg z-50 flex flex-col items-center gap-2">
-              <Button
-                onClick={onToggleMute}
-                disabled={isLoading}
-                variant="outline"
-                size="icon"
-              >
-                {isMuted || volume === 0 ? (
-                  <VolumeX className="h-4 w-4" />
-                ) : (
-                  <Volume2 className="h-4 w-4" />
-                )}
-              </Button>
-              
+            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-background border rounded-lg p-3 shadow-lg z-50 flex flex-col items-center">
               <div className="h-20 flex items-center justify-center">
-                <div className="relative h-16 w-2 flex items-center justify-center">
+                <div className="relative flex items-center justify-center">
                   <Slider
                     orientation="vertical"
                     value={[isMuted ? 0 : volume]}
@@ -100,7 +87,7 @@ export function VideoControls({
                     max={1}
                     step={0.1}
                     disabled={isLoading}
-                    className="h-16 w-2 [&>span[data-orientation=vertical]]:bg-black [&>span[data-orientation=vertical]]:w-1 [&>span[data-orientation=vertical]]:h-full [&>span[data-orientation=vertical]]:rounded-full [&>span[role=slider]]:bg-white [&>span[role=slider]]:border-black [&>span[role=slider]]:border-2 [&>span[role=slider]]:w-4 [&>span[role=slider]]:h-4"
+                    className="h-16 w-2 flex items-center justify-center [&>span[data-orientation=vertical]]:bg-black [&>span[data-orientation=vertical]]:w-1 [&>span[data-orientation=vertical]]:h-16 [&>span[data-orientation=vertical]]:rounded-none [&>span[role=slider]]:bg-white [&>span[role=slider]]:border-black [&>span[role=slider]]:border-2 [&>span[role=slider]]:w-4 [&>span[role=slider]]:h-4 [&>span[role=slider]]:shadow-none [&>span[role=slider]]:ring-0"
                   />
                 </div>
               </div>
