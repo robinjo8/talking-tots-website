@@ -31,12 +31,16 @@ const VajeMoториkeGovoril = () => {
           {/* First Image */}
           <div className="text-center">
             <img 
-              src={`${supabaseUrl}/storage/v1/object/public/${bucketName}/nasmeh.jpg`}
+              src={`${supabaseUrl}/storage/v1/object/public/${bucketName}/nasmeh.jpg?v=${Date.now()}`}
               alt="Nasmehni se"
               className="w-full max-w-2xl mx-auto rounded-2xl shadow-lg"
+              loading="eager"
+              decoding="async"
               onError={(e) => {
                 console.error('Failed to load first image:', e.currentTarget.src);
+                console.error('User agent:', navigator.userAgent);
                 e.currentTarget.style.border = '2px solid red';
+                e.currentTarget.style.background = 'lightgray';
               }}
               onLoad={() => console.log('First image loaded successfully')}
             />
@@ -46,12 +50,16 @@ const VajeMoториkeGovoril = () => {
           {/* Second Image */}
           <div className="text-center">
             <img 
-              src={`${supabaseUrl}/storage/v1/object/public/${bucketName}/nasmeh-zobje.jpg`}
+              src={`${supabaseUrl}/storage/v1/object/public/${bucketName}/nasmeh-zobje.jpg?v=${Date.now()}`}
               alt="Nasmehni se in pokaži zobe"
               className="w-full max-w-2xl mx-auto rounded-2xl shadow-lg"
+              loading="eager"
+              decoding="async"
               onError={(e) => {
                 console.error('Failed to load second image:', e.currentTarget.src);
+                console.error('User agent:', navigator.userAgent);
                 e.currentTarget.style.border = '2px solid red';
+                e.currentTarget.style.background = 'lightgray';
               }}
               onLoad={() => console.log('Second image loaded successfully')}
             />
