@@ -2,14 +2,21 @@ import Header from "@/components/Header";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Play, Pause, Square, RotateCcw, Loader2, ExternalLink } from "lucide-react";
-import { useRef, useState } from "react";
+import { Play, Pause, Square, RotateCcw, Loader2, ExternalLink, Volume2, VolumeX, Gauge } from "lucide-react";
+import { useRef, useState, useEffect } from "react";
 
 const VideoNavodilaCrkaR = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isMuted, setIsMuted] = useState(true);
+  const [playbackRate, setPlaybackRate] = useState(1.0);
+  const [videoMetadata, setVideoMetadata] = useState<{
+    duration?: number;
+    hasAudio?: boolean;
+    currentTime?: number;
+  }>({});
   
   const videoUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/video-navodila/crka-R.mp4";
 
@@ -74,6 +81,71 @@ const VideoNavodilaCrkaR = () => {
     setIsLoading(false);
   };
 
+  const handleToggleMute = () => {
+    if (videoRef.current) {
+      const newMutedState = !isMuted;
+      videoRef.current.muted = newMutedState;
+      setIsMuted(newMutedState);
+    }
+  };
+
+  const handlePlaybackRateChange = (rate: number) => {
+    if (videoRef.current) {
+      videoRef.current.playbackRate = rate;
+      setPlaybackRate(rate);
+      console.log(`Playback rate changed to: ${rate}`);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (videoRef.current) {
+      const video = videoRef.current;
+      const hasAudioTracks = !!(video as any).webkitAudioDecodedByteCount || 
+                            !!(video as any).audioTracks?.length ||
+                            !!(video as any).mozHasAudio;
+      
+      setVideoMetadata({
+        duration: video.duration,
+        hasAudio: hasAudioTracks,
+        currentTime: video.currentTime
+      });
+      
+      // Ensure playback rate is 1.0
+      video.playbackRate = 1.0;
+      setPlaybackRate(1.0);
+      
+      console.log("Video metadata loaded:", {
+        duration: video.duration,
+        hasAudio: hasAudioTracks,
+        videoWidth: video.videoWidth,
+        videoHeight: video.videoHeight,
+        playbackRate: video.playbackRate
+      });
+    }
+  };
+
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      setVideoMetadata(prev => ({
+        ...prev,
+        currentTime: videoRef.current!.currentTime
+      }));
+    }
+  };
+
+  // Auto-unmute on first user interaction
+  useEffect(() => {
+    const handleFirstInteraction = () => {
+      if (videoRef.current && isMuted) {
+        handleToggleMute();
+      }
+      document.removeEventListener('click', handleFirstInteraction);
+    };
+
+    document.addEventListener('click', handleFirstInteraction);
+    return () => document.removeEventListener('click', handleFirstInteraction);
+  }, [isMuted]);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -118,24 +190,47 @@ const VideoNavodilaCrkaR = () => {
                 onPause={() => setIsPlaying(false)}
                 onLoadStart={handleLoadStart}
                 onCanPlay={handleCanPlay}
+                onLoadedMetadata={handleLoadedMetadata}
+                onTimeUpdate={handleTimeUpdate}
                 onError={handleError}
                 controls={false}
                 preload="metadata"
                 playsInline
-                muted
+                muted={isMuted}
               >
                 <source src={videoUrl} type="video/mp4" />
                 Vaš brskalnik ne podpira video predvajanja.
               </video>
             </div>
             
+            {/* Video Information */}
+            {videoMetadata.duration && (
+              <div className="mb-4 p-3 bg-muted rounded-lg">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                  <div>
+                    <span className="font-medium">Trajanje:</span> {Math.round(videoMetadata.duration || 0)}s
+                  </div>
+                  <div>
+                    <span className="font-medium">Čas:</span> {Math.round(videoMetadata.currentTime || 0)}s
+                  </div>
+                  <div>
+                    <span className="font-medium">Hitrost:</span> {playbackRate}x
+                  </div>
+                  <div>
+                    <span className="font-medium">Zvok:</span> {videoMetadata.hasAudio ? '✓' : '✗'}
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="mb-4 text-center text-sm text-muted-foreground">
               Video URL: <a href={videoUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
                 Testiraj direktno
               </a>
             </div>
             
-            <div className="flex justify-center gap-4 flex-wrap">
+            {/* Playback Controls */}
+            <div className="flex justify-center gap-4 flex-wrap mb-4">
               <Button
                 onClick={handlePlay}
                 disabled={isPlaying || isLoading}
@@ -171,6 +266,34 @@ const VideoNavodilaCrkaR = () => {
                 <RotateCcw className="h-4 w-4 mr-2" />
                 Ponovi
               </Button>
+
+              <Button
+                onClick={handleToggleMute}
+                disabled={isLoading}
+                variant="outline"
+              >
+                {isMuted ? <VolumeX className="h-4 w-4 mr-2" /> : <Volume2 className="h-4 w-4 mr-2" />}
+                {isMuted ? 'Vklopi zvok' : 'Izklopi zvok'}
+              </Button>
+            </div>
+
+            {/* Playback Rate Controls */}
+            <div className="flex justify-center gap-2 flex-wrap">
+              <div className="flex items-center gap-2">
+                <Gauge className="h-4 w-4" />
+                <span className="text-sm font-medium">Hitrost:</span>
+              </div>
+              {[0.5, 0.75, 1.0, 1.25, 1.5, 2.0].map((rate) => (
+                <Button
+                  key={rate}
+                  onClick={() => handlePlaybackRateChange(rate)}
+                  disabled={isLoading}
+                  variant={playbackRate === rate ? "default" : "outline"}
+                  size="sm"
+                >
+                  {rate}x
+                </Button>
+              ))}
             </div>
           </CardContent>
         </Card>
