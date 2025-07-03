@@ -79,11 +79,10 @@ export function VideoControls({
           {showVolumeSlider && (
             <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-background border rounded-lg p-3 shadow-lg z-50 flex flex-col items-center gap-2">
               <Button
-                onClick={() => setShowVolumeSlider(false)}
+                onClick={onToggleMute}
                 disabled={isLoading}
                 variant="outline"
                 size="icon"
-                className="mb-2"
               >
                 {isMuted || volume === 0 ? (
                   <VolumeX className="h-4 w-4" />
@@ -103,20 +102,6 @@ export function VideoControls({
                   className="h-16"
                 />
               </div>
-              
-              <Button
-                onClick={onToggleFullscreen}
-                disabled={isLoading}
-                variant="outline"
-                size="icon"
-                className="mt-2"
-              >
-                {isFullscreen ? (
-                  <Minimize className="h-4 w-4" />
-                ) : (
-                  <Maximize className="h-4 w-4" />
-                )}
-              </Button>
             </div>
           )}
           <Button
@@ -132,6 +117,19 @@ export function VideoControls({
             )}
           </Button>
         </div>
+
+        <Button
+          onClick={onToggleFullscreen}
+          disabled={isLoading}
+          variant="outline"
+          size="icon"
+        >
+          {isFullscreen ? (
+            <Minimize className="h-4 w-4" />
+          ) : (
+            <Maximize className="h-4 w-4" />
+          )}
+        </Button>
 
       </div>
     );
