@@ -11,7 +11,7 @@ const VideoNavodilaCrkaR = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  const videoUrl = "https://dc6f3012-b411-4c62-93c0-292d63747df0.supabase.co/storage/v1/object/public/video-navodila/crka-RRR.mp4";
+  const videoUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/video-navodila/crka-RRR.mp4";
 
   const handlePlay = async () => {
     if (videoRef.current) {
