@@ -77,26 +77,46 @@ export function VideoControls({
         
         <div className="relative">
           {showVolumeSlider && (
-            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-background border rounded-2xl p-4 shadow-lg z-50">
-              <div className="bg-muted/30 rounded-full px-3 py-4 flex flex-col items-center gap-2">
-                <div className="flex gap-1 mb-2">
-                  <div className="w-1 h-1 bg-muted-foreground/40 rounded-full"></div>
-                  <div className="w-1 h-1 bg-muted-foreground/40 rounded-full"></div>
-                  <div className="w-1 h-1 bg-muted-foreground/40 rounded-full"></div>
-                </div>
-                <div className="h-20 flex items-center">
-                  <Slider
-                    orientation="vertical"
-                    value={[isMuted ? 0 : volume]}
-                    onValueChange={(value) => onVolumeChange(value[0])}
-                    max={1}
-                    step={0.1}
-                    disabled={isLoading}
-                    className="h-16"
-                  />
-                </div>
-                <Volume2 className="h-4 w-4 text-muted-foreground mt-2" />
+            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-background border rounded-lg p-3 shadow-lg z-50 flex flex-col items-center gap-2">
+              <Button
+                onClick={() => setShowVolumeSlider(false)}
+                disabled={isLoading}
+                variant="outline"
+                size="icon"
+                className="mb-2"
+              >
+                {isMuted || volume === 0 ? (
+                  <VolumeX className="h-4 w-4" />
+                ) : (
+                  <Volume2 className="h-4 w-4" />
+                )}
+              </Button>
+              
+              <div className="h-20 flex items-center">
+                <Slider
+                  orientation="vertical"
+                  value={[isMuted ? 0 : volume]}
+                  onValueChange={(value) => onVolumeChange(value[0])}
+                  max={1}
+                  step={0.1}
+                  disabled={isLoading}
+                  className="h-16"
+                />
               </div>
+              
+              <Button
+                onClick={onToggleFullscreen}
+                disabled={isLoading}
+                variant="outline"
+                size="icon"
+                className="mt-2"
+              >
+                {isFullscreen ? (
+                  <Minimize className="h-4 w-4" />
+                ) : (
+                  <Maximize className="h-4 w-4" />
+                )}
+              </Button>
             </div>
           )}
           <Button
@@ -104,7 +124,6 @@ export function VideoControls({
             disabled={isLoading}
             variant="outline"
             size="icon"
-            className="rounded-full bg-background hover:bg-accent border-2"
           >
             {isMuted || volume === 0 ? (
               <VolumeX className="h-4 w-4" />
@@ -114,18 +133,6 @@ export function VideoControls({
           </Button>
         </div>
 
-        <Button
-          onClick={onToggleFullscreen}
-          disabled={isLoading}
-          variant="outline"
-          size="icon"
-        >
-          {isFullscreen ? (
-            <Minimize className="h-4 w-4" />
-          ) : (
-            <Maximize className="h-4 w-4" />
-          )}
-        </Button>
       </div>
     );
   }
