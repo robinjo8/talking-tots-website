@@ -9,7 +9,7 @@ const VideoNavodilaCrkaR = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   
-  const videoUrl = "https://dc6f3012-b411-4c62-93c0-292d63747df0.supabase.co/storage/v1/object/public/video-navodila/črka-R.mp4";
+  const videoUrl = "https://dc6f3012-b411-4c62-93c0-292d63747df0.supabase.co/storage/v1/object/public/video-navodila/crka-R.mp4";
 
   const handlePlay = () => {
     if (videoRef.current) {
@@ -110,19 +110,6 @@ const VideoNavodilaCrkaR = () => {
           </CardContent>
         </Card>
         
-        <Card>
-          <CardContent className="pt-6">
-            <h3 className="text-lg font-semibold mb-3 text-app-purple">
-              Navodila za pravilno izgovorjavo črke R
-            </h3>
-            <div className="space-y-2 text-gray-600">
-              <p>• Jezik dvignite proti nebu</p>
-              <p>• Konico jezika postavite za zgornje zobe</p>
-              <p>• Prepustite, da jezik vibrira</p>
-              <p>• Vadite počasi in potrpežljivo</p>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
