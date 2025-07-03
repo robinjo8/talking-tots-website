@@ -26,25 +26,26 @@ export function PageHeader({ title, onBack, backPath }: PageHeaderProps) {
   return (
     <div className="bg-background border-b border-gray-100 sticky top-20 z-40">
       <div className="container max-w-5xl mx-auto px-4 py-4">
-        <div className="flex items-center justify-between relative">
+        <div className="space-y-3">
           {/* Back Button */}
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="flex items-center gap-2 text-dragon-green hover:text-dragon-green/80 hover:bg-dragon-green/10 transition-colors"
-            onClick={handleBack}
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span className="font-medium">Nazaj</span>
-          </Button>
+          <div className="flex justify-start">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="flex items-center gap-2 text-dragon-green hover:text-dragon-green/80 hover:bg-dragon-green/10 transition-colors"
+              onClick={handleBack}
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span className="font-medium">Nazaj</span>
+            </Button>
+          </div>
           
-          {/* Centered Title */}
-          <h1 className="absolute left-1/2 transform -translate-x-1/2 text-xl md:text-2xl font-bold text-foreground">
-            {title}
-          </h1>
-          
-          {/* Empty space for balance */}
-          <div className="w-20"></div>
+          {/* Title below back button */}
+          <div className="flex justify-center">
+            <h1 className="text-xl md:text-2xl font-bold text-foreground text-center whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
+              {title}
+            </h1>
+          </div>
         </div>
       </div>
     </div>
