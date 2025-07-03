@@ -14,6 +14,7 @@ import ArtIzgovorjavaPage from "@/pages/ArtIzgovorjavaPage";
 import GovorneIgre from "@/pages/GovorneIgre";
 import MojiIzzivi from "@/pages/MojiIzzivi";
 import VideoNavodila from "@/pages/VideoNavodila";
+import VideoNavodilaCrkaR from "@/pages/VideoNavodilaCrkaR";
 import LogopedskiKoticek from "@/pages/LogopedskiKoticek";
 import SpominR from "@/pages/SpominR";
 import SpominGames from "@/pages/SpominGames";
@@ -138,6 +139,14 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <VideoNavodila />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/video-navodila/crka-r" 
+        element={
+          <ProtectedRoute>
+            <VideoNavodilaCrkaR />
           </ProtectedRoute>
         }
       />
