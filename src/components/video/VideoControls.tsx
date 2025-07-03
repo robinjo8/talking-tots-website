@@ -2,6 +2,7 @@ import { Play, Pause, Square, RotateCcw, Volume2, VolumeX, Maximize, Minimize } 
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useState } from "react";
 
 interface VideoControlsProps {
   isPlaying: boolean;
@@ -33,6 +34,7 @@ export function VideoControls({
   onToggleFullscreen
 }: VideoControlsProps) {
   const isMobile = useIsMobile();
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
 
   if (isMobile) {
     return (
@@ -72,19 +74,36 @@ export function VideoControls({
         >
           <RotateCcw className="h-4 w-4" />
         </Button>
-
-        <Button
-          onClick={onToggleMute}
-          disabled={isLoading}
-          variant="outline"
-          size="icon"
-        >
-          {isMuted || volume === 0 ? (
-            <VolumeX className="h-4 w-4" />
-          ) : (
-            <Volume2 className="h-4 w-4" />
+        
+        <div className="relative">
+          {showVolumeSlider && (
+            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-background border rounded-lg p-3 shadow-lg">
+              <div className="h-20 flex items-center">
+                <Slider
+                  orientation="vertical"
+                  value={[isMuted ? 0 : volume]}
+                  onValueChange={(value) => onVolumeChange(value[0])}
+                  max={1}
+                  step={0.1}
+                  disabled={isLoading}
+                  className="h-16"
+                />
+              </div>
+            </div>
           )}
-        </Button>
+          <Button
+            onClick={() => setShowVolumeSlider(!showVolumeSlider)}
+            disabled={isLoading}
+            variant="outline"
+            size="icon"
+          >
+            {isMuted || volume === 0 ? (
+              <VolumeX className="h-4 w-4" />
+            ) : (
+              <Volume2 className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
 
         <Button
           onClick={onToggleFullscreen}
