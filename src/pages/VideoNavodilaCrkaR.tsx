@@ -12,6 +12,9 @@ const VideoNavodilaCrkaR = () => {
   const [error, setError] = useState<string | null>(null);
   const [isMuted, setIsMuted] = useState(true);
   const [playbackRate, setPlaybackRate] = useState(1.0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [isSeekingMode, setIsSeekingMode] = useState(false);
   const [videoMetadata, setVideoMetadata] = useState<{
     duration?: number;
     hasAudio?: boolean;
@@ -104,6 +107,7 @@ const VideoNavodilaCrkaR = () => {
                             !!(video as any).audioTracks?.length ||
                             !!(video as any).mozHasAudio;
       
+      setDuration(video.duration);
       setVideoMetadata({
         duration: video.duration,
         hasAudio: hasAudioTracks,
@@ -125,12 +129,51 @@ const VideoNavodilaCrkaR = () => {
   };
 
   const handleTimeUpdate = () => {
-    if (videoRef.current) {
+    if (videoRef.current && !isSeekingMode) {
+      const time = videoRef.current.currentTime;
+      setCurrentTime(time);
       setVideoMetadata(prev => ({
         ...prev,
-        currentTime: videoRef.current!.currentTime
+        currentTime: time
       }));
     }
+  };
+
+  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (videoRef.current && duration > 0) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const newTime = (clickX / rect.width) * duration;
+      
+      videoRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
+    }
+  };
+
+  const handleProgressMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    setIsSeekingMode(true);
+    handleProgressClick(e);
+  };
+
+  const handleProgressMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isSeekingMode && videoRef.current && duration > 0) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const newTime = Math.max(0, Math.min((clickX / rect.width) * duration, duration));
+      
+      videoRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
+    }
+  };
+
+  const handleProgressMouseUp = () => {
+    setIsSeekingMode(false);
+  };
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
   // Auto-unmute on first user interaction
@@ -203,18 +246,30 @@ const VideoNavodilaCrkaR = () => {
               </video>
             </div>
             
-            {/* Video Information */}
-            {videoMetadata.duration && (
+            {/* Video Progress Bar */}
+            {duration > 0 && (
               <div className="mb-6 p-4 bg-muted/50 rounded-lg border">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Trajanje:</span>
-                    <span className="font-medium">{Math.round(videoMetadata.duration || 0)}s</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Trenutni čas:</span>
-                    <span className="font-medium">{Math.round(videoMetadata.currentTime || 0)}s</span>
-                  </div>
+                <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
+                  <span>{formatTime(currentTime)}</span>
+                  <span>{formatTime(duration)}</span>
+                </div>
+                
+                <div 
+                  className="relative w-full h-2 bg-muted rounded-full cursor-pointer"
+                  onClick={handleProgressClick}
+                  onMouseDown={handleProgressMouseDown}
+                  onMouseMove={handleProgressMouseMove}
+                  onMouseUp={handleProgressMouseUp}
+                  onMouseLeave={handleProgressMouseUp}
+                >
+                  <div 
+                    className="absolute top-0 left-0 h-full bg-primary rounded-full transition-all duration-150"
+                    style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                  />
+                  <div 
+                    className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-primary rounded-full border-2 border-background shadow-sm cursor-grab active:cursor-grabbing transition-transform hover:scale-110"
+                    style={{ left: `calc(${duration > 0 ? (currentTime / duration) * 100 : 0}% - 8px)` }}
+                  />
                 </div>
               </div>
             )}
