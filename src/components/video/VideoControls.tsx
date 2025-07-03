@@ -91,16 +91,18 @@ export function VideoControls({
                 )}
               </Button>
               
-              <div className="h-20 flex items-center">
-                <Slider
-                  orientation="vertical"
-                  value={[isMuted ? 0 : volume]}
-                  onValueChange={(value) => onVolumeChange(value[0])}
-                  max={1}
-                  step={0.1}
-                  disabled={isLoading}
-                  className="h-16"
-                />
+              <div className="h-20 flex items-center justify-center">
+                <div className="relative h-16 w-2 flex items-center justify-center">
+                  <Slider
+                    orientation="vertical"
+                    value={[isMuted ? 0 : volume]}
+                    onValueChange={(value) => onVolumeChange(value[0])}
+                    max={1}
+                    step={0.1}
+                    disabled={isLoading}
+                    className="h-16 w-2 [&>span[data-orientation=vertical]]:bg-black [&>span[data-orientation=vertical]]:w-1 [&>span[data-orientation=vertical]]:h-full [&>span[data-orientation=vertical]]:rounded-full [&>span[role=slider]]:bg-white [&>span[role=slider]]:border-black [&>span[role=slider]]:border-2 [&>span[role=slider]]:w-4 [&>span[role=slider]]:h-4"
+                  />
+                </div>
               </div>
             </div>
           )}
