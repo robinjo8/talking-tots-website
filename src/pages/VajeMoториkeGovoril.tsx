@@ -31,7 +31,7 @@ const VajeMoториkeGovoril = () => {
           {/* First Image */}
           <div className="text-center">
             <img 
-              src={`${supabaseUrl}/storage/v1/object/public/${bucketName}/nasmeh.png`}
+              src={`${supabaseUrl}/storage/v1/object/public/${bucketName}/nasmeh.jpg`}
               alt="Nasmehni se"
               className="w-full max-w-2xl mx-auto rounded-2xl shadow-lg"
             />
@@ -41,7 +41,7 @@ const VajeMoториkeGovoril = () => {
           {/* Second Image */}
           <div className="text-center">
             <img 
-              src={`${supabaseUrl}/storage/v1/object/public/${bucketName}/nasmeh-zobe.png`}
+              src={`${supabaseUrl}/storage/v1/object/public/${bucketName}/nasmeh-zobje.jpg`}
               alt="Nasmehni se in pokaži zobe"
               className="w-full max-w-2xl mx-auto rounded-2xl shadow-lg"
             />
