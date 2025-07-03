@@ -1,4 +1,5 @@
 
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -26,35 +27,24 @@ export function PageHeader({ title, onBack, backPath }: PageHeaderProps) {
     <div className="bg-background border-b border-gray-100 sticky top-20 z-40">
       <div className="container max-w-5xl mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          {/* Back Button - Curved arrow in green circle */}
+          {/* Back Button - Curved arrow like in image */}
           <Button 
             variant="ghost" 
             size="icon"
-            className="w-10 h-10 rounded-full bg-dragon-green hover:bg-dragon-green/90 text-white flex items-center justify-center transition-colors flex-shrink-0"
+            className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 transition-colors flex-shrink-0"
             onClick={handleBack}
           >
             <svg 
-              width="20" 
-              height="20" 
-              viewBox="0 0 24 24" 
+              width="24" 
+              height="24" 
+              viewBox="0 0 100 100" 
               fill="none" 
               xmlns="http://www.w3.org/2000/svg"
-              className="text-white"
+              className="text-black"
             >
               <path 
-                d="M20 12H4M4 12L10 18M4 12L10 6" 
-                stroke="currentColor" 
-                strokeWidth="2" 
-                strokeLinecap="round" 
-                strokeLinejoin="round"
-              />
-              <path 
-                d="M4 12C4 12 6 10 8 8C10 6 12 4 12 4" 
-                stroke="currentColor" 
-                strokeWidth="1.5" 
-                strokeLinecap="round" 
-                fill="none"
-                opacity="0.6"
+                d="M15 50 L45 20 L45 35 C70 35 85 50 85 75 C85 85 80 90 75 85 C70 80 60 70 45 70 L45 80 Z" 
+                fill="currentColor"
               />
             </svg>
           </Button>
@@ -71,3 +61,4 @@ export function PageHeader({ title, onBack, backPath }: PageHeaderProps) {
     </div>
   );
 }
+
