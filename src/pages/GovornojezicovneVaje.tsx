@@ -11,13 +11,13 @@ const GovornojezicovneVaje = () => {
 
   const exerciseTypes = [
     {
-      id: "vaje-za-jezik",
-      title: "Vaje za jezik",
-      description: "Gibalne vaje za jezik, ki pomagajo pri obdelavni artikulaciji in razvijajo govorne organe.",
+      id: "vaje-motorike-govoril",
+      title: "Vaje motorike govoril",
+      description: "Vaje motorike govoril so namenjene razgibavanju govoril – ust, ustnic in jezika.",
       icon: Dumbbell,
       color: "text-app-purple",
       gradient: "from-app-purple/10 to-app-blue/10",
-      path: "/govorno-jezikovne-vaje/vaje-za-jezik",
+      path: "/govorno-jezikovne-vaje/vaje-motorike-govoril",
       example: "Primer: gibanje jezika gor, dol, lažkamo in razpiranje.",
       available: true
     },

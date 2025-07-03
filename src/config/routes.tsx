@@ -9,7 +9,7 @@ import NotFound from "@/pages/NotFound";
 import Profile from "@/pages/Profile";
 import MojaStran from "@/pages/MojaStran";
 import GovornojezicovneVaje from "@/pages/GovornojezicovneVaje";
-import VajeZaJezik from "@/pages/VajeZaJezik";
+import VajeMoториkeGovoril from "@/pages/VajeMoториkeGovoril";
 import ArtIzgovorjavaPage from "@/pages/ArtIzgovorjavaPage";
 import GovorneIgre from "@/pages/GovorneIgre";
 import MojiIzzivi from "@/pages/MojiIzzivi";
@@ -65,10 +65,10 @@ export function AppRoutes() {
         }
       />
       <Route 
-        path="/govorno-jezikovne-vaje/vaje-za-jezik" 
+        path="/govorno-jezikovne-vaje/vaje-motorike-govoril" 
         element={
           <ProtectedRoute>
-            <VajeZaJezik />
+            <VajeMoториkeGovoril />
           </ProtectedRoute>
         }
       />
