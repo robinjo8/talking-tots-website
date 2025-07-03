@@ -16,6 +16,8 @@ const VideoNavodilaCrkaR = () => {
     isLoading,
     error,
     isMuted,
+    volume,
+    isFullscreen,
     currentTime,
     duration,
     isSeekingMode,
@@ -58,10 +60,16 @@ const VideoNavodilaCrkaR = () => {
             <VideoControls
               isPlaying={isPlaying}
               isLoading={isLoading}
+              isMuted={isMuted}
+              volume={volume}
+              isFullscreen={isFullscreen}
               onPlay={handlers.handlePlay}
               onPause={handlers.handlePause}
               onStop={handlers.handleStop}
               onRestart={handlers.handleRestart}
+              onToggleMute={handlers.handleToggleMute}
+              onVolumeChange={handlers.handleVolumeChange}
+              onToggleFullscreen={handlers.handleToggleFullscreen}
             />
           </CardContent>
         </Card>

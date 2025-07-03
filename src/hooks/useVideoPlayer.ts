@@ -12,6 +12,8 @@ export const useVideoPlayer = (videoUrl: string) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isMuted, setIsMuted] = useState(true);
+  const [volume, setVolume] = useState(1.0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1.0);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -87,6 +89,48 @@ export const useVideoPlayer = (videoUrl: string) => {
     }
   };
 
+  const handleVolumeChange = (newVolume: number) => {
+    if (videoRef.current) {
+      const clampedVolume = Math.max(0, Math.min(1, newVolume));
+      videoRef.current.volume = clampedVolume;
+      setVolume(clampedVolume);
+      
+      // Auto unmute if volume is increased
+      if (clampedVolume > 0 && isMuted) {
+        videoRef.current.muted = false;
+        setIsMuted(false);
+      }
+    }
+  };
+
+  const handleToggleFullscreen = async () => {
+    if (!videoRef.current) return;
+
+    try {
+      if (!isFullscreen) {
+        // Enter fullscreen
+        if (videoRef.current.requestFullscreen) {
+          await videoRef.current.requestFullscreen();
+        } else if ((videoRef.current as any).webkitRequestFullscreen) {
+          await (videoRef.current as any).webkitRequestFullscreen();
+        } else if ((videoRef.current as any).msRequestFullscreen) {
+          await (videoRef.current as any).msRequestFullscreen();
+        }
+      } else {
+        // Exit fullscreen
+        if (document.exitFullscreen) {
+          await document.exitFullscreen();
+        } else if ((document as any).webkitExitFullscreen) {
+          await (document as any).webkitExitFullscreen();
+        } else if ((document as any).msExitFullscreen) {
+          await (document as any).msExitFullscreen();
+        }
+      }
+    } catch (error) {
+      console.error("Fullscreen error:", error);
+    }
+  };
+
   const handlePlaybackRateChange = (rate: number) => {
     if (videoRef.current) {
       videoRef.current.playbackRate = rate;
@@ -103,6 +147,7 @@ export const useVideoPlayer = (videoUrl: string) => {
                             !!(video as any).mozHasAudio;
       
       setDuration(video.duration);
+      setVolume(video.volume);
       setVideoMetadata({
         duration: video.duration,
         hasAudio: hasAudioTracks,
@@ -140,6 +185,23 @@ export const useVideoPlayer = (videoUrl: string) => {
     }
   };
 
+  // Listen for fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('msfullscreenchange', handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('msfullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
   // Auto-unmute on first user interaction
   useEffect(() => {
     const handleFirstInteraction = () => {
@@ -160,6 +222,8 @@ export const useVideoPlayer = (videoUrl: string) => {
     isLoading,
     error,
     isMuted,
+    volume,
+    isFullscreen,
     playbackRate,
     currentTime,
     duration,
@@ -176,6 +240,8 @@ export const useVideoPlayer = (videoUrl: string) => {
       handleCanPlay,
       handleError,
       handleToggleMute,
+      handleVolumeChange,
+      handleToggleFullscreen,
       handlePlaybackRateChange,
       handleLoadedMetadata,
       handleTimeUpdate,
