@@ -9,7 +9,7 @@ const VideoNavodilaCrkaR = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   
-  const videoUrl = "https://dc6f3012-b411-4c62-93c0-292d63747df0.supabase.co/storage/v1/object/public/video-navodila/crka-R.mp4";
+  const videoUrl = "https://dc6f3012-b411-4c62-93c0-292d63747df0.supabase.co/storage/v1/object/public/video-navodila/crka-RR.avi";
 
   const handlePlay = () => {
     if (videoRef.current) {
