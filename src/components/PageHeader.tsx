@@ -1,5 +1,4 @@
 
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -27,7 +26,7 @@ export function PageHeader({ title, onBack, backPath }: PageHeaderProps) {
     <div className="bg-background border-b border-gray-100 sticky top-20 z-40">
       <div className="container max-w-5xl mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          {/* Back Button - Curved arrow like in image */}
+          {/* Back Button - Professional arrow */}
           <Button 
             variant="ghost" 
             size="icon"
@@ -35,16 +34,19 @@ export function PageHeader({ title, onBack, backPath }: PageHeaderProps) {
             onClick={handleBack}
           >
             <svg 
-              width="24" 
-              height="24" 
-              viewBox="0 0 100 100" 
+              width="18" 
+              height="18" 
+              viewBox="0 0 24 24" 
               fill="none" 
               xmlns="http://www.w3.org/2000/svg"
-              className="text-black"
+              className="text-gray-700"
             >
               <path 
-                d="M15 50 L45 20 L45 35 C70 35 85 50 85 75 C85 85 80 90 75 85 C70 80 60 70 45 70 L45 80 Z" 
-                fill="currentColor"
+                d="M19 12H5M12 19L5 12L12 5" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
               />
             </svg>
           </Button>
@@ -61,4 +63,3 @@ export function PageHeader({ title, onBack, backPath }: PageHeaderProps) {
     </div>
   );
 }
-
