@@ -205,38 +205,29 @@ const VideoNavodilaCrkaR = () => {
             
             {/* Video Information */}
             {videoMetadata.duration && (
-              <div className="mb-4 p-3 bg-muted rounded-lg">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                  <div>
-                    <span className="font-medium">Trajanje:</span> {Math.round(videoMetadata.duration || 0)}s
+              <div className="mb-6 p-4 bg-muted/50 rounded-lg border">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Trajanje:</span>
+                    <span className="font-medium">{Math.round(videoMetadata.duration || 0)}s</span>
                   </div>
-                  <div>
-                    <span className="font-medium">Čas:</span> {Math.round(videoMetadata.currentTime || 0)}s
-                  </div>
-                  <div>
-                    <span className="font-medium">Hitrost:</span> {playbackRate}x
-                  </div>
-                  <div>
-                    <span className="font-medium">Zvok:</span> {videoMetadata.hasAudio ? '✓' : '✗'}
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Trenutni čas:</span>
+                    <span className="font-medium">{Math.round(videoMetadata.currentTime || 0)}s</span>
                   </div>
                 </div>
               </div>
             )}
-
-            <div className="mb-4 text-center text-sm text-muted-foreground">
-              Video URL: <a href={videoUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                Testiraj direktno
-              </a>
-            </div>
             
             {/* Playback Controls */}
-            <div className="flex justify-center gap-4 flex-wrap mb-4">
+            <div className="flex justify-center gap-3 flex-wrap">
               <Button
                 onClick={handlePlay}
                 disabled={isPlaying || isLoading}
-                className="bg-app-purple hover:bg-app-purple/90"
+                size="lg"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
               >
-                <Play className="h-4 w-4 mr-2" />
+                <Play className="h-5 w-5 mr-2" />
                 Predvajaj
               </Button>
               
@@ -244,8 +235,9 @@ const VideoNavodilaCrkaR = () => {
                 onClick={handlePause}
                 disabled={!isPlaying || isLoading}
                 variant="outline"
+                size="lg"
               >
-                <Pause className="h-4 w-4 mr-2" />
+                <Pause className="h-5 w-5 mr-2" />
                 Premor
               </Button>
               
@@ -253,8 +245,9 @@ const VideoNavodilaCrkaR = () => {
                 onClick={handleStop}
                 disabled={isLoading}
                 variant="outline"
+                size="lg"
               >
-                <Square className="h-4 w-4 mr-2" />
+                <Square className="h-5 w-5 mr-2" />
                 Ustavi
               </Button>
               
@@ -262,38 +255,11 @@ const VideoNavodilaCrkaR = () => {
                 onClick={handleRestart}
                 disabled={isLoading}
                 variant="outline"
+                size="lg"
               >
-                <RotateCcw className="h-4 w-4 mr-2" />
+                <RotateCcw className="h-5 w-5 mr-2" />
                 Ponovi
               </Button>
-
-              <Button
-                onClick={handleToggleMute}
-                disabled={isLoading}
-                variant="outline"
-              >
-                {isMuted ? <VolumeX className="h-4 w-4 mr-2" /> : <Volume2 className="h-4 w-4 mr-2" />}
-                {isMuted ? 'Vklopi zvok' : 'Izklopi zvok'}
-              </Button>
-            </div>
-
-            {/* Playback Rate Controls */}
-            <div className="flex justify-center gap-2 flex-wrap">
-              <div className="flex items-center gap-2">
-                <Gauge className="h-4 w-4" />
-                <span className="text-sm font-medium">Hitrost:</span>
-              </div>
-              {[0.5, 0.75, 1.0, 1.25, 1.5, 2.0].map((rate) => (
-                <Button
-                  key={rate}
-                  onClick={() => handlePlaybackRateChange(rate)}
-                  disabled={isLoading}
-                  variant={playbackRate === rate ? "default" : "outline"}
-                  size="sm"
-                >
-                  {rate}x
-                </Button>
-              ))}
             </div>
           </CardContent>
         </Card>
