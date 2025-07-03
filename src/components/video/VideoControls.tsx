@@ -1,6 +1,7 @@
 import { Play, Pause, Square, RotateCcw, Volume2, VolumeX, Maximize, Minimize } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface VideoControlsProps {
   isPlaying: boolean;
@@ -31,6 +32,76 @@ export function VideoControls({
   onVolumeChange,
   onToggleFullscreen
 }: VideoControlsProps) {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <div className="flex justify-center items-center gap-2 p-2">
+        <Button
+          onClick={onPlay}
+          disabled={isPlaying || isLoading}
+          variant="outline"
+          size="icon"
+        >
+          <Play className="h-4 w-4" />
+        </Button>
+        
+        <Button
+          onClick={onPause}
+          disabled={!isPlaying || isLoading}
+          variant="outline"
+          size="icon"
+        >
+          <Pause className="h-4 w-4" />
+        </Button>
+        
+        <Button
+          onClick={onStop}
+          disabled={isLoading}
+          variant="outline"
+          size="icon"
+        >
+          <Square className="h-4 w-4" />
+        </Button>
+        
+        <Button
+          onClick={onRestart}
+          disabled={isLoading}
+          variant="outline"
+          size="icon"
+        >
+          <RotateCcw className="h-4 w-4" />
+        </Button>
+
+        <Button
+          onClick={onToggleMute}
+          disabled={isLoading}
+          variant="outline"
+          size="icon"
+        >
+          {isMuted || volume === 0 ? (
+            <VolumeX className="h-4 w-4" />
+          ) : (
+            <Volume2 className="h-4 w-4" />
+          )}
+        </Button>
+
+        <Button
+          onClick={onToggleFullscreen}
+          disabled={isLoading}
+          variant="outline"
+          size="icon"
+        >
+          {isFullscreen ? (
+            <Minimize className="h-4 w-4" />
+          ) : (
+            <Maximize className="h-4 w-4" />
+          )}
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       {/* Main Playback Controls */}

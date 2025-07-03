@@ -28,9 +28,9 @@ const VideoNavodilaCrkaR = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <PageHeader title="Video navodila - Črka R" backPath="/video-navodila" />
+      <PageHeader title="Črka R" backPath="/video-navodila" />
       
-      <div className="container max-w-4xl mx-auto pt-8 pb-20 px-4">
+      <div className="container max-w-4xl mx-auto pt-16 pb-20 px-4">
         <Card className="mb-6">
           <CardContent className="p-6">
             <VideoPlayer

@@ -73,6 +73,7 @@ export function VideoPlayer({
         onTimeUpdate={onTimeUpdate}
         onError={onError}
         controls={false}
+        controlsList="nodownload"
         preload="metadata"
         playsInline
         muted={isMuted}
