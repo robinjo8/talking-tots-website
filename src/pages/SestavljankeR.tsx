@@ -67,38 +67,35 @@ export default function SestavljankeR() {
           Izberi eno izmed slik za sestavljanje in začni z igro.
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
           {puzzleOptions.map((option) => (
             <Card 
               key={option.id}
-              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col cursor-pointer hover:scale-105"
+              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 cursor-pointer hover:scale-105 overflow-hidden"
               onClick={() => handleOptionClick(option)}
             >
-              <CardHeader className={`bg-gradient-to-r ${option.gradient} rounded-t-2xl pb-4`}>
-                <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
-                  <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center border border-gray-200 overflow-hidden">
-                    {images[option.id] ? (
-                      <img 
-                        src={images[option.id]} 
-                        alt={option.title}
-                        className="w-full h-full object-cover rounded-xl"
-                        onError={(e) => {
-                          // Fallback if image doesn't load
-                          e.currentTarget.style.display = 'none';
-                          e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                        }}
-                      />
-                    ) : null}
-                    <span className={`text-3xl font-bold ${option.color} ${images[option.id] ? 'hidden' : ''}`}>
-                      {option.title[0]}
-                    </span>
+              <div className="aspect-square w-full bg-white flex items-center justify-center p-4">
+                {images[option.id] ? (
+                  <img 
+                    src={images[option.id]} 
+                    alt={option.title}
+                    className="w-full h-full object-contain rounded-lg"
+                    onError={(e) => {
+                      // Fallback if image doesn't load
+                      e.currentTarget.style.display = 'none';
+                      const fallback = e.currentTarget.parentElement?.querySelector('.fallback-text');
+                      if (fallback) fallback.classList.remove('hidden');
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
+                    <span className="text-gray-400">Nalagam...</span>
                   </div>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6 pb-4 flex-grow text-center">
-                <h3 className={`text-lg font-semibold mb-2 ${option.color}`}>{option.title}</h3>
-                <p className="text-sm text-gray-600">{option.description}</p>
-              </CardContent>
+                )}
+                <div className={`fallback-text w-full h-full flex items-center justify-center text-6xl font-bold ${option.color} ${images[option.id] ? 'hidden' : ''}`}>
+                  {option.title[0]}
+                </div>
+              </div>
             </Card>
           ))}
         </div>
