@@ -26,6 +26,7 @@ import ArtikuacijskiTest from "@/pages/ArtikuacijskiTest";
 import Sestavljanke from "@/pages/Sestavljanke";
 import SestavljankeGames from "@/pages/SestavljankeGames";
 import SestavljankeR from "@/pages/SestavljankeR";
+import SestavljankeRiba from "@/pages/SestavljankeRiba";
 
 export function AppRoutes() {
   return (
@@ -134,6 +135,15 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <SestavljankeR />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/sestavljanke/riba" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeRiba />
           </ProtectedRoute>
         }
       />
