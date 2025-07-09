@@ -28,11 +28,12 @@ const otherGames = [
   {
     id: "sestavljanke",
     title: "Sestavljanke",
-    description: "Kmalu na voljo",
+    description: "Igraj sestavljanke in vadi logično razmišljanje",
     icon: SquareDashed,
     color: "text-app-teal",
     gradient: "from-app-teal/10 to-dragon-green/10",
-    available: false
+    path: "/govorne-igre/sestavljanke",
+    available: true
   },
   {
     id: "igra4",

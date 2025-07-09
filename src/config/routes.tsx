@@ -23,6 +23,7 @@ import SpominS from "@/pages/SpominS";
 import SpominŠ from "@/pages/SpominŠ";
 import DrsneStevike from "@/pages/DrsneStevike";
 import ArtikuacijskiTest from "@/pages/ArtikuacijskiTest";
+import Sestavljanke from "@/pages/Sestavljanke";
 
 export function AppRoutes() {
   return (
@@ -113,6 +114,15 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <DrsneStevike />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/sestavljanke" 
+        element={
+          <ProtectedRoute>
+            <Sestavljanke />
           </ProtectedRoute>
         }
       />
