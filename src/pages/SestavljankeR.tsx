@@ -67,19 +67,19 @@ export default function SestavljankeR() {
           Izberi eno izmed slik za sestavljanje in začni z igro.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-8 justify-center items-center max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
           {puzzleOptions.map((option) => (
-            <div
+            <Card 
               key={option.id}
-              className="group transition-all duration-300 hover:scale-105 cursor-pointer"
+              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 cursor-pointer hover:scale-105 overflow-hidden"
               onClick={() => handleOptionClick(option)}
             >
-              <div className="w-48 h-48 bg-white rounded-3xl border-4 border-gray-800 flex items-center justify-center p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <div className="aspect-square w-full bg-white flex items-center justify-center p-4">
                 {images[option.id] ? (
                   <img 
                     src={images[option.id]} 
                     alt={option.title}
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-contain rounded-lg"
                     onError={(e) => {
                       // Fallback if image doesn't load
                       e.currentTarget.style.display = 'none';
@@ -88,15 +88,15 @@ export default function SestavljankeR() {
                     }}
                   />
                 ) : (
-                  <div className="w-full h-full bg-gray-100 rounded-2xl flex items-center justify-center">
-                    <span className="text-gray-400 text-sm">Nalagam...</span>
+                  <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
+                    <span className="text-gray-400">Nalagam...</span>
                   </div>
                 )}
                 <div className={`fallback-text w-full h-full flex items-center justify-center text-6xl font-bold ${option.color} ${images[option.id] ? 'hidden' : ''}`}>
                   {option.title[0]}
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       </div>
