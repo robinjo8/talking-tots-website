@@ -36,12 +36,25 @@ export default function SestavljankeRiba() {
   const playRibaAudio = async () => {
     setIsAudioLoading(true);
     try {
+      // First check if the file exists in the bucket
+      const { data: files } = await supabase.storage
+        .from('sestavljanke')
+        .list('', { search: 'sestavljanka_riba.mp3' });
+
+      if (!files || files.length === 0) {
+        throw new Error('Audio file not found in storage');
+      }
+
       const { data } = await supabase.storage
         .from('sestavljanke')
         .createSignedUrl('sestavljanka_riba.mp3', 3600);
       
       if (data?.signedUrl) {
         playAudio(data.signedUrl);
+        toast({
+          title: "Predvajam",
+          description: "Poslušajte besedo 'riba'",
+        });
       } else {
         throw new Error('Could not get audio file');
       }
@@ -49,7 +62,7 @@ export default function SestavljankeRiba() {
       console.error('Error playing audio:', error);
       toast({
         title: "Napaka",
-        description: "Ni mogoče predvajati zvoka.",
+        description: "Zvočna datoteka 'sestavljanka_riba.mp3' ni najdena. Prosimo naložite jo v Supabase storage bucket 'sestavljanke'.",
         variant: "destructive",
       });
     } finally {
