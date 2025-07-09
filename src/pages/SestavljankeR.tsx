@@ -41,8 +41,8 @@ export default function SestavljankeR() {
       const imageUrls: {[key: string]: string} = {};
       
       for (const option of puzzleOptions) {
-        // Construct the Supabase storage URL
-        const imageUrl = `https://dc6f3012-b411-4c62-93c0-292d63747df0.supabase.co/storage/v1/object/public/sestavljanke/${option.imageName}`;
+        // Construct the Supabase storage URL with correct project ID
+        const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke/${option.imageName}`;
         imageUrls[option.id] = imageUrl;
       }
       
