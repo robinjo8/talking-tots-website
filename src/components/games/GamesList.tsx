@@ -26,12 +26,75 @@ const otherGames = [
     available: true
   },
   {
-    id: "igra3",
-    title: "Igra 3",
+    id: "sestavljanke",
+    title: "Sestavljanke",
     description: "Kmalu na voljo",
     icon: SquareDashed,
     color: "text-app-teal",
     gradient: "from-app-teal/10 to-dragon-green/10",
+    available: false
+  },
+  {
+    id: "igra4",
+    title: "Igra 4",
+    description: "Kmalu na voljo",
+    icon: SquareDashed,
+    color: "text-app-purple",
+    gradient: "from-app-purple/10 to-app-blue/10",
+    available: false
+  },
+  {
+    id: "igra5",
+    title: "Igra 5",
+    description: "Kmalu na voljo",
+    icon: SquareDashed,
+    color: "text-app-orange",
+    gradient: "from-app-orange/10 to-app-yellow/10",
+    available: false
+  },
+  {
+    id: "igra6",
+    title: "Igra 6",
+    description: "Kmalu na voljo",
+    icon: SquareDashed,
+    color: "text-app-teal",
+    gradient: "from-app-teal/10 to-dragon-green/10",
+    available: false
+  },
+  {
+    id: "igra7",
+    title: "Igra 7",
+    description: "Kmalu na voljo",
+    icon: SquareDashed,
+    color: "text-app-purple",
+    gradient: "from-app-purple/10 to-app-blue/10",
+    available: false
+  },
+  {
+    id: "igra8",
+    title: "Igra 8",
+    description: "Kmalu na voljo",
+    icon: SquareDashed,
+    color: "text-app-orange",
+    gradient: "from-app-orange/10 to-app-yellow/10",
+    available: false
+  },
+  {
+    id: "igra9",
+    title: "Igra 9",
+    description: "Kmalu na voljo",
+    icon: SquareDashed,
+    color: "text-app-teal",
+    gradient: "from-app-teal/10 to-dragon-green/10",
+    available: false
+  },
+  {
+    id: "igra10",
+    title: "Igra 10",
+    description: "Kmalu na voljo",
+    icon: SquareDashed,
+    color: "text-app-purple",
+    gradient: "from-app-purple/10 to-app-blue/10",
     available: false
   }
 ];
