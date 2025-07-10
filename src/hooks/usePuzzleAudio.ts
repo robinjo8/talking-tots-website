@@ -30,8 +30,54 @@ export function usePuzzleAudio() {
     }
   };
 
+  const playRokaAudio = async () => {
+    setIsAudioLoading(true);
+    try {
+      const publicUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke/sestavljanka_roka.mp4";
+      
+      playAudio(publicUrl);
+      toast({
+        title: "Predvajam",
+        description: "Poslušajte besedo 'roka'",
+      });
+    } catch (error) {
+      console.error('Error playing audio:', error);
+      toast({
+        title: "Napaka",
+        description: "Ni mogoče predvajati zvoka.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAudioLoading(false);
+    }
+  };
+
+  const playRozaAudio = async () => {
+    setIsAudioLoading(true);
+    try {
+      const publicUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke/sestavljanka_roza.mp3";
+      
+      playAudio(publicUrl);
+      toast({
+        title: "Predvajam",
+        description: "Poslušajte besedo 'roža'",
+      });
+    } catch (error) {
+      console.error('Error playing audio:', error);
+      toast({
+        title: "Napaka",
+        description: "Ni mogoče predvajati zvoka.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAudioLoading(false);
+    }
+  };
+
   return {
     isAudioLoading,
-    playRibaAudio
+    playRibaAudio,
+    playRokaAudio,
+    playRozaAudio
   };
 }

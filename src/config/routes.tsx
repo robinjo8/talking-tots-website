@@ -27,6 +27,8 @@ import Sestavljanke from "@/pages/Sestavljanke";
 import SestavljankeGames from "@/pages/SestavljankeGames";
 import SestavljankeR from "@/pages/SestavljankeR";
 import SestavljankeRiba from "@/pages/SestavljankeRiba";
+import SestavljankeRoka from "@/pages/SestavljankeRoka";
+import SestavljankeRoza from "@/pages/SestavljankeRoza";
 
 export function AppRoutes() {
   return (
@@ -144,6 +146,24 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <SestavljankeRiba />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/sestavljanke/r/roka" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeRoka />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/sestavljanke/r/roža" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeRoza />
           </ProtectedRoute>
         }
       />
