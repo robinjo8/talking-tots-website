@@ -1,42 +1,90 @@
+import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+// All consonants (excluding vowels A, E, I, O, U)
+const consonants = [
+  { letter: "B", color: "text-app-orange", gradient: "from-app-orange/10 to-app-yellow/10" },
+  { letter: "C", color: "text-dragon-green", gradient: "from-dragon-green/10 to-app-teal/10" },
+  { letter: "Č", color: "text-app-blue", gradient: "from-app-blue/10 to-app-purple/10" },
+  { letter: "D", color: "text-app-purple", gradient: "from-app-purple/10 to-app-blue/10" },
+  { letter: "F", color: "text-dragon-green", gradient: "from-dragon-green/10 to-app-teal/10" },
+  { letter: "G", color: "text-app-blue", gradient: "from-app-blue/10 to-app-purple/10" },
+  { letter: "H", color: "text-app-purple", gradient: "from-app-purple/10 to-app-blue/10" },
+  { letter: "J", color: "text-dragon-green", gradient: "from-dragon-green/10 to-app-teal/10" },
+  { letter: "K", color: "text-app-orange", gradient: "from-app-orange/10 to-app-yellow/10" },
+  { letter: "L", color: "text-app-purple", gradient: "from-app-purple/10 to-app-blue/10" },
+  { letter: "M", color: "text-app-orange", gradient: "from-app-orange/10 to-app-yellow/10" },
+  { letter: "N", color: "text-dragon-green", gradient: "from-dragon-green/10 to-app-teal/10" },
+  { letter: "P", color: "text-app-purple", gradient: "from-app-purple/10 to-app-blue/10" },
+  { letter: "S", color: "text-dragon-green", gradient: "from-dragon-green/10 to-app-teal/10" },
+  { letter: "Š", color: "text-app-blue", gradient: "from-app-blue/10 to-app-purple/10" },
+  { letter: "T", color: "text-app-orange", gradient: "from-app-orange/10 to-app-yellow/10" },
+  { letter: "V", color: "text-app-blue", gradient: "from-app-blue/10 to-app-purple/10" },
+  { letter: "Z", color: "text-app-purple", gradient: "from-app-purple/10 to-app-blue/10" },
+  { letter: "Ž", color: "text-app-orange", gradient: "from-app-orange/10 to-app-yellow/10" }
+];
 
 export default function Sestavljanke() {
   const navigate = useNavigate();
 
+  const handleRClick = () => {
+    navigate("/govorne-igre/sestavljanke/r");
+  };
+
   return (
-    <div style={{ width: "100%", height: "100vh", overflow: "hidden", position: "relative" }}>
-      {/* Minimal back button floating over the iframe */}
-      <Button 
-        variant="ghost" 
-        size="icon"
-        className="absolute top-4 left-4 z-50 w-10 h-10 bg-background/80 backdrop-blur-sm hover:bg-background/90 transition-colors shadow-md"
-        onClick={() => navigate("/govorne-igre")}
-      >
-        <svg 
-          width="18" 
-          height="18" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          xmlns="http://www.w3.org/2000/svg"
-          className="text-foreground"
-        >
-          <path 
-            d="M19 12H5M12 19L5 12L12 5" 
-            stroke="currentColor" 
-            strokeWidth="2" 
-            strokeLinecap="round" 
-            strokeLinejoin="round"
-          />
-        </svg>
-      </Button>
+    <div className="min-h-screen bg-background">
+      <Header />
       
-      <iframe 
-        src="https://puzzel.org/en/crossword/embed?p=-N7G3WdPBEnNh4jW6-Q7" 
-        style={{ width: "100%", height: "100%", border: "none" }}
-        title="Križanka"
-        allowFullScreen
-      />
+      <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
+        {/* Section 1: Active puzzles */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-foreground mb-6">Izberi sestavljanko:</h2>
+          <div className="max-w-xs">
+            <Card 
+              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 cursor-pointer hover:scale-105"
+              onClick={handleRClick}
+            >
+              <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-blue/10 rounded-t-2xl pb-4">
+                <CardTitle className="text-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
+                    <span className="text-2xl font-bold text-app-purple">R</span>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6 pb-4 text-center">
+                <span className="text-lg font-semibold text-app-purple">R</span>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Section 2: Coming soon */}
+        <div>
+          <h2 className="text-2xl font-bold text-foreground mb-6">Kmalu na voljo</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {consonants.map((consonant) => (
+              <Card 
+                key={consonant.letter}
+                className="transition-all duration-300 rounded-2xl border-2 border-gray-200 opacity-60 cursor-not-allowed"
+              >
+                <CardHeader className={`bg-gradient-to-r ${consonant.gradient} rounded-t-2xl pb-4`}>
+                  <CardTitle className="text-xl flex items-center justify-center">
+                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
+                      <span className={`text-2xl font-bold ${consonant.color}`}>
+                        {consonant.letter}
+                      </span>
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-6 pb-4 text-center">
+                  <span className={`text-lg font-semibold ${consonant.color}`}>{consonant.letter}</span>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
