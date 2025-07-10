@@ -64,7 +64,7 @@ export default function SpominŠ() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
+      <div className="container max-w-5xl mx-auto pt-16 pb-20 px-4">
         <div className="flex items-center justify-between gap-3 mb-4 md:mb-6 flex-shrink-0">
           <div className="flex items-center gap-3">
             <Button 

@@ -36,7 +36,7 @@ const ArtikuacijskiTest = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
+      <div className="container max-w-5xl mx-auto pt-16 pb-20 px-4">
         {/* Back button and title - only visible on desktop */}
         <div className="hidden lg:flex items-center gap-3 mb-8">
           <Button 

@@ -19,7 +19,7 @@ const VajeZaJezik = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
+      <div className="container max-w-5xl mx-auto pt-16 pb-20 px-4">
         <p className="text-muted-foreground mb-8">
           Gibalne vaje za jezik, ki pomagajo pri izboljšanju artikulacije in motorike govornih organov.
         </p>

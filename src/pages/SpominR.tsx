@@ -79,7 +79,7 @@ export default function SpominR() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
+      <div className="container max-w-5xl mx-auto pt-16 pb-20 px-4">
         <div className="mb-4 flex items-center justify-between">
           <div>
             <p className="text-muted-foreground">Število potez: {moves}</p>
