@@ -80,7 +80,7 @@ export default function SestavljankeRoka() {
         </div>
       ) : (
         /* Desktop layout */
-        <div className="flex flex-col gap-4 p-4">
+        <div className="flex flex-col gap-4 p-4 pt-20">
           {/* Puzzle iframe */}
           <div className="w-full h-[60vh]">
             <PuzzleIframe 
