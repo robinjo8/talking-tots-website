@@ -269,10 +269,6 @@ export default function SestavljankeGames() {
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
-        <p className="text-muted-foreground mb-8">
-          Izberi eno izmed sestavljank in začni vaditi logično razmišljanje na zabaven način.
-        </p>
-
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {puzzleGames.map((game) => (
             <Card 

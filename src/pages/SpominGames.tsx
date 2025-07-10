@@ -271,10 +271,6 @@ export default function SpominGames() {
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
-        <p className="text-muted-foreground mb-8">
-          Izberi eno izmed spomin iger in začni vaditi izgovorjavo na zabaven način.
-        </p>
-
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {memoryGames.map((game) => (
             <Card 

@@ -115,10 +115,6 @@ const GovornojezicovneVaje = () => {
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
-        <p className="text-muted-foreground mb-8">
-          Izberi eno izmed govornih vaj in začni z vadbo.
-        </p>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {exerciseTypes.map((exercise) => (
             <Card 
