@@ -107,7 +107,7 @@ export default function SpominS() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container max-w-5xl mx-auto pt-16 pb-20 px-4">
+      <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
           {cards.map((card, index) => (
             <Card

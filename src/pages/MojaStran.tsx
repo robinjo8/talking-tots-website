@@ -37,7 +37,7 @@ const MojaStran = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container max-w-5xl mx-auto pt-16 pb-20 px-4">
+      <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
             {selectedChild ? (

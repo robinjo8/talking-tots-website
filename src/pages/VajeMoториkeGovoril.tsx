@@ -20,7 +20,7 @@ const VajeMoториkeGovoril = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container max-w-4xl mx-auto pt-16 pb-20 px-4">
+      <div className="container max-w-4xl mx-auto pt-20 md:pt-24 pb-20 px-4">
         <p className="text-muted-foreground mb-8 text-center">
           Vaje motorike govoril so namenjene razgibavanju govoril – ust, ustnic in jezika.
         </p>
