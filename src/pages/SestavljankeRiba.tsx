@@ -141,15 +141,15 @@ export default function SestavljankeRiba() {
                       Ali si res zaključil/a igro?
                     </AlertDialogDescription>
                   </AlertDialogHeader>
-                  <AlertDialogFooter className="flex justify-center gap-3">
+                  <AlertDialogFooter className="flex justify-center gap-3 mt-6">
                     <AlertDialogAction 
                       onClick={handlePuzzleComplete}
-                      className="bg-dragon-green hover:bg-dragon-green/90 text-white"
+                      className="bg-green-500 hover:bg-green-600 text-white rounded-md px-6 py-2"
                     >
                       <Check className="w-4 h-4 mr-2" />
                       Da
                     </AlertDialogAction>
-                    <AlertDialogCancel className="bg-red-500 hover:bg-red-600 text-white border-red-500">
+                    <AlertDialogCancel className="bg-red-500 hover:bg-red-600 text-white border-red-500 rounded-md px-6 py-2">
                       <X className="w-4 h-4 mr-2" />
                       Ne
                     </AlertDialogCancel>
@@ -203,15 +203,15 @@ export default function SestavljankeRiba() {
                       Ali si res zaključil/a igro?
                     </AlertDialogDescription>
                   </AlertDialogHeader>
-                  <AlertDialogFooter className="flex justify-center gap-3">
+                  <AlertDialogFooter className="flex justify-center gap-3 mt-6">
                     <AlertDialogAction 
                       onClick={handlePuzzleComplete}
-                      className="bg-dragon-green hover:bg-dragon-green/90 text-white"
+                      className="bg-green-500 hover:bg-green-600 text-white rounded-md px-6 py-2"
                     >
                       <Check className="w-4 h-4 mr-2" />
                       Da
                     </AlertDialogAction>
-                    <AlertDialogCancel className="bg-red-500 hover:bg-red-600 text-white border-red-500">
+                    <AlertDialogCancel className="bg-red-500 hover:bg-red-600 text-white border-red-500 rounded-md px-6 py-2">
                       <X className="w-4 h-4 mr-2" />
                       Ne
                     </AlertDialogCancel>
