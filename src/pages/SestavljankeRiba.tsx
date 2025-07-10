@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { useSpeechRecording } from "@/hooks/useSpeechRecording";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -11,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 export default function SestavljankeRiba() {
   const [isPuzzleCompleted, setIsPuzzleCompleted] = useState(false);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
+  const [isAudioDialogOpen, setIsAudioDialogOpen] = useState(false);
   const { playAudio } = useAudioPlayback();
   const { toast } = useToast();
   const isMobile = useIsMobile();
@@ -26,12 +28,17 @@ export default function SestavljankeRiba() {
 
   const handlePuzzleComplete = async () => {
     setIsPuzzleCompleted(true);
-    await playRibaAudio();
+    setIsAudioDialogOpen(true);
     
     toast({
       title: "Čestitamo! 🎉",
       description: "Uspešno ste sestavili sestavljanko!",
     });
+    
+    // Auto-play audio when dialog opens
+    setTimeout(() => {
+      playRibaAudio();
+    }, 500);
   };
 
   const playRibaAudio = async () => {
@@ -64,8 +71,8 @@ export default function SestavljankeRiba() {
       {/* Mobile edge-to-edge layout */}
       {isMobile ? (
         <div className="flex flex-col">
-          {/* Puzzle iframe - edge to edge on mobile */}
-          <div className="w-full" style={{ height: 'calc(100vh - 160px)' }}>
+          {/* Puzzle iframe - edge to edge on mobile with better spacing */}
+          <div className="w-full pt-4" style={{ height: 'calc(100vh - 200px)' }}>
             <iframe 
               src='https://puzzel.org/en/jigsaw/embed?p=-OUil2vhH3RR0sfbrViW' 
               width='100%' 
@@ -76,16 +83,14 @@ export default function SestavljankeRiba() {
             />
           </div>
 
-          {/* Audio Controls Section - directly below puzzle */}
+          {/* Complete puzzle button - positioned below puzzle */}
           <div className="bg-card border-t p-4">
-            <h3 className="text-lg font-semibold mb-4 text-center">Audio vaje</h3>
-            
-            {!isPuzzleCompleted ? (
+            {!isPuzzleCompleted && (
               <div className="text-center">
                 <Button 
                   onClick={handlePuzzleComplete}
                   size="lg"
-                  className="mb-4"
+                  className="mb-2"
                 >
                   <CheckCircle className="w-5 h-5 mr-2" />
                   Sestavil sem sestavljanko!
@@ -93,43 +98,6 @@ export default function SestavljankeRiba() {
                 <p className="text-muted-foreground text-sm">
                   Ko sestavite sestavljanko, kliknite gumb za nadaljevanje z vajami.
                 </p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="text-center">
-                  <h4 className="font-medium mb-3">Poslušajte in ponovite besedo:</h4>
-                  <div className="flex justify-center gap-3">
-                    <Button 
-                      onClick={playRibaAudio}
-                      disabled={isAudioLoading}
-                      variant="outline"
-                    >
-                      {isAudioLoading ? (
-                        <div className="w-4 h-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                      ) : (
-                        <Volume2 className="w-4 h-4" />
-                      )}
-                      <span className="ml-2">Predvajaj</span>
-                    </Button>
-                    
-                    <Button 
-                      onClick={startRecording}
-                      disabled={isRecording}
-                      variant={isRecording ? "destructive" : "default"}
-                    >
-                      <Mic className="w-4 h-4 mr-2" />
-                      {isRecording ? "Snemam..." : "Posnemi se"}
-                    </Button>
-                  </div>
-                </div>
-
-                {feedbackMessage && (
-                  <div className={`text-center p-3 rounded-md ${
-                    showPositiveFeedback ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {feedbackMessage}
-                  </div>
-                )}
               </div>
             )}
           </div>
@@ -149,11 +117,9 @@ export default function SestavljankeRiba() {
             />
           </div>
 
-          {/* Audio Controls Section */}
-          <div className="bg-card border p-6 rounded-lg shadow-lg">
-            <h3 className="text-lg font-semibold mb-4 text-center">Audio vaje</h3>
-            
-            {!isPuzzleCompleted ? (
+          {/* Complete puzzle button */}
+          {!isPuzzleCompleted && (
+            <div className="bg-card border p-6 rounded-lg shadow-lg">
               <div className="text-center">
                 <Button 
                   onClick={handlePuzzleComplete}
@@ -167,47 +133,56 @@ export default function SestavljankeRiba() {
                   Ko sestavite sestavljanko, kliknite gumb za nadaljevanje z vajami.
                 </p>
               </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="text-center">
-                  <h4 className="font-medium mb-3">Poslušajte in ponovite besedo:</h4>
-                  <div className="flex justify-center gap-3">
-                    <Button 
-                      onClick={playRibaAudio}
-                      disabled={isAudioLoading}
-                      variant="outline"
-                    >
-                      {isAudioLoading ? (
-                        <div className="w-4 h-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                      ) : (
-                        <Volume2 className="w-4 h-4" />
-                      )}
-                      <span className="ml-2">Predvajaj</span>
-                    </Button>
-                    
-                    <Button 
-                      onClick={startRecording}
-                      disabled={isRecording}
-                      variant={isRecording ? "destructive" : "default"}
-                    >
-                      <Mic className="w-4 h-4 mr-2" />
-                      {isRecording ? "Snemam..." : "Posnemi se"}
-                    </Button>
-                  </div>
-                </div>
+            </div>
+          )}
+        </div>
+      )}
 
-                {feedbackMessage && (
-                  <div className={`text-center p-3 rounded-md ${
-                    showPositiveFeedback ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {feedbackMessage}
-                  </div>
-                )}
+      {/* Audio Dialog - appears automatically when puzzle is completed */}
+      <Dialog open={isAudioDialogOpen} onOpenChange={setIsAudioDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center">Audio vaje</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="text-center">
+              <h4 className="font-medium mb-3">Poslušajte in ponovite besedo:</h4>
+              <div className="flex justify-center gap-3">
+                <Button 
+                  onClick={playRibaAudio}
+                  disabled={isAudioLoading}
+                  variant="outline"
+                >
+                  {isAudioLoading ? (
+                    <div className="w-4 h-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                  ) : (
+                    <Volume2 className="w-4 h-4" />
+                  )}
+                  <span className="ml-2">Predvajaj</span>
+                </Button>
+                
+                <Button 
+                  onClick={startRecording}
+                  disabled={isRecording}
+                  variant={isRecording ? "destructive" : "default"}
+                >
+                  <Mic className="w-4 h-4 mr-2" />
+                  {isRecording ? "Snemam..." : "Posnemi se"}
+                </Button>
+              </div>
+            </div>
+
+            {feedbackMessage && (
+              <div className={`text-center p-3 rounded-md ${
+                showPositiveFeedback ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+              }`}>
+                {feedbackMessage}
               </div>
             )}
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
