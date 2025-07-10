@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -13,6 +13,9 @@ export default function SestavljankeRiba() {
   const [isPuzzleCompleted, setIsPuzzleCompleted] = useState(false);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
   const [isAudioDialogOpen, setIsAudioDialogOpen] = useState(false);
+  const [buttonUsed, setButtonUsed] = useState(false);
+  const [puzzleInteracted, setPuzzleInteracted] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const { playAudio } = useAudioPlayback();
   const { toast } = useToast();
   const isMobile = useIsMobile();
@@ -26,9 +29,34 @@ export default function SestavljankeRiba() {
     }
   );
 
+  // Add iframe interaction detection
+  useEffect(() => {
+    const handleIframeInteraction = () => {
+      if (buttonUsed) {
+        setPuzzleInteracted(true);
+        setButtonUsed(false);
+      }
+    };
+
+    const iframe = iframeRef.current;
+    if (iframe) {
+      iframe.addEventListener('mouseenter', handleIframeInteraction);
+      iframe.addEventListener('focus', handleIframeInteraction);
+      
+      return () => {
+        iframe.removeEventListener('mouseenter', handleIframeInteraction);
+        iframe.removeEventListener('focus', handleIframeInteraction);
+      };
+    }
+  }, [buttonUsed]);
+
   const handlePuzzleComplete = async () => {
+    if (buttonUsed) return; // Prevent multiple clicks
+    
     setIsPuzzleCompleted(true);
     setIsAudioDialogOpen(true);
+    setButtonUsed(true);
+    setPuzzleInteracted(false);
     
     toast({
       title: "Čestitamo! 🎉",
@@ -40,6 +68,9 @@ export default function SestavljankeRiba() {
       playRibaAudio();
     }, 500);
   };
+
+  const isButtonActive = !buttonUsed || puzzleInteracted;
+  const buttonText = buttonUsed && !puzzleInteracted ? "Sestavljanko že rešeno" : "Sestavil sem sestavljanko!";
 
   const playRibaAudio = async () => {
     setIsAudioLoading(true);
@@ -74,6 +105,7 @@ export default function SestavljankeRiba() {
           {/* Puzzle iframe - edge to edge on mobile with better spacing */}
           <div className="w-full pt-4" style={{ height: 'calc(100vh - 200px)' }}>
             <iframe 
+              ref={iframeRef}
               src='https://puzzel.org/en/jigsaw/embed?p=-OUil2vhH3RR0sfbrViW' 
               width='100%' 
               height='100%' 
@@ -85,21 +117,24 @@ export default function SestavljankeRiba() {
 
           {/* Complete puzzle button - positioned below puzzle */}
           <div className="bg-card border-t p-4">
-            {!isPuzzleCompleted && (
-              <div className="text-center">
-                <Button 
-                  onClick={handlePuzzleComplete}
-                  size="lg"
-                  className="mb-2"
-                >
-                  <CheckCircle className="w-5 h-5 mr-2" />
-                  Sestavil sem sestavljanko!
-                </Button>
-                <p className="text-muted-foreground text-sm">
-                  Ko sestavite sestavljanko, kliknite gumb za nadaljevanje z vajami.
-                </p>
-              </div>
-            )}
+            <div className="text-center">
+              <Button 
+                onClick={handlePuzzleComplete}
+                disabled={!isButtonActive}
+                size="lg"
+                className={`mb-2 ${
+                  isButtonActive 
+                    ? 'bg-dragon-green hover:bg-dragon-green/90 text-white' 
+                    : 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                }`}
+              >
+                <CheckCircle className="w-5 h-5 mr-2" />
+                {buttonText}
+              </Button>
+              <p className="text-muted-foreground text-sm">
+                Ko sestavite sestavljanko, kliknite gumb za nadaljevanje z vajami.
+              </p>
+            </div>
           </div>
         </div>
       ) : (
@@ -108,6 +143,7 @@ export default function SestavljankeRiba() {
           {/* Puzzle iframe */}
           <div className="w-full h-[60vh]">
             <iframe 
+              ref={iframeRef}
               src='https://puzzel.org/en/jigsaw/embed?p=-OUil2vhH3RR0sfbrViW' 
               width='100%' 
               height='100%' 
@@ -117,24 +153,27 @@ export default function SestavljankeRiba() {
             />
           </div>
 
-          {/* Complete puzzle button */}
-          {!isPuzzleCompleted && (
-            <div className="bg-card border p-6 rounded-lg shadow-lg">
-              <div className="text-center">
-                <Button 
-                  onClick={handlePuzzleComplete}
-                  size="lg"
-                  className="mb-4"
-                >
-                  <CheckCircle className="w-5 h-5 mr-2" />
-                  Sestavil sem sestavljanko!
-                </Button>
-                <p className="text-muted-foreground text-sm">
-                  Ko sestavite sestavljanko, kliknite gumb za nadaljevanje z vajami.
-                </p>
-              </div>
+          {/* Complete puzzle button - always visible */}
+          <div className="bg-card border p-6 rounded-lg shadow-lg">
+            <div className="text-center">
+              <Button 
+                onClick={handlePuzzleComplete}
+                disabled={!isButtonActive}
+                size="lg"
+                className={`mb-4 ${
+                  isButtonActive 
+                    ? 'bg-dragon-green hover:bg-dragon-green/90 text-white' 
+                    : 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                }`}
+              >
+                <CheckCircle className="w-5 h-5 mr-2" />
+                {buttonText}
+              </Button>
+              <p className="text-muted-foreground text-sm">
+                Ko sestavite sestavljanko, kliknite gumb za nadaljevanje z vajami.
+              </p>
             </div>
-          )}
+          </div>
         </div>
       )}
 
