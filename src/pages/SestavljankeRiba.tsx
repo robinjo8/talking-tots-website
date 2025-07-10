@@ -8,6 +8,7 @@ import { usePuzzleAudio } from "@/hooks/usePuzzleAudio";
 import { PuzzleIframe } from "@/components/puzzle/PuzzleIframe";
 import { PuzzleCompletionButton } from "@/components/puzzle/PuzzleCompletionButton";
 import { AudioPracticeDialog } from "@/components/puzzle/AudioPracticeDialog";
+import { Button } from "@/components/ui/button";
 
 export default function SestavljankeRiba() {
   const [isPuzzleCompleted, setIsPuzzleCompleted] = useState(false);
@@ -66,10 +67,14 @@ export default function SestavljankeRiba() {
                 isActive={isButtonActive}
                 onComplete={handlePuzzleComplete}
                 className="mb-2"
-              />
-              <p className="text-muted-foreground text-sm">
-                Ko sestavite sestavljanko, kliknite gumb za nadaljevanje z vajami.
-              </p>
+               />
+               <Button 
+                 variant="outline" 
+                 className="bg-white text-foreground border-border hover:bg-gray-50"
+                 onClick={() => window.history.back()}
+               >
+                 Nazaj na sestavljanke
+               </Button>
             </div>
           </div>
         </div>
@@ -92,11 +97,15 @@ export default function SestavljankeRiba() {
                 isActive={isButtonActive}
                 onComplete={handlePuzzleComplete}
                 className="mb-4"
-              />
-              <p className="text-muted-foreground text-sm">
-                Ko sestavite sestavljanko, kliknite gumb za nadaljevanje z vajami.
-              </p>
-            </div>
+               />
+               <Button 
+                 variant="outline" 
+                 className="bg-white text-foreground border-border hover:bg-gray-50"
+                 onClick={() => window.history.back()}
+               >
+                 Nazaj na sestavljanke
+               </Button>
+             </div>
           </div>
         </div>
       )}
