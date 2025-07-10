@@ -10,9 +10,15 @@ export const useAudioPlayback = () => {
         audioRef.current = new Audio();
       }
 
-      // Reset the audio element
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
+      // Only pause if audio is actually playing to avoid browser notifications
+      if (!audioRef.current.paused && !audioRef.current.ended) {
+        audioRef.current.pause();
+      }
+      
+      // Reset position only if needed
+      if (audioRef.current.currentTime > 0) {
+        audioRef.current.currentTime = 0;
+      }
       
       // Set new source and play
       audioRef.current.src = audioUrl;
