@@ -55,9 +55,10 @@ export default function SestavljankeR() {
   const handleOptionClick = (option: typeof puzzleOptions[0]) => {
     if (option.id === "riba") {
       navigate("/govorne-igre/sestavljanke/riba");
-    } else {
-      // For now, just log the selection - other games will be added later
-      console.log(`Selected puzzle: ${option.title}`);
+    } else if (option.id === "roka") {
+      navigate("/govorne-igre/sestavljanke/r/roka");
+    } else if (option.id === "roza") {
+      navigate("/govorne-igre/sestavljanke/r/roza");
     }
   };
 
