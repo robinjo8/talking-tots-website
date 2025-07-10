@@ -55,7 +55,7 @@ export default function SestavljankeRiba() {
           <div className="w-full pt-4" style={{ height: 'calc(100vh - 200px)' }}>
             <PuzzleIframe 
               ref={iframeRef}
-              src='https://puzzel.org/en/jigsaw/embed?p=-OUil2vhH3RR0sfbrViW'
+              src='https://puzzel.org/sl/jigsaw/embed?p=-OUil2vhH3RR0sfbrViW'
               className="block"
             />
           </div>
@@ -85,7 +85,7 @@ export default function SestavljankeRiba() {
           <div className="w-full h-[60vh]">
             <PuzzleIframe 
               ref={iframeRef}
-              src='https://puzzel.org/en/jigsaw/embed?p=-OUil2vhH3RR0sfbrViW'
+              src='https://puzzel.org/sl/jigsaw/embed?p=-OUil2vhH3RR0sfbrViW'
               className="rounded-lg shadow-lg"
             />
           </div>

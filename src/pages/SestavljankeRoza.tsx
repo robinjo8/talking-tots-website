@@ -55,7 +55,7 @@ export default function SestavljankeRoza() {
           <div className="w-full pt-4" style={{ height: 'calc(100vh - 200px)' }}>
             <PuzzleIframe 
               ref={iframeRef}
-              src='https://puzzel.org/en/jigsaw/embed?p=-OUoF4s1KB3rGu60l0oU'
+              src='https://puzzel.org/sl/jigsaw/embed?p=-OUoF4s1KB3rGu60l0oU'
               className="block"
             />
           </div>
@@ -85,7 +85,7 @@ export default function SestavljankeRoza() {
           <div className="w-full h-[60vh]">
             <PuzzleIframe 
               ref={iframeRef}
-              src='https://puzzel.org/en/jigsaw/embed?p=-OUoF4s1KB3rGu60l0oU'
+              src='https://puzzel.org/sl/jigsaw/embed?p=-OUoF4s1KB3rGu60l0oU'
               className="rounded-lg shadow-lg"
             />
           </div>
