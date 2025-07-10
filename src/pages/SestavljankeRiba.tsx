@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { useSpeechRecording } from "@/hooks/useSpeechRecording";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import { Volume2, Mic, Play, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -13,6 +14,7 @@ export default function SestavljankeRiba() {
   const [isAudioLoading, setIsAudioLoading] = useState(false);
   const { playAudio } = useAudioPlayback();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   
   const { isRecording, feedbackMessage, showPositiveFeedback, startRecording } = useSpeechRecording(
     (points) => {
@@ -61,22 +63,21 @@ export default function SestavljankeRiba() {
       <Header />
       <PageHeader title="Sestavljanka - Riba" backPath="/govorne-igre/sestavljanke/r" />
       
-      <div className="flex flex-col gap-4 p-4">
+      <div className={`flex flex-col gap-4 ${isMobile ? 'px-1 py-2' : 'p-4'}`}>
         {/* Puzzle iframe */}
-        <div className="w-full h-[60vh]">
+        <div className={`w-full ${isMobile ? 'h-[75vh]' : 'h-[60vh]'}`}>
           <iframe 
             src='https://puzzel.org/en/jigsaw/embed?p=-OUil2vhH3RR0sfbrViW' 
             width='100%' 
             height='100%' 
             frameBorder='0' 
             allowFullScreen
-            title="Riba Sestavljanka"
-            className="rounded-lg shadow-lg"
+            className={isMobile ? '' : 'rounded-lg shadow-lg'}
           />
         </div>
 
         {/* Audio Controls Section */}
-        <div className="bg-card p-6 rounded-lg shadow-lg border">
+        <div className={`bg-card border ${isMobile ? 'p-4 mx-2 rounded-lg shadow-sm' : 'p-6 rounded-lg shadow-lg'}`}>
           <h3 className="text-lg font-semibold mb-4 text-center">Audio vaje</h3>
           
           {!isPuzzleCompleted ? (
