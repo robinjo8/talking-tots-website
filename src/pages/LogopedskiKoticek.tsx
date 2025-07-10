@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
-import { PageHeader } from "@/components/PageHeader";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -91,7 +90,6 @@ const LogopedskiKoticek = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <PageHeader title="Logopedski kotiček" backPath={backPath} />
       <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
         <div className="flex items-center gap-3 mb-8">
           <Button 

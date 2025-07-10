@@ -1,5 +1,4 @@
 import Header from "@/components/Header";
-import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { VideoPlayer } from "@/components/video/VideoPlayer";
 import { VideoProgressBar } from "@/components/video/VideoProgressBar";
@@ -28,7 +27,6 @@ const VideoNavodilaCrkaR = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <PageHeader title="Črka R" backPath="/video-navodila" />
       
       <div className="container max-w-4xl mx-auto pt-16 pb-20 px-4">
         <Card className="mb-6">

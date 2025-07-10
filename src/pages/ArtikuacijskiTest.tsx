@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import Header from "@/components/Header";
-import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -36,7 +35,6 @@ const ArtikuacijskiTest = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <PageHeader title="Artikulacijski test" backPath="/moja-stran" />
       
       <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
         {/* Back button and title - only visible on desktop */}

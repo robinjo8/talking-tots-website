@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import Header from "@/components/Header";
-import { PageHeader } from "@/components/PageHeader";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, RotateCcw, Info } from "lucide-react";
@@ -64,7 +63,6 @@ export default function SpominK() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <PageHeader title="Spomin - črka K" backPath="/govorne-igre/spomin" />
       
       <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
         <div className="flex items-center justify-between gap-3 mb-4 md:mb-6 flex-shrink-0">

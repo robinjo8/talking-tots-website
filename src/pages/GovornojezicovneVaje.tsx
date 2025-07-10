@@ -1,6 +1,5 @@
 
 import Header from "@/components/Header";
-import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { Dumbbell, TestTube, Volume2, Clock, BookText, FileText, MessageSquare, Pen, Eye } from "lucide-react";
@@ -114,7 +113,6 @@ const GovornojezicovneVaje = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <PageHeader title="Govorno-jezikovne vaje" backPath="/moja-stran" />
       
       <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
         <p className="text-muted-foreground mb-8">

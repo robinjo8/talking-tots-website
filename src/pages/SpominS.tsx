@@ -1,5 +1,4 @@
 import Header from "@/components/Header";
-import { PageHeader } from "@/components/PageHeader";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -107,7 +106,6 @@ export default function SpominS() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <PageHeader title="Spomin - črka S" backPath="/govorne-igre/spomin" />
       
       <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">

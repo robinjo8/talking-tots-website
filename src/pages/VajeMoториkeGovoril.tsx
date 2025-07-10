@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
-import { PageHeader } from "@/components/PageHeader";
 
 const VajeMoториkeGovoril = () => {
   const { user } = useAuth();
@@ -20,7 +19,6 @@ const VajeMoториkeGovoril = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <PageHeader title="Vaje motorike govoril" backPath="/govorno-jezikovne-vaje" />
       
       <div className="container max-w-4xl mx-auto pt-8 pb-20 px-4">
         <p className="text-muted-foreground mb-8 text-center">

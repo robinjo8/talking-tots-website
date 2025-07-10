@@ -4,7 +4,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import Header from "@/components/Header";
-import { PageHeader } from "@/components/PageHeader";
 import { User } from "lucide-react";
 import { DeleteChildDialog } from "@/components/DeleteChildDialog";
 import { EditChildModal } from "@/components/EditChildModal";
@@ -108,7 +107,6 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <PageHeader title="Profil" backPath="/moja-stran" />
       
       <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
         <h1 className="text-3xl font-bold mb-8 flex items-center gap-2">

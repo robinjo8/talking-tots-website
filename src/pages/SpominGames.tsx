@@ -1,6 +1,5 @@
 
 import Header from "@/components/Header";
-import { PageHeader } from "@/components/PageHeader";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -270,7 +269,6 @@ export default function SpominGames() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <PageHeader title="Spomin igre" backPath="/govorne-igre" />
       
       <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
         <p className="text-muted-foreground mb-8">
