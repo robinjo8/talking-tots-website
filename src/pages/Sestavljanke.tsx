@@ -2,7 +2,7 @@ import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 
-// Slovenian vowels for the "Kmalu na voljo" section
+// Vowels for the "Kmalu na voljo" section
 const vowels = [
   { letter: "A", color: "text-app-orange", gradient: "from-app-orange/10 to-app-yellow/10" },
   { letter: "E", color: "text-dragon-green", gradient: "from-dragon-green/10 to-app-teal/10" },
@@ -23,7 +23,7 @@ export default function Sestavljanke() {
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
-        {/* Section 1: Active puzzle - Letter R */}
+        {/* Section 1: Izberi sestavljanko */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold mb-6 mt-12">Izberi sestavljanko:</h2>
           <div className="flex justify-start">
@@ -40,7 +40,7 @@ export default function Sestavljanke() {
           </div>
         </div>
 
-        {/* Section 2: Coming soon vowels */}
+        {/* Section 2: Kmalu na voljo */}
         <div>
           <h2 className="text-2xl font-bold mb-6 mt-12">Kmalu na voljo:</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
