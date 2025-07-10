@@ -142,10 +142,6 @@ export default function SestavljankeRiba() {
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter className="flex justify-center gap-3">
-                    <AlertDialogCancel className="bg-red-500 hover:bg-red-600 text-white border-red-500">
-                      <X className="w-4 h-4 mr-2" />
-                      Ne
-                    </AlertDialogCancel>
                     <AlertDialogAction 
                       onClick={handlePuzzleComplete}
                       className="bg-dragon-green hover:bg-dragon-green/90 text-white"
@@ -153,6 +149,10 @@ export default function SestavljankeRiba() {
                       <Check className="w-4 h-4 mr-2" />
                       Da
                     </AlertDialogAction>
+                    <AlertDialogCancel className="bg-red-500 hover:bg-red-600 text-white border-red-500">
+                      <X className="w-4 h-4 mr-2" />
+                      Ne
+                    </AlertDialogCancel>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
@@ -204,10 +204,6 @@ export default function SestavljankeRiba() {
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter className="flex justify-center gap-3">
-                    <AlertDialogCancel className="bg-red-500 hover:bg-red-600 text-white border-red-500">
-                      <X className="w-4 h-4 mr-2" />
-                      Ne
-                    </AlertDialogCancel>
                     <AlertDialogAction 
                       onClick={handlePuzzleComplete}
                       className="bg-dragon-green hover:bg-dragon-green/90 text-white"
@@ -215,6 +211,10 @@ export default function SestavljankeRiba() {
                       <Check className="w-4 h-4 mr-2" />
                       Da
                     </AlertDialogAction>
+                    <AlertDialogCancel className="bg-red-500 hover:bg-red-600 text-white border-red-500">
+                      <X className="w-4 h-4 mr-2" />
+                      Ne
+                    </AlertDialogCancel>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
