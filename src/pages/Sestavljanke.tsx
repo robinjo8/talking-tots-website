@@ -42,14 +42,20 @@ export default function Sestavljanke() {
           <h2 className="text-2xl font-bold text-foreground mb-6">Izberi sestavljanko:</h2>
           <div className="flex justify-start">
             <Card 
-              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 cursor-pointer hover:scale-105 w-24 h-24"
+              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 cursor-pointer hover:scale-105 w-80"
               onClick={handleRClick}
             >
-              <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-blue/10 rounded-2xl p-0 h-full flex items-center justify-center">
-                <CardTitle className="flex items-center justify-center">
-                  <span className="text-3xl font-bold text-app-purple">R</span>
+              <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-blue/10 rounded-t-2xl">
+                <CardTitle className="text-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200 mr-3">
+                    <span className="text-2xl font-bold text-app-purple">R</span>
+                  </div>
+                  Sestavljanke - R
                 </CardTitle>
               </CardHeader>
+              <CardContent className="p-4">
+                <p className="text-muted-foreground text-sm">Reši sestavljanke s črko R</p>
+              </CardContent>
             </Card>
           </div>
         </div>
@@ -57,19 +63,26 @@ export default function Sestavljanke() {
         {/* Section 2: Coming soon */}
         <div>
           <h2 className="text-2xl font-bold text-foreground mb-6">Kmalu na voljo</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {consonants.map((consonant) => (
               <Card 
                 key={consonant.letter}
-                className="transition-all duration-300 rounded-2xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24"
+                className="transition-all duration-300 rounded-2xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-80"
               >
-                <CardHeader className={`bg-gradient-to-r ${consonant.gradient} rounded-2xl p-0 h-full flex items-center justify-center`}>
-                  <CardTitle className="flex items-center justify-center">
-                    <span className={`text-3xl font-bold ${consonant.color}`}>
-                      {consonant.letter}
-                    </span>
+                <CardHeader className={`bg-gradient-to-r ${consonant.gradient} rounded-t-2xl`}>
+                  <CardTitle className="text-xl flex items-center justify-center">
+                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200 mr-3">
+                      <span className={`text-2xl font-bold ${consonant.color}`}>
+                        {consonant.letter}
+                      </span>
+                    </div>
+                    Sestavljanke - {consonant.letter}
                   </CardTitle>
                 </CardHeader>
+                <CardContent className="p-4">
+                  <p className="text-muted-foreground text-sm">Reši sestavljanke s črko {consonant.letter}</p>
+                  <p className="text-muted-foreground text-xs mt-2 font-medium">Kmalu na voljo</p>
+                </CardContent>
               </Card>
             ))}
           </div>
