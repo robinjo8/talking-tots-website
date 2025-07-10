@@ -19,7 +19,7 @@ export function PuzzleConfirmationDialog({ children, onConfirm }: PuzzleConfirma
             Ali si res zaključil/a igro?
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter className="flex flex-row justify-center items-center gap-3 mt-6">
+        <AlertDialogFooter className="flex flex-row justify-center sm:justify-center items-center gap-3 mt-6">
           <AlertDialogAction 
             onClick={onConfirm}
             className="bg-green-500 hover:bg-green-600 text-white rounded-md px-6 py-2"
