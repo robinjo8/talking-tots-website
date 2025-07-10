@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Header from "@/components/Header";
-import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { useSpeechRecording } from "@/hooks/useSpeechRecording";
@@ -61,7 +60,6 @@ export default function SestavljankeRiba() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <PageHeader title="Sestavljanka - Riba" backPath="/govorne-igre/sestavljanke/r" />
       
       {/* Mobile edge-to-edge layout */}
       {isMobile ? (
