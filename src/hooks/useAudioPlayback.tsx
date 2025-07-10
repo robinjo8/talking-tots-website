@@ -6,19 +6,14 @@ export const useAudioPlayback = () => {
 
   const playAudio = useCallback((audioUrl: string) => {
     try {
-      if (!audioRef.current) {
-        audioRef.current = new Audio();
-      }
-
-      // Only pause if audio is actually playing to avoid browser notifications
-      if (!audioRef.current.paused && !audioRef.current.ended) {
-        audioRef.current.pause();
+      // Stop any existing audio by clearing source instead of pausing
+      if (audioRef.current) {
+        audioRef.current.src = "";
+        audioRef.current.load(); // Reset the audio element
       }
       
-      // Reset position only if needed
-      if (audioRef.current.currentTime > 0) {
-        audioRef.current.currentTime = 0;
-      }
+      // Create a fresh audio element to avoid mobile browser notifications
+      audioRef.current = new Audio();
       
       // Set new source and play
       audioRef.current.src = audioUrl;
