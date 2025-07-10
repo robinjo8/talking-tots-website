@@ -40,16 +40,14 @@ export default function Sestavljanke() {
         {/* Section 1: Active puzzles */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-foreground mb-6">Izberi sestavljanko:</h2>
-          <div className="max-w-xs">
+          <div className="flex justify-start">
             <Card 
-              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 cursor-pointer hover:scale-105"
+              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 cursor-pointer hover:scale-105 w-24 h-24"
               onClick={handleRClick}
             >
-              <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-blue/10 rounded-2xl py-8">
-                <CardTitle className="text-xl flex items-center justify-center">
-                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
-                    <span className="text-2xl font-bold text-app-purple">R</span>
-                  </div>
+              <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-blue/10 rounded-2xl p-0 h-full flex items-center justify-center">
+                <CardTitle className="flex items-center justify-center">
+                  <span className="text-3xl font-bold text-app-purple">R</span>
                 </CardTitle>
               </CardHeader>
             </Card>
@@ -63,15 +61,13 @@ export default function Sestavljanke() {
             {consonants.map((consonant) => (
               <Card 
                 key={consonant.letter}
-                className="transition-all duration-300 rounded-2xl border-2 border-gray-200 opacity-60 cursor-not-allowed"
+                className="transition-all duration-300 rounded-2xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24"
               >
-                <CardHeader className={`bg-gradient-to-r ${consonant.gradient} rounded-2xl py-8`}>
-                  <CardTitle className="text-xl flex items-center justify-center">
-                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
-                      <span className={`text-2xl font-bold ${consonant.color}`}>
-                        {consonant.letter}
-                      </span>
-                    </div>
+                <CardHeader className={`bg-gradient-to-r ${consonant.gradient} rounded-2xl p-0 h-full flex items-center justify-center`}>
+                  <CardTitle className="flex items-center justify-center">
+                    <span className={`text-3xl font-bold ${consonant.color}`}>
+                      {consonant.letter}
+                    </span>
                   </CardTitle>
                 </CardHeader>
               </Card>
