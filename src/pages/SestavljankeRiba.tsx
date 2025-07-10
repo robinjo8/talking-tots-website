@@ -61,11 +61,11 @@ export default function SestavljankeRiba() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <PageHeader title="Sestavljanka - Riba" backPath="/govorne-igre/sestavljanke/r" />
+      {!isMobile && <PageHeader title="Sestavljanka - Riba" backPath="/govorne-igre/sestavljanke/r" />}
       
-      <div className={`flex flex-col gap-4 ${isMobile ? 'px-1 py-2' : 'p-4'}`}>
+      <div className={isMobile ? 'flex flex-col' : 'flex flex-col gap-4 p-4'}>
         {/* Puzzle iframe */}
-        <div className={`w-full ${isMobile ? 'h-[75vh]' : 'h-[60vh]'}`}>
+        <div className={isMobile ? 'w-full h-[calc(100vh-80px)]' : 'w-full h-[60vh]'}>
           <iframe 
             src='https://puzzel.org/en/jigsaw/embed?p=-OUil2vhH3RR0sfbrViW' 
             width='100%' 
@@ -77,7 +77,7 @@ export default function SestavljankeRiba() {
         </div>
 
         {/* Audio Controls Section */}
-        <div className={`bg-card border ${isMobile ? 'p-4 mx-2 rounded-lg shadow-sm' : 'p-6 rounded-lg shadow-lg'}`}>
+        <div className={`bg-card border ${isMobile ? 'p-4 mx-0 rounded-none shadow-sm mt-0' : 'p-6 rounded-lg shadow-lg'}`}>
           <h3 className="text-lg font-semibold mb-4 text-center">Audio vaje</h3>
           
           {!isPuzzleCompleted ? (
