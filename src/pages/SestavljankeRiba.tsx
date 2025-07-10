@@ -2,11 +2,12 @@ import { useState, useEffect, useRef } from "react";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { useSpeechRecording } from "@/hooks/useSpeechRecording";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
-import { Volume2, Mic, Play, CheckCircle } from "lucide-react";
+import { Volume2, Mic, Play, CheckCircle, Check, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function SestavljankeRiba() {
@@ -70,7 +71,7 @@ export default function SestavljankeRiba() {
   };
 
   const isButtonActive = !buttonUsed || puzzleInteracted;
-  const buttonText = buttonUsed && !puzzleInteracted ? "Sestavljanko že rešeno" : "Sestavil sem sestavljanko!";
+  const buttonText = buttonUsed && !puzzleInteracted ? "Sestavljanka je že rešena" : "Sestavil sem sestavljanko!";
 
   const playRibaAudio = async () => {
     setIsAudioLoading(true);
@@ -118,19 +119,43 @@ export default function SestavljankeRiba() {
           {/* Complete puzzle button - positioned below puzzle */}
           <div className="bg-card border-t p-4">
             <div className="text-center">
-              <Button 
-                onClick={handlePuzzleComplete}
-                disabled={!isButtonActive}
-                size="lg"
-                className={`mb-2 ${
-                  isButtonActive 
-                    ? 'bg-dragon-green hover:bg-dragon-green/90 text-white' 
-                    : 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                }`}
-              >
-                <CheckCircle className="w-5 h-5 mr-2" />
-                {buttonText}
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    disabled={!isButtonActive}
+                    size="lg"
+                    className={`mb-2 ${
+                      isButtonActive 
+                        ? 'bg-dragon-green hover:bg-dragon-green/90 text-white' 
+                        : 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                    }`}
+                  >
+                    <CheckCircle className="w-5 h-5 mr-2" />
+                    {buttonText}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-center">Potrditev</AlertDialogTitle>
+                    <AlertDialogDescription className="text-center">
+                      Ali si res zaključil/a igro?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter className="flex justify-center gap-3">
+                    <AlertDialogCancel className="bg-red-500 hover:bg-red-600 text-white border-red-500">
+                      <X className="w-4 h-4 mr-2" />
+                      Ne
+                    </AlertDialogCancel>
+                    <AlertDialogAction 
+                      onClick={handlePuzzleComplete}
+                      className="bg-dragon-green hover:bg-dragon-green/90 text-white"
+                    >
+                      <Check className="w-4 h-4 mr-2" />
+                      Da
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
               <p className="text-muted-foreground text-sm">
                 Ko sestavite sestavljanko, kliknite gumb za nadaljevanje z vajami.
               </p>
@@ -156,19 +181,43 @@ export default function SestavljankeRiba() {
           {/* Complete puzzle button - always visible */}
           <div className="bg-card border p-6 rounded-lg shadow-lg">
             <div className="text-center">
-              <Button 
-                onClick={handlePuzzleComplete}
-                disabled={!isButtonActive}
-                size="lg"
-                className={`mb-4 ${
-                  isButtonActive 
-                    ? 'bg-dragon-green hover:bg-dragon-green/90 text-white' 
-                    : 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                }`}
-              >
-                <CheckCircle className="w-5 h-5 mr-2" />
-                {buttonText}
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    disabled={!isButtonActive}
+                    size="lg"
+                    className={`mb-4 ${
+                      isButtonActive 
+                        ? 'bg-dragon-green hover:bg-dragon-green/90 text-white' 
+                        : 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                    }`}
+                  >
+                    <CheckCircle className="w-5 h-5 mr-2" />
+                    {buttonText}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-center">Potrditev</AlertDialogTitle>
+                    <AlertDialogDescription className="text-center">
+                      Ali si res zaključil/a igro?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter className="flex justify-center gap-3">
+                    <AlertDialogCancel className="bg-red-500 hover:bg-red-600 text-white border-red-500">
+                      <X className="w-4 h-4 mr-2" />
+                      Ne
+                    </AlertDialogCancel>
+                    <AlertDialogAction 
+                      onClick={handlePuzzleComplete}
+                      className="bg-dragon-green hover:bg-dragon-green/90 text-white"
+                    >
+                      <Check className="w-4 h-4 mr-2" />
+                      Da
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
               <p className="text-muted-foreground text-sm">
                 Ko sestavite sestavljanko, kliknite gumb za nadaljevanje z vajami.
               </p>
