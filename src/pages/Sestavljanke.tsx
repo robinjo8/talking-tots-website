@@ -45,16 +45,13 @@ export default function Sestavljanke() {
               className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 cursor-pointer hover:scale-105"
               onClick={handleRClick}
             >
-              <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-blue/10 rounded-t-2xl pb-4">
+              <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-blue/10 rounded-2xl py-8">
                 <CardTitle className="text-xl flex items-center justify-center">
                   <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
                     <span className="text-2xl font-bold text-app-purple">R</span>
                   </div>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-6 pb-4 text-center">
-                <span className="text-lg font-semibold text-app-purple">R</span>
-              </CardContent>
             </Card>
           </div>
         </div>
@@ -68,7 +65,7 @@ export default function Sestavljanke() {
                 key={consonant.letter}
                 className="transition-all duration-300 rounded-2xl border-2 border-gray-200 opacity-60 cursor-not-allowed"
               >
-                <CardHeader className={`bg-gradient-to-r ${consonant.gradient} rounded-t-2xl pb-4`}>
+                <CardHeader className={`bg-gradient-to-r ${consonant.gradient} rounded-2xl py-8`}>
                   <CardTitle className="text-xl flex items-center justify-center">
                     <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
                       <span className={`text-2xl font-bold ${consonant.color}`}>
@@ -77,9 +74,6 @@ export default function Sestavljanke() {
                     </div>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-6 pb-4 text-center">
-                  <span className={`text-lg font-semibold ${consonant.color}`}>{consonant.letter}</span>
-                </CardContent>
               </Card>
             ))}
           </div>
