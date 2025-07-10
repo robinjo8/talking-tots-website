@@ -38,7 +38,7 @@ export default function SestavljankeGames() {
             <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
               <CardHeader className="bg-gradient-to-r from-app-orange/10 to-app-yellow/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
-                  <span className="text-3xl font-bold text-app-orange">A</span>
+                  <span className="text-3xl font-bold text-app-orange">B</span>
                 </CardTitle>
               </CardHeader>
             </Card>
@@ -46,7 +46,7 @@ export default function SestavljankeGames() {
             <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
               <CardHeader className="bg-gradient-to-r from-dragon-green/10 to-app-teal/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
-                  <span className="text-3xl font-bold text-dragon-green">E</span>
+                  <span className="text-3xl font-bold text-dragon-green">C</span>
                 </CardTitle>
               </CardHeader>
             </Card>
@@ -54,7 +54,7 @@ export default function SestavljankeGames() {
             <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
               <CardHeader className="bg-gradient-to-r from-app-blue/10 to-app-purple/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
-                  <span className="text-3xl font-bold text-app-blue">I</span>
+                  <span className="text-3xl font-bold text-app-blue">Č</span>
                 </CardTitle>
               </CardHeader>
             </Card>
@@ -62,7 +62,7 @@ export default function SestavljankeGames() {
             <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
               <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-blue/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
-                  <span className="text-3xl font-bold text-app-purple">O</span>
+                  <span className="text-3xl font-bold text-app-purple">D</span>
                 </CardTitle>
               </CardHeader>
             </Card>
@@ -70,7 +70,119 @@ export default function SestavljankeGames() {
             <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
               <CardHeader className="bg-gradient-to-r from-app-orange/10 to-app-yellow/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
-                  <span className="text-3xl font-bold text-app-orange">U</span>
+                  <span className="text-3xl font-bold text-app-orange">F</span>
+                </CardTitle>
+              </CardHeader>
+            </Card>
+            
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+              <CardHeader className="bg-gradient-to-r from-dragon-green/10 to-app-teal/10 rounded-3xl p-0 h-full flex items-center justify-center">
+                <CardTitle className="flex items-center justify-center">
+                  <span className="text-3xl font-bold text-dragon-green">G</span>
+                </CardTitle>
+              </CardHeader>
+            </Card>
+            
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+              <CardHeader className="bg-gradient-to-r from-app-blue/10 to-app-purple/10 rounded-3xl p-0 h-full flex items-center justify-center">
+                <CardTitle className="flex items-center justify-center">
+                  <span className="text-3xl font-bold text-app-blue">H</span>
+                </CardTitle>
+              </CardHeader>
+            </Card>
+            
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+              <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-blue/10 rounded-3xl p-0 h-full flex items-center justify-center">
+                <CardTitle className="flex items-center justify-center">
+                  <span className="text-3xl font-bold text-app-purple">J</span>
+                </CardTitle>
+              </CardHeader>
+            </Card>
+            
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+              <CardHeader className="bg-gradient-to-r from-app-orange/10 to-app-yellow/10 rounded-3xl p-0 h-full flex items-center justify-center">
+                <CardTitle className="flex items-center justify-center">
+                  <span className="text-3xl font-bold text-app-orange">K</span>
+                </CardTitle>
+              </CardHeader>
+            </Card>
+            
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+              <CardHeader className="bg-gradient-to-r from-dragon-green/10 to-app-teal/10 rounded-3xl p-0 h-full flex items-center justify-center">
+                <CardTitle className="flex items-center justify-center">
+                  <span className="text-3xl font-bold text-dragon-green">L</span>
+                </CardTitle>
+              </CardHeader>
+            </Card>
+            
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+              <CardHeader className="bg-gradient-to-r from-app-blue/10 to-app-purple/10 rounded-3xl p-0 h-full flex items-center justify-center">
+                <CardTitle className="flex items-center justify-center">
+                  <span className="text-3xl font-bold text-app-blue">M</span>
+                </CardTitle>
+              </CardHeader>
+            </Card>
+            
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+              <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-blue/10 rounded-3xl p-0 h-full flex items-center justify-center">
+                <CardTitle className="flex items-center justify-center">
+                  <span className="text-3xl font-bold text-app-purple">N</span>
+                </CardTitle>
+              </CardHeader>
+            </Card>
+            
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+              <CardHeader className="bg-gradient-to-r from-app-orange/10 to-app-yellow/10 rounded-3xl p-0 h-full flex items-center justify-center">
+                <CardTitle className="flex items-center justify-center">
+                  <span className="text-3xl font-bold text-app-orange">P</span>
+                </CardTitle>
+              </CardHeader>
+            </Card>
+            
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+              <CardHeader className="bg-gradient-to-r from-dragon-green/10 to-app-teal/10 rounded-3xl p-0 h-full flex items-center justify-center">
+                <CardTitle className="flex items-center justify-center">
+                  <span className="text-3xl font-bold text-dragon-green">S</span>
+                </CardTitle>
+              </CardHeader>
+            </Card>
+            
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+              <CardHeader className="bg-gradient-to-r from-app-blue/10 to-app-purple/10 rounded-3xl p-0 h-full flex items-center justify-center">
+                <CardTitle className="flex items-center justify-center">
+                  <span className="text-3xl font-bold text-app-blue">Š</span>
+                </CardTitle>
+              </CardHeader>
+            </Card>
+            
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+              <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-blue/10 rounded-3xl p-0 h-full flex items-center justify-center">
+                <CardTitle className="flex items-center justify-center">
+                  <span className="text-3xl font-bold text-app-purple">T</span>
+                </CardTitle>
+              </CardHeader>
+            </Card>
+            
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+              <CardHeader className="bg-gradient-to-r from-app-orange/10 to-app-yellow/10 rounded-3xl p-0 h-full flex items-center justify-center">
+                <CardTitle className="flex items-center justify-center">
+                  <span className="text-3xl font-bold text-app-orange">V</span>
+                </CardTitle>
+              </CardHeader>
+            </Card>
+            
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+              <CardHeader className="bg-gradient-to-r from-dragon-green/10 to-app-teal/10 rounded-3xl p-0 h-full flex items-center justify-center">
+                <CardTitle className="flex items-center justify-center">
+                  <span className="text-3xl font-bold text-dragon-green">Z</span>
+                </CardTitle>
+              </CardHeader>
+            </Card>
+            
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+              <CardHeader className="bg-gradient-to-r from-app-blue/10 to-app-purple/10 rounded-3xl p-0 h-full flex items-center justify-center">
+                <CardTitle className="flex items-center justify-center">
+                  <span className="text-3xl font-bold text-app-blue">Ž</span>
                 </CardTitle>
               </CardHeader>
             </Card>
