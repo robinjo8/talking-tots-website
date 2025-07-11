@@ -11,83 +11,122 @@ export default function SestavljankeGames() {
   } = useAuth();
   const selectedChild = profile?.children?.[selectedChildIndex ?? 0];
   const childName = selectedChild?.name;
-  const consonants = [{
+const consonants = [
+  {
     letter: "B",
     gradient: "from-app-orange/10 to-app-yellow/10",
-    color: "text-app-orange"
-  }, {
+    color: "text-app-orange",
+    description: "Sestavi sliko s črko B in nato glasno ponovi besedo"
+  },
+  {
     letter: "C",
     gradient: "from-dragon-green/10 to-app-teal/10",
-    color: "text-dragon-green"
-  }, {
+    color: "text-dragon-green",
+    description: "Sestavi sliko s črko C in nato glasno ponovi besedo"
+  },
+  {
     letter: "Č",
     gradient: "from-app-blue/10 to-app-purple/10",
-    color: "text-app-blue"
-  }, {
+    color: "text-app-blue",
+    description: "Sestavi sliko s črko Č in nato glasno ponovi besedo"
+  },
+  {
     letter: "D",
     gradient: "from-app-purple/10 to-app-blue/10",
-    color: "text-app-purple"
-  }, {
+    color: "text-app-purple",
+    description: "Sestavi sliko s črko D in nato glasno ponovi besedo"
+  },
+  {
     letter: "F",
     gradient: "from-app-orange/10 to-app-yellow/10",
-    color: "text-app-orange"
-  }, {
+    color: "text-app-orange",
+    description: "Sestavi sliko s črko F in nato glasno ponovi besedo"
+  },
+  {
     letter: "G",
     gradient: "from-dragon-green/10 to-app-teal/10",
-    color: "text-dragon-green"
-  }, {
+    color: "text-dragon-green",
+    description: "Sestavi sliko s črko G in nato glasno ponovi besedo"
+  },
+  {
     letter: "H",
     gradient: "from-app-blue/10 to-app-purple/10",
-    color: "text-app-blue"
-  }, {
+    color: "text-app-blue",
+    description: "Sestavi sliko s črko H in nato glasno ponovi besedo"
+  },
+  {
     letter: "J",
     gradient: "from-app-purple/10 to-app-blue/10",
-    color: "text-app-purple"
-  }, {
+    color: "text-app-purple",
+    description: "Sestavi sliko s črko J in nato glasno ponovi besedo"
+  },
+  {
     letter: "K",
     gradient: "from-app-orange/10 to-app-yellow/10",
-    color: "text-app-orange"
-  }, {
+    color: "text-app-orange",
+    description: "Sestavi sliko s črko K in nato glasno ponovi besedo"
+  },
+  {
     letter: "L",
     gradient: "from-dragon-green/10 to-app-teal/10",
-    color: "text-dragon-green"
-  }, {
+    color: "text-dragon-green",
+    description: "Sestavi sliko s črko L in nato glasno ponovi besedo"
+  },
+  {
     letter: "M",
     gradient: "from-app-blue/10 to-app-purple/10",
-    color: "text-app-blue"
-  }, {
+    color: "text-app-blue",
+    description: "Sestavi sliko s črko M in nato glasno ponovi besedo"
+  },
+  {
     letter: "N",
     gradient: "from-app-purple/10 to-app-blue/10",
-    color: "text-app-purple"
-  }, {
+    color: "text-app-purple",
+    description: "Sestavi sliko s črko N in nato glasno ponovi besedo"
+  },
+  {
     letter: "P",
     gradient: "from-app-orange/10 to-app-yellow/10",
-    color: "text-app-orange"
-  }, {
+    color: "text-app-orange",
+    description: "Sestavi sliko s črko P in nato glasno ponovi besedo"
+  },
+  {
     letter: "S",
     gradient: "from-dragon-green/10 to-app-teal/10",
-    color: "text-dragon-green"
-  }, {
+    color: "text-dragon-green",
+    description: "Sestavi sliko s črko S in nato glasno ponovi besedo"
+  },
+  {
     letter: "Š",
     gradient: "from-app-blue/10 to-app-purple/10",
-    color: "text-app-blue"
-  }, {
+    color: "text-app-blue",
+    description: "Sestavi sliko s črko Š in nato glasno ponovi besedo"
+  },
+  {
     letter: "T",
     gradient: "from-app-purple/10 to-app-blue/10",
-    color: "text-app-purple"
-  }, {
+    color: "text-app-purple",
+    description: "Sestavi sliko s črko T in nato glasno ponovi besedo"
+  },
+  {
     letter: "V",
     gradient: "from-app-orange/10 to-app-yellow/10",
-    color: "text-app-orange"
-  }, {
+    color: "text-app-orange",
+    description: "Sestavi sliko s črko V in nato glasno ponovi besedo"
+  },
+  {
     letter: "Z",
     gradient: "from-dragon-green/10 to-app-teal/10",
-    color: "text-dragon-green"
-  }, {
+    color: "text-dragon-green",
+    description: "Sestavi sliko s črko Z in nato glasno ponovi besedo"
+  },
+  {
     letter: "Ž",
     gradient: "from-app-blue/10 to-app-purple/10",
-    color: "text-app-blue"
-  }];
+    color: "text-app-blue",
+    description: "Sestavi sliko s črko Ž in nato glasno ponovi besedo"
+  }
+];
   const handleRClick = () => {
     navigate("/govorne-igre/sestavljanke/r");
   };
@@ -120,30 +159,62 @@ export default function SestavljankeGames() {
 
         {/* Section 1: Izberi sestavljanko */}
         <div className="mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center ">Izberi sestavljanko</h2>
-          <div className="flex justify-start">
-            <Card className="transition-all duration-300 hover:shadow-lg rounded-3xl border-2 border-gray-200 cursor-pointer hover:scale-105 w-24 h-24" onClick={handleRClick}>
-              <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-blue/10 rounded-3xl p-0 h-full flex items-center justify-center">
-                <CardTitle className="flex items-center justify-center">
-                  <span className="text-3xl font-bold text-app-purple">R</span>
+          <h2 className="text-3xl font-bold text-center mb-8 text-primary">
+            Izberi sestavljanko
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <Card 
+              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col cursor-pointer hover:scale-105"
+              onClick={handleRClick}
+            >
+              <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-blue/10 rounded-t-2xl pb-4">
+                <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
+                    <span className="text-2xl font-bold text-app-purple">
+                      R
+                    </span>
+                  </div>
                 </CardTitle>
               </CardHeader>
+              <CardContent className="pt-6 pb-4 flex-grow text-center">
+                <p className="text-sm font-semibold mb-2 text-app-purple">
+                  Sestavi sliko s črko R in nato glasno ponovi besedo
+                </p>
+              </CardContent>
             </Card>
           </div>
         </div>
 
         {/* Section 2: Kmalu na voljo */}
         <div>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center ">Kmalu na voljo</h2>
-          
-          <div className="grid grid-cols-3 md:grid-cols-5 gap-4 justify-items-center">
-            {consonants.map((consonant, index) => <Card key={index} className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-full max-w-24 aspect-square">
-                <CardHeader className={`bg-gradient-to-r ${consonant.gradient} rounded-3xl p-0 h-full flex items-center justify-center`}>
-                  <CardTitle className="flex items-center justify-center">
-                    <span className={`text-3xl font-bold ${consonant.color}`}>{consonant.letter}</span>
+          <h2 className="text-3xl font-bold text-center mb-8 text-muted-foreground">
+            Kmalu na voljo
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {consonants.map((consonant, index) => (
+              <Card 
+                key={index} 
+                className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col opacity-60 cursor-not-allowed"
+              >
+                <CardHeader className={`bg-gradient-to-r ${consonant.gradient} rounded-t-2xl pb-4`}>
+                  <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
+                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
+                      <span className={`text-2xl font-bold ${consonant.color}`}>
+                        {consonant.letter}
+                      </span>
+                    </div>
                   </CardTitle>
                 </CardHeader>
-              </Card>)}
+                <CardContent className="pt-6 pb-4 flex-grow text-center">
+                  <p className={`text-sm font-semibold mb-2 ${consonant.color}`}>
+                    {consonant.description}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2 italic">
+                    Kmalu na voljo
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </div>
