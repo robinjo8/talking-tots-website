@@ -63,17 +63,17 @@ export default function SpominK() {
   }, [gameCompleted, gameStartTimeRef, gameTime, toast]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`${isFullscreen ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}>
       {!isFullscreen && <Header />}
       
-      <div className={`${isFullscreen ? 'fixed inset-0 flex flex-col' : 'container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-2 sm:px-4'}`}>
+      <div className={`${isFullscreen ? 'h-full flex flex-col' : 'container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-2 sm:px-4'}`}>
         
-        <Card className={`bg-dragon-green/5 ${isFullscreen ? 'absolute top-4 left-4 right-4 z-10' : 'mb-4 md:mb-6'} flex-shrink-0`}>
-          <CardContent className="p-4 md:p-6">
-            <div className="space-y-4">
+        <Card className={`bg-dragon-green/5 ${isFullscreen ? 'mx-2 mt-2 mb-1' : 'mb-4 md:mb-6'} flex-shrink-0`}>
+          <CardContent className={`${isFullscreen ? 'p-3' : 'p-4 md:p-6'}`}>
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-lg md:text-xl font-bold">Igra spomin</h2>
+                  <h2 className={`${isFullscreen ? 'text-base' : 'text-lg md:text-xl'} font-bold`}>Igra spomin</h2>
                   <div className="text-sm mt-1">
                     <span className="font-medium">Najdeni pari: </span>
                     <span className="text-dragon-green font-bold">{matchedPairs.length}</span>
@@ -82,57 +82,88 @@ export default function SpominK() {
                 </div>
                 
                 {gameCompleted && gameTime !== null && (
-                  <div className="bg-dragon-green/10 text-dragon-green px-3 py-1 rounded-md text-sm font-medium">
-                    Čas: {gameTime} sekund
+                  <div className="bg-dragon-green/10 text-dragon-green px-2 py-1 rounded-md text-xs font-medium">
+                    Čas: {gameTime}s
                   </div>
                 )}
               </div>
               
-              <div className="flex gap-2 flex-wrap">
-                <Button
-                  onClick={handleReset}
-                  className="gap-2 bg-dragon-green hover:bg-dragon-green/90 text-white"
-                  variant="default"
-                >
-                  <RotateCcw className="h-4 w-4" />
-                  Nova igra
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  onClick={() => navigate("/govorne-igre/spomin")}
-                  className="gap-2"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  Nazaj
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  onClick={() => setShowInfo(true)}
-                  className="gap-2"
-                >
-                  <BookOpen className="h-4 w-4" />
-                  Navodila
-                </Button>
-                
-                {isFullscreen && (
-                  <Button
-                    variant="outline"
-                    onClick={() => navigate("/govorne-igre/spomin/spomin-k")}
-                    className="gap-2 ml-auto"
-                  >
-                    <X className="h-4 w-4" />
-                    Zapri celozaslonski način
-                  </Button>
+              <div className="flex gap-2 justify-center">
+                {isFullscreen ? (
+                  <>
+                    <Button
+                      onClick={handleReset}
+                      size="sm"
+                      className="bg-dragon-green hover:bg-dragon-green/90 text-white p-2 h-10 w-10"
+                      variant="default"
+                    >
+                      <RotateCcw className="h-4 w-4" />
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      onClick={() => navigate("/govorne-igre/spomin")}
+                      size="sm"
+                      className="p-2 h-10 w-10"
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowInfo(true)}
+                      size="sm"
+                      className="p-2 h-10 w-10"
+                    >
+                      <BookOpen className="h-4 w-4" />
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      onClick={() => navigate("/govorne-igre/spomin/spomin-k")}
+                      size="sm"
+                      className="p-2 h-10 w-10"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      onClick={handleReset}
+                      className="gap-2 bg-dragon-green hover:bg-dragon-green/90 text-white"
+                      variant="default"
+                    >
+                      <RotateCcw className="h-4 w-4" />
+                      Nova igra
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      onClick={() => navigate("/govorne-igre/spomin")}
+                      className="gap-2"
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                      Nazaj
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowInfo(true)}
+                      className="gap-2"
+                    >
+                      <BookOpen className="h-4 w-4" />
+                      Navodila
+                    </Button>
+                  </>
                 )}
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <div className={`${isFullscreen ? 'flex-1 flex justify-center items-center pt-32 pb-4 px-4' : 'flex-1 flex justify-center items-center min-h-0'}`}>
-          <div className={`w-full ${isFullscreen ? 'max-w-6xl' : 'max-w-4xl'} h-full flex items-center justify-center`}>
+        <div className={`${isFullscreen ? 'flex-1 px-2 pb-2 overflow-hidden' : 'flex-1 flex justify-center items-center min-h-0'}`}>
+          <div className={`w-full ${isFullscreen ? 'h-full' : 'max-w-4xl h-full'} flex items-center justify-center`}>
             {isLoading && (
               <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
             )}
