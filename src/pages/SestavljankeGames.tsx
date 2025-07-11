@@ -1,17 +1,9 @@
-import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { cn } from "@/lib/utils";
 
 export default function SestavljankeGames() {
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
-  const [api, setApi] = useState<any>(null);
-  const [current, setCurrent] = useState(0);
-  const [count, setCount] = useState(0);
 
   const consonants = [
     { letter: "B", gradient: "from-app-orange/10 to-app-yellow/10", color: "text-app-orange" },
@@ -39,25 +31,6 @@ export default function SestavljankeGames() {
     navigate("/govorne-igre/sestavljanke/r");
   };
 
-  const handleDotClick = (index: number) => {
-    if (api) {
-      api.scrollTo(index);
-    }
-  };
-
-  useEffect(() => {
-    if (!api) return;
-    setCount(api.scrollSnapList().length);
-    setCurrent(api.selectedScrollSnap());
-    const onSelect = () => {
-      setCurrent(api.selectedScrollSnap());
-    };
-    api.on("select", onSelect);
-    return () => {
-      api.off("select", onSelect);
-    };
-  }, [api]);
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -84,65 +57,17 @@ export default function SestavljankeGames() {
         <div>
           <h2 className="text-2xl font-bold mb-6 mt-12">Kmalu na voljo:</h2>
           
-          {isMobile ? (
-            <div className="w-full px-4">
-              <Carousel 
-                setApi={setApi} 
-                className="w-full" 
-                opts={{
-                  align: "center",
-                  loop: false,
-                  containScroll: "trimSnaps",
-                  slidesToScroll: 1
-                }}
-              >
-                <CarouselContent className="-ml-2">
-                  {consonants.map((consonant, index) => (
-                    <CarouselItem key={index} className="pl-2 basis-1/3 flex-shrink-0">
-                      <div className="px-1">
-                        <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-full aspect-square">
-                          <CardHeader className={`bg-gradient-to-r ${consonant.gradient} rounded-3xl p-0 h-full flex items-center justify-center`}>
-                            <CardTitle className="flex items-center justify-center">
-                              <span className={`text-3xl font-bold ${consonant.color}`}>{consonant.letter}</span>
-                            </CardTitle>
-                          </CardHeader>
-                        </Card>
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-              </Carousel>
-              
-              {/* Navigation dots for mobile - perfectly centered */}
-              <div className="w-full flex justify-center items-center gap-2 mt-6 pb-6">
-                {Array.from({ length: count }).map((_, i) => (
-                  <button
-                    key={i}
-                    className={cn(
-                      "w-2.5 h-2.5 rounded-full transition-all duration-300 flex-shrink-0",
-                      i === current 
-                        ? "bg-dragon-green scale-125 shadow-sm" 
-                        : "bg-muted-foreground/40 hover:bg-muted-foreground/60"
-                    )}
-                    onClick={() => handleDotClick(i)}
-                    aria-label={`Pojdi na črku ${i + 1}`}
-                  />
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-5 gap-4">
-              {consonants.map((consonant, index) => (
-                <Card key={index} className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
-                  <CardHeader className={`bg-gradient-to-r ${consonant.gradient} rounded-3xl p-0 h-full flex items-center justify-center`}>
-                    <CardTitle className="flex items-center justify-center">
-                      <span className={`text-3xl font-bold ${consonant.color}`}>{consonant.letter}</span>
-                    </CardTitle>
-                  </CardHeader>
-                </Card>
-              ))}
-            </div>
-          )}
+          <div className="grid grid-cols-3 md:grid-cols-5 gap-4 justify-items-center">
+            {consonants.map((consonant, index) => (
+              <Card key={index} className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-full max-w-24 aspect-square">
+                <CardHeader className={`bg-gradient-to-r ${consonant.gradient} rounded-3xl p-0 h-full flex items-center justify-center`}>
+                  <CardTitle className="flex items-center justify-center">
+                    <span className={`text-3xl font-bold ${consonant.color}`}>{consonant.letter}</span>
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
     </div>
