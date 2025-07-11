@@ -25,7 +25,7 @@ export default function SpominK() {
   const { toast } = useToast();
   
   // Extract letter from URL path
-  const currentLetter = location.pathname.split('-').pop()?.toUpperCase() || 'K';
+  const currentLetter = decodeURIComponent(location.pathname.split('-').pop() || 'k').toUpperCase();
   const { 
     cards, 
     isLoading, 
