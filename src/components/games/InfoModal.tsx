@@ -16,18 +16,18 @@ interface InfoModalProps {
 export function InfoModal({ isOpen, onClose, title, content }: InfoModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-center">
+          <DialogTitle className="text-xl font-bold text-center mb-4">
             {title}
           </DialogTitle>
         </DialogHeader>
-        <div className="p-4">
-          <div className="text-muted-foreground leading-relaxed space-y-3">
+        <div className="px-2 pb-4">
+          <div className="space-y-4">
             {content.split('\n\n').map((paragraph, index) => (
-              <div key={index} className="flex items-start gap-2">
-                <span className="text-dragon-green font-bold mt-1">•</span>
-                <span>{paragraph}</span>
+              <div key={index} className="flex items-start gap-3">
+                <div className="w-2 h-2 bg-dragon-green rounded-full mt-2 flex-shrink-0"></div>
+                <p className="text-foreground leading-relaxed text-sm">{paragraph}</p>
               </div>
             ))}
           </div>
