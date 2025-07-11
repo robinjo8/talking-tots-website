@@ -85,7 +85,7 @@ export default function SestavljankeGames() {
           <h2 className="text-2xl font-bold mb-6 mt-12">Kmalu na voljo:</h2>
           
           {isMobile ? (
-            <div className="w-full">
+            <div className="w-full px-2">
               <Carousel 
                 setApi={setApi} 
                 className="w-full" 
@@ -96,25 +96,23 @@ export default function SestavljankeGames() {
                   slidesToScroll: 1
                 }}
               >
-                <CarouselContent className="-ml-0">
+                <CarouselContent className="-ml-1 gap-1">
                   {consonants.map((consonant, index) => (
-                    <CarouselItem key={index} className="pl-0 basis-1/3 min-w-0">
-                      <div className="px-2 flex justify-center">
-                        <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-full aspect-square max-w-24">
-                          <CardHeader className={`bg-gradient-to-r ${consonant.gradient} rounded-3xl p-0 h-full flex items-center justify-center`}>
-                            <CardTitle className="flex items-center justify-center">
-                              <span className={`text-3xl font-bold ${consonant.color}`}>{consonant.letter}</span>
-                            </CardTitle>
-                          </CardHeader>
-                        </Card>
-                      </div>
+                    <CarouselItem key={index} className="pl-1 basis-1/3 min-w-0 flex-shrink-0">
+                      <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-full aspect-square">
+                        <CardHeader className={`bg-gradient-to-r ${consonant.gradient} rounded-3xl p-0 h-full flex items-center justify-center`}>
+                          <CardTitle className="flex items-center justify-center">
+                            <span className={`text-3xl font-bold ${consonant.color}`}>{consonant.letter}</span>
+                          </CardTitle>
+                        </CardHeader>
+                      </Card>
                     </CarouselItem>
                   ))}
                 </CarouselContent>
               </Carousel>
               
               {/* Navigation dots for mobile - properly centered and visible */}
-              <div className="flex justify-center items-center gap-2 mt-6">
+              <div className="w-full flex justify-center items-center gap-2 mt-6 pb-4">
                 {Array.from({ length: count }).map((_, i) => (
                   <button
                     key={i}
@@ -125,7 +123,7 @@ export default function SestavljankeGames() {
                         : "bg-muted-foreground/40 hover:bg-muted-foreground/60"
                     )}
                     onClick={() => handleDotClick(i)}
-                    aria-label={`Pojdi na črko ${i + 1}`}
+                    aria-label={`Pojdi na črku ${i + 1}`}
                   />
                 ))}
               </div>
