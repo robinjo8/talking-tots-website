@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, RotateCcw, Info } from "lucide-react";
+import { RotateCcw, BookOpen } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { MemoryGrid } from "@/components/games/MemoryGrid";
 import { useMemoryGameK } from "@/hooks/useMemoryGameK";
@@ -65,55 +65,18 @@ export default function SpominK() {
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
-        <div className="flex items-center justify-between gap-3 mb-4 md:mb-6 flex-shrink-0">
-          <div className="flex items-center gap-3">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="gap-2" 
-              onClick={() => navigate("/govorne-igre")}
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Nazaj
-            </Button>
-            
-            <h1 className="text-lg md:text-2xl lg:text-3xl font-bold text-foreground">
-              Črka K
-            </h1>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowInfo(true)}
-              className="h-8 w-8 p-0"
-            >
-              <Info className="h-4 w-4" />
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleReset}
-              className="gap-2"
-            >
-              <RotateCcw className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Nova igra</span>
-            </Button>
-          </div>
-        </div>
         
         <Card className="bg-dragon-green/5 mb-4 md:mb-6 flex-shrink-0">
           <CardContent className="p-4 md:p-6">
-            <div className="space-y-2">
-              <h2 className="text-lg md:text-xl font-bold">Igra spomin</h2>
-              
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <div className="text-sm">
-                  <span className="font-medium">Najdeni pari: </span>
-                  <span className="text-dragon-green font-bold">{matchedPairs.length}</span>
-                  <span className="text-muted-foreground"> od {totalPairs}</span>
+                <div>
+                  <h2 className="text-lg md:text-xl font-bold">Igra spomin</h2>
+                  <div className="text-sm mt-1">
+                    <span className="font-medium">Najdeni pari: </span>
+                    <span className="text-dragon-green font-bold">{matchedPairs.length}</span>
+                    <span className="text-muted-foreground"> od {totalPairs}</span>
+                  </div>
                 </div>
                 
                 {gameCompleted && gameTime !== null && (
@@ -121,6 +84,26 @@ export default function SpominK() {
                     Čas: {gameTime} sekund
                   </div>
                 )}
+              </div>
+              
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleReset}
+                  className="flex-1 gap-2"
+                  variant="default"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  Nova igra
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={() => setShowInfo(true)}
+                  className="gap-2"
+                >
+                  <BookOpen className="h-4 w-4" />
+                  Navodila
+                </Button>
               </div>
             </div>
           </CardContent>
@@ -170,8 +153,8 @@ export default function SpominK() {
       <InfoModal 
         isOpen={showInfo}
         onClose={() => setShowInfo(false)}
-        title="Kako igrati spomin"
-        content="Obračaj kartice in najdi pare. Ko obrneš kartico, boš slišal/a besedo in videl/a sliko. Ko najdeš vse pare, si uspešno zaključil/a igro!"
+        title="Navodila za igro Spomin"
+        content="Ta igra je super za vadbo spomina in izgovorjave besed! Klikni na dve ploščici in poskusi najti pravi par (sliko in besedo). Ko najdeš par, se odpre okno z izgovorjavo – poslušaj in ponovi besedo na glas. Če jo pravilno izgovoriš, se par obdrži! Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede."
       />
     </div>
   );
