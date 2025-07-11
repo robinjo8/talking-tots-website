@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { RotateCcw, BookOpen, ArrowLeft, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { MemoryGrid } from "@/components/games/MemoryGrid";
-import { useMemoryGame } from "@/hooks/useMemoryGame";
+import { useMemoryGameR } from "@/hooks/useMemoryGameR";
 import { useToast } from "@/components/ui/use-toast";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { InfoModal } from "@/components/games/InfoModal";
@@ -36,7 +36,7 @@ export default function SpominR() {
     matchedPairs,
     totalPairs,
     isCheckingMatch
-  } = useMemoryGame();
+  } = useMemoryGameR();
   const gameStartTimeRef = useRef<number | null>(null);
   const [gameTime, setGameTime] = useState<number | null>(null);
 
