@@ -9,12 +9,17 @@ import { useMemoryGameK } from "@/hooks/useMemoryGameK";
 import { useToast } from "@/components/ui/use-toast";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { InfoModal } from "@/components/games/InfoModal";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function SpominK() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const isFullscreen = searchParams.get('fullscreen') === 'true';
+  const isMobile = useIsMobile();
+  
+  // Mobile devices always get fullscreen, desktop never gets fullscreen
+  const effectiveFullscreen = isMobile;
+  
   const { audioRef } = useAudioPlayback();
   const [showInfo, setShowInfo] = useState(false);
   const { toast } = useToast();
@@ -51,9 +56,9 @@ export default function SpominK() {
     });
   };
 
-  // Enable fullscreen on mobile
+  // Enable fullscreen on mobile devices only
   useEffect(() => {
-    if (isFullscreen && window.innerWidth <= 768) {
+    if (effectiveFullscreen) {
       const requestFullscreen = async () => {
         try {
           if (document.documentElement.requestFullscreen) {
@@ -71,7 +76,7 @@ export default function SpominK() {
         }
       };
     }
-  }, [isFullscreen]);
+  }, [effectiveFullscreen]);
 
   useEffect(() => {
     if (gameCompleted && gameStartTimeRef.current && gameTime === null) {
@@ -89,16 +94,16 @@ export default function SpominK() {
   }, [gameCompleted, gameStartTimeRef, gameTime, toast]);
 
   return (
-    <div className={`${isFullscreen ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}>
-      {!isFullscreen && <Header />}
+    <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}>
+      {!effectiveFullscreen && <Header />}
       
-      <div className={`${isFullscreen ? 'h-full flex flex-col' : 'container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-2 sm:px-4'}`}>
+      <div className={`${effectiveFullscreen ? 'h-full flex flex-col' : 'container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-2 sm:px-4'}`}>
         
-        <Card className={`bg-dragon-green/5 ${isFullscreen ? 'mx-2 mt-2 mb-1' : 'mb-4 md:mb-6'} flex-shrink-0`}>
-          <CardContent className={`${isFullscreen ? 'p-3' : 'p-4 md:p-6'}`}>
+        <Card className={`bg-dragon-green/5 ${effectiveFullscreen ? 'mx-2 mt-2 mb-1' : 'mb-4 md:mb-6'} flex-shrink-0`}>
+          <CardContent className={`${effectiveFullscreen ? 'p-3' : 'p-4 md:p-6'}`}>
             <div className="space-y-3">
               <div>
-                <h2 className={`${isFullscreen ? 'text-base' : 'text-lg md:text-xl'} font-bold mb-2`}>Igra spomin za črko {currentLetter}</h2>
+                <h2 className={`${effectiveFullscreen ? 'text-base' : 'text-lg md:text-xl'} font-bold mb-2`}>Igra spomin za črko {currentLetter}</h2>
                 <div className="flex items-center justify-between gap-2">
                   <div className="text-sm">
                     <span className="font-medium">Najdeni pari: </span>
@@ -112,7 +117,7 @@ export default function SpominK() {
                   </div>
                   
                   <div className="flex gap-1 flex-shrink-0">
-                    {isFullscreen ? (
+                    {effectiveFullscreen ? (
                       <>
                         <Button
                           onClick={handleReset}
@@ -187,8 +192,8 @@ export default function SpominK() {
           </CardContent>
         </Card>
 
-        <div className={`${isFullscreen ? 'flex-1 px-2 pb-2 overflow-hidden' : 'flex-1 flex justify-center items-center min-h-0'}`}>
-          <div className={`w-full ${isFullscreen ? 'h-full' : 'max-w-4xl h-full'} flex items-center justify-center`}>
+        <div className={`${effectiveFullscreen ? 'flex-1 px-2 pb-2 overflow-hidden' : 'flex-1 flex justify-center items-center min-h-0'}`}>
+          <div className={`w-full ${effectiveFullscreen ? 'h-full' : 'max-w-4xl h-full'} flex items-center justify-center`}>
             {isLoading && (
               <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
             )}
