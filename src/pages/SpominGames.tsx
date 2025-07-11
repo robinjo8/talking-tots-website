@@ -1,8 +1,9 @@
 
 import Header from "@/components/Header";
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { MessageSquare } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const memoryGames = [
   {
@@ -259,49 +260,98 @@ const memoryGames = [
 
 export default function SpominGames() {
   const navigate = useNavigate();
+  const childName = "Tian";
+  
+  const activeGames = memoryGames.filter(game => game.available);
+  const inactiveGames = memoryGames.filter(game => !game.available);
   
   const handleCardClick = (game: typeof memoryGames[0]) => {
     if (game.available) {
       navigate(game.path);
     }
   };
+
+  const GameCard = ({ game }: { game: typeof memoryGames[0] }) => (
+    <Card 
+      className={`transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col ${
+        game.available 
+          ? 'cursor-pointer hover:scale-105' 
+          : 'opacity-60 cursor-not-allowed'
+      }`}
+      onClick={() => handleCardClick(game)}
+    >
+      <CardHeader className={`bg-gradient-to-r ${game.gradient} rounded-t-2xl pb-4`}>
+        <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
+          <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
+            <span className={`text-2xl font-bold ${game.color}`}>
+              {game.letter}
+            </span>
+          </div>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pt-6 pb-4 flex-grow text-center">
+        <p className={`text-sm font-semibold mb-2 ${game.color}`}>
+          Poišči pare slik s črko {game.letter} in nato ponovi besedo
+        </p>
+        {!game.available && (
+          <p className="text-xs text-muted-foreground mt-2 italic">
+            Kmalu na voljo
+          </p>
+        )}
+      </CardContent>
+    </Card>
+  );
   
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {memoryGames.map((game) => (
-            <Card 
-              key={game.id}
-              className={`transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col ${
-                game.available 
-                  ? 'cursor-pointer hover:scale-105' 
-                  : 'opacity-60 cursor-not-allowed'
-              }`}
-              onClick={() => handleCardClick(game)}
-            >
-              <CardHeader className={`bg-gradient-to-r ${game.gradient} rounded-t-2xl pb-4`}>
-                <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
-                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
-                    <span className={`text-2xl font-bold ${game.color}`}>
-                      {game.letter}
-                    </span>
-                  </div>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6 pb-4 flex-grow text-center">
-                <h3 className={`text-lg font-semibold mb-2 ${game.color}`}>{game.title}</h3>
-                <p className="text-sm text-gray-600">{game.description}</p>
-                {!game.available && (
-                  <p className="text-xs text-muted-foreground mt-2 italic">
-                    Kmalu na voljo
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+        {/* Instruction speech-bubble */}
+        <Card className="mb-8 bg-gradient-to-r from-sky-50 to-green-50 border-dragon-green/30 shadow-md">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-xl md:text-2xl text-dragon-green">
+              <MessageSquare className="h-5 w-5 text-dragon-green" />
+              Hej, {childName || "Tian"}!
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-2 flex items-center gap-4">
+            <div className="hidden sm:block w-20 h-20">
+              <img 
+                src="/lovable-uploads/4377ec70-1996-47a9-bf05-8093cffcaf0b.png" 
+                alt="Zmajček Tomi" 
+                className="w-full h-full object-contain animate-bounce-gentle"
+              />
+            </div>
+            <div className="flex-1">
+              <p className="text-lg font-medium italic">Poišči pare slik z enako črko in nato glasno ponovi besedo!</p>
+              <p className="text-sm text-muted-foreground mt-2">Z vajami postajamo vedno boljši!</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Section 1: Izberi igro */}
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold text-center mb-8 text-primary">
+            Izberi igro
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {activeGames.map((game) => (
+              <GameCard key={game.id} game={game} />
+            ))}
+          </div>
+        </div>
+
+        {/* Section 2: Kmalu na voljo */}
+        <div>
+          <h2 className="text-3xl font-bold text-center mb-8 text-muted-foreground">
+            Kmalu na voljo
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {inactiveGames.map((game) => (
+              <GameCard key={game.id} game={game} />
+            ))}
+          </div>
         </div>
       </div>
     </div>
