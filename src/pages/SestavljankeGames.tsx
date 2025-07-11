@@ -96,14 +96,14 @@ export default function SestavljankeGames() {
                   slidesToScroll: 1
                 }}
               >
-                <CarouselContent className="-ml-1">
+                <CarouselContent className="-ml-0">
                   {consonants.map((consonant, index) => (
-                    <CarouselItem key={index} className="pl-1 basis-1/3 min-w-0">
-                      <div className="p-1 flex justify-center">
-                        <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-20 h-20 flex-shrink-0">
+                    <CarouselItem key={index} className="pl-0 basis-1/3 min-w-0">
+                      <div className="px-2 flex justify-center">
+                        <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-full aspect-square max-w-24">
                           <CardHeader className={`bg-gradient-to-r ${consonant.gradient} rounded-3xl p-0 h-full flex items-center justify-center`}>
                             <CardTitle className="flex items-center justify-center">
-                              <span className={`text-2xl font-bold ${consonant.color}`}>{consonant.letter}</span>
+                              <span className={`text-3xl font-bold ${consonant.color}`}>{consonant.letter}</span>
                             </CardTitle>
                           </CardHeader>
                         </Card>
@@ -114,7 +114,7 @@ export default function SestavljankeGames() {
               </Carousel>
               
               {/* Navigation dots for mobile - properly centered and visible */}
-              <div className="flex justify-center items-center gap-2 mt-6 px-4 pb-2">
+              <div className="flex justify-center items-center gap-2 mt-6">
                 {Array.from({ length: count }).map((_, i) => (
                   <button
                     key={i}
