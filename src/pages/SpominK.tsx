@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import Header from "@/components/Header";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { RotateCcw, BookOpen, ArrowLeft, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,11 +12,15 @@ import { InfoModal } from "@/components/games/InfoModal";
 
 export default function SpominK() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const isFullscreen = searchParams.get('fullscreen') === 'true';
   const { audioRef } = useAudioPlayback();
   const [showInfo, setShowInfo] = useState(false);
   const { toast } = useToast();
+  
+  // Extract letter from URL path
+  const currentLetter = location.pathname.split('-').pop()?.toUpperCase() || 'K';
   const { 
     cards, 
     isLoading, 
@@ -47,6 +51,28 @@ export default function SpominK() {
     });
   };
 
+  // Enable fullscreen on mobile
+  useEffect(() => {
+    if (isFullscreen && window.innerWidth <= 768) {
+      const requestFullscreen = async () => {
+        try {
+          if (document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen();
+          }
+        } catch (error) {
+          console.log('Fullscreen not supported:', error);
+        }
+      };
+      requestFullscreen();
+      
+      return () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen?.();
+        }
+      };
+    }
+  }, [isFullscreen]);
+
   useEffect(() => {
     if (gameCompleted && gameStartTimeRef.current && gameTime === null) {
       const endTime = Date.now();
@@ -71,92 +97,91 @@ export default function SpominK() {
         <Card className={`bg-dragon-green/5 ${isFullscreen ? 'mx-2 mt-2 mb-1' : 'mb-4 md:mb-6'} flex-shrink-0`}>
           <CardContent className={`${isFullscreen ? 'p-3' : 'p-4 md:p-6'}`}>
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className={`${isFullscreen ? 'text-base' : 'text-lg md:text-xl'} font-bold`}>Igra spomin</h2>
-                  <div className="text-sm mt-1">
+              <div>
+                <h2 className={`${isFullscreen ? 'text-base' : 'text-lg md:text-xl'} font-bold mb-2`}>Igra spomin za črko {currentLetter}</h2>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-sm">
                     <span className="font-medium">Najdeni pari: </span>
                     <span className="text-dragon-green font-bold">{matchedPairs.length}</span>
                     <span className="text-muted-foreground"> od {totalPairs}</span>
+                    {gameCompleted && gameTime !== null && (
+                      <span className="ml-3 bg-dragon-green/10 text-dragon-green px-2 py-1 rounded-md text-xs font-medium">
+                        Čas: {gameTime}s
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="flex gap-1 flex-shrink-0">
+                    {isFullscreen ? (
+                      <>
+                        <Button
+                          onClick={handleReset}
+                          size="sm"
+                          className="bg-dragon-green hover:bg-dragon-green/90 text-white p-1.5 h-8 w-8"
+                          variant="default"
+                        >
+                          <RotateCcw className="h-3 w-3" />
+                        </Button>
+                        
+                        <Button
+                          variant="outline"
+                          onClick={() => navigate("/govorne-igre/spomin")}
+                          size="sm"
+                          className="p-1.5 h-8 w-8"
+                        >
+                          <ArrowLeft className="h-3 w-3" />
+                        </Button>
+                        
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowInfo(true)}
+                          size="sm"
+                          className="p-1.5 h-8 w-8"
+                        >
+                          <BookOpen className="h-3 w-3" />
+                        </Button>
+                        
+                        <Button
+                          variant="outline"
+                          onClick={() => navigate("/govorne-igre/spomin/spomin-k")}
+                          size="sm"
+                          className="p-1.5 h-8 w-8"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          onClick={handleReset}
+                          className="gap-2 bg-dragon-green hover:bg-dragon-green/90 text-white"
+                          variant="default"
+                        >
+                          <RotateCcw className="h-4 w-4" />
+                          Nova igra
+                        </Button>
+                        
+                        <Button
+                          variant="outline"
+                          onClick={() => navigate("/govorne-igre/spomin")}
+                          className="gap-2"
+                        >
+                          <ArrowLeft className="h-4 w-4" />
+                          Nazaj
+                        </Button>
+                        
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowInfo(true)}
+                          className="gap-2"
+                        >
+                          <BookOpen className="h-4 w-4" />
+                          Navodila
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
-                
-                {gameCompleted && gameTime !== null && (
-                  <div className="bg-dragon-green/10 text-dragon-green px-2 py-1 rounded-md text-xs font-medium">
-                    Čas: {gameTime}s
-                  </div>
-                )}
-              </div>
-              
-              <div className="flex gap-2 justify-center">
-                {isFullscreen ? (
-                  <>
-                    <Button
-                      onClick={handleReset}
-                      size="sm"
-                      className="bg-dragon-green hover:bg-dragon-green/90 text-white p-2 h-10 w-10"
-                      variant="default"
-                    >
-                      <RotateCcw className="h-4 w-4" />
-                    </Button>
-                    
-                    <Button
-                      variant="outline"
-                      onClick={() => navigate("/govorne-igre/spomin")}
-                      size="sm"
-                      className="p-2 h-10 w-10"
-                    >
-                      <ArrowLeft className="h-4 w-4" />
-                    </Button>
-                    
-                    <Button
-                      variant="outline"
-                      onClick={() => setShowInfo(true)}
-                      size="sm"
-                      className="p-2 h-10 w-10"
-                    >
-                      <BookOpen className="h-4 w-4" />
-                    </Button>
-                    
-                    <Button
-                      variant="outline"
-                      onClick={() => navigate("/govorne-igre/spomin/spomin-k")}
-                      size="sm"
-                      className="p-2 h-10 w-10"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button
-                      onClick={handleReset}
-                      className="gap-2 bg-dragon-green hover:bg-dragon-green/90 text-white"
-                      variant="default"
-                    >
-                      <RotateCcw className="h-4 w-4" />
-                      Nova igra
-                    </Button>
-                    
-                    <Button
-                      variant="outline"
-                      onClick={() => navigate("/govorne-igre/spomin")}
-                      className="gap-2"
-                    >
-                      <ArrowLeft className="h-4 w-4" />
-                      Nazaj
-                    </Button>
-                    
-                    <Button
-                      variant="outline"
-                      onClick={() => setShowInfo(true)}
-                      className="gap-2"
-                    >
-                      <BookOpen className="h-4 w-4" />
-                      Navodila
-                    </Button>
-                  </>
-                )}
               </div>
             </div>
           </CardContent>
