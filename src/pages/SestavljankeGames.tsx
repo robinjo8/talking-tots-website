@@ -85,34 +85,36 @@ export default function SestavljankeGames() {
           <h2 className="text-2xl font-bold mb-6 mt-12">Kmalu na voljo:</h2>
           
           {isMobile ? (
-            <div className="w-full px-2">
+            <div className="w-full px-4">
               <Carousel 
                 setApi={setApi} 
                 className="w-full" 
                 opts={{
-                  align: "start",
+                  align: "center",
                   loop: false,
                   containScroll: "trimSnaps",
                   slidesToScroll: 1
                 }}
               >
-                <CarouselContent className="-ml-1 gap-1">
+                <CarouselContent className="-ml-2">
                   {consonants.map((consonant, index) => (
-                    <CarouselItem key={index} className="pl-1 basis-1/3 min-w-0 flex-shrink-0">
-                      <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-full aspect-square">
-                        <CardHeader className={`bg-gradient-to-r ${consonant.gradient} rounded-3xl p-0 h-full flex items-center justify-center`}>
-                          <CardTitle className="flex items-center justify-center">
-                            <span className={`text-3xl font-bold ${consonant.color}`}>{consonant.letter}</span>
-                          </CardTitle>
-                        </CardHeader>
-                      </Card>
+                    <CarouselItem key={index} className="pl-2 basis-1/3 flex-shrink-0">
+                      <div className="px-1">
+                        <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-full aspect-square">
+                          <CardHeader className={`bg-gradient-to-r ${consonant.gradient} rounded-3xl p-0 h-full flex items-center justify-center`}>
+                            <CardTitle className="flex items-center justify-center">
+                              <span className={`text-3xl font-bold ${consonant.color}`}>{consonant.letter}</span>
+                            </CardTitle>
+                          </CardHeader>
+                        </Card>
+                      </div>
                     </CarouselItem>
                   ))}
                 </CarouselContent>
               </Carousel>
               
-              {/* Navigation dots for mobile - properly centered and visible */}
-              <div className="w-full flex justify-center items-center gap-2 mt-6 pb-4">
+              {/* Navigation dots for mobile - perfectly centered */}
+              <div className="w-full flex justify-center items-center gap-2 mt-6 pb-6">
                 {Array.from({ length: count }).map((_, i) => (
                   <button
                     key={i}
