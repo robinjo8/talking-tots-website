@@ -96,11 +96,11 @@ export default function SestavljankeGames() {
                   slidesToScroll: 1
                 }}
               >
-                <CarouselContent className="ml-0">
+                <CarouselContent className="-ml-0">
                   {consonants.map((consonant, index) => (
-                    <CarouselItem key={index} className="basis-1/3 min-w-0">
-                      <div className="px-1">
-                        <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-full aspect-square">
+                    <CarouselItem key={index} className="pl-0 basis-1/3 min-w-0">
+                      <div className="px-2 flex justify-center">
+                        <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-full aspect-square max-w-24">
                           <CardHeader className={`bg-gradient-to-r ${consonant.gradient} rounded-3xl p-0 h-full flex items-center justify-center`}>
                             <CardTitle className="flex items-center justify-center">
                               <span className={`text-3xl font-bold ${consonant.color}`}>{consonant.letter}</span>
@@ -113,13 +113,13 @@ export default function SestavljankeGames() {
                 </CarouselContent>
               </Carousel>
               
-              {/* Navigation dots for mobile - centered horizontally */}
-              <div className="flex justify-center items-center gap-2 mt-6 w-full">
+              {/* Navigation dots for mobile - properly centered and visible */}
+              <div className="flex justify-center items-center gap-2 mt-6">
                 {Array.from({ length: count }).map((_, i) => (
                   <button
                     key={i}
                     className={cn(
-                      "w-2.5 h-2.5 rounded-full transition-all duration-300",
+                      "w-2.5 h-2.5 rounded-full transition-all duration-300 flex-shrink-0",
                       i === current 
                         ? "bg-dragon-green scale-125 shadow-sm" 
                         : "bg-muted-foreground/40 hover:bg-muted-foreground/60"
