@@ -23,9 +23,14 @@ export function InfoModal({ isOpen, onClose, title, content }: InfoModalProps) {
           </DialogTitle>
         </DialogHeader>
         <div className="p-4">
-          <p className="text-muted-foreground text-center leading-relaxed">
-            {content}
-          </p>
+          <div className="text-muted-foreground leading-relaxed space-y-3">
+            {content.split('\n\n').map((paragraph, index) => (
+              <div key={index} className="flex items-start gap-2">
+                <span className="text-dragon-green font-bold mt-1">•</span>
+                <span>{paragraph}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

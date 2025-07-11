@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, BookOpen } from "lucide-react";
+import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { MemoryGrid } from "@/components/games/MemoryGrid";
 import { useMemoryGameK } from "@/hooks/useMemoryGameK";
@@ -89,11 +89,20 @@ export default function SpominK() {
               <div className="flex gap-2">
                 <Button
                   onClick={handleReset}
-                  className="flex-1 gap-2"
+                  className="gap-2 bg-dragon-green hover:bg-dragon-green/90 text-white"
                   variant="default"
                 >
                   <RotateCcw className="h-4 w-4" />
                   Nova igra
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={() => navigate("/govorne-igre/spomin")}
+                  className="gap-2"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Nazaj
                 </Button>
                 
                 <Button
@@ -154,7 +163,15 @@ export default function SpominK() {
         isOpen={showInfo}
         onClose={() => setShowInfo(false)}
         title="Navodila za igro Spomin"
-        content="Ta igra je super za vadbo spomina in izgovorjave besed! Klikni na dve ploščici in poskusi najti pravi par (sliko in besedo). Ko najdeš par, se odpre okno z izgovorjavo – poslušaj in ponovi besedo na glas. Če jo pravilno izgovoriš, se par obdrži! Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede."
+        content="Ta igra je super za vadbo spomina in izgovorjave besed!
+
+Klikni na dve ploščici in poskusi najti pravi par (sliko in besedo).
+
+Ko najdeš par, se odpre okno z izgovorjavo – poslušaj in ponovi besedo na glas.
+
+Če jo pravilno izgovoriš, se par obdrži!
+
+Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede."
       />
     </div>
   );
