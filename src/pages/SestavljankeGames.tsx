@@ -34,8 +34,8 @@ export default function SestavljankeGames() {
         {/* Section 2: Kmalu na voljo */}
         <div>
           <h2 className="text-2xl font-bold mb-6 mt-12">Kmalu na voljo:</h2>
-          <div className="flex gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-5 md:overflow-visible md:pb-0">
-            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+          <div className="flex gap-4 overflow-x-auto overflow-y-hidden pb-4 md:grid md:grid-cols-5 md:overflow-visible md:pb-0 [-webkit-overflow-scrolling:touch] scrollbar-hide">
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24 flex-shrink-0">
               <CardHeader className="bg-gradient-to-r from-app-orange/10 to-app-yellow/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
                   <span className="text-3xl font-bold text-app-orange">B</span>
@@ -43,7 +43,7 @@ export default function SestavljankeGames() {
               </CardHeader>
             </Card>
             
-            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24 flex-shrink-0">
               <CardHeader className="bg-gradient-to-r from-dragon-green/10 to-app-teal/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
                   <span className="text-3xl font-bold text-dragon-green">C</span>
@@ -51,7 +51,7 @@ export default function SestavljankeGames() {
               </CardHeader>
             </Card>
             
-            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24 flex-shrink-0">
               <CardHeader className="bg-gradient-to-r from-app-blue/10 to-app-purple/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
                   <span className="text-3xl font-bold text-app-blue">Č</span>
@@ -59,7 +59,7 @@ export default function SestavljankeGames() {
               </CardHeader>
             </Card>
             
-            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24 flex-shrink-0">
               <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-blue/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
                   <span className="text-3xl font-bold text-app-purple">D</span>
@@ -67,7 +67,7 @@ export default function SestavljankeGames() {
               </CardHeader>
             </Card>
             
-            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24 flex-shrink-0">
               <CardHeader className="bg-gradient-to-r from-app-orange/10 to-app-yellow/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
                   <span className="text-3xl font-bold text-app-orange">F</span>
@@ -75,7 +75,7 @@ export default function SestavljankeGames() {
               </CardHeader>
             </Card>
             
-            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24 flex-shrink-0">
               <CardHeader className="bg-gradient-to-r from-dragon-green/10 to-app-teal/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
                   <span className="text-3xl font-bold text-dragon-green">G</span>
@@ -83,7 +83,7 @@ export default function SestavljankeGames() {
               </CardHeader>
             </Card>
             
-            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24 flex-shrink-0">
               <CardHeader className="bg-gradient-to-r from-app-blue/10 to-app-purple/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
                   <span className="text-3xl font-bold text-app-blue">H</span>
@@ -91,7 +91,7 @@ export default function SestavljankeGames() {
               </CardHeader>
             </Card>
             
-            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24 flex-shrink-0">
               <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-blue/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
                   <span className="text-3xl font-bold text-app-purple">J</span>
@@ -99,7 +99,7 @@ export default function SestavljankeGames() {
               </CardHeader>
             </Card>
             
-            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24 flex-shrink-0">
               <CardHeader className="bg-gradient-to-r from-app-orange/10 to-app-yellow/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
                   <span className="text-3xl font-bold text-app-orange">K</span>
@@ -107,7 +107,7 @@ export default function SestavljankeGames() {
               </CardHeader>
             </Card>
             
-            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24 flex-shrink-0">
               <CardHeader className="bg-gradient-to-r from-dragon-green/10 to-app-teal/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
                   <span className="text-3xl font-bold text-dragon-green">L</span>
@@ -115,7 +115,7 @@ export default function SestavljankeGames() {
               </CardHeader>
             </Card>
             
-            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24 flex-shrink-0">
               <CardHeader className="bg-gradient-to-r from-app-blue/10 to-app-purple/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
                   <span className="text-3xl font-bold text-app-blue">M</span>
@@ -123,7 +123,7 @@ export default function SestavljankeGames() {
               </CardHeader>
             </Card>
             
-            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24 flex-shrink-0">
               <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-blue/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
                   <span className="text-3xl font-bold text-app-purple">N</span>
@@ -131,7 +131,7 @@ export default function SestavljankeGames() {
               </CardHeader>
             </Card>
             
-            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24 flex-shrink-0">
               <CardHeader className="bg-gradient-to-r from-app-orange/10 to-app-yellow/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
                   <span className="text-3xl font-bold text-app-orange">P</span>
@@ -139,7 +139,7 @@ export default function SestavljankeGames() {
               </CardHeader>
             </Card>
             
-            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24 flex-shrink-0">
               <CardHeader className="bg-gradient-to-r from-dragon-green/10 to-app-teal/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
                   <span className="text-3xl font-bold text-dragon-green">S</span>
@@ -147,7 +147,7 @@ export default function SestavljankeGames() {
               </CardHeader>
             </Card>
             
-            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24 flex-shrink-0">
               <CardHeader className="bg-gradient-to-r from-app-blue/10 to-app-purple/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
                   <span className="text-3xl font-bold text-app-blue">Š</span>
@@ -155,7 +155,7 @@ export default function SestavljankeGames() {
               </CardHeader>
             </Card>
             
-            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24 flex-shrink-0">
               <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-blue/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
                   <span className="text-3xl font-bold text-app-purple">T</span>
@@ -163,7 +163,7 @@ export default function SestavljankeGames() {
               </CardHeader>
             </Card>
             
-            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24 flex-shrink-0">
               <CardHeader className="bg-gradient-to-r from-app-orange/10 to-app-yellow/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
                   <span className="text-3xl font-bold text-app-orange">V</span>
@@ -171,7 +171,7 @@ export default function SestavljankeGames() {
               </CardHeader>
             </Card>
             
-            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24 flex-shrink-0">
               <CardHeader className="bg-gradient-to-r from-dragon-green/10 to-app-teal/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
                   <span className="text-3xl font-bold text-dragon-green">Z</span>
@@ -179,7 +179,7 @@ export default function SestavljankeGames() {
               </CardHeader>
             </Card>
             
-            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
+            <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24 flex-shrink-0">
               <CardHeader className="bg-gradient-to-r from-app-blue/10 to-app-purple/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
                   <span className="text-3xl font-bold text-app-blue">Ž</span>
