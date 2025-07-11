@@ -1,123 +1,252 @@
+import React, { useState, useRef, useEffect } from "react";
 import Header from "@/components/Header";
-import { useEffect, useState } from "react";
-import { Card } from "@/components/ui/card";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, RotateCcw } from "lucide-react";
-import { shuffle } from "@/lib/utils";
-
-interface CardItem {
-  id: number;
-  letter: string;
-  isFlipped: boolean;
-  isMatched: boolean;
-}
+import { RotateCcw, BookOpen, ArrowLeft, X } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { MemoryGrid } from "@/components/games/MemoryGrid";
+import { useMemoryGame } from "@/hooks/useMemoryGame";
+import { useToast } from "@/components/ui/use-toast";
+import { useAudioPlayback } from "@/hooks/useAudioPlayback";
+import { InfoModal } from "@/components/games/InfoModal";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function SpominR() {
-  const [cards, setCards] = useState<CardItem[]>([]);
-  const [flippedCards, setFlippedCards] = useState<number[]>([]);
-  const [moves, setMoves] = useState(0);
-  const [gameWon, setGameWon] = useState(false);
-
-  useEffect(() => {
-    const letters = ['R', 'R', 'R', 'R', 'R', 'R'];
-    const initialCards = shuffle([...letters, ...letters]).map((letter, index) => ({
-      id: index,
-      letter,
-      isFlipped: false,
-      isMatched: false,
-    }));
-    setCards(initialCards);
-    setMoves(0);
-    setGameWon(false);
-    setFlippedCards([]);
-  }, []);
-
-  useEffect(() => {
-    if (flippedCards.length === 2) {
-      setMoves(prevMoves => prevMoves + 1);
-      const [firstIndex, secondIndex] = flippedCards;
-      if (cards[firstIndex].letter === cards[secondIndex].letter) {
-        const newCards = cards.map((card, index) => index === firstIndex || index === secondIndex ? { ...card, isMatched: true } : card);
-        setCards(newCards);
-        setFlippedCards([]);
-      } else {
-        setTimeout(() => {
-          setFlippedCards([]);
-        }, 1000);
-      }
-    }
-  }, [flippedCards, cards]);
-
-  useEffect(() => {
-    if (cards.length > 0 && cards.every(card => card.isMatched)) {
-      setGameWon(true);
-    }
-  }, [cards]);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const isMobile = useIsMobile();
+  
+  // Mobile devices always get fullscreen, desktop never gets fullscreen
+  const effectiveFullscreen = isMobile;
+  
+  const { audioRef } = useAudioPlayback();
+  const [showInfo, setShowInfo] = useState(false);
+  const { toast } = useToast();
+  
+  // Extract letter from URL path
+  const currentLetter = location.pathname.split('-').pop()?.toUpperCase() || 'R';
+  const { 
+    cards, 
+    isLoading, 
+    error, 
+    flipCard, 
+    resetGame, 
+    gameCompleted,
+    matchedPairs,
+    totalPairs,
+    isCheckingMatch
+  } = useMemoryGame();
+  const gameStartTimeRef = useRef<number | null>(null);
+  const [gameTime, setGameTime] = useState<number | null>(null);
 
   const handleCardClick = (index: number) => {
-    if (flippedCards.length < 2 && !cards[index].isFlipped && !cards[index].isMatched) {
-      setCards(cards.map((card, i) => i === index ? { ...card, isFlipped: true } : card));
-      setFlippedCards([...flippedCards, index]);
+    if (!gameStartTimeRef.current && cards.length > 0) {
+      gameStartTimeRef.current = Date.now();
     }
+    flipCard(index);
   };
 
-  const resetGame = () => {
-    const letters = ['R', 'R', 'R', 'R', 'R', 'R'];
-    const initialCards = shuffle([...letters, ...letters]).map((letter, index) => ({
-      id: index,
-      letter,
-      isFlipped: false,
-      isMatched: false,
-    }));
-    setCards(initialCards);
-    setFlippedCards([]);
-    setMoves(0);
-    setGameWon(false);
+  const handleReset = () => {
+    resetGame();
+    gameStartTimeRef.current = null;
+    setGameTime(null);
+    toast({
+      title: "Igra je bila ponovno nastavljena!",
+    });
   };
+
+  // Enable fullscreen on mobile devices only
+  useEffect(() => {
+    if (effectiveFullscreen) {
+      const requestFullscreen = async () => {
+        try {
+          if (document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen();
+          }
+        } catch (error) {
+          console.log('Fullscreen not supported:', error);
+        }
+      };
+      requestFullscreen();
+      
+      return () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen?.();
+        }
+      };
+    }
+  }, [effectiveFullscreen]);
+
+  useEffect(() => {
+    if (gameCompleted && gameStartTimeRef.current && gameTime === null) {
+      const endTime = Date.now();
+      const timeTaken = Math.floor((endTime - gameStartTimeRef.current) / 1000);
+      setGameTime(timeTaken);
+      
+      setTimeout(() => {
+        toast({
+          title: "Čestitamo!",
+          description: `Igra je končana v ${timeTaken} sekundah!`,
+        });
+      }, 500);
+    }
+  }, [gameCompleted, gameStartTimeRef, gameTime, toast]);
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}>
+      {!effectiveFullscreen && <Header />}
       
-      <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
-        <div className="mb-4 flex items-center justify-between">
-          <div>
-            <p className="text-muted-foreground">Število potez: {moves}</p>
-          </div>
-          <div>
-            <Button onClick={resetGame} variant="outline">
-              <RotateCcw className="mr-2 h-4 w-4" />
-              Ponastavi igro
-            </Button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-4 gap-4">
-          {cards.map((card, index) => (
-            <Card
-              key={card.id}
-              className={`relative cursor-pointer rounded-md ${card.isFlipped || card.isMatched ? 'bg-muted' : 'bg-secondary'} ${card.isFlipped ? 'text-foreground' : 'text-transparent'} overflow-hidden`}
-              onClick={() => handleCardClick(index)}
-            >
-              <div className="absolute inset-0 flex items-center justify-center text-4xl font-bold">
-                {card.letter}
-              </div>
-              {card.isMatched && (
-                <div className="absolute inset-0 bg-green-500 opacity-50 flex items-center justify-center">
-                  <CheckCircle2 className="h-12 w-12 text-green-700" />
+      <div className={`${effectiveFullscreen ? 'h-full flex flex-col' : 'container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-2 sm:px-4'}`}>
+        
+        <Card className={`bg-dragon-green/5 ${effectiveFullscreen ? 'mx-2 mt-2 mb-1' : 'mb-4 md:mb-6'} flex-shrink-0`}>
+          <CardContent className={`${effectiveFullscreen ? 'p-3' : 'p-4 md:p-6'}`}>
+            <div className="space-y-3">
+              <div>
+                <h2 className={`${effectiveFullscreen ? 'text-base' : 'text-lg md:text-xl'} font-bold mb-2`}>Igra spomin za črko {currentLetter}</h2>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-sm">
+                    <span className="font-medium">Najdeni pari: </span>
+                    <span className="text-dragon-green font-bold">{matchedPairs.length}</span>
+                    <span className="text-muted-foreground"> od {totalPairs}</span>
+                    {gameCompleted && gameTime !== null && (
+                      <span className="ml-3 bg-dragon-green/10 text-dragon-green px-2 py-1 rounded-md text-xs font-medium">
+                        Čas: {gameTime}s
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="flex gap-1 flex-shrink-0">
+                    {effectiveFullscreen ? (
+                      <>
+                        <Button
+                          onClick={handleReset}
+                          size="sm"
+                          className="bg-dragon-green hover:bg-dragon-green/90 text-white p-1.5 h-8 w-8"
+                          variant="default"
+                        >
+                          <RotateCcw className="h-3 w-3" />
+                        </Button>
+                        
+                        <Button
+                          variant="outline"
+                          onClick={() => navigate("/govorne-igre/spomin")}
+                          size="sm"
+                          className="p-1.5 h-8 w-8"
+                        >
+                          <ArrowLeft className="h-3 w-3" />
+                        </Button>
+                        
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowInfo(true)}
+                          size="sm"
+                          className="p-1.5 h-8 w-8"
+                        >
+                          <BookOpen className="h-3 w-3" />
+                        </Button>
+                        
+                        <Button
+                          variant="outline"
+                          onClick={() => navigate("/govorne-igre/spomin/spomin-r")}
+                          size="sm"
+                          className="p-1.5 h-8 w-8"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          onClick={handleReset}
+                          className="gap-2 bg-dragon-green hover:bg-dragon-green/90 text-white"
+                          variant="default"
+                        >
+                          <RotateCcw className="h-4 w-4" />
+                          Nova igra
+                        </Button>
+                        
+                        <Button
+                          variant="outline"
+                          onClick={() => navigate("/govorne-igre/spomin")}
+                          className="gap-2"
+                        >
+                          <ArrowLeft className="h-4 w-4" />
+                          Nazaj
+                        </Button>
+                        
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowInfo(true)}
+                          className="gap-2"
+                        >
+                          <BookOpen className="h-4 w-4" />
+                          Navodila
+                        </Button>
+                      </>
+                    )}
+                  </div>
                 </div>
-              )}
-            </Card>
-          ))}
-        </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-        {gameWon && (
-          <div className="mt-8 text-center">
-            <h2 className="text-2xl font-bold text-green-500">Čestitke! Zmagali ste!</h2>
-            <p className="text-muted-foreground">Igra je končana v {moves} potezah.</p>
+        <div className={`${effectiveFullscreen ? 'flex-1 px-2 pb-2 overflow-hidden' : 'flex-1 flex justify-center items-center min-h-0'}`}>
+          <div className={`w-full ${effectiveFullscreen ? 'h-full' : 'max-w-4xl h-full'} flex items-center justify-center`}>
+            {isLoading && (
+              <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
+            )}
+            
+            {error && (
+              <div className="bg-red-50 p-6 rounded-lg border border-red-100 text-center">
+                <h3 className="text-red-600 font-medium mb-2">Napaka pri nalaganju igre</h3>
+                <p className="text-sm text-red-500">Poskusite znova kasneje.</p>
+                <Button 
+                  variant="outline" 
+                  className="mt-4" 
+                  onClick={() => window.location.reload()}
+                >
+                  Poskusi znova
+                </Button>
+              </div>
+            )}
+            
+            {!isLoading && !error && cards.length > 0 && (
+              <div className={`transition-opacity duration-500 w-full h-full flex items-center justify-center ${cards.length ? 'opacity-100' : 'opacity-0'}`}>
+                <MemoryGrid 
+                  cards={cards} 
+                  onCardClick={handleCardClick}
+                  isCheckingMatch={isCheckingMatch}
+                />
+              </div>
+            )}
+            
+            {!isLoading && !error && cards.length === 0 && (
+              <div className="text-center p-10 border rounded-lg">
+                <p className="text-muted-foreground">
+                  Ni kartic za prikaz. Prosim, preverite nastavitve igre.
+                </p>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
+
+      <InfoModal 
+        isOpen={showInfo}
+        onClose={() => setShowInfo(false)}
+        title="Navodila za igro Spomin"
+        content="Ta igra je super za vadbo spomina in izgovorjave besed!
+
+Klikni na dve ploščici in poskusi najti pravi par (sliko in besedo).
+
+Ko najdeš par, se odpre okno z izgovorjavo – poslušaj in ponovi besedo na glas.
+
+Če jo pravilno izgovoriš, se par obdrži!
+
+Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede."
+      />
     </div>
   );
 }
