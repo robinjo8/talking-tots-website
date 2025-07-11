@@ -1,9 +1,14 @@
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function SestavljankeGames() {
   const navigate = useNavigate();
+  const { profile, selectedChildIndex } = useAuth();
+  
+  const selectedChild = profile?.children?.[selectedChildIndex ?? 0];
+  const childName = selectedChild?.name;
 
   const consonants = [
     { letter: "B", gradient: "from-app-orange/10 to-app-yellow/10", color: "text-app-orange" },
@@ -36,6 +41,13 @@ export default function SestavljankeGames() {
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
+        {/* Instruction text */}
+        <div className="mb-8">
+          <p className="text-lg text-center text-foreground">
+            Hej, {childName || "ime otroka"}! Izberi črko in pomagaj Tomiju sestaviti sliko. Na koncu pa skupaj glasno ponovita besedo!
+          </p>
+        </div>
+
         {/* Section 1: Izberi sestavljanko */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold mb-6 mt-12">Izberi sestavljanko:</h2>
