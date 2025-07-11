@@ -64,7 +64,7 @@ export default function SpominK() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
+      <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-2 sm:px-4">
         
         <Card className="bg-dragon-green/5 mb-4 md:mb-6 flex-shrink-0">
           <CardContent className="p-4 md:p-6">
