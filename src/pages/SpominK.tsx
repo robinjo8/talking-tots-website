@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import Header from "@/components/Header";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
+import { RotateCcw, BookOpen, ArrowLeft, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { MemoryGrid } from "@/components/games/MemoryGrid";
 import { useMemoryGameK } from "@/hooks/useMemoryGameK";
@@ -12,6 +12,8 @@ import { InfoModal } from "@/components/games/InfoModal";
 
 export default function SpominK() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isFullscreen = searchParams.get('fullscreen') === 'true';
   const { audioRef } = useAudioPlayback();
   const [showInfo, setShowInfo] = useState(false);
   const { toast } = useToast();
@@ -62,11 +64,11 @@ export default function SpominK() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      {!isFullscreen && <Header />}
       
-      <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-2 sm:px-4">
+      <div className={`${isFullscreen ? 'fixed inset-0 flex flex-col' : 'container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-2 sm:px-4'}`}>
         
-        <Card className="bg-dragon-green/5 mb-4 md:mb-6 flex-shrink-0">
+        <Card className={`bg-dragon-green/5 ${isFullscreen ? 'absolute top-4 left-4 right-4 z-10' : 'mb-4 md:mb-6'} flex-shrink-0`}>
           <CardContent className="p-4 md:p-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -86,7 +88,7 @@ export default function SpominK() {
                 )}
               </div>
               
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 <Button
                   onClick={handleReset}
                   className="gap-2 bg-dragon-green hover:bg-dragon-green/90 text-white"
@@ -113,13 +115,24 @@ export default function SpominK() {
                   <BookOpen className="h-4 w-4" />
                   Navodila
                 </Button>
+                
+                {isFullscreen && (
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate("/govorne-igre/spomin/spomin-k")}
+                    className="gap-2 ml-auto"
+                  >
+                    <X className="h-4 w-4" />
+                    Zapri celozaslonski način
+                  </Button>
+                )}
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <div className="flex-1 flex justify-center items-center min-h-0">
-          <div className="w-full max-w-4xl h-full flex items-center justify-center">
+        <div className={`${isFullscreen ? 'flex-1 flex justify-center items-center pt-32 pb-4 px-4' : 'flex-1 flex justify-center items-center min-h-0'}`}>
+          <div className={`w-full ${isFullscreen ? 'max-w-6xl' : 'max-w-4xl'} h-full flex items-center justify-center`}>
             {isLoading && (
               <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
             )}

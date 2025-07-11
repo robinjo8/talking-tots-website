@@ -267,7 +267,7 @@ export default function SpominGames() {
   
   const handleCardClick = (game: typeof memoryGames[0]) => {
     if (game.available) {
-      navigate(game.path);
+      navigate(`${game.path}?fullscreen=true`);
     }
   };
 
