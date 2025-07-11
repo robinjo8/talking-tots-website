@@ -119,7 +119,7 @@ export default function SpominK() {
         </Card>
 
         <div className="flex-1 flex justify-center items-center min-h-0">
-          <div className="w-full max-w-4xl h-full flex items-center justify-center px-2 sm:px-4">
+          <div className="w-full max-w-4xl h-full flex items-center justify-center">
             {isLoading && (
               <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
             )}

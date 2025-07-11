@@ -2,7 +2,6 @@
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -22,9 +21,6 @@ export function InfoModal({ isOpen, onClose, title, content }: InfoModalProps) {
           <DialogTitle className="text-xl font-bold text-center mb-4">
             {title}
           </DialogTitle>
-          <DialogDescription className="sr-only">
-            Game instructions dialog
-          </DialogDescription>
         </DialogHeader>
         <div className="px-2 pb-4">
           <div className="space-y-4">
