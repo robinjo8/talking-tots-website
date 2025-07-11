@@ -34,7 +34,7 @@ export default function SestavljankeGames() {
         {/* Section 2: Kmalu na voljo */}
         <div>
           <h2 className="text-2xl font-bold mb-6 mt-12">Kmalu na voljo:</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+          <div className="flex gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-5 md:overflow-visible md:pb-0">
             <Card className="transition-all duration-300 rounded-3xl border-2 border-gray-200 opacity-60 cursor-not-allowed w-24 h-24">
               <CardHeader className="bg-gradient-to-r from-app-orange/10 to-app-yellow/10 rounded-3xl p-0 h-full flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
