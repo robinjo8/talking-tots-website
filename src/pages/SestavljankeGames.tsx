@@ -1,8 +1,6 @@
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert } from "@/components/ui/alert";
-import { MessageCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function SestavljankeGames() {
@@ -43,22 +41,11 @@ export default function SestavljankeGames() {
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
-        {/* Tomi's instruction bubble */}
-        <div className="mb-8 max-w-md mx-auto">
-          <Alert className="bg-emerald-50 border-emerald-200 shadow-sm">
-            <MessageCircle className="h-4 w-4 text-emerald-600" />
-            <div className="ml-2">
-              <p className="text-sm font-medium text-emerald-800 mb-1">
-                Zmajček Tomi ti sporoča:
-              </p>
-              <p className="text-sm text-emerald-700 font-medium mb-2">
-                Skupaj bova ujela vse črke – eno za drugo!
-              </p>
-              <p className="text-xs text-emerald-600">
-                Z vajami postajamo vedno boljši!
-              </p>
-            </div>
-          </Alert>
+        {/* Instruction text */}
+        <div className="mb-8">
+          <p className="text-lg text-center text-foreground">
+            Hej, {childName || "ime otroka"}! Izberi črko in pomagaj Tomiju sestaviti sliko. Na koncu pa skupaj glasno ponovita besedo!
+          </p>
         </div>
 
         {/* Section 1: Izberi sestavljanko */}
