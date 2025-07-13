@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSpeechRecording } from "@/hooks/useSpeechRecording";
@@ -16,6 +16,9 @@ export default function SestavljankeRiba() {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   
+  // Mobile devices always get fullscreen, desktop never gets fullscreen
+  const effectiveFullscreen = isMobile;
+  
   const { iframeRef, isButtonActive, markButtonAsUsed } = usePuzzleInteraction();
   const { isAudioLoading, playRibaAudio } = usePuzzleAudio();
   
@@ -27,6 +30,28 @@ export default function SestavljankeRiba() {
       });
     }
   );
+
+  // Enable fullscreen on mobile devices only
+  useEffect(() => {
+    if (effectiveFullscreen) {
+      const requestFullscreen = async () => {
+        try {
+          if (document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen();
+          }
+        } catch (error) {
+          console.log('Fullscreen not supported:', error);
+        }
+      };
+      requestFullscreen();
+      
+      return () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen?.();
+        }
+      };
+    }
+  }, [effectiveFullscreen]);
 
   const handlePuzzleComplete = async () => {
     setIsPuzzleCompleted(true);
@@ -45,35 +70,35 @@ export default function SestavljankeRiba() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}>
+      {!effectiveFullscreen && <Header />}
       
       {/* Mobile edge-to-edge layout */}
-      {isMobile ? (
-        <div className="flex flex-col">
-          {/* Puzzle iframe - edge to edge on mobile with better spacing */}
-          <div className="w-full pt-4" style={{ height: 'calc(100vh - 200px)' }}>
+      {effectiveFullscreen ? (
+        <div className="h-full flex flex-col">
+          {/* Puzzle iframe - fullscreen on mobile */}
+          <div className="flex-1 p-2 overflow-hidden">
             <PuzzleIframe 
               ref={iframeRef}
               src='https://puzzel.org/sl/jigsaw/embed?p=-OUil2vhH3RR0sfbrViW'
-              className="block"
+              className="w-full h-full"
             />
           </div>
 
           {/* Complete puzzle button - positioned below puzzle */}
-          <div className="bg-card border-t p-4">
-            <div className="text-center">
+          <div className="bg-card border-t p-2 flex-shrink-0">
+            <div className="flex gap-2 justify-center">
               <PuzzleCompletionButton
                 isActive={isButtonActive}
                 onComplete={handlePuzzleComplete}
-                className="mb-2"
+                className="flex-1 max-w-xs"
                />
                <Button 
                  variant="outline" 
-                 className="bg-white text-foreground border-border hover:bg-gray-50"
+                 className="bg-white text-foreground border-border hover:bg-gray-50 px-3"
                  onClick={() => window.history.back()}
                >
-                 Nazaj na sestavljanke
+                 Nazaj
                </Button>
             </div>
           </div>
