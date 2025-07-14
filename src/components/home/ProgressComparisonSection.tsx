@@ -40,17 +40,17 @@ const ProgressComparisonSection = () => {
         </div>
 
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8">
-            <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4">
-              Hitrejši napredek kot pri tradicionalnih pristopih
-            </h3>
-            <p className="text-lg text-gray-600 leading-relaxed">
-              TomiTalk omogoča otrokom personalizirano govorno vadbo vsak dan. Z redno uporabo 30 minut dnevno otroci letno dosežejo več kot 180 ur govorne vaje, kar je do 7× več kot pri klasičnih logopedskih obravnavah.
-            </p>
-          </div>
+          <div className="bg-white rounded-lg shadow-lg p-8">
+            <div className="text-center mb-8">
+              <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4">
+                Hitrejši napredek kot pri tradicionalnih pristopih
+              </h3>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                TomiTalk omogoča otrokom personalizirano govorno vadbo vsak dan. Z redno uporabo 30 minut dnevno otroci letno dosežejo več kot 180 ur govorne vaje, kar je do 7× več kot pri klasičnih logopedskih obravnavah.
+              </p>
+            </div>
 
-          <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
-            <div className="space-y-8">
+            <div className="space-y-8 mb-8">
               {therapyData.map((therapy, index) => (
                 <div key={therapy.name} className="space-y-3">
                   <div className="flex items-center gap-3 mb-2">
@@ -63,10 +63,10 @@ const ProgressComparisonSection = () => {
                   <div className="relative">
                     <div className="w-full bg-gray-200 rounded-full h-6 overflow-hidden">
                       <div
-                        className={`h-full ${therapy.color} transition-all duration-4000 ease-out`}
+                        className={`h-full ${therapy.color} transition-all duration-[20000ms] ease-out`}
                         style={{
                           width: isVisible ? `${(therapy.hours / maxHours) * 100}%` : '0%',
-                          transitionDelay: `${index * 300}ms`
+                          transitionDelay: `${index * 1500}ms`
                         }}
                       />
                     </div>
@@ -74,12 +74,12 @@ const ProgressComparisonSection = () => {
                 </div>
               ))}
             </div>
-          </div>
 
-          <div className="text-center">
-            <p className="text-gray-600 leading-relaxed">
-              Primerjava temelji na tipični letni uporabi. Z aplikacijo TomiTalk otrok lahko vsak dan vadi govorne spretnosti v varnem in igrivem okolju – kjerkoli in kadarkoli.
-            </p>
+            <div className="text-center">
+              <p className="text-gray-600 leading-relaxed">
+                Primerjava temelji na tipični letni uporabi. Z aplikacijo TomiTalk otrok lahko vsak dan vadi govorne spretnosti v varnem in igrivem okolju – kjerkoli in kadarkoli.
+              </p>
+            </div>
           </div>
         </div>
       </div>
