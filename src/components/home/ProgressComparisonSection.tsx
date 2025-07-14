@@ -61,7 +61,7 @@ const ProgressComparisonSection = () => {
                     </div>
                   </div>
                   <div className="relative">
-                    <div className="w-full bg-gray-200 rounded-full h-6 overflow-hidden">
+                    <div className="w-full bg-gray-200 rounded-full h-6 overflow-hidden relative">
                       <div
                         className={`h-full ${therapy.color} transition-all duration-[20000ms] ease-out`}
                         style={{
@@ -69,6 +69,14 @@ const ProgressComparisonSection = () => {
                           transitionDelay: `${index * 1500}ms`
                         }}
                       />
+                      {/* Icons positioned across the bar */}
+                      <div className="absolute inset-0 flex items-center justify-evenly px-2">
+                        <therapy.icon className="w-4 h-4 text-white drop-shadow-sm" />
+                        <therapy.icon className="w-4 h-4 text-white drop-shadow-sm" />
+                        <therapy.icon className="w-4 h-4 text-white drop-shadow-sm" />
+                        <therapy.icon className="w-4 h-4 text-white drop-shadow-sm" />
+                        <therapy.icon className="w-4 h-4 text-white drop-shadow-sm" />
+                      </div>
                     </div>
                   </div>
                 </div>
