@@ -138,11 +138,6 @@ export function PricingSection() {
             </Card>
           </TabsContent>
         </Tabs>
-        
-        {/* Additional note */}
-        <div className="mt-6 text-center text-sm text-gray-600">
-          <p>Vsak dodatni otrok: <strong>+3,90 € / mesec</strong></p>
-        </div>
       </div>
     </section>
   );

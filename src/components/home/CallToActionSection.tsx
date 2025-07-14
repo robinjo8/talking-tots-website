@@ -23,17 +23,39 @@ export const CallToActionSection = () => {
           </div>
 
           {/* Text content */}
-          <div className="flex-1">
+          <div className="flex-1 text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Ste pripravljeni na govorno avanturo?</h2>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto lg:mx-0">
+            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
               Prenesite Tomi Talk danes in opazujte, kako komunikacijske veščine vašega otroka cvetijo!
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-              <Button size="lg" className="bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full w-full sm:w-auto px-8">
-                Prenos za iOS
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Button 
+                size="lg" 
+                className="bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full w-full sm:w-auto px-8"
+                onClick={() => {
+                  const gamesSection = document.getElementById('govorne-igre');
+                  if (gamesSection) {
+                    gamesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  } else {
+                    window.location.href = '/govorne-igre';
+                  }
+                }}
+              >
+                Pojdi na igre
               </Button>
-              <Button size="lg" className="bg-app-blue hover:bg-app-blue/90 text-white rounded-full w-full sm:w-auto px-8">
-                Prenos za Android
+              <Button 
+                size="lg" 
+                className="bg-app-blue hover:bg-app-blue/90 text-white rounded-full w-full sm:w-auto px-8"
+                onClick={() => {
+                  const exercisesSection = document.getElementById('govorno-jezikovne-vaje');
+                  if (exercisesSection) {
+                    exercisesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  } else {
+                    window.location.href = '/govorno-jezikovne-vaje';
+                  }
+                }}
+              >
+                Pojdi na vaje
               </Button>
             </div>
           </div>

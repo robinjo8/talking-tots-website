@@ -107,7 +107,7 @@ const ProgressComparisonSection = () => {
               </div>
 
               {/* Bar chart */}
-              <div className="flex justify-center items-end gap-8 mb-8 h-40">
+              <div className="flex justify-center items-end gap-8 mb-12 h-40 mt-8">
                 {/* TomiTalk bar */}
                 <div className="flex flex-col items-center">
                   <div className="mb-2 text-center">
@@ -116,7 +116,7 @@ const ProgressComparisonSection = () => {
                   <div 
                     className="bg-green-500 w-16 rounded-t-lg transition-all duration-1000 ease-out"
                     style={{
-                      height: isVisible ? '20px' : '0px',
+                      height: isVisible ? '40px' : '0px',
                       transitionDelay: '0.3s'
                     }}
                   />
@@ -144,15 +144,14 @@ const ProgressComparisonSection = () => {
               </div>
 
               {/* Button */}
-              <div className="text-center mb-6">
+              <div className="text-center mb-8 mt-4">
                 <button className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200">
                   Prihranite in začnite zdaj
                 </button>
               </div>
 
-              {/* Description */}
               <div className="text-center">
-                <p className="text-sm text-gray-600 leading-relaxed">
+                <p className="text-gray-600 leading-relaxed">
                   Temelji na 50 individualnih urah letno pri zasebni logopedski obravnavi. Več kot ima otrok individualnih obravnav, bolj izrazita je cenovna prednost TomiTalk
                 </p>
               </div>
