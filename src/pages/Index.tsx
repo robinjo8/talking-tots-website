@@ -12,7 +12,7 @@ import { FooterSection } from "@/components/home/FooterSection";
 
 const Index = () => {
   return (
-    <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden">
+    <div className="min-h-screen bg-background">
       <Header />
       
       {/* Hero Section */}

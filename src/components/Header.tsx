@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useSidebar } from "@/components/ui/sidebar";
+
 import { MobileMenu } from "./header/MobileMenu";
 import { DesktopNavigation } from "./header/DesktopNavigation";
 
@@ -17,9 +17,6 @@ export default function Header() {
   } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const {
-    setOpenMobile
-  } = useSidebar();
   const selectedChild = selectedChildIndex !== null && profile?.children ? profile.children[selectedChildIndex] : null;
   
   const handleStartNow = () => {
