@@ -6,10 +6,10 @@ const ProgressComparisonSection = () => {
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
-        setTimeout(() => setIsVisible(true), 500);
+        setTimeout(() => setIsVisible(true), 200);
       }
     }, {
-      threshold: 0.1
+      threshold: 0.3
     });
     if (sectionRef.current) {
       observer.observe(sectionRef.current);
@@ -21,19 +21,25 @@ const ProgressComparisonSection = () => {
     hours: 180,
     color: "bg-green-500",
     icon: Trophy,
-    iconColor: "text-yellow-600"
+    iconColor: "text-yellow-600",
+    duration: "6s",
+    delay: "0.2s"
   }, {
     name: "Samoplačniško",
     hours: 50,
     color: "bg-orange-500",
     icon: Trophy,
-    iconColor: "text-gray-600"
+    iconColor: "text-gray-600",
+    duration: "4s",
+    delay: "0.5s"
   }, {
     name: "Javno zdravstvo",
     hours: 25,
     color: "bg-purple-500",
     icon: Trophy,
-    iconColor: "text-purple-600"
+    iconColor: "text-purple-600",
+    duration: "3s",
+    delay: "0.8s"
   }];
   const maxHours = 180;
   return <section ref={sectionRef} className="py-16 bg-light-cloud">
@@ -63,8 +69,13 @@ const ProgressComparisonSection = () => {
                   </div>
                   <div className="relative">
                     <div className="w-full bg-gray-200 rounded-full h-6 overflow-hidden relative">
-                      <div className={`h-full ${therapy.color} transition-all duration-[10000ms] ease-out will-change-[width]`} style={{
-                    width: isVisible ? `${therapy.hours / maxHours * 100}%` : '0%'
+                      <div className={`h-full ${therapy.color}`} style={{
+                    width: isVisible ? `${therapy.hours / maxHours * 100}%` : '0%',
+                    transitionProperty: 'width',
+                    transitionDuration: therapy.duration,
+                    transitionDelay: therapy.delay,
+                    transitionTimingFunction: 'ease-out',
+                    willChange: 'width'
                   }} />
                        {/* Icons positioned at specific percentages */}
                        <div className="absolute inset-0 flex items-center">
