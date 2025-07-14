@@ -12,7 +12,7 @@ export const TargetAudienceSection = () => {
         "Test preverjanja izgovorjave glasov omogoča avtomatizirano analizo govora za učinkovito obravnavo",
         "Personalizirane vaje in igre za individualno prilagojeno terapijo.",
         "Objektivno spremljanje napredka, kar poveča učinkovitost terapije.",
-        "Možnost uporabe kot dopolnilo v ordinaciji ali kot vodeno delo za domačo vadbo.",
+        "Uporabno kot dopolnilo v ordinaciji ali kot vodeno delo za domačo vadbo.",
         "Več časa za neposredno delo z otrokom in učinkovitejše terapije."
       ],
       bgColor: "bg-white",
