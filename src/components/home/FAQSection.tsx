@@ -1,21 +1,11 @@
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { ChevronDown } from "lucide-react";
-import { useState } from "react";
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const FAQSection = () => {
-  const [openItems, setOpenItems] = useState<number[]>([]);
-
-  const toggleItem = (index: number) => {
-    setOpenItems(prev => 
-      prev.includes(index) 
-        ? prev.filter(i => i !== index)
-        : [...prev, index]
-    );
-  };
 
   const faqData = [
     {
@@ -61,7 +51,7 @@ const FAQSection = () => {
   ];
 
   return (
-    <section className="py-16 bg-background">
+    <section className="py-16 bg-light-cloud">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
@@ -69,37 +59,32 @@ const FAQSection = () => {
           </h2>
         </div>
         
-        <div className="max-w-4xl mx-auto space-y-4">
-          {faqData.map((faq, index) => (
-            <Collapsible
-              key={index}
-              open={openItems.includes(index)}
-              onOpenChange={() => toggleItem(index)}
-            >
-              <div className="bg-card border border-border rounded-lg shadow-sm">
-                <CollapsibleTrigger className="w-full px-6 py-4 text-left hover:bg-muted/50 transition-colors duration-200 rounded-lg">
-                  <div className="flex items-center justify-between">
+        <div className="max-w-4xl mx-auto">
+          <Accordion type="single" collapsible className="space-y-4">
+            {faqData.map((faq, index) => (
+              <AccordionItem 
+                key={index} 
+                value={`item-${index}`}
+                className="bg-card border border-border rounded-lg shadow-sm"
+              >
+                <AccordionTrigger className="w-full px-6 py-4 text-left hover:bg-muted/50 transition-colors duration-200 rounded-lg [&[data-state=open]>div>svg]:rotate-180">
+                  <div className="flex items-center justify-between w-full">
                     <h3 className="text-lg font-semibold text-card-foreground pr-4">
                       {faq.question}
                     </h3>
-                    <ChevronDown 
-                      className={`w-5 h-5 text-muted-foreground transition-transform duration-200 flex-shrink-0 ${
-                        openItems.includes(index) ? 'transform rotate-180' : ''
-                      }`}
-                    />
                   </div>
-                </CollapsibleTrigger>
+                </AccordionTrigger>
                 
-                <CollapsibleContent>
+                <AccordionContent>
                   <div className="px-6 pb-4">
                     <p className="text-muted-foreground leading-relaxed">
                       {faq.answer}
                     </p>
                   </div>
-                </CollapsibleContent>
-              </div>
-            </Collapsible>
-          ))}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </div>
       </div>
     </section>

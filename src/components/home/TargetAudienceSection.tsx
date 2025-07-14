@@ -28,7 +28,7 @@ export const TargetAudienceSection = () => {
         "Večja povezanost staršev in otrok preko skupnih aktivnosti.",
         "Konstantna strokovna podpora ter praktični nasveti za starše."
       ],
-      bgColor: "bg-gradient-to-br from-dragon-green/10 to-app-teal/10",
+      bgColor: "bg-white",
       titleColor: "text-dragon-green"
     },
     {
@@ -47,7 +47,7 @@ export const TargetAudienceSection = () => {
   ];
 
   return (
-    <section className="py-14 px-4 md:px-10 bg-background w-full">
+    <section className="py-14 px-4 md:px-10 bg-light-cloud w-full">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
