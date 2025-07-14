@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Trophy, Medal, Award } from "lucide-react";
 
 const ProgressComparisonSection = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -22,9 +23,9 @@ const ProgressComparisonSection = () => {
   }, []);
 
   const therapyData = [
-    { name: "🟩 TomiTalk", hours: 180, color: "bg-green-500" },
-    { name: "🟧 Samoplačniško", hours: 50, color: "bg-orange-500" },
-    { name: "🟪 Javno zdravstvo", hours: 25, color: "bg-purple-500" }
+    { name: "TomiTalk", hours: 180, color: "bg-green-500", icon: Trophy, iconColor: "text-yellow-600" },
+    { name: "Samoplačniško", hours: 50, color: "bg-orange-500", icon: Medal, iconColor: "text-gray-600" },
+    { name: "Javno zdravstvo", hours: 25, color: "bg-purple-500", icon: Award, iconColor: "text-purple-600" }
   ];
 
   const maxHours = 180;
@@ -52,30 +53,22 @@ const ProgressComparisonSection = () => {
             <div className="space-y-8">
               {therapyData.map((therapy, index) => (
                 <div key={therapy.name} className="space-y-3">
-                  <div className="flex flex-col">
-                    <span className="font-medium text-gray-900 mb-1">{therapy.name}</span>
-                    <span className="text-sm font-semibold text-gray-700">{therapy.hours}h letno</span>
+                  <div className="flex items-center gap-3 mb-2">
+                    <therapy.icon className={`w-6 h-6 ${therapy.iconColor}`} />
+                    <div className="flex flex-col">
+                      <span className="font-medium text-gray-900">{therapy.name}</span>
+                      <span className="text-sm font-semibold text-gray-700">(povp. {therapy.hours} ur/leto)</span>
+                    </div>
                   </div>
                   <div className="relative">
                     <div className="w-full bg-gray-200 rounded-full h-6 overflow-hidden">
                       <div
-                        className={`h-full ${therapy.color} transition-all duration-4000 ease-out relative`}
+                        className={`h-full ${therapy.color} transition-all duration-4000 ease-out`}
                         style={{
                           width: isVisible ? `${(therapy.hours / maxHours) * 100}%` : '0%',
                           transitionDelay: `${index * 300}ms`
                         }}
-                      >
-                        <div className="absolute right-0 top-0 h-full w-1 bg-white/30"></div>
-                      </div>
-                    </div>
-                    <div 
-                      className="absolute right-0 top-1/2 transform -translate-y-1/2 transition-all duration-4000 ease-out"
-                      style={{
-                        right: isVisible ? `${100 - (therapy.hours / maxHours) * 100}%` : '100%',
-                        transitionDelay: `${index * 300}ms`
-                      }}
-                    >
-                      <div className="w-2 h-8 bg-gray-800 rounded-sm shadow-md"></div>
+                      />
                     </div>
                   </div>
                 </div>
