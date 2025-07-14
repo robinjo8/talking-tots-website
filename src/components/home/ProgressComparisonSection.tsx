@@ -6,10 +6,10 @@ const ProgressComparisonSection = () => {
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
-        setIsVisible(true);
+        setTimeout(() => setIsVisible(true), 100);
       }
     }, {
-      threshold: 0.3
+      threshold: 0.1
     });
     if (sectionRef.current) {
       observer.observe(sectionRef.current);
@@ -44,7 +44,7 @@ const ProgressComparisonSection = () => {
           </h2>
         </div>
 
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <div className="bg-white rounded-lg shadow-lg p-8">
             <div className="text-center mb-8">
               <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4">
@@ -64,7 +64,7 @@ const ProgressComparisonSection = () => {
                   </div>
                   <div className="relative">
                     <div className="w-full bg-gray-200 rounded-full h-6 overflow-hidden relative">
-                      <div className={`h-full ${therapy.color} transition-all duration-[35000ms] ease-in-out`} style={{
+                      <div className={`h-full ${therapy.color} transition-all duration-[35000ms] ease-linear`} style={{
                     width: isVisible ? `${therapy.hours / maxHours * 100}%` : '0%'
                   }} />
                        {/* Icons positioned at specific percentages */}
