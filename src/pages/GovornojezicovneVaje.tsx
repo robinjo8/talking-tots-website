@@ -115,7 +115,7 @@ const GovornojezicovneVaje = () => {
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-28 md:pt-32 pb-20 px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           {exerciseTypes.map((exercise) => (
             <Card 
               key={exercise.id}
@@ -134,16 +134,16 @@ const GovornojezicovneVaje = () => {
                   </div>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-6 pb-4 flex-grow">
-                <h3 className={`text-lg font-semibold mb-2 ${exercise.color} text-center`}>{exercise.title}</h3>
-                {!exercise.available && (
-                  <div className="text-center mb-3">
-                    <span className="text-sm text-muted-foreground italic">Kmalu na voljo</span>
-                  </div>
-                )}
+              <CardContent className="pt-6 pb-4 flex-grow text-center">
+                <h3 className={`text-lg font-semibold mb-2 ${exercise.color}`}>{exercise.title}</h3>
                 <p className="text-sm text-gray-600 mb-3">{exercise.description}</p>
                 {exercise.example && (
                   <p className="text-xs text-gray-500 italic">{exercise.example}</p>
+                )}
+                {!exercise.available && (
+                  <div className="mt-3 text-sm text-muted-foreground italic">
+                    Kmalu na voljo
+                  </div>
                 )}
               </CardContent>
             </Card>
