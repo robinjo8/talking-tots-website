@@ -53,9 +53,9 @@ export const HeroSection = () => {
 
   return (
     <>
-      <section className="pt-24 md:pt-32 pb-10 px-4 md:px-[40px]">
-        <div className="absolute -top-10 -left-10 w-32 h-32 bg-app-yellow/20 rounded-full blur-3xl"></div>
-        <div className="absolute top-40 -right-10 w-60 h-60 bg-app-blue/20 rounded-full blur-3xl"></div>
+      <section className="pt-24 md:pt-32 pb-10 px-4 md:px-[40px] overflow-hidden relative">
+        <div className="absolute -top-10 -left-10 w-32 h-32 bg-app-yellow/20 rounded-full blur-3xl opacity-50"></div>
+        <div className="absolute top-40 -right-10 w-60 h-60 bg-app-blue/20 rounded-full blur-3xl opacity-50"></div>
         
         <div className="max-w-6xl mx-auto">
           {/* Mobile Layout - Centered */}
@@ -63,7 +63,7 @@ export const HeroSection = () => {
             <div
               className={`flex flex-col items-center text-center space-y-6 ${
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-              } transition-all duration-700 ease-out w-full max-w-sm mx-auto px-4`}
+              } transition-all duration-700 ease-out w-full max-w-full mx-auto`}
             >
               {/* Main Headlines - Centered */}
               <div className="mb-4 w-full">
@@ -109,7 +109,7 @@ export const HeroSection = () => {
               </div>
               
               {/* Trust Badges - Centered and padded */}
-              <div className="flex justify-center gap-4 mb-6 py-5 w-full max-w-sm mx-auto">
+              <div className="flex justify-center gap-2 mb-6 py-5 w-full px-2">
                 <div className="flex-1 min-w-0 flex flex-col items-center text-center">
                   <div className="w-16 h-16 mb-2 rounded-full bg-gradient-to-br from-dragon-green to-app-teal flex items-center justify-center shadow-lg border-2 border-white">
                     <CheckCircle className="h-8 w-8 text-white" />
