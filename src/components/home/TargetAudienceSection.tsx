@@ -1,4 +1,5 @@
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 export const TargetAudienceSection = () => {
   const isMobile = useIsMobile();
@@ -54,38 +55,88 @@ export const TargetAudienceSection = () => {
           </h2>
         </div>
         
-        <div className={`${isMobile ? 'flex flex-col space-y-6' : 'grid grid-cols-3 gap-6'}`}>
-          {audiences.map((audience, index) => (
-            <div 
-              key={index} 
-              className={`${audience.bgColor} rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 md:p-8 h-full flex flex-col border border-gray-100`}
-            >
-              {/* Title */}
-              <div className="text-center mb-6">
-                <h3 className={`text-xl md:text-2xl font-bold ${audience.titleColor} mb-2`}>
+        {isMobile ? (
+          // Mobile: Tab interface
+          <Tabs defaultValue="DRUŽINAM" className="w-full">
+            <TabsList className="grid w-full grid-cols-3 mb-8">
+              {audiences.map((audience) => (
+                <TabsTrigger 
+                  key={audience.title} 
+                  value={audience.title}
+                  className="text-xs sm:text-sm font-medium"
+                >
                   {audience.title}
-                </h3>
-                <p className="text-gray-700 font-semibold text-base md:text-lg">
-                  {audience.subtitle}
-                </p>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            
+            {audiences.map((audience) => (
+              <TabsContent key={audience.title} value={audience.title}>
+                <div 
+                  className={`${audience.bgColor} rounded-xl shadow-md p-6 border border-gray-100`}
+                >
+                  {/* Title */}
+                  <div className="text-center mb-6">
+                    <h3 className={`text-xl font-bold ${audience.titleColor} mb-2`}>
+                      {audience.title}
+                    </h3>
+                    <p className="text-gray-700 font-semibold text-base">
+                      {audience.subtitle}
+                    </p>
+                  </div>
+                  
+                  {/* Benefits List */}
+                  <div>
+                    <ul className="space-y-3">
+                      {audience.benefits.map((benefit, benefitIndex) => (
+                        <li key={benefitIndex} className="flex items-start">
+                          <div className={`w-2 h-2 rounded-full ${audience.titleColor.replace('text-', 'bg-')} flex-shrink-0 mt-2 mr-3`}></div>
+                          <span className="text-gray-700 text-sm leading-relaxed">
+                            {benefit}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </TabsContent>
+            ))}
+          </Tabs>
+        ) : (
+          // Desktop: Grid layout
+          <div className="grid grid-cols-3 gap-6">
+            {audiences.map((audience, index) => (
+              <div 
+                key={index} 
+                className={`${audience.bgColor} rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-8 h-full flex flex-col border border-gray-100`}
+              >
+                {/* Title */}
+                <div className="text-center mb-6">
+                  <h3 className={`text-2xl font-bold ${audience.titleColor} mb-2`}>
+                    {audience.title}
+                  </h3>
+                  <p className="text-gray-700 font-semibold text-lg">
+                    {audience.subtitle}
+                  </p>
+                </div>
+                
+                {/* Benefits List */}
+                <div className="flex-grow">
+                  <ul className="space-y-3">
+                    {audience.benefits.map((benefit, benefitIndex) => (
+                      <li key={benefitIndex} className="flex items-start">
+                        <div className={`w-2 h-2 rounded-full ${audience.titleColor.replace('text-', 'bg-')} flex-shrink-0 mt-2 mr-3`}></div>
+                        <span className="text-gray-700 text-base leading-relaxed">
+                          {benefit}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-              
-              {/* Benefits List */}
-              <div className="flex-grow">
-                <ul className="space-y-3">
-                  {audience.benefits.map((benefit, benefitIndex) => (
-                    <li key={benefitIndex} className="flex items-start">
-                      <div className={`w-2 h-2 rounded-full ${audience.titleColor.replace('text-', 'bg-')} flex-shrink-0 mt-2 mr-3`}></div>
-                      <span className="text-gray-700 text-sm md:text-base leading-relaxed">
-                        {benefit}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
