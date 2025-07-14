@@ -30,7 +30,7 @@ const FAQSection = () => {
     },
     {
       question: "Ali aplikacija omogoča podporo logopedov?",
-      answer: "Da, TomiTalk ponuja strokovno podporo logopedov, video navodila za pravilno izvajanje vaj ter strokovne članke v razdelkih »Logopedski kotiček« in »Blog«."
+      answer: "Da, TomiTalk ponuja strokovno podporo logopedov, video navodila za pravilno izvajanje vaj ter strokovne članke v razdelkih »Logopedski nasveti« in »Blog«."
     },
     {
       question: "Kako varen je TomiTalk za uporabo?",

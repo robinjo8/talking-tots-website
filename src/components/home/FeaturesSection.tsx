@@ -7,9 +7,6 @@ export const FeaturesSection = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Kako TomiTalk deluje?</h2>
-          <p className="text-xl text-muted-foreground max-w-xl mx-auto">
-            Naša aplikacija omogoča razvoj govora na zabaven in učinkovit način s pomočjo interaktivnih funkcij
-          </p>
         </div>
         
         <FeaturesCarousel />

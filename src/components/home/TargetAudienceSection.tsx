@@ -9,13 +9,13 @@ export const TargetAudienceSection = () => {
       title: "LOGOPEDOM",
       subtitle: "Prednosti za logopede:",
       benefits: [
-        "Avtomatizirana analiza govora za lažjo diagnostiko.",
+        "Test preverjanja izgovorjave glasov omogoča avtomatizirano analizo govora za učinkovito obravnavo",
         "Personalizirane vaje in igre za individualno prilagojeno terapijo.",
         "Objektivno spremljanje napredka, kar poveča učinkovitost terapije.",
-        "Zgodnje prepoznavanje spremljajočih psihosocialnih težav.",
+        "Možnost uporabe kot dopolnilo v ordinaciji ali kot vodeno delo za domačo vadbo.",
         "Več časa za neposredno delo z otrokom in učinkovitejše terapije."
       ],
-      bgColor: "bg-gradient-to-br from-app-blue/10 to-app-teal/10",
+      bgColor: "bg-white",
       titleColor: "text-app-blue"
     },
     {
@@ -24,7 +24,7 @@ export const TargetAudienceSection = () => {
       benefits: [
         "Hitrejši in opaznejši napredek pri govornem razvoju.",
         "Otroci z veseljem izvajajo vaje v obliki zabavnih iger.",
-        "Manjša verjetnost razvoja psihosocialnih težav (tesnoba, nizka samozavest, socialna izolacija).",
+        "Izboljša čustveno stabilnost in socialne veščine, kar zmanjšuje verjetnost pojava tesnobe in nizke samopodobe.",
         "Večja povezanost staršev in otrok preko skupnih aktivnosti.",
         "Konstantna strokovna podpora ter praktični nasveti za starše."
       ],
@@ -41,7 +41,7 @@ export const TargetAudienceSection = () => {
         "Manjša verjetnost psihosocialnih težav in boljša splošna klima v skupini.",
         "Bolj zadovoljni starši, ki cenijo kakovostno obravnavo otrok v vašem vrtcu."
       ],
-      bgColor: "bg-gradient-to-br from-app-orange/10 to-app-yellow/10",
+      bgColor: "bg-white",
       titleColor: "text-app-orange"
     }
   ];

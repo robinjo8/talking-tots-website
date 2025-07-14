@@ -51,7 +51,7 @@ export function DesktopNavigation({ user, onStartNow, onCenikScroll }: DesktopNa
                 (isActivePath(link.path) ? 'bg-accent' : '')
               }
             >
-              {link.label === "Logopedski kotiček" && <BookOpen className="h-4 w-4 mr-2" />}
+              {link.label === "Logopedski nasveti" && <BookOpen className="h-4 w-4 mr-2" />}
               {link.label}
             </Button>
           ))}

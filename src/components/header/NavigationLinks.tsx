@@ -28,7 +28,7 @@ export const navigationLinks: NavigationLink[] = [{
   path: "/video-navodila",
   icon: Video
 }, {
-  label: "Logopedski kotiček",
+  label: "Logopedski nasveti",
   path: "/logopedski-koticek",
   icon: BookOpen
 }, {

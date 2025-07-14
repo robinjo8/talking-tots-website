@@ -31,7 +31,7 @@ export function SubscriptionSection() {
     { icon: <Target className="h-4 w-4 text-dragon-green" />, text: "Napredno testiranje izgovorjave" },
     { icon: <Gamepad2 className="h-4 w-4 text-app-purple" />, text: "Dostop do govornih vaj in iger" },
     { icon: <Video className="h-4 w-4 text-app-teal" />, text: "Video navodila logopeda" },
-    { icon: <BookOpen className="h-4 w-4 text-app-orange" />, text: "Logopedski kotiček za starše" },
+    { icon: <BookOpen className="h-4 w-4 text-app-orange" />, text: "Logopedski nasveti za starše" },
     { icon: <MessageCircle className="h-4 w-4 text-app-blue" />, text: "Pogovor s pametnim AI asistentom" },
     { icon: <TrendingUp className="h-4 w-4 text-dragon-green" />, text: "Sledenje napredku otroka" },
     { icon: <FileText className="h-4 w-4 text-app-purple" />, text: "Prilagojen govorni načrt" }

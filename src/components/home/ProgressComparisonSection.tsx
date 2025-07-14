@@ -103,7 +103,7 @@ const ProgressComparisonSection = () => {
                 <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4">
                   Neomejene TomiTalk vaje in igre vs. samoplačniške metode
                 </h3>
-                <p className="text-lg text-gray-600 leading-relaxed">Za ceno le 1,5 obiska pri samoplačniškem logopedu prejmete celoletno naročnino na TomiTalk – z vsakodnevnimi personaliziranimi vajami, igrami in sledenjem napredku.</p>
+                <p className="text-lg text-gray-600 leading-relaxed">Za ceno le 1,5 obiska pri samoplačniškem logopedu prejmete celoletno naročnino na TomiTalk</p>
               </div>
 
               {/* Bar chart */}
@@ -153,9 +153,7 @@ const ProgressComparisonSection = () => {
               {/* Description */}
               <div className="text-center">
                 <p className="text-sm text-gray-600 leading-relaxed">
-                  Primer temelji na 50 individualnih urah letno pri zasebni logopedski obravnavi.
-                  <br />
-                  Več kot ima otrok individualnih obravnav, bolj izrazita je cenovna prednost TomiTalk, ki omogoča neomejene vaje vse leto, kjerkoli in kadarkoli.
+                  Temelji na 50 individualnih urah letno pri zasebni logopedski obravnavi. Več kot ima otrok individualnih obravnav, bolj izrazita je cenovna prednost TomiTalk
                 </p>
               </div>
             </div>

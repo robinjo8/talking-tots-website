@@ -46,18 +46,18 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
   const menuItems = [
     // These items will only be shown in mobile view when user is logged in
     {
-      label: "Moja stran",
-      path: "/moja-stran",
-      icon: Home,
+      label: "Vaje",
+      path: "/govorno-jezikovne-vaje",
+      icon: Activity,
       active: true,
       showOnDesktop: false,
       showOnMobile: true,
       showWhenLoggedIn: true,
     },
     {
-      label: "Vaje",
-      path: "/govorno-jezikovne-vaje",
-      icon: Activity,
+      label: "Moja stran",
+      path: "/moja-stran",
+      icon: Home,
       active: true,
       showOnDesktop: false,
       showOnMobile: true,
