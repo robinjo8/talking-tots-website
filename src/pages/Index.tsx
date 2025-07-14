@@ -2,12 +2,12 @@
 import Header from "@/components/Header";
 import { HeroSection } from "@/components/home/HeroSection";
 import { TargetAudienceSection } from "@/components/home/TargetAudienceSection";
-import { TestimonialsSection } from "@/components/home/TestimonialsSection";
-import ProgressComparisonSection from "@/components/ProgressComparisonSection";
-import NewProgressComparisonSection from "@/components/home/ProgressComparisonSection";
 import { FeaturesSection } from "@/components/home/FeaturesSection";
-import { CallToActionSection } from "@/components/home/CallToActionSection";
+import NewProgressComparisonSection from "@/components/home/ProgressComparisonSection";
+import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import PricingSection from "@/components/PricingSection";
+import FAQSection from "@/components/home/FAQSection";
+import { CallToActionSection } from "@/components/home/CallToActionSection";
 import { FooterSection } from "@/components/home/FooterSection";
 
 const Index = () => {
@@ -21,23 +21,23 @@ const Index = () => {
       {/* Target Audience Section */}
       <TargetAudienceSection />
 
+      {/* Features Section */}
+      <FeaturesSection />
+
+      {/* Progress Comparison Section */}
+      <NewProgressComparisonSection />
+
       {/* Testimonials Section */}
       <TestimonialsSection />
 
-      {/* New Progress Comparison Section */}
-      <NewProgressComparisonSection />
-
-      {/* Progress Comparison Section */}
-      <ProgressComparisonSection />
-
-      {/* Features Section */}
-      <FeaturesSection />
-      
-      {/* Call to Action with Dragon */}
-      <CallToActionSection />
-
       {/* Pricing Section */}
       <PricingSection />
+
+      {/* FAQ Section */}
+      <FAQSection />
+      
+      {/* Call to Action Section */}
+      <CallToActionSection />
 
       {/* Footer */}
       <FooterSection />
