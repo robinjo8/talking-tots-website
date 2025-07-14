@@ -1,13 +1,25 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Menu, Play, UserPlus, LogOut } from "lucide-react";
+import { 
+  Menu, 
+  Play, 
+  UserPlus, 
+  LogOut, 
+  Home, 
+  Activity, 
+  Gamepad, 
+  Award, 
+  Video, 
+  BookOpen,
+  Bell,
+  CreditCard,
+  User
+} from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ProfileSelector } from "./ProfileSelector";
-import { navigationLinks } from "./NavigationLinks";
 import { Profile } from "@/contexts/AuthContext";
 
 interface MobileMenuProps {
@@ -79,17 +91,19 @@ export function MobileMenu({
         <SheetContent side="right" className="p-0 w-80">
           <ScrollArea className="h-[90vh]">
             <div className="flex flex-col p-6 space-y-6">
-              {/* Always visible links on mobile drawer */}
-              <div className="flex flex-row items-center gap-2 pb-3">
-                <Button 
-                  type="button"
-                  variant="ghost"
-                  className="font-semibold flex-1 h-12 rounded-full text-base"
-                  onClick={onCenikScroll}
-                >
-                  Cenik
-                </Button>
-              </div>
+              {/* Show Cenik only when NOT logged in */}
+              {!user && (
+                <div className="flex flex-row items-center gap-2 pb-3">
+                  <Button 
+                    type="button"
+                    variant="default"
+                    className="font-semibold flex-1 h-12 rounded-full text-base w-full"
+                    onClick={onCenikScroll}
+                  >
+                    Cenik
+                  </Button>
+                </div>
+              )}
               
               {user && (
                 <>
@@ -100,40 +114,109 @@ export function MobileMenu({
                     userEmail={user.email}
                   />
                   
-                  {/* Main navigation */}
+                  {/* Main navigation - custom order with Moja stran first */}
                   <div className="space-y-3">
                     <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Navigacija</h3>
-                    {navigationLinks.map((link, index) => (
-                      <Button 
-                        key={index}
-                        variant="ghost" 
-                        className={`w-full justify-start text-left h-12 ${
-                          !link.disabled ? '' : 'opacity-50 cursor-not-allowed'
-                        } ${isActivePath(link.path) ? 'bg-accent' : ''}`}
-                        onClick={() => {
-                          if (!link.disabled) {
-                            if (link.options) {
-                              handleNavigate(link.path, link.options);
-                            } else {
-                              handleNavigate(link.path);
-                            }
-                          }
-                        }}
-                        disabled={link.disabled}
-                      >
-                        <link.icon className="h-5 w-5 mr-3" />
-                        <span className="font-medium">{link.label}</span>
-                      </Button>
-                    ))}
                     
-                    {/* Logout button */}
+                    {/* Moja stran - FIRST */}
                     <Button 
                       variant="ghost" 
-                      className="w-full justify-start text-left h-12 text-red-600 hover:text-red-700 hover:bg-red-50"
+                      className={`w-full justify-start text-left h-12 ${isActivePath('/moja-stran') ? 'bg-accent' : ''}`}
+                      onClick={() => handleNavigate('/moja-stran')}
+                    >
+                      <Home className="h-4 w-4 mr-2" />
+                      Moja stran
+                    </Button>
+                    
+                    {/* Vaje - SECOND */}
+                    <Button 
+                      variant="ghost" 
+                      className={`w-full justify-start text-left h-12 ${isActivePath('/govorno-jezikovne-vaje') ? 'bg-accent' : ''}`}
+                      onClick={() => handleNavigate('/govorno-jezikovne-vaje')}
+                    >
+                      <Activity className="h-4 w-4 mr-2" />
+                      Vaje
+                    </Button>
+                    
+                    {/* Igre - THIRD */}
+                    <Button 
+                      variant="ghost" 
+                      className={`w-full justify-start text-left h-12 ${isActivePath('/govorne-igre') ? 'bg-accent' : ''}`}
+                      onClick={() => handleNavigate('/govorne-igre')}
+                    >
+                      <Gamepad className="h-4 w-4 mr-2" />
+                      Igre
+                    </Button>
+                    
+                    {/* Izzivi - FOURTH */}
+                    <Button 
+                      variant="ghost" 
+                      className={`w-full justify-start text-left h-12 ${isActivePath('/moji-izzivi') ? 'bg-accent' : ''}`}
+                      onClick={() => handleNavigate('/moji-izzivi')}
+                    >
+                      <Award className="h-4 w-4 mr-2" />
+                      Izzivi
+                    </Button>
+                    
+                    {/* Video navodila - FIFTH */}
+                    <Button 
+                      variant="ghost" 
+                      className={`w-full justify-start text-left h-12 ${isActivePath('/video-navodila') ? 'bg-accent' : ''}`}
+                      onClick={() => handleNavigate('/video-navodila')}
+                    >
+                      <Video className="h-4 w-4 mr-2" />
+                      Video navodila
+                    </Button>
+                    
+                    {/* Logopedski nasveti - SIXTH */}
+                    <Button 
+                      variant="ghost" 
+                      className={`w-full justify-start text-left h-12 ${isActivePath('/logopedski-koticek') ? 'bg-accent' : ''}`}
+                      onClick={() => handleNavigate('/logopedski-koticek')}
+                    >
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      Logopedski nasveti
+                    </Button>
+                  </div>
+                  
+                  {/* User menu items */}
+                  <div className="space-y-3 pt-4 border-t">
+                    <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Račun</h3>
+                    
+                    <Button 
+                      variant="ghost" 
+                      className="w-full justify-start text-left h-12 opacity-50 cursor-not-allowed"
+                      disabled={true}
+                    >
+                      <Bell className="h-4 w-4 mr-2" />
+                      Obvestila
+                    </Button>
+                    
+                    <Button 
+                      variant="ghost" 
+                      className={`w-full justify-start text-left h-12 ${isActivePath('/profile') ? 'bg-accent' : ''}`}
+                      onClick={() => handleNavigate('/profile', { expandSection: 'subscription' })}
+                    >
+                      <CreditCard className="h-4 w-4 mr-2" />
+                      Moja naročnina
+                    </Button>
+                    
+                    <Button 
+                      variant="ghost" 
+                      className={`w-full justify-start text-left h-12 ${isActivePath('/profile') ? 'bg-accent' : ''}`}
+                      onClick={() => handleNavigate('/profile')}
+                    >
+                      <User className="h-4 w-4 mr-2" />
+                      Nastavitve
+                    </Button>
+                    
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start text-left h-12 mt-4"
                       onClick={onSignOut}
                     >
-                      <LogOut className="h-5 w-5 mr-3" />
-                      <span className="font-medium">Odjava</span>
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Odjava
                     </Button>
                   </div>
                 </>
