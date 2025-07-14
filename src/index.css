@@ -78,6 +78,7 @@
   }
   html {
     @apply overflow-x-hidden;
+    scrollbar-gutter: stable;
   }
 }
 
