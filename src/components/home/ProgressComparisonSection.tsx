@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Trophy, Medal, Award } from "lucide-react";
+import { Trophy, Award, Crown } from "lucide-react";
 const ProgressComparisonSection = () => {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -26,13 +26,13 @@ const ProgressComparisonSection = () => {
     name: "Samoplačniško",
     hours: 50,
     color: "bg-orange-500",
-    icon: Medal,
+    icon: Trophy,
     iconColor: "text-gray-600"
   }, {
     name: "Javno zdravstvo",
     hours: 25,
     color: "bg-purple-500",
-    icon: Award,
+    icon: Trophy,
     iconColor: "text-purple-600"
   }];
   const maxHours = 180;
@@ -67,14 +67,12 @@ const ProgressComparisonSection = () => {
                       <div className={`h-full ${therapy.color} transition-all duration-[35000ms] ease-in-out`} style={{
                     width: isVisible ? `${therapy.hours / maxHours * 100}%` : '0%'
                   }} />
-                      {/* Icons positioned across the bar */}
-                      <div className="absolute inset-0 flex items-center justify-evenly px-2">
-                        <therapy.icon className="w-4 h-4 text-white drop-shadow-sm" />
-                        <therapy.icon className="w-4 h-4 text-white drop-shadow-sm" />
-                        <therapy.icon className="w-4 h-4 text-white drop-shadow-sm" />
-                        <therapy.icon className="w-4 h-4 text-white drop-shadow-sm" />
-                        <therapy.icon className="w-4 h-4 text-white drop-shadow-sm" />
-                      </div>
+                       {/* Icons positioned at specific percentages */}
+                       <div className="absolute inset-0 flex items-center">
+                         <Trophy className="w-4 h-4 text-white drop-shadow-sm absolute" style={{ left: '45%', transform: 'translateX(-50%)' }} />
+                         <Award className="w-4 h-4 text-white drop-shadow-sm absolute" style={{ left: '70%', transform: 'translateX(-50%)' }} />
+                         <Crown className="w-4 h-4 text-white drop-shadow-sm absolute" style={{ left: '90%', transform: 'translateX(-50%)' }} />
+                       </div>
                     </div>
                   </div>
                 </div>)}
