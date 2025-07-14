@@ -44,7 +44,7 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
 
   // Menu items configuration with visibility control
   const menuItems = [
-    // These items will only be shown in mobile view when user is logged in
+    // FIRST: Moja stran - should appear at the top of mobile navigation
     {
       label: "Moja stran",
       path: "/moja-stran",
@@ -54,6 +54,7 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
       showOnMobile: true,
       showWhenLoggedIn: true,
     },
+    // SECOND: Vaje
     {
       label: "Vaje",
       path: "/govorno-jezikovne-vaje",
@@ -63,6 +64,7 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
       showOnMobile: true,
       showWhenLoggedIn: true,
     },
+    // THIRD: Govorne igre
     {
       label: "Govorne igre",
       path: "/govorne-igre",
@@ -72,6 +74,7 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
       showOnMobile: true,
       showWhenLoggedIn: true,
     },
+    // FOURTH: Izzivi
     {
       label: "Izzivi",
       path: "/moji-izzivi",
@@ -81,6 +84,7 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
       showOnMobile: true,
       showWhenLoggedIn: true,
     },
+    // FIFTH: Video navodila
     {
       label: "Video navodila",
       path: "/video-navodila",
@@ -90,6 +94,7 @@ export function SidebarNavigation({ isMobileMenu = false }: SidebarNavigationPro
       showOnMobile: true,
       showWhenLoggedIn: true,
     },
+    // SIXTH: Logopedski nasveti
     {
       label: "Logopedski nasveti",
       path: "/logopedski-koticek",
