@@ -42,9 +42,11 @@ export const HeroSection = () => {
   const scrollToFeatures = () => {
     const featuresSection = document.getElementById('features');
     if (featuresSection) {
-      featuresSection.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
+      const headerHeight = 80; // Account for fixed header
+      const elementPosition = featuresSection.offsetTop - headerHeight;
+      window.scrollTo({
+        top: elementPosition,
+        behavior: 'smooth'
       });
     }
   };
