@@ -56,7 +56,6 @@ const ProgressComparisonSection = () => {
             <div className="space-y-8 mb-8">
               {therapyData.map((therapy, index) => <div key={therapy.name} className="space-y-3">
                   <div className="flex items-center gap-3 mb-2">
-                    <therapy.icon className={`w-6 h-6 ${therapy.iconColor}`} />
                     <div className="flex flex-col">
                       <span className="font-medium text-gray-900">{therapy.name}</span>
                       <span className="text-sm font-semibold text-gray-700">(povp. {therapy.hours} ur/leto)</span>
@@ -64,14 +63,14 @@ const ProgressComparisonSection = () => {
                   </div>
                   <div className="relative">
                     <div className="w-full bg-gray-200 rounded-full h-6 overflow-hidden relative">
-                      <div className={`h-full ${therapy.color} transition-all duration-[35000ms] ease-linear`} style={{
+                      <div className={`h-full ${therapy.color} transition-all duration-[4000ms] ease-linear`} style={{
                     width: isVisible ? `${therapy.hours / maxHours * 100}%` : '0%'
                   }} />
                        {/* Icons positioned at specific percentages */}
                        <div className="absolute inset-0 flex items-center">
-                         <Trophy className="w-4 h-4 text-white drop-shadow-sm absolute" style={{ left: '45%', transform: 'translateX(-50%)' }} />
-                         <Award className="w-4 h-4 text-white drop-shadow-sm absolute" style={{ left: '70%', transform: 'translateX(-50%)' }} />
-                         <Crown className="w-4 h-4 text-white drop-shadow-sm absolute" style={{ left: '90%', transform: 'translateX(-50%)' }} />
+                         <Trophy className={`w-4 h-4 drop-shadow-sm absolute ${index === 0 ? 'text-yellow-400 filter drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]' : 'text-white'}`} style={{ left: '45%', transform: 'translateX(-50%)' }} />
+                         <Award className={`w-4 h-4 drop-shadow-sm absolute ${index === 0 ? 'text-yellow-400 filter drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]' : 'text-white'}`} style={{ left: '70%', transform: 'translateX(-50%)' }} />
+                         <Crown className={`w-4 h-4 drop-shadow-sm absolute ${index === 0 ? 'text-yellow-400 filter drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]' : 'text-white'}`} style={{ left: '90%', transform: 'translateX(-50%)' }} />
                        </div>
                     </div>
                   </div>
