@@ -63,10 +63,9 @@ const ProgressComparisonSection = () => {
                   <div className="relative">
                     <div className="w-full bg-gray-200 rounded-full h-6 overflow-hidden relative">
                       <div
-                        className={`h-full ${therapy.color} transition-all duration-[20000ms] ease-out`}
+                        className={`h-full ${therapy.color} transition-all duration-[35000ms] ease-in-out`}
                         style={{
-                          width: isVisible ? `${(therapy.hours / maxHours) * 100}%` : '0%',
-                          transitionDelay: `${index * 1500}ms`
+                          width: isVisible ? `${(therapy.hours / maxHours) * 100}%` : '0%'
                         }}
                       />
                       {/* Icons positioned across the bar */}
