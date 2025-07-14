@@ -40,10 +40,7 @@ const VideoNavodila = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
-        <p className="text-muted-foreground mb-8">
-          Oglejte si video navodila za pravilno izgovorjavo soglasnikov.
-        </p>
+      <div className="container max-w-5xl mx-auto pt-28 md:pt-32 pb-20 px-4">
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {consonants.map((consonant) => (

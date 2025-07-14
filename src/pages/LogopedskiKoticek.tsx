@@ -90,24 +90,7 @@ const LogopedskiKoticek = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
-        <div className="flex items-center gap-3 mb-8">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="gap-2" 
-            onClick={() => navigate(backPath)}
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Nazaj
-          </Button>
-          <h1 className="text-2xl font-bold text-foreground">
-            Logopedski kotiček
-          </h1>
-        </div>
-        <p className="text-muted-foreground mb-8">
-          Strokovne informacije, nasveti in viri za podporo govornemu razvoju vašega otroka.
-        </p>
+      <div className="container max-w-5xl mx-auto pt-28 md:pt-32 pb-20 px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           {contentSections.map((section) => (
             <Card 

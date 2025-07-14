@@ -8,10 +8,7 @@ export default function MojiIzzivi() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
-        <p className="text-muted-foreground mb-8">
-          Tukaj boš našel svoje govorne izzive, ki jih lahko opraviš za dodatne točke!
-        </p>
+      <div className="container max-w-5xl mx-auto pt-28 md:pt-32 pb-20 px-4">
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           <Card 
