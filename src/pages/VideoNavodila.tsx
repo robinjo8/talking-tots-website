@@ -2,6 +2,8 @@
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { MessageSquare } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Slovenian consonants only
 const consonants = [
@@ -29,6 +31,12 @@ const consonants = [
 
 const VideoNavodila = () => {
   const navigate = useNavigate();
+  const {
+    profile,
+    selectedChildIndex
+  } = useAuth();
+  const selectedChild = profile?.children?.[selectedChildIndex ?? 0];
+  const childName = selectedChild?.name;
 
   const handleLetterClick = (letter: string, available: boolean) => {
     if (available) {
@@ -41,42 +49,91 @@ const VideoNavodila = () => {
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-28 md:pt-32 pb-20 px-4">
+        {/* Instruction speech-bubble */}
+        <Card className="mb-8 bg-gradient-to-r from-sky-50 to-green-50 border-dragon-green/30 shadow-md">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-xl md:text-2xl text-dragon-green">
+              <MessageSquare className="h-5 w-5 text-dragon-green" />
+              Hej, {childName || "Tian"}!
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-2 flex items-center gap-4">
+            <div className="hidden sm:block w-20 h-20">
+              <img 
+                src="/lovable-uploads/4377ec70-1996-47a9-bf05-8093cffcaf0b.png" 
+                alt="Zmajček Tomi" 
+                className="w-full h-full object-contain animate-bounce-gentle"
+              />
+            </div>
+            <div className="flex-1">
+              <p className="text-lg font-medium italic">Na tej strani si lahko izberete črko, ki vas zanima – prikazal se bo video z navodili za pravilno izgovorjavo te črke.</p>
+              <p className="text-sm text-muted-foreground mt-2">Z vajami postajamo vedno boljši!</p>
+            </div>
+          </CardContent>
+        </Card>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {consonants.map((consonant) => (
-            <Card 
-              key={consonant.letter}
-              className={`transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col ${
-                consonant.available 
-                  ? 'cursor-pointer hover:scale-105' 
-                  : 'opacity-60 cursor-not-allowed'
-              }`}
-              onClick={() => handleLetterClick(consonant.letter, consonant.available)}
-            >
-              <CardHeader className={`bg-gradient-to-r ${consonant.gradient} rounded-t-2xl pb-4`}>
-                <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
-                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
-                    <span className={`text-2xl font-bold ${consonant.color}`}>
-                      {consonant.letter}
-                    </span>
-                  </div>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6 pb-4 flex-grow text-center">
-                <h3 className={`text-lg font-semibold mb-2 ${consonant.color}`}>
-                  Črka {consonant.letter}
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Video navodila za izgovorjavo črke {consonant.letter}
-                </p>
-                {!consonant.available && (
+        {/* Available letter section */}
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold text-center mb-8 text-primary">
+            Izberi črko
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {consonants.filter(c => c.available).map((consonant) => (
+              <Card 
+                key={consonant.letter}
+                className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col cursor-pointer hover:scale-105"
+                onClick={() => handleLetterClick(consonant.letter, consonant.available)}
+              >
+                <CardHeader className={`bg-gradient-to-r ${consonant.gradient} rounded-t-2xl pb-4`}>
+                  <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
+                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
+                      <span className={`text-2xl font-bold ${consonant.color}`}>
+                        {consonant.letter}
+                      </span>
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-6 pb-4 flex-grow text-center">
+                  <p className={`text-sm font-semibold mb-2 ${consonant.color}`}>
+                    Video navodila za izgovorjavo črke {consonant.letter}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Unavailable letters section */}
+        <div>
+          <h2 className="text-3xl font-bold text-center mb-8 text-muted-foreground">
+            Kmalu na voljo
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {consonants.filter(c => !c.available).map((consonant) => (
+              <Card 
+                key={consonant.letter}
+                className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col opacity-60 cursor-not-allowed"
+              >
+                <CardHeader className={`bg-gradient-to-r ${consonant.gradient} rounded-t-2xl pb-4`}>
+                  <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
+                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
+                      <span className={`text-2xl font-bold ${consonant.color}`}>
+                        {consonant.letter}
+                      </span>
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-6 pb-4 flex-grow text-center">
+                  <p className={`text-sm font-semibold mb-2 ${consonant.color}`}>
+                    Video navodila za izgovorjavo črke {consonant.letter}
+                  </p>
                   <p className="text-xs text-muted-foreground mt-2 italic">
                     Kmalu na voljo
                   </p>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
     </div>
