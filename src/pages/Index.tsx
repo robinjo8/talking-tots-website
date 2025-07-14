@@ -4,6 +4,7 @@ import { HeroSection } from "@/components/home/HeroSection";
 import { TargetAudienceSection } from "@/components/home/TargetAudienceSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import ProgressComparisonSection from "@/components/ProgressComparisonSection";
+import NewProgressComparisonSection from "@/components/home/ProgressComparisonSection";
 import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { CallToActionSection } from "@/components/home/CallToActionSection";
 import PricingSection from "@/components/PricingSection";
@@ -22,6 +23,9 @@ const Index = () => {
 
       {/* Testimonials Section */}
       <TestimonialsSection />
+
+      {/* New Progress Comparison Section */}
+      <NewProgressComparisonSection />
 
       {/* Progress Comparison Section */}
       <ProgressComparisonSection />
