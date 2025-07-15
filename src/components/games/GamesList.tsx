@@ -10,7 +10,7 @@ const otherGames = [
     title: "Spomin",
     description: "Igraj spomin in vadi izgovorjavo",
     icon: Puzzle,
-    image: "/lovable-uploads/7b964716-839d-4c87-b6b1-04a4f3af5271.png",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/spomin.png",
     color: "text-app-purple",
     gradient: "from-app-purple/10 to-app-blue/10",
     path: "/govorne-igre/spomin",
@@ -32,7 +32,7 @@ const otherGames = [
     title: "Sestavljanke",
     description: "Igraj sestavljanke in vadi logično razmišljanje",
     icon: SquareDashed,
-    image: "/lovable-uploads/72915882-0746-4362-afc3-bebd9148890a.png",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/sestavljanka.png",
     color: "text-app-teal",
     gradient: "from-app-teal/10 to-dragon-green/10",
     path: "/govorne-igre/sestavljanke",
@@ -116,7 +116,7 @@ export function GamesList() {
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-primary">
           Izberi igro
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {activeGames.map((game) => (
             <Card 
               key={game.id}
@@ -124,7 +124,7 @@ export function GamesList() {
                 "transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 overflow-hidden flex flex-col cursor-pointer hover:scale-105"
               )}
               onClick={() => game.path && navigate(game.path)}
-              style={{ aspectRatio: '3/4', minHeight: '300px' }}
+              style={{ aspectRatio: '4/5', minHeight: '240px' }}
             >
               {/* Top colored section with game name */}
               <CardHeader className={`bg-gradient-to-r ${game.gradient} rounded-t-2xl pb-3 sm:pb-4 flex-shrink-0`}>
