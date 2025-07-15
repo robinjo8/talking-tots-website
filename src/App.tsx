@@ -3,8 +3,14 @@ import { AppProviders } from "@/config/providers";
 import { AppRouter } from "@/config/router";
 
 const App = () => {
-  // Add error boundary logging
-  console.log("App component rendering - v2.0 cache bust");
+  // EMERGENCY: Complete cache invalidation - v3.0
+  console.log("🚨 EMERGENCY App component rendering - v3.0 EMERGENCY cache bust - " + Date.now());
+  
+  // Force clear all caches immediately
+  if (typeof window !== 'undefined') {
+    localStorage.clear();
+    sessionStorage.clear();
+  }
   
   return (
     <AppProviders>

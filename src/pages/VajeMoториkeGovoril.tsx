@@ -14,9 +14,11 @@ const VajeMoториkeGovoril = () => {
   const navigate = useNavigate();
   const [selectedCard, setSelectedCard] = useState<number | null>(null);
   const [cacheVersion, setCacheVersion] = useState(Date.now());
+  const [cacheCleared, setCacheCleared] = useState(false);
   
-  // Force browser to recognize this as new version - v2.0
-  const pageVersion = "v2.0-" + Date.now();
+  // EMERGENCY: Force complete cache invalidation - v3.0
+  const pageVersion = "v3.0-EMERGENCY-" + Date.now();
+  const emergencyCacheBuster = `?emergency=${Date.now()}&v=3.0&mobile=${navigator.userAgent.includes('Mobile')}`;
   
   const {
     progress,
@@ -27,30 +29,48 @@ const VajeMoториkeGovoril = () => {
     isCardActive,
   } = useExerciseProgress();
 
-  // Clear caches on component mount
+  // EMERGENCY: Aggressive cache clearing on component mount
   useEffect(() => {
-    const clearCaches = () => {
-      // Clear localStorage items related to caching
-      Object.keys(localStorage).forEach(key => {
-        if (key.includes('cache') || key.includes('vaje-motorike')) {
-          localStorage.removeItem(key);
+    const aggressiveCacheClear = async () => {
+      try {
+        // 1. Clear ALL localStorage and sessionStorage
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // 2. Unregister ALL service workers
+        if ('serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(registrations.map(registration => registration.unregister()));
         }
-      });
-      
-      // Clear sessionStorage
-      sessionStorage.clear();
-      
-      // Force service worker to update if available
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(registrations => {
-          registrations.forEach(registration => {
-            registration.update();
-          });
-        });
+        
+        // 3. Clear all caches API
+        if ('caches' in window) {
+          const cacheNames = await caches.keys();
+          await Promise.all(cacheNames.map(name => caches.delete(name)));
+        }
+        
+        // 4. Force browser cache clear with meta refresh
+        const metaRefresh = document.createElement('meta');
+        metaRefresh.httpEquiv = 'Cache-Control';
+        metaRefresh.content = 'no-cache, no-store, must-revalidate, max-age=0';
+        document.head.appendChild(metaRefresh);
+        
+        // 5. Add mobile-specific cache prevention
+        if (navigator.userAgent.includes('Mobile')) {
+          const mobileMeta = document.createElement('meta');
+          mobileMeta.name = 'cache-control';
+          mobileMeta.content = 'no-store';
+          document.head.appendChild(mobileMeta);
+        }
+        
+        setCacheCleared(true);
+        console.log('✅ EMERGENCY: All caches cleared successfully');
+      } catch (error) {
+        console.error('❌ Cache clearing failed:', error);
       }
     };
     
-    clearCaches();
+    aggressiveCacheClear();
   }, []);
 
   useEffect(() => {
@@ -61,12 +81,13 @@ const VajeMoториkeGovoril = () => {
 
   const handleForceRefresh = () => {
     setCacheVersion(Date.now());
-    // Force hard refresh on mobile
-    if (window.location.reload) {
-      window.location.reload();
-    } else {
-      window.location.href = window.location.href;
-    }
+    // EMERGENCY: Nuclear option for mobile cache
+    window.location.href = window.location.href.split('?')[0] + `?force=${Date.now()}&emergency=true`;
+  };
+  
+  const handleEmergencyReload = () => {
+    // Change URL to bypass cache completely
+    window.location.href = '/govorno-jezikovne-vaje/vaje-motorike-govoril-v2' + emergencyCacheBuster;
   };
 
   const supabaseUrl = "https://ecmtctwovkheohqwahvt.supabase.co";
@@ -136,9 +157,17 @@ const VajeMoториkeGovoril = () => {
             Vaje motorike govoril so namenjene razgibavanju govoril – ust, ustnic in jezika. 
             Začnite z vajo št. 1 in nadaljujte po vrsti.
           </p>
-          {/* Debug indicator - NEW VERSION */}
-          <div className="mt-2 text-xs text-green-600 font-mono">
-            ✅ Nova verzija: {pageVersion}
+          {/* EMERGENCY DEBUG INDICATOR */}
+          <div className="mt-2 p-2 bg-red-100 border border-red-300 rounded text-xs">
+            <div className="text-red-600 font-mono font-bold">
+              🚨 EMERGENCY VERSION: {pageVersion}
+            </div>
+            <div className="text-red-500 mt-1">
+              Cache Status: {cacheCleared ? '✅ Cleared' : '⏳ Clearing...'}
+            </div>
+            <div className="text-red-500">
+              Mobile: {navigator.userAgent.includes('Mobile') ? 'YES' : 'NO'}
+            </div>
           </div>
         </div>
 
@@ -150,17 +179,30 @@ const VajeMoториkeGovoril = () => {
             onReset={resetProgress}
           />
           
-          {/* Force Refresh Button for Mobile Cache Issues */}
-          <div className="text-center">
-            <Button
-              onClick={handleForceRefresh}
-              variant="outline"
-              size="sm"
-              className="text-xs"
-            >
-              <RefreshCw className="h-3 w-3 mr-1" />
-              Osveži stran
-            </Button>
+          {/* EMERGENCY CACHE BUSTING CONTROLS */}
+          <div className="text-center space-y-2">
+            <div className="flex flex-col sm:flex-row gap-2 justify-center">
+              <Button
+                onClick={handleForceRefresh}
+                variant="destructive"
+                size="sm"
+                className="text-xs"
+              >
+                <RefreshCw className="h-3 w-3 mr-1" />
+                🚨 Osveži stran
+              </Button>
+              <Button
+                onClick={handleEmergencyReload}
+                variant="outline"
+                size="sm"
+                className="text-xs border-red-300 text-red-600"
+              >
+                🆘 Emergenčni reload
+              </Button>
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Če še vedno vidite staro različico, uporabite emergenčni reload
+            </div>
           </div>
         </div>
 
@@ -185,8 +227,8 @@ const VajeMoториkeGovoril = () => {
             onClose={handleCloseModal}
             cardNumber={selectedCard}
             instruction={instructions[selectedCard - 1]}
-            imageUrl={`${supabaseUrl}/storage/v1/object/public/${bucketName}/${selectedCard}.jpg?v=${cacheVersion}&t=${Date.now()}`}
-            audioUrl={`${supabaseUrl}/storage/v1/object/public/${bucketName}/${selectedCard}.m4a?v=${cacheVersion}&t=${Date.now()}`}
+            imageUrl={`${supabaseUrl}/storage/v1/object/public/${bucketName}/${selectedCard}.jpg${emergencyCacheBuster}&img=${Date.now()}`}
+            audioUrl={`${supabaseUrl}/storage/v1/object/public/${bucketName}/${selectedCard}.m4a${emergencyCacheBuster}&audio=${Date.now()}`}
             onComplete={handleCompleteCard}
           />
         )}

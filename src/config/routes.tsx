@@ -79,6 +79,15 @@ export function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      {/* EMERGENCY ROUTE - Alternative URL to bypass cache */}
+      <Route 
+        path="/govorno-jezikovne-vaje/vaje-motorike-govoril-v2" 
+        element={
+          <ProtectedRoute>
+            <VajeMoториkeGovoril />
+          </ProtectedRoute>
+        }
+      />
       <Route 
         path="/artikulacija" 
         element={
