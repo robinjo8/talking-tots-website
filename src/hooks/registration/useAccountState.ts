@@ -7,7 +7,7 @@ export function useAccountState() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [selectedPlan, setSelectedPlan] = useState("Mesečna naročnina - 19,90 € / mesec");
+  const [selectedPlan, setSelectedPlan] = useState("yearly");
   const [isCheckingEmail, setIsCheckingEmail] = useState(false);
 
   const checkEmailExists = async (email: string): Promise<boolean> => {
