@@ -1,8 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { Trophy, Award, Crown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 const ProgressComparisonSection = () => {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleStartNow = () => {
+    if (!user) {
+      navigate('/register');
+    }
+  };
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
@@ -148,14 +158,17 @@ const ProgressComparisonSection = () => {
 
               {/* Button */}
               <div className="text-center mb-8 mt-4">
-                <button className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200">
+                <button 
+                  onClick={handleStartNow}
+                  className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200"
+                >
                   Prihranite in začnite zdaj
                 </button>
               </div>
 
               <div className="text-center">
                 <p className="text-gray-600 leading-relaxed">
-                  Temelji na 50 individualnih urah letno pri zasebni logopedski obravnavi. Več kot ima otrok individualnih obravnav, bolj izrazita je cenovna prednost TomiTalk
+                  Temelji na 50 individualnih urah letno pri zasebni logopedski obravnavi. Več kot ima otrok individualnih obravnav, bolj izrazita je cenovna prednost TomiTalk.
                 </p>
               </div>
             </div>
