@@ -34,11 +34,14 @@ export function SpeechDevelopmentQuestions({
 
   return (
     <div className="space-y-6">
-      <SpeechHeader 
-        onBack={onBack} 
-        childName={childName}
-        title="Govorni razvoj za"
-      />
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold text-center">
+          Osnovni vprašalnik
+        </h2>
+        <p className="text-center text-muted-foreground">
+          Vaši odgovori nam bodo pomagali bolje razumeti otroka in prilagoditi vaje njegovim potrebam.
+        </p>
+      </div>
 
       <div className="space-y-6">
         {SPEECH_DEVELOPMENT_QUESTIONS.map((question) => (
@@ -70,6 +73,16 @@ export function SpeechDevelopmentQuestions({
       >
         <ArrowLeft className="h-4 w-4" />
         Nazaj
+      </Button>
+
+      <Button 
+        type="button" 
+        variant="ghost" 
+        size="sm" 
+        onClick={() => onSubmit({})}
+        className="w-full text-muted-foreground"
+      >
+        Ne želim odgovoriti
       </Button>
     </div>
   );
