@@ -25,7 +25,7 @@ const FAQSection = () => {
       answer: "Aplikacija beleži vsakodnevne rezultate vaj in iger, analizira napredek v primerjavi s standardi logopedske stroke, staršem pa omogoča pregledno spremljanje izboljšav skozi čas v razdelku »Moj napredek«."
     },
     {
-      question: "V čem se TomiTalk razlikuje od logopedske obravnave v javnem in zasebnem sektorju?",
+      question: "V čem še TomiTalk razlikuje od drugih logopedskih metod (javno zdravstvo, samoplačniško,...)?",
       answer: "Glavne prednosti TomiTalk-a so dostopnost kadarkoli in kjerkoli, takojšen začetek obravnave brez čakalnih dob, vsakodnevne vaje, stalno spremljanje napredka, motivacija prek zabavnih iger ter ugodna cena. Za ceno le 1,5 obiska pri samoplačniškem logopedu prejmete celoletno naročnino na TomiTalk."
     },
     {
