@@ -61,29 +61,21 @@ export const ExerciseModal = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
-      {/* Close button with white background and red text */}
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 z-10 px-4 py-2 rounded-lg bg-white text-red-600 hover:bg-gray-100 transition-colors font-semibold"
+        className="absolute top-4 right-4 z-10 text-white hover:text-gray-300 transition-colors"
       >
-        Zapri
+        <X className="h-6 w-6" />
       </button>
 
-      {/* Content */}
       <div className="w-full max-w-4xl mx-auto text-center">
-        {/* Instruction */}
         <div className="mb-6">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
             {instruction}
           </h2>
         </div>
 
-        {/* Image with card number on top */}
-        <div className="relative bg-white rounded-xl p-4 shadow-2xl">
-          {/* Card number at top of image with white background and black text */}
-          <div className="absolute top-2 left-2 bg-white text-black px-3 py-1 rounded-lg font-bold text-lg border border-gray-300 z-10">
-            {cardNumber}
-          </div>
+        <div className="bg-white rounded-xl p-4 shadow-2xl">
           <img
             src={imageUrl}
             alt={`Vaja ${cardNumber}: ${instruction}`}
@@ -96,7 +88,13 @@ export const ExerciseModal = ({
           />
         </div>
 
-        {/* Progress indicator */}
+        <button
+          onClick={onComplete}
+          className="mt-6 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-semibold"
+        >
+          Dokončaj vajo
+        </button>
+
         <div className="mt-4 text-white/70 text-sm">
           Vaja {cardNumber} od 27
         </div>
