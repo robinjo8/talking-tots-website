@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, UserX } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Trash2, UserX, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ChildProfile } from "@/hooks/registration/types";
 import { avatarOptions } from "@/components/AvatarSelector";
@@ -161,12 +162,12 @@ export function ChildInformationForm({
                 
                 <div>
                   <Label>Izberi avatarja</Label>
-                  <Select 
-                    value={child.avatarId?.toString() || "0"} 
-                    onValueChange={(value) => updateChildField(child.id, "avatarId", parseInt(value))}
-                  >
-                    <SelectTrigger className="mt-2">
-                      <SelectValue placeholder="Izberi avatarja">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full mt-2 justify-between h-12"
+                      >
                         <div className="flex items-center justify-center">
                           {child.avatarId === 0 || !child.avatarId ? (
                             <UserX className="h-8 w-8 text-gray-400" />
@@ -177,25 +178,38 @@ export function ChildInformationForm({
                             </Avatar>
                           )}
                         </div>
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {avatarOptions.map(avatar => (
-                        <SelectItem key={avatar.id} value={avatar.id.toString()}>
-                          <div className="flex items-center justify-center p-2">
-                            {avatar.id === 0 ? (
-                              <UserX className="h-12 w-12 text-gray-400" />
-                            ) : (
-                              <Avatar className="h-12 w-12">
-                                <AvatarImage src={avatar.src} alt={avatar.alt} />
-                                <AvatarFallback className="text-xs">A</AvatarFallback>
-                              </Avatar>
+                        <ChevronDown className="h-4 w-4 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80 p-4 bg-white border shadow-lg z-50">
+                      <div className="grid grid-cols-3 gap-3">
+                        {avatarOptions.slice(1).map(avatar => (
+                          <div 
+                            key={avatar.id}
+                            onClick={() => updateChildField(child.id, "avatarId", avatar.id)}
+                            className={cn(
+                              "cursor-pointer rounded-lg p-2 transition-all flex items-center justify-center hover:bg-gray-100",
+                              child.avatarId === avatar.id && "bg-dragon-green/20 ring-2 ring-dragon-green"
                             )}
+                          >
+                            <Avatar className="h-12 w-12">
+                              <AvatarImage src={avatar.src} alt={avatar.alt} />
+                              <AvatarFallback className="text-xs">A</AvatarFallback>
+                            </Avatar>
                           </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                        ))}
+                      </div>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => updateChildField(child.id, "avatarId", 0)}
+                        className="w-full mt-4"
+                      >
+                        Ne želim izbrati
+                      </Button>
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div> : <div className="flex items-center gap-3">
                 {child.avatarId === 0 ? <div className="h-12 w-12 rounded-full flex items-center justify-center bg-gray-100">
