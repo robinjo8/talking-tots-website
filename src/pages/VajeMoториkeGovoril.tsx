@@ -21,47 +21,46 @@ const VajeMoториkeGovoril = () => {
     isCardActive,
   } = useExerciseProgress();
 
-  // Aggressive cache clearing for mobile browsers
+  // Smart cache clearing that preserves authentication
   useEffect(() => {
-    const timestamp = Date.now();
-    
-    const clearAllCaches = async () => {
+    const clearCachesSmartly = async () => {
       try {
-        // 1. Clear localStorage and sessionStorage
-        localStorage.clear();
-        sessionStorage.clear();
+        // Only clear non-auth related cache data
+        const keysToPreserve = [
+          'sb-ecmtctwovkheohqwahvt-auth-token',
+          'supabase.auth.token',
+          'auth-user',
+          'auth-session'
+        ];
         
-        // 2. Clear all application caches
+        // Clear only cache-related localStorage items
+        const localStorage = window.localStorage;
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && !keysToPreserve.some(preserve => key.includes(preserve))) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+        
+        // Clear application caches
         if ('caches' in window) {
           const cacheNames = await caches.keys();
           await Promise.all(cacheNames.map(name => caches.delete(name)));
         }
         
-        // 3. Unregister all service workers
-        if ('serviceWorker' in navigator) {
-          const registrations = await navigator.serviceWorker.getRegistrations();
-          for (const registration of registrations) {
-            await registration.unregister();
-          }
-        }
+        // Clear sessionStorage (safe for auth as it's not used by Supabase)
+        sessionStorage.clear();
         
-        // 4. Force reload the page if URL doesn't have cache buster
-        const urlParams = new URLSearchParams(window.location.search);
-        if (!urlParams.has('cb')) {
-          // Add cache buster and reload
-          const newUrl = `${window.location.pathname}?cb=${timestamp}`;
-          window.history.replaceState({}, document.title, newUrl);
-          window.location.reload();
-          return;
-        }
-        
-        console.log('✅ All caches cleared for mobile browser');
+        console.log('✅ Smart cache clearing completed - auth preserved');
       } catch (error) {
-        console.error('Cache clearing failed:', error);
+        console.error('Smart cache clearing failed:', error);
       }
     };
     
-    clearAllCaches();
+    // Only run once on mount
+    clearCachesSmartly();
   }, []);
 
   useEffect(() => {
