@@ -12,7 +12,7 @@ const GovornojezicovneVaje = () => {
     {
       id: "vaje-motorike-govoril",
       title: "Vaje motorike govoril",
-      description: "Vaje motorike govoril so namenjene razgibavanju govoril – ust, ustnic in jezika.",
+      description: "Vaje motorike govoril so namenjene razgibavanju govoril – ust, ustnic, jezika. Hkrati gibljemo tudi nekatere druge dele obraza in ust, ki so vključeni v govor in tudi negovorne aktivnosti. Vaje so pomembne za izboljšanje motorike ust, ki z ostalimi deli govornega aparata oblikuje posamezne glasove ter seveda sam govor. Vaje motorike govoril niso pogoj za pojav govora in ne uporabljamo jih pri terapiji vseh govorno-jezikovnih motenj.",
       icon: Dumbbell,
       color: "text-app-purple",
       gradient: "from-app-purple/10 to-app-blue/10",
