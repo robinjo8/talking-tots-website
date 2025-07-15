@@ -25,12 +25,23 @@ export const ExerciseModal = ({
   
   useEffect(() => {
     if (isOpen && audioUrl) {
-      console.log('Attempting to play audio:', audioUrl);
-      // Small delay to ensure modal is fully rendered
-      const timer = setTimeout(() => {
-        playAudio(audioUrl);
-      }, 300);
-      return () => clearTimeout(timer);
+      console.log('Modal opened, attempting to play audio:', audioUrl);
+      
+      // Test if audio file exists first
+      fetch(audioUrl, { method: 'HEAD' })
+        .then(response => {
+          if (response.ok) {
+            console.log('Audio file exists, playing now');
+            playAudio(audioUrl);
+          } else {
+            console.error('Audio file not found:', audioUrl, 'Status:', response.status);
+          }
+        })
+        .catch(error => {
+          console.error('Error checking audio file:', error);
+          // Try to play anyway in case it's a CORS issue
+          playAudio(audioUrl);
+        });
     }
   }, [isOpen, audioUrl, playAudio]);
 
@@ -91,7 +102,7 @@ export const ExerciseModal = ({
             onClick={onComplete}
             className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-lg font-semibold text-lg transition-colors"
           >
-            Dokončaj vajo
+            Zapri
           </button>
         </div>
 

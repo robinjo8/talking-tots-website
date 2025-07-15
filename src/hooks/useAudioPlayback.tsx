@@ -14,11 +14,16 @@ export const useAudioPlayback = () => {
         audioRef.current.load(); // Reset the audio element
       }
       
-      // Create a fresh audio element to avoid mobile browser notifications
+      // Create a fresh audio element
       audioRef.current = new Audio();
       
-      // Disable caching for audio on mobile to prevent old cached versions
-      audioRef.current.setAttribute('crossOrigin', 'anonymous');
+      // Add event listeners for debugging
+      audioRef.current.addEventListener('loadstart', () => console.log('Audio load started'));
+      audioRef.current.addEventListener('canplay', () => console.log('Audio can play'));
+      audioRef.current.addEventListener('error', (e) => console.error('Audio element error:', e));
+      
+      // Don't set crossOrigin as it might cause CORS issues with Supabase
+      // audioRef.current.setAttribute('crossOrigin', 'anonymous');
       
       // Set new source and play
       audioRef.current.src = audioUrl;
