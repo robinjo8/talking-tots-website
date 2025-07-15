@@ -82,12 +82,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         name: child.name || '',
         gender: child.gender || 'M',
         avatarId: child.avatarId || 1,
-        age: child.age || 0,
         birthDate: child.birthDate ? new Date(child.birthDate) : null,
         speechDifficulties: child.speechDifficulties || [],
         speechDifficultiesDescription: child.speechDifficultiesDescription || '',
         speechDevelopment: child.speechDevelopment || {},
-        isComplete: child.isComplete || false
+        isComplete: !!(child.speechDevelopment && Object.keys(child.speechDevelopment).length > 0)
       }));
 
       console.log('Profile loaded from metadata:', {
