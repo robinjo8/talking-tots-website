@@ -169,8 +169,8 @@ const VajeMoториkeGovoril = () => {
             onClose={handleCloseModal}
             cardNumber={selectedCard}
             instruction={instructions[selectedCard - 1]}
-            imageUrl={`${supabaseUrl}/storage/v1/object/public/${bucketName}/${selectedCard}.jpg?t=${Date.now()}`}
-            audioUrl={`${supabaseUrl}/storage/v1/object/public/${bucketName}/${selectedCard}.m4a?t=${Date.now()}`}
+            imageUrl={`${supabaseUrl}/storage/v1/object/public/${bucketName}/${selectedCard}.jpg?v=2.0.0`}
+            audioUrl={`${supabaseUrl}/storage/v1/object/public/${bucketName}/${selectedCard}.m4a?v=2.0.0`}
             onComplete={handleCompleteCard}
           />
         )}

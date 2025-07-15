@@ -22,11 +22,13 @@ export const ExerciseModal = ({
   onComplete,
 }: ExerciseModalProps) => {
   const { playAudio } = useAudioPlayback();
-  const cacheVersion = Date.now();
+  
+  // Static cache-busting version to prevent infinite re-renders
+  const CACHE_VERSION = "v2.0.0";
 
   // Add cache-busting parameters
-  const cacheBustedImageUrl = `${imageUrl}&cb=${cacheVersion}`;
-  const cacheBustedAudioUrl = `${audioUrl}&cb=${cacheVersion}`;
+  const cacheBustedImageUrl = `${imageUrl}&cb=${CACHE_VERSION}`;
+  const cacheBustedAudioUrl = `${audioUrl}&cb=${CACHE_VERSION}`;
 
   useEffect(() => {
     if (isOpen && audioUrl) {
