@@ -33,14 +33,16 @@ export function SpeechDifficultyEditor({
     try {
       setIsSubmitting(true);
       
-      // Get current user metadata
-      const { data: userData, error: userError } = await supabase.auth.getUser();
+      // Get complete user metadata including raw data using RPC
+      const { data: userMetadata, error: metadataError } = await supabase.rpc('get_auth_user_data');
       
-      if (userError) throw userError;
+      if (metadataError) {
+        console.error('Error fetching user metadata:', metadataError);
+        throw metadataError;
+      }
       
-      const currentUser = userData.user;
-      const currentMetadata = currentUser.user_metadata || {};
-      const currentChildren = [...(currentMetadata.children || [])];
+      const metadataObject = userMetadata as any;
+      const currentChildren = [...(metadataObject?.children || [])];
       
       // Update difficulties for the specific child
       if (childIndex >= 0 && childIndex < currentChildren.length) {
@@ -57,6 +59,10 @@ export function SpeechDifficultyEditor({
         if (updateError) throw updateError;
         
         toast.success("Govorne motnje uspešno posodobljene!");
+        
+        // Refresh the auth context to get updated data
+        window.location.reload();
+        
         onClose();
       } else {
         toast.error("Napaka pri posodobitvi motenj. Indeks ni veljaven.");

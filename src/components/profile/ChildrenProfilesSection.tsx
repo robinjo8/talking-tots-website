@@ -3,10 +3,10 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, ChevronDown, ChevronUp, Plus } from "lucide-react";
+import { Users, ChevronDown, ChevronUp } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChildDatabaseManager } from "@/components/children/ChildDatabaseManager";
-import { ChildProfileCard } from "@/components/ChildProfileCard";
+import { ChildProfileDisplay } from "@/components/profile/ChildProfileDisplay";
 
 type ChildrenProfilesSectionProps = {
   isExpanded: boolean;
@@ -53,46 +53,39 @@ export function ChildrenProfilesSection({
         
         <CollapsibleContent>
           <CardContent className="pt-4">
-            <div className="space-y-4">
-              {/* Toggle for database manager */}
-              <div className="flex justify-between items-center">
-                <p className="text-sm text-muted-foreground">
-                  Upravljajte profile svojih otrok
-                </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowDatabaseManager(!showDatabaseManager)}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  {showDatabaseManager ? "Skrij upravljanje" : "Upravljaj otroke"}
-                </Button>
-              </div>
+            <div className="space-y-6">
+              {/* Database manager - only show if no children exist */}
+              {(!profile?.children || profile.children.length === 0) && (
+                <>
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm text-muted-foreground">
+                      Dodajte profil otroka, da začnete uporabljati aplikacijo
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowDatabaseManager(!showDatabaseManager)}
+                      className="border-dragon-green text-dragon-green hover:bg-dragon-green/10"
+                    >
+                      {showDatabaseManager ? "Skrij dodajanje" : "Dodaj otroka"}
+                    </Button>
+                  </div>
 
-              {/* Database manager (new secure way) */}
-              {showDatabaseManager && (
-                <ChildDatabaseManager />
+                  {showDatabaseManager && (
+                    <ChildDatabaseManager />
+                  )}
+                </>
               )}
 
-              {/* Children list */}
+              {/* Child profile display - single child layout */}
               {profile?.children && profile.children.length > 0 ? (
-                <div className="grid gap-4 md:grid-cols-2">
-                  {profile.children.map((child, index) => (
-                    <ChildProfileCard
-                      key={child.id || index}
-                      child={child}
-                      isSelected={selectedChildIndex === index}
-                      onSelect={() => {
-                        setSelectedChildIndex(index);
-                        localStorage.setItem('selectedChildIndex', index.toString());
-                      }}
-                      onEdit={() => setEditingChildIndex(index)}
-                      onDelete={() => setDeletingChildIndex(index)}
-                      onEditDifficulties={() => setEditingDifficultiesIndex(index)}
-                    />
-                  ))}
-                </div>
-              ) : (
+                <ChildProfileDisplay
+                  child={profile.children[0]}
+                  onEdit={() => setEditingChildIndex(0)}
+                  onDelete={() => setDeletingChildIndex(0)}
+                  onEditDifficulties={() => setEditingDifficultiesIndex(0)}
+                />
+              ) : !showDatabaseManager && (
                 <div className="text-center py-8">
                   <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                   <h3 className="text-lg font-medium mb-2">Ni dodanih otrok</h3>
