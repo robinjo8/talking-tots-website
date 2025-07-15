@@ -20,7 +20,17 @@ export function SpeechHeader({
         </Button>}
       
       <h2 className="text-xl font-bold text-center">
-        {title} 
+        Osnovni vprašalnik
       </h2>
+      
+      <p className="text-center text-muted-foreground mt-3 mb-6">
+        Vaši odgovori nam bodo pomagali bolje razumeti otroka in prilagoditi vaje njegovim potrebam.
+      </p>
+      
+      <div className="flex justify-center mt-8">
+        <Button type="button" variant="outline" onClick={onBack}>
+          Ne želim odgovoriti
+        </Button>
+      </div>
     </div>;
 }
