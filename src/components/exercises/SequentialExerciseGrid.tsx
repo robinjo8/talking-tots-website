@@ -36,7 +36,7 @@ export const SequentialExerciseGrid = () => {
   };
 
   const getAudioUrl = (cardNumber: number) => {
-    return `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/vaje-motorike-govoril/od${cardNumber}.m4a`;
+    return `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/vaje-motorike-govoril/${cardNumber}.m4a`;
   };
 
   const renderedCards = useMemo(() => {
