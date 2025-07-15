@@ -138,7 +138,7 @@ export function GamesList() {
               {/* Bottom white section with image */}
               <CardContent className="pt-4 pb-4 flex-grow flex items-center justify-center bg-white rounded-b-2xl">
                 {game.image ? (
-                  <div className="w-full h-full flex items-center justify-center p-4">
+                  <div className="w-full h-full flex items-center justify-center p-2 sm:p-4">
                     <img
                       src={game.image}
                       alt={game.title}
