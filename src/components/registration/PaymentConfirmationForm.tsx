@@ -1,55 +1,49 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { 
-  ArrowLeft,
-  Target,
-  Gamepad2,
-  Video,
-  BookOpen,
-  MessageCircle,
-  TrendingUp,
-  FileText
-} from "lucide-react";
+import { ArrowLeft, Target, Gamepad2, Video, BookOpen, MessageCircle, TrendingUp, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
-
 type PaymentConfirmationFormProps = {
   selectedPlan: string;
   onBack: () => void;
 };
-
 export function PaymentConfirmationForm({
   selectedPlan,
   onBack
 }: PaymentConfirmationFormProps) {
-  const features = [
-    { icon: <Target className="h-4 w-4 text-dragon-green" />, text: "Napredno testiranje izgovorjave" },
-    { icon: <Gamepad2 className="h-4 w-4 text-app-purple" />, text: "Dostop do govornih vaj in iger" },
-    { icon: <Video className="h-4 w-4 text-app-teal" />, text: "Video navodila logopeda" },
-    { icon: <BookOpen className="h-4 w-4 text-app-orange" />, text: "Logopedski nasveti za starše" },
-    { icon: <MessageCircle className="h-4 w-4 text-app-blue" />, text: "Pogovor s pametnim AI asistentom" },
-    { icon: <TrendingUp className="h-4 w-4 text-dragon-green" />, text: "Sledenje napredku otroka" },
-    { icon: <FileText className="h-4 w-4 text-app-purple" />, text: "Prilagojen govorni načrt" }
-  ];
-  
-  return (
-    <div className="space-y-6">
+  const features = [{
+    icon: <Target className="h-4 w-4 text-dragon-green" />,
+    text: "Napredno testiranje izgovorjave"
+  }, {
+    icon: <Gamepad2 className="h-4 w-4 text-app-purple" />,
+    text: "Dostop do govornih vaj in iger"
+  }, {
+    icon: <Video className="h-4 w-4 text-app-teal" />,
+    text: "Video navodila logopeda"
+  }, {
+    icon: <BookOpen className="h-4 w-4 text-app-orange" />,
+    text: "Logopedski nasveti za starše"
+  }, {
+    icon: <MessageCircle className="h-4 w-4 text-app-blue" />,
+    text: "Pogovor s pametnim AI asistentom"
+  }, {
+    icon: <TrendingUp className="h-4 w-4 text-dragon-green" />,
+    text: "Sledenje napredku otroka"
+  }, {
+    icon: <FileText className="h-4 w-4 text-app-purple" />,
+    text: "Prilagojen govorni načrt"
+  }];
+  return <div className="space-y-6">
       <div className="max-w-3xl mx-auto text-center mb-10">
-        <h2 className="text-3xl md:text-4xl font-bold mb-2">Cenik</h2>
-        <p className="text-lg text-muted-foreground">
+        
+        <p className="text-lg text-muted-foreground py-0 my-0">
           Naši paketi so zasnovani posebej za starše in njihove otroke. Izberite paket, ki vam najbolj ustreza.
         </p>
       </div>
       
       <div className="max-w-2xl mx-auto">
-        <Card 
-          className={cn(
-            "relative border-2 transition-all duration-300 hover:shadow-lg",
-            "border-dragon-green shadow-md"
-          )}
-        >
+        <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg", "border-dragon-green shadow-md")}>
           <CardContent className="p-8">
             <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
               <span className="bg-app-orange text-white text-sm px-4 py-1 rounded-full font-medium">
@@ -73,12 +67,10 @@ export function PaymentConfirmationForm({
             </div>
 
             <div className="space-y-3 mb-8">
-              {features.map((feature, index) => (
-                <div key={index} className="flex items-center gap-3 text-sm">
+              {features.map((feature, index) => <div key={index} className="flex items-center gap-3 text-sm">
                   {feature.icon}
                   <span>{feature.text}</span>
-                </div>
-              ))}
+                </div>)}
             </div>
 
             <Button className="w-full bg-dragon-green hover:bg-dragon-green/90 text-white h-12 text-lg font-semibold">
@@ -92,6 +84,5 @@ export function PaymentConfirmationForm({
         <ArrowLeft className="h-4 w-4" />
         Nazaj
       </Button>
-    </div>
-  );
+    </div>;
 }

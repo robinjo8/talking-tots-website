@@ -109,7 +109,7 @@ export default function Register() {
 
       {currentStep === RegistrationStep.PAYMENT_CONFIRMATION && <div className="space-y-6">
           <div>
-            <h3 className="text-2xl font-bold font-extrabold text-dragon-green mb-4 text-center">Začnite 7-dnevni brezplačni preizkus</h3>
+            <h3 className="text-2xl font-bold font-extrabold text-dragon-green mb-4 text-center py-[22px] my-[4px]">Začnite 7-dnevni brezplačni preizkus</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               {subscriptionOptions.map(option => {})}
