@@ -45,26 +45,41 @@ export type Database = {
         Row: {
           age: number
           avatar_url: string | null
+          birth_date: string | null
           created_at: string
           id: string
           name: string
           parent_id: string
+          speech_development: Json | null
+          speech_difficulties: string[] | null
+          speech_difficulties_description: string | null
+          updated_at: string | null
         }
         Insert: {
           age: number
           avatar_url?: string | null
+          birth_date?: string | null
           created_at?: string
           id?: string
           name: string
           parent_id: string
+          speech_development?: Json | null
+          speech_difficulties?: string[] | null
+          speech_difficulties_description?: string | null
+          updated_at?: string | null
         }
         Update: {
           age?: number
           avatar_url?: string | null
+          birth_date?: string | null
           created_at?: string
           id?: string
           name?: string
           parent_id?: string
+          speech_development?: Json | null
+          speech_difficulties?: string[] | null
+          speech_difficulties_description?: string | null
+          updated_at?: string | null
         }
         Relationships: [
           {

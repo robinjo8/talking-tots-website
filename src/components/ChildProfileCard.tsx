@@ -1,17 +1,21 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Check, UserRound, Pencil, Trash2, FileEdit } from "lucide-react";
+import { Check, UserRound, Pencil, Trash2, FileEdit, Calendar, MessageSquare } from "lucide-react";
 import { SpeechDifficultiesList } from "@/components/SpeechDifficultiesList";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
+import { SPEECH_DEVELOPMENT_QUESTIONS } from "@/models/SpeechDevelopment";
 
 type ChildProfileProps = {
   child: {
     name: string;
     gender: string;
     avatarId: number;
+    birthDate?: Date | null;
     speechDifficulties?: string[];
+    speechDifficultiesDescription?: string;
+    speechDevelopment?: Record<string, string>;
   };
   isSelected: boolean;
   onSelect: () => void;
@@ -64,6 +68,22 @@ export function ChildProfileCard({
       case "Ž": return "Deklica";
       default: return "Ni določeno";
     }
+  };
+
+  const calculateAge = (birthDate: Date | null): number | null => {
+    if (!birthDate) return null;
+    const today = new Date();
+    const age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      return age - 1;
+    }
+    return age;
+  };
+
+  const formatDate = (date: Date | null): string => {
+    if (!date) return "Ni določeno";
+    return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
   };
 
   if (minimal) {
@@ -151,14 +171,22 @@ export function ChildProfileCard({
             }`}>
               {child.name}
             </h4>
-            <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
-              <span className={`inline-block w-2 h-2 rounded-full ${
-                child.gender === "M" ? "bg-app-blue" : 
-                child.gender === "Ž" ? "bg-app-orange" : 
-                "bg-gray-400"
-              }`}></span>
-              {formatGender(child.gender)}
-            </p>
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground flex items-center gap-1">
+                <span className={`inline-block w-2 h-2 rounded-full ${
+                  child.gender === "M" ? "bg-app-blue" : 
+                  child.gender === "Ž" ? "bg-app-orange" : 
+                  "bg-gray-400"
+                }`}></span>
+                {formatGender(child.gender)}
+              </p>
+              {child.birthDate && (
+                <p className="text-sm text-muted-foreground flex items-center gap-1">
+                  <Calendar className="h-3 w-3" />
+                  {formatDate(child.birthDate)} ({calculateAge(child.birthDate)} let)
+                </p>
+              )}
+            </div>
           </div>
           
           {isSelected && (
@@ -236,7 +264,40 @@ export function ChildProfileCard({
               Ni zabeleženih govornih motenj
             </p>
           )}
+          
+          {child.speechDifficultiesDescription && (
+            <div className="mt-2 pl-2">
+              <p className="text-xs text-gray-600 font-medium">Dodaten opis:</p>
+              <p className="text-sm text-gray-700 mt-1">{child.speechDifficultiesDescription}</p>
+            </div>
+          )}
         </div>
+
+        {/* Speech development questionnaire section */}
+        {child.speechDevelopment && Object.keys(child.speechDevelopment).length > 0 && (
+          <div className="pt-3 border-t border-gray-100">
+            <h5 className="font-medium text-gray-700 mb-2 flex items-center gap-2">
+              <MessageSquare className="h-4 w-4" />
+              Osnovni vprašalnik
+            </h5>
+            
+            <div className="space-y-2 pl-2">
+              {Object.entries(child.speechDevelopment).map(([questionId, answer]) => {
+                const question = SPEECH_DEVELOPMENT_QUESTIONS.find(q => q.id === questionId);
+                const option = question?.options.find(opt => opt.value === answer);
+                
+                if (!question || !option) return null;
+                
+                return (
+                  <div key={questionId} className="text-sm">
+                    <p className="text-gray-600 font-medium">{question.question}</p>
+                    <p className="text-gray-700 pl-3">→ {option.label}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

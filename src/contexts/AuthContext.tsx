@@ -10,7 +10,10 @@ export type ChildProfile = {
   gender: string;
   avatarId: number;
   age?: number;
+  birthDate?: Date | null;
   speechDifficulties?: string[];
+  speechDifficultiesDescription?: string;
+  speechDevelopment?: Record<string, string>;
 };
 
 export type Profile = {
@@ -58,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Fetch children from children table
       const { data: childrenData, error: childrenError } = await supabase
         .from('children')
-        .select('id, name, age, avatar_url')
+        .select('id, name, age, avatar_url, birth_date, speech_difficulties, speech_difficulties_description, speech_development')
         .eq('parent_id', userId)
         .order('created_at');
 
@@ -74,7 +77,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         gender: 'other', // Default since we don't store gender in DB yet
         avatarId: child.avatar_url ? parseInt(child.avatar_url) : 1,
         age: child.age || undefined,
-        speechDifficulties: []
+        birthDate: child.birth_date ? new Date(child.birth_date) : null,
+        speechDifficulties: child.speech_difficulties || [],
+        speechDifficultiesDescription: child.speech_difficulties_description || undefined,
+        speechDevelopment: child.speech_development as Record<string, string> || undefined
       })) || [];
 
       console.log("Profile loaded:", { username: profileData?.username, childrenCount: children.length });
