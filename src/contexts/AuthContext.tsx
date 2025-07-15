@@ -14,6 +14,7 @@ export type ChildProfile = {
   speechDifficulties?: string[];
   speechDifficultiesDescription?: string;
   speechDevelopment?: Record<string, string>;
+  isComplete?: boolean;
 };
 
 export type Profile = {
@@ -41,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedChildIndex, setSelectedChildIndex] = useState<number | null>(null);
 
-  // Function to fetch user profile and children from database
+  // Function to fetch user profile and children from user metadata (where registration stores data)
   const fetchUserProfile = async (userId: string) => {
     try {
       console.log("Fetching profile for user:", userId);
@@ -58,32 +59,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw profileError;
       }
 
-      // Fetch children from children table
-      const { data: childrenData, error: childrenError } = await supabase
-        .from('children')
-        .select('id, name, age, avatar_url, birth_date, gender, speech_difficulties, speech_difficulties_description, speech_development')
-        .eq('parent_id', userId)
-        .order('created_at');
-
-      if (childrenError) {
-        console.error("Children error:", childrenError);
-        throw childrenError;
+      // Fetch user metadata from auth.users which contains child registration data
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        console.error('Error fetching user metadata:', userError);
+        setProfile({
+          username: profileData?.username || null,
+          children: []
+        });
+        return;
       }
 
-      // Convert children data to the expected format
-      const children: ChildProfile[] = childrenData?.map(child => ({
-        id: child.id,
-        name: child.name,
-        gender: child.gender || 'other',
-        avatarId: child.avatar_url ? parseInt(child.avatar_url) : 1,
-        age: child.age || undefined,
-        birthDate: child.birth_date ? new Date(child.birth_date) : null,
-        speechDifficulties: child.speech_difficulties || [],
-        speechDifficultiesDescription: child.speech_difficulties_description || undefined,
-        speechDevelopment: child.speech_development as Record<string, string> || undefined
-      })) || [];
+      console.log('User metadata:', user.user_metadata);
 
-      console.log("Profile loaded:", { username: profileData?.username, childrenCount: children.length });
+      // Extract children data from user metadata (where registration stores it)
+      const childrenFromMetadata = user.user_metadata?.children || [];
+      
+      // Transform children data to match ChildProfile interface
+      const children: ChildProfile[] = childrenFromMetadata.map((child: any) => ({
+        id: child.id || crypto.randomUUID(),
+        name: child.name || '',
+        gender: child.gender || 'M',
+        avatarId: child.avatarId || 1,
+        age: child.age || 0,
+        birthDate: child.birthDate ? new Date(child.birthDate) : null,
+        speechDifficulties: child.speechDifficulties || [],
+        speechDifficultiesDescription: child.speechDifficultiesDescription || '',
+        speechDevelopment: child.speechDevelopment || {},
+        isComplete: child.isComplete || false
+      }));
+
+      console.log('Profile loaded from metadata:', {
+        username: profileData?.username,
+        childrenCount: children.length,
+        children: children
+      });
 
       setProfile({
         username: profileData?.username || null,
@@ -165,6 +176,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }, 0);
         } else {
           setProfile(null);
+          setSelectedChildIndex(null);
         }
         
         setIsLoading(false);

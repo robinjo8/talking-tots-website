@@ -6,17 +6,10 @@ import { SpeechDifficultiesList } from "@/components/SpeechDifficultiesList";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { SPEECH_DEVELOPMENT_QUESTIONS } from "@/models/SpeechDevelopment";
+import { ChildProfile } from "@/contexts/AuthContext";
 
 type ChildProfileProps = {
-  child: {
-    name: string;
-    gender: string;
-    avatarId: number;
-    birthDate?: Date | null;
-    speechDifficulties?: string[];
-    speechDifficultiesDescription?: string;
-    speechDevelopment?: Record<string, string>;
-  };
+  child: ChildProfile;
   isSelected: boolean;
   onSelect: () => void;
   onEdit?: () => void;
@@ -65,6 +58,7 @@ export function ChildProfileCard({
   const formatGender = (gender: string) => {
     switch (gender) {
       case "M": return "Deček";
+      case "F": return "Deklica";
       case "Ž": return "Deklica";
       default: return "Ni določeno";
     }
@@ -175,7 +169,7 @@ export function ChildProfileCard({
               <p className="text-sm text-muted-foreground flex items-center gap-1">
                 <span className={`inline-block w-2 h-2 rounded-full ${
                   child.gender === "M" ? "bg-app-blue" : 
-                  child.gender === "Ž" ? "bg-app-orange" : 
+                  (child.gender === "F" || child.gender === "Ž") ? "bg-app-orange" : 
                   "bg-gray-400"
                 }`}></span>
                 {formatGender(child.gender)}
@@ -279,6 +273,11 @@ export function ChildProfileCard({
             <h5 className="font-medium text-gray-700 mb-2 flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
               Osnovni vprašalnik
+              {child.isComplete && (
+                <Badge variant="default" className="text-xs bg-dragon-green text-white">
+                  Izpolnjeno
+                </Badge>
+              )}
             </h5>
             
             <div className="space-y-2 pl-2">
