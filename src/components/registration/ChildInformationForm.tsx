@@ -167,20 +167,14 @@ export function ChildInformationForm({
                   >
                     <SelectTrigger className="mt-2">
                       <SelectValue placeholder="Izberi avatarja">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center justify-center">
                           {child.avatarId === 0 || !child.avatarId ? (
-                            <>
-                              <UserX className="h-4 w-4 text-gray-400" />
-                              <span>Brez avatarja</span>
-                            </>
+                            <UserX className="h-8 w-8 text-gray-400" />
                           ) : (
-                            <>
-                              <Avatar className="h-6 w-6">
-                                <AvatarImage src={avatarOptions.find(a => a.id === child.avatarId)?.src} alt="Avatar" />
-                                <AvatarFallback className="text-xs">A</AvatarFallback>
-                              </Avatar>
-                              <span>{avatarOptions.find(a => a.id === child.avatarId)?.alt}</span>
-                            </>
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={avatarOptions.find(a => a.id === child.avatarId)?.src} alt="Avatar" />
+                              <AvatarFallback className="text-xs">A</AvatarFallback>
+                            </Avatar>
                           )}
                         </div>
                       </SelectValue>
@@ -188,20 +182,14 @@ export function ChildInformationForm({
                     <SelectContent>
                       {avatarOptions.map(avatar => (
                         <SelectItem key={avatar.id} value={avatar.id.toString()}>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center justify-center p-2">
                             {avatar.id === 0 ? (
-                              <>
-                                <UserX className="h-4 w-4 text-gray-400" />
-                                <span>{avatar.alt}</span>
-                              </>
+                              <UserX className="h-12 w-12 text-gray-400" />
                             ) : (
-                              <>
-                                <Avatar className="h-6 w-6">
-                                  <AvatarImage src={avatar.src} alt={avatar.alt} />
-                                  <AvatarFallback className="text-xs">A</AvatarFallback>
-                                </Avatar>
-                                <span>{avatar.alt}</span>
-                              </>
+                              <Avatar className="h-12 w-12">
+                                <AvatarImage src={avatar.src} alt={avatar.alt} />
+                                <AvatarFallback className="text-xs">A</AvatarFallback>
+                              </Avatar>
                             )}
                           </div>
                         </SelectItem>

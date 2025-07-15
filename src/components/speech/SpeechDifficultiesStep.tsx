@@ -146,16 +146,27 @@ Kakšna je otrokova odzivnost? Se rad pogovarja, je zadržan, se jezi, če ga ne
               <Label htmlFor="detailed-description" className="text-sm font-medium">
                 Podroben opis težav z govorom
               </Label>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button type="button" className="text-gray-400 hover:text-gray-600">
-                    <Info className="h-4 w-4" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent className="max-w-xs whitespace-pre-line">
-                  {tooltipText}
-                </TooltipContent>
-              </Tooltip>
+               <Tooltip>
+                 <TooltipTrigger asChild>
+                   <button type="button" className="text-gray-400 hover:text-gray-600 transition-colors">
+                     <Info className="h-4 w-4" />
+                   </button>
+                 </TooltipTrigger>
+                 <TooltipContent 
+                   className="max-w-sm p-4 whitespace-pre-line text-sm leading-relaxed z-50"
+                   side="bottom"
+                   align="start"
+                 >
+                   <div className="space-y-2">
+                     <p>Kateri glasovi so otroku težavni? (npr. R, L, S, Č, Ž ...)</p>
+                     <p>Kako se težava kaže? (npr. otrok nadomešča glasove, izpušča črke, zamenjuje zvoke ...)</p>
+                     <p>Kdaj ste težavo prvič opazili?</p>
+                     <p>V katerih situacijah se težava najbolj kaže? (npr. doma, v vrtcu, pri hitrem govoru ...)</p>
+                     <p>Ali ste že kaj poskusili? (npr. obisk logopeda, posebne vaje, igre, gledanje govora ...)</p>
+                     <p>Kakšna je otrokova odzivnost? Se rad pogovarja, je zadržan, se jezi, če ga ne razumete?</p>
+                   </div>
+                 </TooltipContent>
+               </Tooltip>
             </div>
             <Textarea
               id="detailed-description"
