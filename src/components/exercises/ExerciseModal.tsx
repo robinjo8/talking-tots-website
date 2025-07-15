@@ -22,16 +22,32 @@ export const ExerciseModal = ({
   onComplete,
 }: ExerciseModalProps) => {
   const { playAudio } = useAudioPlayback();
+  const cacheVersion = Date.now();
+
+  // Add cache-busting parameters
+  const cacheBustedImageUrl = `${imageUrl}&cb=${cacheVersion}`;
+  const cacheBustedAudioUrl = `${audioUrl}&cb=${cacheVersion}`;
 
   useEffect(() => {
     if (isOpen && audioUrl) {
+      // Clear any cached versions
+      if ('caches' in window) {
+        caches.keys().then(names => {
+          names.forEach(name => {
+            if (name.includes('motorike') || name.includes('govoril')) {
+              caches.delete(name);
+            }
+          });
+        });
+      }
+      
       // Small delay to ensure modal is fully rendered
       const timer = setTimeout(() => {
-        playAudio(audioUrl);
+        playAudio(cacheBustedAudioUrl);
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [isOpen, audioUrl, playAudio]);
+  }, [isOpen, cacheBustedAudioUrl, playAudio]);
 
   useEffect(() => {
     if (isOpen) {
@@ -73,11 +89,11 @@ export const ExerciseModal = ({
         {/* Image */}
         <div className="relative bg-white rounded-xl p-4 shadow-2xl">
           <img
-            src={imageUrl}
+            src={cacheBustedImageUrl}
             alt={`Vaja ${cardNumber}: ${instruction}`}
             className="w-full max-w-2xl mx-auto rounded-lg"
             onError={(e) => {
-              console.error('Failed to load exercise image:', imageUrl);
+              console.error('Failed to load exercise image:', cacheBustedImageUrl);
               e.currentTarget.style.border = '2px solid red';
               e.currentTarget.style.background = 'lightgray';
             }}

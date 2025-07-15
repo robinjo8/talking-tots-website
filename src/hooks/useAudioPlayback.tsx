@@ -15,6 +15,9 @@ export const useAudioPlayback = () => {
       // Create a fresh audio element to avoid mobile browser notifications
       audioRef.current = new Audio();
       
+      // Disable caching for audio on mobile to prevent old cached versions
+      audioRef.current.setAttribute('crossOrigin', 'anonymous');
+      
       // Set new source and play
       audioRef.current.src = audioUrl;
       audioRef.current.play().catch(error => {

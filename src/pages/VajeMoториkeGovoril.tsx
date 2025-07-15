@@ -6,11 +6,14 @@ import { SequentialCard } from "@/components/exercises/SequentialCard";
 import { ExerciseModal } from "@/components/exercises/ExerciseModal";
 import { ProgressTracker } from "@/components/exercises/ProgressTracker";
 import { useExerciseProgress } from "@/hooks/useExerciseProgress";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
 
 const VajeMoториkeGovoril = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [selectedCard, setSelectedCard] = useState<number | null>(null);
+  const [cacheVersion, setCacheVersion] = useState(Date.now());
   
   const {
     progress,
@@ -21,11 +24,47 @@ const VajeMoториkeGovoril = () => {
     isCardActive,
   } = useExerciseProgress();
 
+  // Clear caches on component mount
+  useEffect(() => {
+    const clearCaches = () => {
+      // Clear localStorage items related to caching
+      Object.keys(localStorage).forEach(key => {
+        if (key.includes('cache') || key.includes('vaje-motorike')) {
+          localStorage.removeItem(key);
+        }
+      });
+      
+      // Clear sessionStorage
+      sessionStorage.clear();
+      
+      // Force service worker to update if available
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+          registrations.forEach(registration => {
+            registration.update();
+          });
+        });
+      }
+    };
+    
+    clearCaches();
+  }, []);
+
   useEffect(() => {
     if (!user) {
       navigate("/login");
     }
   }, [user, navigate]);
+
+  const handleForceRefresh = () => {
+    setCacheVersion(Date.now());
+    // Force hard refresh on mobile
+    if (window.location.reload) {
+      window.location.reload();
+    } else {
+      window.location.href = window.location.href;
+    }
+  };
 
   const supabaseUrl = "https://ecmtctwovkheohqwahvt.supabase.co";
   const bucketName = "slike-vaje-motorike-govoril";
@@ -96,12 +135,27 @@ const VajeMoториkeGovoril = () => {
           </p>
         </div>
 
-        <ProgressTracker
-          currentCard={progress.currentUnlockedCard}
-          totalCards={27}
-          completedCount={progress.completedCards.length}
-          onReset={resetProgress}
-        />
+        <div className="flex flex-col gap-4 mb-6">
+          <ProgressTracker
+            currentCard={progress.currentUnlockedCard}
+            totalCards={27}
+            completedCount={progress.completedCards.length}
+            onReset={resetProgress}
+          />
+          
+          {/* Force Refresh Button for Mobile Cache Issues */}
+          <div className="text-center">
+            <Button
+              onClick={handleForceRefresh}
+              variant="outline"
+              size="sm"
+              className="text-xs"
+            >
+              <RefreshCw className="h-3 w-3 mr-1" />
+              Osveži stran
+            </Button>
+          </div>
+        </div>
 
         {/* Cards Grid */}
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 md:gap-4 max-w-4xl mx-auto">
@@ -124,8 +178,8 @@ const VajeMoториkeGovoril = () => {
             onClose={handleCloseModal}
             cardNumber={selectedCard}
             instruction={instructions[selectedCard - 1]}
-            imageUrl={`${supabaseUrl}/storage/v1/object/public/${bucketName}/${selectedCard}.jpg?v=${Date.now()}`}
-            audioUrl={`${supabaseUrl}/storage/v1/object/public/${bucketName}/${selectedCard}.m4a?v=${Date.now()}`}
+            imageUrl={`${supabaseUrl}/storage/v1/object/public/${bucketName}/${selectedCard}.jpg?v=${cacheVersion}&t=${Date.now()}`}
+            audioUrl={`${supabaseUrl}/storage/v1/object/public/${bucketName}/${selectedCard}.m4a?v=${cacheVersion}&t=${Date.now()}`}
             onComplete={handleCompleteCard}
           />
         )}

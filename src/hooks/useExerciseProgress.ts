@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 const STORAGE_KEY = "vaje-motorike-govoril-progress";
+const CACHE_VERSION = Date.now();
 
 interface ExerciseProgress {
   currentUnlockedCard: number;
