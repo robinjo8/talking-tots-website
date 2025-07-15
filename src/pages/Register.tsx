@@ -31,8 +31,6 @@ export default function Register() {
     goBack,
     handleSpeechDifficultiesSubmit,
     handleSpeechDevelopmentSubmit,
-    addChild,
-    removeChild,
     updateChildField,
     handleSubmit,
     currentChild,
@@ -85,12 +83,9 @@ export default function Register() {
           
           <div>
             
-            <ChildInformationForm children={children} selectedChildIndex={selectedChildIndex} setSelectedChildIndex={setSelectedChildIndex} removeChild={removeChild} updateChildField={updateChildField} error={error} />
+            <ChildInformationForm children={children} selectedChildIndex={selectedChildIndex} setSelectedChildIndex={setSelectedChildIndex} updateChildField={updateChildField} error={error} />
           </div>
           
-          {children.some(child => child.isComplete) && <Button type="button" variant="outline" onClick={addChild} className="mt-4 border-dragon-green text-dragon-green hover:bg-dragon-green/10 w-full">
-              Dodaj otroka
-            </Button>}
           
           <Button type="submit" className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6" disabled={isLoading || isCheckingEmail}>
             {isCheckingEmail ? "Preverjanje..." : "Naprej"}

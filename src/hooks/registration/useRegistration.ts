@@ -23,7 +23,7 @@ export function useRegistration() {
     children, setChildren,
     selectedChildIndex, setSelectedChildIndex,
     currentChild,
-    addChild, removeChild, updateChildField,
+    updateChildField,
     handleSpeechDifficultiesSubmit: updateSpeechDifficulties,
     handleSpeechDevelopmentSubmit: updateSpeechDevelopment
   } = useChildrenState();
@@ -145,7 +145,7 @@ export function useRegistration() {
     children,
     selectedChildIndex, setSelectedChildIndex,
     currentChild,
-    addChild, removeChild, updateChildField,
+    updateChildField,
     
     // Validation
     error, setError,

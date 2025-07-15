@@ -173,11 +173,6 @@ export function SubscriptionSection() {
                   </Card>
                 </TabsContent>
               </Tabs>
-              
-              {/* Additional note */}
-              <div className="mt-6 text-center text-sm text-gray-600 bg-gray-50 dark:bg-gray-800/30 rounded-lg p-4">
-                <p>Vsak dodatni otrok: <strong>+3,90 € / mesec</strong></p>
-              </div>
             </div>
           </CardContent>
         </CollapsibleContent>

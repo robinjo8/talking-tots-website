@@ -100,14 +100,6 @@ export function ChildDatabaseManager() {
               />
             </div>
           </div>
-          <Button 
-            onClick={handleCreateChild}
-            disabled={isCreating || !newChildName.trim() || !newChildAge}
-            className="w-full"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            {isCreating ? "Dodajam..." : "Dodaj otroka"}
-          </Button>
         </div>
 
         {/* List existing children */}

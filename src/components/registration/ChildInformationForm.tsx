@@ -15,7 +15,6 @@ type ChildInformationFormProps = {
   children: ChildProfile[];
   selectedChildIndex: number;
   setSelectedChildIndex: (index: number) => void;
-  removeChild: (id: string) => void;
   updateChildField: (id: string, field: keyof ChildProfile, value: any) => void;
   error: string | null;
 };
@@ -23,7 +22,6 @@ export function ChildInformationForm({
   children,
   selectedChildIndex,
   setSelectedChildIndex,
-  removeChild,
   updateChildField,
   error
 }: ChildInformationFormProps) {
@@ -55,9 +53,6 @@ export function ChildInformationForm({
                     Dokončano
                   </span>}
               </h4>
-              {children.length > 1 && <Button type="button" variant="outline" size="sm" onClick={() => removeChild(child.id)} className="h-8 px-2 text-red-500 hover:text-red-600 hover:bg-red-50">
-                  <Trash2 className="h-4 w-4" />
-                </Button>}
             </div>
             
             {selectedChildIndex === index ? <div className="space-y-4">

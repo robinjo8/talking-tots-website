@@ -11,26 +11,6 @@ export function useChildrenState() {
 
   const currentChild = children[selectedChildIndex];
 
-  const addChild = () => {
-    setChildren([
-      ...children,
-      { id: crypto.randomUUID(), name: "", gender: "M", birthDate: null, avatarId: 1 }
-    ]);
-    setSelectedChildIndex(children.length);
-  };
-
-  const removeChild = (id: string) => {
-    if (children.filter(c => c.isComplete).length > 1 || !children.some(c => c.isComplete)) {
-      setChildren(children.filter(child => child.id !== id));
-      
-      // If we're removing the currently selected child, adjust the index
-      if (children[selectedChildIndex].id === id) {
-        setSelectedChildIndex(Math.max(0, selectedChildIndex - 1));
-      }
-    } else {
-      toast.error("Potreben je vsaj en otrok.");
-    }
-  };
 
   const updateChildField = (id: string, field: keyof ChildProfile, value: any) => {
     setChildren(children.map(child => 
@@ -68,8 +48,6 @@ export function useChildrenState() {
     selectedChildIndex,
     setSelectedChildIndex,
     currentChild,
-    addChild,
-    removeChild,
     updateChildField,
     handleSpeechDifficultiesSubmit,
     handleSpeechDevelopmentSubmit

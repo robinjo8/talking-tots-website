@@ -99,10 +99,6 @@ export function ChildrenProfilesSection({
                   <p className="text-muted-foreground mb-4">
                     Dodajte profil otroka, da začnete uporabljati aplikacijo.
                   </p>
-                  <Button onClick={() => setShowDatabaseManager(true)}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Dodaj otroka
-                  </Button>
                 </div>
               )}
             </div>
