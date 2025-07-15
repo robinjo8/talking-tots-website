@@ -10,6 +10,7 @@ const otherGames = [
     title: "Spomin",
     description: "Igraj spomin in vadi izgovorjavo",
     icon: Puzzle,
+    image: "/lovable-uploads/7b964716-839d-4c87-b6b1-04a4f3af5271.png",
     color: "text-app-purple",
     gradient: "from-app-purple/10 to-app-blue/10",
     path: "/govorne-igre/spomin",
@@ -20,6 +21,7 @@ const otherGames = [
     title: "Drsne številke",
     description: "Igraj drsne številke in vadi logično razmišljanje",
     icon: Gamepad,
+    image: null,
     color: "text-app-orange",
     gradient: "from-app-orange/10 to-app-yellow/10",
     path: "/govorne-igre/drsne-stevilke",
@@ -30,6 +32,7 @@ const otherGames = [
     title: "Sestavljanke",
     description: "Igraj sestavljanke in vadi logično razmišljanje",
     icon: SquareDashed,
+    image: "/lovable-uploads/72915882-0746-4362-afc3-bebd9148890a.png",
     color: "text-app-teal",
     gradient: "from-app-teal/10 to-dragon-green/10",
     path: "/govorne-igre/sestavljanke",
@@ -103,35 +106,94 @@ const otherGames = [
 export function GamesList() {
   const navigate = useNavigate();
   
+  const activeGames = otherGames.filter(game => game.available);
+  const inactiveGames = otherGames.filter(game => !game.available);
+  
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-      {otherGames.map((game) => (
-        <Card 
-          key={game.id}
-          className={cn(
-            "transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col",
-            game.available ? "cursor-pointer" : "opacity-50"
-          )}
-          onClick={() => game.available && game.path && navigate(game.path)}
-        >
-          <CardHeader className={`bg-gradient-to-r ${game.gradient} rounded-t-2xl pb-4`}>
-            <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
-              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
-                {game.icon && <game.icon className={`h-6 w-6 ${game.color}`} />}
-              </div>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-6 pb-4 flex-grow text-center">
-            <h3 className={cn("text-lg font-semibold mb-2", game.color)}>{game.title}</h3>
-            <p className="text-sm text-gray-600">{game.description}</p>
-            {!game.available && (
-              <div className="mt-3 text-sm text-muted-foreground italic">
-                Kmalu na voljo
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+    <>
+      {/* Available Games Section */}
+      <div className="mb-12">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-primary">
+          Izberi igro
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {activeGames.map((game) => (
+            <Card 
+              key={game.id}
+              className={cn(
+                "transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 overflow-hidden flex flex-col cursor-pointer hover:scale-105"
+              )}
+              onClick={() => game.path && navigate(game.path)}
+              style={{ aspectRatio: '3/4', minHeight: '300px' }}
+            >
+              {/* Top colored section with game name */}
+              <CardHeader className={`bg-gradient-to-r ${game.gradient} rounded-t-2xl pb-3 sm:pb-4 flex-shrink-0`}>
+                <CardTitle className="text-lg sm:text-xl text-center">
+                  <span className={`font-bold ${game.color}`}>
+                    {game.title}
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              
+              {/* Bottom white section with image */}
+              <CardContent className="pt-4 pb-4 flex-grow flex items-center justify-center bg-white rounded-b-2xl">
+                {game.image ? (
+                  <div className="w-full h-full flex items-center justify-center p-4">
+                    <img
+                      src={game.image}
+                      alt={game.title}
+                      className="max-w-full max-h-full object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 rounded-xl flex items-center justify-center">
+                    <game.icon className={`h-10 w-10 sm:h-12 sm:w-12 ${game.color}`} />
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Unavailable Games Section */}
+      {inactiveGames.length > 0 && (
+        <div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-muted-foreground">
+            Kmalu na voljo
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {inactiveGames.map((game) => (
+              <Card 
+                key={game.id}
+                className={cn(
+                  "transition-all duration-300 rounded-2xl border-2 border-gray-200 overflow-hidden flex flex-col opacity-60 cursor-not-allowed"
+                )}
+                style={{ aspectRatio: '3/4', minHeight: '300px' }}
+              >
+                {/* Top colored section with game name */}
+                <CardHeader className={`bg-gradient-to-r ${game.gradient} rounded-t-2xl pb-3 sm:pb-4 flex-shrink-0`}>
+                  <CardTitle className="text-lg sm:text-xl text-center">
+                    <span className={`font-bold ${game.color}`}>
+                      {game.title}
+                    </span>
+                  </CardTitle>
+                </CardHeader>
+                
+                {/* Bottom white section with image */}
+                <CardContent className="pt-4 pb-4 flex-grow flex flex-col items-center justify-center bg-white rounded-b-2xl">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 rounded-xl flex items-center justify-center mb-2">
+                    <game.icon className={`h-10 w-10 sm:h-12 sm:w-12 ${game.color}`} />
+                  </div>
+                  <p className="text-xs text-muted-foreground italic text-center">
+                    Kmalu na voljo
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+    </>
   );
 }
