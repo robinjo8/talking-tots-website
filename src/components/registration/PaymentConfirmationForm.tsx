@@ -1,11 +1,10 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ArrowLeft, Check } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { ArrowLeft, Target, Gamepad2, Video, BookOpen, MessageCircle, TrendingUp, FileText } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type PaymentConfirmationFormProps = {
   selectedPlan: string;
@@ -16,120 +15,137 @@ export function PaymentConfirmationForm({
   selectedPlan,
   onBack
 }: PaymentConfirmationFormProps) {
-  const [cardNumber, setCardNumber] = useState("");
-  const [cardName, setCardName] = useState("");
-  const [expiryDate, setExpiryDate] = useState("");
-  const [cvc, setCvc] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'monthly' | 'yearly'>('yearly');
 
-  // Format the price and billing frequency based on the selected plan
-  const getPlanDetails = () => {
-    if (selectedPlan.includes("Letna naročnina")) {
-      return {
-        name: "Letna naročnina",
-        price: "9,90 €",
-        frequency: "mesec (plačilo letno)"
-      };
-    } else {
-      return {
-        name: "Mesečna naročnina",
-        price: "19,90 €",
-        frequency: "mesec (plačilo mesečno)"
-      };
-    }
-  };
-  const planDetails = getPlanDetails();
+  const features = [
+    { icon: <Target className="h-4 w-4 text-dragon-green" />, text: "Napredno testiranje izgovorjave" },
+    { icon: <Gamepad2 className="h-4 w-4 text-app-purple" />, text: "Dostop do govornih vaj in iger" },
+    { icon: <Video className="h-4 w-4 text-app-teal" />, text: "Video navodila logopeda" },
+    { icon: <BookOpen className="h-4 w-4 text-app-orange" />, text: "Logopedski nasveti za starše" },
+    { icon: <MessageCircle className="h-4 w-4 text-app-blue" />, text: "Pogovor s pametnim AI asistentom" },
+    { icon: <TrendingUp className="h-4 w-4 text-dragon-green" />, text: "Sledenje napredku otroka" },
+    { icon: <FileText className="h-4 w-4 text-app-purple" />, text: "Prilagojen govorni načrt" }
+  ];
   
-  const formatCardNumber = (value: string) => {
-    // Remove all non-digits
-    const digits = value.replace(/\D/g, "");
-
-    // Add space after every 4 digits
-    let formatted = "";
-    for (let i = 0; i < digits.length; i++) {
-      if (i > 0 && i % 4 === 0) {
-        formatted += " ";
-      }
-      formatted += digits[i];
-    }
-
-    // Limit to 19 characters (16 digits + 3 spaces)
-    return formatted.substring(0, 19);
-  };
-  
-  const formatExpiryDate = (value: string) => {
-    // Remove all non-digits
-    const digits = value.replace(/\D/g, "");
-
-    // Format as MM/YY
-    if (digits.length <= 2) {
-      return digits;
-    }
-    return `${digits.substring(0, 2)}/${digits.substring(2, 4)}`;
-  };
-  
-  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCardNumber(formatCardNumber(e.target.value));
-  };
-  
-  const handleExpiryDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setExpiryDate(formatExpiryDate(e.target.value));
-  };
-  
-  const handleCvcChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Only allow digits and limit to 4 characters
-    const value = e.target.value.replace(/\D/g, "").substring(0, 4);
-    setCvc(value);
-  };
-  
-  return <div className="space-y-6">
+  return (
+    <div className="space-y-6">
       <div className="text-center mb-6">
-        
+        <h2 className="text-3xl md:text-4xl font-bold mb-2">Cenik</h2>
+        <p className="text-lg text-muted-foreground">
+          Naši paketi so zasnovani posebej za starše in njihove otroke. Izberite paket, ki vam najbolj ustreza.
+        </p>
       </div>
       
-      <Card className="p-6 border-blue-200 bg-blue-50">
-        <div className="flex items-start gap-4">
-          <div className="bg-blue-100 p-1.5 rounded-full text-black-700 mt-1">
-            <Check className="h-5 w-5" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-lg">Izbrani paket: {planDetails.name}</h3>
-            <p className="text-gray-600 mt-1">
-              <span className="font-medium">{planDetails.price} / {planDetails.frequency}</span>
-            </p>
-            <p className="text-gray-600 mt-1">
-              Vaš 7-dnevni brezplačni preizkus se začne danes. Po tem obdobju bo zaračunana izbrana naročnina.
-            </p>
-          </div>
-        </div>
-      </Card>
-      
-      {error && <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>}
-      
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="cardName">Ime na kartici</Label>
-          <Input id="cardName" value={cardName} onChange={e => setCardName(e.target.value)} placeholder="Janez Novak" className="rounded-md text-base" required />
-        </div>
+      <div className="max-w-2xl mx-auto">
+        {/* Plan Toggle */}
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'monthly' | 'yearly')} className="w-full mb-8">
+          <TabsList className="grid w-full grid-cols-2 bg-gray-100 dark:bg-gray-800">
+            <TabsTrigger value="monthly" className="data-[state=active]:bg-white data-[state=active]:text-gray-900">
+              Plačuj mesečno
+            </TabsTrigger>
+            <TabsTrigger value="yearly" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 relative">
+              Prihrani letno
+              <span className="absolute -top-2 -right-2 bg-app-orange text-white text-xs px-2 py-0.5 rounded-full font-medium">
+                -54%
+              </span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="monthly" className="mt-6">
+            <Card 
+              className={cn(
+                "relative border-2 transition-all duration-300 hover:shadow-lg",
+                "border-app-blue shadow-md"
+              )}
+            >
+              <CardContent className="p-8">
+                <div className="text-center mb-6">
+                  <h3 className="text-2xl font-bold text-app-blue mb-2">Mesečna naročnina</h3>
+                  <div className="flex items-baseline justify-center gap-1 mb-2">
+                    <span className="text-4xl font-bold">22 €</span>
+                    <span className="text-gray-500">/mesec</span>
+                  </div>
+                  <p className="text-sm text-gray-600">zaračunano mesečno</p>
+                </div>
+
+                <div className="text-center mb-6">
+                  <p className="text-lg font-medium text-gray-700 mb-4">
+                    "Vse, kar potrebuje otrok, da izboljša govor!"
+                  </p>
+                </div>
+
+                <div className="space-y-3 mb-8">
+                  {features.map((feature, index) => (
+                    <div key={index} className="flex items-center gap-3 text-sm">
+                      {feature.icon}
+                      <span>{feature.text}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <Button className="w-full bg-app-blue hover:bg-app-blue/90 text-white h-12 text-lg font-semibold">
+                  Izberi mesečno naročnino
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="yearly" className="mt-6">
+            <Card 
+              className={cn(
+                "relative border-2 transition-all duration-300 hover:shadow-lg",
+                "border-dragon-green shadow-md"
+              )}
+            >
+              <CardContent className="p-8">
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                  <span className="bg-app-orange text-white text-sm px-4 py-1 rounded-full font-medium">
+                    Večina staršev izbere
+                  </span>
+                </div>
+                
+                <div className="text-center mb-6 mt-2">
+                  <h3 className="text-2xl font-bold text-dragon-green mb-2">Letna naročnina</h3>
+                  <div className="flex items-baseline justify-center gap-1 mb-2">
+                    <span className="text-4xl font-bold">10 €</span>
+                    <span className="text-gray-500">/mesec</span>
+                  </div>
+                  <p className="text-sm text-gray-600">zaračunano letno</p>
+                </div>
+
+                <div className="text-center mb-6">
+                  <p className="text-lg font-medium text-gray-700 mb-4">
+                    "Vse, kar potrebuje otrok, da izboljša govor!"
+                  </p>
+                </div>
+
+                <div className="space-y-3 mb-8">
+                  {features.map((feature, index) => (
+                    <div key={index} className="flex items-center gap-3 text-sm">
+                      {feature.icon}
+                      <span>{feature.text}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <Button className="w-full bg-dragon-green hover:bg-dragon-green/90 text-white h-12 text-lg font-semibold">
+                  Izberi letno naročnino
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
         
-        <div className="space-y-2">
-          <Label htmlFor="cardNumber">Številka kartice</Label>
-          <Input id="cardNumber" value={cardNumber} onChange={handleCardNumberChange} placeholder="1234 5678 9012 3456" className="rounded-md text-base" required />
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="expiryDate">Velja do</Label>
-            <Input id="expiryDate" value={expiryDate} onChange={handleExpiryDateChange} placeholder="MM/LL" className="rounded-md text-base" maxLength={5} required />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="cvc">CVC/CVV</Label>
-            <Input id="cvc" value={cvc} onChange={handleCvcChange} placeholder="123" className="rounded-md text-base" required />
-          </div>
+        {/* Additional note */}
+        <div className="mt-6 text-center text-sm text-gray-600 bg-gray-50 dark:bg-gray-800/30 rounded-lg p-4">
+          <p>Vsak dodatni otrok: <strong>+3,90 € / mesec</strong></p>
         </div>
       </div>
-    </div>;
+
+      <Button onClick={onBack} variant="outline" size="sm" className="flex items-center gap-2">
+        <ArrowLeft className="h-4 w-4" />
+        Nazaj
+      </Button>
+    </div>
+  );
 }
