@@ -21,28 +21,47 @@ const VajeMoториkeGovoril = () => {
     isCardActive,
   } = useExerciseProgress();
 
-  // Clean cache busting for mobile browsers
+  // Aggressive cache clearing for mobile browsers
   useEffect(() => {
     const timestamp = Date.now();
     
-    // Add cache-busting meta tags silently
-    const addCacheBustingMeta = () => {
-      const metaRefresh = document.createElement('meta');
-      metaRefresh.httpEquiv = 'Cache-Control';
-      metaRefresh.content = 'no-cache, no-store, must-revalidate, max-age=0';
-      metaRefresh.setAttribute('data-cache-bust', timestamp.toString());
-      document.head.appendChild(metaRefresh);
-      
-      if (navigator.userAgent.includes('Mobile')) {
-        const mobileMeta = document.createElement('meta');
-        mobileMeta.name = 'cache-control';
-        mobileMeta.content = 'no-store';
-        mobileMeta.setAttribute('data-mobile-cache-bust', timestamp.toString());
-        document.head.appendChild(mobileMeta);
+    const clearAllCaches = async () => {
+      try {
+        // 1. Clear localStorage and sessionStorage
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // 2. Clear all application caches
+        if ('caches' in window) {
+          const cacheNames = await caches.keys();
+          await Promise.all(cacheNames.map(name => caches.delete(name)));
+        }
+        
+        // 3. Unregister all service workers
+        if ('serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          for (const registration of registrations) {
+            await registration.unregister();
+          }
+        }
+        
+        // 4. Force reload the page if URL doesn't have cache buster
+        const urlParams = new URLSearchParams(window.location.search);
+        if (!urlParams.has('cb')) {
+          // Add cache buster and reload
+          const newUrl = `${window.location.pathname}?cb=${timestamp}`;
+          window.history.replaceState({}, document.title, newUrl);
+          window.location.reload();
+          return;
+        }
+        
+        console.log('✅ All caches cleared for mobile browser');
+      } catch (error) {
+        console.error('Cache clearing failed:', error);
       }
     };
     
-    addCacheBustingMeta();
+    clearAllCaches();
   }, []);
 
   useEffect(() => {
