@@ -95,7 +95,7 @@ Kakšna je otrokova odzivnost? Se rad pogovarja, je zadržan, se jezi, če ga ne
 
         <div className="space-y-6">
           <p className="text-sm text-gray-700 leading-relaxed">
-            Ta razdelek predstavlja prvi stik in oceno otrokovih težav. Zelo pomembno je, da čim bolj natančno opišete, s katerimi glasovi ima otrok težave, saj bo aplikacija na podlagi teh informacij predlagala ustrezne vaje in igre.
+            Ta razdelek predstavlja prvi stik in oceno otrokovih težav. Zelo pomembno je, da čim bolj natančno opišete, s katerimi glasovi ima otrok težave, saj bo aplikacija na podlagi teh informacij predlagala ustrezne vaje in igre. Če niste prepričani, lahko označite možnost »Nisem prepričan/a« ali »Ne vem« – vseeno pa vam priporočamo, da v spodnjem polju čim bolj podrobno opišete otrokove težave.
           </p>
 
           <div className="flex items-start space-x-3">

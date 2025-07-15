@@ -59,16 +59,21 @@ export default function Register() {
     discount: true,
     discountPercent: "PRIHRANEK 50%"
   }];
-  return <AuthLayout title="Ustvarite račun" subtitle="Registrirajte se in začnite uporabljati aplikacijo.">
+  return <AuthLayout title="" subtitle="">
       {/* Progress Tracker */}
-      <div className="mb-6 mt-4">
+      <div className="mb-6">
         <div className="flex justify-between text-sm text-gray-500 mb-2">
           <span>Korak {getCurrentStep()} od {getTotalSteps()}</span>
         </div>
         <Progress value={getCurrentStep() / getTotalSteps() * 100} className="h-2" />
       </div>
 
-      {currentStep === RegistrationStep.ACCOUNT_INFO && <form onSubmit={goToNextStep} className="mt-6 space-y-6">
+      {currentStep === RegistrationStep.ACCOUNT_INFO && <>
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold mb-2">Ustvarite račun</h1>
+          <p className="text-gray-600">Registrirajte se in začnite uporabljati aplikacijo.</p>
+        </div>
+        <form onSubmit={goToNextStep} className="space-y-6">
           {error && !error.includes("otrok") && <Alert variant="destructive">
               <AlertDescription>{error}</AlertDescription>
             </Alert>}
@@ -97,17 +102,18 @@ export default function Register() {
               Prijavite se
             </Link>
           </div>
-        </form>}
+        </form>
+      </>}
 
-      {currentStep === RegistrationStep.SPEECH_DIFFICULTIES && <div className="mt-6">
+      {currentStep === RegistrationStep.SPEECH_DIFFICULTIES && <div>
           <SpeechDifficultiesStep onBack={goBack} onSubmit={handleSpeechDifficultiesSubmit} childName={currentChild.name} initialDifficulties={currentChild.speechDifficulties} submitButtonText="Naprej" />
         </div>}
 
-      {currentStep === RegistrationStep.SPEECH_DEVELOPMENT && <div className="mt-6">
+      {currentStep === RegistrationStep.SPEECH_DEVELOPMENT && <div>
           <SpeechDevelopmentQuestions onBack={goBack} onSubmit={handleSpeechDevelopmentSubmit} childName={currentChild.name} initialAnswers={currentChild.speechDevelopment} />
         </div>}
 
-      {currentStep === RegistrationStep.PAYMENT_CONFIRMATION && <div className="mt-6 space-y-6">
+      {currentStep === RegistrationStep.PAYMENT_CONFIRMATION && <div className="space-y-6">
           <div>
             <h3 className="text-2xl font-bold font-extrabold text-dragon-green mb-4 text-center">Začnite 7-dnevni brezplačni preizkus</h3>
             

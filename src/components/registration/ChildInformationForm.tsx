@@ -5,11 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Trash2, UserX } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
 import { ChildProfile } from "@/hooks/registration/types";
 import { avatarOptions } from "@/components/AvatarSelector";
 type ChildInformationFormProps = {
@@ -68,27 +66,78 @@ export function ChildInformationForm({
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor={`birth-date-${child.id}`}>Datum rojstva otroka <span className="text-red-500">*</span></Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button id={`birth-date-${child.id}`} variant="outline" className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !child.birthDate && "text-muted-foreground"
-                        )}>
-                        {child.birthDate ? format(child.birthDate, "dd.MM.yyyy") : "Izberite datum rojstva"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar 
-                        mode="single" 
-                        selected={child.birthDate || undefined} 
-                        onSelect={date => updateChildField(child.id, "birthDate", date)} 
-                        disabled={(date) => date > new Date()} 
-                        initialFocus 
-                        className={cn("p-3 pointer-events-auto")} 
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <Label>Datum rojstva otroka <span className="text-red-500">*</span></Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <Label htmlFor={`birth-day-${child.id}`} className="text-xs text-gray-600">Dan</Label>
+                      <Select 
+                        value={child.birthDate ? child.birthDate.getDate().toString() : ""} 
+                        onValueChange={(value) => {
+                          const currentDate = child.birthDate || new Date();
+                          const newDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), parseInt(value));
+                          updateChildField(child.id, "birthDate", newDate);
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Dan" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
+                            <SelectItem key={day} value={day.toString()}>{day}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor={`birth-month-${child.id}`} className="text-xs text-gray-600">Mesec</Label>
+                      <Select 
+                        value={child.birthDate ? child.birthDate.getMonth().toString() : ""} 
+                        onValueChange={(value) => {
+                          const currentDate = child.birthDate || new Date();
+                          const newDate = new Date(currentDate.getFullYear(), parseInt(value), currentDate.getDate());
+                          updateChildField(child.id, "birthDate", newDate);
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Mesec" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="0">Januar</SelectItem>
+                          <SelectItem value="1">Februar</SelectItem>
+                          <SelectItem value="2">Marec</SelectItem>
+                          <SelectItem value="3">April</SelectItem>
+                          <SelectItem value="4">Maj</SelectItem>
+                          <SelectItem value="5">Junij</SelectItem>
+                          <SelectItem value="6">Julij</SelectItem>
+                          <SelectItem value="7">Avgust</SelectItem>
+                          <SelectItem value="8">September</SelectItem>
+                          <SelectItem value="9">Oktober</SelectItem>
+                          <SelectItem value="10">November</SelectItem>
+                          <SelectItem value="11">December</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor={`birth-year-${child.id}`} className="text-xs text-gray-600">Leto</Label>
+                      <Select 
+                        value={child.birthDate ? child.birthDate.getFullYear().toString() : ""} 
+                        onValueChange={(value) => {
+                          const currentDate = child.birthDate || new Date();
+                          const newDate = new Date(parseInt(value), currentDate.getMonth(), currentDate.getDate());
+                          updateChildField(child.id, "birthDate", newDate);
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Leto" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.from({ length: new Date().getFullYear() - 1990 + 1 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                            <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                   {!child.birthDate && <p className="text-sm text-red-500">Datum rojstva je obvezen.</p>}
                 </div>
                 
@@ -112,19 +161,53 @@ export function ChildInformationForm({
                 
                 <div>
                   <Label>Izberi avatarja</Label>
-                  <div className="grid grid-cols-3 gap-3 mt-3">
-                    {avatarOptions.map(avatar => <div key={avatar.id} onClick={() => updateChildField(child.id, "avatarId", avatar.id)} className={`cursor-pointer rounded-lg p-2 transition-all flex items-center justify-center ${child.avatarId === avatar.id ? 'bg-dragon-green/20 ring-2 ring-dragon-green' : 'hover:bg-gray-100'}`}>
-                        {avatar.id === 0 ? <div className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-full flex items-center justify-center bg-gray-100 border border-gray-200">
-                            <UserX className="h-8 w-8 text-gray-400" />
-                            <span className="sr-only">{avatar.alt}</span>
-                          </div> : <Avatar className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24">
-                            <AvatarImage src={avatar.src} alt={avatar.alt} className="object-contain" />
-                            <AvatarFallback className="text-xs text-center p-1">
-                              {avatar.alt.substring(0, 10)}...
-                            </AvatarFallback>
-                          </Avatar>}
-                      </div>)}
-                  </div>
+                  <Select 
+                    value={child.avatarId?.toString() || "0"} 
+                    onValueChange={(value) => updateChildField(child.id, "avatarId", parseInt(value))}
+                  >
+                    <SelectTrigger className="mt-2">
+                      <SelectValue placeholder="Izberi avatarja">
+                        <div className="flex items-center gap-2">
+                          {child.avatarId === 0 || !child.avatarId ? (
+                            <>
+                              <UserX className="h-4 w-4 text-gray-400" />
+                              <span>Brez avatarja</span>
+                            </>
+                          ) : (
+                            <>
+                              <Avatar className="h-6 w-6">
+                                <AvatarImage src={avatarOptions.find(a => a.id === child.avatarId)?.src} alt="Avatar" />
+                                <AvatarFallback className="text-xs">A</AvatarFallback>
+                              </Avatar>
+                              <span>{avatarOptions.find(a => a.id === child.avatarId)?.alt}</span>
+                            </>
+                          )}
+                        </div>
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {avatarOptions.map(avatar => (
+                        <SelectItem key={avatar.id} value={avatar.id.toString()}>
+                          <div className="flex items-center gap-2">
+                            {avatar.id === 0 ? (
+                              <>
+                                <UserX className="h-4 w-4 text-gray-400" />
+                                <span>{avatar.alt}</span>
+                              </>
+                            ) : (
+                              <>
+                                <Avatar className="h-6 w-6">
+                                  <AvatarImage src={avatar.src} alt={avatar.alt} />
+                                  <AvatarFallback className="text-xs">A</AvatarFallback>
+                                </Avatar>
+                                <span>{avatar.alt}</span>
+                              </>
+                            )}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div> : <div className="flex items-center gap-3">
                 {child.avatarId === 0 ? <div className="h-12 w-12 rounded-full flex items-center justify-center bg-gray-100">
@@ -139,7 +222,7 @@ export function ChildInformationForm({
                     Spol: {getGenderDisplayText(child.gender)}
                   </p>
                   {child.birthDate && <p className="text-sm text-gray-600">
-                      Datum rojstva: {format(child.birthDate, "dd.MM.yyyy")}
+                      Datum rojstva: {child.birthDate.getDate()}.{child.birthDate.getMonth() + 1}.{child.birthDate.getFullYear()}
                     </p>}
                 </div>
                 <Button type="button" variant="outline" size="sm" className="ml-auto" onClick={() => setSelectedChildIndex(index)}>
