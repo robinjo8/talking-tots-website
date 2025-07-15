@@ -25,6 +25,7 @@ export const ExerciseModal = ({
   
   useEffect(() => {
     if (isOpen && audioUrl) {
+      console.log('Attempting to play audio:', audioUrl);
       // Small delay to ensure modal is fully rendered
       const timer = setTimeout(() => {
         playAudio(audioUrl);
@@ -84,8 +85,18 @@ export const ExerciseModal = ({
           />
         </div>
 
+        {/* Complete button */}
+        <div className="mt-6">
+          <button
+            onClick={onComplete}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-lg font-semibold text-lg transition-colors"
+          >
+            Dokončaj vajo
+          </button>
+        </div>
+
         {/* Progress indicator */}
-        <div className="mt-6 text-white/70 text-sm">
+        <div className="mt-4 text-white/70 text-sm">
           Vaja {cardNumber} od 27
         </div>
       </div>
