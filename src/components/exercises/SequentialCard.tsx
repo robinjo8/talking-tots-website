@@ -42,7 +42,7 @@ export const SequentialCard = ({
         <img 
           src="/lovable-uploads/bfe0cdb1-b9d1-427e-93fa-2711a0d6bfbb.png" 
           alt="Completed" 
-          className="h-8 w-8 object-contain"
+          className="h-16 w-16 object-contain"
         />
       )}
       {!isLocked && !isCompleted && (
