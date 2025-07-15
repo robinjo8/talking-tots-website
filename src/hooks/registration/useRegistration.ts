@@ -57,8 +57,8 @@ export function useRegistration() {
     }
   };
 
-  const handleSpeechDifficultiesSubmit = (difficulties: string[]) => {
-    updateSpeechDifficulties(difficulties);
+  const handleSpeechDifficultiesSubmit = (difficulties: string[], detailedDescription?: string) => {
+    updateSpeechDifficulties(difficulties, detailedDescription);
     setCurrentStep(RegistrationStep.SPEECH_DEVELOPMENT);
   };
 
@@ -109,6 +109,7 @@ export function useRegistration() {
               birthDate: child.birthDate ? child.birthDate.toISOString() : null,
               avatarId: child.avatarId,
               speechDifficulties: child.speechDifficulties || [],
+              speechDifficultiesDescription: child.speechDifficultiesDescription || "",
               speechDevelopment: child.speechDevelopment || {}
             }))
           }

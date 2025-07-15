@@ -38,11 +38,15 @@ export function useChildrenState() {
     ));
   };
 
-  const handleSpeechDifficultiesSubmit = (difficulties: string[]) => {
+  const handleSpeechDifficultiesSubmit = (difficulties: string[], detailedDescription?: string) => {
     setChildren(prev => 
       prev.map((child, index) => 
         index === selectedChildIndex 
-          ? { ...child, speechDifficulties: difficulties } 
+          ? { 
+              ...child, 
+              speechDifficulties: difficulties,
+              speechDifficultiesDescription: detailedDescription || ""
+            } 
           : child
       )
     );

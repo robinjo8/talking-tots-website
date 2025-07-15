@@ -13,6 +13,7 @@ export type ChildProfile = {
   birthDate: Date | null;
   avatarId: number;
   speechDifficulties?: string[];
+  speechDifficultiesDescription?: string;
   speechDevelopment?: Record<string, string>;
   isComplete?: boolean;
 };

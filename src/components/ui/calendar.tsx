@@ -4,6 +4,7 @@ import { DayPicker } from "react-day-picker";
 
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
@@ -13,10 +14,38 @@ function Calendar({
   showOutsideDays = true,
   ...props
 }: CalendarProps) {
+  const [month, setMonth] = React.useState<Date>(() => props.selected as Date || new Date());
+
+  const handleYearChange = (year: string) => {
+    const newDate = new Date(month);
+    newDate.setFullYear(parseInt(year));
+    setMonth(newDate);
+  };
+
+  const handleMonthChange = (monthIndex: string) => {
+    const newDate = new Date(month);
+    newDate.setMonth(parseInt(monthIndex));
+    setMonth(newDate);
+  };
+
+  const currentYear = month.getFullYear();
+  const currentMonthIndex = month.getMonth();
+
+  // Generate year options (from 1950 to current year + 10)
+  const yearOptions = Array.from({ length: new Date().getFullYear() - 1950 + 11 }, (_, i) => 1950 + i).reverse();
+  
+  // Month names in Slovenian
+  const monthNames = [
+    "Januar", "Februar", "Marec", "April", "Maj", "Junij",
+    "Julij", "Avgust", "September", "Oktober", "November", "December"
+  ];
+
   return (
     <DayPicker
+      month={month}
+      onMonthChange={setMonth}
       showOutsideDays={showOutsideDays}
-      className={cn("p-3", className)}
+      className={cn("p-3 pointer-events-auto", className)}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
@@ -54,6 +83,34 @@ function Calendar({
       components={{
         IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />,
         IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />,
+        Caption: ({ displayMonth }) => (
+          <div className="flex justify-center pt-1 relative items-center gap-2">
+            <Select value={currentMonthIndex.toString()} onValueChange={handleMonthChange}>
+              <SelectTrigger className="w-auto h-7 px-2 text-sm font-medium border-none shadow-none">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {monthNames.map((monthName, index) => (
+                  <SelectItem key={index} value={index.toString()}>
+                    {monthName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={currentYear.toString()} onValueChange={handleYearChange}>
+              <SelectTrigger className="w-auto h-7 px-2 text-sm font-medium border-none shadow-none">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {yearOptions.map((year) => (
+                  <SelectItem key={year} value={year.toString()}>
+                    {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        ),
       }}
       {...props}
     />
