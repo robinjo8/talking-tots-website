@@ -15,6 +15,9 @@ const VajeMoториkeGovoril = () => {
   const [selectedCard, setSelectedCard] = useState<number | null>(null);
   const [cacheVersion, setCacheVersion] = useState(Date.now());
   
+  // Force browser to recognize this as new version - v2.0
+  const pageVersion = "v2.0-" + Date.now();
+  
   const {
     progress,
     completeCard,
@@ -133,6 +136,10 @@ const VajeMoториkeGovoril = () => {
             Vaje motorike govoril so namenjene razgibavanju govoril – ust, ustnic in jezika. 
             Začnite z vajo št. 1 in nadaljujte po vrsti.
           </p>
+          {/* Debug indicator - NEW VERSION */}
+          <div className="mt-2 text-xs text-green-600 font-mono">
+            ✅ Nova verzija: {pageVersion}
+          </div>
         </div>
 
         <div className="flex flex-col gap-4 mb-6">
