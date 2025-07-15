@@ -112,7 +112,7 @@ const GovornojezicovneVaje = () => {
               <CardContent className="pt-6 pb-4 flex-grow text-center">
                 <h3 className={`text-lg font-semibold mb-2 ${exercise.color}`}>{exercise.title}</h3>
                 <p className="text-sm text-gray-600 mb-3 text-justify">{exercise.description}</p>
-                {exercise.example && <p className="text-xs text-gray-500 italic">{exercise.example}</p>}
+                {exercise.example}
                 {!exercise.available && <div className="mt-3 text-sm text-muted-foreground italic">
                     Kmalu na voljo
                   </div>}
