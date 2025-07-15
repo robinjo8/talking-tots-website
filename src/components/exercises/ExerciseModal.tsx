@@ -61,29 +61,29 @@ export const ExerciseModal = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
-      {/* Close button */}
+      {/* Close button with white background and red text */}
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
+        className="absolute top-4 right-4 z-10 px-4 py-2 rounded-lg bg-white text-red-600 hover:bg-gray-100 transition-colors font-semibold"
       >
-        <X className="h-6 w-6" />
+        Zapri
       </button>
-
 
       {/* Content */}
       <div className="w-full max-w-4xl mx-auto text-center">
-        {/* Card number and instruction */}
+        {/* Instruction */}
         <div className="mb-6">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary text-primary-foreground font-bold text-lg mb-4">
-            {cardNumber}
-          </div>
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
             {instruction}
           </h2>
         </div>
 
-        {/* Image */}
+        {/* Image with card number on top */}
         <div className="relative bg-white rounded-xl p-4 shadow-2xl">
+          {/* Card number at top of image with white background and black text */}
+          <div className="absolute top-2 left-2 bg-white text-black px-3 py-1 rounded-lg font-bold text-lg border border-gray-300 z-10">
+            {cardNumber}
+          </div>
           <img
             src={imageUrl}
             alt={`Vaja ${cardNumber}: ${instruction}`}
@@ -94,16 +94,6 @@ export const ExerciseModal = ({
               e.currentTarget.style.background = 'lightgray';
             }}
           />
-        </div>
-
-        {/* Complete button */}
-        <div className="mt-6">
-          <button
-            onClick={onComplete}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-lg font-semibold text-lg transition-colors"
-          >
-            Zapri
-          </button>
         </div>
 
         {/* Progress indicator */}

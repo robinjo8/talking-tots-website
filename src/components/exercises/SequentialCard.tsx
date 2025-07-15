@@ -1,5 +1,6 @@
-import { Lock, Check } from "lucide-react";
+import { Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import dragonCompleted from "@/assets/dragon-completed.png";
 
 interface SequentialCardProps {
   number: number;
@@ -40,8 +41,7 @@ export const SequentialCard = ({
       )}
       {isCompleted && (
         <div className="flex items-center justify-center">
-          <Check className="h-5 w-5 mr-1" />
-          <span>{number}</span>
+          <img src={dragonCompleted} alt="Completed" className="h-8 w-8" />
         </div>
       )}
       {!isLocked && !isCompleted && (
