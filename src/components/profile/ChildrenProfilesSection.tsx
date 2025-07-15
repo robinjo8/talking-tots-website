@@ -83,7 +83,7 @@ export function ChildrenProfilesSection({
                   child={profile.children[0]}
                   onEdit={() => setEditingChildIndex(0)}
                   onDelete={() => setDeletingChildIndex(0)}
-                  onEditDifficulties={() => setEditingDifficultiesIndex(0)}
+                  onRefresh={() => window.location.reload()}
                 />
               ) : !showDatabaseManager && (
                 <div className="text-center py-8">

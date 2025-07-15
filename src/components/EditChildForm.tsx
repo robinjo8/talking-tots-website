@@ -5,6 +5,10 @@ import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import { AvatarSelector } from "@/components/AvatarSelector";
 import { GenderSelector } from "@/components/GenderSelector";
 
@@ -12,6 +16,7 @@ type ChildData = {
   name: string;
   gender: string;
   avatarId: number;
+  birthDate?: Date | null;
 };
 
 type EditChildFormProps = {
@@ -26,12 +31,14 @@ export function EditChildForm({ childIndex, initialData, onSuccess, onCancel }: 
   const [name, setName] = useState(initialData.name);
   const [gender, setGender] = useState(initialData.gender);
   const [avatarId, setAvatarId] = useState(initialData.avatarId);
+  const [birthDate, setBirthDate] = useState<Date | null>(initialData.birthDate || null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     setName(initialData.name);
     setGender(initialData.gender);
     setAvatarId(initialData.avatarId);
+    setBirthDate(initialData.birthDate || null);
   }, [initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -66,6 +73,7 @@ export function EditChildForm({ childIndex, initialData, onSuccess, onCancel }: 
           name: name.trim(),
           gender,
           avatarId,
+          birthDate,
           speechDifficulties: existingDifficulties
         };
         
@@ -103,6 +111,32 @@ export function EditChildForm({ childIndex, initialData, onSuccess, onCancel }: 
             className="mt-1"
             required
           />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="birth-date">Datum rojstva otroka</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                id="birth-date"
+                variant="outline"
+                className={cn(
+                  "w-full justify-start text-left font-normal",
+                  !birthDate && "text-muted-foreground"
+                )}
+              >
+                {birthDate ? format(birthDate, "dd.MM.yyyy") : "Izberite datum rojstva"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={birthDate}
+                onSelect={setBirthDate}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
         </div>
         
         <GenderSelector 

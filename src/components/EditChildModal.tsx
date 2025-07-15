@@ -12,6 +12,7 @@ type EditChildModalProps = {
     name: string;
     gender: string;
     avatarId: number;
+    birthDate?: Date | null;
   };
   onSuccess: () => void;
 };

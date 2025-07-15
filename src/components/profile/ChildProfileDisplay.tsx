@@ -1,17 +1,21 @@
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { UserRound, Pencil, Trash2, FileEdit, Calendar, MessageSquare } from "lucide-react";
 import { SpeechDifficultiesList } from "@/components/SpeechDifficultiesList";
 import { Badge } from "@/components/ui/badge";
 import { SPEECH_DEVELOPMENT_QUESTIONS } from "@/models/SpeechDevelopment";
 import { ChildProfile } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 type ChildProfileDisplayProps = {
   child: ChildProfile;
   onEdit?: () => void;
   onDelete?: () => void;
-  onEditDifficulties?: () => void;
+  onRefresh?: () => void;
 };
 
 const getAvatarSrc = (avatarId: number): string => {
@@ -41,8 +45,11 @@ export function ChildProfileDisplay({
   child, 
   onEdit, 
   onDelete,
-  onEditDifficulties,
+  onRefresh,
 }: ChildProfileDisplayProps) {
+  const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const [editingDescription, setEditingDescription] = useState(child.speechDifficultiesDescription || "");
+  const [isSavingDescription, setIsSavingDescription] = useState(false);
   const avatarSrc = getAvatarSrc(child.avatarId);
   
   const formatGender = (gender: string) => {
@@ -68,6 +75,41 @@ export function ChildProfileDisplay({
   const formatDate = (date: Date | null): string => {
     if (!date) return "Ni določeno";
     return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+  };
+
+  const handleSaveDescription = async () => {
+    try {
+      setIsSavingDescription(true);
+      
+      const { data: userData, error: userError } = await supabase.rpc('get_auth_user_data');
+      
+      if (userError) throw userError;
+      
+      const currentChildren = [...((userData as any).children || [])];
+      
+      if (currentChildren.length > 0) {
+        currentChildren[0] = {
+          ...currentChildren[0],
+          speechDifficultiesDescription: editingDescription.trim()
+        };
+        
+        const { error: updateError } = await supabase.auth.updateUser({
+          data: { children: currentChildren }
+        });
+        
+        if (updateError) throw updateError;
+        
+        setIsEditingDescription(false);
+        toast.success("Opis uspešno posodobljen!");
+        
+        if (onRefresh) onRefresh();
+      }
+    } catch (error: any) {
+      console.error("Napaka pri posodobitvi opisa:", error);
+      toast.error("Napaka pri posodobitvi opisa. Poskusite znova.");
+    } finally {
+      setIsSavingDescription(false);
+    }
   };
 
   return (
@@ -141,18 +183,6 @@ export function ChildProfileDisplay({
                   Izbriši
                 </Button>
               )}
-              
-              {onEditDifficulties && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={onEditDifficulties}
-                  className="border-app-purple text-app-purple hover:bg-app-purple/10"
-                >
-                  <FileEdit className="h-4 w-4 mr-2" />
-                  Uredi govorne težave
-                </Button>
-              )}
             </div>
           </div>
         </CardContent>
@@ -179,10 +209,55 @@ export function ChildProfileDisplay({
               </p>
             )}
             
-            {child.speechDifficultiesDescription && (
+            {(child.speechDifficultiesDescription || isEditingDescription) && (
               <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm font-medium text-gray-700 mb-1">Dodaten opis:</p>
-                <p className="text-sm text-gray-600">{child.speechDifficultiesDescription}</p>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-gray-700">Dodaten opis:</p>
+                  {!isEditingDescription && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setEditingDescription(child.speechDifficultiesDescription || "");
+                        setIsEditingDescription(true);
+                      }}
+                      className="border-app-purple text-app-purple hover:bg-app-purple/10"
+                    >
+                      <Pencil className="h-3 w-3 mr-1" />
+                      Uredi
+                    </Button>
+                  )}
+                </div>
+                {isEditingDescription ? (
+                  <div className="space-y-2">
+                    <Input
+                      value={editingDescription}
+                      onChange={(e) => setEditingDescription(e.target.value)}
+                      placeholder="Vnesite dodaten opis govornih težav..."
+                      className="text-sm"
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        onClick={handleSaveDescription}
+                        disabled={isSavingDescription}
+                        className="bg-dragon-green hover:bg-dragon-green/90"
+                      >
+                        {isSavingDescription ? "Shranjevanje..." : "Shrani"}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsEditingDescription(false)}
+                        disabled={isSavingDescription}
+                      >
+                        Prekliči
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-600">{child.speechDifficultiesDescription}</p>
+                )}
               </div>
             )}
           </CardContent>
