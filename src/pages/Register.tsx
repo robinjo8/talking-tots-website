@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
@@ -113,19 +112,7 @@ export default function Register() {
             <h3 className="text-2xl font-bold font-extrabold text-dragon-green mb-4 text-center">Začnite 7-dnevni brezplačni preizkus</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              {subscriptionOptions.map(option => <div key={option.id} className={`border rounded-lg p-4 cursor-pointer ${selectedPlan === option.fullName ? "border-dragon-green bg-green-50" : "hover:bg-gray-50"}`} onClick={() => setSelectedPlan(option.fullName)}>
-                  <div className="flex justify-between items-center mb-2">
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-medium">{option.name}</h4>
-                      {option.discount && <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded">{option.discountPercent}</span>}
-                    </div>
-                    <div className="h-4 w-4 rounded-full border border-dragon-green flex items-center justify-center">
-                      {selectedPlan === option.fullName && <div className="h-2 w-2 rounded-full bg-dragon-green"></div>}
-                    </div>
-                  </div>
-                  <p className="font-bold text-xl">{option.price} <span className="text-gray-500 text-sm font-normal">/ {option.period}</span></p>
-                  <p className="text-sm text-gray-600 mt-1">{option.billing}</p>
-                </div>)}
+              {subscriptionOptions.map(option => {})}
             </div>
           </div>
           
