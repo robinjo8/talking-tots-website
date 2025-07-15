@@ -63,7 +63,6 @@ const VajeMoториkeGovoril = () => {
   const handleCardClick = (cardNumber: number) => {
     if (isCardLocked(cardNumber)) return;
     setSelectedCard(cardNumber);
-    completeCard(cardNumber);
   };
 
   const handleCloseModal = () => {
