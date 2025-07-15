@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { SequentialCard } from "./SequentialCard";
 import { ExerciseModal } from "./ExerciseModal";
 import { useExerciseProgress } from "@/hooks/useExerciseProgress";
@@ -14,22 +14,22 @@ export const SequentialExerciseGrid = () => {
     isCardActive 
   } = useExerciseProgress();
 
-  const handleCardClick = (cardNumber: number) => {
+  const handleCardClick = useCallback((cardNumber: number) => {
     if (!isCardLocked(cardNumber)) {
       setSelectedCard(cardNumber);
     }
-  };
+  }, [isCardLocked]);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setSelectedCard(null);
-  };
+  }, []);
 
-  const handleCompleteExercise = () => {
+  const handleCompleteExercise = useCallback(() => {
     if (selectedCard) {
       completeCard(selectedCard);
       setSelectedCard(null);
     }
-  };
+  }, [selectedCard, completeCard]);
 
   const getImageUrl = (cardNumber: number) => {
     return `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/vaje-motorike-govoril/${cardNumber}.jpg`;
@@ -39,7 +39,7 @@ export const SequentialExerciseGrid = () => {
     return `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/vaje-motorike-govoril/od${cardNumber}.m4a`;
   };
 
-  const renderCards = () => {
+  const renderedCards = useMemo(() => {
     const cards = [];
     for (let i = 1; i <= 27; i++) {
       cards.push(
@@ -54,13 +54,13 @@ export const SequentialExerciseGrid = () => {
       );
     }
     return cards;
-  };
+  }, [isCardLocked, isCardCompleted, isCardActive, handleCardClick]);
 
   return (
     <>
       <div className="w-full max-w-4xl mx-auto p-4">
         <div className="grid grid-cols-5 gap-4 auto-rows-fr">
-          {renderCards()}
+          {renderedCards}
         </div>
       </div>
 
