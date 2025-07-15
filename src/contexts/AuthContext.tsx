@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Fetch children from children table
       const { data: childrenData, error: childrenError } = await supabase
         .from('children')
-        .select('id, name, age, avatar_url, birth_date, speech_difficulties, speech_difficulties_description, speech_development')
+        .select('id, name, age, avatar_url, birth_date, gender, speech_difficulties, speech_difficulties_description, speech_development')
         .eq('parent_id', userId)
         .order('created_at');
 
@@ -74,7 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const children: ChildProfile[] = childrenData?.map(child => ({
         id: child.id,
         name: child.name,
-        gender: 'other', // Default since we don't store gender in DB yet
+        gender: child.gender || 'other',
         avatarId: child.avatar_url ? parseInt(child.avatar_url) : 1,
         age: child.age || undefined,
         birthDate: child.birth_date ? new Date(child.birth_date) : null,
