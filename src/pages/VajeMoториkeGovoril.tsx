@@ -67,18 +67,15 @@ const VajeMoториkeGovoril = () => {
   };
 
   const handleCloseModal = () => {
+    if (selectedCard) {
+      completeCard(selectedCard);
+    }
     setSelectedCard(null);
   };
 
-  const handlePrevious = () => {
-    if (selectedCard && selectedCard > 1) {
-      setSelectedCard(selectedCard - 1);
-    }
-  };
-
-  const handleNext = () => {
-    if (selectedCard && selectedCard < 27) {
-      setSelectedCard(selectedCard + 1);
+  const handleCompleteCard = () => {
+    if (selectedCard) {
+      completeCard(selectedCard);
     }
   };
 
@@ -129,11 +126,8 @@ const VajeMoториkeGovoril = () => {
             cardNumber={selectedCard}
             instruction={instructions[selectedCard - 1]}
             imageUrl={`${supabaseUrl}/storage/v1/object/public/${bucketName}/${selectedCard}.jpg?v=${Date.now()}`}
-            audioUrl={`${supabaseUrl}/storage/v1/object/public/${bucketName}/od${selectedCard}.m4a?v=${Date.now()}`}
-            onPrevious={handlePrevious}
-            onNext={handleNext}
-            hasPrevious={selectedCard > 1}
-            hasNext={selectedCard < 27}
+            audioUrl={`${supabaseUrl}/storage/v1/object/public/${bucketName}/${selectedCard}.m4a?v=${Date.now()}`}
+            onComplete={handleCompleteCard}
           />
         )}
       </div>

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { X } from "lucide-react";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 
 interface ExerciseModalProps {
@@ -9,10 +9,7 @@ interface ExerciseModalProps {
   instruction: string;
   imageUrl: string;
   audioUrl: string;
-  onPrevious?: () => void;
-  onNext?: () => void;
-  hasPrevious: boolean;
-  hasNext: boolean;
+  onComplete: () => void;
 }
 
 export const ExerciseModal = ({
@@ -22,10 +19,7 @@ export const ExerciseModal = ({
   instruction,
   imageUrl,
   audioUrl,
-  onPrevious,
-  onNext,
-  hasPrevious,
-  hasNext,
+  onComplete,
 }: ExerciseModalProps) => {
   const { playAudio } = useAudioPlayback();
 
@@ -63,24 +57,6 @@ export const ExerciseModal = ({
         <X className="h-6 w-6" />
       </button>
 
-      {/* Navigation buttons */}
-      {hasPrevious && (
-        <button
-          onClick={onPrevious}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-3 rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
-        >
-          <ChevronLeft className="h-6 w-6" />
-        </button>
-      )}
-
-      {hasNext && (
-        <button
-          onClick={onNext}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-3 rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
-        >
-          <ChevronRight className="h-6 w-6" />
-        </button>
-      )}
 
       {/* Content */}
       <div className="w-full max-w-4xl mx-auto text-center">

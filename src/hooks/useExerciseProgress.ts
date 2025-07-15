@@ -39,6 +39,14 @@ export const useExerciseProgress = () => {
       const newCompletedCards = [...prev.completedCards, cardNumber];
       const newCurrentUnlocked = Math.max(prev.currentUnlockedCard, cardNumber + 1);
 
+      // If completing card 27, reset to beginning
+      if (cardNumber === 27) {
+        return {
+          currentUnlockedCard: 1,
+          completedCards: [],
+        };
+      }
+
       return {
         currentUnlockedCard: Math.min(newCurrentUnlocked, 27),
         completedCards: newCompletedCards,
