@@ -81,9 +81,18 @@ const ProgressComparisonSection = () => {
                     }} />
                          {/* Icons positioned at specific percentages */}
                          <div className="absolute inset-0 flex items-center">
-                           <Trophy className={`w-4 h-4 drop-shadow-sm absolute ${index === 0 ? 'text-yellow-400 filter drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]' : 'text-white'}`} style={{ left: '45%', transform: 'translateX(-50%)' }} />
-                           <Award className={`w-4 h-4 drop-shadow-sm absolute ${index === 0 ? 'text-yellow-400 filter drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]' : 'text-white'}`} style={{ left: '70%', transform: 'translateX(-50%)' }} />
-                           <Crown className={`w-4 h-4 drop-shadow-sm absolute ${index === 0 ? 'text-yellow-400 filter drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]' : 'text-white'}`} style={{ left: '90%', transform: 'translateX(-50%)' }} />
+                           <Trophy className={`w-4 h-4 drop-shadow-sm absolute ${index === 0 ? 'text-yellow-400 filter drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]' : 'text-white'}`} style={{
+                        left: '45%',
+                        transform: 'translateX(-50%)'
+                      }} />
+                           <Award className={`w-4 h-4 drop-shadow-sm absolute ${index === 0 ? 'text-yellow-400 filter drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]' : 'text-white'}`} style={{
+                        left: '70%',
+                        transform: 'translateX(-50%)'
+                      }} />
+                           <Crown className={`w-4 h-4 drop-shadow-sm absolute ${index === 0 ? 'text-yellow-400 filter drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]' : 'text-white'}`} style={{
+                        left: '90%',
+                        transform: 'translateX(-50%)'
+                      }} />
                          </div>
                       </div>
                     </div>
@@ -103,7 +112,7 @@ const ProgressComparisonSection = () => {
                 <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4">
                   Neomejene TomiTalk vaje in igre vs. samoplačniške metode
                 </h3>
-                <p className="text-lg text-gray-600 leading-relaxed">Za ceno le 1,5 obiska pri samoplačniškem logopedu prejmete celoletno naročnino na TomiTalk</p>
+                <p className="text-lg text-gray-600 leading-relaxed">Za ceno le 1,5 obiska pri samoplačniškem obisku prejmete neomejeno celoletno naročnino na TomiTalk.</p>
               </div>
 
               {/* Bar chart */}
@@ -113,13 +122,10 @@ const ProgressComparisonSection = () => {
                   <div className="mb-2 text-center">
                     <span className="text-sm font-semibold text-green-600">30× in več ceneje</span>
                   </div>
-                  <div 
-                    className="bg-green-500 w-16 rounded-t-lg transition-all duration-1000 ease-out"
-                    style={{
-                      height: isVisible ? '40px' : '0px',
-                      transitionDelay: '0.3s'
-                    }}
-                  />
+                  <div className="bg-green-500 w-16 rounded-t-lg transition-all duration-1000 ease-out" style={{
+                  height: isVisible ? '40px' : '0px',
+                  transitionDelay: '0.3s'
+                }} />
                   <div className="mt-2 text-center">
                     <span className="text-sm font-medium text-gray-900">TomiTalk</span>
                   </div>
@@ -130,13 +136,10 @@ const ProgressComparisonSection = () => {
                   <div className="mb-2 text-center h-5">
                     {/* Empty space for label alignment */}
                   </div>
-                  <div 
-                    className="bg-gray-500 w-16 rounded-t-lg transition-all duration-1500 ease-out"
-                    style={{
-                      height: isVisible ? '160px' : '0px',
-                      transitionDelay: '0.5s'
-                    }}
-                  />
+                  <div className="bg-gray-500 w-16 rounded-t-lg transition-all duration-1500 ease-out" style={{
+                  height: isVisible ? '160px' : '0px',
+                  transitionDelay: '0.5s'
+                }} />
                   <div className="mt-2 text-center">
                     <span className="text-sm font-medium text-gray-900">Samoplačniško</span>
                   </div>
