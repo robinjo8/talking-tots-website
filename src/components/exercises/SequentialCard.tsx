@@ -39,7 +39,11 @@ export const SequentialCard = ({
         <Lock className="h-5 w-5 text-muted-foreground" />
       )}
       {isCompleted && (
-        <span>✓</span>
+        <img 
+          src="/lovable-uploads/bfe0cdb1-b9d1-427e-93fa-2711a0d6bfbb.png" 
+          alt="Completed" 
+          className="h-8 w-8 object-contain"
+        />
       )}
       {!isLocked && !isCompleted && (
         <span>{number}</span>
