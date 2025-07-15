@@ -63,7 +63,7 @@ const ProgressComparisonSection = () => {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* First box - Progress comparison */}
-            <div className="bg-white rounded-lg shadow-lg p-8">
+            <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col">
               <div className="text-center mb-8">
                 <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4">
                   Hitrejši napredek kot pri tradicionalnih pristopih
@@ -71,7 +71,7 @@ const ProgressComparisonSection = () => {
                 <p className="text-lg text-gray-600 leading-relaxed">Z redno uporabo otroci dosežejo hitrejši napredek kot pri klasičnih logopedskih obravnavah.</p>
               </div>
 
-              <div className="space-y-8 mb-8">
+              <div className="space-y-8 mb-8 flex-grow">
                 {therapyData.map((therapy, index) => <div key={therapy.name} className="space-y-3">
                     <div className="flex items-center gap-3 mb-2">
                       <div className="flex flex-col">
@@ -109,7 +109,7 @@ const ProgressComparisonSection = () => {
                   </div>)}
               </div>
 
-              <div className="text-center">
+              <div className="text-center mt-auto">
                 <p className="text-gray-600 leading-relaxed">
                   Primerjava temelji na tipični letni uporabi. Z aplikacijo TomiTalk otrok lahko vsak dan vadi govorne spretnosti v varnem in igrivem okolju – kjerkoli in kadarkoli.
                 </p>
@@ -117,7 +117,7 @@ const ProgressComparisonSection = () => {
             </div>
 
             {/* Second box - Cost comparison */}
-            <div className="bg-white rounded-lg shadow-lg p-8">
+            <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col">
               <div className="text-center mb-8">
                 <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4">
                   Neomejene TomiTalk vaje in igre vs. samoplačniške metode
@@ -125,48 +125,50 @@ const ProgressComparisonSection = () => {
                 <p className="text-lg text-gray-600 leading-relaxed">Za ceno le 1,5 obiska pri samoplačniškem obisku prejmete neomejeno celoletno naročnino na TomiTalk.</p>
               </div>
 
-              {/* Bar chart */}
-              <div className="flex justify-center items-end gap-8 mb-12 h-40 mt-8">
-                {/* TomiTalk bar */}
-                <div className="flex flex-col items-center">
-                  <div className="mb-2 text-center">
-                    <span className="text-sm font-semibold text-green-600">30× in več ceneje</span>
+              <div className="flex-grow flex flex-col">
+                {/* Bar chart */}
+                <div className="flex justify-center items-end gap-8 mb-12 h-40 mt-8">
+                  {/* TomiTalk bar */}
+                  <div className="flex flex-col items-center">
+                    <div className="mb-2 text-center">
+                      <span className="text-sm font-semibold text-green-600">30× in več ceneje</span>
+                    </div>
+                    <div className="bg-green-500 w-16 rounded-t-lg transition-all duration-1000 ease-out" style={{
+                    height: isVisible ? '40px' : '0px',
+                    transitionDelay: '0.3s'
+                  }} />
+                    <div className="mt-2 text-center">
+                      <span className="text-sm font-medium text-gray-900">TomiTalk</span>
+                    </div>
                   </div>
-                  <div className="bg-green-500 w-16 rounded-t-lg transition-all duration-1000 ease-out" style={{
-                  height: isVisible ? '40px' : '0px',
-                  transitionDelay: '0.3s'
-                }} />
-                  <div className="mt-2 text-center">
-                    <span className="text-sm font-medium text-gray-900">TomiTalk</span>
+
+                  {/* Samoplačniško bar */}
+                  <div className="flex flex-col items-center">
+                    <div className="mb-2 text-center h-5">
+                      {/* Empty space for label alignment */}
+                    </div>
+                    <div className="bg-gray-500 w-16 rounded-t-lg transition-all duration-1500 ease-out" style={{
+                    height: isVisible ? '160px' : '0px',
+                    transitionDelay: '0.5s'
+                  }} />
+                    <div className="mt-2 text-center">
+                      <span className="text-sm font-medium text-gray-900">Samoplačniško</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Samoplačniško bar */}
-                <div className="flex flex-col items-center">
-                  <div className="mb-2 text-center h-5">
-                    {/* Empty space for label alignment */}
-                  </div>
-                  <div className="bg-gray-500 w-16 rounded-t-lg transition-all duration-1500 ease-out" style={{
-                  height: isVisible ? '160px' : '0px',
-                  transitionDelay: '0.5s'
-                }} />
-                  <div className="mt-2 text-center">
-                    <span className="text-sm font-medium text-gray-900">Samoplačniško</span>
-                  </div>
+                {/* Button */}
+                <div className="text-center mb-8 mt-auto">
+                  <button 
+                    onClick={handleStartNow}
+                    className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200"
+                  >
+                    Prihranite in začnite zdaj
+                  </button>
                 </div>
               </div>
 
-              {/* Button */}
-              <div className="text-center mb-8 mt-4">
-                <button 
-                  onClick={handleStartNow}
-                  className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200"
-                >
-                  Prihranite in začnite zdaj
-                </button>
-              </div>
-
-              <div className="text-center">
+              <div className="text-center mt-auto">
                 <p className="text-gray-600 leading-relaxed">
                   Temelji na 50 individualnih urah letno pri zasebni logopedski obravnavi. Več kot ima otrok individualnih obravnav, bolj izrazita je cenovna prednost TomiTalk.
                 </p>
