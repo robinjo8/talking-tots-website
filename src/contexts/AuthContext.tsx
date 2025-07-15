@@ -59,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw profileError;
       }
 
-      // Fetch user data from auth - this should contain the signup metadata
+      // Fetch user data from auth
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       
       if (userError || !user) {
@@ -71,13 +71,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      console.log('Full user object:', user);
-      console.log('User metadata:', user.user_metadata);
-
-      // Extract children data from user metadata (where registration stores it)
-      const childrenFromMetadata = user.user_metadata?.children || [];
+      // Get complete user metadata including raw data
+      const { data: userMetadata, error: metadataError } = await supabase.rpc('get_auth_user_data');
       
-      console.log('Children from metadata:', childrenFromMetadata);
+      if (metadataError) {
+        console.error('Error fetching user metadata:', metadataError);
+      }
+
+      console.log('User metadata from RPC:', userMetadata);
+
+      // Extract children data from complete metadata
+      const metadataObject = userMetadata as any;
+      const childrenFromMetadata = metadataObject?.children || [];
       
       // Transform children data to match ChildProfile interface
       const children: ChildProfile[] = childrenFromMetadata.map((child: any) => ({

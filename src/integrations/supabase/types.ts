@@ -441,6 +441,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_auth_user_data: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       has_role: {
         Args:
           | {
