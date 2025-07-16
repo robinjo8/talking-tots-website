@@ -1,6 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { shuffleTiles, checkWin, canMoveTile } from '../utils/slidePuzzleUtils';
+import { useUserProgress } from './useUserProgress';
 
 export interface GameState {
   tiles: number[];
@@ -17,7 +18,8 @@ export interface Move {
   moves: number;
 }
 
-export const useSlidePuzzleGame = (size: number) => {
+export const useSlidePuzzleGame = (size: number, puzzleType: string = 'general') => {
+  const { recordPuzzleCompletion } = useUserProgress();
   const [gameState, setGameState] = useState<GameState>({
     tiles: [],
     emptyIndex: 0,
@@ -107,6 +109,8 @@ export const useSlidePuzzleGame = (size: number) => {
 
       if (isWon && gameState.time > 0) {
         saveBestTime(size, gameState.time);
+        // Record puzzle completion in progress system
+        recordPuzzleCompletion(puzzleType, gameState.time);
       }
     }
   };

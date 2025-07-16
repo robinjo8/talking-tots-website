@@ -8,7 +8,7 @@ import { ActivityOptions } from "@/components/ActivityOptions";
 import { TipSection } from "@/components/TipSection";
 import { NoChildSelected } from "@/components/NoChildSelected";
 import { FooterSection } from "@/components/FooterSection";
-import { MotivationalMessage } from "@/components/MotivationalMessage";
+
 
 const MojaStran = () => {
   const { user, profile, signOut, selectedChildIndex } = useAuth();
@@ -50,8 +50,6 @@ const MojaStran = () => {
         
         {selectedChild ? (
           <>
-            <MotivationalMessage />
-            
             <ProgressSection />
             
             <ActivityOptions />

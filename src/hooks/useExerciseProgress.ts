@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useUserProgress } from "./useUserProgress";
 
 const STORAGE_KEY = "vaje-motorike-govoril-progress";
 const CACHE_VERSION = "v2.0.0";
@@ -10,6 +11,7 @@ interface ExerciseProgress {
 }
 
 export const useExerciseProgress = () => {
+  const { recordExerciseCompletion } = useUserProgress();
   const [progress, setProgress] = useState<ExerciseProgress>({
     currentUnlockedCard: 1,
     completedCards: [],
@@ -54,6 +56,10 @@ export const useExerciseProgress = () => {
         };
         // Force immediate localStorage update
         localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
+        
+        // Record progress in Supabase
+        recordExerciseCompletion(1);
+        
         return newState;
       }
 

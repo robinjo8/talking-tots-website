@@ -309,6 +309,8 @@ export type Database = {
       }
       progress: {
         Row: {
+          activity_subtype: string | null
+          activity_type: Database["public"]["Enums"]["activity_type"] | null
           child_id: string
           completed_at: string
           correct_answers: number
@@ -316,9 +318,13 @@ export type Database = {
           exercise_id: string
           id: string
           score: number
+          session_metadata: Json | null
+          stars_earned: number | null
           total_questions: number
         }
         Insert: {
+          activity_subtype?: string | null
+          activity_type?: Database["public"]["Enums"]["activity_type"] | null
           child_id: string
           completed_at?: string
           correct_answers: number
@@ -326,9 +332,13 @@ export type Database = {
           exercise_id: string
           id?: string
           score: number
+          session_metadata?: Json | null
+          stars_earned?: number | null
           total_questions: number
         }
         Update: {
+          activity_subtype?: string | null
+          activity_type?: Database["public"]["Enums"]["activity_type"] | null
           child_id?: string
           completed_at?: string
           correct_answers?: number
@@ -336,6 +346,8 @@ export type Database = {
           exercise_id?: string
           id?: string
           score?: number
+          session_metadata?: Json | null
+          stars_earned?: number | null
           total_questions?: number
         }
         Relationships: [
@@ -445,6 +457,19 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Json
       }
+      get_child_activity_summary: {
+        Args: { child_uuid: string }
+        Returns: {
+          activity_type: Database["public"]["Enums"]["activity_type"]
+          activity_subtype: string
+          completion_count: number
+          total_stars: number
+        }[]
+      }
+      get_child_total_stars: {
+        Args: { child_uuid: string }
+        Returns: number
+      }
       has_role: {
         Args:
           | {
@@ -456,6 +481,7 @@ export type Database = {
       }
     }
     Enums: {
+      activity_type: "exercise" | "memory_game" | "puzzle"
       user_role: "admin" | "user"
     }
     CompositeTypes: {
@@ -584,6 +610,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      activity_type: ["exercise", "memory_game", "puzzle"],
       user_role: ["admin", "user"],
     },
   },
