@@ -24,7 +24,7 @@ export const ExerciseProgressInfo = ({
   return (
     <>
       {/* Green instruction box like on games pages */}
-      <Card className="mb-6 bg-gradient-to-r from-sky-50 to-green-50 border-dragon-green/30 shadow-md">
+      <Card className="mb-6 bg-gradient-to-r from-sky-50 to-light-cloud border-dragon-green/30 shadow-md">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-xl md:text-2xl text-dragon-green">
             <MessageSquare className="h-5 w-5 text-dragon-green" />
