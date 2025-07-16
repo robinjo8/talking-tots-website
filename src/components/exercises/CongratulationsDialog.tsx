@@ -8,31 +8,14 @@ interface CongratulationsDialogProps {
   completionCount: number;
 }
 
-const dragonImages = [
-  "Zmajcek_1.png",
-  "Zmajcek_2.png", 
-  "Zmajcek_4.png",
-  "Zmajcek_7.png",
-  "Zmajcek_8.png",
-  "Zmajcek_9.png",
-  "Zmajcek_10.png",
-  "Zmajcek_11.png"
-];
+const dragonImage = "Zmajcek_3.png";
 
 export const CongratulationsDialog = ({ 
   isOpen, 
   onClose, 
   completionCount 
 }: CongratulationsDialogProps) => {
-  const [randomDragon, setRandomDragon] = useState<string>("");
-
-  useEffect(() => {
-    if (isOpen) {
-      const randomIndex = Math.floor(Math.random() * dragonImages.length);
-      const selectedDragon = dragonImages[randomIndex];
-      setRandomDragon(`https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/${selectedDragon}`);
-    }
-  }, [isOpen]);
+  const dragonUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/${dragonImage}`;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -53,23 +36,21 @@ export const CongratulationsDialog = ({
             </div>
           </div>
 
-          {randomDragon && (
-            <div className="mb-4">
-              <img 
-                src={randomDragon} 
-                alt="Čestitamo zmajček" 
-                className="w-32 h-32 mx-auto rounded-full border-4 border-emerald-200 dark:border-emerald-700 shadow-lg"
-                onError={(e) => {
-                  console.error("Failed to load dragon image:", randomDragon);
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
-            </div>
-          )}
+          <div className="mb-4">
+            <img 
+              src={dragonUrl} 
+              alt="Čestitamo zmajček" 
+              className="w-32 h-32 mx-auto rounded-full border-4 border-emerald-200 dark:border-emerald-700 shadow-lg object-cover"
+              onError={(e) => {
+                console.error("Failed to load dragon image:", dragonUrl);
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          </div>
 
           <div className="bg-white dark:bg-emerald-950 rounded-lg p-3 mb-4 border border-emerald-200 dark:border-emerald-800">
             <p className="text-sm text-emerald-600 dark:text-emerald-400">
-              To je vaša <strong>{completionCount}.</strong> uspešna izvedba vseh 27 vaj!
+              Bravo to je tvoja <strong>{completionCount}.</strong> uspešno izvedena vaja!
             </p>
           </div>
 

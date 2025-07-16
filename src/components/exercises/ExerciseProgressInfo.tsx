@@ -33,7 +33,7 @@ export const ExerciseProgressInfo = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-emerald-800 dark:text-emerald-200">
-                Opravljenih ciklov
+                Napredek vaj
               </p>
               <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
                 {completionCount}
@@ -48,24 +48,10 @@ export const ExerciseProgressInfo = ({
 
         {/* Current progress */}
         <div className="space-y-3">
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-sm font-medium text-foreground">
-                Trenutna vaja: {currentCard}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Opravljenih: {completedCount}/{totalCards}
-              </p>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onReset}
-              className="text-xs"
-            >
-              <RotateCcw className="h-3 w-3 mr-1" />
-              Ponastavi
-            </Button>
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground">
+              Opravljenih: {completedCount}/{totalCards}
+            </p>
           </div>
           
           <div className="w-full bg-secondary rounded-full h-2">
