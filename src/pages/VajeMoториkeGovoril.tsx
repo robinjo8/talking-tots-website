@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import { SequentialExerciseGrid } from "@/components/exercises/SequentialExerciseGrid";
 import { ExerciseProgressInfo } from "@/components/exercises/ExerciseProgressInfo";
 import { useExerciseProgress } from "@/hooks/useExerciseProgress";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
 
@@ -12,6 +13,10 @@ const VajeMoториkeGovoril = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { progress, resetProgress, isCardCompleted } = useExerciseProgress();
+  const isMobile = useIsMobile();
+
+  // Mobile devices always get fullscreen, desktop never gets fullscreen
+  const effectiveFullscreen = isMobile;
 
   useEffect(() => {
     if (!user) {
@@ -19,27 +24,71 @@ const VajeMoториkeGovoril = () => {
     }
   }, [user, navigate]);
 
-  return (
-    <div className="min-h-screen bg-background">
-      <Header />
+  // Enable fullscreen on mobile devices only
+  useEffect(() => {
+    if (effectiveFullscreen) {
+      const requestFullscreen = async () => {
+        try {
+          if (document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen();
+          }
+        } catch (error) {
+          console.log('Fullscreen not supported:', error);
+        }
+      };
+      requestFullscreen();
       
-      <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Vaje motorike govoril
-          </h1>
+      return () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen?.();
+        }
+      };
+    }
+  }, [effectiveFullscreen]);
+
+  return (
+    <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}>
+      {!effectiveFullscreen && <Header />}
+      
+      {effectiveFullscreen ? (
+        <div className="h-full flex flex-col p-2">
+          <div className="text-center mb-4">
+            <h1 className="text-xl font-bold text-foreground mb-2">
+              Vaje motorike govoril
+            </h1>
+          </div>
+
+          <ExerciseProgressInfo
+            completionCount={progress.completionCount}
+            currentCard={progress.currentUnlockedCard}
+            totalCards={27}
+            completedCount={progress.completedCards.length}
+            onReset={resetProgress}
+          />
+
+          <div className="flex-1 overflow-auto">
+            <SequentialExerciseGrid />
+          </div>
         </div>
+      ) : (
+        <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Vaje motorike govoril
+            </h1>
+          </div>
 
-        <ExerciseProgressInfo
-          completionCount={progress.completionCount}
-          currentCard={progress.currentUnlockedCard}
-          totalCards={27}
-          completedCount={progress.completedCards.length}
-          onReset={resetProgress}
-        />
+          <ExerciseProgressInfo
+            completionCount={progress.completionCount}
+            currentCard={progress.currentUnlockedCard}
+            totalCards={27}
+            completedCount={progress.completedCards.length}
+            onReset={resetProgress}
+          />
 
-        <SequentialExerciseGrid />
-      </div>
+          <SequentialExerciseGrid />
+        </div>
+      )}
     </div>
   );
 };
