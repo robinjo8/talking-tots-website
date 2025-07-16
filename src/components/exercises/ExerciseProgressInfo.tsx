@@ -27,23 +27,7 @@ export const ExerciseProgressInfo = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Current progress */}
-        <div className="space-y-3">
-          <div className="text-center">
-            <p className="text-sm text-muted-foreground">
-              Opravljenih: {completedCount}/{totalCards}
-            </p>
-          </div>
-          
-          <div className="w-full bg-secondary rounded-full h-2">
-            <div 
-              className="bg-primary h-2 rounded-full transition-all duration-300"
-              style={{ width: `${progressPercentage}%` }}
-            />
-          </div>
-        </div>
-
-        {completedCount === totalCards && (
+        {completedCount === 27 && (
           <div className="text-center p-3 bg-emerald-50 dark:bg-emerald-950 rounded-lg border border-emerald-200 dark:border-emerald-800">
             <p className="text-emerald-700 dark:text-emerald-300 font-medium text-sm">
               🎉 Pripravljeni ste za zaključek cikla!

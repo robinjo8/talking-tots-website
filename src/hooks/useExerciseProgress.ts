@@ -35,6 +35,8 @@ export const useExerciseProgress = () => {
   }, [progress]);
 
   const completeCard = (cardNumber: number) => {
+    console.log(`Completing card ${cardNumber}`, { currentProgress: progress });
+    
     setProgress(prev => {
       const isAlreadyCompleted = prev.completedCards.includes(cardNumber);
       if (isAlreadyCompleted) return prev;
@@ -42,8 +44,9 @@ export const useExerciseProgress = () => {
       const newCompletedCards = [...prev.completedCards, cardNumber];
       const newCurrentUnlocked = Math.max(prev.currentUnlockedCard, cardNumber + 1);
 
-      // If completing card 27, reset to beginning and increment completion count
-      if (cardNumber === 27) {
+      // Check if completing card 27 AND all previous cards (1-26) are completed
+      if (cardNumber === 27 && newCompletedCards.length === 27) {
+        console.log("Completing full cycle, incrementing completion count");
         return {
           currentUnlockedCard: 1,
           completedCards: [],
