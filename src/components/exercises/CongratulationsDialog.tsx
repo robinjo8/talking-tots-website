@@ -40,7 +40,7 @@ export const CongratulationsDialog = ({
             <img 
               src={dragonUrl} 
               alt="Čestitamo zmajček" 
-              className="w-32 h-32 mx-auto rounded-full border-4 border-emerald-200 dark:border-emerald-700 shadow-lg object-cover"
+              className="w-32 h-32 mx-auto rounded-full border-4 border-emerald-200 dark:border-emerald-700 shadow-lg object-contain p-2"
               onError={(e) => {
                 console.error("Failed to load dragon image:", dragonUrl);
                 e.currentTarget.style.display = 'none';

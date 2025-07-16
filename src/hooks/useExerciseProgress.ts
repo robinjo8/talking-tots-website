@@ -47,11 +47,14 @@ export const useExerciseProgress = () => {
       // Check if completing card 27 AND all previous cards (1-26) are completed
       if (cardNumber === 27 && newCompletedCards.length === 27) {
         console.log("Completing full cycle, incrementing completion count");
-        return {
+        const newState = {
           currentUnlockedCard: 1,
           completedCards: [],
           completionCount: prev.completionCount + 1,
         };
+        // Force immediate localStorage update
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
+        return newState;
       }
 
       return {
