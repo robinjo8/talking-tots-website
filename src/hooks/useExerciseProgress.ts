@@ -45,7 +45,7 @@ export const useExerciseProgress = () => {
       const newCurrentUnlocked = Math.max(prev.currentUnlockedCard, cardNumber + 1);
 
       // Check if completing card 27 AND all previous cards (1-26) are completed
-      if (cardNumber === 27 && newCompletedCards.length === 27) {
+      if (cardNumber === 27 && prev.completedCards.length === 26) {
         console.log("Completing full cycle, incrementing completion count");
         const newState = {
           currentUnlockedCard: 1,
