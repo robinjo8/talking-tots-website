@@ -6,12 +6,14 @@ const CACHE_VERSION = "v2.0.0";
 interface ExerciseProgress {
   currentUnlockedCard: number;
   completedCards: number[];
+  completionCount: number;
 }
 
 export const useExerciseProgress = () => {
   const [progress, setProgress] = useState<ExerciseProgress>({
     currentUnlockedCard: 1,
     completedCards: [],
+    completionCount: 0,
   });
 
   // Load progress from localStorage on mount
@@ -40,17 +42,19 @@ export const useExerciseProgress = () => {
       const newCompletedCards = [...prev.completedCards, cardNumber];
       const newCurrentUnlocked = Math.max(prev.currentUnlockedCard, cardNumber + 1);
 
-      // If completing card 27, reset to beginning
+      // If completing card 27, reset to beginning and increment completion count
       if (cardNumber === 27) {
         return {
           currentUnlockedCard: 1,
           completedCards: [],
+          completionCount: prev.completionCount + 1,
         };
       }
 
       return {
         currentUnlockedCard: Math.min(newCurrentUnlocked, 27),
         completedCards: newCompletedCards,
+        completionCount: prev.completionCount,
       };
     });
   };
@@ -59,6 +63,7 @@ export const useExerciseProgress = () => {
     setProgress({
       currentUnlockedCard: 1,
       completedCards: [],
+      completionCount: 0,
     });
   };
 

@@ -1,11 +1,13 @@
 import { useState, useCallback, useMemo } from "react";
 import { SequentialCard } from "./SequentialCard";
 import { ExerciseModal } from "./ExerciseModal";
+import { CongratulationsDialog } from "./CongratulationsDialog";
 import { useExerciseProgress } from "@/hooks/useExerciseProgress";
 import { exerciseInstructions } from "@/data/exerciseInstructions";
 
 export const SequentialExerciseGrid = () => {
   const [selectedCard, setSelectedCard] = useState<number | null>(null);
+  const [showCongratulations, setShowCongratulations] = useState(false);
   const { 
     progress, 
     completeCard, 
@@ -27,6 +29,12 @@ export const SequentialExerciseGrid = () => {
   const handleCompleteExercise = useCallback(() => {
     if (selectedCard) {
       completeCard(selectedCard);
+      
+      // Show congratulations dialog when completing card 27
+      if (selectedCard === 27) {
+        setShowCongratulations(true);
+      }
+      
       setSelectedCard(null);
     }
   }, [selectedCard, completeCard]);
@@ -75,6 +83,12 @@ export const SequentialExerciseGrid = () => {
           onComplete={handleCompleteExercise}
         />
       )}
+
+      <CongratulationsDialog
+        isOpen={showCongratulations}
+        onClose={() => setShowCongratulations(false)}
+        completionCount={progress.completionCount}
+      />
     </>
   );
 };
