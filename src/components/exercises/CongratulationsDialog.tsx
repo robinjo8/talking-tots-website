@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { X, Trophy } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 interface CongratulationsDialogProps {
   isOpen: boolean;
@@ -37,27 +37,21 @@ export const CongratulationsDialog = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md mx-auto bg-gradient-to-b from-emerald-50 to-emerald-100 dark:from-emerald-950 dark:to-emerald-900 border-emerald-200 dark:border-emerald-800">
-        <button 
-          onClick={onClose}
-          className="absolute top-4 right-4 z-10 text-emerald-600 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-200 transition-colors"
-        >
-          <X className="h-5 w-5" />
-        </button>
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold text-emerald-800 dark:text-emerald-200 text-center">
+            Čestitke!
+          </DialogTitle>
+          <DialogDescription className="text-emerald-700 dark:text-emerald-300 text-center">
+            Uspešno ste opravili vse vaje motorike govoril!
+          </DialogDescription>
+        </DialogHeader>
 
-        <div className="text-center pt-6 pb-4">
+        <div className="text-center pt-2 pb-4">
           <div className="flex justify-center mb-4">
             <div className="bg-emerald-500 text-white rounded-full p-3">
               <Trophy className="h-8 w-8" />
             </div>
           </div>
-
-          <h2 className="text-2xl font-bold text-emerald-800 dark:text-emerald-200 mb-2">
-            Čestitke!
-          </h2>
-
-          <p className="text-emerald-700 dark:text-emerald-300 mb-4">
-            Uspešno ste opravili vse vaje motorike govoril!
-          </p>
 
           {randomDragon && (
             <div className="mb-4">
