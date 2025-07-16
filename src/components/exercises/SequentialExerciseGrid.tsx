@@ -8,6 +8,7 @@ import { exerciseInstructions } from "@/data/exerciseInstructions";
 export const SequentialExerciseGrid = () => {
   const [selectedCard, setSelectedCard] = useState<number | null>(null);
   const [showCongratulations, setShowCongratulations] = useState(false);
+  const [congratulationsCount, setCongratulationsCount] = useState(0);
   const { 
     progress, 
     completeCard, 
@@ -28,16 +29,21 @@ export const SequentialExerciseGrid = () => {
 
   const handleCompleteExercise = useCallback(() => {
     if (selectedCard) {
-      completeCard(selectedCard);
+      console.log("Before completing card:", selectedCard, "Current completion count:", progress.completionCount);
       
       // Show congratulations dialog when completing card 27
       if (selectedCard === 27) {
+        // Calculate what the new completion count will be
+        const newCompletionCount = progress.completedCards.length === 26 ? progress.completionCount + 1 : progress.completionCount;
+        console.log("Setting congratulations count to:", newCompletionCount);
+        setCongratulationsCount(newCompletionCount);
         setShowCongratulations(true);
       }
       
+      completeCard(selectedCard);
       setSelectedCard(null);
     }
-  }, [selectedCard, completeCard]);
+  }, [selectedCard, completeCard, progress.completionCount, progress.completedCards.length]);
 
   const getImageUrl = (cardNumber: number) => {
     return `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/vaje-motorike-govoril/${cardNumber}.jpg`;
@@ -87,7 +93,7 @@ export const SequentialExerciseGrid = () => {
       <CongratulationsDialog
         isOpen={showCongratulations}
         onClose={() => setShowCongratulations(false)}
-        completionCount={progress.completionCount}
+        completionCount={congratulationsCount}
       />
     </>
   );

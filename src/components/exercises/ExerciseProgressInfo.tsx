@@ -17,6 +17,7 @@ export const ExerciseProgressInfo = ({
   completedCount,
   onReset
 }: ExerciseProgressInfoProps) => {
+  console.log("ExerciseProgressInfo render:", { completionCount, currentCard, totalCards, completedCount });
   const progressPercentage = (completedCount / totalCards) * 100;
 
   return (
