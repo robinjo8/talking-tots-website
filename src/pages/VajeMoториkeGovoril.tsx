@@ -6,15 +6,19 @@ import { SequentialExerciseGrid } from "@/components/exercises/SequentialExercis
 import { ExerciseProgressInfo } from "@/components/exercises/ExerciseProgressInfo";
 import { useExerciseProgress } from "@/hooks/useExerciseProgress";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageSquare } from "lucide-react";
 
 const VajeMoториkeGovoril = () => {
-  const { user } = useAuth();
+  const { user, profile, selectedChildIndex } = useAuth();
   const navigate = useNavigate();
   const exerciseProgressHook = useExerciseProgress();
   const { progress, resetProgress, isCardCompleted } = exerciseProgressHook;
   const isMobile = useIsMobile();
+
+  // Get selected child's name
+  const selectedChild = selectedChildIndex !== null && profile?.children 
+    ? profile.children[selectedChildIndex] 
+    : null;
+  const childName = selectedChild?.name;
 
   // Mobile devices always get fullscreen, desktop never gets fullscreen
   const effectiveFullscreen = isMobile;
@@ -53,18 +57,13 @@ const VajeMoториkeGovoril = () => {
       
       {effectiveFullscreen ? (
         <div className="h-full flex flex-col p-2">
-          <div className="text-center mb-4">
-            <h1 className="text-xl font-bold text-foreground mb-2">
-              Vaje motorike govoril
-            </h1>
-          </div>
-
           <ExerciseProgressInfo
             completionCount={progress.completionCount}
             currentCard={progress.currentUnlockedCard}
             totalCards={27}
             completedCount={progress.completedCards.length}
             onReset={resetProgress}
+            childName={childName}
           />
 
           <div className="flex-1 overflow-auto">
@@ -73,18 +72,13 @@ const VajeMoториkeGovoril = () => {
         </div>
       ) : (
         <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Vaje motorike govoril
-            </h1>
-          </div>
-
           <ExerciseProgressInfo
             completionCount={progress.completionCount}
             currentCard={progress.currentUnlockedCard}
             totalCards={27}
             completedCount={progress.completedCards.length}
             onReset={resetProgress}
+            childName={childName}
           />
 
           <SequentialExerciseGrid exerciseProgressHook={exerciseProgressHook} />
