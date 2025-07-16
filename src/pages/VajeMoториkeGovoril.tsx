@@ -12,7 +12,8 @@ import { MessageSquare } from "lucide-react";
 const VajeMoториkeGovoril = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { progress, resetProgress, isCardCompleted } = useExerciseProgress();
+  const exerciseProgressHook = useExerciseProgress();
+  const { progress, resetProgress, isCardCompleted } = exerciseProgressHook;
   const isMobile = useIsMobile();
 
   // Mobile devices always get fullscreen, desktop never gets fullscreen
@@ -67,7 +68,7 @@ const VajeMoториkeGovoril = () => {
           />
 
           <div className="flex-1 overflow-auto">
-            <SequentialExerciseGrid />
+            <SequentialExerciseGrid exerciseProgressHook={exerciseProgressHook} />
           </div>
         </div>
       ) : (
@@ -86,7 +87,7 @@ const VajeMoториkeGovoril = () => {
             onReset={resetProgress}
           />
 
-          <SequentialExerciseGrid />
+          <SequentialExerciseGrid exerciseProgressHook={exerciseProgressHook} />
         </div>
       )}
     </div>

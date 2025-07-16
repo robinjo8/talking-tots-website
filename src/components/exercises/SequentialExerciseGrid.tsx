@@ -2,10 +2,24 @@ import { useState, useCallback, useMemo } from "react";
 import { SequentialCard } from "./SequentialCard";
 import { ExerciseModal } from "./ExerciseModal";
 import { CongratulationsDialog } from "./CongratulationsDialog";
-import { useExerciseProgress } from "@/hooks/useExerciseProgress";
 import { exerciseInstructions } from "@/data/exerciseInstructions";
 
-export const SequentialExerciseGrid = () => {
+interface SequentialExerciseGridProps {
+  exerciseProgressHook: {
+    progress: {
+      currentUnlockedCard: number;
+      completedCards: number[];
+      completionCount: number;
+    };
+    completeCard: (cardNumber: number) => void;
+    resetProgress: () => void;
+    isCardLocked: (cardNumber: number) => boolean;
+    isCardCompleted: (cardNumber: number) => boolean;
+    isCardActive: (cardNumber: number) => boolean;
+  };
+}
+
+export const SequentialExerciseGrid = ({ exerciseProgressHook }: SequentialExerciseGridProps) => {
   const [selectedCard, setSelectedCard] = useState<number | null>(null);
   const [showCongratulations, setShowCongratulations] = useState(false);
   const [congratulationsCount, setCongratulationsCount] = useState(0);
@@ -15,7 +29,7 @@ export const SequentialExerciseGrid = () => {
     isCardLocked, 
     isCardCompleted, 
     isCardActive 
-  } = useExerciseProgress();
+  } = exerciseProgressHook;
 
   const handleCardClick = useCallback((cardNumber: number) => {
     if (!isCardLocked(cardNumber)) {
