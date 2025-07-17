@@ -24,7 +24,7 @@ export function DragonDisplay({ currentDragons, maxDragons = 10, animated = true
             : "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_6_cb.png"
           }
           alt={isEarned ? "Zmajček" : "Neosvojeni zmajček"}
-          className={`w-16 h-16 object-contain transition-all duration-300 ${
+          className={`w-12 h-12 md:w-16 md:h-16 object-contain transition-all duration-300 ${
             isEarned ? "" : "opacity-30"
           }`}
           onError={(e) => {
@@ -37,13 +37,8 @@ export function DragonDisplay({ currentDragons, maxDragons = 10, animated = true
   });
 
   return (
-    <div className="flex items-center gap-1 flex-wrap justify-center">
+    <div className="grid grid-cols-5 gap-1 justify-items-center max-w-xs mx-auto">
       {dragons}
-      {currentDragons > maxDragons && (
-        <span className="text-dragon-green font-bold text-lg ml-2">
-          +{currentDragons - maxDragons}
-        </span>
-      )}
     </div>
   );
 }

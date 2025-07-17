@@ -21,30 +21,25 @@ export function TrophyDisplay({ trophies, totalDragons, dragonsToNextTrophy }: T
             <h3 className="text-2xl font-bold text-dragon-green">POKALI</h3>
           </div>
           
-          <div className="flex items-center justify-center gap-2 mb-4">
+          <div className="grid grid-cols-5 md:grid-cols-10 gap-2 justify-items-center mb-4 max-w-lg mx-auto">
             {trophies > 0 ? (
-              Array.from({ length: Math.min(trophies, 5) }, (_, index) => (
+              Array.from({ length: trophies }, (_, index) => (
                 <motion.img
                   key={index}
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ scale: 1, rotate: 0 }}
-                  transition={{ delay: index * 0.2, duration: 0.5 }}
+                  transition={{ delay: (index % 10) * 0.1, duration: 0.5 }}
                   src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/pokal.png"
                   alt="Trophy"
-                  className="w-12 h-12 object-contain"
+                  className="w-8 h-8 md:w-10 md:h-10 object-contain"
                 />
               ))
             ) : (
               <img
                 src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/pokal_cb.png"
                 alt="Empty trophy"
-                className="w-12 h-12 object-contain opacity-50"
+                className="w-8 h-8 md:w-10 md:h-10 object-contain opacity-50 col-span-1"
               />
-            )}
-            {trophies > 5 && (
-              <span className="text-dragon-green font-bold text-lg ml-2">
-                +{trophies - 5}
-              </span>
             )}
           </div>
           

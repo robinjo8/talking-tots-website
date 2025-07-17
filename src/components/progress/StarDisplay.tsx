@@ -39,7 +39,7 @@ export function StarDisplay({ currentStars, maxStars = 10, size = "md", animated
   });
 
   return (
-    <div className="flex items-center gap-1 flex-wrap justify-center">
+    <div className="grid grid-cols-5 gap-1 justify-items-center max-w-xs mx-auto">
       {stars}
     </div>
   );
