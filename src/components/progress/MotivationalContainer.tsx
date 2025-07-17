@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { MessageSquare } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { MigrationButton } from "./MigrationButton";
 
 interface MotivationalContainerProps {
   childName: string;
@@ -31,14 +32,16 @@ export function MotivationalContainer({ childName }: MotivationalContainerProps)
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-base sm:text-lg font-medium italic leading-relaxed">
-              Tukaj lahko spremljaš svoj napredek. Za vsako opravljeno igro ali vajo dobiš 
-              <span className="font-bold"> zvezdo</span>. Ko zbereš 10 zvezd, dobiš 
-              <span className="font-bold"> zmajčka</span>. Ko zbereš 10 zmajčkov, pa si zasluži 
+              Tukaj lahko spremljaš svoj napredek. Vsako zvezdico si prislužiš, ko uspešno opraviš 
+              eno vajo ali igro. Ko zbereš 10 
+              <span className="font-bold"> zvezdic</span>, pridobiš enega 
+              <span className="font-bold"> zmajčka</span>. In ko zbereš 10 zmajčkov, osvojiš 
               <span className="font-bold"> pokal</span>! 
             </p>
             <p className="text-xs sm:text-sm text-muted-foreground mt-2">
-              Zmajček Tomi ti navija ves čas – zato vztrajno, korak za korakom, proti cilju!
+              Zmajček Tomi te ves čas spremlja in navija zate – zato pogumno naprej, korak za korakom do cilja!
             </p>
+            <MigrationButton />
           </div>
         </CardContent>
       </Card>

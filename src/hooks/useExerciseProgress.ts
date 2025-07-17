@@ -46,6 +46,9 @@ export const useExerciseProgress = () => {
       const newCompletedCards = [...prev.completedCards, cardNumber];
       const newCurrentUnlocked = Math.max(prev.currentUnlockedCard, cardNumber + 1);
 
+      // Record individual card completion in Supabase immediately
+      recordExerciseCompletion('vaje_motorike_govoril');
+
       // Check if completing card 27 AND all previous cards (1-26) are completed
       if (cardNumber === 27 && prev.completedCards.length === 26) {
         console.log("Completing full cycle, incrementing completion count");
@@ -56,9 +59,6 @@ export const useExerciseProgress = () => {
         };
         // Force immediate localStorage update
         localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
-        
-        // Record progress in Supabase
-        recordExerciseCompletion('vaje_motorike_govoril');
         
         return newState;
       }
