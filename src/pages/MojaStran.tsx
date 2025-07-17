@@ -38,15 +38,6 @@ const MojaStran = () => {
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-28 md:pt-32 pb-20 px-4">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">
-            {selectedChild ? (
-              <>Živjo, <span className="text-dragon-green">{selectedChild.name}</span>!</>
-            ) : (
-              <>Pozdravljen, <span className="text-dragon-green">{profile?.username || user.email}</span>!</>
-            )}
-          </h1>
-        </div>
         
         {selectedChild ? (
           <>
