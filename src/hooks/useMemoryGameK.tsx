@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useUserProgress } from "./useUserProgress";
+import { useEnhancedProgress } from "./useEnhancedProgress";
 
 export interface MemoryCard {
   id: string;
@@ -15,7 +15,7 @@ export interface MemoryCard {
 }
 
 export const useMemoryGameK = () => {
-  const { recordMemoryGameCompletion } = useUserProgress();
+  const { recordGameCompletion } = useEnhancedProgress();
   const [cards, setCards] = useState<MemoryCard[]>([]);
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
   const [matchedPairs, setMatchedPairs] = useState<string[]>([]);
@@ -134,9 +134,9 @@ export const useMemoryGameK = () => {
       console.log("Game completed!");
       setGameCompleted(true);
       // Record completion in progress system
-      recordMemoryGameCompletion('K');
+      recordGameCompletion('memory', 'K');
     }
-  }, [matchedPairs, cards, recordMemoryGameCompletion]);
+  }, [matchedPairs, cards, recordGameCompletion]);
 
   const resetGame = () => {
     if (memoryCardsData && memoryCardsData.length > 0) {

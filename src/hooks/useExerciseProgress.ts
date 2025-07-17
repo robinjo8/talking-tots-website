@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useUserProgress } from "./useUserProgress";
+import { useEnhancedProgress } from "./useEnhancedProgress";
 
 const STORAGE_KEY = "vaje-motorike-govoril-progress";
 const CACHE_VERSION = "v2.0.0";
@@ -11,7 +11,7 @@ interface ExerciseProgress {
 }
 
 export const useExerciseProgress = () => {
-  const { recordExerciseCompletion } = useUserProgress();
+  const { recordExerciseCompletion } = useEnhancedProgress();
   const [progress, setProgress] = useState<ExerciseProgress>({
     currentUnlockedCard: 1,
     completedCards: [],
@@ -58,7 +58,7 @@ export const useExerciseProgress = () => {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
         
         // Record progress in Supabase
-        recordExerciseCompletion(1);
+        recordExerciseCompletion('vaje_motorike_govoril');
         
         return newState;
       }
