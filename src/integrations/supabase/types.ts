@@ -479,6 +479,10 @@ export type Database = {
           | { role_name: Database["public"]["Enums"]["user_role"] }
         Returns: boolean
       }
+      sync_children_from_metadata: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       activity_type: "exercise" | "memory_game" | "puzzle"

@@ -42,11 +42,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedChildIndex, setSelectedChildIndex] = useState<number | null>(null);
 
-  // Function to fetch user profile and children from user metadata (where registration stores data)
+  // Function to fetch user profile and children (prioritizing database over metadata)
   const fetchUserProfile = async (userId: string) => {
     try {
       console.log("Fetching profile for user:", userId);
       
+      // First, try to fetch children from the database
+      const { data: dbChildren, error: childrenError } = await supabase
+        .from('children')
+        .select('*')
+        .eq('parent_id', userId)
+        .order('created_at', { ascending: true });
+
+      if (childrenError) {
+        console.log("Children fetch error:", childrenError);
+      }
+
       // Fetch user profile from profiles table
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
@@ -56,48 +67,84 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (profileError && profileError.code !== 'PGRST116') {
         console.error("Profile error:", profileError);
-        throw profileError;
       }
 
-      // Fetch user data from auth
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      
-      if (userError || !user) {
-        console.error('Error fetching user metadata:', userError);
-        setProfile({
-          username: profileData?.username || null,
-          children: []
-        });
-        return;
+      let children: ChildProfile[] = [];
+
+      // Prioritize database children if they exist
+      if (dbChildren && dbChildren.length > 0) {
+        children = dbChildren.map((child: any) => ({
+          id: child.id, // Use actual database ID for persistence
+          name: child.name,
+          gender: child.gender || 'M',
+          avatarId: 1, // Keep for backwards compatibility
+          age: child.age,
+          birthDate: child.birth_date ? new Date(child.birth_date) : null,
+          speechDifficulties: child.speech_difficulties || [],
+          speechDifficultiesDescription: child.speech_difficulties_description || '',
+          speechDevelopment: child.speech_development || {},
+          isComplete: !!(child.speech_development && Object.keys(child.speech_development).length > 0)
+        }));
+        console.log("Using database children:", children);
+      } else {
+        // Fallback to metadata children if no database children exist
+        console.log("No database children found, checking metadata...");
+        
+        const { data: userMetadata, error: metadataError } = await supabase.rpc('get_auth_user_data');
+        
+        if (metadataError) {
+          console.error('Error fetching user metadata:', metadataError);
+        } else {
+          const metadataObject = userMetadata as any;
+          if (metadataObject?.children && Array.isArray(metadataObject.children) && metadataObject.children.length > 0) {
+            // If we have metadata children but no database children, sync them
+            console.log("Found metadata children, syncing to database...");
+            try {
+              await supabase.rpc('sync_children_from_metadata');
+              // Re-fetch database children after sync
+              const { data: syncedChildren } = await supabase
+                .from('children')
+                .select('*')
+                .eq('parent_id', userId)
+                .order('created_at', { ascending: true });
+              
+              if (syncedChildren && syncedChildren.length > 0) {
+                children = syncedChildren.map((child: any) => ({
+                  id: child.id,
+                  name: child.name,
+                  gender: child.gender || 'M',
+                  avatarId: 1,
+                  age: child.age,
+                  birthDate: child.birth_date ? new Date(child.birth_date) : null,
+                  speechDifficulties: child.speech_difficulties || [],
+                  speechDifficultiesDescription: child.speech_difficulties_description || '',
+                  speechDevelopment: child.speech_development || {},
+                  isComplete: !!(child.speech_development && Object.keys(child.speech_development).length > 0)
+                }));
+                console.log("Synced children from metadata:", children);
+              }
+            } catch (syncError) {
+              console.error("Error syncing children:", syncError);
+              // Fallback to temporary metadata children if sync fails
+              const childrenFromMetadata = metadataObject?.children || [];
+              children = childrenFromMetadata.map((child: any) => ({
+                id: child.id || crypto.randomUUID(),
+                name: child.name || '',
+                gender: child.gender || 'M',
+                avatarId: child.avatarId || 1,
+                age: child.age,
+                birthDate: child.birthDate ? new Date(child.birthDate) : null,
+                speechDifficulties: child.speechDifficulties || [],
+                speechDifficultiesDescription: child.speechDifficultiesDescription || '',
+                speechDevelopment: child.speechDevelopment || {},
+                isComplete: !!(child.speechDevelopment && Object.keys(child.speechDevelopment).length > 0)
+              }));
+            }
+          }
+        }
       }
 
-      // Get complete user metadata including raw data
-      const { data: userMetadata, error: metadataError } = await supabase.rpc('get_auth_user_data');
-      
-      if (metadataError) {
-        console.error('Error fetching user metadata:', metadataError);
-      }
-
-      console.log('User metadata from RPC:', userMetadata);
-
-      // Extract children data from complete metadata
-      const metadataObject = userMetadata as any;
-      const childrenFromMetadata = metadataObject?.children || [];
-      
-      // Transform children data to match ChildProfile interface
-      const children: ChildProfile[] = childrenFromMetadata.map((child: any) => ({
-        id: child.id || crypto.randomUUID(),
-        name: child.name || '',
-        gender: child.gender || 'M',
-        avatarId: child.avatarId || 1,
-        birthDate: child.birthDate ? new Date(child.birthDate) : null,
-        speechDifficulties: child.speechDifficulties || [],
-        speechDifficultiesDescription: child.speechDifficultiesDescription || '',
-        speechDevelopment: child.speechDevelopment || {},
-        isComplete: !!(child.speechDevelopment && Object.keys(child.speechDevelopment).length > 0)
-      }));
-
-      console.log('Profile loaded from metadata:', {
+      console.log('Final profile loaded:', {
         username: profileData?.username,
         childrenCount: children.length,
         children: children
