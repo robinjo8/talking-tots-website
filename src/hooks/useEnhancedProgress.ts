@@ -104,11 +104,19 @@ export const useEnhancedProgress = () => {
     }) => {
       if (!selectedChild?.id) throw new Error("No child selected");
 
+      // Map activity subtypes to proper exercise IDs
+      const exerciseIdMap: Record<string, string> = {
+        'vaje_motorike_govoril': 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+        'general': 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' // Default to vaje motorike govoril
+      };
+
+      const exerciseId = exerciseIdMap[params.activitySubtype || 'general'] || exerciseIdMap['general'];
+
       const { data, error } = await supabase
         .from('progress')
         .insert({
           child_id: selectedChild.id,
-          exercise_id: '00000000-0000-0000-0000-000000000000',
+          exercise_id: exerciseId,
           activity_type: params.activityType,
           activity_subtype: params.activitySubtype,
           stars_earned: params.starsEarned || 1,

@@ -46,7 +46,7 @@ export const useExerciseProgress = () => {
       const newCompletedCards = [...prev.completedCards, cardNumber];
       const newCurrentUnlocked = Math.max(prev.currentUnlockedCard, cardNumber + 1);
 
-      // Record individual card completion in Supabase immediately
+      // Record individual card completion in Supabase with proper exercise ID
       recordExerciseCompletion('vaje_motorike_govoril');
 
       // Check if completing card 27 AND all previous cards (1-26) are completed
