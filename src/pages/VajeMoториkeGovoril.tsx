@@ -11,7 +11,7 @@ const VajeMoториkeGovoril = () => {
   const { user, profile, selectedChildIndex } = useAuth();
   const navigate = useNavigate();
   const exerciseProgressHook = useExerciseProgress();
-  const { progress, resetProgress, isCardCompleted } = exerciseProgressHook;
+  const { progress, resetProgress, setTestCompletionCount, isCardCompleted } = exerciseProgressHook;
   const isMobile = useIsMobile();
 
   // Get selected child's name
@@ -63,6 +63,7 @@ const VajeMoториkeGovoril = () => {
             totalCards={27}
             completedCount={progress.completedCards.length}
             onReset={resetProgress}
+            onTestSet={setTestCompletionCount}
             childName={childName}
           />
 
@@ -78,6 +79,7 @@ const VajeMoториkeGovoril = () => {
             totalCards={27}
             completedCount={progress.completedCards.length}
             onReset={resetProgress}
+            onTestSet={setTestCompletionCount}
             childName={childName}
           />
 

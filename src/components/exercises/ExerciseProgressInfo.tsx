@@ -8,6 +8,7 @@ interface ExerciseProgressInfoProps {
   totalCards: number;
   completedCount: number;
   onReset: () => void;
+  onTestSet?: (count: number) => void;
   childName?: string;
 }
 
@@ -17,6 +18,7 @@ export const ExerciseProgressInfo = ({
   totalCards,
   completedCount,
   onReset,
+  onTestSet,
   childName
 }: ExerciseProgressInfoProps) => {
   console.log("ExerciseProgressInfo render:", { completionCount, currentCard, totalCards, completedCount });
@@ -44,10 +46,20 @@ export const ExerciseProgressInfo = ({
               {childName || "Tian"}, poskušaj odpreti vse zmajčke in si zasluži nagrado!
             </p>
             <div className="space-y-2">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-lg font-semibold text-dragon-green">
                   Opravljene vaje: {completionCount}
                 </span>
+                {onTestSet && (
+                  <Button 
+                    onClick={() => onTestSet(99)} 
+                    variant="outline" 
+                    size="sm"
+                    className="text-xs"
+                  >
+                    Test: Set to 99
+                  </Button>
+                )}
               </div>
               {completedCount === 27 && (
                 <div className="text-center p-2 bg-emerald-50 dark:bg-emerald-950 rounded-lg border border-emerald-200 dark:border-emerald-800">

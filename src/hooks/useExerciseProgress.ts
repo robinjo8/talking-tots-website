@@ -80,6 +80,13 @@ export const useExerciseProgress = () => {
     });
   };
 
+  const setTestCompletionCount = (count: number) => {
+    setProgress(prev => ({
+      ...prev,
+      completionCount: count,
+    }));
+  };
+
   const isCardLocked = (cardNumber: number) => {
     return cardNumber > progress.currentUnlockedCard;
   };
@@ -96,6 +103,7 @@ export const useExerciseProgress = () => {
     progress,
     completeCard,
     resetProgress,
+    setTestCompletionCount,
     isCardLocked,
     isCardCompleted,
     isCardActive,
