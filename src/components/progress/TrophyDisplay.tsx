@@ -24,15 +24,23 @@ export function TrophyDisplay({ trophies, totalDragons, dragonsToNextTrophy }: T
           <div className="grid grid-cols-5 md:grid-cols-10 gap-2 justify-items-center mb-4 max-w-lg mx-auto">
             {trophies > 0 ? (
               Array.from({ length: trophies }, (_, index) => (
-                <motion.img
+                <motion.div
                   key={index}
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ delay: (index % 10) * 0.1, duration: 0.5 }}
-                  src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/pokal.png"
-                  alt="Trophy"
-                  className="w-8 h-8 md:w-10 md:h-10 object-contain"
-                />
+                  className="inline-block"
+                >
+                  <img
+                    src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/pokal.png"
+                    alt="Trophy"
+                    className="w-8 h-8 md:w-10 md:h-10 object-contain"
+                    onError={(e) => {
+                      console.error("Trophy image failed to load:", e.currentTarget.src);
+                      e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9H4.5a2.5 2.5 0 0 1 0-5H6'/%3E%3Cpath d='M18 9h1.5a2.5 2.5 0 0 0 0-5H18'/%3E%3Cpath d='M4 22h16'/%3E%3Cpath d='M10 14.66V17c0 .55.47.98.97 1.21C12.04 18.75 13 20.24 13 22'/%3E%3Cpath d='M14 14.66V17c0 .55-.47.98-.97 1.21C11.96 18.75 11 20.24 11 22'/%3E%3Cpath d='M18 2H6v7a6 6 0 0 0 12 0V2Z'/%3E%3C/svg%3E";
+                    }}
+                  />
+                </motion.div>
               ))
             ) : (
               <img

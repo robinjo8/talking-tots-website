@@ -61,18 +61,19 @@ export const useEnhancedProgress = () => {
       // Calculate game progress
       const gamesTotalStars = gameActivities.reduce((sum, a) => sum + a.total_stars, 0);
       const gamesTotalCompletions = gameActivities.reduce((sum, a) => sum + a.completion_count, 0);
-      const gameDragons = Math.floor(gamesTotalStars / 10);
-      const gameCurrentStars = gamesTotalStars % 10;
+      const gameDragons = Math.floor((gamesTotalCompletions % 100) / 10);
+      const gameCurrentStars = gamesTotalCompletions % 10;
 
       // Calculate exercise progress
       const exercisesTotalStars = exerciseActivities.reduce((sum, a) => sum + a.total_stars, 0);
       const exercisesTotalCompletions = exerciseActivities.reduce((sum, a) => sum + a.completion_count, 0);
-      const exerciseDragons = Math.floor(exercisesTotalStars / 10);
-      const exerciseCurrentStars = exercisesTotalStars % 10;
+      const exerciseDragons = Math.floor((exercisesTotalCompletions % 100) / 10);
+      const exerciseCurrentStars = exercisesTotalCompletions % 10;
 
-      // Calculate total dragons and trophies
-      const totalDragons = gameDragons + exerciseDragons;
-      const totalTrophies = Math.floor(totalDragons / 10);
+      // Calculate total dragons and trophies based on total completions
+      const totalCompletions = gamesTotalCompletions + exercisesTotalCompletions;
+      const totalTrophies = Math.floor(totalCompletions / 100);
+      const totalDragons = Math.floor((totalCompletions % 100) / 10);
 
       return {
         games: {
