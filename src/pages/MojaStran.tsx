@@ -41,9 +41,15 @@ const MojaStran = () => {
         
         {selectedChild ? (
           <>
-            <ProgressSection />
+            {/* Progress Section Wrapper */}
+            <div className="mb-12">
+              <ProgressSection />
+            </div>
             
-            <ActivityOptions />
+            {/* Activity Options Wrapper */}
+            <div className="mb-12">
+              <ActivityOptions />
+            </div>
             
             <TipSection childName={selectedChild.name} />
           </>

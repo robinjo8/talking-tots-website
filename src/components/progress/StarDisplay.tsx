@@ -1,4 +1,3 @@
-import { Star } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface StarDisplayProps {
@@ -10,9 +9,9 @@ interface StarDisplayProps {
 
 export function StarDisplay({ currentStars, maxStars = 10, size = "md", animated = true }: StarDisplayProps) {
   const sizeClasses = {
-    sm: "h-4 w-4",
-    md: "h-6 w-6", 
-    lg: "h-8 w-8"
+    sm: "text-lg",
+    md: "text-2xl", 
+    lg: "text-3xl"
   };
 
   const stars = Array.from({ length: maxStars }, (_, index) => {
@@ -26,13 +25,15 @@ export function StarDisplay({ currentStars, maxStars = 10, size = "md", animated
         transition={animated ? { delay: index * 0.1, duration: 0.3 } : undefined}
         className="inline-block"
       >
-        <Star
+        <span
           className={`${sizeClasses[size]} ${
             isFilled 
-              ? "text-app-yellow fill-app-yellow drop-shadow-md" 
-              : "text-muted-foreground/30"
+              ? "filter drop-shadow-lg" 
+              : "opacity-30"
           } transition-all duration-300`}
-        />
+        >
+          {isFilled ? "⭐" : "☆"}
+        </span>
       </motion.div>
     );
   });
