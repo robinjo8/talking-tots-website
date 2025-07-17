@@ -85,6 +85,11 @@ export const useExerciseProgress = () => {
       ...prev,
       completionCount: count,
     }));
+    
+    // Record each completion in Supabase for testing
+    for (let i = 0; i < count; i++) {
+      recordExerciseCompletion('vaje_motorike_govoril');
+    }
   };
 
   const isCardLocked = (cardNumber: number) => {

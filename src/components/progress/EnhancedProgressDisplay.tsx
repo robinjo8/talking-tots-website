@@ -1,18 +1,39 @@
 import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { EnhancedProgressSummary } from "@/hooks/useEnhancedProgress";
 import { TrophyDisplay } from "./TrophyDisplay";
 import { StarDisplay } from "./StarDisplay";
 import { DragonDisplay } from "./DragonDisplay";
+import { TrophyDialog } from "../exercises/TrophyDialog";
 
 interface EnhancedProgressDisplayProps {
   progressData: EnhancedProgressSummary;
 }
 
 export function EnhancedProgressDisplay({ progressData }: EnhancedProgressDisplayProps) {
+  const [showTrophyDialog, setShowTrophyDialog] = useState(false);
+  const [lastTotalStars, setLastTotalStars] = useState(0);
+  
   const dragonsToNextTrophy = 10 - (progressData.totalDragons % 10);
+  const totalStars = progressData.games.stars + progressData.exercises.stars;
+  
+  // Check if we've reached 100 stars for the first time
+  useEffect(() => {
+    if (totalStars >= 100 && lastTotalStars < 100) {
+      setShowTrophyDialog(true);
+    }
+    setLastTotalStars(totalStars);
+  }, [totalStars, lastTotalStars]);
 
   return (
+    <>
+      <TrophyDialog 
+        isOpen={showTrophyDialog}
+        onClose={() => setShowTrophyDialog(false)}
+        totalStars={totalStars}
+      />
+      
     <div className="space-y-6">
       {/* Trophy Section */}
       <TrophyDisplay 
@@ -74,5 +95,6 @@ export function EnhancedProgressDisplay({ progressData }: EnhancedProgressDispla
         </motion.div>
       </div>
     </div>
+    </>
   );
 }
