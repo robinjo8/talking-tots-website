@@ -26,14 +26,14 @@ export const useProgressMigration = () => {
       const parsed = JSON.parse(saved);
       const { completedCards, completionCount } = parsed;
 
-      // Migrate completed cards as individual completions
-      const totalCompletions = completedCards.length + (completionCount * 27);
+      // Migrate only full exercise cycles (completionCount), not individual cards
+      const fullExerciseCompletions = completionCount;
       
-      if (totalCompletions > 0) {
-        console.log(`Migrating ${totalCompletions} exercise completions for ${selectedChild.name}`);
+      if (fullExerciseCompletions > 0) {
+        console.log(`Migrating ${fullExerciseCompletions} full exercise completions for ${selectedChild.name}`);
 
-        // Record each completion in the database
-        for (let i = 0; i < totalCompletions; i++) {
+        // Record only full exercise completions in the database
+        for (let i = 0; i < fullExerciseCompletions; i++) {
           recordExerciseCompletion('vaje_motorike_govoril');
         }
 

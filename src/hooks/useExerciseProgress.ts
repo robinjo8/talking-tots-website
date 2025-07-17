@@ -46,12 +46,13 @@ export const useExerciseProgress = () => {
       const newCompletedCards = [...prev.completedCards, cardNumber];
       const newCurrentUnlocked = Math.max(prev.currentUnlockedCard, cardNumber + 1);
 
-      // Record individual card completion in Supabase with proper exercise ID
-      recordExerciseCompletion('vaje_motorike_govoril');
-
       // Check if completing card 27 AND all previous cards (1-26) are completed
       if (cardNumber === 27 && prev.completedCards.length === 26) {
         console.log("Completing full cycle, incrementing completion count");
+        
+        // Only record exercise completion when all 27 cards are done
+        recordExerciseCompletion('vaje_motorike_govoril');
+        
         const newState = {
           currentUnlockedCard: 1,
           completedCards: [],
