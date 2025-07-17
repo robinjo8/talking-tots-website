@@ -9,9 +9,9 @@ interface StarDisplayProps {
 
 export function StarDisplay({ currentStars, maxStars = 10, size = "md", animated = true }: StarDisplayProps) {
   const sizeClasses = {
-    sm: "text-lg",
-    md: "text-2xl", 
-    lg: "text-3xl"
+    sm: "text-2xl",
+    md: "text-4xl", 
+    lg: "text-6xl"
   };
 
   const stars = Array.from({ length: maxStars }, (_, index) => {

@@ -24,7 +24,7 @@ export function DragonDisplay({ currentDragons, maxDragons = 10, animated = true
             : "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_6_cb.png"
           }
           alt={isEarned ? "Earned dragon" : "Unearned dragon"}
-          className={`w-8 h-8 object-contain transition-all duration-300 ${
+          className={`w-16 h-16 object-contain transition-all duration-300 ${
             isEarned ? "" : "opacity-30"
           }`}
           onError={(e) => {

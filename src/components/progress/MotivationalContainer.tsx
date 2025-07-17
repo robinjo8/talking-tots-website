@@ -1,13 +1,23 @@
 import { motion } from "framer-motion";
 import { MessageSquare } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MigrationButton } from "./MigrationButton";
+import { useProgressMigration } from "@/hooks/useProgressMigration";
+import { useEffect } from "react";
 
 interface MotivationalContainerProps {
   childName: string;
 }
 
 export function MotivationalContainer({ childName }: MotivationalContainerProps) {
+  const { migrateExistingProgress, selectedChild } = useProgressMigration();
+
+  // Auto-migrate existing progress on component mount
+  useEffect(() => {
+    if (selectedChild) {
+      migrateExistingProgress();
+    }
+  }, [selectedChild, migrateExistingProgress]);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -41,7 +51,6 @@ export function MotivationalContainer({ childName }: MotivationalContainerProps)
             <p className="text-xs sm:text-sm text-muted-foreground mt-2">
               Zmajček Tomi te ves čas spremlja in navija zate – zato pogumno naprej, korak za korakom do cilja!
             </p>
-            <MigrationButton />
           </div>
         </CardContent>
       </Card>
