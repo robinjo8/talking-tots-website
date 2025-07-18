@@ -89,7 +89,7 @@ export function ActivityOptions() {
             <div className="w-32 h-32 flex items-center justify-center">
               <img src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_izzivi.png" alt="Zmajček izzivi" className="w-full h-full object-contain" />
             </div>
-            <p className="text-sm text-gray-600">Izberi, s katero izgovorjavo imaš težave in prejmi prilagojene vaje.</p>
+            <p className="text-sm text-gray-600">Priporočila pametnega asistenta.</p>
           </CardContent>
           <CardFooter className="pb-6">
             <Button className="w-full bg-app-orange hover:bg-app-orange/90 rounded-2xl" onClick={e => {
