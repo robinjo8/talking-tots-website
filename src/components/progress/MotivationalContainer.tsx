@@ -1,8 +1,10 @@
 import { motion } from "framer-motion";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, ChevronDown, ChevronUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useProgressMigration } from "@/hooks/useProgressMigration";
-import { useEffect } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useEffect, useState } from "react";
 
 interface MotivationalContainerProps {
   childName: string;
@@ -10,6 +12,8 @@ interface MotivationalContainerProps {
 
 export function MotivationalContainer({ childName }: MotivationalContainerProps) {
   const { migrateExistingProgress, selectedChild } = useProgressMigration();
+  const isMobile = useIsMobile();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Auto-migrate existing progress on component mount
   useEffect(() => {
@@ -26,33 +30,78 @@ export function MotivationalContainer({ childName }: MotivationalContainerProps)
       className="mb-8"
     >
       <Card className="bg-gradient-to-r from-sky-50 to-green-50 border-dragon-green/30 shadow-md">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-xl md:text-2xl text-dragon-green">
-            <MessageSquare className="h-5 w-5 text-dragon-green" />
-            Hej, {childName}!
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-2 flex items-center gap-3 sm:gap-4">
-          <div className="hidden sm:block w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
-            <img 
-              src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_6.png" 
-              alt="Zmajček Tomi" 
-              className="w-full h-full object-contain animate-bounce-gentle"
-            />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-base sm:text-lg font-medium italic leading-relaxed">
-              Tukaj lahko spremljaš svoj napredek. Vsako zvezdico si prislužiš, ko uspešno opraviš 
-              eno vajo ali igro. Ko zbereš 10 
-              <span className="font-bold"> zvezdic</span>, pridobiš enega 
-              <span className="font-bold"> zmajčka</span>. In ko zbereš 10 zmajčkov, osvojiš 
-              <span className="font-bold"> pokal</span>! 
-            </p>
-            <p className="text-xs sm:text-sm text-muted-foreground mt-2">
-              Zmajček Tomi te ves čas spremlja in navija zate – zato pogumno naprej, korak za korakom do cilja!
-            </p>
-          </div>
-        </CardContent>
+        {isMobile ? (
+          <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+            <CollapsibleTrigger asChild>
+              <CardHeader className="pb-2 cursor-pointer hover:bg-dragon-green/5 transition-colors">
+                <CardTitle className="flex items-center justify-between text-xl text-dragon-green">
+                  <div className="flex items-center gap-2">
+                    <MessageSquare className="h-5 w-5 text-dragon-green" />
+                    Hej, {childName}!
+                  </div>
+                  {isExpanded ? (
+                    <ChevronUp className="h-5 w-5 text-dragon-green" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5 text-dragon-green" />
+                  )}
+                </CardTitle>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="pt-2 flex items-center gap-3">
+                <div className="w-16 h-16 flex-shrink-0">
+                  <img 
+                    src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_6.png" 
+                    alt="Zmajček Tomi" 
+                    className="w-full h-full object-contain animate-bounce-gentle"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-base font-medium italic leading-relaxed">
+                    Tukaj lahko spremljaš svoj napredek. Vsako zvezdico si prislužiš, ko uspešno opraviš 
+                    eno vajo ali igro. Ko zbereš 10 
+                    <span className="font-bold"> zvezdic</span>, pridobiš enega 
+                    <span className="font-bold"> zmajčka</span>. In ko zbereš 10 zmajčkov, osvojiš 
+                    <span className="font-bold"> pokal</span>! 
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Zmajček Tomi te ves čas spremlja in navija zate – zato pogumno naprej, korak za korakom do cilja!
+                  </p>
+                </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Collapsible>
+        ) : (
+          <>
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-xl md:text-2xl text-dragon-green">
+                <MessageSquare className="h-5 w-5 text-dragon-green" />
+                Hej, {childName}!
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-2 flex items-center gap-3 sm:gap-4">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
+                <img 
+                  src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_6.png" 
+                  alt="Zmajček Tomi" 
+                  className="w-full h-full object-contain animate-bounce-gentle"
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-base sm:text-lg font-medium italic leading-relaxed">
+                  Tukaj lahko spremljaš svoj napredek. Vsako zvezdico si prislužiš, ko uspešno opraviš 
+                  eno vajo ali igro. Ko zbereš 10 
+                  <span className="font-bold"> zvezdic</span>, pridobiš enega 
+                  <span className="font-bold"> zmajčka</span>. In ko zbereš 10 zmajčkov, osvojiš 
+                  <span className="font-bold"> pokal</span>! 
+                </p>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-2">
+                  Zmajček Tomi te ves čas spremlja in navija zate – zato pogumno naprej, korak za korakom do cilja!
+                </p>
+              </div>
+            </CardContent>
+          </>
+        )}
       </Card>
     </motion.div>
   );
