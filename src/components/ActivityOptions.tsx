@@ -1,116 +1,171 @@
 import { Card, CardHeader, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookText, Gamepad, Zap, Video, TestTube } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+
 export function ActivityOptions() {
   const navigate = useNavigate();
+  
   const handleGoToExercises = () => {
     navigate("/govorno-jezikovne-vaje");
   };
+  
   const handleGoToGames = () => {
     navigate("/govorne-igre");
   };
+  
   const handleGoToArticulationTest = () => {
     navigate("/artikulacijski-test");
   };
-  return <>
-      <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center ">Izberi možnost</h2>
+  
+  const handleGoToMyChallenges = () => {
+    navigate("/moji-izzivi");
+  };
+  
+  const handleGoToVideoInstructions = () => {
+    navigate("/video-navodila");
+  };
+
+  return (
+    <>
+      <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center text-dragon-green">MOJE APLIKACIJE</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-        <Card className="transition-all duration-300 hover:shadow-lg rounded-3xl border-2 border-gray-200">
+        
+        {/* Govorno-jezikovne vaje */}
+        <Card 
+          className="transition-all duration-300 hover:shadow-lg rounded-3xl border-2 border-gray-200 cursor-pointer"
+          onClick={handleGoToExercises}
+        >
           <CardHeader className="bg-gradient-to-r from-app-blue/10 to-app-teal/10 rounded-t-3xl pb-4">
-            <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
-              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
-                <BookText className="h-6 w-6 text-app-blue" />
+            <CardTitle className="text-xl flex flex-col items-center justify-center gap-3 text-center">
+              <div className="w-20 h-20 flex items-center justify-center">
+                <img
+                  src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_vaje.png"
+                  alt="Zmajček vaje"
+                  className="w-full h-full object-contain"
+                />
               </div>
+              <h3 className="text-lg font-semibold text-app-blue">Govorno-jezikovne vaje</h3>
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6 pb-4 text-center">
-            <h3 className="text-lg font-semibold mb-2 text-app-blue">Govorno-jezikovne vaje</h3>
             <p className="text-sm text-gray-600">Prilagojene aktivnosti za izboljšanje otrokove izgovorjave.</p>
           </CardContent>
           <CardFooter className="pb-6">
-            <Button className="w-full bg-app-blue hover:bg-app-blue/90 rounded-2xl" onClick={handleGoToExercises}>
+            <Button className="w-full bg-app-blue hover:bg-app-blue/90 rounded-2xl" onClick={(e) => { e.stopPropagation(); handleGoToExercises(); }}>
               Pojdi na vaje
             </Button>
           </CardFooter>
         </Card>
         
-        <Card className="transition-all duration-300 hover:shadow-lg rounded-3xl border-2 border-gray-200">
-          <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-blue/10 rounded-t-3xl pb-4">
-            <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
-              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
-                <Gamepad className="h-6 w-6 text-app-purple" />
+        {/* Govorne igre */}
+        <Card 
+          className="transition-all duration-300 hover:shadow-lg rounded-3xl border-2 border-gray-200 cursor-pointer"
+          onClick={handleGoToGames}
+        >
+          <CardHeader className="bg-gradient-to-r from-app-blue/10 to-app-blue/10 rounded-t-3xl pb-4">
+            <CardTitle className="text-xl flex flex-col items-center justify-center gap-3 text-center">
+              <div className="w-20 h-20 flex items-center justify-center">
+                <img
+                  src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_igre.png"
+                  alt="Zmajček igre"
+                  className="w-full h-full object-contain"
+                />
               </div>
+              <h3 className="text-lg font-semibold text-app-blue">Govorne igre</h3>
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6 pb-4 text-center">
-            <h3 className="text-lg font-semibold mb-2 text-app-purple">Govorne igre</h3>
             <p className="text-sm text-gray-600">Zabavne igre za izboljšanje izgovorjave.</p>
           </CardContent>
           <CardFooter className="pb-6">
-            <Button className="w-full bg-app-purple hover:bg-app-purple/90 rounded-2xl" onClick={handleGoToGames}>
+            <Button className="w-full bg-app-blue hover:bg-app-blue/90 rounded-2xl" onClick={(e) => { e.stopPropagation(); handleGoToGames(); }}>
               Začni igro
             </Button>
           </CardFooter>
         </Card>
         
-        <Card className="transition-all duration-300 hover:shadow-lg rounded-3xl border-2 border-gray-200 h-full flex flex-col">
+        {/* Artikulacijski test */}
+        <Card 
+          className="transition-all duration-300 hover:shadow-lg rounded-3xl border-2 border-gray-200 h-full flex flex-col cursor-pointer"
+          onClick={handleGoToArticulationTest}
+        >
           <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-teal/10 rounded-t-3xl pb-4">
-            <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
-              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
-                <TestTube className="h-6 w-6 text-app-purple" />
+            <CardTitle className="text-xl flex flex-col items-center justify-center gap-3 text-center">
+              <div className="w-20 h-20 flex items-center justify-center">
+                <img
+                  src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_artikulacija.png"
+                  alt="Zmajček artikulacija"
+                  className="w-full h-full object-contain"
+                />
               </div>
+              <h3 className="text-lg font-semibold text-app-purple">Artikulacijski test</h3>
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6 pb-4 flex-grow text-center">
-            <h3 className="text-lg font-semibold mb-2 text-app-purple">Artikulacijski test</h3>
             <p className="text-sm text-gray-600">Test izgovorjave za vse slovenske soglasnike.</p>
           </CardContent>
           <CardFooter className="pb-6">
-            <Button className="w-full bg-[#9b87f5] hover:bg-[#8B5CF6] rounded-2xl" onClick={handleGoToArticulationTest}>
+            <Button className="w-full bg-[#9b87f5] hover:bg-[#8B5CF6] rounded-2xl" onClick={(e) => { e.stopPropagation(); handleGoToArticulationTest(); }}>
               Začni test
             </Button>
           </CardFooter>
         </Card>
         
-        <Card className="transition-all duration-300 hover:shadow-lg rounded-3xl border-2 border-gray-200 h-full flex flex-col">
+        {/* Moji izzivi */}
+        <Card 
+          className="transition-all duration-300 hover:shadow-lg rounded-3xl border-2 border-gray-200 h-full flex flex-col cursor-pointer"
+          onClick={handleGoToMyChallenges}
+        >
           <CardHeader className="bg-gradient-to-r from-app-orange/10 to-app-yellow/10 rounded-t-3xl pb-4">
-            <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
-              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
-                <Zap className="h-6 w-6 text-app-orange" />
+            <CardTitle className="text-xl flex flex-col items-center justify-center gap-3 text-center">
+              <div className="w-20 h-20 flex items-center justify-center">
+                <img
+                  src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_izzivi.png"
+                  alt="Zmajček izzivi"
+                  className="w-full h-full object-contain"
+                />
               </div>
+              <h3 className="text-lg font-semibold text-app-orange">Moji izzivi</h3>
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6 pb-4 flex-grow text-center">
-            <h3 className="text-lg font-semibold mb-2 text-app-orange">Moji izzivi</h3>
             <p className="text-sm text-gray-600">Izberi, s katero izgovorjavo imaš težave in prejmi prilagojene vaje.</p>
           </CardContent>
           <CardFooter className="pb-6">
-            <Button className="w-full bg-app-orange hover:bg-app-orange/90 rounded-2xl">
+            <Button className="w-full bg-app-orange hover:bg-app-orange/90 rounded-2xl" onClick={(e) => { e.stopPropagation(); handleGoToMyChallenges(); }}>
               Izberi težavo
             </Button>
           </CardFooter>
         </Card>
         
-        <Card className="transition-all duration-300 hover:shadow-lg rounded-3xl border-2 border-gray-200 h-full flex flex-col">
+        {/* Video navodila */}
+        <Card 
+          className="transition-all duration-300 hover:shadow-lg rounded-3xl border-2 border-gray-200 h-full flex flex-col cursor-pointer"
+          onClick={handleGoToVideoInstructions}
+        >
           <CardHeader className="bg-gradient-to-r from-app-teal/10 to-dragon-green/10 rounded-t-3xl pb-4">
-            <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
-              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
-                <Video className="h-6 w-6 text-app-teal" />
+            <CardTitle className="text-xl flex flex-col items-center justify-center gap-3 text-center">
+              <div className="w-20 h-20 flex items-center justify-center">
+                <img
+                  src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_video.png"
+                  alt="Zmajček video"
+                  className="w-full h-full object-contain"
+                />
               </div>
+              <h3 className="text-lg font-semibold text-app-teal">Video navodila</h3>
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6 pb-4 flex-grow text-center">
-            <h3 className="text-lg font-semibold mb-2 text-app-teal">Video navodila</h3>
             <p className="text-sm text-gray-600">Poglej kako logoped pravilno izgovori posamezne črke.</p>
           </CardContent>
           <CardFooter className="pb-6">
-            <Button className="w-full bg-app-teal hover:bg-app-teal/90 rounded-2xl">
+            <Button className="w-full bg-app-teal hover:bg-app-teal/90 rounded-2xl" onClick={(e) => { e.stopPropagation(); handleGoToVideoInstructions(); }}>
               Poglej video
             </Button>
           </CardFooter>
         </Card>
       </div>
-    </>;
+    </>
+  );
 }
