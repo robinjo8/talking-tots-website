@@ -105,7 +105,7 @@ export function ActivityOptions() {
             <CardTitle className="text-lg font-semibold text-app-teal text-center">VIDEO NAVODILA</CardTitle>
           </CardHeader>
           <CardContent className="pt-6 pb-4 flex-grow text-center flex flex-col items-center gap-4">
-            <div className="w-32 h-32 md:w-40 md:h-40 flex items-center justify-center">
+            <div className="w-32 h-32 md:w-48 md:h-48 flex items-center justify-center">
               <img src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_video.png" alt="Zmajček video" className="w-full h-full object-contain" />
             </div>
             <p className="text-sm text-gray-600">Poglej kako logoped pravilno izgovori posamezne črke.</p>

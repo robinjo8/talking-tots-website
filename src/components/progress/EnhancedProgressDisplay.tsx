@@ -54,13 +54,13 @@ export function EnhancedProgressDisplay({ progressData }: EnhancedProgressDispla
             <CardContent className="p-6">
               <h3 className="text-2xl font-bold text-center text-dragon-green mb-6">IGRE</h3>
               
-              <div className="mb-4">
-                <StarDisplay currentStars={progressData.games.stars} />
-              </div>
-              
-              <div className="mb-4">
-                <DragonDisplay currentDragons={progressData.games.dragons} />
-              </div>
+               <div className="mb-4">
+                 <StarDisplay currentStars={0} />
+               </div>
+               
+               <div className="mb-4">
+                 <DragonDisplay currentDragons={0} />
+               </div>
               
               <div className="text-center text-sm text-muted-foreground">
                 Skupaj opravljenih: {progressData.games.totalCompletions}
@@ -79,13 +79,13 @@ export function EnhancedProgressDisplay({ progressData }: EnhancedProgressDispla
             <CardContent className="p-6">
               <h3 className="text-2xl font-bold text-center text-app-blue mb-6">VAJE</h3>
               
-              <div className="mb-4">
-                <StarDisplay currentStars={progressData.exercises.stars} />
-              </div>
-              
-              <div className="mb-4">
-                <DragonDisplay currentDragons={progressData.exercises.dragons} />
-              </div>
+               <div className="mb-4">
+                 <StarDisplay currentStars={0} />
+               </div>
+               
+               <div className="mb-4">
+                 <DragonDisplay currentDragons={0} />
+               </div>
               
               <div className="text-center text-sm text-muted-foreground">
                 Skupaj opravljenih: {progressData.exercises.totalCompletions}

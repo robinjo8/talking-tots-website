@@ -52,12 +52,12 @@ export const ExerciseProgressInfo = ({
                 </span>
                 {onTestSet && (
                   <Button 
-                    onClick={() => onTestSet(99)} 
+                    onClick={() => onTestSet(9)} 
                     variant="outline" 
                     size="sm"
                     className="text-xs"
                   >
-                    Test: Set to 99
+                    Test: Set to 9
                   </Button>
                 )}
               </div>
