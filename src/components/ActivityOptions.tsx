@@ -32,7 +32,7 @@ export function ActivityOptions() {
             <div className="w-32 h-32 flex items-center justify-center">
               <img src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_vaje.png" alt="Zmajček vaje" className="w-full h-full object-contain" />
             </div>
-            <p className="text-sm text-gray-600">Prilagojene aktivnosti za izboljšanje otrokove izgovorjave.</p>
+            <p className="text-sm text-gray-600">Prilagojene aktivnosti za izboljšanje izgovorjave.</p>
           </CardContent>
           <CardFooter className="pb-6">
             <Button className="w-full bg-app-blue hover:bg-app-blue/90 rounded-2xl" onClick={e => {
