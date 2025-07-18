@@ -50,7 +50,7 @@ export function EnhancedProgressDisplay({ progressData }: EnhancedProgressDispla
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
         >
-          <Card className="bg-gradient-to-br from-app-orange/15 to-app-orange/5 border-app-orange/30 shadow-lg">
+          <Card className="bg-gradient-to-br from-app-blue/15 to-app-blue/5 border-app-blue/30 shadow-lg">
             <CardContent className="p-6">
               <h3 className="text-2xl font-bold text-center text-app-orange mb-6">IGRE</h3>
               
