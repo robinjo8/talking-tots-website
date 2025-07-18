@@ -16,14 +16,13 @@ export function TipSection({
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-6 pb-4 text-center">
-        <h3 className="text-lg font-semibold mb-2 text-dragon-green">Nasvet zmajčka Tomija:</h3>
+        <h3 className="text-lg font-semibold mb-2 text-dragon-green uppercase">NASVET ZMAJČKA TOMIJA:</h3>
         <div className="flex items-center justify-center gap-6">
           <div className="hidden md:block w-24 h-24">
             <img alt="Tomi the Dragon" className="w-full h-full object-contain" src="/lovable-uploads/3fd65e0b-3bbc-4a9e-a4e4-77fb47e6a0a5.png" />
           </div>
           <div className="text-left">
-            <p className="text-lg mb-2">"{childName}, danes poskusi ponoviti črko R vsaj 3-krat! Zmoreš!"</p>
-            <p className="text-sm text-muted-foreground">Vsaka vaja ti prinese točke in zvezdice.</p>
+            <p className="text-lg mb-2 uppercase font-semibold">"VSE VSEBINE SO PRILAGOJENE STAROSTI IN TEŽAVAM OTROKA. ZA NAJBOLJŠE REZULTATE VADITE REDNO!"</p>
           </div>
         </div>
       </CardContent>
