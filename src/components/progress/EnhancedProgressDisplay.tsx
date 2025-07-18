@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,7 +17,7 @@ export function EnhancedProgressDisplay({ progressData }: EnhancedProgressDispla
   const [lastTotalStars, setLastTotalStars] = useState(0);
   
   const dragonsToNextTrophy = 10 - (progressData.totalDragons % 10);
-  const totalStars = progressData.games.stars + progressData.exercises.stars;
+  const totalStars = progressData.games.totalStars + progressData.exercises.totalStars;
   
   // Check if we've reached 100 stars for the first time
   useEffect(() => {
@@ -54,13 +55,13 @@ export function EnhancedProgressDisplay({ progressData }: EnhancedProgressDispla
             <CardContent className="p-6">
               <h3 className="text-2xl font-bold text-center text-dragon-green mb-6">IGRE</h3>
               
-               <div className="mb-4">
-                 <StarDisplay currentStars={0} />
-               </div>
-               
-               <div className="mb-4">
-                 <DragonDisplay currentDragons={0} />
-               </div>
+              <div className="mb-4">
+                <StarDisplay currentStars={progressData.games.stars} />
+              </div>
+              
+              <div className="mb-4">
+                <DragonDisplay currentDragons={progressData.games.dragons} />
+              </div>
               
               <div className="text-center text-sm text-muted-foreground">
                 Skupaj opravljenih: {progressData.games.totalCompletions}
@@ -79,13 +80,13 @@ export function EnhancedProgressDisplay({ progressData }: EnhancedProgressDispla
             <CardContent className="p-6">
               <h3 className="text-2xl font-bold text-center text-app-blue mb-6">VAJE</h3>
               
-               <div className="mb-4">
-                 <StarDisplay currentStars={0} />
-               </div>
-               
-               <div className="mb-4">
-                 <DragonDisplay currentDragons={0} />
-               </div>
+              <div className="mb-4">
+                <StarDisplay currentStars={progressData.exercises.stars} />
+              </div>
+              
+              <div className="mb-4">
+                <DragonDisplay currentDragons={progressData.exercises.dragons} />
+              </div>
               
               <div className="text-center text-sm text-muted-foreground">
                 Skupaj opravljenih: {progressData.exercises.totalCompletions}

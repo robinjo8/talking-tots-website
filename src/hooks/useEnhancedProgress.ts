@@ -1,10 +1,11 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export interface CategoryProgress {
   stars: number; // 0-9 (resets to 0 when reaching 10)
-  dragons: number; // earned dragons for this category
+  dragons: number; // earned dragons for this category (0-9)
   totalStars: number; // total stars earned in this category
   totalCompletions: number; // total activities completed
 }
@@ -58,34 +59,44 @@ export const useEnhancedProgress = () => {
         a.activity_type === 'exercise'
       );
 
-      // Calculate game progress
-      const gamesTotalStars = gameActivities.reduce((sum, a) => sum + a.total_stars, 0);
+      // Calculate game progress - each completion = 1 star
       const gamesTotalCompletions = gameActivities.reduce((sum, a) => sum + a.completion_count, 0);
-      const gameDragons = Math.floor((gamesTotalCompletions % 100) / 10);
-      const gameCurrentStars = gamesTotalCompletions % 10;
-
-      // Calculate exercise progress
-      const exercisesTotalStars = exerciseActivities.reduce((sum, a) => sum + a.total_stars, 0);
+      const gameCurrentStars = gamesTotalCompletions % 10; // 0-9 stars
+      const gameDragons = Math.floor((gamesTotalCompletions % 100) / 10); // 0-9 dragons
+      
+      // Calculate exercise progress - each completion = 1 star (1 completion = 27 cards done)
       const exercisesTotalCompletions = exerciseActivities.reduce((sum, a) => sum + a.completion_count, 0);
-      const exerciseDragons = Math.floor((exercisesTotalCompletions % 100) / 10);
-      const exerciseCurrentStars = exercisesTotalCompletions % 10;
+      const exerciseCurrentStars = exercisesTotalCompletions % 10; // 0-9 stars
+      const exerciseDragons = Math.floor((exercisesTotalCompletions % 100) / 10); // 0-9 dragons
 
-      // Calculate total dragons and trophies based on total completions
+      // Calculate total progress across both categories
       const totalCompletions = gamesTotalCompletions + exercisesTotalCompletions;
-      const totalTrophies = Math.floor(totalCompletions / 100);
-      const totalDragons = Math.floor((totalCompletions % 100) / 10);
+      const totalTrophies = Math.floor(totalCompletions / 100); // Every 100 completions = 1 trophy
+      const totalDragons = Math.floor((totalCompletions % 100) / 10); // Every 10 completions = 1 dragon
+
+      console.log("Progress calculation:", {
+        gamesTotalCompletions,
+        exercisesTotalCompletions,
+        totalCompletions,
+        gameCurrentStars,
+        exerciseCurrentStars,
+        gameDragons,
+        exerciseDragons,
+        totalTrophies,
+        totalDragons
+      });
 
       return {
         games: {
           stars: gameCurrentStars,
           dragons: gameDragons,
-          totalStars: gamesTotalStars,
+          totalStars: gamesTotalCompletions, // Each completion is 1 star
           totalCompletions: gamesTotalCompletions
         },
         exercises: {
           stars: exerciseCurrentStars,
           dragons: exerciseDragons,
-          totalStars: exercisesTotalStars,
+          totalStars: exercisesTotalCompletions, // Each completion is 1 star
           totalCompletions: exercisesTotalCompletions
         },
         totalTrophies,
@@ -112,6 +123,8 @@ export const useEnhancedProgress = () => {
       };
 
       const exerciseId = exerciseIdMap[params.activitySubtype || 'general'] || exerciseIdMap['general'];
+
+      console.log("Recording progress:", params);
 
       const { data, error } = await supabase
         .from('progress')

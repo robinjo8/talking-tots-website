@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from "react";
 import { useEnhancedProgress } from "./useEnhancedProgress";
 
 const STORAGE_KEY = "vaje-motorike-govoril-progress";
-const CACHE_VERSION = "v2.0.0";
+const CACHE_VERSION = "v3.0.0";
 
 interface ExerciseProgress {
   currentUnlockedCard: number;
@@ -24,16 +25,31 @@ export const useExerciseProgress = () => {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        setProgress(parsed);
+        // Reset if old version or corrupted data
+        if (!parsed.version || parsed.version !== CACHE_VERSION) {
+          console.log("Resetting progress due to version mismatch");
+          const resetProgress = {
+            currentUnlockedCard: 1,
+            completedCards: [],
+            completionCount: 0,
+            version: CACHE_VERSION
+          };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(resetProgress));
+          setProgress(resetProgress);
+        } else {
+          setProgress(parsed);
+        }
       } catch (error) {
         console.error("Failed to parse saved progress:", error);
+        resetProgress();
       }
     }
   }, []);
 
   // Save progress to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    const dataToSave = { ...progress, version: CACHE_VERSION };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
   }, [progress]);
 
   const completeCard = (cardNumber: number) => {
@@ -57,7 +73,9 @@ export const useExerciseProgress = () => {
           currentUnlockedCard: 1,
           completedCards: [],
           completionCount: prev.completionCount + 1,
+          version: CACHE_VERSION
         };
+        
         // Force immediate localStorage update
         localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
         
@@ -73,11 +91,12 @@ export const useExerciseProgress = () => {
   };
 
   const resetProgress = () => {
-    setProgress({
+    const resetState = {
       currentUnlockedCard: 1,
       completedCards: [],
       completionCount: 0,
-    });
+    };
+    setProgress(resetState);
   };
 
   const setTestCompletionCount = (count: number) => {
@@ -86,7 +105,7 @@ export const useExerciseProgress = () => {
       completionCount: count,
     }));
     
-    // Record each completion in Supabase for testing
+    // Record each completion in Supabase for testing - each represents a full 27-card cycle
     for (let i = 0; i < count; i++) {
       recordExerciseCompletion('vaje_motorike_govoril');
     }
