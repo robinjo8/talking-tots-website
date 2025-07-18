@@ -19,31 +19,17 @@ export const useExerciseProgress = () => {
     completionCount: 0,
   });
 
-  // Load progress from localStorage on mount
+  // Load progress from localStorage on mount - ALWAYS RESET TO ZERO
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        // Reset if old version or corrupted data
-        if (!parsed.version || parsed.version !== CACHE_VERSION) {
-          console.log("Resetting progress due to version mismatch");
-          const resetProgress = {
-            currentUnlockedCard: 1,
-            completedCards: [],
-            completionCount: 0,
-            version: CACHE_VERSION
-          };
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(resetProgress));
-          setProgress(resetProgress);
-        } else {
-          setProgress(parsed);
-        }
-      } catch (error) {
-        console.error("Failed to parse saved progress:", error);
-        resetProgress();
-      }
-    }
+    console.log("Force resetting all progress to zero");
+    const resetProgress = {
+      currentUnlockedCard: 1,
+      completedCards: [],
+      completionCount: 0,
+      version: CACHE_VERSION
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(resetProgress));
+    setProgress(resetProgress);
   }, []);
 
   // Save progress to localStorage whenever it changes
@@ -100,14 +86,25 @@ export const useExerciseProgress = () => {
   };
 
   const setTestCompletionCount = (count: number) => {
-    setProgress(prev => ({
-      ...prev,
-      completionCount: count,
-    }));
+    console.log(`Setting test completion count to ${count}`);
     
-    // Record each completion in Supabase for testing - each represents a full 27-card cycle
+    // Update local storage and state
+    const newState = {
+      currentUnlockedCard: 1,
+      completedCards: [],
+      completionCount: count,
+      version: CACHE_VERSION
+    };
+    
+    setProgress(newState);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
+    
+    // Record the exact number of completions in Supabase
+    // Each completion represents one full 27-card cycle = 1 star
     for (let i = 0; i < count; i++) {
-      recordExerciseCompletion('vaje_motorike_govoril');
+      setTimeout(() => {
+        recordExerciseCompletion('vaje_motorike_govoril');
+      }, i * 100); // Small delay to ensure all records are created
     }
   };
 
