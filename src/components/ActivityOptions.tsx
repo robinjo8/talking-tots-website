@@ -37,18 +37,18 @@ export function ActivityOptions() {
           onClick={handleGoToExercises}
         >
           <CardHeader className="bg-gradient-to-r from-app-blue/10 to-app-teal/10 rounded-t-3xl pb-4">
-            <CardTitle className="text-xl flex flex-col items-center justify-center gap-3 text-center">
-              <div className="w-20 h-20 flex items-center justify-center">
-                <img
-                  src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_vaje.png"
-                  alt="Zmajček vaje"
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <h3 className="text-lg font-semibold text-app-blue">Govorno-jezikovne vaje</h3>
+            <CardTitle className="text-lg font-semibold text-app-blue text-center">
+              Govorno-jezikovne vaje
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-6 pb-4 text-center">
+          <CardContent className="pt-6 pb-4 text-center flex flex-col items-center gap-4">
+            <div className="w-32 h-32 flex items-center justify-center">
+              <img
+                src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_vaje.png"
+                alt="Zmajček vaje"
+                className="w-full h-full object-contain"
+              />
+            </div>
             <p className="text-sm text-gray-600">Prilagojene aktivnosti za izboljšanje otrokove izgovorjave.</p>
           </CardContent>
           <CardFooter className="pb-6">
@@ -64,18 +64,18 @@ export function ActivityOptions() {
           onClick={handleGoToGames}
         >
           <CardHeader className="bg-gradient-to-r from-app-blue/10 to-app-blue/10 rounded-t-3xl pb-4">
-            <CardTitle className="text-xl flex flex-col items-center justify-center gap-3 text-center">
-              <div className="w-20 h-20 flex items-center justify-center">
-                <img
-                  src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_igre.png"
-                  alt="Zmajček igre"
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <h3 className="text-lg font-semibold text-app-blue">Govorne igre</h3>
+            <CardTitle className="text-lg font-semibold text-app-blue text-center">
+              Govorne igre
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-6 pb-4 text-center">
+          <CardContent className="pt-6 pb-4 text-center flex flex-col items-center gap-4">
+            <div className="w-32 h-32 flex items-center justify-center">
+              <img
+                src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_igre.png"
+                alt="Zmajček igre"
+                className="w-full h-full object-contain"
+              />
+            </div>
             <p className="text-sm text-gray-600">Zabavne igre za izboljšanje izgovorjave.</p>
           </CardContent>
           <CardFooter className="pb-6">
@@ -91,18 +91,18 @@ export function ActivityOptions() {
           onClick={handleGoToArticulationTest}
         >
           <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-teal/10 rounded-t-3xl pb-4">
-            <CardTitle className="text-xl flex flex-col items-center justify-center gap-3 text-center">
-              <div className="w-20 h-20 flex items-center justify-center">
-                <img
-                  src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_artikulacija.png"
-                  alt="Zmajček artikulacija"
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <h3 className="text-lg font-semibold text-app-purple">Artikulacijski test</h3>
+            <CardTitle className="text-lg font-semibold text-app-purple text-center">
+              Artikulacijski test
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-6 pb-4 flex-grow text-center">
+          <CardContent className="pt-6 pb-4 flex-grow text-center flex flex-col items-center gap-4">
+            <div className="w-32 h-32 flex items-center justify-center">
+              <img
+                src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_artikulacija.png"
+                alt="Zmajček artikulacija"
+                className="w-full h-full object-contain"
+              />
+            </div>
             <p className="text-sm text-gray-600">Test izgovorjave za vse slovenske soglasnike.</p>
           </CardContent>
           <CardFooter className="pb-6">
@@ -118,18 +118,18 @@ export function ActivityOptions() {
           onClick={handleGoToMyChallenges}
         >
           <CardHeader className="bg-gradient-to-r from-app-orange/10 to-app-yellow/10 rounded-t-3xl pb-4">
-            <CardTitle className="text-xl flex flex-col items-center justify-center gap-3 text-center">
-              <div className="w-20 h-20 flex items-center justify-center">
-                <img
-                  src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_izzivi.png"
-                  alt="Zmajček izzivi"
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <h3 className="text-lg font-semibold text-app-orange">Moji izzivi</h3>
+            <CardTitle className="text-lg font-semibold text-app-orange text-center">
+              Moji izzivi
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-6 pb-4 flex-grow text-center">
+          <CardContent className="pt-6 pb-4 flex-grow text-center flex flex-col items-center gap-4">
+            <div className="w-32 h-32 flex items-center justify-center">
+              <img
+                src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_izzivi.png"
+                alt="Zmajček izzivi"
+                className="w-full h-full object-contain"
+              />
+            </div>
             <p className="text-sm text-gray-600">Izberi, s katero izgovorjavo imaš težave in prejmi prilagojene vaje.</p>
           </CardContent>
           <CardFooter className="pb-6">
@@ -145,18 +145,18 @@ export function ActivityOptions() {
           onClick={handleGoToVideoInstructions}
         >
           <CardHeader className="bg-gradient-to-r from-app-teal/10 to-dragon-green/10 rounded-t-3xl pb-4">
-            <CardTitle className="text-xl flex flex-col items-center justify-center gap-3 text-center">
-              <div className="w-20 h-20 flex items-center justify-center">
-                <img
-                  src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_video.png"
-                  alt="Zmajček video"
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <h3 className="text-lg font-semibold text-app-teal">Video navodila</h3>
+            <CardTitle className="text-lg font-semibold text-app-teal text-center">
+              Video navodila
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-6 pb-4 flex-grow text-center">
+          <CardContent className="pt-6 pb-4 flex-grow text-center flex flex-col items-center gap-4">
+            <div className="w-32 h-32 flex items-center justify-center">
+              <img
+                src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_video.png"
+                alt="Zmajček video"
+                className="w-full h-full object-contain"
+              />
+            </div>
             <p className="text-sm text-gray-600">Poglej kako logoped pravilno izgovori posamezne črke.</p>
           </CardContent>
           <CardFooter className="pb-6">
