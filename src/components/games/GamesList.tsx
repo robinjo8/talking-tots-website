@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 const otherGames = [
   {
     id: "spomin",
-    title: "Spomin",
+    title: "SPOMIN",
     description: "Igraj spomin in vadi izgovorjavo",
     icon: Puzzle,
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/spomin.png",
@@ -17,19 +17,8 @@ const otherGames = [
     available: true
   },
   {
-    id: "drsne-stevilke",
-    title: "Drsne številke",
-    description: "Igraj drsne številke in vadi logično razmišljanje",
-    icon: Gamepad,
-    image: null,
-    color: "text-app-orange",
-    gradient: "from-app-orange/10 to-app-yellow/10",
-    path: "/govorne-igre/drsne-stevilke",
-    available: true
-  },
-  {
     id: "sestavljanke",
-    title: "Sestavljanke",
+    title: "SESTAVLJANKE",
     description: "Igraj sestavljanke in vadi logično razmišljanje",
     icon: SquareDashed,
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/sestavljanka.png",
@@ -39,28 +28,31 @@ const otherGames = [
     available: true
   },
   {
-    id: "igra4",
-    title: "Igra 4",
+    id: "zaporedja",
+    title: "ZAPOREDJA",
     description: "Kmalu na voljo",
     icon: SquareDashed,
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/zaporedja.png",
     color: "text-app-purple",
     gradient: "from-app-purple/10 to-app-blue/10",
     available: false
   },
   {
-    id: "igra5",
-    title: "Igra 5",
+    id: "drsna-sestavljanka",
+    title: "DRSNA SESTAVLJANKA",
     description: "Kmalu na voljo",
     icon: SquareDashed,
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/drsna_sestavljanka.png",
     color: "text-app-orange",
     gradient: "from-app-orange/10 to-app-yellow/10",
     available: false
   },
   {
-    id: "igra6",
-    title: "Igra 6",
+    id: "povezi-pare",
+    title: "POVEŽI PARE",
     description: "Kmalu na voljo",
     icon: SquareDashed,
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/povezi_pare.png",
     color: "text-app-teal",
     gradient: "from-app-teal/10 to-dragon-green/10",
     available: false

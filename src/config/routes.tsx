@@ -21,7 +21,7 @@ import SpominGames from "@/pages/SpominGames";
 import SpominK from "@/pages/SpominK";
 import SpominS from "@/pages/SpominS";
 import SpominŠ from "@/pages/SpominŠ";
-import DrsneStevike from "@/pages/DrsneStevike";
+
 import ArtikuacijskiTest from "@/pages/ArtikuacijskiTest";
 import Sestavljanke from "@/pages/Sestavljanke";
 import SestavljankeGames from "@/pages/SestavljankeGames";
@@ -114,14 +114,6 @@ export function AppRoutes() {
         }
       />
       
-      <Route 
-        path="/govorne-igre/drsne-stevilke" 
-        element={
-          <ProtectedRoute>
-            <DrsneStevike />
-          </ProtectedRoute>
-        }
-      />
       
       <Route 
         path="/govorne-igre/sestavljanke" 
