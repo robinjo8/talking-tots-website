@@ -10,7 +10,7 @@ const otherGames = [
     title: "SPOMIN",
     description: "Igraj spomin in vadi izgovorjavo",
     icon: Puzzle,
-    image: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/spomin.png?t=${Date.now()}`,
+    image: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/spomin.png?t=${new Date().getTime()}`,
     color: "text-app-purple",
     gradient: "from-app-purple/10 to-app-blue/10",
     path: "/govorne-igre/spomin",
@@ -106,7 +106,7 @@ export function GamesList() {
       {/* Available Games Section */}
       <div className="mb-12">
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-primary">
-          Izberi igro
+          IZBERI IGRO
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {activeGames.map((game) => (
@@ -152,16 +152,16 @@ export function GamesList() {
       {inactiveGames.length > 0 && (
         <div>
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-muted-foreground">
-            Kmalu na voljo
+            KMALU NA VOLJO
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {inactiveGames.map((game) => (
               <Card 
                 key={game.id}
                 className={cn(
                   "transition-all duration-300 rounded-2xl border-2 border-gray-200 overflow-hidden flex flex-col opacity-60 cursor-not-allowed"
                 )}
-                style={{ aspectRatio: '3/4', minHeight: '300px' }}
+                style={{ aspectRatio: '4/5', minHeight: '240px' }}
               >
                 {/* Top colored section with game name */}
                 <CardHeader className={`bg-gradient-to-r ${game.gradient} rounded-t-2xl pb-3 sm:pb-4 flex-shrink-0`}>
@@ -188,7 +188,7 @@ export function GamesList() {
                     </div>
                   )}
                   <p className="text-xs text-muted-foreground italic text-center">
-                    Kmalu na voljo
+                    KMALU NA VOLJO
                   </p>
                 </CardContent>
               </Card>
