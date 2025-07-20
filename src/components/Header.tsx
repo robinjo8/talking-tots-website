@@ -77,13 +77,13 @@ export default function Header() {
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <Link to="/" className="flex items-center gap-2">
           <div className="flex items-center">
-            <span className="text-2xl md:text-3xl font-extrabold text-dragon-green md:uppercase lg:text-2xl mx-0 px-0">Tomi</span>
-            <span className="text-2xl md:text-3xl font-extrabold text-app-orange md:uppercase lg:text-2xl">Talk</span>
+            <span className="text-2xl md:text-3xl font-extrabold text-dragon-green uppercase lg:text-2xl mx-0 px-0">Tomi</span>
+            <span className="text-2xl md:text-3xl font-extrabold text-app-orange uppercase lg:text-2xl">Talk</span>
           </div>
         </Link>
         
-        {/* Main navigation and action buttons */}
-        <div className="flex items-center gap-3">
+        {/* Main navigation and action buttons - improved centering */}
+        <div className="flex items-center justify-center gap-3 flex-1">
           <MobileMenu user={user} profile={profile} selectedChildIndex={selectedChildIndex} selectedChild={selectedChild} onSelectChild={handleSelectChild} onSignOut={handleSignOut} onStartNow={handleStartNow} onCenikScroll={handleCenikScroll} />
 
           <DesktopNavigation user={user} onStartNow={handleStartNow} onCenikScroll={handleCenikScroll} />

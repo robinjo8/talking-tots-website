@@ -53,7 +53,7 @@ export function MobileMenu({
                 {selectedChild.name[0]}
               </AvatarFallback>
             </Avatar>}
-          <span className="text-sm font-medium text-muted-foreground">
+          <span className="text-sm font-medium text-muted-foreground uppercase">
             {selectedChild.name}
           </span>
         </div>}
