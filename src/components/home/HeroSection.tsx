@@ -83,7 +83,7 @@ export const HeroSection = () => {
                 <Button
                   size="lg"
                   onClick={handleStartNow}
-                  className="w-full h-12 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold"
+                  className="w-full h-12 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold uppercase"
                 >
                   <Play className="h-4 w-4" />
                   Začni zdaj
@@ -92,7 +92,7 @@ export const HeroSection = () => {
                 <div className="flex gap-3 w-full">
                   <Button
                     size="lg"
-                    className="flex-1 h-12 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold"
+                    className="flex-1 h-12 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold uppercase"
                   >
                     <CirclePlay className="h-4 w-4" />
                     Demo
@@ -100,7 +100,7 @@ export const HeroSection = () => {
                   <Button
                     size="lg"
                     onClick={scrollToFeatures}
-                    className="flex-1 h-12 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold"
+                    className="flex-1 h-12 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold uppercase"
                   >
                     <Info className="h-4 w-4" />
                     Info

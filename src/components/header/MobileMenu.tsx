@@ -148,14 +148,14 @@ export function MobileMenu({
                 </>}
               
               {!user && <div className="flex flex-col gap-3">
-                  <Button onClick={onStartNow} className="w-full h-12 rounded-full text-base bg-dragon-green hover:bg-dragon-green/90 text-white font-semibold">
+                  <Button onClick={onStartNow} className="w-full h-12 rounded-full text-base bg-dragon-green hover:bg-dragon-green/90 text-white font-semibold uppercase">
                     <Play className="h-4 w-4 mr-2" />
                     Začni zdaj
                   </Button>
-                  <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold" onClick={() => navigate("/login")}>
+                  <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={() => navigate("/login")}>
                     Prijava
                   </Button>
-                  <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold" onClick={() => navigate("/register")}>
+                  <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={() => navigate("/register")}>
                     <UserPlus className="h-4 w-4 mr-2" />
                     Registracija
                   </Button>
