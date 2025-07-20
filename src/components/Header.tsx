@@ -79,8 +79,8 @@ export default function Header() {
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <Link to="/" className="flex items-center gap-2">
           <div className="flex items-center">
-            <span className="text-2xl font-extrabold text-dragon-green">Tomi</span>
-            <span className="text-2xl font-extrabold text-app-orange">Talk</span>
+            <span className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-dragon-green md:uppercase">Tomi</span>
+            <span className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-app-orange md:uppercase">Talk</span>
           </div>
         </Link>
         
