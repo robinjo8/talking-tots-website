@@ -10,7 +10,7 @@ const otherGames = [
     title: "SPOMIN",
     description: "Igraj spomin in vadi izgovorjavo",
     icon: Puzzle,
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/spomin.png",
+    image: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/spomin.png?t=${Date.now()}`,
     color: "text-app-purple",
     gradient: "from-app-purple/10 to-app-blue/10",
     path: "/govorne-igre/spomin",
@@ -174,9 +174,19 @@ export function GamesList() {
                 
                 {/* Bottom white section with image */}
                 <CardContent className="pt-4 pb-4 flex-grow flex flex-col items-center justify-center bg-white rounded-b-2xl">
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 rounded-xl flex items-center justify-center mb-2">
-                    <game.icon className={`h-10 w-10 sm:h-12 sm:w-12 ${game.color}`} />
-                  </div>
+                  {game.image ? (
+                    <div className="w-full h-full flex items-center justify-center p-1 sm:p-4 mb-2">
+                      <img
+                        src={game.image}
+                        alt={game.title}
+                        className="max-w-full max-h-full object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 rounded-xl flex items-center justify-center mb-2">
+                      <game.icon className={`h-10 w-10 sm:h-12 sm:w-12 ${game.color}`} />
+                    </div>
+                  )}
                   <p className="text-xs text-muted-foreground italic text-center">
                     Kmalu na voljo
                   </p>
