@@ -3,14 +3,14 @@ import { GamesList } from "@/components/games/GamesList";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-
 export default function GovorneIgre() {
-  const { profile, selectedChildIndex } = useAuth();
+  const {
+    profile,
+    selectedChildIndex
+  } = useAuth();
   const selectedChild = profile?.children?.[selectedChildIndex ?? 0];
   const childName = selectedChild?.name;
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
@@ -24,21 +24,16 @@ export default function GovorneIgre() {
           </CardHeader>
           <CardContent className="pt-2 flex items-center gap-3 sm:gap-4">
             <div className="hidden sm:block w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
-              <img 
-                src="/lovable-uploads/4377ec70-1996-47a9-bf05-8093cffcaf0b.png" 
-                alt="Zmajček Tomi" 
-                className="w-full h-full object-contain animate-bounce-gentle"
-              />
+              <img src="/lovable-uploads/4377ec70-1996-47a9-bf05-8093cffcaf0b.png" alt="Zmajček Tomi" className="w-full h-full object-contain animate-bounce-gentle" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-base sm:text-lg font-medium italic leading-relaxed">Izberi eno izmed spodnjih iger in začni vaditi izgovorjavo. Vsaka igra je zabaven korak do hitrejšega napredka!</p>
-              <p className="text-xs sm:text-sm text-muted-foreground mt-2">Z vajami postajamo vedno boljši!</p>
+              <p className="text-base sm:text-lg font-medium italic leading-relaxed">IZBERI ENO IZMED SPODNJIH IGER IN ZAČNI VADITI IZGOVORJAVO. VSAKA IGRA JE ZABAVEN KORAK DO HITREJŠEGA NAPREDKA!</p>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-2">Z VAJAMI POSTAJAMO VEDNO BOLJŠI!</p>
             </div>
           </CardContent>
         </Card>
 
         <GamesList />
       </div>
-    </div>
-  );
+    </div>;
 }
