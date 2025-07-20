@@ -32,9 +32,9 @@ export function PricingSection() {
       id="cenik"
       className="w-full bg-light-cloud py-10 md:py-16 px-4"
     >
-      <div className="max-w-3xl mx-auto text-center mb-10">
+      <div className="max-w-3xl md:max-w-5xl mx-auto text-center mb-10">
         <h2 className="text-3xl md:text-4xl font-bold mb-2">Cenik</h2>
-        <p className="text-lg text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis">
+        <p className="text-lg text-muted-foreground md:whitespace-nowrap">
           Naši paketi so zasnovani posebej za starše in njihove otroke. Izberite paket, ki vam najbolj ustreza.
         </p>
       </div>
