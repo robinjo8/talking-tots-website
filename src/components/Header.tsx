@@ -74,19 +74,25 @@ export default function Header() {
     navigate("/login");
   };
   return <header className="py-4 px-4 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="flex items-center">
-            <span className="text-2xl md:text-3xl font-extrabold text-dragon-green uppercase lg:text-2xl mx-0 px-0">Tomi</span>
-            <span className="text-2xl md:text-3xl font-extrabold text-app-orange uppercase lg:text-2xl">Talk</span>
-          </div>
-        </Link>
+      <div className="max-w-7xl mx-auto flex items-center">
+        {/* Left side - Logo with equal flex space */}
+        <div className="flex-1 flex justify-start">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="flex items-center">
+              <span className="text-2xl md:text-3xl font-extrabold text-dragon-green uppercase lg:text-2xl mx-0 px-0">Tomi</span>
+              <span className="text-2xl md:text-3xl font-extrabold text-app-orange uppercase lg:text-2xl">Talk</span>
+            </div>
+          </Link>
+        </div>
         
-        {/* Main navigation and action buttons - improved centering */}
-        <div className="flex items-center justify-center gap-3 flex-1">
-          <MobileMenu user={user} profile={profile} selectedChildIndex={selectedChildIndex} selectedChild={selectedChild} onSelectChild={handleSelectChild} onSignOut={handleSignOut} onStartNow={handleStartNow} onCenikScroll={handleCenikScroll} />
-
+        {/* Center - Navigation */}
+        <div className="flex items-center gap-3">
           <DesktopNavigation user={user} onStartNow={handleStartNow} onCenikScroll={handleCenikScroll} />
+        </div>
+        
+        {/* Right side - Mobile menu and profile with equal flex space */}
+        <div className="flex-1 flex justify-end">
+          <MobileMenu user={user} profile={profile} selectedChildIndex={selectedChildIndex} selectedChild={selectedChild} onSelectChild={handleSelectChild} onSignOut={handleSignOut} onStartNow={handleStartNow} onCenikScroll={handleCenikScroll} />
         </div>
       </div>
     </header>;
