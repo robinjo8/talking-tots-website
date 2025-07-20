@@ -1,10 +1,7 @@
-
 import { useIsMobile } from "@/hooks/use-mobile";
 import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
-
 export const TestimonialsSection = () => {
   const isMobile = useIsMobile();
-
   const testimonials = [{
     quote: "Moj sin je imel težave z izgovorjavo črke R. Po enem mesecu vaj z zmajčkom Tomijem jo izgovarja brez težav! Toplo priporočam!",
     author: "— Tanja, mama 6-letnika"
@@ -24,9 +21,7 @@ export const TestimonialsSection = () => {
     quote: "Z govornimi vajami se je mojemu otroku odprlo tudi na drugih področjih in ni več tako zaprt.",
     author: "— Peter, oče 6-letnika"
   }];
-
-  return (
-    <section className="py-14 px-4 md:px-10 bg-light-cloud w-full">
+  return <section className="py-14 px-4 md:px-10 bg-light-cloud w-full">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">Kaj o TomiTalk pravijo starši?</h2>
@@ -34,10 +29,8 @@ export const TestimonialsSection = () => {
             Pridružite se številnim družinam, ki so že odkrile moč TomiTalk aplikacije
           </p>
         </div>
-        {!isMobile && (
-          <div className="grid grid-cols-3 gap-6">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-background rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 md:p-8 h-full flex flex-col justify-between min-h-[280px] relative overflow-hidden border-0">
+        {!isMobile && <div className="grid grid-cols-3 gap-6">
+            {testimonials.map((testimonial, index) => <div key={index} className="bg-background rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 md:p-8 h-full flex flex-col justify-between min-h-[280px] relative overflow-hidden border-0">
                 {/* Quote Icon */}
                 <div className="absolute top-4 left-4 text-dragon-green/20">
                   <svg className="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
@@ -58,16 +51,11 @@ export const TestimonialsSection = () => {
                     {testimonial.author}
                   </p>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-        {isMobile && (
-          <div className="px-1">
+              </div>)}
+          </div>}
+        {isMobile && <div className="px-1">
             <TestimonialsCarousel />
-          </div>
-        )}
+          </div>}
       </div>
-    </section>
-  );
+    </section>;
 };

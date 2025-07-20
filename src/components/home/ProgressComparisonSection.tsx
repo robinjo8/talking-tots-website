@@ -6,8 +6,9 @@ const ProgressComparisonSection = () => {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const { user } = useAuth();
-
+  const {
+    user
+  } = useAuth();
   const handleStartNow = () => {
     if (!user) {
       navigate('/register');
@@ -55,9 +56,7 @@ const ProgressComparisonSection = () => {
   return <section ref={sectionRef} className="py-16 bg-light-cloud">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-            Izboljšajte otrokov govor – preprosto in brez stresa
-          </h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Izboljšajte otrokov govor, preprosto in brez stresa!</h2>
         </div>
 
         <div className="max-w-7xl mx-auto">
@@ -159,10 +158,7 @@ const ProgressComparisonSection = () => {
 
                 {/* Button */}
                 <div className="text-center mb-8 mt-auto">
-                  <button 
-                    onClick={handleStartNow}
-                    className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200"
-                  >
+                  <button onClick={handleStartNow} className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200">
                     Prihranite in začnite zdaj
                   </button>
                 </div>
