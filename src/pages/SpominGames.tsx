@@ -312,7 +312,7 @@ export default function SpominGames() {
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-xl md:text-2xl text-dragon-green">
               <MessageSquare className="h-5 w-5 text-dragon-green" />
-              Hej, {childName || "Tian"}!
+              HEJ, {childName?.toUpperCase() || "TIAN"}!
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-2 flex items-center gap-4">
@@ -324,8 +324,8 @@ export default function SpominGames() {
               />
             </div>
             <div className="flex-1">
-              <p className="text-lg font-medium italic">Poišči pare slik z enako črko in nato glasno ponovi besedo!</p>
-              <p className="text-sm text-muted-foreground mt-2">Z vajami postajamo vedno boljši!</p>
+              <p className="text-lg font-medium italic">POIŠČI PARE SLIK Z ENAKO ČRKO IN NATO GLASNO PONOVI BESEDO!</p>
+              <p className="text-sm text-muted-foreground mt-2">Z VAJAMI POSTAJAMO VEDNO BOLJŠI!</p>
             </div>
           </CardContent>
         </Card>

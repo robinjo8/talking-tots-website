@@ -54,7 +54,7 @@ const VideoNavodila = () => {
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-xl md:text-2xl text-dragon-green">
               <MessageSquare className="h-5 w-5 text-dragon-green" />
-              Hej, {childName || "Tian"}!
+              HEJ, {childName?.toUpperCase() || "TIAN"}!
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-2 flex items-center gap-3 sm:gap-4">
@@ -66,8 +66,8 @@ const VideoNavodila = () => {
               />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-base sm:text-lg font-medium italic leading-relaxed">Na tej strani si lahko izberete črko, ki vas zanima – prikazal se bo video z navodili za pravilno izgovorjavo te črke.</p>
-              <p className="text-xs sm:text-sm text-muted-foreground mt-2">Z vajami postajamo vedno boljši!</p>
+              <p className="text-base sm:text-lg font-medium italic leading-relaxed">NA TEJ STRANI SI LAHKO IZBERETE ČRKO, KI VAS ZANIMA – PRIKAZAL SE BO VIDEO Z NAVODILI ZA PRAVILNO IZGOVORJAVO TE ČRKE.</p>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-2">Z VAJAMI POSTAJAMO VEDNO BOLJŠI!</p>
             </div>
           </CardContent>
         </Card>

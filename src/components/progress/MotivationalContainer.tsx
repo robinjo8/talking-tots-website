@@ -37,7 +37,7 @@ export function MotivationalContainer({ childName }: MotivationalContainerProps)
                 <CardTitle className="flex items-center justify-between text-xl text-dragon-green">
                   <div className="flex items-center gap-2">
                     <MessageSquare className="h-5 w-5 text-dragon-green" />
-                    Hej, {childName}!
+                     HEJ, {childName?.toUpperCase()}!
                   </div>
                   {isExpanded ? (
                     <ChevronUp className="h-5 w-5 text-dragon-green" />
@@ -58,14 +58,14 @@ export function MotivationalContainer({ childName }: MotivationalContainerProps)
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-base font-medium italic leading-relaxed">
-                    Tukaj lahko spremljaš svoj napredek. Vsako zvezdico si prislužiš, ko uspešno opraviš 
-                    eno vajo ali igro. Ko zbereš 10 
-                    <span className="font-bold"> zvezdic</span>, pridobiš enega 
-                    <span className="font-bold"> zmajčka</span>. In ko zbereš 10 zmajčkov, osvojiš 
-                    <span className="font-bold"> pokal</span>! 
+                    TUKAJ LAHKO SPREMLJAŠ SVOJ NAPREDEK. VSAKO ZVEZDICO SI PRISLUŽIŠ, KO USPEŠNO OPRAVIŠ 
+                    ENO VAJO ALI IGRO. KO ZBEREŠ 10 
+                    <span className="font-bold"> ZVEZDIC</span>, PRIDOBIŠ ENEGA 
+                    <span className="font-bold"> ZMAJČKA</span>. IN KO ZBEREŠ 10 ZMAJČKOV, OSVOJIŠ 
+                    <span className="font-bold"> POKAL</span>! 
                   </p>
                   <p className="text-sm text-muted-foreground mt-2">
-                    Zmajček Tomi te ves čas spremlja in navija zate – zato pogumno naprej, korak za korakom do cilja!
+                    ZMAJČEK TOMI TE VES ČAS SPREMLJA IN NAVIJA ZATE – ZATO POGUMNO NAPREJ, KORAK ZA KORAKOM DO CILJA!
                   </p>
                 </div>
               </CardContent>
@@ -76,7 +76,7 @@ export function MotivationalContainer({ childName }: MotivationalContainerProps)
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-xl md:text-2xl text-dragon-green">
                 <MessageSquare className="h-5 w-5 text-dragon-green" />
-                Hej, {childName}!
+                HEJ, {childName?.toUpperCase()}!
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-2 flex items-center gap-3 sm:gap-4">
@@ -89,14 +89,14 @@ export function MotivationalContainer({ childName }: MotivationalContainerProps)
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-base sm:text-lg font-medium italic leading-relaxed">
-                  Tukaj lahko spremljaš svoj napredek. Vsako zvezdico si prislužiš, ko uspešno opraviš 
-                  eno vajo ali igro. Ko zbereš 10 
-                  <span className="font-bold"> zvezdic</span>, pridobiš enega 
-                  <span className="font-bold"> zmajčka</span>. In ko zbereš 10 zmajčkov, osvojiš 
-                  <span className="font-bold"> pokal</span>! 
+                  TUKAJ LAHKO SPREMLJAŠ SVOJ NAPREDEK. VSAKO ZVEZDICO SI PRISLUŽIŠ, KO USPEŠNO OPRAVIŠ 
+                  ENO VAJO ALI IGRO. KO ZBEREŠ 10 
+                  <span className="font-bold"> ZVEZDIC</span>, PRIDOBIŠ ENEGA 
+                  <span className="font-bold"> ZMAJČKA</span>. IN KO ZBEREŠ 10 ZMAJČKOV, OSVOJIŠ 
+                  <span className="font-bold"> POKAL</span>! 
                 </p>
                 <p className="text-xs sm:text-sm text-muted-foreground mt-2">
-                  Zmajček Tomi te ves čas spremlja in navija zate – zato pogumno naprej, korak za korakom do cilja!
+                  ZMAJČEK TOMI TE VES ČAS SPREMLJA IN NAVIJA ZATE – ZATO POGUMNO NAPREJ, KORAK ZA KORAKOM DO CILJA!
                 </p>
               </div>
             </CardContent>

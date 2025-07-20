@@ -34,7 +34,7 @@ export function MotivationalMessage() {
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-xl md:text-2xl text-dragon-green">
           <MessageSquare className="h-5 w-5 text-dragon-green" />
-          Zmajček Tomi ti sporoča:
+          ZMAJČEK TOMI TI SPOROČA:
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-2 flex items-center gap-4">
@@ -46,8 +46,8 @@ export function MotivationalMessage() {
           />
         </div>
         <div className="flex-1">
-          <p className="text-lg font-medium italic">{message}</p>
-          <p className="text-sm text-muted-foreground mt-2">Z vajami postajamo vedno boljši!</p>
+          <p className="text-lg font-medium italic">{message.toUpperCase()}</p>
+          <p className="text-sm text-muted-foreground mt-2">Z VAJAMI POSTAJAMO VEDNO BOLJŠI!</p>
         </div>
       </CardContent>
     </Card>

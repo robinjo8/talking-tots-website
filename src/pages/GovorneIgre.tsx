@@ -19,7 +19,7 @@ export default function GovorneIgre() {
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-xl md:text-2xl text-dragon-green">
               <MessageSquare className="h-5 w-5 text-dragon-green" />
-              Hej, {childName || "Tian"}!
+              HEJ, {childName?.toUpperCase() || "TIAN"}!
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-2 flex items-center gap-3 sm:gap-4">
