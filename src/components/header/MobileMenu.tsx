@@ -45,10 +45,23 @@ export function MobileMenu({
     return location.pathname === path;
   };
   return <div className="lg:hidden flex items-center gap-2">
-      {/* Hamburger menu and child info aligned horizontally */}
+      {/* Show selected child first (left side) */}
+      {selectedChild && <div className="flex items-center gap-2">
+          {selectedChild.avatarId > 0 && <Avatar className="h-6 w-6 border border-green-200">
+              <AvatarImage src={getAvatarSrc(selectedChild.avatarId)} alt={selectedChild.name} className="object-contain" />
+              <AvatarFallback className="bg-green-100 text-green-800">
+                {selectedChild.name[0]}
+              </AvatarFallback>
+            </Avatar>}
+          <span className="text-sm font-medium text-muted-foreground uppercase">
+            {selectedChild.name}
+          </span>
+        </div>}
+      
+      {/* Hamburger menu on the right */}
       <Sheet>
         <SheetTrigger asChild>
-          <Button variant="ghost" size="sm" className="flex items-center">
+          <Button variant="ghost" size="sm" className="flex items-center ml-auto">
             <Menu className="h-5 w-5" />
           </Button>
         </SheetTrigger>
@@ -151,18 +164,5 @@ export function MobileMenu({
           </ScrollArea>
         </SheetContent>
       </Sheet>
-      
-      {/* Show selected child next to hamburger menu */}
-      {selectedChild && <div className="flex items-center gap-2">
-          {selectedChild.avatarId > 0 && <Avatar className="h-6 w-6 border border-green-200">
-              <AvatarImage src={getAvatarSrc(selectedChild.avatarId)} alt={selectedChild.name} className="object-contain" />
-              <AvatarFallback className="bg-green-100 text-green-800">
-                {selectedChild.name[0]}
-              </AvatarFallback>
-            </Avatar>}
-          <span className="text-sm font-medium text-muted-foreground uppercase">
-            {selectedChild.name}
-          </span>
-        </div>}
     </div>;
 }
