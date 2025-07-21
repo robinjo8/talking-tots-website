@@ -52,7 +52,7 @@ export default function PoveziPareR() {
     setSelectedGame(gameOptions[randomIndex]);
   }, []);
 
-  // Enable fullscreen on mobile devices only and force landscape
+  // Enable fullscreen on mobile devices only (no orientation lock - allow portrait)
   useEffect(() => {
     if (effectiveFullscreen) {
       const requestFullscreen = async () => {
@@ -65,13 +65,6 @@ export default function PoveziPareR() {
         }
       };
       requestFullscreen();
-      
-      // Force landscape orientation
-      if (screen.orientation && 'lock' in screen.orientation) {
-        (screen.orientation as any).lock('landscape').catch((err: any) => {
-          console.log('Orientation lock not supported:', err);
-        });
-      }
       
       return () => {
         if (document.fullscreenElement) {
@@ -149,7 +142,7 @@ export default function PoveziPareR() {
         /* Desktop layout */
         <div className="flex flex-col gap-4 p-4 pt-20">
           {/* Puzzle iframe */}
-          <div className="w-full h-[60vh]">
+          <div className="w-full h-[75vh]">
             <PuzzleIframe 
               ref={iframeRef}
               src={selectedGame.iframeUrl}
