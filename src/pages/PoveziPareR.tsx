@@ -1,13 +1,14 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { PageHeader } from "@/components/PageHeader";
+import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Volume2 } from "lucide-react";
 import { PuzzleIframe } from "@/components/puzzle/PuzzleIframe";
 import { usePoveziPareAudio } from "@/hooks/usePoveziPareAudio";
 import { useUserProgress } from "@/hooks/useUserProgress";
 import { usePuzzleInteraction } from "@/hooks/usePuzzleInteraction";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Define the 5 iframe games with their corresponding audio files
 const gameOptions = [
@@ -35,17 +36,50 @@ const gameOptions = [
 
 export default function PoveziPareR() {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const { playSelectedAudio, isAudioLoading } = usePoveziPareAudio();
   const { recordPuzzleCompletion } = useUserProgress();
   const { iframeRef, isButtonActive, markButtonAsUsed } = usePuzzleInteraction();
   
   const [selectedGame, setSelectedGame] = useState<typeof gameOptions[0] | null>(null);
 
+  // Mobile devices always get fullscreen, desktop never gets fullscreen
+  const effectiveFullscreen = isMobile;
+
   // Randomly select a game when component mounts
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * gameOptions.length);
     setSelectedGame(gameOptions[randomIndex]);
   }, []);
+
+  // Enable fullscreen on mobile devices only and force landscape
+  useEffect(() => {
+    if (effectiveFullscreen) {
+      const requestFullscreen = async () => {
+        try {
+          if (document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen();
+          }
+        } catch (error) {
+          console.log('Fullscreen not supported:', error);
+        }
+      };
+      requestFullscreen();
+      
+      // Force landscape orientation
+      if (screen.orientation && 'lock' in screen.orientation) {
+        (screen.orientation as any).lock('landscape').catch((err: any) => {
+          console.log('Orientation lock not supported:', err);
+        });
+      }
+      
+      return () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen?.();
+        }
+      };
+    }
+  }, [effectiveFullscreen]);
 
   const handleGameComplete = () => {
     if (selectedGame) {
@@ -61,8 +95,8 @@ export default function PoveziPareR() {
 
   if (!selectedGame) {
     return (
-      <div className="min-h-screen bg-background">
-        <PageHeader title="POVEŽI PARE - R" backPath="/govorne-igre/povezi-pare" />
+      <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}>
+        {!effectiveFullscreen && <Header />}
         <div className="flex items-center justify-center h-64">
           <p className="text-lg">Nalagam igro...</p>
         </div>
@@ -71,24 +105,61 @@ export default function PoveziPareR() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <PageHeader title="POVEŽI PARE - R" backPath="/govorne-igre/povezi-pare" />
+    <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}>
+      {!effectiveFullscreen && <Header />}
       
-      <div className="container max-w-5xl mx-auto px-4 pb-20">
-        {/* Game container */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-          {/* Game area */}
-          <div className="aspect-video bg-gray-50 relative">
+      {/* Mobile edge-to-edge layout */}
+      {effectiveFullscreen ? (
+        <div className="h-full flex flex-col">
+          {/* Puzzle iframe - fullscreen on mobile */}
+          <div className="flex-1 p-2 overflow-hidden">
             <PuzzleIframe 
               ref={iframeRef}
               src={selectedGame.iframeUrl}
               className="w-full h-full"
             />
           </div>
-          
-          {/* Button section */}
-          <div className="p-6 bg-white border-t border-gray-100">
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+
+          {/* Complete puzzle button - positioned below puzzle */}
+          <div className="bg-card border-t p-2 flex-shrink-0">
+            <div className="flex gap-2 justify-center">
+              <Button
+                onClick={handleGameComplete}
+                disabled={!isButtonActive || isAudioLoading}
+                className={`${
+                  isButtonActive 
+                    ? 'bg-dragon-green hover:bg-dragon-green/90 text-white' 
+                    : 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                } flex-1 max-w-xs`}
+              >
+                <Volume2 className="w-4 h-4 mr-2" />
+                {isAudioLoading ? 'Predvajam...' : 'IGRA JE KONČANA'}
+              </Button>
+              <Button 
+                variant="outline" 
+                className="bg-white text-foreground border-border hover:bg-gray-50 px-3"
+                onClick={handleBackToGames}
+              >
+                Nazaj
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* Desktop layout */
+        <div className="flex flex-col gap-4 p-4 pt-20">
+          {/* Puzzle iframe */}
+          <div className="w-full h-[60vh]">
+            <PuzzleIframe 
+              ref={iframeRef}
+              src={selectedGame.iframeUrl}
+              className="rounded-lg shadow-lg"
+            />
+          </div>
+
+          {/* Complete puzzle button - always visible */}
+          <div className="bg-card border p-6 rounded-lg shadow-lg">
+            <div className="text-center">
               <Button
                 onClick={handleGameComplete}
                 disabled={!isButtonActive || isAudioLoading}
@@ -97,24 +168,22 @@ export default function PoveziPareR() {
                   isButtonActive 
                     ? 'bg-dragon-green hover:bg-dragon-green/90 text-white' 
                     : 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                } min-w-[200px]`}
+                } mb-4`}
               >
                 <Volume2 className="w-5 h-5 mr-2" />
                 {isAudioLoading ? 'Predvajam...' : 'IGRA JE KONČANA'}
               </Button>
-              
-              <Button
+              <Button 
+                variant="outline" 
+                className="bg-white text-foreground border-border hover:bg-gray-50"
                 onClick={handleBackToGames}
-                variant="outline"
-                size="lg"
-                className="min-w-[200px]"
               >
                 NAZAJ NA IGRE
               </Button>
-            </div>
+             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
