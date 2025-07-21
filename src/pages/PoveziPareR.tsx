@@ -53,7 +53,9 @@ export default function PoveziPareR() {
   // Randomly select a game when component mounts
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * gameOptions.length);
-    setSelectedGame(gameOptions[randomIndex]);
+    const newGame = gameOptions[randomIndex];
+    console.log('Initial game selection:', newGame.audioFile, 'for iframe:', newGame.iframeUrl);
+    setSelectedGame(newGame);
   }, []);
 
   // Enable fullscreen on mobile devices only (no orientation lock - allow portrait)
@@ -78,17 +80,45 @@ export default function PoveziPareR() {
     }
   }, [effectiveFullscreen]);
 
+  // Consolidated audio playing function with validation
+  const playAudioForGame = (game: typeof gameOptions[0]) => {
+    console.log('Playing audio for game:', game.audioFile, 'iframe:', game.iframeUrl);
+    
+    // Validate game object structure
+    if (!game || !game.audioFile || !game.iframeUrl) {
+      console.error('Invalid game object:', game);
+      return;
+    }
+
+    // Verify the game-to-audio mapping
+    const expectedGame = gameOptions.find(g => g.iframeUrl === game.iframeUrl);
+    if (!expectedGame) {
+      console.error('Game not found in gameOptions:', game.iframeUrl);
+      return;
+    }
+
+    if (expectedGame.audioFile !== game.audioFile) {
+      console.error('Audio file mismatch! Expected:', expectedGame.audioFile, 'Got:', game.audioFile);
+      return;
+    }
+
+    console.log('Audio mapping verified successfully. Playing:', game.audioFile);
+    playSelectedAudio(game.audioFile);
+  };
+
   const handleAutoPlayAudio = () => {
     if (selectedGame) {
-      console.log('Auto-playing audio for completed game:', selectedGame.audioFile);
-      playSelectedAudio(selectedGame.audioFile);
+      console.log('Auto-playing audio for completed game:', selectedGame.audioFile, 'iframe:', selectedGame.iframeUrl);
+      playAudioForGame(selectedGame);
       recordPuzzleCompletion('povezi_pare_r');
       markButtonAsUsed();
       setShowAudioDialog(true);
+    } else {
+      console.error('No selected game available for auto-play');
     }
   };
 
-  // Listen for postMessage events from the iframe
+  // Listen for postMessage events from the iframe - removed selectedGame dependency
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       console.log('Received postMessage:', event.data, 'from origin:', event.origin);
@@ -109,23 +139,29 @@ export default function PoveziPareR() {
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [selectedGame]);
+  }, []); // Removed selectedGame dependency to prevent race conditions
 
   const handleGameComplete = () => {
     if (selectedGame && gameCompleted) {
-      console.log('Playing audio for completed game:', selectedGame.audioFile);
-      playSelectedAudio(selectedGame.audioFile);
+      console.log('Manual audio play for completed game:', selectedGame.audioFile, 'iframe:', selectedGame.iframeUrl);
+      playAudioForGame(selectedGame);
       setShowAudioDialog(true);
+    } else {
+      console.log('Cannot play audio - gameCompleted:', gameCompleted, 'selectedGame:', selectedGame);
     }
   };
 
   const handlePlayAudioInDialog = () => {
     if (selectedGame) {
-      playSelectedAudio(selectedGame.audioFile);
+      console.log('Playing audio in dialog for game:', selectedGame.audioFile, 'iframe:', selectedGame.iframeUrl);
+      playAudioForGame(selectedGame);
+    } else {
+      console.error('No selected game available for dialog audio play');
     }
   };
 
   const handleNewGame = async () => {
+    console.log('Starting new game...');
     setIsResetting(true);
     
     // Reset current game using postMessage
@@ -141,12 +177,16 @@ export default function PoveziPareR() {
     const randomIndex = Math.floor(Math.random() * gameOptions.length);
     const newGame = gameOptions[randomIndex];
     
+    console.log('New game selected:', newGame.audioFile, 'for iframe:', newGame.iframeUrl);
+    
+    // Atomic update - set all related states together
+    setSelectedGame(newGame);
+    setGameCompleted(false);
+    
     // Small delay to ensure reset message is processed
     setTimeout(() => {
-      console.log('Setting new game:', newGame.audioFile, 'for iframe:', newGame.iframeUrl);
-      setSelectedGame(newGame);
-      setGameCompleted(false); // Reset completion state for new game
       setIsResetting(false);
+      console.log('New game setup complete');
     }, 100);
   };
 

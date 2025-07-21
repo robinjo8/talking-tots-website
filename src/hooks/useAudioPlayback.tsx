@@ -20,13 +20,22 @@ export const useAudioPlayback = () => {
       // Add event listeners for debugging
       audioRef.current.addEventListener('loadstart', () => console.log('Audio load started'));
       audioRef.current.addEventListener('canplay', () => console.log('Audio can play'));
-      audioRef.current.addEventListener('error', (e) => console.error('Audio element error:', e));
-      
-      // Don't set crossOrigin as it might cause CORS issues with Supabase
-      // audioRef.current.setAttribute('crossOrigin', 'anonymous');
+      audioRef.current.addEventListener('loadeddata', () => console.log('Audio data loaded'));
+      audioRef.current.addEventListener('error', (e) => {
+        console.error('Audio element error:', e);
+        const target = e.target as HTMLAudioElement;
+        console.error('Audio error details:', {
+          error: target.error,
+          networkState: target.networkState,
+          readyState: target.readyState,
+          src: target.src
+        });
+      });
       
       // Set new source and play
       audioRef.current.src = audioUrl;
+      audioRef.current.load(); // Force load to ensure fresh start
+      
       audioRef.current.play().then(() => {
         console.log('Audio started playing successfully');
       }).catch(error => {
