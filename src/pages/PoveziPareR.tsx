@@ -92,7 +92,7 @@ export default function PoveziPareR() {
   }, []);
 
   const handleGameComplete = () => {
-    if (selectedGame) {
+    if (selectedGame && gameCompleted) {
       playSelectedAudio(selectedGame.audioFile);
       recordPuzzleCompletion('povezi_pare_r');
       markButtonAsUsed();
@@ -138,7 +138,7 @@ export default function PoveziPareR() {
     );
   }
 
-  const isWordButtonActive = gameCompleted || isButtonActive;
+  const isWordButtonActive = gameCompleted;
 
   return (
     <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}>
