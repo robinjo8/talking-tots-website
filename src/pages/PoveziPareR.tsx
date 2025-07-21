@@ -79,9 +79,15 @@ export default function PoveziPareR() {
   // Listen for postMessage events from the iframe
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
+      console.log('Received postMessage:', event.data, 'from origin:', event.origin);
+      
       // Check if message is from the puzzle iframe
       if (event.origin === 'https://puzzel.org') {
-        if (event.data && event.data.type === 'game-completed') {
+        console.log('Message from puzzle.org:', event.data);
+        
+        // puzzle.org sends { completed: boolean, activityKey: string }
+        if (event.data && event.data.completed === true) {
+          console.log('Game completed! Setting gameCompleted to true');
           setGameCompleted(true);
         }
       }
@@ -92,7 +98,8 @@ export default function PoveziPareR() {
   }, []);
 
   const handleGameComplete = () => {
-    if (selectedGame && (gameCompleted || isButtonActive)) {
+    if (selectedGame && gameCompleted) {
+      console.log('Playing audio for completed game:', selectedGame.audioFile);
       playSelectedAudio(selectedGame.audioFile);
       recordPuzzleCompletion('povezi_pare_r');
       markButtonAsUsed();
@@ -117,8 +124,9 @@ export default function PoveziPareR() {
     
     // Small delay to ensure reset message is processed
     setTimeout(() => {
+      console.log('Setting new game:', newGame.audioFile, 'for iframe:', newGame.iframeUrl);
       setSelectedGame(newGame);
-      setGameCompleted(false);
+      setGameCompleted(false); // Reset completion state for new game
       setIsResetting(false);
     }, 100);
   };
@@ -138,7 +146,7 @@ export default function PoveziPareR() {
     );
   }
 
-  const isWordButtonActive = gameCompleted || isButtonActive;
+  const isWordButtonActive = gameCompleted;
 
   return (
     <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}>
