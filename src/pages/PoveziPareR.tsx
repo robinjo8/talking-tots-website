@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { Volume2, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import { PuzzleIframe } from "@/components/puzzle/PuzzleIframe";
 import { AudioPracticeDialog } from "@/components/puzzle/AudioPracticeDialog";
 import { usePoveziPareAudio } from "@/hooks/usePoveziPareAudio";
@@ -80,45 +80,8 @@ export default function PoveziPareR() {
     }
   }, [effectiveFullscreen]);
 
-  // Consolidated audio playing function with validation
-  const playAudioForGame = (game: typeof gameOptions[0]) => {
-    console.log('Playing audio for game:', game.audioFile, 'iframe:', game.iframeUrl);
-    
-    // Validate game object structure
-    if (!game || !game.audioFile || !game.iframeUrl) {
-      console.error('Invalid game object:', game);
-      return;
-    }
 
-    // Verify the game-to-audio mapping
-    const expectedGame = gameOptions.find(g => g.iframeUrl === game.iframeUrl);
-    if (!expectedGame) {
-      console.error('Game not found in gameOptions:', game.iframeUrl);
-      return;
-    }
-
-    if (expectedGame.audioFile !== game.audioFile) {
-      console.error('Audio file mismatch! Expected:', expectedGame.audioFile, 'Got:', game.audioFile);
-      return;
-    }
-
-    console.log('Audio mapping verified successfully. Playing:', game.audioFile);
-    playSelectedAudio(game.audioFile);
-  };
-
-  const handleAutoPlayAudio = () => {
-    if (selectedGame) {
-      console.log('Auto-playing audio for completed game:', selectedGame.audioFile, 'iframe:', selectedGame.iframeUrl);
-      playAudioForGame(selectedGame);
-      recordPuzzleCompletion('povezi_pare_r');
-      markButtonAsUsed();
-      setShowAudioDialog(true);
-    } else {
-      console.error('No selected game available for auto-play');
-    }
-  };
-
-  // Listen for postMessage events from the iframe - removed selectedGame dependency
+  // Listen for postMessage events from the iframe and auto-play audio on completion
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       console.log('Received postMessage:', event.data, 'from origin:', event.origin);
@@ -129,32 +92,49 @@ export default function PoveziPareR() {
         
         // puzzle.org sends { completed: boolean, activityKey: string }
         if (event.data && event.data.completed === true) {
-          console.log('Game completed! Setting gameCompleted to true');
+          console.log('Game completed! Auto-playing audio...');
           setGameCompleted(true);
-          // Automatically play audio and show dialog when game completes
-          handleAutoPlayAudio();
+          
+          // Get the current selected game directly at the time of completion
+          const currentGame = selectedGame;
+          if (currentGame) {
+            console.log('Auto-playing audio for completed game:', currentGame.audioFile, 'iframe:', currentGame.iframeUrl);
+            
+            // Validate the game-to-audio mapping before playing
+            const expectedGame = gameOptions.find(g => g.iframeUrl === currentGame.iframeUrl);
+            if (expectedGame && expectedGame.audioFile === currentGame.audioFile) {
+              console.log('✓ Audio mapping verified. Playing:', currentGame.audioFile);
+              playSelectedAudio(currentGame.audioFile);
+              recordPuzzleCompletion('povezi_pare_r');
+              markButtonAsUsed();
+              setShowAudioDialog(true);
+            } else {
+              console.error('❌ Audio mapping failed! Expected:', expectedGame?.audioFile, 'Got:', currentGame.audioFile);
+            }
+          } else {
+            console.error('❌ No selected game available for auto-play');
+          }
         }
       }
     };
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, []); // Removed selectedGame dependency to prevent race conditions
+  }, [selectedGame, playSelectedAudio, recordPuzzleCompletion, markButtonAsUsed]); // Include dependencies for proper closure
 
-  const handleGameComplete = () => {
-    if (selectedGame && gameCompleted) {
-      console.log('Manual audio play for completed game:', selectedGame.audioFile, 'iframe:', selectedGame.iframeUrl);
-      playAudioForGame(selectedGame);
-      setShowAudioDialog(true);
-    } else {
-      console.log('Cannot play audio - gameCompleted:', gameCompleted, 'selectedGame:', selectedGame);
-    }
-  };
 
   const handlePlayAudioInDialog = () => {
     if (selectedGame) {
       console.log('Playing audio in dialog for game:', selectedGame.audioFile, 'iframe:', selectedGame.iframeUrl);
-      playAudioForGame(selectedGame);
+      
+      // Validate the game-to-audio mapping before playing
+      const expectedGame = gameOptions.find(g => g.iframeUrl === selectedGame.iframeUrl);
+      if (expectedGame && expectedGame.audioFile === selectedGame.audioFile) {
+        console.log('✓ Audio mapping verified. Playing:', selectedGame.audioFile);
+        playSelectedAudio(selectedGame.audioFile);
+      } else {
+        console.error('❌ Audio mapping failed! Expected:', expectedGame?.audioFile, 'Got:', selectedGame.audioFile);
+      }
     } else {
       console.error('No selected game available for dialog audio play');
     }
@@ -205,8 +185,6 @@ export default function PoveziPareR() {
     );
   }
 
-  const isWordButtonActive = gameCompleted;
-
   return (
     <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}>
       {!effectiveFullscreen && <Header />}
@@ -223,42 +201,25 @@ export default function PoveziPareR() {
             />
           </div>
 
-          {/* Button container - two rows on mobile */}
+          {/* Button container - single row on mobile */}
           <div className="bg-card border-t p-2 flex-shrink-0">
-            <div className="flex flex-col gap-2">
-              {/* First row: GOVORNA VAJA */}
+            <div className="flex gap-2">
               <Button
-                onClick={handleGameComplete}
-                disabled={!isWordButtonActive || isAudioLoading}
-                className={`${
-                  isWordButtonActive 
-                    ? 'bg-dragon-green hover:bg-dragon-green/90 text-white' 
-                    : 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                } w-full`}
+                onClick={handleNewGame}
+                disabled={isResetting}
+                variant="outline"
+                className="bg-white text-foreground border-border hover:bg-gray-50 flex-1"
               >
-                <Volume2 className="w-4 h-4 mr-2" />
-                {isAudioLoading ? 'Nalagam...' : 'GOVORNA VAJA'}
+                <RotateCcw className="w-4 h-4 mr-2" />
+                {isResetting ? 'Nalagam...' : 'NOVA IGRA'}
               </Button>
-              
-              {/* Second row: NOVA IGRA and Nazaj */}
-              <div className="flex gap-2">
-                <Button
-                  onClick={handleNewGame}
-                  disabled={isResetting}
-                  variant="outline"
-                  className="bg-white text-foreground border-border hover:bg-gray-50 flex-1"
-                >
-                  <RotateCcw className="w-4 h-4 mr-2" />
-                  {isResetting ? 'Nalagam...' : 'NOVA IGRA'}
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="bg-white text-foreground border-border hover:bg-gray-50 flex-1"
-                  onClick={handleBackToGames}
-                >
-                  Nazaj
-                </Button>
-              </div>
+              <Button 
+                variant="outline" 
+                className="bg-white text-foreground border-border hover:bg-gray-50 flex-1"
+                onClick={handleBackToGames}
+              >
+                Nazaj
+              </Button>
             </div>
           </div>
         </div>
@@ -274,22 +235,9 @@ export default function PoveziPareR() {
             />
           </div>
 
-          {/* Button container - always visible with all buttons in one row */}
+          {/* Button container - desktop layout */}
           <div className="bg-card border p-6 rounded-lg shadow-lg">
             <div className="flex gap-4 justify-center items-center">
-              <Button
-                onClick={handleGameComplete}
-                disabled={!isWordButtonActive || isAudioLoading}
-                size="lg"
-                className={`${
-                  isWordButtonActive 
-                    ? 'bg-dragon-green hover:bg-dragon-green/90 text-white' 
-                    : 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                }`}
-              >
-                <Volume2 className="w-5 h-5 mr-2" />
-                {isAudioLoading ? 'Nalagam...' : 'GOVORNA VAJA'}
-              </Button>
               <Button
                 onClick={handleNewGame}
                 disabled={isResetting}
