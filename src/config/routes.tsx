@@ -1,3 +1,4 @@
+
 import { Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "@/pages/Index";
@@ -29,6 +30,8 @@ import SestavljankeR from "@/pages/SestavljankeR";
 import SestavljankeRiba from "@/pages/SestavljankeRiba";
 import SestavljankeRoka from "@/pages/SestavljankeRoka";
 import SestavljankeRoza from "@/pages/SestavljankeRoza";
+import PoveziPareGames from "@/pages/PoveziPareGames";
+import PoveziPareR from "@/pages/PoveziPareR";
 
 export function AppRoutes() {
   return (
@@ -114,7 +117,6 @@ export function AppRoutes() {
         }
       />
       
-      
       <Route 
         path="/govorne-igre/sestavljanke" 
         element={
@@ -165,6 +167,24 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <Sestavljanke />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/povezi-pare" 
+        element={
+          <ProtectedRoute>
+            <PoveziPareGames />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/povezi-pare/r" 
+        element={
+          <ProtectedRoute>
+            <PoveziPareR />
           </ProtectedRoute>
         }
       />
