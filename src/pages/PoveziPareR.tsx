@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { Volume2 } from "lucide-react";
+import { Volume2, RotateCcw } from "lucide-react";
 import { PuzzleIframe } from "@/components/puzzle/PuzzleIframe";
 import { usePoveziPareAudio } from "@/hooks/usePoveziPareAudio";
 import { useUserProgress } from "@/hooks/useUserProgress";
@@ -42,6 +42,8 @@ export default function PoveziPareR() {
   const { iframeRef, isButtonActive, markButtonAsUsed } = usePuzzleInteraction();
   
   const [selectedGame, setSelectedGame] = useState<typeof gameOptions[0] | null>(null);
+  const [gameCompleted, setGameCompleted] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   // Mobile devices always get fullscreen, desktop never gets fullscreen
   const effectiveFullscreen = isMobile;
@@ -74,12 +76,51 @@ export default function PoveziPareR() {
     }
   }, [effectiveFullscreen]);
 
+  // Listen for postMessage events from the iframe
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      // Check if message is from the puzzle iframe
+      if (event.origin === 'https://puzzel.org') {
+        if (event.data && event.data.type === 'game-completed') {
+          setGameCompleted(true);
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
   const handleGameComplete = () => {
     if (selectedGame) {
       playSelectedAudio(selectedGame.audioFile);
       recordPuzzleCompletion('povezi_pare_r');
       markButtonAsUsed();
     }
+  };
+
+  const handleNewGame = async () => {
+    setIsResetting(true);
+    
+    // Reset current game using postMessage
+    if (iframeRef.current?.contentWindow) {
+      try {
+        iframeRef.current.contentWindow.postMessage({ trigger: { type: "reset" } }, "*");
+      } catch (error) {
+        console.log('PostMessage not supported:', error);
+      }
+    }
+    
+    // Randomly select a new game
+    const randomIndex = Math.floor(Math.random() * gameOptions.length);
+    const newGame = gameOptions[randomIndex];
+    
+    // Small delay to ensure reset message is processed
+    setTimeout(() => {
+      setSelectedGame(newGame);
+      setGameCompleted(false);
+      setIsResetting(false);
+    }, 100);
   };
 
   const handleBackToGames = () => {
@@ -97,6 +138,8 @@ export default function PoveziPareR() {
     );
   }
 
+  const isWordButtonActive = gameCompleted || isButtonActive;
+
   return (
     <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}>
       {!effectiveFullscreen && <Header />}
@@ -113,20 +156,29 @@ export default function PoveziPareR() {
             />
           </div>
 
-          {/* Complete puzzle button - positioned below puzzle */}
+          {/* Button container - positioned below puzzle */}
           <div className="bg-card border-t p-2 flex-shrink-0">
             <div className="flex gap-2 justify-center">
               <Button
                 onClick={handleGameComplete}
-                disabled={!isButtonActive || isAudioLoading}
+                disabled={!isWordButtonActive || isAudioLoading}
                 className={`${
-                  isButtonActive 
+                  isWordButtonActive 
                     ? 'bg-dragon-green hover:bg-dragon-green/90 text-white' 
                     : 'bg-gray-400 text-gray-600 cursor-not-allowed'
                 } flex-1 max-w-xs`}
               >
                 <Volume2 className="w-4 h-4 mr-2" />
-                {isAudioLoading ? 'Predvajam...' : 'IGRA JE KONČANA'}
+                {isAudioLoading ? 'Predvajam...' : 'IZGOVORI BESEDE'}
+              </Button>
+              <Button
+                onClick={handleNewGame}
+                disabled={isResetting}
+                variant="outline"
+                className="bg-white text-foreground border-border hover:bg-gray-50 px-3"
+              >
+                <RotateCcw className="w-4 h-4 mr-2" />
+                {isResetting ? 'Nalagam...' : 'NOVA IGRA'}
               </Button>
               <Button 
                 variant="outline" 
@@ -150,22 +202,34 @@ export default function PoveziPareR() {
             />
           </div>
 
-          {/* Complete puzzle button - always visible */}
+          {/* Button container - always visible */}
           <div className="bg-card border p-6 rounded-lg shadow-lg">
             <div className="text-center">
-              <Button
-                onClick={handleGameComplete}
-                disabled={!isButtonActive || isAudioLoading}
-                size="lg"
-                className={`${
-                  isButtonActive 
-                    ? 'bg-dragon-green hover:bg-dragon-green/90 text-white' 
-                    : 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                } mb-4`}
-              >
-                <Volume2 className="w-5 h-5 mr-2" />
-                {isAudioLoading ? 'Predvajam...' : 'IGRA JE KONČANA'}
-              </Button>
+              <div className="flex gap-4 justify-center mb-4">
+                <Button
+                  onClick={handleGameComplete}
+                  disabled={!isWordButtonActive || isAudioLoading}
+                  size="lg"
+                  className={`${
+                    isWordButtonActive 
+                      ? 'bg-dragon-green hover:bg-dragon-green/90 text-white' 
+                      : 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                  }`}
+                >
+                  <Volume2 className="w-5 h-5 mr-2" />
+                  {isAudioLoading ? 'Predvajam...' : 'IZGOVORI BESEDE'}
+                </Button>
+                <Button
+                  onClick={handleNewGame}
+                  disabled={isResetting}
+                  size="lg"
+                  variant="outline"
+                  className="bg-white text-foreground border-border hover:bg-gray-50"
+                >
+                  <RotateCcw className="w-5 h-5 mr-2" />
+                  {isResetting ? 'Nalagam...' : 'NOVA IGRA'}
+                </Button>
+              </div>
               <Button 
                 variant="outline" 
                 className="bg-white text-foreground border-border hover:bg-gray-50"
@@ -173,7 +237,7 @@ export default function PoveziPareR() {
               >
                 NAZAJ NA IGRE
               </Button>
-             </div>
+            </div>
           </div>
         </div>
       )}
