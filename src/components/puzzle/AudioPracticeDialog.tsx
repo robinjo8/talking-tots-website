@@ -27,7 +27,7 @@ export function AudioPracticeDialog({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-center">Audio vaje</DialogTitle>
+          <DialogTitle className="text-center">Govorna vaja</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4">
@@ -50,7 +50,7 @@ export function AudioPracticeDialog({
               <Button 
                 onClick={onStartRecording}
                 disabled={isRecording}
-                variant={isRecording ? "destructive" : "default"}
+                className="bg-dragon-green hover:bg-dragon-green/90 text-white"
               >
                 <Mic className="w-4 h-4 mr-2" />
                 {isRecording ? "Snemam..." : "Posnemi se"}

@@ -174,8 +174,8 @@ export default function PoveziPareR() {
       {/* Mobile edge-to-edge layout */}
       {effectiveFullscreen ? (
         <div className="h-full flex flex-col">
-          {/* Puzzle iframe - fullscreen on mobile */}
-          <div className="flex-1 p-2 overflow-hidden">
+          {/* Puzzle iframe - reduced height for mobile */}
+          <div className="flex-1 p-2 overflow-hidden" style={{ maxHeight: 'calc(100vh - 140px)' }}>
             <PuzzleIframe 
               ref={iframeRef}
               src={selectedGame.iframeUrl}
@@ -183,9 +183,10 @@ export default function PoveziPareR() {
             />
           </div>
 
-          {/* Button container - positioned below puzzle */}
+          {/* Button container - two rows on mobile */}
           <div className="bg-card border-t p-2 flex-shrink-0">
-            <div className="flex gap-2 justify-center">
+            <div className="flex flex-col gap-2">
+              {/* First row: GOVORNA VAJA */}
               <Button
                 onClick={handleGameComplete}
                 disabled={!isWordButtonActive || isAudioLoading}
@@ -193,35 +194,39 @@ export default function PoveziPareR() {
                   isWordButtonActive 
                     ? 'bg-dragon-green hover:bg-dragon-green/90 text-white' 
                     : 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                } flex-1 max-w-xs`}
+                } w-full`}
               >
                 <Volume2 className="w-4 h-4 mr-2" />
-                {isAudioLoading ? 'Predvajam...' : 'IZGOVORI BESEDE'}
+                {isAudioLoading ? 'Nalagam...' : 'GOVORNA VAJA'}
               </Button>
-              <Button
-                onClick={handleNewGame}
-                disabled={isResetting}
-                variant="outline"
-                className="bg-white text-foreground border-border hover:bg-gray-50 px-3"
-              >
-                <RotateCcw className="w-4 h-4 mr-2" />
-                {isResetting ? 'Nalagam...' : 'NOVA IGRA'}
-              </Button>
-              <Button 
-                variant="outline" 
-                className="bg-white text-foreground border-border hover:bg-gray-50 px-3"
-                onClick={handleBackToGames}
-              >
-                Nazaj
-              </Button>
+              
+              {/* Second row: NOVA IGRA and Nazaj */}
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleNewGame}
+                  disabled={isResetting}
+                  variant="outline"
+                  className="bg-white text-foreground border-border hover:bg-gray-50 flex-1"
+                >
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  {isResetting ? 'Nalagam...' : 'NOVA IGRA'}
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="bg-white text-foreground border-border hover:bg-gray-50 flex-1"
+                  onClick={handleBackToGames}
+                >
+                  Nazaj
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       ) : (
         /* Desktop layout */
         <div className="flex flex-col gap-4 p-4 pt-20">
-          {/* Puzzle iframe */}
-          <div className="w-full h-[75vh]">
+          {/* Puzzle iframe - increased height for desktop */}
+          <div className="w-full h-[80vh]">
             <PuzzleIframe 
               ref={iframeRef}
               src={selectedGame.iframeUrl}
@@ -243,7 +248,7 @@ export default function PoveziPareR() {
                 }`}
               >
                 <Volume2 className="w-5 h-5 mr-2" />
-                {isAudioLoading ? 'Predvajam...' : 'IZGOVORI BESEDE'}
+                {isAudioLoading ? 'Nalagam...' : 'GOVORNA VAJA'}
               </Button>
               <Button
                 onClick={handleNewGame}
