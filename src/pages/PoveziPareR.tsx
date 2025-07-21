@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Volume2, RotateCcw } from "lucide-react";
 import { PuzzleIframe } from "@/components/puzzle/PuzzleIframe";
+import { AudioPracticeDialog } from "@/components/puzzle/AudioPracticeDialog";
 import { usePoveziPareAudio } from "@/hooks/usePoveziPareAudio";
 import { useUserProgress } from "@/hooks/useUserProgress";
 import { usePuzzleInteraction } from "@/hooks/usePuzzleInteraction";
@@ -44,6 +45,7 @@ export default function PoveziPareR() {
   const [selectedGame, setSelectedGame] = useState<typeof gameOptions[0] | null>(null);
   const [gameCompleted, setGameCompleted] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+  const [showAudioDialog, setShowAudioDialog] = useState(false);
 
   // Mobile devices always get fullscreen, desktop never gets fullscreen
   const effectiveFullscreen = isMobile;
@@ -76,6 +78,16 @@ export default function PoveziPareR() {
     }
   }, [effectiveFullscreen]);
 
+  const handleAutoPlayAudio = () => {
+    if (selectedGame) {
+      console.log('Auto-playing audio for completed game:', selectedGame.audioFile);
+      playSelectedAudio(selectedGame.audioFile);
+      recordPuzzleCompletion('povezi_pare_r');
+      markButtonAsUsed();
+      setShowAudioDialog(true);
+    }
+  };
+
   // Listen for postMessage events from the iframe
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -89,20 +101,27 @@ export default function PoveziPareR() {
         if (event.data && event.data.completed === true) {
           console.log('Game completed! Setting gameCompleted to true');
           setGameCompleted(true);
+          // Automatically play audio and show dialog when game completes
+          handleAutoPlayAudio();
         }
       }
     };
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, []);
+  }, [selectedGame]);
 
   const handleGameComplete = () => {
     if (selectedGame && gameCompleted) {
       console.log('Playing audio for completed game:', selectedGame.audioFile);
       playSelectedAudio(selectedGame.audioFile);
-      recordPuzzleCompletion('povezi_pare_r');
-      markButtonAsUsed();
+      setShowAudioDialog(true);
+    }
+  };
+
+  const handlePlayAudioInDialog = () => {
+    if (selectedGame) {
+      playSelectedAudio(selectedGame.audioFile);
     }
   };
 
@@ -210,36 +229,35 @@ export default function PoveziPareR() {
             />
           </div>
 
-          {/* Button container - always visible */}
+          {/* Button container - always visible with all buttons in one row */}
           <div className="bg-card border p-6 rounded-lg shadow-lg">
-            <div className="text-center">
-              <div className="flex gap-4 justify-center mb-4">
-                <Button
-                  onClick={handleGameComplete}
-                  disabled={!isWordButtonActive || isAudioLoading}
-                  size="lg"
-                  className={`${
-                    isWordButtonActive 
-                      ? 'bg-dragon-green hover:bg-dragon-green/90 text-white' 
-                      : 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                  }`}
-                >
-                  <Volume2 className="w-5 h-5 mr-2" />
-                  {isAudioLoading ? 'Predvajam...' : 'IZGOVORI BESEDE'}
-                </Button>
-                <Button
-                  onClick={handleNewGame}
-                  disabled={isResetting}
-                  size="lg"
-                  variant="outline"
-                  className="bg-white text-foreground border-border hover:bg-gray-50"
-                >
-                  <RotateCcw className="w-5 h-5 mr-2" />
-                  {isResetting ? 'Nalagam...' : 'NOVA IGRA'}
-                </Button>
-              </div>
+            <div className="flex gap-4 justify-center items-center">
+              <Button
+                onClick={handleGameComplete}
+                disabled={!isWordButtonActive || isAudioLoading}
+                size="lg"
+                className={`${
+                  isWordButtonActive 
+                    ? 'bg-dragon-green hover:bg-dragon-green/90 text-white' 
+                    : 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                }`}
+              >
+                <Volume2 className="w-5 h-5 mr-2" />
+                {isAudioLoading ? 'Predvajam...' : 'IZGOVORI BESEDE'}
+              </Button>
+              <Button
+                onClick={handleNewGame}
+                disabled={isResetting}
+                size="lg"
+                variant="outline"
+                className="bg-white text-foreground border-border hover:bg-gray-50"
+              >
+                <RotateCcw className="w-5 h-5 mr-2" />
+                {isResetting ? 'Nalagam...' : 'NOVA IGRA'}
+              </Button>
               <Button 
                 variant="outline" 
+                size="lg"
                 className="bg-white text-foreground border-border hover:bg-gray-50"
                 onClick={handleBackToGames}
               >
@@ -249,6 +267,17 @@ export default function PoveziPareR() {
           </div>
         </div>
       )}
+      
+      {/* Audio Practice Dialog */}
+      <AudioPracticeDialog
+        isOpen={showAudioDialog}
+        onOpenChange={setShowAudioDialog}
+        onPlayAudio={handlePlayAudioInDialog}
+        onStartRecording={() => {}} // TODO: Implement recording functionality
+        isAudioLoading={isAudioLoading}
+        isRecording={false}
+        showPositiveFeedback={false}
+      />
     </div>
   );
 }
