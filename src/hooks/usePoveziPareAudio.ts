@@ -11,8 +11,10 @@ export function usePoveziPareAudio() {
     setIsAudioLoading(true);
     
     try {
-      const publicUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/povezi-pare-r/${audioFilename}`;
-      console.log('Audio URL:', publicUrl);
+      // Add cache-busting parameter to force fresh downloads
+      const timestamp = new Date().getTime();
+      const publicUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/povezi-pare-r/${audioFilename}?t=${timestamp}`;
+      console.log('Audio URL with cache-busting:', publicUrl);
       
       playAudio(publicUrl);
       
