@@ -1,15 +1,12 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { ProgressSection } from "@/components/ProgressSection";
-import { TipSection } from "@/components/TipSection";
+import { ActivityOptions } from "@/components/ActivityOptions";
 import { NoChildSelected } from "@/components/NoChildSelected";
 import { FooterSection } from "@/components/FooterSection";
 
-
-const MojaStran = () => {
+const MojeAplikacije = () => {
   const { user, profile, signOut, selectedChildIndex } = useAuth();
   const navigate = useNavigate();
   
@@ -22,7 +19,7 @@ const MojaStran = () => {
       await signOut();
       navigate("/login");
     } catch (error) {
-      console.error("Error in MojaStran handleSignOut:", error);
+      console.error("Error in MojeAplikacije handleSignOut:", error);
       toast.error("Napaka pri odjavi");
     }
   };
@@ -40,12 +37,10 @@ const MojaStran = () => {
         
         {selectedChild ? (
           <>
-            {/* Progress Section Wrapper */}
+            {/* Activity Options Wrapper */}
             <div className="mb-12">
-              <ProgressSection />
+              <ActivityOptions />
             </div>
-            
-            <TipSection childName={selectedChild.name} />
           </>
         ) : (
           <NoChildSelected />
@@ -57,4 +52,4 @@ const MojaStran = () => {
   );
 };
 
-export default MojaStran;
+export default MojeAplikacije;

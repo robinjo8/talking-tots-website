@@ -8,6 +8,7 @@ import UpdatePassword from "@/pages/UpdatePassword";
 import NotFound from "@/pages/NotFound";
 import Profile from "@/pages/Profile";
 import MojaStran from "@/pages/MojaStran";
+import MojeAplikacije from "@/pages/MojeAplikacije";
 import GovornojezicovneVaje from "@/pages/GovornojezicovneVaje";
 import VajeMoториkeGovoril from "@/pages/VajeMoториkeGovoril";
 import ArtIzgovorjavaPage from "@/pages/ArtIzgovorjavaPage";
@@ -67,6 +68,14 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <MojaStran />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/moje-aplikacije" 
+        element={
+          <ProtectedRoute>
+            <MojeAplikacije />
           </ProtectedRoute>
         }
       />

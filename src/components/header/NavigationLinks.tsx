@@ -12,25 +12,13 @@ export interface NavigationLink {
 }
 
 export const navigationLinks: NavigationLink[] = [{
-  label: "Vaje",
-  path: "/govorno-jezikovne-vaje",
-  icon: Activity
-}, {
-  label: "Igre",
-  path: "/govorne-igre",
-  icon: Gamepad
-}, {
-  label: "Izzivi",
-  path: "/moji-izzivi",
-  icon: Award
-}, {
-  label: "Video navodila",
-  path: "/video-navodila",
-  icon: Video
-}, {
   label: "Logopedski nasveti",
   path: "/logopedski-koticek",
   icon: BookOpen
+}, {
+  label: "Moje aplikacije",
+  path: "/moje-aplikacije",
+  icon: Activity
 }, {
   label: "Moja stran",
   path: "/moja-stran",
