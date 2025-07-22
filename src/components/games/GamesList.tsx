@@ -1,202 +1,77 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Puzzle, Gamepad, SquareDashed } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { cn } from "@/lib/utils";
-
-const otherGames = [
-  {
-    id: "spomin",
-    title: "SPOMIN",
-    description: "Igraj spomin in vadi izgovorjavo",
-    icon: Puzzle,
-    image: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/spomin.png?t=${new Date().getTime()}`,
-    color: "text-app-purple",
-    gradient: "from-app-purple/10 to-app-blue/10",
-    path: "/govorne-igre/spomin",
-    available: true
-  },
-  {
-    id: "sestavljanke",
-    title: "SESTAVLJANKE",
-    description: "Igraj sestavljanke in vadi logično razmišljanje",
-    icon: SquareDashed,
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/sestavljanka.png",
-    color: "text-app-teal",
-    gradient: "from-app-teal/10 to-dragon-green/10",
-    path: "/govorne-igre/sestavljanke",
-    available: true
-  },
-  {
-    id: "povezi-pare",
-    title: "POVEŽI PARE",
-    description: "Poveži pare in vadi izgovorjavo",
-    icon: SquareDashed,
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/povezi_pare.png",
-    color: "text-app-teal",
-    gradient: "from-app-teal/10 to-dragon-green/10",
-    path: "/govorne-igre/povezi-pare",
-    available: true
-  },
-  {
-    id: "zaporedja",
-    title: "ZAPOREDJA",
-    description: "Kmalu na voljo",
-    icon: SquareDashed,
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/zaporedja.png",
-    color: "text-app-purple",
-    gradient: "from-app-purple/10 to-app-blue/10",
-    available: false
-  },
-  {
-    id: "drsna-sestavljanka",
-    title: "DRSNA SESTAVLJANKA",
-    description: "Kmalu na voljo",
-    icon: SquareDashed,
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/drsna_sestavljanka.png",
-    color: "text-app-orange",
-    gradient: "from-app-orange/10 to-app-yellow/10",
-    available: false
-  },
-  {
-    id: "igra7",
-    title: "Igra 7",
-    description: "Kmalu na voljo",
-    icon: SquareDashed,
-    color: "text-app-purple",
-    gradient: "from-app-purple/10 to-app-blue/10",
-    available: false
-  },
-  {
-    id: "igra8",
-    title: "Igra 8",
-    description: "Kmalu na voljo",
-    icon: SquareDashed,
-    color: "text-app-orange",
-    gradient: "from-app-orange/10 to-app-yellow/10",
-    available: false
-  },
-  {
-    id: "igra9",
-    title: "Igra 9",
-    description: "Kmalu na voljo",
-    icon: SquareDashed,
-    color: "text-app-teal",
-    gradient: "from-app-teal/10 to-dragon-green/10",
-    available: false
-  },
-  {
-    id: "igra10",
-    title: "Igra 10",
-    description: "Kmalu na voljo",
-    icon: SquareDashed,
-    color: "text-app-purple",
-    gradient: "from-app-purple/10 to-app-blue/10",
-    available: false
-  }
-];
 
 export function GamesList() {
   const navigate = useNavigate();
-  
-  const activeGames = otherGames.filter(game => game.available);
-  const inactiveGames = otherGames.filter(game => !game.available);
-  
-  return (
-    <>
-      {/* Available Games Section */}
-      <div className="mb-12">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-primary">
-          IZBERI IGRO
-        </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {activeGames.map((game) => (
-            <Card 
-              key={game.id}
-              className={cn(
-                "transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 overflow-hidden flex flex-col cursor-pointer hover:scale-105"
-              )}
-              onClick={() => game.path && navigate(game.path)}
-              style={{ aspectRatio: '4/5', minHeight: '240px' }}
-            >
-              {/* Top colored section with game name */}
-              <CardHeader className={`bg-gradient-to-r ${game.gradient} rounded-t-2xl pb-3 sm:pb-4 flex-shrink-0`}>
-                <CardTitle className="text-lg sm:text-xl text-center">
-                  <span className={`font-bold ${game.color}`}>
-                    {game.title}
-                  </span>
-                </CardTitle>
-              </CardHeader>
-              
-              {/* Bottom white section with image */}
-              <CardContent className="pt-4 pb-4 flex-grow flex items-center justify-center bg-white rounded-b-2xl">
-                {game.image ? (
-                  <div className="w-full h-full flex items-center justify-center p-1 sm:p-4">
-                    <img
-                      src={game.image}
-                      alt={game.title}
-                      className="max-w-full max-h-full object-contain"
-                    />
-                  </div>
-                ) : (
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 rounded-xl flex items-center justify-center">
-                    <game.icon className={`h-10 w-10 sm:h-12 sm:w-12 ${game.color}`} />
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
 
-      {/* Unavailable Games Section */}
-      {inactiveGames.length > 0 && (
-        <div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-muted-foreground">
-            KMALU NA VOLJO
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {inactiveGames.map((game) => (
-              <Card 
-                key={game.id}
-                className={cn(
-                  "transition-all duration-300 rounded-2xl border-2 border-gray-200 overflow-hidden flex flex-col opacity-60 cursor-not-allowed"
-                )}
-                style={{ aspectRatio: '4/5', minHeight: '240px' }}
-              >
-                {/* Top colored section with game name */}
-                <CardHeader className={`bg-gradient-to-r ${game.gradient} rounded-t-2xl pb-3 sm:pb-4 flex-shrink-0`}>
-                  <CardTitle className="text-lg sm:text-xl text-center">
-                    <span className={`font-bold ${game.color}`}>
-                      {game.title}
-                    </span>
-                  </CardTitle>
-                </CardHeader>
-                
-                {/* Bottom white section with image */}
-                <CardContent className="pt-4 pb-4 flex-grow flex flex-col items-center justify-center bg-white rounded-b-2xl">
-                  {game.image ? (
-                    <div className="w-full h-full flex items-center justify-center p-1 sm:p-4 mb-2">
-                      <img
-                        src={game.image}
-                        alt={game.title}
-                        className="max-w-full max-h-full object-contain"
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 rounded-xl flex items-center justify-center mb-2">
-                      <game.icon className={`h-10 w-10 sm:h-12 sm:w-12 ${game.color}`} />
-                    </div>
-                  )}
-                  <p className="text-xs text-muted-foreground italic text-center">
-                    KMALU NA VOLJO
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      )}
-    </>
+  const games = [
+    {
+      title: "Spomin",
+      description: "Različne igre spomina za urjenje spomina in pozornosti",
+      icon: "🧠",
+      path: "/govorne-igre/spomin",
+      color: "from-green-400 to-lime-500",
+      difficulty: "Srednja",
+      ageRange: "4-10 let"
+    },
+    {
+      title: "Poveži Pare",
+      description: "Poišči pare kartic s slikami in besedami",
+      icon: "🔗",
+      path: "/govorne-igre/povezi-pare",
+      color: "from-orange-400 to-yellow-500",
+      difficulty: "Srednja",
+      ageRange: "5-10 let"
+    },
+    {
+      title: "Sestavljanke",
+      description: "Sestavljanke za razvoj motoričnih sposobnosti in logičnega razmišljanja",
+      icon: "🧩",
+      path: "/govorne-igre/sestavljanke",
+      color: "from-blue-400 to-purple-500",
+      difficulty: "Težka",
+      ageRange: "6-10 let"
+    },
+    {
+      title: "Prilagodljive Sestavljanke",
+      description: "Sestavljanke prilagojene starosti otroka",
+      icon: "🧩",
+      path: "/govorne-igre/adaptive-puzzle",
+      color: "from-purple-500 to-pink-500",
+      difficulty: "Prilagojeno starosti",
+      ageRange: "3-10 let"
+    }
+  ];
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {games.map((game, index) => (
+        <Card
+          key={index}
+          className="bg-card text-card-foreground shadow-md transition-colors hover:shadow-lg cursor-pointer"
+          onClick={() => navigate(game.path)}
+        >
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <span className="text-2xl">{game.icon}</span>
+              {game.title}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">{game.description}</p>
+            <div className="mt-4 flex flex-col gap-2 text-xs">
+              <div className="flex justify-between">
+                <span className="font-medium">Težavnost:</span>
+                <span className="text-muted-foreground">{game.difficulty}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Primerno za starost:</span>
+                <span className="text-muted-foreground">{game.ageRange}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
   );
 }

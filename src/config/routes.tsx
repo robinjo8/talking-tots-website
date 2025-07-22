@@ -1,4 +1,3 @@
-
 import { Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "@/pages/Index";
@@ -32,6 +31,7 @@ import SestavljankeRoka from "@/pages/SestavljankeRoka";
 import SestavljankeRoza from "@/pages/SestavljankeRoza";
 import PoveziPareGames from "@/pages/PoveziPareGames";
 import PoveziPareR from "@/pages/PoveziPareR";
+import AdaptivePuzzlePage from "@/pages/AdaptivePuzzlePage";
 
 export function AppRoutes() {
   return (
@@ -263,6 +263,15 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <SpominGames />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/adaptive-puzzle" 
+        element={
+          <ProtectedRoute>
+            <AdaptivePuzzlePage />
           </ProtectedRoute>
         }
       />
