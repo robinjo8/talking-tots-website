@@ -91,27 +91,23 @@ export function GamesList() {
       {/* Available Games Section */}
       <div className="mb-12">
         
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {activeGames.map(game => <Card key={game.id} className={cn("transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 overflow-hidden flex flex-col cursor-pointer hover:scale-105")} onClick={() => game.path && navigate(game.path)} style={{
-          aspectRatio: '4/5',
-          minHeight: '240px'
-        }}>
+        <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-6">
+          {activeGames.map(game => <Card key={game.id} className={cn("transition-all duration-300 hover:shadow-lg rounded-3xl border-2 border-gray-200 h-full flex flex-col cursor-pointer")} onClick={() => game.path && navigate(game.path)}>
               {/* Top colored section with game name */}
-              <CardHeader className={`bg-gradient-to-r ${game.gradient} rounded-t-2xl pb-3 sm:pb-4 flex-shrink-0`}>
-                <CardTitle className="text-lg sm:text-xl text-center">
-                  <span className={`font-bold ${game.color}`}>
+              <CardHeader className={`bg-gradient-to-r ${game.gradient} rounded-t-3xl pb-2 md:pb-4`}>
+                <CardTitle className="text-sm md:text-lg font-semibold text-center whitespace-nowrap">
+                  <span className={`${game.color}`}>
                     {game.title}
                   </span>
                 </CardTitle>
               </CardHeader>
               
-              {/* Bottom white section with image */}
-              <CardContent className="pt-4 pb-4 flex-grow flex items-center justify-center bg-white rounded-b-2xl">
-                {game.image ? <div className="w-full h-full flex items-center justify-center p-1 sm:p-4">
-                    <img src={game.image} alt={game.title} className="max-w-full max-h-full object-contain" />
-                  </div> : <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 rounded-xl flex items-center justify-center">
-                    <game.icon className={`h-10 w-10 sm:h-12 sm:w-12 ${game.color}`} />
-                  </div>}
+              {/* Content section with consistent height and flex layout */}
+              <CardContent className="pt-3 md:pt-6 pb-2 md:pb-4 flex-grow text-center flex flex-col items-center justify-between gap-2 md:gap-4">
+                <div className="w-20 h-20 md:w-40 md:h-40 flex items-center justify-center">
+                  {game.image ? <img src={game.image} alt={game.title} className="w-full h-full object-contain" /> : <game.icon className={`h-10 w-10 md:h-20 md:w-20 ${game.color}`} />}
+                </div>
+                <p className="text-xs md:text-sm text-gray-600 leading-tight">{game.description}</p>
               </CardContent>
             </Card>)}
         </div>
@@ -119,33 +115,26 @@ export function GamesList() {
 
       {/* Unavailable Games Section */}
       {inactiveGames.length > 0 && <div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-muted-foreground">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-8 text-muted-foreground">
             KMALU NA VOLJO
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {inactiveGames.map(game => <Card key={game.id} className={cn("transition-all duration-300 rounded-2xl border-2 border-gray-200 overflow-hidden flex flex-col opacity-60 cursor-not-allowed")} style={{
-          aspectRatio: '4/5',
-          minHeight: '240px'
-        }}>
+          <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-6">
+            {inactiveGames.map(game => <Card key={game.id} className={cn("transition-all duration-300 rounded-3xl border-2 border-gray-200 h-full flex flex-col opacity-60 cursor-not-allowed")}>
                 {/* Top colored section with game name */}
-                <CardHeader className={`bg-gradient-to-r ${game.gradient} rounded-t-2xl pb-3 sm:pb-4 flex-shrink-0`}>
-                  <CardTitle className="text-lg sm:text-xl text-center">
-                    <span className={`font-bold ${game.color}`}>
+                <CardHeader className={`bg-gradient-to-r ${game.gradient} rounded-t-3xl pb-2 md:pb-4`}>
+                  <CardTitle className="text-sm md:text-lg font-semibold text-center whitespace-nowrap">
+                    <span className={`${game.color}`}>
                       {game.title}
                     </span>
                   </CardTitle>
                 </CardHeader>
                 
-                {/* Bottom white section with image */}
-                <CardContent className="pt-4 pb-4 flex-grow flex flex-col items-center justify-center bg-white rounded-b-2xl">
-                  {game.image ? <div className="w-full h-full flex items-center justify-center p-1 sm:p-4 mb-2">
-                      <img src={game.image} alt={game.title} className="max-w-full max-h-full object-contain" />
-                    </div> : <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 rounded-xl flex items-center justify-center mb-2">
-                      <game.icon className={`h-10 w-10 sm:h-12 sm:w-12 ${game.color}`} />
-                    </div>}
-                  <p className="text-xs text-muted-foreground italic text-center">
-                    KMALU NA VOLJO
-                  </p>
+                {/* Content section with consistent height and flex layout */}
+                <CardContent className="pt-3 md:pt-6 pb-2 md:pb-4 flex-grow text-center flex flex-col items-center justify-between gap-2 md:gap-4">
+                  <div className="w-20 h-20 md:w-40 md:h-40 flex items-center justify-center">
+                    {game.image ? <img src={game.image} alt={game.title} className="w-full h-full object-contain" /> : <game.icon className={`h-10 w-10 md:h-20 md:w-20 ${game.color}`} />}
+                  </div>
+                  <p className="text-xs md:text-sm text-gray-600 leading-tight italic">KMALU NA VOLJO</p>
                 </CardContent>
               </Card>)}
           </div>
