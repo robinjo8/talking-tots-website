@@ -26,7 +26,7 @@ export function ActivityOptions() {
         {/* Govorno-jezikovne vaje */}
         <Card className="transition-all duration-300 hover:shadow-lg rounded-3xl border-2 border-gray-200 cursor-pointer" onClick={handleGoToExercises}>
           <CardHeader className="bg-gradient-to-r from-app-blue/10 to-app-teal/10 rounded-t-3xl pb-4">
-            <CardTitle className="text-lg font-semibold text-app-blue text-center">GOVORNO-JEZIKOVNE VAJE</CardTitle>
+            <CardTitle className="text-lg font-semibold text-app-blue text-center">GOVORNE VAJE</CardTitle>
           </CardHeader>
           <CardContent className="pt-6 pb-4 text-center flex flex-col items-center gap-4">
             <div className="w-32 h-32 md:w-40 md:h-40 flex items-center justify-center">
