@@ -21,7 +21,7 @@ export function ActivityOptions() {
   return <>
       <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center text-dragon-green">MOJE APLIKACIJE</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+      <div className="grid grid-cols-2 md:grid-cols-2 gap-6 mb-12">
         
         {/* Govorno-jezikovne vaje */}
         <Card className="transition-all duration-300 hover:shadow-lg rounded-3xl border-2 border-gray-200 cursor-pointer" onClick={handleGoToExercises}>
@@ -54,7 +54,7 @@ export function ActivityOptions() {
             <p className="text-sm text-gray-600">Zabavne igre za izboljšanje izgovorjave.</p>
           </CardContent>
           <CardFooter className="pb-6">
-            <Button className="w-full bg-app-blue hover:bg-app-blue/90 rounded-2xl" onClick={e => {
+            <Button className="w-full bg-dragon-green hover:bg-dragon-green/90 rounded-2xl" onClick={e => {
             e.stopPropagation();
             handleGoToGames();
           }}>ZAČNI IGRO</Button>
