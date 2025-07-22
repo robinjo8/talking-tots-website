@@ -27,7 +27,7 @@ type EditChildFormProps = {
 };
 
 export function EditChildForm({ childIndex, initialData, onSuccess, onCancel }: EditChildFormProps) {
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const [name, setName] = useState(initialData.name);
   const [gender, setGender] = useState(initialData.gender);
   const [avatarId, setAvatarId] = useState(initialData.avatarId);
@@ -40,6 +40,20 @@ export function EditChildForm({ childIndex, initialData, onSuccess, onCancel }: 
     setAvatarId(initialData.avatarId);
     setBirthDate(initialData.birthDate || null);
   }, [initialData]);
+
+  const calculateAge = (birthDate: Date | null): number => {
+    if (!birthDate) return 4; // Default age
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    
+    return Math.max(age, 3); // Minimum age 3
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,6 +81,7 @@ export function EditChildForm({ childIndex, initialData, onSuccess, onCancel }: 
       
       if (childIndex >= 0 && childIndex < currentChildren.length) {
         const existingDifficulties = currentChildren[childIndex].speechDifficulties || [];
+        const calculatedAge = calculateAge(birthDate);
         
         currentChildren[childIndex] = {
           ...currentChildren[childIndex],
@@ -74,6 +89,7 @@ export function EditChildForm({ childIndex, initialData, onSuccess, onCancel }: 
           gender,
           avatarId,
           birthDate,
+          age: calculatedAge,
           speechDifficulties: existingDifficulties
         };
         
@@ -82,6 +98,9 @@ export function EditChildForm({ childIndex, initialData, onSuccess, onCancel }: 
         });
         
         if (updateError) throw updateError;
+        
+        // Refresh the profile to get updated data
+        await refreshProfile();
         
         toast.success("Otrok uspešno posodobljen!");
         
