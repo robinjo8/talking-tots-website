@@ -2,7 +2,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
-import { User, ChevronDown, Users, Bell, Wallet, LogOut } from "lucide-react";
+import { User, ChevronDown, Users, Bell, Wallet, LogOut, Menu } from "lucide-react";
 import { 
   Popover,
   PopoverContent,
@@ -109,7 +109,7 @@ export function UserProfile() {
             <span className="text-base lg:text-lg font-semibold lg:uppercase">
               {selectedChild ? selectedChild.name.toUpperCase() : profile?.username || user.email}
             </span>
-            <ChevronDown className="h-4 w-4 lg:h-5 lg:w-5 text-gray-500" />
+            <Menu className="h-4 w-4 lg:h-5 lg:w-5 text-gray-500" />
           </div>
         </PopoverTrigger>
         <PopoverContent className="w-72 p-0 shadow-lg border-gray-200" align="end" sideOffset={4}>

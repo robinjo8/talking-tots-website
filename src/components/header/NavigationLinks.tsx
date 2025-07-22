@@ -23,18 +23,4 @@ export const navigationLinks: NavigationLink[] = [{
   label: "Moja stran",
   path: "/moja-stran",
   icon: Home
-}, {
-  label: "Obvestila",
-  path: "#",
-  icon: Bell,
-  disabled: true
-}, {
-  label: "Moja naročnina",
-  path: "/profile",
-  icon: CreditCard,
-  options: { expandSection: "subscription" }
-}, {
-  label: "Nastavitve",
-  path: "/profile",
-  icon: User
 }];
