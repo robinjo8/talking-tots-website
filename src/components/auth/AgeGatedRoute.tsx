@@ -17,13 +17,21 @@ export function AgeGatedRoute({ requiredAgeGroup, children }: AgeGatedRouteProps
   const childAge = selectedChild?.age;
   
   useEffect(() => {
+    if (!selectedChild) {
+      // Redirect to profile setup if no child selected
+      navigate('/profile');
+      return;
+    }
+    
     if (!childAge) {
+      console.log('No age found for child:', selectedChild);
       // Redirect to profile setup if no age
       navigate('/profile');
       return;
     }
     
     const actualAgeGroup = getAgeGroup(childAge);
+    console.log(`Child age: ${childAge}, actual age group: ${actualAgeGroup}, required: ${requiredAgeGroup}`);
     
     if (actualAgeGroup !== requiredAgeGroup) {
       // Check if child can access this level (within age range)
@@ -31,11 +39,12 @@ export function AgeGatedRoute({ requiredAgeGroup, children }: AgeGatedRouteProps
       
       if (!canAccessThisLevel) {
         const correctRoute = getRouteForAgeGroup(actualAgeGroup);
+        console.log(`Redirecting to correct route: ${correctRoute}`);
         navigate(correctRoute, { replace: true });
         return;
       }
     }
-  }, [childAge, requiredAgeGroup, navigate]);
+  }, [selectedChild, childAge, requiredAgeGroup, navigate]);
   
   if (!childAge) {
     return <div className="flex items-center justify-center h-64">

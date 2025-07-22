@@ -71,33 +71,54 @@ export function EditChildForm({ childIndex, initialData, onSuccess, onCancel }: 
     try {
       setIsSubmitting(true);
       
-      const { data: userData, error: userError } = await supabase.auth.getUser();
+      const calculatedAge = calculateAge(birthDate);
       
+      // Update in database first
+      const { data: userData, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
       
-      const currentUser = userData.user;
-      const currentMetadata = currentUser.user_metadata || {};
-      const currentChildren = [...(currentMetadata.children || [])];
+      const { data: children, error: fetchError } = await supabase
+        .from('children')
+        .select('*')
+        .eq('parent_id', userData.user.id)
+        .order('created_at', { ascending: true });
       
-      if (childIndex >= 0 && childIndex < currentChildren.length) {
-        const existingDifficulties = currentChildren[childIndex].speechDifficulties || [];
-        const calculatedAge = calculateAge(birthDate);
+      if (fetchError) throw fetchError;
+      
+      if (children && childIndex >= 0 && childIndex < children.length) {
+        const childToUpdate = children[childIndex];
         
-        currentChildren[childIndex] = {
-          ...currentChildren[childIndex],
-          name: name.trim(),
-          gender,
-          avatarId,
-          birthDate,
-          age: calculatedAge,
-          speechDifficulties: existingDifficulties
-        };
-        
-        const { error: updateError } = await supabase.auth.updateUser({
-          data: { children: currentChildren }
-        });
+        const { error: updateError } = await supabase
+          .from('children')
+          .update({
+            name: name.trim(),
+            gender,
+            age: calculatedAge,
+            birth_date: birthDate?.toISOString().split('T')[0] || null,
+            avatar_url: `/lovable-uploads/avatar-${avatarId}.png`
+          })
+          .eq('id', childToUpdate.id);
         
         if (updateError) throw updateError;
+        
+        // Also update metadata for compatibility
+        const currentMetadata = userData.user.user_metadata || {};
+        const metadataChildren = [...(currentMetadata.children || [])];
+        
+        if (metadataChildren[childIndex]) {
+          metadataChildren[childIndex] = {
+            ...metadataChildren[childIndex],
+            name: name.trim(),
+            gender,
+            avatarId,
+            birthDate,
+            age: calculatedAge
+          };
+          
+          await supabase.auth.updateUser({
+            data: { children: metadataChildren }
+          });
+        }
         
         // Refresh the profile to get updated data
         await refreshProfile();
