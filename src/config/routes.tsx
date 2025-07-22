@@ -1,4 +1,3 @@
-
 import { Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "@/pages/Index";
@@ -32,6 +31,11 @@ import SestavljankeRoka from "@/pages/SestavljankeRoka";
 import SestavljankeRoza from "@/pages/SestavljankeRoza";
 import PoveziPareGames from "@/pages/PoveziPareGames";
 import PoveziPareR from "@/pages/PoveziPareR";
+import PoveziPareRouter from "@/pages/PoveziPareRouter";
+import PoveziPareGames3to4 from "@/pages/PoveziPareGames3to4";
+import PoveziPareGames5to6 from "@/pages/PoveziPareGames5to6";
+import PoveziPareGames7to8 from "@/pages/PoveziPareGames7to8";
+import PoveziPareGames9to10 from "@/pages/PoveziPareGames9to10";
 
 export function AppRoutes() {
   return (
@@ -175,7 +179,52 @@ export function AppRoutes() {
         path="/govorne-igre/povezi-pare" 
         element={
           <ProtectedRoute>
-            <PoveziPareGames />
+            <PoveziPareRouter />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/povezi-pare-3-4" 
+        element={
+          <ProtectedRoute>
+            <PoveziPareGames3to4 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/povezi-pare-5-6" 
+        element={
+          <ProtectedRoute>
+            <PoveziPareGames5to6 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/povezi-pare-7-8" 
+        element={
+          <ProtectedRoute>
+            <PoveziPareGames7to8 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/povezi-pare-9-10" 
+        element={
+          <ProtectedRoute>
+            <PoveziPareGames9to10 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/povezi-pare/r" 
+        element={
+          <ProtectedRoute>
+            <PoveziPareR />
           </ProtectedRoute>
         }
       />
