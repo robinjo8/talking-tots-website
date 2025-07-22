@@ -21,7 +21,7 @@ export function ActivityOptions() {
   return <>
       <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center text-dragon-green">MOJE APLIKACIJE</h2>
       
-      <div className="grid grid-cols-2 md:grid-cols-2 gap-4 md:gap-6 mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
         
         {/* Govorno-jezikovne vaje */}
         <Card className="transition-all duration-300 hover:shadow-lg rounded-3xl border-2 border-gray-200 cursor-pointer" onClick={handleGoToExercises}>
