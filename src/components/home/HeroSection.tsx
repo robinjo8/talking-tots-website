@@ -29,14 +29,8 @@ export const HeroSection = () => {
       return;
     }
 
-    // If logged in, continue with existing behavior
-    if (selectedChildIndex !== null && profile?.children) {
-      navigate("/moja-stran");
-    } else if (profile?.children?.length === 0) {
-      navigate("/profile");
-    } else {
-      setShowChildSelector(true);
-    }
+    // If logged in, redirect to moje-aplikacije
+    navigate("/moje-aplikacije");
   };
 
   const scrollToFeatures = () => {

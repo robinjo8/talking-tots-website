@@ -78,41 +78,23 @@ export function MobileMenu({
               {user && <>
                   <ProfileSelector profile={profile} selectedChildIndex={selectedChildIndex} onSelectChild={onSelectChild} userEmail={user.email} />
                   
-                  {/* Main navigation - custom order with Moja stran first */}
+                  {/* Main navigation */}
                   <div className="space-y-3">
                     <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Navigacija</h3>
                     
-                    {/* Moja stran - FIRST */}
+                    {/* Moja stran */}
                     <Button variant="ghost" className={`w-full justify-start text-left h-12 ${isActivePath('/moja-stran') ? 'bg-accent' : ''}`} onClick={() => handleNavigate('/moja-stran')}>
                       <Home className="h-4 w-4 mr-2" />
                       Moja stran
                     </Button>
                     
-                    {/* Vaje - SECOND */}
-                    <Button variant="ghost" className={`w-full justify-start text-left h-12 ${isActivePath('/govorno-jezikovne-vaje') ? 'bg-accent' : ''}`} onClick={() => handleNavigate('/govorno-jezikovne-vaje')}>
+                    {/* Moje aplikacije */}
+                    <Button variant="ghost" className={`w-full justify-start text-left h-12 ${isActivePath('/moje-aplikacije') ? 'bg-accent' : ''}`} onClick={() => handleNavigate('/moje-aplikacije')}>
                       <Activity className="h-4 w-4 mr-2" />
-                      Vaje
+                      Moje aplikacije
                     </Button>
                     
-                    {/* Igre - THIRD */}
-                    <Button variant="ghost" className={`w-full justify-start text-left h-12 ${isActivePath('/govorne-igre') ? 'bg-accent' : ''}`} onClick={() => handleNavigate('/govorne-igre')}>
-                      <Gamepad className="h-4 w-4 mr-2" />
-                      Igre
-                    </Button>
-                    
-                    {/* Izzivi - FOURTH */}
-                    <Button variant="ghost" className={`w-full justify-start text-left h-12 ${isActivePath('/moji-izzivi') ? 'bg-accent' : ''}`} onClick={() => handleNavigate('/moji-izzivi')}>
-                      <Award className="h-4 w-4 mr-2" />
-                      Izzivi
-                    </Button>
-                    
-                    {/* Video navodila - FIFTH */}
-                    <Button variant="ghost" className={`w-full justify-start text-left h-12 ${isActivePath('/video-navodila') ? 'bg-accent' : ''}`} onClick={() => handleNavigate('/video-navodila')}>
-                      <Video className="h-4 w-4 mr-2" />
-                      Video navodila
-                    </Button>
-                    
-                    {/* Logopedski nasveti - SIXTH */}
+                    {/* Logopedski nasveti */}
                     <Button variant="ghost" className={`w-full justify-start text-left h-12 ${isActivePath('/logopedski-koticek') ? 'bg-accent' : ''}`} onClick={() => handleNavigate('/logopedski-koticek')}>
                       <BookOpen className="h-4 w-4 mr-2" />
                       Logopedski nasveti
@@ -123,11 +105,13 @@ export function MobileMenu({
                   <div className="space-y-3 pt-4 border-t">
                     <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Račun</h3>
                     
-                    <Button variant="ghost" className="w-full justify-start text-left h-12 opacity-50 cursor-not-allowed" disabled={true}>
-                      <Bell className="h-4 w-4 mr-2" />
-                      Obvestila
+                    {/* Nastavitve */}
+                    <Button variant="ghost" className={`w-full justify-start text-left h-12 ${isActivePath('/profile') ? 'bg-accent' : ''}`} onClick={() => handleNavigate('/profile')}>
+                      <User className="h-4 w-4 mr-2" />
+                      Nastavitve
                     </Button>
                     
+                    {/* Moja naročnina */}
                     <Button variant="ghost" className={`w-full justify-start text-left h-12 ${isActivePath('/profile') ? 'bg-accent' : ''}`} onClick={() => handleNavigate('/profile', {
                   expandSection: 'subscription'
                 })}>
@@ -135,11 +119,19 @@ export function MobileMenu({
                       Moja naročnina
                     </Button>
                     
-                    <Button variant="ghost" className={`w-full justify-start text-left h-12 ${isActivePath('/profile') ? 'bg-accent' : ''}`} onClick={() => handleNavigate('/profile')}>
-                      <User className="h-4 w-4 mr-2" />
-                      Nastavitve
+                    {/* Obvestila */}
+                    <Button variant="ghost" className="w-full justify-start text-left h-12 opacity-50 cursor-not-allowed" disabled={true}>
+                      <Bell className="h-4 w-4 mr-2" />
+                      Obvestila
                     </Button>
                     
+                    {/* Cenik */}
+                    <Button variant="ghost" className="w-full justify-start text-left h-12" onClick={onCenikScroll}>
+                      <CreditCard className="h-4 w-4 mr-2" />
+                      Cenik
+                    </Button>
+                    
+                    {/* Odjava */}
                     <Button variant="outline" onClick={onSignOut} className="w-full justify-start text-left h-12 mt-4 text-red-600">
                       <LogOut className="h-4 w-4 mr-2" />
                       Odjava

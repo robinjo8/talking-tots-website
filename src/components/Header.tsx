@@ -22,16 +22,8 @@ export default function Header() {
       return;
     }
 
-    // If logged in, continue with existing behavior
-    if (selectedChildIndex !== null && profile?.children) {
-      navigate("/moja-stran");
-    } else if (profile?.children?.length === 0) {
-      navigate("/profile");
-    } else {
-      // We'll need to show the child selector dialog
-      // For now, just navigate to the profile page
-      navigate("/profile");
-    }
+    // If logged in, redirect to moje-aplikacije
+    navigate("/moje-aplikacije");
   };
 
   // Cenik scroll handler
@@ -74,7 +66,8 @@ export default function Header() {
     navigate("/login");
   };
   return <header className="py-4 px-4 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
-      <div className="flex items-center justify-center w-full">
+      {/* Desktop layout - centered */}
+      <div className="hidden lg:flex items-center justify-center w-full">
         <div className="flex items-center gap-8 lg:gap-12">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
@@ -86,10 +79,21 @@ export default function Header() {
           
           {/* Navigation */}
           <DesktopNavigation user={user} onStartNow={handleStartNow} onCenikScroll={handleCenikScroll} />
-          
-          {/* Mobile menu and profile */}
-          <MobileMenu user={user} profile={profile} selectedChildIndex={selectedChildIndex} selectedChild={selectedChild} onSelectChild={handleSelectChild} onSignOut={handleSignOut} onStartNow={handleStartNow} onCenikScroll={handleCenikScroll} />
         </div>
+      </div>
+
+      {/* Mobile layout - logo left, profile right */}
+      <div className="lg:hidden flex items-center justify-between w-full">
+        {/* Logo on far left */}
+        <Link to="/" className="flex items-center gap-2">
+          <div className="flex items-center">
+            <span className="text-2xl md:text-3xl font-extrabold text-dragon-green uppercase lg:text-2xl mx-0 px-0">Tomi</span>
+            <span className="text-2xl md:text-3xl font-extrabold text-app-orange uppercase lg:text-2xl">Talk</span>
+          </div>
+        </Link>
+        
+        {/* Mobile menu and profile on far right */}
+        <MobileMenu user={user} profile={profile} selectedChildIndex={selectedChildIndex} selectedChild={selectedChild} onSelectChild={handleSelectChild} onSignOut={handleSignOut} onStartNow={handleStartNow} onCenikScroll={handleCenikScroll} />
       </div>
     </header>;
 }
