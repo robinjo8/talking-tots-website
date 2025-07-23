@@ -244,15 +244,15 @@ export default function SpominGames() {
   }: {
     game: typeof memoryGames[0];
   }) => <Card className={`transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col bg-gradient-to-r ${game.gradient} ${game.available ? 'cursor-pointer hover:scale-105' : 'opacity-60 cursor-not-allowed'}`} onClick={() => handleCardClick(game)}>
-      <CardHeader className="rounded-t-2xl pb-4">
-        <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
-          <span className={`text-2xl font-bold ${game.color}`}>
+      <CardHeader className="rounded-t-2xl pb-2 flex-grow flex items-center justify-center">
+        <CardTitle className="flex items-center justify-center">
+          <span className={`text-6xl font-bold ${game.color}`}>
             {game.letter}
           </span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-6 pb-4 flex-grow text-center">
-        {!game.available && <p className="text-xs text-muted-foreground mt-2 italic">
+      <CardContent className="pt-2 pb-4 text-center">
+        {!game.available && <p className="text-xs text-muted-foreground italic">
             Kmalu na voljo
           </p>}
       </CardContent>
