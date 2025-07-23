@@ -254,9 +254,6 @@ export default function SpominGames() {
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-6 pb-4 flex-grow text-center">
-        <p className={`text-sm font-semibold mb-2 ${game.color}`}>
-          Poišči pare slik s črko {game.letter} in nato ponovi besedo
-        </p>
         {!game.available && <p className="text-xs text-muted-foreground mt-2 italic">
             Kmalu na voljo
           </p>}
@@ -288,7 +285,7 @@ export default function SpominGames() {
         {/* Section 1: Izberi igro */}
         <div className="mb-12">
           
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {activeGames.map(game => <GameCard key={game.id} game={game} />)}
           </div>
         </div>
@@ -298,7 +295,7 @@ export default function SpominGames() {
           <h2 className="text-3xl font-bold text-center mb-8 text-muted-foreground">
             Kmalu na voljo
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {inactiveGames.map(game => <GameCard key={game.id} game={game} />)}
           </div>
         </div>
