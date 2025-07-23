@@ -65,12 +65,12 @@ export function MobileMenu({
             <Menu className="h-5 w-5" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="right" className="p-0 w-80">
+        <SheetContent side="right" className="p-0 w-80 lg:w-96">
           <ScrollArea className="h-[90vh]">
             <div className="flex flex-col p-6 space-y-6">
               {/* Show Cenik only when NOT logged in */}
               {!user && <div className="flex flex-row items-center gap-2 pb-3">
-                  <Button type="button" variant="default" className="font-semibold flex-1 h-12 rounded-full text-base w-full" onClick={onCenikScroll}>
+                  <Button type="button" variant="default" className="font-semibold flex-1 h-12 rounded-full text-base w-full uppercase" onClick={onCenikScroll}>
                     Cenik
                   </Button>
                 </div>}
@@ -83,19 +83,19 @@ export function MobileMenu({
                     <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Navigacija</h3>
                     
                     {/* Moja stran */}
-                    <Button variant="ghost" className={`w-full justify-start text-left h-12 ${isActivePath('/moja-stran') ? 'bg-accent' : ''}`} onClick={() => handleNavigate('/moja-stran')}>
+                    <Button variant="ghost" className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/moja-stran') ? 'bg-accent' : ''}`} onClick={() => handleNavigate('/moja-stran')}>
                       <Home className="h-4 w-4 mr-2" />
                       Moja stran
                     </Button>
                     
                     {/* Moje aplikacije */}
-                    <Button variant="ghost" className={`w-full justify-start text-left h-12 ${isActivePath('/moje-aplikacije') ? 'bg-accent' : ''}`} onClick={() => handleNavigate('/moje-aplikacije')}>
+                    <Button variant="ghost" className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/moje-aplikacije') ? 'bg-accent' : ''}`} onClick={() => handleNavigate('/moje-aplikacije')}>
                       <Activity className="h-4 w-4 mr-2" />
                       Moje aplikacije
                     </Button>
                     
                     {/* Logopedski nasveti */}
-                    <Button variant="ghost" className={`w-full justify-start text-left h-12 ${isActivePath('/logopedski-koticek') ? 'bg-accent' : ''}`} onClick={() => handleNavigate('/logopedski-koticek')}>
+                    <Button variant="ghost" className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/logopedski-koticek') ? 'bg-accent' : ''}`} onClick={() => handleNavigate('/logopedski-koticek')}>
                       <BookOpen className="h-4 w-4 mr-2" />
                       Logopedski nasveti
                     </Button>
@@ -106,13 +106,13 @@ export function MobileMenu({
                     <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Račun</h3>
                     
                     {/* Nastavitve */}
-                    <Button variant="ghost" className={`w-full justify-start text-left h-12 ${isActivePath('/profile') ? 'bg-accent' : ''}`} onClick={() => handleNavigate('/profile')}>
+                    <Button variant="ghost" className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/profile') ? 'bg-accent' : ''}`} onClick={() => handleNavigate('/profile')}>
                       <User className="h-4 w-4 mr-2" />
                       Nastavitve
                     </Button>
                     
                     {/* Moja naročnina */}
-                    <Button variant="ghost" className={`w-full justify-start text-left h-12 ${isActivePath('/profile') ? 'bg-accent' : ''}`} onClick={() => handleNavigate('/profile', {
+                    <Button variant="ghost" className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/profile') ? 'bg-accent' : ''}`} onClick={() => handleNavigate('/profile', {
                   expandSection: 'subscription'
                 })}>
                       <CreditCard className="h-4 w-4 mr-2" />
@@ -120,19 +120,19 @@ export function MobileMenu({
                     </Button>
                     
                     {/* Obvestila */}
-                    <Button variant="ghost" className="w-full justify-start text-left h-12 opacity-50 cursor-not-allowed" disabled={true}>
+                    <Button variant="ghost" className="w-full justify-start text-left h-12 uppercase opacity-50 cursor-not-allowed" disabled={true}>
                       <Bell className="h-4 w-4 mr-2" />
                       Obvestila
                     </Button>
                     
                     {/* Cenik */}
-                    <Button variant="ghost" className="w-full justify-start text-left h-12" onClick={onCenikScroll}>
+                    <Button variant="ghost" className="w-full justify-start text-left h-12 uppercase" onClick={onCenikScroll}>
                       <CreditCard className="h-4 w-4 mr-2" />
                       Cenik
                     </Button>
                     
                     {/* Odjava */}
-                    <Button variant="outline" onClick={onSignOut} className="w-full justify-start text-left h-12 mt-4 text-red-600">
+                    <Button variant="outline" onClick={onSignOut} className="w-full justify-start text-left h-12 mt-4 text-red-600 uppercase">
                       <LogOut className="h-4 w-4 mr-2" />
                       Odjava
                     </Button>
