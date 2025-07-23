@@ -19,7 +19,7 @@ export function ActivityOptions() {
     navigate("/video-navodila");
   };
   return <>
-      <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center text-dragon-green">MOJE APLIKACIJE</h2>
+      
       
       <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-6 mb-12">
         
