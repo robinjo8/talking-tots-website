@@ -243,14 +243,12 @@ export default function SpominGames() {
     game
   }: {
     game: typeof memoryGames[0];
-  }) => <Card className={`transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col ${game.available ? 'cursor-pointer hover:scale-105' : 'opacity-60 cursor-not-allowed'}`} onClick={() => handleCardClick(game)}>
-      <CardHeader className={`bg-gradient-to-r ${game.gradient} rounded-t-2xl pb-4`}>
+  }) => <Card className={`transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col bg-gradient-to-r ${game.gradient} ${game.available ? 'cursor-pointer hover:scale-105' : 'opacity-60 cursor-not-allowed'}`} onClick={() => handleCardClick(game)}>
+      <CardHeader className="rounded-t-2xl pb-4">
         <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
-          <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
-            <span className={`text-2xl font-bold ${game.color}`}>
-              {game.letter}
-            </span>
-          </div>
+          <span className={`text-2xl font-bold ${game.color}`}>
+            {game.letter}
+          </span>
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-6 pb-4 flex-grow text-center">
