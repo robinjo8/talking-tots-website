@@ -18,10 +18,14 @@ export function ActivityOptions() {
   const handleGoToVideoInstructions = () => {
     navigate("/video-navodila");
   };
+
+  const handleGoToLogopedskiKoticek = () => {
+    navigate("/logopedski-koticek");
+  };
   return <>
       
       
-      <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-6 mb-12">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 mb-12">
         
         {/* Govorno-jezikovne vaje */}
         <Card className="transition-all duration-300 hover:shadow-lg rounded-3xl border-2 border-gray-200 h-full flex flex-col cursor-pointer" onClick={handleGoToExercises}>
@@ -105,7 +109,7 @@ export function ActivityOptions() {
             <CardTitle className="text-sm md:text-lg font-semibold text-app-teal text-center whitespace-nowrap">VIDEO NAVODILA</CardTitle>
           </CardHeader>
           <CardContent className="pt-3 md:pt-6 pb-2 md:pb-4 flex-grow text-center flex flex-col items-center justify-between gap-2 md:gap-4">
-            <div className="w-20 h-20 md:w-48 md:h-48 flex items-center justify-center">
+            <div className="w-20 h-20 md:w-40 md:h-40 flex items-center justify-center">
               <img src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_video.png" alt="Zmajček video" className="w-full h-full object-contain" />
             </div>
             <p className="text-xs md:text-sm text-gray-600 leading-tight">Poglej kako logoped pravilno izgovori posamezne črke.</p>
@@ -115,6 +119,25 @@ export function ActivityOptions() {
             e.stopPropagation();
             handleGoToVideoInstructions();
           }}>POGLEJ VIDEO</Button>
+          </CardFooter>
+        </Card>
+        
+        {/* Logopedski nasveti */}
+        <Card className="transition-all duration-300 hover:shadow-lg rounded-3xl border-2 border-gray-200 h-full flex flex-col cursor-pointer" onClick={handleGoToLogopedskiKoticek}>
+          <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-blue/10 rounded-t-3xl pb-2 md:pb-4">
+            <CardTitle className="text-sm md:text-lg font-semibold text-app-purple text-center whitespace-nowrap">LOGOPEDSKI NASVETI</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-3 md:pt-6 pb-2 md:pb-4 flex-grow text-center flex flex-col items-center justify-between gap-2 md:gap-4">
+            <div className="w-20 h-20 md:w-40 md:h-40 flex items-center justify-center">
+              <img src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_nasveti.png" alt="Zmajček nasveti" className="w-full h-full object-contain" />
+            </div>
+            <p className="text-xs md:text-sm text-gray-600 leading-tight">Koristni nasveti in informacije o govornem razvoju.</p>
+          </CardContent>
+          <CardFooter className="pb-3 md:pb-6 mt-auto">
+            <Button className="w-full bg-[#9b87f5] hover:bg-[#8B5CF6] rounded-2xl text-xs md:text-sm py-2 md:py-3" onClick={e => {
+            e.stopPropagation();
+            handleGoToLogopedskiKoticek();
+          }}>PREBERI NASVETE</Button>
           </CardFooter>
         </Card>
       </div>
