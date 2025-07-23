@@ -44,7 +44,7 @@ export function MobileMenu({
   const isActivePath = (path: string) => {
     return location.pathname === path;
   };
-  return <div className="flex items-center gap-2">
+  return <div className="lg:hidden flex items-center gap-2">
       {/* Show selected child first (left side) */}
       {selectedChild && <div className="flex items-center gap-2">
           {selectedChild.avatarId > 0 && <Avatar className="h-6 w-6 border border-green-200">
