@@ -129,7 +129,7 @@ export function ActivityOptions() {
           </CardHeader>
           <CardContent className="pt-3 md:pt-6 pb-2 md:pb-4 flex-grow text-center flex flex-col items-center justify-between gap-2 md:gap-4">
             <div className="w-20 h-20 md:w-40 md:h-40 flex items-center justify-center">
-              <img src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_nasveti.png" alt="Zmajček nasveti" className="w-full h-full object-contain" />
+              <img src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_logoped.png" alt="Zmajček logoped" className="w-full h-full object-contain" />
             </div>
             <p className="text-xs md:text-sm text-gray-600 leading-tight">Koristni nasveti in informacije o govornem razvoju.</p>
           </CardContent>
