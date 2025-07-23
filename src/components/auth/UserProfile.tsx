@@ -112,16 +112,8 @@ export function UserProfile() {
             <Menu className="h-4 w-4 lg:h-5 lg:w-5 text-gray-500" />
           </div>
         </PopoverTrigger>
-        <PopoverContent className="w-96 lg:w-[480px] p-0 shadow-lg border-gray-200" align="end" sideOffset={4}>
-          {/* Profile selection header */}
-          <div className="p-4 bg-blue-50 border-b border-gray-200">
-            <div className="text-base font-semibold uppercase">Izberi profil</div>
-            <div className="text-xs text-gray-500 mt-1 uppercase">
-              Preklapljaj med starševskim in otroškim profilom
-            </div>
-          </div>
-          
-          <div className="p-2">
+        <PopoverContent className="w-80 p-0 shadow-lg border-gray-200 bg-blue-50/30" align="end" sideOffset={4}>
+          <div className="p-3">
             {/* Parent profile */}
             <div 
               className={`flex items-center gap-2 p-2 rounded-md cursor-pointer ${
@@ -138,9 +130,9 @@ export function UserProfile() {
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <div className="font-medium uppercase">{profile?.username || user.email}</div>
+                <div className="font-medium text-base uppercase">{profile?.username || user.email}</div>
                 <div className="flex items-center">
-                  <span className="text-xs px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded uppercase">starš</span>
+                  <span className="text-sm px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded uppercase">starš</span>
                 </div>
               </div>
               {selectedChildIndex === null && (
@@ -151,7 +143,7 @@ export function UserProfile() {
             {/* Children profiles section */}
             {profile?.children && profile.children.length > 0 && (
               <div className="mt-2">
-                <div className="px-2 py-1.5 text-xs font-medium text-gray-500 flex items-center gap-1 uppercase">
+                <div className="px-2 py-1.5 text-sm font-medium text-gray-500 flex items-center gap-1 uppercase">
                   <Users className="h-3 w-3" />
                   <span>Otroški profili</span>
                 </div>
@@ -177,7 +169,7 @@ export function UserProfile() {
                           </AvatarFallback>
                         )}
                       </Avatar>
-                      <span className="text-sm flex-1 uppercase">{child.name}</span>
+                      <span className="text-base flex-1 uppercase">{child.name}</span>
                       {selectedChildIndex === index && (
                         <div className="h-2 w-2 rounded-full bg-green-600"></div>
                       )}
@@ -203,7 +195,7 @@ export function UserProfile() {
                     disabled={item.disabled}
                   >
                     <item.icon className="h-4 w-4 mr-2" />
-                    {item.label}
+                    <span className="text-base">{item.label}</span>
                   </Button>
                 </div>
               ))}
@@ -214,7 +206,7 @@ export function UserProfile() {
                 onClick={handleSignOut}
               >
                 <LogOut className="h-4 w-4 mr-2" />
-                Odjava
+                <span className="text-base">Odjava</span>
               </Button>
             </div>
           </div>
