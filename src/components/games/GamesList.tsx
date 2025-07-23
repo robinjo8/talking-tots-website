@@ -1,4 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Puzzle, Gamepad, SquareDashed } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -109,6 +110,21 @@ export function GamesList() {
                 </div>
                 <p className="text-xs md:text-sm text-gray-600 leading-tight">{game.description}</p>
               </CardContent>
+              <CardFooter className="pb-3 md:pb-6 mt-auto">
+                <Button 
+                  className={`w-full rounded-2xl text-xs md:text-sm py-2 md:py-3 ${
+                    game.id === "spomin" ? "bg-app-purple hover:bg-app-purple/90" :
+                    game.id === "sestavljanke" ? "bg-app-teal hover:bg-app-teal/90" :
+                    "bg-app-teal hover:bg-app-teal/90"
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    game.path && navigate(game.path);
+                  }}
+                >
+                  ZAČNI IGRO
+                </Button>
+              </CardFooter>
             </Card>)}
         </div>
       </div>
