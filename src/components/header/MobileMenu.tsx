@@ -65,7 +65,7 @@ export function MobileMenu({
             <Menu className="h-5 w-5" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="right" className="p-0 w-80 lg:w-[480px]">
+        <SheetContent side="right" className="p-0 w-80 lg:w-[600px]">
           <ScrollArea className="h-[90vh]">
             <div className="flex flex-col p-6 space-y-6">
               {/* Show Cenik only when NOT logged in */}
