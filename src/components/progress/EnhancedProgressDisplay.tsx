@@ -54,7 +54,7 @@ export function EnhancedProgressDisplay({ progressData }: EnhancedProgressDispla
         >
           <Card className="bg-gradient-to-br from-dragon-green/15 to-dragon-green/5 border-dragon-green/30 shadow-lg relative">
             <InfoButton 
-              title="O Zvezdah in Zmajčkih"
+              title="O zvezdicah in zmajčkih"
               content="Zvezdico si prislužiš za vsako opravljeno vajo ali zaključeno igro. Vsaka zvezdica pomeni, da si naredil nekaj dobrega zase in za svoj govor. Ko zbereš 10 zvezdic si prislužiš enega zmajčka – to je znak, da vztrajno napreduješ!
 
 Zmajček je nagrada za vztrajnost. Pridobiš ga, ko zbereš 10 zvezdic. Zmajček pomeni, da si že desetkrat pridno vadil in se učil. Zmajčki spremljajo tvoj napredek in rastejo skupaj s tabo – čim več jih imaš, tem boljši postajaš!"
@@ -85,7 +85,7 @@ Zmajček je nagrada za vztrajnost. Pridobiš ga, ko zbereš 10 zvezdic. Zmajček
         >
           <Card className="bg-gradient-to-br from-app-blue/15 to-app-blue/5 border-app-blue/30 shadow-lg relative">
             <InfoButton 
-              title="O Zvezdah in Zmajčkih"
+              title="O zvezdicah in zmajčkih"
               content="Zvezdico si prislužiš za vsako opravljeno vajo ali zaključeno igro. Vsaka zvezdica pomeni, da si naredil nekaj dobrega zase in za svoj govor. Ko zbereš 10 zvezdic si prislužiš enega zmajčka – to je znak, da vztrajno napreduješ!
 
 Zmajček je nagrada za vztrajnost. Pridobiš ga, ko zbereš 10 zvezdic. Zmajček pomeni, da si že desetkrat pridno vadil in se učil. Zmajčki spremljajo tvoj napredek in rastejo skupaj s tabo – čim več jih imaš, tem boljši postajaš!"
