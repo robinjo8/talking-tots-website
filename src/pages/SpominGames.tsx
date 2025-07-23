@@ -291,14 +291,7 @@ export default function SpominGames() {
         </div>
 
         {/* Section 2: Kmalu na voljo */}
-        <div>
-          <h2 className="text-3xl font-bold text-center mb-8 text-muted-foreground">
-            Kmalu na voljo
-          </h2>
-          <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {inactiveGames.map(game => <GameCard key={game.id} game={game} />)}
-          </div>
-        </div>
+        
       </div>
     </div>;
 }
