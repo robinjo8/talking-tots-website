@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
+import { InfoButton } from "./InfoButton";
 
 interface TrophyDisplayProps {
   trophies: number;
@@ -9,7 +10,11 @@ interface TrophyDisplayProps {
 
 export function TrophyDisplay({ trophies, totalDragons, dragonsToNextTrophy }: TrophyDisplayProps) {
   return (
-    <Card className="bg-gradient-to-br from-app-yellow/20 via-app-orange/10 to-app-yellow/20 border-app-yellow/40 shadow-lg">
+    <Card className="bg-gradient-to-br from-app-yellow/20 via-app-orange/10 to-app-yellow/20 border-app-yellow/40 shadow-lg relative">
+      <InfoButton 
+        title="O Pokalih"
+        content="Pokal je največja nagrada in dokaz, da si res trdno in redno vadil. Pridobiš ga, ko zbereš 10 zmajčkov – to pomeni kar 100 zvezdic! Pokal pokaže, da si izjemno vztrajen, pogumen in pripravljen premagati vsako govorno nalogo."
+      />
       <CardContent className="p-6">
         <motion.div
           initial={{ y: -20, opacity: 0 }}

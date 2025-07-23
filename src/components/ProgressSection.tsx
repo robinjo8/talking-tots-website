@@ -33,7 +33,6 @@ export function ProgressSection() {
   if (!progressData) {
     return (
       <>
-        <MotivationalContainer childName={selectedChild.name} />
         <Card className="mb-8">
           <CardContent className="p-6">
             <div className="text-center text-muted-foreground">
@@ -48,7 +47,6 @@ export function ProgressSection() {
 
   return (
     <>
-      <MotivationalContainer childName={selectedChild.name} />
       <EnhancedProgressDisplay progressData={progressData} />
     </>
   );
