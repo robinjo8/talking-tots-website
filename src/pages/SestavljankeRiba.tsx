@@ -31,99 +31,24 @@ export default function SestavljankeRiba() {
     }
   );
 
-  // Enable fullscreen and landscape orientation on mobile devices only
+  // Enable fullscreen on mobile devices only (simple approach like PoveziPareR)
   useEffect(() => {
     if (effectiveFullscreen) {
       const requestFullscreen = async () => {
         try {
-          // Force landscape orientation first
-          if (screen.orientation && 'lock' in screen.orientation) {
-            await (screen.orientation as any).lock('landscape-primary');
+          if (document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen();
           }
-          
-          // Multiple fullscreen attempts for maximum compatibility
-          const element = document.documentElement;
-          
-          // Try different fullscreen methods
-          if (element.requestFullscreen) {
-            await element.requestFullscreen({ navigationUI: 'hide' });
-          } else if ((element as any).webkitRequestFullscreen) {
-            await (element as any).webkitRequestFullscreen();
-          } else if ((element as any).mozRequestFullScreen) {
-            await (element as any).mozRequestFullScreen();
-          } else if ((element as any).msRequestFullscreen) {
-            await (element as any).msRequestFullscreen();
-          }
-          
-          // Aggressive viewport manipulation for mobile
-          const viewport = document.querySelector('meta[name=viewport]');
-          if (viewport) {
-            viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui, viewport-fit=cover, orientation=landscape');
-          }
-          
-          // Hide browser UI completely
-          window.scrollTo(0, 1);
-          
-          // Additional mobile-specific fullscreen techniques
-          if (window.navigator && (window.navigator as any).standalone !== undefined) {
-            // iOS Safari standalone mode
-            document.body.style.height = '100vh';
-            document.body.style.overflow = 'hidden';
-          }
-          
-          // Android Chrome specific
-          if ('wakeLock' in navigator) {
-            try {
-              await (navigator as any).wakeLock.request('screen');
-            } catch (err) {
-              console.log('Wake lock not supported');
-            }
-          }
-          
         } catch (error) {
-          console.log('Fullscreen or orientation lock not supported:', error);
+          console.log('Fullscreen not supported:', error);
         }
       };
-      
-      // Initial fullscreen request
       requestFullscreen();
       
-      // Handle orientation changes to maintain landscape
-      const handleOrientationChange = () => {
-        if (screen.orientation && 'lock' in screen.orientation) {
-          (screen.orientation as any).lock('landscape-primary').catch(() => {
-            console.log('Could not lock orientation');
-          });
-        }
-      };
-      
-      // Listen for orientation changes
-      window.addEventListener('orientationchange', handleOrientationChange);
-      screen.orientation?.addEventListener('change', handleOrientationChange);
-      
       return () => {
-        // Cleanup
-        window.removeEventListener('orientationchange', handleOrientationChange);
-        screen.orientation?.removeEventListener('change', handleOrientationChange);
-        
         if (document.fullscreenElement) {
           document.exitFullscreen?.();
         }
-        
-        // Unlock orientation
-        if (screen.orientation && 'unlock' in screen.orientation) {
-          (screen.orientation as any).unlock();
-        }
-        
-        // Restore viewport
-        const viewport = document.querySelector('meta[name=viewport]');
-        if (viewport) {
-          viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
-        }
-        
-        // Restore body styles
-        document.body.style.height = '';
-        document.body.style.overflow = '';
       };
     }
   }, [effectiveFullscreen]);
