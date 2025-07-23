@@ -112,7 +112,7 @@ export function UserProfile() {
             <Menu className="h-4 w-4 lg:h-5 lg:w-5 text-gray-500" />
           </div>
         </PopoverTrigger>
-        <PopoverContent className="w-80 p-0 shadow-lg border-gray-200 bg-blue-50/30" align="end" sideOffset={4}>
+        <PopoverContent className="w-80 p-0 shadow-lg border bg-card text-card-foreground" align="end" sideOffset={4}>
           <div className="p-3">
             {/* Parent profile */}
             <div 
