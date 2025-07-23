@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
+import { InfoButton } from "./InfoButton";
 
 interface TrophyDisplayProps {
   trophies: number;
@@ -17,8 +18,11 @@ export function TrophyDisplay({ trophies, totalDragons, dragonsToNextTrophy }: T
           transition={{ duration: 0.6 }}
           className="text-center"
         >
-          <div className="flex items-center justify-center gap-4 mb-4">
+          <div className="flex items-center justify-center gap-4 mb-4 relative">
             <h3 className="text-2xl font-bold text-dragon-green">POKALI</h3>
+            <InfoButton 
+              content="Pokal je največja nagrada in dokaz, da si res trdno in redno vadil. Pridobiš ga, ko zbereš 10 zmajčkov – to pomeni kar 100 zvezdic! Pokal pokaže, da si izjemno vztrajen, pogumen in pripravljen premagati vsako govorno nalogo."
+            />
           </div>
           
           <div className="grid grid-cols-5 md:grid-cols-10 gap-2 justify-items-center mb-4 max-w-lg mx-auto">
