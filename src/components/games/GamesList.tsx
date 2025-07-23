@@ -92,7 +92,7 @@ export function GamesList() {
       {/* Available Games Section */}
       <div className="mb-12">
         
-        <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
           {activeGames.map(game => <Card key={game.id} className={cn("transition-all duration-300 hover:shadow-lg rounded-3xl border-2 border-gray-200 h-full flex flex-col cursor-pointer")} onClick={() => game.path && navigate(game.path)}>
               {/* Top colored section with game name */}
               <CardHeader className={`bg-gradient-to-r ${game.gradient} rounded-t-3xl pb-2 md:pb-4`}>
@@ -134,7 +134,7 @@ export function GamesList() {
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-8 text-muted-foreground">
             KMALU NA VOLJO
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
             {inactiveGames.map(game => <Card key={game.id} className={cn("transition-all duration-300 rounded-3xl border-2 border-gray-200 h-full flex flex-col opacity-60 cursor-not-allowed")}>
                 {/* Top colored section with game name */}
                 <CardHeader className={`bg-gradient-to-r ${game.gradient} rounded-t-3xl pb-2 md:pb-4`}>
