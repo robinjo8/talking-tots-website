@@ -31,16 +31,31 @@ export default function SestavljankeRiba() {
     }
   );
 
-  // Enable fullscreen on mobile devices only
+  // Enable fullscreen and landscape orientation on mobile devices only
   useEffect(() => {
     if (effectiveFullscreen) {
       const requestFullscreen = async () => {
         try {
+          // Lock to landscape orientation (with proper type casting)
+          if (screen.orientation && 'lock' in screen.orientation) {
+            await (screen.orientation as any).lock('landscape');
+          }
+          
+          // Request fullscreen with aggressive system UI hiding
           if (document.documentElement.requestFullscreen) {
             await document.documentElement.requestFullscreen();
           }
+          
+          // Hide address bar on mobile browsers
+          window.scrollTo(0, 1);
+          
+          // Additional viewport meta manipulation for full immersion
+          const viewport = document.querySelector('meta[name=viewport]');
+          if (viewport) {
+            viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui, viewport-fit=cover');
+          }
         } catch (error) {
-          console.log('Fullscreen not supported:', error);
+          console.log('Fullscreen or orientation lock not supported:', error);
         }
       };
       requestFullscreen();
@@ -48,6 +63,15 @@ export default function SestavljankeRiba() {
       return () => {
         if (document.fullscreenElement) {
           document.exitFullscreen?.();
+        }
+        // Unlock orientation
+        if (screen.orientation && 'unlock' in screen.orientation) {
+          (screen.orientation as any).unlock();
+        }
+        // Restore viewport
+        const viewport = document.querySelector('meta[name=viewport]');
+        if (viewport) {
+          viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
         }
       };
     }
@@ -70,37 +94,19 @@ export default function SestavljankeRiba() {
   };
 
   return (
-    <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}>
+    <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden w-screen h-screen' : 'min-h-screen bg-background'}`} style={effectiveFullscreen ? { position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 9999 } : {}}>
       {!effectiveFullscreen && <Header />}
       
       {/* Mobile edge-to-edge layout */}
       {effectiveFullscreen ? (
-        <div className="h-full flex flex-col">
-          {/* Puzzle iframe - fullscreen on mobile */}
-          <div className="flex-1 p-2 overflow-hidden">
+        <div className="h-full">
+          {/* Puzzle iframe - fullscreen on mobile with no buttons */}
+          <div className="h-full p-2">
             <PuzzleIframe 
               ref={iframeRef}
               src='https://puzzel.org/sl/jigsaw/embed?p=-OUil2vhH3RR0sfbrViW'
               className="w-full h-full"
             />
-          </div>
-
-          {/* Complete puzzle button - positioned below puzzle */}
-          <div className="bg-card border-t p-2 flex-shrink-0">
-            <div className="flex gap-2 justify-center">
-              <PuzzleCompletionButton
-                isActive={isButtonActive}
-                onComplete={handlePuzzleComplete}
-                className="flex-1 max-w-xs"
-               />
-               <Button 
-                 variant="outline" 
-                 className="bg-white text-foreground border-border hover:bg-gray-50 px-3"
-                 onClick={() => window.history.back()}
-               >
-                 Nazaj
-               </Button>
-            </div>
           </div>
         </div>
       ) : (
