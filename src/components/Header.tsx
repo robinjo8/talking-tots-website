@@ -72,8 +72,8 @@ export default function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <div className="flex items-center">
-              <span className="text-2xl md:text-3xl font-extrabold text-dragon-green uppercase lg:text-2xl mx-0 px-0">Tomi</span>
-              <span className="text-2xl md:text-3xl font-extrabold text-app-orange uppercase lg:text-2xl">Talk</span>
+              <span className="text-2xl md:text-3xl font-extrabold text-dragon-green uppercase mx-0 px-0 lg:text-3xl">Tomi</span>
+              <span className="text-2xl md:text-3xl font-extrabold text-app-orange uppercase lg:text-3xl">Talk</span>
             </div>
           </Link>
           
