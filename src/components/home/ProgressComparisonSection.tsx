@@ -13,6 +13,7 @@ const ProgressComparisonSection = () => {
     if (!user) {
       navigate('/register');
     }
+    // No action if user is logged in
   };
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => {
@@ -132,10 +133,12 @@ const ProgressComparisonSection = () => {
                     <div className="mb-2 text-center">
                       <span className="text-sm font-semibold text-green-600">30× in več ceneje</span>
                     </div>
-                    <div className="bg-green-500 w-16 rounded-t-lg transition-all duration-1000 ease-out" style={{
+                    <div className="bg-green-500 w-16 rounded-t-lg transition-all duration-1000 ease-out relative" style={{
                     height: isVisible ? '40px' : '0px',
                     transitionDelay: '0.3s'
-                  }} />
+                  }}>
+                      <div className="absolute inset-0 rounded-t-lg border-2 border-green-400 animate-pulse shadow-[0_0_15px_rgba(34,197,94,0.5)]" />
+                    </div>
                     <div className="mt-2 text-center">
                       <span className="text-sm font-medium text-gray-900">TomiTalk</span>
                     </div>
