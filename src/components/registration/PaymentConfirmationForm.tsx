@@ -27,8 +27,8 @@ export function PaymentConfirmationForm({
 
   return (
     <div className="space-y-6">
-      <div className="max-w-3xl mx-auto text-center mb-10">
-        <p className="text-lg text-muted-foreground py-0 my-0 whitespace-nowrap">
+      <div className="w-full px-4 mx-auto text-center mb-6 md:mb-10">
+        <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-4xl mx-auto">
           Naši paketi so zasnovani posebej za starše in njihove otroke. Izberite paket, ki vam najbolj ustreza.
         </p>
       </div>
