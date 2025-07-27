@@ -97,26 +97,46 @@ export function useRegistration() {
     
     try {
       setIsLoading(true);
-      const { error } = await supabase.auth.signUp({
+      
+      // First, register the user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            username: username,
-            children: validChildren.map(child => ({
-              name: child.name,
-              gender: child.gender,
-              birthDate: child.birthDate ? child.birthDate.toISOString() : null,
-              avatarId: child.avatarId,
-              speechDifficulties: child.speechDifficulties || [],
-              speechDifficultiesDescription: child.speechDifficultiesDescription || "",
-              speechDevelopment: child.speechDevelopment || {}
-            }))
-          }
+            username: username
+          },
+          emailRedirectTo: `${window.location.origin}/`
         }
       });
       
-      if (error) throw error;
+      if (authError) throw authError;
+      
+      // If user is created successfully, save children to database
+      if (authData.user) {
+        // Insert children into database
+        const childrenForDB = validChildren.map(child => ({
+          parent_id: authData.user!.id,
+          name: child.name,
+          gender: child.gender,
+          birth_date: child.birthDate ? child.birthDate.toISOString().split('T')[0] : null,
+          age: child.birthDate ? new Date().getFullYear() - child.birthDate.getFullYear() : null,
+          avatar_url: `/lovable-uploads/avatar-${child.avatarId}.png`,
+          speech_difficulties: child.speechDifficulties || [],
+          speech_difficulties_description: child.speechDifficultiesDescription || "",
+          speech_development: child.speechDevelopment || {}
+        }));
+
+        const { error: childrenError } = await supabase
+          .from('children')
+          .insert(childrenForDB);
+
+        if (childrenError) {
+          console.error("Error saving children:", childrenError);
+          // Don't fail registration if children save fails, but log it
+          toast.error("Registracija uspešna, vendar se otroci niso shranili. Dodajte jih ročno.");
+        }
+      }
       
       toast.success("Registracija uspešna! Preverite vašo e-pošto za potrditev računa.");
       navigate("/login");

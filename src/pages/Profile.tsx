@@ -53,36 +53,38 @@ export default function Profile() {
   }, []);
 
   const handleDeleteChild = async () => {
-    if (deletingChildIndex === null || !user) return;
+    if (deletingChildIndex === null || !user || !profile?.children) return;
     
     try {
       setIsDeleting(true);
       
-      const { data: userData, error: userError } = await supabase.auth.getUser();
+      const childToDelete = profile.children[deletingChildIndex];
+      if (!childToDelete || !childToDelete.id) {
+        toast.error("Napaka: ni mogoče identificirati otroka za brisanje.");
+        return;
+      }
       
-      if (userError) throw userError;
+      // Delete child from database
+      const { error: deleteError } = await supabase
+        .from('children')
+        .delete()
+        .eq('id', childToDelete.id);
+        
+      if (deleteError) throw deleteError;
       
-      const currentUser = userData.user;
-      const currentMetadata = currentUser.user_metadata || {};
-      const currentChildren = [...(currentMetadata.children || [])];
+      toast.success(`Otrok "${childToDelete.name}" je bil uspešno izbrisan.`);
       
-      if (deletingChildIndex >= 0 && deletingChildIndex < currentChildren.length) {
-        const removedChild = currentChildren.splice(deletingChildIndex, 1);
-        
-        const { error: updateError } = await supabase.auth.updateUser({
-          data: { children: currentChildren }
-        });
-        
-        if (updateError) throw updateError;
-        
-        toast.success(`Otrok "${removedChild[0]?.name}" je bil uspešno izbrisan.`);
-        
-        if (selectedChildIndex === deletingChildIndex) {
-          setSelectedChildIndex(currentChildren.length > 0 ? 0 : null);
-        } 
-        else if (selectedChildIndex !== null && selectedChildIndex > deletingChildIndex) {
-          setSelectedChildIndex(selectedChildIndex - 1);
-        }
+      // Update selected child index
+      if (selectedChildIndex === deletingChildIndex) {
+        const remainingChildrenCount = profile.children.length - 1;
+        setSelectedChildIndex(remainingChildrenCount > 0 ? 0 : null);
+      } else if (selectedChildIndex !== null && selectedChildIndex > deletingChildIndex) {
+        setSelectedChildIndex(selectedChildIndex - 1);
+      }
+      
+      // Refresh profile to get updated children list
+      if (window.location.pathname === '/profile') {
+        window.location.reload();
       }
       
     } catch (error: any) {
