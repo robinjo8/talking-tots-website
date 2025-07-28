@@ -3,10 +3,11 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, ChevronDown, ChevronUp } from "lucide-react";
+import { Users, ChevronDown, ChevronUp, RefreshCw } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChildDatabaseManager } from "@/components/children/ChildDatabaseManager";
 import { ChildProfileDisplay } from "@/components/profile/ChildProfileDisplay";
+import { toast } from "sonner";
 
 type ChildrenProfilesSectionProps = {
   isExpanded: boolean;
@@ -23,8 +24,25 @@ export function ChildrenProfilesSection({
   setDeletingChildIndex,
   setEditingDifficultiesIndex,
 }: ChildrenProfilesSectionProps) {
-  const { profile, selectedChildIndex, setSelectedChildIndex } = useAuth();
+  const { profile, selectedChildIndex, setSelectedChildIndex, manualSyncChildren } = useAuth();
   const [showDatabaseManager, setShowDatabaseManager] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const handleManualSync = async () => {
+    setIsSyncing(true);
+    try {
+      const success = await manualSyncChildren();
+      if (success) {
+        toast.success("Otroci uspešno sinhronizirani iz registracije!");
+      } else {
+        toast.error("Ni podatkov za sinhronizacijo ali sinhronizacija ni uspela.");
+      }
+    } catch (error) {
+      toast.error("Napaka pri sinhronizaciji otrok.");
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   return (
     <Collapsible open={isExpanded} onOpenChange={setIsExpanded} className="w-full">
@@ -54,6 +72,39 @@ export function ChildrenProfilesSection({
         <CollapsibleContent>
           <CardContent className="pt-4">
             <div className="space-y-6">
+              {/* Show sync button if children need syncing */}
+              {profile?.needsSync && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium text-amber-800 mb-1">
+                        Obstajajo podatki o otroku iz registracije
+                      </h4>
+                      <p className="text-sm text-amber-700">
+                        Zaznali smo podatke o otroku iz registracije, ki se niso shranili. Kliknite za sinhronizacijo.
+                      </p>
+                    </div>
+                    <Button
+                      onClick={handleManualSync}
+                      disabled={isSyncing}
+                      className="bg-amber-600 hover:bg-amber-700 text-white"
+                    >
+                      {isSyncing ? (
+                        <>
+                          <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                          Sinhroniziram...
+                        </>
+                      ) : (
+                        <>
+                          <RefreshCw className="h-4 w-4 mr-2" />
+                          Sinhroniziraj
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
               {/* Database manager - only show if no children exist */}
               {(!profile?.children || profile.children.length === 0) && (
                 <>
