@@ -112,6 +112,7 @@ export function EditChildForm({ childIndex, initialData, onSuccess, onCancel }: 
             name: name.trim(),
             gender,
             avatarId,
+            avatarUrl: `/lovable-uploads/avatar-${avatarId}.png`,
             birthDate,
             age: calculatedAge
           };
