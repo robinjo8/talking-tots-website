@@ -58,7 +58,7 @@ export function ChildrenProfilesSection({
           <CardContent className="pt-4">
             <div className="space-y-6">
 
-              {/* Database manager - show if no children or always allow adding more */}
+              {/* Database manager - show only if no children exist */}
               {(!profile?.children || profile.children.length === 0) && (
                 <>
                   <div className="flex justify-between items-center">
@@ -72,26 +72,6 @@ export function ChildrenProfilesSection({
                       className="border-dragon-green text-dragon-green hover:bg-dragon-green/10"
                     >
                       {showDatabaseManager ? "Skrij dodajanje" : "Dodaj otroka"}
-                    </Button>
-                  </div>
-
-                  {showDatabaseManager && (
-                    <ChildDatabaseManager />
-                  )}
-                </>
-              )}
-              
-              {/* Allow adding more children even when children exist */}
-              {profile?.children && profile.children.length > 0 && (
-                <>
-                  <div className="flex justify-end">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setShowDatabaseManager(!showDatabaseManager)}
-                      className="border-dragon-green text-dragon-green hover:bg-dragon-green/10"
-                    >
-                      {showDatabaseManager ? "Skrij dodajanje" : "Dodaj novega otroka"}
                     </Button>
                   </div>
 

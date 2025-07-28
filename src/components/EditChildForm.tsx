@@ -94,7 +94,9 @@ export function EditChildForm({ childIndex, initialData, onSuccess, onCancel }: 
             name: name.trim(),
             gender,
             age: calculatedAge,
-            birth_date: birthDate?.toISOString().split('T')[0] || null,
+            birth_date: birthDate ? 
+              new Date(birthDate.getFullYear(), birthDate.getMonth(), birthDate.getDate())
+                .toISOString().split('T')[0] : null,
             avatar_url: `/lovable-uploads/avatar-${avatarId}.png`
           })
           .eq('id', childToUpdate.id);
