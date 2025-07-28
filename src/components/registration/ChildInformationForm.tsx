@@ -176,21 +176,21 @@ export function ChildInformationForm({
                         <ChevronDown className="h-5 w-5 opacity-50" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[600px] p-6 bg-white border-2 shadow-xl z-50" align="start">
+                    <PopoverContent className="w-[500px] p-6 bg-white border-2 shadow-xl z-50" align="center">
                       <h4 className="text-lg font-medium mb-4 text-center">Izberi avatarja za otroka</h4>
-                      <div className="grid grid-cols-5 gap-4 mb-6">
+                      <div className="grid grid-cols-3 gap-6 mb-6">
                         {avatarOptions.slice(1).map(avatar => (
                           <div 
                             key={avatar.id}
                             onClick={() => updateChildField(child.id, "avatarId", avatar.id)}
                             className={cn(
-                              "cursor-pointer rounded-xl p-4 transition-all duration-200 flex flex-col items-center justify-center min-h-[100px] hover:shadow-lg border-2",
+                              "cursor-pointer rounded-xl p-4 transition-all duration-200 flex items-center justify-center min-h-[120px] hover:shadow-lg border-2",
                               child.avatarId === avatar.id 
                                 ? "bg-dragon-green/20 ring-3 ring-dragon-green shadow-xl scale-[1.02] border-dragon-green" 
                                 : "bg-white hover:bg-gray-50 border-gray-200 hover:border-dragon-green/40"
                             )}
                           >
-                            <Avatar className="h-16 w-16 lg:h-20 lg:w-20 ring-2 ring-transparent mb-2">
+                            <Avatar className="h-20 w-20 lg:h-24 lg:w-24 ring-2 ring-transparent">
                               <AvatarImage 
                                 src={avatar.src} 
                                 alt={avatar.alt} 
@@ -198,9 +198,6 @@ export function ChildInformationForm({
                               />
                               <AvatarFallback className="text-xs bg-dragon-green/10">🐲</AvatarFallback>
                             </Avatar>
-                            <span className="text-xs text-center text-gray-600 leading-tight max-w-full break-words">
-                              Zmajček {avatar.id}
-                            </span>
                           </div>
                         ))}
                       </div>
