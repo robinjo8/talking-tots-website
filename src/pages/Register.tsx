@@ -71,10 +71,6 @@ export default function Register() {
           <p className="text-gray-600">Registrirajte se in začnite uporabljati aplikacijo.</p>
         </div>
         <form onSubmit={goToNextStep} className="space-y-6">
-          {error && !error.includes("otrok") && <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>}
-          
           <div>
             <h2 className="font-semibold text-lg mb-4">Uporabniški podatki</h2>
             <AccountInfoForm username={username} setUsername={setUsername} email={email} setEmail={setEmail} password={password} setPassword={setPassword} confirmPassword={confirmPassword} setConfirmPassword={setConfirmPassword} />
@@ -89,6 +85,10 @@ export default function Register() {
           <Button type="submit" className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6" disabled={isLoading || isCheckingEmail}>
             {isCheckingEmail ? "Preverjanje..." : "Naprej"}
           </Button>
+          
+          {error && !error.includes("otrok") && <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>}
           
           <div className="text-sm text-center">
             Že imate račun?{" "}
