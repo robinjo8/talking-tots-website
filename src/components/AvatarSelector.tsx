@@ -33,25 +33,25 @@ type AvatarSelectorProps = {
 export function AvatarSelector({ selectedAvatarId, onAvatarSelect }: AvatarSelectorProps) {
   return (
     <div>
-      <Label>Izberi avatarja</Label>
-      <div className="grid grid-cols-3 gap-3 mt-3">
+      <Label className="text-base font-medium">Izberi avatarja</Label>
+      <div className="grid grid-cols-3 gap-6 mt-6 p-4 bg-gray-50/50 rounded-xl border">
         {avatarOptions.map(avatar => (
           <div 
             key={avatar.id}
             onClick={() => onAvatarSelect(avatar.id)}
-            className={`cursor-pointer rounded-lg p-2 transition-all flex items-center justify-center ${
+            className={`cursor-pointer rounded-xl p-4 transition-all flex items-center justify-center hover:shadow-md ${
               selectedAvatarId === avatar.id 
-                ? 'bg-dragon-green/20 ring-2 ring-dragon-green' 
-                : 'hover:bg-gray-100'
+                ? 'bg-dragon-green/20 ring-2 ring-dragon-green shadow-lg scale-105' 
+                : 'bg-white hover:bg-gray-50 border border-gray-200 hover:border-dragon-green/30'
             }`}
           >
             {avatar.id === 0 ? (
-              <div className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-full flex items-center justify-center bg-gray-100 border border-gray-200">
-                <UserX className="h-8 w-8 text-gray-400" />
+              <div className="h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28 rounded-full flex items-center justify-center bg-gray-100 border-2 border-gray-300">
+                <UserX className="h-10 w-10 text-gray-400" />
                 <span className="sr-only">{avatar.alt}</span>
               </div>
             ) : (
-              <Avatar className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24">
+              <Avatar className="h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28 ring-2 ring-transparent">
                 <AvatarImage src={avatar.src} alt={avatar.alt} className="object-contain" />
                 <AvatarFallback className="text-xs text-center p-1">
                   {avatar.alt.substring(0, 10)}...
