@@ -85,9 +85,9 @@ export function useRegistration() {
       return;
     }
     
-    // Filter for completed children
+    // Filter for valid children (must have name and birthdate)
     const validChildren = children.filter(child => 
-      child.name.trim() !== "" && child.isComplete && child.birthDate !== null
+      child.name.trim() !== "" && child.birthDate !== null
     );
     
     if (validChildren.length === 0) {
