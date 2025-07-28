@@ -48,7 +48,7 @@ export function MobileMenu({
       {/* Show selected child first (left side) */}
       {selectedChild && <div className="flex items-center gap-2">
           {selectedChild.avatarId > 0 && <Avatar className="h-6 w-6 border border-green-200">
-              <AvatarImage src={getAvatarSrc(selectedChild.avatarId)} alt={selectedChild.name} className="object-contain" />
+              <AvatarImage src={selectedChild.avatarUrl || getAvatarSrc(selectedChild.avatarId)} alt={selectedChild.name} className="object-contain" />
               <AvatarFallback className="bg-green-100 text-green-800">
                 {selectedChild.name[0]}
               </AvatarFallback>

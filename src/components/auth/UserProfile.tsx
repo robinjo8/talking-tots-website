@@ -90,7 +90,7 @@ export function UserProfile() {
             {selectedChild && selectedChild.avatarId > 0 ? (
               <Avatar className="h-8 w-8 lg:h-10 lg:w-10 border border-green-200">
                 <AvatarImage 
-                  src={getAvatarSrc(selectedChild.avatarId)} 
+                  src={selectedChild.avatarUrl || getAvatarSrc(selectedChild.avatarId)}
                   alt={selectedChild.name} 
                   className="object-contain" 
                 />
@@ -159,7 +159,7 @@ export function UserProfile() {
                       <Avatar className="h-8 w-8 border border-green-200">
                         {child.avatarId > 0 ? (
                           <AvatarImage 
-                            src={getAvatarSrc(child.avatarId)} 
+                            src={child.avatarUrl || getAvatarSrc(child.avatarId)}
                             alt={child.name} 
                             className="object-contain" 
                           />

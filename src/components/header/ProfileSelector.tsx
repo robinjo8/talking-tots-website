@@ -56,7 +56,7 @@ export function ProfileSelector({ profile, selectedChildIndex, onSelectChild, us
               <Avatar className="h-8 w-8 border border-green-200">
                 {child.avatarId > 0 ? (
                   <AvatarImage 
-                    src={getAvatarSrc(child.avatarId)} 
+                    src={child.avatarUrl || getAvatarSrc(child.avatarId)} 
                     alt={child.name} 
                     className="object-contain" 
                   />

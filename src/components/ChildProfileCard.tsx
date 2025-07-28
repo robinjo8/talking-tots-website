@@ -52,7 +52,7 @@ export function ChildProfileCard({
   hideActions = false,
   minimal = false
 }: ChildProfileProps) {
-  const avatarSrc = getAvatarSrc(child.avatarId);
+  const avatarSrc = child.avatarUrl || getAvatarSrc(child.avatarId);
   const [isHovered, setIsHovered] = useState(false);
   
   const formatGender = (gender: string) => {
