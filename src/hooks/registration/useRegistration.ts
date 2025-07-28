@@ -7,6 +7,7 @@ import { useChildrenState } from "./useChildrenState";
 import { useRegistrationValidation } from "./useRegistrationValidation";
 import { useRegistrationFlow } from "./useRegistrationFlow";
 import { RegistrationStep } from "./types";
+import { calculateAge, validateChildData } from "@/utils/childUtils";
 
 export function useRegistration() {
   const navigate = useNavigate();
@@ -69,6 +70,7 @@ export function useRegistration() {
   };
 
   const handleSubmit = async () => {
+    console.log('Registration: Starting submission process');
     setError(null);
     
     const isValid = await validateAccountInfo(
@@ -82,13 +84,22 @@ export function useRegistration() {
     );
     
     if (!isValid) {
+      console.log('Registration: Account validation failed');
       return;
     }
     
-    // Filter for valid children (must have name and birthdate)
-    const validChildren = children.filter(child => 
-      child.name.trim() !== "" && child.birthDate !== null
-    );
+    // Filter for valid children using the new validation function
+    const validChildren = children.filter(child => {
+      const validation = validateChildData(child);
+      if (!validation.isValid) {
+        console.warn('Registration: Invalid child data:', validation.error, child);
+        return false;
+      }
+      return true;
+    });
+    
+    console.log('Registration: Valid children count:', validChildren.length);
+    console.log('Registration: Valid children data:', validChildren);
     
     if (validChildren.length === 0) {
       setError("Dodajte vsaj enega otroka s podatki.");
@@ -110,38 +121,60 @@ export function useRegistration() {
         }
       });
       
-      if (authError) throw authError;
+      if (authError) {
+        console.error('Registration: Auth error:', authError);
+        throw authError;
+      }
+      
+      console.log('Registration: User created successfully:', authData.user?.id);
       
       // If user is created successfully, save children to database
       if (authData.user) {
-        // Insert children into database
-        const childrenForDB = validChildren.map(child => ({
-          parent_id: authData.user!.id,
-          name: child.name,
-          gender: child.gender,
-          birth_date: child.birthDate ? child.birthDate.toISOString().split('T')[0] : null,
-          age: child.birthDate ? new Date().getFullYear() - child.birthDate.getFullYear() : null,
-          avatar_url: `/lovable-uploads/avatar-${child.avatarId}.png`,
-          speech_difficulties: child.speechDifficulties || [],
-          speech_difficulties_description: child.speechDifficultiesDescription || "",
-          speech_development: child.speechDevelopment || {}
-        }));
+        // Insert children into database with proper age calculation
+        const childrenForDB = validChildren.map(child => {
+          const age = calculateAge(child.birthDate);
+          const childData = {
+            parent_id: authData.user!.id,
+            name: child.name.trim(),
+            gender: child.gender,
+            birth_date: child.birthDate ? child.birthDate.toISOString().split('T')[0] : null,
+            age: age, // This is now always a valid number
+            avatar_url: `/lovable-uploads/${child.avatarId || 1}.png`,
+            speech_difficulties: child.speechDifficulties || [],
+            speech_difficulties_description: child.speechDifficultiesDescription || "",
+            speech_development: child.speechDevelopment || {}
+          };
+          
+          console.log('Registration: Prepared child data for DB:', childData);
+          return childData;
+        });
 
-        const { error: childrenError } = await supabase
+        console.log('Registration: Inserting children into database:', childrenForDB);
+
+        const { data: insertedChildren, error: childrenError } = await supabase
           .from('children')
-          .insert(childrenForDB);
+          .insert(childrenForDB)
+          .select();
 
         if (childrenError) {
-          console.error("Error saving children:", childrenError);
-          // Don't fail registration if children save fails, but log it
-          toast.error("Registracija uspešna, vendar se otroci niso shranili. Dodajte jih ročno.");
+          console.error('Registration: Children insert error:', childrenError);
+          console.error('Registration: Error details:', {
+            message: childrenError.message,
+            details: childrenError.details,
+            hint: childrenError.hint
+          });
+          // Don't fail registration, but show error
+          toast.error(`Registracija uspešna, vendar se otrok ni shranil: ${childrenError.message}`);
+        } else {
+          console.log('Registration: Children inserted successfully:', insertedChildren);
+          console.log('Registration: Number of children inserted:', insertedChildren?.length);
+          toast.success("Registracija uspešna! Otrok je bil shranjen v profil.");
         }
       }
       
-      toast.success("Registracija uspešna! Preverite vašo e-pošto za potrditev računa.");
       navigate("/login");
     } catch (error: any) {
-      console.error("Napaka pri registraciji:", error);
+      console.error("Registration: Unexpected error:", error);
       if (error.message.includes("email")) {
         setError("E-poštni naslov je že v uporabi ali ni veljaven.");
       } else {
