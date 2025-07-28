@@ -8,12 +8,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export function ChildDatabaseManager() {
   const { user, profile, refreshProfile } = useAuth();
   const [isCreating, setIsCreating] = useState(false);
   const [newChildName, setNewChildName] = useState("");
   const [newChildAge, setNewChildAge] = useState("");
+  const [deletingChild, setDeletingChild] = useState<{id: string, name: string} | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleCreateChild = async () => {
     if (!user || !newChildName.trim() || !newChildAge) {
@@ -47,24 +50,26 @@ export function ChildDatabaseManager() {
     }
   };
 
-  const handleDeleteChild = async (childId: string, childName: string) => {
-    if (!confirm(`Ali ste prepričani, da želite izbrisati profil otroka "${childName}"?`)) {
-      return;
-    }
+  const handleDeleteChild = async () => {
+    if (!deletingChild) return;
 
     try {
+      setIsDeleting(true);
       const { error } = await supabase
         .from('children')
         .delete()
-        .eq('id', childId);
+        .eq('id', deletingChild.id);
 
       if (error) throw error;
 
-      toast.success(`Otrok "${childName}" je bil uspešno izbrisan`);
+      toast.success(`Otrok "${deletingChild.name}" je bil uspešno izbrisan`);
       await refreshProfile();
+      setDeletingChild(null);
     } catch (error: any) {
       console.error("Error deleting child:", error);
       toast.error("Napaka pri brisanju otroka: " + error.message);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -100,6 +105,16 @@ export function ChildDatabaseManager() {
               />
             </div>
           </div>
+          <div className="flex justify-end mt-4">
+            <Button
+              onClick={handleCreateChild}
+              disabled={isCreating || !newChildName.trim() || !newChildAge}
+              className="flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              {isCreating ? "Dodajanje..." : "Dodaj otroka"}
+            </Button>
+          </div>
         </div>
 
         {/* List existing children */}
@@ -119,7 +134,7 @@ export function ChildDatabaseManager() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleDeleteChild(child.id!, child.name)}
+                      onClick={() => setDeletingChild({id: child.id!, name: child.name})}
                       className="text-destructive hover:text-destructive"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -132,6 +147,18 @@ export function ChildDatabaseManager() {
             <p className="text-muted-foreground">Ni dodanih otrok</p>
           )}
         </div>
+
+        <ConfirmDialog
+          open={!!deletingChild}
+          onOpenChange={(open) => !open && setDeletingChild(null)}
+          title="Potrdite brisanje otroka"
+          description="Z izbrisom profila vašega otroka bodo vsi povezani podatki trajno odstranjeni. Ali želite nadaljevati?"
+          confirmText="Da"
+          cancelText="Ne"
+          confirmVariant="destructive"
+          isLoading={isDeleting}
+          onConfirm={handleDeleteChild}
+        />
       </CardContent>
     </Card>
   );
