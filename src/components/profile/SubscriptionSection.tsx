@@ -19,8 +19,12 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
-export function SubscriptionSection() {
-  const [isExpanded, setIsExpanded] = useState(false);
+type SubscriptionSectionProps = {
+  isExpanded: boolean;
+  setIsExpanded: () => void;
+};
+
+export function SubscriptionSection({ isExpanded, setIsExpanded }: SubscriptionSectionProps) {
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly'>('yearly');
 
   const handleSubscribe = (plan: string) => {
@@ -40,17 +44,13 @@ export function SubscriptionSection() {
   return (
     <Collapsible open={isExpanded} onOpenChange={setIsExpanded} className="w-full">
       <Card>
-        <CardHeader className="bg-gradient-to-r from-app-yellow/10 to-app-orange/10 flex flex-row items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CircleDollarSign className="h-5 w-5 text-app-yellow" />
-            <CardTitle>Naročnina</CardTitle>
-          </div>
-          <CollapsibleTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="flex items-center gap-1 text-app-yellow hover:bg-app-yellow/10"
-            >
+        <CollapsibleTrigger asChild>
+          <CardHeader className="bg-gradient-to-r from-app-yellow/10 to-app-orange/10 flex flex-row items-center justify-between cursor-pointer hover:bg-gradient-to-r hover:from-app-yellow/15 hover:to-app-orange/15 transition-colors">
+            <div className="flex items-center gap-2">
+              <CircleDollarSign className="h-5 w-5 text-app-yellow" />
+              <CardTitle>Naročnina</CardTitle>
+            </div>
+            <div className="flex items-center gap-1 text-app-yellow">
               {isExpanded ? (
                 <>
                   <ChevronUp className="h-4 w-4" />
@@ -62,9 +62,9 @@ export function SubscriptionSection() {
                   <span className="hidden md:inline">Prikaži podrobnosti</span>
                 </>
               )}
-            </Button>
-          </CollapsibleTrigger>
-        </CardHeader>
+            </div>
+          </CardHeader>
+        </CollapsibleTrigger>
         
         <CollapsibleContent>
           <CardContent className="p-6">

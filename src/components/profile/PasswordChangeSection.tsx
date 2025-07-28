@@ -9,8 +9,12 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export function PasswordChangeSection() {
-  const [isExpanded, setIsExpanded] = useState(false);
+type PasswordChangeSectionProps = {
+  isExpanded: boolean;
+  setIsExpanded: () => void;
+};
+
+export function PasswordChangeSection({ isExpanded, setIsExpanded }: PasswordChangeSectionProps) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
@@ -57,17 +61,13 @@ export function PasswordChangeSection() {
   return (
     <Collapsible open={isExpanded} onOpenChange={setIsExpanded} className="w-full">
       <Card>
-        <CardHeader className="bg-gradient-to-r from-app-orange/10 to-app-purple/10 flex flex-row items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-app-orange" />
-            <CardTitle>Spremeni geslo</CardTitle>
-          </div>
-          <CollapsibleTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="flex items-center gap-1 text-app-orange hover:bg-app-orange/10"
-            >
+        <CollapsibleTrigger asChild>
+          <CardHeader className="bg-gradient-to-r from-app-orange/10 to-app-purple/10 flex flex-row items-center justify-between cursor-pointer hover:bg-gradient-to-r hover:from-app-orange/15 hover:to-app-purple/15 transition-colors">
+            <div className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-app-orange" />
+              <CardTitle>Spremeni geslo</CardTitle>
+            </div>
+            <div className="flex items-center gap-1 text-app-orange">
               {isExpanded ? (
                 <>
                   <ChevronUp className="h-4 w-4" />
@@ -79,9 +79,9 @@ export function PasswordChangeSection() {
                   <span className="hidden md:inline">Prikaži podrobnosti</span>
                 </>
               )}
-            </Button>
-          </CollapsibleTrigger>
-        </CardHeader>
+            </div>
+          </CardHeader>
+        </CollapsibleTrigger>
         
         <CollapsibleContent>
           <form onSubmit={handlePasswordChange}>

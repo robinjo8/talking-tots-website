@@ -19,9 +19,8 @@ export default function Profile() {
   const { user, profile, selectedChildIndex, setSelectedChildIndex } = useAuth();
   const navigate = useNavigate();
   
-  // Section UI state - check localStorage for expandSection
-  const [isUserProfileExpanded, setIsUserProfileExpanded] = useState(false);
-  const [isChildrenSectionExpanded, setIsChildrenSectionExpanded] = useState(false);
+  // Accordion state - only one section can be expanded at a time
+  const [expandedSection, setExpandedSection] = useState<string | null>(null);
   
   // Child profile management state
   const [editingChildIndex, setEditingChildIndex] = useState<number | null>(null);
@@ -46,6 +45,7 @@ export default function Profile() {
   useEffect(() => {
     const sectionToExpand = localStorage.getItem('expandSection');
     if (sectionToExpand === 'subscription') {
+      setExpandedSection('subscription');
       const subscriptionSection = document.querySelector('[data-section="subscription"]');
       if (subscriptionSection) {
         subscriptionSection.scrollIntoView({ behavior: 'smooth' });
@@ -53,6 +53,11 @@ export default function Profile() {
       }
     }
   }, []);
+
+  // Helper function to handle section toggle
+  const handleSectionToggle = (sectionName: string) => {
+    setExpandedSection(expandedSection === sectionName ? null : sectionName);
+  };
 
   const handleDeleteChild = async () => {
     if (deletingChildIndex === null || !user || !profile?.children) return;
@@ -121,14 +126,14 @@ export default function Profile() {
         <div className="grid gap-8">
           {/* User Profile Section (collapsed by default) */}
           <UserProfileSection 
-            isExpanded={isUserProfileExpanded}
-            setIsExpanded={setIsUserProfileExpanded}
+            isExpanded={expandedSection === 'userProfile'}
+            setIsExpanded={() => handleSectionToggle('userProfile')}
           />
           
           {/* Children Profiles Section */}
           <ChildrenProfilesSection 
-            isExpanded={isChildrenSectionExpanded}
-            setIsExpanded={setIsChildrenSectionExpanded}
+            isExpanded={expandedSection === 'children'}
+            setIsExpanded={() => handleSectionToggle('children')}
             setEditingChildIndex={setEditingChildIndex}
             setDeletingChildIndex={setDeletingChildIndex}
             setEditingDifficultiesIndex={setEditingDifficultiesIndex}
@@ -137,14 +142,23 @@ export default function Profile() {
           
           {/* Subscription Section */}
           <div data-section="subscription">
-            <SubscriptionSection />
+            <SubscriptionSection 
+              isExpanded={expandedSection === 'subscription'}
+              setIsExpanded={() => handleSectionToggle('subscription')}
+            />
           </div>
           
           {/* Payment Methods Section (new) */}
-          <PaymentMethodsSection />
+          <PaymentMethodsSection 
+            isExpanded={expandedSection === 'paymentMethods'}
+            setIsExpanded={() => handleSectionToggle('paymentMethods')}
+          />
           
           {/* Password Change Section */}
-          <PasswordChangeSection />
+          <PasswordChangeSection 
+            isExpanded={expandedSection === 'passwordChange'}
+            setIsExpanded={() => handleSectionToggle('passwordChange')}
+          />
         </div>
         
         {/* Dialogs and Modals */}

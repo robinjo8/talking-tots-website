@@ -5,23 +5,23 @@ import { Button } from "@/components/ui/button";
 import { CreditCard, ChevronDown, ChevronUp } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
-export function PaymentMethodsSection() {
-  const [isExpanded, setIsExpanded] = useState(false);
+type PaymentMethodsSectionProps = {
+  isExpanded: boolean;
+  setIsExpanded: () => void;
+};
+
+export function PaymentMethodsSection({ isExpanded, setIsExpanded }: PaymentMethodsSectionProps) {
 
   return (
     <Collapsible open={isExpanded} onOpenChange={setIsExpanded} className="w-full">
       <Card>
-        <CardHeader className="bg-gradient-to-r from-app-teal/10 to-dragon-green/10 flex flex-row items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CreditCard className="h-5 w-5 text-app-teal" />
-            <CardTitle>Plačilne metode</CardTitle>
-          </div>
-          <CollapsibleTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="flex items-center gap-1 text-app-teal hover:bg-app-teal/10"
-            >
+        <CollapsibleTrigger asChild>
+          <CardHeader className="bg-gradient-to-r from-app-teal/10 to-dragon-green/10 flex flex-row items-center justify-between cursor-pointer hover:bg-gradient-to-r hover:from-app-teal/15 hover:to-dragon-green/15 transition-colors">
+            <div className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5 text-app-teal" />
+              <CardTitle>Plačilne metode</CardTitle>
+            </div>
+            <div className="flex items-center gap-1 text-app-teal">
               {isExpanded ? (
                 <>
                   <ChevronUp className="h-4 w-4" />
@@ -33,9 +33,9 @@ export function PaymentMethodsSection() {
                   <span className="hidden md:inline">Prikaži podrobnosti</span>
                 </>
               )}
-            </Button>
-          </CollapsibleTrigger>
-        </CardHeader>
+            </div>
+          </CardHeader>
+        </CollapsibleTrigger>
         
         <CollapsibleContent>
           <CardContent className="pt-4">

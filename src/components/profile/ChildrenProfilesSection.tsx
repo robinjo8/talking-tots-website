@@ -32,13 +32,13 @@ export function ChildrenProfilesSection({
   return (
     <Collapsible open={isExpanded} onOpenChange={setIsExpanded} className="w-full">
       <Card>
-        <CardHeader className="bg-gradient-to-r from-app-blue/10 to-dragon-green/10 flex flex-row items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-app-blue" />
-            <CardTitle>Otroci ({profile?.children?.length || 0})</CardTitle>
-          </div>
-          <CollapsibleTrigger asChild>
-            <Button variant="ghost" size="sm" className="flex items-center gap-1 text-app-blue hover:bg-app-blue/10">
+        <CollapsibleTrigger asChild>
+          <CardHeader className="bg-gradient-to-r from-app-blue/10 to-dragon-green/10 flex flex-row items-center justify-between cursor-pointer hover:bg-gradient-to-r hover:from-app-blue/15 hover:to-dragon-green/15 transition-colors">
+            <div className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-app-blue" />
+              <CardTitle>Otroci ({profile?.children?.length || 0})</CardTitle>
+            </div>
+            <div className="flex items-center gap-1 text-app-blue">
               {isExpanded ? (
                 <>
                   <ChevronUp className="h-4 w-4" />
@@ -50,9 +50,9 @@ export function ChildrenProfilesSection({
                   <span className="hidden md:inline">Prikaži otroke</span>
                 </>
               )}
-            </Button>
-          </CollapsibleTrigger>
-        </CardHeader>
+            </div>
+          </CardHeader>
+        </CollapsibleTrigger>
         
         <CollapsibleContent>
           <CardContent className="pt-4">
