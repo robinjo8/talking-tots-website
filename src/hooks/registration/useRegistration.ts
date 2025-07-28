@@ -109,13 +109,23 @@ export function useRegistration() {
     try {
       setIsLoading(true);
       
-      // First, register the user
+      // First, register the user with children in metadata for backup
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            username: username
+            username: username,
+            children: validChildren.map(child => ({
+              name: child.name,
+              gender: child.gender,
+              birthDate: child.birthDate?.toISOString(),
+              avatarId: child.avatarId,
+              speechDifficulties: child.speechDifficulties || [],
+              speechDifficultiesDescription: child.speechDifficultiesDescription || "",
+              speechDevelopment: child.speechDevelopment || {},
+              age: calculateAge(child.birthDate)
+            }))
           },
           emailRedirectTo: `${window.location.origin}/`
         }
@@ -128,17 +138,35 @@ export function useRegistration() {
       
       console.log('Registration: User created successfully:', authData.user?.id);
       
-      // If user is created successfully, save children to database
-      if (authData.user) {
-        // Insert children into database with proper age calculation
+      // Sign in the user immediately after registration to establish auth context
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) {
+        console.error('Registration: Auto sign-in failed:', signInError);
+        // Don't fail the registration, just inform the user
+        toast.success("Registracija uspešna! Prijavite se in dodajte otroke ročno v profilu.");
+        navigate("/login");
+        return;
+      }
+
+      console.log('Registration: User signed in successfully after registration');
+      
+      // Now try to save children with proper auth context
+      if (signInData.user && validChildren.length > 0) {
+        // Give a small delay to ensure auth context is fully established
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         const childrenForDB = validChildren.map(child => {
           const age = calculateAge(child.birthDate);
           const childData = {
-            parent_id: authData.user!.id,
+            parent_id: signInData.user.id,
             name: child.name.trim(),
             gender: child.gender,
             birth_date: child.birthDate ? child.birthDate.toISOString().split('T')[0] : null,
-            age: age, // This is now always a valid number
+            age: age,
             avatar_url: `/lovable-uploads/${child.avatarId || 1}.png`,
             speech_difficulties: child.speechDifficulties || [],
             speech_difficulties_description: child.speechDifficultiesDescription || "",
@@ -149,7 +177,7 @@ export function useRegistration() {
           return childData;
         });
 
-        console.log('Registration: Inserting children into database:', childrenForDB);
+        console.log('Registration: Inserting children into database with auth context');
 
         const { data: insertedChildren, error: childrenError } = await supabase
           .from('children')
@@ -163,16 +191,24 @@ export function useRegistration() {
             details: childrenError.details,
             hint: childrenError.hint
           });
-          // Don't fail registration, but show error
-          toast.error(`Registracija uspešna, vendar se otrok ni shranil: ${childrenError.message}`);
+          
+          // Registration was successful, but children saving failed
+          toast.success("Registracija uspešna! Otroke dodajte ročno v profilu.");
+          navigate("/");
+          return;
         } else {
           console.log('Registration: Children inserted successfully:', insertedChildren);
           console.log('Registration: Number of children inserted:', insertedChildren?.length);
           toast.success("Registracija uspešna! Otrok je bil shranjen v profil.");
+          navigate("/");
+          return;
         }
       }
       
-      navigate("/login");
+      // Fallback if no children to save
+      toast.success("Registracija uspešna!");
+      navigate("/");
+      
     } catch (error: any) {
       console.error("Registration: Unexpected error:", error);
       if (error.message.includes("email")) {
