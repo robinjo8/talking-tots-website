@@ -20,7 +20,6 @@ export type ChildProfile = {
 export type Profile = {
   username: string | null;
   children?: ChildProfile[];
-  needsSync?: boolean;
 };
 
 type AuthContextType = {
@@ -32,7 +31,6 @@ type AuthContextType = {
   selectedChildIndex: number | null;
   setSelectedChildIndex: (index: number | null) => void;
   refreshProfile: () => Promise<void>;
-  manualSyncChildren: () => Promise<boolean>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -89,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }));
         console.log("Using database children:", children);
       } else {
-        // Fallback to metadata children if no database children exist
+        // Check metadata for children and auto-sync if found
         console.log("No database children found, checking metadata...");
         
         const { data: userMetadata, error: metadataError } = await supabase.rpc('get_auth_user_data');
@@ -99,41 +97,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } else {
           const metadataObject = userMetadata as any;
           if (metadataObject?.children && Array.isArray(metadataObject.children) && metadataObject.children.length > 0) {
-            // If we have metadata children but no database children, sync them
-            console.log("Found metadata children, syncing to database...");
+            // Auto-sync metadata children to database
+            console.log("Found metadata children, auto-syncing to database...");
             children = await syncChildrenFromMetadata(userId, metadataObject.children);
+            if (children.length > 0) {
+              toast.success("Podatki o otrocih so bili uspešno shranjeni");
+            }
           }
         }
       }
-      
-      // Check for metadata children even if we have database children
-      // This helps detect if registration children weren't saved
-      const { data: userMetadata } = await supabase.rpc('get_auth_user_data');
-      const metadataObject = userMetadata as any;
-      const hasMetadataChildren = metadataObject?.children && Array.isArray(metadataObject.children) && metadataObject.children.length > 0;
-      
-      // Store metadata sync status for UI
-      const needsSync = hasMetadataChildren && children.length === 0;
 
       console.log('Final profile loaded:', {
         username: profileData?.username,
         childrenCount: children.length,
-        children: children,
-        needsSync: needsSync
+        children: children
       });
 
       setProfile({
         username: profileData?.username || null,
-        children,
-        needsSync: needsSync
+        children
       });
     } catch (error) {
       console.error("Error fetching user profile:", error);
       // Set a basic profile even if there's an error to prevent infinite loading
       setProfile({
         username: null,
-        children: [],
-        needsSync: false
+        children: []
       });
     }
   };
@@ -194,27 +183,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Manual sync function for UI use
-  const manualSyncChildren = async (): Promise<boolean> => {
-    if (!user) return false;
-    
-    try {
-      const { data: userMetadata } = await supabase.rpc('get_auth_user_data');
-      const metadataObject = userMetadata as any;
-      
-      if (metadataObject?.children && Array.isArray(metadataObject.children) && metadataObject.children.length > 0) {
-        const syncedChildren = await syncChildrenFromMetadata(user.id, metadataObject.children);
-        if (syncedChildren.length > 0) {
-          await fetchUserProfile(user.id); // Refresh profile
-          return true;
-        }
-      }
-      return false;
-    } catch (error) {
-      console.error("Manual sync failed:", error);
-      return false;
-    }
-  };
 
   const refreshProfile = async () => {
     if (user) {
@@ -331,7 +299,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     selectedChildIndex,
     setSelectedChildIndex,
     refreshProfile,
-    manualSyncChildren,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
