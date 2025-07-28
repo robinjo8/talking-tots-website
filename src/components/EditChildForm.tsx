@@ -92,6 +92,8 @@ export function EditChildForm({ childIndex, initialData, onSuccess, onCancel }: 
         const selectedAvatar = avatarOptions.find(avatar => avatar.id === avatarId);
         const avatarUrl = selectedAvatar?.src || "";
         
+        console.log("Updating child with:", { avatarId, avatarUrl, selectedAvatar });
+        
         const { error: updateError } = await supabase
           .from('children')
           .update({

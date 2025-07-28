@@ -54,7 +54,8 @@ export function ChildProfileDisplay({
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [editingDescription, setEditingDescription] = useState(child.speechDifficultiesDescription || "");
   const [isSavingDescription, setIsSavingDescription] = useState(false);
-  const avatarSrc = getAvatarSrc(child.avatarId);
+  // Use avatar_url from database if available, otherwise derive from avatarId
+  const avatarSrc = child.avatarUrl || getAvatarSrc(child.avatarId);
   
   const formatGender = (gender: string) => {
     switch (gender) {

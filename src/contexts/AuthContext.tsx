@@ -9,6 +9,7 @@ export type ChildProfile = {
   name: string;
   gender: string;
   avatarId: number;
+  avatarUrl?: string;
   age?: number;
   birthDate?: Date | null;
   speechDifficulties?: string[];
@@ -78,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           name: child.name,
           gender: child.gender || 'M',
           avatarId: 1, // Keep for backwards compatibility
+          avatarUrl: child.avatar_url,
           age: child.age,
           birthDate: child.birth_date ? new Date(child.birth_date) : null,
           speechDifficulties: child.speech_difficulties || [],
