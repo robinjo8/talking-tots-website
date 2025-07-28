@@ -32,36 +32,45 @@ type AvatarSelectorProps = {
 
 export function AvatarSelector({ selectedAvatarId, onAvatarSelect }: AvatarSelectorProps) {
   return (
-    <div>
-      <Label className="text-base font-medium">Izberi avatarja</Label>
-      <div className="grid grid-cols-3 gap-6 mt-6 p-4 bg-gray-50/50 rounded-xl border">
+    <div className="w-full">
+      <Label className="text-base font-medium mb-4 block">Izberi avatarja</Label>
+      <div className="grid grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-6 p-6 bg-gray-50/50 rounded-xl border">
         {avatarOptions.map(avatar => (
           <div 
             key={avatar.id}
             onClick={() => onAvatarSelect(avatar.id)}
-            className={`cursor-pointer rounded-xl p-4 transition-all flex items-center justify-center hover:shadow-md ${
+            className={`cursor-pointer rounded-2xl p-6 transition-all duration-200 flex flex-col items-center justify-center min-h-[120px] hover:shadow-lg ${
               selectedAvatarId === avatar.id 
-                ? 'bg-dragon-green/20 ring-2 ring-dragon-green shadow-lg scale-105' 
-                : 'bg-white hover:bg-gray-50 border border-gray-200 hover:border-dragon-green/30'
+                ? 'bg-dragon-green/20 ring-3 ring-dragon-green shadow-xl scale-[1.02]' 
+                : 'bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-dragon-green/40'
             }`}
           >
             {avatar.id === 0 ? (
-              <div className="h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28 rounded-full flex items-center justify-center bg-gray-100 border-2 border-gray-300">
-                <UserX className="h-10 w-10 text-gray-400" />
+              <div className="h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24 rounded-full flex items-center justify-center bg-gray-100 border-2 border-gray-300 mb-2">
+                <UserX className="h-8 w-8 sm:h-10 sm:w-10 text-gray-400" />
                 <span className="sr-only">{avatar.alt}</span>
               </div>
             ) : (
-              <Avatar className="h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28 ring-2 ring-transparent">
-                <AvatarImage src={avatar.src} alt={avatar.alt} className="object-contain" />
-                <AvatarFallback className="text-xs text-center p-1">
-                  {avatar.alt.substring(0, 10)}...
-                </AvatarFallback>
-              </Avatar>
+              <div className="relative">
+                <Avatar className="h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24 ring-2 ring-transparent">
+                  <AvatarImage 
+                    src={avatar.src} 
+                    alt={avatar.alt} 
+                    className="object-contain w-full h-full p-1" 
+                  />
+                  <AvatarFallback className="text-xs text-center p-1 bg-dragon-green/10">
+                    🐲
+                  </AvatarFallback>
+                </Avatar>
+              </div>
             )}
+            <span className="text-xs text-center text-gray-600 mt-2 leading-tight max-w-full break-words">
+              {avatar.id === 0 ? "Brez" : `Zmajček ${avatar.id}`}
+            </span>
           </div>
         ))}
       </div>
-      <div className="mt-4">
+      <div className="mt-6">
         <Button 
           type="button" 
           variant="outline" 
