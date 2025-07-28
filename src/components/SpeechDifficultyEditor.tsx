@@ -12,6 +12,7 @@ type SpeechDifficultyEditorProps = {
   childName: string;
   childId: string;
   initialDifficulties: string[];
+  initialDescription?: string;
 };
 
 export function SpeechDifficultyEditor({ 
@@ -19,12 +20,13 @@ export function SpeechDifficultyEditor({
   onClose, 
   childName, 
   childId, 
-  initialDifficulties 
+  initialDifficulties,
+  initialDescription = ""
 }: SpeechDifficultyEditorProps) {
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const handleSaveDifficulties = async (selectedDifficulties: string[]) => {
+  const handleSaveDifficulties = async (selectedDifficulties: string[], detailedDescription?: string) => {
     if (!user) {
       toast.error("Morate biti prijavljeni za urejanje motenj.");
       return;
@@ -37,7 +39,8 @@ export function SpeechDifficultyEditor({
       const { error: updateError } = await supabase
         .from('children')
         .update({ 
-          speech_difficulties: selectedDifficulties 
+          speech_difficulties: selectedDifficulties,
+          speech_difficulties_description: detailedDescription || ''
         })
         .eq('id', childId)
         .eq('parent_id', user.id);
@@ -75,6 +78,7 @@ export function SpeechDifficultyEditor({
             onBack={handleGoBack}
             onSubmit={handleSaveDifficulties}
             initialDifficulties={initialDifficulties}
+            initialDescription={initialDescription}
             submitButtonText={isSubmitting ? "Shranjevanje..." : "Shrani spremembe"}
           />
         </div>

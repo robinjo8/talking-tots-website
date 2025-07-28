@@ -13,6 +13,7 @@ interface SpeechDifficultiesStepProps {
   onSubmit: (selectedDifficulties: string[], detailedDescription?: string) => void;
   childName: string;
   initialDifficulties?: string[];
+  initialDescription?: string;
   submitButtonText?: string;
 }
 
@@ -21,14 +22,19 @@ export function SpeechDifficultiesStep({
   onSubmit, 
   childName,
   initialDifficulties = [],
+  initialDescription = "",
   submitButtonText = "Naprej"
 }: SpeechDifficultiesStepProps) {
   const [hasArticulationDisorder, setHasArticulationDisorder] = useState<boolean>(
     initialDifficulties.includes("articulation")
   );
-  const [detailedDescription, setDetailedDescription] = useState<string>("");
-  const [dontKnow, setDontKnow] = useState<boolean>(false);
-  const [notSure, setNotSure] = useState<boolean>(false);
+  const [detailedDescription, setDetailedDescription] = useState<string>(initialDescription);
+  const [dontKnow, setDontKnow] = useState<boolean>(
+    initialDifficulties.includes("dont_know")
+  );
+  const [notSure, setNotSure] = useState<boolean>(
+    initialDifficulties.includes("not_sure")
+  );
 
   const handleArticulationChange = (checked: boolean) => {
     setHasArticulationDisorder(checked);

@@ -174,6 +174,7 @@ export default function Profile() {
             childName={profile.children[editingDifficultiesIndex].name}
             childId={profile.children[editingDifficultiesIndex].id}
             initialDifficulties={profile.children[editingDifficultiesIndex].speechDifficulties || []}
+            initialDescription={profile.children[editingDifficultiesIndex].speechDifficultiesDescription || ""}
           />
         )}
         
