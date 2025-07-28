@@ -84,15 +84,7 @@ export type Database = {
           speech_difficulties_description?: string | null
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "children_parent_id_fkey"
-            columns: ["parent_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       exercises: {
         Row: {
