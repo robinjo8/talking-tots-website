@@ -60,5 +60,17 @@ export const SPEECH_DIFFICULTIES: SpeechDifficulty[] = [
     icon: "🔊",
     title: "Slaba sposobnost zavedanja in ločevanja glasov",
     description: "Otrok težko sliši razliko med podobnimi glasovi. Pogosto vodi v težave pri branju, pisanju ali disleksijo."
+  },
+  {
+    id: "dont_know",
+    icon: "❓",
+    title: "Ne vem",
+    description: "Nisem prepričan/a, kakšne govorne težave ima otrok."
+  },
+  {
+    id: "not_sure",
+    icon: "🤔",
+    title: "Nisem prepričan/a",
+    description: "Nisem prepričan/a, ali ima otrok govorne težave."
   }
 ];

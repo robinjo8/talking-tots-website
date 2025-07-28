@@ -216,66 +216,23 @@ export function ChildProfileDisplay({
             </div>
             
             {child.speechDifficulties && child.speechDifficulties.length > 0 ? (
-              <SpeechDifficultiesList 
-                difficultiesIds={child.speechDifficulties} 
-                showDescription={true}
-              />
+              <div className="space-y-3">
+                <SpeechDifficultiesList 
+                  difficultiesIds={child.speechDifficulties} 
+                  showDescription={true}
+                />
+                
+                {child.speechDifficultiesDescription && (
+                  <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                    <p className="text-sm font-medium text-gray-700 mb-2">Dodaten opis:</p>
+                    <p className="text-sm text-gray-600">{child.speechDifficultiesDescription}</p>
+                  </div>
+                )}
+              </div>
             ) : (
               <p className="text-gray-500 text-sm italic">
                 Ni zabeleženih govornih motenj
               </p>
-            )}
-            
-            {(child.speechDifficultiesDescription || isEditingDescription) && (
-              <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-medium text-gray-700">Dodaten opis:</p>
-                  {!isEditingDescription && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setEditingDescription(child.speechDifficultiesDescription || "");
-                        setIsEditingDescription(true);
-                      }}
-                      className="border-app-purple text-app-purple hover:bg-app-purple/10"
-                    >
-                      <Pencil className="h-3 w-3 mr-1" />
-                      Uredi
-                    </Button>
-                  )}
-                </div>
-                {isEditingDescription ? (
-                  <div className="space-y-2">
-                    <Input
-                      value={editingDescription}
-                      onChange={(e) => setEditingDescription(e.target.value)}
-                      placeholder="Vnesite dodaten opis govornih težav..."
-                      className="text-sm"
-                    />
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        onClick={handleSaveDescription}
-                        disabled={isSavingDescription}
-                        className="bg-dragon-green hover:bg-dragon-green/90"
-                      >
-                        {isSavingDescription ? "Shranjevanje..." : "Shrani"}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setIsEditingDescription(false)}
-                        disabled={isSavingDescription}
-                      >
-                        Prekliči
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-600">{child.speechDifficultiesDescription}</p>
-                )}
-              </div>
             )}
           </CardContent>
         </Card>
