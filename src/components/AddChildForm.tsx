@@ -25,9 +25,9 @@ interface SavedChild {
   speechDevelopment: Record<string, string>;
 }
 
-export function AddChildForm({ onSuccess }: { onSuccess?: () => void }) {
+export function AddChildForm({ onSuccess, initialName }: { onSuccess?: () => void; initialName?: string }) {
   const { user } = useAuth();
-  const [name, setName] = useState("");
+  const [name, setName] = useState(initialName || "");
   const [gender, setGender] = useState("M");
   const [avatarId, setAvatarId] = useState(1);
   const [birthDate, setBirthDate] = useState<Date | null>(null);

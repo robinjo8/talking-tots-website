@@ -5,7 +5,7 @@ import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Users, ChevronDown, ChevronUp, RefreshCw } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChildDatabaseManager } from "@/components/children/ChildDatabaseManager";
+import { SimpleChildForm } from "@/components/profile/SimpleChildForm";
 import { ChildProfileDisplay } from "@/components/profile/ChildProfileDisplay";
 import { toast } from "sonner";
 
@@ -76,7 +76,10 @@ export function ChildrenProfilesSection({
                   </div>
 
                   {showDatabaseManager && (
-                    <ChildDatabaseManager />
+                    <SimpleChildForm onSuccess={() => {
+                      setShowDatabaseManager(false);
+                      window.location.reload();
+                    }} />
                   )}
                 </>
               )}
