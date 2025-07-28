@@ -9,7 +9,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { AvatarSelector } from "@/components/AvatarSelector";
+import { AvatarSelector, avatarOptions } from "@/components/AvatarSelector";
 import { GenderSelector } from "@/components/GenderSelector";
 
 type ChildData = {
@@ -88,6 +88,10 @@ export function EditChildForm({ childIndex, initialData, onSuccess, onCancel }: 
       if (children && childIndex >= 0 && childIndex < children.length) {
         const childToUpdate = children[childIndex];
         
+        // Get the correct avatar URL from avatarOptions
+        const selectedAvatar = avatarOptions.find(avatar => avatar.id === avatarId);
+        const avatarUrl = selectedAvatar?.src || "";
+        
         const { error: updateError } = await supabase
           .from('children')
           .update({
@@ -96,7 +100,7 @@ export function EditChildForm({ childIndex, initialData, onSuccess, onCancel }: 
             age: calculatedAge,
             birth_date: birthDate ? 
               `${birthDate.getFullYear()}-${String(birthDate.getMonth() + 1).padStart(2, '0')}-${String(birthDate.getDate()).padStart(2, '0')}` : null,
-            avatar_url: `/lovable-uploads/avatar-${avatarId}.png`
+            avatar_url: avatarUrl
           })
           .eq('id', childToUpdate.id);
         
@@ -112,7 +116,7 @@ export function EditChildForm({ childIndex, initialData, onSuccess, onCancel }: 
             name: name.trim(),
             gender,
             avatarId,
-            avatarUrl: `/lovable-uploads/avatar-${avatarId}.png`,
+            avatarUrl,
             birthDate,
             age: calculatedAge
           };
