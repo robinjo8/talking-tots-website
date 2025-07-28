@@ -15,6 +15,7 @@ type ChildrenProfilesSectionProps = {
   setEditingChildIndex: (index: number | null) => void;
   setDeletingChildIndex: (index: number | null) => void;
   setEditingDifficultiesIndex: (index: number | null) => void;
+  setEditingDevelopmentIndex: (index: number | null) => void;
 };
 
 export function ChildrenProfilesSection({
@@ -23,6 +24,7 @@ export function ChildrenProfilesSection({
   setEditingChildIndex,
   setDeletingChildIndex,
   setEditingDifficultiesIndex,
+  setEditingDevelopmentIndex
 }: ChildrenProfilesSectionProps) {
   const { profile, selectedChildIndex, setSelectedChildIndex } = useAuth();
   const [showDatabaseManager, setShowDatabaseManager] = useState(false);
@@ -99,14 +101,21 @@ export function ChildrenProfilesSection({
                 </>
               )}
 
-              {/* Child profile display - single child layout */}
+              {/* Child profiles display */}
               {profile?.children && profile.children.length > 0 ? (
-                <ChildProfileDisplay
-                  child={profile.children[0]}
-                  onEdit={() => setEditingChildIndex(0)}
-                  onDelete={() => setDeletingChildIndex(0)}
-                  onRefresh={() => window.location.reload()}
-                />
+                <div className="space-y-6">
+                  {profile.children.map((child, index) => (
+                    <ChildProfileDisplay
+                      key={child.id}
+                      child={child}
+                      onEdit={() => setEditingChildIndex(index)}
+                      onDelete={() => setDeletingChildIndex(index)}
+                      onRefresh={() => window.location.reload()}
+                      onEditDifficulties={() => setEditingDifficultiesIndex(index)}
+                      onEditDevelopment={() => setEditingDevelopmentIndex(index)}
+                    />
+                  ))}
+                </div>
               ) : !showDatabaseManager && (
                 <div className="text-center py-8">
                   <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />

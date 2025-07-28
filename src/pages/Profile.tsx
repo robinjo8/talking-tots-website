@@ -8,6 +8,7 @@ import { User } from "lucide-react";
 import { DeleteChildDialog } from "@/components/DeleteChildDialog";
 import { EditChildModal } from "@/components/EditChildModal";
 import { SpeechDifficultyEditor } from "@/components/SpeechDifficultyEditor";
+import { SpeechDevelopmentEditor } from "@/components/children/SpeechDevelopmentEditor";
 import { UserProfileSection } from "@/components/profile/UserProfileSection";
 import { PasswordChangeSection } from "@/components/profile/PasswordChangeSection";
 import { ChildrenProfilesSection } from "@/components/profile/ChildrenProfilesSection";
@@ -25,6 +26,7 @@ export default function Profile() {
   // Child profile management state
   const [editingChildIndex, setEditingChildIndex] = useState<number | null>(null);
   const [editingDifficultiesIndex, setEditingDifficultiesIndex] = useState<number | null>(null);
+  const [editingDevelopmentIndex, setEditingDevelopmentIndex] = useState<number | null>(null);
   const [deletingChildIndex, setDeletingChildIndex] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -130,6 +132,7 @@ export default function Profile() {
             setEditingChildIndex={setEditingChildIndex}
             setDeletingChildIndex={setDeletingChildIndex}
             setEditingDifficultiesIndex={setEditingDifficultiesIndex}
+            setEditingDevelopmentIndex={setEditingDevelopmentIndex}
           />
           
           {/* Subscription Section */}
@@ -171,6 +174,16 @@ export default function Profile() {
             childName={profile.children[editingDifficultiesIndex].name}
             childIndex={editingDifficultiesIndex}
             initialDifficulties={profile.children[editingDifficultiesIndex].speechDifficulties || []}
+          />
+        )}
+        
+        {editingDevelopmentIndex !== null && profile?.children && (
+          <SpeechDevelopmentEditor
+            open={editingDevelopmentIndex !== null}
+            onClose={() => setEditingDevelopmentIndex(null)}
+            childName={profile.children[editingDevelopmentIndex].name}
+            childIndex={editingDevelopmentIndex}
+            initialAnswers={profile.children[editingDevelopmentIndex].speechDevelopment || {}}
           />
         )}
       </div>

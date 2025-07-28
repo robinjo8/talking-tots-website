@@ -16,6 +16,8 @@ type ChildProfileDisplayProps = {
   onEdit?: () => void;
   onDelete?: () => void;
   onRefresh?: () => void;
+  onEditDifficulties?: () => void;
+  onEditDevelopment?: () => void;
 };
 
 const getAvatarSrc = (avatarId: number): string => {
@@ -46,6 +48,8 @@ export function ChildProfileDisplay({
   onEdit, 
   onDelete,
   onRefresh,
+  onEditDifficulties,
+  onEditDevelopment,
 }: ChildProfileDisplayProps) {
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [editingDescription, setEditingDescription] = useState(child.speechDifficultiesDescription || "");
@@ -193,10 +197,23 @@ export function ChildProfileDisplay({
         {/* Left column: Speech Issues */}
         <Card className="h-fit">
           <CardContent className="p-6">
-            <h5 className="font-semibold text-lg text-gray-800 mb-4 flex items-center gap-2">
-              <FileEdit className="h-5 w-5 text-app-purple" />
-              Govorne težave
-            </h5>
+            <div className="flex items-center justify-between mb-4">
+              <h5 className="font-semibold text-lg text-gray-800 flex items-center gap-2">
+                <FileEdit className="h-5 w-5 text-app-purple" />
+                Govorne težave
+              </h5>
+              {onEditDifficulties && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onEditDifficulties}
+                  className="border-app-purple text-app-purple hover:bg-app-purple/10"
+                >
+                  <Pencil className="h-3 w-3 mr-1" />
+                  Uredi
+                </Button>
+              )}
+            </div>
             
             {child.speechDifficulties && child.speechDifficulties.length > 0 ? (
               <SpeechDifficultiesList 
@@ -266,15 +283,28 @@ export function ChildProfileDisplay({
         {/* Right column: Basic Questionnaire */}
         <Card className="h-fit">
           <CardContent className="p-6">
-            <h5 className="font-semibold text-lg text-gray-800 mb-4 flex items-center gap-2">
-              <MessageSquare className="h-5 w-5 text-app-blue" />
-              Osnovni vprašalnik
-              {child.isComplete && (
-                <Badge variant="default" className="text-xs bg-dragon-green text-white ml-2">
-                  Izpolnjeno
-                </Badge>
+            <div className="flex items-center justify-between mb-4">
+              <h5 className="font-semibold text-lg text-gray-800 flex items-center gap-2">
+                <MessageSquare className="h-5 w-5 text-app-blue" />
+                Osnovni vprašalnik
+                {child.isComplete && (
+                  <Badge variant="default" className="text-xs bg-dragon-green text-white ml-2">
+                    Izpolnjeno
+                  </Badge>
+                )}
+              </h5>
+              {onEditDevelopment && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onEditDevelopment}
+                  className="border-app-blue text-app-blue hover:bg-app-blue/10"
+                >
+                  <Pencil className="h-3 w-3 mr-1" />
+                  Uredi
+                </Button>
               )}
-            </h5>
+            </div>
             
             {child.speechDevelopment && Object.keys(child.speechDevelopment).length > 0 ? (
               <div className="space-y-3">
