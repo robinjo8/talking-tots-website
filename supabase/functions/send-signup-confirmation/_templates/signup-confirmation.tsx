@@ -32,7 +32,7 @@ export const SignupConfirmationEmail = ({
 }: SignupConfirmationEmailProps) => (
   <Html>
     <Head />
-    <Preview>Potrdi svoj račun pri TomiTalk</Preview>
+    <Preview>Potrdite registracijo na TomiTalk</Preview>
     <Body style={main}>
       <Container style={container}>
         {/* Header with Logo */}
@@ -45,18 +45,18 @@ export const SignupConfirmationEmail = ({
 
         {/* Welcome Content */}
         <Section style={content}>
-          <Heading style={h1}>Dobrodošli pri TomiTalk! 🐉</Heading>
+          <Heading style={h1}>Dobrodošli pri TomiTalk!</Heading>
           
           <Text style={text}>
             Pozdravljeni!
           </Text>
           
           <Text style={text}>
-            Hvala, ker se pridružujete naši skupnosti staršev, ki pomagajo svojim otrokom pri odpravljanju govornih težav.
+            Veseli nas, da ste se pridružili TomiTalk – prvi slovenski govorni aplikaciji, ki otrokom pomaga pri premagovanju govornih izzivov na zabaven in učinkovit način.
           </Text>
 
           <Text style={text}>
-            Za dokončanje registracije kliknite spodnjo povezavo:
+            Preden začnete uporabljati vse funkcionalnosti, vas prosimo, da potrdite svoj račun s klikom na spodnjo povezavo:
           </Text>
 
           {/* Main CTA Button */}
@@ -69,24 +69,23 @@ export const SignupConfirmationEmail = ({
             </Button>
           </Section>
 
-          <Text style={smallText}>
-            Ali pa kopirajte in prilepite to kodo za potrditev:
-          </Text>
-          <code style={code}>{token}</code>
-
           <Text style={text}>
-            Ko boste potrdili svoj račun, boste lahko:
+            Po potrditvi boste lahko:
           </Text>
           
           <Text style={featureText}>
-            ✅ Dodali profile svojih otrok<br/>
-            ✅ Dostopali do personaliziranih vaj<br/>
-            ✅ Spremljali napredek pri govornih vajah<br/>
-            ✅ Uporabljali AI pomočnika za govorne težave
+            • dostopali do prilagojenih vaj in iger,<br/>
+            • spremljali napredek pri govoru,<br/>
+            • uporabljali naprednega AI pomočnika za govorno vadbo.
           </Text>
 
           <Text style={text}>
             Vaje so zasnovane na logopedskih smernicah in prilagojene starosti ter specifičnim potrebam vašega otroka.
+          </Text>
+
+          <Text style={smallText}>
+            Če se povezava ne odpre, kopirajte in prilepite naslednji naslov v svoj brskalnik:<br/>
+            {`${supabase_url}/auth/v1/verify?token=${token_hash}&type=${email_action_type}&redirect_to=${redirect_to}`}
           </Text>
         </Section>
 
@@ -97,7 +96,14 @@ export const SignupConfirmationEmail = ({
           </Text>
           <Text style={footerText}>
             S spoštovanjem,<br/>
-            <span style={logoTextGreen}>Tomi</span><span style={logoTextOrange}>Talk</span> ekipa
+            <span style={logoTextGreen}>Tomi</span><span style={logoTextOrange}>Talk</span>
+          </Text>
+        </Section>
+        
+        <Section style={footer}>
+          <Text style={footerText}>
+            To sporočilo ste prejeli, ker ste se prijavili v TomiTalk.<br/>
+            Če teh e-poštnih sporočil ne želite več prejemati, se lahko odjavite.
           </Text>
         </Section>
       </Container>
@@ -189,7 +195,7 @@ const buttonContainer = {
 
 const button = {
   backgroundColor: 'hsl(122, 39%, 49%)', // dragon-green
-  color: '#ffffff',
+  color: 'hsl(36, 100%, 50%)', // app-orange
   fontSize: '18px',
   fontWeight: 'bold',
   textDecoration: 'none',
