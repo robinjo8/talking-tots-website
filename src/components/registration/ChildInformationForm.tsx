@@ -156,41 +156,51 @@ export function ChildInformationForm({
                 </div>
                 
                 <div>
-                  <Label>Izberi avatarja</Label>
+                  <Label className="text-base font-medium mb-4 block">Izberi avatarja</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
-                        className="w-full mt-2 justify-between h-12"
+                        className="w-full mt-2 justify-between h-16 bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-dragon-green/40"
                       >
                         <div className="flex items-center justify-center">
                           {child.avatarId === 0 || !child.avatarId ? (
-                            <UserX className="h-8 w-8 text-gray-400" />
+                            <UserX className="h-10 w-10 text-gray-400" />
                           ) : (
-                            <Avatar className="h-8 w-8">
-                              <AvatarImage src={avatarOptions.find(a => a.id === child.avatarId)?.src} alt="Avatar" />
+                            <Avatar className="h-12 w-12 ring-2 ring-dragon-green/20">
+                              <AvatarImage src={avatarOptions.find(a => a.id === child.avatarId)?.src} alt="Avatar" className="object-contain" />
                               <AvatarFallback className="text-xs">A</AvatarFallback>
                             </Avatar>
                           )}
                         </div>
-                        <ChevronDown className="h-4 w-4 opacity-50" />
+                        <ChevronDown className="h-5 w-5 opacity-50" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-80 p-4 bg-white border shadow-lg z-50">
-                      <div className="grid grid-cols-3 gap-3">
+                    <PopoverContent className="w-[600px] p-6 bg-white border-2 shadow-xl z-50" align="start">
+                      <h4 className="text-lg font-medium mb-4 text-center">Izberi avatarja za otroka</h4>
+                      <div className="grid grid-cols-5 gap-4 mb-6">
                         {avatarOptions.slice(1).map(avatar => (
                           <div 
                             key={avatar.id}
                             onClick={() => updateChildField(child.id, "avatarId", avatar.id)}
                             className={cn(
-                              "cursor-pointer rounded-lg p-2 transition-all flex items-center justify-center hover:bg-gray-100",
-                              child.avatarId === avatar.id && "bg-dragon-green/20 ring-2 ring-dragon-green"
+                              "cursor-pointer rounded-xl p-4 transition-all duration-200 flex flex-col items-center justify-center min-h-[100px] hover:shadow-lg border-2",
+                              child.avatarId === avatar.id 
+                                ? "bg-dragon-green/20 ring-3 ring-dragon-green shadow-xl scale-[1.02] border-dragon-green" 
+                                : "bg-white hover:bg-gray-50 border-gray-200 hover:border-dragon-green/40"
                             )}
                           >
-                            <Avatar className="h-12 w-12">
-                              <AvatarImage src={avatar.src} alt={avatar.alt} />
-                              <AvatarFallback className="text-xs">A</AvatarFallback>
+                            <Avatar className="h-16 w-16 lg:h-20 lg:w-20 ring-2 ring-transparent mb-2">
+                              <AvatarImage 
+                                src={avatar.src} 
+                                alt={avatar.alt} 
+                                className="object-contain w-full h-full p-1" 
+                              />
+                              <AvatarFallback className="text-xs bg-dragon-green/10">🐲</AvatarFallback>
                             </Avatar>
+                            <span className="text-xs text-center text-gray-600 leading-tight max-w-full break-words">
+                              Zmajček {avatar.id}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -199,9 +209,9 @@ export function ChildInformationForm({
                         variant="outline" 
                         size="sm" 
                         onClick={() => updateChildField(child.id, "avatarId", 0)}
-                        className="w-full mt-4"
+                        className="w-full"
                       >
-                        Ne želim izbrati
+                        Ne želim izbrati avatarja
                       </Button>
                     </PopoverContent>
                   </Popover>
