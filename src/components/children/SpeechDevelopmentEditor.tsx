@@ -43,6 +43,11 @@ export function SpeechDevelopmentEditor({
       const currentMetadata = currentUser.user_metadata || {};
       const currentChildren = [...(currentMetadata.children || [])];
       
+      // Debug logging
+      console.log('Child index:', childIndex);
+      console.log('Current children count:', currentChildren.length);
+      console.log('Current children:', currentChildren);
+      
       // Update development data for the specific child
       if (childIndex >= 0 && childIndex < currentChildren.length) {
         currentChildren[childIndex] = {
@@ -60,6 +65,7 @@ export function SpeechDevelopmentEditor({
         toast.success("Podatki o razvoju uspešno posodobljeni!");
         onClose();
       } else {
+        console.error(`Invalid child index: ${childIndex}, children length: ${currentChildren.length}`);
         toast.error("Napaka pri posodobitvi. Indeks ni veljaven.");
       }
       

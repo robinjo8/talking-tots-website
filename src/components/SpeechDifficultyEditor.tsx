@@ -44,6 +44,11 @@ export function SpeechDifficultyEditor({
       const metadataObject = userMetadata as any;
       const currentChildren = [...(metadataObject?.children || [])];
       
+      // Debug logging
+      console.log('Child index:', childIndex);
+      console.log('Current children count:', currentChildren.length);
+      console.log('Current children:', currentChildren);
+      
       // Update difficulties for the specific child
       if (childIndex >= 0 && childIndex < currentChildren.length) {
         currentChildren[childIndex] = {
@@ -65,6 +70,7 @@ export function SpeechDifficultyEditor({
         
         onClose();
       } else {
+        console.error(`Invalid child index: ${childIndex}, children length: ${currentChildren.length}`);
         toast.error("Napaka pri posodobitvi motenj. Indeks ni veljaven.");
       }
       
