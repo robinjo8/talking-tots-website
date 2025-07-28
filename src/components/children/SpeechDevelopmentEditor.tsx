@@ -11,7 +11,7 @@ type SpeechDevelopmentEditorProps = {
   open: boolean;
   onClose: () => void;
   childName: string;
-  childIndex: number;
+  childId: string;
   initialAnswers: Record<string, string>;
 };
 
@@ -19,7 +19,7 @@ export function SpeechDevelopmentEditor({
   open,
   onClose,
   childName,
-  childIndex,
+  childId,
   initialAnswers
 }: SpeechDevelopmentEditorProps) {
   const { user } = useAuth();
@@ -34,40 +34,22 @@ export function SpeechDevelopmentEditor({
     try {
       setIsSubmitting(true);
       
-      // Get current user metadata
-      const { data: userData, error: userError } = await supabase.auth.getUser();
-      
-      if (userError) throw userError;
-      
-      const currentUser = userData.user;
-      const currentMetadata = currentUser.user_metadata || {};
-      const currentChildren = [...(currentMetadata.children || [])];
-      
-      // Debug logging
-      console.log('Child index:', childIndex);
-      console.log('Current children count:', currentChildren.length);
-      console.log('Current children:', currentChildren);
-      
-      // Update development data for the specific child
-      if (childIndex >= 0 && childIndex < currentChildren.length) {
-        currentChildren[childIndex] = {
-          ...currentChildren[childIndex],
-          speechDevelopment: answers
-        };
+      // Update speech development directly in database
+      const { error: updateError } = await supabase
+        .from('children')
+        .update({ 
+          speech_development: answers 
+        })
+        .eq('id', childId)
+        .eq('parent_id', user.id);
         
-        // Update user metadata
-        const { error: updateError } = await supabase.auth.updateUser({
-          data: { children: currentChildren }
-        });
-        
-        if (updateError) throw updateError;
-        
-        toast.success("Podatki o razvoju uspešno posodobljeni!");
-        onClose();
-      } else {
-        console.error(`Invalid child index: ${childIndex}, children length: ${currentChildren.length}`);
-        toast.error("Napaka pri posodobitvi. Indeks ni veljaven.");
-      }
+      if (updateError) throw updateError;
+      
+      toast.success("Podatki o razvoju uspešno posodobljeni!");
+      onClose();
+      
+      // Refresh the page to show updated data
+      window.location.reload();
       
     } catch (error: any) {
       console.error("Napaka pri posodobitvi podatkov o razvoju:", error);

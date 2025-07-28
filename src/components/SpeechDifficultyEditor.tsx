@@ -10,7 +10,7 @@ type SpeechDifficultyEditorProps = {
   open: boolean;
   onClose: () => void;
   childName: string;
-  childIndex: number;
+  childId: string;
   initialDifficulties: string[];
 };
 
@@ -18,7 +18,7 @@ export function SpeechDifficultyEditor({
   open, 
   onClose, 
   childName, 
-  childIndex, 
+  childId, 
   initialDifficulties 
 }: SpeechDifficultyEditorProps) {
   const { user } = useAuth();
@@ -33,46 +33,22 @@ export function SpeechDifficultyEditor({
     try {
       setIsSubmitting(true);
       
-      // Get complete user metadata including raw data using RPC
-      const { data: userMetadata, error: metadataError } = await supabase.rpc('get_auth_user_data');
+      // Update speech difficulties directly in database
+      const { error: updateError } = await supabase
+        .from('children')
+        .update({ 
+          speech_difficulties: selectedDifficulties 
+        })
+        .eq('id', childId)
+        .eq('parent_id', user.id);
+        
+      if (updateError) throw updateError;
       
-      if (metadataError) {
-        console.error('Error fetching user metadata:', metadataError);
-        throw metadataError;
-      }
+      toast.success("Govorne motnje uspešno posodobljene!");
+      onClose();
       
-      const metadataObject = userMetadata as any;
-      const currentChildren = [...(metadataObject?.children || [])];
-      
-      // Debug logging
-      console.log('Child index:', childIndex);
-      console.log('Current children count:', currentChildren.length);
-      console.log('Current children:', currentChildren);
-      
-      // Update difficulties for the specific child
-      if (childIndex >= 0 && childIndex < currentChildren.length) {
-        currentChildren[childIndex] = {
-          ...currentChildren[childIndex],
-          speechDifficulties: selectedDifficulties
-        };
-        
-        // Update user metadata
-        const { error: updateError } = await supabase.auth.updateUser({
-          data: { children: currentChildren }
-        });
-        
-        if (updateError) throw updateError;
-        
-        toast.success("Govorne motnje uspešno posodobljene!");
-        
-        // Refresh the auth context to get updated data
-        window.location.reload();
-        
-        onClose();
-      } else {
-        console.error(`Invalid child index: ${childIndex}, children length: ${currentChildren.length}`);
-        toast.error("Napaka pri posodobitvi motenj. Indeks ni veljaven.");
-      }
+      // Refresh the page to show updated data
+      window.location.reload();
       
     } catch (error: any) {
       console.error("Napaka pri posodobitvi motenj:", error);

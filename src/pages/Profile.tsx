@@ -172,7 +172,7 @@ export default function Profile() {
             open={editingDifficultiesIndex !== null}
             onClose={() => setEditingDifficultiesIndex(null)}
             childName={profile.children[editingDifficultiesIndex].name}
-            childIndex={editingDifficultiesIndex}
+            childId={profile.children[editingDifficultiesIndex].id}
             initialDifficulties={profile.children[editingDifficultiesIndex].speechDifficulties || []}
           />
         )}
@@ -182,7 +182,7 @@ export default function Profile() {
             open={editingDevelopmentIndex !== null}
             onClose={() => setEditingDevelopmentIndex(null)}
             childName={profile.children[editingDevelopmentIndex].name}
-            childIndex={editingDevelopmentIndex}
+            childId={profile.children[editingDevelopmentIndex].id}
             initialAnswers={profile.children[editingDevelopmentIndex].speechDevelopment || {}}
           />
         )}
