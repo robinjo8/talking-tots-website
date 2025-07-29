@@ -191,6 +191,54 @@ export type Database = {
         }
         Relationships: []
       }
+      memory_cards_c: {
+        Row: {
+          audio_url: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          word: string | null
+        }
+        Insert: {
+          audio_url?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          word?: string | null
+        }
+        Update: {
+          audio_url?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          word?: string | null
+        }
+        Relationships: []
+      }
+      memory_cards_Č: {
+        Row: {
+          audio_url: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          word: string | null
+        }
+        Insert: {
+          audio_url?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          word?: string | null
+        }
+        Update: {
+          audio_url?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          word?: string | null
+        }
+        Relationships: []
+      }
       memory_cards_K: {
         Row: {
           audio_url: string | null
@@ -206,6 +254,30 @@ export type Database = {
         }
         Update: {
           audio_url?: string | null
+          id?: string
+          image_url?: string | null
+          word?: string | null
+        }
+        Relationships: []
+      }
+      memory_cards_l: {
+        Row: {
+          audio_url: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          word: string | null
+        }
+        Insert: {
+          audio_url?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          word?: string | null
+        }
+        Update: {
+          audio_url?: string | null
+          created_at?: string
           id?: string
           image_url?: string | null
           word?: string | null
@@ -248,6 +320,54 @@ export type Database = {
         }
         Update: {
           audio_url?: string | null
+          id?: string
+          image_url?: string | null
+          word?: string | null
+        }
+        Relationships: []
+      }
+      memory_cards_z: {
+        Row: {
+          audio_url: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          word: string | null
+        }
+        Insert: {
+          audio_url?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          word?: string | null
+        }
+        Update: {
+          audio_url?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          word?: string | null
+        }
+        Relationships: []
+      }
+      memory_cards_Ž: {
+        Row: {
+          audio_url: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          word: string | null
+        }
+        Insert: {
+          audio_url?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          word?: string | null
+        }
+        Update: {
+          audio_url?: string | null
+          created_at?: string
           id?: string
           image_url?: string | null
           word?: string | null
