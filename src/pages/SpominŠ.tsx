@@ -9,6 +9,7 @@ import { useMemoryGameŠ } from "@/hooks/useMemoryGameŠ";
 import { useToast } from "@/components/ui/use-toast";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { InfoModal } from "@/components/games/InfoModal";
+import { MemoryGameTestControls } from "@/components/games/MemoryGameTestControls";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function SpominŠ() {
@@ -191,6 +192,14 @@ export default function SpominŠ() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Test Controls - only show on desktop */}
+        {!effectiveFullscreen && (
+          <MemoryGameTestControls 
+            gameSubtype="Š" 
+            completionCount={0} 
+          />
+        )}
 
         <div className={`${effectiveFullscreen ? 'flex-1 px-2 pb-2 overflow-hidden' : 'flex-1 flex justify-center items-center min-h-0'}`}>
           <div className={`w-full ${effectiveFullscreen ? 'h-full' : 'max-w-4xl h-full'} flex items-center justify-center`}>
