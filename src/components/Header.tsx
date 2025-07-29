@@ -8,13 +8,12 @@ export default function Header() {
   const {
     user,
     profile,
-    selectedChildIndex,
-    setSelectedChildIndex,
+    selectedChild,
     signOut
   } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const selectedChild = selectedChildIndex !== null && profile?.children ? profile.children[selectedChildIndex] : null;
+  
   const handleStartNow = () => {
     // If not logged in, redirect to login page
     if (!user) {
@@ -47,18 +46,6 @@ export default function Header() {
           });
         }
       }, 300);
-    }
-  };
-  const handleSelectChild = (index: number | null) => {
-    try {
-      setSelectedChildIndex(index);
-      if (index !== null) {
-        localStorage.setItem('selectedChildIndex', index.toString());
-      } else {
-        localStorage.removeItem('selectedChildIndex');
-      }
-    } catch (error) {
-      console.error("Napaka pri izbiri otroka:", error);
     }
   };
   const handleSignOut = async () => {
@@ -111,7 +98,7 @@ export default function Header() {
         </Link>
         
         {/* Mobile menu and profile on far right */}
-        <MobileMenu user={user} profile={profile} selectedChildIndex={selectedChildIndex} selectedChild={selectedChild} onSelectChild={handleSelectChild} onSignOut={handleSignOut} onStartNow={handleStartNow} onCenikScroll={handleCenikScroll} />
+        <MobileMenu user={user} profile={profile} selectedChild={selectedChild} onSignOut={handleSignOut} onStartNow={handleStartNow} onCenikScroll={handleCenikScroll} />
       </div>
     </header>;
 }

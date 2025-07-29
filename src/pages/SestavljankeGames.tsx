@@ -6,10 +6,8 @@ import { useAuth } from "@/contexts/AuthContext";
 export default function SestavljankeGames() {
   const navigate = useNavigate();
   const {
-    profile,
-    selectedChildIndex
+    selectedChild
   } = useAuth();
-  const selectedChild = profile?.children?.[selectedChildIndex ?? 0];
   const childName = selectedChild?.name;
 const consonants = [
   {

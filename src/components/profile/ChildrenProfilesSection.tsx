@@ -26,7 +26,7 @@ export function ChildrenProfilesSection({
   setEditingDifficultiesIndex,
   setEditingDevelopmentIndex
 }: ChildrenProfilesSectionProps) {
-  const { profile, selectedChildIndex, setSelectedChildIndex } = useAuth();
+  const { profile } = useAuth();
   const [showDatabaseManager, setShowDatabaseManager] = useState(false);
 
   return (

@@ -32,10 +32,8 @@ const consonants = [
 const VideoNavodila = () => {
   const navigate = useNavigate();
   const {
-    profile,
-    selectedChildIndex
+    selectedChild
   } = useAuth();
-  const selectedChild = profile?.children?.[selectedChildIndex ?? 0];
   const childName = selectedChild?.name;
 
   const handleLetterClick = (letter: string, available: boolean) => {

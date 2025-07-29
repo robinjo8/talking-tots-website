@@ -5,17 +5,14 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { ProgressSection } from "@/components/ProgressSection";
 import { TipSection } from "@/components/TipSection";
-import { NoChildSelected } from "@/components/NoChildSelected";
+
 import { FooterSection } from "@/components/FooterSection";
 
 
 const MojaStran = () => {
-  const { user, profile, signOut, selectedChildIndex } = useAuth();
+  const { user, selectedChild, signOut } = useAuth();
   const navigate = useNavigate();
   
-  const selectedChild = selectedChildIndex !== null && profile?.children 
-    ? profile.children[selectedChildIndex] 
-    : null;
 
   const handleSignOut = async () => {
     try {
@@ -48,7 +45,9 @@ const MojaStran = () => {
             <TipSection childName={selectedChild.name} />
           </>
         ) : (
-          <NoChildSelected />
+          <div className="min-h-[400px] flex flex-col items-center justify-center">
+            <p className="text-lg text-muted-foreground">Prosimo, dodajte profil otroka v nastavitvah.</p>
+          </div>
         )}
         
         <FooterSection handleSignOut={handleSignOut} />

@@ -10,9 +10,7 @@ import { Profile } from "@/contexts/AuthContext";
 interface MobileMenuProps {
   user: any;
   profile: Profile | null;
-  selectedChildIndex: number | null;
   selectedChild: any;
-  onSelectChild: (index: number | null) => void;
   onSignOut: () => void;
   onStartNow: () => void;
   onCenikScroll: () => void;
@@ -20,9 +18,7 @@ interface MobileMenuProps {
 export function MobileMenu({
   user,
   profile,
-  selectedChildIndex,
   selectedChild,
-  onSelectChild,
   onSignOut,
   onStartNow,
   onCenikScroll
@@ -76,7 +72,28 @@ export function MobileMenu({
                 </div>}
               
               {user && <>
-                  <ProfileSelector profile={profile} selectedChildIndex={selectedChildIndex} onSelectChild={onSelectChild} userEmail={user.email} />
+                  {/* Profile section simplified for single child */}
+                  {selectedChild && (
+                    <div className="flex items-center gap-3 p-3 bg-green-50 rounded-md">
+                      <Avatar className="h-10 w-10 border border-green-200">
+                        {selectedChild.avatarId > 0 ? (
+                          <AvatarImage 
+                            src={selectedChild.avatarUrl || getAvatarSrc(selectedChild.avatarId)}
+                            alt={selectedChild.name} 
+                            className="object-contain" 
+                          />
+                        ) : (
+                          <AvatarFallback className="bg-green-100 text-green-800">
+                            {selectedChild.name[0]}
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                      <div>
+                        <div className="font-medium text-base uppercase">{selectedChild.name}</div>
+                        <div className="text-sm text-muted-foreground">Aktivni profil</div>
+                      </div>
+                    </div>
+                  )}
                   
                   {/* Main navigation */}
                   <div className="space-y-3">

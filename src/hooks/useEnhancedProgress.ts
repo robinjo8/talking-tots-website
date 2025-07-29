@@ -18,12 +18,8 @@ export interface EnhancedProgressSummary {
 }
 
 export const useEnhancedProgress = () => {
-  const { selectedChildIndex, profile } = useAuth();
+  const { selectedChild } = useAuth();
   const queryClient = useQueryClient();
-
-  const selectedChild = selectedChildIndex !== null && profile?.children 
-    ? profile.children[selectedChildIndex] 
-    : null;
 
   // Fetch enhanced progress data
   const { data: progressData, isLoading, error } = useQuery({

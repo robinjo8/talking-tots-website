@@ -29,8 +29,7 @@ type AuthContextType = {
   profile: Profile | null;
   isLoading: boolean;
   signOut: () => Promise<void>;
-  selectedChildIndex: number | null;
-  setSelectedChildIndex: (index: number | null) => void;
+  selectedChild: ChildProfile | null;
   refreshProfile: () => Promise<void>;
 };
 
@@ -41,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedChildIndex, setSelectedChildIndex] = useState<number | null>(null);
+  
 
   // Function to fetch user profile and children (prioritizing database over metadata)
   const fetchUserProfile = async (userId: string) => {
@@ -199,11 +198,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         console.log("Initializing auth...");
         
-        // Check if there's a selectedChildIndex in localStorage during initialization
-        const storedChildIndex = localStorage.getItem('selectedChildIndex');
-        if (storedChildIndex && mounted) {
-          setSelectedChildIndex(parseInt(storedChildIndex));
-        }
 
         // Get initial session
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -251,7 +245,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }, 0);
         } else {
           setProfile(null);
-          setSelectedChildIndex(null);
         }
         
         setIsLoading(false);
@@ -281,8 +274,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(null);
       setSession(null);
       setProfile(null);
-      setSelectedChildIndex(null);
-      localStorage.removeItem('selectedChildIndex');
       
       console.log("Sign out successful");
       toast.success("Uspešno ste se odjavili");
@@ -292,14 +283,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const selectedChild = profile?.children?.[0] || null;
+
   const value = {
     session,
     user,
     profile,
     isLoading,
     signOut,
-    selectedChildIndex,
-    setSelectedChildIndex,
+    selectedChild,
     refreshProfile,
   };
 

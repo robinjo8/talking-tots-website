@@ -11,7 +11,7 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export function UserProfile() {
-  const { user, profile, signOut, selectedChildIndex, setSelectedChildIndex } = useAuth();
+  const { user, profile, signOut, selectedChild } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -20,19 +20,6 @@ export function UserProfile() {
     navigate("/login");
   };
 
-  const handleSelectChild = (index: number) => {
-    try {
-      setSelectedChildIndex(index);
-      localStorage.setItem('selectedChildIndex', index.toString());
-      
-      // Navigate to Moja Stran if not already there
-      if (location.pathname !== '/moja-stran') {
-        navigate('/moja-stran');
-      }
-    } catch (error) {
-      console.error("Napaka pri izbiri otroka:", error);
-    }
-  };
 
   const handleGoToProfile = (options?: { expandSection?: string }) => {
     navigate("/profile", { state: options });
@@ -45,9 +32,6 @@ export function UserProfile() {
     return null;
   }
 
-  const selectedChild = selectedChildIndex !== null && profile?.children 
-    ? profile.children[selectedChildIndex] 
-    : null;
 
   // Function to get child avatar source based on avatarId
   const getAvatarSrc = (avatarId: number): string => {
@@ -114,68 +98,45 @@ export function UserProfile() {
         </PopoverTrigger>
         <PopoverContent className="w-80 p-0 shadow-lg border bg-card text-card-foreground" align="end" sideOffset={4}>
           <div className="p-3">
-            {/* Parent profile */}
-            <div 
-              className={`flex items-center gap-2 p-2 rounded-md cursor-pointer ${
-                selectedChildIndex === null ? 'bg-blue-50' : 'hover:bg-gray-100'
-              }`}
-              onClick={() => {
-                setSelectedChildIndex(null);
-                localStorage.removeItem('selectedChildIndex');
-              }}
-            >
-              <Avatar className="h-8 w-8 border border-blue-200">
-                <AvatarFallback className="bg-blue-100 text-blue-800">
-                  {profile?.username?.[0] || user.email?.[0] || "U"}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <div className="font-medium text-base uppercase">{profile?.username || user.email}</div>
-                <div className="flex items-center">
-                  <span className="text-sm px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded uppercase">starš</span>
+            {/* Child profile display - since there's only one child per parent */}
+            {selectedChild ? (
+              <div className="flex items-center gap-2 p-2 rounded-md bg-green-50">
+                <Avatar className="h-8 w-8 border border-green-200">
+                  {selectedChild.avatarId > 0 ? (
+                    <AvatarImage 
+                      src={selectedChild.avatarUrl || getAvatarSrc(selectedChild.avatarId)}
+                      alt={selectedChild.name} 
+                      className="object-contain" 
+                    />
+                  ) : (
+                    <AvatarFallback className="bg-green-100 text-green-800">
+                      {selectedChild.name[0]}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+                <div className="flex-1">
+                  <div className="font-medium text-base uppercase">{selectedChild.name}</div>
+                  <div className="flex items-center">
+                    <span className="text-sm px-1.5 py-0.5 bg-green-100 text-green-800 rounded uppercase">otrok</span>
+                  </div>
                 </div>
+                <div className="h-2 w-2 rounded-full bg-green-600"></div>
               </div>
-              {selectedChildIndex === null && (
+            ) : (
+              /* Parent profile when no child exists */
+              <div className="flex items-center gap-2 p-2 rounded-md bg-blue-50">
+                <Avatar className="h-8 w-8 border border-blue-200">
+                  <AvatarFallback className="bg-blue-100 text-blue-800">
+                    {profile?.username?.[0] || user.email?.[0] || "U"}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <div className="font-medium text-base uppercase">{profile?.username || user.email}</div>
+                  <div className="flex items-center">
+                    <span className="text-sm px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded uppercase">starš</span>
+                  </div>
+                </div>
                 <div className="h-2 w-2 rounded-full bg-blue-600"></div>
-              )}
-            </div>
-            
-            {/* Children profiles section */}
-            {profile?.children && profile.children.length > 0 && (
-              <div className="mt-2">
-                <div className="px-2 py-1.5 text-sm font-medium text-gray-500 flex items-center gap-1 uppercase">
-                  <Users className="h-3 w-3" />
-                  <span>Otroški profili</span>
-                </div>
-                <div className="mt-1 bg-green-50 rounded-md overflow-hidden">
-                  {profile.children.map((child, index) => (
-                    <div 
-                      key={index}
-                      className={`flex items-center gap-2 p-2 cursor-pointer ${
-                        selectedChildIndex === index ? 'bg-green-100' : 'hover:bg-green-100/50'
-                      }`}
-                      onClick={() => handleSelectChild(index)}
-                    >
-                      <Avatar className="h-8 w-8 border border-green-200">
-                        {child.avatarId > 0 ? (
-                          <AvatarImage 
-                            src={child.avatarUrl || getAvatarSrc(child.avatarId)}
-                            alt={child.name} 
-                            className="object-contain" 
-                          />
-                        ) : (
-                          <AvatarFallback className="bg-green-100 text-green-800">
-                            {child.name[0]}
-                          </AvatarFallback>
-                        )}
-                      </Avatar>
-                      <span className="text-base flex-1 uppercase">{child.name}</span>
-                      {selectedChildIndex === index && (
-                        <div className="h-2 w-2 rounded-full bg-green-600"></div>
-                      )}
-                    </div>
-                  ))}
-                </div>
               </div>
             )}
           </div>

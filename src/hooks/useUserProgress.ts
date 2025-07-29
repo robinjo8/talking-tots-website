@@ -19,12 +19,9 @@ export interface ProgressSummary {
 }
 
 export const useUserProgress = () => {
-  const { selectedChildIndex, profile } = useAuth();
+  const { selectedChild } = useAuth();
   const queryClient = useQueryClient();
 
-  const selectedChild = selectedChildIndex !== null && profile?.children 
-    ? profile.children[selectedChildIndex] 
-    : null;
 
   // Fetch child's progress summary
   const { data: progressSummary, isLoading, error } = useQuery({

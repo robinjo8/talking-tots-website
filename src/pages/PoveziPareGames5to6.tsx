@@ -7,10 +7,8 @@ import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 
 export default function PoveziPareGames5to6() {
   const {
-    profile,
-    selectedChildIndex
+    selectedChild
   } = useAuth();
-  const selectedChild = profile?.children?.[selectedChildIndex ?? 0];
   const childName = selectedChild?.name;
 
   return (

@@ -16,7 +16,7 @@ import { SubscriptionSection } from "@/components/profile/SubscriptionSection";
 import { PaymentMethodsSection } from "@/components/profile/PaymentMethodsSection";
 
 export default function Profile() {
-  const { user, profile, selectedChildIndex, setSelectedChildIndex } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   
   // Accordion state - only one section can be expanded at a time
@@ -36,11 +36,6 @@ export default function Profile() {
     }
   }, [user, navigate]);
 
-  useEffect(() => {
-    if (profile?.children && profile.children.length > 0 && selectedChildIndex === null) {
-      setSelectedChildIndex(0);
-    }
-  }, [profile?.children, selectedChildIndex, setSelectedChildIndex]);
 
   useEffect(() => {
     const sectionToExpand = localStorage.getItem('expandSection');
@@ -81,13 +76,7 @@ export default function Profile() {
       
       toast.success(`Otrok "${childToDelete.name}" je bil uspešno izbrisan.`);
       
-      // Update selected child index
-      if (selectedChildIndex === deletingChildIndex) {
-        const remainingChildrenCount = profile.children.length - 1;
-        setSelectedChildIndex(remainingChildrenCount > 0 ? 0 : null);
-      } else if (selectedChildIndex !== null && selectedChildIndex > deletingChildIndex) {
-        setSelectedChildIndex(selectedChildIndex - 1);
-      }
+      // No need to update selection since there's only one child per parent
       
       // Refresh profile to get updated children list
       if (window.location.pathname === '/profile') {
