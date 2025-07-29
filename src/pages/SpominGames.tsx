@@ -29,7 +29,7 @@ const memoryGames = [{
   color: "text-dragon-green",
   gradient: "from-dragon-green/10 to-app-teal/10",
   path: "/govorne-igre/spomin/spomin-c",
-  available: false
+  available: true
 }, {
   id: "spomin-č",
   title: "Spomin - Č",
@@ -38,7 +38,7 @@ const memoryGames = [{
   color: "text-app-blue",
   gradient: "from-app-blue/10 to-app-purple/10",
   path: "/govorne-igre/spomin/spomin-č",
-  available: false
+  available: true
 }, {
   id: "spomin-d",
   title: "Spomin - D",
@@ -119,7 +119,7 @@ const memoryGames = [{
   color: "text-app-purple",
   gradient: "from-app-purple/10 to-app-blue/10",
   path: "/govorne-igre/spomin/spomin-l",
-  available: false
+  available: true
 }, {
   id: "spomin-m",
   title: "Spomin - M",
@@ -218,7 +218,7 @@ const memoryGames = [{
   color: "text-app-purple",
   gradient: "from-app-purple/10 to-app-blue/10",
   path: "/govorne-igre/spomin/spomin-z",
-  available: false
+  available: true
 }, {
   id: "spomin-ž",
   title: "Spomin - Ž",

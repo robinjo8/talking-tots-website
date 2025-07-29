@@ -23,6 +23,11 @@ import SpominGames from "@/pages/SpominGames";
 import SpominK from "@/pages/SpominK";
 import SpominS from "@/pages/SpominS";
 import SpominŠ from "@/pages/SpominŠ";
+import SpominC from "@/pages/SpominC";
+import SpominČ from "@/pages/SpominČ";
+import SpominZ from "@/pages/SpominZ";
+import SpominŽ from "@/pages/SpominŽ";
+import SpominL from "@/pages/SpominL";
 
 import ArtikuacijskiTest from "@/pages/ArtikuacijskiTest";
 import Sestavljanke from "@/pages/Sestavljanke";
@@ -319,6 +324,51 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <SpominŠ />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/spomin/spomin-c" 
+        element={
+          <ProtectedRoute>
+            <SpominC />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/spomin/spomin-č" 
+        element={
+          <ProtectedRoute>
+            <SpominČ />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/spomin/spomin-z" 
+        element={
+          <ProtectedRoute>
+            <SpominZ />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/spomin/spomin-ž" 
+        element={
+          <ProtectedRoute>
+            <SpominŽ />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/spomin/spomin-l" 
+        element={
+          <ProtectedRoute>
+            <SpominL />
           </ProtectedRoute>
         }
       />
