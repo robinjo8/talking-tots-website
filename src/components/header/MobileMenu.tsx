@@ -10,7 +10,9 @@ import { Profile } from "@/contexts/AuthContext";
 interface MobileMenuProps {
   user: any;
   profile: Profile | null;
+  selectedChildIndex: number | null;
   selectedChild: any;
+  onSelectChild: (index: number | null) => void;
   onSignOut: () => void;
   onStartNow: () => void;
   onCenikScroll: () => void;
@@ -18,7 +20,9 @@ interface MobileMenuProps {
 export function MobileMenu({
   user,
   profile,
+  selectedChildIndex,
   selectedChild,
+  onSelectChild,
   onSignOut,
   onStartNow,
   onCenikScroll
@@ -72,13 +76,7 @@ export function MobileMenu({
                 </div>}
               
               {user && <>
-                  {/* Profile section simplified for single child */}
-                  {selectedChild && (
-                    <div className="text-center py-4 border-b">
-                      <p className="text-sm text-muted-foreground">Aktivni otrok:</p>
-                      <p className="font-semibold">{selectedChild.name}</p>
-                    </div>
-                  )}
+                  <ProfileSelector profile={profile} selectedChildIndex={selectedChildIndex} onSelectChild={onSelectChild} userEmail={user.email} />
                   
                   {/* Main navigation */}
                   <div className="space-y-3">

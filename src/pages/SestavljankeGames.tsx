@@ -5,7 +5,11 @@ import { MessageSquare } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 export default function SestavljankeGames() {
   const navigate = useNavigate();
-  const { selectedChild } = useAuth();
+  const {
+    profile,
+    selectedChildIndex
+  } = useAuth();
+  const selectedChild = profile?.children?.[selectedChildIndex ?? 0];
   const childName = selectedChild?.name;
 const consonants = [
   {

@@ -5,17 +5,18 @@ import { useAuth } from "@/contexts/AuthContext";
 import { getAgeGroup, getRouteForAgeGroup } from "@/utils/ageUtils";
 
 export default function PoveziPareRouter() {
-  const { selectedChild } = useAuth();
+  const { profile, selectedChildIndex } = useAuth();
   const navigate = useNavigate();
   
   useEffect(() => {
+    const selectedChild = profile?.children?.[selectedChildIndex ?? 0];
     const childAge = selectedChild?.age ?? 4; // Default to 4
     const ageGroup = getAgeGroup(childAge);
     const targetRoute = getRouteForAgeGroup(ageGroup);
     
     console.log(`Redirecting child (age ${childAge}) to age group ${ageGroup}: ${targetRoute}`);
     navigate(targetRoute, { replace: true });
-  }, [selectedChild, navigate]);
+  }, [profile, selectedChildIndex, navigate]);
   
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">

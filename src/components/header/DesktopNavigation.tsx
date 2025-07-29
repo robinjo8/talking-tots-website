@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Play, UserPlus, BookOpen } from "lucide-react";
-// UserProfile component removed - simplified for single child per parent
+import { UserProfile } from "@/components/auth/UserProfile";
 import { navigationLinks } from "./NavigationLinks";
 
 interface DesktopNavigationProps {
@@ -55,6 +55,7 @@ export function DesktopNavigation({ user, onStartNow, onCenikScroll }: DesktopNa
               {link.label}
             </Button>
           ))}
+          <UserProfile />
         </>
       )}
       

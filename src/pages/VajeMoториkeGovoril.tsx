@@ -8,12 +8,16 @@ import { useExerciseProgress } from "@/hooks/useExerciseProgress";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const VajeMoториkeGovoril = () => {
-  const { user, selectedChild } = useAuth();
+  const { user, profile, selectedChildIndex } = useAuth();
   const navigate = useNavigate();
   const exerciseProgressHook = useExerciseProgress();
   const { progress, resetProgress, setTestCompletionCount, isCardCompleted } = exerciseProgressHook;
   const isMobile = useIsMobile();
 
+  // Get selected child's name
+  const selectedChild = selectedChildIndex !== null && profile?.children 
+    ? profile.children[selectedChildIndex] 
+    : null;
   const childName = selectedChild?.name;
 
   // Mobile devices always get fullscreen, desktop never gets fullscreen

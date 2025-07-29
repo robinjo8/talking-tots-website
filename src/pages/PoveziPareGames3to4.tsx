@@ -8,7 +8,11 @@ import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 
 export default function PoveziPareGames3to4() {
   const navigate = useNavigate();
-  const { selectedChild } = useAuth();
+  const {
+    profile,
+    selectedChildIndex
+  } = useAuth();
+  const selectedChild = profile?.children?.[selectedChildIndex ?? 0];
   const childName = selectedChild?.name;
 
   const handleRClick = () => {

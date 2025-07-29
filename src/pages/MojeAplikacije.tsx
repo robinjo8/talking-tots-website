@@ -3,12 +3,16 @@ import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { ActivityOptions } from "@/components/ActivityOptions";
-// NoChildSelected component removed - only one child per parent now
+import { NoChildSelected } from "@/components/NoChildSelected";
 import { FooterSection } from "@/components/FooterSection";
 
 const MojeAplikacije = () => {
-  const { user, profile, signOut, selectedChild } = useAuth();
+  const { user, profile, signOut, selectedChildIndex } = useAuth();
   const navigate = useNavigate();
+  
+  const selectedChild = selectedChildIndex !== null && profile?.children 
+    ? profile.children[selectedChildIndex] 
+    : null;
 
   const handleSignOut = async () => {
     try {
@@ -39,16 +43,7 @@ const MojeAplikacije = () => {
             </div>
           </>
         ) : (
-          <div className="text-center">
-            <h2 className="text-2xl font-semibold mb-4">Nimate še nobenega otroškega profila</h2>
-            <p className="text-muted-foreground mb-8">Za začetek dodajte profil otroka v nastavitvah.</p>
-            <button 
-              onClick={() => navigate("/profile")}
-              className="bg-dragon-green hover:bg-dragon-green/90 text-white px-6 py-3 rounded-lg"
-            >
-              Dodaj profil otroka
-            </button>
-          </div>
+          <NoChildSelected />
         )}
         
         <FooterSection handleSignOut={handleSignOut} />

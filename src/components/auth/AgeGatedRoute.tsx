@@ -10,8 +10,10 @@ interface AgeGatedRouteProps {
 }
 
 export function AgeGatedRoute({ requiredAgeGroup, children }: AgeGatedRouteProps) {
-  const { selectedChild } = useAuth();
+  const { profile, selectedChildIndex } = useAuth();
   const navigate = useNavigate();
+  
+  const selectedChild = profile?.children?.[selectedChildIndex ?? 0];
   const childAge = selectedChild?.age;
   
   useEffect(() => {

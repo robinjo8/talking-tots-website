@@ -79,7 +79,8 @@ const artikulacijaLetters = [
 ];
 
 export default function ArtikulacijaVaje() {
-  const { selectedChild } = useAuth();
+  const { profile, selectedChildIndex } = useAuth();
+  const selectedChild = profile?.children?.[selectedChildIndex ?? 0];
   const childName = selectedChild?.name;
 
   const LetterCard = ({ letter }: { letter: typeof artikulacijaLetters[0] }) => (

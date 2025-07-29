@@ -7,7 +7,11 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export default function PoveziPareGames() {
   const navigate = useNavigate();
-  const { selectedChild } = useAuth();
+  const {
+    profile,
+    selectedChildIndex
+  } = useAuth();
+  const selectedChild = profile?.children?.[selectedChildIndex ?? 0];
   const childName = selectedChild?.name;
 
   const consonants = [
