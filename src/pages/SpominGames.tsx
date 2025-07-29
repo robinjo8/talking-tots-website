@@ -227,7 +227,7 @@ const memoryGames = [{
   color: "text-app-orange",
   gradient: "from-app-orange/10 to-app-yellow/10",
   path: "/govorne-igre/spomin/spomin-ž",
-  available: false
+  available: true
 }];
 export default function SpominGames() {
   const navigate = useNavigate();
