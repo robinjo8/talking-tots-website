@@ -2,12 +2,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEnhancedProgress } from "./useEnhancedProgress";
 
 export const useProgressMigration = () => {
-  const { selectedChildIndex, profile } = useAuth();
+  const { selectedChild } = useAuth();
   const { recordExerciseCompletion } = useEnhancedProgress();
-
-  const selectedChild = selectedChildIndex !== null && profile?.children 
-    ? profile.children[selectedChildIndex] 
-    : null;
 
   const migrateExistingProgress = () => {
     if (!selectedChild) return;

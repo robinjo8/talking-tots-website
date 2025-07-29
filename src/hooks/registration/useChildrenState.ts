@@ -4,49 +4,48 @@ import { ChildProfile } from "./types";
 import { toast } from "sonner";
 
 export function useChildrenState() {
-  const [children, setChildren] = useState<ChildProfile[]>([
-    { id: crypto.randomUUID(), name: "", gender: "M", birthDate: null, avatarId: 1 }
-  ]);
-  const [selectedChildIndex, setSelectedChildIndex] = useState(0);
+  // Only one child per parent now
+  const [child, setChild] = useState<ChildProfile>({ 
+    id: crypto.randomUUID(), 
+    name: "", 
+    gender: "M", 
+    birthDate: null, 
+    avatarId: 1 
+  });
 
-  const currentChild = children[selectedChildIndex];
+  // For backward compatibility, we'll maintain the children array structure but with only one child
+  const children = [child];
+  const selectedChildIndex = 0;
+  const currentChild = child;
 
 
   const updateChildField = (id: string, field: keyof ChildProfile, value: any) => {
-    setChildren(children.map(child => 
-      child.id === id ? { ...child, [field]: value } : child
-    ));
+    if (child.id === id) {
+      setChild(prev => ({ ...prev, [field]: value }));
+    }
   };
 
   const handleSpeechDifficultiesSubmit = (difficulties: string[], detailedDescription?: string) => {
-    setChildren(prev => 
-      prev.map((child, index) => 
-        index === selectedChildIndex 
-          ? { 
-              ...child, 
-              speechDifficulties: difficulties,
-              speechDifficultiesDescription: detailedDescription || ""
-            } 
-          : child
-      )
-    );
+    setChild(prev => ({ 
+      ...prev, 
+      speechDifficulties: difficulties,
+      speechDifficultiesDescription: detailedDescription || ""
+    }));
   };
 
   const handleSpeechDevelopmentSubmit = (answers: Record<string, string>) => {
-    setChildren(prev => 
-      prev.map((child, index) => 
-        index === selectedChildIndex 
-          ? { ...child, speechDevelopment: answers, isComplete: true } 
-          : child
-      )
-    );
+    setChild(prev => ({ 
+      ...prev, 
+      speechDevelopment: answers, 
+      isComplete: true 
+    }));
   };
 
   return {
-    children,
-    setChildren,
+    children, // Still an array for backward compatibility
+    setChildren: (children: ChildProfile[]) => setChild(children[0] || child), // Update only first child
     selectedChildIndex,
-    setSelectedChildIndex,
+    setSelectedChildIndex: () => {}, // No-op since there's only one child
     currentChild,
     updateChildField,
     handleSpeechDifficultiesSubmit,

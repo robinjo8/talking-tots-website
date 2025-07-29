@@ -29,8 +29,7 @@ type AuthContextType = {
   profile: Profile | null;
   isLoading: boolean;
   signOut: () => Promise<void>;
-  selectedChildIndex: number | null;
-  setSelectedChildIndex: (index: number | null) => void;
+  selectedChild: ChildProfile | null;
   refreshProfile: () => Promise<void>;
 };
 
@@ -41,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedChildIndex, setSelectedChildIndex] = useState<number | null>(null);
+  const [selectedChild, setSelectedChild] = useState<ChildProfile | null>(null);
 
   // Function to fetch user profile and children (prioritizing database over metadata)
   const fetchUserProfile = async (userId: string) => {
@@ -119,6 +118,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         username: profileData?.username || null,
         children
       });
+
+      // Set the first (and only) child as selected
+      if (children.length > 0) {
+        setSelectedChild(children[0]);
+      } else {
+        setSelectedChild(null);
+      }
     } catch (error) {
       console.error("Error fetching user profile:", error);
       // Set a basic profile even if there's an error to prevent infinite loading
@@ -126,6 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         username: null,
         children: []
       });
+      setSelectedChild(null);
     }
   };
 
@@ -198,12 +205,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const initializeAuth = async () => {
       try {
         console.log("Initializing auth...");
-        
-        // Check if there's a selectedChildIndex in localStorage during initialization
-        const storedChildIndex = localStorage.getItem('selectedChildIndex');
-        if (storedChildIndex && mounted) {
-          setSelectedChildIndex(parseInt(storedChildIndex));
-        }
 
         // Get initial session
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -251,7 +252,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }, 0);
         } else {
           setProfile(null);
-          setSelectedChildIndex(null);
+          setSelectedChild(null);
         }
         
         setIsLoading(false);
@@ -281,8 +282,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(null);
       setSession(null);
       setProfile(null);
-      setSelectedChildIndex(null);
-      localStorage.removeItem('selectedChildIndex');
+      setSelectedChild(null);
       
       console.log("Sign out successful");
       toast.success("Uspešno ste se odjavili");
@@ -298,8 +298,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     profile,
     isLoading,
     signOut,
-    selectedChildIndex,
-    setSelectedChildIndex,
+    selectedChild,
     refreshProfile,
   };
 

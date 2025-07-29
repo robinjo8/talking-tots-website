@@ -5,16 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Play, CirclePlay, Info, CheckCircle, ArrowUp, Users } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { SelectChildDialog } from "@/components/SelectChildDialog";
+// SelectChildDialog removed - only one child per parent now
 
 export const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const [showChildSelector, setShowChildSelector] = useState(false);
-  const {
-    user,
-    profile,
-    selectedChildIndex
-  } = useAuth();
+  const { user } = useAuth();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
 
@@ -193,8 +188,6 @@ export const HeroSection = () => {
           )}
         </div>
       </section>
-      
-      <SelectChildDialog open={showChildSelector} onOpenChange={setShowChildSelector} />
     </>
   );
 };
