@@ -8,9 +8,6 @@ interface ProfessionalJigsawProps {
   gridRows?: number;
   onComplete?: () => void;
   className?: string;
-  onNewGame?: () => void;
-  onBack?: () => void;
-  onInstructions?: () => void;
 }
 
 interface PuzzlePiece {
@@ -42,10 +39,7 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   gridCols = 2,
   gridRows = 3,
   onComplete,
-  className = "",
-  onNewGame,
-  onBack,
-  onInstructions
+  className = ""
 }) => {
   // Show rotation message on mobile portrait BEFORE any hooks
   if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) {
@@ -72,9 +66,9 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   const isMobile = window.innerWidth < 768;
   const isDesktop = window.innerWidth >= 768;
   
-  // Full screen dimensions - use entire viewport for mobile, container dimensions for desktop
-  const CANVAS_WIDTH = isMobile ? window.innerWidth : 800;
-  const CANVAS_HEIGHT = isMobile ? window.innerHeight : 480;
+  // Full screen dimensions - use entire viewport
+  const CANVAS_WIDTH = window.innerWidth;
+  const CANVAS_HEIGHT = window.innerHeight;
   
   // Desktop scaling factor (10% reduction)
   const desktopScale = isDesktop ? 0.9 : 1;
@@ -154,17 +148,16 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
       isDragging: false
     })));
     setShowSettingsMenu(false);
-    onNewGame?.();
   };
 
   const handleBack = () => {
+    window.history.back();
     setShowSettingsMenu(false);
-    onBack?.();
   };
 
   const handleInstructions = () => {
+    alert('Povlecite dele sestavljanke na pravo mesto. Ko se del približa svojemu mestu, se bo samodejno prilepil.');
     setShowSettingsMenu(false);
-    onInstructions?.();
   };
 
   // Load and process image
@@ -579,7 +572,24 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
 
 
   return (
-    <div className={`${isMobile ? 'fixed inset-0 overflow-hidden bg-background' : 'relative'} ${className}`}>
+    <div className={`fixed inset-0 overflow-hidden bg-background ${className}`}>
+      {/* Desktop Controls */}
+      {isDesktop && (
+        <div className="absolute top-4 left-4 z-10 flex gap-2">
+          <Button onClick={handleNewGame} variant="default" size="sm" className="flex items-center gap-2">
+            <RotateCcw className="w-4 h-4" />
+            Nova igra
+          </Button>
+          <Button onClick={handleBack} variant="outline" size="sm" className="flex items-center gap-2">
+            <ArrowLeft className="w-4 h-4" />
+            Nazaj
+          </Button>
+          <Button onClick={handleInstructions} variant="outline" size="sm" className="flex items-center gap-2">
+            <HelpCircle className="w-4 h-4" />
+            Navodila
+          </Button>
+        </div>
+      )}
 
       {/* Mobile Settings Button */}
       {isMobile && (
@@ -632,13 +642,11 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
         ref={canvasRef}
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
-        className="cursor-pointer block w-full h-full"
+        className="cursor-pointer block"
         style={{ 
-          width: isMobile ? `${CANVAS_WIDTH}px` : '100%', 
-          height: isMobile ? `${CANVAS_HEIGHT}px` : '100%',
-          display: 'block',
-          maxWidth: isMobile ? undefined : '100%',
-          maxHeight: isMobile ? undefined : '100%'
+          width: `${CANVAS_WIDTH}px`, 
+          height: `${CANVAS_HEIGHT}px`,
+          display: 'block'
         }}
         onMouseDown={handleStart}
         onMouseMove={handleMove}
