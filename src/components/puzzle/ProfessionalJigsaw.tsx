@@ -59,14 +59,39 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   
-  // Responsive dimensions based on viewport
-  const PUZZLE_WIDTH = window.innerWidth > 768 ? 800 : 500;
-  const PUZZLE_HEIGHT = window.innerWidth > 768 ? 600 : 375;
-  const CANVAS_WIDTH = window.innerWidth > 768 ? 1600 : 900;
-  const CANVAS_HEIGHT = window.innerWidth > 768 ? 900 : 600;
-  const TAB_SIZE = window.innerWidth > 768 ? 25 : 15;
+  // Full screen dimensions - use entire viewport
+  const CANVAS_WIDTH = window.innerWidth;
+  const CANVAS_HEIGHT = window.innerHeight;
+  
+  // Calculate optimal puzzle size maintaining aspect ratio
+  const availableWidth = CANVAS_WIDTH * 0.6; // 60% for puzzle area
+  const availableHeight = CANVAS_HEIGHT * 0.8; // 80% for puzzle area
+  
+  // Determine puzzle dimensions based on image aspect ratio while maintaining proportions
+  const aspectRatio = 1.33; // Default 4:3 aspect ratio, will be updated when image loads
+  let PUZZLE_WIDTH: number;
+  let PUZZLE_HEIGHT: number;
+  
+  if (availableWidth / availableHeight > aspectRatio) {
+    PUZZLE_HEIGHT = availableHeight;
+    PUZZLE_WIDTH = PUZZLE_HEIGHT * aspectRatio;
+  } else {
+    PUZZLE_WIDTH = availableWidth;
+    PUZZLE_HEIGHT = PUZZLE_WIDTH / aspectRatio;
+  }
+  
+  // Center the puzzle board
   const BOARD_X = (CANVAS_WIDTH - PUZZLE_WIDTH) / 2;
   const BOARD_Y = (CANVAS_HEIGHT - PUZZLE_HEIGHT) / 2;
+  
+  // Side areas for pieces (left and right)
+  const SIDE_AREA_WIDTH = (CANVAS_WIDTH - PUZZLE_WIDTH) / 2;
+  const LEFT_AREA_START = 0;
+  const LEFT_AREA_END = BOARD_X;
+  const RIGHT_AREA_START = BOARD_X + PUZZLE_WIDTH;
+  const RIGHT_AREA_END = CANVAS_WIDTH;
+  
+  const TAB_SIZE = Math.max(15, Math.min(30, PUZZLE_WIDTH / 40));
 
   // Load and process image
   useEffect(() => {
@@ -205,11 +230,11 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
           y: row * pieceHeight,
           width: pieceWidth,
           height: pieceHeight,
-          // Scatter pieces on left and right sides
+          // Scatter pieces in left and right side areas
           currentX: Math.random() > 0.5 
-            ? 20 + Math.random() * 150  // Left side
-            : CANVAS_WIDTH - 200 + Math.random() * 150, // Right side
-          currentY: 50 + Math.random() * (CANVAS_HEIGHT - 150),
+            ? LEFT_AREA_START + 20 + Math.random() * (LEFT_AREA_END - 120)  // Left side
+            : RIGHT_AREA_START + 20 + Math.random() * (RIGHT_AREA_END - RIGHT_AREA_START - 120), // Right side
+          currentY: 20 + Math.random() * (CANVAS_HEIGHT - 120),
           correctX: BOARD_X + col * pieceWidth,
           correctY: BOARD_Y + row * pieceHeight,
           isPlaced: false,
@@ -404,10 +429,20 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
     if (!draggedPiece) return;
 
     const eventPos = getEventPos(e);
+    let newX = eventPos.x - offset.x;
+    let newY = eventPos.y - offset.y;
+
+    // Apply boundary constraints - pieces can only move within game area
+    const pieceWidth = draggedPiece.width + TAB_SIZE * 2;
+    const pieceHeight = draggedPiece.height + TAB_SIZE * 2;
+    
+    // Constrain to canvas boundaries
+    newX = Math.max(-TAB_SIZE, Math.min(CANVAS_WIDTH - pieceWidth + TAB_SIZE, newX));
+    newY = Math.max(-TAB_SIZE, Math.min(CANVAS_HEIGHT - pieceHeight + TAB_SIZE, newY));
 
     setPieces(prev => prev.map(p => 
       p.id === draggedPiece.id 
-        ? { ...p, currentX: eventPos.x - offset.x, currentY: eventPos.y - offset.y }
+        ? { ...p, currentX: newX, currentY: newY }
         : p
     ));
   };
@@ -470,16 +505,16 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
 
 
   return (
-    <div className={`w-full h-screen flex items-center justify-center bg-background ${className}`}>
+    <div className={`fixed inset-0 overflow-hidden bg-background ${className}`}>
       <canvas
         ref={canvasRef}
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
-        className="max-w-full max-h-full cursor-pointer"
+        className="cursor-pointer block"
         style={{ 
-          width: '100%', 
-          height: '100%',
-          objectFit: 'contain'
+          width: `${CANVAS_WIDTH}px`, 
+          height: `${CANVAS_HEIGHT}px`,
+          display: 'block'
         }}
         onMouseDown={handleStart}
         onMouseMove={handleMove}
