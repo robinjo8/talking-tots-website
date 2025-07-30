@@ -27,6 +27,8 @@ export default function SestavljankeTest() {
   // Debug logging
   console.log('SestavljankeTest render - isMobile:', isMobile);
   console.log('SestavljankeTest render - window dimensions:', window.innerWidth, 'x', window.innerHeight);
+  console.log('SestavljankeTest render - fullscreen element:', document.fullscreenElement);
+  console.log('SestavljankeTest render - screen orientation:', screen.orientation?.type);
   
   const { isRecording, feedbackMessage, showPositiveFeedback, startRecording } = useSpeechRecording(
     (points) => {
