@@ -39,6 +39,19 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   onComplete,
   className = ""
 }) => {
+  // Show rotation message on mobile portrait BEFORE any hooks
+  if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) {
+    return (
+      <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
+        <div className="text-white text-center p-8">
+          <div className="text-6xl mb-4">📱</div>
+          <h2 className="text-2xl font-bold mb-2">Rotate Your Device</h2>
+          <p className="text-lg">Please rotate your device to landscape mode to play the puzzle game.</p>
+        </div>
+      </div>
+    );
+  }
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [pieces, setPieces] = useState<PuzzlePiece[]>([]);
   const [draggedPiece, setDraggedPiece] = useState<PuzzlePiece | null>(null);
@@ -455,39 +468,6 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
     );
   }
 
-  // Force landscape orientation on mobile
-  useEffect(() => {
-    const handleOrientationChange = () => {
-      if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) {
-        // Portrait mode on mobile - show rotation message
-        document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = 'auto';
-      }
-    };
-
-    handleOrientationChange();
-    window.addEventListener('resize', handleOrientationChange);
-    window.addEventListener('orientationchange', handleOrientationChange);
-
-    return () => {
-      window.removeEventListener('resize', handleOrientationChange);
-      window.removeEventListener('orientationchange', handleOrientationChange);
-    };
-  }, []);
-
-  // Show rotation message on mobile portrait
-  if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) {
-    return (
-      <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
-        <div className="text-white text-center p-8">
-          <div className="text-6xl mb-4">📱</div>
-          <h2 className="text-2xl font-bold mb-2">Rotate Your Device</h2>
-          <p className="text-lg">Please rotate your device to landscape mode to play the puzzle game.</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className={`w-full h-screen flex items-center justify-center bg-background ${className}`}>
