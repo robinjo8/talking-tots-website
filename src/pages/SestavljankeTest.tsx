@@ -23,6 +23,7 @@ export default function SestavljankeTest() {
     return stored ? parseInt(stored, 10) : 0;
   });
   const [isExiting, setIsExiting] = useState(false);
+  const [isGameActive, setIsGameActive] = useState(true); // Track if we're actively in the game
   const { toast } = useToast();
   const { 
     isMobile, 
@@ -261,18 +262,28 @@ export default function SestavljankeTest() {
   };
 
   const handleBack = async () => {
+    console.log('handleBack clicked - starting exit process');
     setIsExiting(true);
+    setIsGameActive(false); // Mark game as inactive to remove fixed positioning
     
     try {
-      // First unlock orientation and exit fullscreen
+      console.log('Unlocking orientation...');
       await unlockOrientation();
+      console.log('Orientation unlocked');
+      
+      console.log('Exiting fullscreen...');
       await exitFullscreen();
+      console.log('Fullscreen exited');
       
       // Clear any session storage
       sessionStorage.removeItem('backPressCount');
       
-      // Navigate immediately to ensure orientation can change
-      navigate('/govorne-igre/sestavljanke', { replace: true });
+      // Add a small delay to ensure orientation changes have time to take effect
+      setTimeout(() => {
+        console.log('Navigating to /govorne-igre/sestavljanke');
+        navigate('/govorne-igre/sestavljanke', { replace: true });
+      }, 100);
+      
     } catch (error) {
       console.warn('Error exiting game:', error);
       // Force navigation even if cleanup fails
@@ -287,8 +298,8 @@ export default function SestavljankeTest() {
 
   return (
     <div 
-      className={`${isMobile ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}
-      style={isMobile ? {
+      className={`${isMobile && isGameActive ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}
+      style={isMobile && isGameActive ? {
         position: 'fixed',
         top: 0,
         left: 0,
