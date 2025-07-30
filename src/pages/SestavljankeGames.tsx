@@ -3,10 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useIsMobile } from "@/hooks/use-mobile";
 export default function SestavljankeGames() {
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
   const {
     selectedChild
   } = useAuth();
@@ -131,23 +129,7 @@ const consonants = [
     navigate("/govorne-igre/sestavljanke/r");
   };
 
-  const handleTestClick = async () => {
-    if (isMobile) {
-      try {
-        // Request fullscreen immediately
-        if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
-          await document.documentElement.requestFullscreen();
-        }
-        
-        // Lock orientation to landscape
-        if (screen.orientation && (screen.orientation as any).lock) {
-          await (screen.orientation as any).lock('landscape');
-        }
-      } catch (error) {
-        console.log('Fullscreen/orientation setup failed:', error);
-      }
-    }
-    
+  const handleTestClick = () => {
     navigate("/govorne-igre/sestavljanke/test");
   };
   return <div className="min-h-screen bg-background">
