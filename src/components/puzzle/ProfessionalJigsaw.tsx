@@ -73,70 +73,6 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
     img.src = imageUrl;
   }, [imageUrl]);
 
-  // Generate puzzle pieces
-  useEffect(() => {
-    if (!image) return;
-
-    const pieceWidth = PUZZLE_WIDTH / gridCols;
-    const pieceHeight = PUZZLE_HEIGHT / gridRows;
-    const newPieces: PuzzlePiece[] = [];
-
-    // Create a temporary canvas to extract image data
-    const tempCanvas = document.createElement('canvas');
-    const tempCtx = tempCanvas.getContext('2d')!;
-    tempCanvas.width = PUZZLE_WIDTH;
-    tempCanvas.height = PUZZLE_HEIGHT;
-    
-    // Draw scaled image
-    tempCtx.drawImage(image, 0, 0, PUZZLE_WIDTH, PUZZLE_HEIGHT);
-
-    for (let row = 0; row < gridRows; row++) {
-      for (let col = 0; col < gridCols; col++) {
-        const piece: PuzzlePiece = {
-          id: `${row}-${col}`,
-          row,
-          col,
-          x: col * pieceWidth,
-          y: row * pieceHeight,
-          width: pieceWidth,
-          height: pieceHeight,
-          // Scatter pieces on left and right sides
-          currentX: Math.random() > 0.5 
-            ? 20 + Math.random() * 150  // Left side
-            : CANVAS_WIDTH - 200 + Math.random() * 150, // Right side
-          currentY: 50 + Math.random() * (CANVAS_HEIGHT - 150),
-          correctX: BOARD_X + col * pieceWidth,
-          correctY: BOARD_Y + row * pieceHeight,
-          isPlaced: false,
-          isDragging: false,
-          tabs: {
-            top: row > 0 ? Math.random() > 0.5 : false,
-            right: col < gridCols - 1 ? Math.random() > 0.5 : false,
-            bottom: row < gridRows - 1 ? Math.random() > 0.5 : false,
-            left: col > 0 ? Math.random() > 0.5 : false,
-          },
-          path: new Path2D(),
-          imageData: null
-        };
-
-        // Create puzzle piece shape
-        piece.path = createPuzzlePiecePath(piece, pieceWidth, pieceHeight);
-        
-        // Extract image data for this piece
-        piece.imageData = tempCtx.getImageData(
-          piece.x, 
-          piece.y, 
-          piece.width + TAB_SIZE * 2, 
-          piece.height + TAB_SIZE * 2
-        );
-
-        newPieces.push(piece);
-      }
-    }
-
-    setPieces(newPieces);
-  }, [image, gridCols, gridRows]);
-
   // Create puzzle piece path with tabs and blanks
   const createPuzzlePiecePath = (piece: PuzzlePiece, width: number, height: number): Path2D => {
     const path = new Path2D();
@@ -208,6 +144,70 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
     path.closePath();
     return path;
   };
+
+  // Generate puzzle pieces
+  useEffect(() => {
+    if (!image) return;
+
+    const pieceWidth = PUZZLE_WIDTH / gridCols;
+    const pieceHeight = PUZZLE_HEIGHT / gridRows;
+    const newPieces: PuzzlePiece[] = [];
+
+    // Create a temporary canvas to extract image data
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d')!;
+    tempCanvas.width = PUZZLE_WIDTH;
+    tempCanvas.height = PUZZLE_HEIGHT;
+    
+    // Draw scaled image
+    tempCtx.drawImage(image, 0, 0, PUZZLE_WIDTH, PUZZLE_HEIGHT);
+
+    for (let row = 0; row < gridRows; row++) {
+      for (let col = 0; col < gridCols; col++) {
+        const piece: PuzzlePiece = {
+          id: `${row}-${col}`,
+          row,
+          col,
+          x: col * pieceWidth,
+          y: row * pieceHeight,
+          width: pieceWidth,
+          height: pieceHeight,
+          // Scatter pieces on left and right sides
+          currentX: Math.random() > 0.5 
+            ? 20 + Math.random() * 150  // Left side
+            : CANVAS_WIDTH - 200 + Math.random() * 150, // Right side
+          currentY: 50 + Math.random() * (CANVAS_HEIGHT - 150),
+          correctX: BOARD_X + col * pieceWidth,
+          correctY: BOARD_Y + row * pieceHeight,
+          isPlaced: false,
+          isDragging: false,
+          tabs: {
+            top: row > 0 ? Math.random() > 0.5 : false,
+            right: col < gridCols - 1 ? Math.random() > 0.5 : false,
+            bottom: row < gridRows - 1 ? Math.random() > 0.5 : false,
+            left: col > 0 ? Math.random() > 0.5 : false,
+          },
+          path: new Path2D(),
+          imageData: null
+        };
+
+        // Create puzzle piece shape
+        piece.path = createPuzzlePiecePath(piece, pieceWidth, pieceHeight);
+        
+        // Extract image data for this piece
+        piece.imageData = tempCtx.getImageData(
+          piece.x, 
+          piece.y, 
+          piece.width + TAB_SIZE * 2, 
+          piece.height + TAB_SIZE * 2
+        );
+
+        newPieces.push(piece);
+      }
+    }
+
+    setPieces(newPieces);
+  }, [image, gridCols, gridRows]);
 
   // Draw the puzzle
   const drawPuzzle = useCallback(() => {
