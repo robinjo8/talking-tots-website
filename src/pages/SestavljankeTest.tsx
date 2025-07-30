@@ -16,13 +16,16 @@ export default function SestavljankeTest() {
   const [isAudioDialogOpen, setIsAudioDialogOpen] = useState(false);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
   const [gameKey, setGameKey] = useState(0); // Force puzzle reset
+  const [backPressCount, setBackPressCount] = useState(0);
   const { toast } = useToast();
   const { 
     isMobile, 
     isLandscape, 
     isFullscreen, 
     requestFullscreen, 
-    lockOrientation 
+    exitFullscreen,
+    lockOrientation,
+    unlockOrientation
   } = useEnhancedMobile();
   const navigate = useNavigate();
   const { recordGameCompletion } = useEnhancedProgress();
@@ -75,6 +78,48 @@ export default function SestavljankeTest() {
     };
   }, [isMobile, isLandscape, isFullscreen, requestFullscreen, lockOrientation]);
 
+  // Handle physical back button
+  useEffect(() => {
+    if (!isMobile) return;
+
+    let backPressTimer: NodeJS.Timeout;
+
+    const handlePopState = (event: PopStateEvent) => {
+      event.preventDefault();
+      setBackPressCount(prev => {
+        const newCount = prev + 1;
+        
+        if (newCount === 1) {
+          // First press - reset counter after 2 seconds
+          backPressTimer = setTimeout(() => {
+            setBackPressCount(0);
+          }, 2000);
+          return 1;
+        } else {
+          // Second press - navigate back
+          clearTimeout(backPressTimer);
+          unlockOrientation();
+          exitFullscreen();
+          setTimeout(() => {
+            navigate('/govorne-igre/sestavljanke');
+          }, 100);
+          return 0;
+        }
+      });
+    };
+
+    // Add entry to history to handle back button
+    window.history.pushState(null, '', window.location.href);
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      if (backPressTimer) {
+        clearTimeout(backPressTimer);
+      }
+    };
+  }, [isMobile, navigate, unlockOrientation, exitFullscreen]);
+
   const handlePuzzleComplete = async () => {
     setIsPuzzleCompleted(true);
     setIsAudioDialogOpen(true);
@@ -122,8 +167,13 @@ export default function SestavljankeTest() {
     }
   };
 
-  const handleBack = () => {
-    navigate(-1);
+  const handleBack = async () => {
+    // Unlock orientation and exit fullscreen before navigating
+    await unlockOrientation();
+    await exitFullscreen();
+    setTimeout(() => {
+      navigate('/govorne-igre/sestavljanke');
+    }, 100);
   };
 
   const handleInstructions = () => {

@@ -115,10 +115,25 @@ export function useEnhancedMobile() {
     return false;
   };
 
+  const unlockOrientation = async () => {
+    try {
+      const screenOrientation = screen?.orientation as any;
+      if (screenOrientation?.unlock) {
+        await screenOrientation.unlock();
+        return true;
+      }
+    } catch (error) {
+      console.warn('Orientation unlock failed:', error);
+      return false;
+    }
+    return false;
+  };
+
   return {
     ...mobileState,
     requestFullscreen,
     exitFullscreen,
     lockOrientation,
+    unlockOrientation,
   };
 }
