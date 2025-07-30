@@ -32,16 +32,15 @@ interface PuzzlePiece {
   imageData: ImageData | null;
 }
 
-export const ProfessionalJigsaw = React.forwardRef<
-  { resetPuzzle: () => void },
-  ProfessionalJigsawProps
->(({
+export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   imageUrl,
   gridCols = 2,
   gridRows = 3,
   onComplete,
   className = ""
-}, ref) => {
+}) => {
+  console.log('ProfessionalJigsaw render - window dimensions:', window.innerWidth, 'x', window.innerHeight);
+  console.log('ProfessionalJigsaw render - imageUrl:', imageUrl);
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [pieces, setPieces] = useState<PuzzlePiece[]>([]);
@@ -107,10 +106,15 @@ export const ProfessionalJigsaw = React.forwardRef<
     })));
   }, [LEFT_AREA_START, LEFT_AREA_END, RIGHT_AREA_START, RIGHT_AREA_END, CANVAS_HEIGHT]);
 
-  // Expose reset function via ref
-  React.useImperativeHandle(ref, () => ({
-    resetPuzzle
-  }), [resetPuzzle]);
+  // Listen for reset puzzle event from parent
+  useEffect(() => {
+    const handleResetPuzzle = () => {
+      resetPuzzle();
+    };
+
+    window.addEventListener('resetPuzzle', handleResetPuzzle);
+    return () => window.removeEventListener('resetPuzzle', handleResetPuzzle);
+  }, [resetPuzzle]);
 
   const handleBack = () => {
     window.history.back();
@@ -553,6 +557,4 @@ export const ProfessionalJigsaw = React.forwardRef<
       />
     </div>
   );
-});
-
-ProfessionalJigsaw.displayName = 'ProfessionalJigsaw';
+};
