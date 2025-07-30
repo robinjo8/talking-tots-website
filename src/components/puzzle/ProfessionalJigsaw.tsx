@@ -41,14 +41,18 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   onComplete,
   className = ""
 }) => {
-  // Show rotation message on mobile portrait BEFORE any hooks
-  if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) {
+  // Mobile landscape detection - force landscape mode only
+  const isMobile = window.innerWidth < 768;
+  const isLandscape = window.innerWidth > window.innerHeight;
+  
+  // Show rotation message on mobile portrait
+  if (isMobile && !isLandscape) {
     return (
       <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
         <div className="text-white text-center p-8">
           <div className="text-6xl mb-4">📱</div>
-          <h2 className="text-2xl font-bold mb-2">Rotate Your Device</h2>
-          <p className="text-lg">Please rotate your device to landscape mode to play the puzzle game.</p>
+          <h2 className="text-2xl font-bold mb-2">Rotiraj napravo</h2>
+          <p className="text-lg">Prosim, rotiraj napravo v ležeči način za igranje sestavljanke.</p>
         </div>
       </div>
     );
@@ -62,9 +66,9 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   
-  // Device detection
-  const isMobile = window.innerWidth < 768;
-  const isDesktop = window.innerWidth >= 768;
+  // Mobile devices in landscape get fullscreen, desktop never gets fullscreen
+  const effectiveFullscreen = isMobile && isLandscape;
+  const isDesktop = !isMobile;
   
   // Full screen dimensions - use entire viewport
   const CANVAS_WIDTH = window.innerWidth;
@@ -106,35 +110,27 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   
   const TAB_SIZE = Math.max(15, Math.min(30, PUZZLE_WIDTH / 40));
 
-  // Fullscreen API for mobile
+  // Enable fullscreen on mobile devices only (like Spomin games)
   useEffect(() => {
-    if (isMobile) {
-      const enterFullscreen = async () => {
+    if (effectiveFullscreen) {
+      const requestFullscreen = async () => {
         try {
           if (document.documentElement.requestFullscreen) {
             await document.documentElement.requestFullscreen();
           }
-          // Lock orientation to landscape
-          if (screen.orientation && (screen.orientation as any).lock) {
-            await (screen.orientation as any).lock('landscape');
-          }
         } catch (error) {
-          console.log('Fullscreen not supported or denied');
+          console.log('Fullscreen not supported:', error);
         }
       };
-
-      enterFullscreen();
-
+      requestFullscreen();
+      
       return () => {
-        if (document.exitFullscreen && document.fullscreenElement) {
-          document.exitFullscreen();
-        }
-        if (screen.orientation && (screen.orientation as any).unlock) {
-          (screen.orientation as any).unlock();
+        if (document.fullscreenElement) {
+          document.exitFullscreen?.();
         }
       };
     }
-  }, [isMobile]);
+  }, [effectiveFullscreen]);
 
   const handleNewGame = () => {
     // Reset all pieces to initial scattered positions
@@ -572,70 +568,67 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
 
 
   return (
-    <div className={`fixed inset-0 overflow-hidden bg-background ${className}`}>
-      {/* Desktop Controls */}
-      {isDesktop && (
+    <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}>
+      {/* Desktop Controls - styled like Spomin games */}
+      {!effectiveFullscreen && (
         <div className="absolute top-4 left-4 z-10 flex gap-2">
-          <Button onClick={handleNewGame} variant="default" size="sm" className="flex items-center gap-2">
+          <Button 
+            onClick={handleNewGame} 
+            variant="default" 
+            className="gap-2 bg-dragon-green hover:bg-dragon-green/90 text-white"
+          >
             <RotateCcw className="w-4 h-4" />
             Nova igra
           </Button>
-          <Button onClick={handleBack} variant="outline" size="sm" className="flex items-center gap-2">
+          <Button 
+            onClick={handleBack} 
+            variant="outline" 
+            className="gap-2"
+          >
             <ArrowLeft className="w-4 h-4" />
             Nazaj
           </Button>
-          <Button onClick={handleInstructions} variant="outline" size="sm" className="flex items-center gap-2">
+          <Button 
+            onClick={handleInstructions} 
+            variant="outline" 
+            className="gap-2"
+          >
             <HelpCircle className="w-4 h-4" />
             Navodila
           </Button>
         </div>
       )}
 
-      {/* Mobile Settings Button */}
-      {isMobile && (
-        <>
+      {/* Mobile Controls - like Spomin games */}
+      {effectiveFullscreen && (
+        <div className="absolute top-4 right-4 z-20 flex gap-1">
           <Button
-            onClick={() => setShowSettingsMenu(!showSettingsMenu)}
-            variant="outline"
+            onClick={handleNewGame}
             size="sm"
-            className="absolute bottom-4 right-4 z-20 w-10 h-10 p-0"
+            className="bg-dragon-green hover:bg-dragon-green/90 text-white p-1.5 h-8 w-8"
+            variant="default"
           >
-            <Settings className="w-4 h-4" />
+            <RotateCcw className="h-3 w-3" />
           </Button>
-
-          {/* Mobile Settings Menu */}
-          {showSettingsMenu && (
-            <div className="absolute bottom-16 right-4 z-30 bg-background border border-border rounded-lg shadow-lg p-2 space-y-1">
-              <Button 
-                onClick={handleNewGame} 
-                variant="ghost" 
-                size="sm" 
-                className="w-full justify-start text-sm"
-              >
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Nova igra
-              </Button>
-              <Button 
-                onClick={handleBack} 
-                variant="ghost" 
-                size="sm" 
-                className="w-full justify-start text-sm"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Nazaj
-              </Button>
-              <Button 
-                onClick={handleInstructions} 
-                variant="ghost" 
-                size="sm" 
-                className="w-full justify-start text-sm"
-              >
-                <HelpCircle className="w-4 h-4 mr-2" />
-                Navodila
-              </Button>
-            </div>
-          )}
-        </>
+          
+          <Button
+            variant="outline"
+            onClick={handleBack}
+            size="sm"
+            className="p-1.5 h-8 w-8"
+          >
+            <ArrowLeft className="h-3 w-3" />
+          </Button>
+          
+          <Button
+            variant="outline"
+            onClick={handleInstructions}
+            size="sm"
+            className="p-1.5 h-8 w-8"
+          >
+            <HelpCircle className="h-3 w-3" />
+          </Button>
+        </div>
       )}
 
       <canvas
