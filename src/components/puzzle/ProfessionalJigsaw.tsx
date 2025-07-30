@@ -162,6 +162,25 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
     // Draw scaled image
     tempCtx.drawImage(image, 0, 0, PUZZLE_WIDTH, PUZZLE_HEIGHT);
 
+    // Generate tab patterns to ensure proper jigsaw connectivity
+    // For horizontal connections (left-right)
+    const horizontalTabs: boolean[][] = [];
+    for (let row = 0; row < gridRows; row++) {
+      horizontalTabs[row] = [];
+      for (let col = 0; col < gridCols - 1; col++) {
+        horizontalTabs[row][col] = Math.random() > 0.5;
+      }
+    }
+
+    // For vertical connections (top-bottom)
+    const verticalTabs: boolean[][] = [];
+    for (let row = 0; row < gridRows - 1; row++) {
+      verticalTabs[row] = [];
+      for (let col = 0; col < gridCols; col++) {
+        verticalTabs[row][col] = Math.random() > 0.5;
+      }
+    }
+
     for (let row = 0; row < gridRows; row++) {
       for (let col = 0; col < gridCols; col++) {
         const piece: PuzzlePiece = {
@@ -182,10 +201,14 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
           isPlaced: false,
           isDragging: false,
           tabs: {
-            top: row > 0 ? Math.random() > 0.5 : false,
-            right: col < gridCols - 1 ? Math.random() > 0.5 : false,
-            bottom: row < gridRows - 1 ? Math.random() > 0.5 : false,
-            left: col > 0 ? Math.random() > 0.5 : false,
+            // Top: has tab if the piece above has a blank (or false if top edge)
+            top: row > 0 ? verticalTabs[row - 1][col] : false,
+            // Right: has tab if this connection is designated as tab for this piece
+            right: col < gridCols - 1 ? horizontalTabs[row][col] : false,
+            // Bottom: has tab if this connection is designated as tab for this piece  
+            bottom: row < gridRows - 1 ? verticalTabs[row][col] : false,
+            // Left: has tab if the piece to the left has a blank (or false if left edge)
+            left: col > 0 ? !horizontalTabs[row][col - 1] : false,
           },
           path: new Path2D(),
           imageData: null
