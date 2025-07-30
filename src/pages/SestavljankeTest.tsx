@@ -23,8 +23,8 @@ export default function SestavljankeTest() {
   const { recordGameCompletion } = useEnhancedProgress();
   const { playAudio } = useAudioPlayback();
   
-  // Mobile devices always get fullscreen, desktop never gets fullscreen
-  const effectiveFullscreen = isMobile;
+  // Always use fullscreen for this game page
+  const effectiveFullscreen = true;
   
   const { isRecording, feedbackMessage, showPositiveFeedback, startRecording } = useSpeechRecording(
     (points) => {
@@ -110,9 +110,9 @@ export default function SestavljankeTest() {
     <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden w-screen h-screen' : 'min-h-screen bg-background'}`} style={effectiveFullscreen ? { position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 9999 } : {}}>
       {!effectiveFullscreen && <Header />}
       
-      {/* Mobile edge-to-edge layout */}
-      {effectiveFullscreen ? (
-        <div className="h-full p-4 relative">
+      {/* Fullscreen layout for all devices */}
+      <div className="h-full flex flex-col relative">
+        <div className="flex-1 p-4">
           <ProfessionalJigsaw
             imageUrl={imageUrl}
             gridCols={2}
@@ -120,8 +120,11 @@ export default function SestavljankeTest() {
             onComplete={handlePuzzleComplete}
             className="h-full"
           />
-          
-          {/* Mobile gear icon in bottom right */}
+        </div>
+        
+        {/* Controls: Mobile gear menu vs Desktop buttons */}
+        {isMobile ? (
+          /* Mobile gear icon in bottom right */
           <div className="absolute bottom-4 right-4 z-50">
             <Popover open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <PopoverTrigger asChild>
@@ -165,49 +168,35 @@ export default function SestavljankeTest() {
               </PopoverContent>
             </Popover>
           </div>
-        </div>
-      ) : (
-        /* Desktop layout */
-        <div className="container max-w-6xl mx-auto pt-20 md:pt-24 pb-20 px-4">
-          <div className="mb-6 text-center">
-            <h1 className="text-3xl font-bold text-primary mb-2">Test Sestavljanka</h1>
-            <p className="text-muted-foreground">Sestavi sliko Zmajčka Tomija</p>
+        ) : (
+          /* Desktop buttons at bottom center */
+          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-50">
+            <div className="flex gap-4">
+              <Button 
+                variant="outline" 
+                onClick={handleNewGame}
+                className="px-6 py-3 text-base font-medium bg-background/90 backdrop-blur-sm shadow-lg hover:bg-background/95"
+              >
+                Nova igra
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={handleBack}
+                className="px-6 py-3 text-base font-medium bg-background/90 backdrop-blur-sm shadow-lg hover:bg-background/95"
+              >
+                Nazaj
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={handleInstructions}
+                className="px-6 py-3 text-base font-medium bg-background/90 backdrop-blur-sm shadow-lg hover:bg-background/95"
+              >
+                Navodila
+              </Button>
+            </div>
           </div>
-
-          <ProfessionalJigsaw
-            imageUrl={imageUrl}
-            gridCols={2}
-            gridRows={3}
-            onComplete={handlePuzzleComplete}
-            className="mb-8"
-          />
-
-          {/* Desktop buttons at bottom center - made more prominent */}
-          <div className="flex justify-center gap-4 mt-8">
-            <Button 
-              variant="outline" 
-              onClick={handleNewGame}
-              className="px-6 py-3 text-base font-medium"
-            >
-              Nova igra
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={handleBack}
-              className="px-6 py-3 text-base font-medium"
-            >
-              Nazaj
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={handleInstructions}
-              className="px-6 py-3 text-base font-medium"
-            >
-              Navodila
-            </Button>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Audio Dialog - appears automatically when puzzle is completed */}
       <AudioPracticeDialog
