@@ -35,13 +35,17 @@ export default function SestavljankeTest() {
     }
   );
 
-  // Enable fullscreen on mobile devices only
+  // Enable fullscreen and landscape orientation on mobile devices only
   useEffect(() => {
-    if (effectiveFullscreen) {
+    if (isMobile) {
       const requestFullscreen = async () => {
         try {
           if (document.documentElement.requestFullscreen) {
             await document.documentElement.requestFullscreen();
+          }
+          // Lock orientation to landscape
+          if (screen.orientation && (screen.orientation as any).lock) {
+            await (screen.orientation as any).lock('landscape');
           }
         } catch (error) {
           console.log('Fullscreen not supported:', error);
@@ -53,9 +57,12 @@ export default function SestavljankeTest() {
         if (document.fullscreenElement) {
           document.exitFullscreen?.();
         }
+        if (screen.orientation && (screen.orientation as any).unlock) {
+          (screen.orientation as any).unlock();
+        }
       };
     }
-  }, [effectiveFullscreen]);
+  }, [isMobile]);
 
   const handlePuzzleComplete = async () => {
     setIsPuzzleCompleted(true);
