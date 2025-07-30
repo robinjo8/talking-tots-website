@@ -9,7 +9,7 @@ import { AudioPracticeDialog } from "@/components/puzzle/AudioPracticeDialog";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Settings } from "lucide-react";
+import { Settings, RotateCcw } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export default function SestavljankeTest() {
@@ -17,6 +17,7 @@ export default function SestavljankeTest() {
   const [isAudioDialogOpen, setIsAudioDialogOpen] = useState(false);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLandscape, setIsLandscape] = useState(true);
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
@@ -35,9 +36,34 @@ export default function SestavljankeTest() {
     }
   );
 
+  // Track orientation on mobile
+  useEffect(() => {
+    if (!isMobile) {
+      setIsLandscape(true);
+      return;
+    }
+
+    const checkOrientation = () => {
+      const isCurrentlyLandscape = window.innerWidth > window.innerHeight;
+      setIsLandscape(isCurrentlyLandscape);
+    };
+
+    // Initial check
+    checkOrientation();
+
+    // Listen for orientation changes
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+
+    return () => {
+      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('orientationchange', checkOrientation);
+    };
+  }, [isMobile]);
+
   // Enable fullscreen and landscape orientation on mobile devices only
   useEffect(() => {
-    if (isMobile) {
+    if (isMobile && isLandscape) {
       const requestFullscreen = async () => {
         try {
           if (document.documentElement.requestFullscreen) {
@@ -62,7 +88,7 @@ export default function SestavljankeTest() {
         }
       };
     }
-  }, [isMobile]);
+  }, [isMobile, isLandscape]);
 
   const handlePuzzleComplete = async () => {
     setIsPuzzleCompleted(true);
@@ -112,6 +138,25 @@ export default function SestavljankeTest() {
     console.log("Navodila clicked");
     setIsMenuOpen(false);
   };
+
+  // Show portrait mode message on mobile when not in landscape
+  if (isMobile && !isLandscape) {
+    return (
+      <div className="fixed inset-0 bg-background flex items-center justify-center p-8" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 9999 }}>
+        <div className="text-center space-y-6">
+          <div className="text-6xl mb-4">
+            <RotateCcw className="w-16 h-16 mx-auto text-primary animate-pulse" />
+          </div>
+          <h2 className="text-2xl font-bold text-foreground">
+            Za začetek igre obrnite telefon
+          </h2>
+          <p className="text-lg text-muted-foreground">
+            Igra se izvaja v ležečem načinu
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden w-screen h-screen' : 'min-h-screen bg-background'}`} style={effectiveFullscreen ? { position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 9999 } : {}}>
