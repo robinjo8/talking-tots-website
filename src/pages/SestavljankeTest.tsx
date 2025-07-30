@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Header from "@/components/Header";
 import { useEnhancedMobile } from "@/hooks/useEnhancedMobile";
 import { useSpeechRecording } from "@/hooks/useSpeechRecording";
@@ -8,15 +8,21 @@ import { ProfessionalJigsaw } from "@/components/puzzle/ProfessionalJigsaw";
 import { AudioPracticeDialog } from "@/components/puzzle/AudioPracticeDialog";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useBeforeUnload } from "react-router-dom";
 import { RotateCcw } from "lucide-react";
+import { ToastAction } from "@/components/ui/toast";
 
 export default function SestavljankeTest() {
   const [isPuzzleCompleted, setIsPuzzleCompleted] = useState(false);
   const [isAudioDialogOpen, setIsAudioDialogOpen] = useState(false);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
   const [gameKey, setGameKey] = useState(0); // Force puzzle reset
-  const [backPressCount, setBackPressCount] = useState(0);
+  const [backPressCount, setBackPressCount] = useState(() => {
+    // Get stored count from sessionStorage to persist across navigation attempts
+    const stored = sessionStorage.getItem('backPressCount');
+    return stored ? parseInt(stored, 10) : 0;
+  });
+  const [isExiting, setIsExiting] = useState(false);
   const { toast } = useToast();
   const { 
     isMobile, 
@@ -78,66 +84,134 @@ export default function SestavljankeTest() {
     };
   }, [isMobile, isLandscape, isFullscreen, requestFullscreen, lockOrientation]);
 
-  // Handle physical back button
+  // Proper navigation exit function
+  const exitGame = useCallback(async () => {
+    if (isExiting) return; // Prevent multiple simultaneous exits
+    
+    setIsExiting(true);
+    sessionStorage.removeItem('backPressCount'); // Clean up storage
+    
+    try {
+      await unlockOrientation();
+      await exitFullscreen();
+      
+      // Navigate with proper cleanup
+      setTimeout(() => {
+        navigate('/govorne-igre/sestavljanke', { replace: true });
+      }, 300);
+    } catch (error) {
+      console.warn('Error exiting game:', error);
+      navigate('/govorne-igre/sestavljanke', { replace: true });
+    }
+  }, [unlockOrientation, exitFullscreen, navigate, isExiting]);
+
+  // Enhanced back button handling with proper state persistence
   useEffect(() => {
     if (!isMobile) return;
 
     let backPressTimer: NodeJS.Timeout;
+    let navigationBlocked = false;
+
+    const handleVisibilityChange = () => {
+      // Reset fullscreen when page becomes visible again (handles Android back button edge cases)
+      if (!document.hidden && isMobile && !isFullscreen) {
+        requestFullscreen();
+      }
+    };
+
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      // This helps with some browsers that fire beforeunload on back button
+      if (backPressCount === 0) {
+        event.preventDefault();
+        event.returnValue = '';
+        handleBackPress();
+        return '';
+      }
+    };
+
+    const handleBackPress = () => {
+      const currentCount = parseInt(sessionStorage.getItem('backPressCount') || '0', 10);
+      
+      if (currentCount === 0) {
+        // First press - show warning and start timer
+        const newCount = 1;
+        sessionStorage.setItem('backPressCount', newCount.toString());
+        setBackPressCount(newCount);
+        
+        toast({
+          title: "Pritisnite ponovno za izhod",
+          description: "Drugo pritiskanje vas bo vrnilo nazaj",
+          duration: 2000,
+          action: (
+            <ToastAction
+              altText="Ostani v igri"
+              onClick={() => {
+                sessionStorage.setItem('backPressCount', '0');
+                setBackPressCount(0);
+                clearTimeout(backPressTimer);
+              }}
+            >
+              Ostani
+            </ToastAction>
+          )
+        });
+        
+        // Reset counter after 2 seconds
+        backPressTimer = setTimeout(() => {
+          sessionStorage.setItem('backPressCount', '0');
+          setBackPressCount(0);
+        }, 2000);
+        
+        // Add another history entry to "catch" the next back press
+        window.history.pushState(null, '', window.location.href);
+        
+      } else {
+        // Second press - exit
+        clearTimeout(backPressTimer);
+        exitGame();
+      }
+    };
 
     const handlePopState = (event: PopStateEvent) => {
       event.preventDefault();
+      event.stopPropagation();
       
-      setBackPressCount(prev => {
-        const newCount = prev + 1;
+      if (!navigationBlocked) {
+        navigationBlocked = true;
+        handleBackPress();
         
-        if (newCount === 1) {
-          // First press - show message and reset timer
-          toast({
-            title: "Pritisnite ponovno za izhod",
-            description: "Drugo pritiskanje vas bo vrnilo nazaj",
-            duration: 2000,
-          });
-          
-          backPressTimer = setTimeout(() => {
-            setBackPressCount(0);
-          }, 2000);
-          return 1;
-        } else {
-          // Second press - exit properly
-          clearTimeout(backPressTimer);
-          
-          // Exit fullscreen and unlock orientation properly
-          const exitGame = async () => {
-            try {
-              await unlockOrientation();
-              await exitFullscreen();
-              // Small delay to ensure fullscreen exit completes
-              setTimeout(() => {
-                navigate('/govorne-igre/sestavljanke');
-              }, 200);
-            } catch (error) {
-              console.warn('Error exiting game:', error);
-              navigate('/govorne-igre/sestavljanke');
-            }
-          };
-          
-          exitGame();
-          return 0;
-        }
-      });
+        // Reset block after a short delay
+        setTimeout(() => {
+          navigationBlocked = false;
+        }, 100);
+      }
     };
 
-    // Prevent browser back button from working normally
+    // Set up initial history entry
     window.history.pushState(null, '', window.location.href);
+    
+    // Add event listeners
     window.addEventListener('popstate', handlePopState);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
       window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       if (backPressTimer) {
         clearTimeout(backPressTimer);
       }
     };
-  }, [isMobile, navigate, unlockOrientation, exitFullscreen, toast]);
+  }, [isMobile, backPressCount, toast, exitGame, requestFullscreen, isFullscreen]);
+
+  // Use React Router's beforeunload hook as additional protection
+  useBeforeUnload(
+    useCallback(() => {
+      const currentCount = parseInt(sessionStorage.getItem('backPressCount') || '0', 10);
+      return currentCount === 0;
+    }, [])
+  );
 
   const handlePuzzleComplete = async () => {
     setIsPuzzleCompleted(true);
@@ -186,20 +260,9 @@ export default function SestavljankeTest() {
     }
   };
 
-  const handleBack = async () => {
-    try {
-      // Force unlock orientation and exit fullscreen
-      await unlockOrientation();
-      await exitFullscreen();
-      
-      // Longer delay to ensure state changes complete
-      setTimeout(() => {
-        navigate('/govorne-igre/sestavljanke');
-      }, 300);
-    } catch (error) {
-      console.warn('Error in handleBack:', error);
-      navigate('/govorne-igre/sestavljanke');
-    }
+  const handleBack = () => {
+    // Use the same exit function for consistency
+    exitGame();
   };
 
   const handleInstructions = () => {
