@@ -133,7 +133,7 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
     }
   }, [isMobile]);
 
-  const handleNewGame = () => {
+  const resetPuzzle = useCallback(() => {
     // Reset all pieces to initial scattered positions
     setPieces(prev => prev.map(piece => ({
       ...piece,
@@ -144,7 +144,17 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
       isPlaced: false,
       isDragging: false
     })));
-  };
+  }, [LEFT_AREA_START, LEFT_AREA_END, RIGHT_AREA_START, RIGHT_AREA_END, CANVAS_HEIGHT]);
+
+  // Listen for reset puzzle event from parent
+  useEffect(() => {
+    const handleResetPuzzle = () => {
+      resetPuzzle();
+    };
+
+    window.addEventListener('resetPuzzle', handleResetPuzzle);
+    return () => window.removeEventListener('resetPuzzle', handleResetPuzzle);
+  }, [resetPuzzle]);
 
   const handleBack = () => {
     window.history.back();

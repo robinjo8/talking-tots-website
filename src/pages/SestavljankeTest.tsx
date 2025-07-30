@@ -124,8 +124,13 @@ export default function SestavljankeTest() {
   const imageUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/Zmajcek_6.png";
 
   const handleNewGame = () => {
-    window.location.reload();
+    // Reset puzzle state without reloading page to maintain fullscreen
+    setIsPuzzleCompleted(false);
+    setIsAudioDialogOpen(false);
     setIsMenuOpen(false);
+    
+    // Reset puzzle pieces - trigger new game in ProfessionalJigsaw
+    window.dispatchEvent(new CustomEvent('resetPuzzle'));
   };
 
   const handleBack = () => {
