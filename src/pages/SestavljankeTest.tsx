@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Header from "@/components/Header";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useEnhancedMobile } from "@/hooks/useEnhancedMobile";
 import { useSpeechRecording } from "@/hooks/useSpeechRecording";
 import { useToast } from "@/hooks/use-toast";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
@@ -9,24 +9,25 @@ import { AudioPracticeDialog } from "@/components/puzzle/AudioPracticeDialog";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Settings, RotateCcw } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { RotateCcw } from "lucide-react";
 
 export default function SestavljankeTest() {
   const [isPuzzleCompleted, setIsPuzzleCompleted] = useState(false);
   const [isAudioDialogOpen, setIsAudioDialogOpen] = useState(false);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [gameKey, setGameKey] = useState(0); // Force puzzle reset
   const { toast } = useToast();
-  const isMobile = useIsMobile();
+  const { 
+    isMobile, 
+    isLandscape, 
+    isFullscreen, 
+    requestFullscreen, 
+    lockOrientation 
+  } = useEnhancedMobile();
   const navigate = useNavigate();
   const { recordGameCompletion } = useEnhancedProgress();
   const { playAudio } = useAudioPlayback();
-  
-  // Debug logging
-  console.log('SestavljankeTest render - isMobile:', isMobile);
-  console.log('SestavljankeTest render - window dimensions:', window.innerWidth, 'x', window.innerHeight);
-  console.log('SestavljankeTest render - isLandscape:', window.innerWidth > window.innerHeight);
+  const puzzleRef = useRef<{ resetPuzzle: () => void }>(null);
   
   const { isRecording, feedbackMessage, showPositiveFeedback, startRecording } = useSpeechRecording(
     (points) => {
@@ -37,27 +38,42 @@ export default function SestavljankeTest() {
     }
   );
 
-  // Enable fullscreen on mobile devices (always)
+  // Enhanced fullscreen and orientation handling
   useEffect(() => {
-    if (isMobile) {
-      const requestFullscreen = async () => {
-        try {
-          if (document.documentElement.requestFullscreen) {
-            await document.documentElement.requestFullscreen();
-          }
-        } catch (error) {
-          console.log('Fullscreen not supported:', error);
+    let fullscreenAttempted = false;
+    
+    const setupMobileExperience = async () => {
+      if (isMobile && !fullscreenAttempted) {
+        fullscreenAttempted = true;
+        
+        // Always request fullscreen immediately on mobile
+        const fullscreenSuccess = await requestFullscreen();
+        
+        if (fullscreenSuccess) {
+          // Try to lock landscape orientation
+          setTimeout(() => {
+            lockOrientation('landscape');
+          }, 100);
         }
-      };
-      requestFullscreen();
-      
-      return () => {
-        if (document.fullscreenElement) {
-          document.exitFullscreen?.();
-        }
-      };
-    }
-  }, [isMobile]);
+      }
+    };
+
+    setupMobileExperience();
+
+    // Handle orientation changes while maintaining fullscreen
+    const handleOrientationChange = async () => {
+      if (isMobile && isLandscape && !isFullscreen) {
+        // Re-request fullscreen if we lost it during orientation change
+        await requestFullscreen();
+      }
+    };
+
+    window.addEventListener('orientationchange', handleOrientationChange);
+    
+    return () => {
+      window.removeEventListener('orientationchange', handleOrientationChange);
+    };
+  }, [isMobile, isLandscape, isFullscreen, requestFullscreen, lockOrientation]);
 
   const handlePuzzleComplete = async () => {
     setIsPuzzleCompleted(true);
@@ -96,32 +112,43 @@ export default function SestavljankeTest() {
     // Reset puzzle state without reloading page to maintain fullscreen
     setIsPuzzleCompleted(false);
     setIsAudioDialogOpen(false);
-    setIsMenuOpen(false);
     
-    // Reset puzzle pieces - trigger new game in ProfessionalJigsaw
-    window.dispatchEvent(new CustomEvent('resetPuzzle'));
+    // Force puzzle component to re-mount with new key
+    setGameKey(prev => prev + 1);
+    
+    // Also call direct reset if available
+    if (puzzleRef.current?.resetPuzzle) {
+      puzzleRef.current.resetPuzzle();
+    }
   };
 
   const handleBack = () => {
     navigate(-1);
-    setIsMenuOpen(false);
   };
 
   const handleInstructions = () => {
     // Handle instructions action
     console.log("Navodila clicked");
-    setIsMenuOpen(false);
   };
 
-  const isLandscape = window.innerWidth > window.innerHeight;
-
   return (
-    <div className={`${isMobile ? 'fixed inset-0 bg-background overflow-hidden w-screen h-screen' : 'min-h-screen bg-background'}`} style={isMobile ? { position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 9999 } : {}}>
+    <div 
+      className={`${isMobile ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}
+      style={isMobile ? {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        zIndex: 9999,
+        backgroundColor: 'black', // Ensure black background for fullscreen
+      } : {}}
+    >
       {!isMobile && <Header />}
       
       {/* Show portrait message on mobile when not in landscape, but WITHIN fullscreen container */}
       {isMobile && !isLandscape ? (
-        <div className="h-full flex items-center justify-center p-8">
+        <div className="h-full flex items-center justify-center p-8 bg-background">
           <div className="text-center space-y-6">
             <div className="text-6xl mb-4">
               <RotateCcw className="w-16 h-16 mx-auto text-primary animate-pulse" />
@@ -135,92 +162,46 @@ export default function SestavljankeTest() {
           </div>
         </div>
       ) : (
-        /* Game layout */
+        /* Game layout - Unified for both mobile and desktop */
         <div className="h-full flex flex-col relative">
-        <div className="flex-1 p-4">
-          <ProfessionalJigsaw
-            imageUrl={imageUrl}
-            gridCols={2}
-            gridRows={3}
-            onComplete={handlePuzzleComplete}
-            className="h-full"
-          />
-        </div>
-        
-        {/* Controls: Mobile gear menu vs Desktop buttons */}
-        {isMobile ? (
-          /* Mobile gear icon in bottom right */
-          <div className="absolute bottom-4 right-4 z-50">
-            <Popover open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-14 w-14 rounded-full bg-background/90 backdrop-blur-sm border-2 shadow-lg hover:bg-background/95 transition-all"
-                >
-                  <Settings size={28} />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent 
-                className="w-52 p-3 mr-4 mb-2" 
-                side="top" 
-                align="end"
-                sideOffset={8}
-              >
-                <div className="flex flex-col gap-2">
-                  <Button
-                    variant="ghost"
-                    onClick={handleNewGame}
-                    className="justify-start w-full text-left px-3 py-2"
-                  >
-                    Nova igra
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={handleBack}
-                    className="justify-start w-full text-left px-3 py-2"
-                  >
-                    Nazaj
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={handleInstructions}
-                    className="justify-start w-full text-left px-3 py-2"
-                  >
-                    Navodila
-                  </Button>
-                </div>
-              </PopoverContent>
-            </Popover>
+          <div className="flex-1 p-4">
+            <ProfessionalJigsaw
+              key={gameKey} // Force re-mount on new game
+              ref={puzzleRef}
+              imageUrl={imageUrl}
+              gridCols={2}
+              gridRows={3}
+              onComplete={handlePuzzleComplete}
+              className="h-full"
+            />
           </div>
-        ) : (
-          /* Desktop buttons at bottom center */
+          
+          {/* Unified Controls: Always bottom center for consistency */}
           <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-50">
             <div className="flex gap-4">
               <Button 
                 variant="outline" 
                 onClick={handleNewGame}
-                className="px-6 py-3 text-base font-medium bg-background/90 backdrop-blur-sm shadow-lg hover:bg-background/95"
+                className="px-6 py-3 text-base font-medium bg-background/90 backdrop-blur-sm shadow-lg hover:bg-background/95 border-2"
               >
                 Nova igra
               </Button>
               <Button 
                 variant="outline" 
                 onClick={handleBack}
-                className="px-6 py-3 text-base font-medium bg-background/90 backdrop-blur-sm shadow-lg hover:bg-background/95"
+                className="px-6 py-3 text-base font-medium bg-background/90 backdrop-blur-sm shadow-lg hover:bg-background/95 border-2"
               >
                 Nazaj
               </Button>
               <Button 
                 variant="outline" 
                 onClick={handleInstructions}
-                className="px-6 py-3 text-base font-medium bg-background/90 backdrop-blur-sm shadow-lg hover:bg-background/95"
+                className="px-6 py-3 text-base font-medium bg-background/90 backdrop-blur-sm shadow-lg hover:bg-background/95 border-2"
               >
                 Navodila
               </Button>
             </div>
           </div>
-        )}
         </div>
       )}
 
