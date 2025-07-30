@@ -60,13 +60,22 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   
   // Responsive dimensions based on viewport
-  const PUZZLE_WIDTH = window.innerWidth > 768 ? 800 : 500;
-  const PUZZLE_HEIGHT = window.innerWidth > 768 ? 600 : 375;
   const CANVAS_WIDTH = window.innerWidth > 768 ? 1600 : 900;
   const CANVAS_HEIGHT = window.innerWidth > 768 ? 900 : 600;
   const TAB_SIZE = window.innerWidth > 768 ? 25 : 15;
-  const BOARD_X = (CANVAS_WIDTH - PUZZLE_WIDTH) / 2;
-  const BOARD_Y = (CANVAS_HEIGHT - PUZZLE_HEIGHT) / 2;
+  
+  // Define three zones: left, center (puzzle board), right
+  const SIDE_ZONE_WIDTH = window.innerWidth > 768 ? 250 : 150;
+  const PUZZLE_WIDTH = CANVAS_WIDTH - (SIDE_ZONE_WIDTH * 2) - 40; // 20px margin on each side
+  const PUZZLE_HEIGHT = window.innerWidth > 768 ? 600 : 375;
+  
+  // Zone boundaries
+  const LEFT_ZONE = { x: 20, y: 20, width: SIDE_ZONE_WIDTH, height: CANVAS_HEIGHT - 40 };
+  const CENTER_ZONE = { x: SIDE_ZONE_WIDTH + 30, y: (CANVAS_HEIGHT - PUZZLE_HEIGHT) / 2, width: PUZZLE_WIDTH, height: PUZZLE_HEIGHT };
+  const RIGHT_ZONE = { x: CANVAS_WIDTH - SIDE_ZONE_WIDTH - 20, y: 20, width: SIDE_ZONE_WIDTH, height: CANVAS_HEIGHT - 40 };
+  
+  const BOARD_X = CENTER_ZONE.x;
+  const BOARD_Y = CENTER_ZONE.y;
 
   // Load and process image
   useEffect(() => {
@@ -205,11 +214,13 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
           y: row * pieceHeight,
           width: pieceWidth,
           height: pieceHeight,
-          // Scatter pieces on left and right sides
+          // Scatter pieces in left and right zones
           currentX: Math.random() > 0.5 
-            ? 20 + Math.random() * 150  // Left side
-            : CANVAS_WIDTH - 200 + Math.random() * 150, // Right side
-          currentY: 50 + Math.random() * (CANVAS_HEIGHT - 150),
+            ? LEFT_ZONE.x + Math.random() * (LEFT_ZONE.width - pieceWidth)  // Left zone
+            : RIGHT_ZONE.x + Math.random() * (RIGHT_ZONE.width - pieceWidth), // Right zone
+          currentY: Math.random() > 0.5 
+            ? LEFT_ZONE.y + Math.random() * (LEFT_ZONE.height / 2 - pieceHeight)  // Top half
+            : LEFT_ZONE.y + LEFT_ZONE.height / 2 + Math.random() * (LEFT_ZONE.height / 2 - pieceHeight), // Bottom half
           correctX: BOARD_X + col * pieceWidth,
           correctY: BOARD_Y + row * pieceHeight,
           isPlaced: false,
@@ -258,12 +269,18 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
     ctx.fillStyle = '#f8fafc';
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    // Draw puzzle board area (centered)
-    ctx.strokeStyle = '#e2e8f0';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([5, 5]);
-    ctx.strokeRect(BOARD_X, BOARD_Y, PUZZLE_WIDTH, PUZZLE_HEIGHT);
-    ctx.setLineDash([]);
+    // Draw zone boundaries
+    ctx.strokeStyle = '#1f2937';
+    ctx.lineWidth = 3;
+    
+    // Left zone
+    ctx.strokeRect(LEFT_ZONE.x, LEFT_ZONE.y, LEFT_ZONE.width, LEFT_ZONE.height);
+    
+    // Center zone (puzzle board)
+    ctx.strokeRect(CENTER_ZONE.x, CENTER_ZONE.y, CENTER_ZONE.width, CENTER_ZONE.height);
+    
+    // Right zone
+    ctx.strokeRect(RIGHT_ZONE.x, RIGHT_ZONE.y, RIGHT_ZONE.width, RIGHT_ZONE.height);
 
 
     // Sort pieces so dragged piece is drawn last (on top)
@@ -400,14 +417,75 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
     }
   };
 
+  // Helper function to check which zone a point is in
+  const getZoneForPosition = (x: number, y: number) => {
+    if (x >= LEFT_ZONE.x && x <= LEFT_ZONE.x + LEFT_ZONE.width &&
+        y >= LEFT_ZONE.y && y <= LEFT_ZONE.y + LEFT_ZONE.height) {
+      return 'left';
+    }
+    if (x >= CENTER_ZONE.x && x <= CENTER_ZONE.x + CENTER_ZONE.width &&
+        y >= CENTER_ZONE.y && y <= CENTER_ZONE.y + CENTER_ZONE.height) {
+      return 'center';
+    }
+    if (x >= RIGHT_ZONE.x && x <= RIGHT_ZONE.x + RIGHT_ZONE.width &&
+        y >= RIGHT_ZONE.y && y <= RIGHT_ZONE.y + RIGHT_ZONE.height) {
+      return 'right';
+    }
+    return null;
+  };
+
+  // Helper function to constrain position within allowed zones
+  const constrainPosition = (x: number, y: number, pieceWidth: number, pieceHeight: number) => {
+    const zone = getZoneForPosition(x + pieceWidth / 2, y + pieceHeight / 2);
+    
+    let constrainedX = x;
+    let constrainedY = y;
+    
+    if (zone === 'left') {
+      constrainedX = Math.max(LEFT_ZONE.x, Math.min(x, LEFT_ZONE.x + LEFT_ZONE.width - pieceWidth));
+      constrainedY = Math.max(LEFT_ZONE.y, Math.min(y, LEFT_ZONE.y + LEFT_ZONE.height - pieceHeight));
+    } else if (zone === 'center') {
+      constrainedX = Math.max(CENTER_ZONE.x, Math.min(x, CENTER_ZONE.x + CENTER_ZONE.width - pieceWidth));
+      constrainedY = Math.max(CENTER_ZONE.y, Math.min(y, CENTER_ZONE.y + CENTER_ZONE.height - pieceHeight));
+    } else if (zone === 'right') {
+      constrainedX = Math.max(RIGHT_ZONE.x, Math.min(x, RIGHT_ZONE.x + RIGHT_ZONE.width - pieceWidth));
+      constrainedY = Math.max(RIGHT_ZONE.y, Math.min(y, RIGHT_ZONE.y + RIGHT_ZONE.height - pieceHeight));
+    } else {
+      // If outside all zones, find the closest zone
+      const distToLeft = Math.abs(x - (LEFT_ZONE.x + LEFT_ZONE.width / 2));
+      const distToCenter = Math.abs(x - (CENTER_ZONE.x + CENTER_ZONE.width / 2));
+      const distToRight = Math.abs(x - (RIGHT_ZONE.x + RIGHT_ZONE.width / 2));
+      
+      if (distToLeft <= distToCenter && distToLeft <= distToRight) {
+        constrainedX = Math.max(LEFT_ZONE.x, Math.min(x, LEFT_ZONE.x + LEFT_ZONE.width - pieceWidth));
+        constrainedY = Math.max(LEFT_ZONE.y, Math.min(y, LEFT_ZONE.y + LEFT_ZONE.height - pieceHeight));
+      } else if (distToCenter <= distToRight) {
+        constrainedX = Math.max(CENTER_ZONE.x, Math.min(x, CENTER_ZONE.x + CENTER_ZONE.width - pieceWidth));
+        constrainedY = Math.max(CENTER_ZONE.y, Math.min(y, CENTER_ZONE.y + CENTER_ZONE.height - pieceHeight));
+      } else {
+        constrainedX = Math.max(RIGHT_ZONE.x, Math.min(x, RIGHT_ZONE.x + RIGHT_ZONE.width - pieceWidth));
+        constrainedY = Math.max(RIGHT_ZONE.y, Math.min(y, RIGHT_ZONE.y + RIGHT_ZONE.height - pieceHeight));
+      }
+    }
+    
+    return { x: constrainedX, y: constrainedY };
+  };
+
   const handleMove = (e: React.MouseEvent | React.TouchEvent) => {
     if (!draggedPiece) return;
 
     const eventPos = getEventPos(e);
+    const newX = eventPos.x - offset.x;
+    const newY = eventPos.y - offset.y;
+    
+    const piece = pieces.find(p => p.id === draggedPiece.id);
+    if (!piece) return;
+    
+    const constrained = constrainPosition(newX, newY, piece.width, piece.height);
 
     setPieces(prev => prev.map(p => 
       p.id === draggedPiece.id 
-        ? { ...p, currentX: eventPos.x - offset.x, currentY: eventPos.y - offset.y }
+        ? { ...p, currentX: constrained.x, currentY: constrained.y }
         : p
     ));
   };
