@@ -46,9 +46,9 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   
-  const PUZZLE_WIDTH = 400;
-  const PUZZLE_HEIGHT = 300;
-  const CANVAS_WIDTH = 1000;
+  const PUZZLE_WIDTH = 600;  // Increased from 400
+  const PUZZLE_HEIGHT = 450; // Increased from 300
+  const CANVAS_WIDTH = 1200; // Increased from 1000
   const CANVAS_HEIGHT = 700;
   const TAB_SIZE = 20;
   const BOARD_X = (CANVAS_WIDTH - PUZZLE_WIDTH) / 2; // Center the board
