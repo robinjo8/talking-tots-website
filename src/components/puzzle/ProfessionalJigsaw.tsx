@@ -93,13 +93,6 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   
   const TAB_SIZE = Math.max(15, Math.min(30, PUZZLE_WIDTH / 40));
 
-  // Debug logging after all variables are declared
-  console.log('ProfessionalJigsaw render - isMobile:', isMobile, 'isDesktop:', isDesktop);
-  console.log('ProfessionalJigsaw render - CANVAS dimensions:', CANVAS_WIDTH, 'x', CANVAS_HEIGHT);
-  console.log('ProfessionalJigsaw render - PUZZLE dimensions:', PUZZLE_WIDTH, 'x', PUZZLE_HEIGHT);
-  console.log('ProfessionalJigsaw render - BOARD position:', BOARD_X, ',', BOARD_Y);
-  console.log('ProfessionalJigsaw render - pieces count:', pieces.length);
-
   const resetPuzzle = useCallback(() => {
     // Reset all pieces to initial scattered positions
     setPieces(prev => prev.map(piece => ({
