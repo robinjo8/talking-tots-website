@@ -9,6 +9,7 @@ import { AudioPracticeDialog } from "@/components/puzzle/AudioPracticeDialog";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { RotateCcw, ArrowLeft, HelpCircle } from "lucide-react";
 
 export default function SestavljankeTest() {
   const [isPuzzleCompleted, setIsPuzzleCompleted] = useState(false);
@@ -85,6 +86,19 @@ export default function SestavljankeTest() {
     }
   };
 
+  const handleNewGame = () => {
+    // This will trigger the puzzle reset through the child component
+    window.location.reload();
+  };
+
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  const handleInstructions = () => {
+    alert('Povlecite dele sestavljanke na pravo mesto. Ko se del približa svojemu mestu, se bo samodejno prilepil.');
+  };
+
   const imageUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/Zmajcek_6.png";
 
   return (
@@ -110,20 +124,43 @@ export default function SestavljankeTest() {
             <p className="text-muted-foreground">Sestavi sliko Zmajčka Tomija</p>
           </div>
 
-          <ProfessionalJigsaw
-            imageUrl={imageUrl}
-            gridCols={2}
-            gridRows={3}
-            onComplete={handlePuzzleComplete}
-            className="mb-6"
-          />
+          <div className="mb-6" style={{ height: '60vh' }}>
+            <ProfessionalJigsaw
+              imageUrl={imageUrl}
+              gridCols={2}
+              gridRows={3}
+              onComplete={handlePuzzleComplete}
+              onNewGame={handleNewGame}
+              onBack={handleBack}
+              onInstructions={handleInstructions}
+              className="w-full h-full"
+            />
+          </div>
 
-          <div className="text-center">
+          <div className="flex justify-center gap-4">
             <Button 
-              variant="outline" 
-              onClick={() => navigate(-1)}
+              onClick={handleNewGame} 
+              variant="default" 
+              className="flex items-center gap-2"
             >
-              Nazaj na sestavljanke
+              <RotateCcw className="w-4 h-4" />
+              Nova igra
+            </Button>
+            <Button 
+              onClick={handleBack} 
+              variant="outline" 
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Nazaj
+            </Button>
+            <Button 
+              onClick={handleInstructions} 
+              variant="outline" 
+              className="flex items-center gap-2"
+            >
+              <HelpCircle className="w-4 h-4" />
+              Navodila
             </Button>
           </div>
         </div>
