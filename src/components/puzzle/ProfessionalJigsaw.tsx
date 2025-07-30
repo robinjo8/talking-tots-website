@@ -46,9 +46,14 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
     return (
       <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
         <div className="text-white text-center p-8">
-          <div className="text-6xl mb-4">📱</div>
-          <h2 className="text-2xl font-bold mb-2">Rotate Your Device</h2>
-          <p className="text-lg">Please rotate your device to landscape mode to play the puzzle game.</p>
+          <div className="relative mb-6">
+            <div className="text-6xl">📱</div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-20 h-20 border-2 border-white border-t-transparent rounded-full animate-spin opacity-60"></div>
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold mb-2">Obrnite telefon</h2>
+          <p className="text-lg">Za igranje sestavljanke prosimo, obrnite svojo napravo v ležeči način.</p>
         </div>
       </div>
     );
