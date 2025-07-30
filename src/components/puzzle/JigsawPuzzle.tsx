@@ -50,61 +50,87 @@ export const JigsawPuzzle: React.FC<JigsawPuzzleProps> = ({
 
     const loadAndCreatePuzzle = async () => {
       try {
-        const img = await FabricImage.fromURL(imageUrl);
+        console.log('Loading image from URL:', imageUrl);
         
-        // Scale image to fit puzzle area
-        const maxWidth = 400;
-        const maxHeight = 300;
-        const scale = Math.min(maxWidth / img.width!, maxHeight / img.height!);
+        // Test if image loads first
+        const testImg = new Image();
+        testImg.crossOrigin = 'anonymous';
         
-        img.scale(scale);
-        
-        const scaledWidth = img.width! * scale;
-        const scaledHeight = img.height! * scale;
-        
-        const pieceWidth = scaledWidth / gridSize;
-        const pieceHeight = scaledHeight / gridSize;
-        
-        const newPieces: PuzzlePiece[] = [];
-        
-        // Create puzzle pieces
-        for (let row = 0; row < gridSize; row++) {
-          for (let col = 0; col < gridSize; col++) {
-            const piece = await createPuzzlePiece(
-              img,
-              col * pieceWidth,
-              row * pieceHeight,
-              pieceWidth,
-              pieceHeight,
-              row,
-              col
-            );
+        testImg.onload = async () => {
+          console.log('Image loaded successfully, dimensions:', testImg.width, testImg.height);
+          
+          try {
+            const img = await FabricImage.fromURL(imageUrl, { crossOrigin: 'anonymous' });
+            console.log('Fabric image created:', img);
             
-            // Randomly position pieces in side area
-            piece.set({
-              left: 450 + Math.random() * 200,
-              top: 50 + Math.random() * 350,
-              selectable: true,
-              hasControls: false,
-              hasBorders: true,
-              borderColor: '#4f46e5',
-              borderScaleFactor: 2,
-            });
+            // Scale image to fit puzzle area
+            const maxWidth = 400;
+            const maxHeight = 300;
+            const scale = Math.min(maxWidth / img.width!, maxHeight / img.height!);
             
-            fabricCanvas.add(piece);
-            newPieces.push(piece);
+            img.scale(scale);
+            
+            const scaledWidth = img.width! * scale;
+            const scaledHeight = img.height! * scale;
+            
+            const pieceWidth = scaledWidth / gridSize;
+            const pieceHeight = scaledHeight / gridSize;
+            
+            console.log('Creating puzzle pieces:', { gridSize, pieceWidth, pieceHeight });
+            
+            const newPieces: PuzzlePiece[] = [];
+            
+            // Create puzzle pieces
+            for (let row = 0; row < gridSize; row++) {
+              for (let col = 0; col < gridSize; col++) {
+                const piece = await createPuzzlePiece(
+                  img,
+                  col * pieceWidth,
+                  row * pieceHeight,
+                  pieceWidth,
+                  pieceHeight,
+                  row,
+                  col
+                );
+                
+                // Randomly position pieces in side area
+                piece.set({
+                  left: 450 + Math.random() * 200,
+                  top: 50 + Math.random() * 350,
+                  selectable: true,
+                  hasControls: false,
+                  hasBorders: true,
+                  borderColor: '#4f46e5',
+                  borderScaleFactor: 2,
+                });
+                
+                fabricCanvas.add(piece);
+                newPieces.push(piece);
+              }
+            }
+            
+            setPieces(newPieces);
+            fabricCanvas.renderAll();
+            console.log('Puzzle created successfully with', newPieces.length, 'pieces');
+            
+            // Add event listeners for drag and drop
+            fabricCanvas.on('object:moving' as any, handlePieceMoving);
+            fabricCanvas.on('object:moved' as any, handlePieceMoved);
+            
+          } catch (fabricError) {
+            console.error('Error creating Fabric image:', fabricError);
           }
-        }
+        };
         
-        setPieces(newPieces);
-        fabricCanvas.renderAll();
+        testImg.onerror = (error) => {
+          console.error('Error loading image:', error);
+          console.error('Failed to load image from URL:', imageUrl);
+        };
         
-        // Add event listeners for drag and drop
-        fabricCanvas.on('object:moving' as any, handlePieceMoving);
-        fabricCanvas.on('object:moved' as any, handlePieceMoved);
+        testImg.src = imageUrl;
         
       } catch (error) {
-        console.error('Error loading puzzle image:', error);
+        console.error('Error in loadAndCreatePuzzle:', error);
       }
     };
 
@@ -120,45 +146,51 @@ export const JigsawPuzzle: React.FC<JigsawPuzzleProps> = ({
     row: number,
     col: number
   ): Promise<PuzzlePiece> => {
-    // Create a cropped version of the image for this piece
-    const pieceImg = await FabricImage.fromURL(imageUrl);
-    const scale = sourceImg.scaleX!;
-    
-    pieceImg.scale(scale);
-    
-    // Create clipping rect
-    const clipRect = new Rect({
-      left: x,
-      top: y,
-      width: width,
-      height: height,
-      absolutePositioned: true,
-    });
-    
-    pieceImg.set({
-      left: -x,
-      top: -y,
-      clipPath: clipRect,
-    });
+    try {
+      // Create a cropped version of the image for this piece
+      const pieceImg = await FabricImage.fromURL(imageUrl, { crossOrigin: 'anonymous' });
+      const scale = sourceImg.scaleX!;
+      
+      pieceImg.scale(scale);
+      
+      // Create clipping rect
+      const clipRect = new Rect({
+        left: x,
+        top: y,
+        width: width,
+        height: height,
+        absolutePositioned: true,
+      });
+      
+      pieceImg.set({
+        left: -x,
+        top: -y,
+        clipPath: clipRect,
+      });
 
-    // Create simple rectangular piece (we can enhance with jigsaw shapes later)
-    const piece = new Group([pieceImg], {
-      left: 50 + col * width, // Start position in puzzle board area
-      top: 50 + row * height,
-      width: width,
-      height: height,
-    }) as PuzzlePiece;
+      // Create simple rectangular piece (we can enhance with jigsaw shapes later)
+      const piece = new Group([pieceImg], {
+        left: 50 + col * width, // Start position in puzzle board area
+        top: 50 + row * height,
+        width: width,
+        height: height,
+      }) as PuzzlePiece;
 
-    // Add custom data
-    piece.puzzleData = {
-      correctX: 50 + col * width,
-      correctY: 50 + row * height,
-      row: row,
-      col: col,
-      isPlaced: false,
-    };
+      // Add custom data
+      piece.puzzleData = {
+        correctX: 50 + col * width,
+        correctY: 50 + row * height,
+        row: row,
+        col: col,
+        isPlaced: false,
+      };
 
-    return piece;
+      console.log('Created puzzle piece:', { row, col, x, y, width, height });
+      return piece;
+    } catch (error) {
+      console.error('Error creating puzzle piece:', error);
+      throw error;
+    }
   };
 
   const handlePieceMoving = (e: any) => {

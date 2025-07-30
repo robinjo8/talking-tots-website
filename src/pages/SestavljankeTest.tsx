@@ -5,6 +5,7 @@ import { useSpeechRecording } from "@/hooks/useSpeechRecording";
 import { useToast } from "@/hooks/use-toast";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { JigsawPuzzle } from "@/components/puzzle/JigsawPuzzle";
+import { SimplePuzzle } from "@/components/puzzle/SimplePuzzle";
 import { AudioPracticeDialog } from "@/components/puzzle/AudioPracticeDialog";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { Button } from "@/components/ui/button";
@@ -109,12 +110,23 @@ export default function SestavljankeTest() {
             <p className="text-muted-foreground">Sestavi sliko Zmajčka Tomija</p>
           </div>
 
-          <JigsawPuzzle
-            imageUrl={imageUrl}
-            gridSize={3}
-            onComplete={handlePuzzleComplete}
-            className="mb-6"
-          />
+          <div className="space-y-6">
+            <SimplePuzzle
+              imageUrl={imageUrl}
+              onComplete={handlePuzzleComplete}
+              className="mb-6"
+            />
+            
+            <div className="border-t pt-6">
+              <h3 className="text-lg font-semibold mb-4">Advanced Fabric.js Version:</h3>
+              <JigsawPuzzle
+                imageUrl={imageUrl}
+                gridSize={3}
+                onComplete={handlePuzzleComplete}
+                className="mb-6"
+              />
+            </div>
+          </div>
 
           <div className="text-center">
             <Button 
