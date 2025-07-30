@@ -23,6 +23,11 @@ export default function SestavljankeTest() {
   const { recordGameCompletion } = useEnhancedProgress();
   const { playAudio } = useAudioPlayback();
   
+  // Debug logging
+  console.log('SestavljankeTest render - isMobile:', isMobile);
+  console.log('SestavljankeTest render - window dimensions:', window.innerWidth, 'x', window.innerHeight);
+  console.log('SestavljankeTest render - isLandscape:', window.innerWidth > window.innerHeight);
+  
   const { isRecording, feedbackMessage, showPositiveFeedback, startRecording } = useSpeechRecording(
     (points) => {
       toast({

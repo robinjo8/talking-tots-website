@@ -39,6 +39,9 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   onComplete,
   className = ""
 }) => {
+  console.log('ProfessionalJigsaw render - window dimensions:', window.innerWidth, 'x', window.innerHeight);
+  console.log('ProfessionalJigsaw render - imageUrl:', imageUrl);
+  
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [pieces, setPieces] = useState<PuzzlePiece[]>([]);
   const [draggedPiece, setDraggedPiece] = useState<PuzzlePiece | null>(null);
