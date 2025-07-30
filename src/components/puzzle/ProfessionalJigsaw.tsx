@@ -41,8 +41,26 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   onComplete,
   className = ""
 }) => {
-  // Show rotation message on mobile portrait BEFORE any hooks
-  if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) {
+  const [isPortrait, setIsPortrait] = useState(window.innerWidth < 768 && window.innerHeight > window.innerWidth);
+  
+  // Listen for orientation changes
+  useEffect(() => {
+    const handleOrientationChange = () => {
+      const isCurrentlyPortrait = window.innerWidth < 768 && window.innerHeight > window.innerWidth;
+      setIsPortrait(isCurrentlyPortrait);
+    };
+
+    window.addEventListener('resize', handleOrientationChange);
+    window.addEventListener('orientationchange', handleOrientationChange);
+
+    return () => {
+      window.removeEventListener('resize', handleOrientationChange);
+      window.removeEventListener('orientationchange', handleOrientationChange);
+    };
+  }, []);
+
+  // Show rotation message on mobile portrait - but don't reset the game state
+  if (isPortrait) {
     return (
       <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
         <div className="text-white text-center p-8">
@@ -111,12 +129,12 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   
   const TAB_SIZE = Math.max(15, Math.min(30, PUZZLE_WIDTH / 40));
 
-  // Fullscreen API for mobile
+  // Fullscreen API for mobile - trigger on component mount
   useEffect(() => {
-    if (isMobile) {
+    if (isMobile && !isPortrait) {
       const enterFullscreen = async () => {
         try {
-          if (document.documentElement.requestFullscreen) {
+          if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
             await document.documentElement.requestFullscreen();
           }
           // Lock orientation to landscape
@@ -139,7 +157,7 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
         }
       };
     }
-  }, [isMobile]);
+  }, [isMobile, isPortrait]);
 
   const handleNewGame = () => {
     // Reset all pieces to initial scattered positions
@@ -596,52 +614,6 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
         </div>
       )}
 
-      {/* Mobile Settings Button */}
-      {isMobile && (
-        <>
-          <Button
-            onClick={() => setShowSettingsMenu(!showSettingsMenu)}
-            variant="outline"
-            size="sm"
-            className="absolute bottom-4 right-4 z-20 w-10 h-10 p-0"
-          >
-            <Settings className="w-4 h-4" />
-          </Button>
-
-          {/* Mobile Settings Menu */}
-          {showSettingsMenu && (
-            <div className="absolute bottom-16 right-4 z-30 bg-background border border-border rounded-lg shadow-lg p-2 space-y-1">
-              <Button 
-                onClick={handleNewGame} 
-                variant="ghost" 
-                size="sm" 
-                className="w-full justify-start text-sm"
-              >
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Nova igra
-              </Button>
-              <Button 
-                onClick={handleBack} 
-                variant="ghost" 
-                size="sm" 
-                className="w-full justify-start text-sm"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Nazaj
-              </Button>
-              <Button 
-                onClick={handleInstructions} 
-                variant="ghost" 
-                size="sm" 
-                className="w-full justify-start text-sm"
-              >
-                <HelpCircle className="w-4 h-4 mr-2" />
-                Navodila
-              </Button>
-            </div>
-          )}
-        </>
-      )}
 
       <canvas
         ref={canvasRef}
