@@ -112,10 +112,10 @@ export default function SestavljankeTest() {
             <PopoverTrigger asChild>
               <Button 
                 variant="outline" 
-                size="icon"
-                className="rounded-full bg-background/80 backdrop-blur-sm hover:bg-background/90"
+                size="lg"
+                className="rounded-full bg-background/80 backdrop-blur-sm hover:bg-background/90 w-16 h-16 p-0"
               >
-                <Settings className="h-5 w-5" />
+                <Settings className="h-8 w-8" />
               </Button>
             </PopoverTrigger>
             <PopoverContent 

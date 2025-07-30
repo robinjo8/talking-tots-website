@@ -573,24 +573,6 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
 
   return (
     <div className={`fixed inset-0 overflow-hidden bg-background ${className}`}>
-      {/* Desktop Controls */}
-      {isDesktop && (
-        <div className="absolute top-4 left-4 z-10 flex gap-2">
-          <Button onClick={handleNewGame} variant="default" size="sm" className="flex items-center gap-2">
-            <RotateCcw className="w-4 h-4" />
-            Nova igra
-          </Button>
-          <Button onClick={handleBack} variant="outline" size="sm" className="flex items-center gap-2">
-            <ArrowLeft className="w-4 h-4" />
-            Nazaj
-          </Button>
-          <Button onClick={handleInstructions} variant="outline" size="sm" className="flex items-center gap-2">
-            <HelpCircle className="w-4 h-4" />
-            Navodila
-          </Button>
-        </div>
-      )}
-
       {/* Mobile Settings Button */}
       {isMobile && (
         <>
