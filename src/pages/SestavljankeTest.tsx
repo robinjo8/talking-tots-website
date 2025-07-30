@@ -20,8 +20,8 @@ export default function SestavljankeTest() {
   const { recordGameCompletion } = useEnhancedProgress();
   const { playAudio } = useAudioPlayback();
   
-  // Mobile devices always get fullscreen, desktop never gets fullscreen
-  const effectiveFullscreen = isMobile;
+  // Both mobile and desktop get fullscreen for test puzzle (header hidden)
+  const effectiveFullscreen = true;
   
   const { isRecording, feedbackMessage, showPositiveFeedback, startRecording } = useSpeechRecording(
     (points) => {
@@ -91,9 +91,10 @@ export default function SestavljankeTest() {
     <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden w-screen h-screen' : 'min-h-screen bg-background'}`} style={effectiveFullscreen ? { position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 9999 } : {}}>
       {!effectiveFullscreen && <Header />}
       
-      {/* Mobile edge-to-edge layout */}
-      {effectiveFullscreen ? (
-        <div className="h-full p-4">
+      {/* Fullscreen layout with game and bottom buttons */}
+      <div className="h-full flex flex-col">
+        {/* Game area */}
+        <div className="flex-1 p-4">
           <ProfessionalJigsaw
             imageUrl={imageUrl}
             gridCols={2}
@@ -102,32 +103,30 @@ export default function SestavljankeTest() {
             className="h-full"
           />
         </div>
-      ) : (
-        /* Desktop layout */
-        <div className="container max-w-6xl mx-auto pt-20 md:pt-24 pb-20 px-4">
-          <div className="mb-6 text-center">
-            <h1 className="text-3xl font-bold text-primary mb-2">Test Sestavljanka</h1>
-            <p className="text-muted-foreground">Sestavi sliko Zmajčka Tomija</p>
-          </div>
-
-          <ProfessionalJigsaw
-            imageUrl={imageUrl}
-            gridCols={2}
-            gridRows={3}
-            onComplete={handlePuzzleComplete}
-            className="mb-6"
-          />
-
-          <div className="text-center">
-            <Button 
-              variant="outline" 
-              onClick={() => navigate(-1)}
-            >
-              Nazaj na sestavljanke
-            </Button>
-          </div>
+        
+        {/* Bottom buttons */}
+        <div className="flex justify-center gap-4 p-4 bg-background">
+          <Button 
+            variant="default" 
+            onClick={() => window.location.reload()}
+            className="bg-emerald-500 hover:bg-emerald-600 text-white"
+          >
+            🔄 Nova igra
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => navigate(-1)}
+          >
+            ← Nazaj
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => alert('Povlecite dele sestavljanke na pravo mesto. Ko se del približa svojemu mestu, se bo samodejno prilepil.')}
+          >
+            📖 Navodila
+          </Button>
         </div>
-      )}
+      </div>
 
       {/* Audio Dialog - appears automatically when puzzle is completed */}
       <AudioPracticeDialog
