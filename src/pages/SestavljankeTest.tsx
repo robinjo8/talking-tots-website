@@ -23,7 +23,6 @@ export default function SestavljankeTest() {
     return stored ? parseInt(stored, 10) : 0;
   });
   const [isExiting, setIsExiting] = useState(false);
-  const [isGameActive, setIsGameActive] = useState(true); // Track if we're actively in the game
   const { toast } = useToast();
   const { 
     isMobile, 
@@ -80,10 +79,31 @@ export default function SestavljankeTest() {
 
     window.addEventListener('orientationchange', handleOrientationChange);
     
+    // Cleanup function to restore normal document state
     return () => {
       window.removeEventListener('orientationchange', handleOrientationChange);
+      
+      // Force cleanup on component unmount
+      const forceCleanup = async () => {
+        try {
+          // Reset document body styles
+          document.body.style.position = '';
+          document.body.style.overflow = '';
+          document.body.style.height = '';
+          document.body.style.width = '';
+          document.documentElement.style.overflow = '';
+          
+          // Unlock orientation and exit fullscreen
+          await unlockOrientation();
+          await exitFullscreen();
+        } catch (error) {
+          console.warn('Cleanup error on unmount:', error);
+        }
+      };
+      
+      forceCleanup();
     };
-  }, [isMobile, isLandscape, isFullscreen, requestFullscreen, lockOrientation]);
+  }, [isMobile, isLandscape, isFullscreen, requestFullscreen, lockOrientation, unlockOrientation, exitFullscreen]);
 
   // Proper navigation exit function
   const exitGame = useCallback(async () => {
@@ -262,33 +282,70 @@ export default function SestavljankeTest() {
   };
 
   const handleBack = async () => {
-    console.log('handleBack clicked - starting exit process');
+    console.log('handleBack clicked - starting comprehensive exit process');
     setIsExiting(true);
-    setIsGameActive(false); // Mark game as inactive to remove fixed positioning
     
-    try {
-      console.log('Unlocking orientation...');
-      await unlockOrientation();
-      console.log('Orientation unlocked');
-      
-      console.log('Exiting fullscreen...');
-      await exitFullscreen();
-      console.log('Fullscreen exited');
-      
-      // Clear any session storage
-      sessionStorage.removeItem('backPressCount');
-      
-      // Add a small delay to ensure orientation changes have time to take effect
-      setTimeout(() => {
-        console.log('Navigating to /govorne-igre/sestavljanke');
-        navigate('/govorne-igre/sestavljanke', { replace: true });
-      }, 100);
-      
-    } catch (error) {
-      console.warn('Error exiting game:', error);
-      // Force navigation even if cleanup fails
+    // Comprehensive cleanup function
+    const performCleanup = async () => {
+      try {
+        // 1. Reset document body styles immediately
+        console.log('Resetting document styles...');
+        document.body.style.position = '';
+        document.body.style.overflow = '';
+        document.body.style.height = '';
+        document.body.style.width = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.zIndex = '';
+        document.documentElement.style.overflow = '';
+        
+        // 2. Force scroll restoration
+        window.scrollTo(0, 0);
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+        
+        // 3. Unlock orientation with multiple methods for better compatibility
+        console.log('Unlocking orientation...');
+        if (screen.orientation && screen.orientation.unlock) {
+          await screen.orientation.unlock();
+        }
+        await unlockOrientation();
+        console.log('Orientation unlocked');
+        
+        // 4. Exit fullscreen
+        console.log('Exiting fullscreen...');
+        if (document.fullscreenElement) {
+          await document.exitFullscreen();
+        }
+        await exitFullscreen();
+        console.log('Fullscreen exited');
+        
+        // 5. Clear session storage
+        sessionStorage.removeItem('backPressCount');
+        
+        console.log('Cleanup completed successfully');
+        return true;
+      } catch (error) {
+        console.warn('Error during cleanup:', error);
+        return false;
+      }
+    };
+    
+    // Perform cleanup and navigate with increased delay
+    const cleanupSuccess = await performCleanup();
+    
+    // Navigate with longer delay to ensure all changes take effect
+    setTimeout(() => {
+      console.log('Navigating to /govorne-igre/sestavljanke');
       navigate('/govorne-igre/sestavljanke', { replace: true });
-    }
+      
+      // Force one more cleanup after navigation as backup
+      setTimeout(() => {
+        document.body.style.position = '';
+        document.body.style.overflow = '';
+        window.scrollTo(0, 0);
+      }, 100);
+    }, cleanupSuccess ? 200 : 50);
   };
 
   const handleInstructions = () => {
@@ -298,8 +355,8 @@ export default function SestavljankeTest() {
 
   return (
     <div 
-      className={`${isMobile && isGameActive ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}
-      style={isMobile && isGameActive ? {
+      className={`${isMobile ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}
+      style={isMobile ? {
         position: 'fixed',
         top: 0,
         left: 0,
