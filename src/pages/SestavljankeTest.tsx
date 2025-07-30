@@ -58,7 +58,13 @@ export default function SestavljankeTest() {
       requestFullscreen();
       
       return () => {
-        // Cleanup will be handled in handleBack function
+        // Clean exit on component unmount
+        if (document.fullscreenElement) {
+          document.exitFullscreen?.();
+        }
+        if (screen.orientation && (screen.orientation as any).unlock) {
+          (screen.orientation as any).unlock?.();
+        }
       };
     }
   }, [isMobile]);
@@ -106,35 +112,9 @@ export default function SestavljankeTest() {
     window.dispatchEvent(new CustomEvent('resetPuzzle'));
   };
 
-  const handleBack = async () => {
+  const handleBack = () => {
     setIsMenuOpen(false);
-    
-    if (isMobile) {
-      try {
-        console.log('Starting mobile cleanup...');
-        
-        // Unlock orientation first
-        if (screen.orientation && (screen.orientation as any).unlock) {
-          console.log('Unlocking orientation...');
-          (screen.orientation as any).unlock();
-        }
-        
-        // Exit fullscreen
-        if (document.fullscreenElement) {
-          console.log('Exiting fullscreen...');
-          await document.exitFullscreen();
-        }
-        
-        // Force page refresh to ensure clean state
-        window.location.href = '/govorne-igre/sestavljanke';
-      } catch (error) {
-        console.log('Error during cleanup:', error);
-        // Fallback: force navigation even if cleanup fails
-        window.location.href = '/govorne-igre/sestavljanke';
-      }
-    } else {
-      navigate('/govorne-igre/sestavljanke');
-    }
+    navigate('/govorne-igre/sestavljanke');
   };
 
   const handleInstructions = () => {
@@ -146,7 +126,7 @@ export default function SestavljankeTest() {
   const isLandscape = window.innerWidth > window.innerHeight;
 
   return (
-    <div className={`${isMobile ? 'fixed inset-0 bg-background overflow-hidden w-screen h-screen' : 'min-h-screen bg-background'}`} style={isMobile ? { position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 9999 } : {}}>
+    <div className={`${isMobile ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}>
       {!isMobile && <Header />}
       
       {/* Show portrait message on mobile when not in landscape, but WITHIN fullscreen container */}
