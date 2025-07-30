@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
+import { Button } from "@/components/ui/button";
+import { Settings, RotateCcw, ArrowLeft, HelpCircle } from "lucide-react";
 
 interface ProfessionalJigsawProps {
   imageUrl: string;
@@ -58,14 +60,25 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isLoading, setIsLoading] = useState(true);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+  
+  // Device detection
+  const isMobile = window.innerWidth < 768;
+  const isDesktop = window.innerWidth >= 768;
   
   // Full screen dimensions - use entire viewport
   const CANVAS_WIDTH = window.innerWidth;
   const CANVAS_HEIGHT = window.innerHeight;
   
+  // Desktop scaling factor (10% reduction)
+  const desktopScale = isDesktop ? 0.9 : 1;
+  
   // Calculate optimal puzzle size maintaining aspect ratio
-  const availableWidth = CANVAS_WIDTH * 0.6; // 60% for puzzle area
-  const availableHeight = CANVAS_HEIGHT * 0.8; // 80% for puzzle area
+  const baseAvailableWidth = CANVAS_WIDTH * 0.6; // 60% for puzzle area
+  const baseAvailableHeight = CANVAS_HEIGHT * 0.8; // 80% for puzzle area
+  
+  const availableWidth = baseAvailableWidth * desktopScale;
+  const availableHeight = baseAvailableHeight * desktopScale;
   
   // Determine puzzle dimensions based on image aspect ratio while maintaining proportions
   const aspectRatio = 1.33; // Default 4:3 aspect ratio, will be updated when image loads
@@ -87,11 +100,65 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   // Side areas for pieces (left and right)
   const SIDE_AREA_WIDTH = (CANVAS_WIDTH - PUZZLE_WIDTH) / 2;
   const LEFT_AREA_START = 0;
-  const LEFT_AREA_END = BOARD_X;
-  const RIGHT_AREA_START = BOARD_X + PUZZLE_WIDTH;
+  const LEFT_AREA_END = BOARD_X - 10; // Add small margin
+  const RIGHT_AREA_START = BOARD_X + PUZZLE_WIDTH + 10; // Add small margin
   const RIGHT_AREA_END = CANVAS_WIDTH;
   
   const TAB_SIZE = Math.max(15, Math.min(30, PUZZLE_WIDTH / 40));
+
+  // Fullscreen API for mobile
+  useEffect(() => {
+    if (isMobile) {
+      const enterFullscreen = async () => {
+        try {
+          if (document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen();
+          }
+          // Lock orientation to landscape
+          if (screen.orientation && (screen.orientation as any).lock) {
+            await (screen.orientation as any).lock('landscape');
+          }
+        } catch (error) {
+          console.log('Fullscreen not supported or denied');
+        }
+      };
+
+      enterFullscreen();
+
+      return () => {
+        if (document.exitFullscreen && document.fullscreenElement) {
+          document.exitFullscreen();
+        }
+        if (screen.orientation && (screen.orientation as any).unlock) {
+          (screen.orientation as any).unlock();
+        }
+      };
+    }
+  }, [isMobile]);
+
+  const handleNewGame = () => {
+    // Reset all pieces to initial scattered positions
+    setPieces(prev => prev.map(piece => ({
+      ...piece,
+      currentX: Math.random() > 0.5 
+        ? LEFT_AREA_START + 20 + Math.random() * Math.max(20, LEFT_AREA_END - LEFT_AREA_START - piece.width - 40)
+        : RIGHT_AREA_START + 20 + Math.random() * Math.max(20, RIGHT_AREA_END - RIGHT_AREA_START - piece.width - 40),
+      currentY: 20 + Math.random() * Math.max(20, CANVAS_HEIGHT - piece.height - 40),
+      isPlaced: false,
+      isDragging: false
+    })));
+    setShowSettingsMenu(false);
+  };
+
+  const handleBack = () => {
+    window.history.back();
+    setShowSettingsMenu(false);
+  };
+
+  const handleInstructions = () => {
+    alert('Povlecite dele sestavljanke na pravo mesto. Ko se del približa svojemu mestu, se bo samodejno prilepil.');
+    setShowSettingsMenu(false);
+  };
 
   // Load and process image
   useEffect(() => {
@@ -230,11 +297,11 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
           y: row * pieceHeight,
           width: pieceWidth,
           height: pieceHeight,
-          // Scatter pieces in left and right side areas
+          // Scatter pieces in left and right side areas with proper bounds checking
           currentX: Math.random() > 0.5 
-            ? LEFT_AREA_START + 20 + Math.random() * (LEFT_AREA_END - 120)  // Left side
-            : RIGHT_AREA_START + 20 + Math.random() * (RIGHT_AREA_END - RIGHT_AREA_START - 120), // Right side
-          currentY: 20 + Math.random() * (CANVAS_HEIGHT - 120),
+            ? LEFT_AREA_START + 20 + Math.random() * Math.max(20, LEFT_AREA_END - LEFT_AREA_START - pieceWidth - 40)
+            : RIGHT_AREA_START + 20 + Math.random() * Math.max(20, RIGHT_AREA_END - RIGHT_AREA_START - pieceWidth - 40),
+          currentY: 20 + Math.random() * Math.max(20, CANVAS_HEIGHT - pieceHeight - 40),
           correctX: BOARD_X + col * pieceWidth,
           correctY: BOARD_Y + row * pieceHeight,
           isPlaced: false,
@@ -506,6 +573,71 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
 
   return (
     <div className={`fixed inset-0 overflow-hidden bg-background ${className}`}>
+      {/* Desktop Controls */}
+      {isDesktop && (
+        <div className="absolute top-4 left-4 z-10 flex gap-2">
+          <Button onClick={handleNewGame} variant="default" size="sm" className="flex items-center gap-2">
+            <RotateCcw className="w-4 h-4" />
+            Nova igra
+          </Button>
+          <Button onClick={handleBack} variant="outline" size="sm" className="flex items-center gap-2">
+            <ArrowLeft className="w-4 h-4" />
+            Nazaj
+          </Button>
+          <Button onClick={handleInstructions} variant="outline" size="sm" className="flex items-center gap-2">
+            <HelpCircle className="w-4 h-4" />
+            Navodila
+          </Button>
+        </div>
+      )}
+
+      {/* Mobile Settings Button */}
+      {isMobile && (
+        <>
+          <Button
+            onClick={() => setShowSettingsMenu(!showSettingsMenu)}
+            variant="outline"
+            size="sm"
+            className="absolute bottom-4 right-4 z-20 w-10 h-10 p-0"
+          >
+            <Settings className="w-4 h-4" />
+          </Button>
+
+          {/* Mobile Settings Menu */}
+          {showSettingsMenu && (
+            <div className="absolute bottom-16 right-4 z-30 bg-background border border-border rounded-lg shadow-lg p-2 space-y-1">
+              <Button 
+                onClick={handleNewGame} 
+                variant="ghost" 
+                size="sm" 
+                className="w-full justify-start text-sm"
+              >
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Nova igra
+              </Button>
+              <Button 
+                onClick={handleBack} 
+                variant="ghost" 
+                size="sm" 
+                className="w-full justify-start text-sm"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Nazaj
+              </Button>
+              <Button 
+                onClick={handleInstructions} 
+                variant="ghost" 
+                size="sm" 
+                className="w-full justify-start text-sm"
+              >
+                <HelpCircle className="w-4 h-4 mr-2" />
+                Navodila
+              </Button>
+            </div>
+          )}
+        </>
+      )}
+
       <canvas
         ref={canvasRef}
         width={CANVAS_WIDTH}
