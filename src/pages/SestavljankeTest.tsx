@@ -86,29 +86,48 @@ export default function SestavljankeTest() {
 
     const handlePopState = (event: PopStateEvent) => {
       event.preventDefault();
+      
       setBackPressCount(prev => {
         const newCount = prev + 1;
         
         if (newCount === 1) {
-          // First press - reset counter after 2 seconds
+          // First press - show message and reset timer
+          toast({
+            title: "Pritisnite ponovno za izhod",
+            description: "Drugo pritiskanje vas bo vrnilo nazaj",
+            duration: 2000,
+          });
+          
           backPressTimer = setTimeout(() => {
             setBackPressCount(0);
           }, 2000);
           return 1;
         } else {
-          // Second press - navigate back
+          // Second press - exit properly
           clearTimeout(backPressTimer);
-          unlockOrientation();
-          exitFullscreen();
-          setTimeout(() => {
-            navigate('/govorne-igre/sestavljanke');
-          }, 100);
+          
+          // Exit fullscreen and unlock orientation properly
+          const exitGame = async () => {
+            try {
+              await unlockOrientation();
+              await exitFullscreen();
+              // Small delay to ensure fullscreen exit completes
+              setTimeout(() => {
+                navigate('/govorne-igre/sestavljanke');
+              }, 200);
+            } catch (error) {
+              console.warn('Error exiting game:', error);
+              navigate('/govorne-igre/sestavljanke');
+            }
+          };
+          
+          exitGame();
           return 0;
         }
       });
     };
 
-    // Add entry to history to handle back button
+    // Prevent browser back button from working normally
     window.history.pushState(null, '', window.location.href);
     window.addEventListener('popstate', handlePopState);
 
@@ -118,7 +137,7 @@ export default function SestavljankeTest() {
         clearTimeout(backPressTimer);
       }
     };
-  }, [isMobile, navigate, unlockOrientation, exitFullscreen]);
+  }, [isMobile, navigate, unlockOrientation, exitFullscreen, toast]);
 
   const handlePuzzleComplete = async () => {
     setIsPuzzleCompleted(true);
@@ -168,12 +187,19 @@ export default function SestavljankeTest() {
   };
 
   const handleBack = async () => {
-    // Unlock orientation and exit fullscreen before navigating
-    await unlockOrientation();
-    await exitFullscreen();
-    setTimeout(() => {
+    try {
+      // Force unlock orientation and exit fullscreen
+      await unlockOrientation();
+      await exitFullscreen();
+      
+      // Longer delay to ensure state changes complete
+      setTimeout(() => {
+        navigate('/govorne-igre/sestavljanke');
+      }, 300);
+    } catch (error) {
+      console.warn('Error in handleBack:', error);
       navigate('/govorne-igre/sestavljanke');
-    }, 100);
+    }
   };
 
   const handleInstructions = () => {
