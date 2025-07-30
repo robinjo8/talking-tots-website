@@ -46,12 +46,13 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   
-  const PUZZLE_WIDTH = 600;  // Increased from 400
-  const PUZZLE_HEIGHT = 450; // Increased from 300
-  const CANVAS_WIDTH = 1200; // Increased from 1000
-  const CANVAS_HEIGHT = 700;
-  const TAB_SIZE = 20;
-  const BOARD_X = (CANVAS_WIDTH - PUZZLE_WIDTH) / 2; // Center the board
+  // Responsive dimensions based on viewport
+  const PUZZLE_WIDTH = window.innerWidth > 768 ? 800 : 500;
+  const PUZZLE_HEIGHT = window.innerWidth > 768 ? 600 : 375;
+  const CANVAS_WIDTH = window.innerWidth > 768 ? 1600 : 900;
+  const CANVAS_HEIGHT = window.innerWidth > 768 ? 900 : 600;
+  const TAB_SIZE = window.innerWidth > 768 ? 25 : 15;
+  const BOARD_X = (CANVAS_WIDTH - PUZZLE_WIDTH) / 2;
   const BOARD_Y = (CANVAS_HEIGHT - PUZZLE_HEIGHT) / 2;
 
   // Load and process image
@@ -251,13 +252,6 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
     ctx.strokeRect(BOARD_X, BOARD_Y, PUZZLE_WIDTH, PUZZLE_HEIGHT);
     ctx.setLineDash([]);
 
-    // Draw side labels
-    ctx.fillStyle = '#64748b';
-    ctx.font = '14px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('Pieces', 100, 30);
-    ctx.fillText('Puzzle Board', CANVAS_WIDTH / 2, 30);
-    ctx.fillText('Pieces', CANVAS_WIDTH - 100, 30);
 
     // Sort pieces so dragged piece is drawn last (on top)
     const sortedPieces = [...pieces].sort((a, b) => {
@@ -461,32 +455,60 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
     );
   }
 
+  // Force landscape orientation on mobile
+  useEffect(() => {
+    const handleOrientationChange = () => {
+      if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) {
+        // Portrait mode on mobile - show rotation message
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = 'auto';
+      }
+    };
+
+    handleOrientationChange();
+    window.addEventListener('resize', handleOrientationChange);
+    window.addEventListener('orientationchange', handleOrientationChange);
+
+    return () => {
+      window.removeEventListener('resize', handleOrientationChange);
+      window.removeEventListener('orientationchange', handleOrientationChange);
+    };
+  }, []);
+
+  // Show rotation message on mobile portrait
+  if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) {
+    return (
+      <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
+        <div className="text-white text-center p-8">
+          <div className="text-6xl mb-4">📱</div>
+          <h2 className="text-2xl font-bold mb-2">Rotate Your Device</h2>
+          <p className="text-lg">Please rotate your device to landscape mode to play the puzzle game.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className={`flex flex-col gap-4 ${className}`}>
-      <div className="text-center mb-4">
-        <h2 className="text-2xl font-bold text-primary mb-2">Professional Jigsaw Puzzle</h2>
-        <p className="text-muted-foreground">Drag the pieces to complete the puzzle</p>
-      </div>
-      
-      <div className="flex justify-center">
-        <canvas
-          ref={canvasRef}
-          width={CANVAS_WIDTH}
-          height={CANVAS_HEIGHT}
-          className="border-2 border-gray-300 rounded-lg shadow-lg cursor-pointer"
-          onMouseDown={handleStart}
-          onMouseMove={handleMove}
-          onMouseUp={handleEnd}
-          onMouseLeave={handleEnd}
-          onTouchStart={handleStart}
-          onTouchMove={handleMove}
-          onTouchEnd={handleEnd}
-        />
-      </div>
-      
-      <div className="text-center text-sm text-muted-foreground">
-        <p>Left & Right: Puzzle Pieces | Center: Puzzle Board | Completed: {pieces.filter(p => p.isPlaced).length}/{pieces.length}</p>
-      </div>
+    <div className={`w-full h-screen flex items-center justify-center bg-background ${className}`}>
+      <canvas
+        ref={canvasRef}
+        width={CANVAS_WIDTH}
+        height={CANVAS_HEIGHT}
+        className="max-w-full max-h-full cursor-pointer"
+        style={{ 
+          width: '100%', 
+          height: '100%',
+          objectFit: 'contain'
+        }}
+        onMouseDown={handleStart}
+        onMouseMove={handleMove}
+        onMouseUp={handleEnd}
+        onMouseLeave={handleEnd}
+        onTouchStart={handleStart}
+        onTouchMove={handleMove}
+        onTouchEnd={handleEnd}
+      />
     </div>
   );
 };
