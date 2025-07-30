@@ -44,11 +44,13 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   
-  const PUZZLE_WIDTH = 400;
-  const PUZZLE_HEIGHT = 300;
-  const CANVAS_WIDTH = 800;
+  const PUZZLE_WIDTH = 300;
+  const PUZZLE_HEIGHT = 225;
+  const CANVAS_WIDTH = 900;
   const CANVAS_HEIGHT = 600;
-  const TAB_SIZE = 20;
+  const TAB_SIZE = 15;
+  const BOARD_X = (CANVAS_WIDTH - PUZZLE_WIDTH) / 2; // Center the board
+  const BOARD_Y = (CANVAS_HEIGHT - PUZZLE_HEIGHT) / 2;
 
   // Load and process image
   useEffect(() => {
@@ -96,10 +98,13 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
           y: row * pieceHeight,
           width: pieceWidth,
           height: pieceHeight,
-          currentX: 500 + (col * 80) + Math.random() * 200,
-          currentY: 50 + (row * 80) + Math.random() * 200,
-          correctX: 50 + col * pieceWidth,
-          correctY: 50 + row * pieceHeight,
+          // Scatter pieces on left and right sides
+          currentX: Math.random() > 0.5 
+            ? 20 + Math.random() * 150  // Left side
+            : CANVAS_WIDTH - 200 + Math.random() * 150, // Right side
+          currentY: 50 + Math.random() * (CANVAS_HEIGHT - 150),
+          correctX: BOARD_X + col * pieceWidth,
+          correctY: BOARD_Y + row * pieceHeight,
           isPlaced: false,
           isDragging: false,
           tabs: {
@@ -214,21 +219,38 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
     ctx.fillStyle = '#f8fafc';
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    // Draw puzzle board area
+    // Draw puzzle board area (centered)
     ctx.strokeStyle = '#e2e8f0';
     ctx.lineWidth = 2;
     ctx.setLineDash([5, 5]);
-    ctx.strokeRect(50, 50, PUZZLE_WIDTH, PUZZLE_HEIGHT);
+    ctx.strokeRect(BOARD_X, BOARD_Y, PUZZLE_WIDTH, PUZZLE_HEIGHT);
     ctx.setLineDash([]);
 
+    // Draw side labels
+    ctx.fillStyle = '#64748b';
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Pieces', 100, 30);
+    ctx.fillText('Puzzle Board', CANVAS_WIDTH / 2, 30);
+    ctx.fillText('Pieces', CANVAS_WIDTH - 100, 30);
+
+    // Sort pieces so dragged piece is drawn last (on top)
+    const sortedPieces = [...pieces].sort((a, b) => {
+      if (a.isDragging) return 1;
+      if (b.isDragging) return -1;
+      return 0;
+    });
+
     // Draw pieces
-    pieces.forEach(piece => {
+    sortedPieces.forEach(piece => {
       if (piece.imageData) {
         ctx.save();
         ctx.translate(piece.currentX, piece.currentY);
         
-        // Create clipping mask
-        ctx.clip(piece.path);
+        // Create clipping mask with the piece shape
+        const clippingPath = new Path2D();
+        clippingPath.addPath(piece.path);
+        ctx.clip(clippingPath);
         
         // Create temporary canvas for the piece image
         const tempCanvas = document.createElement('canvas');
@@ -245,8 +267,21 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
         // Draw piece border
         ctx.save();
         ctx.translate(piece.currentX, piece.currentY);
-        ctx.strokeStyle = piece.isDragging ? '#3b82f6' : piece.isPlaced ? '#10b981' : '#64748b';
-        ctx.lineWidth = piece.isDragging ? 3 : 2;
+        
+        if (piece.isDragging) {
+          // Glow effect for dragged piece
+          ctx.shadowColor = '#3b82f6';
+          ctx.shadowBlur = 10;
+          ctx.strokeStyle = '#3b82f6';
+          ctx.lineWidth = 3;
+        } else if (piece.isPlaced) {
+          ctx.strokeStyle = '#10b981';
+          ctx.lineWidth = 2;
+        } else {
+          ctx.strokeStyle = '#64748b';
+          ctx.lineWidth = 1.5;
+        }
+        
         ctx.stroke(piece.path);
         ctx.restore();
       }
@@ -273,13 +308,23 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   }, [pieces, image]);
 
   // Mouse event handlers
+  const getMousePos = (e: React.MouseEvent): { x: number, y: number } => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (e.clientX - rect.left) * (canvas.width / rect.width),
+      y: (e.clientY - rect.top) * (canvas.height / rect.height)
+    };
+  };
+
   const handleMouseDown = (e: React.MouseEvent) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const mousePos = getMousePos(e);
+    console.log('Mouse down at:', mousePos);
 
     // Find clicked piece (in reverse order to get top piece)
     for (let i = pieces.length - 1; i >= 0; i--) {
@@ -289,16 +334,22 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
         ctx.save();
         ctx.translate(piece.currentX, piece.currentY);
         
-        if (ctx.isPointInPath(piece.path, x - piece.currentX, y - piece.currentY)) {
+        const isInside = ctx.isPointInPath(piece.path, mousePos.x - piece.currentX, mousePos.y - piece.currentY);
+        ctx.restore();
+        
+        if (isInside) {
+          console.log('Clicked piece:', piece.id);
           setDraggedPiece(piece);
-          setOffset({ x: x - piece.currentX, y: y - piece.currentY });
+          setOffset({ 
+            x: mousePos.x - piece.currentX, 
+            y: mousePos.y - piece.currentY 
+          });
           
           setPieces(prev => prev.map(p => 
-            p.id === piece.id ? { ...p, isDragging: true } : p
+            p.id === piece.id ? { ...p, isDragging: true } : { ...p, isDragging: false }
           ));
           break;
         }
-        ctx.restore();
       }
     }
   };
@@ -306,22 +357,19 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!draggedPiece) return;
 
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const mousePos = getMousePos(e);
 
     setPieces(prev => prev.map(p => 
       p.id === draggedPiece.id 
-        ? { ...p, currentX: x - offset.x, currentY: y - offset.y }
+        ? { ...p, currentX: mousePos.x - offset.x, currentY: mousePos.y - offset.y }
         : p
     ));
   };
 
   const handleMouseUp = () => {
     if (!draggedPiece) return;
+
+    console.log('Mouse up, draggedPiece:', draggedPiece.id);
 
     const piece = pieces.find(p => p.id === draggedPiece.id);
     if (!piece) return;
@@ -397,7 +445,7 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
       </div>
       
       <div className="text-center text-sm text-muted-foreground">
-        <p>Puzzle Board (left) | Puzzle Pieces (right) | Completed: {pieces.filter(p => p.isPlaced).length}/{pieces.length}</p>
+        <p>Left & Right: Puzzle Pieces | Center: Puzzle Board | Completed: {pieces.filter(p => p.isPlaced).length}/{pieces.length}</p>
       </div>
     </div>
   );
