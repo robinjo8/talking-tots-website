@@ -122,37 +122,42 @@ export default function SestavljankeTest() {
           />
           
           {/* Mobile gear icon in bottom right */}
-          <div className="absolute bottom-4 right-4">
+          <div className="absolute bottom-4 right-4 z-50">
             <Popover open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   size="icon"
-                  className="h-12 w-12 rounded-full bg-background/80 backdrop-blur-sm border-2"
+                  className="h-14 w-14 rounded-full bg-background/90 backdrop-blur-sm border-2 shadow-lg hover:bg-background/95 transition-all"
                 >
-                  <Settings size={24} />
+                  <Settings size={28} />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-48 p-2" side="top" align="end">
+              <PopoverContent 
+                className="w-52 p-3 mr-4 mb-2" 
+                side="top" 
+                align="end"
+                sideOffset={8}
+              >
                 <div className="flex flex-col gap-2">
                   <Button
                     variant="ghost"
                     onClick={handleNewGame}
-                    className="justify-start"
+                    className="justify-start w-full text-left px-3 py-2"
                   >
                     Nova igra
                   </Button>
                   <Button
                     variant="ghost"
                     onClick={handleBack}
-                    className="justify-start"
+                    className="justify-start w-full text-left px-3 py-2"
                   >
                     Nazaj
                   </Button>
                   <Button
                     variant="ghost"
                     onClick={handleInstructions}
-                    className="justify-start"
+                    className="justify-start w-full text-left px-3 py-2"
                   >
                     Navodila
                   </Button>
@@ -163,7 +168,7 @@ export default function SestavljankeTest() {
         </div>
       ) : (
         /* Desktop layout */
-        <div className="container max-w-6xl mx-auto pt-20 md:pt-24 pb-20 px-4 relative">
+        <div className="container max-w-6xl mx-auto pt-20 md:pt-24 pb-20 px-4">
           <div className="mb-6 text-center">
             <h1 className="text-3xl font-bold text-primary mb-2">Test Sestavljanka</h1>
             <p className="text-muted-foreground">Sestavi sliko Zmajčka Tomija</p>
@@ -174,18 +179,30 @@ export default function SestavljankeTest() {
             gridCols={2}
             gridRows={3}
             onComplete={handlePuzzleComplete}
-            className="mb-6"
+            className="mb-8"
           />
 
-          {/* Desktop buttons at bottom center */}
-          <div className="flex justify-center gap-4">
-            <Button variant="outline" onClick={handleNewGame}>
+          {/* Desktop buttons at bottom center - made more prominent */}
+          <div className="flex justify-center gap-4 mt-8">
+            <Button 
+              variant="outline" 
+              onClick={handleNewGame}
+              className="px-6 py-3 text-base font-medium"
+            >
               Nova igra
             </Button>
-            <Button variant="outline" onClick={handleBack}>
+            <Button 
+              variant="outline" 
+              onClick={handleBack}
+              className="px-6 py-3 text-base font-medium"
+            >
               Nazaj
             </Button>
-            <Button variant="outline" onClick={handleInstructions}>
+            <Button 
+              variant="outline" 
+              onClick={handleInstructions}
+              className="px-6 py-3 text-base font-medium"
+            >
               Navodila
             </Button>
           </div>
