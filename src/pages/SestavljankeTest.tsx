@@ -37,24 +37,28 @@ export default function SestavljankeTest() {
     }
   );
 
-  // Enable fullscreen on mobile devices (always)
+  // Enable fullscreen and landscape lock on mobile devices
   useEffect(() => {
     if (isMobile) {
       const requestFullscreen = async () => {
         try {
+          // Request fullscreen
           if (document.documentElement.requestFullscreen) {
             await document.documentElement.requestFullscreen();
           }
+          
+          // Lock orientation to landscape
+          if (screen.orientation && (screen.orientation as any).lock) {
+            await (screen.orientation as any).lock('landscape');
+          }
         } catch (error) {
-          console.log('Fullscreen not supported:', error);
+          console.log('Fullscreen or orientation lock not supported:', error);
         }
       };
       requestFullscreen();
       
       return () => {
-        if (document.fullscreenElement) {
-          document.exitFullscreen?.();
-        }
+        // Cleanup will be handled in handleBack function
       };
     }
   }, [isMobile]);
@@ -102,9 +106,32 @@ export default function SestavljankeTest() {
     window.dispatchEvent(new CustomEvent('resetPuzzle'));
   };
 
-  const handleBack = () => {
-    navigate(-1);
+  const handleBack = async () => {
     setIsMenuOpen(false);
+    
+    if (isMobile) {
+      try {
+        // Exit fullscreen
+        if (document.fullscreenElement) {
+          await document.exitFullscreen();
+        }
+        
+        // Unlock orientation
+        if (screen.orientation && (screen.orientation as any).unlock) {
+          (screen.orientation as any).unlock();
+        }
+        
+        // Small delay to ensure orientation changes take effect
+        setTimeout(() => {
+          navigate('/govorne-igre/sestavljanke');
+        }, 100);
+      } catch (error) {
+        console.log('Error during cleanup:', error);
+        navigate('/govorne-igre/sestavljanke');
+      }
+    } else {
+      navigate('/govorne-igre/sestavljanke');
+    }
   };
 
   const handleInstructions = () => {
