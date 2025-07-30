@@ -8,7 +8,7 @@ import { ProfessionalJigsaw } from "@/components/puzzle/ProfessionalJigsaw";
 import { AudioPracticeDialog } from "@/components/puzzle/AudioPracticeDialog";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { Button } from "@/components/ui/button";
-import { useNavigate, useBeforeUnload } from "react-router-dom";
+import { useNavigate, useBeforeUnload, useBlocker } from "react-router-dom";
 import { RotateCcw } from "lucide-react";
 import { ToastAction } from "@/components/ui/toast";
 
@@ -105,38 +105,23 @@ export default function SestavljankeTest() {
     }
   }, [unlockOrientation, exitFullscreen, navigate, isExiting]);
 
-  // Enhanced back button handling with proper state persistence
+  // React Router navigation blocker - the proper way to handle back button
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) => {
+      // Only block if we're trying to navigate away from this game page
+      return currentLocation.pathname !== nextLocation.pathname;
+    }
+  );
+
+  // Handle the blocking state
   useEffect(() => {
-    if (!isMobile) return;
-
-    let backPressTimer: NodeJS.Timeout;
-    let navigationBlocked = false;
-
-    const handleVisibilityChange = () => {
-      // Reset fullscreen when page becomes visible again (handles Android back button edge cases)
-      if (!document.hidden && isMobile && !isFullscreen) {
-        requestFullscreen();
-      }
-    };
-
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      // This helps with some browsers that fire beforeunload on back button
-      if (backPressCount === 0) {
-        event.preventDefault();
-        event.returnValue = '';
-        handleBackPress();
-        return '';
-      }
-    };
-
-    const handleBackPress = () => {
+    if (blocker.state === "blocked") {
       const currentCount = parseInt(sessionStorage.getItem('backPressCount') || '0', 10);
       
       if (currentCount === 0) {
-        // First press - show warning and start timer
-        const newCount = 1;
-        sessionStorage.setItem('backPressCount', newCount.toString());
-        setBackPressCount(newCount);
+        // First press - show warning
+        sessionStorage.setItem('backPressCount', '1');
+        setBackPressCount(1);
         
         toast({
           title: "Pritisnite ponovno za izhod",
@@ -148,7 +133,7 @@ export default function SestavljankeTest() {
               onClick={() => {
                 sessionStorage.setItem('backPressCount', '0');
                 setBackPressCount(0);
-                clearTimeout(backPressTimer);
+                blocker.reset();
               }}
             >
               Ostani
@@ -156,62 +141,41 @@ export default function SestavljankeTest() {
           )
         });
         
-        // Reset counter after 2 seconds
-        backPressTimer = setTimeout(() => {
+        // Reset counter after 2 seconds and reset blocker
+        setTimeout(() => {
           sessionStorage.setItem('backPressCount', '0');
           setBackPressCount(0);
+          blocker.reset();
         }, 2000);
         
-        // Add another history entry to "catch" the next back press
-        window.history.pushState(null, '', window.location.href);
-        
       } else {
-        // Second press - exit
-        clearTimeout(backPressTimer);
-        exitGame();
-      }
-    };
-
-    const handlePopState = (event: PopStateEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
-      
-      if (!navigationBlocked) {
-        navigationBlocked = true;
-        handleBackPress();
+        // Second press - exit immediately
+        sessionStorage.removeItem('backPressCount');
+        setBackPressCount(0);
         
-        // Reset block after a short delay
-        setTimeout(() => {
-          navigationBlocked = false;
-        }, 100);
+        // Clean up fullscreen and orientation before proceeding
+        const cleanupAndNavigate = async () => {
+          try {
+            await unlockOrientation();
+            await exitFullscreen();
+          } catch (error) {
+            console.warn('Error during cleanup:', error);
+          }
+          // Proceed with the blocked navigation
+          blocker.proceed();
+        };
+        
+        cleanupAndNavigate();
       }
-    };
+    }
+  }, [blocker, toast, unlockOrientation, exitFullscreen]);
 
-    // Set up initial history entry
-    window.history.pushState(null, '', window.location.href);
-    
-    // Add event listeners
-    window.addEventListener('popstate', handlePopState);
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
+  // Clean up on unmount
+  useEffect(() => {
     return () => {
-      window.removeEventListener('popstate', handlePopState);
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      if (backPressTimer) {
-        clearTimeout(backPressTimer);
-      }
+      sessionStorage.removeItem('backPressCount');
     };
-  }, [isMobile, backPressCount, toast, exitGame, requestFullscreen, isFullscreen]);
-
-  // Use React Router's beforeunload hook as additional protection
-  useBeforeUnload(
-    useCallback(() => {
-      const currentCount = parseInt(sessionStorage.getItem('backPressCount') || '0', 10);
-      return currentCount === 0;
-    }, [])
-  );
+  }, []);
 
   const handlePuzzleComplete = async () => {
     setIsPuzzleCompleted(true);
