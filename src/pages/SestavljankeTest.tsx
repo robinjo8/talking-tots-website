@@ -123,11 +123,22 @@ export default function SestavljankeTest() {
 
   const imageUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/Zmajcek_6.png";
 
-  const handleNewGame = () => {
+  const handleNewGame = async () => {
     // Reset puzzle state without reloading page to maintain fullscreen
     setIsPuzzleCompleted(false);
     setIsAudioDialogOpen(false);
     setIsMenuOpen(false);
+    
+    // Ensure we stay in fullscreen mode on mobile
+    if (isMobile && isLandscape) {
+      try {
+        if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        }
+      } catch (error) {
+        console.log('Fullscreen maintained');
+      }
+    }
     
     // Reset puzzle pieces - trigger new game in ProfessionalJigsaw
     window.dispatchEvent(new CustomEvent('resetPuzzle'));
