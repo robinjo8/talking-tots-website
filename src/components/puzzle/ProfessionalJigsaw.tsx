@@ -39,19 +39,6 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   onComplete,
   className = ""
 }) => {
-  // Show rotation message on mobile portrait BEFORE any hooks
-  if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) {
-    return (
-      <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
-        <div className="text-white text-center p-8">
-          <div className="text-6xl mb-4">📱</div>
-          <h2 className="text-2xl font-bold mb-2">Rotate Your Device</h2>
-          <p className="text-lg">Please rotate your device to landscape mode to play the puzzle game.</p>
-        </div>
-      </div>
-    );
-  }
-
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [pieces, setPieces] = useState<PuzzlePiece[]>([]);
   const [draggedPiece, setDraggedPiece] = useState<PuzzlePiece | null>(null);
@@ -102,36 +89,6 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   const RIGHT_AREA_END = CANVAS_WIDTH;
   
   const TAB_SIZE = Math.max(15, Math.min(30, PUZZLE_WIDTH / 40));
-
-  // Fullscreen API for mobile
-  useEffect(() => {
-    if (isMobile) {
-      const enterFullscreen = async () => {
-        try {
-          if (document.documentElement.requestFullscreen) {
-            await document.documentElement.requestFullscreen();
-          }
-          // Lock orientation to landscape
-          if (screen.orientation && (screen.orientation as any).lock) {
-            await (screen.orientation as any).lock('landscape');
-          }
-        } catch (error) {
-          console.log('Fullscreen not supported or denied');
-        }
-      };
-
-      enterFullscreen();
-
-      return () => {
-        if (document.exitFullscreen && document.fullscreenElement) {
-          document.exitFullscreen();
-        }
-        if (screen.orientation && (screen.orientation as any).unlock) {
-          (screen.orientation as any).unlock();
-        }
-      };
-    }
-  }, [isMobile]);
 
   const resetPuzzle = useCallback(() => {
     // Reset all pieces to initial scattered positions
