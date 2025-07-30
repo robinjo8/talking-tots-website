@@ -17,15 +17,11 @@ export default function SestavljankeTest() {
   const [isAudioDialogOpen, setIsAudioDialogOpen] = useState(false);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLandscape, setIsLandscape] = useState(true);
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const { recordGameCompletion } = useEnhancedProgress();
   const { playAudio } = useAudioPlayback();
-  
-  // Always use fullscreen for this game page
-  const effectiveFullscreen = true;
   
   const { isRecording, feedbackMessage, showPositiveFeedback, startRecording } = useSpeechRecording(
     (points) => {
@@ -36,42 +32,13 @@ export default function SestavljankeTest() {
     }
   );
 
-  // Track orientation on mobile
+  // Enable fullscreen on mobile devices (always)
   useEffect(() => {
-    if (!isMobile) {
-      setIsLandscape(true);
-      return;
-    }
-
-    const checkOrientation = () => {
-      const isCurrentlyLandscape = window.innerWidth > window.innerHeight;
-      setIsLandscape(isCurrentlyLandscape);
-    };
-
-    // Initial check
-    checkOrientation();
-
-    // Listen for orientation changes
-    window.addEventListener('resize', checkOrientation);
-    window.addEventListener('orientationchange', checkOrientation);
-
-    return () => {
-      window.removeEventListener('resize', checkOrientation);
-      window.removeEventListener('orientationchange', checkOrientation);
-    };
-  }, [isMobile]);
-
-  // Enable fullscreen and landscape orientation on mobile devices only
-  useEffect(() => {
-    if (isMobile && isLandscape) {
+    if (isMobile) {
       const requestFullscreen = async () => {
         try {
           if (document.documentElement.requestFullscreen) {
             await document.documentElement.requestFullscreen();
-          }
-          // Lock orientation to landscape
-          if (screen.orientation && (screen.orientation as any).lock) {
-            await (screen.orientation as any).lock('landscape');
           }
         } catch (error) {
           console.log('Fullscreen not supported:', error);
@@ -83,12 +50,9 @@ export default function SestavljankeTest() {
         if (document.fullscreenElement) {
           document.exitFullscreen?.();
         }
-        if (screen.orientation && (screen.orientation as any).unlock) {
-          (screen.orientation as any).unlock();
-        }
       };
     }
-  }, [isMobile, isLandscape]);
+  }, [isMobile]);
 
   const handlePuzzleComplete = async () => {
     setIsPuzzleCompleted(true);
@@ -123,22 +87,11 @@ export default function SestavljankeTest() {
 
   const imageUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/Zmajcek_6.png";
 
-  const handleNewGame = async () => {
+  const handleNewGame = () => {
     // Reset puzzle state without reloading page to maintain fullscreen
     setIsPuzzleCompleted(false);
     setIsAudioDialogOpen(false);
     setIsMenuOpen(false);
-    
-    // Ensure we stay in fullscreen mode on mobile
-    if (isMobile && isLandscape) {
-      try {
-        if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
-          await document.documentElement.requestFullscreen();
-        }
-      } catch (error) {
-        console.log('Fullscreen maintained');
-      }
-    }
     
     // Reset puzzle pieces - trigger new game in ProfessionalJigsaw
     window.dispatchEvent(new CustomEvent('resetPuzzle'));
@@ -155,31 +108,30 @@ export default function SestavljankeTest() {
     setIsMenuOpen(false);
   };
 
-  // Show portrait mode message on mobile when not in landscape
-  if (isMobile && !isLandscape) {
-    return (
-      <div className="fixed inset-0 bg-background flex items-center justify-center p-8" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 9999 }}>
-        <div className="text-center space-y-6">
-          <div className="text-6xl mb-4">
-            <RotateCcw className="w-16 h-16 mx-auto text-primary animate-pulse" />
-          </div>
-          <h2 className="text-2xl font-bold text-foreground">
-            Za začetek igre obrnite telefon
-          </h2>
-          <p className="text-lg text-muted-foreground">
-            Igra se izvaja v ležečem načinu
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const isLandscape = window.innerWidth > window.innerHeight;
 
   return (
-    <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden w-screen h-screen' : 'min-h-screen bg-background'}`} style={effectiveFullscreen ? { position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 9999 } : {}}>
-      {!effectiveFullscreen && <Header />}
+    <div className={`${isMobile ? 'fixed inset-0 bg-background overflow-hidden w-screen h-screen' : 'min-h-screen bg-background'}`} style={isMobile ? { position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 9999 } : {}}>
+      {!isMobile && <Header />}
       
-      {/* Fullscreen layout for all devices */}
-      <div className="h-full flex flex-col relative">
+      {/* Show portrait message on mobile when not in landscape, but WITHIN fullscreen container */}
+      {isMobile && !isLandscape ? (
+        <div className="h-full flex items-center justify-center p-8">
+          <div className="text-center space-y-6">
+            <div className="text-6xl mb-4">
+              <RotateCcw className="w-16 h-16 mx-auto text-primary animate-pulse" />
+            </div>
+            <h2 className="text-2xl font-bold text-foreground">
+              Za začetek igre obrnite telefon
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Igra se izvaja v ležečem načinu
+            </p>
+          </div>
+        </div>
+      ) : (
+        /* Game layout */
+        <div className="h-full flex flex-col relative">
         <div className="flex-1 p-4">
           <ProfessionalJigsaw
             imageUrl={imageUrl}
@@ -264,7 +216,8 @@ export default function SestavljankeTest() {
             </div>
           </div>
         )}
-      </div>
+        </div>
+      )}
 
       {/* Audio Dialog - appears automatically when puzzle is completed */}
       <AudioPracticeDialog
