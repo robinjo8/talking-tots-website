@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -9,7 +10,7 @@ import { AudioPracticeDialog } from "@/components/puzzle/AudioPracticeDialog";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Settings, RotateCcw } from "lucide-react";
+import { Settings } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export default function SestavljankeTest() {
@@ -26,7 +27,6 @@ export default function SestavljankeTest() {
   // Debug logging
   console.log('SestavljankeTest render - isMobile:', isMobile);
   console.log('SestavljankeTest render - window dimensions:', window.innerWidth, 'x', window.innerHeight);
-  console.log('SestavljankeTest render - isLandscape:', window.innerWidth > window.innerHeight);
   
   const { isRecording, feedbackMessage, showPositiveFeedback, startRecording } = useSpeechRecording(
     (points) => {
@@ -37,27 +37,52 @@ export default function SestavljankeTest() {
     }
   );
 
-  // Enable fullscreen and landscape lock on mobile devices
+  // Enhanced fullscreen and landscape lock on mobile devices
   useEffect(() => {
     if (isMobile) {
-      const requestFullscreen = async () => {
+      const setupMobileGame = async () => {
         try {
-          // Request fullscreen
-          if (document.documentElement.requestFullscreen) {
+          console.log('Setting up mobile game environment...');
+          
+          // Request fullscreen first
+          if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
             await document.documentElement.requestFullscreen();
+            console.log('Fullscreen enabled');
           }
           
           // Lock orientation to landscape
           if (screen.orientation && (screen.orientation as any).lock) {
             await (screen.orientation as any).lock('landscape');
+            console.log('Orientation locked to landscape');
           }
+          
+          // Add orientation change listener to maintain lock
+          const handleOrientationChange = async () => {
+            console.log('Orientation change detected, re-locking...');
+            if (screen.orientation && (screen.orientation as any).lock) {
+              try {
+                await (screen.orientation as any).lock('landscape');
+              } catch (error) {
+                console.log('Re-lock failed:', error);
+              }
+            }
+          };
+          
+          screen.orientation?.addEventListener('change', handleOrientationChange);
+          
+          return () => {
+            screen.orientation?.removeEventListener('change', handleOrientationChange);
+          };
         } catch (error) {
-          console.log('Fullscreen or orientation lock not supported:', error);
+          console.log('Mobile setup failed:', error);
         }
       };
-      requestFullscreen();
+      
+      const cleanup = setupMobileGame();
       
       return () => {
+        cleanup?.then(cleanupFn => cleanupFn?.());
+        
         // Clean exit on component unmount
         if (document.fullscreenElement) {
           document.exitFullscreen?.();
@@ -105,7 +130,7 @@ export default function SestavljankeTest() {
   const handleNewGame = () => {
     // Reset puzzle state without reloading page to maintain fullscreen
     setIsPuzzleCompleted(false);
-    setIsAudioDialogOpen(false);
+    setIsAudioDialogOpen(false);  
     setIsMenuOpen(false);
     
     // Reset puzzle pieces - trigger new game in ProfessionalJigsaw
@@ -123,30 +148,12 @@ export default function SestavljankeTest() {
     setIsMenuOpen(false);
   };
 
-  const isLandscape = window.innerWidth > window.innerHeight;
-
   return (
-    <div className={`${isMobile ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}>
+    <div className={`${isMobile ? 'fixed inset-0 bg-background overflow-hidden z-50' : 'min-h-screen bg-background'}`}>
       {!isMobile && <Header />}
       
-      {/* Show portrait message on mobile when not in landscape, but WITHIN fullscreen container */}
-      {isMobile && !isLandscape ? (
-        <div className="h-full flex items-center justify-center p-8">
-          <div className="text-center space-y-6">
-            <div className="text-6xl mb-4">
-              <RotateCcw className="w-16 h-16 mx-auto text-primary animate-pulse" />
-            </div>
-            <h2 className="text-2xl font-bold text-foreground">
-              Za začetek igre obrnite telefon
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Igra se izvaja v ležečem načinu
-            </p>
-          </div>
-        </div>
-      ) : (
-        /* Game layout */
-        <div className="h-full flex flex-col relative">
+      {/* Game layout - consistent for all mobile orientations */}
+      <div className="h-full flex flex-col relative">
         <div className="flex-1 p-4">
           <ProfessionalJigsaw
             imageUrl={imageUrl}
@@ -159,7 +166,7 @@ export default function SestavljankeTest() {
         
         {/* Controls: Mobile gear menu vs Desktop buttons */}
         {isMobile ? (
-          /* Mobile gear icon in bottom right */
+          /* Mobile gear icon in bottom right - always visible */
           <div className="absolute bottom-4 right-4 z-50">
             <Popover open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <PopoverTrigger asChild>
@@ -231,8 +238,7 @@ export default function SestavljankeTest() {
             </div>
           </div>
         )}
-        </div>
-      )}
+      </div>
 
       {/* Audio Dialog - appears automatically when puzzle is completed */}
       <AudioPracticeDialog
