@@ -111,23 +111,26 @@ export default function SestavljankeTest() {
     
     if (isMobile) {
       try {
-        // Exit fullscreen
-        if (document.fullscreenElement) {
-          await document.exitFullscreen();
-        }
+        console.log('Starting mobile cleanup...');
         
-        // Unlock orientation
+        // Unlock orientation first
         if (screen.orientation && (screen.orientation as any).unlock) {
+          console.log('Unlocking orientation...');
           (screen.orientation as any).unlock();
         }
         
-        // Small delay to ensure orientation changes take effect
-        setTimeout(() => {
-          navigate('/govorne-igre/sestavljanke');
-        }, 100);
+        // Exit fullscreen
+        if (document.fullscreenElement) {
+          console.log('Exiting fullscreen...');
+          await document.exitFullscreen();
+        }
+        
+        // Force page refresh to ensure clean state
+        window.location.href = '/govorne-igre/sestavljanke';
       } catch (error) {
         console.log('Error during cleanup:', error);
-        navigate('/govorne-igre/sestavljanke');
+        // Fallback: force navigation even if cleanup fails
+        window.location.href = '/govorne-igre/sestavljanke';
       }
     } else {
       navigate('/govorne-igre/sestavljanke');
