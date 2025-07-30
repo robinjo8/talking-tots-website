@@ -9,8 +9,6 @@ import { AudioPracticeDialog } from "@/components/puzzle/AudioPracticeDialog";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Settings } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export default function SestavljankeTest() {
   const [isPuzzleCompleted, setIsPuzzleCompleted] = useState(false);
@@ -106,51 +104,27 @@ export default function SestavljankeTest() {
           />
         </div>
         
-        {/* Settings menu in bottom right corner */}
-        <div className="absolute bottom-4 right-4">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button 
-                variant="outline" 
-                size="lg"
-                className="rounded-full bg-background/80 backdrop-blur-sm hover:bg-background/90 w-16 h-16 p-0"
-              >
-                <Settings className="h-8 w-8" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent 
-              className="w-auto p-2" 
-              side="top" 
-              align="end"
-            >
-              <div className="flex flex-col gap-2">
-                <Button 
-                  variant="default" 
-                  onClick={() => window.location.reload()}
-                  className="bg-emerald-500 hover:bg-emerald-600 text-white justify-start"
-                  size="sm"
-                >
-                  🔄 Nova igra
-                </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={() => navigate(-1)}
-                  className="justify-start"
-                  size="sm"
-                >
-                  ← Nazaj
-                </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={() => alert('Povlecite dele sestavljanke na pravo mesto. Ko se del približa svojemu mestu, se bo samodejno prilepil.')}
-                  className="justify-start"
-                  size="sm"
-                >
-                  📖 Navodila
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
+        {/* Bottom buttons */}
+        <div className="flex justify-center gap-4 p-4 bg-background">
+          <Button 
+            variant="default" 
+            onClick={() => window.location.reload()}
+            className="bg-emerald-500 hover:bg-emerald-600 text-white"
+          >
+            🔄 Nova igra
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => navigate(-1)}
+          >
+            ← Nazaj
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => alert('Povlecite dele sestavljanke na pravo mesto. Ko se del približa svojemu mestu, se bo samodejno prilepil.')}
+          >
+            📖 Navodila
+          </Button>
         </div>
       </div>
 
