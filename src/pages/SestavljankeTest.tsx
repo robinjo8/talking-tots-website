@@ -4,8 +4,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useSpeechRecording } from "@/hooks/useSpeechRecording";
 import { useToast } from "@/hooks/use-toast";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { JigsawPuzzle } from "@/components/puzzle/JigsawPuzzle";
-import { SimplePuzzle } from "@/components/puzzle/SimplePuzzle";
+import { ProfessionalJigsaw } from "@/components/puzzle/ProfessionalJigsaw";
 import { AudioPracticeDialog } from "@/components/puzzle/AudioPracticeDialog";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { Button } from "@/components/ui/button";
@@ -95,7 +94,7 @@ export default function SestavljankeTest() {
       {/* Mobile edge-to-edge layout */}
       {effectiveFullscreen ? (
         <div className="h-full p-4">
-          <JigsawPuzzle
+          <ProfessionalJigsaw
             imageUrl={imageUrl}
             gridSize={3}
             onComplete={handlePuzzleComplete}
@@ -110,23 +109,12 @@ export default function SestavljankeTest() {
             <p className="text-muted-foreground">Sestavi sliko Zmajčka Tomija</p>
           </div>
 
-          <div className="space-y-6">
-            <SimplePuzzle
-              imageUrl={imageUrl}
-              onComplete={handlePuzzleComplete}
-              className="mb-6"
-            />
-            
-            <div className="border-t pt-6">
-              <h3 className="text-lg font-semibold mb-4">Advanced Fabric.js Version:</h3>
-              <JigsawPuzzle
-                imageUrl={imageUrl}
-                gridSize={3}
-                onComplete={handlePuzzleComplete}
-                className="mb-6"
-              />
-            </div>
-          </div>
+          <ProfessionalJigsaw
+            imageUrl={imageUrl}
+            gridSize={4}
+            onComplete={handlePuzzleComplete}
+            className="mb-6"
+          />
 
           <div className="text-center">
             <Button 
