@@ -260,9 +260,24 @@ export default function SestavljankeTest() {
     }
   };
 
-  const handleBack = () => {
-    // Use the same exit function for consistency
-    exitGame();
+  const handleBack = async () => {
+    setIsExiting(true);
+    
+    try {
+      // First unlock orientation and exit fullscreen
+      await unlockOrientation();
+      await exitFullscreen();
+      
+      // Clear any session storage
+      sessionStorage.removeItem('backPressCount');
+      
+      // Navigate immediately to ensure orientation can change
+      navigate('/govorne-igre/sestavljanke', { replace: true });
+    } catch (error) {
+      console.warn('Error exiting game:', error);
+      // Force navigation even if cleanup fails
+      navigate('/govorne-igre/sestavljanke', { replace: true });
+    }
   };
 
   const handleInstructions = () => {
