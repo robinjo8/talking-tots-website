@@ -201,13 +201,13 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
           isPlaced: false,
           isDragging: false,
           tabs: {
-            // Top: has tab if the piece above has a blank (or false if top edge)
-            top: row > 0 ? verticalTabs[row - 1][col] : false,
+            // Top: has tab if the piece above has a blank (opposite of piece above's bottom tab)
+            top: row > 0 ? !verticalTabs[row - 1][col] : false,
             // Right: has tab if this connection is designated as tab for this piece
             right: col < gridCols - 1 ? horizontalTabs[row][col] : false,
             // Bottom: has tab if this connection is designated as tab for this piece  
             bottom: row < gridRows - 1 ? verticalTabs[row][col] : false,
-            // Left: has tab if the piece to the left has a blank (or false if left edge)
+            // Left: has tab if the piece to the left has a blank (opposite of left piece's right tab)
             left: col > 0 ? !horizontalTabs[row][col - 1] : false,
           },
           path: new Path2D(),
