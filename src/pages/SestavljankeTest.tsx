@@ -96,7 +96,8 @@ export default function SestavljankeTest() {
         <div className="h-full p-4">
           <ProfessionalJigsaw
             imageUrl={imageUrl}
-            gridSize={3}
+            gridCols={2}
+            gridRows={3}
             onComplete={handlePuzzleComplete}
             className="h-full"
           />
@@ -111,7 +112,8 @@ export default function SestavljankeTest() {
 
           <ProfessionalJigsaw
             imageUrl={imageUrl}
-            gridSize={4}
+            gridCols={2}
+            gridRows={3}
             onComplete={handlePuzzleComplete}
             className="mb-6"
           />

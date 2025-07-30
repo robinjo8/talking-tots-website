@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 
 interface ProfessionalJigsawProps {
   imageUrl: string;
-  gridSize?: number;
+  gridCols?: number;
+  gridRows?: number;
   onComplete?: () => void;
   className?: string;
 }
@@ -33,7 +34,8 @@ interface PuzzlePiece {
 
 export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   imageUrl,
-  gridSize = 4,
+  gridCols = 2,
+  gridRows = 3,
   onComplete,
   className = ""
 }) => {
@@ -44,11 +46,11 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   
-  const PUZZLE_WIDTH = 300;
-  const PUZZLE_HEIGHT = 225;
-  const CANVAS_WIDTH = 900;
-  const CANVAS_HEIGHT = 600;
-  const TAB_SIZE = 15;
+  const PUZZLE_WIDTH = 400;
+  const PUZZLE_HEIGHT = 300;
+  const CANVAS_WIDTH = 1000;
+  const CANVAS_HEIGHT = 700;
+  const TAB_SIZE = 20;
   const BOARD_X = (CANVAS_WIDTH - PUZZLE_WIDTH) / 2; // Center the board
   const BOARD_Y = (CANVAS_HEIGHT - PUZZLE_HEIGHT) / 2;
 
@@ -75,8 +77,8 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   useEffect(() => {
     if (!image) return;
 
-    const pieceWidth = PUZZLE_WIDTH / gridSize;
-    const pieceHeight = PUZZLE_HEIGHT / gridSize;
+    const pieceWidth = PUZZLE_WIDTH / gridCols;
+    const pieceHeight = PUZZLE_HEIGHT / gridRows;
     const newPieces: PuzzlePiece[] = [];
 
     // Create a temporary canvas to extract image data
@@ -88,8 +90,8 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
     // Draw scaled image
     tempCtx.drawImage(image, 0, 0, PUZZLE_WIDTH, PUZZLE_HEIGHT);
 
-    for (let row = 0; row < gridSize; row++) {
-      for (let col = 0; col < gridSize; col++) {
+    for (let row = 0; row < gridRows; row++) {
+      for (let col = 0; col < gridCols; col++) {
         const piece: PuzzlePiece = {
           id: `${row}-${col}`,
           row,
@@ -109,8 +111,8 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
           isDragging: false,
           tabs: {
             top: row > 0 ? Math.random() > 0.5 : false,
-            right: col < gridSize - 1 ? Math.random() > 0.5 : false,
-            bottom: row < gridSize - 1 ? Math.random() > 0.5 : false,
+            right: col < gridCols - 1 ? Math.random() > 0.5 : false,
+            bottom: row < gridRows - 1 ? Math.random() > 0.5 : false,
             left: col > 0 ? Math.random() > 0.5 : false,
           },
           path: new Path2D(),
@@ -133,7 +135,7 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
     }
 
     setPieces(newPieces);
-  }, [image, gridSize]);
+  }, [image, gridCols, gridRows]);
 
   // Create puzzle piece path with tabs and blanks
   const createPuzzlePiecePath = (piece: PuzzlePiece, width: number, height: number): Path2D => {
@@ -164,7 +166,7 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
       path.quadraticCurveTo(width + tabSize, height * 0.4, width + tabSize, height * 0.5);
       path.quadraticCurveTo(width + tabSize, height * 0.6, width, height * 0.7);
       path.lineTo(width, height);
-    } else if (piece.col < gridSize - 1) {
+    } else if (piece.col < gridCols - 1) {
       path.lineTo(width, height * 0.3);
       path.quadraticCurveTo(width - tabSize, height * 0.4, width - tabSize, height * 0.5);
       path.quadraticCurveTo(width - tabSize, height * 0.6, width, height * 0.7);
@@ -179,7 +181,7 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
       path.quadraticCurveTo(width * 0.6, height + tabSize, width * 0.5, height + tabSize);
       path.quadraticCurveTo(width * 0.4, height + tabSize, width * 0.3, height);
       path.lineTo(0, height);
-    } else if (piece.row < gridSize - 1) {
+    } else if (piece.row < gridRows - 1) {
       path.lineTo(width * 0.7, height);
       path.quadraticCurveTo(width * 0.6, height - tabSize, width * 0.5, height - tabSize);
       path.quadraticCurveTo(width * 0.4, height - tabSize, width * 0.3, height);
@@ -307,42 +309,56 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
 
   }, [pieces, image]);
 
-  // Mouse event handlers
-  const getMousePos = (e: React.MouseEvent): { x: number, y: number } => {
+  // Mouse and touch event handlers
+  const getEventPos = (e: React.MouseEvent | React.TouchEvent): { x: number, y: number } => {
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
     
     const rect = canvas.getBoundingClientRect();
+    
+    let clientX: number, clientY: number;
+    if ('touches' in e) {
+      if (e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = e.changedTouches[0].clientX;
+        clientY = e.changedTouches[0].clientY;
+      }
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+    
     return {
-      x: (e.clientX - rect.left) * (canvas.width / rect.width),
-      y: (e.clientY - rect.top) * (canvas.height / rect.height)
+      x: (clientX - rect.left) * (canvas.width / rect.width),
+      y: (clientY - rect.top) * (canvas.height / rect.height)
     };
   };
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleStart = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const mousePos = getMousePos(e);
-    console.log('Mouse down at:', mousePos);
+    const eventPos = getEventPos(e);
 
     // Find clicked piece (in reverse order to get top piece)
     for (let i = pieces.length - 1; i >= 0; i--) {
       const piece = pieces[i];
       if (!piece.isPlaced) {
-        const ctx = canvas.getContext('2d')!;
-        ctx.save();
-        ctx.translate(piece.currentX, piece.currentY);
+        // Check if event position is within piece bounds using a more accurate method
+        const relativeX = eventPos.x - piece.currentX;
+        const relativeY = eventPos.y - piece.currentY;
         
-        const isInside = ctx.isPointInPath(piece.path, mousePos.x - piece.currentX, mousePos.y - piece.currentY);
-        ctx.restore();
-        
-        if (isInside) {
-          console.log('Clicked piece:', piece.id);
+        // Simple bounds check first
+        if (relativeX >= -TAB_SIZE && relativeX <= piece.width + TAB_SIZE &&
+            relativeY >= -TAB_SIZE && relativeY <= piece.height + TAB_SIZE) {
+          
           setDraggedPiece(piece);
           setOffset({ 
-            x: mousePos.x - piece.currentX, 
-            y: mousePos.y - piece.currentY 
+            x: relativeX, 
+            y: relativeY 
           });
           
           setPieces(prev => prev.map(p => 
@@ -354,22 +370,20 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
     }
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handleMove = (e: React.MouseEvent | React.TouchEvent) => {
     if (!draggedPiece) return;
 
-    const mousePos = getMousePos(e);
+    const eventPos = getEventPos(e);
 
     setPieces(prev => prev.map(p => 
       p.id === draggedPiece.id 
-        ? { ...p, currentX: mousePos.x - offset.x, currentY: mousePos.y - offset.y }
+        ? { ...p, currentX: eventPos.x - offset.x, currentY: eventPos.y - offset.y }
         : p
     ));
   };
 
-  const handleMouseUp = () => {
+  const handleEnd = () => {
     if (!draggedPiece) return;
-
-    console.log('Mouse up, draggedPiece:', draggedPiece.id);
 
     const piece = pieces.find(p => p.id === draggedPiece.id);
     if (!piece) return;
@@ -380,7 +394,7 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
       Math.pow(piece.currentY - piece.correctY, 2)
     );
 
-    if (distance < 30) {
+    if (distance < 40) {
       // Snap to correct position
       setPieces(prev => prev.map(p => 
         p.id === piece.id 
@@ -437,10 +451,13 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
           width={CANVAS_WIDTH}
           height={CANVAS_HEIGHT}
           className="border-2 border-gray-300 rounded-lg shadow-lg cursor-pointer"
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
+          onMouseDown={handleStart}
+          onMouseMove={handleMove}
+          onMouseUp={handleEnd}
+          onMouseLeave={handleEnd}
+          onTouchStart={handleStart}
+          onTouchMove={handleMove}
+          onTouchEnd={handleEnd}
         />
       </div>
       
