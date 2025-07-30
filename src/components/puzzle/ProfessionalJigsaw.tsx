@@ -41,8 +41,29 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   onComplete,
   className = ""
 }) => {
-  // Show rotation message on mobile portrait BEFORE any hooks
-  if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [pieces, setPieces] = useState<PuzzlePiece[]>([]);
+  const [draggedPiece, setDraggedPiece] = useState<PuzzlePiece | null>(null);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [isLoading, setIsLoading] = useState(true);
+  const [image, setImage] = useState<HTMLImageElement | null>(null);
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+  const [showRotationMessage, setShowRotationMessage] = useState(false);
+
+  // Check orientation and update rotation message state
+  useEffect(() => {
+    const checkOrientation = () => {
+      const isMobilePortrait = window.innerWidth < 768 && window.innerHeight > window.innerWidth;
+      setShowRotationMessage(isMobilePortrait);
+    };
+
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    return () => window.removeEventListener('resize', checkOrientation);
+  }, []);
+
+  // Show rotation message overlay without resetting component
+  if (showRotationMessage) {
     return (
       <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
         <div className="text-white text-center p-8">
@@ -58,14 +79,6 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
       </div>
     );
   }
-
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [pieces, setPieces] = useState<PuzzlePiece[]>([]);
-  const [draggedPiece, setDraggedPiece] = useState<PuzzlePiece | null>(null);
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const [isLoading, setIsLoading] = useState(true);
-  const [image, setImage] = useState<HTMLImageElement | null>(null);
-  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   
   // Device detection
   const isMobile = window.innerWidth < 768;
