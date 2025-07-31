@@ -41,19 +41,8 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   onComplete,
   className = ""
 }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [pieces, setPieces] = useState<PuzzlePiece[]>([]);
-  const [draggedPiece, setDraggedPiece] = useState<PuzzlePiece | null>(null);
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const [isLoading, setIsLoading] = useState(true);
-  const [image, setImage] = useState<HTMLImageElement | null>(null);
-  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
-
-  // Check if we should show rotation message for mobile portrait
-  const isMobilePortrait = window.innerWidth < 768 && window.innerHeight > window.innerWidth;
-  
-  // Show rotation message overlay without resetting component state
-  if (isMobilePortrait) {
+  // Show rotation message on mobile portrait BEFORE any hooks
+  if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) {
     return (
       <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
         <div className="text-white text-center p-8">
@@ -69,6 +58,14 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
       </div>
     );
   }
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [pieces, setPieces] = useState<PuzzlePiece[]>([]);
+  const [draggedPiece, setDraggedPiece] = useState<PuzzlePiece | null>(null);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [isLoading, setIsLoading] = useState(true);
+  const [image, setImage] = useState<HTMLImageElement | null>(null);
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   
   // Device detection
   const isMobile = window.innerWidth < 768;
