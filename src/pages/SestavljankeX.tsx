@@ -1,5 +1,6 @@
 import { AppLayout } from "@/components/AppLayout";
 import { SimpleJigsaw } from "@/components/puzzle/SimpleJigsaw";
+import { SplitLayoutPuzzle } from "@/components/puzzle/SplitLayoutPuzzle";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -116,25 +117,15 @@ export default function SestavljankeX() {
             </div>
           </div>
 
-          {/* Middle Section - Holding Area for pieces */}
-          <div className="flex-1 bg-muted/20 p-2 border-b">
-            <div className="w-full h-full border-2 border-dashed border-muted-foreground/30 rounded-lg flex items-center justify-center">
-              <p className="text-muted-foreground text-sm">Področje za puzzle koščke</p>
-            </div>
-          </div>
-
-          {/* Bottom Section - Assembly Area */}
-          <div className="flex-1 p-2">
-            <div className="w-full h-full border-2 border-dashed border-black rounded-lg bg-white flex items-center justify-center overflow-hidden">
-              <SimpleJigsaw 
-                key={puzzleKey}
-                imageUrl={imageUrl}
-                gridCols={3}
-                gridRows={2}
-                onComplete={handleComplete}
-                className="max-w-full max-h-full"
-              />
-            </div>
+          {/* Split Layout Puzzle */}
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <SplitLayoutPuzzle 
+              key={puzzleKey}
+              imageUrl={imageUrl}
+              gridCols={3}
+              gridRows={2}
+              onComplete={handleComplete}
+            />
           </div>
         </div>
 
