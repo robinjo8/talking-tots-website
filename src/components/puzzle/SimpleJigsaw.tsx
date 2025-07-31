@@ -49,9 +49,18 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
   // Responsive canvas dimensions
   const getCanvasDimensions = () => {
     const isMobile = window.innerWidth < 768;
-    const width = Math.min(window.innerWidth - 32, isMobile ? 400 : 600);
-    const height = Math.min(window.innerHeight - 100, isMobile ? 300 : 450);
-    return { width, height };
+    if (isMobile) {
+      const width = Math.min(window.innerWidth - 32, 400);
+      const height = Math.min(window.innerHeight - 100, 300);
+      return { width, height };
+    } else {
+      // Desktop: Use much larger canvas size (80-90% of viewport)
+      const maxWidth = Math.min(window.innerWidth * 0.85, 1000);
+      const maxHeight = Math.min(window.innerHeight * 0.7, 700);
+      const width = Math.max(600, maxWidth);
+      const height = Math.max(450, maxHeight);
+      return { width, height };
+    }
   };
 
   const [canvasDimensions, setCanvasDimensions] = useState(getCanvasDimensions());
