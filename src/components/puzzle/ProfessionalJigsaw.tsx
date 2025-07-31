@@ -1,6 +1,4 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { Button } from "@/components/ui/button";
-import { Settings, RotateCcw, ArrowLeft, HelpCircle } from "lucide-react";
 
 interface ProfessionalJigsawProps {
   imageUrl: string;
@@ -41,23 +39,6 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   onComplete,
   className = ""
 }) => {
-  // Show rotation message on mobile portrait BEFORE any hooks
-  if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) {
-    return (
-      <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
-        <div className="text-white text-center p-8">
-          <div className="relative mb-6">
-            <div className="text-6xl">📱</div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-20 h-20 border-2 border-white border-t-transparent rounded-full animate-spin opacity-60"></div>
-            </div>
-          </div>
-          <h2 className="text-2xl font-bold mb-2">Obrnite telefon</h2>
-          <p className="text-lg">Za igranje sestavljanke prosimo, obrnite svojo napravo v ležeči način.</p>
-        </div>
-      </div>
-    );
-  }
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [pieces, setPieces] = useState<PuzzlePiece[]>([]);
@@ -65,7 +46,6 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isLoading, setIsLoading] = useState(true);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
-  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   
   // Device detection
   const isMobile = window.innerWidth < 768;
@@ -111,36 +91,6 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   
   const TAB_SIZE = Math.max(15, Math.min(30, PUZZLE_WIDTH / 40));
 
-  // Fullscreen API for mobile
-  useEffect(() => {
-    if (isMobile) {
-      const enterFullscreen = async () => {
-        try {
-          if (document.documentElement.requestFullscreen) {
-            await document.documentElement.requestFullscreen();
-          }
-          // Lock orientation to landscape
-          if (screen.orientation && (screen.orientation as any).lock) {
-            await (screen.orientation as any).lock('landscape');
-          }
-        } catch (error) {
-          console.log('Fullscreen not supported or denied');
-        }
-      };
-
-      enterFullscreen();
-
-      return () => {
-        if (document.exitFullscreen && document.fullscreenElement) {
-          document.exitFullscreen();
-        }
-        if (screen.orientation && (screen.orientation as any).unlock) {
-          (screen.orientation as any).unlock();
-        }
-      };
-    }
-  }, [isMobile]);
-
   const handleNewGame = () => {
     // Reset all pieces to initial scattered positions
     setPieces(prev => prev.map(piece => ({
@@ -152,17 +102,6 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
       isPlaced: false,
       isDragging: false
     })));
-    setShowSettingsMenu(false);
-  };
-
-  const handleBack = () => {
-    window.history.back();
-    setShowSettingsMenu(false);
-  };
-
-  const handleInstructions = () => {
-    alert('Povlecite dele sestavljanke na pravo mesto. Ko se del približa svojemu mestu, se bo samodejno prilepil.');
-    setShowSettingsMenu(false);
   };
 
   // Load and process image
@@ -577,77 +516,12 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
 
 
   return (
-    <div className={`fixed inset-0 overflow-hidden bg-background ${className}`}>
-      {/* Desktop Controls */}
-      {isDesktop && (
-        <div className="absolute top-4 left-4 z-10 flex gap-2">
-          <Button onClick={handleNewGame} variant="default" size="sm" className="flex items-center gap-2">
-            <RotateCcw className="w-4 h-4" />
-            Nova igra
-          </Button>
-          <Button onClick={handleBack} variant="outline" size="sm" className="flex items-center gap-2">
-            <ArrowLeft className="w-4 h-4" />
-            Nazaj
-          </Button>
-          <Button onClick={handleInstructions} variant="outline" size="sm" className="flex items-center gap-2">
-            <HelpCircle className="w-4 h-4" />
-            Navodila
-          </Button>
-        </div>
-      )}
-
-      {/* Mobile Settings Button */}
-      {isMobile && (
-        <>
-          <Button
-            onClick={() => setShowSettingsMenu(!showSettingsMenu)}
-            variant="outline"
-            size="sm"
-            className="absolute bottom-4 right-4 z-20 w-10 h-10 p-0"
-          >
-            <Settings className="w-4 h-4" />
-          </Button>
-
-          {/* Mobile Settings Menu */}
-          {showSettingsMenu && (
-            <div className="absolute bottom-16 right-4 z-30 bg-background border border-border rounded-lg shadow-lg p-2 space-y-1">
-              <Button 
-                onClick={handleNewGame} 
-                variant="ghost" 
-                size="sm" 
-                className="w-full justify-start text-sm"
-              >
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Nova igra
-              </Button>
-              <Button 
-                onClick={handleBack} 
-                variant="ghost" 
-                size="sm" 
-                className="w-full justify-start text-sm"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Nazaj
-              </Button>
-              <Button 
-                onClick={handleInstructions} 
-                variant="ghost" 
-                size="sm" 
-                className="w-full justify-start text-sm"
-              >
-                <HelpCircle className="w-4 h-4 mr-2" />
-                Navodila
-              </Button>
-            </div>
-          )}
-        </>
-      )}
-
+    <div className={`w-full h-full ${className}`}>
       <canvas
         ref={canvasRef}
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
-        className="cursor-pointer block"
+        className="cursor-pointer block w-full h-full"
         style={{ 
           width: `${CANVAS_WIDTH}px`, 
           height: `${CANVAS_HEIGHT}px`,
