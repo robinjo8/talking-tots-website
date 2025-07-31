@@ -48,22 +48,12 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
-  const [showRotationMessage, setShowRotationMessage] = useState(false);
 
-  // Check orientation and update rotation message state
-  useEffect(() => {
-    const checkOrientation = () => {
-      const isMobilePortrait = window.innerWidth < 768 && window.innerHeight > window.innerWidth;
-      setShowRotationMessage(isMobilePortrait);
-    };
-
-    checkOrientation();
-    window.addEventListener('resize', checkOrientation);
-    return () => window.removeEventListener('resize', checkOrientation);
-  }, []);
-
-  // Show rotation message overlay without resetting component
-  if (showRotationMessage) {
+  // Check if we should show rotation message for mobile portrait
+  const isMobilePortrait = window.innerWidth < 768 && window.innerHeight > window.innerWidth;
+  
+  // Show rotation message overlay without resetting component state
+  if (isMobilePortrait) {
     return (
       <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
         <div className="text-white text-center p-8">
