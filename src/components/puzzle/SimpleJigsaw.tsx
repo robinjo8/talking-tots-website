@@ -284,8 +284,11 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
     ctx.fillStyle = '#f8fafc';
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    // Draw puzzle board outline
-    ctx.strokeStyle = '#e2e8f0';
+    // Draw puzzle board with white background and black dashed border
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(BOARD_X, BOARD_Y, PUZZLE_WIDTH, PUZZLE_HEIGHT);
+    
+    ctx.strokeStyle = '#000000';
     ctx.lineWidth = 2;
     ctx.setLineDash([5, 5]);
     ctx.strokeRect(BOARD_X, BOARD_Y, PUZZLE_WIDTH, PUZZLE_HEIGHT);
