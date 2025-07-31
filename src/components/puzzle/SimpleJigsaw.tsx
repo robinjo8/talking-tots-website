@@ -78,9 +78,31 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
   const CANVAS_WIDTH = canvasDimensions.width;
   const CANVAS_HEIGHT = canvasDimensions.height;
   
-  // Puzzle area (smaller and more centered)
-  const PUZZLE_WIDTH = CANVAS_WIDTH * 0.6;
-  const PUZZLE_HEIGHT = CANVAS_HEIGHT * 0.65;
+  // Calculate puzzle dimensions maintaining image aspect ratio
+  const calculatePuzzleDimensions = () => {
+    if (!image) {
+      return { width: CANVAS_WIDTH * 0.6, height: CANVAS_HEIGHT * 0.65 };
+    }
+    
+    const imageAspectRatio = image.naturalWidth / image.naturalHeight;
+    const maxPuzzleWidth = CANVAS_WIDTH * 0.6;
+    const maxPuzzleHeight = CANVAS_HEIGHT * 0.65;
+    
+    let puzzleWidth = maxPuzzleWidth;
+    let puzzleHeight = puzzleWidth / imageAspectRatio;
+    
+    // If height exceeds max, adjust based on height
+    if (puzzleHeight > maxPuzzleHeight) {
+      puzzleHeight = maxPuzzleHeight;
+      puzzleWidth = puzzleHeight * imageAspectRatio;
+    }
+    
+    return { width: puzzleWidth, height: puzzleHeight };
+  };
+  
+  const puzzleDimensions = calculatePuzzleDimensions();
+  const PUZZLE_WIDTH = puzzleDimensions.width;
+  const PUZZLE_HEIGHT = puzzleDimensions.height;
   const BOARD_X = (CANVAS_WIDTH - PUZZLE_WIDTH) / 2;
   const BOARD_Y = (CANVAS_HEIGHT - PUZZLE_HEIGHT) / 2;
   
