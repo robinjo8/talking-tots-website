@@ -78,26 +78,15 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
   const CANVAS_WIDTH = canvasDimensions.width;
   const CANVAS_HEIGHT = canvasDimensions.height;
   
-  // Calculate puzzle dimensions maintaining image aspect ratio
+  // Calculate square puzzle dimensions (1:1 aspect ratio for dragon image)
   const calculatePuzzleDimensions = () => {
-    if (!image) {
-      return { width: CANVAS_WIDTH * 0.6, height: CANVAS_HEIGHT * 0.65 };
-    }
+    const maxPuzzleWidth = CANVAS_WIDTH * 0.5;
+    const maxPuzzleHeight = CANVAS_HEIGHT * 0.6;
     
-    const imageAspectRatio = image.naturalWidth / image.naturalHeight;
-    const maxPuzzleWidth = CANVAS_WIDTH * 0.6;
-    const maxPuzzleHeight = CANVAS_HEIGHT * 0.65;
+    // Force square aspect ratio (1:1) for dragon image
+    const puzzleSize = Math.min(maxPuzzleWidth, maxPuzzleHeight);
     
-    let puzzleWidth = maxPuzzleWidth;
-    let puzzleHeight = puzzleWidth / imageAspectRatio;
-    
-    // If height exceeds max, adjust based on height
-    if (puzzleHeight > maxPuzzleHeight) {
-      puzzleHeight = maxPuzzleHeight;
-      puzzleWidth = puzzleHeight * imageAspectRatio;
-    }
-    
-    return { width: puzzleWidth, height: puzzleHeight };
+    return { width: puzzleSize, height: puzzleSize };
   };
   
   const puzzleDimensions = calculatePuzzleDimensions();
