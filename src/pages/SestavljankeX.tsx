@@ -35,7 +35,7 @@ export default function SestavljankeX() {
     setShowInstructions(true);
   };
 
-  // Enable fullscreen on mobile devices only
+  // Enable fullscreen and portrait lock on mobile devices only
   useEffect(() => {
     if (effectiveFullscreen) {
       const requestFullscreen = async () => {
@@ -47,11 +47,30 @@ export default function SestavljankeX() {
           console.log('Fullscreen not supported:', error);
         }
       };
+
+      const lockPortrait = async () => {
+        try {
+          if (screen.orientation && 'lock' in screen.orientation) {
+            await (screen.orientation as any).lock('portrait');
+          }
+        } catch (error) {
+          console.log('Portrait lock not supported:', error);
+        }
+      };
+
       requestFullscreen();
+      lockPortrait();
       
       return () => {
         if (document.fullscreenElement) {
           document.exitFullscreen?.();
+        }
+        try {
+          if (screen.orientation && 'unlock' in screen.orientation) {
+            (screen.orientation as any).unlock();
+          }
+        } catch (error) {
+          console.log('Orientation unlock error:', error);
         }
       };
     }
@@ -59,60 +78,61 @@ export default function SestavljankeX() {
 
   if (effectiveFullscreen) {
     return (
-      <div className="fixed inset-0 bg-background overflow-hidden" style={{ transform: 'rotate(0deg)' }}>
+      <div className="fixed inset-0 bg-background overflow-hidden select-none">
         <div className="h-full flex flex-col">
-          <Card className="bg-dragon-green/5 mx-2 mt-2 mb-1 flex-shrink-0">
-            <CardContent className="p-3">
-              <div className="space-y-3">
-                <div>
-                  <h2 className="text-base font-bold mb-2">Sestavljanka X</h2>
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="text-sm">
-                      <span className="font-medium">Sestavljaj sliko zmajčka</span>
-                    </div>
-                    
-                    <div className="flex gap-1 flex-shrink-0">
-                      <Button
-                        onClick={handleNewGame}
-                        size="sm"
-                        className="bg-dragon-green hover:bg-dragon-green/90 text-white p-1.5 h-8 w-8"
-                        variant="default"
-                      >
-                        <RotateCcw className="h-3 w-3" />
-                      </Button>
-                      
-                      <Button
-                        variant="outline"
-                        onClick={handleBack}
-                        size="sm"
-                        className="p-1.5 h-8 w-8"
-                      >
-                        <ArrowLeft className="h-3 w-3" />
-                      </Button>
-                      
-                      <Button
-                        variant="outline"
-                        onClick={handleInstructions}
-                        size="sm"
-                        className="p-1.5 h-8 w-8"
-                      >
-                        <BookOpen className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Top Section - Buttons */}
+          <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
+            <h2 className="text-lg font-bold mb-3 text-center">Sestavljanka X</h2>
+            <div className="flex justify-center gap-3">
+              <Button
+                onClick={handleNewGame}
+                size="sm"
+                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
+                variant="default"
+              >
+                <RotateCcw className="h-4 w-4" />
+                Nova igra
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={handleBack}
+                size="sm"
+                className="gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Nazaj
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={handleInstructions}
+                size="sm"
+                className="gap-2"
+              >
+                <BookOpen className="h-4 w-4" />
+                Navodila
+              </Button>
+            </div>
+          </div>
 
-          <div className="flex-1 px-2 pb-2 overflow-hidden">
-            <div className="w-full h-full flex items-center justify-center">
+          {/* Middle Section - Holding Area for pieces */}
+          <div className="flex-1 bg-muted/20 p-2 border-b">
+            <div className="w-full h-full border-2 border-dashed border-muted-foreground/30 rounded-lg flex items-center justify-center">
+              <p className="text-muted-foreground text-sm">Področje za puzzle koščke</p>
+            </div>
+          </div>
+
+          {/* Bottom Section - Assembly Area */}
+          <div className="flex-1 p-2">
+            <div className="w-full h-full border-2 border-dashed border-black rounded-lg bg-white flex items-center justify-center overflow-hidden">
               <SimpleJigsaw 
                 key={puzzleKey}
                 imageUrl={imageUrl}
                 gridCols={3}
                 gridRows={2}
                 onComplete={handleComplete}
+                className="max-w-full max-h-full"
               />
             </div>
           </div>
