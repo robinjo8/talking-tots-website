@@ -129,9 +129,6 @@ const consonants = [
     navigate("/govorne-igre/sestavljanke/r");
   };
 
-  const handleTestClick = () => {
-    navigate("/govorne-igre/sestavljanke/test");
-  };
 
   const handleXClick = () => {
     navigate("/govorne-igre/sestavljanke/X");
@@ -189,25 +186,6 @@ const consonants = [
               </CardContent>
             </Card>
 
-            <Card 
-              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col cursor-pointer hover:scale-105"
-              onClick={handleTestClick}
-            >
-              <CardHeader className="bg-gradient-to-r from-app-orange/10 to-app-yellow/10 rounded-t-2xl pb-4">
-                <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
-                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
-                    <span className="text-2xl font-bold text-app-orange">
-                      TEST
-                    </span>
-                  </div>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6 pb-4 flex-grow text-center">
-                <p className="text-sm font-semibold mb-2 text-app-orange">
-                  Preizkusi novo sestavljanko z Zmajčkom Tomijem
-                </p>
-              </CardContent>
-            </Card>
 
             <Card 
               className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col cursor-pointer hover:scale-105"
