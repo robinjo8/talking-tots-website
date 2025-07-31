@@ -85,9 +85,9 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
     const isMobile = window.innerWidth < 768;
     
     if (isMobile) {
-      // Mobile: Assembly area in bottom half
-      const maxPuzzleWidth = CANVAS_WIDTH * 0.8;
-      const maxPuzzleHeight = (CANVAS_HEIGHT / 2) * 0.8; // Bottom half only
+      // Mobile: Maximize use of available space
+      const maxPuzzleWidth = CANVAS_WIDTH * 0.95; // Use almost full width
+      const maxPuzzleHeight = (CANVAS_HEIGHT / 2) * 0.9; // Use 90% of bottom half
       const puzzleSize = Math.min(maxPuzzleWidth, maxPuzzleHeight);
       return { width: puzzleSize, height: puzzleSize };
     } else {
