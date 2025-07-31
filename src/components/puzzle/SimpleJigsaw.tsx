@@ -50,16 +50,17 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
   const getCanvasDimensions = () => {
     const isMobile = window.innerWidth < 768;
     if (isMobile) {
-      const width = Math.min(window.innerWidth - 32, 400);
-      const height = Math.min(window.innerHeight - 100, 300);
-      return { width, height };
+      // Mobile: Use landscape fullscreen dimensions
+      const width = Math.max(window.innerWidth, window.innerHeight) - 16;
+      const height = Math.min(window.innerWidth, window.innerHeight) - 120;
+      return { width: Math.min(width, 900), height: Math.min(height, 500) };
     } else {
-      // Desktop: Use much larger canvas size (80-90% of viewport)
-      const maxWidth = Math.min(window.innerWidth * 0.85, 1000);
-      const maxHeight = Math.min(window.innerHeight * 0.7, 700);
-      const width = Math.max(600, maxWidth);
-      const height = Math.max(450, maxHeight);
-      return { width, height };
+      // Desktop: Use 90-95% of viewport width for much larger canvas
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const width = Math.min(viewportWidth * 0.9, 1200);
+      const height = Math.min(viewportHeight * 0.75, 800);
+      return { width: Math.max(800, width), height: Math.max(600, height) };
     }
   };
 
