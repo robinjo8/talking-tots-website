@@ -23,6 +23,7 @@ export function PuzzleCompletionDialog({
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
+  const [recordingTimeLeft, setRecordingTimeLeft] = useState(3);
   const { playAudio } = useAudioPlayback();
 
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke/${completedImage.filename}`;
@@ -68,7 +69,29 @@ export function PuzzleCompletionDialog({
       setMediaRecorder(recorder);
       recorder.start();
       setIsRecording(true);
+      setRecordingTimeLeft(3);
       toast("Snemanje se je začelo...");
+
+      // Start countdown timer
+      const countdownInterval = setInterval(() => {
+        setRecordingTimeLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(countdownInterval);
+            stopRecording();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      // Auto-stop after 3 seconds
+      setTimeout(() => {
+        clearInterval(countdownInterval);
+        if (recorder && recorder.state === 'recording') {
+          stopRecording();
+        }
+      }, 3000);
+
     } catch (error) {
       console.error('Error starting recording:', error);
       toast.error("Napaka pri dostopu do mikrofona");
@@ -148,7 +171,7 @@ export function PuzzleCompletionDialog({
               }`}
             >
               <Mic className="w-5 h-5" />
-              {isRecording ? 'Ustavi' : 'Posnemi se'}
+              {isRecording ? `Ustavi (${recordingTimeLeft}s)` : 'Posnemi se'}
             </Button>
           </div>
 
