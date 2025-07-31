@@ -1,6 +1,5 @@
 import { AppLayout } from "@/components/AppLayout";
 import { SimpleJigsaw } from "@/components/puzzle/SimpleJigsaw";
-import { SplitLayoutPuzzle } from "@/components/puzzle/SplitLayoutPuzzle";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -117,14 +116,15 @@ export default function SestavljankeX() {
             </div>
           </div>
 
-          {/* Split Layout Puzzle */}
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <SplitLayoutPuzzle 
+          {/* Mobile Split Layout - Unified Puzzle */}
+          <div className="flex-1 overflow-hidden">
+            <SimpleJigsaw 
               key={puzzleKey}
               imageUrl={imageUrl}
               gridCols={3}
               gridRows={2}
               onComplete={handleComplete}
+              className="w-full h-full"
             />
           </div>
         </div>

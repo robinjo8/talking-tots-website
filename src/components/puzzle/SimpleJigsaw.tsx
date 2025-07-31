@@ -50,10 +50,12 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
   const getCanvasDimensions = () => {
     const isMobile = window.innerWidth < 768;
     if (isMobile) {
-      // Mobile: Use full available screen for landscape
-      const width = Math.max(window.innerWidth, window.innerHeight) - 32;
-      const height = Math.min(window.innerWidth, window.innerHeight) - 80;
-      return { width, height };
+      // Mobile: Use full container dimensions
+      const container = canvasRef.current?.parentElement;
+      if (container) {
+        return { width: container.clientWidth, height: container.clientHeight };
+      }
+      return { width: 350, height: 600 };
     } else {
       // Desktop: Use almost full viewport width
       const viewportWidth = window.innerWidth;
@@ -78,26 +80,38 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
   const CANVAS_WIDTH = canvasDimensions.width;
   const CANVAS_HEIGHT = canvasDimensions.height;
   
-  // Calculate square puzzle dimensions (1:1 aspect ratio for dragon image)
+  // Calculate puzzle dimensions based on device
   const calculatePuzzleDimensions = () => {
-    const maxPuzzleWidth = CANVAS_WIDTH * 0.5;
-    const maxPuzzleHeight = CANVAS_HEIGHT * 0.6;
+    const isMobile = window.innerWidth < 768;
     
-    // Force square aspect ratio (1:1) for dragon image
-    const puzzleSize = Math.min(maxPuzzleWidth, maxPuzzleHeight);
-    
-    return { width: puzzleSize, height: puzzleSize };
+    if (isMobile) {
+      // Mobile: Assembly area in bottom half
+      const maxPuzzleWidth = CANVAS_WIDTH * 0.8;
+      const maxPuzzleHeight = (CANVAS_HEIGHT / 2) * 0.8; // Bottom half only
+      const puzzleSize = Math.min(maxPuzzleWidth, maxPuzzleHeight);
+      return { width: puzzleSize, height: puzzleSize };
+    } else {
+      // Desktop: Use center area
+      const maxPuzzleWidth = CANVAS_WIDTH * 0.5;
+      const maxPuzzleHeight = CANVAS_HEIGHT * 0.6;
+      const puzzleSize = Math.min(maxPuzzleWidth, maxPuzzleHeight);
+      return { width: puzzleSize, height: puzzleSize };
+    }
   };
   
   const puzzleDimensions = calculatePuzzleDimensions();
   const PUZZLE_WIDTH = puzzleDimensions.width;
   const PUZZLE_HEIGHT = puzzleDimensions.height;
-  const BOARD_X = (CANVAS_WIDTH - PUZZLE_WIDTH) / 2;
-  const BOARD_Y = (CANVAS_HEIGHT - PUZZLE_HEIGHT) / 2;
   
-  // Side areas for scattered pieces
-  const LEFT_AREA_END = BOARD_X - 10;
-  const RIGHT_AREA_START = BOARD_X + PUZZLE_WIDTH + 10;
+  const isMobile = window.innerWidth < 768;
+  const BOARD_X = (CANVAS_WIDTH - PUZZLE_WIDTH) / 2;
+  const BOARD_Y = isMobile 
+    ? (CANVAS_HEIGHT / 2) + ((CANVAS_HEIGHT / 2) - PUZZLE_HEIGHT) / 2  // Bottom half center
+    : (CANVAS_HEIGHT - PUZZLE_HEIGHT) / 2;  // Full canvas center
+  
+  // Areas for scattered pieces
+  const LEFT_AREA_END = isMobile ? CANVAS_WIDTH : BOARD_X - 10;
+  const RIGHT_AREA_START = isMobile ? 0 : BOARD_X + PUZZLE_WIDTH + 10;
   
   const TAB_SIZE = Math.max(8, Math.min(15, PUZZLE_WIDTH / 30));
 
@@ -235,11 +249,15 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
           y: row * pieceHeight,
           width: pieceWidth,
           height: pieceHeight,
-          // Scatter pieces in side areas
-          currentX: Math.random() > 0.5 
-            ? 10 + Math.random() * Math.max(10, LEFT_AREA_END - pieceWidth - 20)
-            : RIGHT_AREA_START + 10 + Math.random() * Math.max(10, CANVAS_WIDTH - RIGHT_AREA_START - pieceWidth - 20),
-          currentY: 10 + Math.random() * Math.max(10, CANVAS_HEIGHT - pieceHeight - 20),
+          // Place pieces differently based on device
+          currentX: isMobile 
+            ? 10 + Math.random() * Math.max(10, CANVAS_WIDTH - pieceWidth - 20)  // Top area on mobile
+            : Math.random() > 0.5 
+              ? 10 + Math.random() * Math.max(10, LEFT_AREA_END - pieceWidth - 20)
+              : RIGHT_AREA_START + 10 + Math.random() * Math.max(10, CANVAS_WIDTH - RIGHT_AREA_START - pieceWidth - 20),
+          currentY: isMobile
+            ? 10 + Math.random() * Math.max(10, (CANVAS_HEIGHT / 2) - pieceHeight - 20)  // Top half only
+            : 10 + Math.random() * Math.max(10, CANVAS_HEIGHT - pieceHeight - 20),
           correctX: BOARD_X + col * pieceWidth,
           correctY: BOARD_Y + row * pieceHeight,
           isPlaced: false,
