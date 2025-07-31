@@ -35,38 +35,48 @@ export default function SestavljankeX() {
     setShowInstructions(true);
   };
 
-  // Enable fullscreen and landscape orientation on mobile devices only
+  // Mobile fullscreen and landscape setup
   useEffect(() => {
     if (effectiveFullscreen) {
-      const requestFullscreen = async () => {
+      // Request fullscreen
+      const enterFullscreen = async () => {
         try {
-          if (document.documentElement.requestFullscreen) {
-            await document.documentElement.requestFullscreen();
-          }
+          await document.documentElement.requestFullscreen();
         } catch (error) {
-          console.log('Fullscreen not supported:', error);
+          console.log('Fullscreen not available:', error);
         }
       };
-      
-      const lockOrientation = async () => {
+
+      // Lock to landscape orientation
+      const lockLandscape = async () => {
         try {
           if (screen.orientation && 'lock' in screen.orientation) {
             await (screen.orientation as any).lock('landscape');
           }
         } catch (error) {
-          console.log('Orientation lock not supported:', error);
+          console.log('Orientation lock not available:', error);
         }
       };
-      
-      requestFullscreen();
-      lockOrientation();
-      
+
+      enterFullscreen();
+      lockLandscape();
+
+      // Cleanup on unmount
       return () => {
-        if (document.fullscreenElement) {
-          document.exitFullscreen?.();
+        try {
+          if (document.fullscreenElement) {
+            document.exitFullscreen();
+          }
+        } catch (error) {
+          console.log('Exit fullscreen error:', error);
         }
-        if (screen.orientation && 'unlock' in screen.orientation) {
-          (screen.orientation as any).unlock();
+        
+        try {
+          if (screen.orientation && 'unlock' in screen.orientation) {
+            (screen.orientation as any).unlock();
+          }
+        } catch (error) {
+          console.log('Orientation unlock error:', error);
         }
       };
     }

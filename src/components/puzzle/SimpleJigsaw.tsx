@@ -50,17 +50,17 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
   const getCanvasDimensions = () => {
     const isMobile = window.innerWidth < 768;
     if (isMobile) {
-      // Mobile: Use landscape fullscreen dimensions
-      const width = Math.max(window.innerWidth, window.innerHeight) - 16;
-      const height = Math.min(window.innerWidth, window.innerHeight) - 120;
-      return { width: Math.min(width, 900), height: Math.min(height, 500) };
+      // Mobile: Use full available screen for landscape
+      const width = Math.max(window.innerWidth, window.innerHeight) - 32;
+      const height = Math.min(window.innerWidth, window.innerHeight) - 80;
+      return { width, height };
     } else {
-      // Desktop: Use 90-95% of viewport width for much larger canvas
+      // Desktop: Use almost full viewport width
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
-      const width = Math.min(viewportWidth * 0.9, 1200);
-      const height = Math.min(viewportHeight * 0.75, 800);
-      return { width: Math.max(800, width), height: Math.max(600, height) };
+      const width = viewportWidth * 0.95;
+      const height = viewportHeight * 0.8;
+      return { width, height };
     }
   };
 
@@ -78,9 +78,9 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
   const CANVAS_WIDTH = canvasDimensions.width;
   const CANVAS_HEIGHT = canvasDimensions.height;
   
-  // Puzzle area (centered)
-  const PUZZLE_WIDTH = CANVAS_WIDTH * 0.5;
-  const PUZZLE_HEIGHT = CANVAS_HEIGHT * 0.6;
+  // Puzzle area (use most of canvas)
+  const PUZZLE_WIDTH = CANVAS_WIDTH * 0.85;
+  const PUZZLE_HEIGHT = CANVAS_HEIGHT * 0.85;
   const BOARD_X = (CANVAS_WIDTH - PUZZLE_WIDTH) / 2;
   const BOARD_Y = (CANVAS_HEIGHT - PUZZLE_HEIGHT) / 2;
   
