@@ -78,9 +78,9 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
   const CANVAS_WIDTH = canvasDimensions.width;
   const CANVAS_HEIGHT = canvasDimensions.height;
   
-  // Puzzle area (use most of canvas)
-  const PUZZLE_WIDTH = CANVAS_WIDTH * 0.85;
-  const PUZZLE_HEIGHT = CANVAS_HEIGHT * 0.85;
+  // Puzzle area (smaller and more centered)
+  const PUZZLE_WIDTH = CANVAS_WIDTH * 0.6;
+  const PUZZLE_HEIGHT = CANVAS_HEIGHT * 0.65;
   const BOARD_X = (CANVAS_WIDTH - PUZZLE_WIDTH) / 2;
   const BOARD_Y = (CANVAS_HEIGHT - PUZZLE_HEIGHT) / 2;
   
