@@ -35,48 +35,23 @@ export default function SestavljankeX() {
     setShowInstructions(true);
   };
 
-  // Mobile fullscreen and landscape setup
+  // Enable fullscreen on mobile devices only
   useEffect(() => {
     if (effectiveFullscreen) {
-      // Request fullscreen
-      const enterFullscreen = async () => {
+      const requestFullscreen = async () => {
         try {
-          await document.documentElement.requestFullscreen();
-        } catch (error) {
-          console.log('Fullscreen not available:', error);
-        }
-      };
-
-      // Lock to landscape orientation
-      const lockLandscape = async () => {
-        try {
-          if (screen.orientation && 'lock' in screen.orientation) {
-            await (screen.orientation as any).lock('landscape');
+          if (document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen();
           }
         } catch (error) {
-          console.log('Orientation lock not available:', error);
+          console.log('Fullscreen not supported:', error);
         }
       };
-
-      enterFullscreen();
-      lockLandscape();
-
-      // Cleanup on unmount
+      requestFullscreen();
+      
       return () => {
-        try {
-          if (document.fullscreenElement) {
-            document.exitFullscreen();
-          }
-        } catch (error) {
-          console.log('Exit fullscreen error:', error);
-        }
-        
-        try {
-          if (screen.orientation && 'unlock' in screen.orientation) {
-            (screen.orientation as any).unlock();
-          }
-        } catch (error) {
-          console.log('Orientation unlock error:', error);
+        if (document.fullscreenElement) {
+          document.exitFullscreen?.();
         }
       };
     }
