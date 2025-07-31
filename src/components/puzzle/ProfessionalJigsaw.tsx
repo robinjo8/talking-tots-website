@@ -41,6 +41,24 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   onComplete,
   className = ""
 }) => {
+  // Show rotation message on mobile portrait BEFORE any hooks
+  if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) {
+    return (
+      <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
+        <div className="text-white text-center p-8">
+          <div className="relative mb-6">
+            <div className="text-6xl">📱</div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-20 h-20 border-2 border-white border-t-transparent rounded-full animate-spin opacity-60"></div>
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold mb-2">Obrnite telefon</h2>
+          <p className="text-lg">Za igranje sestavljanke prosimo, obrnite svojo napravo v ležeči način.</p>
+        </div>
+      </div>
+    );
+  }
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [pieces, setPieces] = useState<PuzzlePiece[]>([]);
   const [draggedPiece, setDraggedPiece] = useState<PuzzlePiece | null>(null);
@@ -93,27 +111,17 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
   
   const TAB_SIZE = Math.max(15, Math.min(30, PUZZLE_WIDTH / 40));
 
-  // Enhanced fullscreen and orientation lock for mobile
+  // Fullscreen API for mobile
   useEffect(() => {
     if (isMobile) {
       const enterFullscreen = async () => {
         try {
-          // Request fullscreen first
           if (document.documentElement.requestFullscreen) {
             await document.documentElement.requestFullscreen();
           }
-          
-          // Lock orientation to landscape more aggressively
-          if (screen.orientation) {
-            try {
-              await (screen.orientation as any).lock('landscape-primary');
-            } catch {
-              try {
-                await (screen.orientation as any).lock('landscape');
-              } catch {
-                console.log('Orientation lock not supported');
-              }
-            }
+          // Lock orientation to landscape
+          if (screen.orientation && (screen.orientation as any).lock) {
+            await (screen.orientation as any).lock('landscape');
           }
         } catch (error) {
           console.log('Fullscreen not supported or denied');
@@ -569,17 +577,7 @@ export const ProfessionalJigsaw: React.FC<ProfessionalJigsawProps> = ({
 
 
   return (
-    <div 
-      className={`fixed inset-0 overflow-hidden bg-background ${className}`}
-      style={{
-        position: 'fixed',
-        width: '100vw',
-        height: '100vh',
-        transform: isMobile && window.innerHeight > window.innerWidth ? 'rotate(90deg) translateX(-100vh)' : 'none',
-        transformOrigin: isMobile && window.innerHeight > window.innerWidth ? 'top left' : 'center',
-        overflow: 'hidden'
-      }}
-    >
+    <div className={`fixed inset-0 overflow-hidden bg-background ${className}`}>
       {/* Desktop Controls */}
       {isDesktop && (
         <div className="absolute top-4 left-4 z-10 flex gap-2">
