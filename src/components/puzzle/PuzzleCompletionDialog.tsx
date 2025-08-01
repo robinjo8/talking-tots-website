@@ -54,50 +54,59 @@ export function PuzzleCompletionDialog({
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       setAudioStream(stream);
 
-      const recorder = new MediaRecorder(stream);
+      const recorder = new MediaRecorder(stream, {
+        mimeType: 'audio/webm;codecs=opus'
+      });
       const chunks: Blob[] = [];
 
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           chunks.push(event.data);
+          console.log('Audio chunk collected, size:', event.data.size);
         }
       };
 
       recorder.onstop = async () => {
-        const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+        console.log('Recording stopped, chunks collected:', chunks.length);
+        if (chunks.length > 0) {
+          const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+          console.log('Audio blob created, size:', audioBlob.size);
+          await saveRecording(audioBlob);
+        } else {
+          console.warn('No audio chunks collected');
+          toast.error("Ni bilo posnetega zvoka");
+        }
         
         // Stop all tracks
         stream.getTracks().forEach(track => track.stop());
         setAudioStream(null);
-        
-        // Save the recording after stopping
-        await saveRecording(audioBlob);
       };
 
       setMediaRecorder(recorder);
       setIsRecording(true);
       setRecordingTimeLeft(3);
       
-      // Start recording
-      recorder.start();
+      // Start recording and collect data every 100ms
+      recorder.start(100);
+      console.log('Recording started');
       toast("Snemanje se je začelo...");
 
       // Countdown timer
+      let timeLeft = 3;
       const countdownInterval = setInterval(() => {
-        setRecordingTimeLeft(prev => {
-          const newTime = prev - 1;
-          if (newTime <= 0) {
-            clearInterval(countdownInterval);
-            // Auto-stop recording after 3 seconds
-            if (recorder.state === 'recording') {
-              recorder.stop();
-              setIsRecording(false);
-              toast("Snemanje končano - shranjujem...");
-            }
-            return 0;
+        timeLeft--;
+        setRecordingTimeLeft(timeLeft);
+        
+        if (timeLeft <= 0) {
+          clearInterval(countdownInterval);
+          console.log('3 seconds elapsed, stopping recording...');
+          
+          if (recorder.state === 'recording') {
+            recorder.stop();
+            setIsRecording(false);
+            toast("Snemanje končano - shranjujem...");
           }
-          return newTime;
-        });
+        }
       }, 1000);
 
     } catch (error) {
