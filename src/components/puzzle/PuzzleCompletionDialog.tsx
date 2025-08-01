@@ -51,44 +51,81 @@ export function PuzzleCompletionDialog({
 
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      console.log('Requesting microphone access...');
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 44100
+        }
+      });
+      console.log('Microphone access granted');
+      
       setAudioStream(stream);
 
-      const recorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus'
-      });
+      // Check supported MIME types
+      const supportedTypes = [
+        'audio/webm',
+        'audio/webm;codecs=opus',
+        'audio/mp4',
+        'audio/ogg;codecs=opus'
+      ];
+      
+      let mimeType = 'audio/webm';
+      for (const type of supportedTypes) {
+        if (MediaRecorder.isTypeSupported(type)) {
+          mimeType = type;
+          break;
+        }
+      }
+      console.log('Using MIME type:', mimeType);
+
+      const recorder = new MediaRecorder(stream, { mimeType });
       const chunks: Blob[] = [];
 
       recorder.ondataavailable = (event) => {
+        console.log('Data available event fired, size:', event.data.size);
         if (event.data.size > 0) {
           chunks.push(event.data);
-          console.log('Audio chunk collected, size:', event.data.size);
         }
       };
 
+      recorder.onstart = () => {
+        console.log('MediaRecorder started');
+      };
+
       recorder.onstop = async () => {
-        console.log('Recording stopped, chunks collected:', chunks.length);
+        console.log('MediaRecorder stopped, chunks:', chunks.length);
+        
+        // Stop all tracks
+        stream.getTracks().forEach(track => {
+          console.log('Stopping track:', track.kind);
+          track.stop();
+        });
+        setAudioStream(null);
+        
         if (chunks.length > 0) {
-          const audioBlob = new Blob(chunks, { type: 'audio/webm' });
-          console.log('Audio blob created, size:', audioBlob.size);
+          const audioBlob = new Blob(chunks, { type: mimeType });
+          console.log('Created audio blob, size:', audioBlob.size);
           await saveRecording(audioBlob);
         } else {
           console.warn('No audio chunks collected');
           toast.error("Ni bilo posnetega zvoka");
         }
-        
-        // Stop all tracks
-        stream.getTracks().forEach(track => track.stop());
-        setAudioStream(null);
+      };
+
+      recorder.onerror = (event) => {
+        console.error('MediaRecorder error:', event);
+        toast.error("Napaka pri snemanju");
       };
 
       setMediaRecorder(recorder);
       setIsRecording(true);
       setRecordingTimeLeft(3);
       
-      // Start recording and collect data every 100ms
+      // Start recording - collect data every 100ms to ensure we get chunks
       recorder.start(100);
-      console.log('Recording started');
+      console.log('Recording started with timeslice 100ms');
       toast("Snemanje se je začelo...");
 
       // Countdown timer
@@ -96,22 +133,32 @@ export function PuzzleCompletionDialog({
       const countdownInterval = setInterval(() => {
         timeLeft--;
         setRecordingTimeLeft(timeLeft);
+        console.log('Recording time left:', timeLeft);
         
         if (timeLeft <= 0) {
           clearInterval(countdownInterval);
-          console.log('3 seconds elapsed, stopping recording...');
+          console.log('Time elapsed, stopping recording...');
           
           if (recorder.state === 'recording') {
             recorder.stop();
             setIsRecording(false);
             toast("Snemanje končano - shranjujem...");
+          } else {
+            console.warn('Recorder not in recording state:', recorder.state);
           }
         }
       }, 1000);
 
     } catch (error) {
       console.error('Error starting recording:', error);
-      toast.error("Napaka pri dostopu do mikrofona");
+      setIsRecording(false);
+      if (error.name === 'NotAllowedError') {
+        toast.error("Dostop do mikrofona ni dovoljen");
+      } else if (error.name === 'NotFoundError') {
+        toast.error("Mikrofon ni najden");
+      } else {
+        toast.error("Napaka pri dostopu do mikrofona");
+      }
     }
   };
 
