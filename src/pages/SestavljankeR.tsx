@@ -1,6 +1,7 @@
 import { AppLayout } from "@/components/AppLayout";
 import { SimpleJigsaw } from "@/components/puzzle/SimpleJigsaw";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
+import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -31,6 +32,7 @@ const getRandomRImage = () => {
 
 export default function SestavljankeR() {
   const [showInstructions, setShowInstructions] = useState(false);
+  const [showCompletion, setShowCompletion] = useState(false);
   
   const [puzzleKey, setPuzzleKey] = useState(0);
   const [currentImage, setCurrentImage] = useState(getRandomRImage());
@@ -43,7 +45,7 @@ export default function SestavljankeR() {
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke/${currentImage.filename}`;
   
   const handleComplete = () => {
-    // Puzzle completed - no popup needed
+    setShowCompletion(true);
   };
 
   const handleNewGame = () => {
@@ -158,6 +160,12 @@ export default function SestavljankeR() {
           onClose={() => setShowInstructions(false)}
         />
 
+        <PuzzleSuccessDialog
+          isOpen={showCompletion}
+          onOpenChange={setShowCompletion}
+          completedImage={currentImage}
+        />
+
       </div>
     );
   }
@@ -193,6 +201,12 @@ export default function SestavljankeR() {
         <InstructionsModal 
           isOpen={showInstructions}
           onClose={() => setShowInstructions(false)}
+        />
+
+        <PuzzleSuccessDialog
+          isOpen={showCompletion}
+          onOpenChange={setShowCompletion}
+          completedImage={currentImage}
         />
 
       </div>
