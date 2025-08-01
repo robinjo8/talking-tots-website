@@ -81,25 +81,22 @@ export function PuzzleCompletionDialog({
       setRecordingTimeLeft(3);
       toast("Snemanje se je začelo...");
 
-      // Start countdown timer
+      // Clean countdown that auto-stops at 0
+      let timeLeft = 3;
       const countdownInterval = setInterval(() => {
-        setRecordingTimeLeft(prev => {
-          if (prev <= 1) {
-            clearInterval(countdownInterval);
-            stopRecording();
-            return 0;
+        timeLeft--;
+        setRecordingTimeLeft(timeLeft);
+        
+        if (timeLeft <= 0) {
+          clearInterval(countdownInterval);
+          // Auto-stop recording when countdown reaches 0
+          if (recorder && recorder.state === 'recording') {
+            recorder.stop();
           }
-          return prev - 1;
-        });
-      }, 1000);
-
-      // Auto-stop after 3 seconds
-      setTimeout(() => {
-        clearInterval(countdownInterval);
-        if (recorder && recorder.state === 'recording') {
-          stopRecording();
+          setIsRecording(false);
+          toast("Snemanje končano");
         }
-      }, 3000);
+      }, 1000);
 
     } catch (error) {
       console.error('Error starting recording:', error);
