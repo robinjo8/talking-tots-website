@@ -172,8 +172,8 @@ export function PuzzleCompletionDialog({
               size="lg"
               className={`gap-2 ${
                 isRecording 
-                  ? 'bg-red-500 hover:bg-red-600 text-white' 
-                  : 'bg-dragon-green hover:bg-dragon-green/90 text-white'
+                  ? 'bg-red-500 hover:bg-red-600 text-white'    // Red when recording
+                  : 'bg-dragon-green hover:bg-dragon-green/90 text-white'  // Green when not recording
               }`}
             >
               <Mic className="w-5 h-5" />
