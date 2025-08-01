@@ -50,12 +50,11 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
   const getCanvasDimensions = () => {
     const isMobile = window.innerWidth < 768;
     if (isMobile) {
-      // Mobile: Use full container dimensions
-      const container = canvasRef.current?.parentElement;
-      if (container) {
-        return { width: container.clientWidth, height: container.clientHeight };
-      }
-      return { width: 350, height: 600 };
+      // Mobile: Always use full viewport dimensions for consistent fullscreen
+      return { 
+        width: window.innerWidth, 
+        height: window.innerHeight 
+      };
     } else {
       // Desktop: Use almost full viewport width
       const viewportWidth = window.innerWidth;
