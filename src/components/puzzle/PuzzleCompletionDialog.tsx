@@ -54,10 +54,7 @@ export function PuzzleCompletionDialog({
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       setAudioStream(stream);
 
-      const recorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus'
-      });
-
+      const recorder = new MediaRecorder(stream);
       const chunks: Blob[] = [];
 
       recorder.ondataavailable = (event) => {
@@ -68,38 +65,40 @@ export function PuzzleCompletionDialog({
 
       recorder.onstop = async () => {
         const audioBlob = new Blob(chunks, { type: 'audio/webm' });
-        await saveRecording(audioBlob);
         
         // Stop all tracks
         stream.getTracks().forEach(track => track.stop());
         setAudioStream(null);
+        
+        // Save the recording after stopping
+        await saveRecording(audioBlob);
       };
 
       setMediaRecorder(recorder);
-      recorder.start();
       setIsRecording(true);
       setRecordingTimeLeft(3);
+      
+      // Start recording
+      recorder.start();
       toast("Snemanje se je začelo...");
 
-      // Start countdown timer
+      // Countdown timer
       const countdownInterval = setInterval(() => {
         setRecordingTimeLeft(prev => {
-          if (prev <= 1) {
+          const newTime = prev - 1;
+          if (newTime <= 0) {
             clearInterval(countdownInterval);
-            stopRecording();
+            // Auto-stop recording after 3 seconds
+            if (recorder.state === 'recording') {
+              recorder.stop();
+              setIsRecording(false);
+              toast("Snemanje končano - shranjujem...");
+            }
             return 0;
           }
-          return prev - 1;
+          return newTime;
         });
       }, 1000);
-
-      // Auto-stop after 3 seconds
-      setTimeout(() => {
-        clearInterval(countdownInterval);
-        if (recorder && recorder.state === 'recording') {
-          stopRecording();
-        }
-      }, 3000);
 
     } catch (error) {
       console.error('Error starting recording:', error);
