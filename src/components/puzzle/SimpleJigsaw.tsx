@@ -50,11 +50,12 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
   const getCanvasDimensions = () => {
     const isMobile = window.innerWidth < 768;
     if (isMobile) {
-      // Mobile: Always use full viewport dimensions for consistent fullscreen
-      return { 
-        width: window.innerWidth, 
-        height: window.innerHeight 
-      };
+      // Mobile: Use full container dimensions
+      const container = canvasRef.current?.parentElement;
+      if (container) {
+        return { width: container.clientWidth, height: container.clientHeight };
+      }
+      return { width: 350, height: 600 };
     } else {
       // Desktop: Use almost full viewport width
       const viewportWidth = window.innerWidth;
@@ -310,42 +311,6 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
     ctx.setLineDash([5, 5]);
     ctx.strokeRect(BOARD_X, BOARD_Y, PUZZLE_WIDTH, PUZZLE_HEIGHT);
     ctx.setLineDash([]);
-
-    // Draw faint template showing piece outlines
-    const pieceWidth = PUZZLE_WIDTH / gridCols;
-    const pieceHeight = PUZZLE_HEIGHT / gridRows;
-    
-    ctx.save();
-    ctx.globalAlpha = 0.15;
-    ctx.strokeStyle = '#60a5fa';
-    ctx.lineWidth = 1;
-    
-    // Draw scaled image as faint background template
-    ctx.drawImage(image, BOARD_X, BOARD_Y, PUZZLE_WIDTH, PUZZLE_HEIGHT);
-    
-    // Draw piece grid lines
-    ctx.globalAlpha = 0.3;
-    ctx.strokeStyle = '#3b82f6';
-    
-    // Vertical lines
-    for (let col = 1; col < gridCols; col++) {
-      const x = BOARD_X + col * pieceWidth;
-      ctx.beginPath();
-      ctx.moveTo(x, BOARD_Y);
-      ctx.lineTo(x, BOARD_Y + PUZZLE_HEIGHT);
-      ctx.stroke();
-    }
-    
-    // Horizontal lines
-    for (let row = 1; row < gridRows; row++) {
-      const y = BOARD_Y + row * pieceHeight;
-      ctx.beginPath();
-      ctx.moveTo(BOARD_X, y);
-      ctx.lineTo(BOARD_X + PUZZLE_WIDTH, y);
-      ctx.stroke();
-    }
-    
-    ctx.restore();
 
     // Sort pieces so dragged piece is drawn last
     const sortedPieces = [...pieces].sort((a, b) => {

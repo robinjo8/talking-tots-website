@@ -29,25 +29,16 @@ export function PuzzleCompletionDialog({
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke/${completedImage.filename}`;
   const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/audio-besede/R/${completedImage.word.toLowerCase()}.mp3`;
 
-  // Play audio automatically when dialog opens and reset recording state
+  // Play audio automatically when dialog opens
   useEffect(() => {
     if (isOpen) {
-      // Reset recording state when dialog opens
-      setIsRecording(false);
-      setRecordingTimeLeft(3);
-      setMediaRecorder(null);
-      if (audioStream) {
-        audioStream.getTracks().forEach(track => track.stop());
-        setAudioStream(null);
-      }
-
       const timer = setTimeout(() => {
         playAudio(audioUrl);
       }, 500); // Small delay to ensure dialog is fully rendered
 
       return () => clearTimeout(timer);
     }
-  }, [isOpen, audioUrl, playAudio, audioStream]);
+  }, [isOpen, audioUrl, playAudio]);
 
   const startRecording = async () => {
     try {
