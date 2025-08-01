@@ -500,10 +500,10 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
           : p
       ));
 
-      // Check if puzzle is complete - no popup needed
+      // Check if puzzle is complete
       const allPlaced = pieces.every(p => p.isPlaced || p.id === piece.id);
       if (allPlaced) {
-        // Puzzle completed silently
+        setTimeout(() => onComplete?.(), 500);
       }
     } else {
       setPieces(prev => prev.map(p => 
