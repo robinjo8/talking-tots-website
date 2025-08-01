@@ -86,17 +86,20 @@ export function PuzzleCompletionDialog({
         setRecordingTimeLeft(prev => {
           if (prev <= 1) {
             clearInterval(countdownInterval);
-            // Auto-stop recording when countdown reaches 0
-            if (recorder && recorder.state === 'recording') {
-              recorder.stop();
-              setIsRecording(false);
-              toast("Snemanje končano");
-            }
+            stopRecording();
             return 0;
           }
           return prev - 1;
         });
       }, 1000);
+
+      // Auto-stop after 3 seconds
+      setTimeout(() => {
+        clearInterval(countdownInterval);
+        if (recorder && recorder.state === 'recording') {
+          stopRecording();
+        }
+      }, 3000);
 
     } catch (error) {
       console.error('Error starting recording:', error);
