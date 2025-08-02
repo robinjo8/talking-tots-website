@@ -13,8 +13,11 @@ export default function SestavljankeR() {
   const navigate = useNavigate();
   
   useEffect(() => {
+    console.log('SestavljankeR useEffect - selectedChild:', selectedChild);
+    
     if (!selectedChild) {
       // Redirect to profile setup if no child selected
+      console.log('No child selected, redirecting to profile');
       navigate('/profile');
       return;
     }
