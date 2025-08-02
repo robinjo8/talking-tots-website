@@ -191,6 +191,33 @@ export function AppRoutes() {
         }
       />
       
+      <Route 
+        path="/sestavljanke-r56" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeR56 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/sestavljanke-r78" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeR78 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/sestavljanke-r910" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeR910 />
+          </ProtectedRoute>
+        }
+      />
+      
       
       
       <Route 
