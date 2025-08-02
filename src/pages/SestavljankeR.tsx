@@ -1,4 +1,5 @@
 import { AppLayout } from "@/components/AppLayout";
+import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { SimpleJigsaw } from "@/components/puzzle/SimpleJigsaw";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
@@ -32,6 +33,14 @@ const getRandomRImage = () => {
 };
 
 export default function SestavljankeR() {
+  return (
+    <AgeGatedRoute requiredAgeGroup="3-4">
+      <SestavljankeRContent />
+    </AgeGatedRoute>
+  );
+}
+
+function SestavljankeRContent() {
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   
