@@ -7,8 +7,7 @@ const getRouteForAgeGroup = (ageGroup: AgeGroup): string => {
   return `/govorne-igre/sestavljanke/r/${ageGroup}`;
 };
 
-
-export default function SestavljankeR() {
+export default function SestavljankeRRouter() {
   const { selectedChild } = useAuth();
   const navigate = useNavigate();
   
