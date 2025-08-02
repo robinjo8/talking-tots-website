@@ -150,8 +150,8 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       const filename = `recording-${completedImage.word.toLowerCase()}-${timestamp}.webm`;
       
-      // Create user-specific path: recordings/user-{user-id}/child-{child-id}/
-      const userSpecificPath = `recordings/user-${user.id}/child-${selectedChild.id}/${filename}`;
+      // Create user-specific path: recordings/{user-email}/child-{child-id}/
+      const userSpecificPath = `recordings/${user.email}/child-${selectedChild.id}/${filename}`;
 
       const { error } = await supabase.storage
         .from('audio-besede')
