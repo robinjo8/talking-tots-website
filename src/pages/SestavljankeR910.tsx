@@ -1,5 +1,4 @@
 import { AppLayout } from "@/components/AppLayout";
-import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { SimpleJigsaw } from "@/components/puzzle/SimpleJigsaw";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
@@ -33,11 +32,7 @@ const getRandomRImage = () => {
 };
 
 export default function SestavljankeR910() {
-  return (
-    <AgeGatedRoute requiredAgeGroup="9-10">
-      <SestavljankeR910Content />
-    </AgeGatedRoute>
-  );
+  return <SestavljankeR910Content />;
 }
 
 function SestavljankeR910Content() {
