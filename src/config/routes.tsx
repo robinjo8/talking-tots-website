@@ -33,6 +33,9 @@ import ArtikuacijskiTest from "@/pages/ArtikuacijskiTest";
 import Sestavljanke from "@/pages/Sestavljanke";
 import SestavljankeGames from "@/pages/SestavljankeGames";
 import SestavljankeR from "@/pages/SestavljankeR";
+import SestavljankeR56 from "@/pages/SestavljankeR56";
+import SestavljankeR78 from "@/pages/SestavljankeR78";
+import SestavljankeR910 from "@/pages/SestavljankeR910";
 
 import SestavljankeX from "@/pages/SestavljankeX";
 import PoveziPareGames from "@/pages/PoveziPareGames";
@@ -157,6 +160,33 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <SestavljankeR />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/sestavljanke/r56" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeR56 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/sestavljanke/r78" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeR78 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/sestavljanke/r910" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeR910 />
           </ProtectedRoute>
         }
       />
