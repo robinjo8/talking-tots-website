@@ -5,6 +5,7 @@ import { Volume2, Mic, X } from 'lucide-react';
 import { useAudioPlayback } from '@/hooks/useAudioPlayback';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface PuzzleSuccessDialogProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
   const { playAudio } = useAudioPlayback();
   const { toast } = useToast();
+  const { user, selectedChild } = useAuth();
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
   const recordingDataRef = useRef<Blob[]>([]);
 
@@ -132,14 +134,28 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
       return;
     }
 
+    // Check if user is authenticated and child is selected
+    if (!user || !selectedChild) {
+      console.error('User not authenticated or no child selected');
+      toast({
+        title: "Napaka",
+        description: "Prijavite se za shranjevanje posnetka.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const audioBlob = new Blob(recordingDataRef.current, { type: 'audio/webm' });
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       const filename = `recording-${completedImage.word.toLowerCase()}-${timestamp}.webm`;
+      
+      // Create user-specific path: recordings/user-{user-id}/child-{child-id}/
+      const userSpecificPath = `recordings/user-${user.id}/child-${selectedChild.id}/${filename}`;
 
       const { error } = await supabase.storage
         .from('audio-besede')
-        .upload(`recordings/${filename}`, audioBlob, {
+        .upload(userSpecificPath, audioBlob, {
           contentType: 'audio/webm'
         });
 
@@ -151,7 +167,7 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
           variant: "destructive",
         });
       } else {
-        console.log('Recording saved successfully');
+        console.log('Recording saved successfully to:', userSpecificPath);
         toast({
           title: "Odlično!",
           description: "Tvoja izgovorjava je bila shranjena.",

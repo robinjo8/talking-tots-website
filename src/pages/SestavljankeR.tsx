@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/contexts/AuthContext";
 import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
 const rImages = [
@@ -38,6 +39,7 @@ export default function SestavljankeR() {
   const [currentImage, setCurrentImage] = useState(getRandomRImage());
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { user, selectedChild } = useAuth();
   
   // Mobile devices always get fullscreen, desktop never gets fullscreen
   const effectiveFullscreen = isMobile;
