@@ -33,6 +33,7 @@ const getRandomRImage = () => {
 };
 
 export default function SestavljankeR78() {
+  console.log('SestavljankeR78 component rendering...');
   return (
     <AgeGatedRoute requiredAgeGroup="7-8">
       <SestavljankeR78Content />
@@ -41,6 +42,7 @@ export default function SestavljankeR78() {
 }
 
 function SestavljankeR78Content() {
+  console.log('SestavljankeR78Content component rendering...');
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   
