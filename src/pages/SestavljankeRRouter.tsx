@@ -8,8 +8,14 @@ export default function SestavljankeRRouter() {
   const navigate = useNavigate();
   
   useEffect(() => {
-    if (!selectedChild?.age) {
-      // Redirect to profile setup if no child or age
+    if (!selectedChild) {
+      // Redirect to profile setup if no child selected
+      navigate('/profile');
+      return;
+    }
+    
+    if (!selectedChild.age) {
+      // Redirect to profile setup if no age
       navigate('/profile');
       return;
     }
@@ -20,7 +26,7 @@ export default function SestavljankeRRouter() {
     let targetRoute = '';
     switch (ageGroup) {
       case '3-4':
-        targetRoute = '/govorne-igre/sestavljanke/r'; // 6 pieces
+        targetRoute = '/govorne-igre/sestavljanke'; // 6 pieces
         break;
       case '5-6':
         targetRoute = '/govorne-igre/sestavljanke/r56'; // 12 pieces
