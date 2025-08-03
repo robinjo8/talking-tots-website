@@ -3,9 +3,10 @@ import { SimpleJigsaw } from "@/components/puzzle/SimpleJigsaw";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
 export default function SestavljankeX() {
@@ -13,6 +14,8 @@ export default function SestavljankeX() {
   const [puzzleKey, setPuzzleKey] = useState(0);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { recordGameCompletion } = useEnhancedProgress();
+  const gameCompletedRef = useRef(false);
   
   // Mobile devices always get fullscreen, desktop never gets fullscreen
   const effectiveFullscreen = isMobile;
@@ -20,10 +23,15 @@ export default function SestavljankeX() {
   const imageUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_6.png";
   
   const handleComplete = () => {
-    console.log("Puzzle completed!");
+    if (!gameCompletedRef.current) {
+      gameCompletedRef.current = true;
+      recordGameCompletion('puzzle', 'puzzle_x');
+      console.log("Puzzle completed!");
+    }
   };
 
   const handleNewGame = () => {
+    gameCompletedRef.current = false;
     setPuzzleKey(prev => prev + 1);
   };
 

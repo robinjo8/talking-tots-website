@@ -6,10 +6,11 @@ import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
 const rImages = [
@@ -49,6 +50,8 @@ function SestavljankeR56Content() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { user, selectedChild } = useAuth();
+  const { recordGameCompletion } = useEnhancedProgress();
+  const gameCompletedRef = useRef(false);
   
   // Mobile devices always get fullscreen, desktop never gets fullscreen
   const effectiveFullscreen = isMobile;
@@ -56,10 +59,15 @@ function SestavljankeR56Content() {
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke/${currentImage.filename}`;
   
   const handleComplete = () => {
-    setShowCompletion(true);
+    if (!gameCompletedRef.current) {
+      gameCompletedRef.current = true;
+      recordGameCompletion('puzzle', 'puzzle_r_12');
+      setShowCompletion(true);
+    }
   };
 
   const handleNewGame = () => {
+    gameCompletedRef.current = false;
     setCurrentImage(getRandomRImage());
     setPuzzleKey(prev => prev + 1);
   };
