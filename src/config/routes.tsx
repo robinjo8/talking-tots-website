@@ -166,6 +166,15 @@ export function AppRoutes() {
       />
       
       <Route 
+        path="/govorne-igre/sestavljanke/r-basic" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeR />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
         path="/govorne-igre/sestavljanke/:letter" 
         element={
           <ProtectedRoute>

@@ -138,7 +138,7 @@ const consonants = [
     let targetRoute = '';
     switch (ageGroup) {
       case '3-4':
-        targetRoute = '/govorne-igre/sestavljanke/:letter'; // 6 pieces
+        targetRoute = '/govorne-igre/sestavljanke/r-basic'; // Use a different path to avoid router
         break;
       case '5-6':
         targetRoute = '/govorne-igre/sestavljanke/r56'; // 12 pieces
@@ -150,10 +150,10 @@ const consonants = [
         targetRoute = '/govorne-igre/sestavljanke/r910'; // 20 pieces
         break;
       default:
-        targetRoute = '/govorne-igre/sestavljanke/:letter'; // Default to 6 pieces
+        targetRoute = '/govorne-igre/sestavljanke/r-basic'; // Default to basic version
     }
     
-    navigate(targetRoute.replace(':letter', 'r'));
+    navigate(targetRoute);
   };
 
 
