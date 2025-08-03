@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { getAgeGroup } from "@/utils/ageUtils";
 export default function SestavljankeGames() {
   const navigate = useNavigate();
   const {
@@ -126,7 +127,33 @@ const consonants = [
   }
 ];
   const handleRClick = () => {
-    navigate("/govorne-igre/sestavljanke/r");
+    if (!selectedChild?.age) {
+      navigate('/profile');
+      return;
+    }
+    
+    const childAge = selectedChild.age;
+    const ageGroup = getAgeGroup(childAge);
+    
+    let targetRoute = '';
+    switch (ageGroup) {
+      case '3-4':
+        targetRoute = '/govorne-igre/sestavljanke/:letter'; // 6 pieces
+        break;
+      case '5-6':
+        targetRoute = '/govorne-igre/sestavljanke/r56'; // 12 pieces
+        break;
+      case '7-8':
+        targetRoute = '/govorne-igre/sestavljanke/r78'; // 16 pieces
+        break;
+      case '9-10':
+        targetRoute = '/govorne-igre/sestavljanke/r910'; // 20 pieces
+        break;
+      default:
+        targetRoute = '/govorne-igre/sestavljanke/:letter'; // Default to 6 pieces
+    }
+    
+    navigate(targetRoute.replace(':letter', 'r'));
   };
 
 
