@@ -25,10 +25,7 @@ export function MemoryCard({
 }: MemoryCardProps) {
   const { playAudio } = useAudioPlayback();
 
-  const handleCardClick = (e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
+  const handleCardClick = () => {
     if (!disabled && !flipped && !matched) {
       // Play audio immediately when card is flipped
       if (audioUrl) {
@@ -40,18 +37,7 @@ export function MemoryCard({
   };
 
   return (
-    <div 
-      className="flip-card" 
-      onClick={handleCardClick}
-      onTouchEnd={handleCardClick}
-      style={{
-        touchAction: 'manipulation',
-        userSelect: 'none',
-        WebkitUserSelect: 'none',
-        WebkitTouchCallout: 'none',
-        WebkitTapHighlightColor: 'transparent'
-      }}
-    >
+    <div className="flip-card" onClick={handleCardClick}>
       <div className={cn("flip-card-inner", flipped || matched ? "flipped" : "")}>
         <div className="flip-card-front">
           <div className="text-4xl font-bold text-dragon-green">?</div>

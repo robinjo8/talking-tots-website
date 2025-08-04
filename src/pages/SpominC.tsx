@@ -11,7 +11,6 @@ import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { InfoModal } from "@/components/games/InfoModal";
 import { MemoryGameTestControls } from "@/components/games/MemoryGameTestControls";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useIOSFullscreen } from "@/hooks/useIOSFullscreen";
 
 export default function SpominC() {
   const navigate = useNavigate();
@@ -58,8 +57,27 @@ export default function SpominC() {
     });
   };
 
-  // Enable iOS-optimized fullscreen on mobile devices
-  useIOSFullscreen(effectiveFullscreen);
+  // Enable fullscreen on mobile devices only
+  useEffect(() => {
+    if (effectiveFullscreen) {
+      const requestFullscreen = async () => {
+        try {
+          if (document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen();
+          }
+        } catch (error) {
+          console.log('Fullscreen not supported:', error);
+        }
+      };
+      requestFullscreen();
+      
+      return () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen?.();
+        }
+      };
+    }
+  }, [effectiveFullscreen]);
 
   useEffect(() => {
     if (gameCompleted && gameStartTimeRef.current && gameTime === null) {
@@ -77,7 +95,7 @@ export default function SpominC() {
   }, [gameCompleted, gameStartTimeRef, gameTime, toast]);
 
   return (
-    <div className={`${effectiveFullscreen ? 'ios-game-container overflow-hidden' : 'min-h-screen bg-background'}`}>
+    <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}>
       {!effectiveFullscreen && <Header />}
       
       <div className={`${effectiveFullscreen ? 'h-full flex flex-col' : 'container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-2 sm:px-4'}`}>

@@ -11,16 +11,7 @@ interface MemoryGridProps {
 
 export function MemoryGrid({ cards, onCardClick, isCheckingMatch }: MemoryGridProps) {
   return (
-    <div 
-      className="grid grid-cols-4 sm:grid-cols-5 gap-2 md:gap-4 w-full"
-      style={{
-        touchAction: 'manipulation',
-        userSelect: 'none',
-        WebkitUserSelect: 'none',
-        WebkitTouchCallout: 'none',
-        WebkitTapHighlightColor: 'transparent'
-      }}
-    >
+    <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 md:gap-4 w-full">
       {cards.map((card, index) => (
         <div 
           key={card.uniqueId || `${card.id}-${index}`} 
