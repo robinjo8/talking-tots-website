@@ -1,15 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
-import Header from "@/components/Header";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, BookOpen, ArrowLeft, X } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 import { MemoryGrid } from "@/components/games/MemoryGrid";
 import { useMemoryGameC } from "@/hooks/useMemoryGameC";
 import { useToast } from "@/components/ui/use-toast";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { InfoModal } from "@/components/games/InfoModal";
-import { MemoryGameTestControls } from "@/components/games/MemoryGameTestControls";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function SpominC() {
@@ -96,19 +93,16 @@ export default function SpominC() {
 
   return (
     <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}>
-      {!effectiveFullscreen && <Header />}
-      
-      <div className={`${effectiveFullscreen ? 'h-full flex flex-col' : 'container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-2 sm:px-4'}`}>
+      <div className={`${effectiveFullscreen ? 'h-full flex flex-col' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
         
         {/* Top Section - Buttons */}
-        <div className={`${effectiveFullscreen ? 'p-3' : 'p-4'} flex-shrink-0 border-b`}>
-          <h2 className={`${effectiveFullscreen ? 'text-lg' : 'text-lg'} font-bold mb-3 text-center`}>Igra spomin za črko {currentLetter}</h2>
+        <div className={`${effectiveFullscreen ? 'p-3' : 'p-4'} flex-shrink-0`}>
           <div className="flex justify-center gap-3">
             <Button
               onClick={handleReset}
               size={effectiveFullscreen ? "sm" : "default"}
-              className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
-              variant="default"
+              variant="outline"
+              className="gap-2"
             >
               <RotateCcw className="h-4 w-4" />
               Nova igra
