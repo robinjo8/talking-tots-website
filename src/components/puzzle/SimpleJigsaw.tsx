@@ -429,6 +429,11 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
 
   const handleStart = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    // Additional iOS-specific preventDefault for touch events
+    if ('touches' in e) {
+      e.preventDefault();
+    }
     const eventPos = getEventPos(e);
 
     // Find clicked piece
@@ -455,6 +460,13 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
 
   const handleMove = (e: React.MouseEvent | React.TouchEvent) => {
     if (!draggedPiece) return;
+    
+    e.preventDefault();
+    e.stopPropagation();
+    // Additional iOS-specific preventDefault for touch events
+    if ('touches' in e) {
+      e.preventDefault();
+    }
 
     const eventPos = getEventPos(e);
     let newX = eventPos.x - offset.x;
@@ -474,8 +486,17 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
     ));
   };
 
-  const handleEnd = () => {
+  const handleEnd = (e?: React.MouseEvent | React.TouchEvent) => {
     if (!draggedPiece) return;
+    
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      // Additional iOS-specific preventDefault for touch events
+      if ('touches' in e) {
+        e.preventDefault();
+      }
+    }
 
     const piece = pieces.find(p => p.id === draggedPiece.id);
     if (!piece) return;
@@ -539,13 +560,7 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
         ref={canvasRef}
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
-        className="cursor-pointer border border-border rounded-lg shadow-lg"
-        style={{ 
-          width: `${CANVAS_WIDTH}px`, 
-          height: `${CANVAS_HEIGHT}px`,
-          maxWidth: '100%',
-          maxHeight: '100%'
-        }}
+        className="cursor-pointer border border-border rounded-lg shadow-lg puzzle-root"
         onMouseDown={handleStart}
         onMouseMove={handleMove}
         onMouseUp={handleEnd}
@@ -553,6 +568,18 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
         onTouchStart={handleStart}
         onTouchMove={handleMove}
         onTouchEnd={handleEnd}
+        onTouchCancel={handleEnd}
+        style={{ 
+          width: `${CANVAS_WIDTH}px`, 
+          height: `${CANVAS_HEIGHT}px`,
+          maxWidth: '100%',
+          maxHeight: '100%',
+          touchAction: 'none',
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+          WebkitTouchCallout: 'none',
+          WebkitTapHighlightColor: 'transparent'
+        }}
       />
     </div>
   );

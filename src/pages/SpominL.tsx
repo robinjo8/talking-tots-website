@@ -11,6 +11,7 @@ import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { InfoModal } from "@/components/games/InfoModal";
 import { MemoryGameTestControls } from "@/components/games/MemoryGameTestControls";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useIOSFullscreen } from "@/hooks/useIOSFullscreen";
 
 export default function SpominL() {
   const navigate = useNavigate();
@@ -57,27 +58,8 @@ export default function SpominL() {
     });
   };
 
-  // Enable fullscreen on mobile devices only
-  useEffect(() => {
-    if (effectiveFullscreen) {
-      const requestFullscreen = async () => {
-        try {
-          if (document.documentElement.requestFullscreen) {
-            await document.documentElement.requestFullscreen();
-          }
-        } catch (error) {
-          console.log('Fullscreen not supported:', error);
-        }
-      };
-      requestFullscreen();
-      
-      return () => {
-        if (document.fullscreenElement) {
-          document.exitFullscreen?.();
-        }
-      };
-    }
-  }, [effectiveFullscreen]);
+  // Enable iOS-optimized fullscreen on mobile devices
+  useIOSFullscreen(effectiveFullscreen);
 
   useEffect(() => {
     if (gameCompleted && gameStartTimeRef.current && gameTime === null) {
@@ -94,63 +76,94 @@ export default function SpominL() {
     }
   }, [gameCompleted, gameStartTimeRef, gameTime, toast]);
 
+  if (effectiveFullscreen) {
+    return (
+      <div className="ios-game-container overflow-hidden select-none">
+        <div className="h-full flex flex-col">
+          <div className="bg-background p-3 flex-shrink-0 border-b">
+            <div className="flex justify-center gap-3">
+              <Button onClick={handleReset} size="sm" variant="outline" className="gap-2">
+                <RotateCcw className="h-4 w-4" />
+                Nova igra
+              </Button>
+              <Button variant="outline" onClick={() => setShowInfo(true)} size="sm" className="gap-2">
+                <BookOpen className="h-4 w-4" />
+                Navodila
+              </Button>
+              <Button variant="outline" onClick={() => navigate("/govorne-igre/spomin")} size="sm" className="gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Nazaj
+              </Button>
+            </div>
+          </div>
+          <div className="flex-1 overflow-hidden">
+            {isLoading && (
+              <div className="h-full flex items-center justify-center text-lg text-muted-foreground">Nalaganje igre...</div>
+            )}
+            
+            {error && (
+              <div className="h-full flex items-center justify-center p-6">
+                <div className="bg-red-50 p-6 rounded-lg border border-red-100 text-center">
+                  <h3 className="text-red-600 font-medium mb-2">Napaka pri nalaganju igre</h3>
+                  <p className="text-sm text-red-500">Poskusite znova později.</p>
+                  <Button 
+                    variant="outline" 
+                    className="mt-4" 
+                    onClick={() => window.location.reload()}
+                  >
+                    Poskusi znova
+                  </Button>
+                </div>
+              </div>
+            )}
+            
+            {!isLoading && !error && cards.length > 0 && (
+              <div className="w-full h-full flex items-center justify-center p-2">
+                <MemoryGrid 
+                  cards={cards} 
+                  onCardClick={handleCardClick}
+                  isCheckingMatch={isCheckingMatch}
+                />
+              </div>
+            )}
+            
+            {!isLoading && !error && cards.length === 0 && (
+              <div className="h-full flex items-center justify-center">
+                <div className="text-center p-10 border rounded-lg">
+                  <p className="text-muted-foreground">
+                    Ni kartic za prikaz. Prosim, preverite nastavitve igre.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}>
-      {!effectiveFullscreen && <Header />}
-      
-      <div className={`${effectiveFullscreen ? 'h-full flex flex-col' : 'container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-2 sm:px-4'}`}>
-        
-        {/* Top Section - Buttons */}
-        <div className={`bg-dragon-green/5 ${effectiveFullscreen ? 'p-3' : 'p-4'} flex-shrink-0 border-b`}>
-          <h2 className={`${effectiveFullscreen ? 'text-lg' : 'text-lg'} font-bold mb-3 text-center`}>Igra spomin za črko {currentLetter}</h2>
-          <div className="flex justify-center gap-3">
-            <Button
-              onClick={handleReset}
-              size={effectiveFullscreen ? "sm" : "default"}
-              className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
-              variant="default"
-            >
+    <div className="min-h-screen bg-background">
+      <div className="w-full bg-background">
+        <div className="bg-background p-4 border-b">
+          <div className="flex justify-center gap-4">
+            <Button onClick={handleReset} variant="outline" className="gap-2">
               <RotateCcw className="h-4 w-4" />
               Nova igra
             </Button>
-            
-            <Button
-              variant="outline"
-              onClick={() => setShowInfo(true)}
-              size={effectiveFullscreen ? "sm" : "default"}
-              className="gap-2"
-            >
+            <Button onClick={() => setShowInfo(true)} variant="outline" className="gap-2">
               <BookOpen className="h-4 w-4" />
               Navodila
             </Button>
-            
-            <Button
-              variant="outline"
-              onClick={() => navigate("/govorne-igre/spomin")}
-              size={effectiveFullscreen ? "sm" : "default"}
-              className="gap-2"
-            >
+            <Button onClick={() => navigate("/govorne-igre/spomin")} variant="outline" className="gap-2">
               <ArrowLeft className="h-4 w-4" />
               Nazaj
             </Button>
           </div>
-          
-          {!effectiveFullscreen && (
-            <div className="text-center mt-3 text-sm">
-              <span className="font-medium">Najdeni pari: </span>
-              <span className="text-dragon-green font-bold">{matchedPairs.length}</span>
-              <span className="text-muted-foreground"> od {totalPairs}</span>
-              {gameCompleted && gameTime !== null && (
-                <span className="ml-3 bg-dragon-green/10 text-dragon-green px-2 py-1 rounded-md text-xs font-medium">
-                  Čas: {gameTime}s
-                </span>
-              )}
-            </div>
-          )}
         </div>
-
-        <div className={`${effectiveFullscreen ? 'flex-1 px-2 pb-2 overflow-hidden' : 'flex-1 flex justify-center items-center min-h-0'}`}>
-          <div className={`w-full ${effectiveFullscreen ? 'h-full' : 'max-w-4xl h-full'} flex items-center justify-center`}>
+        
+        <div className="w-full flex justify-center items-center p-4">
+          <div className="w-full max-w-4xl bg-muted/30 rounded-lg p-6 min-h-[500px] flex items-center justify-center">
             {isLoading && (
               <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
             )}
@@ -170,7 +183,7 @@ export default function SpominL() {
             )}
             
             {!isLoading && !error && cards.length > 0 && (
-              <div className={`transition-opacity duration-500 w-full h-full flex items-center justify-center ${cards.length ? 'opacity-100' : 'opacity-0'}`}>
+              <div className="w-full bg-background rounded-lg shadow-sm border p-6 flex items-center justify-center">
                 <MemoryGrid 
                   cards={cards} 
                   onCardClick={handleCardClick}
@@ -180,7 +193,7 @@ export default function SpominL() {
             )}
             
             {!isLoading && !error && cards.length === 0 && (
-              <div className="text-center p-10 border rounded-lg">
+              <div className="text-center p-10 border rounded-lg bg-background">
                 <p className="text-muted-foreground">
                   Ni kartic za prikaz. Prosim, preverite nastavitve igre.
                 </p>
@@ -188,6 +201,19 @@ export default function SpominL() {
             )}
           </div>
         </div>
+        
+        {cards.length > 0 && (
+          <div className="text-center pb-6 text-sm">
+            <span className="font-medium">Najdeni pari: </span>
+            <span className="text-dragon-green font-bold">{matchedPairs.length}</span>
+            <span className="text-muted-foreground"> od {totalPairs}</span>
+            {gameCompleted && gameTime !== null && (
+              <span className="ml-3 bg-dragon-green/10 text-dragon-green px-2 py-1 rounded-md text-xs font-medium">
+                Čas: {gameTime}s
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       <InfoModal 
