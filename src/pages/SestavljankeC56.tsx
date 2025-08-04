@@ -10,7 +10,6 @@ import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { useIOSFullscreen } from "@/hooks/useIOSFullscreen";
 import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
 const cImages = [
@@ -70,12 +69,29 @@ function SestavljankeC56Content() {
     navigate("/govorne-igre/sestavljanke");
   };
 
-  // Enable iOS-optimized fullscreen on mobile devices
-  useIOSFullscreen(effectiveFullscreen);
+  useEffect(() => {
+    if (effectiveFullscreen) {
+      const requestFullscreen = async () => {
+        try {
+          if (document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen();
+          }
+        } catch (error) {
+          console.log('Fullscreen not supported:', error);
+        }
+      };
+      requestFullscreen();
+      return () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen?.();
+        }
+      };
+    }
+  }, [effectiveFullscreen]);
 
   if (effectiveFullscreen) {
     return (
-      <div className="ios-game-container overflow-hidden select-none">
+      <div className="fixed inset-0 bg-background overflow-hidden select-none">
         <div className="h-full flex flex-col">
           <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
             <h2 className="text-lg font-bold mb-3 text-center">Sestavljanka C</h2>
