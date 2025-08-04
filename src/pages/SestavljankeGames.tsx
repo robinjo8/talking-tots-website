@@ -162,7 +162,33 @@ const consonants = [
   };
 
   const handleLetterClick = (letter: string) => {
-    navigate(`/govorne-igre/sestavljanke/${letter.toLowerCase()}`);
+    if (!selectedChild?.age) {
+      navigate('/profile');
+      return;
+    }
+    
+    const childAge = selectedChild.age;
+    const ageGroup = getAgeGroup(childAge);
+    
+    let targetRoute = '';
+    switch (ageGroup) {
+      case '3-4':
+        targetRoute = `/govorne-igre/sestavljanke/${letter.toLowerCase()}`;
+        break;
+      case '5-6':
+        targetRoute = `/govorne-igre/sestavljanke/${letter.toLowerCase()}56`;
+        break;
+      case '7-8':
+        targetRoute = `/govorne-igre/sestavljanke/${letter.toLowerCase()}78`;
+        break;
+      case '9-10':
+        targetRoute = `/govorne-igre/sestavljanke/${letter.toLowerCase()}910`;
+        break;
+      default:
+        targetRoute = `/govorne-igre/sestavljanke/${letter.toLowerCase()}`;
+    }
+    
+    navigate(targetRoute);
   };
   return <div className="min-h-screen bg-background">
       <Header />
