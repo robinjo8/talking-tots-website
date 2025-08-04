@@ -40,6 +40,7 @@ import SestavljankeR910 from "@/pages/SestavljankeR910";
 
 import SestavljankeX from "@/pages/SestavljankeX";
 import SestavljankeC from "@/pages/SestavljankeC";
+import SestavljankeC56 from "@/pages/SestavljankeC56";
 import SestavljankeČ from "@/pages/SestavljankeČ";
 import SestavljankeS from "@/pages/SestavljankeS";
 import SestavljankeŠ from "@/pages/SestavljankeŠ";
@@ -261,6 +262,15 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <SestavljankeC />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/sestavljanke/c56" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeC56 />
           </ProtectedRoute>
         }
       />
