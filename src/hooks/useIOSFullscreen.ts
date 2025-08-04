@@ -1,41 +1,59 @@
 import { useEffect } from 'react';
 import { useIsMobile } from './use-mobile';
 
+const isIOS = () => {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+};
+
+const isAndroid = () => {
+  return /Android/.test(navigator.userAgent);
+};
+
 export const useIOSFullscreen = (enabled: boolean = true) => {
   const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!enabled || !isMobile) return;
 
-    const setupIOSFullscreen = async () => {
+    const setupMobileFullscreen = async () => {
       try {
-        // Prevent iOS pull-to-refresh and other gestures
+        // Common mobile gestures prevention
         document.body.style.overscrollBehavior = 'none';
-        document.body.style.touchAction = 'none';
         document.body.style.userSelect = 'none';
         (document.body.style as any).webkitUserSelect = 'none';
         (document.body.style as any).webkitTouchCallout = 'none';
         (document.body.style as any).webkitTapHighlightColor = 'transparent';
         
-        // Lock orientation on mobile devices if supported
-        if (screen.orientation && (screen.orientation as any).lock) {
-          try {
-            await (screen.orientation as any).lock('landscape');
-          } catch (orientationError) {
-            console.log('Screen orientation lock not supported:', orientationError);
+        if (isIOS()) {
+          // iOS-specific: Disable touch actions and request fullscreen API
+          document.body.style.touchAction = 'none';
+          
+          // Lock orientation on iOS if supported
+          if (screen.orientation && (screen.orientation as any).lock) {
+            try {
+              await (screen.orientation as any).lock('landscape');
+            } catch (orientationError) {
+              console.log('Screen orientation lock not supported:', orientationError);
+            }
           }
-        }
-        
-        // Request fullscreen if supported
-        if (document.documentElement.requestFullscreen) {
-          await document.documentElement.requestFullscreen();
+          
+          // Request fullscreen API for iOS
+          if (document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen();
+          }
+        } else if (isAndroid()) {
+          // Android-specific: Use CSS-only approach, respect safe areas
+          document.body.style.touchAction = 'manipulation';
+          
+          // Don't request fullscreen API on Android - let it use safe areas naturally
+          console.log('Android detected: Using CSS-only fullscreen with safe areas');
         }
       } catch (error) {
-        console.log('iOS fullscreen setup failed:', error);
+        console.log('Mobile fullscreen setup failed:', error);
       }
     };
 
-    setupIOSFullscreen();
+    setupMobileFullscreen();
 
     return () => {
       // Restore original styles
@@ -46,7 +64,8 @@ export const useIOSFullscreen = (enabled: boolean = true) => {
       (document.body.style as any).webkitTouchCallout = '';
       (document.body.style as any).webkitTapHighlightColor = '';
       
-      if (document.fullscreenElement) {
+      // Only exit fullscreen if we're actually in fullscreen mode
+      if (document.fullscreenElement && isIOS()) {
         document.exitFullscreen?.();
       }
     };

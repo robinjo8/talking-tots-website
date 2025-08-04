@@ -58,8 +58,11 @@ export default function SpominC() {
     });
   };
 
-  // Enable iOS-optimized fullscreen on mobile devices
+  // Enable mobile fullscreen (different behavior for iOS vs Android)
   useIOSFullscreen(effectiveFullscreen);
+
+  // Detect Android for CSS class
+  const isAndroid = /Android/.test(navigator.userAgent);
 
   useEffect(() => {
     if (gameCompleted && gameStartTimeRef.current && gameTime === null) {
@@ -78,7 +81,7 @@ export default function SpominC() {
 
   if (effectiveFullscreen) {
     return (
-      <div className="ios-game-container overflow-hidden select-none">
+      <div className={`ios-game-container overflow-hidden select-none ${isAndroid ? 'android' : ''}`}>
         <div className="h-full flex flex-col">
           <div className="bg-background p-3 flex-shrink-0 border-b">
             <div className="flex justify-center gap-3">
