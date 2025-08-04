@@ -147,20 +147,23 @@ export default function SpominC() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="w-full bg-background">
-        <div className="flex justify-center gap-4 p-4">
-          <Button onClick={handleReset} variant="outline" className="gap-2">
-            <RotateCcw className="h-4 w-4" />
-            Nova igra
-          </Button>
-          <Button onClick={() => setShowInfo(true)} variant="outline" className="gap-2">
-            <BookOpen className="h-4 w-4" />
-            Navodila
-          </Button>
-          <Button onClick={() => navigate("/govorne-igre/spomin")} variant="outline" className="gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Nazaj
-          </Button>
+      <div className="w-full bg-background pt-20 md:pt-24">
+        <div className="bg-dragon-green/5 p-4 border-b">
+          <h2 className="text-lg font-bold mb-3 text-center">Igra spomin za črko {currentLetter}</h2>
+          <div className="flex justify-center gap-4">
+            <Button onClick={handleReset} variant="outline" className="gap-2">
+              <RotateCcw className="h-4 w-4" />
+              Nova igra
+            </Button>
+            <Button onClick={() => setShowInfo(true)} variant="outline" className="gap-2">
+              <BookOpen className="h-4 w-4" />
+              Navodila
+            </Button>
+            <Button onClick={() => navigate("/govorne-igre/spomin")} variant="outline" className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Nazaj
+            </Button>
+          </div>
         </div>
         
         <div className="w-full flex justify-center items-center p-4">
