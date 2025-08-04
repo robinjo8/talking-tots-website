@@ -231,7 +231,8 @@ const memoryGames = [{
 }];
 export default function SpominGames() {
   const navigate = useNavigate();
-  const childName = "Tian";
+  const { selectedChild } = useAuth();
+  const childName = selectedChild?.name;
   const activeGames = memoryGames.filter(game => game.available);
   const inactiveGames = memoryGames.filter(game => !game.available);
   const handleCardClick = (game: typeof memoryGames[0]) => {
