@@ -80,20 +80,19 @@ export default function SpominR() {
     return (
       <div className="ios-game-container overflow-hidden select-none">
         <div className="h-full flex flex-col">
-          <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
-            <h2 className="text-lg font-bold mb-3 text-center">Igra spomin za črko {currentLetter}</h2>
+          <div className="bg-background p-3 flex-shrink-0 border-b">
             <div className="flex justify-center gap-3">
-              <Button onClick={handleReset} size="sm" className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
+              <Button onClick={handleReset} size="sm" variant="outline" className="gap-2">
                 <RotateCcw className="h-4 w-4" />
                 Nova igra
-              </Button>
-              <Button variant="outline" onClick={() => navigate("/govorne-igre/spomin")} size="sm" className="gap-2">
-                <ArrowLeft className="h-4 w-4" />
-                Nazaj
               </Button>
               <Button variant="outline" onClick={() => setShowInfo(true)} size="sm" className="gap-2">
                 <BookOpen className="h-4 w-4" />
                 Navodila
+              </Button>
+              <Button variant="outline" onClick={() => navigate("/govorne-igre/spomin")} size="sm" className="gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Nazaj
               </Button>
             </div>
           </div>
@@ -145,11 +144,8 @@ export default function SpominR() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      
-      <div className="w-full bg-background pt-20 md:pt-24">
-        <div className="bg-dragon-green/5 p-4 border-b">
-          <h2 className="text-lg font-bold mb-3 text-center">Igra spomin za črko {currentLetter}</h2>
+      <div className="w-full bg-background">
+        <div className="bg-background p-4 border-b">
           <div className="flex justify-center gap-4">
             <Button onClick={handleReset} variant="outline" className="gap-2">
               <RotateCcw className="h-4 w-4" />

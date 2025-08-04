@@ -80,24 +80,23 @@ export default function SpominC() {
     return (
       <div className="ios-game-container overflow-hidden select-none">
         <div className="h-full flex flex-col">
-          <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
-            <h2 className="text-lg font-bold mb-3 text-center">Igra spomin za črko {currentLetter}</h2>
+          <div className="bg-background p-3 flex-shrink-0 border-b">
             <div className="flex justify-center gap-3">
-              <Button onClick={handleReset} size="sm" className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
+              <Button onClick={handleReset} size="sm" variant="outline" className="gap-2">
                 <RotateCcw className="h-4 w-4" />
                 Nova igra
-              </Button>
-              <Button variant="outline" onClick={() => navigate("/govorne-igre/spomin")} size="sm" className="gap-2">
-                <ArrowLeft className="h-4 w-4" />
-                Nazaj
               </Button>
               <Button variant="outline" onClick={() => setShowInfo(true)} size="sm" className="gap-2">
                 <BookOpen className="h-4 w-4" />
                 Navodila
               </Button>
+              <Button variant="outline" onClick={() => navigate("/govorne-igre/spomin")} size="sm" className="gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Nazaj
+              </Button>
             </div>
           </div>
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-hidden bg-muted/30">
             {isLoading && (
               <div className="h-full flex items-center justify-center text-lg text-muted-foreground">Nalaganje igre...</div>
             )}
@@ -119,18 +118,20 @@ export default function SpominC() {
             )}
             
             {!isLoading && !error && cards.length > 0 && (
-              <div className="w-full h-full flex items-center justify-center p-2">
-                <MemoryGrid 
-                  cards={cards} 
-                  onCardClick={handleCardClick}
-                  isCheckingMatch={isCheckingMatch}
-                />
+              <div className="w-full h-full flex items-center justify-center p-6">
+                <div className="w-full bg-background rounded-lg shadow-sm border p-6 flex items-center justify-center">
+                  <MemoryGrid 
+                    cards={cards} 
+                    onCardClick={handleCardClick}
+                    isCheckingMatch={isCheckingMatch}
+                  />
+                </div>
               </div>
             )}
             
             {!isLoading && !error && cards.length === 0 && (
               <div className="h-full flex items-center justify-center">
-                <div className="text-center p-10 border rounded-lg">
+                <div className="text-center p-10 border rounded-lg bg-background">
                   <p className="text-muted-foreground">
                     Ni kartic za prikaz. Prosim, preverite nastavitve igre.
                   </p>
@@ -145,11 +146,8 @@ export default function SpominC() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      
-      <div className="w-full bg-background pt-20 md:pt-24">
-        <div className="bg-dragon-green/5 p-4 border-b">
-          <h2 className="text-lg font-bold mb-3 text-center">Igra spomin za črko {currentLetter}</h2>
+      <div className="w-full bg-background">
+        <div className="bg-background p-4 border-b">
           <div className="flex justify-center gap-4">
             <Button onClick={handleReset} variant="outline" className="gap-2">
               <RotateCcw className="h-4 w-4" />
