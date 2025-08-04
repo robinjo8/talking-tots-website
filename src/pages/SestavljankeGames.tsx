@@ -160,6 +160,10 @@ const consonants = [
   const handleXClick = () => {
     navigate("/govorne-igre/sestavljanke/X");
   };
+
+  const handleLetterClick = (letter: string) => {
+    navigate(`/govorne-igre/sestavljanke/${letter.toLowerCase()}`);
+  };
   return <div className="min-h-screen bg-background">
       <Header />
       
@@ -213,22 +217,181 @@ const consonants = [
               </CardContent>
             </Card>
 
-
             <Card 
               className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col cursor-pointer hover:scale-105"
-              onClick={handleXClick}
+              onClick={() => handleLetterClick('C')}
             >
               <CardHeader className="bg-gradient-to-r from-dragon-green/10 to-app-teal/10 rounded-t-2xl pb-4">
                 <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
                   <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
                     <span className="text-2xl font-bold text-dragon-green">
-                      X
+                      C
                     </span>
                   </div>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6 pb-4 flex-grow text-center">
                 <p className="text-sm font-semibold mb-2 text-dragon-green">
+                  Sestavi sliko s črko C in nato glasno ponovi besedo
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card 
+              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col cursor-pointer hover:scale-105"
+              onClick={() => handleLetterClick('Č')}
+            >
+              <CardHeader className="bg-gradient-to-r from-app-blue/10 to-app-purple/10 rounded-t-2xl pb-4">
+                <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
+                    <span className="text-2xl font-bold text-app-blue">
+                      Č
+                    </span>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6 pb-4 flex-grow text-center">
+                <p className="text-sm font-semibold mb-2 text-app-blue">
+                  Sestavi sliko s črko Č in nato glasno ponovi besedo
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card 
+              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col cursor-pointer hover:scale-105"
+              onClick={() => handleLetterClick('S')}
+            >
+              <CardHeader className="bg-gradient-to-r from-dragon-green/10 to-app-teal/10 rounded-t-2xl pb-4">
+                <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
+                    <span className="text-2xl font-bold text-dragon-green">
+                      S
+                    </span>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6 pb-4 flex-grow text-center">
+                <p className="text-sm font-semibold mb-2 text-dragon-green">
+                  Sestavi sliko s črko S in nato glasno ponovi besedo
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card 
+              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col cursor-pointer hover:scale-105"
+              onClick={() => handleLetterClick('Š')}
+            >
+              <CardHeader className="bg-gradient-to-r from-app-blue/10 to-app-purple/10 rounded-t-2xl pb-4">
+                <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
+                    <span className="text-2xl font-bold text-app-blue">
+                      Š
+                    </span>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6 pb-4 flex-grow text-center">
+                <p className="text-sm font-semibold mb-2 text-app-blue">
+                  Sestavi sliko s črko Š in nato glasno ponovi besedo
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card 
+              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col cursor-pointer hover:scale-105"
+              onClick={() => handleLetterClick('Z')}
+            >
+              <CardHeader className="bg-gradient-to-r from-dragon-green/10 to-app-teal/10 rounded-t-2xl pb-4">
+                <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
+                    <span className="text-2xl font-bold text-dragon-green">
+                      Z
+                    </span>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6 pb-4 flex-grow text-center">
+                <p className="text-sm font-semibold mb-2 text-dragon-green">
+                  Sestavi sliko s črko Z in nato glasno ponovi besedo
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card 
+              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col cursor-pointer hover:scale-105"
+              onClick={() => handleLetterClick('Ž')}
+            >
+              <CardHeader className="bg-gradient-to-r from-app-blue/10 to-app-purple/10 rounded-t-2xl pb-4">
+                <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
+                    <span className="text-2xl font-bold text-app-blue">
+                      Ž
+                    </span>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6 pb-4 flex-grow text-center">
+                <p className="text-sm font-semibold mb-2 text-app-blue">
+                  Sestavi sliko s črko Ž in nato glasno ponovi besedo
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card 
+              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col cursor-pointer hover:scale-105"
+              onClick={() => handleLetterClick('K')}
+            >
+              <CardHeader className="bg-gradient-to-r from-app-orange/10 to-app-yellow/10 rounded-t-2xl pb-4">
+                <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
+                    <span className="text-2xl font-bold text-app-orange">
+                      K
+                    </span>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6 pb-4 flex-grow text-center">
+                <p className="text-sm font-semibold mb-2 text-app-orange">
+                  Sestavi sliko s črko K in nato glasno ponovi besedo
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card 
+              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col cursor-pointer hover:scale-105"
+              onClick={() => handleLetterClick('L')}
+            >
+              <CardHeader className="bg-gradient-to-r from-dragon-green/10 to-app-teal/10 rounded-t-2xl pb-4">
+                <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
+                    <span className="text-2xl font-bold text-dragon-green">
+                      L
+                    </span>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6 pb-4 flex-grow text-center">
+                <p className="text-sm font-semibold mb-2 text-dragon-green">
+                  Sestavi sliko s črko L in nato glasno ponovi besedo
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card 
+              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col cursor-pointer hover:scale-105"
+              onClick={handleXClick}
+            >
+              <CardHeader className="bg-gradient-to-r from-app-purple/10 to-app-blue/10 rounded-t-2xl pb-4">
+                <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
+                    <span className="text-2xl font-bold text-app-purple">
+                      X
+                    </span>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6 pb-4 flex-grow text-center">
+                <p className="text-sm font-semibold mb-2 text-app-purple">
                   Sestavi Zmajčka Tomija - Nova sestavljanka
                 </p>
               </CardContent>

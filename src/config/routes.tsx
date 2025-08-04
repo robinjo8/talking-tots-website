@@ -39,6 +39,14 @@ import SestavljankeR78 from "@/pages/SestavljankeR78";
 import SestavljankeR910 from "@/pages/SestavljankeR910";
 
 import SestavljankeX from "@/pages/SestavljankeX";
+import SestavljankeC from "@/pages/SestavljankeC";
+import SestavljankeČ from "@/pages/SestavljankeČ";
+import SestavljankeS from "@/pages/SestavljankeS";
+import SestavljankeŠ from "@/pages/SestavljankeŠ";
+import SestavljankeZ from "@/pages/SestavljankeZ";
+import SestavljankeŽ from "@/pages/SestavljankeŽ";
+import SestavljankeK from "@/pages/SestavljankeK";
+import SestavljankeL from "@/pages/SestavljankeL";
 import PoveziPareGames from "@/pages/PoveziPareGames";
 import PoveziPareR from "@/pages/PoveziPareR";
 import PoveziPareRouter from "@/pages/PoveziPareRouter";
@@ -244,6 +252,78 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <SestavljankeX />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/sestavljanke/c" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeC />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/sestavljanke/č" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeČ />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/sestavljanke/s" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeS />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/sestavljanke/š" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeŠ />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/sestavljanke/z" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeZ />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/sestavljanke/ž" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeŽ />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/sestavljanke/k" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeK />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/sestavljanke/l" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeL />
           </ProtectedRoute>
         }
       />
