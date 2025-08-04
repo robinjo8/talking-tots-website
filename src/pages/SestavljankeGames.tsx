@@ -175,20 +175,15 @@ export default function SestavljankeGames() {
               className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col bg-gradient-to-r from-gray-100/50 to-gray-200/50 cursor-pointer hover:scale-105" 
               onClick={() => navigate('/govorne-igre')}
             >
-              <CardHeader className="rounded-t-2xl pb-2 flex-grow flex items-center justify-center">
+              <CardHeader className="rounded-2xl flex-grow flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
                   <img 
                     src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/puscica_1.png" 
                     alt="Nazaj" 
-                    className="h-12 w-12 object-contain"
+                    className="h-16 w-16 object-contain"
                   />
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-2 pb-4 text-center">
-                <p className="text-xs text-muted-foreground font-medium">
-                  NAZAJ
-                </p>
-              </CardContent>
             </Card>
             
             {activeGames.map(game => (
