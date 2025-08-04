@@ -101,7 +101,7 @@ export default function SpominC() {
       <div className={`${effectiveFullscreen ? 'h-full flex flex-col' : 'container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-2 sm:px-4'}`}>
         
         {/* Top Section - Buttons */}
-        <div className={`bg-dragon-green/5 ${effectiveFullscreen ? 'p-3' : 'p-4'} flex-shrink-0 border-b`}>
+        <div className={`${effectiveFullscreen ? 'p-3' : 'p-4'} flex-shrink-0 border-b`}>
           <h2 className={`${effectiveFullscreen ? 'text-lg' : 'text-lg'} font-bold mb-3 text-center`}>Igra spomin za črko {currentLetter}</h2>
           <div className="flex justify-center gap-3">
             <Button
@@ -149,7 +149,7 @@ export default function SpominC() {
           )}
         </div>
 
-        <div className={`${effectiveFullscreen ? 'flex-1 px-2 pb-2 overflow-hidden' : 'flex-1 flex justify-center items-center min-h-0'}`}>
+        <div className={`${effectiveFullscreen ? 'flex-1 px-2 pb-2 overflow-hidden' : 'flex-1 flex justify-center items-center min-h-0'} bg-muted/30`}>
           <div className={`w-full ${effectiveFullscreen ? 'h-full' : 'max-w-4xl h-full'} flex items-center justify-center`}>
             {isLoading && (
               <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
@@ -170,13 +170,11 @@ export default function SpominC() {
             )}
             
             {!isLoading && !error && cards.length > 0 && (
-              <div className={`transition-opacity duration-500 w-full h-full flex items-center justify-center ${cards.length ? 'opacity-100' : 'opacity-0'}`}>
-                <MemoryGrid 
-                  cards={cards} 
-                  onCardClick={handleCardClick}
-                  isCheckingMatch={isCheckingMatch}
-                />
-              </div>
+              <MemoryGrid 
+                cards={cards} 
+                onCardClick={handleCardClick}
+                isCheckingMatch={isCheckingMatch}
+              />
             )}
             
             {!isLoading && !error && cards.length === 0 && (
