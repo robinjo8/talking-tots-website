@@ -292,7 +292,11 @@ export default function SpominGames() {
             >
               <CardHeader className="rounded-t-2xl pb-2 flex-grow flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
-                  <ArrowLeft className="h-12 w-12 text-muted-foreground" />
+                  <img 
+                    src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/puscica_1.png" 
+                    alt="Nazaj" 
+                    className="h-12 w-12 object-contain"
+                  />
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-2 pb-4 text-center">
