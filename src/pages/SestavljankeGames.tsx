@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { getAgeGroup } from "@/utils/ageUtils";
 
@@ -170,6 +170,23 @@ export default function SestavljankeGames() {
         {/* Section 1: Izberi igro */}
         <div className="mb-12">
           <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {/* Back button */}
+            <Card 
+              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col bg-gradient-to-r from-gray-100/50 to-gray-200/50 cursor-pointer hover:scale-105" 
+              onClick={() => navigate('/govorne-igre')}
+            >
+              <CardHeader className="rounded-t-2xl pb-2 flex-grow flex items-center justify-center">
+                <CardTitle className="flex items-center justify-center">
+                  <ArrowLeft className="h-12 w-12 text-muted-foreground" />
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-2 pb-4 text-center">
+                <p className="text-xs text-muted-foreground font-medium">
+                  NAZAJ
+                </p>
+              </CardContent>
+            </Card>
+            
             {activeGames.map(game => (
               <GameCard key={game.id} game={game} />
             ))}
