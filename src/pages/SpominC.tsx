@@ -147,7 +147,7 @@ export default function SpominC() {
   return (
     <div className="min-h-screen bg-background">
       <div className="w-full bg-background">
-        <div className="bg-background p-4 border-b">
+        <div className="bg-background p-4">
           <div className="flex justify-center gap-4">
             <Button onClick={handleReset} variant="outline" className="gap-2">
               <RotateCcw className="h-4 w-4" />
