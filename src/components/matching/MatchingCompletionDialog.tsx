@@ -92,8 +92,26 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       countdownRef.current = setInterval(() => {
         setRecordingTimeLeft(prev => {
           if (prev <= 1) {
-            // Auto-stop recording
-            stopRecording();
+            // Auto-stop recording immediately
+            if (countdownRef.current) {
+              clearInterval(countdownRef.current);
+              countdownRef.current = null;
+            }
+            // Stop recording and update states immediately
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+              mediaRecorder.stop();
+            }
+            if (audioStream) {
+              audioStream.getTracks().forEach(track => track.stop());
+              setAudioStream(null);
+            }
+            // Update states immediately
+            setRecordingStates(prev => ({
+              ...prev,
+              [imageIndex]: false
+            }));
+            setCompletedRecordings(prev => new Set([...prev, imageIndex]));
+            setCurrentRecordingIndex(null);
             return 0;
           }
           return prev - 1;
