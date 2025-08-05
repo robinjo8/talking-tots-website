@@ -4,9 +4,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { AppLayout } from "@/components/AppLayout";
 import { MatchingGame } from '@/components/matching/MatchingGame';
+import { ThreeColumnGame } from '@/components/matching/ThreeColumnGame';
 import { MatchingInstructionsModal } from '@/components/matching/MatchingInstructionsModal';
 import { MatchingCompletionDialog } from '@/components/matching/MatchingCompletionDialog';
 import { getLetterData, getImagesForAgeGroup } from '@/data/matchingGameData';
+import { getRandomThreeColumnItems } from '@/data/threeColumnMatchingData';
 import { getAgeGroup } from '@/utils/ageUtils';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, RotateCcw, BookOpen } from 'lucide-react';
@@ -55,14 +57,18 @@ export default function MatchingGameLetter() {
     );
   }
 
-  // Get age-appropriate images
-  const images = getImagesForAgeGroup(letterData.images, ageGroup);
+  
+  // For 5-6 age group, use ThreeColumnGame with different data
+  const isThreeColumnGame = ageGroup === '5-6';
+  const items = isThreeColumnGame ? getRandomThreeColumnItems(4, letter?.toLowerCase()) : [];
+  
+  // Get age-appropriate images for MatchingGame (non-5-6 age groups)
+  const images = !isThreeColumnGame ? getImagesForAgeGroup(letterData.images, ageGroup) : [];
 
-  // Determine number of columns based on age group
+  // Determine number of columns based on age group (only for MatchingGame)
   const getColumnsForAge = (age: string) => {
     switch (age) {
       case '3-4': return 2;
-      case '5-6': return 3;
       case '7-8': return 3;
       case '9-10': return 4;
       default: return 2;
@@ -70,6 +76,8 @@ export default function MatchingGameLetter() {
   };
 
   const numColumns = getColumnsForAge(ageGroup);
+  
+  console.log('MatchingGameLetter - Age group:', ageGroup, 'IsThreeColumn:', isThreeColumnGame, 'Items:', items, 'Images:', images);
 
   // Handle game completion
   const handleGameComplete = (score: number) => {
@@ -160,13 +168,21 @@ export default function MatchingGameLetter() {
 
           {/* Game Area with gray background */}
           <div className="flex-1 overflow-hidden bg-muted/30 p-4">
-            <MatchingGame
-              key={gameKey}
-              images={images}
-              numColumns={numColumns}
-              onGameComplete={handleGameComplete}
-              className="h-full"
-            />
+            {isThreeColumnGame ? (
+              <ThreeColumnGame
+                key={gameKey}
+                items={items}
+                onGameComplete={handleGameComplete}
+              />
+            ) : (
+              <MatchingGame
+                key={gameKey}
+                images={images}
+                numColumns={numColumns}
+                onGameComplete={handleGameComplete}
+                className="h-full"
+              />
+            )}
           </div>
         </div>
         
@@ -178,7 +194,10 @@ export default function MatchingGameLetter() {
         <MatchingCompletionDialog
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
-          images={images}
+          images={isThreeColumnGame 
+            ? items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))
+            : images
+          }
         />
       </div>
     );
@@ -203,13 +222,21 @@ export default function MatchingGameLetter() {
         </div>
         
         <div className="w-full bg-muted/30 flex justify-center items-center p-4 min-h-[calc(100vh-200px)]">
-          <MatchingGame
-            key={gameKey}
-            images={images}
-            numColumns={numColumns}
-            onGameComplete={handleGameComplete}
-            className="w-full"
-          />
+          {isThreeColumnGame ? (
+            <ThreeColumnGame
+              key={gameKey}
+              items={items}
+              onGameComplete={handleGameComplete}
+            />
+          ) : (
+            <MatchingGame
+              key={gameKey}
+              images={images}
+              numColumns={numColumns}
+              onGameComplete={handleGameComplete}
+              className="w-full"
+            />
+          )}
         </div>
         
         <MatchingInstructionsModal
@@ -220,7 +247,10 @@ export default function MatchingGameLetter() {
         <MatchingCompletionDialog
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
-          images={images}
+          images={isThreeColumnGame 
+            ? items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))
+            : images
+          }
         />
       </div>
     </AppLayout>
