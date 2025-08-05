@@ -37,6 +37,9 @@ export default function PoveziPareC56() {
   
   // Get 4 random items for the three-column game
   const items = getRandomThreeColumnItems(4, 'c');
+  
+  // Debug logging
+  console.log('Three column items:', items);
 
   // Handle game completion
   const handleGameComplete = (score: number) => {

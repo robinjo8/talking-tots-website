@@ -52,6 +52,7 @@ export function ThreeColumnGame({ items, onGameComplete }: ThreeColumnGameProps)
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold mb-2">Poveži zvok, senco in sliko</h2>
         <p className="text-muted-foreground">Rezultat: {gameState.score}/{items.length}</p>
+        <p className="text-xs text-red-500">DEBUG: Audio items: {gameState.shuffledAudio.length}, Shadow items: {gameState.shuffledShadows.length}, Original items: {gameState.shuffledOriginals.length}</p>
       </div>
 
       {/* Game Grid */}
