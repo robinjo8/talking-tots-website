@@ -48,8 +48,8 @@ export function useMatchingGame(images: MatchingGameImage[], numColumns: number 
   const initializeGame = useCallback(() => {
     const shuffledColumns: MatchingGameImage[][] = [];
     
-    // Create shuffled versions for each column (except the first original column)
-    for (let i = 0; i < numColumns - 1; i++) {
+    // Create shuffled versions for each column (ALL columns are shuffled)
+    for (let i = 0; i < numColumns; i++) {
       shuffledColumns.push(shuffleArray(images));
     }
 

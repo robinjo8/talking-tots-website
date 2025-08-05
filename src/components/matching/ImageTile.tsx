@@ -18,7 +18,7 @@ export function ImageTile({ image, isSelected, isMatched, onClick, className, ..
     <div
       onClick={onClick}
       className={cn(
-        "relative w-16 h-16 md:w-20 md:h-20 rounded-lg border-2 cursor-pointer transition-all duration-200 bg-background",
+        "relative rounded-lg border-2 cursor-pointer transition-all duration-200 bg-background",
         "hover:scale-105 hover:shadow-md",
         isSelected && "border-app-purple shadow-lg scale-105",
         isMatched && "border-dragon-green bg-dragon-green/10",

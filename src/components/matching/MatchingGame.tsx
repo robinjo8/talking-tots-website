@@ -45,84 +45,29 @@ export function MatchingGame({
   }
 
   return (
-    <div className={cn("w-full max-w-6xl mx-auto p-4", className)}>
-      {/* Header with score and reset button */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <h2 className="text-xl md:text-2xl font-bold text-foreground">
-            Poveži pare
-          </h2>
-          {gameState.isComplete && (
-            <div className="flex items-center gap-2 text-dragon-green font-bold">
-              <Trophy className="h-5 w-5" />
-              <span>Uspešno!</span>
-            </div>
-          )}
-        </div>
-        
-        <div className="flex items-center gap-4">
-          <div className="text-sm text-muted-foreground">
-            Točke: <span className="font-bold text-foreground">{gameState.score}</span>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={resetGame}
-            className="gap-2"
-          >
-            <RotateCcw className="h-4 w-4" />
-            Nova igra
-          </Button>
-        </div>
-      </div>
-
-      {/* Game area */}
+    <div className={cn("w-full max-w-6xl mx-auto", className)}>
+      {/* Game area with gray background */}
       <div 
         ref={containerRef}
-        className="relative bg-gradient-to-br from-background to-muted/30 rounded-xl p-6 border-2 border-border"
+        className="relative bg-muted/30 rounded-xl p-6 border border-border"
       >
         <ConnectionLine connections={gameState.connections} containerRef={containerRef} />
         
         <div className="grid gap-6" style={{ gridTemplateColumns: `repeat(${numColumns}, 1fr)` }}>
-          {/* Original column */}
-          <div className="flex flex-col gap-3">
-            <h3 className="text-sm font-semibold text-center text-muted-foreground mb-2">
-              Originalne slike
-            </h3>
-            <div className="flex flex-col gap-3">
-              {gameState.originalImages.map((image, index) => (
-                <ImageTile
-                  key={`original-${image.word}-${index}`}
-                  image={image}
-                  isSelected={isTileSelected(image.word, 0, index)}
-                  isMatched={isTileMatched(image.word)}
-                  onClick={() => handleTileClick(image.word, 0, index)}
-                  className="mx-auto"
-                  data-image-id={image.word}
-                  data-column="0"
-                  data-index={index}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Shuffled columns */}
+          {/* All columns are now shuffled */}
           {gameState.shuffledColumns.map((column, columnIndex) => (
-            <div key={`column-${columnIndex + 1}`} className="flex flex-col gap-3">
-              <h3 className="text-sm font-semibold text-center text-muted-foreground mb-2">
-                Stolpec {columnIndex + 2}
-              </h3>
-              <div className="flex flex-col gap-3">
+            <div key={`column-${columnIndex}`} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4">
                 {column.map((image, index) => (
                   <ImageTile
-                    key={`column-${columnIndex + 1}-${image.word}-${index}`}
+                    key={`column-${columnIndex}-${image.word}-${index}`}
                     image={image}
-                    isSelected={isTileSelected(image.word, columnIndex + 1, index)}
+                    isSelected={isTileSelected(image.word, columnIndex, index)}
                     isMatched={isTileMatched(image.word)}
-                    onClick={() => handleTileClick(image.word, columnIndex + 1, index)}
-                    className="mx-auto"
+                    onClick={() => handleTileClick(image.word, columnIndex, index)}
+                    className="mx-auto w-20 h-20 md:w-24 md:h-24"
                     data-image-id={image.word}
-                    data-column={columnIndex + 1}
+                    data-column={columnIndex}
                     data-index={index}
                   />
                 ))}
@@ -131,31 +76,30 @@ export function MatchingGame({
           ))}
         </div>
 
-        {/* Progress indicator */}
-        <div className="mt-6 text-center">
-          <div className="text-sm text-muted-foreground">
-            Ujemanja: {gameState.completedMatches.size} / {gameState.originalImages.length}
+        {/* Game completion indicator */}
+        {gameState.isComplete && (
+          <div className="mt-6 text-center">
+            <div className="flex items-center justify-center gap-2 text-dragon-green font-bold text-lg">
+              <Trophy className="h-6 w-6" />
+              <span>Uspešno dokončano!</span>
+            </div>
           </div>
-          <div className="w-full bg-muted rounded-full h-2 mt-2">
-            <div 
-              className="bg-dragon-green h-2 rounded-full transition-all duration-300"
-              style={{ 
-                width: `${(gameState.completedMatches.size / gameState.originalImages.length) * 100}%` 
-              }}
-            />
-          </div>
-        </div>
-      </div>
+        )}
 
-      {/* Instructions */}
-      {gameState.completedMatches.size === 0 && (
-        <div className="mt-4 p-4 bg-muted/50 rounded-lg text-center">
-          <p className="text-sm text-muted-foreground">
-            Klikni na sliko v prvem stolpcu in nato poišči enako sliko v drugih stolpcih. 
-            Ko najdeš pravo ujemanje, se bosta sliki povezali z črto!
-          </p>
-        </div>
-      )}
+        {/* Progress indicator */}
+        {!gameState.isComplete && (
+          <div className="mt-6 text-center">
+            <div className="w-full bg-muted rounded-full h-2">
+              <div 
+                className="bg-dragon-green h-2 rounded-full transition-all duration-300"
+                style={{ 
+                  width: `${(gameState.completedMatches.size / gameState.originalImages.length) * 100}%` 
+                }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
