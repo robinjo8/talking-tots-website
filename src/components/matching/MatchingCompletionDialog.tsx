@@ -136,6 +136,9 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
   const saveRecording = async (word: string, imageIndex: number) => {
     if (recordingDataRef.current.length === 0) {
       console.log('No recording data to save');
+      // Still mark as completed even if no data
+      setCompletedRecordings(prev => new Set([...prev, imageIndex]));
+      setCurrentRecordingIndex(null);
       return;
     }
 
@@ -147,8 +150,16 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
         description: "Prijavite se za shranjevanje posnetka.",
         variant: "destructive"
       });
+      // Still mark as completed even if auth fails
+      setCompletedRecordings(prev => new Set([...prev, imageIndex]));
+      setCurrentRecordingIndex(null);
       return;
     }
+
+    // Mark as completed first to prevent multiple clicks
+    setCompletedRecordings(prev => new Set([...prev, imageIndex]));
+    setCurrentRecordingIndex(null);
+
     try {
       const audioBlob = new Blob(recordingDataRef.current, {
         type: 'audio/webm'
@@ -172,12 +183,6 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
         });
       } else {
         console.log('Recording saved successfully to:', userSpecificPath);
-        // Immediately mark as completed and clear recording state
-        setCompletedRecordings(prev => new Set([...prev, imageIndex]));
-        setRecordingStates(prev => ({
-          ...prev,
-          [imageIndex]: false
-        }));
         toast({
           title: "Odlično!",
           description: "Tvoja izgovorjava je bila shranjena."
@@ -192,7 +197,6 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       });
     }
     recordingDataRef.current = [];
-    setCurrentRecordingIndex(null);
   };
   const handleClose = () => {
     const allCompleted = completedRecordings.size === 4;
@@ -222,8 +226,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
   return <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-dragon-green">
-            <Trophy className="h-6 w-6" />
+          <DialogTitle className="text-2xl font-bold text-dragon-green text-center">
             Bravo!
           </DialogTitle>
         </DialogHeader>
