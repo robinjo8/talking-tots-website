@@ -519,8 +519,9 @@ export function AppRoutes() {
         element={<Navigate to="/govorne-igre/povezi-pare-3-4/c" replace />}
       />
       
+      {/* New consistent URL pattern for matching games */}
       <Route 
-        path="/govorne-igre/povezi-pare/c56" 
+        path="/govorne-igre/povezi-pare-5-6/c" 
         element={
           <ProtectedRoute>
             <PoveziPareC56 />
@@ -529,7 +530,7 @@ export function AppRoutes() {
       />
       
       <Route 
-        path="/govorne-igre/povezi-pare/c78" 
+        path="/govorne-igre/povezi-pare-7-8/c" 
         element={
           <ProtectedRoute>
             <PoveziPareC78 />
@@ -538,12 +539,28 @@ export function AppRoutes() {
       />
       
       <Route 
-        path="/govorne-igre/povezi-pare/c910" 
+        path="/govorne-igre/povezi-pare-9-10/c" 
         element={
           <ProtectedRoute>
             <PoveziPareC910 />
           </ProtectedRoute>
         }
+      />
+      
+      {/* Backward compatibility redirects */}
+      <Route 
+        path="/govorne-igre/povezi-pare/c56" 
+        element={<Navigate to="/govorne-igre/povezi-pare-5-6/c" replace />}
+      />
+      
+      <Route 
+        path="/govorne-igre/povezi-pare/c78" 
+        element={<Navigate to="/govorne-igre/povezi-pare-7-8/c" replace />}
+      />
+      
+      <Route 
+        path="/govorne-igre/povezi-pare/c910" 
+        element={<Navigate to="/govorne-igre/povezi-pare-9-10/c" replace />}
       />
       
       <Route 
