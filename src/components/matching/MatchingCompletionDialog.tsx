@@ -124,15 +124,13 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       audioStream.getTracks().forEach(track => track.stop());
       setAudioStream(null);
     }
-    setRecordingStates(prev => {
-      const newState = {
-        ...prev
-      };
-      Object.keys(newState).forEach(key => {
-        newState[parseInt(key)] = false;
-      });
-      return newState;
-    });
+    // Only clear the current recording state, not all recording states
+    if (currentRecordingIndex !== null) {
+      setRecordingStates(prev => ({
+        ...prev,
+        [currentRecordingIndex]: false
+      }));
+    }
     setRecordingTimeLeft(3);
   };
   const saveRecording = async (word: string, imageIndex: number) => {
@@ -174,7 +172,12 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
         });
       } else {
         console.log('Recording saved successfully to:', userSpecificPath);
+        // Immediately mark as completed and clear recording state
         setCompletedRecordings(prev => new Set([...prev, imageIndex]));
+        setRecordingStates(prev => ({
+          ...prev,
+          [imageIndex]: false
+        }));
         toast({
           title: "Odlično!",
           description: "Tvoja izgovorjava je bila shranjena."
@@ -202,9 +205,19 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     }
   };
   const handleImageClick = (imageIndex: number, word: string) => {
-    if (!completedRecordings.has(imageIndex) && !recordingStates[imageIndex]) {
-      startRecording(imageIndex, word);
+    // Prevent clicking if already completed or currently recording
+    if (completedRecordings.has(imageIndex) || recordingStates[imageIndex]) {
+      return;
     }
+    startRecording(imageIndex, word);
+  };
+
+  const handleReset = () => {
+    // Reset all recordings to allow re-recording
+    setCompletedRecordings(new Set());
+    setRecordingStates({});
+    setCurrentRecordingIndex(null);
+    setRecordingTimeLeft(3);
   };
   return <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-lg">
@@ -242,6 +255,13 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
                   </span>
                 </div>;
           })}
+          </div>
+
+          {/* Reset button */}
+          <div className="flex justify-center">
+            <Button onClick={handleReset} variant="outline" className="gap-2">
+              Ponovi
+            </Button>
           </div>
         </div>
         <div className="flex justify-center">
