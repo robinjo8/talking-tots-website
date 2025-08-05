@@ -263,7 +263,8 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-6 py-4">
-          <p className="text-center text-sm text-black">KLIKNI NA SPODNJE SLIČICE IN PONOVI BESEDE. ZA VSAKO SLIČICO IMAŠ 3 SEKUNDE ČASA. V KOLIKOR TI NE USPE, LAHKO PONOVIŠ Z GUMBOM »PONOVI«</p>
+          <p className="text-sm text-black text-justify mx-[64px]">KLIKNI NA SPODNJE SLIČICE IN PONOVI BESEDE. 
+ZA VSAKO SLIČICO IMAŠ 3 SEKUNDE ČASA. V KOLIKOR TI NE USPE, LAHKO PONOVIŠ Z GUMBOM »PONOVI«</p>
           
           {/* Display images in 2x2 grid */}
           <div className="grid grid-cols-2 gap-4 mx-auto max-w-xs">
