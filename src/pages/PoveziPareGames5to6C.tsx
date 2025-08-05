@@ -5,12 +5,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { ThreeColumnGame } from "@/components/matching/ThreeColumnGame";
 import { getRandomThreeColumnItems } from "@/data/threeColumnMatchingData";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function PoveziPareGames5to6C() {
   const { selectedChild } = useAuth();
   const childName = selectedChild?.name;
-  const [gameItems, setGameItems] = useState(() => getRandomThreeColumnItems(4));
+  const [gameItems, setGameItems] = useState(() => getRandomThreeColumnItems(4, 'c'));
 
   const handleGameComplete = (score: number) => {
     console.log(`Game completed with score: ${score}/4`);
@@ -18,7 +18,7 @@ export default function PoveziPareGames5to6C() {
   };
 
   const startNewGame = () => {
-    setGameItems(getRandomThreeColumnItems(4));
+    setGameItems(getRandomThreeColumnItems(4, 'c'));
   };
 
   return (
