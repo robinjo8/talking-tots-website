@@ -1,31 +1,45 @@
 import Header from "@/components/Header";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { MessageSquare } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { MessageSquare, RotateCcw, BookOpen } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { MatchingGame } from "@/components/matching/MatchingGame";
+import { MatchingInstructionsModal } from "@/components/matching/MatchingInstructionsModal";
+import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
 import { getLetterData, getImagesForAgeGroup } from "@/data/matchingGameData";
-import { useState } from "react";
-import { toast } from "sonner";
+import { useState, useRef } from "react";
 
 export default function PoveziPareC() {
   const { selectedChild } = useAuth();
   const childName = selectedChild?.name;
+  const [gameKey, setGameKey] = useState(0);
+  const [showInstructions, setShowInstructions] = useState(false);
+  const [showCompletion, setShowCompletion] = useState(false);
+  const gameCompletedRef = useRef(false);
   
   const getGameImages = () => {
     const letterData = getLetterData('C');
     return letterData ? getImagesForAgeGroup(letterData.images, '3-4') : [];
   };
   
-  const [gameItems, setGameItems] = useState(getGameImages);
+  const gameImages = getGameImages();
 
   const handleGameComplete = (score: number) => {
-    const maxScore = gameItems.length;
-    toast.success(`Odlično! Dosegel si ${score} od ${maxScore} točk!`);
+    if (!gameCompletedRef.current) {
+      gameCompletedRef.current = true;
+      console.log(`Game completed with score: ${score}`);
+      setShowCompletion(true);
+    }
   };
 
-  const startNewGame = () => {
-    setGameItems(getGameImages());
+  const handleNewGame = () => {
+    gameCompletedRef.current = false;
+    setGameKey(prev => prev + 1);
+  };
+
+  const handleInstructions = () => {
+    setShowInstructions(true);
   };
 
   return (
@@ -57,12 +71,36 @@ export default function PoveziPareC() {
             </CardContent>
           </Card>
 
+          {/* Game Controls */}
+          <div className="flex justify-center gap-4 mb-6">
+            <Button onClick={handleNewGame} variant="outline" className="gap-2">
+              <RotateCcw className="h-4 w-4" />
+              Nova igra
+            </Button>
+            <Button onClick={handleInstructions} variant="outline" className="gap-2">
+              <BookOpen className="h-4 w-4" />
+              Navodila
+            </Button>
+          </div>
+
           <MatchingGame 
-            images={gameItems}
+            key={gameKey}
+            images={gameImages}
             numColumns={2}
             onGameComplete={handleGameComplete}
           />
         </div>
+        
+        <MatchingInstructionsModal
+          isOpen={showInstructions}
+          onClose={() => setShowInstructions(false)}
+        />
+        
+        <MatchingCompletionDialog
+          isOpen={showCompletion}
+          onClose={() => setShowCompletion(false)}
+          images={gameImages}
+        />
       </div>
     </AgeGatedRoute>
   );
