@@ -78,6 +78,7 @@ import PoveziPareC56 from "@/pages/PoveziPareC56";
 import PoveziPareC78 from "@/pages/PoveziPareC78";
 import PoveziPareC910 from "@/pages/PoveziPareC910";
 import MatchingGames3to4 from "@/pages/MatchingGames3to4";
+import MatchingGames5to6 from "@/pages/MatchingGames5to6";
 import MatchingGameLetter from "@/pages/MatchingGameLetter";
 
 export function AppRoutes() {
@@ -519,34 +520,6 @@ export function AppRoutes() {
         element={<Navigate to="/govorne-igre/povezi-pare-3-4/c" replace />}
       />
       
-      {/* New consistent URL pattern for matching games */}
-      <Route 
-        path="/govorne-igre/povezi-pare-5-6/c" 
-        element={
-          <ProtectedRoute>
-            <PoveziPareC56 />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route 
-        path="/govorne-igre/povezi-pare-7-8/c" 
-        element={
-          <ProtectedRoute>
-            <PoveziPareC78 />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route 
-        path="/govorne-igre/povezi-pare-9-10/c" 
-        element={
-          <ProtectedRoute>
-            <PoveziPareC910 />
-          </ProtectedRoute>
-        }
-      />
-      
       {/* Backward compatibility redirects */}
       <Route 
         path="/govorne-igre/povezi-pare/c56" 
@@ -674,7 +647,61 @@ export function AppRoutes() {
       />
       
       <Route 
+        path="/govorne-igre/povezi-pare-5-6" 
+        element={
+          <ProtectedRoute>
+            <MatchingGames5to6 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
         path="/govorne-igre/povezi-pare-3-4/:letter" 
+        element={
+          <ProtectedRoute>
+            <MatchingGameLetter />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route 
+        path="/govorne-igre/povezi-pare-5-6/:letter" 
+        element={
+          <ProtectedRoute>
+            <MatchingGameLetter />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route 
+        path="/govorne-igre/povezi-pare-7-8" 
+        element={
+          <ProtectedRoute>
+            <MatchingGames5to6 />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route 
+        path="/govorne-igre/povezi-pare-7-8/:letter" 
+        element={
+          <ProtectedRoute>
+            <MatchingGameLetter />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route 
+        path="/govorne-igre/povezi-pare-9-10" 
+        element={
+          <ProtectedRoute>
+            <MatchingGames5to6 />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route 
+        path="/govorne-igre/povezi-pare-9-10/:letter" 
         element={
           <ProtectedRoute>
             <MatchingGameLetter />

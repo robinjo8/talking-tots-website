@@ -1,61 +1,228 @@
-import Header from "@/components/Header";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { MessageSquare } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
-import { ThreeColumnGame } from "@/components/matching/ThreeColumnGame";
-import { getRandomThreeColumnItems } from "@/data/threeColumnMatchingData";
-import { useState } from "react";
-import { toast } from "sonner";
+import { useEffect, useState, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { AppLayout } from "@/components/AppLayout";
+import { MatchingGame } from '@/components/matching/MatchingGame';
+import { MatchingInstructionsModal } from '@/components/matching/MatchingInstructionsModal';
+import { MatchingCompletionDialog } from '@/components/matching/MatchingCompletionDialog';
+import { getLetterData, getImagesForAgeGroup } from '@/data/matchingGameData';
+import { getAgeGroup } from '@/utils/ageUtils';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, RotateCcw, BookOpen } from 'lucide-react';
 
 export default function PoveziPareC56() {
-  const { selectedChild } = useAuth();
-  const childName = selectedChild?.name;
-  const [gameItems, setGameItems] = useState(() => getRandomThreeColumnItems(4, 'c'));
+  const { user, selectedChild } = useAuth();
+  const navigate = useNavigate();
+  const letter = 'c'; // Fixed to 'c' for this component
+  const isMobile = useIsMobile();
+  const [gameKey, setGameKey] = useState(0);
+  const [showInstructions, setShowInstructions] = useState(false);
+  const [showCompletion, setShowCompletion] = useState(false);
+  const gameCompletedRef = useRef(false);
 
+  // Check authentication
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
+
+  // Check age group access and get appropriate age group
+  const childAge = selectedChild?.age || 5; // Default to 5 for this age group
+  const ageGroup = getAgeGroup(childAge);
+
+  // Get letter data
+  const upperCaseLetter = letter?.toUpperCase();
+  const letterData = getLetterData(upperCaseLetter || '');
+  
+  if (!letterData || !upperCaseLetter) {
+    return (
+      <AppLayout>
+        <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">Napaka</h1>
+            <p className="text-muted-foreground">Ni bilo mogoče naložiti podatkov za črko {upperCaseLetter}.</p>
+            <Button 
+              onClick={() => navigate('/govorne-igre')}
+              className="mt-4"
+            >
+              Nazaj na igre
+            </Button>
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // Get age-appropriate images
+  const images = getImagesForAgeGroup(letterData.images, ageGroup);
+
+  // Determine number of columns based on age group
+  const getColumnsForAge = (age: string) => {
+    switch (age) {
+      case '3-4': return 2;
+      case '5-6': return 3;
+      case '7-8': return 3;
+      case '9-10': return 4;
+      default: return 3; // Default for 5-6 age group
+    }
+  };
+
+  const numColumns = getColumnsForAge(ageGroup);
+
+  // Handle game completion
   const handleGameComplete = (score: number) => {
-    toast.success(`Odlično! Dosegel si ${score} od 4 točk!`);
+    if (!gameCompletedRef.current) {
+      gameCompletedRef.current = true;
+      console.log(`Game completed with score: ${score}`);
+      setShowCompletion(true);
+    }
   };
 
-  const startNewGame = () => {
-    setGameItems(getRandomThreeColumnItems(4, 'c'));
+  const handleNewGame = () => {
+    gameCompletedRef.current = false;
+    setGameKey(prev => prev + 1);
   };
+
+  const handleBack = () => {
+    navigate(getBackPath());
+  };
+
+  const handleInstructions = () => {
+    setShowInstructions(true);
+  };
+
+  // Fullscreen handling for mobile
+  useEffect(() => {
+    if (isMobile) {
+      document.documentElement.requestFullscreen?.();
+      return () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen?.();
+        }
+      };
+    }
+  }, [isMobile]);
+
+  const effectiveFullscreen = isMobile;
+
+  // Determine back navigation based on age group
+  const getBackPath = () => {
+    switch (ageGroup) {
+      case '3-4': return '/govorne-igre/povezi-pare-3-4';
+      case '5-6': return '/govorne-igre/povezi-pare-5-6';
+      case '7-8': return '/govorne-igre/povezi-pare-7-8';
+      case '9-10': return '/govorne-igre/povezi-pare-9-10';
+      default: return '/govorne-igre/povezi-pare-5-6';
+    }
+  };
+
+  if (effectiveFullscreen) {
+    return (
+      <div className="fixed inset-0 bg-background overflow-hidden select-none">
+        <div className="h-full flex flex-col">
+          {/* Top Section - Buttons */}
+          <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
+            <h2 className="text-lg font-bold mb-3 text-center">Igra ujemanja {upperCaseLetter}</h2>
+            <div className="flex justify-center gap-3">
+              <Button
+                onClick={handleNewGame}
+                size="sm"
+                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
+                variant="default"
+              >
+                <RotateCcw className="h-4 w-4" />
+                Nova igra
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={handleBack}
+                size="sm"
+                className="gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Nazaj
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={handleInstructions}
+                size="sm"
+                className="gap-2"
+              >
+                <BookOpen className="h-4 w-4" />
+                Navodila
+              </Button>
+            </div>
+          </div>
+
+          {/* Game Area with gray background */}
+          <div className="flex-1 overflow-hidden bg-muted/30 p-4">
+            <MatchingGame
+              key={gameKey}
+              images={images}
+              numColumns={numColumns}
+              onGameComplete={handleGameComplete}
+              className="h-full"
+            />
+          </div>
+        </div>
+        
+        <MatchingInstructionsModal
+          isOpen={showInstructions}
+          onClose={() => setShowInstructions(false)}
+        />
+        
+        <MatchingCompletionDialog
+          isOpen={showCompletion}
+          onClose={() => setShowCompletion(false)}
+          images={images}
+        />
+      </div>
+    );
+  }
 
   return (
-    <AgeGatedRoute requiredAgeGroup="5-6">
-      <div className="min-h-screen bg-background">
-        <Header />
+    <AppLayout>
+      <div className="w-full min-h-screen bg-background">
+        <div className="flex justify-center gap-4 p-4">
+          <Button onClick={handleNewGame} variant="outline" className="gap-2">
+            <RotateCcw className="h-4 w-4" />
+            Nova igra
+          </Button>
+          <Button onClick={handleInstructions} variant="outline" className="gap-2">
+            <BookOpen className="h-4 w-4" />
+            Navodila
+          </Button>
+          <Button onClick={handleBack} variant="outline" className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Nazaj
+          </Button>
+        </div>
         
-        <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
-          {/* Instruction speech-bubble */}
-          <Card className="mb-8 bg-gradient-to-r from-sky-50 to-green-50 border-dragon-green/30 shadow-md">
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-xl md:text-2xl text-dragon-green">
-                <MessageSquare className="h-5 w-5 text-dragon-green" />
-                HEJ, {childName?.toUpperCase() || "TIAN"}!
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-2 flex items-center gap-4">
-              <div className="hidden sm:block w-20 h-20">
-                <img 
-                  src="/lovable-uploads/4377ec70-1996-47a9-bf05-8093cffcaf0b.png" 
-                  alt="Zmajček Tomi" 
-                  className="w-full h-full object-contain animate-bounce-gentle"
-                />
-              </div>
-              <div className="flex-1">
-                <p className="text-lg font-medium italic">ODLIČEN NAPREDEK! POVEŽI SLIKO, SENCO IN ZVOK ZA ČRKO C!</p>
-                <p className="text-sm text-muted-foreground mt-2">IZZIV ZA NAPREDNEJŠE OTROKE!</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <ThreeColumnGame 
-            items={gameItems}
+        <div className="w-full bg-muted/30 flex justify-center items-center p-4 min-h-[calc(100vh-200px)]">
+          <MatchingGame
+            key={gameKey}
+            images={images}
+            numColumns={numColumns}
             onGameComplete={handleGameComplete}
+            className="w-full"
           />
         </div>
+        
+        <MatchingInstructionsModal
+          isOpen={showInstructions}
+          onClose={() => setShowInstructions(false)}
+        />
+        
+        <MatchingCompletionDialog
+          isOpen={showCompletion}
+          onClose={() => setShowCompletion(false)}
+          images={images}
+        />
       </div>
-    </AgeGatedRoute>
+    </AppLayout>
   );
 }
