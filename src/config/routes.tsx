@@ -76,6 +76,7 @@ import PoveziPareR from "@/pages/PoveziPareR";
 import PoveziPareRouter from "@/pages/PoveziPareRouter";
 import PoveziPareGames3to4 from "@/pages/PoveziPareGames3to4";
 import PoveziPareGames5to6 from "@/pages/PoveziPareGames5to6";
+import PoveziPareGames5to6C from "@/pages/PoveziPareGames5to6C";
 import PoveziPareGames7to8 from "@/pages/PoveziPareGames7to8";
 import PoveziPareGames9to10 from "@/pages/PoveziPareGames9to10";
 import MatchingGames3to4 from "@/pages/MatchingGames3to4";
@@ -593,6 +594,15 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <PoveziPareGames5to6 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/povezi-pare-5-6/c" 
+        element={
+          <ProtectedRoute>
+            <PoveziPareGames5to6C />
           </ProtectedRoute>
         }
       />
