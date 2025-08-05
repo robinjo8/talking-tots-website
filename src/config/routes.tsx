@@ -73,7 +73,6 @@ import SestavljankeL78 from "@/pages/SestavljankeL78";
 import SestavljankeL910 from "@/pages/SestavljankeL910";
 import PoveziPareGames from "@/pages/PoveziPareGames";
 import PoveziPareR from "@/pages/PoveziPareR";
-
 import PoveziPareGames3to4 from "@/pages/PoveziPareGames3to4";
 import PoveziPareGames5to6 from "@/pages/PoveziPareGames5to6";
 import PoveziPareGames5to6C from "@/pages/PoveziPareGames5to6C";
@@ -271,8 +270,6 @@ export function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      
-      
       
       <Route 
         path="/govorne-igre/sestavljanke/X" 
@@ -508,78 +505,7 @@ export function AppRoutes() {
         }
       />
       
-      <Route 
-        path="/govorne-igre/sestavljanke/č" 
-        element={
-          <ProtectedRoute>
-            <SestavljankeČ />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route 
-        path="/govorne-igre/sestavljanke/s" 
-        element={
-          <ProtectedRoute>
-            <SestavljankeS />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route 
-        path="/govorne-igre/sestavljanke/š" 
-        element={
-          <ProtectedRoute>
-            <SestavljankeŠ />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route 
-        path="/govorne-igre/sestavljanke/z" 
-        element={
-          <ProtectedRoute>
-            <SestavljankeZ />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route 
-        path="/govorne-igre/sestavljanke/ž" 
-        element={
-          <ProtectedRoute>
-            <SestavljankeŽ />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route 
-        path="/govorne-igre/sestavljanke/k" 
-        element={
-          <ProtectedRoute>
-            <SestavljankeK />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route 
-        path="/govorne-igre/sestavljanke/l" 
-        element={
-          <ProtectedRoute>
-            <SestavljankeL />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route 
-        path="/govorne-igre/sestavljanke/old" 
-        element={
-          <ProtectedRoute>
-            <Sestavljanke />
-          </ProtectedRoute>
-        }
-      />
-      
+      {/* Povezi Pare Routes */}
       <Route 
         path="/govorne-igre/povezi-pare" 
         element={
@@ -634,43 +560,22 @@ export function AppRoutes() {
         }
       />
       
+      {/* Spomin Game Routes */}
+      <Route 
+        path="/govorne-igre/spomin" 
+        element={
+          <ProtectedRoute>
+            <SpominGames />
+          </ProtectedRoute>
+        }
+      />
+      
       <Route 
         path="/govorne-igre/spomin/spomin-r" 
         element={
           <ProtectedRoute>
             <SpominR />
           </ProtectedRoute>
-        }
-      />
-      
-      <Route 
-        path="/moji-izzivi" 
-        element={
-          <ProtectedRoute>
-            <MojiIzzivi />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/video-navodila" 
-        element={
-          <ProtectedRoute>
-            <VideoNavodila />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/video-navodila/crka-r" 
-        element={
-          <ProtectedRoute>
-            <VideoNavodilaCrkaR />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/logopedski-koticek" 
-        element={
-          <LogopedskiKoticek />
         }
       />
       
@@ -765,16 +670,39 @@ export function AppRoutes() {
         }
       />
 
-      <Route path="*" element={<NotFound />} />
-      
+      {/* Other Routes */}
       <Route 
-        path="/govorne-igre/spomin" 
+        path="/moji-izzivi" 
         element={
           <ProtectedRoute>
-            <SpominGames />
+            <MojiIzzivi />
           </ProtectedRoute>
         }
       />
+      <Route 
+        path="/video-navodila" 
+        element={
+          <ProtectedRoute>
+            <VideoNavodila />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/video-navodila/crka-r" 
+        element={
+          <ProtectedRoute>
+            <VideoNavodilaCrkaR />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/logopedski-koticek" 
+        element={
+          <LogopedskiKoticek />
+        }
+      />
+
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }
