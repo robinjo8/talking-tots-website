@@ -52,13 +52,15 @@ const otherGames = [{
   gradient: "from-app-orange/10 to-app-yellow/10",
   available: false
 }, {
-  id: "igra7",
-  title: "Igra 7",
-  description: "Kmalu na voljo",
+  id: "povezi-pare-matching",
+  title: "POVEŽI PARE - NOVI",
+  description: "Poveži enake slike med stolpci",
   icon: SquareDashed,
+  image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/povezi_pare.png",
   color: "text-app-purple",
   gradient: "from-app-purple/10 to-app-blue/10",
-  available: false
+  path: "/govorne-igre/povezi-pare-3-4",
+  available: true
 }, {
   id: "igra8",
   title: "Igra 8",

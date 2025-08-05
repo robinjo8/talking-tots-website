@@ -78,6 +78,8 @@ import PoveziPareGames3to4 from "@/pages/PoveziPareGames3to4";
 import PoveziPareGames5to6 from "@/pages/PoveziPareGames5to6";
 import PoveziPareGames7to8 from "@/pages/PoveziPareGames7to8";
 import PoveziPareGames9to10 from "@/pages/PoveziPareGames9to10";
+import MatchingGames3to4 from "@/pages/MatchingGames3to4";
+import MatchingGameLetter from "@/pages/MatchingGameLetter";
 
 export function AppRoutes() {
   return (
@@ -587,15 +589,6 @@ export function AppRoutes() {
       />
       
       <Route 
-        path="/govorne-igre/povezi-pare-3-4" 
-        element={
-          <ProtectedRoute>
-            <PoveziPareGames3to4 />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route 
         path="/govorne-igre/povezi-pare-5-6" 
         element={
           <ProtectedRoute>
@@ -618,15 +611,6 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <PoveziPareGames9to10 />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route 
-        path="/govorne-igre/povezi-pare/r" 
-        element={
-          <ProtectedRoute>
-            <PoveziPareR />
           </ProtectedRoute>
         }
       />
@@ -752,6 +736,25 @@ export function AppRoutes() {
         }
       />
       
+      {/* Matching Games Routes */}
+      <Route 
+        path="/govorne-igre/povezi-pare-3-4" 
+        element={
+          <ProtectedRoute>
+            <MatchingGames3to4 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/povezi-pare-3-4/:letter" 
+        element={
+          <ProtectedRoute>
+            <MatchingGameLetter />
+          </ProtectedRoute>
+        }
+      />
+
       <Route path="*" element={<NotFound />} />
       
       <Route 
