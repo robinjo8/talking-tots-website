@@ -73,7 +73,7 @@ import SestavljankeL78 from "@/pages/SestavljankeL78";
 import SestavljankeL910 from "@/pages/SestavljankeL910";
 import PoveziPareGames from "@/pages/PoveziPareGames";
 import PoveziPareR from "@/pages/PoveziPareR";
-import PoveziPareRouter from "@/pages/PoveziPareRouter";
+
 import PoveziPareGames3to4 from "@/pages/PoveziPareGames3to4";
 import PoveziPareGames5to6 from "@/pages/PoveziPareGames5to6";
 import PoveziPareGames5to6C from "@/pages/PoveziPareGames5to6C";
@@ -584,7 +584,7 @@ export function AppRoutes() {
         path="/govorne-igre/povezi-pare" 
         element={
           <ProtectedRoute>
-            <PoveziPareRouter />
+            <PoveziPareGames />
           </ProtectedRoute>
         }
       />

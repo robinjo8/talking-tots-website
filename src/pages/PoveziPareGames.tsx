@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { getAgeGroup } from "@/utils/ageUtils";
 
 export default function PoveziPareGames() {
   const navigate = useNavigate();
@@ -133,6 +134,36 @@ export default function PoveziPareGames() {
     navigate("/govorne-igre/povezi-pare/r");
   };
 
+  const handleCClick = () => {
+    if (!selectedChild?.age) {
+      navigate('/profile');
+      return;
+    }
+    
+    const childAge = selectedChild.age;
+    const ageGroup = getAgeGroup(childAge);
+    
+    let targetRoute = '';
+    switch (ageGroup) {
+      case '3-4':
+        targetRoute = `/govorne-igre/povezi-pare-3-4`;
+        break;
+      case '5-6':
+        targetRoute = `/govorne-igre/povezi-pare-5-6/c`;
+        break;
+      case '7-8':
+        targetRoute = `/govorne-igre/povezi-pare-7-8`;
+        break;
+      case '9-10':
+        targetRoute = `/govorne-igre/povezi-pare-9-10`;
+        break;
+      default:
+        targetRoute = `/govorne-igre/povezi-pare-3-4`;
+    }
+    
+    navigate(targetRoute);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -186,6 +217,26 @@ export default function PoveziPareGames() {
                 </p>
               </CardContent>
             </Card>
+            
+            <Card 
+              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col cursor-pointer hover:scale-105"
+              onClick={handleCClick}
+            >
+              <CardHeader className="bg-gradient-to-r from-dragon-green/10 to-app-teal/10 rounded-t-2xl pb-4">
+                <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
+                    <span className="text-2xl font-bold text-dragon-green">
+                      C
+                    </span>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6 pb-4 flex-grow text-center">
+                <p className="text-sm font-semibold mb-2 text-dragon-green">
+                  Poveži zvoke, sence in slike s črkami C, Č, K, L, R, S, Š, Z, Ž
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
@@ -195,7 +246,7 @@ export default function PoveziPareGames() {
             KMALU NA VOLJO
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {consonants.map((consonant, index) => (
+            {consonants.filter(consonant => consonant.letter !== 'C').map((consonant, index) => (
               <Card 
                 key={index} 
                 className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col opacity-60 cursor-not-allowed"
