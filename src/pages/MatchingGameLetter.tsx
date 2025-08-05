@@ -4,6 +4,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { AppLayout } from "@/components/AppLayout";
 import { MatchingGame } from '@/components/matching/MatchingGame';
+import { MatchingInstructionsModal } from '@/components/matching/MatchingInstructionsModal';
+import { MatchingCompletionDialog } from '@/components/matching/MatchingCompletionDialog';
 import { getLetterData, getImagesForAgeGroup } from '@/data/matchingGameData';
 import { getAgeGroup } from '@/utils/ageUtils';
 import { Button } from '@/components/ui/button';
@@ -16,6 +18,7 @@ export default function MatchingGameLetter() {
   const isMobile = useIsMobile();
   const [gameKey, setGameKey] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [showCompletion, setShowCompletion] = useState(false);
   const gameCompletedRef = useRef(false);
 
   // Check authentication
@@ -73,7 +76,7 @@ export default function MatchingGameLetter() {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
       console.log(`Game completed with score: ${score}`);
-      // Here you could save progress, show celebration, etc.
+      setShowCompletion(true);
     }
   };
 
@@ -166,6 +169,17 @@ export default function MatchingGameLetter() {
             />
           </div>
         </div>
+        
+        <MatchingInstructionsModal
+          isOpen={showInstructions}
+          onClose={() => setShowInstructions(false)}
+        />
+        
+        <MatchingCompletionDialog
+          isOpen={showCompletion}
+          onClose={() => setShowCompletion(false)}
+          images={images}
+        />
       </div>
     );
   }
@@ -197,6 +211,17 @@ export default function MatchingGameLetter() {
             className="w-full"
           />
         </div>
+        
+        <MatchingInstructionsModal
+          isOpen={showInstructions}
+          onClose={() => setShowInstructions(false)}
+        />
+        
+        <MatchingCompletionDialog
+          isOpen={showCompletion}
+          onClose={() => setShowCompletion(false)}
+          images={images}
+        />
       </div>
     </AppLayout>
   );
