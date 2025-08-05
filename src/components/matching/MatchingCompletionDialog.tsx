@@ -124,12 +124,15 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       audioStream.getTracks().forEach(track => track.stop());
       setAudioStream(null);
     }
-    // Only clear the current recording state, not all recording states
+    // Clear the current recording state and mark as completed
     if (currentRecordingIndex !== null) {
       setRecordingStates(prev => ({
         ...prev,
         [currentRecordingIndex]: false
       }));
+      // Mark as completed immediately when recording stops
+      setCompletedRecordings(prev => new Set([...prev, currentRecordingIndex]));
+      setCurrentRecordingIndex(null);
     }
     setRecordingTimeLeft(3);
   };
@@ -217,6 +220,19 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
   };
 
   const handleReset = () => {
+    // Clear any running countdown timer
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+      countdownRef.current = null;
+    }
+    // Stop any ongoing recording
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaRecorder.stop();
+    }
+    if (audioStream) {
+      audioStream.getTracks().forEach(track => track.stop());
+      setAudioStream(null);
+    }
     // Reset all recordings to allow re-recording
     setCompletedRecordings(new Set());
     setRecordingStates({});
