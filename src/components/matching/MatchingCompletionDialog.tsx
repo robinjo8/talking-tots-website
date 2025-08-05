@@ -180,7 +180,6 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     // Mark as completed first to prevent multiple clicks
     setCompletedRecordings(prev => new Set([...prev, imageIndex]));
     setCurrentRecordingIndex(null);
-
     try {
       const audioBlob = new Blob(recordingDataRef.current, {
         type: 'audio/webm'
@@ -236,7 +235,6 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     }
     startRecording(imageIndex, word);
   };
-
   const handleReset = () => {
     // Clear any running countdown timer
     if (countdownRef.current) {
@@ -265,9 +263,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-6 py-4">
-          <p className="text-center text-sm text-black">
-            Klikni na spodnje sličice in ponovi besede
-          </p>
+          <p className="text-center text-sm text-black">KLIKNI NA SPODNJE SLIČICE IN PONOVI BESEDE. ZA VSAKO SLIČICO IMAŠ 3 SEKUNDE ČASA. V KOLIKOR TI NE USPE, LAHKO PONOVIŠ Z GUMBOM »PONOVI«</p>
           
           {/* Display images in 2x2 grid */}
           <div className="grid grid-cols-2 gap-4 mx-auto max-w-xs">
