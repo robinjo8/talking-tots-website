@@ -188,12 +188,13 @@ export default function MatchingGameLetter() {
           </Button>
         </div>
         
-        <div className="w-full flex justify-center items-center p-4">
+        <div className="w-full bg-muted/30 flex justify-center items-center p-4 min-h-[calc(100vh-200px)]">
           <MatchingGame
             key={gameKey}
             images={images}
             numColumns={numColumns}
             onGameComplete={handleGameComplete}
+            className="w-full"
           />
         </div>
       </div>
