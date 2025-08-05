@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "@/pages/Index";
 import Login from "@/pages/Login";
@@ -516,11 +516,7 @@ export function AppRoutes() {
       
       <Route 
         path="/govorne-igre/povezi-pare/c" 
-        element={
-          <ProtectedRoute>
-            <PoveziPareC />
-          </ProtectedRoute>
-        }
+        element={<Navigate to="/govorne-igre/povezi-pare-3-4/c" replace />}
       />
       
       <Route 
