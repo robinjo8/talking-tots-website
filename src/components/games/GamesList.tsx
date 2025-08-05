@@ -24,16 +24,6 @@ const otherGames = [{
   path: "/govorne-igre/sestavljanke",
   available: true
 }, {
-  id: "povezi-pare",
-  title: "POVEŽI PARE",
-  description: "Poveži pare in vadi izgovorjavo",
-  icon: SquareDashed,
-  image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/povezi_pare.png",
-  color: "text-app-teal",
-  gradient: "from-app-teal/10 to-dragon-green/10",
-  path: "/govorne-igre/povezi-pare",
-  available: true
-}, {
   id: "zaporedja",
   title: "ZAPOREDJA",
   description: "Kmalu na voljo",
@@ -53,7 +43,7 @@ const otherGames = [{
   available: false
 }, {
   id: "povezi-pare-matching",
-  title: "POVEŽI PARE - NOVI",
+  title: "IGRA UJEMANJA",
   description: "Poveži enake slike med stolpci",
   icon: SquareDashed,
   image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/povezi_pare.png",
