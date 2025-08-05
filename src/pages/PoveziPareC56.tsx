@@ -6,15 +6,15 @@ import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { ThreeColumnGame } from "@/components/matching/ThreeColumnGame";
 import { getRandomThreeColumnItems } from "@/data/threeColumnMatchingData";
 import { useState } from "react";
+import { toast } from "sonner";
 
-export default function PoveziPareGames5to6C() {
+export default function PoveziPareC56() {
   const { selectedChild } = useAuth();
   const childName = selectedChild?.name;
   const [gameItems, setGameItems] = useState(() => getRandomThreeColumnItems(4, 'c'));
 
   const handleGameComplete = (score: number) => {
-    console.log(`Game completed with score: ${score}/4`);
-    // Here you could save progress to database if needed
+    toast.success(`Odlično! Dosegel si ${score} od 4 točk!`);
   };
 
   const startNewGame = () => {
@@ -26,7 +26,7 @@ export default function PoveziPareGames5to6C() {
       <div className="min-h-screen bg-background">
         <Header />
         
-        <div className="container max-w-7xl mx-auto pt-20 md:pt-24 pb-20 px-4">
+        <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
           {/* Instruction speech-bubble */}
           <Card className="mb-8 bg-gradient-to-r from-sky-50 to-green-50 border-dragon-green/30 shadow-md">
             <CardHeader className="pb-2">
@@ -44,13 +44,12 @@ export default function PoveziPareGames5to6C() {
                 />
               </div>
               <div className="flex-1">
-                <p className="text-lg font-medium italic">POVEŽI ZVOK, SENCO IN SLIKO! TO JE ZAHTEVNEJŠA IGRA ZA TVOJO STAROST!</p>
-                <p className="text-sm text-muted-foreground mt-2">IZBERI EN ZVOK, ENO SENCO IN ENO SLIKO, KI SE UJEMAJO!</p>
+                <p className="text-lg font-medium italic">ODLIČEN NAPREDEK! POVEŽI SLIKO, SENCO IN ZVOK ZA ČRKO C!</p>
+                <p className="text-sm text-muted-foreground mt-2">IZZIV ZA NAPREDNEJŠE OTROKE!</p>
               </div>
             </CardContent>
           </Card>
 
-          {/* Game */}
           <ThreeColumnGame 
             items={gameItems}
             onGameComplete={handleGameComplete}

@@ -73,11 +73,10 @@ import SestavljankeL78 from "@/pages/SestavljankeL78";
 import SestavljankeL910 from "@/pages/SestavljankeL910";
 import PoveziPareGames from "@/pages/PoveziPareGames";
 import PoveziPareR from "@/pages/PoveziPareR";
-import PoveziPareGames3to4 from "@/pages/PoveziPareGames3to4";
-import PoveziPareGames5to6 from "@/pages/PoveziPareGames5to6";
-import PoveziPareGames5to6C from "@/pages/PoveziPareGames5to6C";
-import PoveziPareGames7to8 from "@/pages/PoveziPareGames7to8";
-import PoveziPareGames9to10 from "@/pages/PoveziPareGames9to10";
+import PoveziPareC from "@/pages/PoveziPareC";
+import PoveziPareC56 from "@/pages/PoveziPareC56";
+import PoveziPareC78 from "@/pages/PoveziPareC78";
+import PoveziPareC910 from "@/pages/PoveziPareC910";
 import MatchingGames3to4 from "@/pages/MatchingGames3to4";
 import MatchingGameLetter from "@/pages/MatchingGameLetter";
 
@@ -516,37 +515,37 @@ export function AppRoutes() {
       />
       
       <Route 
-        path="/govorne-igre/povezi-pare-5-6" 
+        path="/govorne-igre/povezi-pare/c" 
         element={
           <ProtectedRoute>
-            <PoveziPareGames5to6 />
+            <PoveziPareC />
           </ProtectedRoute>
         }
       />
       
       <Route 
-        path="/govorne-igre/povezi-pare-5-6/c" 
+        path="/govorne-igre/povezi-pare/c56" 
         element={
           <ProtectedRoute>
-            <PoveziPareGames5to6C />
+            <PoveziPareC56 />
           </ProtectedRoute>
         }
       />
       
       <Route 
-        path="/govorne-igre/povezi-pare-7-8" 
+        path="/govorne-igre/povezi-pare/c78" 
         element={
           <ProtectedRoute>
-            <PoveziPareGames7to8 />
+            <PoveziPareC78 />
           </ProtectedRoute>
         }
       />
       
       <Route 
-        path="/govorne-igre/povezi-pare-9-10" 
+        path="/govorne-igre/povezi-pare/c910" 
         element={
           <ProtectedRoute>
-            <PoveziPareGames9to10 />
+            <PoveziPareC910 />
           </ProtectedRoute>
         }
       />

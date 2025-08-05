@@ -1,15 +1,25 @@
-
 import Header from "@/components/Header";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
+import { ThreeColumnGame } from "@/components/matching/ThreeColumnGame";
+import { getRandomThreeColumnItems } from "@/data/threeColumnMatchingData";
+import { useState } from "react";
+import { toast } from "sonner";
 
-export default function PoveziPareGames9to10() {
-  const {
-    selectedChild
-  } = useAuth();
+export default function PoveziPareC910() {
+  const { selectedChild } = useAuth();
   const childName = selectedChild?.name;
+  const [gameItems, setGameItems] = useState(() => getRandomThreeColumnItems(4, 'c'));
+
+  const handleGameComplete = (score: number) => {
+    toast.success(`Odlično! Dosegel si ${score} od 4 točk!`);
+  };
+
+  const startNewGame = () => {
+    setGameItems(getRandomThreeColumnItems(4, 'c'));
+  };
 
   return (
     <AgeGatedRoute requiredAgeGroup="9-10">
@@ -34,26 +44,16 @@ export default function PoveziPareGames9to10() {
                 />
               </div>
               <div className="flex-1">
-                <p className="text-lg font-medium italic">NEVERJETNO! SI POSTAL PRAVI MOJSTER BESED! PRIČAKAJO TE NAJTEŽJI IZZIVI!</p>
-                <p className="text-sm text-muted-foreground mt-2">IGRE ZA STAROST 9-10 LET - ZA NAJVEČJE STROKOVNJAKE!</p>
+                <p className="text-lg font-medium italic">NEVERJETNO! SI POSTAL PRAVI MOJSTER BESED! POVEŽI SLIKO, SENCO IN ZVOK ZA ČRKO C!</p>
+                <p className="text-sm text-muted-foreground mt-2">NAJTEŽJI IZZIVI ZA NAJVEČJE STROKOVNJAKE!</p>
               </div>
             </CardContent>
           </Card>
 
-          <div className="text-center py-20">
-            <h2 className="text-3xl font-bold mb-8 text-primary">
-              IGRE ZA STAROST 9-10 LET
-            </h2>
-            <div className="bg-gradient-to-r from-app-purple/10 to-app-blue/10 rounded-2xl p-8 max-w-2xl mx-auto">
-              <p className="text-xl mb-4">👑 MOJSTRSKI IZZIVI 👑</p>
-              <p className="text-lg text-muted-foreground">
-                Pripravljamo najbolj zahtevne naloge za prave mojstre!
-              </p>
-              <p className="text-sm text-muted-foreground mt-4">
-                Kmalu boš lahko preizkusil svoje mojstrstvo z najzahtevnejšimi besedami in izzivi.
-              </p>
-            </div>
-          </div>
+          <ThreeColumnGame 
+            items={gameItems}
+            onGameComplete={handleGameComplete}
+          />
         </div>
       </div>
     </AgeGatedRoute>

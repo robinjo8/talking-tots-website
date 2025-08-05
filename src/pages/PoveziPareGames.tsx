@@ -103,22 +103,12 @@ export default function PoveziPareGames() {
       // R game uses old structure
       targetRoute = `/govorne-igre/povezi-pare/r`;
     } else {
-      // C game uses new three-column structure
-      switch (ageGroup) {
-        case '3-4':
-          targetRoute = `/govorne-igre/povezi-pare-3-4`;
-          break;
-        case '5-6':
-          targetRoute = `/govorne-igre/povezi-pare-5-6/${game.letter.toLowerCase()}`;
-          break;
-        case '7-8':
-          targetRoute = `/govorne-igre/povezi-pare-7-8`;
-          break;
-        case '9-10':
-          targetRoute = `/govorne-igre/povezi-pare-9-10`;
-          break;
-        default:
-          targetRoute = `/govorne-igre/povezi-pare-3-4`;
+      // New three-column structure for C and other letters
+      const letter = game.letter.toLowerCase();
+      if (ageGroup === '3-4') {
+        targetRoute = `/govorne-igre/povezi-pare/${letter}`;
+      } else {
+        targetRoute = `/govorne-igre/povezi-pare/${letter}${ageGroup.replace('-', '')}`;
       }
     }
     

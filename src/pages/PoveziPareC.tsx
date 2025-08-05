@@ -1,18 +1,28 @@
-
 import Header from "@/components/Header";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
+import { ThreeColumnGame } from "@/components/matching/ThreeColumnGame";
+import { getRandomThreeColumnItems } from "@/data/threeColumnMatchingData";
+import { useState } from "react";
+import { toast } from "sonner";
 
-export default function PoveziPareGames5to6() {
-  const {
-    selectedChild
-  } = useAuth();
+export default function PoveziPareC() {
+  const { selectedChild } = useAuth();
   const childName = selectedChild?.name;
+  const [gameItems, setGameItems] = useState(() => getRandomThreeColumnItems(4, 'c'));
+
+  const handleGameComplete = (score: number) => {
+    toast.success(`Odlično! Dosegel si ${score} od 4 točk!`);
+  };
+
+  const startNewGame = () => {
+    setGameItems(getRandomThreeColumnItems(4, 'c'));
+  };
 
   return (
-    <AgeGatedRoute requiredAgeGroup="5-6">
+    <AgeGatedRoute requiredAgeGroup="3-4">
       <div className="min-h-screen bg-background">
         <Header />
         
@@ -34,31 +44,16 @@ export default function PoveziPareGames5to6() {
                 />
               </div>
               <div className="flex-1">
-                <p className="text-lg font-medium italic">ODLIČEN NAPREDEK! SEDAJ LAHKO POSKUSIŠ Z BOLJ ZAHTEVNIMI IGRAMI!</p>
-                <p className="text-sm text-muted-foreground mt-2">IGRE ZA STAROST 5-6 LET - IZZIVI ZA NAPREDNEJŠE OTROKE!</p>
+                <p className="text-lg font-medium italic">POVEŽI SLIKO, SENCO IN ZVOK ZA ČRKO C!</p>
+                <p className="text-sm text-muted-foreground mt-2">KLIKNI NA SLIKO, SENCO IN ZVOK, KI SODIJO SKUPAJ!</p>
               </div>
             </CardContent>
           </Card>
 
-          <div className="text-center py-20">
-            <h2 className="text-3xl font-bold mb-8 text-primary">
-              IGRE ZA STAROST 5-6 LET
-            </h2>
-            <div className="bg-gradient-to-r from-app-blue/10 to-app-purple/10 rounded-2xl p-8 max-w-2xl mx-auto">
-              <p className="text-xl mb-4">🎯 IZBERI IGRO</p>
-              <div className="space-y-4">
-                <a 
-                  href="/govorne-igre/povezi-pare-5-6/c"
-                  className="block w-full bg-dragon-green text-white py-4 px-6 rounded-lg hover:bg-dragon-green/90 transition-colors text-lg font-semibold"
-                >
-                  Poveži zvok, senco in sliko (C, Č, K, L, R, S, Š, Z, Ž)
-                </a>
-              </div>
-              <p className="text-sm text-muted-foreground mt-4">
-                Tri-kolonska igra za naprednejše otroke
-              </p>
-            </div>
-          </div>
+          <ThreeColumnGame 
+            items={gameItems}
+            onGameComplete={handleGameComplete}
+          />
         </div>
       </div>
     </AgeGatedRoute>
