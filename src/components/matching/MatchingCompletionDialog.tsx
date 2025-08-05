@@ -291,18 +291,16 @@ ZA VSAKO SLIČICO IMAŠ 3 SEKUNDE ČASA. V KOLIKOR TI NE USPE, LAHKO PONOVIŠ Z 
           })}
           </div>
 
-          {/* Reset button */}
-          <div className="flex justify-center">
-            <Button onClick={handleReset} variant="outline" className="gap-2">
+          {/* Action buttons */}
+          <div className="flex justify-center gap-4">
+            <Button onClick={handleReset} variant="outline" className="gap-2 flex-1 max-w-32">
               Ponovi
             </Button>
+            <Button onClick={handleClose} className="bg-dragon-green hover:bg-dragon-green/90 gap-2 flex-1 max-w-32">
+              <X className="w-4 h-4" />
+              Zapri
+            </Button>
           </div>
-        </div>
-        <div className="flex justify-center">
-          <Button onClick={handleClose} className="bg-dragon-green hover:bg-dragon-green/90 gap-2">
-            <X className="w-4 h-4" />
-            Zapri
-          </Button>
         </div>
       </DialogContent>
     </Dialog>;
