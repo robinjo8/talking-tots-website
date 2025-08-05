@@ -153,17 +153,29 @@ export function getLetterData(letter: string): LetterData | undefined {
   return matchingGameData.find(data => data.letter === letter);
 }
 
+// Utility function to shuffle array
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 export function getImagesForAgeGroup(images: MatchingGameImage[], ageGroup: string): MatchingGameImage[] {
+  const shuffledImages = shuffleArray(images);
+  
   switch (ageGroup) {
     case '3-4':
-      return images.slice(0, 4); // 4 images for youngest
+      return shuffledImages.slice(0, 4); // 4 randomly selected images for youngest
     case '5-6':
-      return images.slice(0, 6); // 6 images
+      return shuffledImages.slice(0, 6); // 6 randomly selected images
     case '7-8':
-      return images.slice(0, 8); // 8 images
+      return shuffledImages.slice(0, 8); // 8 randomly selected images
     case '9-10':
-      return images; // All 10 images for oldest
+      return shuffledImages; // All 10 images (shuffled) for oldest
     default:
-      return images.slice(0, 4);
+      return shuffledImages.slice(0, 4);
   }
 }
