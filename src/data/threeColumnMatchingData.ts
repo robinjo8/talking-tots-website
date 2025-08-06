@@ -6,6 +6,15 @@ export interface ThreeColumnMatchingItem {
   originalImage: string; // .png file in slike bucket
 }
 
+export interface FourColumnMatchingItem {
+  id: string;
+  word: string;
+  audioFile: string; // .m4a file in zvocni-posnetki bucket
+  writtenWord: string; // Written word in uppercase
+  shadowImage: string; // _senca.png file in slike-sence bucket
+  originalImage: string; // .png file in slike bucket
+}
+
 // Only words starting with letter C - as per user specifications
 export const threeColumnMatchingDataC: ThreeColumnMatchingItem[] = [
   { id: 'cedilo', word: 'CEDILO', audioFile: 'CEDILO.m4a', shadowImage: 'cedilo_senca.png', originalImage: 'cedilo.png' },
@@ -132,6 +141,20 @@ export const threeColumnMatchingDataŽ: ThreeColumnMatchingItem[] = [
   { id: 'zolna', word: 'ŽOLNA', audioFile: 'ZOLNA.m4a', shadowImage: 'zolna_senca.png', originalImage: 'zolna.png' }
 ];
 
+// Four-column data for 7-8 age group (letter C)
+export const fourColumnMatchingDataC: FourColumnMatchingItem[] = [
+  { id: 'cedilo', word: 'CEDILO', audioFile: 'CEDILO.m4a', writtenWord: 'CEDILO', shadowImage: 'cedilo_senca.png', originalImage: 'cedilo.png' },
+  { id: 'cekin', word: 'CEKIN', audioFile: 'CEKIN.m4a', writtenWord: 'CEKIN', shadowImage: 'cekin_senca.png', originalImage: 'cekin.png' },
+  { id: 'cerkev', word: 'CERKEV', audioFile: 'CERKEV.m4a', writtenWord: 'CERKEV', shadowImage: 'cerkev_senca.png', originalImage: 'cerkev.png' },
+  { id: 'cesta', word: 'CESTA', audioFile: 'CESTA.m4a', writtenWord: 'CESTA', shadowImage: 'cesta_senca.png', originalImage: 'cesta.png' },
+  { id: 'cev', word: 'CEV', audioFile: 'CEV.m4a', writtenWord: 'CEV', shadowImage: 'cev_senca.png', originalImage: 'cev.png' },
+  { id: 'cirkus', word: 'CIRKUS', audioFile: 'CIRKUS.m4a', writtenWord: 'CIRKUS', shadowImage: 'cirkus_senca.png', originalImage: 'cirkus.png' },
+  { id: 'cisterna', word: 'CISTERNA', audioFile: 'CISTERNA.m4a', writtenWord: 'CISTERNA', shadowImage: 'cisterna_senca.png', originalImage: 'cisterna.png' },
+  { id: 'cokla', word: 'COKLA', audioFile: 'COKLA.m4a', writtenWord: 'COKLA', shadowImage: 'cokla_senca.png', originalImage: 'cokla.png' },
+  { id: 'copat', word: 'COPAT', audioFile: 'COPAT.m4a', writtenWord: 'COPAT', shadowImage: 'copat_senca.png', originalImage: 'copat.png' },
+  { id: 'cvet', word: 'CVET', audioFile: 'CVET.m4a', writtenWord: 'CVET', shadowImage: 'cvet_senca.png', originalImage: 'cvet.png' }
+];
+
 // Function to get letter-specific data
 export function getLetterMatchingData(letter: string): ThreeColumnMatchingItem[] {
   switch (letter.toLowerCase()) {
@@ -160,6 +183,12 @@ export function getLetterMatchingData(letter: string): ThreeColumnMatchingItem[]
 
 export function getRandomThreeColumnItems(count: number = 4, letter?: string): ThreeColumnMatchingItem[] {
   const dataSet = letter ? getLetterMatchingData(letter) : threeColumnMatchingDataC;
+  const shuffled = [...dataSet].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, Math.min(count, dataSet.length));
+}
+
+export function getRandomFourColumnItems(count: number = 4, letter?: string): FourColumnMatchingItem[] {
+  const dataSet = letter?.toLowerCase() === 'c' ? fourColumnMatchingDataC : fourColumnMatchingDataC; // Only C for now
   const shuffled = [...dataSet].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, Math.min(count, dataSet.length));
 }
