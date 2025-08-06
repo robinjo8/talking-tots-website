@@ -189,21 +189,21 @@ export function ChildInformationForm({
                         <ChevronDown className="h-5 w-5 opacity-50" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[90vw] max-w-[420px] p-4 bg-white border-2 shadow-xl z-50" align="center">
-                      <h4 className="text-base font-medium mb-3 text-center">Izberi avatarja za otroka</h4>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 mb-4 max-h-[60vh] overflow-y-auto">
+                    <PopoverContent className="w-[90vw] max-w-[420px] p-3 bg-white border-2 shadow-xl z-50" align="center">
+                      <h4 className="text-sm font-medium mb-3 text-center">Izberi avatarja za otroka</h4>
+                      <div className="grid grid-cols-3 gap-1.5 sm:gap-3 mb-3">
                         {avatarOptions.slice(1).map(avatar => (
-                          <div 
+                          <div
                             key={avatar.id}
                             onClick={() => setTempAvatarSelection(prev => ({ ...prev, [child.id]: avatar.id }))}
                             className={cn(
-                              "cursor-pointer rounded-lg p-2 sm:p-3 transition-all duration-200 flex items-center justify-center min-h-[70px] sm:min-h-[90px] hover:shadow-lg border-2",
+                              "cursor-pointer rounded-lg p-1 sm:p-2 transition-all duration-200 flex items-center justify-center min-h-[60px] sm:min-h-[80px] hover:shadow-lg border-2",
                               (tempAvatarSelection[child.id] === avatar.id || (tempAvatarSelection[child.id] === undefined && child.avatarId === avatar.id))
                                 ? "bg-dragon-green/20 ring-2 ring-dragon-green shadow-xl scale-[1.02] border-dragon-green" 
                                 : "bg-white hover:bg-gray-50 border-gray-200 hover:border-dragon-green/40"
                             )}
                           >
-                            <Avatar className="h-12 w-12 sm:h-16 sm:w-16 ring-2 ring-transparent">
+                            <Avatar className="h-10 w-10 sm:h-14 sm:w-14 ring-2 ring-transparent">
                               <AvatarImage 
                                 src={avatar.src} 
                                 alt={avatar.alt} 
@@ -219,7 +219,7 @@ export function ChildInformationForm({
                         <Button 
                           type="button" 
                           onClick={() => confirmAvatarSelection(child.id)}
-                          className="w-full mb-2 bg-dragon-green hover:bg-dragon-green/90"
+                          className="w-full mb-2 bg-dragon-green hover:bg-dragon-green/90 text-sm py-2"
                         >
                           <Check className="h-4 w-4 mr-2" />
                           Potrdi izbiro
@@ -234,7 +234,7 @@ export function ChildInformationForm({
                           setTempAvatarSelection(prev => ({ ...prev, [child.id]: 0 }));
                           confirmAvatarSelection(child.id);
                         }}
-                        className="w-full"
+                        className="w-full text-sm py-2"
                       >
                         Ne želim izbrati avatarja
                       </Button>
