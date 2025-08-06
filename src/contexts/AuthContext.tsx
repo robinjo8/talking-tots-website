@@ -262,11 +262,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     try {
       console.log("Attempting to sign out...");
+      
+      // Check if we have a valid session before attempting signOut
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      
+      if (!currentSession) {
+        console.log("No active session found, clearing local state only");
+        // Clear local state even if no session exists
+        setUser(null);
+        setSession(null);
+        setProfile(null);
+        toast.success("Uspešno ste se odjavili");
+        return;
+      }
+      
       const { error } = await supabase.auth.signOut();
       
       if (error) {
         console.error("Error during sign out:", error);
-        toast.error("Napaka pri odjavi: " + error.message);
+        // Even if signOut fails, clear local state to ensure user appears logged out
+        setUser(null);
+        setSession(null);
+        setProfile(null);
+        
+        // Only show error for non-session related issues
+        if (!error.message.includes("session") && !error.message.includes("Session")) {
+          toast.error("Napaka pri odjavi: " + error.message);
+        } else {
+          toast.success("Uspešno ste se odjavili");
+        }
         return;
       }
       
@@ -279,7 +303,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       toast.success("Uspešno ste se odjavili");
     } catch (error) {
       console.error("Unexpected error during sign out:", error);
-      toast.error("Nepričakovana napaka pri odjavi");
+      // Always clear local state to ensure clean logout
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      toast.success("Uspešno ste se odjavili");
     }
   };
 
