@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +10,7 @@ import { Trash2, UserX, ChevronDown, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ChildProfile } from "@/hooks/registration/types";
 import { avatarOptions } from "@/components/AvatarSelector";
+
 type ChildInformationFormProps = {
   children: ChildProfile[];
   selectedChildIndex: number;
@@ -18,6 +18,7 @@ type ChildInformationFormProps = {
   updateChildField: (id: string, field: keyof ChildProfile, value: any) => void;
   error: string | null;
 };
+
 export function ChildInformationForm({
   children,
   selectedChildIndex,
@@ -51,26 +52,47 @@ export function ChildInformationForm({
       updateChildField(childId, "avatarId", selectedAvatarId);
     }
     setTempAvatarSelection(prev => ({ ...prev, [childId]: undefined }));
+    // Force close the popover
     setAvatarPopoverOpen(prev => ({ ...prev, [childId]: false }));
   };
-  return <div className="pt-4 border-t">
+
+  const handleNoAvatarSelection = (childId: string) => {
+    updateChildField(childId, "avatarId", 0);
+    setTempAvatarSelection(prev => ({ ...prev, [childId]: undefined }));
+    // Force close the popover
+    setAvatarPopoverOpen(prev => ({ ...prev, [childId]: false }));
+  };
+
+  return (
+    <div className="pt-4 border-t">
       <h3 className="text-lg font-medium mb-4">Podatki o otrocih</h3>
       
       <div className="space-y-6">
-        {children.map((child, index) => <div key={child.id} className={`p-4 border rounded-lg ${selectedChildIndex === index ? 'bg-sky-50/50 border-dragon-green' : 'bg-gray-50/50'}`}>
+        {children.map((child, index) => (
+          <div key={child.id} className={`p-4 border rounded-lg ${selectedChildIndex === index ? 'bg-sky-50/50 border-dragon-green' : 'bg-gray-50/50'}`}>
             <div className="flex justify-between items-center mb-3">
               <h4 className="font-medium">
                 Otrok {index + 1}
-                {child.isComplete && <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
+                {child.isComplete && (
+                  <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
                     Dokončano
-                  </span>}
+                  </span>
+                )}
               </h4>
             </div>
             
-            {selectedChildIndex === index ? <div className="space-y-4">
+            {selectedChildIndex === index ? (
+              <div className="space-y-4">
                 <div>
                   <Label htmlFor={`child-name-${child.id}`}>Ime otroka</Label>
-                  <Input id={`child-name-${child.id}`} value={child.name} onChange={e => updateChildField(child.id, "name", e.target.value)} placeholder="Vnesite ime otroka" className="mt-1" required />
+                  <Input
+                    id={`child-name-${child.id}`}
+                    value={child.name}
+                    onChange={(e) => updateChildField(child.id, "name", e.target.value)}
+                    placeholder="Vnesite ime otroka"
+                    className="mt-1"
+                    required
+                  />
                 </div>
                 
                 <div className="space-y-2">
@@ -149,12 +171,18 @@ export function ChildInformationForm({
                       </Select>
                     </div>
                   </div>
-                  {!child.birthDate && <p className="text-sm text-red-500">Datum rojstva je obvezen.</p>}
+                  {!child.birthDate && (
+                    <p className="text-sm text-red-500">Datum rojstva je obvezen.</p>
+                  )}
                 </div>
                 
                 <div>
                   <Label>Spol</Label>
-                  <RadioGroup value={child.gender} onValueChange={value => updateChildField(child.id, "gender", value)} className="flex space-x-4 mt-1">
+                  <RadioGroup 
+                    value={child.gender} 
+                    onValueChange={(value) => updateChildField(child.id, "gender", value)} 
+                    className="flex space-x-4 mt-1"
+                  >
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="M" id={`gender-m-${child.id}`} />
                       <Label htmlFor={`gender-m-${child.id}`} className="cursor-pointer">M</Label>
@@ -172,7 +200,10 @@ export function ChildInformationForm({
                 
                 <div>
                   <Label className="text-base font-medium mb-4 block">Izberi avatarja</Label>
-                  <Popover open={avatarPopoverOpen[child.id] || false} onOpenChange={(open) => setAvatarPopoverOpen(prev => ({ ...prev, [child.id]: open }))}>>
+                  <Popover 
+                    open={avatarPopoverOpen[child.id] || false} 
+                    onOpenChange={(open) => setAvatarPopoverOpen(prev => ({ ...prev, [child.id]: open }))}
+                  >
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
@@ -195,7 +226,7 @@ export function ChildInformationForm({
                       <h4 className="text-sm font-medium mb-3 text-center">Izberi avatarja za otroka</h4>
                       <div className="grid grid-cols-3 gap-1.5 sm:gap-3 mb-3">
                         {avatarOptions.slice(1).map(avatar => (
-                          <div
+                          <div 
                             key={avatar.id}
                             onClick={() => setTempAvatarSelection(prev => ({ ...prev, [child.id]: avatar.id }))}
                             className={cn(
@@ -232,10 +263,7 @@ export function ChildInformationForm({
                         type="button" 
                         variant="outline" 
                         size="sm" 
-                        onClick={() => {
-                          setTempAvatarSelection(prev => ({ ...prev, [child.id]: 0 }));
-                          confirmAvatarSelection(child.id);
-                        }}
+                        onClick={() => handleNoAvatarSelection(child.id)}
                         className="w-full text-sm py-2"
                       >
                         Ne želim izbrati avatarja
@@ -243,29 +271,48 @@ export function ChildInformationForm({
                     </PopoverContent>
                   </Popover>
                 </div>
-              </div> : <div className="flex items-center gap-3">
-                {child.avatarId === 0 ? <div className="h-12 w-12 rounded-full flex items-center justify-center bg-gray-100">
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                {child.avatarId === 0 ? (
+                  <div className="h-12 w-12 rounded-full flex items-center justify-center bg-gray-100">
                     <UserX className="h-6 w-6 text-gray-400" />
-                  </div> : <Avatar className="h-12 w-12">
+                  </div>
+                ) : (
+                  <Avatar className="h-12 w-12">
                     <AvatarImage src={avatarOptions.find(a => a.id === child.avatarId)?.src} alt="Avatar otroka" />
                     <AvatarFallback>{child.name.charAt(0)}</AvatarFallback>
-                  </Avatar>}
+                  </Avatar>
+                )}
                 <div>
                   <p className="font-medium">{child.name || "Brez imena"}</p>
                   <p className="text-sm text-gray-600">
                     Spol: {getGenderDisplayText(child.gender)}
                   </p>
-                  {child.birthDate && <p className="text-sm text-gray-600">
+                  {child.birthDate && (
+                    <p className="text-sm text-gray-600">
                       Datum rojstva: {child.birthDate.getDate()}.{child.birthDate.getMonth() + 1}.{child.birthDate.getFullYear()}
-                    </p>}
+                    </p>
+                  )}
                 </div>
-                <Button type="button" variant="outline" size="sm" className="ml-auto" onClick={() => setSelectedChildIndex(index)}>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm" 
+                  className="ml-auto" 
+                  onClick={() => setSelectedChildIndex(index)}
+                >
                   Uredi
                 </Button>
-              </div>}
-          </div>)}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
       
-      {error && error.includes("otrok") && <p className="text-sm text-red-500 mt-2">{error}</p>}
-    </div>;
+      {error && error.includes("otrok") && (
+        <p className="text-sm text-red-500 mt-2">{error}</p>
+      )}
+    </div>
+  );
 }
