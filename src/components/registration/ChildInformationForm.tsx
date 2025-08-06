@@ -26,6 +26,7 @@ export function ChildInformationForm({
   error
 }: ChildInformationFormProps) {
   const [tempAvatarSelection, setTempAvatarSelection] = useState<{ [childId: string]: number }>({});
+  const [avatarPopoverOpen, setAvatarPopoverOpen] = useState<{ [childId: string]: boolean }>({});
   
   // Function to get gender display text
   const getGenderDisplayText = (gender: string): string => {
@@ -50,6 +51,7 @@ export function ChildInformationForm({
       updateChildField(childId, "avatarId", selectedAvatarId);
     }
     setTempAvatarSelection(prev => ({ ...prev, [childId]: undefined }));
+    setAvatarPopoverOpen(prev => ({ ...prev, [childId]: false }));
   };
   return <div className="pt-4 border-t">
       <h3 className="text-lg font-medium mb-4">Podatki o otrocih</h3>
@@ -170,7 +172,7 @@ export function ChildInformationForm({
                 
                 <div>
                   <Label className="text-base font-medium mb-4 block">Izberi avatarja</Label>
-                  <Popover>
+                  <Popover open={avatarPopoverOpen[child.id] || false} onOpenChange={(open) => setAvatarPopoverOpen(prev => ({ ...prev, [child.id]: open }))}>>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
