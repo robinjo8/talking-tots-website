@@ -85,6 +85,22 @@ import IgraUjemanjaC from "@/pages/IgraUjemanjaC";
 import IgraUjemanjaC56 from "@/pages/IgraUjemanjaC56";
 import IgraUjemanjaC78 from "@/pages/IgraUjemanjaC78";
 import IgraUjemanjaC910 from "@/pages/IgraUjemanjaC910";
+import IgraUjemanjaR from "@/pages/IgraUjemanjaR";
+import IgraUjemanjaR56 from "@/pages/IgraUjemanjaR56";
+import IgraUjemanjaL from "@/pages/IgraUjemanjaL";
+import IgraUjemanjaL56 from "@/pages/IgraUjemanjaL56";
+import IgraUjemanjaK from "@/pages/IgraUjemanjaK";
+import IgraUjemanjaK56 from "@/pages/IgraUjemanjaK56";
+import IgraUjemanjaČ from "@/pages/IgraUjemanjaČ";
+import IgraUjemanjaČ56 from "@/pages/IgraUjemanjaČ56";
+import IgraUjemanjaS from "@/pages/IgraUjemanjaS";
+import IgraUjemanjaS56 from "@/pages/IgraUjemanjaS56";
+import IgraUjemanjaŠ from "@/pages/IgraUjemanjaŠ";
+import IgraUjemanjaŠ56 from "@/pages/IgraUjemanjaŠ56";
+import IgraUjemanjaZ from "@/pages/IgraUjemanjaZ";
+import IgraUjemanjaZ56 from "@/pages/IgraUjemanjaZ56";
+import IgraUjemanjaŽ from "@/pages/IgraUjemanjaŽ";
+import IgraUjemanjaŽ56 from "@/pages/IgraUjemanjaŽ56";
 
 export function AppRoutes() {
   return (
@@ -756,6 +772,150 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <IgraUjemanjaC910 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/igra-ujemanja/r" 
+        element={
+          <ProtectedRoute>
+            <IgraUjemanjaR />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/igra-ujemanja/r56" 
+        element={
+          <ProtectedRoute>
+            <IgraUjemanjaR56 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/igra-ujemanja/l" 
+        element={
+          <ProtectedRoute>
+            <IgraUjemanjaL />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/igra-ujemanja/l56" 
+        element={
+          <ProtectedRoute>
+            <IgraUjemanjaL56 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/igra-ujemanja/k" 
+        element={
+          <ProtectedRoute>
+            <IgraUjemanjaK />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/igra-ujemanja/k56" 
+        element={
+          <ProtectedRoute>
+            <IgraUjemanjaK56 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/igra-ujemanja/č" 
+        element={
+          <ProtectedRoute>
+            <IgraUjemanjaČ />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/igra-ujemanja/č56" 
+        element={
+          <ProtectedRoute>
+            <IgraUjemanjaČ56 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/igra-ujemanja/s" 
+        element={
+          <ProtectedRoute>
+            <IgraUjemanjaS />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/igra-ujemanja/s56" 
+        element={
+          <ProtectedRoute>
+            <IgraUjemanjaS56 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/igra-ujemanja/š" 
+        element={
+          <ProtectedRoute>
+            <IgraUjemanjaŠ />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/igra-ujemanja/š56" 
+        element={
+          <ProtectedRoute>
+            <IgraUjemanjaŠ56 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/igra-ujemanja/z" 
+        element={
+          <ProtectedRoute>
+            <IgraUjemanjaZ />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/igra-ujemanja/z56" 
+        element={
+          <ProtectedRoute>
+            <IgraUjemanjaZ56 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/igra-ujemanja/ž" 
+        element={
+          <ProtectedRoute>
+            <IgraUjemanjaŽ />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/igra-ujemanja/ž56" 
+        element={
+          <ProtectedRoute>
+            <IgraUjemanjaŽ56 />
           </ProtectedRoute>
         }
       />
