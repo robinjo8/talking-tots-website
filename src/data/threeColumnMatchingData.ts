@@ -143,16 +143,144 @@ export const threeColumnMatchingDataŽ: ThreeColumnMatchingItem[] = [
 
 // Four-column data for 7-8 age group (letter C)
 export const fourColumnMatchingDataC: FourColumnMatchingItem[] = [
-  { id: 'cedilo', word: 'CEDILO', audioFile: 'CEDILO.m4a', writtenWord: 'CEDILO', shadowImage: 'cedilo_senca.png', originalImage: 'cedilo.png' },
-  { id: 'cekin', word: 'CEKIN', audioFile: 'CEKIN.m4a', writtenWord: 'CEKIN', shadowImage: 'cekin_senca.png', originalImage: 'cekin.png' },
-  { id: 'cerkev', word: 'CERKEV', audioFile: 'CERKEV.m4a', writtenWord: 'CERKEV', shadowImage: 'cerkev_senca.png', originalImage: 'cerkev.png' },
-  { id: 'cesta', word: 'CESTA', audioFile: 'CESTA.m4a', writtenWord: 'CESTA', shadowImage: 'cesta_senca.png', originalImage: 'cesta.png' },
-  { id: 'cev', word: 'CEV', audioFile: 'CEV.m4a', writtenWord: 'CEV', shadowImage: 'cev_senca.png', originalImage: 'cev.png' },
-  { id: 'cirkus', word: 'CIRKUS', audioFile: 'CIRKUS.m4a', writtenWord: 'CIRKUS', shadowImage: 'cirkus_senca.png', originalImage: 'cirkus.png' },
-  { id: 'cisterna', word: 'CISTERNA', audioFile: 'CISTERNA.m4a', writtenWord: 'CISTERNA', shadowImage: 'cisterna_senca.png', originalImage: 'cisterna.png' },
-  { id: 'cokla', word: 'COKLA', audioFile: 'COKLA.m4a', writtenWord: 'COKLA', shadowImage: 'cokla_senca.png', originalImage: 'cokla.png' },
-  { id: 'copat', word: 'COPAT', audioFile: 'COPAT.m4a', writtenWord: 'COPAT', shadowImage: 'copat_senca.png', originalImage: 'copat.png' },
-  { id: 'cvet', word: 'CVET', audioFile: 'CVET.m4a', writtenWord: 'CVET', shadowImage: 'cvet_senca.png', originalImage: 'cvet.png' }
+  { id: 'cedilo', word: 'cedilo', audioFile: 'CEDILO.m4a', writtenWord: 'CEDILO', shadowImage: 'cedilo_senca.png', originalImage: 'cedilo.png' },
+  { id: 'cekin', word: 'cekin', audioFile: 'CEKIN.m4a', writtenWord: 'CEKIN', shadowImage: 'cekin_senca.png', originalImage: 'cekin.png' },
+  { id: 'cerkev', word: 'cerkev', audioFile: 'CERKEV.m4a', writtenWord: 'CERKEV', shadowImage: 'cerkev_senca.png', originalImage: 'cerkev.png' },
+  { id: 'cesta', word: 'cesta', audioFile: 'CESTA.m4a', writtenWord: 'CESTA', shadowImage: 'cesta_senca.png', originalImage: 'cesta.png' },
+  { id: 'cev', word: 'cev', audioFile: 'CEV.m4a', writtenWord: 'CEV', shadowImage: 'cev_senca.png', originalImage: 'cev.png' },
+  { id: 'cirkus', word: 'cirkus', audioFile: 'CIRKUS.m4a', writtenWord: 'CIRKUS', shadowImage: 'cirkus_senca.png', originalImage: 'cirkus.png' },
+  { id: 'cisterna', word: 'cisterna', audioFile: 'CISTERNA.m4a', writtenWord: 'CISTERNA', shadowImage: 'cisterna_senca.png', originalImage: 'cisterna.png' },
+  { id: 'cokla', word: 'cokla', audioFile: 'COKLA.m4a', writtenWord: 'COKLA', shadowImage: 'cokla_senca.png', originalImage: 'cokla.png' },
+  { id: 'copat', word: 'copat', audioFile: 'COPAT.m4a', writtenWord: 'COPAT', shadowImage: 'copat_senca.png', originalImage: 'copat.png' },
+  { id: 'cvet', word: 'cvet', audioFile: 'CVET.m4a', writtenWord: 'CVET', shadowImage: 'cvet_senca.png', originalImage: 'cvet.png' }
+];
+
+// Four-column data for letter Č
+export const fourColumnMatchingDataČ: FourColumnMatchingItem[] = [
+  { id: 'caj', word: 'čaj', audioFile: 'CAJ.m4a', writtenWord: 'ČAJ', shadowImage: 'caj_senca.png', originalImage: 'caj.png' },
+  { id: 'casopis', word: 'časopis', audioFile: 'CASOPIS.m4a', writtenWord: 'ČASOPIS', shadowImage: 'casopis_senca.png', originalImage: 'casopis.png' },
+  { id: 'cebela', word: 'čebela', audioFile: 'CEBELA.m4a', writtenWord: 'ČEBELA', shadowImage: 'cebela_senca.png', originalImage: 'cebela.png' },
+  { id: 'cebula', word: 'čebula', audioFile: 'CEBULA.m4a', writtenWord: 'ČEBULA', shadowImage: 'cebula_senca.png', originalImage: 'cebula.png' },
+  { id: 'cesen', word: 'česen', audioFile: 'CESEN.m4a', writtenWord: 'ČESEN', shadowImage: 'cesen_senca.png', originalImage: 'cesen.png' },
+  { id: 'cevlji', word: 'čevlji', audioFile: 'CEVLJI.m4a', writtenWord: 'ČEVLJI', shadowImage: 'cevlji_senca.png', originalImage: 'cevlji.png' },
+  { id: 'cokolada', word: 'čokolada', audioFile: 'COKOLADA.m4a', writtenWord: 'ČOKOLADA', shadowImage: 'cokolada_senca.png', originalImage: 'cokolada.png' },
+  { id: 'coln', word: 'čoln', audioFile: 'COLN.m4a', writtenWord: 'ČOLN', shadowImage: 'coln_senca.png', originalImage: 'coln.png' },
+  { id: 'copic', word: 'čopič', audioFile: 'COPIC.m4a', writtenWord: 'ČOPIČ', shadowImage: 'copic_senca.png', originalImage: 'copic.png' },
+  { id: 'crke', word: 'črke', audioFile: 'CRKE.m4a', writtenWord: 'ČRKE', shadowImage: 'crke_senca.png', originalImage: 'crke.png' }
+];
+
+// Four-column data for letter K
+export const fourColumnMatchingDataK: FourColumnMatchingItem[] = [
+  { id: 'kaca', word: 'kača', audioFile: 'KACA.m4a', writtenWord: 'KAČA', shadowImage: 'kaca_senca.png', originalImage: 'kaca.png' },
+  { id: 'kapa', word: 'kapa', audioFile: 'KAPA.m4a', writtenWord: 'KAPA', shadowImage: 'kapa_senca.png', originalImage: 'kapa.png' },
+  { id: 'kava', word: 'kava', audioFile: 'KAVA.m4a', writtenWord: 'KAVA', shadowImage: 'kava_senca.png', originalImage: 'kava.png' },
+  { id: 'klavir', word: 'klavir', audioFile: 'KLAVIR.m4a', writtenWord: 'KLAVIR', shadowImage: 'klavir_senca.png', originalImage: 'klavir.png' },
+  { id: 'kljuc', word: 'ključ', audioFile: 'KLJUC.m4a', writtenWord: 'KLJUČ', shadowImage: 'kljuc_senca.png', originalImage: 'kljuc.png' },
+  { id: 'klop', word: 'klop', audioFile: 'KLOP.m4a', writtenWord: 'KLOP', shadowImage: 'klop_senca.png', originalImage: 'klop.png' },
+  { id: 'knjiga', word: 'knjiga', audioFile: 'KNJIGA.m4a', writtenWord: 'KNJIGA', shadowImage: 'knjiga_senca.png', originalImage: 'knjiga.png' },
+  { id: 'kocka', word: 'kocka', audioFile: 'KOCKA.m4a', writtenWord: 'KOCKA', shadowImage: 'kocka_senca.png', originalImage: 'kocka.png' },
+  { id: 'kokos', word: 'kokoš', audioFile: 'KOKOS.m4a', writtenWord: 'KOKOŠ', shadowImage: 'kokos_senca.png', originalImage: 'kokos.png' },
+  { id: 'kolo', word: 'kolo', audioFile: 'KOLO.m4a', writtenWord: 'KOLO', shadowImage: 'kolo_senca.png', originalImage: 'kolo.png' },
+  { id: 'kost', word: 'kost', audioFile: 'KOST.m4a', writtenWord: 'KOST', shadowImage: 'kost_senca.png', originalImage: 'kost.png' },
+  { id: 'kos', word: 'koš', audioFile: 'KOS.m4a', writtenWord: 'KOŠ', shadowImage: 'kos_senca.png', originalImage: 'kos.png' },
+  { id: 'kosara', word: 'košara', audioFile: 'KOSARA.m4a', writtenWord: 'KOŠARA', shadowImage: 'kosara_senca.png', originalImage: 'kosara.png' },
+  { id: 'koza', word: 'koza', audioFile: 'KOZA.m4a', writtenWord: 'KOZA', shadowImage: 'koza_senca.png', originalImage: 'koza.png' },
+  { id: 'krava', word: 'krava', audioFile: 'KRAVA.m4a', writtenWord: 'KRAVA', shadowImage: 'krava_senca.png', originalImage: 'krava.png' },
+  { id: 'krof', word: 'krof', audioFile: 'KROF.m4a', writtenWord: 'KROF', shadowImage: 'krof_senca.png', originalImage: 'krof.png' },
+  { id: 'krog', word: 'krog', audioFile: 'KROG.m4a', writtenWord: 'KROG', shadowImage: 'krog_senca.png', originalImage: 'krog.png' },
+  { id: 'kruh', word: 'kruh', audioFile: 'KRUH.m4a', writtenWord: 'KRUH', shadowImage: 'kruh_senca.png', originalImage: 'kruh.png' },
+  { id: 'kumara', word: 'kumara', audioFile: 'KUMARA.m4a', writtenWord: 'KUMARA', shadowImage: 'kumara_senca.png', originalImage: 'kumara.png' },
+  { id: 'kuza', word: 'kuža', audioFile: 'KUZA.m4a', writtenWord: 'KUŽA', shadowImage: 'kuza_senca.png', originalImage: 'kuza.png' }
+];
+
+// Four-column data for letter L
+export const fourColumnMatchingDataL: FourColumnMatchingItem[] = [
+  { id: 'ladja', word: 'ladja', audioFile: 'LADJA.m4a', writtenWord: 'LADJA', shadowImage: 'ladja_senca.png', originalImage: 'ladja.png' },
+  { id: 'led', word: 'led', audioFile: 'LED.m4a', writtenWord: 'LED', shadowImage: 'led_senca.png', originalImage: 'led.png' },
+  { id: 'letalo', word: 'letalo', audioFile: 'LETALO.m4a', writtenWord: 'LETALO', shadowImage: 'letalo_senca.png', originalImage: 'letalo.png' },
+  { id: 'lev', word: 'lev', audioFile: 'LEV.m4a', writtenWord: 'LEV', shadowImage: 'lev_senca.png', originalImage: 'lev.png' },
+  { id: 'list', word: 'list', audioFile: 'LIST.m4a', writtenWord: 'LIST', shadowImage: 'list_senca.png', originalImage: 'list.png' },
+  { id: 'lizika', word: 'lizika', audioFile: 'LIZIKA.m4a', writtenWord: 'LIZIKA', shadowImage: 'lizika_senca.png', originalImage: 'lizika.png' },
+  { id: 'lonec', word: 'lonec', audioFile: 'LONEC.m4a', writtenWord: 'LONEC', shadowImage: 'lonec_senca.png', originalImage: 'lonec.png' },
+  { id: 'lopar', word: 'lopar', audioFile: 'LOPAR.m4a', writtenWord: 'LOPAR', shadowImage: 'lopar_senca.png', originalImage: 'lopar.png' },
+  { id: 'lubenica', word: 'lubenica', audioFile: 'LUBENICA.m4a', writtenWord: 'LUBENICA', shadowImage: 'lubenica_senca.png', originalImage: 'lubenica.png' },
+  { id: 'luc', word: 'luč', audioFile: 'LUC.m4a', writtenWord: 'LUČ', shadowImage: 'luc_senca.png', originalImage: 'luc.png' }
+];
+
+// Four-column data for letter R
+export const fourColumnMatchingDataR: FourColumnMatchingItem[] = [
+  { id: 'raca', word: 'raca', audioFile: 'RACA.m4a', writtenWord: 'RACA', shadowImage: 'raca_senca.png', originalImage: 'raca.png' },
+  { id: 'rak', word: 'rak', audioFile: 'RAK.m4a', writtenWord: 'RAK', shadowImage: 'rak_senca.png', originalImage: 'rak.png' },
+  { id: 'raketa', word: 'raketa', audioFile: 'RAKETA.m4a', writtenWord: 'RAKETA', shadowImage: 'raketa_senca.png', originalImage: 'raketa.png' },
+  { id: 'ravnilo', word: 'ravnilo', audioFile: 'RAVNILO.m4a', writtenWord: 'RAVNILO', shadowImage: 'ravnilo_senca.png', originalImage: 'ravnilo.png' },
+  { id: 'rep', word: 'rep', audioFile: 'REP.m4a', writtenWord: 'REP', shadowImage: 'rep_senca.png', originalImage: 'rep.png' },
+  { id: 'repa', word: 'repa', audioFile: 'REPA.m4a', writtenWord: 'REPA', shadowImage: 'repa_senca.png', originalImage: 'repa.png' },
+  { id: 'riba', word: 'riba', audioFile: 'RIBA.m4a', writtenWord: 'RIBA', shadowImage: 'riba_senca.png', originalImage: 'riba.png' },
+  { id: 'robot', word: 'robot', audioFile: 'ROBOT.m4a', writtenWord: 'ROBOT', shadowImage: 'robot_senca.png', originalImage: 'robot.png' },
+  { id: 'roka', word: 'roka', audioFile: 'ROKA.m4a', writtenWord: 'ROKA', shadowImage: 'roka_senca.png', originalImage: 'roka.png' },
+  { id: 'rolka', word: 'rolka', audioFile: 'ROLKA.m4a', writtenWord: 'ROLKA', shadowImage: 'rolka_senca.png', originalImage: 'rolka.png' },
+  { id: 'ropotuljica', word: 'ropotuljica', audioFile: 'ROPOTULJICA.m4a', writtenWord: 'ROPOTULJICA', shadowImage: 'ropotuljica_senca.png', originalImage: 'ropotuljica.png' },
+  { id: 'roza', word: 'roža', audioFile: 'ROZA.m4a', writtenWord: 'ROŽA', shadowImage: 'roza_senca.png', originalImage: 'roza.png' }
+];
+
+// Four-column data for letter S
+export const fourColumnMatchingDataS: FourColumnMatchingItem[] = [
+  { id: 'sedem', word: 'sedem', audioFile: 'SEDEM.m4a', writtenWord: 'SEDEM', shadowImage: 'sedem_senca.png', originalImage: 'sedem.png' },
+  { id: 'sir', word: 'sir', audioFile: 'SIR.m4a', writtenWord: 'SIR', shadowImage: 'sir_senca.png', originalImage: 'sir.png' },
+  { id: 'sladoled', word: 'sladoled', audioFile: 'SLADOLED.m4a', writtenWord: 'SLADOLED', shadowImage: 'sladoled_senca.png', originalImage: 'sladoled.png' },
+  { id: 'slika', word: 'slika', audioFile: 'SLIKA.m4a', writtenWord: 'SLIKA', shadowImage: 'slika_senca.png', originalImage: 'slika.png' },
+  { id: 'slon', word: 'slon', audioFile: 'SLON.m4a', writtenWord: 'SLON', shadowImage: 'slon_senca.png', originalImage: 'slon.png' },
+  { id: 'smreka', word: 'smreka', audioFile: 'SMREKA.m4a', writtenWord: 'SMREKA', shadowImage: 'smreka_senca.png', originalImage: 'smreka.png' },
+  { id: 'sneg', word: 'sneg', audioFile: 'SNEG.m4a', writtenWord: 'SNEG', shadowImage: 'sneg_senca.png', originalImage: 'sneg.png' },
+  { id: 'snezak', word: 'snežak', audioFile: 'SNEZAK.m4a', writtenWord: 'SNEŽAK', shadowImage: 'snezak_senca.png', originalImage: 'snezak.png' },
+  { id: 'sok', word: 'sok', audioFile: 'SOK.m4a', writtenWord: 'SOK', shadowImage: 'sok_senca.png', originalImage: 'sok.png' },
+  { id: 'sonce', word: 'sonce', audioFile: 'SONCE.m4a', writtenWord: 'SONCE', shadowImage: 'sonce_senca.png', originalImage: 'sonce.png' },
+  { id: 'sova', word: 'sova', audioFile: 'SOVA.m4a', writtenWord: 'SOVA', shadowImage: 'sova_senca.png', originalImage: 'sova.png' },
+  { id: 'stol', word: 'stol', audioFile: 'STOL.m4a', writtenWord: 'STOL', shadowImage: 'stol_senca.png', originalImage: 'stol.png' },
+  { id: 'svetilka', word: 'svetilka', audioFile: 'SVETILKA.m4a', writtenWord: 'SVETILKA', shadowImage: 'svetilka_senca.png', originalImage: 'svetilka.png' },
+  { id: 'svincnik', word: 'svinčnik', audioFile: 'SVINCNIK.m4a', writtenWord: 'SVINČNIK', shadowImage: 'svincnik_senca.png', originalImage: 'svincnik.png' }
+];
+
+// Four-column data for letter Š
+export const fourColumnMatchingDataŠ: FourColumnMatchingItem[] = [
+  { id: 'sah', word: 'šah', audioFile: 'SAH.m4a', writtenWord: 'ŠAH', shadowImage: 'sah_senca.png', originalImage: 'sah.png' },
+  { id: 'sal', word: 'šal', audioFile: 'SAL.m4a', writtenWord: 'ŠAL', shadowImage: 'sal_senca.png', originalImage: 'sal.png' },
+  { id: 'scetka', word: 'ščetka', audioFile: 'SCETKA.m4a', writtenWord: 'ŠČETKA', shadowImage: 'scetka_senca.png', originalImage: 'scetka.png' },
+  { id: 'skarje', word: 'škarje', audioFile: 'SKARJE.m4a', writtenWord: 'ŠKARJE', shadowImage: 'skarje_senca.png', originalImage: 'skarje.png' },
+  { id: 'skatla', word: 'škatla', audioFile: 'SKATLA.m4a', writtenWord: 'ŠKATLA', shadowImage: 'skatla_senca.png', originalImage: 'skatla.png' },
+  { id: 'skoljka', word: 'školjka', audioFile: 'SKOLJKA.m4a', writtenWord: 'ŠKOLJKA', shadowImage: 'skoljka_senca.png', originalImage: 'skoljka.png' },
+  { id: 'sopek', word: 'šopek', audioFile: 'SOPEK.m4a', writtenWord: 'ŠOPEK', shadowImage: 'sopek_senca.png', originalImage: 'sopek.png' },
+  { id: 'sotor', word: 'šotor', audioFile: 'SOTOR.m4a', writtenWord: 'ŠOTOR', shadowImage: 'sotor_senca.png', originalImage: 'sotor.png' },
+  { id: 'stampiljka', word: 'štampiljka', audioFile: 'STAMPILJKA.m4a', writtenWord: 'ŠTAMPILJKA', shadowImage: 'stampiljka_senca.png', originalImage: 'stampiljka.png' },
+  { id: 'storklja', word: 'štorklja', audioFile: 'STORKLJA.m4a', writtenWord: 'ŠTORKLJA', shadowImage: 'storklja_senca.png', originalImage: 'storklja.png' }
+];
+
+// Four-column data for letter Z
+export const fourColumnMatchingDataZ: FourColumnMatchingItem[] = [
+  { id: 'zajec', word: 'zajec', audioFile: 'ZAJEC.m4a', writtenWord: 'ZAJEC', shadowImage: 'zajec_senca.png', originalImage: 'zajec.png' },
+  { id: 'zaslon', word: 'zaslon', audioFile: 'ZASLON.m4a', writtenWord: 'ZASLON', shadowImage: 'zaslon_senca.png', originalImage: 'zaslon.png' },
+  { id: 'zavesa', word: 'zavese', audioFile: 'ZAVESA.m4a', writtenWord: 'ZAVESE', shadowImage: 'zavesa_senca.png', originalImage: 'zavesa.png' },
+  { id: 'zebra', word: 'zebra', audioFile: 'ZEBRA.m4a', writtenWord: 'ZEBRA', shadowImage: 'zebra_senca.png', originalImage: 'zebra.png' },
+  { id: 'zlato', word: 'zlato', audioFile: 'ZLATO.m4a', writtenWord: 'ZLATO', shadowImage: 'zlato_senca.png', originalImage: 'zlato.png' },
+  { id: 'zmaj', word: 'zmaj', audioFile: 'ZMAJ.m4a', writtenWord: 'ZMAJ', shadowImage: 'zmaj_senca.png', originalImage: 'zmaj.png' },
+  { id: 'zob', word: 'zob', audioFile: 'ZOB.m4a', writtenWord: 'ZOB', shadowImage: 'zob_senca.png', originalImage: 'zob.png' },
+  { id: 'zobotrebec', word: 'zobotrebec', audioFile: 'ZOBOTREBEC.m4a', writtenWord: 'ZOBOTREBEC', shadowImage: 'zobotrebec_senca.png', originalImage: 'zobotrebec.png' },
+  { id: 'zvezda', word: 'zvezda', audioFile: 'ZVEZDA.m4a', writtenWord: 'ZVEZDA', shadowImage: 'zvezda_senca.png', originalImage: 'zvezda.png' },
+  { id: 'zvocnik', word: 'zvočnik', audioFile: 'ZVOCNIK.m4a', writtenWord: 'ZVOČNIK', shadowImage: 'zvocnik_senca.png', originalImage: 'zvocnik.png' }
+];
+
+// Four-column data for letter Ž
+export const fourColumnMatchingDataŽ: FourColumnMatchingItem[] = [
+  { id: 'zaba', word: 'žaba', audioFile: 'ZABA.m4a', writtenWord: 'ŽABA', shadowImage: 'zaba_senca.png', originalImage: 'zaba.png' },
+  { id: 'zaga', word: 'žaga', audioFile: 'ZAGA.m4a', writtenWord: 'ŽAGA', shadowImage: 'zaga_senca.png', originalImage: 'zaga.png' },
+  { id: 'zarnica', word: 'žarnica', audioFile: 'ZARNICA.m4a', writtenWord: 'ŽARNICA', shadowImage: 'zarnica_senca.png', originalImage: 'zarnica.png' },
+  { id: 'zebelj', word: 'žebelj', audioFile: 'ZEBELJ.m4a', writtenWord: 'ŽEBELJ', shadowImage: 'zebelj_senca.png', originalImage: 'zebelj.png' },
+  { id: 'zelva', word: 'želva', audioFile: 'ZELVA.m4a', writtenWord: 'ŽELVA', shadowImage: 'zelva_senca.png', originalImage: 'zelva.png' },
+  { id: 'zerjav', word: 'žerjav', audioFile: 'ZERJAV.m4a', writtenWord: 'ŽERJAV', shadowImage: 'zerjav_senca.png', originalImage: 'zerjav.png' },
+  { id: 'zirafa', word: 'žirafa', audioFile: 'ZIRAFA.m4a', writtenWord: 'ŽIRAFA', shadowImage: 'zirafa_senca.png', originalImage: 'zirafa.png' },
+  { id: 'zlica', word: 'žlica', audioFile: 'ZLICA.m4a', writtenWord: 'ŽLICA', shadowImage: 'zlica_senca.png', originalImage: 'zlica.png' },
+  { id: 'zoga', word: 'žoga', audioFile: 'ZOGA.m4a', writtenWord: 'ŽOGA', shadowImage: 'zoga_senca.png', originalImage: 'zoga.png' },
+  { id: 'zolna', word: 'žolna', audioFile: 'ZOLNA.m4a', writtenWord: 'ŽOLNA', shadowImage: 'zolna_senca.png', originalImage: 'zolna.png' }
 ];
 
 // Function to get letter-specific data
@@ -181,6 +309,32 @@ export function getLetterMatchingData(letter: string): ThreeColumnMatchingItem[]
   }
 }
 
+// Function to get letter-specific four-column data
+export function getFourColumnLetterData(letter: string): FourColumnMatchingItem[] {
+  switch (letter.toLowerCase()) {
+    case 'c':
+      return fourColumnMatchingDataC;
+    case 'č':
+      return fourColumnMatchingDataČ;
+    case 'k':
+      return fourColumnMatchingDataK;
+    case 'l':
+      return fourColumnMatchingDataL;
+    case 'r':
+      return fourColumnMatchingDataR;
+    case 's':
+      return fourColumnMatchingDataS;
+    case 'š':
+      return fourColumnMatchingDataŠ;
+    case 'z':
+      return fourColumnMatchingDataZ;
+    case 'ž':
+      return fourColumnMatchingDataŽ;
+    default:
+      return fourColumnMatchingDataC; // Fallback to C
+  }
+}
+
 export function getRandomThreeColumnItems(count: number = 4, letter?: string): ThreeColumnMatchingItem[] {
   const dataSet = letter ? getLetterMatchingData(letter) : threeColumnMatchingDataC;
   const shuffled = [...dataSet].sort(() => Math.random() - 0.5);
@@ -188,7 +342,7 @@ export function getRandomThreeColumnItems(count: number = 4, letter?: string): T
 }
 
 export function getRandomFourColumnItems(count: number = 4, letter?: string): FourColumnMatchingItem[] {
-  const dataSet = letter?.toLowerCase() === 'c' ? fourColumnMatchingDataC : fourColumnMatchingDataC; // Only C for now
+  const dataSet = letter ? getFourColumnLetterData(letter) : fourColumnMatchingDataC;
   const shuffled = [...dataSet].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, Math.min(count, dataSet.length));
 }
