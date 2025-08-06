@@ -40,6 +40,13 @@ export function MobileMenu({
   const isActivePath = (path: string) => {
     return location.pathname === path;
   };
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  const handleCenikClick = () => {
+    setIsOpen(false);
+    onCenikScroll();
+  };
+
   return <div className="lg:hidden flex items-center gap-2">
       {/* Show selected child first (left side) */}
       {selectedChild && <div className="flex items-center gap-2">
@@ -55,7 +62,7 @@ export function MobileMenu({
         </div>}
       
       {/* Hamburger menu on the right */}
-      <Sheet>
+      <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
           <Button variant="ghost" size="sm" className="flex items-center ml-auto">
             <Menu className="h-5 w-5" />
@@ -66,7 +73,7 @@ export function MobileMenu({
             <div className="flex flex-col p-6 space-y-6">
               {/* Show Cenik only when NOT logged in */}
               {!user && <div className="flex flex-row items-center gap-2 pb-3">
-                  <Button type="button" variant="default" className="font-semibold flex-1 h-12 rounded-full text-base w-full uppercase" onClick={onCenikScroll}>
+                  <Button type="button" variant="default" className="font-semibold flex-1 h-12 rounded-full text-base w-full uppercase" onClick={handleCenikClick}>
                     Cenik
                   </Button>
                 </div>}
@@ -143,7 +150,7 @@ export function MobileMenu({
                     </Button>
                     
                     {/* Cenik */}
-                    <Button variant="ghost" className="w-full justify-start text-left h-12 uppercase" onClick={onCenikScroll}>
+                    <Button variant="ghost" className="w-full justify-start text-left h-12 uppercase" onClick={handleCenikClick}>
                       <CreditCard className="h-4 w-4 mr-2" />
                       Cenik
                     </Button>

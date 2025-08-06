@@ -102,7 +102,7 @@ export function PricingSection() {
             >
               <CardContent className="p-8">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-app-orange text-white text-sm px-4 py-1 rounded-full font-medium">
+                  <span className="bg-app-orange text-white text-sm px-4 py-1 rounded-full font-medium whitespace-nowrap">
                     Večina staršev izbere
                   </span>
                 </div>
