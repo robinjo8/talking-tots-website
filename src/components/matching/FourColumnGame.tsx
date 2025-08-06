@@ -66,7 +66,6 @@ export function FourColumnGame({ items, onGameComplete }: FourColumnGameProps) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 lg:gap-6">
           {/* Audio Column */}
           <div className="flex flex-col gap-2 md:gap-4">
-            <h3 className="text-center text-sm md:text-base font-semibold mb-2">Audio</h3>
             {gameState.shuffledAudio.map((itemId, index) => {
               const item = items.find(i => i.id === itemId);
               if (!item) return null;
@@ -94,7 +93,6 @@ export function FourColumnGame({ items, onGameComplete }: FourColumnGameProps) {
 
           {/* Written Word Column */}
           <div className="flex flex-col gap-2 md:gap-4">
-            <h3 className="text-center text-sm md:text-base font-semibold mb-2">Beseda</h3>
             {gameState.shuffledWritten.map((itemId, index) => {
               const item = items.find(i => i.id === itemId);
               if (!item) return null;
@@ -115,7 +113,6 @@ export function FourColumnGame({ items, onGameComplete }: FourColumnGameProps) {
 
           {/* Shadow Images Column */}
           <div className="flex flex-col gap-2 md:gap-4">
-            <h3 className="text-center text-sm md:text-base font-semibold mb-2">Senca</h3>
             {gameState.shuffledShadows.map((itemId, index) => {
               const item = items.find(i => i.id === itemId);
               if (!item) return null;
@@ -138,7 +135,6 @@ export function FourColumnGame({ items, onGameComplete }: FourColumnGameProps) {
 
           {/* Original Images Column */}
           <div className="flex flex-col gap-2 md:gap-4">
-            <h3 className="text-center text-sm md:text-base font-semibold mb-2">Slika</h3>
             {gameState.shuffledOriginals.map((itemId, index) => {
               const item = items.find(i => i.id === itemId);
               if (!item) return null;
