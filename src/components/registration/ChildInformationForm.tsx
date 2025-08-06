@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Trash2, UserX, ChevronDown } from "lucide-react";
+import { Trash2, UserX, ChevronDown, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ChildProfile } from "@/hooks/registration/types";
 import { avatarOptions } from "@/components/AvatarSelector";
@@ -25,6 +25,8 @@ export function ChildInformationForm({
   updateChildField,
   error
 }: ChildInformationFormProps) {
+  const [tempAvatarSelection, setTempAvatarSelection] = useState<{ [childId: string]: number }>({});
+  
   // Function to get gender display text
   const getGenderDisplayText = (gender: string): string => {
     switch (gender) {
@@ -40,6 +42,14 @@ export function ChildInformationForm({
       default:
         return "Ni izbrano";
     }
+  };
+
+  const confirmAvatarSelection = (childId: string) => {
+    const selectedAvatarId = tempAvatarSelection[childId];
+    if (selectedAvatarId !== undefined) {
+      updateChildField(childId, "avatarId", selectedAvatarId);
+    }
+    setTempAvatarSelection(prev => ({ ...prev, [childId]: undefined }));
   };
   return <div className="pt-4 border-t">
       <h3 className="text-lg font-medium mb-4">Podatki o otrocih</h3>
@@ -70,7 +80,8 @@ export function ChildInformationForm({
                         value={child.birthDate ? child.birthDate.getDate().toString() : ""} 
                         onValueChange={(value) => {
                           const currentDate = child.birthDate || new Date();
-                          const newDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), parseInt(value));
+                          // Create date with proper local time (noon to avoid timezone issues)
+                          const newDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), parseInt(value), 12, 0, 0);
                           updateChildField(child.id, "birthDate", newDate);
                         }}
                       >
@@ -90,7 +101,8 @@ export function ChildInformationForm({
                         value={child.birthDate ? child.birthDate.getMonth().toString() : ""} 
                         onValueChange={(value) => {
                           const currentDate = child.birthDate || new Date();
-                          const newDate = new Date(currentDate.getFullYear(), parseInt(value), currentDate.getDate());
+                          // Create date with proper local time (noon to avoid timezone issues)
+                          const newDate = new Date(currentDate.getFullYear(), parseInt(value), currentDate.getDate(), 12, 0, 0);
                           updateChildField(child.id, "birthDate", newDate);
                         }}
                       >
@@ -119,7 +131,8 @@ export function ChildInformationForm({
                         value={child.birthDate ? child.birthDate.getFullYear().toString() : ""} 
                         onValueChange={(value) => {
                           const currentDate = child.birthDate || new Date();
-                          const newDate = new Date(parseInt(value), currentDate.getMonth(), currentDate.getDate());
+                          // Create date with proper local time (noon to avoid timezone issues)
+                          const newDate = new Date(parseInt(value), currentDate.getMonth(), currentDate.getDate(), 12, 0, 0);
                           updateChildField(child.id, "birthDate", newDate);
                         }}
                       >
@@ -176,21 +189,21 @@ export function ChildInformationForm({
                         <ChevronDown className="h-5 w-5 opacity-50" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[420px] p-4 bg-white border-2 shadow-xl z-50" align="center">
+                    <PopoverContent className="w-[90vw] max-w-[420px] p-4 bg-white border-2 shadow-xl z-50" align="center">
                       <h4 className="text-base font-medium mb-3 text-center">Izberi avatarja za otroka</h4>
-                      <div className="grid grid-cols-3 gap-4 mb-4">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 mb-4 max-h-[60vh] overflow-y-auto">
                         {avatarOptions.slice(1).map(avatar => (
                           <div 
                             key={avatar.id}
-                            onClick={() => updateChildField(child.id, "avatarId", avatar.id)}
+                            onClick={() => setTempAvatarSelection(prev => ({ ...prev, [child.id]: avatar.id }))}
                             className={cn(
-                              "cursor-pointer rounded-lg p-3 transition-all duration-200 flex items-center justify-center min-h-[90px] hover:shadow-lg border-2",
-                              child.avatarId === avatar.id 
+                              "cursor-pointer rounded-lg p-2 sm:p-3 transition-all duration-200 flex items-center justify-center min-h-[70px] sm:min-h-[90px] hover:shadow-lg border-2",
+                              (tempAvatarSelection[child.id] === avatar.id || (tempAvatarSelection[child.id] === undefined && child.avatarId === avatar.id))
                                 ? "bg-dragon-green/20 ring-2 ring-dragon-green shadow-xl scale-[1.02] border-dragon-green" 
                                 : "bg-white hover:bg-gray-50 border-gray-200 hover:border-dragon-green/40"
                             )}
                           >
-                            <Avatar className="h-16 w-16 ring-2 ring-transparent">
+                            <Avatar className="h-12 w-12 sm:h-16 sm:w-16 ring-2 ring-transparent">
                               <AvatarImage 
                                 src={avatar.src} 
                                 alt={avatar.alt} 
@@ -201,11 +214,26 @@ export function ChildInformationForm({
                           </div>
                         ))}
                       </div>
+                      
+                      {(tempAvatarSelection[child.id] !== undefined || child.avatarId !== 0) && (
+                        <Button 
+                          type="button" 
+                          onClick={() => confirmAvatarSelection(child.id)}
+                          className="w-full mb-2 bg-dragon-green hover:bg-dragon-green/90"
+                        >
+                          <Check className="h-4 w-4 mr-2" />
+                          Potrdi izbiro
+                        </Button>
+                      )}
+                      
                       <Button 
                         type="button" 
                         variant="outline" 
                         size="sm" 
-                        onClick={() => updateChildField(child.id, "avatarId", 0)}
+                        onClick={() => {
+                          setTempAvatarSelection(prev => ({ ...prev, [child.id]: 0 }));
+                          confirmAvatarSelection(child.id);
+                        }}
                         className="w-full"
                       >
                         Ne želim izbrati avatarja

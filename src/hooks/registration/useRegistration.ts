@@ -147,7 +147,7 @@ export function useRegistration() {
       if (signInError) {
         console.error('Registration: Auto sign-in failed:', signInError);
         // Don't fail the registration, just inform the user
-        toast.success("Registracija uspešna! Prijavite se in dodajte otroke ročno v profilu.");
+        toast.success("Prosimo, potrdite svoj račun – prejeli boste potrditveno e-pošto.");
         navigate("/login");
         return;
       }
@@ -165,7 +165,7 @@ export function useRegistration() {
             parent_id: signInData.user.id,
             name: child.name.trim(),
             gender: child.gender,
-            birth_date: child.birthDate ? child.birthDate.toISOString().split('T')[0] : null,
+            birth_date: child.birthDate ? `${child.birthDate.getFullYear()}-${String(child.birthDate.getMonth() + 1).padStart(2, '0')}-${String(child.birthDate.getDate()).padStart(2, '0')}` : null,
             age: age,
             avatar_url: `/lovable-uploads/${child.avatarId || 1}.png`,
             speech_difficulties: child.speechDifficulties || [],
@@ -193,20 +193,20 @@ export function useRegistration() {
           });
           
           // Registration was successful, but children saving failed
-          toast.success("Registracija uspešna! Otroke dodajte ročno v profilu.");
+          toast.success("Prosimo, potrdite svoj račun – prejeli boste potrditveno e-pošto.");
           navigate("/");
           return;
         } else {
           console.log('Registration: Children inserted successfully:', insertedChildren);
           console.log('Registration: Number of children inserted:', insertedChildren?.length);
-          toast.success("Registracija uspešna! Otrok je bil shranjen v profil.");
+          toast.success("Prosimo, potrdite svoj račun – prejeli boste potrditveno e-pošto.");
           navigate("/");
           return;
         }
       }
       
       // Fallback if no children to save
-      toast.success("Registracija uspešna!");
+      toast.success("Prosimo, potrdite svoj račun – prejeli boste potrditveno e-pošto.");
       navigate("/");
       
     } catch (error: any) {
