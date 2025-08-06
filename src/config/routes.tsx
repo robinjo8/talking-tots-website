@@ -80,6 +80,11 @@ import PoveziPareC910 from "@/pages/PoveziPareC910";
 import MatchingGames3to4 from "@/pages/MatchingGames3to4";
 import MatchingGames5to6 from "@/pages/MatchingGames5to6";
 import MatchingGameLetter from "@/pages/MatchingGameLetter";
+import IgraUjemanja from "@/pages/IgraUjemanja";
+import IgraUjemanjaC from "@/pages/IgraUjemanjaC";
+import IgraUjemanjaC56 from "@/pages/IgraUjemanjaC56";
+import IgraUjemanjaC78 from "@/pages/IgraUjemanjaC78";
+import IgraUjemanjaC910 from "@/pages/IgraUjemanjaC910";
 
 export function AppRoutes() {
   return (
@@ -705,6 +710,52 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <MatchingGameLetter />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Igra Ujemanja Routes */}
+      <Route 
+        path="/govorne-igre/igra-ujemanja" 
+        element={
+          <ProtectedRoute>
+            <IgraUjemanja />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/igra-ujemanja/c" 
+        element={
+          <ProtectedRoute>
+            <IgraUjemanjaC />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/igra-ujemanja/c56" 
+        element={
+          <ProtectedRoute>
+            <IgraUjemanjaC56 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/igra-ujemanja/c78" 
+        element={
+          <ProtectedRoute>
+            <IgraUjemanjaC78 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/igra-ujemanja/c910" 
+        element={
+          <ProtectedRoute>
+            <IgraUjemanjaC910 />
           </ProtectedRoute>
         }
       />
