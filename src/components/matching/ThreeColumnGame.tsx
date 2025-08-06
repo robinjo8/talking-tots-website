@@ -1,4 +1,4 @@
-import { Play, Volume2 } from "lucide-react";
+import { Play, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ThreeColumnMatchingItem } from "@/data/threeColumnMatchingData";
@@ -24,14 +24,14 @@ export function ThreeColumnGame({ items, onGameComplete }: ThreeColumnGameProps)
   };
 
   const getAudioTileClass = (itemId: string) => {
-    const baseClass = "h-20 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105";
+    const baseClass = "w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105";
     if (isItemCompleted(itemId)) return `${baseClass} bg-green-100 border-green-300 opacity-60`;
     if (isItemSelected(itemId, 'audio')) return `${baseClass} bg-blue-100 border-blue-400 border-4`;
     return `${baseClass} bg-white border-gray-200 hover:border-blue-300`;
   };
 
   const getImageTileClass = (itemId: string, column: 'shadow' | 'original') => {
-    const baseClass = "h-20 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden";
+    const baseClass = "w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden";
     if (isItemCompleted(itemId)) return `${baseClass} bg-green-100 border-green-300 opacity-60`;
     if (isItemSelected(itemId, column)) return `${baseClass} bg-blue-100 border-blue-400 border-4`;
     return `${baseClass} bg-white border-gray-200 hover:border-blue-300`;
@@ -47,22 +47,12 @@ export function ThreeColumnGame({ items, onGameComplete }: ThreeColumnGameProps)
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-4">
-      {/* Header */}
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold mb-2">Poveži zvok, senco in sliko</h2>
-        <p className="text-muted-foreground">Rezultat: {gameState.score}/{items.length}</p>
-      </div>
-
-      {/* Game Grid */}
-      <div className="grid grid-cols-3 gap-6 mb-6">
-        {/* Audio Column */}
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold text-center mb-4 flex items-center justify-center gap-2">
-            <Volume2 className="w-5 h-5" />
-            Zvoki
-          </h3>
-          <div className="space-y-2">
+    <div className="w-full">
+      {/* Game area */}
+      <div className="relative rounded-xl p-6">
+        <div className="grid grid-cols-3 gap-6">
+          {/* Audio Column */}
+          <div className="flex flex-col gap-4">
             {gameState.shuffledAudio.map((itemId, index) => {
               const item = items.find(i => i.id === itemId);
               if (!item) return null;
@@ -88,12 +78,9 @@ export function ThreeColumnGame({ items, onGameComplete }: ThreeColumnGameProps)
               );
             })}
           </div>
-        </div>
 
-        {/* Shadow Images Column */}
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold text-center mb-4">Sence</h3>
-          <div className="space-y-2">
+          {/* Shadow Images Column */}
+          <div className="flex flex-col gap-4">
             {gameState.shuffledShadows.map((itemId, index) => {
               const item = items.find(i => i.id === itemId);
               if (!item) return null;
@@ -113,12 +100,9 @@ export function ThreeColumnGame({ items, onGameComplete }: ThreeColumnGameProps)
               );
             })}
           </div>
-        </div>
 
-        {/* Original Images Column */}
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold text-center mb-4">Slike</h3>
-          <div className="space-y-2">
+          {/* Original Images Column */}
+          <div className="flex flex-col gap-4">
             {gameState.shuffledOriginals.map((itemId, index) => {
               const item = items.find(i => i.id === itemId);
               if (!item) return null;
@@ -139,29 +123,31 @@ export function ThreeColumnGame({ items, onGameComplete }: ThreeColumnGameProps)
             })}
           </div>
         </div>
+
+        {/* Game completion indicator */}
+        {gameState.isComplete && (
+          <div className="mt-6 text-center">
+            <div className="flex items-center justify-center gap-2 text-dragon-green font-bold text-lg">
+              <Trophy className="h-6 w-6" />
+              <span>Uspešno dokončano!</span>
+            </div>
+          </div>
+        )}
+
+        {/* Progress indicator */}
+        {!gameState.isComplete && (
+          <div className="mt-6 text-center">
+            <div className="w-full bg-muted rounded-full h-2">
+              <div 
+                className="bg-dragon-green h-2 rounded-full transition-all duration-300"
+                style={{ 
+                  width: `${(gameState.score / items.length) * 100}%` 
+                }}
+              />
+            </div>
+          </div>
+        )}
       </div>
-
-      {/* Game completion */}
-      {gameState.isComplete && (
-        <Card className="p-6 text-center bg-green-50 border-green-200">
-          <h3 className="text-xl font-bold mb-2 text-green-800">Čestitamo!</h3>
-          <p className="text-green-700 mb-4">
-            Končali ste igro z rezultatom {gameState.score}/{items.length}!
-          </p>
-          <Button onClick={resetGame} className="bg-green-600 hover:bg-green-700">
-            Igraj znova
-          </Button>
-        </Card>
-      )}
-
-      {/* Reset button (when not completed) */}
-      {!gameState.isComplete && (
-        <div className="text-center">
-          <Button onClick={resetGame} variant="outline">
-            Začni znova
-          </Button>
-        </div>
-      )}
     </div>
   );
 }
