@@ -24,14 +24,14 @@ export function ThreeColumnGame({ items, onGameComplete }: ThreeColumnGameProps)
   };
 
   const getAudioTileClass = (itemId: string) => {
-    const baseClass = "w-24 h-24 md:w-32 md:h-32 lg:w-36 lg:h-36 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105";
+    const baseClass = "w-24 h-24 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105";
     if (isItemCompleted(itemId)) return `${baseClass} bg-green-100 border-green-300 opacity-60`;
     if (isItemSelected(itemId, 'audio')) return `${baseClass} bg-blue-100 border-blue-400 border-4`;
     return `${baseClass} bg-white border-gray-200 hover:border-blue-300`;
   };
 
   const getImageTileClass = (itemId: string, column: 'shadow' | 'original') => {
-    const baseClass = "w-24 h-24 md:w-32 md:h-32 lg:w-36 lg:h-36 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden";
+    const baseClass = "w-24 h-24 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden";
     if (isItemCompleted(itemId)) return `${baseClass} bg-green-100 border-green-300 opacity-60`;
     if (isItemSelected(itemId, column)) return `${baseClass} bg-blue-100 border-blue-400 border-4`;
     return `${baseClass} bg-white border-gray-200 hover:border-blue-300`;

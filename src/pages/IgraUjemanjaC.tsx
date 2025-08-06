@@ -51,7 +51,9 @@ export default function IgraUjemanjaC() {
   return (
     <AgeGatedRoute requiredAgeGroup="3-4">
       <div className="min-h-screen bg-background">
-        <div className="flex flex-col justify-center items-center min-h-screen px-4 py-8">
+        <Header />
+        
+        <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
           {/* Game Controls */}
           <div className="flex justify-center gap-4 mb-6">
             <Button onClick={handleNewGame} variant="outline" className="gap-2">
@@ -68,14 +70,12 @@ export default function IgraUjemanjaC() {
             </Button>
           </div>
 
-          <div className="w-full max-w-4xl">
-            <MatchingGame 
-              key={gameKey}
-              images={gameImages}
-              numColumns={2}
-              onGameComplete={handleGameComplete}
-            />
-          </div>
+          <MatchingGame 
+            key={gameKey}
+            images={gameImages}
+            numColumns={2}
+            onGameComplete={handleGameComplete}
+          />
         </div>
         
         <MatchingInstructionsModal

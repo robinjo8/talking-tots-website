@@ -65,7 +65,7 @@ export function MatchingGame({
                     isSelected={isTileSelected(image.word, columnIndex, index)}
                     isMatched={isTileMatched(image.word)}
                     onClick={() => handleTileClick(image.word, columnIndex, index)}
-                    className="mx-auto w-24 h-24 md:w-32 md:h-32 lg:w-36 lg:h-36"
+                    className="mx-auto w-24 h-24 md:w-48 md:h-48 lg:w-52 lg:h-52"
                     data-image-id={image.word}
                     data-column={columnIndex}
                     data-index={index}
