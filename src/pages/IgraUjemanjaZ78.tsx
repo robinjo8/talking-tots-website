@@ -155,11 +155,13 @@ export default function IgraUjemanjaZ78() {
         </div>
         
         <div className="w-full bg-muted/30 flex justify-center items-center p-4 min-h-[calc(100vh-200px)]">
-          <FourColumnGame
-            key={gameKey}
-            items={items}
-            onGameComplete={handleGameComplete}
-          />
+          <div className="w-full max-w-5xl">
+            <FourColumnGame
+              key={gameKey}
+              items={items}
+              onGameComplete={handleGameComplete}
+            />
+          </div>
         </div>
         
         <FourColumnInstructionsModal

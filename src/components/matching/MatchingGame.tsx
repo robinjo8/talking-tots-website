@@ -45,11 +45,11 @@ export function MatchingGame({
   }
 
   return (
-    <div className={cn("w-full", className)}>
+    <div className={cn("w-full flex justify-center", className)}>
       {/* Game area */}
       <div 
         ref={containerRef}
-        className="relative rounded-xl p-6"
+        className="relative rounded-xl p-6 w-full max-w-4xl"
       >
         <ConnectionLine connections={gameState.connections} containerRef={containerRef} />
         
@@ -65,7 +65,7 @@ export function MatchingGame({
                     isSelected={isTileSelected(image.word, columnIndex, index)}
                     isMatched={isTileMatched(image.word)}
                     onClick={() => handleTileClick(image.word, columnIndex, index)}
-                    className="mx-auto w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48"
+                    className="mx-auto w-24 h-24 md:w-32 md:h-32 lg:w-36 lg:h-36"
                     data-image-id={image.word}
                     data-column={columnIndex}
                     data-index={index}

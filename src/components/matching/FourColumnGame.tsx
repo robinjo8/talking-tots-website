@@ -60,10 +60,10 @@ export function FourColumnGame({ items, onGameComplete }: FourColumnGameProps) {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full flex justify-center">
       {/* Game area */}
-      <div className="relative rounded-xl p-2 md:p-4 lg:p-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 lg:gap-6">
+      <div className="relative rounded-xl p-2 md:p-4 lg:p-6 w-full max-w-4xl">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 lg:gap-6 justify-center">
           {/* Audio Column */}
           <div className="flex flex-col gap-2 md:gap-4">
             {gameState.shuffledAudio.map((itemId, index) => {
