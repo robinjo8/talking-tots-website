@@ -6,7 +6,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { FourColumnGame } from '@/components/matching/FourColumnGame';
 import { FourColumnInstructionsModal } from '@/components/matching/FourColumnInstructionsModal';
 import { MatchingCompletionDialog } from '@/components/matching/MatchingCompletionDialog';
-import { getRandomFourColumnItems } from '@/data/threeColumnMatchingData';
+import { getRandomFourColumnItems, FourColumnMatchingItem } from '@/data/threeColumnMatchingData';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, RotateCcw, BookOpen } from 'lucide-react';
 
@@ -18,6 +18,8 @@ export default function IgraUjemanjaK78() {
   const [gameKey, setGameKey] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
+  const [items, setItems] = useState<FourColumnMatchingItem[]>(() => getRandomFourColumnItems(4, 'k'));
+  const [completedItems, setCompletedItems] = useState<FourColumnMatchingItem[]>([]);
   const gameCompletedRef = useRef(false);
 
   // Check authentication
@@ -30,9 +32,6 @@ export default function IgraUjemanjaK78() {
   // Get letter data for four-column game (fixed to 'k')
   const upperCaseLetter = letter?.toUpperCase() || 'K';
   
-  // Get 4 random items for the four-column game
-  const items = getRandomFourColumnItems(4, 'k');
-  
   // Debug logging
   console.log('Four column items:', items);
 
@@ -41,12 +40,15 @@ export default function IgraUjemanjaK78() {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
       console.log(`Game completed with score: ${score}`);
+      setCompletedItems(items); // Capture the current items that were just completed
       setShowCompletion(true);
     }
   };
 
   const handleNewGame = () => {
     gameCompletedRef.current = false;
+    const newItems = getRandomFourColumnItems(4, 'k');
+    setItems(newItems);
     setGameKey(prev => prev + 1);
   };
 
@@ -130,7 +132,7 @@ export default function IgraUjemanjaK78() {
         <MatchingCompletionDialog
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
-          images={items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
+          images={completedItems.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
         />
       </div>
     );
@@ -170,7 +172,7 @@ export default function IgraUjemanjaK78() {
         <MatchingCompletionDialog
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
-          images={items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
+          images={completedItems.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
         />
       </div>
     </AppLayout>
