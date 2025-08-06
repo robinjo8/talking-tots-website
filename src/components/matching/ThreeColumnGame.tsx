@@ -61,16 +61,15 @@ export function ThreeColumnGame({ items, onGameComplete }: ThreeColumnGameProps)
                 <div
                   key={`audio-${itemId}-${index}`}
                   className={getAudioTileClass(itemId)}
-                  onClick={() => selectAudio(itemId)}
+                  onClick={() => {
+                    selectAudio(itemId);
+                    playAudioFile(item.audioFile);
+                  }}
                 >
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="p-2"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      playAudioFile(item.audioFile);
-                    }}
+                    className="p-2 pointer-events-none"
                   >
                     <Play className="w-6 h-6" />
                   </Button>
