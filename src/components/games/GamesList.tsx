@@ -49,7 +49,7 @@ const otherGames = [{
   image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/povezi_pare.png",
   color: "text-app-purple",
   gradient: "from-app-purple/10 to-app-blue/10",
-  path: "/govorne-igre/povezi-pare-5-6",
+  path: "/govorne-igre/povezi-pare",
   available: true
 }, {
   id: "igra8",
