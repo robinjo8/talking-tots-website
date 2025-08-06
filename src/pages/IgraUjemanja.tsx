@@ -21,6 +21,62 @@ const matchingGames = [{
   color: "text-app-purple",
   gradient: "from-app-purple/10 to-app-blue/10",
   available: true
+}, {
+  id: "igra-ujemanja-l",
+  title: "Igra Ujemanja - L",
+  description: "Povežite besedo s črko L s pravo sliko",
+  letter: "L",
+  color: "text-app-orange",
+  gradient: "from-app-orange/10 to-amber-300/10",
+  available: true
+}, {
+  id: "igra-ujemanja-k",
+  title: "Igra Ujemanja - K",
+  description: "Povežite besedo s črko K s pravo sliko",
+  letter: "K",
+  color: "text-blue-600",
+  gradient: "from-blue-600/10 to-cyan-400/10",
+  available: true
+}, {
+  id: "igra-ujemanja-č",
+  title: "Igra Ujemanja - Č",
+  description: "Povežite besedo s črko Č s pravo sliko",
+  letter: "Č",
+  color: "text-red-600",
+  gradient: "from-red-600/10 to-pink-400/10",
+  available: true
+}, {
+  id: "igra-ujemanja-s",
+  title: "Igra Ujemanja - S",
+  description: "Povežite besedo s črko S s pravo sliko",
+  letter: "S",
+  color: "text-green-600",
+  gradient: "from-green-600/10 to-emerald-400/10",
+  available: true
+}, {
+  id: "igra-ujemanja-š",
+  title: "Igra Ujemanja - Š",
+  description: "Povežite besedo s črko Š s pravo sliko",
+  letter: "Š",
+  color: "text-indigo-600",
+  gradient: "from-indigo-600/10 to-purple-400/10",
+  available: true
+}, {
+  id: "igra-ujemanja-z",
+  title: "Igra Ujemanja - Z",
+  description: "Povežite besedo s črko Z s pravo sliko",
+  letter: "Z",
+  color: "text-yellow-600",
+  gradient: "from-yellow-600/10 to-orange-400/10",
+  available: true
+}, {
+  id: "igra-ujemanja-ž",
+  title: "Igra Ujemanja - Ž",
+  description: "Povežite besedo s črko Ž s pravo sliko",
+  letter: "Ž",
+  color: "text-pink-600",
+  gradient: "from-pink-600/10 to-rose-400/10",
+  available: true
 }];
 
 export default function IgraUjemanja() {
