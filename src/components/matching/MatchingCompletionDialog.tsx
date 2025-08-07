@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Trophy, Mic, X } from "lucide-react";
+import { Trophy, Mic, X, Star } from "lucide-react";
 import { MatchingGameImage } from "@/data/matchingGameData";
 import { useAudioPlayback } from '@/hooks/useAudioPlayback';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,11 +11,13 @@ interface MatchingCompletionDialogProps {
   isOpen: boolean;
   onClose: () => void;
   images: MatchingGameImage[];
+  onStarClaimed?: () => void;
 }
 export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> = ({
   isOpen,
   onClose,
-  images
+  images,
+  onStarClaimed
 }) => {
   const [recordingStates, setRecordingStates] = useState<{
     [key: number]: boolean;
@@ -25,6 +27,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
   const [currentRecordingIndex, setCurrentRecordingIndex] = useState<number | null>(null);
+  const [starClaimed, setStarClaimed] = useState(false);
   const {
     playAudio
   } = useAudioPlayback();
@@ -45,6 +48,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       setCompletedRecordings(new Set());
       setRecordingTimeLeft(3);
       setCurrentRecordingIndex(null);
+      setStarClaimed(false);
       if (countdownRef.current) {
         clearInterval(countdownRef.current);
         countdownRef.current = null;
@@ -220,13 +224,29 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
   };
   const handleClose = () => {
     const allCompleted = completedRecordings.size === 4;
-    if (!allCompleted) {
+    if (allCompleted && !starClaimed) {
+      if (window.confirm("Če zapreš igro, ne boš prejel zvezdice. Ali si prepričan?")) {
+        onClose();
+      }
+    } else if (!allCompleted) {
       if (window.confirm("Ali ste prepričani, da se želite zapreti okno? Niste še končali vseh posnetkov.")) {
         onClose();
       }
     } else {
       onClose();
     }
+  };
+
+  const handleClaimStar = () => {
+    setStarClaimed(true);
+    onStarClaimed?.();
+    toast({
+      title: "Odlično!",
+      description: "Prejel si zvezdico! ⭐"
+    });
+    setTimeout(() => {
+      onClose();
+    }, 1500);
   };
   const handleImageClick = (imageIndex: number, word: string) => {
     // Prevent clicking if already completed or currently recording
@@ -292,14 +312,29 @@ ZA VSAKO SLIČICO IMAŠ 3 SEKUNDE ČASA. V KOLIKOR TI NE USPE, LAHKO PONOVIŠ Z 
           </div>
 
           {/* Action buttons */}
-          <div className="flex justify-center gap-4">
-            <Button onClick={handleReset} variant="outline" className="gap-2 flex-1 max-w-32">
+          <div className="flex justify-center gap-3">
+            <Button onClick={handleReset} variant="outline" className="gap-2 flex-1 max-w-28">
               Ponovi
             </Button>
-            <Button onClick={handleClose} className="bg-dragon-green hover:bg-dragon-green/90 gap-2 flex-1 max-w-32">
-              <X className="w-4 h-4" />
-              Zapri
-            </Button>
+            
+            {/* Show Claim Star button when all challenges completed */}
+            {completedRecordings.size === 4 && !starClaimed && (
+              <Button 
+                onClick={handleClaimStar} 
+                className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 flex-1 max-w-32"
+              >
+                <Star className="w-4 h-4" />
+                Vzemi zvezdico
+              </Button>
+            )}
+            
+            {/* Show Close button conditionally */}
+            {(completedRecordings.size < 4 || starClaimed) && (
+              <Button onClick={handleClose} className="bg-dragon-green hover:bg-dragon-green/90 gap-2 flex-1 max-w-28">
+                <X className="w-4 h-4" />
+                Zapri
+              </Button>
+            )}
           </div>
         </div>
       </DialogContent>

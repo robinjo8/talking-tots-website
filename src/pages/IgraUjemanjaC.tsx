@@ -10,10 +10,12 @@ import { MatchingInstructionsModal } from "@/components/matching/MatchingInstruc
 import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
 import { getLetterData, getImagesForAgeGroup } from "@/data/matchingGameData";
 import { useState, useRef } from "react";
+import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 
 export default function IgraUjemanjaC() {
   const navigate = useNavigate();
   const { selectedChild } = useAuth();
+  const { recordGameCompletion } = useEnhancedProgress();
   const childName = selectedChild?.name;
   const [gameKey, setGameKey] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
@@ -46,6 +48,10 @@ export default function IgraUjemanjaC() {
 
   const handleBack = () => {
     navigate('/govorne-igre/igra-ujemanja');
+  };
+
+  const handleStarClaimed = () => {
+    recordGameCompletion('memory', 'matching_c_3-4');
   };
 
   return (
@@ -87,6 +93,7 @@ export default function IgraUjemanjaC() {
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
           images={gameImages}
+          onStarClaimed={handleStarClaimed}
         />
       </div>
     </AgeGatedRoute>
