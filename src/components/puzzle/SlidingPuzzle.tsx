@@ -123,7 +123,7 @@ export const SlidingPuzzle: React.FC<SlidingPuzzleProps> = ({
             <div
               key={`${piece.id}-${index}`}
               className={`
-                w-32 h-32 md:w-40 md:h-40 relative cursor-pointer
+                w-32 h-32 md:w-64 md:h-64 relative cursor-pointer
                 ${piece.isEmpty ? 'bg-gray-300' : 'bg-white'}
                 ${!piece.isEmpty ? 'hover:opacity-80 transition-opacity' : ''}
                 rounded border-2 border-gray-600
