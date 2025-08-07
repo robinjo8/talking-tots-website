@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { AppLayout } from "@/components/AppLayout";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
+import { useEnhancedProgress } from '@/hooks/useEnhancedProgress';
 import { FourColumnGame } from '@/components/matching/FourColumnGame';
 import { FourColumnInstructionsModal } from '@/components/matching/FourColumnInstructionsModal';
 import { MatchingCompletionDialog } from '@/components/matching/MatchingCompletionDialog';
@@ -28,6 +29,7 @@ function IgraUjemanjaK910Content() {
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   const gameCompletedRef = useRef(false);
+  const { recordGameCompletion } = useEnhancedProgress();
 
   // Check authentication
   useEffect(() => {
@@ -52,6 +54,10 @@ function IgraUjemanjaK910Content() {
       console.log(`Game completed with score: ${score}`);
       setShowCompletion(true);
     }
+  };
+
+  const handleStarClaimed = () => {
+    recordGameCompletion('matching_k_9-10');
   };
 
   const handleNewGame = () => {
@@ -140,6 +146,7 @@ function IgraUjemanjaK910Content() {
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
           images={items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
+          onStarClaimed={handleStarClaimed}
         />
       </div>
     );
@@ -180,6 +187,7 @@ function IgraUjemanjaK910Content() {
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
           images={items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
+          onStarClaimed={handleStarClaimed}
         />
       </div>
     </AppLayout>

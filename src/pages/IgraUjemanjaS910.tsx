@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { AppLayout } from "@/components/AppLayout";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
+import { useEnhancedProgress } from '@/hooks/useEnhancedProgress';
 import { FourColumnGame } from '@/components/matching/FourColumnGame';
 import { FourColumnInstructionsModal } from '@/components/matching/FourColumnInstructionsModal';
 import { MatchingCompletionDialog } from '@/components/matching/MatchingCompletionDialog';
@@ -28,6 +29,11 @@ function IgraUjemanjaS910Content() {
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   const gameCompletedRef = useRef(false);
+  const { recordGameCompletion } = useEnhancedProgress();
+
+  const handleStarClaimed = () => {
+    recordGameCompletion('matching_s_9-10');
+  };
 
   // Check authentication
   useEffect(() => {
