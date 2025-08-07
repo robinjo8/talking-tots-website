@@ -146,6 +146,7 @@ function IgraUjemanjaŠ910Content() {
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
           images={items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
+          onStarClaimed={handleStarClaimed}
         />
       </div>
     );
@@ -186,6 +187,7 @@ function IgraUjemanjaŠ910Content() {
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
           images={items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
+          onStarClaimed={handleStarClaimed}
         />
       </div>
     </AppLayout>
