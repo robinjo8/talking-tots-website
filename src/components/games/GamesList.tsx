@@ -35,12 +35,13 @@ const otherGames = [{
 }, {
   id: "drsna-sestavljanka",
   title: "DRSNA SESTAVLJANKA",
-  description: "Kmalu na voljo",
+  description: "Drsne sestavljanke za vajo izgovorjave",
   icon: SquareDashed,
   image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/drsna_sestavljanka.png",
   color: "text-app-orange",
   gradient: "from-app-orange/10 to-app-yellow/10",
-  available: false
+  path: "/govorne-igre/drsna-sestavljanka",
+  available: true
 }, {
   id: "povezi-pare-matching",
   title: "IGRA UJEMANJA",
@@ -107,6 +108,7 @@ export function GamesList() {
                   className={`w-full rounded-2xl text-xs md:text-sm py-2 md:py-3 ${
                     game.id === "spomin" ? "bg-app-purple hover:bg-app-purple/90" :
                     game.id === "sestavljanke" ? "bg-app-teal hover:bg-app-teal/90" :
+                    game.id === "drsna-sestavljanka" ? "bg-app-orange hover:bg-app-orange/90" :
                     "bg-app-teal hover:bg-app-teal/90"
                   }`}
                   onClick={(e) => {
