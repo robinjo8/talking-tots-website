@@ -23,31 +23,32 @@ export function FourColumnGame({ items, onGameComplete }: FourColumnGameProps) {
   };
 
   const getAudioTileClass = (itemId: string) => {
-    const baseClass = "w-16 h-16 sm:w-20 sm:h-20 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105";
+    const baseClass = "w-18 h-18 sm:w-22 sm:h-22 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105";
     if (isItemCompleted(itemId)) return `${baseClass} bg-green-100 border-green-300 opacity-60`;
     if (isItemSelected(itemId, 'audio')) return `${baseClass} bg-blue-100 border-blue-400 border-4`;
     return `${baseClass} bg-white border-gray-200 hover:border-blue-300`;
   };
 
   const getWrittenTileClass = (itemId: string) => {
-    const baseClass = "w-16 h-16 sm:w-20 sm:h-20 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 p-2";
+    const baseClass = "w-18 h-18 sm:w-22 sm:h-22 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 p-1 sm:p-2";
     if (isItemCompleted(itemId)) return `${baseClass} bg-green-100 border-green-300 opacity-60`;
     if (isItemSelected(itemId, 'written')) return `${baseClass} bg-blue-100 border-blue-400 border-4`;
     return `${baseClass} bg-white border-gray-200 hover:border-blue-300`;
   };
 
   const getImageTileClass = (itemId: string, column: 'shadow' | 'original') => {
-    const baseClass = "w-16 h-16 sm:w-20 sm:h-20 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden";
+    const baseClass = "w-18 h-18 sm:w-22 sm:h-22 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden";
     if (isItemCompleted(itemId)) return `${baseClass} bg-green-100 border-green-300 opacity-60`;
     if (isItemSelected(itemId, column)) return `${baseClass} bg-blue-100 border-blue-400 border-4`;
     return `${baseClass} bg-white border-gray-200 hover:border-blue-300`;
   };
 
   const getFontSizeClass = (word: string) => {
-    if (word.length <= 4) return "text-xs sm:text-sm md:text-xl lg:text-2xl";
-    if (word.length <= 6) return "text-xs sm:text-sm md:text-lg lg:text-xl";
-    if (word.length <= 8) return "text-xs sm:text-xs md:text-base lg:text-lg";
-    return "text-xs sm:text-xs md:text-sm lg:text-base";
+    if (word.length <= 3) return "text-xs sm:text-sm md:text-xl lg:text-2xl";
+    if (word.length <= 5) return "text-xs sm:text-xs md:text-lg lg:text-xl";
+    if (word.length <= 7) return "text-xs sm:text-xs md:text-base lg:text-lg";
+    if (word.length <= 9) return "text-xs sm:text-xs md:text-sm lg:text-base";
+    return "text-xs sm:text-xs md:text-xs lg:text-sm";
   };
 
   // Handle game completion
