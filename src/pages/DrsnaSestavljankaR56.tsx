@@ -14,17 +14,17 @@ import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
 const rImages = [
   { filename: 'raca.png', word: 'RACA' },
-  { filename: 'raketa.png', word: 'RAKETA' },
   { filename: 'rak.png', word: 'RAK' },
+  { filename: 'raketa.png', word: 'RAKETA' },
   { filename: 'ravnilo.png', word: 'RAVNILO' },
-  { filename: 'repa.png', word: 'REPA' },
   { filename: 'rep.png', word: 'REP' },
+  { filename: 'repa.png', word: 'REPA' },
   { filename: 'riba.png', word: 'RIBA' },
   { filename: 'robot.png', word: 'ROBOT' },
   { filename: 'roka.png', word: 'ROKA' },
   { filename: 'rolka.png', word: 'ROLKA' },
   { filename: 'ropotuljica.png', word: 'ROPOTULJICA' },
-  { filename: 'roza.png', word: 'ROZA' }
+  { filename: 'roza.png', word: 'ROŽA' }
 ];
 
 const getRandomRImage = () => {

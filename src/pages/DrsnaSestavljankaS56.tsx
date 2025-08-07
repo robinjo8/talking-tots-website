@@ -13,14 +13,8 @@ import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
 const sImages = [
-  { filename: 'sah.png', word: 'ŠAH' },
-  { filename: 'sal.png', word: 'ŠAL' },
-  { filename: 'scetka.png', word: 'ŠČETKA' },
   { filename: 'sedem.png', word: 'SEDEM' },
   { filename: 'sir.png', word: 'SIR' },
-  { filename: 'skarje.png', word: 'ŠKARJE' },
-  { filename: 'skatla.png', word: 'ŠKATLA' },
-  { filename: 'skoljka.png', word: 'ŠKOLJKA' },
   { filename: 'sladoled.png', word: 'SLADOLED' },
   { filename: 'slika.png', word: 'SLIKA' },
   { filename: 'slon.png', word: 'SLON' },
@@ -29,12 +23,8 @@ const sImages = [
   { filename: 'snezak.png', word: 'SNEŽAK' },
   { filename: 'sok.png', word: 'SOK' },
   { filename: 'sonce.png', word: 'SONCE' },
-  { filename: 'sopek.png', word: 'ŠOPEK' },
-  { filename: 'sotor.png', word: 'ŠOTOR' },
   { filename: 'sova.png', word: 'SOVA' },
-  { filename: 'stampiljka.png', word: 'ŠTAMPILJKA' },
   { filename: 'stol.png', word: 'STOL' },
-  { filename: 'storklja.png', word: 'ŠTORKLJA' },
   { filename: 'svetilka.png', word: 'SVETILKA' },
   { filename: 'svincnik.png', word: 'SVINČNIK' }
 ];

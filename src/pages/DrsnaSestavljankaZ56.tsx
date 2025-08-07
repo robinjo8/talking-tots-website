@@ -13,24 +13,14 @@ import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
 const zImages = [
-  { filename: 'zaba.png', word: 'ŽABA' },
-  { filename: 'zaga.png', word: 'ŽAGA' },
   { filename: 'zajec.png', word: 'ZAJEC' },
-  { filename: 'zarnica.png', word: 'ŽARNICA' },
   { filename: 'zaslon.png', word: 'ZASLON' },
-  { filename: 'zavesa.png', word: 'ZAVESA' },
-  { filename: 'zebelj.png', word: 'ŽEBELJ' },
+  { filename: 'zavesa.png', word: 'ZAVESE' },
   { filename: 'zebra.png', word: 'ZEBRA' },
-  { filename: 'zelva.png', word: 'ŽELVA' },
-  { filename: 'zerjav.png', word: 'ŽERJAV' },
-  { filename: 'zirafa.png', word: 'ŽIRAFA' },
   { filename: 'zlato.png', word: 'ZLATO' },
-  { filename: 'zlica.png', word: 'ŽLICA' },
   { filename: 'zmaj.png', word: 'ZMAJ' },
-  { filename: 'zobotrebec.png', word: 'ZOBOTREBEC' },
   { filename: 'zob.png', word: 'ZOB' },
-  { filename: 'zoga.png', word: 'ŽOGA' },
-  { filename: 'zolna.png', word: 'ŽOLNA' },
+  { filename: 'zobotrebec.png', word: 'ZOBOTREBEC' },
   { filename: 'zvezda.png', word: 'ZVEZDA' },
   { filename: 'zvocnik.png', word: 'ZVOČNIK' }
 ];

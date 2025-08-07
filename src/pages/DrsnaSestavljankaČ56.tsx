@@ -13,16 +13,16 @@ import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
 const čImages = [
-  { filename: 'cedilo.png', word: 'CEDILO' },
-  { filename: 'cekin.png', word: 'CEKIN' },
-  { filename: 'cerkev.png', word: 'CERKEV' },
-  { filename: 'cesta.png', word: 'CESTA' },
-  { filename: 'cev.png', word: 'CEV' },
-  { filename: 'cirkus.png', word: 'CIRKUS' },
-  { filename: 'cisterna.png', word: 'CISTERNA' },
-  { filename: 'cokla.png', word: 'ČOKLA' },
-  { filename: 'copat.png', word: 'ČOPAT' },
-  { filename: 'cvet.png', word: 'CVET' }
+  { filename: 'caj.png', word: 'ČAJ' },
+  { filename: 'casopis.png', word: 'ČASOPIS' },
+  { filename: 'cebela.png', word: 'ČEBELA' },
+  { filename: 'cebula.png', word: 'ČEBULA' },
+  { filename: 'cesen.png', word: 'ČESEN' },
+  { filename: 'cevlji.png', word: 'ČEVLJI' },
+  { filename: 'cokolada.png', word: 'ČOKOLADA' },
+  { filename: 'coln.png', word: 'ČOLN' },
+  { filename: 'copic.png', word: 'ČOPIČ' },
+  { filename: 'crke.png', word: 'ČRKE' }
 ];
 
 const getRandomČImage = () => {
