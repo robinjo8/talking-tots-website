@@ -23,31 +23,31 @@ export function FourColumnGame({ items, onGameComplete }: FourColumnGameProps) {
   };
 
   const getAudioTileClass = (itemId: string) => {
-    const baseClass = "w-24 h-24 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105";
+    const baseClass = "w-16 h-16 sm:w-20 sm:h-20 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105";
     if (isItemCompleted(itemId)) return `${baseClass} bg-green-100 border-green-300 opacity-60`;
     if (isItemSelected(itemId, 'audio')) return `${baseClass} bg-blue-100 border-blue-400 border-4`;
     return `${baseClass} bg-white border-gray-200 hover:border-blue-300`;
   };
 
   const getWrittenTileClass = (itemId: string) => {
-    const baseClass = "w-24 h-24 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 p-2";
+    const baseClass = "w-16 h-16 sm:w-20 sm:h-20 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 p-2";
     if (isItemCompleted(itemId)) return `${baseClass} bg-green-100 border-green-300 opacity-60`;
     if (isItemSelected(itemId, 'written')) return `${baseClass} bg-blue-100 border-blue-400 border-4`;
     return `${baseClass} bg-white border-gray-200 hover:border-blue-300`;
   };
 
   const getImageTileClass = (itemId: string, column: 'shadow' | 'original') => {
-    const baseClass = "w-24 h-24 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden";
+    const baseClass = "w-16 h-16 sm:w-20 sm:h-20 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden";
     if (isItemCompleted(itemId)) return `${baseClass} bg-green-100 border-green-300 opacity-60`;
     if (isItemSelected(itemId, column)) return `${baseClass} bg-blue-100 border-blue-400 border-4`;
     return `${baseClass} bg-white border-gray-200 hover:border-blue-300`;
   };
 
   const getFontSizeClass = (word: string) => {
-    if (word.length <= 4) return "text-lg md:text-xl lg:text-2xl";
-    if (word.length <= 6) return "text-base md:text-lg lg:text-xl";
-    if (word.length <= 8) return "text-sm md:text-base lg:text-lg";
-    return "text-xs md:text-sm lg:text-base";
+    if (word.length <= 4) return "text-xs sm:text-sm md:text-xl lg:text-2xl";
+    if (word.length <= 6) return "text-xs sm:text-sm md:text-lg lg:text-xl";
+    if (word.length <= 8) return "text-xs sm:text-xs md:text-base lg:text-lg";
+    return "text-xs sm:text-xs md:text-sm lg:text-base";
   };
 
   // Handle game completion
@@ -63,9 +63,9 @@ export function FourColumnGame({ items, onGameComplete }: FourColumnGameProps) {
     <div className="w-full flex justify-center">
       {/* Game area */}
       <div className="relative rounded-xl p-2 md:p-4 lg:p-6 w-full max-w-4xl">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 lg:gap-6 justify-center">
+        <div className="grid grid-cols-4 gap-1 sm:gap-2 md:gap-4 lg:gap-6 justify-center">
           {/* Audio Column */}
-          <div className="flex flex-col gap-2 md:gap-4">
+          <div className="flex flex-col gap-1 sm:gap-2 md:gap-4">
             {gameState.shuffledAudio.map((itemId, index) => {
               const item = items.find(i => i.id === itemId);
               if (!item) return null;
@@ -84,7 +84,7 @@ export function FourColumnGame({ items, onGameComplete }: FourColumnGameProps) {
                     size="sm"
                     className="p-1 md:p-2 pointer-events-none"
                   >
-                    <Play className="w-4 h-4 md:w-6 md:h-6" />
+                    <Play className="w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6" />
                   </Button>
                 </div>
               );
@@ -92,7 +92,7 @@ export function FourColumnGame({ items, onGameComplete }: FourColumnGameProps) {
           </div>
 
           {/* Written Word Column */}
-          <div className="flex flex-col gap-2 md:gap-4">
+          <div className="flex flex-col gap-1 sm:gap-2 md:gap-4">
             {gameState.shuffledWritten.map((itemId, index) => {
               const item = items.find(i => i.id === itemId);
               if (!item) return null;
@@ -112,7 +112,7 @@ export function FourColumnGame({ items, onGameComplete }: FourColumnGameProps) {
           </div>
 
           {/* Shadow Images Column */}
-          <div className="flex flex-col gap-2 md:gap-4">
+          <div className="flex flex-col gap-1 sm:gap-2 md:gap-4">
             {gameState.shuffledShadows.map((itemId, index) => {
               const item = items.find(i => i.id === itemId);
               if (!item) return null;
@@ -134,7 +134,7 @@ export function FourColumnGame({ items, onGameComplete }: FourColumnGameProps) {
           </div>
 
           {/* Original Images Column */}
-          <div className="flex flex-col gap-2 md:gap-4">
+          <div className="flex flex-col gap-1 sm:gap-2 md:gap-4">
             {gameState.shuffledOriginals.map((itemId, index) => {
               const item = items.find(i => i.id === itemId);
               if (!item) return null;
