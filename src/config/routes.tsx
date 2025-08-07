@@ -32,6 +32,7 @@ import SpominL from "@/pages/SpominL";
 import ArtikuacijskiTest from "@/pages/ArtikuacijskiTest";
 import Sestavljanke from "@/pages/Sestavljanke";
 import DrsnaSestavljanka from "@/pages/DrsnaSestavljanka";
+import DrsnaSestavljankaC56 from "@/pages/DrsnaSestavljankaC56";
 import SestavljankeGames from "@/pages/SestavljankeGames";
 import SestavljankeR from "@/pages/SestavljankeR";
 import SestavljankeRRouter from "@/pages/SestavljankeRRouter";
@@ -222,11 +223,20 @@ export function AppRoutes() {
         }
       />
       
-      <Route 
+        <Route 
         path="/govorne-igre/drsna-sestavljanka" 
         element={
           <ProtectedRoute>
             <DrsnaSestavljanka />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/c56" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaC56 />
           </ProtectedRoute>
         }
       />
