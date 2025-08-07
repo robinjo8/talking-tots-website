@@ -71,12 +71,6 @@ import SestavljankeL from "@/pages/SestavljankeL";
 import SestavljankeL56 from "@/pages/SestavljankeL56";
 import SestavljankeL78 from "@/pages/SestavljankeL78";
 import SestavljankeL910 from "@/pages/SestavljankeL910";
-import PoveziPareGames from "@/pages/PoveziPareGames";
-import PoveziPareR from "@/pages/PoveziPareR";
-import PoveziPareC from "@/pages/PoveziPareC";
-import PoveziPareC56 from "@/pages/PoveziPareC56";
-import PoveziPareC78 from "@/pages/PoveziPareC78";
-import PoveziPareC910 from "@/pages/PoveziPareC910";
 import MatchingGames3to4 from "@/pages/MatchingGames3to4";
 import MatchingGames5to6 from "@/pages/MatchingGames5to6";
 import MatchingGameLetter from "@/pages/MatchingGameLetter";
@@ -542,45 +536,6 @@ export function AppRoutes() {
         }
       />
       
-      {/* Povezi Pare Routes */}
-      <Route 
-        path="/govorne-igre/povezi-pare" 
-        element={
-          <ProtectedRoute>
-            <PoveziPareGames />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route
-        path="/govorne-igre/povezi-pare/c" 
-        element={<Navigate to="/govorne-igre/povezi-pare-3-4/c" replace />}
-      />
-      
-      {/* Backward compatibility redirects */}
-      <Route 
-        path="/govorne-igre/povezi-pare/c56" 
-        element={<Navigate to="/govorne-igre/povezi-pare-5-6/c" replace />}
-      />
-      
-      <Route 
-        path="/govorne-igre/povezi-pare/c78" 
-        element={<Navigate to="/govorne-igre/povezi-pare-7-8/c" replace />}
-      />
-      
-      <Route 
-        path="/govorne-igre/povezi-pare/c910" 
-        element={<Navigate to="/govorne-igre/povezi-pare-9-10/c" replace />}
-      />
-      
-      <Route 
-        path="/govorne-igre/povezi-pare/r" 
-        element={
-          <ProtectedRoute>
-            <PoveziPareR />
-          </ProtectedRoute>
-        }
-      />
       
       {/* Spomin Game Routes */}
       <Route 

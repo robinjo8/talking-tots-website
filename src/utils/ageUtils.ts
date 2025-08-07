@@ -10,7 +10,7 @@ export function getAgeGroup(age: number): AgeGroup {
 }
 
 export function getRouteForAgeGroup(ageGroup: AgeGroup): string {
-  return `/govorne-igre/povezi-pare-${ageGroup}`;
+  return `/govorne-igre/igra-ujemanja-${ageGroup}`;
 }
 
 export function shouldAllowNextLevel(childAge: number, requiredAgeGroup: AgeGroup): boolean {
