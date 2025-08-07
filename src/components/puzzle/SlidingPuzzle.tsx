@@ -106,7 +106,19 @@ export const SlidingPuzzle: React.FC<SlidingPuzzleProps> = ({
   return (
     <div className={`${className} flex justify-center items-center`}>
       <div className="relative">
-        <div className="grid grid-cols-3 gap-1 bg-gray-800 p-2 rounded-lg shadow-lg">
+        {/* Silhouette background - positioned behind the puzzle */}
+        <div 
+          className="absolute inset-0 rounded-lg opacity-15 pointer-events-none"
+          style={{
+            backgroundImage: `url(${imageUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            filter: 'brightness(0.3) contrast(2)',
+            zIndex: 0
+          }}
+        />
+        
+        <div className="relative grid grid-cols-3 gap-1 bg-gray-800 p-2 rounded-lg shadow-lg" style={{ zIndex: 1 }}>
           {pieces.map((piece, index) => (
             <div
               key={`${piece.id}-${index}`}
@@ -125,6 +137,13 @@ export const SlidingPuzzle: React.FC<SlidingPuzzleProps> = ({
                   `${(piece.id % 3) * -100}% ${Math.floor(piece.id / 3) * -100}%`
               }}
             >
+              {/* Number overlay for non-empty pieces */}
+              {!piece.isEmpty && (
+                <div className="absolute top-1 right-1 bg-black/70 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {piece.id + 1}
+                </div>
+              )}
+              
               {piece.isEmpty && !isCompleted && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-4 h-4 bg-gray-500 rounded-full opacity-50"></div>
