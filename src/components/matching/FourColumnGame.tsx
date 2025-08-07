@@ -23,24 +23,24 @@ export function FourColumnGame({ items, onGameComplete }: FourColumnGameProps) {
   };
 
   const getAudioTileClass = (itemId: string) => {
-    const baseClass = "w-18 h-18 sm:w-22 sm:h-22 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden";
-    if (isItemCompleted(itemId)) return `${baseClass} bg-green-100 border-green-300 opacity-60`;
-    if (isItemSelected(itemId, 'audio')) return `${baseClass} bg-blue-100 border-blue-400 border-4`;
-    return `${baseClass} bg-white border-gray-200 hover:border-blue-300`;
+    const baseClass = "w-20 h-20 sm:w-24 sm:h-24 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden bg-white";
+    if (isItemCompleted(itemId)) return `${baseClass} border-green-300 bg-green-100 opacity-60`;
+    if (isItemSelected(itemId, 'audio')) return `${baseClass} border-blue-400 bg-blue-100 border-4`;
+    return `${baseClass} border-gray-200 hover:border-blue-300`;
   };
 
   const getWrittenTileClass = (itemId: string) => {
-    const baseClass = "w-18 h-18 sm:w-22 sm:h-22 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden p-1 sm:p-2";
-    if (isItemCompleted(itemId)) return `${baseClass} bg-green-100 border-green-300 opacity-60`;
-    if (isItemSelected(itemId, 'written')) return `${baseClass} bg-blue-100 border-blue-400 border-4`;
-    return `${baseClass} bg-white border-gray-200 hover:border-blue-300`;
+    const baseClass = "w-20 h-20 sm:w-24 sm:h-24 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden bg-white p-1";
+    if (isItemCompleted(itemId)) return `${baseClass} border-green-300 bg-green-100 opacity-60`;
+    if (isItemSelected(itemId, 'written')) return `${baseClass} border-blue-400 bg-blue-100 border-4`;
+    return `${baseClass} border-gray-200 hover:border-blue-300`;
   };
 
   const getImageTileClass = (itemId: string, column: 'shadow' | 'original') => {
-    const baseClass = "w-18 h-18 sm:w-22 sm:h-22 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden";
-    if (isItemCompleted(itemId)) return `${baseClass} bg-green-100 border-green-300 opacity-60`;
-    if (isItemSelected(itemId, column)) return `${baseClass} bg-blue-100 border-blue-400 border-4`;
-    return `${baseClass} bg-white border-gray-200 hover:border-blue-300`;
+    const baseClass = "w-20 h-20 sm:w-24 sm:h-24 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden bg-white";
+    if (isItemCompleted(itemId)) return `${baseClass} border-green-300 bg-green-100 opacity-60`;
+    if (isItemSelected(itemId, column)) return `${baseClass} border-blue-400 bg-blue-100 border-4`;
+    return `${baseClass} border-gray-200 hover:border-blue-300`;
   };
 
   const getFontSizeClass = (word: string) => {
