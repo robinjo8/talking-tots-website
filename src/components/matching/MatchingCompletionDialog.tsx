@@ -318,7 +318,7 @@ ZA VSAKO SLIČICO IMAŠ 3 SEKUNDE ČASA. V KOLIKOR TI NE USPE, LAHKO PONOVIŠ Z 
             </Button>
             
             {/* Show Claim Star button when all challenges completed */}
-            {completedRecordings.size === 4 && !starClaimed && (
+            {completedRecordings.size === images.length && !starClaimed && (
               <Button 
                 onClick={handleClaimStar} 
                 className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 flex-1 max-w-32"
@@ -329,7 +329,7 @@ ZA VSAKO SLIČICO IMAŠ 3 SEKUNDE ČASA. V KOLIKOR TI NE USPE, LAHKO PONOVIŠ Z 
             )}
             
             {/* Show Close button conditionally */}
-            {(completedRecordings.size < 4 || starClaimed) && (
+            {(completedRecordings.size < images.length || starClaimed) && (
               <Button onClick={handleClose} className="bg-dragon-green hover:bg-dragon-green/90 gap-2 flex-1 max-w-28">
                 <X className="w-4 h-4" />
                 Zapri
