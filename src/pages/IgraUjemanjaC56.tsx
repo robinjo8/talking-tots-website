@@ -150,34 +150,32 @@ export default function IgraUjemanjaC56() {
   return (
     <AppLayout>
       <div className="w-full min-h-screen bg-background">
-        <div className="p-4 flex-shrink-0">
-          <div className="flex justify-between gap-3">
-            <Button
-              variant="outline"
-              onClick={handleBack}
-              className="gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Nazaj
-            </Button>
-            
-            <Button
-              onClick={handleNewGame}
-              className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
-            >
-              <RotateCcw className="h-4 w-4" />
-              Nova igra
-            </Button>
-            
-            <Button
-              variant="outline"
-              onClick={handleInstructions}
-              className="gap-2"
-            >
-              <BookOpen className="h-4 w-4" />
-              Navodila
-            </Button>
-          </div>
+        <div className="flex justify-center gap-4 p-4">
+          <Button
+            variant="outline"
+            onClick={handleBack}
+            className="gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Nazaj
+          </Button>
+          
+          <Button
+            onClick={handleNewGame}
+            className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
+          >
+            <RotateCcw className="h-4 w-4" />
+            Nova igra
+          </Button>
+          
+          <Button
+            variant="outline"
+            onClick={handleInstructions}
+            className="gap-2"
+          >
+            <BookOpen className="h-4 w-4" />
+            Navodila
+          </Button>
         </div>
         
         <div className="w-full bg-muted/30 flex justify-center items-center p-4 min-h-[calc(100vh-200px)]">
