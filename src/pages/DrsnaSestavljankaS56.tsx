@@ -13,24 +13,30 @@ import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
 const sImages = [
-  { filename: 'saje.png', word: 'SAJE' },
-  { filename: 'salam.png', word: 'SALAM' },
-  { filename: 'sani.png', word: 'SANI' },
-  { filename: 'sadje.png', word: 'SADJE' },
-  { filename: 'semafor.png', word: 'SEMAFOR' },
-  { filename: 'sito.png', word: 'SITO' },
-  { filename: 'sladoled.png', word: 'SLADOLED' },
-  { filename: 'slon.png', word: 'SLON' },
-  { filename: 'sova.png', word: 'SOVA' },
-  { filename: 'sveca.png', word: 'SVEČA' },
-  { filename: 'swing.png', word: 'SWING' },
+  { filename: 'sah.png', word: 'ŠAH' },
+  { filename: 'sal.png', word: 'ŠAL' },
+  { filename: 'scetka.png', word: 'ŠČETKA' },
+  { filename: 'sedem.png', word: 'SEDEM' },
   { filename: 'sir.png', word: 'SIR' },
-  { filename: 'soline.png', word: 'SOLINE' },
-  { filename: 'stopnice.png', word: 'STOPNICE' },
-  { filename: 'suh.png', word: 'SUH' },
-  { filename: 'solata.png', word: 'SOLATA' },
-  { filename: 'solze.png', word: 'SOLZE' },
-  { filename: 'sonce.png', word: 'SONCE' }
+  { filename: 'skarje.png', word: 'ŠKARJE' },
+  { filename: 'skatla.png', word: 'ŠKATLA' },
+  { filename: 'skoljka.png', word: 'ŠKOLJKA' },
+  { filename: 'sladoled.png', word: 'SLADOLED' },
+  { filename: 'slika.png', word: 'SLIKA' },
+  { filename: 'slon.png', word: 'SLON' },
+  { filename: 'smreka.png', word: 'SMREKA' },
+  { filename: 'sneg.png', word: 'SNEG' },
+  { filename: 'snezak.png', word: 'SNEŽAK' },
+  { filename: 'sok.png', word: 'SOK' },
+  { filename: 'sonce.png', word: 'SONCE' },
+  { filename: 'sopek.png', word: 'ŠOPEK' },
+  { filename: 'sotor.png', word: 'ŠOTOR' },
+  { filename: 'sova.png', word: 'SOVA' },
+  { filename: 'stampiljka.png', word: 'ŠTAMPILJKA' },
+  { filename: 'stol.png', word: 'STOL' },
+  { filename: 'storklja.png', word: 'ŠTORKLJA' },
+  { filename: 'svetilka.png', word: 'SVETILKA' },
+  { filename: 'svincnik.png', word: 'SVINČNIK' }
 ];
 
 const getRandomSImage = () => {
@@ -57,7 +63,7 @@ function DrsnaSestavljankaS56Content() {
   const gameCompletedRef = useRef(false);
   const effectiveFullscreen = isMobile;
   
-  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke/${currentImage.filename}`;
+  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentImage.filename}`;
   
   const handleComplete = () => {
     if (!gameCompletedRef.current) {

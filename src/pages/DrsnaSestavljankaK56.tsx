@@ -14,23 +14,23 @@ import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
 const kImages = [
   { filename: 'kaca.png', word: 'KAČA' },
-  { filename: 'kajak.png', word: 'KAJAK' },
-  { filename: 'kaktus.png', word: 'KAKTUS' },
-  { filename: 'kamen.png', word: 'KAMEN' },
-  { filename: 'kapljica.png', word: 'KAPLJICA' },
+  { filename: 'kapa.png', word: 'KAPA' },
   { filename: 'kava.png', word: 'KAVA' },
-  { filename: 'kip.png', word: 'KIP' },
-  { filename: 'klobuk.png', word: 'KLOBUK' },
-  { filename: 'klovn.png', word: 'KLOVN' },
-  { filename: 'kokoš.png', word: 'KOKOŠ' },
-  { filename: 'konj.png', word: 'KONJ' },
-  { filename: 'košara.png', word: 'KOŠARA' },
+  { filename: 'klavir.png', word: 'KLAVIR' },
+  { filename: 'kljuc.png', word: 'KLJUČ' },
+  { filename: 'klop.png', word: 'KLOP' },
+  { filename: 'knjiga.png', word: 'KNJIGA' },
+  { filename: 'kocka.png', word: 'KOCKA' },
+  { filename: 'kokos.png', word: 'KOKOS' },
+  { filename: 'kolo.png', word: 'KOLO' },
+  { filename: 'kosara.png', word: 'KOŠARA' },
+  { filename: 'kos.png', word: 'KOS' },
   { filename: 'kost.png', word: 'KOST' },
-  { filename: 'kovček.png', word: 'KOVČEK' },
   { filename: 'koza.png', word: 'KOZA' },
+  { filename: 'krava.png', word: 'KRAVA' },
   { filename: 'kruh.png', word: 'KRUH' },
-  { filename: 'kura.png', word: 'KURA' },
-  { filename: 'kuverta.png', word: 'KUVERTA' }
+  { filename: 'kumara.png', word: 'KUMARA' },
+  { filename: 'kuza.png', word: 'KUŽA' }
 ];
 
 const getRandomKImage = () => {
@@ -57,7 +57,7 @@ function DrsnaSestavljankaK56Content() {
   const gameCompletedRef = useRef(false);
   const effectiveFullscreen = isMobile;
   
-  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke/${currentImage.filename}`;
+  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentImage.filename}`;
   
   const handleComplete = () => {
     if (!gameCompletedRef.current) {

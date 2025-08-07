@@ -13,16 +13,16 @@ import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
 const žImages = [
-  { filename: 'žaba.png', word: 'ŽABA' },
-  { filename: 'žaga.png', word: 'ŽAGA' },
-  { filename: 'žakelj.png', word: 'ŽAKELJ' },
-  { filename: 'žebelj.png', word: 'ŽEBELJ' },
-  { filename: 'ženska.png', word: 'ŽENSKA' },
-  { filename: 'žiga.png', word: 'ŽIGA' },
-  { filename: 'žival.png', word: 'ŽIVAL' },
-  { filename: 'žoga.png', word: 'ŽOGA' },
-  { filename: 'žoga_košarka.png', word: 'ŽOGA' },
-  { filename: 'žvečilni.png', word: 'ŽVEČILNI' }
+  { filename: 'zaba.png', word: 'ŽABA' },
+  { filename: 'zaga.png', word: 'ŽAGA' },
+  { filename: 'zarnica.png', word: 'ŽARNICA' },
+  { filename: 'zebelj.png', word: 'ŽEBELJ' },
+  { filename: 'zelva.png', word: 'ŽELVA' },
+  { filename: 'zerjav.png', word: 'ŽERJAV' },
+  { filename: 'zirafa.png', word: 'ŽIRAFA' },
+  { filename: 'zlica.png', word: 'ŽLICA' },
+  { filename: 'zoga.png', word: 'ŽOGA' },
+  { filename: 'zolna.png', word: 'ŽOLNA' }
 ];
 
 const getRandomŽImage = () => {
@@ -49,7 +49,7 @@ function DrsnaSestavljankaŽ56Content() {
   const gameCompletedRef = useRef(false);
   const effectiveFullscreen = isMobile;
   
-  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke/${currentImage.filename}`;
+  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentImage.filename}`;
   
   const handleComplete = () => {
     if (!gameCompletedRef.current) {

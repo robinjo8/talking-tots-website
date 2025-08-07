@@ -8,7 +8,7 @@ interface TrophyDialogProps {
 }
 
 export const TrophyDialog = ({ isOpen, onClose, totalStars }: TrophyDialogProps) => {
-  const trophyImageUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/pokal.png";
+  const trophyImageUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/pokal.png";
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

@@ -13,16 +13,18 @@ import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
 const rImages = [
-  { filename: 'radio.png', word: 'RADIO' },
   { filename: 'raca.png', word: 'RACA' },
+  { filename: 'raketa.png', word: 'RAKETA' },
   { filename: 'rak.png', word: 'RAK' },
-  { filename: 'rama.png', word: 'RAMA' },
-  { filename: 'rana.png', word: 'RANA' },
-  { filename: 'ris.png', word: 'RIS' },
+  { filename: 'ravnilo.png', word: 'RAVNILO' },
+  { filename: 'repa.png', word: 'REPA' },
+  { filename: 'rep.png', word: 'REP' },
+  { filename: 'riba.png', word: 'RIBA' },
   { filename: 'robot.png', word: 'ROBOT' },
   { filename: 'roka.png', word: 'ROKA' },
-  { filename: 'roze.png', word: 'ROŽE' },
-  { filename: 'riba.png', word: 'RIBA' }
+  { filename: 'rolka.png', word: 'ROLKA' },
+  { filename: 'ropotuljica.png', word: 'ROPOTULJICA' },
+  { filename: 'roza.png', word: 'ROZA' }
 ];
 
 const getRandomRImage = () => {
@@ -49,7 +51,7 @@ function DrsnaSestavljankaR56Content() {
   const gameCompletedRef = useRef(false);
   const effectiveFullscreen = isMobile;
   
-  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke/${currentImage.filename}`;
+  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentImage.filename}`;
   
   const handleComplete = () => {
     if (!gameCompletedRef.current) {

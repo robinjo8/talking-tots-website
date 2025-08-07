@@ -13,16 +13,26 @@ import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
 const zImages = [
-  { filename: 'zebra.png', word: 'ZEBRA' },
-  { filename: 'zob.png', word: 'ZOB' },
-  { filename: 'zoo.png', word: 'ZOO' },
+  { filename: 'zaba.png', word: 'ŽABA' },
+  { filename: 'zaga.png', word: 'ŽAGA' },
   { filename: 'zajec.png', word: 'ZAJEC' },
-  { filename: 'zakaj.png', word: 'ZAKAJ' },
-  { filename: 'zaklad.png', word: 'ZAKLAD' },
+  { filename: 'zarnica.png', word: 'ŽARNICA' },
+  { filename: 'zaslon.png', word: 'ZASLON' },
+  { filename: 'zavesa.png', word: 'ZAVESA' },
+  { filename: 'zebelj.png', word: 'ŽEBELJ' },
+  { filename: 'zebra.png', word: 'ZEBRA' },
+  { filename: 'zelva.png', word: 'ŽELVA' },
+  { filename: 'zerjav.png', word: 'ŽERJAV' },
+  { filename: 'zirafa.png', word: 'ŽIRAFA' },
+  { filename: 'zlato.png', word: 'ZLATO' },
+  { filename: 'zlica.png', word: 'ŽLICA' },
+  { filename: 'zmaj.png', word: 'ZMAJ' },
+  { filename: 'zobotrebec.png', word: 'ZOBOTREBEC' },
+  { filename: 'zob.png', word: 'ZOB' },
+  { filename: 'zoga.png', word: 'ŽOGA' },
+  { filename: 'zolna.png', word: 'ŽOLNA' },
   { filename: 'zvezda.png', word: 'ZVEZDA' },
-  { filename: 'zrak.png', word: 'ZRAK' },
-  { filename: 'žoga.png', word: 'ŽOGA' },
-  { filename: 'žebelj.png', word: 'ŽEBELJ' }
+  { filename: 'zvocnik.png', word: 'ZVOČNIK' }
 ];
 
 const getRandomZImage = () => {
@@ -49,7 +59,7 @@ function DrsnaSestavljankaZ56Content() {
   const gameCompletedRef = useRef(false);
   const effectiveFullscreen = isMobile;
   
-  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke/${currentImage.filename}`;
+  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentImage.filename}`;
   
   const handleComplete = () => {
     if (!gameCompletedRef.current) {

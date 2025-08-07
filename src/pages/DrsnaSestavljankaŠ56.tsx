@@ -13,16 +13,16 @@ import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
 const šImages = [
-  { filename: 'šal.png', word: 'ŠAL' },
-  { filename: 'šator.png', word: 'ŠATOR' },
-  { filename: 'šestilo.png', word: 'ŠESTILO' },
-  { filename: 'špageti.png', word: 'ŠPAGETI' },
-  { filename: 'škatla.png', word: 'ŠKATLA' },
-  { filename: 'školjka.png', word: 'ŠKOLJKA' },
-  { filename: 'šola.png', word: 'ŠOLA' },
-  { filename: 'šopek.png', word: 'ŠOPEK' },
-  { filename: 'škornji.png', word: 'ŠKORNJI' },
-  { filename: 'štiri.png', word: 'ŠTIRI' }
+  { filename: 'sah.png', word: 'ŠAH' },
+  { filename: 'sal.png', word: 'ŠAL' },
+  { filename: 'scetka.png', word: 'ŠČETKA' },
+  { filename: 'skarje.png', word: 'ŠKARJE' },
+  { filename: 'skatla.png', word: 'ŠKATLA' },
+  { filename: 'skoljka.png', word: 'ŠKOLJKA' },
+  { filename: 'sopek.png', word: 'ŠOPEK' },
+  { filename: 'sotor.png', word: 'ŠOTOR' },
+  { filename: 'stampiljka.png', word: 'ŠTAMPILJKA' },
+  { filename: 'storklja.png', word: 'ŠTORKLJA' }
 ];
 
 const getRandomŠImage = () => {
@@ -49,7 +49,7 @@ function DrsnaSestavljankaŠ56Content() {
   const gameCompletedRef = useRef(false);
   const effectiveFullscreen = isMobile;
   
-  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke/${currentImage.filename}`;
+  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentImage.filename}`;
   
   const handleComplete = () => {
     if (!gameCompletedRef.current) {
