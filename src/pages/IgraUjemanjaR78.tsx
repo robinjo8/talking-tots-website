@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { AppLayout } from "@/components/AppLayout";
+import { useEnhancedProgress } from '@/hooks/useEnhancedProgress';
 import { FourColumnGame } from '@/components/matching/FourColumnGame';
 import { FourColumnInstructionsModal } from '@/components/matching/FourColumnInstructionsModal';
 import { MatchingCompletionDialog } from '@/components/matching/MatchingCompletionDialog';
@@ -19,6 +20,7 @@ export default function IgraUjemanjaR78() {
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   const gameCompletedRef = useRef(false);
+  const { recordGameCompletion } = useEnhancedProgress();
 
   // Check authentication
   useEffect(() => {
@@ -56,6 +58,10 @@ export default function IgraUjemanjaR78() {
 
   const handleInstructions = () => {
     setShowInstructions(true);
+  };
+
+  const handleStarClaimed = () => {
+    recordGameCompletion('matching_r_7-8');
   };
 
   // Fullscreen handling for mobile
@@ -131,6 +137,7 @@ export default function IgraUjemanjaR78() {
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
           images={items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
+          onStarClaimed={handleStarClaimed}
         />
       </div>
     );
@@ -171,6 +178,7 @@ export default function IgraUjemanjaR78() {
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
           images={items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
+          onStarClaimed={handleStarClaimed}
         />
       </div>
     </AppLayout>
