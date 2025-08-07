@@ -33,6 +33,14 @@ import ArtikuacijskiTest from "@/pages/ArtikuacijskiTest";
 import Sestavljanke from "@/pages/Sestavljanke";
 import DrsnaSestavljanka from "@/pages/DrsnaSestavljanka";
 import DrsnaSestavljankaC56 from "@/pages/DrsnaSestavljankaC56";
+import DrsnaSestavljankaR56 from "@/pages/DrsnaSestavljankaR56";
+import DrsnaSestavljankaL56 from "@/pages/DrsnaSestavljankaL56";
+import DrsnaSestavljankaK56 from "@/pages/DrsnaSestavljankaK56";
+import DrsnaSestavljankaČ56 from "@/pages/DrsnaSestavljankaČ56";
+import DrsnaSestavljankaS56 from "@/pages/DrsnaSestavljankaS56";
+import DrsnaSestavljankaŠ56 from "@/pages/DrsnaSestavljankaŠ56";
+import DrsnaSestavljankaZ56 from "@/pages/DrsnaSestavljankaZ56";
+import DrsnaSestavljankaŽ56 from "@/pages/DrsnaSestavljankaŽ56";
 import SestavljankeGames from "@/pages/SestavljankeGames";
 import SestavljankeR from "@/pages/SestavljankeR";
 import SestavljankeRRouter from "@/pages/SestavljankeRRouter";
@@ -237,6 +245,78 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <DrsnaSestavljankaC56 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/r56" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaR56 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/l56" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaL56 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/k56" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaK56 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/č56" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaČ56 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/s56" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaS56 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/š56" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaŠ56 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/z56" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaZ56 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/ž56" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaŽ56 />
           </ProtectedRoute>
         }
       />
