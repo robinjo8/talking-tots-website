@@ -28,58 +28,153 @@ export const avatarOptions = [
 type AvatarSelectorProps = {
   selectedAvatarId: number;
   onAvatarSelect: (id: number) => void;
+  variant?: 'grid' | 'dropdown';
 };
 
-export function AvatarSelector({ selectedAvatarId, onAvatarSelect }: AvatarSelectorProps) {
+export function AvatarSelector({ selectedAvatarId, onAvatarSelect, variant = 'grid' }: AvatarSelectorProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Grid variant (original design for registration)
+  if (variant === 'grid') {
+    return (
+      <div className="w-full">
+        <Label className="text-base font-medium mb-4 block">Izberi avatarja</Label>
+        <div className="grid grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-6 p-6 bg-gray-50/50 rounded-xl border">
+          {avatarOptions.map(avatar => (
+            <div 
+              key={avatar.id}
+              onClick={() => onAvatarSelect(avatar.id)}
+              className={`cursor-pointer rounded-2xl p-6 transition-all duration-200 flex flex-col items-center justify-center min-h-[120px] hover:shadow-lg ${
+                selectedAvatarId === avatar.id 
+                  ? 'bg-dragon-green/20 ring-3 ring-dragon-green shadow-xl scale-[1.02]' 
+                  : 'bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-dragon-green/40'
+              }`}
+            >
+              {avatar.id === 0 ? (
+                <div className="h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24 rounded-full flex items-center justify-center bg-gray-100 border-2 border-gray-300 mb-2">
+                  <UserX className="h-8 w-8 sm:h-10 sm:w-10 text-gray-400" />
+                  <span className="sr-only">{avatar.alt}</span>
+                </div>
+              ) : (
+                <div className="relative">
+                  <Avatar className="h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24 ring-2 ring-transparent">
+                    <AvatarImage 
+                      src={avatar.src} 
+                      alt={avatar.alt} 
+                      className="object-contain w-full h-full p-1" 
+                    />
+                    <AvatarFallback className="text-xs text-center p-1 bg-dragon-green/10">
+                      🐲
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+              )}
+              <span className="text-xs text-center text-gray-600 mt-2 leading-tight max-w-full break-words">
+                {avatar.id === 0 ? "Brez" : `Zmajček ${avatar.id}`}
+              </span>
+            </div>
+          ))}
+        </div>
+        <div className="mt-6">
+          <Button 
+            type="button" 
+            variant="outline" 
+            size="sm" 
+            onClick={() => onAvatarSelect(0)}
+            className="w-full"
+          >
+            Ne želim izbrati avatarja
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Dropdown variant (new design for profile editing)
   return (
     <div className="w-full">
-      <Label className="text-base font-medium mb-4 block">Izberi avatarja</Label>
-      <div className="grid grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-6 p-6 bg-gray-50/50 rounded-xl border">
-        {avatarOptions.map(avatar => (
-          <div 
-            key={avatar.id}
-            onClick={() => onAvatarSelect(avatar.id)}
-            className={`cursor-pointer rounded-2xl p-6 transition-all duration-200 flex flex-col items-center justify-center min-h-[120px] hover:shadow-lg ${
-              selectedAvatarId === avatar.id 
-                ? 'bg-dragon-green/20 ring-3 ring-dragon-green shadow-xl scale-[1.02]' 
-                : 'bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-dragon-green/40'
-            }`}
-          >
-            {avatar.id === 0 ? (
-              <div className="h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24 rounded-full flex items-center justify-center bg-gray-100 border-2 border-gray-300 mb-2">
-                <UserX className="h-8 w-8 sm:h-10 sm:w-10 text-gray-400" />
-                <span className="sr-only">{avatar.alt}</span>
-              </div>
-            ) : (
-              <div className="relative">
-                <Avatar className="h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24 ring-2 ring-transparent">
-                  <AvatarImage 
-                    src={avatar.src} 
-                    alt={avatar.alt} 
-                    className="object-contain w-full h-full p-1" 
-                  />
-                  <AvatarFallback className="text-xs text-center p-1 bg-dragon-green/10">
-                    🐲
-                  </AvatarFallback>
-                </Avatar>
-              </div>
-            )}
-            <span className="text-xs text-center text-gray-600 mt-2 leading-tight max-w-full break-words">
-              {avatar.id === 0 ? "Brez" : `Zmajček ${avatar.id}`}
-            </span>
-          </div>
-        ))}
-      </div>
-      <div className="mt-6">
-        <Button 
-          type="button" 
-          variant="outline" 
-          size="sm" 
-          onClick={() => onAvatarSelect(0)}
-          className="w-full"
+      <Label className="text-base font-medium mb-2 block">Izberi avatarja</Label>
+      
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-full p-4 bg-white border-2 border-gray-200 rounded-lg flex items-center justify-between hover:border-dragon-green/40 transition-colors"
         >
-          Ne želim izbrati avatarja
-        </Button>
+          <div className="flex items-center gap-3">
+            {selectedAvatarId === 0 ? (
+              <>
+                <div className="h-10 w-10 rounded-full flex items-center justify-center bg-gray-100 border border-gray-300">
+                  <UserX className="h-5 w-5 text-gray-400" />
+                </div>
+                <span className="text-gray-600">Brez avatarja</span>
+              </>
+            ) : (
+              <>
+                <Avatar className="h-10 w-10 ring-2 ring-dragon-green/20">
+                  <AvatarImage 
+                    src={avatarOptions.find(a => a.id === selectedAvatarId)?.src} 
+                    alt="Izbrani avatar" 
+                    className="object-contain" 
+                  />
+                  <AvatarFallback className="text-xs bg-dragon-green/10">🐲</AvatarFallback>
+                </Avatar>
+                <span className="text-gray-700">Izbrani avatar</span>
+              </>
+            )}
+          </div>
+          <svg 
+            className={`h-5 w-5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        {isOpen && (
+          <div className="absolute top-full left-0 right-0 mt-2 bg-white border-2 border-gray-200 rounded-lg shadow-lg z-50 p-4">
+            <div className="grid grid-cols-3 gap-3 mb-4">
+              {avatarOptions.slice(1).map(avatar => (
+                <div 
+                  key={avatar.id}
+                  onClick={() => {
+                    onAvatarSelect(avatar.id);
+                    setIsOpen(false);
+                  }}
+                  className={`cursor-pointer rounded-lg p-3 transition-all duration-200 flex items-center justify-center min-h-[80px] hover:shadow-lg border-2 ${
+                    selectedAvatarId === avatar.id 
+                      ? 'bg-dragon-green/20 ring-2 ring-dragon-green shadow-xl border-dragon-green' 
+                      : 'bg-white hover:bg-gray-50 border-gray-200 hover:border-dragon-green/40'
+                  }`}
+                >
+                  <Avatar className="h-12 w-12 ring-2 ring-transparent">
+                    <AvatarImage 
+                      src={avatar.src} 
+                      alt={avatar.alt} 
+                      className="object-contain w-full h-full p-1" 
+                    />
+                    <AvatarFallback className="text-xs bg-dragon-green/10">🐲</AvatarFallback>
+                  </Avatar>
+                </div>
+              ))}
+            </div>
+            
+            <Button 
+              type="button" 
+              variant="outline" 
+              size="sm" 
+              onClick={() => {
+                onAvatarSelect(0);
+                setIsOpen(false);
+              }}
+              className="w-full"
+            >
+              Ne želim izbrati avatarja
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

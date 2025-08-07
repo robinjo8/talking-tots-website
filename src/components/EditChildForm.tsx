@@ -195,6 +195,7 @@ export function EditChildForm({ childIndex, initialData, onSuccess, onCancel }: 
         <AvatarSelector
           selectedAvatarId={avatarId}
           onAvatarSelect={setAvatarId}
+          variant="dropdown"
         />
       </div>
       
