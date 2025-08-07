@@ -97,13 +97,25 @@ export default function SpominL() {
       <div className={`${effectiveFullscreen ? 'h-full flex flex-col' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
         
         {/* Top Section - Buttons */}
-        <div className={`${effectiveFullscreen ? 'p-3' : 'p-4'} flex-shrink-0`}>
-          <div className="flex justify-center gap-3">
+        <div className={`${effectiveFullscreen ? 'bg-dragon-green/5 p-3 flex-shrink-0 border-b' : 'p-4 flex-shrink-0'}`}>
+          {effectiveFullscreen && (
+            <h2 className="text-lg font-bold mb-3 text-center">Spomin L</h2>
+          )}
+          <div className="flex justify-between gap-3">
+            <Button
+              variant="outline"
+              onClick={() => navigate("/govorne-igre/spomin")}
+              size={effectiveFullscreen ? "sm" : "default"}
+              className="gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Nazaj
+            </Button>
+            
             <Button
               onClick={handleReset}
               size={effectiveFullscreen ? "sm" : "default"}
-              variant="outline"
-              className="gap-2"
+              className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
             >
               <RotateCcw className="h-4 w-4" />
               Nova igra
@@ -117,16 +129,6 @@ export default function SpominL() {
             >
               <BookOpen className="h-4 w-4" />
               Navodila
-            </Button>
-            
-            <Button
-              variant="outline"
-              onClick={() => navigate("/govorne-igre/spomin")}
-              size={effectiveFullscreen ? "sm" : "default"}
-              className="gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Nazaj
             </Button>
           </div>
           
