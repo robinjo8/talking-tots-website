@@ -82,7 +82,7 @@ function DrsnaSestavljankaC56Content() {
           // Lock screen orientation - simple approach
           try {
             if ('orientation' in screen && 'lock' in screen.orientation) {
-              (screen.orientation as any).lock('landscape').catch(() => {
+              (screen.orientation as any).lock('portrait').catch(() => {
                 console.log('Screen orientation lock not supported');
               });
             }
