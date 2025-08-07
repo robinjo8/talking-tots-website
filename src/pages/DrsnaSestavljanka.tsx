@@ -178,7 +178,7 @@ export default function DrsnaSestavljanka() {
               <CardHeader className="rounded-2xl flex-grow flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
                   <img 
-                    src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/puscica_1.png" 
+                    src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/puscica_1.png" 
                     alt="Nazaj" 
                     className="h-16 w-16 object-contain"
                   />
