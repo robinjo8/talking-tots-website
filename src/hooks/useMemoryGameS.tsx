@@ -22,6 +22,8 @@ export const useMemoryGameS = () => {
   const [matchedPairs, setMatchedPairs] = useState<string[]>([]);
   const [isCheckingMatch, setIsCheckingMatch] = useState(false);
   const [gameCompleted, setGameCompleted] = useState(false);
+  const [showPairDialog, setShowPairDialog] = useState(false);
+  const [currentMatchedPair, setCurrentMatchedPair] = useState<MemoryCard | null>(null);
   const gameCompletedRef = useRef(false);
 
   const { data: memoryCardsData, isLoading, error } = useQuery({
@@ -110,6 +112,10 @@ export const useMemoryGameS = () => {
           setMatchedPairs([...matchedPairs, firstCard.pairId]);
           setFlippedCards([]);
           setIsCheckingMatch(false);
+          
+          // Show pair dialog
+          setCurrentMatchedPair(firstCard);
+          setShowPairDialog(true);
         }, 500);
       } else {
         console.log("No match. Flipping cards back.");
@@ -146,6 +152,13 @@ export const useMemoryGameS = () => {
     if (memoryCardsData && memoryCardsData.length > 0) {
       initializeGame(memoryCardsData);
     }
+    setShowPairDialog(false);
+    setCurrentMatchedPair(null);
+  };
+
+  const handlePairDialogContinue = () => {
+    setShowPairDialog(false);
+    setCurrentMatchedPair(null);
   };
 
   return {
@@ -157,6 +170,9 @@ export const useMemoryGameS = () => {
     gameCompleted,
     matchedPairs,
     totalPairs: cards.length / 2,
-    isCheckingMatch
+    isCheckingMatch,
+    showPairDialog,
+    currentMatchedPair,
+    handlePairDialogContinue
   };
 };

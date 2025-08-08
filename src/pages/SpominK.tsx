@@ -9,6 +9,7 @@ import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { InfoModal } from "@/components/games/InfoModal";
 
 import { useIsMobile } from "@/hooks/use-mobile";
+import { MemoryPairDialog } from "@/components/games/MemoryPairDialog";
 
 export default function SpominK() {
   const navigate = useNavigate();

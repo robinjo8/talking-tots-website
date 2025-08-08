@@ -8,6 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { InfoModal } from "@/components/games/InfoModal";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { MemoryPairDialog } from "@/components/games/MemoryPairDialog";
 
 export default function SpominC() {
   const navigate = useNavigate();
@@ -33,7 +34,10 @@ export default function SpominC() {
     gameCompleted,
     matchedPairs,
     totalPairs,
-    isCheckingMatch
+    isCheckingMatch,
+    showPairDialog,
+    currentMatchedPair,
+    handlePairDialogContinue
   } = useMemoryGameC();
   const gameStartTimeRef = useRef<number | null>(null);
   const [gameTime, setGameTime] = useState<number | null>(null);
@@ -197,6 +201,17 @@ Ko najdeš par, se odpre okno z izgovorjavo – poslušaj in ponovi besedo na gl
 Če jo pravilno izgovoriš, se par obdrži!
 
 Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede."
+      />
+
+      <MemoryPairDialog
+        isOpen={showPairDialog}
+        onClose={handlePairDialogContinue}
+        onContinue={handlePairDialogContinue}
+        pairNumber={matchedPairs.length}
+        totalPairs={totalPairs}
+        imageUrl={currentMatchedPair?.image_url || null}
+        word={currentMatchedPair?.word || null}
+        audioUrl={currentMatchedPair?.audio_url || null}
       />
     </div>
   );
