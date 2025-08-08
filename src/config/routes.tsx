@@ -43,6 +43,7 @@ import DrsnaSestavljankaZ56 from "@/pages/DrsnaSestavljankaZ56";
 import DrsnaSestavljankaŽ56 from "@/pages/DrsnaSestavljankaŽ56";
 import DrsnaSestavljankaC34 from "@/pages/DrsnaSestavljankaC34";
 import DrsnaSestavljankaR34 from "@/pages/DrsnaSestavljankaR34";
+import DrsnaSestavljanka34Router from "@/pages/DrsnaSestavljanka34Router";
 import SestavljankeGames from "@/pages/SestavljankeGames";
 import SestavljankeR from "@/pages/SestavljankeR";
 import SestavljankeRRouter from "@/pages/SestavljankeRRouter";
@@ -337,6 +338,15 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <DrsnaSestavljankaR34 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/:letter" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljanka34Router />
           </ProtectedRoute>
         }
       />
