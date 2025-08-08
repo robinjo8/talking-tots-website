@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Trophy, Mic, X, Star } from "lucide-react";
 import { MatchingGameImage } from "@/data/matchingGameData";
 import { useAudioPlayback } from '@/hooks/useAudioPlayback';
@@ -28,6 +29,12 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
   const [currentRecordingIndex, setCurrentRecordingIndex] = useState<number | null>(null);
   const [starClaimed, setStarClaimed] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [confirmDialogConfig, setConfirmDialogConfig] = useState<{
+    title: string;
+    description: string;
+    onConfirm: () => void;
+  } | null>(null);
   const {
     playAudio
   } = useAudioPlayback();
@@ -223,15 +230,27 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     recordingDataRef.current = [];
   };
   const handleClose = () => {
-    const allCompleted = completedRecordings.size === 4;
+    const allCompleted = completedRecordings.size === images.length;
     if (allCompleted && !starClaimed) {
-      if (window.confirm("Če zapreš igro, ne boš prejel zvezdice. Ali si prepričan?")) {
-        onClose();
-      }
+      setConfirmDialogConfig({
+        title: "Zapri igro",
+        description: "Če zapreš igro, ne boš prejel zvezdice. Ali si prepričan?",
+        onConfirm: () => {
+          setShowConfirmDialog(false);
+          onClose();
+        }
+      });
+      setShowConfirmDialog(true);
     } else if (!allCompleted) {
-      if (window.confirm("Ali ste prepričani, da se želite zapreti okno? Niste še končali vseh posnetkov.")) {
-        onClose();
-      }
+      setConfirmDialogConfig({
+        title: "Zapri okno",
+        description: "Ali ste prepričani, da se želite zapreti okno? Niste še končali vseh posnetkov.",
+        onConfirm: () => {
+          setShowConfirmDialog(false);
+          onClose();
+        }
+      });
+      setShowConfirmDialog(true);
     } else {
       onClose();
     }
@@ -286,8 +305,8 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
           <p className="text-sm text-black text-justify mx-[64px]">KLIKNI NA SPODNJE SLIČICE IN PONOVI BESEDE. 
 ZA VSAKO SLIČICO IMAŠ 3 SEKUNDE ČASA. V KOLIKOR TI NE USPE, LAHKO PONOVIŠ Z GUMBOM »PONOVI«</p>
           
-          {/* Display images in 2x2 grid */}
-          <div className="grid grid-cols-2 gap-4 mx-auto max-w-xs">
+          {/* Display images - center single image, otherwise use grid */}
+          <div className={images.length === 1 ? "flex justify-center" : "grid grid-cols-2 gap-4 mx-auto max-w-xs"}>
             {images.slice(0, 4).map((image, index) => {
             const isRecording = recordingStates[index];
             const isCompleted = completedRecordings.has(index);
@@ -338,5 +357,16 @@ ZA VSAKO SLIČICO IMAŠ 3 SEKUNDE ČASA. V KOLIKOR TI NE USPE, LAHKO PONOVIŠ Z 
           </div>
         </div>
       </DialogContent>
+      
+      <ConfirmDialog
+        open={showConfirmDialog}
+        onOpenChange={setShowConfirmDialog}
+        title={confirmDialogConfig?.title || ""}
+        description={confirmDialogConfig?.description || ""}
+        confirmText="V redu"
+        cancelText="Prekliči"
+        onConfirm={() => confirmDialogConfig?.onConfirm()}
+        onCancel={() => setShowConfirmDialog(false)}
+      />
     </Dialog>;
 };

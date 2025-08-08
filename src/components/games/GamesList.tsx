@@ -89,7 +89,7 @@ export function GamesList() {
           {activeGames.map(game => <Card key={game.id} className={cn("transition-all duration-300 hover:shadow-lg rounded-3xl border-2 border-gray-200 h-full flex flex-col cursor-pointer")} onClick={() => game.path && navigate(game.path)}>
               {/* Top colored section with game name */}
               <CardHeader className={`bg-gradient-to-r ${game.gradient} rounded-t-3xl pb-2 md:pb-4`}>
-                <CardTitle className="text-sm md:text-lg font-semibold text-center whitespace-nowrap">
+                <CardTitle className="text-sm md:text-lg font-semibold text-center md:whitespace-nowrap">
                   <span className={`${game.color}`}>
                     {game.title}
                   </span>
@@ -132,7 +132,7 @@ export function GamesList() {
             {inactiveGames.map(game => <Card key={game.id} className={cn("transition-all duration-300 rounded-3xl border-2 border-gray-200 h-full flex flex-col opacity-60 cursor-not-allowed")}>
                 {/* Top colored section with game name */}
                 <CardHeader className={`bg-gradient-to-r ${game.gradient} rounded-t-3xl pb-2 md:pb-4`}>
-                  <CardTitle className="text-sm md:text-lg font-semibold text-center whitespace-nowrap">
+                  <CardTitle className="text-sm md:text-lg font-semibold text-center md:whitespace-nowrap">
                     <span className={`${game.color}`}>
                       {game.title}
                     </span>
