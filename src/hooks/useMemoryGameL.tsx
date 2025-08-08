@@ -157,6 +157,24 @@ export const useMemoryGameL = () => {
     setCurrentMatchedPair(null);
   };
 
+  const handlePairUnmatch = () => {
+    if (currentMatchedPair) {
+      // Find and unmatch the pair
+      const updatedCards = cards.map(card => {
+        if (card.pairId === currentMatchedPair.pairId) {
+          return { ...card, matched: false, flipped: false };
+        }
+        return card;
+      });
+      setCards(updatedCards);
+      
+      // Remove from matched pairs
+      setMatchedPairs(prev => prev.filter(id => id !== currentMatchedPair.pairId));
+    }
+    setShowPairDialog(false);
+    setCurrentMatchedPair(null);
+  };
+
   return {
     cards,
     isLoading,
@@ -169,6 +187,7 @@ export const useMemoryGameL = () => {
     isCheckingMatch,
     showPairDialog,
     currentMatchedPair,
-    handlePairDialogContinue
+    handlePairDialogContinue,
+    handlePairUnmatch
   };
 };

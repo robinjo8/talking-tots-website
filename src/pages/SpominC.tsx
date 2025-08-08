@@ -25,19 +25,20 @@ export default function SpominC() {
   
   // Extract letter from URL path
   const currentLetter = decodeURIComponent(location.pathname.split('-').pop() || 'c').toUpperCase();
-  const { 
-    cards, 
-    isLoading, 
-    error, 
-    flipCard, 
-    resetGame, 
+  const {
+    cards,
+    isLoading,
+    error,
+    flipCard,
+    resetGame,
     gameCompleted,
     matchedPairs,
     totalPairs,
     isCheckingMatch,
     showPairDialog,
     currentMatchedPair,
-    handlePairDialogContinue
+    handlePairDialogContinue,
+    handlePairUnmatch
   } = useMemoryGameC();
   const gameStartTimeRef = useRef<number | null>(null);
   const [gameTime, setGameTime] = useState<number | null>(null);
@@ -207,6 +208,7 @@ Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede."
         isOpen={showPairDialog}
         onClose={handlePairDialogContinue}
         onContinue={handlePairDialogContinue}
+        onUnmatch={handlePairUnmatch}
         pairNumber={matchedPairs.length}
         totalPairs={totalPairs}
         imageUrl={currentMatchedPair?.image_url || null}

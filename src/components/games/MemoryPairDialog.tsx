@@ -11,6 +11,7 @@ interface MemoryPairDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onContinue: () => void;
+  onUnmatch: () => void;
   pairNumber: number;
   totalPairs: number;
   imageUrl: string | null;
@@ -22,6 +23,7 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
   isOpen,
   onClose,
   onContinue,
+  onUnmatch,
   pairNumber,
   totalPairs,
   imageUrl,
@@ -172,8 +174,14 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
     onContinue();
   };
 
+  const handleClose = () => {
+    // Un-match the pair when dialog is closed without recording
+    onUnmatch();
+    onClose();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={() => {}}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-dragon-green text-center">
