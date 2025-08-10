@@ -14,13 +14,15 @@ interface MatchingCompletionDialogProps {
   images: MatchingGameImage[];
   onStarClaimed?: () => void;
   instructionText?: string;
+  autoPlayAudio?: boolean;
 }
 export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> = ({
   isOpen,
   onClose,
   images,
   onStarClaimed,
-  instructionText = "KLIKNI NA SPODNJE SLIČICE IN PONOVI BESEDE. ZA VSAKO SLIČICO IMAŠ 3 SEKUNDE ČASA. V KOLIKOR TI NE USPE, LAHKO PONOVIŠ Z GUMBOM »PONOVI«"
+  instructionText = "KLIKNI NA SPODNJE SLIČICE IN PONOVI BESEDE. ZA VSAKO SLIČICO IMAŠ 3 SEKUNDE ČASA. V KOLIKOR TI NE USPE, LAHKO PONOVIŠ Z GUMBOM »PONOVI«",
+  autoPlayAudio = false
 }) => {
   const [recordingStates, setRecordingStates] = useState<{
     [key: number]: boolean;
@@ -70,6 +72,31 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       recordingDataRef.current = [];
     }
   }, [isOpen, audioStream]);
+
+  // Auto-play audio when dialog opens
+  useEffect(() => {
+    if (isOpen && autoPlayAudio && images.length > 0) {
+      const playAudioForImage = async () => {
+        try {
+          // Construct audio URL based on image filename
+          const imageFilename = images[0].filename;
+          const audioFilename = imageFilename.replace('.png', '.wav');
+          const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
+          
+          const audio = new Audio(audioUrl);
+          audio.play().catch(error => {
+            console.warn('Auto-play failed:', error);
+            // Auto-play might be blocked by browser policy
+          });
+        } catch (error) {
+          console.error('Error playing audio:', error);
+        }
+      };
+      
+      // Small delay to ensure dialog is fully rendered
+      setTimeout(playAudioForImage, 300);
+    }
+  }, [isOpen, autoPlayAudio, images]);
   const startRecording = async (imageIndex: number, word: string) => {
     if (completedRecordings.has(imageIndex)) return;
     try {
