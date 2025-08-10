@@ -78,11 +78,13 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     if (isOpen && autoPlayAudio && images.length > 0) {
       const playAudioForImage = async () => {
         try {
-          // Construct audio URL based on image filename
-          const imageFilename = images[0].filename;
-          const audioFilename = imageFilename.replace('.png', '.wav');
+          // Construct audio URL based on the word
+          const word = images[0].word;
+          // Handle special case for ROŽA -> ROZA.wav
+          const audioFilename = word === 'ROŽA' ? 'ROZA.wav' : `${word}.wav`;
           const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
           
+          console.log('Playing audio:', audioUrl); // Debug log
           const audio = new Audio(audioUrl);
           audio.play().catch(error => {
             console.warn('Auto-play failed:', error);
