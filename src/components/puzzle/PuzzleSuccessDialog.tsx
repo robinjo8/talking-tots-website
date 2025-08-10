@@ -34,7 +34,7 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   // Auto-play audio when dialog opens
   useEffect(() => {
     if (isOpen && completedImage.word) {
-      const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/audio-besede/${completedImage.word}.mp3`;
+      const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/audio-besede/${completedImage.word}.wav`;
       playAudio(audioUrl);
     }
   }, [isOpen, completedImage.word, playAudio]);
@@ -186,7 +186,7 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   };
 
   const handlePlayAudio = () => {
-    const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/audio-besede/${completedImage.word}.mp3`;
+    const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/audio-besede/${completedImage.word}.wav`;
     playAudio(audioUrl);
   };
 
