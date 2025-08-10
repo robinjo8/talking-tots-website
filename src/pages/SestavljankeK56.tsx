@@ -2,7 +2,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { SimpleJigsaw } from "@/components/puzzle/SimpleJigsaw";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
-import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
+import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
 
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useRef } from "react";
