@@ -13,12 +13,14 @@ interface MatchingCompletionDialogProps {
   onClose: () => void;
   images: MatchingGameImage[];
   onStarClaimed?: () => void;
+  instructionText?: string;
 }
 export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> = ({
   isOpen,
   onClose,
   images,
-  onStarClaimed
+  onStarClaimed,
+  instructionText = "KLIKNI NA SPODNJE SLIČICE IN PONOVI BESEDE. ZA VSAKO SLIČICO IMAŠ 3 SEKUNDE ČASA. V KOLIKOR TI NE USPE, LAHKO PONOVIŠ Z GUMBOM »PONOVI«"
 }) => {
   const [recordingStates, setRecordingStates] = useState<{
     [key: number]: boolean;
@@ -302,8 +304,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-6 py-4">
-          <p className="text-sm text-black text-justify mx-[64px]">KLIKNI NA SPODNJE SLIČICE IN PONOVI BESEDE. 
-ZA VSAKO SLIČICO IMAŠ 3 SEKUNDE ČASA. V KOLIKOR TI NE USPE, LAHKO PONOVIŠ Z GUMBOM »PONOVI«</p>
+          <p className="text-sm text-black text-justify mx-[64px]">{instructionText}</p>
           
           {/* Display images - center single image, otherwise use grid */}
           <div className={images.length === 1 ? "flex justify-center" : "grid grid-cols-2 gap-4 mx-auto max-w-xs"}>
