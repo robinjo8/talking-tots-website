@@ -2,7 +2,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { SimpleJigsaw } from "@/components/puzzle/SimpleJigsaw";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
-import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
+import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -63,9 +63,12 @@ function SestavljankeR78Content() {
   const handleComplete = () => {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
-      recordGameCompletion('puzzle', 'puzzle_r_16');
       setShowCompletion(true);
     }
+  };
+
+  const handleStarClaimed = () => {
+    recordGameCompletion('puzzle', 'puzzle_r_16');
   };
 
   const handleNewGame = () => {
@@ -181,10 +184,11 @@ function SestavljankeR78Content() {
           onClose={() => setShowInstructions(false)}
         />
 
-        <PuzzleSuccessDialog
+        <MatchingCompletionDialog
           isOpen={showCompletion}
-          onOpenChange={setShowCompletion}
-          completedImage={currentImage}
+          onClose={() => setShowCompletion(false)}
+          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
+          onStarClaimed={handleStarClaimed}
         />
 
       </div>
@@ -224,10 +228,11 @@ function SestavljankeR78Content() {
           onClose={() => setShowInstructions(false)}
         />
 
-        <PuzzleSuccessDialog
+        <MatchingCompletionDialog
           isOpen={showCompletion}
-          onOpenChange={setShowCompletion}
-          completedImage={currentImage}
+          onClose={() => setShowCompletion(false)}
+          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
+          onStarClaimed={handleStarClaimed}
         />
 
       </div>

@@ -1,6 +1,7 @@
 import { AppLayout } from "@/components/AppLayout";
 import { SimpleJigsaw } from "@/components/puzzle/SimpleJigsaw";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
+import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useState, useEffect, useRef } from "react";
@@ -20,14 +21,19 @@ export default function SestavljankeX() {
   // Mobile devices always get fullscreen, desktop never gets fullscreen
   const effectiveFullscreen = isMobile;
   
+  const [showCompletion, setShowCompletion] = useState(false);
+  const currentImage = { filename: 'Zmajcek_6.png', word: 'ZMAJČEK' };
   const imageUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_6.png";
-  
+
   const handleComplete = () => {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
-      recordGameCompletion('puzzle', 'puzzle_x');
-      console.log("Puzzle completed!");
+      setShowCompletion(true);
     }
+  };
+
+  const handleStarClaimed = () => {
+    recordGameCompletion('puzzle', 'puzzle_x');
   };
 
   const handleNewGame = () => {
@@ -141,6 +147,12 @@ export default function SestavljankeX() {
           isOpen={showInstructions}
           onClose={() => setShowInstructions(false)}
         />
+        <MatchingCompletionDialog
+          isOpen={showCompletion}
+          onClose={() => setShowCompletion(false)}
+          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
+          onStarClaimed={handleStarClaimed}
+        />
       </div>
     );
   }
@@ -176,6 +188,12 @@ export default function SestavljankeX() {
         <InstructionsModal 
           isOpen={showInstructions}
           onClose={() => setShowInstructions(false)}
+        />
+        <MatchingCompletionDialog
+          isOpen={showCompletion}
+          onClose={() => setShowCompletion(false)}
+          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
+          onStarClaimed={handleStarClaimed}
         />
       </div>
     </AppLayout>

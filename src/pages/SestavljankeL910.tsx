@@ -2,7 +2,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { SimpleJigsaw } from "@/components/puzzle/SimpleJigsaw";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
-import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
+import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
 
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useRef } from "react";
@@ -54,9 +54,12 @@ function SestavljankeL910Content() {
   const handleComplete = () => {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
-      recordGameCompletion('puzzle', 'puzzle_l_20');
       setShowCompletion(true);
     }
+  };
+
+  const handleStarClaimed = () => {
+    recordGameCompletion('puzzle', 'puzzle_l_20');
   };
 
   const handleNewGame = () => {
@@ -122,7 +125,12 @@ function SestavljankeL910Content() {
           </div>
         </div>
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
-        <PuzzleSuccessDialog isOpen={showCompletion} onOpenChange={setShowCompletion} completedImage={currentImage} />
+        <MatchingCompletionDialog
+          isOpen={showCompletion}
+          onClose={() => setShowCompletion(false)}
+          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
+          onStarClaimed={handleStarClaimed}
+        />
       </div>
     );
   }
@@ -154,7 +162,12 @@ function SestavljankeL910Content() {
           />
         </div>
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
-        <PuzzleSuccessDialog isOpen={showCompletion} onOpenChange={setShowCompletion} completedImage={currentImage} />
+        <MatchingCompletionDialog
+          isOpen={showCompletion}
+          onClose={() => setShowCompletion(false)}
+          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
+          onStarClaimed={handleStarClaimed}
+        />
       </div>
     </AppLayout>
   );
