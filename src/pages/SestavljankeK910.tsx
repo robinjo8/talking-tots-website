@@ -64,9 +64,12 @@ function SestavljankeK910Content() {
   const handleComplete = () => {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
-      recordGameCompletion('puzzle', 'puzzle_k_20');
       setShowCompletion(true);
     }
+  };
+
+  const handleStarClaimed = () => {
+    recordGameCompletion('puzzle', 'puzzle_k_20');
   };
 
   const handleNewGame = () => {
@@ -132,7 +135,12 @@ function SestavljankeK910Content() {
           </div>
         </div>
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
-        <PuzzleSuccessDialog isOpen={showCompletion} onOpenChange={setShowCompletion} completedImage={currentImage} />
+        <MatchingCompletionDialog 
+          isOpen={showCompletion} 
+          onClose={() => setShowCompletion(false)}
+          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
+          onStarClaimed={handleStarClaimed}
+        />
       </div>
     );
   }
@@ -164,7 +172,12 @@ function SestavljankeK910Content() {
           />
         </div>
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
-        <PuzzleSuccessDialog isOpen={showCompletion} onOpenChange={setShowCompletion} completedImage={currentImage} />
+        <MatchingCompletionDialog 
+          isOpen={showCompletion} 
+          onClose={() => setShowCompletion(false)}
+          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
+          onStarClaimed={handleStarClaimed}
+        />
       </div>
     </AppLayout>
   );
