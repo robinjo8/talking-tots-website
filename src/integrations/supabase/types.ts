@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -572,8 +572,8 @@ export type Database = {
       get_child_activity_summary: {
         Args: { child_uuid: string }
         Returns: {
-          activity_type: Database["public"]["Enums"]["activity_type"]
           activity_subtype: string
+          activity_type: Database["public"]["Enums"]["activity_type"]
           completion_count: number
           total_stars: number
         }[]
@@ -585,8 +585,8 @@ export type Database = {
       has_role: {
         Args:
           | {
-              _user_id: string
               _role: Database["public"]["Enums"]["user_role"]
+              _user_id: string
             }
           | { role_name: Database["public"]["Enums"]["user_role"] }
         Returns: boolean
