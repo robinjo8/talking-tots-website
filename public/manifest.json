@@ -11,38 +11,13 @@
   "lang": "sl",
   "categories": ["education", "kids", "health"],
   "icons": [
-    {
-      "src": "/icons/icon-72x72.png",
-      "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icons/icon-144x144.png",
-      "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icons/icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icons/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
+    { "src": "/lovable-uploads/b92b1981-2355-4598-9584-8c795f31b564.png", "sizes": "72x72", "type": "image/png", "purpose": "any" },
+    { "src": "/lovable-uploads/b92b1981-2355-4598-9584-8c795f31b564.png", "sizes": "144x144", "type": "image/png", "purpose": "any" },
+    { "src": "/lovable-uploads/b92b1981-2355-4598-9584-8c795f31b564.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/lovable-uploads/b92b1981-2355-4598-9584-8c795f31b564.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ],
   "screenshots": [
-    {
-      "src": "/icons/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "form_factor": "narrow"
-    }
+    { "src": "/lovable-uploads/b92b1981-2355-4598-9584-8c795f31b564.png", "sizes": "512x512", "type": "image/png", "form_factor": "narrow" }
   ],
   "shortcuts": [
     {
@@ -50,14 +25,14 @@
       "short_name": "Spomin",
       "description": "Igre spomina za vadbo govora",
       "url": "/spomin-games",
-      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/lovable-uploads/b92b1981-2355-4598-9584-8c795f31b564.png", "sizes": "192x192" }]
     },
     {
       "name": "Sestavljanke",
       "short_name": "Sestavljanke",
       "description": "Govorne sestavljanke",
       "url": "/sestavljanke-games",
-      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/lovable-uploads/b92b1981-2355-4598-9584-8c795f31b564.png", "sizes": "192x192" }]
     }
   ]
 }
