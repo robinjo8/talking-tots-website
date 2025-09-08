@@ -1,5 +1,5 @@
 const CACHE_NAME = 'tomitalk-v1.0.1';
-const CACHE_VERSION = 1;
+const CACHE_VERSION = 2;
 
 // Essential files to cache for offline functionality
 const ESSENTIAL_CACHE = [
@@ -228,5 +228,12 @@ self.addEventListener('notificationclick', (event) => {
     event.waitUntil(
       clients.openWindow('/')
     );
+  }
+});
+
+// Listen for skip waiting message to activate update immediately
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
   }
 });
