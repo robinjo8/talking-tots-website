@@ -2,6 +2,9 @@ import React from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { usePWA } from "@/hooks/usePWA";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { MobileMenu } from "./header/MobileMenu";
 import { DesktopNavigation } from "./header/DesktopNavigation";
 export default function Header() {
@@ -13,6 +16,22 @@ export default function Header() {
   } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { canInstall, promptInstall, isIOSDevice, isStandalone, isInstalled } = usePWA();
+  const showInstall = (!isStandalone && !isInstalled) && (isIOSDevice || canInstall);
+
+  const handleInstallClick = async () => {
+    try {
+      if (canInstall) {
+        await promptInstall();
+      } else if (isIOSDevice) {
+        toast.info("Za namestitev na iOS: Share → Add to Home Screen");
+      } else {
+        toast.message("Namestitev ni na voljo na tej napravi.");
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
   
   const handleStartNow = () => {
     // If not logged in, redirect to login page
@@ -75,6 +94,11 @@ export default function Header() {
           
           {/* Navigation */}
           <DesktopNavigation user={user} onStartNow={handleStartNow} onCenikScroll={handleCenikScroll} />
+          {showInstall && (
+            <Button variant="secondary" onClick={handleInstallClick}>
+              Namesti aplikacijo
+            </Button>
+          )}
         </div>
       </div>
 

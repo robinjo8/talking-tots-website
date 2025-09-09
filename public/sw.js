@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tomitalk-v1.0.1';
+const CACHE_NAME = 'tomitalk-v1.0.2';
 const CACHE_VERSION = 2;
 
 // Essential files to cache for offline functionality
