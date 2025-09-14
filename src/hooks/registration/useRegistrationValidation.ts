@@ -11,7 +11,7 @@ export function useRegistrationValidation() {
     confirmPassword: string, 
     childName: string,
     childBirthDate: Date | null,
-    checkEmailExists: (email: string) => Promise<boolean>
+    validateEmailSafely?: (email: string) => Promise<{ isValid: boolean; message?: string }>
   ): Promise<boolean> => {
     if (!username || !email || !password || !confirmPassword) {
       setError("Prosimo, izpolnite vsa obvezna polja.");
@@ -45,11 +45,13 @@ export function useRegistrationValidation() {
       return false;
     }
 
-    // Check if email already exists - this is a critical check
-    const emailExists = await checkEmailExists(email);
-    if (emailExists) {
-      setError("Uporabnik s tem e-poštnim naslovom že obstaja.");
-      return false;
+    // Secure email validation without enumeration
+    if (validateEmailSafely) {
+      const emailValidation = await validateEmailSafely(email);
+      if (!emailValidation.isValid) {
+        setError(emailValidation.message || "Napaka pri preverjanju e-pošte.");
+        return false;
+      }
     }
 
     return true;

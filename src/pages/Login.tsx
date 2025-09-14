@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuthRateLimit } from "@/hooks/useAuthRateLimit";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -15,10 +16,18 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { checkRateLimit, recordFailedAttempt, recordSuccessfulLogin } = useAuthRateLimit();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    
+    // Check rate limiting first
+    const rateLimitCheck = checkRateLimit();
+    if (!rateLimitCheck.allowed) {
+      setError(rateLimitCheck.message || "Preveč poskusov.");
+      return;
+    }
     
     if (!email || !password) {
       setError("Prosimo, vnesite e-pošto in geslo.");
@@ -32,10 +41,22 @@ export default function Login() {
         password,
       });
       
-      if (error) throw error;
+      if (error) {
+        recordFailedAttempt();
+        throw error;
+      }
       
+      recordSuccessfulLogin();
       toast.success("Prijava uspešna!");
-      navigate("/");
+      
+      // Check for intended redirect after login
+      const redirectPath = sessionStorage.getItem("redirectAfterLogin");
+      if (redirectPath) {
+        sessionStorage.removeItem("redirectAfterLogin");
+        navigate(redirectPath);
+      } else {
+        navigate("/");
+      }
     } catch (error: any) {
       console.error("Napaka pri prijavi:", error);
       setError(error.message === "Invalid login credentials" 

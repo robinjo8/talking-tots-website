@@ -2,7 +2,7 @@
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useAccountState } from "./useAccountState";
+import { useSecureAccountState } from "./useSecureAccountState";
 import { useChildrenState } from "./useChildrenState";
 import { useRegistrationValidation } from "./useRegistrationValidation";
 import { useRegistrationFlow } from "./useRegistrationFlow";
@@ -43,15 +43,15 @@ export function useRegistration() {
     e.preventDefault();
     
     if (currentStep === RegistrationStep.ACCOUNT_INFO) {
-      const isValid = await validateAccountInfo(
-        username, 
-        email, 
-        password, 
-        confirmPassword, 
-        currentChild.name,
-        currentChild.birthDate,
-        checkEmailExists
-      );
+    const isValid = await validateAccountInfo(
+      username,
+      email,
+      password,
+      confirmPassword,
+      currentChild.name,
+      currentChild.birthDate,
+      validateEmailSafely
+    );
       if (!isValid) return;
       setCurrentStep(RegistrationStep.SPEECH_DIFFICULTIES);
       setError(null);
@@ -74,13 +74,13 @@ export function useRegistration() {
     setError(null);
     
     const isValid = await validateAccountInfo(
-      username, 
-      email, 
-      password, 
-      confirmPassword, 
+      username,
+      email,
+      password,
+      confirmPassword,
       currentChild.name,
       currentChild.birthDate,
-      checkEmailExists
+      validateEmailSafely
     );
     
     if (!isValid) {
