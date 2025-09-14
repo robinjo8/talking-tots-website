@@ -19,7 +19,6 @@ export default function Register() {
     setConfirmPassword,
     error,
     isLoading,
-    isCheckingEmail,
     selectedPlan,
     setSelectedPlan,
     children,
@@ -82,8 +81,8 @@ export default function Register() {
           </div>
           
           
-          <Button type="submit" className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6" disabled={isLoading || isCheckingEmail}>
-            {isCheckingEmail ? "Preverjanje..." : "Naprej"}
+          <Button type="submit" className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6" disabled={isLoading}>
+            Naprej
           </Button>
           
           {error && !error.includes("otrok") && <Alert variant="destructive">

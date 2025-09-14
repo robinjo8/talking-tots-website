@@ -11,14 +11,15 @@ import { calculateAge, validateChildData } from "@/utils/childUtils";
 
 export function useRegistration() {
   const navigate = useNavigate();
+  
   const { 
     username, setUsername,
     email, setEmail,
     password, setPassword,
     confirmPassword, setConfirmPassword,
     selectedPlan, setSelectedPlan,
-    isCheckingEmail, checkEmailExists
-  } = useAccountState();
+    validateEmailSafely
+  } = useSecureAccountState();
   
   const {
     children, setChildren,
@@ -228,7 +229,6 @@ export function useRegistration() {
     password, setPassword,
     confirmPassword, setConfirmPassword,
     selectedPlan, setSelectedPlan,
-    isCheckingEmail,
     
     // Children state
     children,

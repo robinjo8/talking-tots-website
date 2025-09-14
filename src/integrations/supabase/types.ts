@@ -704,9 +704,26 @@ export type Database = {
         }
         Returns: undefined
       }
+      log_security_event: {
+        Args: {
+          details?: Json
+          event_type: string
+          ip_address?: unknown
+          user_id?: string
+        }
+        Returns: undefined
+      }
       sync_children_from_metadata: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      validate_email_format: {
+        Args: { email_input: string }
+        Returns: boolean
+      }
+      validate_password_strength: {
+        Args: { password_input: string }
+        Returns: Json
       }
     }
     Enums: {
