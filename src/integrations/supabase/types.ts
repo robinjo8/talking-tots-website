@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_permissions: {
+        Row: {
+          expires_at: string | null
+          granted_at: string
+          granted_by: string
+          id: string
+          is_active: boolean
+          role: Database["public"]["Enums"]["admin_role_type"]
+          user_id: string
+        }
+        Insert: {
+          expires_at?: string | null
+          granted_at?: string
+          granted_by: string
+          id?: string
+          is_active?: boolean
+          role: Database["public"]["Enums"]["admin_role_type"]
+          user_id: string
+        }
+        Update: {
+          expires_at?: string | null
+          granted_at?: string
+          granted_by?: string
+          id?: string
+          is_active?: boolean
+          role?: Database["public"]["Enums"]["admin_role_type"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       artikulacijski_test: {
         Row: {
           created_at: string
@@ -83,6 +113,33 @@ export type Database = {
           speech_difficulties?: string[] | null
           speech_difficulties_description?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      children_access_log: {
+        Row: {
+          access_reason: string | null
+          access_type: string
+          accessed_by: string
+          child_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          access_reason?: string | null
+          access_type: string
+          accessed_by: string
+          child_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          access_reason?: string | null
+          access_type?: string
+          accessed_by?: string
+          child_id?: string
+          created_at?: string
+          id?: string
         }
         Relationships: []
       }
@@ -471,6 +528,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "progress_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children_analytics"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "progress_exercise_id_fkey"
             columns: ["exercise_id"]
             isOneToOne: false
@@ -562,7 +626,36 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      children_analytics: {
+        Row: {
+          age_years: number | null
+          created_at: string | null
+          difficulties_count: number | null
+          gender: string | null
+          has_development_data: string | null
+          id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          age_years?: never
+          created_at?: string | null
+          difficulties_count?: never
+          gender?: string | null
+          has_development_data?: never
+          id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          age_years?: never
+          created_at?: string | null
+          difficulties_count?: never
+          gender?: string | null
+          has_development_data?: never
+          id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_auth_user_data: {
@@ -582,6 +675,18 @@ export type Database = {
         Args: { child_uuid: string }
         Returns: number
       }
+      grant_admin_role: {
+        Args: {
+          p_expires_at?: string
+          p_role: Database["public"]["Enums"]["admin_role_type"]
+          p_user_id: string
+        }
+        Returns: undefined
+      }
+      has_admin_role: {
+        Args: { p_role: Database["public"]["Enums"]["admin_role_type"] }
+        Returns: boolean
+      }
       has_role: {
         Args:
           | {
@@ -591,6 +696,14 @@ export type Database = {
           | { role_name: Database["public"]["Enums"]["user_role"] }
         Returns: boolean
       }
+      log_child_access: {
+        Args: {
+          p_access_reason?: string
+          p_access_type: string
+          p_child_id: string
+        }
+        Returns: undefined
+      }
       sync_children_from_metadata: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -598,6 +711,7 @@ export type Database = {
     }
     Enums: {
       activity_type: "exercise" | "memory_game" | "puzzle"
+      admin_role_type: "super_admin" | "support_admin" | "data_analyst"
       user_role: "admin" | "user"
     }
     CompositeTypes: {
@@ -727,6 +841,7 @@ export const Constants = {
   public: {
     Enums: {
       activity_type: ["exercise", "memory_game", "puzzle"],
+      admin_role_type: ["super_admin", "support_admin", "data_analyst"],
       user_role: ["admin", "user"],
     },
   },
