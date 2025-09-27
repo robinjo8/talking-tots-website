@@ -44,6 +44,16 @@ import DrsnaSestavljankaŽ56 from "@/pages/DrsnaSestavljankaŽ56";
 import DrsnaSestavljankaC34 from "@/pages/DrsnaSestavljankaC34";
 import DrsnaSestavljankaR34 from "@/pages/DrsnaSestavljankaR34";
 import DrsnaSestavljanka34Router from "@/pages/DrsnaSestavljanka34Router";
+
+// Import missing sliding puzzle components
+import DrsnaSestavljankaČ34 from "@/pages/DrsnaSestavljankaČ34";
+import DrsnaSestavljankaS34 from "@/pages/DrsnaSestavljankaS34";
+import DrsnaSestavljankaŠ34 from "@/pages/DrsnaSestavljankaŠ34";
+import DrsnaSestavljankaZ34 from "@/pages/DrsnaSestavljankaZ34";
+import DrsnaSestavljankaŽ34 from "@/pages/DrsnaSestavljankaŽ34";
+import DrsnaSestavljankaL34 from "@/pages/DrsnaSestavljankaL34";
+import DrsnaSestavljankaK34 from "@/pages/DrsnaSestavljankaK34";
+import DrsnaSestavljankaC78 from "@/pages/DrsnaSestavljankaC78";
 import SestavljankeGames from "@/pages/SestavljankeGames";
 import SestavljankeR from "@/pages/SestavljankeR";
 import SestavljankeRRouter from "@/pages/SestavljankeRRouter";
