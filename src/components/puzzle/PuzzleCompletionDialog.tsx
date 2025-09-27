@@ -113,6 +113,12 @@ export function PuzzleCompletionDialog({
   };
 
   const saveRecording = async (audioBlob: Blob) => {
+    // Don't save if we're just manually stopping (no actual complete recording)
+    if (audioBlob.size === 0) {
+      console.log('No valid recording data to save');
+      return;
+    }
+
     try {
       const fileName = `recording_${completedImage.word.toLowerCase()}_${Date.now()}.webm`;
       
@@ -137,6 +143,11 @@ export function PuzzleCompletionDialog({
     playAudio(audioUrl);
   };
 
+  const handleImageClick = () => {
+    // Play audio when image is clicked
+    handlePlayAudio();
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md mx-auto">
@@ -144,7 +155,10 @@ export function PuzzleCompletionDialog({
           <h2 className="text-2xl font-bold text-center">Odlično!</h2>
           
           {/* Completed Image */}
-          <div className="w-32 h-32 rounded-lg overflow-hidden border-2 border-primary">
+          <div 
+            className="w-32 h-32 rounded-lg overflow-hidden border-2 border-primary cursor-pointer hover:scale-105 transition-transform"
+            onClick={handleImageClick}
+          >
             <img 
               src={imageUrl} 
               alt={completedImage.word}

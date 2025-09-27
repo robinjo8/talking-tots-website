@@ -34,6 +34,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
   const [currentRecordingIndex, setCurrentRecordingIndex] = useState<number | null>(null);
   const [starClaimed, setStarClaimed] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
   const [confirmDialogConfig, setConfirmDialogConfig] = useState<{
     title: string;
     description: string;
@@ -197,6 +198,14 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     setRecordingTimeLeft(3);
   };
   const saveRecording = async (word: string, imageIndex: number) => {
+    // Don't save if we're resetting
+    if (isResetting) {
+      console.log('Skipping save during reset');
+      setCompletedRecordings(prev => new Set([...prev, imageIndex]));
+      setCurrentRecordingIndex(null);
+      return;
+    }
+
     if (recordingDataRef.current.length === 0) {
       console.log('No recording data to save');
       // Still mark as completed even if no data
@@ -245,10 +254,13 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
         });
       } else {
         console.log('Recording saved successfully to:', userSpecificPath);
-        toast({
-          title: "Odlično!",
-          description: "Tvoja izgovorjava je bila shranjena."
-        });
+        // Only show success toast if not resetting
+        if (!isResetting) {
+          toast({
+            title: "Odlično!",
+            description: "Tvoja izgovorjava je bila shranjena."
+          });
+        }
       }
     } catch (error) {
       console.error('Error in saveRecording:', error);
@@ -303,9 +315,26 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     if (completedRecordings.has(imageIndex) || recordingStates[imageIndex]) {
       return;
     }
-    startRecording(imageIndex, word);
+    
+    // Play audio first
+    try {
+      // Handle special case for ROŽA -> ROZA.wav
+      const audioFilename = word === 'ROŽA' ? 'ROZA.wav' : `${word}.wav`;
+      const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
+      playAudio(audioUrl);
+    } catch (error) {
+      console.error('Error playing audio:', error);
+    }
+    
+    // Start recording after a short delay to let audio play
+    setTimeout(() => {
+      startRecording(imageIndex, word);
+    }, 500);
   };
   const handleReset = () => {
+    // Set resetting flag to prevent saving incomplete recordings
+    setIsResetting(true);
+    
     // Clear any running countdown timer
     if (countdownRef.current) {
       clearInterval(countdownRef.current);
@@ -319,11 +348,17 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       audioStream.getTracks().forEach(track => track.stop());
       setAudioStream(null);
     }
+    
     // Reset all recordings to allow re-recording
     setCompletedRecordings(new Set());
     setRecordingStates({});
     setCurrentRecordingIndex(null);
     setRecordingTimeLeft(3);
+    
+    // Clear resetting flag after a short delay
+    setTimeout(() => {
+      setIsResetting(false);
+    }, 100);
   };
   return <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-lg">
