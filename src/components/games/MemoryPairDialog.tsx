@@ -174,6 +174,27 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
     onContinue();
   };
 
+  const handleReset = () => {
+    // Clear any running countdown timer
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+      countdownRef.current = null;
+    }
+    // Stop any ongoing recording
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaRecorder.stop();
+    }
+    if (audioStream) {
+      audioStream.getTracks().forEach(track => track.stop());
+      setAudioStream(null);
+    }
+    // Reset recording state to allow re-recording
+    setHasRecorded(false);
+    setIsRecording(false);
+    setRecordingTimeLeft(3);
+    recordingDataRef.current = [];
+  };
+
   const handleClose = () => {
     // Un-match the pair when dialog is closed without recording
     onUnmatch();
@@ -240,23 +261,28 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
 
           <div className="flex justify-center gap-3">
             {hasRecorded && (
-              <Button 
-                onClick={handleContinue}
-                className={`gap-2 ${
-                  isLastPair 
-                    ? 'bg-yellow-500 hover:bg-yellow-600 text-white' 
-                    : 'bg-dragon-green hover:bg-dragon-green/90 text-white'
-                }`}
-              >
-                {isLastPair ? (
-                  <>
-                    <Star className="w-4 h-4" />
-                    Vzemi zvezdico
-                  </>
-                ) : (
-                  'Nadaljuj'
-                )}
-              </Button>
+              <>
+                <Button onClick={handleReset} variant="outline" className="gap-2 flex-1 max-w-28">
+                  Ponovi
+                </Button>
+                <Button 
+                  onClick={handleContinue}
+                  className={`gap-2 flex-1 ${
+                    isLastPair 
+                      ? 'bg-yellow-500 hover:bg-yellow-600 text-white max-w-32' 
+                      : 'bg-dragon-green hover:bg-dragon-green/90 text-white max-w-28'
+                  }`}
+                >
+                  {isLastPair ? (
+                    <>
+                      <Star className="w-4 h-4" />
+                      Vzemi zvezdico
+                    </>
+                  ) : (
+                    'Nadaljuj'
+                  )}
+                </Button>
+              </>
             )}
           </div>
         </div>
