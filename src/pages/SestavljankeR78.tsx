@@ -15,10 +15,8 @@ import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
 const rImages = [
   { filename: 'raca.png', word: 'RACA' },
-  { filename: 'rak.png', word: 'RAK' },
   { filename: 'raketa.png', word: 'RAKETA' },
   { filename: 'ravnilo.png', word: 'RAVNILO' },
-  { filename: 'rep.png', word: 'REP' },
   { filename: 'repa.png', word: 'REPA' },
   { filename: 'riba.png', word: 'RIBA' },
   { filename: 'robot.png', word: 'ROBOT' },
