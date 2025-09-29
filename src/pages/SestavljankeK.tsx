@@ -59,9 +59,12 @@ function SestavljankeKContent() {
   const handleComplete = () => {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
-      recordGameCompletion('puzzle', 'puzzle_k_6');
       setShowCompletion(true);
     }
+  };
+
+  const handleStarClaimed = () => {
+    recordGameCompletion('puzzle', 'puzzle_k_6');
   };
 
   const handleNewGame = () => {
@@ -181,6 +184,7 @@ function SestavljankeKContent() {
           isOpen={showCompletion}
           onOpenChange={setShowCompletion}
           completedImage={currentImage}
+          onStarClaimed={handleStarClaimed}
         />
 
       </div>
@@ -224,6 +228,7 @@ function SestavljankeKContent() {
           isOpen={showCompletion}
           onOpenChange={setShowCompletion}
           completedImage={currentImage}
+          onStarClaimed={handleStarClaimed}
         />
 
       </div>

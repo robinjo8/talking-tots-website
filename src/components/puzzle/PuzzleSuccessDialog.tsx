@@ -14,16 +14,19 @@ interface PuzzleSuccessDialogProps {
     filename: string;
     word: string;
   };
+  onStarClaimed?: () => void;
 }
 
 export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   isOpen,
   onOpenChange,
-  completedImage
+  completedImage,
+  onStarClaimed
 }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [hasRecorded, setHasRecorded] = useState(false);
   const [recordingTimeLeft, setRecordingTimeLeft] = useState(3);
+  const [starClaimed, setStarClaimed] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
   const { playAudio } = useAudioPlayback();
@@ -201,6 +204,18 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
     onOpenChange(false);
   };
 
+  const handleClaimStar = () => {
+    setStarClaimed(true);
+    onStarClaimed?.();
+    toast({
+      title: "Odlično!",
+      description: "Prejel si zvezdico! ⭐"
+    });
+    setTimeout(() => {
+      onOpenChange(false);
+    }, 1500);
+  };
+
   const handlePlayAudio = () => {
     const wordLower = completedImage.word.toLowerCase();
     const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${wordLower}.m4a`;
@@ -281,13 +296,14 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
             {hasRecorded && (
               <>
                 <Button onClick={handleReset} variant="outline" className="gap-2 flex-1 max-w-28">
-                  Ponovi
+                  PONOVI
                 </Button>
                 <Button 
-                  onClick={handleClose}
+                  onClick={handleClaimStar}
                   className="gap-2 flex-1 bg-dragon-green hover:bg-dragon-green/90 text-white max-w-28"
+                  disabled={starClaimed}
                 >
-                  Nadaljuj
+                  VZEMI ZVEZDICO
                 </Button>
               </>
             )}
