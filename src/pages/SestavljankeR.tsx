@@ -15,10 +15,8 @@ import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
 const rImages = [
   { filename: 'raca.png', word: 'RACA' },
-  { filename: 'rak.png', word: 'RAK' },
   { filename: 'raketa.png', word: 'RAKETA' },
   { filename: 'ravnilo.png', word: 'RAVNILO' },
-  { filename: 'rep.png', word: 'REP' },
   { filename: 'repa.png', word: 'REPA' },
   { filename: 'riba.png', word: 'RIBA' },
   { filename: 'robot.png', word: 'ROBOT' },
@@ -56,7 +54,7 @@ function SestavljankeRContent() {
   // Mobile devices always get fullscreen, desktop never gets fullscreen
   const effectiveFullscreen = isMobile;
   
-  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke/${currentImage.filename}`;
+  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentImage.filename}`;
   
   const handleComplete = () => {
     if (!gameCompletedRef.current) {

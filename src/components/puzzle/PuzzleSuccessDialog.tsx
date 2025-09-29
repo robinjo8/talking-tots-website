@@ -34,7 +34,8 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   // Auto-play audio when dialog opens
   useEffect(() => {
     if (isOpen && completedImage.word) {
-      const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/audio-besede/${completedImage.word}.mp3`;
+      const wordLower = completedImage.word.toLowerCase();
+      const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${wordLower}.m4a`;
       playAudio(audioUrl);
     }
   }, [isOpen, completedImage.word, playAudio]);
@@ -154,7 +155,7 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
       const userSpecificPath = `recordings/${user.email}/child-${selectedChild.id}/${filename}`;
 
       const { error } = await supabase.storage
-        .from('audio-besede')
+        .from('zvocni-posnetki')
         .upload(userSpecificPath, audioBlob, {
           contentType: 'audio/webm'
         });
@@ -186,11 +187,18 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   };
 
   const handlePlayAudio = () => {
-    const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/audio-besede/${completedImage.word}.mp3`;
+    const wordLower = completedImage.word.toLowerCase();
+    const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${wordLower}.m4a`;
     playAudio(audioUrl);
   };
 
-  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke/${completedImage.filename}`;
+  const handleImageClick = () => {
+    if (!isRecording) {
+      startRecording();
+    }
+  };
+
+  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${completedImage.filename}`;
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -199,13 +207,26 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
           {/* Title */}
           <h2 className="text-2xl font-bold text-dragon-green">Odlično!</h2>
           
+          {/* Instruction Text */}
+          <p className="text-sm text-black text-center">
+            KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO
+          </p>
+          
           {/* Image */}
           <div className="relative">
             <img 
               src={imageUrl}
               alt={completedImage.word}
-              className="w-48 h-48 object-contain mx-auto border-2 border-dragon-green rounded-lg"
+              className="w-48 h-48 object-contain mx-auto border-2 border-dragon-green rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={handleImageClick}
             />
+            {isRecording && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg">
+                <div className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                  Snemanje... {recordingTimeLeft}s
+                </div>
+              </div>
+            )}
           </div>
           
           {/* Word */}
@@ -223,21 +244,7 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
               className="gap-2 w-full"
             >
               <Volume2 className="w-5 h-5" />
-              Predvajaj
-            </Button>
-            
-            {/* Record Button */}
-            <Button
-              onClick={isRecording ? stopRecording : startRecording}
-              size="lg"
-              className={`gap-2 w-full ${
-                isRecording 
-                  ? 'bg-red-500 hover:bg-red-600 text-white'
-                  : 'bg-dragon-green hover:bg-dragon-green/90 text-white'
-              }`}
-            >
-              <Mic className="w-5 h-5" />
-              {isRecording ? `Ustavi (${recordingTimeLeft}s)` : 'Posnemi se'}
+              PREDVAJAJ
             </Button>
             
             {/* Close Button */}

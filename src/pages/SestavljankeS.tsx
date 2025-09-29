@@ -14,15 +14,11 @@ import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
 const sImages = [
-  { filename: 'sedem.png', word: 'SEDEM' },
-  { filename: 'sir.png', word: 'SIR' },
   { filename: 'sladoled.png', word: 'SLADOLED' },
   { filename: 'slika.png', word: 'SLIKA' },
   { filename: 'slon.png', word: 'SLON' },
   { filename: 'smreka.png', word: 'SMREKA' },
-  { filename: 'sneg.png', word: 'SNEG' },
   { filename: 'snezak.png', word: 'SNEŽAK' },
-  { filename: 'sok.png', word: 'SOK' },
   { filename: 'sonce.png', word: 'SONCE' },
   { filename: 'sova.png', word: 'SOVA' },
   { filename: 'stol.png', word: 'STOL' },
@@ -58,7 +54,7 @@ function SestavljankeSContent() {
   // Mobile devices always get fullscreen, desktop never gets fullscreen
   const effectiveFullscreen = isMobile;
   
-  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke/${currentImage.filename}`;
+  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentImage.filename}`;
   
   const handleComplete = () => {
     if (!gameCompletedRef.current) {
