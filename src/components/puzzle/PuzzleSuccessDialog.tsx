@@ -307,12 +307,12 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
           <div className="flex justify-center gap-3">
             {hasRecorded && (
               <>
-                <Button onClick={handleReset} variant="outline" className="gap-2 flex-1 max-w-28">
+                <Button onClick={handleReset} variant="outline" className="gap-2 flex-1 max-w-32">
                   PONOVI
                 </Button>
                 <Button 
                   onClick={handleClaimStar}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 flex-1 max-w-32"
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 flex-1 max-w-44"
                   disabled={starClaimed}
                 >
                   <Star className="w-4 h-4" />
