@@ -147,11 +147,25 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
 
       if (error) {
         console.error('Error saving recording:', error);
+        toast({
+          title: "Napaka",
+          description: "Snemanje ni bilo shranjeno. Poskusi znova.",
+          variant: "destructive"
+        });
       } else {
         console.log('Recording saved successfully to:', userSpecificPath);
+        toast({
+          title: "Odlično!",
+          description: "Tvoja izgovorjava je bila shranjena.",
+        });
       }
     } catch (error) {
       console.error('Error in saveRecording:', error);
+      toast({
+        title: "Napaka",
+        description: "Snemanje ni bilo shranjeno. Poskusi znova.",
+        variant: "destructive"
+      });
     }
     
     recordingDataRef.current = [];
