@@ -22,6 +22,7 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   completedImage
 }) => {
   const [isRecording, setIsRecording] = useState(false);
+  const [hasRecorded, setHasRecorded] = useState(false);
   const [recordingTimeLeft, setRecordingTimeLeft] = useState(3);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
@@ -44,6 +45,7 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   useEffect(() => {
     if (!isOpen) {
       setIsRecording(false);
+      setHasRecorded(false);
       setRecordingTimeLeft(3);
       if (countdownRef.current) {
         clearInterval(countdownRef.current);
@@ -76,6 +78,7 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
       };
 
       recorder.onstop = () => {
+        setHasRecorded(true);
         saveRecording();
       };
 
@@ -186,6 +189,17 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
     recordingDataRef.current = [];
   };
 
+  const handleReset = () => {
+    setHasRecorded(false);
+    setIsRecording(false);
+    setRecordingTimeLeft(3);
+    recordingDataRef.current = [];
+  };
+
+  const handleClose = () => {
+    onOpenChange(false);
+  };
+
   const handlePlayAudio = () => {
     const wordLower = completedImage.word.toLowerCase();
     const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${wordLower}.m4a`;
@@ -217,7 +231,9 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
             <img 
               src={imageUrl}
               alt={completedImage.word}
-              className="w-48 h-48 object-contain mx-auto border-2 border-dragon-green rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+              className={`w-48 h-48 object-contain mx-auto border-2 border-dragon-green rounded-lg cursor-pointer transition-all ${
+                isRecording || hasRecorded ? 'opacity-50 grayscale' : 'hover:opacity-80'
+              }`}
               onClick={handleImageClick}
             />
             {isRecording && (
@@ -247,16 +263,26 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
               PREDVAJAJ
             </Button>
             
-            {/* Close Button */}
-            <Button
-              onClick={() => onOpenChange(false)}
-              size="lg"
-              variant="outline"
-              className="gap-2 w-full"
-            >
-              <X className="w-5 h-5" />
-              Zapri
-            </Button>
+            {/* Recording Action Buttons */}
+            {hasRecorded && (
+              <div className="flex gap-3">
+                <Button
+                  onClick={handleReset}
+                  size="lg"
+                  variant="outline"
+                  className="gap-2 flex-1"
+                >
+                  PONOVI
+                </Button>
+                <Button
+                  onClick={handleClose}
+                  size="lg"
+                  className="gap-2 flex-1 bg-green-600 hover:bg-green-700 text-white"
+                >
+                  SHRANI
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </DialogContent>
