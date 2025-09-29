@@ -154,6 +154,7 @@ function DrsnaSestavljankaC56Content() {
           onClose={() => setShowCompletion(false)}
           images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
           onStarClaimed={handleStarClaimed}
+          instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO."
           autoPlayAudio={true}
         />
       </div>
@@ -203,6 +204,7 @@ function DrsnaSestavljankaC56Content() {
           onClose={() => setShowCompletion(false)}
           images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
           onStarClaimed={handleStarClaimed}
+          instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO."
           autoPlayAudio={true}
         />
       </div>
