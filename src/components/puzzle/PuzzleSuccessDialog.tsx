@@ -203,7 +203,7 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   };
 
   const handleClose = () => {
-    if (hasRecorded && !starClaimed) {
+    if (!starClaimed) {
       setShowConfirmDialog(true);
     } else {
       onOpenChange(false);
