@@ -461,6 +461,69 @@ export function AppRoutes() {
       />
       
       <Route 
+        path="/govorne-igre/sestavljanke/č" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeČ />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/sestavljanke/k" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeK />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/sestavljanke/l" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeL />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/sestavljanke/s" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeS />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/sestavljanke/š" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeŠ />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/sestavljanke/z" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeZ />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/sestavljanke/ž" 
+        element={
+          <ProtectedRoute>
+            <SestavljankeŽ />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
         path="/govorne-igre/sestavljanke/c56" 
         element={
           <ProtectedRoute>
