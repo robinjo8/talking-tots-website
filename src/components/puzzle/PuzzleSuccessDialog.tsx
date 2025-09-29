@@ -215,73 +215,80 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${completedImage.filename}`;
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-xl">
-        <div className="text-center space-y-6">
-          {/* Title */}
-          <h2 className="text-2xl font-bold text-dragon-green">Odlično!</h2>
+    <Dialog open={isOpen} onOpenChange={() => {}}>
+      <DialogContent className="sm:max-w-lg">
+        <div className="space-y-6 py-4">
+          <h2 className="text-2xl font-bold text-dragon-green text-center">Odlično!</h2>
           
-          {/* Instruction Text */}
           <p className="text-sm text-black text-center">
             KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO
           </p>
           
-          {/* Image */}
-          <div className="relative">
-            <img 
-              src={imageUrl}
-              alt={completedImage.word}
-              className={`w-48 h-48 object-contain mx-auto border-2 border-dragon-green rounded-lg cursor-pointer transition-all ${
-                isRecording || hasRecorded ? 'opacity-50 grayscale' : 'hover:opacity-80'
+          <div className="flex justify-center">
+            <div 
+              className={`flex flex-col items-center space-y-2 cursor-pointer transition-all ${
+                hasRecorded ? 'opacity-70 cursor-not-allowed' : 'hover:scale-105'
               }`}
               onClick={handleImageClick}
-            />
-            {isRecording && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg">
-                <div className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                  Snemanje... {recordingTimeLeft}s
-                </div>
+            >
+              <div className="relative">
+                <img
+                  src={imageUrl}
+                  alt={completedImage.word}
+                  className={`w-32 h-32 object-cover rounded-lg border-2 ${
+                    hasRecorded ? 'border-gray-400' : 
+                    isRecording ? 'border-red-500' : 'border-dragon-green'
+                  }`}
+                />
+                
+                {isRecording && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-lg">
+                    <div className="bg-red-500 text-white rounded-full w-10 h-10 flex items-center justify-center">
+                      <Mic className="w-5 h-5" />
+                    </div>
+                  </div>
+                )}
+                
+                {isRecording && (
+                  <div className="absolute -top-2 -right-2 bg-red-500 text-white text-sm rounded-full w-8 h-8 flex items-center justify-center font-bold">
+                    {recordingTimeLeft}
+                  </div>
+                )}
               </div>
-            )}
+              
+              <span className={`text-lg font-medium text-center ${
+                hasRecorded ? 'text-gray-400' : 'text-black'
+              }`}>
+                {completedImage.word.toUpperCase()}
+              </span>
+            </div>
           </div>
-          
-          {/* Word */}
-          <div className="text-3xl font-bold text-gray-800">
-            {completedImage.word}
-          </div>
-          
-          {/* Buttons */}
-          <div className="flex flex-col gap-3">
-            {/* Play Audio Button */}
+
+          {/* Audio playback button */}
+          <div className="flex justify-center">
             <Button
               onClick={handlePlayAudio}
-              size="lg"
               variant="outline"
-              className="gap-2 w-full"
+              className="gap-2"
             >
-              <Volume2 className="w-5 h-5" />
+              <Volume2 className="w-4 h-4" />
               PREDVAJAJ
             </Button>
-            
-            {/* Recording Action Buttons */}
+          </div>
+
+          <div className="flex justify-center gap-3">
             {hasRecorded && (
-              <div className="flex gap-3">
-                <Button
-                  onClick={handleReset}
-                  size="lg"
-                  variant="outline"
-                  className="gap-2 flex-1"
-                >
-                  PONOVI
+              <>
+                <Button onClick={handleReset} variant="outline" className="gap-2 flex-1 max-w-28">
+                  Ponovi
                 </Button>
-                <Button
+                <Button 
                   onClick={handleClose}
-                  size="lg"
-                  className="gap-2 flex-1 bg-green-600 hover:bg-green-700 text-white"
+                  className="gap-2 flex-1 bg-dragon-green hover:bg-dragon-green/90 text-white max-w-28"
                 >
-                  SHRANI
+                  Nadaljuj
                 </Button>
-              </div>
+              </>
             )}
           </div>
         </div>
