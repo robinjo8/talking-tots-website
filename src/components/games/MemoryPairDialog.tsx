@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Mic, Star } from "lucide-react";
+import { Mic, Star, Volume2 } from "lucide-react";
 import { useAudioPlayback } from '@/hooks/useAudioPlayback';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -226,7 +226,7 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
         
         <div className="space-y-6 py-4">
           <p className="text-sm text-black text-center">
-            KLIKNI NA SLIČICO IN PONOVI BESEDO. IMAŠ 3 SEKUNDE ČASA.
+            KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO
           </p>
           
           <div className="flex justify-center">
@@ -271,6 +271,19 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
                 </span>
               )}
             </div>
+          </div>
+
+          {/* Audio playback button */}
+          <div className="flex justify-center">
+            <Button
+              onClick={() => audioUrl && playAudio(audioUrl)}
+              disabled={!audioUrl}
+              variant="outline"
+              className="gap-2"
+            >
+              <Volume2 className="w-4 h-4" />
+              PREDVAJAJ
+            </Button>
           </div>
 
           <div className="flex justify-center gap-3">
