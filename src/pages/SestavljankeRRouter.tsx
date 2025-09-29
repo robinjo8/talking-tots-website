@@ -26,7 +26,7 @@ export default function SestavljankeRRouter() {
     let targetRoute = '';
     switch (ageGroup) {
       case '3-4':
-        targetRoute = '/govorne-igre/sestavljanke/r'; // 6 pieces
+        targetRoute = '/govorne-igre/drsna-sestavljanka/r34'; // sliding puzzle
         break;
       case '5-6':
         targetRoute = '/govorne-igre/sestavljanke/r56'; // 12 pieces

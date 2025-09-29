@@ -365,7 +365,7 @@ export function AppRoutes() {
         path="/govorne-igre/sestavljanke/r" 
         element={
           <ProtectedRoute>
-            <SestavljankeRRouter />
+            <SestavljankeR />
           </ProtectedRoute>
         }
       />
