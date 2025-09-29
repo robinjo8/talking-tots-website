@@ -162,6 +162,7 @@ function DrsnaSestavljankaR34Content() {
           onClose={() => setShowCompletion(false)}
           images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
           onStarClaimed={handleStarClaimed}
+          autoPlayAudio={true}
         />
       </div>
     );
@@ -210,6 +211,7 @@ function DrsnaSestavljankaR34Content() {
           onClose={() => setShowCompletion(false)}
           images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
           onStarClaimed={handleStarClaimed}
+          autoPlayAudio={true}
         />
       </div>
     </AppLayout>

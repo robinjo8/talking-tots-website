@@ -159,6 +159,7 @@ function DrsnaSestavljankaS34Content() {
           images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
           onStarClaimed={handleStarClaimed}
           instructionText="KLIKNI NA SPODNJO SLIČICO IN PONOVI BESEDO. ZA IZGOVORJAVO IMAŠ NA VOLJO 3 SEKUNDE ČASA. V KOLIKOR TI NE USPE, LAHKO PONOVIŠ Z GUMBOM 'PONOVI'."
+          autoPlayAudio={true}
         />
       </div>
     );
@@ -208,6 +209,7 @@ function DrsnaSestavljankaS34Content() {
           images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
           onStarClaimed={handleStarClaimed}
           instructionText="KLIKNI NA SPODNJO SLIČICO IN PONOVI BESEDO. ZA IZGOVORJAVO IMAŠ NA VOLJO 3 SEKUNDE ČASA. V KOLIKOR TI NE USPE, LAHKO PONOVIŠ Z GUMBOM 'PONOVI'."
+          autoPlayAudio={true}
         />
       </div>
     </AppLayout>
