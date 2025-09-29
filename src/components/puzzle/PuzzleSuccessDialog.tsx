@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Volume2, Mic, X } from 'lucide-react';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { Volume2, Mic, X, Star } from 'lucide-react';
 import { useAudioPlayback } from '@/hooks/useAudioPlayback';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -27,6 +28,7 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   const [hasRecorded, setHasRecorded] = useState(false);
   const [recordingTimeLeft, setRecordingTimeLeft] = useState(3);
   const [starClaimed, setStarClaimed] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
   const { playAudio } = useAudioPlayback();
@@ -201,6 +203,15 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   };
 
   const handleClose = () => {
+    if (hasRecorded && !starClaimed) {
+      setShowConfirmDialog(true);
+    } else {
+      onOpenChange(false);
+    }
+  };
+
+  const handleConfirmClose = () => {
+    setShowConfirmDialog(false);
     onOpenChange(false);
   };
 
@@ -231,7 +242,8 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${completedImage.filename}`;
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => {}}>
+    <>
+      <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-lg">
         <div className="space-y-6 py-4">
           <h2 className="text-2xl font-bold text-dragon-green text-center">Odlično!</h2>
@@ -300,9 +312,10 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
                 </Button>
                 <Button 
                   onClick={handleClaimStar}
-                  className="gap-2 flex-1 bg-dragon-green hover:bg-dragon-green/90 text-white max-w-28"
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 flex-1 max-w-32"
                   disabled={starClaimed}
                 >
+                  <Star className="w-4 h-4" />
                   VZEMI ZVEZDICO
                 </Button>
               </>
@@ -311,5 +324,17 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
         </div>
       </DialogContent>
     </Dialog>
+    
+    <ConfirmDialog
+      open={showConfirmDialog}
+      onOpenChange={setShowConfirmDialog}
+      title="Zapri igro"
+      description="Če zapreš igro, ne boš prejel zvezdice. Ali si prepričan?"
+      confirmText="V redu"
+      cancelText="Prekliči"
+      onConfirm={handleConfirmClose}
+      onCancel={() => setShowConfirmDialog(false)}
+    />
+  </>
   );
 };
