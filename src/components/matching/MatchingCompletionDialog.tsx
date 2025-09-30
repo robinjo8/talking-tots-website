@@ -21,7 +21,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
   onClose,
   images,
   onStarClaimed,
-  instructionText = "KLIKNI NA SPODNJE SLIČICE IN PONOVI BESEDE. ZA VSAKO SLIČICO IMAŠ 3 SEKUNDE ČASA. V KOLIKOR TI NE USPE, LAHKO PONOVIŠ Z GUMBOM »PONOVI«",
+  instructionText = "KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO.",
   autoPlayAudio = false
 }) => {
   const [recordingStates, setRecordingStates] = useState<{
