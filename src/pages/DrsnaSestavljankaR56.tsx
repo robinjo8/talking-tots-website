@@ -140,7 +140,8 @@ function DrsnaSestavljankaR56Content() {
           onClose={() => setShowCompletion(false)}
           images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
           onStarClaimed={handleStarClaimed}
-          instructionText="KLIKNI NA SPODNJO SLIČICO IN PONOVI BESEDO. ZA IZGOVORJAVO IMAŠ NA VOLJO 3 SEKUNDE ČASA. V KOLIKOR TI NE USPE, LAHKO PONOVIŠ Z GUMBOM 'PONOVI'."
+          instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO."
+          autoPlayAudio={true}
         />
       </div>
     );
@@ -176,7 +177,8 @@ function DrsnaSestavljankaR56Content() {
           onClose={() => setShowCompletion(false)}
           images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
           onStarClaimed={handleStarClaimed}
-          instructionText="KLIKNI NA SPODNJO SLIČICO IN PONOVI BESEDO. ZA IZGOVORJAVO IMAŠ NA VOLJO 3 SEKUNDE ČASA. V KOLIKOR TI NE USPE, LAHKO PONOVIŠ Z GUMBOM 'PONOVI'."
+          instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO."
+          autoPlayAudio={true}
         />
       </div>
     </AppLayout>
