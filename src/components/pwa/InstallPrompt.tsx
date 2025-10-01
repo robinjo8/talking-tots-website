@@ -42,7 +42,7 @@ export function InstallPrompt() {
           initial={{ opacity: 0, y: 100 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 100 }}
-          className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:max-w-sm"
+          className="fixed bottom-4 left-4 right-4 z-50 max-w-[calc(100vw-2rem)] md:left-auto md:right-4 md:max-w-sm"
         >
           <Card className="border-primary shadow-lg">
             <CardContent className="p-4">

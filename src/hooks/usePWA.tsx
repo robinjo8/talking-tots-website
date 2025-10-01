@@ -68,6 +68,11 @@ export function usePWA(): PWAState & PWAActions {
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
               setHasUpdate(true);
+              console.log('PWA Update detected:', {
+                isStandalone: window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true,
+                hasUpdate: true,
+                timestamp: new Date().toISOString()
+              });
             }
           });
         }

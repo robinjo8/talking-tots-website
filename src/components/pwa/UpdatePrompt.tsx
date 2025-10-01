@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from '@/hooks/use-toast';
 
 export function UpdatePrompt() {
-  const { hasUpdate, installUpdate } = usePWA();
+  const { hasUpdate, installUpdate, isStandalone } = usePWA();
   const [isVisible, setIsVisible] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
 
@@ -59,7 +59,7 @@ export function UpdatePrompt() {
     });
   };
 
-  if (!hasUpdate || !isVisible) return null;
+  if (!hasUpdate || !isVisible || !isStandalone) return null;
 
   return (
     <AnimatePresence>
@@ -67,9 +67,10 @@ export function UpdatePrompt() {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md mx-4"
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
       >
-        <Card className="border-primary shadow-xl bg-background">
+        <div className="w-full max-w-md">
+          <Card className="border-primary shadow-xl bg-background">
           <CardContent className="p-6">
             <div className="text-center space-y-4">
               {/* Update Icon */}
@@ -153,6 +154,7 @@ export function UpdatePrompt() {
             </div>
           </CardContent>
         </Card>
+        </div>
       </motion.div>
     </AnimatePresence>
   );
