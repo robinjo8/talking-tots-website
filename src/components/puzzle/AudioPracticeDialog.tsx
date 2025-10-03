@@ -37,14 +37,14 @@ export function AudioPracticeDialog({
               <Button 
                 onClick={onPlayAudio}
                 disabled={isAudioLoading}
-                variant="outline"
+                size="icon"
+                className="bg-green-500 hover:bg-green-600 text-white h-12 w-12"
               >
                 {isAudioLoading ? (
-                  <div className="w-4 h-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                  <div className="w-6 h-6 animate-spin rounded-full border-2 border-white border-t-transparent" />
                 ) : (
-                  <Volume2 className="w-4 h-4" />
+                  <Volume2 className="w-6 h-6" />
                 )}
-                <span className="ml-2">Predvajaj</span>
               </Button>
               
               <Button 

@@ -6,6 +6,7 @@ import { useAudioPlayback } from '@/hooks/useAudioPlayback';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 interface MemoryPairDialogProps {
   isOpen: boolean;
@@ -35,6 +36,7 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
   const [recordingTimeLeft, setRecordingTimeLeft] = useState(3);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
+  const [showCloseConfirmation, setShowCloseConfirmation] = useState(false);
   
   const { playAudio } = useAudioPlayback();
   const { toast } = useToast();
@@ -209,14 +211,25 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
     recordingDataRef.current = [];
   };
 
-  const handleClose = () => {
-    // Un-match the pair when dialog is closed without recording
+  const handleCloseAttempt = () => {
+    // Show confirmation dialog before closing
+    setShowCloseConfirmation(true);
+  };
+
+  const handleConfirmClose = () => {
+    setShowCloseConfirmation(false);
+    // Un-match the pair when dialog is closed without continuing
     onUnmatch();
     onClose();
   };
 
+  const handleCancelClose = () => {
+    setShowCloseConfirmation(false);
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <>
+      <Dialog open={isOpen} onOpenChange={(open) => !open && handleCloseAttempt()}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-dragon-green text-center">
@@ -314,5 +327,18 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
         </div>
       </DialogContent>
     </Dialog>
+
+    <ConfirmDialog
+      open={showCloseConfirmation}
+      onOpenChange={setShowCloseConfirmation}
+      title="Zapuščaš igro"
+      description="Ali res želiš zapreti okno? Tvoj posnetek ne bo shranjen."
+      confirmText="Zapri"
+      cancelText="Nadaljuj z igro"
+      confirmVariant="destructive"
+      onConfirm={handleConfirmClose}
+      onCancel={handleCancelClose}
+    />
+    </>
   );
 };

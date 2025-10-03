@@ -296,11 +296,10 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
           <div className="flex justify-center">
             <Button
               onClick={handlePlayAudio}
-              variant="outline"
-              className="gap-2"
+              size="icon"
+              className="bg-green-500 hover:bg-green-600 text-white h-12 w-12"
             >
-              <Volume2 className="w-4 h-4" />
-              PREDVAJAJ
+              <Volume2 className="w-6 h-6" />
             </Button>
           </div>
 
