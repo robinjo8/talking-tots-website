@@ -105,12 +105,11 @@ export default function SpominC() {
           {effectiveFullscreen && (
             <h2 className="text-lg font-bold mb-3 text-center">Spomin C</h2>
           )}
-          <div className="flex justify-between gap-3">
+          <div className="flex justify-center gap-3">
             <Button
-              variant="outline"
               onClick={() => navigate("/govorne-igre/spomin")}
               size={effectiveFullscreen ? "sm" : "default"}
-              className="gap-2"
+              className="bg-black hover:bg-black/90 text-white gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
               Nazaj
@@ -126,10 +125,9 @@ export default function SpominC() {
             </Button>
             
             <Button
-              variant="outline"
               onClick={() => setShowInfo(true)}
               size={effectiveFullscreen ? "sm" : "default"}
-              className="gap-2"
+              className="bg-black hover:bg-black/90 text-white gap-2"
             >
               <BookOpen className="h-4 w-4" />
               Navodila
