@@ -160,9 +160,9 @@ export function PuzzleCompletionDialog({
             <Button
               onClick={handlePlayAudio}
               size="lg"
-              className="bg-green-500 hover:bg-green-600 text-white gap-2"
+              className="bg-teal-500 hover:bg-teal-600 text-white gap-2"
             >
-              <Volume2 className="w-5 h-5" />
+              <Volume2 className="w-5 h-5 text-green-400" />
               Predvajaj
             </Button>
 
