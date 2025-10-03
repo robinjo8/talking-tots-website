@@ -278,8 +278,7 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
             <Button
               onClick={() => audioUrl && playAudio(audioUrl)}
               disabled={!audioUrl}
-              variant="outline"
-              className="gap-2"
+              className="bg-green-500 hover:bg-green-600 text-white gap-2"
             >
               <Volume2 className="w-4 h-4" />
               PREDVAJAJ

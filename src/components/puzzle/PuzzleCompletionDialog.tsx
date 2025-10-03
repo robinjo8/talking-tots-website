@@ -159,9 +159,8 @@ export function PuzzleCompletionDialog({
           <div className="flex gap-4">
             <Button
               onClick={handlePlayAudio}
-              variant="outline"
               size="lg"
-              className="gap-2"
+              className="bg-green-500 hover:bg-green-600 text-white gap-2"
             >
               <Volume2 className="w-5 h-5" />
               Predvajaj
