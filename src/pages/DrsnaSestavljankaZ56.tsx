@@ -139,13 +139,6 @@ function DrsnaSestavljankaZ56Content() {
           completedImage={currentImage}
           onStarClaimed={handleStarClaimed}
         />
-          isOpen={showCompletion}
-          onClose={() => setShowCompletion(false)}
-          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
-          onStarClaimed={handleStarClaimed}
-          instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO."
-          autoPlayAudio={true}
-        />
       </div>
     );
   }
@@ -180,13 +173,6 @@ function DrsnaSestavljankaZ56Content() {
           onOpenChange={setShowCompletion}
           completedImage={currentImage}
           onStarClaimed={handleStarClaimed}
-        />
-          isOpen={showCompletion}
-          onClose={() => setShowCompletion(false)}
-          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
-          onStarClaimed={handleStarClaimed}
-          instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO."
-          autoPlayAudio={true}
         />
       </div>
     </AppLayout>
