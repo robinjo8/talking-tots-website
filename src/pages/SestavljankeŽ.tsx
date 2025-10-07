@@ -14,16 +14,16 @@ import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
 const žImages = [
-  { filename: 'zaba.png', word: 'ŽABA' },
-  { filename: 'zaga.png', word: 'ŽAGA' },
-  { filename: 'zarnica.png', word: 'ŽARNICA' },
-  { filename: 'zebelj.png', word: 'ŽEBELJ' },
-  { filename: 'zelva.png', word: 'ŽELVA' },
-  { filename: 'zerjav.png', word: 'ŽERJAV' },
-  { filename: 'zirafa.png', word: 'ŽIRAFA' },
-  { filename: 'zlica.png', word: 'ŽLICA' },
-  { filename: 'zoga.png', word: 'ŽOGA' },
-  { filename: 'zolna.png', word: 'ŽOLNA' }
+  { filename: 'zaba.png', word: 'ŽABA', audio: 'zaba.m4a' },
+  { filename: 'zaga.png', word: 'ŽAGA', audio: 'zaga.m4a' },
+  { filename: 'zarnica.png', word: 'ŽARNICA', audio: 'zarnica.m4a' },
+  { filename: 'zebelj.png', word: 'ŽEBELJ', audio: 'zebelj.m4a' },
+  { filename: 'zelva.png', word: 'ŽELVA', audio: 'zelva.m4a' },
+  { filename: 'zerjav.png', word: 'ŽERJAV', audio: 'zerjav.m4a' },
+  { filename: 'zirafa.png', word: 'ŽIRAFA', audio: 'zirafa.m4a' },
+  { filename: 'zlica.png', word: 'ŽLICA', audio: 'zlica.m4a' },
+  { filename: 'zoga.png', word: 'ŽOGA', audio: 'zoga.m4a' },
+  { filename: 'zolna.png', word: 'ŽOLNA', audio: 'zolna.m4a' }
 ];
 
 const getRandomŽImage = () => {

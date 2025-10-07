@@ -13,16 +13,16 @@ import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
 const čImages = [
-  { filename: 'caj.png', word: 'ČAJ' },
-  { filename: 'casopis.png', word: 'ČASOPIS' },
-  { filename: 'cebela.png', word: 'ČEBELA' },
-  { filename: 'cebula.png', word: 'ČEBULA' },
-  { filename: 'cesen.png', word: 'ČESEN' },
-  { filename: 'cevlji.png', word: 'ČEVLJI' },
-  { filename: 'cokolada.png', word: 'ČOKOLADA' },
-  { filename: 'coln.png', word: 'ČOLN' },
-  { filename: 'copic.png', word: 'ČOPIČ' },
-  { filename: 'crke.png', word: 'ČRKE' }
+  { filename: 'caj.png', word: 'ČAJ', audio: 'caj.m4a' },
+  { filename: 'casopis.png', word: 'ČASOPIS', audio: 'casopis.m4a' },
+  { filename: 'cebela.png', word: 'ČEBELA', audio: 'cebela.m4a' },
+  { filename: 'cebula.png', word: 'ČEBULA', audio: 'cebula.m4a' },
+  { filename: 'cesen.png', word: 'ČESEN', audio: 'cesen.m4a' },
+  { filename: 'cevlji.png', word: 'ČEVLJI', audio: 'cevlji.m4a' },
+  { filename: 'cokolada.png', word: 'ČOKOLADA', audio: 'cokolada.m4a' },
+  { filename: 'coln.png', word: 'ČOLN', audio: 'coln.m4a' },
+  { filename: 'copic.png', word: 'ČOPIČ', audio: 'copic.m4a' },
+  { filename: 'crke.png', word: 'ČRKE', audio: 'crke.m4a' }
 ];
 
 const getRandomČImage = () => {

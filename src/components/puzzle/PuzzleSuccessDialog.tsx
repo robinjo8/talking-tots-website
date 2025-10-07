@@ -14,6 +14,7 @@ interface PuzzleSuccessDialogProps {
   completedImage: {
     filename: string;
     word: string;
+    audio?: string;
   };
   onStarClaimed?: () => void;
 }
@@ -39,12 +40,12 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
 
   // Auto-play audio when dialog opens
   useEffect(() => {
-    if (isOpen && completedImage.word) {
-      const wordLower = completedImage.word.toLowerCase();
-      const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${wordLower}.m4a`;
+    if (isOpen && completedImage) {
+      const audioFilename = completedImage.audio || `${completedImage.word.toLowerCase()}.m4a`;
+      const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
       playAudio(audioUrl);
     }
-  }, [isOpen, completedImage.word, playAudio]);
+  }, [isOpen, completedImage, playAudio]);
 
   // Cleanup on dialog close
   useEffect(() => {
@@ -228,8 +229,8 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   };
 
   const handlePlayAudio = () => {
-    const wordLower = completedImage.word.toLowerCase();
-    const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${wordLower}.m4a`;
+    const audioFilename = completedImage.audio || `${completedImage.word.toLowerCase()}.m4a`;
+    const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
     playAudio(audioUrl);
   };
 
