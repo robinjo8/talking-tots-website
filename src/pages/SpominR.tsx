@@ -35,7 +35,11 @@ export default function SpominR() {
     gameCompleted,
     matchedPairs,
     totalPairs,
-    isCheckingMatch
+    isCheckingMatch,
+    showPairDialog,
+    currentMatchedPair,
+    handlePairDialogContinue,
+    handlePairUnmatch
   } = useMemoryGameR();
   const gameStartTimeRef = useRef<number | null>(null);
   const [gameTime, setGameTime] = useState<number | null>(null);
@@ -197,6 +201,18 @@ Ko najdeš par, se odpre okno z izgovorjavo – poslušaj in ponovi besedo na gl
 Če jo pravilno izgovoriš, se par obdrži!
 
 Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede."
+      />
+
+      <MemoryPairDialog
+        isOpen={showPairDialog}
+        onClose={handlePairDialogContinue}
+        onContinue={handlePairDialogContinue}
+        onUnmatch={handlePairUnmatch}
+        pairNumber={matchedPairs.length}
+        totalPairs={totalPairs}
+        imageUrl={currentMatchedPair?.image_url || null}
+        word={currentMatchedPair?.word || null}
+        audioUrl={currentMatchedPair?.audio_url || null}
       />
     </div>
   );
