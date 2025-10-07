@@ -159,7 +159,13 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
     try {
       const audioBlob = new Blob(recordingDataRef.current, { type: 'audio/webm' });
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const filename = `recording-${completedImage.word.toLowerCase()}-${timestamp}.webm`;
+      // Normalize word to remove special characters (č, š, ž, etc.)
+      const normalizedWord = completedImage.word
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+        .replace(/[^a-z0-9]/g, '-'); // Replace non-alphanumeric with dash
+      const filename = `recording-${normalizedWord}-${timestamp}.webm`;
       
       // Create user-specific path: recordings/{user-email}/child-{child-id}/
       const userSpecificPath = `recordings/${user.email}/child-${selectedChild.id}/${filename}`;

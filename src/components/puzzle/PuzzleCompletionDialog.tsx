@@ -114,7 +114,13 @@ export function PuzzleCompletionDialog({
 
   const saveRecording = async (audioBlob: Blob) => {
     try {
-      const fileName = `recording_${completedImage.word.toLowerCase()}_${Date.now()}.webm`;
+      // Normalize word to remove special characters (č, š, ž, etc.)
+      const normalizedWord = completedImage.word
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+        .replace(/[^a-z0-9]/g, '-'); // Replace non-alphanumeric with dash
+      const fileName = `recording_${normalizedWord}_${Date.now()}.webm`;
       
       const { error } = await supabase.storage
         .from('audio-besede')

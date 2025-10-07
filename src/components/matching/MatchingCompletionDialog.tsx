@@ -227,7 +227,13 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
         type: 'audio/webm'
       });
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const filename = `recording-${word.toLowerCase()}-${timestamp}.webm`;
+      // Normalize word to remove special characters (č, š, ž, etc.)
+      const normalizedWord = word
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+        .replace(/[^a-z0-9]/g, '-'); // Replace non-alphanumeric with dash
+      const filename = `recording-${normalizedWord}-${timestamp}.webm`;
 
       // Create user-specific path: recordings/{user-email}/child-{child-id}/
       const userSpecificPath = `recordings/${user.email}/child-${selectedChild.id}/${filename}`;
