@@ -335,7 +335,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-dragon-green text-center">
-            Bravo!
+            Odlično!
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-6 py-4">
