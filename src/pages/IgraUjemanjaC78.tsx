@@ -89,10 +89,9 @@ export default function IgraUjemanjaC78() {
             <h2 className="text-lg font-bold mb-3 text-center">Igra ujemanja {upperCaseLetter} (7-8 let)</h2>
             <div className="flex justify-center gap-3">
               <Button
-                variant="outline"
                 onClick={handleBack}
                 size="sm"
-                className="gap-2"
+                className="bg-black hover:bg-black/90 text-white gap-2"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Nazaj
@@ -102,17 +101,15 @@ export default function IgraUjemanjaC78() {
                 onClick={handleNewGame}
                 size="sm"
                 className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
-                variant="default"
               >
                 <RotateCcw className="h-4 w-4" />
                 Nova igra
               </Button>
               
               <Button
-                variant="outline"
                 onClick={handleInstructions}
                 size="sm"
-                className="gap-2"
+                className="bg-black hover:bg-black/90 text-white gap-2"
               >
                 <BookOpen className="h-4 w-4" />
                 Navodila
@@ -149,15 +146,15 @@ export default function IgraUjemanjaC78() {
     <AppLayout>
       <div className="w-full min-h-screen bg-background">
         <div className="flex justify-center gap-4 p-4">
-          <Button onClick={handleBack} variant="outline" className="gap-2">
+          <Button onClick={handleBack} className="bg-black hover:bg-black/90 text-white gap-2">
             <ArrowLeft className="h-4 w-4" />
             Nazaj
           </Button>
-          <Button onClick={handleNewGame} variant="default" className="gap-2">
+          <Button onClick={handleNewGame} className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
             <RotateCcw className="h-4 w-4" />
             Nova igra
           </Button>
-          <Button onClick={handleInstructions} variant="outline" className="gap-2">
+          <Button onClick={handleInstructions} className="bg-black hover:bg-black/90 text-white gap-2">
             <BookOpen className="h-4 w-4" />
             Navodila
           </Button>

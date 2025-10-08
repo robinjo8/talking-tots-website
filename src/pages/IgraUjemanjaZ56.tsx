@@ -7,7 +7,7 @@ import { useEnhancedProgress } from '@/hooks/useEnhancedProgress';
 import { ThreeColumnGame } from '@/components/matching/ThreeColumnGame';
 import { MatchingInstructionsModal } from '@/components/matching/MatchingInstructionsModal';
 import { MatchingCompletionDialog } from '@/components/matching/MatchingCompletionDialog';
-import { getRandomThreeColumnItems } from '@/data/threeColumnMatchingData';
+import { getRandomThreeColumnItems, ThreeColumnMatchingItem } from '@/data/threeColumnMatchingData';
 import { getAgeGroup } from '@/utils/ageUtils';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, RotateCcw, BookOpen } from 'lucide-react';
@@ -20,6 +20,7 @@ export default function IgraUjemanjaZ56() {
   const [gameKey, setGameKey] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
+  const [completedItems, setCompletedItems] = useState<ThreeColumnMatchingItem[]>([]);
   const gameCompletedRef = useRef(false);
   const { recordGameCompletion } = useEnhancedProgress();
 
@@ -44,10 +45,11 @@ export default function IgraUjemanjaZ56() {
   console.log('Three column items:', items);
 
   // Handle game completion
-  const handleGameComplete = (score: number) => {
+  const handleGameComplete = (score: number, playedItems: ThreeColumnMatchingItem[]) => {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
       console.log(`Game completed with score: ${score}`);
+      setCompletedItems(playedItems);
       setShowCompletion(true);
     }
   };
@@ -92,10 +94,9 @@ export default function IgraUjemanjaZ56() {
             <h2 className="text-lg font-bold mb-3 text-center">Igra ujemanja {upperCaseLetter}</h2>
             <div className="flex justify-center gap-3">
               <Button
-                variant="secondary"
                 onClick={handleBack}
                 size="sm"
-                className="gap-2"
+                className="bg-black hover:bg-black/90 text-white gap-2"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Nazaj
@@ -111,10 +112,9 @@ export default function IgraUjemanjaZ56() {
               </Button>
               
               <Button
-                variant="secondary"
                 onClick={handleInstructions}
                 size="sm"
-                className="gap-2"
+                className="bg-black hover:bg-black/90 text-white gap-2"
               >
                 <BookOpen className="h-4 w-4" />
                 Navodila
@@ -127,7 +127,7 @@ export default function IgraUjemanjaZ56() {
             <ThreeColumnGame
               key={gameKey}
               items={items}
-              onGameComplete={handleGameComplete}
+              onGameComplete={(score, playedItems) => handleGameComplete(score, playedItems)}
             />
           </div>
         </div>
@@ -140,7 +140,7 @@ export default function IgraUjemanjaZ56() {
         <MatchingCompletionDialog
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
-          images={items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
+          images={completedItems.length > 0 ? completedItems.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage })) : items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
           onStarClaimed={handleStarClaimed}
         />
       </div>
@@ -151,7 +151,7 @@ export default function IgraUjemanjaZ56() {
     <AppLayout>
       <div className="w-full min-h-screen bg-background">
         <div className="flex justify-center gap-4 p-4">
-          <Button onClick={handleBack} variant="secondary" className="gap-2">
+          <Button onClick={handleBack} className="bg-black hover:bg-black/90 text-white gap-2">
             <ArrowLeft className="h-4 w-4" />
             Nazaj
           </Button>
@@ -159,7 +159,7 @@ export default function IgraUjemanjaZ56() {
             <RotateCcw className="h-4 w-4" />
             Nova igra
           </Button>
-          <Button onClick={handleInstructions} variant="secondary" className="gap-2">
+          <Button onClick={handleInstructions} className="bg-black hover:bg-black/90 text-white gap-2">
             <BookOpen className="h-4 w-4" />
             Navodila
           </Button>
@@ -169,7 +169,7 @@ export default function IgraUjemanjaZ56() {
           <ThreeColumnGame
             key={gameKey}
             items={items}
-            onGameComplete={handleGameComplete}
+            onGameComplete={(score, playedItems) => handleGameComplete(score, playedItems)}
           />
         </div>
         
@@ -181,7 +181,7 @@ export default function IgraUjemanjaZ56() {
         <MatchingCompletionDialog
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
-          images={items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
+          images={completedItems.length > 0 ? completedItems.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage })) : items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
           onStarClaimed={handleStarClaimed}
         />
       </div>

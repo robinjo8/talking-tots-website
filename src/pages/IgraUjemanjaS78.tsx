@@ -7,64 +7,51 @@ import { useEnhancedProgress } from '@/hooks/useEnhancedProgress';
 import { FourColumnGame } from '@/components/matching/FourColumnGame';
 import { FourColumnInstructionsModal } from '@/components/matching/FourColumnInstructionsModal';
 import { MatchingCompletionDialog } from '@/components/matching/MatchingCompletionDialog';
-import { getRandomFourColumnItems } from '@/data/threeColumnMatchingData';
+import { getRandomFourColumnItems, FourColumnMatchingItem } from '@/data/threeColumnMatchingData';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, RotateCcw, BookOpen } from 'lucide-react';
 
 export default function IgraUjemanjaS78() {
   const { user, selectedChild } = useAuth();
   const navigate = useNavigate();
-  const letter = 's'; // Fixed to 's' for this component
+  const letter = 's';
   const isMobile = useIsMobile();
   const [gameKey, setGameKey] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
+  const [items, setItems] = useState<FourColumnMatchingItem[]>(() => getRandomFourColumnItems(4, 's'));
+  const [completedItems, setCompletedItems] = useState<FourColumnMatchingItem[]>([]);
   const gameCompletedRef = useRef(false);
   const { recordGameCompletion } = useEnhancedProgress();
 
-  // Check authentication
   useEffect(() => {
     if (!user) {
       navigate('/login');
     }
   }, [user, navigate]);
 
-  // Get letter data for four-column game (fixed to 's')
   const upperCaseLetter = letter?.toUpperCase() || 'S';
-  
-  // Get 4 random items for the four-column game
-  const items = getRandomFourColumnItems(4, 's');
-  
-  // Debug logging
-  console.log('Four column items:', items);
 
-  // Handle game completion
   const handleGameComplete = (score: number) => {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
-      console.log(`Game completed with score: ${score}`);
+      setCompletedItems(items);
       setShowCompletion(true);
     }
   };
 
   const handleNewGame = () => {
     gameCompletedRef.current = false;
+    const newItems = getRandomFourColumnItems(4, 's');
+    setItems(newItems);
+    setCompletedItems([]);
     setGameKey(prev => prev + 1);
   };
 
-  const handleBack = () => {
-    navigate('/govorne-igre/igra-ujemanja');
-  };
+  const handleBack = () => navigate('/govorne-igre/igra-ujemanja');
+  const handleInstructions = () => setShowInstructions(true);
+  const handleStarClaimed = () => recordGameCompletion('matching_s_7-8');
 
-  const handleInstructions = () => {
-    setShowInstructions(true);
-  };
-
-  const handleStarClaimed = () => {
-    recordGameCompletion('matching_s_7-8');
-  };
-
-  // Fullscreen handling for mobile
   useEffect(() => {
     if (isMobile) {
       document.documentElement.requestFullscreen?.();
@@ -82,63 +69,29 @@ export default function IgraUjemanjaS78() {
     return (
       <div className="fixed inset-0 bg-background overflow-hidden select-none">
         <div className="h-full flex flex-col">
-          {/* Top Section - Buttons */}
           <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
             <h2 className="text-lg font-bold mb-3 text-center">Igra ujemanja {upperCaseLetter} (7-8 let)</h2>
             <div className="flex justify-center gap-3">
-              <Button
-                variant="outline"
-                onClick={handleBack}
-                size="sm"
-                className="gap-2"
-              >
+              <Button onClick={handleBack} size="sm" className="bg-black hover:bg-black/90 text-white gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Nazaj
               </Button>
-              
-              <Button
-                onClick={handleNewGame}
-                size="sm"
-                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
-                variant="default"
-              >
+              <Button onClick={handleNewGame} size="sm" className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
                 <RotateCcw className="h-4 w-4" />
                 Nova igra
               </Button>
-              
-              <Button
-                variant="outline"
-                onClick={handleInstructions}
-                size="sm"
-                className="gap-2"
-              >
+              <Button onClick={handleInstructions} size="sm" className="bg-black hover:bg-black/90 text-white gap-2">
                 <BookOpen className="h-4 w-4" />
                 Navodila
               </Button>
             </div>
           </div>
-
-          {/* Game Area with gray background */}
           <div className="flex-1 overflow-hidden bg-muted/30 p-2">
-            <FourColumnGame
-              key={gameKey}
-              items={items}
-              onGameComplete={handleGameComplete}
-            />
+            <FourColumnGame key={gameKey} items={items} onGameComplete={handleGameComplete} />
           </div>
         </div>
-        
-        <FourColumnInstructionsModal
-          isOpen={showInstructions}
-          onClose={() => setShowInstructions(false)}
-        />
-        
-        <MatchingCompletionDialog
-          isOpen={showCompletion}
-          onClose={() => setShowCompletion(false)}
-          images={items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
-          onStarClaimed={handleStarClaimed}
-        />
+        <FourColumnInstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
+        <MatchingCompletionDialog isOpen={showCompletion} onClose={() => setShowCompletion(false)} images={completedItems.length > 0 ? completedItems.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage })) : items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))} onStarClaimed={handleStarClaimed} />
       </div>
     );
   }
@@ -147,39 +100,24 @@ export default function IgraUjemanjaS78() {
     <AppLayout>
       <div className="w-full min-h-screen bg-background">
         <div className="flex justify-center gap-4 p-4">
-          <Button onClick={handleBack} variant="outline" className="gap-2">
+          <Button onClick={handleBack} className="bg-black hover:bg-black/90 text-white gap-2">
             <ArrowLeft className="h-4 w-4" />
             Nazaj
           </Button>
-          <Button onClick={handleNewGame} variant="default" className="gap-2">
+          <Button onClick={handleNewGame} className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
             <RotateCcw className="h-4 w-4" />
             Nova igra
           </Button>
-          <Button onClick={handleInstructions} variant="outline" className="gap-2">
+          <Button onClick={handleInstructions} className="bg-black hover:bg-black/90 text-white gap-2">
             <BookOpen className="h-4 w-4" />
             Navodila
           </Button>
         </div>
-        
         <div className="w-full bg-muted/30 flex justify-center items-center p-4 min-h-[calc(100vh-200px)]">
-          <FourColumnGame
-            key={gameKey}
-            items={items}
-            onGameComplete={handleGameComplete}
-          />
+          <FourColumnGame key={gameKey} items={items} onGameComplete={handleGameComplete} />
         </div>
-        
-        <FourColumnInstructionsModal
-          isOpen={showInstructions}
-          onClose={() => setShowInstructions(false)}
-        />
-        
-        <MatchingCompletionDialog
-          isOpen={showCompletion}
-          onClose={() => setShowCompletion(false)}
-          images={items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
-          onStarClaimed={handleStarClaimed}
-        />
+        <FourColumnInstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
+        <MatchingCompletionDialog isOpen={showCompletion} onClose={() => setShowCompletion(false)} images={completedItems.length > 0 ? completedItems.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage })) : items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))} onStarClaimed={handleStarClaimed} />
       </div>
     </AppLayout>
   );
