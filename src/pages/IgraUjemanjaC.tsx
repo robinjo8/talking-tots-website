@@ -8,7 +8,7 @@ import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { MatchingGame } from "@/components/matching/MatchingGame";
 import { MatchingInstructionsModal } from "@/components/matching/MatchingInstructionsModal";
 import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
-import { getLetterData, getImagesForAgeGroup } from "@/data/matchingGameData";
+import { getLetterData, getImagesForAgeGroup, MatchingGameImage } from "@/data/matchingGameData";
 import { useState, useRef } from "react";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 
@@ -20,6 +20,7 @@ export default function IgraUjemanjaC() {
   const [gameKey, setGameKey] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
+  const [playedImages, setPlayedImages] = useState<MatchingGameImage[]>([]);
   const gameCompletedRef = useRef(false);
   
   const getGameImages = () => {
@@ -29,9 +30,10 @@ export default function IgraUjemanjaC() {
   
   const gameImages = getGameImages();
 
-  const handleGameComplete = (score: number) => {
+  const handleGameComplete = (score: number, images: MatchingGameImage[]) => {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
+      setPlayedImages(images);
       console.log(`Game completed with score: ${score}`);
       setShowCompletion(true);
     }
@@ -39,6 +41,7 @@ export default function IgraUjemanjaC() {
 
   const handleNewGame = () => {
     gameCompletedRef.current = false;
+    setPlayedImages([]);
     setGameKey(prev => prev + 1);
   };
 
@@ -92,7 +95,7 @@ export default function IgraUjemanjaC() {
         <MatchingCompletionDialog
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
-          images={gameImages}
+          images={playedImages.length > 0 ? playedImages : gameImages}
           onStarClaimed={handleStarClaimed}
         />
       </div>

@@ -7,7 +7,7 @@ import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 
 interface ThreeColumnGameProps {
   items: ThreeColumnMatchingItem[];
-  onGameComplete?: (score: number) => void;
+  onGameComplete?: (score: number, playedItems: ThreeColumnMatchingItem[]) => void;
 }
 
 export function ThreeColumnGame({ items, onGameComplete }: ThreeColumnGameProps) {
@@ -39,7 +39,7 @@ export function ThreeColumnGame({ items, onGameComplete }: ThreeColumnGameProps)
 
   // Handle game completion
   if (gameState.isComplete && onGameComplete) {
-    onGameComplete(gameState.score);
+    onGameComplete(gameState.score, items);
   }
 
   if (!items.length) {

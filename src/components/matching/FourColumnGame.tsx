@@ -6,7 +6,7 @@ import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 
 interface FourColumnGameProps {
   items: FourColumnMatchingItem[];
-  onGameComplete?: (score: number) => void;
+  onGameComplete?: (score: number, playedItems: FourColumnMatchingItem[]) => void;
 }
 
 export function FourColumnGame({ items, onGameComplete }: FourColumnGameProps) {
@@ -53,7 +53,7 @@ export function FourColumnGame({ items, onGameComplete }: FourColumnGameProps) {
 
   // Handle game completion
   if (gameState.isComplete && onGameComplete) {
-    onGameComplete(gameState.score);
+    onGameComplete(gameState.score, items);
   }
 
   if (!items.length) {

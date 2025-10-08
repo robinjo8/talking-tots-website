@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 interface MatchingGameProps {
   images: MatchingGameImage[];
   numColumns?: number;
-  onGameComplete?: (score: number) => void;
+  onGameComplete?: (score: number, playedImages: MatchingGameImage[]) => void;
   className?: string;
 }
 
@@ -32,9 +32,9 @@ export function MatchingGame({
   // Handle game completion
   useEffect(() => {
     if (gameState.isComplete && onGameComplete) {
-      onGameComplete(gameState.score);
+      onGameComplete(gameState.score, gameState.originalImages);
     }
-  }, [gameState.isComplete, gameState.score, onGameComplete]);
+  }, [gameState.isComplete, gameState.score, gameState.originalImages, onGameComplete]);
 
   if (images.length === 0) {
     return (
