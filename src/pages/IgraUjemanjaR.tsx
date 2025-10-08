@@ -61,17 +61,17 @@ export default function IgraUjemanjaR() {
         <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
           {/* Game Controls */}
           <div className="flex justify-center gap-4 mb-6">
-            <Button onClick={handleNewGame} variant="outline" className="gap-2">
+            <Button onClick={handleBack} variant="outline" className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Nazaj
+            </Button>
+            <Button onClick={handleNewGame} variant="default" className="gap-2">
               <RotateCcw className="h-4 w-4" />
               Nova igra
             </Button>
             <Button onClick={handleInstructions} variant="outline" className="gap-2">
               <BookOpen className="h-4 w-4" />
               Navodila
-            </Button>
-            <Button onClick={handleBack} variant="outline" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Nazaj
             </Button>
           </div>
 

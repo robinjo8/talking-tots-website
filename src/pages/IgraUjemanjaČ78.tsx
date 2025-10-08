@@ -87,16 +87,6 @@ export default function IgraUjemanjaČ78() {
             <h2 className="text-lg font-bold mb-3 text-center">Igra ujemanja {upperCaseLetter} (7-8 let)</h2>
             <div className="flex justify-center gap-3">
               <Button
-                onClick={handleNewGame}
-                size="sm"
-                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
-                variant="default"
-              >
-                <RotateCcw className="h-4 w-4" />
-                Nova igra
-              </Button>
-              
-              <Button
                 variant="outline"
                 onClick={handleBack}
                 size="sm"
@@ -104,6 +94,16 @@ export default function IgraUjemanjaČ78() {
               >
                 <ArrowLeft className="h-4 w-4" />
                 Nazaj
+              </Button>
+              
+              <Button
+                onClick={handleNewGame}
+                size="sm"
+                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
+                variant="default"
+              >
+                <RotateCcw className="h-4 w-4" />
+                Nova igra
               </Button>
               
               <Button
@@ -147,17 +147,17 @@ export default function IgraUjemanjaČ78() {
     <AppLayout>
       <div className="w-full min-h-screen bg-background">
         <div className="flex justify-center gap-4 p-4">
-          <Button onClick={handleNewGame} variant="outline" className="gap-2">
+          <Button onClick={handleBack} variant="outline" className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Nazaj
+          </Button>
+          <Button onClick={handleNewGame} variant="default" className="gap-2">
             <RotateCcw className="h-4 w-4" />
             Nova igra
           </Button>
           <Button onClick={handleInstructions} variant="outline" className="gap-2">
             <BookOpen className="h-4 w-4" />
             Navodila
-          </Button>
-          <Button onClick={handleBack} variant="outline" className="gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Nazaj
           </Button>
         </div>
         
