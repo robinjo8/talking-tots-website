@@ -7,7 +7,7 @@ import { useEnhancedProgress } from '@/hooks/useEnhancedProgress';
 import { ThreeColumnGame } from '@/components/matching/ThreeColumnGame';
 import { MatchingInstructionsModal } from '@/components/matching/MatchingInstructionsModal';
 import { MatchingCompletionDialog } from '@/components/matching/MatchingCompletionDialog';
-import { getRandomThreeColumnItems } from '@/data/threeColumnMatchingData';
+import { getRandomThreeColumnItems, ThreeColumnMatchingItem } from '@/data/threeColumnMatchingData';
 import { getAgeGroup } from '@/utils/ageUtils';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, RotateCcw, BookOpen } from 'lucide-react';
@@ -20,6 +20,7 @@ export default function IgraUjemanjaK56() {
   const [gameKey, setGameKey] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
+  const [completedItems, setCompletedItems] = useState<ThreeColumnMatchingItem[]>([]);
   const gameCompletedRef = useRef(false);
   const { recordGameCompletion } = useEnhancedProgress();
 
@@ -44,9 +45,10 @@ export default function IgraUjemanjaK56() {
   console.log('Three column items:', items);
 
   // Handle game completion
-  const handleGameComplete = (score: number) => {
+  const handleGameComplete = (score: number, playedItems: ThreeColumnMatchingItem[]) => {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
+      setCompletedItems(playedItems);
       console.log(`Game completed with score: ${score}`);
       setShowCompletion(true);
     }
@@ -54,6 +56,7 @@ export default function IgraUjemanjaK56() {
 
   const handleNewGame = () => {
     gameCompletedRef.current = false;
+    setCompletedItems([]);
     setGameKey(prev => prev + 1);
   };
 
@@ -125,7 +128,7 @@ export default function IgraUjemanjaK56() {
             <ThreeColumnGame
               key={gameKey}
               items={items}
-              onGameComplete={handleGameComplete}
+              onGameComplete={(score, playedItems) => handleGameComplete(score, playedItems)}
             />
           </div>
         </div>
@@ -138,7 +141,7 @@ export default function IgraUjemanjaK56() {
         <MatchingCompletionDialog
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
-          images={items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
+          images={(completedItems.length > 0 ? completedItems : items).map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
           onStarClaimed={handleStarClaimed}
         />
       </div>
@@ -167,7 +170,7 @@ export default function IgraUjemanjaK56() {
           <ThreeColumnGame
             key={gameKey}
             items={items}
-            onGameComplete={handleGameComplete}
+            onGameComplete={(score, playedItems) => handleGameComplete(score, playedItems)}
           />
         </div>
         
@@ -179,7 +182,7 @@ export default function IgraUjemanjaK56() {
         <MatchingCompletionDialog
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
-          images={items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
+          images={(completedItems.length > 0 ? completedItems : items).map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
           onStarClaimed={handleStarClaimed}
         />
       </div>
