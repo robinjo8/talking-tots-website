@@ -90,9 +90,9 @@ export default function IgraUjemanjaC56() {
           {/* Top Section - Buttons */}
           <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
             <h2 className="text-lg font-bold mb-3 text-center">Igra ujemanja {upperCaseLetter}</h2>
-            <div className="flex justify-between gap-3">
+            <div className="flex justify-center gap-3">
               <Button
-                variant="outline"
+                variant="secondary"
                 onClick={handleBack}
                 size="sm"
                 className="gap-2"
@@ -111,7 +111,7 @@ export default function IgraUjemanjaC56() {
               </Button>
               
               <Button
-                variant="outline"
+                variant="secondary"
                 onClick={handleInstructions}
                 size="sm"
                 className="gap-2"
@@ -152,7 +152,7 @@ export default function IgraUjemanjaC56() {
       <div className="w-full min-h-screen bg-background">
         <div className="flex justify-center gap-4 p-4">
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={handleBack}
             className="gap-2"
           >
@@ -169,7 +169,7 @@ export default function IgraUjemanjaC56() {
           </Button>
           
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={handleInstructions}
             className="gap-2"
           >

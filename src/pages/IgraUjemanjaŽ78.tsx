@@ -87,17 +87,7 @@ export default function IgraUjemanjaŽ78() {
             <h2 className="text-lg font-bold mb-3 text-center">Igra ujemanja {upperCaseLetter} (7-8 let)</h2>
             <div className="flex justify-center gap-3">
               <Button
-                onClick={handleNewGame}
-                size="sm"
-                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
-                variant="default"
-              >
-                <RotateCcw className="h-4 w-4" />
-                Nova igra
-              </Button>
-              
-              <Button
-                variant="outline"
+                variant="secondary"
                 onClick={handleBack}
                 size="sm"
                 className="gap-2"
@@ -107,7 +97,16 @@ export default function IgraUjemanjaŽ78() {
               </Button>
               
               <Button
-                variant="outline"
+                onClick={handleNewGame}
+                size="sm"
+                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
+              >
+                <RotateCcw className="h-4 w-4" />
+                Nova igra
+              </Button>
+              
+              <Button
+                variant="secondary"
                 onClick={handleInstructions}
                 size="sm"
                 className="gap-2"
@@ -147,17 +146,17 @@ export default function IgraUjemanjaŽ78() {
     <AppLayout>
       <div className="w-full min-h-screen bg-background">
         <div className="flex justify-center gap-4 p-4">
-          <Button onClick={handleNewGame} variant="outline" className="gap-2">
+          <Button onClick={handleBack} variant="secondary" className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Nazaj
+          </Button>
+          <Button onClick={handleNewGame} className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
             <RotateCcw className="h-4 w-4" />
             Nova igra
           </Button>
-          <Button onClick={handleInstructions} variant="outline" className="gap-2">
+          <Button onClick={handleInstructions} variant="secondary" className="gap-2">
             <BookOpen className="h-4 w-4" />
             Navodila
-          </Button>
-          <Button onClick={handleBack} variant="outline" className="gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Nazaj
           </Button>
         </div>
         
