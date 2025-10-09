@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEnhancedProgress } from "./useEnhancedProgress";
@@ -23,6 +23,7 @@ export const useMemoryGameL = () => {
   const [gameCompleted, setGameCompleted] = useState(false);
   const [showPairDialog, setShowPairDialog] = useState(false);
   const [currentMatchedPair, setCurrentMatchedPair] = useState<MemoryCard | null>(null);
+  const gameCompletedRef = useRef(false);
 
   const { data: memoryCardsData, isLoading, error } = useQuery({
     queryKey: ["memoryCardsL"],
@@ -67,6 +68,7 @@ export const useMemoryGameL = () => {
     setFlippedCards([]);
     setMatchedPairs([]);
     setGameCompleted(false);
+    gameCompletedRef.current = false;
     
     console.log("Game initialized with shuffled cards:", shuffledCards);
   };
@@ -136,13 +138,14 @@ export const useMemoryGameL = () => {
   }, [memoryCardsData]);
 
   useEffect(() => {
-    if (cards.length > 0 && matchedPairs.length === cards.length / 2) {
+    if (cards.length > 0 && matchedPairs.length === cards.length / 2 && !gameCompletedRef.current) {
       console.log("Game completed!");
       setGameCompleted(true);
+      gameCompletedRef.current = true;
       // Record completion in progress system
       recordGameCompletion('memory', 'L');
     }
-  }, [matchedPairs, cards, recordGameCompletion]);
+  }, [matchedPairs, cards]);
 
   const resetGame = () => {
     if (memoryCardsData && memoryCardsData.length > 0) {
