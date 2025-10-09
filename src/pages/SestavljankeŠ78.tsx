@@ -125,11 +125,12 @@ function SestavljankeŠ78Content() {
           </div>
         </div>
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
-        <MatchingCompletionDialog 
-          isOpen={showCompletion} 
+        <MatchingCompletionDialog
+          isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
           images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
           onStarClaimed={handleStarClaimed}
+          instructionText="KLIKNI NA SPODNJO SLIČICO IN PONOVI BESEDO..."
         />
       </div>
     );
