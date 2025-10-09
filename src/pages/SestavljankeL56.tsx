@@ -168,6 +168,7 @@ function SestavljankeL56Content() {
           onClose={() => setShowCompletion(false)}
           images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
           onStarClaimed={handleStarClaimed}
+          instructionText="KLIKNI NA SPODNJO SLIČICO IN PONOVI BESEDO..."
         />
       </div>
     </AppLayout>
