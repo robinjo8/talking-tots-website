@@ -103,11 +103,11 @@ function SestavljankeČ78Content() {
                 <RotateCcw className="h-4 w-4" />
                 Nova igra
               </Button>
-              <Button variant="outline" onClick={handleBack} size="sm" className="gap-2">
+              <Button onClick={handleBack} size="sm" className="bg-black hover:bg-black/90 text-white gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Nazaj
               </Button>
-              <Button variant="outline" onClick={() => setShowInstructions(true)} size="sm" className="gap-2">
+              <Button onClick={() => setShowInstructions(true)} size="sm" className="bg-black hover:bg-black/90 text-white gap-2">
                 <BookOpen className="h-4 w-4" />
                 Navodila
               </Button>
@@ -140,15 +140,15 @@ function SestavljankeČ78Content() {
     <AppLayout>
       <div className="w-full min-h-screen bg-background">
         <div className="flex justify-center gap-4 p-4">
-          <Button onClick={handleNewGame} variant="outline" className="gap-2">
+          <Button onClick={handleNewGame} className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
             <RotateCcw className="h-4 w-4" />
             Nova igra
           </Button>
-          <Button onClick={() => setShowInstructions(true)} variant="outline" className="gap-2">
+          <Button onClick={() => setShowInstructions(true)} className="bg-black hover:bg-black/90 text-white gap-2">
             <BookOpen className="h-4 w-4" />
             Navodila
           </Button>
-          <Button onClick={handleBack} variant="outline" className="gap-2">
+          <Button onClick={handleBack} className="bg-black hover:bg-black/90 text-white gap-2">
             <ArrowLeft className="h-4 w-4" />
             Nazaj
           </Button>
@@ -168,7 +168,7 @@ function SestavljankeČ78Content() {
           onClose={() => setShowCompletion(false)}
           images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
           onStarClaimed={handleStarClaimed}
-          instructionText="KLIKNI NA SPODNJO SLIČICO IN PONOVI BESEDO. ZA IZGOVORJAVO IMAŠ NA VOLJO 3 SEKUNDE ČASA. V KOLIKOR TI NE USPE, LAHKO PONOVIŠ Z GUMBOM 'PONOVI'."
+          instructionText="KLIKNI NA SPODNJO SLIČICO IN PONOVI BESEDO..."
         />
       </div>
     </AppLayout>
