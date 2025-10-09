@@ -132,13 +132,13 @@ function SestavljankeR78Content() {
           <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
             <h2 className="text-lg font-bold mb-3 text-center">Sestavljanka R - 16 kosov</h2>
             <div className="flex justify-center gap-3">
-              <Button onClick={handleNewGame} size="sm" className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
-                <RotateCcw className="h-4 w-4" />
-                Nova igra
-              </Button>
               <Button onClick={handleBack} size="sm" className="bg-black hover:bg-black/90 text-white gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Nazaj
+              </Button>
+              <Button onClick={handleNewGame} size="sm" className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
+                <RotateCcw className="h-4 w-4" />
+                Nova igra
               </Button>
               <Button onClick={handleInstructions} size="sm" className="bg-black hover:bg-black/90 text-white gap-2">
                 <BookOpen className="h-4 w-4" />
@@ -181,6 +181,10 @@ function SestavljankeR78Content() {
     <AppLayout>
       <div className="w-full min-h-screen bg-background">
         <div className="flex justify-center gap-4 p-4">
+          <Button onClick={handleBack} className="bg-black hover:bg-black/90 text-white gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Nazaj
+          </Button>
           <Button onClick={handleNewGame} className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
             <RotateCcw className="h-4 w-4" />
             Nova igra
@@ -188,10 +192,6 @@ function SestavljankeR78Content() {
           <Button onClick={handleInstructions} className="bg-black hover:bg-black/90 text-white gap-2">
             <BookOpen className="h-4 w-4" />
             Navodila
-          </Button>
-          <Button onClick={handleBack} className="bg-black hover:bg-black/90 text-white gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Nazaj
           </Button>
         </div>
         
