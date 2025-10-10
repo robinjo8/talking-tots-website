@@ -196,7 +196,7 @@ export function usePWA(): PWAState & PWAActions {
     if (dismissed) {
       const dismissedTime = parseInt(dismissed);
       const daysSinceDismissed = (Date.now() - dismissedTime) / (1000 * 60 * 60 * 24);
-      return daysSinceDismissed > 7; // Show again after 7 days
+      return daysSinceDismissed > 3; // Show again after 3 days
     }
     
     return true;

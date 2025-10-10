@@ -15,7 +15,7 @@ export function InstallPrompt() {
     if (canInstall && !isIOSDevice) {
       const timer = setTimeout(() => {
         setIsVisible(true);
-      }, 5000); // Show after 5 seconds
+      }, 2000); // Show after 2 seconds
 
       return () => clearTimeout(timer);
     }
