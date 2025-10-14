@@ -97,7 +97,8 @@ export default function IgraUjemanjaC56() {
               <Button
                 onClick={handleBack}
                 size="sm"
-                className="bg-black hover:bg-black/90 text-white gap-2"
+                variant="outline"
+                className="gap-2"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Nazaj
@@ -115,7 +116,8 @@ export default function IgraUjemanjaC56() {
               <Button
                 onClick={handleInstructions}
                 size="sm"
-                className="bg-black hover:bg-black/90 text-white gap-2"
+                variant="outline"
+                className="gap-2"
               >
                 <BookOpen className="h-4 w-4" />
                 Navodila
@@ -154,7 +156,8 @@ export default function IgraUjemanjaC56() {
         <div className="flex justify-center gap-4 p-4">
           <Button
             onClick={handleBack}
-            className="bg-black hover:bg-black/90 text-white gap-2"
+            variant="outline"
+            className="gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
             Nazaj
@@ -170,7 +173,8 @@ export default function IgraUjemanjaC56() {
           
           <Button
             onClick={handleInstructions}
-            className="bg-black hover:bg-black/90 text-white gap-2"
+            variant="outline"
+            className="gap-2"
           >
             <BookOpen className="h-4 w-4" />
             Navodila

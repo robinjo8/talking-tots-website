@@ -109,7 +109,8 @@ export default function SpominC() {
             <Button
               onClick={() => navigate("/govorne-igre/spomin")}
               size={effectiveFullscreen ? "sm" : "default"}
-              className="bg-black hover:bg-black/90 text-white gap-2"
+              variant="outline"
+              className="gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
               Nazaj
@@ -127,7 +128,8 @@ export default function SpominC() {
             <Button
               onClick={() => setShowInfo(true)}
               size={effectiveFullscreen ? "sm" : "default"}
-              className="bg-black hover:bg-black/90 text-white gap-2"
+              variant="outline"
+              className="gap-2"
             >
               <BookOpen className="h-4 w-4" />
               Navodila

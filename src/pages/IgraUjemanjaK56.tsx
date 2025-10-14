@@ -97,7 +97,8 @@ export default function IgraUjemanjaK56() {
               <Button
                 onClick={handleBack}
                 size="sm"
-                className="bg-black hover:bg-black/90 text-white gap-2"
+                variant="outline"
+                className="gap-2"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Nazaj
@@ -115,7 +116,8 @@ export default function IgraUjemanjaK56() {
               <Button
                 onClick={handleInstructions}
                 size="sm"
-                className="bg-black hover:bg-black/90 text-white gap-2"
+                variant="outline"
+                className="gap-2"
               >
                 <BookOpen className="h-4 w-4" />
                 Navodila
@@ -152,7 +154,7 @@ export default function IgraUjemanjaK56() {
     <AppLayout>
       <div className="w-full min-h-screen bg-background">
         <div className="flex justify-center gap-4 p-4">
-          <Button onClick={handleBack} className="bg-black hover:bg-black/90 text-white gap-2">
+          <Button variant="outline" onClick={handleBack} className="gap-2">
             <ArrowLeft className="h-4 w-4" />
             Nazaj
           </Button>
@@ -160,7 +162,7 @@ export default function IgraUjemanjaK56() {
             <RotateCcw className="h-4 w-4" />
             Nova igra
           </Button>
-          <Button onClick={handleInstructions} className="bg-black hover:bg-black/90 text-white gap-2">
+          <Button variant="outline" onClick={handleInstructions} className="gap-2">
             <BookOpen className="h-4 w-4" />
             Navodila
           </Button>

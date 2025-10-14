@@ -133,7 +133,8 @@ function SestavljankeCContent() {
               <Button
                 onClick={handleBack}
                 size="sm"
-                className="bg-black hover:bg-black/90 text-white gap-2"
+                variant="outline"
+                className="gap-2"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Nazaj
@@ -151,7 +152,8 @@ function SestavljankeCContent() {
               <Button
                 onClick={handleInstructions}
                 size="sm"
-                className="bg-black hover:bg-black/90 text-white gap-2"
+                variant="outline"
+                className="gap-2"
               >
                 <BookOpen className="h-4 w-4" />
                 Navodila
@@ -192,7 +194,7 @@ function SestavljankeCContent() {
     <AppLayout>
       <div className="w-full min-h-screen bg-background">
         <div className="flex justify-center gap-4 p-4">
-          <Button onClick={handleBack} className="bg-black hover:bg-black/90 text-white gap-2">
+          <Button variant="outline" onClick={handleBack} className="gap-2">
             <ArrowLeft className="h-4 w-4" />
             Nazaj
           </Button>
@@ -200,7 +202,7 @@ function SestavljankeCContent() {
             <RotateCcw className="h-4 w-4" />
             Nova igra
           </Button>
-          <Button onClick={handleInstructions} className="bg-black hover:bg-black/90 text-white gap-2">
+          <Button variant="outline" onClick={handleInstructions} className="gap-2">
             <BookOpen className="h-4 w-4" />
             Navodila
           </Button>
