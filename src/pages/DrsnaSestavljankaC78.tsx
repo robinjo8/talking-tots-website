@@ -109,7 +109,7 @@ function DrsnaSestavljankaC78Content() {
           <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
             <h2 className="text-lg font-bold mb-3 text-center">Drsna sestavljanka C</h2>
             <div className="flex justify-center gap-3">
-              <Button onClick={handleBack} size="sm" className="bg-black hover:bg-black/90 text-white gap-2">
+              <Button onClick={handleBack} size="sm" variant="outline" className="gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Nazaj
               </Button>
@@ -117,7 +117,7 @@ function DrsnaSestavljankaC78Content() {
                 <RotateCcw className="h-4 w-4" />
                 Nova igra
               </Button>
-              <Button onClick={() => setShowInstructions(true)} size="sm" className="bg-black hover:bg-black/90 text-white gap-2">
+              <Button onClick={() => setShowInstructions(true)} size="sm" variant="outline" className="gap-2">
                 <BookOpen className="h-4 w-4" />
                 Navodila
               </Button>
@@ -147,7 +147,7 @@ function DrsnaSestavljankaC78Content() {
     <AppLayout>
       <div className="w-full min-h-screen bg-background">
         <div className="flex justify-center gap-4 p-4">
-          <Button onClick={handleBack} className="bg-black hover:bg-black/90 text-white gap-2">
+          <Button onClick={handleBack} variant="outline" className="gap-2">
             <ArrowLeft className="h-4 w-4" />
             Nazaj
           </Button>
@@ -155,7 +155,7 @@ function DrsnaSestavljankaC78Content() {
             <RotateCcw className="h-4 w-4" />
             Nova igra
           </Button>
-          <Button onClick={() => setShowInstructions(true)} className="bg-black hover:bg-black/90 text-white gap-2">
+          <Button onClick={() => setShowInstructions(true)} variant="outline" className="gap-2">
             <BookOpen className="h-4 w-4" />
             Navodila
           </Button>

@@ -120,7 +120,8 @@ function DrsnaSestavljankaK56Content() {
               <Button
                 onClick={handleBack}
                 size="sm"
-                className="bg-black hover:bg-black/90 text-white gap-2"
+                variant="outline"
+                className="gap-2"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Nazaj
@@ -138,7 +139,8 @@ function DrsnaSestavljankaK56Content() {
               <Button
                 onClick={() => setShowInstructions(true)}
                 size="sm"
-                className="bg-black hover:bg-black/90 text-white gap-2"
+                variant="outline"
+                className="gap-2"
               >
                 <BookOpen className="h-4 w-4" />
                 Navodila
@@ -169,7 +171,7 @@ function DrsnaSestavljankaK56Content() {
     <AppLayout>
       <div className="w-full min-h-screen bg-background">
         <div className="flex justify-center gap-4 p-4">
-          <Button onClick={handleBack} className="bg-black hover:bg-black/90 text-white gap-2">
+          <Button onClick={handleBack} variant="outline" className="gap-2">
             <ArrowLeft className="h-4 w-4" />
             Nazaj
           </Button>
@@ -177,7 +179,7 @@ function DrsnaSestavljankaK56Content() {
             <RotateCcw className="h-4 w-4" />
             Nova igra
           </Button>
-          <Button onClick={() => setShowInstructions(true)} className="bg-black hover:bg-black/90 text-white gap-2">
+          <Button onClick={() => setShowInstructions(true)} variant="outline" className="gap-2">
             <BookOpen className="h-4 w-4" />
             Navodila
           </Button>
