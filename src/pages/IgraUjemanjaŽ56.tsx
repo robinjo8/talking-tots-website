@@ -94,9 +94,10 @@ export default function IgraUjemanjaŽ56() {
             <h2 className="text-lg font-bold mb-3 text-center">Igra ujemanja {upperCaseLetter}</h2>
             <div className="flex justify-center gap-3">
               <Button
+                variant="outline"
                 onClick={handleBack}
                 size="sm"
-                className="bg-black hover:bg-black/90 text-white gap-2"
+                className="gap-2"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Nazaj
@@ -112,9 +113,10 @@ export default function IgraUjemanjaŽ56() {
               </Button>
               
               <Button
+                variant="outline"
                 onClick={handleInstructions}
                 size="sm"
-                className="bg-black hover:bg-black/90 text-white gap-2"
+                className="gap-2"
               >
                 <BookOpen className="h-4 w-4" />
                 Navodila
@@ -152,8 +154,9 @@ export default function IgraUjemanjaŽ56() {
       <div className="w-full min-h-screen bg-background">
         <div className="flex justify-center gap-4 p-4">
           <Button
+            variant="outline"
             onClick={handleBack}
-            className="bg-black hover:bg-black/90 text-white gap-2"
+            className="gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
             Nazaj
@@ -168,8 +171,9 @@ export default function IgraUjemanjaŽ56() {
           </Button>
           
           <Button
+            variant="outline"
             onClick={handleInstructions}
-            className="bg-black hover:bg-black/90 text-white gap-2"
+            className="gap-2"
           >
             <BookOpen className="h-4 w-4" />
             Navodila
