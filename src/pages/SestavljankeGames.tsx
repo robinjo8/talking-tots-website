@@ -161,7 +161,7 @@ export default function SestavljankeGames() {
               />
             </div>
             <div className="flex-1">
-              <p className="text-lg font-medium italic">IZBERI ČRKO IN POMAGAJ TOMIJU SESTAVITI SLIKO. NA KONCU PA SKUPAJ GLASNO PONOVITA BESEDO!</p>
+              <p className="text-lg font-medium italic">IZBERI ČRKO IN SESTAVI SLIKO TER NATO PONOVI BESEDO!</p>
               <p className="text-sm text-muted-foreground mt-2">Z VAJAMI POSTAJAMO VEDNO BOLJŠI!</p>
             </div>
           </CardContent>
