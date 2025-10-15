@@ -6,14 +6,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { getAgeGroup } from "@/utils/ageUtils";
 
 const memoryGames = [{
-  id: "sestavljanke-r",
-  title: "Sestavljanke - R",
-  description: "Sestavi sliko s črko R in nato glasno ponovi besedo",
-  letter: "R",
-  color: "text-app-purple",
-  gradient: "from-app-purple/10 to-app-blue/10",
-  available: true
-}, {
   id: "sestavljanke-c",
   title: "Sestavljanke - C",
   description: "Sestavi sliko s črko C in nato glasno ponovi besedo",
@@ -28,6 +20,30 @@ const memoryGames = [{
   letter: "Č",
   color: "text-app-blue",
   gradient: "from-app-blue/10 to-app-purple/10",
+  available: true
+}, {
+  id: "sestavljanke-k",
+  title: "Sestavljanke - K",
+  description: "Sestavi sliko s črko K in nato glasno ponovi besedo",
+  letter: "K",
+  color: "text-app-orange",
+  gradient: "from-app-orange/10 to-app-yellow/10",
+  available: true
+}, {
+  id: "sestavljanke-l",
+  title: "Sestavljanke - L",
+  description: "Sestavi sliko s črko L in nato glasno ponovi besedo",
+  letter: "L",
+  color: "text-dragon-green",
+  gradient: "from-dragon-green/10 to-app-teal/10",
+  available: true
+}, {
+  id: "sestavljanke-r",
+  title: "Sestavljanke - R",
+  description: "Sestavi sliko s črko R in nato glasno ponovi besedo",
+  letter: "R",
+  color: "text-app-purple",
+  gradient: "from-app-purple/10 to-app-blue/10",
   available: true
 }, {
   id: "sestavljanke-s",
@@ -60,22 +76,6 @@ const memoryGames = [{
   letter: "Ž",
   color: "text-app-blue",
   gradient: "from-app-blue/10 to-app-purple/10",
-  available: true
-}, {
-  id: "sestavljanke-k",
-  title: "Sestavljanke - K",
-  description: "Sestavi sliko s črko K in nato glasno ponovi besedo",
-  letter: "K",
-  color: "text-app-orange",
-  gradient: "from-app-orange/10 to-app-yellow/10",
-  available: true
-}, {
-  id: "sestavljanke-l",
-  title: "Sestavljanke - L",
-  description: "Sestavi sliko s črko L in nato glasno ponovi besedo",
-  letter: "L",
-  color: "text-dragon-green",
-  gradient: "from-dragon-green/10 to-app-teal/10",
   available: true
 }];
 
