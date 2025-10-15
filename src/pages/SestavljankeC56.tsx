@@ -118,7 +118,7 @@ function SestavljankeC56Content() {
               key={puzzleKey}
               imageUrl={imageUrl}
               gridCols={4}
-              gridRows={3}
+              gridRows={5}
               onComplete={handleComplete}
               className="w-full h-full"
             />
@@ -158,7 +158,7 @@ function SestavljankeC56Content() {
             key={puzzleKey}
             imageUrl={imageUrl}
             gridCols={4}
-            gridRows={3}
+            gridRows={5}
             onComplete={handleComplete}
           />
         </div>

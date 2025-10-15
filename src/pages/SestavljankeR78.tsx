@@ -152,8 +152,8 @@ function SestavljankeR78Content() {
             <SimpleJigsaw 
               key={puzzleKey}
               imageUrl={imageUrl}
-              gridCols={4}
-              gridRows={4}
+              gridCols={5}
+              gridRows={5}
               onComplete={handleComplete}
               className="w-full h-full"
             />
@@ -199,8 +199,8 @@ function SestavljankeR78Content() {
           <SimpleJigsaw 
             key={puzzleKey}
             imageUrl={imageUrl}
-            gridCols={4}
-            gridRows={4}
+            gridCols={5}
+            gridRows={5}
             onComplete={handleComplete}
           />
         </div>

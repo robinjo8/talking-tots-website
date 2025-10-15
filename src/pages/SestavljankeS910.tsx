@@ -117,8 +117,8 @@ function SestavljankeS910Content() {
             <SimpleJigsaw 
               key={puzzleKey}
               imageUrl={imageUrl}
-              gridCols={5}
-              gridRows={4}
+              gridCols={6}
+              gridRows={5}
               onComplete={handleComplete}
               className="w-full h-full"
             />
@@ -157,8 +157,8 @@ function SestavljankeS910Content() {
           <SimpleJigsaw 
             key={puzzleKey}
             imageUrl={imageUrl}
-            gridCols={5}
-            gridRows={4}
+            gridCols={6}
+            gridRows={5}
             onComplete={handleComplete}
           />
         </div>

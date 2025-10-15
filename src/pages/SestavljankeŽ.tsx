@@ -165,7 +165,7 @@ function SestavljankeŽContent() {
               key={puzzleKey}
               imageUrl={imageUrl}
               gridCols={3}
-              gridRows={2}
+              gridRows={3}
               onComplete={handleComplete}
               className="w-full h-full"
             />
@@ -210,7 +210,7 @@ function SestavljankeŽContent() {
             key={puzzleKey}
             imageUrl={imageUrl}
             gridCols={3}
-            gridRows={2}
+            gridRows={3}
             onComplete={handleComplete}
           />
         </div>
