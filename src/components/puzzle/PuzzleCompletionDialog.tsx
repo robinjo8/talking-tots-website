@@ -145,24 +145,32 @@ export function PuzzleCompletionDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md mx-auto">
-        <div className="flex flex-col items-center gap-6 p-6">
-          <h2 className="text-2xl font-bold text-center">Odlično!</h2>
+      <DialogContent className="sm:max-w-lg">
+        <div className="space-y-6 py-4">
+          <h2 className="text-2xl font-bold text-dragon-green text-center">Odlično!</h2>
           
-          {/* Completed Image */}
-          <div className="w-32 h-32 rounded-lg overflow-hidden border-2 border-primary">
-            <img 
-              src={imageUrl} 
-              alt={completedImage.word}
-              className="w-full h-full object-contain"
-            />
+          <p className="text-sm text-black text-center">
+            KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO
+          </p>
+          
+          <div className="flex justify-center">
+            <div className="flex flex-col items-center space-y-2">
+              <div className="w-32 h-32 rounded-lg overflow-hidden border-2 border-dragon-green">
+                <img 
+                  src={imageUrl} 
+                  alt={completedImage.word}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+
+              <span className="text-lg font-medium text-center text-black">
+                {completedImage.word}
+              </span>
+            </div>
           </div>
 
-          {/* Word Label */}
-          <h3 className="text-xl font-semibold">{completedImage.word}</h3>
-
-          {/* Audio Controls */}
-          <div className="flex gap-4">
+          {/* Audio playback button */}
+          <div className="flex justify-center">
             <Button
               onClick={handlePlayAudio}
               size="icon"
@@ -170,29 +178,7 @@ export function PuzzleCompletionDialog({
             >
               <Volume2 className="w-6 h-6" />
             </Button>
-
-            <Button
-              onClick={isRecording ? stopRecording : startRecording}
-              size="lg"
-              className={`gap-2 ${
-                isRecording 
-                  ? 'bg-red-500 hover:bg-red-600 text-white'    // Red when recording
-                  : 'bg-dragon-green hover:bg-dragon-green/90 text-white'  // Green when not recording
-              }`}
-            >
-              <Mic className="w-5 h-5" />
-              {isRecording ? `Ustavi (${recordingTimeLeft}s)` : 'Posnemi se'}
-            </Button>
           </div>
-
-          {/* Close Button */}
-          <Button
-            onClick={() => onOpenChange(false)}
-            variant="outline"
-            className="mt-4"
-          >
-            Zapri
-          </Button>
         </div>
       </DialogContent>
     </Dialog>
