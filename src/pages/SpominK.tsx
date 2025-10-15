@@ -7,7 +7,7 @@ import { useMemoryGameK } from "@/hooks/useMemoryGameK";
 import { useToast } from "@/components/ui/use-toast";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { InfoModal } from "@/components/games/InfoModal";
-
+import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MemoryPairDialog } from "@/components/games/MemoryPairDialog";
 
@@ -107,15 +107,16 @@ export default function SpominK() {
             <h2 className="text-lg font-bold mb-3 text-center">Spomin K</h2>
           )}
           <div className="flex justify-center gap-3">
-            <Button
-              onClick={() => navigate("/govorne-igre/spomin")}
-              size={effectiveFullscreen ? "sm" : "default"}
-              variant="outline"
-              className="gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Nazaj
-            </Button>
+            <MemoryExitConfirmationDialog onConfirm={() => navigate("/govorne-igre/spomin")}>
+              <Button
+                size={effectiveFullscreen ? "sm" : "default"}
+                variant="outline"
+                className="gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Nazaj
+              </Button>
+            </MemoryExitConfirmationDialog>
             
             <Button
               onClick={handleReset}
