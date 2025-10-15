@@ -187,6 +187,7 @@ export function EditChildForm({ childIndex, initialData, onSuccess, onCancel }: 
                 mode="single"
                 selected={birthDate ?? undefined}
                 onSelect={handleDateSelect}
+                disabled={(date) => date > new Date()}
                 initialFocus
               />
             </PopoverContent>

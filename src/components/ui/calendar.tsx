@@ -31,8 +31,8 @@ function Calendar({
   const currentYear = month.getFullYear();
   const currentMonthIndex = month.getMonth();
 
-  // Generate year options (from 1950 to current year + 10)
-  const yearOptions = Array.from({ length: new Date().getFullYear() - 1950 + 11 }, (_, i) => 1950 + i).reverse();
+  // Generate year options (from 1950 to current year only)
+  const yearOptions = Array.from({ length: new Date().getFullYear() - 1950 + 1 }, (_, i) => 1950 + i).reverse();
   
   // Month names in Slovenian
   const monthNames = [
