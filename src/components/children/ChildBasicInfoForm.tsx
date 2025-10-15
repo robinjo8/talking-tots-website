@@ -35,6 +35,13 @@ export function ChildBasicInfoForm({
   onSubmit,
   title = "Dodaj novega otroka"
 }: ChildBasicInfoFormProps) {
+  const [calendarOpen, setCalendarOpen] = useState(false);
+
+  const handleDateSelect = (date: Date | null) => {
+    onBirthDateChange(date);
+    setCalendarOpen(false);
+  };
+
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <h3 className="text-lg font-medium mb-2">{title}</h3>
@@ -54,7 +61,7 @@ export function ChildBasicInfoForm({
 
         <div className="space-y-2">
           <Label htmlFor="birth-date">Datum rojstva otroka</Label>
-          <Popover>
+          <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
             <PopoverTrigger asChild>
               <Button
                 id="birth-date"
@@ -71,7 +78,7 @@ export function ChildBasicInfoForm({
               <Calendar
                 mode="single"
                 selected={birthDate}
-                onSelect={onBirthDateChange}
+                onSelect={handleDateSelect}
                 initialFocus
               />
             </PopoverContent>
