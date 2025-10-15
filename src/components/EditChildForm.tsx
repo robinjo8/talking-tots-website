@@ -33,6 +33,12 @@ export function EditChildForm({ childIndex, initialData, onSuccess, onCancel }: 
   const [avatarId, setAvatarId] = useState(initialData.avatarId);
   const [birthDate, setBirthDate] = useState<Date | null>(initialData.birthDate || null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+
+  const handleDateSelect = (date: Date | undefined) => {
+    setBirthDate(date || null);
+    setCalendarOpen(false);
+  };
 
   useEffect(() => {
     setName(initialData.name);
@@ -163,7 +169,7 @@ export function EditChildForm({ childIndex, initialData, onSuccess, onCancel }: 
 
         <div className="space-y-2">
           <Label htmlFor="birth-date">Datum rojstva otroka</Label>
-          <Popover>
+          <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
             <PopoverTrigger asChild>
               <Button
                 id="birth-date"
@@ -179,8 +185,8 @@ export function EditChildForm({ childIndex, initialData, onSuccess, onCancel }: 
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
-                selected={birthDate}
-                onSelect={setBirthDate}
+                selected={birthDate ?? undefined}
+                onSelect={handleDateSelect}
                 initialFocus
               />
             </PopoverContent>
