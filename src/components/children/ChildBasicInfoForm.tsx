@@ -37,8 +37,8 @@ export function ChildBasicInfoForm({
 }: ChildBasicInfoFormProps) {
   const [calendarOpen, setCalendarOpen] = useState(false);
 
-  const handleDateSelect = (date: Date | null) => {
-    onBirthDateChange(date);
+  const handleDateSelect = (date: Date | undefined) => {
+    onBirthDateChange(date || null);
     setCalendarOpen(false);
   };
 
@@ -77,7 +77,7 @@ export function ChildBasicInfoForm({
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
-                selected={birthDate}
+                selected={birthDate ?? undefined}
                 onSelect={handleDateSelect}
                 initialFocus
               />
