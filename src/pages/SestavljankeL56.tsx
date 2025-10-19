@@ -140,7 +140,7 @@ function SestavljankeL56Content() {
     <AppLayout>
       <div className="w-full min-h-screen bg-background">
         <div className="flex justify-center gap-4 p-4">
-          <Button variant="outline" onClick={handleBack} className="gap-2">
+          <Button onClick={handleBack} variant="outline" className="gap-2">
             <ArrowLeft className="h-4 w-4" />
             Nazaj
           </Button>
