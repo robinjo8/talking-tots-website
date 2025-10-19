@@ -2,7 +2,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { SimpleJigsaw } from "@/components/puzzle/SimpleJigsaw";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
-import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
+import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -179,13 +179,11 @@ function SestavljankeR56Content() {
           onClose={() => setShowInstructions(false)}
         />
 
-        <MatchingCompletionDialog
+        <PuzzleSuccessDialog
           isOpen={showCompletion}
-          onClose={() => setShowCompletion(false)}
-          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
+          onOpenChange={setShowCompletion}
+          completedImage={currentImage}
           onStarClaimed={handleStarClaimed}
-          instructionText="KLIKNI NA SPODNJO SLIČICO IN PONOVI BESEDO..."
-          autoPlayAudio={true}
         />
 
       </div>
@@ -225,13 +223,11 @@ function SestavljankeR56Content() {
           onClose={() => setShowInstructions(false)}
         />
 
-        <MatchingCompletionDialog
+        <PuzzleSuccessDialog
           isOpen={showCompletion}
-          onClose={() => setShowCompletion(false)}
-          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
+          onOpenChange={setShowCompletion}
+          completedImage={currentImage}
           onStarClaimed={handleStarClaimed}
-          instructionText="KLIKNI NA SPODNJO SLIČICO IN PONOVI BESEDO..."
-          autoPlayAudio={true}
         />
 
       </div>

@@ -2,7 +2,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { SimpleJigsaw } from "@/components/puzzle/SimpleJigsaw";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
-import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
+import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
 
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useRef } from "react";
@@ -125,12 +125,11 @@ function SestavljankeS56Content() {
           </div>
         </div>
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
-        <MatchingCompletionDialog 
-          isOpen={showCompletion} 
-          onClose={() => setShowCompletion(false)}
-          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
+        <PuzzleSuccessDialog
+          isOpen={showCompletion}
+          onOpenChange={setShowCompletion}
+          completedImage={currentImage}
           onStarClaimed={handleStarClaimed}
-          instructionText="KLIKNI NA SPODNJO SLIČICO IN PONOVI BESEDO..."
         />
       </div>
     );
@@ -163,12 +162,11 @@ function SestavljankeS56Content() {
           />
         </div>
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
-        <MatchingCompletionDialog 
-          isOpen={showCompletion} 
-          onClose={() => setShowCompletion(false)}
-          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
+        <PuzzleSuccessDialog
+          isOpen={showCompletion}
+          onOpenChange={setShowCompletion}
+          completedImage={currentImage}
           onStarClaimed={handleStarClaimed}
-          instructionText="KLIKNI NA SPODNJO SLIČICO IN PONOVI BESEDO..."
         />
       </div>
     </AppLayout>
