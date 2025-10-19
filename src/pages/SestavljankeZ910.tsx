@@ -72,6 +72,10 @@ function SestavljankeZ910Content() {
     navigate("/govorne-igre/sestavljanke");
   };
 
+  const handleInstructions = () => {
+    setShowInstructions(true);
+  };
+
   useEffect(() => {
     if (effectiveFullscreen) {
       const requestFullscreen = async () => {
@@ -147,7 +151,7 @@ function SestavljankeZ910Content() {
             <RotateCcw className="h-4 w-4" />
             Nova igra
           </Button>
-          <Button onClick={() => setShowInstructions(true)} variant="outline" className="gap-2">
+          <Button onClick={handleInstructions} variant="outline" className="gap-2">
             <BookOpen className="h-4 w-4" />
             Navodila
           </Button>
