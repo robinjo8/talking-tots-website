@@ -6,7 +6,6 @@ import { ConnectionLine } from './ConnectionLine';
 import { Button } from '@/components/ui/button';
 import { RotateCcw, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { MemoryPairDialog } from '@/components/games/MemoryPairDialog';
 
 interface MatchingGameProps {
   images: MatchingGameImage[];
@@ -27,8 +26,7 @@ export function MatchingGame({
     handleTileClick,
     resetGame,
     isTileSelected,
-    isTileMatched,
-    handlePairDialogContinue
+    isTileMatched
   } = useMatchingGame(images, numColumns);
 
   // Handle game completion
@@ -102,18 +100,6 @@ export function MatchingGame({
           </div>
         )}
       </div>
-
-      <MemoryPairDialog
-        isOpen={gameState.showPairDialog}
-        onClose={handlePairDialogContinue}
-        onContinue={handlePairDialogContinue}
-        onUnmatch={() => {}}
-        pairNumber={gameState.completedMatches.size}
-        totalPairs={gameState.originalImages.length}
-        imageUrl={gameState.currentMatchedPair?.url || null}
-        word={gameState.currentMatchedPair?.word || null}
-        audioUrl={gameState.currentMatchedPair?.audio_url || null}
-      />
     </div>
   );
 }
