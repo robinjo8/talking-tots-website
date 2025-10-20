@@ -13,15 +13,11 @@ import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
 const sImages = [
-  { filename: 'sedem.png', word: 'SEDEM' },
-  { filename: 'sir.png', word: 'SIR' },
   { filename: 'sladoled.png', word: 'SLADOLED' },
   { filename: 'slika.png', word: 'SLIKA' },
   { filename: 'slon.png', word: 'SLON' },
   { filename: 'smreka.png', word: 'SMREKA' },
-  { filename: 'sneg.png', word: 'SNEG' },
   { filename: 'snezak.png', word: 'SNEŽAK' },
-  { filename: 'sok.png', word: 'SOK' },
   { filename: 'sonce.png', word: 'SONCE' },
   { filename: 'sova.png', word: 'SOVA' },
   { filename: 'stol.png', word: 'STOL' },

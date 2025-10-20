@@ -14,22 +14,14 @@ import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
 const rImages = [
   { filename: 'raca.png', word: 'RACA' },
-  { filename: 'radar.png', word: 'RADAR' },
-  { filename: 'radij.png', word: 'RADIJ' },
-  { filename: 'radio.png', word: 'RADIO' },
-  { filename: 'rak.png', word: 'RAK' },
   { filename: 'raketa.png', word: 'RAKETA' },
-  { filename: 'rama.png', word: 'RAMA' },
-  { filename: 'rampa.png', word: 'RAMPA' },
-  { filename: 'rana.png', word: 'RANA' },
-  { filename: 'ranc.png', word: 'RANČ' },
-  { filename: 'rasa.png', word: 'RASA' },
-  { filename: 'resa.png', word: 'RESA' },
+  { filename: 'ravnilo.png', word: 'RAVNILO' },
+  { filename: 'repa.png', word: 'REPA' },
   { filename: 'riba.png', word: 'RIBA' },
-  { filename: 'robida.png', word: 'ROBIDA' },
+  { filename: 'robot.png', word: 'ROBOT' },
   { filename: 'roka.png', word: 'ROKA' },
-  { filename: 'rosa.png', word: 'ROSA' },
-  { filename: 'rozina.png', word: 'ROZINA' },
+  { filename: 'rolka.png', word: 'ROLKA' },
+  { filename: 'ropotuljica.png', word: 'ROPOTULJICA' },
   { filename: 'roza.png', word: 'ROŽA' }
 ];
 

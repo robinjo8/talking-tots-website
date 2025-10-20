@@ -13,21 +13,15 @@ import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
 const kImages = [
-  { filename: 'kaca.png', word: 'KAČA' },
   { filename: 'kapa.png', word: 'KAPA' },
-  { filename: 'kava.png', word: 'KAVA' },
   { filename: 'klavir.png', word: 'KLAVIR' },
-  { filename: 'kljuc.png', word: 'KLJUČ' },
-  { filename: 'klop.png', word: 'KLOP' },
   { filename: 'knjiga.png', word: 'KNJIGA' },
   { filename: 'kocka.png', word: 'KOCKA' },
-  { filename: 'kokos.png', word: 'KOKOŠ' },
+  { filename: 'kokos.png', word: 'KOKOS' },
   { filename: 'kolo.png', word: 'KOLO' },
-  { filename: 'kost.png', word: 'KOST' },
-  { filename: 'kos.png', word: 'KOŠ' },
   { filename: 'kosara.png', word: 'KOŠARA' },
-  { filename: 'koza.png', word: 'KOZA' },
-  { filename: 'krava.png', word: 'KRAVA' }
+  { filename: 'kruh.png', word: 'KRUH' },
+  { filename: 'kumara.png', word: 'KUMARA' }
 ];
 
 const getRandomKImage = () => {
