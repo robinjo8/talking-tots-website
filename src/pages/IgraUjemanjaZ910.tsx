@@ -8,6 +8,7 @@ import { useEnhancedProgress } from '@/hooks/useEnhancedProgress';
 import { FourColumnGame } from '@/components/matching/FourColumnGame';
 import { FourColumnInstructionsModal } from '@/components/matching/FourColumnInstructionsModal';
 import { MatchingCompletionDialog } from '@/components/matching/MatchingCompletionDialog';
+import { MemoryExitConfirmationDialog } from '@/components/games/MemoryExitConfirmationDialog';
 import { getRandomFourColumnItems } from '@/data/threeColumnMatchingData';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, RotateCcw, BookOpen } from 'lucide-react';
@@ -105,15 +106,16 @@ function IgraUjemanjaZ910Content() {
                 Nova igra
               </Button>
               
-              <Button
-                variant="outline"
-                onClick={handleBack}
-                size="sm"
-                className="gap-2"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Nazaj
-              </Button>
+              <MemoryExitConfirmationDialog onConfirm={handleBack}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Nazaj
+                </Button>
+              </MemoryExitConfirmationDialog>
               
               <Button
                 variant="outline"
@@ -164,10 +166,12 @@ function IgraUjemanjaZ910Content() {
             <BookOpen className="h-4 w-4" />
             Navodila
           </Button>
-          <Button onClick={handleBack} variant="outline" className="gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Nazaj
-          </Button>
+          <MemoryExitConfirmationDialog onConfirm={handleBack}>
+            <Button variant="outline" className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Nazaj
+            </Button>
+          </MemoryExitConfirmationDialog>
         </div>
         
         <div className="w-full bg-muted/30 flex justify-center items-center p-4 min-h-[calc(100vh-200px)]">
