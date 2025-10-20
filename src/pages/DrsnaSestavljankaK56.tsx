@@ -118,15 +118,16 @@ function DrsnaSestavljankaK56Content() {
           <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
             <h2 className="text-lg font-bold mb-3 text-center">Drsna sestavljanka K</h2>
             <div className="flex justify-center gap-3">
-              <Button
-                onClick={handleBack}
-                size="sm"
-                variant="outline"
-                className="gap-2"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Nazaj
-              </Button>
+              <MemoryExitConfirmationDialog onConfirm={handleBack}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-2"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Nazaj
+                </Button>
+              </MemoryExitConfirmationDialog>
               
               <Button
                 onClick={handleNewGame}
@@ -172,10 +173,12 @@ function DrsnaSestavljankaK56Content() {
     <AppLayout>
       <div className="w-full min-h-screen bg-background">
         <div className="flex justify-center gap-4 p-4">
-          <Button onClick={handleBack} variant="outline" className="gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Nazaj
-          </Button>
+          <MemoryExitConfirmationDialog onConfirm={handleBack}>
+            <Button variant="outline" className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Nazaj
+            </Button>
+          </MemoryExitConfirmationDialog>
           <Button onClick={handleNewGame} className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
             <RotateCcw className="h-4 w-4" />
             Nova igra
