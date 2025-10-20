@@ -2,7 +2,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { SlidingPuzzle910 } from "@/components/puzzle/SlidingPuzzle910";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
-import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
+import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 
 import { Button } from "@/components/ui/button";
@@ -133,14 +133,12 @@ function DrsnaSestavljankaK910Content() {
           </div>
         </div>
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
-        <MatchingCompletionDialog
-          isOpen={showCompletion}
-          onClose={() => setShowCompletion(false)}
-          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
-          onStarClaimed={handleStarClaimed}
-          instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO."
-          autoPlayAudio={true}
-        />
+          <PuzzleSuccessDialog
+            isOpen={showCompletion}
+            onOpenChange={setShowCompletion}
+            completedImage={currentImage}
+            onStarClaimed={handleStarClaimed}
+          />
       </div>
     );
   }
@@ -172,13 +170,11 @@ function DrsnaSestavljankaK910Content() {
           />
         </div>
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
-        <MatchingCompletionDialog
+        <PuzzleSuccessDialog
           isOpen={showCompletion}
-          onClose={() => setShowCompletion(false)}
-          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
+          onOpenChange={setShowCompletion}
+          completedImage={currentImage}
           onStarClaimed={handleStarClaimed}
-          instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO."
-          autoPlayAudio={true}
         />
       </div>
     </AppLayout>
