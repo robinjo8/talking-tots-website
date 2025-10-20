@@ -3,8 +3,7 @@ import { MatchingGameImage } from '@/data/matchingGameData';
 import { useMatchingGame } from '@/hooks/useMatchingGame';
 import { ImageTile } from './ImageTile';
 import { ConnectionLine } from './ConnectionLine';
-import { Button } from '@/components/ui/button';
-import { RotateCcw, Trophy } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface MatchingGameProps {

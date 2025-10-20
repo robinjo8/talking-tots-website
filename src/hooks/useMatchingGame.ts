@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { MatchingGameImage } from '@/data/matchingGameData';
 
 export interface MatchPosition {
@@ -24,6 +24,8 @@ export interface MatchingGameState {
 }
 
 export function useMatchingGame(images: MatchingGameImage[], numColumns: number = 2) {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  
   const [gameState, setGameState] = useState<MatchingGameState>({
     originalImages: [],
     shuffledColumns: [],
@@ -88,6 +90,21 @@ export function useMatchingGame(images: MatchingGameImage[], numColumns: number 
 
       // Check if it's a valid match (same image, different columns)
       if (prev.selectedPosition.imageId === imageId) {
+        // Find the matched image to get its audio URL
+        const matchedImage = prev.originalImages.find(img => img.word === imageId);
+        
+        // Play audio if available
+        if (matchedImage?.audio_url) {
+          if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.src = "";
+          }
+          audioRef.current = new Audio(matchedImage.audio_url);
+          audioRef.current.play().catch(error => {
+            console.error("Error playing match audio:", error);
+          });
+        }
+        
         // Create connection
         const connectionId = `${prev.selectedPosition.imageId}-${Date.now()}`;
         const newConnection: Connection = {

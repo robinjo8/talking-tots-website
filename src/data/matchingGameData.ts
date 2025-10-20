@@ -2,6 +2,7 @@ export interface MatchingGameImage {
   word: string;
   filename: string;
   url: string;
+  audio_url?: string;
 }
 
 export interface LetterData {
@@ -15,136 +16,136 @@ export const matchingGameData: LetterData[] = [
   {
     letter: "C",
     images: [
-      { word: "CEDILO", filename: "cedilo.png", url: `${SUPABASE_STORAGE_URL}/cedilo.png` },
-      { word: "CEKIN", filename: "cekin.png", url: `${SUPABASE_STORAGE_URL}/cekin.png` },
-      { word: "CERKEV", filename: "cerkev.png", url: `${SUPABASE_STORAGE_URL}/cerkev.png` },
-      { word: "CESTA", filename: "cesta.png", url: `${SUPABASE_STORAGE_URL}/cesta.png` },
-      { word: "CEV", filename: "cev.png", url: `${SUPABASE_STORAGE_URL}/cev.png` },
-      { word: "CIRKUS", filename: "cirkus.png", url: `${SUPABASE_STORAGE_URL}/cirkus.png` },
-      { word: "CISTERNA", filename: "cisterna.png", url: `${SUPABASE_STORAGE_URL}/cisterna.png` },
-      { word: "COKLA", filename: "cokla.png", url: `${SUPABASE_STORAGE_URL}/cokla.png` },
-      { word: "COPAT", filename: "copat.png", url: `${SUPABASE_STORAGE_URL}/copat.png` },
-      { word: "CVET", filename: "cvet.png", url: `${SUPABASE_STORAGE_URL}/cvet.png` }
+      { word: "CEDILO", filename: "cedilo.png", url: `${SUPABASE_STORAGE_URL}/cedilo.png`, audio_url: `${SUPABASE_STORAGE_URL}/cedilo.m4a` },
+      { word: "CEKIN", filename: "cekin.png", url: `${SUPABASE_STORAGE_URL}/cekin.png`, audio_url: `${SUPABASE_STORAGE_URL}/cekin.m4a` },
+      { word: "CERKEV", filename: "cerkev.png", url: `${SUPABASE_STORAGE_URL}/cerkev.png`, audio_url: `${SUPABASE_STORAGE_URL}/cerkev.m4a` },
+      { word: "CESTA", filename: "cesta.png", url: `${SUPABASE_STORAGE_URL}/cesta.png`, audio_url: `${SUPABASE_STORAGE_URL}/cesta.m4a` },
+      { word: "CEV", filename: "cev.png", url: `${SUPABASE_STORAGE_URL}/cev.png`, audio_url: `${SUPABASE_STORAGE_URL}/cev.m4a` },
+      { word: "CIRKUS", filename: "cirkus.png", url: `${SUPABASE_STORAGE_URL}/cirkus.png`, audio_url: `${SUPABASE_STORAGE_URL}/cirkus.m4a` },
+      { word: "CISTERNA", filename: "cisterna.png", url: `${SUPABASE_STORAGE_URL}/cisterna.png`, audio_url: `${SUPABASE_STORAGE_URL}/cisterna.m4a` },
+      { word: "COKLA", filename: "cokla.png", url: `${SUPABASE_STORAGE_URL}/cokla.png`, audio_url: `${SUPABASE_STORAGE_URL}/cokla.m4a` },
+      { word: "COPAT", filename: "copat.png", url: `${SUPABASE_STORAGE_URL}/copat.png`, audio_url: `${SUPABASE_STORAGE_URL}/copat.m4a` },
+      { word: "CVET", filename: "cvet.png", url: `${SUPABASE_STORAGE_URL}/cvet.png`, audio_url: `${SUPABASE_STORAGE_URL}/cvet.m4a` }
     ]
   },
   {
     letter: "Č",
     images: [
-      { word: "ČAJ", filename: "caj.png", url: `${SUPABASE_STORAGE_URL}/caj.png` },
-      { word: "ČASOPIS", filename: "casopis.png", url: `${SUPABASE_STORAGE_URL}/casopis.png` },
-      { word: "ČEBELA", filename: "cebela.png", url: `${SUPABASE_STORAGE_URL}/cebela.png` },
-      { word: "ČEBULA", filename: "cebula.png", url: `${SUPABASE_STORAGE_URL}/cebula.png` },
-      { word: "ČESEN", filename: "cesen.png", url: `${SUPABASE_STORAGE_URL}/cesen.png` },
-      { word: "ČEVLJI", filename: "cevlji.png", url: `${SUPABASE_STORAGE_URL}/cevlji.png` },
-      { word: "ČOKOLADA", filename: "cokolada.png", url: `${SUPABASE_STORAGE_URL}/cokolada.png` },
-      { word: "ČOLN", filename: "coln.png", url: `${SUPABASE_STORAGE_URL}/coln.png` },
-      { word: "ČOPIČ", filename: "copic.png", url: `${SUPABASE_STORAGE_URL}/copic.png` },
-      { word: "ČRKE", filename: "crke.png", url: `${SUPABASE_STORAGE_URL}/crke.png` }
+      { word: "ČAJ", filename: "caj.png", url: `${SUPABASE_STORAGE_URL}/caj.png`, audio_url: `${SUPABASE_STORAGE_URL}/caj.m4a` },
+      { word: "ČASOPIS", filename: "casopis.png", url: `${SUPABASE_STORAGE_URL}/casopis.png`, audio_url: `${SUPABASE_STORAGE_URL}/casopis.m4a` },
+      { word: "ČEBELA", filename: "cebela.png", url: `${SUPABASE_STORAGE_URL}/cebela.png`, audio_url: `${SUPABASE_STORAGE_URL}/cebela.m4a` },
+      { word: "ČEBULA", filename: "cebula.png", url: `${SUPABASE_STORAGE_URL}/cebula.png`, audio_url: `${SUPABASE_STORAGE_URL}/cebula.m4a` },
+      { word: "ČESEN", filename: "cesen.png", url: `${SUPABASE_STORAGE_URL}/cesen.png`, audio_url: `${SUPABASE_STORAGE_URL}/cesen.m4a` },
+      { word: "ČEVLJI", filename: "cevlji.png", url: `${SUPABASE_STORAGE_URL}/cevlji.png`, audio_url: `${SUPABASE_STORAGE_URL}/cevlji.m4a` },
+      { word: "ČOKOLADA", filename: "cokolada.png", url: `${SUPABASE_STORAGE_URL}/cokolada.png`, audio_url: `${SUPABASE_STORAGE_URL}/cokolada.m4a` },
+      { word: "ČOLN", filename: "coln.png", url: `${SUPABASE_STORAGE_URL}/coln.png`, audio_url: `${SUPABASE_STORAGE_URL}/coln.m4a` },
+      { word: "ČOPIČ", filename: "copic.png", url: `${SUPABASE_STORAGE_URL}/copic.png`, audio_url: `${SUPABASE_STORAGE_URL}/copic.m4a` },
+      { word: "ČRKE", filename: "crke.png", url: `${SUPABASE_STORAGE_URL}/crke.png`, audio_url: `${SUPABASE_STORAGE_URL}/crke.m4a` }
     ]
   },
   {
     letter: "K",
     images: [
-      { word: "KAČA", filename: "kaca.png", url: `${SUPABASE_STORAGE_URL}/kaca.png` },
-      { word: "KAPA", filename: "kapa.png", url: `${SUPABASE_STORAGE_URL}/kapa.png` },
-      { word: "KAVA", filename: "kava.png", url: `${SUPABASE_STORAGE_URL}/kava.png` },
-      { word: "KLAVIR", filename: "klavir.png", url: `${SUPABASE_STORAGE_URL}/klavir.png` },
-      { word: "KLJUČ", filename: "kljuc.png", url: `${SUPABASE_STORAGE_URL}/kljuc.png` },
-      { word: "KLOP", filename: "klop.png", url: `${SUPABASE_STORAGE_URL}/klop.png` },
-      { word: "KNJIGA", filename: "knjiga.png", url: `${SUPABASE_STORAGE_URL}/knjiga.png` },
-      { word: "KOCKA", filename: "kocka.png", url: `${SUPABASE_STORAGE_URL}/kocka.png` },
-      { word: "KOKOS", filename: "kokos.png", url: `${SUPABASE_STORAGE_URL}/kokos.png` },
-      { word: "KOLO", filename: "kolo.png", url: `${SUPABASE_STORAGE_URL}/kolo.png` }
+      { word: "KAČA", filename: "kaca.png", url: `${SUPABASE_STORAGE_URL}/kaca.png`, audio_url: `${SUPABASE_STORAGE_URL}/kaca.m4a` },
+      { word: "KAPA", filename: "kapa.png", url: `${SUPABASE_STORAGE_URL}/kapa.png`, audio_url: `${SUPABASE_STORAGE_URL}/kapa.m4a` },
+      { word: "KAVA", filename: "kava.png", url: `${SUPABASE_STORAGE_URL}/kava.png`, audio_url: `${SUPABASE_STORAGE_URL}/kava.m4a` },
+      { word: "KLAVIR", filename: "klavir.png", url: `${SUPABASE_STORAGE_URL}/klavir.png`, audio_url: `${SUPABASE_STORAGE_URL}/klavir.m4a` },
+      { word: "KLJUČ", filename: "kljuc.png", url: `${SUPABASE_STORAGE_URL}/kljuc.png`, audio_url: `${SUPABASE_STORAGE_URL}/kljuc.m4a` },
+      { word: "KLOP", filename: "klop.png", url: `${SUPABASE_STORAGE_URL}/klop.png`, audio_url: `${SUPABASE_STORAGE_URL}/klop.m4a` },
+      { word: "KNJIGA", filename: "knjiga.png", url: `${SUPABASE_STORAGE_URL}/knjiga.png`, audio_url: `${SUPABASE_STORAGE_URL}/knjiga.m4a` },
+      { word: "KOCKA", filename: "kocka.png", url: `${SUPABASE_STORAGE_URL}/kocka.png`, audio_url: `${SUPABASE_STORAGE_URL}/kocka.m4a` },
+      { word: "KOKOS", filename: "kokos.png", url: `${SUPABASE_STORAGE_URL}/kokos.png`, audio_url: `${SUPABASE_STORAGE_URL}/kokos.m4a` },
+      { word: "KOLO", filename: "kolo.png", url: `${SUPABASE_STORAGE_URL}/kolo.png`, audio_url: `${SUPABASE_STORAGE_URL}/kolo.m4a` }
     ]
   },
   {
     letter: "L",
     images: [
-      { word: "LADJA", filename: "ladja.png", url: `${SUPABASE_STORAGE_URL}/ladja.png` },
-      { word: "LED", filename: "led.png", url: `${SUPABASE_STORAGE_URL}/led.png` },
-      { word: "LETALO", filename: "letalo.png", url: `${SUPABASE_STORAGE_URL}/letalo.png` },
-      { word: "LEV", filename: "lev.png", url: `${SUPABASE_STORAGE_URL}/lev.png` },
-      { word: "LIST", filename: "list.png", url: `${SUPABASE_STORAGE_URL}/list.png` },
-      { word: "LIZIKA", filename: "lizika.png", url: `${SUPABASE_STORAGE_URL}/lizika.png` },
-      { word: "LONEC", filename: "lonec.png", url: `${SUPABASE_STORAGE_URL}/lonec.png` },
-      { word: "LOPAR", filename: "lopar.png", url: `${SUPABASE_STORAGE_URL}/lopar.png` },
-      { word: "LUBENICA", filename: "lubenica.png", url: `${SUPABASE_STORAGE_URL}/lubenica.png` },
-      { word: "LUČ", filename: "luc.png", url: `${SUPABASE_STORAGE_URL}/luc.png` }
+      { word: "LADJA", filename: "ladja.png", url: `${SUPABASE_STORAGE_URL}/ladja.png`, audio_url: `${SUPABASE_STORAGE_URL}/ladja.m4a` },
+      { word: "LED", filename: "led.png", url: `${SUPABASE_STORAGE_URL}/led.png`, audio_url: `${SUPABASE_STORAGE_URL}/led.m4a` },
+      { word: "LETALO", filename: "letalo.png", url: `${SUPABASE_STORAGE_URL}/letalo.png`, audio_url: `${SUPABASE_STORAGE_URL}/letalo.m4a` },
+      { word: "LEV", filename: "lev.png", url: `${SUPABASE_STORAGE_URL}/lev.png`, audio_url: `${SUPABASE_STORAGE_URL}/lev.m4a` },
+      { word: "LIST", filename: "list.png", url: `${SUPABASE_STORAGE_URL}/list.png`, audio_url: `${SUPABASE_STORAGE_URL}/list.m4a` },
+      { word: "LIZIKA", filename: "lizika.png", url: `${SUPABASE_STORAGE_URL}/lizika.png`, audio_url: `${SUPABASE_STORAGE_URL}/lizika.m4a` },
+      { word: "LONEC", filename: "lonec.png", url: `${SUPABASE_STORAGE_URL}/lonec.png`, audio_url: `${SUPABASE_STORAGE_URL}/lonec.m4a` },
+      { word: "LOPAR", filename: "lopar.png", url: `${SUPABASE_STORAGE_URL}/lopar.png`, audio_url: `${SUPABASE_STORAGE_URL}/lopar.m4a` },
+      { word: "LUBENICA", filename: "lubenica.png", url: `${SUPABASE_STORAGE_URL}/lubenica.png`, audio_url: `${SUPABASE_STORAGE_URL}/lubenica.m4a` },
+      { word: "LUČ", filename: "luc.png", url: `${SUPABASE_STORAGE_URL}/luc.png`, audio_url: `${SUPABASE_STORAGE_URL}/luc.m4a` }
     ]
   },
   {
     letter: "S",
     images: [
-      { word: "SEDEM", filename: "sedem.png", url: `${SUPABASE_STORAGE_URL}/sedem.png` },
-      { word: "SIR", filename: "sir.png", url: `${SUPABASE_STORAGE_URL}/sir.png` },
-      { word: "SLADOLED", filename: "sladoled.png", url: `${SUPABASE_STORAGE_URL}/sladoled.png` },
-      { word: "SLIKA", filename: "slika.png", url: `${SUPABASE_STORAGE_URL}/slika.png` },
-      { word: "SLON", filename: "slon.png", url: `${SUPABASE_STORAGE_URL}/slon.png` },
-      { word: "SMREKA", filename: "smreka.png", url: `${SUPABASE_STORAGE_URL}/smreka.png` },
-      { word: "SNEG", filename: "sneg.png", url: `${SUPABASE_STORAGE_URL}/sneg.png` },
-      { word: "SNEŽAK", filename: "snezak.png", url: `${SUPABASE_STORAGE_URL}/snezak.png` },
-      { word: "SOK", filename: "sok.png", url: `${SUPABASE_STORAGE_URL}/sok.png` },
-      { word: "SONCE", filename: "sonce.png", url: `${SUPABASE_STORAGE_URL}/sonce.png` }
+      { word: "SEDEM", filename: "sedem.png", url: `${SUPABASE_STORAGE_URL}/sedem.png`, audio_url: `${SUPABASE_STORAGE_URL}/sedem.m4a` },
+      { word: "SIR", filename: "sir.png", url: `${SUPABASE_STORAGE_URL}/sir.png`, audio_url: `${SUPABASE_STORAGE_URL}/sir.m4a` },
+      { word: "SLADOLED", filename: "sladoled.png", url: `${SUPABASE_STORAGE_URL}/sladoled.png`, audio_url: `${SUPABASE_STORAGE_URL}/sladoled.m4a` },
+      { word: "SLIKA", filename: "slika.png", url: `${SUPABASE_STORAGE_URL}/slika.png`, audio_url: `${SUPABASE_STORAGE_URL}/slika.m4a` },
+      { word: "SLON", filename: "slon.png", url: `${SUPABASE_STORAGE_URL}/slon.png`, audio_url: `${SUPABASE_STORAGE_URL}/slon.m4a` },
+      { word: "SMREKA", filename: "smreka.png", url: `${SUPABASE_STORAGE_URL}/smreka.png`, audio_url: `${SUPABASE_STORAGE_URL}/smreka.m4a` },
+      { word: "SNEG", filename: "sneg.png", url: `${SUPABASE_STORAGE_URL}/sneg.png`, audio_url: `${SUPABASE_STORAGE_URL}/sneg.m4a` },
+      { word: "SNEŽAK", filename: "snezak.png", url: `${SUPABASE_STORAGE_URL}/snezak.png`, audio_url: `${SUPABASE_STORAGE_URL}/snezak.m4a` },
+      { word: "SOK", filename: "sok.png", url: `${SUPABASE_STORAGE_URL}/sok.png`, audio_url: `${SUPABASE_STORAGE_URL}/sok.m4a` },
+      { word: "SONCE", filename: "sonce.png", url: `${SUPABASE_STORAGE_URL}/sonce.png`, audio_url: `${SUPABASE_STORAGE_URL}/sonce.m4a` }
     ]
   },
   {
     letter: "Š",
     images: [
-      { word: "ŠAH", filename: "sah.png", url: `${SUPABASE_STORAGE_URL}/sah.png` },
-      { word: "ŠAL", filename: "sal.png", url: `${SUPABASE_STORAGE_URL}/sal.png` },
-      { word: "ŠČETKA", filename: "scetka.png", url: `${SUPABASE_STORAGE_URL}/scetka.png` },
-      { word: "ŠKARJE", filename: "skarje.png", url: `${SUPABASE_STORAGE_URL}/skarje.png` },
-      { word: "ŠKATLA", filename: "skatla.png", url: `${SUPABASE_STORAGE_URL}/skatla.png` },
-      { word: "ŠKOLJKA", filename: "skoljka.png", url: `${SUPABASE_STORAGE_URL}/skoljka.png` },
-      { word: "ŠOPEK", filename: "sopek.png", url: `${SUPABASE_STORAGE_URL}/sopek.png` },
-      { word: "ŠOTOR", filename: "sotor.png", url: `${SUPABASE_STORAGE_URL}/sotor.png` },
-      { word: "ŠTAMPILJKA", filename: "stampiljka.png", url: `${SUPABASE_STORAGE_URL}/stampiljka.png` },
-      { word: "ŠTORKLJA", filename: "storklja.png", url: `${SUPABASE_STORAGE_URL}/storklja.png` }
+      { word: "ŠAH", filename: "sah.png", url: `${SUPABASE_STORAGE_URL}/sah.png`, audio_url: `${SUPABASE_STORAGE_URL}/sah.m4a` },
+      { word: "ŠAL", filename: "sal.png", url: `${SUPABASE_STORAGE_URL}/sal.png`, audio_url: `${SUPABASE_STORAGE_URL}/sal.m4a` },
+      { word: "ŠČETKA", filename: "scetka.png", url: `${SUPABASE_STORAGE_URL}/scetka.png`, audio_url: `${SUPABASE_STORAGE_URL}/scetka.m4a` },
+      { word: "ŠKARJE", filename: "skarje.png", url: `${SUPABASE_STORAGE_URL}/skarje.png`, audio_url: `${SUPABASE_STORAGE_URL}/skarje.m4a` },
+      { word: "ŠKATLA", filename: "skatla.png", url: `${SUPABASE_STORAGE_URL}/skatla.png`, audio_url: `${SUPABASE_STORAGE_URL}/skatla.m4a` },
+      { word: "ŠKOLJKA", filename: "skoljka.png", url: `${SUPABASE_STORAGE_URL}/skoljka.png`, audio_url: `${SUPABASE_STORAGE_URL}/skoljka.m4a` },
+      { word: "ŠOPEK", filename: "sopek.png", url: `${SUPABASE_STORAGE_URL}/sopek.png`, audio_url: `${SUPABASE_STORAGE_URL}/sopek.m4a` },
+      { word: "ŠOTOR", filename: "sotor.png", url: `${SUPABASE_STORAGE_URL}/sotor.png`, audio_url: `${SUPABASE_STORAGE_URL}/sotor.m4a` },
+      { word: "ŠTAMPILJKA", filename: "stampiljka.png", url: `${SUPABASE_STORAGE_URL}/stampiljka.png`, audio_url: `${SUPABASE_STORAGE_URL}/stampiljka.m4a` },
+      { word: "ŠTORKLJA", filename: "storklja.png", url: `${SUPABASE_STORAGE_URL}/storklja.png`, audio_url: `${SUPABASE_STORAGE_URL}/storklja.m4a` }
     ]
   },
   {
     letter: "Z",
     images: [
-      { word: "ZAJEC", filename: "zajec.png", url: `${SUPABASE_STORAGE_URL}/zajec.png` },
-      { word: "ZASLON", filename: "zaslon.png", url: `${SUPABASE_STORAGE_URL}/zaslon.png` },
-      { word: "ZAVESA", filename: "zavesa.png", url: `${SUPABASE_STORAGE_URL}/zavesa.png` },
-      { word: "ZEBRA", filename: "zebra.png", url: `${SUPABASE_STORAGE_URL}/zebra.png` },
-      { word: "ZLATO", filename: "zlato.png", url: `${SUPABASE_STORAGE_URL}/zlato.png` },
-      { word: "ZMAJ", filename: "zmaj.png", url: `${SUPABASE_STORAGE_URL}/zmaj.png` },
-      { word: "ZOB", filename: "zob.png", url: `${SUPABASE_STORAGE_URL}/zob.png` },
-      { word: "ZOBOTREBEC", filename: "zobotrebec.png", url: `${SUPABASE_STORAGE_URL}/zobotrebec.png` },
-      { word: "ZVEZDA", filename: "zvezda.png", url: `${SUPABASE_STORAGE_URL}/zvezda.png` },
-      { word: "ZVOČNIK", filename: "zvocnik.png", url: `${SUPABASE_STORAGE_URL}/zvocnik.png` }
+      { word: "ZAJEC", filename: "zajec.png", url: `${SUPABASE_STORAGE_URL}/zajec.png`, audio_url: `${SUPABASE_STORAGE_URL}/zajec.m4a` },
+      { word: "ZASLON", filename: "zaslon.png", url: `${SUPABASE_STORAGE_URL}/zaslon.png`, audio_url: `${SUPABASE_STORAGE_URL}/zaslon.m4a` },
+      { word: "ZAVESA", filename: "zavesa.png", url: `${SUPABASE_STORAGE_URL}/zavesa.png`, audio_url: `${SUPABASE_STORAGE_URL}/zavesa.m4a` },
+      { word: "ZEBRA", filename: "zebra.png", url: `${SUPABASE_STORAGE_URL}/zebra.png`, audio_url: `${SUPABASE_STORAGE_URL}/zebra.m4a` },
+      { word: "ZLATO", filename: "zlato.png", url: `${SUPABASE_STORAGE_URL}/zlato.png`, audio_url: `${SUPABASE_STORAGE_URL}/zlato.m4a` },
+      { word: "ZMAJ", filename: "zmaj.png", url: `${SUPABASE_STORAGE_URL}/zmaj.png`, audio_url: `${SUPABASE_STORAGE_URL}/zmaj.m4a` },
+      { word: "ZOB", filename: "zob.png", url: `${SUPABASE_STORAGE_URL}/zob.png`, audio_url: `${SUPABASE_STORAGE_URL}/zob.m4a` },
+      { word: "ZOBOTREBEC", filename: "zobotrebec.png", url: `${SUPABASE_STORAGE_URL}/zobotrebec.png`, audio_url: `${SUPABASE_STORAGE_URL}/zobotrebec.m4a` },
+      { word: "ZVEZDA", filename: "zvezda.png", url: `${SUPABASE_STORAGE_URL}/zvezda.png`, audio_url: `${SUPABASE_STORAGE_URL}/zvezda.m4a` },
+      { word: "ZVOČNIK", filename: "zvocnik.png", url: `${SUPABASE_STORAGE_URL}/zvocnik.png`, audio_url: `${SUPABASE_STORAGE_URL}/zvocnik.m4a` }
     ]
   },
   {
     letter: "Ž",
     images: [
-      { word: "ŽABA", filename: "zaba.png", url: `${SUPABASE_STORAGE_URL}/zaba.png` },
-      { word: "ŽAGA", filename: "zaga.png", url: `${SUPABASE_STORAGE_URL}/zaga.png` },
-      { word: "ŽARNICA", filename: "zarnica.png", url: `${SUPABASE_STORAGE_URL}/zarnica.png` },
-      { word: "ŽEBELJ", filename: "zebelj.png", url: `${SUPABASE_STORAGE_URL}/zebelj.png` },
-      { word: "ŽELVA", filename: "zelva.png", url: `${SUPABASE_STORAGE_URL}/zelva.png` },
-      { word: "ŽERJAV", filename: "zerjav.png", url: `${SUPABASE_STORAGE_URL}/zerjav.png` },
-      { word: "ŽIRAFA", filename: "zirafa.png", url: `${SUPABASE_STORAGE_URL}/zirafa.png` },
-      { word: "ŽLICA", filename: "zlica.png", url: `${SUPABASE_STORAGE_URL}/zlica.png` },
-      { word: "ŽOGA", filename: "zoga.png", url: `${SUPABASE_STORAGE_URL}/zoga.png` },
-      { word: "ŽOLNA", filename: "zolna.png", url: `${SUPABASE_STORAGE_URL}/zolna.png` }
+      { word: "ŽABA", filename: "zaba.png", url: `${SUPABASE_STORAGE_URL}/zaba.png`, audio_url: `${SUPABASE_STORAGE_URL}/zaba.m4a` },
+      { word: "ŽAGA", filename: "zaga.png", url: `${SUPABASE_STORAGE_URL}/zaga.png`, audio_url: `${SUPABASE_STORAGE_URL}/zaga.m4a` },
+      { word: "ŽARNICA", filename: "zarnica.png", url: `${SUPABASE_STORAGE_URL}/zarnica.png`, audio_url: `${SUPABASE_STORAGE_URL}/zarnica.m4a` },
+      { word: "ŽEBELJ", filename: "zebelj.png", url: `${SUPABASE_STORAGE_URL}/zebelj.png`, audio_url: `${SUPABASE_STORAGE_URL}/zebelj.m4a` },
+      { word: "ŽELVA", filename: "zelva.png", url: `${SUPABASE_STORAGE_URL}/zelva.png`, audio_url: `${SUPABASE_STORAGE_URL}/zelva.m4a` },
+      { word: "ŽERJAV", filename: "zerjav.png", url: `${SUPABASE_STORAGE_URL}/zerjav.png`, audio_url: `${SUPABASE_STORAGE_URL}/zerjav.m4a` },
+      { word: "ŽIRAFA", filename: "zirafa.png", url: `${SUPABASE_STORAGE_URL}/zirafa.png`, audio_url: `${SUPABASE_STORAGE_URL}/zirafa.m4a` },
+      { word: "ŽLICA", filename: "zlica.png", url: `${SUPABASE_STORAGE_URL}/zlica.png`, audio_url: `${SUPABASE_STORAGE_URL}/zlica.m4a` },
+      { word: "ŽOGA", filename: "zoga.png", url: `${SUPABASE_STORAGE_URL}/zoga.png`, audio_url: `${SUPABASE_STORAGE_URL}/zoga.m4a` },
+      { word: "ŽOLNA", filename: "zolna.png", url: `${SUPABASE_STORAGE_URL}/zolna.png`, audio_url: `${SUPABASE_STORAGE_URL}/zolna.m4a` }
     ]
   },
   {
     letter: "R",
     images: [
-      { word: "RACA", filename: "raca.png", url: `${SUPABASE_STORAGE_URL}/raca.png` },
-      { word: "RAK", filename: "rak.png", url: `${SUPABASE_STORAGE_URL}/rak.png` },
-      { word: "RAKETA", filename: "raketa.png", url: `${SUPABASE_STORAGE_URL}/raketa.png` },
-      { word: "RAVNILO", filename: "ravnilo.png", url: `${SUPABASE_STORAGE_URL}/ravnilo.png` },
-      { word: "REP", filename: "rep.png", url: `${SUPABASE_STORAGE_URL}/rep.png` },
-      { word: "REPA", filename: "repa.png", url: `${SUPABASE_STORAGE_URL}/repa.png` },
-      { word: "RIBA", filename: "riba.png", url: `${SUPABASE_STORAGE_URL}/riba.png` },
-      { word: "ROBOT", filename: "robot.png", url: `${SUPABASE_STORAGE_URL}/robot.png` },
-      { word: "ROKA", filename: "roka.png", url: `${SUPABASE_STORAGE_URL}/roka.png` },
-      { word: "ROLKA", filename: "rolka.png", url: `${SUPABASE_STORAGE_URL}/rolka.png` }
+      { word: "RACA", filename: "raca.png", url: `${SUPABASE_STORAGE_URL}/raca.png`, audio_url: `${SUPABASE_STORAGE_URL}/raca.m4a` },
+      { word: "RAK", filename: "rak.png", url: `${SUPABASE_STORAGE_URL}/rak.png`, audio_url: `${SUPABASE_STORAGE_URL}/rak.m4a` },
+      { word: "RAKETA", filename: "raketa.png", url: `${SUPABASE_STORAGE_URL}/raketa.png`, audio_url: `${SUPABASE_STORAGE_URL}/raketa.m4a` },
+      { word: "RAVNILO", filename: "ravnilo.png", url: `${SUPABASE_STORAGE_URL}/ravnilo.png`, audio_url: `${SUPABASE_STORAGE_URL}/ravnilo.m4a` },
+      { word: "REP", filename: "rep.png", url: `${SUPABASE_STORAGE_URL}/rep.png`, audio_url: `${SUPABASE_STORAGE_URL}/rep.m4a` },
+      { word: "REPA", filename: "repa.png", url: `${SUPABASE_STORAGE_URL}/repa.png`, audio_url: `${SUPABASE_STORAGE_URL}/repa.m4a` },
+      { word: "RIBA", filename: "riba.png", url: `${SUPABASE_STORAGE_URL}/riba.png`, audio_url: `${SUPABASE_STORAGE_URL}/riba.m4a` },
+      { word: "ROBOT", filename: "robot.png", url: `${SUPABASE_STORAGE_URL}/robot.png`, audio_url: `${SUPABASE_STORAGE_URL}/robot.m4a` },
+      { word: "ROKA", filename: "roka.png", url: `${SUPABASE_STORAGE_URL}/roka.png`, audio_url: `${SUPABASE_STORAGE_URL}/roka.m4a` },
+      { word: "ROLKA", filename: "rolka.png", url: `${SUPABASE_STORAGE_URL}/rolka.png`, audio_url: `${SUPABASE_STORAGE_URL}/rolka.m4a` }
     ]
   }
 ];
