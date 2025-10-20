@@ -7,6 +7,7 @@ import { useEnhancedProgress } from '@/hooks/useEnhancedProgress';
 import { FourColumnGame } from '@/components/matching/FourColumnGame';
 import { FourColumnInstructionsModal } from '@/components/matching/FourColumnInstructionsModal';
 import { MatchingCompletionDialog } from '@/components/matching/MatchingCompletionDialog';
+import { MemoryExitConfirmationDialog } from '@/components/games/MemoryExitConfirmationDialog';
 import { getRandomFourColumnItems, FourColumnMatchingItem } from '@/data/threeColumnMatchingData';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, RotateCcw, BookOpen } from 'lucide-react';
@@ -72,10 +73,12 @@ export default function IgraUjemanjaS78() {
           <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
             <h2 className="text-lg font-bold mb-3 text-center">Igra ujemanja {upperCaseLetter} (7-8 let)</h2>
             <div className="flex justify-center gap-3">
-              <Button onClick={handleBack} size="sm" variant="outline" className="gap-2">
-                <ArrowLeft className="h-4 w-4" />
-                Nazaj
-              </Button>
+              <MemoryExitConfirmationDialog onConfirm={handleBack}>
+                <Button size="sm" variant="outline" className="gap-2">
+                  <ArrowLeft className="h-4 w-4" />
+                  Nazaj
+                </Button>
+              </MemoryExitConfirmationDialog>
               <Button onClick={handleNewGame} size="sm" className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
                 <RotateCcw className="h-4 w-4" />
                 Nova igra
@@ -100,10 +103,12 @@ export default function IgraUjemanjaS78() {
     <AppLayout>
       <div className="w-full min-h-screen bg-background">
         <div className="flex justify-center gap-4 p-4">
-          <Button variant="outline" onClick={handleBack} className="gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Nazaj
-          </Button>
+          <MemoryExitConfirmationDialog onConfirm={handleBack}>
+            <Button variant="outline" className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Nazaj
+            </Button>
+          </MemoryExitConfirmationDialog>
           <Button onClick={handleNewGame} className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
             <RotateCcw className="h-4 w-4" />
             Nova igra

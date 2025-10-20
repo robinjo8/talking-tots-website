@@ -7,6 +7,7 @@ import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { MatchingGame } from "@/components/matching/MatchingGame";
 import { MatchingInstructionsModal } from "@/components/matching/MatchingInstructionsModal";
 import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
+import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { getLetterData, getImagesForAgeGroup, MatchingGameImage } from "@/data/matchingGameData";
 import { useState, useRef } from "react";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
@@ -64,10 +65,12 @@ export default function IgraUjemanjaS() {
         <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
           {/* Game Controls */}
           <div className="flex justify-center gap-4 mb-6">
-            <Button variant="outline" onClick={handleBack} className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Nazaj
-            </Button>
+            <MemoryExitConfirmationDialog onConfirm={handleBack}>
+              <Button variant="outline" className="gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Nazaj
+              </Button>
+            </MemoryExitConfirmationDialog>
             <Button onClick={handleNewGame} className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
               <RotateCcw className="h-4 w-4" />
               Nova igra
