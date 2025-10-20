@@ -9,6 +9,7 @@ import { MatchingGame } from "@/components/matching/MatchingGame";
 import { MatchingInstructionsModal } from "@/components/matching/MatchingInstructionsModal";
 import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
+import { MemoryPairDialog } from "@/components/games/MemoryPairDialog";
 import { getLetterData, getImagesForAgeGroup, MatchingGameImage } from "@/data/matchingGameData";
 import { useState, useRef } from "react";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";

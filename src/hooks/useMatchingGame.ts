@@ -21,6 +21,8 @@ export interface MatchingGameState {
   completedMatches: Set<string>;
   isComplete: boolean;
   score: number;
+  showPairDialog: boolean;
+  currentMatchedPair: MatchingGameImage | null;
 }
 
 export function useMatchingGame(images: MatchingGameImage[], numColumns: number = 2) {
@@ -31,7 +33,9 @@ export function useMatchingGame(images: MatchingGameImage[], numColumns: number 
     selectedPosition: null,
     completedMatches: new Set(),
     isComplete: false,
-    score: 0
+    score: 0,
+    showPairDialog: false,
+    currentMatchedPair: null
   });
 
   // Shuffle array utility
@@ -60,7 +64,9 @@ export function useMatchingGame(images: MatchingGameImage[], numColumns: number 
       selectedPosition: null,
       completedMatches: new Set(),
       isComplete: false,
-      score: 0
+      score: 0,
+      showPairDialog: false,
+      currentMatchedPair: null
     });
   }, [images, numColumns, shuffleArray]);
 
@@ -102,13 +108,18 @@ export function useMatchingGame(images: MatchingGameImage[], numColumns: number 
         const newConnections = [...prev.connections, newConnection];
         const isComplete = newCompletedMatches.size === prev.originalImages.length;
 
+        // Find the matched image to show in dialog
+        const matchedImage = prev.originalImages.find(img => img.word === imageId);
+
         return {
           ...prev,
           connections: newConnections,
           selectedPosition: null,
           completedMatches: newCompletedMatches,
           isComplete,
-          score: prev.score + 10
+          score: prev.score + 10,
+          showPairDialog: true,
+          currentMatchedPair: matchedImage || null
         };
       }
 
@@ -134,6 +145,15 @@ export function useMatchingGame(images: MatchingGameImage[], numColumns: number 
     return gameState.completedMatches.has(imageId);
   }, [gameState.completedMatches]);
 
+  // Handle pair dialog continue
+  const handlePairDialogContinue = useCallback(() => {
+    setGameState(prev => ({
+      ...prev,
+      showPairDialog: false,
+      currentMatchedPair: null
+    }));
+  }, []);
+
   // Initialize game on mount or when images change
   useEffect(() => {
     if (images.length > 0) {
@@ -146,6 +166,7 @@ export function useMatchingGame(images: MatchingGameImage[], numColumns: number 
     handleTileClick,
     resetGame,
     isTileSelected,
-    isTileMatched
+    isTileMatched,
+    handlePairDialogContinue
   };
 }
