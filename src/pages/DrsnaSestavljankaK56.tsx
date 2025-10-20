@@ -3,6 +3,7 @@ import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { SlidingPuzzle } from "@/components/puzzle/SlidingPuzzle";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
+import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useRef } from "react";
