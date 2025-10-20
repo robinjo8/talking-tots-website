@@ -54,6 +54,23 @@ import DrsnaSestavljankaŽ34 from "@/pages/DrsnaSestavljankaŽ34";
 import DrsnaSestavljankaL34 from "@/pages/DrsnaSestavljankaL34";
 import DrsnaSestavljankaK34 from "@/pages/DrsnaSestavljankaK34";
 import DrsnaSestavljankaC78 from "@/pages/DrsnaSestavljankaC78";
+import DrsnaSestavljankaK78 from "@/pages/DrsnaSestavljankaK78";
+import DrsnaSestavljankaL78 from "@/pages/DrsnaSestavljankaL78";
+import DrsnaSestavljankaR78 from "@/pages/DrsnaSestavljankaR78";
+import DrsnaSestavljankaS78 from "@/pages/DrsnaSestavljankaS78";
+import DrsnaSestavljankaZ78 from "@/pages/DrsnaSestavljankaZ78";
+import DrsnaSestavljankaČ78 from "@/pages/DrsnaSestavljankaČ78";
+import DrsnaSestavljankaŠ78 from "@/pages/DrsnaSestavljankaŠ78";
+import DrsnaSestavljankaŽ78 from "@/pages/DrsnaSestavljankaŽ78";
+import DrsnaSestavljankaC910 from "@/pages/DrsnaSestavljankaC910";
+import DrsnaSestavljankaK910 from "@/pages/DrsnaSestavljankaK910";
+import DrsnaSestavljankaL910 from "@/pages/DrsnaSestavljankaL910";
+import DrsnaSestavljankaR910 from "@/pages/DrsnaSestavljankaR910";
+import DrsnaSestavljankaS910 from "@/pages/DrsnaSestavljankaS910";
+import DrsnaSestavljankaZ910 from "@/pages/DrsnaSestavljankaZ910";
+import DrsnaSestavljankaČ910 from "@/pages/DrsnaSestavljankaČ910";
+import DrsnaSestavljankaŠ910 from "@/pages/DrsnaSestavljankaŠ910";
+import DrsnaSestavljankaŽ910 from "@/pages/DrsnaSestavljankaŽ910";
 import SestavljankeGames from "@/pages/SestavljankeGames";
 import SestavljankeR from "@/pages/SestavljankeR";
 import SestavljankeRRouter from "@/pages/SestavljankeRRouter";
@@ -357,6 +374,170 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <DrsnaSestavljanka34Router />
+          </ProtectedRoute>
+        }
+      />
+      
+      {/* Drsna sestavljanka 7-8 routes */}
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/c78" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaC78 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/k78" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaK78 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/l78" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaL78 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/r78" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaR78 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/s78" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaS78 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/z78" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaZ78 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/č78" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaČ78 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/š78" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaŠ78 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/ž78" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaŽ78 />
+          </ProtectedRoute>
+        }
+      />
+      
+      {/* Drsna sestavljanka 9-10 routes */}
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/c910" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaC910 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/k910" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaK910 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/l910" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaL910 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/r910" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaR910 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/s910" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaS910 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/z910" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaZ910 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/č910" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaČ910 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/š910" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaŠ910 />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route 
+        path="/govorne-igre/drsna-sestavljanka/ž910" 
+        element={
+          <ProtectedRoute>
+            <DrsnaSestavljankaŽ910 />
           </ProtectedRoute>
         }
       />
