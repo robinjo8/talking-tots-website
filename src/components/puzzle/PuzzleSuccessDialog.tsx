@@ -41,8 +41,8 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   // Auto-play audio when dialog opens
   useEffect(() => {
     if (isOpen && completedImage) {
-      const audioFilename = completedImage.audio || `sestavljanka_${completedImage.word.toLowerCase()}.mp3`;
-      const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke/${audioFilename}`;
+      const audioFilename = completedImage.audio || `${completedImage.word.toLowerCase()}.m4a`;
+      const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
       playAudio(audioUrl);
     }
   }, [isOpen, completedImage, playAudio]);
@@ -235,8 +235,8 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   };
 
   const handlePlayAudio = () => {
-    const audioFilename = completedImage.audio || `sestavljanka_${completedImage.word.toLowerCase()}.mp3`;
-    const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke/${audioFilename}`;
+    const audioFilename = completedImage.audio || `${completedImage.word.toLowerCase()}.m4a`;
+    const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
     playAudio(audioUrl);
   };
 
