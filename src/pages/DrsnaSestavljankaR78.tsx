@@ -2,48 +2,48 @@ import { AppLayout } from "@/components/AppLayout";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { SlidingPuzzle78 } from "@/components/puzzle/SlidingPuzzle78";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
-import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
+import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useAuth } from "@/contexts/AuthContext";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
-const cImages = [
-  { filename: 'cedilo.png', word: 'CEDILO' },
-  { filename: 'cekin.png', word: 'CEKIN' },
-  { filename: 'cerkev.png', word: 'CERKEV' },
-  { filename: 'cesta.png', word: 'CESTA' },
-  { filename: 'cev.png', word: 'CEV' },
-  { filename: 'cirkus.png', word: 'CIRKUS' },
-  { filename: 'cisterna.png', word: 'CISTERNA' },
-  { filename: 'cokla.png', word: 'COKLA' },
-  { filename: 'copat.png', word: 'COPAT' },
-  { filename: 'cvet.png', word: 'CVET' }
+const rImages = [
+  { filename: 'raca.png', word: 'RACA' },
+  { filename: 'radar.png', word: 'RADAR' },
+  { filename: 'radij.png', word: 'RADIJ' },
+  { filename: 'radio.png', word: 'RADIO' },
+  { filename: 'rak.png', word: 'RAK' },
+  { filename: 'raketa.png', word: 'RAKETA' },
+  { filename: 'rama.png', word: 'RAMA' },
+  { filename: 'rampa.png', word: 'RAMPA' },
+  { filename: 'rana.png', word: 'RANA' },
+  { filename: 'ranc.png', word: 'RANČ' },
+  { filename: 'rasa.png', word: 'RASA' }
 ];
 
-const getRandomCImage = () => {
-  const randomIndex = Math.floor(Math.random() * cImages.length);
-  return cImages[randomIndex];
+const getRandomRImage = () => {
+  const randomIndex = Math.floor(Math.random() * rImages.length);
+  return rImages[randomIndex];
 };
 
-export default function DrsnaSestavljankaC78() {
+export default function DrsnaSestavljankaR78() {
   return (
     <AgeGatedRoute requiredAgeGroup="7-8">
-      <DrsnaSestavljankaC78Content />
+      <DrsnaSestavljankaR78Content />
     </AgeGatedRoute>
   );
 }
 
-function DrsnaSestavljankaC78Content() {
+function DrsnaSestavljankaR78Content() {
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   const [puzzleKey, setPuzzleKey] = useState(0);
-  const [currentImage, setCurrentImage] = useState(getRandomCImage());
+  const [currentImage, setCurrentImage] = useState(getRandomRImage());
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { recordGameCompletion } = useEnhancedProgress();
@@ -61,7 +61,7 @@ function DrsnaSestavljankaC78Content() {
 
   const handleNewGame = () => {
     gameCompletedRef.current = false;
-    setCurrentImage(getRandomCImage());
+    setCurrentImage(getRandomRImage());
     setPuzzleKey(prev => prev + 1);
   };
 
@@ -70,7 +70,7 @@ function DrsnaSestavljankaC78Content() {
   };
 
   const handleStarClaimed = () => {
-    recordGameCompletion('sliding_puzzle', 'sliding_puzzle_c_7-8');
+    recordGameCompletion('sliding_puzzle', 'sliding_puzzle_r_7-8');
   };
 
   useEffect(() => {
@@ -80,7 +80,6 @@ function DrsnaSestavljankaC78Content() {
           if (document.documentElement.requestFullscreen) {
             await document.documentElement.requestFullscreen();
           }
-          // Lock screen orientation - simple approach
           try {
             if ('orientation' in screen && 'lock' in screen.orientation) {
               (screen.orientation as any).lock('portrait').catch(() => {
@@ -108,7 +107,7 @@ function DrsnaSestavljankaC78Content() {
       <div className="fixed inset-0 bg-background overflow-hidden select-none">
         <div className="h-full flex flex-col">
           <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
-            <h2 className="text-lg font-bold mb-3 text-center">Drsna sestavljanka C</h2>
+            <h2 className="text-lg font-bold mb-3 text-center">Drsna sestavljanka R</h2>
             <div className="flex justify-center gap-3">
               <MemoryExitConfirmationDialog onConfirm={handleBack}>
                 <Button size="sm" variant="outline" className="gap-2">
@@ -136,11 +135,13 @@ function DrsnaSestavljankaC78Content() {
           </div>
         </div>
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
-        <PuzzleSuccessDialog
+        <MatchingCompletionDialog
           isOpen={showCompletion}
-          onOpenChange={setShowCompletion}
-          completedImage={currentImage}
+          onClose={() => setShowCompletion(false)}
+          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
           onStarClaimed={handleStarClaimed}
+          instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO."
+          autoPlayAudio={true}
         />
       </div>
     );
@@ -160,7 +161,7 @@ function DrsnaSestavljankaC78Content() {
             <RotateCcw className="h-4 w-4" />
             Nova igra
           </Button>
-          <Button onClick={() => setShowInstructions(true)} variant="outline" className="gap-2">
+          <Button variant="outline" onClick={() => setShowInstructions(true)} className="gap-2">
             <BookOpen className="h-4 w-4" />
             Navodila
           </Button>
@@ -173,11 +174,13 @@ function DrsnaSestavljankaC78Content() {
           />
         </div>
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
-        <PuzzleSuccessDialog
+        <MatchingCompletionDialog
           isOpen={showCompletion}
-          onOpenChange={setShowCompletion}
-          completedImage={currentImage}
+          onClose={() => setShowCompletion(false)}
+          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
           onStarClaimed={handleStarClaimed}
+          instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO."
+          autoPlayAudio={true}
         />
       </div>
     </AppLayout>
