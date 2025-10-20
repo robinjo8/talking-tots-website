@@ -23,7 +23,10 @@ const sImages = [
   { filename: 'snezak.png', word: 'SNEŽAK' },
   { filename: 'sok.png', word: 'SOK' },
   { filename: 'sonce.png', word: 'SONCE' },
-  { filename: 'sova.png', word: 'SOVA' }
+  { filename: 'sova.png', word: 'SOVA' },
+  { filename: 'stol.png', word: 'STOL' },
+  { filename: 'svetilka.png', word: 'SVETILKA' },
+  { filename: 'svincnik.png', word: 'SVINČNIK' }
 ];
 
 const getRandomSImage = () => {

@@ -23,7 +23,11 @@ const kImages = [
   { filename: 'kocka.png', word: 'KOCKA' },
   { filename: 'kokos.png', word: 'KOKOŠ' },
   { filename: 'kolo.png', word: 'KOLO' },
-  { filename: 'kost.png', word: 'KOST' }
+  { filename: 'kost.png', word: 'KOST' },
+  { filename: 'kos.png', word: 'KOŠ' },
+  { filename: 'kosara.png', word: 'KOŠARA' },
+  { filename: 'koza.png', word: 'KOZA' },
+  { filename: 'krava.png', word: 'KRAVA' }
 ];
 
 const getRandomKImage = () => {

@@ -23,7 +23,14 @@ const rImages = [
   { filename: 'rampa.png', word: 'RAMPA' },
   { filename: 'rana.png', word: 'RANA' },
   { filename: 'ranc.png', word: 'RANČ' },
-  { filename: 'rasa.png', word: 'RASA' }
+  { filename: 'rasa.png', word: 'RASA' },
+  { filename: 'resa.png', word: 'RESA' },
+  { filename: 'riba.png', word: 'RIBA' },
+  { filename: 'robida.png', word: 'ROBIDA' },
+  { filename: 'roka.png', word: 'ROKA' },
+  { filename: 'rosa.png', word: 'ROSA' },
+  { filename: 'rozina.png', word: 'ROZINA' },
+  { filename: 'roza.png', word: 'ROŽA' }
 ];
 
 const getRandomRImage = () => {
