@@ -145,7 +145,12 @@ export default function IgraUjemanjaK56() {
         <MatchingCompletionDialog
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
-          images={(completedItems.length > 0 ? completedItems : items).map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
+          images={(completedItems.length > 0 ? completedItems : items).map(item => ({ 
+            word: item.word, 
+            url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, 
+            filename: item.originalImage,
+            audio_url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${item.audioFile}`
+          }))}
           onStarClaimed={handleStarClaimed}
         />
       </div>
@@ -188,7 +193,12 @@ export default function IgraUjemanjaK56() {
         <MatchingCompletionDialog
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
-          images={(completedItems.length > 0 ? completedItems : items).map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
+          images={(completedItems.length > 0 ? completedItems : items).map(item => ({ 
+            word: item.word, 
+            url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, 
+            filename: item.originalImage,
+            audio_url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${item.audioFile}`
+          }))}
           onStarClaimed={handleStarClaimed}
         />
       </div>
