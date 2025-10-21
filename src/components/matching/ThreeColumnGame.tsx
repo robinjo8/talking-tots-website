@@ -1,3 +1,4 @@
+import React from "react";
 import { Play, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -30,10 +31,12 @@ export function ThreeColumnGame({ items, onGameComplete }: ThreeColumnGameProps)
     return `${baseClass} bg-white border-gray-200 hover:border-blue-300`;
   };
 
-  // Handle game completion
-  if (gameState.isComplete && onGameComplete) {
-    onGameComplete(gameState.score, items);
-  }
+  // Handle game completion with useEffect to avoid state update during render
+  React.useEffect(() => {
+    if (gameState.isComplete && onGameComplete) {
+      onGameComplete(gameState.score, items);
+    }
+  }, [gameState.isComplete, onGameComplete, gameState.score, items]);
 
   if (!items.length) {
     return <div className="text-center py-8">Loading game...</div>;

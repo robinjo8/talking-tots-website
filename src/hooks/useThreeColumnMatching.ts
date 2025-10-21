@@ -62,42 +62,26 @@ export function useThreeColumnMatching(items: ThreeColumnMatchingItem[]) {
   const selectAudio = (itemId: string) => {
     if (gameState.completedItems.has(itemId)) return;
     
-    // Play audio BEFORE state update using same logic as useAudioPlayback
+    // Play audio BEFORE state update - try .mp3 first, fallback to .m4a
     const item = items.find(i => i.id === itemId);
     if (item) {
-      const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${item.audioFile}`;
+      // Try mp3 format first (more widely supported)
+      const audioFileName = item.audioFile.replace('.m4a', '.mp3');
+      const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFileName}`;
       
       try {
         console.log('Playing audio from URL:', audioUrl);
         
-        // Stop any existing audio by clearing source instead of pausing
+        // Stop any existing audio
         if (audioRef.current) {
+          audioRef.current.pause();
           audioRef.current.src = "";
-          audioRef.current.load(); // Reset the audio element
         }
         
         // Create a fresh audio element
-        audioRef.current = new Audio();
+        audioRef.current = new Audio(audioUrl);
         
-        // Add event listeners for debugging
-        audioRef.current.addEventListener('loadstart', () => console.log('Audio load started'));
-        audioRef.current.addEventListener('canplay', () => console.log('Audio can play'));
-        audioRef.current.addEventListener('loadeddata', () => console.log('Audio data loaded'));
-        audioRef.current.addEventListener('error', (e) => {
-          console.error('Audio element error:', e);
-          const target = e.target as HTMLAudioElement;
-          console.error('Audio error details:', {
-            error: target.error,
-            networkState: target.networkState,
-            readyState: target.readyState,
-            src: target.src
-          });
-        });
-        
-        // Set new source and play
-        audioRef.current.src = audioUrl;
-        audioRef.current.load(); // Force load to ensure fresh start
-        
+        // Play immediately
         audioRef.current.play().then(() => {
           console.log('Audio started playing successfully');
         }).catch(error => {
@@ -106,7 +90,6 @@ export function useThreeColumnMatching(items: ThreeColumnMatchingItem[]) {
         });
       } catch (error) {
         console.error("Error setting up audio playback:", error);
-        console.error("Audio URL that caused error:", audioUrl);
       }
     }
     
