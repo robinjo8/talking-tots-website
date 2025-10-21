@@ -374,15 +374,14 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
                     {image.word.toUpperCase()}
                   </span>
                   <Button
-                    variant="ghost"
-                    size="sm"
                     onClick={(e) => {
                       e.stopPropagation();
                       handlePlayAudio(image);
                     }}
-                    className="h-8 w-8 p-0 hover:bg-dragon-green/10"
+                    size="icon"
+                    className="bg-green-500 hover:bg-green-600 text-white h-12 w-12"
                   >
-                    <Volume2 className="h-4 w-4 text-dragon-green" />
+                    <Volume2 className="w-6 h-6" />
                   </Button>
                 </div>;
           })}
