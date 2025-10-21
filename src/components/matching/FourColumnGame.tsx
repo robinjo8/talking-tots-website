@@ -2,7 +2,6 @@ import { Play, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FourColumnMatchingItem } from "@/data/threeColumnMatchingData";
 import { useFourColumnMatching } from "@/hooks/useFourColumnMatching";
-import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 
 interface FourColumnGameProps {
   items: FourColumnMatchingItem[];
@@ -11,12 +10,6 @@ interface FourColumnGameProps {
 
 export function FourColumnGame({ items, onGameComplete }: FourColumnGameProps) {
   const { gameState, selectAudio, selectWritten, selectShadow, selectOriginal, resetGame, isItemSelected, isItemCompleted } = useFourColumnMatching(items);
-  const { playAudio } = useAudioPlayback();
-
-  const playAudioFile = (audioFilename: string) => {
-    const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
-    playAudio(audioUrl);
-  };
 
   const getImageUrl = (filename: string, bucket: 'slike-sence' | 'slike') => {
     return `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/${bucket}/${filename}`;
@@ -75,10 +68,7 @@ export function FourColumnGame({ items, onGameComplete }: FourColumnGameProps) {
                 <div
                   key={`audio-${itemId}-${index}`}
                   className={getAudioTileClass(itemId)}
-                  onClick={() => {
-                    selectAudio(itemId);
-                    playAudioFile(item.audioFile);
-                  }}
+                  onClick={() => selectAudio(itemId)}
                 >
                   <Button
                     variant="ghost"

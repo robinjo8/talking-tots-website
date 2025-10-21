@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ThreeColumnMatchingItem } from "@/data/threeColumnMatchingData";
 import { useThreeColumnMatching } from "@/hooks/useThreeColumnMatching";
-import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 
 interface ThreeColumnGameProps {
   items: ThreeColumnMatchingItem[];
@@ -12,12 +11,6 @@ interface ThreeColumnGameProps {
 
 export function ThreeColumnGame({ items, onGameComplete }: ThreeColumnGameProps) {
   const { gameState, selectAudio, selectShadow, selectOriginal, resetGame, isItemSelected, isItemCompleted } = useThreeColumnMatching(items);
-  const { playAudio } = useAudioPlayback();
-
-  const playAudioFile = (audioFilename: string) => {
-    const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
-    playAudio(audioUrl);
-  };
 
   const getImageUrl = (filename: string, bucket: 'slike-sence' | 'slike') => {
     return `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/${bucket}/${filename}`;
@@ -61,10 +54,7 @@ export function ThreeColumnGame({ items, onGameComplete }: ThreeColumnGameProps)
                 <div
                   key={`audio-${itemId}-${index}`}
                   className={getAudioTileClass(itemId)}
-                  onClick={() => {
-                    selectAudio(itemId);
-                    playAudioFile(item.audioFile);
-                  }}
+                  onClick={() => selectAudio(itemId)}
                 >
                   <Button
                     variant="ghost"

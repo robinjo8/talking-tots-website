@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ThreeColumnMatchingItem } from '@/data/threeColumnMatchingData';
 
 export interface ThreeColumnConnection {
@@ -23,6 +23,8 @@ export interface ThreeColumnGameState {
 }
 
 export function useThreeColumnMatching(items: ThreeColumnMatchingItem[]) {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  
   const [gameState, setGameState] = useState<ThreeColumnGameState>({
     items: [],
     shuffledAudio: [],
@@ -59,6 +61,24 @@ export function useThreeColumnMatching(items: ThreeColumnMatchingItem[]) {
 
   const selectAudio = (itemId: string) => {
     if (gameState.completedItems.has(itemId)) return;
+    
+    // Play audio BEFORE state update
+    const item = items.find(i => i.id === itemId);
+    if (item) {
+      const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${item.audioFile}`;
+      
+      // Stop any existing audio
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+      
+      // Create and play new audio
+      audioRef.current = new Audio(audioUrl);
+      audioRef.current.play().catch(error => {
+        console.error("Error playing audio:", error);
+      });
+    }
     
     setGameState(prev => ({
       ...prev,

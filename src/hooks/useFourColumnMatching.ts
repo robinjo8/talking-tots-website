@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FourColumnMatchingItem } from '@/data/threeColumnMatchingData';
-import { useAudioPlayback } from '@/hooks/useAudioPlayback';
 
 export interface FourColumnConnection {
   audioId: string;
@@ -27,7 +26,7 @@ export interface FourColumnGameState {
 }
 
 export function useFourColumnMatching(items: FourColumnMatchingItem[]) {
-  const { playAudio } = useAudioPlayback();
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [gameState, setGameState] = useState<FourColumnGameState>({
     items: [],
     shuffledAudio: [],
@@ -69,6 +68,24 @@ export function useFourColumnMatching(items: FourColumnMatchingItem[]) {
 
   const selectAudio = (itemId: string) => {
     if (gameState.completedItems.has(itemId)) return;
+    
+    // Play audio BEFORE state update
+    const item = items.find(i => i.id === itemId);
+    if (item) {
+      const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${item.audioFile}`;
+      
+      // Stop any existing audio
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+      
+      // Create and play new audio
+      audioRef.current = new Audio(audioUrl);
+      audioRef.current.play().catch(error => {
+        console.error("Error playing audio:", error);
+      });
+    }
     
     setGameState(prev => ({
       ...prev,
