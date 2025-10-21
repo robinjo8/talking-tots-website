@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FourColumnMatchingItem } from '@/data/threeColumnMatchingData';
+import { useAudioPlayback } from '@/hooks/useAudioPlayback';
 
 export interface FourColumnConnection {
   audioId: string;
@@ -26,6 +27,7 @@ export interface FourColumnGameState {
 }
 
 export function useFourColumnMatching(items: FourColumnMatchingItem[]) {
+  const { playAudio } = useAudioPlayback();
   const [gameState, setGameState] = useState<FourColumnGameState>({
     items: [],
     shuffledAudio: [],
@@ -125,10 +127,32 @@ export function useFourColumnMatching(items: FourColumnMatchingItem[]) {
       if (isCorrect) {
         newCompletedItems.add(selectedAudio);
         newScore += 1;
+        
+        // Play audio for matched pair
+        const matchedItem = prev.items.find(item => item.id === selectedAudio);
+        if (matchedItem) {
+          const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${matchedItem.audioFile}`;
+          const audio = new Audio(audioUrl);
+          
+          // Check if this is the last match
+          const willBeComplete = newCompletedItems.size === prev.items.length;
+          
+          if (willBeComplete) {
+            // Delay completion until audio finishes
+            audio.onended = () => {
+              setGameState(current => ({
+                ...current,
+                isComplete: true
+              }));
+            };
+          }
+          
+          audio.play().catch(err => console.error('Error playing audio:', err));
+        }
       }
 
       const newConnections = [...prev.connections, newConnection];
-      const isComplete = newCompletedItems.size === prev.items.length;
+      const isComplete = isCorrect ? false : newCompletedItems.size === prev.items.length;
 
       return {
         ...prev,
