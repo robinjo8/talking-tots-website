@@ -93,18 +93,6 @@ export function useMatchingGame(images: MatchingGameImage[], numColumns: number 
         // Find the matched image to get its audio URL
         const matchedImage = prev.originalImages.find(img => img.word === imageId);
         
-        // Play audio if available
-        if (matchedImage?.audio_url) {
-          if (audioRef.current) {
-            audioRef.current.pause();
-            audioRef.current.src = "";
-          }
-          audioRef.current = new Audio(matchedImage.audio_url);
-          audioRef.current.play().catch(error => {
-            console.error("Error playing match audio:", error);
-          });
-        }
-        
         // Create connection
         const connectionId = `${prev.selectedPosition.imageId}-${Date.now()}`;
         const newConnection: Connection = {
@@ -117,14 +105,54 @@ export function useMatchingGame(images: MatchingGameImage[], numColumns: number 
         newCompletedMatches.add(imageId);
 
         const newConnections = [...prev.connections, newConnection];
-        const isComplete = newCompletedMatches.size === prev.originalImages.length;
+        const willBeComplete = newCompletedMatches.size === prev.originalImages.length;
+
+        // Play audio if available
+        if (matchedImage?.audio_url) {
+          if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.src = "";
+          }
+          audioRef.current = new Audio(matchedImage.audio_url);
+          
+          // If this is the last match, wait for audio to finish before marking complete
+          if (willBeComplete) {
+            audioRef.current.onended = () => {
+              setGameState(current => ({
+                ...current,
+                isComplete: true
+              }));
+            };
+          }
+          
+          audioRef.current.play().catch(error => {
+            console.error("Error playing match audio:", error);
+            // If audio fails, still mark as complete if needed
+            if (willBeComplete) {
+              setGameState(current => ({
+                ...current,
+                isComplete: true
+              }));
+            }
+          });
+        } else if (willBeComplete) {
+          // No audio, mark as complete immediately
+          return {
+            ...prev,
+            connections: newConnections,
+            selectedPosition: null,
+            completedMatches: newCompletedMatches,
+            isComplete: true,
+            score: prev.score + 10
+          };
+        }
 
         return {
           ...prev,
           connections: newConnections,
           selectedPosition: null,
           completedMatches: newCompletedMatches,
-          isComplete,
+          isComplete: willBeComplete && !matchedImage?.audio_url ? true : false,
           score: prev.score + 10
         };
       }

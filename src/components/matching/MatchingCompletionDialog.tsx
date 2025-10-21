@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { Trophy, Mic, X, Star } from "lucide-react";
+import { Trophy, Mic, X, Star, Volume2 } from "lucide-react";
 import { MatchingGameImage } from "@/data/matchingGameData";
 import { useAudioPlayback } from '@/hooks/useAudioPlayback';
 import { supabase } from '@/integrations/supabase/client';
@@ -331,6 +331,12 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     setCurrentRecordingIndex(null);
     setRecordingTimeLeft(3);
   };
+
+  const handlePlayAudio = (image: MatchingGameImage) => {
+    if (image.audio_url) {
+      playAudio(image.audio_url);
+    }
+  };
   return <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
@@ -347,21 +353,37 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
             const isRecording = recordingStates[index];
             const isCompleted = completedRecordings.has(index);
             const isCurrentlyRecording = currentRecordingIndex === index;
-            return <div key={index} className={`flex flex-col items-center space-y-2 cursor-pointer transition-all ${isCompleted ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`} onClick={() => handleImageClick(index, image.word)}>
-                  <div className="relative">
-                    <img src={image.url} alt={image.word} className={`w-20 h-20 object-cover rounded-lg border-2 ${isCompleted ? 'border-gray-400 grayscale' : isRecording ? 'border-red-500' : 'border-dragon-green'}`} />
-                    {isRecording && <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-lg">
-                        <div className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
-                          <Mic className="w-4 h-4" />
-                        </div>
-                      </div>}
-                    {isCurrentlyRecording && <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
-                        {recordingTimeLeft}
-                      </div>}
+            return <div key={index} className="flex flex-col items-center space-y-2">
+                  <div 
+                    className={`cursor-pointer transition-all ${isCompleted ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
+                    onClick={() => handleImageClick(index, image.word)}
+                  >
+                    <div className="relative">
+                      <img src={image.url} alt={image.word} className={`w-20 h-20 object-cover rounded-lg border-2 ${isCompleted ? 'border-gray-400 grayscale' : isRecording ? 'border-red-500' : 'border-dragon-green'}`} />
+                      {isRecording && <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-lg">
+                          <div className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                            <Mic className="w-4 h-4" />
+                          </div>
+                        </div>}
+                      {isCurrentlyRecording && <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
+                          {recordingTimeLeft}
+                        </div>}
+                    </div>
                   </div>
                   <span className={`text-sm font-medium text-center ${isCompleted ? 'text-gray-400' : 'text-black'}`}>
                     {image.word.toUpperCase()}
                   </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handlePlayAudio(image);
+                    }}
+                    className="h-8 w-8 p-0 hover:bg-dragon-green/10"
+                  >
+                    <Volume2 className="h-4 w-4 text-dragon-green" />
+                  </Button>
                 </div>;
           })}
           </div>
