@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { ThreeColumnMatchingItem } from '@/data/threeColumnMatchingData';
-import { useAudioPlayback } from '@/hooks/useAudioPlayback';
 
 export interface ThreeColumnConnection {
   audioId: string;
@@ -24,7 +23,6 @@ export interface ThreeColumnGameState {
 }
 
 export function useThreeColumnMatching(items: ThreeColumnMatchingItem[]) {
-  const { playAudio } = useAudioPlayback();
   const [gameState, setGameState] = useState<ThreeColumnGameState>({
     items: [],
     shuffledAudio: [],
@@ -107,32 +105,10 @@ export function useThreeColumnMatching(items: ThreeColumnMatchingItem[]) {
       if (isCorrect) {
         newCompletedItems.add(selectedAudio);
         newScore += 1;
-        
-        // Play audio for matched pair
-        const matchedItem = prev.items.find(item => item.id === selectedAudio);
-        if (matchedItem) {
-          const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${matchedItem.audioFile}`;
-          const audio = new Audio(audioUrl);
-          
-          // Check if this is the last match
-          const willBeComplete = newCompletedItems.size === prev.items.length;
-          
-          if (willBeComplete) {
-            // Delay completion until audio finishes
-            audio.onended = () => {
-              setGameState(current => ({
-                ...current,
-                isComplete: true
-              }));
-            };
-          }
-          
-          audio.play().catch(err => console.error('Error playing audio:', err));
-        }
       }
 
       const newConnections = [...prev.connections, newConnection];
-      const isComplete = isCorrect ? false : newCompletedItems.size === prev.items.length;
+      const isComplete = newCompletedItems.size === prev.items.length;
 
       return {
         ...prev,
