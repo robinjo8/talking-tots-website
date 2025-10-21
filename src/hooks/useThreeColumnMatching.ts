@@ -62,12 +62,10 @@ export function useThreeColumnMatching(items: ThreeColumnMatchingItem[]) {
   const selectAudio = (itemId: string) => {
     if (gameState.completedItems.has(itemId)) return;
     
-    // Play audio BEFORE state update - try .mp3 first, fallback to .m4a
+    // Play audio IMMEDIATELY when audio tile is clicked
     const item = items.find(i => i.id === itemId);
     if (item) {
-      // Try mp3 format first (more widely supported)
-      const audioFileName = item.audioFile.replace('.m4a', '.mp3');
-      const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFileName}`;
+      const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${item.audioFile}`;
       
       try {
         console.log('Playing audio from URL:', audioUrl);
@@ -78,13 +76,9 @@ export function useThreeColumnMatching(items: ThreeColumnMatchingItem[]) {
           audioRef.current.src = "";
         }
         
-        // Create a fresh audio element
+        // Create a fresh audio element and play immediately
         audioRef.current = new Audio(audioUrl);
-        
-        // Play immediately
-        audioRef.current.play().then(() => {
-          console.log('Audio started playing successfully');
-        }).catch(error => {
+        audioRef.current.play().catch(error => {
           console.error("Error playing audio:", error);
           console.error("Audio URL that failed:", audioUrl);
         });
