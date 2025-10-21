@@ -69,22 +69,52 @@ export function useFourColumnMatching(items: FourColumnMatchingItem[]) {
   const selectAudio = (itemId: string) => {
     if (gameState.completedItems.has(itemId)) return;
     
-    // Play audio BEFORE state update
+    // Play audio BEFORE state update using same logic as useAudioPlayback
     const item = items.find(i => i.id === itemId);
     if (item) {
       const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${item.audioFile}`;
       
-      // Stop any existing audio
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
+      try {
+        console.log('Playing audio from URL:', audioUrl);
+        
+        // Stop any existing audio by clearing source instead of pausing
+        if (audioRef.current) {
+          audioRef.current.src = "";
+          audioRef.current.load(); // Reset the audio element
+        }
+        
+        // Create a fresh audio element
+        audioRef.current = new Audio();
+        
+        // Add event listeners for debugging
+        audioRef.current.addEventListener('loadstart', () => console.log('Audio load started'));
+        audioRef.current.addEventListener('canplay', () => console.log('Audio can play'));
+        audioRef.current.addEventListener('loadeddata', () => console.log('Audio data loaded'));
+        audioRef.current.addEventListener('error', (e) => {
+          console.error('Audio element error:', e);
+          const target = e.target as HTMLAudioElement;
+          console.error('Audio error details:', {
+            error: target.error,
+            networkState: target.networkState,
+            readyState: target.readyState,
+            src: target.src
+          });
+        });
+        
+        // Set new source and play
+        audioRef.current.src = audioUrl;
+        audioRef.current.load(); // Force load to ensure fresh start
+        
+        audioRef.current.play().then(() => {
+          console.log('Audio started playing successfully');
+        }).catch(error => {
+          console.error("Error playing audio:", error);
+          console.error("Audio URL that failed:", audioUrl);
+        });
+      } catch (error) {
+        console.error("Error setting up audio playback:", error);
+        console.error("Audio URL that caused error:", audioUrl);
       }
-      
-      // Create and play new audio
-      audioRef.current = new Audio(audioUrl);
-      audioRef.current.play().catch(error => {
-        console.error("Error playing audio:", error);
-      });
     }
     
     setGameState(prev => ({
