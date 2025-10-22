@@ -129,8 +129,8 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
         saveRecording(word, imageIndex);
       };
 
-      // Start recording
-      recorder.start();
+      // Start recording with timeslice to ensure ondataavailable is called
+      recorder.start(100); // Collect data every 100ms
       setRecordingStates(prev => ({
         ...prev,
         [imageIndex]: true
@@ -146,13 +146,22 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
               clearInterval(countdownRef.current);
               countdownRef.current = null;
             }
-            // Stop recording
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-              mediaRecorder.stop();
+            // Request final data before stopping
+            if (recorder && recorder.state === 'recording') {
+              console.log('Requesting final data before stop');
+              recorder.requestData(); // Ensure we get all data
+              // Stop recording - this will trigger onstop after requestData
+              setTimeout(() => {
+                if (recorder.state === 'recording') {
+                  recorder.stop();
+                }
+              }, 50); // Small delay to ensure requestData completes
             }
             if (audioStream) {
-              audioStream.getTracks().forEach(track => track.stop());
-              setAudioStream(null);
+              setTimeout(() => {
+                audioStream.getTracks().forEach(track => track.stop());
+                setAudioStream(null);
+              }, 100);
             }
             // Update recording state but DON'T mark as completed yet
             // Completion will be marked in saveRecording after successful save
