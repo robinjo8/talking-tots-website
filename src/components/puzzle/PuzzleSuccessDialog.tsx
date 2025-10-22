@@ -178,7 +178,7 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
       const userSpecificPath = `recordings/${user.email}/child-${selectedChild.id}/${filename}`;
 
       const { error } = await supabase.storage
-        .from('zvocni-posnetki')
+        .from('audio-besede')
         .upload(userSpecificPath, audioBlob, {
           contentType: 'audio/webm'
         });
