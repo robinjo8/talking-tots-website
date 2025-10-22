@@ -83,8 +83,11 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
         }
       };
 
-      recorder.onstop = () => {
-        // Recording data will be handled by countdown completion
+      recorder.onstop = async () => {
+        // Save recording after MediaRecorder has stopped
+        if (recordingDataRef.current.length > 0) {
+          await saveRecording();
+        }
       };
 
       // Start recording
@@ -99,7 +102,7 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
             // Auto-stop recording and set hasRecorded
             stopRecording();
             setHasRecorded(true);
-            saveRecording();
+            // Note: saveRecording() is called from onstop event
             return 0;
           }
           return prev - 1;
