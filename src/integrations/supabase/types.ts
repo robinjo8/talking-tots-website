@@ -658,10 +658,7 @@ export type Database = {
       }
     }
     Functions: {
-      get_auth_user_data: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
+      get_auth_user_data: { Args: never; Returns: Json }
       get_child_activity_summary: {
         Args: { child_uuid: string }
         Returns: {
@@ -671,10 +668,7 @@ export type Database = {
           total_stars: number
         }[]
       }
-      get_child_total_stars: {
-        Args: { child_uuid: string }
-        Returns: number
-      }
+      get_child_total_stars: { Args: { child_uuid: string }; Returns: number }
       grant_admin_role: {
         Args: {
           p_expires_at?: string
@@ -687,15 +681,18 @@ export type Database = {
         Args: { p_role: Database["public"]["Enums"]["admin_role_type"] }
         Returns: boolean
       }
-      has_role: {
-        Args:
-          | {
+      has_role:
+        | {
+            Args: { role_name: Database["public"]["Enums"]["user_role"] }
+            Returns: boolean
+          }
+        | {
+            Args: {
               _role: Database["public"]["Enums"]["user_role"]
               _user_id: string
             }
-          | { role_name: Database["public"]["Enums"]["user_role"] }
-        Returns: boolean
-      }
+            Returns: boolean
+          }
       log_child_access: {
         Args: {
           p_access_reason?: string
@@ -713,14 +710,8 @@ export type Database = {
         }
         Returns: undefined
       }
-      sync_children_from_metadata: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      validate_email_format: {
-        Args: { email_input: string }
-        Returns: boolean
-      }
+      sync_children_from_metadata: { Args: never; Returns: undefined }
+      validate_email_format: { Args: { email_input: string }; Returns: boolean }
       validate_password_strength: {
         Args: { password_input: string }
         Returns: Json
