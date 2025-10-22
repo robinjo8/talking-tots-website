@@ -80,8 +80,13 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
         try {
           // Construct audio URL based on the word
           const word = images[0].word;
+          // Normalize word to remove diacritics (č, š, ž, etc.)
+          const normalizedWord = word
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, ''); // Remove diacritics
           // Use .m4a format like in regular puzzles
-          const audioFilename = `${word.toLowerCase()}.m4a`;
+          const audioFilename = `${normalizedWord}.m4a`;
           const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
           
           console.log('Playing audio:', audioUrl); // Debug log

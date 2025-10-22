@@ -41,7 +41,11 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   // Auto-play audio when dialog opens
   useEffect(() => {
     if (isOpen && completedImage) {
-      const audioFilename = completedImage.audio || `${completedImage.word.toLowerCase()}.m4a`;
+      const normalizedWord = completedImage.word
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, ''); // Remove diacritics
+      const audioFilename = completedImage.audio || `${normalizedWord}.m4a`;
       const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
       playAudio(audioUrl);
     }
@@ -238,7 +242,11 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   };
 
   const handlePlayAudio = () => {
-    const audioFilename = completedImage.audio || `${completedImage.word.toLowerCase()}.m4a`;
+    const normalizedWord = completedImage.word
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, ''); // Remove diacritics
+    const audioFilename = completedImage.audio || `${normalizedWord}.m4a`;
     const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
     playAudio(audioUrl);
   };
