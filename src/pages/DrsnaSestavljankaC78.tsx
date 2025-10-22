@@ -135,7 +135,7 @@ function DrsnaSestavljankaC78Content() {
             />
           </div>
         </div>
-        <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
+        <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
         <PuzzleSuccessDialog
           isOpen={showCompletion}
           onOpenChange={setShowCompletion}
@@ -172,7 +172,7 @@ function DrsnaSestavljankaC78Content() {
             onComplete={handleComplete}
           />
         </div>
-        <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
+        <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
         <PuzzleSuccessDialog
           isOpen={showCompletion}
           onOpenChange={setShowCompletion}

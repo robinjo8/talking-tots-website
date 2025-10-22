@@ -4,25 +4,37 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 interface InstructionsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  type?: "jigsaw" | "sliding";
 }
 
 export const InstructionsModal: React.FC<InstructionsModalProps> = ({
   isOpen,
-  onClose
+  onClose,
+  type = "jigsaw"
 }) => {
-  const content = [
-    "Sestavljaj sliko, dokler ni cela.",
-    "Ko bo slika končana, se bo predvajal posnetek logopeda.",
-    "Dobro poslušaj, kako logoped izgovori besedo.",
-    "Nato besedo jasno in glasno ponovi."
-  ];
+  const content = type === "sliding" 
+    ? [
+        "Sestavljanka je razdeljena na kvadrate, pri čemer je en kvadrat prazen.",
+        "Premikaj posamezne dele slike tako, da klikneš na polje, ki ga želiš premakniti.",
+        "Cilj je, da s premikanjem vseh delov slike sestaviš celotno sliko v pravilni obliki.",
+        "Ko bo igra končana, se bo predvajal posnetek logopeda.",
+        "Dobro poslušaj, nato pa ponovi besedo."
+      ]
+    : [
+        "Sestavljaj sliko, dokler ni cela.",
+        "Ko bo slika končana, se bo predvajal posnetek logopeda.",
+        "Dobro poslušaj, kako logoped izgovori besedo.",
+        "Nato besedo jasno in glasno ponovi."
+      ];
+  
+  const title = type === "sliding" ? "Drsna sestavljanka" : "Navodila za igro Sestavljanka";
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-center mb-4">
-            Navodila za igro Sestavljanka
+            {title}
           </DialogTitle>
         </DialogHeader>
         <div className="px-2 pb-4">

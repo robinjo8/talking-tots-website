@@ -154,7 +154,7 @@ function DrsnaSestavljankaR34Content() {
             />
           </div>
         </div>
-        <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
+        <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
         <PuzzleSuccessDialog
           isOpen={showCompletion}
           onOpenChange={setShowCompletion}
@@ -191,7 +191,7 @@ function DrsnaSestavljankaR34Content() {
             onComplete={handleComplete}
           />
         </div>
-        <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
+        <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
         <PuzzleSuccessDialog
           isOpen={showCompletion}
           onOpenChange={setShowCompletion}

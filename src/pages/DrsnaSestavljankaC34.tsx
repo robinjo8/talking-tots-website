@@ -150,7 +150,7 @@ function DrsnaSestavljankaC34Content() {
             />
           </div>
         </div>
-        <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
+        <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
         <MatchingCompletionDialog
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
@@ -189,7 +189,7 @@ function DrsnaSestavljankaC34Content() {
             onComplete={handleComplete}
           />
         </div>
-        <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
+        <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
         <MatchingCompletionDialog
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
