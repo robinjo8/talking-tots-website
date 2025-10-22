@@ -120,10 +120,12 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       setCurrentRecordingIndex(imageIndex);
       recorder.ondataavailable = event => {
         if (event.data.size > 0) {
+          console.log('Recording data available:', event.data.size, 'bytes');
           recordingDataRef.current.push(event.data);
         }
       };
       recorder.onstop = () => {
+        console.log('Recording stopped, data chunks:', recordingDataRef.current.length);
         saveRecording(word, imageIndex);
       };
 
@@ -200,8 +202,11 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     setRecordingTimeLeft(3);
   };
   const saveRecording = async (word: string, imageIndex: number) => {
+    console.log('saveRecording called with word:', word, 'imageIndex:', imageIndex);
+    console.log('recordingDataRef.current.length:', recordingDataRef.current.length);
+    
     if (recordingDataRef.current.length === 0) {
-      console.log('No recording data to save');
+      console.error('No recording data to save');
       toast({
         title: "Napaka",
         description: "Ni podatkov za shranjevanje. Poskusite ponovno.",
@@ -213,7 +218,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
 
     // Check if user is authenticated and child is selected
     if (!user || !selectedChild) {
-      console.error('User not authenticated or no child selected');
+      console.error('User not authenticated or no child selected', { user: !!user, selectedChild: !!selectedChild });
       toast({
         title: "Napaka",
         description: "Prijavite se za shranjevanje posnetka.",
@@ -223,6 +228,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       return;
     }
 
+    console.log('Attempting to save recording...', { user: user.email, child: selectedChild.id });
     try {
       const audioBlob = new Blob(recordingDataRef.current, {
         type: 'audio/webm'
@@ -238,16 +244,18 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
 
       // Create user-specific path: recordings/{user-email}/child-{child-id}/
       const userSpecificPath = `recordings/${user.email}/child-${selectedChild.id}/${filename}`;
+      console.log('Uploading to path:', userSpecificPath);
       const {
         error
       } = await supabase.storage.from('audio-besede').upload(userSpecificPath, audioBlob, {
         contentType: 'audio/webm'
       });
       if (error) {
-        console.error('Error saving recording:', error);
+        console.error('Supabase storage error:', error);
+        console.error('Error details:', JSON.stringify(error, null, 2));
         toast({
           title: "Napaka",
-          description: "Snemanje ni bilo shranjeno.",
+          description: `Snemanje ni bilo shranjeno: ${error.message}`,
           variant: "destructive"
         });
         // Don't mark as completed if save failed
