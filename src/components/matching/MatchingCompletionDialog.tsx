@@ -118,19 +118,32 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       setMediaRecorder(recorder);
       recordingDataRef.current = [];
       setCurrentRecordingIndex(imageIndex);
+      
       recorder.ondataavailable = event => {
         if (event.data.size > 0) {
           console.log('Recording data available:', event.data.size, 'bytes');
           recordingDataRef.current.push(event.data);
         }
       };
-      recorder.onstop = () => {
+      
+      recorder.onstop = async () => {
         console.log('Recording stopped, data chunks:', recordingDataRef.current.length);
-        saveRecording(word, imageIndex);
+        // Save recording after MediaRecorder has stopped
+        if (recordingDataRef.current.length > 0) {
+          await saveRecording(word, imageIndex);
+        } else {
+          console.error('No recording data available in onstop');
+          toast({
+            title: "Napaka",
+            description: "Ni podatkov za shranjevanje. Poskusite ponovno.",
+            variant: "destructive"
+          });
+          setCurrentRecordingIndex(null);
+        }
       };
 
-      // Start recording with timeslice to ensure ondataavailable is called
-      recorder.start(100); // Collect data every 100ms
+      // Start recording without timeslice
+      recorder.start();
       setRecordingStates(prev => ({
         ...prev,
         [imageIndex]: true
@@ -141,39 +154,19 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       countdownRef.current = setInterval(() => {
         setRecordingTimeLeft(prev => {
           if (prev <= 1) {
-            // Auto-stop recording immediately
+            // Auto-stop recording
             if (countdownRef.current) {
               clearInterval(countdownRef.current);
               countdownRef.current = null;
             }
-            // Request final data before stopping
-            if (recorder && recorder.state === 'recording') {
-              console.log('Requesting final data before stop');
-              recorder.requestData(); // Ensure we get all data
-              // Stop recording - this will trigger onstop after requestData
-              setTimeout(() => {
-                if (recorder.state === 'recording') {
-                  recorder.stop();
-                }
-              }, 50); // Small delay to ensure requestData completes
-            }
-            if (audioStream) {
-              setTimeout(() => {
-                audioStream.getTracks().forEach(track => track.stop());
-                setAudioStream(null);
-              }, 100);
-            }
-            // Update recording state but DON'T mark as completed yet
-            // Completion will be marked in saveRecording after successful save
-            setRecordingStates(prev => ({
-              ...prev,
-              [imageIndex]: false
-            }));
+            stopRecording();
+            // Note: saveRecording() is called from onstop event
             return 0;
           }
           return prev - 1;
         });
       }, 1000);
+      
       toast({
         title: "Snemanje se je začelo",
         description: "Povej besedo glasno in razločno!"
@@ -192,13 +185,16 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       clearInterval(countdownRef.current);
       countdownRef.current = null;
     }
+
     if (mediaRecorder && mediaRecorder.state === 'recording') {
       mediaRecorder.stop();
     }
+
     if (audioStream) {
       audioStream.getTracks().forEach(track => track.stop());
       setAudioStream(null);
     }
+
     // Clear the current recording state
     if (currentRecordingIndex !== null) {
       setRecordingStates(prev => ({
@@ -208,7 +204,6 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       // Don't mark as completed here - will be marked in saveRecording after successful save
       setCurrentRecordingIndex(null);
     }
-    setRecordingTimeLeft(3);
   };
   const saveRecording = async (word: string, imageIndex: number) => {
     console.log('saveRecording called with word:', word, 'imageIndex:', imageIndex);
@@ -242,6 +237,8 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       const audioBlob = new Blob(recordingDataRef.current, {
         type: 'audio/webm'
       });
+      console.log('Created audio blob, size:', audioBlob.size, 'bytes');
+      
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       // Normalize word to remove special characters (č, š, ž, etc.)
       const normalizedWord = word
@@ -254,11 +251,13 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       // Create user-specific path: recordings/{user-email}/child-{child-id}/
       const userSpecificPath = `recordings/${user.email}/child-${selectedChild.id}/${filename}`;
       console.log('Uploading to path:', userSpecificPath);
+      
       const {
         error
       } = await supabase.storage.from('audio-besede').upload(userSpecificPath, audioBlob, {
         contentType: 'audio/webm'
       });
+      
       if (error) {
         console.error('Supabase storage error:', error);
         console.error('Error details:', JSON.stringify(error, null, 2));
