@@ -144,7 +144,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
               clearInterval(countdownRef.current);
               countdownRef.current = null;
             }
-            // Stop recording and update states immediately
+            // Stop recording
             if (mediaRecorder && mediaRecorder.state === 'recording') {
               mediaRecorder.stop();
             }
@@ -152,13 +152,12 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
               audioStream.getTracks().forEach(track => track.stop());
               setAudioStream(null);
             }
-            // Update states immediately
+            // Update recording state but DON'T mark as completed yet
+            // Completion will be marked in saveRecording after successful save
             setRecordingStates(prev => ({
               ...prev,
               [imageIndex]: false
             }));
-            setCompletedRecordings(prev => new Set([...prev, imageIndex]));
-            setCurrentRecordingIndex(null);
             return 0;
           }
           return prev - 1;
@@ -189,14 +188,13 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       audioStream.getTracks().forEach(track => track.stop());
       setAudioStream(null);
     }
-    // Clear the current recording state and mark as completed
+    // Clear the current recording state
     if (currentRecordingIndex !== null) {
       setRecordingStates(prev => ({
         ...prev,
         [currentRecordingIndex]: false
       }));
-      // Mark as completed immediately when recording stops
-      setCompletedRecordings(prev => new Set([...prev, currentRecordingIndex]));
+      // Don't mark as completed here - will be marked in saveRecording after successful save
       setCurrentRecordingIndex(null);
     }
     setRecordingTimeLeft(3);
@@ -204,8 +202,11 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
   const saveRecording = async (word: string, imageIndex: number) => {
     if (recordingDataRef.current.length === 0) {
       console.log('No recording data to save');
-      // Still mark as completed even if no data
-      setCompletedRecordings(prev => new Set([...prev, imageIndex]));
+      toast({
+        title: "Napaka",
+        description: "Ni podatkov za shranjevanje. Poskusite ponovno.",
+        variant: "destructive"
+      });
       setCurrentRecordingIndex(null);
       return;
     }
@@ -218,15 +219,10 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
         description: "Prijavite se za shranjevanje posnetka.",
         variant: "destructive"
       });
-      // Still mark as completed even if auth fails
-      setCompletedRecordings(prev => new Set([...prev, imageIndex]));
       setCurrentRecordingIndex(null);
       return;
     }
 
-    // Mark as completed first to prevent multiple clicks
-    setCompletedRecordings(prev => new Set([...prev, imageIndex]));
-    setCurrentRecordingIndex(null);
     try {
       const audioBlob = new Blob(recordingDataRef.current, {
         type: 'audio/webm'
@@ -254,12 +250,15 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
           description: "Snemanje ni bilo shranjeno.",
           variant: "destructive"
         });
+        // Don't mark as completed if save failed
       } else {
         console.log('Recording saved successfully to:', userSpecificPath);
         toast({
           title: "Odlično!",
           description: "Tvoja izgovorjava je bila shranjena."
         });
+        // Only mark as completed after successful save
+        setCompletedRecordings(prev => new Set([...prev, imageIndex]));
       }
     } catch (error) {
       console.error('Error in saveRecording:', error);
@@ -268,7 +267,10 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
         description: "Prišlo je do napake pri shranjevanju.",
         variant: "destructive"
       });
+      // Don't mark as completed if save failed
     }
+    
+    setCurrentRecordingIndex(null);
     recordingDataRef.current = [];
   };
   const handleClose = () => {
