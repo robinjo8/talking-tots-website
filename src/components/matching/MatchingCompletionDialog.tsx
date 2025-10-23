@@ -125,6 +125,9 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
         }
       };
       
+      // Capture stream in local scope for onstop callback
+      const localStream = stream;
+      
       recorder.onstop = async () => {
         console.log('Recording stopped, data chunks:', recordingDataRef.current.length);
         
@@ -142,10 +145,9 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
             setCurrentRecordingIndex(null);
           }
         } finally {
-          // Ustavi stream šele KO je shranjeno!
-          if (audioStream) {
-            audioStream.getTracks().forEach(track => track.stop());
-            setAudioStream(null);
+          // Ustavi LOCAL stream šele KO je shranjeno!
+          if (localStream) {
+            localStream.getTracks().forEach(track => track.stop());
           }
           
           // Remove from pending saves (always execute, even if error occurred)
