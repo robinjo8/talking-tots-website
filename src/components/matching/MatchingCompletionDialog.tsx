@@ -115,27 +115,62 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       // Create MediaRecorder
       const recorder = new MediaRecorder(stream);
       setMediaRecorder(recorder);
-      recordingDataRef.current = [];
+      
+      // CRITICAL: Capture BOTH recorder and stream in local scope for callbacks
+      const localRecorder = recorder;
+      const localStream = stream;
+      
+      // Use separate data array for this specific recording
+      const recordingData: Blob[] = [];
       setCurrentRecordingIndex(imageIndex);
       
       recorder.ondataavailable = event => {
         if (event.data.size > 0) {
-          console.log('Recording data available:', event.data.size, 'bytes');
-          recordingDataRef.current.push(event.data);
+          console.log('[DATA] Recording data available for index:', imageIndex, 'size:', event.data.size, 'bytes');
+          recordingData.push(event.data);
         }
       };
       
-      // Capture stream in local scope for onstop callback
-      const localStream = stream;
-      
-      recorder.onstop = async () => {
+      localRecorder.onstop = async () => {
         console.log('[ONSTOP] Recording stopped for index:', imageIndex, 'word:', word);
-        console.log('[ONSTOP] Data chunks:', recordingDataRef.current.length);
+        console.log('[ONSTOP] Data chunks:', recordingData.length);
         
         try {
           // Save recording after MediaRecorder has stopped
-          if (recordingDataRef.current.length > 0) {
-            await saveRecording(word, imageIndex);
+          if (recordingData.length > 0) {
+            // Create blob from local recordingData
+            const audioBlob = new Blob(recordingData, { type: 'audio/webm' });
+            console.log('[ONSTOP] Created audio blob, size:', audioBlob.size, 'bytes');
+            
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const normalizedWord = word
+              .toLowerCase()
+              .normalize('NFD')
+              .replace(/[\u0300-\u036f]/g, '')
+              .replace(/[^a-z0-9]/g, '-');
+            const filename = `recording-${normalizedWord}-${timestamp}.webm`;
+            const userSpecificPath = `recordings/${user!.email}/child-${selectedChild!.id}/${filename}`;
+            
+            console.log('[ONSTOP] Uploading to path:', userSpecificPath);
+            
+            const { error } = await supabase.storage
+              .from('audio-besede')
+              .upload(userSpecificPath, audioBlob, { contentType: 'audio/webm' });
+            
+            if (error) {
+              console.error('[ONSTOP] Supabase storage error:', error);
+              toast({
+                title: "Napaka",
+                description: `Snemanje ni bilo shranjeno: ${error.message}`,
+                variant: "destructive"
+              });
+            } else {
+              console.log('[ONSTOP] Recording saved successfully to:', userSpecificPath);
+              toast({
+                title: "Odlično!",
+                description: "Tvoja izgovorjava je bila shranjena."
+              });
+            }
           } else {
             console.error('[ONSTOP] No recording data available');
             toast({
@@ -162,8 +197,8 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
 
       // Start recording
       console.log('[START] Starting recorder for index:', imageIndex, 'word:', word);
-      recorder.start();
-      console.log('[START] Recorder state after start:', recorder.state);
+      localRecorder.start();
+      console.log('[START] Recorder state after start:', localRecorder.state);
       setRecordingTimeLeft(3);
 
       // Start countdown
@@ -176,16 +211,24 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
               clearInterval(countdownRef.current);
               countdownRef.current = null;
             }
-            // Track this save operation BEFORE stopRecording() to prevent race condition
+            // Track this save operation BEFORE stopping recorder
             pendingSavesRef.current.add(imageIndex);
-            setIsSavingRecording(true); // Takoj posodobi state
-            console.log('[COUNTDOWN] Calling stopRecording for index:', imageIndex);
-            stopRecording();
+            setIsSavingRecording(true);
+            console.log('[COUNTDOWN] Calling stop on localRecorder for index:', imageIndex);
+            console.log('[COUNTDOWN] LocalRecorder state:', localRecorder.state);
+            
+            // Stop the LOCAL recorder, not the global state
+            if (localRecorder.state !== 'inactive') {
+              localRecorder.stop();
+              console.log('[COUNTDOWN] LocalRecorder.stop() called');
+            } else {
+              console.error('[COUNTDOWN] LocalRecorder already inactive!');
+            }
+            
             // Mark as completed immediately for UI feedback
             setCompletedRecordings(prevCompleted => new Set([...prevCompleted, imageIndex]));
             setCurrentRecordingIndex(null);
             console.log('[COUNTDOWN] Completed for index:', imageIndex);
-            // Note: saveRecording() is still called from onstop event but won't change state
             return 0;
           }
           return prev - 1;
@@ -228,88 +271,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     // Don't stop audioStream here - it will be stopped in recorder.onstop after saving
     // Don't set currentRecordingIndex to null here - it will be set in saveRecording
   };
-  const saveRecording = async (word: string, imageIndex: number) => {
-    console.log('saveRecording called with word:', word, 'imageIndex:', imageIndex);
-    console.log('recordingDataRef.current.length:', recordingDataRef.current.length);
-    
-    if (recordingDataRef.current.length === 0) {
-      console.error('No recording data to save');
-      toast({
-        title: "Napaka",
-        description: "Ni podatkov za shranjevanje. Poskusite ponovno.",
-        variant: "destructive"
-      });
-      setCurrentRecordingIndex(null);
-      return;
-    }
-
-    // Check if user is authenticated and child is selected
-    if (!user || !selectedChild) {
-      console.error('User not authenticated or no child selected', { user: !!user, selectedChild: !!selectedChild });
-      toast({
-        title: "Napaka",
-        description: "Prijavite se za shranjevanje posnetka.",
-        variant: "destructive"
-      });
-      setCurrentRecordingIndex(null);
-      return;
-    }
-
-    console.log('Attempting to save recording...', { user: user.email, child: selectedChild.id });
-    try {
-      const audioBlob = new Blob(recordingDataRef.current, {
-        type: 'audio/webm'
-      });
-      console.log('Created audio blob, size:', audioBlob.size, 'bytes');
-      
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      // Normalize word to remove special characters (č, š, ž, etc.)
-      const normalizedWord = word
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
-        .replace(/[^a-z0-9]/g, '-'); // Replace non-alphanumeric with dash
-      const filename = `recording-${normalizedWord}-${timestamp}.webm`;
-
-      // Create user-specific path: recordings/{user-email}/child-{child-id}/
-      const userSpecificPath = `recordings/${user.email}/child-${selectedChild.id}/${filename}`;
-      console.log('Uploading to path:', userSpecificPath);
-      
-      const {
-        error
-      } = await supabase.storage.from('audio-besede').upload(userSpecificPath, audioBlob, {
-        contentType: 'audio/webm'
-      });
-      
-      if (error) {
-        console.error('Supabase storage error:', error);
-        console.error('Error details:', JSON.stringify(error, null, 2));
-        toast({
-          title: "Napaka",
-          description: `Snemanje ni bilo shranjeno: ${error.message}`,
-          variant: "destructive"
-        });
-        // Don't change state here - already updated in countdown
-      } else {
-        console.log('Recording saved successfully to:', userSpecificPath);
-        toast({
-          title: "Odlično!",
-          description: "Tvoja izgovorjava je bila shranjena."
-        });
-        // Don't change state here - already updated in countdown
-      }
-    } catch (error) {
-      console.error('Error in saveRecording:', error);
-      toast({
-        title: "Napaka",
-        description: "Prišlo je do napake pri shranjevanju.",
-        variant: "destructive"
-      });
-      // Don't change state here - already updated in countdown
-    }
-    
-    recordingDataRef.current = [];
-  };
+  // This function is no longer needed - saving is done directly in recorder.onstop
   const handleClose = () => {
     const allCompleted = completedRecordings.size === images.length;
     if (allCompleted && !starClaimed) {
