@@ -9,7 +9,7 @@ import { MatchingInstructionsModal } from "@/components/matching/MatchingInstruc
 import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { getLetterData, getImagesForAgeGroup, MatchingGameImage } from "@/data/matchingGameData";
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 
 export default function IgraUjemanjaK() {
@@ -23,12 +23,10 @@ export default function IgraUjemanjaK() {
   const [playedImages, setPlayedImages] = useState<MatchingGameImage[]>([]);
   const gameCompletedRef = useRef(false);
   
-  const getGameImages = () => {
+  const gameImages = useMemo(() => {
     const letterData = getLetterData('K');
     return letterData ? getImagesForAgeGroup(letterData.images, '3-4') : [];
-  };
-  
-  const gameImages = getGameImages();
+  }, [gameKey]);
 
   const handleGameComplete = (score: number, images: MatchingGameImage[]) => {
     if (!gameCompletedRef.current) {
