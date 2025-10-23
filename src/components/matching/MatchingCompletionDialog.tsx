@@ -21,7 +21,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
   onClose,
   images,
   onStarClaimed,
-  instructionText = "KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO.",
+  instructionText = "KLIKNI NA SPODNJE SLIKE IN PONOVI BESEDE.",
   autoPlayAudio = false
 }) => {
   const [recordingStates, setRecordingStates] = useState<{
@@ -368,7 +368,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-6 py-4">
-          <p className="text-sm text-black text-justify mx-[64px]">{instructionText}</p>
+          <p className="text-sm text-black text-center">{instructionText}</p>
           
           {/* Display images - center single image, otherwise use grid */}
           <div className={images.length === 1 ? "flex justify-center" : "grid grid-cols-2 gap-4 mx-auto max-w-xs"}>
