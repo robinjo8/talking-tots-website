@@ -127,7 +127,6 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       
       recorder.onstop = async () => {
         console.log('Recording stopped, data chunks:', recordingDataRef.current.length);
-        setIsSavingRecording(true);
         
         try {
           // Save recording after MediaRecorder has stopped
@@ -146,6 +145,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
           // Remove from pending saves (always execute, even if error occurred)
           pendingSavesRef.current.delete(imageIndex);
           setIsSavingRecording(pendingSavesRef.current.size > 0);
+          console.log('Pending saves remaining:', pendingSavesRef.current.size);
         }
       };
 
@@ -164,6 +164,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
             }
             // Track this save operation BEFORE stopRecording() to prevent race condition
             pendingSavesRef.current.add(imageIndex);
+            setIsSavingRecording(true); // Takoj posodobi state
             stopRecording();
             // Mark as completed immediately for UI feedback
             setCompletedRecordings(prevCompleted => new Set([...prevCompleted, imageIndex]));
