@@ -138,8 +138,8 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
         }
       };
 
-      // Start recording with timeslice to ensure data is collected
-      recorder.start(100); // Request data every 100ms
+      // Start recording
+      recorder.start();
       setRecordingTimeLeft(3);
 
       // Start countdown
