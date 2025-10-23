@@ -49,6 +49,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
   } = useAuth();
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
   const recordingDataRef = useRef<Blob[]>([]);
+  const pendingSavesRef = useRef<Set<number>>(new Set());
 
   // Cleanup on dialog close
   useEffect(() => {
@@ -67,6 +68,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       }
       setMediaRecorder(null);
       recordingDataRef.current = [];
+      pendingSavesRef.current.clear();
     }
   }, [isOpen, audioStream]);
 
@@ -125,7 +127,10 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       
       recorder.onstop = async () => {
         console.log('Recording stopped, data chunks:', recordingDataRef.current.length);
+        // Track this save operation
+        pendingSavesRef.current.add(imageIndex);
         setIsSavingRecording(true);
+        
         // Save recording after MediaRecorder has stopped
         if (recordingDataRef.current.length > 0) {
           await saveRecording(word, imageIndex);
@@ -138,7 +143,10 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
           });
           setCurrentRecordingIndex(null);
         }
-        setIsSavingRecording(false);
+        
+        // Remove from pending saves
+        pendingSavesRef.current.delete(imageIndex);
+        setIsSavingRecording(pendingSavesRef.current.size > 0);
       };
 
       // Start recording
@@ -306,14 +314,36 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
 
   const handleClaimStar = async () => {
     // Wait for any ongoing save operation to complete
-    if (isSavingRecording) {
+    if (pendingSavesRef.current.size > 0) {
       toast({
         title: "Počakaj",
-        description: "Shranjujem zadnji posnetek..."
+        description: "Shranjujem posnetke..."
       });
+      
+      // Wait for all saves to complete
+      const checkInterval = setInterval(() => {
+        if (pendingSavesRef.current.size === 0) {
+          clearInterval(checkInterval);
+          proceedWithStarClaim();
+        }
+      }, 100);
+      
+      // Timeout after 10 seconds
+      setTimeout(() => {
+        clearInterval(checkInterval);
+        if (pendingSavesRef.current.size > 0) {
+          console.error('Timeout waiting for saves to complete');
+          proceedWithStarClaim();
+        }
+      }, 10000);
+      
       return;
     }
     
+    proceedWithStarClaim();
+  };
+
+  const proceedWithStarClaim = () => {
     setStarClaimed(true);
     onStarClaimed?.();
     toast({
