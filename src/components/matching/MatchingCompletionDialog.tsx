@@ -127,26 +127,26 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       
       recorder.onstop = async () => {
         console.log('Recording stopped, data chunks:', recordingDataRef.current.length);
-        // Track this save operation
-        pendingSavesRef.current.add(imageIndex);
         setIsSavingRecording(true);
         
-        // Save recording after MediaRecorder has stopped
-        if (recordingDataRef.current.length > 0) {
-          await saveRecording(word, imageIndex);
-        } else {
-          console.error('No recording data available in onstop');
-          toast({
-            title: "Napaka",
-            description: "Ni podatkov za shranjevanje. Poskusite ponovno.",
-            variant: "destructive"
-          });
-          setCurrentRecordingIndex(null);
+        try {
+          // Save recording after MediaRecorder has stopped
+          if (recordingDataRef.current.length > 0) {
+            await saveRecording(word, imageIndex);
+          } else {
+            console.error('No recording data available in onstop');
+            toast({
+              title: "Napaka",
+              description: "Ni podatkov za shranjevanje. Poskusite ponovno.",
+              variant: "destructive"
+            });
+            setCurrentRecordingIndex(null);
+          }
+        } finally {
+          // Remove from pending saves (always execute, even if error occurred)
+          pendingSavesRef.current.delete(imageIndex);
+          setIsSavingRecording(pendingSavesRef.current.size > 0);
         }
-        
-        // Remove from pending saves
-        pendingSavesRef.current.delete(imageIndex);
-        setIsSavingRecording(pendingSavesRef.current.size > 0);
       };
 
       // Start recording
@@ -162,6 +162,8 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
               clearInterval(countdownRef.current);
               countdownRef.current = null;
             }
+            // Track this save operation BEFORE stopRecording() to prevent race condition
+            pendingSavesRef.current.add(imageIndex);
             stopRecording();
             // Mark as completed immediately for UI feedback
             setCompletedRecordings(prevCompleted => new Set([...prevCompleted, imageIndex]));
