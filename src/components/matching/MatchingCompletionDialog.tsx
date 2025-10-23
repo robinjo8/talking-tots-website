@@ -129,14 +129,15 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       const localStream = stream;
       
       recorder.onstop = async () => {
-        console.log('Recording stopped, data chunks:', recordingDataRef.current.length);
+        console.log('[ONSTOP] Recording stopped for index:', imageIndex, 'word:', word);
+        console.log('[ONSTOP] Data chunks:', recordingDataRef.current.length);
         
         try {
           // Save recording after MediaRecorder has stopped
           if (recordingDataRef.current.length > 0) {
             await saveRecording(word, imageIndex);
           } else {
-            console.error('No recording data available in onstop');
+            console.error('[ONSTOP] No recording data available');
             toast({
               title: "Napaka",
               description: "Ni podatkov za shranjevanje. Poskusite ponovno.",
@@ -145,26 +146,31 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
             setCurrentRecordingIndex(null);
           }
         } finally {
+          console.log('[ONSTOP] Finally block for index:', imageIndex);
           // Ustavi LOCAL stream šele KO je shranjeno!
           if (localStream) {
+            console.log('[ONSTOP] Stopping localStream tracks:', localStream.getTracks().length);
             localStream.getTracks().forEach(track => track.stop());
           }
           
           // Remove from pending saves (always execute, even if error occurred)
           pendingSavesRef.current.delete(imageIndex);
           setIsSavingRecording(pendingSavesRef.current.size > 0);
-          console.log('Pending saves remaining:', pendingSavesRef.current.size);
+          console.log('[ONSTOP] Pending saves remaining:', pendingSavesRef.current.size);
         }
       };
 
       // Start recording
+      console.log('[START] Starting recorder for index:', imageIndex, 'word:', word);
       recorder.start();
+      console.log('[START] Recorder state after start:', recorder.state);
       setRecordingTimeLeft(3);
 
       // Start countdown
       countdownRef.current = setInterval(() => {
         setRecordingTimeLeft(prev => {
           if (prev <= 1) {
+            console.log('[COUNTDOWN] Time up for index:', imageIndex);
             // Auto-stop recording
             if (countdownRef.current) {
               clearInterval(countdownRef.current);
@@ -173,10 +179,12 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
             // Track this save operation BEFORE stopRecording() to prevent race condition
             pendingSavesRef.current.add(imageIndex);
             setIsSavingRecording(true); // Takoj posodobi state
+            console.log('[COUNTDOWN] Calling stopRecording for index:', imageIndex);
             stopRecording();
             // Mark as completed immediately for UI feedback
             setCompletedRecordings(prevCompleted => new Set([...prevCompleted, imageIndex]));
             setCurrentRecordingIndex(null);
+            console.log('[COUNTDOWN] Completed for index:', imageIndex);
             // Note: saveRecording() is still called from onstop event but won't change state
             return 0;
           }
@@ -198,13 +206,23 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     }
   };
   const stopRecording = () => {
+    console.log('[STOP] stopRecording called, currentIndex:', currentRecordingIndex);
+    
     if (countdownRef.current) {
       clearInterval(countdownRef.current);
       countdownRef.current = null;
     }
 
-    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-      mediaRecorder.stop();
+    if (mediaRecorder) {
+      console.log('[STOP] MediaRecorder state:', mediaRecorder.state);
+      if (mediaRecorder.state !== 'inactive') {
+        console.log('[STOP] Calling mediaRecorder.stop()');
+        mediaRecorder.stop();
+      } else {
+        console.error('[STOP] MediaRecorder already inactive!');
+      }
+    } else {
+      console.error('[STOP] No mediaRecorder available!');
     }
     
     // Don't stop audioStream here - it will be stopped in recorder.onstop after saving
