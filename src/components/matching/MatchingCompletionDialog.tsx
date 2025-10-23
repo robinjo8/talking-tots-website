@@ -31,6 +31,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
   const [currentRecordingIndex, setCurrentRecordingIndex] = useState<number | null>(null);
   const [starClaimed, setStarClaimed] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isSavingRecording, setIsSavingRecording] = useState(false);
   const [confirmDialogConfig, setConfirmDialogConfig] = useState<{
     title: string;
     description: string;
@@ -124,6 +125,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       
       recorder.onstop = async () => {
         console.log('Recording stopped, data chunks:', recordingDataRef.current.length);
+        setIsSavingRecording(true);
         // Save recording after MediaRecorder has stopped
         if (recordingDataRef.current.length > 0) {
           await saveRecording(word, imageIndex);
@@ -136,6 +138,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
           });
           setCurrentRecordingIndex(null);
         }
+        setIsSavingRecording(false);
       };
 
       // Start recording
@@ -301,7 +304,16 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     }
   };
 
-  const handleClaimStar = () => {
+  const handleClaimStar = async () => {
+    // Wait for any ongoing save operation to complete
+    if (isSavingRecording) {
+      toast({
+        title: "Počakaj",
+        description: "Shranjujem zadnji posnetek..."
+      });
+      return;
+    }
+    
     setStarClaimed(true);
     onStarClaimed?.();
     toast({
@@ -404,9 +416,10 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
               <Button 
                 onClick={handleClaimStar} 
                 className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 flex-1 max-w-32"
+                disabled={isSavingRecording}
               >
                 <Star className="w-4 h-4" />
-                Vzemi zvezdico
+                {isSavingRecording ? 'Shranjujem...' : 'Vzemi zvezdico'}
               </Button>
             )}
             
