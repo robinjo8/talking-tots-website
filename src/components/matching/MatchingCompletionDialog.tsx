@@ -142,6 +142,12 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
             setCurrentRecordingIndex(null);
           }
         } finally {
+          // Ustavi stream šele KO je shranjeno!
+          if (audioStream) {
+            audioStream.getTracks().forEach(track => track.stop());
+            setAudioStream(null);
+          }
+          
           // Remove from pending saves (always execute, even if error occurred)
           pendingSavesRef.current.delete(imageIndex);
           setIsSavingRecording(pendingSavesRef.current.size > 0);
@@ -198,12 +204,8 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     if (mediaRecorder && mediaRecorder.state !== 'inactive') {
       mediaRecorder.stop();
     }
-
-    if (audioStream) {
-      audioStream.getTracks().forEach(track => track.stop());
-      setAudioStream(null);
-    }
     
+    // Don't stop audioStream here - it will be stopped in recorder.onstop after saving
     // Don't set currentRecordingIndex to null here - it will be set in saveRecording
   };
   const saveRecording = async (word: string, imageIndex: number) => {
