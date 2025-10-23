@@ -138,8 +138,8 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
         }
       };
 
-      // Start recording without timeslice
-      recorder.start();
+      // Start recording with timeslice to ensure data is collected
+      recorder.start(100); // Request data every 100ms
       setRecordingTimeLeft(3);
 
       // Start countdown
@@ -178,7 +178,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       countdownRef.current = null;
     }
 
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
       mediaRecorder.stop();
     }
 
