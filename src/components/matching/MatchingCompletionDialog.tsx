@@ -24,9 +24,6 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
   instructionText = "KLIKNI NA SPODNJE SLIKE IN PONOVI BESEDE.",
   autoPlayAudio = false
 }) => {
-  const [recordingStates, setRecordingStates] = useState<{
-    [key: number]: boolean;
-  }>({});
   const [completedRecordings, setCompletedRecordings] = useState<Set<number>>(new Set());
   const [recordingTimeLeft, setRecordingTimeLeft] = useState(3);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
@@ -55,7 +52,6 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
   // Cleanup on dialog close
   useEffect(() => {
     if (!isOpen) {
-      setRecordingStates({});
       setCompletedRecordings(new Set());
       setRecordingTimeLeft(3);
       setCurrentRecordingIndex(null);
@@ -144,10 +140,6 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
 
       // Start recording without timeslice
       recorder.start();
-      setRecordingStates(prev => ({
-        ...prev,
-        [imageIndex]: true
-      }));
       setRecordingTimeLeft(3);
 
       // Start countdown
@@ -194,16 +186,8 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       audioStream.getTracks().forEach(track => track.stop());
       setAudioStream(null);
     }
-
-    // Clear the current recording state
-    if (currentRecordingIndex !== null) {
-      setRecordingStates(prev => ({
-        ...prev,
-        [currentRecordingIndex]: false
-      }));
-      // Don't mark as completed here - will be marked in saveRecording after successful save
-      setCurrentRecordingIndex(null);
-    }
+    
+    // Don't set currentRecordingIndex to null here - it will be set in saveRecording
   };
   const saveRecording = async (word: string, imageIndex: number) => {
     console.log('saveRecording called with word:', word, 'imageIndex:', imageIndex);
@@ -266,15 +250,16 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
           description: `Snemanje ni bilo shranjeno: ${error.message}`,
           variant: "destructive"
         });
-        // Don't mark as completed if save failed
+        setCurrentRecordingIndex(null);
       } else {
         console.log('Recording saved successfully to:', userSpecificPath);
         toast({
           title: "Odlično!",
           description: "Tvoja izgovorjava je bila shranjena."
         });
-        // Only mark as completed after successful save
+        // Mark as completed and reset current recording index after successful save
         setCompletedRecordings(prev => new Set([...prev, imageIndex]));
+        setCurrentRecordingIndex(null);
       }
     } catch (error) {
       console.error('Error in saveRecording:', error);
@@ -283,10 +268,9 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
         description: "Prišlo je do napake pri shranjevanju.",
         variant: "destructive"
       });
-      // Don't mark as completed if save failed
+      setCurrentRecordingIndex(null);
     }
     
-    setCurrentRecordingIndex(null);
     recordingDataRef.current = [];
   };
   const handleClose = () => {
@@ -329,7 +313,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
   };
   const handleImageClick = (imageIndex: number, word: string) => {
     // Prevent clicking if already completed or currently recording
-    if (completedRecordings.has(imageIndex) || recordingStates[imageIndex]) {
+    if (completedRecordings.has(imageIndex) || currentRecordingIndex !== null) {
       return;
     }
     startRecording(imageIndex, word);
@@ -350,7 +334,6 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     }
     // Reset all recordings to allow re-recording
     setCompletedRecordings(new Set());
-    setRecordingStates({});
     setCurrentRecordingIndex(null);
     setRecordingTimeLeft(3);
   };
@@ -373,9 +356,8 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
           {/* Display images - center single image, otherwise use grid */}
           <div className={images.length === 1 ? "flex justify-center" : "grid grid-cols-2 gap-4 mx-auto max-w-xs"}>
             {images.slice(0, 4).map((image, index) => {
-            const isRecording = recordingStates[index];
+            const isRecording = currentRecordingIndex === index;
             const isCompleted = completedRecordings.has(index);
-            const isCurrentlyRecording = currentRecordingIndex === index;
             return <div key={index} className="flex flex-col items-center space-y-2">
                   <div 
                     className={`cursor-pointer transition-all ${isCompleted ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
@@ -388,7 +370,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
                             <Mic className="w-4 h-4" />
                           </div>
                         </div>}
-                      {isCurrentlyRecording && <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
+                      {isRecording && <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
                           {recordingTimeLeft}
                         </div>}
                     </div>
