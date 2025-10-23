@@ -152,7 +152,10 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
               countdownRef.current = null;
             }
             stopRecording();
-            // Note: saveRecording() is called from onstop event
+            // Mark as completed immediately for UI feedback
+            setCompletedRecordings(prevCompleted => new Set([...prevCompleted, imageIndex]));
+            setCurrentRecordingIndex(null);
+            // Note: saveRecording() is still called from onstop event but won't change state
             return 0;
           }
           return prev - 1;
@@ -250,16 +253,14 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
           description: `Snemanje ni bilo shranjeno: ${error.message}`,
           variant: "destructive"
         });
-        setCurrentRecordingIndex(null);
+        // Don't change state here - already updated in countdown
       } else {
         console.log('Recording saved successfully to:', userSpecificPath);
         toast({
           title: "Odlično!",
           description: "Tvoja izgovorjava je bila shranjena."
         });
-        // Mark as completed and reset current recording index after successful save
-        setCompletedRecordings(prev => new Set([...prev, imageIndex]));
-        setCurrentRecordingIndex(null);
+        // Don't change state here - already updated in countdown
       }
     } catch (error) {
       console.error('Error in saveRecording:', error);
@@ -268,7 +269,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
         description: "Prišlo je do napake pri shranjevanju.",
         variant: "destructive"
       });
-      setCurrentRecordingIndex(null);
+      // Don't change state here - already updated in countdown
     }
     
     recordingDataRef.current = [];
