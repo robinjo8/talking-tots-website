@@ -78,7 +78,7 @@ const VideoNavodila = () => {
             {/* Back button */}
             <Card 
               className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col bg-gradient-to-r from-gray-100/50 to-gray-200/50 cursor-pointer hover:scale-105" 
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/moje-aplikacije')}
             >
               <CardHeader className="rounded-2xl flex-grow flex items-center justify-center">
                 <CardTitle className="flex items-center justify-center">
