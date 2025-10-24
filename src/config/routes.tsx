@@ -17,6 +17,14 @@ import GovorneIgre from "@/pages/GovorneIgre";
 import MojiIzzivi from "@/pages/MojiIzzivi";
 import VideoNavodila from "@/pages/VideoNavodila";
 import VideoNavodilaCrkaR from "@/pages/VideoNavodilaCrkaR";
+import VideoNavodilaCrkaC from "@/pages/VideoNavodilaCrkaC";
+import VideoNavodilaCrkaČ from "@/pages/VideoNavodilaCrkaČ";
+import VideoNavodilaCrkaK from "@/pages/VideoNavodilaCrkaK";
+import VideoNavodilaCrkaL from "@/pages/VideoNavodilaCrkaL";
+import VideoNavodilaCrkaS from "@/pages/VideoNavodilaCrkaS";
+import VideoNavodilaCrkaŠ from "@/pages/VideoNavodilaCrkaŠ";
+import VideoNavodilaCrkaZ from "@/pages/VideoNavodilaCrkaZ";
+import VideoNavodilaCrkaŽ from "@/pages/VideoNavodilaCrkaŽ";
 import LogopedskiKoticek from "@/pages/LogopedskiKoticek";
 import SpominR from "@/pages/SpominR";
 import SpominGames from "@/pages/SpominGames";
@@ -1437,10 +1445,74 @@ export function AppRoutes() {
         }
       />
       <Route 
+        path="/video-navodila/crka-c" 
+        element={
+          <ProtectedRoute>
+            <VideoNavodilaCrkaC />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/video-navodila/crka-č" 
+        element={
+          <ProtectedRoute>
+            <VideoNavodilaCrkaČ />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/video-navodila/crka-k" 
+        element={
+          <ProtectedRoute>
+            <VideoNavodilaCrkaK />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/video-navodila/crka-l" 
+        element={
+          <ProtectedRoute>
+            <VideoNavodilaCrkaL />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
         path="/video-navodila/crka-r" 
         element={
           <ProtectedRoute>
             <VideoNavodilaCrkaR />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/video-navodila/crka-s" 
+        element={
+          <ProtectedRoute>
+            <VideoNavodilaCrkaS />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/video-navodila/crka-š" 
+        element={
+          <ProtectedRoute>
+            <VideoNavodilaCrkaŠ />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/video-navodila/crka-z" 
+        element={
+          <ProtectedRoute>
+            <VideoNavodilaCrkaZ />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/video-navodila/crka-ž" 
+        element={
+          <ProtectedRoute>
+            <VideoNavodilaCrkaŽ />
           </ProtectedRoute>
         }
       />

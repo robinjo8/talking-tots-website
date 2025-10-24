@@ -6,8 +6,8 @@ import { VideoControls } from "@/components/video/VideoControls";
 import { useVideoPlayer } from "@/hooks/useVideoPlayer";
 import { PageHeader } from "@/components/PageHeader";
 
-const VideoNavodilaCrkaR = () => {
-  const videoUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/video-navodila/Glas%20R%20(video).mp4";
+const VideoNavodilaCrkaS = () => {
+  const videoUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/video-navodila/Glas%20S%20(video).mp4";
   
   const {
     videoRef,
@@ -28,7 +28,7 @@ const VideoNavodilaCrkaR = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <PageHeader title="Video navodila - R" backPath="/video-navodila" />
+      <PageHeader title="Video navodila - S" backPath="/video-navodila" />
       
       <div className="container max-w-4xl mx-auto pt-4 pb-20 px-4">
         <Card className="mb-6">
@@ -78,4 +78,4 @@ const VideoNavodilaCrkaR = () => {
   );
 };
 
-export default VideoNavodilaCrkaR;
+export default VideoNavodilaCrkaS;
