@@ -11,7 +11,7 @@ const artikulacijaLetters = [
     color: "text-app-purple",
     gradient: "from-app-purple/10 to-app-blue/10",
     path: "/govorno-jezikovne-vaje/artikulacija/r",
-    available: false
+    available: true
   },
   {
     id: "vaje-l",
@@ -19,7 +19,7 @@ const artikulacijaLetters = [
     color: "text-app-orange",
     gradient: "from-app-orange/10 to-app-yellow/10",
     path: "/govorno-jezikovne-vaje/artikulacija/l",
-    available: false
+    available: true
   },
   {
     id: "vaje-k",
@@ -27,7 +27,7 @@ const artikulacijaLetters = [
     color: "text-dragon-green",
     gradient: "from-dragon-green/10 to-app-teal/10",
     path: "/govorno-jezikovne-vaje/artikulacija/k",
-    available: false
+    available: true
   },
   {
     id: "vaje-c",
@@ -43,7 +43,7 @@ const artikulacijaLetters = [
     color: "text-app-purple",
     gradient: "from-app-purple/10 to-app-blue/10",
     path: "/govorno-jezikovne-vaje/artikulacija/č",
-    available: false
+    available: true
   },
   {
     id: "vaje-s",
@@ -51,7 +51,7 @@ const artikulacijaLetters = [
     color: "text-app-orange",
     gradient: "from-app-orange/10 to-app-yellow/10",
     path: "/govorno-jezikovne-vaje/artikulacija/s",
-    available: false
+    available: true
   },
   {
     id: "vaje-š",
@@ -59,7 +59,7 @@ const artikulacijaLetters = [
     color: "text-dragon-green",
     gradient: "from-dragon-green/10 to-app-teal/10",
     path: "/govorno-jezikovne-vaje/artikulacija/š",
-    available: false
+    available: true
   },
   {
     id: "vaje-z",
@@ -67,7 +67,7 @@ const artikulacijaLetters = [
     color: "text-app-blue",
     gradient: "from-app-blue/10 to-app-purple/10",
     path: "/govorno-jezikovne-vaje/artikulacija/z",
-    available: false
+    available: true
   },
   {
     id: "vaje-ž",
@@ -75,7 +75,7 @@ const artikulacijaLetters = [
     color: "text-app-purple",
     gradient: "from-app-purple/10 to-app-blue/10",
     path: "/govorno-jezikovne-vaje/artikulacija/ž",
-    available: false
+    available: true
   }
 ];
 

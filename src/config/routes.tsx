@@ -14,6 +14,14 @@ import VajeMoториkeGovoril from "@/pages/VajeMoториkeGovoril";
 import ArtIzgovorjavaPage from "@/pages/ArtIzgovorjavaPage";
 import ArtikulacijaVaje from "@/pages/ArtikulacijaVaje";
 import ArtikulacijaVajeC from "@/pages/ArtikulacijaVajeC";
+import ArtikulacijaVajeČ from "@/pages/ArtikulacijaVajeČ";
+import ArtikulacijaVajeK from "@/pages/ArtikulacijaVajeK";
+import ArtikulacijaVajeL from "@/pages/ArtikulacijaVajeL";
+import ArtikulacijaVajeR from "@/pages/ArtikulacijaVajeR";
+import ArtikulacijaVajeS from "@/pages/ArtikulacijaVajeS";
+import ArtikulacijaVajeŠ from "@/pages/ArtikulacijaVajeŠ";
+import ArtikulacijaVajeZ from "@/pages/ArtikulacijaVajeZ";
+import ArtikulacijaVajeŽ from "@/pages/ArtikulacijaVajeŽ";
 import GovorneIgre from "@/pages/GovorneIgre";
 import MojiIzzivi from "@/pages/MojiIzzivi";
 import VideoNavodila from "@/pages/VideoNavodila";
@@ -231,6 +239,70 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <ArtikulacijaVajeC />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorno-jezikovne-vaje/artikulacija/č" 
+        element={
+          <ProtectedRoute>
+            <ArtikulacijaVajeČ />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorno-jezikovne-vaje/artikulacija/k" 
+        element={
+          <ProtectedRoute>
+            <ArtikulacijaVajeK />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorno-jezikovne-vaje/artikulacija/l" 
+        element={
+          <ProtectedRoute>
+            <ArtikulacijaVajeL />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorno-jezikovne-vaje/artikulacija/r" 
+        element={
+          <ProtectedRoute>
+            <ArtikulacijaVajeR />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorno-jezikovne-vaje/artikulacija/s" 
+        element={
+          <ProtectedRoute>
+            <ArtikulacijaVajeS />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorno-jezikovne-vaje/artikulacija/š" 
+        element={
+          <ProtectedRoute>
+            <ArtikulacijaVajeŠ />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorno-jezikovne-vaje/artikulacija/z" 
+        element={
+          <ProtectedRoute>
+            <ArtikulacijaVajeZ />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorno-jezikovne-vaje/artikulacija/ž" 
+        element={
+          <ProtectedRoute>
+            <ArtikulacijaVajeŽ />
           </ProtectedRoute>
         }
       />
