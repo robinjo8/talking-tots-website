@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "@/components/Header";
+import { AppLayout } from "@/components/AppLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, RotateCw } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { ArrowLeft, RotateCw, Volume2 } from "lucide-react";
+import { useAudioPlayback } from "@/hooks/useAudioPlayback";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const wordsDataC = [
   { word: "CEDILO", image: "cedilo.png", audio: "cedilo.m4a" },
@@ -22,143 +23,172 @@ const wordsDataC = [
 export default function ArtikulacijaVajeC() {
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const [loading, setLoading] = useState(false);
+  const { playAudio } = useAudioPlayback();
+  const isMobile = useIsMobile();
 
   const currentWord = wordsDataC[currentIndex];
+  
+  // Construct URLs for Supabase storage
+  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentWord.image}`;
+  const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${currentWord.audio}`;
 
-  // Load image and audio URLs from Supabase
+  // Auto-play audio when word changes
   useEffect(() => {
-    const loadMedia = async () => {
-      setLoading(true);
-      
-      // Get image URL
-      const { data: imageData } = supabase.storage
-        .from('slike-artikulacija-vaje')
-        .getPublicUrl(`C/${currentWord.image}`);
-      
-      setImageUrl(imageData.publicUrl);
-
-      // Get audio URL
-      const { data: audioData } = supabase.storage
-        .from('audio-artikulacija-vaje')
-        .getPublicUrl(`C/${currentWord.audio}`);
-      
-      setAudioUrl(audioData.publicUrl);
-      setLoading(false);
-    };
-
-    loadMedia();
-  }, [currentIndex, currentWord.image, currentWord.audio]);
-
-  // Auto-play audio when it's loaded
-  useEffect(() => {
-    if (audioUrl && audioRef.current && !loading) {
-      // Small delay to ensure everything is loaded
-      const timer = setTimeout(() => {
-        audioRef.current?.play().catch(error => {
-          console.error("Error playing audio:", error);
-        });
-      }, 300);
-
-      return () => clearTimeout(timer);
-    }
-  }, [audioUrl, loading]);
+    const timer = setTimeout(() => {
+      playAudio(audioUrl);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [currentIndex, audioUrl, playAudio]);
 
   const handleNextWord = () => {
     setCurrentIndex((prev) => (prev + 1) % wordsDataC.length);
   };
 
   const handlePlayAudio = () => {
-    if (audioRef.current && audioUrl) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(error => {
-        console.error("Error playing audio:", error);
-      });
-    }
+    playAudio(audioUrl);
   };
 
-  return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
-      <div className="container max-w-4xl mx-auto pt-20 md:pt-24 pb-20 px-4">
-        {/* Header with back button */}
-        <div className="mb-6 flex items-center justify-between">
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={() => navigate('/govorno-jezikovne-vaje/artikulacija')}
-            className="gap-2"
-          >
-            <ArrowLeft className="h-5 w-5" />
-            Nazaj
-          </Button>
-          
-          <h1 className="text-3xl md:text-4xl font-bold text-app-blue">
-            Črka C - Vaje
-          </h1>
-          
-          <div className="w-24" /> {/* Spacer for centering */}
-        </div>
+  const handleBack = () => {
+    navigate('/govorno-jezikovne-vaje/artikulacija');
+  };
 
-        {/* Word display card */}
-        <Card className="mb-6">
-          <CardContent className="p-8">
-            <div className="text-center mb-4">
-              <h2 className="text-4xl md:text-5xl font-bold text-dragon-green mb-2">
-                {currentWord.word}
-              </h2>
-              <p className="text-muted-foreground">
-                Beseda {currentIndex + 1} / {wordsDataC.length}
-              </p>
-            </div>
+  // Mobile gets fullscreen, desktop gets AppLayout
+  const effectiveFullscreen = isMobile;
 
-            {/* Image display */}
-            <div className="relative w-full max-w-lg mx-auto mb-6">
-              <div className="aspect-square bg-muted rounded-lg overflow-hidden flex items-center justify-center">
-                {loading ? (
-                  <div className="text-muted-foreground">Nalaganje...</div>
-                ) : imageUrl ? (
-                  <img
-                    src={imageUrl}
-                    alt={currentWord.word}
-                    className="w-full h-full object-contain"
-                  />
-                ) : (
-                  <div className="text-muted-foreground">Slika ni na voljo</div>
-                )}
-              </div>
-            </div>
-
-            {/* Audio controls */}
-            <div className="flex justify-center gap-4">
+  if (effectiveFullscreen) {
+    return (
+      <div className="fixed inset-0 bg-background overflow-hidden select-none">
+        <div className="h-full flex flex-col">
+          {/* Top Section - Buttons */}
+          <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
+            <h2 className="text-lg font-bold mb-3 text-center">Artikulacija - Črka C</h2>
+            <div className="flex justify-center gap-3">
               <Button
-                size="lg"
-                onClick={handlePlayAudio}
-                disabled={!audioUrl || loading}
+                onClick={handleBack}
+                size="sm"
+                variant="outline"
                 className="gap-2"
               >
-                🔊 Poslušaj besedo
+                <ArrowLeft className="h-4 w-4" />
+                Nazaj
               </Button>
               
               <Button
-                size="lg"
                 onClick={handleNextWord}
-                className="gap-2 bg-dragon-green hover:bg-dragon-green/90"
+                size="sm"
+                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
               >
-                <RotateCw className="h-5 w-5" />
+                <RotateCw className="h-4 w-4" />
                 Nova beseda
               </Button>
+              
+              <Button
+                onClick={handlePlayAudio}
+                size="sm"
+                variant="outline"
+                className="gap-2"
+              >
+                <Volume2 className="h-4 w-4" />
+                Zvok
+              </Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Hidden audio element */}
-        <audio ref={audioRef} src={audioUrl || undefined} />
+          {/* Content Section */}
+          <div className="flex-1 overflow-auto p-4">
+            <Card>
+              <CardContent className="p-6">
+                <div className="text-center mb-4">
+                  <h2 className="text-3xl font-bold text-dragon-green mb-2">
+                    {currentWord.word}
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Beseda {currentIndex + 1} / {wordsDataC.length}
+                  </p>
+                </div>
+
+                <div className="relative w-full max-w-lg mx-auto">
+                  <div className="aspect-square bg-muted rounded-lg overflow-hidden flex items-center justify-center">
+                    {loading ? (
+                      <div className="text-muted-foreground">Nalaganje...</div>
+                    ) : (
+                      <img
+                        src={imageUrl}
+                        alt={currentWord.word}
+                        className="w-full h-full object-contain p-4"
+                      />
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
-    </div>
+    );
+  }
+
+  return (
+    <AppLayout>
+      <div className="w-full min-h-screen bg-background">
+        <div className="flex justify-center gap-4 p-4">
+          <Button 
+            onClick={handleBack}
+            variant="outline" 
+            className="gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Nazaj
+          </Button>
+          
+          <Button 
+            onClick={handleNextWord}
+            className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
+          >
+            <RotateCw className="h-4 w-4" />
+            Nova beseda
+          </Button>
+          
+          <Button 
+            onClick={handlePlayAudio}
+            variant="outline" 
+            className="gap-2"
+          >
+            <Volume2 className="h-4 w-4" />
+            Poslušaj besedo
+          </Button>
+        </div>
+        
+        <div className="w-full flex justify-center items-center p-4">
+          <Card className="w-full max-w-2xl">
+            <CardContent className="p-8">
+              <div className="text-center mb-6">
+                <h2 className="text-4xl md:text-5xl font-bold text-dragon-green mb-2">
+                  {currentWord.word}
+                </h2>
+                <p className="text-muted-foreground">
+                  Beseda {currentIndex + 1} / {wordsDataC.length}
+                </p>
+              </div>
+
+              <div className="relative w-full max-w-lg mx-auto">
+                <div className="aspect-square bg-muted rounded-lg overflow-hidden flex items-center justify-center">
+                  {loading ? (
+                    <div className="text-muted-foreground">Nalaganje...</div>
+                  ) : (
+                    <img
+                      src={imageUrl}
+                      alt={currentWord.word}
+                      className="w-full h-full object-contain p-4"
+                    />
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </AppLayout>
   );
 }
