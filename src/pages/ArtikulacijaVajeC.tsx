@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, RotateCw, Volume2 } from "lucide-react";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 
 const wordsDataC = [
   { word: "CEDILO", image: "cedilo.png", audio: "cedilo.m4a" },
@@ -24,6 +25,7 @@ export default function ArtikulacijaVajeC() {
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
   const { playAudio } = useAudioPlayback();
   const isMobile = useIsMobile();
 
@@ -84,6 +86,7 @@ export default function ArtikulacijaVajeC() {
                 </Button>
                 
                 <Button
+                  onClick={() => setShowInstructions(true)}
                   size="sm"
                   variant="outline"
                   className="gap-2"
@@ -113,8 +116,7 @@ export default function ArtikulacijaVajeC() {
               <div className="flex justify-center gap-3">
                 <Button
                   onClick={handlePlayAudio}
-                  variant="outline"
-                  className="gap-2"
+                  className="bg-black hover:bg-black/90 text-white gap-2"
                 >
                   <Volume2 className="h-4 w-4" />
                   Poslušaj besedo
@@ -131,6 +133,12 @@ export default function ArtikulacijaVajeC() {
             </CardContent>
           </Card>
         </div>
+
+        <InstructionsModal
+          isOpen={showInstructions}
+          onClose={() => setShowInstructions(false)}
+          type="articulation"
+        />
       </div>
     );
   }
@@ -159,6 +167,7 @@ export default function ArtikulacijaVajeC() {
               </Button>
               
               <Button 
+                onClick={() => setShowInstructions(true)}
                 variant="outline" 
                 className="gap-2"
               >
@@ -185,8 +194,7 @@ export default function ArtikulacijaVajeC() {
             <div className="flex justify-center gap-4">
               <Button 
                 onClick={handlePlayAudio}
-                variant="outline" 
-                className="gap-2"
+                className="bg-black hover:bg-black/90 text-white gap-2"
               >
                 <Volume2 className="h-4 w-4" />
                 Poslušaj besedo
@@ -203,6 +211,12 @@ export default function ArtikulacijaVajeC() {
           </CardContent>
         </Card>
       </div>
+
+      <InstructionsModal
+        isOpen={showInstructions}
+        onClose={() => setShowInstructions(false)}
+        type="articulation"
+      />
     </AppLayout>
   );
 }

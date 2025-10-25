@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 interface InstructionsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  type?: "jigsaw" | "sliding";
+  type?: "jigsaw" | "sliding" | "articulation";
 }
 
 export const InstructionsModal: React.FC<InstructionsModalProps> = ({
@@ -12,7 +12,16 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
   onClose,
   type = "jigsaw"
 }) => {
-  const content = type === "sliding" 
+  const content = type === "articulation"
+    ? [
+        "Na tej strani lahko vadiš besede.",
+        "Ob prikazu slike se predvaja zvok besede.",
+        "Po koncu predvajanja ponovi besedo.",
+        "Ko ponoviš besedo, klikni zeleni gumb 'Nova beseda'.",
+        "Besede lahko ponavljaš po želji.",
+        "Namen vaje je osvojiti črko, ki jo vadiš."
+      ]
+    : type === "sliding" 
     ? [
         "Sestavljanka je razdeljena na kvadrate, pri čemer je en kvadrat prazen.",
         "Premikaj posamezne dele slike tako, da klikneš na polje, ki ga želiš premakniti.",
@@ -27,7 +36,11 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
         "Nato besedo jasno in glasno ponovi."
       ];
   
-  const title = type === "sliding" ? "Drsna sestavljanka" : "Navodila za igro Sestavljanka";
+  const title = type === "articulation" 
+    ? "Navodila za vajo" 
+    : type === "sliding" 
+    ? "Drsna sestavljanka" 
+    : "Navodila za igro Sestavljanka";
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
