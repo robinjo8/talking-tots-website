@@ -2,6 +2,7 @@ import Header from "@/components/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const artikulacijaLetters = [
   {
@@ -34,7 +35,7 @@ const artikulacijaLetters = [
     color: "text-app-blue",
     gradient: "from-app-blue/10 to-app-purple/10",
     path: "/govorno-jezikovne-vaje/artikulacija/c",
-    available: false
+    available: true
   },
   {
     id: "vaje-č",
@@ -79,11 +80,20 @@ const artikulacijaLetters = [
 ];
 
 export default function ArtikulacijaVaje() {
+  const navigate = useNavigate();
   const { selectedChild } = useAuth();
   const childName = selectedChild?.name;
 
+  const handleLetterClick = (letter: typeof artikulacijaLetters[0]) => {
+    if (!letter.available) return;
+    navigate(letter.path);
+  };
+
   const LetterCard = ({ letter }: { letter: typeof artikulacijaLetters[0] }) => (
-    <Card className={`transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col bg-gradient-to-r ${letter.gradient} ${letter.available ? 'cursor-pointer hover:scale-105' : 'opacity-60 cursor-not-allowed'}`}>
+    <Card 
+      className={`transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col bg-gradient-to-r ${letter.gradient} ${letter.available ? 'cursor-pointer hover:scale-105' : 'opacity-60 cursor-not-allowed'}`}
+      onClick={() => handleLetterClick(letter)}
+    >
       <CardHeader className="rounded-t-2xl pb-2 flex-grow flex items-center justify-center">
         <CardTitle className="flex items-center justify-center">
           <span className={`text-6xl font-bold ${letter.color}`}>
@@ -131,6 +141,22 @@ export default function ArtikulacijaVaje() {
 
         {/* Letter Cards Grid */}
         <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          {/* Back button */}
+          <Card 
+            className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col bg-gradient-to-r from-gray-100/50 to-gray-200/50 cursor-pointer hover:scale-105" 
+            onClick={() => navigate('/govorno-jezikovne-vaje')}
+          >
+            <CardHeader className="rounded-2xl flex-grow flex items-center justify-center">
+              <CardTitle className="flex items-center justify-center">
+                <img 
+                  src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/puscica_1.png" 
+                  alt="Nazaj" 
+                  className="h-16 w-16 object-contain"
+                />
+              </CardTitle>
+            </CardHeader>
+          </Card>
+          
           {artikulacijaLetters.map(letter => (
             <LetterCard key={letter.id} letter={letter} />
           ))}

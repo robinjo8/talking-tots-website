@@ -13,6 +13,7 @@ import GovornojezicovneVaje from "@/pages/GovornojezicovneVaje";
 import VajeMoториkeGovoril from "@/pages/VajeMoториkeGovoril";
 import ArtIzgovorjavaPage from "@/pages/ArtIzgovorjavaPage";
 import ArtikulacijaVaje from "@/pages/ArtikulacijaVaje";
+import ArtikulacijaVajeC from "@/pages/ArtikulacijaVajeC";
 import GovorneIgre from "@/pages/GovorneIgre";
 import MojiIzzivi from "@/pages/MojiIzzivi";
 import VideoNavodila from "@/pages/VideoNavodila";
@@ -222,6 +223,14 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <ArtikulacijaVaje />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorno-jezikovne-vaje/artikulacija/c" 
+        element={
+          <ProtectedRoute>
+            <ArtikulacijaVajeC />
           </ProtectedRoute>
         }
       />
