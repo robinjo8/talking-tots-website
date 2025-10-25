@@ -42,7 +42,9 @@ export default function ArtikulacijaVajeC() {
   }, [currentIndex, audioUrl, playAudio]);
 
   const handleNextWord = () => {
-    setCurrentIndex((prev) => (prev + 1) % wordsDataC.length);
+    // Select random word
+    const randomIndex = Math.floor(Math.random() * wordsDataC.length);
+    setCurrentIndex(randomIndex);
   };
 
   const handlePlayAudio = () => {
@@ -59,56 +61,40 @@ export default function ArtikulacijaVajeC() {
   if (effectiveFullscreen) {
     return (
       <div className="fixed inset-0 bg-background overflow-hidden select-none">
-        <div className="h-full flex flex-col">
-          {/* Top Section - Buttons */}
-          <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
-            <h2 className="text-lg font-bold mb-3 text-center">Artikulacija - Črka C</h2>
-            <div className="flex justify-center gap-3">
-              <Button
-                onClick={handleBack}
-                size="sm"
-                variant="outline"
-                className="gap-2"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Nazaj
-              </Button>
-              
-              <Button
-                onClick={handleNextWord}
-                size="sm"
-                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
-              >
-                <RotateCw className="h-4 w-4" />
-                Nova beseda
-              </Button>
-              
-              <Button
-                onClick={handlePlayAudio}
-                size="sm"
-                variant="outline"
-                className="gap-2"
-              >
-                <Volume2 className="h-4 w-4" />
-                Zvok
-              </Button>
-            </div>
-          </div>
+        <div className="h-full flex flex-col p-4">
+          <Card className="flex-1 flex flex-col">
+            <CardContent className="p-6 flex-1 flex flex-col">
+              {/* Title */}
+              <div className="text-center mb-4">
+                <h2 className="text-3xl font-bold text-dragon-green">
+                  {currentWord.word}
+                </h2>
+              </div>
 
-          {/* Content Section */}
-          <div className="flex-1 overflow-auto p-4">
-            <Card>
-              <CardContent className="p-6">
-                <div className="text-center mb-4">
-                  <h2 className="text-3xl font-bold text-dragon-green mb-2">
-                    {currentWord.word}
-                  </h2>
-                  <p className="text-muted-foreground">
-                    Beseda {currentIndex + 1} / {wordsDataC.length}
-                  </p>
-                </div>
+              {/* Top buttons */}
+              <div className="flex justify-center gap-3 mb-4">
+                <Button
+                  onClick={handleBack}
+                  size="sm"
+                  variant="outline"
+                  className="gap-2"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Nazaj
+                </Button>
+                
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-2"
+                >
+                  Navodila
+                </Button>
+              </div>
 
-                <div className="relative w-full max-w-lg mx-auto">
+              {/* Image */}
+              <div className="flex-1 flex items-center justify-center mb-4">
+                <div className="relative w-full max-w-md">
                   <div className="aspect-square bg-muted rounded-lg overflow-hidden flex items-center justify-center">
                     {loading ? (
                       <div className="text-muted-foreground">Nalaganje...</div>
@@ -121,9 +107,29 @@ export default function ArtikulacijaVajeC() {
                     )}
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+
+              {/* Bottom buttons */}
+              <div className="flex justify-center gap-3">
+                <Button
+                  onClick={handlePlayAudio}
+                  variant="outline"
+                  className="gap-2"
+                >
+                  <Volume2 className="h-4 w-4" />
+                  Poslušaj besedo
+                </Button>
+                
+                <Button
+                  onClick={handleNextWord}
+                  className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
+                >
+                  <RotateCw className="h-4 w-4" />
+                  Nova beseda
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
@@ -131,63 +137,71 @@ export default function ArtikulacijaVajeC() {
 
   return (
     <AppLayout>
-      <div className="w-full min-h-screen bg-background">
-        <div className="flex justify-center gap-4 p-4">
-          <Button 
-            onClick={handleBack}
-            variant="outline" 
-            className="gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Nazaj
-          </Button>
-          
-          <Button 
-            onClick={handleNextWord}
-            className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
-          >
-            <RotateCw className="h-4 w-4" />
-            Nova beseda
-          </Button>
-          
-          <Button 
-            onClick={handlePlayAudio}
-            variant="outline" 
-            className="gap-2"
-          >
-            <Volume2 className="h-4 w-4" />
-            Poslušaj besedo
-          </Button>
-        </div>
-        
-        <div className="w-full flex justify-center items-center p-4">
-          <Card className="w-full max-w-2xl">
-            <CardContent className="p-8">
-              <div className="text-center mb-6">
-                <h2 className="text-4xl md:text-5xl font-bold text-dragon-green mb-2">
-                  {currentWord.word}
-                </h2>
-                <p className="text-muted-foreground">
-                  Beseda {currentIndex + 1} / {wordsDataC.length}
-                </p>
-              </div>
+      <div className="w-full min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-2xl">
+          <CardContent className="p-8">
+            {/* Title */}
+            <div className="text-center mb-6">
+              <h2 className="text-4xl md:text-5xl font-bold text-dragon-green">
+                {currentWord.word}
+              </h2>
+            </div>
 
-              <div className="relative w-full max-w-lg mx-auto">
-                <div className="aspect-square bg-muted rounded-lg overflow-hidden flex items-center justify-center">
-                  {loading ? (
-                    <div className="text-muted-foreground">Nalaganje...</div>
-                  ) : (
-                    <img
-                      src={imageUrl}
-                      alt={currentWord.word}
-                      className="w-full h-full object-contain p-4"
-                    />
-                  )}
-                </div>
+            {/* Top buttons */}
+            <div className="flex justify-center gap-4 mb-6">
+              <Button 
+                onClick={handleBack}
+                variant="outline" 
+                className="gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Nazaj
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                className="gap-2"
+              >
+                Navodila
+              </Button>
+            </div>
+
+            {/* Image */}
+            <div className="relative w-full max-w-lg mx-auto mb-6">
+              <div className="aspect-square bg-muted rounded-lg overflow-hidden flex items-center justify-center">
+                {loading ? (
+                  <div className="text-muted-foreground">Nalaganje...</div>
+                ) : (
+                  <img
+                    src={imageUrl}
+                    alt={currentWord.word}
+                    className="w-full h-full object-contain p-4"
+                  />
+                )}
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+
+            {/* Bottom buttons */}
+            <div className="flex justify-center gap-4">
+              <Button 
+                onClick={handlePlayAudio}
+                variant="outline" 
+                className="gap-2"
+              >
+                <Volume2 className="h-4 w-4" />
+                Poslušaj besedo
+              </Button>
+              
+              <Button 
+                onClick={handleNextWord}
+                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
+              >
+                <RotateCw className="h-4 w-4" />
+                Nova beseda
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </AppLayout>
   );
