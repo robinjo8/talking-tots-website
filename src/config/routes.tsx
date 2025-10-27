@@ -35,6 +35,7 @@ import VideoNavodilaCrkaŠ from "@/pages/VideoNavodilaCrkaŠ";
 import VideoNavodilaCrkaZ from "@/pages/VideoNavodilaCrkaZ";
 import VideoNavodilaCrkaŽ from "@/pages/VideoNavodilaCrkaŽ";
 import LogopedskiKoticek from "@/pages/LogopedskiKoticek";
+import RazvojGovora from "@/pages/RazvojGovora";
 import SpominR from "@/pages/SpominR";
 import SpominGames from "@/pages/SpominGames";
 import SpominK from "@/pages/SpominK";
@@ -1601,6 +1602,12 @@ export function AppRoutes() {
         path="/logopedski-koticek" 
         element={
           <LogopedskiKoticek />
+        }
+      />
+      <Route 
+        path="/clanki/razvoj-govora" 
+        element={
+          <RazvojGovora />
         }
       />
 

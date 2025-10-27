@@ -36,9 +36,11 @@ const LogopedskiKoticek = () => {
   const contentSections = [
     {
       id: 'development',
-      title: 'Govorni razvoj po starostnih obdobjih',
-      description: 'Pregled tipičnega govornega razvoja otrok od 1. do 6. leta starosti. Mejniki v razvoju govora in jezika ter kdaj je priporočljivo poiskati pomoč logopeda.',
+      title: 'Razvoj govora',
+      description: 'Odkrijte, kako se govor razvija pri otrocih od rojstva do šolskega obdobja. Razumejte ključne mejnike in prepoznajte, kdaj je potrebna strokovna pomoč.',
       icon: sectionIcons.development,
+      articleUrl: '/clanki/razvoj-govora',
+      available: true,
     },
     {
       id: 'disorders',
@@ -78,9 +80,12 @@ const LogopedskiKoticek = () => {
     }
   ];
 
-  const handleSectionSelect = (sectionId: string) => {
-    // For now, show a "coming soon" message for all sections
-    alert('Ta vsebina bo na voljo kmalu!');
+  const handleSectionSelect = (section: any) => {
+    if (section.available && section.articleUrl) {
+      navigate(section.articleUrl);
+    } else {
+      alert('Ta vsebina bo na voljo kmalu!');
+    }
   };
 
   // Pick the backPath depending on if previous page is available.
@@ -96,10 +101,10 @@ const LogopedskiKoticek = () => {
             <Card 
               key={section.id} 
               className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 cursor-pointer h-full flex flex-col"
-              onClick={() => handleSectionSelect(section.id)}
+              onClick={() => handleSectionSelect(section)}
             >
               <CardHeader className={`
-                rounded-t-2xl pb-4
+                rounded-t-2xl pb-6
                 ${section.id === 'development' && 'bg-gradient-to-r from-app-blue/10 to-app-teal/10'}
                 ${section.id === 'disorders' && 'bg-gradient-to-r from-app-orange/10 to-app-yellow/10'}
                 ${section.id === 'parent_tips' && 'bg-gradient-to-r from-app-purple/10 to-app-blue/10'}
@@ -108,15 +113,12 @@ const LogopedskiKoticek = () => {
                 ${section.id === 'articles' && 'bg-gradient-to-r from-app-yellow/10 to-dragon-green/10'}
                 ${section.id === 'resources' && 'bg-gradient-to-r from-app-blue/10 to-app-purple/10'}
               `}>
-                <CardTitle className="text-xl flex items-center justify-center gap-2 text-center">
-                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200">
-                    {section.icon}
-                  </div>
+                <CardTitle className="text-2xl font-bold text-center text-foreground">
+                  {section.title}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-6 pb-4 flex-grow text-center">
-                <h3 className="text-lg font-semibold mb-2">{section.title}</h3>
-                <p className="text-sm text-gray-600">
+              <CardContent className="pt-4 pb-6 flex-grow">
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   {section.description}
                 </p>
               </CardContent>
