@@ -11,10 +11,10 @@ const RazvojGovora = () => {
         backPath="/logopedski-koticek"
       />
       <div className="container max-w-4xl mx-auto px-4 py-8 pb-20">
-        <article className="bg-card rounded-2xl shadow-sm border-2 border-gray-200 p-6 md:p-10">
+        <article className="bg-card rounded-2xl shadow-sm border-2 border-gray-200 p-8 md:p-12">
           {/* Uvod */}
-          <div className="mb-8">
-            <p className="text-base md:text-lg leading-relaxed text-muted-foreground">
+          <div className="mb-10 pt-4">
+            <p className="text-lg md:text-xl leading-relaxed text-foreground/80 font-light">
               Pred pojavom govorno-jezikovne komunikacije je potrebna ustrezno razvita fiziološka podlaga za govor. 
               Ta vključuje razvoj splošne motorike telesa in govornih organov, razvoj slušnega in vidnega zaznavanja, 
               razvoj koncentracije in pozornosti, razvoj kognitivnih sposobnosti, razvoj ustreznega odzivanja telesa 
@@ -22,8 +22,8 @@ const RazvojGovora = () => {
             </p>
           </div>
 
-          <div className="mb-8">
-            <p className="text-base md:text-lg leading-relaxed text-muted-foreground">
+          <div className="mb-10">
+            <p className="text-lg md:text-xl leading-relaxed text-foreground/80 font-light">
               Ključne značilnosti običajnega govorno-jezikovnega razvoja se med posameznimi otroki razlikujejo, 
               lahko pa nam služijo kot pomoč pri spremljanju in učenju pridobivanja glasov, besed, slovničnih prvin 
               ter pojmov, ki jih otrok še ni usvojil.
@@ -31,17 +31,17 @@ const RazvojGovora = () => {
           </div>
 
           {/* 1 leto */}
-          <section className="mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">1 leto</h2>
-            <p className="text-base md:text-lg leading-relaxed text-muted-foreground">
+          <section className="mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">1 leto</h2>
+            <p className="text-lg md:text-xl leading-relaxed text-foreground/70">
               Pojavi se prva beseda.
             </p>
           </section>
 
           {/* 1,5 - 2 leti */}
-          <section className="mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">1,5 – 2 leti</h2>
-            <ul className="space-y-3 text-base md:text-lg leading-relaxed text-muted-foreground">
+          <section className="mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">1,5 – 2 leti</h2>
+            <ul className="space-y-4 text-lg md:text-xl leading-relaxed text-foreground/70 list-disc list-inside">
               <li>Otrok se začne izražati v stavkih, sestavljenih iz samostalnika in glagola, na primer <em>Ema pia (pila)</em> ali <em>Tim gaja (nagaja)</em>.</li>
               <li>Do drugega leta ima besedni zaklad približno 200 ali več besed.</li>
               <li>Otrok se odziva na enostavna navodila in razume preprosta vprašanja.</li>
@@ -50,9 +50,9 @@ const RazvojGovora = () => {
           </section>
 
           {/* 3 leta */}
-          <section className="mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">3 leta</h2>
-            <ul className="space-y-3 text-base md:text-lg leading-relaxed text-muted-foreground">
+          <section className="mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">3 leta</h2>
+            <ul className="space-y-4 text-lg md:text-xl leading-relaxed text-foreground/70 list-disc list-inside">
               <li>Govor se izpopolni in postane bolj razumljiv okolici.</li>
               <li>Otrok razume in se odziva na enostavna navodila, sestavljena iz več besed, ter razume tudi dvojna navodila (z dvema zahtevama).</li>
               <li>Razume in odgovarja na enostavna vprašanja, začne razumeti predloge, nasprotja, časovne pojme, pridevnike in zaimke.</li>
@@ -63,9 +63,9 @@ const RazvojGovora = () => {
           </section>
 
           {/* 4 - 5 let */}
-          <section className="mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">4 – 5 let</h2>
-            <ul className="space-y-3 text-base md:text-lg leading-relaxed text-muted-foreground">
+          <section className="mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">4 – 5 let</h2>
+            <ul className="space-y-4 text-lg md:text-xl leading-relaxed text-foreground/70 list-disc list-inside">
               <li>Govor se še naprej izpopolnjuje, nabor besed postaja zelo velik.</li>
               <li>Izgovorjava je vse bolj pravilna, stavki so daljši (štiri do pet besed).</li>
               <li>Otrok uporablja različne besedne vrste – predloge, pridevnike, veznike, prislove in členke.</li>
@@ -77,18 +77,18 @@ const RazvojGovora = () => {
           </section>
 
           {/* Od petega leta naprej */}
-          <section className="mb-10">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">Od petega leta naprej</h2>
-            <ul className="space-y-3 text-base md:text-lg leading-relaxed text-muted-foreground">
+          <section className="mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">Od petega leta naprej</h2>
+            <ul className="space-y-4 text-lg md:text-xl leading-relaxed text-foreground/70 list-disc list-inside">
               <li>Otrokov govor postaja vedno bolj podoben govoru odrasle osebe.</li>
               <li>Besedni zaklad se hitro bogati, izgovorjava je večinoma popolna, otrok pa z govorom izraža tudi čustva, razmišljanja in izkušnje.</li>
             </ul>
           </section>
 
           {/* Viri in literatura */}
-          <section className="border-t-2 border-gray-200 pt-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">Viri in literatura</h2>
-            <ul className="space-y-2 text-sm md:text-base leading-relaxed text-muted-foreground">
+          <section className="border-t-2 border-gray-200 pt-10 mt-12">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6">Viri in literatura</h2>
+            <ul className="space-y-3 text-base md:text-lg leading-relaxed text-foreground/60">
               <li>• Vladisavljević, S. (1973). <em>Patološki nerazvijen govor u dece</em>. Beograd: Savez defektologa Jugoslavije.</li>
               <li>• Grilc, N. (2013). <em>Govorno-jezikovne motnje</em>. Ljubljana: ZRSŠ.</li>
               <li>• Levc, S. (2014). <em>Liba laca lak. Kako pomagamo otroku do boljšega govora</em>. Ljubljana: Samozaložba.</li>
