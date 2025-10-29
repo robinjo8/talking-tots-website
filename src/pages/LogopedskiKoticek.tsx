@@ -1,10 +1,6 @@
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { 
-  ArrowLeft, 
   Baby, 
   AlertTriangle, 
   Heart, 
@@ -95,34 +91,54 @@ const LogopedskiKoticek = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="container max-w-5xl mx-auto pt-28 md:pt-32 pb-20 px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+      <div className="container max-w-6xl mx-auto pt-28 md:pt-32 pb-20 px-4">
+        {/* Page Title */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
+            Logopedski kotiček
+          </h1>
+          <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full"></div>
+        </div>
+
+        {/* Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {contentSections.map((section) => (
-            <Card 
-              key={section.id} 
-              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 cursor-pointer h-full flex flex-col"
+            <div
+              key={section.id}
+              className="bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group"
               onClick={() => handleSectionSelect(section)}
             >
-              <CardHeader className={`
-                rounded-t-2xl pb-6
-                ${section.id === 'development' && 'bg-gradient-to-r from-app-blue/10 to-app-teal/10'}
-                ${section.id === 'disorders' && 'bg-gradient-to-r from-app-orange/10 to-app-yellow/10'}
-                ${section.id === 'parent_tips' && 'bg-gradient-to-r from-app-purple/10 to-app-blue/10'}
-                ${section.id === 'home_activities' && 'bg-gradient-to-r from-app-teal/10 to-dragon-green/10'}
-                ${section.id === 'faq' && 'bg-gradient-to-r from-dragon-green/10 to-app-teal/10'}
-                ${section.id === 'articles' && 'bg-gradient-to-r from-app-yellow/10 to-dragon-green/10'}
-                ${section.id === 'resources' && 'bg-gradient-to-r from-app-blue/10 to-app-purple/10'}
-              `}>
-                <CardTitle className="text-2xl font-bold text-center text-foreground">
+              {/* Card Image */}
+              <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-app-blue/20 to-app-teal/20">
+                {section.id === 'development' ? (
+                  <img
+                    src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/logopedski-koticek/logoped_slika_1.png"
+                    alt={section.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="text-6xl opacity-20">
+                      {section.icon}
+                    </div>
+                  </div>
+                )}
+                {/* Badge overlay */}
+                <div className="absolute bottom-3 right-3 w-10 h-10 bg-app-orange rounded-full flex items-center justify-center shadow-lg">
+                  <span className="text-white text-xs font-bold">📚</span>
+                </div>
+              </div>
+
+              {/* Card Content */}
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
                   {section.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-4 pb-6 flex-grow">
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
                   {section.description}
                 </p>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       </div>
