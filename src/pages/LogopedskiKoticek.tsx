@@ -123,10 +123,6 @@ const LogopedskiKoticek = () => {
                     </div>
                   </div>
                 )}
-                {/* Badge overlay */}
-                <div className="absolute bottom-3 right-3 w-10 h-10 bg-app-orange rounded-full flex items-center justify-center shadow-lg">
-                  <span className="text-white text-xs font-bold">📚</span>
-                </div>
               </div>
 
               {/* Card Content */}

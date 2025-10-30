@@ -81,10 +81,6 @@ export function ActivityOptions() {
                 className="w-4/5 h-4/5 object-contain group-hover:scale-110 transition-transform duration-300"
               />
             </div>
-            {/* Badge overlay */}
-            <div className="absolute bottom-3 right-3 w-10 h-10 bg-app-orange rounded-full flex items-center justify-center shadow-lg">
-              <span className="text-white text-xs font-bold">{activity.badge}</span>
-            </div>
           </div>
 
           {/* Card Content */}
