@@ -95,7 +95,7 @@ const LogopedskiKoticek = () => {
         {/* Page Title */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
-            Logopedski kotiček
+            Logopedski nasveti
           </h1>
           <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full"></div>
         </div>
