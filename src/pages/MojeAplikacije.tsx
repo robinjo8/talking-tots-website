@@ -35,10 +35,11 @@ const MojeAplikacije = () => {
         {selectedChild ? (
           <>
             {/* Page Title */}
-            <div className="mb-12">
-              <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+            <div className="text-center mb-12">
+              <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
                 Moje aplikacije
               </h1>
+              <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full"></div>
             </div>
             
             {/* Activity Options Wrapper */}
