@@ -78,7 +78,7 @@ export function ActivityOptions() {
               <img 
                 src={activity.image}
                 alt={activity.title}
-                className="w-4/5 h-4/5 object-contain group-hover:scale-110 transition-transform duration-300"
+                className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
               />
             </div>
           </div>
