@@ -73,7 +73,7 @@ export function ActivityOptions() {
           onClick={() => handleActivityClick(activity.url)}
         >
           {/* Card Image */}
-          <div className={`relative aspect-video overflow-hidden bg-gradient-to-br ${activity.gradient}`}>
+          <div className={`relative aspect-square overflow-hidden bg-gradient-to-br ${activity.gradient}`}>
             <div className="w-full h-full flex items-center justify-center">
               <img 
                 src={activity.image}
