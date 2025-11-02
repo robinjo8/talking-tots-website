@@ -30,7 +30,7 @@ const MojeAplikacije = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container max-w-5xl mx-auto pt-28 md:pt-32 pb-20 px-4">
+      <div className="container max-w-6xl mx-auto pt-28 md:pt-32 pb-20 px-4">
         
         {selectedChild ? (
           <>
