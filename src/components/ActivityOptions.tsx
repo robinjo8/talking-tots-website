@@ -75,15 +75,11 @@ export function ActivityOptions() {
           {/* Card Image */}
           <div className={`relative aspect-video overflow-hidden bg-gradient-to-br ${activity.gradient}`}>
             <div className="w-full h-full flex items-center justify-center">
-              <img 
-                src={activity.image}
-                alt={activity.title}
-                className={`object-contain group-hover:scale-110 transition-transform duration-300 ${
-                  activity.id === 'video' || activity.id === 'exercises' 
-                    ? 'w-[95%] h-[95%]' 
-                    : 'w-full h-full'
-                }`}
-              />
+            <img 
+              src={activity.image}
+              alt={activity.title}
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+            />
             </div>
           </div>
 
