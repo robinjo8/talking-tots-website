@@ -1,10 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import zmajcekVaje from "@/assets/zmajcek_vaje_16x9.png";
-import zmajcekIgre from "@/assets/zmajcek_igre_16x9.png";
-import zmajcekArtikulacija from "@/assets/zmajcek_artikulacija_16x9.png";
-import zmajcekIzzivi from "@/assets/zmajcek_izzivi_16x9.png";
-import zmajcekVideo from "@/assets/zmajcek_video_16x9.png";
-import zmajcekLogoped from "@/assets/zmajcek_logoped_16x9.png";
 
 export function ActivityOptions() {
   const navigate = useNavigate();
@@ -14,7 +8,8 @@ export function ActivityOptions() {
       id: 'exercises',
       title: 'Govorne vaje',
       description: 'Prilagojene aktivnosti za izboljšanje izgovorjave.',
-      image: zmajcekVaje,
+      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_vaje_1.png',
+      gradient: 'from-app-blue/20 to-app-teal/20',
       badge: '📝',
       url: '/govorno-jezikovne-vaje'
     },
@@ -22,7 +17,8 @@ export function ActivityOptions() {
       id: 'games',
       title: 'Govorne igre',
       description: 'Zabavne igre za izboljšanje izgovorjave.',
-      image: zmajcekIgre,
+      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_igre_1.png',
+      gradient: 'from-dragon-green/20 to-dragon-green/20',
       badge: '🎮',
       url: '/govorne-igre'
     },
@@ -30,7 +26,8 @@ export function ActivityOptions() {
       id: 'test',
       title: 'Test izgovorjave',
       description: 'Test izgovorjave za vse slovenske soglasnike.',
-      image: zmajcekArtikulacija,
+      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_artikulacija_1.png',
+      gradient: 'from-app-purple/20 to-app-teal/20',
       badge: '🎯',
       url: '/artikulacijski-test'
     },
@@ -38,7 +35,8 @@ export function ActivityOptions() {
       id: 'challenges',
       title: 'Moji izzivi',
       description: 'Priporočila pametnega asistenta.',
-      image: zmajcekIzzivi,
+      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_izzivi_1.png',
+      gradient: 'from-app-orange/20 to-app-yellow/20',
       badge: '⭐',
       url: '/moji-izzivi'
     },
@@ -46,7 +44,8 @@ export function ActivityOptions() {
       id: 'video',
       title: 'Video navodila',
       description: 'Poglej kako logoped pravilno izgovori posamezne črke.',
-      image: zmajcekVideo,
+      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_video_1.png',
+      gradient: 'from-app-teal/20 to-dragon-green/20',
       badge: '🎥',
       url: '/video-navodila'
     },
@@ -54,7 +53,8 @@ export function ActivityOptions() {
       id: 'advice',
       title: 'Logopedski nasveti',
       description: 'Koristni nasveti in informacije o govornem razvoju.',
-      image: zmajcekLogoped,
+      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_logoped_1.png',
+      gradient: 'from-app-purple/20 to-app-blue/20',
       badge: '💡',
       url: '/logopedski-koticek'
     }
@@ -73,12 +73,18 @@ export function ActivityOptions() {
           onClick={() => handleActivityClick(activity.url)}
         >
           {/* Card Image */}
-          <div className="relative aspect-video overflow-hidden">
-            <img 
-              src={activity.image}
-              alt={activity.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
+          <div className={`relative aspect-video overflow-hidden bg-gradient-to-br ${activity.gradient}`}>
+            <div className="w-full h-full flex items-center justify-center">
+              <img 
+                src={activity.image}
+                alt={activity.title}
+                className={`object-contain group-hover:scale-110 transition-transform duration-300 ${
+                  activity.id === 'video' || activity.id === 'exercises' 
+                    ? 'w-[95%] h-[95%]' 
+                    : 'w-full h-full'
+                }`}
+              />
+            </div>
           </div>
 
           {/* Card Content */}
