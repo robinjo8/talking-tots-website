@@ -5,22 +5,22 @@ export function ActivityOptions() {
 
   const activities = [
     {
-      id: 'exercises',
-      title: 'Govorne vaje',
-      description: 'Prilagojene aktivnosti za izboljšanje izgovorjave.',
-      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_vaje_1.png',
-      gradient: 'from-app-blue/20 to-app-teal/20',
-      badge: '📝',
-      url: '/govorno-jezikovne-vaje'
-    },
-    {
       id: 'games',
       title: 'Govorne igre',
       description: 'Zabavne igre za izboljšanje izgovorjave.',
-      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_igre_1.png',
+      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_igre_4.png',
       gradient: 'from-dragon-green/20 to-dragon-green/20',
       badge: '🎮',
       url: '/govorne-igre'
+    },
+    {
+      id: 'exercises',
+      title: 'Govorne vaje',
+      description: 'Prilagojene aktivnosti za izboljšanje izgovorjave.',
+      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_vaje_4.png',
+      gradient: 'from-app-blue/20 to-app-teal/20',
+      badge: '📝',
+      url: '/govorno-jezikovne-vaje'
     },
     {
       id: 'test',
@@ -35,7 +35,7 @@ export function ActivityOptions() {
       id: 'challenges',
       title: 'Moji izzivi',
       description: 'Priporočila pametnega asistenta.',
-      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_izzivi_1.png',
+      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_izzivi_4.png',
       gradient: 'from-app-orange/20 to-app-yellow/20',
       badge: '⭐',
       url: '/moji-izzivi'
@@ -44,7 +44,7 @@ export function ActivityOptions() {
       id: 'video',
       title: 'Video navodila',
       description: 'Poglej kako logoped pravilno izgovori posamezne črke.',
-      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_video_1.png',
+      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_video_4.png',
       gradient: 'from-app-teal/20 to-dragon-green/20',
       badge: '🎥',
       url: '/video-navodila'
@@ -53,7 +53,7 @@ export function ActivityOptions() {
       id: 'advice',
       title: 'Logopedski nasveti',
       description: 'Koristni nasveti in informacije o govornem razvoju.',
-      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_logoped_1.png',
+      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_logoped_4.png',
       gradient: 'from-app-purple/20 to-app-blue/20',
       badge: '💡',
       url: '/logopedski-koticek'
