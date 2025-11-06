@@ -17,7 +17,7 @@ export function ActivityOptions() {
       id: 'exercises',
       title: 'Govorne vaje',
       description: 'Prilagojene aktivnosti za izboljšanje izgovorjave.',
-      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_vaje_4.png',
+      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_vaje_5.png',
       gradient: 'from-app-blue/20 to-app-teal/20',
       badge: '📝',
       url: '/govorno-jezikovne-vaje'
