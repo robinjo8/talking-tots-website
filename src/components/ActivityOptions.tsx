@@ -78,11 +78,7 @@ export function ActivityOptions() {
               <img 
                 src={activity.image}
                 alt={activity.title}
-                className={`object-contain group-hover:scale-110 transition-transform duration-300 ${
-                  activity.id === 'video' || activity.id === 'exercises' 
-                    ? 'w-[95%] h-[95%]' 
-                    : 'w-full h-full'
-                }`}
+                className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
               />
             </div>
           </div>
