@@ -24,15 +24,71 @@ const MUSIC_ROUTES = [
 
 export function BackgroundMusicProvider({ children }: BackgroundMusicProviderProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const fadeIntervalRef = useRef<number | null>(null);
   const location = useLocation();
+
+  const TARGET_VOLUME = 0.3;
+  const FADE_DURATION = 1000; // 1 second fade
+  const FADE_STEPS = 50;
+
+  // Clear any ongoing fade animation
+  const clearFade = () => {
+    if (fadeIntervalRef.current) {
+      clearInterval(fadeIntervalRef.current);
+      fadeIntervalRef.current = null;
+    }
+  };
+
+  // Fade in effect
+  const fadeIn = (audio: HTMLAudioElement) => {
+    clearFade();
+    audio.volume = 0;
+    
+    audio.play().catch(error => {
+      console.log('Background music autoplay prevented:', error);
+    });
+
+    const step = TARGET_VOLUME / FADE_STEPS;
+    const interval = FADE_DURATION / FADE_STEPS;
+
+    fadeIntervalRef.current = window.setInterval(() => {
+      if (audio.volume < TARGET_VOLUME) {
+        audio.volume = Math.min(audio.volume + step, TARGET_VOLUME);
+      } else {
+        clearFade();
+      }
+    }, interval);
+  };
+
+  // Fade out effect
+  const fadeOut = (audio: HTMLAudioElement) => {
+    clearFade();
+    
+    const step = TARGET_VOLUME / FADE_STEPS;
+    const interval = FADE_DURATION / FADE_STEPS;
+
+    fadeIntervalRef.current = window.setInterval(() => {
+      if (audio.volume > step) {
+        audio.volume = Math.max(audio.volume - step, 0);
+      } else {
+        audio.volume = 0;
+        audio.pause();
+        clearFade();
+      }
+    }, interval);
+  };
 
   useEffect(() => {
     // Initialize audio element once
     if (!audioRef.current) {
       audioRef.current = new Audio(MUSIC_URL);
       audioRef.current.loop = true;
-      audioRef.current.volume = 0.3; // Set to 30% volume for background music
+      audioRef.current.volume = 0;
     }
+
+    return () => {
+      clearFade();
+    };
   }, []);
 
   useEffect(() => {
@@ -43,19 +99,21 @@ export function BackgroundMusicProvider({ children }: BackgroundMusicProviderPro
     const shouldPlay = MUSIC_ROUTES.includes(currentPath);
 
     if (shouldPlay) {
-      // Play music if on a valid route
-      audio.play().catch(error => {
-        console.log('Background music autoplay prevented:', error);
-      });
+      // Fade in music if on a valid route
+      if (audio.paused) {
+        fadeIn(audio);
+      }
     } else {
-      // Pause music on other routes
-      audio.pause();
+      // Fade out music on other routes
+      if (!audio.paused) {
+        fadeOut(audio);
+      }
     }
 
     // Cleanup on unmount
     return () => {
       if (audio && !MUSIC_ROUTES.includes(location.pathname)) {
-        audio.pause();
+        fadeOut(audio);
       }
     };
   }, [location.pathname]);
