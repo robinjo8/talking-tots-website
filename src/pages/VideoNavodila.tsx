@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import useEmblaCarousel from "embla-carousel-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const videoLetters = [
   { 
@@ -66,6 +68,12 @@ const VideoNavodila = () => {
   const navigate = useNavigate();
   const { selectedChild } = useAuth();
   const childName = selectedChild?.name;
+  const isMobile = useIsMobile();
+  const [emblaRef] = useEmblaCarousel({ 
+    align: 'start',
+    dragFree: true,
+    containScroll: 'trimSnaps'
+  });
 
   const handleLetterClick = (letter: string) => {
     navigate(`/video-navodila/crka-${letter.toLowerCase()}`);
@@ -154,13 +162,27 @@ const VideoNavodila = () => {
           </Card>
         </div>
 
-        {/* Letters grid */}
+        {/* Letters grid/carousel */}
         <div className="mb-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {videoLetters.map(letter => (
-              <LetterCard key={letter.letter} letter={letter} />
-            ))}
-          </div>
+          {isMobile ? (
+            /* Mobile: Horizontal scroll carousel */
+            <div className="overflow-hidden -mx-4" ref={emblaRef}>
+              <div className="flex gap-4 px-4">
+                {videoLetters.map(letter => (
+                  <div key={letter.letter} className="flex-[0_0_85%] min-w-0">
+                    <LetterCard letter={letter} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            /* Desktop: Grid layout */
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {videoLetters.map(letter => (
+                <LetterCard key={letter.letter} letter={letter} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
