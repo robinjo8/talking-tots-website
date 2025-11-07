@@ -83,6 +83,7 @@ const VideoNavodila = () => {
             src={letter.image}
             alt={`Črka ${letter.letter}`}
             className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+            style={{ mixBlendMode: 'multiply' }}
           />
         </div>
       </div>
