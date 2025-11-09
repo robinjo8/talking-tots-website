@@ -51,10 +51,20 @@ const FAQSection = () => {
   ];
 
   return (
-    <section className="py-16 bg-light-cloud">
-      <div className="container mx-auto px-4">
+    <section className="relative py-20 bg-dragon-green">
+      <div className="absolute top-0 left-0 w-full overflow-hidden leading-[0] transform rotate-180" style={{ height: '80px' }}>
+        <svg className="relative block w-full" style={{ height: '80px' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+          <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#4CAF50"/>
+        </svg>
+      </div>
+      <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0]" style={{ height: '80px' }}>
+        <svg className="relative block w-full" style={{ height: '80px' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+          <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#4CAF50"/>
+        </svg>
+      </div>
+      <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
             Pogosta vprašanja
           </h2>
         </div>
@@ -67,9 +77,9 @@ const FAQSection = () => {
                 value={`item-${index}`}
                 className="bg-card border border-border rounded-lg shadow-sm"
               >
-                <AccordionTrigger className="w-full px-6 py-4 text-left hover:bg-muted/50 transition-colors duration-200 rounded-lg [&[data-state=open]>div>svg]:rotate-180">
+                <AccordionTrigger className="w-full px-6 py-4 text-left hover:bg-gray-50 transition-colors duration-200 rounded-lg [&[data-state=open]>div>svg]:rotate-180">
                   <div className="flex items-center justify-between w-full">
-                    <h3 className="text-lg font-semibold text-card-foreground pr-4">
+                    <h3 className="text-lg font-semibold text-gray-900 pr-4">
                       {faq.question}
                     </h3>
                   </div>
@@ -77,7 +87,7 @@ const FAQSection = () => {
                 
                 <AccordionContent>
                   <div className="px-6 pb-4">
-                    <p className="text-muted-foreground leading-relaxed">
+                    <p className="text-gray-700 leading-relaxed">
                       {faq.answer}
                     </p>
                   </div>

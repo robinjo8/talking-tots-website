@@ -54,7 +54,7 @@ const ProgressComparisonSection = () => {
     delay: "0.8s"
   }];
   const maxHours = 180;
-  return <section ref={sectionRef} className="py-16 bg-light-cloud">
+  return <section ref={sectionRef} className="py-16 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Izboljšajte otrokov govor, preprosto in brez stresa!</h2>
@@ -63,7 +63,7 @@ const ProgressComparisonSection = () => {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* First box - Progress comparison */}
-            <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col">
+            <div className="bg-white rounded-2xl shadow-xl border-2 border-gray-100 p-8 flex flex-col hover:shadow-2xl transition-shadow duration-300">
               <div className="text-center mb-8">
                 <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4">
                   Hitrejši napredek kot pri tradicionalnih pristopih
@@ -117,7 +117,7 @@ const ProgressComparisonSection = () => {
             </div>
 
             {/* Second box - Cost comparison */}
-            <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col">
+            <div className="bg-white rounded-2xl shadow-xl border-2 border-gray-100 p-8 flex flex-col hover:shadow-2xl transition-shadow duration-300">
               <div className="text-center mb-8">
                 <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4">
                   Neomejene TomiTalk vaje in igre vs. samoplačniške metode

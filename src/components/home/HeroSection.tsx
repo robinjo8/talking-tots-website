@@ -1,196 +1,100 @@
-
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Play, CirclePlay, Info, CheckCircle, ArrowUp, Users } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
-
+import { Check } from "lucide-react";
+import { WavyDivider } from "./WavyDivider";
 
 export const HeroSection = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  
-  const { user, selectedChild } = useAuth();
-  const isMobile = useIsMobile();
+  const { user } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
+  const isMobile = useIsMobile();
 
   const handleStartNow = () => {
-    // If not logged in, redirect to login page
     if (!user) {
       navigate("/login");
-      return;
+    } else {
+      navigate("/moje-aplikacije");
     }
-
-    // If logged in, redirect to moje-aplikacije
-    navigate("/moje-aplikacije");
   };
 
   const scrollToFeatures = () => {
-    const featuresSection = document.getElementById('features');
-    if (featuresSection) {
-      const headerHeight = 80; // Account for fixed header
-      const elementPosition = featuresSection.offsetTop - headerHeight;
-      window.scrollTo({
-        top: elementPosition,
-        behavior: 'smooth'
-      });
+    const learningSection = document.getElementById('learning-outcomes');
+    if (learningSection) {
+      learningSection.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
-  return (
-    <>
-      <section className="pt-24 md:pt-32 pb-10 px-4 md:px-[40px] overflow-hidden relative">
-        <div className="absolute -top-10 -left-10 w-32 h-32 bg-app-yellow/20 rounded-full blur-3xl opacity-50"></div>
-        <div className="absolute top-40 -right-10 w-60 h-60 bg-app-blue/20 rounded-full blur-3xl opacity-50"></div>
-        
-        <div className="max-w-6xl mx-auto">
-          {/* Mobile Layout - Centered */}
-          {isMobile && (
-            <div
-              className={`flex flex-col items-center text-center space-y-6 ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-              } transition-all duration-700 ease-out w-full max-w-full mx-auto`}
-            >
-              {/* Main Headlines - Centered */}
-              <div className="mb-4 w-full">
-                <h1 className="text-3xl leading-tight font-bold mb-4 break-words">
-                  <span className="block text-neutral-950">Odpravite govorne težave brez čakanja –</span>
-                  <span className="block text-dragon-green mt-2">
-                    s pomočjo pametnega AI pomočnika!
-                  </span>
-                </h1>
-                <p className="text-lg leading-relaxed text-neutral-950 font-medium">
-                  Pridruži se staršem, ki že vsak dan vadijo govorne vaje s svojimi otroki – personalizirano glede na starost, težavo in logopedske smernice.
-                </p>
-              </div>
-              
-              {/* Action Buttons */}
-              <div className="flex flex-col items-center gap-3 mb-6 w-full">
-                <Button
-                  size="lg"
-                  onClick={handleStartNow}
-                  className="w-full h-12 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold uppercase"
-                >
-                  <Play className="h-4 w-4" />
-                  Začni zdaj
-                </Button>
+  const trustBadges = [
+    { text: "Temelji na logopedskih smernicah" },
+    { text: "Dokazan napredek pri izgovorjavi" },
+    { text: "Priporočeno s strani staršev" }
+  ];
 
-                <div className="flex gap-3 w-full">
-                  <Button
-                    size="lg"
-                    className="flex-1 h-12 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold uppercase"
-                  >
-                    <CirclePlay className="h-4 w-4" />
-                    Demo
-                  </Button>
-                  <Button
-                    size="lg"
-                    onClick={scrollToFeatures}
-                    className="flex-1 h-12 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold uppercase"
-                  >
-                    <Info className="h-4 w-4" />
-                    Info
-                  </Button>
-                </div>
-              </div>
+  return (
+    <section className="relative bg-white w-full overflow-hidden pt-20 pb-32 md:pb-40">
+      <div className="max-w-7xl mx-auto px-4 md:px-10">
+        <div className={`grid ${isMobile ? 'grid-cols-1 gap-8' : 'grid-cols-2 gap-12 items-center'}`}>
+          {/* Left: Text Content */}
+          <div className={`${isMobile ? 'text-center' : 'text-left'} space-y-6`}>
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight">
+              <span className="text-foreground">Odpravite govorne težave brez čakanja </span>
+              <span className="text-dragon-green">- na zabaven način</span>
+            </h1>
+            
+            <p className="text-lg md:text-xl text-muted-foreground">
+              Razvito s strani logopedov, da pomaga vašemu otroku pri razvoju govora
+            </p>
+
+            <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} gap-4`}>
+              <Button
+                onClick={handleStartNow}
+                size="lg"
+                className="bg-dragon-green hover:bg-dragon-green/90 text-white font-semibold px-8 py-6 text-lg"
+              >
+                Začni zdaj
+              </Button>
               
-              {/* Trust Badges - Centered and padded */}
-              <div className="flex justify-center gap-2 mb-6 py-5 w-full px-2">
-                <div className="flex-1 min-w-0 flex flex-col items-center text-center">
-                  <div className="w-16 h-16 mb-2 rounded-full bg-gradient-to-br from-dragon-green to-app-teal flex items-center justify-center shadow-lg border-2 border-white">
-                    <CheckCircle className="h-8 w-8 text-white" />
-                  </div>
-                  <span className="text-neutral-950 font-medium text-xs leading-tight">
-                    Temelji na logopedskih smernicah
-                  </span>
-                </div>
-                <div className="flex-1 min-w-0 flex flex-col items-center text-center">
-                  <div className="w-16 h-16 mb-2 rounded-full bg-gradient-to-br from-app-blue to-app-purple flex items-center justify-center shadow-lg border-2 border-white">
-                    <ArrowUp className="h-8 w-8 text-white" />
-                  </div>
-                  <span className="text-neutral-950 font-medium text-xs leading-tight">
-                    Dokazan napredek pri izgovorjavi
-                  </span>
-                </div>
-                <div className="flex-1 min-w-0 flex flex-col items-center text-center">
-                  <div className="w-16 h-16 mb-2 rounded-full bg-gradient-to-br from-app-orange to-app-yellow flex items-center justify-center shadow-lg border-2 border-white">
-                    <Users className="h-8 w-8 text-white" />
-                  </div>
-                  <span className="text-neutral-950 font-medium text-xs leading-tight">
-                    Priporočeno s strani staršev
-                  </span>
-                </div>
-              </div>
+              <Button
+                onClick={scrollToFeatures}
+                size="lg"
+                variant="outline"
+                className="border-2 border-dragon-green text-dragon-green hover:bg-dragon-green/10 font-semibold px-8 py-6 text-lg"
+              >
+                Več o tem
+              </Button>
             </div>
-          )}
-          
-          {/* Desktop Layout - Centered content */}
-          {!isMobile && (
-            <div className="relative flex flex-col items-center justify-center text-center">
-              {/* Main Headline - Centered */}
-              <div className={`mb-6 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-100`}>
-                <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl leading-tight font-bold">
-                  <span className="block text-neutral-950">Odpravite govorne težave brez čakanja –</span>
-                  <span className="block text-dragon-green mt-2">
-                    s pomočjo pametnega AI pomočnika!
+
+            {/* Trust Badges */}
+            <div className={`pt-6 space-y-3 ${isMobile ? 'flex flex-col items-center' : ''}`}>
+              {trustBadges.map((badge, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-dragon-green/20 flex items-center justify-center">
+                    <Check className="h-4 w-4 text-dragon-green" />
+                  </div>
+                  <span className="text-sm md:text-base text-gray-700 font-medium">
+                    {badge.text}
                   </span>
-                </h1>
-              </div>
-              
-              {/* Subheadline - Centered */}
-              <div className={`mb-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-200`}>
-                <p className="text-lg md:text-xl leading-relaxed text-neutral-950 font-medium max-w-4xl mx-auto">
-                  Pridruži se staršem, ki že vsak dan vadijo govorne vaje s svojimi otroki – personalizirano glede na starost, težavo in logopedske smernice.
-                </p>
-              </div>
-              
-              {/* Action Buttons - Centered */}
-              <div className={`flex flex-row gap-4 justify-center mb-10 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-300`}>
-                <Button size="lg" className="w-auto sm:w-48 lg:w-56 lg:h-14 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 lg:text-lg lg:uppercase font-semibold">
-                  <CirclePlay className="h-4 w-4 lg:h-5 lg:w-5" />
-                  Poglej demo
-                </Button>
-                <Button size="lg" onClick={handleStartNow} className="w-auto sm:w-48 lg:w-56 lg:h-14 bg-dragon-green hover:bg-dragon-green/90 text-white rounded-full flex items-center justify-center gap-2 lg:text-lg lg:uppercase font-semibold">
-                  <Play className="h-4 w-4 lg:h-5 lg:w-5" />
-                  Začni zdaj
-                </Button>
-                <Button size="lg" onClick={scrollToFeatures} className="w-auto sm:w-48 lg:w-56 lg:h-14 bg-app-blue hover:bg-app-blue/90 text-white rounded-full flex items-center justify-center gap-2 lg:text-lg lg:uppercase font-semibold">
-                  <Info className="h-4 w-4 lg:h-5 lg:w-5" />
-                  Več info
-                </Button>
-              </div>
-              
-              {/* Trust Badges - Centered */}
-              <div className={`grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 lg:mb-0 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-700 ease-out delay-400`}>
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-20 h-20 mb-3 rounded-full bg-gradient-to-br from-dragon-green to-app-teal flex items-center justify-center shadow-lg border-4 border-white">
-                    <CheckCircle className="h-8 w-8 text-white" />
-                  </div>
-                  <span className="text-neutral-950 font-medium text-sm">Temelji na logopedskih smernicah</span>
                 </div>
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-20 h-20 mb-3 rounded-full bg-gradient-to-br from-app-blue to-app-purple flex items-center justify-center shadow-lg border-4 border-white">
-                    <ArrowUp className="h-8 w-8 text-white" />
-                  </div>
-                  <span className="text-neutral-950 font-medium text-sm">Dokazan napredek pri izgovorjavi</span>
-                </div>
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-20 h-20 mb-3 rounded-full bg-gradient-to-br from-app-orange to-app-yellow flex items-center justify-center shadow-lg border-4 border-white">
-                    <Users className="h-8 w-8 text-white" />
-                  </div>
-                  <span className="text-neutral-950 font-medium text-sm">Priporočeno s strani staršev</span>
-                </div>
-              </div>
+              ))}
             </div>
-          )}
+          </div>
+
+          {/* Right: Dragon Image */}
+          <div className={`relative ${isMobile ? 'order-first' : ''}`}>
+            <div className="relative w-full aspect-square max-w-lg mx-auto">
+              <img
+                src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_naslovna_slika.png"
+                alt="Zmajček maskota"
+                className="w-full h-full object-contain animate-float"
+                style={{ transform: 'scaleX(-1)' }}
+              />
+            </div>
+          </div>
         </div>
-      </section>
-      
-      
-    </>
+      </div>
+
+      <WavyDivider color="green" position="bottom" />
+    </section>
   );
 };

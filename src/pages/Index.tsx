@@ -1,6 +1,7 @@
 
 import Header from "@/components/Header";
 import { HeroSection } from "@/components/home/HeroSection";
+import { LearningOutcomesSection } from "@/components/home/LearningOutcomesSection";
 import { TargetAudienceSection } from "@/components/home/TargetAudienceSection";
 import { FeaturesSection } from "@/components/home/FeaturesSection";
 import NewProgressComparisonSection from "@/components/home/ProgressComparisonSection";
@@ -17,6 +18,11 @@ const Index = () => {
       
       {/* Hero Section */}
       <HeroSection />
+
+      {/* Learning Outcomes Section */}
+      <div id="learning-outcomes">
+        <LearningOutcomesSection />
+      </div>
 
       {/* Target Audience Section */}
       <TargetAudienceSection />
