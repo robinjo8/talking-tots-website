@@ -36,7 +36,7 @@ export const HeroSection = () => {
         <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-2 gap-12 items-center'}`}>
           {/* Left: Text Content */}
           <div className={`${isMobile ? 'text-center' : 'text-left'} space-y-3 md:space-y-6`}>
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-snug md:leading-tight">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight">{/*  leading-tight ensures consistent spacing between lines */}
               {isMobile ? (
                 <>
                   <span className="text-foreground block">Odpravite govorne težave</span>
