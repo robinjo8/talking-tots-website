@@ -1,5 +1,4 @@
 import { Volume2, BookOpen, Activity, MessageSquare } from "lucide-react";
-import { WavyDivider } from "./WavyDivider";
 
 const outcomes = [
   {
@@ -27,8 +26,6 @@ const outcomes = [
 export const LearningOutcomesSection = () => {
   return (
     <section className="relative py-20 px-4 md:px-10 bg-dragon-green w-full">
-      <WavyDivider color="white" position="top" flip={true} />
-      
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
@@ -60,8 +57,6 @@ export const LearningOutcomesSection = () => {
           })}
         </div>
       </div>
-      
-      <WavyDivider color="white" position="bottom" />
     </section>
   );
 };

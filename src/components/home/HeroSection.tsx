@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Check } from "lucide-react";
+import { WavyDivider } from "./WavyDivider";
 
 export const HeroSection = () => {
   const { user } = useAuth();
@@ -92,6 +93,7 @@ export const HeroSection = () => {
           </div>
         </div>
       </div>
+      <WavyDivider color="green" position="bottom" />
     </section>
   );
 };
