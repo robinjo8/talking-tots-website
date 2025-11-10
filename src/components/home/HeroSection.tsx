@@ -31,12 +31,12 @@ export const HeroSection = () => {
   ];
 
   return (
-    <section className="relative bg-white w-full overflow-hidden pt-32 md:pt-36 pb-32 md:pb-40">
+    <section className="relative bg-white w-full overflow-hidden pt-16 md:pt-36 pb-32 md:pb-40">
       <div className="max-w-7xl mx-auto px-4 md:px-10">
         <div className={`grid ${isMobile ? 'grid-cols-1 gap-8' : 'grid-cols-2 gap-12 items-center'}`}>
           {/* Left: Text Content */}
-          <div className={`${isMobile ? 'text-center' : 'text-left'} space-y-6`}>
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight">
+          <div className={`${isMobile ? 'text-center' : 'text-left'} space-y-3 md:space-y-6`}>
+            <h1 className="text-2xl md:text-5xl lg:text-6xl font-bold leading-snug md:leading-tight">
               {isMobile ? (
                 <>
                   <span className="text-foreground block">Odpravite govorne težave</span>
@@ -51,14 +51,14 @@ export const HeroSection = () => {
               )}
             </h1>
             
-            <p className="text-lg md:text-xl text-muted-foreground">
+            <p className="text-base md:text-xl text-muted-foreground">
               Razvito s strani logopedov, da pomaga vašemu otroku pri razvoju govora
             </p>
 
             {/* Dragon Image - Mobile Only */}
             {isMobile && (
-              <div className="relative py-2">
-                <div className="relative w-full aspect-square max-w-sm mx-auto scale-[0.85]">
+              <div className="relative">
+                <div className="relative w-full aspect-square max-w-xs mx-auto scale-[0.7]">
                   <img
                     src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_0.png"
                     alt="Zmajček maskota"
@@ -69,11 +69,11 @@ export const HeroSection = () => {
               </div>
             )}
 
-            <div className={`flex ${isMobile ? 'flex-col pt-2' : 'flex-row'} gap-4`}>
+            <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} gap-3`}>
               <Button
                 onClick={handleStartNow}
                 size="lg"
-                className="bg-dragon-green hover:bg-dragon-green/90 text-white font-semibold px-8 py-6 text-lg"
+                className="bg-dragon-green hover:bg-dragon-green/90 text-white font-semibold px-8 py-5 md:py-6 text-lg"
               >
                 Začni zdaj
               </Button>
@@ -82,25 +82,27 @@ export const HeroSection = () => {
                 onClick={scrollToFeatures}
                 size="lg"
                 variant="outline"
-                className="border-2 border-dragon-green text-dragon-green hover:bg-dragon-green/10 font-semibold px-8 py-6 text-lg"
+                className="border-2 border-dragon-green text-dragon-green hover:bg-dragon-green/10 font-semibold px-8 py-5 md:py-6 text-lg"
               >
                 Izvedite več
               </Button>
             </div>
 
-            {/* Trust Badges */}
-            <div className={`pt-6 space-y-3 ${isMobile ? 'flex flex-col items-start' : ''}`}>
-              {trustBadges.map((badge, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-dragon-green/20 flex items-center justify-center">
-                    <Check className="h-4 w-4 text-dragon-green" />
+            {/* Trust Badges - Hidden on mobile */}
+            {!isMobile && (
+              <div className="pt-6 space-y-3">
+                {trustBadges.map((badge, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-dragon-green/20 flex items-center justify-center">
+                      <Check className="h-4 w-4 text-dragon-green" />
+                    </div>
+                    <span className="text-sm md:text-base text-gray-700 font-medium">
+                      {badge.text}
+                    </span>
                   </div>
-                  <span className="text-sm md:text-base text-gray-700 font-medium">
-                    {badge.text}
-                  </span>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Right: Dragon Image - Desktop Only */}
