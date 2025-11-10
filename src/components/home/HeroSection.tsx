@@ -41,7 +41,7 @@ export const HeroSection = () => {
                 <>
                   <span className="text-foreground block">Odpravite govorne težave</span>
                   <span className="text-foreground block">brez čakanja</span>
-                  <span className="text-dragon-green block mt-2">na zabaven način</span>
+                  <span className="text-dragon-green block">na zabaven način</span>
                 </>
               ) : (
                 <>
