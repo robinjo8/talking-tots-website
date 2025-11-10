@@ -37,8 +37,18 @@ export const HeroSection = () => {
           {/* Left: Text Content */}
           <div className={`${isMobile ? 'text-center' : 'text-left'} space-y-6`}>
             <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight">
-              <span className="text-foreground">Odpravite govorne težave brez čakanja </span>
-              <span className="text-dragon-green">- na zabaven način</span>
+              {isMobile ? (
+                <>
+                  <span className="text-foreground block">Odpravite govorne težave</span>
+                  <span className="text-foreground block">brez čakanja</span>
+                  <span className="text-dragon-green block">na zabaven način</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-foreground">Odpravite govorne težave brez čakanja </span>
+                  <span className="text-dragon-green">na zabaven način</span>
+                </>
+              )}
             </h1>
             
             <p className="text-lg md:text-xl text-muted-foreground">
@@ -47,7 +57,7 @@ export const HeroSection = () => {
 
             {/* Dragon Image - Mobile Only */}
             {isMobile && (
-              <div className="relative py-6">
+              <div className="relative py-2">
                 <div className="relative w-full aspect-square max-w-sm mx-auto scale-[0.85]">
                   <img
                     src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_0.png"
@@ -59,7 +69,7 @@ export const HeroSection = () => {
               </div>
             )}
 
-            <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} gap-4`}>
+            <div className={`flex ${isMobile ? 'flex-col items-center' : 'flex-row'} gap-4 ${isMobile ? 'pt-2' : ''}`}>
               <Button
                 onClick={handleStartNow}
                 size="lg"
@@ -74,7 +84,7 @@ export const HeroSection = () => {
                 variant="outline"
                 className="border-2 border-dragon-green text-dragon-green hover:bg-dragon-green/10 font-semibold px-8 py-6 text-lg"
               >
-                Več o tem
+                Izvedite več
               </Button>
             </div>
 
