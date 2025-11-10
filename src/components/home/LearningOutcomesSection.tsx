@@ -18,7 +18,7 @@ const outcomes = [{
   description: "Otroci bodo izboljšali razumevanje navodil, tvorbo stavkov in samozavest pri govornem izražanju"
 }];
 export const LearningOutcomesSection = () => {
-  return <section className="relative py-20 px-4 md:px-10 bg-dragon-green w-full">
+  return <section className="relative py-10 md:py-20 px-4 md:px-10 bg-dragon-green w-full">
       <WavyDivider color="green" position="top" />
       
       <div className="max-w-7xl mx-auto relative z-10">

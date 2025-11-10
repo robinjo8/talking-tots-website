@@ -1,6 +1,6 @@
 import { FeaturesCarousel } from "@/components/FeaturesCarousel";
 export const FeaturesSection = () => {
-  return <section id="features" className="relative py-20 px-4 md:px-[40px] bg-dragon-green w-full overflow-x-hidden">
+  return <section id="features" className="relative py-10 md:py-20 px-4 md:px-[40px] bg-dragon-green w-full overflow-x-hidden">
       <div className="absolute top-0 left-0 w-full overflow-hidden leading-[0] transform rotate-180" style={{
       height: '80px'
     }}>
