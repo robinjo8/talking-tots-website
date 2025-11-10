@@ -31,7 +31,7 @@ export const HeroSection = () => {
   ];
 
   return (
-    <section className="relative bg-white w-full overflow-hidden pt-20 pb-32 md:pb-40">
+    <section className="relative bg-white w-full overflow-hidden pt-32 md:pt-36 pb-32 md:pb-40">
       <div className="max-w-7xl mx-auto px-4 md:px-10">
         <div className={`grid ${isMobile ? 'grid-cols-1 gap-8' : 'grid-cols-2 gap-12 items-center'}`}>
           {/* Left: Text Content */}
