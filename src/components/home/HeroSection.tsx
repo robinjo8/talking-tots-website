@@ -45,6 +45,20 @@ export const HeroSection = () => {
               Razvito s strani logopedov, da pomaga vašemu otroku pri razvoju govora
             </p>
 
+            {/* Dragon Image - Mobile Only */}
+            {isMobile && (
+              <div className="relative py-6">
+                <div className="relative w-full aspect-square max-w-sm mx-auto">
+                  <img
+                    src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_0.png"
+                    alt="Zmajček maskota"
+                    className="w-full h-full object-contain animate-float"
+                    style={{ transform: 'scaleX(-1)' }}
+                  />
+                </div>
+              </div>
+            )}
+
             <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} gap-4`}>
               <Button
                 onClick={handleStartNow}
@@ -65,7 +79,7 @@ export const HeroSection = () => {
             </div>
 
             {/* Trust Badges */}
-            <div className={`pt-6 space-y-3 ${isMobile ? 'flex flex-col items-center' : ''}`}>
+            <div className={`pt-6 space-y-3 ${isMobile ? 'flex flex-col items-start' : ''}`}>
               {trustBadges.map((badge, index) => (
                 <div key={index} className="flex items-center gap-2">
                   <div className="flex-shrink-0 w-6 h-6 rounded-full bg-dragon-green/20 flex items-center justify-center">
@@ -79,17 +93,19 @@ export const HeroSection = () => {
             </div>
           </div>
 
-          {/* Right: Dragon Image */}
-          <div className={`relative ${isMobile ? 'order-first' : ''}`}>
-            <div className="relative w-full aspect-square max-w-lg mx-auto">
-              <img
-                src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_naslovna_slika.png"
-                alt="Zmajček maskota"
-                className="w-full h-full object-contain animate-float"
-                style={{ transform: 'scaleX(-1)' }}
-              />
+          {/* Right: Dragon Image - Desktop Only */}
+          {!isMobile && (
+            <div className="relative">
+              <div className="relative w-full aspect-square max-w-lg mx-auto">
+                <img
+                  src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_0.png"
+                  alt="Zmajček maskota"
+                  className="w-full h-full object-contain animate-float"
+                  style={{ transform: 'scaleX(-1)' }}
+                />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </section>
