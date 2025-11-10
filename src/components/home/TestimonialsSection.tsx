@@ -33,8 +33,8 @@ export const TestimonialsSection = () => {
         </svg>
       </div>
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Kaj pravijo starši?</h2>
+        <div className="text-center mb-6 md:mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold mb-2 md:mb-4 text-white">Kaj pravijo starši?</h2>
           <p className="text-lg text-white/90 max-w-2xl mx-auto">
             Pridružite se številnim družinam, ki so že odkrile moč TomiTalk aplikacije
           </p>

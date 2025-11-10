@@ -24,8 +24,8 @@ export const CallToActionSection = () => {
 
           {/* Text content */}
           <div className="flex-1 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">STE PRIPRAVLJENI NA GOVORNO AVANTURO?</h2>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold mb-3 md:mb-4">STE PRIPRAVLJENI NA GOVORNO AVANTURO?</h2>
+            <p className="text-xl text-muted-foreground mb-4 md:mb-8 max-w-2xl mx-auto">
               Prenesite Tomi Talk danes in opazujte, kako komunikacijske veščine vašega otroka cvetijo!
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

@@ -56,8 +56,8 @@ const ProgressComparisonSection = () => {
   const maxHours = 180;
   return <section ref={sectionRef} className="py-10 md:py-16 bg-white">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Izboljšajte otrokov govor, preprosto in brez stresa!</h2>
+        <div className="text-center mb-6 md:mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 md:mb-6">Izboljšajte otrokov govor, preprosto in brez stresa!</h2>
         </div>
 
         <div className="max-w-7xl mx-auto">

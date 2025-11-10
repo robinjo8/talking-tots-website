@@ -23,8 +23,8 @@ export const TargetAudienceSection = () => {
   }];
   return <section className="py-8 md:py-14 px-4 md:px-10 bg-white w-full">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">Komu je namenjeno?</h2>
+        <div className="text-center mb-6 md:mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold mb-2 md:mb-4 text-gray-900">Komu je namenjeno?</h2>
         </div>
         
         {isMobile ?
