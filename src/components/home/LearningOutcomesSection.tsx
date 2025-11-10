@@ -23,7 +23,7 @@ export const LearningOutcomesSection = () => {
       
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">Kaj se bodo otroci naučili ?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">Kaj se bodo otroci naučili?</h2>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
