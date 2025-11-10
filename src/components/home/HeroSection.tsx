@@ -31,12 +31,12 @@ export const HeroSection = () => {
   ];
 
   return (
-    <section className="relative bg-white w-full overflow-hidden pt-16 md:pt-36 pb-32 md:pb-40">
+    <section className="relative bg-white w-full overflow-hidden pt-24 md:pt-36 pb-16 md:pb-40">
       <div className="max-w-7xl mx-auto px-4 md:px-10">
-        <div className={`grid ${isMobile ? 'grid-cols-1 gap-8' : 'grid-cols-2 gap-12 items-center'}`}>
+        <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-2 gap-12 items-center'}`}>
           {/* Left: Text Content */}
           <div className={`${isMobile ? 'text-center' : 'text-left'} space-y-3 md:space-y-6`}>
-            <h1 className="text-2xl md:text-5xl lg:text-6xl font-bold leading-snug md:leading-tight">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-snug md:leading-tight">
               {isMobile ? (
                 <>
                   <span className="text-foreground block">Odpravite govorne težave</span>
@@ -57,8 +57,8 @@ export const HeroSection = () => {
 
             {/* Dragon Image - Mobile Only */}
             {isMobile && (
-              <div className="relative">
-                <div className="relative w-full aspect-square max-w-xs mx-auto scale-[0.7]">
+              <div className="relative -my-4">
+                <div className="relative w-full aspect-square max-w-xs mx-auto scale-[0.8]">
                   <img
                     src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_0.png"
                     alt="Zmajček maskota"
