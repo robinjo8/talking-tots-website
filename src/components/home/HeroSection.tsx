@@ -48,7 +48,7 @@ export const HeroSection = () => {
             {/* Dragon Image - Mobile Only */}
             {isMobile && (
               <div className="relative py-6">
-                <div className="relative w-full aspect-square max-w-sm mx-auto">
+                <div className="relative w-full aspect-square max-w-sm mx-auto scale-[0.85]">
                   <img
                     src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_0.png"
                     alt="Zmajček maskota"
