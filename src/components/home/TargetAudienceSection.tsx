@@ -1,7 +1,5 @@
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { WavyDivider } from "./WavyDivider";
-
 export const TargetAudienceSection = () => {
   const isMobile = useIsMobile();
   const audiences = [{
@@ -23,8 +21,7 @@ export const TargetAudienceSection = () => {
     bgColor: "bg-white",
     titleColor: "text-app-orange"
   }];
-  return <section className="relative py-14 px-4 md:px-10 bg-white w-full">
-      <WavyDivider color="green" position="top" flip={true} />
+  return <section className="py-14 px-4 md:px-10 bg-white w-full">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">Komu je namenjeno?</h2>
