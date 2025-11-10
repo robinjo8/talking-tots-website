@@ -37,7 +37,7 @@ export const TargetAudienceSection = () => {
             </TabsList>
             
             {audiences.map(audience => <TabsContent key={audience.title} value={audience.title}>
-                <div className={`${audience.bgColor} rounded-xl shadow-xl p-6 border border-gray-100`}>
+                <div className={`${audience.bgColor} rounded-xl shadow-xl p-6 border border-gray-300`}>
                   {/* Title */}
                   <div className="text-center mb-6">
                     <h3 className={`text-xl font-bold ${audience.titleColor} mb-2`}>
@@ -64,7 +64,7 @@ export const TargetAudienceSection = () => {
           </Tabs> :
       // Desktop: Grid layout
       <div className="grid grid-cols-3 gap-6">
-            {audiences.map((audience, index) => <div key={index} className={`${audience.bgColor} rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8 h-full flex flex-col border border-gray-100`}>
+            {audiences.map((audience, index) => <div key={index} className={`${audience.bgColor} rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8 h-full flex flex-col border border-gray-300`}>
                 {/* Title */}
                 <div className="text-center mb-6">
                   <h3 className={`text-2xl font-bold ${audience.titleColor} mb-2`}>
