@@ -27,7 +27,7 @@ const outcomes = [
 export const LearningOutcomesSection = () => {
   return (
     <section className="relative py-20 px-4 md:px-10 bg-dragon-green w-full">
-      <WavyDivider color="white" position="top" />
+      <WavyDivider color="green" position="top" />
       
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-12">
@@ -61,7 +61,7 @@ export const LearningOutcomesSection = () => {
         </div>
       </div>
       
-      <WavyDivider color="white" position="bottom" />
+      <WavyDivider color="green" position="bottom" />
     </section>
   );
 };
