@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Check, TrendingUp, Users } from "lucide-react";
+import { Check } from "lucide-react";
 
 export const HeroSection = () => {
   const { user } = useAuth();
@@ -25,25 +25,13 @@ export const HeroSection = () => {
   };
 
   const trustBadges = [
-    { 
-      icon: Check, 
-      text: "Temelji na logopedskih smernicah",
-      bgColor: "bg-green-500"
-    },
-    { 
-      icon: TrendingUp, 
-      text: "Dokazan napredek pri izgovorjavi",
-      bgColor: "bg-blue-500"
-    },
-    { 
-      icon: Users, 
-      text: "Priporočeno s strani staršev",
-      bgColor: "bg-yellow-500"
-    }
+    { text: "Temelji na logopedskih smernicah" },
+    { text: "Dokazan napredek pri izgovorjavi" },
+    { text: "Priporočeno s strani staršev" }
   ];
 
   return (
-    <section className="relative bg-white w-full overflow-hidden pt-20 pb-8">
+    <section className="relative bg-white w-full overflow-hidden pt-20 pb-32 md:pb-40">
       <div className="max-w-7xl mx-auto px-4 md:px-10">
         <div className={`grid ${isMobile ? 'grid-cols-1 gap-8' : 'grid-cols-2 gap-12 items-center'}`}>
           {/* Left: Text Content */}
@@ -75,37 +63,32 @@ export const HeroSection = () => {
                 Več o tem
               </Button>
             </div>
+
+            {/* Trust Badges */}
+            <div className={`pt-6 space-y-3 ${isMobile ? 'flex flex-col items-center' : ''}`}>
+              {trustBadges.map((badge, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-dragon-green/20 flex items-center justify-center">
+                    <Check className="h-4 w-4 text-dragon-green" />
+                  </div>
+                  <span className="text-sm md:text-base text-gray-700 font-medium">
+                    {badge.text}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Right: Dragon Image */}
           <div className={`relative ${isMobile ? 'order-first' : ''}`}>
             <div className="relative w-full aspect-square max-w-lg mx-auto">
               <img
-                src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_naslovna_1.png"
+                src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_naslovna_slika.png"
                 alt="Zmajček maskota"
                 className="w-full h-full object-contain animate-float"
                 style={{ transform: 'scaleX(-1)' }}
               />
             </div>
-          </div>
-        </div>
-
-        {/* Trust Badges - Now at the bottom in white section */}
-        <div className="mt-16 mb-8">
-          <div className={`flex ${isMobile ? 'flex-col items-center gap-8' : 'flex-row justify-center gap-12'}`}>
-            {trustBadges.map((badge, index) => {
-              const IconComponent = badge.icon;
-              return (
-                <div key={index} className="flex flex-col items-center text-center max-w-[200px]">
-                  <div className={`w-20 h-20 rounded-full ${badge.bgColor} flex items-center justify-center mb-3 shadow-lg`}>
-                    <IconComponent className="h-10 w-10 text-white" strokeWidth={2.5} />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700 leading-tight">
-                    {badge.text}
-                  </span>
-                </div>
-              );
-            })}
           </div>
         </div>
       </div>
