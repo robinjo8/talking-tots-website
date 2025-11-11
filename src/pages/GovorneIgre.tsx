@@ -1,10 +1,20 @@
 import Header from "@/components/Header";
 import { GamesList } from "@/components/games/GamesList";
 import AnimatedBackground from "@/components/AnimatedBackground";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function GovorneIgre() {
+  const isMobile = useIsMobile();
+  
   return <div className="min-h-screen relative">
-      <AnimatedBackground />
+      {isMobile ? (
+        <div 
+          className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat opacity-20"
+          style={{ backgroundImage: 'url(/mobile-background.png)' }}
+        />
+      ) : (
+        <AnimatedBackground />
+      )}
       <Header />
       
       <div className="container max-w-6xl mx-auto pt-28 md:pt-32 pb-20 px-4">

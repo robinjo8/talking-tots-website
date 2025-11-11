@@ -157,7 +157,14 @@ export default function DrsnaSestavljanka() {
 
   return (
     <div className="min-h-screen relative">
-      <AnimatedBackground />
+      {isMobile ? (
+        <div 
+          className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat opacity-20"
+          style={{ backgroundImage: 'url(/mobile-background.png)' }}
+        />
+      ) : (
+        <AnimatedBackground />
+      )}
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">

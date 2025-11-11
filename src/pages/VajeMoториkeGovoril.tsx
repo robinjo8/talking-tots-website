@@ -52,7 +52,14 @@ const VajeMoториkeGovoril = () => {
     <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen relative'}`}>
       {!effectiveFullscreen && (
         <>
-          <AnimatedBackground />
+          {isMobile ? (
+            <div 
+              className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat opacity-20"
+              style={{ backgroundImage: 'url(/mobile-background.png)' }}
+            />
+          ) : (
+            <AnimatedBackground />
+          )}
           <Header />
         </>
       )}
