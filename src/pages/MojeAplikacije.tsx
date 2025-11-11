@@ -3,7 +3,7 @@ import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { ActivityOptions } from "@/components/ActivityOptions";
-
+import AnimatedBackground from "@/components/AnimatedBackground";
 import { FooterSection } from "@/components/FooterSection";
 
 const MojeAplikacije = () => {
@@ -27,7 +27,8 @@ const MojeAplikacije = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen relative">
+      <AnimatedBackground />
       <Header />
       
       <div className="container max-w-6xl mx-auto pt-28 md:pt-32 pb-20 px-4">
