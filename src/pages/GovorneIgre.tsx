@@ -1,8 +1,10 @@
 import Header from "@/components/Header";
 import { GamesList } from "@/components/games/GamesList";
+import AnimatedBackground from "@/components/AnimatedBackground";
 
 export default function GovorneIgre() {
-  return <div className="min-h-screen bg-background">
+  return <div className="min-h-screen relative">
+      <AnimatedBackground />
       <Header />
       
       <div className="container max-w-6xl mx-auto pt-28 md:pt-32 pb-20 px-4">

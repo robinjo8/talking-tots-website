@@ -2,6 +2,7 @@ import Header from "@/components/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import AnimatedBackground from "@/components/AnimatedBackground";
 const GovornojezicovneVaje = () => {
   const navigate = useNavigate();
   const exerciseTypes = [{
@@ -86,7 +87,8 @@ const GovornojezicovneVaje = () => {
     example: "",
     available: false
   }];
-  return <div className="min-h-screen bg-background">
+  return <div className="min-h-screen relative">
+      <AnimatedBackground />
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-28 md:pt-32 pb-20 px-4">

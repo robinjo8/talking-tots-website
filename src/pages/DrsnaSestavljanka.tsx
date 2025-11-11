@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { getAgeGroup } from "@/utils/ageUtils";
 import useEmblaCarousel from "embla-carousel-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import AnimatedBackground from "@/components/AnimatedBackground";
 
 const memoryGames = [
   {
@@ -155,7 +156,8 @@ export default function DrsnaSestavljanka() {
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen relative">
+      <AnimatedBackground />
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
