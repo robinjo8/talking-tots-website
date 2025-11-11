@@ -32,7 +32,7 @@ const MojeAplikacije = () => {
     <div className="min-h-screen relative">
       {isMobile ? (
         <div 
-          className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat"
+          className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat opacity-20"
           style={{ backgroundImage: 'url(/mobile-background.png)' }}
         />
       ) : (
