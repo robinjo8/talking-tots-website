@@ -5,12 +5,10 @@ import { toast } from "sonner";
 import { ActivityOptions } from "@/components/ActivityOptions";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import { FooterSection } from "@/components/FooterSection";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 const MojeAplikacije = () => {
   const { user, selectedChild, signOut } = useAuth();
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
   
 
   const handleSignOut = async () => {
@@ -30,14 +28,7 @@ const MojeAplikacije = () => {
 
   return (
     <div className="min-h-screen relative">
-      {isMobile ? (
-        <div 
-          className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat opacity-20"
-          style={{ backgroundImage: 'url(/mobile-background.png)' }}
-        />
-      ) : (
-        <AnimatedBackground />
-      )}
+      <AnimatedBackground />
       <Header />
       
       <div className="container max-w-6xl mx-auto pt-28 md:pt-32 pb-20 px-4">

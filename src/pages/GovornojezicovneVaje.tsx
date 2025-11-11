@@ -2,11 +2,8 @@ import Header from "@/components/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import AnimatedBackground from "@/components/AnimatedBackground";
-import { useIsMobile } from "@/hooks/use-mobile";
 const GovornojezicovneVaje = () => {
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
   const exerciseTypes = [{
     id: "vaje-motorike-govoril",
     title: "VAJE MOTORIKE GOVORIL",
@@ -89,15 +86,7 @@ const GovornojezicovneVaje = () => {
     example: "",
     available: false
   }];
-  return <div className="min-h-screen relative">
-      {isMobile ? (
-        <div 
-          className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat opacity-20"
-          style={{ backgroundImage: 'url(/mobile-background.png)' }}
-        />
-      ) : (
-        <AnimatedBackground />
-      )}
+  return <div className="min-h-screen bg-background">
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-28 md:pt-32 pb-20 px-4">

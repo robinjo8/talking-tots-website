@@ -6,7 +6,6 @@ import { SequentialExerciseGrid } from "@/components/exercises/SequentialExercis
 import { ExerciseProgressInfo } from "@/components/exercises/ExerciseProgressInfo";
 import { useExerciseProgress } from "@/hooks/useExerciseProgress";
 import { useIsMobile } from "@/hooks/use-mobile";
-import AnimatedBackground from "@/components/AnimatedBackground";
 
 const VajeMoториkeGovoril = () => {
   const { user, selectedChild } = useAuth();
@@ -49,21 +48,8 @@ const VajeMoториkeGovoril = () => {
   }, [effectiveFullscreen]);
 
   return (
-    <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen relative'}`}>
-      {!effectiveFullscreen && (
-        <>
-          {isMobile ? (
-            <div 
-              className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat opacity-20"
-              style={{ backgroundImage: 'url(/mobile-background.png)' }}
-            />
-          ) : (
-            <AnimatedBackground />
-          )}
-          <Header />
-        </>
-      )}
-
+    <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}>
+      {!effectiveFullscreen && <Header />}
       
       {effectiveFullscreen ? (
         <div className="h-full flex flex-col p-2">
