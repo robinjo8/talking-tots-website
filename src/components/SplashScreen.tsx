@@ -97,23 +97,6 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
             ))}
           </div>
 
-          {/* Sparkle Effects around Text */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 1, 0] }}
-            transition={{ delay: 1.2, duration: 1, repeat: Infinity, repeatDelay: 2 }}
-            className="absolute top-[35%] left-[15%] text-yellow-400 text-3xl"
-          >
-            ✨
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 1, 0] }}
-            transition={{ delay: 1.5, duration: 1, repeat: Infinity, repeatDelay: 2 }}
-            className="absolute top-[35%] right-[15%] text-yellow-400 text-3xl"
-          >
-            ✨
-          </motion.div>
 
           {/* Dragon Image with Multiple Animations */}
           <motion.div
@@ -173,34 +156,6 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
             />
           </motion.div>
 
-          {/* Confetti around dragon */}
-          {[...Array(8)].map((_, i) => (
-            <motion.div
-              key={`confetti-${i}`}
-              initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
-              animate={{
-                opacity: [0, 1, 0],
-                scale: [0, 1, 0],
-                x: Math.cos(i * 45 * Math.PI / 180) * 150,
-                y: Math.sin(i * 45 * Math.PI / 180) * 150,
-              }}
-              transition={{
-                delay: 2 + i * 0.1,
-                duration: 1.5,
-                repeat: Infinity,
-                repeatDelay: 2,
-              }}
-              className="absolute"
-              style={{
-                left: "50%",
-                top: "60%",
-              }}
-            >
-              <span className="text-2xl">
-                {["🎉", "🎊", "⭐", "✨", "🌟", "💫", "🎈", "🎨"][i]}
-              </span>
-            </motion.div>
-          ))}
         </motion.div>
       )}
     </AnimatePresence>
