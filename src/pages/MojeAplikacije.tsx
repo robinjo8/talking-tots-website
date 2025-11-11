@@ -6,7 +6,6 @@ import { ActivityOptions } from "@/components/ActivityOptions";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import { FooterSection } from "@/components/FooterSection";
 import { useIsMobile } from "@/hooks/use-mobile";
-import mobileBackground from "@/assets/mobile-background.png";
 
 const MojeAplikacije = () => {
   const { user, selectedChild, signOut } = useAuth();
@@ -34,7 +33,7 @@ const MojeAplikacije = () => {
       {isMobile ? (
         <div 
           className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${mobileBackground})` }}
+          style={{ backgroundImage: 'url(/mobile-background.png)' }}
         />
       ) : (
         <AnimatedBackground />

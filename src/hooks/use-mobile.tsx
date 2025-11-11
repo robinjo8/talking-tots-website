@@ -6,18 +6,19 @@ const MOBILE_BREAKPOINT = 768;
 
 export function useIsMobile() {
   // Start with undefined to avoid hydration issues
-  const [isMobile, setIsMobile] = React.useState<boolean>(false);
+  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined);
 
   React.useEffect(() => {
     // Check if window is available (client-side only)
     if (typeof window === 'undefined') return;
     
-    // Set initial value
-    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    // Set initial value immediately
+    const checkMobile = () => window.innerWidth < MOBILE_BREAKPOINT;
+    setIsMobile(checkMobile());
     
     // Create handler function
     const handleResize = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+      setIsMobile(checkMobile());
     };
     
     // Add event listener
@@ -27,5 +28,5 @@ export function useIsMobile() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  return isMobile;
+  return isMobile ?? false;
 }
