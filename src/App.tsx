@@ -8,12 +8,12 @@ const App = () => {
   const [hasShownSplash, setHasShownSplash] = useState(false);
 
   useEffect(() => {
-    // Check if splash was already shown in this session
-    const splashShown = sessionStorage.getItem("splashShown");
-    if (splashShown === "true") {
-      setShowSplash(false);
-      setHasShownSplash(true);
-    }
+    // Temporarily disabled to always show splash screen for testing
+    // const splashShown = sessionStorage.getItem("splashShown");
+    // if (splashShown === "true") {
+    //   setShowSplash(false);
+    //   setHasShownSplash(true);
+    // }
   }, []);
 
   const handleSplashComplete = () => {
