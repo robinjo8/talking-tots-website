@@ -139,33 +139,8 @@ export default function SpominGames() {
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
-        {/* Instruction speech-bubble with back button */}
-        <div className="mb-8 flex items-center gap-4">
-          {/* Back button */}
-          <button
-            onClick={() => navigate('/govorne-igre')}
-            className="flex-shrink-0 w-12 h-12 flex items-center justify-center hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <svg 
-              width="24" 
-              height="24" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              xmlns="http://www.w3.org/2000/svg"
-              className="text-gray-700"
-            >
-              <path 
-                d="M19 12H5M12 19L5 12L12 5" 
-                stroke="currentColor" 
-                strokeWidth="2" 
-                strokeLinecap="round" 
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-
-          {/* Instruction card */}
-          <Card className="flex-1 bg-gradient-to-r from-sky-50 to-green-50 border-dragon-green/30 shadow-md">
+        {/* Instruction speech-bubble */}
+        <Card className="mb-8 bg-gradient-to-r from-sky-50 to-green-50 border-dragon-green/30 shadow-md">
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-xl md:text-2xl text-dragon-green">
                 <MessageSquare className="h-5 w-5 text-dragon-green" />
@@ -185,8 +160,7 @@ export default function SpominGames() {
                 <p className="text-sm text-muted-foreground mt-2">Z VAJAMI POSTAJAMO VEDNO BOLJŠI!</p>
               </div>
             </CardContent>
-          </Card>
-        </div>
+        </Card>
 
         {/* Letters grid/carousel */}
         <div className="mb-12">

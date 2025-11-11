@@ -1,89 +1,97 @@
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { MessageSquare, ArrowLeft } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { getAgeGroup } from "@/utils/ageUtils";
+import useEmblaCarousel from "embla-carousel-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
-const matchingGames = [{
-  id: "igra-ujemanja-c",
-  title: "Igra Ujemanja - C",
-  description: "Povežite besedo s črko C s pravo sliko",
-  letter: "C",
-  color: "text-dragon-green",
-  gradient: "from-dragon-green/10 to-app-teal/10",
-  available: true
-}, {
-  id: "igra-ujemanja-r",
-  title: "Igra Ujemanja - R",
-  description: "Povežite besedo s črko R s pravo sliko",
-  letter: "R",
-  color: "text-app-purple",
-  gradient: "from-app-purple/10 to-app-blue/10",
-  available: true
-}, {
-  id: "igra-ujemanja-l",
-  title: "Igra Ujemanja - L",
-  description: "Povežite besedo s črko L s pravo sliko",
-  letter: "L",
-  color: "text-app-orange",
-  gradient: "from-app-orange/10 to-amber-300/10",
-  available: true
-}, {
-  id: "igra-ujemanja-k",
-  title: "Igra Ujemanja - K",
-  description: "Povežite besedo s črko K s pravo sliko",
-  letter: "K",
-  color: "text-blue-600",
-  gradient: "from-blue-600/10 to-cyan-400/10",
-  available: true
-}, {
-  id: "igra-ujemanja-č",
-  title: "Igra Ujemanja - Č",
-  description: "Povežite besedo s črko Č s pravo sliko",
-  letter: "Č",
-  color: "text-red-600",
-  gradient: "from-red-600/10 to-pink-400/10",
-  available: true
-}, {
-  id: "igra-ujemanja-s",
-  title: "Igra Ujemanja - S",
-  description: "Povežite besedo s črko S s pravo sliko",
-  letter: "S",
-  color: "text-green-600",
-  gradient: "from-green-600/10 to-emerald-400/10",
-  available: true
-}, {
-  id: "igra-ujemanja-š",
-  title: "Igra Ujemanja - Š",
-  description: "Povežite besedo s črko Š s pravo sliko",
-  letter: "Š",
-  color: "text-indigo-600",
-  gradient: "from-indigo-600/10 to-purple-400/10",
-  available: true
-}, {
-  id: "igra-ujemanja-z",
-  title: "Igra Ujemanja - Z",
-  description: "Povežite besedo s črko Z s pravo sliko",
-  letter: "Z",
-  color: "text-yellow-600",
-  gradient: "from-yellow-600/10 to-orange-400/10",
-  available: true
-}, {
-  id: "igra-ujemanja-ž",
-  title: "Igra Ujemanja - Ž",
-  description: "Povežite besedo s črko Ž s pravo sliko",
-  letter: "Ž",
-  color: "text-pink-600",
-  gradient: "from-pink-600/10 to-rose-400/10",
-  available: true
-}];
+const matchingGames = [
+  {
+    id: "igra-ujemanja-c",
+    letter: "C",
+    gradient: "from-dragon-green/20 to-dragon-green/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
+    description: "Poveži besedo s črko C s pravo sliko",
+    available: true
+  },
+  {
+    id: "igra-ujemanja-č",
+    letter: "Č",
+    gradient: "from-app-blue/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
+    description: "Poveži besedo s črko Č s pravo sliko",
+    available: true
+  },
+  {
+    id: "igra-ujemanja-k",
+    letter: "K",
+    gradient: "from-app-orange/20 to-app-yellow/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png",
+    description: "Poveži besedo s črko K s pravo sliko",
+    available: true
+  },
+  {
+    id: "igra-ujemanja-l",
+    letter: "L",
+    gradient: "from-app-purple/20 to-app-blue/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png",
+    description: "Poveži besedo s črko L s pravo sliko",
+    available: true
+  },
+  {
+    id: "igra-ujemanja-r",
+    letter: "R",
+    gradient: "from-app-purple/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
+    description: "Poveži besedo s črko R s pravo sliko",
+    available: true
+  },
+  {
+    id: "igra-ujemanja-s",
+    letter: "S",
+    gradient: "from-dragon-green/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
+    description: "Poveži besedo s črko S s pravo sliko",
+    available: true
+  },
+  {
+    id: "igra-ujemanja-š",
+    letter: "Š",
+    gradient: "from-app-blue/20 to-app-purple/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
+    description: "Poveži besedo s črko Š s pravo sliko",
+    available: true
+  },
+  {
+    id: "igra-ujemanja-z",
+    letter: "Z",
+    gradient: "from-app-teal/20 to-dragon-green/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
+    description: "Poveži besedo s črko Z s pravo sliko",
+    available: true
+  },
+  {
+    id: "igra-ujemanja-ž",
+    letter: "Ž",
+    gradient: "from-app-purple/20 to-app-blue/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
+    description: "Poveži besedo s črko Ž s pravo sliko",
+    available: true
+  }
+];
 
 export default function IgraUjemanja() {
   const navigate = useNavigate();
   const { selectedChild } = useAuth();
   const childName = selectedChild?.name;
-  const activeGames = matchingGames.filter(game => game.available);
+  const isMobile = useIsMobile();
+  const [emblaRef] = useEmblaCarousel({ 
+    align: 'start',
+    dragFree: true,
+    containScroll: 'trimSnaps'
+  });
 
   const handleCardClick = (game: typeof matchingGames[0]) => {
     if (!game.available) return;
@@ -117,26 +125,33 @@ export default function IgraUjemanja() {
     navigate(targetRoute);
   };
 
-  const GameCard = ({ game }: { game: typeof matchingGames[0] }) => (
-    <Card 
-      className={`transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col bg-gradient-to-r ${game.gradient} ${game.available ? 'cursor-pointer hover:scale-105' : 'opacity-60 cursor-not-allowed'}`} 
+  const LetterCard = ({ game }: { game: typeof matchingGames[0] }) => (
+    <div
+      className="bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group border border-gray-200"
       onClick={() => handleCardClick(game)}
     >
-      <CardHeader className="rounded-t-2xl pb-2 flex-grow flex items-center justify-center">
-        <CardTitle className="flex items-center justify-center">
-          <span className={`text-6xl font-bold ${game.color}`}>
-            {game.letter}
-          </span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-2 pb-4 text-center">
-        {!game.available && (
-          <p className="text-xs text-muted-foreground italic">
-            Kmalu na voljo
-          </p>
-        )}
-      </CardContent>
-    </Card>
+      {/* Card Image */}
+      <div className={`relative aspect-video overflow-hidden bg-gradient-to-br ${game.gradient}`}>
+        <div className="w-full h-full flex items-center justify-center">
+          <img 
+            src={game.image}
+            alt={`Črka ${game.letter}`}
+            className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+            style={{ mixBlendMode: 'multiply' }}
+          />
+        </div>
+      </div>
+
+      {/* Card Content */}
+      <div className="p-6">
+        <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
+          Črka {game.letter}
+        </h3>
+        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+          {game.description}
+        </p>
+      </div>
+    </div>
   );
 
   return (
@@ -167,29 +182,27 @@ export default function IgraUjemanja() {
           </CardContent>
         </Card>
 
-        {/* Section 1: Izberi igro */}
+        {/* Letters grid/carousel */}
         <div className="mb-12">
-          <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {/* Back button */}
-            <Card 
-              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col bg-gradient-to-r from-gray-100/50 to-gray-200/50 cursor-pointer hover:scale-105" 
-              onClick={() => navigate('/govorne-igre')}
-            >
-              <CardHeader className="rounded-2xl flex-grow flex items-center justify-center">
-                <CardTitle className="flex items-center justify-center">
-                  <img 
-                    src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/puscica_1.png" 
-                    alt="Nazaj" 
-                    className="h-16 w-16 object-contain"
-                  />
-                </CardTitle>
-              </CardHeader>
-            </Card>
-            
-            {activeGames.map(game => (
-              <GameCard key={game.id} game={game} />
-            ))}
-          </div>
+          {isMobile ? (
+            /* Mobile: Horizontal scroll carousel */
+            <div className="overflow-hidden -mx-4" ref={emblaRef}>
+              <div className="flex gap-4 px-4">
+                {matchingGames.map(game => (
+                  <div key={game.id} className="flex-[0_0_85%] min-w-0">
+                    <LetterCard game={game} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            /* Desktop: Grid layout */
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {matchingGames.map(game => (
+                <LetterCard key={game.id} game={game} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
