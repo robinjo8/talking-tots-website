@@ -5,18 +5,52 @@ import { MessageSquare } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { matchingGameData } from "@/data/matchingGameData";
 import { getAgeGroup } from "@/utils/ageUtils";
+import useEmblaCarousel from "embla-carousel-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+
+const letterData = [
+  {
+    letter: "C",
+    gradient: "from-dragon-green/20 to-dragon-green/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
+    description: "Pomagaj Tomiju povezati pare s črko C",
+  },
+  {
+    letter: "Č",
+    gradient: "from-app-blue/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
+    description: "Pomagaj Tomiju povezati pare s črko Č",
+  },
+  {
+    letter: "K",
+    gradient: "from-app-orange/20 to-app-yellow/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png",
+    description: "Pomagaj Tomiju povezati pare s črko K",
+  },
+  {
+    letter: "L",
+    gradient: "from-app-purple/20 to-app-blue/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png",
+    description: "Pomagaj Tomiju povezati pare s črko L",
+  },
+];
 
 export default function MatchingGames3to4() {
   const navigate = useNavigate();
   const { selectedChild } = useAuth();
   const childName = selectedChild?.name;
+  const isMobile = useIsMobile();
+  const [emblaRef] = useEmblaCarousel({ 
+    align: 'start',
+    dragFree: true,
+    containScroll: 'trimSnaps'
+  });
 
   // Check if child is in correct age group
   const childAge = selectedChild?.age || 3;
   const ageGroup = getAgeGroup(childAge);
 
   if (ageGroup !== '3-4') {
-    // Redirect to appropriate age group or show access denied
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -32,93 +66,110 @@ export default function MatchingGames3to4() {
     );
   }
 
-  const getGameColor = (letter: string) => {
-    const index = matchingGameData.findIndex(data => data.letter === letter);
-    const colors = [
-      { color: "text-app-purple", gradient: "from-app-purple/10 to-app-blue/10" },
-      { color: "text-dragon-green", gradient: "from-dragon-green/10 to-app-teal/10" },
-      { color: "text-app-blue", gradient: "from-app-blue/10 to-app-purple/10" },
-      { color: "text-app-orange", gradient: "from-app-orange/10 to-app-yellow/10" },
-    ];
-    return colors[index % colors.length];
-  };
+  const LetterCard = ({ letter }: { letter: typeof letterData[0] }) => (
+    <div
+      className="bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group border border-gray-200"
+      onClick={() => navigate(`/govorne-igre/povezi-pare-3-4/${letter.letter.toLowerCase()}`)}
+    >
+      {/* Card Image */}
+      <div className={`relative aspect-video overflow-hidden bg-gradient-to-br ${letter.gradient}`}>
+        <div className="w-full h-full flex items-center justify-center">
+          <img 
+            src={letter.image}
+            alt={`Črka ${letter.letter}`}
+            className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+            style={{ mixBlendMode: 'multiply' }}
+          />
+        </div>
+      </div>
 
-  const GameCard = ({ letter, onClick }: { letter: string; onClick: () => void }) => {
-    const colorScheme = getGameColor(letter);
-    return (
-      <Card
-        className={`transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col bg-gradient-to-r ${colorScheme.gradient} cursor-pointer hover:scale-105`}
-        onClick={onClick}
-      >
-        <CardHeader className="rounded-t-2xl pb-2 flex-grow flex items-center justify-center">
-          <CardTitle className="flex items-center justify-center">
-            <span className={`text-6xl font-bold ${colorScheme.color}`}>
-              {letter}
-            </span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-2 pb-4 text-center">
-          {/* No description text needed to match sestavljanke */}
-        </CardContent>
-      </Card>
-    );
-  };
+      {/* Card Content */}
+      <div className="p-6">
+        <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
+          Črka {letter.letter}
+        </h3>
+        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+          {letter.description}
+        </p>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
-        {/* Instruction speech-bubble */}
-        <Card className="mb-8 bg-gradient-to-r from-sky-50 to-green-50 border-dragon-green/30 shadow-md">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-xl md:text-2xl text-dragon-green">
-              <MessageSquare className="h-5 w-5 text-dragon-green" />
-              HEJ, {childName?.toUpperCase() || "TIAN"}!
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-2 flex items-center gap-4">
-            <div className="hidden sm:block w-20 h-20">
-              <img 
-                src="/lovable-uploads/4377ec70-1996-47a9-bf05-8093cffcaf0b.png" 
-                alt="Zmajček Tomi" 
-                className="w-full h-full object-contain animate-bounce-gentle"
-              />
-            </div>
-            <div className="flex-1">
-              <p className="text-lg font-medium italic">IZBERI ČRKO IN POMAGAJ TOMIJU POVEZATI PARE. NA KONCU PA SKUPAJ GLASNO PONOVITA BESEDO!</p>
-              <p className="text-sm text-muted-foreground mt-2">Z VAJAMI POSTAJAMO VEDNO BOLJŠI!</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Section 1: Izberi igro */}
-        <div className="mb-12">
-          <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {/* Back button */}
-            <Card 
-              className="transition-all duration-300 hover:shadow-lg rounded-2xl border-2 border-gray-200 h-full flex flex-col bg-gradient-to-r from-gray-100/50 to-gray-200/50 cursor-pointer hover:scale-105" 
-              onClick={() => navigate('/govorne-igre')}
+        {/* Instruction speech-bubble with back button */}
+        <div className="mb-8 flex items-center gap-4">
+          {/* Back button */}
+          <button
+            onClick={() => navigate('/govorne-igre')}
+            className="flex-shrink-0 w-12 h-12 flex items-center justify-center hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <svg 
+              width="24" 
+              height="24" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              xmlns="http://www.w3.org/2000/svg"
+              className="text-gray-700"
             >
-              <CardHeader className="rounded-2xl flex-grow flex items-center justify-center">
-                <CardTitle className="flex items-center justify-center">
-                  <img 
-                    src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/puscica_1.png" 
-                    alt="Nazaj" 
-                    className="h-16 w-16 object-contain"
-                  />
-                </CardTitle>
-              </CardHeader>
-            </Card>
-            
-            {matchingGameData.map(letterData => (
-              <GameCard 
-                key={letterData.letter}
-                letter={letterData.letter}
-                onClick={() => navigate(`/govorne-igre/povezi-pare-3-4/${letterData.letter.toLowerCase()}`)}
+              <path 
+                d="M19 12H5M12 19L5 12L12 5" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
               />
-            ))}
-          </div>
+            </svg>
+          </button>
+
+          {/* Instruction card */}
+          <Card className="flex-1 bg-gradient-to-r from-sky-50 to-green-50 border-dragon-green/30 shadow-md">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-xl md:text-2xl text-dragon-green">
+                <MessageSquare className="h-5 w-5 text-dragon-green" />
+                HEJ, {childName?.toUpperCase() || "TIAN"}!
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-2 flex items-center gap-4">
+              <div className="hidden sm:block w-20 h-20">
+                <img 
+                  src="/lovable-uploads/4377ec70-1996-47a9-bf05-8093cffcaf0b.png" 
+                  alt="Zmajček Tomi" 
+                  className="w-full h-full object-contain animate-bounce-gentle"
+                />
+              </div>
+              <div className="flex-1">
+                <p className="text-lg font-medium italic">IZBERI ČRKO IN POMAGAJ TOMIJU POVEZATI PARE. NA KONCU PA SKUPAJ GLASNO PONOVITA BESEDO!</p>
+                <p className="text-sm text-muted-foreground mt-2">Z VAJAMI POSTAJAMO VEDNO BOLJŠI!</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Letters grid/carousel */}
+        <div className="mb-12">
+          {isMobile ? (
+            /* Mobile: Horizontal scroll carousel */
+            <div className="overflow-hidden -mx-4" ref={emblaRef}>
+              <div className="flex gap-4 px-4">
+                {letterData.map(letter => (
+                  <div key={letter.letter} className="flex-[0_0_85%] min-w-0">
+                    <LetterCard letter={letter} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            /* Desktop: Grid layout */
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {letterData.map(letter => (
+                <LetterCard key={letter.letter} letter={letter} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
