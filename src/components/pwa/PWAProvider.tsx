@@ -1,5 +1,4 @@
 import { ReactNode } from 'react';
-import { InstallPrompt, DesktopInstallBanner } from './InstallPrompt';
 import { UpdatePrompt, UpdateNotification } from './UpdatePrompt';
 import { ManualInstallButton } from './ManualInstallButton';
 
@@ -12,9 +11,7 @@ export function PWAProvider({ children }: PWAProviderProps) {
     <>
       {children}
       
-      {/* PWA Install Prompts */}
-      <InstallPrompt />
-      <DesktopInstallBanner />
+      {/* PWA Install Prompts - Only ManualInstallButton for desktop */}
       <ManualInstallButton />
       
       {/* PWA Update Prompts */}
