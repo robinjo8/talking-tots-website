@@ -12,11 +12,11 @@ export const CallToActionSection = () => {
           {/* Dragon Image - shown first on mobile, right on desktop */}
           <div className="lg:order-last flex-shrink-0">
             <div className="relative w-44 h-44 md:w-52 md:h-52">
-              <div className="animate-float relative w-full h-full">
+              <div className="relative w-full h-full">
                 <img
                   alt="Tomi Talk Dragon Mascot"
                   className="w-full h-full object-contain"
-                  src="/lovable-uploads/b4fcf93f-c3f9-45bc-8e24-9bc2f838587a.png"
+                  src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_naslovna_1.png"
                 />
               </div>
             </div>
