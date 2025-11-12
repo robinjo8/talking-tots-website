@@ -11,7 +11,7 @@ export const CallToActionSection = () => {
         <div className="flex flex-col lg:flex-row items-center justify-center text-center lg:text-left gap-8 lg:gap-16">
           {/* Dragon Image - shown first on mobile, right on desktop */}
           <div className="lg:order-last flex-shrink-0">
-            <div className="relative w-44 h-44 md:w-52 md:h-52">
+            <div className="relative w-55 h-55 md:w-65 md:h-65">
               <div className="relative w-full h-full">
                 <img
                   alt="Tomi Talk Dragon Mascot"
