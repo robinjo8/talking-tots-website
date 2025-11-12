@@ -1,12 +1,14 @@
-const CACHE_NAME = 'tomitalk-v1.0.2';
-const CACHE_VERSION = 2;
+const CACHE_NAME = 'tomitalk-v1.0.3';
+const CACHE_VERSION = 3;
 
 // Essential files to cache for offline functionality
 const ESSENTIAL_CACHE = [
   '/',
-  '/manifest.json',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png',
+  '/manifest.json?v=6',
+  '/icons/icon-72x72.png?v=zmajcek3',
+  '/icons/icon-144x144.png?v=zmajcek3',
+  '/icons/icon-192x192.png?v=zmajcek3',
+  '/icons/icon-512x512.png?v=zmajcek3',
   // Add other essential assets
 ];
 
@@ -197,8 +199,8 @@ self.addEventListener('push', (event) => {
   
   const options = {
     body: 'Čas je za novo govorino vajo!',
-    icon: '/icons/icon-192x192.png',
-    badge: '/icons/icon-72x72.png',
+    icon: '/icons/icon-192x192.png?v=zmajcek3',
+    badge: '/icons/icon-72x72.png?v=zmajcek3',
     tag: 'speech-reminder',
     requireInteraction: true,
     actions: [

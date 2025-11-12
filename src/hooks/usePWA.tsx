@@ -16,6 +16,7 @@ interface PWAState {
   hasUpdate: boolean;
   isOnline: boolean;
   isIOSDevice: boolean;
+  isAndroidDevice: boolean;
   canInstall: boolean;
 }
 
@@ -36,6 +37,9 @@ export function usePWA(): PWAState & PWAActions {
 
   // Detect if running on iOS
   const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  
+  // Detect if running on Android
+  const isAndroidDevice = /Android/.test(navigator.userAgent);
   
   // Detect if running in standalone mode
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
@@ -210,6 +214,7 @@ export function usePWA(): PWAState & PWAActions {
     hasUpdate,
     isOnline,
     isIOSDevice,
+    isAndroidDevice,
     canInstall,
     // Actions
     promptInstall,

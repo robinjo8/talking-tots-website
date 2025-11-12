@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Smartphone, Share, X } from 'lucide-react';
+import { Download, Smartphone, Share, X, Menu } from 'lucide-react';
 import { usePWA, useIOSInstallInstructions } from '@/hooks/usePWA';
 import { Card, CardContent } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function ManualInstallButton() {
-  const { promptInstall, isInstalled, isIOSDevice, isInstallable } = usePWA();
+  const { promptInstall, isInstalled, isIOSDevice, isAndroidDevice, isInstallable } = usePWA();
   const { isInSafari, canShowInstructions } = useIOSInstallInstructions();
   const [showInstructions, setShowInstructions] = useState(false);
 
@@ -16,13 +16,11 @@ export function ManualInstallButton() {
   const handleInstallClick = async () => {
     if (isIOSDevice) {
       setShowInstructions(true);
+    } else if (isInstallable) {
+      await promptInstall();
     } else {
-      if (isInstallable) {
-        await promptInstall();
-      } else {
-        // Show message that browser doesn't support auto-install
-        alert('Vaš brskalnik ne podpira avtomatične namestitve. Prosimo, uporabite možnost "Dodaj na začetni zaslon" v meniju brskalnika.');
-      }
+      // Show Android instructions dialog if on Android, otherwise generic message
+      setShowInstructions(true);
     }
   };
 
@@ -45,7 +43,7 @@ export function ManualInstallButton() {
         </Button>
       </motion.div>
 
-      {/* iOS Install Instructions Modal */}
+      {/* Install Instructions Modal */}
       <AnimatePresence>
         {showInstructions && (
           <motion.div
@@ -70,7 +68,9 @@ export function ManualInstallButton() {
                       </div>
                       <div>
                         <h3 className="text-lg font-semibold">Namesti TomiTalk</h3>
-                        <p className="text-sm text-muted-foreground">iOS navodila</p>
+                        <p className="text-sm text-muted-foreground">
+                          {isIOSDevice ? 'iOS navodila' : 'Android navodila'}
+                        </p>
                       </div>
                     </div>
                     <Button
@@ -84,36 +84,73 @@ export function ManualInstallButton() {
                   </div>
 
                   <div className="space-y-4">
-                    <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
-                      <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-sm font-medium">1</span>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium mb-1">Pritisni gumb za deljenje</p>
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Share className="h-4 w-4" />
-                          <span className="text-xs">(spodaj na sredini)</span>
+                    {isIOSDevice ? (
+                      <>
+                        <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
+                          <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="text-sm font-medium">1</span>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium mb-1">Pritisni gumb za deljenje</p>
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Share className="h-4 w-4" />
+                              <span className="text-xs">(spodaj na sredini)</span>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
 
-                    <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
-                      <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-sm font-medium">2</span>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Izberi "Dodaj na začetni zaslon"</p>
-                      </div>
-                    </div>
+                        <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
+                          <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="text-sm font-medium">2</span>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">Izberi "Dodaj na začetni zaslon"</p>
+                          </div>
+                        </div>
 
-                    <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
-                      <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-sm font-medium">3</span>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Pritisni "Dodaj"</p>
-                      </div>
-                    </div>
+                        <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
+                          <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="text-sm font-medium">3</span>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">Pritisni "Dodaj"</p>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
+                          <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="text-sm font-medium">1</span>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium mb-1">Odpri meni brskalnika</p>
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Menu className="h-4 w-4" />
+                              <span className="text-xs">(zgoraj desno, tri pike)</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
+                          <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="text-sm font-medium">2</span>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">Izberi "Dodaj na začetni zaslon" ali "Namesti aplikacijo"</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
+                          <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="text-sm font-medium">3</span>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">Potrdi namestitev</p>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   <Button
