@@ -20,7 +20,7 @@ export const HeroSection = () => {
   const scrollToFeatures = () => {
     const learningSection = document.getElementById('learning-outcomes');
     if (learningSection) {
-      const headerHeight = 80; // Header height
+      const headerHeight = isMobile ? 64 : 80; // Different header height for mobile
       const elementPosition = learningSection.getBoundingClientRect().top + window.scrollY;
       const offsetPosition = elementPosition - headerHeight;
       
