@@ -11,11 +11,11 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(false);
-    }, 6000); // Extended to 6 seconds
+    }, 1000); // 1 second duration
 
     const completeTimer = setTimeout(() => {
       onComplete();
-    }, 6500); // Extra time for fade out animation
+    }, 1500); // Extra time for fade out animation
 
     return () => {
       clearTimeout(timer);
