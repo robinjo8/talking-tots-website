@@ -20,7 +20,14 @@ export const HeroSection = () => {
   const scrollToFeatures = () => {
     const learningSection = document.getElementById('learning-outcomes');
     if (learningSection) {
-      learningSection.scrollIntoView({ behavior: 'smooth' });
+      const headerHeight = 80; // Header height
+      const elementPosition = learningSection.getBoundingClientRect().top + window.scrollY;
+      const offsetPosition = elementPosition - headerHeight;
+      
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
     }
   };
 
