@@ -91,7 +91,12 @@ export function GamesList() {
               onClick={() => handleGameClick(game.path)}
             >
               {/* Card Image */}
-              <div className={`relative aspect-video overflow-hidden bg-gradient-to-br ${game.gradient}`}>
+              <div 
+                className="relative aspect-video overflow-hidden"
+                style={{
+                  background: 'radial-gradient(circle, rgb(255, 171, 0) 0%, rgb(234, 88, 12) 100%)'
+                }}
+              >
                 <div className="w-full h-full flex items-center justify-center">
                   <img 
                     src={game.image}
@@ -128,7 +133,12 @@ export function GamesList() {
                 className="bg-card rounded-xl shadow-md transition-all duration-300 overflow-hidden opacity-60 cursor-not-allowed"
               >
                 {/* Card Image */}
-                <div className={`relative aspect-video overflow-hidden bg-gradient-to-br ${game.gradient}`}>
+                <div 
+                  className="relative aspect-video overflow-hidden"
+                  style={{
+                    background: 'radial-gradient(circle, rgb(255, 171, 0) 0%, rgb(234, 88, 12) 100%)'
+                  }}
+                >
                   <div className="w-full h-full flex items-center justify-center">
                     {game.image ? (
                       <img 
