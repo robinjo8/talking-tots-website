@@ -35,7 +35,7 @@ export function ActivityOptions() {
       id: 'challenges',
       title: 'Moji izzivi',
       description: 'Priporočila pametnega asistenta.',
-      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_izzivi_5.png',
+      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/Zmajcek_izzivi_5.png',
       gradient: 'from-app-orange/20 to-app-yellow/20',
       badge: '⭐',
       url: '/moji-izzivi'
@@ -44,7 +44,7 @@ export function ActivityOptions() {
       id: 'video',
       title: 'Video navodila',
       description: 'Poglej kako logoped pravilno izgovori posamezne črke.',
-      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_video_5.png',
+      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/Zmajcek_video_5.png',
       gradient: 'from-app-teal/20 to-dragon-green/20',
       badge: '🎥',
       url: '/video-navodila'
