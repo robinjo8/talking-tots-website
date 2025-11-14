@@ -34,7 +34,7 @@ const otherGames = [
     description: "Drsne sestavljanke za vajo izgovorjave",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/drsna_4.png",
     gradient: "from-app-orange/20 to-app-yellow/20",
-    backgroundGradient: "radial-gradient(circle, rgb(252, 165, 165) 0%, rgb(127, 29, 29) 100%)",
+    backgroundGradient: "radial-gradient(circle, rgb(252, 165, 165) 0%, rgb(220, 38, 38) 100%)",
     path: "/govorne-igre/drsna-sestavljanka",
     available: true
   },
@@ -44,7 +44,7 @@ const otherGames = [
     description: "Poveži enake slike med stolpci",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/povezi_pare_4.png",
     gradient: "from-app-purple/20 to-app-blue/20",
-    backgroundGradient: "radial-gradient(circle, rgb(253, 224, 71) 0%, rgb(161, 98, 7) 100%)",
+    backgroundGradient: "radial-gradient(circle, rgb(253, 224, 71) 0%, rgb(234, 179, 8) 100%)",
     path: "/govorne-igre/igra-ujemanja",
     available: true
   },
