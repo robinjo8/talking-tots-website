@@ -17,7 +17,7 @@ export function ActivityOptions() {
       id: 'exercises',
       title: 'Govorne vaje',
       description: 'Prilagojene aktivnosti za izboljšanje izgovorjave.',
-      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_vaje_5.png',
+      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_vaje_6.png',
       gradient: 'from-app-blue/20 to-app-teal/20',
       badge: '📝',
       url: '/govorno-jezikovne-vaje'
@@ -35,7 +35,7 @@ export function ActivityOptions() {
       id: 'challenges',
       title: 'Moji izzivi',
       description: 'Priporočila pametnega asistenta.',
-      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_izzivi_4.png',
+      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_izzivi_5.png',
       gradient: 'from-app-orange/20 to-app-yellow/20',
       badge: '⭐',
       url: '/moji-izzivi'
@@ -44,7 +44,7 @@ export function ActivityOptions() {
       id: 'video',
       title: 'Video navodila',
       description: 'Poglej kako logoped pravilno izgovori posamezne črke.',
-      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_video_4.png',
+      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_video_5.png',
       gradient: 'from-app-teal/20 to-dragon-green/20',
       badge: '🎥',
       url: '/video-navodila'
