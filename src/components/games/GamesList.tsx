@@ -5,7 +5,7 @@ const otherGames = [
     id: "spomin",
     title: "SPOMIN",
     description: "Igraj spomin in vadi izgovorjavo",
-    image: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/spomin.png?t=${new Date().getTime()}`,
+    image: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/spomin_2.png?t=${new Date().getTime()}`,
     gradient: "from-app-purple/20 to-app-blue/20",
     path: "/govorne-igre/spomin",
     available: true
@@ -14,7 +14,7 @@ const otherGames = [
     id: "sestavljanke",
     title: "SESTAVLJANKE",
     description: "Igraj sestavljanke in vadi logično razmišljanje",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/sestavljanka.png",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/sestavljanka_2.png",
     gradient: "from-app-teal/20 to-dragon-green/20",
     path: "/govorne-igre/sestavljanke",
     available: true
@@ -31,7 +31,7 @@ const otherGames = [
     id: "drsna-sestavljanka",
     title: "DRSNA SESTAVLJANKA",
     description: "Drsne sestavljanke za vajo izgovorjave",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/drsna_sestavljanka.png",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/drsna_2.png",
     gradient: "from-app-orange/20 to-app-yellow/20",
     path: "/govorne-igre/drsna-sestavljanka",
     available: true
@@ -40,7 +40,7 @@ const otherGames = [
     id: "povezi-pare-matching",
     title: "IGRA UJEMANJA",
     description: "Poveži enake slike med stolpci",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/povezi_pare.png",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/povezi_pare_1.png",
     gradient: "from-app-purple/20 to-app-blue/20",
     path: "/govorne-igre/igra-ujemanja",
     available: true
