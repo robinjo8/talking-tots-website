@@ -7,7 +7,7 @@ const otherGames = [
     description: "Igraj spomin in vadi izgovorjavo",
     image: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/spomin_4.png?t=${new Date().getTime()}`,
     gradient: "from-app-purple/20 to-app-blue/20",
-    backgroundGradient: "radial-gradient(circle, rgb(147, 197, 253) 0%, rgb(30, 58, 138) 100%)",
+    backgroundGradient: "radial-gradient(circle, rgb(255, 171, 0) 0%, rgb(234, 88, 12) 100%)",
     path: "/govorne-igre/spomin",
     available: true
   },
@@ -17,6 +17,7 @@ const otherGames = [
     description: "Igraj sestavljanke in vadi logično razmišljanje",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/sestavljanka_4.png",
     gradient: "from-app-teal/20 to-dragon-green/20",
+    backgroundGradient: "radial-gradient(circle, rgb(255, 171, 0) 0%, rgb(234, 88, 12) 100%)",
     path: "/govorne-igre/sestavljanke",
     available: true
   },
@@ -34,7 +35,7 @@ const otherGames = [
     description: "Drsne sestavljanke za vajo izgovorjave",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/drsna_4.png",
     gradient: "from-app-orange/20 to-app-yellow/20",
-    backgroundGradient: "radial-gradient(circle, rgb(252, 165, 165) 0%, rgb(220, 38, 38) 100%)",
+    backgroundGradient: "radial-gradient(circle, rgb(255, 171, 0) 0%, rgb(234, 88, 12) 100%)",
     path: "/govorne-igre/drsna-sestavljanka",
     available: true
   },
@@ -44,7 +45,7 @@ const otherGames = [
     description: "Poveži enake slike med stolpci",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/povezi_pare_4.png",
     gradient: "from-app-purple/20 to-app-blue/20",
-    backgroundGradient: "radial-gradient(circle, rgb(253, 224, 71) 0%, rgb(234, 179, 8) 100%)",
+    backgroundGradient: "radial-gradient(circle, rgb(255, 171, 0) 0%, rgb(234, 88, 12) 100%)",
     path: "/govorne-igre/igra-ujemanja",
     available: true
   },
