@@ -7,6 +7,7 @@ const otherGames = [
     description: "Igraj spomin in vadi izgovorjavo",
     image: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/spomin_4.png?t=${new Date().getTime()}`,
     gradient: "from-app-purple/20 to-app-blue/20",
+    backgroundGradient: "radial-gradient(circle, rgb(30, 58, 138) 0%, rgb(147, 197, 253) 100%)",
     path: "/govorne-igre/spomin",
     available: true
   },
@@ -33,6 +34,7 @@ const otherGames = [
     description: "Drsne sestavljanke za vajo izgovorjave",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/drsna_4.png",
     gradient: "from-app-orange/20 to-app-yellow/20",
+    backgroundGradient: "radial-gradient(circle, rgb(127, 29, 29) 0%, rgb(252, 165, 165) 100%)",
     path: "/govorne-igre/drsna-sestavljanka",
     available: true
   },
@@ -42,6 +44,7 @@ const otherGames = [
     description: "Poveži enake slike med stolpci",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/povezi_pare_4.png",
     gradient: "from-app-purple/20 to-app-blue/20",
+    backgroundGradient: "radial-gradient(circle, rgb(161, 98, 7) 0%, rgb(253, 224, 71) 100%)",
     path: "/govorne-igre/igra-ujemanja",
     available: true
   },
@@ -94,7 +97,7 @@ export function GamesList() {
               <div 
                 className="relative aspect-video overflow-hidden"
                 style={{
-                  background: 'radial-gradient(circle, rgb(255, 171, 0) 0%, rgb(234, 88, 12) 100%)'
+                  background: game.backgroundGradient || 'radial-gradient(circle, rgb(255, 171, 0) 0%, rgb(234, 88, 12) 100%)'
                 }}
               >
                 <div className="w-full h-full flex items-center justify-center">
