@@ -169,6 +169,7 @@ import IgraUjemanjaŠ910 from "@/pages/IgraUjemanjaŠ910";
 import IgraUjemanjaZ910 from "@/pages/IgraUjemanjaZ910";
 import IgraUjemanjaŽ910 from "@/pages/IgraUjemanjaŽ910";
 import IgraUjemanjaČ910 from "@/pages/IgraUjemanjaČ910";
+import AdminRemoveBackground from "@/pages/AdminRemoveBackground";
 
 export function AppRoutes() {
   return (
@@ -1610,6 +1611,8 @@ export function AppRoutes() {
           <RazvojGovora />
         }
       />
+
+      <Route path="/admin/remove-background" element={<AdminRemoveBackground />} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>
