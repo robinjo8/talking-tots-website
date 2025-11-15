@@ -21,7 +21,7 @@ export const SequenceItem = ({
   onDrop
 }: SequenceItemProps) => {
   const [isDraggedOver, setIsDraggedOver] = useState(false);
-  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/memory-game/${image.image_url}`;
+  const imageUrl = image.image_url || '';
 
   const handleDragStart = (e: React.DragEvent) => {
     if (!isDraggable) return;
