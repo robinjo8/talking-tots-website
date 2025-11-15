@@ -95,8 +95,14 @@ export default function Zaporedja() {
   const handleCardClick = (game: typeof sequenceGames[0]) => {
     if (!game.available) return;
     
-    // TODO: Add navigation when we create individual letter pages
-    console.log(`Navigating to ${game.letter} sequence game`);
+    const letterMap: Record<string, string> = {
+      'C': '/govorne-igre/zaporedja/c'
+    };
+    
+    const path = letterMap[game.letter];
+    if (path) {
+      navigate(path);
+    }
   };
 
   const LetterCard = ({ game }: { game: typeof sequenceGames[0] }) => (
