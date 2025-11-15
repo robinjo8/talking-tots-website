@@ -70,13 +70,6 @@ export const SequenceItem = ({
         className="w-full h-full object-cover"
         draggable={false}
       />
-      {!isTarget && (
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
-          <p className="text-white text-center font-semibold text-sm">
-            {image.word}
-          </p>
-        </div>
-      )}
     </div>
   );
 };

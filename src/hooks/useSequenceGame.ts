@@ -40,6 +40,28 @@ export const useSequenceGame = (tableName: string, count: number = 4) => {
     return newArray;
   };
 
+  const shuffleUntilDifferent = (target: SequenceImage[], maxAttempts: number = 100): SequenceImage[] => {
+    let shuffled = shuffleArray([...target]);
+    let attempts = 0;
+    
+    // Keep shuffling until no item is in the same position
+    while (attempts < maxAttempts) {
+      const hasMatch = shuffled.some((item, index) => item.id === target[index]?.id);
+      if (!hasMatch) {
+        return shuffled;
+      }
+      shuffled = shuffleArray([...target]);
+      attempts++;
+    }
+    
+    // Fallback: manually swap first two items if still matching after max attempts
+    if (shuffled[0]?.id === target[0]?.id) {
+      [shuffled[0], shuffled[1]] = [shuffled[1], shuffled[0]];
+    }
+    
+    return shuffled;
+  };
+
   const initializeGame = useCallback(() => {
     if (!imagesData || imagesData.length < count) return;
 
@@ -48,7 +70,7 @@ export const useSequenceGame = (tableName: string, count: number = 4) => {
     const selected = shuffled.slice(0, count) as SequenceImage[];
 
     setTargetSequence(selected);
-    setCurrentSequence(shuffleArray([...selected]) as SequenceImage[]);
+    setCurrentSequence(shuffleUntilDifferent(selected));
     setIsComplete(false);
   }, [imagesData, count]);
 
