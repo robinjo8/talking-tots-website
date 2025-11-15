@@ -134,6 +134,7 @@ import MatchingGames5to6 from "@/pages/MatchingGames5to6";
 import MatchingGameLetter from "@/pages/MatchingGameLetter";
 import IgraUjemanja from "@/pages/IgraUjemanja";
 import Zaporedja from "@/pages/Zaporedja";
+import ZaporedjaC from "@/pages/ZaporedjaC";
 import IgraUjemanjaC from "@/pages/IgraUjemanjaC";
 import IgraUjemanjaC56 from "@/pages/IgraUjemanjaC56";
 import IgraUjemanjaC78 from "@/pages/IgraUjemanjaC78";
@@ -1193,6 +1194,14 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <Zaporedja />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/c"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaC />
           </ProtectedRoute>
         }
       />
