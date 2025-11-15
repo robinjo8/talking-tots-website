@@ -101,28 +101,27 @@ export default function Zaporedja() {
 
   const LetterCard = ({ game }: { game: typeof sequenceGames[0] }) => (
     <div
-      key={game.id}
+      className="bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group border border-gray-200"
       onClick={() => handleCardClick(game)}
-      className={`${
-        isMobile ? "embla__slide min-w-[280px] mr-4" : ""
-      } bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 ${
-        game.available ? "cursor-pointer" : "opacity-60 cursor-not-allowed"
-      } overflow-hidden group`}
     >
+      {/* Card Image */}
       <div className={`relative aspect-video overflow-hidden bg-gradient-to-br ${game.gradient}`}>
-        <div className="w-full h-full flex items-center justify-center p-4">
+        <div className="w-full h-full flex items-center justify-center">
           <img 
             src={game.image}
-            alt={game.letter}
+            alt={`Črka ${game.letter}`}
             className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+            style={{ mixBlendMode: 'multiply' }}
           />
         </div>
       </div>
+
+      {/* Card Content */}
       <div className="p-6">
-        <h3 className="text-2xl font-bold text-foreground mb-2 text-center group-hover:text-app-blue transition-colors">
-          {game.letter}
+        <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
+          Črka {game.letter}
         </h3>
-        <p className="text-sm text-muted-foreground text-center">
+        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
           {game.description}
         </p>
       </div>
@@ -133,43 +132,52 @@ export default function Zaporedja() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container max-w-6xl mx-auto pt-28 md:pt-32 pb-20 px-4">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
-            Zaporedja
-          </h1>
-          <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full mb-8"></div>
-        </div>
-
-        <Card className="bg-card/80 backdrop-blur-sm border-2 border-border/50 mb-12">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-xl text-foreground">
-              <MessageSquare className="w-5 h-5 text-app-blue" />
-              {childName ? `Pozdravljeni, ${childName}!` : 'Pozdravljeni!'}
+      <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
+        {/* Instruction speech-bubble */}
+        <Card className="mb-8 bg-gradient-to-r from-sky-50 to-green-50 border-dragon-green/30 shadow-md">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-xl md:text-2xl text-dragon-green">
+              <MessageSquare className="h-5 w-5 text-dragon-green" />
+              HEJ, {childName?.toUpperCase() || "TIAN"}!
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground leading-relaxed">
-              Izberi črko in igraj zaporedja - uredi slike v pravem vrstnem redu in vadi izgovorjavo.
-            </p>
+          <CardContent className="pt-2 flex items-center gap-4">
+            <div className="hidden sm:block w-20 h-20">
+              <img 
+                src="/lovable-uploads/4377ec70-1996-47a9-bf05-8093cffcaf0b.png" 
+                alt="Zmajček Tomi" 
+                className="w-full h-full object-contain animate-bounce-gentle"
+              />
+            </div>
+            <div className="flex-1">
+              <p className="text-lg font-medium italic">IZBERI ČRKO IN UREDI ZAPOREDJE SLIK!</p>
+              <p className="text-sm text-muted-foreground mt-2">Z VAJAMI POSTAJAMO VEDNO BOLJŠI!</p>
+            </div>
           </CardContent>
         </Card>
 
-        {isMobile ? (
-          <div className="embla overflow-hidden" ref={emblaRef}>
-            <div className="embla__container flex">
-              {sequenceGames.map((game) => (
+        {/* Letters grid/carousel */}
+        <div className="mb-12">
+          {isMobile ? (
+            /* Mobile: Horizontal scroll carousel */
+            <div className="overflow-hidden -mx-4" ref={emblaRef}>
+              <div className="flex gap-4 px-4">
+                {sequenceGames.map(game => (
+                  <div key={game.id} className="flex-[0_0_85%] min-w-0">
+                    <LetterCard game={game} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            /* Desktop: Grid layout */
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {sequenceGames.map(game => (
                 <LetterCard key={game.id} game={game} />
               ))}
             </div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {sequenceGames.map((game) => (
-              <LetterCard key={game.id} game={game} />
-            ))}
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
