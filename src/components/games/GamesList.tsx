@@ -24,10 +24,12 @@ const otherGames = [
   {
     id: "zaporedja",
     title: "ZAPOREDJA",
-    description: "Kmalu na voljo",
+    description: "Uredi zaporedje slik in vadi izgovorjavo",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/zaporedja.png",
     gradient: "from-app-purple/20 to-app-blue/20",
-    available: false
+    backgroundGradient: "radial-gradient(circle, rgb(255, 171, 0) 0%, rgb(234, 88, 12) 100%)",
+    path: "/govorne-igre/zaporedja",
+    available: true
   },
   {
     id: "drsna-sestavljanka",
