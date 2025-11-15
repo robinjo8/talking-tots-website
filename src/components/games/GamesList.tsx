@@ -6,7 +6,7 @@ const otherGames = [
     title: "SPOMIN",
     description: "Igraj spomin in vadi izgovorjavo",
     image: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/spomin_4.png?t=${new Date().getTime()}`,
-    gradient: "from-app-purple/20 to-app-blue/20",
+    gradient: "from-app-orange via-app-orange/60 to-app-orange/20",
     backgroundGradient: "radial-gradient(circle, rgb(255, 171, 0) 0%, rgb(234, 88, 12) 100%)",
     path: "/govorne-igre/spomin",
     available: true
