@@ -24,8 +24,15 @@ export default function ZaporedjaC() {
   const handleGameComplete = (images: any[]) => {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
-      setPlayedImages(images);
-      console.log(`Sequence game completed`);
+      // Transform SequenceImage to MatchingGameImage format
+      const transformedImages = images.map(img => ({
+        url: img.image_url || '',
+        word: img.word || '',
+        audio_url: img.audio_url || '',
+        filename: img.word?.toLowerCase() || ''
+      }));
+      setPlayedImages(transformedImages);
+      console.log(`Sequence game completed`, transformedImages);
       setShowCompletion(true);
     }
   };
