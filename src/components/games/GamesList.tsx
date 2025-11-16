@@ -52,11 +52,14 @@ const otherGames = [
     available: true
   },
   {
-    id: "igra8",
-    title: "Igra 8",
-    description: "Kmalu na voljo",
+    id: "labirint",
+    title: "LABIRINT",
+    description: "Poišči pot skozi labirint in vadi izgovorjavo",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/labirint_4.png",
     gradient: "from-app-orange/20 to-app-yellow/20",
-    available: false
+    backgroundGradient: "radial-gradient(circle, rgb(255, 171, 0) 0%, rgb(234, 88, 12) 100%)",
+    path: "/govorne-igre/labirint",
+    available: true
   },
   {
     id: "igra9",
