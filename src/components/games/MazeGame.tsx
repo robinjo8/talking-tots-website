@@ -43,6 +43,10 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // Enable high-quality image rendering
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
     // Draw maze walls
     ctx.strokeStyle = 'hsl(var(--primary))';
     ctx.lineWidth = WALL_WIDTH;
@@ -101,8 +105,13 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
     const playerY = playerPosition.y * CELL_SIZE + CELL_SIZE / 2;
     
     if (dragonImageRef.current) {
-      // Draw dragon image
-      const imgSize = CELL_SIZE * 0.8;
+      // Draw dragon image with high quality
+      const imgSize = CELL_SIZE * 1.2; // Larger size for better visibility
+      
+      // Save context state
+      ctx.save();
+      
+      // Draw with smooth scaling
       ctx.drawImage(
         dragonImageRef.current,
         playerX - imgSize / 2,
@@ -110,6 +119,9 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
         imgSize,
         imgSize
       );
+      
+      // Restore context state
+      ctx.restore();
     } else {
       // Fallback: Draw dragon circle with emoji
       ctx.fillStyle = 'hsl(var(--primary))';
