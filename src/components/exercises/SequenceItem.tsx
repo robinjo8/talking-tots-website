@@ -92,17 +92,18 @@ export const SequenceItem = ({
     
     // Create ghost element for mobile
     if (draggedElement.current && !ghostElement.current) {
+      const rect = draggedElement.current.getBoundingClientRect();
       const clone = draggedElement.current.cloneNode(true) as HTMLDivElement;
       clone.style.position = "fixed";
       clone.style.pointerEvents = "none";
       clone.style.zIndex = "9999";
       clone.style.opacity = "0.8";
-      clone.style.transform = "none";
+      clone.style.transform = "scale(0.85)";
       clone.style.transition = "none";
-      clone.style.width = `${draggedElement.current.offsetWidth}px`;
-      clone.style.height = `${draggedElement.current.offsetHeight}px`;
-      clone.style.left = `${touch.clientX - draggedElement.current.offsetWidth / 2}px`;
-      clone.style.top = `${touch.clientY - draggedElement.current.offsetHeight / 2}px`;
+      clone.style.width = `${rect.width}px`;
+      clone.style.height = `${rect.height}px`;
+      clone.style.left = `${touch.clientX - rect.width * 0.85 / 2}px`;
+      clone.style.top = `${touch.clientY - rect.height * 0.85 / 2}px`;
       document.body.appendChild(clone);
       ghostElement.current = clone;
     }
@@ -117,9 +118,10 @@ export const SequenceItem = ({
     const touch = e.touches[0];
     
     // Move ghost element
-    if (ghostElement.current) {
-      ghostElement.current.style.left = `${touch.clientX - ghostElement.current.offsetWidth / 2}px`;
-      ghostElement.current.style.top = `${touch.clientY - ghostElement.current.offsetHeight / 2}px`;
+    if (ghostElement.current && draggedElement.current) {
+      const rect = draggedElement.current.getBoundingClientRect();
+      ghostElement.current.style.left = `${touch.clientX - rect.width * 0.85 / 2}px`;
+      ghostElement.current.style.top = `${touch.clientY - rect.height * 0.85 / 2}px`;
     }
     
     // Highlight drop target
