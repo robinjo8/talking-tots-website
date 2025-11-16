@@ -109,86 +109,30 @@ const LabirintCContent = () => {
     }
   }, [effectiveFullscreen]);
 
-  return (
-    <>
-      {!effectiveFullscreen && (
-        <AppLayout>
-          <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
-            <Header />
-            
-            <div className="container mx-auto px-4 py-8">
-              <div className="flex justify-center gap-4 mb-6">
-                <MemoryExitConfirmationDialog onConfirm={confirmExit}>
-                  <Button variant="outline" className="gap-2">
-                    <ArrowLeft className="h-4 w-4" />
-                    Nazaj
-                  </Button>
-                </MemoryExitConfirmationDialog>
-                
-                <Button
-                  onClick={handleNewGame}
-                  className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
-                >
-                  <RotateCcw className="h-4 w-4" />
-                  Nova igra
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  onClick={handleInstructions}
-                  className="gap-2"
-                >
-                  <BookOpen className="h-4 w-4" />
-                  Navodila
-                </Button>
-              </div>
-
-              <Card className="shadow-lg">
-                <CardContent className="p-6">
-                  <MazeGame key={gameKey} onComplete={handleGameComplete} />
-                </CardContent>
-              </Card>
-            </div>
-
-            <InstructionsModal
-              isOpen={showInstructions}
-              onClose={() => setShowInstructions(false)}
-              type="maze"
-            />
-
-            {completionImage && (
-              <MatchingCompletionDialog
-                isOpen={showCompletion}
-                onClose={() => setShowCompletion(false)}
-                images={[completionImage]}
-                onStarClaimed={handleStarClaimed}
-                instructionText="BRAVO! Prišel si do cilja. Sedaj klikni na sliko in ponovi besedo."
-                autoPlayAudio={true}
-              />
-            )}
-          </div>
-        </AppLayout>
-      )}
-
-      {effectiveFullscreen && (
-        <div className="min-h-screen bg-gradient-to-b from-background to-background/80 flex flex-col">
-          <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-3 bg-background/95 backdrop-blur-sm border-b">
+  // Mobile fullscreen version
+  if (effectiveFullscreen) {
+    return (
+      <div className="fixed inset-0 bg-background overflow-hidden select-none">
+        <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
+          <div className="flex items-center justify-between gap-2">
             <MemoryExitConfirmationDialog onConfirm={confirmExit}>
-              <Button size="sm" variant="outline" className="gap-2">
-                <ArrowLeft className="w-4 h-4" />
+              <Button size="sm" variant="outline" className="gap-1 text-xs h-8">
+                <ArrowLeft className="w-3 h-3" />
                 Nazaj
               </Button>
             </MemoryExitConfirmationDialog>
             
-            <h1 className="text-xl font-bold text-foreground">Labirint - C</h1>
+            <h1 className="text-base font-bold text-foreground flex-1 text-center">
+              Labirint - C
+            </h1>
             
-            <div className="flex gap-2">
+            <div className="flex gap-1">
               <Button
                 size="sm"
                 onClick={handleNewGame}
-                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
+                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-1 text-xs h-8"
               >
-                <RotateCcw className="w-4 h-4" />
+                <RotateCcw className="w-3 h-3" />
                 Nova
               </Button>
               
@@ -196,36 +140,92 @@ const LabirintCContent = () => {
                 size="sm"
                 variant="outline"
                 onClick={handleInstructions}
-                className="gap-2"
+                className="gap-1 text-xs h-8"
               >
-                <BookOpen className="w-4 h-4" />
+                <BookOpen className="w-3 h-3" />
               </Button>
             </div>
           </div>
-
-          <div className="flex-1 flex items-center justify-center pt-16 px-4">
-            <MazeGame key={gameKey} onComplete={handleGameComplete} />
-          </div>
-
-          <InstructionsModal
-            isOpen={showInstructions}
-            onClose={() => setShowInstructions(false)}
-            type="maze"
-          />
-
-          {completionImage && (
-            <MatchingCompletionDialog
-              isOpen={showCompletion}
-              onClose={() => setShowCompletion(false)}
-              images={[completionImage]}
-              onStarClaimed={handleStarClaimed}
-              instructionText="BRAVO! Prišel si do cilja. Sedaj klikni na sliko in ponovi besedo."
-              autoPlayAudio={true}
-            />
-          )}
         </div>
+
+        <div className="flex-1 overflow-hidden">
+          <MazeGame key={gameKey} onComplete={handleGameComplete} />
+        </div>
+
+        <InstructionsModal
+          isOpen={showInstructions}
+          onClose={() => setShowInstructions(false)}
+          type="maze"
+        />
+
+        {completionImage && (
+          <MatchingCompletionDialog
+            isOpen={showCompletion}
+            onClose={() => setShowCompletion(false)}
+            images={[completionImage]}
+            onStarClaimed={handleStarClaimed}
+            instructionText="BRAVO! Prišel si do cilja. Sedaj klikni na sliko in ponovi besedo."
+            autoPlayAudio={true}
+          />
+        )}
+      </div>
+    );
+  }
+
+  // Desktop version
+  return (
+    <AppLayout>
+      <div className="flex justify-center gap-4 p-4">
+        <MemoryExitConfirmationDialog onConfirm={confirmExit}>
+          <Button variant="outline" className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Nazaj
+          </Button>
+        </MemoryExitConfirmationDialog>
+        
+        <Button
+          onClick={handleNewGame}
+          className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
+        >
+          <RotateCcw className="h-4 w-4" />
+          Nova igra
+        </Button>
+        
+        <Button
+          variant="outline"
+          onClick={handleInstructions}
+          className="gap-2"
+        >
+          <BookOpen className="h-4 w-4" />
+          Navodila
+        </Button>
+      </div>
+
+      <div className="container mx-auto px-4">
+        <Card className="shadow-lg">
+          <CardContent className="p-6">
+            <MazeGame key={gameKey} onComplete={handleGameComplete} />
+          </CardContent>
+        </Card>
+      </div>
+
+      <InstructionsModal
+        isOpen={showInstructions}
+        onClose={() => setShowInstructions(false)}
+        type="maze"
+      />
+
+      {completionImage && (
+        <MatchingCompletionDialog
+          isOpen={showCompletion}
+          onClose={() => setShowCompletion(false)}
+          images={[completionImage]}
+          onStarClaimed={handleStarClaimed}
+          instructionText="BRAVO! Prišel si do cilja. Sedaj klikni na sliko in ponovi besedo."
+          autoPlayAudio={true}
+        />
       )}
-    </>
+    </AppLayout>
   );
 };
 
