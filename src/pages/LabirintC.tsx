@@ -115,6 +115,12 @@ const LabirintCContent = () => {
       <div className="fixed inset-0 bg-background overflow-hidden select-none">
         <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
           <div className="flex items-center justify-between gap-2">
+            <h1 className="text-base font-bold text-foreground flex-1 text-center">
+              Labirint - C
+            </h1>
+          </div>
+          
+          <div className="flex justify-center gap-2 mt-2">
             <MemoryExitConfirmationDialog onConfirm={confirmExit}>
               <Button size="sm" variant="outline" className="gap-1 text-xs h-8">
                 <ArrowLeft className="w-3 h-3" />
@@ -122,29 +128,24 @@ const LabirintCContent = () => {
               </Button>
             </MemoryExitConfirmationDialog>
             
-            <h1 className="text-base font-bold text-foreground flex-1 text-center">
-              Labirint - C
-            </h1>
+            <Button
+              size="sm"
+              onClick={handleNewGame}
+              className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-1 text-xs h-8"
+            >
+              <RotateCcw className="w-3 h-3" />
+              Nova igra
+            </Button>
             
-            <div className="flex gap-1">
-              <Button
-                size="sm"
-                onClick={handleNewGame}
-                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-1 text-xs h-8"
-              >
-                <RotateCcw className="w-3 h-3" />
-                Nova
-              </Button>
-              
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleInstructions}
-                className="gap-1 text-xs h-8"
-              >
-                <BookOpen className="w-3 h-3" />
-              </Button>
-            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleInstructions}
+              className="gap-1 text-xs h-8"
+            >
+              <BookOpen className="w-3 h-3" />
+              Navodila
+            </Button>
           </div>
         </div>
 
