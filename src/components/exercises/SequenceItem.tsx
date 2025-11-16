@@ -96,8 +96,8 @@ export const SequenceItem = ({
       clone.style.position = "fixed";
       clone.style.pointerEvents = "none";
       clone.style.zIndex = "9999";
-      clone.style.opacity = "0.7";
-      clone.style.transform = "scale(1.1) rotate(3deg)";
+      clone.style.opacity = "0.8";
+      clone.style.transform = "none";
       clone.style.transition = "none";
       clone.style.width = `${draggedElement.current.offsetWidth}px`;
       clone.style.height = `${draggedElement.current.offsetHeight}px`;
@@ -209,11 +209,7 @@ export const SequenceItem = ({
       
       {/* Drop zone indicator */}
       {isDraggedOver && !isTarget && !isDragging && (
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/60 to-primary/40 backdrop-blur-sm flex items-center justify-center rounded-xl border-4 border-primary animate-pulse">
-          <div className="bg-white/90 px-4 py-2 rounded-lg shadow-lg">
-            <span className="text-primary text-lg font-bold">↓ Spusti tukaj ↓</span>
-          </div>
-        </div>
+        <div className="absolute inset-0 rounded-xl border-4 border-primary bg-primary/10" />
       )}
       
       {/* Dragging indicator */}
