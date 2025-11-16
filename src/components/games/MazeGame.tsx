@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useMazeGame } from '@/hooks/useMazeGame';
 import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,22 +12,28 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const dragonImageRef = useRef<HTMLImageElement | null>(null);
+  const [dragonImageLoaded, setDragonImageLoaded] = useState(false);
 
   const CELL_SIZE = 40;
   const WALL_WIDTH = 3;
 
-  // Load dragon image
+  // Load dragon image from Supabase
   useEffect(() => {
     const img = new Image();
-    img.src = '/lovable-uploads/Zmajcek_glava.png';
+    img.src = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_glava-removebg-preview%20(1).png';
     img.onload = () => {
       dragonImageRef.current = img;
+      setDragonImageLoaded(true);
+    };
+    img.onerror = () => {
+      console.error('Failed to load dragon image');
+      setDragonImageLoaded(true); // Still allow game to continue with fallback
     };
   }, []);
 
   // Draw maze
   useEffect(() => {
-    if (!canvasRef.current || !maze.length || isGenerating) return;
+    if (!canvasRef.current || !maze.length || isGenerating || !dragonImageLoaded) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -115,7 +121,7 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
       ctx.fillText('🐲', playerX, playerY);
     }
 
-  }, [maze, playerPosition, COLS, ROWS, isGenerating]);
+  }, [maze, playerPosition, COLS, ROWS, isGenerating, dragonImageLoaded]);
 
   // Trigger completion callback
   useEffect(() => {
