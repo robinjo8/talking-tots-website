@@ -11,9 +11,19 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
   const { maze, playerPosition, isCompleted, isGenerating, movePlayer, COLS, ROWS } = useMazeGame();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const dragonImageRef = useRef<HTMLImageElement | null>(null);
 
   const CELL_SIZE = 40;
   const WALL_WIDTH = 3;
+
+  // Load dragon image
+  useEffect(() => {
+    const img = new Image();
+    img.src = '/lovable-uploads/Zmajcek_glava.png';
+    img.onload = () => {
+      dragonImageRef.current = img;
+    };
+  }, []);
 
   // Draw maze
   useEffect(() => {
@@ -62,37 +72,48 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
       });
     });
 
-    // Draw start (green)
-    ctx.fillStyle = 'hsl(var(--success))';
-    ctx.fillRect(2, 2, CELL_SIZE - 4, CELL_SIZE - 4);
+    // Draw start (green) - 2 cells wide
+    ctx.fillStyle = '#22c55e';
+    ctx.fillRect(2, 2, CELL_SIZE * 2 - 4, CELL_SIZE - 4);
     ctx.fillStyle = 'white';
     ctx.font = 'bold 14px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('START', CELL_SIZE / 2, CELL_SIZE / 2);
+    ctx.fillText('START', CELL_SIZE, CELL_SIZE / 2);
 
-    // Draw goal (gold)
-    const goalX = (COLS - 1) * CELL_SIZE;
+    // Draw goal (orange) - 2 cells wide at bottom right
+    const goalX = (COLS - 2) * CELL_SIZE;
     const goalY = (ROWS - 1) * CELL_SIZE;
-    ctx.fillStyle = 'hsl(var(--warning))';
-    ctx.fillRect(goalX + 2, goalY + 2, CELL_SIZE - 4, CELL_SIZE - 4);
+    ctx.fillStyle = '#f97316';
+    ctx.fillRect(goalX + 2, goalY + 2, CELL_SIZE * 2 - 4, CELL_SIZE - 4);
     ctx.fillStyle = 'white';
-    ctx.fillText('CILJ', goalX + CELL_SIZE / 2, goalY + CELL_SIZE / 2);
+    ctx.fillText('CILJ', goalX + CELL_SIZE, goalY + CELL_SIZE / 2);
 
     // Draw player (dragon)
     const playerX = playerPosition.x * CELL_SIZE + CELL_SIZE / 2;
     const playerY = playerPosition.y * CELL_SIZE + CELL_SIZE / 2;
     
-    // Draw dragon circle
-    ctx.fillStyle = 'hsl(var(--primary))';
-    ctx.beginPath();
-    ctx.arc(playerX, playerY, CELL_SIZE / 3, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Draw dragon emoji/text
-    ctx.fillStyle = 'white';
-    ctx.font = 'bold 20px sans-serif';
-    ctx.fillText('🐲', playerX, playerY);
+    if (dragonImageRef.current) {
+      // Draw dragon image
+      const imgSize = CELL_SIZE * 0.8;
+      ctx.drawImage(
+        dragonImageRef.current,
+        playerX - imgSize / 2,
+        playerY - imgSize / 2,
+        imgSize,
+        imgSize
+      );
+    } else {
+      // Fallback: Draw dragon circle with emoji
+      ctx.fillStyle = 'hsl(var(--primary))';
+      ctx.beginPath();
+      ctx.arc(playerX, playerY, CELL_SIZE / 3, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.fillStyle = 'white';
+      ctx.font = 'bold 20px sans-serif';
+      ctx.fillText('🐲', playerX, playerY);
+    }
 
   }, [maze, playerPosition, COLS, ROWS, isGenerating]);
 
@@ -139,6 +160,22 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [movePlayer]);
+
+  // Prevent pull-to-refresh on mobile
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const preventRefresh = (e: TouchEvent) => {
+      e.preventDefault();
+    };
+    
+    canvas.addEventListener('touchmove', preventRefresh, { passive: false });
+    
+    return () => {
+      canvas.removeEventListener('touchmove', preventRefresh);
+    };
+  }, []);
 
   // Touch/swipe controls
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -192,6 +229,7 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
           width={COLS * 40}
           height={ROWS * 40}
           className="bg-background"
+          style={{ touchAction: 'none' }}
         />
       </div>
 

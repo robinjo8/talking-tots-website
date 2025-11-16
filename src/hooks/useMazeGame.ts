@@ -96,6 +96,53 @@ export const useMazeGame = () => {
       }
     }
 
+    // Add 1-2 dead ends to make the maze more interesting
+    const addDeadEnds = (grid: Cell[][]): void => {
+      const deadEndsToAdd = 1 + Math.floor(Math.random() * 2);
+      let deadEndsAdded = 0;
+      
+      for (let y = 1; y < ROWS - 1 && deadEndsAdded < deadEndsToAdd; y++) {
+        for (let x = 1; x < COLS - 1 && deadEndsAdded < deadEndsToAdd; x++) {
+          const cell = grid[y][x];
+          const openings = [
+            !cell.walls.top, !cell.walls.right, 
+            !cell.walls.bottom, !cell.walls.left
+          ].filter(Boolean).length;
+          
+          // If cell has only 1 opening, try to create a dead end branch
+          if (openings === 1 && Math.random() > 0.7) {
+            const directions: Array<{ dir: keyof Cell['walls'], dx: number, dy: number }> = [
+              { dir: 'top', dx: 0, dy: -1 },
+              { dir: 'right', dx: 1, dy: 0 },
+              { dir: 'bottom', dx: 0, dy: 1 },
+              { dir: 'left', dx: -1, dy: 0 }
+            ];
+            
+            const closedWalls = directions.filter(d => cell.walls[d.dir]);
+            if (closedWalls.length > 0) {
+              const randomWall = closedWalls[Math.floor(Math.random() * closedWalls.length)];
+              const nextX = x + randomWall.dx;
+              const nextY = y + randomWall.dy;
+              
+              // Check bounds
+              if (nextX >= 0 && nextX < COLS && nextY >= 0 && nextY < ROWS) {
+                // Open the walls
+                cell.walls[randomWall.dir] = false;
+                const oppositeDir = 
+                  randomWall.dir === 'top' ? 'bottom' :
+                  randomWall.dir === 'bottom' ? 'top' :
+                  randomWall.dir === 'left' ? 'right' : 'left';
+                grid[nextY][nextX].walls[oppositeDir] = false;
+                deadEndsAdded++;
+              }
+            }
+          }
+        }
+      }
+    };
+
+    addDeadEnds(grid);
+
     setMaze(grid);
     setPlayerPosition({ x: 0, y: 0 });
     setIsCompleted(false);
@@ -161,8 +208,8 @@ export const useMazeGame = () => {
           canMove = false; // Stop at intersection
         }
 
-        // Check if reached goal
-        if (nextPos.x === COLS - 1 && nextPos.y === ROWS - 1) {
+        // Check if reached goal (last 2 cells in bottom row)
+        if (nextPos.y === ROWS - 1 && (nextPos.x === COLS - 1 || nextPos.x === COLS - 2)) {
           setIsCompleted(true);
           canMove = false;
         }
