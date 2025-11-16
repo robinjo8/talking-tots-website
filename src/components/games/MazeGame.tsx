@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useMazeGame } from '@/hooks/useMazeGame';
 import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import dragonHead from '@/assets/zmajcek-glava-hq.png';
+import dragonHead from '@/assets/zmajcek-glava-transparent.png';
 
 interface MazeGameProps {
   onComplete: () => void;
