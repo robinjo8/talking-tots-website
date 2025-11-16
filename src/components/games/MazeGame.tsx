@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useMazeGame } from '@/hooks/useMazeGame';
 import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import dragonHead from '@/assets/zmajcek-glava.png';
 
 interface MazeGameProps {
   onComplete: () => void;
@@ -17,10 +18,10 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
   const CELL_SIZE = 40;
   const WALL_WIDTH = 3;
 
-  // Load dragon image from Supabase
+  // Load dragon image
   useEffect(() => {
     const img = new Image();
-    img.src = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_glava-removebg-preview%20(1).png';
+    img.src = dragonHead;
     img.onload = () => {
       dragonImageRef.current = img;
       setDragonImageLoaded(true);
