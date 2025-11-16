@@ -68,7 +68,13 @@ export const SequenceItem = ({
     onDragOver?.(index);
   };
 
-  const handleDragLeave = () => {
+  const handleDragLeave = (e: React.DragEvent) => {
+    // Preveri, ali res zapuščamo element ali smo samo prešli čez notranje elemente
+    const relatedTarget = e.relatedTarget as Node;
+    if (draggedElement.current && relatedTarget && draggedElement.current.contains(relatedTarget)) {
+      // Še vedno smo znotraj elementa, ne resetiraj
+      return;
+    }
     setIsDraggedOver(false);
   };
 
