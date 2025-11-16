@@ -45,13 +45,15 @@ export const SequenceItem = ({
     
     // Create custom drag image
     if (draggedElement.current) {
+      const rect = draggedElement.current.getBoundingClientRect();
       const clone = draggedElement.current.cloneNode(true) as HTMLElement;
       clone.style.opacity = "0.8";
-      clone.style.transform = "rotate(5deg)";
       clone.style.position = "absolute";
       clone.style.top = "-9999px";
+      clone.style.width = `${rect.width}px`;
+      clone.style.height = `${rect.height}px`;
       document.body.appendChild(clone);
-      e.dataTransfer.setDragImage(clone, 50, 50);
+      e.dataTransfer.setDragImage(clone, rect.width / 2, rect.height / 2);
       setTimeout(() => document.body.removeChild(clone), 0);
     }
     
