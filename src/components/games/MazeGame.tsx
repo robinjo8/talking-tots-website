@@ -116,8 +116,8 @@ const PADDING = 20; // White border around maze
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
-    // Fill entire canvas with cyan/blue background
-    ctx.fillStyle = '#06b6d4'; // Blue background
+    // Fill entire canvas with cyan/blue background (same as walls)
+    ctx.fillStyle = '#0ea5e9'; // Same blue as walls
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Fill inner area with white (maze area with padding)
@@ -317,9 +317,9 @@ const PADDING = 20; // White border around maze
   return (
     <div className="flex flex-col items-center gap-6 py-4">
       <div 
-        className="relative bg-white rounded-lg shadow-2xl border-8 border-white"
+        className="relative bg-white rounded-lg shadow-2xl border-8 border-[#0ea5e9]"
         style={{ 
-          boxShadow: '0 10px 30px rgba(0,0,0,0.3), 0 0 0 8px white',
+          boxShadow: '0 10px 30px rgba(0,0,0,0.3), 0 0 0 8px #0ea5e9',
         }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
