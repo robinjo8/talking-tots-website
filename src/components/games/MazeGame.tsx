@@ -115,12 +115,22 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
-    // Fill all cells with white background (maze paths)
-    ctx.fillStyle = 'white';
+    // Fill canvas with light green background first
+    ctx.fillStyle = '#86efac'; // Light green
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    // Draw white background only for each maze cell (path)
+    ctx.fillStyle = 'white';
+    maze.forEach((row, y) => {
+      row.forEach((cell, x) => {
+        const startX = x * CELL_SIZE;
+        const startY = y * CELL_SIZE;
+        ctx.fillRect(startX + 1, startY + 1, CELL_SIZE - 2, CELL_SIZE - 2);
+      });
+    });
+
     // Draw maze walls
-    ctx.strokeStyle = '#1e40af'; // Dark blue
+    ctx.strokeStyle = '#0ea5e9'; // Cyan/light blue
     ctx.lineWidth = WALL_WIDTH;
 
     maze.forEach((row, y) => {
@@ -300,7 +310,7 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
   return (
     <div className="flex flex-col items-center gap-6 py-4">
       <div 
-        className="relative border-4 border-[#1e40af] rounded-lg shadow-lg"
+        className="relative border-4 border-[#0ea5e9] rounded-lg shadow-lg"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
@@ -308,7 +318,6 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
           ref={canvasRef}
           width={COLS * 40}
           height={ROWS * 40}
-          className="bg-[#86efac]"
           style={{ touchAction: 'none' }}
         />
       </div>
