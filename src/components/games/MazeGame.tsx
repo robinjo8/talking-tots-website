@@ -68,8 +68,9 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
   const [dragonImageLoaded, setDragonImageLoaded] = useState(false);
   const [glowIntensity, setGlowIntensity] = useState(0.3);
 
-  const CELL_SIZE = 40;
-  const WALL_WIDTH = 6;
+const CELL_SIZE = 40;
+const WALL_WIDTH = 10;
+const PADDING = 20; // White border around maze
 
   // Load dragon image
   useEffect(() => {
@@ -115,28 +116,34 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
-    // Fill canvas with light green background first
-    ctx.fillStyle = '#86efac'; // Light green
+    // Fill entire canvas with cyan/blue background
+    ctx.fillStyle = '#06b6d4'; // Blue background
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Fill inner area with white (maze area with padding)
+    ctx.fillStyle = 'white';
+    ctx.fillRect(PADDING, PADDING, canvas.width - PADDING * 2, canvas.height - PADDING * 2);
 
     // Draw white background only for each maze cell (path)
     ctx.fillStyle = 'white';
     maze.forEach((row, y) => {
       row.forEach((cell, x) => {
-        const startX = x * CELL_SIZE;
-        const startY = y * CELL_SIZE;
+        const startX = x * CELL_SIZE + PADDING;
+        const startY = y * CELL_SIZE + PADDING;
         ctx.fillRect(startX + 1, startY + 1, CELL_SIZE - 2, CELL_SIZE - 2);
       });
     });
 
     // Draw maze walls
     ctx.strokeStyle = '#0ea5e9'; // Cyan/light blue
+    ctx.lineJoin = 'round'; // Rounded corners at joints
+    ctx.lineCap = 'round';  // Rounded corners at ends
     ctx.lineWidth = WALL_WIDTH;
 
     maze.forEach((row, y) => {
       row.forEach((cell, x) => {
-        const startX = x * CELL_SIZE;
-        const startY = y * CELL_SIZE;
+        const startX = x * CELL_SIZE + PADDING;
+        const startY = y * CELL_SIZE + PADDING;
 
         if (cell.walls.top) {
           ctx.beginPath();
@@ -166,14 +173,14 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
     });
 
     // Draw glowing star at goal (center of 2-cell goal)
-    const goalX = (COLS - 1.5) * CELL_SIZE;
-    const goalY = (ROWS - 1) * CELL_SIZE + CELL_SIZE / 2;
+    const goalX = (COLS - 1.5) * CELL_SIZE + PADDING;
+    const goalY = (ROWS - 1) * CELL_SIZE + CELL_SIZE / 2 + PADDING;
 
     drawStar(ctx, goalX, goalY, 5, CELL_SIZE / 3, CELL_SIZE / 6, glowIntensity);
 
     // Draw player (dragon)
-    const playerX = playerPosition.x * CELL_SIZE + CELL_SIZE / 2;
-    const playerY = playerPosition.y * CELL_SIZE + CELL_SIZE / 2;
+    const playerX = playerPosition.x * CELL_SIZE + CELL_SIZE / 2 + PADDING;
+    const playerY = playerPosition.y * CELL_SIZE + CELL_SIZE / 2 + PADDING;
     
     if (dragonImageRef.current) {
       // Draw dragon image with high quality
@@ -310,14 +317,17 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
   return (
     <div className="flex flex-col items-center gap-6 py-4">
       <div 
-        className="relative border-4 border-[#0ea5e9] rounded-lg shadow-lg"
+        className="relative bg-white rounded-lg shadow-2xl border-8 border-white"
+        style={{ 
+          boxShadow: '0 10px 30px rgba(0,0,0,0.3), 0 0 0 8px white',
+        }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
         <canvas
           ref={canvasRef}
-          width={COLS * 40}
-          height={ROWS * 40}
+          width={COLS * 40 + PADDING * 2}
+          height={ROWS * 40 + PADDING * 2}
           style={{ touchAction: 'none' }}
         />
       </div>
