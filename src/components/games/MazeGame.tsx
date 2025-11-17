@@ -70,6 +70,9 @@ export const MazeGame = ({ onComplete, cols, rows }: MazeGameProps) => {
   const [dragonImageLoaded, setDragonImageLoaded] = useState(false);
   const [glowIntensity, setGlowIntensity] = useState(0.3);
 
+const WALL_WIDTH = 8;
+const PADDING = 15; // White border around maze
+
 // Calculate cell size based on available space and maze dimensions
 const calculateCellSize = () => {
   const maxWidth = typeof window !== 'undefined' ? window.innerWidth - 40 : 800;
@@ -82,8 +85,6 @@ const calculateCellSize = () => {
 };
 
 const CELL_SIZE = calculateCellSize();
-const WALL_WIDTH = 8;
-const PADDING = 15; // White border around maze
 
   // Load dragon image
   useEffect(() => {
