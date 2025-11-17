@@ -76,12 +76,13 @@ const PADDING = 15; // White border around maze
 // Calculate cell size based on available space and maze dimensions
 const calculateCellSize = () => {
   const maxWidth = typeof window !== 'undefined' ? window.innerWidth - 40 : 800;
-  const maxHeight = typeof window !== 'undefined' ? window.innerHeight - 180 : 600;
+  const maxHeight = typeof window !== 'undefined' ? window.innerHeight - 120 : 600;
   
   const cellSizeByWidth = Math.floor((maxWidth - PADDING * 2) / COLS);
   const cellSizeByHeight = Math.floor((maxHeight - PADDING * 2) / ROWS);
   
-  return Math.min(cellSizeByWidth, cellSizeByHeight);
+  // Use the dimension that better fits the screen
+  return Math.min(cellSizeByWidth, cellSizeByHeight, 50); // Max 50px per cell for readability
 };
 
 const CELL_SIZE = calculateCellSize();
@@ -329,21 +330,19 @@ const CELL_SIZE = calculateCellSize();
   }
 
   return (
-    <div className="flex flex-col items-center gap-6 py-4 w-full h-full justify-center">
+    <div className="flex flex-col items-center gap-4 w-full h-full justify-center p-2">
       <div 
         className="relative bg-white rounded-lg shadow-2xl border-8 border-[#0ea5e9]"
         style={{ 
           boxShadow: '0 10px 30px rgba(0,0,0,0.3), 0 0 0 8px #0ea5e9',
-          maxWidth: '100%',
-          maxHeight: '100%',
         }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
         <canvas
           ref={canvasRef}
-          width={COLS * 40 + PADDING * 2}
-          height={ROWS * 40 + PADDING * 2}
+          width={COLS * CELL_SIZE + PADDING * 2}
+          height={ROWS * CELL_SIZE + PADDING * 2}
           style={{ touchAction: 'none' }}
         />
       </div>
