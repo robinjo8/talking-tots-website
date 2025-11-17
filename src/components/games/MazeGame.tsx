@@ -8,23 +8,27 @@ interface MazeGameProps {
   onComplete: () => void;
 }
 
-// Helper function to draw a star
+// Helper function to draw a star with glow
 const drawStar = (
   ctx: CanvasRenderingContext2D,
   cx: number,
   cy: number,
   spikes: number,
   outerRadius: number,
-  innerRadius: number
+  innerRadius: number,
+  glowIntensity: number
 ) => {
-  ctx.fillStyle = '#fbbf24'; // Golden yellow color
-  ctx.strokeStyle = '#f59e0b'; // Darker yellow border
-  ctx.lineWidth = 2;
-  
   let rot = (Math.PI / 2) * 3;
   let x = cx;
   let y = cy;
   const step = Math.PI / spikes;
+
+  // Draw glow (orange shadow)
+  ctx.save();
+  ctx.shadowColor = `rgba(249, 115, 22, ${glowIntensity})`; // Orange glow
+  ctx.shadowBlur = 20 * glowIntensity;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
 
   ctx.beginPath();
   ctx.moveTo(cx, cy - outerRadius);
@@ -43,7 +47,16 @@ const drawStar = (
   
   ctx.lineTo(cx, cy - outerRadius);
   ctx.closePath();
+  
+  // Fill with golden yellow
+  ctx.fillStyle = '#fbbf24';
   ctx.fill();
+  
+  ctx.restore();
+  
+  // Draw border (orange, pulsing with glow)
+  ctx.strokeStyle = `rgba(249, 115, 22, ${0.5 + glowIntensity * 0.5})`;
+  ctx.lineWidth = 2;
   ctx.stroke();
 };
 
@@ -53,7 +66,7 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const dragonImageRef = useRef<HTMLImageElement | null>(null);
   const [dragonImageLoaded, setDragonImageLoaded] = useState(false);
-  const [starScale, setStarScale] = useState(1);
+  const [glowIntensity, setGlowIntensity] = useState(0.3);
 
   const CELL_SIZE = 40;
   const WALL_WIDTH = 6;
@@ -72,11 +85,17 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
     };
   }, []);
 
-  // Animation effect for blinking star
+  // Animation effect for glowing star
   useEffect(() => {
+    let direction = 1;
     const interval = setInterval(() => {
-      setStarScale(prev => prev === 1 ? 1.3 : 1);
-    }, 500);
+      setGlowIntensity(prev => {
+        const next = prev + (0.02 * direction);
+        if (next >= 1) direction = -1;
+        if (next <= 0.3) direction = 1;
+        return next;
+      });
+    }, 50);
     
     return () => clearInterval(interval);
   }, []);
@@ -101,7 +120,7 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Draw maze walls
-    ctx.strokeStyle = '#0ea5e9';
+    ctx.strokeStyle = '#1e40af'; // Dark blue
     ctx.lineWidth = WALL_WIDTH;
 
     maze.forEach((row, y) => {
@@ -136,24 +155,11 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
       });
     });
 
-    // Draw blinking star at goal (2 cells at bottom right)
-    const goalX1 = (COLS - 2) * CELL_SIZE + CELL_SIZE / 2;
-    const goalX2 = (COLS - 1) * CELL_SIZE + CELL_SIZE / 2;
+    // Draw glowing star at goal (center of 2-cell goal)
+    const goalX = (COLS - 1.5) * CELL_SIZE;
     const goalY = (ROWS - 1) * CELL_SIZE + CELL_SIZE / 2;
 
-    // Draw star at first goal cell
-    ctx.save();
-    ctx.translate(goalX1, goalY);
-    ctx.scale(starScale, starScale);
-    drawStar(ctx, 0, 0, 5, CELL_SIZE / 3, CELL_SIZE / 6);
-    ctx.restore();
-
-    // Draw star at second goal cell
-    ctx.save();
-    ctx.translate(goalX2, goalY);
-    ctx.scale(starScale, starScale);
-    drawStar(ctx, 0, 0, 5, CELL_SIZE / 3, CELL_SIZE / 6);
-    ctx.restore();
+    drawStar(ctx, goalX, goalY, 5, CELL_SIZE / 3, CELL_SIZE / 6, glowIntensity);
 
     // Draw player (dragon)
     const playerX = playerPosition.x * CELL_SIZE + CELL_SIZE / 2;
@@ -189,7 +195,7 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
       ctx.fillText('🐲', playerX, playerY);
     }
 
-  }, [maze, playerPosition, COLS, ROWS, isGenerating, dragonImageLoaded, starScale]);
+  }, [maze, playerPosition, COLS, ROWS, isGenerating, dragonImageLoaded, glowIntensity]);
 
   // Trigger completion callback
   useEffect(() => {
@@ -294,7 +300,7 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
   return (
     <div className="flex flex-col items-center gap-6 py-4">
       <div 
-        className="relative border-4 border-primary rounded-lg shadow-lg"
+        className="relative border-4 border-[#1e40af] rounded-lg shadow-lg"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
