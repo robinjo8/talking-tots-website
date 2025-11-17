@@ -150,7 +150,7 @@ const LabirintCContent = () => {
         </div>
 
         <div className="flex-1 overflow-hidden">
-          <MazeGame key={gameKey} onComplete={handleGameComplete} />
+          <MazeGame key={gameKey} onComplete={handleGameComplete} cols={8} rows={12} />
         </div>
 
         <InstructionsModal
@@ -173,41 +173,43 @@ const LabirintCContent = () => {
     );
   }
 
-  // Desktop version
+  // Desktop version - landscape full screen
   return (
-    <AppLayout>
-      <div className="flex justify-center gap-4 p-4">
-        <MemoryExitConfirmationDialog onConfirm={confirmExit}>
-          <Button variant="outline" className="gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Nazaj
+    <div className="fixed inset-0 bg-background overflow-hidden">
+      <div className="bg-dragon-green/5 p-4 flex-shrink-0 border-b">
+        <div className="flex items-center justify-center gap-4">
+          <MemoryExitConfirmationDialog onConfirm={confirmExit}>
+            <Button variant="outline" className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Nazaj
+            </Button>
+          </MemoryExitConfirmationDialog>
+          
+          <h1 className="text-2xl font-bold text-foreground">
+            Labirint - C
+          </h1>
+          
+          <Button
+            onClick={handleNewGame}
+            className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
+          >
+            <RotateCcw className="h-4 w-4" />
+            Nova igra
           </Button>
-        </MemoryExitConfirmationDialog>
-        
-        <Button
-          onClick={handleNewGame}
-          className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
-        >
-          <RotateCcw className="h-4 w-4" />
-          Nova igra
-        </Button>
-        
-        <Button
-          variant="outline"
-          onClick={handleInstructions}
-          className="gap-2"
-        >
-          <BookOpen className="h-4 w-4" />
-          Navodila
-        </Button>
+          
+          <Button
+            variant="outline"
+            onClick={handleInstructions}
+            className="gap-2"
+          >
+            <BookOpen className="h-4 w-4" />
+            Navodila
+          </Button>
+        </div>
       </div>
 
-      <div className="container mx-auto px-4">
-        <Card className="shadow-lg">
-          <CardContent className="p-6">
-            <MazeGame key={gameKey} onComplete={handleGameComplete} />
-          </CardContent>
-        </Card>
+      <div className="flex-1 overflow-hidden p-4 flex items-center justify-center">
+        <MazeGame key={gameKey} onComplete={handleGameComplete} cols={16} rows={9} />
       </div>
 
       <InstructionsModal
@@ -226,7 +228,7 @@ const LabirintCContent = () => {
           autoPlayAudio={true}
         />
       )}
-    </AppLayout>
+    </div>
   );
 };
 

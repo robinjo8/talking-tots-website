@@ -17,14 +17,19 @@ export interface Position {
   y: number;
 }
 
-const COLS = 8;
-const ROWS = 12;
+interface UseMazeGameProps {
+  cols?: number;
+  rows?: number;
+}
 
-export const useMazeGame = () => {
+export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
   const [maze, setMaze] = useState<Cell[][]>([]);
   const [playerPosition, setPlayerPosition] = useState<Position>({ x: 0, y: 0 });
   const [isCompleted, setIsCompleted] = useState(false);
   const [isGenerating, setIsGenerating] = useState(true);
+
+  const COLS = cols;
+  const ROWS = rows;
 
   // Generate maze using Recursive Backtracker algorithm
   const generateMaze = useCallback(() => {

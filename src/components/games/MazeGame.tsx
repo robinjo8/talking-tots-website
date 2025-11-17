@@ -6,6 +6,8 @@ import dragonHead from '@/assets/zmajcek-glava.png';
 
 interface MazeGameProps {
   onComplete: () => void;
+  cols?: number;
+  rows?: number;
 }
 
 // Helper function to draw a star with glow
@@ -60,15 +62,26 @@ const drawStar = (
   ctx.stroke();
 };
 
-export const MazeGame = ({ onComplete }: MazeGameProps) => {
-  const { maze, playerPosition, isCompleted, isGenerating, movePlayer, COLS, ROWS } = useMazeGame();
+export const MazeGame = ({ onComplete, cols, rows }: MazeGameProps) => {
+  const { maze, playerPosition, isCompleted, isGenerating, movePlayer, COLS, ROWS } = useMazeGame({ cols, rows });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const dragonImageRef = useRef<HTMLImageElement | null>(null);
   const [dragonImageLoaded, setDragonImageLoaded] = useState(false);
   const [glowIntensity, setGlowIntensity] = useState(0.3);
 
-const CELL_SIZE = 40;
+// Calculate cell size based on available space and maze dimensions
+const calculateCellSize = () => {
+  const maxWidth = typeof window !== 'undefined' ? window.innerWidth - 100 : 800;
+  const maxHeight = typeof window !== 'undefined' ? window.innerHeight - 200 : 600;
+  
+  const cellSizeByWidth = Math.floor(maxWidth / COLS);
+  const cellSizeByHeight = Math.floor(maxHeight / ROWS);
+  
+  return Math.min(cellSizeByWidth, cellSizeByHeight, 60); // Max 60px per cell
+};
+
+const CELL_SIZE = calculateCellSize();
 const WALL_WIDTH = 10;
 const PADDING = 20; // White border around maze
 
