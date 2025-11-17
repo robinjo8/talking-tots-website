@@ -8,15 +8,55 @@ interface MazeGameProps {
   onComplete: () => void;
 }
 
+// Helper function to draw a star
+const drawStar = (
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  spikes: number,
+  outerRadius: number,
+  innerRadius: number
+) => {
+  ctx.fillStyle = '#fbbf24'; // Golden yellow color
+  ctx.strokeStyle = '#f59e0b'; // Darker yellow border
+  ctx.lineWidth = 2;
+  
+  let rot = (Math.PI / 2) * 3;
+  let x = cx;
+  let y = cy;
+  const step = Math.PI / spikes;
+
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - outerRadius);
+  
+  for (let i = 0; i < spikes; i++) {
+    x = cx + Math.cos(rot) * outerRadius;
+    y = cy + Math.sin(rot) * outerRadius;
+    ctx.lineTo(x, y);
+    rot += step;
+
+    x = cx + Math.cos(rot) * innerRadius;
+    y = cy + Math.sin(rot) * innerRadius;
+    ctx.lineTo(x, y);
+    rot += step;
+  }
+  
+  ctx.lineTo(cx, cy - outerRadius);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+};
+
 export const MazeGame = ({ onComplete }: MazeGameProps) => {
   const { maze, playerPosition, isCompleted, isGenerating, movePlayer, COLS, ROWS } = useMazeGame();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const dragonImageRef = useRef<HTMLImageElement | null>(null);
   const [dragonImageLoaded, setDragonImageLoaded] = useState(false);
+  const [starScale, setStarScale] = useState(1);
 
   const CELL_SIZE = 40;
-  const WALL_WIDTH = 3;
+  const WALL_WIDTH = 6;
 
   // Load dragon image
   useEffect(() => {
@@ -30,6 +70,15 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
       console.error('Failed to load dragon image');
       setDragonImageLoaded(true); // Still allow game to continue with fallback
     };
+  }, []);
+
+  // Animation effect for blinking star
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStarScale(prev => prev === 1 ? 1.3 : 1);
+    }, 500);
+    
+    return () => clearInterval(interval);
   }, []);
 
   // Draw maze
@@ -47,8 +96,12 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
+    // Fill all cells with white background (maze paths)
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
     // Draw maze walls
-    ctx.strokeStyle = 'hsl(var(--primary))';
+    ctx.strokeStyle = '#0ea5e9';
     ctx.lineWidth = WALL_WIDTH;
 
     maze.forEach((row, y) => {
@@ -83,22 +136,24 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
       });
     });
 
-    // Draw start (green) - 2 cells wide
-    ctx.fillStyle = '#22c55e';
-    ctx.fillRect(2, 2, CELL_SIZE * 2 - 4, CELL_SIZE - 4);
-    ctx.fillStyle = 'white';
-    ctx.font = 'bold 14px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('START', CELL_SIZE, CELL_SIZE / 2);
+    // Draw blinking star at goal (2 cells at bottom right)
+    const goalX1 = (COLS - 2) * CELL_SIZE + CELL_SIZE / 2;
+    const goalX2 = (COLS - 1) * CELL_SIZE + CELL_SIZE / 2;
+    const goalY = (ROWS - 1) * CELL_SIZE + CELL_SIZE / 2;
 
-    // Draw goal (orange) - 2 cells wide at bottom right
-    const goalX = (COLS - 2) * CELL_SIZE;
-    const goalY = (ROWS - 1) * CELL_SIZE;
-    ctx.fillStyle = '#f97316';
-    ctx.fillRect(goalX + 2, goalY + 2, CELL_SIZE * 2 - 4, CELL_SIZE - 4);
-    ctx.fillStyle = 'white';
-    ctx.fillText('CILJ', goalX + CELL_SIZE, goalY + CELL_SIZE / 2);
+    // Draw star at first goal cell
+    ctx.save();
+    ctx.translate(goalX1, goalY);
+    ctx.scale(starScale, starScale);
+    drawStar(ctx, 0, 0, 5, CELL_SIZE / 3, CELL_SIZE / 6);
+    ctx.restore();
+
+    // Draw star at second goal cell
+    ctx.save();
+    ctx.translate(goalX2, goalY);
+    ctx.scale(starScale, starScale);
+    drawStar(ctx, 0, 0, 5, CELL_SIZE / 3, CELL_SIZE / 6);
+    ctx.restore();
 
     // Draw player (dragon)
     const playerX = playerPosition.x * CELL_SIZE + CELL_SIZE / 2;
@@ -134,7 +189,7 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
       ctx.fillText('🐲', playerX, playerY);
     }
 
-  }, [maze, playerPosition, COLS, ROWS, isGenerating, dragonImageLoaded]);
+  }, [maze, playerPosition, COLS, ROWS, isGenerating, dragonImageLoaded, starScale]);
 
   // Trigger completion callback
   useEffect(() => {
@@ -247,7 +302,7 @@ export const MazeGame = ({ onComplete }: MazeGameProps) => {
           ref={canvasRef}
           width={COLS * 40}
           height={ROWS * 40}
-          className="bg-background"
+          className="bg-[#86efac]"
           style={{ touchAction: 'none' }}
         />
       </div>
