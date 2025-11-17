@@ -207,7 +207,7 @@ const LabirintCContent = () => {
         </div>
       </div>
 
-      <div className="flex-1 overflow-hidden flex items-center justify-center p-2">
+      <div className="flex-1 overflow-hidden flex items-center justify-center w-full">
         <MazeGame key={gameKey} onComplete={handleGameComplete} cols={16} rows={9} />
       </div>
 
