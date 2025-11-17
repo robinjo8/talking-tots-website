@@ -175,19 +175,18 @@ const LabirintCContent = () => {
 
   // Desktop version - landscape full screen
   return (
-    <div className="fixed inset-0 bg-background overflow-hidden">
-      <div className="bg-dragon-green/5 p-4 flex-shrink-0 border-b">
-        <div className="flex items-center justify-center gap-4">
+    <div className="fixed inset-0 bg-background overflow-hidden flex flex-col">
+      <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
+        <h1 className="text-2xl font-bold text-foreground text-center mb-2">
+          Labirint - C
+        </h1>
+        <div className="flex items-center justify-center gap-3">
           <MemoryExitConfirmationDialog onConfirm={confirmExit}>
             <Button variant="outline" className="gap-2">
               <ArrowLeft className="h-4 w-4" />
               Nazaj
             </Button>
           </MemoryExitConfirmationDialog>
-          
-          <h1 className="text-2xl font-bold text-foreground">
-            Labirint - C
-          </h1>
           
           <Button
             onClick={handleNewGame}
@@ -208,7 +207,7 @@ const LabirintCContent = () => {
         </div>
       </div>
 
-      <div className="flex-1 overflow-hidden p-4 flex items-center justify-center">
+      <div className="flex-1 overflow-hidden flex items-center justify-center p-2">
         <MazeGame key={gameKey} onComplete={handleGameComplete} cols={16} rows={9} />
       </div>
 

@@ -72,18 +72,18 @@ export const MazeGame = ({ onComplete, cols, rows }: MazeGameProps) => {
 
 // Calculate cell size based on available space and maze dimensions
 const calculateCellSize = () => {
-  const maxWidth = typeof window !== 'undefined' ? window.innerWidth - 100 : 800;
-  const maxHeight = typeof window !== 'undefined' ? window.innerHeight - 200 : 600;
+  const maxWidth = typeof window !== 'undefined' ? window.innerWidth - 60 : 800;
+  const maxHeight = typeof window !== 'undefined' ? window.innerHeight - 150 : 600;
   
   const cellSizeByWidth = Math.floor(maxWidth / COLS);
   const cellSizeByHeight = Math.floor(maxHeight / ROWS);
   
-  return Math.min(cellSizeByWidth, cellSizeByHeight, 60); // Max 60px per cell
+  return Math.min(cellSizeByWidth, cellSizeByHeight, 80); // Max 80px per cell for landscape
 };
 
 const CELL_SIZE = calculateCellSize();
 const WALL_WIDTH = 10;
-const PADDING = 20; // White border around maze
+const PADDING = 15; // White border around maze
 
   // Load dragon image
   useEffect(() => {
