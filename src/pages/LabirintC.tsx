@@ -150,7 +150,7 @@ const LabirintCContent = () => {
         </div>
 
         <div className="flex-1 flex items-stretch justify-center overflow-hidden">
-          <MazeGame key={gameKey} onComplete={handleGameComplete} cols={8} rows={12} />
+          <MazeGame key={gameKey} onComplete={handleGameComplete} cols={8} rows={12} mode="mobile" />
         </div>
 
         <InstructionsModal
@@ -208,7 +208,7 @@ const LabirintCContent = () => {
       </div>
 
       <div className="flex-1 overflow-hidden flex items-center justify-center w-full">
-        <MazeGame key={gameKey} onComplete={handleGameComplete} cols={16} rows={9} />
+        <MazeGame key={gameKey} onComplete={handleGameComplete} cols={16} rows={9} mode="desktop" />
       </div>
 
       <InstructionsModal
