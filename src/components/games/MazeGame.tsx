@@ -73,7 +73,7 @@ export const MazeGame = ({ onComplete, cols, rows }: MazeGameProps) => {
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
   const WALL_WIDTH = 8;
-  const PADDING = 10; // Minimal white border around maze
+  const PADDING = 2; // Minimal white border around maze
 
   // Measure container size
   useEffect(() => {
@@ -107,8 +107,8 @@ export const MazeGame = ({ onComplete, cols, rows }: MazeGameProps) => {
     
     const maxCellSize = Math.min(cellSizeByWidth, cellSizeByHeight);
     
-    // Use 95% of calculated size to ensure it fits comfortably
-    return Math.floor(maxCellSize * 0.95);
+    // Use 99% of calculated size to fill the space better
+    return Math.floor(maxCellSize * 0.99);
   }, [containerSize, COLS, ROWS]);
 
   // Load dragon image
