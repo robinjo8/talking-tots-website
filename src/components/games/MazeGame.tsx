@@ -74,7 +74,6 @@ export const MazeGame = ({ onComplete, cols, rows }: MazeGameProps) => {
 
   const WALL_WIDTH = 8;
   const PADDING = 15; // White border around maze
-  const CONTROLS_RESERVE = 120; // Space for internal controls (arrows, etc.)
 
   // Measure container size
   useEffect(() => {
@@ -100,8 +99,8 @@ export const MazeGame = ({ onComplete, cols, rows }: MazeGameProps) => {
       return 40; // Default while measuring
     }
     
-    const availableWidth = containerSize.width - 40; // Account for margins
-    const availableHeight = containerSize.height - CONTROLS_RESERVE; // Reserve space for controls
+    const availableWidth = containerSize.width - 20; // Minimal margin
+    const availableHeight = containerSize.height - 20; // Minimal margin
     
     const cellSizeByWidth = Math.floor((availableWidth - PADDING * 2) / COLS);
     const cellSizeByHeight = Math.floor((availableHeight - PADDING * 2) / ROWS);
