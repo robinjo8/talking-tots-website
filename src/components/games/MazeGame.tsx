@@ -354,10 +354,7 @@ export const MazeGame = ({ onComplete, cols, rows }: MazeGameProps) => {
   return (
     <div ref={containerRef} className="flex items-center justify-center w-full h-full">
       <div
-        className="relative bg-white rounded-lg shadow-2xl border-8 border-[#0ea5e9]"
-        style={{ 
-          boxShadow: '0 10px 30px rgba(0,0,0,0.3), 0 0 0 8px #0ea5e9',
-        }}
+        className="relative bg-white rounded-lg shadow-lg"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
