@@ -97,7 +97,7 @@ export const MazeGame = ({ onComplete, cols, rows, alignTop }: MazeGameProps) =>
   // Calculate cell size based on container dimensions
   const CELL_SIZE = useMemo(() => {
     if (containerSize.width === 0 || containerSize.height === 0) {
-      return 40; // Default while measuring
+      return null; // Don't render until we have measurements
     }
     
     const availableWidth = containerSize.width;
@@ -346,7 +346,7 @@ export const MazeGame = ({ onComplete, cols, rows, alignTop }: MazeGameProps) =>
     touchStartRef.current = null;
   };
 
-  if (isGenerating) {
+  if (isGenerating || CELL_SIZE === null) {
     return (
       <div className="flex items-center justify-center h-64">
         <p className="text-lg">Generiranje labirinta...</p>
