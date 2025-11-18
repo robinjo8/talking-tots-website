@@ -73,7 +73,7 @@ export const MazeGame = ({ onComplete, cols, rows }: MazeGameProps) => {
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
   const WALL_WIDTH = 8;
-  const PADDING = 15; // White border around maze
+  const PADDING = 10; // Minimal white border around maze
 
   // Measure container size
   useEffect(() => {
@@ -99,13 +99,16 @@ export const MazeGame = ({ onComplete, cols, rows }: MazeGameProps) => {
       return 40; // Default while measuring
     }
     
-    const availableWidth = containerSize.width - 20; // Minimal margin
-    const availableHeight = containerSize.height - 20; // Minimal margin
+    const availableWidth = containerSize.width;
+    const availableHeight = containerSize.height;
     
     const cellSizeByWidth = Math.floor((availableWidth - PADDING * 2) / COLS);
     const cellSizeByHeight = Math.floor((availableHeight - PADDING * 2) / ROWS);
     
-    return Math.min(cellSizeByWidth, cellSizeByHeight);
+    const maxCellSize = Math.min(cellSizeByWidth, cellSizeByHeight);
+    
+    // Use 95% of calculated size to ensure it fits comfortably
+    return Math.floor(maxCellSize * 0.95);
   }, [containerSize, COLS, ROWS]);
 
   // Load dragon image
@@ -351,7 +354,7 @@ export const MazeGame = ({ onComplete, cols, rows }: MazeGameProps) => {
   }
 
   return (
-    <div ref={containerRef} className="flex items-center justify-center w-full h-full">
+    <div ref={containerRef} className="w-full h-full flex items-center justify-center">
       <div
         className="relative bg-white rounded-lg shadow-lg"
         onTouchStart={handleTouchStart}
