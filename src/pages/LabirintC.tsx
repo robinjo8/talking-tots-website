@@ -140,7 +140,7 @@ const LabirintCContent = () => {
       <div className="fixed inset-0 bg-background overflow-hidden select-none">
         <div className="flex-1 flex items-stretch justify-center overflow-hidden h-full">
           {isLandscape ? (
-            <MazeGame key={gameKey} onComplete={handleGameComplete} cols={8} rows={12} />
+            <MazeGame key={gameKey} onComplete={handleGameComplete} cols={16} rows={9} />
           ) : (
             <div className="w-full h-full flex items-center justify-center px-6 text-center">
               <p className="text-base font-semibold text-foreground">
