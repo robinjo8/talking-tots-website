@@ -352,7 +352,7 @@ export const MazeGame = ({ onComplete, cols, rows }: MazeGameProps) => {
   }
 
   return (
-    <div ref={containerRef} className="flex flex-col items-center gap-4 w-full h-full justify-center p-2">
+    <div ref={containerRef} className="flex items-center justify-center w-full h-full">
       <div
         className="relative bg-white rounded-lg shadow-2xl border-8 border-[#0ea5e9]"
         style={{ 
@@ -367,47 +367,6 @@ export const MazeGame = ({ onComplete, cols, rows }: MazeGameProps) => {
           height={ROWS * CELL_SIZE + PADDING * 2}
           style={{ touchAction: 'none' }}
         />
-      </div>
-
-      <div className="text-center space-y-2">
-        <p className="text-sm text-muted-foreground">
-          Uporabi puščice ali podrsaj za premikanje zmajčka
-        </p>
-        
-        {/* Mobile controls */}
-        <div className="grid grid-cols-3 gap-2 max-w-[200px] mx-auto md:hidden">
-          <div></div>
-          <Button
-            size="icon"
-            variant="outline"
-            onClick={() => movePlayer('up')}
-          >
-            <ArrowUp className="h-5 w-5" />
-          </Button>
-          <div></div>
-          
-          <Button
-            size="icon"
-            variant="outline"
-            onClick={() => movePlayer('left')}
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <Button
-            size="icon"
-            variant="outline"
-            onClick={() => movePlayer('down')}
-          >
-            <ArrowDown className="h-5 w-5" />
-          </Button>
-          <Button
-            size="icon"
-            variant="outline"
-            onClick={() => movePlayer('right')}
-          >
-            <ArrowRight className="h-5 w-5" />
-          </Button>
-        </div>
       </div>
     </div>
   );
