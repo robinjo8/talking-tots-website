@@ -8,7 +8,8 @@ import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, RotateCcw, BookOpen } from "lucide-react";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { ArrowLeft, RotateCcw, BookOpen, Home } from "lucide-react";
 import { matchingGameData } from "@/data/matchingGameData";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
@@ -29,6 +30,7 @@ const LabirintCContent = () => {
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   const [isLandscape, setIsLandscape] = useState(true);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const { recordGameCompletion } = useEnhancedProgress();
   const isMobile = useIsMobile();
   const { user, selectedChild } = useAuth();
@@ -136,43 +138,7 @@ const LabirintCContent = () => {
   if (effectiveFullscreen) {
     return (
       <div className="fixed inset-0 bg-background overflow-hidden select-none">
-        <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
-          <div className="flex items-center justify-between gap-2">
-            <h1 className="text-base font-bold text-foreground flex-1 text-center">
-              Labirint - C
-            </h1>
-          </div>
-          
-          <div className="flex justify-center gap-2 mt-2">
-            <MemoryExitConfirmationDialog onConfirm={confirmExit}>
-              <Button size="sm" variant="outline" className="gap-1 text-xs h-8">
-                <ArrowLeft className="w-3 h-3" />
-                Nazaj
-              </Button>
-            </MemoryExitConfirmationDialog>
-            
-            <Button
-              size="sm"
-              onClick={handleNewGame}
-              className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-1 text-xs h-8"
-            >
-              <RotateCcw className="w-3 h-3" />
-              Nova igra
-            </Button>
-            
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleInstructions}
-              className="gap-1 text-xs h-8"
-            >
-              <BookOpen className="w-3 h-3" />
-              Navodila
-            </Button>
-          </div>
-        </div>
-
-        <div className="flex-1 flex items-stretch justify-center overflow-hidden">
+        <div className="flex-1 flex items-stretch justify-center overflow-hidden h-full">
           {isLandscape ? (
             <MazeGame key={gameKey} onComplete={handleGameComplete} cols={8} rows={12} />
           ) : (
@@ -183,6 +149,51 @@ const LabirintCContent = () => {
             </div>
           )}
         </div>
+
+        {/* Floating home button */}
+        <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+          <DrawerTrigger asChild>
+            <Button
+              size="icon"
+              className="fixed bottom-4 left-4 z-50 bg-app-orange hover:bg-app-orange/90 text-white shadow-lg rounded-full w-14 h-14"
+            >
+              <Home className="w-6 h-6" />
+            </Button>
+          </DrawerTrigger>
+          <DrawerContent>
+            <div className="flex flex-col gap-3 p-6">
+              <MemoryExitConfirmationDialog onConfirm={confirmExit}>
+                <Button variant="outline" className="gap-2 w-full h-12 text-base">
+                  <ArrowLeft className="w-5 h-5" />
+                  Nazaj
+                </Button>
+              </MemoryExitConfirmationDialog>
+              
+              <Button
+                onClick={() => {
+                  handleNewGame();
+                  setDrawerOpen(false);
+                }}
+                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 w-full h-12 text-base"
+              >
+                <RotateCcw className="w-5 h-5" />
+                Nova igra
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={() => {
+                  handleInstructions();
+                  setDrawerOpen(false);
+                }}
+                className="gap-2 w-full h-12 text-base"
+              >
+                <BookOpen className="w-5 h-5" />
+                Navodila
+              </Button>
+            </div>
+          </DrawerContent>
+        </Drawer>
 
         <InstructionsModal
           isOpen={showInstructions}
