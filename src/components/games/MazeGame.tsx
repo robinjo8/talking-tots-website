@@ -346,7 +346,7 @@ export const MazeGame = ({ onComplete, cols, rows, alignTop }: MazeGameProps) =>
     touchStartRef.current = null;
   };
 
-  if (isGenerating || CELL_SIZE === null) {
+  if (isGenerating) {
     return (
       <div className="flex items-center justify-center h-64">
         <p className="text-lg">Generiranje labirinta...</p>
@@ -356,18 +356,24 @@ export const MazeGame = ({ onComplete, cols, rows, alignTop }: MazeGameProps) =>
 
   return (
     <div ref={containerRef} className={`w-full h-full flex justify-center ${alignTop ? 'items-start' : 'items-center'}`}>
-      <div
-        className="relative bg-white rounded-lg shadow-lg"
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      >
-        <canvas
-          ref={canvasRef}
-          width={COLS * CELL_SIZE + PADDING * 2}
-          height={ROWS * CELL_SIZE + PADDING * 2}
-          style={{ touchAction: 'none' }}
-        />
-      </div>
+      {CELL_SIZE === null ? (
+        <div className="flex items-center justify-center h-64">
+          <p className="text-lg">Generiranje labirinta...</p>
+        </div>
+      ) : (
+        <div
+          className="relative bg-white rounded-lg shadow-lg"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          <canvas
+            ref={canvasRef}
+            width={COLS * CELL_SIZE + PADDING * 2}
+            height={ROWS * CELL_SIZE + PADDING * 2}
+            style={{ touchAction: 'none' }}
+          />
+        </div>
+      )}
     </div>
   );
 };
