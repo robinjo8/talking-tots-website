@@ -8,7 +8,6 @@ interface MazeGameProps {
   onComplete: () => void;
   cols?: number;
   rows?: number;
-  mode?: 'desktop' | 'mobile';
 }
 
 // Helper function to draw a star with glow
@@ -63,7 +62,7 @@ const drawStar = (
   ctx.stroke();
 };
 
-export const MazeGame = ({ onComplete, cols, rows, mode = 'desktop' }: MazeGameProps) => {
+export const MazeGame = ({ onComplete, cols, rows }: MazeGameProps) => {
   const { maze, playerPosition, isCompleted, isGenerating, movePlayer, COLS, ROWS } = useMazeGame({ cols, rows });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -72,34 +71,12 @@ export const MazeGame = ({ onComplete, cols, rows, mode = 'desktop' }: MazeGameP
   const [dragonImageLoaded, setDragonImageLoaded] = useState(false);
   const [glowIntensity, setGlowIntensity] = useState(0.3);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
-  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
 
-const WALL_WIDTH = 8;
-const PADDING = 15; // White border around maze
-const CONTROLS_RESERVE = 120; // Space for internal controls (arrows, etc.)
-const MOBILE_HEADER_RESERVE = 120; // Space for mobile header
-const MOBILE_FOOTER_RESERVE = 140; // Space for mobile controls/arrows
+  const WALL_WIDTH = 8;
+  const PADDING = 15; // White border around maze
+  const CONTROLS_RESERVE = 120; // Space for internal controls (arrows, etc.)
 
-  // Measure viewport size for mobile mode
-  useEffect(() => {
-    const updateViewportSize = () => {
-      setViewportSize({
-        width: window.innerWidth,
-        height: window.innerHeight
-      });
-    };
-
-    updateViewportSize();
-    window.addEventListener('resize', updateViewportSize);
-    window.addEventListener('orientationchange', updateViewportSize);
-
-    return () => {
-      window.removeEventListener('resize', updateViewportSize);
-      window.removeEventListener('orientationchange', updateViewportSize);
-    };
-  }, []);
-
-  // Measure container size for desktop mode
+  // Measure container size
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -117,36 +94,20 @@ const MOBILE_FOOTER_RESERVE = 140; // Space for mobile controls/arrows
     };
   }, []);
 
-  // Calculate cell size based on mode
+  // Calculate cell size based on container dimensions
   const CELL_SIZE = useMemo(() => {
-    if (mode === 'mobile') {
-      // Mobile mode: use viewport dimensions
-      if (viewportSize.width === 0 || viewportSize.height === 0) {
-        return 40; // Default while measuring
-      }
-      
-      const availableWidth = viewportSize.width - 40; // Account for margins
-      const availableHeight = viewportSize.height - MOBILE_HEADER_RESERVE - MOBILE_FOOTER_RESERVE;
-      
-      const cellSizeByWidth = Math.floor((availableWidth - PADDING * 2) / COLS);
-      const cellSizeByHeight = Math.floor((availableHeight - PADDING * 2) / ROWS);
-      
-      return Math.min(cellSizeByWidth, cellSizeByHeight);
-    } else {
-      // Desktop mode: use container dimensions
-      if (containerSize.width === 0 || containerSize.height === 0) {
-        return 40; // Default while measuring
-      }
-      
-      const availableWidth = containerSize.width - 40; // Account for margins
-      const availableHeight = containerSize.height - CONTROLS_RESERVE; // Reserve space for controls
-      
-      const cellSizeByWidth = Math.floor((availableWidth - PADDING * 2) / COLS);
-      const cellSizeByHeight = Math.floor((availableHeight - PADDING * 2) / ROWS);
-      
-      return Math.min(cellSizeByWidth, cellSizeByHeight);
+    if (containerSize.width === 0 || containerSize.height === 0) {
+      return 40; // Default while measuring
     }
-  }, [mode, containerSize, viewportSize, COLS, ROWS]);
+    
+    const availableWidth = containerSize.width - 40; // Account for margins
+    const availableHeight = containerSize.height - CONTROLS_RESERVE; // Reserve space for controls
+    
+    const cellSizeByWidth = Math.floor((availableWidth - PADDING * 2) / COLS);
+    const cellSizeByHeight = Math.floor((availableHeight - PADDING * 2) / ROWS);
+    
+    return Math.min(cellSizeByWidth, cellSizeByHeight);
+  }, [containerSize, COLS, ROWS]);
 
   // Load dragon image
   useEffect(() => {
