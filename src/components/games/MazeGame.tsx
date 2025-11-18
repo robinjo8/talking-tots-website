@@ -65,30 +65,50 @@ const drawStar = (
 export const MazeGame = ({ onComplete, cols, rows }: MazeGameProps) => {
   const { maze, playerPosition, isCompleted, isGenerating, movePlayer, COLS, ROWS } = useMazeGame({ cols, rows });
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const dragonImageRef = useRef<HTMLImageElement | null>(null);
   const [dragonImageLoaded, setDragonImageLoaded] = useState(false);
   const [glowIntensity, setGlowIntensity] = useState(0.3);
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
 const WALL_WIDTH = 8;
 const PADDING = 15; // White border around maze
+const CONTROLS_RESERVE = 120; // Space for internal controls (arrows, etc.)
 
-  // Calculate cell size dynamically based on maze dimensions
+  // Measure container size
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        setContainerSize({ width, height });
+      }
+    });
+
+    resizeObserver.observe(containerRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
+  // Calculate cell size based on actual container dimensions
   const CELL_SIZE = useMemo(() => {
-    if (typeof window === 'undefined') return 40; // Default for SSR
+    if (containerSize.width === 0 || containerSize.height === 0) {
+      return 40; // Default while measuring
+    }
     
-    const maxWidth = window.innerWidth - 40;
-    // Adjust reserved space based on orientation
-    const isPortrait = window.innerHeight > window.innerWidth;
-    const reservedSpace = isPortrait ? 200 : 120; // More space for mobile controls
-    const maxHeight = window.innerHeight - reservedSpace;
+    const availableWidth = containerSize.width - 40; // Account for margins
+    const availableHeight = containerSize.height - CONTROLS_RESERVE; // Reserve space for controls
     
-    const cellSizeByWidth = Math.floor((maxWidth - PADDING * 2) / COLS);
-    const cellSizeByHeight = Math.floor((maxHeight - PADDING * 2) / ROWS);
+    const cellSizeByWidth = Math.floor((availableWidth - PADDING * 2) / COLS);
+    const cellSizeByHeight = Math.floor((availableHeight - PADDING * 2) / ROWS);
     
     // Use the smaller dimension to ensure maze fits
     return Math.min(cellSizeByWidth, cellSizeByHeight);
-  }, [COLS, ROWS]);
+  }, [containerSize, COLS, ROWS]);
 
   // Load dragon image
   useEffect(() => {
@@ -333,8 +353,8 @@ const PADDING = 15; // White border around maze
   }
 
   return (
-    <div className="flex flex-col items-center gap-4 w-full h-full justify-center p-2">
-      <div 
+    <div ref={containerRef} className="flex flex-col items-center gap-4 w-full h-full justify-center p-2">
+      <div
         className="relative bg-white rounded-lg shadow-2xl border-8 border-[#0ea5e9]"
         style={{ 
           boxShadow: '0 10px 30px rgba(0,0,0,0.3), 0 0 0 8px #0ea5e9',
