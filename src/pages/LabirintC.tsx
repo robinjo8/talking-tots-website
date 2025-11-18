@@ -250,7 +250,12 @@ const LabirintCContent = () => {
       </div>
 
       <div className="flex-1 overflow-hidden w-full h-full">
-        <MazeGame key={gameKey} onComplete={handleGameComplete} cols={16} rows={9} />
+        <MazeGame 
+          key={gameKey} 
+          onComplete={handleGameComplete} 
+          cols={isMobile ? 16 : 32} 
+          rows={isMobile ? 9 : 18} 
+        />
       </div>
 
       <InstructionsModal
