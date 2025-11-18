@@ -8,6 +8,7 @@ interface MazeGameProps {
   onComplete: () => void;
   cols?: number;
   rows?: number;
+  alignTop?: boolean;
 }
 
 // Helper function to draw a star with glow
@@ -62,7 +63,7 @@ const drawStar = (
   ctx.stroke();
 };
 
-export const MazeGame = ({ onComplete, cols, rows }: MazeGameProps) => {
+export const MazeGame = ({ onComplete, cols, rows, alignTop }: MazeGameProps) => {
   const { maze, playerPosition, isCompleted, isGenerating, movePlayer, COLS, ROWS } = useMazeGame({ cols, rows });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -354,7 +355,7 @@ export const MazeGame = ({ onComplete, cols, rows }: MazeGameProps) => {
   }
 
   return (
-    <div ref={containerRef} className="w-full h-full flex items-center justify-center">
+    <div ref={containerRef} className={`w-full h-full flex justify-center ${alignTop ? 'items-start' : 'items-center'}`}>
       <div
         className="relative bg-white rounded-lg shadow-lg"
         onTouchStart={handleTouchStart}

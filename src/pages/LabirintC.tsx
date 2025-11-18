@@ -218,8 +218,8 @@ const LabirintCContent = () => {
   // Desktop version - landscape full screen
   return (
     <div className="fixed inset-0 bg-background overflow-hidden flex flex-col">
-      <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
-        <h1 className="text-2xl font-bold text-foreground text-center mb-2">
+      <div className="bg-dragon-green/5 px-3 py-2 flex-shrink-0 border-b">
+        <h1 className="text-xl font-bold text-foreground text-center mb-1">
           Labirint - C
         </h1>
         <div className="flex items-center justify-center gap-3">
@@ -250,7 +250,7 @@ const LabirintCContent = () => {
       </div>
 
       <div className="flex-1 overflow-hidden w-full h-full">
-        <MazeGame key={gameKey} onComplete={handleGameComplete} cols={16} rows={9} />
+        <MazeGame key={gameKey} onComplete={handleGameComplete} cols={16} rows={9} alignTop />
       </div>
 
       <InstructionsModal
