@@ -28,6 +28,7 @@ const LabirintCContent = () => {
   const [gameKey, setGameKey] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
+  const [isLandscape, setIsLandscape] = useState(true);
   const { recordGameCompletion } = useEnhancedProgress();
   const isMobile = useIsMobile();
   const { user, selectedChild } = useAuth();
@@ -69,6 +70,24 @@ const LabirintCContent = () => {
     setShowCompletion(false);
   };
 
+  // Track orientation
+  useEffect(() => {
+    const updateOrientation = () => {
+      if (typeof window !== 'undefined') {
+        setIsLandscape(window.innerWidth >= window.innerHeight);
+      }
+    };
+
+    updateOrientation();
+    window.addEventListener('resize', updateOrientation);
+    window.addEventListener('orientationchange', updateOrientation);
+
+    return () => {
+      window.removeEventListener('resize', updateOrientation);
+      window.removeEventListener('orientationchange', updateOrientation);
+    };
+  }, []);
+
   useEffect(() => {
     if (effectiveFullscreen) {
       const requestFullscreen = async () => {
@@ -81,18 +100,22 @@ const LabirintCContent = () => {
         }
       };
 
-      const lockPortrait = async () => {
+      const lockLandscape = async () => {
         try {
           if (screen.orientation && 'lock' in screen.orientation) {
-            await (screen.orientation as any).lock('portrait');
+            try {
+              await (screen.orientation as any).lock('landscape-primary');
+            } catch {
+              await (screen.orientation as any).lock('landscape');
+            }
           }
         } catch (error) {
-          console.log('Portrait lock not supported:', error);
+          console.log('Landscape lock not supported:', error);
         }
       };
 
-      requestFullscreen();
-      lockPortrait();
+    requestFullscreen();
+    lockLandscape();
       
       return () => {
         if (document.fullscreenElement) {
@@ -150,7 +173,15 @@ const LabirintCContent = () => {
         </div>
 
         <div className="flex-1 flex items-stretch justify-center overflow-hidden">
-          <MazeGame key={gameKey} onComplete={handleGameComplete} cols={8} rows={12} mode="mobile" />
+          {isLandscape ? (
+            <MazeGame key={gameKey} onComplete={handleGameComplete} cols={8} rows={12} />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center px-6 text-center">
+              <p className="text-base font-semibold text-foreground">
+                Za igranje labirinta prosim obrni telefon v ležeči položaj.
+              </p>
+            </div>
+          )}
         </div>
 
         <InstructionsModal
@@ -208,7 +239,7 @@ const LabirintCContent = () => {
       </div>
 
       <div className="flex-1 overflow-hidden flex items-center justify-center w-full">
-        <MazeGame key={gameKey} onComplete={handleGameComplete} cols={16} rows={9} mode="desktop" />
+        <MazeGame key={gameKey} onComplete={handleGameComplete} cols={16} rows={9} />
       </div>
 
       <InstructionsModal
