@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMazeGame } from '@/hooks/useMazeGame';
 import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -73,19 +73,22 @@ export const MazeGame = ({ onComplete, cols, rows }: MazeGameProps) => {
 const WALL_WIDTH = 8;
 const PADDING = 15; // White border around maze
 
-// Calculate cell size based on available space and maze dimensions
-const calculateCellSize = () => {
-  const maxWidth = typeof window !== 'undefined' ? window.innerWidth - 40 : 800;
-  const maxHeight = typeof window !== 'undefined' ? window.innerHeight - 120 : 600;
-  
-  const cellSizeByWidth = Math.floor((maxWidth - PADDING * 2) / COLS);
-  const cellSizeByHeight = Math.floor((maxHeight - PADDING * 2) / ROWS);
-  
-  // Use the dimension that better fits the screen
-  return Math.min(cellSizeByWidth, cellSizeByHeight, 50); // Max 50px per cell for readability
-};
-
-const CELL_SIZE = calculateCellSize();
+  // Calculate cell size dynamically based on maze dimensions
+  const CELL_SIZE = useMemo(() => {
+    if (typeof window === 'undefined') return 40; // Default for SSR
+    
+    const maxWidth = window.innerWidth - 40;
+    // Adjust reserved space based on orientation
+    const isPortrait = window.innerHeight > window.innerWidth;
+    const reservedSpace = isPortrait ? 200 : 120; // More space for mobile controls
+    const maxHeight = window.innerHeight - reservedSpace;
+    
+    const cellSizeByWidth = Math.floor((maxWidth - PADDING * 2) / COLS);
+    const cellSizeByHeight = Math.floor((maxHeight - PADDING * 2) / ROWS);
+    
+    // Use the smaller dimension to ensure maze fits
+    return Math.min(cellSizeByWidth, cellSizeByHeight);
+  }, [COLS, ROWS]);
 
   // Load dragon image
   useEffect(() => {
@@ -227,7 +230,7 @@ const CELL_SIZE = calculateCellSize();
       ctx.fillText('🐲', playerX, playerY);
     }
 
-  }, [maze, playerPosition, COLS, ROWS, isGenerating, dragonImageLoaded, glowIntensity]);
+  }, [maze, playerPosition, COLS, ROWS, CELL_SIZE, isGenerating, dragonImageLoaded, glowIntensity]);
 
   // Trigger completion callback
   useEffect(() => {
