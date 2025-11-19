@@ -78,8 +78,6 @@ export const MazeGame = ({ onComplete, cols, rows, alignTop }: MazeGameProps) =>
 
   // Measure container size
   useEffect(() => {
-    if (!containerRef.current) return;
-
     const updateSize = () => {
       if (alignTop) {
         // Desktop: use window dimensions minus header
