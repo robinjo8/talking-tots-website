@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import Header from "@/components/Header";
+import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { User } from "lucide-react";
 import { DeleteChildDialog } from "@/components/DeleteChildDialog";
 import { EditChildModal } from "@/components/EditChildModal";
@@ -107,6 +108,11 @@ export default function Profile() {
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-28 md:pt-32 pb-20 px-4">
+        {/* Breadcrumb - Desktop only */}
+        <div className="hidden lg:block mb-8">
+          <BreadcrumbNavigation />
+        </div>
+        
         <h1 className="text-3xl font-bold mb-8 flex items-center gap-2">
           <User className="h-6 w-6 text-dragon-green" />
           Nastavitve

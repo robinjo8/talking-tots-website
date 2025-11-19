@@ -1,4 +1,5 @@
 import Header from "@/components/Header";
+import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -90,6 +91,19 @@ const GovornojezicovneVaje = () => {
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-28 md:pt-32 pb-20 px-4">
+        {/* Page Title */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
+            Govorno-jezikovne vaje
+          </h1>
+          <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full"></div>
+        </div>
+        
+        {/* Breadcrumb - Desktop only */}
+        <div className="hidden lg:block mb-8">
+          <BreadcrumbNavigation />
+        </div>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           {exerciseTypes.map(exercise => <Card key={exercise.id} className={cn("transition-all duration-300 rounded-2xl border-2 border-gray-200 h-full flex flex-col", exercise.available ? "hover:shadow-lg cursor-pointer" : "opacity-50 cursor-not-allowed")} onClick={() => exercise.available && navigate(exercise.path)}>
               <CardHeader className={`bg-gradient-to-r ${exercise.gradient} rounded-t-2xl pb-4 flex items-center justify-center`}>

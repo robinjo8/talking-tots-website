@@ -1,5 +1,5 @@
 import Header from "@/components/Header";
-import { Link } from "react-router-dom";
+import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,35 +14,20 @@ const RazvojGovora = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      {/* Breadcrumb Navigation */}
-      <div className="container max-w-4xl mx-auto px-4 pt-24 pb-4">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link to="/">Domov</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link to="/logopedski-koticek">Logopedski kotiček</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Razvoj govora</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+      {/* Page Title and Breadcrumb */}
+      <div className="container max-w-4xl mx-auto px-4 pt-28 md:pt-32 pb-4">
+        <h1 className="text-4xl md:text-5xl font-bold text-center text-foreground mb-6">
+          Razvoj govora
+        </h1>
+        
+        {/* Breadcrumb - Desktop only */}
+        <div className="hidden lg:block">
+          <BreadcrumbNavigation />
+        </div>
       </div>
 
       {/* Blog Article */}
       <article className="container max-w-4xl mx-auto px-4 pb-20">
-        {/* Title */}
-        <h1 className="text-4xl md:text-5xl font-bold text-center text-foreground mb-8">
-          Razvoj govora
-        </h1>
 
         {/* Featured Image */}
         <div className="mb-10 rounded-2xl overflow-hidden shadow-lg border-4 border-gray-100">
