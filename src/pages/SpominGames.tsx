@@ -140,6 +140,11 @@ export default function SpominGames() {
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
+        {/* Breadcrumb - Desktop only */}
+        <div className="hidden lg:block mb-6">
+          <BreadcrumbNavigation />
+        </div>
+
         {/* Instruction speech-bubble */}
         <Card className="mb-8 bg-gradient-to-r from-sky-50 to-green-50 border-dragon-green/30 shadow-md">
             <CardHeader className="pb-2">
@@ -162,11 +167,6 @@ export default function SpominGames() {
               </div>
             </CardContent>
         </Card>
-
-        {/* Breadcrumb - Desktop only */}
-        <div className="hidden lg:block mb-8">
-          <BreadcrumbNavigation />
-        </div>
 
         {/* Letters grid/carousel */}
         <div className="mb-12">

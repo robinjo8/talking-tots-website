@@ -156,6 +156,11 @@ export default function Labirint() {
       <Header />
       
       <div className="container max-w-7xl mx-auto pt-28 md:pt-32 pb-20 px-4">
+        {/* Breadcrumb - Desktop only */}
+        <div className="hidden lg:block mb-6">
+          <BreadcrumbNavigation />
+        </div>
+
         {/* Page Title */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
@@ -172,11 +177,6 @@ export default function Labirint() {
             </p>
           </CardContent>
         </Card>
-
-        {/* Breadcrumb - Desktop only */}
-        <div className="hidden lg:block mb-8">
-          <BreadcrumbNavigation />
-        </div>
 
         {/* Desktop Grid */}
         {!isMobile && (

@@ -70,6 +70,11 @@ const VajeMoториkeGovoril = () => {
         </div>
       ) : (
         <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
+          {/* Breadcrumb - Desktop only */}
+          <div className="hidden lg:block mb-6">
+            <BreadcrumbNavigation />
+          </div>
+
           <ExerciseProgressInfo
             completionCount={progress.completionCount}
             currentCard={progress.currentUnlockedCard}
@@ -79,11 +84,6 @@ const VajeMoториkeGovoril = () => {
             onTestSet={setTestCompletionCount}
             childName={childName}
           />
-
-          {/* Breadcrumb - Desktop only */}
-          <div className="hidden lg:block mb-8">
-            <BreadcrumbNavigation />
-          </div>
 
           <SequentialExerciseGrid exerciseProgressHook={exerciseProgressHook} />
         </div>
