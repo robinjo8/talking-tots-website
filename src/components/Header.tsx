@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { MobileMenu } from "./header/MobileMenu";
 import { DesktopNavigation } from "./header/DesktopNavigation";
-import { BreadcrumbNavigation } from "./BreadcrumbNavigation";
 export default function Header() {
   const {
     user,
@@ -128,11 +127,6 @@ export default function Header() {
           <MobileMenu user={user} profile={profile} selectedChild={selectedChild} onSignOut={handleSignOut} onStartNow={handleStartNow} onCenikScroll={handleCenikScroll} />
         </div>
       </header>
-      
-      {/* Breadcrumb Navigation - Only on Desktop, sticky below header */}
-      <div className="hidden lg:block sticky top-[73px] z-40 bg-background border-b border-gray-100 shadow-sm">
-        <BreadcrumbNavigation />
-      </div>
     </>
   );
 }

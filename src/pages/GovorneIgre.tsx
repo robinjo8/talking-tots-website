@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import { GamesList } from "@/components/games/GamesList";
 import AnimatedBackground from "@/components/AnimatedBackground";
+import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 
 export default function GovorneIgre() {
   return <div className="min-h-screen relative">
@@ -14,6 +15,11 @@ export default function GovorneIgre() {
             Govorne igre
           </h1>
           <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full"></div>
+        </div>
+        
+        {/* Breadcrumb - Desktop only */}
+        <div className="hidden lg:block mb-8">
+          <BreadcrumbNavigation />
         </div>
         
         <GamesList />

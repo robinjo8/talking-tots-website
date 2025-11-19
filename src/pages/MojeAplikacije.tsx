@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { ActivityOptions } from "@/components/ActivityOptions";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import { FooterSection } from "@/components/FooterSection";
+import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 
 const MojeAplikacije = () => {
   const { user, selectedChild, signOut } = useAuth();
@@ -32,17 +33,21 @@ const MojeAplikacije = () => {
       <Header />
       
       <div className="container max-w-6xl mx-auto pt-28 md:pt-32 pb-20 px-4">
+        {/* Page Title */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
+            Moje aplikacije
+          </h1>
+          <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full"></div>
+        </div>
+        
+        {/* Breadcrumb - Desktop only */}
+        <div className="hidden lg:block mb-8">
+          <BreadcrumbNavigation />
+        </div>
         
         {selectedChild ? (
           <>
-            {/* Page Title */}
-            <div className="text-center mb-12">
-              <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
-                Moje aplikacije
-              </h1>
-              <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full"></div>
-            </div>
-            
             {/* Activity Options Wrapper */}
             <div className="mb-12">
               <ActivityOptions />

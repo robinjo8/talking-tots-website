@@ -1,5 +1,6 @@
 
 import Header from "@/components/Header";
+import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { Zap } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -9,6 +10,10 @@ export default function MojiIzzivi() {
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-28 md:pt-32 pb-20 px-4">
+        {/* Breadcrumb - Desktop only */}
+        <div className="hidden lg:block mb-8">
+          <BreadcrumbNavigation />
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           <Card 

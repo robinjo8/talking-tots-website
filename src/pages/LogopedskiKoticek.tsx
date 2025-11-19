@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
+import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { 
   Baby, 
   AlertTriangle, 
@@ -98,6 +99,11 @@ const LogopedskiKoticek = () => {
             Logopedski nasveti
           </h1>
           <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full"></div>
+        </div>
+        
+        {/* Breadcrumb - Desktop only */}
+        <div className="hidden lg:block mb-8">
+          <BreadcrumbNavigation />
         </div>
 
         {/* Cards Grid */}

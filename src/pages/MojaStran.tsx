@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { ProgressSection } from "@/components/ProgressSection";
 import { TipSection } from "@/components/TipSection";
-
+import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { FooterSection } from "@/components/FooterSection";
 
 
@@ -34,6 +34,10 @@ const MojaStran = () => {
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-28 md:pt-32 pb-20 px-4">
+        {/* Breadcrumb - Desktop only */}
+        <div className="hidden lg:block mb-8">
+          <BreadcrumbNavigation />
+        </div>
         
         {selectedChild ? (
           <>
