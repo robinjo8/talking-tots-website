@@ -29,18 +29,37 @@ const breadcrumbConfig: BreadcrumbConfig[] = [
   
   // Govorne igre hierarchy
   { path: "/govorne-igre", label: "Govorne igre", parent: "/moje-aplikacije" },
+  
+  // Spomin
   { path: "/govorne-igre/spomin", label: "Spomin", parent: "/govorne-igre" },
+  { path: "/govorne-igre/spomin/spomin-c", label: "C", parent: "/govorne-igre/spomin" },
+  { path: "/govorne-igre/spomin/spomin-č", label: "Č", parent: "/govorne-igre/spomin" },
+  { path: "/govorne-igre/spomin/spomin-k", label: "K", parent: "/govorne-igre/spomin" },
+  { path: "/govorne-igre/spomin/spomin-l", label: "L", parent: "/govorne-igre/spomin" },
+  { path: "/govorne-igre/spomin/spomin-r", label: "R", parent: "/govorne-igre/spomin" },
+  { path: "/govorne-igre/spomin/spomin-s", label: "S", parent: "/govorne-igre/spomin" },
+  { path: "/govorne-igre/spomin/spomin-š", label: "Š", parent: "/govorne-igre/spomin" },
+  { path: "/govorne-igre/spomin/spomin-z", label: "Z", parent: "/govorne-igre/spomin" },
+  { path: "/govorne-igre/spomin/spomin-ž", label: "Ž", parent: "/govorne-igre/spomin" },
+  
+  // Labirint
   { path: "/govorne-igre/labirint", label: "Labirint", parent: "/govorne-igre" },
+  { path: "/govorne-igre/labirint/c", label: "C", parent: "/govorne-igre/labirint" },
+  
+  // Sestavljanke
   { path: "/govorne-igre/sestavljanke", label: "Sestavljanke", parent: "/govorne-igre" },
+  
+  // Drsna sestavljanka
   { path: "/govorne-igre/drsna-sestavljanka", label: "Drsna sestavljanka", parent: "/govorne-igre" },
+  
+  // Igra ujemanja
   { path: "/govorne-igre/igra-ujemanja", label: "Igra ujemanja", parent: "/govorne-igre" },
   
   // Govorno-jezikovne vaje hierarchy
   { path: "/govornojezicovne-vaje", label: "Govorno-jezikovne vaje", parent: "/moje-aplikacije" },
   { path: "/govorno-jezikovne-vaje", label: "Govorno-jezikovne vaje", parent: "/moje-aplikacije" },
-  { path: "/vaje-motorike-govoril", label: "Vaje motorike govoril", parent: "/govorno-jezikovne-vaje" },
+  { path: "/vaje-motorike-govoril", label: "Vaje motorike govoril", parent: "/govornojezicovne-vaje" },
   { path: "/govorno-jezikovne-vaje/vaje-motorike-govoril", label: "Vaje motorike govoril", parent: "/govorno-jezikovne-vaje" },
-  { path: "/vaje-za-jezik", label: "Vaje za jezik", parent: "/govorno-jezikovne-vaje" },
   
   // Video navodila hierarchy
   { path: "/video-navodila", label: "Video navodila", parent: "/moje-aplikacije" },
@@ -58,13 +77,22 @@ const breadcrumbConfig: BreadcrumbConfig[] = [
   { path: "/artikulacija-vaje", label: "Artikulacija vaje", parent: "/moje-aplikacije" },
 ];
 
-// Paths where breadcrumb should NOT be shown (games and their subpages)
+// Paths where breadcrumb should NOT be shown (actual game pages, not listing pages)
 const excludedPaths = [
-  "/spomin/",
-  "/labirint/",
-  "/sestavljanke/",
-  "/drsna-sestavljanka/",
-  "/igra-ujemanja/",
+  // Exclude individual game pages but not listing pages
+  "/govorne-igre/spomin/spomin-",  // Individual spomin games (e.g., /spomin/spomin-c)
+  "/govorne-igre/labirint/c",      // Individual labirint games
+  "/govorne-igre/labirint/k",
+  "/govorne-igre/labirint/l",
+  "/govorne-igre/sestavljanke/c",  // Individual sestavljanke games
+  "/govorne-igre/sestavljanke/k",
+  "/govorne-igre/sestavljanke/l",
+  "/govorne-igre/drsna-sestavljanka/c", // Individual drsna games
+  "/govorne-igre/drsna-sestavljanka/k",
+  "/govorne-igre/drsna-sestavljanka/l",
+  "/govorne-igre/igra-ujemanja/c",      // Individual ujemanja games
+  "/govorne-igre/igra-ujemanja/k",
+  "/govorne-igre/igra-ujemanja/l",
   "/artikulacija-vaje/",
   "/vaje-za-jezik",
   "/artikulacijski-test",

@@ -6,6 +6,7 @@ import { SequentialExerciseGrid } from "@/components/exercises/SequentialExercis
 import { ExerciseProgressInfo } from "@/components/exercises/ExerciseProgressInfo";
 import { useExerciseProgress } from "@/hooks/useExerciseProgress";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 
 const VajeMoториkeGovoril = () => {
   const { user, selectedChild } = useAuth();
@@ -78,6 +79,11 @@ const VajeMoториkeGovoril = () => {
             onTestSet={setTestCompletionCount}
             childName={childName}
           />
+
+          {/* Breadcrumb - Desktop only */}
+          <div className="hidden lg:block mb-8">
+            <BreadcrumbNavigation />
+          </div>
 
           <SequentialExerciseGrid exerciseProgressHook={exerciseProgressHook} />
         </div>
