@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { MobileMenu } from "./header/MobileMenu";
 import { DesktopNavigation } from "./header/DesktopNavigation";
+import { BreadcrumbNavigation } from "./BreadcrumbNavigation";
 export default function Header() {
   const {
     user,
@@ -71,11 +72,42 @@ export default function Header() {
     await signOut();
     navigate("/login");
   };
-  return <header className="py-4 px-4 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-gray-200 shadow-sm">
-      {/* Desktop layout - centered */}
-      <div className="hidden lg:flex items-center justify-center w-full">
-        <div className="flex items-center gap-8 lg:gap-12">
-          {/* Logo */}
+  return (
+    <>
+      <header className="py-4 px-4 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-gray-200 shadow-sm">
+        {/* Desktop layout - centered */}
+        <div className="hidden lg:flex items-center justify-center w-full">
+          <div className="flex items-center gap-8 lg:gap-12">
+            {/* Logo */}
+            <Link 
+              to="/" 
+              className="flex items-center gap-2"
+              onClick={(e) => {
+                if (window.location.pathname === '/') {
+                  e.preventDefault();
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              }}
+            >
+              <div className="flex items-center">
+                <span className="text-2xl md:text-3xl font-extrabold text-dragon-green uppercase mx-0 px-0 lg:text-3xl">Tomi</span>
+                <span className="text-2xl md:text-3xl font-extrabold text-app-orange uppercase lg:text-3xl">Talk</span>
+              </div>
+            </Link>
+            
+            {/* Navigation */}
+            <DesktopNavigation user={user} onStartNow={handleStartNow} onCenikScroll={handleCenikScroll} />
+            {showInstall && (
+              <Button variant="secondary" onClick={handleInstallClick}>
+                Namesti aplikacijo
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Mobile layout - logo left, profile right */}
+        <div className="lg:hidden flex items-center justify-between w-full">
+          {/* Logo on far left */}
           <Link 
             to="/" 
             className="flex items-center gap-2"
@@ -87,42 +119,20 @@ export default function Header() {
             }}
           >
             <div className="flex items-center">
-              <span className="text-2xl md:text-3xl font-extrabold text-dragon-green uppercase mx-0 px-0 lg:text-3xl">Tomi</span>
-              <span className="text-2xl md:text-3xl font-extrabold text-app-orange uppercase lg:text-3xl">Talk</span>
+              <span className="text-2xl md:text-3xl font-extrabold text-dragon-green uppercase lg:text-2xl mx-0 px-0">Tomi</span>
+              <span className="text-2xl md:text-3xl font-extrabold text-app-orange uppercase lg:text-2xl">Talk</span>
             </div>
           </Link>
           
-          {/* Navigation */}
-          <DesktopNavigation user={user} onStartNow={handleStartNow} onCenikScroll={handleCenikScroll} />
-          {showInstall && (
-            <Button variant="secondary" onClick={handleInstallClick}>
-              Namesti aplikacijo
-            </Button>
-          )}
+          {/* Mobile menu and profile on far right */}
+          <MobileMenu user={user} profile={profile} selectedChild={selectedChild} onSignOut={handleSignOut} onStartNow={handleStartNow} onCenikScroll={handleCenikScroll} />
         </div>
+      </header>
+      
+      {/* Breadcrumb Navigation - Only on Desktop, sticky below header */}
+      <div className="hidden lg:block sticky top-[73px] z-40 bg-background border-b border-gray-100 shadow-sm">
+        <BreadcrumbNavigation />
       </div>
-
-      {/* Mobile layout - logo left, profile right */}
-      <div className="lg:hidden flex items-center justify-between w-full">
-        {/* Logo on far left */}
-        <Link 
-          to="/" 
-          className="flex items-center gap-2"
-          onClick={(e) => {
-            if (window.location.pathname === '/') {
-              e.preventDefault();
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-          }}
-        >
-          <div className="flex items-center">
-            <span className="text-2xl md:text-3xl font-extrabold text-dragon-green uppercase lg:text-2xl mx-0 px-0">Tomi</span>
-            <span className="text-2xl md:text-3xl font-extrabold text-app-orange uppercase lg:text-2xl">Talk</span>
-          </div>
-        </Link>
-        
-        {/* Mobile menu and profile on far right */}
-        <MobileMenu user={user} profile={profile} selectedChild={selectedChild} onSignOut={handleSignOut} onStartNow={handleStartNow} onCenikScroll={handleCenikScroll} />
-      </div>
-    </header>;
+    </>
+  );
 }
