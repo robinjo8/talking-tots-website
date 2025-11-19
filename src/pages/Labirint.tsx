@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import useEmblaCarousel from "embla-carousel-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 
 const labirintGames = [
   {
@@ -171,6 +172,11 @@ export default function Labirint() {
             </p>
           </CardContent>
         </Card>
+
+        {/* Breadcrumb - Desktop only */}
+        <div className="hidden lg:block mb-8">
+          <BreadcrumbNavigation />
+        </div>
 
         {/* Desktop Grid */}
         {!isMobile && (

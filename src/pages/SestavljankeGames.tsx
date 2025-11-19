@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { getAgeGroup } from "@/utils/ageUtils";
 import useEmblaCarousel from "embla-carousel-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 
 const memoryGames = [
   {
@@ -181,6 +182,11 @@ export default function SestavljankeGames() {
               </div>
             </CardContent>
         </Card>
+
+        {/* Breadcrumb - Desktop only */}
+        <div className="hidden lg:block mb-8">
+          <BreadcrumbNavigation />
+        </div>
 
         {/* Letters grid/carousel */}
         <div className="mb-12">
