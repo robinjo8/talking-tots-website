@@ -33,6 +33,7 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
 
   // Generate maze using Recursive Backtracker algorithm
   const generateMaze = useCallback(() => {
+    console.log('MazeGame: generateMaze start', { cols: COLS, rows: ROWS });
     setIsGenerating(true);
     
     // Initialize grid
@@ -151,6 +152,7 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
     setMaze(grid);
     setPlayerPosition({ x: 0, y: 0 });
     setIsCompleted(false);
+    console.log('MazeGame: generateMaze done', { cols: COLS, rows: ROWS });
     setIsGenerating(false);
   }, []);
 

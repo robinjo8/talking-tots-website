@@ -84,11 +84,13 @@ export const MazeGame = ({ onComplete, cols, rows, alignTop }: MazeGameProps) =>
         const width = window.innerWidth;
         const height = window.innerHeight - 80; // 80px for header
         setContainerSize({ width, height });
+        console.log('MazeGame: updateSize desktop', { width, height });
       } else {
         // Mobile: use full window dimensions (fullscreen mode)
         const width = window.innerWidth;
         const height = window.innerHeight;
         setContainerSize({ width, height });
+        console.log('MazeGame: updateSize mobile', { width, height });
       }
     };
 
@@ -99,7 +101,7 @@ export const MazeGame = ({ onComplete, cols, rows, alignTop }: MazeGameProps) =>
       window.removeEventListener('resize', updateSize);
     };
   }, [alignTop]);
-
+ 
   // Calculate cell size based on container dimensions
   const CELL_SIZE = useMemo(() => {
     if (containerSize.width === 0 || containerSize.height === 0) {
@@ -117,6 +119,8 @@ export const MazeGame = ({ onComplete, cols, rows, alignTop }: MazeGameProps) =>
     // Use 99% of calculated size to fill the space better
     return Math.floor(maxCellSize * 0.99);
   }, [containerSize, COLS, ROWS]);
+ 
+  console.log('MazeGame render state', { alignTop, isGenerating, containerSize, CELL_SIZE });
 
   // Load dragon image
   useEffect(() => {
