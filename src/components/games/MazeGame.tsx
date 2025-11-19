@@ -80,19 +80,29 @@ export const MazeGame = ({ onComplete, cols, rows, alignTop }: MazeGameProps) =>
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const { width, height } = entry.contentRect;
+    const updateSize = () => {
+      if (alignTop) {
+        // Desktop: use window dimensions minus header
+        const width = window.innerWidth;
+        const height = window.innerHeight - 80; // 80px for header
         setContainerSize({ width, height });
+      } else {
+        // Mobile: use container dimensions
+        const width = containerRef.current?.clientWidth || 0;
+        const height = containerRef.current?.clientHeight || 0;
+        if (width > 0 && height > 0) {
+          setContainerSize({ width, height });
+        }
       }
-    });
+    };
 
-    resizeObserver.observe(containerRef.current);
+    updateSize();
+    window.addEventListener('resize', updateSize);
 
     return () => {
-      resizeObserver.disconnect();
+      window.removeEventListener('resize', updateSize);
     };
-  }, []);
+  }, [alignTop]);
 
   // Calculate cell size based on container dimensions
   const CELL_SIZE = useMemo(() => {
