@@ -58,7 +58,7 @@ const breadcrumbConfig: BreadcrumbConfig[] = [
   // Govorno-jezikovne vaje hierarchy
   { path: "/govornojezicovne-vaje", label: "Govorno-jezikovne vaje", parent: "/moje-aplikacije" },
   { path: "/govorno-jezikovne-vaje", label: "Govorno-jezikovne vaje", parent: "/moje-aplikacije" },
-  { path: "/vaje-motorike-govoril", label: "Vaje motorike govoril", parent: "/govornojezicovne-vaje" },
+  { path: "/vaje-motorike-govoril", label: "Vaje motorike govoril", parent: "/moje-aplikacije" },
   { path: "/govorno-jezikovne-vaje/vaje-motorike-govoril", label: "Vaje motorike govoril", parent: "/govorno-jezikovne-vaje" },
   
   // Video navodila hierarchy
