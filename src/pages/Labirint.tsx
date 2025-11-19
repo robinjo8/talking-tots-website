@@ -164,19 +164,10 @@ export default function Labirint() {
         {/* Page Title */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
-            Labirint - Izberi črko
+            Izberi črko za igro
           </h1>
           <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full"></div>
         </div>
-
-        {/* Instructional Card */}
-        <Card className="mb-12 bg-gradient-to-br from-app-blue/10 to-app-purple/10 border-2 border-app-blue/20">
-          <CardContent className="p-6 md:p-8">
-            <p className="text-center text-lg md:text-xl text-foreground leading-relaxed">
-              Izberi črko in poišči pot skozi labirint. Pomakni zmajčka od začetka do cilja! 🐉
-            </p>
-          </CardContent>
-        </Card>
 
         {/* Desktop Grid */}
         {!isMobile && (
