@@ -85,12 +85,10 @@ export const MazeGame = ({ onComplete, cols, rows, alignTop }: MazeGameProps) =>
         const height = window.innerHeight - 80; // 80px for header
         setContainerSize({ width, height });
       } else {
-        // Mobile: use container dimensions
-        const width = containerRef.current?.clientWidth || 0;
-        const height = containerRef.current?.clientHeight || 0;
-        if (width > 0 && height > 0) {
-          setContainerSize({ width, height });
-        }
+        // Mobile: use full window dimensions (fullscreen mode)
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        setContainerSize({ width, height });
       }
     };
 
