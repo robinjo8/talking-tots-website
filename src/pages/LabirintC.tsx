@@ -8,8 +8,8 @@ import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
-import { ArrowLeft, RotateCcw, BookOpen, Home } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ArrowLeft, RotateCcw, BookOpen, Menu } from "lucide-react";
 import { matchingGameData } from "@/data/matchingGameData";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
@@ -30,7 +30,7 @@ const LabirintCContent = () => {
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   const [isLandscape, setIsLandscape] = useState(true);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const { recordGameCompletion } = useEnhancedProgress();
   const isMobile = useIsMobile();
   const { user, selectedChild } = useAuth();
@@ -150,20 +150,25 @@ const LabirintCContent = () => {
           )}
         </div>
 
-        {/* Floating home button */}
-        <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-          <DrawerTrigger asChild>
+        {/* Floating menu button */}
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger asChild>
             <Button
               size="icon"
-              className="fixed bottom-4 left-4 z-50 bg-app-orange hover:bg-app-orange/90 text-white shadow-lg rounded-full w-14 h-14"
+              className="fixed bottom-4 left-4 z-50 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white shadow-2xl rounded-full w-16 h-16 border-2 border-white/20"
             >
-              <Home className="w-6 h-6" />
+              <Menu className="w-7 h-7" />
             </Button>
-          </DrawerTrigger>
-          <DrawerContent>
-            <div className="flex flex-col gap-3 p-6">
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            side="top" 
+            align="start" 
+            className="mb-2 ml-4 w-56 p-2 bg-background/95 backdrop-blur-sm border-2 shadow-xl z-[60]"
+            sideOffset={8}
+          >
+            <div className="flex flex-col gap-2">
               <MemoryExitConfirmationDialog onConfirm={confirmExit}>
-                <Button variant="outline" className="gap-2 w-full h-12 text-base">
+                <Button variant="outline" className="gap-2 w-full h-11 text-base justify-start">
                   <ArrowLeft className="w-5 h-5" />
                   Nazaj
                 </Button>
@@ -172,9 +177,9 @@ const LabirintCContent = () => {
               <Button
                 onClick={() => {
                   handleNewGame();
-                  setDrawerOpen(false);
+                  setMenuOpen(false);
                 }}
-                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 w-full h-12 text-base"
+                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 w-full h-11 text-base justify-start"
               >
                 <RotateCcw className="w-5 h-5" />
                 Nova igra
@@ -184,16 +189,16 @@ const LabirintCContent = () => {
                 variant="outline"
                 onClick={() => {
                   handleInstructions();
-                  setDrawerOpen(false);
+                  setMenuOpen(false);
                 }}
-                className="gap-2 w-full h-12 text-base"
+                className="gap-2 w-full h-11 text-base justify-start"
               >
                 <BookOpen className="w-5 h-5" />
                 Navodila
               </Button>
             </div>
-          </DrawerContent>
-        </Drawer>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <InstructionsModal
           isOpen={showInstructions}
