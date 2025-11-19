@@ -11,72 +11,72 @@ const labirintGames = [
   {
     id: "c",
     letter: "C",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_c.png",
-    gradient: "from-blue-400/80 to-purple-500/80",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
+    gradient: "from-dragon-green/20 to-dragon-green/20",
     description: "Poišči pot skozi labirint s črko C",
     available: true
   },
   {
     id: "č",
     letter: "Č",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_c.png",
-    gradient: "from-purple-400/80 to-pink-500/80",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
+    gradient: "from-app-blue/20 to-app-teal/20",
     description: "Poišči pot skozi labirint s črko Č",
     available: false
   },
   {
     id: "k",
     letter: "K",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_k.png",
-    gradient: "from-green-400/80 to-teal-500/80",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png",
+    gradient: "from-app-orange/20 to-app-yellow/20",
     description: "Poišči pot skozi labirint s črko K",
     available: false
   },
   {
     id: "l",
     letter: "L",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_l.png",
-    gradient: "from-yellow-400/80 to-orange-500/80",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png",
+    gradient: "from-app-purple/20 to-app-blue/20",
     description: "Poišči pot skozi labirint s črko L",
     available: false
   },
   {
     id: "r",
     letter: "R",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_r.png",
-    gradient: "from-red-400/80 to-rose-500/80",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
+    gradient: "from-app-purple/20 to-app-teal/20",
     description: "Poišči pot skozi labirint s črko R",
     available: false
   },
   {
     id: "s",
     letter: "S",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_s.png",
-    gradient: "from-cyan-400/80 to-blue-500/80",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
+    gradient: "from-dragon-green/20 to-app-teal/20",
     description: "Poišči pot skozi labirint s črko S",
     available: false
   },
   {
     id: "š",
     letter: "Š",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_s.png",
-    gradient: "from-indigo-400/80 to-violet-500/80",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
+    gradient: "from-app-blue/20 to-app-purple/20",
     description: "Poišči pot skozi labirint s črko Š",
     available: false
   },
   {
     id: "z",
     letter: "Z",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_z.png",
-    gradient: "from-lime-400/80 to-green-500/80",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
+    gradient: "from-app-teal/20 to-dragon-green/20",
     description: "Poišči pot skozi labirint s črko Z",
     available: false
   },
   {
     id: "ž",
     letter: "Ž",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_z.png",
-    gradient: "from-emerald-400/80 to-teal-500/80",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
+    gradient: "from-app-purple/20 to-app-blue/20",
     description: "Poišči pot skozi labirint s črko Ž",
     available: false
   }
