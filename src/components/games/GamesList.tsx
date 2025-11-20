@@ -8,7 +8,7 @@ const otherGames = [
     image: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/spomin_4.png?t=${new Date().getTime()}`,
     gradient: "from-app-purple/20 to-app-blue/20",
     backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/background-gradient-lights.jpg",
-    backgroundOpacity: 0.9,
+    backgroundOpacity: 0.8,
     path: "/govorne-igre/spomin",
     available: true
   },
@@ -30,7 +30,7 @@ const otherGames = [
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/zaporedja.png",
     gradient: "from-app-purple/20 to-app-blue/20",
     backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/background-gradient-lights.jpg",
-    backgroundOpacity: 0.7,
+    backgroundOpacity: 0.8,
     path: "/govorne-igre/zaporedja",
     available: true
   },
@@ -41,7 +41,7 @@ const otherGames = [
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/drsna_4.png",
     gradient: "from-app-orange/20 to-app-yellow/20",
     backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/background-gradient-lights.jpg",
-    backgroundOpacity: 0.6,
+    backgroundOpacity: 0.8,
     path: "/govorne-igre/drsna-sestavljanka",
     available: true
   },
@@ -52,7 +52,7 @@ const otherGames = [
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/povezi_pare_4.png",
     gradient: "from-app-purple/20 to-app-blue/20",
     backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/background-gradient-lights.jpg",
-    backgroundOpacity: 0.5,
+    backgroundOpacity: 0.8,
     path: "/govorne-igre/igra-ujemanja",
     available: true
   },
@@ -63,7 +63,7 @@ const otherGames = [
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/labirint_4.png",
     gradient: "from-app-orange/20 to-app-yellow/20",
     backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/background-gradient-lights.jpg",
-    backgroundOpacity: 0.4,
+    backgroundOpacity: 0.8,
     path: "/govorne-igre/labirint",
     available: true
   },
