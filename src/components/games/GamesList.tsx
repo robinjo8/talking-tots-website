@@ -62,8 +62,7 @@ const otherGames = [
     description: "Poišči pot skozi labirint in vadi izgovorjavo",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/labirint_4.png",
     gradient: "from-app-orange/20 to-app-yellow/20",
-    backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/background-gradient-lights.jpg",
-    backgroundOpacity: 0.8,
+    customBackground: "radial-gradient(circle, hsl(40, 100%, 90%) 0%, hsl(38, 100%, 75%) 30%, hsl(33, 100%, 50%) 100%)",
     path: "/govorne-igre/labirint",
     available: true
   },
@@ -107,7 +106,7 @@ export function GamesList() {
             >
               {/* Card Image */}
               <div className="relative aspect-video overflow-hidden">
-                {/* Background with opacity */}
+                {/* Background with opacity or custom gradient */}
                 {game.backgroundImage && (
                   <div 
                     className="absolute inset-0"
@@ -116,6 +115,14 @@ export function GamesList() {
                       backgroundSize: "cover",
                       backgroundPosition: "center",
                       opacity: game.backgroundOpacity || 1
+                    }}
+                  />
+                )}
+                {game.customBackground && (
+                  <div 
+                    className="absolute inset-0"
+                    style={{
+                      background: game.customBackground
                     }}
                   />
                 )}
