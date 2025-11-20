@@ -7,7 +7,7 @@ const otherGames = [
     description: "Igraj spomin in vadi izgovorjavo",
     image: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/spomin_4.png?t=${new Date().getTime()}`,
     gradient: "from-app-purple/20 to-app-blue/20",
-    backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/fr4.jpg",
+    backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/9907ec86-1738-4986-8597-ee09d75b468d.jpg",
     path: "/govorne-igre/spomin",
     available: true
   },
@@ -17,7 +17,7 @@ const otherGames = [
     description: "Igraj sestavljanke in vadi logično razmišljanje",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/sestavljanka_4.png",
     gradient: "from-app-teal/20 to-dragon-green/20",
-    backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/ftuy4.jpg",
+    backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/9907ec86-1738-4986-8597-ee09d75b468d.jpg",
     path: "/govorne-igre/sestavljanke",
     available: true
   },
@@ -27,7 +27,7 @@ const otherGames = [
     description: "Uredi zaporedje slik in vadi izgovorjavo",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/zaporedja.png",
     gradient: "from-app-purple/20 to-app-blue/20",
-    backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/v915-wit-010.jpg",
+    backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/9907ec86-1738-4986-8597-ee09d75b468d.jpg",
     path: "/govorne-igre/zaporedja",
     available: true
   },
@@ -47,7 +47,7 @@ const otherGames = [
     description: "Poveži enake slike med stolpci",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/povezi_pare_4.png",
     gradient: "from-app-purple/20 to-app-blue/20",
-    backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/59f4934c-8b47-4714-995a-63853d531649.jpg",
+    backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/9907ec86-1738-4986-8597-ee09d75b468d.jpg",
     path: "/govorne-igre/igra-ujemanja",
     available: true
   },
@@ -57,7 +57,7 @@ const otherGames = [
     description: "Poišči pot skozi labirint in vadi izgovorjavo",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/labirint_4.png",
     gradient: "from-app-orange/20 to-app-yellow/20",
-    backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/bee2716e-fafd-4bc3-b2f4-a7b8c18312b9.jpg",
+    backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/9907ec86-1738-4986-8597-ee09d75b468d.jpg",
     path: "/govorne-igre/labirint",
     available: true
   },
@@ -108,12 +108,7 @@ export function GamesList() {
                   backgroundPosition: "center"
                 }}
               >
-                <div 
-                  className="w-full h-full flex items-center justify-center"
-                  style={{
-                    transform: game.id === "labirint" ? "rotate(90deg) scale(1.4)" : "none"
-                  }}
-                >
+                <div className="w-full h-full flex items-center justify-center">
                   <img 
                     src={game.image}
                     alt={game.title}
