@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const otherGames = [
   {
@@ -15,11 +16,13 @@ const otherGames = [
     id: "sestavljanke",
     title: "SESTAVLJANKE",
     description: "Igraj sestavljanke in vadi logično razmišljanje",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/sestavljanka_4.png",
+    image: "/lovable-uploads/sestavljanka_normal.png",
+    hoverImage: "/lovable-uploads/sestavljanka_hover.png",
     gradient: "from-app-teal/20 to-dragon-green/20",
     backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/ftuy4.jpg",
     path: "/govorne-igre/sestavljanke",
-    available: true
+    available: true,
+    hasHoverAnimation: true
   },
   {
     id: "zaporedja",
@@ -79,6 +82,7 @@ const otherGames = [
 
 export function GamesList() {
   const navigate = useNavigate();
+  const [hoveredGame, setHoveredGame] = useState<string | null>(null);
   const activeGames = otherGames.filter(game => game.available);
   const inactiveGames = otherGames.filter(game => !game.available);
 
@@ -113,11 +117,16 @@ export function GamesList() {
                   style={{
                     transform: game.id === "labirint" ? "rotate(90deg) scale(1.4)" : "none"
                   }}
+                  onMouseEnter={() => game.hasHoverAnimation && setHoveredGame(game.id)}
+                  onMouseLeave={() => setHoveredGame(null)}
                 >
                   <img 
-                    src={game.image}
+                    src={hoveredGame === game.id && game.hoverImage ? game.hoverImage : game.image}
                     alt={game.title}
-                    className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+                    className="w-full h-full object-contain transition-all duration-500 ease-in-out"
+                    style={{
+                      transform: game.id !== "labirint" && hoveredGame === game.id ? "scale(1.05)" : "scale(1)"
+                    }}
                   />
                 </div>
               </div>
