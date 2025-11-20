@@ -7,7 +7,6 @@ const otherGames = [
     description: "Igraj spomin in vadi izgovorjavo",
     image: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/spomin_4.png?t=${new Date().getTime()}`,
     gradient: "from-app-purple/20 to-app-blue/20",
-    backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/fr4.jpg",
     path: "/govorne-igre/spomin",
     available: true
   },
@@ -17,7 +16,6 @@ const otherGames = [
     description: "Igraj sestavljanke in vadi logično razmišljanje",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/sestavljanka_4.png",
     gradient: "from-app-teal/20 to-dragon-green/20",
-    backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/ftuy4.jpg",
     path: "/govorne-igre/sestavljanke",
     available: true
   },
@@ -27,7 +25,6 @@ const otherGames = [
     description: "Uredi zaporedje slik in vadi izgovorjavo",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/zaporedja.png",
     gradient: "from-app-purple/20 to-app-blue/20",
-    backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/v915-wit-010.jpg",
     path: "/govorne-igre/zaporedja",
     available: true
   },
@@ -37,7 +34,6 @@ const otherGames = [
     description: "Drsne sestavljanke za vajo izgovorjave",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/drsna_4.png",
     gradient: "from-app-orange/20 to-app-yellow/20",
-    backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/9907ec86-1738-4986-8597-ee09d75b468d.jpg",
     path: "/govorne-igre/drsna-sestavljanka",
     available: true
   },
@@ -47,7 +43,6 @@ const otherGames = [
     description: "Poveži enake slike med stolpci",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/povezi_pare_4.png",
     gradient: "from-app-purple/20 to-app-blue/20",
-    backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/59f4934c-8b47-4714-995a-63853d531649.jpg",
     path: "/govorne-igre/igra-ujemanja",
     available: true
   },
@@ -57,7 +52,6 @@ const otherGames = [
     description: "Poišči pot skozi labirint in vadi izgovorjavo",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/labirint_4.png",
     gradient: "from-app-orange/20 to-app-yellow/20",
-    backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/bee2716e-fafd-4bc3-b2f4-a7b8c18312b9.jpg",
     path: "/govorne-igre/labirint",
     available: true
   },
@@ -100,20 +94,8 @@ export function GamesList() {
               onClick={() => handleGameClick(game.path)}
             >
               {/* Card Image */}
-              <div 
-                className="relative aspect-video overflow-hidden"
-                style={{
-                  backgroundImage: game.backgroundImage ? `url(${game.backgroundImage})` : undefined,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center"
-                }}
-              >
-                <div 
-                  className="w-full h-full flex items-center justify-center"
-                  style={{
-                    transform: game.id === "labirint" ? "rotate(90deg) scale(1.4)" : "none"
-                  }}
-                >
+              <div className="relative aspect-video overflow-hidden bg-muted/30">
+                <div className="w-full h-full flex items-center justify-center">
                   <img 
                     src={game.image}
                     alt={game.title}
@@ -149,12 +131,7 @@ export function GamesList() {
                 className="bg-card rounded-xl shadow-md transition-all duration-300 overflow-hidden opacity-60 cursor-not-allowed"
               >
                 {/* Card Image */}
-                <div 
-                  className="relative aspect-video overflow-hidden"
-                  style={{
-                    background: 'radial-gradient(circle, rgb(255, 171, 0) 0%, rgb(234, 88, 12) 100%)'
-                  }}
-                >
+                <div className="relative aspect-video overflow-hidden bg-muted/30">
                   <div className="w-full h-full flex items-center justify-center">
                     {game.image ? (
                       <img 
