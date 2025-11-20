@@ -94,7 +94,14 @@ export function GamesList() {
               onClick={() => handleGameClick(game.path)}
             >
               {/* Card Image */}
-              <div className="relative aspect-video overflow-hidden bg-muted/30">
+              <div 
+                className="relative aspect-video overflow-hidden"
+                style={{
+                  backgroundImage: "url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/ftuy4.jpg)",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center"
+                }}
+              >
                 <div className="w-full h-full flex items-center justify-center">
                   <img 
                     src={game.image}
@@ -131,7 +138,14 @@ export function GamesList() {
                 className="bg-card rounded-xl shadow-md transition-all duration-300 overflow-hidden opacity-60 cursor-not-allowed"
               >
                 {/* Card Image */}
-                <div className="relative aspect-video overflow-hidden bg-muted/30">
+                <div 
+                  className="relative aspect-video overflow-hidden"
+                  style={{
+                    backgroundImage: "url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/ftuy4.jpg)",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center"
+                  }}
+                >
                   <div className="w-full h-full flex items-center justify-center">
                     {game.image ? (
                       <img 
