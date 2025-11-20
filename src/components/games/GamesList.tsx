@@ -62,7 +62,7 @@ const otherGames = [
     description: "Poišči pot skozi labirint in vadi izgovorjavo",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/labirint_4.png",
     gradient: "from-app-orange/20 to-app-yellow/20",
-    customBackground: "radial-gradient(circle, hsl(40, 100%, 90%) 0%, hsl(38, 100%, 75%) 15%, hsl(33, 100%, 50%) 100%)",
+    customBackground: "radial-gradient(circle, hsl(42, 100%, 92%) 0%, hsl(40, 100%, 88%) 40%, hsl(38, 100%, 70%) 70%, hsl(33, 100%, 50%) 100%)",
     path: "/govorne-igre/labirint",
     available: true
   },
