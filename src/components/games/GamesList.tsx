@@ -106,16 +106,21 @@ export function GamesList() {
               onClick={() => handleGameClick(game.path)}
             >
               {/* Card Image */}
-              <div 
-                className="relative aspect-video overflow-hidden"
-                style={{
-                  backgroundImage: game.backgroundImage ? `url(${game.backgroundImage})` : undefined,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  opacity: game.backgroundOpacity || 1
-                }}
-              >
-                <div className="w-full h-full flex items-center justify-center">
+              <div className="relative aspect-video overflow-hidden">
+                {/* Background with opacity */}
+                {game.backgroundImage && (
+                  <div 
+                    className="absolute inset-0"
+                    style={{
+                      backgroundImage: `url(${game.backgroundImage})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      opacity: game.backgroundOpacity || 1
+                    }}
+                  />
+                )}
+                {/* Image on top - 100% opacity */}
+                <div className="relative w-full h-full flex items-center justify-center">
                   <img 
                     src={game.image}
                     alt={game.title}
