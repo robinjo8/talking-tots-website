@@ -7,8 +7,7 @@ const otherGames = [
     description: "Igraj spomin in vadi izgovorjavo",
     image: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/spomin_4.png?t=${new Date().getTime()}`,
     gradient: "from-app-purple/20 to-app-blue/20",
-    backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/background-gradient-lights.jpg",
-    backgroundOpacity: 0.8,
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 92%) 0%, hsl(42, 100%, 88%) 30%, hsl(38, 100%, 70%) 60%, hsl(33, 100%, 50%) 100%)",
     path: "/govorne-igre/spomin",
     available: true
   },
@@ -18,8 +17,7 @@ const otherGames = [
     description: "Igraj sestavljanke in vadi logično razmišljanje",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/sestavljanka_4.png",
     gradient: "from-app-teal/20 to-dragon-green/20",
-    backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/background-gradient-lights.jpg",
-    backgroundOpacity: 0.8,
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 92%) 0%, hsl(42, 100%, 88%) 30%, hsl(38, 100%, 70%) 60%, hsl(33, 100%, 50%) 100%)",
     path: "/govorne-igre/sestavljanke",
     available: true
   },
@@ -29,8 +27,7 @@ const otherGames = [
     description: "Uredi zaporedje slik in vadi izgovorjavo",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/zaporedja.png",
     gradient: "from-app-purple/20 to-app-blue/20",
-    backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/background-gradient-lights.jpg",
-    backgroundOpacity: 0.8,
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 92%) 0%, hsl(42, 100%, 88%) 30%, hsl(38, 100%, 70%) 60%, hsl(33, 100%, 50%) 100%)",
     path: "/govorne-igre/zaporedja",
     available: true
   },
@@ -40,8 +37,7 @@ const otherGames = [
     description: "Drsne sestavljanke za vajo izgovorjave",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/drsna_4.png",
     gradient: "from-app-orange/20 to-app-yellow/20",
-    backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/background-gradient-lights.jpg",
-    backgroundOpacity: 0.8,
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 92%) 0%, hsl(42, 100%, 88%) 30%, hsl(38, 100%, 70%) 60%, hsl(33, 100%, 50%) 100%)",
     path: "/govorne-igre/drsna-sestavljanka",
     available: true
   },
@@ -51,8 +47,7 @@ const otherGames = [
     description: "Poveži enake slike med stolpci",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/povezi_pare_4.png",
     gradient: "from-app-purple/20 to-app-blue/20",
-    backgroundImage: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/background-gradient-lights.jpg",
-    backgroundOpacity: 0.8,
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 92%) 0%, hsl(42, 100%, 88%) 30%, hsl(38, 100%, 70%) 60%, hsl(33, 100%, 50%) 100%)",
     path: "/govorne-igre/igra-ujemanja",
     available: true
   },
@@ -106,18 +101,7 @@ export function GamesList() {
             >
               {/* Card Image */}
               <div className="relative aspect-video overflow-hidden">
-                {/* Background with opacity or custom gradient */}
-                {game.backgroundImage && (
-                  <div 
-                    className="absolute inset-0"
-                    style={{
-                      backgroundImage: `url(${game.backgroundImage})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                      opacity: game.backgroundOpacity || 1
-                    }}
-                  />
-                )}
+                {/* Custom gradient background */}
                 {game.customBackground && (
                   <div 
                     className="absolute inset-0"
