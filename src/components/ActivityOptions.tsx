@@ -10,6 +10,7 @@ export function ActivityOptions() {
       description: 'Zabavne igre za izboljšanje izgovorjave.',
       image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_igre_4.png',
       gradient: 'from-dragon-green/20 to-dragon-green/20',
+      customBackground: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/background-gradient-lights.jpg',
       badge: '🎮',
       url: '/govorne-igre'
     },
@@ -19,6 +20,7 @@ export function ActivityOptions() {
       description: 'Prilagojene aktivnosti za izboljšanje izgovorjave.',
       image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_vaje_6.png',
       gradient: 'from-app-blue/20 to-app-teal/20',
+      customBackground: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/background-gradient-lights.jpg',
       badge: '📝',
       url: '/govorno-jezikovne-vaje'
     },
@@ -28,6 +30,7 @@ export function ActivityOptions() {
       description: 'Test izgovorjave za vse slovenske soglasnike.',
       image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_artikulacija_4.png',
       gradient: 'from-app-purple/20 to-app-teal/20',
+      customBackground: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/background-gradient-lights.jpg',
       badge: '🎯',
       url: '/artikulacijski-test'
     },
@@ -37,6 +40,7 @@ export function ActivityOptions() {
       description: 'Priporočila pametnega asistenta.',
       image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/Zmajcek_izzivi_5.png',
       gradient: 'from-app-orange/20 to-app-yellow/20',
+      customBackground: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/background-gradient-lights.jpg',
       badge: '⭐',
       url: '/moji-izzivi'
     },
@@ -46,6 +50,7 @@ export function ActivityOptions() {
       description: 'Poglej kako logoped pravilno izgovori posamezne črke.',
       image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/Zmajcek_video_7.png',
       gradient: 'from-app-teal/20 to-dragon-green/20',
+      customBackground: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/background-gradient-lights.jpg',
       badge: '🎥',
       url: '/video-navodila'
     },
@@ -55,6 +60,7 @@ export function ActivityOptions() {
       description: 'Koristni nasveti in informacije o govornem razvoju.',
       image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_logoped_4.png',
       gradient: 'from-app-purple/20 to-app-blue/20',
+      customBackground: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/background-gradient-lights.jpg',
       badge: '💡',
       url: '/logopedski-koticek'
     }
@@ -73,8 +79,21 @@ export function ActivityOptions() {
           onClick={() => handleActivityClick(activity.url)}
         >
           {/* Card Image */}
-          <div className={`relative aspect-video overflow-hidden bg-gradient-to-br ${activity.gradient}`}>
-            <div className="w-full h-full flex items-center justify-center">
+          <div className="relative aspect-video overflow-hidden">
+            {/* Background image */}
+            {activity.customBackground && (
+              <div 
+                className="absolute inset-0"
+                style={{
+                  backgroundImage: `url(${activity.customBackground})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  opacity: 0.8
+                }}
+              />
+            )}
+            {/* Zmajček image on top */}
+            <div className="relative w-full h-full flex items-center justify-center">
               <img 
                 src={activity.image}
                 alt={activity.title}
