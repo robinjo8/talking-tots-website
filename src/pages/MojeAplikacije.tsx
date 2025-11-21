@@ -29,6 +29,16 @@ const MojeAplikacije = () => {
 
   return (
     <div className="min-h-screen relative">
+      {/* Background image */}
+      <div 
+        className="fixed inset-0 z-0"
+        style={{
+          backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/background-gradient-lights.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      />
       <AnimatedBackground />
       <Header />
       
