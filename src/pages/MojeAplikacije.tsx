@@ -41,9 +41,7 @@ const MojeAplikacije = () => {
       {/* Hero sekcija */}
       <section className="bg-dragon-green py-12 md:py-16">
         <div className="container max-w-6xl mx-auto px-4">
-          <BreadcrumbNavigation />
-          
-          <div className="text-center mt-8 mb-8">
+          <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
               Izberi aktivnost{selectedChild ? `, ${selectedChild.name}` : ''}!
             </h1>
@@ -75,6 +73,11 @@ const MojeAplikacije = () => {
         style={{ backgroundColor: 'white' }}
       >
         <div className="container max-w-6xl mx-auto px-4">
+          {/* Breadcrumb - samo na desktopu */}
+          <div className="hidden lg:block mb-8">
+            <BreadcrumbNavigation />
+          </div>
+          
           {selectedChild ? (
             <ActivityOptions />
           ) : (

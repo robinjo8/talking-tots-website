@@ -76,9 +76,9 @@ export function ActivityOptions() {
       {activities.map((activity, index) => {
         console.log('🎯 Rendering card:', activity.title);
         return (
-          <div key={activity.id}>
+          <div key={activity.id} className="flex h-full">
             <div
-              className="bg-white rounded-xl shadow-xl border border-gray-200 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group"
+              className="bg-white rounded-xl shadow-xl border border-gray-200 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group flex flex-col w-full"
               onClick={() => handleActivityClick(activity.url)}
             >
             {/* Card Image */}
@@ -99,8 +99,8 @@ export function ActivityOptions() {
             </div>
 
             {/* Card Content */}
-            <div className="p-6">
-              <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
+            <div className="p-6 flex flex-col flex-grow">
+              <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors min-h-[3.5rem] flex items-center">
                 {activity.title}
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
