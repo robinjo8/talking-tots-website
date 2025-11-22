@@ -89,97 +89,88 @@ export function GamesList() {
   };
 
   return (
-    <>
+    <div className="space-y-16">
       {/* Available Games Section */}
-      <div className="mb-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <section>
+        <h2 className="text-3xl font-bold text-foreground mb-8 text-center">
+          Igre na voljo
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {activeGames.map((game) => (
             <div
               key={game.id}
-              className="bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group"
               onClick={() => handleGameClick(game.path)}
+              className="group cursor-pointer"
             >
-              {/* Card Image */}
-              <div className="relative aspect-video overflow-hidden">
-                {/* Custom gradient background */}
-                {game.customBackground && (
-                  <div 
-                    className="absolute inset-0"
-                    style={{
-                      background: game.customBackground
-                    }}
-                  />
-                )}
-                {/* Image on top - 100% opacity */}
-                <div className="relative w-full h-full flex items-center justify-center">
-                  <img 
+              <div className="bg-white/80 backdrop-blur-sm border border-green-100/50 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                {/* Image Container */}
+                <div className="bg-white/90 aspect-square flex items-center justify-center p-8 border-b border-green-50/50">
+                  <img
                     src={game.image}
                     alt={game.title}
-                    className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+                    className="w-full h-full object-contain drop-shadow-lg transform group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
-              </div>
-
-              {/* Card Content */}
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
-                  {game.title}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
-                  {game.description}
-                </p>
+                
+                {/* Text Content */}
+                <div className="p-6 text-center">
+                  <h3 className="text-2xl font-bold text-foreground mb-2 group-hover:text-[hsl(122,39%,49%)] transition-colors">
+                    {game.title}
+                  </h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    {game.description}
+                  </p>
+                </div>
               </div>
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Unavailable Games Section */}
+      {/* Coming Soon Section */}
       {inactiveGames.length > 0 && (
-        <div>
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-muted-foreground">
+        <section>
+          <h2 className="text-3xl font-bold text-foreground mb-8 text-center">
             KMALU NA VOLJO
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {inactiveGames.map((game) => (
               <div
                 key={game.id}
-                className="bg-card rounded-xl shadow-md transition-all duration-300 overflow-hidden opacity-60 cursor-not-allowed"
+                className="opacity-60 cursor-not-allowed"
               >
-                {/* Card Image */}
-                <div 
-                  className="relative aspect-video overflow-hidden"
-                  style={{
-                    background: 'radial-gradient(circle, rgb(255, 171, 0) 0%, rgb(234, 88, 12) 100%)'
-                  }}
-                >
-                  <div className="w-full h-full flex items-center justify-center">
+                <div className="bg-white/60 backdrop-blur-sm border border-orange-100/50 rounded-3xl overflow-hidden shadow-lg">
+                  {/* Image Container with orange gradient for inactive */}
+                  <div className="bg-gradient-to-br from-orange-50 to-orange-100 aspect-square flex items-center justify-center p-8 border-b border-orange-50/50">
                     {game.image ? (
-                      <img 
+                      <img
                         src={game.image}
                         alt={game.title}
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-contain drop-shadow-lg grayscale"
                       />
                     ) : (
                       <div className="text-6xl">🎮</div>
                     )}
                   </div>
-                </div>
-
-                {/* Card Content */}
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-foreground mb-3">
-                    {game.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed italic">
-                    Kmalu na voljo
-                  </p>
+                  
+                  {/* Text Content */}
+                  <div className="p-6 text-center">
+                    <h3 className="text-2xl font-bold text-foreground mb-2">
+                      {game.title}
+                    </h3>
+                    <p className="text-muted-foreground text-sm leading-relaxed mb-3">
+                      {game.description}
+                    </p>
+                    <p className="text-app-orange font-semibold text-sm">
+                      Kmalu na voljo
+                    </p>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </section>
       )}
-    </>
+    </div>
   );
 }
