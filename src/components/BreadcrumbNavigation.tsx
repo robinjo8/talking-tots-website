@@ -159,8 +159,8 @@ export function BreadcrumbNavigation() {
       <Breadcrumb>
         <BreadcrumbList>
           {breadcrumbItems.map((item, index) => (
-            <React.Fragment key={item.path}>
-              <BreadcrumbItem>
+            <>
+              <BreadcrumbItem key={`item-${item.path}`}>
                 {index === breadcrumbItems.length - 1 ? (
                   <BreadcrumbPage className="flex items-center gap-1.5">
                     {index === 0 && <Home className="h-4 w-4" />}
@@ -176,11 +176,11 @@ export function BreadcrumbNavigation() {
                 )}
               </BreadcrumbItem>
               {index < breadcrumbItems.length - 1 && (
-                <BreadcrumbSeparator>
+                <BreadcrumbSeparator key={`sep-${item.path}`}>
                   <ChevronRight className="h-4 w-4" />
                 </BreadcrumbSeparator>
               )}
-            </React.Fragment>
+            </>
           ))}
         </BreadcrumbList>
       </Breadcrumb>
