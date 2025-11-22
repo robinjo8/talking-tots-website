@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 export function ActivityOptions() {
   const navigate = useNavigate();
@@ -66,33 +67,45 @@ export function ActivityOptions() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {activities.map((activity) => (
-        <div
+      {activities.map((activity, index) => (
+        <motion.div
           key={activity.id}
-          className="bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group"
-          onClick={() => handleActivityClick(activity.url)}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: index * 0.1 }}
         >
-          {/* Card Image */}
-          <div className={`relative aspect-video overflow-hidden bg-gradient-to-br ${activity.gradient}`}>
-            <div className="w-full h-full flex items-center justify-center">
-              <img 
-                src={activity.image}
-                alt={activity.title}
-                className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-300"
-              />
+          <div
+            className="bg-card rounded-xl shadow-md hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group"
+            onClick={() => handleActivityClick(activity.url)}
+          >
+            {/* Card Image */}
+            <div className={`relative aspect-video overflow-hidden bg-gradient-to-br ${activity.gradient}`}>
+              {/* Recommended badge - statično na Moji izzivi */}
+              {activity.id === 'challenges' && (
+                <div className="absolute top-4 right-4 bg-app-yellow text-foreground px-3 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-1 z-10">
+                  ⭐ Priporočeno
+                </div>
+              )}
+              <div className="w-full h-full flex items-center justify-center">
+                <img 
+                  src={activity.image}
+                  alt={activity.title}
+                  className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-300"
+                />
+              </div>
+            </div>
+
+            {/* Card Content */}
+            <div className="p-6">
+              <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
+                {activity.title}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                {activity.description}
+              </p>
             </div>
           </div>
-
-          {/* Card Content */}
-          <div className="p-6">
-            <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
-              {activity.title}
-            </h3>
-            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
-              {activity.description}
-            </p>
-          </div>
-        </div>
+        </motion.div>
       ))}
     </div>
   );
