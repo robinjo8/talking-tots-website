@@ -7,6 +7,7 @@ const otherGames = [
     description: "Igraj spomin in vadi izgovorjavo",
     image: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/spomin_4.png?t=${new Date().getTime()}`,
     gradient: "from-app-purple/20 to-app-blue/20",
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 92%) 0%, hsl(42, 100%, 88%) 30%, hsl(38, 100%, 70%) 60%, hsl(33, 100%, 50%) 100%)",
     path: "/govorne-igre/spomin",
     available: true
   },
@@ -16,6 +17,7 @@ const otherGames = [
     description: "Igraj sestavljanke in vadi logično razmišljanje",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/sestavljanka_4.png",
     gradient: "from-app-teal/20 to-dragon-green/20",
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 92%) 0%, hsl(42, 100%, 88%) 30%, hsl(38, 100%, 70%) 60%, hsl(33, 100%, 50%) 100%)",
     path: "/govorne-igre/sestavljanke",
     available: true
   },
@@ -24,7 +26,8 @@ const otherGames = [
     title: "ZAPOREDJA",
     description: "Uredi zaporedje slik in vadi izgovorjavo",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/zaporedja.png",
-    gradient: "from-dragon-green/20 to-app-teal/20",
+    gradient: "from-app-purple/20 to-app-blue/20",
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 92%) 0%, hsl(42, 100%, 88%) 30%, hsl(38, 100%, 70%) 60%, hsl(33, 100%, 50%) 100%)",
     path: "/govorne-igre/zaporedja",
     available: true
   },
@@ -34,6 +37,7 @@ const otherGames = [
     description: "Drsne sestavljanke za vajo izgovorjave",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/drsna_4.png",
     gradient: "from-app-orange/20 to-app-yellow/20",
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 92%) 0%, hsl(42, 100%, 88%) 30%, hsl(38, 100%, 70%) 60%, hsl(33, 100%, 50%) 100%)",
     path: "/govorne-igre/drsna-sestavljanka",
     available: true
   },
@@ -42,7 +46,8 @@ const otherGames = [
     title: "IGRA UJEMANJA",
     description: "Poveži enake slike med stolpci",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/povezi_pare_4.png",
-    gradient: "from-app-blue/20 to-app-purple/20",
+    gradient: "from-app-purple/20 to-app-blue/20",
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 92%) 0%, hsl(42, 100%, 88%) 30%, hsl(38, 100%, 70%) 60%, hsl(33, 100%, 50%) 100%)",
     path: "/govorne-igre/igra-ujemanja",
     available: true
   },
@@ -51,7 +56,8 @@ const otherGames = [
     title: "LABIRINT",
     description: "Poišči pot skozi labirint in vadi izgovorjavo",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/labirint_4.png",
-    gradient: "from-app-yellow/20 to-app-orange/20",
+    gradient: "from-app-orange/20 to-app-yellow/20",
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 92%) 0%, hsl(42, 100%, 88%) 30%, hsl(38, 100%, 70%) 60%, hsl(33, 100%, 50%) 100%)",
     path: "/govorne-igre/labirint",
     available: true
   },
@@ -83,88 +89,97 @@ export function GamesList() {
   };
 
   return (
-    <div className="space-y-16">
+    <>
       {/* Available Games Section */}
-      <section>
-        <h2 className="text-3xl font-bold text-foreground mb-8 text-center">
-          Igre na voljo
-        </h2>
+      <div className="mb-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {activeGames.map((game) => (
             <div
               key={game.id}
+              className="bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group"
               onClick={() => handleGameClick(game.path)}
-              className="group cursor-pointer"
             >
-              <div className={`bg-gradient-to-br ${game.gradient} bg-card rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300`}>
-                {/* Image Container */}
-                <div className="aspect-video relative overflow-hidden">
-                  <img
+              {/* Card Image */}
+              <div className="relative aspect-video overflow-hidden">
+                {/* Custom gradient background */}
+                {game.customBackground && (
+                  <div 
+                    className="absolute inset-0"
+                    style={{
+                      background: game.customBackground
+                    }}
+                  />
+                )}
+                {/* Image on top - 100% opacity */}
+                <div className="relative w-full h-full flex items-center justify-center">
+                  <img 
                     src={game.image}
                     alt={game.title}
-                    className="w-full h-full object-cover object-center transform group-hover:scale-110 transition-transform duration-300"
+                    className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
                   />
                 </div>
-                
-                {/* Text Content */}
-                <div className="p-6 text-center">
-                  <h3 className="text-2xl font-bold text-foreground mb-2 group-hover:text-app-blue transition-colors">
-                    {game.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    {game.description}
-                  </p>
-                </div>
+              </div>
+
+              {/* Card Content */}
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
+                  {game.title}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                  {game.description}
+                </p>
               </div>
             </div>
           ))}
         </div>
-      </section>
+      </div>
 
-      {/* Coming Soon Section */}
+      {/* Unavailable Games Section */}
       {inactiveGames.length > 0 && (
-        <section>
-          <h2 className="text-3xl font-bold text-foreground mb-8 text-center">
+        <div>
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-muted-foreground">
             KMALU NA VOLJO
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {inactiveGames.map((game) => (
               <div
                 key={game.id}
-                className="opacity-60 cursor-not-allowed"
+                className="bg-card rounded-xl shadow-md transition-all duration-300 overflow-hidden opacity-60 cursor-not-allowed"
               >
-                <div className={`bg-gradient-to-br ${game.gradient} bg-card rounded-xl overflow-hidden shadow-md`}>
-                  {/* Image Container with orange gradient for inactive */}
-                  <div className="aspect-video relative overflow-hidden bg-gradient-to-br from-orange-50 to-orange-100">
+                {/* Card Image */}
+                <div 
+                  className="relative aspect-video overflow-hidden"
+                  style={{
+                    background: 'radial-gradient(circle, rgb(255, 171, 0) 0%, rgb(234, 88, 12) 100%)'
+                  }}
+                >
+                  <div className="w-full h-full flex items-center justify-center">
                     {game.image ? (
-                      <img
+                      <img 
                         src={game.image}
                         alt={game.title}
-                        className="w-full h-full object-cover object-center grayscale"
+                        className="w-full h-full object-contain"
                       />
                     ) : (
-                      <div className="absolute inset-0 flex items-center justify-center text-6xl">🎮</div>
+                      <div className="text-6xl">🎮</div>
                     )}
                   </div>
-                  
-                  {/* Text Content */}
-                  <div className="p-6 text-center">
-                    <h3 className="text-2xl font-bold text-foreground mb-2">
-                      {game.title}
-                    </h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed mb-3">
-                      {game.description}
-                    </p>
-                    <p className="text-app-orange font-semibold text-sm">
-                      Kmalu na voljo
-                    </p>
-                  </div>
+                </div>
+
+                {/* Card Content */}
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-foreground mb-3">
+                    {game.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed italic">
+                    Kmalu na voljo
+                  </p>
                 </div>
               </div>
             ))}
           </div>
-        </section>
+        </div>
       )}
-    </div>
+    </>
   );
 }

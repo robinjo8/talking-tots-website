@@ -16,10 +16,10 @@ export default function GovorneIgre() {
         
         {/* Page Title */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4 drop-shadow-sm">
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
             Govorne igre
           </h1>
-          <div className="w-48 h-1.5 bg-[hsl(122,39%,49%)] mx-auto rounded-full shadow-sm"></div>
+          <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full"></div>
         </div>
         
         <GamesList />
