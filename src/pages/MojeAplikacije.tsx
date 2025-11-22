@@ -17,6 +17,8 @@ const MojeAplikacije = () => {
   const targetStars = 100;
   const percentage = Math.min((totalStars / targetStars) * 100, 100);
 
+  console.log('🎯 MojeAplikacije - Selected child:', selectedChild?.name);
+
   const handleSignOut = async () => {
     try {
       await signOut();
@@ -68,13 +70,18 @@ const MojeAplikacije = () => {
       </section>
       
       {/* Bela sekcija z aktivnostmi */}
-      <section className="py-12 bg-background">
+      <section 
+        className="py-12 bg-white min-h-screen" 
+        style={{ backgroundColor: 'white' }}
+      >
         <div className="container max-w-6xl mx-auto px-4">
           {selectedChild ? (
             <ActivityOptions />
           ) : (
             <div className="min-h-[400px] flex flex-col items-center justify-center">
-              <p className="text-lg text-muted-foreground">Prosimo, dodajte profil otroka v nastavitvah.</p>
+              <p className="text-lg text-red-500">
+                Prosimo, dodajte profil otroka v nastavitvah.
+              </p>
             </div>
           )}
         </div>

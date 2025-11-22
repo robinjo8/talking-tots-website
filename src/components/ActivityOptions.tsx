@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 
 export function ActivityOptions() {
   const navigate = useNavigate();
+  
+  console.log('🎯 ActivityOptions rendering');
 
   const activities = [
     {
@@ -65,19 +66,21 @@ export function ActivityOptions() {
     navigate(url);
   };
 
+  console.log('🎯 Rendering cards, count:', activities.length);
+  
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {activities.map((activity, index) => (
-        <motion.div
-          key={activity.id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: index * 0.1 }}
-        >
-          <div
-            className="bg-card rounded-xl shadow-md hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group"
-            onClick={() => handleActivityClick(activity.url)}
-          >
+    <div 
+      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+      style={{ minHeight: '500px' }}
+    >
+      {activities.map((activity, index) => {
+        console.log('🎯 Rendering card:', activity.title);
+        return (
+          <div key={activity.id}>
+            <div
+              className="bg-white rounded-xl shadow-xl border border-gray-200 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group"
+              onClick={() => handleActivityClick(activity.url)}
+            >
             {/* Card Image */}
             <div className={`relative aspect-video overflow-hidden bg-gradient-to-br ${activity.gradient}`}>
               {/* Recommended badge - statično na Moji izzivi */}
@@ -105,8 +108,9 @@ export function ActivityOptions() {
               </p>
             </div>
           </div>
-        </motion.div>
-      ))}
+        </div>
+        );
+      })}
     </div>
   );
 }
