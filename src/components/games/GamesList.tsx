@@ -7,7 +7,6 @@ const otherGames = [
     description: "Igraj spomin in vadi izgovorjavo",
     image: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/spomin_4.png?t=${new Date().getTime()}`,
     gradient: "from-app-purple/20 to-app-blue/20",
-    customBackground: "radial-gradient(ellipse at center, hsl(122, 39%, 92%) 0%, hsl(122, 39%, 85%) 30%, hsl(122, 39%, 65%) 60%, hsl(122, 39%, 49%) 100%)",
     path: "/govorne-igre/spomin",
     available: true
   },
@@ -17,7 +16,6 @@ const otherGames = [
     description: "Igraj sestavljanke in vadi logično razmišljanje",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/sestavljanka_4.png",
     gradient: "from-app-teal/20 to-dragon-green/20",
-    customBackground: "radial-gradient(ellipse at center, hsl(122, 39%, 92%) 0%, hsl(122, 39%, 85%) 30%, hsl(122, 39%, 65%) 60%, hsl(122, 39%, 49%) 100%)",
     path: "/govorne-igre/sestavljanke",
     available: true
   },
@@ -26,8 +24,7 @@ const otherGames = [
     title: "ZAPOREDJA",
     description: "Uredi zaporedje slik in vadi izgovorjavo",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/zaporedja.png",
-    gradient: "from-app-purple/20 to-app-blue/20",
-    customBackground: "radial-gradient(ellipse at center, hsl(122, 39%, 92%) 0%, hsl(122, 39%, 85%) 30%, hsl(122, 39%, 65%) 60%, hsl(122, 39%, 49%) 100%)",
+    gradient: "from-dragon-green/20 to-app-teal/20",
     path: "/govorne-igre/zaporedja",
     available: true
   },
@@ -37,7 +34,6 @@ const otherGames = [
     description: "Drsne sestavljanke za vajo izgovorjave",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/drsna_4.png",
     gradient: "from-app-orange/20 to-app-yellow/20",
-    customBackground: "radial-gradient(ellipse at center, hsl(122, 39%, 92%) 0%, hsl(122, 39%, 85%) 30%, hsl(122, 39%, 65%) 60%, hsl(122, 39%, 49%) 100%)",
     path: "/govorne-igre/drsna-sestavljanka",
     available: true
   },
@@ -46,8 +42,7 @@ const otherGames = [
     title: "IGRA UJEMANJA",
     description: "Poveži enake slike med stolpci",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/povezi_pare_4.png",
-    gradient: "from-app-purple/20 to-app-blue/20",
-    customBackground: "radial-gradient(ellipse at center, hsl(122, 39%, 92%) 0%, hsl(122, 39%, 85%) 30%, hsl(122, 39%, 65%) 60%, hsl(122, 39%, 49%) 100%)",
+    gradient: "from-app-blue/20 to-app-purple/20",
     path: "/govorne-igre/igra-ujemanja",
     available: true
   },
@@ -56,8 +51,7 @@ const otherGames = [
     title: "LABIRINT",
     description: "Poišči pot skozi labirint in vadi izgovorjavo",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/labirint_4.png",
-    gradient: "from-app-orange/20 to-app-yellow/20",
-    customBackground: "radial-gradient(ellipse at center, hsl(122, 39%, 92%) 0%, hsl(122, 39%, 85%) 30%, hsl(122, 39%, 65%) 60%, hsl(122, 39%, 49%) 100%)",
+    gradient: "from-app-yellow/20 to-app-orange/20",
     path: "/govorne-igre/labirint",
     available: true
   },
@@ -102,13 +96,13 @@ export function GamesList() {
               onClick={() => handleGameClick(game.path)}
               className="group cursor-pointer"
             >
-              <div className="bg-white/80 backdrop-blur-sm border border-green-100/50 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+              <div className={`bg-gradient-to-br ${game.gradient} bg-card rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300`}>
                 {/* Image Container */}
-                <div className="bg-white/90 aspect-square flex items-center justify-center p-8 border-b border-green-50/50">
+                <div className="aspect-video relative overflow-hidden">
                   <img
                     src={game.image}
                     alt={game.title}
-                    className="w-full h-full object-contain drop-shadow-lg transform group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover object-center transform group-hover:scale-110 transition-transform duration-300"
                   />
                 </div>
                 
@@ -139,17 +133,17 @@ export function GamesList() {
                 key={game.id}
                 className="opacity-60 cursor-not-allowed"
               >
-                <div className="bg-white/60 backdrop-blur-sm border border-orange-100/50 rounded-3xl overflow-hidden shadow-lg">
+                <div className={`bg-gradient-to-br ${game.gradient} bg-card rounded-xl overflow-hidden shadow-md`}>
                   {/* Image Container with orange gradient for inactive */}
-                  <div className="bg-gradient-to-br from-orange-50 to-orange-100 aspect-square flex items-center justify-center p-8 border-b border-orange-50/50">
+                  <div className="aspect-video relative overflow-hidden bg-gradient-to-br from-orange-50 to-orange-100">
                     {game.image ? (
                       <img
                         src={game.image}
                         alt={game.title}
-                        className="w-full h-full object-contain drop-shadow-lg grayscale"
+                        className="w-full h-full object-cover object-center grayscale"
                       />
                     ) : (
-                      <div className="text-6xl">🎮</div>
+                      <div className="absolute inset-0 flex items-center justify-center text-6xl">🎮</div>
                     )}
                   </div>
                   
