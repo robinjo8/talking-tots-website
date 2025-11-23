@@ -6,16 +6,15 @@ import { ActivityOptions } from "@/components/ActivityOptions";
 import { FooterSection } from "@/components/FooterSection";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { Progress } from "@/components/ui/progress";
-import { useUserProgress } from "@/hooks/useUserProgress";
+import { useDailyProgress } from "@/hooks/useDailyProgress";
 
 const MojeAplikacije = () => {
   const { user, selectedChild, signOut } = useAuth();
   const navigate = useNavigate();
-  const { progressSummary, isLoading } = useUserProgress();
+  const { dailyActivities, isLoading } = useDailyProgress();
   
-  const totalStars = progressSummary?.totalStars || 0;
-  const targetStars = 100;
-  const percentage = Math.min((totalStars / targetStars) * 100, 100);
+  const targetActivities = 15;
+  const percentage = Math.min((dailyActivities / targetActivities) * 100, 100);
 
   console.log('🎯 MojeAplikacije - Selected child:', selectedChild?.name);
 
@@ -55,7 +54,7 @@ const MojeAplikacije = () => {
               <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-white/90 text-sm font-medium">Tvoj dnevni napredek</span>
-                  <span className="text-white font-bold text-sm">{totalStars}/{targetStars} ⭐</span>
+                  <span className="text-white font-bold text-sm">{dailyActivities}/{targetActivities} ⭐</span>
                 </div>
                 <Progress 
                   value={percentage} 
