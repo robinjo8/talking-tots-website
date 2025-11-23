@@ -1,10 +1,36 @@
+import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useUserProgress } from "@/hooks/useUserProgress";
+import { FooterSection } from "@/components/FooterSection";
 const GovornojezicovneVaje = () => {
+  const { user, selectedChild, signOut } = useAuth();
   const navigate = useNavigate();
+  const { progressSummary, isLoading } = useUserProgress();
+  
+  const totalStars = progressSummary?.totalStars || 0;
+  const targetStars = 100;
+  const percentage = Math.min((totalStars / targetStars) * 100, 100);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate("/login");
+    } catch (error) {
+      console.error("Error in GovornojezicovneVaje handleSignOut:", error);
+      toast.error("Napaka pri odjavi");
+    }
+  };
+
+  if (!user) {
+    navigate("/login");
+    return null;
+  }
   const exerciseTypes = [{
     id: "vaje-motorike-govoril",
     title: "VAJE MOTORIKE GOVORIL",
@@ -87,40 +113,91 @@ const GovornojezicovneVaje = () => {
     example: "",
     available: false
   }];
-  return <div className="min-h-screen bg-background">
+  return (
+    <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container max-w-5xl mx-auto pt-28 md:pt-32 pb-20 px-4">
-        {/* Page Title */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
-            Govorno-jezikovne vaje
-          </h1>
-          <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full"></div>
+      {/* Hero sekcija */}
+      <section className="bg-dragon-green py-12 md:py-16 pt-24 md:pt-28">
+        <div className="container max-w-6xl mx-auto px-4">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              Govorno-jezikovne vaje{selectedChild ? `, ${selectedChild.name}` : ''}!
+            </h1>
+            <p className="text-xl text-white/90">
+              Izberi vajo in se zabavaj pri učenju!
+            </p>
+          </div>
+          
+          {selectedChild && (
+            <div className="max-w-md mx-auto">
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-white/90 text-sm font-medium">Tvoj napredek</span>
+                  <span className="text-white font-bold text-sm">{totalStars}/{targetStars} ⭐</span>
+                </div>
+                <Progress 
+                  value={percentage} 
+                  className="h-3 bg-white/20"
+                />
+              </div>
+            </div>
+          )}
         </div>
-        
-        {/* Breadcrumb - Desktop only */}
-        <div className="hidden lg:block mb-8">
-          <BreadcrumbNavigation />
+      </section>
+      
+      {/* Bela sekcija z vajami */}
+      <section 
+        className="py-12 bg-white min-h-screen" 
+        style={{ backgroundColor: 'white' }}
+      >
+        <div className="container max-w-6xl mx-auto px-4">
+          {/* Breadcrumb - samo na desktopu */}
+          <div className="hidden lg:block mb-8">
+            <BreadcrumbNavigation />
+          </div>
+          
+          {selectedChild ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {exerciseTypes.map(exercise => (
+                <div key={exercise.id} className="flex h-full">
+                  <Card 
+                    className={cn(
+                      "transition-all duration-300 rounded-2xl border-2 border-gray-200 flex flex-col w-full", 
+                      exercise.available ? "hover:shadow-lg cursor-pointer" : "opacity-50 cursor-not-allowed"
+                    )} 
+                    onClick={() => exercise.available && navigate(exercise.path)}
+                  >
+                    <CardHeader className={`bg-gradient-to-r ${exercise.gradient} rounded-t-2xl pb-4 flex items-center justify-center`}>
+                      <CardTitle className={`text-lg font-semibold text-center ${exercise.color} min-h-[3.5rem] flex items-center`}>
+                        {exercise.title}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-6 pb-4 flex flex-col flex-grow text-center">
+                      <p className="text-sm text-gray-600 mb-3 text-justify">{exercise.description}</p>
+                      {exercise.example && <p className="text-sm text-gray-500 mb-3 italic">{exercise.example}</p>}
+                      {!exercise.available && (
+                        <div className="mt-3 text-sm text-muted-foreground italic">
+                          Kmalu na voljo
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="min-h-[400px] flex flex-col items-center justify-center">
+              <p className="text-lg text-red-500">
+                Prosimo, dodajte profil otroka v nastavitvah.
+              </p>
+            </div>
+          )}
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-          {exerciseTypes.map(exercise => <Card key={exercise.id} className={cn("transition-all duration-300 rounded-2xl border-2 border-gray-200 h-full flex flex-col", exercise.available ? "hover:shadow-lg cursor-pointer" : "opacity-50 cursor-not-allowed")} onClick={() => exercise.available && navigate(exercise.path)}>
-              <CardHeader className={`bg-gradient-to-r ${exercise.gradient} rounded-t-2xl pb-4 flex items-center justify-center`}>
-                <CardTitle className={`text-lg font-semibold text-center ${exercise.color}`}>
-                  {exercise.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6 pb-4 flex-grow text-center">
-                <p className="text-sm text-gray-600 mb-3 text-justify">{exercise.description}</p>
-                {exercise.example && <p className="text-sm text-gray-500 mb-3 italic">{exercise.example}</p>}
-                {!exercise.available && <div className="mt-3 text-sm text-muted-foreground italic">
-                    Kmalu na voljo
-                  </div>}
-              </CardContent>
-            </Card>)}
-        </div>
-      </div>
-    </div>;
+      </section>
+      
+      <FooterSection handleSignOut={handleSignOut} />
+    </div>
+  );
 };
 export default GovornojezicovneVaje;
