@@ -1,7 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -157,31 +156,42 @@ const GovornojezicovneVaje = () => {
           </div>
           
           {selectedChild ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {exerciseTypes.map(exercise => (
                 <div key={exercise.id} className="flex h-full">
-                  <Card 
+                  <div
                     className={cn(
-                      "transition-all duration-300 rounded-2xl border-2 border-gray-200 flex flex-col w-full", 
-                      exercise.available ? "hover:shadow-lg cursor-pointer" : "opacity-50 cursor-not-allowed"
-                    )} 
+                      "bg-white rounded-xl shadow-xl border border-gray-200 transition-all duration-300 overflow-hidden group flex flex-col w-full",
+                      exercise.available 
+                        ? "hover:shadow-2xl hover:scale-[1.02] cursor-pointer" 
+                        : "opacity-50 cursor-not-allowed"
+                    )}
                     onClick={() => exercise.available && navigate(exercise.path)}
                   >
-                    <CardHeader className={`bg-gradient-to-r ${exercise.gradient} rounded-t-2xl pb-4 flex items-center justify-center`}>
-                      <CardTitle className={`text-lg font-semibold text-center ${exercise.color} min-h-[3.5rem] flex items-center`}>
-                        {exercise.title}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-6 pb-4 flex flex-col flex-grow text-center">
-                      <p className="text-sm text-gray-600 mb-3 text-justify">{exercise.description}</p>
-                      {exercise.example && <p className="text-sm text-gray-500 mb-3 italic">{exercise.example}</p>}
+                    {/* Card Header with gradient */}
+                    <div className={`relative bg-gradient-to-br ${exercise.gradient} p-6 flex items-center justify-center min-h-[120px]`}>
                       {!exercise.available && (
-                        <div className="mt-3 text-sm text-muted-foreground italic">
-                          Kmalu na voljo
+                        <div className="absolute top-4 right-4 bg-muted text-foreground px-3 py-1.5 rounded-full text-xs font-bold shadow-lg">
+                          Kmalu
                         </div>
                       )}
-                    </CardContent>
-                  </Card>
+                      <h3 className={`text-xl font-bold text-center ${exercise.color} px-4`}>
+                        {exercise.title}
+                      </h3>
+                    </div>
+
+                    {/* Card Content */}
+                    <div className="p-6 flex flex-col flex-grow">
+                      <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                        {exercise.description}
+                      </p>
+                      {exercise.example && (
+                        <p className="text-sm text-muted-foreground/80 italic">
+                          {exercise.example}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
