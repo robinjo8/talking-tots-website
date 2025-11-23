@@ -133,7 +133,7 @@ const GovornojezicovneVaje = () => {
             <div className="max-w-md mx-auto">
               <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-white/90 text-sm font-medium">Tvoj napredek</span>
+                  <span className="text-white/90 text-sm font-medium">Tvoj dnevni napredek</span>
                   <span className="text-white font-bold text-sm">{totalStars}/{targetStars} ⭐</span>
                 </div>
                 <Progress 
