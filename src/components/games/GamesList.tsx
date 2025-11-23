@@ -94,40 +94,41 @@ export function GamesList() {
       <div className="mb-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {activeGames.map((game) => (
-            <div
-              key={game.id}
-              className="bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group"
-              onClick={() => handleGameClick(game.path)}
-            >
-              {/* Card Image */}
-              <div className="relative aspect-video overflow-hidden">
-                {/* Custom gradient background */}
-                {game.customBackground && (
-                  <div 
-                    className="absolute inset-0"
-                    style={{
-                      background: game.customBackground
-                    }}
-                  />
-                )}
-                {/* Image on top - 100% opacity */}
-                <div className="relative w-full h-full flex items-center justify-center">
-                  <img 
-                    src={game.image}
-                    alt={game.title}
-                    className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
-                  />
+            <div key={game.id} className="flex h-full">
+              <div
+                className="bg-white rounded-xl shadow-xl border border-gray-200 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group flex flex-col w-full"
+                onClick={() => handleGameClick(game.path)}
+              >
+                {/* Card Image */}
+                <div className="relative aspect-video overflow-hidden">
+                  {/* Custom gradient background */}
+                  {game.customBackground && (
+                    <div 
+                      className="absolute inset-0"
+                      style={{
+                        background: game.customBackground
+                      }}
+                    />
+                  )}
+                  {/* Image on top - 100% opacity */}
+                  <div className="relative w-full h-full flex items-center justify-center">
+                    <img 
+                      src={game.image}
+                      alt={game.title}
+                      className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* Card Content */}
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
-                  {game.title}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
-                  {game.description}
-                </p>
+                {/* Card Content */}
+                <div className="p-6 flex flex-col flex-grow">
+                  <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors min-h-[3.5rem] flex items-center">
+                    {game.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                    {game.description}
+                  </p>
+                </div>
               </div>
             </div>
           ))}
