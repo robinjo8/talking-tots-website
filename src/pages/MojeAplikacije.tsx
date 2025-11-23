@@ -39,7 +39,7 @@ const MojeAplikacije = () => {
       <Header />
       
       {/* Hero sekcija */}
-      <section className="bg-dragon-green py-12 md:py-16">
+      <section className="bg-dragon-green py-12 md:py-16 pt-24 md:pt-28">
         <div className="container max-w-6xl mx-auto px-4">
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
