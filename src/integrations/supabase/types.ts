@@ -668,6 +668,10 @@ export type Database = {
           total_stars: number
         }[]
       }
+      get_child_daily_activities: {
+        Args: { child_uuid: string }
+        Returns: number
+      }
       get_child_total_stars: { Args: { child_uuid: string }; Returns: number }
       grant_admin_role: {
         Args: {
