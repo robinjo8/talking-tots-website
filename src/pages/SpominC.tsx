@@ -99,7 +99,7 @@ export default function SpominC() {
     }
   }, [gameCompleted, gameStartTimeRef, gameTime, toast]);
 
-  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/47412.jpg`;
+  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/ozadje_2.jpg`;
 
   return (
     <div className={`${effectiveFullscreen ? 'fixed inset-0 overflow-hidden' : 'min-h-screen'} relative`}>
