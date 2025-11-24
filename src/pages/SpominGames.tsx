@@ -9,6 +9,9 @@ import { useDailyProgress } from "@/hooks/useDailyProgress";
 import { FooterSection } from "@/components/FooterSection";
 import { toast } from "sonner";
 
+const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
+const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/ozadje_1.jpg`;
+
 const memoryGames = [
   { 
     id: "spomin-c",
@@ -186,8 +189,8 @@ export default function SpominGames() {
       
       {/* Bela sekcija */}
       <section 
-        className="py-12 bg-white min-h-screen" 
-        style={{ backgroundColor: 'white' }}
+        className="py-12 bg-cover bg-center bg-no-repeat min-h-screen" 
+        style={{ backgroundImage: `url('${backgroundImageUrl}')` }}
       >
         <div className="container max-w-6xl mx-auto px-4">
           {/* Breadcrumb - samo na desktopu */}
