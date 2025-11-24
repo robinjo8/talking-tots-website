@@ -105,13 +105,13 @@ export default function SpominŠ() {
     <div className={`${effectiveFullscreen ? 'fixed inset-0 overflow-hidden' : 'min-h-screen'} relative`}>
       {/* Background image layer */}
       <div 
-        className="absolute inset-0 -z-10 bg-cover bg-center bg-no-repeat"
+        className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
         style={{
           backgroundImage: `url('${backgroundImageUrl}')`
         }}
       />
       
-      <div className={`${effectiveFullscreen ? 'h-full flex flex-col' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
+      <div className={`relative z-10 ${effectiveFullscreen ? 'h-full flex flex-col' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
         
         {/* Top Section - Buttons */}
         <div className={`${effectiveFullscreen ? 'bg-dragon-green/5 p-3 flex-shrink-0 border-b' : 'p-4 flex-shrink-0'}`}>
