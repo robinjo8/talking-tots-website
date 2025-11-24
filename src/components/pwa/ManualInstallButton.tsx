@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Download, Smartphone, Share, X, Menu } from 'lucide-react';
 import { usePWA, useIOSInstallInstructions } from '@/hooks/usePWA';
@@ -6,12 +7,13 @@ import { Card, CardContent } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function ManualInstallButton() {
+  const location = useLocation();
   const { promptInstall, isInstalled, isIOSDevice, isAndroidDevice, isInstallable } = usePWA();
   const { isInSafari, canShowInstructions } = useIOSInstallInstructions();
   const [showInstructions, setShowInstructions] = useState(false);
 
-  // Don't show if already installed
-  if (isInstalled) return null;
+  // Don't show if already installed or not on homepage
+  if (isInstalled || location.pathname !== '/') return null;
 
   const handleInstallClick = async () => {
     if (isIOSDevice) {
