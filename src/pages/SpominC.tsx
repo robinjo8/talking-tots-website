@@ -113,7 +113,7 @@ export default function SpominC() {
         }}
       />
       
-      <div className={`relative z-10 ${effectiveFullscreen ? 'h-full flex flex-col' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
+      <div className={`relative z-10 ${effectiveFullscreen ? 'h-full flex flex-col justify-center' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
         
         {/* Top Section - Buttons (Desktop only) */}
         {!effectiveFullscreen && (
@@ -163,7 +163,7 @@ export default function SpominC() {
           </div>
         )}
 
-        <div className={`${effectiveFullscreen ? 'flex-1 flex items-center justify-center px-2' : 'flex-1 flex justify-center items-center min-h-0'}`}>
+        <div className={`${effectiveFullscreen ? 'flex items-center justify-center px-2' : 'flex-1 flex justify-center items-center min-h-0'}`}>
           <div className={`w-full ${effectiveFullscreen ? 'flex items-center justify-center' : 'max-w-4xl h-full flex items-center justify-center'}`}>
             {isLoading && (
               <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
