@@ -126,8 +126,8 @@ export default function MatchingGames3to4() {
         {/* Letters grid */}
         <div className="mb-12">
           {isMobile ? (
-            /* Mobile: 3-column grid */
-            <div className="grid grid-cols-3 gap-4">
+            /* Mobile: 2-column grid */
+            <div className="grid grid-cols-2 gap-4">
               {letterData.map(letter => (
                 <LetterCard key={letter.letter} letter={letter} />
               ))}
