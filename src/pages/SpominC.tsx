@@ -25,6 +25,7 @@ export default function SpominC() {
   
   const { audioRef } = useAudioPlayback();
   const [showInfo, setShowInfo] = useState(false);
+  const [showExitDialog, setShowExitDialog] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { toast } = useToast();
   
@@ -220,23 +221,17 @@ export default function SpominC() {
             sideOffset={8}
           >
             <div className="flex flex-col gap-2">
-              <MemoryExitConfirmationDialog 
-                onConfirm={() => navigate("/govorne-igre/spomin")}
-                onOpenChange={(open) => {
-                  if (open) {
-                    // Zapri meni z majhno zamudo, da se dialog najprej odpre
-                    setTimeout(() => setMenuOpen(false), 100);
-                  }
+              <Button 
+                variant="outline" 
+                className="gap-2 w-full h-11 text-base justify-start"
+                onClick={() => {
+                  setShowExitDialog(true);
+                  setMenuOpen(false);
                 }}
               >
-                <Button 
-                  variant="outline" 
-                  className="gap-2 w-full h-11 text-base justify-start"
-                >
-                  <ArrowLeft className="w-5 h-5" />
-                  Nazaj
-                </Button>
-              </MemoryExitConfirmationDialog>
+                <ArrowLeft className="w-5 h-5" />
+                Nazaj
+              </Button>
               
               <Button
                 onClick={() => {
@@ -291,6 +286,14 @@ Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede."
         word={currentMatchedPair?.word || null}
         audioUrl={currentMatchedPair?.audio_url || null}
       />
+
+      <MemoryExitConfirmationDialog
+        open={showExitDialog}
+        onOpenChange={setShowExitDialog}
+        onConfirm={() => navigate("/govorne-igre/spomin")}
+      >
+        <div />
+      </MemoryExitConfirmationDialog>
     </div>
   );
 }
