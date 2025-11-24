@@ -11,6 +11,8 @@ import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfi
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MemoryPairDialog } from "@/components/games/MemoryPairDialog";
 
+const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
+
 export default function SpominK() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -97,11 +99,16 @@ export default function SpominK() {
     }
   }, [gameCompleted, gameStartTimeRef, gameTime, toast]);
 
+  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/ozadje_1.jpg`;
+
   return (
     <div 
       className={`${effectiveFullscreen ? 'fixed inset-0 overflow-hidden' : 'min-h-screen'} bg-cover bg-center bg-no-repeat`}
       style={{
-        backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/ozadje_1.jpg)'
+        backgroundImage: `url('${backgroundImageUrl}')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
       }}
     >
       <div className={`${effectiveFullscreen ? 'h-full flex flex-col' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
