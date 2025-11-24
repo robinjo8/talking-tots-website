@@ -123,18 +123,14 @@ export default function MatchingGames3to4() {
             </CardContent>
         </Card>
 
-        {/* Letters grid/carousel */}
+        {/* Letters grid */}
         <div className="mb-12">
           {isMobile ? (
-            /* Mobile: Horizontal scroll carousel */
-            <div className="overflow-hidden -mx-4" ref={emblaRef}>
-              <div className="flex gap-4 px-4">
-                {letterData.map(letter => (
-                  <div key={letter.letter} className="flex-[0_0_85%] min-w-0">
-                    <LetterCard letter={letter} />
-                  </div>
-                ))}
-              </div>
+            /* Mobile: 3-column grid */
+            <div className="grid grid-cols-3 gap-4">
+              {letterData.map(letter => (
+                <LetterCard key={letter.letter} letter={letter} />
+              ))}
             </div>
           ) : (
             /* Desktop: Grid layout */
