@@ -9,7 +9,7 @@ import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfi
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { ArrowLeft, RotateCcw, BookOpen, Menu } from "lucide-react";
+import { ArrowLeft, RotateCcw, BookOpen, Home } from "lucide-react";
 import { matchingGameData } from "@/data/matchingGameData";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
@@ -157,7 +157,7 @@ const LabirintCContent = () => {
               size="icon"
               className="fixed bottom-4 left-4 z-50 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white shadow-2xl rounded-full w-16 h-16 border-2 border-white/20"
             >
-              <Menu className="w-7 h-7" />
+              <Home className="w-7 h-7" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent 

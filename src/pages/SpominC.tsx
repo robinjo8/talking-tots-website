@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
+import { RotateCcw, BookOpen, ArrowLeft, Home } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MemoryGrid } from "@/components/games/MemoryGrid";
 import { useMemoryGameC } from "@/hooks/useMemoryGameC";
 import { useToast } from "@/components/ui/use-toast";
@@ -24,6 +25,7 @@ export default function SpominC() {
   
   const { audioRef } = useAudioPlayback();
   const [showInfo, setShowInfo] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const { toast } = useToast();
   
   // Extract letter from URL path
@@ -113,44 +115,41 @@ export default function SpominC() {
       
       <div className={`relative z-10 ${effectiveFullscreen ? 'h-full flex flex-col' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
         
-        {/* Top Section - Buttons */}
-        <div className={`${effectiveFullscreen ? 'bg-dragon-green/5 p-3 flex-shrink-0 border-b' : 'p-4 flex-shrink-0'}`}>
-          {effectiveFullscreen && (
-            <h2 className="text-lg font-bold mb-3 text-center">Spomin C</h2>
-          )}
-          <div className="flex justify-center gap-3">
-            <MemoryExitConfirmationDialog onConfirm={() => navigate("/govorne-igre/spomin")}>
+        {/* Top Section - Buttons (Desktop only) */}
+        {!effectiveFullscreen && (
+          <div className="p-4 flex-shrink-0">
+            <div className="flex justify-center gap-3">
+              <MemoryExitConfirmationDialog onConfirm={() => navigate("/govorne-igre/spomin")}>
+                <Button
+                  size="default"
+                  variant="outline"
+                  className="gap-2"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Nazaj
+                </Button>
+              </MemoryExitConfirmationDialog>
+              
               <Button
-                size={effectiveFullscreen ? "sm" : "default"}
+                onClick={handleReset}
+                size="default"
+                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
+              >
+                <RotateCcw className="h-4 w-4" />
+                Nova igra
+              </Button>
+              
+              <Button
+                onClick={() => setShowInfo(true)}
+                size="default"
                 variant="outline"
                 className="gap-2"
               >
-                <ArrowLeft className="h-4 w-4" />
-                Nazaj
+                <BookOpen className="h-4 w-4" />
+                Navodila
               </Button>
-            </MemoryExitConfirmationDialog>
+            </div>
             
-            <Button
-              onClick={handleReset}
-              size={effectiveFullscreen ? "sm" : "default"}
-              className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
-            >
-              <RotateCcw className="h-4 w-4" />
-              Nova igra
-            </Button>
-            
-            <Button
-              onClick={() => setShowInfo(true)}
-              size={effectiveFullscreen ? "sm" : "default"}
-              variant="outline"
-              className="gap-2"
-            >
-              <BookOpen className="h-4 w-4" />
-              Navodila
-            </Button>
-          </div>
-          
-          {!effectiveFullscreen && (
             <div className="text-center mt-3 text-sm">
               <span className="font-medium">Najdeni pari: </span>
               <span className="text-dragon-green font-bold">{matchedPairs.length}</span>
@@ -161,8 +160,8 @@ export default function SpominC() {
                 </span>
               )}
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         <div className={`${effectiveFullscreen ? 'flex-1 px-2 pb-2 overflow-hidden' : 'flex-1 flex justify-center items-center min-h-0'}`}>
           <div className={`w-full ${effectiveFullscreen ? 'h-full' : 'max-w-4xl h-full'} flex items-center justify-center`}>
@@ -203,7 +202,59 @@ export default function SpominC() {
         </div>
       </div>
 
-      <InfoModal 
+      {/* Floating menu button - Mobile only */}
+      {effectiveFullscreen && (
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger asChild>
+            <Button
+              size="icon"
+              className="fixed bottom-4 left-4 z-50 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white shadow-2xl rounded-full w-16 h-16 border-2 border-white/20"
+            >
+              <Home className="w-7 h-7" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            side="top" 
+            align="start" 
+            className="mb-2 ml-4 w-56 p-2 bg-background/95 backdrop-blur-sm border-2 shadow-xl z-[60]"
+            sideOffset={8}
+          >
+            <div className="flex flex-col gap-2">
+              <MemoryExitConfirmationDialog onConfirm={() => navigate("/govorne-igre/spomin")}>
+                <Button variant="outline" className="gap-2 w-full h-11 text-base justify-start">
+                  <ArrowLeft className="w-5 h-5" />
+                  Nazaj
+                </Button>
+              </MemoryExitConfirmationDialog>
+              
+              <Button
+                onClick={() => {
+                  handleReset();
+                  setMenuOpen(false);
+                }}
+                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 w-full h-11 text-base justify-start"
+              >
+                <RotateCcw className="w-5 h-5" />
+                Nova igra
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowInfo(true);
+                  setMenuOpen(false);
+                }}
+                className="gap-2 w-full h-11 text-base justify-start"
+              >
+                <BookOpen className="w-5 h-5" />
+                Navodila
+              </Button>
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+
+      <InfoModal
         isOpen={showInfo}
         onClose={() => setShowInfo(false)}
         title="Navodila za igro Spomin"
