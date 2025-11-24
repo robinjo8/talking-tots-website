@@ -113,7 +113,7 @@ export default function SpominC() {
         }}
       />
       
-      <div className={`relative z-10 ${effectiveFullscreen ? 'h-full flex flex-col justify-center' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
+      <div className={`relative z-10 ${effectiveFullscreen ? 'h-full flex flex-col items-center justify-center' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
         
         {/* Top Section - Buttons (Desktop only) */}
         {!effectiveFullscreen && (
