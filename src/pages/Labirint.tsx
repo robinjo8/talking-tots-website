@@ -151,18 +151,14 @@ export default function Labirint() {
           <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full"></div>
         </div>
 
-        {/* Letters grid/carousel */}
+        {/* Letters grid */}
         <div className="mb-12">
           {isMobile ? (
-            /* Mobile: Horizontal scroll carousel */
-            <div className="overflow-hidden -mx-4" ref={emblaRef}>
-              <div className="flex gap-4 px-4">
-                {labirintGames.map(game => (
-                  <div key={game.id} className="flex-[0_0_85%] min-w-0">
-                    <LetterCard game={game} />
-                  </div>
-                ))}
-              </div>
+            /* Mobile: 3-column grid */
+            <div className="grid grid-cols-3 gap-4">
+              {labirintGames.map(game => (
+                <LetterCard key={game.id} game={game} />
+              ))}
             </div>
           ) : (
             /* Desktop: Grid layout */
