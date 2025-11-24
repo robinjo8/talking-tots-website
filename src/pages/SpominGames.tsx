@@ -189,8 +189,8 @@ export default function SpominGames() {
       
       {/* Bela sekcija */}
       <section 
-        className="py-12 bg-cover bg-center bg-no-repeat min-h-screen" 
-        style={{ backgroundImage: `url('${backgroundImageUrl}')` }}
+        className="py-12 bg-white min-h-screen" 
+        style={{ backgroundColor: 'white' }}
       >
         <div className="container max-w-6xl mx-auto px-4">
           {/* Breadcrumb - samo na desktopu */}
