@@ -98,7 +98,12 @@ export default function SpominČ() {
   }, [gameCompleted, gameStartTimeRef, gameTime, toast]);
 
   return (
-    <div className={`${effectiveFullscreen ? 'fixed inset-0 bg-background overflow-hidden' : 'min-h-screen bg-background'}`}>
+    <div 
+      className={`${effectiveFullscreen ? 'fixed inset-0 overflow-hidden' : 'min-h-screen'} bg-cover bg-center bg-no-repeat`}
+      style={{
+        backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/ozadje_1.jpg)'
+      }}
+    >
       <div className={`${effectiveFullscreen ? 'h-full flex flex-col' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
         
         {/* Top Section - Buttons */}
