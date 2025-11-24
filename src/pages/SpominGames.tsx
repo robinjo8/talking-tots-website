@@ -131,25 +131,27 @@ export default function SpominGames() {
       onClick={() => handleLetterClick(game)}
     >
       {/* Card Image */}
-      <div className={`relative aspect-video overflow-hidden bg-gradient-to-br ${game.gradient}`}>
+      <div className={`relative overflow-hidden bg-gradient-to-br ${game.gradient} ${isMobile ? 'aspect-square' : 'aspect-video'}`}>
         <div className="w-full h-full flex items-center justify-center">
           <img 
             src={game.image}
             alt={`Črka ${game.letter}`}
-            className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+            className={`object-contain group-hover:scale-110 transition-transform duration-300 ${isMobile ? 'w-[80%] h-[80%]' : 'w-full h-full'}`}
             style={{ mixBlendMode: 'multiply' }}
           />
         </div>
       </div>
 
       {/* Card Content */}
-      <div className="p-6">
+      <div className={`p-6 ${isMobile ? 'text-center' : ''}`}>
         <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
           Črka {game.letter}
         </h3>
-        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
-          {game.description}
-        </p>
+        {!isMobile && (
+          <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+            {game.description}
+          </p>
+        )}
       </div>
     </div>
   );
