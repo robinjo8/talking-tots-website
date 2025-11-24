@@ -7,11 +7,15 @@ import { useDailyProgress } from "@/hooks/useDailyProgress";
 import { FooterSection } from "@/components/FooterSection";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 export default function GovorneIgre() {
   const { user, selectedChild, signOut } = useAuth();
   const navigate = useNavigate();
   const { dailyActivities, isLoading } = useDailyProgress();
+  const isMobile = useIsMobile();
   
   const targetActivities = 15;
   const percentage = Math.min((dailyActivities / targetActivities) * 100, 100);
@@ -36,6 +40,17 @@ export default function GovorneIgre() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      
+      {/* Mobile Back Button */}
+      {isMobile && (
+        <Button
+          onClick={() => navigate("/moje-aplikacije")}
+          className="fixed bottom-6 left-6 z-50 h-14 w-14 rounded-full bg-app-orange hover:bg-app-orange/90 shadow-lg"
+          size="icon"
+        >
+          <ArrowLeft className="h-6 w-6 text-white" />
+        </Button>
+      )}
       
       {/* Hero sekcija */}
       <section className="bg-dragon-green py-12 md:py-16 pt-24 md:pt-28">
