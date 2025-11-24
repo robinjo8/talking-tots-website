@@ -7,6 +7,11 @@ import { matchingGameData } from "@/data/matchingGameData";
 import { getAgeGroup } from "@/utils/ageUtils";
 import useEmblaCarousel from "embla-carousel-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
+import { Progress } from "@/components/ui/progress";
+import { useDailyProgress } from "@/hooks/useDailyProgress";
+import { FooterSection } from "@/components/FooterSection";
+import { toast } from "sonner";
 
 const letterData = [
   {
@@ -37,14 +42,28 @@ const letterData = [
 
 export default function MatchingGames3to4() {
   const navigate = useNavigate();
-  const { selectedChild } = useAuth();
+  const { user, selectedChild, signOut } = useAuth();
   const childName = selectedChild?.name;
   const isMobile = useIsMobile();
+  const { dailyActivities, isLoading } = useDailyProgress();
   const [emblaRef] = useEmblaCarousel({ 
     align: 'start',
     dragFree: true,
     containScroll: 'trimSnaps'
   });
+  
+  const targetActivities = 15;
+  const percentage = Math.min((dailyActivities / targetActivities) * 100, 100);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate("/login");
+    } catch (error) {
+      console.error("Error in MatchingGames3to4 handleSignOut:", error);
+      toast.error("Napaka pri odjavi");
+    }
+  };
 
   // Check if child is in correct age group
   const childAge = selectedChild?.age || 3;
@@ -99,9 +118,48 @@ export default function MatchingGames3to4() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
-        {/* Instruction speech-bubble */}
-        <Card className="mb-8 bg-gradient-to-r from-sky-50 to-green-50 border-dragon-green/30 shadow-md">
+      {/* Hero sekcija */}
+      <section className="bg-dragon-green py-12 md:py-16 pt-24 md:pt-28">
+        <div className="container max-w-6xl mx-auto px-4">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              Povezi pare{selectedChild ? `, ${selectedChild.name}` : ''}!
+            </h1>
+            <p className="text-xl text-white/90">
+              Izberi črko in poveži pare slik
+            </p>
+          </div>
+          
+          {selectedChild && (
+            <div className="max-w-md mx-auto">
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-white text-sm font-medium">Tvoj dnevni napredek</span>
+                  <span className="text-white font-bold text-sm">{dailyActivities}/{targetActivities} ⭐</span>
+                </div>
+                <Progress 
+                  value={percentage} 
+                  className="h-3 bg-white/20 [&>div]:bg-app-orange"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+      
+      {/* Bela sekcija */}
+      <section 
+        className="py-12 bg-white min-h-screen" 
+        style={{ backgroundColor: 'white' }}
+      >
+        <div className="container max-w-6xl mx-auto px-4">
+          {/* Breadcrumb - samo na desktopu */}
+          <div className="hidden lg:block mb-8">
+            <BreadcrumbNavigation />
+          </div>
+          
+          {/* Instruction card */}
+          <Card className="mb-8 bg-gradient-to-r from-sky-50 to-green-50 border-dragon-green/30 shadow-md">
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-xl md:text-2xl text-dragon-green">
                 <MessageSquare className="h-5 w-5 text-dragon-green" />
@@ -121,27 +179,30 @@ export default function MatchingGames3to4() {
                 <p className="text-sm text-muted-foreground mt-2">Z VAJAMI POSTAJAMO VEDNO BOLJŠI!</p>
               </div>
             </CardContent>
-        </Card>
-
-        {/* Letters grid */}
-        <div className="mb-12">
-          {isMobile ? (
-            /* Mobile: 2-column grid */
-            <div className="grid grid-cols-2 gap-4">
-              {letterData.map(letter => (
-                <LetterCard key={letter.letter} letter={letter} />
-              ))}
-            </div>
-          ) : (
-            /* Desktop: Grid layout */
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {letterData.map(letter => (
-                <LetterCard key={letter.letter} letter={letter} />
-              ))}
-            </div>
-          )}
+          </Card>
+          
+          {/* Letters grid */}
+          <div className="mb-12">
+            {isMobile ? (
+              /* Mobile: 2-column grid */
+              <div className="grid grid-cols-2 gap-4">
+                {letterData.map(letter => (
+                  <LetterCard key={letter.letter} letter={letter} />
+                ))}
+              </div>
+            ) : (
+              /* Desktop: Grid layout */
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {letterData.map(letter => (
+                  <LetterCard key={letter.letter} letter={letter} />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </section>
+      
+      <FooterSection handleSignOut={handleSignOut} />
     </div>
   );
 }

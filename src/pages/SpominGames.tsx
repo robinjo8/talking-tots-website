@@ -4,6 +4,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import useEmblaCarousel from "embla-carousel-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
+import { Progress } from "@/components/ui/progress";
+import { useDailyProgress } from "@/hooks/useDailyProgress";
+import { FooterSection } from "@/components/FooterSection";
+import { toast } from "sonner";
 
 const memoryGames = [
   { 
@@ -91,14 +95,28 @@ const memoryGames = [
 
 export default function SpominGames() {
   const navigate = useNavigate();
-  const { selectedChild } = useAuth();
+  const { user, selectedChild, signOut } = useAuth();
   const childName = selectedChild?.name;
   const isMobile = useIsMobile();
+  const { dailyActivities, isLoading } = useDailyProgress();
   const [emblaRef] = useEmblaCarousel({ 
     align: 'start',
     dragFree: true,
     containScroll: 'trimSnaps'
   });
+  
+  const targetActivities = 15;
+  const percentage = Math.min((dailyActivities / targetActivities) * 100, 100);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate("/login");
+    } catch (error) {
+      console.error("Error in SpominGames handleSignOut:", error);
+      toast.error("Napaka pri odjavi");
+    }
+  };
 
   const handleLetterClick = (game: typeof memoryGames[0]) => {
     navigate(game.path);
@@ -137,39 +155,68 @@ export default function SpominGames() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container max-w-6xl mx-auto pt-28 md:pt-32 pb-20 px-4">
-        {/* Breadcrumb - Desktop only */}
-        <div className="hidden lg:block mb-6">
-          <BreadcrumbNavigation />
-        </div>
-        
-        {/* Page Title */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
-            Izberi črko za igro
-          </h1>
-          <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full"></div>
-        </div>
-
-        {/* Letters grid */}
-        <div className="mb-12">
-          {isMobile ? (
-            /* Mobile: 2-column grid */
-            <div className="grid grid-cols-2 gap-4">
-              {memoryGames.map(game => (
-                <LetterCard key={game.id} game={game} />
-              ))}
-            </div>
-          ) : (
-            /* Desktop: Grid layout */
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {memoryGames.map(game => (
-                <LetterCard key={game.id} game={game} />
-              ))}
+      {/* Hero sekcija */}
+      <section className="bg-dragon-green py-12 md:py-16 pt-24 md:pt-28">
+        <div className="container max-w-6xl mx-auto px-4">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              Spomin{selectedChild ? `, ${selectedChild.name}` : ''}!
+            </h1>
+            <p className="text-xl text-white/90">
+              Izberi črko za igro spomina
+            </p>
+          </div>
+          
+          {selectedChild && (
+            <div className="max-w-md mx-auto">
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-white text-sm font-medium">Tvoj dnevni napredek</span>
+                  <span className="text-white font-bold text-sm">{dailyActivities}/{targetActivities} ⭐</span>
+                </div>
+                <Progress 
+                  value={percentage} 
+                  className="h-3 bg-white/20 [&>div]:bg-app-orange"
+                />
+              </div>
             </div>
           )}
         </div>
-      </div>
+      </section>
+      
+      {/* Bela sekcija */}
+      <section 
+        className="py-12 bg-white min-h-screen" 
+        style={{ backgroundColor: 'white' }}
+      >
+        <div className="container max-w-6xl mx-auto px-4">
+          {/* Breadcrumb - samo na desktopu */}
+          <div className="hidden lg:block mb-8">
+            <BreadcrumbNavigation />
+          </div>
+          
+          {/* Letters grid */}
+          <div className="mb-12">
+            {isMobile ? (
+              /* Mobile: 2-column grid */
+              <div className="grid grid-cols-2 gap-4">
+                {memoryGames.map(game => (
+                  <LetterCard key={game.id} game={game} />
+                ))}
+              </div>
+            ) : (
+              /* Desktop: Grid layout */
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {memoryGames.map(game => (
+                  <LetterCard key={game.id} game={game} />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+      
+      <FooterSection handleSignOut={handleSignOut} />
     </div>
   );
 }
