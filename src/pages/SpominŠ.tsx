@@ -102,15 +102,15 @@ export default function SpominŠ() {
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/ozadje_1.jpg`;
 
   return (
-    <div 
-      className={`${effectiveFullscreen ? 'fixed inset-0 overflow-hidden' : 'min-h-screen'} bg-cover bg-center bg-no-repeat`}
-      style={{
-        backgroundImage: `url('${backgroundImageUrl}')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}
-    >
+    <div className={`${effectiveFullscreen ? 'fixed inset-0 overflow-hidden' : 'min-h-screen'} relative`}>
+      {/* Background image layer */}
+      <div 
+        className="absolute inset-0 -z-10 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url('${backgroundImageUrl}')`
+        }}
+      />
+      
       <div className={`${effectiveFullscreen ? 'h-full flex flex-col' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
         
         {/* Top Section - Buttons */}
@@ -164,7 +164,7 @@ export default function SpominŠ() {
           )}
         </div>
 
-        <div className={`${effectiveFullscreen ? 'flex-1 px-2 pb-2 overflow-hidden' : 'flex-1 flex justify-center items-center min-h-0'} bg-muted/30`}>
+        <div className={`${effectiveFullscreen ? 'flex-1 px-2 pb-2 overflow-hidden' : 'flex-1 flex justify-center items-center min-h-0'}`}>
           <div className={`w-full ${effectiveFullscreen ? 'h-full' : 'max-w-4xl h-full'} flex items-center justify-center`}>
             {isLoading && (
               <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
