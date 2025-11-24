@@ -224,7 +224,8 @@ export default function SpominC() {
                 onConfirm={() => navigate("/govorne-igre/spomin")}
                 onOpenChange={(open) => {
                   if (open) {
-                    setMenuOpen(false);
+                    // Zapri meni z majhno zamudo, da se dialog najprej odpre
+                    setTimeout(() => setMenuOpen(false), 100);
                   }
                 }}
               >
