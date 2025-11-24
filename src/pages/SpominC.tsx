@@ -163,8 +163,8 @@ export default function SpominC() {
           </div>
         )}
 
-        <div className={`${effectiveFullscreen ? 'flex-1 px-2 pb-2 overflow-hidden' : 'flex-1 flex justify-center items-center min-h-0'}`}>
-          <div className={`w-full ${effectiveFullscreen ? 'h-full' : 'max-w-4xl h-full'} flex items-center justify-center`}>
+        <div className={`${effectiveFullscreen ? 'flex-1 flex items-center justify-center px-2 pb-2 overflow-hidden' : 'flex-1 flex justify-center items-center min-h-0'}`}>
+          <div className={`w-full ${effectiveFullscreen ? 'flex items-center justify-center' : 'max-w-4xl h-full flex items-center justify-center'}`}>
             {isLoading && (
               <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
             )}
@@ -210,7 +210,7 @@ export default function SpominC() {
               size="icon"
               className="fixed bottom-4 left-4 z-50 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white shadow-2xl rounded-full w-16 h-16 border-2 border-white/20"
             >
-              <Home className="w-7 h-7" />
+              <Home className="w-9 h-9" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent 
