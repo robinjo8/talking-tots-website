@@ -4,12 +4,13 @@ import { Check, X } from "lucide-react";
 interface MemoryExitConfirmationDialogProps {
   children: React.ReactNode;
   onConfirm: () => void;
+  open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
 
-export function MemoryExitConfirmationDialog({ children, onConfirm, onOpenChange }: MemoryExitConfirmationDialogProps) {
+export function MemoryExitConfirmationDialog({ children, onConfirm, open, onOpenChange }: MemoryExitConfirmationDialogProps) {
   return (
-    <AlertDialog onOpenChange={onOpenChange}>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogTrigger asChild>
         {children}
       </AlertDialogTrigger>
