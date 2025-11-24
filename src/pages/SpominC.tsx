@@ -221,7 +221,11 @@ export default function SpominC() {
           >
             <div className="flex flex-col gap-2">
               <MemoryExitConfirmationDialog onConfirm={() => navigate("/govorne-igre/spomin")}>
-                <Button variant="outline" className="gap-2 w-full h-11 text-base justify-start">
+                <Button 
+                  variant="outline" 
+                  className="gap-2 w-full h-11 text-base justify-start"
+                  onClick={() => setMenuOpen(false)}
+                >
                   <ArrowLeft className="w-5 h-5" />
                   Nazaj
                 </Button>
