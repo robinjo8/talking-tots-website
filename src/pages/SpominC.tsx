@@ -115,54 +115,6 @@ export default function SpominC() {
       />
       
       <div className={`relative z-10 ${effectiveFullscreen ? 'h-full flex flex-col' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
-        
-        {/* Top Section - Buttons (Desktop only) */}
-        {!effectiveFullscreen && (
-          <div className="p-4 flex-shrink-0">
-            <div className="flex justify-center gap-3">
-              <MemoryExitConfirmationDialog onConfirm={() => navigate("/govorne-igre/spomin")}>
-                <Button
-                  size="default"
-                  variant="outline"
-                  className="gap-2"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  Nazaj
-                </Button>
-              </MemoryExitConfirmationDialog>
-              
-              <Button
-                onClick={handleReset}
-                size="default"
-                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
-              >
-                <RotateCcw className="h-4 w-4" />
-                Nova igra
-              </Button>
-              
-              <Button
-                onClick={() => setShowInfo(true)}
-                size="default"
-                variant="outline"
-                className="gap-2"
-              >
-                <BookOpen className="h-4 w-4" />
-                Navodila
-              </Button>
-            </div>
-            
-            <div className="text-center mt-3 text-sm">
-              <span className="font-medium">Najdeni pari: </span>
-              <span className="text-dragon-green font-bold">{matchedPairs.length}</span>
-              <span className="text-muted-foreground"> od {totalPairs}</span>
-              {gameCompleted && gameTime !== null && (
-                <span className="ml-3 bg-dragon-green/10 text-dragon-green px-2 py-1 rounded-md text-xs font-medium">
-                  Čas: {gameTime}s
-                </span>
-              )}
-            </div>
-          </div>
-        )}
 
         <div className={`${effectiveFullscreen ? 'mt-[25vh] px-2' : 'flex-1 flex justify-center items-center min-h-0'}`}>
           <div className={`w-full ${effectiveFullscreen ? '' : 'max-w-4xl h-full flex items-center justify-center'}`}>
@@ -203,9 +155,8 @@ export default function SpominC() {
         </div>
       </div>
 
-      {/* Floating menu button - Mobile only */}
-      {effectiveFullscreen && (
-        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+      {/* Floating menu button - Now available on all devices */}
+      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
             <Button
               size="icon"
@@ -258,7 +209,6 @@ export default function SpominC() {
             </div>
           </DropdownMenuContent>
         </DropdownMenu>
-      )}
 
       <InfoModal
         isOpen={showInfo}
