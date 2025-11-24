@@ -116,8 +116,8 @@ export default function SpominS() {
       
       <div className={`relative z-10 ${effectiveFullscreen ? 'h-full flex flex-col' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
 
-        <div className={`${effectiveFullscreen ? 'mt-[25vh] px-2' : 'mt-[20vh] px-4 flex justify-center'}`}>
-          <div className={`w-full ${effectiveFullscreen ? '' : 'max-w-4xl'}`}>
+        <div className={`${effectiveFullscreen ? 'mt-[25vh] px-2' : 'mt-[20vh] px-4'}`}>
+          <div className={`w-full ${effectiveFullscreen ? '' : 'max-w-4xl mx-auto'}`}>
             {isLoading && (
               <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
             )}
