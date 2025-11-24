@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
+import { RotateCcw, BookOpen, ArrowLeft, Home } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MemoryGrid } from "@/components/games/MemoryGrid";
 import { useMemoryGameZ } from "@/hooks/useMemoryGameZ";
 import { useToast } from "@/components/ui/use-toast";
@@ -24,6 +25,8 @@ export default function SpominZ() {
   
   const { audioRef } = useAudioPlayback();
   const [showInfo, setShowInfo] = useState(false);
+  const [showExitDialog, setShowExitDialog] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const { toast } = useToast();
   
   // Extract letter from URL path
@@ -99,7 +102,7 @@ export default function SpominZ() {
     }
   }, [gameCompleted, gameStartTimeRef, gameTime, toast]);
 
-  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/ozadje_1.jpg`;
+  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/47412.jpg`;
 
   return (
     <div className={`${effectiveFullscreen ? 'fixed inset-0 overflow-hidden' : 'min-h-screen'} relative`}>
@@ -112,60 +115,9 @@ export default function SpominZ() {
       />
       
       <div className={`relative z-10 ${effectiveFullscreen ? 'h-full flex flex-col' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
-        
-        {/* Top Section - Buttons */}
-        <div className={`${effectiveFullscreen ? 'bg-dragon-green/5 p-3 flex-shrink-0 border-b' : 'p-4 flex-shrink-0'}`}>
-          {effectiveFullscreen && (
-            <h2 className="text-lg font-bold mb-3 text-center">Spomin Z</h2>
-          )}
-          <div className="flex justify-center gap-3">
-            <MemoryExitConfirmationDialog onConfirm={() => navigate("/govorne-igre/spomin")}>
-              <Button
-                size={effectiveFullscreen ? "sm" : "default"}
-                variant="outline"
-                className="gap-2"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Nazaj
-              </Button>
-            </MemoryExitConfirmationDialog>
-            
-            <Button
-              onClick={handleReset}
-              size={effectiveFullscreen ? "sm" : "default"}
-              className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
-            >
-              <RotateCcw className="h-4 w-4" />
-              Nova igra
-            </Button>
-            
-            <Button
-              onClick={() => setShowInfo(true)}
-              size={effectiveFullscreen ? "sm" : "default"}
-              variant="outline"
-              className="gap-2"
-            >
-              <BookOpen className="h-4 w-4" />
-              Navodila
-            </Button>
-          </div>
-          
-          {!effectiveFullscreen && (
-            <div className="text-center mt-3 text-sm">
-              <span className="font-medium">Najdeni pari: </span>
-              <span className="text-dragon-green font-bold">{matchedPairs.length}</span>
-              <span className="text-muted-foreground"> od {totalPairs}</span>
-              {gameCompleted && gameTime !== null && (
-                <span className="ml-3 bg-dragon-green/10 text-dragon-green px-2 py-1 rounded-md text-xs font-medium">
-                  Čas: {gameTime}s
-                </span>
-              )}
-            </div>
-          )}
-        </div>
 
-        <div className={`${effectiveFullscreen ? 'flex-1 px-2 pb-2 overflow-hidden' : 'flex-1 flex justify-center items-center min-h-0'}`}>
-          <div className={`w-full ${effectiveFullscreen ? 'h-full' : 'max-w-4xl h-full'} flex items-center justify-center`}>
+        <div className={`${effectiveFullscreen ? 'mt-[25vh] px-2' : 'mt-[20vh] px-4'}`}>
+          <div className={`w-full ${effectiveFullscreen ? '' : 'max-w-4xl h-full flex items-center justify-center'}`}>
             {isLoading && (
               <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
             )}
@@ -203,7 +155,62 @@ export default function SpominZ() {
         </div>
       </div>
 
-      <InfoModal 
+      {/* Floating menu button - Now available on all devices */}
+      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button
+            size="icon"
+            className="fixed bottom-4 left-4 z-50 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white shadow-2xl rounded-full w-16 h-16 border-2 border-white/20"
+          >
+            <Home className="w-11 h-11" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent 
+          side="top" 
+          align="start" 
+          className="mb-2 ml-4 w-56 p-2 bg-background/95 backdrop-blur-sm border-2 shadow-xl z-[60]"
+          sideOffset={8}
+        >
+          <div className="flex flex-col gap-2">
+            <Button 
+              variant="outline" 
+              className="gap-2 w-full h-11 text-base justify-start"
+              onClick={() => {
+                setShowExitDialog(true);
+                setMenuOpen(false);
+              }}
+            >
+              <ArrowLeft className="w-5 h-5" />
+              Nazaj
+            </Button>
+            
+            <Button
+              onClick={() => {
+                handleReset();
+                setMenuOpen(false);
+              }}
+              className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 w-full h-11 text-base justify-start"
+            >
+              <RotateCcw className="w-5 h-5" />
+              Nova igra
+            </Button>
+            
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowInfo(true);
+                setMenuOpen(false);
+              }}
+              className="gap-2 w-full h-11 text-base justify-start"
+            >
+              <BookOpen className="w-5 h-5" />
+              Navodila
+            </Button>
+          </div>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <InfoModal
         isOpen={showInfo}
         onClose={() => setShowInfo(false)}
         title="Navodila za igro Spomin"
@@ -229,6 +236,14 @@ Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede."
         word={currentMatchedPair?.word || null}
         audioUrl={currentMatchedPair?.audio_url || null}
       />
+
+      <MemoryExitConfirmationDialog
+        open={showExitDialog}
+        onOpenChange={setShowExitDialog}
+        onConfirm={() => navigate("/govorne-igre/spomin")}
+      >
+        <div />
+      </MemoryExitConfirmationDialog>
     </div>
   );
 }
