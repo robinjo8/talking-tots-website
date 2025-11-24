@@ -105,7 +105,7 @@ export default function SpominR() {
     <div className={`${effectiveFullscreen ? 'fixed inset-0 overflow-hidden' : 'min-h-screen'} relative`}>
       {/* Background image layer */}
       <div 
-        className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+        className="absolute inset-0 w-full min-h-screen bg-cover bg-center bg-no-repeat"
         style={{
           backgroundImage: `url('${backgroundImageUrl}')`
         }}
