@@ -163,7 +163,7 @@ export default function SpominC() {
           </div>
         )}
 
-        <div className={`${effectiveFullscreen ? 'flex items-center justify-center px-2' : 'flex-1 flex justify-center items-center min-h-0'}`}>
+        <div className={`${effectiveFullscreen ? 'h-full flex items-center justify-center px-2' : 'flex-1 flex justify-center items-center min-h-0'}`}>
           <div className={`w-full ${effectiveFullscreen ? 'flex items-center justify-center max-w-sm' : 'max-w-4xl h-full flex items-center justify-center'}`}>
             {isLoading && (
               <div className="text-lg text-muted-foreground">Nalaganje igre...</div>

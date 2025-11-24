@@ -11,8 +11,9 @@ export function ManualInstallButton() {
   const [showInstructions, setShowInstructions] = useState(false);
 
   // Don't show if already installed or not on homepage
-  const isHomepage = window.location.pathname === '/';
-  if (isInstalled || !isHomepage) return null;
+  const isHomepage = window.location.pathname === '/' || window.location.pathname === '';
+  const isGamePage = window.location.pathname.includes('/govorne-igre/');
+  if (isInstalled || !isHomepage || isGamePage) return null;
 
   const handleInstallClick = async () => {
     if (isIOSDevice) {
