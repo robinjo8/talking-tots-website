@@ -8,6 +8,8 @@ import { Progress } from "@/components/ui/progress";
 import { useDailyProgress } from "@/hooks/useDailyProgress";
 import { FooterSection } from "@/components/FooterSection";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
 const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/ozadje_1.jpg`;
@@ -159,6 +161,17 @@ export default function SpominGames() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      
+      {/* Mobile Back Button */}
+      {isMobile && (
+        <Button
+          onClick={() => navigate("/govorne-igre")}
+          className="fixed bottom-6 left-6 z-50 h-14 w-14 rounded-full bg-app-orange hover:bg-app-orange/90 shadow-lg"
+          size="icon"
+        >
+          <ArrowLeft className="h-6 w-6 text-white" />
+        </Button>
+      )}
       
       {/* Hero sekcija */}
       <section className="bg-dragon-green py-12 md:py-16 pt-24 md:pt-28">
