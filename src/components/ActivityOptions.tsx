@@ -7,6 +7,15 @@ export function ActivityOptions() {
 
   const activities = [
     {
+      id: 'challenges',
+      title: 'Moji izzivi',
+      description: 'Priporočila pametnega asistenta.',
+      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_izzivi_6.png',
+      gradient: 'from-app-orange/20 to-app-yellow/20',
+      badge: '⭐',
+      url: '/moji-izzivi'
+    },
+    {
       id: 'games',
       title: 'Govorne igre',
       description: 'Zabavne igre za izboljšanje izgovorjave.',
@@ -32,15 +41,6 @@ export function ActivityOptions() {
       gradient: 'from-app-purple/20 to-app-teal/20',
       badge: '🎯',
       url: '/artikulacijski-test'
-    },
-    {
-      id: 'challenges',
-      title: 'Moji izzivi',
-      description: 'Priporočila pametnega asistenta.',
-      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/Zmajcek_izzivi_5.png',
-      gradient: 'from-app-orange/20 to-app-yellow/20',
-      badge: '⭐',
-      url: '/moji-izzivi'
     },
     {
       id: 'video',
