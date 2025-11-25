@@ -102,7 +102,7 @@ export function GamesList() {
                 onClick={() => handleGameClick(game.path)}
               >
                 {/* Card Image */}
-                <div className="relative aspect-video overflow-hidden">
+                <div className={isMobile ? "relative aspect-square overflow-hidden" : "relative aspect-video overflow-hidden"}>
                   {/* Custom gradient background */}
                   {game.customBackground && (
                     <div 
@@ -117,19 +117,24 @@ export function GamesList() {
                     <img 
                       src={game.image}
                       alt={game.title}
-                      className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+                      className={isMobile ? "w-[85%] h-[85%] object-contain group-hover:scale-110 transition-transform duration-300" : "w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"}
                     />
                   </div>
                 </div>
 
                 {/* Card Content */}
-                <div className="p-6 flex flex-col flex-grow">
-                  <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors min-h-[3.5rem] flex items-center">
+                <div className={isMobile ? "p-3 flex flex-col flex-grow" : "p-6 flex flex-col flex-grow"}>
+                  <h3 className={isMobile 
+                    ? "text-base font-bold text-foreground mb-1 group-hover:text-app-blue transition-colors leading-tight" 
+                    : "text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors min-h-[3.5rem] flex items-center"
+                  }>
                     {game.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
-                    {game.description}
-                  </p>
+                  {!isMobile && (
+                    <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                      {game.description}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
