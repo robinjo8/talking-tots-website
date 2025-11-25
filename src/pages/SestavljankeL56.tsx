@@ -99,11 +99,11 @@ function SestavljankeL56Content() {
     }
   }, [effectiveFullscreen]);
 
-  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/28256.jpg`;
+  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/video-game-background-1405076_1920.png`;
 
   if (effectiveFullscreen) {
     return (
-      <div className="fixed inset-0 overflow-hidden select-none relative">
+      <div className="fixed inset-0 overflow-hidden select-none relative touch-none overscroll-none">
         {/* Background image layer */}
         <div className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${backgroundImageUrl}')` }} />
         
