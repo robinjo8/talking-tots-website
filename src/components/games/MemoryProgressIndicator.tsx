@@ -13,13 +13,14 @@ export function MemoryProgressIndicator({ matchedPairs, totalPairs, className }:
         <div
           key={index}
           className={cn(
-            "w-3 h-3 rounded-full transition-all duration-300",
+            "w-4 h-4 rounded-full transition-all duration-500 ease-out",
             index < matchedPairs
-              ? "bg-dragon-green scale-110 shadow-md"
-              : "bg-gray-300/50 scale-100"
+              ? "bg-gradient-to-br from-dragon-green to-app-teal scale-125 shadow-lg shadow-dragon-green/50 animate-scale-in"
+              : "bg-gray-300/40 scale-100"
           )}
         />
       ))}
     </div>
   );
 }
+
