@@ -10,8 +10,8 @@ export default function MojiIzzivi() {
       <Header />
       
       <div className="container max-w-5xl mx-auto pt-28 md:pt-32 pb-20 px-4">
-        {/* Breadcrumb - Desktop only */}
-        <div className="hidden lg:block mb-8">
+        {/* Breadcrumb */}
+        <div className="mb-8">
           <BreadcrumbNavigation />
         </div>
         

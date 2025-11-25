@@ -158,8 +158,8 @@ export default function IgraUjemanja() {
       <Header />
       
       <div className="container max-w-6xl mx-auto pt-28 md:pt-32 pb-20 px-4">
-        {/* Breadcrumb - Desktop only */}
-        <div className="hidden lg:block mb-6">
+        {/* Breadcrumb */}
+        <div className="mb-6">
           <BreadcrumbNavigation />
         </div>
         

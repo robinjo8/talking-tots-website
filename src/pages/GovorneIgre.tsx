@@ -87,8 +87,8 @@ export default function GovorneIgre() {
         style={{ backgroundColor: 'white' }}
       >
         <div className="container max-w-6xl mx-auto px-4">
-          {/* Breadcrumb - samo na desktopu */}
-          <div className="hidden lg:block mb-8">
+          {/* Breadcrumb */}
+          <div className="mb-8">
             <BreadcrumbNavigation />
           </div>
           
