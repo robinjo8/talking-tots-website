@@ -473,7 +473,7 @@ export function AppRoutes() {
         }
       />
       
-      {/* Drsna sestavljanka 7-8 routes */}
+      {/* Drsna igra 7-8 routes */}
       <Route 
         path="/govorne-igre/drsna-sestavljanka/c78" 
         element={
@@ -555,7 +555,7 @@ export function AppRoutes() {
         }
       />
       
-      {/* Drsna sestavljanka 9-10 routes */}
+      {/* Drsna igra 9-10 routes */}
       <Route 
         path="/govorne-igre/drsna-sestavljanka/c910" 
         element={
