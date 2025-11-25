@@ -297,10 +297,6 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
     const ctx = canvas.getContext('2d')!;
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    // Draw background
-    ctx.fillStyle = '#f8fafc';
-    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
     // Draw puzzle board with white background and black dashed border
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(BOARD_X, BOARD_Y, PUZZLE_WIDTH, PUZZLE_HEIGHT);
