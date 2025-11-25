@@ -9,6 +9,8 @@ import { Progress } from "@/components/ui/progress";
 import { useDailyProgress } from "@/hooks/useDailyProgress";
 import { FooterSection } from "@/components/FooterSection";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const memoryGames = [
   {
@@ -148,25 +150,27 @@ export default function SestavljankeGames() {
       onClick={() => handleCardClick(game)}
     >
       {/* Card Image */}
-      <div className={`relative aspect-video overflow-hidden bg-gradient-to-br ${game.gradient}`}>
+      <div className={`relative overflow-hidden bg-gradient-to-br ${game.gradient} ${isMobile ? 'aspect-square' : 'aspect-video'}`}>
         <div className="w-full h-full flex items-center justify-center">
           <img 
             src={game.image}
             alt={`Črka ${game.letter}`}
-            className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+            className={`object-contain group-hover:scale-110 transition-transform duration-300 ${isMobile ? 'w-[80%] h-[80%]' : 'w-full h-full'}`}
             style={{ mixBlendMode: 'multiply' }}
           />
         </div>
       </div>
 
       {/* Card Content */}
-      <div className="p-6">
+      <div className={`p-6 ${isMobile ? 'text-center' : ''}`}>
         <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
           Črka {game.letter}
         </h3>
-        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
-          {game.description}
-        </p>
+        {!isMobile && (
+          <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+            {game.description}
+          </p>
+        )}
       </div>
     </div>
   );
@@ -174,6 +178,17 @@ export default function SestavljankeGames() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      
+      {/* Mobile Back Button */}
+      {isMobile && (
+        <Button
+          onClick={() => navigate("/govorne-igre")}
+          className="fixed bottom-6 left-6 z-50 h-14 w-14 rounded-full bg-app-orange hover:bg-app-orange/90 shadow-lg"
+          size="icon"
+        >
+          <ArrowLeft className="h-6 w-6 text-white" />
+        </Button>
+      )}
       
       {/* Hero sekcija */}
       <section className="bg-dragon-green py-12 md:py-16 pt-24 md:pt-28">
