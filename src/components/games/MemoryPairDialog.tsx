@@ -165,6 +165,7 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
         toast({
           title: "Odlično!",
           description: "Tvoja izgovorjava je bila shranjena.",
+          duration: 1000,
         });
       }
     } catch (error) {
