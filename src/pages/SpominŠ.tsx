@@ -11,6 +11,7 @@ import { InfoModal } from "@/components/games/InfoModal";
 import { MemoryPairDialog } from "@/components/games/MemoryPairDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { MemoryProgressIndicator } from "@/components/games/MemoryProgressIndicator";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
 
@@ -136,13 +137,19 @@ export default function SpominŠ() {
             )}
             
             {!isLoading && !error && cards.length > 0 && (
-              <div className="my-[160px]">
-                <MemoryGrid
-                  cards={cards}
-                  onCardClick={handleCardClick}
-                  isCheckingMatch={isCheckingMatch}
+              <>
+                <div className="my-[160px]">
+                  <MemoryGrid
+                    cards={cards}
+                    onCardClick={handleCardClick}
+                    isCheckingMatch={isCheckingMatch}
+                  />
+                </div>
+                <MemoryProgressIndicator 
+                  matchedPairs={matchedPairs.length} 
+                  totalPairs={totalPairs} 
                 />
-              </div>
+              </>
             )}
             
             {!isLoading && !error && cards.length === 0 && (
@@ -175,13 +182,19 @@ export default function SpominŠ() {
               )}
               
               {!isLoading && !error && cards.length > 0 && (
-                <div className="my-[160px]">
-                  <MemoryGrid 
-                    cards={cards} 
-                    onCardClick={handleCardClick}
-                    isCheckingMatch={isCheckingMatch}
+                <>
+                  <div className="my-[160px]">
+                    <MemoryGrid 
+                      cards={cards} 
+                      onCardClick={handleCardClick}
+                      isCheckingMatch={isCheckingMatch}
+                    />
+                  </div>
+                  <MemoryProgressIndicator 
+                    matchedPairs={matchedPairs.length} 
+                    totalPairs={totalPairs} 
                   />
-                </div>
+                </>
               )}
               
               {!isLoading && !error && cards.length === 0 && (
