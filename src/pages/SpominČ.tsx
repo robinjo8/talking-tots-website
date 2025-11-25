@@ -136,11 +136,13 @@ export default function SpominČ() {
             )}
             
             {!isLoading && !error && cards.length > 0 && (
-              <MemoryGrid 
-                cards={cards} 
-                onCardClick={handleCardClick}
-                isCheckingMatch={isCheckingMatch}
-              />
+              <div className="w-full px-4">
+                <MemoryGrid
+                  cards={cards}
+                  onCardClick={handleCardClick}
+                  isCheckingMatch={isCheckingMatch}
+                />
+              </div>
             )}
             
             {!isLoading && !error && cards.length === 0 && (
