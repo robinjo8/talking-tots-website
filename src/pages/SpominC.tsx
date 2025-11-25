@@ -105,8 +105,7 @@ export default function SpominC() {
     }} />
       
       <div className={`relative z-10 ${effectiveFullscreen ? 'h-full flex items-center justify-center overflow-hidden' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
-        {effectiveFullscreen ? (
-          <div className="w-full px-4">
+        {effectiveFullscreen ? <div className="w-full px-4">
             {isLoading && <div className="text-lg text-muted-foreground">Nalaganje igre...</div>}
             
             {error && <div className="bg-red-50 p-6 rounded-lg border border-red-100 text-center">
@@ -117,22 +116,14 @@ export default function SpominC() {
                 </Button>
               </div>}
             
-            {!isLoading && !error && cards.length > 0 && (
-              <MemoryGrid
-                cards={cards}
-                onCardClick={handleCardClick}
-                isCheckingMatch={isCheckingMatch}
-              />
-            )}
+            {!isLoading && !error && cards.length > 0 && <MemoryGrid cards={cards} onCardClick={handleCardClick} isCheckingMatch={isCheckingMatch} className="my-[160px]" />}
             
             {!isLoading && !error && cards.length === 0 && <div className="text-center p-10 border rounded-lg">
                 <p className="text-muted-foreground">
                   Ni kartic za prikaz. Prosim, preverite nastavitve igre.
                 </p>
               </div>}
-          </div>
-        ) : (
-          <div className="mt-[20vh] px-4">
+          </div> : <div className="mt-[20vh] px-4">
             <div className="w-full max-w-4xl mx-auto">
               {isLoading && <div className="text-lg text-muted-foreground">Nalaganje igre...</div>}
               
@@ -144,15 +135,9 @@ export default function SpominC() {
                   </Button>
                 </div>}
               
-              {!isLoading && !error && cards.length > 0 && (
-                <div className="my-[160px]">
-                  <MemoryGrid
-                    cards={cards}
-                    onCardClick={handleCardClick}
-                    isCheckingMatch={isCheckingMatch}
-                  />
-                </div>
-              )}
+              {!isLoading && !error && cards.length > 0 && <div className="my-[160px]">
+                  <MemoryGrid cards={cards} onCardClick={handleCardClick} isCheckingMatch={isCheckingMatch} />
+                </div>}
               
               {!isLoading && !error && cards.length === 0 && <div className="text-center p-10 border rounded-lg">
                   <p className="text-muted-foreground">
@@ -160,8 +145,7 @@ export default function SpominC() {
                   </p>
                 </div>}
             </div>
-          </div>
-        )}
+          </div>}
       </div>
 
       {/* Floating menu button - Now available on all devices */}
