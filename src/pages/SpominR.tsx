@@ -136,11 +136,13 @@ export default function SpominR() {
             )}
             
             {!isLoading && !error && cards.length > 0 && (
-              <MemoryGrid
-                cards={cards}
-                onCardClick={handleCardClick}
-                isCheckingMatch={isCheckingMatch}
-              />
+              <div className="my-[160px]">
+                <MemoryGrid
+                  cards={cards}
+                  onCardClick={handleCardClick}
+                  isCheckingMatch={isCheckingMatch}
+                />
+              </div>
             )}
             
             {!isLoading && !error && cards.length === 0 && (
@@ -152,7 +154,7 @@ export default function SpominR() {
             )}
           </div>
         ) : (
-          <div className="mt-[20vh] px-4">
+          <div className="px-4">
             <div className="w-full max-w-4xl mx-auto">
               {isLoading && (
                 <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
@@ -173,11 +175,13 @@ export default function SpominR() {
               )}
               
               {!isLoading && !error && cards.length > 0 && (
-                <MemoryGrid 
-                  cards={cards} 
-                  onCardClick={handleCardClick}
-                  isCheckingMatch={isCheckingMatch}
-                />
+                <div className="my-[160px]">
+                  <MemoryGrid 
+                    cards={cards} 
+                    onCardClick={handleCardClick}
+                    isCheckingMatch={isCheckingMatch}
+                  />
+                </div>
               )}
               
               {!isLoading && !error && cards.length === 0 && (

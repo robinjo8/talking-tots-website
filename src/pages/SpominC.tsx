@@ -116,7 +116,9 @@ export default function SpominC() {
                 </Button>
               </div>}
             
-            {!isLoading && !error && cards.length > 0 && <MemoryGrid cards={cards} onCardClick={handleCardClick} isCheckingMatch={isCheckingMatch} className="my-[160px]" />}
+            {!isLoading && !error && cards.length > 0 && <div className="my-[160px]">
+              <MemoryGrid cards={cards} onCardClick={handleCardClick} isCheckingMatch={isCheckingMatch} />
+            </div>}
             
             {!isLoading && !error && cards.length === 0 && <div className="text-center p-10 border rounded-lg">
                 <p className="text-muted-foreground">
@@ -136,8 +138,8 @@ export default function SpominC() {
                 </div>}
               
               {!isLoading && !error && cards.length > 0 && <div className="my-[160px]">
-                  <MemoryGrid cards={cards} onCardClick={handleCardClick} isCheckingMatch={isCheckingMatch} />
-                </div>}
+                <MemoryGrid cards={cards} onCardClick={handleCardClick} isCheckingMatch={isCheckingMatch} />
+              </div>}
               
               {!isLoading && !error && cards.length === 0 && <div className="text-center p-10 border rounded-lg">
                   <p className="text-muted-foreground">
