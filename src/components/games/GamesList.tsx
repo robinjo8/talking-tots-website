@@ -84,7 +84,7 @@ const otherGames = [
   },
   {
     id: "igra-razvrscanja",
-    title: "IGRA RAZVRŠČANJA",
+    title: "RAZVRŠČANJE",
     description: "Kmalu na voljo",
     gradient: "from-app-orange/20 to-app-yellow/20",
     available: false
