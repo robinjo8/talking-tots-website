@@ -13,6 +13,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
+const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
+
 const lImages = [
   { filename: 'ladja.png', word: 'LADJA' },
   { filename: 'led.png', word: 'LED' },
@@ -97,10 +99,15 @@ function SestavljankeL56Content() {
     }
   }, [effectiveFullscreen]);
 
+  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/7064592.jpg`;
+
   if (effectiveFullscreen) {
     return (
-      <div className="fixed inset-0 bg-background overflow-hidden select-none">
-        <div className="h-full flex flex-col">
+      <div className="fixed inset-0 overflow-hidden select-none relative">
+        {/* Background image layer */}
+        <div className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${backgroundImageUrl}')` }} />
+        
+        <div className="relative z-10 h-full flex flex-col">
           <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
             <h2 className="text-lg font-bold mb-3 text-center">Sestavljanka L</h2>
             <div className="flex justify-center gap-3">
@@ -144,7 +151,11 @@ function SestavljankeL56Content() {
 
   return (
     <AppLayout>
-      <div className="w-full min-h-screen bg-background">
+      <div className="w-full min-h-screen relative">
+        {/* Background image layer */}
+        <div className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${backgroundImageUrl}')` }} />
+        
+        <div className="relative z-10">
         <div className="flex justify-center gap-4 p-4">
           <MemoryExitConfirmationDialog onConfirm={handleBack}>
             <Button variant="outline" className="gap-2">
@@ -177,6 +188,7 @@ function SestavljankeL56Content() {
           completedImage={currentImage}
           onStarClaimed={handleStarClaimed}
         />
+        </div>
       </div>
     </AppLayout>
   );

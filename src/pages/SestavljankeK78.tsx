@@ -13,6 +13,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
+const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
+
 const kImages = [
   { filename: 'kapa.png', word: 'KAPA' },
   { filename: 'klavir.png', word: 'KLAVIR' },
@@ -97,10 +99,15 @@ function SestavljankeK78Content() {
     }
   }, [effectiveFullscreen]);
 
+  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/7064592.jpg`;
+
   if (effectiveFullscreen) {
     return (
-      <div className="fixed inset-0 bg-background overflow-hidden select-none">
-        <div className="h-full flex flex-col">
+      <div className="fixed inset-0 overflow-hidden select-none relative">
+        {/* Background image layer */}
+        <div className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${backgroundImageUrl}')` }} />
+        
+        <div className="relative z-10 h-full flex flex-col">
           <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
             <h2 className="text-lg font-bold mb-3 text-center">Sestavljanka K</h2>
             <div className="flex justify-center gap-3">
@@ -144,39 +151,44 @@ function SestavljankeK78Content() {
 
   return (
     <AppLayout>
-      <div className="w-full min-h-screen bg-background">
-        <div className="flex justify-center gap-4 p-4">
-          <MemoryExitConfirmationDialog onConfirm={handleBack}>
-            <Button variant="outline" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Nazaj
+      <div className="w-full min-h-screen relative">
+        {/* Background image layer */}
+        <div className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${backgroundImageUrl}')` }} />
+        
+        <div className="relative z-10">
+          <div className="flex justify-center gap-4 p-4">
+            <MemoryExitConfirmationDialog onConfirm={handleBack}>
+              <Button variant="outline" className="gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Nazaj
+              </Button>
+            </MemoryExitConfirmationDialog>
+            <Button onClick={handleNewGame} className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
+              <RotateCcw className="h-4 w-4" />
+              Nova igra
             </Button>
-          </MemoryExitConfirmationDialog>
-          <Button onClick={handleNewGame} className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
-            <RotateCcw className="h-4 w-4" />
-            Nova igra
-          </Button>
-          <Button onClick={handleInstructions} variant="outline" className="gap-2">
-            <BookOpen className="h-4 w-4" />
-            Navodila
-          </Button>
-        </div>
-        <div className="w-full flex justify-center items-center p-4">
-          <SimpleJigsaw 
-            key={puzzleKey}
-            imageUrl={imageUrl}
-            gridCols={5}
-            gridRows={5}
-            onComplete={handleComplete}
+            <Button onClick={handleInstructions} variant="outline" className="gap-2">
+              <BookOpen className="h-4 w-4" />
+              Navodila
+            </Button>
+          </div>
+          <div className="w-full flex justify-center items-center p-4">
+            <SimpleJigsaw 
+              key={puzzleKey}
+              imageUrl={imageUrl}
+              gridCols={5}
+              gridRows={5}
+              onComplete={handleComplete}
+            />
+          </div>
+          <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
+          <PuzzleSuccessDialog
+            isOpen={showCompletion}
+            onOpenChange={setShowCompletion}
+            completedImage={currentImage}
+            onStarClaimed={handleStarClaimed}
           />
         </div>
-        <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
-        <PuzzleSuccessDialog
-          isOpen={showCompletion}
-          onOpenChange={setShowCompletion}
-          completedImage={currentImage}
-          onStarClaimed={handleStarClaimed}
-        />
       </div>
     </AppLayout>
   );
