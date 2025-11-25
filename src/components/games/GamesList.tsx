@@ -10,7 +10,8 @@ const otherGames = [
     gradient: "from-app-purple/20 to-app-blue/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/spomin",
-    available: true
+    available: true,
+    mobileImageSize: "90%"
   },
   {
     id: "sestavljanke",
@@ -20,7 +21,8 @@ const otherGames = [
     gradient: "from-app-teal/20 to-dragon-green/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/sestavljanke",
-    available: true
+    available: true,
+    mobileImageSize: "90%"
   },
   {
     id: "zaporedja",
@@ -30,7 +32,8 @@ const otherGames = [
     gradient: "from-app-purple/20 to-app-blue/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/zaporedja",
-    available: true
+    available: true,
+    mobileImageSize: "85%"
   },
   {
     id: "drsna-sestavljanka",
@@ -40,7 +43,8 @@ const otherGames = [
     gradient: "from-app-orange/20 to-app-yellow/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/drsna-sestavljanka",
-    available: true
+    available: true,
+    mobileImageSize: "95%"
   },
   {
     id: "povezi-pare-matching",
@@ -50,7 +54,8 @@ const otherGames = [
     gradient: "from-app-purple/20 to-app-blue/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/igra-ujemanja",
-    available: true
+    available: true,
+    mobileImageSize: "85%"
   },
   {
     id: "labirint",
@@ -60,7 +65,8 @@ const otherGames = [
     gradient: "from-app-orange/20 to-app-yellow/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/labirint",
-    available: true
+    available: true,
+    mobileImageSize: "70%"
   },
   {
     id: "igra9",
@@ -117,8 +123,11 @@ export function GamesList() {
                     <img 
                       src={game.image}
                       alt={game.title}
-                      className={isMobile ? "w-[85%] h-[85%] object-contain group-hover:scale-110 transition-transform duration-300" : "w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"}
-                      style={['zaporedja', 'povezi-pare-matching', 'labirint'].includes(game.id) ? { mixBlendMode: 'multiply' } : undefined}
+                      className={isMobile ? `object-contain group-hover:scale-110 transition-transform duration-300` : "w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"}
+                      style={{
+                        ...(isMobile ? { width: game.mobileImageSize || "90%", height: game.mobileImageSize || "90%" } : {}),
+                        ...(['zaporedja', 'povezi-pare-matching', 'labirint'].includes(game.id) ? { mixBlendMode: 'multiply' } : {})
+                      }}
                     />
                   </div>
                 </div>
