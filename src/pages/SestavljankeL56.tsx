@@ -108,8 +108,8 @@ function SestavljankeL56Content() {
         <div className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${backgroundImageUrl}')` }} />
         
         <div className="relative z-10 h-full flex flex-col">
-          <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
-            <h2 className="text-lg font-bold mb-3 text-center">Sestavljanka L</h2>
+          <div className="p-3 flex-shrink-0">
+            <h2 className="text-lg font-bold mb-3 text-center text-white drop-shadow-lg">Sestavljanka L</h2>
             <div className="flex justify-center gap-3">
               <MemoryExitConfirmationDialog onConfirm={handleBack}>
                 <Button size="sm" variant="outline" className="gap-2">
