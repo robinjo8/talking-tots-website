@@ -136,13 +136,11 @@ export default function SpominZ() {
             )}
             
             {!isLoading && !error && cards.length > 0 && (
-              <div className="w-full px-4">
-                <MemoryGrid
-                  cards={cards}
-                  onCardClick={handleCardClick}
-                  isCheckingMatch={isCheckingMatch}
-                />
-              </div>
+              <MemoryGrid
+                cards={cards}
+                onCardClick={handleCardClick}
+                isCheckingMatch={isCheckingMatch}
+              />
             )}
             
             {!isLoading && !error && cards.length === 0 && (
