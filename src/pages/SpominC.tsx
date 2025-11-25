@@ -106,7 +106,7 @@ export default function SpominC() {
       
       <div className={`relative z-10 ${effectiveFullscreen ? 'h-full flex items-center justify-center overflow-hidden' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
         {effectiveFullscreen ? (
-          <div className="px-2">
+          <div className="w-full px-4">
             {isLoading && <div className="text-lg text-muted-foreground">Nalaganje igre...</div>}
             
             {error && <div className="bg-red-50 p-6 rounded-lg border border-red-100 text-center">
