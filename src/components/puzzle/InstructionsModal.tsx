@@ -48,7 +48,7 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
   const title = type === "articulation" 
     ? "Navodila za vajo" 
     : type === "sliding" 
-    ? "Drsna sestavljanka"
+    ? "Drsna igra"
     : type === "maze"
     ? "Navodila za labirint"
     : "Navodila za igro Sestavljanka";

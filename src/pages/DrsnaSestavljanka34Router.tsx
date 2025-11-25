@@ -236,7 +236,7 @@ function DrsnaSestavljanka34Content() {
       <div className="fixed inset-0 bg-background overflow-hidden select-none">
         <div className="h-full flex flex-col">
           <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
-            <h2 className="text-lg font-bold mb-3 text-center">Drsna sestavljanka {titleLetter}</h2>
+            <h2 className="text-lg font-bold mb-3 text-center">Drsna igra {titleLetter}</h2>
             <div className="flex justify-center gap-3">
               <Button onClick={handleBack} size="sm" variant="outline" className="gap-2">
                 <ArrowLeft className="h-4 w-4" />

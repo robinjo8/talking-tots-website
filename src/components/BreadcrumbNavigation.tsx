@@ -49,8 +49,8 @@ const breadcrumbConfig: BreadcrumbConfig[] = [
   // Sestavljanke
   { path: "/govorne-igre/sestavljanke", label: "Sestavljanke", parent: "/govorne-igre" },
   
-  // Drsna sestavljanka
-  { path: "/govorne-igre/drsna-sestavljanka", label: "Drsna sestavljanka", parent: "/govorne-igre" },
+  // Drsna igra
+  { path: "/govorne-igre/drsna-sestavljanka", label: "Drsna igra", parent: "/govorne-igre" },
   
   // Igra ujemanja
   { path: "/govorne-igre/igra-ujemanja", label: "Igra ujemanja", parent: "/govorne-igre" },

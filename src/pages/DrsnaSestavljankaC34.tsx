@@ -108,7 +108,7 @@ function DrsnaSestavljankaC34Content() {
       <div className="fixed inset-0 bg-background overflow-hidden select-none">
         <div className="h-full flex flex-col">
           <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
-            <h2 className="text-lg font-bold mb-3 text-center">Drsna sestavljanka C</h2>
+            <h2 className="text-lg font-bold mb-3 text-center">Drsna igra C</h2>
             <div className="flex justify-center gap-3">
               <MemoryExitConfirmationDialog onConfirm={handleBack}>
                 <Button

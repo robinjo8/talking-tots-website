@@ -34,7 +34,7 @@ const otherGames = [
   },
   {
     id: "drsna-sestavljanka",
-    title: "DRSNA SESTAVLJANKA",
+    title: "DRSNA IGRA",
     description: "Drsne sestavljanke za vajo izgovorjave",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/drsna_4.png",
     gradient: "from-app-orange/20 to-app-yellow/20",
