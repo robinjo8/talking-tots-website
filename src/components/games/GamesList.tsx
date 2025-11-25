@@ -130,11 +130,12 @@ export function GamesList() {
                   }>
                     {game.title}
                   </h3>
-                  {!isMobile && (
-                    <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
-                      {game.description}
-                    </p>
-                  )}
+                  <p className={isMobile 
+                    ? "text-xs text-muted-foreground leading-tight line-clamp-2" 
+                    : "text-sm text-muted-foreground leading-relaxed line-clamp-3"
+                  }>
+                    {game.description}
+                  </p>
                 </div>
               </div>
             </div>
