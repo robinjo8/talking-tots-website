@@ -8,7 +8,7 @@ const otherGames = [
     description: "Igraj spomin in vadi izgovorjavo",
     image: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/spomin_4.png?t=${new Date().getTime()}`,
     gradient: "from-app-purple/20 to-app-blue/20",
-    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 92%) 0%, hsl(42, 100%, 88%) 30%, hsl(38, 100%, 70%) 60%, hsl(33, 100%, 50%) 100%)",
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/spomin",
     available: true
   },
@@ -18,7 +18,7 @@ const otherGames = [
     description: "Igraj sestavljanke in vadi logično razmišljanje",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/sestavljanka_4.png",
     gradient: "from-app-teal/20 to-dragon-green/20",
-    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 92%) 0%, hsl(42, 100%, 88%) 30%, hsl(38, 100%, 70%) 60%, hsl(33, 100%, 50%) 100%)",
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/sestavljanke",
     available: true
   },
@@ -28,7 +28,7 @@ const otherGames = [
     description: "Uredi zaporedje slik in vadi izgovorjavo",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/zaporedja_2.png",
     gradient: "from-app-purple/20 to-app-blue/20",
-    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 92%) 0%, hsl(42, 100%, 88%) 30%, hsl(38, 100%, 70%) 60%, hsl(33, 100%, 50%) 100%)",
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/zaporedja",
     available: true
   },
@@ -38,7 +38,7 @@ const otherGames = [
     description: "Drsne sestavljanke za vajo izgovorjave",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/drsna_4.png",
     gradient: "from-app-orange/20 to-app-yellow/20",
-    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 92%) 0%, hsl(42, 100%, 88%) 30%, hsl(38, 100%, 70%) 60%, hsl(33, 100%, 50%) 100%)",
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/drsna-sestavljanka",
     available: true
   },
@@ -48,7 +48,7 @@ const otherGames = [
     description: "Poveži enake slike med stolpci",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/povezi_pare_8.png",
     gradient: "from-app-purple/20 to-app-blue/20",
-    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 92%) 0%, hsl(42, 100%, 88%) 30%, hsl(38, 100%, 70%) 60%, hsl(33, 100%, 50%) 100%)",
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/igra-ujemanja",
     available: true
   },
@@ -58,7 +58,7 @@ const otherGames = [
     description: "Poišči pot skozi labirint in vadi izgovorjavo",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/labirint.png",
     gradient: "from-app-orange/20 to-app-yellow/20",
-    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 92%) 0%, hsl(42, 100%, 88%) 30%, hsl(38, 100%, 70%) 60%, hsl(33, 100%, 50%) 100%)",
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/labirint",
     available: true
   },
