@@ -125,7 +125,7 @@ export function GamesList() {
                 {/* Card Content */}
                 <div className={isMobile ? "p-3 flex flex-col flex-grow" : "p-6 flex flex-col flex-grow"}>
                   <h3 className={isMobile 
-                    ? "text-base font-bold text-foreground mb-1 group-hover:text-app-blue transition-colors leading-tight" 
+                    ? "text-base font-bold text-foreground mb-1 group-hover:text-app-blue transition-colors leading-tight text-center" 
                     : "text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors min-h-[3.5rem] flex items-center"
                   }>
                     {game.title}
