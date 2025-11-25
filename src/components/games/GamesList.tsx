@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const otherGames = [
   {
@@ -79,6 +80,7 @@ const otherGames = [
 
 export function GamesList() {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const activeGames = otherGames.filter(game => game.available);
   const inactiveGames = otherGames.filter(game => !game.available);
 
@@ -92,7 +94,7 @@ export function GamesList() {
     <>
       {/* Available Games Section */}
       <div className="mb-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className={isMobile ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"}>
           {activeGames.map((game) => (
             <div key={game.id} className="flex h-full">
               <div
@@ -141,7 +143,7 @@ export function GamesList() {
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-muted-foreground">
             KMALU NA VOLJO
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className={isMobile ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"}>
             {inactiveGames.map((game) => (
               <div
                 key={game.id}
