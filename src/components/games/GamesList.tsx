@@ -55,7 +55,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/igra-ujemanja",
     available: true,
-    mobileImageSize: "85%"
+    mobileImageSize: "70%"
   },
   {
     id: "labirint",
