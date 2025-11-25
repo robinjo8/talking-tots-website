@@ -69,17 +69,24 @@ const otherGames = [
     mobileImageSize: "70%"
   },
   {
-    id: "igra9",
-    title: "Igra 9",
+    id: "pobarvanke",
+    title: "Pobarvanke",
     description: "Kmalu na voljo",
     gradient: "from-app-teal/20 to-dragon-green/20",
     available: false
   },
   {
-    id: "igra10",
-    title: "Igra 10",
+    id: "povezi-pike",
+    title: "Poveži pike",
     description: "Kmalu na voljo",
     gradient: "from-app-purple/20 to-app-blue/20",
+    available: false
+  },
+  {
+    id: "igra-razvrscanja",
+    title: "Igra razvrščanja",
+    description: "Kmalu na voljo",
+    gradient: "from-app-orange/20 to-app-yellow/20",
     available: false
   }
 ];
