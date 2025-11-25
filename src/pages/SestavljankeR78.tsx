@@ -14,6 +14,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
+const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
+
 const rImages = [
   { filename: 'raca.png', word: 'RACA' },
   { filename: 'raketa.png', word: 'RAKETA' },
@@ -125,12 +127,17 @@ function SestavljankeR78Content() {
     }
   }, [effectiveFullscreen]);
 
+  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/video-game-background-1405076_1920.png`;
+
   if (effectiveFullscreen) {
     return (
-      <div className="fixed inset-0 bg-background overflow-hidden select-none">
-        <div className="h-full flex flex-col">
+      <div className="fixed inset-0 overflow-hidden select-none relative touch-none overscroll-none">
+        {/* Background image layer */}
+        <div className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${backgroundImageUrl}')` }} />
+        
+        <div className="relative z-10 h-full flex flex-col">
           {/* Top Section - Buttons */}
-          <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
+          <div className="p-3 flex-shrink-0">
             <h2 className="text-lg font-bold mb-3 text-center">Sestavljanka R - 16 kosov</h2>
             <div className="flex justify-center gap-3">
               <MemoryExitConfirmationDialog onConfirm={handleBack}>
