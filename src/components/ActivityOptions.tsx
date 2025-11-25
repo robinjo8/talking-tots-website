@@ -85,7 +85,7 @@ export function ActivityOptions() {
             <div className={`relative aspect-video overflow-hidden bg-gradient-to-br ${activity.gradient}`}>
               {/* Recommended badge - statično na Moji izzivi */}
               {activity.id === 'challenges' && (
-                <div className="absolute top-4 left-4 bg-app-orange text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-1 z-10">
+                <div className="absolute top-4 left-4 bg-dragon-green text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-1 z-10">
                   ⭐ Priporočeno
                 </div>
               )}
