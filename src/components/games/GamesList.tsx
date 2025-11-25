@@ -48,7 +48,7 @@ const otherGames = [
   },
   {
     id: "povezi-pare-matching",
-    title: "IGRA UJEMANJA",
+    title: "RAZVRŠČANJE",
     description: "Poveži enake slike med stolpci",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/povezi_pare_8.png",
     gradient: "from-app-purple/20 to-app-blue/20",
