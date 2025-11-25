@@ -11,6 +11,7 @@ import { InfoModal } from "@/components/games/InfoModal";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MemoryPairDialog } from "@/components/games/MemoryPairDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
+import { MemoryProgressIndicator } from "@/components/games/MemoryProgressIndicator";
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
 export default function SpominC() {
   const navigate = useNavigate();
@@ -116,9 +117,12 @@ export default function SpominC() {
                 </Button>
               </div>}
             
-            {!isLoading && !error && cards.length > 0 && <div className="my-[160px]">
+            {!isLoading && !error && cards.length > 0 && <>
+              <div className="my-[160px]">
               <MemoryGrid cards={cards} onCardClick={handleCardClick} isCheckingMatch={isCheckingMatch} />
-            </div>}
+            </div>
+              <MemoryProgressIndicator matchedPairs={matchedPairs.length} totalPairs={totalPairs} />
+            </>}
             
             {!isLoading && !error && cards.length === 0 && <div className="text-center p-10 border rounded-lg">
                 <p className="text-muted-foreground">
@@ -137,9 +141,12 @@ export default function SpominC() {
                   </Button>
                 </div>}
               
-              {!isLoading && !error && cards.length > 0 && <div className="my-[160px]">
+              {!isLoading && !error && cards.length > 0 && <>
+                <div className="my-[160px]">
                 <MemoryGrid cards={cards} onCardClick={handleCardClick} isCheckingMatch={isCheckingMatch} />
-              </div>}
+              </div>
+                <MemoryProgressIndicator matchedPairs={matchedPairs.length} totalPairs={totalPairs} />
+              </>}
               
               {!isLoading && !error && cards.length === 0 && <div className="text-center p-10 border rounded-lg">
                   <p className="text-muted-foreground">
