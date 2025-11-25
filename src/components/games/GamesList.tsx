@@ -70,21 +70,21 @@ const otherGames = [
   },
   {
     id: "pobarvanke",
-    title: "Pobarvanke",
+    title: "POBARVANKE",
     description: "Kmalu na voljo",
     gradient: "from-app-teal/20 to-dragon-green/20",
     available: false
   },
   {
     id: "povezi-pike",
-    title: "Poveži pike",
+    title: "POVEŽI PIKE",
     description: "Kmalu na voljo",
     gradient: "from-app-purple/20 to-app-blue/20",
     available: false
   },
   {
     id: "igra-razvrscanja",
-    title: "Igra razvrščanja",
+    title: "IGRA RAZVRŠČANJA",
     description: "Kmalu na voljo",
     gradient: "from-app-orange/20 to-app-yellow/20",
     available: false
@@ -193,11 +193,17 @@ export function GamesList() {
                 </div>
 
                 {/* Card Content */}
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-foreground mb-3">
+                <div className={isMobile ? "p-3 flex flex-col flex-grow" : "p-6 flex flex-col flex-grow"}>
+                  <h3 className={isMobile 
+                    ? "text-base font-bold text-foreground mb-1 leading-tight text-center" 
+                    : "text-xl font-bold text-foreground mb-3 min-h-[3.5rem] flex items-center"
+                  }>
                     {game.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed italic">
+                  <p className={isMobile 
+                    ? "text-xs text-muted-foreground leading-tight line-clamp-2 text-center italic" 
+                    : "text-sm text-muted-foreground leading-relaxed line-clamp-3 italic"
+                  }>
                     Kmalu na voljo
                   </p>
                 </div>
