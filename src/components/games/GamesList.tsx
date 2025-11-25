@@ -26,7 +26,7 @@ const otherGames = [
     id: "zaporedja",
     title: "ZAPOREDJA",
     description: "Uredi zaporedje slik in vadi izgovorjavo",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/zaporedja.png",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/zaporedja_2.png",
     gradient: "from-app-purple/20 to-app-blue/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 92%) 0%, hsl(42, 100%, 88%) 30%, hsl(38, 100%, 70%) 60%, hsl(33, 100%, 50%) 100%)",
     path: "/govorne-igre/zaporedja",
@@ -46,7 +46,7 @@ const otherGames = [
     id: "povezi-pare-matching",
     title: "IGRA UJEMANJA",
     description: "Poveži enake slike med stolpci",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/povezi_pare_4.png",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/povezi_pare_8.png",
     gradient: "from-app-purple/20 to-app-blue/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 92%) 0%, hsl(42, 100%, 88%) 30%, hsl(38, 100%, 70%) 60%, hsl(33, 100%, 50%) 100%)",
     path: "/govorne-igre/igra-ujemanja",
@@ -56,7 +56,7 @@ const otherGames = [
     id: "labirint",
     title: "LABIRINT",
     description: "Poišči pot skozi labirint in vadi izgovorjavo",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/labirint_4.png",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/labirint.png",
     gradient: "from-app-orange/20 to-app-yellow/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 92%) 0%, hsl(42, 100%, 88%) 30%, hsl(38, 100%, 70%) 60%, hsl(33, 100%, 50%) 100%)",
     path: "/govorne-igre/labirint",
@@ -118,6 +118,7 @@ export function GamesList() {
                       src={game.image}
                       alt={game.title}
                       className={isMobile ? "w-[85%] h-[85%] object-contain group-hover:scale-110 transition-transform duration-300" : "w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"}
+                      style={['zaporedja', 'povezi-pare-matching', 'labirint'].includes(game.id) ? { mixBlendMode: 'multiply' } : undefined}
                     />
                   </div>
                 </div>
