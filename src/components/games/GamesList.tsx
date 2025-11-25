@@ -131,7 +131,7 @@ export function GamesList() {
                     {game.title}
                   </h3>
                   <p className={isMobile 
-                    ? "text-xs text-muted-foreground leading-tight line-clamp-2" 
+                    ? "text-xs text-muted-foreground leading-tight line-clamp-2 text-center" 
                     : "text-sm text-muted-foreground leading-relaxed line-clamp-3"
                   }>
                     {game.description}
