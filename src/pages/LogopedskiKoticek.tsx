@@ -101,8 +101,8 @@ const LogopedskiKoticek = () => {
           <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full"></div>
         </div>
         
-        {/* Breadcrumb - Desktop only */}
-        <div className="hidden lg:block mb-8">
+        {/* Breadcrumb */}
+        <div className="mb-8">
           <BreadcrumbNavigation />
         </div>
 

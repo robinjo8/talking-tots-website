@@ -70,8 +70,8 @@ const VajeMoториkeGovoril = () => {
         </div>
       ) : (
         <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
-          {/* Breadcrumb - Desktop only */}
-          <div className="hidden lg:block mb-6">
+          {/* Breadcrumb */}
+          <div className="mb-6">
             <BreadcrumbNavigation />
           </div>
 

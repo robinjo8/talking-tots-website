@@ -20,8 +20,8 @@ const RazvojGovora = () => {
           Razvoj govora
         </h1>
         
-        {/* Breadcrumb - Desktop only */}
-        <div className="hidden lg:block">
+        {/* Breadcrumb */}
+        <div className="mb-4">
           <BreadcrumbNavigation />
         </div>
       </div>
