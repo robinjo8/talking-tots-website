@@ -13,6 +13,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
 
+const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
+
 const žImages = [
   { filename: 'zaba.png', word: 'ŽABA', audio: 'zaba.m4a' },
   { filename: 'zaga.png', word: 'ŽAGA', audio: 'zaga.m4a' },
@@ -97,12 +99,17 @@ function SestavljankeŽ56Content() {
     }
   }, [effectiveFullscreen]);
 
+  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/video-game-background-1405076_1920.png`;
+
   if (effectiveFullscreen) {
     return (
-      <div className="fixed inset-0 bg-background overflow-hidden select-none">
-        <div className="h-full flex flex-col">
-          <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
-            <h2 className="text-lg font-bold mb-3 text-center">Sestavljanka Ž</h2>
+      <div className="fixed inset-0 overflow-hidden select-none relative touch-none overscroll-none">
+        {/* Background image layer */}
+        <div className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${backgroundImageUrl}')` }} />
+        
+        <div className="relative z-10 h-full flex flex-col">
+          <div className="p-3 flex-shrink-0">
+            <h2 className="text-lg font-bold mb-3 text-center text-white drop-shadow-lg">Sestavljanka Ž</h2>
             <div className="flex justify-center gap-3">
               <MemoryExitConfirmationDialog onConfirm={handleBack}>
                 <Button size="sm" variant="outline" className="gap-2">
