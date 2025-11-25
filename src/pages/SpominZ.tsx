@@ -138,6 +138,10 @@ export default function SpominZ() {
             
             {!isLoading && !error && cards.length > 0 && (
               <>
+                <MemoryProgressIndicator 
+                  matchedPairs={matchedPairs.length} 
+                  totalPairs={totalPairs} 
+                />
                 <div className="my-[160px]">
                   <MemoryGrid
                     cards={cards}
@@ -145,10 +149,6 @@ export default function SpominZ() {
                     isCheckingMatch={isCheckingMatch}
                   />
                 </div>
-                <MemoryProgressIndicator 
-                  matchedPairs={matchedPairs.length} 
-                  totalPairs={totalPairs} 
-                />
               </>
             )}
             
@@ -183,6 +183,10 @@ export default function SpominZ() {
               
               {!isLoading && !error && cards.length > 0 && (
                 <>
+                  <MemoryProgressIndicator 
+                    matchedPairs={matchedPairs.length} 
+                    totalPairs={totalPairs} 
+                  />
                   <div className="my-[160px]">
                     <MemoryGrid 
                       cards={cards} 
@@ -190,10 +194,6 @@ export default function SpominZ() {
                       isCheckingMatch={isCheckingMatch}
                     />
                   </div>
-                  <MemoryProgressIndicator 
-                    matchedPairs={matchedPairs.length} 
-                    totalPairs={totalPairs} 
-                  />
                 </>
               )}
               

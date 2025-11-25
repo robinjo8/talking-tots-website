@@ -118,10 +118,10 @@ export default function SpominC() {
               </div>}
             
             {!isLoading && !error && cards.length > 0 && <>
+              <MemoryProgressIndicator matchedPairs={matchedPairs.length} totalPairs={totalPairs} />
               <div className="my-[160px]">
               <MemoryGrid cards={cards} onCardClick={handleCardClick} isCheckingMatch={isCheckingMatch} />
             </div>
-              <MemoryProgressIndicator matchedPairs={matchedPairs.length} totalPairs={totalPairs} />
             </>}
             
             {!isLoading && !error && cards.length === 0 && <div className="text-center p-10 border rounded-lg">
@@ -142,10 +142,10 @@ export default function SpominC() {
                 </div>}
               
               {!isLoading && !error && cards.length > 0 && <>
+                <MemoryProgressIndicator matchedPairs={matchedPairs.length} totalPairs={totalPairs} />
                 <div className="my-[160px]">
                 <MemoryGrid cards={cards} onCardClick={handleCardClick} isCheckingMatch={isCheckingMatch} />
               </div>
-                <MemoryProgressIndicator matchedPairs={matchedPairs.length} totalPairs={totalPairs} />
               </>}
               
               {!isLoading && !error && cards.length === 0 && <div className="text-center p-10 border rounded-lg">
