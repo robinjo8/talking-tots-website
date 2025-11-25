@@ -99,7 +99,7 @@ function SestavljankeL56Content() {
     }
   }, [effectiveFullscreen]);
 
-  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/28256.jpg`;
+  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/7064592.jpg`;
 
   if (effectiveFullscreen) {
     return (

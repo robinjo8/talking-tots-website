@@ -297,7 +297,15 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
     const ctx = canvas.getContext('2d')!;
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    // No puzzle board background or border - let background image show through
+    // Draw puzzle board with white background and black dashed border
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(BOARD_X, BOARD_Y, PUZZLE_WIDTH, PUZZLE_HEIGHT);
+    
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 5]);
+    ctx.strokeRect(BOARD_X, BOARD_Y, PUZZLE_WIDTH, PUZZLE_HEIGHT);
+    ctx.setLineDash([]);
 
     // Draw faint template showing piece outlines
     const pieceWidth = PUZZLE_WIDTH / gridCols;
