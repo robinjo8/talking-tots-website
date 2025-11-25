@@ -114,10 +114,9 @@ export default function SpominS() {
         }}
       />
       
-      <div className={`relative z-10 ${effectiveFullscreen ? 'h-full flex flex-col' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
-
-        <div className={`${effectiveFullscreen ? 'mt-[25vh] px-2' : 'mt-[20vh] px-4'}`}>
-          <div className={`w-full ${effectiveFullscreen ? '' : 'max-w-4xl mx-auto'}`}>
+      <div className={`relative z-10 ${effectiveFullscreen ? 'h-full flex items-center justify-center overflow-hidden' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
+        {effectiveFullscreen ? (
+          <div className="px-2">
             {isLoading && (
               <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
             )}
@@ -152,7 +151,45 @@ export default function SpominS() {
               </div>
             )}
           </div>
-        </div>
+        ) : (
+          <div className="mt-[20vh] px-4">
+            <div className="w-full max-w-4xl mx-auto">
+              {isLoading && (
+                <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
+              )}
+              
+              {error && (
+                <div className="bg-red-50 p-6 rounded-lg border border-red-100 text-center">
+                  <h3 className="text-red-600 font-medium mb-2">Napaka pri nalaganju igre</h3>
+                  <p className="text-sm text-red-500">Poskusite znova kasneje.</p>
+                  <Button 
+                    variant="outline" 
+                    className="mt-4" 
+                    onClick={() => window.location.reload()}
+                  >
+                    Poskusi znova
+                  </Button>
+                </div>
+              )}
+              
+              {!isLoading && !error && cards.length > 0 && (
+                <MemoryGrid 
+                  cards={cards} 
+                  onCardClick={handleCardClick}
+                  isCheckingMatch={isCheckingMatch}
+                />
+              )}
+              
+              {!isLoading && !error && cards.length === 0 && (
+                <div className="text-center p-10 border rounded-lg">
+                  <p className="text-muted-foreground">
+                    Ni kartic za prikaz. Prosim, preverite nastavitve igre.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Floating menu button - Now available on all devices */}

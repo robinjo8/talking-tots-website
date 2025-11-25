@@ -5,8 +5,13 @@ import * as React from "react";
 const MOBILE_BREAKPOINT = 768;
 
 export function useIsMobile() {
-  // Start with undefined to avoid hydration issues
-  const [isMobile, setIsMobile] = React.useState<boolean>(false);
+  // Initialize with correct value to prevent hydration issues
+  const [isMobile, setIsMobile] = React.useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < MOBILE_BREAKPOINT;
+    }
+    return false;
+  });
 
   React.useEffect(() => {
     // Check if window is available (client-side only)
