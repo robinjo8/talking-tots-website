@@ -2,7 +2,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { SlidingPuzzle78 } from "@/components/puzzle/SlidingPuzzle78";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
-import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
+import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 
 import { Button } from "@/components/ui/button";
@@ -172,11 +172,13 @@ function DrsnaSestavljankaC78Content() {
         </DropdownMenu>
 
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
-        <PuzzleSuccessDialog
+        <MatchingCompletionDialog
           isOpen={showCompletion}
-          onOpenChange={setShowCompletion}
-          completedImage={currentImage}
+          onClose={() => setShowCompletion(false)}
+          images={[{ url: imageUrl, filename: currentImage.filename, word: currentImage.word }]}
+          instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO."
           onStarClaimed={handleStarClaimed}
+          autoPlayAudio={true}
         />
         <MemoryExitConfirmationDialog 
           open={showExitDialog} 
@@ -249,13 +251,15 @@ function DrsnaSestavljankaC78Content() {
         </DropdownMenu>
 
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
-        <PuzzleSuccessDialog
+        <MatchingCompletionDialog
           isOpen={showCompletion}
-          onOpenChange={setShowCompletion}
-          completedImage={currentImage}
+          onClose={() => setShowCompletion(false)}
+          images={[{ url: imageUrl, filename: currentImage.filename, word: currentImage.word }]}
+          instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO."
           onStarClaimed={handleStarClaimed}
+          autoPlayAudio={true}
         />
-        <MemoryExitConfirmationDialog 
+        <MemoryExitConfirmationDialog
           open={showExitDialog} 
           onOpenChange={setShowExitDialog}
           onConfirm={() => navigate("/govorne-igre/drsna-sestavljanka")}
