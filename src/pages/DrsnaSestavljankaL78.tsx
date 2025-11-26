@@ -109,39 +109,65 @@ function DrsnaSestavljankaL78Content() {
 
   if (effectiveFullscreen) {
     return (
-      <div className="fixed inset-0 bg-background overflow-hidden select-none">
-        <div className="h-full flex flex-col">
-          <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
-            <h2 className="text-lg font-bold mb-3 text-center">Drsna igra L</h2>
-            <div className="flex justify-center gap-3">
-              <MemoryExitConfirmationDialog 
-                open={showExitDialog} 
-                onOpenChange={setShowExitDialog}
-                onConfirm={() => navigate('/govorne-igre/drsna-sestavljanka')}
-              >
-                <Button size="sm" variant="outline" className="gap-2">
-                  Nazaj
-                </Button>
-              </MemoryExitConfirmationDialog>
-              <Button onClick={handleNewGame} size="sm" className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
-                <RotateCcw className="h-4 w-4" />
-                Nova igra
-              </Button>
-              <Button onClick={() => setShowInstructions(true)} size="sm" variant="outline" className="gap-2">
-                <BookOpen className="h-4 w-4" />
-                Navodila
-              </Button>
-            </div>
-          </div>
-          <div className="flex-1 overflow-hidden bg-muted/30 flex items-center justify-center p-4">
-            <SlidingPuzzle78 
-              key={puzzleKey}
-              imageUrl={imageUrl}
-              onComplete={handleComplete}
-              className="w-full h-full"
-            />
-          </div>
+      <div className="fixed inset-0 overflow-hidden touch-none overscroll-none select-none">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${backgroundImageUrl})` }}
+        />
+        <div className="relative h-full flex items-center justify-center p-4">
+          <SlidingPuzzle78 
+            key={puzzleKey}
+            imageUrl={imageUrl}
+            onComplete={handleComplete}
+            className="w-full h-full"
+          />
         </div>
+        
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+              size="icon"
+            >
+              <Home className="h-7 w-7 text-white" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="top" className="mb-2 ml-4 bg-white/95 border-2 border-orange-200 shadow-xl">
+            <button
+              onClick={handleBack}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 flex items-center gap-3 rounded-t-md transition-colors"
+            >
+              <span className="text-2xl">🏠</span>
+              <span className="font-semibold">Nazaj</span>
+            </button>
+            <button
+              onClick={handleNewGame}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 flex items-center gap-3 transition-colors"
+            >
+              <span className="text-2xl">🔄</span>
+              <span className="font-semibold">Nova igra</span>
+            </button>
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                setShowInstructions(true);
+              }}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 flex items-center gap-3 rounded-b-md transition-colors"
+            >
+              <span className="text-2xl">📖</span>
+              <span className="font-semibold">Navodila</span>
+            </button>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <MemoryExitConfirmationDialog 
+          open={showExitDialog} 
+          onOpenChange={setShowExitDialog}
+          onConfirm={() => navigate('/govorne-igre/drsna-sestavljanka')}
+        >
+          <div />
+        </MemoryExitConfirmationDialog>
+
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
         <PuzzleSuccessDialog
           isOpen={showCompletion}
@@ -155,33 +181,64 @@ function DrsnaSestavljankaL78Content() {
 
   return (
     <AppLayout>
-      <div className="w-full min-h-screen bg-background">
-        <div className="flex justify-center gap-4 p-4">
-          <MemoryExitConfirmationDialog 
-            open={showExitDialog} 
-            onOpenChange={setShowExitDialog}
-            onConfirm={() => navigate('/govorne-igre/drsna-sestavljanka')}
-          >
-            <Button variant="outline" className="gap-2">
-              Nazaj
-            </Button>
-          </MemoryExitConfirmationDialog>
-          <Button onClick={handleNewGame} className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
-            <RotateCcw className="h-4 w-4" />
-            Nova igra
-          </Button>
-          <Button variant="outline" onClick={() => setShowInstructions(true)} className="gap-2">
-            <BookOpen className="h-4 w-4" />
-            Navodila
-          </Button>
-        </div>
-        <div className="w-full bg-muted/30 flex justify-center items-center p-4 min-h-[calc(100vh-200px)]">
+      <div className="relative w-full min-h-screen">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${backgroundImageUrl})` }}
+        />
+        <div className="relative w-full min-h-screen flex items-center justify-center p-4">
           <SlidingPuzzle78 
             key={puzzleKey}
             imageUrl={imageUrl}
             onComplete={handleComplete}
           />
         </div>
+
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+              size="icon"
+            >
+              <Home className="h-7 w-7 text-white" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="top" className="mb-2 ml-4 bg-white/95 border-2 border-orange-200 shadow-xl">
+            <button
+              onClick={handleBack}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 flex items-center gap-3 rounded-t-md transition-colors"
+            >
+              <span className="text-2xl">🏠</span>
+              <span className="font-semibold">Nazaj</span>
+            </button>
+            <button
+              onClick={handleNewGame}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 flex items-center gap-3 transition-colors"
+            >
+              <span className="text-2xl">🔄</span>
+              <span className="font-semibold">Nova igra</span>
+            </button>
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                setShowInstructions(true);
+              }}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 flex items-center gap-3 rounded-b-md transition-colors"
+            >
+              <span className="text-2xl">📖</span>
+              <span className="font-semibold">Navodila</span>
+            </button>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <MemoryExitConfirmationDialog 
+          open={showExitDialog} 
+          onOpenChange={setShowExitDialog}
+          onConfirm={() => navigate('/govorne-igre/drsna-sestavljanka')}
+        >
+          <div />
+        </MemoryExitConfirmationDialog>
+
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
         <PuzzleSuccessDialog
           isOpen={showCompletion}
