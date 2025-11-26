@@ -114,9 +114,12 @@ function DrsnaSestavljankaL78Content() {
           <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
             <h2 className="text-lg font-bold mb-3 text-center">Drsna igra L</h2>
             <div className="flex justify-center gap-3">
-              <MemoryExitConfirmationDialog onConfirm={handleBack}>
+              <MemoryExitConfirmationDialog 
+                open={showExitDialog} 
+                onOpenChange={setShowExitDialog}
+                onConfirm={() => navigate('/govorne-igre/drsna-sestavljanka')}
+              >
                 <Button size="sm" variant="outline" className="gap-2">
-                  <ArrowLeft className="h-4 w-4" />
                   Nazaj
                 </Button>
               </MemoryExitConfirmationDialog>
@@ -154,9 +157,12 @@ function DrsnaSestavljankaL78Content() {
     <AppLayout>
       <div className="w-full min-h-screen bg-background">
         <div className="flex justify-center gap-4 p-4">
-          <MemoryExitConfirmationDialog onConfirm={handleBack}>
+          <MemoryExitConfirmationDialog 
+            open={showExitDialog} 
+            onOpenChange={setShowExitDialog}
+            onConfirm={() => navigate('/govorne-igre/drsna-sestavljanka')}
+          >
             <Button variant="outline" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
               Nazaj
             </Button>
           </MemoryExitConfirmationDialog>
