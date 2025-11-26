@@ -130,9 +130,9 @@ function DrsnaSestavljankaŠ56Content() {
           <DropdownMenuTrigger asChild>
             <Button 
               size="icon" 
-              className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg"
+              className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm"
             >
-              <Home className="h-8 w-8 text-white" />
+              <Home className="h-7 w-7 text-white" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent 
@@ -207,9 +207,9 @@ function DrsnaSestavljankaŠ56Content() {
           <DropdownMenuTrigger asChild>
             <Button 
               size="icon" 
-              className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg"
+              className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm"
             >
-              <Home className="h-8 w-8 text-white" />
+              <Home className="h-7 w-7 text-white" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent 
