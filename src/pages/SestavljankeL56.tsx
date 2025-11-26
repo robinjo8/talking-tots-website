@@ -185,23 +185,8 @@ function SestavljankeL56Content() {
         <div className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${backgroundImageUrl}')` }} />
         
         <div className="relative z-10">
-        <div className="flex justify-center gap-4 p-4">
-          <MemoryExitConfirmationDialog onConfirm={handleBack}>
-            <Button variant="outline" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Nazaj
-            </Button>
-          </MemoryExitConfirmationDialog>
-          <Button onClick={handleNewGame} className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
-            <RotateCcw className="h-4 w-4" />
-            Nova igra
-          </Button>
-          <Button onClick={handleInstructions} variant="outline" className="gap-2">
-            <BookOpen className="h-4 w-4" />
-            Navodila
-          </Button>
           <div className="w-full flex justify-center items-center p-4">
-            <SimpleJigsaw 
+            <SimpleJigsaw
               key={puzzleKey}
               imageUrl={imageUrl}
               gridCols={4}
