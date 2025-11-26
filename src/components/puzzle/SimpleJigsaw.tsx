@@ -386,8 +386,11 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
           ctx.strokeStyle = '#10b981';
           ctx.lineWidth = 2;
         } else {
-          ctx.strokeStyle = '#64748b';
-          ctx.lineWidth = 1.5;
+          // White border with black shadow for better visibility
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+          ctx.shadowBlur = 2;
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 2.5;
         }
         
         ctx.stroke(piece.path);
@@ -530,17 +533,18 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
   }
 
   return (
-    <div className={`w-full h-full flex justify-center items-center ${className}`}>
+    <div className={`w-full h-full flex justify-center items-center overflow-hidden touch-none ${className}`}>
       <canvas
         ref={canvasRef}
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
-        className="cursor-pointer border border-border rounded-lg shadow-lg"
+        className="cursor-pointer border border-border rounded-lg shadow-lg touch-none select-none"
         style={{ 
           width: `${CANVAS_WIDTH}px`, 
           height: `${CANVAS_HEIGHT}px`,
           maxWidth: '100%',
-          maxHeight: '100%'
+          maxHeight: '100%',
+          touchAction: 'none'
         }}
         onMouseDown={handleStart}
         onMouseMove={handleMove}
