@@ -2,7 +2,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { SlidingPuzzle } from "@/components/puzzle/SlidingPuzzle";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
-import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
+import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 
 import { Button } from "@/components/ui/button";
@@ -180,11 +180,13 @@ function DrsnaSestavljankaK56Content() {
         </DropdownMenu>
 
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
-        <PuzzleSuccessDialog
-          isOpen={showCompletion}
-          onOpenChange={setShowCompletion}
-          completedImage={currentImage}
+        <MatchingCompletionDialog 
+          isOpen={showCompletion} 
+          onClose={() => setShowCompletion(false)}
+          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
           onStarClaimed={handleStarClaimed}
+          instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO."
+          autoPlayAudio={true}
         />
         <MemoryExitConfirmationDialog 
           open={showExitDialog} 
@@ -257,11 +259,13 @@ function DrsnaSestavljankaK56Content() {
         </DropdownMenu>
 
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
-        <PuzzleSuccessDialog
-          isOpen={showCompletion}
-          onOpenChange={setShowCompletion}
-          completedImage={currentImage}
+        <MatchingCompletionDialog 
+          isOpen={showCompletion} 
+          onClose={() => setShowCompletion(false)}
+          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
           onStarClaimed={handleStarClaimed}
+          instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO."
+          autoPlayAudio={true}
         />
         <MemoryExitConfirmationDialog 
           open={showExitDialog} 

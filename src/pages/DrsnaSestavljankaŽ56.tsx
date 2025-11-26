@@ -2,7 +2,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { SlidingPuzzle } from "@/components/puzzle/SlidingPuzzle";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
-import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
+import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 
 import { Button } from "@/components/ui/button";
@@ -135,16 +135,38 @@ function DrsnaSestavljankaŽ56Content() {
               <Home className="h-8 w-8 text-white" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48 bg-background/95 backdrop-blur-sm">
-            <DropdownMenuItem onClick={handleBack} className="cursor-pointer">
-              Nazaj
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleNewGame} className="cursor-pointer">
-              Nova igra
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleInstructions} className="cursor-pointer">
-              Navodila
-            </DropdownMenuItem>
+          <DropdownMenuContent 
+            align="start" 
+            side="top"
+            className="w-48 mb-2 ml-4 bg-white/95 backdrop-blur-sm border-2 border-orange-200 shadow-xl"
+          >
+            <button
+              onClick={handleBack}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+            >
+              <span className="text-2xl">🏠</span>
+              <span>Nazaj</span>
+            </button>
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                handleNewGame();
+              }}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+            >
+              <span className="text-2xl">🔄</span>
+              <span>Nova igra</span>
+            </button>
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                setShowInstructions(true);
+              }}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
+            >
+              <span className="text-2xl">📖</span>
+              <span>Navodila</span>
+            </button>
           </DropdownMenuContent>
         </DropdownMenu>
         <MemoryExitConfirmationDialog 
@@ -155,11 +177,13 @@ function DrsnaSestavljankaŽ56Content() {
           <div />
         </MemoryExitConfirmationDialog>
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
-        <PuzzleSuccessDialog
-          isOpen={showCompletion}
-          onOpenChange={setShowCompletion}
-          completedImage={currentImage}
+        <MatchingCompletionDialog 
+          isOpen={showCompletion} 
+          onClose={() => setShowCompletion(false)}
+          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
           onStarClaimed={handleStarClaimed}
+          instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO."
+          autoPlayAudio={true}
         />
       </div>
     );
@@ -188,16 +212,38 @@ function DrsnaSestavljankaŽ56Content() {
               <Home className="h-8 w-8 text-white" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48 bg-background/95 backdrop-blur-sm">
-            <DropdownMenuItem onClick={handleBack} className="cursor-pointer">
-              Nazaj
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleNewGame} className="cursor-pointer">
-              Nova igra
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleInstructions} className="cursor-pointer">
-              Navodila
-            </DropdownMenuItem>
+          <DropdownMenuContent 
+            align="start" 
+            side="top"
+            className="w-48 mb-2 ml-4 bg-white/95 backdrop-blur-sm border-2 border-orange-200 shadow-xl"
+          >
+            <button
+              onClick={handleBack}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+            >
+              <span className="text-2xl">🏠</span>
+              <span>Nazaj</span>
+            </button>
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                handleNewGame();
+              }}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+            >
+              <span className="text-2xl">🔄</span>
+              <span>Nova igra</span>
+            </button>
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                setShowInstructions(true);
+              }}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
+            >
+              <span className="text-2xl">📖</span>
+              <span>Navodila</span>
+            </button>
           </DropdownMenuContent>
         </DropdownMenu>
         <MemoryExitConfirmationDialog 
@@ -208,11 +254,13 @@ function DrsnaSestavljankaŽ56Content() {
           <div />
         </MemoryExitConfirmationDialog>
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
-        <PuzzleSuccessDialog
-          isOpen={showCompletion}
-          onOpenChange={setShowCompletion}
-          completedImage={currentImage}
+        <MatchingCompletionDialog 
+          isOpen={showCompletion} 
+          onClose={() => setShowCompletion(false)}
+          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
           onStarClaimed={handleStarClaimed}
+          instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO."
+          autoPlayAudio={true}
         />
       </div>
     </AppLayout>
