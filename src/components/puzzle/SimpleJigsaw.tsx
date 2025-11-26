@@ -105,7 +105,7 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
   const isMobile = window.innerWidth < 768;
   const BOARD_X = (CANVAS_WIDTH - PUZZLE_WIDTH) / 2;
   const BOARD_Y = isMobile 
-    ? (CANVAS_HEIGHT / 2) + ((CANVAS_HEIGHT / 2) - PUZZLE_HEIGHT) / 2  // Bottom half center
+    ? CANVAS_HEIGHT - PUZZLE_HEIGHT - 120  // 120px from bottom to leave space for home button
     : (CANVAS_HEIGHT - PUZZLE_HEIGHT) / 2;  // Full canvas center
   
   // Areas for scattered pieces
