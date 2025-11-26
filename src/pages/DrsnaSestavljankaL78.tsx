@@ -6,11 +6,12 @@ import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 
 import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
+import { RotateCcw, BookOpen, Home } from "lucide-react";
 
 const lImages = [
   { filename: 'ladja.png', word: 'LADJA' },
@@ -43,11 +44,15 @@ function DrsnaSestavljankaL78Content() {
   const [showCompletion, setShowCompletion] = useState(false);
   const [puzzleKey, setPuzzleKey] = useState(0);
   const [currentImage, setCurrentImage] = useState(getRandomLImage());
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [showExitDialog, setShowExitDialog] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { recordGameCompletion } = useEnhancedProgress();
   const gameCompletedRef = useRef(false);
   const effectiveFullscreen = isMobile;
+  
+  const backgroundImageUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/47412.jpg";
   
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentImage.filename}`;
   
@@ -65,7 +70,8 @@ function DrsnaSestavljankaL78Content() {
   };
 
   const handleBack = () => {
-    navigate("/govorne-igre/drsna-sestavljanka");
+    setMenuOpen(false);
+    setShowExitDialog(true);
   };
 
   const handleStarClaimed = () => {
