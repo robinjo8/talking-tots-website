@@ -213,13 +213,15 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
     const newPieces: PuzzlePiece[] = [];
 
     // Create temporary canvas to extract image data
+    // Add padding to prevent transparent edges on right and bottom pieces
+    const padding = TAB_SIZE * 2;
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d')!;
-    tempCanvas.width = PUZZLE_WIDTH;
-    tempCanvas.height = PUZZLE_HEIGHT;
+    tempCanvas.width = PUZZLE_WIDTH + padding * 2;
+    tempCanvas.height = PUZZLE_HEIGHT + padding * 2;
     
-    // Draw scaled image
-    tempCtx.drawImage(image, 0, 0, PUZZLE_WIDTH, PUZZLE_HEIGHT);
+    // Draw scaled image to center of padded canvas
+    tempCtx.drawImage(image, padding, padding, PUZZLE_WIDTH, PUZZLE_HEIGHT);
 
     // Generate tab patterns
     const horizontalTabs: boolean[][] = [];
@@ -274,10 +276,10 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
         // Create puzzle piece shape
         piece.path = createPuzzlePiecePath(piece, pieceWidth, pieceHeight);
         
-        // Extract image data for this piece
+        // Extract image data for this piece with padding offset
         piece.imageData = tempCtx.getImageData(
-          piece.x, 
-          piece.y, 
+          piece.x + padding - TAB_SIZE, 
+          piece.y + padding - TAB_SIZE, 
           piece.width + TAB_SIZE * 2, 
           piece.height + TAB_SIZE * 2
         );
