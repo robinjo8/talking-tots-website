@@ -150,49 +150,54 @@ function SestavljankeSContent() {
         <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
             <Button
-              className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg"
+              size="icon"
+              className="fixed bottom-4 left-4 z-50 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white shadow-2xl rounded-full w-16 h-16 border-2 border-white/20"
             >
-              <Home className="h-6 w-6 text-white" />
+              <Home className="w-11 h-11" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent 
             side="top" 
             align="start"
-            className="mb-2 bg-background/95 backdrop-blur-sm"
+            sideOffset={8}
+            className="mb-2 ml-4 w-56 p-2 bg-background/95 backdrop-blur-sm border-2 shadow-xl z-[60]"
           >
-            <Button
-              onClick={() => {
-                setMenuOpen(false);
-                setShowExitDialog(true);
-              }}
-              variant="ghost"
-              className="w-full justify-start gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Nazaj
-            </Button>
-            <Button
-              onClick={() => {
-                setMenuOpen(false);
-                handleNewGame();
-              }}
-              variant="ghost"
-              className="w-full justify-start gap-2"
-            >
-              <RotateCcw className="h-4 w-4" />
-              Nova igra
-            </Button>
-            <Button
-              onClick={() => {
-                setMenuOpen(false);
-                handleInstructions();
-              }}
-              variant="ghost"
-              className="w-full justify-start gap-2"
-            >
-              <BookOpen className="h-4 w-4" />
-              Navodila
-            </Button>
+            <div className="flex flex-col gap-2">
+              <Button
+                variant="outline"
+                className="gap-2 w-full h-11 text-base justify-start"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setShowExitDialog(true);
+                }}
+              >
+                <ArrowLeft className="w-5 h-5" />
+                Nazaj
+              </Button>
+              
+              <Button
+                onClick={() => {
+                  setMenuOpen(false);
+                  handleNewGame();
+                }}
+                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 w-full h-11 text-base justify-start"
+              >
+                <RotateCcw className="w-5 h-5" />
+                Nova igra
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setMenuOpen(false);
+                  handleInstructions();
+                }}
+                className="gap-2 w-full h-11 text-base justify-start"
+              >
+                <BookOpen className="w-5 h-5" />
+                Navodila
+              </Button>
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -244,49 +249,54 @@ function SestavljankeSContent() {
         <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
             <Button
-              className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg"
+              size="icon"
+              className="fixed bottom-4 left-4 z-50 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white shadow-2xl rounded-full w-16 h-16 border-2 border-white/20"
             >
-              <Home className="h-6 w-6 text-white" />
+              <Home className="w-11 h-11" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent 
             side="top" 
             align="start"
-            className="mb-2 bg-background/95 backdrop-blur-sm"
+            sideOffset={8}
+            className="mb-2 ml-4 w-56 p-2 bg-background/95 backdrop-blur-sm border-2 shadow-xl z-[60]"
           >
-            <Button
-              onClick={() => {
-                setMenuOpen(false);
-                setShowExitDialog(true);
-              }}
-              variant="ghost"
-              className="w-full justify-start gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Nazaj
-            </Button>
-            <Button
-              onClick={() => {
-                setMenuOpen(false);
-                handleNewGame();
-              }}
-              variant="ghost"
-              className="w-full justify-start gap-2"
-            >
-              <RotateCcw className="h-4 w-4" />
-              Nova igra
-            </Button>
-            <Button
-              onClick={() => {
-                setMenuOpen(false);
-                handleInstructions();
-              }}
-              variant="ghost"
-              className="w-full justify-start gap-2"
-            >
-              <BookOpen className="h-4 w-4" />
-              Navodila
-            </Button>
+            <div className="flex flex-col gap-2">
+              <Button
+                variant="outline"
+                className="gap-2 w-full h-11 text-base justify-start"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setShowExitDialog(true);
+                }}
+              >
+                <ArrowLeft className="w-5 h-5" />
+                Nazaj
+              </Button>
+              
+              <Button
+                onClick={() => {
+                  setMenuOpen(false);
+                  handleNewGame();
+                }}
+                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 w-full h-11 text-base justify-start"
+              >
+                <RotateCcw className="w-5 h-5" />
+                Nova igra
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setMenuOpen(false);
+                  handleInstructions();
+                }}
+                className="gap-2 w-full h-11 text-base justify-start"
+              >
+                <BookOpen className="w-5 h-5" />
+                Navodila
+              </Button>
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
 
