@@ -6,11 +6,12 @@ import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 
 import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
+import { RotateCcw, BookOpen, Home } from "lucide-react";
 
 const zImages = [
   { filename: 'zajec.png', word: 'ZAJEC' },
@@ -43,11 +44,15 @@ function DrsnaSestavljankaZ910Content() {
   const [showCompletion, setShowCompletion] = useState(false);
   const [puzzleKey, setPuzzleKey] = useState(0);
   const [currentImage, setCurrentImage] = useState(getRandomZImage());
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [showExitDialog, setShowExitDialog] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { recordGameCompletion } = useEnhancedProgress();
   const gameCompletedRef = useRef(false);
   const effectiveFullscreen = isMobile;
+  
+  const backgroundImageUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/47412.jpg";
   
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentImage.filename}`;
   
@@ -65,7 +70,8 @@ function DrsnaSestavljankaZ910Content() {
   };
 
   const handleBack = () => {
-    navigate("/govorne-igre/drsna-sestavljanka");
+    setMenuOpen(false);
+    setShowExitDialog(true);
   };
 
   const handleStarClaimed = () => {
@@ -103,73 +109,46 @@ function DrsnaSestavljankaZ910Content() {
 
   if (effectiveFullscreen) {
     return (
-      <div className="fixed inset-0 bg-background overflow-hidden select-none">
-        <div className="h-full flex flex-col">
-          <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
-            <h2 className="text-lg font-bold mb-3 text-center">Drsna igra Z</h2>
-            <div className="flex justify-center gap-3">
-              <MemoryExitConfirmationDialog onConfirm={handleBack}>
-                <Button size="sm" variant="outline" className="gap-2">
-                  <ArrowLeft className="h-4 w-4" />
-                  Nazaj
-                </Button>
-              </MemoryExitConfirmationDialog>
-              <Button onClick={handleNewGame} size="sm" className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
-                <RotateCcw className="h-4 w-4" />
-                Nova igra
-              </Button>
-              <Button onClick={() => setShowInstructions(true)} size="sm" variant="outline" className="gap-2">
-                <BookOpen className="h-4 w-4" />
-                Navodila
-              </Button>
-            </div>
-          </div>
-          <div className="flex-1 overflow-hidden bg-muted/30 flex items-center justify-center p-4">
-            <SlidingPuzzle910 
-              key={puzzleKey}
-              imageUrl={imageUrl}
-              onComplete={handleComplete}
-              className="w-full h-full"
-            />
-          </div>
-        </div>
-        <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
-          <PuzzleSuccessDialog
-            isOpen={showCompletion}
-            onOpenChange={setShowCompletion}
-            completedImage={currentImage}
-            onStarClaimed={handleStarClaimed}
-          />
-      </div>
-    );
-  }
-
-  return (
-    <AppLayout>
-      <div className="w-full min-h-screen bg-background">
-        <div className="flex justify-center gap-4 p-4">
-          <MemoryExitConfirmationDialog onConfirm={handleBack}>
-            <Button variant="outline" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Nazaj
-            </Button>
-          </MemoryExitConfirmationDialog>
-          <Button onClick={handleNewGame} className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
-            <RotateCcw className="h-4 w-4" />
-            Nova igra
-          </Button>
-          <Button variant="outline" onClick={() => setShowInstructions(true)} className="gap-2">
-            <BookOpen className="h-4 w-4" />
-            Navodila
-          </Button>
-        </div>
-        <div className="w-full bg-muted/30 flex justify-center items-center p-4 min-h-[calc(100vh-200px)]">
+      <div className="fixed inset-0 overflow-hidden select-none touch-none overscroll-none">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${backgroundImageUrl})` }}
+        />
+        <div className="relative h-full flex items-center justify-center p-4">
           <SlidingPuzzle910 
             key={puzzleKey}
             imageUrl={imageUrl}
             onComplete={handleComplete}
+            className="w-full h-full"
           />
         </div>
+        
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg"
+              size="icon"
+            >
+              <Home className="h-6 w-6 text-white" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="ml-4 mb-2 bg-background/95 backdrop-blur-sm border-2">
+            <div className="flex flex-col gap-2 p-2">
+              <Button onClick={handleBack} variant="ghost" className="justify-start gap-2 w-full">
+                Nazaj
+              </Button>
+              <Button onClick={handleNewGame} variant="ghost" className="justify-start gap-2 w-full">
+                <RotateCcw className="h-4 w-4" />
+                Nova igra
+              </Button>
+              <Button onClick={() => { setMenuOpen(false); setShowInstructions(true); }} variant="ghost" className="justify-start gap-2 w-full">
+                <BookOpen className="h-4 w-4" />
+                Navodila
+              </Button>
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
         <PuzzleSuccessDialog
           isOpen={showCompletion}
@@ -177,6 +156,74 @@ function DrsnaSestavljankaZ910Content() {
           completedImage={currentImage}
           onStarClaimed={handleStarClaimed}
         />
+        
+        <MemoryExitConfirmationDialog 
+          open={showExitDialog} 
+          onOpenChange={setShowExitDialog}
+          onConfirm={() => navigate('/govorne-igre/drsna-sestavljanka')}
+        >
+          <div />
+        </MemoryExitConfirmationDialog>
+      </div>
+    );
+  }
+
+  return (
+    <AppLayout>
+      <div className="w-full min-h-screen relative">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat -z-10"
+          style={{ backgroundImage: `url(${backgroundImageUrl})` }}
+        />
+        <div className="w-full flex justify-center items-center p-4 min-h-screen">
+          <SlidingPuzzle910 
+            key={puzzleKey}
+            imageUrl={imageUrl}
+            onComplete={handleComplete}
+          />
+        </div>
+        
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg"
+              size="icon"
+            >
+              <Home className="h-6 w-6 text-white" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="ml-4 mb-2 bg-background/95 backdrop-blur-sm border-2">
+            <div className="flex flex-col gap-2 p-2">
+              <Button onClick={handleBack} variant="ghost" className="justify-start gap-2 w-full">
+                Nazaj
+              </Button>
+              <Button onClick={handleNewGame} variant="ghost" className="justify-start gap-2 w-full">
+                <RotateCcw className="h-4 w-4" />
+                Nova igra
+              </Button>
+              <Button onClick={() => { setMenuOpen(false); setShowInstructions(true); }} variant="ghost" className="justify-start gap-2 w-full">
+                <BookOpen className="h-4 w-4" />
+                Navodila
+              </Button>
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        
+        <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
+        <PuzzleSuccessDialog
+          isOpen={showCompletion}
+          onOpenChange={setShowCompletion}
+          completedImage={currentImage}
+          onStarClaimed={handleStarClaimed}
+        />
+        
+        <MemoryExitConfirmationDialog 
+          open={showExitDialog} 
+          onOpenChange={setShowExitDialog}
+          onConfirm={() => navigate('/govorne-igre/drsna-sestavljanka')}
+        >
+          <div />
+        </MemoryExitConfirmationDialog>
       </div>
     </AppLayout>
   );
