@@ -2,7 +2,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { SlidingPuzzle910 } from "@/components/puzzle/SlidingPuzzle910";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
-import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
+import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { RotateCcw, BookOpen, Home } from "lucide-react";
+import { Home } from "lucide-react";
 
 const lImages = [
   { filename: 'ladja.png', word: 'LADJA' },
@@ -126,35 +126,56 @@ function DrsnaSestavljankaL910Content() {
         <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
             <Button 
-              className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg"
+              className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm"
               size="icon"
             >
-              <Home className="h-6 w-6 text-white" />
+              <Home className="h-7 w-7 text-white" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="ml-4 mb-2 bg-background/95 backdrop-blur-sm border-2">
-            <div className="flex flex-col gap-2 p-2">
-              <Button onClick={handleBack} variant="ghost" className="justify-start gap-2 w-full">
-                Nazaj
-              </Button>
-              <Button onClick={handleNewGame} variant="ghost" className="justify-start gap-2 w-full">
-                <RotateCcw className="h-4 w-4" />
-                Nova igra
-              </Button>
-              <Button onClick={() => { setMenuOpen(false); setShowInstructions(true); }} variant="ghost" className="justify-start gap-2 w-full">
-                <BookOpen className="h-4 w-4" />
-                Navodila
-              </Button>
-            </div>
+          <DropdownMenuContent 
+            align="start" 
+            side="top"
+            sideOffset={8}
+            className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+          >
+            <button
+              onClick={handleBack}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+            >
+              <span className="text-2xl">🏠</span>
+              <span>Nazaj</span>
+            </button>
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                handleNewGame();
+              }}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+            >
+              <span className="text-2xl">🔄</span>
+              <span>Nova igra</span>
+            </button>
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                setShowInstructions(true);
+              }}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
+            >
+              <span className="text-2xl">📖</span>
+              <span>Navodila</span>
+            </button>
           </DropdownMenuContent>
         </DropdownMenu>
         
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
-        <PuzzleSuccessDialog
+        <MatchingCompletionDialog
           isOpen={showCompletion}
-          onOpenChange={setShowCompletion}
-          completedImage={currentImage}
+          onClose={() => setShowCompletion(false)}
+          images={[{ url: imageUrl, filename: currentImage.filename, word: currentImage.word }]}
+          instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO."
           onStarClaimed={handleStarClaimed}
+          autoPlayAudio={true}
         />
         
         <MemoryExitConfirmationDialog 
@@ -186,35 +207,56 @@ function DrsnaSestavljankaL910Content() {
         <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
             <Button 
-              className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg"
+              className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm"
               size="icon"
             >
-              <Home className="h-6 w-6 text-white" />
+              <Home className="h-7 w-7 text-white" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="ml-4 mb-2 bg-background/95 backdrop-blur-sm border-2">
-            <div className="flex flex-col gap-2 p-2">
-              <Button onClick={handleBack} variant="ghost" className="justify-start gap-2 w-full">
-                Nazaj
-              </Button>
-              <Button onClick={handleNewGame} variant="ghost" className="justify-start gap-2 w-full">
-                <RotateCcw className="h-4 w-4" />
-                Nova igra
-              </Button>
-              <Button onClick={() => { setMenuOpen(false); setShowInstructions(true); }} variant="ghost" className="justify-start gap-2 w-full">
-                <BookOpen className="h-4 w-4" />
-                Navodila
-              </Button>
-            </div>
+          <DropdownMenuContent 
+            align="start" 
+            side="top"
+            sideOffset={8}
+            className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+          >
+            <button
+              onClick={handleBack}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+            >
+              <span className="text-2xl">🏠</span>
+              <span>Nazaj</span>
+            </button>
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                handleNewGame();
+              }}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+            >
+              <span className="text-2xl">🔄</span>
+              <span>Nova igra</span>
+            </button>
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                setShowInstructions(true);
+              }}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
+            >
+              <span className="text-2xl">📖</span>
+              <span>Navodila</span>
+            </button>
           </DropdownMenuContent>
         </DropdownMenu>
         
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
-        <PuzzleSuccessDialog
+        <MatchingCompletionDialog
           isOpen={showCompletion}
-          onOpenChange={setShowCompletion}
-          completedImage={currentImage}
+          onClose={() => setShowCompletion(false)}
+          images={[{ url: imageUrl, filename: currentImage.filename, word: currentImage.word }]}
+          instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO."
           onStarClaimed={handleStarClaimed}
+          autoPlayAudio={true}
         />
         
         <MemoryExitConfirmationDialog 
