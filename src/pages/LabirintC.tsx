@@ -109,7 +109,7 @@ const LabirintCContent = () => {
     setShowCompletion(false);
   };
 
-  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/3858.jpg`;
+  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/tunt_1zdj_231020.jpg`;
 
   // Track orientation
   useEffect(() => {
