@@ -46,7 +46,7 @@ import SpominČ from "@/pages/SpominČ";
 import SpominZ from "@/pages/SpominZ";
 import SpominŽ from "@/pages/SpominŽ";
 import SpominL from "@/pages/SpominL";
-import LabirintC from "@/pages/LabirintC";
+import LabirintX from "@/pages/LabirintX";
 import Labirint from "@/pages/Labirint";
 
 import ArtikuacijskiTest from "@/pages/ArtikuacijskiTest";
@@ -1108,10 +1108,10 @@ export function AppRoutes() {
         }
       />
       <Route 
-        path="/govorne-igre/labirint/c" 
+        path="/govorne-igre/labirint/x" 
         element={
           <ProtectedRoute>
-            <LabirintC />
+            <LabirintX />
           </ProtectedRoute>
         }
       />
