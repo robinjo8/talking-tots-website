@@ -8,7 +8,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
+import { Home } from "lucide-react";
 
 export default function SestavljankeX() {
   const [showInstructions, setShowInstructions] = useState(false);
