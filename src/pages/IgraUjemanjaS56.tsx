@@ -199,13 +199,51 @@ export default function IgraUjemanjaS56() {
           onClose={() => setShowInstructions(false)}
         />
         
-        <MatchingCompletionDialog
-          isOpen={showCompletion}
-          onClose={() => setShowCompletion(false)}
-          images={completedItems.length > 0 ? completedItems.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage })) : items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
-          onStarClaimed={handleStarClaimed}
-        />
-      </div>
-    </AppLayout>
-  );
+      <MatchingCompletionDialog
+        isOpen={showCompletion}
+        onClose={() => setShowCompletion(false)}
+        images={completedItems.length > 0 ? completedItems.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage })) : items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
+        onStarClaimed={handleStarClaimed}
+      />
+
+      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button 
+            className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+            size="icon"
+          >
+            <Home className="h-7 w-7 text-white" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent 
+          align="start" 
+          side="top"
+          sideOffset={8}
+          className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+        >
+          <button onClick={() => { setMenuOpen(false); setShowExitDialog(true); }} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 rounded-lg transition-colors text-left">
+            <span className="text-2xl">🏠</span>
+            <span className="font-medium">Nazaj</span>
+          </button>
+          <button onClick={() => { setMenuOpen(false); handleNewGame(); }} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 rounded-lg transition-colors text-left">
+            <span className="text-2xl">🔄</span>
+            <span className="font-medium">Nova igra</span>
+          </button>
+          <button onClick={() => { setMenuOpen(false); setShowInstructions(true); }} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 rounded-lg transition-colors text-left">
+            <span className="text-2xl">📖</span>
+            <span className="font-medium">Navodila</span>
+          </button>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <MemoryExitConfirmationDialog 
+        open={showExitDialog} 
+        onOpenChange={setShowExitDialog} 
+        onConfirm={handleBack}
+      >
+        <div />
+      </MemoryExitConfirmationDialog>
+    </div>
+  </AppLayout>
+);
 }
