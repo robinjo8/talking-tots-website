@@ -9,7 +9,7 @@ import { FourColumnGame } from '@/components/matching/FourColumnGame';
 import { FourColumnInstructionsModal } from '@/components/matching/FourColumnInstructionsModal';
 import { MatchingCompletionDialog } from '@/components/matching/MatchingCompletionDialog';
 import { MemoryExitConfirmationDialog } from '@/components/games/MemoryExitConfirmationDialog';
-import { getRandomFourColumnItems } from '@/data/threeColumnMatchingData';
+import { getRandomFourColumnItems, FourColumnMatchingItem } from '@/data/threeColumnMatchingData';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, RotateCcw, BookOpen } from 'lucide-react';
 
@@ -29,6 +29,8 @@ function IgraUjemanjaK910Content() {
   const [gameKey, setGameKey] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
+  const [items, setItems] = useState<FourColumnMatchingItem[]>(() => getRandomFourColumnItems(4, 'k'));
+  const [completedItems, setCompletedItems] = useState<FourColumnMatchingItem[]>([]);
   const gameCompletedRef = useRef(false);
   const { recordGameCompletion } = useEnhancedProgress();
 
@@ -42,9 +44,6 @@ function IgraUjemanjaK910Content() {
   // Get letter data for four-column game (fixed to 'k')
   const upperCaseLetter = letter?.toUpperCase() || 'K';
   
-  // Get 4 random items for the four-column game
-  const items = getRandomFourColumnItems(4, 'k');
-  
   // Debug logging
   console.log('Four column items:', items);
 
@@ -52,6 +51,7 @@ function IgraUjemanjaK910Content() {
   const handleGameComplete = (score: number) => {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
+      setCompletedItems(items); // Save items that were just played
       console.log(`Game completed with score: ${score}`);
       setShowCompletion(true);
     }
@@ -63,6 +63,9 @@ function IgraUjemanjaK910Content() {
 
   const handleNewGame = () => {
     gameCompletedRef.current = false;
+    const newItems = getRandomFourColumnItems(4, 'k');
+    setItems(newItems);
+    setCompletedItems([]);
     setGameKey(prev => prev + 1);
   };
 
@@ -156,7 +159,7 @@ function IgraUjemanjaK910Content() {
         <MatchingCompletionDialog
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
-          images={items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
+          images={(completedItems.length > 0 ? completedItems : items).map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
           onStarClaimed={handleStarClaimed}
         />
       </div>
@@ -208,7 +211,7 @@ function IgraUjemanjaK910Content() {
         <MatchingCompletionDialog
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
-          images={items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
+          images={(completedItems.length > 0 ? completedItems : items).map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
           onStarClaimed={handleStarClaimed}
         />
       </div>
