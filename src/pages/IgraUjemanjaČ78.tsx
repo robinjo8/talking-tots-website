@@ -82,7 +82,16 @@ export default function IgraUjemanjaČ78() {
   if (effectiveFullscreen) {
     return (
       <div className="fixed inset-0 bg-background overflow-hidden select-none">
-        <div className="h-full flex flex-col">
+        <div 
+          className="fixed inset-0 z-0"
+          style={{
+            backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/background-gradient-lights.jpg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        />
+        <div className="h-full flex flex-col relative z-10">
           {/* Top Section - Buttons */}
           <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
             <h2 className="text-lg font-bold mb-3 text-center">Igra ujemanja {upperCaseLetter} (7-8 let)</h2>
@@ -147,8 +156,17 @@ export default function IgraUjemanjaČ78() {
 
   return (
     <AppLayout>
-      <div className="w-full min-h-screen bg-background">
-        <div className="flex justify-center gap-4 p-4">
+      <div className="w-full min-h-screen bg-background relative">
+        <div 
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/background-gradient-lights.jpg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        />
+        <div className="flex justify-center gap-4 p-4 relative z-10">
           <MemoryExitConfirmationDialog onConfirm={handleBack}>
             <Button variant="outline" className="gap-2">
               <ArrowLeft className="h-4 w-4" />
@@ -165,7 +183,7 @@ export default function IgraUjemanjaČ78() {
           </Button>
         </div>
         
-        <div className="w-full bg-muted/30 flex justify-center items-center p-4 min-h-[calc(100vh-200px)]">
+        <div className="w-full bg-muted/30 flex justify-center items-center p-4 min-h-[calc(100vh-200px)] relative z-10">
           <FourColumnGame
             key={gameKey}
             items={items}
