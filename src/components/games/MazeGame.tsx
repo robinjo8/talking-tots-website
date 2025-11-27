@@ -181,19 +181,19 @@ export const MazeGame = ({
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
-    // Draw maze walls with white pavement/tile look
+    // Draw maze walls with pavement/tile look
     maze.forEach((row, y) => {
       row.forEach((cell, x) => {
         const startX = x * CELL_SIZE + PADDING;
         const startY = y * CELL_SIZE + PADDING;
         
-        // Draw walls as thick rectangles with white color
+        // Draw walls as thick rectangles with gray stone texture
         const drawWall = (x1: number, y1: number, x2: number, y2: number) => {
-          // Create gradient for subtle depth
+          // Create gradient for 3D stone effect
           const gradient = ctx.createLinearGradient(x1, y1, x2, y2);
-          gradient.addColorStop(0, '#ffffff'); // white
-          gradient.addColorStop(0.5, '#f9fafb'); // gray-50 (very light gray)
-          gradient.addColorStop(1, '#ffffff'); // white
+          gradient.addColorStop(0, '#6b7280'); // gray-500
+          gradient.addColorStop(0.5, '#9ca3af'); // gray-400 (lighter middle)
+          gradient.addColorStop(1, '#4b5563'); // gray-600 (darker edge)
           
           ctx.fillStyle = gradient;
           
@@ -206,8 +206,8 @@ export const MazeGame = ({
             ctx.fillRect(x1, y1 - WALL_WIDTH / 2, x2 - x1, WALL_WIDTH);
           }
           
-          // Add light border for definition
-          ctx.strokeStyle = '#e5e7eb'; // gray-200
+          // Add darker border for depth
+          ctx.strokeStyle = '#374151'; // gray-700
           ctx.lineWidth = 2;
           ctx.lineCap = 'square';
           ctx.lineJoin = 'miter';
