@@ -1,6 +1,6 @@
-import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
+import { Home } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
@@ -21,6 +21,8 @@ export default function IgraUjemanjaČ() {
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   const [playedImages, setPlayedImages] = useState<MatchingGameImage[]>([]);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [showExitDialog, setShowExitDialog] = useState(false);
   const gameCompletedRef = useRef(false);
   
   const gameImages = useMemo(() => {
@@ -67,28 +69,8 @@ export default function IgraUjemanjaČ() {
             backgroundRepeat: 'no-repeat'
           }}
         />
-        <Header />
-        
         <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4 relative z-10">
-          {/* Game Controls */}
-          <div className="flex justify-center gap-4 mb-6">
-            <MemoryExitConfirmationDialog onConfirm={handleBack}>
-              <Button variant="outline" className="gap-2">
-                <ArrowLeft className="h-4 w-4" />
-                Nazaj
-              </Button>
-            </MemoryExitConfirmationDialog>
-            <Button onClick={handleNewGame} className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
-              <RotateCcw className="h-4 w-4" />
-              Nova igra
-            </Button>
-            <Button variant="outline" onClick={handleInstructions} className="gap-2">
-              <BookOpen className="h-4 w-4" />
-              Navodila
-            </Button>
-          </div>
-
-          <MatchingGame 
+          <MatchingGame
             key={gameKey}
             images={gameImages}
             numColumns={2}
@@ -107,6 +89,53 @@ export default function IgraUjemanjaČ() {
           images={playedImages.length > 0 ? playedImages : gameImages}
           onStarClaimed={handleStarClaimed}
         />
+
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+              size="icon"
+            >
+              <Home className="h-7 w-7 text-white" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            align="start" 
+            side="top"
+            sideOffset={8}
+            className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+          >
+            <button 
+              onClick={() => { setMenuOpen(false); setShowExitDialog(true); }} 
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 rounded-lg transition-colors text-left"
+            >
+              <span className="text-2xl">🏠</span>
+              <span className="font-medium">Nazaj</span>
+            </button>
+            <button 
+              onClick={() => { setMenuOpen(false); handleNewGame(); }} 
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 rounded-lg transition-colors text-left"
+            >
+              <span className="text-2xl">🔄</span>
+              <span className="font-medium">Nova igra</span>
+            </button>
+            <button 
+              onClick={() => { setMenuOpen(false); setShowInstructions(true); }} 
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 rounded-lg transition-colors text-left"
+            >
+              <span className="text-2xl">📖</span>
+              <span className="font-medium">Navodila</span>
+            </button>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <MemoryExitConfirmationDialog 
+          open={showExitDialog} 
+          onOpenChange={setShowExitDialog} 
+          onConfirm={handleBack}
+        >
+          <div />
+        </MemoryExitConfirmationDialog>
       </div>
     </AgeGatedRoute>
   );
