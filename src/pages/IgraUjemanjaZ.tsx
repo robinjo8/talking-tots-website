@@ -59,10 +59,19 @@ export default function IgraUjemanjaZ() {
 
   return (
     <AgeGatedRoute requiredAgeGroup="3-4">
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background relative">
+        <div 
+          className="fixed inset-0 z-0"
+          style={{
+            backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/background-gradient-lights.jpg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        />
         <Header />
         
-        <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
+        <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4 relative z-10">
           {/* Game Controls */}
           <div className="flex justify-center gap-4 mb-6">
             <MemoryExitConfirmationDialog onConfirm={handleBack}>
