@@ -166,24 +166,6 @@ export const MazeGame = ({ onComplete, cols, rows, alignTop }: MazeGameProps) =>
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
-    // Fill entire canvas with cyan/blue background (same as walls)
-    ctx.fillStyle = '#0ea5e9'; // Same blue as walls
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Fill inner area with white (maze area with padding)
-    ctx.fillStyle = 'white';
-    ctx.fillRect(PADDING, PADDING, canvas.width - PADDING * 2, canvas.height - PADDING * 2);
-
-    // Draw white background only for each maze cell (path)
-    ctx.fillStyle = 'white';
-    maze.forEach((row, y) => {
-      row.forEach((cell, x) => {
-        const startX = x * CELL_SIZE + PADDING;
-        const startY = y * CELL_SIZE + PADDING;
-        ctx.fillRect(startX + 1, startY + 1, CELL_SIZE - 2, CELL_SIZE - 2);
-      });
-    });
-
     // Draw maze walls
     ctx.strokeStyle = '#0ea5e9'; // Cyan/light blue
     ctx.lineJoin = 'round'; // Rounded corners at joints
@@ -372,7 +354,7 @@ export const MazeGame = ({ onComplete, cols, rows, alignTop }: MazeGameProps) =>
         </div>
       ) : (
         <div
-          className="relative bg-white rounded-lg shadow-lg"
+          className="relative rounded-lg"
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
