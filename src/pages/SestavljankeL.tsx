@@ -268,7 +268,7 @@ function SestavljankeLContent() {
               }}
               className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
             >
-              <span className="text-xl">🏠</span>
+              <span className="text-2xl">🏠</span>
               <span>Nazaj</span>
             </button>
             
@@ -279,7 +279,7 @@ function SestavljankeLContent() {
               }}
               className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
             >
-              <span className="text-xl">🔄</span>
+              <span className="text-2xl">🔄</span>
               <span>Nova igra</span>
             </button>
             
@@ -290,7 +290,7 @@ function SestavljankeLContent() {
               }}
               className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
             >
-              <span className="text-xl">📖</span>
+              <span className="text-2xl">📖</span>
               <span>Navodila</span>
             </button>
           </DropdownMenuContent>
