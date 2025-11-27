@@ -187,13 +187,13 @@ export const MazeGame = ({
         const startX = x * CELL_SIZE + PADDING;
         const startY = y * CELL_SIZE + PADDING;
         
-        // Draw walls as thick rectangles with gray stone texture
+        // Draw walls as thick rectangles with dark gray stone texture
         const drawWall = (x1: number, y1: number, x2: number, y2: number) => {
-          // Create gradient for 3D stone effect
+          // Create gradient for 3D stone effect with darker gray
           const gradient = ctx.createLinearGradient(x1, y1, x2, y2);
-          gradient.addColorStop(0, '#6b7280'); // gray-500
-          gradient.addColorStop(0.5, '#9ca3af'); // gray-400 (lighter middle)
-          gradient.addColorStop(1, '#4b5563'); // gray-600 (darker edge)
+          gradient.addColorStop(0, '#3f3f46'); // zinc-700
+          gradient.addColorStop(0.5, '#52525b'); // zinc-600 (lighter middle)
+          gradient.addColorStop(1, '#27272a'); // zinc-800 (darker edge)
           
           ctx.fillStyle = gradient;
           
@@ -206,11 +206,11 @@ export const MazeGame = ({
             ctx.fillRect(x1, y1 - WALL_WIDTH / 2, x2 - x1, WALL_WIDTH);
           }
           
-          // Add darker border for depth
-          ctx.strokeStyle = '#374151'; // gray-700
+          // Add darker border for depth with rounded corners
+          ctx.strokeStyle = '#18181b'; // zinc-900
           ctx.lineWidth = 2;
-          ctx.lineCap = 'square';
-          ctx.lineJoin = 'miter';
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
           ctx.beginPath();
           ctx.moveTo(x1, y1);
           ctx.lineTo(x2, y2);
@@ -232,9 +232,9 @@ export const MazeGame = ({
       });
     });
 
-    // Draw glowing star at goal (center of 2-cell goal)
-    const goalX = (COLS - 1.5) * CELL_SIZE + PADDING;
-    const goalY = (ROWS - 1) * CELL_SIZE + CELL_SIZE / 2 + PADDING;
+    // Draw glowing star at goal (bottom right corner)
+    const goalX = (COLS - 0.5) * CELL_SIZE + PADDING;
+    const goalY = (ROWS - 0.5) * CELL_SIZE + PADDING;
     drawStar(ctx, goalX, goalY, 5, CELL_SIZE / 3, CELL_SIZE / 6, glowIntensity);
 
     // Draw player (dragon)
