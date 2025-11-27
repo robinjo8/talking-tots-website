@@ -181,38 +181,53 @@ export const MazeGame = ({
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
-    // Draw maze walls
-    ctx.strokeStyle = '#0ea5e9'; // Cyan/light blue
-    ctx.lineJoin = 'round'; // Rounded corners at joints
-    ctx.lineCap = 'round'; // Rounded corners at ends
-    ctx.lineWidth = WALL_WIDTH;
+    // Draw maze walls with pavement/tile look
     maze.forEach((row, y) => {
       row.forEach((cell, x) => {
         const startX = x * CELL_SIZE + PADDING;
         const startY = y * CELL_SIZE + PADDING;
-        if (cell.walls.top) {
+        
+        // Draw walls as thick rectangles with gray stone texture
+        const drawWall = (x1: number, y1: number, x2: number, y2: number) => {
+          // Create gradient for 3D stone effect
+          const gradient = ctx.createLinearGradient(x1, y1, x2, y2);
+          gradient.addColorStop(0, '#6b7280'); // gray-500
+          gradient.addColorStop(0.5, '#9ca3af'); // gray-400 (lighter middle)
+          gradient.addColorStop(1, '#4b5563'); // gray-600 (darker edge)
+          
+          ctx.fillStyle = gradient;
+          
+          // Draw thick wall rectangle
+          if (x1 === x2) {
+            // Vertical wall
+            ctx.fillRect(x1 - WALL_WIDTH / 2, y1, WALL_WIDTH, y2 - y1);
+          } else {
+            // Horizontal wall
+            ctx.fillRect(x1, y1 - WALL_WIDTH / 2, x2 - x1, WALL_WIDTH);
+          }
+          
+          // Add darker border for depth
+          ctx.strokeStyle = '#374151'; // gray-700
+          ctx.lineWidth = 2;
+          ctx.lineCap = 'square';
+          ctx.lineJoin = 'miter';
           ctx.beginPath();
-          ctx.moveTo(startX, startY);
-          ctx.lineTo(startX + CELL_SIZE, startY);
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
           ctx.stroke();
+        };
+        
+        if (cell.walls.top) {
+          drawWall(startX, startY, startX + CELL_SIZE, startY);
         }
         if (cell.walls.right) {
-          ctx.beginPath();
-          ctx.moveTo(startX + CELL_SIZE, startY);
-          ctx.lineTo(startX + CELL_SIZE, startY + CELL_SIZE);
-          ctx.stroke();
+          drawWall(startX + CELL_SIZE, startY, startX + CELL_SIZE, startY + CELL_SIZE);
         }
         if (cell.walls.bottom) {
-          ctx.beginPath();
-          ctx.moveTo(startX, startY + CELL_SIZE);
-          ctx.lineTo(startX + CELL_SIZE, startY + CELL_SIZE);
-          ctx.stroke();
+          drawWall(startX, startY + CELL_SIZE, startX + CELL_SIZE, startY + CELL_SIZE);
         }
         if (cell.walls.left) {
-          ctx.beginPath();
-          ctx.moveTo(startX, startY);
-          ctx.lineTo(startX, startY + CELL_SIZE);
-          ctx.stroke();
+          drawWall(startX, startY, startX, startY + CELL_SIZE);
         }
       });
     });
