@@ -11,7 +11,8 @@ import { MemoryExitConfirmationDialog } from '@/components/games/MemoryExitConfi
 import { getRandomThreeColumnItems, ThreeColumnMatchingItem } from '@/data/threeColumnMatchingData';
 import { getAgeGroup } from '@/utils/ageUtils';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, RotateCcw, BookOpen } from 'lucide-react';
+import { Home } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export default function IgraUjemanjaČ56() {
   const { user, selectedChild } = useAuth();
@@ -22,6 +23,8 @@ export default function IgraUjemanjaČ56() {
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   const [completedItems, setCompletedItems] = useState<ThreeColumnMatchingItem[]>([]);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [showExitDialog, setShowExitDialog] = useState(false);
   const gameCompletedRef = useRef(false);
   const { recordGameCompletion } = useEnhancedProgress();
 
@@ -99,42 +102,6 @@ export default function IgraUjemanjaČ56() {
           }}
         />
         <div className="h-full flex flex-col relative z-10">
-          {/* Top Section - Buttons */}
-          <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
-            <h2 className="text-lg font-bold mb-3 text-center">Igra ujemanja {upperCaseLetter}</h2>
-            <div className="flex justify-center gap-3">
-              <MemoryExitConfirmationDialog onConfirm={handleBack}>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  Nazaj
-                </Button>
-              </MemoryExitConfirmationDialog>
-              
-              <Button
-                onClick={handleNewGame}
-                size="sm"
-                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
-              >
-                <RotateCcw className="h-4 w-4" />
-                Nova igra
-              </Button>
-              
-              <Button
-                variant="outline"
-                onClick={handleInstructions}
-                size="sm"
-                className="gap-2"
-              >
-                <BookOpen className="h-4 w-4" />
-                Navodila
-              </Button>
-            </div>
-          </div>
-
           {/* Game Area with gray background */}
           <div className="flex-1 overflow-hidden bg-muted/30 p-4">
             <ThreeColumnGame
@@ -156,6 +123,53 @@ export default function IgraUjemanjaČ56() {
           images={completedItems.length > 0 ? completedItems.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage })) : items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
           onStarClaimed={handleStarClaimed}
         />
+
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+              size="icon"
+            >
+              <Home className="h-7 w-7 text-white" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            align="start" 
+            side="top"
+            sideOffset={8}
+            className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+          >
+            <button 
+              onClick={() => { setMenuOpen(false); setShowExitDialog(true); }} 
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 rounded-lg transition-colors text-left"
+            >
+              <span className="text-2xl">🏠</span>
+              <span className="font-medium">Nazaj</span>
+            </button>
+            <button 
+              onClick={() => { setMenuOpen(false); handleNewGame(); }} 
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 rounded-lg transition-colors text-left"
+            >
+              <span className="text-2xl">🔄</span>
+              <span className="font-medium">Nova igra</span>
+            </button>
+            <button 
+              onClick={() => { setMenuOpen(false); setShowInstructions(true); }} 
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 rounded-lg transition-colors text-left"
+            >
+              <span className="text-2xl">📖</span>
+              <span className="font-medium">Navodila</span>
+            </button>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <MemoryExitConfirmationDialog 
+          open={showExitDialog} 
+          onOpenChange={setShowExitDialog} 
+          onConfirm={handleBack}
+        >
+          <div />
+        </MemoryExitConfirmationDialog>
       </div>
     );
   }
@@ -172,23 +186,6 @@ export default function IgraUjemanjaČ56() {
             backgroundRepeat: 'no-repeat'
           }}
         />
-        <div className="flex justify-center gap-4 p-4 relative z-10">
-          <MemoryExitConfirmationDialog onConfirm={handleBack}>
-            <Button variant="outline" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Nazaj
-            </Button>
-          </MemoryExitConfirmationDialog>
-          <Button onClick={handleNewGame} className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
-            <RotateCcw className="h-4 w-4" />
-            Nova igra
-          </Button>
-          <Button variant="outline" onClick={handleInstructions} className="gap-2">
-            <BookOpen className="h-4 w-4" />
-            Navodila
-          </Button>
-        </div>
-        
         <div className="w-full bg-muted/30 flex justify-center items-center p-4 min-h-[calc(100vh-200px)] relative z-10">
           <ThreeColumnGame
             key={gameKey}
