@@ -49,6 +49,7 @@ export default function IgraUjemanjaK78() {
     gameCompletedRef.current = false;
     const newItems = getRandomFourColumnItems(4, 'k');
     setItems(newItems);
+    setCompletedItems([]);
     setGameKey(prev => prev + 1);
   };
 

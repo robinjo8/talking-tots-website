@@ -53,6 +53,7 @@ export default function IgraUjemanjaŠ78() {
     gameCompletedRef.current = false;
     const newItems = getRandomFourColumnItems(4, 'š');
     setItems(newItems);
+    setCompletedItems([]);
     setGameKey(prev => prev + 1);
   };
 

@@ -53,6 +53,7 @@ export default function IgraUjemanjaČ78() {
     gameCompletedRef.current = false;
     const newItems = getRandomFourColumnItems(4, 'č');
     setItems(newItems);
+    setCompletedItems([]);
     setGameKey(prev => prev + 1);
   };
 
