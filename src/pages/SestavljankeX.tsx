@@ -5,6 +5,8 @@ import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useState, useEffect, useRef } from "react";
+import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
@@ -13,6 +15,8 @@ import { Home } from "lucide-react";
 export default function SestavljankeX() {
   const [showInstructions, setShowInstructions] = useState(false);
   const [puzzleKey, setPuzzleKey] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [showExitDialog, setShowExitDialog] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { recordGameCompletion } = useEnhancedProgress();
@@ -92,55 +96,71 @@ export default function SestavljankeX() {
 
   if (effectiveFullscreen) {
     return (
-      <div className="fixed inset-0 bg-background overflow-hidden select-none">
-        <div className="h-full flex flex-col">
-          {/* Top Section - Buttons */}
-          <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
-            <h2 className="text-lg font-bold mb-3 text-center">Sestavljanka X</h2>
-            <div className="flex justify-center gap-3">
-              <Button
-                onClick={handleBack}
-                size="sm"
-                variant="outline"
-                className="gap-2"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Nazaj
-              </Button>
-              
-              <Button
-                onClick={handleNewGame}
-                size="sm"
-                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
-              >
-                <RotateCcw className="h-4 w-4" />
-                Nova igra
-              </Button>
-              
-              <Button
-                onClick={handleInstructions}
-                size="sm"
-                variant="outline"
-                className="gap-2"
-              >
-                <BookOpen className="h-4 w-4" />
-                Navodila
-              </Button>
-            </div>
-          </div>
+      <div className="fixed inset-0 overflow-hidden select-none touch-none overscroll-none relative bg-background">
+        <SimpleJigsaw 
+          key={puzzleKey}
+          imageUrl={imageUrl}
+          gridCols={3}
+          gridRows={3}
+          onComplete={handleComplete}
+          className="w-full h-full"
+        />
 
-          {/* Mobile Split Layout - Unified Puzzle */}
-          <div className="flex-1 overflow-hidden">
-            <SimpleJigsaw 
-              key={puzzleKey}
-              imageUrl={imageUrl}
-              gridCols={3}
-              gridRows={3}
-              onComplete={handleComplete}
-              className="w-full h-full"
-            />
-          </div>
-        </div>
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+              size="icon"
+            >
+              <Home className="h-7 w-7 text-white" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            align="start" 
+            side="top"
+            sideOffset={8}
+            className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+          >
+            <button
+              onClick={() => {
+                setShowExitDialog(true);
+                setMenuOpen(false);
+              }}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+            >
+              <span className="text-2xl">🏠</span>
+              <span>Nazaj</span>
+            </button>
+            <button
+              onClick={() => {
+                handleNewGame();
+                setMenuOpen(false);
+              }}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+            >
+              <span className="text-2xl">🔄</span>
+              <span>Nova igra</span>
+            </button>
+            <button
+              onClick={() => {
+                setShowInstructions(true);
+                setMenuOpen(false);
+              }}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
+            >
+              <span className="text-2xl">📖</span>
+              <span>Navodila</span>
+            </button>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <MemoryExitConfirmationDialog 
+          open={showExitDialog} 
+          onOpenChange={setShowExitDialog} 
+          onConfirm={() => navigate("/govorne-igre/sestavljanke")}
+        >
+          <div />
+        </MemoryExitConfirmationDialog>
 
         <InstructionsModal 
           isOpen={showInstructions}
@@ -159,22 +179,7 @@ export default function SestavljankeX() {
   return (
     <AppLayout>
       <div className="w-full min-h-screen bg-background">
-        <div className="flex justify-center gap-4 p-4">
-          <Button variant="outline" onClick={handleBack} className="gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Nazaj
-          </Button>
-          <Button onClick={handleNewGame} className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
-            <RotateCcw className="h-4 w-4" />
-            Nova igra
-          </Button>
-          <Button variant="outline" onClick={handleInstructions} className="gap-2">
-            <BookOpen className="h-4 w-4" />
-            Navodila
-          </Button>
-        </div>
-        
-        <div className="w-full flex justify-center items-center p-4">
+        <div className="w-full flex justify-center items-center p-4 min-h-screen">
           <SimpleJigsaw 
             key={puzzleKey}
             imageUrl={imageUrl}
@@ -183,6 +188,62 @@ export default function SestavljankeX() {
             onComplete={handleComplete}
           />
         </div>
+
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+              size="icon"
+            >
+              <Home className="h-7 w-7 text-white" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            align="start" 
+            side="top"
+            sideOffset={8}
+            className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+          >
+            <button
+              onClick={() => {
+                setShowExitDialog(true);
+                setMenuOpen(false);
+              }}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+            >
+              <span className="text-2xl">🏠</span>
+              <span>Nazaj</span>
+            </button>
+            <button
+              onClick={() => {
+                handleNewGame();
+                setMenuOpen(false);
+              }}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+            >
+              <span className="text-2xl">🔄</span>
+              <span>Nova igra</span>
+            </button>
+            <button
+              onClick={() => {
+                setShowInstructions(true);
+                setMenuOpen(false);
+              }}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
+            >
+              <span className="text-2xl">📖</span>
+              <span>Navodila</span>
+            </button>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <MemoryExitConfirmationDialog 
+          open={showExitDialog} 
+          onOpenChange={setShowExitDialog} 
+          onConfirm={() => navigate("/govorne-igre/sestavljanke")}
+        >
+          <div />
+        </MemoryExitConfirmationDialog>
 
         <InstructionsModal 
           isOpen={showInstructions}
