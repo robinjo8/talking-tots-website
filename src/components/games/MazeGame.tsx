@@ -187,24 +187,34 @@ export const MazeGame = ({
         const startX = x * CELL_SIZE + PADDING;
         const startY = y * CELL_SIZE + PADDING;
         
-        // Draw walls as thick rectangles with solid gray color and rounded corners
+        // Draw walls as thick rectangles with gray stone texture
         const drawWall = (x1: number, y1: number, x2: number, y2: number) => {
-          ctx.fillStyle = '#52525b'; // zinc-600 solid gray
+          // Create gradient for 3D stone effect
+          const gradient = ctx.createLinearGradient(x1, y1, x2, y2);
+          gradient.addColorStop(0, '#6b7280'); // gray-500
+          gradient.addColorStop(0.5, '#9ca3af'); // gray-400 (lighter middle)
+          gradient.addColorStop(1, '#4b5563'); // gray-600 (darker edge)
           
-          const cornerRadius = 4; // Rounded corner radius
+          ctx.fillStyle = gradient;
           
-          // Draw thick wall rectangle with rounded corners
+          // Draw thick wall rectangle
           if (x1 === x2) {
             // Vertical wall
-            ctx.beginPath();
-            ctx.roundRect(x1 - WALL_WIDTH / 2, y1, WALL_WIDTH, y2 - y1, cornerRadius);
-            ctx.fill();
+            ctx.fillRect(x1 - WALL_WIDTH / 2, y1, WALL_WIDTH, y2 - y1);
           } else {
             // Horizontal wall
-            ctx.beginPath();
-            ctx.roundRect(x1, y1 - WALL_WIDTH / 2, x2 - x1, WALL_WIDTH, cornerRadius);
-            ctx.fill();
+            ctx.fillRect(x1, y1 - WALL_WIDTH / 2, x2 - x1, WALL_WIDTH);
           }
+          
+          // Add darker border for depth
+          ctx.strokeStyle = '#374151'; // gray-700
+          ctx.lineWidth = 2;
+          ctx.lineCap = 'square';
+          ctx.lineJoin = 'miter';
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.stroke();
         };
         
         if (cell.walls.top) {
@@ -222,9 +232,9 @@ export const MazeGame = ({
       });
     });
 
-    // Draw glowing star at goal (bottom right corner)
-    const goalX = (COLS - 0.5) * CELL_SIZE + PADDING;
-    const goalY = (ROWS - 0.5) * CELL_SIZE + PADDING;
+    // Draw glowing star at goal (center of 2-cell goal)
+    const goalX = (COLS - 1.5) * CELL_SIZE + PADDING;
+    const goalY = (ROWS - 1) * CELL_SIZE + CELL_SIZE / 2 + PADDING;
     drawStar(ctx, goalX, goalY, 5, CELL_SIZE / 3, CELL_SIZE / 6, glowIntensity);
 
     // Draw player (dragon)
