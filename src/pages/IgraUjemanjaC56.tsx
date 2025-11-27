@@ -27,6 +27,7 @@ export default function IgraUjemanjaC56() {
   const [showExitDialog, setShowExitDialog] = useState(false);
   const gameCompletedRef = useRef(false);
   const { recordGameCompletion } = useEnhancedProgress();
+  const [items, setItems] = useState<ThreeColumnMatchingItem[]>(() => getRandomThreeColumnItems(4, 'C'));
 
   // Check authentication
   useEffect(() => {
@@ -41,9 +42,6 @@ export default function IgraUjemanjaC56() {
 
   // Get letter data for three-column game (fixed to 'c')
   const upperCaseLetter = letter?.toUpperCase() || 'C';
-  
-  // Get 4 random items for the three-column game
-  const items = getRandomThreeColumnItems(4, 'c');
   
   // Debug logging
   console.log('Three column items:', items);
@@ -61,6 +59,7 @@ export default function IgraUjemanjaC56() {
   const handleNewGame = () => {
     gameCompletedRef.current = false;
     setCompletedItems([]);
+    setItems(getRandomThreeColumnItems(4, 'C'));
     setGameKey(prev => prev + 1);
   };
 
@@ -142,24 +141,24 @@ export default function IgraUjemanjaC56() {
           >
             <button 
               onClick={() => { setMenuOpen(false); setShowExitDialog(true); }} 
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 rounded-lg transition-colors text-left"
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
             >
               <span className="text-2xl">🏠</span>
-              <span className="font-medium">Nazaj</span>
+              <span>Nazaj</span>
             </button>
             <button 
               onClick={() => { setMenuOpen(false); handleNewGame(); }} 
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 rounded-lg transition-colors text-left"
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
             >
               <span className="text-2xl">🔄</span>
-              <span className="font-medium">Nova igra</span>
+              <span>Nova igra</span>
             </button>
             <button 
               onClick={() => { setMenuOpen(false); setShowInstructions(true); }} 
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 rounded-lg transition-colors text-left"
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
             >
               <span className="text-2xl">📖</span>
-              <span className="font-medium">Navodila</span>
+              <span>Navodila</span>
             </button>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -222,17 +221,17 @@ export default function IgraUjemanjaC56() {
           sideOffset={8}
           className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
         >
-          <button onClick={() => { setMenuOpen(false); setShowExitDialog(true); }} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 rounded-lg transition-colors text-left">
+          <button onClick={() => { setMenuOpen(false); setShowExitDialog(true); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100">
             <span className="text-2xl">🏠</span>
-            <span className="font-medium">Nazaj</span>
+            <span>Nazaj</span>
           </button>
-          <button onClick={() => { setMenuOpen(false); handleNewGame(); }} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 rounded-lg transition-colors text-left">
+          <button onClick={() => { setMenuOpen(false); handleNewGame(); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100">
             <span className="text-2xl">🔄</span>
-            <span className="font-medium">Nova igra</span>
+            <span>Nova igra</span>
           </button>
-          <button onClick={() => { setMenuOpen(false); setShowInstructions(true); }} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 rounded-lg transition-colors text-left">
+          <button onClick={() => { setMenuOpen(false); setShowInstructions(true); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium">
             <span className="text-2xl">📖</span>
-            <span className="font-medium">Navodila</span>
+            <span>Navodila</span>
           </button>
         </DropdownMenuContent>
       </DropdownMenu>
