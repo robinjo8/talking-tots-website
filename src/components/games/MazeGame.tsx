@@ -187,34 +187,24 @@ export const MazeGame = ({
         const startX = x * CELL_SIZE + PADDING;
         const startY = y * CELL_SIZE + PADDING;
         
-        // Draw walls as thick rectangles with dark gray stone texture
+        // Draw walls as thick rectangles with solid gray color and rounded corners
         const drawWall = (x1: number, y1: number, x2: number, y2: number) => {
-          // Create gradient for 3D stone effect with darker gray
-          const gradient = ctx.createLinearGradient(x1, y1, x2, y2);
-          gradient.addColorStop(0, '#3f3f46'); // zinc-700
-          gradient.addColorStop(0.5, '#52525b'); // zinc-600 (lighter middle)
-          gradient.addColorStop(1, '#27272a'); // zinc-800 (darker edge)
+          ctx.fillStyle = '#52525b'; // zinc-600 solid gray
           
-          ctx.fillStyle = gradient;
+          const cornerRadius = 4; // Rounded corner radius
           
-          // Draw thick wall rectangle
+          // Draw thick wall rectangle with rounded corners
           if (x1 === x2) {
             // Vertical wall
-            ctx.fillRect(x1 - WALL_WIDTH / 2, y1, WALL_WIDTH, y2 - y1);
+            ctx.beginPath();
+            ctx.roundRect(x1 - WALL_WIDTH / 2, y1, WALL_WIDTH, y2 - y1, cornerRadius);
+            ctx.fill();
           } else {
             // Horizontal wall
-            ctx.fillRect(x1, y1 - WALL_WIDTH / 2, x2 - x1, WALL_WIDTH);
+            ctx.beginPath();
+            ctx.roundRect(x1, y1 - WALL_WIDTH / 2, x2 - x1, WALL_WIDTH, cornerRadius);
+            ctx.fill();
           }
-          
-          // Add darker border for depth with rounded corners
-          ctx.strokeStyle = '#18181b'; // zinc-900
-          ctx.lineWidth = 2;
-          ctx.lineCap = 'round';
-          ctx.lineJoin = 'round';
-          ctx.beginPath();
-          ctx.moveTo(x1, y1);
-          ctx.lineTo(x2, y2);
-          ctx.stroke();
         };
         
         if (cell.walls.top) {
