@@ -66,7 +66,7 @@ const VajeMoториkeGovoril = () => {
     }
   }, [effectiveFullscreen]);
 
-  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/background-gradient-lights.jpg`;
+  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/oranzno_ozadje.png`;
   const gridClassName = isMobile ? "grid-cols-3 grid-rows-9" : "grid-cols-9 grid-rows-3";
 
   return (
@@ -74,7 +74,10 @@ const VajeMoториkeGovoril = () => {
       {/* Background image layer */}
       <div 
         className={`${effectiveFullscreen ? 'fixed' : 'absolute'} inset-0 w-full h-full bg-cover bg-center bg-no-repeat`}
-        style={{ backgroundImage: `url('${backgroundImageUrl}')` }}
+        style={{ 
+          backgroundImage: `url('${backgroundImageUrl}')`,
+          filter: 'brightness(0.8)'
+        }}
       />
       
       <div className={`relative z-10 ${effectiveFullscreen ? 'h-full flex items-center justify-center overflow-hidden touch-none overscroll-none' : 'container max-w-6xl mx-auto pt-20 pb-20 px-4'}`}>
