@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { Home } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { SequentialExerciseGrid } from "@/components/exercises/SequentialExerciseGrid";
@@ -88,12 +87,11 @@ const VajeMoториkeGovoril = () => {
       {/* Floating menu button */}
       <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
         <DropdownMenuTrigger asChild>
-          <Button 
-            className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm"
-            size="icon"
+          <button 
+            className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm flex items-center justify-center transition-all"
           >
             <Home className="h-7 w-7 text-white" />
-          </Button>
+          </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent 
           align="start" 
