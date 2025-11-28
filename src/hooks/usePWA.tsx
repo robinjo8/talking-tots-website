@@ -168,21 +168,44 @@ export function usePWA(): PWAState & PWAActions {
     }
   }, [deferredPrompt]);
 
-  // Install app update
+  // Install app update (force reload with latest version)
   const installUpdate = useCallback(async () => {
-    if (!swRegistration || !hasUpdate) {
+    if (!('serviceWorker' in navigator)) {
+      window.location.reload();
       return;
     }
 
-    const waitingWorker = swRegistration.waiting;
-    if (waitingWorker) {
-      waitingWorker.postMessage({ type: 'SKIP_WAITING' });
-      setHasUpdate(false);
-      
-      // Reload page to activate new service worker
+    try {
+      const registration =
+        swRegistration || (await navigator.serviceWorker.getRegistration());
+
+      if (!registration) {
+        window.location.reload();
+        return;
+      }
+
+      if (registration.waiting) {
+        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+        setHasUpdate(false);
+      } else {
+        try {
+          await registration.update();
+        } catch (err) {
+          console.error('Service worker update() failed, will try unregister:', err);
+        }
+      }
+    } finally {
+      try {
+        const currentReg = await navigator.serviceWorker.getRegistration();
+        await currentReg?.unregister();
+      } catch (err) {
+        console.error('Service worker unregister failed:', err);
+      }
+
+      // Always reload to pull the very latest assets
       window.location.reload();
     }
-  }, [swRegistration, hasUpdate]);
+  }, [swRegistration, setHasUpdate]);
 
   // Dismiss install prompt
   const dismissInstallPrompt = useCallback(() => {
