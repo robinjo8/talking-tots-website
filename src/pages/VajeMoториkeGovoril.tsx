@@ -76,7 +76,7 @@ const VajeMoториkeGovoril = () => {
         className={`${effectiveFullscreen ? 'fixed' : 'absolute'} inset-0 w-full h-full bg-cover bg-center bg-no-repeat`}
         style={{ 
           backgroundImage: `url('${backgroundImageUrl}')`,
-          filter: 'brightness(0.8)'
+          opacity: 0.8
         }}
       />
       
