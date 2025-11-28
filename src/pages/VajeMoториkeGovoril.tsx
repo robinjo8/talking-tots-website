@@ -66,7 +66,7 @@ const VajeMoториkeGovoril = () => {
     }
   }, [effectiveFullscreen]);
 
-  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/47412.jpg`;
+  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/background-gradient-lights.jpg`;
   const gridClassName = isMobile ? "grid-cols-3 grid-rows-9" : "grid-cols-9 grid-rows-3";
 
   return (
