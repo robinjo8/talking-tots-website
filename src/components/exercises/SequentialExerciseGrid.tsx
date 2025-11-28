@@ -17,9 +17,10 @@ interface SequentialExerciseGridProps {
     isCardCompleted: (cardNumber: number) => boolean;
     isCardActive: (cardNumber: number) => boolean;
   };
+  gridClassName?: string;
 }
 
-export const SequentialExerciseGrid = ({ exerciseProgressHook }: SequentialExerciseGridProps) => {
+export const SequentialExerciseGrid = ({ exerciseProgressHook, gridClassName = "grid-cols-5" }: SequentialExerciseGridProps) => {
   const [selectedCard, setSelectedCard] = useState<number | null>(null);
   const [showCongratulations, setShowCongratulations] = useState(false);
   const [congratulationsCount, setCongratulationsCount] = useState(0);
@@ -86,8 +87,8 @@ export const SequentialExerciseGrid = ({ exerciseProgressHook }: SequentialExerc
 
   return (
     <>
-      <div className="w-full max-w-4xl mx-auto p-4">
-        <div className="grid grid-cols-5 gap-4 auto-rows-fr">
+      <div className="w-full max-w-6xl mx-auto p-4">
+        <div className={`grid ${gridClassName} gap-4 auto-rows-fr`}>
           {renderedCards}
         </div>
       </div>
