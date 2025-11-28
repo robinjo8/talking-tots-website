@@ -36,7 +36,7 @@ export function UpdatePrompt() {
         description: "Aplikacija bo samodejno ponovno naložena.",
       });
       
-      // The installUpdate function will reload the page
+      // installUpdate bo sprožil reload strani
     } catch (error) {
       console.error('Update installation failed:', error);
       
@@ -45,7 +45,9 @@ export function UpdatePrompt() {
         description: "Poskusite ponovno naložiti stran.",
         variant: "destructive",
       });
-      
+    } finally {
+      // Če iz kakršnegakoli razloga reload ne uspe,
+      // vsaj ustavimo neskončno vrtenje ikonice
       setIsInstalling(false);
     }
   };
