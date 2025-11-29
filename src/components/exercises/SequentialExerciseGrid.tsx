@@ -87,7 +87,7 @@ export const SequentialExerciseGrid = ({ exerciseProgressHook, gridClassName = "
 
   return (
     <>
-      <div className="w-full max-w-3xl mx-auto p-4">
+      <div className="w-full max-w-7xl mx-auto p-4">
         <div className={`grid ${gridClassName} gap-4 auto-rows-fr`}>
           {renderedCards}
         </div>
