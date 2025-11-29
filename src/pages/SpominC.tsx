@@ -65,8 +65,11 @@ export default function SpominC() {
     });
   };
 
-  // Enable fullscreen on mobile devices only
+  // Disable scrolling on body
   useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    
     if (effectiveFullscreen) {
       const requestFullscreen = async () => {
         try {
@@ -78,12 +81,15 @@ export default function SpominC() {
         }
       };
       requestFullscreen();
-      return () => {
-        if (document.fullscreenElement) {
-          document.exitFullscreen?.();
-        }
-      };
     }
+    
+    return () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.();
+      }
+    };
   }, [effectiveFullscreen]);
   useEffect(() => {
     if (gameCompleted && gameStartTimeRef.current && gameTime === null) {
@@ -105,8 +111,8 @@ export default function SpominC() {
       backgroundImage: `url('${backgroundImageUrl}')`
     }} />
       
-      <div className={`relative z-10 ${effectiveFullscreen ? 'h-full flex items-center justify-center overflow-hidden' : 'h-full flex items-center justify-center overflow-hidden'}`}>
-        <div className="w-full px-4">
+      <div className="relative z-10 h-full flex flex-col items-center justify-center overflow-hidden p-4">
+        <div className="w-full max-w-6xl h-full flex flex-col items-center justify-center">
             {isLoading && <div className="text-lg text-muted-foreground">Nalaganje igre...</div>}
             
             {error && <div className="bg-red-50 p-6 rounded-lg border border-red-100 text-center">
@@ -117,12 +123,12 @@ export default function SpominC() {
                 </Button>
               </div>}
             
-            {!isLoading && !error && cards.length > 0 && <>
+            {!isLoading && !error && cards.length > 0 && <div className="w-full flex flex-col items-center justify-center gap-4">
               <MemoryProgressIndicator matchedPairs={matchedPairs.length} totalPairs={totalPairs} />
-              <div className="my-[160px]">
-              <MemoryGrid cards={cards} onCardClick={handleCardClick} isCheckingMatch={isCheckingMatch} />
-            </div>
-            </>}
+              <div className="w-full max-h-[70vh] flex items-center justify-center">
+                <MemoryGrid cards={cards} onCardClick={handleCardClick} isCheckingMatch={isCheckingMatch} />
+              </div>
+            </div>}
             
             {!isLoading && !error && cards.length === 0 && <div className="text-center p-10 border rounded-lg">
                 <p className="text-muted-foreground">
