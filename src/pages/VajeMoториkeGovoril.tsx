@@ -65,7 +65,7 @@ const VajeMoториkeGovoril = () => {
     }
   }, [effectiveFullscreen]);
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/oranzno_ozadje.png`;
-  const gridClassName = "grid-cols-9";
+  const gridClassName = isMobile ? "grid-cols-5" : "grid-cols-9";
   return <div className={`${effectiveFullscreen ? 'fixed inset-0 overflow-hidden' : 'min-h-screen'} relative`}>
       {/* Background image layer */}
       <div className={`${effectiveFullscreen ? 'fixed' : 'absolute'} inset-0 w-full h-full bg-cover bg-center bg-no-repeat`} style={{
@@ -73,7 +73,7 @@ const VajeMoториkeGovoril = () => {
       opacity: 0.8
     }} />
       
-      <div className={`relative z-10 ${effectiveFullscreen ? 'h-full overflow-hidden pt-4 pb-20' : 'container max-w-6xl mx-auto pt-20 pb-20 px-4'}`}>
+      <div className={`relative z-10 ${effectiveFullscreen ? 'h-full overflow-hidden pt-2' : 'container max-w-6xl mx-auto pt-20 pb-20 px-4'}`}>
         <SequentialExerciseGrid exerciseProgressHook={exerciseProgressHook} gridClassName={gridClassName} isMobile={isMobile} />
       </div>
 
