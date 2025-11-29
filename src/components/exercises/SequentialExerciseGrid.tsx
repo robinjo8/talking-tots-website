@@ -88,8 +88,8 @@ export const SequentialExerciseGrid = ({ exerciseProgressHook, gridClassName = "
 
   return (
     <>
-      <div className={`w-full ${isMobile ? 'h-full px-2' : 'max-w-7xl my-[121px]'} mx-auto p-4`}>
-        <div className={`grid ${gridClassName} gap-4 ${isMobile ? 'h-full' : 'auto-rows-fr'}`}>
+      <div className={`w-full ${isMobile ? 'h-[calc(100vh-100px)] px-2' : 'max-w-7xl my-[121px]'} mx-auto ${isMobile ? '' : 'p-4'}`}>
+        <div className={`grid ${gridClassName} ${isMobile ? 'gap-2 h-full auto-rows-fr' : 'gap-4 auto-rows-fr'}`}>
           {renderedCards}
         </div>
       </div>
