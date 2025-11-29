@@ -19,17 +19,28 @@ export const useExerciseProgress = () => {
     completionCount: 0,
   });
 
-  // Load progress from localStorage on mount - ALWAYS RESET TO ZERO
+  // Load progress from localStorage on mount
   useEffect(() => {
-    console.log("Force resetting all progress to zero");
-    const resetProgress = {
-      currentUnlockedCard: 1,
-      completedCards: [],
-      completionCount: 0,
-      version: CACHE_VERSION
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(resetProgress));
-    setProgress(resetProgress);
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        // Check version and load saved progress
+        if (parsed.version === CACHE_VERSION) {
+          setProgress({
+            currentUnlockedCard: parsed.currentUnlockedCard || 1,
+            completedCards: parsed.completedCards || [],
+            completionCount: parsed.completionCount || 0,
+          });
+          console.log("Loaded saved progress:", parsed);
+          return;
+        }
+      } catch (e) {
+        console.error("Failed to load progress:", e);
+      }
+    }
+    // If no saved progress or invalid version, start fresh
+    console.log("No saved progress found, starting fresh");
   }, []);
 
   // Save progress to localStorage whenever it changes
