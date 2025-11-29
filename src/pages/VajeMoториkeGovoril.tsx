@@ -67,7 +67,7 @@ const VajeMoториkeGovoril = () => {
   }, [effectiveFullscreen]);
 
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/oranzno_ozadje.png`;
-  const gridClassName = isMobile ? "grid-cols-3" : "grid-cols-7";
+  const gridClassName = isMobile ? "grid-cols-3" : "grid-cols-3";
 
   return (
     <div className={`${effectiveFullscreen ? 'fixed inset-0 overflow-hidden' : 'min-h-screen'} relative`}>
