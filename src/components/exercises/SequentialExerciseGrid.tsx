@@ -18,9 +18,10 @@ interface SequentialExerciseGridProps {
     isCardActive: (cardNumber: number) => boolean;
   };
   gridClassName?: string;
+  isMobile?: boolean;
 }
 
-export const SequentialExerciseGrid = ({ exerciseProgressHook, gridClassName = "grid-cols-5" }: SequentialExerciseGridProps) => {
+export const SequentialExerciseGrid = ({ exerciseProgressHook, gridClassName = "grid-cols-5", isMobile = false }: SequentialExerciseGridProps) => {
   const [selectedCard, setSelectedCard] = useState<number | null>(null);
   const [showCongratulations, setShowCongratulations] = useState(false);
   const [congratulationsCount, setCongratulationsCount] = useState(0);
@@ -87,8 +88,8 @@ export const SequentialExerciseGrid = ({ exerciseProgressHook, gridClassName = "
 
   return (
     <>
-      <div className="w-full max-w-7xl mx-auto p-4 my-[121px]">
-        <div className={`grid ${gridClassName} gap-4 auto-rows-fr`}>
+      <div className={`w-full ${isMobile ? 'h-full px-2' : 'max-w-7xl my-[121px]'} mx-auto p-4`}>
+        <div className={`grid ${gridClassName} gap-4 ${isMobile ? 'h-full' : 'auto-rows-fr'}`}>
           {renderedCards}
         </div>
       </div>
