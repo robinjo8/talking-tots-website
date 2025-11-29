@@ -74,7 +74,7 @@ const VajeMoториkeGovoril = () => {
     }} />
       
       <div className={`relative z-10 ${effectiveFullscreen ? 'h-full overflow-y-auto py-8' : 'container max-w-6xl mx-auto pt-20 pb-20 px-4'}`}>
-        <SequentialExerciseGrid exerciseProgressHook={exerciseProgressHook} gridClassName={gridClassName} className="my-[121px]" />
+        <SequentialExerciseGrid exerciseProgressHook={exerciseProgressHook} gridClassName={gridClassName} className="my-[120px]" />
       </div>
 
       {/* Floating menu button */}
