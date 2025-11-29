@@ -99,14 +99,14 @@ export default function SpominC() {
     }
   }, [gameCompleted, gameStartTimeRef, gameTime, toast]);
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/47412.jpg`;
-  return <div className={`${effectiveFullscreen ? 'fixed inset-0 overflow-hidden' : 'min-h-screen'} relative`}>
+  return <div className={`fixed inset-0 overflow-hidden relative`}>
       {/* Background image layer */}
-      <div className={`${effectiveFullscreen ? 'fixed' : 'absolute'} inset-0 w-full h-full bg-cover bg-center bg-no-repeat`} style={{
+      <div className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat" style={{
       backgroundImage: `url('${backgroundImageUrl}')`
     }} />
       
-      <div className={`relative z-10 ${effectiveFullscreen ? 'h-full flex items-center justify-center overflow-hidden' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
-        {effectiveFullscreen ? <div className="w-full px-4">
+      <div className={`relative z-10 ${effectiveFullscreen ? 'h-full flex items-center justify-center overflow-hidden' : 'h-full flex items-center justify-center overflow-hidden'}`}>
+        <div className="w-full px-4">
             {isLoading && <div className="text-lg text-muted-foreground">Nalaganje igre...</div>}
             
             {error && <div className="bg-red-50 p-6 rounded-lg border border-red-100 text-center">
@@ -129,32 +129,7 @@ export default function SpominC() {
                   Ni kartic za prikaz. Prosim, preverite nastavitve igre.
                 </p>
               </div>}
-          </div> : <div className="mt-[20vh] px-4">
-            <div className="w-full max-w-4xl mx-auto">
-              {isLoading && <div className="text-lg text-muted-foreground">Nalaganje igre...</div>}
-              
-              {error && <div className="bg-red-50 p-6 rounded-lg border border-red-100 text-center">
-                  <h3 className="text-red-600 font-medium mb-2">Napaka pri nalaganju igre</h3>
-                  <p className="text-sm text-red-500">Poskusite znova kasneje.</p>
-                  <Button variant="outline" className="mt-4" onClick={() => window.location.reload()}>
-                    Poskusi znova
-                  </Button>
-                </div>}
-              
-              {!isLoading && !error && cards.length > 0 && <>
-                <MemoryProgressIndicator matchedPairs={matchedPairs.length} totalPairs={totalPairs} />
-                <div className="my-[160px]">
-                <MemoryGrid cards={cards} onCardClick={handleCardClick} isCheckingMatch={isCheckingMatch} />
-              </div>
-              </>}
-              
-              {!isLoading && !error && cards.length === 0 && <div className="text-center p-10 border rounded-lg">
-                  <p className="text-muted-foreground">
-                    Ni kartic za prikaz. Prosim, preverite nastavitve igre.
-                  </p>
-                </div>}
-            </div>
-          </div>}
+          </div>
       </div>
 
       {/* Floating menu button - Now available on all devices */}
