@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { SequentialCard } from "./SequentialCard";
 import { ExerciseModal } from "./ExerciseModal";
 import { CongratulationsDialog } from "./CongratulationsDialog";
@@ -25,6 +25,9 @@ export const SequentialExerciseGrid = ({ exerciseProgressHook, gridClassName = "
   const [selectedCard, setSelectedCard] = useState<number | null>(null);
   const [showCongratulations, setShowCongratulations] = useState(false);
   const [congratulationsCount, setCongratulationsCount] = useState(0);
+  const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
+  const gridRef = useRef<HTMLDivElement>(null);
+  
   const { 
     progress, 
     completeCard, 
@@ -86,9 +89,26 @@ export const SequentialExerciseGrid = ({ exerciseProgressHook, gridClassName = "
     return cards;
   }, [isCardLocked, isCardCompleted, isCardActive, handleCardClick]);
 
+  // Auto-scroll after 12 completed cards
+  useEffect(() => {
+    if (isMobile && progress.completedCards.length === 12 && !hasAutoScrolled && gridRef.current) {
+      const scrollTarget = gridRef.current.scrollHeight * 0.5;
+      window.scrollTo({
+        top: scrollTarget,
+        behavior: 'smooth'
+      });
+      setHasAutoScrolled(true);
+      console.log("Auto-scrolled after 12 cards");
+    }
+    // Reset auto-scroll flag when progress resets
+    if (progress.completedCards.length < 12) {
+      setHasAutoScrolled(false);
+    }
+  }, [progress.completedCards.length, isMobile, hasAutoScrolled]);
+
   return (
     <>
-      <div className={`w-full ${isMobile ? 'h-full px-1' : 'max-w-7xl my-[121px]'} mx-auto ${isMobile ? '' : 'p-4'}`}>
+      <div ref={gridRef} className={`w-full ${isMobile ? 'h-full px-1 pb-24' : 'max-w-7xl my-[121px]'} mx-auto ${isMobile ? '' : 'p-4'}`}>
         <div className={`grid ${gridClassName} ${isMobile ? 'gap-1 h-full auto-rows-fr' : 'gap-4 auto-rows-fr'}`}>
           {renderedCards}
         </div>
