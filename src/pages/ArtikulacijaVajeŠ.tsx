@@ -58,7 +58,15 @@ export default function ArtikulacijaVajeŠ() {
 
   if (effectiveFullscreen) {
     return (
-      <div className="fixed inset-0 bg-background overflow-hidden select-none">
+      <div 
+        className="fixed inset-0 overflow-hidden select-none"
+        style={{
+          backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
         <div className="h-full flex flex-col p-4">
           <Card className="flex-1 flex flex-col">
             <CardContent className="p-6 flex-1 flex flex-col">
@@ -137,7 +145,15 @@ export default function ArtikulacijaVajeŠ() {
 
   return (
     <AppLayout>
-      <div className="w-full min-h-screen bg-background flex items-center justify-center p-4">
+      <div 
+        className="w-full min-h-screen flex items-center justify-center p-4"
+        style={{
+          backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
         <Card className="w-full max-w-2xl">
           <CardContent className="p-8">
             <div className="text-center mb-6">
