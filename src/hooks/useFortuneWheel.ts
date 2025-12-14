@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 interface WordData {
   word: string;
@@ -22,6 +22,35 @@ interface UseFortuneWheelReturn {
   closeResult: () => void;
 }
 
+// Spinning sound effect using Web Audio API
+const createSpinSound = () => {
+  try {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    
+    const playTickSound = () => {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = 800 + Math.random() * 400;
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05);
+      
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + 0.05);
+    };
+    
+    return { playTickSound, audioContext };
+  } catch (error) {
+    console.error('Web Audio API not supported:', error);
+    return null;
+  }
+};
+
 export const useFortuneWheel = ({ 
   wordsData, 
   spinDuration = 3000 
@@ -31,13 +60,56 @@ export const useFortuneWheel = ({
   const [selectedWord, setSelectedWord] = useState<WordData | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
+  
+  const soundRef = useRef<{ playTickSound: () => void; audioContext: AudioContext } | null>(null);
+  const tickIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Initialize audio context on first interaction
+  useEffect(() => {
+    return () => {
+      if (tickIntervalRef.current) {
+        clearInterval(tickIntervalRef.current);
+      }
+      if (soundRef.current?.audioContext) {
+        soundRef.current.audioContext.close();
+      }
+    };
+  }, []);
 
   const spinWheel = useCallback(() => {
     if (isSpinning) return;
 
+    // Initialize sound on first spin (requires user interaction)
+    if (!soundRef.current) {
+      soundRef.current = createSpinSound();
+    }
+
     setIsSpinning(true);
     setShowResult(false);
     setSelectedWord(null);
+
+    // Start tick sound effect
+    if (soundRef.current) {
+      let tickSpeed = 50; // Start fast
+      const maxTickSpeed = 300; // End slow
+      
+      const playTicks = () => {
+        if (tickIntervalRef.current) {
+          clearTimeout(tickIntervalRef.current);
+        }
+        
+        soundRef.current?.playTickSound();
+        
+        // Gradually slow down the ticks
+        tickSpeed = Math.min(tickSpeed * 1.1, maxTickSpeed);
+        
+        if (tickSpeed < maxTickSpeed) {
+          tickIntervalRef.current = setTimeout(playTicks, tickSpeed);
+        }
+      };
+      
+      playTicks();
+    }
 
     // Calculate random winning segment
     const segmentCount = wordsData.length;
@@ -46,23 +118,20 @@ export const useFortuneWheel = ({
     // Random index for winning segment
     const winningIndex = Math.floor(Math.random() * segmentCount);
     
-    // Calculate the rotation needed to land on this segment
-    // The pointer is at the top (0 degrees), so we need to calculate accordingly
-    // We want the winning segment to be under the pointer
     const segmentCenter = winningIndex * segmentAngle + segmentAngle / 2;
     
     // Add multiple full rotations for visual effect (5-8 full spins)
     const fullRotations = (5 + Math.random() * 3) * 360;
     
-    // Final rotation: current rotation + full spins + adjustment to land on segment
-    // The pointer is at top, so segment 0 starts from the right side
-    // We need to rotate so that the winning segment aligns with the top pointer
     const finalRotation = rotation + fullRotations + (360 - segmentCenter);
 
     setRotation(finalRotation);
 
     // After spin completes, show result
     setTimeout(() => {
+      if (tickIntervalRef.current) {
+        clearInterval(tickIntervalRef.current);
+      }
       setIsSpinning(false);
       setSelectedIndex(winningIndex);
       setSelectedWord(wordsData[winningIndex]);

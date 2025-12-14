@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Home } from "lucide-react";
+import { Home, HelpCircle } from "lucide-react";
 import { FortuneWheel } from "@/components/wheel/FortuneWheel";
 import { useFortuneWheel } from "@/hooks/useFortuneWheel";
-import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
+import { useWordProgress } from "@/hooks/useWordProgress";
+import { WheelSuccessDialog } from "@/components/wheel/WheelSuccessDialog";
+import { ProgressModal } from "@/components/wheel/ProgressModal";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
@@ -27,10 +29,13 @@ const wordsDataR = [
   { word: "ROŽA", image: "roza.png", audio: "roza.m4a" }
 ];
 
+const wordsList = wordsDataR.map(w => w.word);
+
 export default function ArtikulacijaVajeR() {
   const navigate = useNavigate();
   const [showInstructions, setShowInstructions] = useState(false);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
+  const [showProgressModal, setShowProgressModal] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const {
@@ -44,6 +49,13 @@ export default function ArtikulacijaVajeR() {
     closeResult,
   } = useFortuneWheel({ wordsData: wordsDataR });
 
+  const {
+    progress,
+    incrementProgress,
+    getProgress,
+    resetProgress,
+  } = useWordProgress('R', wordsList);
+
   const handleBack = () => {
     setMenuOpen(false);
     setShowExitConfirmation(true);
@@ -56,6 +68,7 @@ export default function ArtikulacijaVajeR() {
   const handleNewGame = () => {
     setMenuOpen(false);
     resetWheel();
+    resetProgress();
   };
 
   const handleInstructions = () => {
@@ -63,10 +76,17 @@ export default function ArtikulacijaVajeR() {
     setShowInstructions(true);
   };
 
+  const handleRecordComplete = () => {
+    if (selectedWord) {
+      incrementProgress(selectedWord.word);
+    }
+  };
+
   const handleStarClaimed = () => {
-    // Star claimed, dialog will close automatically
     closeResult();
   };
+
+  const currentWordProgress = selectedWord ? getProgress(selectedWord.word) : 0;
 
   return (
     <div 
@@ -93,7 +113,7 @@ export default function ArtikulacijaVajeR() {
         />
       </div>
 
-      {/* Floating Menu Button */}
+      {/* Floating Menu Button - Left */}
       <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
         <DropdownMenuTrigger asChild>
           <button 
@@ -132,9 +152,17 @@ export default function ArtikulacijaVajeR() {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Success Dialog */}
+      {/* Progress Button - Right */}
+      <button 
+        onClick={() => setShowProgressModal(true)}
+        className="fixed bottom-4 right-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
+      >
+        <HelpCircle className="w-8 h-8 text-white" />
+      </button>
+
+      {/* Success Dialog with Progress */}
       {selectedWord && (
-        <PuzzleSuccessDialog
+        <WheelSuccessDialog
           isOpen={showResult}
           onOpenChange={(open) => {
             if (!open) closeResult();
@@ -144,9 +172,20 @@ export default function ArtikulacijaVajeR() {
             word: selectedWord.word,
             audio: selectedWord.audio,
           }}
+          pronunciationCount={currentWordProgress}
+          onRecordComplete={handleRecordComplete}
           onStarClaimed={handleStarClaimed}
         />
       )}
+
+      {/* Progress Modal */}
+      <ProgressModal
+        isOpen={showProgressModal}
+        onClose={() => setShowProgressModal(false)}
+        words={wordsDataR}
+        progress={progress}
+        letter="R"
+      />
 
       {/* Instructions Modal */}
       <InstructionsModal
