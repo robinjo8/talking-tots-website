@@ -687,14 +687,14 @@ export type Database = {
       }
       has_role:
         | {
-            Args: { role_name: Database["public"]["Enums"]["user_role"] }
-            Returns: boolean
-          }
-        | {
             Args: {
               _role: Database["public"]["Enums"]["user_role"]
               _user_id: string
             }
+            Returns: boolean
+          }
+        | {
+            Args: { role_name: Database["public"]["Enums"]["user_role"] }
             Returns: boolean
           }
       log_child_access: {
