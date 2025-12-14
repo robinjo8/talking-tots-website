@@ -54,6 +54,7 @@ export default function ArtikulacijaVajeR() {
     incrementProgress,
     getProgress,
     resetProgress,
+    resetWordProgress,
   } = useWordProgress('R', wordsList);
 
   const handleBack = () => {
@@ -83,6 +84,9 @@ export default function ArtikulacijaVajeR() {
   };
 
   const handleStarClaimed = () => {
+    if (selectedWord) {
+      resetWordProgress(selectedWord.word);
+    }
     closeResult();
   };
 
