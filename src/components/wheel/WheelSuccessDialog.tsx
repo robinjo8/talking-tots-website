@@ -32,13 +32,13 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTimeLeft, setRecordingTimeLeft] = useState(3);
   const [starClaimed, setStarClaimed] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
   const [justRecorded, setJustRecorded] = useState(false);
   const { playAudio } = useAudioPlayback();
   const { toast } = useToast();
   const { user, selectedChild } = useAuth();
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordingDataRef = useRef<Blob[]>([]);
 
   const canClaimStar = pronunciationCount >= 3;
@@ -72,7 +72,7 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
         audioStream.getTracks().forEach(track => track.stop());
         setAudioStream(null);
       }
-      setMediaRecorder(null);
+      mediaRecorderRef.current = null;
       recordingDataRef.current = [];
     }
   }, [isOpen, audioStream]);
@@ -85,7 +85,7 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
       setAudioStream(stream);
 
       const recorder = new MediaRecorder(stream);
-      setMediaRecorder(recorder);
+      mediaRecorderRef.current = recorder;
       recordingDataRef.current = [];
 
       recorder.ondataavailable = (event) => {
@@ -138,8 +138,9 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
       countdownRef.current = null;
     }
 
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
-      mediaRecorder.stop();
+    const recorder = mediaRecorderRef.current;
+    if (recorder && recorder.state === 'recording') {
+      recorder.stop();
     }
 
     if (audioStream) {
@@ -241,7 +242,9 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
             <div className="flex justify-center">
               <div 
                 className={`flex flex-col items-center space-y-2 cursor-pointer transition-all ${
-                  justRecorded || showClaimButton ? 'opacity-70 cursor-not-allowed' : 'hover:scale-105'
+                  (justRecorded || showClaimButton)
+                    ? 'opacity-70 cursor-not-allowed grayscale'
+                    : 'hover:scale-105'
                 }`}
                 onClick={handleImageClick}
               >
