@@ -10,6 +10,7 @@ interface UseWordProgressReturn {
   getProgress: (word: string) => number;
   isCompleted: (word: string) => boolean;
   resetProgress: () => void;
+  resetWordProgress: (word: string) => void; // Reset single word to 0
   getTotalCompleted: () => number;
   getTotalWords: () => number;
 }
@@ -76,6 +77,13 @@ export const useWordProgress = (letter: string, words: string[]): UseWordProgres
     setProgress(initial);
   }, [words]);
 
+  const resetWordProgress = useCallback((word: string) => {
+    setProgress(prev => ({
+      ...prev,
+      [word]: 0
+    }));
+  }, []);
+
   const getTotalCompleted = useCallback((): number => {
     return Object.values(progress).filter(count => count >= 3).length;
   }, [progress]);
@@ -90,6 +98,7 @@ export const useWordProgress = (letter: string, words: string[]): UseWordProgres
     getProgress,
     isCompleted,
     resetProgress,
+    resetWordProgress,
     getTotalCompleted,
     getTotalWords
   };

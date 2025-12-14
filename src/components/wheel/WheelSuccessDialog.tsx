@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { Volume2, Mic, Star } from 'lucide-react';
 import { useAudioPlayback } from '@/hooks/useAudioPlayback';
 import { supabase } from '@/integrations/supabase/client';
@@ -33,7 +32,6 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTimeLeft, setRecordingTimeLeft] = useState(3);
   const [starClaimed, setStarClaimed] = useState(false);
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
   const [justRecorded, setJustRecorded] = useState(false);
@@ -186,15 +184,6 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
   };
 
   const handleClose = () => {
-    if (canClaimStar && !starClaimed) {
-      setShowConfirmDialog(true);
-    } else {
-      onOpenChange(false);
-    }
-  };
-
-  const handleConfirmClose = () => {
-    setShowConfirmDialog(false);
     onOpenChange(false);
   };
 
@@ -322,24 +311,13 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
                   onClick={() => onOpenChange(false)}
                   className="bg-dragon-green hover:bg-dragon-green/90 text-white"
                 >
-                  NAPREJ
+                  NADALJUJ
                 </Button>
               ) : null}
             </div>
           </div>
         </DialogContent>
       </Dialog>
-      
-      <ConfirmDialog
-        open={showConfirmDialog}
-        onOpenChange={setShowConfirmDialog}
-        title="Zapri igro"
-        description="Če zapreš igro, ne boš prejel zvezdice. Ali si prepričan?"
-        confirmText="V redu"
-        cancelText="Prekliči"
-        onConfirm={handleConfirmClose}
-        onCancel={() => setShowConfirmDialog(false)}
-      />
     </>
   );
 };
