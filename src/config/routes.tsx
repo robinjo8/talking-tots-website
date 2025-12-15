@@ -18,6 +18,7 @@ import ArtikulacijaVajeČ from "@/pages/ArtikulacijaVajeČ";
 import ArtikulacijaVajeK from "@/pages/ArtikulacijaVajeK";
 import ArtikulacijaVajeL from "@/pages/ArtikulacijaVajeL";
 import ArtikulacijaVajeR from "@/pages/ArtikulacijaVajeR";
+import ArtikulacijaVajeRSredinaKonec from "@/pages/ArtikulacijaVajeRSredinaKonec";
 import ArtikulacijaVajeS from "@/pages/ArtikulacijaVajeS";
 import ArtikulacijaVajeŠ from "@/pages/ArtikulacijaVajeŠ";
 import ArtikulacijaVajeZ from "@/pages/ArtikulacijaVajeZ";
@@ -269,6 +270,14 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <ArtikulacijaVajeR />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorno-jezikovne-vaje/artikulacija/r-sredina-konec" 
+        element={
+          <ProtectedRoute>
+            <ArtikulacijaVajeRSredinaKonec />
           </ProtectedRoute>
         }
       />

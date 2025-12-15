@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 interface InstructionsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  type?: "jigsaw" | "sliding" | "articulation" | "maze";
+  type?: "jigsaw" | "sliding" | "articulation" | "maze" | "bingo";
 }
 
 export const InstructionsModal: React.FC<InstructionsModalProps> = ({
@@ -38,6 +38,15 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
         "Poslušaj besedo in jo ponovi v mikrofon.",
         "Osvoji zvezdo za vsak uspešno opravljen labirint!"
       ]
+    : type === "bingo"
+    ? [
+        "Klikni na gumb ZAVRTI, da se izžreba naključna slika.",
+        "Poišči vse izžrebane slike na svoji mreži in jih klikni.",
+        "Če po 10 sekundah ne najdeš vseh slik, ti bo pomagala pomoč z utripajočim robom.",
+        "Ko najdeš vse slike, ponovi besedo v mikrofon.",
+        "Zapolni vseh 16 polj, da osvojiš zvezdico!",
+        "Zvezdica se bo zabeležila pod VAJE na tvoji strani."
+      ]
     : [
         "Sestavljaj sliko, dokler ni cela.",
         "Ko bo slika končana, se bo predvajal posnetek logopeda.",
@@ -51,6 +60,8 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
     ? "Drsna igra"
     : type === "maze"
     ? "Navodila za labirint"
+    : type === "bingo"
+    ? "Navodila za Bingo"
     : "Navodila za igro Sestavljanka";
 
   return (
