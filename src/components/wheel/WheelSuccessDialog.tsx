@@ -95,10 +95,7 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
       };
 
       recorder.onstop = async () => {
-        // Always set justRecorded and call onRecordComplete, even if save fails
-        setJustRecorded(true);
-        onRecordComplete();
-        
+        // Only save recording here - UI state updates happen in stopRecording
         if (recordingDataRef.current.length > 0) {
           await saveRecording();
         }
@@ -150,6 +147,10 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
 
     setIsRecording(false);
     setRecordingTimeLeft(3);
+    
+    // Immediately update UI state - don't wait for async onstop callback
+    setJustRecorded(true);
+    onRecordComplete();
   };
 
   const saveRecording = async () => {
