@@ -12,37 +12,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
 const artikulacijaLetters = [
-  // ZAČETEK - obstoječe kartice
-  {
-    id: "vaje-r-zacetek",
-    letter: "R",
-    title: "Črka R - začetek",
-    gradient: "from-app-purple/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Vadi izgovorjavo črke R na začetku besede",
-    path: "/govorno-jezikovne-vaje/artikulacija/r",
-    available: true
-  },
-  {
-    id: "vaje-l-zacetek",
-    letter: "L",
-    title: "Črka L - začetek",
-    gradient: "from-app-purple/20 to-app-blue/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png",
-    description: "Vadi izgovorjavo črke L na začetku besede",
-    path: "/govorno-jezikovne-vaje/artikulacija/l",
-    available: true
-  },
-  {
-    id: "vaje-k-zacetek",
-    letter: "K",
-    title: "Črka K - začetek",
-    gradient: "from-app-orange/20 to-app-yellow/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png",
-    description: "Vadi izgovorjavo črke K na začetku besede",
-    path: "/govorno-jezikovne-vaje/artikulacija/k",
-    available: true
-  },
+  // C
   {
     id: "vaje-c-zacetek",
     letter: "C",
@@ -51,87 +21,6 @@ const artikulacijaLetters = [
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
     description: "Vadi izgovorjavo črke C na začetku besede",
     path: "/govorno-jezikovne-vaje/artikulacija/c",
-    available: true
-  },
-  {
-    id: "vaje-č-zacetek",
-    letter: "Č",
-    title: "Črka Č - začetek",
-    gradient: "from-app-blue/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
-    description: "Vadi izgovorjavo črke Č na začetku besede",
-    path: "/govorno-jezikovne-vaje/artikulacija/č",
-    available: true
-  },
-  {
-    id: "vaje-s-zacetek",
-    letter: "S",
-    title: "Črka S - začetek",
-    gradient: "from-dragon-green/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
-    description: "Vadi izgovorjavo črke S na začetku besede",
-    path: "/govorno-jezikovne-vaje/artikulacija/s",
-    available: true
-  },
-  {
-    id: "vaje-š-zacetek",
-    letter: "Š",
-    title: "Črka Š - začetek",
-    gradient: "from-app-blue/20 to-app-purple/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
-    description: "Vadi izgovorjavo črke Š na začetku besede",
-    path: "/govorno-jezikovne-vaje/artikulacija/š",
-    available: true
-  },
-  {
-    id: "vaje-z-zacetek",
-    letter: "Z",
-    title: "Črka Z - začetek",
-    gradient: "from-app-teal/20 to-dragon-green/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
-    description: "Vadi izgovorjavo črke Z na začetku besede",
-    path: "/govorno-jezikovne-vaje/artikulacija/z",
-    available: true
-  },
-  {
-    id: "vaje-ž-zacetek",
-    letter: "Ž",
-    title: "Črka Ž - začetek",
-    gradient: "from-app-purple/20 to-app-blue/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
-    description: "Vadi izgovorjavo črke Ž na začetku besede",
-    path: "/govorno-jezikovne-vaje/artikulacija/ž",
-    available: true
-  },
-  // SREDINA/KONEC - nove kartice
-  {
-    id: "vaje-r-sredina-konec",
-    letter: "R",
-    title: "Črka R - sredina/konec",
-    gradient: "from-app-purple/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Vadi izgovorjavo črke R na sredini in koncu besede",
-    path: "/govorno-jezikovne-vaje/artikulacija/r-sredina-konec",
-    available: true
-  },
-  {
-    id: "vaje-l-sredina-konec",
-    letter: "L",
-    title: "Črka L - sredina/konec",
-    gradient: "from-app-purple/20 to-app-blue/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png",
-    description: "Vadi izgovorjavo črke L na sredini in koncu besede",
-    path: "/govorno-jezikovne-vaje/artikulacija/l-sredina-konec",
-    available: true
-  },
-  {
-    id: "vaje-k-sredina-konec",
-    letter: "K",
-    title: "Črka K - sredina/konec",
-    gradient: "from-app-orange/20 to-app-yellow/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png",
-    description: "Vadi izgovorjavo črke K na sredini in koncu besede",
-    path: "/govorno-jezikovne-vaje/artikulacija/k-sredina-konec",
     available: true
   },
   {
@@ -144,6 +33,17 @@ const artikulacijaLetters = [
     path: "/govorno-jezikovne-vaje/artikulacija/c-sredina-konec",
     available: true
   },
+  // Č
+  {
+    id: "vaje-č-zacetek",
+    letter: "Č",
+    title: "Črka Č - začetek",
+    gradient: "from-app-blue/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
+    description: "Vadi izgovorjavo črke Č na začetku besede",
+    path: "/govorno-jezikovne-vaje/artikulacija/č",
+    available: true
+  },
   {
     id: "vaje-č-sredina-konec",
     letter: "Č",
@@ -152,6 +52,80 @@ const artikulacijaLetters = [
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
     description: "Vadi izgovorjavo črke Č na sredini in koncu besede",
     path: "/govorno-jezikovne-vaje/artikulacija/č-sredina-konec",
+    available: true
+  },
+  // K
+  {
+    id: "vaje-k-zacetek",
+    letter: "K",
+    title: "Črka K - začetek",
+    gradient: "from-app-orange/20 to-app-yellow/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png",
+    description: "Vadi izgovorjavo črke K na začetku besede",
+    path: "/govorno-jezikovne-vaje/artikulacija/k",
+    available: true
+  },
+  {
+    id: "vaje-k-sredina-konec",
+    letter: "K",
+    title: "Črka K - sredina/konec",
+    gradient: "from-app-orange/20 to-app-yellow/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png",
+    description: "Vadi izgovorjavo črke K na sredini in koncu besede",
+    path: "/govorno-jezikovne-vaje/artikulacija/k-sredina-konec",
+    available: true
+  },
+  // L
+  {
+    id: "vaje-l-zacetek",
+    letter: "L",
+    title: "Črka L - začetek",
+    gradient: "from-app-purple/20 to-app-blue/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png",
+    description: "Vadi izgovorjavo črke L na začetku besede",
+    path: "/govorno-jezikovne-vaje/artikulacija/l",
+    available: true
+  },
+  {
+    id: "vaje-l-sredina-konec",
+    letter: "L",
+    title: "Črka L - sredina/konec",
+    gradient: "from-app-purple/20 to-app-blue/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png",
+    description: "Vadi izgovorjavo črke L na sredini in koncu besede",
+    path: "/govorno-jezikovne-vaje/artikulacija/l-sredina-konec",
+    available: true
+  },
+  // R
+  {
+    id: "vaje-r-zacetek",
+    letter: "R",
+    title: "Črka R - začetek",
+    gradient: "from-app-purple/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
+    description: "Vadi izgovorjavo črke R na začetku besede",
+    path: "/govorno-jezikovne-vaje/artikulacija/r",
+    available: true
+  },
+  {
+    id: "vaje-r-sredina-konec",
+    letter: "R",
+    title: "Črka R - sredina/konec",
+    gradient: "from-app-purple/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
+    description: "Vadi izgovorjavo črke R na sredini in koncu besede",
+    path: "/govorno-jezikovne-vaje/artikulacija/r-sredina-konec",
+    available: true
+  },
+  // S
+  {
+    id: "vaje-s-zacetek",
+    letter: "S",
+    title: "Črka S - začetek",
+    gradient: "from-dragon-green/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
+    description: "Vadi izgovorjavo črke S na začetku besede",
+    path: "/govorno-jezikovne-vaje/artikulacija/s",
     available: true
   },
   {
@@ -164,6 +138,17 @@ const artikulacijaLetters = [
     path: "/govorno-jezikovne-vaje/artikulacija/s-sredina-konec",
     available: true
   },
+  // Š
+  {
+    id: "vaje-š-zacetek",
+    letter: "Š",
+    title: "Črka Š - začetek",
+    gradient: "from-app-blue/20 to-app-purple/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
+    description: "Vadi izgovorjavo črke Š na začetku besede",
+    path: "/govorno-jezikovne-vaje/artikulacija/š",
+    available: true
+  },
   {
     id: "vaje-š-sredina-konec",
     letter: "Š",
@@ -174,6 +159,17 @@ const artikulacijaLetters = [
     path: "/govorno-jezikovne-vaje/artikulacija/š-sredina-konec",
     available: true
   },
+  // Z
+  {
+    id: "vaje-z-zacetek",
+    letter: "Z",
+    title: "Črka Z - začetek",
+    gradient: "from-app-teal/20 to-dragon-green/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
+    description: "Vadi izgovorjavo črke Z na začetku besede",
+    path: "/govorno-jezikovne-vaje/artikulacija/z",
+    available: true
+  },
   {
     id: "vaje-z-sredina-konec",
     letter: "Z",
@@ -182,6 +178,17 @@ const artikulacijaLetters = [
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
     description: "Vadi izgovorjavo črke Z na sredini in koncu besede",
     path: "/govorno-jezikovne-vaje/artikulacija/z-sredina-konec",
+    available: true
+  },
+  // Ž
+  {
+    id: "vaje-ž-zacetek",
+    letter: "Ž",
+    title: "Črka Ž - začetek",
+    gradient: "from-app-purple/20 to-app-blue/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
+    description: "Vadi izgovorjavo črke Ž na začetku besede",
+    path: "/govorno-jezikovne-vaje/artikulacija/ž",
     available: true
   },
   {
