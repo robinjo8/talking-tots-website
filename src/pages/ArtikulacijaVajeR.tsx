@@ -35,6 +35,7 @@ export default function ArtikulacijaVajeR() {
   const navigate = useNavigate();
   const [showInstructions, setShowInstructions] = useState(false);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
+  const [showNewGameConfirmation, setShowNewGameConfirmation] = useState(false);
   const [showProgressModal, setShowProgressModal] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -68,8 +69,13 @@ export default function ArtikulacijaVajeR() {
 
   const handleNewGame = () => {
     setMenuOpen(false);
+    setShowNewGameConfirmation(true);
+  };
+
+  const handleConfirmNewGame = () => {
     resetWheel();
     resetProgress();
+    setShowNewGameConfirmation(false);
   };
 
   const handleInstructions = () => {
@@ -208,6 +214,18 @@ export default function ArtikulacijaVajeR() {
         cancelText="Ne"
         onConfirm={handleConfirmExit}
         onCancel={() => setShowExitConfirmation(false)}
+      />
+
+      {/* New Game Confirmation Dialog */}
+      <ConfirmDialog
+        open={showNewGameConfirmation}
+        onOpenChange={setShowNewGameConfirmation}
+        title="Nova igra"
+        description="Ali res želiš začeti novo igro? Ves napredek bo ponastavljen na začetno stanje."
+        confirmText="Da"
+        cancelText="Ne"
+        onConfirm={handleConfirmNewGame}
+        onCancel={() => setShowNewGameConfirmation(false)}
       />
     </div>
   );
