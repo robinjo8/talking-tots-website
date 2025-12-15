@@ -40,8 +40,17 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordingDataRef = useRef<Blob[]>([]);
+  const shouldStopRef = useRef(false);
 
   const canClaimStar = pronunciationCount >= 3;
+
+  // Watch for recording time reaching 0 and stop recording
+  useEffect(() => {
+    if (isRecording && recordingTimeLeft === 0 && !shouldStopRef.current) {
+      shouldStopRef.current = true;
+      stopRecordingNow();
+    }
+  }, [recordingTimeLeft, isRecording]);
 
   // Auto-play audio when dialog opens
   useEffect(() => {
@@ -55,6 +64,7 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
       playAudio(audioUrl);
       setJustRecorded(false);
       setStarClaimed(false);
+      shouldStopRef.current = false;
     }
   }, [isOpen, completedImage, playAudio]);
 
@@ -108,8 +118,7 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
       countdownRef.current = setInterval(() => {
         setRecordingTimeLeft(prev => {
           if (prev <= 1) {
-            stopRecording();
-            return 0;
+            return 0; // Just set to 0, useEffect will handle stopRecording
           }
           return prev - 1;
         });
@@ -129,7 +138,7 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
     }
   };
 
-  const stopRecording = () => {
+  const stopRecordingNow = () => {
     if (countdownRef.current) {
       clearInterval(countdownRef.current);
       countdownRef.current = null;
@@ -148,7 +157,7 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
     setIsRecording(false);
     setRecordingTimeLeft(3);
     
-    // Immediately update UI state - don't wait for async onstop callback
+    // Immediately update UI state
     setJustRecorded(true);
     onRecordComplete();
   };
