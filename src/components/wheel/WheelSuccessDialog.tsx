@@ -45,6 +45,9 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
 
   // Avoid stale-closure when stopping recording from setInterval.
   const stopRecordingRef = useRef<() => void>(() => {});
+  
+  // Track previous isOpen to detect dialog opening (false -> true)
+  const prevIsOpenRef = useRef(false);
 
   const canClaimStar = pronunciationCount >= 3;
 
@@ -103,9 +106,13 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
     stopRecordingRef.current = stopRecordingNow;
   }, [stopRecordingNow]);
 
-  // Auto-play audio when dialog opens
+  // Auto-play audio ONLY when dialog OPENS (false -> true)
+  // This prevents resetting justRecorded when completedImage prop changes due to pronunciationCount updates
   useEffect(() => {
-    if (isOpen && completedImage) {
+    const dialogJustOpened = isOpen && !prevIsOpenRef.current;
+    prevIsOpenRef.current = isOpen;
+    
+    if (dialogJustOpened && completedImage) {
       const normalizedWord = completedImage.word
         .toLowerCase()
         .normalize('NFD')
@@ -114,7 +121,7 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
       const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
       playAudio(audioUrl);
 
-      // Important: each time the dialog opens for a word, user must be able to record again.
+      // Reset states ONLY when dialog first opens, not on every completedImage change
       setJustRecorded(false);
       setStarClaimed(false);
     }
