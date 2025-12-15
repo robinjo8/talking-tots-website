@@ -156,6 +156,14 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
   };
 
   const startRecording = async () => {
+    console.log('[WheelSuccessDialog] startRecording', {
+      isOpen,
+      word: completedImage?.word,
+      justRecorded,
+      isRecording,
+      pronunciationCount,
+    });
+
     if (justRecorded) return; // Prevent multiple recordings in same dialog session
 
     try {
@@ -176,6 +184,10 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
       };
 
       recorder.onstop = async () => {
+        console.log('[WheelSuccessDialog] recorder.onstop', {
+          chunks: recordingDataRef.current.length,
+          word: completedImage?.word,
+        });
         if (recordingDataRef.current.length > 0) {
           await saveRecording();
         }
@@ -188,7 +200,9 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
       countdownRef.current = setInterval(() => {
         setRecordingTimeLeft((prev) => {
           const next = prev - 1;
+          console.log('[WheelSuccessDialog] countdown tick', { prev, next });
           if (next <= 0) {
+            console.log('[WheelSuccessDialog] countdown reached 0 -> stopping');
             // Stop exactly once and with the latest function (no stale state).
             cleanupCountdown();
             setTimeout(() => stopRecordingRef.current(), 0);
@@ -217,6 +231,7 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
   };
 
   const handleClaimStar = () => {
+    console.log('[WheelSuccessDialog] claim star', { word: completedImage?.word, pronunciationCount });
     setStarClaimed(true);
     onStarClaimed();
     toast({
@@ -239,6 +254,7 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
   };
 
   const handleImageClick = () => {
+    console.log('[WheelSuccessDialog] image click', { isRecording, justRecorded });
     if (!isRecording && !justRecorded) {
       startRecording();
     }
