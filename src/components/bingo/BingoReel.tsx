@@ -104,21 +104,21 @@ export const BingoReel: React.FC<BingoReelProps> = ({
   }, [isSpinning, drawnWord]);
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-2">
       {/* Reel container */}
-      <div className="relative w-full max-w-md h-24 md:h-32 overflow-hidden bg-white/30 rounded-xl backdrop-blur-sm border-4 border-white/50">
+      <div className="relative w-full max-w-[320px] md:max-w-[400px] h-16 md:h-20 overflow-hidden bg-white/30 rounded-xl backdrop-blur-sm border-2 border-white/50">
         {/* Reel items */}
         <div 
-          className="flex items-center justify-center h-full gap-2 px-2 transition-transform duration-100"
+          className="flex items-center justify-center h-full gap-1 px-1 transition-transform duration-100"
           style={{ transform: `translateX(${offset}px)` }}
         >
           {displayedWords.map((word, index) => (
             <div
               key={`${word.word}-${index}`}
               className={`
-                flex-shrink-0 w-16 h-16 md:w-24 md:h-24 rounded-lg overflow-hidden
+                flex-shrink-0 w-12 h-12 md:w-16 md:h-16 rounded-lg overflow-hidden
                 transition-all duration-200
-                ${index === 2 && !isSpinning ? 'ring-4 ring-yellow-400 scale-110' : 'opacity-70'}
+                ${index === 2 && !isSpinning ? 'ring-2 ring-yellow-400 scale-110' : 'opacity-70'}
               `}
             >
               <img
@@ -131,25 +131,26 @@ export const BingoReel: React.FC<BingoReelProps> = ({
         </div>
         
         {/* Center indicator */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-yellow-400" />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-b-8 border-transparent border-b-yellow-400" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-yellow-400" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-yellow-400" />
       </div>
       
-      {/* Drawn word label */}
-      {drawnWord && !isSpinning && (
-        <div className="text-xl md:text-2xl font-bold text-white drop-shadow-lg animate-bounce">
-          Najdi: {drawnWord.word}
-        </div>
-      )}
-      
-      {/* Spin button */}
-      <Button
-        onClick={onSpin}
-        disabled={isSpinning || disabled}
-        className="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-bold text-lg md:text-xl px-8 py-4 h-auto rounded-full shadow-lg"
-      >
-        {isSpinning ? '🎰 VRTENJE...' : '🎰 ZAVRTI'}
-      </Button>
+      {/* Drawn word label and spin button in row */}
+      <div className="flex items-center gap-4">
+        <Button
+          onClick={onSpin}
+          disabled={isSpinning || disabled}
+          className="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-bold text-sm md:text-base px-4 py-2 h-auto rounded-full shadow-lg"
+        >
+          {isSpinning ? '🎰 VRTENJE...' : '🎰 ZAVRTI'}
+        </Button>
+        
+        {drawnWord && !isSpinning && (
+          <div className="text-base md:text-lg font-bold text-white drop-shadow-lg">
+            Najdi: <span className="text-yellow-300">{drawnWord.word}</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -75,7 +75,7 @@ export default function ArtikulacijaVajeRSredinaKonec() {
 
   return (
     <div 
-      className="fixed inset-0 overflow-auto select-none"
+      className="fixed inset-0 overflow-hidden select-none"
       style={{
         backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.png)',
         backgroundSize: 'cover',
@@ -83,15 +83,16 @@ export default function ArtikulacijaVajeRSredinaKonec() {
         backgroundRepeat: 'no-repeat'
       }}
     >
-      {/* Main content */}
-      <div className="min-h-full flex flex-col items-center p-4 pb-24 pt-8 gap-4">
-        <h1 className="text-2xl md:text-4xl font-bold text-white text-center drop-shadow-lg">
-          BINGO - R
-        </h1>
-        
-        {/* Progress indicator */}
-        <div className="text-white text-lg font-medium bg-white/20 px-4 py-2 rounded-full">
-          {completedCount}/16 polj
+      {/* Main content - flex layout to fit viewport */}
+      <div className="h-full flex flex-col items-center justify-center p-2 md:p-4 gap-1 md:gap-2">
+        {/* Header row with title and progress */}
+        <div className="flex items-center gap-4">
+          <h1 className="text-xl md:text-2xl font-bold text-white text-center drop-shadow-lg">
+            BINGO - R
+          </h1>
+          <div className="text-white text-sm md:text-base font-medium bg-white/20 px-3 py-1 rounded-full">
+            {completedCount}/16
+          </div>
         </div>
         
         {/* Reel */}
@@ -113,7 +114,7 @@ export default function ArtikulacijaVajeRSredinaKonec() {
         
         {/* Game complete message */}
         {gameComplete && !showPopup && (
-          <div className="bg-yellow-400 text-black font-bold text-xl px-6 py-3 rounded-full animate-bounce">
+          <div className="bg-yellow-400 text-black font-bold text-sm md:text-lg px-4 py-2 rounded-full animate-bounce">
             🎉 BRAVO! Zaključil si Bingo! 🎉
           </div>
         )}
