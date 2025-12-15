@@ -48,6 +48,9 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
   
   // Track previous isOpen to detect dialog opening (false -> true)
   const prevIsOpenRef = useRef(false);
+  
+  // Store pronunciation count when dialog opens to avoid double counting
+  const initialPronunciationCountRef = useRef(pronunciationCount);
 
   const canClaimStar = pronunciationCount >= 3;
 
@@ -113,6 +116,9 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
     prevIsOpenRef.current = isOpen;
     
     if (dialogJustOpened && completedImage) {
+      // Store the pronunciation count at the moment dialog opens
+      initialPronunciationCountRef.current = pronunciationCount;
+      
       const normalizedWord = completedImage.word
         .toLowerCase()
         .normalize('NFD')
@@ -281,8 +287,10 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
 
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${completedImage.filename}`;
 
-  // Display count includes the just-recorded one if applicable
-  const displayCount = justRecorded ? Math.min(pronunciationCount + 1, 3) : pronunciationCount;
+  // Display count uses stored initial count + 1 when just recorded to avoid double counting
+  const displayCount = justRecorded 
+    ? Math.min(initialPronunciationCountRef.current + 1, 3) 
+    : pronunciationCount;
   const showClaimButton = displayCount >= 3;
 
   return (
@@ -341,7 +349,7 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
 
             {/* Progress circles and count */}
             <div className="flex flex-col items-center space-y-2">
-              <ProgressCircles count={displayCount} size="lg" animate={justRecorded} />
+              <ProgressCircles count={displayCount} size="lg" animate={false} />
               <span className="text-sm text-muted-foreground">
                 Izgovoril si {displayCount}/3 krat
                 {!showClaimButton && ` (še ${3 - displayCount}x za zvezdico)`}
