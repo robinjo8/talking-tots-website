@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Volume2, Mic, Star } from 'lucide-react';
@@ -27,23 +27,69 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
   completedImage,
   pronunciationCount,
   onRecordComplete,
-  onStarClaimed
+  onStarClaimed,
 }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTimeLeft, setRecordingTimeLeft] = useState(3);
   const [starClaimed, setStarClaimed] = useState(false);
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
   const [justRecorded, setJustRecorded] = useState(false);
+
   const { playAudio } = useAudioPlayback();
   const { toast } = useToast();
   const { user, selectedChild } = useAuth();
+
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordingDataRef = useRef<Blob[]>([]);
-  
+
+  // Avoid stale-closure when stopping recording from setInterval.
+  const stopRecordingRef = useRef<() => void>(() => {});
 
   const canClaimStar = pronunciationCount >= 3;
 
+  const cleanupCountdown = useCallback(() => {
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+      countdownRef.current = null;
+    }
+  }, []);
+
+  const cleanupStream = useCallback(() => {
+    if (audioStream) {
+      audioStream.getTracks().forEach((track) => track.stop());
+      setAudioStream(null);
+    }
+  }, [audioStream]);
+
+  const stopRecordingNow = useCallback(() => {
+    // Always run cleanup (even if state says we're already stopped) – this mirrors
+    // the reliable behavior you see when "VZEMI ZVEZDICO" appears.
+    cleanupCountdown();
+
+    const recorder = mediaRecorderRef.current;
+    if (recorder && recorder.state === 'recording') {
+      try {
+        recorder.stop();
+      } catch {
+        // ignore
+      }
+    }
+
+    cleanupStream();
+
+    setIsRecording(false);
+    setRecordingTimeLeft(3);
+
+    // This is the key UI state: after EVERY pronunciation in this dialog,
+    // we gray out the image and show "NADALJUJ".
+    setJustRecorded(true);
+    onRecordComplete();
+  }, [cleanupCountdown, cleanupStream, onRecordComplete]);
+
+  useEffect(() => {
+    stopRecordingRef.current = stopRecordingNow;
+  }, [stopRecordingNow]);
 
   // Auto-play audio when dialog opens
   useEffect(() => {
@@ -55,6 +101,8 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
       const audioFilename = completedImage.audio || `${normalizedWord}.m4a`;
       const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
       playAudio(audioUrl);
+
+      // Important: each time the dialog opens for a word, user must be able to record again.
       setJustRecorded(false);
       setStarClaimed(false);
     }
@@ -66,103 +114,12 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
       setIsRecording(false);
       setRecordingTimeLeft(3);
       setJustRecorded(false);
-      if (countdownRef.current) {
-        clearInterval(countdownRef.current);
-        countdownRef.current = null;
-      }
-      if (audioStream) {
-        audioStream.getTracks().forEach(track => track.stop());
-        setAudioStream(null);
-      }
+      cleanupCountdown();
+      cleanupStream();
       mediaRecorderRef.current = null;
       recordingDataRef.current = [];
     }
-  }, [isOpen, audioStream]);
-
-  const startRecording = async () => {
-    if (justRecorded) return; // Prevent multiple recordings in same session
-    
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      setAudioStream(stream);
-
-      const recorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = recorder;
-      recordingDataRef.current = [];
-
-      recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          recordingDataRef.current.push(event.data);
-        }
-      };
-
-      recorder.onstop = async () => {
-        // Only save recording here - UI state updates happen in stopRecording
-        if (recordingDataRef.current.length > 0) {
-          await saveRecording();
-        }
-      };
-
-      recorder.start();
-      setIsRecording(true);
-      setRecordingTimeLeft(3);
-
-      countdownRef.current = setInterval(() => {
-        setRecordingTimeLeft(prev => {
-          const newValue = prev - 1;
-          if (newValue <= 0) {
-            // Dejansko ustavi snemanje in posodobi UI
-            setTimeout(() => {
-              stopRecordingNow();
-            }, 0);
-            return 0;
-          }
-          return newValue;
-        });
-      }, 1000);
-
-      toast({
-        title: "Snemanje se je začelo",
-        description: "Povej besedo glasno in razločno!",
-      });
-    } catch (error) {
-      console.error('Error starting recording:', error);
-      toast({
-        title: "Napaka",
-        description: "Ni mogoče dostopati do mikrofona.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const stopRecordingNow = () => {
-    // Če je snemanje že ustavljeno in ni aktivnega toka ali snemalnika, ne delaj nič
-    if (!isRecording && !audioStream && !mediaRecorderRef.current) {
-      return;
-    }
-
-    if (countdownRef.current) {
-      clearInterval(countdownRef.current);
-      countdownRef.current = null;
-    }
-
-    const recorder = mediaRecorderRef.current;
-    if (recorder && recorder.state === 'recording') {
-      recorder.stop();
-    }
-
-    if (audioStream) {
-      audioStream.getTracks().forEach(track => track.stop());
-      setAudioStream(null);
-    }
-
-    setIsRecording(false);
-    setRecordingTimeLeft(3);
-    
-    // Takoj posodobi UI stanje
-    setJustRecorded(true);
-    onRecordComplete();
-  };
+  }, [isOpen, cleanupCountdown, cleanupStream]);
 
   const saveRecording = async () => {
     if (recordingDataRef.current.length === 0) return;
@@ -188,14 +145,71 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
         .upload(userSpecificPath, audioBlob, { contentType: 'audio/webm' });
 
       toast({
-        title: "Odlično!",
-        description: "Tvoja izgovorjava je bila shranjena.",
+        title: 'Odlično!',
+        description: 'Tvoja izgovorjava je bila shranjena.',
       });
     } catch (error) {
       console.error('Error in saveRecording:', error);
     }
 
     recordingDataRef.current = [];
+  };
+
+  const startRecording = async () => {
+    if (justRecorded) return; // Prevent multiple recordings in same dialog session
+
+    try {
+      // Reset any prior remnants
+      cleanupCountdown();
+      recordingDataRef.current = [];
+
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      setAudioStream(stream);
+
+      const recorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = recorder;
+
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          recordingDataRef.current.push(event.data);
+        }
+      };
+
+      recorder.onstop = async () => {
+        if (recordingDataRef.current.length > 0) {
+          await saveRecording();
+        }
+      };
+
+      recorder.start();
+      setIsRecording(true);
+      setRecordingTimeLeft(3);
+
+      countdownRef.current = setInterval(() => {
+        setRecordingTimeLeft((prev) => {
+          const next = prev - 1;
+          if (next <= 0) {
+            // Stop exactly once and with the latest function (no stale state).
+            cleanupCountdown();
+            setTimeout(() => stopRecordingRef.current(), 0);
+            return 0;
+          }
+          return next;
+        });
+      }, 1000);
+
+      toast({
+        title: 'Snemanje se je začelo',
+        description: 'Povej besedo glasno in razločno!',
+      });
+    } catch (error) {
+      console.error('Error starting recording:', error);
+      toast({
+        title: 'Napaka',
+        description: 'Ni mogoče dostopati do mikrofona.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleClose = () => {
@@ -206,8 +220,8 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
     setStarClaimed(true);
     onStarClaimed();
     toast({
-      title: "Čestitke! 🎉",
-      description: "Osvojil si to besedo in prejel zvezdico! ⭐"
+      title: 'Čestitke! 🎉',
+      description: 'Osvojil si to besedo in prejel zvezdico! ⭐',
     });
     setTimeout(() => {
       onOpenChange(false);
@@ -244,19 +258,15 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
             <h2 className="text-2xl font-bold text-dragon-green text-center">
               {showClaimButton ? '🎉 Čestitke! 🎉' : 'Odlično!'}
             </h2>
-            
+
             {!showClaimButton && (
-              <p className="text-sm text-black text-center">
-                KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO
-              </p>
+              <p className="text-sm text-black text-center">KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO</p>
             )}
-            
+
             <div className="flex justify-center">
-              <div 
+              <div
                 className={`flex flex-col items-center space-y-2 cursor-pointer transition-all ${
-                  (justRecorded || showClaimButton)
-                    ? 'opacity-70 cursor-not-allowed grayscale'
-                    : 'hover:scale-105'
+                  justRecorded || showClaimButton ? 'opacity-70 cursor-not-allowed grayscale' : 'hover:scale-105'
                 }`}
                 onClick={handleImageClick}
               >
@@ -265,12 +275,16 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
                     src={imageUrl}
                     alt={completedImage.word}
                     className={`w-32 h-32 object-cover rounded-lg border-2 ${
-                      showClaimButton ? 'border-yellow-400' :
-                      justRecorded ? 'border-gray-400' : 
-                      isRecording ? 'border-red-500' : 'border-dragon-green'
+                      showClaimButton
+                        ? 'border-yellow-400'
+                        : justRecorded
+                          ? 'border-gray-400'
+                          : isRecording
+                            ? 'border-red-500'
+                            : 'border-dragon-green'
                     }`}
                   />
-                  
+
                   {isRecording && (
                     <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-lg">
                       <div className="bg-red-500 text-white rounded-full w-10 h-10 flex items-center justify-center">
@@ -278,17 +292,15 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
                       </div>
                     </div>
                   )}
-                  
+
                   {isRecording && (
                     <div className="absolute -top-2 -right-2 bg-red-500 text-white text-sm rounded-full w-8 h-8 flex items-center justify-center font-bold">
                       {recordingTimeLeft}
                     </div>
                   )}
                 </div>
-                
-                <span className="text-lg font-medium text-center text-black">
-                  {completedImage.word.toUpperCase()}
-                </span>
+
+                <span className="text-lg font-medium text-center text-black">{completedImage.word.toUpperCase()}</span>
               </div>
             </div>
 
@@ -315,7 +327,7 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
             {/* Action buttons */}
             <div className="flex justify-center gap-3">
               {showClaimButton ? (
-                <Button 
+                <Button
                   onClick={handleClaimStar}
                   className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 px-8"
                   disabled={starClaimed}
@@ -324,10 +336,7 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
                   VZEMI ZVEZDICO
                 </Button>
               ) : justRecorded ? (
-                <Button 
-                  onClick={() => onOpenChange(false)}
-                  className="bg-dragon-green hover:bg-dragon-green/90 text-white"
-                >
+                <Button onClick={() => onOpenChange(false)} className="bg-dragon-green hover:bg-dragon-green/90 text-white">
                   NADALJUJ
                 </Button>
               ) : null}
