@@ -63,6 +63,11 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
   }, [audioStream]);
 
   const stopRecordingNow = useCallback(() => {
+    console.log('[WheelSuccessDialog] stopRecordingNow', {
+      word: completedImage?.word,
+      pronunciationCount,
+    });
+
     // Always run cleanup (even if state says we're already stopped) – this mirrors
     // the reliable behavior you see when "VZEMI ZVEZDICO" appears.
     cleanupCountdown();
@@ -83,9 +88,16 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
 
     // This is the key UI state: after EVERY pronunciation in this dialog,
     // we gray out the image and show "NADALJUJ".
+    console.log('[WheelSuccessDialog] setJustRecorded(true)');
     setJustRecorded(true);
-    onRecordComplete();
-  }, [cleanupCountdown, cleanupStream, onRecordComplete]);
+
+    // Defer parent progress update so this component re-renders once with justRecorded=true
+    // before any parent-driven prop changes can remount/reset the dialog.
+    setTimeout(() => {
+      console.log('[WheelSuccessDialog] onRecordComplete()');
+      onRecordComplete();
+    }, 0);
+  }, [cleanupCountdown, cleanupStream, onRecordComplete, completedImage?.word, pronunciationCount]);
 
   useEffect(() => {
     stopRecordingRef.current = stopRecordingNow;
