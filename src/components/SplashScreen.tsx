@@ -56,6 +56,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
                 x: [0, star.x],
               }}
               transition={{
+                type: "tween",
                 delay: star.delay,
                 duration: star.duration,
                 repeat: Infinity,
@@ -80,7 +81,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
                 animate={{ 
                   y: 0, 
                   opacity: 1, 
-                  scale: [0, 1.2, 1],
+                  scale: 1,
                 }}
                 transition={{
                   delay: 0.2 + index * 0.1,
@@ -148,6 +149,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
                 scale: [0.8, 1.2, 0.8],
               }}
               transition={{
+                type: "tween",
                 delay: 1.5,
                 duration: 2,
                 repeat: Infinity,
