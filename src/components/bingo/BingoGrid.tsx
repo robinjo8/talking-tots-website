@@ -24,24 +24,24 @@ export const BingoGrid: React.FC<BingoGridProps> = ({
   };
 
   return (
-    <div className="grid grid-cols-4 gap-2 md:gap-3 p-2 md:p-4 bg-white/20 rounded-xl backdrop-blur-sm">
+    <div className="grid grid-cols-4 gap-1 md:gap-2 p-2 bg-white/20 rounded-xl backdrop-blur-sm max-w-[320px] md:max-w-[400px]">
       {grid.map((cell, index) => (
         <button
           key={index}
           onClick={() => onCellClick(index)}
           disabled={cell.isCompleted}
           className={`
-            relative aspect-square rounded-lg overflow-hidden transition-all duration-300
+            relative w-[72px] h-[72px] md:w-[90px] md:h-[90px] rounded-lg overflow-hidden transition-all duration-300
             ${cell.isCompleted 
               ? 'opacity-60 cursor-not-allowed' 
               : 'hover:scale-105 cursor-pointer'
             }
             ${cell.isClicked 
-              ? 'ring-4 ring-yellow-400 scale-105' 
+              ? 'ring-2 ring-yellow-400 scale-105' 
               : ''
             }
             ${shouldPulse(cell) 
-              ? 'animate-pulse ring-4 ring-orange-400' 
+              ? 'animate-pulse ring-2 ring-orange-400' 
               : ''
             }
           `}
@@ -55,8 +55,8 @@ export const BingoGrid: React.FC<BingoGridProps> = ({
           {/* Completed overlay */}
           {cell.isCompleted && (
             <div className="absolute inset-0 bg-green-500/50 flex items-center justify-center">
-              <div className="bg-white rounded-full p-1 md:p-2">
-                <Check className="w-4 h-4 md:w-6 md:h-6 text-green-600" />
+              <div className="bg-white rounded-full p-1">
+                <Check className="w-3 h-3 md:w-4 md:h-4 text-green-600" />
               </div>
             </div>
           )}
@@ -64,8 +64,8 @@ export const BingoGrid: React.FC<BingoGridProps> = ({
           {/* Clicked overlay */}
           {cell.isClicked && !cell.isCompleted && (
             <div className="absolute inset-0 bg-yellow-400/30 flex items-center justify-center">
-              <div className="bg-yellow-400 rounded-full p-1 md:p-2">
-                <Check className="w-4 h-4 md:w-6 md:h-6 text-white" />
+              <div className="bg-yellow-400 rounded-full p-1">
+                <Check className="w-3 h-3 md:w-4 md:h-4 text-white" />
               </div>
             </div>
           )}
