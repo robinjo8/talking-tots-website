@@ -3,29 +3,23 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { 
-  Target,
-  Gamepad2,
-  Video,
-  BookOpen,
-  MessageCircle,
-  TrendingUp,
-  FileText
-} from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 
 export function PricingSection() {
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly'>('yearly');
+  const [includeGovornoUcniNacrt, setIncludeGovornoUcniNacrt] = useState(false);
 
   const features = [
-    { icon: <Target className="h-4 w-4 text-dragon-green" />, text: "Napredno testiranje izgovorjave" },
-    { icon: <Gamepad2 className="h-4 w-4 text-app-purple" />, text: "Dostop do govornih vaj in iger" },
-    { icon: <Video className="h-4 w-4 text-app-teal" />, text: "Video navodila logopeda" },
-    { icon: <BookOpen className="h-4 w-4 text-app-orange" />, text: "Logopedski nasveti za starše" },
-    { icon: <MessageCircle className="h-4 w-4 text-app-blue" />, text: "Pogovor s pametnim AI asistentom" },
-    { icon: <TrendingUp className="h-4 w-4 text-dragon-green" />, text: "Sledenje napredku otroka" },
-    { icon: <FileText className="h-4 w-4 text-app-purple" />, text: "Prilagojen govorni načrt" }
+    "Preverjanje izgovorjave",
+    "Dostop do govornih vaj in iger",
+    "Video navodila logopeda",
+    "Logopedski nasveti za starše",
+    "Sledenje napredku otroka",
+    "Pogovor s pametnim AI asistentom"
   ];
+
+  const addonPrice = selectedPlan === 'monthly' ? 49 : 29;
 
   return (
     <section
@@ -42,14 +36,14 @@ export function PricingSection() {
       <div className="max-w-2xl mx-auto">
         {/* Plan Toggle */}
         <Tabs value={selectedPlan} onValueChange={(value) => setSelectedPlan(value as 'monthly' | 'yearly')} className="w-full mb-8">
-          <TabsList className="grid w-full grid-cols-2 bg-gray-100 dark:bg-gray-800">
-            <TabsTrigger value="monthly" className="data-[state=active]:bg-white data-[state=active]:text-gray-900">
-              Plačuj mesečno
+          <TabsList className="grid w-full grid-cols-2 bg-gray-100 dark:bg-gray-800 h-12">
+            <TabsTrigger value="monthly" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-base">
+              Mesečno
             </TabsTrigger>
-            <TabsTrigger value="yearly" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 relative">
-              Prihrani letno
+            <TabsTrigger value="yearly" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 relative text-base">
+              Letno
               <span className="absolute -top-2 -right-2 bg-app-orange text-white text-xs px-2 py-0.5 rounded-full font-medium">
-                -54%
+                -53%
               </span>
             </TabsTrigger>
           </TabsList>
@@ -62,10 +56,16 @@ export function PricingSection() {
               )}
             >
               <CardContent className="p-8">
-                <div className="text-center mb-6">
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                  <span className="bg-gray-500 text-white text-sm px-4 py-1 rounded-full font-medium whitespace-nowrap">
+                    Fleksibilno
+                  </span>
+                </div>
+                
+                <div className="text-center mb-6 mt-2">
                   <h3 className="text-2xl font-bold text-app-blue mb-2">Mesečna naročnina</h3>
                   <div className="flex items-baseline justify-center gap-1 mb-2">
-                    <span className="text-4xl font-bold">22 €</span>
+                    <span className="text-4xl font-bold">15 €</span>
                     <span className="text-gray-500">/mesec</span>
                   </div>
                   <p className="text-sm text-gray-600">zaračunano mesečno</p>
@@ -77,13 +77,30 @@ export function PricingSection() {
                   </p>
                 </div>
 
-                <div className="space-y-3 mb-8">
+                <div className="space-y-3 mb-6">
                   {features.map((feature, index) => (
                     <div key={index} className="flex items-center gap-3 text-sm">
-                      {feature.icon}
-                      <span>{feature.text}</span>
+                      <div className="h-2 w-2 rounded-full bg-dragon-green flex-shrink-0" />
+                      <span>{feature}</span>
                     </div>
                   ))}
+                </div>
+
+                {/* Optional Add-on */}
+                <div className="border-t border-gray-200 pt-4 mb-6">
+                  <div className="flex items-start gap-3">
+                    <Checkbox 
+                      id="addon-monthly"
+                      checked={includeGovornoUcniNacrt}
+                      onCheckedChange={(checked) => setIncludeGovornoUcniNacrt(checked as boolean)}
+                      className="mt-0.5"
+                    />
+                    <label htmlFor="addon-monthly" className="text-sm cursor-pointer">
+                      <span className="font-medium">Prilagojen govorno učni načrt</span>
+                      <span className="text-app-orange font-semibold ml-2">+{addonPrice} €</span>
+                      <p className="text-gray-500 text-xs mt-1">Dodatna storitev po meri vašega otroka</p>
+                    </label>
+                  </div>
                 </div>
 
                 <Button className="w-full bg-app-blue hover:bg-app-blue/90 text-white h-12 text-lg font-semibold">
@@ -109,9 +126,13 @@ export function PricingSection() {
                 
                 <div className="text-center mb-6 mt-2">
                   <h3 className="text-2xl font-bold text-dragon-green mb-2">Letna naročnina</h3>
-                  <div className="flex items-baseline justify-center gap-1 mb-2">
-                    <span className="text-4xl font-bold">10 €</span>
+                  <div className="flex items-baseline justify-center gap-2 mb-2">
+                    <span className="text-2xl text-gray-400 line-through">15 €</span>
+                    <span className="text-4xl font-bold">7 €</span>
                     <span className="text-gray-500">/mesec</span>
+                    <span className="bg-dragon-green/10 text-dragon-green text-sm px-2 py-0.5 rounded-full font-semibold">
+                      -53%
+                    </span>
                   </div>
                   <p className="text-sm text-gray-600">zaračunano letno</p>
                 </div>
@@ -122,13 +143,30 @@ export function PricingSection() {
                   </p>
                 </div>
 
-                <div className="space-y-3 mb-8">
+                <div className="space-y-3 mb-6">
                   {features.map((feature, index) => (
                     <div key={index} className="flex items-center gap-3 text-sm">
-                      {feature.icon}
-                      <span>{feature.text}</span>
+                      <div className="h-2 w-2 rounded-full bg-dragon-green flex-shrink-0" />
+                      <span>{feature}</span>
                     </div>
                   ))}
+                </div>
+
+                {/* Optional Add-on */}
+                <div className="border-t border-gray-200 pt-4 mb-6">
+                  <div className="flex items-start gap-3">
+                    <Checkbox 
+                      id="addon-yearly"
+                      checked={includeGovornoUcniNacrt}
+                      onCheckedChange={(checked) => setIncludeGovornoUcniNacrt(checked as boolean)}
+                      className="mt-0.5"
+                    />
+                    <label htmlFor="addon-yearly" className="text-sm cursor-pointer">
+                      <span className="font-medium">Prilagojen govorno učni načrt</span>
+                      <span className="text-app-orange font-semibold ml-2">+{addonPrice} €</span>
+                      <p className="text-gray-500 text-xs mt-1">Dodatna storitev po meri vašega otroka</p>
+                    </label>
+                  </div>
                 </div>
 
                 <Button className="w-full bg-dragon-green hover:bg-dragon-green/90 text-white h-12 text-lg font-semibold">
