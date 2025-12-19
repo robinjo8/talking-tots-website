@@ -15,8 +15,10 @@ export function PricingSection() {
     "Dostop do govornih vaj in iger",
     "Video navodila logopeda",
     "Logopedski nasveti za starše",
+    "Poročila o napredku",
     "Sledenje napredku otroka",
-    "Pogovor s pametnim AI asistentom"
+    "Pogovor s pametnim AI asistentom",
+    "Dostop do vseh novih vsebin"
   ];
 
   const addonPrice = selectedPlan === 'monthly' ? 49 : 29;
@@ -57,7 +59,7 @@ export function PricingSection() {
             >
               <CardContent className="p-8">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-gray-500 text-white text-sm px-4 py-1 rounded-full font-medium whitespace-nowrap">
+                  <span className="bg-app-blue text-white text-sm px-4 py-1 rounded-full font-medium whitespace-nowrap">
                     Fleksibilno
                   </span>
                 </div>
@@ -77,7 +79,7 @@ export function PricingSection() {
                   </p>
                 </div>
 
-                <div className="space-y-3 mb-6">
+                <div className="space-y-3 mb-6 flex flex-col items-center">
                   {features.map((feature, index) => (
                     <div key={index} className="flex items-center gap-3 text-sm">
                       <div className="h-2 w-2 rounded-full bg-dragon-green flex-shrink-0" />
@@ -98,7 +100,7 @@ export function PricingSection() {
                     <label htmlFor="addon-monthly" className="text-sm cursor-pointer">
                       <span className="font-medium">Prilagojen govorno učni načrt</span>
                       <span className="text-app-orange font-semibold ml-2">+{addonPrice} €</span>
-                      <p className="text-gray-500 text-xs mt-1">Dodatna storitev po meri vašega otroka</p>
+                      <p className="text-gray-500 text-xs mt-1">Na podlagi otrokove starosti in govorne težave pripravimo osebno prilagojen načrt vaj in iger. Otrok vadi točno tisto, kar potrebuje, staršem pa ponuja jasen pregled in spremljanje razvoja.</p>
                     </label>
                   </div>
                 </div>
@@ -143,7 +145,7 @@ export function PricingSection() {
                   </p>
                 </div>
 
-                <div className="space-y-3 mb-6">
+                <div className="space-y-3 mb-6 flex flex-col items-center">
                   {features.map((feature, index) => (
                     <div key={index} className="flex items-center gap-3 text-sm">
                       <div className="h-2 w-2 rounded-full bg-dragon-green flex-shrink-0" />
@@ -164,7 +166,7 @@ export function PricingSection() {
                     <label htmlFor="addon-yearly" className="text-sm cursor-pointer">
                       <span className="font-medium">Prilagojen govorno učni načrt</span>
                       <span className="text-app-orange font-semibold ml-2">+{addonPrice} €</span>
-                      <p className="text-gray-500 text-xs mt-1">Dodatna storitev po meri vašega otroka</p>
+                      <p className="text-gray-500 text-xs mt-1">Na podlagi otrokove starosti in govorne težave pripravimo osebno prilagojen načrt vaj in iger. Otrok vadi točno tisto, kar potrebuje, staršem pa ponuja jasen pregled in spremljanje razvoja.</p>
                     </label>
                   </div>
                 </div>
