@@ -11,12 +11,12 @@ export const TargetAudienceSection = () => {
   }, {
     title: "DRUŽINAM",
     subtitle: "Prednosti za družine:",
-    benefits: ["Hitrejši in opaznejši napredek pri govornem razvoju.", "Otroci z veseljem izvajajo vaje v obliki zabavnih iger.", "Izboljša čustveno stabilnost in socialne veščine, kar zmanjšuje verjetnost pojava tesnobe in nizke samopodobe.", "Večja povezanost staršev in otrok preko skupnih aktivnosti.", "Konstantna strokovna podpora ter praktični nasveti za starše."],
+    benefits: ["Hitrejši in opaznejši napredek pri govornem razvoju.", "Otroci z veseljem izvajajo vaje v obliki zabavnih iger.", "Izboljša samopodobo in socialne veščine.", "Večja povezanost staršev in otrok preko skupnih aktivnosti.", "Konstantna strokovna podpora ter praktični nasveti za starše."],
     bgColor: "bg-white",
     titleColor: "text-dragon-green"
   }, {
-    title: "VRTCEM",
-    subtitle: "Prednosti za vrtce:",
+    title: "VRTCEM in ŠOLAM",
+    subtitle: "Prednosti za vrtce in šole:",
     benefits: ["Zgodnja in učinkovita identifikacija govornih težav pri otrocih.", "Enostavna vključitev govornih aktivnosti v vsakodnevne rutine vrtca.", "Izboljšanje komunikacije, socializacije in vključevanja otrok v vrstniške skupine.", "Manjša verjetnost psihosocialnih težav in boljša splošna klima v skupini.", "Bolj zadovoljni starši, ki cenijo kakovostno obravnavo otrok v vašem vrtcu."],
     bgColor: "bg-white",
     titleColor: "text-app-orange"
@@ -40,7 +40,7 @@ export const TargetAudienceSection = () => {
                 <div className={`${audience.bgColor} rounded-xl shadow-xl p-6 border border-gray-300`}>
                   {/* Title */}
                   <div className="text-center mb-6">
-                    <h3 className={`text-xl font-bold ${audience.titleColor} mb-2`}>
+                    <h3 className={`text-base font-bold ${audience.titleColor} mb-2`}>
                       {audience.title}
                     </h3>
                     <p className="text-gray-700 font-semibold text-base">
@@ -67,7 +67,7 @@ export const TargetAudienceSection = () => {
             {audiences.map((audience, index) => <div key={index} className={`${audience.bgColor} rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8 h-full flex flex-col border border-gray-300`}>
                 {/* Title */}
                 <div className="text-center mb-6">
-                  <h3 className={`text-2xl font-bold ${audience.titleColor} mb-2`}>
+                  <h3 className={`text-xl font-bold ${audience.titleColor} mb-2 whitespace-nowrap`}>
                     {audience.title}
                   </h3>
                   <p className="text-gray-700 font-semibold text-lg">
