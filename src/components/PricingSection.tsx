@@ -53,7 +53,7 @@ export function PricingSection() {
           <TabsContent value="monthly" className="mt-6">
             <Card 
               className={cn(
-                "relative border-2 transition-all duration-300 hover:shadow-lg",
+                "relative border-2 transition-all duration-300 hover:shadow-lg min-h-[580px]",
                 "border-app-blue shadow-md"
               )}
             >
@@ -79,13 +79,15 @@ export function PricingSection() {
                   </p>
                 </div>
 
-                <div className="space-y-3 mb-6 flex flex-col items-center">
-                  {features.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-3 text-sm">
-                      <div className="h-2 w-2 rounded-full bg-dragon-green flex-shrink-0" />
-                      <span>{feature}</span>
-                    </div>
-                  ))}
+                <div className="flex justify-center mb-6">
+                  <div className="space-y-3">
+                    {features.map((feature, index) => (
+                      <div key={index} className="flex items-center gap-3 text-sm">
+                        <div className="h-2 w-2 rounded-full bg-dragon-green flex-shrink-0" />
+                        <span>{feature}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Optional Add-on */}
@@ -115,7 +117,7 @@ export function PricingSection() {
           <TabsContent value="yearly" className="mt-6">
             <Card 
               className={cn(
-                "relative border-2 transition-all duration-300 hover:shadow-lg",
+                "relative border-2 transition-all duration-300 hover:shadow-lg min-h-[580px]",
                 "border-dragon-green shadow-md"
               )}
             >
@@ -145,13 +147,15 @@ export function PricingSection() {
                   </p>
                 </div>
 
-                <div className="space-y-3 mb-6 flex flex-col items-center">
-                  {features.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-3 text-sm">
-                      <div className="h-2 w-2 rounded-full bg-dragon-green flex-shrink-0" />
-                      <span>{feature}</span>
-                    </div>
-                  ))}
+                <div className="flex justify-center mb-6">
+                  <div className="space-y-3">
+                    {features.map((feature, index) => (
+                      <div key={index} className="flex items-center gap-3 text-sm">
+                        <div className="h-2 w-2 rounded-full bg-dragon-green flex-shrink-0" />
+                        <span>{feature}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Optional Add-on */}
