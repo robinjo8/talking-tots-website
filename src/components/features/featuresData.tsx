@@ -1,18 +1,12 @@
 
-import { Mic, Stars, Volume2, MessageSquare, Zap, Book, Award } from "lucide-react";
+import { Stars, Volume2, Zap, Book, Award } from "lucide-react";
 
 export const features = [
   {
     icon: <Book className="h-8 w-8 md:h-10 md:w-10 text-white" />,
-    title: "Odobreno s strani logopedov",
+    title: "Podprto s strani logopedov",
     description: "Razvito v sodelovanju s profesionalnimi logopedi",
     color: "bg-gradient-to-br from-dragon-green to-dragon-green/80"
-  },
-  {
-    icon: <Mic className="h-8 w-8 md:h-10 md:w-10 text-white" />,
-    title: "Prepoznavanje glasu",
-    description: "Posluša govor vašega otroka in nudi koristne povratne informacije",
-    color: "bg-gradient-to-br from-app-blue to-app-blue/80"
   },
   {
     icon: <Stars className="h-8 w-8 md:h-10 md:w-10 text-white" />,
@@ -27,12 +21,6 @@ export const features = [
     color: "bg-gradient-to-br from-app-teal to-app-teal/80"
   },
   {
-    icon: <MessageSquare className="h-8 w-8 md:h-10 md:w-10 text-white" />,
-    title: "Interaktivni pogovor",
-    description: "Pogovarjajte se z našim prijaznim zmajčkom za vajo v pogovorih",
-    color: "bg-gradient-to-br from-app-orange to-app-orange/80"
-  },
-  {
     icon: <Zap className="h-8 w-8 md:h-10 md:w-10 text-white" />,
     title: "Sledenje napredku",
     description: "Spremljajte izboljšanje vašega otroka skozi čas",
@@ -41,7 +29,7 @@ export const features = [
   {
     icon: <Award className="h-8 w-8 md:h-10 md:w-10 text-white" />,
     title: "Sistem nagrajevanja",
-    description: "Pridobivajte značke in odklepajte nove zmajčke",
+    description: "Pridobivajte zvezdice in odklepajte nove zmajčke",
     color: "bg-gradient-to-br from-app-blue to-app-teal"
   }
 ];
