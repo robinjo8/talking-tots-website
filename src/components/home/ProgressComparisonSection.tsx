@@ -57,7 +57,7 @@ const ProgressComparisonSection = () => {
   return <section ref={sectionRef} className="py-10 md:py-16 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-6 md:mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 md:mb-6">Izboljšajte otrokov govor, preprosto in brez stresa!</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 md:mb-6">Enostavna govorna vadba za otroke – dostopna za starše</h2>
         </div>
 
         <div className="max-w-7xl mx-auto">
@@ -66,9 +66,9 @@ const ProgressComparisonSection = () => {
             <div className="bg-white rounded-2xl shadow-xl border-2 border-gray-100 p-8 flex flex-col hover:shadow-2xl transition-shadow duration-300">
               <div className="text-center mb-8">
                 <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4">
-                  Hitrejši napredek kot pri tradicionalnih pristopih
+                  Otrok napreduje hitreje
                 </h3>
-                <p className="text-lg text-gray-600 leading-relaxed">Z redno uporabo otroci dosežejo hitrejši napredek kot pri klasičnih logopedskih obravnavah.</p>
+                <p className="text-lg text-gray-600 leading-relaxed">Vsakodnevna vadba otrokom omogoča hitrejše izboljšanje govora</p>
               </div>
 
               <div className="space-y-8 mb-8 flex-grow">
@@ -120,9 +120,9 @@ const ProgressComparisonSection = () => {
             <div className="bg-white rounded-2xl shadow-xl border-2 border-gray-100 p-8 flex flex-col hover:shadow-2xl transition-shadow duration-300">
               <div className="text-center mb-8">
                 <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4">
-                  Neomejene TomiTalk vaje in igre vs. samoplačniške metode
+                  Neomejena vadba
                 </h3>
-                <p className="text-lg text-gray-600 leading-relaxed">Za ceno le 1,5 obiska pri samoplačniškem obisku prejmete neomejeno celoletno naročnino na TomiTalk.</p>
+                <p className="text-lg text-gray-600 leading-relaxed">Za ceno eno do dve samoplačniške ure prejmete neomejeno celoletno naročnino na TomiTalk.</p>
               </div>
 
               <div className="flex-grow flex flex-col">
@@ -169,7 +169,7 @@ const ProgressComparisonSection = () => {
 
               <div className="text-center mt-auto">
                 <p className="text-gray-600 leading-relaxed">
-                  Temelji na 50 individualnih urah letno pri zasebni logopedski obravnavi. Več kot ima otrok individualnih obravnav, bolj izrazita je cenovna prednost TomiTalk.
+                  Primerjava temelji na 50 individualnih obravnavah letno pri samoplačniški obravnavi. Več individualnih obravnav pomeni bolj izrazito cenovno prednost TomiTalk.
                 </p>
               </div>
             </div>
