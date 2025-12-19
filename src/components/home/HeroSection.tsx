@@ -33,7 +33,7 @@ export const HeroSection = () => {
 
   const trustBadges = [
     { text: "Temelji na logopedskih smernicah" },
-    { text: "Dokazan napredek pri izgovorjavi" },
+    { text: "Napredek pri izgovorjavi" },
     { text: "Priporočeno s strani staršev" }
   ];
 
