@@ -1,6 +1,5 @@
 
 import { useEffect } from "react";
-import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 
@@ -39,16 +38,22 @@ export function MemoryCard({
   return (
     <div className="flip-card" onClick={handleCardClick}>
       <div className={cn("flip-card-inner", flipped || matched ? "flipped" : "")}>
+        {/* Front side - Green with question mark */}
         <div className="flip-card-front">
-          <div className="text-4xl font-bold text-dragon-green">?</div>
+          <div className="flex items-center justify-center w-full h-full">
+            <span className="text-5xl md:text-6xl font-bold text-white drop-shadow-lg select-none">
+              ?
+            </span>
+          </div>
         </div>
 
+        {/* Back side - White with image */}
         <div className={cn("flip-card-back", matched && "matched")}>
           {imageUrl && (
             <img
               src={imageUrl}
               alt="Spominska kartica"
-              className="object-contain w-full h-full p-2"
+              className="object-contain w-full h-full p-3"
               onError={(e) => console.error("Error loading image:", e)}
             />
           )}
