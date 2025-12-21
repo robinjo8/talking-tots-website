@@ -104,7 +104,7 @@ export default function SpominC() {
       }, 500);
     }
   }, [gameCompleted, gameStartTimeRef, gameTime, toast]);
-  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/47412.jpg`;
+  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/zeleno_ozadje.png`;
   return <div className={`fixed inset-0 overflow-hidden relative`}>
       {/* Background image layer */}
       <div className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat" style={{
