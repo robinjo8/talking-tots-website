@@ -10,33 +10,29 @@ interface MemoryGridProps {
 }
 
 export function MemoryGrid({ cards, onCardClick, isCheckingMatch }: MemoryGridProps) {
-  // Calculate grid dimensions based on card count
+  // Mobile: 4 columns, 5 rows (20 cards) - larger cards centered
+  // Desktop: dynamic based on card count, limited height to fit viewport
   const cardCount = cards.length;
-  const columns = cardCount <= 16 ? 4 : 5;
-  const rows = Math.ceil(cardCount / columns);
+  const desktopColumns = cardCount <= 16 ? 4 : 5;
+  const desktopRows = Math.ceil(cardCount / desktopColumns);
   
   return (
     <div 
-      className="grid gap-2 md:gap-3 w-full mx-auto"
+      className="grid grid-cols-4 gap-2 md:gap-3 w-full mx-auto items-center justify-items-center"
       style={{
-        gridTemplateColumns: `repeat(${columns}, 1fr)`,
         maxWidth: '900px',
-        // Calculate card height to fit in viewport
-        // Each card should be square, so we calculate based on available height
       }}
     >
       {cards.map((card, index) => (
         <div 
           key={card.uniqueId || `${card.id}-${index}`} 
           className={cn(
-            "aspect-square",
+            "aspect-square w-full",
             "transform transition-transform duration-200",
-            "hover:scale-[1.02]"
+            "hover:scale-[1.02]",
+            // Mobile: limit card size for proper display
+            "max-w-[72px] sm:max-w-[85px] md:max-w-[140px] lg:max-w-[160px]"
           )}
-          style={{
-            // Limit max height per card based on viewport and row count
-            maxHeight: `calc((100vh - 120px) / ${rows})`,
-          }}
         >
           <MemoryCard
             id={card.id}
