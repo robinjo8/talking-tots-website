@@ -59,7 +59,7 @@ export function PricingSection() {
                 <div className="flex justify-center mb-6">
                   <div className="space-y-3">
                     {features.map((feature, index) => <div key={index} className="flex items-center gap-3 text-sm">
-                        <div className="h-2 w-2 rounded-full bg-dragon-green flex-shrink-0" />
+                        <div className="h-2 w-2 rounded-full bg-app-blue flex-shrink-0" />
                         <span>{feature}</span>
                       </div>)}
                   </div>
