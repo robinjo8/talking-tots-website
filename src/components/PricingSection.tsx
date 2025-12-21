@@ -72,7 +72,7 @@ export function PricingSection() {
                     <label htmlFor="addon-monthly" className="text-sm cursor-pointer">
                       <span className="font-medium">Prilagojen govorno učni načrt + Pogovor z AI asistentom</span>
                       <span className="text-app-orange font-semibold ml-2">+{addonPrice} €</span>
-                      <p className="text-gray-500 text-xs mt-1">Za vas pripravimo osebno prilagojen načrt vaj in iger na podlagi otrokove starosti in govorne težave. Otrok vadi točno tisto, kar potrebuje, staršem pa ponuja jasen pregled in spremljanje razvoja. Dodatno pa omogoča pogovor z AI asistentom za sprotno spremljanje in dodatna pojasnila glede otrokove vadbe.</p>
+                      <p className="text-gray-500 text-xs mt-1 text-justify">Za vas pripravimo osebno prilagojen načrt vaj in iger na podlagi otrokove starosti in govorne težave. Otrok vadi točno tisto, kar potrebuje, staršem pa ponuja jasen pregled in spremljanje razvoja. Dodatno pa omogoča pogovor z AI asistentom za sprotno spremljanje in dodatna pojasnila glede otrokove vadbe.</p>
                     </label>
                   </div>
                 </div>
