@@ -1,32 +1,15 @@
-
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
-
 export function PricingSection() {
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly'>('yearly');
   const [includeGovornoUcniNacrt, setIncludeGovornoUcniNacrt] = useState(false);
-
-  const features = [
-    "Preverjanje izgovorjave",
-    "Dostop do govornih vaj in iger",
-    "Video navodila logopeda",
-    "Logopedski nasveti za starše",
-    "Poročila o napredku",
-    "Sledenje napredku otroka",
-    "Dostop do vseh novih vsebin"
-  ];
-
+  const features = ["Preverjanje izgovorjave", "Dostop do govornih vaj in iger", "Video navodila logopeda", "Logopedski nasveti za starše", "Poročila o napredku", "Sledenje napredku otroka", "Dostop do vseh novih vsebin"];
   const addonPrice = selectedPlan === 'monthly' ? 49 : 29;
-
-  return (
-    <section
-      id="cenik"
-      className="w-full bg-white py-10 md:py-16 px-4"
-    >
+  return <section id="cenik" className="w-full bg-white py-10 md:py-16 px-4">
       <div className="max-w-3xl md:max-w-5xl mx-auto text-center mb-10">
         <h2 className="text-3xl md:text-4xl font-bold mb-2">Cenik</h2>
         <p className="text-lg text-muted-foreground md:whitespace-nowrap">
@@ -36,7 +19,7 @@ export function PricingSection() {
       
       <div className="max-w-2xl mx-auto">
         {/* Plan Toggle */}
-        <Tabs value={selectedPlan} onValueChange={(value) => setSelectedPlan(value as 'monthly' | 'yearly')} className="w-full mb-8">
+        <Tabs value={selectedPlan} onValueChange={value => setSelectedPlan(value as 'monthly' | 'yearly')} className="w-full mb-8">
           <TabsList className="grid w-full grid-cols-2 bg-gray-100 dark:bg-gray-800 h-12">
             <TabsTrigger value="monthly" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-base">
               Mesečno
@@ -50,12 +33,7 @@ export function PricingSection() {
           </TabsList>
 
           <TabsContent value="monthly" className="mt-6">
-            <Card 
-              className={cn(
-                "relative border-2 transition-all duration-300 hover:shadow-lg min-h-[580px]",
-                "border-app-blue shadow-md"
-              )}
-            >
+            <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg min-h-[580px]", "border-app-blue shadow-md")}>
               <CardContent className="p-8">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <span className="bg-app-blue text-white text-sm px-4 py-1 rounded-full font-medium whitespace-nowrap">
@@ -80,24 +58,17 @@ export function PricingSection() {
 
                 <div className="flex justify-center mb-6">
                   <div className="space-y-3">
-                    {features.map((feature, index) => (
-                      <div key={index} className="flex items-center gap-3 text-sm">
+                    {features.map((feature, index) => <div key={index} className="flex items-center gap-3 text-sm">
                         <div className="h-2 w-2 rounded-full bg-dragon-green flex-shrink-0" />
                         <span>{feature}</span>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                 </div>
 
                 {/* Optional Add-on */}
                 <div className="border-t border-gray-200 pt-4 mb-6">
                   <div className="flex items-start gap-3">
-                    <Checkbox 
-                      id="addon-monthly"
-                      checked={includeGovornoUcniNacrt}
-                      onCheckedChange={(checked) => setIncludeGovornoUcniNacrt(checked as boolean)}
-                      className="mt-0.5"
-                    />
+                    <Checkbox id="addon-monthly" checked={includeGovornoUcniNacrt} onCheckedChange={checked => setIncludeGovornoUcniNacrt(checked as boolean)} className="mt-0.5" />
                     <label htmlFor="addon-monthly" className="text-sm cursor-pointer">
                       <span className="font-medium">Prilagojen govorno učni načrt + Pogovor z AI asistentom</span>
                       <span className="text-app-orange font-semibold ml-2">+{addonPrice} €</span>
@@ -114,12 +85,7 @@ export function PricingSection() {
           </TabsContent>
 
           <TabsContent value="yearly" className="mt-6">
-            <Card 
-              className={cn(
-                "relative border-2 transition-all duration-300 hover:shadow-lg min-h-[580px]",
-                "border-dragon-green shadow-md"
-              )}
-            >
+            <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg min-h-[580px]", "border-dragon-green shadow-md")}>
               <CardContent className="p-8">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <span className="bg-app-orange text-white text-sm px-4 py-1 rounded-full font-medium whitespace-nowrap">
@@ -148,28 +114,21 @@ export function PricingSection() {
 
                 <div className="flex justify-center mb-6">
                   <div className="space-y-3">
-                    {features.map((feature, index) => (
-                      <div key={index} className="flex items-center gap-3 text-sm">
+                    {features.map((feature, index) => <div key={index} className="flex items-center gap-3 text-sm">
                         <div className="h-2 w-2 rounded-full bg-dragon-green flex-shrink-0" />
                         <span>{feature}</span>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                 </div>
 
                 {/* Optional Add-on */}
                 <div className="border-t border-gray-200 pt-4 mb-6">
                   <div className="flex items-start gap-3">
-                    <Checkbox 
-                      id="addon-yearly"
-                      checked={includeGovornoUcniNacrt}
-                      onCheckedChange={(checked) => setIncludeGovornoUcniNacrt(checked as boolean)}
-                      className="mt-0.5"
-                    />
+                    <Checkbox id="addon-yearly" checked={includeGovornoUcniNacrt} onCheckedChange={checked => setIncludeGovornoUcniNacrt(checked as boolean)} className="mt-0.5" />
                     <label htmlFor="addon-yearly" className="text-sm cursor-pointer">
                       <span className="font-medium">Prilagojen govorno učni načrt + Pogovor z AI asistentom</span>
                       <span className="text-app-orange font-semibold ml-2">+{addonPrice} €</span>
-                      <p className="text-gray-500 text-xs mt-1">Za vas pripravimo osebno prilagojen načrt vaj in iger na podlagi otrokove starosti in govorne težave. Otrok vadi točno tisto, kar potrebuje, staršem pa ponuja jasen pregled in spremljanje razvoja. Dodatno pa omogoča pogovor z AI asistentom za sprotno spremljanje in dodatna pojasnila glede otrokove vadbe.</p>
+                      <p className="text-gray-500 text-xs mt-1 text-justify">Za vas pripravimo osebno prilagojen načrt vaj in iger na podlagi otrokove starosti in govorne težave. Otrok vadi točno tisto, kar potrebuje, staršem pa ponuja jasen pregled in spremljanje razvoja. Dodatno pa omogoča pogovor z AI asistentom za sprotno spremljanje in dodatna pojasnila glede otrokove vadbe.</p>
                     </label>
                   </div>
                 </div>
@@ -182,8 +141,6 @@ export function PricingSection() {
           </TabsContent>
         </Tabs>
       </div>
-    </section>
-  );
+    </section>;
 }
-
 export default PricingSection;
