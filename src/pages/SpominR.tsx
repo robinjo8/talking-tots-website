@@ -137,13 +137,19 @@ export default function SpominR() {
             )}
             
             {!isLoading && !error && cards.length > 0 && (
-              <div className="my-[160px]">
-                <MemoryGrid
-                  cards={cards}
-                  onCardClick={handleCardClick}
-                  isCheckingMatch={isCheckingMatch}
+              <>
+                <MemoryProgressIndicator 
+                  matchedPairs={matchedPairs.length} 
+                  totalPairs={totalPairs} 
                 />
-              </div>
+                <div className="my-[160px]">
+                  <MemoryGrid
+                    cards={cards}
+                    onCardClick={handleCardClick}
+                    isCheckingMatch={isCheckingMatch}
+                  />
+                </div>
+              </>
             )}
             
             {!isLoading && !error && cards.length === 0 && (
