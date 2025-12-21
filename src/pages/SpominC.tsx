@@ -111,8 +111,8 @@ export default function SpominC() {
       backgroundImage: `url('${backgroundImageUrl}')`
     }} />
       
-      <div className="relative z-10 h-full flex flex-col items-center justify-center overflow-hidden p-4">
-        <div className="w-full max-w-6xl h-full flex flex-col items-center justify-center">
+      <div className="relative z-10 h-full flex flex-col items-center justify-center overflow-hidden px-4 py-2">
+        <div className="w-full max-w-5xl flex flex-col items-center justify-center">
             {isLoading && <div className="text-lg text-muted-foreground">Nalaganje igre...</div>}
             
             {error && <div className="bg-red-50 p-6 rounded-lg border border-red-100 text-center">
@@ -123,9 +123,9 @@ export default function SpominC() {
                 </Button>
               </div>}
             
-            {!isLoading && !error && cards.length > 0 && <div className="w-full flex flex-col items-center justify-center gap-4">
+            {!isLoading && !error && cards.length > 0 && <div className="w-full flex flex-col items-center justify-center gap-2">
               <MemoryProgressIndicator matchedPairs={matchedPairs.length} totalPairs={totalPairs} />
-              <div className="w-full max-h-[70vh] flex items-center justify-center">
+              <div className="w-full" style={{ maxHeight: 'calc(100vh - 80px)' }}>
                 <MemoryGrid cards={cards} onCardClick={handleCardClick} isCheckingMatch={isCheckingMatch} />
               </div>
             </div>}
