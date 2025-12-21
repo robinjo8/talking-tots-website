@@ -133,7 +133,7 @@ export function PricingSection() {
                   </div>
                 </div>
 
-                <Button className="w-full bg-dragon-green hover:bg-dragon-green/90 text-white h-12 text-lg font-semibold">
+                <Button className="absolute -top-2 -right-2 bg-app-orange text-white text-xs px-2 py-0.5 rounded-full font-medium">
                   Izberi letno naročnino
                 </Button>
               </CardContent>
