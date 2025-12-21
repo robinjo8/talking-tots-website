@@ -99,7 +99,7 @@ export function PricingSection() {
                     <span className="text-2xl text-gray-400 line-through">15 €</span>
                     <span className="text-4xl font-bold">7 €</span>
                     <span className="text-gray-500">/mesec</span>
-                    <span className="bg-dragon-green/10 text-dragon-green text-sm px-2 py-0.5 rounded-full font-semibold">
+                    <span className="bg-app-orange text-white text-sm px-2 py-0.5 rounded-full font-semibold">
                       -53%
                     </span>
                   </div>
