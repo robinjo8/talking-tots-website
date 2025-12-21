@@ -41,7 +41,7 @@ export function PricingSection() {
                   </span>
                 </div>
                 
-                <div className="text-center mb-6 mt-2 min-h-[88px]">
+                <div className="text-center mb-6 mt-2 h-[88px]">
                   <h3 className="text-2xl font-bold text-app-blue mb-2">Mesečna naročnina</h3>
                   <div className="flex items-baseline justify-center gap-2 mb-2">
                     <span className="text-4xl font-bold">15 €</span>
@@ -93,9 +93,9 @@ export function PricingSection() {
                   </span>
                 </div>
                 
-                <div className="text-center mb-6 mt-2 min-h-[88px]">
+                <div className="text-center mb-6 mt-2 h-[88px]">
                   <h3 className="text-2xl font-bold text-dragon-green mb-2">Letna naročnina</h3>
-                  <div className="flex items-baseline justify-center gap-2 mb-2 flex-wrap">
+                  <div className="flex items-baseline justify-center gap-2 mb-2">
                     <span className="text-2xl text-gray-400 line-through">15 €</span>
                     <span className="text-4xl font-bold">7 €</span>
                     <span className="text-gray-500">/mesec</span>
