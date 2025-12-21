@@ -21,7 +21,6 @@ export default function SpominŽ() {
   const [searchParams] = useSearchParams();
   const isMobile = useIsMobile();
   
-  // Mobile devices always get fullscreen, desktop never gets fullscreen
   const effectiveFullscreen = isMobile;
   
   const { audioRef } = useAudioPlayback();
@@ -30,7 +29,6 @@ export default function SpominŽ() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { toast } = useToast();
   
-  // Extract letter from URL path
   const currentLetter = decodeURIComponent(location.pathname.split('-').pop() || 'ž').toUpperCase();
   const { 
     cards, 
@@ -66,8 +64,10 @@ export default function SpominŽ() {
     });
   };
 
-  // Enable fullscreen on mobile devices only
   useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    
     if (effectiveFullscreen) {
       const requestFullscreen = async () => {
         try {
@@ -79,13 +79,15 @@ export default function SpominŽ() {
         }
       };
       requestFullscreen();
-      
-      return () => {
-        if (document.fullscreenElement) {
-          document.exitFullscreen?.();
-        }
-      };
     }
+    
+    return () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.();
+      }
+    };
   }, [effectiveFullscreen]);
 
   useEffect(() => {
@@ -106,110 +108,44 @@ export default function SpominŽ() {
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/zeleno_ozadje.png`;
 
   return (
-    <div className={`${effectiveFullscreen ? 'fixed inset-0 overflow-hidden' : 'min-h-screen'} relative`}>
-      {/* Background image layer */}
-      <div 
-        className={`${effectiveFullscreen ? 'fixed' : 'absolute'} inset-0 w-full h-full bg-cover bg-center bg-no-repeat`}
-        style={{
-          backgroundImage: `url('${backgroundImageUrl}')`
-        }}
-      />
+    <div className="fixed inset-0 overflow-hidden relative">
+      <div className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat" style={{
+        backgroundImage: `url('${backgroundImageUrl}')`
+      }} />
       
-      <div className={`relative z-10 ${effectiveFullscreen ? 'h-full flex items-center justify-center overflow-hidden' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
-        {effectiveFullscreen ? (
-          <div className="w-full px-2">
-            {isLoading && (
-              <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
-            )}
-            
-            {error && (
-              <div className="bg-red-50 p-6 rounded-lg border border-red-100 text-center">
-                <h3 className="text-red-600 font-medium mb-2">Napaka pri nalaganju igre</h3>
-                <p className="text-sm text-red-500">Poskusite znova kasneje.</p>
-                <Button 
-                  variant="outline" 
-                  className="mt-4" 
-                  onClick={() => window.location.reload()}
-                >
-                  Poskusi znova
-                </Button>
-              </div>
-            )}
-            
-            {!isLoading && !error && cards.length > 0 && (
-              <>
-                <MemoryProgressIndicator 
-                  matchedPairs={matchedPairs.length} 
-                  totalPairs={totalPairs} 
-                />
-                <div className="my-[160px]">
-                  <MemoryGrid
-                    cards={cards}
-                    onCardClick={handleCardClick}
-                    isCheckingMatch={isCheckingMatch}
-                  />
-                </div>
-              </>
-            )}
-            
-            {!isLoading && !error && cards.length === 0 && (
-              <div className="text-center p-10 border rounded-lg">
-                <p className="text-muted-foreground">
-                  Ni kartic za prikaz. Prosim, preverite nastavitve igre.
-                </p>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="px-4">
-            <div className="w-full max-w-4xl mx-auto">
-              {isLoading && (
-                <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
-              )}
-              
-              {error && (
-                <div className="bg-red-50 p-6 rounded-lg border border-red-100 text-center">
-                  <h3 className="text-red-600 font-medium mb-2">Napaka pri nalaganju igre</h3>
-                  <p className="text-sm text-red-500">Poskusite znova later.</p>
-                  <Button 
-                    variant="outline" 
-                    className="mt-4" 
-                    onClick={() => window.location.reload()}
-                  >
-                    Poskusi znova
-                  </Button>
-                </div>
-              )}
-              
-              {!isLoading && !error && cards.length > 0 && (
-                <>
-                  <MemoryProgressIndicator 
-                    matchedPairs={matchedPairs.length} 
-                    totalPairs={totalPairs} 
-                  />
-                  <div className="my-[160px]">
-                    <MemoryGrid 
-                      cards={cards} 
-                      onCardClick={handleCardClick}
-                      isCheckingMatch={isCheckingMatch}
-                    />
-                  </div>
-                </>
-              )}
-              
-              {!isLoading && !error && cards.length === 0 && (
-                <div className="text-center p-10 border rounded-lg">
-                  <p className="text-muted-foreground">
-                    Ni kartic za prikaz. Prosim, preverite nastavitve igre.
-                  </p>
-                </div>
-              )}
+      <div className="relative z-10 h-full flex flex-col items-center justify-center overflow-hidden px-4 py-2">
+        <div className="w-full max-w-5xl flex flex-col items-center justify-center">
+          {isLoading && <div className="text-lg text-muted-foreground">Nalaganje igre...</div>}
+          
+          {error && (
+            <div className="bg-red-50 p-6 rounded-lg border border-red-100 text-center">
+              <h3 className="text-red-600 font-medium mb-2">Napaka pri nalaganju igre</h3>
+              <p className="text-sm text-red-500">Poskusite znova kasneje.</p>
+              <Button variant="outline" className="mt-4" onClick={() => window.location.reload()}>
+                Poskusi znova
+              </Button>
             </div>
-          </div>
-        )}
+          )}
+          
+          {!isLoading && !error && cards.length > 0 && (
+            <div className="w-full flex flex-col items-center justify-center gap-2">
+              <MemoryProgressIndicator matchedPairs={matchedPairs.length} totalPairs={totalPairs} />
+              <div className="w-full" style={{ maxHeight: 'calc(100vh - 80px)' }}>
+                <MemoryGrid cards={cards} onCardClick={handleCardClick} isCheckingMatch={isCheckingMatch} />
+              </div>
+            </div>
+          )}
+          
+          {!isLoading && !error && cards.length === 0 && (
+            <div className="text-center p-10 border rounded-lg">
+              <p className="text-muted-foreground">
+                Ni kartic za prikaz. Prosim, preverite nastavitve igre.
+              </p>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Floating menu button - Now available on all devices */}
       <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
         <DropdownMenuTrigger asChild>
           <Button 
