@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, BookOpen, ArrowLeft, Home } from "lucide-react";
+import { RotateCcw, BookOpen, ArrowLeft, Home, Smartphone } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MemoryGrid } from "@/components/games/MemoryGrid";
 import { useMemoryGameČ } from "@/hooks/useMemoryGameČ";
@@ -28,6 +28,7 @@ export default function SpominČ() {
   const [showInfo, setShowInfo] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isPortrait, setIsPortrait] = useState(false);
   const { toast } = useToast();
   
   // Extract letter from URL path
@@ -66,26 +67,64 @@ export default function SpominČ() {
     });
   };
 
-  // Enable fullscreen on mobile devices only
+  // Check orientation for portrait overlay (mobile only)
   useEffect(() => {
-    if (effectiveFullscreen) {
-      const requestFullscreen = async () => {
-        try {
-          if (document.documentElement.requestFullscreen) {
-            await document.documentElement.requestFullscreen();
+    if (!isMobile) return;
+    
+    const checkOrientation = () => {
+      setIsPortrait(window.innerHeight > window.innerWidth);
+    };
+    
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+    
+    return () => {
+      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('orientationchange', checkOrientation);
+    };
+  }, [isMobile]);
+
+  // Enable fullscreen and lock landscape orientation on mobile devices
+  useEffect(() => {
+    if (!effectiveFullscreen) return;
+    
+    const requestFullscreenAndLockLandscape = async () => {
+      try {
+        // First request fullscreen
+        if (document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        }
+        
+        // Then lock to landscape (requires fullscreen)
+        if (screen.orientation && 'lock' in screen.orientation) {
+          try {
+            await (screen.orientation as any).lock('landscape');
+          } catch (lockError) {
+            console.log('Landscape lock not supported:', lockError);
           }
-        } catch (error) {
-          console.log('Fullscreen not supported:', error);
         }
-      };
-      requestFullscreen();
+      } catch (error) {
+        console.log('Fullscreen not supported:', error);
+      }
+    };
+    
+    requestFullscreenAndLockLandscape();
+    
+    return () => {
+      // Unlock orientation on cleanup
+      if (screen.orientation && 'unlock' in screen.orientation) {
+        try {
+          (screen.orientation as any).unlock();
+        } catch (e) {
+          console.log('Orientation unlock error:', e);
+        }
+      }
       
-      return () => {
-        if (document.fullscreenElement) {
-          document.exitFullscreen?.();
-        }
-      };
-    }
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.();
+      }
+    };
   }, [effectiveFullscreen]);
 
   useEffect(() => {
@@ -105,6 +144,37 @@ export default function SpominČ() {
 
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/zeleno_ozadje.png`;
 
+  // Portrait overlay for mobile - shown when device is in portrait mode
+  if (isMobile && isPortrait) {
+    return (
+      <div 
+        className="fixed inset-0 z-[100] flex flex-col items-center justify-center p-8"
+        style={{
+          backgroundImage: `url('${backgroundImageUrl}')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 max-w-sm text-center shadow-2xl border-4 border-orange-300">
+          <div className="mb-6 animate-bounce">
+            <Smartphone className="w-20 h-20 mx-auto text-orange-500 rotate-90" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-3">
+            Obrni telefon
+          </h2>
+          <p className="text-gray-600 text-lg">
+            Za igranje te igre obrni telefon v ležeči položaj
+          </p>
+          <div className="mt-6 flex justify-center gap-2">
+            <div className="w-3 h-3 bg-orange-400 rounded-full animate-pulse" />
+            <div className="w-3 h-3 bg-orange-400 rounded-full animate-pulse delay-100" />
+            <div className="w-3 h-3 bg-orange-400 rounded-full animate-pulse delay-200" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`${effectiveFullscreen ? 'fixed inset-0 overflow-hidden' : 'min-h-screen'} relative`}>
       {/* Background image layer */}
@@ -117,9 +187,9 @@ export default function SpominČ() {
       
       <div className={`relative z-10 ${effectiveFullscreen ? 'h-full flex items-center justify-center overflow-hidden' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
         {effectiveFullscreen ? (
-          <div className="w-full px-2">
+          <div className="w-full h-full flex items-center justify-center px-4">
             {isLoading && (
-              <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
+              <div className="text-lg text-white">Nalaganje igre...</div>
             )}
             
             {error && (
@@ -137,23 +207,24 @@ export default function SpominČ() {
             )}
             
             {!isLoading && !error && cards.length > 0 && (
-              <>
+              <div className="w-full h-full flex flex-col items-center justify-center py-2">
                 <MemoryProgressIndicator 
                   matchedPairs={matchedPairs.length} 
                   totalPairs={totalPairs} 
                 />
-                <div className="my-[160px]">
+                <div className="flex-1 flex items-center justify-center w-full max-w-[95vw]">
                   <MemoryGrid
                     cards={cards}
                     onCardClick={handleCardClick}
                     isCheckingMatch={isCheckingMatch}
+                    isLandscape={true}
                   />
                 </div>
-              </>
+              </div>
             )}
             
             {!isLoading && !error && cards.length === 0 && (
-              <div className="text-center p-10 border rounded-lg">
+              <div className="text-center p-10 border rounded-lg bg-white/90">
                 <p className="text-muted-foreground">
                   Ni kartic za prikaz. Prosim, preverite nastavitve igre.
                 </p>

@@ -1,4 +1,3 @@
-
 import { MemoryCard } from "@/components/games/MemoryCard";
 import { MemoryCard as MemoryCardType } from "@/hooks/useMemoryGame";
 import { cn } from "@/lib/utils";
@@ -7,22 +6,30 @@ interface MemoryGridProps {
   cards: MemoryCardType[];
   onCardClick: (index: number) => void;
   isCheckingMatch: boolean;
+  isLandscape?: boolean;
 }
 
-export function MemoryGrid({ cards, onCardClick, isCheckingMatch }: MemoryGridProps) {
-  // Calculate grid dimensions based on card count
+export function MemoryGrid({ cards, onCardClick, isCheckingMatch, isLandscape = false }: MemoryGridProps) {
   const cardCount = cards.length;
-  const columns = cardCount <= 16 ? 4 : 5;
+  
+  // In landscape mode: 5 columns x 4 rows for better horizontal layout
+  // In portrait/desktop mode: 4 columns x 5 rows
+  const columns = isLandscape ? 5 : (cardCount <= 16 ? 4 : 5);
   const rows = Math.ceil(cardCount / columns);
   
   return (
     <div 
-      className="grid gap-2 md:gap-3 w-full mx-auto"
+      className={cn(
+        "grid gap-2 md:gap-3 w-full mx-auto",
+        isLandscape && "h-full"
+      )}
       style={{
         gridTemplateColumns: `repeat(${columns}, 1fr)`,
-        maxWidth: '900px',
-        // Calculate card height to fit in viewport
-        // Each card should be square, so we calculate based on available height
+        maxWidth: isLandscape ? '100%' : '900px',
+        // In landscape, limit height to fit screen
+        ...(isLandscape && {
+          maxHeight: 'calc(100vh - 60px)',
+        })
       }}
     >
       {cards.map((card, index) => (
@@ -34,8 +41,11 @@ export function MemoryGrid({ cards, onCardClick, isCheckingMatch }: MemoryGridPr
             "hover:scale-[1.02]"
           )}
           style={{
-            // Limit max height per card based on viewport and row count
-            maxHeight: `calc((100vh - 120px) / ${rows})`,
+            // In landscape: calculate based on 4 rows fitting in viewport height
+            // In portrait/desktop: calculate based on row count
+            maxHeight: isLandscape 
+              ? 'calc((100vh - 80px) / 4)' 
+              : `calc((100vh - 120px) / ${rows})`,
           }}
         >
           <MemoryCard
