@@ -26,9 +26,9 @@ export function MemoryGrid({ cards, onCardClick, isCheckingMatch, isLandscape = 
       style={{
         gridTemplateColumns: `repeat(${columns}, 1fr)`,
         maxWidth: isLandscape ? '100%' : '900px',
-        // In landscape, limit height to fit screen
+        // In landscape, fill entire viewport
         ...(isLandscape && {
-          maxHeight: 'calc(100vh - 60px)',
+          height: '100%',
         })
       }}
     >
@@ -41,10 +41,10 @@ export function MemoryGrid({ cards, onCardClick, isCheckingMatch, isLandscape = 
             "hover:scale-[1.02]"
           )}
           style={{
-            // In landscape: calculate based on 4 rows fitting in viewport height
+            // In landscape: fill available space evenly
             // In portrait/desktop: calculate based on row count
             maxHeight: isLandscape 
-              ? 'calc((100vh - 80px) / 4)' 
+              ? 'calc(100vh / 4.2)' 
               : `calc((100vh - 120px) / ${rows})`,
           }}
         >
