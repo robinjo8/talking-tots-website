@@ -61,16 +61,13 @@ export default function SpominČ() {
     checkDevice();
   }, []);
 
-  // Check orientation using screen.orientation API
+  // Check orientation - IDENTICAL to LabirintC (no dependency, no early return)
   useEffect(() => {
-    if (!isTouchDevice) return;
-    
     const checkOrientation = () => {
       let portrait = false;
       if (window.screen.orientation) {
         portrait = window.screen.orientation.type.includes('portrait');
       } else {
-        // Use screen dimensions (like LabirintC) - more reliable than innerHeight/Width
         portrait = window.screen.height > window.screen.width;
       }
       setIsPortrait(portrait);
@@ -93,7 +90,7 @@ export default function SpominČ() {
         window.screen.orientation.removeEventListener('change', checkOrientation);
       }
     };
-  }, [isTouchDevice]);
+  }, []);
 
   const handleCardClick = (index: number) => {
     if (!gameStartTimeRef.current && cards.length > 0) {
@@ -210,7 +207,7 @@ export default function SpominČ() {
                 cards={cards}
                 onCardClick={handleCardClick}
                 isCheckingMatch={isCheckingMatch}
-                isLandscape={true}
+                isLandscape={!isPortrait}
               />
             ) : (
               <div className="flex items-center justify-center h-full">

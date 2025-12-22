@@ -28,12 +28,17 @@ export function MemoryGrid({
         height: window.innerHeight
       });
     };
+    
+    // Named function for proper cleanup - IDENTICAL pattern to LabirintC
+    const handleOrientationChange = () => setTimeout(updateSize, 100);
+    
     updateSize();
     window.addEventListener('resize', updateSize);
-    window.addEventListener('orientationchange', () => setTimeout(updateSize, 100));
+    window.addEventListener('orientationchange', handleOrientationChange);
+    
     return () => {
       window.removeEventListener('resize', updateSize);
-      window.removeEventListener('orientationchange', updateSize);
+      window.removeEventListener('orientationchange', handleOrientationChange);
     };
   }, []);
   
@@ -72,9 +77,12 @@ export function MemoryGrid({
   }
   
   return (
-    <div className={cn(
-      isLandscape && "w-full h-full flex items-center justify-center"
-    )}>
+    <div 
+      className={cn(
+        isLandscape && "w-full h-full flex items-center justify-center"
+      )}
+      style={{ touchAction: 'none' }}
+    >
       <div 
         className={cn(
           "grid gap-2",
@@ -85,6 +93,7 @@ export function MemoryGrid({
           gridTemplateRows: `repeat(${rows}, ${cardSize}px)`,
           width: gridWidth,
           height: gridHeight,
+          touchAction: 'none',
         } : {
           gridTemplateColumns: `repeat(${columns}, 1fr)`,
           maxWidth: '900px',
