@@ -25,15 +25,13 @@ export function MemoryGrid({ cards, onCardClick, isCheckingMatch, isLandscape = 
           display: 'grid',
           gridTemplateColumns: 'repeat(5, 1fr)',
           gridTemplateRows: 'repeat(4, 1fr)',
-          gap: '8px',
-          maxWidth: '100vw',
-          maxHeight: '100vh',
+          gap: '6px',
         }}
       >
         {cards.map((card, index) => (
           <div 
             key={card.uniqueId || `${card.id}-${index}`} 
-            className="w-full h-full min-w-0 min-h-0"
+            className="w-full h-full min-w-0 min-h-0 flip-card-landscape"
           >
             <MemoryCard
               id={card.id}

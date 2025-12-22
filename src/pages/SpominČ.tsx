@@ -153,33 +153,18 @@ export default function SpominČ() {
   // Mobile fullscreen version (like LabirintC)
   if (effectiveFullscreen) {
     return (
-      <div 
-        className="fixed inset-0 overflow-hidden select-none"
-        style={{ 
-          width: '100vw', 
-          height: '100vh',
-          minHeight: '100vh',
-          minWidth: '100vw'
-        }}
-      >
+      <div className="fixed inset-0 overflow-hidden select-none">
         {/* Full screen background */}
         <div 
-          className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-          style={{ 
-            backgroundImage: `url('${backgroundImageUrl}')`,
-            width: '100vw',
-            height: '100vh'
-          }}
+          className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url('${backgroundImageUrl}')` }}
         />
         
         {/* Game content */}
-        <div 
-          className="absolute inset-0 z-10 flex items-center justify-center"
-          style={{ width: '100vw', height: '100vh' }}
-        >
+        <div className="relative z-10 flex-1 flex items-stretch justify-center overflow-hidden h-full w-full">
           {!isPortrait ? (
-            // Landscape - show game filling the entire screen
-            <div className="w-full h-full">
+            // Landscape - show game
+            <>
               {isLoading && (
                 <div className="w-full h-full flex items-center justify-center text-lg text-muted-foreground">Nalaganje igre...</div>
               )}
@@ -218,7 +203,7 @@ export default function SpominČ() {
                   </div>
                 </div>
               )}
-            </div>
+            </>
           ) : (
             // Portrait - show rotate message
             <div className="w-full h-full flex items-center justify-center px-6 text-center">
