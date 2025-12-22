@@ -150,25 +150,17 @@ export default function SpominČ() {
   // Mobile fullscreen version
   if (effectiveFullscreen) {
     return (
-      <div className="fixed inset-0 overflow-hidden select-none touch-none overscroll-none">
-        {/* Fullscreen background */}
+      <div className="fixed inset-0 overflow-hidden select-none">
+        {/* Full screen background */}
         <div 
           className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url('${backgroundImageUrl}')` }}
         />
         
         {/* Game content */}
-        <div className="relative z-10 h-full w-full flex flex-col items-center justify-center">
-          {isPortrait ? (
-            // Portrait orientation message
-            <div className="w-full h-full flex items-center justify-center px-6 text-center">
-              <p className="text-base font-semibold text-foreground bg-white/80 p-6 rounded-xl shadow-lg">
-                Za igranje igre Spomin prosim obrni telefon v ležeči položaj.
-              </p>
-            </div>
-          ) : (
-            // Landscape - show game
-            <div className="w-full h-full flex flex-col items-center justify-center px-4 py-2">
+        <div className="relative z-10 flex-1 flex items-stretch justify-center overflow-hidden h-full w-full">
+          {!isPortrait ? (
+            <>
               {isLoading && (
                 <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
               )}
@@ -188,20 +180,12 @@ export default function SpominČ() {
               )}
               
               {!isLoading && !error && cards.length > 0 && (
-                <>
-                  <MemoryProgressIndicator 
-                    matchedPairs={matchedPairs.length} 
-                    totalPairs={totalPairs} 
-                  />
-                  <div className="flex-1 w-full flex items-center justify-center">
-                    <MemoryGrid
-                      cards={cards}
-                      onCardClick={handleCardClick}
-                      isCheckingMatch={isCheckingMatch}
-                      isLandscape={true}
-                    />
-                  </div>
-                </>
+                <MemoryGrid
+                  cards={cards}
+                  onCardClick={handleCardClick}
+                  isCheckingMatch={isCheckingMatch}
+                  isLandscape={true}
+                />
               )}
               
               {!isLoading && !error && cards.length === 0 && (
@@ -211,6 +195,12 @@ export default function SpominČ() {
                   </p>
                 </div>
               )}
+            </>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center px-6 text-center">
+              <p className="text-base font-semibold text-foreground">
+                Za igranje igre Spomin prosim obrni telefon v ležeči položaj.
+              </p>
             </div>
           )}
         </div>
