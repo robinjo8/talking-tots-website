@@ -215,8 +215,8 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
           canMove = false; // Stop at intersection
         }
 
-        // Check if reached goal (last 2 cells in bottom row)
-        if (nextPos.y === ROWS - 1 && (nextPos.x === COLS - 1 || nextPos.x === COLS - 2)) {
+        // Check if reached goal (bottom-right corner cell only)
+        if (nextPos.y === ROWS - 1 && nextPos.x === COLS - 1) {
           setIsCompleted(true);
           canMove = false;
         }
