@@ -66,26 +66,38 @@ export default function SpominČ() {
     if (!isTouchDevice) return;
     
     const checkOrientation = () => {
+      let portrait = false;
       if (window.screen.orientation) {
-        setIsPortrait(window.screen.orientation.type.includes('portrait'));
+        portrait = window.screen.orientation.type.includes('portrait');
+        console.log('SPOMIN orientation check:', window.screen.orientation.type, 'isPortrait:', portrait);
       } else {
-        setIsPortrait(window.screen.height > window.screen.width);
+        portrait = window.innerHeight > window.innerWidth;
+        console.log('SPOMIN fallback orientation check: height=', window.innerHeight, 'width=', window.innerWidth, 'isPortrait:', portrait);
       }
+      setIsPortrait(portrait);
     };
     
     checkOrientation();
     
     const handleOrientationChange = () => {
+      console.log('SPOMIN orientationchange event fired');
       setTimeout(checkOrientation, 100);
     };
     
+    const handleResize = () => {
+      console.log('SPOMIN resize event fired');
+      checkOrientation();
+    };
+    
     window.addEventListener('orientationchange', handleOrientationChange);
+    window.addEventListener('resize', handleResize);
     if (window.screen.orientation) {
       window.screen.orientation.addEventListener('change', checkOrientation);
     }
     
     return () => {
       window.removeEventListener('orientationchange', handleOrientationChange);
+      window.removeEventListener('resize', handleResize);
       if (window.screen.orientation) {
         window.screen.orientation.removeEventListener('change', checkOrientation);
       }
