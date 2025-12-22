@@ -17,15 +17,17 @@ export function MemoryGrid({ cards, onCardClick, isCheckingMatch, isLandscape = 
   const columns = isLandscape ? 5 : (cardCount <= 16 ? 4 : 5);
   
   if (isLandscape) {
-    // Mobile landscape: use CSS Grid that fills the entire viewport
+    // Mobile landscape: use CSS Grid that fills the entire viewport with explicit dimensions
     return (
       <div 
-        className="w-full h-full p-2 box-border"
+        className="p-2 box-border"
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(5, 1fr)',
           gridTemplateRows: 'repeat(4, 1fr)',
           gap: '6px',
+          width: '100vw',
+          height: '100vh',
         }}
       >
         {cards.map((card, index) => (
