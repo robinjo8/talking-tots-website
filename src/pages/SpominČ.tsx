@@ -20,14 +20,19 @@ const isTouchDevice = () => {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 };
 
+const getInitialOrientation = () => {
+  if (typeof window === 'undefined') return false;
+  return window.innerHeight > window.innerWidth;
+};
+
 export default function SpominČ() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   
-  // Use touch detection for mobile - more reliable than screen width
-  const [isMobileDevice, setIsMobileDevice] = useState(false);
-  const [isPortrait, setIsPortrait] = useState(false);
+  // Use touch detection for mobile - initialize immediately if possible
+  const [isMobileDevice, setIsMobileDevice] = useState(() => isTouchDevice());
+  const [isPortrait, setIsPortrait] = useState(() => getInitialOrientation());
   
   const { audioRef } = useAudioPlayback();
   const [showInfo, setShowInfo] = useState(false);
@@ -53,19 +58,18 @@ export default function SpominČ() {
   const gameStartTimeRef = useRef<number | null>(null);
   const [gameTime, setGameTime] = useState<number | null>(null);
 
-  // Detect mobile device on mount
-  useEffect(() => {
-    setIsMobileDevice(isTouchDevice());
-  }, []);
-
-  // Check orientation
+  // Check orientation and update on changes
   useEffect(() => {
     const checkOrientation = () => {
       const portrait = window.innerHeight > window.innerWidth;
+      console.log('Orientation check:', { portrait, height: window.innerHeight, width: window.innerWidth, isMobileDevice });
       setIsPortrait(portrait);
     };
     
+    // Also re-check mobile device
+    setIsMobileDevice(isTouchDevice());
     checkOrientation();
+    
     window.addEventListener('resize', checkOrientation);
     window.addEventListener('orientationchange', checkOrientation);
     
