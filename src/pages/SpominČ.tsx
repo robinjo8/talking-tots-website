@@ -254,6 +254,22 @@ const SpominČContent = () => {
           )}
         </div>
 
+        {/* Progress dots on right side - mobile only */}
+        {!isPortrait && (
+          <div className="fixed right-2 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2">
+            {Array.from({ length: totalPairs }).map((_, index) => (
+              <div
+                key={index}
+                className={`w-3 h-3 rounded-full border-2 border-white/70 transition-all duration-300 ${
+                  index < matchedPairs.length
+                    ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]'
+                    : 'bg-transparent'
+                }`}
+              />
+            ))}
+          </div>
+        )}
+
         {/* Floating menu button */}
         <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
