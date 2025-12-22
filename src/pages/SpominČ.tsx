@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Home } from "lucide-react";
@@ -49,6 +49,26 @@ export default function SpominČ() {
   } = useMemoryGameČ();
   const gameStartTimeRef = useRef<number | null>(null);
   const [gameTime, setGameTime] = useState<number | null>(null);
+  
+  // Container size for dynamic grid calculation (like MazeGame)
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+
+  // Measure actual window size (like MazeGame does)
+  useEffect(() => {
+    const updateSize = () => {
+      setContainerSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    window.addEventListener('orientationchange', () => setTimeout(updateSize, 100));
+    return () => {
+      window.removeEventListener('resize', updateSize);
+      window.removeEventListener('orientationchange', updateSize);
+    };
+  }, []);
 
   // Detect touch device once on mount
   useEffect(() => {
@@ -185,6 +205,8 @@ export default function SpominČ() {
                   onCardClick={handleCardClick}
                   isCheckingMatch={isCheckingMatch}
                   isLandscape={true}
+                  containerWidth={containerSize.width}
+                  containerHeight={containerSize.height}
                 />
               )}
               
