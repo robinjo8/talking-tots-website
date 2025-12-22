@@ -33,8 +33,6 @@ const SpominČContent = () => {
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   // Portrait detection for showing rotation message
   const [isPortrait, setIsPortrait] = useState(false);
-  // NEW: isReady state for timing buffer (like LabirintC async load)
-  const [isReady, setIsReady] = useState(false);
   
   // Touch devices get fullscreen mode
   const effectiveFullscreen = isTouchDevice;
@@ -63,21 +61,13 @@ const SpominČContent = () => {
   const gameStartTimeRef = useRef<number | null>(null);
   const [gameTime, setGameTime] = useState<number | null>(null);
 
-  // DEBUG: Log component mount
-  useEffect(() => {
-    console.log('[SpominČ] Component mounted');
-    return () => console.log('[SpominČ] Component unmounted');
-  }, []);
-
   // Detect touch device once on mount
   useEffect(() => {
     const checkDevice = () => {
       const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
       const smallerDimension = Math.min(window.screen.width, window.screen.height);
       const isSmallScreen = smallerDimension <= 900;
-      const result = hasTouch && isSmallScreen;
-      console.log('[SpominČ] Device check:', { hasTouch, smallerDimension, isSmallScreen, isTouchDevice: result });
-      setIsTouchDevice(result);
+      setIsTouchDevice(hasTouch && isSmallScreen);
     };
     checkDevice();
   }, []);
@@ -111,53 +101,30 @@ const SpominČContent = () => {
     };
   }, []);
 
-  // NEW: Timing buffer - wait 100ms before attempting fullscreen/lock
+  // Fullscreen and orientation lock - IDENTICAL to LabirintC
   useEffect(() => {
-    console.log('[SpominČ] Setting up isReady timer...');
-    const timer = setTimeout(() => {
-      console.log('[SpominČ] isReady = true (after 100ms buffer)');
-      setIsReady(true);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Fullscreen and orientation lock - NOW WAITS FOR isReady
-  useEffect(() => {
-    console.log('[SpominČ] Fullscreen effect check:', { effectiveFullscreen, isReady });
-    
-    if (effectiveFullscreen && isReady) {
-      console.log('[SpominČ] Attempting fullscreen and landscape lock...');
-      
+    if (effectiveFullscreen) {
       const requestFullscreen = async () => {
         try {
           if (document.documentElement.requestFullscreen) {
-            console.log('[SpominČ] Calling requestFullscreen()...');
             await document.documentElement.requestFullscreen();
-            console.log('[SpominČ] requestFullscreen() SUCCESS');
-          } else {
-            console.log('[SpominČ] requestFullscreen not available');
           }
         } catch (error) {
-          console.log('[SpominČ] requestFullscreen() FAILED:', error);
+          // Fullscreen not supported or denied
         }
       };
 
       const lockLandscape = async () => {
         try {
           if (screen.orientation && 'lock' in screen.orientation) {
-            console.log('[SpominČ] Calling screen.orientation.lock()...');
             try {
               await (screen.orientation as any).lock('landscape-primary');
-              console.log('[SpominČ] orientation.lock(landscape-primary) SUCCESS');
             } catch {
               await (screen.orientation as any).lock('landscape');
-              console.log('[SpominČ] orientation.lock(landscape) SUCCESS (fallback)');
             }
-          } else {
-            console.log('[SpominČ] screen.orientation.lock not available');
           }
         } catch (error) {
-          console.log('[SpominČ] orientation.lock() FAILED:', error);
+          // Orientation lock not supported
         }
       };
 
@@ -173,11 +140,11 @@ const SpominČContent = () => {
             (screen.orientation as any).unlock();
           }
         } catch (error) {
-          console.log('Portrait unlock not supported:', error);
+          // Unlock not supported
         }
       };
     }
-  }, [effectiveFullscreen, isReady]);
+  }, [effectiveFullscreen]);
 
   const handleCardClick = (index: number) => {
     if (!gameStartTimeRef.current && cards.length > 0) {
