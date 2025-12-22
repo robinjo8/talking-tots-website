@@ -158,7 +158,7 @@ export default function SpominČ() {
         />
         
         {/* Game content */}
-        <div className="relative z-10 flex-1 flex items-stretch justify-center overflow-hidden h-full w-full">
+        <div className="relative z-10 h-full w-full flex items-center justify-center p-2">
           {!isPortrait ? (
             <>
               {isLoading && (
