@@ -61,8 +61,11 @@ export default function SpominČ() {
     checkDevice();
   }, []);
 
-  // Check orientation - IDENTICAL to LabirintC (no dependency, no early return)
+  // Orientation check - for DESKTOP only, mobile will be handled in fullscreen effect
   useEffect(() => {
+    // Skip for touch devices - they handle orientation in the fullscreen effect
+    if (isTouchDevice) return;
+    
     const checkOrientation = () => {
       let portrait = false;
       if (window.screen.orientation) {
@@ -90,7 +93,7 @@ export default function SpominČ() {
         window.screen.orientation.removeEventListener('change', checkOrientation);
       }
     };
-  }, []);
+  }, [isTouchDevice]);
 
   const handleCardClick = (index: number) => {
     if (!gameStartTimeRef.current && cards.length > 0) {
@@ -108,11 +111,28 @@ export default function SpominČ() {
     });
   };
 
-  // Enable fullscreen and landscape lock on mobile devices - MUST run before orientation check
+  // Enable fullscreen and landscape lock on mobile devices
+  // This also handles orientation checking for touch devices
   useEffect(() => {
     if (!effectiveFullscreen) return;
     
     let mounted = true;
+    
+    const checkOrientation = () => {
+      if (window.screen.orientation) {
+        return window.screen.orientation.type.includes('portrait');
+      }
+      return window.screen.height > window.screen.width;
+    };
+    
+    const handleOrientationChange = () => {
+      if (!mounted) return;
+      setTimeout(() => {
+        if (mounted) {
+          setIsPortrait(checkOrientation());
+        }
+      }, 100);
+    };
     
     const setupFullscreenAndLock = async () => {
       // Request fullscreen first
@@ -125,34 +145,50 @@ export default function SpominČ() {
       }
 
       // Then lock to landscape
+      let lockSucceeded = false;
       try {
         if (screen.orientation && 'lock' in screen.orientation) {
           try {
             await (screen.orientation as any).lock('landscape-primary');
+            lockSucceeded = true;
           } catch {
-            await (screen.orientation as any).lock('landscape');
+            try {
+              await (screen.orientation as any).lock('landscape');
+              lockSucceeded = true;
+            } catch {
+              lockSucceeded = false;
+            }
           }
         }
       } catch (error) {
         console.log('Landscape lock not supported:', error);
       }
       
-      // After lock succeeds, re-check orientation with small delay
+      // After lock attempt, check orientation with delay
       if (mounted) {
         setTimeout(() => {
-          if (window.screen.orientation) {
-            setIsPortrait(window.screen.orientation.type.includes('portrait'));
-          } else {
-            setIsPortrait(window.screen.height > window.screen.width);
+          if (mounted) {
+            setIsPortrait(checkOrientation());
           }
-        }, 150);
+        }, 200);
       }
     };
     
+    // Set up orientation change listeners
+    window.addEventListener('orientationchange', handleOrientationChange);
+    if (window.screen.orientation) {
+      window.screen.orientation.addEventListener('change', handleOrientationChange);
+    }
+    
+    // Start the setup
     setupFullscreenAndLock();
       
     return () => {
       mounted = false;
+      window.removeEventListener('orientationchange', handleOrientationChange);
+      if (window.screen.orientation) {
+        window.screen.orientation.removeEventListener('change', handleOrientationChange);
+      }
       if (document.fullscreenElement) {
         document.exitFullscreen?.();
       }
