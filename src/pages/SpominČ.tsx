@@ -147,7 +147,7 @@ export default function SpominČ() {
 
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/zeleno_ozadje.png`;
 
-  // Mobile fullscreen version
+  // Mobile fullscreen version - structure identical to LabirintC
   if (effectiveFullscreen) {
     return (
       <div className="fixed inset-0 overflow-hidden select-none">
@@ -157,15 +157,16 @@ export default function SpominČ() {
           style={{ backgroundImage: `url('${backgroundImageUrl}')` }}
         />
         
-        {/* Game content */}
+        {/* Game content - IDENTICAL structure to LabirintC */}
         <div className="relative z-10 flex-1 flex items-stretch justify-center overflow-hidden h-full w-full">
           {!isPortrait ? (
-            <>
-              {isLoading && (
+            // Direct render like MazeGame - no Fragment wrapper
+            isLoading ? (
+              <div className="flex items-center justify-center h-full">
                 <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
-              )}
-              
-              {error && (
+              </div>
+            ) : error ? (
+              <div className="flex items-center justify-center h-full">
                 <div className="bg-red-50 p-6 rounded-lg border border-red-100 text-center">
                   <h3 className="text-red-600 font-medium mb-2">Napaka pri nalaganju igre</h3>
                   <p className="text-sm text-red-500">Poskusite znova kasneje.</p>
@@ -177,25 +178,19 @@ export default function SpominČ() {
                     Poskusi znova
                   </Button>
                 </div>
-              )}
-              
-              {!isLoading && !error && cards.length > 0 && (
-                <MemoryGrid
-                  cards={cards}
-                  onCardClick={handleCardClick}
-                  isCheckingMatch={isCheckingMatch}
-                  isLandscape={true}
-                />
-              )}
-              
-              {!isLoading && !error && cards.length === 0 && (
-                <div className="text-center p-10 border rounded-lg">
-                  <p className="text-muted-foreground">
-                    Ni kartic za prikaz. Prosim, preverite nastavitve igre.
-                  </p>
-                </div>
-              )}
-            </>
+              </div>
+            ) : cards.length > 0 ? (
+              <MemoryGrid
+                cards={cards}
+                onCardClick={handleCardClick}
+                isCheckingMatch={isCheckingMatch}
+                isLandscape={true}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <p className="text-muted-foreground">Ni kartic za prikaz.</p>
+              </div>
+            )
           ) : (
             <div className="w-full h-full flex items-center justify-center px-6 text-center">
               <p className="text-base font-semibold text-foreground">
