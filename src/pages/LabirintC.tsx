@@ -22,7 +22,6 @@ import {
 import { Home } from "lucide-react";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -41,16 +40,53 @@ const LabirintCContent = () => {
   const [gameKey, setGameKey] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
-  const [isLandscape, setIsLandscape] = useState(true);
+  const [isPortrait, setIsPortrait] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [cards, setCards] = useState<Array<{ image_url: string; word: string; audio_url: string }>>([]);
   const { recordGameCompletion } = useEnhancedProgress();
-  const isMobile = useIsMobile();
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const { user, selectedChild } = useAuth();
   const gameCompletedRef = useRef(false);
   
-  const effectiveFullscreen = isMobile;
+  // Reliable touch device detection using physical screen size
+  useEffect(() => {
+    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const isSmallScreen = Math.min(window.screen.width, window.screen.height) <= 900;
+    setIsTouchDevice(hasTouch && isSmallScreen);
+  }, []);
+
+  // Reliable orientation detection using screen.orientation
+  useEffect(() => {
+    const checkOrientation = () => {
+      if (window.screen.orientation) {
+        setIsPortrait(window.screen.orientation.type.includes('portrait'));
+      } else {
+        // Fallback: use screen dimensions (not window - those change with CSS rotation)
+        setIsPortrait(window.screen.height > window.screen.width);
+      }
+    };
+    
+    checkOrientation();
+    
+    const handleOrientationChange = () => {
+      setTimeout(checkOrientation, 100);
+    };
+    
+    window.addEventListener('orientationchange', handleOrientationChange);
+    if (window.screen.orientation) {
+      window.screen.orientation.addEventListener('change', checkOrientation);
+    }
+    
+    return () => {
+      window.removeEventListener('orientationchange', handleOrientationChange);
+      if (window.screen.orientation) {
+        window.screen.orientation.removeEventListener('change', checkOrientation);
+      }
+    };
+  }, []);
+
+  const effectiveFullscreen = isTouchDevice;
 
   // Load cards from Supabase
   useEffect(() => {
@@ -111,23 +147,7 @@ const LabirintCContent = () => {
 
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/1190.jpg`;
 
-  // Track orientation
-  useEffect(() => {
-    const updateOrientation = () => {
-      if (typeof window !== 'undefined') {
-        setIsLandscape(window.innerWidth >= window.innerHeight);
-      }
-    };
-
-    updateOrientation();
-    window.addEventListener('resize', updateOrientation);
-    window.addEventListener('orientationchange', updateOrientation);
-
-    return () => {
-      window.removeEventListener('resize', updateOrientation);
-      window.removeEventListener('orientationchange', updateOrientation);
-    };
-  }, []);
+  // Orientation tracking now handled in the useEffect above with screen.orientation
 
   useEffect(() => {
     if (effectiveFullscreen) {
@@ -185,7 +205,7 @@ const LabirintCContent = () => {
         
         {/* Game content */}
         <div className="relative z-10 flex-1 flex items-stretch justify-center overflow-hidden h-full">
-          {isLandscape ? (
+          {!isPortrait ? (
             <MazeGame key={gameKey} onComplete={handleGameComplete} cols={16} rows={9} />
           ) : (
             <div className="w-full h-full flex items-center justify-center px-6 text-center">
