@@ -1,14 +1,22 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Home } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { MemoryGrid } from "@/components/games/MemoryGrid";
 import { useMemoryGameČ } from "@/hooks/useMemoryGameČ";
 import { useToast } from "@/components/ui/use-toast";
-import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { InfoModal } from "@/components/games/InfoModal";
-import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { MemoryPairDialog } from "@/components/games/MemoryPairDialog";
 import { MemoryProgressIndicator } from "@/components/games/MemoryProgressIndicator";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
@@ -24,25 +32,20 @@ const SpominČ = () => {
   );
 };
 
-// Content component - mounts AFTER age gate click (enables fullscreen/lock)
+// Content component - mounts AFTER age gate click
 const SpominČContent = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   
-  // Synchronous touch device detection for immediate fullscreen activation
-  const [isTouchDevice, setIsTouchDevice] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    const isSmallScreen = Math.min(window.screen.width, window.screen.height) <= 900;
-    return hasTouch && isSmallScreen;
-  });
+  // Touch device detection - same as LabirintC
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
   // Portrait detection for showing rotation message
   const [isPortrait, setIsPortrait] = useState(false);
+  // Mobile game started state - for user gesture activation
+  const [mobileGameStarted, setMobileGameStarted] = useState(false);
   
   // Touch devices get fullscreen mode
   const effectiveFullscreen = isTouchDevice;
   
-  const { audioRef } = useAudioPlayback();
   const [showInfo, setShowInfo] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -66,23 +69,20 @@ const SpominČContent = () => {
   const gameStartTimeRef = useRef<number | null>(null);
   const [gameTime, setGameTime] = useState<number | null>(null);
 
-  // Detect touch device once on mount
+  // Reliable touch device detection using physical screen size - same as LabirintC
   useEffect(() => {
-    const checkDevice = () => {
-      const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-      const smallerDimension = Math.min(window.screen.width, window.screen.height);
-      const isSmallScreen = smallerDimension <= 900;
-      setIsTouchDevice(hasTouch && isSmallScreen);
-    };
-    checkDevice();
+    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const isSmallScreen = Math.min(window.screen.width, window.screen.height) <= 900;
+    setIsTouchDevice(hasTouch && isSmallScreen);
   }, []);
 
-  // Reliable orientation detection using screen.orientation
+  // Reliable orientation detection using screen.orientation - same as LabirintC
   useEffect(() => {
     const checkOrientation = () => {
       if (window.screen.orientation) {
         setIsPortrait(window.screen.orientation.type.includes('portrait'));
       } else {
+        // Fallback: use screen dimensions (not window - those change with CSS rotation)
         setIsPortrait(window.screen.height > window.screen.width);
       }
     };
@@ -106,50 +106,48 @@ const SpominČContent = () => {
     };
   }, []);
 
-  // Fullscreen and orientation lock - IDENTICAL to LabirintC
+  // Cleanup fullscreen and orientation on unmount
   useEffect(() => {
-    if (effectiveFullscreen) {
-      const requestFullscreen = async () => {
-        try {
-          if (document.documentElement.requestFullscreen) {
-            await document.documentElement.requestFullscreen();
-          }
-        } catch (error) {
-          // Fullscreen not supported or denied
+    return () => {
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.();
+      }
+      try {
+        if (screen.orientation && 'unlock' in screen.orientation) {
+          (screen.orientation as any).unlock();
         }
-      };
+      } catch (error) {
+        // Unlock not supported
+      }
+    };
+  }, []);
 
-      const lockLandscape = async () => {
-        try {
-          if (screen.orientation && 'lock' in screen.orientation) {
-            try {
-              await (screen.orientation as any).lock('landscape-primary');
-            } catch {
-              await (screen.orientation as any).lock('landscape');
-            }
-          }
-        } catch (error) {
-          // Orientation lock not supported
-        }
-      };
-
-      requestFullscreen();
-      lockLandscape();
-        
-      return () => {
-        if (document.fullscreenElement) {
-          document.exitFullscreen?.();
-        }
-        try {
-          if (screen.orientation && 'unlock' in screen.orientation) {
-            (screen.orientation as any).unlock();
-          }
-        } catch (error) {
-          // Unlock not supported
-        }
-      };
+  // Handle mobile game start - triggers fullscreen and orientation lock via user gesture
+  const handleMobileStart = async () => {
+    // Request fullscreen
+    try {
+      if (document.documentElement.requestFullscreen) {
+        await document.documentElement.requestFullscreen();
+      }
+    } catch (error) {
+      console.log('Fullscreen not supported:', error);
     }
-  }, [effectiveFullscreen]);
+
+    // Lock to landscape
+    try {
+      if (screen.orientation && 'lock' in screen.orientation) {
+        try {
+          await (screen.orientation as any).lock('landscape-primary');
+        } catch {
+          await (screen.orientation as any).lock('landscape');
+        }
+      }
+    } catch (error) {
+      console.log('Landscape lock not supported:', error);
+    }
+
+    setMobileGameStarted(true);
+  };
 
   const handleCardClick = (index: number) => {
     if (!gameStartTimeRef.current && cards.length > 0) {
@@ -165,6 +163,26 @@ const SpominČContent = () => {
     toast({
       title: "Igra je bila ponovno nastavljena!",
     });
+  };
+
+  const handleBack = () => {
+    setMenuOpen(false);
+    setShowExitDialog(true);
+  };
+
+  const handleConfirmExit = () => {
+    // Exit fullscreen and unlock orientation before navigating
+    if (document.fullscreenElement) {
+      document.exitFullscreen?.();
+    }
+    try {
+      if (screen.orientation && 'unlock' in screen.orientation) {
+        (screen.orientation as any).unlock();
+      }
+    } catch (error) {
+      // Unlock not supported
+    }
+    navigate('/govorne-igre/spomin');
   };
 
   useEffect(() => {
@@ -184,8 +202,30 @@ const SpominČContent = () => {
 
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/zeleno_ozadje.png`;
 
-  // Mobile fullscreen version - DIRECT entry like LabirintC (no "Začni igro" overlay)
+  // Mobile fullscreen version - IDENTICAL structure to LabirintC
   if (effectiveFullscreen) {
+    // Show start overlay if game not started yet
+    if (!mobileGameStarted) {
+      return (
+        <div className="fixed inset-0 overflow-hidden select-none">
+          {/* Full screen background */}
+          <div 
+            className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: `url('${backgroundImageUrl}')` }}
+          />
+          
+          {/* Start overlay */}
+          <div className="relative z-10 flex items-center justify-center h-full w-full">
+            <Button
+              onClick={handleMobileStart}
+              className="px-8 py-6 text-xl font-bold bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 rounded-xl"
+            >
+              Začni igro
+            </Button>
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div className="fixed inset-0 overflow-hidden select-none">
@@ -254,10 +294,7 @@ const SpominČContent = () => {
             className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
           >
             <button
-              onClick={() => {
-                setMenuOpen(false);
-                setShowExitDialog(true);
-              }}
+              onClick={handleBack}
               className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
             >
               <span className="text-2xl">🏠</span>
@@ -286,6 +323,23 @@ const SpominČContent = () => {
           </DropdownMenuContent>
         </DropdownMenu>
 
+        <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Ali res želite prekiniti igro?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Trenutna igra bo izgubljena.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Prekliči</AlertDialogCancel>
+              <AlertDialogAction onClick={handleConfirmExit}>
+                Potrdi
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
         <InfoModal
           isOpen={showInfo}
           onClose={() => setShowInfo(false)}
@@ -312,19 +366,11 @@ Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede."
           word={currentMatchedPair?.word || null}
           audioUrl={currentMatchedPair?.audio_url || null}
         />
-
-        <MemoryExitConfirmationDialog
-          open={showExitDialog}
-          onOpenChange={setShowExitDialog}
-          onConfirm={() => navigate("/govorne-igre/spomin")}
-        >
-          <div />
-        </MemoryExitConfirmationDialog>
       </div>
     );
   }
 
-  // Desktop version - unchanged
+  // Desktop version
   return (
     <div className="min-h-screen relative">
       {/* Background image layer */}
@@ -398,10 +444,7 @@ Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede."
           className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
         >
           <button
-            onClick={() => {
-              setMenuOpen(false);
-              setShowExitDialog(true);
-            }}
+            onClick={handleBack}
             className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
           >
             <span className="text-2xl">🏠</span>
@@ -457,13 +500,22 @@ Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede."
         audioUrl={currentMatchedPair?.audio_url || null}
       />
 
-      <MemoryExitConfirmationDialog
-        open={showExitDialog}
-        onOpenChange={setShowExitDialog}
-        onConfirm={() => navigate("/govorne-igre/spomin")}
-      >
-        <div />
-      </MemoryExitConfirmationDialog>
+      <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Ali res želite prekiniti igro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Trenutna igra bo izgubljena.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Prekliči</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmExit}>
+              Potrdi
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
