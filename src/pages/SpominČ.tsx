@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Home } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -11,17 +11,15 @@ import { InfoModal } from "@/components/games/InfoModal";
 import { MemoryPairDialog } from "@/components/games/MemoryPairDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { MemoryProgressIndicator } from "@/components/games/MemoryProgressIndicator";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
 
 export default function SpominČ() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchParams] = useSearchParams();
   
-  // Use reliable mobile detection hook
-  const isMobile = useIsMobile();
+  // Reliable touch device detection
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [isPortrait, setIsPortrait] = useState(false);
   
   const { audioRef } = useAudioPlayback();
@@ -48,7 +46,25 @@ export default function SpominČ() {
   const gameStartTimeRef = useRef<number | null>(null);
   const [gameTime, setGameTime] = useState<number | null>(null);
 
-  // Check orientation and update on changes - only matters on mobile
+  // Reliable touch device detection - runs once on mount
+  useEffect(() => {
+    const checkTouch = () => {
+      const hasTouch = (
+        'ontouchstart' in window ||
+        navigator.maxTouchPoints > 0 ||
+        (navigator as any).msMaxTouchPoints > 0
+      );
+      // Consider it a mobile/tablet if has touch AND screen is reasonably small
+      const isSmallScreen = Math.min(window.innerWidth, window.innerHeight) <= 1024;
+      setIsTouchDevice(hasTouch && isSmallScreen);
+    };
+    
+    checkTouch();
+    window.addEventListener('resize', checkTouch);
+    return () => window.removeEventListener('resize', checkTouch);
+  }, []);
+
+  // Check orientation and update on changes
   useEffect(() => {
     const checkOrientation = () => {
       const portrait = window.innerHeight > window.innerWidth;
@@ -58,7 +74,10 @@ export default function SpominČ() {
     checkOrientation();
     
     window.addEventListener('resize', checkOrientation);
-    window.addEventListener('orientationchange', checkOrientation);
+    window.addEventListener('orientationchange', () => {
+      // Delay to get accurate dimensions after orientation change
+      setTimeout(checkOrientation, 100);
+    });
     
     return () => {
       window.removeEventListener('resize', checkOrientation);
@@ -66,8 +85,58 @@ export default function SpominČ() {
     };
   }, []);
 
-  // Mobile fullscreen mode - always true on mobile
-  const effectiveFullscreen = isMobile;
+  // Prevent body scroll on touch devices
+  useEffect(() => {
+    if (isTouchDevice) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.body.style.height = '100%';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.height = '';
+    };
+  }, [isTouchDevice]);
+
+  // Try to lock landscape orientation (Android only - iOS doesn't support this)
+  useEffect(() => {
+    if (!isTouchDevice) return;
+    
+    const requestFullscreenAndLockLandscape = async () => {
+      try {
+        if (document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        }
+        
+        if (screen.orientation && 'lock' in screen.orientation) {
+          try {
+            await (screen.orientation as any).lock('landscape');
+          } catch (lockError) {
+            // Orientation lock not supported (iOS Safari)
+          }
+        }
+      } catch (error) {
+        // Fullscreen not supported
+      }
+    };
+    
+    requestFullscreenAndLockLandscape();
+    
+    return () => {
+      if (screen.orientation && 'unlock' in screen.orientation) {
+        try {
+          (screen.orientation as any).unlock();
+        } catch (e) {}
+      }
+      
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.();
+      }
+    };
+  }, [isTouchDevice]);
 
   const handleCardClick = (index: number) => {
     if (!gameStartTimeRef.current && cards.length > 0) {
@@ -84,45 +153,6 @@ export default function SpominČ() {
       title: "Igra je bila ponovno nastavljena!",
     });
   };
-
-  // Enable fullscreen and try to lock landscape orientation
-  useEffect(() => {
-    if (!effectiveFullscreen) return;
-    
-    const requestFullscreenAndLockLandscape = async () => {
-      try {
-        if (document.documentElement.requestFullscreen) {
-          await document.documentElement.requestFullscreen();
-        }
-        
-        if (screen.orientation && 'lock' in screen.orientation) {
-          try {
-            await (screen.orientation as any).lock('landscape');
-          } catch (lockError) {
-            console.log('Landscape lock not supported:', lockError);
-          }
-        }
-      } catch (error) {
-        console.log('Fullscreen not supported:', error);
-      }
-    };
-    
-    requestFullscreenAndLockLandscape();
-    
-    return () => {
-      if (screen.orientation && 'unlock' in screen.orientation) {
-        try {
-          (screen.orientation as any).unlock();
-        } catch (e) {
-          console.log('Orientation unlock error:', e);
-        }
-      }
-      
-      if (document.fullscreenElement) {
-        document.exitFullscreen?.();
-      }
-    };
-  }, [effectiveFullscreen]);
 
   useEffect(() => {
     if (gameCompleted && gameStartTimeRef.current && gameTime === null) {
@@ -141,12 +171,11 @@ export default function SpominČ() {
 
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/zeleno_ozadje.png`;
 
-  // For mobile in portrait: use CSS transform to force landscape view
-  // This works even if orientation lock is not supported (iOS)
-  const shouldRotate = isMobile && isPortrait;
+  // Force landscape via CSS rotation when touch device is in portrait
+  const shouldForceRotate = isTouchDevice && isPortrait;
 
-  // Container styles for rotated view - swap width/height and rotate
-  const rotatedContainerStyle: React.CSSProperties = shouldRotate ? {
+  // Container styles - rotate entire container when in portrait on touch device
+  const containerStyle: React.CSSProperties = shouldForceRotate ? {
     position: 'fixed',
     top: 0,
     left: 0,
@@ -157,13 +186,17 @@ export default function SpominČ() {
     marginLeft: '100vw',
     overflow: 'hidden',
     zIndex: 9999,
-  } : {};
+  } : {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    overflow: 'hidden',
+  };
 
   return (
-    <div 
-      className={`${effectiveFullscreen ? 'fixed inset-0 overflow-hidden' : 'min-h-screen'} relative`}
-      style={rotatedContainerStyle}
-    >
+    <div style={containerStyle}>
       {/* Background image layer */}
       <div 
         className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
@@ -172,111 +205,64 @@ export default function SpominČ() {
         }}
       />
       
-      <div className={`relative z-10 ${effectiveFullscreen ? 'h-full flex items-center justify-center overflow-hidden' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
-        {effectiveFullscreen ? (
-          <div className="w-full h-full flex items-center justify-center px-4">
-            {isLoading && (
-              <div className="text-lg text-white">Nalaganje igre...</div>
-            )}
-            
-            {error && (
-              <div className="bg-red-50 p-6 rounded-lg border border-red-100 text-center">
-                <h3 className="text-red-600 font-medium mb-2">Napaka pri nalaganju igre</h3>
-                <p className="text-sm text-red-500">Poskusite znova kasneje.</p>
-                <Button 
-                  variant="outline" 
-                  className="mt-4" 
-                  onClick={() => window.location.reload()}
-                >
-                  Poskusi znova
-                </Button>
-              </div>
-            )}
-            
-            {!isLoading && !error && cards.length > 0 && (
-              <div className="w-full h-full flex flex-col items-center justify-center py-2">
-                <MemoryProgressIndicator 
-                  matchedPairs={matchedPairs.length} 
-                  totalPairs={totalPairs} 
-                />
-                <div className="flex-1 flex items-center justify-center w-full" style={{ maxWidth: shouldRotate ? '95vh' : '95vw' }}>
-                  <MemoryGrid
-                    cards={cards}
-                    onCardClick={handleCardClick}
-                    isCheckingMatch={isCheckingMatch}
-                    isLandscape={true}
-                  />
-                </div>
-              </div>
-            )}
-            
-            {!isLoading && !error && cards.length === 0 && (
-              <div className="text-center p-10 border rounded-lg bg-white/90">
-                <p className="text-muted-foreground">
-                  Ni kartic za prikaz. Prosim, preverite nastavitve igre.
-                </p>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="px-4">
-            <div className="w-full max-w-4xl mx-auto">
-              {isLoading && (
-                <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
-              )}
-              
-              {error && (
-                <div className="bg-red-50 p-6 rounded-lg border border-red-100 text-center">
-                  <h3 className="text-red-600 font-medium mb-2">Napaka pri nalaganju igre</h3>
-                  <p className="text-sm text-red-500">Poskusite znova kasneje.</p>
-                  <Button 
-                    variant="outline" 
-                    className="mt-4" 
-                    onClick={() => window.location.reload()}
-                  >
-                    Poskusi znova
-                  </Button>
-                </div>
-              )}
-              
-              {!isLoading && !error && cards.length > 0 && (
-                <>
-                  <MemoryProgressIndicator 
-                    matchedPairs={matchedPairs.length} 
-                    totalPairs={totalPairs} 
-                  />
-                  <div className="my-[160px]">
-                    <MemoryGrid 
-                      cards={cards} 
-                      onCardClick={handleCardClick}
-                      isCheckingMatch={isCheckingMatch}
-                    />
-                  </div>
-                </>
-              )}
-              
-              {!isLoading && !error && cards.length === 0 && (
-                <div className="text-center p-10 border rounded-lg">
-                  <p className="text-muted-foreground">
-                    Ni kartic za prikaz. Prosim, preverite nastavitve igre.
-                  </p>
-                </div>
-              )}
+      {/* Game content */}
+      <div className="relative z-10 h-full w-full flex items-center justify-center overflow-hidden">
+        <div className="w-full h-full flex items-center justify-center px-4">
+          {isLoading && (
+            <div className="text-lg text-white">Nalaganje igre...</div>
+          )}
+          
+          {error && (
+            <div className="bg-red-50 p-6 rounded-lg border border-red-100 text-center">
+              <h3 className="text-red-600 font-medium mb-2">Napaka pri nalaganju igre</h3>
+              <p className="text-sm text-red-500">Poskusite znova kasneje.</p>
+              <Button 
+                variant="outline" 
+                className="mt-4" 
+                onClick={() => window.location.reload()}
+              >
+                Poskusi znova
+              </Button>
             </div>
-          </div>
-        )}
+          )}
+          
+          {!isLoading && !error && cards.length > 0 && (
+            <div className="w-full h-full flex flex-col items-center justify-center py-2">
+              <MemoryProgressIndicator 
+                matchedPairs={matchedPairs.length} 
+                totalPairs={totalPairs} 
+              />
+              <div className="flex-1 flex items-center justify-center w-full">
+                <MemoryGrid
+                  cards={cards}
+                  onCardClick={handleCardClick}
+                  isCheckingMatch={isCheckingMatch}
+                  isLandscape={true}
+                />
+              </div>
+            </div>
+          )}
+          
+          {!isLoading && !error && cards.length === 0 && (
+            <div className="text-center p-10 border rounded-lg bg-white/90">
+              <p className="text-muted-foreground">
+                Ni kartic za prikaz. Prosim, preverite nastavitve igre.
+              </p>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Floating menu button */}
+      {/* Floating menu button - position adjusts based on rotation */}
       <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
         <DropdownMenuTrigger asChild>
           <Button 
             className="fixed z-50 rounded-full w-14 h-14 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm"
             style={{
-              bottom: shouldRotate ? 'auto' : '16px',
-              left: shouldRotate ? 'auto' : '16px',
-              top: shouldRotate ? '16px' : 'auto',
-              right: shouldRotate ? '16px' : 'auto',
+              bottom: shouldForceRotate ? 'auto' : '16px',
+              left: shouldForceRotate ? 'auto' : '16px',
+              top: shouldForceRotate ? '16px' : 'auto',
+              right: shouldForceRotate ? '16px' : 'auto',
             }}
             size="icon"
           >
@@ -284,8 +270,8 @@ export default function SpominČ() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent 
-          align={shouldRotate ? "end" : "start"}
-          side={shouldRotate ? "bottom" : "top"}
+          align={shouldForceRotate ? "end" : "start"}
+          side={shouldForceRotate ? "bottom" : "top"}
           sideOffset={8}
           className="w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
         >
