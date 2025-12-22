@@ -42,13 +42,14 @@ export function MemoryGrid({
   const columns = isLandscape ? 5 : (cardCount <= 16 ? 4 : 5);
   const rows = Math.ceil(cardCount / columns);
   
+  const gap = 8; // gap-2 = 8px
+  
   // Calculate card size dynamically based on actual window dimensions (like MazeGame)
   const cardSize = useMemo(() => {
     if (!isLandscape || containerSize.width === 0 || containerSize.height === 0) {
       return null;
     }
     
-    const gap = 8; // gap-2 = 8px
     const PADDING = 4; // minimal padding
     
     const availableWidth = containerSize.width - PADDING * 2;
@@ -59,7 +60,11 @@ export function MemoryGrid({
     
     // Use the smaller dimension to ensure cards fit, with slight reduction for safety
     return Math.floor(Math.min(sizeByWidth, sizeByHeight) * 0.98);
-  }, [containerSize, columns, rows, isLandscape]);
+  }, [containerSize, columns, rows, isLandscape, gap]);
+  
+  // Calculate explicit grid dimensions (like canvas width/height in MazeGame)
+  const gridWidth = cardSize ? columns * cardSize + gap * (columns - 1) : 0;
+  const gridHeight = cardSize ? rows * cardSize + gap * (rows - 1) : 0;
   
   // Don't render until we have proper dimensions in landscape mode
   if (isLandscape && !cardSize) {
@@ -78,6 +83,8 @@ export function MemoryGrid({
         style={isLandscape && cardSize ? {
           gridTemplateColumns: `repeat(${columns}, ${cardSize}px)`,
           gridTemplateRows: `repeat(${rows}, ${cardSize}px)`,
+          width: gridWidth,
+          height: gridHeight,
         } : {
           gridTemplateColumns: `repeat(${columns}, 1fr)`,
           maxWidth: '900px',
