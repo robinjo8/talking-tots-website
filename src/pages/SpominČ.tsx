@@ -160,7 +160,7 @@ export default function SpominČ() {
         {/* Game content */}
         <div className="relative z-10 flex-1 flex items-stretch justify-center overflow-hidden h-full w-full">
           {!isPortrait ? (
-            <div className="w-full h-full flex items-center justify-center">
+            <>
               {isLoading && (
                 <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
               )}
@@ -195,7 +195,7 @@ export default function SpominČ() {
                   </p>
                 </div>
               )}
-            </div>
+            </>
           ) : (
             <div className="w-full h-full flex items-center justify-center px-6 text-center">
               <p className="text-base font-semibold text-foreground">
