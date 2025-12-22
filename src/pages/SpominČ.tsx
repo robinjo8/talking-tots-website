@@ -10,29 +10,31 @@ import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { InfoModal } from "@/components/games/InfoModal";
 import { MemoryPairDialog } from "@/components/games/MemoryPairDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { MemoryProgressIndicator } from "@/components/games/MemoryProgressIndicator";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
+
+// Detect if device is touch-enabled (more reliable than screen width for mobile detection)
+const isTouchDevice = () => {
+  if (typeof window === 'undefined') return false;
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+};
 
 export default function SpominČ() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const isMobile = useIsMobile();
   
-  // Mobile devices always get fullscreen, desktop never gets fullscreen
-  const effectiveFullscreen = isMobile;
+  // Use touch detection for mobile - more reliable than screen width
+  const [isMobileDevice, setIsMobileDevice] = useState(false);
+  const [isPortrait, setIsPortrait] = useState(false);
   
   const { audioRef } = useAudioPlayback();
   const [showInfo, setShowInfo] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isPortrait, setIsPortrait] = useState(false);
   const { toast } = useToast();
   
-  // Extract letter from URL path
-  const currentLetter = decodeURIComponent(location.pathname.split('-').pop() || 'č').toUpperCase();
   const { 
     cards, 
     isLoading, 
@@ -51,6 +53,31 @@ export default function SpominČ() {
   const gameStartTimeRef = useRef<number | null>(null);
   const [gameTime, setGameTime] = useState<number | null>(null);
 
+  // Detect mobile device on mount
+  useEffect(() => {
+    setIsMobileDevice(isTouchDevice());
+  }, []);
+
+  // Check orientation
+  useEffect(() => {
+    const checkOrientation = () => {
+      const portrait = window.innerHeight > window.innerWidth;
+      setIsPortrait(portrait);
+    };
+    
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+    
+    return () => {
+      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('orientationchange', checkOrientation);
+    };
+  }, []);
+
+  // Mobile fullscreen mode
+  const effectiveFullscreen = isMobileDevice;
+
   const handleCardClick = (index: number) => {
     if (!gameStartTimeRef.current && cards.length > 0) {
       gameStartTimeRef.current = Date.now();
@@ -67,36 +94,16 @@ export default function SpominČ() {
     });
   };
 
-  // Check orientation for portrait overlay (mobile only)
-  useEffect(() => {
-    if (!isMobile) return;
-    
-    const checkOrientation = () => {
-      setIsPortrait(window.innerHeight > window.innerWidth);
-    };
-    
-    checkOrientation();
-    window.addEventListener('resize', checkOrientation);
-    window.addEventListener('orientationchange', checkOrientation);
-    
-    return () => {
-      window.removeEventListener('resize', checkOrientation);
-      window.removeEventListener('orientationchange', checkOrientation);
-    };
-  }, [isMobile]);
-
-  // Enable fullscreen and lock landscape orientation on mobile devices
+  // Enable fullscreen and try to lock landscape orientation
   useEffect(() => {
     if (!effectiveFullscreen) return;
     
     const requestFullscreenAndLockLandscape = async () => {
       try {
-        // First request fullscreen
         if (document.documentElement.requestFullscreen) {
           await document.documentElement.requestFullscreen();
         }
         
-        // Then lock to landscape (requires fullscreen)
         if (screen.orientation && 'lock' in screen.orientation) {
           try {
             await (screen.orientation as any).lock('landscape');
@@ -112,7 +119,6 @@ export default function SpominČ() {
     requestFullscreenAndLockLandscape();
     
     return () => {
-      // Unlock orientation on cleanup
       if (screen.orientation && 'unlock' in screen.orientation) {
         try {
           (screen.orientation as any).unlock();
@@ -144,42 +150,30 @@ export default function SpominČ() {
 
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/zeleno_ozadje.png`;
 
-  // Portrait overlay for mobile - shown when device is in portrait mode
-  if (isMobile && isPortrait) {
-    return (
-      <div 
-        className="fixed inset-0 z-[100] flex flex-col items-center justify-center p-8"
-        style={{
-          backgroundImage: `url('${backgroundImageUrl}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 max-w-sm text-center shadow-2xl border-4 border-orange-300">
-          <div className="mb-6 animate-bounce">
-            <Smartphone className="w-20 h-20 mx-auto text-orange-500 rotate-90" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-3">
-            Obrni telefon
-          </h2>
-          <p className="text-gray-600 text-lg">
-            Za igranje te igre obrni telefon v ležeči položaj
-          </p>
-          <div className="mt-6 flex justify-center gap-2">
-            <div className="w-3 h-3 bg-orange-400 rounded-full animate-pulse" />
-            <div className="w-3 h-3 bg-orange-400 rounded-full animate-pulse delay-100" />
-            <div className="w-3 h-3 bg-orange-400 rounded-full animate-pulse delay-200" />
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // For mobile in portrait: use CSS transform to force landscape view
+  const shouldRotate = isMobileDevice && isPortrait;
+
+  // Container styles for rotated view
+  const rotatedContainerStyle: React.CSSProperties = shouldRotate ? {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vh',
+    height: '100vw',
+    transform: 'rotate(90deg)',
+    transformOrigin: 'top left',
+    marginLeft: '100vw',
+    overflow: 'hidden',
+  } : {};
 
   return (
-    <div className={`${effectiveFullscreen ? 'fixed inset-0 overflow-hidden' : 'min-h-screen'} relative`}>
+    <div 
+      className={`${effectiveFullscreen ? 'fixed inset-0 overflow-hidden' : 'min-h-screen'} relative`}
+      style={rotatedContainerStyle}
+    >
       {/* Background image layer */}
       <div 
-        className={`${effectiveFullscreen ? 'fixed' : 'absolute'} inset-0 w-full h-full bg-cover bg-center bg-no-repeat`}
+        className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
         style={{
           backgroundImage: `url('${backgroundImageUrl}')`
         }}
@@ -212,7 +206,7 @@ export default function SpominČ() {
                   matchedPairs={matchedPairs.length} 
                   totalPairs={totalPairs} 
                 />
-                <div className="flex-1 flex items-center justify-center w-full max-w-[95vw]">
+                <div className="flex-1 flex items-center justify-center w-full" style={{ maxWidth: shouldRotate ? '95vh' : '95vw' }}>
                   <MemoryGrid
                     cards={cards}
                     onCardClick={handleCardClick}
@@ -280,21 +274,27 @@ export default function SpominČ() {
         )}
       </div>
 
-      {/* Floating menu button - Now available on all devices */}
+      {/* Floating menu button */}
       <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
         <DropdownMenuTrigger asChild>
           <Button 
-            className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+            className="fixed z-50 rounded-full w-14 h-14 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+            style={{
+              bottom: shouldRotate ? 'auto' : '16px',
+              left: shouldRotate ? 'auto' : '16px',
+              top: shouldRotate ? '16px' : 'auto',
+              right: shouldRotate ? '16px' : 'auto',
+            }}
             size="icon"
           >
-            <Home className="h-7 w-7 text-white" />
+            <Home className="h-6 w-6 text-white" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent 
-          align="start" 
-          side="top"
+          align={shouldRotate ? "end" : "start"}
+          side={shouldRotate ? "bottom" : "top"}
           sideOffset={8}
-          className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+          className="w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
         >
           <button
             onClick={() => {
