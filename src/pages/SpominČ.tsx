@@ -82,19 +82,13 @@ export default function SpominČ() {
       setTimeout(checkOrientation, 100);
     };
     
-    const handleResize = () => {
-      checkOrientation();
-    };
-    
     window.addEventListener('orientationchange', handleOrientationChange);
-    window.addEventListener('resize', handleResize);
     if (window.screen.orientation) {
       window.screen.orientation.addEventListener('change', checkOrientation);
     }
     
     return () => {
       window.removeEventListener('orientationchange', handleOrientationChange);
-      window.removeEventListener('resize', handleResize);
       if (window.screen.orientation) {
         window.screen.orientation.removeEventListener('change', checkOrientation);
       }
