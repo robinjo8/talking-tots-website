@@ -11,10 +11,21 @@ import { InfoModal } from "@/components/games/InfoModal";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { MemoryPairDialog } from "@/components/games/MemoryPairDialog";
 import { MemoryProgressIndicator } from "@/components/games/MemoryProgressIndicator";
+import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
 
-export default function SpominČ() {
+// Wrapper component with AgeGatedRoute - IDENTICAL structure to LabirintC
+const SpominČ = () => {
+  return (
+    <AgeGatedRoute requiredAgeGroup="3-4">
+      <SpominČContent />
+    </AgeGatedRoute>
+  );
+};
+
+// Content component - mounts AFTER age gate click (enables fullscreen/lock)
+const SpominČContent = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   
@@ -450,4 +461,6 @@ Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede."
       </MemoryExitConfirmationDialog>
     </div>
   );
-}
+};
+
+export default SpominČ;
