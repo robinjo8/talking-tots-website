@@ -24,6 +24,8 @@ export default function SpominČ() {
   // Mobile devices always get fullscreen, desktop never gets fullscreen
   const effectiveFullscreen = isMobile;
   
+  // Reliable touch device detection using ontouchstart + screen dimensions
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
   // Portrait detection for mobile CSS rotation
   const [isPortrait, setIsPortrait] = useState(false);
   
@@ -51,25 +53,49 @@ export default function SpominČ() {
   const gameStartTimeRef = useRef<number | null>(null);
   const [gameTime, setGameTime] = useState<number | null>(null);
 
-  // Check orientation for mobile devices only
+  // Detect touch device once on mount
   useEffect(() => {
-    if (!isMobile) return;
+    const checkDevice = () => {
+      const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      // Use screen.width/height - physical screen size that doesn't change with CSS rotation
+      const smallerDimension = Math.min(window.screen.width, window.screen.height);
+      const isSmallScreen = smallerDimension <= 900;
+      setIsTouchDevice(hasTouch && isSmallScreen);
+    };
+    checkDevice();
+  }, []);
+
+  // Check orientation using screen.orientation API (reliable, doesn't change with CSS)
+  useEffect(() => {
+    if (!isTouchDevice) return;
     
     const checkOrientation = () => {
-      setIsPortrait(window.innerHeight > window.innerWidth);
+      if (window.screen.orientation) {
+        setIsPortrait(window.screen.orientation.type.includes('portrait'));
+      } else {
+        // Fallback: use screen dimensions (physical, not affected by CSS rotation)
+        setIsPortrait(window.screen.height > window.screen.width);
+      }
     };
     
     checkOrientation();
-    window.addEventListener('resize', checkOrientation);
-    window.addEventListener('orientationchange', () => {
+    
+    const handleOrientationChange = () => {
       setTimeout(checkOrientation, 100);
-    });
+    };
+    
+    window.addEventListener('orientationchange', handleOrientationChange);
+    if (window.screen.orientation) {
+      window.screen.orientation.addEventListener('change', checkOrientation);
+    }
     
     return () => {
-      window.removeEventListener('resize', checkOrientation);
-      window.removeEventListener('orientationchange', checkOrientation);
+      window.removeEventListener('orientationchange', handleOrientationChange);
+      if (window.screen.orientation) {
+        window.screen.orientation.removeEventListener('change', checkOrientation);
+      }
     };
-  }, [isMobile]);
+  }, [isTouchDevice]);
 
   const handleCardClick = (index: number) => {
     if (!gameStartTimeRef.current && cards.length > 0) {
@@ -126,34 +152,38 @@ export default function SpominČ() {
 
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/zeleno_ozadje.png`;
 
-  // Force landscape via CSS rotation when mobile is in portrait
-  const shouldForceRotate = isMobile && isPortrait;
+  // Force landscape via CSS rotation when touch device is in portrait
+  const shouldForceRotate = isTouchDevice && isPortrait;
 
-  // Mobile rotation styles
-  const mobileRotatedStyle: React.CSSProperties = shouldForceRotate ? {
+  // Container styles for CSS rotation on touch devices in portrait mode
+  const containerStyle: React.CSSProperties = shouldForceRotate ? {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vh',
+    height: '100vw',
     transform: 'rotate(90deg)',
     transformOrigin: 'top left',
     marginLeft: '100vw',
-    width: '100vh',
-    height: '100vw',
+    overflow: 'hidden',
   } : {};
 
   return (
     <div 
       className={`${effectiveFullscreen ? 'fixed inset-0 overflow-hidden' : 'min-h-screen'} relative`}
-      style={isMobile ? mobileRotatedStyle : {}}
+      style={shouldForceRotate ? containerStyle : {}}
     >
       {/* Background image layer */}
       <div 
-        className={`${effectiveFullscreen ? 'fixed' : 'absolute'} inset-0 w-full h-full bg-cover bg-center bg-no-repeat`}
+        className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
         style={{
           backgroundImage: `url('${backgroundImageUrl}')`
         }}
       />
       
-      <div className={`relative z-10 ${effectiveFullscreen ? 'h-full flex items-center justify-center overflow-hidden' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
+      <div className={`relative z-10 ${effectiveFullscreen ? 'h-full flex flex-col items-center justify-center overflow-hidden' : 'container max-w-5xl mx-auto pt-4 pb-20 px-2 sm:px-4'}`}>
         {effectiveFullscreen ? (
-          <div className="w-full px-2">
+          <div className="w-full h-full flex flex-col items-center justify-center px-4 py-2">
             {isLoading && (
               <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
             )}
@@ -178,7 +208,7 @@ export default function SpominČ() {
                   matchedPairs={matchedPairs.length} 
                   totalPairs={totalPairs} 
                 />
-                <div className="my-[160px]">
+                <div className="flex-1 w-full flex items-center justify-center">
                   <MemoryGrid
                     cards={cards}
                     onCardClick={handleCardClick}
@@ -224,7 +254,7 @@ export default function SpominČ() {
                     matchedPairs={matchedPairs.length} 
                     totalPairs={totalPairs} 
                   />
-                  <div className="my-[160px]">
+                  <div className="mt-8">
                     <MemoryGrid 
                       cards={cards} 
                       onCardClick={handleCardClick}
