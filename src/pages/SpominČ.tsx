@@ -61,19 +61,15 @@ export default function SpominČ() {
     checkDevice();
   }, []);
 
-  // Orientation check - for DESKTOP only, mobile will be handled in fullscreen effect
+  // Reliable orientation detection using screen.orientation - IDENTICAL to LabirintC
   useEffect(() => {
-    // Skip for touch devices - they handle orientation in the fullscreen effect
-    if (isTouchDevice) return;
-    
     const checkOrientation = () => {
-      let portrait = false;
       if (window.screen.orientation) {
-        portrait = window.screen.orientation.type.includes('portrait');
+        setIsPortrait(window.screen.orientation.type.includes('portrait'));
       } else {
-        portrait = window.screen.height > window.screen.width;
+        // Fallback: use screen dimensions (not window - those change with CSS rotation)
+        setIsPortrait(window.screen.height > window.screen.width);
       }
-      setIsPortrait(portrait);
     };
     
     checkOrientation();
@@ -93,7 +89,7 @@ export default function SpominČ() {
         window.screen.orientation.removeEventListener('change', checkOrientation);
       }
     };
-  }, [isTouchDevice]);
+  }, []);
 
   const handleCardClick = (index: number) => {
     if (!gameStartTimeRef.current && cards.length > 0) {
@@ -111,95 +107,49 @@ export default function SpominČ() {
     });
   };
 
-  // Enable fullscreen and landscape lock on mobile devices
-  // This also handles orientation checking for touch devices
+  // Enable fullscreen and landscape lock on mobile devices - IDENTICAL to LabirintC
   useEffect(() => {
-    if (!effectiveFullscreen) return;
-    
-    let mounted = true;
-    
-    const checkOrientation = () => {
-      if (window.screen.orientation) {
-        return window.screen.orientation.type.includes('portrait');
-      }
-      return window.screen.height > window.screen.width;
-    };
-    
-    const handleOrientationChange = () => {
-      if (!mounted) return;
-      setTimeout(() => {
-        if (mounted) {
-          setIsPortrait(checkOrientation());
+    if (effectiveFullscreen) {
+      const requestFullscreen = async () => {
+        try {
+          if (document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen();
+          }
+        } catch (error) {
+          console.log('Fullscreen not supported:', error);
         }
-      }, 100);
-    };
-    
-    const setupFullscreenAndLock = async () => {
-      // Request fullscreen first
-      try {
-        if (document.documentElement.requestFullscreen) {
-          await document.documentElement.requestFullscreen();
-        }
-      } catch (error) {
-        console.log('Fullscreen not supported:', error);
-      }
+      };
 
-      // Then lock to landscape
-      let lockSucceeded = false;
-      try {
-        if (screen.orientation && 'lock' in screen.orientation) {
-          try {
-            await (screen.orientation as any).lock('landscape-primary');
-            lockSucceeded = true;
-          } catch {
+      const lockLandscape = async () => {
+        try {
+          if (screen.orientation && 'lock' in screen.orientation) {
             try {
-              await (screen.orientation as any).lock('landscape');
-              lockSucceeded = true;
+              await (screen.orientation as any).lock('landscape-primary');
             } catch {
-              lockSucceeded = false;
+              await (screen.orientation as any).lock('landscape');
             }
           }
+        } catch (error) {
+          console.log('Landscape lock not supported:', error);
         }
-      } catch (error) {
-        console.log('Landscape lock not supported:', error);
-      }
+      };
+
+      requestFullscreen();
+      lockLandscape();
       
-      // After lock attempt, check orientation with delay
-      if (mounted) {
-        setTimeout(() => {
-          if (mounted) {
-            setIsPortrait(checkOrientation());
+      return () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen?.();
+        }
+        try {
+          if (screen.orientation && 'unlock' in screen.orientation) {
+            (screen.orientation as any).unlock();
           }
-        }, 200);
-      }
-    };
-    
-    // Set up orientation change listeners
-    window.addEventListener('orientationchange', handleOrientationChange);
-    if (window.screen.orientation) {
-      window.screen.orientation.addEventListener('change', handleOrientationChange);
-    }
-    
-    // Start the setup
-    setupFullscreenAndLock();
-      
-    return () => {
-      mounted = false;
-      window.removeEventListener('orientationchange', handleOrientationChange);
-      if (window.screen.orientation) {
-        window.screen.orientation.removeEventListener('change', handleOrientationChange);
-      }
-      if (document.fullscreenElement) {
-        document.exitFullscreen?.();
-      }
-      try {
-        if (screen.orientation && 'unlock' in screen.orientation) {
-          (screen.orientation as any).unlock();
+        } catch (error) {
+          console.log('Portrait unlock not supported:', error);
         }
-      } catch (error) {
-        console.log('Portrait unlock not supported:', error);
-      }
-    };
+      };
+    }
   }, [effectiveFullscreen]);
 
   useEffect(() => {
