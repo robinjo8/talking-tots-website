@@ -153,58 +153,69 @@ export default function SpominČ() {
   // Mobile fullscreen version (like LabirintC)
   if (effectiveFullscreen) {
     return (
-      <div className="fixed inset-0 overflow-hidden select-none">
+      <div 
+        className="fixed inset-0 overflow-hidden select-none"
+        style={{ 
+          width: '100vw', 
+          height: '100vh',
+          minHeight: '100vh',
+          minWidth: '100vw'
+        }}
+      >
         {/* Full screen background */}
         <div 
-          className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url('${backgroundImageUrl}')` }}
+          className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+          style={{ 
+            backgroundImage: `url('${backgroundImageUrl}')`,
+            width: '100vw',
+            height: '100vh'
+          }}
         />
         
         {/* Game content */}
-        <div className="relative z-10 flex-1 flex items-center justify-center overflow-hidden h-full w-full">
+        <div 
+          className="absolute inset-0 z-10 flex items-center justify-center"
+          style={{ width: '100vw', height: '100vh' }}
+        >
           {!isPortrait ? (
-            // Landscape - show game
-            <div className="w-full h-full flex flex-col items-center justify-center px-4 py-2">
+            // Landscape - show game filling the entire screen
+            <div className="w-full h-full">
               {isLoading && (
-                <div className="text-lg text-muted-foreground">Nalaganje igre...</div>
+                <div className="w-full h-full flex items-center justify-center text-lg text-muted-foreground">Nalaganje igre...</div>
               )}
               
               {error && (
-                <div className="bg-red-50 p-6 rounded-lg border border-red-100 text-center">
-                  <h3 className="text-red-600 font-medium mb-2">Napaka pri nalaganju igre</h3>
-                  <p className="text-sm text-red-500">Poskusite znova kasneje.</p>
-                  <Button 
-                    variant="outline" 
-                    className="mt-4" 
-                    onClick={() => window.location.reload()}
-                  >
-                    Poskusi znova
-                  </Button>
+                <div className="w-full h-full flex items-center justify-center">
+                  <div className="bg-red-50 p-6 rounded-lg border border-red-100 text-center">
+                    <h3 className="text-red-600 font-medium mb-2">Napaka pri nalaganju igre</h3>
+                    <p className="text-sm text-red-500">Poskusite znova kasneje.</p>
+                    <Button 
+                      variant="outline" 
+                      className="mt-4"
+                      onClick={() => window.location.reload()}
+                    >
+                      Poskusi znova
+                    </Button>
+                  </div>
                 </div>
               )}
               
               {!isLoading && !error && cards.length > 0 && (
-                <>
-                  <MemoryProgressIndicator 
-                    matchedPairs={matchedPairs.length} 
-                    totalPairs={totalPairs} 
-                  />
-                  <div className="flex-1 w-full flex items-center justify-center">
-                    <MemoryGrid
-                      cards={cards}
-                      onCardClick={handleCardClick}
-                      isCheckingMatch={isCheckingMatch}
-                      isLandscape={true}
-                    />
-                  </div>
-                </>
+                <MemoryGrid
+                  cards={cards}
+                  onCardClick={handleCardClick}
+                  isCheckingMatch={isCheckingMatch}
+                  isLandscape={true}
+                />
               )}
               
               {!isLoading && !error && cards.length === 0 && (
-                <div className="text-center p-10 border rounded-lg">
-                  <p className="text-muted-foreground">
-                    Ni kartic za prikaz. Prosim, preverite nastavitve igre.
-                  </p>
+                <div className="w-full h-full flex items-center justify-center">
+                  <div className="text-center p-10 border rounded-lg bg-white/80">
+                    <p className="text-muted-foreground">
+                      Ni kartic za prikaz. Prosim, preverite nastavitve igre.
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
