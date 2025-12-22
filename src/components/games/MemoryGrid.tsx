@@ -18,10 +18,12 @@ export function MemoryGrid({ cards, onCardClick, isCheckingMatch }: MemoryGridPr
   
   return (
     <div 
-      className="grid grid-cols-4 gap-2 md:gap-3 w-full mx-auto items-center justify-items-center"
-      style={{
-        maxWidth: '900px',
-      }}
+      className={cn(
+        "grid grid-cols-4 gap-2 md:gap-3 mx-auto items-center justify-items-center",
+        // Mobile: auto-fit width based on card size, centered
+        "w-fit md:w-full",
+        "md:max-w-[900px]"
+      )}
     >
       {cards.map((card, index) => (
         <div 
