@@ -108,6 +108,12 @@
   cursor: pointer;
 }
 
+/* Landscape mode: cards fill the grid cell without aspect-ratio constraint */
+.flip-card-landscape .flip-card {
+  aspect-ratio: unset;
+  height: 100%;
+}
+
 .flip-card-inner {
   position: relative;
   width: 100%;
