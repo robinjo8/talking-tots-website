@@ -296,19 +296,19 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-lg">
-          <div className="space-y-4 py-4">
-            <h2 className="text-2xl font-bold text-dragon-green text-center">
+        <DialogContent className="max-w-[95vw] max-h-[90vh] sm:max-w-lg overflow-y-auto p-4 sm:p-6">
+          <div className="space-y-2 sm:space-y-4 py-1 sm:py-4">
+            <h2 className="text-lg sm:text-2xl font-bold text-dragon-green text-center">
               {showClaimButton ? '🎉 Čestitke! 🎉' : 'Odlično!'}
             </h2>
 
             {!showClaimButton && (
-              <p className="text-sm text-black text-center">KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO</p>
+              <p className="text-xs sm:text-sm text-black text-center">KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO</p>
             )}
 
             <div className="flex justify-center">
               <div
-                className={`flex flex-col items-center space-y-2 cursor-pointer transition-all ${
+                className={`flex flex-col items-center space-y-1 sm:space-y-2 cursor-pointer transition-all ${
                   justRecorded || showClaimButton ? 'opacity-70 cursor-not-allowed grayscale' : 'hover:scale-105'
                 }`}
                 onClick={handleImageClick}
@@ -317,7 +317,7 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
                   <img
                     src={imageUrl}
                     alt={completedImage.word}
-                    className={`w-32 h-32 object-cover rounded-lg border-2 ${
+                    className={`w-20 h-20 sm:w-32 sm:h-32 object-cover rounded-lg border-2 ${
                       showClaimButton
                         ? 'border-yellow-400'
                         : justRecorded
@@ -330,27 +330,27 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
 
                   {isRecording && (
                     <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-lg">
-                      <div className="bg-red-500 text-white rounded-full w-10 h-10 flex items-center justify-center">
-                        <Mic className="w-5 h-5" />
+                      <div className="bg-red-500 text-white rounded-full w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center">
+                        <Mic className="w-4 h-4 sm:w-5 sm:h-5" />
                       </div>
                     </div>
                   )}
 
                   {isRecording && (
-                    <div className="absolute -top-2 -right-2 bg-red-500 text-white text-sm rounded-full w-8 h-8 flex items-center justify-center font-bold">
+                    <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-red-500 text-white text-xs sm:text-sm rounded-full w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center font-bold">
                       {recordingTimeLeft}
                     </div>
                   )}
                 </div>
 
-                <span className="text-lg font-medium text-center text-black">{completedImage.word.toUpperCase()}</span>
+                <span className="text-base sm:text-lg font-medium text-center text-black">{completedImage.word.toUpperCase()}</span>
               </div>
             </div>
 
             {/* Progress circles and count */}
-            <div className="flex flex-col items-center space-y-2">
+            <div className="flex flex-col items-center space-y-1 sm:space-y-2">
               <ProgressCircles count={displayCount} size="lg" animate={false} />
-              <span className="text-sm text-muted-foreground">
+              <span className="text-xs sm:text-sm text-muted-foreground">
                 Izgovoril si {displayCount}/3 krat
                 {!showClaimButton && ` (še ${3 - displayCount}x za zvezdico)`}
               </span>
@@ -361,25 +361,25 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
               <Button
                 onClick={handlePlayAudio}
                 size="icon"
-                className="bg-green-500 hover:bg-green-600 text-white h-12 w-12"
+                className="bg-green-500 hover:bg-green-600 text-white h-10 w-10 sm:h-12 sm:w-12"
               >
-                <Volume2 className="w-6 h-6" />
+                <Volume2 className="w-5 h-5 sm:w-6 sm:h-6" />
               </Button>
             </div>
 
             {/* Action buttons */}
-            <div className="flex justify-center gap-3">
+            <div className="flex justify-center gap-2 sm:gap-3">
               {showClaimButton ? (
                 <Button
                   onClick={handleClaimStar}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 px-8"
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white gap-1 sm:gap-2 px-4 sm:px-8 text-sm sm:text-base h-9 sm:h-10"
                   disabled={starClaimed}
                 >
-                  <Star className="w-5 h-5" />
+                  <Star className="w-4 h-4 sm:w-5 sm:h-5" />
                   VZEMI ZVEZDICO
                 </Button>
               ) : justRecorded ? (
-                <Button onClick={() => onOpenChange(false)} className="bg-dragon-green hover:bg-dragon-green/90 text-white">
+                <Button onClick={() => onOpenChange(false)} className="bg-dragon-green hover:bg-dragon-green/90 text-white text-sm sm:text-base h-9 sm:h-10">
                   NADALJUJ
                 </Button>
               ) : null}
