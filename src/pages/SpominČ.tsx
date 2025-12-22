@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, BookOpen, ArrowLeft, Home, Smartphone } from "lucide-react";
+import { Home } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MemoryGrid } from "@/components/games/MemoryGrid";
 import { useMemoryGameČ } from "@/hooks/useMemoryGameČ";
@@ -11,28 +11,18 @@ import { InfoModal } from "@/components/games/InfoModal";
 import { MemoryPairDialog } from "@/components/games/MemoryPairDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { MemoryProgressIndicator } from "@/components/games/MemoryProgressIndicator";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
-
-// Detect if device is touch-enabled (more reliable than screen width for mobile detection)
-const isTouchDevice = () => {
-  if (typeof window === 'undefined') return false;
-  return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-};
-
-const getInitialOrientation = () => {
-  if (typeof window === 'undefined') return false;
-  return window.innerHeight > window.innerWidth;
-};
 
 export default function SpominČ() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   
-  // Use touch detection for mobile - initialize immediately if possible
-  const [isMobileDevice, setIsMobileDevice] = useState(() => isTouchDevice());
-  const [isPortrait, setIsPortrait] = useState(() => getInitialOrientation());
+  // Use reliable mobile detection hook
+  const isMobile = useIsMobile();
+  const [isPortrait, setIsPortrait] = useState(false);
   
   const { audioRef } = useAudioPlayback();
   const [showInfo, setShowInfo] = useState(false);
@@ -58,16 +48,13 @@ export default function SpominČ() {
   const gameStartTimeRef = useRef<number | null>(null);
   const [gameTime, setGameTime] = useState<number | null>(null);
 
-  // Check orientation and update on changes
+  // Check orientation and update on changes - only matters on mobile
   useEffect(() => {
     const checkOrientation = () => {
       const portrait = window.innerHeight > window.innerWidth;
-      console.log('Orientation check:', { portrait, height: window.innerHeight, width: window.innerWidth, isMobileDevice });
       setIsPortrait(portrait);
     };
     
-    // Also re-check mobile device
-    setIsMobileDevice(isTouchDevice());
     checkOrientation();
     
     window.addEventListener('resize', checkOrientation);
@@ -79,8 +66,8 @@ export default function SpominČ() {
     };
   }, []);
 
-  // Mobile fullscreen mode
-  const effectiveFullscreen = isMobileDevice;
+  // Mobile fullscreen mode - always true on mobile
+  const effectiveFullscreen = isMobile;
 
   const handleCardClick = (index: number) => {
     if (!gameStartTimeRef.current && cards.length > 0) {
@@ -155,9 +142,10 @@ export default function SpominČ() {
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/zeleno_ozadje.png`;
 
   // For mobile in portrait: use CSS transform to force landscape view
-  const shouldRotate = isMobileDevice && isPortrait;
+  // This works even if orientation lock is not supported (iOS)
+  const shouldRotate = isMobile && isPortrait;
 
-  // Container styles for rotated view
+  // Container styles for rotated view - swap width/height and rotate
   const rotatedContainerStyle: React.CSSProperties = shouldRotate ? {
     position: 'fixed',
     top: 0,
@@ -168,6 +156,7 @@ export default function SpominČ() {
     transformOrigin: 'top left',
     marginLeft: '100vw',
     overflow: 'hidden',
+    zIndex: 9999,
   } : {};
 
   return (
