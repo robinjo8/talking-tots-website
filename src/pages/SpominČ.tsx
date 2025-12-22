@@ -108,7 +108,7 @@ export default function SpominČ() {
     });
   };
 
-  // Enable fullscreen on mobile devices only
+  // Enable fullscreen and landscape lock on mobile devices
   useEffect(() => {
     if (effectiveFullscreen) {
       const requestFullscreen = async () => {
@@ -120,11 +120,34 @@ export default function SpominČ() {
           console.log('Fullscreen not supported:', error);
         }
       };
+
+      const lockLandscape = async () => {
+        try {
+          if (screen.orientation && 'lock' in screen.orientation) {
+            try {
+              await (screen.orientation as any).lock('landscape-primary');
+            } catch {
+              await (screen.orientation as any).lock('landscape');
+            }
+          }
+        } catch (error) {
+          console.log('Landscape lock not supported:', error);
+        }
+      };
+
       requestFullscreen();
+      lockLandscape();
       
       return () => {
         if (document.fullscreenElement) {
           document.exitFullscreen?.();
+        }
+        try {
+          if (screen.orientation && 'unlock' in screen.orientation) {
+            (screen.orientation as any).unlock();
+          }
+        } catch (error) {
+          console.log('Portrait unlock not supported:', error);
         }
       };
     }
