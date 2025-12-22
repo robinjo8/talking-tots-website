@@ -29,8 +29,13 @@ const SpominČContent = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   
-  // Reliable touch device detection using ontouchstart + screen dimensions
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  // Synchronous touch device detection for immediate fullscreen activation
+  const [isTouchDevice, setIsTouchDevice] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const isSmallScreen = Math.min(window.screen.width, window.screen.height) <= 900;
+    return hasTouch && isSmallScreen;
+  });
   // Portrait detection for showing rotation message
   const [isPortrait, setIsPortrait] = useState(false);
   
