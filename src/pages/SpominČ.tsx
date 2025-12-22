@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, Play } from "lucide-react";
+import { Home } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MemoryGrid } from "@/components/games/MemoryGrid";
 import { useMemoryGameČ } from "@/hooks/useMemoryGameČ";
@@ -22,8 +22,6 @@ export default function SpominČ() {
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   // Portrait detection for showing rotation message
   const [isPortrait, setIsPortrait] = useState(false);
-  // Game started state - controls when fullscreen/lock are triggered
-  const [gameStarted, setGameStarted] = useState(false);
   
   // Touch devices get fullscreen mode
   const effectiveFullscreen = isTouchDevice;
@@ -92,38 +90,36 @@ export default function SpominČ() {
     };
   }, []);
 
-  // Handle game start - fullscreen and orientation lock MUST be called from user gesture
-  const handleStartGame = async () => {
-    try {
-      if (document.documentElement.requestFullscreen) {
-        await document.documentElement.requestFullscreen();
-      }
-    } catch (error) {
-      console.log('Fullscreen not supported:', error);
-    }
-
-    try {
-      if (screen.orientation && 'lock' in screen.orientation) {
-        try {
-          await (screen.orientation as any).lock('landscape-primary');
-        } catch {
-          try {
-            await (screen.orientation as any).lock('landscape');
-          } catch (e) {
-            console.log('Landscape lock not supported');
-          }
-        }
-      }
-    } catch (error) {
-      console.log('Orientation lock not supported:', error);
-    }
-
-    setGameStarted(true);
-  };
-
-  // Cleanup fullscreen and orientation lock on unmount
+  // Fullscreen and orientation lock - IDENTICAL to LabirintC
   useEffect(() => {
-    if (effectiveFullscreen && gameStarted) {
+    if (effectiveFullscreen) {
+      const requestFullscreen = async () => {
+        try {
+          if (document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen();
+          }
+        } catch (error) {
+          console.log('Fullscreen not supported:', error);
+        }
+      };
+
+      const lockLandscape = async () => {
+        try {
+          if (screen.orientation && 'lock' in screen.orientation) {
+            try {
+              await (screen.orientation as any).lock('landscape-primary');
+            } catch {
+              await (screen.orientation as any).lock('landscape');
+            }
+          }
+        } catch (error) {
+          console.log('Landscape lock not supported:', error);
+        }
+      };
+
+      requestFullscreen();
+      lockLandscape();
+        
       return () => {
         if (document.fullscreenElement) {
           document.exitFullscreen?.();
@@ -137,7 +133,7 @@ export default function SpominČ() {
         }
       };
     }
-  }, [effectiveFullscreen, gameStarted]);
+  }, [effectiveFullscreen]);
 
   const handleCardClick = (index: number) => {
     if (!gameStartTimeRef.current && cards.length > 0) {
@@ -172,31 +168,8 @@ export default function SpominČ() {
 
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/zeleno_ozadje.png`;
 
-  // Mobile fullscreen version
+  // Mobile fullscreen version - DIRECT entry like LabirintC (no "Začni igro" overlay)
   if (effectiveFullscreen) {
-    // Show start overlay if game hasn't started yet
-    if (!gameStarted) {
-      return (
-        <div className="fixed inset-0 overflow-hidden select-none">
-          <div 
-            className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url('${backgroundImageUrl}')` }}
-          />
-          <div className="relative z-10 flex items-center justify-center h-full w-full">
-            <button
-              onClick={handleStartGame}
-              className="flex flex-col items-center gap-4 px-12 py-8 bg-white/95 rounded-3xl shadow-2xl border-4 border-orange-300 transform transition-transform active:scale-95"
-            >
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-lg">
-                <Play className="h-10 w-10 text-white ml-1" />
-              </div>
-              <span className="text-2xl font-bold text-gray-800">Začni igro</span>
-              <span className="text-sm text-gray-500">Obrni telefon v ležeči položaj</span>
-            </button>
-          </div>
-        </div>
-      );
-    }
 
     return (
       <div className="fixed inset-0 overflow-hidden select-none">
