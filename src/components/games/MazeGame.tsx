@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMazeGame } from '@/hooks/useMazeGame';
-import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import dragonHead from '@/assets/zmajcek-glava.png';
+
+const SUPABASE_URL = "https://ixtgjnsolqwjiheuebjq.supabase.co";
+const BACKGROUND_IMAGE_URL = `${SUPABASE_URL}/storage/v1/object/public/ozadja/svetlomodro_ozadje.png.png`;
+
 interface MazeGameProps {
   onComplete: () => void;
   cols?: number;
@@ -79,8 +81,11 @@ export const MazeGame = ({
     width: 0,
     height: 0
   });
-  const WALL_WIDTH = 8;
-  const PADDING = 2; // Minimal white border around maze
+  const [bgImageLoaded, setBgImageLoaded] = useState(false);
+  const bgImageRef = useRef<HTMLImageElement | null>(null);
+  const WALL_WIDTH = 10;
+  const WALL_RADIUS = 5; // Rounded corners for walls
+  const PADDING = 2; // Minimal border around maze
 
   // Measure container size
   useEffect(() => {
@@ -153,6 +158,21 @@ export const MazeGame = ({
     };
   }, []);
 
+  // Load background image
+  useEffect(() => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = BACKGROUND_IMAGE_URL;
+    img.onload = () => {
+      bgImageRef.current = img;
+      setBgImageLoaded(true);
+    };
+    img.onerror = () => {
+      console.error('Failed to load background image');
+      setBgImageLoaded(true); // Continue without background
+    };
+  }, []);
+
   // Animation effect for glowing star
   useEffect(() => {
     let direction = 1;
@@ -169,7 +189,7 @@ export const MazeGame = ({
 
   // Draw maze
   useEffect(() => {
-    if (!canvasRef.current || !maze.length || isGenerating || !dragonImageLoaded) return;
+    if (!canvasRef.current || !maze.length || isGenerating || !dragonImageLoaded || !CELL_SIZE) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -181,59 +201,81 @@ export const MazeGame = ({
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
-    // Draw maze walls with pavement/tile look
+    // Draw background image if loaded
+    if (bgImageRef.current && bgImageLoaded) {
+      ctx.drawImage(bgImageRef.current, 0, 0, canvas.width, canvas.height);
+    } else {
+      // Fallback light blue background
+      ctx.fillStyle = '#e0f2fe';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Helper to draw a rounded rectangle
+    const drawRoundedRect = (x: number, y: number, width: number, height: number, radius: number) => {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    };
+
+    // Draw maze walls with orange color and rounded corners
     maze.forEach((row, y) => {
       row.forEach((cell, x) => {
         const startX = x * CELL_SIZE + PADDING;
         const startY = y * CELL_SIZE + PADDING;
         
-        // Draw walls as thick rectangles with gray stone texture
-        const drawWall = (x1: number, y1: number, x2: number, y2: number) => {
-          // Create gradient for 3D stone effect
-          const gradient = ctx.createLinearGradient(x1, y1, x2, y2);
-          gradient.addColorStop(0, '#6b7280'); // gray-500
-          gradient.addColorStop(0.5, '#9ca3af'); // gray-400 (lighter middle)
-          gradient.addColorStop(1, '#4b5563'); // gray-600 (darker edge)
+        // Draw walls as thick rounded rectangles with orange gradient
+        const drawWall = (x1: number, y1: number, x2: number, y2: number, isVertical: boolean) => {
+          // Create gradient for 3D orange effect
+          const gradient = isVertical 
+            ? ctx.createLinearGradient(x1 - WALL_WIDTH/2, y1, x1 + WALL_WIDTH/2, y1)
+            : ctx.createLinearGradient(x1, y1 - WALL_WIDTH/2, x1, y1 + WALL_WIDTH/2);
+          gradient.addColorStop(0, '#fb923c'); // orange-400
+          gradient.addColorStop(0.5, '#fdba74'); // orange-300 (lighter middle)
+          gradient.addColorStop(1, '#ea580c'); // orange-600 (darker edge)
           
           ctx.fillStyle = gradient;
           
-          // Draw thick wall rectangle
-          if (x1 === x2) {
+          // Draw thick wall rectangle with rounded corners
+          if (isVertical) {
             // Vertical wall
-            ctx.fillRect(x1 - WALL_WIDTH / 2, y1, WALL_WIDTH, y2 - y1);
+            drawRoundedRect(x1 - WALL_WIDTH / 2, y1, WALL_WIDTH, y2 - y1, WALL_RADIUS);
           } else {
             // Horizontal wall
-            ctx.fillRect(x1, y1 - WALL_WIDTH / 2, x2 - x1, WALL_WIDTH);
+            drawRoundedRect(x1, y1 - WALL_WIDTH / 2, x2 - x1, WALL_WIDTH, WALL_RADIUS);
           }
+          ctx.fill();
           
-          // Add darker border for depth
-          ctx.strokeStyle = '#374151'; // gray-700
-          ctx.lineWidth = 2;
-          ctx.lineCap = 'square';
-          ctx.lineJoin = 'miter';
-          ctx.beginPath();
-          ctx.moveTo(x1, y1);
-          ctx.lineTo(x2, y2);
+          // Add darker orange border for depth
+          ctx.strokeStyle = '#c2410c'; // orange-700
+          ctx.lineWidth = 1.5;
           ctx.stroke();
         };
         
         if (cell.walls.top) {
-          drawWall(startX, startY, startX + CELL_SIZE, startY);
+          drawWall(startX, startY, startX + CELL_SIZE, startY, false);
         }
         if (cell.walls.right) {
-          drawWall(startX + CELL_SIZE, startY, startX + CELL_SIZE, startY + CELL_SIZE);
+          drawWall(startX + CELL_SIZE, startY, startX + CELL_SIZE, startY + CELL_SIZE, true);
         }
         if (cell.walls.bottom) {
-          drawWall(startX, startY + CELL_SIZE, startX + CELL_SIZE, startY + CELL_SIZE);
+          drawWall(startX, startY + CELL_SIZE, startX + CELL_SIZE, startY + CELL_SIZE, false);
         }
         if (cell.walls.left) {
-          drawWall(startX, startY, startX, startY + CELL_SIZE);
+          drawWall(startX, startY, startX, startY + CELL_SIZE, true);
         }
       });
     });
 
-    // Draw glowing star at goal (center of 2-cell goal)
-    const goalX = (COLS - 1.5) * CELL_SIZE + PADDING;
+    // Draw glowing star at goal - bottom-right corner (single cell)
+    const goalX = (COLS - 1) * CELL_SIZE + CELL_SIZE / 2 + PADDING;
     const goalY = (ROWS - 1) * CELL_SIZE + CELL_SIZE / 2 + PADDING;
     drawStar(ctx, goalX, goalY, 5, CELL_SIZE / 3, CELL_SIZE / 6, glowIntensity);
 
@@ -262,7 +304,7 @@ export const MazeGame = ({
       ctx.font = 'bold 20px sans-serif';
       ctx.fillText('🐲', playerX, playerY);
     }
-  }, [maze, playerPosition, COLS, ROWS, CELL_SIZE, isGenerating, dragonImageLoaded, glowIntensity]);
+  }, [maze, playerPosition, COLS, ROWS, CELL_SIZE, isGenerating, dragonImageLoaded, bgImageLoaded, glowIntensity]);
 
   // Trigger completion callback
   useEffect(() => {
