@@ -108,49 +108,62 @@ export default function SpominČ() {
     });
   };
 
-  // Enable fullscreen and landscape lock on mobile devices
+  // Enable fullscreen and landscape lock on mobile devices - MUST run before orientation check
   useEffect(() => {
-    if (effectiveFullscreen) {
-      const requestFullscreen = async () => {
-        try {
-          if (document.documentElement.requestFullscreen) {
-            await document.documentElement.requestFullscreen();
-          }
-        } catch (error) {
-          console.log('Fullscreen not supported:', error);
+    if (!effectiveFullscreen) return;
+    
+    let mounted = true;
+    
+    const setupFullscreenAndLock = async () => {
+      // Request fullscreen first
+      try {
+        if (document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
         }
-      };
+      } catch (error) {
+        console.log('Fullscreen not supported:', error);
+      }
 
-      const lockLandscape = async () => {
-        try {
-          if (screen.orientation && 'lock' in screen.orientation) {
-            try {
-              await (screen.orientation as any).lock('landscape-primary');
-            } catch {
-              await (screen.orientation as any).lock('landscape');
-            }
+      // Then lock to landscape
+      try {
+        if (screen.orientation && 'lock' in screen.orientation) {
+          try {
+            await (screen.orientation as any).lock('landscape-primary');
+          } catch {
+            await (screen.orientation as any).lock('landscape');
           }
-        } catch (error) {
-          console.log('Landscape lock not supported:', error);
         }
-      };
-
-      requestFullscreen();
-      lockLandscape();
+      } catch (error) {
+        console.log('Landscape lock not supported:', error);
+      }
       
-      return () => {
-        if (document.fullscreenElement) {
-          document.exitFullscreen?.();
-        }
-        try {
-          if (screen.orientation && 'unlock' in screen.orientation) {
-            (screen.orientation as any).unlock();
+      // After lock succeeds, re-check orientation with small delay
+      if (mounted) {
+        setTimeout(() => {
+          if (window.screen.orientation) {
+            setIsPortrait(window.screen.orientation.type.includes('portrait'));
+          } else {
+            setIsPortrait(window.screen.height > window.screen.width);
           }
-        } catch (error) {
-          console.log('Portrait unlock not supported:', error);
+        }, 150);
+      }
+    };
+    
+    setupFullscreenAndLock();
+      
+    return () => {
+      mounted = false;
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.();
+      }
+      try {
+        if (screen.orientation && 'unlock' in screen.orientation) {
+          (screen.orientation as any).unlock();
         }
-      };
-    }
+      } catch (error) {
+        console.log('Portrait unlock not supported:', error);
+      }
+    };
   }, [effectiveFullscreen]);
 
   useEffect(() => {
