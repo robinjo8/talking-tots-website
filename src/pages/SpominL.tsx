@@ -136,6 +136,22 @@ export default function SpominL() {
             <div className="w-full h-full flex items-center justify-center px-6 text-center"><p className="text-base font-semibold text-foreground">Za igranje igre Spomin prosim obrni telefon v ležeči položaj.</p></div>
           )}
         </div>
+
+        {/* Progress dots on right side - mobile only */}
+        {!isPortrait && (
+          <div className="fixed right-2 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2">
+            {Array.from({ length: totalPairs }).map((_, index) => (
+              <div
+                key={index}
+                className={`w-3 h-3 rounded-full border-2 border-white/70 transition-all duration-300 ${
+                  index < matchedPairs.length
+                    ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]'
+                    : 'bg-transparent'
+                }`}
+              />
+            ))}
+          </div>
+        )}
         <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild><Button className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm" size="icon"><Home className="h-7 w-7 text-white" /></Button></DropdownMenuTrigger>
           <DropdownMenuContent align="start" side="top" sideOffset={8} className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl">
