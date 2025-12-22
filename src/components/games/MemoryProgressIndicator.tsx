@@ -15,8 +15,8 @@ export function MemoryProgressIndicator({ matchedPairs, totalPairs, className }:
           className={cn(
             "w-4 h-4 rounded-full transition-all duration-500 ease-out",
             index < matchedPairs
-              ? "bg-gradient-to-br from-orange-400 to-orange-500 border-2 border-white scale-110 animate-scale-in"
-              : "bg-white scale-100"
+              ? "bg-gradient-to-br from-orange-400 to-orange-500 scale-125 shadow-lg shadow-orange-500/50 animate-scale-in"
+              : "bg-white/80 scale-100"
           )}
         />
       ))}
