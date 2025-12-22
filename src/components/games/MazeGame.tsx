@@ -2,8 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMazeGame } from '@/hooks/useMazeGame';
 import dragonHead from '@/assets/zmajcek-glava.png';
 
-const SUPABASE_URL = "https://ixtgjnsolqwjiheuebjq.supabase.co";
-const BACKGROUND_IMAGE_URL = `${SUPABASE_URL}/storage/v1/object/public/ozadja/svetlomodro_ozadje.png.png`;
+const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
+const BACKGROUND_IMAGE_URL = `${SUPABASE_URL}/storage/v1/object/public/ozadja/svetlomodro_ozadje.png`;
 
 interface MazeGameProps {
   onComplete: () => void;
@@ -83,8 +83,7 @@ export const MazeGame = ({
   });
   const [bgImageLoaded, setBgImageLoaded] = useState(false);
   const bgImageRef = useRef<HTMLImageElement | null>(null);
-  const WALL_WIDTH = 10;
-  const WALL_RADIUS = 5; // Rounded corners for walls
+  const WALL_WIDTH = 6; // Thinner stroke like fortune wheel
   const PADDING = 2; // Minimal border around maze
 
   // Measure container size
@@ -210,66 +209,41 @@ export const MazeGame = ({
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
-    // Helper to draw a rounded rectangle
-    const drawRoundedRect = (x: number, y: number, width: number, height: number, radius: number) => {
-      ctx.beginPath();
-      ctx.moveTo(x + radius, y);
-      ctx.lineTo(x + width - radius, y);
-      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-      ctx.lineTo(x + width, y + height - radius);
-      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-      ctx.lineTo(x + radius, y + height);
-      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-      ctx.lineTo(x, y + radius);
-      ctx.quadraticCurveTo(x, y, x + radius, y);
-      ctx.closePath();
-    };
+    // Draw maze walls as round orange strokes (like fortune wheel)
+    ctx.strokeStyle = 'hsl(35, 90%, 50%)'; // Same orange as fortune wheel
+    ctx.lineWidth = WALL_WIDTH;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
 
-    // Draw maze walls with orange color and rounded corners
     maze.forEach((row, y) => {
       row.forEach((cell, x) => {
         const startX = x * CELL_SIZE + PADDING;
         const startY = y * CELL_SIZE + PADDING;
         
-        // Draw walls as thick rounded rectangles with orange gradient
-        const drawWall = (x1: number, y1: number, x2: number, y2: number, isVertical: boolean) => {
-          // Create gradient for 3D orange effect
-          const gradient = isVertical 
-            ? ctx.createLinearGradient(x1 - WALL_WIDTH/2, y1, x1 + WALL_WIDTH/2, y1)
-            : ctx.createLinearGradient(x1, y1 - WALL_WIDTH/2, x1, y1 + WALL_WIDTH/2);
-          gradient.addColorStop(0, '#fb923c'); // orange-400
-          gradient.addColorStop(0.5, '#fdba74'); // orange-300 (lighter middle)
-          gradient.addColorStop(1, '#ea580c'); // orange-600 (darker edge)
-          
-          ctx.fillStyle = gradient;
-          
-          // Draw thick wall rectangle with rounded corners
-          if (isVertical) {
-            // Vertical wall
-            drawRoundedRect(x1 - WALL_WIDTH / 2, y1, WALL_WIDTH, y2 - y1, WALL_RADIUS);
-          } else {
-            // Horizontal wall
-            drawRoundedRect(x1, y1 - WALL_WIDTH / 2, x2 - x1, WALL_WIDTH, WALL_RADIUS);
-          }
-          ctx.fill();
-          
-          // Add darker orange border for depth
-          ctx.strokeStyle = '#c2410c'; // orange-700
-          ctx.lineWidth = 1.5;
-          ctx.stroke();
-        };
-        
+        // Draw walls as simple rounded strokes
         if (cell.walls.top) {
-          drawWall(startX, startY, startX + CELL_SIZE, startY, false);
+          ctx.beginPath();
+          ctx.moveTo(startX, startY);
+          ctx.lineTo(startX + CELL_SIZE, startY);
+          ctx.stroke();
         }
         if (cell.walls.right) {
-          drawWall(startX + CELL_SIZE, startY, startX + CELL_SIZE, startY + CELL_SIZE, true);
+          ctx.beginPath();
+          ctx.moveTo(startX + CELL_SIZE, startY);
+          ctx.lineTo(startX + CELL_SIZE, startY + CELL_SIZE);
+          ctx.stroke();
         }
         if (cell.walls.bottom) {
-          drawWall(startX, startY + CELL_SIZE, startX + CELL_SIZE, startY + CELL_SIZE, false);
+          ctx.beginPath();
+          ctx.moveTo(startX, startY + CELL_SIZE);
+          ctx.lineTo(startX + CELL_SIZE, startY + CELL_SIZE);
+          ctx.stroke();
         }
         if (cell.walls.left) {
-          drawWall(startX, startY, startX, startY + CELL_SIZE, true);
+          ctx.beginPath();
+          ctx.moveTo(startX, startY);
+          ctx.lineTo(startX, startY + CELL_SIZE);
+          ctx.stroke();
         }
       });
     });
