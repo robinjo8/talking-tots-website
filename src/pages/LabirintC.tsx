@@ -145,7 +145,7 @@ const LabirintCContent = () => {
     setShowCompletion(false);
   };
 
-  // Background is now handled by MazeGame component directly
+  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/svetlomodro_ozadje.png`;
 
   // Orientation tracking now handled in the useEffect above with screen.orientation
 
@@ -197,12 +197,18 @@ const LabirintCContent = () => {
   if (effectiveFullscreen) {
     return (
       <div className="fixed inset-0 overflow-hidden select-none">
-        {/* Game content - no separate background, MazeGame handles it */}
+        {/* Full screen background */}
+        <div 
+          className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url('${backgroundImageUrl}')` }}
+        />
+        
+        {/* Game content */}
         <div className="relative z-10 flex-1 flex items-stretch justify-center overflow-hidden h-full w-full">
           {!isPortrait ? (
             <MazeGame key={gameKey} onComplete={handleGameComplete} cols={16} rows={9} />
           ) : (
-            <div className="w-full h-full flex items-center justify-center px-6 text-center bg-sky-100">
+            <div className="w-full h-full flex items-center justify-center px-6 text-center">
               <p className="text-base font-semibold text-foreground">
                 Za igranje labirinta prosim obrni telefon v ležeči položaj.
               </p>
@@ -293,7 +299,13 @@ const LabirintCContent = () => {
   // Desktop version
   return (
     <div className="fixed inset-0 overflow-hidden flex flex-col">
-      {/* Game content - background is handled by MazeGame */}
+      {/* Full screen background */}
+      <div 
+        className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url('${backgroundImageUrl}')` }}
+      />
+      
+      {/* Game content */}
       <div className="relative z-10 flex-1 overflow-hidden w-full h-full">
         <MazeGame key={gameKey} onComplete={handleGameComplete} cols={16} rows={9} alignTop />
       </div>

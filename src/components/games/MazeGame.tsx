@@ -2,8 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMazeGame } from '@/hooks/useMazeGame';
 import dragonHead from '@/assets/zmajcek-glava.png';
 
-const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
-const BACKGROUND_IMAGE_URL = `${SUPABASE_URL}/storage/v1/object/public/ozadja/svetlomodro_ozadje.png`;
+// Background is now handled by parent component (LabirintC)
 
 interface MazeGameProps {
   onComplete: () => void;
@@ -81,8 +80,6 @@ export const MazeGame = ({
     width: 0,
     height: 0
   });
-  const [bgImageLoaded, setBgImageLoaded] = useState(false);
-  const bgImageRef = useRef<HTMLImageElement | null>(null);
   const WALL_WIDTH = 6; // Thinner stroke like fortune wheel
   const PADDING = 2; // Minimal border around maze
 
@@ -157,21 +154,6 @@ export const MazeGame = ({
     };
   }, []);
 
-  // Load background image
-  useEffect(() => {
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.src = BACKGROUND_IMAGE_URL;
-    img.onload = () => {
-      bgImageRef.current = img;
-      setBgImageLoaded(true);
-    };
-    img.onerror = () => {
-      console.error('Failed to load background image');
-      setBgImageLoaded(true); // Continue without background
-    };
-  }, []);
-
   // Animation effect for glowing star
   useEffect(() => {
     let direction = 1;
@@ -193,21 +175,12 @@ export const MazeGame = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Clear canvas
+    // Clear canvas (transparent - background is handled by parent)
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Enable high-quality image rendering
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
-
-    // Draw background image if loaded
-    if (bgImageRef.current && bgImageLoaded) {
-      ctx.drawImage(bgImageRef.current, 0, 0, canvas.width, canvas.height);
-    } else {
-      // Fallback light blue background
-      ctx.fillStyle = '#e0f2fe';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
 
     // Draw maze walls as round orange strokes (like fortune wheel)
     ctx.strokeStyle = 'hsl(35, 90%, 50%)'; // Same orange as fortune wheel
@@ -278,7 +251,7 @@ export const MazeGame = ({
       ctx.font = 'bold 20px sans-serif';
       ctx.fillText('🐲', playerX, playerY);
     }
-  }, [maze, playerPosition, COLS, ROWS, CELL_SIZE, isGenerating, dragonImageLoaded, bgImageLoaded, glowIntensity]);
+  }, [maze, playerPosition, COLS, ROWS, CELL_SIZE, isGenerating, dragonImageLoaded, glowIntensity]);
 
   // Trigger completion callback
   useEffect(() => {
