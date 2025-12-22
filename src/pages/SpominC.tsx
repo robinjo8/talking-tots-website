@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, Play } from "lucide-react";
+import { Home } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MemoryGrid } from "@/components/games/MemoryGrid";
 import { useMemoryGameC } from "@/hooks/useMemoryGameC";
@@ -19,10 +19,9 @@ export default function SpominC() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   
-  // Reliable touch device detection
+  // Reliable touch device detection using physical screen size
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [isPortrait, setIsPortrait] = useState(false);
-  const [gameStarted, setGameStarted] = useState(false);
   
   const effectiveFullscreen = isTouchDevice;
   
@@ -51,21 +50,20 @@ export default function SpominC() {
   const gameStartTimeRef = useRef<number | null>(null);
   const [gameTime, setGameTime] = useState<number | null>(null);
 
+  // Reliable touch device detection using physical screen size
   useEffect(() => {
-    const checkDevice = () => {
-      const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-      const smallerDimension = Math.min(window.screen.width, window.screen.height);
-      const isSmallScreen = smallerDimension <= 900;
-      setIsTouchDevice(hasTouch && isSmallScreen);
-    };
-    checkDevice();
+    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const isSmallScreen = Math.min(window.screen.width, window.screen.height) <= 900;
+    setIsTouchDevice(hasTouch && isSmallScreen);
   }, []);
 
+  // Reliable orientation detection using screen.orientation
   useEffect(() => {
     const checkOrientation = () => {
       if (window.screen.orientation) {
         setIsPortrait(window.screen.orientation.type.includes('portrait'));
       } else {
+        // Fallback: use screen dimensions (not window - those change with CSS rotation)
         setIsPortrait(window.screen.height > window.screen.width);
       }
     };
@@ -89,36 +87,36 @@ export default function SpominC() {
     };
   }, []);
 
-  const handleStartGame = async () => {
-    try {
-      if (document.documentElement.requestFullscreen) {
-        await document.documentElement.requestFullscreen();
-      }
-    } catch (error) {
-      console.log('Fullscreen not supported:', error);
-    }
-
-    try {
-      if (screen.orientation && 'lock' in screen.orientation) {
-        try {
-          await (screen.orientation as any).lock('landscape-primary');
-        } catch {
-          try {
-            await (screen.orientation as any).lock('landscape');
-          } catch (e) {
-            console.log('Landscape lock not supported');
-          }
-        }
-      }
-    } catch (error) {
-      console.log('Orientation lock not supported:', error);
-    }
-
-    setGameStarted(true);
-  };
-
+  // Automatic fullscreen and landscape lock (identical to LabirintC)
   useEffect(() => {
-    if (effectiveFullscreen && gameStarted) {
+    if (effectiveFullscreen) {
+      const requestFullscreen = async () => {
+        try {
+          if (document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen();
+          }
+        } catch (error) {
+          console.log('Fullscreen not supported:', error);
+        }
+      };
+
+      const lockLandscape = async () => {
+        try {
+          if (screen.orientation && 'lock' in screen.orientation) {
+            try {
+              await (screen.orientation as any).lock('landscape-primary');
+            } catch {
+              await (screen.orientation as any).lock('landscape');
+            }
+          }
+        } catch (error) {
+          console.log('Landscape lock not supported:', error);
+        }
+      };
+
+      requestFullscreen();
+      lockLandscape();
+        
       return () => {
         if (document.fullscreenElement) {
           document.exitFullscreen?.();
@@ -132,7 +130,7 @@ export default function SpominC() {
         }
       };
     }
-  }, [effectiveFullscreen, gameStarted]);
+  }, [effectiveFullscreen]);
 
   const handleCardClick = (index: number) => {
     if (!gameStartTimeRef.current && cards.length > 0) {
@@ -166,37 +164,17 @@ export default function SpominC() {
 
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/zeleno_ozadje.png`;
 
+  // Mobile fullscreen version
   if (effectiveFullscreen) {
-    if (!gameStarted) {
-      return (
-        <div className="fixed inset-0 overflow-hidden select-none">
-          <div 
-            className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url('${backgroundImageUrl}')` }}
-          />
-          <div className="relative z-10 flex items-center justify-center h-full w-full">
-            <button
-              onClick={handleStartGame}
-              className="flex flex-col items-center gap-4 px-12 py-8 bg-white/95 rounded-3xl shadow-2xl border-4 border-orange-300 transform transition-transform active:scale-95"
-            >
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-lg">
-                <Play className="h-10 w-10 text-white ml-1" />
-              </div>
-              <span className="text-2xl font-bold text-gray-800">Začni igro</span>
-              <span className="text-sm text-gray-500">Obrni telefon v ležeči položaj</span>
-            </button>
-          </div>
-        </div>
-      );
-    }
-
     return (
       <div className="fixed inset-0 overflow-hidden select-none">
+        {/* Full screen background */}
         <div 
           className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url('${backgroundImageUrl}')` }}
         />
         
+        {/* Game content */}
         <div className="relative z-10 flex-1 flex items-stretch justify-center overflow-hidden h-full w-full">
           {!isPortrait ? (
             isLoading ? (
@@ -234,6 +212,7 @@ export default function SpominC() {
           )}
         </div>
 
+        {/* Floating menu button */}
         <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
             <Button 
@@ -273,7 +252,11 @@ export default function SpominC() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <InfoModal isOpen={showInfo} onClose={() => setShowInfo(false)} title="Navodila za igro Spomin" content="Ta igra je super za vadbo spomina in izgovorjave besed!
+        <InfoModal 
+          isOpen={showInfo} 
+          onClose={() => setShowInfo(false)} 
+          title="Navodila za igro Spomin" 
+          content="Ta igra je super za vadbo spomina in izgovorjave besed!
 
 Klikni na dve ploščici in poskusi najti pravi par (sliko in besedo).
 
@@ -281,11 +264,26 @@ Ko najdeš par, se odpre okno z izgovorjavo – poslušaj in ponovi besedo na gl
 
 Če jo pravilno izgovoriš, se par obdrži!
 
-Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede." />
+Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede." 
+        />
 
-        <MemoryPairDialog isOpen={showPairDialog} onClose={handlePairDialogContinue} onContinue={handlePairDialogContinue} onUnmatch={handlePairUnmatch} pairNumber={matchedPairs.length} totalPairs={totalPairs} imageUrl={currentMatchedPair?.image_url || null} word={currentMatchedPair?.word || null} audioUrl={currentMatchedPair?.audio_url || null} />
+        <MemoryPairDialog 
+          isOpen={showPairDialog} 
+          onClose={handlePairDialogContinue} 
+          onContinue={handlePairDialogContinue} 
+          onUnmatch={handlePairUnmatch} 
+          pairNumber={matchedPairs.length} 
+          totalPairs={totalPairs} 
+          imageUrl={currentMatchedPair?.image_url || null} 
+          word={currentMatchedPair?.word || null} 
+          audioUrl={currentMatchedPair?.audio_url || null} 
+        />
 
-        <MemoryExitConfirmationDialog open={showExitDialog} onOpenChange={setShowExitDialog} onConfirm={() => navigate("/govorne-igre/spomin")}>
+        <MemoryExitConfirmationDialog 
+          open={showExitDialog} 
+          onOpenChange={setShowExitDialog} 
+          onConfirm={() => navigate("/govorne-igre/spomin")}
+        >
           <div />
         </MemoryExitConfirmationDialog>
       </div>
@@ -333,6 +331,7 @@ Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede." />
         </div>
       </div>
 
+      {/* Floating menu button */}
       <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
         <DropdownMenuTrigger asChild>
           <Button 
@@ -342,20 +341,41 @@ Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede." />
             <Home className="h-7 w-7 text-white" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" side="top" sideOffset={8} className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl">
-          <button onClick={() => { setMenuOpen(false); setShowExitDialog(true); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100">
-            <span className="text-2xl">🏠</span><span>Nazaj</span>
+        <DropdownMenuContent 
+          align="start" 
+          side="top" 
+          sideOffset={8} 
+          className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+        >
+          <button 
+            onClick={() => { setMenuOpen(false); setShowExitDialog(true); }} 
+            className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+          >
+            <span className="text-2xl">🏠</span>
+            <span>Nazaj</span>
           </button>
-          <button onClick={() => { setMenuOpen(false); handleReset(); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100">
-            <span className="text-2xl">🔄</span><span>Nova igra</span>
+          <button 
+            onClick={() => { setMenuOpen(false); handleReset(); }} 
+            className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+          >
+            <span className="text-2xl">🔄</span>
+            <span>Nova igra</span>
           </button>
-          <button onClick={() => { setMenuOpen(false); setShowInfo(true); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium">
-            <span className="text-2xl">📖</span><span>Navodila</span>
+          <button 
+            onClick={() => { setMenuOpen(false); setShowInfo(true); }} 
+            className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
+          >
+            <span className="text-2xl">📖</span>
+            <span>Navodila</span>
           </button>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <InfoModal isOpen={showInfo} onClose={() => setShowInfo(false)} title="Navodila za igro Spomin" content="Ta igra je super za vadbo spomina in izgovorjave besed!
+      <InfoModal 
+        isOpen={showInfo} 
+        onClose={() => setShowInfo(false)} 
+        title="Navodila za igro Spomin" 
+        content="Ta igra je super za vadbo spomina in izgovorjave besed!
 
 Klikni na dve ploščici in poskusi najti pravi par (sliko in besedo).
 
@@ -363,11 +383,26 @@ Ko najdeš par, se odpre okno z izgovorjavo – poslušaj in ponovi besedo na gl
 
 Če jo pravilno izgovoriš, se par obdrži!
 
-Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede." />
+Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede." 
+      />
 
-      <MemoryPairDialog isOpen={showPairDialog} onClose={handlePairDialogContinue} onContinue={handlePairDialogContinue} onUnmatch={handlePairUnmatch} pairNumber={matchedPairs.length} totalPairs={totalPairs} imageUrl={currentMatchedPair?.image_url || null} word={currentMatchedPair?.word || null} audioUrl={currentMatchedPair?.audio_url || null} />
+      <MemoryPairDialog 
+        isOpen={showPairDialog} 
+        onClose={handlePairDialogContinue} 
+        onContinue={handlePairDialogContinue} 
+        onUnmatch={handlePairUnmatch} 
+        pairNumber={matchedPairs.length} 
+        totalPairs={totalPairs} 
+        imageUrl={currentMatchedPair?.image_url || null} 
+        word={currentMatchedPair?.word || null} 
+        audioUrl={currentMatchedPair?.audio_url || null} 
+      />
 
-      <MemoryExitConfirmationDialog open={showExitDialog} onOpenChange={setShowExitDialog} onConfirm={() => navigate("/govorne-igre/spomin")}>
+      <MemoryExitConfirmationDialog 
+        open={showExitDialog} 
+        onOpenChange={setShowExitDialog} 
+        onConfirm={() => navigate("/govorne-igre/spomin")}
+      >
         <div />
       </MemoryExitConfirmationDialog>
     </div>
