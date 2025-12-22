@@ -69,10 +69,9 @@ export default function SpominČ() {
       let portrait = false;
       if (window.screen.orientation) {
         portrait = window.screen.orientation.type.includes('portrait');
-        console.log('SPOMIN orientation check:', window.screen.orientation.type, 'isPortrait:', portrait);
       } else {
-        portrait = window.innerHeight > window.innerWidth;
-        console.log('SPOMIN fallback orientation check: height=', window.innerHeight, 'width=', window.innerWidth, 'isPortrait:', portrait);
+        // Use screen dimensions (like LabirintC) - more reliable than innerHeight/Width
+        portrait = window.screen.height > window.screen.width;
       }
       setIsPortrait(portrait);
     };
@@ -80,12 +79,10 @@ export default function SpominČ() {
     checkOrientation();
     
     const handleOrientationChange = () => {
-      console.log('SPOMIN orientationchange event fired');
       setTimeout(checkOrientation, 100);
     };
     
     const handleResize = () => {
-      console.log('SPOMIN resize event fired');
       checkOrientation();
     };
     
