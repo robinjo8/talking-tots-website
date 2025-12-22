@@ -40,8 +40,6 @@ const SpominČContent = () => {
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   // Portrait detection for showing rotation message
   const [isPortrait, setIsPortrait] = useState(false);
-  // Mobile game started state - for user gesture activation
-  const [mobileGameStarted, setMobileGameStarted] = useState(false);
   
   // Touch devices get fullscreen mode
   const effectiveFullscreen = isTouchDevice;
@@ -106,48 +104,50 @@ const SpominČContent = () => {
     };
   }, []);
 
-  // Cleanup fullscreen and orientation on unmount
+  // Automatic fullscreen and landscape lock - IDENTICAL to LabirintC
   useEffect(() => {
-    return () => {
-      if (document.fullscreenElement) {
-        document.exitFullscreen?.();
-      }
-      try {
-        if (screen.orientation && 'unlock' in screen.orientation) {
-          (screen.orientation as any).unlock();
-        }
-      } catch (error) {
-        // Unlock not supported
-      }
-    };
-  }, []);
-
-  // Handle mobile game start - triggers fullscreen and orientation lock via user gesture
-  const handleMobileStart = async () => {
-    // Request fullscreen
-    try {
-      if (document.documentElement.requestFullscreen) {
-        await document.documentElement.requestFullscreen();
-      }
-    } catch (error) {
-      console.log('Fullscreen not supported:', error);
-    }
-
-    // Lock to landscape
-    try {
-      if (screen.orientation && 'lock' in screen.orientation) {
+    if (effectiveFullscreen) {
+      const requestFullscreen = async () => {
         try {
-          await (screen.orientation as any).lock('landscape-primary');
-        } catch {
-          await (screen.orientation as any).lock('landscape');
+          if (document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen();
+          }
+        } catch (error) {
+          console.log('Fullscreen not supported:', error);
         }
-      }
-    } catch (error) {
-      console.log('Landscape lock not supported:', error);
-    }
+      };
 
-    setMobileGameStarted(true);
-  };
+      const lockLandscape = async () => {
+        try {
+          if (screen.orientation && 'lock' in screen.orientation) {
+            try {
+              await (screen.orientation as any).lock('landscape-primary');
+            } catch {
+              await (screen.orientation as any).lock('landscape');
+            }
+          }
+        } catch (error) {
+          console.log('Landscape lock not supported:', error);
+        }
+      };
+
+      requestFullscreen();
+      lockLandscape();
+        
+      return () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen?.();
+        }
+        try {
+          if (screen.orientation && 'unlock' in screen.orientation) {
+            (screen.orientation as any).unlock();
+          }
+        } catch (error) {
+          console.log('Orientation unlock not supported:', error);
+        }
+      };
+    }
+  }, [effectiveFullscreen]);
 
   const handleCardClick = (index: number) => {
     if (!gameStartTimeRef.current && cards.length > 0) {
@@ -204,29 +204,6 @@ const SpominČContent = () => {
 
   // Mobile fullscreen version - IDENTICAL structure to LabirintC
   if (effectiveFullscreen) {
-    // Show start overlay if game not started yet
-    if (!mobileGameStarted) {
-      return (
-        <div className="fixed inset-0 overflow-hidden select-none">
-          {/* Full screen background */}
-          <div 
-            className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url('${backgroundImageUrl}')` }}
-          />
-          
-          {/* Start overlay */}
-          <div className="relative z-10 flex items-center justify-center h-full w-full">
-            <Button
-              onClick={handleMobileStart}
-              className="px-8 py-6 text-xl font-bold bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 rounded-xl"
-            >
-              Začni igro
-            </Button>
-          </div>
-        </div>
-      );
-    }
-
     return (
       <div className="fixed inset-0 overflow-hidden select-none">
         {/* Full screen background */}
