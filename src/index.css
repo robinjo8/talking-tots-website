@@ -99,13 +99,13 @@
   @apply bg-gradient-rainbow bg-clip-text text-transparent animate-pulse;
 }
 
-/* Finger swipe animation for sequence game - more movement */
-@keyframes swipe-finger {
+/* Hand swipe animation for sequence game - slow movement */
+@keyframes swipe-hand {
   0%, 100% {
-    transform: translateX(-15px);
+    transform: translateX(-12px);
   }
   50% {
-    transform: translateX(15px);
+    transform: translateX(12px);
   }
 }
 
