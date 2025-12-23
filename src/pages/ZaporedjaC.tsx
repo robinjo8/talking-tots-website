@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Home } from "lucide-react";
+import { Home, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
@@ -26,6 +26,7 @@ export default function ZaporedjaC() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
   const [showNewGameConfirmation, setShowNewGameConfirmation] = useState(false);
+  const [showNewGameButton, setShowNewGameButton] = useState(false);
   const gameCompletedRef = useRef(false);
 
   // Mobile detection and orientation state
@@ -142,6 +143,14 @@ export default function ZaporedjaC() {
     setPlayedImages([]);
     setGameKey(prev => prev + 1);
     setShowNewGameConfirmation(false);
+    setShowNewGameButton(false);
+  };
+
+  const handleStartNewGameDirect = () => {
+    gameCompletedRef.current = false;
+    setPlayedImages([]);
+    setGameKey(prev => prev + 1);
+    setShowNewGameButton(false);
   };
 
   const handleInstructions = () => {
@@ -160,6 +169,8 @@ export default function ZaporedjaC() {
 
   const handleStarClaimed = () => {
     recordGameCompletion('memory', 'sequence_c_3-4');
+    setShowCompletion(false);
+    setShowNewGameButton(true);
   };
 
   const backgroundImageUrl = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.png';
@@ -194,45 +205,59 @@ export default function ZaporedjaC() {
             )}
           </div>
 
-          {/* Floating menu button */}
-          <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-            <DropdownMenuTrigger asChild>
+          {/* Floating buttons container */}
+          <div className="fixed bottom-4 left-4 z-50 flex items-center gap-3">
+            {/* Home menu button */}
+            <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  className="rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+                  size="icon"
+                >
+                  <Home className="h-7 w-7 text-white" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                align="start" 
+                side="top"
+                sideOffset={8}
+                className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+              >
+                <button
+                  onClick={handleBack}
+                  className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+                >
+                  <span className="text-2xl">🏠</span>
+                  <span>Nazaj</span>
+                </button>
+                <button
+                  onClick={handleNewGame}
+                  className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+                >
+                  <span className="text-2xl">🔄</span>
+                  <span>Nova igra</span>
+                </button>
+                <button
+                  onClick={handleInstructions}
+                  className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
+                >
+                  <span className="text-2xl">📖</span>
+                  <span>Navodila</span>
+                </button>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* New Game button - appears after claiming star */}
+            {showNewGameButton && (
               <Button 
-                className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm"
-                size="icon"
+                onClick={handleStartNewGameDirect}
+                className="rounded-full h-16 px-6 bg-sky-400 hover:bg-sky-500 shadow-lg border-2 border-white/50 backdrop-blur-sm text-white font-bold text-lg gap-2"
               >
-                <Home className="h-7 w-7 text-white" />
+                <RefreshCw className="h-6 w-6" />
+                Nova igra
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent 
-              align="start" 
-              side="top"
-              sideOffset={8}
-              className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
-            >
-              <button
-                onClick={handleBack}
-                className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
-              >
-                <span className="text-2xl">🏠</span>
-                <span>Nazaj</span>
-              </button>
-              <button
-                onClick={handleNewGame}
-                className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
-              >
-                <span className="text-2xl">🔄</span>
-                <span>Nova igra</span>
-              </button>
-              <button
-                onClick={handleInstructions}
-                className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
-              >
-                <span className="text-2xl">📖</span>
-                <span>Navodila</span>
-              </button>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            )}
+          </div>
 
           <MatchingInstructionsModal
             isOpen={showInstructions}
@@ -299,44 +324,58 @@ export default function ZaporedjaC() {
           />
         </div>
 
-        {/* Floating Menu Button - Left */}
-        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-          <DropdownMenuTrigger asChild>
-            <button 
-              className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
+        {/* Floating buttons container */}
+        <div className="fixed bottom-4 left-4 z-50 flex items-center gap-3">
+          {/* Home menu button */}
+          <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+            <DropdownMenuTrigger asChild>
+              <button 
+                className="w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
+              >
+                <Home className="w-8 h-8 text-white" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+              align="start"
+              side="top"
+              sideOffset={8}
             >
-              <Home className="w-8 h-8 text-white" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent 
-            className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
-            align="start"
-            side="top"
-            sideOffset={8}
-          >
-            <button
-              onClick={handleBack}
-              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
+              <button
+                onClick={handleBack}
+                className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
+              >
+                <span className="text-xl">🏠</span>
+                <span className="font-medium">Nazaj</span>
+              </button>
+              <button
+                onClick={handleNewGame}
+                className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
+              >
+                <span className="text-xl">🔄</span>
+                <span className="font-medium">Nova igra</span>
+              </button>
+              <button
+                onClick={handleInstructions}
+                className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
+              >
+                <span className="text-xl">📖</span>
+                <span className="font-medium">Navodila</span>
+              </button>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* New Game button - appears after claiming star */}
+          {showNewGameButton && (
+            <Button 
+              onClick={handleStartNewGameDirect}
+              className="rounded-full h-16 px-6 bg-sky-400 hover:bg-sky-500 shadow-lg border-2 border-white/50 backdrop-blur-sm text-white font-bold text-lg gap-2"
             >
-              <span className="text-xl">🏠</span>
-              <span className="font-medium">Nazaj</span>
-            </button>
-            <button
-              onClick={handleNewGame}
-              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
-            >
-              <span className="text-xl">🔄</span>
-              <span className="font-medium">Nova igra</span>
-            </button>
-            <button
-              onClick={handleInstructions}
-              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
-            >
-              <span className="text-xl">📖</span>
-              <span className="font-medium">Navodila</span>
-            </button>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              <RefreshCw className="h-6 w-6" />
+              Nova igra
+            </Button>
+          )}
+        </div>
         
         <MatchingInstructionsModal
           isOpen={showInstructions}
