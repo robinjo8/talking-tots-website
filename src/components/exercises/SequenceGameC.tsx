@@ -43,7 +43,7 @@ export const SequenceGameC = ({ onGameComplete }: SequenceGameCProps) => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <Loader2 className="h-12 w-12 animate-spin text-white" />
       </div>
     );
   }
@@ -51,7 +51,7 @@ export const SequenceGameC = ({ onGameComplete }: SequenceGameCProps) => {
   if (targetSequence.length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-muted-foreground">Ni na voljo slik za to igro.</p>
+        <p className="text-white/80 drop-shadow">Ni na voljo slik za to igro.</p>
       </div>
     );
   }
@@ -61,10 +61,10 @@ export const SequenceGameC = ({ onGameComplete }: SequenceGameCProps) => {
       {/* Target Sequence - Top Row */}
       <div className="space-y-4">
         <div className="text-center">
-          <h3 className="text-2xl font-bold text-foreground mb-2">Cilj</h3>
-          <p className="text-muted-foreground">Razporedi spodnje slike v ta vrstni red</p>
+          <h3 className="text-2xl font-bold text-white mb-2 drop-shadow-lg">Cilj</h3>
+          <p className="text-white/90 drop-shadow">Razporedi spodnje slike v ta vrstni red</p>
         </div>
-        <div className="grid grid-cols-4 gap-4 p-6 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl border-2 border-primary/20">
+        <div className="grid grid-cols-4 gap-4 p-6 bg-white/20 backdrop-blur-sm rounded-xl border-2 border-orange-400/50">
           {targetSequence.map((image, index) => (
             <SequenceItem
               key={`target-${image.id}`}
@@ -80,14 +80,14 @@ export const SequenceGameC = ({ onGameComplete }: SequenceGameCProps) => {
       {/* Current Sequence - Bottom Row (Draggable) */}
       <div className="space-y-4">
         <div className="text-center">
-          <h3 className="text-2xl font-bold text-foreground mb-2">
+          <h3 className="text-2xl font-bold text-white mb-2 drop-shadow-lg">
             {isComplete ? "✨ Čestitam! ✨" : "Premikaj me"}
           </h3>
-          <p className="text-muted-foreground">
+          <p className="text-white/90 drop-shadow">
             {isComplete ? "Pravilno si razporedil/-a slike!" : "Povleci in spusti slike, da jih razvrstiš"}
           </p>
         </div>
-        <div className="grid grid-cols-4 gap-4 p-6 bg-card rounded-xl border-2 border-border">
+        <div className="grid grid-cols-4 gap-4 p-6 bg-white/30 backdrop-blur-sm rounded-xl border-2 border-orange-400">
           {currentSequence.map((image, index) => (
             <SequenceItem
               key={`current-${image.id}-${index}`}
@@ -104,9 +104,9 @@ export const SequenceGameC = ({ onGameComplete }: SequenceGameCProps) => {
 
       {isComplete && (
         <div className="text-center py-4">
-          <div className="inline-flex items-center gap-2 bg-green-500/10 text-green-600 dark:text-green-400 px-6 py-3 rounded-full border-2 border-green-500/20">
+          <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-full border-2 border-white/30">
             <span className="text-2xl">🎉</span>
-            <span className="font-semibold">Igra je končana!</span>
+            <span className="font-semibold drop-shadow">Igra je končana!</span>
             <span className="text-2xl">🎉</span>
           </div>
         </div>
