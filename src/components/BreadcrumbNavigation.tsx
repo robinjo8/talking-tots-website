@@ -55,6 +55,10 @@ const breadcrumbConfig: BreadcrumbConfig[] = [
   // Igra ujemanja
   { path: "/govorne-igre/igra-ujemanja", label: "Igra ujemanja", parent: "/govorne-igre" },
   
+  // Zaporedja
+  { path: "/govorne-igre/zaporedja", label: "Zaporedja", parent: "/govorne-igre" },
+  { path: "/govorne-igre/zaporedja/c", label: "C", parent: "/govorne-igre/zaporedja" },
+  
   // Govorno-jezikovne vaje hierarchy
   { path: "/govornojezicovne-vaje", label: "Govorno-jezikovne vaje", parent: "/moje-aplikacije" },
   { path: "/govorno-jezikovne-vaje", label: "Govorno-jezikovne vaje", parent: "/moje-aplikacije" },
