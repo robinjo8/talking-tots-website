@@ -426,7 +426,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
           {completedRecordings.size === images.length && !starClaimed ? (
             <Button 
               onClick={handleClaimStar} 
-              className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 flex-1 max-w-36 landscape:h-10"
+              className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 flex-1 max-w-36 landscape:h-10"
               disabled={isSavingRecording}
             >
               <Star className="w-4 h-4" />
