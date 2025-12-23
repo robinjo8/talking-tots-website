@@ -416,26 +416,22 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
           })}
           </div>
 
-          {/* Action buttons */}
+          {/* Action buttons - always visible inside dialog */}
           <div className="flex justify-center gap-3">
             <Button onClick={handleReset} variant="outline" className="gap-2 flex-1 max-w-28">
               Ponovi
             </Button>
             
-            {/* Show Claim Star button when all challenges completed */}
-            {completedRecordings.size === images.length && !starClaimed && (
+            {completedRecordings.size === images.length && !starClaimed ? (
               <Button 
                 onClick={handleClaimStar} 
-                className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 flex-1 max-w-32"
+                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 flex-1 max-w-32"
                 disabled={isSavingRecording}
               >
                 <Star className="w-4 h-4" />
                 {isSavingRecording ? 'Shranjujem...' : 'Vzemi zvezdico'}
               </Button>
-            )}
-            
-            {/* Show Close button conditionally */}
-            {(completedRecordings.size < images.length || starClaimed) && (
+            ) : (
               <Button onClick={handleClose} className="bg-dragon-green hover:bg-dragon-green/90 gap-2 flex-1 max-w-28">
                 <X className="w-4 h-4" />
                 Zapri
