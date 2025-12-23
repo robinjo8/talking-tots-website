@@ -59,7 +59,16 @@ export const SequenceGameC = ({ onGameComplete }: SequenceGameCProps) => {
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8">
       {/* Target Sequence - Top Row */}
-      <div className="space-y-4 relative">
+      <div className="relative">
+        {/* Lock icon centered above */}
+        <div className="flex justify-center mb-2">
+          <div className="bg-amber-500 rounded-lg p-2 shadow-lg border-2 border-amber-600">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+        </div>
         <div className="grid grid-cols-4 gap-4 p-6 bg-white/20 backdrop-blur-sm rounded-xl border-2 border-gray-400/50">
           {targetSequence.map((image, index) => (
             <SequenceItem
@@ -70,13 +79,6 @@ export const SequenceGameC = ({ onGameComplete }: SequenceGameCProps) => {
               isTarget={true}
             />
           ))}
-        </div>
-        {/* Lock icon outside top-right */}
-        <div className="absolute -top-2 -right-2 bg-amber-500 rounded-lg p-2 shadow-lg border-2 border-amber-600">
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-          </svg>
         </div>
       </div>
 
@@ -91,7 +93,7 @@ export const SequenceGameC = ({ onGameComplete }: SequenceGameCProps) => {
       </div>
 
       {/* Current Sequence - Bottom Row (Draggable) */}
-      <div className="space-y-4 relative">
+      <div className="relative">
         <div className="grid grid-cols-4 gap-4 p-6 bg-white/30 backdrop-blur-sm rounded-xl border-3 border-orange-400 animate-[pulse-border_2s_ease-in-out_infinite]">
           {currentSequence.map((image, index) => (
             <SequenceItem
@@ -105,15 +107,15 @@ export const SequenceGameC = ({ onGameComplete }: SequenceGameCProps) => {
             />
           ))}
         </div>
-        {/* Hand icon outside bottom-right with swipe animation */}
+        {/* Pointing finger icon centered below with swipe animation */}
         {!isComplete && (
-          <div className="absolute -bottom-2 -right-2 bg-orange-500 rounded-lg p-2 shadow-lg border-2 border-orange-600 animate-[swipe-hand_1.5s_ease-in-out_infinite]">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2"/>
-              <path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2"/>
-              <path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"/>
-              <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>
-            </svg>
+          <div className="flex justify-center mt-2">
+            <div className="bg-orange-500 rounded-lg p-2 shadow-lg border-2 border-orange-600 animate-[swipe-finger_1.2s_ease-in-out_infinite]">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M10 5.5a2.5 2.5 0 0 1 5 0v6"/>
+                <path d="M9 10a2 2 0 0 0-2 2v7c0 1.7 1.3 3 3 3h6a3 3 0 0 0 3-3v-4a2 2 0 0 0-2-2h-2"/>
+              </svg>
+            </div>
           </div>
         )}
       </div>
