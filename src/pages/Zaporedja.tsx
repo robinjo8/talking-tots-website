@@ -133,8 +133,9 @@ export default function Zaporedja() {
   };
 
   const LetterCard = ({ game }: { game: typeof sequenceGames[0] }) => (
-    <div
-      className="bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group border border-gray-200"
+    <button
+      type="button"
+      className="bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group border border-gray-200 w-full text-left"
       onClick={() => handleCardClick(game)}
     >
       {/* Card Image */}
@@ -160,7 +161,7 @@ export default function Zaporedja() {
           </p>
         )}
       </div>
-    </div>
+    </button>
   );
 
   return (
