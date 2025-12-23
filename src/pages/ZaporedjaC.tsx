@@ -270,6 +270,7 @@ export default function ZaporedjaC() {
             images={playedImages}
             onStarClaimed={handleStarClaimed}
             instructionText="Klikni na slike in posnemaj besede"
+            isMobileLandscape={true}
           />
 
           {/* Exit Confirmation Dialog */}
@@ -388,6 +389,7 @@ export default function ZaporedjaC() {
           images={playedImages}
           onStarClaimed={handleStarClaimed}
           instructionText="Klikni na slike in posnemaj besede"
+          isMobileLandscape={false}
         />
 
         {/* Exit Confirmation Dialog */}

@@ -121,7 +121,7 @@ export default function ZaporedjaČ() {
             {showNewGameButton && <Button onClick={handleStartNewGameDirect} className="rounded-full w-16 h-16 bg-sky-400 hover:bg-sky-500 shadow-lg border-2 border-white/50 backdrop-blur-sm" size="icon"><RefreshCw className="h-7 w-7 text-white" /></Button>}
           </div>
           <MatchingInstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
-          <MatchingCompletionDialog isOpen={showCompletion} onClose={() => setShowCompletion(false)} images={playedImages} onStarClaimed={handleStarClaimed} instructionText="Klikni na slike in posnemaj besede" />
+          <MatchingCompletionDialog isOpen={showCompletion} onClose={() => setShowCompletion(false)} images={playedImages} onStarClaimed={handleStarClaimed} instructionText="Klikni na slike in posnemaj besede" isMobileLandscape={true} />
           <ConfirmDialog open={showExitConfirmation} onOpenChange={setShowExitConfirmation} title="Zapusti igro" description="Ali res želiš zapustiti igro?" confirmText="Da" cancelText="Ne" onConfirm={handleConfirmExit} onCancel={() => setShowExitConfirmation(false)} />
           <ConfirmDialog open={showNewGameConfirmation} onOpenChange={setShowNewGameConfirmation} title="Nova igra" description="Ali res želiš začeti novo igro?" confirmText="Da" cancelText="Ne" onConfirm={handleConfirmNewGame} onCancel={() => setShowNewGameConfirmation(false)} />
         </div>
@@ -150,7 +150,7 @@ export default function ZaporedjaČ() {
           {showNewGameButton && <Button onClick={handleStartNewGameDirect} className="rounded-full w-16 h-16 bg-sky-400 hover:bg-sky-500 shadow-lg border-2 border-white/50 backdrop-blur-sm" size="icon"><RefreshCw className="h-7 w-7 text-white" /></Button>}
         </div>
         <MatchingInstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
-        <MatchingCompletionDialog isOpen={showCompletion} onClose={() => setShowCompletion(false)} images={playedImages} onStarClaimed={handleStarClaimed} instructionText="Klikni na slike in posnemaj besede" />
+        <MatchingCompletionDialog isOpen={showCompletion} onClose={() => setShowCompletion(false)} images={playedImages} onStarClaimed={handleStarClaimed} instructionText="Klikni na slike in posnemaj besede" isMobileLandscape={false} />
         <ConfirmDialog open={showExitConfirmation} onOpenChange={setShowExitConfirmation} title="Zapusti igro" description="Ali res želiš zapustiti igro?" confirmText="Da" cancelText="Ne" onConfirm={handleConfirmExit} onCancel={() => setShowExitConfirmation(false)} />
         <ConfirmDialog open={showNewGameConfirmation} onOpenChange={setShowNewGameConfirmation} title="Nova igra" description="Ali res želiš začeti novo igro?" confirmText="Da" cancelText="Ne" onConfirm={handleConfirmNewGame} onCancel={() => setShowNewGameConfirmation(false)} />
       </div>
