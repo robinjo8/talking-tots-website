@@ -60,8 +60,8 @@ export const SequenceGameC = ({ onGameComplete }: SequenceGameCProps) => {
     <div className="w-full max-w-4xl mx-auto space-y-8">
       {/* Target Sequence - Top Row */}
       <div className="relative">
-        {/* Lock icon centered above */}
-        <div className="flex justify-center mb-2">
+        {/* Lock icon centered on top border */}
+        <div className="absolute left-1/2 -translate-x-1/2 -top-4 z-10">
           <div className="bg-amber-500 rounded-lg p-2 shadow-lg border-2 border-amber-600">
             <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
@@ -69,7 +69,7 @@ export const SequenceGameC = ({ onGameComplete }: SequenceGameCProps) => {
             </svg>
           </div>
         </div>
-        <div className="grid grid-cols-4 gap-4 p-6 bg-white/20 backdrop-blur-sm rounded-xl border-2 border-gray-400/50">
+        <div className="grid grid-cols-4 gap-4 p-6 bg-white/20 backdrop-blur-sm rounded-xl border-2 border-gray-400/50 mt-2">
           {targetSequence.map((image, index) => (
             <SequenceItem
               key={`target-${image.id}`}
@@ -107,13 +107,15 @@ export const SequenceGameC = ({ onGameComplete }: SequenceGameCProps) => {
             />
           ))}
         </div>
-        {/* Pointing finger icon centered below with swipe animation */}
+        {/* Hand icon centered on bottom border with swipe animation */}
         {!isComplete && (
-          <div className="flex justify-center mt-2">
-            <div className="bg-orange-500 rounded-lg p-2 shadow-lg border-2 border-orange-600 animate-[swipe-finger_1.2s_ease-in-out_infinite]">
+          <div className="absolute left-1/2 -translate-x-1/2 -bottom-4 z-10">
+            <div className="bg-orange-500 rounded-lg p-2 shadow-lg border-2 border-orange-600 animate-[swipe-hand_2s_ease-in-out_infinite]">
               <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M10 5.5a2.5 2.5 0 0 1 5 0v6"/>
-                <path d="M9 10a2 2 0 0 0-2 2v7c0 1.7 1.3 3 3 3h6a3 3 0 0 0 3-3v-4a2 2 0 0 0-2-2h-2"/>
+                <path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2"/>
+                <path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2"/>
+                <path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"/>
+                <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>
               </svg>
             </div>
           </div>
