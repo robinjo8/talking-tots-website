@@ -143,9 +143,7 @@ export default function SpominK() {
     resetGame();
     gameStartTimeRef.current = null;
     setGameTime(null);
-    toast({
-      title: "Igra je bila ponovno nastavljena!",
-    });
+    // Game reset - no toast notification per user request
   };
 
   useEffect(() => {
@@ -153,14 +151,9 @@ export default function SpominK() {
       const endTime = Date.now();
       const timeTaken = Math.floor((endTime - gameStartTimeRef.current) / 1000);
       setGameTime(timeTaken);
-      setTimeout(() => {
-        toast({
-          title: "Čestitamo!",
-          description: `Igra je končana v ${timeTaken} sekundah!`,
-        });
-      }, 500);
+      // Game completed - no toast notification per user request
     }
-  }, [gameCompleted, gameStartTimeRef, gameTime, toast]);
+  }, [gameCompleted, gameStartTimeRef, gameTime]);
 
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/zeleno_ozadje.png`;
 

@@ -169,10 +169,7 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
         .from('audio-besede')
         .upload(userSpecificPath, audioBlob, { contentType: 'audio/webm' });
 
-      toast({
-        title: 'Odlično!',
-        description: 'Tvoja izgovorjava je bila shranjena.',
-      });
+      // Recording saved - no toast notification per user request
     } catch (error) {
       console.error('Error in saveRecording:', error);
     }
@@ -237,10 +234,7 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
         });
       }, 1000);
 
-      toast({
-        title: 'Snemanje se je začelo',
-        description: 'Povej besedo glasno in razločno!',
-      });
+      // Recording started - no toast notification per user request
     } catch (error) {
       console.error('Error starting recording:', error);
       toast({

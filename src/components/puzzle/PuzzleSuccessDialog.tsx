@@ -113,10 +113,7 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
         });
       }, 1000);
 
-      toast({
-        title: "Snemanje se je začelo",
-        description: "Povej besedo glasno in razločno!",
-      });
+      // Recording started - no toast notification per user request
     } catch (error) {
       console.error('Error starting recording:', error);
       toast({
@@ -192,10 +189,7 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
         });
       } else {
         console.log('Recording saved successfully to:', userSpecificPath);
-        toast({
-          title: "Odlično!",
-          description: "Tvoja izgovorjava je bila shranjena.",
-        });
+        // Recording saved - no toast notification per user request
       }
     } catch (error) {
       console.error('Error in saveRecording:', error);

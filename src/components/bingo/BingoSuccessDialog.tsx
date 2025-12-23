@@ -109,11 +109,8 @@ export const BingoSuccessDialog: React.FC<BingoSuccessDialogProps> = ({
     setRecordingTimeLeft(3);
     setHasRecorded(true);
 
-    toast({
-      title: 'Odlično!',
-      description: 'Tvoja izgovorjava je bila shranjena.',
-    });
-  }, [toast]);
+    // Recording saved - no toast notification per user request
+  }, []);
 
   const startRecording = async () => {
     if (hasRecorded) return;
@@ -152,10 +149,7 @@ export const BingoSuccessDialog: React.FC<BingoSuccessDialogProps> = ({
         });
       }, 1000);
 
-      toast({
-        title: 'Snemanje se je začelo',
-        description: 'Povej besedo glasno in razločno!',
-      });
+      // Recording started - no toast notification per user request
     } catch (error) {
       console.error('Error starting recording:', error);
       toast({
