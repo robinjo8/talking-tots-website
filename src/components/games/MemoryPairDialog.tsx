@@ -305,32 +305,34 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
             </div>
           </div>
 
-          {/* Action buttons */}
+          {/* Action buttons - always visible, disabled until recorded */}
           <div className="flex justify-center gap-3">
-            {hasRecorded && (
-              <>
-                <Button onClick={handleReset} variant="outline" className="gap-2 flex-1 max-w-28">
-                  Ponovi
-                </Button>
-                <Button 
-                  onClick={handleContinue}
-                  className={`gap-2 flex-1 ${
-                    isLastPair 
-                      ? 'bg-yellow-500 hover:bg-yellow-600 text-white max-w-32' 
-                      : 'bg-dragon-green hover:bg-dragon-green/90 text-white max-w-28'
-                  }`}
-                >
-                  {isLastPair ? (
-                    <>
-                      <Star className="w-4 h-4" />
-                      Vzemi zvezdico
-                    </>
-                  ) : (
-                    'Nadaljuj'
-                  )}
-                </Button>
-              </>
-            )}
+            <Button 
+              onClick={handleReset} 
+              variant="outline" 
+              className="gap-2 flex-1 max-w-28"
+              disabled={!hasRecorded}
+            >
+              Ponovi
+            </Button>
+            <Button 
+              onClick={handleContinue}
+              className={`gap-2 flex-1 ${
+                isLastPair 
+                  ? 'bg-yellow-500 hover:bg-yellow-600 text-white max-w-32' 
+                  : 'bg-dragon-green hover:bg-dragon-green/90 text-white max-w-28'
+              }`}
+              disabled={!hasRecorded}
+            >
+              {isLastPair ? (
+                <>
+                  <Star className="w-4 h-4" />
+                  Vzemi zvezdico
+                </>
+              ) : (
+                'Nadaljuj'
+              )}
+            </Button>
           </div>
         </div>
       </DialogContent>
