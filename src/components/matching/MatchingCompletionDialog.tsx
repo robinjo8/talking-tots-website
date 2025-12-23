@@ -15,6 +15,7 @@ interface MatchingCompletionDialogProps {
   onStarClaimed?: () => void;
   instructionText?: string;
   autoPlayAudio?: boolean;
+  isMobileLandscape?: boolean;
 }
 export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> = ({
   isOpen,
@@ -22,7 +23,8 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
   images,
   onStarClaimed,
   instructionText = "KLIKNI NA SPODNJE SLIKE IN PONOVI BESEDE.",
-  autoPlayAudio = false
+  autoPlayAudio = false,
+  isMobileLandscape = false
 }) => {
   const [completedRecordings, setCompletedRecordings] = useState<Set<number>>(new Set());
   const [recordingTimeLeft, setRecordingTimeLeft] = useState(3);
@@ -368,27 +370,36 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     }
   };
   return <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="w-[95vw] max-w-lg landscape:w-[60vw] landscape:h-screen landscape:max-h-screen landscape:rounded-none landscape:flex landscape:flex-col landscape:justify-between landscape:py-4">
-        <DialogHeader className="pb-0 landscape:pb-0 flex-shrink-0">
-          <DialogTitle className="text-lg md:text-2xl font-bold text-dragon-green text-center landscape:text-xl">
+      <DialogContent className={isMobileLandscape 
+        ? "w-[60vw] h-screen max-h-screen rounded-none flex flex-col justify-between py-4" 
+        : "sm:max-w-lg"
+      }>
+        <DialogHeader className={isMobileLandscape ? "pb-0 flex-shrink-0" : ""}>
+          <DialogTitle className={`font-bold text-dragon-green text-center ${isMobileLandscape ? "text-xl" : "text-lg md:text-2xl"}`}>
             Odlično!
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-2 md:space-y-6 py-2 md:py-4 landscape:flex-1 landscape:flex landscape:flex-col landscape:justify-center landscape:items-center landscape:space-y-3">
-          <p className="text-xs md:text-sm text-black text-center uppercase landscape:text-sm">{instructionText}</p>
+        <div className={isMobileLandscape 
+          ? "flex-1 flex flex-col justify-center items-center space-y-3 py-2" 
+          : "space-y-2 md:space-y-6 py-2 md:py-4"
+        }>
+          <p className={`text-black text-center uppercase ${isMobileLandscape ? "text-sm" : "text-xs md:text-sm"}`}>{instructionText}</p>
           
           {/* Display images - 4 in row for landscape, 2x2 for portrait */}
-          <div className={images.length === 1 ? "flex justify-center" : "grid grid-cols-4 landscape:grid-cols-4 portrait:grid-cols-2 gap-2 md:gap-4 landscape:gap-4 mx-auto"}>
+          <div className={images.length === 1 
+            ? "flex justify-center" 
+            : `grid gap-2 md:gap-4 mx-auto ${isMobileLandscape ? "grid-cols-4 gap-4" : "grid-cols-4 portrait:grid-cols-2"}`
+          }>
             {images.slice(0, 4).map((image, index) => {
             const isRecording = currentRecordingIndex === index;
             const isCompleted = completedRecordings.has(index);
-            return <div key={index} className="flex flex-col items-center space-y-1 md:space-y-2 landscape:space-y-1">
+            return <div key={index} className={`flex flex-col items-center ${isMobileLandscape ? "space-y-1" : "space-y-1 md:space-y-2"}`}>
                   <div 
                     className={`cursor-pointer transition-all ${isCompleted ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
                     onClick={() => handleImageClick(index, image.word)}
                   >
                     <div className="relative">
-                      <img src={image.url} alt={image.word} className={`w-14 h-14 md:w-20 md:h-20 landscape:w-16 landscape:h-16 object-cover rounded-xl border-2 ${isCompleted ? 'border-gray-400 grayscale' : isRecording ? 'border-red-500' : 'border-dragon-green'}`} />
+                      <img src={image.url} alt={image.word} className={`object-cover rounded-xl border-2 ${isMobileLandscape ? "w-16 h-16" : "w-14 h-14 md:w-20 md:h-20"} ${isCompleted ? 'border-gray-400 grayscale' : isRecording ? 'border-red-500' : 'border-dragon-green'}`} />
                       {isRecording && <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-xl">
                           <div className="bg-red-500 text-white rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
                             <Mic className="w-3 h-3 md:w-4 md:h-4" />
@@ -399,7 +410,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
                         </div>}
                     </div>
                   </div>
-                  <span className={`text-xs md:text-sm landscape:text-xs font-medium text-center ${isCompleted ? 'text-gray-400' : 'text-black'}`}>
+                  <span className={`font-medium text-center ${isMobileLandscape ? "text-xs" : "text-xs md:text-sm"} ${isCompleted ? 'text-gray-400' : 'text-black'}`}>
                     {image.word.toUpperCase()}
                   </span>
                   <Button
@@ -408,9 +419,9 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
                       handlePlayAudio(image);
                     }}
                     size="icon"
-                    className="bg-green-500 hover:bg-green-600 text-white h-8 w-8 md:h-12 md:w-12 landscape:h-10 landscape:w-10"
+                    className={`bg-green-500 hover:bg-green-600 text-white ${isMobileLandscape ? "h-10 w-10" : "h-8 w-8 md:h-12 md:w-12"}`}
                   >
-                    <Volume2 className="w-4 h-4 md:w-6 md:h-6 landscape:w-5 landscape:h-5" />
+                    <Volume2 className={isMobileLandscape ? "w-5 h-5" : "w-4 h-4 md:w-6 md:h-6"} />
                   </Button>
                 </div>;
           })}
@@ -418,22 +429,22 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
         </div>
 
         {/* Action buttons - always visible at bottom */}
-        <div className="flex justify-center gap-3 flex-shrink-0 landscape:pb-2">
-          <Button onClick={handleReset} variant="outline" className="gap-2 flex-1 max-w-32 landscape:h-10">
+        <div className={`flex justify-center gap-3 flex-shrink-0 ${isMobileLandscape ? "pb-2" : ""}`}>
+          <Button onClick={handleReset} variant="outline" className={`gap-2 flex-1 max-w-32 ${isMobileLandscape ? "h-10" : ""}`}>
             Ponovi
           </Button>
           
           {completedRecordings.size === images.length && !starClaimed ? (
             <Button 
               onClick={handleClaimStar} 
-              className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 flex-1 max-w-36 landscape:h-10"
+              className={`bg-yellow-500 hover:bg-yellow-600 text-white gap-2 flex-1 max-w-36 ${isMobileLandscape ? "h-10" : ""}`}
               disabled={isSavingRecording}
             >
               <Star className="w-4 h-4" />
               {isSavingRecording ? 'Shranjujem...' : 'Vzemi zvezdico'}
             </Button>
           ) : (
-            <Button onClick={handleClose} className="bg-dragon-green hover:bg-dragon-green/90 gap-2 flex-1 max-w-32 landscape:h-10">
+            <Button onClick={handleClose} className={`bg-dragon-green hover:bg-dragon-green/90 gap-2 flex-1 max-w-32 ${isMobileLandscape ? "h-10" : ""}`}>
               <X className="w-4 h-4" />
               Zapri
             </Button>
