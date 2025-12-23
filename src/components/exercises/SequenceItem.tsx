@@ -225,7 +225,7 @@ export const SequenceItem = ({
       {/* Dragging indicator */}
       {isDragging && (
         <div className="absolute inset-0 bg-background/50 backdrop-blur-[2px] flex items-center justify-center rounded-xl border-2 border-dashed border-primary/50">
-          <div className="text-muted-foreground text-sm font-medium">Premikam...</div>
+          <div className="text-muted-foreground text-sm font-medium uppercase">PREMIKAM...</div>
         </div>
       )}
     </div>
