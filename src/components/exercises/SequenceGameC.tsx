@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSequenceGame } from "@/hooks/useSequenceGame";
 import { SequenceItem } from "./SequenceItem";
 import { Loader2 } from "lucide-react";
@@ -12,13 +12,13 @@ export const SequenceGameC = ({ onGameComplete, isLandscape = false }: SequenceG
   const { targetSequence, currentSequence, isComplete, isLoading, moveItem } = useSequenceGame("memory_cards_c", 4);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [gameCompletedTriggered, setGameCompletedTriggered] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+  
+  // Use window dimensions like MemoryGrid for reliable mobile sizing
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     if (isComplete && !gameCompletedTriggered && targetSequence.length > 0) {
       setGameCompletedTriggered(true);
-      // Trigger completion after a short delay for better UX
       setTimeout(() => {
         onGameComplete(targetSequence);
       }, 500);
@@ -32,47 +32,53 @@ export const SequenceGameC = ({ onGameComplete, isLandscape = false }: SequenceG
     }
   }, [isComplete]);
 
-  // Measure container size for dynamic item sizing (mobile)
+  // Measure window size like MemoryGrid (identical pattern)
   useEffect(() => {
-    if (!isLandscape) return;
-    
     const updateSize = () => {
-      if (containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        setContainerSize({ width: rect.width, height: rect.height });
-      }
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
     };
-
+    
+    const handleOrientationChange = () => setTimeout(updateSize, 100);
+    
     updateSize();
     window.addEventListener('resize', updateSize);
-    window.addEventListener('orientationchange', () => setTimeout(updateSize, 100));
+    window.addEventListener('orientationchange', handleOrientationChange);
     
     return () => {
       window.removeEventListener('resize', updateSize);
-      window.removeEventListener('orientationchange', () => setTimeout(updateSize, 100));
+      window.removeEventListener('orientationchange', handleOrientationChange);
     };
-  }, [isLandscape]);
+  }, []);
 
-  // Calculate optimal item size for mobile landscape
+  // Calculate optimal item size for mobile landscape (like MemoryGrid)
+  // Layout: 4 columns, 2 rows (target row + draggable row) + middle text
   const itemSize = useMemo(() => {
-    if (!isLandscape || containerSize.width === 0 || containerSize.height === 0) {
-      return undefined; // Use default sizing
+    if (!isLandscape || windowSize.width === 0 || windowSize.height === 0) {
+      return undefined;
     }
 
-    // Available height is container height minus space for text and padding
-    // We have 2 rows of items + text in between
-    const availableHeight = containerSize.height - 80; // Reserve space for text and margins
-    const rowHeight = availableHeight / 2.2; // 2 rows with some gap
-    
-    // Available width for 4 items with gaps
+    const columns = 4;
+    const rows = 2;
     const gap = 8;
-    const padding = 16;
-    const availableWidth = containerSize.width - padding * 2 - gap * 3;
-    const widthBasedSize = availableWidth / 4;
+    const PADDING = 8;
+    const TEXT_HEIGHT = 40; // Space for "PREMIKAJ ME" text between rows
     
-    // Use the smaller dimension to ensure items fit
-    return Math.floor(Math.min(rowHeight, widthBasedSize));
-  }, [isLandscape, containerSize]);
+    const availableWidth = windowSize.width - PADDING * 2;
+    const availableHeight = windowSize.height - PADDING * 2 - TEXT_HEIGHT;
+    
+    const sizeByWidth = Math.floor((availableWidth - gap * (columns - 1)) / columns);
+    const sizeByHeight = Math.floor((availableHeight - gap * (rows - 1)) / rows);
+    
+    // Use smaller dimension with reduction for borders/icons
+    return Math.floor(Math.min(sizeByWidth, sizeByHeight) * 0.92);
+  }, [isLandscape, windowSize]);
+
+  // Calculate grid dimensions
+  const gridWidth = itemSize ? 4 * itemSize + 8 * 3 : 0;
+  const gridHeight = itemSize ? itemSize : 0;
 
   const handleDragStart = (index: number) => {
     setDraggedIndex(index);
@@ -101,17 +107,15 @@ export const SequenceGameC = ({ onGameComplete, isLandscape = false }: SequenceG
     );
   }
 
-  // Grid style for mobile with dynamic sizing
-  const gridStyle = isLandscape && itemSize ? {
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '8px',
-  } : {};
+  // Don't render until we have dimensions in landscape mode
+  if (isLandscape && !itemSize) {
+    return null;
+  }
 
   return (
     <div 
-      ref={containerRef}
-      className={`w-full mx-auto ${isLandscape ? 'h-full flex flex-col justify-center px-2' : 'max-w-4xl space-y-2 md:space-y-8 px-2 md:px-0'}`}
+      className={`w-full mx-auto ${isLandscape ? 'h-full flex flex-col items-center justify-center' : 'max-w-4xl space-y-2 md:space-y-8 px-2 md:px-0'}`}
+      style={{ touchAction: 'none' }}
     >
       {/* Target Sequence - Top Row */}
       <div className="relative">
@@ -125,8 +129,8 @@ export const SequenceGameC = ({ onGameComplete, isLandscape = false }: SequenceG
           </div>
         </div>
         <div 
-          className={`bg-white/20 backdrop-blur-sm rounded-xl border-2 border-gray-400/50 ${isLandscape ? 'p-2 mt-1' : 'grid grid-cols-4 gap-1.5 md:gap-4 p-2 md:p-6 mt-1 md:mt-2'}`}
-          style={gridStyle}
+          className={`bg-white/20 backdrop-blur-sm rounded-xl border-2 border-gray-400/50 ${isLandscape ? 'flex justify-center gap-2 p-2 mt-1' : 'grid grid-cols-4 gap-1.5 md:gap-4 p-2 md:p-6 mt-1 md:mt-2'}`}
+          style={isLandscape && itemSize ? { width: gridWidth } : {}}
         >
           {targetSequence.map((image, index) => (
             <SequenceItem
@@ -156,8 +160,8 @@ export const SequenceGameC = ({ onGameComplete, isLandscape = false }: SequenceG
       {/* Current Sequence - Bottom Row (Draggable) */}
       <div className="relative">
         <div 
-          className={`bg-white/30 backdrop-blur-sm rounded-xl border-3 border-orange-400 animate-[pulse-border_2s_ease-in-out_infinite] ${isLandscape ? 'p-2' : 'grid grid-cols-4 gap-1.5 md:gap-4 p-2 md:p-6'}`}
-          style={gridStyle}
+          className={`bg-white/30 backdrop-blur-sm rounded-xl border-3 border-orange-400 animate-[pulse-border_2s_ease-in-out_infinite] ${isLandscape ? 'flex justify-center gap-2 p-2' : 'grid grid-cols-4 gap-1.5 md:gap-4 p-2 md:p-6'}`}
+          style={isLandscape && itemSize ? { width: gridWidth } : {}}
         >
           {currentSequence.map((image, index) => (
             <SequenceItem
