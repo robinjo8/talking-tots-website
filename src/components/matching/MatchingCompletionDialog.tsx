@@ -368,27 +368,27 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     }
   };
   return <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="w-[95vw] max-w-lg landscape:w-[90vw] landscape:h-[85vh] landscape:max-h-[85vh] landscape:flex landscape:flex-col landscape:py-2 overflow-hidden">
+      <DialogContent className="w-[95vw] max-w-lg landscape:w-[60vw] landscape:h-screen landscape:max-h-screen landscape:rounded-none landscape:flex landscape:flex-col landscape:justify-between landscape:py-4">
         <DialogHeader className="pb-0 landscape:pb-0 flex-shrink-0">
-          <DialogTitle className="text-lg md:text-2xl font-bold text-dragon-green text-center landscape:text-sm">
+          <DialogTitle className="text-lg md:text-2xl font-bold text-dragon-green text-center landscape:text-xl">
             Odlično!
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-1 md:space-y-6 py-1 md:py-4 landscape:flex-1 landscape:flex landscape:flex-col landscape:justify-between landscape:space-y-1 landscape:py-1 overflow-auto">
-          <p className="text-xs md:text-sm text-black text-center uppercase landscape:text-[10px]">{instructionText}</p>
+        <div className="space-y-2 md:space-y-6 py-2 md:py-4 landscape:flex-1 landscape:flex landscape:flex-col landscape:justify-center landscape:items-center landscape:space-y-3">
+          <p className="text-xs md:text-sm text-black text-center uppercase landscape:text-sm">{instructionText}</p>
           
           {/* Display images - 4 in row for landscape, 2x2 for portrait */}
-          <div className={images.length === 1 ? "flex justify-center" : "grid grid-cols-4 landscape:grid-cols-4 portrait:grid-cols-2 gap-2 md:gap-4 landscape:gap-1 mx-auto"}>
+          <div className={images.length === 1 ? "flex justify-center" : "grid grid-cols-4 landscape:grid-cols-4 portrait:grid-cols-2 gap-2 md:gap-4 landscape:gap-4 mx-auto"}>
             {images.slice(0, 4).map((image, index) => {
             const isRecording = currentRecordingIndex === index;
             const isCompleted = completedRecordings.has(index);
-            return <div key={index} className="flex flex-col items-center space-y-1 md:space-y-2 landscape:space-y-0.5">
+            return <div key={index} className="flex flex-col items-center space-y-1 md:space-y-2 landscape:space-y-1">
                   <div 
                     className={`cursor-pointer transition-all ${isCompleted ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
                     onClick={() => handleImageClick(index, image.word)}
                   >
                     <div className="relative">
-                      <img src={image.url} alt={image.word} className={`w-14 h-14 md:w-20 md:h-20 landscape:w-12 landscape:h-12 object-cover rounded-xl border-2 ${isCompleted ? 'border-gray-400 grayscale' : isRecording ? 'border-red-500' : 'border-dragon-green'}`} />
+                      <img src={image.url} alt={image.word} className={`w-14 h-14 md:w-20 md:h-20 landscape:w-16 landscape:h-16 object-cover rounded-xl border-2 ${isCompleted ? 'border-gray-400 grayscale' : isRecording ? 'border-red-500' : 'border-dragon-green'}`} />
                       {isRecording && <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-xl">
                           <div className="bg-red-500 text-white rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
                             <Mic className="w-3 h-3 md:w-4 md:h-4" />
@@ -399,7 +399,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
                         </div>}
                     </div>
                   </div>
-                  <span className={`text-xs md:text-sm landscape:text-[10px] font-medium text-center ${isCompleted ? 'text-gray-400' : 'text-black'}`}>
+                  <span className={`text-xs md:text-sm landscape:text-xs font-medium text-center ${isCompleted ? 'text-gray-400' : 'text-black'}`}>
                     {image.word.toUpperCase()}
                   </span>
                   <Button
@@ -408,36 +408,36 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
                       handlePlayAudio(image);
                     }}
                     size="icon"
-                    className="bg-green-500 hover:bg-green-600 text-white h-8 w-8 md:h-12 md:w-12 landscape:h-6 landscape:w-6"
+                    className="bg-green-500 hover:bg-green-600 text-white h-8 w-8 md:h-12 md:w-12 landscape:h-10 landscape:w-10"
                   >
-                    <Volume2 className="w-4 h-4 md:w-6 md:h-6 landscape:w-3 landscape:h-3" />
+                    <Volume2 className="w-4 h-4 md:w-6 md:h-6 landscape:w-5 landscape:h-5" />
                   </Button>
                 </div>;
           })}
           </div>
+        </div>
 
-          {/* Action buttons - always visible inside dialog */}
-          <div className="flex justify-center gap-3 landscape:mt-auto landscape:pt-1 flex-shrink-0">
-            <Button onClick={handleReset} variant="outline" className="gap-2 flex-1 max-w-28 landscape:h-8 landscape:text-xs">
-              Ponovi
+        {/* Action buttons - always visible at bottom */}
+        <div className="flex justify-center gap-3 flex-shrink-0 landscape:pb-2">
+          <Button onClick={handleReset} variant="outline" className="gap-2 flex-1 max-w-32 landscape:h-10">
+            Ponovi
+          </Button>
+          
+          {completedRecordings.size === images.length && !starClaimed ? (
+            <Button 
+              onClick={handleClaimStar} 
+              className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 flex-1 max-w-36 landscape:h-10"
+              disabled={isSavingRecording}
+            >
+              <Star className="w-4 h-4" />
+              {isSavingRecording ? 'Shranjujem...' : 'Vzemi zvezdico'}
             </Button>
-            
-            {completedRecordings.size === images.length && !starClaimed ? (
-              <Button 
-                onClick={handleClaimStar} 
-                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 flex-1 max-w-32 landscape:h-8 landscape:text-xs"
-                disabled={isSavingRecording}
-              >
-                <Star className="w-4 h-4 landscape:w-3 landscape:h-3" />
-                {isSavingRecording ? 'Shranjujem...' : 'Vzemi zvezdico'}
-              </Button>
-            ) : (
-              <Button onClick={handleClose} className="bg-dragon-green hover:bg-dragon-green/90 gap-2 flex-1 max-w-28 landscape:h-8 landscape:text-xs">
-                <X className="w-4 h-4 landscape:w-3 landscape:h-3" />
-                Zapri
-              </Button>
-            )}
-          </div>
+          ) : (
+            <Button onClick={handleClose} className="bg-dragon-green hover:bg-dragon-green/90 gap-2 flex-1 max-w-32 landscape:h-10">
+              <X className="w-4 h-4" />
+              Zapri
+            </Button>
+          )}
         </div>
       </DialogContent>
       
