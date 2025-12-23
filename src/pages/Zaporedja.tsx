@@ -115,7 +115,15 @@ export default function Zaporedja() {
     if (!game.available) return;
     
     const letterMap: Record<string, string> = {
-      'C': '/govorne-igre/zaporedja/c'
+      'C': '/govorne-igre/zaporedja/c',
+      'Č': '/govorne-igre/zaporedja/č',
+      'K': '/govorne-igre/zaporedja/k',
+      'L': '/govorne-igre/zaporedja/l',
+      'R': '/govorne-igre/zaporedja/r',
+      'S': '/govorne-igre/zaporedja/s',
+      'Š': '/govorne-igre/zaporedja/š',
+      'Z': '/govorne-igre/zaporedja/z',
+      'Ž': '/govorne-igre/zaporedja/ž'
     };
     
     const path = letterMap[game.letter];
