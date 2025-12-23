@@ -394,8 +394,8 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
                     onClick={() => handleImageClick(index, image.word)}
                   >
                     <div className="relative">
-                      <img src={image.url} alt={image.word} className={`w-20 h-20 object-cover rounded-lg border-2 ${isCompleted ? 'border-gray-400 grayscale' : isRecording ? 'border-red-500' : 'border-dragon-green'}`} />
-                      {isRecording && <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-lg">
+                      <img src={image.url} alt={image.word} className={`w-20 h-20 object-cover rounded-xl border-2 ${isCompleted ? 'border-gray-400 grayscale' : isRecording ? 'border-red-500' : 'border-dragon-green'}`} />
+                      {isRecording && <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-xl">
                           <div className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
                             <Mic className="w-4 h-4" />
                           </div>
