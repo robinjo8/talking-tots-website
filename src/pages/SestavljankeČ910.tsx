@@ -102,7 +102,7 @@ function SestavljankeČ910Content() {
     }
   }, [effectiveFullscreen]);
 
-  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/background-gradient-lights.jpg`;
+  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/zeleno_ozadje.png`;
 
   if (effectiveFullscreen) {
     return (
