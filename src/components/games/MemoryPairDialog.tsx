@@ -237,21 +237,21 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={(open) => !open && handleCloseAttempt()}>
-      <DialogContent className="max-w-[95vw] sm:max-w-lg p-3 sm:p-6">
-        <DialogHeader className="pb-0 sm:pb-2">
-          <DialogTitle className="text-base sm:text-2xl font-bold text-dragon-green text-center">
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="text-xl sm:text-2xl font-bold text-dragon-green text-center">
             Par {pairNumber} od {totalPairs}
           </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-1.5 sm:space-y-6 py-1 sm:py-4">
-          <p className="text-[10px] sm:text-sm text-black text-center leading-tight">
+        <div className="space-y-4 sm:space-y-6 py-2 sm:py-4">
+          <p className="text-xs sm:text-sm text-black text-center">
             KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO
           </p>
           
           <div className="flex justify-center">
             <div 
-              className={`flex flex-col items-center space-y-0.5 sm:space-y-2 cursor-pointer transition-all ${
+              className={`flex flex-col items-center space-y-2 cursor-pointer transition-all ${
                 hasRecorded ? 'opacity-70 cursor-not-allowed' : 'hover:scale-105'
               }`}
               onClick={handleImageClick}
@@ -261,7 +261,7 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
                   <img
                     src={imageUrl}
                     alt={word || "Spominska kartica"}
-                    className={`w-16 h-16 sm:w-32 sm:h-32 object-cover rounded-lg border-2 ${
+                    className={`w-20 h-20 object-cover rounded-lg border-2 ${
                       hasRecorded ? 'border-gray-400' : 
                       isRecording ? 'border-red-500' : 'border-dragon-green'
                     }`}
@@ -270,21 +270,21 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
                 
                 {isRecording && (
                   <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-lg">
-                    <div className="bg-red-500 text-white rounded-full w-6 h-6 sm:w-10 sm:h-10 flex items-center justify-center">
-                      <Mic className="w-3 h-3 sm:w-5 sm:h-5" />
+                    <div className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                      <Mic className="w-4 h-4" />
                     </div>
                   </div>
                 )}
                 
                 {isRecording && (
-                  <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-red-500 text-white text-[10px] sm:text-sm rounded-full w-5 h-5 sm:w-8 sm:h-8 flex items-center justify-center font-bold">
+                  <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
                     {recordingTimeLeft}
                   </div>
                 )}
               </div>
               
               {word && (
-                <span className={`text-sm sm:text-lg font-medium text-center ${
+                <span className={`text-sm font-medium text-center ${
                   hasRecorded ? 'text-gray-400' : 'text-black'
                 }`}>
                   {word.toUpperCase()}
@@ -299,29 +299,29 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
               onClick={() => audioUrl && playAudio(audioUrl)}
               disabled={!audioUrl}
               size="icon"
-              className="bg-green-500 hover:bg-green-600 text-white h-8 w-8 sm:h-12 sm:w-12"
+              className="bg-green-500 hover:bg-green-600 text-white h-12 w-12"
             >
-              <Volume2 className="w-4 h-4 sm:w-6 sm:h-6" />
+              <Volume2 className="w-6 h-6" />
             </Button>
           </div>
 
-          <div className="flex justify-center gap-2 sm:gap-3">
+          <div className="flex justify-center gap-3">
             {hasRecorded && (
               <>
-                <Button onClick={handleReset} variant="outline" className="gap-1 sm:gap-2 flex-1 max-w-20 sm:max-w-28 text-xs sm:text-base h-8 sm:h-10">
+                <Button onClick={handleReset} variant="outline" className="gap-2 flex-1 max-w-28">
                   Ponovi
                 </Button>
                 <Button 
                   onClick={handleContinue}
-                  className={`gap-1 sm:gap-2 flex-1 text-xs sm:text-base h-8 sm:h-10 ${
+                  className={`gap-2 flex-1 ${
                     isLastPair 
-                      ? 'bg-yellow-500 hover:bg-yellow-600 text-white max-w-24 sm:max-w-32' 
-                      : 'bg-dragon-green hover:bg-dragon-green/90 text-white max-w-20 sm:max-w-28'
+                      ? 'bg-yellow-500 hover:bg-yellow-600 text-white max-w-32' 
+                      : 'bg-dragon-green hover:bg-dragon-green/90 text-white max-w-28'
                   }`}
                 >
                   {isLastPair ? (
                     <>
-                      <Star className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <Star className="w-4 h-4" />
                       Vzemi zvezdico
                     </>
                   ) : (
