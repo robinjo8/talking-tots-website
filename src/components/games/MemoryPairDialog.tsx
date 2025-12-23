@@ -239,48 +239,50 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
       <Dialog open={isOpen} onOpenChange={(open) => !open && handleCloseAttempt()}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="text-xl sm:text-2xl font-bold text-dragon-green text-center">
+          <DialogTitle className="text-2xl font-bold text-dragon-green text-center">
             Par {pairNumber} od {totalPairs}
           </DialogTitle>
         </DialogHeader>
-        
-        <div className="space-y-4 sm:space-y-6 py-2 sm:py-4">
-          <p className="text-xs sm:text-sm text-black text-center">
+        <div className="space-y-6 py-4">
+          <p className="text-sm text-black text-center">
             KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO
           </p>
           
+          {/* Image container - same structure as MatchingCompletionDialog */}
           <div className="flex justify-center">
-            <div 
-              className={`flex flex-col items-center space-y-2 cursor-pointer transition-all ${
-                hasRecorded ? 'opacity-70 cursor-not-allowed' : 'hover:scale-105'
-              }`}
-              onClick={handleImageClick}
-            >
-              <div className="relative">
-                {imageUrl && (
-                  <img
-                    src={imageUrl}
-                    alt={word || "Spominska kartica"}
-                    className={`w-20 h-20 object-cover rounded-lg border-2 ${
-                      hasRecorded ? 'border-gray-400' : 
-                      isRecording ? 'border-red-500' : 'border-dragon-green'
-                    }`}
-                  />
-                )}
-                
-                {isRecording && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-lg">
-                    <div className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
-                      <Mic className="w-4 h-4" />
+            <div className="flex flex-col items-center space-y-2">
+              <div 
+                className={`cursor-pointer transition-all ${
+                  hasRecorded ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'
+                }`}
+                onClick={handleImageClick}
+              >
+                <div className="relative">
+                  {imageUrl && (
+                    <img
+                      src={imageUrl}
+                      alt={word || "Spominska kartica"}
+                      className={`w-20 h-20 object-cover rounded-lg border-2 ${
+                        hasRecorded ? 'border-gray-400 grayscale' : 
+                        isRecording ? 'border-red-500' : 'border-dragon-green'
+                      }`}
+                    />
+                  )}
+                  
+                  {isRecording && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-lg">
+                      <div className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                        <Mic className="w-4 h-4" />
+                      </div>
                     </div>
-                  </div>
-                )}
-                
-                {isRecording && (
-                  <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
-                    {recordingTimeLeft}
-                  </div>
-                )}
+                  )}
+                  
+                  {isRecording && (
+                    <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
+                      {recordingTimeLeft}
+                    </div>
+                  )}
+                </div>
               </div>
               
               {word && (
@@ -290,21 +292,20 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
                   {word.toUpperCase()}
                 </span>
               )}
+              
+              {/* Audio button directly under word - same as MatchingCompletionDialog */}
+              <Button
+                onClick={() => audioUrl && playAudio(audioUrl)}
+                disabled={!audioUrl}
+                size="icon"
+                className="bg-green-500 hover:bg-green-600 text-white h-12 w-12"
+              >
+                <Volume2 className="w-6 h-6" />
+              </Button>
             </div>
           </div>
 
-          {/* Audio playback button */}
-          <div className="flex justify-center">
-            <Button
-              onClick={() => audioUrl && playAudio(audioUrl)}
-              disabled={!audioUrl}
-              size="icon"
-              className="bg-green-500 hover:bg-green-600 text-white h-12 w-12"
-            >
-              <Volume2 className="w-6 h-6" />
-            </Button>
-          </div>
-
+          {/* Action buttons */}
           <div className="flex justify-center gap-3">
             {hasRecorded && (
               <>
