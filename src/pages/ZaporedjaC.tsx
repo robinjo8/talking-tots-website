@@ -182,6 +182,7 @@ export default function ZaporedjaC() {
                 <SequenceGameC 
                   key={gameKey}
                   onGameComplete={handleGameComplete}
+                  isLandscape={true}
                 />
               </div>
             ) : (
