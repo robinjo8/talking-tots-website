@@ -6,6 +6,7 @@ interface SequenceItemProps {
   index: number;
   isDraggable: boolean;
   isTarget?: boolean;
+  size?: number; // Optional fixed size in pixels for mobile
   onDragStart?: (index: number) => void;
   onDragOver?: (index: number) => void;
   onDrop?: (index: number) => void;
@@ -16,6 +17,7 @@ export const SequenceItem = ({
   index,
   isDraggable,
   isTarget = false,
+  size,
   onDragStart,
   onDragOver,
   onDrop
@@ -185,6 +187,9 @@ export const SequenceItem = ({
     touchStartPos.current = null;
   };
 
+  // Use fixed size if provided, otherwise use aspect-square
+  const sizeStyle = size ? { width: size, height: size } : {};
+
   return (
     <div
       ref={draggedElement}
@@ -198,8 +203,10 @@ export const SequenceItem = ({
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      style={sizeStyle}
       className={`
-        relative w-full aspect-square rounded-xl overflow-hidden
+        relative rounded-xl overflow-hidden
+        ${size ? '' : 'w-full aspect-square'}
         ${isDraggable ? 'cursor-move touch-none' : 'cursor-default'}
         ${isDraggedOver && isDraggable ? 'ring-4 ring-primary scale-105 shadow-2xl' : ''}
         ${isDragging ? 'opacity-40 scale-95' : 'opacity-100 scale-100'}
