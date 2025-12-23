@@ -299,11 +299,11 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
     const ctx = canvas.getContext('2d')!;
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    // Draw puzzle board with white background and orange dashed border
+    // Draw puzzle board with white background and black dashed border
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(BOARD_X, BOARD_Y, PUZZLE_WIDTH, PUZZLE_HEIGHT);
     
-    ctx.strokeStyle = '#f97316';
+    ctx.strokeStyle = '#000000';
     ctx.lineWidth = 2;
     ctx.setLineDash([5, 5]);
     ctx.strokeRect(BOARD_X, BOARD_Y, PUZZLE_WIDTH, PUZZLE_HEIGHT);
@@ -315,15 +315,15 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
     
     ctx.save();
     ctx.globalAlpha = 0.15;
-    ctx.strokeStyle = '#f97316';
+    ctx.strokeStyle = '#000000';
     ctx.lineWidth = 1;
     
     // Draw scaled image as faint background template
     ctx.drawImage(image, BOARD_X, BOARD_Y, PUZZLE_WIDTH, PUZZLE_HEIGHT);
     
-    // Draw piece grid lines with orange dashed style
-    ctx.globalAlpha = 0.5;
-    ctx.strokeStyle = '#f97316';
+    // Draw piece grid lines with black dashed style
+    ctx.globalAlpha = 0.3;
+    ctx.strokeStyle = '#000000';
     ctx.setLineDash([5, 5]);
     
     // Vertical lines
