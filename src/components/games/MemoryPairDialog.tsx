@@ -262,7 +262,7 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
                     <img
                       src={imageUrl}
                       alt={word || "Spominska kartica"}
-                      className={`w-20 h-20 object-cover rounded-lg border-2 ${
+                      className={`w-20 h-20 object-cover rounded-xl border-2 ${
                         hasRecorded ? 'border-gray-400 grayscale' : 
                         isRecording ? 'border-red-500' : 'border-dragon-green'
                       }`}
@@ -270,7 +270,7 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
                   )}
                   
                   {isRecording && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-lg">
+                    <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-xl">
                       <div className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
                         <Mic className="w-4 h-4" />
                       </div>
