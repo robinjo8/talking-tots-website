@@ -251,10 +251,10 @@ export default function ZaporedjaC() {
             {showNewGameButton && (
               <Button 
                 onClick={handleStartNewGameDirect}
-                className="rounded-full h-16 px-6 bg-sky-400 hover:bg-sky-500 shadow-lg border-2 border-white/50 backdrop-blur-sm text-white font-bold text-lg gap-2"
+                className="rounded-full w-16 h-16 bg-sky-400 hover:bg-sky-500 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+                size="icon"
               >
-                <RefreshCw className="h-6 w-6" />
-                Nova igra
+                <RefreshCw className="h-7 w-7 text-white" />
               </Button>
             )}
           </div>
@@ -369,10 +369,10 @@ export default function ZaporedjaC() {
           {showNewGameButton && (
             <Button 
               onClick={handleStartNewGameDirect}
-              className="rounded-full h-16 px-6 bg-sky-400 hover:bg-sky-500 shadow-lg border-2 border-white/50 backdrop-blur-sm text-white font-bold text-lg gap-2"
+              className="rounded-full w-16 h-16 bg-sky-400 hover:bg-sky-500 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+              size="icon"
             >
-              <RefreshCw className="h-6 w-6" />
-              Nova igra
+              <RefreshCw className="h-7 w-7 text-white" />
             </Button>
           )}
         </div>
