@@ -263,8 +263,9 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
                       src={imageUrl}
                       alt={word || "Spominska kartica"}
                       className={`w-20 h-20 object-cover rounded-xl border-2 ${
+                        hasRecorded ? 'border-gray-400 grayscale' : 
                         isRecording ? 'border-red-500' : 'border-dragon-green'
-                      } ${hasRecorded ? 'grayscale' : ''}`}
+                      }`}
                     />
                   )}
                   
