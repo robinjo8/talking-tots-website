@@ -253,24 +253,24 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
             <div className="flex flex-col items-center space-y-2">
               <div 
                 className={`cursor-pointer transition-all ${
-                  hasRecorded ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'
+                  hasRecorded ? 'cursor-not-allowed' : 'hover:scale-105'
                 }`}
                 onClick={handleImageClick}
               >
-                <div className="relative">
+                <div className={`relative rounded-xl border-2 overflow-hidden ${
+                  hasRecorded ? 'border-gray-400' : 
+                  isRecording ? 'border-red-500' : 'border-dragon-green'
+                }`}>
                   {imageUrl && (
                     <img
                       src={imageUrl}
                       alt={word || "Spominska kartica"}
-                      className={`w-20 h-20 object-cover rounded-xl border-2 ${
-                        hasRecorded ? 'border-gray-400 grayscale' : 
-                        isRecording ? 'border-red-500' : 'border-dragon-green'
-                      }`}
+                      className={`w-20 h-20 object-cover ${hasRecorded ? 'grayscale opacity-50' : ''}`}
                     />
                   )}
                   
                   {isRecording && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-xl">
+                    <div className="absolute inset-0 flex items-center justify-center bg-red-500/20">
                       <div className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
                         <Mic className="w-4 h-4" />
                       </div>

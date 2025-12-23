@@ -390,12 +390,12 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
             const isCompleted = completedRecordings.has(index);
             return <div key={index} className="flex flex-col items-center space-y-2">
                   <div 
-                    className={`cursor-pointer transition-all ${isCompleted ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
+                    className={`cursor-pointer transition-all ${isCompleted ? 'cursor-not-allowed' : 'hover:scale-105'}`}
                     onClick={() => handleImageClick(index, image.word)}
                   >
-                    <div className="relative">
-                      <img src={image.url} alt={image.word} className={`w-20 h-20 object-cover rounded-xl border-2 ${isCompleted ? 'border-gray-400 grayscale' : isRecording ? 'border-red-500' : 'border-dragon-green'}`} />
-                      {isRecording && <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-xl">
+                    <div className={`relative rounded-xl border-2 overflow-hidden ${isCompleted ? 'border-gray-400' : isRecording ? 'border-red-500' : 'border-dragon-green'}`}>
+                      <img src={image.url} alt={image.word} className={`w-20 h-20 object-cover ${isCompleted ? 'grayscale opacity-50' : ''}`} />
+                      {isRecording && <div className="absolute inset-0 flex items-center justify-center bg-red-500/20">
                           <div className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
                             <Mic className="w-4 h-4" />
                           </div>
