@@ -79,7 +79,6 @@ export function PuzzleCompletionDialog({
       recorder.start();
       setIsRecording(true);
       setRecordingTimeLeft(3);
-      toast("Snemanje se je začelo...");
 
       // Clean countdown that auto-stops at 0
       let timeLeft = 3;
