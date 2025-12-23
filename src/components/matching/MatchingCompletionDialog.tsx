@@ -368,38 +368,38 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     }
   };
   return <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-dragon-green text-center">
+      <DialogContent className="w-[95vw] max-w-lg landscape:max-h-[90vh] landscape:overflow-auto">
+        <DialogHeader className="pb-1 landscape:pb-0">
+          <DialogTitle className="text-xl md:text-2xl font-bold text-dragon-green text-center">
             Odlično!
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-6 py-4">
-          <p className="text-sm text-black text-center">{instructionText}</p>
+        <div className="space-y-2 md:space-y-6 py-2 md:py-4">
+          <p className="text-xs md:text-sm text-black text-center">{instructionText}</p>
           
-          {/* Display images - center single image, otherwise use grid */}
-          <div className={images.length === 1 ? "flex justify-center" : "grid grid-cols-2 gap-4 mx-auto max-w-xs"}>
+          {/* Display images - 4 in row for landscape, 2x2 for portrait */}
+          <div className={images.length === 1 ? "flex justify-center" : "grid grid-cols-4 landscape:grid-cols-4 portrait:grid-cols-2 gap-2 md:gap-4 mx-auto"}>
             {images.slice(0, 4).map((image, index) => {
             const isRecording = currentRecordingIndex === index;
             const isCompleted = completedRecordings.has(index);
-            return <div key={index} className="flex flex-col items-center space-y-2">
+            return <div key={index} className="flex flex-col items-center space-y-1 md:space-y-2">
                   <div 
                     className={`cursor-pointer transition-all ${isCompleted ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
                     onClick={() => handleImageClick(index, image.word)}
                   >
                     <div className="relative">
-                      <img src={image.url} alt={image.word} className={`w-20 h-20 object-cover rounded-xl border-2 ${isCompleted ? 'border-gray-400 grayscale' : isRecording ? 'border-red-500' : 'border-dragon-green'}`} />
+                      <img src={image.url} alt={image.word} className={`w-14 h-14 md:w-20 md:h-20 object-cover rounded-xl border-2 ${isCompleted ? 'border-gray-400 grayscale' : isRecording ? 'border-red-500' : 'border-dragon-green'}`} />
                       {isRecording && <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-xl">
-                          <div className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
-                            <Mic className="w-4 h-4" />
+                          <div className="bg-red-500 text-white rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
+                            <Mic className="w-3 h-3 md:w-4 md:h-4" />
                           </div>
                         </div>}
-                      {isRecording && <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
+                      {isRecording && <div className="absolute -top-1 -right-1 md:-top-2 md:-right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 md:w-6 md:h-6 flex items-center justify-center">
                           {recordingTimeLeft}
                         </div>}
                     </div>
                   </div>
-                  <span className={`text-sm font-medium text-center ${isCompleted ? 'text-gray-400' : 'text-black'}`}>
+                  <span className={`text-xs md:text-sm font-medium text-center ${isCompleted ? 'text-gray-400' : 'text-black'}`}>
                     {image.word.toUpperCase()}
                   </span>
                   <Button
@@ -408,9 +408,9 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
                       handlePlayAudio(image);
                     }}
                     size="icon"
-                    className="bg-green-500 hover:bg-green-600 text-white h-12 w-12"
+                    className="bg-green-500 hover:bg-green-600 text-white h-8 w-8 md:h-12 md:w-12"
                   >
-                    <Volume2 className="w-6 h-6" />
+                    <Volume2 className="w-4 h-4 md:w-6 md:h-6" />
                   </Button>
                 </div>;
           })}
