@@ -368,14 +368,14 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     }
   };
   return <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="w-[95vw] max-w-lg landscape:max-h-[90vh] landscape:overflow-auto">
-        <DialogHeader className="pb-1 landscape:pb-0">
-          <DialogTitle className="text-xl md:text-2xl font-bold text-dragon-green text-center">
+      <DialogContent className="w-[95vw] max-w-lg landscape:max-h-[85vh] landscape:py-2">
+        <DialogHeader className="pb-0 landscape:pb-0">
+          <DialogTitle className="text-lg md:text-2xl font-bold text-dragon-green text-center landscape:text-base">
             Odlično!
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-2 md:space-y-6 py-2 md:py-4">
-          <p className="text-xs md:text-sm text-black text-center">{instructionText}</p>
+        <div className="space-y-1 md:space-y-6 py-1 md:py-4">
+          <p className="text-xs md:text-sm text-black text-center uppercase">{instructionText}</p>
           
           {/* Display images - 4 in row for landscape, 2x2 for portrait */}
           <div className={images.length === 1 ? "flex justify-center" : "grid grid-cols-4 landscape:grid-cols-4 portrait:grid-cols-2 gap-2 md:gap-4 mx-auto"}>
