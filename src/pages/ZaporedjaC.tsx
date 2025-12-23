@@ -176,13 +176,9 @@ export default function ZaporedjaC() {
           />
           
           {/* Game content */}
-          <div className="relative z-10 flex-1 flex items-center justify-center overflow-hidden h-full w-full">
+          <div className="relative z-10 flex-1 flex items-center justify-center overflow-hidden h-full w-full p-2">
             {!isPortrait ? (
-              <div className="w-full h-full flex flex-col items-center justify-center p-4">
-                <h1 className="text-2xl font-bold text-white mb-4 text-center drop-shadow-lg">
-                  ZAPOREDJA - C
-                </h1>
-                
+              <div className="w-full h-full flex flex-col items-center justify-center">
                 <SequenceGameC 
                   key={gameKey}
                   onGameComplete={handleGameComplete}
