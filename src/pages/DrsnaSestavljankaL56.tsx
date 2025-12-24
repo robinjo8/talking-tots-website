@@ -131,6 +131,7 @@ function DrsnaSestavljankaL56Content() {
         images={[
           { word: currentImage.word, url: imageUrl, filename: currentImage.filename },
           { word: currentImage.word, url: imageUrl, filename: currentImage.filename },
+          { word: currentImage.word, url: imageUrl, filename: currentImage.filename },
           { word: currentImage.word, url: imageUrl, filename: currentImage.filename }
         ]}
         onStarClaimed={handleStarClaimed}
