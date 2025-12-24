@@ -118,15 +118,15 @@ export const SlidingPuzzle34: React.FC<SlidingPuzzle34Props> = ({
           }}
         />
         
-        <div className="relative grid grid-cols-3 grid-rows-2 gap-1 bg-gray-800 p-2 rounded-lg shadow-lg" style={{ zIndex: 1 }}>
+        <div className="relative grid grid-cols-3 grid-rows-2 gap-0.5 bg-gray-800 p-1 rounded-lg shadow-lg border-2 border-gray-700" style={{ zIndex: 1 }}>
           {pieces.map((piece, index) => (
             <div
               key={`${piece.id}-${index}`}
               className={`
-                w-32 h-32 md:w-64 md:h-64 relative cursor-pointer
+                w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[150px] md:h-[150px] relative cursor-pointer
                 ${piece.isEmpty ? 'bg-gray-300' : 'bg-white'}
                 ${!piece.isEmpty ? 'hover:opacity-80 transition-opacity' : ''}
-                rounded border-2 border-gray-600
+                border border-gray-600
                 ${isCompleted ? 'border-dragon-green' : ''}
               `}
               onClick={() => handlePieceClick(index)}
