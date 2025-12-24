@@ -1,17 +1,14 @@
-import { AppLayout } from "@/components/AppLayout";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { SlidingPuzzle34 } from "@/components/puzzle/SlidingPuzzle34";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
-import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
-import { Button } from "@/components/ui/button";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useAuth } from "@/contexts/AuthContext";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { RotateCcw, BookOpen, ArrowLeft, Home } from "lucide-react";
+import { Home } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const cImages = [
@@ -46,7 +43,8 @@ function DrsnaSestavljankaC34Content() {
   const [puzzleKey, setPuzzleKey] = useState(0);
   const [currentImage, setCurrentImage] = useState(getRandomCImage());
   const [menuOpen, setMenuOpen] = useState(false);
-  const [showExitDialog, setShowExitDialog] = useState(false);
+  const [showExitConfirmation, setShowExitConfirmation] = useState(false);
+  const [showNewGameConfirmation, setShowNewGameConfirmation] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { recordGameCompletion } = useEnhancedProgress();
@@ -54,7 +52,7 @@ function DrsnaSestavljankaC34Content() {
   const effectiveFullscreen = isMobile;
   
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentImage.filename}`;
-  const backgroundImageUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/47412.jpg";
+  const backgroundImageUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.png";
   
   const handleComplete = () => {
     if (!gameCompletedRef.current) {
@@ -70,7 +68,27 @@ function DrsnaSestavljankaC34Content() {
   };
 
   const handleBack = () => {
+    setMenuOpen(false);
+    setShowExitConfirmation(true);
+  };
+
+  const handleConfirmExit = () => {
     navigate("/govorne-igre/drsna-sestavljanka");
+  };
+
+  const handleNewGameClick = () => {
+    setMenuOpen(false);
+    setShowNewGameConfirmation(true);
+  };
+
+  const handleConfirmNewGame = () => {
+    handleNewGame();
+    setShowNewGameConfirmation(false);
+  };
+
+  const handleInstructions = () => {
+    setMenuOpen(false);
+    setShowInstructions(true);
   };
 
   const handleStarClaimed = () => {
@@ -84,7 +102,6 @@ function DrsnaSestavljankaC34Content() {
           if (document.documentElement.requestFullscreen) {
             await document.documentElement.requestFullscreen();
           }
-          // Lock screen orientation - simple approach
           try {
             if ('orientation' in screen && 'lock' in screen.orientation) {
               (screen.orientation as any).lock('portrait').catch(() => {
@@ -107,144 +124,112 @@ function DrsnaSestavljankaC34Content() {
     }
   }, [effectiveFullscreen]);
 
-  if (effectiveFullscreen) {
-    return (
-      <div className="fixed inset-0 overflow-hidden relative">
-        <div className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-             style={{ backgroundImage: `url('${backgroundImageUrl}')` }} />
-        
-        <div className="relative z-10 h-full flex items-center justify-center overflow-hidden">
-          <div className="w-full px-4">
-            <SlidingPuzzle34
-              key={puzzleKey}
-              imageUrl={imageUrl}
-              onComplete={handleComplete}
-              className="w-full h-full"
-            />
-          </div>
-        </div>
-
-        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-          <DropdownMenuTrigger asChild>
-            <Button size="icon" className="fixed bottom-4 left-4 z-50 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white shadow-2xl rounded-full w-16 h-16 border-2 border-white/20">
-              <Home className="w-11 h-11" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent side="top" align="start" className="mb-2 ml-4 w-56 p-2 bg-background/95 backdrop-blur-sm border-2 shadow-xl z-[60]" sideOffset={8}>
-            <div className="flex flex-col gap-2">
-              <Button variant="outline" className="gap-2 w-full h-11 text-base justify-start" onClick={() => {
-                setShowExitDialog(true);
-                setMenuOpen(false);
-              }}>
-                <ArrowLeft className="w-5 h-5" />
-                Nazaj
-              </Button>
-              
-              <Button onClick={() => {
-                handleNewGame();
-                setMenuOpen(false);
-              }} className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 w-full h-11 text-base justify-start">
-                <RotateCcw className="w-5 h-5" />
-                Nova igra
-              </Button>
-              
-              <Button variant="outline" onClick={() => {
-                setShowInstructions(true);
-                setMenuOpen(false);
-              }} className="gap-2 w-full h-11 text-base justify-start">
-                <BookOpen className="w-5 h-5" />
-                Navodila
-              </Button>
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
-        <MatchingCompletionDialog
-          isOpen={showCompletion}
-          onClose={() => setShowCompletion(false)}
-          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
-          onStarClaimed={handleStarClaimed}
-          instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO."
-          autoPlayAudio={true}
-        />
-
-        <MemoryExitConfirmationDialog 
-          open={showExitDialog} 
-          onOpenChange={setShowExitDialog} 
-          onConfirm={() => navigate("/govorne-igre/drsna-sestavljanka")}>
-          <div />
-        </MemoryExitConfirmationDialog>
-      </div>
-    );
-  }
-
   return (
-    <AppLayout>
-      <div className="w-full min-h-screen relative">
-        <div className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-             style={{ backgroundImage: `url('${backgroundImageUrl}')` }} />
+    <div 
+      className="fixed inset-0 overflow-auto select-none"
+      style={{
+        backgroundImage: `url('${backgroundImageUrl}')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      {/* Main content */}
+      <div className="min-h-full flex flex-col items-center justify-center p-4 pb-24">
+        <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 md:mb-8 text-center drop-shadow-lg">
+          DRSNA SESTAVLJANKA - C
+        </h1>
         
-        <div className="relative z-10 flex justify-center items-center p-4 min-h-screen">
+        <div className={effectiveFullscreen ? "w-full max-w-md" : "w-full max-w-lg"}>
           <SlidingPuzzle34
             key={puzzleKey}
             imageUrl={imageUrl}
             onComplete={handleComplete}
+            className="w-full"
           />
         </div>
-
-        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-          <DropdownMenuTrigger asChild>
-            <Button size="icon" className="fixed bottom-4 left-4 z-50 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white shadow-2xl rounded-full w-16 h-16 border-2 border-white/20">
-              <Home className="w-11 h-11" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent side="top" align="start" className="mb-2 ml-4 w-56 p-2 bg-background/95 backdrop-blur-sm border-2 shadow-xl z-[60]" sideOffset={8}>
-            <div className="flex flex-col gap-2">
-              <Button variant="outline" className="gap-2 w-full h-11 text-base justify-start" onClick={() => {
-                setShowExitDialog(true);
-                setMenuOpen(false);
-              }}>
-                <ArrowLeft className="w-5 h-5" />
-                Nazaj
-              </Button>
-              
-              <Button onClick={() => {
-                handleNewGame();
-                setMenuOpen(false);
-              }} className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 w-full h-11 text-base justify-start">
-                <RotateCcw className="w-5 h-5" />
-                Nova igra
-              </Button>
-              
-              <Button variant="outline" onClick={() => {
-                setShowInstructions(true);
-                setMenuOpen(false);
-              }} className="gap-2 w-full h-11 text-base justify-start">
-                <BookOpen className="w-5 h-5" />
-                Navodila
-              </Button>
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
-        <MatchingCompletionDialog
-          isOpen={showCompletion}
-          onClose={() => setShowCompletion(false)}
-          images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
-          onStarClaimed={handleStarClaimed}
-          instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO."
-          autoPlayAudio={true}
-        />
-
-        <MemoryExitConfirmationDialog 
-          open={showExitDialog} 
-          onOpenChange={setShowExitDialog} 
-          onConfirm={() => navigate("/govorne-igre/drsna-sestavljanka")}>
-          <div />
-        </MemoryExitConfirmationDialog>
       </div>
-    </AppLayout>
+
+      {/* Floating Menu Button - Left */}
+      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+        <DropdownMenuTrigger asChild>
+          <button 
+            className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
+          >
+            <Home className="w-8 h-8 text-white" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent 
+          className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+          align="start"
+          side="top"
+          sideOffset={8}
+        >
+          <button
+            onClick={handleBack}
+            className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
+          >
+            <span className="text-xl">🏠</span>
+            <span className="font-medium">Nazaj</span>
+          </button>
+          <button
+            onClick={handleNewGameClick}
+            className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
+          >
+            <span className="text-xl">🔄</span>
+            <span className="font-medium">Nova igra</span>
+          </button>
+          <button
+            onClick={handleInstructions}
+            className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
+          >
+            <span className="text-xl">📖</span>
+            <span className="font-medium">Navodila</span>
+          </button>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {/* Instructions Modal */}
+      <InstructionsModal 
+        isOpen={showInstructions} 
+        onClose={() => setShowInstructions(false)} 
+        type="sliding" 
+      />
+
+      {/* Completion Dialog */}
+      <MatchingCompletionDialog
+        isOpen={showCompletion}
+        onClose={() => setShowCompletion(false)}
+        images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
+        onStarClaimed={handleStarClaimed}
+        instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO."
+        autoPlayAudio={true}
+        isMobileLandscape={effectiveFullscreen}
+      />
+
+      {/* Exit Confirmation Dialog */}
+      <ConfirmDialog
+        open={showExitConfirmation}
+        onOpenChange={setShowExitConfirmation}
+        title="Zapusti igro"
+        description="Ali res želiš zapustiti igro?"
+        confirmText="Da"
+        cancelText="Ne"
+        onConfirm={handleConfirmExit}
+        onCancel={() => setShowExitConfirmation(false)}
+      />
+
+      {/* New Game Confirmation Dialog */}
+      <ConfirmDialog
+        open={showNewGameConfirmation}
+        onOpenChange={setShowNewGameConfirmation}
+        title="Nova igra"
+        description="Ali res želiš začeti novo igro?"
+        confirmText="Da"
+        cancelText="Ne"
+        onConfirm={handleConfirmNewGame}
+        onCancel={() => setShowNewGameConfirmation(false)}
+      />
+    </div>
   );
 }
