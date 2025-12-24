@@ -127,7 +127,7 @@ function DrsnaSestavljankaČ910Content() {
         { word: currentImage.word, url: imageUrl, filename: currentImage.filename },
         { word: currentImage.word, url: imageUrl, filename: currentImage.filename },
         { word: currentImage.word, url: imageUrl, filename: currentImage.filename }
-      ]} onStarClaimed={handleStarClaimed} instructionText="KLIKNI NA VSAKO SLIKO IN 3X IZGOVORI BESEDO." autoPlayAudio={true} />
+      ]} onStarClaimed={handleStarClaimed} instructionText="KLIKNI NA VSAKO SLIKO IN 4X IZGOVORI BESEDO." autoPlayAudio={true} />
       <ConfirmDialog open={showExitDialog} onOpenChange={setShowExitDialog} title="Zapusti igro" description="Ali res želiš zapustiti igro?" confirmText="Da" cancelText="Ne" onConfirm={() => navigate("/govorne-igre/drsna-sestavljanka")} onCancel={() => setShowExitDialog(false)} />
       <ConfirmDialog open={showNewGameDialog} onOpenChange={setShowNewGameDialog} title="Nova igra" description="Ali res želiš začeti novo igro?" confirmText="Da" cancelText="Ne" onConfirm={handleConfirmNewGame} onCancel={() => setShowNewGameDialog(false)} />
     </div>

@@ -159,7 +159,7 @@ function DrsnaSestavljankaR56Content() {
           { word: currentImage.word, url: imageUrl, filename: currentImage.filename }
         ]}
         onStarClaimed={handleStarClaimed}
-        instructionText="KLIKNI NA VSAKO SLIKO IN 3X IZGOVORI BESEDO."
+        instructionText="KLIKNI NA VSAKO SLIKO IN 4X IZGOVORI BESEDO."
         autoPlayAudio={true}
       />
       <ConfirmDialog open={showExitDialog} onOpenChange={setShowExitDialog} title="Zapusti igro" description="Ali res želiš zapustiti igro?" confirmText="Da" cancelText="Ne" onConfirm={() => navigate("/govorne-igre/drsna-sestavljanka")} onCancel={() => setShowExitDialog(false)} />
