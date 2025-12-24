@@ -4,10 +4,11 @@ import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { Home } from "lucide-react";
+import { Home, RefreshCw } from "lucide-react";
 
 const lImages = [
   { filename: 'ladja.png', word: 'LADJA' },
@@ -41,6 +42,7 @@ function DrsnaSestavljankaL56Content() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [showNewGameDialog, setShowNewGameDialog] = useState(false);
+  const [showNewGameButton, setShowNewGameButton] = useState(false);
 
   const currentImage = useMemo(() => lImages[Math.floor(Math.random() * lImages.length)], [puzzleKey]);
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentImage.filename}`;
@@ -61,6 +63,13 @@ function DrsnaSestavljankaL56Content() {
     gameCompletedRef.current = false;
     setPuzzleKey(prev => prev + 1);
     setShowNewGameDialog(false);
+    setShowNewGameButton(false);
+  };
+
+  const handleStartNewGameDirect = () => {
+    gameCompletedRef.current = false;
+    setPuzzleKey(prev => prev + 1);
+    setShowNewGameButton(false);
   };
 
   const handleBack = () => {
@@ -70,6 +79,8 @@ function DrsnaSestavljankaL56Content() {
 
   const handleStarClaimed = () => {
     recordGameCompletion('sliding_puzzle', 'sliding_puzzle_l_5-6');
+    setShowCompletion(false);
+    setShowNewGameButton(true);
   };
 
   const handleInstructions = () => {
@@ -95,14 +106,15 @@ function DrsnaSestavljankaL56Content() {
         />
       </div>
 
-      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-        <DropdownMenuTrigger asChild>
-          <button 
-            className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
-          >
-            <Home className="w-8 h-8 text-white" />
-          </button>
-        </DropdownMenuTrigger>
+      <div className="fixed bottom-4 left-4 z-50 flex items-center gap-3">
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger asChild>
+            <button 
+              className="w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
+            >
+              <Home className="w-8 h-8 text-white" />
+            </button>
+          </DropdownMenuTrigger>
         <DropdownMenuContent 
           className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
           align="start"
@@ -122,7 +134,17 @@ function DrsnaSestavljankaL56Content() {
             <span className="font-medium">Navodila</span>
           </button>
         </DropdownMenuContent>
-      </DropdownMenu>
+        </DropdownMenu>
+        {showNewGameButton && (
+          <Button 
+            onClick={handleStartNewGameDirect} 
+            className="rounded-full w-16 h-16 bg-sky-400 hover:bg-sky-500 shadow-lg border-2 border-white/50 backdrop-blur-sm" 
+            size="icon"
+          >
+            <RefreshCw className="h-7 w-7 text-white" />
+          </Button>
+        )}
+      </div>
 
       <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
       <MatchingCompletionDialog 
