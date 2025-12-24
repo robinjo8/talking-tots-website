@@ -102,16 +102,6 @@ function DrsnaSestavljankaČ910Content() {
       </div>
 
       <div className="fixed bottom-4 left-4 z-50 flex items-center gap-3">
-        {showNewGameButton && (
-          <Button
-            onClick={handleStartNewGameDirect}
-            className="h-14 px-6 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold shadow-lg border-2 border-white/50"
-          >
-            <RefreshCw className="w-5 h-5 mr-2" />
-            Nova igra
-          </Button>
-        )}
-        
         <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
             <button className="w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform">
@@ -124,6 +114,11 @@ function DrsnaSestavljankaČ910Content() {
             <button onClick={handleInstructions} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"><span className="text-xl">📖</span><span className="font-medium">Navodila</span></button>
           </DropdownMenuContent>
         </DropdownMenu>
+        {showNewGameButton && (
+          <Button onClick={handleStartNewGameDirect} className="rounded-full w-16 h-16 bg-sky-400 hover:bg-sky-500 shadow-lg border-2 border-white/50 backdrop-blur-sm" size="icon">
+            <RefreshCw className="h-7 w-7 text-white" />
+          </Button>
+        )}
       </div>
 
       <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
@@ -132,7 +127,7 @@ function DrsnaSestavljankaČ910Content() {
         { word: currentImage.word, url: imageUrl, filename: currentImage.filename },
         { word: currentImage.word, url: imageUrl, filename: currentImage.filename },
         { word: currentImage.word, url: imageUrl, filename: currentImage.filename }
-      ]} onStarClaimed={handleStarClaimed} instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO." autoPlayAudio={true} />
+      ]} onStarClaimed={handleStarClaimed} instructionText="KLIKNI NA VSAKO SLIKO IN 3X IZGOVORI BESEDO." autoPlayAudio={true} />
       <ConfirmDialog open={showExitDialog} onOpenChange={setShowExitDialog} title="Zapusti igro" description="Ali res želiš zapustiti igro?" confirmText="Da" cancelText="Ne" onConfirm={() => navigate("/govorne-igre/drsna-sestavljanka")} onCancel={() => setShowExitDialog(false)} />
       <ConfirmDialog open={showNewGameDialog} onOpenChange={setShowNewGameDialog} title="Nova igra" description="Ali res želiš začeti novo igro?" confirmText="Da" cancelText="Ne" onConfirm={handleConfirmNewGame} onCancel={() => setShowNewGameDialog(false)} />
     </div>
