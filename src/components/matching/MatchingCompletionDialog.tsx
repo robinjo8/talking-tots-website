@@ -74,9 +74,9 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     }
   }, [isOpen, audioStream]);
 
-  // Auto-play audio when dialog opens
+  // Auto-play audio when dialog opens (but NOT when star is claimed)
   useEffect(() => {
-    if (isOpen && autoPlayAudio && images.length > 0) {
+    if (isOpen && autoPlayAudio && images.length > 0 && !starClaimed) {
       const playAudioForImage = async () => {
         try {
           // Construct audio URL based on the word
@@ -104,7 +104,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       // Small delay to ensure dialog is fully rendered
       setTimeout(playAudioForImage, 300);
     }
-  }, [isOpen, autoPlayAudio, images]);
+  }, [isOpen, autoPlayAudio, images, starClaimed]);
   const startRecording = async (imageIndex: number, word: string) => {
     if (completedRecordings.has(imageIndex)) return;
     try {
