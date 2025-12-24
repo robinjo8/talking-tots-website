@@ -3,11 +3,12 @@ import { SlidingPuzzle } from "@/components/puzzle/SlidingPuzzle";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { Home } from "lucide-react";
+import { Home, RefreshCw } from "lucide-react";
 
 const sImages = [
   { filename: 'sedem.png', word: 'SEDEM' },
@@ -45,6 +46,7 @@ function DrsnaSestavljankaS56Content() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [showNewGameDialog, setShowNewGameDialog] = useState(false);
+  const [showNewGameButton, setShowNewGameButton] = useState(false);
 
   const currentImage = useMemo(() => sImages[Math.floor(Math.random() * sImages.length)], [puzzleKey]);
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentImage.filename}`;
@@ -63,8 +65,15 @@ function DrsnaSestavljankaS56Content() {
 
   const handleConfirmNewGame = () => {
     gameCompletedRef.current = false;
+    setShowNewGameButton(false);
     setPuzzleKey(prev => prev + 1);
     setShowNewGameDialog(false);
+  };
+
+  const handleStartNewGameDirect = () => {
+    gameCompletedRef.current = false;
+    setShowNewGameButton(false);
+    setPuzzleKey(prev => prev + 1);
   };
 
   const handleBack = () => {
@@ -74,6 +83,7 @@ function DrsnaSestavljankaS56Content() {
 
   const handleStarClaimed = () => {
     recordGameCompletion('sliding_puzzle', 'sliding_puzzle_s_5-6');
+    setShowNewGameButton(true);
   };
 
   const handleInstructions = () => {
@@ -92,40 +102,41 @@ function DrsnaSestavljankaS56Content() {
       }}
     >
       <div className="min-h-full flex flex-col items-center justify-center p-4 pb-24">
-        <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 md:mb-8 text-center drop-shadow-lg">
-          DRSNA SESTAVLJANKA - S
-        </h1>
-        
-        <div className="w-full max-w-md">
-          <SlidingPuzzle 
-            key={puzzleKey}
-            imageUrl={imageUrl}
-            onComplete={handleComplete}
-          />
-        </div>
+        <SlidingPuzzle key={puzzleKey} imageUrl={imageUrl} onComplete={handleComplete} />
       </div>
 
-      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-        <DropdownMenuTrigger asChild>
-          <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform">
-            <Home className="w-8 h-8 text-white" />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl" align="start" side="top" sideOffset={8}>
-          <button onClick={handleBack} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors">
-            <span className="text-xl">🏠</span><span className="font-medium">Nazaj</span>
-          </button>
-          <button onClick={handleNewGame} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors">
-            <span className="text-xl">🔄</span><span className="font-medium">Nova igra</span>
-          </button>
-          <button onClick={handleInstructions} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors">
-            <span className="text-xl">📖</span><span className="font-medium">Navodila</span>
-          </button>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div className="fixed bottom-4 left-4 z-50 flex items-center gap-3">
+        {showNewGameButton && (
+          <Button
+            onClick={handleStartNewGameDirect}
+            className="h-14 px-6 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold shadow-lg border-2 border-white/50"
+          >
+            <RefreshCw className="w-5 h-5 mr-2" />
+            Nova igra
+          </Button>
+        )}
+        
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger asChild>
+            <button className="w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform">
+              <Home className="w-8 h-8 text-white" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl" align="start" side="top" sideOffset={8}>
+            <button onClick={handleBack} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"><span className="text-xl">🏠</span><span className="font-medium">Nazaj</span></button>
+            <button onClick={handleNewGame} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"><span className="text-xl">🔄</span><span className="font-medium">Nova igra</span></button>
+            <button onClick={handleInstructions} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"><span className="text-xl">📖</span><span className="font-medium">Navodila</span></button>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
 
       <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
-      <MatchingCompletionDialog isOpen={showCompletion} onClose={() => setShowCompletion(false)} images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]} onStarClaimed={handleStarClaimed} instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO." autoPlayAudio={true} />
+      <MatchingCompletionDialog isOpen={showCompletion} onClose={() => setShowCompletion(false)} images={[
+        { word: currentImage.word, url: imageUrl, filename: currentImage.filename },
+        { word: currentImage.word, url: imageUrl, filename: currentImage.filename },
+        { word: currentImage.word, url: imageUrl, filename: currentImage.filename },
+        { word: currentImage.word, url: imageUrl, filename: currentImage.filename }
+      ]} onStarClaimed={handleStarClaimed} instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO." autoPlayAudio={true} />
       <ConfirmDialog open={showExitDialog} onOpenChange={setShowExitDialog} title="Zapusti igro" description="Ali res želiš zapustiti igro?" confirmText="Da" cancelText="Ne" onConfirm={() => navigate("/govorne-igre/drsna-sestavljanka")} onCancel={() => setShowExitDialog(false)} />
       <ConfirmDialog open={showNewGameDialog} onOpenChange={setShowNewGameDialog} title="Nova igra" description="Ali res želiš začeti novo igro?" confirmText="Da" cancelText="Ne" onConfirm={handleConfirmNewGame} onCancel={() => setShowNewGameDialog(false)} />
     </div>
