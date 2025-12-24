@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home } from "lucide-react";
+import { Home, RefreshCw } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MemoryGrid } from "@/components/games/MemoryGrid";
 import { useMemoryGameL } from "@/hooks/useMemoryGameL";
@@ -11,6 +11,7 @@ import { InfoModal } from "@/components/games/InfoModal";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { MemoryPairDialog } from "@/components/games/MemoryPairDialog";
 import { MemoryProgressIndicator } from "@/components/games/MemoryProgressIndicator";
+import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
 
@@ -18,9 +19,12 @@ export default function SpominL() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
+  const { recordGameCompletion } = useEnhancedProgress();
   
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [isPortrait, setIsPortrait] = useState(false);
+  const [showNewGameButton, setShowNewGameButton] = useState(false);
+  const gameCompletedRef = useRef(false);
   
   const effectiveFullscreen = isTouchDevice;
   
@@ -109,16 +113,35 @@ export default function SpominL() {
   }, [effectiveFullscreen]);
 
   const handleCardClick = (index: number) => { if (!gameStartTimeRef.current && cards.length > 0) { gameStartTimeRef.current = Date.now(); } flipCard(index); };
-  const handleReset = () => { resetGame(); gameStartTimeRef.current = null; setGameTime(null); };
+  
+  const handleReset = () => { 
+    resetGame(); 
+    gameStartTimeRef.current = null; 
+    setGameTime(null); 
+    setShowNewGameButton(false);
+    gameCompletedRef.current = false;
+  };
+
+  const handleStartNewGameDirect = () => {
+    gameCompletedRef.current = false;
+    resetGame();
+    gameStartTimeRef.current = null;
+    setGameTime(null);
+    setShowNewGameButton(false);
+  };
 
   useEffect(() => {
     if (gameCompleted && gameStartTimeRef.current && gameTime === null) {
       const endTime = Date.now();
       const timeTaken = Math.floor((endTime - gameStartTimeRef.current) / 1000);
       setGameTime(timeTaken);
-      // Game completed - no toast notification per user request
+      if (!gameCompletedRef.current) {
+        gameCompletedRef.current = true;
+        recordGameCompletion('memory', 'memory_l_game');
+        setShowNewGameButton(true);
+      }
     }
-  }, [gameCompleted, gameStartTimeRef, gameTime]);
+  }, [gameCompleted, gameStartTimeRef, gameTime, recordGameCompletion]);
 
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/zeleno_ozadje.png`;
 
@@ -152,14 +175,25 @@ export default function SpominL() {
             ))}
           </div>
         )}
-        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-          <DropdownMenuTrigger asChild><Button className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm" size="icon"><Home className="h-7 w-7 text-white" /></Button></DropdownMenuTrigger>
-          <DropdownMenuContent align="start" side="top" sideOffset={8} className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl">
-            <button onClick={() => { setMenuOpen(false); setShowExitDialog(true); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"><span className="text-2xl">🏠</span><span>Nazaj</span></button>
-            <button onClick={() => { setMenuOpen(false); handleReset(); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"><span className="text-2xl">🔄</span><span>Nova igra</span></button>
-            <button onClick={() => { setMenuOpen(false); setShowInfo(true); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"><span className="text-2xl">📖</span><span>Navodila</span></button>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="fixed bottom-4 left-4 z-50 flex items-center gap-3">
+          <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+            <DropdownMenuTrigger asChild><Button className="rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm" size="icon"><Home className="h-7 w-7 text-white" /></Button></DropdownMenuTrigger>
+            <DropdownMenuContent align="start" side="top" sideOffset={8} className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl">
+              <button onClick={() => { setMenuOpen(false); setShowExitDialog(true); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"><span className="text-2xl">🏠</span><span>Nazaj</span></button>
+              <button onClick={() => { setMenuOpen(false); handleReset(); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"><span className="text-2xl">🔄</span><span>Nova igra</span></button>
+              <button onClick={() => { setMenuOpen(false); setShowInfo(true); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"><span className="text-2xl">📖</span><span>Navodila</span></button>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {showNewGameButton && (
+            <Button 
+              onClick={handleStartNewGameDirect} 
+              className="rounded-full w-16 h-16 bg-sky-400 hover:bg-sky-500 shadow-lg border-2 border-white/50 backdrop-blur-sm" 
+              size="icon"
+            >
+              <RefreshCw className="h-7 w-7 text-white" />
+            </Button>
+          )}
+        </div>
         <InfoModal isOpen={showInfo} onClose={() => setShowInfo(false)} title="Navodila za igro Spomin" content="Ta igra je super za vadbo spomina in izgovorjave besed!
 
 Klikni na dve ploščici in poskusi najti pravi par (sliko in besedo).
@@ -188,14 +222,25 @@ Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede." />
           </div>
         </div>
       </div>
-      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-        <DropdownMenuTrigger asChild><Button className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm" size="icon"><Home className="h-7 w-7 text-white" /></Button></DropdownMenuTrigger>
-        <DropdownMenuContent align="start" side="top" sideOffset={8} className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl">
-          <button onClick={() => { setMenuOpen(false); setShowExitDialog(true); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"><span className="text-2xl">🏠</span><span>Nazaj</span></button>
-          <button onClick={() => { setMenuOpen(false); handleReset(); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"><span className="text-2xl">🔄</span><span>Nova igra</span></button>
-          <button onClick={() => { setMenuOpen(false); setShowInfo(true); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"><span className="text-2xl">📖</span><span>Navodila</span></button>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div className="fixed bottom-4 left-4 z-50 flex items-center gap-3">
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger asChild><Button className="rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm" size="icon"><Home className="h-7 w-7 text-white" /></Button></DropdownMenuTrigger>
+          <DropdownMenuContent align="start" side="top" sideOffset={8} className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl">
+            <button onClick={() => { setMenuOpen(false); setShowExitDialog(true); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"><span className="text-2xl">🏠</span><span>Nazaj</span></button>
+            <button onClick={() => { setMenuOpen(false); handleReset(); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"><span className="text-2xl">🔄</span><span>Nova igra</span></button>
+            <button onClick={() => { setMenuOpen(false); setShowInfo(true); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"><span className="text-2xl">📖</span><span>Navodila</span></button>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        {showNewGameButton && (
+          <Button 
+            onClick={handleStartNewGameDirect} 
+            className="rounded-full w-16 h-16 bg-sky-400 hover:bg-sky-500 shadow-lg border-2 border-white/50 backdrop-blur-sm" 
+            size="icon"
+          >
+            <RefreshCw className="h-7 w-7 text-white" />
+          </Button>
+        )}
+      </div>
       <InfoModal isOpen={showInfo} onClose={() => setShowInfo(false)} title="Navodila za igro Spomin" content="Ta igra je super za vadbo spomina in izgovorjave besed!
 
 Klikni na dve ploščici in poskusi najti pravi par (sliko in besedo).
