@@ -88,17 +88,11 @@ function DrsnaSestavljankaL56Content() {
       }}
     >
       <div className="min-h-full flex flex-col items-center justify-center p-4 pb-24">
-        <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 md:mb-8 text-center drop-shadow-lg">
-          DRSNA SESTAVLJANKA - L
-        </h1>
-        
-        <div className="w-full max-w-md">
-          <SlidingPuzzle 
-            key={puzzleKey}
-            imageUrl={imageUrl}
-            onComplete={handleComplete}
-          />
-        </div>
+        <SlidingPuzzle 
+          key={puzzleKey}
+          imageUrl={imageUrl}
+          onComplete={handleComplete}
+        />
       </div>
 
       <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
