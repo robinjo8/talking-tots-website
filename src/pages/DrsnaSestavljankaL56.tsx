@@ -128,9 +128,13 @@ function DrsnaSestavljankaL56Content() {
       <MatchingCompletionDialog 
         isOpen={showCompletion} 
         onClose={() => setShowCompletion(false)}
-        images={[{ word: currentImage.word, url: imageUrl, filename: currentImage.filename }]}
+        images={[
+          { word: currentImage.word, url: imageUrl, filename: currentImage.filename },
+          { word: currentImage.word, url: imageUrl, filename: currentImage.filename },
+          { word: currentImage.word, url: imageUrl, filename: currentImage.filename }
+        ]}
         onStarClaimed={handleStarClaimed}
-        instructionText="KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO."
+        instructionText="KLIKNI NA VSAKO SLIKO IN 3X IZGOVORI BESEDO."
         autoPlayAudio={true}
       />
       <ConfirmDialog open={showExitDialog} onOpenChange={setShowExitDialog} title="Zapusti igro" description="Ali res želiš zapustiti igro?" confirmText="Da" cancelText="Ne" onConfirm={() => navigate("/govorne-igre/drsna-sestavljanka")} onCancel={() => setShowExitDialog(false)} />
