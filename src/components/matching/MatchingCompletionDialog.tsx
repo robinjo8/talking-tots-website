@@ -385,10 +385,10 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
         }>
           <p className={`text-black text-center uppercase ${isMobileLandscape ? "text-sm" : "text-xs md:text-sm"}`}>{instructionText}</p>
           
-          {/* Display images - 4 in row for landscape, 2x2 for portrait */}
+          {/* Display images - centered grid based on count */}
           <div className={images.length === 1 
             ? "flex justify-center" 
-            : `grid gap-2 md:gap-4 mx-auto ${isMobileLandscape ? "grid-cols-4 gap-4" : "grid-cols-4 portrait:grid-cols-2"}`
+            : `flex justify-center gap-2 md:gap-4`
           }>
             {images.slice(0, 4).map((image, index) => {
             const isRecording = currentRecordingIndex === index;
