@@ -1,17 +1,13 @@
-import { AppLayout } from "@/components/AppLayout";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { SlidingPuzzle34 } from "@/components/puzzle/SlidingPuzzle34";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
-import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
-
-import { Button } from "@/components/ui/button";
-import { useState, useEffect, useRef } from "react";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { useAuth } from "@/contexts/AuthContext";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { RotateCcw, BookOpen, ArrowLeft } from "lucide-react";
+import { Home } from "lucide-react";
 
 const rImages = [
   { filename: 'raca.png', word: 'RACA' },
@@ -34,11 +30,6 @@ const rImages = [
   { filename: 'roza.png', word: 'ROŽA' }
 ];
 
-const getRandomRImage = () => {
-  const randomIndex = Math.floor(Math.random() * rImages.length);
-  return rImages[randomIndex];
-};
-
 export default function DrsnaSestavljankaR34() {
   return (
     <AgeGatedRoute requiredAgeGroup="3-4">
@@ -48,18 +39,20 @@ export default function DrsnaSestavljankaR34() {
 }
 
 function DrsnaSestavljankaR34Content() {
+  const navigate = useNavigate();
+  const { recordGameCompletion } = useEnhancedProgress();
+  const gameCompletedRef = useRef(false);
+
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   const [puzzleKey, setPuzzleKey] = useState(0);
-  const [currentImage, setCurrentImage] = useState(getRandomRImage());
-  const navigate = useNavigate();
-  const isMobile = useIsMobile();
-  const { recordGameCompletion } = useEnhancedProgress();
-  const gameCompletedRef = useRef(false);
-  const effectiveFullscreen = isMobile;
-  
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [showExitDialog, setShowExitDialog] = useState(false);
+  const [showNewGameDialog, setShowNewGameDialog] = useState(false);
+
+  const currentImage = useMemo(() => rImages[Math.floor(Math.random() * rImages.length)], [puzzleKey]);
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentImage.filename}`;
-  
+
   const handleComplete = () => {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
@@ -68,137 +61,132 @@ function DrsnaSestavljankaR34Content() {
   };
 
   const handleNewGame = () => {
+    setMenuOpen(false);
+    setShowNewGameDialog(true);
+  };
+
+  const handleConfirmNewGame = () => {
     gameCompletedRef.current = false;
-    setCurrentImage(getRandomRImage());
     setPuzzleKey(prev => prev + 1);
+    setShowNewGameDialog(false);
   };
 
   const handleBack = () => {
-    navigate("/govorne-igre/drsna-sestavljanka");
+    setMenuOpen(false);
+    setShowExitDialog(true);
   };
 
   const handleStarClaimed = () => {
     recordGameCompletion('sliding_puzzle', 'sliding_puzzle_r_3-4');
   };
 
-  useEffect(() => {
-    if (effectiveFullscreen) {
-      const requestFullscreen = async () => {
-        try {
-          if (document.documentElement.requestFullscreen) {
-            await document.documentElement.requestFullscreen();
-          }
-          // Lock screen orientation - simple approach
-          try {
-            if ('orientation' in screen && 'lock' in screen.orientation) {
-              (screen.orientation as any).lock('portrait').catch(() => {
-                console.log('Screen orientation lock not supported');
-              });
-            }
-          } catch (error) {
-            console.log('Screen orientation lock not available');
-          }
-        } catch (error) {
-          console.log('Fullscreen or orientation lock not supported:', error);
-        }
-      };
-      requestFullscreen();
-      return () => {
-        if (document.fullscreenElement) {
-          document.exitFullscreen?.();
-        }
-      };
-    }
-  }, [effectiveFullscreen]);
-
-  if (effectiveFullscreen) {
-    return (
-      <div className="fixed inset-0 bg-background overflow-hidden select-none">
-        <div className="h-full flex flex-col">
-            <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
-              <h2 className="text-lg font-bold mb-3 text-center">Drsna igra R</h2>
-              <div className="flex justify-center gap-3">
-                <MemoryExitConfirmationDialog onConfirm={handleBack}>
-                  <Button size="sm" variant="outline" className="gap-2">
-                    <ArrowLeft className="h-4 w-4" />
-                    Nazaj
-                  </Button>
-                </MemoryExitConfirmationDialog>
-              
-              <Button
-                onClick={handleNewGame}
-                size="sm"
-                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
-              >
-                <RotateCcw className="h-4 w-4" />
-                Nova igra
-              </Button>
-              
-              <Button
-                onClick={() => setShowInstructions(true)}
-                size="sm"
-                variant="outline"
-                className="gap-2"
-              >
-                <BookOpen className="h-4 w-4" />
-                Navodila
-              </Button>
-            </div>
-          </div>
-          <div className="flex-1 overflow-hidden bg-muted/30 flex items-center justify-center p-4">
-            <SlidingPuzzle34 
-              key={puzzleKey}
-              imageUrl={imageUrl}
-              onComplete={handleComplete}
-              className="w-full h-full"
-            />
-          </div>
-        </div>
-        <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
-        <PuzzleSuccessDialog
-          isOpen={showCompletion}
-          onOpenChange={setShowCompletion}
-          completedImage={currentImage}
-          onStarClaimed={handleStarClaimed}
-        />
-      </div>
-    );
-  }
+  const handleInstructions = () => {
+    setMenuOpen(false);
+    setShowInstructions(true);
+  };
 
   return (
-    <AppLayout>
-      <div className="w-full min-h-screen bg-background">
-          <div className="flex justify-center gap-4 p-4">
-            <MemoryExitConfirmationDialog onConfirm={handleBack}>
-              <Button variant="outline" className="gap-2">
-                <ArrowLeft className="h-4 w-4" />
-                Nazaj
-              </Button>
-            </MemoryExitConfirmationDialog>
-          <Button onClick={handleNewGame} className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2">
-            <RotateCcw className="h-4 w-4" />
-            Nova igra
-          </Button>
-          <Button onClick={() => setShowInstructions(true)} variant="outline" className="gap-2">
-            <BookOpen className="h-4 w-4" />
-            Navodila
-          </Button>
-        </div>
-        <div className="w-full bg-muted/30 flex justify-center items-center p-4 min-h-[calc(100vh-200px)]">
+    <div 
+      className="fixed inset-0 overflow-auto select-none"
+      style={{
+        backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      {/* Main content */}
+      <div className="min-h-full flex flex-col items-center justify-center p-4 pb-24">
+        <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 md:mb-8 text-center drop-shadow-lg">
+          DRSNA SESTAVLJANKA - R
+        </h1>
+        
+        <div className="w-full max-w-md">
           <SlidingPuzzle34 
             key={puzzleKey}
             imageUrl={imageUrl}
             onComplete={handleComplete}
           />
         </div>
-        <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
-        <PuzzleSuccessDialog
-          isOpen={showCompletion}
-          onOpenChange={setShowCompletion}
-          completedImage={currentImage}
-          onStarClaimed={handleStarClaimed}
-        />
       </div>
-    </AppLayout>
+
+      {/* Floating Menu Button - Left */}
+      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+        <DropdownMenuTrigger asChild>
+          <button 
+            className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
+          >
+            <Home className="w-8 h-8 text-white" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent 
+          className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+          align="start"
+          side="top"
+          sideOffset={8}
+        >
+          <button
+            onClick={handleBack}
+            className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
+          >
+            <span className="text-xl">🏠</span>
+            <span className="font-medium">Nazaj</span>
+          </button>
+          <button
+            onClick={handleNewGame}
+            className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
+          >
+            <span className="text-xl">🔄</span>
+            <span className="font-medium">Nova igra</span>
+          </button>
+          <button
+            onClick={handleInstructions}
+            className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
+          >
+            <span className="text-xl">📖</span>
+            <span className="font-medium">Navodila</span>
+          </button>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {/* Instructions Modal */}
+      <InstructionsModal 
+        isOpen={showInstructions} 
+        onClose={() => setShowInstructions(false)} 
+        type="sliding" 
+      />
+
+      {/* Puzzle Success Dialog */}
+      <PuzzleSuccessDialog
+        isOpen={showCompletion}
+        onOpenChange={setShowCompletion}
+        completedImage={currentImage}
+        onStarClaimed={handleStarClaimed}
+      />
+
+      {/* Exit Confirmation Dialog */}
+      <ConfirmDialog
+        open={showExitDialog}
+        onOpenChange={setShowExitDialog}
+        title="Zapusti igro"
+        description="Ali res želiš zapustiti igro?"
+        confirmText="Da"
+        cancelText="Ne"
+        onConfirm={() => navigate("/govorne-igre/drsna-sestavljanka")}
+        onCancel={() => setShowExitDialog(false)}
+      />
+
+      {/* New Game Confirmation Dialog */}
+      <ConfirmDialog
+        open={showNewGameDialog}
+        onOpenChange={setShowNewGameDialog}
+        title="Nova igra"
+        description="Ali res želiš začeti novo igro?"
+        confirmText="Da"
+        cancelText="Ne"
+        onConfirm={handleConfirmNewGame}
+        onCancel={() => setShowNewGameDialog(false)}
+      />
+    </div>
   );
 }
