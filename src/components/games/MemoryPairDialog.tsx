@@ -13,6 +13,7 @@ interface MemoryPairDialogProps {
   onClose: () => void;
   onContinue: () => void;
   onUnmatch: () => void;
+  onStarClaimed?: () => void;
   pairNumber: number;
   totalPairs: number;
   imageUrl: string | null;
@@ -25,6 +26,7 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
   onClose,
   onContinue,
   onUnmatch,
+  onStarClaimed,
   pairNumber,
   totalPairs,
   imageUrl,
@@ -186,6 +188,7 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
         title: "Odlično!",
         description: "Prejel si zvezdico! ⭐"
       });
+      onStarClaimed?.();
     }
     onContinue();
   };

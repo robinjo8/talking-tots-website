@@ -129,18 +129,21 @@ export default function SpominS() {
     setShowNewGameButton(false);
   };
 
+  const handleStarClaimed = () => {
+    if (!gameCompletedRef.current) {
+      gameCompletedRef.current = true;
+      recordGameCompletion('memory', 'memory_s_game');
+    }
+    setShowNewGameButton(true);
+  };
+
   useEffect(() => {
     if (gameCompleted && gameStartTimeRef.current && gameTime === null) {
       const endTime = Date.now();
       const timeTaken = Math.floor((endTime - gameStartTimeRef.current) / 1000);
       setGameTime(timeTaken);
-      if (!gameCompletedRef.current) {
-        gameCompletedRef.current = true;
-        recordGameCompletion('memory', 'memory_s_game');
-        setShowNewGameButton(true);
-      }
     }
-  }, [gameCompleted, gameStartTimeRef, gameTime, recordGameCompletion]);
+  }, [gameCompleted, gameStartTimeRef, gameTime]);
 
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/zeleno_ozadje.png`;
 
@@ -197,7 +200,7 @@ Ko najdeš par, se odpre okno z izgovorjavo – poslušaj in ponovi besedo na gl
 Če jo pravilno izgovoriš, se par obdrži!
 
 Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede." />
-        <MemoryPairDialog isOpen={showPairDialog} onClose={handlePairDialogContinue} onContinue={handlePairDialogContinue} onUnmatch={handlePairUnmatch} pairNumber={matchedPairs.length} totalPairs={totalPairs} imageUrl={currentMatchedPair?.image_url || null} word={currentMatchedPair?.word || null} audioUrl={currentMatchedPair?.audio_url || null} />
+        <MemoryPairDialog isOpen={showPairDialog} onClose={handlePairDialogContinue} onContinue={handlePairDialogContinue} onUnmatch={handlePairUnmatch} onStarClaimed={handleStarClaimed} pairNumber={matchedPairs.length} totalPairs={totalPairs} imageUrl={currentMatchedPair?.image_url || null} word={currentMatchedPair?.word || null} audioUrl={currentMatchedPair?.audio_url || null} />
         <MemoryExitConfirmationDialog open={showExitDialog} onOpenChange={setShowExitDialog} onConfirm={() => navigate("/govorne-igre/spomin")}><div /></MemoryExitConfirmationDialog>
       </div>
     );
@@ -240,7 +243,7 @@ Ko najdeš par, se odpre okno z izgovorjavo – poslušaj in ponovi besedo na gl
 Če jo pravilno izgovoriš, se par obdrži!
 
 Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede." />
-      <MemoryPairDialog isOpen={showPairDialog} onClose={handlePairDialogContinue} onContinue={handlePairDialogContinue} onUnmatch={handlePairUnmatch} pairNumber={matchedPairs.length} totalPairs={totalPairs} imageUrl={currentMatchedPair?.image_url || null} word={currentMatchedPair?.word || null} audioUrl={currentMatchedPair?.audio_url || null} />
+      <MemoryPairDialog isOpen={showPairDialog} onClose={handlePairDialogContinue} onContinue={handlePairDialogContinue} onUnmatch={handlePairUnmatch} onStarClaimed={handleStarClaimed} pairNumber={matchedPairs.length} totalPairs={totalPairs} imageUrl={currentMatchedPair?.image_url || null} word={currentMatchedPair?.word || null} audioUrl={currentMatchedPair?.audio_url || null} />
       <MemoryExitConfirmationDialog open={showExitDialog} onOpenChange={setShowExitDialog} onConfirm={() => navigate("/govorne-igre/spomin")}><div /></MemoryExitConfirmationDialog>
     </div>
   );

@@ -143,6 +143,14 @@ const SpominČContent = () => {
     setShowNewGameButton(false);
   };
 
+  const handleStarClaimed = () => {
+    if (!gameCompletedRef.current) {
+      gameCompletedRef.current = true;
+      recordGameCompletion('memory', 'memory_č_game');
+    }
+    setShowNewGameButton(true);
+  };
+
   const handleBack = () => {
     setMenuOpen(false);
     setShowExitDialog(true);
@@ -167,13 +175,8 @@ const SpominČContent = () => {
       const endTime = Date.now();
       const timeTaken = Math.floor((endTime - gameStartTimeRef.current) / 1000);
       setGameTime(timeTaken);
-      if (!gameCompletedRef.current) {
-        gameCompletedRef.current = true;
-        recordGameCompletion('memory', 'memory_č_game');
-        setShowNewGameButton(true);
-      }
     }
-  }, [gameCompleted, gameStartTimeRef, gameTime, recordGameCompletion]);
+  }, [gameCompleted, gameStartTimeRef, gameTime]);
 
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/zeleno_ozadje.png`;
 
@@ -271,7 +274,7 @@ Ko najdeš par, se odpre okno z izgovorjavo – poslušaj in ponovi besedo na gl
 
 Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede." />
 
-        <MemoryPairDialog isOpen={showPairDialog} onClose={handlePairDialogContinue} onContinue={handlePairDialogContinue} onUnmatch={handlePairUnmatch} pairNumber={matchedPairs.length} totalPairs={totalPairs} imageUrl={currentMatchedPair?.image_url || null} word={currentMatchedPair?.word || null} audioUrl={currentMatchedPair?.audio_url || null} />
+        <MemoryPairDialog isOpen={showPairDialog} onClose={handlePairDialogContinue} onContinue={handlePairDialogContinue} onUnmatch={handlePairUnmatch} onStarClaimed={handleStarClaimed} pairNumber={matchedPairs.length} totalPairs={totalPairs} imageUrl={currentMatchedPair?.image_url || null} word={currentMatchedPair?.word || null} audioUrl={currentMatchedPair?.audio_url || null} />
       </div>
     );
   }
@@ -343,7 +346,7 @@ Ko najdeš par, se odpre okno z izgovorjavo – poslušaj in ponovi besedo na gl
 
 Igra je končana, ko odkriješ vse pare in pravilno izgovoriš vse besede." />
 
-      <MemoryPairDialog isOpen={showPairDialog} onClose={handlePairDialogContinue} onContinue={handlePairDialogContinue} onUnmatch={handlePairUnmatch} pairNumber={matchedPairs.length} totalPairs={totalPairs} imageUrl={currentMatchedPair?.image_url || null} word={currentMatchedPair?.word || null} audioUrl={currentMatchedPair?.audio_url || null} />
+      <MemoryPairDialog isOpen={showPairDialog} onClose={handlePairDialogContinue} onContinue={handlePairDialogContinue} onUnmatch={handlePairUnmatch} onStarClaimed={handleStarClaimed} pairNumber={matchedPairs.length} totalPairs={totalPairs} imageUrl={currentMatchedPair?.image_url || null} word={currentMatchedPair?.word || null} audioUrl={currentMatchedPair?.audio_url || null} />
 
       <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
         <AlertDialogContent>
