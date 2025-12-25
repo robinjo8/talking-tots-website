@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { Home } from "lucide-react";
+import { Home, RefreshCw } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
@@ -49,30 +49,17 @@ function SestavljankeŽ56Content() {
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [puzzleKey, setPuzzleKey] = useState(0);
   const [currentImage, setCurrentImage] = useState(getRandomŽImage());
+  const [showNewGameButton, setShowNewGameButton] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { recordGameCompletion } = useEnhancedProgress();
   const gameCompletedRef = useRef(false);
   const effectiveFullscreen = isMobile;
-  
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentImage.filename}`;
-  
-  const handleComplete = () => {
-    if (!gameCompletedRef.current) {
-      gameCompletedRef.current = true;
-      setShowCompletion(true);
-    }
-  };
+  const handleComplete = () => { if (!gameCompletedRef.current) { gameCompletedRef.current = true; setShowCompletion(true); } };
+  const handleStarClaimed = () => { recordGameCompletion('puzzle', 'puzzle_ž_12'); setShowNewGameButton(true); };
 
-  const handleStarClaimed = () => {
-    recordGameCompletion('puzzle', 'puzzle_ž_12');
-  };
-
-  const handleNewGame = () => {
-    gameCompletedRef.current = false;
-    setCurrentImage(getRandomŽImage());
-    setPuzzleKey(prev => prev + 1);
-  };
+  const handleNewGame = () => { gameCompletedRef.current = false; setCurrentImage(getRandomŽImage()); setPuzzleKey(prev => prev + 1); setShowNewGameButton(false); };
 
   const handleBack = () => {
     navigate("/govorne-igre/sestavljanke");
@@ -181,12 +168,8 @@ function SestavljankeŽ56Content() {
         </MemoryExitConfirmationDialog>
         
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
-        <PuzzleSuccessDialog
-          isOpen={showCompletion}
-          onOpenChange={setShowCompletion}
-          completedImage={currentImage}
-          onStarClaimed={handleStarClaimed}
-        />
+        {showNewGameButton && (<Button size="icon" onClick={handleNewGame} className="fixed bottom-4 left-24 z-50 bg-blue-500 hover:bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg"><RefreshCw className="w-6 h-6" /></Button>)}
+        <PuzzleSuccessDialog isOpen={showCompletion} onOpenChange={setShowCompletion} completedImage={currentImage} allImages={žImages} onStarClaimed={handleStarClaimed} />
       </div>
     );
   }
@@ -266,12 +249,8 @@ function SestavljankeŽ56Content() {
           </MemoryExitConfirmationDialog>
           
           <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
-          <PuzzleSuccessDialog
-            isOpen={showCompletion}
-            onOpenChange={setShowCompletion}
-            completedImage={currentImage}
-            onStarClaimed={handleStarClaimed}
-          />
+          {showNewGameButton && (<Button size="icon" onClick={handleNewGame} className="fixed bottom-4 left-24 z-50 bg-blue-500 hover:bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg"><RefreshCw className="w-6 h-6" /></Button>)}
+          <PuzzleSuccessDialog isOpen={showCompletion} onOpenChange={setShowCompletion} completedImage={currentImage} allImages={žImages} onStarClaimed={handleStarClaimed} />
         </div>
       </div>
     </AppLayout>

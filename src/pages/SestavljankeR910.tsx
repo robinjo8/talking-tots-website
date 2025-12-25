@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { RotateCcw, BookOpen, ArrowLeft, Home } from "lucide-react";
+import { RotateCcw, BookOpen, ArrowLeft, Home, RefreshCw } from "lucide-react";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
 
@@ -49,6 +49,7 @@ function SestavljankeR910Content() {
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [puzzleKey, setPuzzleKey] = useState(0);
   const [currentImage, setCurrentImage] = useState(getRandomRImage());
+  const [showNewGameButton, setShowNewGameButton] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { user, selectedChild } = useAuth();
@@ -69,12 +70,14 @@ function SestavljankeR910Content() {
 
   const handleStarClaimed = () => {
     recordGameCompletion('puzzle', 'puzzle_r_20');
+    setShowNewGameButton(true);
   };
 
   const handleNewGame = () => {
     gameCompletedRef.current = false;
     setCurrentImage(getRandomRImage());
     setPuzzleKey(prev => prev + 1);
+    setShowNewGameButton(false);
   };
 
   const handleBack = () => {
@@ -203,10 +206,21 @@ function SestavljankeR910Content() {
           onClose={() => setShowInstructions(false)}
         />
 
+        {showNewGameButton && (
+          <Button
+            size="icon"
+            onClick={handleNewGame}
+            className="fixed bottom-4 left-24 z-50 bg-blue-500 hover:bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg"
+          >
+            <RefreshCw className="w-6 h-6" />
+          </Button>
+        )}
+
         <PuzzleSuccessDialog
           isOpen={showCompletion}
           onOpenChange={setShowCompletion}
           completedImage={currentImage}
+          allImages={rImages}
           onStarClaimed={handleStarClaimed}
         />
 
@@ -283,10 +297,21 @@ function SestavljankeR910Content() {
           onClose={() => setShowInstructions(false)}
         />
 
+        {showNewGameButton && (
+          <Button
+            size="icon"
+            onClick={handleNewGame}
+            className="fixed bottom-4 left-24 z-50 bg-blue-500 hover:bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg"
+          >
+            <RefreshCw className="w-6 h-6" />
+          </Button>
+        )}
+
         <PuzzleSuccessDialog
           isOpen={showCompletion}
           onOpenChange={setShowCompletion}
           completedImage={currentImage}
+          allImages={rImages}
           onStarClaimed={handleStarClaimed}
         />
 

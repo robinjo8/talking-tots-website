@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { RotateCcw, BookOpen, ArrowLeft, Home } from "lucide-react";
+import { RotateCcw, BookOpen, ArrowLeft, Home, RefreshCw } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
@@ -49,6 +49,7 @@ function SestavljankeL56Content() {
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [puzzleKey, setPuzzleKey] = useState(0);
   const [currentImage, setCurrentImage] = useState(getRandomLImage());
+  const [showNewGameButton, setShowNewGameButton] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { recordGameCompletion } = useEnhancedProgress();
@@ -66,12 +67,14 @@ function SestavljankeL56Content() {
 
   const handleStarClaimed = () => {
     recordGameCompletion('puzzle', 'puzzle_l_12');
+    setShowNewGameButton(true);
   };
 
   const handleNewGame = () => {
     gameCompletedRef.current = false;
     setCurrentImage(getRandomLImage());
     setPuzzleKey(prev => prev + 1);
+    setShowNewGameButton(false);
   };
 
   const handleBack = () => {
@@ -175,10 +178,21 @@ function SestavljankeL56Content() {
         </MemoryExitConfirmationDialog>
         
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
+        {showNewGameButton && (
+          <Button
+            size="icon"
+            onClick={handleNewGame}
+            className="fixed bottom-4 left-24 z-50 bg-blue-500 hover:bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg"
+          >
+            <RefreshCw className="w-6 h-6" />
+          </Button>
+        )}
+
         <PuzzleSuccessDialog
           isOpen={showCompletion}
           onOpenChange={setShowCompletion}
           completedImage={currentImage}
+          allImages={lImages}
           onStarClaimed={handleStarClaimed}
         />
       </div>
@@ -246,7 +260,16 @@ function SestavljankeL56Content() {
         </DropdownMenu>
           <MemoryExitConfirmationDialog open={showExitDialog} onOpenChange={setShowExitDialog} onConfirm={() => navigate("/govorne-igre/sestavljanke")}><div /></MemoryExitConfirmationDialog>
           <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
-          <PuzzleSuccessDialog isOpen={showCompletion} onOpenChange={setShowCompletion} completedImage={currentImage} onStarClaimed={handleStarClaimed} />
+          {showNewGameButton && (
+            <Button
+              size="icon"
+              onClick={handleNewGame}
+              className="fixed bottom-4 left-24 z-50 bg-blue-500 hover:bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg"
+            >
+              <RefreshCw className="w-6 h-6" />
+            </Button>
+          )}
+          <PuzzleSuccessDialog isOpen={showCompletion} onOpenChange={setShowCompletion} completedImage={currentImage} allImages={lImages} onStarClaimed={handleStarClaimed} />
         </div>
       </div>
     </AppLayout>
