@@ -8,14 +8,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
+interface ImageData {
+  filename: string;
+  word: string;
+  audio?: string;
+}
+
 interface PuzzleSuccessDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  completedImage: {
-    filename: string;
-    word: string;
-    audio?: string;
-  };
+  completedImage: ImageData;
+  allImages?: ImageData[]; // Optional - if not provided, will use just completedImage
   onStarClaimed?: () => void;
 }
 
@@ -23,40 +26,62 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   isOpen,
   onOpenChange,
   completedImage,
+  allImages,
   onStarClaimed
 }) => {
-  const [isRecording, setIsRecording] = useState(false);
-  const [hasRecorded, setHasRecorded] = useState(false);
+  const [completedRecordings, setCompletedRecordings] = useState<Set<number>>(new Set());
   const [recordingTimeLeft, setRecordingTimeLeft] = useState(3);
+  const [currentRecordingIndex, setCurrentRecordingIndex] = useState<number | null>(null);
   const [starClaimed, setStarClaimed] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
+  const [displayImages, setDisplayImages] = useState<ImageData[]>([]);
   const { playAudio } = useAudioPlayback();
   const { toast } = useToast();
   const { user, selectedChild } = useAuth();
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
   const recordingDataRef = useRef<Blob[]>([]);
 
+  // Select 4 random images including the completed one when dialog opens
+  useEffect(() => {
+    if (isOpen && allImages && allImages.length > 0) {
+      // Always include the completed image
+      const otherImages = allImages.filter(img => img.filename !== completedImage.filename);
+      
+      // Shuffle and take 3 random other images
+      const shuffled = [...otherImages].sort(() => Math.random() - 0.5);
+      const selected = shuffled.slice(0, 3);
+      
+      // Combine with completed image and shuffle the final array
+      const combined = [completedImage, ...selected].sort(() => Math.random() - 0.5);
+      setDisplayImages(combined);
+    } else if (isOpen && completedImage) {
+      // Fallback: just show the completed image
+      setDisplayImages([completedImage]);
+    }
+  }, [isOpen, allImages, completedImage]);
+
   // Auto-play audio when dialog opens
   useEffect(() => {
-    if (isOpen && completedImage) {
-      const normalizedWord = completedImage.word
+    if (isOpen && displayImages.length > 0) {
+      const normalizedWord = displayImages[0].word
         .toLowerCase()
         .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, ''); // Remove diacritics
-      const audioFilename = completedImage.audio || `${normalizedWord}.m4a`;
+        .replace(/[\u0300-\u036f]/g, '');
+      const audioFilename = displayImages[0].audio || `${normalizedWord}.m4a`;
       const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
       playAudio(audioUrl);
     }
-  }, [isOpen, completedImage, playAudio]);
+  }, [isOpen, displayImages, playAudio]);
 
   // Cleanup on dialog close
   useEffect(() => {
     if (!isOpen) {
-      setIsRecording(false);
-      setHasRecorded(false);
+      setCompletedRecordings(new Set());
       setRecordingTimeLeft(3);
+      setCurrentRecordingIndex(null);
+      setStarClaimed(false);
       if (countdownRef.current) {
         clearInterval(countdownRef.current);
         countdownRef.current = null;
@@ -70,50 +95,73 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
     }
   }, [isOpen, audioStream]);
 
-  const startRecording = async () => {
+  const startRecording = async (imageIndex: number, word: string) => {
+    if (completedRecordings.has(imageIndex) || currentRecordingIndex !== null) return;
     try {
-      // Request microphone access
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       setAudioStream(stream);
 
-      // Create MediaRecorder
       const recorder = new MediaRecorder(stream);
       setMediaRecorder(recorder);
-      recordingDataRef.current = [];
+      const localRecorder = recorder;
+      const localStream = stream;
+      const recordingData: Blob[] = [];
+      setCurrentRecordingIndex(imageIndex);
 
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
-          recordingDataRef.current.push(event.data);
+          recordingData.push(event.data);
         }
       };
 
-      recorder.onstop = async () => {
-        // Save recording after MediaRecorder has stopped
-        if (recordingDataRef.current.length > 0) {
-          await saveRecording();
+      localRecorder.onstop = async () => {
+        try {
+          if (recordingData.length > 0 && user && selectedChild) {
+            const audioBlob = new Blob(recordingData, { type: 'audio/webm' });
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const normalizedWord = word
+              .toLowerCase()
+              .normalize('NFD')
+              .replace(/[\u0300-\u036f]/g, '')
+              .replace(/[^a-z0-9]/g, '-');
+            const filename = `recording-${normalizedWord}-${timestamp}.webm`;
+            const userSpecificPath = `recordings/${user.email}/child-${selectedChild.id}/${filename}`;
+
+            const { error } = await supabase.storage
+              .from('audio-besede')
+              .upload(userSpecificPath, audioBlob, { contentType: 'audio/webm' });
+
+            if (error) {
+              console.error('Error saving recording:', error);
+            }
+          }
+        } finally {
+          if (localStream) {
+            localStream.getTracks().forEach(track => track.stop());
+          }
         }
       };
 
-      // Start recording
-      recorder.start();
-      setIsRecording(true);
+      localRecorder.start();
       setRecordingTimeLeft(3);
 
-      // Start countdown
       countdownRef.current = setInterval(() => {
         setRecordingTimeLeft(prev => {
           if (prev <= 1) {
-            // Auto-stop recording and set hasRecorded
-            stopRecording();
-            setHasRecorded(true);
-            // Note: saveRecording() is called from onstop event
+            if (countdownRef.current) {
+              clearInterval(countdownRef.current);
+              countdownRef.current = null;
+            }
+            if (localRecorder.state !== 'inactive') {
+              localRecorder.stop();
+            }
+            setCompletedRecordings(prevCompleted => new Set([...prevCompleted, imageIndex]));
+            setCurrentRecordingIndex(null);
             return 0;
           }
           return prev - 1;
         });
       }, 1000);
-
-      // Recording started - no toast notification per user request
     } catch (error) {
       console.error('Error starting recording:', error);
       toast({
@@ -124,94 +172,28 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
     }
   };
 
-  const stopRecording = () => {
+  const handleReset = () => {
     if (countdownRef.current) {
       clearInterval(countdownRef.current);
       countdownRef.current = null;
     }
-
     if (mediaRecorder && mediaRecorder.state === 'recording') {
       mediaRecorder.stop();
     }
-
     if (audioStream) {
       audioStream.getTracks().forEach(track => track.stop());
       setAudioStream(null);
     }
-
-    setIsRecording(false);
-    setRecordingTimeLeft(3);
-  };
-
-  const saveRecording = async () => {
-    if (recordingDataRef.current.length === 0) {
-      console.log('No recording data to save');
-      return;
-    }
-
-    // Check if user is authenticated and child is selected
-    if (!user || !selectedChild) {
-      console.error('User not authenticated or no child selected');
-      toast({
-        title: "Napaka",
-        description: "Prijavite se za shranjevanje posnetka.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const audioBlob = new Blob(recordingDataRef.current, { type: 'audio/webm' });
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      // Normalize word to remove special characters (č, š, ž, etc.)
-      const normalizedWord = completedImage.word
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
-        .replace(/[^a-z0-9]/g, '-'); // Replace non-alphanumeric with dash
-      const filename = `recording-${normalizedWord}-${timestamp}.webm`;
-      
-      // Create user-specific path: recordings/{user-email}/child-{child-id}/
-      const userSpecificPath = `recordings/${user.email}/child-${selectedChild.id}/${filename}`;
-
-      const { error } = await supabase.storage
-        .from('audio-besede')
-        .upload(userSpecificPath, audioBlob, {
-          contentType: 'audio/webm'
-        });
-
-      if (error) {
-        console.error('Error saving recording:', error);
-        toast({
-          title: "Napaka",
-          description: "Snemanje ni bilo shranjeno.",
-          variant: "destructive",
-        });
-      } else {
-        console.log('Recording saved successfully to:', userSpecificPath);
-        // Recording saved - no toast notification per user request
-      }
-    } catch (error) {
-      console.error('Error in saveRecording:', error);
-      toast({
-        title: "Napaka",
-        description: "Prišlo je do napake pri shranjevanju.",
-        variant: "destructive",
-      });
-    }
-
-    recordingDataRef.current = [];
-  };
-
-  const handleReset = () => {
-    setHasRecorded(false);
-    setIsRecording(false);
+    setCompletedRecordings(new Set());
+    setCurrentRecordingIndex(null);
     setRecordingTimeLeft(3);
     recordingDataRef.current = [];
   };
 
   const handleClose = () => {
-    if (!starClaimed) {
+    if (!starClaimed && completedRecordings.size === displayImages.length) {
+      setShowConfirmDialog(true);
+    } else if (completedRecordings.size < displayImages.length) {
       setShowConfirmDialog(true);
     } else {
       onOpenChange(false);
@@ -235,92 +217,104 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
     }, 1500);
   };
 
-  const handlePlayAudio = () => {
-    const normalizedWord = completedImage.word
+  const handlePlayAudio = (image: ImageData) => {
+    const normalizedWord = image.word
       .toLowerCase()
       .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, ''); // Remove diacritics
-    const audioFilename = completedImage.audio || `${normalizedWord}.m4a`;
+      .replace(/[\u0300-\u036f]/g, '');
+    const audioFilename = image.audio || `${normalizedWord}.m4a`;
     const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
     playAudio(audioUrl);
   };
 
-  const handleImageClick = () => {
-    if (!isRecording) {
-      startRecording();
+  const handleImageClick = (imageIndex: number, word: string) => {
+    if (completedRecordings.has(imageIndex) || currentRecordingIndex !== null) {
+      return;
     }
+    startRecording(imageIndex, word);
   };
 
-  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${completedImage.filename}`;
+  const allRecordingsComplete = displayImages.length > 0 && completedRecordings.size === displayImages.length;
 
   return (
     <>
       <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-lg">
-        <div className="space-y-6 py-4">
-          <h2 className="text-2xl font-bold text-dragon-green text-center">Odlično!</h2>
-          
-          <p className="text-sm text-black text-center">
-            KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO
-          </p>
-          
-          <div className="flex justify-center">
-            <div 
-              className={`flex flex-col items-center space-y-2 cursor-pointer transition-all ${
-                hasRecorded ? 'opacity-70 cursor-not-allowed' : 'hover:scale-105'
-              }`}
-              onClick={handleImageClick}
-            >
-              <div className="relative">
-                <img
-                  src={imageUrl}
-                  alt={completedImage.word}
-                  className={`w-32 h-32 object-cover rounded-lg border-2 ${
-                    hasRecorded ? 'border-gray-400' : 
-                    isRecording ? 'border-red-500' : 'border-dragon-green'
-                  }`}
-                />
+        <DialogContent className="sm:max-w-lg">
+          <div className="space-y-4 py-4">
+            <h2 className="text-2xl font-bold text-dragon-green text-center">Odlično!</h2>
+            
+            <p className="text-sm text-black text-center uppercase">
+              KLIKNI NA SPODNJE SLIKE IN PONOVI BESEDE
+            </p>
+            
+            {/* Display 4 images in a grid */}
+            <div className="flex justify-center gap-2 md:gap-4 flex-wrap">
+              {displayImages.map((image, index) => {
+                const isRecording = currentRecordingIndex === index;
+                const isCompleted = completedRecordings.has(index);
+                const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${image.filename}`;
                 
-                {isRecording && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-lg">
-                    <div className="bg-red-500 text-white rounded-full w-10 h-10 flex items-center justify-center">
-                      <Mic className="w-5 h-5" />
+                return (
+                  <div key={index} className="flex flex-col items-center space-y-1">
+                    <div 
+                      className={`cursor-pointer transition-all ${
+                        isCompleted ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'
+                      }`}
+                      onClick={() => handleImageClick(index, image.word)}
+                    >
+                      <div className="relative">
+                        <img
+                          src={imageUrl}
+                          alt={image.word}
+                          className={`w-16 h-16 md:w-20 md:h-20 object-cover rounded-lg border-2 ${
+                            isCompleted ? 'border-gray-400 grayscale' : 
+                            isRecording ? 'border-red-500' : 'border-dragon-green'
+                          }`}
+                        />
+                        
+                        {isRecording && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-lg">
+                            <div className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                              <Mic className="w-4 h-4" />
+                            </div>
+                          </div>
+                        )}
+                        
+                        {isRecording && (
+                          <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
+                            {recordingTimeLeft}
+                          </div>
+                        )}
+                      </div>
                     </div>
+                    
+                    <span className={`text-xs font-medium text-center ${
+                      isCompleted ? 'text-gray-400' : 'text-black'
+                    }`}>
+                      {image.word.toUpperCase()}
+                    </span>
+                    
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePlayAudio(image);
+                      }}
+                      size="icon"
+                      className="bg-green-500 hover:bg-green-600 text-white h-8 w-8"
+                    >
+                      <Volume2 className="w-4 h-4" />
+                    </Button>
                   </div>
-                )}
-                
-                {isRecording && (
-                  <div className="absolute -top-2 -right-2 bg-red-500 text-white text-sm rounded-full w-8 h-8 flex items-center justify-center font-bold">
-                    {recordingTimeLeft}
-                  </div>
-                )}
-              </div>
-              
-              <span className={`text-lg font-medium text-center ${
-                hasRecorded ? 'text-gray-400' : 'text-black'
-              }`}>
-                {completedImage.word.toUpperCase()}
-              </span>
+                );
+              })}
             </div>
-          </div>
 
-          {/* Audio playback button */}
-          <div className="flex justify-center">
-            <Button
-              onClick={handlePlayAudio}
-              size="icon"
-              className="bg-green-500 hover:bg-green-600 text-white h-12 w-12"
-            >
-              <Volume2 className="w-6 h-6" />
-            </Button>
-          </div>
-
-          <div className="flex justify-center gap-3">
-            {hasRecorded && (
-              <>
-                <Button onClick={handleReset} variant="outline" className="gap-2 flex-1 max-w-32">
-                  PONOVI
-                </Button>
+            <div className="flex justify-center gap-3">
+              <Button onClick={handleReset} variant="outline" className="gap-2 flex-1 max-w-32">
+                PONOVI
+              </Button>
+              
+              {allRecordingsComplete && !starClaimed && (
                 <Button 
                   onClick={handleClaimStar}
                   className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 flex-1 max-w-44"
@@ -329,23 +323,22 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
                   <Star className="w-4 h-4" />
                   VZEMI ZVEZDICO
                 </Button>
-              </>
-            )}
+              )}
+            </div>
           </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-    
-    <ConfirmDialog
-      open={showConfirmDialog}
-      onOpenChange={setShowConfirmDialog}
-      title="Zapri igro"
-      description="Če zapreš igro, ne boš prejel zvezdice. Ali si prepričan?"
-      confirmText="V redu"
-      cancelText="Prekliči"
-      onConfirm={handleConfirmClose}
-      onCancel={() => setShowConfirmDialog(false)}
-    />
-  </>
+        </DialogContent>
+      </Dialog>
+      
+      <ConfirmDialog
+        open={showConfirmDialog}
+        onOpenChange={setShowConfirmDialog}
+        title="Zapri igro"
+        description="Če zapreš igro, ne boš prejel zvezdice. Ali si prepričan?"
+        confirmText="V redu"
+        cancelText="Prekliči"
+        onConfirm={handleConfirmClose}
+        onCancel={() => setShowConfirmDialog(false)}
+      />
+    </>
   );
 };

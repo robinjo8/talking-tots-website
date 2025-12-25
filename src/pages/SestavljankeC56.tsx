@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { RotateCcw, BookOpen, ArrowLeft, Home } from "lucide-react";
+import { RotateCcw, BookOpen, ArrowLeft, Home, RefreshCw } from "lucide-react";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
 
@@ -49,6 +49,7 @@ function SestavljankeC56Content() {
   const [currentImage, setCurrentImage] = useState(getRandomCImage());
   const [menuOpen, setMenuOpen] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const [showNewGameButton, setShowNewGameButton] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { recordGameCompletion } = useEnhancedProgress();
@@ -66,12 +67,14 @@ function SestavljankeC56Content() {
 
   const handleStarClaimed = () => {
     recordGameCompletion('puzzle', 'puzzle_c_12');
+    setShowNewGameButton(true);
   };
 
   const handleNewGame = () => {
     gameCompletedRef.current = false;
     setCurrentImage(getRandomCImage());
     setPuzzleKey(prev => prev + 1);
+    setShowNewGameButton(false);
   };
 
   const handleBack = () => {
@@ -166,11 +169,23 @@ function SestavljankeC56Content() {
           </DropdownMenuContent>
         </DropdownMenu>
 
+        {/* Blue New Game button - appears after star claimed */}
+        {showNewGameButton && (
+          <Button
+            onClick={handleNewGame}
+            className="fixed bottom-4 left-24 z-50 bg-blue-500 hover:bg-blue-600 text-white gap-2 px-4 h-14 rounded-full shadow-lg"
+          >
+            <RefreshCw className="w-5 h-5" />
+            Nova igra
+          </Button>
+        )}
+
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
         <PuzzleSuccessDialog
           isOpen={showCompletion}
           onOpenChange={setShowCompletion}
           completedImage={currentImage}
+          allImages={cImages}
           onStarClaimed={handleStarClaimed}
         />
         
@@ -245,11 +260,23 @@ function SestavljankeC56Content() {
             </DropdownMenuContent>
           </DropdownMenu>
           
+          {/* Blue New Game button - appears after star claimed */}
+          {showNewGameButton && (
+            <Button
+              onClick={handleNewGame}
+              className="fixed bottom-4 left-24 z-50 bg-blue-500 hover:bg-blue-600 text-white gap-2 px-4 h-14 rounded-full shadow-lg"
+            >
+              <RefreshCw className="w-5 h-5" />
+              Nova igra
+            </Button>
+          )}
+          
           <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
           <PuzzleSuccessDialog
             isOpen={showCompletion}
             onOpenChange={setShowCompletion}
             completedImage={currentImage}
+            allImages={cImages}
             onStarClaimed={handleStarClaimed}
           />
           
