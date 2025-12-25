@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { RotateCcw, BookOpen, ArrowLeft, Home } from "lucide-react";
+import { RotateCcw, BookOpen, ArrowLeft, Home, RefreshCw } from "lucide-react";
 
 const kImages = [
   { filename: 'kapa.png', word: 'KAPA' },
@@ -46,6 +46,7 @@ function SestavljankeKContent() {
   const [showCompletion, setShowCompletion] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const [showNewGameButton, setShowNewGameButton] = useState(false);
   
   const [puzzleKey, setPuzzleKey] = useState(0);
   const [currentImage, setCurrentImage] = useState(getRandomKImage());
@@ -69,12 +70,14 @@ function SestavljankeKContent() {
 
   const handleStarClaimed = () => {
     recordGameCompletion('puzzle', 'puzzle_k_6');
+    setShowNewGameButton(true);
   };
 
   const handleNewGame = () => {
     gameCompletedRef.current = false;
     setCurrentImage(getRandomKImage());
     setPuzzleKey(prev => prev + 1);
+    setShowNewGameButton(false);
   };
 
   const handleBack = () => {
