@@ -205,10 +205,22 @@ function SestavljankeCContent() {
           onClose={() => setShowInstructions(false)}
         />
 
+        {/* Blue New Game button - appears after star claimed */}
+        {showNewGameButton && (
+          <Button
+            size="icon"
+            onClick={handleNewGame}
+            className="fixed bottom-4 left-24 z-50 bg-blue-500 hover:bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg"
+          >
+            <RefreshCw className="w-6 h-6" />
+          </Button>
+        )}
+
         <PuzzleSuccessDialog
           isOpen={showCompletion}
           onOpenChange={setShowCompletion}
           completedImage={currentImage}
+          allImages={cImages}
           onStarClaimed={handleStarClaimed}
         />
       </div>
@@ -293,10 +305,22 @@ function SestavljankeCContent() {
           onClose={() => setShowInstructions(false)}
         />
 
+        {/* Blue New Game button - appears after star claimed */}
+        {showNewGameButton && (
+          <Button
+            size="icon"
+            onClick={handleNewGame}
+            className="fixed bottom-4 left-24 z-50 bg-blue-500 hover:bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg"
+          >
+            <RefreshCw className="w-6 h-6" />
+          </Button>
+        )}
+
         <PuzzleSuccessDialog
           isOpen={showCompletion}
           onOpenChange={setShowCompletion}
           completedImage={currentImage}
+          allImages={cImages}
           onStarClaimed={handleStarClaimed}
         />
       </div>
