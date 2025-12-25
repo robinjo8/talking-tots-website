@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { Home } from "lucide-react";
+import { Home, RefreshCw } from "lucide-react";
 
 const šImages = [
   { filename: 'sah.png', word: 'ŠAH' },
@@ -46,6 +46,7 @@ function SestavljankeŠContent() {
   const [showCompletion, setShowCompletion] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const [showNewGameButton, setShowNewGameButton] = useState(false);
   
   const [puzzleKey, setPuzzleKey] = useState(0);
   const [currentImage, setCurrentImage] = useState(getRandomŠImage());
@@ -69,12 +70,14 @@ function SestavljankeŠContent() {
 
   const handleStarClaimed = () => {
     recordGameCompletion('puzzle', 'puzzle_š_6');
+    setShowNewGameButton(true);
   };
 
   const handleNewGame = () => {
     gameCompletedRef.current = false;
     setCurrentImage(getRandomŠImage());
     setPuzzleKey(prev => prev + 1);
+    setShowNewGameButton(false);
   };
 
   const handleBack = () => {
@@ -208,10 +211,22 @@ function SestavljankeŠContent() {
           onClose={() => setShowInstructions(false)}
         />
 
+        {/* Blue New Game button - appears after star claimed */}
+        {showNewGameButton && (
+          <Button
+            size="icon"
+            onClick={handleNewGame}
+            className="fixed bottom-4 left-24 z-50 bg-blue-500 hover:bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg"
+          >
+            <RefreshCw className="w-6 h-6" />
+          </Button>
+        )}
+
         <PuzzleSuccessDialog
           isOpen={showCompletion}
           onOpenChange={setShowCompletion}
           completedImage={currentImage}
+          allImages={šImages}
           onStarClaimed={handleStarClaimed}
         />
       </div>
@@ -301,10 +316,22 @@ function SestavljankeŠContent() {
           onClose={() => setShowInstructions(false)}
         />
 
+        {/* Blue New Game button - appears after star claimed */}
+        {showNewGameButton && (
+          <Button
+            size="icon"
+            onClick={handleNewGame}
+            className="fixed bottom-4 left-24 z-50 bg-blue-500 hover:bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg"
+          >
+            <RefreshCw className="w-6 h-6" />
+          </Button>
+        )}
+
         <PuzzleSuccessDialog
           isOpen={showCompletion}
           onOpenChange={setShowCompletion}
           completedImage={currentImage}
+          allImages={šImages}
           onStarClaimed={handleStarClaimed}
         />
       </div>
