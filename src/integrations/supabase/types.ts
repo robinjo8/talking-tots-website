@@ -341,6 +341,30 @@ export type Database = {
         }
         Relationships: []
       }
+      memory_cards_r: {
+        Row: {
+          audio_url: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          word: string | null
+        }
+        Insert: {
+          audio_url?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          word?: string | null
+        }
+        Update: {
+          audio_url?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          word?: string | null
+        }
+        Relationships: []
+      }
       memory_cards_S: {
         Row: {
           audio_url: string | null
