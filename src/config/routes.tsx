@@ -147,6 +147,7 @@ import ZaporedjaS56 from "@/pages/ZaporedjaS56";
 import ZaporedjaŠ56 from "@/pages/ZaporedjaŠ56";
 import ZaporedjaZ56 from "@/pages/ZaporedjaZ56";
 import ZaporedjaŽ56 from "@/pages/ZaporedjaŽ56";
+import ZaporedjaC78 from "@/pages/ZaporedjaC78";
 import IgraUjemanjaC from "@/pages/IgraUjemanjaC";
 import IgraUjemanjaC56 from "@/pages/IgraUjemanjaC56";
 import IgraUjemanjaC78 from "@/pages/IgraUjemanjaC78";
@@ -1256,6 +1257,14 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <ZaporedjaC56 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/c78"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaC78 />
           </ProtectedRoute>
         }
       />
