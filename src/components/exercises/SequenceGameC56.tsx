@@ -34,15 +34,15 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
     }
   });
 
-  // Target sequence (5 correct images)
+  // Target sequence (4 correct images)
   const [targetSequence, setTargetSequence] = useState<SequenceImage[]>([]);
-  // All 10 images for selection dialog
+  // All 8 images for selection dialog
   const [selectionImages, setSelectionImages] = useState<SequenceImage[]>([]);
   
   // Game state
   const [gamePhase, setGamePhase] = useState<GamePhase>("memorize");
   const [countdown, setCountdown] = useState(10);
-  const [placedImages, setPlacedImages] = useState<(SequenceImage | null)[]>([null, null, null, null, null]);
+  const [placedImages, setPlacedImages] = useState<(SequenceImage | null)[]>([null, null, null, null]);
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const [isComplete, setIsComplete] = useState(false);
   const [gameCompletedTriggered, setGameCompletedTriggered] = useState(false);
@@ -53,17 +53,17 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
   // Window size for responsive layout
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
 
-  // Initialize game with 5 target + 5 extra images
+  // Initialize game with 4 target + 4 extra images
   useEffect(() => {
-    if (!allImages || allImages.length < 10) return;
+    if (!allImages || allImages.length < 8) return;
     if (targetSequence.length > 0) return; // Already initialized
 
     const shuffled = [...allImages].sort(() => Math.random() - 0.5);
-    const target = shuffled.slice(0, 5);
-    const extraImages = shuffled.slice(5, 10);
+    const target = shuffled.slice(0, 4);
+    const extraImages = shuffled.slice(4, 8);
     
     setTargetSequence(target);
-    // Shuffle all 10 for selection dialog
+    // Shuffle all 8 for selection dialog
     setSelectionImages([...target, ...extraImages].sort(() => Math.random() - 0.5));
   }, [allImages, targetSequence.length]);
 
@@ -191,7 +191,7 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
   // Handle moving images in arrange phase
   const handleMoveImage = (fromIndex: number, direction: "left" | "right") => {
     const toIndex = direction === "left" ? fromIndex - 1 : fromIndex + 1;
-    if (toIndex < 0 || toIndex > 4) return;
+    if (toIndex < 0 || toIndex > 3) return;
     
     setPlacedImages(prev => {
       const newPlaced = [...prev];
@@ -210,7 +210,7 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
   // Calculate item size for mobile
   const itemSize = useMemo(() => {
     if (!isLandscape || windowSize.width === 0) return undefined;
-    const columns = 5;
+    const columns = 4;
     const rows = 2;
     const gap = 8;
     const PADDING = 8;
@@ -225,7 +225,7 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
     return Math.floor(Math.min(sizeByWidth, sizeByHeight) * 0.85);
   }, [isLandscape, windowSize]);
 
-  const gridWidth = itemSize ? 5 * itemSize + 8 * 4 : 0;
+  const gridWidth = itemSize ? 4 * itemSize + 8 * 3 : 0;
 
   // Get border color class based on status
   const getSlotBorderClass = (status: SlotStatus) => {
@@ -274,7 +274,7 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
         </div>
         
         <div 
-          className={`bg-white/20 backdrop-blur-sm rounded-xl border-2 border-gray-400/50 ${isLandscape ? 'flex justify-center gap-2 p-2 mt-1' : 'grid grid-cols-5 gap-1.5 md:gap-4 p-2 md:p-6 mt-1 md:mt-2'}`}
+          className={`bg-white/20 backdrop-blur-sm rounded-xl border-2 border-gray-400/50 ${isLandscape ? 'flex justify-center gap-2 p-2 mt-1' : 'grid grid-cols-4 gap-1.5 md:gap-4 p-2 md:p-6 mt-1 md:mt-2'}`}
           style={isLandscape && itemSize ? { width: gridWidth } : {}}
         >
           {targetSequence.map((image, index) => (
@@ -358,7 +358,7 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
             </h3>
             {!isLandscape && (
               <p className="text-xs md:text-base text-white/90 drop-shadow uppercase">
-                IZBERI 5 PRAVILNIH SLIK
+                IZBERI 4 PRAVILNE SLIKE
               </p>
             )}
           </>
@@ -370,7 +370,7 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
         <div 
           className={cn(
             "backdrop-blur-sm rounded-xl border-3 transition-all duration-300",
-            isLandscape ? 'flex justify-center gap-2 p-2' : 'grid grid-cols-5 gap-1.5 md:gap-4 p-2 md:p-6',
+            isLandscape ? 'flex justify-center gap-2 p-2' : 'grid grid-cols-4 gap-1.5 md:gap-4 p-2 md:p-6',
             gamePhase !== "memorize" && !isComplete && "animate-glow-border",
             "bg-white/30 border-orange-400"
           )}
@@ -413,10 +413,10 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
                           </button>
                           <button
                             onClick={() => handleMoveImage(index, "right")}
-                            disabled={index === 4 || isComplete}
+                            disabled={index === 3 || isComplete}
                             className={cn(
                               "p-1 rounded-full bg-orange-500 text-white shadow-md transition-opacity",
-                              index === 4 ? "opacity-30" : "hover:bg-orange-600"
+                              index === 3 ? "opacity-30" : "hover:bg-orange-600"
                             )}
                           >
                             <ArrowRight className="w-4 h-4" />

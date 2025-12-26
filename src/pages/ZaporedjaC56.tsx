@@ -298,7 +298,7 @@ export default function ZaporedjaC56() {
       >
         <div className="min-h-full flex flex-col items-center justify-center p-4 pb-24">
           <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 md:mb-8 text-center drop-shadow-lg">
-            ZAPOREDJA - C (5-6)
+            ZAPOREDJA - C
           </h1>
           
           <SequenceGameC56 
