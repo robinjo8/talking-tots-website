@@ -265,7 +265,7 @@ export const SequenceGameBase = ({
       >
         <div className="flex flex-col items-center justify-center min-h-[400px] gap-6">
           <h3 className={`font-bold text-white drop-shadow-lg uppercase text-center ${isLandscape ? 'text-xl' : 'text-2xl md:text-4xl'}`}>
-            PRIPRAVLJEN?
+            PRIPRAVI SE NA IGRO ZAPOREDJA!
           </h3>
           <div className="bg-white/20 backdrop-blur-sm rounded-full w-32 h-32 md:w-40 md:h-40 flex items-center justify-center border-4 border-red-400 shadow-[0_0_30px_rgba(239,68,68,0.5)]">
             <span className="text-6xl md:text-8xl font-bold text-red-500 drop-shadow-lg animate-pulse">{preCountdown}</span>

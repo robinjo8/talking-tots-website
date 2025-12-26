@@ -235,8 +235,8 @@ export const SequenceGame56Base = ({ onGameComplete, isLandscape = false, tableN
   if (gamePhase === "pre-countdown") {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-6">
-        <h3 className="text-xl md:text-3xl font-bold text-white drop-shadow-lg uppercase">
-          PRIPRAVLJEN?
+        <h3 className="text-xl md:text-3xl font-bold text-white drop-shadow-lg uppercase text-center">
+          PRIPRAVI SE NA IGRO ZAPOREDJA!
         </h3>
         <div className="bg-white/20 backdrop-blur-sm rounded-full w-24 h-24 md:w-32 md:h-32 flex items-center justify-center border-4 border-red-400/50">
           <span className="text-5xl md:text-7xl font-bold text-red-500 drop-shadow-lg">{preCountdown}</span>

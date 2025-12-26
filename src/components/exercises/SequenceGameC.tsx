@@ -134,8 +134,8 @@ export const SequenceGameC = ({ onGameComplete, isLandscape = false }: SequenceG
   if (gamePhase === "pre-countdown") {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <h3 className="text-xl md:text-3xl font-bold text-white drop-shadow-lg uppercase">
-          PRIPRAVLJEN?
+        <h3 className="text-xl md:text-3xl font-bold text-white drop-shadow-lg uppercase text-center">
+          PRIPRAVI SE NA IGRO ZAPOREDJA!
         </h3>
         <div className="text-6xl md:text-8xl font-bold text-red-500 drop-shadow-lg animate-pulse">
           {preCountdown}
