@@ -139,6 +139,14 @@ import ZaporedjaŠ from "@/pages/ZaporedjaŠ";
 import ZaporedjaZ from "@/pages/ZaporedjaZ";
 import ZaporedjaŽ from "@/pages/ZaporedjaŽ";
 import ZaporedjaC56 from "@/pages/ZaporedjaC56";
+import ZaporedjaČ56 from "@/pages/ZaporedjaČ56";
+import ZaporedjaK56 from "@/pages/ZaporedjaK56";
+import ZaporedjaL56 from "@/pages/ZaporedjaL56";
+import ZaporedjaR56 from "@/pages/ZaporedjaR56";
+import ZaporedjaS56 from "@/pages/ZaporedjaS56";
+import ZaporedjaŠ56 from "@/pages/ZaporedjaŠ56";
+import ZaporedjaZ56 from "@/pages/ZaporedjaZ56";
+import ZaporedjaŽ56 from "@/pages/ZaporedjaŽ56";
 import IgraUjemanjaC from "@/pages/IgraUjemanjaC";
 import IgraUjemanjaC56 from "@/pages/IgraUjemanjaC56";
 import IgraUjemanjaC78 from "@/pages/IgraUjemanjaC78";
@@ -1248,6 +1256,70 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <ZaporedjaC56 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/č56"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaČ56 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/k56"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaK56 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/l56"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaL56 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/r56"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaR56 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/s56"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaS56 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/š56"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaŠ56 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/z56"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaZ56 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/ž56"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaŽ56 />
           </ProtectedRoute>
         }
       />
