@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 
 export interface SequenceGameConfig {
   imageCount: number;       // Number of images to guess (3-4 for 56, 5 for 78)
+  preCountdownSeconds?: number; // Pre-game countdown (red number, no images shown)
   countdownSeconds: number; // Memorize phase duration (10 for 56, 7 for 78)
   helpAttempts: number;     // Number of help uses (3 for 56, 2 for 78)
   helpDuration: number;     // How long help shows (5 seconds)
@@ -22,7 +23,7 @@ interface SequenceGameBaseProps {
   config: SequenceGameConfig;
 }
 
-type GamePhase = "memorize" | "select" | "arrange";
+type GamePhase = "pre-countdown" | "memorize" | "select" | "arrange";
 type SlotStatus = "empty" | "correct" | "wrong-position" | "wrong";
 
 export const SequenceGameBase = ({ 
@@ -32,7 +33,7 @@ export const SequenceGameBase = ({
   queryKey,
   config 
 }: SequenceGameBaseProps) => {
-  const { imageCount, countdownSeconds, helpAttempts, helpDuration } = config;
+  const { imageCount, preCountdownSeconds, countdownSeconds, helpAttempts, helpDuration } = config;
   const extraImageCount = Math.min(imageCount, 5); // Extra images for selection
 
   const { data: allImages, isLoading } = useQuery({
@@ -54,7 +55,8 @@ export const SequenceGameBase = ({
 
   const [targetSequence, setTargetSequence] = useState<SequenceImage[]>([]);
   const [selectionImages, setSelectionImages] = useState<SequenceImage[]>([]);
-  const [gamePhase, setGamePhase] = useState<GamePhase>("memorize");
+  const [gamePhase, setGamePhase] = useState<GamePhase>(preCountdownSeconds ? "pre-countdown" : "memorize");
+  const [preCountdown, setPreCountdown] = useState(preCountdownSeconds || 0);
   const [countdown, setCountdown] = useState(countdownSeconds);
   const [placedImages, setPlacedImages] = useState<(SequenceImage | null)[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
@@ -99,6 +101,18 @@ export const SequenceGameBase = ({
     };
   }, []);
 
+  // Pre-countdown timer (red countdown before game starts)
+  useEffect(() => {
+    if (gamePhase !== "pre-countdown" || targetSequence.length === 0) return;
+    if (preCountdown <= 0) {
+      setGamePhase("memorize");
+      return;
+    }
+    const timer = setTimeout(() => setPreCountdown(prev => prev - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [preCountdown, gamePhase, targetSequence]);
+
+  // Memorize phase countdown
   useEffect(() => {
     if (gamePhase !== "memorize" || targetSequence.length === 0) return;
     if (countdown <= 0) {
@@ -239,7 +253,30 @@ export const SequenceGameBase = ({
   if (isLandscape && !itemSize) return null;
 
   const showTargetRow = gamePhase === "memorize" || showHelp;
+  const showPreCountdown = gamePhase === "pre-countdown";
   const gridColsClass = `grid-cols-${imageCount}`;
+
+  // Pre-countdown phase - show only red countdown number
+  if (showPreCountdown) {
+    return (
+      <div 
+        className={`w-full mx-auto ${isLandscape ? 'h-full flex flex-col items-center justify-center' : 'max-w-5xl px-2 md:px-0'}`}
+        style={{ touchAction: 'none' }}
+      >
+        <div className="flex flex-col items-center justify-center min-h-[400px] gap-6">
+          <h3 className={`font-bold text-white drop-shadow-lg uppercase text-center ${isLandscape ? 'text-xl' : 'text-2xl md:text-4xl'}`}>
+            PRIPRAVLJEN?
+          </h3>
+          <div className="bg-white/20 backdrop-blur-sm rounded-full w-32 h-32 md:w-40 md:h-40 flex items-center justify-center border-4 border-red-400 shadow-[0_0_30px_rgba(239,68,68,0.5)]">
+            <span className="text-6xl md:text-8xl font-bold text-red-500 drop-shadow-lg animate-pulse">{preCountdown}</span>
+          </div>
+          <p className={`text-white/80 drop-shadow uppercase ${isLandscape ? 'text-sm' : 'text-base md:text-xl'}`}>
+            IGRA SE KMALU ZAČNE...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 
@@ -336,7 +373,7 @@ export const SequenceGameBase = ({
               </p>
             )}
           </>
-        ) : (
+        ) : gamePhase === "select" ? (
           <>
             <h3 className={`font-bold text-white drop-shadow-lg uppercase ${isLandscape ? 'text-sm mb-0' : 'text-base md:text-2xl mb-0.5 md:mb-2'}`}>
               KLIKNI NA POLJE IN IZBERI PRAVILNO SLIKO
@@ -347,7 +384,7 @@ export const SequenceGameBase = ({
               </p>
             )}
           </>
-        )}
+        ) : null}
       </div>
 
       {/* Bottom Row - Clickable slots */}

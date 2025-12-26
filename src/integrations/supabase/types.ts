@@ -556,7 +556,14 @@ export type Database = {
             columns: ["child_id"]
             isOneToOne: false
             referencedRelation: "children_analytics"
-            referencedColumns: ["id"]
+            referencedColumns: ["child_id"]
+          },
+          {
+            foreignKeyName: "progress_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children_analytics_admin"
+            referencedColumns: ["child_id"]
           },
           {
             foreignKeyName: "progress_exercise_id_fkey"
@@ -652,31 +659,23 @@ export type Database = {
     Views: {
       children_analytics: {
         Row: {
-          age_years: number | null
-          created_at: string | null
-          difficulties_count: number | null
-          gender: string | null
-          has_development_data: string | null
-          id: string | null
-          updated_at: string | null
+          avg_score: number | null
+          child_id: string | null
+          child_name: string | null
+          last_activity_at: string | null
+          sessions_count: number | null
+          stars_total: number | null
         }
-        Insert: {
-          age_years?: never
-          created_at?: string | null
-          difficulties_count?: never
-          gender?: string | null
-          has_development_data?: never
-          id?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          age_years?: never
-          created_at?: string | null
-          difficulties_count?: never
-          gender?: string | null
-          has_development_data?: never
-          id?: string | null
-          updated_at?: string | null
+        Relationships: []
+      }
+      children_analytics_admin: {
+        Row: {
+          avg_score: number | null
+          child_id: string | null
+          child_name: string | null
+          last_activity_at: string | null
+          sessions_count: number | null
+          stars_total: number | null
         }
         Relationships: []
       }
@@ -697,6 +696,23 @@ export type Database = {
         Returns: number
       }
       get_child_total_stars: { Args: { child_uuid: string }; Returns: number }
+      get_children_analytics: {
+        Args: never
+        Returns: {
+          avg_score: number | null
+          child_id: string | null
+          child_name: string | null
+          last_activity_at: string | null
+          sessions_count: number | null
+          stars_total: number | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "children_analytics"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       grant_admin_role: {
         Args: {
           p_expires_at?: string
