@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { SequenceGameC56 } from "@/components/exercises/SequenceGameC56";
-import { MatchingInstructionsModal } from "@/components/matching/MatchingInstructionsModal";
+import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { useState, useRef, useEffect } from "react";
@@ -249,9 +249,10 @@ export default function ZaporedjaC56() {
             )}
           </div>
 
-          <MatchingInstructionsModal
+          <InstructionsModal
             isOpen={showInstructions}
             onClose={() => setShowInstructions(false)}
+            type="sequence"
           />
           
           <MatchingCompletionDialog
@@ -356,9 +357,10 @@ export default function ZaporedjaC56() {
           )}
         </div>
         
-        <MatchingInstructionsModal
+        <InstructionsModal
           isOpen={showInstructions}
           onClose={() => setShowInstructions(false)}
+          type="sequence"
         />
         
         <MatchingCompletionDialog
