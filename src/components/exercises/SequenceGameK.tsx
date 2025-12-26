@@ -3,6 +3,9 @@ import { useSequenceGame } from "@/hooks/useSequenceGame";
 import { SequenceItem } from "./SequenceItem";
 import { Loader2 } from "lucide-react";
 
+const PRE_COUNTDOWN_SECONDS = 5;
+type GamePhase = "pre-countdown" | "playing";
+
 interface SequenceGameKProps {
   onGameComplete: (images: any[]) => void;
   isLandscape?: boolean;
@@ -12,6 +15,8 @@ export const SequenceGameK = ({ onGameComplete, isLandscape = false }: SequenceG
   const { targetSequence, currentSequence, isComplete, isLoading, moveItem } = useSequenceGame("memory_cards_K", 4);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [gameCompletedTriggered, setGameCompletedTriggered] = useState(false);
+  const [gamePhase, setGamePhase] = useState<GamePhase>("pre-countdown");
+  const [preCountdown, setPreCountdown] = useState(PRE_COUNTDOWN_SECONDS);
   
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
 
@@ -29,6 +34,19 @@ export const SequenceGameK = ({ onGameComplete, isLandscape = false }: SequenceG
       setGameCompletedTriggered(false);
     }
   }, [isComplete]);
+
+  // Pre-countdown phase
+  useEffect(() => {
+    if (gamePhase !== "pre-countdown" || targetSequence.length === 0) return;
+    
+    if (preCountdown <= 0) {
+      setGamePhase("playing");
+      return;
+    }
+    
+    const timer = setTimeout(() => setPreCountdown(prev => prev - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [preCountdown, gamePhase, targetSequence]);
 
   useEffect(() => {
     const updateSize = () => {
@@ -101,6 +119,20 @@ export const SequenceGameK = ({ onGameComplete, isLandscape = false }: SequenceG
 
   if (isLandscape && !itemSize) {
     return null;
+  }
+
+  // Pre-countdown phase - show red countdown only
+  if (gamePhase === "pre-countdown") {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <h3 className="text-xl md:text-3xl font-bold text-white drop-shadow-lg uppercase">
+          PRIPRAVLJEN?
+        </h3>
+        <div className="text-6xl md:text-8xl font-bold text-red-500 drop-shadow-lg animate-pulse">
+          {preCountdown}
+        </div>
+      </div>
+    );
   }
 
   return (

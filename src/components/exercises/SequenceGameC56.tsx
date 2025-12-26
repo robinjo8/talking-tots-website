@@ -12,7 +12,8 @@ interface SequenceGameC56Props {
   isLandscape?: boolean;
 }
 
-type GamePhase = "memorize" | "select" | "arrange";
+type GamePhase = "pre-countdown" | "memorize" | "select" | "arrange";
+const PRE_COUNTDOWN_SECONDS = 5;
 type SlotStatus = "empty" | "correct" | "wrong-position" | "wrong";
 
 export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: SequenceGameC56Props) => {
@@ -40,7 +41,8 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
   const [selectionImages, setSelectionImages] = useState<SequenceImage[]>([]);
   
   // Game state
-  const [gamePhase, setGamePhase] = useState<GamePhase>("memorize");
+  const [gamePhase, setGamePhase] = useState<GamePhase>("pre-countdown");
+  const [preCountdown, setPreCountdown] = useState(PRE_COUNTDOWN_SECONDS);
   const [countdown, setCountdown] = useState(10);
   const [placedImages, setPlacedImages] = useState<(SequenceImage | null)[]>([null, null, null, null]);
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
@@ -48,7 +50,7 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
   const [gameCompletedTriggered, setGameCompletedTriggered] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [helpCountdown, setHelpCountdown] = useState(5);
-  const [helpUsesLeft, setHelpUsesLeft] = useState(3);
+  const [helpUsesLeft, setHelpUsesLeft] = useState(1);
   
   // Window size for responsive layout
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
@@ -80,6 +82,19 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
       window.removeEventListener('orientationchange', () => setTimeout(updateSize, 100));
     };
   }, []);
+
+  // Pre-countdown phase (5 seconds before showing images)
+  useEffect(() => {
+    if (gamePhase !== "pre-countdown" || targetSequence.length === 0) return;
+    
+    if (preCountdown <= 0) {
+      setGamePhase("memorize");
+      return;
+    }
+    
+    const timer = setTimeout(() => setPreCountdown(prev => prev - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [preCountdown, gamePhase, targetSequence]);
 
   // Memorize phase countdown
   useEffect(() => {
@@ -256,6 +271,20 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
   if (isLandscape && !itemSize) return null;
 
   const showTargetRow = gamePhase === "memorize" || showHelp;
+
+  // Pre-countdown phase - show red countdown only
+  if (gamePhase === "pre-countdown") {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <h3 className="text-xl md:text-3xl font-bold text-white drop-shadow-lg uppercase">
+          PRIPRAVLJEN?
+        </h3>
+        <div className="text-6xl md:text-8xl font-bold text-red-500 drop-shadow-lg animate-pulse">
+          {preCountdown}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 
