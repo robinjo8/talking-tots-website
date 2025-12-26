@@ -25,6 +25,7 @@ const zImages = [
   { filename: 'zob.png', word: 'ZOB' },
   { filename: 'zobotrebec.png', word: 'ZOBOTREBEC' },
   { filename: 'zvezda.png', word: 'ZVEZDA' },
+  { filename: 'zvezek.png', word: 'ZVEZEK' },
   { filename: 'zvocnik.png', word: 'ZVOČNIK' }
 ];
 
