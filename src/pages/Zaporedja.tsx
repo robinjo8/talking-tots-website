@@ -10,6 +10,7 @@ import { FooterSection } from "@/components/FooterSection";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { getAgeGroup } from "@/utils/ageUtils";
 
 const sequenceGames = [
   {
@@ -114,6 +115,20 @@ export default function Zaporedja() {
   const handleCardClick = (game: typeof sequenceGames[0]) => {
     if (!game.available) return;
     
+    // Get child's age group for routing
+    const childAge = selectedChild?.age;
+    const ageGroup = childAge ? getAgeGroup(childAge) : '3-4';
+    
+    // Map age groups to route suffixes
+    const ageSuffixMap: Record<string, string> = {
+      '3-4': '',
+      '5-6': '56',
+      '7-8': '78',
+      '9-10': '910'
+    };
+    
+    const suffix = ageSuffixMap[ageGroup] || '';
+    
     const letterMap: Record<string, string> = {
       'C': '/govorne-igre/zaporedja/c',
       'Č': '/govorne-igre/zaporedja/č',
@@ -126,9 +141,9 @@ export default function Zaporedja() {
       'Ž': '/govorne-igre/zaporedja/ž'
     };
     
-    const path = letterMap[game.letter];
-    if (path) {
-      navigate(path);
+    const basePath = letterMap[game.letter];
+    if (basePath) {
+      navigate(basePath + suffix);
     }
   };
 
