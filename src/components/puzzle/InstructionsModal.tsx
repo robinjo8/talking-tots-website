@@ -20,7 +20,7 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
 }) => {
   const content: InstructionItem[] = type === "sequence"
     ? [
-        { text: "Na začetku se prikaže 5 slik za 10 sekund. Zapomni si vrstni red!" },
+        { text: "Na začetku se prikažejo 4 slike za 10 sekund. Zapomni si vrstni red!" },
         { text: "Ko se čas izteče, slike izginejo. Klikni na prazno polje in izberi pravilno sliko." },
         { text: "Slike se obarvajo glede na pravilnost:" },
         { text: "Pravilna slika na pravem mestu", icon: "green" },

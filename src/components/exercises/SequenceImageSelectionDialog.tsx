@@ -30,8 +30,8 @@ export const SequenceImageSelectionDialog = ({
           KATERA SLIKA SPADA NA MESTO {slotIndex + 1}?
         </p>
         
-        {/* 5x2 grid for 10 images */}
-        <div className="grid grid-cols-5 gap-2 sm:gap-3">
+        {/* 4x2 grid for 8 images */}
+        <div className="grid grid-cols-4 gap-2 sm:gap-3">
           {images.map((image) => (
             <button
               key={image.id}
