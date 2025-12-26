@@ -1,4 +1,4 @@
-import { SequenceGame56Base } from "./SequenceGame56Base";
+import { SequenceGame56StorageBase } from "./SequenceGame56StorageBase";
 
 interface SequenceGameZ56Props {
   onGameComplete: (images: any[]) => void;
@@ -7,11 +7,10 @@ interface SequenceGameZ56Props {
 
 export const SequenceGameZ56 = ({ onGameComplete, isLandscape = false }: SequenceGameZ56Props) => {
   return (
-    <SequenceGame56Base
+    <SequenceGame56StorageBase
       onGameComplete={onGameComplete}
       isLandscape={isLandscape}
-      tableName="memory_cards_z"
-      queryKey="memory_cards_z"
+      letter="Z"
     />
   );
 };
