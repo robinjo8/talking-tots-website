@@ -30,8 +30,11 @@ export const SequenceImageSelectionDialog = ({
           KATERA SLIKA SPADA NA MESTO {slotIndex + 1}?
         </p>
         
-        {/* 4x2 grid for 8 images */}
-        <div className="grid grid-cols-4 gap-2 sm:gap-3">
+        {/* Dynamic grid: 5 columns for 10 images (78 games), 4 columns for 8 images (56 games) */}
+        <div className={cn(
+          "grid gap-2 sm:gap-3",
+          images.length >= 10 ? "grid-cols-5" : "grid-cols-4"
+        )}>
           {images.map((image) => (
             <button
               key={image.id}
