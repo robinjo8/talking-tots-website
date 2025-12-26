@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SequenceImage } from "@/hooks/useSequenceGame";
 import { SequenceImageSelectionDialog } from "./SequenceImageSelectionDialog";
-import { Loader2, EyeOff, ArrowLeft, ArrowRight } from "lucide-react";
+import { Loader2, Eye, EyeOff, ArrowLeft, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -443,21 +443,19 @@ export const SequenceGameBase = ({
         </div>
       </div>
 
-      {/* Help button */}
-      {gamePhase !== "memorize" && !isComplete && (
-        <div className={`flex justify-center ${isLandscape ? 'mt-1' : 'mt-2 md:mt-4'}`}>
+      {/* Help button - styled like C56 */}
+      {(gamePhase === "select" || gamePhase === "arrange") && !isComplete && helpUsesLeft > 0 && (
+        <div className="fixed bottom-4 right-4 z-40">
           <Button
             onClick={handleHelp}
-            disabled={helpUsesLeft <= 0 || showHelp}
-            variant="outline"
-            className={cn(
-              "bg-white/20 border-white/40 text-white hover:bg-white/30",
-              isLandscape ? 'px-3 py-1 text-xs' : 'px-4 py-2',
-              (helpUsesLeft <= 0 || showHelp) && "opacity-50 cursor-not-allowed"
-            )}
+            disabled={showHelp}
+            className="rounded-full w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 shadow-lg border-2 border-white/50 relative"
+            size="icon"
           >
-            <span className={isLandscape ? 'text-base mr-1' : 'text-lg mr-2'}>👁️</span>
-            POMOČ ({helpUsesLeft})
+            <Eye className="h-6 w-6 text-white" />
+            <span className="absolute -top-1 -right-1 bg-white text-purple-700 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+              {helpUsesLeft}
+            </span>
           </Button>
         </div>
       )}
