@@ -1,20 +1,22 @@
-import { SequenceGame34StorageBase } from "./SequenceGame34StorageBase";
+import { useState, useEffect, useMemo } from "react";
+import { useSequenceGameStorage, SequenceStorageImage } from "@/hooks/useSequenceGameStorage";
+import { SequenceItem } from "./SequenceItem";
+import { Loader2 } from "lucide-react";
 
-interface SequenceGameČProps {
+interface SequenceGame34StorageBaseProps {
   onGameComplete: (images: any[]) => void;
   isLandscape?: boolean;
+  letter: string;
+  imageCount?: number;
 }
 
-export const SequenceGameČ = ({ onGameComplete, isLandscape = false }: SequenceGameČProps) => {
-  return (
-    <SequenceGame34StorageBase
-      onGameComplete={onGameComplete}
-      isLandscape={isLandscape}
-      letter="Č"
-      imageCount={4}
-    />
-  );
-};
+export const SequenceGame34StorageBase = ({ 
+  onGameComplete, 
+  isLandscape = false, 
+  letter,
+  imageCount = 4
+}: SequenceGame34StorageBaseProps) => {
+  const { targetSequence, currentSequence, isComplete, isLoading, moveItem } = useSequenceGameStorage(letter, imageCount);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [gameCompletedTriggered, setGameCompletedTriggered] = useState(false);
   
@@ -60,7 +62,7 @@ export const SequenceGameČ = ({ onGameComplete, isLandscape = false }: Sequence
       return undefined;
     }
 
-    const columns = 4;
+    const columns = imageCount;
     const rows = 2;
     const gap = 8;
     const PADDING = 8;
@@ -73,9 +75,9 @@ export const SequenceGameČ = ({ onGameComplete, isLandscape = false }: Sequence
     const sizeByHeight = Math.floor((availableHeight - gap * (rows - 1)) / rows);
     
     return Math.floor(Math.min(sizeByWidth, sizeByHeight) * 0.92);
-  }, [isLandscape, windowSize]);
+  }, [isLandscape, windowSize, imageCount]);
 
-  const gridWidth = itemSize ? 4 * itemSize + 8 * 3 : 0;
+  const gridWidth = itemSize ? imageCount * itemSize + 8 * (imageCount - 1) : 0;
 
   const handleDragStart = (index: number) => {
     setDraggedIndex(index);
@@ -123,13 +125,13 @@ export const SequenceGameČ = ({ onGameComplete, isLandscape = false }: Sequence
           </div>
         </div>
         <div 
-          className={`bg-white/20 backdrop-blur-sm rounded-xl border-2 border-gray-400/50 ${isLandscape ? 'flex justify-center gap-2 p-2 mt-1' : 'grid grid-cols-4 gap-1.5 md:gap-4 p-2 md:p-6 mt-1 md:mt-2'}`}
-          style={isLandscape && itemSize ? { width: gridWidth } : {}}
+          className={`bg-white/20 backdrop-blur-sm rounded-xl border-2 border-gray-400/50 ${isLandscape ? 'flex justify-center gap-2 p-2 mt-1' : 'grid gap-1.5 md:gap-4 p-2 md:p-6 mt-1 md:mt-2'}`}
+          style={isLandscape && itemSize ? { width: gridWidth } : { gridTemplateColumns: `repeat(${imageCount}, minmax(0, 1fr))` }}
         >
           {targetSequence.map((image, index) => (
             <SequenceItem
               key={`target-${image.id}`}
-              image={image}
+              image={image as any}
               index={index}
               isDraggable={false}
               isTarget={true}
@@ -152,13 +154,13 @@ export const SequenceGameČ = ({ onGameComplete, isLandscape = false }: Sequence
 
       <div className="relative">
         <div 
-          className={`bg-white/30 backdrop-blur-sm rounded-xl border-3 border-orange-400 animate-[pulse-border_2s_ease-in-out_infinite] ${isLandscape ? 'flex justify-center gap-2 p-2' : 'grid grid-cols-4 gap-1.5 md:gap-4 p-2 md:p-6'}`}
-          style={isLandscape && itemSize ? { width: gridWidth } : {}}
+          className={`bg-white/30 backdrop-blur-sm rounded-xl border-3 border-orange-400 animate-[pulse-border_2s_ease-in-out_infinite] ${isLandscape ? 'flex justify-center gap-2 p-2' : 'grid gap-1.5 md:gap-4 p-2 md:p-6'}`}
+          style={isLandscape && itemSize ? { width: gridWidth } : { gridTemplateColumns: `repeat(${imageCount}, minmax(0, 1fr))` }}
         >
           {currentSequence.map((image, index) => (
             <SequenceItem
               key={`current-${image.id}-${index}`}
-              image={image}
+              image={image as any}
               index={index}
               isDraggable={!isComplete}
               isTarget={false}
