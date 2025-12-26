@@ -1,7 +1,9 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { useSequenceGame, SequenceImage } from "@/hooks/useSequenceGame";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { SequenceImage } from "@/hooks/useSequenceGame";
 import { SequenceImageSelectionDialog } from "./SequenceImageSelectionDialog";
-import { Loader2, Eye, EyeOff } from "lucide-react";
+import { Loader2, Eye, EyeOff, ArrowLeft, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -10,10 +12,32 @@ interface SequenceGameC56Props {
   isLandscape?: boolean;
 }
 
-type GamePhase = "memorize" | "play";
+type GamePhase = "memorize" | "select" | "arrange";
+type SlotStatus = "empty" | "correct" | "wrong-position" | "wrong";
 
 export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: SequenceGameC56Props) => {
-  const { targetSequence, isLoading, resetGame } = useSequenceGame("memory_cards_c", 4);
+  // Fetch 8 images for selection
+  const { data: allImages, isLoading } = useQuery({
+    queryKey: ["sequenceImages56", "memory_cards_c"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("memory_cards_c" as any)
+        .select("*")
+        .limit(20);
+      
+      if (error) {
+        console.error("Error fetching sequence images:", error);
+        throw error;
+      }
+      
+      return data as unknown as SequenceImage[];
+    }
+  });
+
+  // Target sequence (4 correct images)
+  const [targetSequence, setTargetSequence] = useState<SequenceImage[]>([]);
+  // All 8 images for selection dialog
+  const [selectionImages, setSelectionImages] = useState<SequenceImage[]>([]);
   
   // Game state
   const [gamePhase, setGamePhase] = useState<GamePhase>("memorize");
@@ -24,21 +48,24 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
   const [gameCompletedTriggered, setGameCompletedTriggered] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [helpCountdown, setHelpCountdown] = useState(5);
-  const [helpUsed, setHelpUsed] = useState(false);
+  const [helpUsesLeft, setHelpUsesLeft] = useState(3);
   
   // Window size for responsive layout
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
 
-  // Shuffle images for selection dialog (don't show in correct order)
-  const shuffledImagesForSelection = useMemo(() => {
-    if (!targetSequence.length) return [];
-    const shuffled = [...targetSequence];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
-  }, [targetSequence]);
+  // Initialize game with 4 target + 4 extra images
+  useEffect(() => {
+    if (!allImages || allImages.length < 8) return;
+    if (targetSequence.length > 0) return; // Already initialized
+
+    const shuffled = [...allImages].sort(() => Math.random() - 0.5);
+    const target = shuffled.slice(0, 4);
+    const extraImages = shuffled.slice(4, 8);
+    
+    setTargetSequence(target);
+    // Shuffle all 8 for selection dialog
+    setSelectionImages([...target, ...extraImages].sort(() => Math.random() - 0.5));
+  }, [allImages, targetSequence.length]);
 
   // Measure window size
   useEffect(() => {
@@ -59,7 +86,7 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
     if (gamePhase !== "memorize" || targetSequence.length === 0) return;
     
     if (countdown <= 0) {
-      setGamePhase("play");
+      setGamePhase("select");
       return;
     }
     
@@ -81,9 +108,23 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
     return () => clearTimeout(timer);
   }, [helpCountdown, showHelp]);
 
-  // Check completion
+  // Check if all 4 correct images are selected (regardless of position)
+  const allCorrectSelected = useMemo(() => {
+    const placedIds = placedImages.filter(img => img !== null).map(img => img!.id);
+    const targetIds = targetSequence.map(img => img.id);
+    return targetIds.every(id => placedIds.includes(id));
+  }, [placedImages, targetSequence]);
+
+  // Transition to arrange phase when all correct images are selected
   useEffect(() => {
-    if (gamePhase !== "play" || placedImages.some(img => img === null)) return;
+    if (gamePhase === "select" && allCorrectSelected) {
+      setGamePhase("arrange");
+    }
+  }, [allCorrectSelected, gamePhase]);
+
+  // Check completion (all in correct positions)
+  useEffect(() => {
+    if (gamePhase !== "arrange" || placedImages.some(img => img === null)) return;
     
     const allCorrect = placedImages.every((img, index) => 
       img?.id === targetSequence[index]?.id
@@ -104,9 +145,23 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
     }
   }, [isComplete, targetSequence, onGameComplete, gameCompletedTriggered]);
 
-  // Handle slot click
+  // Get slot status for color coding
+  const getSlotStatus = useCallback((image: SequenceImage | null, index: number): SlotStatus => {
+    if (!image) return "empty";
+    
+    const isInTarget = targetSequence.some(t => t.id === image.id);
+    if (!isInTarget) return "wrong";
+    
+    const isCorrectPosition = targetSequence[index]?.id === image.id;
+    if (isCorrectPosition) return "correct";
+    
+    return "wrong-position";
+  }, [targetSequence]);
+
+  // Handle slot click for selection
   const handleSlotClick = (index: number) => {
-    if (gamePhase !== "play" || isComplete || showHelp) return;
+    if (gamePhase !== "select" || isComplete || showHelp) return;
+    // Allow clicking any slot, even if already filled (to replace)
     setSelectedSlot(index);
   };
 
@@ -114,26 +169,42 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
   const handleImageSelect = useCallback((image: SequenceImage) => {
     if (selectedSlot === null) return;
     
-    const correctImage = targetSequence[selectedSlot];
+    // Check if this image is already placed somewhere else
+    const existingIndex = placedImages.findIndex(img => img?.id === image.id);
     
-    if (image.id === correctImage?.id) {
-      // Correct selection
-      setPlacedImages(prev => {
-        const newPlaced = [...prev];
-        newPlaced[selectedSlot] = image;
-        return newPlaced;
-      });
-    }
-    // Wrong selection - just close dialog (could add shake animation)
+    setPlacedImages(prev => {
+      const newPlaced = [...prev];
+      
+      // If image is already placed, swap or remove from old position
+      if (existingIndex !== -1 && existingIndex !== selectedSlot) {
+        // Swap with current slot's image
+        newPlaced[existingIndex] = prev[selectedSlot];
+      }
+      
+      newPlaced[selectedSlot] = image;
+      return newPlaced;
+    });
     
     setSelectedSlot(null);
-  }, [selectedSlot, targetSequence]);
+  }, [selectedSlot, placedImages]);
+
+  // Handle moving images in arrange phase
+  const handleMoveImage = (fromIndex: number, direction: "left" | "right") => {
+    const toIndex = direction === "left" ? fromIndex - 1 : fromIndex + 1;
+    if (toIndex < 0 || toIndex > 3) return;
+    
+    setPlacedImages(prev => {
+      const newPlaced = [...prev];
+      [newPlaced[fromIndex], newPlaced[toIndex]] = [newPlaced[toIndex], newPlaced[fromIndex]];
+      return newPlaced;
+    });
+  };
 
   // Handle help button
   const handleHelp = () => {
-    if (helpUsed || showHelp || gamePhase !== "play") return;
+    if (helpUsesLeft <= 0 || showHelp || gamePhase === "memorize") return;
     setShowHelp(true);
-    setHelpUsed(true);
+    setHelpUsesLeft(prev => prev - 1);
   };
 
   // Calculate item size for mobile
@@ -156,6 +227,16 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
 
   const gridWidth = itemSize ? 4 * itemSize + 8 * 3 : 0;
 
+  // Get border color class based on status
+  const getSlotBorderClass = (status: SlotStatus) => {
+    switch (status) {
+      case "correct": return "border-green-500 bg-green-100";
+      case "wrong-position": return "border-yellow-500 bg-yellow-100";
+      case "wrong": return "border-red-500 bg-red-100";
+      default: return "border-orange-400 bg-white/50";
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
@@ -164,7 +245,7 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
     );
   }
 
-  if (targetSequence.length === 0) {
+  if (targetSequence.length === 0 && !isLoading) {
     return (
       <div className="text-center py-8">
         <p className="text-white/80 drop-shadow uppercase">NI NA VOLJO SLIK ZA TO IGRO.</p>
@@ -213,11 +294,11 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
                     className="w-full h-full object-contain bg-white/90 p-1"
                     draggable={false}
                   />
-                  {/* Countdown or help countdown overlay */}
-                  {(gamePhase === "memorize" || showHelp) && (
+                  {/* Help countdown overlay only */}
+                  {showHelp && (
                     <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
                       <span className="text-white font-bold text-lg drop-shadow-lg">
-                        {showHelp ? helpCountdown : (gamePhase === "memorize" ? countdown : "")}
+                        {helpCountdown}
                       </span>
                     </div>
                   )}
@@ -235,13 +316,29 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
       {/* Middle section - countdown/instructions */}
       <div className={`text-center ${isLandscape ? 'py-1' : 'py-1 md:py-0'}`}>
         {gamePhase === "memorize" ? (
-          <h3 className={`font-bold text-white drop-shadow-lg uppercase ${isLandscape ? 'text-sm mb-0' : 'text-base md:text-2xl mb-0.5 md:mb-2'}`}>
-            ZAPOMNI SI VRSTNI RED! ({countdown})
-          </h3>
+          <div className="flex flex-col items-center gap-2">
+            <h3 className={`font-bold text-white drop-shadow-lg uppercase ${isLandscape ? 'text-sm mb-0' : 'text-base md:text-2xl mb-0.5 md:mb-2'}`}>
+              ZAPOMNI SI VRSTNI RED!
+            </h3>
+            <div className="bg-white/20 backdrop-blur-sm rounded-full px-6 py-2 border-2 border-white/30">
+              <span className="text-3xl md:text-5xl font-bold text-white drop-shadow-lg">{countdown}</span>
+            </div>
+          </div>
         ) : isComplete ? (
           <h3 className={`font-bold text-white drop-shadow-lg uppercase ${isLandscape ? 'text-sm mb-0' : 'text-base md:text-2xl mb-0.5 md:mb-2'}`}>
             ✨ ČESTITAM! ✨
           </h3>
+        ) : gamePhase === "arrange" ? (
+          <>
+            <h3 className={`font-bold text-white drop-shadow-lg uppercase ${isLandscape ? 'text-sm mb-0' : 'text-base md:text-2xl mb-0.5 md:mb-2'}`}>
+              UREDI SLIKE V PRAVILNI VRSTNI RED
+            </h3>
+            {!isLandscape && (
+              <p className="text-xs md:text-base text-white/90 drop-shadow uppercase">
+                PREMIKAJ SLIKE LEVO IN DESNO
+              </p>
+            )}
+          </>
         ) : (
           <>
             <h3 className={`font-bold text-white drop-shadow-lg uppercase ${isLandscape ? 'text-sm mb-0' : 'text-base md:text-2xl mb-0.5 md:mb-2'}`}>
@@ -249,7 +346,7 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
             </h3>
             {!isLandscape && (
               <p className="text-xs md:text-base text-white/90 drop-shadow uppercase">
-                POSTAVI SLIKE V PRAVILNI VRSTNI RED
+                IZBERI 4 PRAVILNE SLIKE
               </p>
             )}
           </>
@@ -259,41 +356,99 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
       {/* Current Sequence - Bottom Row (Clickable slots) */}
       <div className="relative">
         <div 
-          className={`bg-white/30 backdrop-blur-sm rounded-xl border-3 border-orange-400 ${isLandscape ? 'flex justify-center gap-2 p-2' : 'grid grid-cols-4 gap-1.5 md:gap-4 p-2 md:p-6'}`}
+          className={cn(
+            "backdrop-blur-sm rounded-xl border-3 transition-all duration-300",
+            isLandscape ? 'flex justify-center gap-2 p-2' : 'grid grid-cols-4 gap-1.5 md:gap-4 p-2 md:p-6',
+            gamePhase !== "memorize" && !isComplete && "animate-glow-border",
+            "bg-white/30 border-orange-400"
+          )}
           style={isLandscape && itemSize ? { width: gridWidth } : {}}
         >
-          {placedImages.map((image, index) => (
-            <button
-              key={`slot-${index}`}
-              onClick={() => handleSlotClick(index)}
-              disabled={image !== null || gamePhase === "memorize" || isComplete || showHelp}
-              className={cn(
-                "relative rounded-lg overflow-hidden transition-all duration-200",
-                isLandscape ? "" : "aspect-square",
-                image === null && gamePhase === "play" && !isComplete && !showHelp
-                  ? "bg-white/50 border-2 border-dashed border-orange-400 hover:bg-white/70 hover:border-orange-500 cursor-pointer animate-pulse"
-                  : "bg-white/90"
-              )}
-              style={itemSize ? { width: itemSize, height: itemSize } : {}}
-            >
-              {image ? (
-                <img
-                  src={image.image_url || ''}
-                  alt={image.word || ''}
-                  className="w-full h-full object-contain p-1"
-                  draggable={false}
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-2xl md:text-4xl text-orange-400/50">?</span>
-                </div>
-              )}
-            </button>
-          ))}
+          {placedImages.map((image, index) => {
+            const status = getSlotStatus(image, index);
+            
+            return (
+              <div key={`slot-${index}`} className="relative">
+                {gamePhase === "arrange" ? (
+                  // Arrange phase - show arrows for moving
+                  <div 
+                    className={cn(
+                      "relative rounded-lg overflow-hidden transition-all duration-200 border-3",
+                      isLandscape ? "" : "aspect-square",
+                      getSlotBorderClass(status)
+                    )}
+                    style={itemSize ? { width: itemSize, height: itemSize } : {}}
+                  >
+                    {image && (
+                      <>
+                        <img
+                          src={image.image_url || ''}
+                          alt={image.word || ''}
+                          className="w-full h-full object-contain p-1"
+                          draggable={false}
+                        />
+                        {/* Arrow buttons */}
+                        <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-2">
+                          <button
+                            onClick={() => handleMoveImage(index, "left")}
+                            disabled={index === 0 || isComplete}
+                            className={cn(
+                              "p-1 rounded-full bg-orange-500 text-white shadow-md transition-opacity",
+                              index === 0 ? "opacity-30" : "hover:bg-orange-600"
+                            )}
+                          >
+                            <ArrowLeft className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleMoveImage(index, "right")}
+                            disabled={index === 3 || isComplete}
+                            className={cn(
+                              "p-1 rounded-full bg-orange-500 text-white shadow-md transition-opacity",
+                              index === 3 ? "opacity-30" : "hover:bg-orange-600"
+                            )}
+                          >
+                            <ArrowRight className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ) : (
+                  // Select phase - clickable slots
+                  <button
+                    onClick={() => handleSlotClick(index)}
+                    disabled={gamePhase === "memorize" || isComplete || showHelp}
+                    className={cn(
+                      "relative rounded-lg overflow-hidden transition-all duration-200 w-full border-3",
+                      isLandscape ? "" : "aspect-square",
+                      image === null 
+                        ? "bg-white/50 border-dashed border-orange-400 hover:bg-white/70 hover:border-orange-500 cursor-pointer"
+                        : getSlotBorderClass(status),
+                      gamePhase !== "memorize" && !isComplete && !showHelp && image === null && "cursor-pointer"
+                    )}
+                    style={itemSize ? { width: itemSize, height: itemSize } : {}}
+                  >
+                    {image ? (
+                      <img
+                        src={image.image_url || ''}
+                        alt={image.word || ''}
+                        className="w-full h-full object-contain p-1"
+                        draggable={false}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-2xl md:text-4xl text-orange-400/50">?</span>
+                      </div>
+                    )}
+                  </button>
+                )}
+              </div>
+            );
+          })}
         </div>
         
-        {/* Hand icon for empty slots */}
-        {!isComplete && gamePhase === "play" && !showHelp && placedImages.some(img => img === null) && (
+        {/* Hand icon for empty slots in select phase */}
+        {!isComplete && gamePhase === "select" && !showHelp && placedImages.some(img => img === null) && (
           <div className={`absolute left-1/2 -translate-x-1/2 z-10 ${isLandscape ? '-bottom-2' : '-bottom-3 md:-bottom-4'}`}>
             <div className={`bg-orange-500 rounded-lg shadow-lg border-2 border-orange-600 animate-bounce ${isLandscape ? 'p-1' : 'p-1.5 md:p-2'}`}>
               <svg xmlns="http://www.w3.org/2000/svg" className={`text-white ${isLandscape ? 'w-4 h-4' : 'w-5 h-5 md:w-6 md:h-6'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -307,16 +462,19 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
         )}
       </div>
 
-      {/* Help button - only in play phase */}
-      {gamePhase === "play" && !isComplete && !helpUsed && (
+      {/* Help button - in select or arrange phase */}
+      {(gamePhase === "select" || gamePhase === "arrange") && !isComplete && helpUsesLeft > 0 && (
         <div className="fixed bottom-4 right-4 z-40">
           <Button
             onClick={handleHelp}
             disabled={showHelp}
-            className="rounded-full w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 shadow-lg border-2 border-white/50"
+            className="rounded-full w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 shadow-lg border-2 border-white/50 relative"
             size="icon"
           >
             <Eye className="h-6 w-6 text-white" />
+            <span className="absolute -top-1 -right-1 bg-white text-purple-700 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+              {helpUsesLeft}
+            </span>
           </Button>
         </div>
       )}
@@ -336,7 +494,7 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
       <SequenceImageSelectionDialog
         isOpen={selectedSlot !== null}
         onClose={() => setSelectedSlot(null)}
-        images={shuffledImagesForSelection}
+        images={selectionImages}
         onSelect={handleImageSelect}
         slotIndex={selectedSlot ?? 0}
       />
