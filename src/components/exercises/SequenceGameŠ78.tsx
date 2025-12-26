@@ -1,0 +1,25 @@
+import { SequenceGameBase, SequenceGameConfig } from "./SequenceGameBase";
+
+interface SequenceGameŠ78Props {
+  onGameComplete: (images: any[]) => void;
+  isLandscape?: boolean;
+}
+
+const config78: SequenceGameConfig = {
+  imageCount: 5,
+  countdownSeconds: 10,
+  helpAttempts: 2,
+  helpDuration: 5
+};
+
+export const SequenceGameŠ78 = ({ onGameComplete, isLandscape = false }: SequenceGameŠ78Props) => {
+  return (
+    <SequenceGameBase
+      onGameComplete={onGameComplete}
+      isLandscape={isLandscape}
+      tableName="memory_cards_Š_duplicate"
+      queryKey="memory_cards_Š_78"
+      config={config78}
+    />
+  );
+};
