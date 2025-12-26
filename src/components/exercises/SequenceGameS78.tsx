@@ -1,11 +1,11 @@
-import { SequenceGameStorageBase, SequenceGameStorageConfig } from "./SequenceGameStorageBase";
+import { SequenceGameBase, SequenceGameConfig } from "./SequenceGameBase";
 
 interface SequenceGameS78Props {
   onGameComplete: (images: any[]) => void;
   isLandscape?: boolean;
 }
 
-const config78: SequenceGameStorageConfig = {
+const config78: SequenceGameConfig = {
   imageCount: 5,
   countdownSeconds: 10,
   helpAttempts: 2,
@@ -14,10 +14,11 @@ const config78: SequenceGameStorageConfig = {
 
 export const SequenceGameS78 = ({ onGameComplete, isLandscape = false }: SequenceGameS78Props) => {
   return (
-    <SequenceGameStorageBase
+    <SequenceGameBase
       onGameComplete={onGameComplete}
       isLandscape={isLandscape}
-      letter="S"
+      tableName="memory_cards_S"
+      queryKey="memory_cards_S_78"
       config={config78}
     />
   );

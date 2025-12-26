@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Home, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { SequenceGameR78 } from "@/components/exercises/SequenceGameR78";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
-import { GameStartModal } from "@/components/games/GameStartModal";
 import { useState, useRef, useEffect } from "react";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import {
@@ -17,6 +17,7 @@ import {
 
 export default function ZaporedjaR78() {
   const navigate = useNavigate();
+  const { selectedChild } = useAuth();
   const { recordGameCompletion } = useEnhancedProgress();
   const [gameKey, setGameKey] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
@@ -26,8 +27,6 @@ export default function ZaporedjaR78() {
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
   const [showNewGameConfirmation, setShowNewGameConfirmation] = useState(false);
   const [showNewGameButton, setShowNewGameButton] = useState(false);
-  const [showStartModal, setShowStartModal] = useState(true);
-  const [gameStarted, setGameStarted] = useState(false);
   const gameCompletedRef = useRef(false);
 
   const [isTouchDevice, setIsTouchDevice] = useState(false);
@@ -68,7 +67,7 @@ export default function ZaporedjaR78() {
   }, []);
 
   useEffect(() => {
-    if (effectiveFullscreen && gameStarted) {
+    if (effectiveFullscreen) {
       const requestFullscreen = async () => {
         try {
           if (document.documentElement.requestFullscreen) {
@@ -109,12 +108,7 @@ export default function ZaporedjaR78() {
         }
       };
     }
-  }, [effectiveFullscreen, gameStarted]);
-
-  const handleStartGame = () => {
-    setShowStartModal(false);
-    setGameStarted(true);
-  };
+  }, [effectiveFullscreen]);
 
   const handleGameComplete = (images: any[]) => {
     if (!gameCompletedRef.current) {
@@ -182,7 +176,7 @@ export default function ZaporedjaR78() {
           />
           
           <div className="relative z-10 flex-1 flex items-center justify-center overflow-hidden h-full w-full p-2">
-            {gameStarted && !isPortrait ? (
+            {!isPortrait ? (
               <div className="w-full h-full flex flex-col items-center justify-center">
                 <SequenceGameR78 
                   key={gameKey}
@@ -190,73 +184,65 @@ export default function ZaporedjaR78() {
                   isLandscape={true}
                 />
               </div>
-            ) : gameStarted && isPortrait ? (
+            ) : (
               <div className="w-full h-full flex items-center justify-center px-6 text-center">
                 <p className="text-base font-semibold text-foreground">
                   Za igranje igre Zaporedja prosim obrni telefon v ležeči položaj.
                 </p>
               </div>
-            ) : null}
+            )}
           </div>
 
-          {gameStarted && (
-            <div className="fixed bottom-4 left-4 z-50 flex items-center gap-3">
-              <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-                <DropdownMenuTrigger asChild>
-                  <Button 
-                    className="rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm"
-                    size="icon"
-                  >
-                    <Home className="h-7 w-7 text-white" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent 
-                  align="start" 
-                  side="top"
-                  sideOffset={8}
-                  className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
-                >
-                  <button
-                    onClick={handleBack}
-                    className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
-                  >
-                    <span className="text-2xl">🏠</span>
-                    <span>Nazaj</span>
-                  </button>
-                  <button
-                    onClick={handleNewGame}
-                    className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
-                  >
-                    <span className="text-2xl">🔄</span>
-                    <span>Nova igra</span>
-                  </button>
-                  <button
-                    onClick={handleInstructions}
-                    className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
-                  >
-                    <span className="text-2xl">📖</span>
-                    <span>Navodila</span>
-                  </button>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {showNewGameButton && (
+          <div className="fixed bottom-4 left-4 z-50 flex items-center gap-3">
+            <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+              <DropdownMenuTrigger asChild>
                 <Button 
-                  onClick={handleStartNewGameDirect}
-                  className="rounded-full w-16 h-16 bg-sky-400 hover:bg-sky-500 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+                  className="rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm"
                   size="icon"
                 >
-                  <RefreshCw className="h-7 w-7 text-white" />
+                  <Home className="h-7 w-7 text-white" />
                 </Button>
-              )}
-            </div>
-          )}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                align="start" 
+                side="top"
+                sideOffset={8}
+                className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+              >
+                <button
+                  onClick={handleBack}
+                  className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+                >
+                  <span className="text-2xl">🏠</span>
+                  <span>Nazaj</span>
+                </button>
+                <button
+                  onClick={handleNewGame}
+                  className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+                >
+                  <span className="text-2xl">🔄</span>
+                  <span>Nova igra</span>
+                </button>
+                <button
+                  onClick={handleInstructions}
+                  className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
+                >
+                  <span className="text-2xl">📖</span>
+                  <span>Navodila</span>
+                </button>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-          <GameStartModal
-            isOpen={showStartModal}
-            onStart={handleStartGame}
-            onShowInstructions={() => setShowInstructions(true)}
-          />
+            {showNewGameButton && (
+              <Button 
+                onClick={handleStartNewGameDirect}
+                className="rounded-full w-16 h-16 bg-sky-400 hover:bg-sky-500 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+                size="icon"
+              >
+                <RefreshCw className="h-7 w-7 text-white" />
+              </Button>
+            )}
+          </div>
 
           <InstructionsModal
             isOpen={showInstructions}
@@ -309,71 +295,61 @@ export default function ZaporedjaR78() {
             ZAPOREDJA - R
           </h1>
           
-          {gameStarted && (
-            <SequenceGameR78 
-              key={gameKey}
-              onGameComplete={handleGameComplete}
-            />
-          )}
+          <SequenceGameR78 
+            key={gameKey}
+            onGameComplete={handleGameComplete}
+          />
         </div>
 
-        {gameStarted && (
-          <div className="fixed bottom-4 left-4 z-50 flex items-center gap-3">
-            <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-              <DropdownMenuTrigger asChild>
-                <button 
-                  className="w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
-                >
-                  <Home className="w-8 h-8 text-white" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
-                align="start"
-                side="top"
-                sideOffset={8}
+        <div className="fixed bottom-4 left-4 z-50 flex items-center gap-3">
+          <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+            <DropdownMenuTrigger asChild>
+              <button 
+                className="w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
               >
-                <button
-                  onClick={handleBack}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
-                >
-                  <span className="text-xl">🏠</span>
-                  <span className="font-medium">Nazaj</span>
-                </button>
-                <button
-                  onClick={handleNewGame}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
-                >
-                  <span className="text-xl">🔄</span>
-                  <span className="font-medium">Nova igra</span>
-                </button>
-                <button
-                  onClick={handleInstructions}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
-                >
-                  <span className="text-xl">📖</span>
-                  <span className="font-medium">Navodila</span>
-                </button>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {showNewGameButton && (
-              <Button 
-                onClick={handleStartNewGameDirect}
-                className="rounded-full w-16 h-16 bg-sky-400 hover:bg-sky-500 shadow-lg border-2 border-white/50 backdrop-blur-sm"
-                size="icon"
+                <Home className="w-8 h-8 text-white" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+              align="start"
+              side="top"
+              sideOffset={8}
+            >
+              <button
+                onClick={handleBack}
+                className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
               >
-                <RefreshCw className="h-7 w-7 text-white" />
-              </Button>
-            )}
-          </div>
-        )}
+                <span className="text-xl">🏠</span>
+                <span className="font-medium">Nazaj</span>
+              </button>
+              <button
+                onClick={handleNewGame}
+                className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
+              >
+                <span className="text-xl">🔄</span>
+                <span className="font-medium">Nova igra</span>
+              </button>
+              <button
+                onClick={handleInstructions}
+                className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
+              >
+                <span className="text-xl">📖</span>
+                <span className="font-medium">Navodila</span>
+              </button>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-        <GameStartModal
-          isOpen={showStartModal}
-          onStart={handleStartGame}
-          onShowInstructions={() => setShowInstructions(true)}
-        />
+          {showNewGameButton && (
+            <Button 
+              onClick={handleStartNewGameDirect}
+              className="rounded-full w-16 h-16 bg-sky-400 hover:bg-sky-500 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+              size="icon"
+            >
+              <RefreshCw className="h-7 w-7 text-white" />
+            </Button>
+          )}
+        </div>
         
         <InstructionsModal
           isOpen={showInstructions}
