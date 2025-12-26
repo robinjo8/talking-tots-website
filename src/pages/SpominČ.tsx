@@ -19,17 +19,12 @@ import { useToast } from "@/components/ui/use-toast";
 import { InfoModal } from "@/components/games/InfoModal";
 import { MemoryPairDialog } from "@/components/games/MemoryPairDialog";
 import { MemoryProgressIndicator } from "@/components/games/MemoryProgressIndicator";
-import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
 
 const SpominČ = () => {
-  return (
-    <AgeGatedRoute requiredAgeGroup="3-4">
-      <SpominČContent />
-    </AgeGatedRoute>
-  );
+  return <SpominČContent />;
 };
 
 const SpominČContent = () => {
