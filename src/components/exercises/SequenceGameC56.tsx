@@ -313,6 +313,15 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
         </div>
       </div>
 
+      {/* Mobile countdown in top-right corner during memorize phase */}
+      {gamePhase === "memorize" && isLandscape && (
+        <div className="fixed top-2 right-2 z-50">
+          <div className="bg-white/20 backdrop-blur-sm rounded-full w-12 h-12 flex items-center justify-center border-2 border-white/30">
+            <span className="text-2xl font-bold text-white drop-shadow-lg">{countdown}</span>
+          </div>
+        </div>
+      )}
+
       {/* Middle section - countdown/instructions */}
       <div className={`text-center ${isLandscape ? 'py-1' : 'py-1 md:py-0'}`}>
         {gamePhase === "memorize" ? (
@@ -320,9 +329,12 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
             <h3 className={`font-bold text-white drop-shadow-lg uppercase ${isLandscape ? 'text-sm mb-0' : 'text-base md:text-2xl mb-0.5 md:mb-2'}`}>
               ZAPOMNI SI VRSTNI RED!
             </h3>
-            <div className="bg-white/20 backdrop-blur-sm rounded-full px-6 py-2 border-2 border-white/30">
-              <span className="text-3xl md:text-5xl font-bold text-white drop-shadow-lg">{countdown}</span>
-            </div>
+            {/* Desktop countdown - centered */}
+            {!isLandscape && (
+              <div className="bg-white/20 backdrop-blur-sm rounded-full px-6 py-2 border-2 border-white/30">
+                <span className="text-3xl md:text-5xl font-bold text-white drop-shadow-lg">{countdown}</span>
+              </div>
+            )}
           </div>
         ) : isComplete ? (
           <h3 className={`font-bold text-white drop-shadow-lg uppercase ${isLandscape ? 'text-sm mb-0' : 'text-base md:text-2xl mb-0.5 md:mb-2'}`}>

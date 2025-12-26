@@ -37,7 +37,7 @@ export const SequenceImageSelectionDialog = ({
               key={image.id}
               onClick={() => onSelect(image)}
               className={cn(
-                "relative aspect-square rounded-xl border-3 border-orange-300",
+                "relative aspect-square rounded-xl border-2 border-gray-200",
                 "bg-white/90 overflow-hidden",
                 "hover:border-orange-500 hover:scale-105 transition-all duration-200",
                 "focus:outline-none focus:ring-4 focus:ring-orange-400/50",
