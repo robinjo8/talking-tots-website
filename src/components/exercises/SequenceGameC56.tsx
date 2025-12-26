@@ -230,9 +230,9 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
   // Get border color class based on status
   const getSlotBorderClass = (status: SlotStatus) => {
     switch (status) {
-      case "correct": return "border-green-500 bg-green-100";
-      case "wrong-position": return "border-yellow-500 bg-yellow-100";
-      case "wrong": return "border-red-500 bg-red-100";
+      case "correct": return "border-emerald-500 bg-emerald-200 border-4 shadow-[0_0_12px_rgba(16,185,129,0.6)]";
+      case "wrong-position": return "border-amber-400 bg-amber-200 border-4 shadow-[0_0_12px_rgba(251,191,36,0.6)]";
+      case "wrong": return "border-rose-500 bg-rose-200 border-4 shadow-[0_0_12px_rgba(244,63,94,0.6)]";
       default: return "border-orange-400 bg-white/50";
     }
   };
