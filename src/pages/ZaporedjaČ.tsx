@@ -6,7 +6,7 @@ import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
 import { SequenceGameČ } from "@/components/exercises/SequenceGameČ";
 import { MatchingInstructionsModal } from "@/components/matching/MatchingInstructionsModal";
 import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { useState, useRef, useEffect } from "react";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -122,8 +122,8 @@ export default function ZaporedjaČ() {
           </div>
           <MatchingInstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
           <MatchingCompletionDialog isOpen={showCompletion} onClose={() => setShowCompletion(false)} images={playedImages} onStarClaimed={handleStarClaimed} instructionText="Klikni na slike in posnemaj besede" isMobileLandscape={true} />
-          <ConfirmDialog open={showExitConfirmation} onOpenChange={setShowExitConfirmation} title="Zapusti igro" description="Ali res želiš zapustiti igro?" confirmText="Da" cancelText="Ne" onConfirm={handleConfirmExit} onCancel={() => setShowExitConfirmation(false)} />
-          <ConfirmDialog open={showNewGameConfirmation} onOpenChange={setShowNewGameConfirmation} title="Nova igra" description="Ali res želiš začeti novo igro?" confirmText="Da" cancelText="Ne" onConfirm={handleConfirmNewGame} onCancel={() => setShowNewGameConfirmation(false)} />
+          <MemoryExitConfirmationDialog open={showExitConfirmation} onOpenChange={setShowExitConfirmation} onConfirm={handleConfirmExit}><></></MemoryExitConfirmationDialog>
+          <MemoryExitConfirmationDialog open={showNewGameConfirmation} onOpenChange={setShowNewGameConfirmation} onConfirm={handleConfirmNewGame}><></></MemoryExitConfirmationDialog>
         </div>
       </AgeGatedRoute>
     );
@@ -151,8 +151,8 @@ export default function ZaporedjaČ() {
         </div>
         <MatchingInstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
         <MatchingCompletionDialog isOpen={showCompletion} onClose={() => setShowCompletion(false)} images={playedImages} onStarClaimed={handleStarClaimed} instructionText="Klikni na slike in posnemaj besede" isMobileLandscape={false} />
-        <ConfirmDialog open={showExitConfirmation} onOpenChange={setShowExitConfirmation} title="Zapusti igro" description="Ali res želiš zapustiti igro?" confirmText="Da" cancelText="Ne" onConfirm={handleConfirmExit} onCancel={() => setShowExitConfirmation(false)} />
-        <ConfirmDialog open={showNewGameConfirmation} onOpenChange={setShowNewGameConfirmation} title="Nova igra" description="Ali res želiš začeti novo igro?" confirmText="Da" cancelText="Ne" onConfirm={handleConfirmNewGame} onCancel={() => setShowNewGameConfirmation(false)} />
+        <MemoryExitConfirmationDialog open={showExitConfirmation} onOpenChange={setShowExitConfirmation} onConfirm={handleConfirmExit}><></></MemoryExitConfirmationDialog>
+        <MemoryExitConfirmationDialog open={showNewGameConfirmation} onOpenChange={setShowNewGameConfirmation} onConfirm={handleConfirmNewGame}><></></MemoryExitConfirmationDialog>
       </div>
     </AgeGatedRoute>
   );
