@@ -14,8 +14,12 @@ interface SequenceGame56BaseProps {
   queryKey: string;
 }
 
-type GamePhase = "memorize" | "select" | "arrange";
+type GamePhase = "pre-countdown" | "memorize" | "select" | "arrange";
 type SlotStatus = "empty" | "correct" | "wrong-position" | "wrong";
+
+const PRE_COUNTDOWN_SECONDS = 5;
+const MEMORIZE_COUNTDOWN_SECONDS = 10;
+const HELP_USES = 1;
 
 export const SequenceGame56Base = ({ onGameComplete, isLandscape = false, tableName, queryKey }: SequenceGame56BaseProps) => {
   const { data: allImages, isLoading } = useQuery({
@@ -37,15 +41,16 @@ export const SequenceGame56Base = ({ onGameComplete, isLandscape = false, tableN
 
   const [targetSequence, setTargetSequence] = useState<SequenceImage[]>([]);
   const [selectionImages, setSelectionImages] = useState<SequenceImage[]>([]);
-  const [gamePhase, setGamePhase] = useState<GamePhase>("memorize");
-  const [countdown, setCountdown] = useState(10);
+  const [gamePhase, setGamePhase] = useState<GamePhase>("pre-countdown");
+  const [preCountdown, setPreCountdown] = useState(PRE_COUNTDOWN_SECONDS);
+  const [countdown, setCountdown] = useState(MEMORIZE_COUNTDOWN_SECONDS);
   const [placedImages, setPlacedImages] = useState<(SequenceImage | null)[]>([null, null, null, null]);
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const [isComplete, setIsComplete] = useState(false);
   const [gameCompletedTriggered, setGameCompletedTriggered] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [helpCountdown, setHelpCountdown] = useState(5);
-  const [helpUsesLeft, setHelpUsesLeft] = useState(3);
+  const [helpUsesLeft, setHelpUsesLeft] = useState(HELP_USES);
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
@@ -73,6 +78,18 @@ export const SequenceGame56Base = ({ onGameComplete, isLandscape = false, tableN
     };
   }, []);
 
+  // Pre-countdown timer (red number, no images)
+  useEffect(() => {
+    if (gamePhase !== "pre-countdown" || targetSequence.length === 0) return;
+    if (preCountdown <= 0) {
+      setGamePhase("memorize");
+      return;
+    }
+    const timer = setTimeout(() => setPreCountdown(prev => prev - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [preCountdown, gamePhase, targetSequence]);
+
+  // Memorize countdown timer
   useEffect(() => {
     if (gamePhase !== "memorize" || targetSequence.length === 0) return;
     if (countdown <= 0) {
@@ -213,6 +230,20 @@ export const SequenceGame56Base = ({ onGameComplete, isLandscape = false, tableN
   if (isLandscape && !itemSize) return null;
 
   const showTargetRow = gamePhase === "memorize" || showHelp;
+
+  // Pre-countdown phase - show only red countdown, no game elements
+  if (gamePhase === "pre-countdown") {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-6">
+        <h3 className="text-xl md:text-3xl font-bold text-white drop-shadow-lg uppercase">
+          PRIPRAVLJEN?
+        </h3>
+        <div className="bg-white/20 backdrop-blur-sm rounded-full w-24 h-24 md:w-32 md:h-32 flex items-center justify-center border-4 border-red-400/50">
+          <span className="text-5xl md:text-7xl font-bold text-red-500 drop-shadow-lg">{preCountdown}</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 
