@@ -121,6 +121,20 @@
   }
 }
 
+/* Gentle glow border animation for sequence game 56 */
+@keyframes glow-border {
+  0%, 100% {
+    box-shadow: 0 0 8px 2px rgba(251, 146, 60, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 16px 4px rgba(251, 146, 60, 0.6);
+  }
+}
+
+.animate-glow-border {
+  animation: glow-border 2s ease-in-out infinite;
+}
+
 /* Card Flip Animation Styles */
 .flip-card {
   background-color: transparent;

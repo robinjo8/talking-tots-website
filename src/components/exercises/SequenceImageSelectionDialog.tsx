@@ -19,10 +19,10 @@ export const SequenceImageSelectionDialog = ({
 }: SequenceImageSelectionDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-md sm:max-w-lg p-4 sm:p-6">
+      <DialogContent className="max-w-md sm:max-w-xl p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle className="text-center text-lg sm:text-xl uppercase font-bold">
-            IZBERI PRAVILNO SLIKO
+            IZBERI SLIKO
           </DialogTitle>
         </DialogHeader>
         
@@ -30,7 +30,8 @@ export const SequenceImageSelectionDialog = ({
           KATERA SLIKA SPADA NA MESTO {slotIndex + 1}?
         </p>
         
-        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+        {/* 4x2 grid for 8 images */}
+        <div className="grid grid-cols-4 gap-2 sm:gap-3">
           {images.map((image) => (
             <button
               key={image.id}
@@ -47,7 +48,7 @@ export const SequenceImageSelectionDialog = ({
                 <img
                   src={image.image_url}
                   alt={image.word || "Slika"}
-                  className="w-full h-full object-contain p-2"
+                  className="w-full h-full object-contain p-1"
                   draggable={false}
                 />
               )}
