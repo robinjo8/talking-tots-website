@@ -17,11 +17,17 @@ import { Home, RefreshCw } from "lucide-react";
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
 
 const sImages = [
+  { filename: 'sedem.png', word: 'SEDEM' },
+  { filename: 'sir.png', word: 'SIR' },
   { filename: 'sladoled.png', word: 'SLADOLED' },
   { filename: 'slika.png', word: 'SLIKA' },
   { filename: 'slon.png', word: 'SLON' },
+  { filename: 'sluz.png', word: 'SLUZ' },
   { filename: 'smreka.png', word: 'SMREKA' },
+  { filename: 'sneg.png', word: 'SNEG' },
   { filename: 'snezak.png', word: 'SNEŽAK' },
+  { filename: 'snezinka.png', word: 'SNEŽINKA' },
+  { filename: 'sok.png', word: 'SOK' },
   { filename: 'sonce.png', word: 'SONCE' },
   { filename: 'sova.png', word: 'SOVA' },
   { filename: 'stol.png', word: 'STOL' },
