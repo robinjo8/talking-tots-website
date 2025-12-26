@@ -7,8 +7,9 @@ interface SequenceGameS78Props {
 
 const config78: SequenceGameConfig = {
   imageCount: 5,
+  preCountdownSeconds: 5,
   countdownSeconds: 10,
-  helpAttempts: 2,
+  helpAttempts: 1,
   helpDuration: 5
 };
 
