@@ -148,6 +148,14 @@ import ZaporedjaŠ56 from "@/pages/ZaporedjaŠ56";
 import ZaporedjaZ56 from "@/pages/ZaporedjaZ56";
 import ZaporedjaŽ56 from "@/pages/ZaporedjaŽ56";
 import ZaporedjaC78 from "@/pages/ZaporedjaC78";
+import ZaporedjaČ78 from "@/pages/ZaporedjaČ78";
+import ZaporedjaK78 from "@/pages/ZaporedjaK78";
+import ZaporedjaL78 from "@/pages/ZaporedjaL78";
+import ZaporedjaR78 from "@/pages/ZaporedjaR78";
+import ZaporedjaS78 from "@/pages/ZaporedjaS78";
+import ZaporedjaŠ78 from "@/pages/ZaporedjaŠ78";
+import ZaporedjaZ78 from "@/pages/ZaporedjaZ78";
+import ZaporedjaŽ78 from "@/pages/ZaporedjaŽ78";
 import IgraUjemanjaC from "@/pages/IgraUjemanjaC";
 import IgraUjemanjaC56 from "@/pages/IgraUjemanjaC56";
 import IgraUjemanjaC78 from "@/pages/IgraUjemanjaC78";
@@ -1265,6 +1273,70 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <ZaporedjaC78 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/č78"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaČ78 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/k78"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaK78 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/l78"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaL78 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/r78"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaR78 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/s78"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaS78 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/š78"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaŠ78 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/z78"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaZ78 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/ž78"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaŽ78 />
           </ProtectedRoute>
         }
       />
