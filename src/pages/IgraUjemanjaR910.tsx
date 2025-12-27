@@ -27,6 +27,18 @@ import {
 import { Home, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+const NewGameButton = ({ isGameCompleted, handleNewGame }: { isGameCompleted: boolean; handleNewGame: () => void }) => (
+  isGameCompleted ? (
+    <Button
+      onClick={handleNewGame}
+      className="fixed bottom-4 left-24 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+      size="icon"
+    >
+      <RefreshCw className="h-7 w-7 text-white" />
+    </Button>
+  ) : null
+);
+
 export default function IgraUjemanjaR910() {
   return (
     <AgeGatedRoute requiredAgeGroup="9-10">
@@ -187,6 +199,8 @@ function IgraUjemanjaR910Content() {
           </DropdownMenuContent>
         </DropdownMenu>
 
+        <NewGameButton isGameCompleted={isGameCompleted} handleNewGame={handleNewGame} />
+
         <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -273,6 +287,8 @@ function IgraUjemanjaR910Content() {
             </div>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <NewGameButton isGameCompleted={isGameCompleted} handleNewGame={handleNewGame} />
 
         <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
           <AlertDialogContent>

@@ -24,7 +24,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Home } from 'lucide-react';
+import { Home, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function IgraUjemanjaC910() {
   return (
@@ -46,6 +47,7 @@ function IgraUjemanjaC910Content() {
   const [completedItems, setCompletedItems] = useState<FourColumnMatchingItem[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const [isGameCompleted, setIsGameCompleted] = useState(false);
   const gameCompletedRef = useRef(false);
   const { recordGameCompletion } = useEnhancedProgress();
 
@@ -71,6 +73,7 @@ function IgraUjemanjaC910Content() {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
       setCompletedItems(items); // Save items that were just played
+      setIsGameCompleted(true);
       console.log(`Game completed with score: ${score}`);
       setShowCompletion(true);
     }
@@ -81,6 +84,7 @@ function IgraUjemanjaC910Content() {
     const newItems = getRandomFourColumnItems(4, 'c');
     setItems(newItems);
     setCompletedItems([]);
+    setIsGameCompleted(false);
     setMenuOpen(false);
     setGameKey(prev => prev + 1);
   };
@@ -183,6 +187,16 @@ function IgraUjemanjaC910Content() {
           </DropdownMenuContent>
         </DropdownMenu>
 
+        {isGameCompleted && (
+          <Button
+            onClick={handleNewGame}
+            className="fixed bottom-4 left-24 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+            size="icon"
+          >
+            <RefreshCw className="h-7 w-7 text-white" />
+          </Button>
+        )}
+
         <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -269,6 +283,16 @@ function IgraUjemanjaC910Content() {
             </div>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        {isGameCompleted && (
+          <Button
+            onClick={handleNewGame}
+            className="fixed bottom-4 left-24 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+            size="icon"
+          >
+            <RefreshCw className="h-7 w-7 text-white" />
+          </Button>
+        )}
 
         <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
           <AlertDialogContent>

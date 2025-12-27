@@ -24,7 +24,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Home } from 'lucide-react';
+import { Home, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function IgraUjemanjaŠ910() {
   return (
@@ -45,6 +46,7 @@ function IgraUjemanjaŠ910Content() {
   const [completedItems, setCompletedItems] = useState<FourColumnMatchingItem[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const [isGameCompleted, setIsGameCompleted] = useState(false);
   const gameCompletedRef = useRef(false);
   const { recordGameCompletion } = useEnhancedProgress();
 
@@ -64,6 +66,7 @@ function IgraUjemanjaŠ910Content() {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
       setCompletedItems(items);
+      setIsGameCompleted(true);
       console.log(`Game completed with score: ${score}`);
       setShowCompletion(true);
     }
@@ -74,6 +77,7 @@ function IgraUjemanjaŠ910Content() {
     const newItems = getRandomFourColumnItems(4, 'š');
     setItems(newItems);
     setCompletedItems([]);
+    setIsGameCompleted(false);
     setMenuOpen(false);
     setGameKey(prev => prev + 1);
   };
@@ -172,6 +176,16 @@ function IgraUjemanjaŠ910Content() {
           onStarClaimed={handleStarClaimed}
         />
 
+        {isGameCompleted && (
+          <Button
+            onClick={handleNewGame}
+            className="fixed bottom-4 left-24 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+            size="icon"
+          >
+            <RefreshCw className="h-7 w-7 text-white" />
+          </Button>
+        )}
+
         <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -254,6 +268,16 @@ function IgraUjemanjaŠ910Content() {
           images={(completedItems.length > 0 ? completedItems : items).map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
           onStarClaimed={handleStarClaimed}
         />
+
+        {isGameCompleted && (
+          <Button
+            onClick={handleNewGame}
+            className="fixed bottom-4 left-24 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+            size="icon"
+          >
+            <RefreshCw className="h-7 w-7 text-white" />
+          </Button>
+        )}
 
         <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
           <AlertDialogContent>
