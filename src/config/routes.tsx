@@ -1162,71 +1162,7 @@ export function AppRoutes() {
         }
       />
       <Route 
-        path="/govorne-igre/labirint/c" 
-        element={
-          <ProtectedRoute>
-            <LabirintLetter />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorne-igre/labirint/č" 
-        element={
-          <ProtectedRoute>
-            <LabirintLetter />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorne-igre/labirint/k" 
-        element={
-          <ProtectedRoute>
-            <LabirintLetter />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorne-igre/labirint/l" 
-        element={
-          <ProtectedRoute>
-            <LabirintLetter />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorne-igre/labirint/r" 
-        element={
-          <ProtectedRoute>
-            <LabirintLetter />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorne-igre/labirint/s" 
-        element={
-          <ProtectedRoute>
-            <LabirintLetter />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorne-igre/labirint/š" 
-        element={
-          <ProtectedRoute>
-            <LabirintLetter />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorne-igre/labirint/z" 
-        element={
-          <ProtectedRoute>
-            <LabirintLetter />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorne-igre/labirint/ž" 
+        path="/govorne-igre/labirint/:letter" 
         element={
           <ProtectedRoute>
             <LabirintLetter />

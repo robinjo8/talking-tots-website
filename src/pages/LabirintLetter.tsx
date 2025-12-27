@@ -30,7 +30,9 @@ const letterToTable: Record<string, string> = {
 };
 
 const LabirintLetter = () => {
-  const { letter } = useParams<{ letter: string }>();
+  const { letter: rawLetter } = useParams<{ letter: string }>();
+  // Decode URL-encoded letters (e.g., %C4%8D → č)
+  const letter = rawLetter ? decodeURIComponent(rawLetter) : undefined;
   const navigate = useNavigate();
   const [gameKey, setGameKey] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
