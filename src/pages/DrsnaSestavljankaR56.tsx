@@ -19,8 +19,13 @@ const rImages = [
   { filename: 'rep.png', word: 'REP' },
   { filename: 'repa.png', word: 'REPA' },
   { filename: 'riba.png', word: 'RIBA' },
+  { filename: 'ribez.png', word: 'RIBEZ' },
+  { filename: 'ribic.png', word: 'RIBIČ' },
+  { filename: 'ris.png', word: 'RIS' },
+  { filename: 'riz.png', word: 'RIŽ' },
   { filename: 'robot.png', word: 'ROBOT' },
   { filename: 'roka.png', word: 'ROKA' },
+  { filename: 'rokometas.png', word: 'ROKOMETAŠ' },
   { filename: 'rolka.png', word: 'ROLKA' },
   { filename: 'ropotuljica.png', word: 'ROPOTULJICA' },
   { filename: 'roza.png', word: 'ROŽA' }

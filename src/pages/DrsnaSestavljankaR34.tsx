@@ -13,22 +13,21 @@ import { Home, RefreshCw } from "lucide-react";
 
 const rImages = [
   { filename: 'raca.png', word: 'RACA' },
-  { filename: 'radar.png', word: 'RADAR' },
-  { filename: 'radij.png', word: 'RADIJ' },
-  { filename: 'radio.png', word: 'RADIO' },
   { filename: 'rak.png', word: 'RAK' },
   { filename: 'raketa.png', word: 'RAKETA' },
-  { filename: 'rama.png', word: 'RAMA' },
-  { filename: 'rampa.png', word: 'RAMPA' },
-  { filename: 'rana.png', word: 'RANA' },
-  { filename: 'ranc.png', word: 'RANČ' },
-  { filename: 'rasa.png', word: 'RASA' },
-  { filename: 'resa.png', word: 'RESA' },
+  { filename: 'ravnilo.png', word: 'RAVNILO' },
+  { filename: 'rep.png', word: 'REP' },
+  { filename: 'repa.png', word: 'REPA' },
   { filename: 'riba.png', word: 'RIBA' },
-  { filename: 'robida.png', word: 'ROBIDA' },
+  { filename: 'ribez.png', word: 'RIBEZ' },
+  { filename: 'ribic.png', word: 'RIBIČ' },
+  { filename: 'ris.png', word: 'RIS' },
+  { filename: 'riz.png', word: 'RIŽ' },
+  { filename: 'robot.png', word: 'ROBOT' },
   { filename: 'roka.png', word: 'ROKA' },
-  { filename: 'rosa.png', word: 'ROSA' },
-  { filename: 'rozina.png', word: 'ROZINA' },
+  { filename: 'rokometas.png', word: 'ROKOMETAŠ' },
+  { filename: 'rolka.png', word: 'ROLKA' },
+  { filename: 'ropotuljica.png', word: 'ROPOTULJICA' },
   { filename: 'roza.png', word: 'ROŽA' }
 ];
 
