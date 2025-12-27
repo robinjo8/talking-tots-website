@@ -287,7 +287,7 @@ const LabirintLetter = () => {
 
   const handleStarClaimed = async () => {
     await recordGameCompletion('memory_game', `labirint-${letter?.toLowerCase()}`);
-    // Don't close dialog - let user see "Nova igra" button
+    setShowCompletion(false); // Close dialog after claiming star
   };
 
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/svetlomodro_ozadje.png`;
@@ -401,7 +401,7 @@ const LabirintLetter = () => {
           {/* Nova igra button - blue circular button */}
           <button
             onClick={handleNewGame}
-            className="w-16 h-16 rounded-full bg-gradient-to-r from-green-400 to-green-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
+            className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-400 to-blue-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
           >
             <RefreshCw className="w-8 h-8 text-white" />
           </button>
@@ -489,10 +489,10 @@ const LabirintLetter = () => {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Nova igra button - green circular button */}
+        {/* Nova igra button - blue circular button */}
         <button
           onClick={handleNewGame}
-          className="w-16 h-16 rounded-full bg-gradient-to-r from-green-400 to-green-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
+          className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-400 to-blue-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
         >
           <RefreshCw className="w-8 h-8 text-white" />
         </button>
