@@ -14,16 +14,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { MemoryExitConfirmationDialog } from '@/components/games/MemoryExitConfirmationDialog';
 import { Home, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -197,20 +188,13 @@ function IgraUjemanjaK910Content() {
           </Button>
         )}
 
-        <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Zapusti igro</AlertDialogTitle>
-              <AlertDialogDescription>
-                Ali res želite prekiniti igro? Vaš napredek ne bo shranjen.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Nadaljuj z igro</AlertDialogCancel>
-              <AlertDialogAction onClick={handleConfirmExit}>Zapusti</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <MemoryExitConfirmationDialog
+          open={showExitDialog} 
+          onOpenChange={setShowExitDialog} 
+          onConfirm={handleConfirmExit}
+        >
+          <div />
+        </MemoryExitConfirmationDialog>
       </div>
     );
   }
@@ -294,20 +278,13 @@ function IgraUjemanjaK910Content() {
           </Button>
         )}
 
-        <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Zapusti igro</AlertDialogTitle>
-              <AlertDialogDescription>
-                Ali res želite prekiniti igro? Vaš napredek ne bo shranjen.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Nadaljuj z igro</AlertDialogCancel>
-              <AlertDialogAction onClick={handleConfirmExit}>Zapusti</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <MemoryExitConfirmationDialog
+          open={showExitDialog} 
+          onOpenChange={setShowExitDialog} 
+          onConfirm={handleConfirmExit}
+        >
+          <div />
+        </MemoryExitConfirmationDialog>
       </div>
     </AppLayout>
   );
