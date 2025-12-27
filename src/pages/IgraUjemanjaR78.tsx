@@ -158,6 +158,16 @@ export default function IgraUjemanjaR78() {
           onStarClaimed={handleStarClaimed}
         />
 
+        {isGameCompleted && (
+          <Button
+            onClick={handleNewGame}
+            className="fixed bottom-4 left-24 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+            size="icon"
+          >
+            <RefreshCw className="h-7 w-7 text-white" />
+          </Button>
+        )}
+
         <MemoryExitConfirmationDialog 
           open={showExitDialog} 
           onOpenChange={setShowExitDialog} 
@@ -244,6 +254,16 @@ export default function IgraUjemanjaR78() {
           images={completedItems.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
           onStarClaimed={handleStarClaimed}
         />
+
+        {isGameCompleted && (
+          <Button
+            onClick={handleNewGame}
+            className="fixed bottom-4 left-24 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+            size="icon"
+          >
+            <RefreshCw className="h-7 w-7 text-white" />
+          </Button>
+        )}
 
         <MemoryExitConfirmationDialog 
           open={showExitDialog} 

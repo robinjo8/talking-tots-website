@@ -10,7 +10,7 @@ import { MatchingCompletionDialog } from '@/components/matching/MatchingCompleti
 import { MemoryExitConfirmationDialog } from '@/components/games/MemoryExitConfirmationDialog';
 import { getRandomFourColumnItems, FourColumnMatchingItem } from '@/data/threeColumnMatchingData';
 import { Button } from '@/components/ui/button';
-import { Home } from 'lucide-react';
+import { Home, RefreshCw } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 export default function IgraUjemanjaS78() {
@@ -25,6 +25,7 @@ export default function IgraUjemanjaS78() {
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [items, setItems] = useState<FourColumnMatchingItem[]>(() => getRandomFourColumnItems(4, 's'));
   const [completedItems, setCompletedItems] = useState<FourColumnMatchingItem[]>([]);
+  const [isGameCompleted, setIsGameCompleted] = useState(false);
   const gameCompletedRef = useRef(false);
   const { recordGameCompletion } = useEnhancedProgress();
 
@@ -40,6 +41,7 @@ export default function IgraUjemanjaS78() {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
       setCompletedItems(items);
+      setIsGameCompleted(true);
       setShowCompletion(true);
     }
   };
@@ -49,6 +51,7 @@ export default function IgraUjemanjaS78() {
     const newItems = getRandomFourColumnItems(4, 's');
     setItems(newItems);
     setCompletedItems([]);
+    setIsGameCompleted(false);
     setGameKey(prev => prev + 1);
   };
 
@@ -133,6 +136,16 @@ export default function IgraUjemanjaS78() {
         <FourColumnInstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
         <MatchingCompletionDialog isOpen={showCompletion} onClose={() => setShowCompletion(false)} images={completedItems.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))} onStarClaimed={handleStarClaimed} />
 
+        {isGameCompleted && (
+          <Button
+            onClick={handleNewGame}
+            className="fixed bottom-4 left-24 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+            size="icon"
+          >
+            <RefreshCw className="h-7 w-7 text-white" />
+          </Button>
+        )}
+
         <MemoryExitConfirmationDialog 
           open={showExitDialog} 
           onOpenChange={setShowExitDialog} 
@@ -205,6 +218,16 @@ export default function IgraUjemanjaS78() {
 
         <FourColumnInstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
         <MatchingCompletionDialog isOpen={showCompletion} onClose={() => setShowCompletion(false)} images={completedItems.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))} onStarClaimed={handleStarClaimed} />
+
+        {isGameCompleted && (
+          <Button
+            onClick={handleNewGame}
+            className="fixed bottom-4 left-24 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+            size="icon"
+          >
+            <RefreshCw className="h-7 w-7 text-white" />
+          </Button>
+        )}
 
         <MemoryExitConfirmationDialog 
           open={showExitDialog} 
