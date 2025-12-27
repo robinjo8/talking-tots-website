@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Home } from "lucide-react";
+import { Home, RefreshCw } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -23,6 +23,7 @@ export default function IgraUjemanjaZ() {
   const [playedImages, setPlayedImages] = useState<MatchingGameImage[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const [isGameCompleted, setIsGameCompleted] = useState(false);
   const gameCompletedRef = useRef(false);
   
   const getGameImages = () => {
@@ -36,6 +37,7 @@ export default function IgraUjemanjaZ() {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
       setPlayedImages(images);
+      setIsGameCompleted(true);
       console.log(`Game completed with score: ${score}`);
       setShowCompletion(true);
     }
@@ -44,6 +46,7 @@ export default function IgraUjemanjaZ() {
   const handleNewGame = () => {
     gameCompletedRef.current = false;
     setPlayedImages([]);
+    setIsGameCompleted(false);
     setGameKey(prev => prev + 1);
   };
 
@@ -131,7 +134,17 @@ export default function IgraUjemanjaZ() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <MemoryExitConfirmationDialog 
+        {isGameCompleted && (
+          <Button
+            onClick={handleNewGame}
+            className="fixed bottom-4 left-24 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+            size="icon"
+          >
+            <RefreshCw className="h-7 w-7 text-white" />
+          </Button>
+        )}
+
+        <MemoryExitConfirmationDialog
           open={showExitDialog} 
           onOpenChange={setShowExitDialog} 
           onConfirm={handleBack}
