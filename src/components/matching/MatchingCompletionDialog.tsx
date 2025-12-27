@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { Trophy, Mic, X, Star, Volume2 } from "lucide-react";
+import { Trophy, Mic, X, Star, Volume2, RefreshCw } from "lucide-react";
 import { MatchingGameImage } from "@/data/matchingGameData";
 import { useAudioPlayback } from '@/hooks/useAudioPlayback';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,6 +13,7 @@ interface MatchingCompletionDialogProps {
   onClose: () => void;
   images: MatchingGameImage[];
   onStarClaimed?: () => void;
+  onNewGame?: () => void;
   instructionText?: string;
   autoPlayAudio?: boolean;
   isMobileLandscape?: boolean;
@@ -22,6 +23,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
   onClose,
   images,
   onStarClaimed,
+  onNewGame,
   instructionText = "KLIKNI NA SPODNJE SLIKE IN PONOVI BESEDE.",
   autoPlayAudio = false,
   isMobileLandscape = false
@@ -333,9 +335,12 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       title: "Odlično!",
       description: "Prejel si zvezdico! ⭐"
     });
-    setTimeout(() => {
-      onClose();
-    }, 1500);
+    // Don't auto-close if onNewGame is provided - let user choose Nova igra or close
+    if (!onNewGame) {
+      setTimeout(() => {
+        onClose();
+      }, 1500);
+    }
   };
   const handleImageClick = (imageIndex: number, word: string) => {
     // Prevent clicking if already completed or currently recording
@@ -456,6 +461,17 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
             >
               <Star className="w-4 h-4" />
               {isSavingRecording ? 'Shranjujem...' : 'Vzemi zvezdico'}
+            </Button>
+          ) : starClaimed && onNewGame ? (
+            <Button 
+              onClick={() => {
+                onClose();
+                onNewGame();
+              }} 
+              className={`bg-blue-500 hover:bg-blue-600 text-white gap-2 flex-1 max-w-36 ${isMobileLandscape ? "h-10" : ""}`}
+            >
+              <RefreshCw className="w-4 h-4" />
+              Nova igra
             </Button>
           ) : (
             <Button onClick={handleClose} className={`bg-dragon-green hover:bg-dragon-green/90 gap-2 flex-1 max-w-32 ${isMobileLandscape ? "h-10" : ""}`}>

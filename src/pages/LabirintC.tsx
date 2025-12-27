@@ -9,30 +9,16 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Home } from "lucide-react";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
+import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
 
 const LabirintC = () => {
-  return (
-    <AgeGatedRoute requiredAgeGroup="3-4">
-      <LabirintCContent />
-    </AgeGatedRoute>
-  );
+  return <LabirintCContent />;
 };
 
 const LabirintCContent = () => {
@@ -103,18 +89,19 @@ const LabirintCContent = () => {
     loadCards();
   }, []);
 
-  const completionImage = useMemo(() => {
-    if (cards.length === 0) return null;
+  const completionImages = useMemo(() => {
+    if (cards.length === 0) return [];
     
-    const randomIndex = Math.floor(Math.random() * cards.length);
-    const card = cards[randomIndex];
+    // Shuffle and pick 4 random cards
+    const shuffled = [...cards].sort(() => Math.random() - 0.5);
+    const selected = shuffled.slice(0, 4);
     
-    return {
+    return selected.map(card => ({
       filename: card.word || '',
       url: card.image_url || '',
       word: card.word || '',
       audioUrl: card.audio_url || ''
-    };
+    }));
   }, [cards, gameKey]);
 
   const handleGameComplete = () => {
@@ -254,22 +241,13 @@ const LabirintCContent = () => {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Ali res želite prekiniti igro?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Trenutna igra bo izgubljena.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Prekliči</AlertDialogCancel>
-              <AlertDialogAction onClick={handleConfirmExit}>
-                Potrdi
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <MemoryExitConfirmationDialog
+          open={showExitDialog}
+          onOpenChange={setShowExitDialog}
+          onConfirm={handleConfirmExit}
+        >
+          <div />
+        </MemoryExitConfirmationDialog>
 
         <InstructionsModal
           isOpen={showInstructions}
@@ -277,14 +255,15 @@ const LabirintCContent = () => {
           type="maze"
         />
 
-        {completionImage && (
+        {completionImages.length > 0 && (
           <MatchingCompletionDialog
             isOpen={showCompletion}
             onClose={() => setShowCompletion(false)}
-            images={[completionImage]}
+            images={completionImages}
             onStarClaimed={handleStarClaimed}
-            instructionText="BRAVO! Prišel si do cilja. Sedaj klikni na sliko in ponovi besedo."
-            autoPlayAudio={true}
+            onNewGame={handleNewGame}
+            instructionText="KLIKNI NA SPODNJE SLIKE IN PONOVI BESEDE"
+            autoPlayAudio={false}
           />
         )}
       </div>
@@ -343,22 +322,13 @@ const LabirintCContent = () => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Ali res želite prekiniti igro?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Trenutna igra bo izgubljena.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Prekliči</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmExit}>
-              Potrdi
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <MemoryExitConfirmationDialog
+        open={showExitDialog}
+        onOpenChange={setShowExitDialog}
+        onConfirm={handleConfirmExit}
+      >
+        <div />
+      </MemoryExitConfirmationDialog>
 
       <InstructionsModal
         isOpen={showInstructions}
@@ -366,14 +336,15 @@ const LabirintCContent = () => {
         type="maze"
       />
 
-      {completionImage && (
+      {completionImages.length > 0 && (
         <MatchingCompletionDialog
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
-          images={[completionImage]}
+          images={completionImages}
           onStarClaimed={handleStarClaimed}
-          instructionText="BRAVO! Prišel si do cilja. Sedaj klikni na sliko in ponovi besedo."
-          autoPlayAudio={true}
+          onNewGame={handleNewGame}
+          instructionText="KLIKNI NA SPODNJE SLIKE IN PONOVI BESEDE"
+          autoPlayAudio={false}
         />
       )}
     </div>
