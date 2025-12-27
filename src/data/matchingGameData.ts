@@ -56,7 +56,7 @@ export const matchingGameData: LetterData[] = [
       { word: "KNJIGA", filename: "knjiga.png", url: `${SUPABASE_STORAGE_URL}/knjiga.png`, audio_url: `${SUPABASE_AUDIO_URL}/knjiga.m4a` },
       { word: "KOCKA", filename: "kocka.png", url: `${SUPABASE_STORAGE_URL}/kocka.png`, audio_url: `${SUPABASE_AUDIO_URL}/kocka.m4a` },
       { word: "KOKOS", filename: "kokos_sadez.png", url: `${SUPABASE_STORAGE_URL}/kokos_sadez.png`, audio_url: `${SUPABASE_AUDIO_URL}/kokos_sadez.m4a` },
-      { word: "KOKOŠ", filename: "kokos.png", url: `${SUPABASE_STORAGE_URL}/kokos.png`, audio_url: `${SUPABASE_AUDIO_URL}/kokos.m4a` },
+      { word: "KOKOŠ", filename: "kokos.png", url: `${SUPABASE_STORAGE_URL}/kokos.png`, audio_url: `${SUPABASE_AUDIO_URL}/kokos_1.m4a` },
       { word: "KOLAČ", filename: "kolac.png", url: `${SUPABASE_STORAGE_URL}/kolac.png`, audio_url: `${SUPABASE_AUDIO_URL}/kolac.m4a` },
       { word: "KOLO", filename: "kolo.png", url: `${SUPABASE_STORAGE_URL}/kolo.png`, audio_url: `${SUPABASE_AUDIO_URL}/kolo.m4a` },
       { word: "KORUZA", filename: "koruza.png", url: `${SUPABASE_STORAGE_URL}/koruza.png`, audio_url: `${SUPABASE_AUDIO_URL}/koruza.m4a` },
