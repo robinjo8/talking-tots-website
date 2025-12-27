@@ -47,6 +47,16 @@ function DrsnaSestavljankaC910Content() {
   const currentImage = useMemo(() => cImages[Math.floor(Math.random() * cImages.length)], [puzzleKey]);
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentImage.filename}`;
 
+  // Get 5 random images for completion dialog
+  const completionImages = useMemo(() => {
+    const shuffled = [...cImages].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, 5).map(img => ({
+      word: img.word,
+      url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${img.filename}`,
+      filename: img.filename
+    }));
+  }, [puzzleKey]);
+
   const handleComplete = () => {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
@@ -150,14 +160,9 @@ function DrsnaSestavljankaC910Content() {
       <MatchingCompletionDialog 
         isOpen={showCompletion} 
         onClose={() => setShowCompletion(false)}
-        images={[
-          { word: currentImage.word, url: imageUrl, filename: currentImage.filename },
-          { word: currentImage.word, url: imageUrl, filename: currentImage.filename },
-          { word: currentImage.word, url: imageUrl, filename: currentImage.filename },
-          { word: currentImage.word, url: imageUrl, filename: currentImage.filename }
-        ]}
+        images={completionImages}
         onStarClaimed={handleStarClaimed}
-        instructionText="KLIKNI NA VSAKO SLIKO IN 4X IZGOVORI BESEDO."
+        instructionText="KLIKNI NA SPODNJE SLIKE IN PONOVI BESEDE"
         autoPlayAudio={true}
       />
       <ConfirmDialog open={showExitDialog} onOpenChange={setShowExitDialog} title="Zapusti igro" description="Ali res želiš zapustiti igro?" confirmText="Da" cancelText="Ne" onConfirm={() => navigate("/govorne-igre/drsna-sestavljanka")} onCancel={() => setShowExitDialog(false)} />
