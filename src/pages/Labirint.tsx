@@ -28,7 +28,7 @@ const labirintGames = [
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
     description: "Poišči pot skozi labirint s črko Č",
     path: "/govorne-igre/labirint/č",
-    available: false
+    available: true
   },
   {
     id: "k",
@@ -37,7 +37,7 @@ const labirintGames = [
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png",
     description: "Poišči pot skozi labirint s črko K",
     path: "/govorne-igre/labirint/k",
-    available: false
+    available: true
   },
   {
     id: "l",
@@ -46,7 +46,7 @@ const labirintGames = [
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png",
     description: "Poišči pot skozi labirint s črko L",
     path: "/govorne-igre/labirint/l",
-    available: false
+    available: true
   },
   {
     id: "r",
@@ -55,7 +55,7 @@ const labirintGames = [
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
     description: "Poišči pot skozi labirint s črko R",
     path: "/govorne-igre/labirint/r",
-    available: false
+    available: true
   },
   {
     id: "s",
@@ -64,7 +64,7 @@ const labirintGames = [
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
     description: "Poišči pot skozi labirint s črko S",
     path: "/govorne-igre/labirint/s",
-    available: false
+    available: true
   },
   {
     id: "š",
@@ -73,7 +73,7 @@ const labirintGames = [
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
     description: "Poišči pot skozi labirint s črko Š",
     path: "/govorne-igre/labirint/š",
-    available: false
+    available: true
   },
   {
     id: "z",
@@ -82,7 +82,7 @@ const labirintGames = [
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
     description: "Poišči pot skozi labirint s črko Z",
     path: "/govorne-igre/labirint/z",
-    available: false
+    available: true
   },
   {
     id: "ž",
@@ -91,7 +91,7 @@ const labirintGames = [
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
     description: "Poišči pot skozi labirint s črko Ž",
     path: "/govorne-igre/labirint/ž",
-    available: false
+    available: true
   }
 ];
 
