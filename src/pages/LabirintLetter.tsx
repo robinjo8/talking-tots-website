@@ -282,7 +282,7 @@ const LabirintLetter = () => {
 
   const handleStarClaimed = async () => {
     await recordGameCompletion('memory_game', `labirint-${letter?.toLowerCase()}`);
-    setShowCompletion(false);
+    // Don't close dialog - let user see "Nova igra" button
   };
 
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/svetlomodro_ozadje.png`;
