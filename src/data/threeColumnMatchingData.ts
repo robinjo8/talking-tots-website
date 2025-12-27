@@ -310,13 +310,14 @@ export const fourColumnMatchingDataŠ: FourColumnMatchingItem[] = [
 export const fourColumnMatchingDataZ: FourColumnMatchingItem[] = [
   { id: 'zajec', word: 'zajec', audioFile: 'zajec.m4a', writtenWord: 'ZAJEC', shadowImage: 'zajec_senca.png', originalImage: 'zajec.png' },
   { id: 'zaslon', word: 'zaslon', audioFile: 'zaslon.m4a', writtenWord: 'ZASLON', shadowImage: 'zaslon_senca.png', originalImage: 'zaslon.png' },
-  { id: 'zavesa', word: 'zavese', audioFile: 'zavesa.m4a', writtenWord: 'ZAVESE', shadowImage: 'zavesa_senca.png', originalImage: 'zavesa.png' },
+  { id: 'zavesa', word: 'zavesa', audioFile: 'zavesa.m4a', writtenWord: 'ZAVESA', shadowImage: 'zavesa_senca.png', originalImage: 'zavesa.png' },
   { id: 'zebra', word: 'zebra', audioFile: 'zebra.m4a', writtenWord: 'ZEBRA', shadowImage: 'zebra_senca.png', originalImage: 'zebra.png' },
   { id: 'zlato', word: 'zlato', audioFile: 'zlato.m4a', writtenWord: 'ZLATO', shadowImage: 'zlato_senca.png', originalImage: 'zlato.png' },
   { id: 'zmaj', word: 'zmaj', audioFile: 'zmaj.m4a', writtenWord: 'ZMAJ', shadowImage: 'zmaj_senca.png', originalImage: 'zmaj.png' },
   { id: 'zob', word: 'zob', audioFile: 'zob.m4a', writtenWord: 'ZOB', shadowImage: 'zob_senca.png', originalImage: 'zob.png' },
   { id: 'zobotrebec', word: 'zobotrebec', audioFile: 'zobotrebec.m4a', writtenWord: 'ZOBOTREBEC', shadowImage: 'zobotrebec_senca.png', originalImage: 'zobotrebec.png' },
   { id: 'zvezda', word: 'zvezda', audioFile: 'zvezda.m4a', writtenWord: 'ZVEZDA', shadowImage: 'zvezda_senca.png', originalImage: 'zvezda.png' },
+  { id: 'zvezek', word: 'zvezek', audioFile: 'zvezek.m4a', writtenWord: 'ZVEZEK', shadowImage: 'zvezek_senca.png', originalImage: 'zvezek.png' },
   { id: 'zvocnik', word: 'zvočnik', audioFile: 'zvocnik.m4a', writtenWord: 'ZVOČNIK', shadowImage: 'zvocnik_senca.png', originalImage: 'zvocnik.png' }
 ];
 
