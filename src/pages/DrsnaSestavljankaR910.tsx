@@ -47,6 +47,16 @@ function DrsnaSestavljankaR910Content() {
   const currentImage = useMemo(() => rImages[Math.floor(Math.random() * rImages.length)], [puzzleKey]);
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentImage.filename}`;
 
+  // Get 5 random images for completion dialog
+  const completionImages = useMemo(() => {
+    const shuffled = [...rImages].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, 5).map(img => ({
+      word: img.word,
+      url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${img.filename}`,
+      filename: img.filename
+    }));
+  }, [puzzleKey]);
+
   const handleComplete = () => {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
@@ -126,12 +136,14 @@ function DrsnaSestavljankaR910Content() {
       </div>
 
       <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
-      <MatchingCompletionDialog isOpen={showCompletion} onClose={() => setShowCompletion(false)} images={[
-        { word: currentImage.word, url: imageUrl, filename: currentImage.filename },
-        { word: currentImage.word, url: imageUrl, filename: currentImage.filename },
-        { word: currentImage.word, url: imageUrl, filename: currentImage.filename },
-        { word: currentImage.word, url: imageUrl, filename: currentImage.filename }
-      ]} onStarClaimed={handleStarClaimed} instructionText="KLIKNI NA VSAKO SLIKO IN 4X IZGOVORI BESEDO." autoPlayAudio={true} />
+      <MatchingCompletionDialog 
+        isOpen={showCompletion} 
+        onClose={() => setShowCompletion(false)} 
+        images={completionImages}
+        onStarClaimed={handleStarClaimed} 
+        instructionText="KLIKNI NA SPODNJE SLIKE IN PONOVI BESEDE" 
+        autoPlayAudio={true} 
+      />
       <ConfirmDialog open={showExitDialog} onOpenChange={setShowExitDialog} title="Zapusti igro" description="Ali res želiš zapustiti igro?" confirmText="Da" cancelText="Ne" onConfirm={() => navigate("/govorne-igre/drsna-sestavljanka")} onCancel={() => setShowExitDialog(false)} />
       <ConfirmDialog open={showNewGameDialog} onOpenChange={setShowNewGameDialog} title="Nova igra" description="Ali res želiš začeti novo igro?" confirmText="Da" cancelText="Ne" onConfirm={handleConfirmNewGame} onCancel={() => setShowNewGameDialog(false)} />
     </div>
