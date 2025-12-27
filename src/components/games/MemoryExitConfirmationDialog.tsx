@@ -21,16 +21,16 @@ export function MemoryExitConfirmationDialog({ children, onConfirm, open, onOpen
             Ali res želite prekiniti igro?
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter className="flex flex-row justify-center sm:justify-center items-center gap-3 mt-6">
+        <AlertDialogFooter className="flex flex-row justify-center sm:justify-center items-center gap-4 mt-6">
           <AlertDialogAction 
             onClick={onConfirm}
-            className="bg-green-500 hover:bg-green-600 text-white rounded-md px-6 py-2"
+            className="bg-green-500 hover:bg-green-600 text-white rounded-lg px-8 py-3 text-base font-medium min-w-[100px]"
           >
-            <Check className="w-4 h-4 mr-2" />
+            <Check className="w-5 h-5 mr-2" />
             Da
           </AlertDialogAction>
-          <AlertDialogCancel className="bg-red-500 hover:bg-red-600 text-white border-red-500 rounded-md px-6 py-2">
-            <X className="w-4 h-4 mr-2" />
+          <AlertDialogCancel className="bg-red-500 hover:bg-red-600 text-white border-red-500 hover:border-red-600 rounded-lg px-8 py-3 text-base font-medium min-w-[100px]">
+            <X className="w-5 h-5 mr-2" />
             Ne
           </AlertDialogCancel>
         </AlertDialogFooter>
