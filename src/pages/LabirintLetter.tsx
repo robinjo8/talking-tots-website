@@ -165,8 +165,13 @@ const labirintImages: Record<string, Array<{ filename: string; word: string }>> 
 const getImageUrl = (filename: string) => 
   `${SUPABASE_URL}/storage/v1/object/public/slike/${filename}`;
 
-const getAudioUrl = (word: string) => 
-  `${SUPABASE_URL}/storage/v1/object/public/zvocni-posnetki/${word.toLowerCase()}.mp3`;
+const getAudioUrl = (word: string) => {
+  const normalizedWord = word
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, ''); // Remove diacritics (č→c, š→s, ž→z)
+  return `${SUPABASE_URL}/storage/v1/object/public/zvocni-posnetki/${normalizedWord}.m4a`;
+};
 
 const LabirintLetter = () => {
   const { letter: rawLetter } = useParams<{ letter: string }>();
