@@ -145,9 +145,7 @@ function IgraUjemanjaC910Content() {
         {/* Floating menu button */}
         <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
-            <button className="fixed bottom-4 left-4 z-50 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white shadow-2xl rounded-full w-16 h-16 border-2 border-white/50 backdrop-blur-sm flex items-center justify-center">
-              <Home className="w-11 h-11" />
-            </button>
+            <button className="fixed bottom-4 left-4 z-50 bg-gradient-to-r from-amber-400 to-orange-500  text-white shadow-2xl rounded-full w-16 h-16 border-2 border-white/50 backdrop-blur-sm flex items-center justify-center hover:scale-105 transition-transform"><Home className="w-8 h-8 text-white" /></button>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="top" align="start" className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl z-[60]" sideOffset={8}>
             <div className="flex flex-col gap-2">
@@ -235,9 +233,7 @@ function IgraUjemanjaC910Content() {
         {/* Floating menu button */}
         <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
-            <button className="fixed bottom-4 left-4 z-50 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white shadow-2xl rounded-full w-16 h-16 border-2 border-white/50 backdrop-blur-sm flex items-center justify-center">
-              <Home className="w-11 h-11" />
-            </button>
+            <button className="fixed bottom-4 left-4 z-50 bg-gradient-to-r from-amber-400 to-orange-500  text-white shadow-2xl rounded-full w-16 h-16 border-2 border-white/50 backdrop-blur-sm flex items-center justify-center hover:scale-105 transition-transform"><Home className="w-8 h-8 text-white" /></button>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="top" align="start" className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl z-[60]" sideOffset={8}>
             <div className="flex flex-col gap-2">

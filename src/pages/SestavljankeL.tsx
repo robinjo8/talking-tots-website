@@ -158,7 +158,7 @@ function SestavljankeLContent() {
           <DropdownMenuTrigger asChild>
             <Button
               size="icon"
-              className="fixed bottom-4 left-4 z-50 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white shadow-2xl rounded-full w-16 h-16 border-2 border-white/20"
+              className="fixed bottom-4 left-4 z-50 bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-2xl rounded-full w-16 h-16 border-2 border-white/20"
             >
               <Home className="w-11 h-11" />
             </Button>
@@ -269,9 +269,9 @@ function SestavljankeLContent() {
           <DropdownMenuTrigger asChild>
             <Button
               size="icon"
-              className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+              className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-r from-amber-400 to-orange-500 shadow-lg border-2 border-white/50 backdrop-blur-sm"
             >
-              <Home className="h-7 w-7 text-white" />
+              <Home className="w-8 h-8 text-white" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent 

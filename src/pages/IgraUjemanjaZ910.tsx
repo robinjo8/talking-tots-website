@@ -126,7 +126,7 @@ function IgraUjemanjaZ910Content() {
         {/* Floating Menu Button */}
         <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
-            <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white shadow-2xl flex items-center justify-center transition-all duration-200 hover:scale-105 border-2 border-white/50 backdrop-blur-sm">
+            <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-2xl flex items-center justify-center transition-all duration-200 hover:scale-105 border-2 border-white/50 backdrop-blur-sm">
               <Home className="h-8 w-8" />
             </button>
           </DropdownMenuTrigger>
@@ -212,7 +212,7 @@ function IgraUjemanjaZ910Content() {
         {/* Floating Menu Button */}
         <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
-            <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white shadow-2xl flex items-center justify-center transition-all duration-200 hover:scale-105 border-2 border-white/50 backdrop-blur-sm">
+            <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-2xl flex items-center justify-center transition-all duration-200 hover:scale-105 border-2 border-white/50 backdrop-blur-sm">
               <Home className="h-8 w-8" />
             </button>
           </DropdownMenuTrigger>
