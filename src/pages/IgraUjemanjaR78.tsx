@@ -10,7 +10,7 @@ import { MatchingCompletionDialog } from '@/components/matching/MatchingCompleti
 import { MemoryExitConfirmationDialog } from '@/components/games/MemoryExitConfirmationDialog';
 import { getRandomFourColumnItems, FourColumnMatchingItem } from '@/data/threeColumnMatchingData';
 import { Button } from '@/components/ui/button';
-import { Home } from 'lucide-react';
+import { Home, RefreshCw } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 export default function IgraUjemanjaR78() {
@@ -25,6 +25,7 @@ export default function IgraUjemanjaR78() {
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [items, setItems] = useState<FourColumnMatchingItem[]>(() => getRandomFourColumnItems(4, 'r'));
   const [completedItems, setCompletedItems] = useState<FourColumnMatchingItem[]>([]);
+  const [isGameCompleted, setIsGameCompleted] = useState(false);
   const gameCompletedRef = useRef(false);
   const { recordGameCompletion } = useEnhancedProgress();
 
@@ -41,6 +42,7 @@ export default function IgraUjemanjaR78() {
       gameCompletedRef.current = true;
       console.log(`Game completed with score: ${score}`);
       setCompletedItems(items);
+      setIsGameCompleted(true);
       setShowCompletion(true);
     }
   };
@@ -50,6 +52,7 @@ export default function IgraUjemanjaR78() {
     const newItems = getRandomFourColumnItems(4, 'r');
     setItems(newItems);
     setCompletedItems([]);
+    setIsGameCompleted(false);
     setGameKey(prev => prev + 1);
   };
 
