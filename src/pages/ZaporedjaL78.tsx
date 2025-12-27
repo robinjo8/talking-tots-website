@@ -255,7 +255,7 @@ export default function ZaporedjaL78() {
             onClose={() => setShowCompletion(false)}
             images={playedImages}
             onStarClaimed={handleStarClaimed}
-            instructionText="Klikni na slike in posnemaj besede"
+            instructionText="KLIKNI NA SPODNJE SLIKE IN PONOVI BESEDE"
             isMobileLandscape={true}
           />
 
@@ -362,7 +362,7 @@ export default function ZaporedjaL78() {
           onClose={() => setShowCompletion(false)}
           images={playedImages}
           onStarClaimed={handleStarClaimed}
-          instructionText="Klikni na slike in posnemaj besede"
+          instructionText="KLIKNI NA SPODNJE SLIKE IN PONOVI BESEDE"
           isMobileLandscape={false}
         />
 

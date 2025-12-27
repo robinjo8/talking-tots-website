@@ -120,7 +120,7 @@ export default function ZaporedjaZ56() {
             {showNewGameButton && <Button onClick={handleStartNewGameDirect} className="rounded-full w-16 h-16 bg-sky-400 hover:bg-sky-500 shadow-lg border-2 border-white/50 backdrop-blur-sm" size="icon"><RefreshCw className="h-7 w-7 text-white" /></Button>}
           </div>
           <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sequence" />
-          <MatchingCompletionDialog isOpen={showCompletion} onClose={() => setShowCompletion(false)} images={playedImages} onStarClaimed={handleStarClaimed} instructionText="Klikni na slike in posnemaj besede" isMobileLandscape={true} />
+          <MatchingCompletionDialog isOpen={showCompletion} onClose={() => setShowCompletion(false)} images={playedImages} onStarClaimed={handleStarClaimed} instructionText="KLIKNI NA SPODNJE SLIKE IN PONOVI BESEDE" isMobileLandscape={true} />
           <MemoryExitConfirmationDialog open={showExitConfirmation} onOpenChange={setShowExitConfirmation} onConfirm={handleConfirmExit}><></></MemoryExitConfirmationDialog>
           <MemoryExitConfirmationDialog open={showNewGameConfirmation} onOpenChange={setShowNewGameConfirmation} onConfirm={handleConfirmNewGame}><></></MemoryExitConfirmationDialog>
         </div>
@@ -147,7 +147,7 @@ export default function ZaporedjaZ56() {
           {showNewGameButton && <Button onClick={handleStartNewGameDirect} className="rounded-full w-16 h-16 bg-sky-400 hover:bg-sky-500 shadow-lg border-2 border-white/50 backdrop-blur-sm" size="icon"><RefreshCw className="h-7 w-7 text-white" /></Button>}
         </div>
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sequence" />
-        <MatchingCompletionDialog isOpen={showCompletion} onClose={() => setShowCompletion(false)} images={playedImages} onStarClaimed={handleStarClaimed} instructionText="Klikni na slike in posnemaj besede" isMobileLandscape={false} />
+        <MatchingCompletionDialog isOpen={showCompletion} onClose={() => setShowCompletion(false)} images={playedImages} onStarClaimed={handleStarClaimed} instructionText="KLIKNI NA SPODNJE SLIKE IN PONOVI BESEDE" isMobileLandscape={false} />
         <MemoryExitConfirmationDialog open={showExitConfirmation} onOpenChange={setShowExitConfirmation} onConfirm={handleConfirmExit}><></></MemoryExitConfirmationDialog>
         <MemoryExitConfirmationDialog open={showNewGameConfirmation} onOpenChange={setShowNewGameConfirmation} onConfirm={handleConfirmNewGame}><></></MemoryExitConfirmationDialog>
       </div>
