@@ -388,18 +388,23 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
           {/* Display images - centered grid based on count */}
           <div className={images.length === 1 
             ? "flex justify-center" 
-            : `flex justify-center gap-2 md:gap-4`
+            : `flex justify-center flex-wrap gap-2 md:gap-4`
           }>
-            {images.slice(0, 4).map((image, index) => {
+            {images.map((image, index) => {
             const isRecording = currentRecordingIndex === index;
             const isCompleted = completedRecordings.has(index);
+            // For 5 images, use smaller sizes to fit
+            const isFiveImages = images.length === 5;
             return <div key={index} className={`flex flex-col items-center ${isMobileLandscape ? "space-y-1" : "space-y-1 md:space-y-2"}`}>
                   <div 
                     className={`cursor-pointer transition-all ${isCompleted ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
                     onClick={() => handleImageClick(index, image.word)}
                   >
                     <div className="relative">
-                      <img src={image.url} alt={image.word} className={`object-cover rounded-xl border-2 ${isMobileLandscape ? "w-16 h-16" : "w-14 h-14 md:w-20 md:h-20"} ${isCompleted ? 'border-gray-400 grayscale' : isRecording ? 'border-red-500' : 'border-dragon-green'}`} />
+                      <img src={image.url} alt={image.word} className={`object-cover rounded-xl border-2 ${isMobileLandscape 
+                        ? isFiveImages ? "w-14 h-14" : "w-16 h-16" 
+                        : isFiveImages ? "w-12 h-12 md:w-16 md:h-16" : "w-14 h-14 md:w-20 md:h-20"
+                      } ${isCompleted ? 'border-gray-400 grayscale' : isRecording ? 'border-red-500' : 'border-dragon-green'}`} />
                       {isRecording && <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-xl">
                           <div className="bg-red-500 text-white rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
                             <Mic className="w-3 h-3 md:w-4 md:h-4" />
@@ -410,7 +415,10 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
                         </div>}
                     </div>
                   </div>
-                  <span className={`font-medium text-center ${isMobileLandscape ? "text-xs" : "text-xs md:text-sm"} ${isCompleted ? 'text-gray-400' : 'text-black'}`}>
+                  <span className={`font-medium text-center ${isMobileLandscape 
+                    ? isFiveImages ? "text-[10px]" : "text-xs" 
+                    : isFiveImages ? "text-[10px] md:text-xs" : "text-xs md:text-sm"
+                  } ${isCompleted ? 'text-gray-400' : 'text-black'}`}>
                     {image.word.toUpperCase()}
                   </span>
                   <Button
@@ -419,9 +427,15 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
                       handlePlayAudio(image);
                     }}
                     size="icon"
-                    className={`bg-green-500 hover:bg-green-600 text-white ${isMobileLandscape ? "h-10 w-10" : "h-8 w-8 md:h-12 md:w-12"}`}
+                    className={`bg-green-500 hover:bg-green-600 text-white ${isMobileLandscape 
+                      ? isFiveImages ? "h-8 w-8" : "h-10 w-10" 
+                      : isFiveImages ? "h-7 w-7 md:h-10 md:w-10" : "h-8 w-8 md:h-12 md:h-12"
+                    }`}
                   >
-                    <Volume2 className={isMobileLandscape ? "w-5 h-5" : "w-4 h-4 md:w-6 md:h-6"} />
+                    <Volume2 className={isMobileLandscape 
+                      ? isFiveImages ? "w-4 h-4" : "w-5 h-5" 
+                      : isFiveImages ? "w-3 h-3 md:w-5 md:h-5" : "w-4 h-4 md:w-6 md:h-6"
+                    } />
                   </Button>
                 </div>;
           })}
