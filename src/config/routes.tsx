@@ -49,6 +49,7 @@ import SpominŽ from "@/pages/SpominŽ";
 import SpominL from "@/pages/SpominL";
 import LabirintX from "@/pages/LabirintX";
 import LabirintC from "@/pages/LabirintC";
+import LabirintLetter from "@/pages/LabirintLetter";
 import Labirint from "@/pages/Labirint";
 
 import ArtikuacijskiTest from "@/pages/ArtikuacijskiTest";
@@ -1164,7 +1165,71 @@ export function AppRoutes() {
         path="/govorne-igre/labirint/c" 
         element={
           <ProtectedRoute>
-            <LabirintC />
+            <LabirintLetter />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/labirint/č" 
+        element={
+          <ProtectedRoute>
+            <LabirintLetter />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/labirint/k" 
+        element={
+          <ProtectedRoute>
+            <LabirintLetter />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/labirint/l" 
+        element={
+          <ProtectedRoute>
+            <LabirintLetter />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/labirint/r" 
+        element={
+          <ProtectedRoute>
+            <LabirintLetter />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/labirint/s" 
+        element={
+          <ProtectedRoute>
+            <LabirintLetter />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/labirint/š" 
+        element={
+          <ProtectedRoute>
+            <LabirintLetter />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/labirint/z" 
+        element={
+          <ProtectedRoute>
+            <LabirintLetter />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/labirint/ž" 
+        element={
+          <ProtectedRoute>
+            <LabirintLetter />
           </ProtectedRoute>
         }
       />

@@ -1,9 +1,8 @@
 import { useState, useMemo, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { MazeGame } from "@/components/games/MazeGame";
 import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,11 +16,21 @@ import { supabase } from "@/integrations/supabase/client";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
 
-const LabirintC = () => {
-  return <LabirintCContent />;
+// Map letter to database table name
+const letterToTable: Record<string, string> = {
+  'c': 'memory_cards_c',
+  'č': 'memory_cards_Č',
+  'k': 'memory_cards_K',
+  'l': 'memory_cards_l',
+  'r': 'memory_cards_r',
+  's': 'memory_cards_S',
+  'š': 'memory_cards_Š_duplicate',
+  'z': 'memory_cards_z',
+  'ž': 'memory_cards_Ž',
 };
 
-const LabirintCContent = () => {
+const LabirintLetter = () => {
+  const { letter } = useParams<{ letter: string }>();
   const navigate = useNavigate();
   const [gameKey, setGameKey] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
@@ -48,7 +57,6 @@ const LabirintCContent = () => {
       if (window.screen.orientation) {
         setIsPortrait(window.screen.orientation.type.includes('portrait'));
       } else {
-        // Fallback: use screen dimensions (not window - those change with CSS rotation)
         setIsPortrait(window.screen.height > window.screen.width);
       }
     };
@@ -74,20 +82,30 @@ const LabirintCContent = () => {
 
   const effectiveFullscreen = isTouchDevice;
 
-  // Load cards from Supabase
+  // Load cards from Supabase based on letter
   useEffect(() => {
     const loadCards = async () => {
+      if (!letter) return;
+      
+      const tableName = letterToTable[letter.toLowerCase()];
+      if (!tableName) {
+        console.error('No table found for letter:', letter);
+        return;
+      }
+      
       const { data, error } = await supabase
-        .from('memory_cards_c')
+        .from(tableName as any)
         .select('image_url, word, audio_url');
       
       if (data && !error) {
-        setCards(data);
+        setCards(data as any);
+      } else if (error) {
+        console.error('Error loading cards:', error);
       }
     };
     
     loadCards();
-  }, []);
+  }, [letter]);
 
   const completionImages = useMemo(() => {
     if (cards.length === 0) return [];
@@ -128,13 +146,11 @@ const LabirintCContent = () => {
   };
 
   const handleStarClaimed = async () => {
-    await recordGameCompletion('memory_game', 'labirint-c');
+    await recordGameCompletion('memory_game', `labirint-${letter?.toLowerCase()}`);
     setShowCompletion(false);
   };
 
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/svetlomodro_ozadje.png`;
-
-  // Orientation tracking now handled in the useEffect above with screen.orientation
 
   useEffect(() => {
     if (effectiveFullscreen) {
@@ -162,8 +178,8 @@ const LabirintCContent = () => {
         }
       };
 
-    requestFullscreen();
-    lockLandscape();
+      requestFullscreen();
+      lockLandscape();
       
       return () => {
         if (document.fullscreenElement) {
@@ -184,13 +200,11 @@ const LabirintCContent = () => {
   if (effectiveFullscreen) {
     return (
       <div className="fixed inset-0 overflow-hidden select-none">
-        {/* Full screen background */}
         <div 
           className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url('${backgroundImageUrl}')` }}
         />
         
-        {/* Game content */}
         <div className="relative z-10 flex-1 flex items-stretch justify-center overflow-hidden h-full w-full">
           {!isPortrait ? (
             <MazeGame key={gameKey} onComplete={handleGameComplete} cols={16} rows={9} />
@@ -203,10 +217,11 @@ const LabirintCContent = () => {
           )}
         </div>
 
-        {/* Floating menu button */}
         <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
-            <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"><Home className="w-8 h-8 text-white" /></button>
+            <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform">
+              <Home className="w-8 h-8 text-white" />
+            </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent 
             align="start" 
@@ -273,21 +288,20 @@ const LabirintCContent = () => {
   // Desktop version
   return (
     <div className="fixed inset-0 overflow-hidden flex flex-col">
-      {/* Full screen background */}
       <div 
         className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url('${backgroundImageUrl}')` }}
       />
       
-      {/* Game content */}
       <div className="relative z-10 flex-1 overflow-hidden w-full h-full">
         <MazeGame key={gameKey} onComplete={handleGameComplete} cols={16} rows={9} alignTop />
       </div>
 
-      {/* Floating menu button */}
       <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
         <DropdownMenuTrigger asChild>
-          <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"><Home className="w-8 h-8 text-white" /></button>
+          <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform">
+            <Home className="w-8 h-8 text-white" />
+          </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent 
           align="start" 
@@ -351,4 +365,4 @@ const LabirintCContent = () => {
   );
 };
 
-export default LabirintC;
+export default LabirintLetter;
