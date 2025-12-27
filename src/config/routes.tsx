@@ -156,6 +156,15 @@ import ZaporedjaS78 from "@/pages/ZaporedjaS78";
 import ZaporedjaŠ78 from "@/pages/ZaporedjaŠ78";
 import ZaporedjaZ78 from "@/pages/ZaporedjaZ78";
 import ZaporedjaŽ78 from "@/pages/ZaporedjaŽ78";
+import ZaporedjaC910 from "@/pages/ZaporedjaC910";
+import ZaporedjaČ910 from "@/pages/ZaporedjaČ910";
+import ZaporedjaK910 from "@/pages/ZaporedjaK910";
+import ZaporedjaL910 from "@/pages/ZaporedjaL910";
+import ZaporedjaR910 from "@/pages/ZaporedjaR910";
+import ZaporedjaS910 from "@/pages/ZaporedjaS910";
+import ZaporedjaŠ910 from "@/pages/ZaporedjaŠ910";
+import ZaporedjaZ910 from "@/pages/ZaporedjaZ910";
+import ZaporedjaŽ910 from "@/pages/ZaporedjaŽ910";
 import IgraUjemanjaC from "@/pages/IgraUjemanjaC";
 import IgraUjemanjaC56 from "@/pages/IgraUjemanjaC56";
 import IgraUjemanjaC78 from "@/pages/IgraUjemanjaC78";
@@ -1337,6 +1346,78 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <ZaporedjaŽ78 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/c910"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaC910 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/č910"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaČ910 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/k910"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaK910 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/l910"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaL910 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/r910"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaR910 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/s910"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaS910 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/š910"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaŠ910 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/z910"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaZ910 />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorne-igre/zaporedja/ž910"
+        element={
+          <ProtectedRoute>
+            <ZaporedjaŽ910 />
           </ProtectedRoute>
         }
       />
