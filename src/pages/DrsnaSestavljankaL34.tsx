@@ -13,15 +13,19 @@ import { Home, RefreshCw } from "lucide-react";
 
 const lImages = [
   { filename: 'ladja.png', word: 'LADJA' },
+  { filename: 'lasje.png', word: 'LASJE' },
   { filename: 'led.png', word: 'LED' },
+  { filename: 'lesnik.png', word: 'LEŠNIK' },
   { filename: 'letalo.png', word: 'LETALO' },
   { filename: 'lev.png', word: 'LEV' },
+  { filename: 'les.png', word: 'LES' },
   { filename: 'list.png', word: 'LIST' },
   { filename: 'lizika.png', word: 'LIZIKA' },
   { filename: 'lonec.png', word: 'LONEC' },
   { filename: 'lopar.png', word: 'LOPAR' },
   { filename: 'lubenica.png', word: 'LUBENICA' },
-  { filename: 'luc.png', word: 'LUČ' }
+  { filename: 'luc.png', word: 'LUČ' },
+  { filename: 'luza.png', word: 'LUŽA' }
 ];
 
 export default function DrsnaSestavljankaL34() {

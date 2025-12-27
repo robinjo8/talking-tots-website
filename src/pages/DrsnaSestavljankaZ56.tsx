@@ -14,13 +14,14 @@ import { Home, RefreshCw } from "lucide-react";
 const zImages = [
   { filename: 'zajec.png', word: 'ZAJEC' },
   { filename: 'zaslon.png', word: 'ZASLON' },
-  { filename: 'zavesa.png', word: 'ZAVESE' },
+  { filename: 'zavesa.png', word: 'ZAVESA' },
   { filename: 'zebra.png', word: 'ZEBRA' },
   { filename: 'zlato.png', word: 'ZLATO' },
   { filename: 'zmaj.png', word: 'ZMAJ' },
   { filename: 'zob.png', word: 'ZOB' },
   { filename: 'zobotrebec.png', word: 'ZOBOTREBEC' },
   { filename: 'zvezda.png', word: 'ZVEZDA' },
+  { filename: 'zvezek.png', word: 'ZVEZEK' },
   { filename: 'zvocnik.png', word: 'ZVOČNIK' }
 ];
 
