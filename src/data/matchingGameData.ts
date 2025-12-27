@@ -55,23 +55,43 @@ export const matchingGameData: LetterData[] = [
       { word: "KLOP", filename: "klop.png", url: `${SUPABASE_STORAGE_URL}/klop.png`, audio_url: `${SUPABASE_AUDIO_URL}/klop.m4a` },
       { word: "KNJIGA", filename: "knjiga.png", url: `${SUPABASE_STORAGE_URL}/knjiga.png`, audio_url: `${SUPABASE_AUDIO_URL}/knjiga.m4a` },
       { word: "KOCKA", filename: "kocka.png", url: `${SUPABASE_STORAGE_URL}/kocka.png`, audio_url: `${SUPABASE_AUDIO_URL}/kocka.m4a` },
-      { word: "KOKOS", filename: "kokos.png", url: `${SUPABASE_STORAGE_URL}/kokos.png`, audio_url: `${SUPABASE_AUDIO_URL}/kokos.m4a` },
-      { word: "KOLO", filename: "kolo.png", url: `${SUPABASE_STORAGE_URL}/kolo.png`, audio_url: `${SUPABASE_AUDIO_URL}/kolo.m4a` }
+      { word: "KOKOS", filename: "kokos_sadez.png", url: `${SUPABASE_STORAGE_URL}/kokos_sadez.png`, audio_url: `${SUPABASE_AUDIO_URL}/kokos_sadez.m4a` },
+      { word: "KOKOŠ", filename: "kokos.png", url: `${SUPABASE_STORAGE_URL}/kokos.png`, audio_url: `${SUPABASE_AUDIO_URL}/kokos.m4a` },
+      { word: "KOLAČ", filename: "kolac.png", url: `${SUPABASE_STORAGE_URL}/kolac.png`, audio_url: `${SUPABASE_AUDIO_URL}/kolac.m4a` },
+      { word: "KOLO", filename: "kolo.png", url: `${SUPABASE_STORAGE_URL}/kolo.png`, audio_url: `${SUPABASE_AUDIO_URL}/kolo.m4a` },
+      { word: "KORUZA", filename: "koruza.png", url: `${SUPABASE_STORAGE_URL}/koruza.png`, audio_url: `${SUPABASE_AUDIO_URL}/koruza.m4a` },
+      { word: "KOST", filename: "kost.png", url: `${SUPABASE_STORAGE_URL}/kost.png`, audio_url: `${SUPABASE_AUDIO_URL}/kost.m4a` },
+      { word: "KOŠ", filename: "kos.png", url: `${SUPABASE_STORAGE_URL}/kos.png`, audio_url: `${SUPABASE_AUDIO_URL}/kos.m4a` },
+      { word: "KOŠARA", filename: "kosara.png", url: `${SUPABASE_STORAGE_URL}/kosara.png`, audio_url: `${SUPABASE_AUDIO_URL}/kosara.m4a` },
+      { word: "KOZA", filename: "koza.png", url: `${SUPABASE_STORAGE_URL}/koza.png`, audio_url: `${SUPABASE_AUDIO_URL}/koza.m4a` },
+      { word: "KOZAREC", filename: "kozarec.png", url: `${SUPABASE_STORAGE_URL}/kozarec.png`, audio_url: `${SUPABASE_AUDIO_URL}/kozarec.m4a` },
+      { word: "KOŽA", filename: "koza_skin.png", url: `${SUPABASE_STORAGE_URL}/koza_skin.png`, audio_url: `${SUPABASE_AUDIO_URL}/koza_skin.m4a` },
+      { word: "KRAVA", filename: "krava.png", url: `${SUPABASE_STORAGE_URL}/krava.png`, audio_url: `${SUPABASE_AUDIO_URL}/krava.m4a` },
+      { word: "KROF", filename: "krof.png", url: `${SUPABASE_STORAGE_URL}/krof.png`, audio_url: `${SUPABASE_AUDIO_URL}/krof.m4a` },
+      { word: "KROG", filename: "krog.png", url: `${SUPABASE_STORAGE_URL}/krog.png`, audio_url: `${SUPABASE_AUDIO_URL}/krog.m4a` },
+      { word: "KROŽNIK", filename: "kroznik.png", url: `${SUPABASE_STORAGE_URL}/kroznik.png`, audio_url: `${SUPABASE_AUDIO_URL}/kroznik.m4a` },
+      { word: "KRUH", filename: "kruh.png", url: `${SUPABASE_STORAGE_URL}/kruh.png`, audio_url: `${SUPABASE_AUDIO_URL}/kruh.m4a` },
+      { word: "KUMARA", filename: "kumara.png", url: `${SUPABASE_STORAGE_URL}/kumara.png`, audio_url: `${SUPABASE_AUDIO_URL}/kumara.m4a` },
+      { word: "KUŽA", filename: "kuza.png", url: `${SUPABASE_STORAGE_URL}/kuza.png`, audio_url: `${SUPABASE_AUDIO_URL}/kuza.m4a` }
     ]
   },
   {
     letter: "L",
     images: [
       { word: "LADJA", filename: "ladja.png", url: `${SUPABASE_STORAGE_URL}/ladja.png`, audio_url: `${SUPABASE_AUDIO_URL}/ladja.m4a` },
+      { word: "LASJE", filename: "lasje.png", url: `${SUPABASE_STORAGE_URL}/lasje.png`, audio_url: `${SUPABASE_AUDIO_URL}/lasje.m4a` },
       { word: "LED", filename: "led.png", url: `${SUPABASE_STORAGE_URL}/led.png`, audio_url: `${SUPABASE_AUDIO_URL}/led.m4a` },
+      { word: "LEŠNIK", filename: "lesnik.png", url: `${SUPABASE_STORAGE_URL}/lesnik.png`, audio_url: `${SUPABASE_AUDIO_URL}/lesnik.m4a` },
       { word: "LETALO", filename: "letalo.png", url: `${SUPABASE_STORAGE_URL}/letalo.png`, audio_url: `${SUPABASE_AUDIO_URL}/letalo.m4a` },
       { word: "LEV", filename: "lev.png", url: `${SUPABASE_STORAGE_URL}/lev.png`, audio_url: `${SUPABASE_AUDIO_URL}/lev.m4a` },
+      { word: "LES", filename: "les.png", url: `${SUPABASE_STORAGE_URL}/les.png`, audio_url: `${SUPABASE_AUDIO_URL}/les.m4a` },
       { word: "LIST", filename: "list.png", url: `${SUPABASE_STORAGE_URL}/list.png`, audio_url: `${SUPABASE_AUDIO_URL}/list.m4a` },
       { word: "LIZIKA", filename: "lizika.png", url: `${SUPABASE_STORAGE_URL}/lizika.png`, audio_url: `${SUPABASE_AUDIO_URL}/lizika.m4a` },
       { word: "LONEC", filename: "lonec.png", url: `${SUPABASE_STORAGE_URL}/lonec.png`, audio_url: `${SUPABASE_AUDIO_URL}/lonec.m4a` },
       { word: "LOPAR", filename: "lopar.png", url: `${SUPABASE_STORAGE_URL}/lopar.png`, audio_url: `${SUPABASE_AUDIO_URL}/lopar.m4a` },
       { word: "LUBENICA", filename: "lubenica.png", url: `${SUPABASE_STORAGE_URL}/lubenica.png`, audio_url: `${SUPABASE_AUDIO_URL}/lubenica.m4a` },
-      { word: "LUČ", filename: "luc.png", url: `${SUPABASE_STORAGE_URL}/luc.png`, audio_url: `${SUPABASE_AUDIO_URL}/luc.m4a` }
+      { word: "LUČ", filename: "luc.png", url: `${SUPABASE_STORAGE_URL}/luc.png`, audio_url: `${SUPABASE_AUDIO_URL}/luc.m4a` },
+      { word: "LUŽA", filename: "luza.png", url: `${SUPABASE_STORAGE_URL}/luza.png`, audio_url: `${SUPABASE_AUDIO_URL}/luza.m4a` }
     ]
   },
   {
@@ -82,11 +102,17 @@ export const matchingGameData: LetterData[] = [
       { word: "SLADOLED", filename: "sladoled.png", url: `${SUPABASE_STORAGE_URL}/sladoled.png`, audio_url: `${SUPABASE_AUDIO_URL}/sladoled.m4a` },
       { word: "SLIKA", filename: "slika.png", url: `${SUPABASE_STORAGE_URL}/slika.png`, audio_url: `${SUPABASE_AUDIO_URL}/slika.m4a` },
       { word: "SLON", filename: "slon.png", url: `${SUPABASE_STORAGE_URL}/slon.png`, audio_url: `${SUPABASE_AUDIO_URL}/slon.m4a` },
+      { word: "SLUZ", filename: "sluz.png", url: `${SUPABASE_STORAGE_URL}/sluz.png`, audio_url: `${SUPABASE_AUDIO_URL}/sluz.m4a` },
       { word: "SMREKA", filename: "smreka.png", url: `${SUPABASE_STORAGE_URL}/smreka.png`, audio_url: `${SUPABASE_AUDIO_URL}/smreka.m4a` },
       { word: "SNEG", filename: "sneg.png", url: `${SUPABASE_STORAGE_URL}/sneg.png`, audio_url: `${SUPABASE_AUDIO_URL}/sneg.m4a` },
       { word: "SNEŽAK", filename: "snezak.png", url: `${SUPABASE_STORAGE_URL}/snezak.png`, audio_url: `${SUPABASE_AUDIO_URL}/snezak.m4a` },
+      { word: "SNEŽINKA", filename: "snezinka.png", url: `${SUPABASE_STORAGE_URL}/snezinka.png`, audio_url: `${SUPABASE_AUDIO_URL}/snezinka.m4a` },
       { word: "SOK", filename: "sok.png", url: `${SUPABASE_STORAGE_URL}/sok.png`, audio_url: `${SUPABASE_AUDIO_URL}/sok.m4a` },
-      { word: "SONCE", filename: "sonce.png", url: `${SUPABASE_STORAGE_URL}/sonce.png`, audio_url: `${SUPABASE_AUDIO_URL}/sonce.m4a` }
+      { word: "SONCE", filename: "sonce.png", url: `${SUPABASE_STORAGE_URL}/sonce.png`, audio_url: `${SUPABASE_AUDIO_URL}/sonce.m4a` },
+      { word: "SOVA", filename: "sova.png", url: `${SUPABASE_STORAGE_URL}/sova.png`, audio_url: `${SUPABASE_AUDIO_URL}/sova.m4a` },
+      { word: "STOL", filename: "stol.png", url: `${SUPABASE_STORAGE_URL}/stol.png`, audio_url: `${SUPABASE_AUDIO_URL}/stol.m4a` },
+      { word: "SVETILKA", filename: "svetilka.png", url: `${SUPABASE_STORAGE_URL}/svetilka.png`, audio_url: `${SUPABASE_AUDIO_URL}/svetilka.m4a` },
+      { word: "SVINČNIK", filename: "svincnik.png", url: `${SUPABASE_STORAGE_URL}/svincnik.png`, audio_url: `${SUPABASE_AUDIO_URL}/svincnik.m4a` }
     ]
   },
   {
@@ -116,6 +142,7 @@ export const matchingGameData: LetterData[] = [
       { word: "ZOB", filename: "zob.png", url: `${SUPABASE_STORAGE_URL}/zob.png`, audio_url: `${SUPABASE_AUDIO_URL}/zob.m4a` },
       { word: "ZOBOTREBEC", filename: "zobotrebec.png", url: `${SUPABASE_STORAGE_URL}/zobotrebec.png`, audio_url: `${SUPABASE_AUDIO_URL}/zobotrebec.m4a` },
       { word: "ZVEZDA", filename: "zvezda.png", url: `${SUPABASE_STORAGE_URL}/zvezda.png`, audio_url: `${SUPABASE_AUDIO_URL}/zvezda.m4a` },
+      { word: "ZVEZEK", filename: "zvezek.png", url: `${SUPABASE_STORAGE_URL}/zvezek.png`, audio_url: `${SUPABASE_AUDIO_URL}/zvezek.m4a` },
       { word: "ZVOČNIK", filename: "zvocnik.png", url: `${SUPABASE_STORAGE_URL}/zvocnik.png`, audio_url: `${SUPABASE_AUDIO_URL}/zvocnik.m4a` }
     ]
   },
@@ -144,9 +171,16 @@ export const matchingGameData: LetterData[] = [
       { word: "REP", filename: "rep.png", url: `${SUPABASE_STORAGE_URL}/rep.png`, audio_url: `${SUPABASE_AUDIO_URL}/rep.m4a` },
       { word: "REPA", filename: "repa.png", url: `${SUPABASE_STORAGE_URL}/repa.png`, audio_url: `${SUPABASE_AUDIO_URL}/repa.m4a` },
       { word: "RIBA", filename: "riba.png", url: `${SUPABASE_STORAGE_URL}/riba.png`, audio_url: `${SUPABASE_AUDIO_URL}/riba.m4a` },
+      { word: "RIBEZ", filename: "ribez.png", url: `${SUPABASE_STORAGE_URL}/ribez.png`, audio_url: `${SUPABASE_AUDIO_URL}/ribez.m4a` },
+      { word: "RIBIČ", filename: "ribic.png", url: `${SUPABASE_STORAGE_URL}/ribic.png`, audio_url: `${SUPABASE_AUDIO_URL}/ribic.m4a` },
+      { word: "RIS", filename: "ris.png", url: `${SUPABASE_STORAGE_URL}/ris.png`, audio_url: `${SUPABASE_AUDIO_URL}/ris.m4a` },
+      { word: "RIŽ", filename: "riz.png", url: `${SUPABASE_STORAGE_URL}/riz.png`, audio_url: `${SUPABASE_AUDIO_URL}/riz.m4a` },
       { word: "ROBOT", filename: "robot.png", url: `${SUPABASE_STORAGE_URL}/robot.png`, audio_url: `${SUPABASE_AUDIO_URL}/robot.m4a` },
       { word: "ROKA", filename: "roka.png", url: `${SUPABASE_STORAGE_URL}/roka.png`, audio_url: `${SUPABASE_AUDIO_URL}/roka.m4a` },
-      { word: "ROLKA", filename: "rolka.png", url: `${SUPABASE_STORAGE_URL}/rolka.png`, audio_url: `${SUPABASE_AUDIO_URL}/rolka.m4a` }
+      { word: "ROKOMETAŠ", filename: "rokometas.png", url: `${SUPABASE_STORAGE_URL}/rokometas.png`, audio_url: `${SUPABASE_AUDIO_URL}/rokometas.m4a` },
+      { word: "ROLKA", filename: "rolka.png", url: `${SUPABASE_STORAGE_URL}/rolka.png`, audio_url: `${SUPABASE_AUDIO_URL}/rolka.m4a` },
+      { word: "ROPOTULJICA", filename: "ropotuljica.png", url: `${SUPABASE_STORAGE_URL}/ropotuljica.png`, audio_url: `${SUPABASE_AUDIO_URL}/ropotuljica.m4a` },
+      { word: "ROŽA", filename: "roza.png", url: `${SUPABASE_STORAGE_URL}/roza.png`, audio_url: `${SUPABASE_AUDIO_URL}/roza.m4a` }
     ]
   }
 ];
