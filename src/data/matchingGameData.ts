@@ -10,7 +10,7 @@ export interface LetterData {
   images: MatchingGameImage[];
 }
 
-const SUPABASE_STORAGE_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke";
+const SUPABASE_STORAGE_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike";
 const SUPABASE_AUDIO_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki";
 
 export const matchingGameData: LetterData[] = [
