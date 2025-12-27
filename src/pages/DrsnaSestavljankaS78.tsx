@@ -3,6 +3,7 @@ import { SlidingPuzzle78 } from "@/components/puzzle/SlidingPuzzle78";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useState, useRef, useMemo } from "react";
@@ -132,7 +133,7 @@ function DrsnaSestavljankaS78Content() {
         { word: currentImage.word, url: imageUrl, filename: currentImage.filename },
         { word: currentImage.word, url: imageUrl, filename: currentImage.filename }
       ]} onStarClaimed={handleStarClaimed} instructionText="KLIKNI NA VSAKO SLIKO IN 4X IZGOVORI BESEDO." autoPlayAudio={true} />
-      <ConfirmDialog open={showExitDialog} onOpenChange={setShowExitDialog} title="Zapusti igro" description="Ali res želiš zapustiti igro?" confirmText="Da" cancelText="Ne" onConfirm={() => navigate("/govorne-igre/drsna-sestavljanka")} onCancel={() => setShowExitDialog(false)} />
+      <MemoryExitConfirmationDialog open={showExitDialog} onOpenChange={setShowExitDialog} onConfirm={() => navigate("/govorne-igre/drsna-sestavljanka")}><div /></MemoryExitConfirmationDialog>
       <ConfirmDialog open={showNewGameDialog} onOpenChange={setShowNewGameDialog} title="Nova igra" description="Ali res želiš začeti novo igro?" confirmText="Da" cancelText="Ne" onConfirm={handleConfirmNewGame} onCancel={() => setShowNewGameDialog(false)} />
     </div>
   );
