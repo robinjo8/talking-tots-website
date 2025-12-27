@@ -8,7 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Home } from "lucide-react";
+import { Home, RefreshCw } from "lucide-react";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { useAuth } from "@/contexts/AuthContext";
@@ -357,12 +357,14 @@ const LabirintLetter = () => {
           )}
         </div>
 
-        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-          <DropdownMenuTrigger asChild>
-            <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform">
-              <Home className="w-8 h-8 text-white" />
-            </button>
-          </DropdownMenuTrigger>
+        {/* Fixed buttons container */}
+        <div className="fixed bottom-4 left-4 z-50 flex items-center gap-3">
+          <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+            <DropdownMenuTrigger asChild>
+              <button className="w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform">
+                <Home className="w-8 h-8 text-white" />
+              </button>
+            </DropdownMenuTrigger>
           <DropdownMenuContent 
             align="start" 
             side="top"
@@ -394,7 +396,16 @@ const LabirintLetter = () => {
               <span>Navodila</span>
             </button>
           </DropdownMenuContent>
-        </DropdownMenu>
+          </DropdownMenu>
+
+          {/* Nova igra button - blue circular button */}
+          <button
+            onClick={handleNewGame}
+            className="w-16 h-16 rounded-full bg-gradient-to-r from-green-400 to-green-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
+          >
+            <RefreshCw className="w-8 h-8 text-white" />
+          </button>
+        </div>
 
         <MemoryExitConfirmationDialog
           open={showExitDialog}
@@ -437,44 +448,55 @@ const LabirintLetter = () => {
         <MazeGame key={gameKey} onComplete={handleGameComplete} cols={16} rows={9} alignTop />
       </div>
 
-      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-        <DropdownMenuTrigger asChild>
-          <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform">
-            <Home className="w-8 h-8 text-white" />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent 
-          align="start" 
-          side="top"
-          sideOffset={8}
-          className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+      {/* Fixed buttons container */}
+      <div className="fixed bottom-4 left-4 z-50 flex items-center gap-3">
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger asChild>
+            <button className="w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform">
+              <Home className="w-8 h-8 text-white" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            align="start" 
+            side="top"
+            sideOffset={8}
+            className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+          >
+            <button
+              onClick={handleBack}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+            >
+              <span className="text-2xl">🏠</span>
+              <span>Nazaj</span>
+            </button>
+            <button
+              onClick={handleNewGame}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+            >
+              <span className="text-2xl">🔄</span>
+              <span>Nova igra</span>
+            </button>
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                setShowInstructions(true);
+              }}
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
+            >
+              <span className="text-2xl">📖</span>
+              <span>Navodila</span>
+            </button>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Nova igra button - green circular button */}
+        <button
+          onClick={handleNewGame}
+          className="w-16 h-16 rounded-full bg-gradient-to-r from-green-400 to-green-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
         >
-          <button
-            onClick={handleBack}
-            className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
-          >
-            <span className="text-2xl">🏠</span>
-            <span>Nazaj</span>
-          </button>
-          <button
-            onClick={handleNewGame}
-            className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
-          >
-            <span className="text-2xl">🔄</span>
-            <span>Nova igra</span>
-          </button>
-          <button
-            onClick={() => {
-              setMenuOpen(false);
-              setShowInstructions(true);
-            }}
-            className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
-          >
-            <span className="text-2xl">📖</span>
-            <span>Navodila</span>
-          </button>
-        </DropdownMenuContent>
-      </DropdownMenu>
+          <RefreshCw className="w-8 h-8 text-white" />
+        </button>
+      </div>
 
       <MemoryExitConfirmationDialog
         open={showExitDialog}
