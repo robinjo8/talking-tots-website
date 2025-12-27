@@ -16,18 +16,157 @@ import { supabase } from "@/integrations/supabase/client";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
 
-// Map letter to database table name
-const letterToTable: Record<string, string> = {
-  'c': 'memory_cards_c',
-  'č': 'memory_cards_Č',
-  'k': 'memory_cards_K',
-  'l': 'memory_cards_l',
-  'r': 'memory_cards_r',
-  's': 'memory_cards_S',
-  'š': 'memory_cards_Š_duplicate',
-  'z': 'memory_cards_z',
-  'ž': 'memory_cards_Ž',
+// Images data for each letter - using bucket "slike"
+const labirintImages: Record<string, Array<{ filename: string; word: string }>> = {
+  'c': [
+    { filename: 'cedilo.png', word: 'Cedilo' },
+    { filename: 'cekin.png', word: 'Cekin' },
+    { filename: 'cerkev.png', word: 'Cerkev' },
+    { filename: 'cesta.png', word: 'Cesta' },
+    { filename: 'cev.png', word: 'Cev' },
+    { filename: 'cirkus.png', word: 'Cirkus' },
+    { filename: 'cisterna.png', word: 'Cisterna' },
+    { filename: 'cokla.png', word: 'Cokla' },
+    { filename: 'copat.png', word: 'Copat' },
+    { filename: 'cvet.png', word: 'Cvet' },
+  ],
+  'č': [
+    { filename: 'caj.png', word: 'Čaj' },
+    { filename: 'casopis.png', word: 'Časopis' },
+    { filename: 'cebela.png', word: 'Čebela' },
+    { filename: 'cebula.png', word: 'Čebula' },
+    { filename: 'cesen.png', word: 'Česen' },
+    { filename: 'cevlji.png', word: 'Čevlji' },
+    { filename: 'cokolada.png', word: 'Čokolada' },
+    { filename: 'coln.png', word: 'Čoln' },
+    { filename: 'copic.png', word: 'Čopič' },
+    { filename: 'crke.png', word: 'Črke' },
+  ],
+  'k': [
+    { filename: 'kaca.png', word: 'Kača' },
+    { filename: 'kapa.png', word: 'Kapa' },
+    { filename: 'kava.png', word: 'Kava' },
+    { filename: 'klavir.png', word: 'Klavir' },
+    { filename: 'kljuc.png', word: 'Ključ' },
+    { filename: 'klop.png', word: 'Klop' },
+    { filename: 'knjiga.png', word: 'Knjiga' },
+    { filename: 'kocka.png', word: 'Kocka' },
+    { filename: 'kokos_sadez.png', word: 'Kokos' },
+    { filename: 'kokos.png', word: 'Kokoš' },
+    { filename: 'kolac.png', word: 'Kolač' },
+    { filename: 'kolo.png', word: 'Kolo' },
+    { filename: 'koruza.png', word: 'Koruza' },
+    { filename: 'kost.png', word: 'Kost' },
+    { filename: 'kos.png', word: 'Koš' },
+    { filename: 'kosara.png', word: 'Košara' },
+    { filename: 'koza.png', word: 'Koza' },
+    { filename: 'kozarec.png', word: 'Kozarec' },
+    { filename: 'koza_skin.png', word: 'Koža' },
+    { filename: 'krava.png', word: 'Krava' },
+    { filename: 'krof.png', word: 'Krof' },
+    { filename: 'krog.png', word: 'Krog' },
+    { filename: 'kroznik.png', word: 'Krožnik' },
+    { filename: 'kruh.png', word: 'Kruh' },
+    { filename: 'kumara.png', word: 'Kumara' },
+    { filename: 'kuza.png', word: 'Kuža' },
+  ],
+  'l': [
+    { filename: 'ladja.png', word: 'Ladja' },
+    { filename: 'lasje.png', word: 'Lasje' },
+    { filename: 'led.png', word: 'Led' },
+    { filename: 'lesnik.png', word: 'Lešnik' },
+    { filename: 'letalo.png', word: 'Letalo' },
+    { filename: 'lev.png', word: 'Lev' },
+    { filename: 'les.png', word: 'Les' },
+    { filename: 'list.png', word: 'List' },
+    { filename: 'lizika.png', word: 'Lizika' },
+    { filename: 'lonec.png', word: 'Lonec' },
+    { filename: 'lopar.png', word: 'Lopar' },
+    { filename: 'lubenica.png', word: 'Lubenica' },
+    { filename: 'luc.png', word: 'Luč' },
+    { filename: 'luza.png', word: 'Luža' },
+  ],
+  'r': [
+    { filename: 'raca.png', word: 'Raca' },
+    { filename: 'rak.png', word: 'Rak' },
+    { filename: 'raketa.png', word: 'Raketa' },
+    { filename: 'ravnilo.png', word: 'Ravnilo' },
+    { filename: 'rep.png', word: 'Rep' },
+    { filename: 'repa.png', word: 'Repa' },
+    { filename: 'riba.png', word: 'Riba' },
+    { filename: 'ribez.png', word: 'Ribez' },
+    { filename: 'ribic.png', word: 'Ribič' },
+    { filename: 'ris.png', word: 'Ris' },
+    { filename: 'riz.png', word: 'Riž' },
+    { filename: 'robot.png', word: 'Robot' },
+    { filename: 'roka.png', word: 'Roka' },
+    { filename: 'rokometas.png', word: 'Rokometaš' },
+    { filename: 'rolka.png', word: 'Rolka' },
+    { filename: 'ropotuljica.png', word: 'Ropotuljica' },
+    { filename: 'roza.png', word: 'Roža' },
+  ],
+  's': [
+    { filename: 'sedem.png', word: 'Sedem' },
+    { filename: 'sir.png', word: 'Sir' },
+    { filename: 'sladoled.png', word: 'Sladoled' },
+    { filename: 'slika.png', word: 'Slika' },
+    { filename: 'slon.png', word: 'Slon' },
+    { filename: 'sluz.png', word: 'Sluz' },
+    { filename: 'smreka.png', word: 'Smreka' },
+    { filename: 'sneg.png', word: 'Sneg' },
+    { filename: 'snezak.png', word: 'Snežak' },
+    { filename: 'snezinka.png', word: 'Snežinka' },
+    { filename: 'sok.png', word: 'Sok' },
+    { filename: 'sonce.png', word: 'Sonce' },
+    { filename: 'sova.png', word: 'Sova' },
+    { filename: 'stol.png', word: 'Stol' },
+    { filename: 'svetilka.png', word: 'Svetilka' },
+    { filename: 'svincnik.png', word: 'Svinčnik' },
+  ],
+  'š': [
+    { filename: 'sah.png', word: 'Šah' },
+    { filename: 'sal.png', word: 'Šal' },
+    { filename: 'scetka.png', word: 'Ščetka' },
+    { filename: 'skarje.png', word: 'Škarje' },
+    { filename: 'skatla.png', word: 'Škatla' },
+    { filename: 'skoljka.png', word: 'Školjka' },
+    { filename: 'sopek.png', word: 'Šopek' },
+    { filename: 'sotor.png', word: 'Šotor' },
+    { filename: 'stampiljka.png', word: 'Štampiljka' },
+    { filename: 'storklja.png', word: 'Štorklja' },
+  ],
+  'z': [
+    { filename: 'zajec.png', word: 'Zajec' },
+    { filename: 'zaslon.png', word: 'Zaslon' },
+    { filename: 'zavesa.png', word: 'Zavesa' },
+    { filename: 'zebra.png', word: 'Zebra' },
+    { filename: 'zlato.png', word: 'Zlato' },
+    { filename: 'zmaj.png', word: 'Zmaj' },
+    { filename: 'zob.png', word: 'Zob' },
+    { filename: 'zobotrebec.png', word: 'Zobotrebec' },
+    { filename: 'zvezda.png', word: 'Zvezda' },
+    { filename: 'zvezek.png', word: 'Zvezek' },
+    { filename: 'zvocnik.png', word: 'Zvočnik' },
+  ],
+  'ž': [
+    { filename: 'zaba.png', word: 'Žaba' },
+    { filename: 'zaga.png', word: 'Žaga' },
+    { filename: 'zarnica.png', word: 'Žarnica' },
+    { filename: 'zebelj.png', word: 'Žebelj' },
+    { filename: 'zelva.png', word: 'Želva' },
+    { filename: 'zerjav.png', word: 'Žerjav' },
+    { filename: 'zirafa.png', word: 'Žirafa' },
+    { filename: 'zlica.png', word: 'Žlica' },
+    { filename: 'zoga.png', word: 'Žoga' },
+    { filename: 'zolna.png', word: 'Žolna' },
+  ],
 };
+
+const getImageUrl = (filename: string) => 
+  `${SUPABASE_URL}/storage/v1/object/public/slike/${filename}`;
+
+const getAudioUrl = (word: string) => 
+  `${SUPABASE_URL}/storage/v1/object/public/zvocni-posnetki/${word.toLowerCase()}.mp3`;
 
 const LabirintLetter = () => {
   const { letter: rawLetter } = useParams<{ letter: string }>();
@@ -84,29 +223,23 @@ const LabirintLetter = () => {
 
   const effectiveFullscreen = isTouchDevice;
 
-  // Load cards from Supabase based on letter
+  // Load cards from static data based on letter - using bucket "slike"
   useEffect(() => {
-    const loadCards = async () => {
-      if (!letter) return;
-      
-      const tableName = letterToTable[letter.toLowerCase()];
-      if (!tableName) {
-        console.error('No table found for letter:', letter);
-        return;
-      }
-      
-      const { data, error } = await supabase
-        .from(tableName as any)
-        .select('image_url, word, audio_url');
-      
-      if (data && !error) {
-        setCards(data as any);
-      } else if (error) {
-        console.error('Error loading cards:', error);
-      }
-    };
+    if (!letter) return;
     
-    loadCards();
+    const images = labirintImages[letter.toLowerCase()];
+    if (!images) {
+      console.error('No images found for letter:', letter);
+      return;
+    }
+    
+    const cardsData = images.map(img => ({
+      image_url: getImageUrl(img.filename),
+      word: img.word,
+      audio_url: getAudioUrl(img.word)
+    }));
+    
+    setCards(cardsData);
   }, [letter]);
 
   const completionImages = useMemo(() => {
