@@ -1,138 +1,77 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, RotateCw, Volume2 } from "lucide-react";
-import { useAudioPlayback } from "@/hooks/useAudioPlayback";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { Home, HelpCircle } from "lucide-react";
+import { FortuneWheel } from "@/components/wheel/FortuneWheel";
+import { useFortuneWheel } from "@/hooks/useFortuneWheel";
+import { useWordProgress } from "@/hooks/useWordProgress";
+import { WheelSuccessDialog } from "@/components/wheel/WheelSuccessDialog";
+import { ProgressModal } from "@/components/wheel/ProgressModal";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const wordsDataZ = [
   { word: "ZAJEC", image: "zajec.png", audio: "zajec.m4a" },
   { word: "ZASLON", image: "zaslon.png", audio: "zaslon.m4a" },
-  { word: "ZAVESE", image: "zavesa.png", audio: "zavesa.m4a" },
+  { word: "ZAVESA", image: "zavesa.png", audio: "zavesa.m4a" },
   { word: "ZEBRA", image: "zebra.png", audio: "zebra.m4a" },
   { word: "ZLATO", image: "zlato.png", audio: "zlato.m4a" },
   { word: "ZMAJ", image: "zmaj.png", audio: "zmaj.m4a" },
   { word: "ZOB", image: "zob.png", audio: "zob.m4a" },
   { word: "ZOBOTREBEC", image: "zobotrebec.png", audio: "zobotrebec.m4a" },
+  { word: "ZVEZEK", image: "zvezek.png", audio: "zvezek.m4a" },
   { word: "ZVEZDA", image: "zvezda.png", audio: "zvezda.m4a" },
   { word: "ZVOČNIK", image: "zvocnik.png", audio: "zvocnik.m4a" }
 ];
 
+const wordsList = wordsDataZ.map(w => w.word);
+
 export default function ArtikulacijaVajeZ() {
   const navigate = useNavigate();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [loading, setLoading] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
-  const { playAudio } = useAudioPlayback();
-  const isMobile = useIsMobile();
+  const [showExitConfirmation, setShowExitConfirmation] = useState(false);
+  const [showNewGameConfirmation, setShowNewGameConfirmation] = useState(false);
+  const [showProgressModal, setShowProgressModal] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const currentWord = wordsDataZ[currentIndex];
-  
-  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentWord.image}`;
-  const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${currentWord.audio}`;
+  const { isSpinning, rotation, selectedWord, selectedIndex, showResult, spinWheel, resetWheel, closeResult } = useFortuneWheel({ wordsData: wordsDataZ });
+  const { progress, incrementProgress, getProgress, resetProgress, resetWordProgress } = useWordProgress('Z', wordsList);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      playAudio(audioUrl);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [currentIndex, audioUrl, playAudio]);
+  const handleBack = () => { setMenuOpen(false); setShowExitConfirmation(true); };
+  const handleConfirmExit = () => { navigate('/govorno-jezikovne-vaje/artikulacija'); };
+  const handleNewGame = () => { setMenuOpen(false); setShowNewGameConfirmation(true); };
+  const handleConfirmNewGame = () => { resetWheel(); resetProgress(); setShowNewGameConfirmation(false); };
+  const handleInstructions = () => { setMenuOpen(false); setShowInstructions(true); };
+  const handleRecordComplete = () => { if (selectedWord) incrementProgress(selectedWord.word); };
+  const handleStarClaimed = () => { if (selectedWord) resetWordProgress(selectedWord.word); closeResult(); };
 
-  const handleNextWord = () => {
-    const randomIndex = Math.floor(Math.random() * wordsDataZ.length);
-    setCurrentIndex(randomIndex);
-  };
-
-  const handlePlayAudio = () => {
-    playAudio(audioUrl);
-  };
-
-  const handleBack = () => {
-    navigate('/govorno-jezikovne-vaje/artikulacija');
-  };
+  const currentWordProgress = selectedWord ? getProgress(selectedWord.word) : 0;
 
   return (
-    <div 
-      className="fixed inset-0 overflow-auto select-none"
-      style={{
-        backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.png)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}
-    >
-      <div className="min-h-full flex items-center justify-center p-4">
-        <Card className="w-full max-w-2xl">
-          <CardContent className="p-6 md:p-8">
-            <div className="text-center mb-4 md:mb-6">
-              <h2 className="text-3xl md:text-5xl font-bold text-dragon-green">
-                {currentWord.word}
-              </h2>
-            </div>
-
-            <div className="flex justify-center gap-3 md:gap-4 mb-4 md:mb-6">
-              <Button 
-                onClick={handleBack}
-                variant="outline" 
-                size={isMobile ? "sm" : "default"}
-                className="gap-2"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Nazaj
-              </Button>
-              
-              <Button 
-                onClick={() => setShowInstructions(true)}
-                variant="outline" 
-                size={isMobile ? "sm" : "default"}
-                className="gap-2"
-              >
-                Navodila
-              </Button>
-            </div>
-
-            <div className="relative w-full max-w-md mx-auto mb-4 md:mb-6">
-              <div className="aspect-square bg-muted rounded-lg overflow-hidden flex items-center justify-center">
-                {loading ? (
-                  <div className="text-muted-foreground">Nalaganje...</div>
-                ) : (
-                  <img
-                    src={imageUrl}
-                    alt={currentWord.word}
-                    className="w-full h-full object-contain p-4"
-                  />
-                )}
-              </div>
-            </div>
-
-            <div className="flex justify-center gap-3 md:gap-4">
-              <Button 
-                onClick={handlePlayAudio}
-                className="bg-black hover:bg-black/90 text-white gap-2"
-              >
-                <Volume2 className="h-4 w-4" />
-                Poslušaj besedo
-              </Button>
-              
-              <Button 
-                onClick={handleNextWord}
-                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
-              >
-                <RotateCw className="h-4 w-4" />
-                Nova beseda
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+    <div className="fixed inset-0 overflow-auto select-none" style={{ backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+      <div className="min-h-full flex flex-col items-center justify-center p-4 pb-24">
+        <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 md:mb-8 text-center drop-shadow-lg">KOLO SREČE - Z</h1>
+        <FortuneWheel segmentCount={wordsDataZ.length} rotation={rotation} isSpinning={isSpinning} onSpin={spinWheel} selectedIndex={selectedIndex} />
       </div>
 
-      <InstructionsModal
-        isOpen={showInstructions}
-        onClose={() => setShowInstructions(false)}
-        type="articulation"
-      />
+      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+        <DropdownMenuTrigger asChild>
+          <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"><Home className="w-8 h-8 text-white" /></button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl" align="start" side="top" sideOffset={8}>
+          <button onClick={handleBack} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"><span className="text-xl">🏠</span><span className="font-medium">Nazaj</span></button>
+          <button onClick={handleNewGame} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"><span className="text-xl">🔄</span><span className="font-medium">Nova igra</span></button>
+          <button onClick={handleInstructions} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"><span className="text-xl">📖</span><span className="font-medium">Navodila</span></button>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <button onClick={() => setShowProgressModal(true)} className="fixed bottom-4 right-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"><HelpCircle className="w-8 h-8 text-white" /></button>
+
+      {selectedWord && <WheelSuccessDialog isOpen={showResult} onOpenChange={(open) => { if (!open) closeResult(); }} completedImage={{ filename: selectedWord.image, word: selectedWord.word, audio: selectedWord.audio }} pronunciationCount={currentWordProgress} onRecordComplete={handleRecordComplete} onStarClaimed={handleStarClaimed} />}
+      <ProgressModal isOpen={showProgressModal} onClose={() => setShowProgressModal(false)} words={wordsDataZ} progress={progress} letter="Z" />
+      <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="articulation" />
+      <ConfirmDialog open={showExitConfirmation} onOpenChange={setShowExitConfirmation} title="Zapusti igro" description="Ali res želiš zapustiti igro?" confirmText="Da" cancelText="Ne" onConfirm={handleConfirmExit} onCancel={() => setShowExitConfirmation(false)} />
+      <ConfirmDialog open={showNewGameConfirmation} onOpenChange={setShowNewGameConfirmation} title="Nova igra" description="Ali res želiš začeti novo igro? Ves napredek bo ponastavljen na začetno stanje." confirmText="Da" cancelText="Ne" onConfirm={handleConfirmNewGame} onCancel={() => setShowNewGameConfirmation(false)} />
     </div>
   );
 }
