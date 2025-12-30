@@ -84,7 +84,7 @@ export default function ArtikulacijaVajeRSredinaKonec() {
       }}
     >
       {/* Main content - flex layout to fit viewport */}
-      <div className="h-full flex flex-col items-center justify-center p-2 md:p-4 gap-1 md:gap-2">
+      <div className="h-full flex flex-col items-center justify-center p-2 md:p-4 gap-1 md:gap-2 md:scale-[1.2] md:origin-center">
         {/* Header row with title and progress */}
         <div className="flex items-center gap-4">
           <h1 className="text-xl md:text-2xl font-bold text-white text-center drop-shadow-lg">
