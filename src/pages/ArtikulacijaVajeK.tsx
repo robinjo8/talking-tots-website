@@ -8,6 +8,7 @@ import { WheelSuccessDialog } from "@/components/wheel/WheelSuccessDialog";
 import { ProgressModal } from "@/components/wheel/ProgressModal";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const wordsDataK = [
@@ -83,7 +84,7 @@ export default function ArtikulacijaVajeK() {
       {selectedWord && <WheelSuccessDialog isOpen={showResult} onOpenChange={(open) => { if (!open) closeResult(); }} completedImage={{ filename: selectedWord.image, word: selectedWord.word, audio: selectedWord.audio }} pronunciationCount={currentWordProgress} onRecordComplete={handleRecordComplete} onStarClaimed={handleStarClaimed} />}
       <ProgressModal isOpen={showProgressModal} onClose={() => setShowProgressModal(false)} words={wordsDataK} progress={progress} letter="K" />
       <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="articulation" />
-      <ConfirmDialog open={showExitConfirmation} onOpenChange={setShowExitConfirmation} title="Zapusti igro" description="Ali res želiš zapustiti igro?" confirmText="Da" cancelText="Ne" onConfirm={handleConfirmExit} onCancel={() => setShowExitConfirmation(false)} />
+      <MemoryExitConfirmationDialog open={showExitConfirmation} onOpenChange={setShowExitConfirmation} onConfirm={handleConfirmExit}><div /></MemoryExitConfirmationDialog>
       <ConfirmDialog open={showNewGameConfirmation} onOpenChange={setShowNewGameConfirmation} title="Nova igra" description="Ali res želiš začeti novo igro? Ves napredek bo ponastavljen na začetno stanje." confirmText="Da" cancelText="Ne" onConfirm={handleConfirmNewGame} onCancel={() => setShowNewGameConfirmation(false)} />
     </div>
   );

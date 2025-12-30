@@ -8,6 +8,7 @@ import { WheelSuccessDialog } from "@/components/wheel/WheelSuccessDialog";
 import { ProgressModal } from "@/components/wheel/ProgressModal";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -205,16 +206,13 @@ export default function ArtikulacijaVajeR() {
       />
 
       {/* Exit Confirmation Dialog */}
-      <ConfirmDialog
+      <MemoryExitConfirmationDialog
         open={showExitConfirmation}
         onOpenChange={setShowExitConfirmation}
-        title="Zapusti igro"
-        description="Ali res želiš zapustiti igro?"
-        confirmText="Da"
-        cancelText="Ne"
         onConfirm={handleConfirmExit}
-        onCancel={() => setShowExitConfirmation(false)}
-      />
+      >
+        <div />
+      </MemoryExitConfirmationDialog>
 
       {/* New Game Confirmation Dialog */}
       <ConfirmDialog
