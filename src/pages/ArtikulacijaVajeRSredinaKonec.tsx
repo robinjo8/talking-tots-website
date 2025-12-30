@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Home, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -43,17 +43,15 @@ export default function ArtikulacijaVajeRSredinaKonec() {
     resetGame
   } = useBingoGame({ words: wordsDataRSredinaKonec, minWordsForWin: 8 });
 
-  // Show congratulations when game is complete
-  const handleGameComplete = () => {
-    if (gameComplete && winningLine && !showCongratulations) {
-      setShowCongratulations(true);
+  // Show congratulations when game is complete (BINGO achieved)
+  useEffect(() => {
+    if (gameComplete && winningLine && !showCongratulations && !showPopup) {
+      const timer = setTimeout(() => {
+        setShowCongratulations(true);
+      }, 500);
+      return () => clearTimeout(timer);
     }
-  };
-
-  // Check for game complete after each popup close
-  if (gameComplete && winningLine && !showCongratulations && !showPopup) {
-    setTimeout(() => setShowCongratulations(true), 100);
-  }
+  }, [gameComplete, winningLine, showCongratulations, showPopup]);
 
   const handleBack = () => {
     setMenuOpen(false);
