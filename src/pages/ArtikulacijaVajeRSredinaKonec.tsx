@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Home } from "lucide-react";
+import { Home, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { wordsDataRSredinaKonec } from "@/data/bingoWordsR";
 import { useBingoGame } from "@/hooks/useBingoGame";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
@@ -23,6 +24,7 @@ export default function ArtikulacijaVajeRSredinaKonec() {
   const [showNewGameConfirmation, setShowNewGameConfirmation] = useState(false);
   const [showCongratulations, setShowCongratulations] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showNewGameButton, setShowNewGameButton] = useState(false);
 
   const { recordExerciseCompletion } = useEnhancedProgress();
 
@@ -85,6 +87,7 @@ export default function ArtikulacijaVajeRSredinaKonec() {
   const handleStarClaimed = () => {
     recordExerciseCompletion('artikulacija_bingo_r');
     setShowCongratulations(false);
+    setShowNewGameButton(true);
   };
 
   return (
@@ -99,16 +102,6 @@ export default function ArtikulacijaVajeRSredinaKonec() {
     >
       {/* Main content - flex layout to fit viewport */}
       <div className="h-full flex flex-col items-center justify-center p-2 md:p-4 gap-1 md:gap-2 md:scale-[1.2] md:origin-center">
-        {/* Header row with title and progress */}
-        <div className="flex items-center gap-4">
-          <h1 className="text-xl md:text-2xl font-bold text-white text-center drop-shadow-lg">
-            BINGO - R
-          </h1>
-          <div className="text-white text-sm md:text-base font-medium bg-white/20 px-3 py-1 rounded-full">
-            {completedCount}/8
-          </div>
-        </div>
-        
         {/* Reel */}
         <BingoReel
           words={wordsDataRSredinaKonec}
@@ -166,6 +159,20 @@ export default function ArtikulacijaVajeRSredinaKonec() {
           </button>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {/* New Game Button - appears after winning */}
+      {showNewGameButton && (
+        <Button
+          size="icon"
+          onClick={() => {
+            setShowNewGameButton(false);
+            resetGame();
+          }}
+          className="fixed bottom-4 left-24 z-50 bg-blue-500 hover:bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg"
+        >
+          <RefreshCw className="w-6 h-6" />
+        </Button>
+      )}
 
       {/* Success Dialog - for each word */}
       {drawnWord && (

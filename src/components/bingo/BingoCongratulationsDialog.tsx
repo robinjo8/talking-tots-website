@@ -15,7 +15,6 @@ export const BingoCongratulationsDialog: React.FC<BingoCongratulationsDialogProp
 }) => {
   const handleClaimStar = () => {
     onStarClaimed();
-    onClose();
   };
 
   return (
