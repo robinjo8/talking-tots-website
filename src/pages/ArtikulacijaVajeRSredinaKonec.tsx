@@ -25,6 +25,7 @@ export default function ArtikulacijaVajeRSredinaKonec() {
   const [showCongratulations, setShowCongratulations] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showNewGameButton, setShowNewGameButton] = useState(false);
+  const [starClaimed, setStarClaimed] = useState(false);
 
   const { recordExerciseCompletion } = useEnhancedProgress();
 
@@ -43,15 +44,15 @@ export default function ArtikulacijaVajeRSredinaKonec() {
     resetGame
   } = useBingoGame({ words: wordsDataRSredinaKonec, minWordsForWin: 8 });
 
-  // Show congratulations when game is complete (BINGO achieved)
+  // Show congratulations when game is complete (BINGO achieved) - only if star not yet claimed
   useEffect(() => {
-    if (gameComplete && winningLine && !showCongratulations && !showPopup) {
+    if (gameComplete && winningLine && !showCongratulations && !showPopup && !starClaimed) {
       const timer = setTimeout(() => {
         setShowCongratulations(true);
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [gameComplete, winningLine, showCongratulations, showPopup]);
+  }, [gameComplete, winningLine, showCongratulations, showPopup, starClaimed]);
 
   const handleBack = () => {
     setMenuOpen(false);
@@ -69,6 +70,7 @@ export default function ArtikulacijaVajeRSredinaKonec() {
 
   const handleConfirmNewGame = () => {
     setShowCongratulations(false);
+    setStarClaimed(false);
     resetGame();
     setShowNewGameConfirmation(false);
   };
@@ -84,6 +86,7 @@ export default function ArtikulacijaVajeRSredinaKonec() {
 
   const handleStarClaimed = () => {
     recordExerciseCompletion('artikulacija_bingo_r');
+    setStarClaimed(true);
     setShowCongratulations(false);
     setShowNewGameButton(true);
   };
