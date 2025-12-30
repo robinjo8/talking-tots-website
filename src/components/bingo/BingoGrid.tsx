@@ -7,13 +7,15 @@ interface BingoGridProps {
   drawnWord: string | null;
   showHint: boolean;
   onCellClick: (index: number) => void;
+  winningLine?: number[] | null;
 }
 
 export const BingoGrid: React.FC<BingoGridProps> = ({
   grid,
   drawnWord,
   showHint,
-  onCellClick
+  onCellClick,
+  winningLine = null
 }) => {
   const shouldPulse = (cell: BingoCell) => {
     return showHint && 
@@ -21,6 +23,10 @@ export const BingoGrid: React.FC<BingoGridProps> = ({
            cell.word.word === drawnWord && 
            !cell.isCompleted && 
            !cell.isClicked;
+  };
+
+  const isWinningCell = (index: number) => {
+    return winningLine && winningLine.includes(index);
   };
 
   return (
@@ -44,6 +50,10 @@ export const BingoGrid: React.FC<BingoGridProps> = ({
               ? 'animate-pulse ring-2 ring-orange-400' 
               : ''
             }
+            ${isWinningCell(index) 
+              ? 'ring-4 ring-yellow-400 scale-105 opacity-100' 
+              : ''
+            }
           `}
         >
           <img
@@ -54,9 +64,9 @@ export const BingoGrid: React.FC<BingoGridProps> = ({
           
           {/* Completed overlay */}
           {cell.isCompleted && (
-            <div className="absolute inset-0 bg-green-500/50 flex items-center justify-center">
+            <div className={`absolute inset-0 flex items-center justify-center ${isWinningCell(index) ? 'bg-yellow-500/50' : 'bg-green-500/50'}`}>
               <div className="bg-white rounded-full p-1">
-                <Check className="w-3 h-3 md:w-4 md:h-4 text-green-600" />
+                <Check className={`w-3 h-3 md:w-4 md:h-4 ${isWinningCell(index) ? 'text-yellow-600' : 'text-green-600'}`} />
               </div>
             </div>
           )}
