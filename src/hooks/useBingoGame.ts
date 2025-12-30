@@ -12,6 +12,13 @@ interface UseBingoGameProps {
   words: BingoWord[];
   gridSize?: number;
   maxRepeat?: number;
+  minWordsForWin?: number;
+}
+
+interface WinningLine {
+  type: 'row' | 'column';
+  index: number;
+  cells: number[];
 }
 
 interface UseBingoGameReturn {
@@ -22,16 +29,33 @@ interface UseBingoGameReturn {
   showPopup: boolean;
   gameComplete: boolean;
   completedCount: number;
+  winningLine: WinningLine | null;
   spinReel: () => void;
   handleCellClick: (index: number) => void;
   closePopup: () => void;
   resetGame: () => void;
 }
 
+// Row and column definitions for 4x4 grid
+const ROWS = [
+  [0, 1, 2, 3],
+  [4, 5, 6, 7],
+  [8, 9, 10, 11],
+  [12, 13, 14, 15]
+];
+
+const COLUMNS = [
+  [0, 4, 8, 12],
+  [1, 5, 9, 13],
+  [2, 6, 10, 14],
+  [3, 7, 11, 15]
+];
+
 export const useBingoGame = ({ 
   words, 
   gridSize = 16, 
-  maxRepeat = 3 
+  maxRepeat = 3,
+  minWordsForWin = 8
 }: UseBingoGameProps): UseBingoGameReturn => {
   const [grid, setGrid] = useState<BingoCell[]>([]);
   const [drawnWord, setDrawnWord] = useState<BingoWord | null>(null);
@@ -39,9 +63,31 @@ export const useBingoGame = ({
   const [showHint, setShowHint] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [gameComplete, setGameComplete] = useState(false);
+  const [winningLine, setWinningLine] = useState<WinningLine | null>(null);
   
   const hintTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const clickedCellsRef = useRef<Set<number>>(new Set());
+
+  // Check for BINGO win (complete row or column)
+  const checkBingoWin = useCallback((currentGrid: BingoCell[]): WinningLine | null => {
+    // Check rows
+    for (let i = 0; i < ROWS.length; i++) {
+      const row = ROWS[i];
+      if (row.every(idx => currentGrid[idx].isCompleted)) {
+        return { type: 'row', index: i, cells: row };
+      }
+    }
+    
+    // Check columns
+    for (let i = 0; i < COLUMNS.length; i++) {
+      const col = COLUMNS[i];
+      if (col.every(idx => currentGrid[idx].isCompleted)) {
+        return { type: 'column', index: i, cells: col };
+      }
+    }
+    
+    return null;
+  }, []);
 
   // Initialize grid
   const initializeGrid = useCallback(() => {
@@ -72,6 +118,7 @@ export const useBingoGame = ({
     setShowHint(false);
     setShowPopup(false);
     setGameComplete(false);
+    setWinningLine(null);
     clickedCellsRef.current.clear();
   }, [words, gridSize, maxRepeat]);
 
@@ -168,22 +215,35 @@ export const useBingoGame = ({
   // Close popup and mark cells as completed
   const closePopup = useCallback(() => {
     // Mark all clicked cells as completed
-    setGrid(prev => prev.map(cell => ({
+    const updatedGrid = grid.map(cell => ({
       ...cell,
       isCompleted: cell.isClicked ? true : cell.isCompleted,
       isClicked: false
-    })));
+    }));
     
+    setGrid(updatedGrid);
     clickedCellsRef.current.clear();
     setShowPopup(false);
     setDrawnWord(null);
     
-    // Check if game is complete
-    const remainingCells = grid.filter(c => !c.isCompleted && !c.isClicked);
-    if (remainingCells.length === 0) {
+    // Count completed cells
+    const newCompletedCount = updatedGrid.filter(c => c.isCompleted).length;
+    
+    // Check for BINGO win only if minimum words reached
+    if (newCompletedCount >= minWordsForWin) {
+      const win = checkBingoWin(updatedGrid);
+      if (win) {
+        setWinningLine(win);
+        setGameComplete(true);
+        return;
+      }
+    }
+    
+    // Check if all cells completed (fallback)
+    if (newCompletedCount === gridSize) {
       setGameComplete(true);
     }
-  }, [grid]);
+  }, [grid, checkBingoWin, minWordsForWin, gridSize]);
 
   // Reset game
   const resetGame = useCallback(() => {
@@ -213,6 +273,7 @@ export const useBingoGame = ({
     showPopup,
     gameComplete,
     completedCount,
+    winningLine,
     spinReel,
     handleCellClick,
     closePopup,

@@ -7,6 +7,7 @@ import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { BingoGrid } from "@/components/bingo/BingoGrid";
 import { BingoReel } from "@/components/bingo/BingoReel";
 import { BingoSuccessDialog } from "@/components/bingo/BingoSuccessDialog";
+import { BingoCongratulationsDialog } from "@/components/bingo/BingoCongratulationsDialog";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
@@ -20,6 +21,7 @@ export default function ArtikulacijaVajeRSredinaKonec() {
   const [showInstructions, setShowInstructions] = useState(false);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
   const [showNewGameConfirmation, setShowNewGameConfirmation] = useState(false);
+  const [showCongratulations, setShowCongratulations] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const { recordExerciseCompletion } = useEnhancedProgress();
@@ -32,11 +34,24 @@ export default function ArtikulacijaVajeRSredinaKonec() {
     showPopup,
     gameComplete,
     completedCount,
+    winningLine,
     spinReel,
     handleCellClick,
     closePopup,
     resetGame
-  } = useBingoGame({ words: wordsDataRSredinaKonec });
+  } = useBingoGame({ words: wordsDataRSredinaKonec, minWordsForWin: 8 });
+
+  // Show congratulations when game is complete
+  const handleGameComplete = () => {
+    if (gameComplete && winningLine && !showCongratulations) {
+      setShowCongratulations(true);
+    }
+  };
+
+  // Check for game complete after each popup close
+  if (gameComplete && winningLine && !showCongratulations && !showPopup) {
+    setTimeout(() => setShowCongratulations(true), 100);
+  }
 
   const handleBack = () => {
     setMenuOpen(false);
@@ -53,6 +68,7 @@ export default function ArtikulacijaVajeRSredinaKonec() {
   };
 
   const handleConfirmNewGame = () => {
+    setShowCongratulations(false);
     resetGame();
     setShowNewGameConfirmation(false);
   };
@@ -68,10 +84,8 @@ export default function ArtikulacijaVajeRSredinaKonec() {
 
   const handleStarClaimed = () => {
     recordExerciseCompletion('artikulacija_bingo_r');
-    closePopup();
+    setShowCongratulations(false);
   };
-
-  const isLastWord = completedCount === 15 && showPopup; // 15 completed + 1 about to complete = 16
 
   return (
     <div 
@@ -91,7 +105,7 @@ export default function ArtikulacijaVajeRSredinaKonec() {
             BINGO - R
           </h1>
           <div className="text-white text-sm md:text-base font-medium bg-white/20 px-3 py-1 rounded-full">
-            {completedCount}/16
+            {completedCount}/8
           </div>
         </div>
         
@@ -110,14 +124,8 @@ export default function ArtikulacijaVajeRSredinaKonec() {
           drawnWord={drawnWord?.word || null}
           showHint={showHint}
           onCellClick={handleCellClick}
+          winningLine={winningLine?.cells || null}
         />
-        
-        {/* Game complete message */}
-        {gameComplete && !showPopup && (
-          <div className="bg-yellow-400 text-black font-bold text-sm md:text-lg px-4 py-2 rounded-full animate-bounce">
-            🎉 BRAVO! Zaključil si Bingo! 🎉
-          </div>
-        )}
       </div>
 
       {/* Floating Menu Button - Left */}
@@ -159,16 +167,23 @@ export default function ArtikulacijaVajeRSredinaKonec() {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Success Dialog */}
+      {/* Success Dialog - for each word */}
       {drawnWord && (
         <BingoSuccessDialog
           isOpen={showPopup}
           onClose={handlePopupClose}
           word={drawnWord}
-          isLastWord={isLastWord}
-          onStarClaimed={handleStarClaimed}
+          isLastWord={false}
+          onStarClaimed={() => {}}
         />
       )}
+
+      {/* Congratulations Dialog - BINGO win */}
+      <BingoCongratulationsDialog
+        isOpen={showCongratulations}
+        onClose={() => setShowCongratulations(false)}
+        onStarClaimed={handleStarClaimed}
+      />
 
       {/* Instructions Modal */}
       <InstructionsModal
