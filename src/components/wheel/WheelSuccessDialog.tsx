@@ -102,8 +102,16 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
     setTimeout(() => {
       console.log('[WheelSuccessDialog] onRecordComplete()');
       onRecordComplete();
+      
+      // Auto-close dialog after recording (only if not at 3/3 - star claim stays open)
+      const newCount = initialPronunciationCountRef.current + 1;
+      if (newCount < 3) {
+        setTimeout(() => {
+          onOpenChange(false);
+        }, 500);
+      }
     }, 0);
-  }, [cleanupCountdown, cleanupStream, onRecordComplete, completedImage?.word, pronunciationCount]);
+  }, [cleanupCountdown, cleanupStream, onRecordComplete, onOpenChange, completedImage?.word, pronunciationCount]);
 
   useEffect(() => {
     stopRecordingRef.current = stopRecordingNow;
