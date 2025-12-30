@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Home, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
+
 import { wordsDataRSredinaKonec } from "@/data/bingoWordsR";
 import { useBingoGame } from "@/hooks/useBingoGame";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
@@ -163,16 +163,16 @@ export default function ArtikulacijaVajeRSredinaKonec() {
 
       {/* New Game Button - appears after winning */}
       {showNewGameButton && (
-        <Button
-          size="icon"
+        <button
           onClick={() => {
             setShowNewGameButton(false);
+            setStarClaimed(false);
             resetGame();
           }}
-          className="fixed bottom-4 left-24 z-50 bg-blue-500 hover:bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg"
+          className="fixed bottom-4 left-24 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-blue-400 to-blue-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
         >
-          <RefreshCw className="w-6 h-6" />
-        </Button>
+          <RefreshCw className="w-8 h-8 text-white" />
+        </button>
       )}
 
       {/* Success Dialog - for each word */}
