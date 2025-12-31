@@ -1,18 +1,23 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Home } from "lucide-react";
+import { Home } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import ArticulationProgressGrid from "@/components/articulation/ArticulationProgressGrid";
 import ArticulationRecordButton from "@/components/articulation/ArticulationRecordButton";
 import ArticulationCompletionDialog from "@/components/articulation/ArticulationCompletionDialog";
 import ArticulationTestInfoDialog from "@/components/articulation/ArticulationTestInfoDialog";
+import ArticulationTestInstructionsDialog from "@/components/articulation/ArticulationTestInstructionsDialog";
+import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { useArticulationTestNew } from "@/hooks/useArticulationTestNew";
 import { cn } from "@/lib/utils";
 
 const ArtikuacijskiTest = () => {
   const navigate = useNavigate();
   const [showInfoDialog, setShowInfoDialog] = useState(true);
+  const [showInstructionsDialog, setShowInstructionsDialog] = useState(false);
+  const [showExitDialog, setShowExitDialog] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [backgroundUrl, setBackgroundUrl] = useState<string | null>(null);
 
   const {
@@ -70,17 +75,20 @@ const ArtikuacijskiTest = () => {
         onClose={handleCloseCompletion}
       />
 
-      {/* Header with Home button */}
-      <div className="absolute top-4 left-4 z-20">
-        <Button
-          onClick={() => navigate("/moja-stran")}
-          variant="ghost"
-          size="icon"
-          className="w-12 h-12 rounded-full bg-white/90 hover:bg-white shadow-md"
-        >
-          <Home className="w-6 h-6 text-gray-700" />
-        </Button>
-      </div>
+      {/* Instructions Dialog */}
+      <ArticulationTestInstructionsDialog
+        open={showInstructionsDialog}
+        onClose={() => setShowInstructionsDialog(false)}
+      />
+
+      {/* Exit Confirmation Dialog */}
+      <MemoryExitConfirmationDialog 
+        open={showExitDialog} 
+        onOpenChange={setShowExitDialog} 
+        onConfirm={() => navigate("/moja-stran")}
+      >
+        <div />
+      </MemoryExitConfirmationDialog>
 
       {/* Title */}
       <div className="pt-6 pb-2 text-center">
@@ -145,6 +153,37 @@ const ArtikuacijskiTest = () => {
             />
           </div>
         </div>
+      </div>
+
+      {/* Floating Home Menu Button - Bottom Left */}
+      <div className="fixed bottom-4 left-4 z-50 flex items-center gap-3">
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger asChild>
+            <button className="w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform">
+              <Home className="w-8 h-8 text-white" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" side="top" sideOffset={8} className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl">
+            <button 
+              onClick={() => { 
+                setMenuOpen(false); 
+                setShowExitDialog(true); 
+              }} 
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+            >
+              <span className="text-2xl">🏠</span><span>Nazaj</span>
+            </button>
+            <button 
+              onClick={() => { 
+                setMenuOpen(false); 
+                setShowInstructionsDialog(true); 
+              }} 
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
+            >
+              <span className="text-2xl">📖</span><span>Navodila</span>
+            </button>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
