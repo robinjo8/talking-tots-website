@@ -1,0 +1,93 @@
+import { cn } from "@/lib/utils";
+
+interface ArticulationProgressGridProps {
+  letters: string[];
+  completedWords: number[]; // 0-3 for each letter
+  currentLetterIndex: number;
+}
+
+const ArticulationProgressGrid = ({
+  letters,
+  completedWords,
+  currentLetterIndex,
+}: ArticulationProgressGridProps) => {
+  // Split letters into two rows of 10
+  const firstRow = letters.slice(0, 10);
+  const secondRow = letters.slice(10, 20);
+
+  const renderLetterBox = (letter: string, index: number) => {
+    const completed = completedWords[index] || 0;
+    const isCurrent = index === currentLetterIndex;
+    const isCompleted = completed === 3;
+
+    // Calculate gradient based on completed words (0-3)
+    const getGradientStyle = () => {
+      if (completed === 0) return {};
+      if (completed === 1) {
+        return {
+          background: `linear-gradient(to top, hsl(142, 76%, 45%) 33.33%, white 33.33%)`,
+        };
+      }
+      if (completed === 2) {
+        return {
+          background: `linear-gradient(to top, hsl(142, 76%, 45%) 66.66%, white 66.66%)`,
+        };
+      }
+      return {
+        background: `hsl(142, 76%, 45%)`,
+      };
+    };
+
+    return (
+      <div
+        key={`${letter}-${index}`}
+        className={cn(
+          "relative w-8 h-8 md:w-10 md:h-10 rounded-md flex items-center justify-center font-bold text-sm md:text-base transition-all duration-300 border-2",
+          isCurrent
+            ? "border-orange-500 shadow-lg shadow-orange-500/30 scale-110 z-10"
+            : "border-gray-300",
+          isCompleted ? "text-white" : "text-gray-700"
+        )}
+        style={getGradientStyle()}
+      >
+        <span className={cn(
+          "relative z-10",
+          completed >= 2 ? "text-white" : "text-gray-700"
+        )}>
+          {letter}
+        </span>
+      </div>
+    );
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-2 mb-6">
+      {/* First row - P to Z */}
+      <div className="flex gap-1 md:gap-2">
+        {firstRow.map((letter, index) => renderLetterBox(letter, index))}
+      </div>
+      {/* Second row - Č to J */}
+      <div className="flex gap-1 md:gap-2">
+        {secondRow.map((letter, index) => renderLetterBox(letter, index + 10))}
+      </div>
+      
+      {/* Legend */}
+      <div className="flex items-center gap-4 mt-2 text-xs text-gray-600">
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-3 border border-gray-300 rounded-sm bg-white"></div>
+          <span>Ni izgovorjeno</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-3 rounded-sm" style={{ background: 'linear-gradient(to top, hsl(142, 76%, 45%) 50%, white 50%)' }}></div>
+          <span>V teku</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-3 rounded-sm bg-green-500"></div>
+          <span>Končano</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ArticulationProgressGrid;
