@@ -3,6 +3,7 @@ import { Trophy, TrendingUp } from "lucide-react";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { MotivationalContainer } from "./progress/MotivationalContainer";
 import { EnhancedProgressDisplay } from "./progress/EnhancedProgressDisplay";
+import { ArticulationTestSection } from "./progress/ArticulationTestSection";
 
 export function ProgressSection() {
   const { progressData, isLoading, selectedChild } = useEnhancedProgress();
@@ -32,7 +33,8 @@ export function ProgressSection() {
 
   if (!progressData) {
     return (
-      <>
+      <div className="space-y-6">
+        <ArticulationTestSection />
         <Card className="mb-8">
           <CardContent className="p-6">
             <div className="text-center text-muted-foreground">
@@ -41,13 +43,14 @@ export function ProgressSection() {
             </div>
           </CardContent>
         </Card>
-      </>
+      </div>
     );
   }
 
   return (
-    <>
+    <div className="space-y-6">
+      <ArticulationTestSection />
       <EnhancedProgressDisplay progressData={progressData} />
-    </>
+    </div>
   );
 }

@@ -5,6 +5,9 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
+import { useArticulationTestStatus } from "@/hooks/useArticulationTestStatus";
+import { toast } from "sonner";
 
 interface ArticulationCompletionDialogProps {
   open: boolean;
@@ -16,6 +19,9 @@ const ArticulationCompletionDialog = ({
   onClose,
 }: ArticulationCompletionDialogProps) => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const navigate = useNavigate();
+  const { saveTestResult } = useArticulationTestStatus();
 
   useEffect(() => {
     const fetchImage = async () => {
@@ -28,6 +34,22 @@ const ArticulationCompletionDialog = ({
     };
     fetchImage();
   }, []);
+
+  const handleClose = async () => {
+    setIsSaving(true);
+    try {
+      const success = await saveTestResult();
+      if (success) {
+        toast.success("Test izgovorjave je bil uspešno shranjen!");
+      }
+    } catch (error) {
+      console.error("Error saving test result:", error);
+    } finally {
+      setIsSaving(false);
+      onClose();
+      navigate("/moja-stran");
+    }
+  };
 
   return (
     <Dialog open={open}>
@@ -52,11 +74,12 @@ const ArticulationCompletionDialog = ({
 
           {/* Close button */}
           <Button
-            onClick={onClose}
+            onClick={handleClose}
+            disabled={isSaving}
             className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-3 rounded-full text-lg font-medium"
             size="lg"
           >
-            Zapri
+            {isSaving ? "Shranjujem..." : "Zapri"}
           </Button>
         </div>
       </DialogContent>

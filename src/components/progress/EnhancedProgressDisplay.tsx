@@ -8,31 +8,41 @@ import { StarDisplay } from "./StarDisplay";
 import { DragonDisplay } from "./DragonDisplay";
 import { TrophyDialog } from "../exercises/TrophyDialog";
 import { InfoButton } from "./InfoButton";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface EnhancedProgressDisplayProps {
   progressData: EnhancedProgressSummary;
 }
 
 export function EnhancedProgressDisplay({ progressData }: EnhancedProgressDisplayProps) {
+  const { selectedChild } = useAuth();
   const [showTrophyDialog, setShowTrophyDialog] = useState(false);
-  const [lastTotalStars, setLastTotalStars] = useState(0);
   
   const dragonsToNextTrophy = 10 - (progressData.totalDragons % 10);
   const totalStars = progressData.games.totalStars + progressData.exercises.totalStars;
   
-  // Check if we've reached 100 stars for the first time
+  // Check if we've reached 100 stars and haven't shown the dialog yet
   useEffect(() => {
-    if (totalStars >= 100 && lastTotalStars < 100) {
+    if (!selectedChild?.id) return;
+    
+    const storageKey = `trophy_dialog_shown_${selectedChild.id}`;
+    const hasShown = localStorage.getItem(storageKey);
+    
+    if (totalStars >= 100 && !hasShown) {
       setShowTrophyDialog(true);
+      localStorage.setItem(storageKey, 'true');
     }
-    setLastTotalStars(totalStars);
-  }, [totalStars, lastTotalStars]);
+  }, [totalStars, selectedChild?.id]);
+
+  const handleCloseTrophyDialog = () => {
+    setShowTrophyDialog(false);
+  };
 
   return (
     <>
       <TrophyDialog 
         isOpen={showTrophyDialog}
-        onClose={() => setShowTrophyDialog(false)}
+        onClose={handleCloseTrophyDialog}
         totalStars={totalStars}
       />
       
