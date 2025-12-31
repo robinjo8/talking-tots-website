@@ -46,14 +46,12 @@ export const ArticulationTestSection = () => {
       <Card className={`overflow-hidden ${!hasCompletedTest ? 'border-red-300 bg-red-50' : 'border-green-300 bg-green-50'}`}>
         <CardContent className="p-6">
           {/* Header */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <h3 className="text-2xl font-bold text-amber-500">TEST IZGOVORJAVE</h3>
-            </div>
+          <div className="flex items-center justify-center mb-4 relative">
+            <h3 className="text-2xl font-bold text-amber-500 text-center">TEST IZGOVORJAVE</h3>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <Button variant="ghost" size="icon" className="h-8 w-8 absolute right-0">
                     <Info className="h-4 w-4 text-muted-foreground" />
                   </Button>
                 </TooltipTrigger>
