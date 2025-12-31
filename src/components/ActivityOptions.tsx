@@ -126,6 +126,17 @@ export function ActivityOptions() {
                   }`}
                 />
               </div>
+              {/* Next test date overlay for locked test */}
+              {isLocked && nextTestDate && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="bg-black/80 text-white px-4 py-2 rounded-lg shadow-lg border border-white/20">
+                    <p className="text-xs text-center text-white/70 mb-1">Naslednji test</p>
+                    <p className="text-sm font-bold text-center">
+                      {format(nextTestDate, "d. MMMM yyyy", { locale: sl })}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Card Content */}
