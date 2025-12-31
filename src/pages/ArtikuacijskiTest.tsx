@@ -1,190 +1,157 @@
-import { useState } from "react";
-import Header from "@/components/Header";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Upload } from "lucide-react";
+import { ArrowRight, Home } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useIsMobile } from "@/hooks/use-mobile";
-import LetterSlider from "@/components/articulation/LetterSlider";
-import { useArtikuacijskiTest } from "@/hooks/useArtikuacijskiTest";
+import { supabase } from "@/integrations/supabase/client";
+import ArticulationProgressGrid from "@/components/articulation/ArticulationProgressGrid";
+import ArticulationRecordButton from "@/components/articulation/ArticulationRecordButton";
+import ArticulationCompletionDialog from "@/components/articulation/ArticulationCompletionDialog";
 import ArticulationTestInfoDialog from "@/components/articulation/ArticulationTestInfoDialog";
+import { useArticulationTestNew } from "@/hooks/useArticulationTestNew";
+import { cn } from "@/lib/utils";
 
 const ArtikuacijskiTest = () => {
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
   const [showInfoDialog, setShowInfoDialog] = useState(true);
+  const [backgroundUrl, setBackgroundUrl] = useState<string | null>(null);
+
   const {
     imageUrl,
     loading,
-    imageError,
+    hasRecorded,
+    isTestComplete,
     currentLetter,
-    allLetters,
-    overallIndex,
+    currentLetterIndex,
+    positionLabel,
+    currentWordIndex,
     totalWords,
-    handleNext,
-    handlePrevious,
+    allLetters,
+    completedWords,
     getCurrentWord,
-    setCurrentLetter
-  } = useArtikuacijskiTest();
+    handleRecordingComplete,
+    handleNext,
+    resetTest,
+  } = useArticulationTestNew();
 
-  const handleLetterChange = (letter: string) => {
-    setCurrentLetter(letter);
+  // Fetch background image
+  useEffect(() => {
+    const { data } = supabase.storage
+      .from("ozadja")
+      .getPublicUrl("svetlomodro_ozadje.png");
+    if (data) {
+      setBackgroundUrl(data.publicUrl);
+    }
+  }, []);
+
+  const handleCloseCompletion = () => {
+    resetTest();
+    navigate("/moja-stran");
   };
 
-  // Calculate current letter index for progress display
-  const currentLetterIndex = allLetters.indexOf(currentLetter);
-
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
-      <ArticulationTestInfoDialog 
-        open={showInfoDialog} 
-        onClose={() => setShowInfoDialog(false)} 
+    <div
+      className="min-h-screen w-full fixed inset-0 flex flex-col"
+      style={{
+        backgroundImage: backgroundUrl ? `url(${backgroundUrl})` : undefined,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      {/* Info Dialog */}
+      <ArticulationTestInfoDialog
+        open={showInfoDialog}
+        onClose={() => setShowInfoDialog(false)}
       />
-      
-      <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
-        {/* Back button and title - only visible on desktop */}
-        <div className="hidden lg:flex items-center gap-3 mb-8">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="gap-2" 
-            onClick={() => navigate("/moja-stran")}
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Nazaj
-          </Button>
-          
-          <h1 className="text-2xl font-bold text-foreground">
-            Artikulacijski test
-          </h1>
-        </div>
 
-        {/* Mobile back button - positioned at top */}
-        {isMobile && (
-          <div className="flex items-center justify-between p-4 bg-background/95 backdrop-blur-sm">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="gap-2" 
-              onClick={() => navigate("/moja-stran")}
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Nazaj
-            </Button>
-            <h1 className="text-lg font-bold text-foreground">
-              Artikulacijski test
-            </h1>
-            <div className="w-16"></div> {/* Spacer for centering */}
-          </div>
-        )}
-        
-        {/* Letter slider component */}
-        <div className={isMobile ? 'px-4' : ''}>
-          <LetterSlider 
-            letters={allLetters} 
-            currentLetter={currentLetter} 
-            onLetterChange={handleLetterChange}
+      {/* Completion Dialog */}
+      <ArticulationCompletionDialog
+        open={isTestComplete}
+        onClose={handleCloseCompletion}
+      />
+
+      {/* Header with Home button */}
+      <div className="absolute top-4 left-4 z-20">
+        <Button
+          onClick={() => navigate("/moja-stran")}
+          variant="ghost"
+          size="icon"
+          className="w-12 h-12 rounded-full bg-white/90 hover:bg-white shadow-md"
+        >
+          <Home className="w-6 h-6 text-gray-700" />
+        </Button>
+      </div>
+
+      {/* Title */}
+      <div className="pt-6 pb-2 text-center">
+        <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-md">
+          TEST IZGOVORJAVE
+        </h1>
+      </div>
+
+      {/* Main content */}
+      <div className="flex-1 flex flex-col items-center justify-start px-4 pb-8 overflow-y-auto">
+        {/* Progress Grid */}
+        <div className="w-full max-w-lg bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-lg mb-4">
+          <ArticulationProgressGrid
+            letters={allLetters}
+            completedWords={completedWords}
+            currentLetterIndex={currentLetterIndex}
           />
         </div>
-        
-        {/* Progress display */}
-        <div className={`flex justify-center ${isMobile ? 'px-4 mb-8' : 'mb-8'}`}>
-          <div className="text-center space-y-2">
-            <p className="text-sm font-medium text-muted-foreground">
-              Črka {currentLetterIndex + 1} od {allLetters.length}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Beseda {overallIndex + 1} od {totalWords}
-            </p>
-          </div>
+
+        {/* Current letter and position */}
+        <div className="text-center mb-4">
+          <h2 className="text-xl md:text-2xl font-bold text-white drop-shadow-md">
+            {currentLetter} - {positionLabel}
+          </h2>
+          <p className="text-sm text-white/80 mt-1">
+            {currentWordIndex + 1} / {totalWords}
+          </p>
         </div>
-        
-        {/* New content area - clean design like PIPA example */}
-        <div className="max-w-md mx-auto text-center space-y-8">
+
+        {/* Word and Image Card */}
+        <div className="w-full max-w-sm bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
           {/* Word display */}
-          <div className="space-y-4">
-            <h2 className="text-4xl font-bold text-app-purple tracking-wider">
-              {getCurrentWord().toUpperCase()}
-            </h2>
-          </div>
-          
+          <h3 className="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-4">
+            {getCurrentWord().toUpperCase()}
+          </h3>
+
           {/* Image display */}
-          <div className="w-full">
+          <div className="relative w-full aspect-square max-h-48 md:max-h-64 flex items-center justify-center mb-6">
             {loading ? (
-              <div className="w-full h-64 flex items-center justify-center bg-muted rounded-xl">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-app-purple"></div>
-              </div>
-            ) : imageError ? (
-              <div className="w-full h-64 flex items-center justify-center bg-muted rounded-xl border-2 border-dashed border-muted-foreground/30">
-                <div className="text-center space-y-3">
-                  <Upload className="h-12 w-12 mx-auto text-muted-foreground/50" />
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">
-                      Slika ni na voljo
-                    </p>
-                    <p className="text-xs text-muted-foreground/70">
-                      {imageError}
-                    </p>
-                  </div>
-                </div>
-              </div>
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-teal-500"></div>
             ) : imageUrl ? (
-              <div className="w-full h-64 flex items-center justify-center">
-                <img 
-                  src={imageUrl} 
-                  alt={getCurrentWord()}
-                  className="max-w-full max-h-full object-contain rounded-xl"
-                  onError={(e) => {
-                    console.error("Error loading image:", e);
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-              </div>
+              <img
+                src={imageUrl}
+                alt={getCurrentWord()}
+                className={cn(
+                  "max-w-full max-h-full object-contain rounded-xl transition-all duration-500",
+                  hasRecorded && "grayscale opacity-60"
+                )}
+              />
             ) : (
-              <div className="w-full h-64 flex items-center justify-center bg-muted rounded-xl">
-                <p className="text-muted-foreground">
-                  Ni podatkov za črko {currentLetter}
-                </p>
-              </div>
+              <div className="text-gray-400">Slika ni na voljo</div>
             )}
           </div>
-          
-          {/* Navigation controls */}
-          <div className="flex justify-between items-center pt-6">
-            <Button
-              onClick={handlePrevious}
-              variant="outline"
-              size="icon"
-              className="h-12 w-12 rounded-full"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">
-                {overallIndex + 1} / {totalWords}
-              </p>
-            </div>
-            
-            <Button
-              onClick={handleNext}
-              variant="outline"
-              size="icon"
-              className="h-12 w-12 rounded-full"
-            >
-              <ArrowLeft className="h-5 w-5 rotate-180" />
-            </Button>
-          </div>
-          
-          {/* Speech recording button placeholder */}
-          <div className="pt-4">
-            <Button 
-              className="bg-app-teal hover:bg-app-teal/90 text-white px-8 py-3 rounded-full text-lg font-medium"
-              size="lg"
-            >
-              🎤 Izgovori besedo
-            </Button>
+
+          {/* Recording button or Next button */}
+          <div className="flex flex-col items-center gap-4">
+            {!hasRecorded ? (
+              <ArticulationRecordButton
+                onRecordingComplete={handleRecordingComplete}
+                disabled={loading}
+              />
+            ) : (
+              <Button
+                onClick={handleNext}
+                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-6 rounded-full text-lg font-medium shadow-lg transition-all duration-300 hover:scale-105"
+                size="lg"
+              >
+                Naprej
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            )}
           </div>
         </div>
       </div>
