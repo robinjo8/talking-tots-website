@@ -48,8 +48,7 @@ export const ArticulationTestSection = () => {
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <ClipboardCheck className={`w-5 h-5 ${!hasCompletedTest ? 'text-red-600' : 'text-green-600'}`} />
-              <h3 className="font-bold text-lg">TEST IZGOVORJAVE</h3>
+              <h3 className="text-2xl font-bold text-amber-500">TEST IZGOVORJAVE</h3>
             </div>
             <TooltipProvider>
               <Tooltip>
