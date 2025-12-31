@@ -211,6 +211,12 @@ import IgraUjemanjaZ910 from "@/pages/IgraUjemanjaZ910";
 import IgraUjemanjaŽ910 from "@/pages/IgraUjemanjaŽ910";
 import IgraUjemanjaČ910 from "@/pages/IgraUjemanjaČ910";
 import AdminRemoveBackground from "@/pages/AdminRemoveBackground";
+import Kontakt from "@/pages/Kontakt";
+import SplosniPogoji from "@/pages/SplosniPogoji";
+import PolitikaZasebnosti from "@/pages/PolitikaZasebnosti";
+import ZaPosameznike from "@/pages/ZaPosameznike";
+import ZaPodjetja from "@/pages/ZaPodjetja";
+import PomocInPodpora from "@/pages/PomocInPodpora";
 
 export function AppRoutes() {
   return (
@@ -2051,6 +2057,14 @@ export function AppRoutes() {
       />
 
       <Route path="/admin/remove-background" element={<AdminRemoveBackground />} />
+
+      {/* Footer pages */}
+      <Route path="/kontakt" element={<Kontakt />} />
+      <Route path="/splosni-pogoji" element={<SplosniPogoji />} />
+      <Route path="/politika-zasebnosti" element={<PolitikaZasebnosti />} />
+      <Route path="/za-posameznike" element={<ZaPosameznike />} />
+      <Route path="/za-podjetja" element={<ZaPodjetja />} />
+      <Route path="/pomoc-in-podpora" element={<PomocInPodpora />} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>
