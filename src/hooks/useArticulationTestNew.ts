@@ -6,7 +6,8 @@ import { articulationData } from "@/data/articulationTestData";
 const positionLabels = ["začetek", "sredina", "konec"];
 
 export const useArticulationTestNew = () => {
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  // TEMPORARY: Start at last letter (Ž) for testing - index 57 = first word of Ž
+  const [currentWordIndex, setCurrentWordIndex] = useState(57);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasRecorded, setHasRecorded] = useState(false);
