@@ -46,18 +46,18 @@ const ArticulationRecordButton = ({
 
   if (showNext) {
     return (
-      <Button
+      <button
         onClick={onNext}
         className={cn(
           "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700",
-          "text-white px-8 py-6 rounded-full text-lg font-medium shadow-lg",
-          "transition-all duration-300 hover:scale-105 min-w-[220px]"
+          "text-white rounded-full text-lg font-medium shadow-lg",
+          "transition-all duration-300 hover:scale-105",
+          "w-[220px] h-14 flex items-center justify-center"
         )}
-        size="lg"
       >
         Naprej
         <ArrowRight className="w-5 h-5 ml-2" />
-      </Button>
+      </button>
     );
   }
 
@@ -65,8 +65,8 @@ const ArticulationRecordButton = ({
     return (
       <div
         className={cn(
-          "relative overflow-hidden rounded-full min-w-[220px] h-14",
-          "bg-gray-200 shadow-lg"
+          "relative overflow-hidden rounded-full shadow-lg",
+          "w-[220px] h-14 bg-gray-200"
         )}
       >
         {/* Progress fill from left to right */}
@@ -85,20 +85,20 @@ const ArticulationRecordButton = ({
   }
 
   return (
-    <Button
+    <button
       onClick={startRecording}
       disabled={disabled}
       className={cn(
         "bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700",
-        "text-white px-8 py-6 rounded-full text-lg font-medium shadow-lg",
-        "transition-all duration-300 hover:scale-105 min-w-[220px]",
+        "text-white rounded-full text-lg font-medium shadow-lg",
+        "transition-all duration-300 hover:scale-105",
+        "w-[220px] h-14 flex items-center justify-center",
         disabled && "opacity-50 cursor-not-allowed"
       )}
-      size="lg"
     >
       <Mic className="w-5 h-5 mr-2" />
       Izgovori besedo
-    </Button>
+    </button>
   );
 };
 
