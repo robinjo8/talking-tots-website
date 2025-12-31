@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
@@ -7,10 +6,12 @@ import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import LetterSlider from "@/components/articulation/LetterSlider";
 import { useArtikuacijskiTest } from "@/hooks/useArtikuacijskiTest";
+import ArticulationTestInfoDialog from "@/components/articulation/ArticulationTestInfoDialog";
 
 const ArtikuacijskiTest = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const [showInfoDialog, setShowInfoDialog] = useState(true);
   const {
     imageUrl,
     loading,
@@ -35,6 +36,11 @@ const ArtikuacijskiTest = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      
+      <ArticulationTestInfoDialog 
+        open={showInfoDialog} 
+        onClose={() => setShowInfoDialog(false)} 
+      />
       
       <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4">
         {/* Back button and title - only visible on desktop */}
