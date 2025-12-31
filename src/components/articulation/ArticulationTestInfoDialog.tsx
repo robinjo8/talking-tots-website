@@ -23,18 +23,18 @@ const ArticulationTestInfoDialog = ({ open, onClose }: ArticulationTestInfoDialo
   return (
     <Dialog open={open}>
       <DialogContent 
-        className="max-w-2xl max-h-[90vh] flex flex-col p-0 gap-0 [&>button]:hidden"
+        className="max-w-2xl max-h-[90vh] flex flex-col p-0 gap-0 [&>button]:hidden overflow-hidden"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
-        <DialogHeader className="p-6 pb-4 border-b">
+        <DialogHeader className="p-6 pb-4 border-b shrink-0">
           <DialogTitle className="text-xl font-bold text-center">
             Obvestilo pred začetkom testa izgovorjave
           </DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 px-6 max-h-[50vh]">
-          <div className="py-4 space-y-6 text-sm leading-relaxed">
+        <ScrollArea className="flex-1 min-h-0 overflow-auto">
+          <div className="px-6 py-4 space-y-6 text-sm leading-relaxed">
             <section>
               <h3 className="font-bold text-base mb-2">Kaj je test izgovorjave?</h3>
               <p className="text-muted-foreground">
@@ -125,7 +125,7 @@ const ArticulationTestInfoDialog = ({ open, onClose }: ArticulationTestInfoDialo
           </div>
         </ScrollArea>
 
-        <div className="p-6 pt-4 border-t space-y-4">
+        <div className="p-6 pt-4 border-t space-y-4 shrink-0">
           <div className="space-y-3">
             <div className="flex items-start space-x-3">
               <Checkbox
