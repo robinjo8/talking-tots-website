@@ -10,138 +10,166 @@ export interface LetterGroup {
   words: Word[];
 }
 
-// Comprehensive test data with all necessary information
+// Slovenian alphabet order for consonants: B, C, Č, D, F, G, H, J, K, L, M, N, P, R, S, Š, T, V, Z, Ž
 export const articulationData: LetterGroup[] = [
-  { 
-    letter: "P", 
-    words: [
-      { text: "PIPA", image: "pipa.png" },
-      { text: "KAPA", image: "kapa.png" },
-      { text: "KLOP", image: "klop.png" },
-    ] 
-  },
   { 
     letter: "B", 
     words: [
-      { text: "BALON", image: "balon.png" },
-      { text: "RIBA", image: "riba.png" },
+      { text: "BIK", image: "bik.png" },
+      { text: "OBLAK", image: "oblak.png" },
       { text: "ZOB", image: "zob.png" },
     ] 
   },
   { 
-    letter: "F", 
+    letter: "C", 
     words: [
-      { text: "FANT", image: "fant.png" },
-      { text: "TELEFON", image: "telefon.png" },
-      { text: "KROF", image: "krof.png" },
+      { text: "CEV", image: "cev.png" },
+      { text: "PICA", image: "pica.png" },
+      { text: "ZAJEC", image: "zajec.png" },
     ] 
   },
   { 
-    letter: "V", 
+    letter: "Č", 
     words: [
-      { text: "VETERNICA", image: "veternica.png" },
-      { text: "KRAVA", image: "krava.png" },
-      { text: "LEV", image: "lev.png" },
-    ] 
-  },
-  { 
-    letter: "T", 
-    words: [
-      { text: "TROBENTA", image: "trobenta.png" },
-      { text: "AVTO", image: "avto.png" },
-      { text: "LIST", image: "list.png" },
+      { text: "ČAJ", image: "caj.png" },
+      { text: "OČI", image: "oci.png" },
+      { text: "LUČ", image: "luc.png" },
     ] 
   },
   { 
     letter: "D", 
     words: [
-      { text: "DREVO", image: "drevo.png" },
       { text: "DUDA", image: "duda.png" },
-      { text: "LED", image: "led.png" },
+      { text: "VODA", image: "voda.png" },
+      { text: "MED", image: "med.png" },
     ] 
   },
-  { letter: "Š", words: [
-      { text: "ŠKARJE", image: "skarje.png" }, 
-      { text: "HRUŠKA", image: "hruska.png" }, 
-      { text: "KOKOŠ", image: "kokos.png" }
+  { 
+    letter: "F", 
+    words: [
+      { text: "FEN", image: "fen.png" },
+      { text: "MAFIN", image: "mafin.png" },
+      { text: "KROF", image: "krof.png" },
     ] 
   },
-  { letter: "S", words: [
-      { text: "SOVA", image: "sova.png" }, 
-      { text: "KOST", image: "kost.png" }, 
-      { text: "PAS", image: "pas.png" }
+  { 
+    letter: "G", 
+    words: [
+      { text: "GOBA", image: "goba.png" },
+      { text: "ŽOGA", image: "zoga.png" },
+      { text: "SNEG", image: "sneg.png" },
     ] 
   },
-  { letter: "Ž", words: [
-      { text: "ŽABA", image: "zaba.png" }, 
-      { text: "ROŽA", image: "roza.png" }, 
-      { text: "POLŽ", image: "polz.png" }
+  { 
+    letter: "H", 
+    words: [
+      { text: "HIŠA", image: "hisa.png" },
+      { text: "JUHA", image: "juha.png" },
+      { text: "KRUH", image: "kruh.png" },
     ] 
   },
-  { letter: "Z", words: [
-      { text: "ZEBRA", image: "zebra.png" }, 
-      { text: "KOZA", image: "koza.png" }, 
-      { text: "OBRAZ", image: "obraz.png" }
+  { 
+    letter: "J", 
+    words: [
+      { text: "JOPA", image: "jopa.png" },
+      { text: "VEJA", image: "veja.png" },
+      { text: "NOJ", image: "noj.png" },
     ] 
   },
-  { letter: "Č", words: [
-      { text: "ČEBELA", image: "cebela.png" }, 
-      { text: "OČALA", image: "ocala.png" }, 
-      { text: "KLJUČ", image: "kljuc.png" }
+  { 
+    letter: "K", 
+    words: [
+      { text: "KOLO", image: "kolo.png" },
+      { text: "ROKA", image: "roka.png" },
+      { text: "RAK", image: "rak.png" },
     ] 
   },
-  { letter: "C", words: [
-      { text: "COPATI", image: "copati.png" }, 
-      { text: "VILICE", image: "vilice.png" }, 
-      { text: "LONEC", image: "lonec.png" }
+  { 
+    letter: "L", 
+    words: [
+      { text: "LEV", image: "lev.png" },
+      { text: "MILO", image: "milo.png" },
+      { text: "GOL", image: "gol.png" },
     ] 
   },
-  { letter: "K", words: [
-      { text: "KAČA", image: "kaca.png" }, 
-      { text: "ČRKE", image: "crke.png" }, 
-      { text: "OBLAK", image: "oblak.png" }
+  { 
+    letter: "M", 
+    words: [
+      { text: "MIZA", image: "miza.png" },
+      { text: "GUMA", image: "guma.png" },
+      { text: "SEDEM", image: "sedem.png" },
     ] 
   },
-  { letter: "G", words: [
-      { text: "GOBA", image: "goba.png" }, 
-      { text: "NOGA", image: "noga.png" }, 
-      { text: "KROG", image: "krog.png" }
+  { 
+    letter: "N", 
+    words: [
+      { text: "NOS", image: "nos.png" },
+      { text: "BANANA", image: "banana.png" },
+      { text: "VOLAN", image: "volan.png" },
     ] 
   },
-  { letter: "H", words: [
-      { text: "HIŠA", image: "hisa.png" }, 
-      { text: "MUHA", image: "muha.png" }, 
-      { text: "KRUH", image: "kruh.png" }
+  { 
+    letter: "P", 
+    words: [
+      { text: "PAJEK", image: "pajek.png" },
+      { text: "KAPA", image: "kapa.png" },
+      { text: "REP", image: "rep.png" },
     ] 
   },
-  { letter: "M", words: [
-      { text: "METLA", image: "metla.png" }, 
-      { text: "OMARA", image: "omara.png" }, 
-      { text: "DIM", image: "dim.png" }
+  { 
+    letter: "R", 
+    words: [
+      { text: "ROŽA", image: "roza.png" },
+      { text: "URA", image: "ura.png" },
+      { text: "SIR", image: "sir.png" },
     ] 
   },
-  { letter: "N", words: [
-      { text: "NOGAVICE", image: "nogavice.png" }, 
-      { text: "BANANA", image: "banana.png" }, 
-      { text: "SLON", image: "slon.png" }
+  { 
+    letter: "S", 
+    words: [
+      { text: "SOK", image: "sok.png" },
+      { text: "OSA", image: "osa.png" },
+      { text: "NOS", image: "nos.png" },
     ] 
   },
-  { letter: "L", words: [
-      { text: "LADJA", image: "ladja.png" }, 
-      { text: "KOLO", image: "kolo.png" }, 
-      { text: "ŠAL", image: "sal.png" }
+  { 
+    letter: "Š", 
+    words: [
+      { text: "ŠAL", image: "sal.png" },
+      { text: "HIŠA", image: "hisa.png" },
+      { text: "KOŠ", image: "kos.png" },
     ] 
   },
-  { letter: "R", words: [
-      { text: "ROKA", image: "roka.png" }, 
-      { text: "URA", image: "ura.png" }, 
-      { text: "SIR", image: "sir.png" }
+  { 
+    letter: "T", 
+    words: [
+      { text: "TORBA", image: "torba.png" },
+      { text: "STOL", image: "stol.png" },
+      { text: "COPAT", image: "copat.png" },
     ] 
   },
-  { letter: "J", words: [
-      { text: "JABOLKO", image: "jabolko.png" }, 
-      { text: "JAJCE", image: "jajce.png" }, 
-      { text: "ZMAJ", image: "zmaj.png" }
+  { 
+    letter: "V", 
+    words: [
+      { text: "VODA", image: "voda.png" },
+      { text: "KAVA", image: "kava.png" },
+      { text: "LEV", image: "lev.png" },
+    ] 
+  },
+  { 
+    letter: "Z", 
+    words: [
+      { text: "ZOB", image: "zob.png" },
+      { text: "MIZA", image: "miza.png" },
+      { text: "VOZ", image: "voz.png" },
+    ] 
+  },
+  { 
+    letter: "Ž", 
+    words: [
+      { text: "ŽOGA", image: "zoga.png" },
+      { text: "ROŽA", image: "roza.png" },
+      { text: "JEŽ", image: "jez.png" },
     ] 
   },
 ];

@@ -135,23 +135,14 @@ const ArtikuacijskiTest = () => {
             )}
           </div>
 
-          {/* Recording button or Next button */}
+          {/* Recording button / Timer / Next button */}
           <div className="flex flex-col items-center gap-4">
-            {!hasRecorded ? (
-              <ArticulationRecordButton
-                onRecordingComplete={handleRecordingComplete}
-                disabled={loading}
-              />
-            ) : (
-              <Button
-                onClick={handleNext}
-                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-6 rounded-full text-lg font-medium shadow-lg transition-all duration-300 hover:scale-105"
-                size="lg"
-              >
-                Naprej
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            )}
+            <ArticulationRecordButton
+              onRecordingComplete={handleRecordingComplete}
+              onNext={handleNext}
+              disabled={loading}
+              showNext={hasRecorded}
+            />
           </div>
         </div>
       </div>
