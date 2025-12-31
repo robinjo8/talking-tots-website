@@ -16,7 +16,7 @@ export const wordsDataCSredinaKonec: BingoWord[] = [
   { word: "RACA", image: "raca.png", audio: "raca.m4a" },
   { word: "ROPOTULJICA", image: "ropotuljica.png", audio: "ropotuljica.m4a" },
   { word: "SONCE", image: "sonce.png", audio: "sonce.m4a" },
-  { word: "VETRNICA", image: "vetrnica.png", audio: "vetrnica.m4a" },
+  { word: "VETRNICA", image: "veternica.png", audio: "veternica.m4a" },
   { word: "VILICA", image: "vilica.png", audio: "vilica.m4a" },
   { word: "ZAJEC", image: "zajec.png", audio: "zajec.m4a" },
   { word: "ZOBOTREBEC", image: "zobotrebec.png", audio: "zobotrebec.m4a" },
