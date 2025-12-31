@@ -1,7 +1,13 @@
 import { useNavigate } from "react-router-dom";
+import { Lock } from "lucide-react";
+import { useArticulationTestStatus } from "@/hooks/useArticulationTestStatus";
+import { toast } from "sonner";
+import { format } from "date-fns";
+import { sl } from "date-fns/locale";
 
 export function ActivityOptions() {
   const navigate = useNavigate();
+  const { isTestAvailable, nextTestDate, lastCompletedAt } = useArticulationTestStatus();
   
   console.log('🎯 ActivityOptions rendering');
 
@@ -62,9 +68,19 @@ export function ActivityOptions() {
     }
   ];
 
-  const handleActivityClick = (url: string) => {
-    navigate(url);
+  const handleActivityClick = (activity: typeof activities[0]) => {
+    // Check if it's the articulation test and if it's locked
+    if (activity.id === 'test' && lastCompletedAt && !isTestAvailable) {
+      const formattedDate = nextTestDate 
+        ? format(nextTestDate, "d. MMMM yyyy", { locale: sl })
+        : "";
+      toast.info(`Test bo na voljo ${formattedDate}`);
+      return;
+    }
+    navigate(activity.url);
   };
+
+  const isTestLocked = lastCompletedAt !== null && !isTestAvailable;
 
   console.log('🎯 Rendering cards, count:', activities.length);
   
@@ -74,12 +90,17 @@ export function ActivityOptions() {
       style={{ minHeight: '500px' }}
     >
       {activities.map((activity, index) => {
+        const isLocked = activity.id === 'test' && isTestLocked;
         console.log('🎯 Rendering card:', activity.title);
         return (
           <div key={activity.id} className="flex h-full">
             <div
-              className="bg-white rounded-xl shadow-xl border border-gray-200 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group flex flex-col w-full"
-              onClick={() => handleActivityClick(activity.url)}
+              className={`bg-white rounded-xl shadow-xl border border-gray-200 transition-all duration-300 overflow-hidden group flex flex-col w-full ${
+                isLocked 
+                  ? 'opacity-60 cursor-not-allowed' 
+                  : 'hover:shadow-2xl hover:scale-[1.02] cursor-pointer'
+              }`}
+              onClick={() => handleActivityClick(activity)}
             >
             {/* Card Image */}
             <div className={`relative aspect-video overflow-hidden bg-gradient-to-br ${activity.gradient}`}>
@@ -89,18 +110,29 @@ export function ActivityOptions() {
                   ⭐ Priporočeno
                 </div>
               )}
+              {/* Locked badge for test */}
+              {isLocked && (
+                <div className="absolute top-4 right-4 bg-gray-600 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-1 z-10">
+                  <Lock className="w-3 h-3" />
+                  Zaklenjeno
+                </div>
+              )}
               <div className="w-full h-full flex items-center justify-center">
                 <img 
                   src={activity.image}
                   alt={activity.title}
-                  className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-300"
+                  className={`w-full h-full object-cover object-center transition-transform duration-300 ${
+                    isLocked ? 'grayscale' : 'group-hover:scale-110'
+                  }`}
                 />
               </div>
             </div>
 
             {/* Card Content */}
             <div className="p-6 flex flex-col flex-grow">
-              <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors min-h-[3.5rem] flex items-center">
+              <h3 className={`text-xl font-bold mb-3 min-h-[3.5rem] flex items-center ${
+                isLocked ? 'text-gray-500' : 'text-foreground group-hover:text-app-blue'
+              } transition-colors`}>
                 {activity.title}
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">

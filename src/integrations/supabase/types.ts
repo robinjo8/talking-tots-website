@@ -44,6 +44,27 @@ export type Database = {
         }
         Relationships: []
       }
+      articulation_test_results: {
+        Row: {
+          child_id: string
+          completed_at: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          child_id: string
+          completed_at?: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          child_id?: string
+          completed_at?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
       artikulacijski_test: {
         Row: {
           created_at: string
