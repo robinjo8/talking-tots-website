@@ -19,6 +19,14 @@ import ArtikulacijaVajeK from "@/pages/ArtikulacijaVajeK";
 import ArtikulacijaVajeL from "@/pages/ArtikulacijaVajeL";
 import ArtikulacijaVajeR from "@/pages/ArtikulacijaVajeR";
 import ArtikulacijaVajeRSredinaKonec from "@/pages/ArtikulacijaVajeRSredinaKonec";
+import ArtikulacijaVajeCSredinaKonec from "@/pages/ArtikulacijaVajeCSredinaKonec";
+import ArtikulacijaVajeČSredinaKonec from "@/pages/ArtikulacijaVajeČSredinaKonec";
+import ArtikulacijaVajeKSredinaKonec from "@/pages/ArtikulacijaVajeKSredinaKonec";
+import ArtikulacijaVajeLSredinaKonec from "@/pages/ArtikulacijaVajeLSredinaKonec";
+import ArtikulacijaVajeSSredinaKonec from "@/pages/ArtikulacijaVajeSSredinaKonec";
+import ArtikulacijaVajeŠSredinaKonec from "@/pages/ArtikulacijaVajeŠSredinaKonec";
+import ArtikulacijaVajeZSredinaKonec from "@/pages/ArtikulacijaVajeZSredinaKonec";
+import ArtikulacijaVajeŽSredinaKonec from "@/pages/ArtikulacijaVajeŽSredinaKonec";
 import ArtikulacijaVajeS from "@/pages/ArtikulacijaVajeS";
 import ArtikulacijaVajeŠ from "@/pages/ArtikulacijaVajeŠ";
 import ArtikulacijaVajeZ from "@/pages/ArtikulacijaVajeZ";
@@ -318,6 +326,70 @@ export function AppRoutes() {
         }
       />
       <Route 
+        path="/govorno-jezikovne-vaje/artikulacija/c-sredina-konec" 
+        element={
+          <ProtectedRoute>
+            <ArtikulacijaVajeCSredinaKonec />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorno-jezikovne-vaje/artikulacija/č-sredina-konec" 
+        element={
+          <ProtectedRoute>
+            <ArtikulacijaVajeČSredinaKonec />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorno-jezikovne-vaje/artikulacija/k-sredina-konec" 
+        element={
+          <ProtectedRoute>
+            <ArtikulacijaVajeKSredinaKonec />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorno-jezikovne-vaje/artikulacija/l-sredina-konec" 
+        element={
+          <ProtectedRoute>
+            <ArtikulacijaVajeLSredinaKonec />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorno-jezikovne-vaje/artikulacija/s-sredina-konec" 
+        element={
+          <ProtectedRoute>
+            <ArtikulacijaVajeSSredinaKonec />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorno-jezikovne-vaje/artikulacija/š-sredina-konec" 
+        element={
+          <ProtectedRoute>
+            <ArtikulacijaVajeŠSredinaKonec />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorno-jezikovne-vaje/artikulacija/z-sredina-konec" 
+        element={
+          <ProtectedRoute>
+            <ArtikulacijaVajeZSredinaKonec />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/govorno-jezikovne-vaje/artikulacija/ž-sredina-konec" 
+        element={
+          <ProtectedRoute>
+            <ArtikulacijaVajeŽSredinaKonec />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/govorno-jezikovne-vaje/artikulacija/s" 
         element={
           <ProtectedRoute>
