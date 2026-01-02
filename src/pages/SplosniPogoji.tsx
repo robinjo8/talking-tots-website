@@ -549,7 +549,6 @@ const SplosniPogoji = () => {
                   src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_0.png"
                   alt="Zmajček maskota"
                   className="w-full h-full object-contain"
-                  style={{ transform: 'scaleX(-1)' }}
                 />
               </div>
             </div>
