@@ -485,6 +485,78 @@ const SplosniPogoji = () => {
         </div>
       </div>
       
+      {/* Promotional Section */}
+      <section className="py-16 px-4 md:px-10 bg-light-cloud">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            {/* Left: Logo, Text and Buttons */}
+            <div className="space-y-6">
+              {/* Logo */}
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-extrabold text-dragon-green">Tomi</span>
+                <span className="text-2xl font-extrabold text-app-orange">Talk</span>
+              </div>
+              
+              <div className="space-y-2">
+                <p className="text-xl md:text-2xl font-semibold text-foreground">
+                  Ne veš, ali otrok pravilno izgovarja glasove?
+                </p>
+                <p className="text-lg text-muted-foreground">
+                  Spoznaj strukturirano govorno podporo za razvoj otrokovega govora:
+                </p>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <span className="text-dragon-green font-bold">✔</span>
+                  <span className="text-muted-foreground">Vodene govorne vaje, prilagojene otrokovi starosti in težavi</span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-dragon-green font-bold">✔</span>
+                  <span className="text-muted-foreground">Otrok vadi izgovorjavo ob slikah in jasnih navodilih</span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-dragon-green font-bold">✔</span>
+                  <span className="text-muted-foreground">Vsebine v slovenskem jeziku, pripravljene po logopedskih smernicah</span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-dragon-green font-bold">✔</span>
+                  <span className="text-muted-foreground">Dostopna pomoč doma – brez dolgih čakalnih dob</span>
+                </div>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                <Button
+                  onClick={() => navigate("/login")}
+                  className="bg-app-orange hover:bg-app-orange/90 text-white font-semibold px-8 py-6 text-base"
+                >
+                  PREIZKUSI BREZPLAČNO
+                </Button>
+                <Button
+                  onClick={() => navigate("/")}
+                  variant="outline"
+                  className="border-2 border-foreground text-foreground hover:bg-foreground/5 font-semibold px-8 py-6 text-base"
+                >
+                  IZVEDI VEČ
+                </Button>
+              </div>
+            </div>
+            
+            {/* Right: Dragon Image */}
+            <div className="relative hidden md:block">
+              <div className="relative w-full aspect-square max-w-md mx-auto">
+                <img
+                  src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_0.png"
+                  alt="Zmajček maskota"
+                  className="w-full h-full object-contain"
+                  style={{ transform: 'scaleX(-1)' }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
       <FooterSection />
     </div>
   );
