@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { FooterSection } from "@/components/home/FooterSection";
 
 const SplosniPogoji = () => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const SplosniPogoji = () => {
         
         <h1 className="text-3xl font-bold text-dragon-green mb-8">Splošni pogoji</h1>
         
-        <div className="prose prose-slate max-w-none space-y-6">
+        <div className="prose prose-slate max-w-none space-y-6 text-justify">
           
           <section>
             <h2 className="text-2xl font-semibold text-foreground mb-4">1. SPLOŠNE DOLOČBE</h2>
@@ -483,6 +484,8 @@ const SplosniPogoji = () => {
           </section>
         </div>
       </div>
+      
+      <FooterSection />
     </div>
   );
 };
