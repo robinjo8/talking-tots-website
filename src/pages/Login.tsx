@@ -48,15 +48,7 @@ export default function Login() {
       
       recordSuccessfulLogin();
       toast.success("Prijava uspešna!");
-      
-      // Check for intended redirect after login
-      const redirectPath = sessionStorage.getItem("redirectAfterLogin");
-      if (redirectPath) {
-        sessionStorage.removeItem("redirectAfterLogin");
-        navigate(redirectPath);
-      } else {
-        navigate("/");
-      }
+      navigate("/");
     } catch (error: any) {
       console.error("Napaka pri prijavi:", error);
       setError(error.message === "Invalid login credentials" 
