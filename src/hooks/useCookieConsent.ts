@@ -8,6 +8,7 @@ interface CookieConsent {
   necessary: boolean; // Always true - required for app to work
   functional: boolean;
   analytics: boolean;
+  performance: boolean;
   marketing: boolean;
 }
 
@@ -19,6 +20,7 @@ const defaultConsent: CookieConsent = {
   necessary: true,
   functional: false,
   analytics: false,
+  performance: false,
   marketing: false,
 };
 
@@ -58,25 +60,13 @@ export function useCookieConsent() {
       necessary: true,
       functional: true,
       analytics: true,
+      performance: true,
       marketing: true,
     };
     saveConsent(newConsent);
   }, [saveConsent]);
 
-  // Accept only necessary cookies
-  const acceptNecessary = useCallback(() => {
-    const newConsent: CookieConsent = {
-      status: 'accepted',
-      timestamp: new Date().toISOString(),
-      necessary: true,
-      functional: false,
-      analytics: false,
-      marketing: false,
-    };
-    saveConsent(newConsent);
-  }, [saveConsent]);
-
-  // Reject all - dismiss banner without saving (will show again)
+  // Reject all - only necessary cookies
   const rejectAll = useCallback(() => {
     const newConsent: CookieConsent = {
       status: 'rejected',
@@ -84,7 +74,24 @@ export function useCookieConsent() {
       necessary: true,
       functional: false,
       analytics: false,
+      performance: false,
       marketing: false,
+    };
+    saveConsent(newConsent);
+  }, [saveConsent]);
+
+  // Save custom preferences
+  const saveCustomPreferences = useCallback((preferences: {
+    functional: boolean;
+    analytics: boolean;
+    performance: boolean;
+    marketing: boolean;
+  }) => {
+    const newConsent: CookieConsent = {
+      status: 'accepted',
+      timestamp: new Date().toISOString(),
+      necessary: true,
+      ...preferences,
     };
     saveConsent(newConsent);
   }, [saveConsent]);
@@ -107,12 +114,13 @@ export function useCookieConsent() {
     isLoaded,
     showBanner,
     acceptAll,
-    acceptNecessary,
     rejectAll,
+    saveCustomPreferences,
     resetConsent,
     // Helper functions to check specific consent
     hasAnalyticsConsent: consent.analytics,
     hasMarketingConsent: consent.marketing,
     hasFunctionalConsent: consent.functional,
+    hasPerformanceConsent: consent.performance,
   };
 }
