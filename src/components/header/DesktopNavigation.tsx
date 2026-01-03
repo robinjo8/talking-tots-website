@@ -23,87 +23,87 @@ export function DesktopNavigation({ user, onStartNow, onCenikScroll }: DesktopNa
     return location.pathname === path;
   };
 
-  return (
-    <nav className="hidden lg:flex items-center gap-4">
-      {/* Always show Cenik */}
-      <Button
-        type="button"
-        variant="ghost"
-        className="font-semibold rounded-full h-12 lg:h-14 text-base lg:text-lg px-6 lg:px-8 lg:uppercase"
-        onClick={onCenikScroll}
-      >
-        Cenik
-      </Button>
-      
-      {/* Always show Logopedski nasveti - visible for everyone */}
-      <Button 
-        variant="ghost" 
-        onClick={() => handleNavigate("/logopedski-koticek")} 
-        className={
-          "rounded-full h-12 lg:h-14 text-base lg:text-lg px-6 lg:px-8 font-semibold lg:uppercase " +
-          (isActivePath("/logopedski-koticek") ? 'bg-accent' : '')
-        }
-      >
-        <BookOpen className="h-4 w-4 lg:h-5 lg:w-5 mr-2" />
-        Logopedski nasveti
-      </Button>
-      
-      {/* When LOGGED IN, show Moje aplikacije, Moja stran, and user profile */}
-      {user && (
-        <>
-          <Button 
-            variant="ghost" 
-            onClick={() => handleNavigate("/moje-aplikacije")} 
-            className={
-              "rounded-full h-12 lg:h-14 text-base lg:text-lg px-6 lg:px-8 font-semibold lg:uppercase " +
-              (isActivePath("/moje-aplikacije") ? 'bg-accent' : '')
-            }
-          >
-            Moje aplikacije
-          </Button>
-          <Button 
-            variant="ghost" 
-            onClick={() => handleNavigate("/moja-stran")} 
-            className={
-              "rounded-full h-12 lg:h-14 text-base lg:text-lg px-6 lg:px-8 font-semibold lg:uppercase " +
-              (isActivePath("/moja-stran") ? 'bg-accent' : '')
-            }
-          >
-            Moja stran
-          </Button>
-          <UserProfile />
-        </>
-      )}
-      
-      {/* When LOGGED OUT, show consistent action buttons */}
-      {!user && (
-        <>
+  return {
+    navLinks: (
+      <nav className="hidden lg:flex items-center gap-2">
+        {/* Always show Cenik */}
+        <Button
+          type="button"
+          variant="ghost"
+          className="font-semibold rounded-full h-10 text-sm px-4 uppercase"
+          onClick={onCenikScroll}
+        >
+          Cenik
+        </Button>
+        
+        {/* Always show Logopedski nasveti - visible for everyone */}
+        <Button 
+          variant="ghost" 
+          onClick={() => handleNavigate("/logopedski-koticek")} 
+          className={
+            "rounded-full h-10 text-sm px-4 font-semibold uppercase " +
+            (isActivePath("/logopedski-koticek") ? 'bg-accent' : '')
+          }
+        >
+          Logopedski nasveti
+        </Button>
+        
+        {/* When LOGGED IN, show Moje aplikacije, Moja stran */}
+        {user && (
+          <>
+            <Button 
+              variant="ghost" 
+              onClick={() => handleNavigate("/moje-aplikacije")} 
+              className={
+                "rounded-full h-10 text-sm px-4 font-semibold uppercase " +
+                (isActivePath("/moje-aplikacije") ? 'bg-accent' : '')
+              }
+            >
+              Moje aplikacije
+            </Button>
+            <Button 
+              variant="ghost" 
+              onClick={() => handleNavigate("/moja-stran")} 
+              className={
+                "rounded-full h-10 text-sm px-4 font-semibold uppercase " +
+                (isActivePath("/moja-stran") ? 'bg-accent' : '')
+              }
+            >
+              Moja stran
+            </Button>
+          </>
+        )}
+      </nav>
+    ),
+    rightSection: user ? (
+      <UserProfile />
+    ) : (
+      <div className="hidden lg:flex items-center gap-2">
+        <Button
+          onClick={onStartNow}
+          className="rounded-full h-10 text-sm px-4 bg-dragon-green hover:bg-dragon-green/90 font-semibold text-white uppercase"
+        >
+          <Play className="h-4 w-4 mr-1" />
+          Začni zdaj
+        </Button>
+        <Link to="/register">
           <Button
-            onClick={onStartNow}
-            className="rounded-full h-12 lg:h-14 text-base lg:text-lg px-6 lg:px-8 bg-dragon-green hover:bg-dragon-green/90 font-semibold text-white min-w-[160px] lg:min-w-[180px] lg:uppercase"
+            variant="outline"
+            className="rounded-full h-10 text-sm px-4 font-semibold uppercase"
           >
-            <Play className="h-4 w-4 lg:h-5 lg:w-5 mr-2" />
-            Začni zdaj
+            <UserPlus className="h-4 w-4 mr-1" />
+            Registracija
           </Button>
-          <Link to="/register">
-            <Button
-              variant="outline"
-              className="rounded-full h-12 lg:h-14 text-base lg:text-lg px-6 lg:px-8 font-semibold min-w-[160px] lg:min-w-[180px] lg:uppercase"
-            >
-              <UserPlus className="h-4 w-4 lg:h-5 lg:w-5 mr-2" />
-              Registracija
-            </Button>
-          </Link>
-          <Link to="/login">
-            <Button
-              variant="outline"
-              className="rounded-full h-12 lg:h-14 text-base lg:text-lg px-6 lg:px-8 font-semibold min-w-[160px] lg:min-w-[180px] lg:uppercase"
-            >
-              Prijava
-            </Button>
-          </Link>
-        </>
-      )}
-    </nav>
-  );
+        </Link>
+        <Link to="/login">
+          <Button
+            variant="outline"
+            className="rounded-full h-10 text-sm px-4 font-semibold uppercase"
+          >
+            Prijava
+          </Button>
+        </Link>
+      </div>
+    )
+  };
 }
