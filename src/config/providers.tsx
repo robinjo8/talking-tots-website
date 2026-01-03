@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { PWAProvider } from "@/components/pwa/PWAProvider";
+import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ export function AppProviders({ children }: AppProvidersProps) {
               <Toaster />
               <Sonner />
               {children}
+              <CookieConsentBanner />
             </PWAProvider>
           </AuthProvider>
         </TooltipProvider>
