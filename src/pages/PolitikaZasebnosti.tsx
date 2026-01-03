@@ -186,8 +186,15 @@ const PolitikaZasebnosti = () => {
               Za namen registracije, uporabe storitev, odgovora na povpraševanja, sodelovanja v promocijskih aktivnostih ter izvajanja naročniškega razmerja obdelujemo osebne podatke, ki jih posamezniki posredujejo prostovoljno, zlasti:
             </p>
             <p className="text-muted-foreground leading-relaxed mt-4">
-              <strong>Podatki staršev oziroma zakonitih zastopnikov:</strong> ime in priimek, elektronski naslov, telefonska številka (neobvezno), naslov (neobvezno).
+              <strong>Podatki staršev oziroma zakonitih zastopnikov:</strong>
             </p>
+            <ul className="list-disc list-inside text-muted-foreground space-y-2 mt-2">
+              <li>ime in priimek,</li>
+              <li>elektronski naslov,</li>
+              <li>po potrebi telefonska številka,</li>
+              <li>podatki, povezani z naročniškim razmerjem in komunikacijo z upravljavcem,</li>
+              <li>drugi podatki, ki jih posameznik prostovoljno posreduje v okviru komunikacije ali uporabe storitev.</li>
+            </ul>
             <p className="text-muted-foreground leading-relaxed mt-4">
               <strong>Podatki otrok (ki jih vnese starš oziroma zakoniti zastopnik):</strong>
             </p>
