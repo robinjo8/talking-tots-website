@@ -107,7 +107,8 @@ export function useCookieConsent() {
   }, []);
 
   // Check if we should show the banner
-  const showBanner = isLoaded && consent.status === 'pending';
+  // TODO: Vrni nazaj na: isLoaded && consent.status === 'pending'
+  const showBanner = isLoaded; // TESTNI NAČIN - vedno prikaži
 
   return {
     consent,
