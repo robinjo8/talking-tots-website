@@ -4,7 +4,7 @@ import { Cookie } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function CookieConsentBanner() {
-  const { showBanner, acceptAll, rejectAll } = useCookieConsent();
+  const { showBanner, acceptAll, acceptNecessary, rejectAll } = useCookieConsent();
 
   return (
     <AnimatePresence>
@@ -48,6 +48,13 @@ export function CookieConsentBanner() {
                   className="flex-1 md:flex-none text-sm"
                 >
                   Zavrni
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={acceptNecessary}
+                  className="flex-1 md:flex-none text-sm"
+                >
+                  Samo nujni
                 </Button>
                 <Button
                   onClick={acceptAll}

@@ -63,7 +63,20 @@ export function useCookieConsent() {
     saveConsent(newConsent);
   }, [saveConsent]);
 
-  // Reject all optional cookies (keep only necessary)
+  // Accept only necessary cookies
+  const acceptNecessary = useCallback(() => {
+    const newConsent: CookieConsent = {
+      status: 'accepted',
+      timestamp: new Date().toISOString(),
+      necessary: true,
+      functional: false,
+      analytics: false,
+      marketing: false,
+    };
+    saveConsent(newConsent);
+  }, [saveConsent]);
+
+  // Reject all - dismiss banner without saving (will show again)
   const rejectAll = useCallback(() => {
     const newConsent: CookieConsent = {
       status: 'rejected',
@@ -94,6 +107,7 @@ export function useCookieConsent() {
     isLoaded,
     showBanner,
     acceptAll,
+    acceptNecessary,
     rejectAll,
     resetConsent,
     // Helper functions to check specific consent
