@@ -30,7 +30,7 @@ export function DesktopNavigation({ user, onStartNow, onCenikScroll }: DesktopNa
         <Button
           type="button"
           variant="ghost"
-          className="font-semibold rounded-full h-10 text-sm px-4 uppercase"
+          className="font-semibold rounded-full h-10 text-base px-4 uppercase"
           onClick={onCenikScroll}
         >
           Cenik
@@ -41,7 +41,7 @@ export function DesktopNavigation({ user, onStartNow, onCenikScroll }: DesktopNa
           variant="ghost" 
           onClick={() => handleNavigate("/logopedski-koticek")} 
           className={
-            "rounded-full h-10 text-sm px-4 font-semibold uppercase " +
+            "rounded-full h-10 text-base px-4 font-semibold uppercase " +
             (isActivePath("/logopedski-koticek") ? 'bg-accent' : '')
           }
         >
@@ -55,7 +55,7 @@ export function DesktopNavigation({ user, onStartNow, onCenikScroll }: DesktopNa
               variant="ghost" 
               onClick={() => handleNavigate("/moje-aplikacije")} 
               className={
-                "rounded-full h-10 text-sm px-4 font-semibold uppercase " +
+                "rounded-full h-10 text-base px-4 font-semibold uppercase " +
                 (isActivePath("/moje-aplikacije") ? 'bg-accent' : '')
               }
             >
@@ -65,7 +65,7 @@ export function DesktopNavigation({ user, onStartNow, onCenikScroll }: DesktopNa
               variant="ghost" 
               onClick={() => handleNavigate("/moja-stran")} 
               className={
-                "rounded-full h-10 text-sm px-4 font-semibold uppercase " +
+                "rounded-full h-10 text-base px-4 font-semibold uppercase " +
                 (isActivePath("/moja-stran") ? 'bg-accent' : '')
               }
             >
