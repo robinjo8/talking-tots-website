@@ -312,16 +312,6 @@ const PolitikaZasebnosti = () => {
           <section>
             <h2 className="text-2xl font-semibold text-foreground mb-4">AVTOMATIZIRANO SPREJEMANJE ODLOČITEV IN PROFILIRANJE</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Osebni podatki uporabnikov in otrok niso predmet avtomatiziranega sprejemanja odločitev v smislu 22. člena GDPR, ki bi imelo pravne učinke ali bi na posameznika podobno znatno vplivalo, prav tako niso predmet oblikovanja profilov v smislu GDPR.
-            </p>
-            <p className="text-muted-foreground leading-relaxed mt-4">
-              Platforma TomiTalk lahko na podlagi vnesenih podatkov in uporabe storitev predlaga prilagojene vsebine, vaje ali priporočila, vendar takšna obdelava ne predstavlja avtomatiziranega odločanja ali profiliranja, temveč služi izključno podpori in prilagoditvi uporabniške izkušnje ter ne nadomešča strokovne presoje.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-foreground mb-4">AVTOMATIZIRANO SPREJEMANJE ODLOČITEV IN PROFILIRANJE</h2>
-            <p className="text-muted-foreground leading-relaxed">
               Osebni podatki uporabnikov in otrok na platformi TomiTalk niso predmet avtomatiziranega sprejemanja odločitev v smislu 22. člena GDPR, ki bi imelo pravne učinke ali bi na posameznika podobno znatno vplivalo, prav tako niso predmet oblikovanja profilov v smislu GDPR.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-4">
