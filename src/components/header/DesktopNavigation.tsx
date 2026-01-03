@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Play, UserPlus, BookOpen } from "lucide-react";
 import { UserProfile } from "@/components/auth/UserProfile";
-import { navigationLinks } from "./NavigationLinks";
 
 interface DesktopNavigationProps {
   user: any;
@@ -36,25 +35,42 @@ export function DesktopNavigation({ user, onStartNow, onCenikScroll }: DesktopNa
         Cenik
       </Button>
       
-      {/* When LOGGED IN, show main navigation left of user profile */}
+      {/* Always show Logopedski nasveti - visible for everyone */}
+      <Button 
+        variant="ghost" 
+        onClick={() => handleNavigate("/logopedski-koticek")} 
+        className={
+          "rounded-full h-12 lg:h-14 text-base lg:text-lg px-6 lg:px-8 font-semibold lg:uppercase " +
+          (isActivePath("/logopedski-koticek") ? 'bg-accent' : '')
+        }
+      >
+        <BookOpen className="h-4 w-4 lg:h-5 lg:w-5 mr-2" />
+        Logopedski nasveti
+      </Button>
+      
+      {/* When LOGGED IN, show Moje aplikacije, Moja stran, and user profile */}
       {user && (
         <>
-          {/* Navigation links in new order: Vaje, Igre, Izzivi, Video navodila, Logopedski kotiček, Moja stran */}
-          {navigationLinks.slice(0, 6).map((link, index) => (
-            <Button 
-              key={index} 
-              variant="ghost" 
-              onClick={() => !link.disabled && handleNavigate(link.path)} 
-              disabled={link.disabled}
-              className={
-                "rounded-full h-12 lg:h-14 text-base lg:text-lg px-6 lg:px-8 font-semibold lg:uppercase " +
-                (isActivePath(link.path) ? 'bg-accent' : '')
-              }
-            >
-              {link.label === "Logopedski nasveti" && <BookOpen className="h-4 w-4 lg:h-5 lg:w-5 mr-2" />}
-              {link.label}
-            </Button>
-          ))}
+          <Button 
+            variant="ghost" 
+            onClick={() => handleNavigate("/moje-aplikacije")} 
+            className={
+              "rounded-full h-12 lg:h-14 text-base lg:text-lg px-6 lg:px-8 font-semibold lg:uppercase " +
+              (isActivePath("/moje-aplikacije") ? 'bg-accent' : '')
+            }
+          >
+            Moje aplikacije
+          </Button>
+          <Button 
+            variant="ghost" 
+            onClick={() => handleNavigate("/moja-stran")} 
+            className={
+              "rounded-full h-12 lg:h-14 text-base lg:text-lg px-6 lg:px-8 font-semibold lg:uppercase " +
+              (isActivePath("/moja-stran") ? 'bg-accent' : '')
+            }
+          >
+            Moja stran
+          </Button>
           <UserProfile />
         </>
       )}
