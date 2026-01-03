@@ -74,27 +74,30 @@ export default function Header() {
   return (
     <>
       <header className="py-4 px-4 md:px-10 w-full fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
-        {/* Desktop layout - logo far left, nav center, profile far right */}
+        {/* Desktop layout - logo and nav on left, profile on right */}
         <div className="hidden lg:flex items-center justify-between w-full">
-          {/* Logo on far left */}
-          <Link 
-            to="/" 
-            className="flex items-center gap-2"
-            onClick={(e) => {
-              if (window.location.pathname === '/') {
-                e.preventDefault();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }
-            }}
-          >
-            <div className="flex items-center">
-              <span className="text-2xl md:text-3xl font-extrabold text-dragon-green uppercase mx-0 px-0 lg:text-3xl">Tomi</span>
-              <span className="text-2xl md:text-3xl font-extrabold text-app-orange uppercase lg:text-3xl">Talk</span>
-            </div>
-          </Link>
-          
-          {/* Navigation center */}
-          <DesktopNavigation user={user} onStartNow={handleStartNow} onCenikScroll={handleCenikScroll} />
+          {/* Left side - Logo and Navigation together */}
+          <div className="flex items-center gap-6">
+            {/* Logo */}
+            <Link 
+              to="/" 
+              className="flex items-center gap-2"
+              onClick={(e) => {
+                if (window.location.pathname === '/') {
+                  e.preventDefault();
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              }}
+            >
+              <div className="flex items-center">
+                <span className="text-2xl md:text-3xl font-extrabold text-dragon-green uppercase mx-0 px-0 lg:text-3xl">Tomi</span>
+                <span className="text-2xl md:text-3xl font-extrabold text-app-orange uppercase lg:text-3xl">Talk</span>
+              </div>
+            </Link>
+            
+            {/* Navigation right next to logo */}
+            <DesktopNavigation user={user} onStartNow={handleStartNow} onCenikScroll={handleCenikScroll} />
+          </div>
           
           {/* Right side - install button if available */}
           {showInstall && (
