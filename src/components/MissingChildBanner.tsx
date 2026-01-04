@@ -5,8 +5,14 @@ import { Link } from "react-router-dom";
 export const MissingChildBanner = () => {
   const { user, profile, isLoading } = useAuth();
 
-  // Don't show if loading, not logged in, or has children
-  if (isLoading || !user || (profile?.children && profile.children.length > 0)) {
+  // Don't show if loading or not logged in
+  if (isLoading || !user) {
+    return null;
+  }
+
+  // Don't show if user has children
+  const hasChildren = profile?.children && profile.children.length > 0;
+  if (hasChildren) {
     return null;
   }
 
