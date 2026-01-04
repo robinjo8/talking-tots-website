@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -19,6 +19,7 @@ import { PaymentMethodsSection } from "@/components/profile/PaymentMethodsSectio
 export default function Profile() {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   
   // Accordion state - only one section can be expanded at a time
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
@@ -39,6 +40,14 @@ export default function Profile() {
 
 
   useEffect(() => {
+    // Check URL parameter for section to expand
+    const sectionParam = searchParams.get('expandSection');
+    if (sectionParam) {
+      setExpandedSection(sectionParam);
+      return;
+    }
+    
+    // Fallback to localStorage for subscription
     const sectionToExpand = localStorage.getItem('expandSection');
     if (sectionToExpand === 'subscription') {
       setExpandedSection('subscription');
@@ -48,7 +57,7 @@ export default function Profile() {
         localStorage.removeItem('expandSection');
       }
     }
-  }, []);
+  }, [searchParams]);
 
   // Helper function to handle section toggle
   const handleSectionToggle = (sectionName: string) => {

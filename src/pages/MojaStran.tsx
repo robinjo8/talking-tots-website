@@ -7,6 +7,7 @@ import { ProgressSection } from "@/components/ProgressSection";
 import { TipSection } from "@/components/TipSection";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { FooterSection } from "@/components/FooterSection";
+import { MissingChildBanner } from "@/components/MissingChildBanner";
 
 
 const MojaStran = () => {
@@ -32,6 +33,7 @@ const MojaStran = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <MissingChildBanner />
       
       <div className="container max-w-5xl mx-auto pt-28 md:pt-32 pb-20 px-4">
         {/* Breadcrumb */}
