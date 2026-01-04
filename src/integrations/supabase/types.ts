@@ -720,19 +720,13 @@ export type Database = {
       get_children_analytics: {
         Args: never
         Returns: {
-          avg_score: number | null
-          child_id: string | null
-          child_name: string | null
-          last_activity_at: string | null
-          sessions_count: number | null
-          stars_total: number | null
+          avg_score: number
+          child_id: string
+          child_name: string
+          last_activity_at: string
+          sessions_count: number
+          stars_total: number
         }[]
-        SetofOptions: {
-          from: "*"
-          to: "children_analytics"
-          isOneToOne: false
-          isSetofReturn: true
-        }
       }
       grant_admin_role: {
         Args: {
