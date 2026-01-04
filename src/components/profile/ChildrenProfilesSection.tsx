@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, ChevronDown, ChevronUp, RefreshCw } from "lucide-react";
+import { Users, ChevronDown, ChevronUp, RefreshCw, Star } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { SimpleChildForm } from "@/components/profile/SimpleChildForm";
 import { ChildProfileDisplay } from "@/components/profile/ChildProfileDisplay";
@@ -36,7 +36,12 @@ export function ChildrenProfilesSection({
           <CardHeader className="bg-gradient-to-r from-app-blue/10 to-dragon-green/10 flex flex-row items-center justify-between cursor-pointer hover:bg-gradient-to-r hover:from-app-blue/15 hover:to-dragon-green/15 transition-colors">
             <div className="flex items-center gap-2">
               <Users className="h-5 w-5 text-app-blue" />
-              <CardTitle>Otroci ({profile?.children?.length || 0})</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                Otroci ({profile?.children?.length || 0})
+                {(!profile?.children || profile.children.length === 0) && (
+                  <Star className="h-5 w-5 text-red-500 fill-red-500 animate-pulse" />
+                )}
+              </CardTitle>
             </div>
             <div className="flex items-center gap-1 text-app-blue">
               {isExpanded ? (
