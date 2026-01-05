@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 // Google Client ID from Google Cloud Console
-const GOOGLE_CLIENT_ID = "850007835498-7cjj5ckk33h6c0llpc3jf3otp2osr6vq.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = "481391137719-0brk1c6l3u2k6ujbbp1a32smqkf0ert1.apps.googleusercontent.com";
 
 interface GoogleOneTapButtonProps {
   onSuccess: () => void;
