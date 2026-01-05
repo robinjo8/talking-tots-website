@@ -24,9 +24,9 @@ export const MissingChildBanner = () => {
         <span className="text-base font-medium leading-none">
           Za začetek uporabe dodajte profil otroka.
         </span>
-        <span className="bg-dragon-green hover:bg-dragon-green/90 text-white 
+        <span className="bg-white text-gray-800 
                        px-5 py-1.5 rounded-full text-sm font-semibold 
-                       leading-none transition-colors">
+                       leading-none transition-colors hover:bg-gray-100 shadow-sm">
           Dodaj
         </span>
       </div>
