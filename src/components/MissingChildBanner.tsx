@@ -14,7 +14,7 @@ export const MissingChildBanner = () => {
   return (
     <Link
       to="/profile?expandSection=children"
-      className="sticky top-[57px] lg:top-[65px] left-0 right-0 z-40 
+      className="sticky top-[72px] lg:top-[73px] left-0 right-0 z-40 
                  bg-red-500 text-white h-12 
                  grid place-items-center 
                  hover:bg-red-600 transition-colors
