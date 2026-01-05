@@ -41,14 +41,14 @@ export const MissingChildBanner = () => {
 
   // Desktop: banner with button
   return (
-    <div className="fixed top-[72px] left-0 right-0 z-40 bg-red-500 text-white py-3.5 px-4 shadow-lg">
-      <div className="container max-w-6xl mx-auto flex items-center justify-center gap-4">
-        <span className="text-base font-medium leading-none">
+    <div className="fixed top-[72px] left-0 right-0 z-40 bg-red-500 text-white shadow-lg">
+      <div className="container max-w-6xl mx-auto h-12 flex items-center justify-center gap-4 px-4">
+        <span className="text-base font-medium">
           Za začetek uporabe dodajte profil otroka.
         </span>
         <Link 
           to="/profile?expandSection=children"
-          className="bg-white text-red-500 px-5 py-1.5 rounded-full text-base font-semibold hover:bg-red-50 transition-colors whitespace-nowrap flex items-center justify-center leading-none"
+          className="bg-white text-red-500 px-5 py-1.5 rounded-full text-base font-semibold hover:bg-red-50 transition-colors whitespace-nowrap"
         >
           Dodaj
         </Link>
