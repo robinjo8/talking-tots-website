@@ -16,14 +16,14 @@ export const MissingChildBanner = () => {
   }
 
   return (
-    <div className="fixed top-[57px] md:top-[65px] left-0 right-0 z-40 bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 px-4 shadow-lg">
-      <div className="container max-w-6xl mx-auto flex items-center justify-center gap-3">
-        <span className="text-sm md:text-base font-medium">
+    <div className="fixed top-[57px] md:top-[65px] left-0 right-0 z-40 bg-gradient-to-r from-orange-500 to-red-500 text-white py-2 md:py-3 px-4 shadow-lg">
+      <div className="container max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-center gap-2 md:gap-3">
+        <span className="text-sm md:text-base font-medium text-center">
           Za uporabo aplikacije je potrebno dodati profil otroka.
         </span>
         <Link 
           to="/profile?expandSection=children"
-          className="ml-2 bg-white text-orange-600 px-4 py-1.5 rounded-full text-sm font-semibold hover:bg-orange-50 transition-colors"
+          className="bg-white text-orange-600 px-4 py-1.5 rounded-full text-sm font-semibold hover:bg-orange-50 transition-colors"
         >
           Dodaj
         </Link>
