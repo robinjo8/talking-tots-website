@@ -20,13 +20,13 @@ export const MissingChildBanner = () => {
                  hover:bg-red-600 transition-colors
                  cursor-pointer w-full block"
     >
-      <div className="flex items-center justify-center gap-4 px-4">
-        <span className="text-base font-medium leading-none">
+      <div className="flex items-center justify-center gap-2 sm:gap-4 px-2 sm:px-4 whitespace-nowrap">
+        <span className="text-xs sm:text-base font-medium leading-none">
           Za začetek uporabe dodajte profil otroka.
         </span>
         <span className="bg-white text-gray-800 
-                       px-5 py-1.5 rounded-full text-sm font-semibold 
-                       leading-none transition-colors hover:bg-gray-100 shadow-sm">
+                       px-3 sm:px-5 py-1.5 rounded-full text-xs sm:text-sm font-semibold 
+                       leading-none transition-colors hover:bg-gray-100 shadow-sm flex-shrink-0">
           Dodaj
         </span>
       </div>
