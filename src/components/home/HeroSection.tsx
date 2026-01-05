@@ -3,8 +3,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Check } from "lucide-react";
+import { useBannerVisible } from "@/components/MissingChildBanner";
 
 export const HeroSection = () => {
+  const bannerVisible = useBannerVisible();
   const { user } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
@@ -38,7 +40,7 @@ export const HeroSection = () => {
   ];
 
   return (
-    <section className="relative bg-white w-full overflow-hidden pt-24 md:pt-36 pb-16 md:pb-40">
+    <section className={`relative bg-white w-full overflow-hidden pb-16 md:pb-40 ${bannerVisible ? 'pt-32 md:pt-48' : 'pt-24 md:pt-36'}`}>
       <div className="max-w-7xl mx-auto px-4 md:px-10">
         <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-2 gap-12 items-center'}`}>
           {/* Left: Text Content */}

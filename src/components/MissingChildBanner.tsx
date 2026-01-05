@@ -1,29 +1,54 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { ChevronRight } from "lucide-react";
+
+export const useBannerVisible = () => {
+  const { user, profile, isLoading } = useAuth();
+  
+  if (isLoading || !user) {
+    return false;
+  }
+  
+  const hasChildren = profile?.children && profile.children.length > 0;
+  return !hasChildren;
+};
 
 export const MissingChildBanner = () => {
-  const { user, profile, isLoading } = useAuth();
+  const isMobile = useIsMobile();
+  const isVisible = useBannerVisible();
 
-  // Don't show if loading or not logged in
-  if (isLoading || !user) {
+  if (!isVisible) {
     return null;
   }
 
-  // Don't show if user has children
-  const hasChildren = profile?.children && profile.children.length > 0;
-  if (hasChildren) {
-    return null;
+  // Mobile: entire banner is clickable
+  if (isMobile) {
+    return (
+      <Link 
+        to="/profile?expandSection=children"
+        className="fixed top-[57px] left-0 right-0 z-40 bg-red-500 text-white py-2.5 px-4 shadow-lg hover:bg-red-600 transition-colors block"
+      >
+        <div className="flex items-center justify-center gap-2">
+          <span className="text-sm font-medium">
+            Za začetek uporabe dodajte profil otroka.
+          </span>
+          <ChevronRight className="w-4 h-4" />
+        </div>
+      </Link>
+    );
   }
 
+  // Desktop: banner with button
   return (
-    <div className="fixed top-[57px] md:top-[72px] left-0 right-0 z-40 bg-red-500 text-white py-2 px-4 shadow-lg">
-      <div className="container max-w-6xl mx-auto flex items-center justify-center gap-3">
-        <span className="text-sm font-medium whitespace-nowrap">
+    <div className="fixed top-[72px] left-0 right-0 z-40 bg-red-500 text-white py-3 px-4 shadow-lg">
+      <div className="container max-w-6xl mx-auto flex items-center justify-center gap-4">
+        <span className="text-base font-medium">
           Za začetek uporabe dodajte profil otroka.
         </span>
         <Link 
           to="/profile?expandSection=children"
-          className="bg-white text-red-500 px-4 py-1 rounded-full text-sm font-semibold hover:bg-red-50 transition-colors whitespace-nowrap"
+          className="bg-white text-red-500 px-5 py-1.5 rounded-full text-base font-semibold hover:bg-red-50 transition-colors whitespace-nowrap"
         >
           Dodaj
         </Link>
