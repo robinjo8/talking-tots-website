@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
+import { useOAuthPopup } from "@/hooks/useOAuthPopup";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -17,23 +18,15 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { signInWithGoogle, isLoading: isGoogleLoading, error: googleError } = useOAuthPopup();
 
   const handleGoogleSignIn = async () => {
-    setIsLoading(true);
-    setError("");
-    
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/`,
-        },
+    const success = await signInWithGoogle();
+    if (success) {
+      toast.success("Registracija uspešna!", {
+        description: "Dobrodošli v TomiTalk!",
       });
-      
-      if (error) throw error;
-    } catch (err: any) {
-      setError(err.message || "Napaka pri prijavi z Google");
-      setIsLoading(false);
+      navigate("/");
     }
   };
 
@@ -128,7 +121,7 @@ export default function Register() {
           variant="outline"
           className="w-full py-6 text-base font-medium"
           onClick={handleGoogleSignIn}
-          disabled={isLoading}
+          disabled={isLoading || isGoogleLoading}
         >
           <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
             <path
@@ -220,9 +213,9 @@ export default function Register() {
             />
           </div>
 
-          {error && (
+          {(error || googleError) && (
             <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
+              <AlertDescription>{error || googleError}</AlertDescription>
             </Alert>
           )}
 
