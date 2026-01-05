@@ -10,7 +10,6 @@ import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { MissingChildBanner } from "@/components/MissingChildBanner";
 
 export default function GovorneIgre() {
   const { user, selectedChild, signOut } = useAuth();
@@ -41,7 +40,6 @@ export default function GovorneIgre() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <MissingChildBanner />
       
       {/* Mobile Back Button */}
       {isMobile && (

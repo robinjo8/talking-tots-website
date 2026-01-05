@@ -1,5 +1,4 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const MissingChildBanner = () => {
@@ -17,17 +16,16 @@ export const MissingChildBanner = () => {
   }
 
   return (
-    <div className="fixed top-16 md:top-20 left-0 right-0 z-40 bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 px-4 shadow-lg">
+    <div className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 px-4 shadow-lg">
       <div className="container max-w-6xl mx-auto flex items-center justify-center gap-3">
-        <AlertTriangle className="h-5 w-5 flex-shrink-0" />
         <span className="text-sm md:text-base font-medium">
-          Za uporabo aplikacije dodajte profil otroka.
+          Za uporabo aplikacije je potrebno dodati profil otroka.
         </span>
         <Link 
           to="/profile?expandSection=children"
           className="ml-2 bg-white text-orange-600 px-4 py-1.5 rounded-full text-sm font-semibold hover:bg-orange-50 transition-colors"
         >
-          Dodaj →
+          Dodaj
         </Link>
       </div>
     </div>
