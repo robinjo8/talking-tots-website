@@ -18,7 +18,7 @@ export const MissingChildBanner = () => {
   return (
     <div className="fixed top-[57px] md:top-[72px] left-0 right-0 z-40 bg-gradient-to-r from-orange-500 to-red-500 text-white py-2 md:py-3 px-4 shadow-lg">
       <div className="container max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-center gap-2 md:gap-3">
-        <span className="text-sm md:text-base font-medium text-center">
+        <span className="text-xs sm:text-sm md:text-base font-medium text-center whitespace-nowrap">
           Za uporabo aplikacije je potrebno dodati profil otroka.
         </span>
         <Link 
