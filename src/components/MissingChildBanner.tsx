@@ -16,7 +16,7 @@ export const MissingChildBanner = () => {
   }
 
   return (
-    <div className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 px-4 shadow-lg">
+    <div className="fixed top-[57px] md:top-[65px] left-0 right-0 z-40 bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 px-4 shadow-lg">
       <div className="container max-w-6xl mx-auto flex items-center justify-center gap-3">
         <span className="text-sm md:text-base font-medium">
           Za uporabo aplikacije je potrebno dodati profil otroka.
