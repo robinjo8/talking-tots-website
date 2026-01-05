@@ -1,7 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ChevronRight } from "lucide-react";
 
 export const useBannerVisible = () => {
   const { user, profile, isLoading } = useAuth();
@@ -22,18 +21,20 @@ export const MissingChildBanner = () => {
     return null;
   }
 
-  // Mobile: entire banner is clickable
+  // Mobile: entire banner is clickable with "Dodaj" button
   if (isMobile) {
     return (
       <Link 
         to="/profile?expandSection=children"
-        className="fixed top-14 left-0 right-0 z-40 bg-red-500 text-white py-3 px-4 shadow-lg hover:bg-red-600 transition-colors block"
+        className="fixed top-14 left-0 right-0 z-40 bg-red-500 text-white shadow-lg hover:bg-red-600 transition-colors block"
       >
-        <div className="flex items-center justify-center gap-2">
-          <span className="text-sm font-medium text-center">
+        <div className="h-12 flex items-center justify-center gap-3 px-4">
+          <span className="text-sm font-medium">
             Za začetek uporabe dodajte profil otroka.
           </span>
-          <ChevronRight className="w-4 h-4 flex-shrink-0" />
+          <span className="bg-white text-red-500 px-4 py-1 rounded-full text-sm font-semibold whitespace-nowrap">
+            Dodaj
+          </span>
         </div>
       </Link>
     );
