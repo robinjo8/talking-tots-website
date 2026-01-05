@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuthRateLimit } from "@/hooks/useAuthRateLimit";
 import { Separator } from "@/components/ui/separator";
+import { useOAuthPopup } from "@/hooks/useOAuthPopup";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -17,23 +18,13 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { checkRateLimit, recordFailedAttempt, recordSuccessfulLogin } = useAuthRateLimit();
+  const { signInWithGoogle, isLoading: isGoogleLoading, error: googleError } = useOAuthPopup();
 
   const handleGoogleSignIn = async () => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/`,
-        },
-      });
-      
-      if (error) throw error;
-    } catch (err: any) {
-      setError(err.message || "Napaka pri prijavi z Google");
-      setIsLoading(false);
+    const success = await signInWithGoogle();
+    if (success) {
+      toast.success("Prijava uspešna!");
+      navigate("/");
     }
   };
 
@@ -90,7 +81,7 @@ export default function Login() {
           variant="outline"
           className="w-full py-6 text-base font-medium"
           onClick={handleGoogleSignIn}
-          disabled={isLoading}
+          disabled={isLoading || isGoogleLoading}
         >
           <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
             <path
@@ -125,9 +116,9 @@ export default function Login() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
+          {(error || googleError) && (
             <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
+              <AlertDescription>{error || googleError}</AlertDescription>
             </Alert>
           )}
           
