@@ -7,8 +7,6 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { MobileMenu } from "./header/MobileMenu";
 import { DesktopNavigation } from "./header/DesktopNavigation";
-import { MissingChildBanner } from "./MissingChildBanner";
-
 export default function Header() {
   const {
     user,
@@ -140,7 +138,6 @@ export default function Header() {
           <MobileMenu user={user} profile={profile} selectedChild={selectedChild} onSignOut={handleSignOut} onStartNow={handleStartNow} onCenikScroll={handleCenikScroll} />
         </div>
       </header>
-      <MissingChildBanner />
     </>
   );
 }
