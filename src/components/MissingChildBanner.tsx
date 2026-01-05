@@ -20,7 +20,7 @@ export const MissingChildBanner = () => {
                  hover:bg-red-600 transition-colors
                  cursor-pointer w-full block"
     >
-      <div className="flex items-center gap-4 px-4 pt-2">
+      <div className="flex items-center justify-center gap-4 px-4">
         <span className="text-base font-medium leading-none">
           Za začetek uporabe dodajte profil otroka.
         </span>
