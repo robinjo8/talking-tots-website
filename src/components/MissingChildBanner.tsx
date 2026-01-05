@@ -26,9 +26,9 @@ export const MissingChildBanner = () => {
     return (
       <Link 
         to="/profile?expandSection=children"
-        className="fixed top-14 left-0 right-0 z-40 bg-red-500 text-white shadow-lg hover:bg-red-600 transition-colors block"
+        className="fixed top-14 left-0 right-0 z-40 bg-red-500 text-white shadow-lg hover:bg-red-600 transition-colors h-12 flex items-center justify-center"
       >
-        <div className="h-12 flex items-center justify-center gap-3 px-4">
+        <div className="flex items-center justify-center gap-3 px-4">
           <span className="text-sm font-medium">
             Za začetek uporabe dodajte profil otroka.
           </span>
@@ -42,8 +42,8 @@ export const MissingChildBanner = () => {
 
   // Desktop: banner with button
   return (
-    <div className="fixed top-[72px] left-0 right-0 z-40 bg-red-500 text-white shadow-lg">
-      <div className="container max-w-6xl mx-auto h-12 flex items-center justify-center gap-4 px-4">
+    <div className="fixed top-[72px] left-0 right-0 z-40 bg-red-500 text-white shadow-lg h-12 flex items-center justify-center">
+      <div className="container max-w-6xl mx-auto flex items-center justify-center gap-4 px-4">
         <span className="text-base font-medium">
           Za začetek uporabe dodajte profil otroka.
         </span>
