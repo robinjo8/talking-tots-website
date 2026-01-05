@@ -15,8 +15,8 @@ export const MissingChildBanner = () => {
     <Link
       to="/profile?expandSection=children"
       className="fixed top-14 lg:top-[72px] left-0 right-0 z-40 
-                 bg-red-500 text-white h-12 
-                 grid place-items-center 
+                 bg-red-500 text-white h-14 sm:h-12 
+                 flex items-end sm:items-center justify-center pb-2 sm:pb-0
                  hover:bg-red-600 transition-colors
                  cursor-pointer w-full block"
     >
