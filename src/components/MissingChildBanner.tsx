@@ -27,13 +27,13 @@ export const MissingChildBanner = () => {
     return (
       <Link 
         to="/profile?expandSection=children"
-        className="fixed top-[57px] left-0 right-0 z-40 bg-red-500 text-white py-2.5 px-4 shadow-lg hover:bg-red-600 transition-colors block"
+        className="fixed top-14 left-0 right-0 z-40 bg-red-500 text-white py-3 px-4 shadow-lg hover:bg-red-600 transition-colors block"
       >
         <div className="flex items-center justify-center gap-2">
-          <span className="text-sm font-medium">
+          <span className="text-sm font-medium text-center">
             Za začetek uporabe dodajte profil otroka.
           </span>
-          <ChevronRight className="w-4 h-4" />
+          <ChevronRight className="w-4 h-4 flex-shrink-0" />
         </div>
       </Link>
     );
@@ -41,14 +41,14 @@ export const MissingChildBanner = () => {
 
   // Desktop: banner with button
   return (
-    <div className="fixed top-[72px] left-0 right-0 z-40 bg-red-500 text-white py-3 px-4 shadow-lg">
+    <div className="fixed top-[72px] left-0 right-0 z-40 bg-red-500 text-white py-3.5 px-4 shadow-lg">
       <div className="container max-w-6xl mx-auto flex items-center justify-center gap-4">
-        <span className="text-base font-medium">
+        <span className="text-base font-medium leading-none">
           Za začetek uporabe dodajte profil otroka.
         </span>
         <Link 
           to="/profile?expandSection=children"
-          className="bg-white text-red-500 px-5 py-1.5 rounded-full text-base font-semibold hover:bg-red-50 transition-colors whitespace-nowrap"
+          className="bg-white text-red-500 px-5 py-1.5 rounded-full text-base font-semibold hover:bg-red-50 transition-colors whitespace-nowrap flex items-center justify-center leading-none"
         >
           Dodaj
         </Link>
