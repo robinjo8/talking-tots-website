@@ -7,7 +7,6 @@ import { FooterSection } from "@/components/FooterSection";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { Progress } from "@/components/ui/progress";
 import { useDailyProgress } from "@/hooks/useDailyProgress";
-import { MissingChildBanner } from "@/components/MissingChildBanner";
 
 const MojeAplikacije = () => {
   const { user, selectedChild, signOut } = useAuth();
@@ -37,7 +36,6 @@ const MojeAplikacije = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <MissingChildBanner />
       
       {/* Hero sekcija */}
       <section className="bg-dragon-green py-12 md:py-16 pt-24 md:pt-28">
