@@ -26,13 +26,13 @@ export const MissingChildBanner = () => {
     return (
       <Link 
         to="/profile?expandSection=children"
-        className="fixed top-14 left-0 right-0 z-40 bg-red-500 text-white shadow-lg hover:bg-red-600 transition-colors h-12 flex items-center justify-center"
+        className="fixed top-14 left-0 right-0 z-40 bg-red-500 text-white shadow-lg hover:bg-red-600 transition-colors h-12 grid place-items-center"
       >
-        <div className="flex items-center justify-center gap-3 px-4">
-          <span className="text-sm font-medium">
+        <div className="flex items-center gap-3 px-4">
+          <span className="text-sm font-medium leading-none">
             Za začetek uporabe dodajte profil otroka.
           </span>
-          <span className="bg-white text-red-500 px-4 py-1 rounded-full text-sm font-semibold whitespace-nowrap">
+          <span className="bg-white text-red-500 px-4 py-1 rounded-full text-sm font-semibold whitespace-nowrap leading-none">
             Dodaj
           </span>
         </div>
@@ -42,14 +42,14 @@ export const MissingChildBanner = () => {
 
   // Desktop: banner with button
   return (
-    <div className="fixed top-[72px] left-0 right-0 z-40 bg-red-500 text-white shadow-lg h-12 flex items-center justify-center">
-      <div className="container max-w-6xl mx-auto flex items-center justify-center gap-4 px-4">
-        <span className="text-base font-medium">
+    <div className="fixed top-[72px] left-0 right-0 z-40 bg-red-500 text-white shadow-lg h-12 grid place-items-center">
+      <div className="flex items-center gap-4 px-4">
+        <span className="text-base font-medium leading-none">
           Za začetek uporabe dodajte profil otroka.
         </span>
         <Link 
           to="/profile?expandSection=children"
-          className="bg-white text-red-500 px-5 py-1.5 rounded-full text-base font-semibold hover:bg-red-50 transition-colors whitespace-nowrap"
+          className="bg-white text-red-500 px-5 py-1.5 rounded-full text-base font-semibold hover:bg-red-50 transition-colors whitespace-nowrap leading-none"
         >
           Dodaj
         </Link>
