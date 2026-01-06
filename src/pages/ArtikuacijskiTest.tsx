@@ -113,7 +113,7 @@ const ArtikuacijskiTest = () => {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col items-center justify-start px-4 pb-8 overflow-y-auto">
+      <div className="flex-1 flex flex-col items-center justify-start px-4 pb-8 overflow-hidden">
         {/* Progress Grid */}
         <div className="w-full max-w-lg bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-lg mb-4">
           <ArticulationProgressGrid
@@ -123,8 +123,8 @@ const ArtikuacijskiTest = () => {
           />
         </div>
 
-        {/* Current letter and position */}
-        <div className="text-center mb-4">
+        {/* Current letter and position - hidden on mobile */}
+        <div className="hidden md:block text-center mb-4">
           <h2 className="text-xl md:text-2xl font-bold text-white drop-shadow-md">
             {currentLetter} - {positionLabel}
           </h2>
@@ -165,7 +165,8 @@ const ArtikuacijskiTest = () => {
               onNext={handleNext}
               disabled={loading || isTranscribing}
               showNext={hasRecorded && !isTranscribing && transcriptionResult?.accepted === true}
-              wrongWord={hasRecorded && !isTranscribing && transcriptionResult?.accepted === false ? transcriptionResult.transcribedText : undefined}
+              wrongWord={hasRecorded && !isTranscribing && transcriptionResult?.accepted === false && transcriptionResult.transcribedText ? transcriptionResult.transcribedText : undefined}
+              isNoise={hasRecorded && !isTranscribing && transcriptionResult?.accepted === false && !transcriptionResult?.transcribedText}
               isTranscribing={isTranscribing}
               feedbackMessage={transcriptionResult?.accepted 
                 ? (transcriptionResult.matchType === 'exact' 
