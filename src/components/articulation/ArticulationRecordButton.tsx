@@ -1,4 +1,4 @@
-import { Mic, ArrowRight, AlertCircle } from "lucide-react";
+import { Mic, ArrowRight, AlertCircle, Volume2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAudioRecording } from "@/hooks/useAudioRecording";
 import { useEffect } from "react";
@@ -8,6 +8,7 @@ interface ArticulationRecordButtonProps {
   onNext: () => void;
   disabled?: boolean;
   showNext?: boolean;
+  onSilenceDetected?: () => void;
 }
 
 const ArticulationRecordButton = ({
@@ -15,6 +16,7 @@ const ArticulationRecordButton = ({
   onNext,
   disabled = false,
   showNext = false,
+  onSilenceDetected,
 }: ArticulationRecordButtonProps) => {
   const {
     isRecording,
@@ -22,6 +24,7 @@ const ArticulationRecordButton = ({
     startRecording,
     error,
     resetRecording,
+    isSilent,
   } = useAudioRecording(5, onRecordingComplete);
 
   // Reset recording state when showNext changes (moving to next word)
@@ -31,8 +34,42 @@ const ArticulationRecordButton = ({
     }
   }, [showNext, resetRecording]);
 
+  // Notify parent when silence is detected
+  useEffect(() => {
+    if (isSilent && onSilenceDetected) {
+      onSilenceDetected();
+    }
+  }, [isSilent, onSilenceDetected]);
+
   // Calculate progress percentage (0 to 100)
   const progressPercent = ((5 - countdown) / 5) * 100;
+
+  // Silence detected - show retry message
+  if (isSilent && !isRecording && !showNext) {
+    return (
+      <div className="flex flex-col items-center gap-2">
+        <div
+          className={cn(
+            "bg-gradient-to-r from-amber-500 to-orange-500",
+            "text-white rounded-full text-sm font-medium shadow-lg",
+            "w-[220px] h-14 flex items-center justify-center gap-2 px-4"
+          )}
+        >
+          <Volume2 className="w-5 h-5 flex-shrink-0" />
+          <span className="truncate">Nisem slišal besede</span>
+        </div>
+        <button
+          onClick={() => {
+            resetRecording();
+            startRecording();
+          }}
+          className="text-sm text-teal-600 hover:text-teal-700 underline"
+        >
+          Poskusi znova
+        </button>
+      </div>
+    );
+  }
 
   if (error) {
     return (
