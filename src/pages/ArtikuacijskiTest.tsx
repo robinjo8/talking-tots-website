@@ -145,22 +145,11 @@ const ArtikuacijskiTest = () => {
             )}
           </div>
 
-          {/* Transcription Result Feedback */}
-          {transcriptionResult && (
-            <div className={cn(
-              "flex items-center justify-center gap-2 py-2 px-4 rounded-full mb-4",
-              transcriptionResult.accepted 
-                ? "bg-green-100 text-green-700" 
-                : "bg-red-100 text-red-700"
-            )}>
-              {transcriptionResult.accepted ? (
-                <Check className="w-5 h-5" />
-              ) : (
-                <X className="w-5 h-5" />
-              )}
-              <span className="font-medium">
-                {transcriptionResult.accepted ? "Pravilno!" : `Slišano: "${transcriptionResult.transcribedText}"`}
-              </span>
+          {/* Transcription Result Feedback - only show for correct answers */}
+          {transcriptionResult?.accepted && (
+            <div className="flex items-center justify-center gap-2 py-2 px-4 rounded-full mb-4 bg-green-100 text-green-700">
+              <Check className="w-5 h-5" />
+              <span className="font-medium">Pravilno!</span>
             </div>
           )}
 
@@ -178,7 +167,8 @@ const ArtikuacijskiTest = () => {
               onRecordingComplete={handleRecordingComplete}
               onNext={handleNext}
               disabled={loading || isTranscribing}
-              showNext={hasRecorded && !isTranscribing}
+              showNext={hasRecorded && !isTranscribing && transcriptionResult?.accepted === true}
+              wrongWord={hasRecorded && !isTranscribing && transcriptionResult?.accepted === false ? transcriptionResult.transcribedText : undefined}
             />
           </div>
         </div>
