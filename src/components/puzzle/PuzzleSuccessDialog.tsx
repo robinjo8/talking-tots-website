@@ -2,11 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import { Volume2, Mic, X, Star } from 'lucide-react';
+import { Volume2, Mic, Star } from 'lucide-react';
 import { useAudioPlayback } from '@/hooks/useAudioPlayback';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
 
 interface ImageData {
   filename: string;
@@ -34,14 +32,10 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   const [currentRecordingIndex, setCurrentRecordingIndex] = useState<number | null>(null);
   const [starClaimed, setStarClaimed] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
-  const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
   const [displayImages, setDisplayImages] = useState<ImageData[]>([]);
   const { playAudio } = useAudioPlayback();
   const { toast } = useToast();
-  const { user, selectedChild } = useAuth();
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
-  const recordingDataRef = useRef<Blob[]>([]);
 
   // Select 4 random images including the completed one when dialog opens
   useEffect(() => {
@@ -86,90 +80,30 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
         clearInterval(countdownRef.current);
         countdownRef.current = null;
       }
-      if (audioStream) {
-        audioStream.getTracks().forEach(track => track.stop());
-        setAudioStream(null);
-      }
-      setMediaRecorder(null);
-      recordingDataRef.current = [];
     }
-  }, [isOpen, audioStream]);
+  }, [isOpen]);
 
-  const startRecording = async (imageIndex: number, word: string) => {
+  // Simulated recording - visual countdown only, no actual audio recording
+  const startRecording = (imageIndex: number, word: string) => {
     if (completedRecordings.has(imageIndex) || currentRecordingIndex !== null) return;
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      setAudioStream(stream);
+    
+    setCurrentRecordingIndex(imageIndex);
+    setRecordingTimeLeft(3);
 
-      const recorder = new MediaRecorder(stream);
-      setMediaRecorder(recorder);
-      const localRecorder = recorder;
-      const localStream = stream;
-      const recordingData: Blob[] = [];
-      setCurrentRecordingIndex(imageIndex);
-
-      recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          recordingData.push(event.data);
+    countdownRef.current = setInterval(() => {
+      setRecordingTimeLeft(prev => {
+        if (prev <= 1) {
+          if (countdownRef.current) {
+            clearInterval(countdownRef.current);
+            countdownRef.current = null;
+          }
+          setCompletedRecordings(prevCompleted => new Set([...prevCompleted, imageIndex]));
+          setCurrentRecordingIndex(null);
+          return 0;
         }
-      };
-
-      localRecorder.onstop = async () => {
-        try {
-          if (recordingData.length > 0 && user && selectedChild) {
-            const audioBlob = new Blob(recordingData, { type: 'audio/webm' });
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            const normalizedWord = word
-              .toLowerCase()
-              .normalize('NFD')
-              .replace(/[\u0300-\u036f]/g, '')
-              .replace(/[^a-z0-9]/g, '-');
-            const filename = `recording-${normalizedWord}-${timestamp}.webm`;
-            const userSpecificPath = `recordings/${user.email}/child-${selectedChild.id}/${filename}`;
-
-            const { error } = await supabase.storage
-              .from('audio-besede')
-              .upload(userSpecificPath, audioBlob, { contentType: 'audio/webm' });
-
-            if (error) {
-              console.error('Error saving recording:', error);
-            }
-          }
-        } finally {
-          if (localStream) {
-            localStream.getTracks().forEach(track => track.stop());
-          }
-        }
-      };
-
-      localRecorder.start();
-      setRecordingTimeLeft(3);
-
-      countdownRef.current = setInterval(() => {
-        setRecordingTimeLeft(prev => {
-          if (prev <= 1) {
-            if (countdownRef.current) {
-              clearInterval(countdownRef.current);
-              countdownRef.current = null;
-            }
-            if (localRecorder.state !== 'inactive') {
-              localRecorder.stop();
-            }
-            setCompletedRecordings(prevCompleted => new Set([...prevCompleted, imageIndex]));
-            setCurrentRecordingIndex(null);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    } catch (error) {
-      console.error('Error starting recording:', error);
-      toast({
-        title: "Napaka",
-        description: "Ni mogoče dostopati do mikrofona.",
-        variant: "destructive",
+        return prev - 1;
       });
-    }
+    }, 1000);
   };
 
   const handleReset = () => {
@@ -177,17 +111,9 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
       clearInterval(countdownRef.current);
       countdownRef.current = null;
     }
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
-      mediaRecorder.stop();
-    }
-    if (audioStream) {
-      audioStream.getTracks().forEach(track => track.stop());
-      setAudioStream(null);
-    }
     setCompletedRecordings(new Set());
     setCurrentRecordingIndex(null);
     setRecordingTimeLeft(3);
-    recordingDataRef.current = [];
   };
 
   const handleClose = () => {
