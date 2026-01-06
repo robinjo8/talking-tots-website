@@ -1,4 +1,4 @@
-import { Mic, ArrowRight, AlertCircle, Volume2 } from "lucide-react";
+import { Mic, ArrowRight, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAudioRecording } from "@/hooks/useAudioRecording";
 import { useEffect } from "react";
@@ -9,6 +9,7 @@ interface ArticulationRecordButtonProps {
   disabled?: boolean;
   showNext?: boolean;
   onSilenceDetected?: () => void;
+  wrongWord?: string;
 }
 
 const ArticulationRecordButton = ({
@@ -17,6 +18,7 @@ const ArticulationRecordButton = ({
   disabled = false,
   showNext = false,
   onSilenceDetected,
+  wrongWord,
 }: ArticulationRecordButtonProps) => {
   const {
     isRecording,
@@ -48,22 +50,43 @@ const ArticulationRecordButton = ({
   if (isSilent && !isRecording && !showNext) {
     return (
       <div className="flex flex-col items-center gap-2">
-        <div
-          className={cn(
-            "bg-gradient-to-r from-amber-500 to-orange-500",
-            "text-white rounded-full text-sm font-medium shadow-lg",
-            "w-[220px] h-14 flex items-center justify-center gap-2 px-4"
-          )}
-        >
-          <Volume2 className="w-5 h-5 flex-shrink-0" />
-          <span className="truncate">Nisem slišal besede</span>
-        </div>
+        <p className="text-red-600 font-medium text-sm">Nisem slišal besede</p>
         <button
           onClick={() => {
             resetRecording();
             startRecording();
           }}
-          className="text-sm text-teal-600 hover:text-teal-700 underline"
+          className={cn(
+            "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600",
+            "text-white rounded-full text-lg font-medium shadow-lg",
+            "transition-all duration-300 hover:scale-105",
+            "w-[220px] h-14 flex items-center justify-center"
+          )}
+        >
+          Poskusi znova
+        </button>
+      </div>
+    );
+  }
+
+  // Wrong word detected - show what was heard and retry option
+  if (wrongWord && !isRecording) {
+    return (
+      <div className="flex flex-col items-center gap-2">
+        <p className="text-red-600 font-medium text-sm">
+          Slišano: "{wrongWord}"
+        </p>
+        <button
+          onClick={() => {
+            resetRecording();
+            startRecording();
+          }}
+          className={cn(
+            "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600",
+            "text-white rounded-full text-lg font-medium shadow-lg",
+            "transition-all duration-300 hover:scale-105",
+            "w-[220px] h-14 flex items-center justify-center"
+          )}
         >
           Poskusi znova
         </button>
