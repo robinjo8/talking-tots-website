@@ -167,7 +167,11 @@ const ArtikuacijskiTest = () => {
               showNext={hasRecorded && !isTranscribing && transcriptionResult?.accepted === true}
               wrongWord={hasRecorded && !isTranscribing && transcriptionResult?.accepted === false ? transcriptionResult.transcribedText : undefined}
               isTranscribing={isTranscribing}
-              feedbackMessage={transcriptionResult?.accepted ? positiveFeedbackMessages[Math.floor(Math.random() * positiveFeedbackMessages.length)] : undefined}
+              feedbackMessage={transcriptionResult?.accepted 
+                ? (transcriptionResult.matchType === 'exact' 
+                    ? positiveFeedbackMessages[Math.floor(Math.random() * positiveFeedbackMessages.length)] 
+                    : "V REDU, LAHKO NADALJUJEŠ") 
+                : undefined}
             />
           </div>
         </div>

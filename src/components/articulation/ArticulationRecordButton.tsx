@@ -70,7 +70,7 @@ const ArticulationRecordButton = ({
       return (
         <>
           <div className="h-[44px] flex items-center justify-center">
-            <p className="text-red-600 font-medium text-sm">Nisem slišal besede</p>
+            <p className="text-red-600 font-medium text-sm">Zvok ni bil zaznan</p>
           </div>
           <button
             onClick={() => {
