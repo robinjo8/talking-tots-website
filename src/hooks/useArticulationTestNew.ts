@@ -100,8 +100,10 @@ export const useArticulationTestNew = () => {
     return currentData?.word.text ?? "";
   };
 
-  // Handle recording complete
-  const handleRecordingComplete = () => {
+  // Handle recording complete - receives audio base64 from microphone
+  const handleRecordingComplete = (audioBase64: string) => {
+    console.log("Recording complete, audio length:", audioBase64.length);
+    // TODO: Send to transcribe-articulation edge function
     setHasRecorded(true);
   };
 
