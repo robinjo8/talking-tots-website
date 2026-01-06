@@ -163,7 +163,8 @@ serve(async (req) => {
     formData.append('file', blob, 'recording.webm');
     formData.append('model', 'whisper-1');
     formData.append('language', 'sl'); // Slovenian
-    // NOTE: Removed 'prompt' parameter to prevent Whisper hallucinations on silence
+    formData.append('prompt', targetWord); // Hint for Whisper to improve recognition
+    console.log(`Whisper API call with prompt hint: "${targetWord}"`);
 
     // Send to OpenAI Whisper API
     console.log('Sending to OpenAI Whisper API...');
