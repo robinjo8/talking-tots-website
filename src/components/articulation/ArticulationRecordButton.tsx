@@ -10,6 +10,7 @@ interface ArticulationRecordButtonProps {
   showNext?: boolean;
   onSilenceDetected?: () => void;
   wrongWord?: string;
+  isNoise?: boolean;
   isTranscribing?: boolean;
   feedbackMessage?: string;
 }
@@ -21,6 +22,7 @@ const ArticulationRecordButton = ({
   showNext = false,
   onSilenceDetected,
   wrongWord,
+  isNoise = false,
   isTranscribing = false,
   feedbackMessage,
 }: ArticulationRecordButtonProps) => {
@@ -71,6 +73,31 @@ const ArticulationRecordButton = ({
         <>
           <div className="h-[44px] flex items-center justify-center">
             <p className="text-red-600 font-medium text-sm">Zvok ni bil zaznan</p>
+          </div>
+          <button
+            onClick={() => {
+              resetRecording();
+              startRecording();
+            }}
+            className={cn(
+              "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600",
+              "text-white rounded-full text-lg font-medium shadow-lg",
+              "transition-all duration-300 hover:scale-105",
+              "w-[220px] h-14 flex items-center justify-center"
+            )}
+          >
+            Poskusi znova
+          </button>
+        </>
+      );
+    }
+
+    // Noise detected - show noise message and retry option
+    if (isNoise && !isRecording) {
+      return (
+        <>
+          <div className="h-[44px] flex items-center justify-center">
+            <p className="text-red-600 font-medium text-sm">Zaznan je bil šum</p>
           </div>
           <button
             onClick={() => {
