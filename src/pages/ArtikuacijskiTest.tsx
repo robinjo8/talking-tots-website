@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Home } from "lucide-react";
+import { Home, Check, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -25,6 +25,8 @@ const ArtikuacijskiTest = () => {
     loading,
     hasRecorded,
     isTestComplete,
+    isTranscribing,
+    transcriptionResult,
     currentLetter,
     currentLetterIndex,
     positionLabel,
@@ -143,13 +145,40 @@ const ArtikuacijskiTest = () => {
             )}
           </div>
 
+          {/* Transcription Result Feedback */}
+          {transcriptionResult && (
+            <div className={cn(
+              "flex items-center justify-center gap-2 py-2 px-4 rounded-full mb-4",
+              transcriptionResult.accepted 
+                ? "bg-green-100 text-green-700" 
+                : "bg-red-100 text-red-700"
+            )}>
+              {transcriptionResult.accepted ? (
+                <Check className="w-5 h-5" />
+              ) : (
+                <X className="w-5 h-5" />
+              )}
+              <span className="font-medium">
+                {transcriptionResult.accepted ? "Pravilno!" : `Slišano: "${transcriptionResult.transcribedText}"`}
+              </span>
+            </div>
+          )}
+
+          {/* Transcribing indicator */}
+          {isTranscribing && (
+            <div className="flex items-center justify-center gap-2 py-2 px-4 mb-4">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-teal-500"></div>
+              <span className="text-gray-600">Preverjam izgovorjavo...</span>
+            </div>
+          )}
+
           {/* Recording button / Timer / Next button */}
           <div className="flex flex-col items-center gap-4">
             <ArticulationRecordButton
               onRecordingComplete={handleRecordingComplete}
               onNext={handleNext}
-              disabled={loading}
-              showNext={hasRecorded}
+              disabled={loading || isTranscribing}
+              showNext={hasRecorded && !isTranscribing}
             />
           </div>
         </div>

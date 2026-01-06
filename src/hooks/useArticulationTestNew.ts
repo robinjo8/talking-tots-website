@@ -1,17 +1,24 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { articulationData } from "@/data/articulationTestData";
+import { useTranscription } from "./useTranscription";
 
 // Position labels in Slovenian
 const positionLabels = ["začetek", "sredina", "konec"];
 
-export const useArticulationTestNew = () => {
+export const useArticulationTestNew = (childId?: string) => {
   // TEMPORARY: Start at last letter (Ž) for testing - index 57 = first word of Ž
   const [currentWordIndex, setCurrentWordIndex] = useState(57);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasRecorded, setHasRecorded] = useState(false);
   const [isTestComplete, setIsTestComplete] = useState(false);
+  const [transcriptionResult, setTranscriptionResult] = useState<{
+    accepted: boolean;
+    transcribedText: string;
+  } | null>(null);
+
+  const { transcribe, isTranscribing, resetTranscription } = useTranscription();
 
   // Total words across all letters
   const totalWords = articulationData.reduce(
@@ -101,9 +108,26 @@ export const useArticulationTestNew = () => {
   };
 
   // Handle recording complete - receives audio base64 from microphone
-  const handleRecordingComplete = (audioBase64: string) => {
+  const handleRecordingComplete = async (audioBase64: string) => {
     console.log("Recording complete, audio length:", audioBase64.length);
-    // TODO: Send to transcribe-articulation edge function
+    
+    const word = currentData?.word;
+    if (!word) return;
+
+    const result = await transcribe(
+      audioBase64,
+      word.text,
+      word.acceptedVariants || [],
+      childId
+    );
+
+    if (result) {
+      setTranscriptionResult({
+        accepted: result.accepted,
+        transcribedText: result.transcribedText,
+      });
+    }
+
     setHasRecorded(true);
   };
 
@@ -112,6 +136,8 @@ export const useArticulationTestNew = () => {
     if (currentWordIndex < totalWords - 1) {
       setCurrentWordIndex((prev) => prev + 1);
       setHasRecorded(false);
+      setTranscriptionResult(null);
+      resetTranscription();
     } else {
       // Test is complete
       setIsTestComplete(true);
@@ -123,6 +149,8 @@ export const useArticulationTestNew = () => {
     setCurrentWordIndex(0);
     setHasRecorded(false);
     setIsTestComplete(false);
+    setTranscriptionResult(null);
+    resetTranscription();
   };
 
   return {
@@ -131,6 +159,8 @@ export const useArticulationTestNew = () => {
     loading,
     hasRecorded,
     isTestComplete,
+    isTranscribing,
+    transcriptionResult,
 
     // Current position info
     currentLetter,
