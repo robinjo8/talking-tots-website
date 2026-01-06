@@ -1,4 +1,13 @@
 project_id = "ecmtctwovkheohqwahvt"
 
+[functions.remove-background-batch]
+verify_jwt = false
+
+[functions.remove-game-backgrounds]
+verify_jwt = false
+
+[functions.send-signup-confirmation]
+verify_jwt = false
+
 [functions.transcribe-articulation]
 verify_jwt = false
