@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
-import { Home, Check } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Home } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -158,32 +158,16 @@ const ArtikuacijskiTest = () => {
             )}
           </div>
 
-          {/* Transcription Result Feedback - only show for correct answers */}
-          {transcriptionResult?.accepted && (
-            <div className="flex items-center justify-center gap-2 py-2 px-4 rounded-full mb-4 bg-green-100 text-green-700">
-              <Check className="w-5 h-5" />
-              <span className="font-medium">
-                {positiveFeedbackMessages[Math.floor(Math.random() * positiveFeedbackMessages.length)]}
-              </span>
-            </div>
-          )}
-
-          {/* Transcribing indicator */}
-          {isTranscribing && (
-            <div className="flex items-center justify-center gap-2 py-2 px-4 mb-4">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-teal-500"></div>
-              <span className="text-gray-600">Preverjam izgovorjavo...</span>
-            </div>
-          )}
-
-          {/* Recording button / Timer / Next button */}
-          <div className="flex flex-col items-center gap-4">
+          {/* Fixed height container for feedback + button */}
+          <div className="min-h-[140px] flex flex-col items-center justify-center">
             <ArticulationRecordButton
               onRecordingComplete={handleRecordingComplete}
               onNext={handleNext}
               disabled={loading || isTranscribing}
               showNext={hasRecorded && !isTranscribing && transcriptionResult?.accepted === true}
               wrongWord={hasRecorded && !isTranscribing && transcriptionResult?.accepted === false ? transcriptionResult.transcribedText : undefined}
+              isTranscribing={isTranscribing}
+              feedbackMessage={transcriptionResult?.accepted ? positiveFeedbackMessages[Math.floor(Math.random() * positiveFeedbackMessages.length)] : undefined}
             />
           </div>
         </div>
