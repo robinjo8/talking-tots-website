@@ -7,6 +7,7 @@ interface UseAudioRecordingReturn {
   audioBase64: string | null;
   error: string | null;
   resetRecording: () => void;
+  isSilent: boolean;
 }
 
 export const useAudioRecording = (
@@ -17,15 +18,21 @@ export const useAudioRecording = (
   const [countdown, setCountdown] = useState(durationSeconds);
   const [audioBase64, setAudioBase64] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isSilent, setIsSilent] = useState(false);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const rmsValuesRef = useRef<number[]>([]);
 
   const resetRecording = useCallback(() => {
     setAudioBase64(null);
     setError(null);
     setCountdown(durationSeconds);
+    setIsSilent(false);
+    rmsValuesRef.current = [];
   }, [durationSeconds]);
 
   const startRecording = useCallback(async () => {
@@ -34,7 +41,9 @@ export const useAudioRecording = (
     try {
       setError(null);
       setAudioBase64(null);
+      setIsSilent(false);
       chunksRef.current = [];
+      rmsValuesRef.current = [];
 
       // Request microphone access
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -44,6 +53,28 @@ export const useAudioRecording = (
           sampleRate: 16000,
         },
       });
+
+      // Set up audio analysis for silence detection
+      const audioContext = new AudioContext();
+      audioContextRef.current = audioContext;
+      const source = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 2048;
+      source.connect(analyser);
+      analyserRef.current = analyser;
+
+      // Start RMS sampling
+      const dataArray = new Float32Array(analyser.fftSize);
+      const sampleRMS = () => {
+        if (analyserRef.current && isRecording) {
+          analyserRef.current.getFloatTimeDomainData(dataArray);
+          const rms = Math.sqrt(
+            dataArray.reduce((sum, val) => sum + val * val, 0) / dataArray.length
+          );
+          rmsValuesRef.current.push(rms);
+        }
+      };
+      const rmsInterval = setInterval(sampleRMS, 100);
 
       // Create MediaRecorder with best available format
       const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
@@ -65,11 +96,29 @@ export const useAudioRecording = (
         // Stop all tracks
         stream.getTracks().forEach((track) => track.stop());
 
-        // Clear countdown interval
+        // Clear countdown interval and RMS sampling
         if (countdownIntervalRef.current) {
           clearInterval(countdownIntervalRef.current);
           countdownIntervalRef.current = null;
         }
+        clearInterval(rmsInterval);
+
+        // Close audio context
+        if (audioContextRef.current) {
+          audioContextRef.current.close();
+          audioContextRef.current = null;
+        }
+
+        // Check for silence (average RMS below threshold)
+        const avgRMS =
+          rmsValuesRef.current.length > 0
+            ? rmsValuesRef.current.reduce((a, b) => a + b, 0) /
+              rmsValuesRef.current.length
+            : 0;
+        const silenceThreshold = 0.01; // Adjust as needed
+        const detectedSilence = avgRMS < silenceThreshold;
+        console.log(`Average RMS: ${avgRMS}, Silence detected: ${detectedSilence}`);
+        setIsSilent(detectedSilence);
 
         // Convert to base64
         const blob = new Blob(chunksRef.current, { type: mimeType });
@@ -83,7 +132,8 @@ export const useAudioRecording = (
           setIsRecording(false);
           setCountdown(durationSeconds);
 
-          if (onRecordingComplete && base64Data) {
+          // Only call onRecordingComplete if not silent
+          if (onRecordingComplete && base64Data && !detectedSilence) {
             onRecordingComplete(base64Data);
           }
         };
@@ -135,5 +185,6 @@ export const useAudioRecording = (
     audioBase64,
     error,
     resetRecording,
+    isSilent,
   };
 };

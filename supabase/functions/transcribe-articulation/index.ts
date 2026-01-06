@@ -163,7 +163,7 @@ serve(async (req) => {
     formData.append('file', blob, 'recording.webm');
     formData.append('model', 'whisper-1');
     formData.append('language', 'sl'); // Slovenian
-    formData.append('prompt', `Slovenian speech therapy test. Expected word: ${targetWord}`);
+    // NOTE: Removed 'prompt' parameter to prevent Whisper hallucinations on silence
 
     // Send to OpenAI Whisper API
     console.log('Sending to OpenAI Whisper API...');
@@ -182,8 +182,25 @@ serve(async (req) => {
     }
 
     const whisperResult = await whisperResponse.json();
-    const transcribedText = whisperResult.text || '';
+    const transcribedText = (whisperResult.text || '').trim();
     console.log(`Transcribed text: "${transcribedText}"`);
+
+    // Check for empty/silence transcription
+    if (!transcribedText || transcribedText.length < 2) {
+      console.log('Empty or too short transcription - likely silence');
+      return new Response(
+        JSON.stringify({
+          success: true,
+          transcribedText: '',
+          targetWord,
+          accepted: false,
+          matchType: 'silence',
+          confidence: 0,
+          storagePath: null
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Check if word is accepted
     const matchResult = isWordAccepted(transcribedText, targetWord, acceptedVariants);
