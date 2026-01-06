@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
-import { Button } from "@/components/ui/button";
-import { Mic, ArrowRight } from "lucide-react";
+import { Mic, ArrowRight, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAudioRecording } from "@/hooks/useAudioRecording";
+import { useEffect } from "react";
 
 interface ArticulationRecordButtonProps {
-  onRecordingComplete: () => void;
+  onRecordingComplete: (audioBase64: string) => void;
   onNext: () => void;
   disabled?: boolean;
   showNext?: boolean;
@@ -16,33 +16,49 @@ const ArticulationRecordButton = ({
   disabled = false,
   showNext = false,
 }: ArticulationRecordButtonProps) => {
-  const [isRecording, setIsRecording] = useState(false);
-  const [countdown, setCountdown] = useState(5);
+  const {
+    isRecording,
+    countdown,
+    startRecording,
+    error,
+    resetRecording,
+  } = useAudioRecording(5, onRecordingComplete);
 
-  const startRecording = useCallback(() => {
-    if (disabled || isRecording) return;
-    setIsRecording(true);
-    setCountdown(5);
-  }, [disabled, isRecording]);
-
+  // Reset recording state when showNext changes (moving to next word)
   useEffect(() => {
-    if (!isRecording) return;
-
-    if (countdown > 0) {
-      const timer = setTimeout(() => {
-        setCountdown((prev) => prev - 1);
-      }, 1000);
-      return () => clearTimeout(timer);
-    } else {
-      // Recording complete
-      setIsRecording(false);
-      setCountdown(5);
-      onRecordingComplete();
+    if (!showNext) {
+      resetRecording();
     }
-  }, [isRecording, countdown, onRecordingComplete]);
+  }, [showNext, resetRecording]);
 
   // Calculate progress percentage (0 to 100)
   const progressPercent = ((5 - countdown) / 5) * 100;
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center gap-2">
+        <div
+          className={cn(
+            "bg-gradient-to-r from-red-500 to-red-600",
+            "text-white rounded-full text-sm font-medium shadow-lg",
+            "w-[220px] h-14 flex items-center justify-center gap-2 px-4"
+          )}
+        >
+          <AlertCircle className="w-5 h-5 flex-shrink-0" />
+          <span className="truncate">Dovoli mikrofon</span>
+        </div>
+        <button
+          onClick={() => {
+            resetRecording();
+            startRecording();
+          }}
+          className="text-sm text-teal-600 hover:text-teal-700 underline"
+        >
+          Poskusi znova
+        </button>
+      </div>
+    );
+  }
 
   if (showNext) {
     return (
@@ -87,13 +103,13 @@ const ArticulationRecordButton = ({
   return (
     <button
       onClick={startRecording}
-      disabled={disabled}
+      disabled={disabled || isRecording}
       className={cn(
         "bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700",
         "text-white rounded-full text-lg font-medium shadow-lg",
         "transition-all duration-300 hover:scale-105",
         "w-[220px] h-14 flex items-center justify-center",
-        disabled && "opacity-50 cursor-not-allowed"
+        (disabled || isRecording) && "opacity-50 cursor-not-allowed"
       )}
     >
       <Mic className="w-5 h-5 mr-2" />
