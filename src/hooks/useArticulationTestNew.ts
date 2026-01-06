@@ -16,6 +16,7 @@ export const useArticulationTestNew = (childId?: string) => {
   const [transcriptionResult, setTranscriptionResult] = useState<{
     accepted: boolean;
     transcribedText: string;
+    matchType?: string;
   } | null>(null);
 
   const { transcribe, isTranscribing, resetTranscription } = useTranscription();
@@ -125,6 +126,7 @@ export const useArticulationTestNew = (childId?: string) => {
       setTranscriptionResult({
         accepted: result.accepted,
         transcribedText: result.transcribedText,
+        matchType: result.matchType,
       });
     }
 
