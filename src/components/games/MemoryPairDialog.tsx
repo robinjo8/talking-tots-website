@@ -3,9 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Mic, Star, Volume2 } from "lucide-react";
 import { useAudioPlayback } from '@/hooks/useAudioPlayback';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 interface MemoryPairDialogProps {
@@ -36,15 +34,11 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
   const [isRecording, setIsRecording] = useState(false);
   const [hasRecorded, setHasRecorded] = useState(false);
   const [recordingTimeLeft, setRecordingTimeLeft] = useState(3);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
-  const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
   const [showCloseConfirmation, setShowCloseConfirmation] = useState(false);
   
   const { playAudio } = useAudioPlayback();
   const { toast } = useToast();
-  const { user, selectedChild } = useAuth();
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
-  const recordingDataRef = useRef<Blob[]>([]);
 
   const isLastPair = pairNumber === totalPairs;
 
@@ -58,121 +52,30 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
         clearInterval(countdownRef.current);
         countdownRef.current = null;
       }
-      if (audioStream) {
-        audioStream.getTracks().forEach(track => track.stop());
-        setAudioStream(null);
-      }
-      setMediaRecorder(null);
-      recordingDataRef.current = [];
     }
-  }, [isOpen, audioStream]);
+  }, [isOpen]);
 
-  const startRecording = async () => {
+  // Simulated recording - visual countdown only, no actual audio recording
+  const startRecording = () => {
     if (hasRecorded || isRecording) return;
     
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      setAudioStream(stream);
+    setIsRecording(true);
+    setRecordingTimeLeft(3);
 
-      const recorder = new MediaRecorder(stream);
-      setMediaRecorder(recorder);
-      recordingDataRef.current = [];
-
-      recorder.ondataavailable = event => {
-        if (event.data.size > 0) {
-          recordingDataRef.current.push(event.data);
-        }
-      };
-
-      recorder.onstop = () => {
-        saveRecording();
-      };
-
-      recorder.start();
-      setIsRecording(true);
-      setRecordingTimeLeft(3);
-
-      countdownRef.current = setInterval(() => {
-        setRecordingTimeLeft(prev => {
-          if (prev <= 1) {
-            if (countdownRef.current) {
-              clearInterval(countdownRef.current);
-              countdownRef.current = null;
-            }
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-              mediaRecorder.stop();
-            }
-            if (audioStream) {
-              audioStream.getTracks().forEach(track => track.stop());
-              setAudioStream(null);
-            }
-            setIsRecording(false);
-            setHasRecorded(true);
-            return 0;
+    countdownRef.current = setInterval(() => {
+      setRecordingTimeLeft(prev => {
+        if (prev <= 1) {
+          if (countdownRef.current) {
+            clearInterval(countdownRef.current);
+            countdownRef.current = null;
           }
-          return prev - 1;
-        });
-      }, 1000);
-
-      // Recording started - no toast notification per user request
-    } catch (error) {
-      console.error('Error starting recording:', error);
-      toast({
-        title: "Napaka",
-        description: "Ni mogoče dostopati do mikrofona.",
-        variant: "destructive"
+          setIsRecording(false);
+          setHasRecorded(true);
+          return 0;
+        }
+        return prev - 1;
       });
-    }
-  };
-
-  const saveRecording = async () => {
-    if (recordingDataRef.current.length === 0 || !word) {
-      console.log('No recording data to save');
-      return;
-    }
-
-    if (!user || !selectedChild) {
-      console.error('User not authenticated or no child selected');
-      return;
-    }
-
-    try {
-      const audioBlob = new Blob(recordingDataRef.current, { type: 'audio/webm' });
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      // Normalize word to remove special characters (č, š, ž, etc.)
-      const normalizedWord = word
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
-        .replace(/[^a-z0-9]/g, '-'); // Replace non-alphanumeric with dash
-      const filename = `memory-${normalizedWord}-${timestamp}.webm`;
-
-      const userSpecificPath = `recordings/${user.email}/child-${selectedChild.id}/${filename}`;
-      const { error } = await supabase.storage
-        .from('audio-besede')
-        .upload(userSpecificPath, audioBlob, { contentType: 'audio/webm' });
-
-      if (error) {
-        console.error('Error saving recording:', error);
-        toast({
-          title: "Napaka",
-          description: "Snemanje ni bilo shranjeno. Poskusi znova.",
-          variant: "destructive"
-        });
-      } else {
-        console.log('Recording saved successfully to:', userSpecificPath);
-        // Recording saved - no toast notification per user request
-      }
-    } catch (error) {
-      console.error('Error in saveRecording:', error);
-      toast({
-        title: "Napaka",
-        description: "Snemanje ni bilo shranjeno. Poskusi znova.",
-        variant: "destructive"
-      });
-    }
-    
-    recordingDataRef.current = [];
+    }, 1000);
   };
 
   const handleImageClick = () => {
@@ -199,19 +102,10 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
       clearInterval(countdownRef.current);
       countdownRef.current = null;
     }
-    // Stop any ongoing recording
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
-      mediaRecorder.stop();
-    }
-    if (audioStream) {
-      audioStream.getTracks().forEach(track => track.stop());
-      setAudioStream(null);
-    }
     // Reset recording state to allow re-recording
     setHasRecorded(false);
     setIsRecording(false);
     setRecordingTimeLeft(3);
-    recordingDataRef.current = [];
   };
 
   const handleCloseAttempt = () => {

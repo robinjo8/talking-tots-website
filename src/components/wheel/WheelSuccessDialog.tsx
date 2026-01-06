@@ -3,9 +3,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Volume2, Mic, Star } from 'lucide-react';
 import { useAudioPlayback } from '@/hooks/useAudioPlayback';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
 import { ProgressCircles } from './ProgressCircles';
 
 interface WheelSuccessDialogProps {
@@ -32,16 +30,12 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTimeLeft, setRecordingTimeLeft] = useState(3);
   const [starClaimed, setStarClaimed] = useState(false);
-  const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
   const [justRecorded, setJustRecorded] = useState(false);
 
   const { playAudio } = useAudioPlayback();
   const { toast } = useToast();
-  const { user, selectedChild } = useAuth();
 
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const recordingDataRef = useRef<Blob[]>([]);
 
   // Avoid stale-closure when stopping recording from setInterval.
   const stopRecordingRef = useRef<() => void>(() => {});
@@ -61,33 +55,13 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
     }
   }, []);
 
-  const cleanupStream = useCallback(() => {
-    if (audioStream) {
-      audioStream.getTracks().forEach((track) => track.stop());
-      setAudioStream(null);
-    }
-  }, [audioStream]);
-
   const stopRecordingNow = useCallback(() => {
     console.log('[WheelSuccessDialog] stopRecordingNow', {
       word: completedImage?.word,
       pronunciationCount,
     });
 
-    // Always run cleanup (even if state says we're already stopped) – this mirrors
-    // the reliable behavior you see when "VZEMI ZVEZDICO" appears.
     cleanupCountdown();
-
-    const recorder = mediaRecorderRef.current;
-    if (recorder && recorder.state === 'recording') {
-      try {
-        recorder.stop();
-      } catch {
-        // ignore
-      }
-    }
-
-    cleanupStream();
 
     setIsRecording(false);
     setRecordingTimeLeft(3);
@@ -111,7 +85,7 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
         }, 500);
       }
     }, 0);
-  }, [cleanupCountdown, cleanupStream, onRecordComplete, onOpenChange, completedImage?.word, pronunciationCount]);
+  }, [cleanupCountdown, onRecordComplete, onOpenChange, completedImage?.word, pronunciationCount]);
 
   useEffect(() => {
     stopRecordingRef.current = stopRecordingNow;
@@ -148,45 +122,12 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
       setRecordingTimeLeft(3);
       setJustRecorded(false);
       cleanupCountdown();
-      cleanupStream();
-      mediaRecorderRef.current = null;
-      recordingDataRef.current = [];
     }
-  }, [isOpen, cleanupCountdown, cleanupStream]);
+  }, [isOpen, cleanupCountdown]);
 
-  const saveRecording = async () => {
-    if (recordingDataRef.current.length === 0) return;
-
-    if (!user || !selectedChild) {
-      console.error('User not authenticated or no child selected');
-      return;
-    }
-
-    try {
-      const audioBlob = new Blob(recordingDataRef.current, { type: 'audio/webm' });
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const normalizedWord = completedImage.word
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]/g, '-');
-      const filename = `recording-${normalizedWord}-${timestamp}.webm`;
-      const userSpecificPath = `recordings/${user.email}/child-${selectedChild.id}/${filename}`;
-
-      await supabase.storage
-        .from('audio-besede')
-        .upload(userSpecificPath, audioBlob, { contentType: 'audio/webm' });
-
-      // Recording saved - no toast notification per user request
-    } catch (error) {
-      console.error('Error in saveRecording:', error);
-    }
-
-    recordingDataRef.current = [];
-  };
-
-  const startRecording = async () => {
-    console.log('[WheelSuccessDialog] startRecording', {
+  // Simulated recording - visual countdown only, no actual audio recording
+  const startRecording = () => {
+    console.log('[WheelSuccessDialog] startRecording (simulated)', {
       isOpen,
       word: completedImage?.word,
       justRecorded,
@@ -196,61 +137,25 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
 
     if (justRecorded) return; // Prevent multiple recordings in same dialog session
 
-    try {
-      // Reset any prior remnants
-      cleanupCountdown();
-      recordingDataRef.current = [];
+    // Reset any prior remnants
+    cleanupCountdown();
 
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      setAudioStream(stream);
+    setIsRecording(true);
+    setRecordingTimeLeft(3);
 
-      const recorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = recorder;
-
-      recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          recordingDataRef.current.push(event.data);
+    countdownRef.current = setInterval(() => {
+      setRecordingTimeLeft((prev) => {
+        const next = prev - 1;
+        console.log('[WheelSuccessDialog] countdown tick', { prev, next });
+        if (next <= 0) {
+          console.log('[WheelSuccessDialog] countdown reached 0 -> stopping');
+          cleanupCountdown();
+          setTimeout(() => stopRecordingRef.current(), 0);
+          return 0;
         }
-      };
-
-      recorder.onstop = async () => {
-        console.log('[WheelSuccessDialog] recorder.onstop', {
-          chunks: recordingDataRef.current.length,
-          word: completedImage?.word,
-        });
-        if (recordingDataRef.current.length > 0) {
-          await saveRecording();
-        }
-      };
-
-      recorder.start();
-      setIsRecording(true);
-      setRecordingTimeLeft(3);
-
-      countdownRef.current = setInterval(() => {
-        setRecordingTimeLeft((prev) => {
-          const next = prev - 1;
-          console.log('[WheelSuccessDialog] countdown tick', { prev, next });
-          if (next <= 0) {
-            console.log('[WheelSuccessDialog] countdown reached 0 -> stopping');
-            // Stop exactly once and with the latest function (no stale state).
-            cleanupCountdown();
-            setTimeout(() => stopRecordingRef.current(), 0);
-            return 0;
-          }
-          return next;
-        });
-      }, 1000);
-
-      // Recording started - no toast notification per user request
-    } catch (error) {
-      console.error('Error starting recording:', error);
-      toast({
-        title: 'Napaka',
-        description: 'Ni mogoče dostopati do mikrofona.',
-        variant: 'destructive',
+        return next;
       });
-    }
+    }, 1000);
   };
 
   const handleClose = () => {

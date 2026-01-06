@@ -5,9 +5,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Trophy, Mic, X, Star, Volume2, RefreshCw } from "lucide-react";
 import { MatchingGameImage } from "@/data/matchingGameData";
 import { useAudioPlayback } from '@/hooks/useAudioPlayback';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
 interface MatchingCompletionDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -30,12 +28,9 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
 }) => {
   const [completedRecordings, setCompletedRecordings] = useState<Set<number>>(new Set());
   const [recordingTimeLeft, setRecordingTimeLeft] = useState(3);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
-  const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
   const [currentRecordingIndex, setCurrentRecordingIndex] = useState<number | null>(null);
   const [starClaimed, setStarClaimed] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [isSavingRecording, setIsSavingRecording] = useState(false);
   const [confirmDialogConfig, setConfirmDialogConfig] = useState<{
     title: string;
     description: string;
@@ -47,13 +42,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
   const {
     toast
   } = useToast();
-  const {
-    user,
-    selectedChild
-  } = useAuth();
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
-  const recordingDataRef = useRef<Blob[]>([]);
-  const pendingSavesRef = useRef<Set<number>>(new Set());
 
   // Cleanup on dialog close
   useEffect(() => {
@@ -66,15 +55,8 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
         clearInterval(countdownRef.current);
         countdownRef.current = null;
       }
-      if (audioStream) {
-        audioStream.getTracks().forEach(track => track.stop());
-        setAudioStream(null);
-      }
-      setMediaRecorder(null);
-      recordingDataRef.current = [];
-      pendingSavesRef.current.clear();
     }
-  }, [isOpen, audioStream]);
+  }, [isOpen]);
 
   // Auto-play audio when dialog opens (but NOT when star is claimed)
   useEffect(() => {
@@ -107,169 +89,38 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       setTimeout(playAudioForImage, 300);
     }
   }, [isOpen, autoPlayAudio, images, starClaimed]);
-  const startRecording = async (imageIndex: number, word: string) => {
+  // Simulated recording - visual countdown only, no actual audio recording
+  const startRecording = (imageIndex: number, word: string) => {
     if (completedRecordings.has(imageIndex)) return;
-    try {
-      // Request microphone access
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true
-      });
-      setAudioStream(stream);
-
-      // Create MediaRecorder
-      const recorder = new MediaRecorder(stream);
-      setMediaRecorder(recorder);
-      
-      // CRITICAL: Capture BOTH recorder and stream in local scope for callbacks
-      const localRecorder = recorder;
-      const localStream = stream;
-      
-      // Use separate data array for this specific recording
-      const recordingData: Blob[] = [];
-      setCurrentRecordingIndex(imageIndex);
-      
-      recorder.ondataavailable = event => {
-        if (event.data.size > 0) {
-          console.log('[DATA] Recording data available for index:', imageIndex, 'size:', event.data.size, 'bytes');
-          recordingData.push(event.data);
-        }
-      };
-      
-      localRecorder.onstop = async () => {
-        console.log('[ONSTOP] Recording stopped for index:', imageIndex, 'word:', word);
-        console.log('[ONSTOP] Data chunks:', recordingData.length);
-        
-        try {
-          // Save recording after MediaRecorder has stopped
-          if (recordingData.length > 0) {
-            // Create blob from local recordingData
-            const audioBlob = new Blob(recordingData, { type: 'audio/webm' });
-            console.log('[ONSTOP] Created audio blob, size:', audioBlob.size, 'bytes');
-            
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            const normalizedWord = word
-              .toLowerCase()
-              .normalize('NFD')
-              .replace(/[\u0300-\u036f]/g, '')
-              .replace(/[^a-z0-9]/g, '-');
-            const filename = `recording-${normalizedWord}-${timestamp}.webm`;
-            const userSpecificPath = `recordings/${user!.email}/child-${selectedChild!.id}/${filename}`;
-            
-            console.log('[ONSTOP] Uploading to path:', userSpecificPath);
-            
-            const { error } = await supabase.storage
-              .from('audio-besede')
-              .upload(userSpecificPath, audioBlob, { contentType: 'audio/webm' });
-            
-            if (error) {
-              console.error('[ONSTOP] Supabase storage error:', error);
-              toast({
-                title: "Napaka",
-                description: `Snemanje ni bilo shranjeno: ${error.message}`,
-                variant: "destructive"
-              });
-            } else {
-              console.log('[ONSTOP] Recording saved successfully to:', userSpecificPath);
-              // Recording saved - no toast notification per user request
-            }
-          } else {
-            console.error('[ONSTOP] No recording data available');
-            toast({
-              title: "Napaka",
-              description: "Ni podatkov za shranjevanje. Poskusite ponovno.",
-              variant: "destructive"
-            });
-            setCurrentRecordingIndex(null);
-          }
-        } finally {
-          console.log('[ONSTOP] Finally block for index:', imageIndex);
-          // Ustavi LOCAL stream šele KO je shranjeno!
-          if (localStream) {
-            console.log('[ONSTOP] Stopping localStream tracks:', localStream.getTracks().length);
-            localStream.getTracks().forEach(track => track.stop());
-          }
-          
-          // Remove from pending saves (always execute, even if error occurred)
-          pendingSavesRef.current.delete(imageIndex);
-          setIsSavingRecording(pendingSavesRef.current.size > 0);
-          console.log('[ONSTOP] Pending saves remaining:', pendingSavesRef.current.size);
-        }
-      };
-
-      // Start recording
-      console.log('[START] Starting recorder for index:', imageIndex, 'word:', word);
-      localRecorder.start();
-      console.log('[START] Recorder state after start:', localRecorder.state);
-      setRecordingTimeLeft(3);
-
-      // Start countdown
-      countdownRef.current = setInterval(() => {
-        setRecordingTimeLeft(prev => {
-          if (prev <= 1) {
-            console.log('[COUNTDOWN] Time up for index:', imageIndex);
-            // Auto-stop recording
-            if (countdownRef.current) {
-              clearInterval(countdownRef.current);
-              countdownRef.current = null;
-            }
-            // Track this save operation BEFORE stopping recorder
-            pendingSavesRef.current.add(imageIndex);
-            setIsSavingRecording(true);
-            console.log('[COUNTDOWN] Calling stop on localRecorder for index:', imageIndex);
-            console.log('[COUNTDOWN] LocalRecorder state:', localRecorder.state);
-            
-            // Stop the LOCAL recorder, not the global state
-            if (localRecorder.state !== 'inactive') {
-              localRecorder.stop();
-              console.log('[COUNTDOWN] LocalRecorder.stop() called');
-            } else {
-              console.error('[COUNTDOWN] LocalRecorder already inactive!');
-            }
-            
-            // Mark as completed immediately for UI feedback
-            setCompletedRecordings(prevCompleted => new Set([...prevCompleted, imageIndex]));
-            setCurrentRecordingIndex(null);
-            console.log('[COUNTDOWN] Completed for index:', imageIndex);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      
-      // Recording started - no toast notification per user request
-    } catch (error) {
-      console.error('Error starting recording:', error);
-      toast({
-        title: "Napaka",
-        description: "Ni mogoče dostopati do mikrofona.",
-        variant: "destructive"
-      });
-    }
-  };
-  const stopRecording = () => {
-    console.log('[STOP] stopRecording called, currentIndex:', currentRecordingIndex);
     
+    setCurrentRecordingIndex(imageIndex);
+    setRecordingTimeLeft(3);
+
+    countdownRef.current = setInterval(() => {
+      setRecordingTimeLeft(prev => {
+        if (prev <= 1) {
+          if (countdownRef.current) {
+            clearInterval(countdownRef.current);
+            countdownRef.current = null;
+          }
+          // Mark as completed immediately for UI feedback
+          setCompletedRecordings(prevCompleted => new Set([...prevCompleted, imageIndex]));
+          setCurrentRecordingIndex(null);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const stopRecording = () => {
     if (countdownRef.current) {
       clearInterval(countdownRef.current);
       countdownRef.current = null;
     }
-
-    if (mediaRecorder) {
-      console.log('[STOP] MediaRecorder state:', mediaRecorder.state);
-      if (mediaRecorder.state !== 'inactive') {
-        console.log('[STOP] Calling mediaRecorder.stop()');
-        mediaRecorder.stop();
-      } else {
-        console.error('[STOP] MediaRecorder already inactive!');
-      }
-    } else {
-      console.error('[STOP] No mediaRecorder available!');
-    }
-    
-    // Don't stop audioStream here - it will be stopped in recorder.onstop after saving
-    // Don't set currentRecordingIndex to null here - it will be set in saveRecording
+    setCurrentRecordingIndex(null);
   };
-  // This function is no longer needed - saving is done directly in recorder.onstop
+
   const handleClose = () => {
     const allCompleted = completedRecordings.size === images.length;
     if (allCompleted && !starClaimed) {
@@ -297,38 +148,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     }
   };
 
-  const handleClaimStar = async () => {
-    // Wait for any ongoing save operation to complete
-    if (pendingSavesRef.current.size > 0) {
-      toast({
-        title: "Počakaj",
-        description: "Shranjujem posnetke..."
-      });
-      
-      // Wait for all saves to complete
-      const checkInterval = setInterval(() => {
-        if (pendingSavesRef.current.size === 0) {
-          clearInterval(checkInterval);
-          proceedWithStarClaim();
-        }
-      }, 100);
-      
-      // Timeout after 10 seconds
-      setTimeout(() => {
-        clearInterval(checkInterval);
-        if (pendingSavesRef.current.size > 0) {
-          console.error('Timeout waiting for saves to complete');
-          proceedWithStarClaim();
-        }
-      }, 10000);
-      
-      return;
-    }
-    
-    proceedWithStarClaim();
-  };
-
-  const proceedWithStarClaim = () => {
+  const handleClaimStar = () => {
     setStarClaimed(true);
     onStarClaimed?.();
     toast({
@@ -342,6 +162,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       }, 1500);
     }
   };
+
   const handleImageClick = (imageIndex: number, word: string) => {
     // Prevent clicking if already completed or currently recording
     if (completedRecordings.has(imageIndex) || currentRecordingIndex !== null) {
@@ -349,19 +170,12 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     }
     startRecording(imageIndex, word);
   };
+
   const handleReset = () => {
     // Clear any running countdown timer
     if (countdownRef.current) {
       clearInterval(countdownRef.current);
       countdownRef.current = null;
-    }
-    // Stop any ongoing recording
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
-      mediaRecorder.stop();
-    }
-    if (audioStream) {
-      audioStream.getTracks().forEach(track => track.stop());
-      setAudioStream(null);
     }
     // Reset all recordings to allow re-recording
     setCompletedRecordings(new Set());
@@ -457,10 +271,9 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
             <Button 
               onClick={handleClaimStar} 
               className={`bg-yellow-500 hover:bg-yellow-600 text-white gap-2 flex-1 max-w-36 ${isMobileLandscape ? "h-10" : ""}`}
-              disabled={isSavingRecording}
             >
               <Star className="w-4 h-4" />
-              {isSavingRecording ? 'Shranjujem...' : 'Vzemi zvezdico'}
+              Vzemi zvezdico
             </Button>
           ) : starClaimed && onNewGame ? (
             <Button 

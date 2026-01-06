@@ -1,10 +1,8 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Mic, Volume2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 
 interface PuzzleCompletionDialogProps {
   isOpen: boolean;
@@ -21,10 +19,9 @@ export function PuzzleCompletionDialog({
   completedImage 
 }: PuzzleCompletionDialogProps) {
   const [isRecording, setIsRecording] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
-  const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
   const [recordingTimeLeft, setRecordingTimeLeft] = useState(3);
   const { playAudio } = useAudioPlayback();
+  const countdownRef = useRef<NodeJS.Timeout | null>(null);
 
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke/${completedImage.filename}`;
   const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/audio-besede/R/${completedImage.word.toLowerCase()}.mp3`;
@@ -35,10 +32,9 @@ export function PuzzleCompletionDialog({
       // Reset recording state when dialog opens
       setIsRecording(false);
       setRecordingTimeLeft(3);
-      setMediaRecorder(null);
-      if (audioStream) {
-        audioStream.getTracks().forEach(track => track.stop());
-        setAudioStream(null);
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+        countdownRef.current = null;
       }
 
       const timer = setTimeout(() => {
@@ -47,95 +43,26 @@ export function PuzzleCompletionDialog({
 
       return () => clearTimeout(timer);
     }
-  }, [isOpen, audioUrl, playAudio, audioStream]);
+  }, [isOpen, audioUrl, playAudio]);
 
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      setAudioStream(stream);
+  // Simulated recording - visual countdown only, no actual audio recording
+  const startRecording = () => {
+    setIsRecording(true);
+    setRecordingTimeLeft(3);
 
-      const recorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus'
-      });
-
-      const chunks: Blob[] = [];
-
-      recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunks.push(event.data);
-        }
-      };
-
-      recorder.onstop = async () => {
-        const audioBlob = new Blob(chunks, { type: 'audio/webm' });
-        await saveRecording(audioBlob);
-        
-        // Stop all tracks
-        stream.getTracks().forEach(track => track.stop());
-        setAudioStream(null);
-      };
-
-      setMediaRecorder(recorder);
-      recorder.start();
-      setIsRecording(true);
-      setRecordingTimeLeft(3);
-
-      // Clean countdown that auto-stops at 0
-      let timeLeft = 3;
-      const countdownInterval = setInterval(() => {
-        timeLeft--;
-        setRecordingTimeLeft(timeLeft);
-        
-        if (timeLeft <= 0) {
-          clearInterval(countdownInterval);
-          // Auto-stop recording when countdown reaches 0
-          if (recorder && recorder.state === 'recording') {
-            recorder.stop();
+    countdownRef.current = setInterval(() => {
+      setRecordingTimeLeft(prev => {
+        if (prev <= 1) {
+          if (countdownRef.current) {
+            clearInterval(countdownRef.current);
+            countdownRef.current = null;
           }
           setIsRecording(false);
-          toast("Snemanje končano");
+          return 0;
         }
-      }, 1000);
-
-    } catch (error) {
-      console.error('Error starting recording:', error);
-      toast.error("Napaka pri dostopu do mikrofona");
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorder && isRecording) {
-      mediaRecorder.stop();
-      setIsRecording(false);
-      toast("Snemanje končano");
-    }
-  };
-
-  const saveRecording = async (audioBlob: Blob) => {
-    try {
-      // Normalize word to remove special characters (č, š, ž, etc.)
-      const normalizedWord = completedImage.word
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
-        .replace(/[^a-z0-9]/g, '-'); // Replace non-alphanumeric with dash
-      const fileName = `recording_${normalizedWord}_${Date.now()}.webm`;
-      
-      const { error } = await supabase.storage
-        .from('audio-besede')
-        .upload(`recordings/${fileName}`, audioBlob, {
-          contentType: 'audio/webm'
-        });
-
-      if (error) {
-        throw error;
-      }
-
-      toast("Posnetek je bil shranjen!");
-    } catch (error) {
-      console.error('Error saving recording:', error);
-      toast.error("Napaka pri shranjevanju posnetka");
-    }
+        return prev - 1;
+      });
+    }, 1000);
   };
 
   const handlePlayAudio = () => {
