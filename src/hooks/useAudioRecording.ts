@@ -66,7 +66,7 @@ export const useAudioRecording = (
       // Start RMS sampling
       const dataArray = new Float32Array(analyser.fftSize);
       const sampleRMS = () => {
-        if (analyserRef.current && isRecording) {
+        if (analyserRef.current) {
           analyserRef.current.getFloatTimeDomainData(dataArray);
           const rms = Math.sqrt(
             dataArray.reduce((sum, val) => sum + val * val, 0) / dataArray.length
@@ -115,7 +115,7 @@ export const useAudioRecording = (
             ? rmsValuesRef.current.reduce((a, b) => a + b, 0) /
               rmsValuesRef.current.length
             : 0;
-        const silenceThreshold = 0.01; // Adjust as needed
+        const silenceThreshold = 0.005; // Lower threshold for better sensitivity
         const detectedSilence = avgRMS < silenceThreshold;
         console.log(`Average RMS: ${avgRMS}, Silence detected: ${detectedSilence}`);
         setIsSilent(detectedSilence);
