@@ -15,11 +15,31 @@ import { FooterSection } from "@/components/home/FooterSection";
 const Index = () => {
   const { user, isLoading } = useAuth();
 
-  // Redirect logopedists to admin portal
+  // Redirect logopedists to admin portal - check both metadata AND database
   useEffect(() => {
-    if (!isLoading && user?.user_metadata?.is_logopedist === true) {
-      window.location.href = '/admin';
-    }
+    const checkLogopedist = async () => {
+      if (!isLoading && user) {
+        // First check metadata
+        if (user.user_metadata?.is_logopedist === true) {
+          window.location.href = '/admin';
+          return;
+        }
+        
+        // Then check database as fallback
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: logopedistProfile } = await supabase
+          .from('logopedist_profiles')
+          .select('id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        
+        if (logopedistProfile) {
+          window.location.href = '/admin';
+        }
+      }
+    };
+    
+    checkLogopedist();
   }, [user, isLoading]);
 
   return (
