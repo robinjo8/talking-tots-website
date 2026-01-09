@@ -313,12 +313,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     // Set up auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state changed:", event);
       
       if (mounted) {
         setSession(session);
         setUser(session?.user ?? null);
+        
+        // Redirect logopedists to admin on sign in
+        if (event === 'SIGNED_IN' && session?.user) {
+          const isLogopedist = session.user.user_metadata?.is_logopedist === true;
+          
+          if (isLogopedist && !window.location.pathname.startsWith('/admin')) {
+            console.log("Logopedist detected, redirecting to /admin");
+            window.location.href = '/admin';
+            return;
+          }
+        }
         
         if (session?.user) {
           // Use setTimeout to avoid blocking the auth state change

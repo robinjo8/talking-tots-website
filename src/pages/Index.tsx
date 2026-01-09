@@ -1,4 +1,5 @@
-
+import { useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import { HeroSection } from "@/components/home/HeroSection";
 import { LearningOutcomesSection } from "@/components/home/LearningOutcomesSection";
@@ -12,6 +13,15 @@ import { CallToActionSection } from "@/components/home/CallToActionSection";
 import { FooterSection } from "@/components/home/FooterSection";
 
 const Index = () => {
+  const { user, isLoading } = useAuth();
+
+  // Redirect logopedists to admin portal
+  useEffect(() => {
+    if (!isLoading && user?.user_metadata?.is_logopedist === true) {
+      window.location.href = '/admin';
+    }
+  }, [user, isLoading]);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
