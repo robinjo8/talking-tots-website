@@ -65,6 +65,142 @@ export type Database = {
         }
         Relationships: []
       }
+      articulation_test_sessions: {
+        Row: {
+          assigned_at: string | null
+          assigned_to: string | null
+          child_id: string
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          notes: string | null
+          parent_id: string
+          priority: string | null
+          reviewed_at: string | null
+          status: Database["public"]["Enums"]["test_session_status"] | null
+          submitted_at: string | null
+          test_version: string | null
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_to?: string | null
+          child_id: string
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          parent_id: string
+          priority?: string | null
+          reviewed_at?: string | null
+          status?: Database["public"]["Enums"]["test_session_status"] | null
+          submitted_at?: string | null
+          test_version?: string | null
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_to?: string | null
+          child_id?: string
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          parent_id?: string
+          priority?: string | null
+          reviewed_at?: string | null
+          status?: Database["public"]["Enums"]["test_session_status"] | null
+          submitted_at?: string | null
+          test_version?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "articulation_test_sessions_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "logopedist_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "articulation_test_sessions_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "articulation_test_sessions_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children_analytics"
+            referencedColumns: ["child_id"]
+          },
+          {
+            foreignKeyName: "articulation_test_sessions_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children_analytics_admin"
+            referencedColumns: ["child_id"]
+          },
+        ]
+      }
+      articulation_word_results: {
+        Row: {
+          ai_accepted: boolean | null
+          ai_confidence: number | null
+          ai_match_type: string | null
+          audio_url: string
+          created_at: string | null
+          error_type: string | null
+          id: string
+          letter: string
+          logopedist_notes: string | null
+          logopedist_rating: Database["public"]["Enums"]["word_rating"] | null
+          position: string
+          session_id: string
+          target_word: string
+          transcribed_text: string | null
+        }
+        Insert: {
+          ai_accepted?: boolean | null
+          ai_confidence?: number | null
+          ai_match_type?: string | null
+          audio_url: string
+          created_at?: string | null
+          error_type?: string | null
+          id?: string
+          letter: string
+          logopedist_notes?: string | null
+          logopedist_rating?: Database["public"]["Enums"]["word_rating"] | null
+          position: string
+          session_id: string
+          target_word: string
+          transcribed_text?: string | null
+        }
+        Update: {
+          ai_accepted?: boolean | null
+          ai_confidence?: number | null
+          ai_match_type?: string | null
+          audio_url?: string
+          created_at?: string | null
+          error_type?: string | null
+          id?: string
+          letter?: string
+          logopedist_notes?: string | null
+          logopedist_rating?: Database["public"]["Enums"]["word_rating"] | null
+          position?: string
+          session_id?: string
+          target_word?: string
+          transcribed_text?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "articulation_word_results_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "articulation_test_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       artikulacijski_test: {
         Row: {
           created_at: string
@@ -89,6 +225,42 @@ export type Database = {
           letter?: string
           order_index?: number | null
           word?: string
+        }
+        Relationships: []
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          actor_id: string
+          actor_type: string
+          created_at: string | null
+          details: Json | null
+          entity_id: string | null
+          entity_type: string
+          id: string
+          ip_address: string | null
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          actor_type: string
+          created_at?: string | null
+          details?: Json | null
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          ip_address?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          actor_type?: string
+          created_at?: string | null
+          details?: Json | null
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          ip_address?: string | null
         }
         Relationships: []
       }
@@ -199,6 +371,113 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      logopedist_profiles: {
+        Row: {
+          created_at: string | null
+          first_name: string
+          id: string
+          is_verified: boolean | null
+          last_name: string
+          mfa_enabled: boolean | null
+          organization_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          first_name: string
+          id?: string
+          is_verified?: boolean | null
+          last_name: string
+          mfa_enabled?: boolean | null
+          organization_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          first_name?: string
+          id?: string
+          is_verified?: boolean | null
+          last_name?: string
+          mfa_enabled?: boolean | null
+          organization_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "logopedist_profiles_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      logopedist_reports: {
+        Row: {
+          created_at: string | null
+          findings: Json | null
+          id: string
+          logopedist_id: string
+          next_steps: string | null
+          pdf_url: string | null
+          recommendations: string | null
+          session_id: string
+          status: Database["public"]["Enums"]["report_status"] | null
+          submitted_at: string | null
+          summary: string | null
+          updated_at: string | null
+          version: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          findings?: Json | null
+          id?: string
+          logopedist_id: string
+          next_steps?: string | null
+          pdf_url?: string | null
+          recommendations?: string | null
+          session_id: string
+          status?: Database["public"]["Enums"]["report_status"] | null
+          submitted_at?: string | null
+          summary?: string | null
+          updated_at?: string | null
+          version?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          findings?: Json | null
+          id?: string
+          logopedist_id?: string
+          next_steps?: string | null
+          pdf_url?: string | null
+          recommendations?: string | null
+          session_id?: string
+          status?: Database["public"]["Enums"]["report_status"] | null
+          submitted_at?: string | null
+          summary?: string | null
+          updated_at?: string | null
+          version?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "logopedist_reports_logopedist_id_fkey"
+            columns: ["logopedist_id"]
+            isOneToOne: false
+            referencedRelation: "logopedist_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "logopedist_reports_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "articulation_test_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       media_files: {
         Row: {
@@ -473,6 +752,30 @@ export type Database = {
           id?: string
           image_url?: string | null
           word?: string | null
+        }
+        Relationships: []
+      }
+      organizations: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          type: Database["public"]["Enums"]["organization_type"]
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          type?: Database["public"]["Enums"]["organization_type"]
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          type?: Database["public"]["Enums"]["organization_type"]
         }
         Relationships: []
       }
@@ -752,6 +1055,8 @@ export type Database = {
             Args: { role_name: Database["public"]["Enums"]["user_role"] }
             Returns: boolean
           }
+      is_internal_logopedist: { Args: { _user_id: string }; Returns: boolean }
+      is_logopedist: { Args: { _user_id: string }; Returns: boolean }
       log_child_access: {
         Args: {
           p_access_reason?: string
@@ -779,7 +1084,11 @@ export type Database = {
     Enums: {
       activity_type: "exercise" | "memory_game" | "puzzle"
       admin_role_type: "super_admin" | "support_admin" | "data_analyst"
-      user_role: "admin" | "user"
+      organization_type: "internal" | "school" | "kindergarten" | "private"
+      report_status: "draft" | "submitted" | "revised"
+      test_session_status: "pending" | "assigned" | "in_review" | "completed"
+      user_role: "admin" | "user" | "logopedist"
+      word_rating: "correct" | "partial" | "incorrect" | "unrated"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -909,7 +1218,11 @@ export const Constants = {
     Enums: {
       activity_type: ["exercise", "memory_game", "puzzle"],
       admin_role_type: ["super_admin", "support_admin", "data_analyst"],
-      user_role: ["admin", "user"],
+      organization_type: ["internal", "school", "kindergarten", "private"],
+      report_status: ["draft", "submitted", "revised"],
+      test_session_status: ["pending", "assigned", "in_review", "completed"],
+      user_role: ["admin", "user", "logopedist"],
+      word_rating: ["correct", "partial", "incorrect", "unrated"],
     },
   },
 } as const

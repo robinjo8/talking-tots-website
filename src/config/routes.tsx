@@ -7,6 +7,10 @@ import AuthCallback from "@/pages/AuthCallback";
 import ResetPassword from "@/pages/ResetPassword";
 import UpdatePassword from "@/pages/UpdatePassword";
 import NotFound from "@/pages/NotFound";
+import AdminLogin from "@/pages/admin/AdminLogin";
+import AdminRegister from "@/pages/admin/AdminRegister";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
+import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 import Profile from "@/pages/Profile";
 import MojaStran from "@/pages/MojaStran";
 import MojeAplikacije from "@/pages/MojeAplikacije";
@@ -2059,6 +2063,11 @@ export function AppRoutes() {
       />
 
       <Route path="/admin/remove-background" element={<AdminRemoveBackground />} />
+
+      {/* Admin Portal Routes */}
+      <Route path="/admin/login" element={<AdminAuthProvider><AdminLogin /></AdminAuthProvider>} />
+      <Route path="/admin/register" element={<AdminAuthProvider><AdminRegister /></AdminAuthProvider>} />
+      <Route path="/admin" element={<AdminAuthProvider><AdminDashboard /></AdminAuthProvider>} />
 
       {/* Footer pages */}
       <Route path="/kontakt" element={<Kontakt />} />
