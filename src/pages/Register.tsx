@@ -68,7 +68,7 @@ export default function Register() {
         email: email.trim(),
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          emailRedirectTo: `${window.location.origin}/auth/confirm`,
           data: {
             username: username.trim(),
           },
