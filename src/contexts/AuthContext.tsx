@@ -320,15 +320,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Redirect logopedists to admin on sign in
+        // Redirect logopedists to admin on sign in - check both metadata AND logopedist_profiles table
         if (event === 'SIGNED_IN' && session?.user) {
-          const isLogopedist = session.user.user_metadata?.is_logopedist === true;
+          const isLogopedistMeta = session.user.user_metadata?.is_logopedist === true;
           
-          if (isLogopedist && !window.location.pathname.startsWith('/admin')) {
-            console.log("Logopedist detected, redirecting to /admin");
-            window.location.href = '/admin';
-            return;
-          }
+          // Also check logopedist_profiles table as fallback
+          setTimeout(async () => {
+            if (!window.location.pathname.startsWith('/admin')) {
+              if (isLogopedistMeta) {
+                console.log("Logopedist detected from metadata, redirecting to /admin");
+                window.location.href = '/admin';
+                return;
+              }
+              
+              // Check database for logopedist profile
+              const { data: logopedistProfile } = await supabase
+                .from('logopedist_profiles')
+                .select('id')
+                .eq('user_id', session.user.id)
+                .maybeSingle();
+              
+              if (logopedistProfile) {
+                console.log("Logopedist detected from database, redirecting to /admin");
+                window.location.href = '/admin';
+              }
+            }
+          }, 0);
         }
         
         if (session?.user) {
