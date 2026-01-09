@@ -124,7 +124,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     organizationId: string
   ) => {
     try {
-      const redirectUrl = `${window.location.origin}/admin`;
+      const redirectUrl = `${window.location.origin}/auth/confirm`;
       
       // Sign up with metadata - the database trigger will create the profile
       const { data, error } = await supabase.auth.signUp({
