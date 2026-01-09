@@ -126,6 +126,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const redirectUrl = `${window.location.origin}/admin`;
       
+      // Sign up with metadata - the database trigger will create the profile
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -134,41 +135,13 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
           data: {
             first_name: firstName,
             last_name: lastName,
+            organization_id: organizationId,
             is_logopedist: true,
           }
         }
       });
 
       if (error) return { error };
-
-      // Create logopedist profile
-      if (data.user) {
-        const { error: profileError } = await supabase
-          .from('logopedist_profiles')
-          .insert({
-            user_id: data.user.id,
-            organization_id: organizationId,
-            first_name: firstName,
-            last_name: lastName,
-          });
-
-        if (profileError) {
-          console.error('Error creating logopedist profile:', profileError);
-          return { error: profileError };
-        }
-
-        // Add logopedist role
-        const { error: roleError } = await supabase
-          .from('user_roles')
-          .insert({
-            user_id: data.user.id,
-            role: 'logopedist' as any,
-          });
-
-        if (roleError) {
-          console.error('Error adding logopedist role:', roleError);
-        }
-      }
 
       return { error: null };
     } catch (err) {
