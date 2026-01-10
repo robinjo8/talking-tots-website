@@ -32,9 +32,11 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<LogopedistProfile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [isProfileLoading, setIsProfileLoading] = useState(false);
 
   const fetchLogopedistProfile = async (userId: string) => {
+    setIsProfileLoading(true);
     try {
       const { data, error } = await supabase
         .from('logopedist_profiles')
@@ -64,6 +66,8 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     } catch (err) {
       console.error('Error fetching logopedist profile:', err);
       setProfile(null);
+    } finally {
+      setIsProfileLoading(false);
     }
   };
 
@@ -81,13 +85,13 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          setTimeout(() => {
-            fetchLogopedistProfile(session.user.id);
-          }, 0);
+          // Profile loading will set isProfileLoading = true
+          fetchLogopedistProfile(session.user.id);
         } else {
           setProfile(null);
+          setIsProfileLoading(false);
         }
-        setIsLoading(false);
+        setIsAuthLoading(false);
       }
     );
 
@@ -97,8 +101,10 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       setUser(session?.user ?? null);
       if (session?.user) {
         fetchLogopedistProfile(session.user.id);
+      } else {
+        setIsProfileLoading(false);
       }
-      setIsLoading(false);
+      setIsAuthLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -149,14 +155,19 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // isLogopedist: preveri profile ALI metadata za takojšnjo detekcijo
+  const isLogopedist = !!profile || user?.user_metadata?.is_logopedist === true;
+  
+  // Združi auth loading IN profile loading
+  const isLoading = isAuthLoading || isProfileLoading;
+
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
     setProfile(null);
+    setIsProfileLoading(false);
   };
-
-  const isLogopedist = !!profile;
 
   return (
     <AdminAuthContext.Provider value={{

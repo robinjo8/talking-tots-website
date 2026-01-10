@@ -13,7 +13,17 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isLoading && (!user || !isLogopedist)) {
+    // Čakaj da se loading konča
+    if (isLoading) return;
+    
+    // Če ni uporabnika, preusmeri na login
+    if (!user) {
+      navigate('/admin/login');
+      return;
+    }
+    
+    // isLogopedist že vključuje metadata check v AdminAuthContext
+    if (!isLogopedist) {
       navigate('/admin/login');
     }
   }, [user, isLogopedist, isLoading, navigate]);
