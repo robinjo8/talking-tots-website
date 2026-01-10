@@ -92,9 +92,6 @@ export default function AdminLogin() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-app-blue/10 via-background to-app-blue/5 p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center justify-center px-4 py-2 bg-white text-black font-bold rounded-md shadow hover:bg-gray-100 transition-colors mb-4">
-            Nazaj na začetno stran
-          </Link>
           <div className="flex items-center justify-center gap-1 mb-2">
             <span className="text-3xl font-extrabold text-dragon-green uppercase">Tomi</span>
             <span className="text-3xl font-extrabold text-app-orange uppercase">Talk</span>
@@ -162,6 +159,13 @@ export default function AdminLogin() {
                   </>
                 )}
               </Button>
+
+              <Link 
+                to="/" 
+                className="w-full h-11 inline-flex items-center justify-center bg-white text-black font-bold rounded-md border border-gray-200 shadow-sm hover:bg-gray-100 transition-colors"
+              >
+                Nazaj na začetno stran
+              </Link>
             </form>
 
             <div className="mt-6 text-center text-sm text-muted-foreground">
