@@ -35,7 +35,7 @@ export default function Login() {
           await supabase.auth.signOut();
           setError(
             <span className="flex flex-col items-center gap-2 text-center">
-              <span>Za prijavo v portal za organizacije uporabite spodnji gumb</span>
+              <span>Za prijavo v portal uporabite spodnji gumb</span>
               <Link to="/admin/login" className="inline-block px-4 py-2 bg-app-blue text-white font-bold uppercase rounded-md hover:bg-app-blue/90 transition-colors">
                 Za organizacije
               </Link>
@@ -97,7 +97,7 @@ export default function Login() {
           await supabase.auth.signOut();
           setError(
             <span className="flex flex-col items-center gap-2 text-center">
-              <span>Za prijavo v portal za organizacije uporabite spodnji gumb</span>
+              <span>Za prijavo v portal uporabite spodnji gumb</span>
               <Link to="/admin/login" className="inline-block px-4 py-2 bg-app-blue text-white font-bold uppercase rounded-md hover:bg-app-blue/90 transition-colors">
                 Za organizacije
               </Link>
