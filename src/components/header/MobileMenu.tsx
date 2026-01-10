@@ -158,7 +158,7 @@ export function MobileMenu({
                   </div>
                 </>}
               
-              {!user && <div className="flex flex-col h-full min-h-[60vh]">
+              {!user && <div className="flex flex-col h-full min-h-[70vh]">
                   <div className="flex flex-col gap-3">
                     <Button className="w-full h-12 rounded-full text-base bg-dragon-green hover:bg-dragon-green/90 text-white font-semibold uppercase" onClick={() => navigate("/login")}>
                       Prijava
@@ -172,7 +172,7 @@ export function MobileMenu({
                     </Button>
                   </div>
                   
-                  <div className="mt-auto pt-6">
+                  <div className="mt-auto pb-8">
                     <Button 
                       variant="outline" 
                       className="w-full h-12 rounded-full text-base font-semibold uppercase bg-app-blue text-white hover:bg-app-blue/90 border-app-blue" 
