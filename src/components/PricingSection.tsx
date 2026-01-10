@@ -51,14 +51,17 @@ export function PricingSection() {
         {/* Plan Toggle */}
         <Tabs value={selectedPlan} onValueChange={value => setSelectedPlan(value as 'start' | 'plus' | 'pro')} className="w-full mb-8">
           <TabsList className="grid w-full grid-cols-3 bg-gray-100 dark:bg-gray-800 h-12">
-            <TabsTrigger value="start" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-base">
-              TomiTalk Start
+            <TabsTrigger value="start" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-sm md:text-base">
+              <span className="md:hidden">Start</span>
+              <span className="hidden md:inline">TomiTalk Start</span>
             </TabsTrigger>
-            <TabsTrigger value="plus" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-base">
-              TomiTalk Plus
+            <TabsTrigger value="plus" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-sm md:text-base">
+              <span className="md:hidden">Plus</span>
+              <span className="hidden md:inline">TomiTalk Plus</span>
             </TabsTrigger>
-            <TabsTrigger value="pro" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 relative text-base">
-              TomiTalk Pro
+            <TabsTrigger value="pro" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 relative text-sm md:text-base">
+              <span className="md:hidden">Pro</span>
+              <span className="hidden md:inline">TomiTalk Pro</span>
               <span className="absolute -top-2 -right-2 bg-dragon-green text-white text-xs px-2 py-0.5 rounded-full font-medium">
                 Naj izbira
               </span>
