@@ -7,7 +7,8 @@ export const useBannerVisible = () => {
 };
 
 export const MissingChildBanner = () => {
-  const isVisible = useBannerVisible();
+  const { user, profile } = useAuth();
+  const isVisible = user && (!profile?.children || profile.children.length === 0);
 
   if (!isVisible) return null;
 
