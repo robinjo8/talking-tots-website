@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Menu, Play, UserPlus, LogOut, Home, Activity, Gamepad, Award, Video, BookOpen, Bell, CreditCard, User } from "lucide-react";
+import { Menu, Play, UserPlus, LogOut, Home, Activity, Gamepad, Award, Video, BookOpen, Bell, CreditCard, User, Building2 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ProfileSelector } from "./ProfileSelector";
 import { Profile } from "@/contexts/AuthContext";
@@ -174,6 +174,14 @@ export function MobileMenu({
                   <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={() => navigate("/register")}>
                     <UserPlus className="h-4 w-4 mr-2" />
                     Registracija
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full h-12 rounded-full text-base font-semibold uppercase bg-app-blue text-white hover:bg-app-blue/90 border-app-blue" 
+                    onClick={() => navigate("/admin/login")}
+                  >
+                    <Building2 className="h-4 w-4 mr-2" />
+                    Za organizacije
                   </Button>
                 </div>}
             </div>
