@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Eye, EyeOff, LogIn, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff, LogIn, Home } from 'lucide-react';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -162,8 +162,9 @@ export default function AdminLogin() {
 
               <Link 
                 to="/" 
-                className="w-full h-11 inline-flex items-center justify-center bg-white text-black font-bold rounded-md border border-gray-200 shadow-sm hover:bg-gray-100 transition-colors"
+                className="w-full h-11 inline-flex items-center justify-center gap-2 bg-white text-black rounded-md border border-gray-200 shadow-sm hover:bg-gray-100 transition-colors text-sm font-medium"
               >
+                <Home className="h-4 w-4" />
                 Nazaj na začetno stran
               </Link>
             </form>
