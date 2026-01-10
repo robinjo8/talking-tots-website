@@ -1,42 +1,56 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 
 export default function AuthConfirm() {
-  const navigate = useNavigate();
   const [status, setStatus] = useState("Preverjam račun...");
 
   useEffect(() => {
     const checkUserAndRedirect = async () => {
-      // Wait a moment for Supabase to process the confirmation
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Longer delay to allow Supabase SDK to process #access_token from URL
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      const { data: { session } } = await supabase.auth.getSession();
+      // Retry logic - try up to 5 times to get session
+      let session = null;
+      for (let attempt = 0; attempt < 5; attempt++) {
+        const { data } = await supabase.auth.getSession();
+        if (data.session?.user) {
+          session = data.session;
+          console.log(`AuthConfirm: Session found on attempt ${attempt + 1}`);
+          break;
+        }
+        console.log(`AuthConfirm: No session on attempt ${attempt + 1}, retrying...`);
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
       
       if (session?.user) {
         const isLogopedist = session.user.user_metadata?.is_logopedist === true;
+        console.log(`AuthConfirm: User found, is_logopedist=${isLogopedist}`);
         
         setStatus(isLogopedist ? "Preusmerjam na admin portal..." : "Preusmerjam...");
         
         // Small delay for UX
         await new Promise(resolve => setTimeout(resolve, 300));
         
+        // Use window.location.href for full page refresh to ensure clean state
         if (isLogopedist) {
-          navigate('/admin', { replace: true });
+          console.log("AuthConfirm: Redirecting logopedist to /admin");
+          window.location.href = '/admin';
         } else {
-          navigate('/', { replace: true });
+          console.log("AuthConfirm: Redirecting regular user to /");
+          window.location.href = '/';
         }
       } else {
-        // No session - redirect to login
+        // No session after retries - redirect to login
+        console.log("AuthConfirm: No session found after retries, redirecting to /login");
         setStatus("Seja ni najdena. Preusmerjam na prijavo...");
         await new Promise(resolve => setTimeout(resolve, 500));
-        navigate('/login', { replace: true });
+        window.location.href = '/login';
       }
     };
 
     checkUserAndRedirect();
-  }, [navigate]);
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
