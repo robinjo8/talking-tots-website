@@ -1,26 +1,27 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuthRateLimit } from "@/hooks/useAuthRateLimit";
 import { Separator } from "@/components/ui/separator";
 import { GoogleOneTapButton } from "@/components/auth/GoogleOneTapButton";
+import { Eye, EyeOff, LogIn, Home } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<React.ReactNode | null>(null);
   const navigate = useNavigate();
   const { checkRateLimit, recordFailedAttempt, recordSuccessfulLogin } = useAuthRateLimit();
 
   const handleGoogleSuccess = async () => {
-    // Check if user is a logopedist - block access via regular login
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
@@ -31,7 +32,6 @@ export default function Login() {
           .maybeSingle();
         
         if (logopedistProfile) {
-          // Logopedist trying to use regular login - sign out and show error with link
           await supabase.auth.signOut();
           setError(
             <span className="flex flex-col items-center gap-2 text-center">
@@ -60,7 +60,6 @@ export default function Login() {
     e.preventDefault();
     setError(null);
     
-    // Check rate limiting first
     const rateLimitCheck = checkRateLimit();
     if (!rateLimitCheck.allowed) {
       setError(rateLimitCheck.message || "Preveč poskusov.");
@@ -84,7 +83,6 @@ export default function Login() {
         throw error;
       }
       
-      // Check if user is a logopedist - block access via regular login
       if (data.user) {
         const { data: logopedistProfile } = await supabase
           .from('logopedist_profiles')
@@ -93,7 +91,6 @@ export default function Login() {
           .maybeSingle();
         
         if (logopedistProfile) {
-          // Logopedist trying to use regular login - sign out and show error with link
           await supabase.auth.signOut();
           setError(
             <span className="flex flex-col items-center gap-2 text-center">
@@ -122,88 +119,129 @@ export default function Login() {
   };
 
   return (
-    <AuthLayout 
-      title="Prijava" 
-      subtitle="Dobrodošli nazaj! Vpišite se z vašim računom."
-    >
-      <div className="mt-6 space-y-6">
-        {/* Google One Tap prijava */}
-        <GoogleOneTapButton
-          onSuccess={handleGoogleSuccess}
-          onError={handleGoogleError}
-          disabled={isLoading}
-        />
-
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <Separator className="w-full" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-dragon-green/10 via-background to-dragon-green/5 p-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-1 mb-2">
+            <span className="text-3xl font-extrabold text-dragon-green uppercase">Tomi</span>
+            <span className="text-3xl font-extrabold text-app-orange uppercase">Talk</span>
           </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">
-              ali z e-pošto
-            </span>
-          </div>
+          <p className="text-lg text-dragon-green font-semibold">Portal za starše</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          
-          <div className="space-y-2">
-            <Label htmlFor="email">E-pošta</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="vnesite@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="rounded-md text-base"
-              required
-              disabled={isLoading}
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password">Geslo</Label>
-              <Link 
-                to="/reset-password" 
-                className="text-xs text-dragon-green hover:underline"
+        <Card className="border-dragon-green/20 shadow-xl">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Prijava</CardTitle>
+            <CardDescription>
+              Dobrodošli nazaj! Vpišite se z vašim računom.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {error && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            {/* Google One Tap prijava */}
+            <div className="mb-4">
+              <GoogleOneTapButton
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                disabled={isLoading}
+              />
+            </div>
+
+            <div className="relative mb-4">
+              <div className="absolute inset-0 flex items-center">
+                <Separator className="w-full" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  ali z e-pošto
+                </span>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">E-pošta</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="vas.email@primer.si"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isLoading}
+                  className="h-11"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Geslo</Label>
+                  <Link 
+                    to="/reset-password" 
+                    className="text-xs text-dragon-green hover:underline"
+                  >
+                    Ste pozabili geslo?
+                  </Link>
+                </div>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={isLoading}
+                    className="h-11 pr-10"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-0 h-11 w-11"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full h-11 bg-dragon-green hover:bg-dragon-green/90"
+                disabled={isLoading}
               >
-                Ste pozabili geslo?
+                {isLoading ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+                ) : (
+                  <>
+                    <LogIn className="h-4 w-4 mr-2" />
+                    Prijava
+                  </>
+                )}
+              </Button>
+
+              <Link 
+                to="/" 
+                className="w-full h-11 inline-flex items-center justify-center gap-2 bg-white text-black rounded-md border border-gray-200 shadow-sm hover:bg-gray-100 transition-colors text-sm font-medium"
+              >
+                <Home className="h-4 w-4" />
+                Nazaj na začetno stran
+              </Link>
+            </form>
+
+            <div className="mt-6 text-center text-sm text-muted-foreground">
+              Nimate računa?{' '}
+              <Link to="/register" className="text-dragon-green hover:underline font-medium">
+                Ustvarite ga zdaj
               </Link>
             </div>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Vnesite geslo"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="rounded-md text-base"
-              required
-              disabled={isLoading}
-            />
-          </div>
-          
-          <Button
-            type="submit"
-            className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6"
-            disabled={isLoading}
-          >
-            {isLoading ? "Prijavljanje..." : "Prijava"}
-          </Button>
-        </form>
-        
-        <div className="text-sm text-center">
-          Nimate računa?{" "}
-          <Link to="/register" className="text-dragon-green hover:underline font-medium">
-            Ustvarite ga zdaj
-          </Link>
-        </div>
+          </CardContent>
+        </Card>
       </div>
-    </AuthLayout>
+    </div>
   );
 }
