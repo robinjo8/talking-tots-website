@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Menu, Play, UserPlus, LogOut, Home, Activity, Gamepad, Award, Video, BookOpen, Bell, CreditCard, User, Building2 } from "lucide-react";
+import { Menu, LogOut, Home, Activity, BookOpen, Bell, CreditCard, User, Building2 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ProfileSelector } from "./ProfileSelector";
 import { Profile } from "@/contexts/AuthContext";
@@ -41,10 +41,12 @@ export function MobileMenu({
     return location.pathname === path;
   };
   const [isOpen, setIsOpen] = React.useState(false);
+
   const handleCenikClick = () => {
     setIsOpen(false);
     onCenikScroll();
   };
+
   return <div className="lg:hidden flex items-center gap-2">
       {/* Show selected child first (left side) */}
       {selectedChild && <div className="flex items-center gap-2">
@@ -69,26 +71,31 @@ export function MobileMenu({
         <SheetContent side="right" className="p-0 w-80 lg:w-[600px]">
           <ScrollArea className="h-[90vh]">
             <div className="flex flex-col p-6 space-y-6">
-              {/* Show Cenik only when NOT logged in */}
-              {!user && <div className="flex flex-row items-center gap-2 pb-3">
-                  <Button type="button" variant="default" className="font-semibold flex-1 h-12 rounded-full text-base w-full uppercase" onClick={handleCenikClick}>
-                    Cenik
-                  </Button>
-                </div>}
+              {/* Navigation for logged in users */}
               
               {user && <>
                   {/* Profile section simplified for single child */}
-                  {selectedChild && <div className="flex items-center gap-3 p-3 bg-green-50 rounded-md">
+                  {selectedChild && (
+                    <div className="flex items-center gap-3 p-3 bg-green-50 rounded-md">
                       <Avatar className="h-10 w-10 border border-green-200">
-                        {selectedChild.avatarId > 0 ? <AvatarImage src={selectedChild.avatarUrl || getAvatarSrc(selectedChild.avatarId)} alt={selectedChild.name} className="object-contain" /> : <AvatarFallback className="bg-green-100 text-green-800">
+                        {selectedChild.avatarId > 0 ? (
+                          <AvatarImage 
+                            src={selectedChild.avatarUrl || getAvatarSrc(selectedChild.avatarId)}
+                            alt={selectedChild.name} 
+                            className="object-contain" 
+                          />
+                        ) : (
+                          <AvatarFallback className="bg-green-100 text-green-800">
                             {selectedChild.name[0]}
-                          </AvatarFallback>}
+                          </AvatarFallback>
+                        )}
                       </Avatar>
                       <div>
                         <div className="font-medium text-base uppercase">{selectedChild.name}</div>
                         <div className="text-sm text-muted-foreground">Aktivni profil</div>
                       </div>
-                    </div>}
+                    </div>
+                  )}
                   
                   {/* Main navigation */}
                   <div className="space-y-3">
@@ -151,22 +158,30 @@ export function MobileMenu({
                   </div>
                 </>}
               
-              {!user && <div className="flex flex-col gap-3">
-                  <Button onClick={onStartNow} className="w-full h-12 rounded-full text-base bg-dragon-green hover:bg-dragon-green/90 text-white font-semibold uppercase">
-                    <Play className="h-4 w-4 mr-2" />
-                    Začni zdaj
-                  </Button>
-                  <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={() => navigate("/login")}>
-                    Prijava
-                  </Button>
-                  <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={() => navigate("/register")}>
-                    <UserPlus className="h-4 w-4 mr-2 mx-0 my-[520px]" />
-                    Registracija
-                  </Button>
-                  <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase bg-app-blue text-white hover:bg-app-blue/90 border-app-blue" onClick={() => navigate("/admin/login")}>
-                    <Building2 className="h-4 w-4 mr-2" />
-                    Za organizacije
-                  </Button>
+              {!user && <div className="flex flex-col h-full min-h-[70vh]">
+                  <div className="flex flex-col gap-3">
+                    <Button className="w-full h-12 rounded-full text-base bg-dragon-green hover:bg-dragon-green/90 text-white font-semibold uppercase" onClick={() => navigate("/login")}>
+                      Prijava
+                    </Button>
+                    <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={handleCenikClick}>
+                      Cenik
+                    </Button>
+                    <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={() => navigate("/logopedski-koticek")}>
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      Logopedski nasveti
+                    </Button>
+                  </div>
+                  
+                  <div className="mt-auto pb-8">
+                    <Button 
+                      variant="outline" 
+                      className="w-full h-12 rounded-full text-base font-semibold uppercase bg-app-blue text-white hover:bg-app-blue/90 border-app-blue" 
+                      onClick={() => navigate("/admin/login")}
+                    >
+                      <Building2 className="h-4 w-4 mr-2" />
+                      Za organizacije
+                    </Button>
+                  </div>
                 </div>}
             </div>
           </ScrollArea>
