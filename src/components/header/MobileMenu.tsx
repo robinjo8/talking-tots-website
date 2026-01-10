@@ -175,10 +175,9 @@ export function MobileMenu({
           
           {/* Za organizacije - fixed at bottom for non-logged users */}
           {!user && (
-            <div className="p-6 pt-0 border-t bg-background">
+            <div className="p-6 pt-4">
               <Button 
-                variant="outline" 
-                className="w-full h-12 rounded-full text-base font-semibold uppercase bg-app-blue text-white hover:bg-app-blue/90 border-app-blue" 
+                className="w-full h-12 rounded-full text-base font-semibold uppercase bg-app-blue text-white hover:bg-app-blue/90 border-0" 
                 onClick={() => navigate("/admin/login")}
               >
                 <Building2 className="h-4 w-4 mr-2" />
