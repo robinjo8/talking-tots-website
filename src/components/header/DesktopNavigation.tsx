@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Building2 } from "lucide-react";
 import { UserProfile } from "@/components/auth/UserProfile";
 
 
@@ -78,6 +79,15 @@ export function DesktopNavigation({ user, onStartNow, onCenikScroll }: DesktopNa
       <UserProfile />
     ) : (
       <div className="hidden lg:flex items-center gap-2">
+        <Link to="/admin/login">
+          <Button
+            variant="outline"
+            className="rounded-full h-10 text-sm px-4 font-semibold uppercase bg-app-blue hover:bg-app-blue/90 text-white border-app-blue"
+          >
+            <Building2 className="h-4 w-4 mr-1" />
+            Za organizacije
+          </Button>
+        </Link>
         <Link to="/login">
           <Button
             className="rounded-full h-10 text-sm px-4 font-semibold uppercase bg-dragon-green hover:bg-dragon-green/90 text-white"
