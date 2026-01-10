@@ -111,7 +111,7 @@ export function useRegistration() {
       setIsLoading(true);
       
       // First, register the user with children in metadata for backup
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      const { error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -128,7 +128,7 @@ export function useRegistration() {
               age: calculateAge(child.birthDate)
             }))
           },
-          emailRedirectTo: `${window.location.origin}/`
+          emailRedirectTo: `${window.location.origin}/auth/confirm`
         }
       });
       
@@ -137,78 +137,12 @@ export function useRegistration() {
         throw authError;
       }
       
-      console.log('Registration: User created successfully:', authData.user?.id);
+      console.log('Registration: User registered, awaiting email confirmation');
       
-      // Sign in the user immediately after registration to establish auth context
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (signInError) {
-        console.error('Registration: Auto sign-in failed:', signInError);
-        // Don't fail the registration, just inform the user
-        toast.success("Prosimo, potrdite svoj račun – prejeli boste potrditveno e-pošto.");
-        navigate("/login");
-        return;
-      }
-
-      console.log('Registration: User signed in successfully after registration');
-      
-      // Now try to save children with proper auth context
-      if (signInData.user && validChildren.length > 0) {
-        // Give a small delay to ensure auth context is fully established
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        const childrenForDB = validChildren.map(child => {
-          const age = calculateAge(child.birthDate);
-          const childData = {
-            parent_id: signInData.user.id,
-            name: child.name.trim(),
-            gender: child.gender,
-            birth_date: child.birthDate ? `${child.birthDate.getFullYear()}-${String(child.birthDate.getMonth() + 1).padStart(2, '0')}-${String(child.birthDate.getDate()).padStart(2, '0')}` : null,
-            age: age,
-            avatar_url: `/lovable-uploads/${child.avatarId || 1}.png`,
-            speech_difficulties: child.speechDifficulties || [],
-            speech_difficulties_description: child.speechDifficultiesDescription || "",
-            speech_development: child.speechDevelopment || {}
-          };
-          
-          console.log('Registration: Prepared child data for DB:', childData);
-          return childData;
-        });
-
-        console.log('Registration: Inserting children into database with auth context');
-
-        const { data: insertedChildren, error: childrenError } = await supabase
-          .from('children')
-          .insert(childrenForDB)
-          .select();
-
-        if (childrenError) {
-          console.error('Registration: Children insert error:', childrenError);
-          console.error('Registration: Error details:', {
-            message: childrenError.message,
-            details: childrenError.details,
-            hint: childrenError.hint
-          });
-          
-          // Registration was successful, but children saving failed
-          toast.success("Prosimo, potrdite svoj račun – prejeli boste potrditveno e-pošto.");
-          navigate("/");
-          return;
-        } else {
-          console.log('Registration: Children inserted successfully:', insertedChildren);
-          console.log('Registration: Number of children inserted:', insertedChildren?.length);
-          toast.success("Prosimo, potrdite svoj račun – prejeli boste potrditveno e-pošto.");
-          navigate("/");
-          return;
-        }
-      }
-      
-      // Fallback if no children to save
+      // Do NOT sign in immediately - user must confirm email first
+      // Children data is saved in user metadata and will be synced on first login after confirmation
       toast.success("Prosimo, potrdite svoj račun – prejeli boste potrditveno e-pošto.");
-      navigate("/");
+      navigate("/login");
       
     } catch (error: any) {
       console.error("Registration: Unexpected error:", error);
