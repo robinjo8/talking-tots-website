@@ -7,13 +7,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { toast } from 'sonner';
 import { Eye, EyeOff, LogIn, ArrowLeft } from 'lucide-react';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, user, isLogopedist, isLoading: authLoading } = useAdminAuth();
+  const { signIn, user, isLogopedist, isLoading: authLoading, signOut } = useAdminAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,10 +42,37 @@ export default function AdminLogin() {
         } else {
           toast.error('Napaka pri prijavi: ' + error.message);
         }
-      } else {
-        toast.success('Uspešna prijava!');
-        navigate('/admin');
+        setIsLoading(false);
+        return;
       }
+
+      // Get the current user after successful login
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      
+      if (!currentUser) {
+        toast.error('Napaka pri pridobivanju uporabniških podatkov');
+        setIsLoading(false);
+        return;
+      }
+
+      // SECURITY CHECK: Verify user is actually a logopedist in database
+      const { data: logopedistProfile } = await supabase
+        .from('logopedist_profiles')
+        .select('id')
+        .eq('user_id', currentUser.id)
+        .maybeSingle();
+
+      if (!logopedistProfile) {
+        // Not a logopedist - sign out and show error
+        console.log('AdminLogin: User is not a logopedist, signing out');
+        await signOut();
+        toast.error('Ta račun ni registriran kot logoped. Za prijavo uporabite glavno stran.');
+        setIsLoading(false);
+        return;
+      }
+
+      toast.success('Uspešna prijava!');
+      navigate('/admin');
     } catch (err) {
       toast.error('Napaka pri prijavi');
     } finally {
