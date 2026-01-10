@@ -60,7 +60,7 @@ export default function AuthConfirm() {
             onClick={() => navigate('/')} 
             className="w-full h-11 bg-app-blue hover:bg-app-blue/90"
           >
-            Pojdi na glavno stran
+            Začni zdaj
           </Button>
         </CardContent>
       </Card>
