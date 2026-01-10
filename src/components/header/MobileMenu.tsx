@@ -158,28 +158,30 @@ export function MobileMenu({
                   </div>
                 </>}
               
-              {!user && <div className="flex flex-col gap-3">
-                  <Button className="w-full h-12 rounded-full text-base bg-dragon-green hover:bg-dragon-green/90 text-white font-semibold uppercase" onClick={() => navigate("/login")}>
-                    Prijava
-                  </Button>
-                  <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={handleCenikClick}>
-                    Cenik
-                  </Button>
-                  <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={() => navigate("/logopedski-koticek")}>
-                    <BookOpen className="h-4 w-4 mr-2" />
-                    Logopedski nasveti
-                  </Button>
+              {!user && <div className="flex flex-col h-full min-h-[60vh]">
+                  <div className="flex flex-col gap-3">
+                    <Button className="w-full h-12 rounded-full text-base bg-dragon-green hover:bg-dragon-green/90 text-white font-semibold uppercase" onClick={() => navigate("/login")}>
+                      Prijava
+                    </Button>
+                    <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={handleCenikClick}>
+                      Cenik
+                    </Button>
+                    <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={() => navigate("/logopedski-koticek")}>
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      Logopedski nasveti
+                    </Button>
+                  </div>
                   
-                  <div className="flex-1" />
-                  
-                  <Button 
-                    variant="outline" 
-                    className="w-full h-12 rounded-full text-base font-semibold uppercase bg-app-blue text-white hover:bg-app-blue/90 border-app-blue mt-auto" 
-                    onClick={() => navigate("/admin/login")}
-                  >
-                    <Building2 className="h-4 w-4 mr-2" />
-                    Za organizacije
-                  </Button>
+                  <div className="mt-auto pt-6">
+                    <Button 
+                      variant="outline" 
+                      className="w-full h-12 rounded-full text-base font-semibold uppercase bg-app-blue text-white hover:bg-app-blue/90 border-app-blue" 
+                      onClick={() => navigate("/admin/login")}
+                    >
+                      <Building2 className="h-4 w-4 mr-2" />
+                      Za organizacije
+                    </Button>
+                  </div>
                 </div>}
             </div>
           </ScrollArea>
