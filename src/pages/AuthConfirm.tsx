@@ -1,84 +1,69 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, CheckCircle } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export default function AuthConfirm() {
-  const [status, setStatus] = useState("Preverjam račun...");
+  const [isProcessing, setIsProcessing] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const checkUserAndRedirect = async () => {
-      // Longer delay to allow Supabase SDK to process #access_token from URL
+    const processConfirmation = async () => {
+      // Wait for Supabase SDK to process #access_token from URL
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Retry logic - try up to 5 times to get fresh session with refreshSession
-      let session = null;
-      for (let attempt = 0; attempt < 5; attempt++) {
-        // Use refreshSession to get the latest metadata from server
-        const { data, error } = await supabase.auth.refreshSession();
-        if (data.session?.user) {
-          session = data.session;
-          console.log(`AuthConfirm: Session found on attempt ${attempt + 1}`);
-          break;
-        }
-        console.log(`AuthConfirm: No session on attempt ${attempt + 1}, error: ${error?.message}, retrying...`);
-        await new Promise(resolve => setTimeout(resolve, 500));
+      // Get session to confirm the token was processed
+      const { data } = await supabase.auth.getSession();
+      
+      if (data.session) {
+        console.log("AuthConfirm: Email confirmed, signing out user");
+        // Sign out the user - they must log in manually
+        await supabase.auth.signOut();
       }
       
-      if (session?.user) {
-        // Check metadata FIRST (fast)
-        let isLogopedist = session.user.user_metadata?.is_logopedist === true;
-        console.log(`AuthConfirm: Metadata is_logopedist=${isLogopedist}`);
-        
-        // If metadata not available, check database (reliable fallback)
-        if (!isLogopedist) {
-          try {
-            const { data: logopedistProfile } = await supabase
-              .from('logopedist_profiles')
-              .select('id')
-              .eq('user_id', session.user.id)
-              .maybeSingle();
-            
-            if (logopedistProfile) {
-              console.log("AuthConfirm: Logopedist detected from database");
-              isLogopedist = true;
-            }
-          } catch (err) {
-            console.error("AuthConfirm: Error checking logopedist_profiles:", err);
-          }
-        }
-        
-        console.log(`AuthConfirm: Final isLogopedist=${isLogopedist}`);
-        setStatus(isLogopedist ? "Preusmerjam na admin portal..." : "Preusmerjam...");
-        
-        // Small delay for UX
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        // Use window.location.href for full page refresh to ensure clean state
-        if (isLogopedist) {
-          console.log("AuthConfirm: Redirecting logopedist to /admin");
-          window.location.href = '/admin';
-        } else {
-          console.log("AuthConfirm: Redirecting regular user to /");
-          window.location.href = '/';
-        }
-      } else {
-        // No session after retries - redirect to login
-        console.log("AuthConfirm: No session found after retries, redirecting to /login");
-        setStatus("Seja ni najdena. Preusmerjam na prijavo...");
-        await new Promise(resolve => setTimeout(resolve, 500));
-        window.location.href = '/login';
-      }
+      setIsProcessing(false);
     };
 
-    checkUserAndRedirect();
+    processConfirmation();
   }, []);
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center space-y-4">
-        <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-        <p className="text-muted-foreground">{status}</p>
+  if (isProcessing) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+          <p className="text-muted-foreground">Preverjam račun...</p>
+        </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-app-blue/10 via-background to-app-blue/5 p-4">
+      <Card className="w-full max-w-md border-app-blue/20 shadow-xl">
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-dragon-green/10 flex items-center justify-center">
+            <CheckCircle className="h-10 w-10 text-dragon-green" />
+          </div>
+          <CardTitle className="text-2xl">Vaš račun je potrjen!</CardTitle>
+          <CardDescription className="text-base">
+            Zdaj se lahko prijavite v aplikacijo.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground text-center">
+            Za prijavo kliknite spodnji gumb in izberite ustrezno možnost na glavni strani.
+          </p>
+          <Button 
+            onClick={() => navigate('/')} 
+            className="w-full h-11 bg-app-blue hover:bg-app-blue/90"
+          >
+            Pojdi na glavno stran
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }

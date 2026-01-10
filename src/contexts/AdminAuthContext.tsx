@@ -156,8 +156,8 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // isLogopedist: preveri profile ALI metadata za takojšnjo detekcijo
-  const isLogopedist = !!profile || user?.user_metadata?.is_logopedist === true;
+  // isLogopedist: SAMO na podlagi profila v bazi - zanesljivo in varno
+  const isLogopedist = !!profile;
   
   // Združi auth loading IN profile loading
   const isLoading = isAuthLoading || isProfileLoading;
