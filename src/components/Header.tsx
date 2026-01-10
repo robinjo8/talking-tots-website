@@ -106,11 +106,6 @@ export default function Header() {
               
               {/* Right side - user profile or login buttons */}
               <div className="flex items-center gap-2">
-                {showInstall && (
-                  <Button variant="secondary" size="sm" onClick={handleInstallClick}>
-                    Namesti
-                  </Button>
-                )}
                 {rightSection}
               </div>
             </div>
