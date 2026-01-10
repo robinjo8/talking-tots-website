@@ -10,23 +10,44 @@ export default function AuthConfirm() {
       // Longer delay to allow Supabase SDK to process #access_token from URL
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Retry logic - try up to 5 times to get session
+      // Retry logic - try up to 5 times to get fresh session with refreshSession
       let session = null;
       for (let attempt = 0; attempt < 5; attempt++) {
-        const { data } = await supabase.auth.getSession();
+        // Use refreshSession to get the latest metadata from server
+        const { data, error } = await supabase.auth.refreshSession();
         if (data.session?.user) {
           session = data.session;
           console.log(`AuthConfirm: Session found on attempt ${attempt + 1}`);
           break;
         }
-        console.log(`AuthConfirm: No session on attempt ${attempt + 1}, retrying...`);
+        console.log(`AuthConfirm: No session on attempt ${attempt + 1}, error: ${error?.message}, retrying...`);
         await new Promise(resolve => setTimeout(resolve, 500));
       }
       
       if (session?.user) {
-        const isLogopedist = session.user.user_metadata?.is_logopedist === true;
-        console.log(`AuthConfirm: User found, is_logopedist=${isLogopedist}`);
+        // Check metadata FIRST (fast)
+        let isLogopedist = session.user.user_metadata?.is_logopedist === true;
+        console.log(`AuthConfirm: Metadata is_logopedist=${isLogopedist}`);
         
+        // If metadata not available, check database (reliable fallback)
+        if (!isLogopedist) {
+          try {
+            const { data: logopedistProfile } = await supabase
+              .from('logopedist_profiles')
+              .select('id')
+              .eq('user_id', session.user.id)
+              .maybeSingle();
+            
+            if (logopedistProfile) {
+              console.log("AuthConfirm: Logopedist detected from database");
+              isLogopedist = true;
+            }
+          } catch (err) {
+            console.error("AuthConfirm: Error checking logopedist_profiles:", err);
+          }
+        }
+        
+        console.log(`AuthConfirm: Final isLogopedist=${isLogopedist}`);
         setStatus(isLogopedist ? "Preusmerjam na admin portal..." : "Preusmerjam...");
         
         // Small delay for UX
