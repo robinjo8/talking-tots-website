@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
 
     // Send the email using Resend
     const { error } = await resend.emails.send({
-      from: 'TomiTalk <onboarding@resend.dev>',
+      from: 'TomiTalk <noreply@tomitalk.si>',
       to: [user.email],
       subject: 'Potrdi svoj račun pri TomiTalk 🐉',
       html,
