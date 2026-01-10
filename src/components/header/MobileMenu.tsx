@@ -68,8 +68,8 @@ export function MobileMenu({
             <Menu className="h-5 w-5" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="right" className="p-0 w-80 lg:w-[600px]">
-          <ScrollArea className="h-[90vh]">
+        <SheetContent side="right" className="p-0 w-80 lg:w-[600px] flex flex-col h-full">
+          <ScrollArea className="flex-1">
             <div className="flex flex-col p-6 space-y-6">
               {/* Navigation for logged in users */}
               
@@ -158,33 +158,34 @@ export function MobileMenu({
                   </div>
                 </>}
               
-              {!user && <div className="flex flex-col h-full min-h-[70vh]">
-                  <div className="flex flex-col gap-3">
-                    <Button className="w-full h-12 rounded-full text-base bg-dragon-green hover:bg-dragon-green/90 text-white font-semibold uppercase" onClick={() => navigate("/login")}>
-                      Prijava
-                    </Button>
-                    <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={handleCenikClick}>
-                      Cenik
-                    </Button>
-                    <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={() => navigate("/logopedski-koticek")}>
-                      <BookOpen className="h-4 w-4 mr-2" />
-                      Logopedski nasveti
-                    </Button>
-                  </div>
-                  
-                  <div className="mt-auto pb-8">
-                    <Button 
-                      variant="outline" 
-                      className="w-full h-12 rounded-full text-base font-semibold uppercase bg-app-blue text-white hover:bg-app-blue/90 border-app-blue" 
-                      onClick={() => navigate("/admin/login")}
-                    >
-                      <Building2 className="h-4 w-4 mr-2" />
-                      Za organizacije
-                    </Button>
-                  </div>
+              {!user && <div className="flex flex-col gap-3">
+                  <Button className="w-full h-12 rounded-full text-base bg-dragon-green hover:bg-dragon-green/90 text-white font-semibold uppercase" onClick={() => navigate("/login")}>
+                    Prijava
+                  </Button>
+                  <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={handleCenikClick}>
+                    Cenik
+                  </Button>
+                  <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={() => navigate("/logopedski-koticek")}>
+                    <BookOpen className="h-4 w-4 mr-2" />
+                    Logopedski nasveti
+                  </Button>
                 </div>}
             </div>
           </ScrollArea>
+          
+          {/* Za organizacije - fixed at bottom for non-logged users */}
+          {!user && (
+            <div className="p-6 pt-0 border-t bg-background">
+              <Button 
+                variant="outline" 
+                className="w-full h-12 rounded-full text-base font-semibold uppercase bg-app-blue text-white hover:bg-app-blue/90 border-app-blue" 
+                onClick={() => navigate("/admin/login")}
+              >
+                <Building2 className="h-4 w-4 mr-2" />
+                Za organizacije
+              </Button>
+            </div>
+          )}
         </SheetContent>
       </Sheet>
     </div>;
