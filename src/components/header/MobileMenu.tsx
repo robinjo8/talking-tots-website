@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Menu, Play, UserPlus, LogOut, Home, Activity, Gamepad, Award, Video, BookOpen, Bell, CreditCard, User, Building2 } from "lucide-react";
+import { Menu, LogOut, Home, Activity, BookOpen, Bell, CreditCard, User, Building2 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ProfileSelector } from "./ProfileSelector";
 import { Profile } from "@/contexts/AuthContext";
@@ -71,12 +71,7 @@ export function MobileMenu({
         <SheetContent side="right" className="p-0 w-80 lg:w-[600px]">
           <ScrollArea className="h-[90vh]">
             <div className="flex flex-col p-6 space-y-6">
-              {/* Show Cenik only when NOT logged in */}
-              {!user && <div className="flex flex-row items-center gap-2 pb-3">
-                  <Button type="button" variant="default" className="font-semibold flex-1 h-12 rounded-full text-base w-full uppercase" onClick={handleCenikClick}>
-                    Cenik
-                  </Button>
-                </div>}
+              {/* Navigation for logged in users */}
               
               {user && <>
                   {/* Profile section simplified for single child */}
@@ -164,20 +159,22 @@ export function MobileMenu({
                 </>}
               
               {!user && <div className="flex flex-col gap-3">
-                  <Button onClick={onStartNow} className="w-full h-12 rounded-full text-base bg-dragon-green hover:bg-dragon-green/90 text-white font-semibold uppercase">
-                    <Play className="h-4 w-4 mr-2" />
-                    Začni zdaj
-                  </Button>
-                  <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={() => navigate("/login")}>
+                  <Button className="w-full h-12 rounded-full text-base bg-dragon-green hover:bg-dragon-green/90 text-white font-semibold uppercase" onClick={() => navigate("/login")}>
                     Prijava
                   </Button>
-                  <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={() => navigate("/register")}>
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Registracija
+                  <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={handleCenikClick}>
+                    Cenik
                   </Button>
+                  <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={() => navigate("/logopedski-koticek")}>
+                    <BookOpen className="h-4 w-4 mr-2" />
+                    Logopedski nasveti
+                  </Button>
+                  
+                  <div className="flex-1" />
+                  
                   <Button 
                     variant="outline" 
-                    className="w-full h-12 rounded-full text-base font-semibold uppercase bg-app-blue text-white hover:bg-app-blue/90 border-app-blue" 
+                    className="w-full h-12 rounded-full text-base font-semibold uppercase bg-app-blue text-white hover:bg-app-blue/90 border-app-blue mt-auto" 
                     onClick={() => navigate("/admin/login")}
                   >
                     <Building2 className="h-4 w-4 mr-2" />
