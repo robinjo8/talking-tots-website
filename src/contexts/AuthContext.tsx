@@ -320,40 +320,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Redirect logopedists to admin on sign in - check both metadata AND logopedist_profiles table
-        if (event === 'SIGNED_IN' && session?.user) {
-          const isLogopedistMeta = session.user.user_metadata?.is_logopedist === true;
-          
-          // Also check logopedist_profiles table as fallback
-          // Use 100ms delay for more stable check, and skip if AuthConfirm is handling it
-          setTimeout(async () => {
-            const currentPath = window.location.pathname;
-            
-            // Skip if already on admin or if AuthConfirm is handling the redirect
-            if (currentPath.startsWith('/admin') || currentPath === '/auth/confirm') {
-              console.log("AuthContext: Skipping redirect, path is", currentPath);
-              return;
-            }
-            
-            if (isLogopedistMeta) {
-              console.log("AuthContext: Logopedist detected from metadata, redirecting to /admin");
-              window.location.href = '/admin';
-              return;
-            }
-            
-            // Check database for logopedist profile
-            const { data: logopedistProfile } = await supabase
-              .from('logopedist_profiles')
-              .select('id')
-              .eq('user_id', session.user.id)
-              .maybeSingle();
-            
-            if (logopedistProfile) {
-              console.log("AuthContext: Logopedist detected from database, redirecting to /admin");
-              window.location.href = '/admin';
-            }
-          }, 100);
-        }
+        // NOTE: Logopedist redirection is handled separately in Login.tsx and AdminLogin.tsx
+        // This prevents automatic redirection from the user portal to admin portal
         
         if (session?.user) {
           // Use setTimeout to avoid blocking the auth state change

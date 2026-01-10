@@ -19,7 +19,28 @@ export default function Login() {
   const navigate = useNavigate();
   const { checkRateLimit, recordFailedAttempt, recordSuccessfulLogin } = useAuthRateLimit();
 
-  const handleGoogleSuccess = () => {
+  const handleGoogleSuccess = async () => {
+    // Check if user is a logopedist - block access via regular login
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: logopedistProfile } = await supabase
+          .from('logopedist_profiles')
+          .select('id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        
+        if (logopedistProfile) {
+          // Logopedist trying to use regular login - sign out and show error
+          await supabase.auth.signOut();
+          setError('Za prijavo v portal za logopede uporabite gumb "Za organizacije".');
+          return;
+        }
+      }
+    } catch (error) {
+      console.error("Error checking logopedist status:", error);
+    }
+    
     toast.success("Prijava uspešna!");
     navigate("/");
   };
@@ -46,7 +67,7 @@ export default function Login() {
     
     try {
       setIsLoading(true);
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -54,6 +75,23 @@ export default function Login() {
       if (error) {
         recordFailedAttempt();
         throw error;
+      }
+      
+      // Check if user is a logopedist - block access via regular login
+      if (data.user) {
+        const { data: logopedistProfile } = await supabase
+          .from('logopedist_profiles')
+          .select('id')
+          .eq('user_id', data.user.id)
+          .maybeSingle();
+        
+        if (logopedistProfile) {
+          // Logopedist trying to use regular login - sign out and show error
+          await supabase.auth.signOut();
+          setError('Za prijavo v portal za logopede uporabite gumb "Za organizacije".');
+          setIsLoading(false);
+          return;
+        }
       }
       
       recordSuccessfulLogin();

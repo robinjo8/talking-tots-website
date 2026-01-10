@@ -44,7 +44,8 @@ export function AdminSidebar() {
 
   const handleSignOut = async () => {
     await signOut();
-    navigate('/admin/login');
+    // Use window.location for clean navigation without React state interference
+    window.location.href = '/admin/login';
   };
 
   const isActive = (href: string) => {
