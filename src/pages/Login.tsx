@@ -15,7 +15,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<React.ReactNode | null>(null);
   const navigate = useNavigate();
   const { checkRateLimit, recordFailedAttempt, recordSuccessfulLogin } = useAuthRateLimit();
 
@@ -31,9 +31,16 @@ export default function Login() {
           .maybeSingle();
         
         if (logopedistProfile) {
-          // Logopedist trying to use regular login - sign out and show error
+          // Logopedist trying to use regular login - sign out and show error with link
           await supabase.auth.signOut();
-          setError('Za prijavo v portal za logopede uporabite gumb "Za organizacije".');
+          setError(
+            <span>
+              Za prijavo v portal za logopede uporabite gumb<br />
+              <Link to="/admin/login" className="underline font-semibold hover:text-destructive/80">
+                "Za organizacije"
+              </Link>
+            </span>
+          );
           return;
         }
       }
@@ -86,9 +93,16 @@ export default function Login() {
           .maybeSingle();
         
         if (logopedistProfile) {
-          // Logopedist trying to use regular login - sign out and show error
+          // Logopedist trying to use regular login - sign out and show error with link
           await supabase.auth.signOut();
-          setError('Za prijavo v portal za logopede uporabite gumb "Za organizacije".');
+          setError(
+            <span>
+              Za prijavo v portal za logopede uporabite gumb<br />
+              <Link to="/admin/login" className="underline font-semibold hover:text-destructive/80">
+                "Za organizacije"
+              </Link>
+            </span>
+          );
           setIsLoading(false);
           return;
         }
