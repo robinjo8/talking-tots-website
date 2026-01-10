@@ -92,9 +92,8 @@ export default function AdminLogin() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-app-blue/10 via-background to-app-blue/5 p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4">
-            <ArrowLeft className="h-4 w-4" />
-            Nazaj na glavno stran
+          <Link to="/" className="inline-flex items-center justify-center px-4 py-2 bg-white text-black font-bold rounded-md shadow hover:bg-gray-100 transition-colors mb-4">
+            Nazaj na začetno stran
           </Link>
           <div className="flex items-center justify-center gap-1 mb-2">
             <span className="text-3xl font-extrabold text-dragon-green uppercase">Tomi</span>
@@ -174,9 +173,6 @@ export default function AdminLogin() {
           </CardContent>
         </Card>
 
-        <p className="text-center text-xs text-muted-foreground mt-6">
-          Ta portal je namenjen izključno logopedinjam in logopedinjam
-        </p>
       </div>
     </div>
   );
