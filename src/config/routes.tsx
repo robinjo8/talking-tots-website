@@ -224,6 +224,8 @@ import ZaPosameznike from "@/pages/ZaPosameznike";
 import ZaPodjetja from "@/pages/ZaPodjetja";
 import PomocInPodpora from "@/pages/PomocInPodpora";
 import KakoDeluje from "@/pages/KakoDeluje";
+import Cenik from "@/pages/Cenik";
+import DelovanjeTest from "@/pages/DelovanjeTest";
 
 export function AppRoutes() {
   return (
@@ -2080,6 +2082,8 @@ export function AppRoutes() {
       <Route path="/za-podjetja" element={<ZaPodjetja />} />
       <Route path="/pomoc-in-podpora" element={<PomocInPodpora />} />
       <Route path="/kako-deluje" element={<KakoDeluje />} />
+      <Route path="/cenik" element={<Cenik />} />
+      <Route path="/delovanje-testa" element={<DelovanjeTest />} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>
