@@ -205,7 +205,7 @@ export function PricingSection() {
                                 <HelpCircle className="h-3.5 w-3.5 md:h-4 md:w-4" />
                               </button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-64 p-3" side="right" align="start">
+                            <PopoverContent className="w-64 p-3" side="bottom" sideOffset={5}>
                               <p className="font-semibold text-sm mb-2">TomiTalk Plus vključuje:</p>
                               <ul className="space-y-1">
                                 {plusIncludedFeatures.map((item, i) => (
