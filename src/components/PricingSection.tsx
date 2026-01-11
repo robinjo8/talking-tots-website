@@ -201,35 +201,12 @@ export function PricingSection() {
                         <div className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-dragon-green flex-shrink-0" />
                         <span className={feature.isBold ? "font-bold" : ""}>{feature.text}</span>
                         {feature.hasInfo && (
-                          <>
-                            {/* Desktop: Popover */}
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <button className="hidden md:block text-gray-400 hover:text-dragon-green transition-colors">
-                                  <HelpCircle className="h-4 w-4" />
-                                </button>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-64 p-3" side="bottom" sideOffset={5}>
-                                <p className="font-semibold text-sm mb-2">TomiTalk Plus vključuje:</p>
-                                <ul className="space-y-1">
-                                  {plusIncludedFeatures.map((item, i) => (
-                                    <li key={i} className="flex items-center gap-2 text-xs">
-                                      <div className="h-1.5 w-1.5 rounded-full bg-app-orange flex-shrink-0" />
-                                      <span>{item}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </PopoverContent>
-                            </Popover>
-                            
-                            {/* Mobile: Dialog trigger */}
-                            <button 
-                              className="md:hidden text-gray-400 hover:text-dragon-green transition-colors"
-                              onClick={() => setShowMobileDialog(true)}
-                            >
-                              <HelpCircle className="h-3.5 w-3.5" />
-                            </button>
-                          </>
+                          <button 
+                            className="text-gray-400 hover:text-dragon-green transition-colors"
+                            onClick={() => setShowMobileDialog(true)}
+                          >
+                            <HelpCircle className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                          </button>
                         )}
                       </div>
                     ))}
