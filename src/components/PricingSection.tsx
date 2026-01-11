@@ -71,7 +71,7 @@ export function PricingSection() {
           {/* TomiTalk Start */}
           <TabsContent value="start" className="mt-4 md:mt-6">
             <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg min-h-[360px] md:min-h-0 md:h-[580px]", "border-app-blue shadow-md")}>
-              <CardContent className="p-3 md:p-8 flex flex-col">
+              <CardContent className="p-3 md:p-8 flex flex-col h-full">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <span className="bg-app-blue text-white text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-medium whitespace-nowrap">
                     Fleksibilno
@@ -104,7 +104,7 @@ export function PricingSection() {
                   </div>
                 </div>
 
-                <Button className="w-full bg-app-blue hover:bg-app-blue/90 text-white h-9 md:h-12 text-sm md:text-lg font-semibold">
+                <Button className="w-full bg-app-blue hover:bg-app-blue/90 text-white h-9 md:h-12 text-sm md:text-lg font-semibold mt-auto">
                   Izberi TomiTalk Start
                 </Button>
               </CardContent>
