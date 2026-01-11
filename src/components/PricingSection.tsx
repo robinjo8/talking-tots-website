@@ -70,15 +70,15 @@ export function PricingSection() {
 
           {/* TomiTalk Start */}
           <TabsContent value="start" className="mt-4 md:mt-6">
-            <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg h-[calc(100vh-160px)] md:h-[580px]", "border-app-blue shadow-md")}>
-              <CardContent className="p-3 md:p-8 flex flex-col h-full">
+            <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg h-auto md:h-[580px]", "border-app-blue shadow-md")}>
+              <CardContent className="p-3 md:p-8 flex flex-col">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <span className="bg-app-blue text-white text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-medium whitespace-nowrap">
                     Fleksibilno
                   </span>
                 </div>
                 
-                <div className="text-center mb-3 md:mb-6 mt-2 md:h-[88px]">
+                <div className="text-center mb-2 md:mb-6 mt-2 md:h-[88px]">
                   <h3 className="text-xl md:text-2xl font-bold text-app-blue mb-1 md:mb-2">TomiTalk Start</h3>
                   <div className="flex items-baseline justify-center gap-2 mb-1 md:mb-2">
                     <span className="text-3xl md:text-4xl font-bold">17 €</span>
@@ -87,14 +87,14 @@ export function PricingSection() {
                   <p className="text-xs md:text-sm text-gray-600">zaračunano mesečno</p>
                 </div>
 
-                <div className="text-center mb-3 md:mb-6">
-                  <p className="text-sm md:text-lg font-medium text-gray-700 mb-2 md:mb-4">
+                <div className="text-center mb-2 md:mb-6">
+                  <p className="text-sm md:text-lg font-medium text-gray-700 mb-1 md:mb-4">
                     "Vse, kar potrebuje otrok, da izboljša govor!"
                   </p>
                 </div>
 
-                <div className="flex justify-center flex-grow">
-                  <div className="inline-flex flex-col items-start space-y-1 md:space-y-3">
+                <div className="flex justify-center mb-3 md:mb-6">
+                  <div className="inline-flex flex-col items-start space-y-0.5 md:space-y-3">
                     {startFeatures.map((feature, index) => (
                       <div key={index} className="flex items-center gap-2 md:gap-3 text-xs md:text-sm">
                         <div className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-app-blue flex-shrink-0" />
@@ -104,7 +104,7 @@ export function PricingSection() {
                   </div>
                 </div>
 
-                <Button className="w-full mt-auto bg-app-blue hover:bg-app-blue/90 text-white h-10 md:h-12 text-base md:text-lg font-semibold">
+                <Button className="w-full bg-app-blue hover:bg-app-blue/90 text-white h-9 md:h-12 text-sm md:text-lg font-semibold">
                   Izberi TomiTalk Start
                 </Button>
               </CardContent>
@@ -113,15 +113,15 @@ export function PricingSection() {
 
           {/* TomiTalk Plus */}
           <TabsContent value="plus" className="mt-4 md:mt-6">
-            <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg h-[calc(100vh-160px)] md:h-[580px]", "border-app-orange shadow-md")}>
-              <CardContent className="p-3 md:p-8 flex flex-col h-full">
+            <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg h-auto md:h-[580px]", "border-app-orange shadow-md")}>
+              <CardContent className="p-3 md:p-8 flex flex-col">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <span className="bg-app-orange text-white text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-medium whitespace-nowrap">
                     Prihranek
                   </span>
                 </div>
                 
-                <div className="text-center mb-3 md:mb-6 mt-2 md:h-[88px]">
+                <div className="text-center mb-2 md:mb-6 mt-2 md:h-[88px]">
                   <h3 className="text-xl md:text-2xl font-bold text-app-orange mb-1 md:mb-2">TomiTalk Plus</h3>
                   <div className="flex items-baseline justify-center gap-2 mb-1 md:mb-2">
                     <span className="text-3xl md:text-4xl font-bold">8 €</span>
@@ -130,14 +130,14 @@ export function PricingSection() {
                   <p className="text-xs md:text-sm text-gray-600">zaračunano letno</p>
                 </div>
 
-                <div className="text-center mb-3 md:mb-6">
-                  <p className="text-sm md:text-lg font-medium text-gray-700 mb-2 md:mb-4">
+                <div className="text-center mb-2 md:mb-6">
+                  <p className="text-sm md:text-lg font-medium text-gray-700 mb-1 md:mb-4">
                     "Vse, kar potrebuje otrok, da izboljša govor!"
                   </p>
                 </div>
 
-                <div className="flex justify-center flex-grow">
-                  <div className="inline-flex flex-col items-start space-y-1 md:space-y-3">
+                <div className="flex justify-center mb-3 md:mb-6">
+                  <div className="inline-flex flex-col items-start space-y-0.5 md:space-y-3">
                     {plusFeatures.map((feature, index) => (
                       <div key={index} className="flex items-center gap-2 md:gap-3 text-xs md:text-sm">
                         <div className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-app-orange flex-shrink-0" />
@@ -147,7 +147,7 @@ export function PricingSection() {
                   </div>
                 </div>
 
-                <Button className="w-full mt-auto bg-app-orange hover:bg-app-orange/90 text-white h-10 md:h-12 text-base md:text-lg font-semibold">
+                <Button className="w-full bg-app-orange hover:bg-app-orange/90 text-white h-9 md:h-12 text-sm md:text-lg font-semibold">
                   Izberi TomiTalk Plus
                 </Button>
               </CardContent>
@@ -156,15 +156,15 @@ export function PricingSection() {
 
           {/* TomiTalk Pro */}
           <TabsContent value="pro" className="mt-4 md:mt-6">
-            <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg h-[calc(100vh-160px)] md:h-[580px]", "border-dragon-green shadow-md")}>
-              <CardContent className="p-3 md:p-8 flex flex-col h-full">
+            <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg h-auto md:h-[580px]", "border-dragon-green shadow-md")}>
+              <CardContent className="p-3 md:p-8 flex flex-col">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <span className="bg-dragon-green text-white text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-medium whitespace-nowrap">
                     Naj izbira
                   </span>
                 </div>
                 
-                <div className="text-center mb-3 md:mb-6 mt-2 md:h-[88px]">
+                <div className="text-center mb-2 md:mb-6 mt-2 md:h-[88px]">
                   <h3 className="text-xl md:text-2xl font-bold text-dragon-green mb-1 md:mb-2">TomiTalk Pro</h3>
                   <div className="flex items-baseline justify-center gap-2 mb-1 md:mb-2">
                     <span className="text-3xl md:text-4xl font-bold">13 €</span>
@@ -173,14 +173,14 @@ export function PricingSection() {
                   <p className="text-xs md:text-sm text-gray-600">zaračunano letno</p>
                 </div>
 
-                <div className="text-center mb-3 md:mb-6">
-                  <p className="text-sm md:text-lg font-medium text-gray-700 mb-2 md:mb-4">
+                <div className="text-center mb-2 md:mb-6">
+                  <p className="text-sm md:text-lg font-medium text-gray-700 mb-1 md:mb-4">
                     "Razširjena strokovna podpora in osebni pristop."
                   </p>
                 </div>
 
-                <div className="flex justify-center flex-grow">
-                  <div className="inline-flex flex-col items-start space-y-1 md:space-y-3">
+                <div className="flex justify-center mb-3 md:mb-6">
+                  <div className="inline-flex flex-col items-start space-y-0.5 md:space-y-3">
                     {proFeatures.map((feature, index) => (
                       <div key={index} className="flex items-center gap-2 md:gap-3 text-xs md:text-sm">
                         <div className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-dragon-green flex-shrink-0" />
@@ -190,7 +190,7 @@ export function PricingSection() {
                   </div>
                 </div>
 
-                <Button className="w-full mt-auto bg-dragon-green hover:bg-dragon-green/90 text-white h-10 md:h-12 text-base md:text-lg font-semibold">
+                <Button className="w-full bg-dragon-green hover:bg-dragon-green/90 text-white h-9 md:h-12 text-sm md:text-lg font-semibold">
                   Izberi TomiTalk Pro
                 </Button>
               </CardContent>
