@@ -223,6 +223,7 @@ import PolitikaZasebnosti from "@/pages/PolitikaZasebnosti";
 import ZaPosameznike from "@/pages/ZaPosameznike";
 import ZaPodjetja from "@/pages/ZaPodjetja";
 import PomocInPodpora from "@/pages/PomocInPodpora";
+import KakoDeluje from "@/pages/KakoDeluje";
 
 export function AppRoutes() {
   return (
@@ -2078,6 +2079,7 @@ export function AppRoutes() {
       <Route path="/za-posameznike" element={<ZaPosameznike />} />
       <Route path="/za-podjetja" element={<ZaPodjetja />} />
       <Route path="/pomoc-in-podpora" element={<PomocInPodpora />} />
+      <Route path="/kako-deluje" element={<KakoDeluje />} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>
