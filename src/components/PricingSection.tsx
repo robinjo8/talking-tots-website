@@ -3,11 +3,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { HelpCircle } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { HelpCircle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function PricingSection() {
   const [selectedPlan, setSelectedPlan] = useState<'start' | 'plus' | 'pro'>('pro');
+  const [showMobileDialog, setShowMobileDialog] = useState(false);
 
   const startFeatures = [
     "Interaktivne govornih igre",
@@ -199,24 +201,35 @@ export function PricingSection() {
                         <div className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-dragon-green flex-shrink-0" />
                         <span className={feature.isBold ? "font-bold" : ""}>{feature.text}</span>
                         {feature.hasInfo && (
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <button className="text-gray-400 hover:text-dragon-green transition-colors">
-                                <HelpCircle className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-64 p-3" side="bottom" sideOffset={5}>
-                              <p className="font-semibold text-sm mb-2">TomiTalk Plus vključuje:</p>
-                              <ul className="space-y-1">
-                                {plusIncludedFeatures.map((item, i) => (
-                                  <li key={i} className="flex items-center gap-2 text-xs">
-                                    <div className="h-1.5 w-1.5 rounded-full bg-app-orange flex-shrink-0" />
-                                    <span>{item}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </PopoverContent>
-                          </Popover>
+                          <>
+                            {/* Desktop: Popover */}
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <button className="hidden md:block text-gray-400 hover:text-dragon-green transition-colors">
+                                  <HelpCircle className="h-4 w-4" />
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-64 p-3" side="bottom" sideOffset={5}>
+                                <p className="font-semibold text-sm mb-2">TomiTalk Plus vključuje:</p>
+                                <ul className="space-y-1">
+                                  {plusIncludedFeatures.map((item, i) => (
+                                    <li key={i} className="flex items-center gap-2 text-xs">
+                                      <div className="h-1.5 w-1.5 rounded-full bg-app-orange flex-shrink-0" />
+                                      <span>{item}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </PopoverContent>
+                            </Popover>
+                            
+                            {/* Mobile: Dialog trigger */}
+                            <button 
+                              className="md:hidden text-gray-400 hover:text-dragon-green transition-colors"
+                              onClick={() => setShowMobileDialog(true)}
+                            >
+                              <HelpCircle className="h-3.5 w-3.5" />
+                            </button>
+                          </>
                         )}
                       </div>
                     ))}
@@ -231,6 +244,50 @@ export function PricingSection() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Mobile Dialog for TomiTalk Pro info */}
+      <Dialog open={showMobileDialog} onOpenChange={setShowMobileDialog}>
+        <DialogContent className="w-[90%] max-w-sm rounded-xl p-0 overflow-hidden">
+          <div className="bg-dragon-green text-white p-4 text-center">
+            <DialogTitle className="text-lg font-bold text-white">TomiTalk Pro vključuje</DialogTitle>
+            <DialogDescription className="text-white/80 text-sm mt-1">
+              Celoten paket za napredek govora
+            </DialogDescription>
+          </div>
+          
+          <div className="p-4">
+            {/* TomiTalk Plus section */}
+            <div className="bg-app-orange/10 border-2 border-app-orange rounded-lg p-3 mb-4">
+              <p className="font-bold text-app-orange text-sm mb-2 text-center">
+                ✓ Vse iz TomiTalk Plus:
+              </p>
+              <ul className="space-y-1.5">
+                {plusIncludedFeatures.map((item, i) => (
+                  <li key={i} className="flex items-center gap-2 text-xs">
+                    <div className="h-1.5 w-1.5 rounded-full bg-app-orange flex-shrink-0" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            {/* TomiTalk Pro exclusive features */}
+            <div className="bg-dragon-green/10 border-2 border-dragon-green rounded-lg p-3">
+              <p className="font-bold text-dragon-green text-sm mb-2 text-center">
+                + Ekskluzivne Pro funkcije:
+              </p>
+              <ul className="space-y-1.5">
+                {proFeatures.filter(f => !f.hasInfo).map((feature, i) => (
+                  <li key={i} className="flex items-center gap-2 text-xs">
+                    <div className="h-1.5 w-1.5 rounded-full bg-dragon-green flex-shrink-0" />
+                    <span>{feature.text}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
