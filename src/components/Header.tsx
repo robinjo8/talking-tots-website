@@ -46,28 +46,9 @@ export default function Header() {
     navigate("/moje-aplikacije");
   };
 
-  // Cenik scroll handler
-  const handleCenikScroll = (e?: React.MouseEvent) => {
-    if (e) e.preventDefault();
-    const cenikSection = document.getElementById("cenik");
-    if (cenikSection) {
-      cenikSection.scrollIntoView({
-        behavior: "smooth"
-      });
-    } else {
-      // fallback: navigate to homepage and scroll after.
-      navigate("/", {
-        replace: true
-      });
-      setTimeout(() => {
-        const cenikSectionRetry = document.getElementById("cenik");
-        if (cenikSectionRetry) {
-          cenikSectionRetry.scrollIntoView({
-            behavior: "smooth"
-          });
-        }
-      }, 300);
-    }
+  // Cenik navigation handler
+  const handleCenikNavigate = () => {
+    navigate("/cenik");
   };
   const handleSignOut = async () => {
     await signOut();
@@ -79,7 +60,7 @@ export default function Header() {
       <header className="py-4 px-4 md:px-10 w-full bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
         {/* Desktop layout - logo and nav on left, profile/buttons on right */}
         {(() => {
-          const { navLinks, rightSection } = DesktopNavigation({ user, onStartNow: handleStartNow, onCenikScroll: handleCenikScroll });
+          const { navLinks, rightSection } = DesktopNavigation({ user, onStartNow: handleStartNow, onCenikNavigate: handleCenikNavigate });
           return (
             <div className="hidden lg:flex items-center justify-between w-full">
               {/* Left side - Logo and Navigation together */}
@@ -133,7 +114,7 @@ export default function Header() {
           </Link>
           
           {/* Mobile menu and profile on far right */}
-          <MobileMenu user={user} profile={profile} selectedChild={selectedChild} onSignOut={handleSignOut} onStartNow={handleStartNow} onCenikScroll={handleCenikScroll} />
+          <MobileMenu user={user} profile={profile} selectedChild={selectedChild} onSignOut={handleSignOut} onStartNow={handleStartNow} onCenikNavigate={handleCenikNavigate} />
         </div>
       </header>
       <MissingChildBanner />

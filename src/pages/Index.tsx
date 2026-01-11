@@ -5,7 +5,7 @@ import { TargetAudienceSection } from "@/components/home/TargetAudienceSection";
 import { FeaturesSection } from "@/components/home/FeaturesSection";
 import NewProgressComparisonSection from "@/components/home/ProgressComparisonSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
-import PricingSection from "@/components/PricingSection";
+import { FeaturesCardsSection } from "@/components/home/FeaturesCardsSection";
 import FAQSection from "@/components/home/FAQSection";
 import { CallToActionSection } from "@/components/home/CallToActionSection";
 import { FooterSection } from "@/components/home/FooterSection";
@@ -35,8 +35,8 @@ const Index = () => {
       {/* Testimonials Section */}
       <TestimonialsSection />
 
-      {/* Pricing Section */}
-      <PricingSection />
+      {/* Features Cards Section (replacing Pricing) */}
+      <FeaturesCardsSection />
 
       {/* FAQ Section */}
       <FAQSection />

@@ -13,7 +13,7 @@ interface MobileMenuProps {
   selectedChild: any;
   onSignOut: () => void;
   onStartNow: () => void;
-  onCenikScroll: () => void;
+  onCenikNavigate: () => void;
 }
 export function MobileMenu({
   user,
@@ -21,7 +21,7 @@ export function MobileMenu({
   selectedChild,
   onSignOut,
   onStartNow,
-  onCenikScroll
+  onCenikNavigate
 }: MobileMenuProps) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -44,7 +44,7 @@ export function MobileMenu({
 
   const handleCenikClick = () => {
     setIsOpen(false);
-    onCenikScroll();
+    onCenikNavigate();
   };
 
   return <div className="lg:hidden flex items-center gap-2">

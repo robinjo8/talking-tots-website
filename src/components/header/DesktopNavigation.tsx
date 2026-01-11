@@ -8,10 +8,10 @@ import { UserProfile } from "@/components/auth/UserProfile";
 interface DesktopNavigationProps {
   user: any;
   onStartNow: () => void;
-  onCenikScroll: () => void;
+  onCenikNavigate: () => void;
 }
 
-export function DesktopNavigation({ user, onStartNow, onCenikScroll }: DesktopNavigationProps) {
+export function DesktopNavigation({ user, onStartNow, onCenikNavigate }: DesktopNavigationProps) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -31,7 +31,7 @@ export function DesktopNavigation({ user, onStartNow, onCenikScroll }: DesktopNa
           type="button"
           variant="ghost"
           className="font-semibold rounded-full h-10 text-base px-4 uppercase"
-          onClick={onCenikScroll}
+          onClick={onCenikNavigate}
         >
           Cenik
         </Button>
