@@ -114,7 +114,7 @@ export function PricingSection() {
           {/* TomiTalk Plus */}
           <TabsContent value="plus" className="mt-4 md:mt-6">
             <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg min-h-[360px] md:min-h-0 md:h-[580px]", "border-app-orange shadow-md")}>
-              <CardContent className="p-3 md:p-8 flex flex-col">
+              <CardContent className="p-3 md:p-8 flex flex-col h-full">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <span className="bg-app-orange text-white text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-medium whitespace-nowrap">
                     Prihranek
@@ -147,7 +147,7 @@ export function PricingSection() {
                   </div>
                 </div>
 
-                <Button className="w-full bg-app-orange hover:bg-app-orange/90 text-white h-9 md:h-12 text-sm md:text-lg font-semibold">
+                <Button className="w-full bg-app-orange hover:bg-app-orange/90 text-white h-9 md:h-12 text-sm md:text-lg font-semibold mt-auto">
                   Izberi TomiTalk Plus
                 </Button>
               </CardContent>
@@ -157,7 +157,7 @@ export function PricingSection() {
           {/* TomiTalk Pro */}
           <TabsContent value="pro" className="mt-4 md:mt-6">
             <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg min-h-[360px] md:min-h-0 md:h-[580px]", "border-dragon-green shadow-md")}>
-              <CardContent className="p-3 md:p-8 flex flex-col">
+              <CardContent className="p-3 md:p-8 flex flex-col h-full">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <span className="bg-dragon-green text-white text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-medium whitespace-nowrap">
                     Naj izbira
@@ -190,7 +190,7 @@ export function PricingSection() {
                   </div>
                 </div>
 
-                <Button className="w-full bg-dragon-green hover:bg-dragon-green/90 text-white h-9 md:h-12 text-sm md:text-lg font-semibold">
+                <Button className="w-full bg-dragon-green hover:bg-dragon-green/90 text-white h-9 md:h-12 text-sm md:text-lg font-semibold mt-auto">
                   Izberi TomiTalk Pro
                 </Button>
               </CardContent>
