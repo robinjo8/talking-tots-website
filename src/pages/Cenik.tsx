@@ -4,14 +4,16 @@ import { FooterSection } from "@/components/home/FooterSection";
 
 const Cenik = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-screen md:min-h-screen bg-background overflow-hidden md:overflow-auto">
       <Header />
       
-      <main className="pt-24">
+      <main className="pt-16 md:pt-24 h-[calc(100vh-64px)] md:h-auto">
         <PricingSection />
       </main>
 
-      <FooterSection />
+      <div className="hidden md:block">
+        <FooterSection />
+      </div>
     </div>
   );
 };
