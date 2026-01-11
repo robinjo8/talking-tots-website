@@ -2,13 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useState, useEffect } from "react";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
+import { cn } from "@/lib/utils";
 
 const features = [
   {
@@ -62,6 +62,71 @@ function FeatureCard({ feature, onButtonClick }: { feature: typeof features[0]; 
   );
 }
 
+function MobileFeatureCarousel({ 
+  features, 
+  onButtonClick 
+}: { 
+  features: { title: string; description: string; image: string; buttonText: string; buttonAction: string }[];
+  onButtonClick: (action: string) => void;
+}) {
+  const [api, setApi] = useState<any>(null);
+  const [current, setCurrent] = useState(0);
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!api) return;
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap());
+    const onSelect = () => {
+      setCurrent(api.selectedScrollSnap());
+    };
+    api.on("select", onSelect);
+    return () => {
+      api.off("select", onSelect);
+    };
+  }, [api]);
+
+  return (
+    <div className="w-full">
+      <Carousel 
+        setApi={setApi} 
+        className="w-full"
+        opts={{
+          align: "center",
+          loop: true,
+        }}
+      >
+        <CarouselContent>
+          {features.map((feature, index) => (
+            <CarouselItem key={index} className="basis-full flex justify-center">
+              <div className="w-full max-w-sm p-1">
+                <FeatureCard feature={feature} onButtonClick={onButtonClick} />
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+      </Carousel>
+      
+      {/* Pagination dots */}
+      <div className="flex justify-center gap-2 mt-6">
+        {Array.from({ length: count }).map((_, i) => (
+          <button
+            key={i}
+            className={cn(
+              "w-2.5 h-2.5 rounded-full transition-all duration-300",
+              i === current 
+                ? "bg-dragon-green scale-125 shadow-sm" 
+                : "bg-muted-foreground/40 hover:bg-muted-foreground/60"
+            )}
+            onClick={() => api?.scrollTo(i)}
+            aria-label={`Pojdi na kartico ${i + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function FeaturesCardsSection() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -87,19 +152,7 @@ export function FeaturesCardsSection() {
         
         {/* Mobile Carousel */}
         <div className="md:hidden">
-          <Carousel className="w-full max-w-sm mx-auto">
-            <CarouselContent>
-              {features.map((feature, index) => (
-                <CarouselItem key={index}>
-                  <div className="p-1">
-                    <FeatureCard feature={feature} onButtonClick={handleButtonClick} />
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="left-0 -translate-x-1/2" />
-            <CarouselNext className="right-0 translate-x-1/2" />
-          </Carousel>
+          <MobileFeatureCarousel features={features} onButtonClick={handleButtonClick} />
         </div>
 
         {/* Desktop Grid */}

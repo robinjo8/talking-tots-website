@@ -16,8 +16,8 @@ export const CarouselPagination = ({ count, current, onDotClick }: CarouselPagin
           className={cn(
             "w-2.5 h-2.5 rounded-full transition-all duration-300",
             i === current 
-              ? "bg-dragon-green scale-125 shadow-sm" 
-              : "bg-muted-foreground/40 hover:bg-muted-foreground/60"
+              ? "bg-white scale-125 shadow-sm" 
+              : "bg-white/40 hover:bg-white/60"
           )}
           onClick={() => onDotClick(i)}
           aria-label={`Pojdi na predstavitev ${i + 1}`}
