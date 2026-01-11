@@ -70,7 +70,7 @@ export function PricingSection() {
 
           {/* TomiTalk Start */}
           <TabsContent value="start" className="mt-4 md:mt-6">
-            <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg min-h-[340px] md:h-[580px]", "border-app-blue shadow-md")}>
+            <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg min-h-[360px] md:min-h-0 md:h-[580px]", "border-app-blue shadow-md")}>
               <CardContent className="p-3 md:p-8 flex flex-col">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <span className="bg-app-blue text-white text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-medium whitespace-nowrap">
@@ -113,7 +113,7 @@ export function PricingSection() {
 
           {/* TomiTalk Plus */}
           <TabsContent value="plus" className="mt-4 md:mt-6">
-            <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg h-auto md:h-[580px]", "border-app-orange shadow-md")}>
+            <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg min-h-[360px] md:min-h-0 md:h-[580px]", "border-app-orange shadow-md")}>
               <CardContent className="p-3 md:p-8 flex flex-col">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <span className="bg-app-orange text-white text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-medium whitespace-nowrap">
@@ -156,7 +156,7 @@ export function PricingSection() {
 
           {/* TomiTalk Pro */}
           <TabsContent value="pro" className="mt-4 md:mt-6">
-            <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg h-auto md:h-[580px]", "border-dragon-green shadow-md")}>
+            <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg min-h-[360px] md:min-h-0 md:h-[580px]", "border-dragon-green shadow-md")}>
               <CardContent className="p-3 md:p-8 flex flex-col">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <span className="bg-dragon-green text-white text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-medium whitespace-nowrap">
