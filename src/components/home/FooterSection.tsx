@@ -81,14 +81,14 @@ export const FooterSection = () => {
             <h4 className="font-bold text-foreground mb-4">VEČ</h4>
             <ul className="space-y-2">
               <li>
-                <a 
-                  href="https://tomitalk.si" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="text-muted-foreground hover:text-dragon-green transition-colors"
-                >
-                  Tomitalk.si
-                </a>
+                <Link to="/kdo-smo" className="text-muted-foreground hover:text-dragon-green transition-colors">
+                  Kdo smo?
+                </Link>
+              </li>
+              <li>
+                <Link to="/kako-deluje" className="text-muted-foreground hover:text-dragon-green transition-colors">
+                  Kako deluje
+                </Link>
               </li>
               <li>
                 <Link to="/za-posameznike" className="text-muted-foreground hover:text-dragon-green transition-colors">

@@ -85,7 +85,7 @@ export const HeroSection = () => {
                 size="lg"
                 className="bg-dragon-green hover:bg-dragon-green/90 text-white font-semibold px-8 py-5 md:py-6 text-lg"
               >
-                Začni zdaj
+                Začni brezplačno
               </Button>
               
               <Button
