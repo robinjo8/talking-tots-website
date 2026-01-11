@@ -70,11 +70,15 @@ function MobileFeatureCarousel({
   onButtonClick: (action: string) => void;
 }) {
   const [api, setApi] = useState<any>(null);
-  const [current, setCurrent] = useState(0);
+  const [current, setCurrent] = useState(1);
   const [count, setCount] = useState(0);
 
   useEffect(() => {
     if (!api) return;
+    
+    // Start at the middle card (Preverjanje izgovorjave)
+    api.scrollTo(1, false);
+    
     setCount(api.scrollSnapList().length);
     setCurrent(api.selectedScrollSnap());
     const onSelect = () => {
@@ -93,7 +97,8 @@ function MobileFeatureCarousel({
         className="w-full"
         opts={{
           align: "center",
-          loop: true,
+          loop: false,
+          startIndex: 1,
         }}
       >
         <CarouselContent>
