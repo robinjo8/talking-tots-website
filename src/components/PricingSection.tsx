@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function PricingSection() {
@@ -27,15 +29,26 @@ export function PricingSection() {
     "Razširjene igre"
   ];
 
+  const plusIncludedFeatures = [
+    "Interaktivne govornih igre",
+    "Vaje za izgovorjavo glasov",
+    "Vaje motorike govoril",
+    "Video navodila logopeda",
+    "Logopedski nasveti za starše",
+    "Spodbujevalni model nagrajevanja",
+    "Dostop do vseh novih vsebin",
+    "Razširjene igre"
+  ];
+
   const proFeatures = [
-    "Vse iz TomiTalk Plus",
-    "Prilagojen osebni načrt",
-    "Preverjanje izgovorjave",
-    "Strokovna obravnava govora",
-    "Logopedska poročila",
-    "Spremljanje napredka z razlago",
-    "Dostop do vseh novih AI vsebin",
-    "Klepet"
+    { text: "Vse iz TomiTalk Plus", isBold: true, hasInfo: true },
+    { text: "Prilagojen osebni načrt", isBold: false, hasInfo: false },
+    { text: "Preverjanje izgovorjave", isBold: false, hasInfo: false },
+    { text: "Strokovna obravnava govora", isBold: false, hasInfo: false },
+    { text: "Logopedska poročila", isBold: false, hasInfo: false },
+    { text: "Spremljanje napredka z razlago", isBold: false, hasInfo: false },
+    { text: "Dostop do vseh novih AI vsebin", isBold: false, hasInfo: false },
+    { text: "Klepet", isBold: false, hasInfo: false }
   ];
 
   return (
@@ -184,7 +197,27 @@ export function PricingSection() {
                     {proFeatures.map((feature, index) => (
                       <div key={index} className="flex items-center gap-2 md:gap-3 text-xs md:text-sm">
                         <div className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-dragon-green flex-shrink-0" />
-                        <span>{feature}</span>
+                        <span className={feature.isBold ? "font-bold" : ""}>{feature.text}</span>
+                        {feature.hasInfo && (
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button className="text-gray-400 hover:text-dragon-green transition-colors">
+                                <HelpCircle className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-64 p-3" side="right" align="start">
+                              <p className="font-semibold text-sm mb-2">TomiTalk Plus vključuje:</p>
+                              <ul className="space-y-1">
+                                {plusIncludedFeatures.map((item, i) => (
+                                  <li key={i} className="flex items-center gap-2 text-xs">
+                                    <div className="h-1.5 w-1.5 rounded-full bg-app-orange flex-shrink-0" />
+                                    <span>{item}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </PopoverContent>
+                          </Popover>
+                        )}
                       </div>
                     ))}
                   </div>
