@@ -7,7 +7,7 @@ const Cenik = () => {
     <div className="h-screen md:min-h-screen bg-background overflow-hidden md:overflow-auto">
       <Header />
       
-      <main className="pt-16 md:pt-24 h-[calc(100vh-64px)] md:h-auto">
+      <main className="pt-16 md:pt-24">
         <PricingSection />
       </main>
 
