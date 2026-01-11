@@ -89,12 +89,12 @@ export const HeroSection = () => {
               </Button>
               
               <Button
-                onClick={scrollToFeatures}
+                onClick={() => navigate('/cenik')}
                 size="lg"
                 variant="outline"
                 className="border-2 border-dragon-green text-dragon-green hover:bg-dragon-green/10 font-semibold px-8 py-5 md:py-6 text-lg"
               >
-                Izvedite več
+                Kupi TomiTalk
               </Button>
             </div>
 
