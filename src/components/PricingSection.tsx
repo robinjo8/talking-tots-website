@@ -70,8 +70,8 @@ export function PricingSection() {
 
           {/* TomiTalk Start */}
           <TabsContent value="start" className="mt-4 md:mt-6">
-            <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg h-[calc(100vh-180px)] md:h-[580px]", "border-app-blue shadow-md")}>
-              <CardContent className="p-4 md:p-8 flex flex-col h-full">
+            <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg h-[calc(100vh-160px)] md:h-[580px]", "border-app-blue shadow-md")}>
+              <CardContent className="p-3 md:p-8 flex flex-col h-full">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <span className="bg-app-blue text-white text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-medium whitespace-nowrap">
                     Fleksibilno
@@ -93,8 +93,8 @@ export function PricingSection() {
                   </p>
                 </div>
 
-                <div className="flex justify-center flex-grow overflow-y-auto">
-                  <div className="flex flex-col items-center space-y-1.5 md:space-y-3">
+                <div className="flex justify-center flex-grow">
+                  <div className="inline-flex flex-col items-start space-y-1 md:space-y-3">
                     {startFeatures.map((feature, index) => (
                       <div key={index} className="flex items-center gap-2 md:gap-3 text-xs md:text-sm">
                         <div className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-app-blue flex-shrink-0" />
@@ -113,8 +113,8 @@ export function PricingSection() {
 
           {/* TomiTalk Plus */}
           <TabsContent value="plus" className="mt-4 md:mt-6">
-            <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg h-[calc(100vh-180px)] md:h-[580px]", "border-app-orange shadow-md")}>
-              <CardContent className="p-4 md:p-8 flex flex-col h-full">
+            <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg h-[calc(100vh-160px)] md:h-[580px]", "border-app-orange shadow-md")}>
+              <CardContent className="p-3 md:p-8 flex flex-col h-full">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <span className="bg-app-orange text-white text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-medium whitespace-nowrap">
                     Prihranek
@@ -136,8 +136,8 @@ export function PricingSection() {
                   </p>
                 </div>
 
-                <div className="flex justify-center flex-grow overflow-y-auto">
-                  <div className="flex flex-col items-center space-y-1.5 md:space-y-3">
+                <div className="flex justify-center flex-grow">
+                  <div className="inline-flex flex-col items-start space-y-1 md:space-y-3">
                     {plusFeatures.map((feature, index) => (
                       <div key={index} className="flex items-center gap-2 md:gap-3 text-xs md:text-sm">
                         <div className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-app-orange flex-shrink-0" />
@@ -156,8 +156,8 @@ export function PricingSection() {
 
           {/* TomiTalk Pro */}
           <TabsContent value="pro" className="mt-4 md:mt-6">
-            <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg h-[calc(100vh-180px)] md:h-[580px]", "border-dragon-green shadow-md")}>
-              <CardContent className="p-4 md:p-8 flex flex-col h-full">
+            <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg h-[calc(100vh-160px)] md:h-[580px]", "border-dragon-green shadow-md")}>
+              <CardContent className="p-3 md:p-8 flex flex-col h-full">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <span className="bg-dragon-green text-white text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-medium whitespace-nowrap">
                     Naj izbira
@@ -179,8 +179,8 @@ export function PricingSection() {
                   </p>
                 </div>
 
-                <div className="flex justify-center flex-grow overflow-y-auto">
-                  <div className="flex flex-col items-center space-y-1.5 md:space-y-3">
+                <div className="flex justify-center flex-grow">
+                  <div className="inline-flex flex-col items-start space-y-1 md:space-y-3">
                     {proFeatures.map((feature, index) => (
                       <div key={index} className="flex items-center gap-2 md:gap-3 text-xs md:text-sm">
                         <div className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-dragon-green flex-shrink-0" />
