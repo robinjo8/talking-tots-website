@@ -7,10 +7,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { PdfUploader } from "./PdfUploader";
 
 interface SpeechDifficultiesStepProps {
   onBack: () => void;
-  onSubmit: (selectedDifficulties: string[], detailedDescription?: string) => void;
+  onSubmit: (selectedDifficulties: string[], detailedDescription?: string, attachedFile?: File | null) => void;
   childName: string;
   initialDifficulties?: string[];
   initialDescription?: string;
@@ -35,6 +36,7 @@ export function SpeechDifficultiesStep({
   const [notSure, setNotSure] = useState<boolean>(
     initialDifficulties.includes("not_sure")
   );
+  const [attachedFile, setAttachedFile] = useState<File | null>(null);
 
   const handleArticulationChange = (checked: boolean) => {
     setHasArticulationDisorder(checked);
@@ -74,7 +76,7 @@ export function SpeechDifficultiesStep({
       selectedDifficulties.push("not_sure");
     }
     
-    onSubmit(selectedDifficulties, detailedDescription);
+    onSubmit(selectedDifficulties, detailedDescription, attachedFile);
   };
 
   const tooltipText = `Kateri glasovi so otroku težavni? (npr. R, L, S, Č, Ž ...)
@@ -184,6 +186,14 @@ Kakšna je otrokova odzivnost? Se rad pogovarja, je zadržan, se jezi, če ga ne
               placeholder=""
               className="min-h-32 resize-none"
             />
+            
+            {/* PDF Uploader */}
+            <div className="mt-4">
+              <PdfUploader
+                selectedFile={attachedFile}
+                onFileSelect={setAttachedFile}
+              />
+            </div>
           </div>
         </div>
 
