@@ -59,10 +59,13 @@ export function ChildrenProfilesSection({
           )}
 
           {hasNoChildren && showDatabaseManager && (
-            <SimpleChildForm onSuccess={() => {
-              setShowDatabaseManager(false);
-              window.location.reload();
-            }} />
+            <SimpleChildForm 
+              onSuccess={() => {
+                setShowDatabaseManager(false);
+                window.location.reload();
+              }}
+              onCancel={() => setShowDatabaseManager(false)}
+            />
           )}
 
           {/* Child profiles display */}

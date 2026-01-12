@@ -7,15 +7,22 @@ import { AddChildForm } from "@/components/AddChildForm";
 
 interface SimpleChildFormProps {
   onSuccess?: () => void;
+  onCancel?: () => void;
 }
 
-export function SimpleChildForm({ onSuccess }: SimpleChildFormProps) {
+export function SimpleChildForm({ onSuccess, onCancel }: SimpleChildFormProps) {
   const [showNameOnly, setShowNameOnly] = useState(true);
   const [childName, setChildName] = useState("");
 
   const handleContinue = () => {
     if (!childName.trim()) return;
     setShowNameOnly(false);
+  };
+
+  const handleBack = () => {
+    if (onCancel) {
+      onCancel();
+    }
   };
 
   if (!showNameOnly) {
@@ -29,7 +36,7 @@ export function SimpleChildForm({ onSuccess }: SimpleChildFormProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="childName">Ime otroka</Label>
+          <Label htmlFor="childName">Ime otroka ali vzdevek</Label>
           <Input
             id="childName"
             value={childName}
@@ -37,7 +44,13 @@ export function SimpleChildForm({ onSuccess }: SimpleChildFormProps) {
             placeholder="Vnesite ime otroka"
           />
         </div>
-        <div className="flex justify-end">
+        <div className="flex justify-between">
+          <Button
+            variant="outline"
+            onClick={handleBack}
+          >
+            Nazaj
+          </Button>
           <Button
             onClick={handleContinue}
             disabled={!childName.trim()}
