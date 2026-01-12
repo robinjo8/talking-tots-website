@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.transcribe-articulation]
 verify_jwt = false
+
+[functions.upload-child-document]
+verify_jwt = false

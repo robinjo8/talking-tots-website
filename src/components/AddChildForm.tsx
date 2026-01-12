@@ -8,6 +8,7 @@ import { ChildBasicInfoForm } from "./children/ChildBasicInfoForm";
 import { ChildCompletedView } from "./children/ChildCompletedView";
 import { ChildProfile } from "@/hooks/registration/types";
 import { calculateAge } from "@/utils/childUtils";
+import { useChildDocuments } from "@/hooks/useChildDocuments";
 
 enum AddChildStep {
   BASIC_INFO,
@@ -34,10 +35,14 @@ export function AddChildForm({ onSuccess, onBack: onBackProp, initialName, initi
   const [avatarId, setAvatarId] = useState(1);
   const [birthDate, setBirthDate] = useState<Date | null>(initialBirthDate || null);
   const [speechDifficulties, setSpeechDifficulties] = useState<string[]>([]);
+  const [speechDescription, setSpeechDescription] = useState<string>("");
+  const [attachedFile, setAttachedFile] = useState<File | null>(null);
   const [speechDevelopment, setSpeechDevelopment] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState<AddChildStep>(AddChildStep.BASIC_INFO);
   const [savedChildren, setSavedChildren] = useState<SavedChild[]>([]);
+  
+  const { uploadDocument } = useChildDocuments();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,8 +55,10 @@ export function AddChildForm({ onSuccess, onBack: onBackProp, initialName, initi
     setCurrentStep(AddChildStep.SPEECH_DIFFICULTIES);
   };
 
-  const handleSpeechDifficultiesSubmit = async (difficulties: string[]) => {
+  const handleSpeechDifficultiesSubmit = async (difficulties: string[], description?: string, file?: File | null) => {
     setSpeechDifficulties(difficulties);
+    setSpeechDescription(description || "");
+    setAttachedFile(file || null);
     setCurrentStep(AddChildStep.SPEECH_DEVELOPMENT);
   };
 
@@ -64,9 +71,43 @@ export function AddChildForm({ onSuccess, onBack: onBackProp, initialName, initi
     try {
       setIsSubmitting(true);
       
-      // Save the child's information temporarily with an id
-      const newChildId = crypto.randomUUID();
       const calculatedAge = calculateAge(birthDate);
+      
+      // First, insert child into database to get a proper ID
+      const { data: childData, error: childError } = await supabase
+        .from('children')
+        .insert({
+          parent_id: user.id,
+          name: name.trim(),
+          gender,
+          avatar_url: null, // Will be set separately if needed
+          birth_date: birthDate ? birthDate.toISOString().split('T')[0] : null,
+          age: calculatedAge,
+          speech_difficulties: speechDifficulties,
+          speech_difficulties_description: speechDescription || null,
+          speech_development: developmentAnswers
+        })
+        .select()
+        .single();
+
+      if (childError) {
+        console.error("Error inserting child:", childError);
+        throw childError;
+      }
+
+      const newChildId = childData.id;
+      
+      // Upload PDF attachment if provided
+      if (attachedFile) {
+        await uploadDocument(attachedFile, newChildId, 'pdf_attachment');
+      }
+      
+      // Upload speech description as text file if provided
+      if (speechDescription && speechDescription.trim()) {
+        const textBlob = new Blob([speechDescription], { type: 'text/plain' });
+        const textFile = new File([textBlob], `opis-govornih-tezav-${Date.now()}.txt`, { type: 'text/plain' });
+        await uploadDocument(textFile, newChildId, 'speech_description');
+      }
       
       const newChild: SavedChild = {
         id: newChildId,
@@ -81,33 +122,29 @@ export function AddChildForm({ onSuccess, onBack: onBackProp, initialName, initi
       
       setSavedChildren(prev => [...prev, newChild]);
       
-      // Get current user metadata
+      // Also update user metadata for backwards compatibility
       const { data: userData, error: userError } = await supabase.auth.getUser();
       
-      if (userError) throw userError;
-      
-      const currentUser = userData.user;
-      const currentMetadata = currentUser.user_metadata || {};
-      const currentChildren = currentMetadata.children || [];
-      
-      // Add new child with calculated age
-      const updatedChildren = [...currentChildren, {
-        id: newChildId,
-        name: name.trim(),
-        gender,
-        avatarId,
-        birthDate: birthDate ? birthDate.toISOString() : null,
-        age: calculatedAge,
-        speechDifficulties,
-        speechDevelopment: developmentAnswers
-      }];
-      
-      // Update user metadata
-      const { error: updateError } = await supabase.auth.updateUser({
-        data: { children: updatedChildren }
-      });
-      
-      if (updateError) throw updateError;
+      if (!userError && userData.user) {
+        const currentMetadata = userData.user.user_metadata || {};
+        const currentChildren = currentMetadata.children || [];
+        
+        const updatedChildren = [...currentChildren, {
+          id: newChildId,
+          name: name.trim(),
+          gender,
+          avatarId,
+          birthDate: birthDate ? birthDate.toISOString() : null,
+          age: calculatedAge,
+          speechDifficulties,
+          speechDifficultiesDescription: speechDescription,
+          speechDevelopment: developmentAnswers
+        }];
+        
+        await supabase.auth.updateUser({
+          data: { children: updatedChildren }
+        });
+      }
       
       toast.success("Otrok uspešno dodan!");
       

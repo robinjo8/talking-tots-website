@@ -264,6 +264,67 @@ export type Database = {
         }
         Relationships: []
       }
+      child_documents: {
+        Row: {
+          child_id: string
+          created_at: string | null
+          document_type: string
+          file_size: number | null
+          id: string
+          original_filename: string | null
+          storage_path: string
+          uploaded_by: string
+          virus_scan_result: Json | null
+          virus_scan_status: string | null
+        }
+        Insert: {
+          child_id: string
+          created_at?: string | null
+          document_type: string
+          file_size?: number | null
+          id?: string
+          original_filename?: string | null
+          storage_path: string
+          uploaded_by: string
+          virus_scan_result?: Json | null
+          virus_scan_status?: string | null
+        }
+        Update: {
+          child_id?: string
+          created_at?: string | null
+          document_type?: string
+          file_size?: number | null
+          id?: string
+          original_filename?: string | null
+          storage_path?: string
+          uploaded_by?: string
+          virus_scan_result?: Json | null
+          virus_scan_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "child_documents_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "child_documents_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children_analytics"
+            referencedColumns: ["child_id"]
+          },
+          {
+            foreignKeyName: "child_documents_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children_analytics_admin"
+            referencedColumns: ["child_id"]
+          },
+        ]
+      }
       children: {
         Row: {
           age: number

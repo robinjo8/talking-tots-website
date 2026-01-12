@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { UserRound, Pencil, Trash2, FileEdit, Calendar, MessageSquare } from "lucide-react";
+import { UserRound, Pencil, Trash2, FileEdit, Calendar, MessageSquare, FileText, Download, Shield, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { SpeechDifficultiesList } from "@/components/SpeechDifficultiesList";
 import { Badge } from "@/components/ui/badge";
 import { SPEECH_DEVELOPMENT_QUESTIONS } from "@/models/SpeechDevelopment";
 import { ChildProfile } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useChildDocuments } from "@/hooks/useChildDocuments";
 
 type ChildProfileDisplayProps = {
   child: ChildProfile;
@@ -55,8 +56,24 @@ export function ChildProfileDisplay({
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [editingDescription, setEditingDescription] = useState(child.speechDifficultiesDescription || "");
   const [isSavingDescription, setIsSavingDescription] = useState(false);
+  const [documents, setDocuments] = useState<any[]>([]);
+  const [loadingDocuments, setLoadingDocuments] = useState(false);
+  
+  const { fetchDocuments, deleteDocument, getDocumentUrl } = useChildDocuments();
+  
   // Use avatar_url from database if available, otherwise derive from avatarId
   const avatarSrc = child.avatarUrl || getAvatarSrc(child.avatarId);
+  
+  // Fetch documents on mount
+  useEffect(() => {
+    if (child.id) {
+      setLoadingDocuments(true);
+      fetchDocuments(child.id).then(docs => {
+        setDocuments(docs);
+        setLoadingDocuments(false);
+      });
+    }
+  }, [child.id, fetchDocuments]);
   
   const formatGender = (gender: string) => {
     switch (gender) {
@@ -289,6 +306,66 @@ export function ChildProfileDisplay({
           </CardContent>
         </Card>
       </div>
+
+      {/* Documents section */}
+      {documents.length > 0 && (
+        <Card className="h-fit">
+          <CardContent className="p-6">
+            <h5 className="font-semibold text-lg text-gray-800 flex items-center gap-2 mb-4">
+              <FileText className="h-5 w-5 text-dragon-green" />
+              Naloženi dokumenti
+            </h5>
+            <div className="space-y-2">
+              {documents.map((doc) => (
+                <div key={doc.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <FileText className="h-4 w-4 text-gray-500" />
+                    <div>
+                      <p className="text-sm font-medium">{doc.original_filename}</p>
+                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                        {doc.virus_scan_status === 'clean' && (
+                          <span className="flex items-center gap-1 text-dragon-green">
+                            <CheckCircle2 className="h-3 w-3" /> Preverjeno
+                          </span>
+                        )}
+                        {doc.virus_scan_status === 'pending' && (
+                          <span className="flex items-center gap-1 text-amber-500">
+                            <Loader2 className="h-3 w-3 animate-spin" /> V pregledu
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={async () => {
+                        const url = await getDocumentUrl(doc.storage_path);
+                        if (url) window.open(url, '_blank');
+                      }}
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive hover:text-destructive"
+                      onClick={async () => {
+                        if (await deleteDocument(doc.id, doc.storage_path)) {
+                          setDocuments(prev => prev.filter(d => d.id !== doc.id));
+                        }
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
