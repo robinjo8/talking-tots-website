@@ -21,7 +21,7 @@ interface UseChildDocumentsResult {
   uploadDocument: (
     file: File,
     childId: string,
-    documentType: 'pdf_attachment' | 'speech_description'
+    documentType: 'pdf_attachment' | 'speech_description' | 'questionnaire'
   ) => Promise<ChildDocument | null>;
   uploadStatus: UploadStatus;
   errorMessage: string | null;
@@ -38,7 +38,7 @@ export function useChildDocuments(): UseChildDocumentsResult {
   const uploadDocument = useCallback(async (
     file: File,
     childId: string,
-    documentType: 'pdf_attachment' | 'speech_description'
+    documentType: 'pdf_attachment' | 'speech_description' | 'questionnaire'
   ): Promise<ChildDocument | null> => {
     try {
       setUploadStatus('uploading');
