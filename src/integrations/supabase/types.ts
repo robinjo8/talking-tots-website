@@ -395,7 +395,29 @@ export type Database = {
           created_at?: string
           id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "children_access_log_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "children_access_log_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children_analytics"
+            referencedColumns: ["child_id"]
+          },
+          {
+            foreignKeyName: "children_access_log_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children_analytics_admin"
+            referencedColumns: ["child_id"]
+          },
+        ]
       }
       exercises: {
         Row: {
