@@ -1,9 +1,12 @@
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { SpeechHeader } from "./SpeechHeader";
 import { DevelopmentQuestionItem } from "./DevelopmentQuestionItem";
-import { SPEECH_DEVELOPMENT_QUESTIONS } from "@/models/SpeechDevelopment";
+import { TextQuestionItem } from "./TextQuestionItem";
+import { 
+  SPEECH_DEVELOPMENT_QUESTIONS, 
+  SPEECH_DEVELOPMENT_TEXT_QUESTIONS 
+} from "@/models/SpeechDevelopment";
 import { ArrowLeft } from "lucide-react";
 
 interface SpeechDevelopmentQuestionsProps {
@@ -28,9 +31,28 @@ export function SpeechDevelopmentQuestions({
     }));
   };
 
+  // Validation: all radio questions + required text questions must be answered
+  const isFormValid = useMemo(() => {
+    // Check all radio questions are answered
+    const allRadioAnswered = SPEECH_DEVELOPMENT_QUESTIONS.every(
+      (q) => answers[q.id] && answers[q.id].trim() !== ""
+    );
+
+    // Check all required text questions are answered
+    const allRequiredTextAnswered = SPEECH_DEVELOPMENT_TEXT_QUESTIONS
+      .filter((q) => q.required)
+      .every((q) => answers[q.id] && answers[q.id].trim() !== "");
+
+    return allRadioAnswered && allRequiredTextAnswered;
+  }, [answers]);
+
   const handleSubmit = () => {
     onSubmit(answers);
   };
+
+  // Get text questions by id for proper ordering
+  const pronunciationQuestion = SPEECH_DEVELOPMENT_TEXT_QUESTIONS.find(q => q.id === "pronunciation_difficulties");
+  const additionalObservationsQuestion = SPEECH_DEVELOPMENT_TEXT_QUESTIONS.find(q => q.id === "additional_observations");
 
   return (
     <div className="space-y-6">
@@ -44,22 +66,108 @@ export function SpeechDevelopmentQuestions({
       </div>
 
       <div className="space-y-6">
-        {SPEECH_DEVELOPMENT_QUESTIONS.map((question) => (
-          <DevelopmentQuestionItem
-            key={question.id}
-            id={question.id}
-            question={question.question}
-            options={question.options}
-            selectedValue={answers[question.id] || ""}
+        {/* Question 1: Speech clarity */}
+        <DevelopmentQuestionItem
+          key={SPEECH_DEVELOPMENT_QUESTIONS[0].id}
+          id={SPEECH_DEVELOPMENT_QUESTIONS[0].id}
+          question={SPEECH_DEVELOPMENT_QUESTIONS[0].question}
+          options={SPEECH_DEVELOPMENT_QUESTIONS[0].options}
+          selectedValue={answers[SPEECH_DEVELOPMENT_QUESTIONS[0].id] || ""}
+          onValueChange={handleAnswer}
+        />
+
+        {/* Question 2: Vocabulary size */}
+        <DevelopmentQuestionItem
+          key={SPEECH_DEVELOPMENT_QUESTIONS[1].id}
+          id={SPEECH_DEVELOPMENT_QUESTIONS[1].id}
+          question={SPEECH_DEVELOPMENT_QUESTIONS[1].question}
+          options={SPEECH_DEVELOPMENT_QUESTIONS[1].options}
+          selectedValue={answers[SPEECH_DEVELOPMENT_QUESTIONS[1].id] || ""}
+          onValueChange={handleAnswer}
+        />
+
+        {/* Question 3: Pronunciation difficulties (TEXT - required) */}
+        {pronunciationQuestion && (
+          <TextQuestionItem
+            key={pronunciationQuestion.id}
+            id={pronunciationQuestion.id}
+            question={pronunciationQuestion.question}
+            placeholder={pronunciationQuestion.placeholder}
+            required={pronunciationQuestion.required}
+            value={answers[pronunciationQuestion.id] || ""}
             onValueChange={handleAnswer}
           />
-        ))}
+        )}
+
+        {/* Question 4: Sentence formation */}
+        <DevelopmentQuestionItem
+          key={SPEECH_DEVELOPMENT_QUESTIONS[2].id}
+          id={SPEECH_DEVELOPMENT_QUESTIONS[2].id}
+          question={SPEECH_DEVELOPMENT_QUESTIONS[2].question}
+          options={SPEECH_DEVELOPMENT_QUESTIONS[2].options}
+          selectedValue={answers[SPEECH_DEVELOPMENT_QUESTIONS[2].id] || ""}
+          onValueChange={handleAnswer}
+        />
+
+        {/* Question 5: Word pronunciation */}
+        <DevelopmentQuestionItem
+          key={SPEECH_DEVELOPMENT_QUESTIONS[3].id}
+          id={SPEECH_DEVELOPMENT_QUESTIONS[3].id}
+          question={SPEECH_DEVELOPMENT_QUESTIONS[3].question}
+          options={SPEECH_DEVELOPMENT_QUESTIONS[3].options}
+          selectedValue={answers[SPEECH_DEVELOPMENT_QUESTIONS[3].id] || ""}
+          onValueChange={handleAnswer}
+        />
+
+        {/* Question 6: Ear infections */}
+        <DevelopmentQuestionItem
+          key={SPEECH_DEVELOPMENT_QUESTIONS[4].id}
+          id={SPEECH_DEVELOPMENT_QUESTIONS[4].id}
+          question={SPEECH_DEVELOPMENT_QUESTIONS[4].question}
+          options={SPEECH_DEVELOPMENT_QUESTIONS[4].options}
+          selectedValue={answers[SPEECH_DEVELOPMENT_QUESTIONS[4].id] || ""}
+          onValueChange={handleAnswer}
+        />
+
+        {/* Question 7: Chewing/blowing */}
+        <DevelopmentQuestionItem
+          key={SPEECH_DEVELOPMENT_QUESTIONS[5].id}
+          id={SPEECH_DEVELOPMENT_QUESTIONS[5].id}
+          question={SPEECH_DEVELOPMENT_QUESTIONS[5].question}
+          options={SPEECH_DEVELOPMENT_QUESTIONS[5].options}
+          selectedValue={answers[SPEECH_DEVELOPMENT_QUESTIONS[5].id] || ""}
+          onValueChange={handleAnswer}
+        />
+
+        {/* Question 8: Sees speech therapist */}
+        <DevelopmentQuestionItem
+          key={SPEECH_DEVELOPMENT_QUESTIONS[6].id}
+          id={SPEECH_DEVELOPMENT_QUESTIONS[6].id}
+          question={SPEECH_DEVELOPMENT_QUESTIONS[6].question}
+          options={SPEECH_DEVELOPMENT_QUESTIONS[6].options}
+          selectedValue={answers[SPEECH_DEVELOPMENT_QUESTIONS[6].id] || ""}
+          onValueChange={handleAnswer}
+        />
+
+        {/* Question 9: Additional observations (TEXT - optional) */}
+        {additionalObservationsQuestion && (
+          <TextQuestionItem
+            key={additionalObservationsQuestion.id}
+            id={additionalObservationsQuestion.id}
+            question={additionalObservationsQuestion.question}
+            placeholder={additionalObservationsQuestion.placeholder}
+            required={additionalObservationsQuestion.required}
+            value={answers[additionalObservationsQuestion.id] || ""}
+            onValueChange={handleAnswer}
+          />
+        )}
       </div>
 
       <Button
         type="button"
         onClick={handleSubmit}
-        className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6"
+        disabled={!isFormValid}
+        className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6 disabled:opacity-50"
       >
         Naprej
       </Button>
