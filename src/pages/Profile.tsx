@@ -142,6 +142,20 @@ export default function Profile() {
         console.warn("handleDeleteChild - no rows deleted, might be RLS issue");
       }
       
+      // 3. Posodobi user metadata - odstrani otroka iz metadata.children
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData?.user?.user_metadata?.children) {
+        const currentMetadataChildren = userData.user.user_metadata.children as any[];
+        const updatedMetadataChildren = currentMetadataChildren.filter(
+          (c: any) => c.name !== childName
+        );
+        
+        await supabase.auth.updateUser({
+          data: { children: updatedMetadataChildren }
+        });
+        console.log("handleDeleteChild - updated metadata, removed child:", childName);
+      }
+      
       toast.success(`Otrok "${childName}" je bil uspešno izbrisan.`);
       
       // Zapri dialog in osveži profil
