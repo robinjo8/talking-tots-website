@@ -57,36 +57,102 @@ export default function Profile() {
   }, [searchParams]);
 
   const handleDeleteChild = async () => {
-    if (deletingChildIndex === null || !user || !profile?.children) return;
+    // Shrani lokalne reference takoj na začetku
+    const childIndex = deletingChildIndex;
+    const children = profile?.children;
+    
+    if (childIndex === null || !user || !children) {
+      console.log("handleDeleteChild - early return:", { childIndex, user: !!user, children: !!children });
+      return;
+    }
+    
+    const childToDelete = children[childIndex];
+    if (!childToDelete?.id) {
+      console.error("handleDeleteChild - child has no ID:", childToDelete);
+      toast.error("Napaka: ni mogoče identificirati otroka za brisanje.");
+      return;
+    }
+    
+    const childId = childToDelete.id;
+    const childName = childToDelete.name;
+    
+    console.log("handleDeleteChild - starting deletion for:", { childId, childName });
     
     try {
       setIsDeleting(true);
       
-      const childToDelete = profile.children[deletingChildIndex];
-      if (!childToDelete || !childToDelete.id) {
-        toast.error("Napaka: ni mogoče identificirati otroka za brisanje.");
-        return;
+      // 1. Najprej pobriši vse datoteke iz storage za tega otroka
+      const folderPath = `${user.id}/${childId}`;
+      
+      // Pridobi seznam vseh datotek v mapi otroka (rekurzivno)
+      const { data: rootFiles } = await supabase.storage
+        .from('uporabniski-profili')
+        .list(folderPath);
+      
+      if (rootFiles && rootFiles.length > 0) {
+        // Za vsako mapo pridobi datoteke
+        const allFilePaths: string[] = [];
+        
+        for (const item of rootFiles) {
+          if (item.id === null) {
+            // To je mapa - pridobi datoteke v njej
+            const { data: subFiles } = await supabase.storage
+              .from('uporabniski-profili')
+              .list(`${folderPath}/${item.name}`);
+            
+            if (subFiles) {
+              for (const subFile of subFiles) {
+                if (subFile.id !== null) {
+                  allFilePaths.push(`${folderPath}/${item.name}/${subFile.name}`);
+                }
+              }
+            }
+          } else {
+            // To je datoteka
+            allFilePaths.push(`${folderPath}/${item.name}`);
+          }
+        }
+        
+        if (allFilePaths.length > 0) {
+          console.log("handleDeleteChild - deleting storage files:", allFilePaths);
+          const { error: storageError } = await supabase.storage
+            .from('uporabniski-profili')
+            .remove(allFilePaths);
+          
+          if (storageError) {
+            console.warn("handleDeleteChild - storage deletion warning:", storageError);
+            // Nadaljuj z brisanjem iz baze kljub napaki pri storage
+          }
+        }
       }
       
-      // Delete child from database
-      const { error: deleteError } = await supabase
+      // 2. Briši otroka iz baze - CASCADE pobriše povezane zapise
+      console.log("handleDeleteChild - deleting from database:", childId);
+      const { error: deleteError, data: deletedData } = await supabase
         .from('children')
         .delete()
-        .eq('id', childToDelete.id);
+        .eq('id', childId)
+        .select();
+      
+      console.log("handleDeleteChild - delete result:", { error: deleteError, data: deletedData });
         
       if (deleteError) throw deleteError;
       
-      toast.success(`Otrok "${childToDelete.name}" je bil uspešno izbrisan.`);
+      if (!deletedData || deletedData.length === 0) {
+        console.warn("handleDeleteChild - no rows deleted, might be RLS issue");
+      }
       
-      // Refresh profile to get updated children list
+      toast.success(`Otrok "${childName}" je bil uspešno izbrisan.`);
+      
+      // Zapri dialog in osveži profil
+      setDeletingChildIndex(null);
       await refreshProfile();
       
     } catch (error: any) {
-      console.error("Napaka pri brisanju otroka:", error);
-      toast.error("Napaka pri brisanju otroka. Poskusite znova.");
+      console.error("handleDeleteChild - error:", error);
+      toast.error("Napaka pri brisanju otroka: " + (error.message || "Poskusite znova."));
     } finally {
       setIsDeleting(false);
-      setDeletingChildIndex(null);
     }
   };
 
