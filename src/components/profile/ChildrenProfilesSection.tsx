@@ -1,17 +1,11 @@
-
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, ChevronDown, ChevronUp, RefreshCw, Star } from "lucide-react";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Users, Star } from "lucide-react";
 import { SimpleChildForm } from "@/components/profile/SimpleChildForm";
 import { ChildProfileDisplay } from "@/components/profile/ChildProfileDisplay";
-import { toast } from "sonner";
 
 type ChildrenProfilesSectionProps = {
-  isExpanded: boolean;
-  setIsExpanded: (expanded: boolean) => void;
   setEditingChildIndex: (index: number | null) => void;
   setDeletingChildIndex: (index: number | null) => void;
   setEditingDifficultiesIndex: (index: number | null) => void;
@@ -19,8 +13,6 @@ type ChildrenProfilesSectionProps = {
 };
 
 export function ChildrenProfilesSection({
-  isExpanded,
-  setIsExpanded,
   setEditingChildIndex,
   setDeletingChildIndex,
   setEditingDifficultiesIndex,
@@ -29,94 +21,76 @@ export function ChildrenProfilesSection({
   const { profile } = useAuth();
   const [showDatabaseManager, setShowDatabaseManager] = useState(false);
 
+  const hasNoChildren = !profile?.children || profile.children.length === 0;
+
   return (
-    <Collapsible open={isExpanded} onOpenChange={setIsExpanded} className="w-full">
-      <Card>
-        <CollapsibleTrigger asChild>
-          <CardHeader className="bg-gradient-to-r from-app-blue/10 to-dragon-green/10 flex flex-row items-center justify-between cursor-pointer hover:bg-gradient-to-r hover:from-app-blue/15 hover:to-dragon-green/15 transition-colors">
-            <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-app-blue" />
-              <CardTitle className="flex items-center gap-2">
-                Otroci ({profile?.children?.length || 0})
-                {(!profile?.children || profile.children.length === 0) && (
-                  <Star className="h-5 w-5 text-red-500 fill-red-500 animate-pulse" />
-                )}
-              </CardTitle>
-            </div>
-            <div className="flex items-center gap-1 text-app-blue">
-              {isExpanded ? (
-                <>
-                  <ChevronUp className="h-4 w-4" />
-                  <span className="hidden md:inline">Skrij otroke</span>
-                </>
-              ) : (
-                <>
-                  <ChevronDown className="h-4 w-4" />
-                  <span className="hidden md:inline">Prikaži otroke</span>
-                </>
+    <div className="bg-white rounded-lg shadow-sm border border-dragon-green/20 overflow-hidden">
+      {/* Header */}
+      <div className="bg-dragon-green text-white p-4">
+        <h2 className="text-xl font-semibold flex items-center gap-2">
+          <Users className="h-5 w-5" />
+          Otroci ({profile?.children?.length || 0})
+          {hasNoChildren && (
+            <Star className="h-5 w-5 text-yellow-300 fill-yellow-300 animate-pulse" />
+          )}
+        </h2>
+      </div>
+      
+      {/* Content */}
+      <div className="p-6">
+        <div className="space-y-6">
+          {/* Database manager - show only if no children exist */}
+          {hasNoChildren && (
+            <>
+              <div className="flex justify-between items-center">
+                <p className="text-sm text-muted-foreground">
+                  Dodajte profil otroka, da začnete uporabljati aplikacijo
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowDatabaseManager(!showDatabaseManager)}
+                  className="border-dragon-green text-dragon-green hover:bg-dragon-green/10"
+                >
+                  {showDatabaseManager ? "Skrij dodajanje" : "Dodaj otroka"}
+                </Button>
+              </div>
+
+              {showDatabaseManager && (
+                <SimpleChildForm onSuccess={() => {
+                  setShowDatabaseManager(false);
+                  window.location.reload();
+                }} />
               )}
-            </div>
-          </CardHeader>
-        </CollapsibleTrigger>
-        
-        <CollapsibleContent>
-          <CardContent className="pt-4">
+            </>
+          )}
+
+          {/* Child profiles display */}
+          {profile?.children && profile.children.length > 0 ? (
             <div className="space-y-6">
-
-              {/* Database manager - show only if no children exist */}
-              {(!profile?.children || profile.children.length === 0) && (
-                <>
-                  <div className="flex justify-between items-center">
-                    <p className="text-sm text-muted-foreground">
-                      Dodajte profil otroka, da začnete uporabljati aplikacijo
-                    </p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setShowDatabaseManager(!showDatabaseManager)}
-                      className="border-dragon-green text-dragon-green hover:bg-dragon-green/10"
-                    >
-                      {showDatabaseManager ? "Skrij dodajanje" : "Dodaj otroka"}
-                    </Button>
-                  </div>
-
-                  {showDatabaseManager && (
-                    <SimpleChildForm onSuccess={() => {
-                      setShowDatabaseManager(false);
-                      window.location.reload();
-                    }} />
-                  )}
-                </>
-              )}
-
-              {/* Child profiles display */}
-              {profile?.children && profile.children.length > 0 ? (
-                <div className="space-y-6">
-                  {profile.children.map((child, index) => (
-                    <ChildProfileDisplay
-                      key={child.id}
-                      child={child}
-                      onEdit={() => setEditingChildIndex(index)}
-                      onDelete={() => setDeletingChildIndex(index)}
-                      onRefresh={() => window.location.reload()}
-                      onEditDifficulties={() => setEditingDifficultiesIndex(index)}
-                      onEditDevelopment={() => setEditingDevelopmentIndex(index)}
-                    />
-                  ))}
-                </div>
-              ) : !showDatabaseManager && (
-                <div className="text-center py-8">
-                  <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium mb-2">Ni dodanih otrok</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Dodajte profil otroka, da začnete uporabljati aplikacijo.
-                  </p>
-                </div>
-              )}
+              {profile.children.map((child, index) => (
+                <ChildProfileDisplay
+                  key={child.id}
+                  child={child}
+                  onEdit={() => setEditingChildIndex(index)}
+                  onDelete={() => setDeletingChildIndex(index)}
+                  onRefresh={() => window.location.reload()}
+                  onEditDifficulties={() => setEditingDifficultiesIndex(index)}
+                  onEditDevelopment={() => setEditingDevelopmentIndex(index)}
+                />
+              ))}
             </div>
-          </CardContent>
-        </CollapsibleContent>
-      </Card>
-    </Collapsible>
+          ) : !showDatabaseManager && (
+            <div className="text-center py-8">
+              <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium mb-2">Ni dodanih otrok</h3>
+              <p className="text-muted-foreground mb-4">
+                Dodajte profil otroka, da začnete uporabljati aplikacijo.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
