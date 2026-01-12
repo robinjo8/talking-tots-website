@@ -106,15 +106,20 @@ export function ConfirmDialog({
               {cancelText}
             </Button>
           </AlertDialogCancel>
-          <Button 
-            variant={confirmVariant}
-            disabled={isLoading}
-            className="w-full sm:w-auto flex items-center gap-1 transition-all duration-150"
-            onClick={handleConfirm}
-          >
-            {isLoading ? "Nalaganje..." : confirmText}
-            {confirmIcon && !isLoading && confirmIcon}
-          </Button>
+          <AlertDialogAction asChild>
+            <Button 
+              variant={confirmVariant}
+              disabled={isLoading}
+              className="w-full sm:w-auto flex items-center gap-1 transition-all duration-150"
+              onClick={(e) => {
+                e.preventDefault();
+                onConfirm();
+              }}
+            >
+              {isLoading ? "Nalaganje..." : confirmText}
+              {confirmIcon && !isLoading && confirmIcon}
+            </Button>
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
