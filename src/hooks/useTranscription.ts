@@ -25,9 +25,9 @@ export const useTranscription = () => {
     setResult(null);
 
     try {
-      // Get user email for storage path
+      // Get user ID for storage path (new unified structure)
       const { data: { user } } = await supabase.auth.getUser();
-      const userEmail = user?.email;
+      const userId = user?.id;
 
       const { data, error: fnError } = await supabase.functions.invoke(
         "transcribe-articulation",
@@ -37,7 +37,7 @@ export const useTranscription = () => {
             targetWord,
             acceptedVariants,
             childId,
-            userEmail,
+            userId, // Changed from userEmail to userId
           },
         }
       );

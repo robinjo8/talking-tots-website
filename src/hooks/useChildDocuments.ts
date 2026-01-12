@@ -120,9 +120,9 @@ export function useChildDocuments(): UseChildDocumentsResult {
     storagePath: string
   ): Promise<boolean> => {
     try {
-      // Delete from storage first
+      // Delete from storage first - using unified bucket
       const { error: storageError } = await supabase.storage
-        .from('child-documents')
+        .from('uporabniski-profili')
         .remove([storagePath]);
 
       if (storageError) {
@@ -149,8 +149,9 @@ export function useChildDocuments(): UseChildDocumentsResult {
 
   const getDocumentUrl = useCallback(async (storagePath: string): Promise<string | null> => {
     try {
+      // Using unified bucket for signed URLs
       const { data, error } = await supabase.storage
-        .from('child-documents')
+        .from('uporabniski-profili')
         .createSignedUrl(storagePath, 3600); // 1 hour expiry
 
       if (error) throw error;
