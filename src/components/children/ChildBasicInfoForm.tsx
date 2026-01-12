@@ -1,22 +1,15 @@
 
-import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 import { AvatarSelector } from "@/components/AvatarSelector";
 import { GenderSelector } from "@/components/GenderSelector";
 
 type ChildBasicInfoFormProps = {
   name: string;
-  birthDate: Date | null;
   gender: string;
   avatarId: number;
   onNameChange: (name: string) => void;
-  onBirthDateChange: (date: Date | null) => void;
   onGenderChange: (gender: string) => void;
   onAvatarChange: (id: number) => void;
   onSubmit: (e: React.FormEvent) => void;
@@ -25,30 +18,21 @@ type ChildBasicInfoFormProps = {
 
 export function ChildBasicInfoForm({
   name,
-  birthDate,
   gender,
   avatarId,
   onNameChange,
-  onBirthDateChange,
   onGenderChange,
   onAvatarChange,
   onSubmit,
   title = "Dodaj novega otroka"
 }: ChildBasicInfoFormProps) {
-  const [calendarOpen, setCalendarOpen] = useState(false);
-
-  const handleDateSelect = (date: Date | undefined) => {
-    onBirthDateChange(date || null);
-    setCalendarOpen(false);
-  };
-
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <h3 className="text-lg font-medium mb-2">{title}</h3>
       
       <div className="space-y-4">
         <div>
-          <Label htmlFor="child-name">Ime otroka</Label>
+          <Label htmlFor="child-name">Ime otroka ali vzdevek</Label>
           <Input
             id="child-name"
             value={name}
@@ -57,32 +41,6 @@ export function ChildBasicInfoForm({
             className="mt-1"
             required
           />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="birth-date">Datum rojstva otroka</Label>
-          <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                id="birth-date"
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !birthDate && "text-muted-foreground"
-                )}
-              >
-                {birthDate ? format(birthDate, "dd.MM.yyyy") : "Izberite datum rojstva"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={birthDate ?? undefined}
-                onSelect={handleDateSelect}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
         </div>
         
         <GenderSelector 
