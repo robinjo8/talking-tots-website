@@ -30,7 +30,7 @@ export function DevelopmentQuestionItem({
       <RadioGroup
         value={selectedValue}
         onValueChange={(value) => onValueChange(id, value)}
-        className="space-y-2"
+        className="flex flex-row gap-4"
       >
         {options.map((option) => (
           <div key={option.value} className="flex items-center space-x-2">
