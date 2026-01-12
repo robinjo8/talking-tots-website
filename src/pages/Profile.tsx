@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import Header from "@/components/Header";
+import { useBannerVisible } from "@/components/MissingChildBanner";
 import { DeleteChildDialog } from "@/components/DeleteChildDialog";
 import { EditChildModal } from "@/components/EditChildModal";
 import { SpeechDifficultyEditor } from "@/components/SpeechDifficultyEditor";
@@ -17,6 +18,7 @@ import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
 import { ProfileMobileTabs } from "@/components/profile/ProfileMobileTabs";
 
 export default function Profile() {
+  const bannerVisible = useBannerVisible();
   const { user, profile } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -104,7 +106,11 @@ export default function Profile() {
     <div className="min-h-screen bg-gray-50">
       <Header />
       
-      <div className="container max-w-6xl mx-auto pt-24 md:pt-32 pb-20 px-4">
+      <div className={`container max-w-6xl mx-auto pb-20 px-4 ${
+        bannerVisible 
+          ? 'pt-36 md:pt-44' 
+          : 'pt-24 md:pt-32'
+      }`}>
         
         {/* Mobile tabs */}
         <div className="md:hidden mb-6">

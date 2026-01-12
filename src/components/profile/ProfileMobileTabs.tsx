@@ -27,7 +27,7 @@ export function ProfileMobileTabs({ activeSection, setActiveSection, childrenCou
   
   return (
     <Select value={activeSection} onValueChange={setActiveSection}>
-      <SelectTrigger className="w-full bg-white border-dragon-green/30 focus:ring-dragon-green">
+      <SelectTrigger className="w-full bg-white border border-dragon-green/30 focus:ring-dragon-green shadow-sm">
         <div className="flex items-center gap-2">
           <ActiveIcon className="h-4 w-4 text-dragon-green" />
           <SelectValue>
@@ -36,7 +36,7 @@ export function ProfileMobileTabs({ activeSection, setActiveSection, childrenCou
           </SelectValue>
         </div>
       </SelectTrigger>
-      <SelectContent className="bg-white z-50">
+      <SelectContent className="bg-white border border-gray-200 shadow-lg z-[100]">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           return (
