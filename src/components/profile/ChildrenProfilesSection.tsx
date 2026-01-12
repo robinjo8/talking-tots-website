@@ -40,33 +40,33 @@ export function ChildrenProfilesSection({
       <div className="p-6">
         <div className="space-y-6">
           {/* Database manager - show only if no children exist */}
-          {hasNoChildren && (
-            <>
-              <div className="flex justify-between items-center">
-                <p className="text-sm text-muted-foreground">
-                  Dodajte profil otroka, da začnete uporabljati aplikacijo
-                </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowDatabaseManager(!showDatabaseManager)}
-                  className="border-dragon-green text-dragon-green hover:bg-dragon-green/10"
-                >
-                  {showDatabaseManager ? "Skrij dodajanje" : "Dodaj otroka"}
-                </Button>
-              </div>
+          {hasNoChildren && !showDatabaseManager && (
+            <div className="text-center py-8">
+              <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium mb-2">Ni dodanih otrok</h3>
+              <p className="text-muted-foreground mb-4">
+                Dodajte profil otroka, da začnete uporabljati aplikacijo.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowDatabaseManager(true)}
+                className="border-red-500 text-red-500 hover:bg-red-50"
+              >
+                Dodaj otroka
+              </Button>
+            </div>
+          )}
 
-              {showDatabaseManager && (
-                <SimpleChildForm onSuccess={() => {
-                  setShowDatabaseManager(false);
-                  window.location.reload();
-                }} />
-              )}
-            </>
+          {hasNoChildren && showDatabaseManager && (
+            <SimpleChildForm onSuccess={() => {
+              setShowDatabaseManager(false);
+              window.location.reload();
+            }} />
           )}
 
           {/* Child profiles display */}
-          {profile?.children && profile.children.length > 0 ? (
+          {profile?.children && profile.children.length > 0 && (
             <div className="space-y-6">
               {profile.children.map((child, index) => (
                 <ChildProfileDisplay
@@ -79,14 +79,6 @@ export function ChildrenProfilesSection({
                   onEditDevelopment={() => setEditingDevelopmentIndex(index)}
                 />
               ))}
-            </div>
-          ) : !showDatabaseManager && (
-            <div className="text-center py-8">
-              <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-medium mb-2">Ni dodanih otrok</h3>
-              <p className="text-muted-foreground mb-4">
-                Dodajte profil otroka, da začnete uporabljati aplikacijo.
-              </p>
             </div>
           )}
         </div>
