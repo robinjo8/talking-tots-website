@@ -1,5 +1,11 @@
-import { User, Users, CircleDollarSign, CreditCard, Shield } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { User, Users, CircleDollarSign, CreditCard, Shield, ChevronDown } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type ProfileMobileTabsProps = {
   activeSection: string;
@@ -8,41 +14,44 @@ type ProfileMobileTabsProps = {
 };
 
 const tabs = [
-  { id: "userProfile", label: "Profil", icon: User },
+  { id: "userProfile", label: "Moj profil", icon: User },
   { id: "children", label: "Otroci", icon: Users, showCount: true },
   { id: "subscription", label: "Naročnina", icon: CircleDollarSign },
-  { id: "paymentMethods", label: "Plačila", icon: CreditCard },
-  { id: "passwordChange", label: "Geslo", icon: Shield },
+  { id: "paymentMethods", label: "Plačilne metode", icon: CreditCard },
+  { id: "passwordChange", label: "Spremeni geslo", icon: Shield },
 ];
 
 export function ProfileMobileTabs({ activeSection, setActiveSection, childrenCount }: ProfileMobileTabsProps) {
+  const activeTab = tabs.find(tab => tab.id === activeSection);
+  const ActiveIcon = activeTab?.icon || User;
+  
   return (
-    <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
-      <div className="flex gap-2 pb-2 min-w-max">
+    <Select value={activeSection} onValueChange={setActiveSection}>
+      <SelectTrigger className="w-full bg-white border-dragon-green/30 focus:ring-dragon-green">
+        <div className="flex items-center gap-2">
+          <ActiveIcon className="h-4 w-4 text-dragon-green" />
+          <SelectValue>
+            {activeTab?.label}
+            {activeTab?.showCount && ` (${childrenCount})`}
+          </SelectValue>
+        </div>
+      </SelectTrigger>
+      <SelectContent className="bg-white z-50">
         {tabs.map((tab) => {
           const Icon = tab.icon;
-          const isActive = activeSection === tab.id;
-          
           return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveSection(tab.id)}
-              className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap",
-                isActive 
-                  ? "bg-dragon-green text-white" 
-                  : "bg-gray-100 text-gray-700 hover:bg-dragon-green/10"
-              )}
-            >
-              <Icon className="h-4 w-4" />
-              <span>
-                {tab.label}
-                {tab.showCount && ` (${childrenCount})`}
-              </span>
-            </button>
+            <SelectItem key={tab.id} value={tab.id} className="cursor-pointer">
+              <div className="flex items-center gap-2">
+                <Icon className="h-4 w-4 text-dragon-green" />
+                <span>
+                  {tab.label}
+                  {tab.showCount && ` (${childrenCount})`}
+                </span>
+              </div>
+            </SelectItem>
           );
         })}
-      </div>
-    </div>
+      </SelectContent>
+    </Select>
   );
 }
