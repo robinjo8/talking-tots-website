@@ -101,7 +101,10 @@ Kakšna je otrokova odzivnost? Se rad pogovarja, je zadržan, se jezi, če ga ne
 
         <div className="space-y-6">
           <p className="text-sm text-gray-700 leading-relaxed">
-            Ta razdelek predstavlja prvi stik in oceno otrokovih težav. Zelo pomembno je, da čim bolj natančno opišete, s katerimi glasovi ima otrok težave, saj bo aplikacija na podlagi teh informacij predlagala ustrezne vaje in igre. Če niste prepričani, lahko označite možnost »Nisem prepričan/a« ali »Ne vem« – vseeno pa vam priporočamo, da v spodnjem polju čim bolj podrobno opišete otrokove težave.
+            Veseli nas, da ste se odločili oddati profil svojega otroka, saj bomo le na ta način lahko skupaj strokovno, ciljno in usmerjeno načrtovali ter vodili otroka skozi njegov govorno-jezikovni razvojni proces.
+          </p>
+          <p className="text-sm text-gray-700 leading-relaxed">
+            Ta razdelek predstavlja prvi stik in začetno oceno otrokovih težav. Zelo pomembno je, da čim bolj natančno opišete, s katerimi glasovi ima otrok težave, saj bo aplikacija na podlagi teh informacij predlagala ustrezne vaje in igre. Če niste povsem prepričani, lahko izberete možnost »Nisem prepričan/a« oziroma »Ne vem«, kljub temu pa vam priporočamo, da v spodnjem polju po svojih najboljših močeh in čim bolj podrobno opišete opažene otrokove govorne težave.
           </p>
 
           <div className="flex items-start space-x-3">
@@ -184,25 +187,23 @@ Kakšna je otrokova odzivnost? Se rad pogovarja, je zadržan, se jezi, če ga ne
           </div>
         </div>
 
-        <Button
-          type="button"
-          onClick={handleSubmit}
-          disabled={!canSubmit}
-          className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {submitButtonText}
-        </Button>
-        
-        <Button 
-          type="button" 
-          variant="outline" 
-          size="sm" 
-          onClick={onBack}
-          className="w-full flex items-center gap-1"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Nazaj
-        </Button>
+        <div className="flex justify-between pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onBack}
+          >
+            Nazaj
+          </Button>
+          <Button
+            type="button"
+            onClick={handleSubmit}
+            disabled={!canSubmit}
+            className="bg-dragon-green hover:bg-dragon-green/90 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {submitButtonText}
+          </Button>
+        </div>
       </div>
     </TooltipProvider>
   );
