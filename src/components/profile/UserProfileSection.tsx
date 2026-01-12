@@ -130,19 +130,35 @@ export function UserProfileSection() {
                 Osnovni podatki
               </h3>
               
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Ime in priimek:</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Ime in priimek" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid gap-4 sm:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Ime:</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Ime" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Priimek:</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Priimek" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               
               <div className="space-y-2">
                 <Label htmlFor="email">E-pošta:</Label>
@@ -193,36 +209,6 @@ export function UserProfileSection() {
                 <Home className="h-4 w-4 text-dragon-green" />
                 Naslov (neobvezno)
               </h3>
-              
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="firstName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Ime:</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Ime" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="lastName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Priimek:</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Priimek" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
               
               <FormField
                 control={form.control}
