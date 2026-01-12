@@ -19,7 +19,7 @@ import { ProfileMobileTabs } from "@/components/profile/ProfileMobileTabs";
 
 export default function Profile() {
   const bannerVisible = useBannerVisible();
-  const { user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   
@@ -79,9 +79,7 @@ export default function Profile() {
       toast.success(`Otrok "${childToDelete.name}" je bil uspešno izbrisan.`);
       
       // Refresh profile to get updated children list
-      if (window.location.pathname === '/profile') {
-        window.location.reload();
-      }
+      await refreshProfile();
       
     } catch (error: any) {
       console.error("Napaka pri brisanju otroka:", error);
