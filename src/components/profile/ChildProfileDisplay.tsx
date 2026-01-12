@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { UserRound, Pencil, Trash2, ChevronDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { SPEECH_DEVELOPMENT_QUESTIONS } from "@/models/SpeechDevelopment";
+import { SPEECH_DEVELOPMENT_QUESTIONS, SPEECH_DEVELOPMENT_TEXT_QUESTIONS } from "@/models/SpeechDevelopment";
 import { ChildProfile } from "@/contexts/AuthContext";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
@@ -235,16 +235,31 @@ export function ChildProfileDisplay({
             <div className="px-4 pb-4 pt-0">
               {child.speechDevelopment && Object.keys(child.speechDevelopment).length > 0 ? (
                 <div className="space-y-3">
+                  {/* Radio questions */}
                   {Object.entries(child.speechDevelopment).map(([questionId, answer]) => {
                     const question = SPEECH_DEVELOPMENT_QUESTIONS.find(q => q.id === questionId);
-                    const option = question?.options.find(opt => opt.value === answer);
+                    if (!question) return null;
                     
-                    if (!question || !option) return null;
+                    const option = question.options.find(opt => opt.value === answer);
+                    if (!option) return null;
                     
                     return (
                       <div key={questionId}>
                         <p className="text-sm text-muted-foreground">{question.question}</p>
                         <p className="text-sm text-dragon-green font-medium mt-0.5">→ {option.label}</p>
+                      </div>
+                    );
+                  })}
+                  
+                  {/* Text questions */}
+                  {SPEECH_DEVELOPMENT_TEXT_QUESTIONS.map((textQuestion) => {
+                    const answer = child.speechDevelopment?.[textQuestion.id];
+                    if (!answer) return null;
+                    
+                    return (
+                      <div key={textQuestion.id}>
+                        <p className="text-sm text-muted-foreground">{textQuestion.question}</p>
+                        <p className="text-sm text-dragon-green font-medium mt-0.5">→ {answer}</p>
                       </div>
                     );
                   })}
