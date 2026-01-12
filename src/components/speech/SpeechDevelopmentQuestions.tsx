@@ -7,7 +7,6 @@ import {
   SPEECH_DEVELOPMENT_QUESTIONS, 
   SPEECH_DEVELOPMENT_TEXT_QUESTIONS 
 } from "@/models/SpeechDevelopment";
-import { ArrowLeft } from "lucide-react";
 
 interface SpeechDevelopmentQuestionsProps {
   onBack: () => void;
@@ -163,25 +162,24 @@ export function SpeechDevelopmentQuestions({
         )}
       </div>
 
-      <Button
-        type="button"
-        onClick={handleSubmit}
-        disabled={!isFormValid}
-        className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6 disabled:opacity-50"
-      >
-        Naprej
-      </Button>
-      
-      <Button 
-        type="button" 
-        variant="outline" 
-        size="sm" 
-        onClick={onBack}
-        className="w-full flex items-center gap-1"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Nazaj
-      </Button>
+      <div className="flex justify-between pt-4">
+        <Button 
+          type="button" 
+          variant="outline" 
+          onClick={onBack}
+        >
+          Nazaj
+        </Button>
+
+        <Button
+          type="button"
+          onClick={handleSubmit}
+          disabled={!isFormValid}
+          className="bg-dragon-green hover:bg-dragon-green/90 disabled:opacity-50"
+        >
+          Naprej
+        </Button>
+      </div>
 
       <Button 
         type="button" 
