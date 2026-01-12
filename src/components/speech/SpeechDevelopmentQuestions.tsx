@@ -162,11 +162,12 @@ export function SpeechDevelopmentQuestions({
         )}
       </div>
 
-      <div className="flex justify-between pt-4">
+      <div className="flex flex-row justify-between gap-4 pt-4">
         <Button 
           type="button" 
           variant="outline" 
           onClick={onBack}
+          className="flex-1"
         >
           Nazaj
         </Button>
@@ -175,7 +176,7 @@ export function SpeechDevelopmentQuestions({
           type="button"
           onClick={handleSubmit}
           disabled={!isFormValid}
-          className="bg-dragon-green hover:bg-dragon-green/90 disabled:opacity-50"
+          className="flex-1 bg-dragon-green hover:bg-dragon-green/90 disabled:opacity-50"
         >
           Naprej
         </Button>
