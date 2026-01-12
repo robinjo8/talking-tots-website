@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -74,6 +74,11 @@ export function AddChildForm({ onSuccess, onBack: onBackProp, initialName, initi
   const [savedChildren, setSavedChildren] = useState<SavedChild[]>([]);
   
   const { uploadDocument } = useChildDocuments();
+
+  // Scroll to top when step changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentStep]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
