@@ -7,6 +7,7 @@ import { SpeechDifficultiesStep, SpeechDevelopmentQuestions } from "@/components
 import { ChildBasicInfoForm } from "./children/ChildBasicInfoForm";
 import { ChildCompletedView } from "./children/ChildCompletedView";
 import { ChildProfile } from "@/hooks/registration/types";
+import { calculateAge } from "@/utils/childUtils";
 
 enum AddChildStep {
   BASIC_INFO,
@@ -18,9 +19,10 @@ enum AddChildStep {
 interface SavedChild {
   id: string;
   name: string;
-  gender: "M" | "F" | "N"; // Update to match supported gender values
+  gender: "M" | "F" | "N";
   avatarId: number;
   birthDate: Date | null;
+  age: number;
   speechDifficulties: string[];
   speechDevelopment: Record<string, string>;
 }
@@ -64,12 +66,15 @@ export function AddChildForm({ onSuccess, initialName, initialBirthDate }: { onS
       
       // Save the child's information temporarily with an id
       const newChildId = crypto.randomUUID();
+      const calculatedAge = calculateAge(birthDate);
+      
       const newChild: SavedChild = {
         id: newChildId,
         name: name.trim(),
-        gender: gender as "M" | "F" | "N", // Cast to appropriate type
+        gender: gender as "M" | "F" | "N",
         avatarId,
         birthDate,
+        age: calculatedAge,
         speechDifficulties,
         speechDevelopment: developmentAnswers
       };
@@ -85,13 +90,14 @@ export function AddChildForm({ onSuccess, initialName, initialBirthDate }: { onS
       const currentMetadata = currentUser.user_metadata || {};
       const currentChildren = currentMetadata.children || [];
       
-      // Add new child
+      // Add new child with calculated age
       const updatedChildren = [...currentChildren, {
         id: newChildId,
         name: name.trim(),
         gender,
         avatarId,
         birthDate: birthDate ? birthDate.toISOString() : null,
+        age: calculatedAge,
         speechDifficulties,
         speechDevelopment: developmentAnswers
       }];
