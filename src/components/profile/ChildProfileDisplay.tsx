@@ -1,16 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { UserRound, Pencil, Trash2, FileEdit, Calendar, MessageSquare, FileText, Download, Shield, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { UserRound, Pencil, Trash2, MessageSquare } from "lucide-react";
 import { SpeechDifficultiesList } from "@/components/SpeechDifficultiesList";
 import { Badge } from "@/components/ui/badge";
 import { SPEECH_DEVELOPMENT_QUESTIONS } from "@/models/SpeechDevelopment";
 import { ChildProfile } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { useChildDocuments } from "@/hooks/useChildDocuments";
 
 type ChildProfileDisplayProps = {
   child: ChildProfile;
@@ -22,7 +18,6 @@ type ChildProfileDisplayProps = {
 };
 
 const getAvatarSrc = (avatarId: number): string => {
-  // Import the exact same mapping from AvatarSelector for consistency
   const avatarImages = [
     "", // id 0 - no avatar
     "/lovable-uploads/39972aa5-2794-48d3-b767-cdab94ecc722.png", // id 1
@@ -53,27 +48,7 @@ export function ChildProfileDisplay({
   onEditDifficulties,
   onEditDevelopment,
 }: ChildProfileDisplayProps) {
-  const [isEditingDescription, setIsEditingDescription] = useState(false);
-  const [editingDescription, setEditingDescription] = useState(child.speechDifficultiesDescription || "");
-  const [isSavingDescription, setIsSavingDescription] = useState(false);
-  const [documents, setDocuments] = useState<any[]>([]);
-  const [loadingDocuments, setLoadingDocuments] = useState(false);
-  
-  const { fetchDocuments, deleteDocument, getDocumentUrl } = useChildDocuments();
-  
-  // Use avatar_url from database if available, otherwise derive from avatarId
   const avatarSrc = child.avatarUrl || getAvatarSrc(child.avatarId);
-  
-  // Fetch documents on mount
-  useEffect(() => {
-    if (child.id) {
-      setLoadingDocuments(true);
-      fetchDocuments(child.id).then(docs => {
-        setDocuments(docs);
-        setLoadingDocuments(false);
-      });
-    }
-  }, [child.id, fetchDocuments]);
   
   const formatGender = (gender: string) => {
     switch (gender) {
@@ -95,116 +70,69 @@ export function ChildProfileDisplay({
     return age;
   };
 
-  const formatDate = (date: Date | null): string => {
-    if (!date) return "Ni določeno";
-    return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
-  };
-
-  const handleSaveDescription = async () => {
-    try {
-      setIsSavingDescription(true);
-      
-      const { data: userData, error: userError } = await supabase.rpc('get_auth_user_data');
-      
-      if (userError) throw userError;
-      
-      const currentChildren = [...((userData as any).children || [])];
-      
-      if (currentChildren.length > 0) {
-        currentChildren[0] = {
-          ...currentChildren[0],
-          speechDifficultiesDescription: editingDescription.trim()
-        };
-        
-        const { error: updateError } = await supabase.auth.updateUser({
-          data: { children: currentChildren }
-        });
-        
-        if (updateError) throw updateError;
-        
-        setIsEditingDescription(false);
-        toast.success("Opis uspešno posodobljen!");
-        
-        if (onRefresh) onRefresh();
-      }
-    } catch (error: any) {
-      console.error("Napaka pri posodobitvi opisa:", error);
-      toast.error("Napaka pri posodobitvi opisa. Poskusite znova.");
-    } finally {
-      setIsSavingDescription(false);
-    }
-  };
-
   return (
     <div className="w-full space-y-6">
-      {/* Top section: Child info and action buttons */}
+      {/* Top section: Child info - centered layout like reference image */}
       <Card className="w-full">
         <CardContent className="p-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            {/* Left side: Avatar and basic info */}
-            <div className="flex items-center gap-4">
-              {child.avatarId === 0 ? (
-                <div className="h-20 w-20 rounded-full flex items-center justify-center bg-gray-100 border-2 border-gray-200">
-                  <UserRound className="h-10 w-10 text-gray-400" />
-                </div>
-              ) : (
-                <Avatar className="h-20 w-20 border-2 border-dragon-green/20">
-                  <AvatarImage 
-                    src={avatarSrc} 
-                    alt={`Avatar za ${child.name}`} 
-                    className="object-contain" 
-                  />
-                  <AvatarFallback className="bg-gradient-to-br from-app-blue/20 to-app-purple/20 text-lg font-bold">
-                    {child.name[0]}
-                  </AvatarFallback>
-                </Avatar>
-              )}
-              
-              <div className="space-y-2">
-                <h4 className="text-2xl font-semibold text-dragon-green">{child.name}</h4>
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                  <p className="text-sm text-muted-foreground flex items-center gap-2">
-                    <span className={`inline-block w-3 h-3 rounded-full ${
-                      child.gender === "M" ? "bg-app-blue" : 
-                      (child.gender === "F" || child.gender === "Ž") ? "bg-app-orange" : 
-                      "bg-gray-400"
-                    }`}></span>
-                    {formatGender(child.gender)}
-                  </p>
-                  {child.birthDate && (
-                    <p className="text-sm text-muted-foreground flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
-                      {calculateAge(child.birthDate)} let ({formatDate(child.birthDate)})
-                    </p>
-                  )}
-                </div>
+          {/* Action buttons - top right */}
+          <div className="flex justify-end gap-2 mb-4">
+            {onEdit && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={onEdit}
+                className="h-9 w-9 text-muted-foreground hover:text-dragon-green hover:bg-dragon-green/10"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            )}
+            {onDelete && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={onDelete}
+                className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+          
+          {/* Centered avatar and info */}
+          <div className="flex flex-col items-center text-center">
+            {child.avatarId === 0 ? (
+              <div className="h-24 w-24 rounded-full flex items-center justify-center bg-gray-100 border-2 border-gray-200">
+                <UserRound className="h-12 w-12 text-gray-400" />
               </div>
-            </div>
+            ) : (
+              <Avatar className="h-24 w-24 border-2 border-dragon-green/20">
+                <AvatarImage 
+                  src={avatarSrc} 
+                  alt={`Avatar za ${child.name}`} 
+                  className="object-contain" 
+                />
+                <AvatarFallback className="bg-gradient-to-br from-dragon-green/20 to-dragon-green/10 text-lg font-bold">
+                  {child.name[0]}
+                </AvatarFallback>
+              </Avatar>
+            )}
             
-            {/* Right side: Action buttons */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              {onEdit && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={onEdit}
-                  className="border-app-blue text-app-blue hover:bg-app-blue/10"
-                >
-                  <Pencil className="h-4 w-4 mr-2" />
-                  Uredi
-                </Button>
-              )}
-              
-              {onDelete && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={onDelete}
-                  className="border-destructive text-destructive hover:bg-destructive/10"
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Izbriši
-                </Button>
+            <h4 className="text-2xl font-semibold text-dragon-green mt-4">{child.name}</h4>
+            
+            <div className="flex items-center gap-4 mt-2 text-muted-foreground">
+              <span className="flex items-center gap-2">
+                <span className={`inline-block w-2.5 h-2.5 rounded-full ${
+                  child.gender === "M" ? "bg-blue-500" : 
+                  (child.gender === "F" || child.gender === "Ž") ? "bg-pink-500" : 
+                  "bg-gray-400"
+                }`} />
+                {formatGender(child.gender)}
+              </span>
+              {child.birthDate && (
+                <span>
+                  {calculateAge(child.birthDate)} let
+                </span>
               )}
             </div>
           </div>
@@ -217,39 +145,42 @@ export function ChildProfileDisplay({
         <Card className="h-fit">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h5 className="font-semibold text-lg text-gray-800 flex items-center gap-2">
-                <FileEdit className="h-5 w-5 text-app-purple" />
+              <h5 className="font-semibold text-lg text-dragon-green">
                 Govorne težave
               </h5>
               {onEditDifficulties && (
                 <Button
-                  variant="outline"
-                  size="sm"
+                  variant="ghost"
+                  size="icon"
                   onClick={onEditDifficulties}
-                  className="border-app-purple text-app-purple hover:bg-app-purple/10"
+                  className="h-8 w-8 text-muted-foreground hover:text-dragon-green hover:bg-dragon-green/10"
                 >
-                  <Pencil className="h-3 w-3 mr-1" />
-                  Uredi
+                  <Pencil className="h-4 w-4" />
                 </Button>
               )}
             </div>
             
             {child.speechDifficulties && child.speechDifficulties.length > 0 ? (
               <div className="space-y-3">
-                <SpeechDifficultiesList 
-                  difficultiesIds={child.speechDifficulties} 
-                  showDescription={true}
-                />
+                <div className="flex flex-wrap gap-2">
+                  {child.speechDifficulties.map((difficultyId, index) => (
+                    <Badge 
+                      key={index} 
+                      className="bg-dragon-green/10 text-dragon-green border-dragon-green/20 hover:bg-dragon-green/20"
+                    >
+                      {difficultyId}
+                    </Badge>
+                  ))}
+                </div>
                 
                 {child.speechDifficultiesDescription && (
-                  <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                    <p className="text-sm font-medium text-gray-700 mb-2">Dodaten opis:</p>
-                    <p className="text-sm text-gray-600">{child.speechDifficultiesDescription}</p>
-                  </div>
+                  <p className="text-sm text-muted-foreground mt-3">
+                    {child.speechDifficultiesDescription}
+                  </p>
                 )}
               </div>
             ) : (
-              <p className="text-gray-500 text-sm italic">
+              <p className="text-muted-foreground text-sm">
                 Ni zabeleženih govornih motenj
               </p>
             )}
@@ -260,30 +191,30 @@ export function ChildProfileDisplay({
         <Card className="h-fit">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h5 className="font-semibold text-lg text-gray-800 flex items-center gap-2">
-                <MessageSquare className="h-5 w-5 text-app-blue" />
-                Osnovni vprašalnik
+              <div className="flex items-center gap-2">
+                <h5 className="font-semibold text-lg text-gray-900">
+                  Osnovni vprašalnik
+                </h5>
                 {child.isComplete && (
-                  <Badge variant="default" className="text-xs bg-dragon-green text-white ml-2">
+                  <Badge className="bg-dragon-green text-white text-xs">
                     Izpolnjeno
                   </Badge>
                 )}
-              </h5>
+              </div>
               {onEditDevelopment && (
                 <Button
-                  variant="outline"
-                  size="sm"
+                  variant="ghost"
+                  size="icon"
                   onClick={onEditDevelopment}
-                  className="border-app-blue text-app-blue hover:bg-app-blue/10"
+                  className="h-8 w-8 text-muted-foreground hover:text-dragon-green hover:bg-dragon-green/10"
                 >
-                  <Pencil className="h-3 w-3 mr-1" />
-                  Uredi
+                  <Pencil className="h-4 w-4" />
                 </Button>
               )}
             </div>
             
             {child.speechDevelopment && Object.keys(child.speechDevelopment).length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {Object.entries(child.speechDevelopment).map(([questionId, answer]) => {
                   const question = SPEECH_DEVELOPMENT_QUESTIONS.find(q => q.id === questionId);
                   const option = question?.options.find(opt => opt.value === answer);
@@ -291,81 +222,21 @@ export function ChildProfileDisplay({
                   if (!question || !option) return null;
                   
                   return (
-                    <div key={questionId} className="p-3 bg-gray-50 rounded-lg">
-                      <p className="text-sm font-medium text-gray-700 mb-1">{question.question}</p>
-                      <p className="text-sm text-gray-600 pl-3">→ {option.label}</p>
+                    <div key={questionId}>
+                      <p className="text-sm font-medium text-gray-700">{question.question}</p>
+                      <p className="text-sm text-dragon-green mt-1">→ {option.label}</p>
                     </div>
                   );
                 })}
               </div>
             ) : (
-              <p className="text-gray-500 text-sm italic">
+              <p className="text-muted-foreground text-sm">
                 Osnovni vprašalnik ni bil izpolnjen
               </p>
             )}
           </CardContent>
         </Card>
       </div>
-
-      {/* Documents section */}
-      {documents.length > 0 && (
-        <Card className="h-fit">
-          <CardContent className="p-6">
-            <h5 className="font-semibold text-lg text-gray-800 flex items-center gap-2 mb-4">
-              <FileText className="h-5 w-5 text-dragon-green" />
-              Naloženi dokumenti
-            </h5>
-            <div className="space-y-2">
-              {documents.map((doc) => (
-                <div key={doc.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <FileText className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <p className="text-sm font-medium">{doc.original_filename}</p>
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        {doc.virus_scan_status === 'clean' && (
-                          <span className="flex items-center gap-1 text-dragon-green">
-                            <CheckCircle2 className="h-3 w-3" /> Preverjeno
-                          </span>
-                        )}
-                        {doc.virus_scan_status === 'pending' && (
-                          <span className="flex items-center gap-1 text-amber-500">
-                            <Loader2 className="h-3 w-3 animate-spin" /> V pregledu
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={async () => {
-                        const url = await getDocumentUrl(doc.storage_path);
-                        if (url) window.open(url, '_blank');
-                      }}
-                    >
-                      <Download className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-destructive hover:text-destructive"
-                      onClick={async () => {
-                        if (await deleteDocument(doc.id, doc.storage_path)) {
-                          setDocuments(prev => prev.filter(d => d.id !== doc.id));
-                        }
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }

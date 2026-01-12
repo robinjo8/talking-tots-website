@@ -217,8 +217,14 @@ Deno.serve(async (req) => {
     let virusScanStatus = 'pending';
     let virusScanResult: any = null;
 
+    // Skip virus scan for text files - they don't need it
+    if (file.type === 'text/plain') {
+      virusScanStatus = 'clean';
+      virusScanResult = { skippedReason: 'text_file', scannedAt: new Date().toISOString() };
+      console.log('Text file - skipping virus scan, marking as clean');
+    }
     // VirusTotal scan for PDF files
-    if (virusTotalApiKey && file.type === 'application/pdf') {
+    else if (virusTotalApiKey && file.type === 'application/pdf') {
       try {
         console.log('Starting VirusTotal scan...');
         
