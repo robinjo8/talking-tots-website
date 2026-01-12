@@ -5,18 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { ChevronDown, ChevronUp, User, Mail, Phone, Home, MapPin } from "lucide-react";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { User, Mail, Phone, Home } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-type UserProfileSectionProps = {
-  isExpanded: boolean;
-  setIsExpanded: (expanded: boolean) => void;
-};
+
 const personalDataSchema = z.object({
   username: z.string().min(1, "Uporabniško ime je obvezno").optional(),
   email: z.string().email("Vnesi veljaven email naslov").optional(),
@@ -28,16 +23,13 @@ const personalDataSchema = z.object({
   country: z.string().optional(),
   postalCode: z.string().optional()
 });
+
 type PersonalDataFormValues = z.infer<typeof personalDataSchema>;
-export function UserProfileSection({
-  isExpanded,
-  setIsExpanded
-}: UserProfileSectionProps) {
-  const {
-    user,
-    profile
-  } = useAuth();
+
+export function UserProfileSection() {
+  const { user, profile } = useAuth();
   const [isUpdating, setIsUpdating] = useState(false);
+  
   const form = useForm<PersonalDataFormValues>({
     resolver: zodResolver(personalDataSchema),
     defaultValues: {
@@ -58,14 +50,17 @@ export function UserProfileSection({
     const loadUserData = async () => {
       if (!user) return;
       try {
-        const {
-          data,
-          error
-        } = await supabase.from("profiles").select("username, phone, first_name, last_name, address, city, country, postal_code").eq("id", user.id).single();
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("username, phone, first_name, last_name, address, city, country, postal_code")
+          .eq("id", user.id)
+          .single();
+          
         if (error) {
           console.error("Napaka pri nalaganju podatkov:", error);
           return;
         }
+        
         if (data) {
           form.reset({
             username: data.username || "",
@@ -85,22 +80,25 @@ export function UserProfileSection({
     };
     loadUserData();
   }, [user, form, profile]);
+
   const onSubmit = async (values: PersonalDataFormValues) => {
     if (!user) return;
     try {
       setIsUpdating(true);
-      const {
-        error
-      } = await supabase.from("profiles").update({
-        username: values.username,
-        phone: values.phone,
-        first_name: values.firstName,
-        last_name: values.lastName,
-        address: values.address,
-        city: values.city,
-        country: values.country,
-        postal_code: values.postalCode
-      }).eq("id", user.id);
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          username: values.username,
+          phone: values.phone,
+          first_name: values.firstName,
+          last_name: values.lastName,
+          address: values.address,
+          city: values.city,
+          country: values.country,
+          postal_code: values.postalCode
+        })
+        .eq("id", user.id);
+        
       if (error) throw error;
       toast.success("Podatki uspešno posodobljeni");
     } catch (error: any) {
@@ -110,166 +108,198 @@ export function UserProfileSection({
       setIsUpdating(false);
     }
   };
-  return <Collapsible open={isExpanded} onOpenChange={setIsExpanded} className="w-full">
-      <Card>
-        <CollapsibleTrigger asChild>
-          <CardHeader className="bg-gradient-to-r from-dragon-green/10 to-app-blue/10 flex flex-row items-center justify-between cursor-pointer hover:bg-gradient-to-r hover:from-dragon-green/15 hover:to-app-blue/15 transition-colors">
-            <div className="flex items-center gap-2">
-              <User className="h-5 w-5 text-dragon-green" />
-              <CardTitle>Moj profil</CardTitle>
+
+  return (
+    <div className="bg-white rounded-lg shadow-sm border border-dragon-green/20 overflow-hidden">
+      {/* Header */}
+      <div className="bg-dragon-green text-white p-4">
+        <h2 className="text-xl font-semibold flex items-center gap-2">
+          <User className="h-5 w-5" />
+          Moj profil
+        </h2>
+      </div>
+      
+      {/* Content */}
+      <div className="p-6">
+        <p className="text-sm text-muted-foreground mb-6">
+          Prosto lahko urediš svoje podatke spodaj.
+        </p>
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* Osnovni podatki */}
+            <div className="space-y-4">
+              <h3 className="text-md font-medium flex items-center gap-2">
+                <User className="h-4 w-4 text-dragon-green" />
+                Osnovni podatki
+              </h3>
+              
+              <div className="space-y-2">
+                <Label htmlFor="email">E-pošta:</Label>
+                <Input 
+                  id="email" 
+                  type="email" 
+                  value={user?.email || ""} 
+                  readOnly 
+                  className="bg-gray-50" 
+                />
+                <p className="text-xs text-muted-foreground">
+                  Email naslov ni mogoče spremeniti
+                </p>
+              </div>
+              
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Uporabniško ime:</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Uporabniško ime" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-            <div className="flex items-center gap-1 text-dragon-green">
-              {isExpanded ? <>
-                  <ChevronUp className="h-4 w-4" />
-                  <span className="hidden md:inline">Skrij podrobnosti</span>
-                </> : <>
-                  <ChevronDown className="h-4 w-4" />
-                  <span className="hidden md:inline">Prikaži podrobnosti</span>
-                </>}
+
+            <Separator />
+
+            {/* Kontaktni podatki */}
+            <div className="space-y-4">
+              <h3 className="text-md font-medium flex items-center gap-2">
+                <Mail className="h-4 w-4 text-dragon-green" />
+                Kontaktni podatki
+              </h3>
+              
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      <div className="flex items-center gap-1">
+                        <Phone className="h-3.5 w-3.5" />
+                        <span>Telefonska številka (neobvezno):</span>
+                      </div>
+                    </FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Telefonska številka" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-          </CardHeader>
-        </CollapsibleTrigger>
-        
-        <CollapsibleContent>
-          <CardContent className="pt-4">
-            <p className="text-sm text-muted-foreground mb-6">
-              Prosto lahko urediš svoje podatke spodaj.
-            </p>
 
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                {/* Osnovni podatki */}
-                <div className="space-y-4">
-                  <h3 className="text-md font-medium flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    Osnovni podatki
-                  </h3>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="email">E-pošta:</Label>
-                    <Input id="email" type="email" value={user?.email || ""} readOnly className="bg-gray-50" />
-                    <p className="text-xs text-muted-foreground">
-                      Email naslov ni mogoče spremeniti
-                    </p>
-                  </div>
-                  
-                  <FormField control={form.control} name="username" render={({
-                  field
-                }) => <FormItem>
-                        <FormLabel>Uporabniško ime:</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Uporabniško ime" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>} />
-                </div>
+            <Separator />
 
-                <Separator />
-
-                {/* Kontaktni podatki */}
-                <div className="space-y-4">
-                  <h3 className="text-md font-medium flex items-center gap-2">
-                    <Mail className="h-4 w-4" />
-                    Kontaktni podatki
-                  </h3>
-                  
-                  <FormField control={form.control} name="phone" render={({
-                  field
-                }) => <FormItem>
-                        <FormLabel>
-                          <div className="flex items-center gap-1">
-                            <Phone className="h-3.5 w-3.5" />
-                            <span>Telefonska številka (neobvezno):</span>
-                          </div>
-                        </FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Telefonska številka" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>} />
-                </div>
-
-                <Separator />
-
-                {/* Naslov */}
-                <div className="space-y-4">
-                  <h3 className="text-md font-medium flex items-center gap-2">
-                    <Home className="h-4 w-4" />
-                    Naslov (neobvezno)
-                  </h3>
-                  
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <FormField control={form.control} name="firstName" render={({
-                    field
-                  }) => <FormItem>
-                          <FormLabel>Ime:</FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder="Ime" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>} />
-                    
-                    <FormField control={form.control} name="lastName" render={({
-                    field
-                  }) => <FormItem>
-                          <FormLabel>Priimek:</FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder="Priimek" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>} />
-                  </div>
-                  
-                  <FormField control={form.control} name="address" render={({
-                  field
-                }) => <FormItem>
-                        <FormLabel>Naslov:</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Naslov" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>} />
-                  
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <FormField control={form.control} name="city" render={({
-                    field
-                  }) => <FormItem>
-                          <FormLabel>Mesto:</FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder="Mesto" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>} />
-                    
-                    <FormField control={form.control} name="country" render={({
-                    field
-                  }) => <FormItem>
-                          <FormLabel>Država:</FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder="Država" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>} />
-                  </div>
-                  
-                  <FormField control={form.control} name="postalCode" render={({
-                  field
-                }) => <FormItem>
-                        <FormLabel>Poštna številka:</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Poštna številka" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>} />
-                </div>
+            {/* Naslov */}
+            <div className="space-y-4">
+              <h3 className="text-md font-medium flex items-center gap-2">
+                <Home className="h-4 w-4 text-dragon-green" />
+                Naslov (neobvezno)
+              </h3>
+              
+              <div className="grid gap-4 sm:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Ime:</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Ime" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 
-                <Button type="submit" className="w-full sm:w-auto" disabled={isUpdating}>
-                  {isUpdating ? "Shranjevanje..." : "Shrani podatke"}
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-        </CollapsibleContent>
-      </Card>
-    </Collapsible>;
+                <FormField
+                  control={form.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Priimek:</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Priimek" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <FormField
+                control={form.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Naslov:</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Naslov" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="grid gap-4 sm:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="city"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Mesto:</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Mesto" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="country"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Država:</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Država" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <FormField
+                control={form.control}
+                name="postalCode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Poštna številka:</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Poštna številka" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            <Button 
+              type="submit" 
+              className="w-full sm:w-auto bg-dragon-green hover:bg-dragon-green/90" 
+              disabled={isUpdating}
+            >
+              {isUpdating ? "Shranjevanje..." : "Shrani podatke"}
+            </Button>
+          </form>
+        </Form>
+      </div>
+    </div>
+  );
 }

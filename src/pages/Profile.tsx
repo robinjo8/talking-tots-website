@@ -15,14 +15,16 @@ import { PasswordChangeSection } from "@/components/profile/PasswordChangeSectio
 import { ChildrenProfilesSection } from "@/components/profile/ChildrenProfilesSection";
 import { SubscriptionSection } from "@/components/profile/SubscriptionSection";
 import { PaymentMethodsSection } from "@/components/profile/PaymentMethodsSection";
+import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
+import { ProfileMobileTabs } from "@/components/profile/ProfileMobileTabs";
 
 export default function Profile() {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   
-  // Accordion state - only one section can be expanded at a time
-  const [expandedSection, setExpandedSection] = useState<string | null>(null);
+  // Active section state
+  const [activeSection, setActiveSection] = useState<string>("userProfile");
   
   // Child profile management state
   const [editingChildIndex, setEditingChildIndex] = useState<number | null>(null);
@@ -38,31 +40,21 @@ export default function Profile() {
     }
   }, [user, navigate]);
 
-
   useEffect(() => {
     // Check URL parameter for section to expand
     const sectionParam = searchParams.get('expandSection');
     if (sectionParam) {
-      setExpandedSection(sectionParam);
+      setActiveSection(sectionParam);
       return;
     }
     
     // Fallback to localStorage for subscription
     const sectionToExpand = localStorage.getItem('expandSection');
     if (sectionToExpand === 'subscription') {
-      setExpandedSection('subscription');
-      const subscriptionSection = document.querySelector('[data-section="subscription"]');
-      if (subscriptionSection) {
-        subscriptionSection.scrollIntoView({ behavior: 'smooth' });
-        localStorage.removeItem('expandSection');
-      }
+      setActiveSection('subscription');
+      localStorage.removeItem('expandSection');
     }
   }, [searchParams]);
-
-  // Helper function to handle section toggle
-  const handleSectionToggle = (sectionName: string) => {
-    setExpandedSection(expandedSection === sectionName ? null : sectionName);
-  };
 
   const handleDeleteChild = async () => {
     if (deletingChildIndex === null || !user || !profile?.children) return;
@@ -85,8 +77,6 @@ export default function Profile() {
       if (deleteError) throw deleteError;
       
       toast.success(`Otrok "${childToDelete.name}" je bil uspešno izbrisan.`);
-      
-      // No need to update selection since there's only one child per parent
       
       // Refresh profile to get updated children list
       if (window.location.pathname === '/profile') {
@@ -113,56 +103,63 @@ export default function Profile() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <Header />
       
-      <div className="container max-w-5xl mx-auto pt-28 md:pt-32 pb-20 px-4">
+      <div className="container max-w-6xl mx-auto pt-28 md:pt-32 pb-20 px-4">
         {/* Breadcrumb */}
-        <div className="mb-8">
+        <div className="mb-6">
           <BreadcrumbNavigation />
         </div>
         
-        <h1 className="text-3xl font-bold mb-8 flex items-center gap-2">
+        <h1 className="text-3xl font-bold mb-6 flex items-center gap-2">
           <User className="h-6 w-6 text-dragon-green" />
           Nastavitve
         </h1>
         
-        <div className="grid gap-8">
-          {/* User Profile Section (collapsed by default) */}
-          <UserProfileSection 
-            isExpanded={expandedSection === 'userProfile'}
-            setIsExpanded={() => handleSectionToggle('userProfile')}
+        {/* Mobile tabs */}
+        <div className="md:hidden mb-6">
+          <ProfileMobileTabs 
+            activeSection={activeSection}
+            setActiveSection={setActiveSection}
+            childrenCount={profile?.children?.length || 0}
           />
-          
-          {/* Children Profiles Section */}
-          <ChildrenProfilesSection 
-            isExpanded={expandedSection === 'children'}
-            setIsExpanded={() => handleSectionToggle('children')}
-            setEditingChildIndex={setEditingChildIndex}
-            setDeletingChildIndex={setDeletingChildIndex}
-            setEditingDifficultiesIndex={setEditingDifficultiesIndex}
-            setEditingDevelopmentIndex={setEditingDevelopmentIndex}
-          />
-          
-          {/* Subscription Section */}
-          <div data-section="subscription">
-            <SubscriptionSection 
-              isExpanded={expandedSection === 'subscription'}
-              setIsExpanded={() => handleSectionToggle('subscription')}
+        </div>
+        
+        {/* Main layout */}
+        <div className="flex gap-8">
+          {/* Desktop sidebar */}
+          <div className="hidden md:block w-60 shrink-0">
+            <ProfileSidebar 
+              activeSection={activeSection}
+              setActiveSection={setActiveSection}
+              childrenCount={profile?.children?.length || 0}
             />
           </div>
           
-          {/* Payment Methods Section (new) */}
-          <PaymentMethodsSection 
-            isExpanded={expandedSection === 'paymentMethods'}
-            setIsExpanded={() => handleSectionToggle('paymentMethods')}
-          />
-          
-          {/* Password Change Section */}
-          <PasswordChangeSection 
-            isExpanded={expandedSection === 'passwordChange'}
-            setIsExpanded={() => handleSectionToggle('passwordChange')}
-          />
+          {/* Content area */}
+          <div className="flex-1 min-w-0">
+            {activeSection === 'userProfile' && <UserProfileSection />}
+            
+            {activeSection === 'children' && (
+              <ChildrenProfilesSection 
+                setEditingChildIndex={setEditingChildIndex}
+                setDeletingChildIndex={setDeletingChildIndex}
+                setEditingDifficultiesIndex={setEditingDifficultiesIndex}
+                setEditingDevelopmentIndex={setEditingDevelopmentIndex}
+              />
+            )}
+            
+            {activeSection === 'subscription' && (
+              <div data-section="subscription">
+                <SubscriptionSection />
+              </div>
+            )}
+            
+            {activeSection === 'paymentMethods' && <PaymentMethodsSection />}
+            
+            {activeSection === 'passwordChange' && <PasswordChangeSection />}
+          </div>
         </div>
         
         {/* Dialogs and Modals */}
