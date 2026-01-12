@@ -2,11 +2,12 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { UserRound, Pencil, Trash2, MessageSquare } from "lucide-react";
-import { SpeechDifficultiesList } from "@/components/SpeechDifficultiesList";
+import { UserRound, Pencil, Trash2, ChevronDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { SPEECH_DEVELOPMENT_QUESTIONS } from "@/models/SpeechDevelopment";
 import { ChildProfile } from "@/contexts/AuthContext";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { cn } from "@/lib/utils";
 
 type ChildProfileDisplayProps = {
   child: ChildProfile;
@@ -21,7 +22,7 @@ const getAvatarSrc = (avatarId: number): string => {
   const avatarImages = [
     "", // id 0 - no avatar
     "/lovable-uploads/39972aa5-2794-48d3-b767-cdab94ecc722.png", // id 1
-    "/lovable-uploads/fa81df29-e699-4465-a715-5a1fad6e4f15.png", // id 2
+    "/lovable-uploads/fa81df29-e699-4465-a715-5a1fad6e5f15.png", // id 2
     "/lovable-uploads/f39a5340-2f93-4a66-b538-f734e037b293.png", // id 3
     "/lovable-uploads/c85cd2ca-023e-4745-8ea5-566e5248866c.png", // id 4
     "/lovable-uploads/4fb9709f-60f1-4a5e-ba2a-b5c6e4e4ebb3.png", // id 5
@@ -48,6 +49,9 @@ export function ChildProfileDisplay({
   onEditDifficulties,
   onEditDevelopment,
 }: ChildProfileDisplayProps) {
+  const [difficultiesOpen, setDifficultiesOpen] = useState(false);
+  const [questionnaireOpen, setQuestionnaireOpen] = useState(false);
+  
   const avatarSrc = child.avatarUrl || getAvatarSrc(child.avatarId);
   
   const formatGender = (gender: string) => {
@@ -71,18 +75,18 @@ export function ChildProfileDisplay({
   };
 
   return (
-    <div className="w-full space-y-6">
-      {/* Top section: Child info - centered layout like reference image */}
-      <Card className="w-full">
-        <CardContent className="p-6">
+    <div className="w-full space-y-4">
+      {/* Top section: Child info with larger avatar */}
+      <Card className="w-full border-dragon-green/20">
+        <CardContent className="pt-4 pb-6 px-6">
           {/* Action buttons - top right */}
-          <div className="flex justify-end gap-2 mb-4">
+          <div className="flex justify-end gap-1 -mt-1 -mr-2">
             {onEdit && (
               <Button 
                 variant="ghost" 
                 size="icon" 
                 onClick={onEdit}
-                className="h-9 w-9 text-muted-foreground hover:text-dragon-green hover:bg-dragon-green/10"
+                className="h-8 w-8 text-muted-foreground hover:text-dragon-green hover:bg-dragon-green/10"
               >
                 <Pencil className="h-4 w-4" />
               </Button>
@@ -92,7 +96,7 @@ export function ChildProfileDisplay({
                 variant="ghost" 
                 size="icon" 
                 onClick={onDelete}
-                className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -100,143 +104,167 @@ export function ChildProfileDisplay({
           </div>
           
           {/* Centered avatar and info */}
-          <div className="flex flex-col items-center text-center">
+          <div className="flex flex-col items-center text-center -mt-2">
             {child.avatarId === 0 ? (
-              <div className="h-24 w-24 rounded-full flex items-center justify-center bg-gray-100 border-2 border-gray-200">
-                <UserRound className="h-12 w-12 text-gray-400" />
+              <div className="h-32 w-32 rounded-full flex items-center justify-center bg-muted border-2 border-muted-foreground/20">
+                <UserRound className="h-16 w-16 text-muted-foreground" />
               </div>
             ) : (
-              <Avatar className="h-24 w-24 border-2 border-dragon-green/20">
+              <Avatar className="h-32 w-32 border-3 border-dragon-green/30">
                 <AvatarImage 
                   src={avatarSrc} 
                   alt={`Avatar za ${child.name}`} 
                   className="object-contain" 
                 />
-                <AvatarFallback className="bg-gradient-to-br from-dragon-green/20 to-dragon-green/10 text-lg font-bold">
+                <AvatarFallback className="bg-dragon-green/10 text-2xl font-bold text-dragon-green">
                   {child.name[0]}
                 </AvatarFallback>
               </Avatar>
             )}
             
-            <h4 className="text-2xl font-semibold text-dragon-green mt-4">{child.name}</h4>
+            <h4 className="text-xl font-semibold text-dragon-green mt-3">{child.name}</h4>
             
-            <div className="flex items-center gap-4 mt-2 text-muted-foreground">
-              <span className="flex items-center gap-2">
-                <span className={`inline-block w-2.5 h-2.5 rounded-full ${
+            <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <span className={cn(
+                  "inline-block w-2 h-2 rounded-full",
                   child.gender === "M" ? "bg-blue-500" : 
                   (child.gender === "F" || child.gender === "Ž") ? "bg-pink-500" : 
-                  "bg-gray-400"
-                }`} />
+                  "bg-muted-foreground"
+                )} />
                 {formatGender(child.gender)}
               </span>
               {child.birthDate && (
-                <span>
-                  {calculateAge(child.birthDate)} let
-                </span>
+                <>
+                  <span className="text-muted-foreground/50">•</span>
+                  <span>{calculateAge(child.birthDate)} let</span>
+                </>
               )}
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Bottom section: Two columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left column: Speech Issues */}
-        <Card className="h-fit">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h5 className="font-semibold text-lg text-dragon-green">
-                Govorne težave
-              </h5>
-              {onEditDifficulties && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={onEditDifficulties}
-                  className="h-8 w-8 text-muted-foreground hover:text-dragon-green hover:bg-dragon-green/10"
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
+      {/* Govorne težave - Collapsible */}
+      <Collapsible open={difficultiesOpen} onOpenChange={setDifficultiesOpen}>
+        <Card className="border-dragon-green/20">
+          <CollapsibleTrigger asChild>
+            <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50 transition-colors">
+              <h5 className="font-medium text-dragon-green">Govorne težave</h5>
+              <div className="flex items-center gap-2">
+                {onEditDifficulties && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditDifficulties();
+                    }}
+                    className="h-7 w-7 text-muted-foreground hover:text-dragon-green hover:bg-dragon-green/10"
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </Button>
+                )}
+                <ChevronDown className={cn(
+                  "h-4 w-4 text-muted-foreground transition-transform duration-200",
+                  difficultiesOpen && "rotate-180"
+                )} />
+              </div>
+            </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="px-4 pb-4 pt-0">
+              {child.speechDifficulties && child.speechDifficulties.length > 0 ? (
+                <div className="space-y-3">
+                  <div className="flex flex-wrap gap-2">
+                    {child.speechDifficulties.map((difficultyId, index) => (
+                      <Badge 
+                        key={index} 
+                        variant="secondary"
+                        className="bg-dragon-green/10 text-dragon-green border-dragon-green/20"
+                      >
+                        {difficultyId}
+                      </Badge>
+                    ))}
+                  </div>
+                  
+                  {child.speechDifficultiesDescription && (
+                    <p className="text-sm text-muted-foreground">
+                      {child.speechDifficultiesDescription}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-muted-foreground text-sm">
+                  Ni zabeleženih govornih motenj
+                </p>
               )}
             </div>
-            
-            {child.speechDifficulties && child.speechDifficulties.length > 0 ? (
-              <div className="space-y-3">
-                <div className="flex flex-wrap gap-2">
-                  {child.speechDifficulties.map((difficultyId, index) => (
-                    <Badge 
-                      key={index} 
-                      className="bg-dragon-green/10 text-dragon-green border-dragon-green/20 hover:bg-dragon-green/20"
-                    >
-                      {difficultyId}
-                    </Badge>
-                  ))}
-                </div>
-                
-                {child.speechDifficultiesDescription && (
-                  <p className="text-sm text-muted-foreground mt-3">
-                    {child.speechDifficultiesDescription}
-                  </p>
-                )}
-              </div>
-            ) : (
-              <p className="text-muted-foreground text-sm">
-                Ni zabeleženih govornih motenj
-              </p>
-            )}
-          </CardContent>
+          </CollapsibleContent>
         </Card>
+      </Collapsible>
 
-        {/* Right column: Basic Questionnaire */}
-        <Card className="h-fit">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
+      {/* Osnovni vprašalnik - Collapsible */}
+      <Collapsible open={questionnaireOpen} onOpenChange={setQuestionnaireOpen}>
+        <Card className="border-dragon-green/20">
+          <CollapsibleTrigger asChild>
+            <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50 transition-colors">
               <div className="flex items-center gap-2">
-                <h5 className="font-semibold text-lg text-gray-900">
-                  Osnovni vprašalnik
-                </h5>
+                <h5 className="font-medium text-foreground">Osnovni vprašalnik</h5>
                 {child.isComplete && (
                   <Badge className="bg-dragon-green text-white text-xs">
                     Izpolnjeno
                   </Badge>
                 )}
               </div>
-              {onEditDevelopment && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={onEditDevelopment}
-                  className="h-8 w-8 text-muted-foreground hover:text-dragon-green hover:bg-dragon-green/10"
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
+              <div className="flex items-center gap-2">
+                {onEditDevelopment && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditDevelopment();
+                    }}
+                    className="h-7 w-7 text-muted-foreground hover:text-dragon-green hover:bg-dragon-green/10"
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </Button>
+                )}
+                <ChevronDown className={cn(
+                  "h-4 w-4 text-muted-foreground transition-transform duration-200",
+                  questionnaireOpen && "rotate-180"
+                )} />
+              </div>
+            </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="px-4 pb-4 pt-0">
+              {child.speechDevelopment && Object.keys(child.speechDevelopment).length > 0 ? (
+                <div className="space-y-3">
+                  {Object.entries(child.speechDevelopment).map(([questionId, answer]) => {
+                    const question = SPEECH_DEVELOPMENT_QUESTIONS.find(q => q.id === questionId);
+                    const option = question?.options.find(opt => opt.value === answer);
+                    
+                    if (!question || !option) return null;
+                    
+                    return (
+                      <div key={questionId}>
+                        <p className="text-sm text-muted-foreground">{question.question}</p>
+                        <p className="text-sm text-dragon-green font-medium mt-0.5">→ {option.label}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-muted-foreground text-sm">
+                  Osnovni vprašalnik ni bil izpolnjen
+                </p>
               )}
             </div>
-            
-            {child.speechDevelopment && Object.keys(child.speechDevelopment).length > 0 ? (
-              <div className="space-y-4">
-                {Object.entries(child.speechDevelopment).map(([questionId, answer]) => {
-                  const question = SPEECH_DEVELOPMENT_QUESTIONS.find(q => q.id === questionId);
-                  const option = question?.options.find(opt => opt.value === answer);
-                  
-                  if (!question || !option) return null;
-                  
-                  return (
-                    <div key={questionId}>
-                      <p className="text-sm font-medium text-gray-700">{question.question}</p>
-                      <p className="text-sm text-dragon-green mt-1">→ {option.label}</p>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <p className="text-muted-foreground text-sm">
-                Osnovni vprašalnik ni bil izpolnjen
-              </p>
-            )}
-          </CardContent>
+          </CollapsibleContent>
         </Card>
-      </div>
+      </Collapsible>
     </div>
   );
 }
