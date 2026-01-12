@@ -104,14 +104,7 @@ export default function Profile() {
     <div className="min-h-screen bg-gray-50">
       <Header />
       
-      <div className="container max-w-6xl mx-auto pt-28 md:pt-32 pb-20 px-4">
-        {/* Page Title */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
-            Nastavitve
-          </h1>
-          <div className="w-32 h-1 bg-dragon-green mx-auto rounded-full"></div>
-        </div>
+      <div className="container max-w-6xl mx-auto pt-24 md:pt-32 pb-20 px-4">
         
         {/* Mobile tabs */}
         <div className="md:hidden mb-6">
