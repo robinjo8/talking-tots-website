@@ -128,28 +128,34 @@ export function AddChildForm({ onSuccess, onBack: onBackProp, initialName, initi
 
       const newChildId = childData.id;
       
-      // Upload PDF attachment if provided
-      if (attachedFile) {
-        await uploadDocument(attachedFile, newChildId, 'pdf_attachment');
-      }
-      
-      // Upload speech description as text file if provided
-      if (speechDescription && speechDescription.trim()) {
-        const textBlob = new Blob([speechDescription], { type: 'text/plain' });
-        const textFile = new File([textBlob], `opis-govornih-tezav-${Date.now()}.txt`, { type: 'text/plain' });
-        await uploadDocument(textFile, newChildId, 'speech_description');
-      }
-      
-      // Upload questionnaire as text file
-      if (Object.keys(developmentAnswers).length > 0) {
-        const questionnaireText = formatQuestionnaireAsText(developmentAnswers, name.trim());
-        const questionnaireBlob = new Blob([questionnaireText], { type: 'text/plain' });
-        const questionnaireFile = new File(
-          [questionnaireBlob], 
-          `${newChildId}-osnovni-vprasalnik.txt`, 
-          { type: 'text/plain' }
-        );
-        await uploadDocument(questionnaireFile, newChildId, 'questionnaire');
+      // Upload documents - non-critical, don't fail if these fail
+      try {
+        // Upload PDF attachment if provided
+        if (attachedFile) {
+          await uploadDocument(attachedFile, newChildId, 'pdf_attachment');
+        }
+        
+        // Upload speech description as text file if provided
+        if (speechDescription && speechDescription.trim()) {
+          const textBlob = new Blob([speechDescription], { type: 'text/plain' });
+          const textFile = new File([textBlob], `opis-govornih-tezav-${Date.now()}.txt`, { type: 'text/plain' });
+          await uploadDocument(textFile, newChildId, 'speech_description');
+        }
+        
+        // Upload questionnaire as text file
+        if (Object.keys(developmentAnswers).length > 0) {
+          const questionnaireText = formatQuestionnaireAsText(developmentAnswers, name.trim());
+          const questionnaireBlob = new Blob([questionnaireText], { type: 'text/plain' });
+          const questionnaireFile = new File(
+            [questionnaireBlob], 
+            `${newChildId}-osnovni-vprasalnik.txt`, 
+            { type: 'text/plain' }
+          );
+          await uploadDocument(questionnaireFile, newChildId, 'questionnaire');
+        }
+      } catch (uploadError) {
+        console.error("Document upload error (non-critical):", uploadError);
+        toast.warning("Dokumenti niso bili naloženi, lahko jih dodate kasneje na profilu otroka.");
       }
       
       const newChild: SavedChild = {
