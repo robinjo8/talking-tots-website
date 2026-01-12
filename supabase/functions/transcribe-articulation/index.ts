@@ -133,7 +133,7 @@ serve(async (req) => {
       targetWord, 
       acceptedVariants = [],
       childId,
-      userEmail,
+      userId, // Changed from userEmail to userId
       wordIndex,
       letter
     } = await req.json();
@@ -207,20 +207,20 @@ serve(async (req) => {
     const matchResult = isWordAccepted(transcribedText, targetWord, acceptedVariants);
     console.log(`Match result:`, matchResult);
 
-    // Save recording to Supabase Storage if childId and userEmail provided
+    // Save recording to Supabase Storage if childId and userId provided
     let storagePath = null;
-    if (childId && userEmail) {
+    if (childId && userId) {
       try {
         const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
         const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
         const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const sanitizedEmail = userEmail.replace(/[@.]/g, '_');
-        storagePath = `recordings/${sanitizedEmail}/child-${childId}/${letter}-${wordIndex}-${targetWord}-${timestamp}.webm`;
+        // New unified storage structure: uporabniski-profili/{user_id}/{child_id}/Preverjanje-izgovorjave/
+        storagePath = `${userId}/${childId}/Preverjanje-izgovorjave/${letter}-${wordIndex}-${targetWord}-${timestamp}.webm`;
 
         const { error: uploadError } = await supabase.storage
-          .from('audio-besede')
+          .from('uporabniski-profili')
           .upload(storagePath, binaryAudio, {
             contentType: 'audio/webm',
             upsert: false

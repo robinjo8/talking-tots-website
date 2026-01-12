@@ -264,16 +264,16 @@ Deno.serve(async (req) => {
       virusScanStatus = 'pending';
     }
 
-    // Generate storage path
+    // Generate storage path - new unified structure
     const timestamp = Date.now();
     const sanitizedFilename = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
-    const storagePath = `${user.id}/${childId}/prvi-stik/${timestamp}_${sanitizedFilename}`;
+    const storagePath = `${user.id}/${childId}/Dokumenti/${timestamp}_${sanitizedFilename}`;
 
     console.log('Uploading to storage:', storagePath);
 
-    // Upload to Supabase Storage
+    // Upload to Supabase Storage - new unified bucket
     const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('child-documents')
+      .from('uporabniski-profili')
       .upload(storagePath, fileBytes, {
         contentType: file.type,
         upsert: false,
@@ -308,7 +308,7 @@ Deno.serve(async (req) => {
     if (documentError) {
       console.error('Database insert error:', documentError);
       // Try to clean up uploaded file
-      await supabase.storage.from('child-documents').remove([storagePath]);
+      await supabase.storage.from('uporabniski-profili').remove([storagePath]);
       
       return new Response(
         JSON.stringify({ error: 'Napaka pri shranjevanju dokumenta: ' + documentError.message }),
