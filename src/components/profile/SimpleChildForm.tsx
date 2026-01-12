@@ -73,7 +73,10 @@ export function SimpleChildForm({ onSuccess, onCancel }: SimpleChildFormProps) {
                 {birthDate ? format(birthDate, "dd.MM.yyyy") : "Izberite datum rojstva"}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 z-[100]" align="start">
+            <PopoverContent 
+              className="w-auto p-0 z-[100] md:relative fixed md:inset-auto inset-0 md:m-0 m-auto md:translate-x-0 md:translate-y-0 md:top-auto md:left-auto top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 md:w-auto w-fit h-fit" 
+              align="start"
+            >
               <Calendar
                 mode="single"
                 selected={birthDate ?? undefined}
