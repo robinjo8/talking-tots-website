@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { SpeechDifficultiesStep, SpeechDevelopmentQuestions } from "@/components/speech";
 import { ChildBasicInfoForm } from "./children/ChildBasicInfoForm";
+import { avatarOptions } from "./AvatarSelector";
 import { ChildCompletedView } from "./children/ChildCompletedView";
 import { ChildProfile } from "@/hooks/registration/types";
 import { calculateAge } from "@/utils/childUtils";
@@ -80,7 +81,7 @@ export function AddChildForm({ onSuccess, onBack: onBackProp, initialName, initi
           parent_id: user.id,
           name: name.trim(),
           gender,
-          avatar_url: null, // Will be set separately if needed
+          avatar_url: avatarOptions.find(a => a.id === avatarId)?.src || null,
           birth_date: birthDate ? birthDate.toISOString().split('T')[0] : null,
           age: calculatedAge,
           speech_difficulties: speechDifficulties,
