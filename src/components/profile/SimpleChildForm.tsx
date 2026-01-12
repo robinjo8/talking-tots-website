@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { AddChildForm } from "@/components/AddChildForm";
@@ -20,6 +21,7 @@ export function SimpleChildForm({ onSuccess, onCancel }: SimpleChildFormProps) {
   const [showNameOnly, setShowNameOnly] = useState(true);
   const [childName, setChildName] = useState("");
   const [birthDate, setBirthDate] = useState<Date | null>(null);
+  const [gender, setGender] = useState<string>("");
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -43,7 +45,7 @@ export function SimpleChildForm({ onSuccess, onCancel }: SimpleChildFormProps) {
   const canContinue = childName.trim().length > 0 && birthDate !== null;
 
   if (!showNameOnly) {
-    return <AddChildForm onSuccess={onSuccess} initialName={childName} initialBirthDate={birthDate} />;
+    return <AddChildForm onSuccess={onSuccess} initialName={childName} initialBirthDate={birthDate} initialGender={gender} />;
   }
 
   const CalendarContent = (
@@ -69,6 +71,24 @@ export function SimpleChildForm({ onSuccess, onCancel }: SimpleChildFormProps) {
             onChange={(e) => setChildName(e.target.value)}
             placeholder="Vnesite ime otroka"
           />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Spol (neobvezno)</Label>
+          <RadioGroup value={gender} onValueChange={setGender} className="flex flex-wrap gap-4">
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="M" id="gender-m" />
+              <Label htmlFor="gender-m" className="font-normal cursor-pointer">Fant</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="F" id="gender-f" />
+              <Label htmlFor="gender-f" className="font-normal cursor-pointer">Punca</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="N" id="gender-n" />
+              <Label htmlFor="gender-n" className="font-normal cursor-pointer">Ne želim izbrati</Label>
+            </div>
+          </RadioGroup>
         </div>
 
         <div className="space-y-2">

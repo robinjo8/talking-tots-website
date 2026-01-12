@@ -27,10 +27,10 @@ interface SavedChild {
   speechDevelopment: Record<string, string>;
 }
 
-export function AddChildForm({ onSuccess, initialName, initialBirthDate }: { onSuccess?: () => void; initialName?: string; initialBirthDate?: Date | null }) {
+export function AddChildForm({ onSuccess, initialName, initialBirthDate, initialGender }: { onSuccess?: () => void; initialName?: string; initialBirthDate?: Date | null; initialGender?: string }) {
   const { user } = useAuth();
   const [name, setName] = useState(initialName || "");
-  const [gender, setGender] = useState("M");
+  const [gender, setGender] = useState(initialGender || "M");
   const [avatarId, setAvatarId] = useState(1);
   const [birthDate, setBirthDate] = useState<Date | null>(initialBirthDate || null);
   const [speechDifficulties, setSpeechDifficulties] = useState<string[]>([]);
