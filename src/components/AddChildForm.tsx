@@ -25,12 +25,12 @@ interface SavedChild {
   speechDevelopment: Record<string, string>;
 }
 
-export function AddChildForm({ onSuccess, initialName }: { onSuccess?: () => void; initialName?: string }) {
+export function AddChildForm({ onSuccess, initialName, initialBirthDate }: { onSuccess?: () => void; initialName?: string; initialBirthDate?: Date | null }) {
   const { user } = useAuth();
   const [name, setName] = useState(initialName || "");
   const [gender, setGender] = useState("M");
   const [avatarId, setAvatarId] = useState(1);
-  const [birthDate, setBirthDate] = useState<Date | null>(null);
+  const [birthDate, setBirthDate] = useState<Date | null>(initialBirthDate || null);
   const [speechDifficulties, setSpeechDifficulties] = useState<string[]>([]);
   const [speechDevelopment, setSpeechDevelopment] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -172,11 +172,9 @@ export function AddChildForm({ onSuccess, initialName }: { onSuccess?: () => voi
   return (
     <ChildBasicInfoForm
       name={name}
-      birthDate={birthDate}
       gender={gender}
       avatarId={avatarId}
       onNameChange={setName}
-      onBirthDateChange={setBirthDate}
       onGenderChange={setGender}
       onAvatarChange={setAvatarId}
       onSubmit={handleSubmit}

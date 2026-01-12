@@ -3,6 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import { AddChildForm } from "@/components/AddChildForm";
 
 interface SimpleChildFormProps {
@@ -13,9 +17,11 @@ interface SimpleChildFormProps {
 export function SimpleChildForm({ onSuccess, onCancel }: SimpleChildFormProps) {
   const [showNameOnly, setShowNameOnly] = useState(true);
   const [childName, setChildName] = useState("");
+  const [birthDate, setBirthDate] = useState<Date | null>(null);
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   const handleContinue = () => {
-    if (!childName.trim()) return;
+    if (!childName.trim() || !birthDate) return;
     setShowNameOnly(false);
   };
 
@@ -25,8 +31,15 @@ export function SimpleChildForm({ onSuccess, onCancel }: SimpleChildFormProps) {
     }
   };
 
+  const handleDateSelect = (date: Date | undefined) => {
+    setBirthDate(date || null);
+    setCalendarOpen(false);
+  };
+
+  const canContinue = childName.trim().length > 0 && birthDate !== null;
+
   if (!showNameOnly) {
-    return <AddChildForm onSuccess={onSuccess} initialName={childName} />;
+    return <AddChildForm onSuccess={onSuccess} initialName={childName} initialBirthDate={birthDate} />;
   }
 
   return (
@@ -44,7 +57,34 @@ export function SimpleChildForm({ onSuccess, onCancel }: SimpleChildFormProps) {
             placeholder="Vnesite ime otroka"
           />
         </div>
-        <div className="flex justify-between">
+
+        <div className="space-y-2">
+          <Label htmlFor="birth-date">Datum rojstva otroka *</Label>
+          <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                id="birth-date"
+                variant="outline"
+                className={cn(
+                  "w-full justify-start text-left font-normal",
+                  !birthDate && "text-muted-foreground"
+                )}
+              >
+                {birthDate ? format(birthDate, "dd.MM.yyyy") : "Izberite datum rojstva"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0 z-[100]" align="start">
+              <Calendar
+                mode="single"
+                selected={birthDate ?? undefined}
+                onSelect={handleDateSelect}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        <div className="flex justify-between pt-2">
           <Button
             variant="outline"
             onClick={handleBack}
@@ -53,7 +93,7 @@ export function SimpleChildForm({ onSuccess, onCancel }: SimpleChildFormProps) {
           </Button>
           <Button
             onClick={handleContinue}
-            disabled={!childName.trim()}
+            disabled={!canContinue}
             className="bg-dragon-green hover:bg-dragon-green/90"
           >
             Nadaljuj
