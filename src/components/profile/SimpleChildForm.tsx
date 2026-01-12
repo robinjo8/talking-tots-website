@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -20,8 +20,8 @@ export function SimpleChildForm({ onSuccess, onCancel }: SimpleChildFormProps) {
   const [showNameOnly, setShowNameOnly] = useState(true);
   const [childName, setChildName] = useState("");
   const [birthDate, setBirthDate] = useState<Date | null>(null);
-  const [calendarOpen, setCalendarOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const handleContinue = () => {
     if (!childName.trim() || !birthDate) return;
@@ -36,7 +36,8 @@ export function SimpleChildForm({ onSuccess, onCancel }: SimpleChildFormProps) {
 
   const handleDateSelect = (date: Date | undefined) => {
     setBirthDate(date || null);
-    setCalendarOpen(false);
+    setPopoverOpen(false);
+    setDialogOpen(false);
   };
 
   const canContinue = childName.trim().length > 0 && birthDate !== null;
@@ -75,7 +76,7 @@ export function SimpleChildForm({ onSuccess, onCancel }: SimpleChildFormProps) {
           
           {/* Desktop: Popover */}
           <div className="hidden md:block">
-            <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+            <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
               <PopoverTrigger asChild>
                 <Button
                   id="birth-date"
@@ -99,7 +100,7 @@ export function SimpleChildForm({ onSuccess, onCancel }: SimpleChildFormProps) {
           <div className="md:hidden">
             <Button
               variant="outline"
-              onClick={() => setCalendarOpen(true)}
+              onClick={() => setDialogOpen(true)}
               className={cn(
                 "w-full justify-start text-left font-normal",
                 !birthDate && "text-muted-foreground"
@@ -108,9 +109,14 @@ export function SimpleChildForm({ onSuccess, onCancel }: SimpleChildFormProps) {
               <CalendarIcon className="mr-2 h-4 w-4" />
               {birthDate ? format(birthDate, "dd.MM.yyyy") : "Izberite datum rojstva"}
             </Button>
-            <Dialog open={calendarOpen} onOpenChange={setCalendarOpen}>
-              <DialogContent className="w-auto p-4 flex items-center justify-center">
-                <div className="bg-white rounded-lg">
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogContent className="w-auto max-w-[320px] p-4">
+                <DialogHeader>
+                  <DialogTitle className="text-center text-lg">
+                    Izberite datum rojstva
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="flex justify-center pt-2">
                   {CalendarContent}
                 </div>
               </DialogContent>
