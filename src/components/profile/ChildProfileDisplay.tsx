@@ -149,9 +149,9 @@ export function ChildProfileDisplay({
       <Collapsible open={difficultiesOpen} onOpenChange={setDifficultiesOpen}>
         <Card className="border-dragon-green/20">
           <CollapsibleTrigger asChild>
-            <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50 transition-colors">
-              <h5 className="font-medium text-dragon-green">Govorne težave</h5>
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center p-4 cursor-pointer hover:bg-muted/50 transition-colors relative">
+              <h5 className="font-medium text-foreground">Govorne težave</h5>
+              <div className="absolute right-4 flex items-center gap-2">
                 {onEditDifficulties && (
                   <Button
                     variant="ghost"
@@ -208,16 +208,9 @@ export function ChildProfileDisplay({
       <Collapsible open={questionnaireOpen} onOpenChange={setQuestionnaireOpen}>
         <Card className="border-dragon-green/20">
           <CollapsibleTrigger asChild>
-            <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50 transition-colors">
-              <div className="flex items-center gap-2">
-                <h5 className="font-medium text-foreground">Osnovni vprašalnik</h5>
-                {child.isComplete && (
-                  <Badge className="bg-dragon-green text-white text-xs">
-                    Izpolnjeno
-                  </Badge>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center p-4 cursor-pointer hover:bg-muted/50 transition-colors relative">
+              <h5 className="font-medium text-foreground">Osnovni vprašalnik</h5>
+              <div className="absolute right-4 flex items-center gap-2">
                 {onEditDevelopment && (
                   <Button
                     variant="ghost"
