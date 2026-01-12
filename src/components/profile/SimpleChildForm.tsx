@@ -10,7 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { AddChildForm } from "@/components/AddChildForm";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, HelpCircle } from "lucide-react";
 
 interface SimpleChildFormProps {
   onSuccess?: () => void;
@@ -24,6 +24,7 @@ export function SimpleChildForm({ onSuccess, onCancel }: SimpleChildFormProps) {
   const [gender, setGender] = useState<string>("");
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [infoDialogOpen, setInfoDialogOpen] = useState(false);
 
   const handleContinue = () => {
     if (!childName.trim() || !birthDate) return;
@@ -78,11 +79,11 @@ export function SimpleChildForm({ onSuccess, onCancel }: SimpleChildFormProps) {
           <RadioGroup value={gender} onValueChange={setGender} className="flex flex-wrap gap-4">
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="M" id="gender-m" />
-              <Label htmlFor="gender-m" className="font-normal cursor-pointer">Fant</Label>
+              <Label htmlFor="gender-m" className="font-normal cursor-pointer">M</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="F" id="gender-f" />
-              <Label htmlFor="gender-f" className="font-normal cursor-pointer">Punca</Label>
+              <Label htmlFor="gender-f" className="font-normal cursor-pointer">Ž</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="N" id="gender-n" />
@@ -92,7 +93,27 @@ export function SimpleChildForm({ onSuccess, onCancel }: SimpleChildFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="birth-date">Datum rojstva otroka *</Label>
+          <div className="flex items-center gap-1">
+            <Label htmlFor="birth-date">Datum rojstva otroka (obvezno)</Label>
+            <button
+              type="button"
+              onClick={() => setInfoDialogOpen(true)}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <HelpCircle className="h-4 w-4" />
+            </button>
+          </div>
+
+          <Dialog open={infoDialogOpen} onOpenChange={setInfoDialogOpen}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle className="text-center">Zakaj potrebujemo datum rojstva?</DialogTitle>
+              </DialogHeader>
+              <p className="text-sm text-muted-foreground text-justify leading-relaxed">
+                Datum rojstva otroka je obvezen podatek, saj aplikacija na njegovi podlagi samodejno izračuna starost. Delovanje aplikacije je namreč prilagojeno razvojnemu obdobju otroka – glede na starost se prilagodijo vsebine, težavnosti iger in vaj. Poleg tega je ta podatek pri naročniškem paketu TomiTalk Pro ključen tudi za strokovno delo, saj logopedinji pri poslušanju posnetkov izgovorjave potrebujeta informacijo o starosti otroka, ki predstavlja pomemben del strokovne logopedske ocene.
+              </p>
+            </DialogContent>
+          </Dialog>
           
           {/* Desktop: Popover */}
           <div className="hidden md:block">
