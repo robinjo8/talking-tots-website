@@ -1,4 +1,4 @@
-import { User, Users, CircleDollarSign, CreditCard, Shield, ChevronDown } from "lucide-react";
+import { User, Users, CircleDollarSign, CreditCard, Shield, FileText } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -15,6 +15,7 @@ type ProfileMobileTabsProps = {
 
 const tabs = [
   { id: "userProfile", label: "Moj profil", icon: User },
+  { id: "myDocuments", label: "Moji dokumenti", icon: FileText },
   { id: "children", label: "Otroci", icon: Users, showCount: true },
   { id: "subscription", label: "Naročnina", icon: CircleDollarSign },
   { id: "paymentMethods", label: "Plačilne metode", icon: CreditCard },

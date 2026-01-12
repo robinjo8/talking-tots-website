@@ -14,6 +14,7 @@ import { PasswordChangeSection } from "@/components/profile/PasswordChangeSectio
 import { ChildrenProfilesSection } from "@/components/profile/ChildrenProfilesSection";
 import { SubscriptionSection } from "@/components/profile/SubscriptionSection";
 import { PaymentMethodsSection } from "@/components/profile/PaymentMethodsSection";
+import { MyDocumentsSection } from "@/components/profile/MyDocumentsSection";
 import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
 import { ProfileMobileTabs } from "@/components/profile/ProfileMobileTabs";
 
@@ -213,6 +214,8 @@ export default function Profile() {
           {/* Content area */}
           <div className="flex-1 min-w-0">
             {activeSection === 'userProfile' && <UserProfileSection />}
+            
+            {activeSection === 'myDocuments' && <MyDocumentsSection />}
             
             {activeSection === 'children' && (
               <ChildrenProfilesSection 
