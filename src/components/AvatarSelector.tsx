@@ -51,23 +51,23 @@ export function AvatarSelector({ selectedAvatarId, onAvatarSelect, variant = 'gr
         <div className="w-full">
           <Label className="text-base font-medium mb-4 block text-center">Izberi avatarja</Label>
           
-          <div className="relative">
-            <div className="overflow-hidden" ref={emblaRef}>
+          <div className="relative px-10">
+            <div className="overflow-hidden py-2" ref={emblaRef}>
               <div className="flex">
                 {avatarsWithoutEmpty.map(avatar => (
                   <div 
                     key={avatar.id}
-                    className="flex-[0_0_100%] min-w-0 flex justify-center"
+                    className="flex-[0_0_100%] min-w-0 flex justify-center px-2"
                   >
                     <div 
                       onClick={() => onAvatarSelect(avatar.id)}
-                      className={`cursor-pointer rounded-2xl p-6 transition-all duration-200 flex flex-col items-center justify-center w-48 h-48 ${
+                      className={`cursor-pointer rounded-2xl p-4 transition-all duration-200 flex flex-col items-center justify-center w-44 h-44 ${
                         selectedAvatarId === avatar.id 
                           ? 'bg-dragon-green/20 ring-4 ring-dragon-green shadow-xl' 
                           : 'bg-white border-2 border-gray-200'
                       }`}
                     >
-                      <Avatar className="h-28 w-28">
+                      <Avatar className="h-24 w-24">
                         <AvatarImage 
                           src={avatar.src} 
                           alt={avatar.alt} 
