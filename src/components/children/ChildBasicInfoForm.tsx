@@ -1,67 +1,54 @@
 
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { AvatarSelector } from "@/components/AvatarSelector";
-import { GenderSelector } from "@/components/GenderSelector";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type ChildBasicInfoFormProps = {
-  name: string;
-  gender: string;
   avatarId: number;
-  onNameChange: (name: string) => void;
-  onGenderChange: (gender: string) => void;
   onAvatarChange: (id: number) => void;
   onSubmit: (e: React.FormEvent) => void;
+  onBack?: () => void;
   title?: string;
 };
 
 export function ChildBasicInfoForm({
-  name,
-  gender,
   avatarId,
-  onNameChange,
-  onGenderChange,
   onAvatarChange,
   onSubmit,
-  title = "Dodaj novega otroka"
+  onBack,
+  title = "Izberi avatarja"
 }: ChildBasicInfoFormProps) {
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <h3 className="text-lg font-medium mb-2">{title}</h3>
-      
-      <div className="space-y-4">
-        <div>
-          <Label htmlFor="child-name">Ime otroka ali vzdevek</Label>
-          <Input
-            id="child-name"
-            value={name}
-            onChange={(e) => onNameChange(e.target.value)}
-            placeholder="Vnesite ime otroka"
-            className="mt-1"
-            required
+    <Card>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={onSubmit} className="space-y-4">
+          <AvatarSelector 
+            selectedAvatarId={avatarId} 
+            onAvatarSelect={onAvatarChange} 
           />
-        </div>
-        
-        <GenderSelector 
-          selectedGender={gender} 
-          onGenderChange={onGenderChange} 
-        />
-        
-        <AvatarSelector 
-          selectedAvatarId={avatarId} 
-          onAvatarSelect={onAvatarChange} 
-        />
-      </div>
-      
-      <div className="pt-4">
-        <Button
-          type="submit"
-          className="w-full bg-dragon-green hover:bg-dragon-green/90"
-        >
-          Naprej
-        </Button>
-      </div>
-    </form>
+          
+          <div className="flex justify-between pt-4">
+            {onBack && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onBack}
+              >
+                Nazaj
+              </Button>
+            )}
+            <Button
+              type="submit"
+              className={`bg-dragon-green hover:bg-dragon-green/90 ${!onBack ? 'w-full' : 'ml-auto'}`}
+            >
+              Naprej
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

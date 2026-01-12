@@ -45,8 +45,12 @@ export function SimpleChildForm({ onSuccess, onCancel }: SimpleChildFormProps) {
 
   const canContinue = childName.trim().length > 0 && birthDate !== null;
 
+  const handleBackFromAvatar = () => {
+    setShowNameOnly(true);
+  };
+
   if (!showNameOnly) {
-    return <AddChildForm onSuccess={onSuccess} initialName={childName} initialBirthDate={birthDate} initialGender={gender} />;
+    return <AddChildForm onSuccess={onSuccess} onBack={handleBackFromAvatar} initialName={childName} initialBirthDate={birthDate} initialGender={gender} />;
   }
 
   const CalendarContent = (

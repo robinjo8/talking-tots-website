@@ -27,7 +27,7 @@ interface SavedChild {
   speechDevelopment: Record<string, string>;
 }
 
-export function AddChildForm({ onSuccess, initialName, initialBirthDate, initialGender }: { onSuccess?: () => void; initialName?: string; initialBirthDate?: Date | null; initialGender?: string }) {
+export function AddChildForm({ onSuccess, onBack: onBackProp, initialName, initialBirthDate, initialGender }: { onSuccess?: () => void; onBack?: () => void; initialName?: string; initialBirthDate?: Date | null; initialGender?: string }) {
   const { user } = useAuth();
   const [name, setName] = useState(initialName || "");
   const [gender, setGender] = useState(initialGender || "M");
@@ -175,15 +175,19 @@ export function AddChildForm({ onSuccess, initialName, initialBirthDate, initial
     );
   }
 
+  const handleBackToSimpleForm = () => {
+    // Go back to SimpleChildForm
+    if (onBackProp) {
+      onBackProp();
+    }
+  };
+
   return (
     <ChildBasicInfoForm
-      name={name}
-      gender={gender}
       avatarId={avatarId}
-      onNameChange={setName}
-      onGenderChange={setGender}
       onAvatarChange={setAvatarId}
       onSubmit={handleSubmit}
+      onBack={handleBackToSimpleForm}
     />
   );
 }

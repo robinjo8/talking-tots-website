@@ -1,9 +1,11 @@
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { UserX } from "lucide-react";
+import { UserX, ChevronLeft, ChevronRight } from "lucide-react";
+import useEmblaCarousel from "embla-carousel-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Avatar options for children
 export const avatarOptions = [
@@ -33,14 +35,93 @@ type AvatarSelectorProps = {
 
 export function AvatarSelector({ selectedAvatarId, onAvatarSelect, variant = 'grid' }: AvatarSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const isMobile = useIsMobile();
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, startIndex: selectedAvatarId > 0 ? selectedAvatarId - 1 : 0 });
+
+  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   // Grid variant (original design for registration)
   if (variant === 'grid') {
+    // Mobile carousel view
+    if (isMobile) {
+      const avatarsWithoutEmpty = avatarOptions.filter(a => a.id !== 0);
+      
+      return (
+        <div className="w-full">
+          <Label className="text-base font-medium mb-4 block text-center">Izberi avatarja</Label>
+          
+          <div className="relative">
+            <div className="overflow-hidden" ref={emblaRef}>
+              <div className="flex">
+                {avatarsWithoutEmpty.map(avatar => (
+                  <div 
+                    key={avatar.id}
+                    className="flex-[0_0_100%] min-w-0 flex justify-center"
+                  >
+                    <div 
+                      onClick={() => onAvatarSelect(avatar.id)}
+                      className={`cursor-pointer rounded-2xl p-6 transition-all duration-200 flex flex-col items-center justify-center w-48 h-48 ${
+                        selectedAvatarId === avatar.id 
+                          ? 'bg-dragon-green/20 ring-4 ring-dragon-green shadow-xl' 
+                          : 'bg-white border-2 border-gray-200'
+                      }`}
+                    >
+                      <Avatar className="h-28 w-28">
+                        <AvatarImage 
+                          src={avatar.src} 
+                          alt={avatar.alt} 
+                          className="object-contain w-full h-full p-1" 
+                        />
+                        <AvatarFallback className="text-2xl bg-dragon-green/10">🐲</AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm text-center text-gray-600 mt-2">
+                        Zmajček {avatar.id}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Navigation arrows */}
+            <button
+              type="button"
+              onClick={scrollPrev}
+              className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-md hover:bg-white transition-colors"
+            >
+              <ChevronLeft className="h-6 w-6 text-gray-600" />
+            </button>
+            <button
+              type="button"
+              onClick={scrollNext}
+              className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-md hover:bg-white transition-colors"
+            >
+              <ChevronRight className="h-6 w-6 text-gray-600" />
+            </button>
+          </div>
+          
+          <div className="mt-6">
+            <Button 
+              type="button" 
+              variant="outline" 
+              size="sm" 
+              onClick={() => onAvatarSelect(0)}
+              className={`w-full ${selectedAvatarId === 0 ? 'ring-2 ring-dragon-green bg-dragon-green/10' : ''}`}
+            >
+              Ne želim izbrati avatarja
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    // Desktop grid view
     return (
       <div className="w-full">
         <Label className="text-base font-medium mb-4 block">Izberi avatarja</Label>
         <div className="grid grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-6 p-6 bg-gray-50/50 rounded-xl border">
-          {avatarOptions.map(avatar => (
+          {avatarOptions.filter(a => a.id !== 0).map(avatar => (
             <div 
               key={avatar.id}
               onClick={() => onAvatarSelect(avatar.id)}
@@ -50,27 +131,20 @@ export function AvatarSelector({ selectedAvatarId, onAvatarSelect, variant = 'gr
                   : 'bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-dragon-green/40'
               }`}
             >
-              {avatar.id === 0 ? (
-                <div className="h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24 rounded-full flex items-center justify-center bg-gray-100 border-2 border-gray-300 mb-2">
-                  <UserX className="h-8 w-8 sm:h-10 sm:w-10 text-gray-400" />
-                  <span className="sr-only">{avatar.alt}</span>
-                </div>
-              ) : (
-                <div className="relative">
-                  <Avatar className="h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24 ring-2 ring-transparent">
-                    <AvatarImage 
-                      src={avatar.src} 
-                      alt={avatar.alt} 
-                      className="object-contain w-full h-full p-1" 
-                    />
-                    <AvatarFallback className="text-xs text-center p-1 bg-dragon-green/10">
-                      🐲
-                    </AvatarFallback>
-                  </Avatar>
-                </div>
-              )}
+              <div className="relative">
+                <Avatar className="h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24 ring-2 ring-transparent">
+                  <AvatarImage 
+                    src={avatar.src} 
+                    alt={avatar.alt} 
+                    className="object-contain w-full h-full p-1" 
+                  />
+                  <AvatarFallback className="text-xs text-center p-1 bg-dragon-green/10">
+                    🐲
+                  </AvatarFallback>
+                </Avatar>
+              </div>
               <span className="text-xs text-center text-gray-600 mt-2 leading-tight max-w-full break-words">
-                {avatar.id === 0 ? "Brez" : `Zmajček ${avatar.id}`}
+                Zmajček {avatar.id}
               </span>
             </div>
           ))}
@@ -81,7 +155,7 @@ export function AvatarSelector({ selectedAvatarId, onAvatarSelect, variant = 'gr
             variant="outline" 
             size="sm" 
             onClick={() => onAvatarSelect(0)}
-            className="w-full"
+            className={`w-full ${selectedAvatarId === 0 ? 'ring-2 ring-dragon-green bg-dragon-green/10' : ''}`}
           >
             Ne želim izbrati avatarja
           </Button>
@@ -89,6 +163,7 @@ export function AvatarSelector({ selectedAvatarId, onAvatarSelect, variant = 'gr
       </div>
     );
   }
+
 
   // Dropdown variant (new design for profile editing)
   return (
