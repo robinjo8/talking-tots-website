@@ -4,8 +4,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import Header from "@/components/Header";
-import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
-import { User } from "lucide-react";
 import { DeleteChildDialog } from "@/components/DeleteChildDialog";
 import { EditChildModal } from "@/components/EditChildModal";
 import { SpeechDifficultyEditor } from "@/components/SpeechDifficultyEditor";
@@ -107,15 +105,13 @@ export default function Profile() {
       <Header />
       
       <div className="container max-w-6xl mx-auto pt-28 md:pt-32 pb-20 px-4">
-        {/* Breadcrumb */}
-        <div className="mb-6">
-          <BreadcrumbNavigation />
+        {/* Page Title */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
+            Nastavitve
+          </h1>
+          <div className="w-32 h-1 bg-dragon-green mx-auto rounded-full"></div>
         </div>
-        
-        <h1 className="text-3xl font-bold mb-6 flex items-center gap-2">
-          <User className="h-6 w-6 text-dragon-green" />
-          Nastavitve
-        </h1>
         
         {/* Mobile tabs */}
         <div className="md:hidden mb-6">

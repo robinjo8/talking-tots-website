@@ -121,10 +121,6 @@ export function UserProfileSection() {
       
       {/* Content */}
       <div className="p-6">
-        <p className="text-sm text-muted-foreground mb-6">
-          Prosto lahko urediš svoje podatke spodaj.
-        </p>
-
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Osnovni podatki */}
@@ -133,6 +129,20 @@ export function UserProfileSection() {
                 <User className="h-4 w-4 text-dragon-green" />
                 Osnovni podatki
               </h3>
+              
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Ime in priimek:</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Ime in priimek" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               
               <div className="space-y-2">
                 <Label htmlFor="email">E-pošta:</Label>
@@ -143,24 +153,7 @@ export function UserProfileSection() {
                   readOnly 
                   className="bg-gray-50" 
                 />
-                <p className="text-xs text-muted-foreground">
-                  Email naslov ni mogoče spremeniti
-                </p>
               </div>
-              
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Uporabniško ime:</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Uporabniško ime" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
 
             <Separator />
