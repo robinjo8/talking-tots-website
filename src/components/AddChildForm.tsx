@@ -10,6 +10,36 @@ import { ChildCompletedView } from "./children/ChildCompletedView";
 import { ChildProfile } from "@/hooks/registration/types";
 import { calculateAge } from "@/utils/childUtils";
 import { useChildDocuments } from "@/hooks/useChildDocuments";
+import { SPEECH_DEVELOPMENT_QUESTIONS, SPEECH_DEVELOPMENT_TEXT_QUESTIONS } from "@/models/SpeechDevelopment";
+
+// Format questionnaire answers as readable text for storage
+const formatQuestionnaireAsText = (answers: Record<string, string>, childName: string): string => {
+  const lines: string[] = [];
+  lines.push(`OSNOVNI VPRAŠALNIK - ${childName}`);
+  lines.push(`Datum: ${new Date().toLocaleDateString('sl-SI')}`);
+  lines.push('');
+  lines.push('='.repeat(50));
+  lines.push('');
+  
+  // Radio questions
+  SPEECH_DEVELOPMENT_QUESTIONS.forEach(q => {
+    const answer = answers[q.id];
+    const option = q.options.find(o => o.value === answer);
+    lines.push(`${q.question}`);
+    lines.push(`Odgovor: ${option?.label || 'Ni odgovora'}`);
+    lines.push('');
+  });
+  
+  // Text questions
+  SPEECH_DEVELOPMENT_TEXT_QUESTIONS.forEach(q => {
+    const answer = answers[q.id];
+    lines.push(`${q.question}`);
+    lines.push(`Odgovor: ${answer || 'Ni odgovora'}`);
+    lines.push('');
+  });
+  
+  return lines.join('\n');
+};
 
 enum AddChildStep {
   BASIC_INFO,
@@ -108,6 +138,18 @@ export function AddChildForm({ onSuccess, onBack: onBackProp, initialName, initi
         const textBlob = new Blob([speechDescription], { type: 'text/plain' });
         const textFile = new File([textBlob], `opis-govornih-tezav-${Date.now()}.txt`, { type: 'text/plain' });
         await uploadDocument(textFile, newChildId, 'speech_description');
+      }
+      
+      // Upload questionnaire as text file
+      if (Object.keys(developmentAnswers).length > 0) {
+        const questionnaireText = formatQuestionnaireAsText(developmentAnswers, name.trim());
+        const questionnaireBlob = new Blob([questionnaireText], { type: 'text/plain' });
+        const questionnaireFile = new File(
+          [questionnaireBlob], 
+          `${newChildId}-osnovni-vprasalnik.txt`, 
+          { type: 'text/plain' }
+        );
+        await uploadDocument(questionnaireFile, newChildId, 'questionnaire');
       }
       
       const newChild: SavedChild = {
