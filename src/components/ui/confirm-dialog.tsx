@@ -96,31 +96,25 @@ export function ConfirmDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="gap-2">
-          <AlertDialogCancel 
-            asChild
-            onClick={handleCancel}
-          >
+          <AlertDialogCancel asChild>
             <Button 
               variant="outline" 
               disabled={isLoading}
               className="w-full sm:w-auto"
+              onClick={handleCancel}
             >
               {cancelText}
             </Button>
           </AlertDialogCancel>
-          <AlertDialogAction
-            asChild
+          <Button 
+            variant={confirmVariant}
+            disabled={isLoading}
+            className="w-full sm:w-auto flex items-center gap-1 transition-all duration-150"
             onClick={handleConfirm}
           >
-            <Button 
-              variant={confirmVariant}
-              disabled={isLoading}
-              className="w-full sm:w-auto flex items-center gap-1 transition-all duration-150"
-            >
-              {isLoading ? "Nalaganje..." : confirmText}
-              {confirmIcon && !isLoading && confirmIcon}
-            </Button>
-          </AlertDialogAction>
+            {isLoading ? "Nalaganje..." : confirmText}
+            {confirmIcon && !isLoading && confirmIcon}
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
