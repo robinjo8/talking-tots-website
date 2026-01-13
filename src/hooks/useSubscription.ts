@@ -32,7 +32,7 @@ export function useSubscription() {
         planId: null,
         productId: null,
         subscriptionEnd: null,
-        isLoading: false, // Important: set loading to false when no session
+        isLoading: false,
         isTrialing: false,
         trialEnd: null,
       });
@@ -42,20 +42,18 @@ export function useSubscription() {
     setSubscription(prev => ({ ...prev, isLoading: true }));
 
     try {
-      // Refresh session to ensure token is valid
-      const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+      // Uporabi obstoječi token iz session - ne klicaj refreshSession() ob prijavi
+      const token = session.access_token;
       
-      if (refreshError || !refreshData.session) {
-        console.error('Session refresh error in useSubscription:', refreshError);
+      if (!token) {
+        console.log('No access token available yet');
         setSubscription(prev => ({ ...prev, isLoading: false }));
         return;
       }
-      
-      const freshToken = refreshData.session.access_token;
 
       const { data, error } = await supabase.functions.invoke('check-subscription', {
         headers: {
-          Authorization: `Bearer ${freshToken}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -84,8 +82,12 @@ export function useSubscription() {
 
   // Check subscription on mount and when user changes
   useEffect(() => {
-    // Always call checkSubscription - it handles the no-session case internally
-    checkSubscription();
+    // Počakaj kratko, da se seja stabilizira po prijavi
+    const timeoutId = setTimeout(() => {
+      checkSubscription();
+    }, 100);
+    
+    return () => clearTimeout(timeoutId);
   }, [user, session, checkSubscription]);
 
   // Periodic refresh every 60 seconds
