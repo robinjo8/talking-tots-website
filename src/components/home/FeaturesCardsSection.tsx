@@ -9,6 +9,8 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
+import { useSubscription } from "@/hooks/useSubscription";
+import { SubscriptionRequiredModal } from "@/components/subscription/SubscriptionRequiredModal";
 
 const features = [
   {
@@ -135,13 +137,20 @@ function MobileFeatureCarousel({
 export function FeaturesCardsSection() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isSubscribed, isLoading } = useSubscription();
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
   const handleButtonClick = (action: string) => {
     if (action === "start") {
-      if (user) {
-        navigate("/moje-aplikacije");
-      } else {
+      if (!user) {
         navigate("/login");
+      } else if (isLoading) {
+        // Still checking subscription, do nothing
+        return;
+      } else if (!isSubscribed) {
+        setShowSubscriptionModal(true);
+      } else {
+        navigate("/moje-aplikacije");
       }
     } else if (action === "howItWorks") {
       navigate("/delovanje-testa");
@@ -167,6 +176,11 @@ export function FeaturesCardsSection() {
           ))}
         </div>
       </div>
+      
+      <SubscriptionRequiredModal 
+        open={showSubscriptionModal} 
+        onOpenChange={setShowSubscriptionModal}
+      />
     </section>
   );
 }
