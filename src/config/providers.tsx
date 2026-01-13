@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { PWAProvider } from "@/components/pwa/PWAProvider";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 
@@ -21,12 +22,14 @@ export function AppProviders({ children }: AppProvidersProps) {
       <ThemeProvider defaultTheme="light">
         <TooltipProvider>
           <AuthProvider>
-            <PWAProvider>
-              <Toaster />
-              <Sonner />
-              {children}
-              <CookieConsentBanner />
-            </PWAProvider>
+            <SubscriptionProvider>
+              <PWAProvider>
+                <Toaster />
+                <Sonner />
+                {children}
+                <CookieConsentBanner />
+              </PWAProvider>
+            </SubscriptionProvider>
           </AuthProvider>
         </TooltipProvider>
       </ThemeProvider>

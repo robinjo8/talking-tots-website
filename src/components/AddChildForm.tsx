@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 import { SpeechDifficultiesStep, SpeechDevelopmentQuestions } from "@/components/speech";
 import { ChildBasicInfoForm } from "./children/ChildBasicInfoForm";
@@ -61,6 +62,7 @@ interface SavedChild {
 
 export function AddChildForm({ onSuccess, onBack: onBackProp, initialName, initialBirthDate, initialGender }: { onSuccess?: () => void; onBack?: () => void; initialName?: string; initialBirthDate?: Date | null; initialGender?: string }) {
   const { user } = useAuth();
+  const { planId } = useSubscription();
   const [name, setName] = useState(initialName || "");
   const [gender, setGender] = useState(initialGender || "M");
   const [avatarId, setAvatarId] = useState(1);
@@ -74,6 +76,9 @@ export function AddChildForm({ onSuccess, onBack: onBackProp, initialName, initi
   const [savedChildren, setSavedChildren] = useState<SavedChild[]>([]);
   
   const { uploadDocument } = useChildDocuments();
+  
+  // Check if user has Pro plan - only Pro users need speech questionnaires
+  const isPro = planId === 'pro';
 
   // Scroll to top when step changes
   useEffect(() => {
@@ -88,7 +93,67 @@ export function AddChildForm({ onSuccess, onBack: onBackProp, initialName, initi
       return;
     }
     
+    // For Start/Plus plans, skip speech questionnaires and save directly
+    if (!isPro) {
+      await handleQuickSave();
+      return;
+    }
+    
+    // For Pro plan, continue to speech difficulties
     setCurrentStep(AddChildStep.SPEECH_DIFFICULTIES);
+  };
+  
+  // Quick save for Start/Plus plans - only basic info
+  const handleQuickSave = async () => {
+    if (!user) {
+      toast.error("Morate biti prijavljeni za dodajanje otroka.");
+      return;
+    }
+    
+    try {
+      setIsSubmitting(true);
+      
+      const calculatedAge = calculateAge(birthDate);
+      
+      const { data: childData, error: childError } = await supabase
+        .from('children')
+        .insert({
+          parent_id: user.id,
+          name: name.trim(),
+          gender,
+          avatar_url: avatarOptions.find(a => a.id === avatarId)?.src || null,
+          birth_date: birthDate ? birthDate.toISOString().split('T')[0] : null,
+          age: calculatedAge,
+          speech_difficulties: [],
+          speech_difficulties_description: null,
+          speech_development: {}
+        })
+        .select()
+        .single();
+
+      if (childError) throw childError;
+
+      const newChild: SavedChild = {
+        id: childData.id,
+        name: name.trim(),
+        gender: gender as "M" | "F" | "N",
+        avatarId,
+        birthDate,
+        age: calculatedAge,
+        speechDifficulties: [],
+        speechDevelopment: {}
+      };
+      
+      setSavedChildren(prev => [...prev, newChild]);
+      toast.success("Otrok uspešno dodan!");
+      setCurrentStep(AddChildStep.COMPLETED);
+      
+    } catch (error: any) {
+      console.error("Napaka pri dodajanju otroka:", error);
+      toast.error("Napaka pri dodajanju otroka. Poskusite znova.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleSpeechDifficultiesSubmit = async (difficulties: string[], description?: string, file?: File | null) => {
