@@ -86,6 +86,9 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
+      subscription_data: {
+        trial_period_days: 7, // 7-dnevno brezplačno obdobje
+      },
       success_url: `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/payment-canceled`,
       metadata: {
@@ -93,6 +96,8 @@ serve(async (req) => {
         planId: planId || '',
       },
     });
+    
+    logStep("Checkout session created with 7-day trial", { sessionId: session.id, url: session.url });
 
     logStep("Checkout session created", { sessionId: session.id, url: session.url });
 

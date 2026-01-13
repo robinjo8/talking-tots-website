@@ -62,21 +62,33 @@ serve(async (req) => {
     const customerId = customers.data[0].id;
     logStep("Found Stripe customer", { customerId });
 
+    // Check for active or trialing subscriptions
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
-      status: "active",
       limit: 1,
     });
     
-    const hasActiveSub = subscriptions.data.length > 0;
+    // Filter to active or trialing subscriptions
+    const activeOrTrialingSub = subscriptions.data.find(
+      sub => sub.status === 'active' || sub.status === 'trialing'
+    );
+    
+    const hasActiveSub = !!activeOrTrialingSub;
     let productId: string | null = null;
     let subscriptionEnd: string | null = null;
+    let isTrialing = false;
+    let trialEnd: string | null = null;
 
-    if (hasActiveSub) {
-      const subscription = subscriptions.data[0];
-      logStep("Active subscription found", { subscriptionId: subscription.id });
+    if (hasActiveSub && activeOrTrialingSub) {
+      const subscription = activeOrTrialingSub;
+      isTrialing = subscription.status === 'trialing';
+      logStep("Subscription found", { 
+        subscriptionId: subscription.id, 
+        status: subscription.status,
+        isTrialing 
+      });
       
-      // Safely convert timestamp to ISO string
+      // Safely convert timestamps
       if (subscription.current_period_end && typeof subscription.current_period_end === 'number') {
         try {
           subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
@@ -84,6 +96,17 @@ serve(async (req) => {
         } catch (e) {
           logStep("Failed to parse subscription end date", { current_period_end: subscription.current_period_end });
           subscriptionEnd = null;
+        }
+      }
+      
+      // Get trial end date if trialing
+      if (isTrialing && subscription.trial_end && typeof subscription.trial_end === 'number') {
+        try {
+          trialEnd = new Date(subscription.trial_end * 1000).toISOString();
+          logStep("Trial end date", { trialEnd });
+        } catch (e) {
+          logStep("Failed to parse trial end date", { trial_end: subscription.trial_end });
+          trialEnd = null;
         }
       }
       
@@ -95,13 +118,15 @@ serve(async (req) => {
         logStep("Determined subscription product", { productId });
       }
     } else {
-      logStep("No active subscription found");
+      logStep("No active or trialing subscription found");
     }
 
     return new Response(JSON.stringify({
       subscribed: hasActiveSub,
       productId,
-      subscriptionEnd
+      subscriptionEnd,
+      isTrialing,
+      trialEnd
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
