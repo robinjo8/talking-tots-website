@@ -308,8 +308,8 @@ export function AddChildForm({ onSuccess, onBack: onBackProp, initialName, initi
     return (
       <ChildCompletedView 
         child={lastChild}
-        onAddNewChild={startNewChild}
         onClose={onSuccess}
+        isPro={isPro}
       />
     );
   }

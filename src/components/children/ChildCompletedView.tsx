@@ -12,16 +12,16 @@ import { SpeechDifficultyBadge } from "@/components/speech";
 
 interface ChildCompletedViewProps {
   child: ChildProfile;
-  onAddNewChild?: () => void;
   onClose: () => void;
   closeButtonText?: string;
+  isPro?: boolean;
 }
 
 export function ChildCompletedView({ 
   child, 
-  onAddNewChild, 
   onClose,
-  closeButtonText = "Zaključi registracijo" 
+  closeButtonText = "Zaključi registracijo",
+  isPro = false
 }: ChildCompletedViewProps) {
   const getAnswerLabels = (answers: Record<string, string> = {}) => {
     const labelMap: Record<string, string> = {
@@ -78,38 +78,44 @@ export function ChildCompletedView({
         </div>
       </div>
       
-      <div>
-        <h3 className="font-semibold text-lg mb-4">Govorne težave</h3>
-        {child.speechDifficulties && child.speechDifficulties.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
-            {child.speechDifficulties.map(diffId => (
-              <SpeechDifficultyBadge 
-                key={diffId} 
-                difficultyId={diffId}
-              />
+      {/* Only show speech difficulties section for Pro users */}
+      {isPro && (
+        <div>
+          <h3 className="font-semibold text-lg mb-4">Govorne težave</h3>
+          {child.speechDifficulties && child.speechDifficulties.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {child.speechDifficulties.map(diffId => (
+                <SpeechDifficultyBadge 
+                  key={diffId} 
+                  difficultyId={diffId}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500 italic">Ni izbranih govornih težav</p>
+          )}
+        </div>
+      )}
+      
+      {/* Only show questionnaire section for Pro users */}
+      {isPro && answerItems.length > 0 && (
+        <div>
+          <h3 className="font-semibold text-lg mb-4">Odgovori na vprašalnik</h3>
+          <div className="bg-white rounded-lg border divide-y">
+            {answerItems.map((item, index) => (
+              <div key={item.id} className="p-4 flex items-center justify-between">
+                <span className="text-gray-700">Vprašanje {index + 1}</span>
+                <Badge 
+                  variant={item.answer === "Da" ? "success" : 
+                         item.answer === "Ne" ? "outline" : "secondary"}
+                >
+                  {item.answer}
+                </Badge>
+              </div>
             ))}
           </div>
-        ) : (
-          <p className="text-gray-500 italic">Ni izbranih govornih težav</p>
-        )}
-      </div>
-      
-      <div>
-        <h3 className="font-semibold text-lg mb-4">Odgovori na vprašalnik</h3>
-        <div className="bg-white rounded-lg border divide-y">
-          {answerItems.map((item, index) => (
-            <div key={item.id} className="p-4 flex items-center justify-between">
-              <span className="text-gray-700">Vprašanje {index + 1}</span>
-              <Badge 
-                variant={item.answer === "Da" ? "success" : 
-                       item.answer === "Ne" ? "outline" : "secondary"}
-              >
-                {item.answer}
-              </Badge>
-            </div>
-          ))}
         </div>
-      </div>
+      )}
       
       <div className="flex flex-col space-y-4 pt-4">
         <Button
@@ -118,16 +124,6 @@ export function ChildCompletedView({
         >
           {closeButtonText}
         </Button>
-        
-        {onAddNewChild && (
-          <Button
-            variant="outline"
-            onClick={onAddNewChild}
-            className="w-full border-dragon-green text-dragon-green hover:bg-dragon-green/10"
-          >
-            Dodaj novega otroka
-          </Button>
-        )}
       </div>
     </div>
   );
