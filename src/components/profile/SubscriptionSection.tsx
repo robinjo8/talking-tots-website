@@ -42,13 +42,24 @@ export function SubscriptionSection() {
     setIsCheckoutLoading(plan.id);
 
     try {
+      // Refresh session to ensure token is valid
+      const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+      
+      if (refreshError || !refreshData.session) {
+        console.error('Session refresh error:', refreshError);
+        toast.error("Seja je potekla. Prosimo, prijavite se znova.");
+        return;
+      }
+
+      const freshToken = refreshData.session.access_token;
+
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: {
           priceId: plan.stripePriceId,
           planId: plan.id,
         },
         headers: {
-          Authorization: `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${freshToken}`,
         },
       });
 
