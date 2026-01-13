@@ -46,7 +46,12 @@ export function MobileMenu({
   };
   
   const handleProtectedNavigate = (path: string) => {
-    if (!isSubscribed && !isLoading) {
+    // Block navigation while loading or if not subscribed
+    if (isLoading) {
+      // Still checking subscription, don't navigate yet
+      return;
+    }
+    if (!isSubscribed) {
       setIsOpen(false);
       setShowSubscriptionModal(true);
       return;

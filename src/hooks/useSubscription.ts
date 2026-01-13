@@ -20,7 +20,7 @@ export function useSubscription() {
     planId: null,
     productId: null,
     subscriptionEnd: null,
-    isLoading: false,
+    isLoading: true, // Start as loading to block access until check completes
     isTrialing: false,
     trialEnd: null,
   });
