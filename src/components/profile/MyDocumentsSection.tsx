@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Download, Trash2, CheckCircle2, Loader2, FileCheck, Upload, AlertCircle } from "lucide-react";
+import { FileText, Download, Trash2, CheckCircle2, Loader2, FileCheck, Upload, AlertCircle, ChevronDown } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChildDocuments } from "@/hooks/useChildDocuments";
 import { Badge } from "@/components/ui/badge";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { cn } from "@/lib/utils";
 
 type DocumentItem = {
   id: string;
@@ -27,6 +28,8 @@ export function MyDocumentsSection() {
   const { fetchDocuments, deleteDocument, getDocumentUrl } = useChildDocuments();
   const [groupedDocuments, setGroupedDocuments] = useState<GroupedDocuments[]>([]);
   const [loading, setLoading] = useState(true);
+  const [uploadedDocsOpen, setUploadedDocsOpen] = useState(true);
+  const [reportsOpen, setReportsOpen] = useState(true);
 
   useEffect(() => {
     const loadAllDocuments = async () => {
@@ -122,106 +125,127 @@ export function MyDocumentsSection() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Section title */}
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">Moji dokumenti</h2>
-        <p className="text-muted-foreground mt-1">
-          Vsi naloženi dokumenti in poročila na enem mestu
-        </p>
+    <div className="bg-white rounded-lg shadow-sm border border-dragon-green/20 overflow-hidden">
+      {/* Header - matching Otroci style */}
+      <div className="bg-dragon-green text-white p-4">
+        <h2 className="text-xl font-semibold flex items-center gap-2">
+          <FileText className="h-5 w-5" />
+          Moji dokumenti
+        </h2>
       </div>
-
-      {/* Uploaded Documents Section */}
-      <Card>
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Upload className="h-5 w-5 text-dragon-green" />
-            Naloženi dokumenti
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {groupedDocuments.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <FileText className="h-12 w-12 mx-auto mb-3 opacity-30" />
-              <p>Ni naloženih dokumentov</p>
-              <p className="text-sm mt-1">
-                Dokumente lahko naložite pri profilu otroka
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {groupedDocuments.map((group) => (
-                <div key={group.childId} className="space-y-3">
-                  <h4 className="font-medium text-dragon-green flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-dragon-green" />
-                    {group.childName}
-                  </h4>
-                  <div className="space-y-2 pl-4">
-                    {group.documents.map((doc) => (
-                      <div 
-                        key={doc.id} 
-                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100"
-                      >
-                        <div className="flex items-center gap-3 min-w-0 flex-1">
-                          <FileText className="h-4 w-4 text-gray-500 shrink-0" />
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium truncate">
-                              {doc.original_filename}
-                            </p>
-                            <div className="flex items-center gap-2 mt-1 flex-wrap">
-                              <span className="text-xs text-muted-foreground">
-                                {getDocumentTypeLabel(doc.document_type)}
-                              </span>
-                              {getStatusBadge(doc.virus_scan_status)}
+      
+      {/* Content */}
+      <div className="p-6 space-y-4">
+        {/* Uploaded Documents Section - collapsible like Govorne težave */}
+        <div className="border border-gray-200 rounded-lg overflow-hidden">
+          <Collapsible open={uploadedDocsOpen} onOpenChange={setUploadedDocsOpen}>
+            <CollapsibleTrigger asChild>
+              <div className="flex items-center justify-center p-4 cursor-pointer hover:bg-muted/50 transition-colors relative">
+                <h5 className="font-medium text-foreground">Naloženi dokumenti</h5>
+                <div className="absolute right-4 flex items-center gap-2">
+                  <ChevronDown className={cn(
+                    "h-4 w-4 text-muted-foreground transition-transform",
+                    uploadedDocsOpen && "rotate-180"
+                  )} />
+                </div>
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="px-4 pb-4 pt-0 border-t border-gray-100">
+                {groupedDocuments.length === 0 ? (
+                  <div className="text-center py-6 text-muted-foreground">
+                    <FileText className="h-10 w-10 mx-auto mb-3 opacity-30" />
+                    <p className="text-sm">Ni naloženih dokumentov</p>
+                    <p className="text-xs mt-1">
+                      Dokumente lahko naložite pri profilu otroka
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4 pt-4">
+                    {groupedDocuments.map((group) => (
+                      <div key={group.childId} className="space-y-3">
+                        <h4 className="font-medium text-dragon-green flex items-center gap-2 text-sm">
+                          <span className="w-2 h-2 rounded-full bg-dragon-green" />
+                          {group.childName}
+                        </h4>
+                        <div className="space-y-2 pl-4">
+                          {group.documents.map((doc) => (
+                            <div 
+                              key={doc.id} 
+                              className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100"
+                            >
+                              <div className="flex items-center gap-3 min-w-0 flex-1">
+                                <FileText className="h-4 w-4 text-gray-500 shrink-0" />
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-sm font-medium truncate">
+                                    {doc.original_filename}
+                                  </p>
+                                  <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                    <span className="text-xs text-muted-foreground">
+                                      {getDocumentTypeLabel(doc.document_type)}
+                                    </span>
+                                    {getStatusBadge(doc.virus_scan_status)}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex gap-1 shrink-0">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleDownload(doc.storage_path)}
+                                  className="h-8 w-8 p-0"
+                                >
+                                  <Download className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                                  onClick={() => handleDelete(doc.id, doc.storage_path, group.childId)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
                             </div>
-                          </div>
-                        </div>
-                        <div className="flex gap-1 shrink-0">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDownload(doc.storage_path)}
-                            className="h-8 w-8 p-0"
-                          >
-                            <Download className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                            onClick={() => handleDelete(doc.id, doc.storage_path, group.childId)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          ))}
                         </div>
                       </div>
                     ))}
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                )}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        </div>
 
-      {/* Reports Section */}
-      <Card>
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <FileCheck className="h-5 w-5 text-dragon-green" />
-            Poročila
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8 text-muted-foreground">
-            <FileCheck className="h-12 w-12 mx-auto mb-3 opacity-30" />
-            <p>Poročil še ni</p>
-            <p className="text-sm mt-1">
-              Tukaj bodo prikazana poročila logopedov
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+        {/* Reports Section - collapsible like Osnovni vprašalnik */}
+        <div className="border border-gray-200 rounded-lg overflow-hidden">
+          <Collapsible open={reportsOpen} onOpenChange={setReportsOpen}>
+            <CollapsibleTrigger asChild>
+              <div className="flex items-center justify-center p-4 cursor-pointer hover:bg-muted/50 transition-colors relative">
+                <h5 className="font-medium text-foreground">Poročila</h5>
+                <div className="absolute right-4 flex items-center gap-2">
+                  <ChevronDown className={cn(
+                    "h-4 w-4 text-muted-foreground transition-transform",
+                    reportsOpen && "rotate-180"
+                  )} />
+                </div>
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="px-4 pb-4 pt-0 border-t border-gray-100">
+                <div className="text-center py-6 text-muted-foreground">
+                  <FileCheck className="h-10 w-10 mx-auto mb-3 opacity-30" />
+                  <p className="text-sm">Poročil še ni</p>
+                  <p className="text-xs mt-1">
+                    Tukaj bodo prikazana poročila logopedov
+                  </p>
+                </div>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        </div>
+      </div>
     </div>
   );
 }
