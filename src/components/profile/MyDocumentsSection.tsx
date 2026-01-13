@@ -6,7 +6,6 @@ import { useChildDocuments } from "@/hooks/useChildDocuments";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
-
 type DocumentItem = {
   id: string;
   child_id: string;
@@ -16,31 +15,32 @@ type DocumentItem = {
   virus_scan_status: string;
   created_at: string;
 };
-
 type GroupedDocuments = {
   childId: string;
   childName: string;
   documents: DocumentItem[];
 };
-
 export function MyDocumentsSection() {
-  const { profile } = useAuth();
-  const { fetchDocuments, deleteDocument, getDocumentUrl } = useChildDocuments();
+  const {
+    profile
+  } = useAuth();
+  const {
+    fetchDocuments,
+    deleteDocument,
+    getDocumentUrl
+  } = useChildDocuments();
   const [groupedDocuments, setGroupedDocuments] = useState<GroupedDocuments[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploadedDocsOpen, setUploadedDocsOpen] = useState(true);
   const [reportsOpen, setReportsOpen] = useState(true);
-
   useEffect(() => {
     const loadAllDocuments = async () => {
       if (!profile?.children) {
         setLoading(false);
         return;
       }
-
       setLoading(true);
       const grouped: GroupedDocuments[] = [];
-
       for (const child of profile.children) {
         if (child.id) {
           const docs = await fetchDocuments(child.id);
@@ -48,84 +48,69 @@ export function MyDocumentsSection() {
             grouped.push({
               childId: child.id,
               childName: child.name,
-              documents: docs,
+              documents: docs
             });
           }
         }
       }
-
       setGroupedDocuments(grouped);
       setLoading(false);
     };
-
     loadAllDocuments();
   }, [profile?.children, fetchDocuments]);
-
   const handleDownload = async (storagePath: string) => {
     const url = await getDocumentUrl(storagePath);
     if (url) window.open(url, '_blank');
   };
-
   const handleDelete = async (docId: string, storagePath: string, childId: string) => {
     if (await deleteDocument(docId, storagePath)) {
-      setGroupedDocuments(prev => 
-        prev.map(group => {
-          if (group.childId === childId) {
-            return {
-              ...group,
-              documents: group.documents.filter(d => d.id !== docId),
-            };
-          }
-          return group;
-        }).filter(group => group.documents.length > 0)
-      );
+      setGroupedDocuments(prev => prev.map(group => {
+        if (group.childId === childId) {
+          return {
+            ...group,
+            documents: group.documents.filter(d => d.id !== docId)
+          };
+        }
+        return group;
+      }).filter(group => group.documents.length > 0));
     }
   };
-
   const getDocumentTypeLabel = (type: string) => {
     switch (type) {
-      case 'pdf_attachment': return 'PDF priponka';
-      case 'speech_description': return 'Opis govornih težav';
-      case 'questionnaire': return 'Osnovni vprašalnik';
-      default: return type;
+      case 'pdf_attachment':
+        return 'PDF priponka';
+      case 'speech_description':
+        return 'Opis govornih težav';
+      case 'questionnaire':
+        return 'Osnovni vprašalnik';
+      default:
+        return type;
     }
   };
-
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'clean':
-        return (
-          <Badge variant="outline" className="text-dragon-green border-dragon-green/30 bg-dragon-green/10">
+        return <Badge variant="outline" className="text-dragon-green border-dragon-green/30 bg-dragon-green/10">
             <CheckCircle2 className="h-3 w-3 mr-1" /> Preverjeno
-          </Badge>
-        );
+          </Badge>;
       case 'pending':
-        return (
-          <Badge variant="outline" className="text-amber-600 border-amber-300 bg-amber-50">
+        return <Badge variant="outline" className="text-amber-600 border-amber-300 bg-amber-50">
             <Loader2 className="h-3 w-3 mr-1 animate-spin" /> V pregledu
-          </Badge>
-        );
+          </Badge>;
       case 'error':
-        return (
-          <Badge variant="outline" className="text-red-600 border-red-300 bg-red-50">
+        return <Badge variant="outline" className="text-red-600 border-red-300 bg-red-50">
             <AlertCircle className="h-3 w-3 mr-1" /> Napaka
-          </Badge>
-        );
+          </Badge>;
       default:
         return null;
     }
   };
-
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
+    return <div className="flex items-center justify-center py-12">
         <Loader2 className="h-8 w-8 animate-spin text-dragon-green" />
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="bg-white rounded-lg shadow-sm border border-dragon-green/20 overflow-hidden">
+  return <div className="bg-white rounded-lg shadow-sm border border-dragon-green/20 overflow-hidden">
       {/* Header - matching Otroci style */}
       <div className="bg-dragon-green text-white p-4">
         <h2 className="text-xl font-semibold flex items-center gap-2">
@@ -143,37 +128,23 @@ export function MyDocumentsSection() {
               <div className="flex items-center justify-center p-4 cursor-pointer hover:bg-muted/50 transition-colors relative">
                 <h5 className="font-medium text-foreground">Naloženi dokumenti</h5>
                 <div className="absolute right-4 flex items-center gap-2">
-                  <ChevronDown className={cn(
-                    "h-4 w-4 text-muted-foreground transition-transform",
-                    uploadedDocsOpen && "rotate-180"
-                  )} />
+                  <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", uploadedDocsOpen && "rotate-180")} />
                 </div>
               </div>
             </CollapsibleTrigger>
             <CollapsibleContent>
               <div className="px-4 pb-4 pt-0 border-t border-gray-100">
-                {groupedDocuments.length === 0 ? (
-                  <div className="text-center py-6 text-muted-foreground">
+                {groupedDocuments.length === 0 ? <div className="text-center py-6 text-muted-foreground">
                     <FileText className="h-10 w-10 mx-auto mb-3 opacity-30" />
                     <p className="text-sm">Ni naloženih dokumentov</p>
                     <p className="text-xs mt-1">
                       Dokumente lahko naložite pri profilu otroka
                     </p>
-                  </div>
-                ) : (
-                  <div className="space-y-4 pt-4">
-                    {groupedDocuments.map((group) => (
-                      <div key={group.childId} className="space-y-3">
-                        <h4 className="font-medium text-dragon-green flex items-center gap-2 text-sm">
-                          <span className="w-2 h-2 rounded-full bg-dragon-green" />
-                          {group.childName}
-                        </h4>
+                  </div> : <div className="space-y-4 pt-4">
+                    {groupedDocuments.map(group => <div key={group.childId} className="space-y-3">
+                        
                         <div className="space-y-2 pl-4">
-                          {group.documents.map((doc) => (
-                            <div 
-                              key={doc.id} 
-                              className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100"
-                            >
+                          {group.documents.map(doc => <div key={doc.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
                               <div className="flex items-center gap-3 min-w-0 flex-1">
                                 <FileText className="h-4 w-4 text-gray-500 shrink-0" />
                                 <div className="min-w-0 flex-1">
@@ -189,30 +160,17 @@ export function MyDocumentsSection() {
                                 </div>
                               </div>
                               <div className="flex gap-1 shrink-0">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleDownload(doc.storage_path)}
-                                  className="h-8 w-8 p-0"
-                                >
+                                <Button variant="ghost" size="sm" onClick={() => handleDownload(doc.storage_path)} className="h-8 w-8 p-0">
                                   <Download className="h-4 w-4" />
                                 </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                                  onClick={() => handleDelete(doc.id, doc.storage_path, group.childId)}
-                                >
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive hover:text-destructive" onClick={() => handleDelete(doc.id, doc.storage_path, group.childId)}>
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
-                            </div>
-                          ))}
+                            </div>)}
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      </div>)}
+                  </div>}
               </div>
             </CollapsibleContent>
           </Collapsible>
@@ -225,10 +183,7 @@ export function MyDocumentsSection() {
               <div className="flex items-center justify-center p-4 cursor-pointer hover:bg-muted/50 transition-colors relative">
                 <h5 className="font-medium text-foreground">Poročila</h5>
                 <div className="absolute right-4 flex items-center gap-2">
-                  <ChevronDown className={cn(
-                    "h-4 w-4 text-muted-foreground transition-transform",
-                    reportsOpen && "rotate-180"
-                  )} />
+                  <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", reportsOpen && "rotate-180")} />
                 </div>
               </div>
             </CollapsibleTrigger>
@@ -246,6 +201,5 @@ export function MyDocumentsSection() {
           </Collapsible>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 }
