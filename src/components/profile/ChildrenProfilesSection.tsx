@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSubscription } from "@/hooks/useSubscription";
 import { Button } from "@/components/ui/button";
-import { Users, Star } from "lucide-react";
+import { Users, Star, CreditCard } from "lucide-react";
 import { SimpleChildForm } from "@/components/profile/SimpleChildForm";
 import { ChildProfileDisplay } from "@/components/profile/ChildProfileDisplay";
 
@@ -19,9 +21,11 @@ export function ChildrenProfilesSection({
   setEditingDevelopmentIndex
 }: ChildrenProfilesSectionProps) {
   const { profile } = useAuth();
+  const { isSubscribed, planId, isLoading } = useSubscription();
   const [showDatabaseManager, setShowDatabaseManager] = useState(false);
 
   const hasNoChildren = !profile?.children || profile.children.length === 0;
+  const isPro = planId === 'pro';
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-dragon-green/20 overflow-hidden">
@@ -30,7 +34,7 @@ export function ChildrenProfilesSection({
         <h2 className="text-xl font-semibold flex items-center gap-2">
           <Users className="h-5 w-5" />
           Otroci ({profile?.children?.length || 0})
-          {hasNoChildren && (
+          {hasNoChildren && isSubscribed && (
             <Star className="h-5 w-5 text-yellow-300 fill-yellow-300 animate-pulse" />
           )}
         </h2>
@@ -39,8 +43,28 @@ export function ChildrenProfilesSection({
       {/* Content */}
       <div className="p-6">
         <div className="space-y-6">
-          {/* Database manager - show only if no children exist */}
-          {hasNoChildren && !showDatabaseManager && (
+          {/* Not subscribed - show message to subscribe first */}
+          {!isLoading && !isSubscribed && (
+            <div className="text-center py-8">
+              <CreditCard className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium mb-2">Naročnina ni aktivna</h3>
+              <p className="text-muted-foreground mb-4">
+                Za dodajanje otroka najprej izberite naročniški paket.
+              </p>
+              <Link to="/cenik">
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="bg-dragon-green hover:bg-dragon-green/90"
+                >
+                  Izberi paket
+                </Button>
+              </Link>
+            </div>
+          )}
+
+          {/* Subscribed but no children - show add child button */}
+          {isSubscribed && hasNoChildren && !showDatabaseManager && (
             <div className="text-center py-8">
               <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium mb-2">Ni dodanih otrok</h3>
@@ -58,7 +82,7 @@ export function ChildrenProfilesSection({
             </div>
           )}
 
-          {hasNoChildren && showDatabaseManager && (
+          {isSubscribed && hasNoChildren && showDatabaseManager && (
             <SimpleChildForm 
               onSuccess={() => {
                 setShowDatabaseManager(false);
@@ -75,11 +99,12 @@ export function ChildrenProfilesSection({
                 <ChildProfileDisplay
                   key={child.id}
                   child={child}
+                  isPro={isPro}
                   onEdit={() => setEditingChildIndex(index)}
                   onDelete={() => setDeletingChildIndex(index)}
                   onRefresh={() => window.location.reload()}
-                  onEditDifficulties={() => setEditingDifficultiesIndex(index)}
-                  onEditDevelopment={() => setEditingDevelopmentIndex(index)}
+                  onEditDifficulties={isPro ? () => setEditingDifficultiesIndex(index) : undefined}
+                  onEditDevelopment={isPro ? () => setEditingDevelopmentIndex(index) : undefined}
                 />
               ))}
             </div>
