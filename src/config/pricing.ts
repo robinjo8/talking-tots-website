@@ -15,6 +15,8 @@ export interface PricingPlan {
   color: 'app-blue' | 'app-orange' | 'dragon-green';
   features: string[];
   isPopular?: boolean;
+  stripePriceId: string;
+  stripeProductId: string;
 }
 
 export interface ProFeature {
@@ -47,6 +49,13 @@ export const proExclusiveFeatures: ProFeature[] = [
   { text: "Klepet", isBold: false, hasInfo: false }
 ];
 
+// Stripe tier mapping - maps product IDs to plan IDs
+export const stripeTiers: Record<string, PlanId> = {
+  'prod_TmbXrf2SNJLlHM': 'start',
+  'prod_TmbZ57jKDl1xGG': 'plus',
+  'prod_TmbZKIH4sZqHqk': 'pro'
+};
+
 // Glavni paketi
 export const pricingPlans: PricingPlan[] = [
   {
@@ -67,7 +76,9 @@ export const pricingPlans: PricingPlan[] = [
       "Logopedski nasveti za starše",
       "Spodbujevalni model nagrajevanja"
     ],
-    isPopular: false
+    isPopular: false,
+    stripePriceId: 'price_1Sp2K9GncjlOci0kLq14l1pk',
+    stripeProductId: 'prod_TmbXrf2SNJLlHM'
   },
   {
     id: 'plus',
@@ -80,7 +91,9 @@ export const pricingPlans: PricingPlan[] = [
     badge: 'Prihranek',
     color: 'app-orange',
     features: plusIncludedFeatures,
-    isPopular: false
+    isPopular: false,
+    stripePriceId: 'price_1Sp2LkGncjlOci0kpIo0MfrQ',
+    stripeProductId: 'prod_TmbZ57jKDl1xGG'
   },
   {
     id: 'pro',
@@ -93,13 +106,19 @@ export const pricingPlans: PricingPlan[] = [
     badge: 'Naj izbira',
     color: 'dragon-green',
     features: [], // Pro uporablja proExclusiveFeatures
-    isPopular: true
+    isPopular: true,
+    stripePriceId: 'price_1Sp2MGGncjlOci0kH1BvqzOE',
+    stripeProductId: 'prod_TmbZKIH4sZqHqk'
   }
 ];
 
 // Helper funkcije
 export const getPlanById = (id: PlanId): PricingPlan | undefined => {
   return pricingPlans.find(plan => plan.id === id);
+};
+
+export const getPlanByProductId = (productId: string): PricingPlan | undefined => {
+  return pricingPlans.find(plan => plan.stripeProductId === productId);
 };
 
 export const getColorClass = (color: PricingPlan['color'], type: 'text' | 'bg' | 'border'): string => {

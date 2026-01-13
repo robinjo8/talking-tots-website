@@ -8,6 +8,8 @@ import AuthConfirm from "@/pages/AuthConfirm";
 import ResetPassword from "@/pages/ResetPassword";
 import UpdatePassword from "@/pages/UpdatePassword";
 import NotFound from "@/pages/NotFound";
+import PaymentSuccess from "@/pages/PaymentSuccess";
+import PaymentCanceled from "@/pages/PaymentCanceled";
 import AdminLogin from "@/pages/admin/AdminLogin";
 import AdminRegister from "@/pages/admin/AdminRegister";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -237,6 +239,8 @@ export function AppRoutes() {
       <Route path="/auth/confirm" element={<AuthConfirm />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/update-password" element={<UpdatePassword />} />
+      <Route path="/payment-success" element={<PaymentSuccess />} />
+      <Route path="/payment-canceled" element={<PaymentCanceled />} />
       
       <Route 
         path="/dashboard" 

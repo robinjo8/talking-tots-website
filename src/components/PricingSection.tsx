@@ -3,8 +3,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, Loader2, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useSubscription } from "@/hooks/useSubscription";
 import { 
   pricingPlans, 
   proExclusiveFeatures, 
@@ -16,10 +21,87 @@ import {
 export function PricingSection() {
   const [selectedPlan, setSelectedPlan] = useState<PlanId>('pro');
   const [showMobileDialog, setShowMobileDialog] = useState(false);
+  const [isCheckoutLoading, setIsCheckoutLoading] = useState<PlanId | null>(null);
+  const navigate = useNavigate();
+  const { user, session } = useAuth();
+  const { isSubscribed, planId: currentPlanId } = useSubscription();
 
   const startPlan = pricingPlans.find(p => p.id === 'start')!;
   const plusPlan = pricingPlans.find(p => p.id === 'plus')!;
   const proPlan = pricingPlans.find(p => p.id === 'pro')!;
+
+  const handleSelectPlan = async (plan: typeof startPlan) => {
+    // If not logged in, redirect to login
+    if (!user || !session) {
+      toast.info("Za naročnino se morate najprej prijaviti.");
+      navigate("/login", { state: { returnTo: "/cenik" } });
+      return;
+    }
+
+    // If already subscribed to this plan
+    if (isSubscribed && currentPlanId === plan.id) {
+      toast.info("Že imate aktivno naročnino na ta paket.");
+      return;
+    }
+
+    setIsCheckoutLoading(plan.id);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: {
+          priceId: plan.stripePriceId,
+          planId: plan.id,
+        },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) {
+        console.error('Checkout error:', error);
+        toast.error("Napaka pri ustvarjanju naročnine. Poskusite znova.");
+        return;
+      }
+
+      if (data?.url) {
+        // Open Stripe checkout in new tab
+        window.open(data.url, '_blank');
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast.error("Napaka pri ustvarjanju naročnine. Poskusite znova.");
+    } finally {
+      setIsCheckoutLoading(null);
+    }
+  };
+
+  const renderPlanButton = (plan: typeof startPlan) => {
+    const isCurrentPlan = isSubscribed && currentPlanId === plan.id;
+    const isLoading = isCheckoutLoading === plan.id;
+
+    return (
+      <Button 
+        className={cn(
+          "w-full text-white h-9 md:h-12 text-sm md:text-lg font-semibold mt-auto hover:opacity-90",
+          getColorClass(plan.color, 'bg'),
+          isCurrentPlan && "opacity-75"
+        )}
+        onClick={() => handleSelectPlan(plan)}
+        disabled={isLoading || isCurrentPlan}
+      >
+        {isLoading ? (
+          <Loader2 className="h-5 w-5 animate-spin" />
+        ) : isCurrentPlan ? (
+          <>
+            <Check className="h-5 w-5 mr-2" />
+            Vaš trenutni paket
+          </>
+        ) : (
+          `Izberi ${plan.name}`
+        )}
+      </Button>
+    );
+  };
 
   return (
     <section id="cenik" className="w-full bg-white py-4 md:py-16 px-4 h-full md:h-auto">
@@ -34,20 +116,30 @@ export function PricingSection() {
         {/* Plan Toggle */}
         <Tabs value={selectedPlan} onValueChange={value => setSelectedPlan(value as PlanId)} className="w-full mb-4 md:mb-8">
           <TabsList className="grid w-full grid-cols-3 bg-gray-100 dark:bg-gray-800 h-10 md:h-12">
-            <TabsTrigger value="start" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-sm md:text-base">
+            <TabsTrigger value="start" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-sm md:text-base relative">
               <span className="md:hidden">{startPlan.shortName}</span>
               <span className="hidden md:inline">{startPlan.name}</span>
+              {isSubscribed && currentPlanId === 'start' && (
+                <Check className="h-4 w-4 text-app-blue absolute -top-1 -right-1" />
+              )}
             </TabsTrigger>
-            <TabsTrigger value="plus" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-sm md:text-base">
+            <TabsTrigger value="plus" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-sm md:text-base relative">
               <span className="md:hidden">{plusPlan.shortName}</span>
               <span className="hidden md:inline">{plusPlan.name}</span>
+              {isSubscribed && currentPlanId === 'plus' && (
+                <Check className="h-4 w-4 text-app-orange absolute -top-1 -right-1" />
+              )}
             </TabsTrigger>
             <TabsTrigger value="pro" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 relative text-sm md:text-base">
               <span className="md:hidden">{proPlan.shortName}</span>
               <span className="hidden md:inline">{proPlan.name}</span>
-              <span className="absolute -top-2 -right-2 bg-dragon-green text-white text-xs px-2 py-0.5 rounded-full font-medium">
-                Naj izbira
-              </span>
+              {isSubscribed && currentPlanId === 'pro' ? (
+                <Check className="h-4 w-4 text-dragon-green absolute -top-1 -right-1" />
+              ) : (
+                <span className="absolute -top-2 -right-2 bg-dragon-green text-white text-xs px-2 py-0.5 rounded-full font-medium">
+                  Naj izbira
+                </span>
+              )}
             </TabsTrigger>
           </TabsList>
 
@@ -55,7 +147,8 @@ export function PricingSection() {
           <TabsContent value="start" className="mt-4 md:mt-6">
             <Card className={cn(
               "relative border-2 transition-all duration-300 hover:shadow-lg h-[360px] md:h-[580px] shadow-md",
-              getColorClass(startPlan.color, 'border')
+              getColorClass(startPlan.color, 'border'),
+              isSubscribed && currentPlanId === 'start' && "ring-2 ring-app-blue ring-offset-2"
             )}>
               <CardContent className="p-3 md:p-8 flex flex-col h-full">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
@@ -63,7 +156,7 @@ export function PricingSection() {
                     "text-white text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-medium whitespace-nowrap",
                     getColorClass(startPlan.color, 'bg')
                   )}>
-                    {startPlan.badge}
+                    {isSubscribed && currentPlanId === 'start' ? 'Vaš paket' : startPlan.badge}
                   </span>
                 </div>
                 
@@ -95,12 +188,7 @@ export function PricingSection() {
                   </div>
                 </div>
 
-                <Button className={cn(
-                  "w-full text-white h-9 md:h-12 text-sm md:text-lg font-semibold mt-auto hover:opacity-90",
-                  getColorClass(startPlan.color, 'bg')
-                )}>
-                  Izberi {startPlan.name}
-                </Button>
+                {renderPlanButton(startPlan)}
               </CardContent>
             </Card>
           </TabsContent>
@@ -109,7 +197,8 @@ export function PricingSection() {
           <TabsContent value="plus" className="mt-4 md:mt-6">
             <Card className={cn(
               "relative border-2 transition-all duration-300 hover:shadow-lg h-[360px] md:h-[580px] shadow-md",
-              getColorClass(plusPlan.color, 'border')
+              getColorClass(plusPlan.color, 'border'),
+              isSubscribed && currentPlanId === 'plus' && "ring-2 ring-app-orange ring-offset-2"
             )}>
               <CardContent className="p-3 md:p-8 flex flex-col h-full">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
@@ -117,7 +206,7 @@ export function PricingSection() {
                     "text-white text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-medium whitespace-nowrap",
                     getColorClass(plusPlan.color, 'bg')
                   )}>
-                    {plusPlan.badge}
+                    {isSubscribed && currentPlanId === 'plus' ? 'Vaš paket' : plusPlan.badge}
                   </span>
                 </div>
                 
@@ -149,12 +238,7 @@ export function PricingSection() {
                   </div>
                 </div>
 
-                <Button className={cn(
-                  "w-full text-white h-9 md:h-12 text-sm md:text-lg font-semibold mt-auto hover:opacity-90",
-                  getColorClass(plusPlan.color, 'bg')
-                )}>
-                  Izberi {plusPlan.name}
-                </Button>
+                {renderPlanButton(plusPlan)}
               </CardContent>
             </Card>
           </TabsContent>
@@ -163,7 +247,8 @@ export function PricingSection() {
           <TabsContent value="pro" className="mt-4 md:mt-6">
             <Card className={cn(
               "relative border-2 transition-all duration-300 hover:shadow-lg h-[360px] md:h-[580px] shadow-md",
-              getColorClass(proPlan.color, 'border')
+              getColorClass(proPlan.color, 'border'),
+              isSubscribed && currentPlanId === 'pro' && "ring-2 ring-dragon-green ring-offset-2"
             )}>
               <CardContent className="p-3 md:p-8 flex flex-col h-full">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
@@ -171,7 +256,7 @@ export function PricingSection() {
                     "text-white text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-medium whitespace-nowrap",
                     getColorClass(proPlan.color, 'bg')
                   )}>
-                    {proPlan.badge}
+                    {isSubscribed && currentPlanId === 'pro' ? 'Vaš paket' : proPlan.badge}
                   </span>
                 </div>
                 
@@ -211,12 +296,7 @@ export function PricingSection() {
                   </div>
                 </div>
 
-                <Button className={cn(
-                  "w-full text-white h-9 md:h-12 text-sm md:text-lg font-semibold mt-auto hover:opacity-90",
-                  getColorClass(proPlan.color, 'bg')
-                )}>
-                  Izberi {proPlan.name}
-                </Button>
+                {renderPlanButton(proPlan)}
               </CardContent>
             </Card>
           </TabsContent>
