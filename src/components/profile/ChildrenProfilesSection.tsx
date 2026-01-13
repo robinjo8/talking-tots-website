@@ -43,7 +43,7 @@ export function ChildrenProfilesSection({
       {/* Content */}
       <div className="p-6">
         <div className="space-y-6">
-          {/* Not subscribed - show message to subscribe first */}
+          {/* Not subscribed - show ONLY message to subscribe first, hide everything else */}
           {!isLoading && !isSubscribed && (
             <div className="text-center py-8">
               <CreditCard className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
@@ -92,8 +92,8 @@ export function ChildrenProfilesSection({
             />
           )}
 
-          {/* Child profiles display */}
-          {profile?.children && profile.children.length > 0 && (
+          {/* Child profiles display - ONLY if subscribed */}
+          {isSubscribed && profile?.children && profile.children.length > 0 && (
             <div className="space-y-6">
               {profile.children.map((child, index) => (
                 <ChildProfileDisplay
