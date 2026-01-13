@@ -33,7 +33,7 @@ export function ChildrenProfilesSection({
       <div className="bg-dragon-green text-white p-4">
         <h2 className="text-xl font-semibold flex items-center gap-2">
           <Users className="h-5 w-5" />
-          Otroci ({profile?.children?.length || 0})
+          Otroci ({isSubscribed ? (profile?.children?.length || 0) : 0})
           {hasNoChildren && isSubscribed && (
             <Star className="h-5 w-5 text-yellow-300 fill-yellow-300 animate-pulse" />
           )}
