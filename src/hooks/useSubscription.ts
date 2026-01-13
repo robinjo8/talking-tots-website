@@ -32,7 +32,7 @@ export function useSubscription() {
         planId: null,
         productId: null,
         subscriptionEnd: null,
-        isLoading: false,
+        isLoading: false, // Important: set loading to false when no session
         isTrialing: false,
         trialEnd: null,
       });
@@ -73,9 +73,8 @@ export function useSubscription() {
 
   // Check subscription on mount and when user changes
   useEffect(() => {
-    if (user && session) {
-      checkSubscription();
-    }
+    // Always call checkSubscription - it handles the no-session case internally
+    checkSubscription();
   }, [user, session, checkSubscription]);
 
   // Periodic refresh every 60 seconds
