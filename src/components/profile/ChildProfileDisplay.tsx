@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 
 type ChildProfileDisplayProps = {
   child: ChildProfile;
+  isPro?: boolean;
   onEdit?: () => void;
   onDelete?: () => void;
   onRefresh?: () => void;
@@ -43,6 +44,7 @@ const getAvatarSrc = (avatarId: number): string => {
 
 export function ChildProfileDisplay({ 
   child, 
+  isPro = false,
   onEdit, 
   onDelete,
   onRefresh,
@@ -145,134 +147,138 @@ export function ChildProfileDisplay({
         </CardContent>
       </Card>
 
-      {/* Govorne težave - Collapsible */}
-      <Collapsible open={difficultiesOpen} onOpenChange={setDifficultiesOpen}>
-        <Card className="border-dragon-green/20">
-          <CollapsibleTrigger asChild>
-            <div className="flex items-center justify-center p-4 cursor-pointer hover:bg-muted/50 transition-colors relative">
-              <h5 className="font-medium text-foreground">Govorne težave</h5>
-              <div className="absolute right-4 flex items-center gap-2">
-                {onEditDifficulties && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onEditDifficulties();
-                    }}
-                    className="h-7 w-7 text-muted-foreground hover:text-dragon-green hover:bg-dragon-green/10"
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                  </Button>
-                )}
-                <ChevronDown className={cn(
-                  "h-4 w-4 text-muted-foreground transition-transform duration-200",
-                  difficultiesOpen && "rotate-180"
-                )} />
-              </div>
-            </div>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <div className="px-4 pb-4 pt-0">
-              {child.speechDifficulties && child.speechDifficulties.length > 0 ? (
-                <div className="space-y-3">
-                  <div className="flex flex-wrap gap-2">
-                    {child.speechDifficulties.map((difficultyId, index) => (
-                      <Badge 
-                        key={index} 
-                        variant="secondary"
-                        className="bg-dragon-green/10 text-dragon-green border-dragon-green/20"
-                      >
-                        {difficultyId}
-                      </Badge>
-                    ))}
-                  </div>
-                  
-                  {child.speechDifficultiesDescription && (
-                    <p className="text-sm text-muted-foreground">
-                      {child.speechDifficultiesDescription}
-                    </p>
+      {/* Govorne težave - Collapsible - Only for Pro users */}
+      {isPro && (
+        <Collapsible open={difficultiesOpen} onOpenChange={setDifficultiesOpen}>
+          <Card className="border-dragon-green/20">
+            <CollapsibleTrigger asChild>
+              <div className="flex items-center justify-center p-4 cursor-pointer hover:bg-muted/50 transition-colors relative">
+                <h5 className="font-medium text-foreground">Govorne težave</h5>
+                <div className="absolute right-4 flex items-center gap-2">
+                  {onEditDifficulties && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEditDifficulties();
+                      }}
+                      className="h-7 w-7 text-muted-foreground hover:text-dragon-green hover:bg-dragon-green/10"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
                   )}
+                  <ChevronDown className={cn(
+                    "h-4 w-4 text-muted-foreground transition-transform duration-200",
+                    difficultiesOpen && "rotate-180"
+                  )} />
                 </div>
-              ) : (
-                <p className="text-muted-foreground text-sm">
-                  Ni zabeleženih govornih motenj
-                </p>
-              )}
-            </div>
-          </CollapsibleContent>
-        </Card>
-      </Collapsible>
-
-      {/* Osnovni vprašalnik - Collapsible */}
-      <Collapsible open={questionnaireOpen} onOpenChange={setQuestionnaireOpen}>
-        <Card className="border-dragon-green/20">
-          <CollapsibleTrigger asChild>
-            <div className="flex items-center justify-center p-4 cursor-pointer hover:bg-muted/50 transition-colors relative">
-              <h5 className="font-medium text-foreground">Osnovni vprašalnik</h5>
-              <div className="absolute right-4 flex items-center gap-2">
-                {onEditDevelopment && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onEditDevelopment();
-                    }}
-                    className="h-7 w-7 text-muted-foreground hover:text-dragon-green hover:bg-dragon-green/10"
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                  </Button>
-                )}
-                <ChevronDown className={cn(
-                  "h-4 w-4 text-muted-foreground transition-transform duration-200",
-                  questionnaireOpen && "rotate-180"
-                )} />
               </div>
-            </div>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <div className="px-4 pb-4 pt-0">
-              {child.speechDevelopment && Object.keys(child.speechDevelopment).length > 0 ? (
-                <div className="space-y-3">
-                  {/* Radio questions */}
-                  {Object.entries(child.speechDevelopment).map(([questionId, answer]) => {
-                    const question = SPEECH_DEVELOPMENT_QUESTIONS.find(q => q.id === questionId);
-                    if (!question) return null;
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="px-4 pb-4 pt-0">
+                {child.speechDifficulties && child.speechDifficulties.length > 0 ? (
+                  <div className="space-y-3">
+                    <div className="flex flex-wrap gap-2">
+                      {child.speechDifficulties.map((difficultyId, index) => (
+                        <Badge 
+                          key={index} 
+                          variant="secondary"
+                          className="bg-dragon-green/10 text-dragon-green border-dragon-green/20"
+                        >
+                          {difficultyId}
+                        </Badge>
+                      ))}
+                    </div>
                     
-                    const option = question.options.find(opt => opt.value === answer);
-                    if (!option) return null;
-                    
-                    return (
-                      <div key={questionId}>
-                        <p className="text-sm text-muted-foreground">{question.question}</p>
-                        <p className="text-sm text-dragon-green font-medium mt-0.5">→ {option.label}</p>
-                      </div>
-                    );
-                  })}
-                  
-                  {/* Text questions */}
-                  {SPEECH_DEVELOPMENT_TEXT_QUESTIONS.map((textQuestion) => {
-                    const answer = child.speechDevelopment?.[textQuestion.id];
-                    if (!answer) return null;
-                    
-                    return (
-                      <div key={textQuestion.id}>
-                        <p className="text-sm text-muted-foreground">{textQuestion.question}</p>
-                        <p className="text-sm text-dragon-green font-medium mt-0.5">→ {answer}</p>
-                      </div>
-                    );
-                  })}
+                    {child.speechDifficultiesDescription && (
+                      <p className="text-sm text-muted-foreground">
+                        {child.speechDifficultiesDescription}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-sm">
+                    Ni zabeleženih govornih motenj
+                  </p>
+                )}
+              </div>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
+      )}
+
+      {/* Osnovni vprašalnik - Collapsible - Only for Pro users */}
+      {isPro && (
+        <Collapsible open={questionnaireOpen} onOpenChange={setQuestionnaireOpen}>
+          <Card className="border-dragon-green/20">
+            <CollapsibleTrigger asChild>
+              <div className="flex items-center justify-center p-4 cursor-pointer hover:bg-muted/50 transition-colors relative">
+                <h5 className="font-medium text-foreground">Osnovni vprašalnik</h5>
+                <div className="absolute right-4 flex items-center gap-2">
+                  {onEditDevelopment && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEditDevelopment();
+                      }}
+                      className="h-7 w-7 text-muted-foreground hover:text-dragon-green hover:bg-dragon-green/10"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
+                  <ChevronDown className={cn(
+                    "h-4 w-4 text-muted-foreground transition-transform duration-200",
+                    questionnaireOpen && "rotate-180"
+                  )} />
                 </div>
-              ) : (
-                <p className="text-muted-foreground text-sm">
-                  Osnovni vprašalnik ni bil izpolnjen
-                </p>
-              )}
-            </div>
-          </CollapsibleContent>
-        </Card>
-      </Collapsible>
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="px-4 pb-4 pt-0">
+                {child.speechDevelopment && Object.keys(child.speechDevelopment).length > 0 ? (
+                  <div className="space-y-3">
+                    {/* Radio questions */}
+                    {Object.entries(child.speechDevelopment).map(([questionId, answer]) => {
+                      const question = SPEECH_DEVELOPMENT_QUESTIONS.find(q => q.id === questionId);
+                      if (!question) return null;
+                      
+                      const option = question.options.find(opt => opt.value === answer);
+                      if (!option) return null;
+                      
+                      return (
+                        <div key={questionId}>
+                          <p className="text-sm text-muted-foreground">{question.question}</p>
+                          <p className="text-sm text-dragon-green font-medium mt-0.5">→ {option.label}</p>
+                        </div>
+                      );
+                    })}
+                    
+                    {/* Text questions */}
+                    {SPEECH_DEVELOPMENT_TEXT_QUESTIONS.map((textQuestion) => {
+                      const answer = child.speechDevelopment?.[textQuestion.id];
+                      if (!answer) return null;
+                      
+                      return (
+                        <div key={textQuestion.id}>
+                          <p className="text-sm text-muted-foreground">{textQuestion.question}</p>
+                          <p className="text-sm text-dragon-green font-medium mt-0.5">→ {answer}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-sm">
+                    Osnovni vprašalnik ni bil izpolnjen
+                  </p>
+                )}
+              </div>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
+      )}
     </div>
   );
 }
