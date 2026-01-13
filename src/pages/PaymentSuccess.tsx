@@ -67,8 +67,7 @@ export default function PaymentSuccess() {
             </p>
           ) : planName ? (
             <p className="text-gray-600 mb-6">
-              Uspešno ste se naročili na <span className="font-semibold text-dragon-green">{planName}</span>. 
-              Zdaj imate dostop do vseh funkcij!
+              Zdaj imate dostop do vseh funkcij <span className="font-semibold text-dragon-green">{planName}</span> paketa!
             </p>
           ) : (
             <p className="text-gray-600 mb-6">
