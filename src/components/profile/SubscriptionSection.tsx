@@ -59,10 +59,10 @@ export function SubscriptionSection() {
             {/* TomiTalk Start */}
             <TabsContent value="start" className="mt-6">
               <Card className={cn(
-                "relative border-2 transition-all duration-300 hover:shadow-lg shadow-md",
+                "relative border-2 transition-all duration-300 hover:shadow-lg h-[580px] shadow-md",
                 getColorClass(startPlan.color, 'border')
               )}>
-                <CardContent className="p-8">
+                <CardContent className="p-8 flex flex-col h-full">
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                     <span className={cn(
                       "text-white text-sm px-4 py-1 rounded-full font-medium whitespace-nowrap",
@@ -72,7 +72,7 @@ export function SubscriptionSection() {
                     </span>
                   </div>
                   
-                  <div className="text-center mb-6 mt-2">
+                  <div className="text-center mb-6 mt-2 h-[88px]">
                     <h3 className={cn("text-2xl font-bold mb-2", getColorClass(startPlan.color, 'text'))}>
                       {startPlan.name}
                     </h3>
@@ -89,18 +89,20 @@ export function SubscriptionSection() {
                     </p>
                   </div>
 
-                  <div className="space-y-3 mb-8">
-                    {startPlan.features.map((feature, index) => (
-                      <div key={index} className="flex items-center gap-3 text-sm">
-                        <div className={cn("h-2 w-2 rounded-full flex-shrink-0", getColorClass(startPlan.color, 'bg'))} />
-                        <span>{feature}</span>
-                      </div>
-                    ))}
+                  <div className="flex justify-center mb-6">
+                    <div className="inline-flex flex-col items-start space-y-3">
+                      {startPlan.features.map((feature, index) => (
+                        <div key={index} className="flex items-center gap-3 text-sm">
+                          <div className={cn("h-2 w-2 rounded-full flex-shrink-0", getColorClass(startPlan.color, 'bg'))} />
+                          <span>{feature}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
                   <Button 
                     className={cn(
-                      "w-full text-white h-12 text-lg font-semibold",
+                      "w-full text-white h-12 text-lg font-semibold mt-auto",
                       getColorClass(startPlan.color, 'bg'),
                       "hover:opacity-90"
                     )}
@@ -115,10 +117,10 @@ export function SubscriptionSection() {
             {/* TomiTalk Plus */}
             <TabsContent value="plus" className="mt-6">
               <Card className={cn(
-                "relative border-2 transition-all duration-300 hover:shadow-lg shadow-md",
+                "relative border-2 transition-all duration-300 hover:shadow-lg h-[580px] shadow-md",
                 getColorClass(plusPlan.color, 'border')
               )}>
-                <CardContent className="p-8">
+                <CardContent className="p-8 flex flex-col h-full">
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                     <span className={cn(
                       "text-white text-sm px-4 py-1 rounded-full font-medium whitespace-nowrap",
@@ -128,7 +130,7 @@ export function SubscriptionSection() {
                     </span>
                   </div>
                   
-                  <div className="text-center mb-6 mt-2">
+                  <div className="text-center mb-6 mt-2 h-[88px]">
                     <h3 className={cn("text-2xl font-bold mb-2", getColorClass(plusPlan.color, 'text'))}>
                       {plusPlan.name}
                     </h3>
@@ -145,18 +147,20 @@ export function SubscriptionSection() {
                     </p>
                   </div>
 
-                  <div className="space-y-3 mb-8">
-                    {plusPlan.features.map((feature, index) => (
-                      <div key={index} className="flex items-center gap-3 text-sm">
-                        <div className={cn("h-2 w-2 rounded-full flex-shrink-0", getColorClass(plusPlan.color, 'bg'))} />
-                        <span>{feature}</span>
-                      </div>
-                    ))}
+                  <div className="flex justify-center mb-6">
+                    <div className="inline-flex flex-col items-start space-y-3">
+                      {plusPlan.features.map((feature, index) => (
+                        <div key={index} className="flex items-center gap-3 text-sm">
+                          <div className={cn("h-2 w-2 rounded-full flex-shrink-0", getColorClass(plusPlan.color, 'bg'))} />
+                          <span>{feature}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
                   <Button 
                     className={cn(
-                      "w-full text-white h-12 text-lg font-semibold",
+                      "w-full text-white h-12 text-lg font-semibold mt-auto",
                       getColorClass(plusPlan.color, 'bg'),
                       "hover:opacity-90"
                     )}
@@ -171,10 +175,10 @@ export function SubscriptionSection() {
             {/* TomiTalk Pro */}
             <TabsContent value="pro" className="mt-6">
               <Card className={cn(
-                "relative border-2 transition-all duration-300 hover:shadow-lg shadow-md",
+                "relative border-2 transition-all duration-300 hover:shadow-lg h-[580px] shadow-md",
                 getColorClass(proPlan.color, 'border')
               )}>
-                <CardContent className="p-8">
+                <CardContent className="p-8 flex flex-col h-full">
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                     <span className={cn(
                       "text-white text-sm px-4 py-1 rounded-full font-medium whitespace-nowrap",
@@ -184,7 +188,7 @@ export function SubscriptionSection() {
                     </span>
                   </div>
                   
-                  <div className="text-center mb-6 mt-2">
+                  <div className="text-center mb-6 mt-2 h-[88px]">
                     <h3 className={cn("text-2xl font-bold mb-2", getColorClass(proPlan.color, 'text'))}>
                       {proPlan.name}
                     </h3>
@@ -201,26 +205,28 @@ export function SubscriptionSection() {
                     </p>
                   </div>
 
-                  <div className="space-y-3 mb-8">
-                    {proExclusiveFeatures.map((feature, index) => (
-                      <div key={index} className="flex items-center gap-3 text-sm">
-                        <div className={cn("h-2 w-2 rounded-full flex-shrink-0", getColorClass(proPlan.color, 'bg'))} />
-                        <span className={feature.isBold ? "font-bold" : ""}>{feature.text}</span>
-                        {feature.hasInfo && (
-                          <button 
-                            className="text-gray-400 hover:text-dragon-green transition-colors"
-                            onClick={() => setShowProDialog(true)}
-                          >
-                            <HelpCircle className="h-4 w-4" />
-                          </button>
-                        )}
-                      </div>
-                    ))}
+                  <div className="flex justify-center mb-6">
+                    <div className="inline-flex flex-col items-start space-y-3">
+                      {proExclusiveFeatures.map((feature, index) => (
+                        <div key={index} className="flex items-center gap-3 text-sm">
+                          <div className={cn("h-2 w-2 rounded-full flex-shrink-0", getColorClass(proPlan.color, 'bg'))} />
+                          <span className={feature.isBold ? "font-bold" : ""}>{feature.text}</span>
+                          {feature.hasInfo && (
+                            <button 
+                              className="text-gray-400 hover:text-dragon-green transition-colors"
+                              onClick={() => setShowProDialog(true)}
+                            >
+                              <HelpCircle className="h-4 w-4" />
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
                   <Button 
                     className={cn(
-                      "w-full text-white h-12 text-lg font-semibold",
+                      "w-full text-white h-12 text-lg font-semibold mt-auto",
                       getColorClass(proPlan.color, 'bg'),
                       "hover:opacity-90"
                     )}
