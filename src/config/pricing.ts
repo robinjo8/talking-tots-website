@@ -52,8 +52,8 @@ export const proExclusiveFeatures: ProFeature[] = [
 // Stripe tier mapping - maps product IDs to plan IDs
 export const stripeTiers: Record<string, PlanId> = {
   'prod_TmbXrf2SNJLlHM': 'start',
-  'prod_TmbZ57jKDl1xGG': 'plus',
-  'prod_TmbZKIH4sZqHqk': 'pro'
+  'prod_TmbXaM32ndD11d': 'plus',
+  'prod_TmbZ19RhCaSzrp': 'pro'
 };
 
 // Glavni paketi
@@ -92,8 +92,8 @@ export const pricingPlans: PricingPlan[] = [
     color: 'app-orange',
     features: plusIncludedFeatures,
     isPopular: false,
-    stripePriceId: 'price_1Sp2LkGncjlOci0kpIo0MfrQ',
-    stripeProductId: 'prod_TmbZ57jKDl1xGG'
+    stripePriceId: 'price_1Sp2KqGncjlOci0krAzeJdIn',
+    stripeProductId: 'prod_TmbXaM32ndD11d'
   },
   {
     id: 'pro',
@@ -107,8 +107,8 @@ export const pricingPlans: PricingPlan[] = [
     color: 'dragon-green',
     features: [], // Pro uporablja proExclusiveFeatures
     isPopular: true,
-    stripePriceId: 'price_1Sp2MGGncjlOci0kH1BvqzOE',
-    stripeProductId: 'prod_TmbZKIH4sZqHqk'
+    stripePriceId: 'price_1Sp2M6GncjlOci0k6WHpDzMv',
+    stripeProductId: 'prod_TmbZ19RhCaSzrp'
   }
 ];
 
