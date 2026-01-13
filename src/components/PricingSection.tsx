@@ -2,56 +2,24 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { HelpCircle, X } from "lucide-react";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { 
+  pricingPlans, 
+  proExclusiveFeatures, 
+  plusIncludedFeatures,
+  getColorClass,
+  type PlanId 
+} from "@/config/pricing";
 
 export function PricingSection() {
-  const [selectedPlan, setSelectedPlan] = useState<'start' | 'plus' | 'pro'>('pro');
+  const [selectedPlan, setSelectedPlan] = useState<PlanId>('pro');
   const [showMobileDialog, setShowMobileDialog] = useState(false);
 
-  const startFeatures = [
-    "Interaktivne govornih igre",
-    "Vaje za izgovorjavo glasov",
-    "Vaje motorike govoril",
-    "Video navodila logopeda",
-    "Logopedski nasveti za starše",
-    "Spodbujevalni model nagrajevanja"
-  ];
-
-  const plusFeatures = [
-    "Interaktivne govornih igre",
-    "Vaje za izgovorjavo glasov",
-    "Vaje motorike govoril",
-    "Video navodila logopeda",
-    "Logopedski nasveti za starše",
-    "Spodbujevalni model nagrajevanja",
-    "Dostop do vseh novih vsebin",
-    "Razširjene igre"
-  ];
-
-  const plusIncludedFeatures = [
-    "Interaktivne govornih igre",
-    "Vaje za izgovorjavo glasov",
-    "Vaje motorike govoril",
-    "Video navodila logopeda",
-    "Logopedski nasveti za starše",
-    "Spodbujevalni model nagrajevanja",
-    "Dostop do vseh novih vsebin",
-    "Razširjene igre"
-  ];
-
-  const proFeatures = [
-    { text: "Vse iz TomiTalk Plus", isBold: true, hasInfo: true },
-    { text: "Prilagojen osebni načrt", isBold: false, hasInfo: false },
-    { text: "Preverjanje izgovorjave", isBold: false, hasInfo: false },
-    { text: "Strokovna obravnava govora", isBold: false, hasInfo: false },
-    { text: "Logopedska poročila", isBold: false, hasInfo: false },
-    { text: "Spremljanje napredka z razlago", isBold: false, hasInfo: false },
-    { text: "Dostop do vseh novih AI vsebin", isBold: false, hasInfo: false },
-    { text: "Klepet", isBold: false, hasInfo: false }
-  ];
+  const startPlan = pricingPlans.find(p => p.id === 'start')!;
+  const plusPlan = pricingPlans.find(p => p.id === 'plus')!;
+  const proPlan = pricingPlans.find(p => p.id === 'pro')!;
 
   return (
     <section id="cenik" className="w-full bg-white py-4 md:py-16 px-4 h-full md:h-auto">
@@ -64,19 +32,19 @@ export function PricingSection() {
       
       <div className="max-w-2xl mx-auto">
         {/* Plan Toggle */}
-        <Tabs value={selectedPlan} onValueChange={value => setSelectedPlan(value as 'start' | 'plus' | 'pro')} className="w-full mb-4 md:mb-8">
+        <Tabs value={selectedPlan} onValueChange={value => setSelectedPlan(value as PlanId)} className="w-full mb-4 md:mb-8">
           <TabsList className="grid w-full grid-cols-3 bg-gray-100 dark:bg-gray-800 h-10 md:h-12">
             <TabsTrigger value="start" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-sm md:text-base">
-              <span className="md:hidden">Start</span>
-              <span className="hidden md:inline">TomiTalk Start</span>
+              <span className="md:hidden">{startPlan.shortName}</span>
+              <span className="hidden md:inline">{startPlan.name}</span>
             </TabsTrigger>
             <TabsTrigger value="plus" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-sm md:text-base">
-              <span className="md:hidden">Plus</span>
-              <span className="hidden md:inline">TomiTalk Plus</span>
+              <span className="md:hidden">{plusPlan.shortName}</span>
+              <span className="hidden md:inline">{plusPlan.name}</span>
             </TabsTrigger>
             <TabsTrigger value="pro" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 relative text-sm md:text-base">
-              <span className="md:hidden">Pro</span>
-              <span className="hidden md:inline">TomiTalk Pro</span>
+              <span className="md:hidden">{proPlan.shortName}</span>
+              <span className="hidden md:inline">{proPlan.name}</span>
               <span className="absolute -top-2 -right-2 bg-dragon-green text-white text-xs px-2 py-0.5 rounded-full font-medium">
                 Naj izbira
               </span>
@@ -85,42 +53,53 @@ export function PricingSection() {
 
           {/* TomiTalk Start */}
           <TabsContent value="start" className="mt-4 md:mt-6">
-            <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg h-[360px] md:h-[580px]", "border-app-blue shadow-md")}>
+            <Card className={cn(
+              "relative border-2 transition-all duration-300 hover:shadow-lg h-[360px] md:h-[580px] shadow-md",
+              getColorClass(startPlan.color, 'border')
+            )}>
               <CardContent className="p-3 md:p-8 flex flex-col h-full">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-app-blue text-white text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-medium whitespace-nowrap">
-                    Fleksibilno
+                  <span className={cn(
+                    "text-white text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-medium whitespace-nowrap",
+                    getColorClass(startPlan.color, 'bg')
+                  )}>
+                    {startPlan.badge}
                   </span>
                 </div>
                 
                 <div className="text-center mb-2 md:mb-6 mt-2 md:h-[88px]">
-                  <h3 className="text-xl md:text-2xl font-bold text-app-blue mb-1 md:mb-2">TomiTalk Start</h3>
+                  <h3 className={cn("text-xl md:text-2xl font-bold mb-1 md:mb-2", getColorClass(startPlan.color, 'text'))}>
+                    {startPlan.name}
+                  </h3>
                   <div className="flex items-baseline justify-center gap-2 mb-1 md:mb-2">
-                    <span className="text-3xl md:text-4xl font-bold">17 €</span>
+                    <span className="text-3xl md:text-4xl font-bold">{startPlan.price} €</span>
                     <span className="text-gray-500 text-sm md:text-base">/mesec</span>
                   </div>
-                  <p className="text-xs md:text-sm text-gray-600">zaračunano mesečno</p>
+                  <p className="text-xs md:text-sm text-gray-600">{startPlan.billingLabel}</p>
                 </div>
 
                 <div className="text-center mb-2 md:mb-6">
                   <p className="text-sm md:text-lg font-medium text-gray-700 mb-1 md:mb-4">
-                    "Vse, kar potrebuje otrok, da izboljša govor!"
+                    {startPlan.tagline}
                   </p>
                 </div>
 
                 <div className="flex justify-center mb-3 md:mb-6">
                   <div className="inline-flex flex-col items-start space-y-0.5 md:space-y-3">
-                    {startFeatures.map((feature, index) => (
+                    {startPlan.features.map((feature, index) => (
                       <div key={index} className="flex items-center gap-2 md:gap-3 text-xs md:text-sm">
-                        <div className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-app-blue flex-shrink-0" />
+                        <div className={cn("h-1.5 w-1.5 md:h-2 md:w-2 rounded-full flex-shrink-0", getColorClass(startPlan.color, 'bg'))} />
                         <span>{feature}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <Button className="w-full bg-app-blue hover:bg-app-blue/90 text-white h-9 md:h-12 text-sm md:text-lg font-semibold mt-auto">
-                  Izberi TomiTalk Start
+                <Button className={cn(
+                  "w-full text-white h-9 md:h-12 text-sm md:text-lg font-semibold mt-auto hover:opacity-90",
+                  getColorClass(startPlan.color, 'bg')
+                )}>
+                  Izberi {startPlan.name}
                 </Button>
               </CardContent>
             </Card>
@@ -128,42 +107,53 @@ export function PricingSection() {
 
           {/* TomiTalk Plus */}
           <TabsContent value="plus" className="mt-4 md:mt-6">
-            <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg h-[360px] md:h-[580px]", "border-app-orange shadow-md")}>
+            <Card className={cn(
+              "relative border-2 transition-all duration-300 hover:shadow-lg h-[360px] md:h-[580px] shadow-md",
+              getColorClass(plusPlan.color, 'border')
+            )}>
               <CardContent className="p-3 md:p-8 flex flex-col h-full">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-app-orange text-white text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-medium whitespace-nowrap">
-                    Prihranek
+                  <span className={cn(
+                    "text-white text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-medium whitespace-nowrap",
+                    getColorClass(plusPlan.color, 'bg')
+                  )}>
+                    {plusPlan.badge}
                   </span>
                 </div>
                 
                 <div className="text-center mb-2 md:mb-6 mt-2 md:h-[88px]">
-                  <h3 className="text-xl md:text-2xl font-bold text-app-orange mb-1 md:mb-2">TomiTalk Plus</h3>
+                  <h3 className={cn("text-xl md:text-2xl font-bold mb-1 md:mb-2", getColorClass(plusPlan.color, 'text'))}>
+                    {plusPlan.name}
+                  </h3>
                   <div className="flex items-baseline justify-center gap-2 mb-1 md:mb-2">
-                    <span className="text-3xl md:text-4xl font-bold">8 €</span>
+                    <span className="text-3xl md:text-4xl font-bold">{plusPlan.price} €</span>
                     <span className="text-gray-500 text-sm md:text-base">/mesec</span>
                   </div>
-                  <p className="text-xs md:text-sm text-gray-600">zaračunano letno</p>
+                  <p className="text-xs md:text-sm text-gray-600">{plusPlan.billingLabel}</p>
                 </div>
 
                 <div className="text-center mb-2 md:mb-6">
                   <p className="text-sm md:text-lg font-medium text-gray-700 mb-1 md:mb-4">
-                    "Vse, kar potrebuje otrok, da izboljša govor!"
+                    {plusPlan.tagline}
                   </p>
                 </div>
 
                 <div className="flex justify-center mb-3 md:mb-6">
                   <div className="inline-flex flex-col items-start space-y-0.5 md:space-y-3">
-                    {plusFeatures.map((feature, index) => (
+                    {plusPlan.features.map((feature, index) => (
                       <div key={index} className="flex items-center gap-2 md:gap-3 text-xs md:text-sm">
-                        <div className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-app-orange flex-shrink-0" />
+                        <div className={cn("h-1.5 w-1.5 md:h-2 md:w-2 rounded-full flex-shrink-0", getColorClass(plusPlan.color, 'bg'))} />
                         <span>{feature}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <Button className="w-full bg-app-orange hover:bg-app-orange/90 text-white h-9 md:h-12 text-sm md:text-lg font-semibold mt-auto">
-                  Izberi TomiTalk Plus
+                <Button className={cn(
+                  "w-full text-white h-9 md:h-12 text-sm md:text-lg font-semibold mt-auto hover:opacity-90",
+                  getColorClass(plusPlan.color, 'bg')
+                )}>
+                  Izberi {plusPlan.name}
                 </Button>
               </CardContent>
             </Card>
@@ -171,34 +161,42 @@ export function PricingSection() {
 
           {/* TomiTalk Pro */}
           <TabsContent value="pro" className="mt-4 md:mt-6">
-            <Card className={cn("relative border-2 transition-all duration-300 hover:shadow-lg h-[360px] md:h-[580px]", "border-dragon-green shadow-md")}>
+            <Card className={cn(
+              "relative border-2 transition-all duration-300 hover:shadow-lg h-[360px] md:h-[580px] shadow-md",
+              getColorClass(proPlan.color, 'border')
+            )}>
               <CardContent className="p-3 md:p-8 flex flex-col h-full">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-dragon-green text-white text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-medium whitespace-nowrap">
-                    Naj izbira
+                  <span className={cn(
+                    "text-white text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-medium whitespace-nowrap",
+                    getColorClass(proPlan.color, 'bg')
+                  )}>
+                    {proPlan.badge}
                   </span>
                 </div>
                 
                 <div className="text-center mb-2 md:mb-6 mt-2 md:h-[88px]">
-                  <h3 className="text-xl md:text-2xl font-bold text-dragon-green mb-1 md:mb-2">TomiTalk Pro</h3>
+                  <h3 className={cn("text-xl md:text-2xl font-bold mb-1 md:mb-2", getColorClass(proPlan.color, 'text'))}>
+                    {proPlan.name}
+                  </h3>
                   <div className="flex items-baseline justify-center gap-2 mb-1 md:mb-2">
-                    <span className="text-3xl md:text-4xl font-bold">13 €</span>
+                    <span className="text-3xl md:text-4xl font-bold">{proPlan.price} €</span>
                     <span className="text-gray-500 text-sm md:text-base">/mesec</span>
                   </div>
-                  <p className="text-xs md:text-sm text-gray-600">zaračunano letno</p>
+                  <p className="text-xs md:text-sm text-gray-600">{proPlan.billingLabel}</p>
                 </div>
 
                 <div className="text-center mb-2 md:mb-6">
                   <p className="text-sm md:text-lg font-medium text-gray-700 mb-1 md:mb-4">
-                    "Razširjena strokovna podpora in osebni pristop."
+                    {proPlan.tagline}
                   </p>
                 </div>
 
                 <div className="flex justify-center mb-3 md:mb-6">
                   <div className="inline-flex flex-col items-start space-y-0.5 md:space-y-3">
-                    {proFeatures.map((feature, index) => (
+                    {proExclusiveFeatures.map((feature, index) => (
                       <div key={index} className="flex items-center gap-2 md:gap-3 text-xs md:text-sm">
-                        <div className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-dragon-green flex-shrink-0" />
+                        <div className={cn("h-1.5 w-1.5 md:h-2 md:w-2 rounded-full flex-shrink-0", getColorClass(proPlan.color, 'bg'))} />
                         <span className={feature.isBold ? "font-bold" : ""}>{feature.text}</span>
                         {feature.hasInfo && (
                           <button 
@@ -213,8 +211,11 @@ export function PricingSection() {
                   </div>
                 </div>
 
-                <Button className="w-full bg-dragon-green hover:bg-dragon-green/90 text-white h-9 md:h-12 text-sm md:text-lg font-semibold mt-auto">
-                  Izberi TomiTalk Pro
+                <Button className={cn(
+                  "w-full text-white h-9 md:h-12 text-sm md:text-lg font-semibold mt-auto hover:opacity-90",
+                  getColorClass(proPlan.color, 'bg')
+                )}>
+                  Izberi {proPlan.name}
                 </Button>
               </CardContent>
             </Card>
@@ -254,7 +255,7 @@ export function PricingSection() {
                 + Ekskluzivne Pro funkcije:
               </p>
               <ul className="space-y-1.5">
-                {proFeatures.filter(f => !f.hasInfo).map((feature, i) => (
+                {proExclusiveFeatures.filter(f => !f.hasInfo).map((feature, i) => (
                   <li key={i} className="flex items-center gap-2 text-xs">
                     <div className="h-1.5 w-1.5 rounded-full bg-dragon-green flex-shrink-0" />
                     <span>{feature.text}</span>
