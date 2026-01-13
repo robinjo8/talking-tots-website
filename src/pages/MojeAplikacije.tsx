@@ -7,6 +7,7 @@ import { FooterSection } from "@/components/FooterSection";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { Progress } from "@/components/ui/progress";
 import { useDailyProgress } from "@/hooks/useDailyProgress";
+import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 const MojeAplikacije = () => {
   const { user, selectedChild, signOut } = useAuth();
@@ -72,20 +73,22 @@ const MojeAplikacije = () => {
         style={{ backgroundColor: 'white' }}
       >
         <div className="container max-w-6xl mx-auto px-4">
-          {/* Breadcrumb */}
-          <div className="mb-8">
-            <BreadcrumbNavigation />
-          </div>
-          
-          {selectedChild ? (
-            <ActivityOptions />
-          ) : (
-            <div className="min-h-[400px] flex flex-col items-center justify-center">
-              <p className="text-lg text-red-500">
-                Prosimo, dodajte profil otroka v nastavitvah.
-              </p>
+          <SubscriptionGate>
+            {/* Breadcrumb */}
+            <div className="mb-8">
+              <BreadcrumbNavigation />
             </div>
-          )}
+            
+            {selectedChild ? (
+              <ActivityOptions />
+            ) : (
+              <div className="min-h-[400px] flex flex-col items-center justify-center">
+                <p className="text-lg text-red-500">
+                  Prosimo, dodajte profil otroka v nastavitvah.
+                </p>
+              </div>
+            )}
+          </SubscriptionGate>
         </div>
       </section>
       

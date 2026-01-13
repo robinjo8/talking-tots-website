@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { getPlanByProductId, type PlanId } from '@/config/pricing';
@@ -42,9 +42,20 @@ export function useSubscription() {
     setSubscription(prev => ({ ...prev, isLoading: true }));
 
     try {
+      // Refresh session to ensure token is valid
+      const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+      
+      if (refreshError || !refreshData.session) {
+        console.error('Session refresh error in useSubscription:', refreshError);
+        setSubscription(prev => ({ ...prev, isLoading: false }));
+        return;
+      }
+      
+      const freshToken = refreshData.session.access_token;
+
       const { data, error } = await supabase.functions.invoke('check-subscription', {
         headers: {
-          Authorization: `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${freshToken}`,
         },
       });
 
