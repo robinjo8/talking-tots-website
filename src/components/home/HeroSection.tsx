@@ -4,16 +4,26 @@ import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Check } from "lucide-react";
 import { useBannerVisible } from "@/components/MissingChildBanner";
+import { useSubscription } from "@/hooks/useSubscription";
+import { SubscriptionRequiredModal } from "@/components/subscription/SubscriptionRequiredModal";
+import { useState } from "react";
 
 export const HeroSection = () => {
   const bannerVisible = useBannerVisible();
   const { user } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { isSubscribed, isLoading } = useSubscription();
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
   const handleStartNow = () => {
     if (!user) {
       navigate("/login");
+    } else if (isLoading) {
+      // Still checking subscription, do nothing
+      return;
+    } else if (!isSubscribed) {
+      setShowSubscriptionModal(true);
     } else {
       navigate("/moje-aplikacije");
     }
@@ -131,6 +141,11 @@ export const HeroSection = () => {
           )}
         </div>
       </div>
+      
+      <SubscriptionRequiredModal 
+        open={showSubscriptionModal} 
+        onOpenChange={setShowSubscriptionModal}
+      />
     </section>
   );
 };

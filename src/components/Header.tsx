@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { MobileMenu } from "./header/MobileMenu";
 import { DesktopNavigation } from "./header/DesktopNavigation";
 import { MissingChildBanner } from "./MissingChildBanner";
+import { useSubscription } from "@/hooks/useSubscription";
+import { SubscriptionRequiredModal } from "@/components/subscription/SubscriptionRequiredModal";
 
 export default function Header() {
   const {
@@ -20,6 +22,8 @@ export default function Header() {
   const isMobile = useIsMobile();
   const { canInstall, promptInstall, isIOSDevice, isStandalone, isInstalled } = usePWA();
   const showInstall = (!isStandalone && !isInstalled) && (isIOSDevice || canInstall);
+  const { isSubscribed, isLoading } = useSubscription();
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
   const handleInstallClick = async () => {
     try {
@@ -42,7 +46,18 @@ export default function Header() {
       return;
     }
 
-    // If logged in, redirect to moje-aplikacije
+    // If still checking subscription, do nothing
+    if (isLoading) {
+      return;
+    }
+
+    // If not subscribed, show modal
+    if (!isSubscribed) {
+      setShowSubscriptionModal(true);
+      return;
+    }
+
+    // If logged in and subscribed, redirect to moje-aplikacije
     navigate("/moje-aplikacije");
   };
 
@@ -118,6 +133,11 @@ export default function Header() {
         </div>
       </header>
       <MissingChildBanner />
+      
+      <SubscriptionRequiredModal 
+        open={showSubscriptionModal} 
+        onOpenChange={setShowSubscriptionModal}
+      />
     </div>
   );
 }
