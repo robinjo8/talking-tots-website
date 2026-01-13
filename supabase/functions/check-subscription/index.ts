@@ -65,12 +65,13 @@ serve(async (req) => {
     // Check for active or trialing subscriptions
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
-      limit: 1,
+      limit: 10, // Get more to find valid ones
     });
     
-    // Filter to active or trialing subscriptions
+    // Filter to active or trialing subscriptions that are NOT canceled
+    // When user cancels, cancel_at_period_end becomes true - we treat this as unsubscribed
     const activeOrTrialingSub = subscriptions.data.find(
-      sub => sub.status === 'active' || sub.status === 'trialing'
+      sub => (sub.status === 'active' || sub.status === 'trialing') && !sub.cancel_at_period_end
     );
     
     const hasActiveSub = !!activeOrTrialingSub;
