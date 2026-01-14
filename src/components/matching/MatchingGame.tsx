@@ -11,13 +11,15 @@ interface MatchingGameProps {
   numColumns?: number;
   onGameComplete?: (score: number, playedImages: MatchingGameImage[]) => void;
   className?: string;
+  isLandscape?: boolean;
 }
 
 export function MatchingGame({ 
   images, 
   numColumns = 2, 
   onGameComplete,
-  className 
+  className,
+  isLandscape = false
 }: MatchingGameProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const {
@@ -43,20 +45,31 @@ export function MatchingGame({
     );
   }
 
+  // Dynamic tile sizing based on landscape mode
+  const tileClass = isLandscape 
+    ? "mx-auto w-16 h-16 sm:w-20 sm:h-20" 
+    : "mx-auto w-24 h-24 md:w-48 md:h-48 lg:w-52 lg:h-52";
+
   return (
-    <div className={cn("w-full flex justify-center", className)}>
+    <div className={cn("w-full h-full flex items-center justify-center", className)}>
       {/* Game area */}
       <div 
         ref={containerRef}
-        className="relative rounded-xl p-6 w-full max-w-4xl"
+        className={cn(
+          "relative rounded-xl w-full max-w-4xl",
+          isLandscape ? "p-2" : "p-6"
+        )}
       >
         <ConnectionLine connections={gameState.connections} containerRef={containerRef} />
         
-        <div className="grid gap-6" style={{ gridTemplateColumns: `repeat(${numColumns}, 1fr)` }}>
+        <div 
+          className={cn("grid", isLandscape ? "gap-2" : "gap-6")} 
+          style={{ gridTemplateColumns: `repeat(${numColumns}, 1fr)` }}
+        >
           {/* All columns are now shuffled */}
           {gameState.shuffledColumns.map((column, columnIndex) => (
-            <div key={`column-${columnIndex}`} className="flex flex-col gap-4">
-              <div className="flex flex-col gap-4">
+            <div key={`column-${columnIndex}`} className={cn("flex flex-col", isLandscape ? "gap-2" : "gap-4")}>
+              <div className={cn("flex flex-col", isLandscape ? "gap-2" : "gap-4")}>
                 {column.map((image, index) => (
                   <ImageTile
                     key={`column-${columnIndex}-${image.word}-${index}`}
@@ -64,7 +77,7 @@ export function MatchingGame({
                     isSelected={isTileSelected(image.word, columnIndex, index)}
                     isMatched={isTileMatched(image.word)}
                     onClick={() => handleTileClick(image.word, columnIndex, index)}
-                    className="mx-auto w-24 h-24 md:w-48 md:h-48 lg:w-52 lg:h-52"
+                    className={tileClass}
                     data-image-id={image.word}
                     data-column={columnIndex}
                     data-index={index}
