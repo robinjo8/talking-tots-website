@@ -4,8 +4,6 @@ import { PlanId } from '@/config/pricing';
 
 export interface SubscriptionContextType extends SubscriptionState {
   refreshSubscription: () => Promise<void>;
-  isTrialing: boolean;
-  trialEnd: string | null;
   // Helper functions
   isPro: boolean;
   isStartOrPlus: boolean;
