@@ -68,15 +68,41 @@
   </head>
 
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Loading fallback - shown while React loads -->
+      <div id="loading-fallback" style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:system-ui;background:#f5f5f5">
+        <div style="text-align:center">
+          <div style="width:40px;height:40px;border:3px solid #4CAF50;border-radius:50%;border-top-color:transparent;animation:spin 1s linear infinite;margin:0 auto"></div>
+          <p style="color:#666;margin-top:16px">Nalaganje...</p>
+        </div>
+      </div>
+      <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+    </div>
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
     
-    <!-- PWA Service Worker Registration -->
+    <!-- PWA Service Worker Registration with Error Recovery -->
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
+          // Recovery timeout - if page doesn't render in 8s, clear SW and reload
+          const renderTimeout = setTimeout(() => {
+            const root = document.querySelector('#root');
+            const fallback = document.querySelector('#loading-fallback');
+            // If fallback is still visible, React hasn't rendered
+            if (fallback && fallback.style.display !== 'none') {
+              console.log('[Recovery] Page not rendered, clearing SW...');
+              navigator.serviceWorker.getRegistrations().then(regs => {
+                regs.forEach(reg => reg.unregister());
+              });
+              caches.keys().then(keys => {
+                keys.forEach(key => caches.delete(key));
+              });
+              setTimeout(() => window.location.reload(), 500);
+            }
+          }, 8000);
+          
           navigator.serviceWorker.register('/sw.js')
             .then((registration) => {
               console.log('SW registered: ', registration);
