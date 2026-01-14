@@ -5,9 +5,16 @@ import { Button } from "@/components/ui/button";
 import { UserRound, Pencil, Trash2, ChevronDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { SPEECH_DEVELOPMENT_QUESTIONS, SPEECH_DEVELOPMENT_TEXT_QUESTIONS } from "@/models/SpeechDevelopment";
+import { SPEECH_DIFFICULTIES } from "@/models/SpeechDifficulties";
 import { ChildProfile } from "@/contexts/AuthContext";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
+
+// Helper function to get Slovenian title for speech difficulty ID
+const getSpeechDifficultyTitle = (difficultyId: string): string => {
+  const difficulty = SPEECH_DIFFICULTIES.find(d => d.id === difficultyId);
+  return difficulty?.title || difficultyId;
+};
 
 type ChildProfileDisplayProps = {
   child: ChildProfile;
@@ -186,15 +193,16 @@ export function ChildProfileDisplay({
                           variant="secondary"
                           className="bg-dragon-green/10 text-dragon-green border-dragon-green/20"
                         >
-                          {difficultyId}
+                          {getSpeechDifficultyTitle(difficultyId)}
                         </Badge>
                       ))}
                     </div>
                     
                     {child.speechDifficultiesDescription && (
-                      <p className="text-sm text-muted-foreground">
-                        {child.speechDifficultiesDescription}
-                      </p>
+                      <div className="mt-2">
+                        <p className="text-sm text-muted-foreground">Podroben opis težav z govorom:</p>
+                        <p className="text-sm text-dragon-green font-medium mt-0.5">→ {child.speechDifficultiesDescription}</p>
+                      </div>
                     )}
                   </div>
                 ) : (
