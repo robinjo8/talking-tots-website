@@ -104,15 +104,13 @@ export default function IgraUjemanjaZ56() {
             backgroundRepeat: 'no-repeat'
           }}
         />
-        <div className="h-full flex flex-col relative z-10">
-          {/* Game Area with gray background */}
-          <div className="flex-1 overflow-hidden bg-muted/30 p-4">
-            <ThreeColumnGame
-              key={gameKey}
-              items={items}
-              onGameComplete={(score, playedItems) => handleGameComplete(score, playedItems)}
-            />
-          </div>
+        <div className="h-full flex items-center justify-center relative z-10">
+          <ThreeColumnGame
+            key={gameKey}
+            items={items}
+            onGameComplete={(score, playedItems) => handleGameComplete(score, playedItems)}
+            isLandscape={true}
+          />
         </div>
         
         <MatchingInstructionsModal

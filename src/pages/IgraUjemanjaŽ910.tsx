@@ -112,15 +112,13 @@ function IgraUjemanjaŽ910Content() {
             backgroundRepeat: 'no-repeat'
           }}
         />
-        <div className="h-full flex flex-col relative z-10">
-          {/* Game Area */}
-          <div className="flex-1 overflow-hidden bg-muted/30 p-2">
-            <FourColumnGame
-              key={gameKey}
-              items={items}
-              onGameComplete={handleGameComplete}
-            />
-          </div>
+        <div className="h-full flex items-center justify-center relative z-10">
+          <FourColumnGame
+            key={gameKey}
+            items={items}
+            onGameComplete={handleGameComplete}
+            isLandscape={true}
+          />
         </div>
 
         {/* Floating Menu Button */}
