@@ -40,6 +40,9 @@ export function UnifiedProgressDisplay({ progressData, recordCompletion }: Unifi
   // Check if we've earned 10 dragons and haven't claimed the trophy yet
   // This creates a unique key for each trophy earned
   useEffect(() => {
+    // Prevent duplicate triggers
+    if (showTrophyDialog) return;
+    
     if (!selectedChild?.id || unified.totalTrophies === 0) return;
     
     // Check if the CURRENT trophy has been claimed
@@ -53,7 +56,7 @@ export function UnifiedProgressDisplay({ progressData, recordCompletion }: Unifi
     if (!hasClaimed) {
       setShowTrophyDialog(true);
     }
-  }, [unified.totalTrophies, selectedChild?.id]);
+  }, [unified.totalTrophies, selectedChild?.id, showTrophyDialog]);
 
   const handleClaimTrophy = () => {
     if (!selectedChild?.id) return;

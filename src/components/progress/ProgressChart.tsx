@@ -24,7 +24,7 @@ const BAR_HEIGHTS = [20, 35, 50, 65, 80, 100, 120, 145, 170, 200];
 export function ProgressChart({ currentDragons, totalTrophies }: ProgressChartProps) {
   // Determine which dragon image to show on the 10th column
   const dragonOnTenthColumn = currentDragons >= 10 
-    ? "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_pokal.png"
+    ? "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/Zmajcek_pokal.png"
     : "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_6.png";
 
   return (
@@ -74,7 +74,7 @@ export function ProgressChart({ currentDragons, totalTrophies }: ProgressChartPr
                 {index === 9 && (
                   currentDragons >= 10 ? (
                     <motion.img
-                      src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_pokal.png"
+                      src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/Zmajcek_pokal.png"
                       alt="Zmajček s pokalom"
                       className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
                       initial={{ scale: 0, rotate: -180 }}
