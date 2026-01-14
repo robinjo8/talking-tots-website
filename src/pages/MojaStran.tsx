@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
@@ -10,9 +11,14 @@ import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 
 const MojaStran = () => {
-  const { user, selectedChild, signOut } = useAuth();
+  const { user, selectedChild, signOut, isLoading } = useAuth();
   const navigate = useNavigate();
   
+  useEffect(() => {
+    if (!isLoading && !user) {
+      navigate("/login");
+    }
+  }, [user, isLoading, navigate]);
 
   const handleSignOut = async () => {
     try {
@@ -24,8 +30,7 @@ const MojaStran = () => {
     }
   };
 
-  if (!user) {
-    navigate("/login");
+  if (isLoading || !user) {
     return null;
   }
 

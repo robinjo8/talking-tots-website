@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
@@ -7,13 +8,20 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useDailyProgress } from "@/hooks/useDailyProgress";
 import { FooterSection } from "@/components/FooterSection";
+
 const GovornojezicovneVaje = () => {
-  const { user, selectedChild, signOut } = useAuth();
+  const { user, selectedChild, signOut, isLoading: isAuthLoading } = useAuth();
   const navigate = useNavigate();
   const { dailyActivities, isLoading } = useDailyProgress();
   
   const targetActivities = 15;
   const percentage = Math.min((dailyActivities / targetActivities) * 100, 100);
+
+  useEffect(() => {
+    if (!isAuthLoading && !user) {
+      navigate("/login");
+    }
+  }, [user, isAuthLoading, navigate]);
 
   const handleSignOut = async () => {
     try {
@@ -25,8 +33,7 @@ const GovornojezicovneVaje = () => {
     }
   };
 
-  if (!user) {
-    navigate("/login");
+  if (isAuthLoading || !user) {
     return null;
   }
   const exerciseTypes = [{
