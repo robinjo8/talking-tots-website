@@ -1,4 +1,4 @@
-import { User, Users, CircleDollarSign, CreditCard, Shield, FileText, ClipboardCheck } from "lucide-react";
+import { User, Users, CircleDollarSign, CreditCard, Shield, FileText, ClipboardCheck, Lock } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -6,6 +6,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
+import { cn } from "@/lib/utils";
 
 type ProfileMobileTabsProps = {
   activeSection: string;
@@ -17,13 +19,14 @@ const tabs = [
   { id: "userProfile", label: "Moj profil", icon: User },
   { id: "myDocuments", label: "Moji dokumenti", icon: FileText },
   { id: "children", label: "Otroci", icon: Users, showCount: true },
-  { id: "articulationTest", label: "Test izgovorjave", icon: ClipboardCheck },
+  { id: "articulationTest", label: "Test izgovorjave", icon: ClipboardCheck, proOnly: true },
   { id: "subscription", label: "Naročnina", icon: CircleDollarSign },
   { id: "paymentMethods", label: "Plačilne metode", icon: CreditCard },
   { id: "passwordChange", label: "Spremeni geslo", icon: Shield },
 ];
 
 export function ProfileMobileTabs({ activeSection, setActiveSection, childrenCount }: ProfileMobileTabsProps) {
+  const { isPro } = useSubscriptionContext();
   const activeTab = tabs.find(tab => tab.id === activeSection);
   const ActiveIcon = activeTab?.icon || User;
   
@@ -41,14 +44,31 @@ export function ProfileMobileTabs({ activeSection, setActiveSection, childrenCou
       <SelectContent className="bg-white border border-gray-200 shadow-lg z-[100]">
         {tabs.map((tab) => {
           const Icon = tab.icon;
+          const isLocked = tab.proOnly && !isPro;
           return (
-            <SelectItem key={tab.id} value={tab.id} className="cursor-pointer">
+            <SelectItem 
+              key={tab.id} 
+              value={tab.id} 
+              disabled={isLocked}
+              className={cn(
+                "cursor-pointer",
+                isLocked && "opacity-50 cursor-not-allowed"
+              )}
+            >
               <div className="flex items-center gap-2">
-                <Icon className="h-4 w-4 text-dragon-green" />
-                <span>
-                  {tab.label}
-                  {tab.showCount && ` (${childrenCount})`}
-                </span>
+                <Icon className={cn("h-4 w-4", isLocked ? "text-gray-400" : "text-dragon-green")} />
+                <div className="flex flex-col">
+                  <span className={isLocked ? "text-gray-400" : ""}>
+                    {tab.label}
+                    {tab.showCount && ` (${childrenCount})`}
+                  </span>
+                  {isLocked && (
+                    <span className="text-xs text-gray-400 flex items-center gap-1">
+                      <Lock className="h-3 w-3" />
+                      Na voljo v TomiTalk Pro
+                    </span>
+                  )}
+                </div>
               </div>
             </SelectItem>
           );
