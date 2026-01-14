@@ -88,11 +88,10 @@
         window.addEventListener('load', () => {
           // Recovery timeout - if page doesn't render in 8s, clear SW and reload
           const renderTimeout = setTimeout(() => {
-            const root = document.querySelector('#root');
-            const fallback = document.querySelector('#loading-fallback');
-            // If fallback is still visible, React hasn't rendered
-            if (fallback && fallback.style.display !== 'none') {
-              console.log('[Recovery] Page not rendered, clearing SW...');
+            // Če #loading-fallback še vedno obstaja v DOM-u, React NI renderiral
+            // (React zamenja celotno vsebino #root z app komponento)
+            if (document.querySelector('#loading-fallback')) {
+              console.log('[Recovery] Page not rendered after 8s, clearing SW and cache...');
               navigator.serviceWorker.getRegistrations().then(regs => {
                 regs.forEach(reg => reg.unregister());
               });
