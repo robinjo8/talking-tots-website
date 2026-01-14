@@ -1,24 +1,18 @@
-
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EnhancedProgressSummary, useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { TrophyDisplay } from "./TrophyDisplay";
 import { StarDisplay } from "./StarDisplay";
 import { DragonDisplay } from "./DragonDisplay";
-import { TrophyDialog } from "../exercises/TrophyDialog";
 import { InfoButton } from "./InfoButton";
-import { useAuth } from "@/contexts/AuthContext";
 
 interface EnhancedProgressDisplayProps {
   progressData: EnhancedProgressSummary;
 }
 
 export function EnhancedProgressDisplay({ progressData }: EnhancedProgressDisplayProps) {
-  const { selectedChild } = useAuth();
   const { recordGameCompletion, recordExerciseCompletion } = useEnhancedProgress();
-  const [showTrophyDialog, setShowTrophyDialog] = useState(false);
   
   const dragonsToNextTrophy = 10 - (progressData.totalDragons % 10);
   const totalStars = progressData.games.totalStars + progressData.exercises.totalStars;
@@ -35,30 +29,8 @@ export function EnhancedProgressDisplay({ progressData }: EnhancedProgressDispla
     }
   };
   
-  // Check if we've reached 100 stars and haven't shown the dialog yet
-  useEffect(() => {
-    if (!selectedChild?.id) return;
-    
-    const storageKey = `trophy_dialog_shown_${selectedChild.id}`;
-    const hasShown = localStorage.getItem(storageKey);
-    
-    if (totalStars >= 100 && !hasShown) {
-      setShowTrophyDialog(true);
-      localStorage.setItem(storageKey, 'true');
-    }
-  }, [totalStars, selectedChild?.id]);
-
-  const handleCloseTrophyDialog = () => {
-    setShowTrophyDialog(false);
-  };
-
   return (
     <>
-      <TrophyDialog 
-        isOpen={showTrophyDialog}
-        onClose={handleCloseTrophyDialog}
-        totalStars={totalStars}
-      />
       
     <div className="space-y-6">
       {/* Trophy Section */}

@@ -1,5 +1,4 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Trophy } from "lucide-react";
 
 interface TrophyDialogProps {
   isOpen: boolean;
@@ -7,10 +6,10 @@ interface TrophyDialogProps {
   onClaimTrophy?: () => void;
   childName?: string;
   totalStars?: number;
+  trophyNumber?: number;
 }
 
-export const TrophyDialog = ({ isOpen, onClose, onClaimTrophy, childName, totalStars }: TrophyDialogProps) => {
-  // Use Zmajcek_pokal.png for the trophy celebration
+export const TrophyDialog = ({ isOpen, onClose, onClaimTrophy, childName, totalStars, trophyNumber }: TrophyDialogProps) => {
   const trophyImageUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_pokal.png";
 
   const handleClaimTrophy = () => {
@@ -26,13 +25,11 @@ export const TrophyDialog = ({ isOpen, onClose, onClaimTrophy, childName, totalS
       <DialogContent 
         className="max-w-md mx-auto bg-gradient-to-b from-yellow-50 to-yellow-100 dark:from-yellow-950 dark:to-yellow-900 border-yellow-200 dark:border-yellow-800"
         onPointerDownOutside={(e) => {
-          // Prevent closing by clicking outside when onClaimTrophy is provided
           if (onClaimTrophy) {
             e.preventDefault();
           }
         }}
         onEscapeKeyDown={(e) => {
-          // Prevent closing by pressing Escape when onClaimTrophy is provided
           if (onClaimTrophy) {
             e.preventDefault();
           }
@@ -42,23 +39,17 @@ export const TrophyDialog = ({ isOpen, onClose, onClaimTrophy, childName, totalS
           <DialogTitle className="text-2xl font-bold text-yellow-800 dark:text-yellow-200 text-center">
             🎉 ČESTITKE! 🎉
           </DialogTitle>
-          <DialogDescription className="text-yellow-700 dark:text-yellow-300 text-center">
-            {childName ? `Čestitamo ${childName} za osvojeni pokal!` : "Dosegli ste 100 zvezd!"}
+          <DialogDescription className="text-lg text-yellow-700 dark:text-yellow-300 text-center">
+            Čestitamo <span className="font-bold text-orange-500">{childName}</span> za osvojeni pokal!
           </DialogDescription>
         </DialogHeader>
 
         <div className="text-center pt-2 pb-4">
-          <div className="flex justify-center mb-4">
-            <div className="bg-yellow-500 text-white rounded-full p-3">
-              <Trophy className="h-8 w-8" />
-            </div>
-          </div>
-
           <div className="mb-4">
             <img 
               src={trophyImageUrl} 
               alt="Zmajček s pokalom" 
-              className="w-40 h-40 mx-auto rounded-lg shadow-lg object-contain bg-yellow-50/50"
+              className="w-48 h-48 mx-auto rounded-lg shadow-lg object-contain bg-yellow-50/50"
               onError={(e) => {
                 console.error("Failed to load trophy image:", trophyImageUrl);
                 e.currentTarget.style.display = 'none';
@@ -72,10 +63,8 @@ export const TrophyDialog = ({ isOpen, onClose, onClaimTrophy, childName, totalS
                 ⭐ {totalStars} ZVEZD ⭐
               </p>
             )}
-            <p className="text-sm text-yellow-600 dark:text-yellow-400 mt-2">
-              {childName 
-                ? `Bravo ${childName}! Osvojil/a si pokal!` 
-                : "Bravo! Osvojili ste svoj prvi pokal!"}
+            <p className="text-base text-yellow-600 dark:text-yellow-400 mt-2">
+              Bravo, to je tvoj <span className="font-bold text-orange-500">{trophyNumber}.</span> pokal!
             </p>
           </div>
 
