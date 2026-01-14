@@ -1,23 +1,14 @@
-const CACHE_NAME = 'tomitalk-v1.0.45';
-const CACHE_VERSION = 7;
+const CACHE_NAME = 'tomitalk-v1.0.46';
+const CACHE_VERSION = 8;
 
-// Essential files to cache for offline functionality
+// Essential files to cache for offline functionality - simplified paths without version params
 const ESSENTIAL_CACHE = [
   '/',
-  '/manifest.json?v=11',
-  '/icons/icon-72x72.png?v=zmajcek9',
-  '/icons/icon-144x144.png?v=zmajcek9',
-  '/icons/icon-192x192.png?v=zmajcek9',
-  '/icons/icon-512x512.png?v=zmajcek9',
-  // Add other essential assets
-];
-
-// Game assets to pre-cache
-const GAME_CACHE = [
-  '/spomin-games',
-  '/sestavljanke-games',
-  '/igra-ujemanja',
-  // Add game-specific assets
+  '/manifest.json',
+  '/icons/icon-72x72.png',
+  '/icons/icon-144x144.png',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png',
 ];
 
 // API endpoints that should be cached
@@ -27,22 +18,38 @@ const API_CACHE_PATTERNS = [
   /\/api\/user/
 ];
 
-// Install event - cache essential resources
+// Install event - cache essential resources with graceful error handling
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing service worker...');
+  console.log('[SW] Installing service worker v1.0.46...');
   
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => {
+      .then(async (cache) => {
         console.log('[SW] Caching essential resources');
-        return cache.addAll(ESSENTIAL_CACHE);
+        // Cache each file individually so one failure doesn't break everything
+        const results = await Promise.allSettled(
+          ESSENTIAL_CACHE.map(async (url) => {
+            try {
+              await cache.add(url);
+              console.log(`[SW] Cached: ${url}`);
+              return url;
+            } catch (err) {
+              console.warn(`[SW] Failed to cache ${url}:`, err);
+              return null;
+            }
+          })
+        );
+        const cached = results.filter(r => r.status === 'fulfilled' && r.value).length;
+        console.log(`[SW] Cached ${cached}/${ESSENTIAL_CACHE.length} essential resources`);
       })
       .then(() => {
-        console.log('[SW] Essential resources cached');
+        console.log('[SW] Service worker installed, skipping waiting');
         return self.skipWaiting();
       })
       .catch((error) => {
         console.error('[SW] Cache installation failed:', error);
+        // Still skip waiting even if caching fails - app will work online
+        return self.skipWaiting();
       })
   );
 });
