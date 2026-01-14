@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { EnhancedProgressSummary, useEnhancedProgress } from "@/hooks/useEnhancedProgress";
+import { EnhancedProgressSummary } from "@/hooks/useEnhancedProgress";
 import { ProgressChart } from "./ProgressChart";
 import { StarDisplay } from "./StarDisplay";
 import { DragonDisplay } from "./DragonDisplay";
@@ -12,11 +12,11 @@ import { useAuth } from "@/contexts/AuthContext";
 
 interface UnifiedProgressDisplayProps {
   progressData: EnhancedProgressSummary;
+  recordCompletion: (type: 'game' | 'exercise', subtype?: string) => void;
 }
 
-export function UnifiedProgressDisplay({ progressData }: UnifiedProgressDisplayProps) {
+export function UnifiedProgressDisplay({ progressData, recordCompletion }: UnifiedProgressDisplayProps) {
   const { selectedChild } = useAuth();
-  const { recordCompletion } = useEnhancedProgress();
   const [showTrophyDialog, setShowTrophyDialog] = useState(false);
   
   // Safe access to unified data with fallback

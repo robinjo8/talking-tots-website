@@ -4,7 +4,7 @@ import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { UnifiedProgressDisplay } from "./progress/UnifiedProgressDisplay";
 
 export function ProgressSection() {
-  const { progressData, isLoading, selectedChild } = useEnhancedProgress();
+  const { progressData, isLoading, selectedChild, recordCompletion } = useEnhancedProgress();
 
   if (isLoading) {
     return (
@@ -43,6 +43,6 @@ export function ProgressSection() {
   }
 
   return (
-    <UnifiedProgressDisplay progressData={progressData} />
+    <UnifiedProgressDisplay progressData={progressData} recordCompletion={recordCompletion} />
   );
 }
