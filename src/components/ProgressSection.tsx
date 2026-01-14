@@ -1,8 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Trophy, TrendingUp } from "lucide-react";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { MotivationalContainer } from "./progress/MotivationalContainer";
-import { EnhancedProgressDisplay } from "./progress/EnhancedProgressDisplay";
+import { UnifiedProgressDisplay } from "./progress/UnifiedProgressDisplay";
 
 export function ProgressSection() {
   const { progressData, isLoading, selectedChild } = useEnhancedProgress();
@@ -44,6 +43,6 @@ export function ProgressSection() {
   }
 
   return (
-    <EnhancedProgressDisplay progressData={progressData} />
+    <UnifiedProgressDisplay progressData={progressData} />
   );
 }

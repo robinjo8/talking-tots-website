@@ -1,13 +1,23 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
+export interface UnifiedProgressSummary {
+  totalStars: number;        // Total completions (games + exercises)
+  currentStars: number;      // 0-9 stars towards next dragon
+  totalDragons: number;      // Total dragons earned (each 10 stars)
+  currentDragons: number;    // 0-9 dragons towards next trophy
+  totalTrophies: number;     // Total trophies earned (each 10 dragons = 100 stars)
+  starsToNextDragon: number; // How many stars needed for next dragon
+  dragonsToNextTrophy: number; // How many dragons needed for next trophy
+}
+
+// Keep for backwards compatibility
 export interface CategoryProgress {
-  stars: number; // 0-9 (resets to 0 when reaching 10)
-  dragons: number; // earned dragons for this category (0-9)
-  totalStars: number; // total stars earned in this category
-  totalCompletions: number; // total activities completed
+  stars: number;
+  dragons: number;
+  totalStars: number;
+  totalCompletions: number;
 }
 
 export interface EnhancedProgressSummary {
@@ -15,6 +25,8 @@ export interface EnhancedProgressSummary {
   exercises: CategoryProgress;
   totalTrophies: number;
   totalDragons: number;
+  // New unified fields
+  unified: UnifiedProgressSummary;
 }
 
 export const useEnhancedProgress = () => {
@@ -25,13 +37,24 @@ export const useEnhancedProgress = () => {
   const { data: progressData, isLoading, error } = useQuery({
     queryKey: ["enhancedProgress", selectedChild?.id],
     queryFn: async (): Promise<EnhancedProgressSummary> => {
-      if (!selectedChild?.id) {
-        return {
-          games: { stars: 0, dragons: 0, totalStars: 0, totalCompletions: 0 },
-          exercises: { stars: 0, dragons: 0, totalStars: 0, totalCompletions: 0 },
+      const emptyProgress: EnhancedProgressSummary = {
+        games: { stars: 0, dragons: 0, totalStars: 0, totalCompletions: 0 },
+        exercises: { stars: 0, dragons: 0, totalStars: 0, totalCompletions: 0 },
+        totalTrophies: 0,
+        totalDragons: 0,
+        unified: {
+          totalStars: 0,
+          currentStars: 0,
+          totalDragons: 0,
+          currentDragons: 0,
           totalTrophies: 0,
-          totalDragons: 0
-        };
+          starsToNextDragon: 10,
+          dragonsToNextTrophy: 10
+        }
+      };
+
+      if (!selectedChild?.id) {
+        return emptyProgress;
       }
 
       // Get activity summary
@@ -39,12 +62,7 @@ export const useEnhancedProgress = () => {
         .rpc('get_child_activity_summary', { child_uuid: selectedChild.id });
 
       if (!activitySummary) {
-        return {
-          games: { stars: 0, dragons: 0, totalStars: 0, totalCompletions: 0 },
-          exercises: { stars: 0, dragons: 0, totalStars: 0, totalCompletions: 0 },
-          totalTrophies: 0,
-          totalDragons: 0
-        };
+        return emptyProgress;
       }
 
       // Categorize activities
@@ -55,48 +73,70 @@ export const useEnhancedProgress = () => {
         a.activity_type === 'exercise'
       );
 
-      // Calculate game progress - each completion = 1 star
+      // Calculate individual category progress (for backwards compatibility)
       const gamesTotalCompletions = gameActivities.reduce((sum, a) => sum + a.completion_count, 0);
-      const gameCurrentStars = gamesTotalCompletions % 10; // 0-9 stars
-      const gameDragons = Math.floor((gamesTotalCompletions % 100) / 10); // 0-9 dragons
-      
-      // Calculate exercise progress - each completion = 1 star (1 completion = 27 cards done)
       const exercisesTotalCompletions = exerciseActivities.reduce((sum, a) => sum + a.completion_count, 0);
-      const exerciseCurrentStars = exercisesTotalCompletions % 10; // 0-9 stars
-      const exerciseDragons = Math.floor((exercisesTotalCompletions % 100) / 10); // 0-9 dragons
 
-      // Calculate total progress across both categories
-      const totalCompletions = gamesTotalCompletions + exercisesTotalCompletions;
-      const totalTrophies = Math.floor(totalCompletions / 100); // Every 100 completions = 1 trophy
-      const totalDragons = Math.floor((totalCompletions % 100) / 10); // Every 10 completions = 1 dragon
+      // NEW UNIFIED LOGIC:
+      // Total stars = all completions combined
+      const totalStars = gamesTotalCompletions + exercisesTotalCompletions;
+      
+      // Current stars = 0-9 stars towards next dragon
+      const currentStars = totalStars % 10;
+      
+      // Total dragons = every 10 stars = 1 dragon
+      const totalDragons = Math.floor(totalStars / 10);
+      
+      // Current dragons = 0-9 dragons towards next trophy
+      const currentDragons = totalDragons % 10;
+      
+      // Total trophies = every 10 dragons (100 stars) = 1 trophy
+      const totalTrophies = Math.floor(totalDragons / 10);
+      
+      // Stars needed for next dragon
+      const starsToNextDragon = 10 - currentStars;
+      
+      // Dragons needed for next trophy
+      const dragonsToNextTrophy = 10 - currentDragons;
 
-      console.log("Progress calculation:", {
+      console.log("Progress calculation (unified):", {
         gamesTotalCompletions,
         exercisesTotalCompletions,
-        totalCompletions,
-        gameCurrentStars,
-        exerciseCurrentStars,
-        gameDragons,
-        exerciseDragons,
+        totalStars,
+        currentStars,
+        totalDragons,
+        currentDragons,
         totalTrophies,
-        totalDragons
+        starsToNextDragon,
+        dragonsToNextTrophy
       });
 
       return {
+        // Keep backwards compatibility
         games: {
-          stars: gameCurrentStars,
-          dragons: gameDragons,
-          totalStars: gamesTotalCompletions, // Each completion is 1 star
+          stars: gamesTotalCompletions % 10,
+          dragons: Math.floor((gamesTotalCompletions % 100) / 10),
+          totalStars: gamesTotalCompletions,
           totalCompletions: gamesTotalCompletions
         },
         exercises: {
-          stars: exerciseCurrentStars,
-          dragons: exerciseDragons,
-          totalStars: exercisesTotalCompletions, // Each completion is 1 star
+          stars: exercisesTotalCompletions % 10,
+          dragons: Math.floor((exercisesTotalCompletions % 100) / 10),
+          totalStars: exercisesTotalCompletions,
           totalCompletions: exercisesTotalCompletions
         },
         totalTrophies,
-        totalDragons
+        totalDragons,
+        // New unified data
+        unified: {
+          totalStars,
+          currentStars,
+          totalDragons,
+          currentDragons,
+          totalTrophies,
+          starsToNextDragon,
+          dragonsToNextTrophy
+        }
       };
     },
     enabled: !!selectedChild?.id
@@ -115,7 +155,7 @@ export const useEnhancedProgress = () => {
       // Map activity subtypes to proper exercise IDs
       const exerciseIdMap: Record<string, string> = {
         'vaje_motorike_govoril': 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-        'general': 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' // Default to vaje motorike govoril
+        'general': 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
       };
 
       const exerciseId = exerciseIdMap[params.activitySubtype || 'general'] || exerciseIdMap['general'];
@@ -165,12 +205,22 @@ export const useEnhancedProgress = () => {
     });
   };
 
+  // New unified recording function
+  const recordCompletion = (type: 'game' | 'exercise', subtype?: string) => {
+    if (type === 'game') {
+      recordGameCompletion('memory', subtype || 'general');
+    } else {
+      recordExerciseCompletion(subtype || 'vaje_motorike_govoril');
+    }
+  };
+
   return {
     progressData,
     isLoading,
     error,
     recordGameCompletion,
     recordExerciseCompletion,
+    recordCompletion,
     selectedChild
   };
 };
