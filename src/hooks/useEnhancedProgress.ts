@@ -33,9 +33,11 @@ export const useEnhancedProgress = () => {
   const { selectedChild } = useAuth();
   const queryClient = useQueryClient();
 
-  // Fetch enhanced progress data
+  // Fetch enhanced progress data with staleTime to prevent unnecessary refetches
   const { data: progressData, isLoading, error } = useQuery({
     queryKey: ["enhancedProgress", selectedChild?.id],
+    staleTime: 30000, // Data considered fresh for 30 seconds
+    gcTime: 60000, // Keep in cache for 60 seconds
     queryFn: async (): Promise<EnhancedProgressSummary> => {
       const emptyProgress: EnhancedProgressSummary = {
         games: { stars: 0, dragons: 0, totalStars: 0, totalCompletions: 0 },

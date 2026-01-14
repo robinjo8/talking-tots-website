@@ -312,9 +312,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
+    // Track current user ID to prevent redundant fetches
+    let currentUserId: string | null = null;
+
     // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state changed:", event);
+      
+      // Ignore TOKEN_REFRESHED events - these don't require profile refetch
+      if (event === 'TOKEN_REFRESHED') {
+        console.log("Token refreshed - skipping profile fetch");
+        return;
+      }
       
       if (mounted) {
         setSession(session);
@@ -324,13 +333,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // This prevents automatic redirection from the user portal to admin portal
         
         if (session?.user) {
-          // Use setTimeout to avoid blocking the auth state change
-          setTimeout(() => {
-            if (mounted) {
-              fetchUserProfile(session.user.id);
-            }
-          }, 0);
+          // Only fetch profile if user actually changed
+          if (currentUserId !== session.user.id) {
+            currentUserId = session.user.id;
+            fetchUserProfile(session.user.id);
+          }
         } else {
+          currentUserId = null;
           setProfile(null);
         }
         
