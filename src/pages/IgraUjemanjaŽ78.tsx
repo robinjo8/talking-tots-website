@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { AppLayout } from "@/components/AppLayout";
 import { useEnhancedProgress } from '@/hooks/useEnhancedProgress';
 import { FourColumnGame } from '@/components/matching/FourColumnGame';
@@ -17,7 +16,6 @@ export default function IgraUjemanjaŽ78() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const letter = 'ž';
-  const isMobile = useIsMobile();
   const [gameKey, setGameKey] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
@@ -29,9 +27,14 @@ export default function IgraUjemanjaŽ78() {
   const gameCompletedRef = useRef(false);
   const { recordGameCompletion } = useEnhancedProgress();
 
-  const handleStarClaimed = () => {
-    recordGameCompletion('matching_ž_7-8');
-  };
+  // Synchronous touch device detection
+  const [isTouchDevice] = useState(() => {
+    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const isSmallScreen = Math.min(window.screen.width, window.screen.height) <= 900;
+    return hasTouch && isSmallScreen;
+  });
+
+  const [isPortrait, setIsPortrait] = useState(() => window.innerHeight > window.innerWidth);
 
   useEffect(() => {
     if (!user) {
@@ -39,12 +42,38 @@ export default function IgraUjemanjaŽ78() {
     }
   }, [user, navigate]);
 
-  const upperCaseLetter = letter?.toUpperCase() || 'Ž';
+  // Orientation detection
+  useEffect(() => {
+    const handleOrientationChange = () => {
+      setIsPortrait(window.innerHeight > window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleOrientationChange);
+    window.addEventListener('orientationchange', handleOrientationChange);
+
+    return () => {
+      window.removeEventListener('resize', handleOrientationChange);
+      window.removeEventListener('orientationchange', handleOrientationChange);
+    };
+  }, []);
+
+  // Fullscreen and landscape lock for touch devices
+  useEffect(() => {
+    if (isTouchDevice) {
+      document.documentElement.requestFullscreen?.();
+      (screen.orientation as any)?.lock?.('landscape').catch(() => {});
+      
+      return () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen?.();
+        }
+      };
+    }
+  }, [isTouchDevice]);
 
   const handleGameComplete = (score: number) => {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
-      console.log(`Game completed with score: ${score}`);
       setCompletedItems(items);
       setIsGameCompleted(true);
       setShowCompletion(true);
@@ -60,28 +89,25 @@ export default function IgraUjemanjaŽ78() {
     setGameKey(prev => prev + 1);
   };
 
-  const handleBack = () => {
-    navigate('/govorne-igre/igra-ujemanja');
-  };
+  const handleBack = () => navigate('/govorne-igre/igra-ujemanja');
+  const handleStarClaimed = () => recordGameCompletion('matching_ž_7-8');
 
-  const handleInstructions = () => {
-    setShowInstructions(true);
-  };
-
-  useEffect(() => {
-    if (isMobile) {
-      document.documentElement.requestFullscreen?.();
-      return () => {
-        if (document.fullscreenElement) {
-          document.exitFullscreen?.();
-        }
-      };
-    }
-  }, [isMobile]);
-
-  const effectiveFullscreen = isMobile;
+  const effectiveFullscreen = isTouchDevice;
 
   if (effectiveFullscreen) {
+    // Portrait mode - show rotate message
+    if (isPortrait) {
+      return (
+        <div className="fixed inset-0 bg-background flex items-center justify-center p-8">
+          <div className="text-center">
+            <div className="text-6xl mb-4">📱</div>
+            <p className="text-xl font-medium">Za igranje igre prosim obrni telefon v ležeči položaj.</p>
+          </div>
+        </div>
+      );
+    }
+
+    // Landscape mode - show game
     return (
       <div className="fixed inset-0 bg-background overflow-hidden select-none">
         <div 
