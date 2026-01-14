@@ -37,20 +37,29 @@ export function UnifiedProgressDisplay({ progressData, recordCompletion }: Unifi
     }
   };
   
-  // Check if we've reached 100 stars and haven't shown the dialog yet
+  // Check if we've earned 10 dragons and haven't claimed the trophy yet
+  // This creates a unique key for each trophy earned
   useEffect(() => {
     if (!selectedChild?.id) return;
     
-    const storageKey = `trophy_dialog_shown_${selectedChild.id}`;
-    const hasShown = localStorage.getItem(storageKey);
+    // Key tracks whether this specific trophy level has been claimed
+    const storageKey = `trophy_claimed_${selectedChild.id}_${unified.totalTrophies}`;
+    const hasClaimed = localStorage.getItem(storageKey);
     
-    if (unified.totalStars >= 100 && !hasShown) {
+    // Show dialog when:
+    // 1. We have 10 dragons (ready for trophy)
+    // 2. We haven't claimed this trophy yet
+    if (unified.currentDragons >= 10 && !hasClaimed) {
       setShowTrophyDialog(true);
-      localStorage.setItem(storageKey, 'true');
     }
-  }, [unified.totalStars, selectedChild?.id]);
+  }, [unified.currentDragons, unified.totalTrophies, selectedChild?.id]);
 
-  const handleCloseTrophyDialog = () => {
+  const handleClaimTrophy = () => {
+    if (!selectedChild?.id) return;
+    
+    // Mark this trophy as claimed
+    const storageKey = `trophy_claimed_${selectedChild.id}_${unified.totalTrophies}`;
+    localStorage.setItem(storageKey, 'true');
     setShowTrophyDialog(false);
   };
 
@@ -58,7 +67,9 @@ export function UnifiedProgressDisplay({ progressData, recordCompletion }: Unifi
     <>
       <TrophyDialog 
         isOpen={showTrophyDialog}
-        onClose={handleCloseTrophyDialog}
+        onClose={() => {}} // Empty function - can't close without claiming
+        onClaimTrophy={handleClaimTrophy}
+        childName={selectedChild?.name || ""}
         totalStars={unified.totalStars}
       />
       

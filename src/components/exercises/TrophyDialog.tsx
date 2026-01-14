@@ -4,21 +4,46 @@ import { Trophy } from "lucide-react";
 interface TrophyDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  totalStars: number;
+  onClaimTrophy?: () => void;
+  childName?: string;
+  totalStars?: number;
 }
 
-export const TrophyDialog = ({ isOpen, onClose, totalStars }: TrophyDialogProps) => {
-  const trophyImageUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/pokal.png";
+export const TrophyDialog = ({ isOpen, onClose, onClaimTrophy, childName, totalStars }: TrophyDialogProps) => {
+  // Use Zmajcek_pokal.png for the trophy celebration
+  const trophyImageUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_pokal.png";
+
+  const handleClaimTrophy = () => {
+    if (onClaimTrophy) {
+      onClaimTrophy();
+    } else {
+      onClose();
+    }
+  };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md mx-auto bg-gradient-to-b from-yellow-50 to-yellow-100 dark:from-yellow-950 dark:to-yellow-900 border-yellow-200 dark:border-yellow-800">
+    <Dialog open={isOpen} onOpenChange={onClaimTrophy ? undefined : onClose}>
+      <DialogContent 
+        className="max-w-md mx-auto bg-gradient-to-b from-yellow-50 to-yellow-100 dark:from-yellow-950 dark:to-yellow-900 border-yellow-200 dark:border-yellow-800"
+        onPointerDownOutside={(e) => {
+          // Prevent closing by clicking outside when onClaimTrophy is provided
+          if (onClaimTrophy) {
+            e.preventDefault();
+          }
+        }}
+        onEscapeKeyDown={(e) => {
+          // Prevent closing by pressing Escape when onClaimTrophy is provided
+          if (onClaimTrophy) {
+            e.preventDefault();
+          }
+        }}
+      >
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-yellow-800 dark:text-yellow-200 text-center">
             🎉 ČESTITKE! 🎉
           </DialogTitle>
           <DialogDescription className="text-yellow-700 dark:text-yellow-300 text-center">
-            Dosegli ste 100 zvezd!
+            {childName ? `Čestitamo ${childName} za osvojeni pokal!` : "Dosegli ste 100 zvezd!"}
           </DialogDescription>
         </DialogHeader>
 
@@ -32,30 +57,33 @@ export const TrophyDialog = ({ isOpen, onClose, totalStars }: TrophyDialogProps)
           <div className="mb-4">
             <img 
               src={trophyImageUrl} 
-              alt="Pokal za 100 zvezd" 
-              className="w-32 h-32 mx-auto rounded-full border-4 border-yellow-200 dark:border-yellow-700 shadow-lg object-cover"
+              alt="Zmajček s pokalom" 
+              className="w-40 h-40 mx-auto rounded-lg shadow-lg object-contain bg-yellow-50/50"
               onError={(e) => {
                 console.error("Failed to load trophy image:", trophyImageUrl);
-                // Show fallback trophy icon
                 e.currentTarget.style.display = 'none';
               }}
             />
           </div>
 
           <div className="bg-white dark:bg-yellow-950 rounded-lg p-4 mb-4 border border-yellow-200 dark:border-yellow-800">
-            <p className="text-lg font-bold text-yellow-600 dark:text-yellow-400">
-              ⭐ {totalStars} ZVEZD ⭐
-            </p>
+            {totalStars !== undefined && (
+              <p className="text-lg font-bold text-yellow-600 dark:text-yellow-400">
+                ⭐ {totalStars} ZVEZD ⭐
+              </p>
+            )}
             <p className="text-sm text-yellow-600 dark:text-yellow-400 mt-2">
-              Bravo! Osvojili ste svoj prvi pokal!
+              {childName 
+                ? `Bravo ${childName}! Osvojil/a si pokal!` 
+                : "Bravo! Osvojili ste svoj prvi pokal!"}
             </p>
           </div>
 
           <button
-            onClick={onClose}
-            className="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+            onClick={handleClaimTrophy}
+            className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-medium transition-colors text-lg shadow-md"
           >
-            Nadaljuj z vajami
+            {onClaimTrophy ? "Vzemi pokal" : "Nadaljuj z vajami"}
           </button>
         </div>
       </DialogContent>
