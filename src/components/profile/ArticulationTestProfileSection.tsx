@@ -86,7 +86,7 @@ export function ArticulationTestProfileSection() {
               <div>
                 <p className="font-medium text-amber-800">Test še ni bil opravljen</p>
                 <p className="text-sm text-amber-700 mt-1">
-                  Opravite test izgovorjave, da preverite govorni razvoj vašega otroka.
+                  Prosimo, opravite test za začetno oceno.
                 </p>
               </div>
             </div>
