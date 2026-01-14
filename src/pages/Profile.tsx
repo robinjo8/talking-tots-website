@@ -15,6 +15,7 @@ import { ChildrenProfilesSection } from "@/components/profile/ChildrenProfilesSe
 import { SubscriptionSection } from "@/components/profile/SubscriptionSection";
 import { PaymentMethodsSection } from "@/components/profile/PaymentMethodsSection";
 import { MyDocumentsSection } from "@/components/profile/MyDocumentsSection";
+import { ArticulationTestProfileSection } from "@/components/profile/ArticulationTestProfileSection";
 import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
 import { ProfileMobileTabs } from "@/components/profile/ProfileMobileTabs";
 
@@ -225,6 +226,8 @@ export default function Profile() {
                 setEditingDevelopmentIndex={setEditingDevelopmentIndex}
               />
             )}
+            
+            {activeSection === 'articulationTest' && <ArticulationTestProfileSection />}
             
             {activeSection === 'subscription' && (
               <div data-section="subscription">
