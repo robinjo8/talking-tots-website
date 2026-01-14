@@ -20,16 +20,25 @@ export function useSubscription() {
     planId: null,
     productId: null,
     subscriptionEnd: null,
-    isLoading: true, // Start as loading to block access until check completes
+    isLoading: true,
     isTrialing: false,
     trialEnd: null,
   });
   
-  // Track user ID to prevent redundant subscription checks
-  const userIdRef = useRef<string | null>(null);
+  // Track if we've already checked for this user ID
+  const lastCheckedUserIdRef = useRef<string | null>(null);
+  // Prevent concurrent checks
+  const isCheckingRef = useRef(false);
 
   const checkSubscription = useCallback(async () => {
-    if (!user || !session) {
+    // Prevent concurrent checks
+    if (isCheckingRef.current) {
+      console.log('Subscription check already in progress, skipping');
+      return;
+    }
+
+    if (!user || !session?.access_token) {
+      console.log('No user or session, setting not subscribed');
       setSubscription({
         isSubscribed: false,
         planId: null,
@@ -42,21 +51,21 @@ export function useSubscription() {
       return;
     }
 
+    // Skip if we already checked for this user (and not in initial loading state)
+    if (lastCheckedUserIdRef.current === user.id && !subscription.isLoading) {
+      console.log('Already checked subscription for this user, skipping');
+      return;
+    }
+
+    isCheckingRef.current = true;
     setSubscription(prev => ({ ...prev, isLoading: true }));
 
     try {
-      // Uporabi obstoječi token iz session - ne klicaj refreshSession() ob prijavi
-      const token = session.access_token;
+      console.log('Checking subscription for user:', user.id);
       
-      if (!token) {
-        console.log('No access token available yet');
-        setSubscription(prev => ({ ...prev, isLoading: false }));
-        return;
-      }
-
       const { data, error } = await supabase.functions.invoke('check-subscription', {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
       });
 
@@ -67,6 +76,15 @@ export function useSubscription() {
       }
 
       const plan = data.productId ? getPlanByProductId(data.productId) : null;
+      
+      // Mark as checked for this user
+      lastCheckedUserIdRef.current = user.id;
+
+      console.log('Subscription check result:', { 
+        subscribed: data.subscribed, 
+        planId: plan?.id,
+        isTrialing: data.isTrialing 
+      });
 
       setSubscription({
         isSubscribed: data.subscribed || false,
@@ -80,32 +98,50 @@ export function useSubscription() {
     } catch (error) {
       console.error('Error checking subscription:', error);
       setSubscription(prev => ({ ...prev, isLoading: false }));
+    } finally {
+      isCheckingRef.current = false;
     }
-  }, [user, session]);
+  }, [user, session?.access_token, subscription.isLoading]);
 
-  // Check subscription on mount and when user actually changes
+  // Check subscription when user and session are available
   useEffect(() => {
-    // Only check if user actually changed (not just session refresh)
-    if (user?.id === userIdRef.current) {
+    // If no user, immediately set not loading
+    if (!user) {
+      setSubscription(prev => {
+        if (prev.isLoading) {
+          return { ...prev, isLoading: false };
+        }
+        return prev;
+      });
+      lastCheckedUserIdRef.current = null;
       return;
     }
-    userIdRef.current = user?.id || null;
-    
-    // Počakaj kratko, da se seja stabilizira po prijavi
+
+    // Wait for session to be available
+    if (!session?.access_token) {
+      return;
+    }
+
+    // Check subscription with a small delay to let auth stabilize
     const timeoutId = setTimeout(() => {
       checkSubscription();
     }, 100);
     
     return () => clearTimeout(timeoutId);
-  }, [user?.id, checkSubscription]);
+  }, [user?.id, session?.access_token, checkSubscription]);
 
   // Periodic refresh every 60 seconds
   useEffect(() => {
-    if (!user || !session) return;
+    if (!user || !session?.access_token) return;
 
-    const interval = setInterval(checkSubscription, 60000);
+    const interval = setInterval(() => {
+      // Reset lastCheckedUserId to force a refresh
+      lastCheckedUserIdRef.current = null;
+      checkSubscription();
+    }, 60000);
+    
     return () => clearInterval(interval);
-  }, [user, session, checkSubscription]);
+  }, [user?.id, session?.access_token, checkSubscription]);
 
   return {
     ...subscription,
