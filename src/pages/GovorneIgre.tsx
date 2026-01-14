@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import { GamesList } from "@/components/games/GamesList";
@@ -12,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
 export default function GovorneIgre() {
-  const { user, selectedChild, signOut } = useAuth();
+  const { user, selectedChild, signOut, isLoading: isAuthLoading } = useAuth();
   const navigate = useNavigate();
   const { dailyActivities, isLoading } = useDailyProgress();
   const isMobile = useIsMobile();
@@ -21,6 +22,12 @@ export default function GovorneIgre() {
   const percentage = Math.min((dailyActivities / targetActivities) * 100, 100);
 
   console.log('🎯 GovorneIgre - Selected child:', selectedChild?.name);
+
+  useEffect(() => {
+    if (!isAuthLoading && !user) {
+      navigate("/login");
+    }
+  }, [user, isAuthLoading, navigate]);
 
   const handleSignOut = async () => {
     try {
@@ -32,8 +39,7 @@ export default function GovorneIgre() {
     }
   };
 
-  if (!user) {
-    navigate("/login");
+  if (isAuthLoading || !user) {
     return null;
   }
 
