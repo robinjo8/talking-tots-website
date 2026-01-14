@@ -10,10 +10,12 @@ export function ManualInstallButton() {
   const { isInSafari, canShowInstructions } = useIOSInstallInstructions();
   const [showInstructions, setShowInstructions] = useState(false);
 
-  // Don't show if already installed or not on homepage
+  // Don't show if already installed, not on homepage, or on desktop
   const isHomepage = window.location.pathname === '/' || window.location.pathname === '';
   const isGamePage = window.location.pathname.includes('/govorne-igre/');
-  if (isInstalled || !isHomepage || isGamePage) return null;
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  
+  if (isInstalled || !isHomepage || isGamePage || !isMobile) return null;
 
   const handleInstallClick = async () => {
     if (isIOSDevice) {
