@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { AppLayout } from "@/components/AppLayout";
 import { useEnhancedProgress } from '@/hooks/useEnhancedProgress';
 import { ThreeColumnGame } from '@/components/matching/ThreeColumnGame';
@@ -9,7 +8,6 @@ import { MatchingInstructionsModal } from '@/components/matching/MatchingInstruc
 import { MatchingCompletionDialog } from '@/components/matching/MatchingCompletionDialog';
 import { MemoryExitConfirmationDialog } from '@/components/games/MemoryExitConfirmationDialog';
 import { getRandomThreeColumnItems, ThreeColumnMatchingItem } from '@/data/threeColumnMatchingData';
-import { getAgeGroup } from '@/utils/ageUtils';
 import { Button } from '@/components/ui/button';
 import { Home, RefreshCw } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -17,8 +15,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/compon
 export default function IgraUjemanjaK56() {
   const { user, selectedChild } = useAuth();
   const navigate = useNavigate();
-  const letter = 'k'; // Fixed to 'k' for this component
-  const isMobile = useIsMobile();
   const [gameKey, setGameKey] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
@@ -30,6 +26,47 @@ export default function IgraUjemanjaK56() {
   const { recordGameCompletion } = useEnhancedProgress();
   const [items, setItems] = useState<ThreeColumnMatchingItem[]>(() => getRandomThreeColumnItems(4, 'K'));
 
+  // Synchronous touch device detection
+  const [isTouchDevice] = useState(() => {
+    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const isSmallScreen = Math.min(window.screen.width, window.screen.height) <= 900;
+    return hasTouch && isSmallScreen;
+  });
+
+  // Portrait/landscape detection
+  const [isPortrait, setIsPortrait] = useState(() => {
+    return window.innerHeight > window.innerWidth;
+  });
+
+  // Orientation change listener
+  useEffect(() => {
+    const handleOrientationChange = () => {
+      setIsPortrait(window.innerHeight > window.innerWidth);
+    };
+    
+    window.addEventListener('resize', handleOrientationChange);
+    window.addEventListener('orientationchange', handleOrientationChange);
+    
+    return () => {
+      window.removeEventListener('resize', handleOrientationChange);
+      window.removeEventListener('orientationchange', handleOrientationChange);
+    };
+  }, []);
+
+  // Fullscreen and orientation lock for touch devices
+  useEffect(() => {
+    if (isTouchDevice && !isPortrait) {
+      document.documentElement.requestFullscreen?.().catch(() => {});
+      (screen.orientation as any)?.lock?.('landscape').catch(() => {});
+    }
+    
+    return () => {
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.().catch(() => {});
+      }
+    };
+  }, [isTouchDevice, isPortrait]);
+
   // Check authentication
   useEffect(() => {
     if (!user) {
@@ -37,23 +74,11 @@ export default function IgraUjemanjaK56() {
     }
   }, [user, navigate]);
 
-  // Check age group access and get appropriate age group
-  const childAge = selectedChild?.age || 5; // Default to 5 for this age group
-  const ageGroup = getAgeGroup(childAge);
-
-  // Get letter data for three-column game (fixed to 'k')
-  const upperCaseLetter = letter?.toUpperCase() || 'K';
-  
-  // Debug logging
-  console.log('Three column items:', items);
-
-  // Handle game completion
   const handleGameComplete = (score: number, playedItems: ThreeColumnMatchingItem[]) => {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
       setCompletedItems(playedItems);
       setIsGameCompleted(true);
-      console.log(`Game completed with score: ${score}`);
       setShowCompletion(true);
     }
   };
@@ -70,31 +95,38 @@ export default function IgraUjemanjaK56() {
     navigate('/govorne-igre/igra-ujemanja');
   };
 
-  const handleInstructions = () => {
-    setShowInstructions(true);
-  };
-
   const handleStarClaimed = () => {
     recordGameCompletion('matching_k_5-6');
   };
 
-  // Fullscreen handling for mobile
-  useEffect(() => {
-    if (isMobile) {
-      document.documentElement.requestFullscreen?.();
-      return () => {
-        if (document.fullscreenElement) {
-          document.exitFullscreen?.();
-        }
-      };
+  // Mobile touch device view
+  if (isTouchDevice) {
+    // Portrait mode - show rotate message
+    if (isPortrait) {
+      return (
+        <div className="fixed inset-0 bg-background flex items-center justify-center p-8">
+          <div 
+            className="fixed inset-0 z-0"
+            style={{
+              backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/oranzno_ozadje.png)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
+            }}
+          />
+          <div className="text-center relative z-10">
+            <div className="text-6xl mb-4">📱</div>
+            <p className="text-xl font-semibold text-foreground">
+              Za igranje igre prosim obrni telefon v ležeči položaj
+            </p>
+          </div>
+        </div>
+      );
     }
-  }, [isMobile]);
 
-  const effectiveFullscreen = isMobile;
-
-  if (effectiveFullscreen) {
+    // Landscape mode - show game
     return (
-      <div className="fixed inset-0 bg-background overflow-hidden select-none">
+      <div className="fixed inset-0 overflow-hidden select-none">
         <div 
           className="fixed inset-0 z-0"
           style={{
@@ -104,7 +136,7 @@ export default function IgraUjemanjaK56() {
             backgroundRepeat: 'no-repeat'
           }}
         />
-        <div className="h-full flex items-center justify-center relative z-10">
+        <div className="relative z-10 flex-1 flex items-center justify-center h-full w-full">
           <ThreeColumnGame
             key={gameKey}
             items={items}
@@ -180,6 +212,7 @@ export default function IgraUjemanjaK56() {
     );
   }
 
+  // Desktop view
   return (
     <AppLayout>
       <div className="w-full min-h-screen bg-background relative">
@@ -205,56 +238,56 @@ export default function IgraUjemanjaK56() {
           onClose={() => setShowInstructions(false)}
         />
         
-      <MatchingCompletionDialog
-        isOpen={showCompletion}
-        onClose={() => setShowCompletion(false)}
-        images={(completedItems.length > 0 ? completedItems : items).map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
-        onStarClaimed={handleStarClaimed}
-      />
+        <MatchingCompletionDialog
+          isOpen={showCompletion}
+          onClose={() => setShowCompletion(false)}
+          images={(completedItems.length > 0 ? completedItems : items).map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))}
+          onStarClaimed={handleStarClaimed}
+        />
 
-      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-        <DropdownMenuTrigger asChild>
-          <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"><Home className="w-8 h-8 text-white" /></button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent 
-          align="start" 
-          side="top"
-          sideOffset={8}
-          className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger asChild>
+            <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"><Home className="w-8 h-8 text-white" /></button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            align="start" 
+            side="top"
+            sideOffset={8}
+            className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+          >
+            <button onClick={() => { setMenuOpen(false); setShowExitDialog(true); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100">
+              <span className="text-2xl">🏠</span>
+              <span>Nazaj</span>
+            </button>
+            <button onClick={() => { setMenuOpen(false); handleNewGame(); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100">
+              <span className="text-2xl">🔄</span>
+              <span>Nova igra</span>
+            </button>
+            <button onClick={() => { setMenuOpen(false); setShowInstructions(true); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium">
+              <span className="text-2xl">📖</span>
+              <span>Navodila</span>
+            </button>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {isGameCompleted && (
+          <Button
+            onClick={handleNewGame}
+            className="fixed bottom-4 left-24 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+            size="icon"
+          >
+            <RefreshCw className="h-7 w-7 text-white" />
+          </Button>
+        )}
+
+        <MemoryExitConfirmationDialog
+          open={showExitDialog} 
+          onOpenChange={setShowExitDialog} 
+          onConfirm={handleBack}
         >
-          <button onClick={() => { setMenuOpen(false); setShowExitDialog(true); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100">
-            <span className="text-2xl">🏠</span>
-            <span>Nazaj</span>
-          </button>
-          <button onClick={() => { setMenuOpen(false); handleNewGame(); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100">
-            <span className="text-2xl">🔄</span>
-            <span>Nova igra</span>
-          </button>
-          <button onClick={() => { setMenuOpen(false); setShowInstructions(true); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium">
-            <span className="text-2xl">📖</span>
-            <span>Navodila</span>
-          </button>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
-      {isGameCompleted && (
-        <Button
-          onClick={handleNewGame}
-          className="fixed bottom-4 left-24 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 shadow-lg border-2 border-white/50 backdrop-blur-sm"
-          size="icon"
-        >
-          <RefreshCw className="h-7 w-7 text-white" />
-        </Button>
-      )}
-
-      <MemoryExitConfirmationDialog
-        open={showExitDialog} 
-        onOpenChange={setShowExitDialog} 
-        onConfirm={handleBack}
-      >
-        <div />
-      </MemoryExitConfirmationDialog>
-    </div>
-  </AppLayout>
-);
+          <div />
+        </MemoryExitConfirmationDialog>
+      </div>
+    </AppLayout>
+  );
 }
