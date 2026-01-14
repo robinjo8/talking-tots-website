@@ -73,41 +73,8 @@ export default function Header() {
   return (
     <div className="fixed top-0 left-0 right-0 z-50">
       <header className="py-4 px-4 md:px-10 w-full bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
-        {/* Desktop layout - logo and nav on left, profile/buttons on right */}
-        {(() => {
-          const { navLinks, rightSection } = DesktopNavigation({ user, onStartNow: handleStartNow, onCenikNavigate: handleCenikNavigate });
-          return (
-            <div className="hidden lg:flex items-center justify-between w-full">
-              {/* Left side - Logo and Navigation together */}
-              <div className="flex items-center gap-4">
-                {/* Logo */}
-                <Link 
-                  to="/" 
-                  className="flex items-center"
-                  onClick={(e) => {
-                    if (window.location.pathname === '/') {
-                      e.preventDefault();
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }
-                  }}
-                >
-                  <div className="flex items-center">
-                    <span className="text-2xl font-extrabold text-dragon-green uppercase">Tomi</span>
-                    <span className="text-2xl font-extrabold text-app-orange uppercase">Talk</span>
-                  </div>
-                </Link>
-                
-                {/* Navigation right next to logo */}
-                {navLinks}
-              </div>
-              
-              {/* Right side - user profile or login buttons */}
-              <div className="flex items-center gap-2">
-                {rightSection}
-              </div>
-            </div>
-          );
-        })()}
+        {/* Desktop layout - rendered as proper component */}
+        <DesktopNavigation user={user} onStartNow={handleStartNow} onCenikNavigate={handleCenikNavigate} />
 
         {/* Mobile layout - logo left, profile right */}
         <div className="lg:hidden flex items-center justify-between w-full">

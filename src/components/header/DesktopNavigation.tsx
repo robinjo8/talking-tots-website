@@ -40,86 +40,111 @@ export function DesktopNavigation({ user, onStartNow, onCenikNavigate }: Desktop
     return location.pathname === path;
   };
 
-  return {
-    navLinks: (
-      <>
-        <nav className="hidden lg:flex items-center gap-2">
-          {/* Always show Cenik */}
-          <Button
-            type="button"
-            variant="ghost"
-            className="font-semibold rounded-full h-10 text-base px-4 uppercase"
-            onClick={onCenikNavigate}
+  return (
+    <>
+      <div className="hidden lg:flex items-center justify-between w-full">
+        {/* Left side - Logo and Navigation together */}
+        <div className="flex items-center gap-4">
+          {/* Logo */}
+          <Link 
+            to="/" 
+            className="flex items-center"
+            onClick={(e) => {
+              if (window.location.pathname === '/') {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }}
           >
-            Cenik
-          </Button>
+            <div className="flex items-center">
+              <span className="text-2xl font-extrabold text-dragon-green uppercase">Tomi</span>
+              <span className="text-2xl font-extrabold text-app-orange uppercase">Talk</span>
+            </div>
+          </Link>
           
-          {/* Always show Logopedski nasveti - visible for everyone */}
-          <Button 
-            variant="ghost" 
-            onClick={() => handleNavigate("/logopedski-koticek")} 
-            className={
-              "rounded-full h-10 text-base px-4 font-semibold uppercase " +
-              (isActivePath("/logopedski-koticek") ? 'bg-accent' : '')
-            }
-          >
-            Logopedski nasveti
-          </Button>
-          
-          {/* When LOGGED IN, show Moje aplikacije, Moja stran - with subscription check */}
-          {user && (
-            <>
-              <Button 
-                variant="ghost" 
-                onClick={() => handleProtectedNavigate("/moje-aplikacije")} 
-                className={
-                  "rounded-full h-10 text-base px-4 font-semibold uppercase " +
-                  (isActivePath("/moje-aplikacije") ? 'bg-accent' : '')
-                }
-              >
-                Moje aplikacije
-              </Button>
-              <Button 
-                variant="ghost" 
-                onClick={() => handleProtectedNavigate("/moja-stran")} 
-                className={
-                  "rounded-full h-10 text-base px-4 font-semibold uppercase " +
-                  (isActivePath("/moja-stran") ? 'bg-accent' : '')
-                }
-              >
-                Moja stran
-              </Button>
-            </>
-          )}
-        </nav>
+          {/* Navigation right next to logo */}
+          <nav className="hidden lg:flex items-center gap-2">
+            {/* Always show Cenik */}
+            <Button
+              type="button"
+              variant="ghost"
+              className="font-semibold rounded-full h-10 text-base px-4 uppercase"
+              onClick={onCenikNavigate}
+            >
+              Cenik
+            </Button>
+            
+            {/* Always show Logopedski nasveti - visible for everyone */}
+            <Button 
+              variant="ghost" 
+              onClick={() => handleNavigate("/logopedski-koticek")} 
+              className={
+                "rounded-full h-10 text-base px-4 font-semibold uppercase " +
+                (isActivePath("/logopedski-koticek") ? 'bg-accent' : '')
+              }
+            >
+              Logopedski nasveti
+            </Button>
+            
+            {/* When LOGGED IN, show Moje aplikacije, Moja stran - with subscription check */}
+            {user && (
+              <>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => handleProtectedNavigate("/moje-aplikacije")} 
+                  className={
+                    "rounded-full h-10 text-base px-4 font-semibold uppercase " +
+                    (isActivePath("/moje-aplikacije") ? 'bg-accent' : '')
+                  }
+                >
+                  Moje aplikacije
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => handleProtectedNavigate("/moja-stran")} 
+                  className={
+                    "rounded-full h-10 text-base px-4 font-semibold uppercase " +
+                    (isActivePath("/moja-stran") ? 'bg-accent' : '')
+                  }
+                >
+                  Moja stran
+                </Button>
+              </>
+            )}
+          </nav>
+        </div>
         
-        <SubscriptionRequiredModal 
-          open={showSubscriptionModal} 
-          onOpenChange={setShowSubscriptionModal}
-        />
-      </>
-    ),
-    rightSection: user ? (
-      <UserProfile />
-    ) : (
-      <div className="hidden lg:flex items-center gap-2">
-        <Link to="/admin/login">
-          <Button
-            variant="outline"
-            className="rounded-full h-10 text-sm px-4 font-semibold uppercase bg-app-blue hover:bg-app-blue/90 text-white border-app-blue"
-          >
-            <Building2 className="h-4 w-4 mr-1" />
-            Za organizacije
-          </Button>
-        </Link>
-        <Link to="/login">
-          <Button
-            className="rounded-full h-10 text-sm px-4 font-semibold uppercase bg-dragon-green hover:bg-dragon-green/90 text-white"
-          >
-            Prijava
-          </Button>
-        </Link>
+        {/* Right side - user profile or login buttons */}
+        <div className="flex items-center gap-2">
+          {user ? (
+            <UserProfile />
+          ) : (
+            <div className="hidden lg:flex items-center gap-2">
+              <Link to="/admin/login">
+                <Button
+                  variant="outline"
+                  className="rounded-full h-10 text-sm px-4 font-semibold uppercase bg-app-blue hover:bg-app-blue/90 text-white border-app-blue"
+                >
+                  <Building2 className="h-4 w-4 mr-1" />
+                  Za organizacije
+                </Button>
+              </Link>
+              <Link to="/login">
+                <Button
+                  className="rounded-full h-10 text-sm px-4 font-semibold uppercase bg-dragon-green hover:bg-dragon-green/90 text-white"
+                >
+                  Prijava
+                </Button>
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
-    )
-  };
+      
+      <SubscriptionRequiredModal 
+        open={showSubscriptionModal} 
+        onOpenChange={setShowSubscriptionModal}
+      />
+    </>
+  );
 }
