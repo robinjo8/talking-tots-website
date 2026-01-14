@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { MobileMenu } from "./header/MobileMenu";
 import { DesktopNavigation } from "./header/DesktopNavigation";
 import { MissingChildBanner } from "./MissingChildBanner";
-import { useSubscription } from "@/hooks/useSubscription";
+import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
 import { SubscriptionRequiredModal } from "@/components/subscription/SubscriptionRequiredModal";
 
 export default function Header() {
@@ -22,7 +22,7 @@ export default function Header() {
   const isMobile = useIsMobile();
   const { canInstall, promptInstall, isIOSDevice, isStandalone, isInstalled } = usePWA();
   const showInstall = (!isStandalone && !isInstalled) && (isIOSDevice || canInstall);
-  const { isSubscribed, isLoading } = useSubscription();
+  const { isSubscribed, isLoading } = useSubscriptionContext();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
   const handleInstallClick = async () => {

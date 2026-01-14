@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Building2, Loader2 } from "lucide-react";
+import { Building2 } from "lucide-react";
 import { UserProfile } from "@/components/auth/UserProfile";
-import { useSubscription } from "@/hooks/useSubscription";
+import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
 import { SubscriptionRequiredModal } from "@/components/subscription/SubscriptionRequiredModal";
 
 
@@ -16,7 +16,7 @@ interface DesktopNavigationProps {
 export function DesktopNavigation({ user, onStartNow, onCenikNavigate }: DesktopNavigationProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isSubscribed, isLoading } = useSubscription();
+  const { isSubscribed, isLoading } = useSubscriptionContext();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
   const handleNavigate = (path: string) => {
@@ -72,27 +72,21 @@ export function DesktopNavigation({ user, onStartNow, onCenikNavigate }: Desktop
               <Button 
                 variant="ghost" 
                 onClick={() => handleProtectedNavigate("/moje-aplikacije")} 
-                disabled={isLoading}
                 className={
                   "rounded-full h-10 text-base px-4 font-semibold uppercase " +
-                  (isActivePath("/moje-aplikacije") ? 'bg-accent' : '') +
-                  (isLoading ? ' opacity-50 cursor-wait' : '')
+                  (isActivePath("/moje-aplikacije") ? 'bg-accent' : '')
                 }
               >
-                {isLoading && <Loader2 className="w-4 h-4 mr-1 animate-spin" />}
                 Moje aplikacije
               </Button>
               <Button 
                 variant="ghost" 
                 onClick={() => handleProtectedNavigate("/moja-stran")} 
-                disabled={isLoading}
                 className={
                   "rounded-full h-10 text-base px-4 font-semibold uppercase " +
-                  (isActivePath("/moja-stran") ? 'bg-accent' : '') +
-                  (isLoading ? ' opacity-50 cursor-wait' : '')
+                  (isActivePath("/moja-stran") ? 'bg-accent' : '')
                 }
               >
-                {isLoading && <Loader2 className="w-4 h-4 mr-1 animate-spin" />}
                 Moja stran
               </Button>
             </>
