@@ -6,6 +6,9 @@ interface DragonDisplayProps {
   animated?: boolean;
 }
 
+// Single image URL - use same image for all dragons, CSS handles visual difference
+const DRAGON_IMAGE_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_6.png";
+
 export function DragonDisplay({ currentDragons, maxDragons = 10, animated = true }: DragonDisplayProps) {
   const dragons = Array.from({ length: maxDragons }, (_, index) => {
     const isEarned = index < currentDragons;
@@ -19,18 +22,11 @@ export function DragonDisplay({ currentDragons, maxDragons = 10, animated = true
         className="inline-block"
       >
         <img
-          src={isEarned 
-            ? "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_6.png"
-            : "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_6_cb.png"
-          }
+          src={DRAGON_IMAGE_URL}
           alt={isEarned ? "Zmajček" : "Neosvojeni zmajček"}
           className={`w-12 h-12 md:w-16 md:h-16 object-contain transition-all duration-300 ${
-            isEarned ? "" : "opacity-30"
+            isEarned ? "" : "opacity-30 grayscale"
           }`}
-          onError={(e) => {
-            console.error("Dragon image failed to load:", e.currentTarget.src);
-            e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z'/%3E%3C/svg%3E";
-          }}
         />
       </motion.div>
     );
