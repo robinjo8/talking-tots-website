@@ -1,4 +1,4 @@
-import { User, Users, CircleDollarSign, CreditCard, Shield, FileText } from "lucide-react";
+import { User, Users, CircleDollarSign, CreditCard, Shield, FileText, ClipboardCheck } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -17,6 +17,7 @@ const tabs = [
   { id: "userProfile", label: "Moj profil", icon: User },
   { id: "myDocuments", label: "Moji dokumenti", icon: FileText },
   { id: "children", label: "Otroci", icon: Users, showCount: true },
+  { id: "articulationTest", label: "Test izgovorjave", icon: ClipboardCheck },
   { id: "subscription", label: "Naročnina", icon: CircleDollarSign },
   { id: "paymentMethods", label: "Plačilne metode", icon: CreditCard },
   { id: "passwordChange", label: "Spremeni geslo", icon: Shield },
