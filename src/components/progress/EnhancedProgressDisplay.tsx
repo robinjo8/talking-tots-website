@@ -2,7 +2,8 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { EnhancedProgressSummary } from "@/hooks/useEnhancedProgress";
+import { Button } from "@/components/ui/button";
+import { EnhancedProgressSummary, useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { TrophyDisplay } from "./TrophyDisplay";
 import { StarDisplay } from "./StarDisplay";
 import { DragonDisplay } from "./DragonDisplay";
@@ -16,10 +17,23 @@ interface EnhancedProgressDisplayProps {
 
 export function EnhancedProgressDisplay({ progressData }: EnhancedProgressDisplayProps) {
   const { selectedChild } = useAuth();
+  const { recordGameCompletion, recordExerciseCompletion } = useEnhancedProgress();
   const [showTrophyDialog, setShowTrophyDialog] = useState(false);
   
   const dragonsToNextTrophy = 10 - (progressData.totalDragons % 10);
   const totalStars = progressData.games.totalStars + progressData.exercises.totalStars;
+
+  const addGameStars = async () => {
+    for (let i = 0; i < 9; i++) {
+      recordGameCompletion('memory', 'test');
+    }
+  };
+
+  const addExerciseStars = async () => {
+    for (let i = 0; i < 9; i++) {
+      recordExerciseCompletion('test');
+    }
+  };
   
   // Check if we've reached 100 stars and haven't shown the dialog yet
   useEffect(() => {
@@ -83,6 +97,14 @@ Zmajček je nagrada za vztrajnost. Pridobiš ga, ko zbereš 10 zvezdic. Zmajček
               <div className="text-center text-sm text-muted-foreground">
                 Skupaj opravljenih: {progressData.games.totalCompletions}
               </div>
+              
+              <Button 
+                onClick={addGameStars}
+                size="sm"
+                className="mt-4 w-full bg-dragon-green hover:bg-dragon-green/80"
+              >
+                +9 zvezdic (test)
+              </Button>
             </CardContent>
           </Card>
         </motion.div>
@@ -114,6 +136,14 @@ Zmajček je nagrada za vztrajnost. Pridobiš ga, ko zbereš 10 zvezdic. Zmajček
               <div className="text-center text-sm text-muted-foreground">
                 Skupaj opravljenih: {progressData.exercises.totalCompletions}
               </div>
+              
+              <Button 
+                onClick={addExerciseStars}
+                size="sm"
+                className="mt-4 w-full bg-app-blue hover:bg-app-blue/80"
+              >
+                +9 zvezdic (test)
+              </Button>
             </CardContent>
           </Card>
         </motion.div>
