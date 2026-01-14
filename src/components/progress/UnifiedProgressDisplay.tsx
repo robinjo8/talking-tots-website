@@ -73,10 +73,11 @@ export function UnifiedProgressDisplay({ progressData, recordCompletion }: Unifi
     <>
       <TrophyDialog 
         isOpen={showTrophyDialog}
-        onClose={() => {}} // Empty function - can't close without claiming
+        onClose={() => {}}
         onClaimTrophy={handleClaimTrophy}
         childName={selectedChild?.name || ""}
         totalStars={unified.totalStars}
+        trophyNumber={unified.totalTrophies}
       />
       
       <div className="space-y-6">
