@@ -42,13 +42,15 @@ export function UnifiedProgressDisplay({ progressData, recordCompletion }: Unifi
   useEffect(() => {
     if (!selectedChild?.id) return;
     
-    // Key tracks whether this specific trophy level has been claimed
-    const storageKey = `trophy_claimed_${selectedChild.id}_${unified.totalTrophies}`;
+    // Key tracks whether the NEXT trophy has been claimed
+    // When we have 10 dragons, we're about to earn trophy (totalTrophies + 1)
+    const nextTrophyNumber = unified.totalTrophies + 1;
+    const storageKey = `trophy_claimed_${selectedChild.id}_${nextTrophyNumber}`;
     const hasClaimed = localStorage.getItem(storageKey);
     
     // Show dialog when:
     // 1. We have 10 dragons (ready for trophy)
-    // 2. We haven't claimed this trophy yet
+    // 2. We haven't claimed this next trophy yet
     if (unified.currentDragons >= 10 && !hasClaimed) {
       setShowTrophyDialog(true);
     }
@@ -57,10 +59,16 @@ export function UnifiedProgressDisplay({ progressData, recordCompletion }: Unifi
   const handleClaimTrophy = () => {
     if (!selectedChild?.id) return;
     
-    // Mark this trophy as claimed
-    const storageKey = `trophy_claimed_${selectedChild.id}_${unified.totalTrophies}`;
+    // Mark the NEXT trophy as claimed
+    const nextTrophyNumber = unified.totalTrophies + 1;
+    const storageKey = `trophy_claimed_${selectedChild.id}_${nextTrophyNumber}`;
     localStorage.setItem(storageKey, 'true');
     setShowTrophyDialog(false);
+  };
+  
+  // Add single test star
+  const addOneStar = () => {
+    recordCompletion('game', 'test');
   };
 
   return (
@@ -181,14 +189,23 @@ export function UnifiedProgressDisplay({ progressData, recordCompletion }: Unifi
                 Skupaj zvezdic: <span className="font-bold">{unified.totalStars}</span>
               </div>
               
-              {/* Test button */}
-              <Button 
-                onClick={addTestStars}
-                size="sm"
-                className="mt-4 w-full bg-app-blue hover:bg-app-blue/80"
-              >
-                +9 zvezdic (test)
-              </Button>
+              {/* Test buttons */}
+              <div className="flex gap-2 mt-4">
+                <Button 
+                  onClick={addOneStar}
+                  size="sm"
+                  className="flex-1 bg-app-blue hover:bg-app-blue/80"
+                >
+                  +1 zvezdica (test)
+                </Button>
+                <Button 
+                  onClick={addTestStars}
+                  size="sm"
+                  className="flex-1 bg-app-blue hover:bg-app-blue/80"
+                >
+                  +9 zvezdic (test)
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </motion.div>

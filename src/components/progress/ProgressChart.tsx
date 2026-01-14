@@ -58,7 +58,7 @@ export function ProgressChart({ currentDragons, totalTrophies }: ProgressChartPr
             <div key={index} className="flex flex-col items-center flex-1 max-w-12 relative">
               {/* Trophy above the 10th column (100) */}
               {index === 9 && (
-                <div className="absolute -top-14 sm:-top-16 left-1/2 -translate-x-1/2 z-10">
+                <div className="absolute -top-4 sm:-top-6 left-1/2 -translate-x-1/2 z-10">
                   <motion.img
                     src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/pokal.png"
                     alt="Cilj - Pokal"
@@ -79,7 +79,7 @@ export function ProgressChart({ currentDragons, totalTrophies }: ProgressChartPr
               )}
               
               {/* Dragon/creature on top of bars */}
-              <div className="h-12 sm:h-16 flex items-end justify-center mb-1">
+              <div className="h-14 sm:h-20 flex items-end justify-center mb-1">
                 {/* Show dragon on current position (for columns 1-9) */}
                 {isCurrentDragonPosition && (
                   <motion.img
