@@ -40,28 +40,26 @@ export function UnifiedProgressDisplay({ progressData, recordCompletion }: Unifi
   // Check if we've earned 10 dragons and haven't claimed the trophy yet
   // This creates a unique key for each trophy earned
   useEffect(() => {
-    if (!selectedChild?.id) return;
+    if (!selectedChild?.id || unified.totalTrophies === 0) return;
     
-    // Key tracks whether the NEXT trophy has been claimed
-    // When we have 10 dragons, we're about to earn trophy (totalTrophies + 1)
-    const nextTrophyNumber = unified.totalTrophies + 1;
-    const storageKey = `trophy_claimed_${selectedChild.id}_${nextTrophyNumber}`;
+    // Check if the CURRENT trophy has been claimed
+    // totalTrophies > 0 means user has earned at least 1 trophy
+    const storageKey = `trophy_claimed_${selectedChild.id}_${unified.totalTrophies}`;
     const hasClaimed = localStorage.getItem(storageKey);
     
     // Show dialog when:
-    // 1. We have 10 dragons (ready for trophy)
-    // 2. We haven't claimed this next trophy yet
-    if (unified.currentDragons >= 10 && !hasClaimed) {
+    // 1. We have at least 1 trophy (totalTrophies > 0)
+    // 2. This trophy hasn't been claimed yet
+    if (!hasClaimed) {
       setShowTrophyDialog(true);
     }
-  }, [unified.currentDragons, unified.totalTrophies, selectedChild?.id]);
+  }, [unified.totalTrophies, selectedChild?.id]);
 
   const handleClaimTrophy = () => {
     if (!selectedChild?.id) return;
     
-    // Mark the NEXT trophy as claimed
-    const nextTrophyNumber = unified.totalTrophies + 1;
-    const storageKey = `trophy_claimed_${selectedChild.id}_${nextTrophyNumber}`;
+    // Mark the CURRENT trophy as claimed
+    const storageKey = `trophy_claimed_${selectedChild.id}_${unified.totalTrophies}`;
     localStorage.setItem(storageKey, 'true');
     setShowTrophyDialog(false);
   };

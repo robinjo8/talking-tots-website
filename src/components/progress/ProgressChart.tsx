@@ -55,53 +55,41 @@ export function ProgressChart({ currentDragons, totalTrophies }: ProgressChartPr
           const isTenthColumnWithDragon = index === 9 && currentDragons >= 10;
           
           return (
-            <div key={index} className="flex flex-col items-center flex-1 max-w-12 relative">
-              {/* Trophy above the 10th column (100) */}
-              {index === 9 && (
-                <div className="absolute -top-4 sm:-top-6 left-1/2 -translate-x-1/2 z-10">
-                  <motion.img
-                    src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/pokal.png"
-                    alt="Cilj - Pokal"
-                    className={`w-8 h-8 sm:w-12 sm:h-12 object-contain transition-all duration-300 ${
-                      currentDragons >= 10 ? "opacity-100 drop-shadow-lg" : "opacity-30 grayscale"
-                    }`}
-                    initial={{ scale: 0.8 }}
-                    animate={{ 
-                      scale: currentDragons >= 10 ? [1, 1.1, 1] : 1,
-                    }}
-                    transition={{ 
-                      duration: 0.5,
-                      repeat: currentDragons >= 10 ? Infinity : 0,
-                      repeatDelay: 2
-                    }}
-                  />
-                </div>
-              )}
-              
-              {/* Dragon/creature on top of bars */}
-              <div className="h-14 sm:h-20 flex items-end justify-center mb-1">
-                {/* Show dragon on current position (for columns 1-9) */}
-                {isCurrentDragonPosition && (
+          <div key={index} className="flex flex-col items-center flex-1 max-w-12 relative">
+              {/* Dragon/creature on top of bars - special handling for 10th column */}
+              <div className="h-10 sm:h-12 flex items-end justify-center mb-0">
+                {/* For columns 1-9: show dragon on current position */}
+                {index < 9 && isCurrentDragonPosition && (
                   <motion.img
                     src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_6.png"
                     alt="Zmajček"
-                    className="w-8 h-8 sm:w-12 sm:h-12 object-contain"
+                    className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
                     initial={{ y: -20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ type: "spring", bounce: 0.5, duration: 0.6 }}
                   />
                 )}
                 
-                {/* Show Zmajcek_pokal on 10th column when 10 dragons earned */}
-                {isTenthColumnWithDragon && (
-                  <motion.img
-                    src={dragonOnTenthColumn}
-                    alt="Zmajček s pokalom"
-                    className="w-10 h-10 sm:w-14 sm:h-14 object-contain"
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ type: "spring", bounce: 0.5, duration: 0.8 }}
-                  />
+                {/* 10th column: show trophy OR Zmajcek_pokal */}
+                {index === 9 && (
+                  currentDragons >= 10 ? (
+                    <motion.img
+                      src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_pokal.png"
+                      alt="Zmajček s pokalom"
+                      className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
+                      initial={{ scale: 0, rotate: -180 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ type: "spring", bounce: 0.5, duration: 0.8 }}
+                    />
+                  ) : (
+                    <motion.img
+                      src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/pokal.png"
+                      alt="Cilj - Pokal"
+                      className="w-8 h-8 sm:w-10 sm:h-10 object-contain opacity-30 grayscale"
+                      initial={{ scale: 0.8 }}
+                      animate={{ scale: 1 }}
+                    />
+                  )
                 )}
               </div>
               
