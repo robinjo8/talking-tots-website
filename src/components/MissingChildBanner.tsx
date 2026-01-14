@@ -1,17 +1,17 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useSubscription } from "@/hooks/useSubscription";
+import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
 
 export const useBannerVisible = () => {
   const { user, profile } = useAuth();
-  const { isSubscribed } = useSubscription();
+  const { isSubscribed } = useSubscriptionContext();
   // Only show banner if user is logged in, HAS a subscription, but no children
   return user && isSubscribed && (!profile?.children || profile.children.length === 0);
 };
 
 export const MissingChildBanner = () => {
   const { user, profile } = useAuth();
-  const { isSubscribed } = useSubscription();
+  const { isSubscribed } = useSubscriptionContext();
   
   // Only show if user has subscription but no children
   const isVisible = user && isSubscribed && (!profile?.children || profile.children.length === 0);
