@@ -82,35 +82,33 @@
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
     
-    <!-- PWA Service Worker Registration with Error Recovery -->
+    <!-- PWA Service Worker Registration - Minimal ES5 Recovery -->
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          // Recovery timeout - if page doesn't render in 8s, clear SW and reload
-          const renderTimeout = setTimeout(() => {
-            // Če #loading-fallback še vedno obstaja v DOM-u, React NI renderiral
-            // (React zamenja celotno vsebino #root z app komponento)
-            if (document.querySelector('#loading-fallback')) {
-              console.log('[Recovery] Page not rendered after 8s, clearing SW and cache...');
-              navigator.serviceWorker.getRegistrations().then(regs => {
-                regs.forEach(reg => reg.unregister());
+      (function() {
+        if (!('serviceWorker' in navigator)) return;
+        
+        // Recovery: if page doesn't render in 5s, force clear everything
+        setTimeout(function() {
+          var fallback = document.getElementById('loading-fallback');
+          if (fallback) {
+            console.log('[Recovery] Clearing stale cache...');
+            if (window.caches) {
+              caches.keys().then(function(names) {
+                names.forEach(function(name) { caches.delete(name); });
               });
-              caches.keys().then(keys => {
-                keys.forEach(key => caches.delete(key));
-              });
-              setTimeout(() => window.location.reload(), 500);
             }
-          }, 8000);
-          
-          navigator.serviceWorker.register('/sw.js')
-            .then((registration) => {
-              console.log('SW registered: ', registration);
-            })
-            .catch((registrationError) => {
-              console.log('SW registration failed: ', registrationError);
+            navigator.serviceWorker.getRegistrations().then(function(regs) {
+              regs.forEach(function(reg) { reg.unregister(); });
             });
+            setTimeout(function() { location.reload(true); }, 300);
+          }
+        }, 5000);
+        
+        // Register SW
+        navigator.serviceWorker.register('/sw.js').catch(function(err) {
+          console.log('SW registration failed:', err);
         });
-      }
+      })();
     </script>
   </body>
 </html>
