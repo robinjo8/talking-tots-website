@@ -3,11 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Menu, LogOut, Home, Activity, BookOpen, Bell, CreditCard, User, Building2, Loader2 } from "lucide-react";
+import { Menu, LogOut, Home, Activity, BookOpen, Bell, CreditCard, User, Building2 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ProfileSelector } from "./ProfileSelector";
 import { Profile } from "@/contexts/AuthContext";
-import { useSubscription } from "@/hooks/useSubscription";
+import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
 import { SubscriptionRequiredModal } from "@/components/subscription/SubscriptionRequiredModal";
 
 interface MobileMenuProps {
@@ -28,7 +28,7 @@ export function MobileMenu({
 }: MobileMenuProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isSubscribed, isLoading } = useSubscription();
+  const { isSubscribed, isLoading } = useSubscriptionContext();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   
   const getAvatarSrc = (avatarId: number): string => {
@@ -127,22 +127,20 @@ export function MobileMenu({
                     {/* Moja stran */}
                     <Button 
                       variant="ghost" 
-                      className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/moja-stran') ? 'bg-accent' : ''} ${isLoading ? 'opacity-50 cursor-wait' : ''}`} 
+                      className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/moja-stran') ? 'bg-accent' : ''}`} 
                       onClick={() => handleProtectedNavigate('/moja-stran')}
-                      disabled={isLoading}
                     >
-                      {isLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Home className="h-4 w-4 mr-2" />}
+                      <Home className="h-4 w-4 mr-2" />
                       Moja stran
                     </Button>
                     
                     {/* Moje aplikacije */}
                     <Button 
                       variant="ghost" 
-                      className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/moje-aplikacije') ? 'bg-accent' : ''} ${isLoading ? 'opacity-50 cursor-wait' : ''}`} 
+                      className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/moje-aplikacije') ? 'bg-accent' : ''}`} 
                       onClick={() => handleProtectedNavigate('/moje-aplikacije')}
-                      disabled={isLoading}
                     >
-                      {isLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Activity className="h-4 w-4 mr-2" />}
+                      <Activity className="h-4 w-4 mr-2" />
                       Moje aplikacije
                     </Button>
                     
