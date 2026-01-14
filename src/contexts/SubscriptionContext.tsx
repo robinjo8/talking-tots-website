@@ -36,8 +36,6 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   
   const value: SubscriptionContextType = {
     ...subscription,
-    isTrialing: false, // Will be updated when hook is extended
-    trialEnd: null,
     isPro,
     isStartOrPlus,
     canAccessPremiumFeatures,

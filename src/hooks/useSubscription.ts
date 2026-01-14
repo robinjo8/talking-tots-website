@@ -39,20 +39,26 @@ export function useSubscription() {
 
     if (!user || !session?.access_token) {
       console.log('No user or session, setting not subscribed');
-      setSubscription({
-        isSubscribed: false,
-        planId: null,
-        productId: null,
-        subscriptionEnd: null,
-        isLoading: false,
-        isTrialing: false,
-        trialEnd: null,
+      setSubscription(prev => {
+        // Only update if state actually needs to change
+        if (prev.isLoading || prev.isSubscribed) {
+          return {
+            isSubscribed: false,
+            planId: null,
+            productId: null,
+            subscriptionEnd: null,
+            isLoading: false,
+            isTrialing: false,
+            trialEnd: null,
+          };
+        }
+        return prev;
       });
       return;
     }
 
-    // Skip if we already checked for this user (and not in initial loading state)
-    if (lastCheckedUserIdRef.current === user.id && !subscription.isLoading) {
+    // Skip if we already checked for this user - use ref only, no state dependency
+    if (lastCheckedUserIdRef.current === user.id) {
       console.log('Already checked subscription for this user, skipping');
       return;
     }
@@ -101,7 +107,7 @@ export function useSubscription() {
     } finally {
       isCheckingRef.current = false;
     }
-  }, [user, session?.access_token, subscription.isLoading]);
+  }, [user, session?.access_token]);
 
   // Check subscription when user and session are available
   useEffect(() => {
