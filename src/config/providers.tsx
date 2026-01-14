@@ -8,7 +8,6 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { PWAProvider } from "@/components/pwa/PWAProvider";
-import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 
 const queryClient = new QueryClient();
 
@@ -27,7 +26,6 @@ export function AppProviders({ children }: AppProvidersProps) {
                 <Toaster />
                 <Sonner />
                 {children}
-                <CookieConsentBanner />
               </PWAProvider>
             </SubscriptionProvider>
           </AuthProvider>
