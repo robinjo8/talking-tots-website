@@ -19,10 +19,19 @@ export function UnifiedProgressDisplay({ progressData }: UnifiedProgressDisplayP
   const { recordCompletion } = useEnhancedProgress();
   const [showTrophyDialog, setShowTrophyDialog] = useState(false);
   
-  const unified = progressData.unified;
+  // Safe access to unified data with fallback
+  const unified = progressData?.unified ?? {
+    totalStars: 0,
+    currentStars: 0,
+    totalDragons: 0,
+    currentDragons: 0,
+    totalTrophies: 0,
+    starsToNextDragon: 10,
+    dragonsToNextTrophy: 10
+  };
   
   // Add test stars (unified)
-  const addTestStars = async () => {
+  const addTestStars = () => {
     for (let i = 0; i < 9; i++) {
       recordCompletion('game', 'test');
     }
