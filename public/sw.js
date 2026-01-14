@@ -1,5 +1,5 @@
-const CACHE_NAME = 'tomitalk-v1.0.49';
-const CACHE_VERSION = 11;
+const CACHE_NAME = 'tomitalk-v1.0.50';
+const CACHE_VERSION = 12;
 
 // Essential files to cache for offline functionality - simplified paths without version params
 const ESSENTIAL_CACHE = [
@@ -20,7 +20,7 @@ const API_CACHE_PATTERNS = [
 
 // Install event - cache essential resources with graceful error handling
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing service worker v1.0.49...');
+  console.log('[SW] Installing service worker v1.0.50...');
   
   event.waitUntil(
     caches.open(CACHE_NAME)
