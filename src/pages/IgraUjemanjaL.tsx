@@ -72,12 +72,13 @@ export default function IgraUjemanjaL() {
             backgroundRepeat: 'no-repeat'
           }}
         />
-        <div className="container max-w-5xl mx-auto pt-20 md:pt-24 pb-20 px-4 relative z-10">
+        <div className="h-full flex items-center justify-center relative z-10">
           <MatchingGame
             key={gameKey}
             images={gameImages}
             numColumns={2}
             onGameComplete={handleGameComplete}
+            isLandscape={true}
           />
         </div>
         
