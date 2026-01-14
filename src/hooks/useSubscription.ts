@@ -24,6 +24,9 @@ export function useSubscription() {
     isTrialing: false,
     trialEnd: null,
   });
+  
+  // Track user ID to prevent redundant subscription checks
+  const userIdRef = useRef<string | null>(null);
 
   const checkSubscription = useCallback(async () => {
     if (!user || !session) {
@@ -80,15 +83,21 @@ export function useSubscription() {
     }
   }, [user, session]);
 
-  // Check subscription on mount and when user changes
+  // Check subscription on mount and when user actually changes
   useEffect(() => {
+    // Only check if user actually changed (not just session refresh)
+    if (user?.id === userIdRef.current) {
+      return;
+    }
+    userIdRef.current = user?.id || null;
+    
     // Počakaj kratko, da se seja stabilizira po prijavi
     const timeoutId = setTimeout(() => {
       checkSubscription();
     }, 100);
     
     return () => clearTimeout(timeoutId);
-  }, [user, session, checkSubscription]);
+  }, [user?.id, checkSubscription]);
 
   // Periodic refresh every 60 seconds
   useEffect(() => {
