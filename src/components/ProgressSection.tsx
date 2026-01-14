@@ -29,7 +29,7 @@ export function ProgressSection() {
     );
   }
 
-  if (!progressData) {
+  if (!progressData || !progressData.unified) {
     return (
       <Card className="mb-8">
         <CardContent className="p-6">

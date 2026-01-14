@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Cookie } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { CookieSettingsDialog, CookiePreferences } from './CookieSettingsDialog';
 
 export function CookieConsentBanner() {
@@ -38,12 +39,12 @@ export function CookieConsentBanner() {
                     <p className="text-muted-foreground text-xs md:text-sm leading-relaxed">
                       Uporabljamo piškotke za izboljšanje vaše izkušnje, analizo prometa in prikazovanje prilagojenih vsebin. 
                       Več o tem si preberite v naši{' '}
-                      <a 
-                        href="/politika-zasebnosti" 
+                      <Link 
+                        to="/politika-zasebnosti" 
                         className="text-dragon-green hover:underline font-medium"
                       >
                         politiki zasebnosti
-                      </a>.
+                      </Link>.
                     </p>
                   </div>
                 </div>
