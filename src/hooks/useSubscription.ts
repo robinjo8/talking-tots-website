@@ -136,18 +136,6 @@ export function useSubscription() {
     return () => clearTimeout(timeoutId);
   }, [user?.id, session?.access_token, checkSubscription]);
 
-  // Periodic refresh every 60 seconds
-  useEffect(() => {
-    if (!user || !session?.access_token) return;
-
-    const interval = setInterval(() => {
-      // Reset lastCheckedUserId to force a refresh
-      lastCheckedUserIdRef.current = null;
-      checkSubscription();
-    }, 60000);
-    
-    return () => clearInterval(interval);
-  }, [user?.id, session?.access_token, checkSubscription]);
 
   return {
     ...subscription,
