@@ -20,7 +20,7 @@ import { useAdminAuth } from '@/contexts/AdminAuthContext';
 
 const navigation = [
   { name: 'Moj portal', href: '/admin', icon: LayoutDashboard },
-  { name: 'Vsa testiranja', href: '/admin/tests', icon: ClipboardList },
+  { name: 'Vsa preverjanja', href: '/admin/tests', icon: ClipboardList },
   { name: 'V čakanju', href: '/admin/tests?status=pending', icon: Clock },
   { name: 'Moji pregledi', href: '/admin/tests?status=assigned', icon: User },
   { name: 'Zaključeni', href: '/admin/tests?status=completed', icon: CheckCircle },
