@@ -20,7 +20,12 @@ function DrsnaSestavljankaŠ78Content() {
   const { recordGameCompletion } = useEnhancedProgress();
   const gameCompletedRef = useRef(false);
   const [isTouchDevice] = useState(() => { const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0; const isSmallScreen = Math.min(window.screen.width, window.screen.height) <= 900; return hasTouch && isSmallScreen; });
-  const [isPortrait, setIsPortrait] = useState(false);
+  const [isPortrait, setIsPortrait] = useState(() => {
+    if (typeof window !== 'undefined' && window.screen?.orientation) {
+      return window.screen.orientation.type.includes('portrait');
+    }
+    return typeof window !== 'undefined' ? window.innerHeight > window.innerWidth : false;
+  });
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   const [puzzleKey, setPuzzleKey] = useState(0);

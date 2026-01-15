@@ -58,7 +58,12 @@ function SestavljankeČ910Content() {
     return hasTouch && isSmallScreen;
   });
 
-  const [isPortrait, setIsPortrait] = useState(false);
+  const [isPortrait, setIsPortrait] = useState(() => {
+    if (typeof window !== 'undefined' && window.screen?.orientation) {
+      return window.screen.orientation.type.includes('portrait');
+    }
+    return typeof window !== 'undefined' ? window.innerHeight > window.innerWidth : false;
+  });
 
   useEffect(() => {
     const checkOrientation = () => {

@@ -60,7 +60,12 @@ function DrsnaSestavljankaK56Content() {
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [showNewGameDialog, setShowNewGameDialog] = useState(false);
   const [showNewGameButton, setShowNewGameButton] = useState(false);
-  const [isPortrait, setIsPortrait] = useState(false);
+  const [isPortrait, setIsPortrait] = useState(() => {
+    if (typeof window !== 'undefined' && window.screen?.orientation) {
+      return window.screen.orientation.type.includes('portrait');
+    }
+    return typeof window !== 'undefined' ? window.innerHeight > window.innerWidth : false;
+  });
 
   const [isTouchDevice] = useState(() => {
     if (typeof window === 'undefined') return false;
