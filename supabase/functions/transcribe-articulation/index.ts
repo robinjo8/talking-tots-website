@@ -225,9 +225,9 @@ serve(async (req) => {
     const matchResult = isWordAccepted(transcribedText, targetWord, acceptedVariants);
     console.log(`Match result:`, matchResult);
 
-    // Save recording to Supabase Storage if childId and userId provided
+    // Save recording to Supabase Storage ONLY if word was accepted (correct pronunciation)
     let storagePath = null;
-    if (childId && userId) {
+    if (childId && userId && matchResult.accepted) {
       try {
         const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
         const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -260,6 +260,8 @@ serve(async (req) => {
       } catch (storageError) {
         console.error('Storage error:', storageError);
       }
+    } else if (childId && userId && !matchResult.accepted) {
+      console.log(`Recording not saved - word not accepted. Transcribed: "${transcribedText}", Target: "${targetWord}", Match type: ${matchResult.matchType}`);
     }
 
     return new Response(
