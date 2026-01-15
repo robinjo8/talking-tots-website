@@ -40,7 +40,7 @@ const ArticulationCompletionDialog = ({
     try {
       const success = await saveTestResult();
       if (success) {
-        toast.success("Test izgovorjave je bil uspešno shranjen!");
+        toast.success("Preverjanje izgovorjave je bilo uspešno shranjeno!");
       }
     } catch (error) {
       console.error("Error saving test result:", error);

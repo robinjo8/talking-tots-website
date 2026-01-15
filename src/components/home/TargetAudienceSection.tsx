@@ -5,7 +5,7 @@ export const TargetAudienceSection = () => {
   const audiences = [{
     title: "LOGOPEDOM",
     subtitle: "Prednosti za logopede:",
-    benefits: ["Test preverjanja izgovorjave glasov omogoča avtomatizirano analizo govora za učinkovito obravnavo", "Personalizirane vaje in igre za individualno prilagojeno terapijo.", "Objektivno spremljanje napredka, kar poveča učinkovitost terapije.", "Uporabno kot dopolnilo v ordinaciji ali kot vodeno delo za domačo vadbo.", "Več časa za neposredno delo z otrokom in učinkovitejše terapije."],
+    benefits: ["Preverjanje izgovorjave glasov omogoča avtomatizirano analizo govora za učinkovito obravnavo", "Personalizirane vaje in igre za individualno prilagojeno terapijo.", "Objektivno spremljanje napredka, kar poveča učinkovitost terapije.", "Uporabno kot dopolnilo v ordinaciji ali kot vodeno delo za domačo vadbo.", "Več časa za neposredno delo z otrokom in učinkovitejše terapije."],
     bgColor: "bg-white",
     titleColor: "text-app-blue"
   }, {

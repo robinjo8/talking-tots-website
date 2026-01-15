@@ -33,7 +33,7 @@ export const FooterSection = () => {
               </li>
               <li>
                 <Link to="/artikulacijski-test" className="text-muted-foreground hover:text-dragon-green transition-colors">
-                  Test izgovorjave
+                  Preverjanje izgovorjave
                 </Link>
               </li>
             </ul>

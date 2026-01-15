@@ -19,7 +19,7 @@ const tabs = [
   { id: "userProfile", label: "Moj profil", icon: User },
   { id: "myDocuments", label: "Moji dokumenti", icon: FileText },
   { id: "children", label: "Otroci", icon: Users, showCount: true },
-  { id: "articulationTest", label: "Test izgovorjave", icon: ClipboardCheck, proOnly: true },
+  { id: "articulationTest", label: "Preverjanje izgovorjave", icon: ClipboardCheck, proOnly: true },
   { id: "subscription", label: "Naročnina", icon: CircleDollarSign },
   { id: "paymentMethods", label: "Plačilne metode", icon: CreditCard },
   { id: "passwordChange", label: "Spremeni geslo", icon: Shield },

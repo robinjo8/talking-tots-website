@@ -47,7 +47,7 @@ export const ArticulationTestSection = () => {
         <CardContent className="p-6">
           {/* Header */}
           <div className="flex items-center justify-center mb-4 relative">
-            <h3 className="text-2xl font-bold text-amber-500 text-center">TEST IZGOVORJAVE</h3>
+            <h3 className="text-2xl font-bold text-amber-500 text-center">PREVERJANJE IZGOVORJAVE</h3>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -57,7 +57,7 @@ export const ArticulationTestSection = () => {
                 </TooltipTrigger>
                 <TooltipContent side="left" className="max-w-xs">
                   <p className="text-sm">
-                    Test izgovorjave se opravi ob začetku uporabe aplikacije in nato vsake 3 mesece za spremljanje napredka.
+                    Preverjanje izgovorjave se opravi ob začetku uporabe aplikacije in nato vsake 3 mesece za spremljanje napredka.
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -69,7 +69,7 @@ export const ArticulationTestSection = () => {
             <div className="flex items-center gap-3 text-red-700">
               <AlertCircle className="w-5 h-5 flex-shrink-0" />
               <div>
-                <p className="font-medium">Test izgovorjave še ni bil opravljen.</p>
+                <p className="font-medium">Preverjanje izgovorjave še ni bilo opravljeno.</p>
                 <p className="text-sm text-red-600">Prosimo, opravite test za začetno oceno.</p>
               </div>
             </div>

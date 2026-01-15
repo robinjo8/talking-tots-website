@@ -48,8 +48,8 @@ export function ActivityOptions() {
     },
     {
       id: 'test',
-      title: 'Test izgovorjave',
-      description: 'Test izgovorjave za vse slovenske soglasnike.',
+      title: 'Preverjanje izgovorjave',
+      description: 'Preverjanje izgovorjave za vse slovenske soglasnike.',
       image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_artikulacija_4.png',
       gradient: 'from-app-purple/20 to-app-teal/20',
       badge: '🎯',
