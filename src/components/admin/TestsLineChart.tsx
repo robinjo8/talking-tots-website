@@ -11,9 +11,9 @@ export function TestsLineChart() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            📊 Statistika testov izgovorjave
+            📊 Statistika preverjanj izgovorjave
           </CardTitle>
-          <CardDescription>Število testov po dnevih</CardDescription>
+          <CardDescription>Število preverjanj po dnevih</CardDescription>
         </CardHeader>
         <CardContent className="h-[300px] flex items-center justify-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-app-blue" />
@@ -26,9 +26,9 @@ export function TestsLineChart() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          📊 Statistika testov izgovorjave
+          📊 Statistika preverjanj izgovorjave
         </CardTitle>
-        <CardDescription>Število testov po dnevih (zadnjih 30 dni)</CardDescription>
+        <CardDescription>Število preverjanj po dnevih (zadnjih 30 dni)</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="h-[300px]">
@@ -59,7 +59,7 @@ export function TestsLineChart() {
               <Line 
                 type="monotone" 
                 dataKey="new" 
-                name="Novi testi"
+                name="Nova preverjanja"
                 stroke="hsl(var(--app-blue))" 
                 strokeWidth={2}
                 dot={{ fill: 'hsl(var(--app-blue))' }}

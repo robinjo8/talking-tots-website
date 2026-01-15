@@ -30,16 +30,16 @@ export default function AdminDashboard() {
             Dobrodošli, {profile?.first_name} {profile?.last_name}
           </h1>
           <p className="text-muted-foreground">
-            {profile?.organization_name} • Preglejte status preverjanj izgovorjave
+            TomiTalk logoped • Preglejte status preverjanj izgovorjave
           </p>
         </div>
 
         {/* Stat cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
-            title="Vsa testiranja"
+            title="Vsa preverjanja"
             value={stats.totalTests}
-            description="Število vseh opravljenih testov"
+            description="Število vseh opravljenih preverjanj"
             icon={ClipboardList}
             color="blue"
             onClick={() => navigate('/admin/tests')}
@@ -47,7 +47,7 @@ export default function AdminDashboard() {
           <StatCard
             title="V čakanju na pregled"
             value={stats.pendingTests}
-            description="Nepregledani testi"
+            description="Nepregledana preverjanja"
             icon={Clock}
             color="orange"
             onClick={() => navigate('/admin/tests?status=pending')}
@@ -55,7 +55,7 @@ export default function AdminDashboard() {
           <StatCard
             title="Moji pregledi"
             value={stats.myReviews}
-            description="Testi v vaši obravnavi"
+            description="Preverjanja v vaši obravnavi"
             icon={User}
             color="green"
             onClick={() => navigate('/admin/tests?status=assigned')}
@@ -63,7 +63,7 @@ export default function AdminDashboard() {
           <StatCard
             title="Zaključeni pregledi"
             value={stats.completedTests}
-            description="Testi z oddanim poročilom"
+            description="Preverjanja z oddanim poročilom"
             icon={CheckCircle}
             color="purple"
             onClick={() => navigate('/admin/tests?status=completed')}
