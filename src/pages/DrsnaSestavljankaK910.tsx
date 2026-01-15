@@ -6,10 +6,10 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { Home, RefreshCw } from "lucide-react";
+import { Home, RefreshCw, RotateCcw } from "lucide-react";
 
 const kImages = [
   { filename: 'kapa.png', word: 'KAPA' },
@@ -43,6 +43,44 @@ function DrsnaSestavljankaK910Content() {
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [showNewGameDialog, setShowNewGameDialog] = useState(false);
   const [showNewGameButton, setShowNewGameButton] = useState(false);
+  const [isPortrait, setIsPortrait] = useState(false);
+
+  const [isTouchDevice] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const isSmallScreen = Math.min(window.screen.width, window.screen.height) <= 900;
+    return hasTouch && isSmallScreen;
+  });
+
+  useEffect(() => {
+    if (!isTouchDevice) return;
+
+    const checkOrientation = () => {
+      setIsPortrait(window.innerHeight > window.innerWidth);
+    };
+
+    checkOrientation();
+
+    const handleOrientationChange = () => {
+      setTimeout(checkOrientation, 100);
+    };
+
+    window.addEventListener('resize', handleOrientationChange);
+    window.addEventListener('orientationchange', handleOrientationChange);
+
+    if ((window.screen?.orientation as any)?.lock && !isPortrait) {
+      (window.screen.orientation as any).lock('landscape').catch(() => {});
+    }
+
+    if (document.documentElement.requestFullscreen && !document.fullscreenElement && !isPortrait) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleOrientationChange);
+      window.removeEventListener('orientationchange', handleOrientationChange);
+    };
+  }, [isTouchDevice, isPortrait]);
 
   const currentImage = useMemo(() => kImages[Math.floor(Math.random() * kImages.length)], [puzzleKey]);
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentImage.filename}`;
@@ -96,6 +134,34 @@ function DrsnaSestavljankaK910Content() {
     setMenuOpen(false);
     setShowInstructions(true);
   };
+
+  if (isTouchDevice && isPortrait) {
+    return (
+      <div 
+        className="fixed inset-0 flex flex-col items-center justify-center select-none p-8"
+        style={{
+          backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 flex flex-col items-center gap-6 shadow-2xl border-4 border-orange-300 max-w-sm">
+          <div className="w-20 h-20 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center animate-pulse">
+            <RotateCcw className="w-10 h-10 text-white" />
+          </div>
+          <p className="text-2xl font-bold text-center text-gray-700 uppercase">
+            Obrni telefon za igranje
+          </p>
+          <div className="flex items-center gap-2 text-orange-500">
+            <span className="text-4xl">📱</span>
+            <span className="text-2xl">→</span>
+            <span className="text-4xl rotate-90">📱</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 
