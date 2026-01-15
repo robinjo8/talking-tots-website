@@ -53,24 +53,25 @@ export function useAdminUsers() {
         return [];
       }
 
-      // 4. Get emails from auth.users for profiles without username using RPC
+      // Helper function to check if string is in email format
+      const isEmailFormat = (str: string | null): boolean => {
+        if (!str) return false;
+        return str.includes('@') && str.includes('.');
+      };
+
+      // 4. Get emails from auth.users for ALL profiles using RPC
       const profileIds = nonLogopedistProfiles.map(p => p.id);
-      const profilesWithoutEmail = nonLogopedistProfiles
-        .filter(p => !p.username)
-        .map(p => p.id);
 
       let authEmailMap = new Map<string, string>();
-      if (profilesWithoutEmail.length > 0) {
-        const { data: authEmails, error: authEmailsError } = await supabase
-          .rpc('get_parent_emails', { parent_ids: profilesWithoutEmail });
-        
-        if (authEmailsError) {
-          console.error('Error fetching auth emails:', authEmailsError);
-        } else if (authEmails) {
-          authEmailMap = new Map(
-            authEmails.map((e: { user_id: string; email: string }) => [e.user_id, e.email])
-          );
-        }
+      const { data: authEmails, error: authEmailsError } = await supabase
+        .rpc('get_parent_emails', { parent_ids: profileIds });
+      
+      if (authEmailsError) {
+        console.error('Error fetching auth emails:', authEmailsError);
+      } else if (authEmails) {
+        authEmailMap = new Map(
+          authEmails.map((e: { user_id: string; email: string }) => [e.user_id, e.email])
+        );
       }
 
       // 5. Get all children for these profiles
@@ -104,14 +105,26 @@ export function useAdminUsers() {
 
       // 7. Build the result - ALL users, including those without children
       const result: ParentWithChildren[] = nonLogopedistProfiles.map(profile => {
-        // Use profile.username first, fallback to auth.users email
-        const email = profile.username || authEmailMap.get(profile.id) || null;
+        // EMAIL: Always from auth.users, fallback to username if it's email format
+        const email = authEmailMap.get(profile.id) || 
+                      (isEmailFormat(profile.username) ? profile.username : null);
+        
+        // NAME: first_name + last_name, or username if it's NOT email format
+        let firstName = profile.first_name || null;
+        let lastName = profile.last_name || null;
+        
+        // If no first/last name, try to extract from username (if not email format)
+        if (!firstName && !lastName && profile.username && !isEmailFormat(profile.username)) {
+          const parts = profile.username.split(' ');
+          firstName = parts[0] || null;
+          lastName = parts.slice(1).join(' ') || null;
+        }
         
         return {
           parent_id: profile.id,
           email: email,
-          first_name: profile.first_name || null,
-          last_name: profile.last_name || null,
+          first_name: firstName,
+          last_name: lastName,
           created_at: profile.created_at || null,
           children: childrenByParent.get(profile.id) || [],
         };
