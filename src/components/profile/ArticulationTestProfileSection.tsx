@@ -1,4 +1,4 @@
-import { ClipboardCheck, AlertCircle, RotateCcw, Info, CalendarCheck, CalendarClock } from "lucide-react";
+import { ClipboardCheck, AlertCircle, RotateCcw, Info, CalendarCheck, CalendarClock, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { sl } from "date-fns/locale";
@@ -6,9 +6,11 @@ import { useArticulationTestStatus } from "@/hooks/useArticulationTestStatus";
 import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export function ArticulationTestProfileSection() {
   const { lastCompletedAt, nextTestDate, isTestAvailable, isLoading, resetTest } = useArticulationTestStatus();
+  const navigate = useNavigate();
 
   const handleReset = async () => {
     const success = await resetTest();
@@ -17,6 +19,10 @@ export function ArticulationTestProfileSection() {
     } else {
       toast.error("Napaka pri ponastavitvi testa.");
     }
+  };
+
+  const handleStartSession = (sessionNumber: number) => {
+    navigate(`/artikulacijski-test?seja=${sessionNumber}`);
   };
 
   if (isLoading) {
@@ -110,6 +116,27 @@ export function ArticulationTestProfileSection() {
             </div>
           </div>
         )}
+
+        {/* Test Sessions for Testing */}
+        <div className="rounded-lg border border-dragon-green/30 overflow-hidden">
+          <div className="bg-dragon-green/10 px-4 py-2 border-b border-dragon-green/20">
+            <p className="font-medium text-dragon-green text-sm">🧪 Testne seje (za razvoj)</p>
+          </div>
+          <div className="p-4 space-y-2">
+            {[1, 2, 3, 4, 5].map((sessionNum) => (
+              <Button
+                key={sessionNum}
+                variant="outline"
+                className="w-full justify-start text-left hover:bg-dragon-green/10 hover:border-dragon-green"
+                onClick={() => handleStartSession(sessionNum)}
+              >
+                <Play className="h-4 w-4 mr-2 text-dragon-green" />
+                Preverjanje izgovorjave {sessionNum}
+                <span className="ml-auto text-xs text-muted-foreground">→ Seja-{sessionNum}</span>
+              </Button>
+            ))}
+          </div>
+        </div>
 
         {/* Reset Button - for testing */}
         {hasCompletedTest && (
