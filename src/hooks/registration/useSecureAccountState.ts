@@ -6,7 +6,8 @@ const MAX_EMAIL_CHECKS = 3;
 const RATE_LIMIT_WINDOW = 60000; // 1 minute
 
 export function useSecureAccountState() {
-  const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -68,8 +69,10 @@ export function useSecureAccountState() {
   };
 
   return {
-    username,
-    setUsername,
+    firstName,
+    setFirstName,
+    lastName,
+    setLastName,
     email,
     setEmail,
     password,

@@ -4,8 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 type AccountInfoFormProps = {
-  username: string;
-  setUsername: (value: string) => void;
+  firstName: string;
+  setFirstName: (value: string) => void;
+  lastName: string;
+  setLastName: (value: string) => void;
   email: string;
   setEmail: (value: string) => void;
   password: string;
@@ -15,8 +17,10 @@ type AccountInfoFormProps = {
 };
 
 export function AccountInfoForm({
-  username,
-  setUsername,
+  firstName,
+  setFirstName,
+  lastName,
+  setLastName,
   email,
   setEmail,
   password,
@@ -26,17 +30,32 @@ export function AccountInfoForm({
 }: AccountInfoFormProps) {
   return (
     <div className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="username">Ime in priimek</Label>
-        <Input
-          id="username"
-          type="text"
-          placeholder="Vnesite vaše ime in priimek"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="rounded-md text-base"
-          required
-        />
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="firstName">Ime</Label>
+          <Input
+            id="firstName"
+            type="text"
+            placeholder="Vnesite vaše ime"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            className="rounded-md text-base"
+            required
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="lastName">Priimek</Label>
+          <Input
+            id="lastName"
+            type="text"
+            placeholder="Vnesite vaš priimek"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            className="rounded-md text-base"
+            required
+          />
+        </div>
       </div>
       
       <div className="space-y-2">

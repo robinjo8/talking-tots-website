@@ -13,7 +13,8 @@ export function useRegistration() {
   const navigate = useNavigate();
   
   const { 
-    username, setUsername,
+    firstName, setFirstName,
+    lastName, setLastName,
     email, setEmail,
     password, setPassword,
     confirmPassword, setConfirmPassword,
@@ -44,15 +45,16 @@ export function useRegistration() {
     e.preventDefault();
     
     if (currentStep === RegistrationStep.ACCOUNT_INFO) {
-    const isValid = await validateAccountInfo(
-      username,
-      email,
-      password,
-      confirmPassword,
-      currentChild.name,
-      currentChild.birthDate,
-      validateEmailSafely
-    );
+      const isValid = await validateAccountInfo(
+        firstName,
+        lastName,
+        email,
+        password,
+        confirmPassword,
+        currentChild.name,
+        currentChild.birthDate,
+        validateEmailSafely
+      );
       if (!isValid) return;
       setCurrentStep(RegistrationStep.SPEECH_DIFFICULTIES);
       setError(null);
@@ -75,7 +77,8 @@ export function useRegistration() {
     setError(null);
     
     const isValid = await validateAccountInfo(
-      username,
+      firstName,
+      lastName,
       email,
       password,
       confirmPassword,
@@ -116,7 +119,8 @@ export function useRegistration() {
         password,
         options: {
           data: {
-            username: username,
+            first_name: firstName,
+            last_name: lastName,
             children: validChildren.map(child => ({
               name: child.name,
               gender: child.gender,
@@ -158,7 +162,8 @@ export function useRegistration() {
 
   return {
     // Account state
-    username, setUsername,
+    firstName, setFirstName,
+    lastName, setLastName,
     email, setEmail,
     password, setPassword,
     confirmPassword, setConfirmPassword,

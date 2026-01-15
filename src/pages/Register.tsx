@@ -13,7 +13,8 @@ import { Eye, EyeOff, UserPlus, Home } from "lucide-react";
 
 export default function Register() {
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -37,8 +38,13 @@ export default function Register() {
     e.preventDefault();
     setError("");
     
-    if (!username.trim()) {
-      setError("Vnesite vaše ime in priimek");
+    if (!firstName.trim()) {
+      setError("Vnesite vaše ime");
+      return;
+    }
+    
+    if (!lastName.trim()) {
+      setError("Vnesite vaš priimek");
       return;
     }
     
@@ -72,7 +78,8 @@ export default function Register() {
         options: {
           emailRedirectTo: `${window.location.origin}/auth/confirm`,
           data: {
-            username: username.trim(),
+            first_name: firstName.trim(),
+            last_name: lastName.trim(),
           },
         },
       });
@@ -151,17 +158,32 @@ export default function Register() {
             </div>
 
             <form onSubmit={handleEmailSignUp} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="username">Ime in priimek</Label>
-                <Input
-                  id="username"
-                  type="text"
-                  placeholder="Janez Novak"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  disabled={isLoading}
-                  className="h-11"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">Ime</Label>
+                  <Input
+                    id="firstName"
+                    type="text"
+                    placeholder="Janez"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    disabled={isLoading}
+                    className="h-11"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Priimek</Label>
+                  <Input
+                    id="lastName"
+                    type="text"
+                    placeholder="Novak"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    disabled={isLoading}
+                    className="h-11"
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
