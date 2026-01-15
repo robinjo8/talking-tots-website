@@ -47,7 +47,7 @@ const ArticulationCompletionDialog = ({
     } finally {
       setIsSaving(false);
       onClose();
-      navigate("/moja-stran");
+      navigate("/moje-aplikacije");
     }
   };
 
@@ -68,7 +68,7 @@ const ArticulationCompletionDialog = ({
           <div className="space-y-2">
             <h2 className="text-3xl font-bold text-green-600">Čestitamo!</h2>
             <p className="text-lg text-gray-700">
-              Test izgovorjave je uspešno zaključen.
+              Preverjanje izgovorjave je uspešno zaključeno.
             </p>
           </div>
 

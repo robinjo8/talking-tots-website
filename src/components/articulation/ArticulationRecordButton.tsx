@@ -33,7 +33,7 @@ const ArticulationRecordButton = ({
     error,
     resetRecording,
     isSilent,
-  } = useAudioRecording(5, onRecordingComplete);
+  } = useAudioRecording(3, onRecordingComplete);
 
   // Reset recording state when showNext changes (moving to next word)
   useEffect(() => {
@@ -50,7 +50,7 @@ const ArticulationRecordButton = ({
   }, [isSilent, onSilenceDetected]);
 
   // Calculate progress percentage (0 to 100)
-  const progressPercent = ((5 - countdown) / 5) * 100;
+  const progressPercent = ((3 - countdown) / 3) * 100;
 
   // Wrapper for consistent height
   const renderContent = () => {
