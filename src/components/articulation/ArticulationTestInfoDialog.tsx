@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { ChevronDown, Check } from "lucide-react";
 
 interface ArticulationTestInfoDialogProps {
   open: boolean;
@@ -17,8 +17,18 @@ interface ArticulationTestInfoDialogProps {
 const ArticulationTestInfoDialog = ({ open, onClose }: ArticulationTestInfoDialogProps) => {
   const [readAgreement, setReadAgreement] = useState(false);
   const [termsAgreement, setTermsAgreement] = useState(false);
+  const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const canContinue = readAgreement && termsAgreement;
+
+  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+    const target = event.currentTarget;
+    const isAtBottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 30;
+    if (isAtBottom && !hasScrolledToBottom) {
+      setHasScrolledToBottom(true);
+    }
+  };
 
   return (
     <Dialog open={open}>
@@ -33,7 +43,11 @@ const ArticulationTestInfoDialog = ({ open, onClose }: ArticulationTestInfoDialo
           </DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 min-h-0 overflow-auto">
+        <div 
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="flex-1 min-h-0 overflow-auto"
+        >
           <div className="px-6 py-4 space-y-6 text-sm leading-relaxed">
             <section>
               <h3 className="font-bold text-base mb-2">Kaj je preverjanje izgovorjave?</h3>
@@ -121,21 +135,40 @@ const ArticulationTestInfoDialog = ({ open, onClose }: ArticulationTestInfoDialo
                 Najpomembneje je, da se otrok počuti sproščeno in varno.
               </p>
             </section>
+
+            {/* Scroll indicator */}
+            <div className="pt-4 pb-2">
+              {!hasScrolledToBottom ? (
+                <div className="flex flex-col items-center justify-center py-4 px-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-center gap-2 text-blue-700 font-medium text-center">
+                    <ChevronDown className="w-5 h-5 animate-bounce" />
+                    <span>Za nadaljevanje prosimo preberite celotno obvestilo do konca</span>
+                    <ChevronDown className="w-5 h-5 animate-bounce" />
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center gap-2 py-4 px-4 bg-green-50 border border-green-200 rounded-lg text-green-700 font-medium">
+                  <Check className="w-5 h-5" />
+                  <span>Sedaj lahko označite soglasja spodaj</span>
+                </div>
+              )}
+            </div>
           </div>
-        </ScrollArea>
+        </div>
 
         <div className="p-6 pt-4 border-t space-y-4 shrink-0">
           <div className="space-y-3">
-            <div className="flex items-start space-x-3">
+            <div className={`flex items-start space-x-3 ${!hasScrolledToBottom ? 'opacity-50' : ''}`}>
               <Checkbox
                 id="readAgreement"
                 checked={readAgreement}
                 onCheckedChange={(checked) => setReadAgreement(checked === true)}
+                disabled={!hasScrolledToBottom}
                 className="mt-0.5"
               />
               <label
                 htmlFor="readAgreement"
-                className="text-sm leading-relaxed cursor-pointer"
+                className={`text-sm leading-relaxed ${hasScrolledToBottom ? 'cursor-pointer' : 'cursor-not-allowed'}`}
               >
                 Prebral/-a sem obvestilo in se strinjam, da lahko moj otrok začne s preverjanjem izgovorjave.
               </label>
