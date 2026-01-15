@@ -6,7 +6,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { Home, RefreshCw } from "lucide-react";
@@ -37,18 +37,6 @@ function DrsnaSestavljankaS910Content() {
   const { recordGameCompletion } = useEnhancedProgress();
   const gameCompletedRef = useRef(false);
 
-  const [isTouchDevice] = useState(() => {
-    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    const isSmallScreen = Math.min(window.screen.width, window.screen.height) <= 900;
-    return hasTouch && isSmallScreen;
-  });
-  const [isPortrait, setIsPortrait] = useState(() => {
-    if (typeof window !== 'undefined' && window.screen?.orientation) {
-      return window.screen.orientation.type.includes('portrait');
-    }
-    return typeof window !== 'undefined' ? window.innerHeight > window.innerWidth : false;
-  });
-
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   const [puzzleKey, setPuzzleKey] = useState(0);
@@ -57,32 +45,10 @@ function DrsnaSestavljankaS910Content() {
   const [showNewGameDialog, setShowNewGameDialog] = useState(false);
   const [showNewGameButton, setShowNewGameButton] = useState(false);
 
-  useEffect(() => {
-    if (!isTouchDevice) return;
-    const checkOrientation = () => setIsPortrait(window.innerHeight > window.innerWidth);
-    checkOrientation();
-    window.addEventListener('resize', checkOrientation);
-    return () => window.removeEventListener('resize', checkOrientation);
-  }, [isTouchDevice]);
-
-  useEffect(() => {
-    if (!isTouchDevice) return;
-    const requestFullscreenAndLock = async () => {
-      try {
-        if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
-          await document.documentElement.requestFullscreen();
-        }
-        if ((window.screen?.orientation as any)?.lock) {
-          await (window.screen.orientation as any).lock('landscape');
-        }
-      } catch (e) { /* ignore */ }
-    };
-    requestFullscreenAndLock();
-  }, [isTouchDevice]);
-
   const currentImage = useMemo(() => sImages[Math.floor(Math.random() * sImages.length)], [puzzleKey]);
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentImage.filename}`;
 
+  // Get 5 random images for completion dialog
   const completionImages = useMemo(() => {
     const shuffled = [...sImages].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, 5).map(img => ({
@@ -132,24 +98,6 @@ function DrsnaSestavljankaS910Content() {
     setShowInstructions(true);
   };
 
-  if (isTouchDevice && isPortrait) {
-    return (
-      <div 
-        className="fixed inset-0 overflow-hidden select-none flex items-center justify-center"
-        style={{
-          backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.png)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      >
-        <div className="text-center text-white text-xl font-bold p-8">
-          Za igranje igre prosim obrni telefon v ležeči položaj.
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div 
       className="fixed inset-0 overflow-auto select-none"
@@ -178,7 +126,11 @@ function DrsnaSestavljankaS910Content() {
           </DropdownMenuContent>
         </DropdownMenu>
         {showNewGameButton && (
-          <Button onClick={handleStartNewGameDirect} className="rounded-full w-16 h-16 bg-sky-400 hover:bg-sky-500 shadow-lg border-2 border-white/50 backdrop-blur-sm" size="icon">
+          <Button 
+            onClick={handleStartNewGameDirect} 
+            className="rounded-full w-16 h-16 bg-sky-400 hover:bg-sky-500 shadow-lg border-2 border-white/50 backdrop-blur-sm" 
+            size="icon"
+          >
             <RefreshCw className="h-7 w-7 text-white" />
           </Button>
         )}

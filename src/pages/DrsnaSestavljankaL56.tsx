@@ -6,7 +6,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { Home, RefreshCw } from "lucide-react";
@@ -41,18 +41,6 @@ function DrsnaSestavljankaL56Content() {
   const { recordGameCompletion } = useEnhancedProgress();
   const gameCompletedRef = useRef(false);
 
-  const [isTouchDevice] = useState(() => {
-    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    const isSmallScreen = Math.min(window.screen.width, window.screen.height) <= 900;
-    return hasTouch && isSmallScreen;
-  });
-  const [isPortrait, setIsPortrait] = useState(() => {
-    if (typeof window !== 'undefined' && window.screen?.orientation) {
-      return window.screen.orientation.type.includes('portrait');
-    }
-    return typeof window !== 'undefined' ? window.innerHeight > window.innerWidth : false;
-  });
-
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   const [puzzleKey, setPuzzleKey] = useState(0);
@@ -61,32 +49,10 @@ function DrsnaSestavljankaL56Content() {
   const [showNewGameDialog, setShowNewGameDialog] = useState(false);
   const [showNewGameButton, setShowNewGameButton] = useState(false);
 
-  useEffect(() => {
-    if (!isTouchDevice) return;
-    const checkOrientation = () => setIsPortrait(window.innerHeight > window.innerWidth);
-    checkOrientation();
-    window.addEventListener('resize', checkOrientation);
-    return () => window.removeEventListener('resize', checkOrientation);
-  }, [isTouchDevice]);
-
-  useEffect(() => {
-    if (!isTouchDevice) return;
-    const requestFullscreenAndLock = async () => {
-      try {
-        if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
-          await document.documentElement.requestFullscreen();
-        }
-        if ((window.screen?.orientation as any)?.lock) {
-          await (window.screen.orientation as any).lock('landscape');
-        }
-      } catch (e) { /* ignore */ }
-    };
-    requestFullscreenAndLock();
-  }, [isTouchDevice]);
-
   const currentImage = useMemo(() => lImages[Math.floor(Math.random() * lImages.length)], [puzzleKey]);
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentImage.filename}`;
 
+  // Get 4 random images for completion dialog
   const completionImages = useMemo(() => {
     const shuffled = [...lImages].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, 4).map(img => ({
@@ -137,24 +103,6 @@ function DrsnaSestavljankaL56Content() {
     setShowInstructions(true);
   };
 
-  if (isTouchDevice && isPortrait) {
-    return (
-      <div 
-        className="fixed inset-0 overflow-hidden select-none flex items-center justify-center"
-        style={{
-          backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.png)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      >
-        <div className="text-center text-white text-xl font-bold p-8">
-          Za igranje igre prosim obrni telefon v ležeči položaj.
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div 
       className="fixed inset-0 overflow-auto select-none"
@@ -182,25 +130,25 @@ function DrsnaSestavljankaL56Content() {
               <Home className="w-8 h-8 text-white" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent 
-            className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
-            align="start"
-            side="top"
-            sideOffset={8}
-          >
-            <button onClick={handleBack} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors">
-              <span className="text-xl">🏠</span>
-              <span className="font-medium">Nazaj</span>
-            </button>
-            <button onClick={handleNewGame} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors">
-              <span className="text-xl">🔄</span>
-              <span className="font-medium">Nova igra</span>
-            </button>
-            <button onClick={handleInstructions} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors">
-              <span className="text-xl">📖</span>
-              <span className="font-medium">Navodila</span>
-            </button>
-          </DropdownMenuContent>
+        <DropdownMenuContent 
+          className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+          align="start"
+          side="top"
+          sideOffset={8}
+        >
+          <button onClick={handleBack} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors">
+            <span className="text-xl">🏠</span>
+            <span className="font-medium">Nazaj</span>
+          </button>
+          <button onClick={handleNewGame} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors">
+            <span className="text-xl">🔄</span>
+            <span className="font-medium">Nova igra</span>
+          </button>
+          <button onClick={handleInstructions} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors">
+            <span className="text-xl">📖</span>
+            <span className="font-medium">Navodila</span>
+          </button>
+        </DropdownMenuContent>
         </DropdownMenu>
         {showNewGameButton && (
           <Button 

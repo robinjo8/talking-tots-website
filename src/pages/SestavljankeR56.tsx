@@ -6,10 +6,13 @@ import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/contexts/AuthContext";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { Home, RefreshCw, Smartphone } from "lucide-react";
+import { RotateCcw, BookOpen, ArrowLeft, Home, RefreshCw } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
@@ -56,34 +59,13 @@ function SestavljankeR56Content() {
   const [currentImage, setCurrentImage] = useState(getRandomRImage());
   const [showNewGameButton, setShowNewGameButton] = useState(false);
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const { user, selectedChild } = useAuth();
   const { recordGameCompletion } = useEnhancedProgress();
   const gameCompletedRef = useRef(false);
   
-  // Synchronous touch device detection
-  const [isTouchDevice] = useState(() => {
-    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    const isSmallScreen = Math.min(window.screen.width, window.screen.height) <= 900;
-    return hasTouch && isSmallScreen;
-  });
-  
-  // Track orientation
-  const [isPortrait, setIsPortrait] = useState(() => {
-    return window.innerHeight > window.innerWidth;
-  });
-  
-  useEffect(() => {
-    const handleOrientationChange = () => {
-      setIsPortrait(window.innerHeight > window.innerWidth);
-    };
-    window.addEventListener('resize', handleOrientationChange);
-    window.addEventListener('orientationchange', handleOrientationChange);
-    return () => {
-      window.removeEventListener('resize', handleOrientationChange);
-      window.removeEventListener('orientationchange', handleOrientationChange);
-    };
-  }, []);
-  
-  const effectiveFullscreen = isTouchDevice;
+  // Mobile devices always get fullscreen, desktop never gets fullscreen
+  const effectiveFullscreen = isMobile;
   
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentImage.filename}`;
   
@@ -114,6 +96,7 @@ function SestavljankeR56Content() {
     setShowInstructions(true);
   };
 
+  // Enable fullscreen and portrait lock on mobile devices only
   useEffect(() => {
     if (effectiveFullscreen) {
       const requestFullscreen = async () => {
@@ -121,14 +104,24 @@ function SestavljankeR56Content() {
           if (document.documentElement.requestFullscreen) {
             await document.documentElement.requestFullscreen();
           }
-          if (screen.orientation && 'lock' in screen.orientation) {
-            await (screen.orientation as any).lock('landscape');
-          }
         } catch (error) {
-          console.log('Fullscreen/orientation lock not supported:', error);
+          console.log('Fullscreen not supported:', error);
         }
       };
+
+      const lockPortrait = async () => {
+        try {
+          if (screen.orientation && 'lock' in screen.orientation) {
+            await (screen.orientation as any).lock('portrait');
+          }
+        } catch (error) {
+          console.log('Portrait lock not supported:', error);
+        }
+      };
+
       requestFullscreen();
+      lockPortrait();
+      
       return () => {
         if (document.fullscreenElement) {
           document.exitFullscreen?.();
@@ -147,20 +140,9 @@ function SestavljankeR56Content() {
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/zeleno_ozadje.png`;
 
   if (effectiveFullscreen) {
-    // Show rotate message in portrait
-    if (isPortrait) {
-      return (
-        <div className="fixed inset-0 overflow-hidden select-none touch-none overscroll-none flex items-center justify-center" style={{ backgroundImage: `url('${backgroundImageUrl}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-          <div className="text-center text-white p-8">
-            <Smartphone className="w-16 h-16 mx-auto mb-4 animate-pulse rotate-90" />
-            <p className="text-xl font-bold">Za igranje igre prosim obrni telefon v ležeči položaj.</p>
-          </div>
-        </div>
-      );
-    }
-    
     return (
       <div className="fixed inset-0 overflow-hidden select-none touch-none overscroll-none relative">
+        {/* Background image layer */}
         <div className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${backgroundImageUrl}')` }} />
         
         <div className="relative z-10 h-full flex flex-col">
@@ -254,6 +236,7 @@ function SestavljankeR56Content() {
   return (
     <AppLayout>
       <div className="w-full min-h-screen relative">
+        {/* Background image layer */}
         <div className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${backgroundImageUrl}')` }} />
         
         <div className="relative z-10">
