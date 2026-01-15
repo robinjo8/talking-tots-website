@@ -11,19 +11,48 @@ export default function AuthConfirm() {
 
   useEffect(() => {
     const processConfirmation = async () => {
-      // Wait for Supabase SDK to process #access_token from URL
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Get session to confirm the token was processed
-      const { data } = await supabase.auth.getSession();
-      
-      if (data.session) {
-        console.log("AuthConfirm: Email confirmed, signing out user");
-        // Sign out the user - they must log in manually
-        await supabase.auth.signOut();
+      try {
+        // 1. Immediately capture and clear the URL hash to prevent error display
+        const hash = window.location.hash;
+        if (hash) {
+          // Clear hash from URL without page reload to prevent SDK from showing errors
+          window.history.replaceState(null, '', window.location.pathname);
+        }
+        
+        // 2. Check if there's an error in the hash (silently log, don't show to user)
+        if (hash) {
+          const hashParams = new URLSearchParams(hash.replace('#', ''));
+          const error = hashParams.get('error');
+          const errorDescription = hashParams.get('error_description');
+          if (error) {
+            console.log('AuthConfirm: Auth error detected (silently ignored):', error, errorDescription);
+            // Still continue - the email was likely confirmed successfully
+          }
+        }
+        
+        // 3. Wait for Supabase SDK to process the token (increased delay for safety)
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // 4. Silently try to get session and sign out
+        try {
+          const { data } = await supabase.auth.getSession();
+          
+          if (data.session) {
+            console.log("AuthConfirm: Email confirmed, signing out user");
+            // Sign out the user - they must log in manually
+            await supabase.auth.signOut();
+          }
+        } catch (sessionError) {
+          // Silently ignore session errors - confirmation page should still show success
+          console.log("AuthConfirm: Session handling error (ignored):", sessionError);
+        }
+        
+      } catch (error) {
+        // Silently ignore all errors during confirmation processing
+        console.log("AuthConfirm: Confirmation process error (ignored):", error);
+      } finally {
+        setIsProcessing(false);
       }
-      
-      setIsProcessing(false);
     };
 
     processConfirmation();

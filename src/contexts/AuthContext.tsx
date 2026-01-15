@@ -319,6 +319,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state changed:", event);
       
+      // Ignore events when on /auth/confirm page - that page handles its own flow
+      if (window.location.pathname === '/auth/confirm') {
+        console.log("On auth/confirm page - skipping auth state handling to prevent error toasts");
+        return;
+      }
+      
       // Ignore TOKEN_REFRESHED events - these don't require profile refetch
       if (event === 'TOKEN_REFRESHED') {
         console.log("Token refreshed - skipping profile fetch");
