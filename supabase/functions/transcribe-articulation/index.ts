@@ -52,6 +52,23 @@ function normalizeText(text: string): string {
     .trim();
 }
 
+// Sanitize text for storage paths (remove special Slovenian characters)
+function sanitizeForStorage(text: string): string {
+  const charMap: Record<string, string> = {
+    'Č': 'C', 'č': 'c',
+    'Š': 'S', 'š': 's',
+    'Ž': 'Z', 'ž': 'z',
+    'Đ': 'D', 'đ': 'd',
+    'Ć': 'C', 'ć': 'c',
+  };
+  
+  return text
+    .split('')
+    .map(char => charMap[char] || char)
+    .join('')
+    .replace(/[^a-zA-Z0-9\-_]/g, '');
+}
+
 // Check if transcribed word matches target or variants
 function isWordAccepted(
   transcribed: string,
@@ -217,10 +234,11 @@ serve(async (req) => {
         const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        // Determine session folder (default to Seja-1 if not provided)
-        const sessionFolder = sessionNumber ? `Seja-${sessionNumber}` : 'Seja-1';
+        // Sanitize letter and word for storage path (remove special characters)
+        const safeLetter = sanitizeForStorage(letter || 'X');
+        const safeWord = sanitizeForStorage(targetWord);
         // New unified storage structure with sessions: uporabniski-profili/{user_id}/{child_id}/Dokumenti/Preverjanje-izgovorjave/Seja-X/
-        storagePath = `${userId}/${childId}/Dokumenti/Preverjanje-izgovorjave/${sessionFolder}/${letter}-${wordIndex}-${targetWord}-${timestamp}.webm`;
+        storagePath = `${userId}/${childId}/Dokumenti/Preverjanje-izgovorjave/${sessionFolder}/${safeLetter}-${wordIndex}-${safeWord}-${timestamp}.webm`;
 
         console.log(`Attempting to save recording to: ${storagePath}`);
 
