@@ -237,6 +237,8 @@ serve(async (req) => {
         // Sanitize letter and word for storage path (remove special characters)
         const safeLetter = sanitizeForStorage(letter || 'X');
         const safeWord = sanitizeForStorage(targetWord);
+        // Construct session folder from sessionNumber parameter
+        const sessionFolder = `Seja-${sessionNumber || 1}`;
         // New unified storage structure with sessions: uporabniski-profili/{user_id}/{child_id}/Dokumenti/Preverjanje-izgovorjave/Seja-X/
         storagePath = `${userId}/${childId}/Dokumenti/Preverjanje-izgovorjave/${sessionFolder}/${safeLetter}-${wordIndex}-${safeWord}-${timestamp}.webm`;
 
