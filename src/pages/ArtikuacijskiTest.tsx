@@ -10,6 +10,7 @@ import ArticulationTestInfoDialog from "@/components/articulation/ArticulationTe
 import ArticulationTestInstructionsDialog from "@/components/articulation/ArticulationTestInstructionsDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { useArticulationTestNew } from "@/hooks/useArticulationTestNew";
+import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 
 const positiveFeedbackMessages = [
@@ -27,11 +28,15 @@ const positiveFeedbackMessages = [
 
 const ArtikuacijskiTest = () => {
   const navigate = useNavigate();
+  const { user, selectedChild } = useAuth();
   const [showInfoDialog, setShowInfoDialog] = useState(true);
   const [showInstructionsDialog, setShowInstructionsDialog] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [backgroundUrl, setBackgroundUrl] = useState<string | null>(null);
+
+  const childId = selectedChild?.id;
+  const userId = user?.id;
 
   const {
     imageUrl,
@@ -51,7 +56,8 @@ const ArtikuacijskiTest = () => {
     handleRecordingComplete,
     handleNext,
     resetTest,
-  } = useArticulationTestNew();
+    initializeSession,
+  } = useArticulationTestNew(childId, userId);
 
   // Fetch background image
   useEffect(() => {
@@ -81,7 +87,11 @@ const ArtikuacijskiTest = () => {
       {/* Info Dialog */}
       <ArticulationTestInfoDialog
         open={showInfoDialog}
-        onClose={() => setShowInfoDialog(false)}
+        onClose={async () => {
+          // Initialize session when user confirms and closes dialog
+          await initializeSession();
+          setShowInfoDialog(false);
+        }}
       />
 
       {/* Completion Dialog */}
