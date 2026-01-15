@@ -12,24 +12,43 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search, Users, Eye, FolderOpen, Loader2 } from 'lucide-react';
+import { Search, Users, Baby, Eye, FolderOpen, Loader2 } from 'lucide-react';
 
-interface FlatChildRow {
+interface DisplayRow {
   parent: ParentWithChildren;
-  child: ChildData;
+  child: ChildData | null; // null for users without children
+  isFirstChild: boolean; // for rowspan styling
+  childCount: number;
 }
 
 export default function AdminUsers() {
   const { data: users, isLoading, error } = useAdminUsers();
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Flatten the data to have one row per child
+  // Flatten the data to have one row per child, or one row for users without children
   const flatRows = useMemo(() => {
     if (!users) return [];
-    const rows: FlatChildRow[] = [];
+    const rows: DisplayRow[] = [];
+    
     for (const parent of users) {
-      for (const child of parent.children) {
-        rows.push({ parent, child });
+      if (parent.children.length === 0) {
+        // User without children - single row
+        rows.push({ 
+          parent, 
+          child: null, 
+          isFirstChild: true,
+          childCount: 0
+        });
+      } else {
+        // User with children - one row per child
+        parent.children.forEach((child, index) => {
+          rows.push({ 
+            parent, 
+            child, 
+            isFirstChild: index === 0,
+            childCount: parent.children.length
+          });
+        });
       }
     }
     return rows;
@@ -43,10 +62,19 @@ export default function AdminUsers() {
       const emailMatch = row.parent.email?.toLowerCase().includes(searchLower);
       const nameMatch = row.parent.first_name?.toLowerCase().includes(searchLower) || 
                         row.parent.last_name?.toLowerCase().includes(searchLower);
-      const childMatch = row.child.name.toLowerCase().includes(searchLower);
+      const childMatch = row.child?.name.toLowerCase().includes(searchLower);
       return emailMatch || nameMatch || childMatch;
     });
   }, [flatRows, searchQuery]);
+
+  // Stats calculations
+  const stats = useMemo(() => {
+    if (!users) return { totalUsers: 0, usersWithChildren: 0, totalChildren: 0 };
+    const totalUsers = users.length;
+    const usersWithChildren = users.filter(u => u.children.length > 0).length;
+    const totalChildren = users.reduce((acc, user) => acc + user.children.length, 0);
+    return { totalUsers, usersWithChildren, totalChildren };
+  }, [users]);
 
   // Helper function to format parent name
   const formatParentName = (parent: ParentWithChildren): string => {
@@ -72,44 +100,45 @@ export default function AdminUsers() {
         <div>
           <h1 className="text-2xl font-bold text-foreground">Uporabniki</h1>
           <p className="text-muted-foreground">
-            Vsi starši z registriranimi otroki na portalu TomiTalk
+            Vsi registrirani uporabniki na portalu TomiTalk
           </p>
         </div>
 
-        {/* Stats Card */}
+        {/* Stats Cards */}
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Skupaj staršev</CardTitle>
+              <CardTitle className="text-sm font-medium">Skupaj uporabnikov</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{users?.length || 0}</div>
+              <div className="text-2xl font-bold">{stats.totalUsers}</div>
+              <p className="text-xs text-muted-foreground">Vseh registriranih</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Uporabniki z otroki</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.usersWithChildren}</div>
+              <p className="text-xs text-muted-foreground">
+                {stats.totalUsers > 0 
+                  ? `${((stats.usersWithChildren / stats.totalUsers) * 100).toFixed(0)}% uporabnikov`
+                  : '0% uporabnikov'
+                }
+              </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Skupaj otrok</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <Baby className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {users?.reduce((acc, user) => acc + user.children.length, 0) || 0}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Povprečno otrok/starš</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {users?.length 
-                  ? (users.reduce((acc, user) => acc + user.children.length, 0) / users.length).toFixed(1)
-                  : '0'
-                }
-              </div>
+              <div className="text-2xl font-bold">{stats.totalChildren}</div>
+              <p className="text-xs text-muted-foreground">Registriranih otrok</p>
             </CardContent>
           </Card>
         </div>
@@ -119,7 +148,7 @@ export default function AdminUsers() {
           <CardHeader>
             <CardTitle>Seznam uporabnikov</CardTitle>
             <CardDescription>
-              Vsi starši z registriranimi otroki na portalu TomiTalk
+              Vsi registrirani uporabniki na portalu TomiTalk
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -158,6 +187,7 @@ export default function AdminUsers() {
                     <TableRow>
                       <TableHead>Ime in priimek starša</TableHead>
                       <TableHead>Email</TableHead>
+                      <TableHead>Št. otrok</TableHead>
                       <TableHead>Ime otroka</TableHead>
                       <TableHead>Starost</TableHead>
                       <TableHead>Spol</TableHead>
@@ -168,17 +198,18 @@ export default function AdminUsers() {
                   <TableBody>
                     {filteredRows.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
+                        <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
                           {searchQuery ? 'Ni rezultatov za iskalni niz' : 'Ni registriranih uporabnikov'}
                         </TableCell>
                       </TableRow>
                     ) : (
-                      filteredRows.map((row) => {
+                      filteredRows.map((row, index) => {
                         const parentName = formatParentName(row.parent);
-                        const gender = formatGender(row.child.gender);
+                        const gender = row.child ? formatGender(row.child.gender) : '';
+                        const rowKey = row.child ? row.child.id : `${row.parent.parent_id}-no-child`;
                         
                         return (
-                          <TableRow key={row.child.id}>
+                          <TableRow key={rowKey}>
                             <TableCell>
                               {parentName ? (
                                 <span className="font-medium">{parentName}</span>
@@ -193,17 +224,32 @@ export default function AdminUsers() {
                                 <span className="text-muted-foreground italic">Ni emaila</span>
                               )}
                             </TableCell>
-                            <TableCell className="font-medium">
-                              {row.child.name}
+                            <TableCell>
+                              <span className={row.childCount === 0 ? 'text-muted-foreground' : 'font-medium'}>
+                                {row.childCount}
+                              </span>
                             </TableCell>
                             <TableCell>
-                              {row.child.age !== null ? `${row.child.age} let` : '-'}
+                              {row.child ? (
+                                <span className="font-medium">{row.child.name}</span>
+                              ) : (
+                                <span className="text-muted-foreground italic">Ni otroka</span>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {row.child && row.child.age !== null ? (
+                                `${row.child.age} let`
+                              ) : (
+                                <span className="text-muted-foreground">-</span>
+                              )}
                             </TableCell>
                             <TableCell>
                               {gender ? (
                                 <span>{gender}</span>
                               ) : (
-                                <span className="text-muted-foreground italic">Ni določen</span>
+                                <span className="text-muted-foreground italic">
+                                  {row.child ? 'Ni določen' : '-'}
+                                </span>
                               )}
                             </TableCell>
                             <TableCell>
@@ -214,9 +260,11 @@ export default function AdminUsers() {
                                 <Button variant="ghost" size="sm" title="Ogled podrobnosti">
                                   <Eye className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="sm" title="Dokumenti">
-                                  <FolderOpen className="h-4 w-4" />
-                                </Button>
+                                {row.child && (
+                                  <Button variant="ghost" size="sm" title="Dokumenti">
+                                    <FolderOpen className="h-4 w-4" />
+                                  </Button>
+                                )}
                               </div>
                             </TableCell>
                           </TableRow>
