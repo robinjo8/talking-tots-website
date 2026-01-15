@@ -25,7 +25,7 @@ export function ArticulationTestProfileSection() {
         <div className="bg-dragon-green text-white p-4">
           <h2 className="text-xl font-semibold flex items-center gap-2">
             <ClipboardCheck className="h-5 w-5" />
-            Test izgovorjave
+            Preverjanje izgovorjave
           </h2>
         </div>
         <div className="flex items-center justify-center py-12">
@@ -43,7 +43,7 @@ export function ArticulationTestProfileSection() {
       <div className="bg-dragon-green text-white p-4 flex items-center justify-between">
         <h2 className="text-xl font-semibold flex items-center gap-2">
           <ClipboardCheck className="h-5 w-5" />
-          Test izgovorjave
+          Preverjanje izgovorjave
         </h2>
         <TooltipProvider>
           <Tooltip>
@@ -54,7 +54,7 @@ export function ArticulationTestProfileSection() {
             </TooltipTrigger>
             <TooltipContent side="left" className="max-w-xs">
               <p>
-                Test izgovorjave lahko opravljate enkrat na 3 mesece. 
+                Preverjanje izgovorjave lahko opravljate enkrat na 3 mesece.
                 Po opravljenem testu bo logoped pregledal rezultate in pripravil poročilo.
               </p>
             </TooltipContent>

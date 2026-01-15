@@ -30,7 +30,7 @@ export default function AdminDashboard() {
             Dobrodošli, {profile?.first_name} {profile?.last_name}
           </h1>
           <p className="text-muted-foreground">
-            {profile?.organization_name} • Preglejte status testiranj izgovorjave
+            {profile?.organization_name} • Preglejte status preverjanj izgovorjave
           </p>
         </div>
 

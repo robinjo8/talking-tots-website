@@ -19,7 +19,7 @@ const ArticulationTestInstructionsDialog = ({ open, onClose }: ArticulationTestI
       <DialogContent className="max-w-2xl max-h-[90vh] p-0">
         <DialogHeader className="px-6 pt-6 pb-2">
           <DialogTitle className="text-2xl font-bold text-center">
-            Kako deluje test izgovorjave
+            Kako deluje preverjanje izgovorjave
           </DialogTitle>
         </DialogHeader>
         
@@ -29,15 +29,15 @@ const ArticulationTestInstructionsDialog = ({ open, onClose }: ArticulationTestI
             <section>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Kratek povzetek</h3>
               <p className="text-sm leading-relaxed">
-                Test izgovorjave je strukturiran govorni preizkus, s katerim preverjamo otrokovo izgovorjavo soglasnikov slovenskega jezika. Uporablja se za začetno oceno govornega stanja ter za spremljanje napredka skozi čas. Na podlagi testa lahko natančneje prepoznamo, kateri glasovi otroku povzročajo težave in kje potrebuje dodatno vajo.
+                Preverjanje izgovorjave je strukturiran govorni preizkus, s katerim preverjamo otrokovo izgovorjavo soglasnikov slovenskega jezika. Uporablja se za začetno oceno govornega stanja ter za spremljanje napredka skozi čas. Na podlagi preverjanja lahko natančneje prepoznamo, kateri glasovi otroku povzročajo težave in kje potrebuje dodatno vajo.
               </p>
             </section>
 
             {/* Kaj se preverja */}
             <section>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Kaj se preverja v testu</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Kaj se preverja</h3>
               <p className="text-sm leading-relaxed mb-2">
-                V testu se preverja 20 soglasnikov slovenske abecede. Za vsak soglasnik se izgovorjava preverja v treh položajih:
+                Pri preverjanju se preverja 20 soglasnikov slovenske abecede. Za vsak soglasnik se izgovorjava preverja v treh položajih:
               </p>
               <ul className="list-disc list-inside text-sm space-y-1 ml-2">
                 <li>na začetku besede (označeno kot B – začetek),</li>
@@ -51,17 +51,17 @@ const ArticulationTestInstructionsDialog = ({ open, onClose }: ArticulationTestI
 
             {/* Struktura testa */}
             <section>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Struktura testa</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Struktura preverjanja</h3>
               <ul className="list-disc list-inside text-sm space-y-1 ml-2">
                 <li>Otrok izgovarja 60 besed, vsaka beseda je podprta s sliko.</li>
                 <li>Slike in besede se prikazujejo v vnaprej določenem vrstnem redu, ki je enak za vse otroke.</li>
-                <li>Test se šteje kot uspešno zaključen, ko je izgovorjenih vseh 60 besed.</li>
+                <li>Preverjanje se šteje kot uspešno zaključeno, ko je izgovorjenih vseh 60 besed.</li>
               </ul>
             </section>
 
             {/* Prikaz napredka */}
             <section>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Prikaz napredka med testom</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Prikaz napredka med preverjanjem</h3>
               <ul className="list-disc list-inside text-sm space-y-1 ml-2">
                 <li>Na vrhu zaslona so prikazane vse črke soglasnikov, ki se preverjajo.</li>
                 <li>Vsaka črka ima tri korake (začetek, sredina, konec).</li>
@@ -74,14 +74,14 @@ const ArticulationTestInstructionsDialog = ({ open, onClose }: ArticulationTestI
                 <li>Ko je polje črke v celoti zeleno, pomeni, da je otrok izgovoril vse tri besede za določen soglasnik.</li>
               </ul>
               <p className="text-sm leading-relaxed mt-2">
-                Ta prikaz omogoča jasen in pregleden vpogled v potek testa.
+                Ta prikaz omogoča jasen in pregleden vpogled v potek preverjanja.
               </p>
               
               {/* Image 1 */}
               <div className="my-4 flex justify-center">
                 <img 
                   src={getImageUrl("test_izgovorjave_1.png")} 
-                  alt="Prikaz napredka testa" 
+                  alt="Prikaz napredka preverjanja" 
                   className="rounded-lg shadow-md max-w-full h-auto"
                   style={{ maxHeight: '300px' }}
                 />
@@ -90,8 +90,8 @@ const ArticulationTestInstructionsDialog = ({ open, onClose }: ArticulationTestI
 
             {/* Kdaj se test izvaja */}
             <section>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Kdaj se test izvaja</h3>
-              <p className="text-sm leading-relaxed mb-2">Test izgovorjave se opravi:</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Kdaj se preverjanje izvaja</h3>
+              <p className="text-sm leading-relaxed mb-2">Preverjanje izgovorjave se opravi:</p>
               <ul className="list-disc list-inside text-sm space-y-1 ml-2">
                 <li>ob prvem začetku uporabe aplikacije,</li>
                 <li>nato periodično (na vsake tri mesece).</li>

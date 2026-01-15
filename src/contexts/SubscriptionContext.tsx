@@ -19,7 +19,7 @@ export type ProOnlyFeature = typeof PRO_ONLY_FEATURES[number];
 
 // Feature ID to readable name mapping
 export const FEATURE_NAMES: Record<ProOnlyFeature, string> = {
-  test: 'Test izgovorjave',
+  test: 'Preverjanje izgovorjave',
   challenges: 'Moji izzivi'
 };
 

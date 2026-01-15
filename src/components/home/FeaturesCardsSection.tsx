@@ -22,7 +22,7 @@ const features = [
   },
   {
     title: "Preverjanje izgovorjave",
-    description: "Test izgovorjave za vse slovenske soglasnike.",
+    description: "Preverjanje izgovorjave za vse slovenske soglasnike.",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_artikulacija_4.png",
     buttonText: "Kako deluje?",
     buttonAction: "howItWorks",
