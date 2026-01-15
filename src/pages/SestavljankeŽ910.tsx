@@ -9,10 +9,8 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { useAuth } from "@/contexts/AuthContext";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { Home, RefreshCw } from "lucide-react";
+import { Home, RefreshCw, Smartphone } from "lucide-react";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
 
@@ -51,40 +49,47 @@ function SestavljankeŽ910Content() {
   const [currentImage, setCurrentImage] = useState(getRandomŽImage());
   const [showNewGameButton, setShowNewGameButton] = useState(false);
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
   const { recordGameCompletion } = useEnhancedProgress();
   const gameCompletedRef = useRef(false);
-  const effectiveFullscreen = isMobile;
+  
+  const [isTouchDevice] = useState(() => {
+    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const isSmallScreen = Math.min(window.screen.width, window.screen.height) <= 900;
+    return hasTouch && isSmallScreen;
+  });
+  
+  const [isPortrait, setIsPortrait] = useState(() => window.innerHeight > window.innerWidth);
+  
+  useEffect(() => {
+    const handleOrientationChange = () => setIsPortrait(window.innerHeight > window.innerWidth);
+    window.addEventListener('resize', handleOrientationChange);
+    window.addEventListener('orientationchange', handleOrientationChange);
+    return () => {
+      window.removeEventListener('resize', handleOrientationChange);
+      window.removeEventListener('orientationchange', handleOrientationChange);
+    };
+  }, []);
+  
+  const effectiveFullscreen = isTouchDevice;
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentImage.filename}`;
   const handleComplete = () => { if (!gameCompletedRef.current) { gameCompletedRef.current = true; setShowCompletion(true); } };
   const handleStarClaimed = () => { recordGameCompletion('puzzle', 'puzzle_ž_20'); setShowNewGameButton(true); };
-
   const handleNewGame = () => { gameCompletedRef.current = false; setCurrentImage(getRandomŽImage()); setPuzzleKey(prev => prev + 1); setShowNewGameButton(false); };
-
-  const handleBack = () => {
-    navigate("/govorne-igre/sestavljanke");
-  };
-
-  const handleInstructions = () => {
-    setShowInstructions(true);
-  };
+  const handleBack = () => navigate("/govorne-igre/sestavljanke");
+  const handleInstructions = () => setShowInstructions(true);
 
   useEffect(() => {
     if (effectiveFullscreen) {
       const requestFullscreen = async () => {
         try {
-          if (document.documentElement.requestFullscreen) {
-            await document.documentElement.requestFullscreen();
-          }
-        } catch (error) {
-          console.log('Fullscreen not supported:', error);
-        }
+          if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen();
+          if (screen.orientation && 'lock' in screen.orientation) await (screen.orientation as any).lock('landscape');
+        } catch (error) { console.log('Fullscreen/orientation lock not supported:', error); }
       };
       requestFullscreen();
       return () => {
-        if (document.fullscreenElement) {
-          document.exitFullscreen?.();
-        }
+        if (document.fullscreenElement) document.exitFullscreen?.();
+        try { if (screen.orientation && 'unlock' in screen.orientation) (screen.orientation as any).unlock(); } catch (error) { console.log('Orientation unlock error:', error); }
       };
     }
   }, [effectiveFullscreen]);
@@ -92,75 +97,36 @@ function SestavljankeŽ910Content() {
   const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/zeleno_ozadje.png`;
 
   if (effectiveFullscreen) {
-    return (
-      <div className="fixed inset-0 overflow-hidden select-none relative touch-none overscroll-none">
-        {/* Background image layer */}
-        <div className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${backgroundImageUrl}')` }} />
-        
-        <div className="relative z-10 h-full flex flex-col">
-          <div className="flex-1 overflow-hidden">
-            <SimpleJigsaw 
-              key={puzzleKey}
-              imageUrl={imageUrl}
-              gridCols={6}
-              gridRows={5}
-              onComplete={handleComplete}
-              className="w-full h-full"
-            />
+    if (isPortrait) {
+      return (
+        <div className="fixed inset-0 overflow-hidden select-none touch-none overscroll-none flex items-center justify-center" style={{ backgroundImage: `url('${backgroundImageUrl}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+          <div className="text-center text-white p-8">
+            <Smartphone className="w-16 h-16 mx-auto mb-4 animate-pulse rotate-90" />
+            <p className="text-xl font-bold">Za igranje igre prosim obrni telefon v ležeči položaj.</p>
           </div>
         </div>
-        {/* Floating menu button */}
+      );
+    }
+    
+    return (
+      <div className="fixed inset-0 overflow-hidden select-none relative touch-none overscroll-none">
+        <div className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${backgroundImageUrl}')` }} />
+        <div className="relative z-10 h-full flex flex-col">
+          <div className="flex-1 overflow-hidden">
+            <SimpleJigsaw key={puzzleKey} imageUrl={imageUrl} gridCols={6} gridRows={5} onComplete={handleComplete} className="w-full h-full" />
+          </div>
+        </div>
         <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
             <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"><Home className="w-8 h-8 text-white" /></button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent 
-            align="start" 
-            side="top"
-            sideOffset={8}
-            className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
-          >
-            <button
-              onClick={() => {
-                setShowExitDialog(true);
-                setMenuOpen(false);
-              }}
-              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
-            >
-              <span className="text-2xl">🏠</span>
-              <span>Nazaj</span>
-            </button>
-            <button
-              onClick={() => {
-                handleNewGame();
-                setMenuOpen(false);
-              }}
-              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
-            >
-              <span className="text-2xl">🔄</span>
-              <span>Nova igra</span>
-            </button>
-            <button
-              onClick={() => {
-                setShowInstructions(true);
-                setMenuOpen(false);
-              }}
-              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
-            >
-              <span className="text-2xl">📖</span>
-              <span>Navodila</span>
-            </button>
+          <DropdownMenuContent align="start" side="top" sideOffset={8} className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl">
+            <button onClick={() => { setShowExitDialog(true); setMenuOpen(false); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"><span className="text-2xl">🏠</span><span>Nazaj</span></button>
+            <button onClick={() => { handleNewGame(); setMenuOpen(false); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"><span className="text-2xl">🔄</span><span>Nova igra</span></button>
+            <button onClick={() => { setShowInstructions(true); setMenuOpen(false); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"><span className="text-2xl">📖</span><span>Navodila</span></button>
           </DropdownMenuContent>
         </DropdownMenu>
-
-        <MemoryExitConfirmationDialog 
-          open={showExitDialog} 
-          onOpenChange={setShowExitDialog} 
-          onConfirm={() => navigate("/govorne-igre/sestavljanke")}
-        >
-          <div />
-        </MemoryExitConfirmationDialog>
-
+        <MemoryExitConfirmationDialog open={showExitDialog} onOpenChange={setShowExitDialog} onConfirm={() => navigate("/govorne-igre/sestavljanke")}><div /></MemoryExitConfirmationDialog>
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
         {showNewGameButton && (<Button size="icon" onClick={handleNewGame} className="fixed bottom-4 left-24 z-50 bg-blue-500 hover:bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg"><RefreshCw className="w-6 h-6" /></Button>)}
         <PuzzleSuccessDialog isOpen={showCompletion} onOpenChange={setShowCompletion} completedImage={currentImage} allImages={žImages} onStarClaimed={handleStarClaimed} />
@@ -171,66 +137,19 @@ function SestavljankeŽ910Content() {
   return (
     <AppLayout>
       <div className="w-full min-h-screen relative" style={{ backgroundImage: `url('${backgroundImageUrl}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-        {/* Floating menu button */}
         <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
             <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"><Home className="w-8 h-8 text-white" /></button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent 
-            align="start" 
-            side="top"
-            sideOffset={8}
-            className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
-          >
-            <button
-              onClick={() => {
-                setShowExitDialog(true);
-                setMenuOpen(false);
-              }}
-              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
-            >
-              <span className="text-2xl">🏠</span>
-              <span>Nazaj</span>
-            </button>
-            <button
-              onClick={() => {
-                handleNewGame();
-                setMenuOpen(false);
-              }}
-              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
-            >
-              <span className="text-2xl">🔄</span>
-              <span>Nova igra</span>
-            </button>
-            <button
-              onClick={() => {
-                setShowInstructions(true);
-                setMenuOpen(false);
-              }}
-              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
-            >
-              <span className="text-2xl">📖</span>
-              <span>Navodila</span>
-            </button>
+          <DropdownMenuContent align="start" side="top" sideOffset={8} className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl">
+            <button onClick={() => { setShowExitDialog(true); setMenuOpen(false); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"><span className="text-2xl">🏠</span><span>Nazaj</span></button>
+            <button onClick={() => { handleNewGame(); setMenuOpen(false); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"><span className="text-2xl">🔄</span><span>Nova igra</span></button>
+            <button onClick={() => { setShowInstructions(true); setMenuOpen(false); }} className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"><span className="text-2xl">📖</span><span>Navodila</span></button>
           </DropdownMenuContent>
         </DropdownMenu>
-
-        <MemoryExitConfirmationDialog 
-          open={showExitDialog} 
-          onOpenChange={setShowExitDialog} 
-          onConfirm={() => navigate("/govorne-igre/sestavljanke")}
-        >
-          <div />
-        </MemoryExitConfirmationDialog>
-
+        <MemoryExitConfirmationDialog open={showExitDialog} onOpenChange={setShowExitDialog} onConfirm={() => navigate("/govorne-igre/sestavljanke")}><div /></MemoryExitConfirmationDialog>
         <div className="w-full flex justify-center items-center p-4">
-          <SimpleJigsaw 
-            key={puzzleKey}
-            imageUrl={imageUrl}
-            gridCols={6}
-            gridRows={5}
-            onComplete={handleComplete}
-          />
+          <SimpleJigsaw key={puzzleKey} imageUrl={imageUrl} gridCols={6} gridRows={5} onComplete={handleComplete} />
         </div>
         <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
         {showNewGameButton && (<Button size="icon" onClick={handleNewGame} className="fixed bottom-4 left-24 z-50 bg-blue-500 hover:bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg"><RefreshCw className="w-6 h-6" /></Button>)}
