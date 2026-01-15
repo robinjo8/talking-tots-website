@@ -239,8 +239,8 @@ serve(async (req) => {
         const safeWord = sanitizeForStorage(targetWord);
         // Construct session folder from sessionNumber parameter
         const sessionFolder = `Seja-${sessionNumber || 1}`;
-        // New unified storage structure with sessions: uporabniski-profili/{user_id}/{child_id}/Dokumenti/Preverjanje-izgovorjave/Seja-X/
-        storagePath = `${userId}/${childId}/Dokumenti/Preverjanje-izgovorjave/${sessionFolder}/${safeLetter}-${wordIndex}-${safeWord}-${timestamp}.webm`;
+        // Storage structure: uporabniski-profili/{user_id}/{child_id}/Preverjanje-izgovorjave/Seja-X/
+        storagePath = `${userId}/${childId}/Preverjanje-izgovorjave/${sessionFolder}/${safeLetter}-${wordIndex}-${safeWord}-${timestamp}.webm`;
 
         console.log(`Attempting to save recording to: ${storagePath}`);
 
