@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Home } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import ArticulationProgressGrid from "@/components/articulation/ArticulationProgressGrid";
@@ -28,6 +28,7 @@ const positiveFeedbackMessages = [
 
 const ArtikuacijskiTest = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user, selectedChild } = useAuth();
   const [showInfoDialog, setShowInfoDialog] = useState(true);
   const [showInstructionsDialog, setShowInstructionsDialog] = useState(false);
@@ -37,6 +38,10 @@ const ArtikuacijskiTest = () => {
 
   const childId = selectedChild?.id;
   const userId = user?.id;
+  
+  // Read session number from URL parameter (for testing)
+  const sejaParam = searchParams.get('seja');
+  const fixedSessionNumber = sejaParam ? parseInt(sejaParam, 10) : undefined;
 
   const {
     imageUrl,
@@ -57,7 +62,7 @@ const ArtikuacijskiTest = () => {
     handleNext,
     resetTest,
     initializeSession,
-  } = useArticulationTestNew(childId, userId);
+  } = useArticulationTestNew(childId, userId, fixedSessionNumber);
 
   // Fetch background image
   useEffect(() => {

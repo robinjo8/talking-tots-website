@@ -6,15 +6,15 @@ import { useTranscription } from "./useTranscription";
 // Position labels in Slovenian
 const positionLabels = ["začetek", "sredina", "konec"];
 
-export const useArticulationTestNew = (childId?: string, userId?: string) => {
-  // TEMPORARY: Start at last letter (Ž) for testing - index 57 = first word of Ž
-  const [currentWordIndex, setCurrentWordIndex] = useState(57);
+export const useArticulationTestNew = (childId?: string, userId?: string, fixedSessionNumber?: number) => {
+  // Start from the first word (index 0)
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasRecorded, setHasRecorded] = useState(false);
   const [isTestComplete, setIsTestComplete] = useState(false);
-  const [sessionNumber, setSessionNumber] = useState<number | null>(null);
-  const [sessionInitialized, setSessionInitialized] = useState(false);
+  const [sessionNumber, setSessionNumber] = useState<number | null>(fixedSessionNumber ?? null);
+  const [sessionInitialized, setSessionInitialized] = useState(fixedSessionNumber ? true : false);
   const [transcriptionResult, setTranscriptionResult] = useState<{
     accepted: boolean;
     transcribedText: string;
@@ -112,12 +112,20 @@ export const useArticulationTestNew = (childId?: string, userId?: string) => {
 
   // Initialize session - determine which Seja-X folder to use
   const initializeSession = useCallback(async () => {
+    // If fixed session is provided, use it directly
+    if (fixedSessionNumber) {
+      setSessionNumber(fixedSessionNumber);
+      setSessionInitialized(true);
+      return;
+    }
+    
     if (!childId || !userId || sessionInitialized) return;
     
     console.log("Initializing session for child:", childId, "user:", userId);
     
     try {
-      const basePath = `${userId}/${childId}/Dokumenti/Preverjanje-izgovorjave`;
+      // Correct path without /Dokumenti/
+      const basePath = `${userId}/${childId}/Preverjanje-izgovorjave`;
       
       // List existing session folders
       const { data: folders, error } = await supabase.storage
@@ -146,7 +154,7 @@ export const useArticulationTestNew = (childId?: string, userId?: string) => {
       setSessionNumber(1);
       setSessionInitialized(true);
     }
-  }, [childId, userId, sessionInitialized]);
+  }, [childId, userId, sessionInitialized, fixedSessionNumber]);
 
   // Handle recording complete - receives audio base64 from microphone
   const handleRecordingComplete = async (audioBase64: string) => {
