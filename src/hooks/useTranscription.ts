@@ -18,7 +18,10 @@ export const useTranscription = () => {
     audioBase64: string,
     targetWord: string,
     acceptedVariants: string[] = [],
-    childId?: string
+    childId?: string,
+    sessionNumber?: number,
+    wordIndex?: number,
+    letter?: string
   ): Promise<TranscriptionResult | null> => {
     setIsTranscribing(true);
     setError(null);
@@ -37,7 +40,10 @@ export const useTranscription = () => {
             targetWord,
             acceptedVariants,
             childId,
-            userId, // Changed from userEmail to userId
+            userId,
+            sessionNumber,
+            wordIndex,
+            letter,
           },
         }
       );

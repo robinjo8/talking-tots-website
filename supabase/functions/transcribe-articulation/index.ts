@@ -133,12 +133,13 @@ serve(async (req) => {
       targetWord, 
       acceptedVariants = [],
       childId,
-      userId, // Changed from userEmail to userId
+      userId,
+      sessionNumber,
       wordIndex,
       letter
     } = await req.json();
 
-    console.log(`Transcription request for word: ${targetWord}, letter: ${letter}, index: ${wordIndex}`);
+    console.log(`Transcription request for word: ${targetWord}, letter: ${letter}, index: ${wordIndex}, session: ${sessionNumber}`);
 
     if (!audio) {
       throw new Error('No audio data provided');
@@ -216,8 +217,12 @@ serve(async (req) => {
         const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        // New unified storage structure: uporabniski-profili/{user_id}/{child_id}/Preverjanje-izgovorjave/
-        storagePath = `${userId}/${childId}/Preverjanje-izgovorjave/${letter}-${wordIndex}-${targetWord}-${timestamp}.webm`;
+        // Determine session folder (default to Seja-1 if not provided)
+        const sessionFolder = sessionNumber ? `Seja-${sessionNumber}` : 'Seja-1';
+        // New unified storage structure with sessions: uporabniski-profili/{user_id}/{child_id}/Dokumenti/Preverjanje-izgovorjave/Seja-X/
+        storagePath = `${userId}/${childId}/Dokumenti/Preverjanje-izgovorjave/${sessionFolder}/${letter}-${wordIndex}-${targetWord}-${timestamp}.webm`;
+
+        console.log(`Attempting to save recording to: ${storagePath}`);
 
         const { error: uploadError } = await supabase.storage
           .from('uporabniski-profili')

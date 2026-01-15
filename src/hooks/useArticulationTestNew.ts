@@ -6,13 +6,15 @@ import { useTranscription } from "./useTranscription";
 // Position labels in Slovenian
 const positionLabels = ["začetek", "sredina", "konec"];
 
-export const useArticulationTestNew = (childId?: string) => {
+export const useArticulationTestNew = (childId?: string, userId?: string) => {
   // TEMPORARY: Start at last letter (Ž) for testing - index 57 = first word of Ž
   const [currentWordIndex, setCurrentWordIndex] = useState(57);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasRecorded, setHasRecorded] = useState(false);
   const [isTestComplete, setIsTestComplete] = useState(false);
+  const [sessionNumber, setSessionNumber] = useState<number | null>(null);
+  const [sessionInitialized, setSessionInitialized] = useState(false);
   const [transcriptionResult, setTranscriptionResult] = useState<{
     accepted: boolean;
     transcribedText: string;
@@ -108,6 +110,44 @@ export const useArticulationTestNew = (childId?: string) => {
     return currentData?.word.text ?? "";
   };
 
+  // Initialize session - determine which Seja-X folder to use
+  const initializeSession = useCallback(async () => {
+    if (!childId || !userId || sessionInitialized) return;
+    
+    console.log("Initializing session for child:", childId, "user:", userId);
+    
+    try {
+      const basePath = `${userId}/${childId}/Dokumenti/Preverjanje-izgovorjave`;
+      
+      // List existing session folders
+      const { data: folders, error } = await supabase.storage
+        .from('uporabniski-profili')
+        .list(basePath);
+      
+      if (error) {
+        console.log("No existing sessions folder, starting with Seja-1:", error.message);
+        setSessionNumber(1);
+        setSessionInitialized(true);
+        return;
+      }
+      
+      // Count existing Seja-X folders
+      const existingSessions = folders?.filter(f => f.name.startsWith('Seja-')) || [];
+      console.log("Existing sessions:", existingSessions.map(s => s.name));
+      
+      // Determine next session number (1-5, cyclical)
+      const nextSession = (existingSessions.length % 5) + 1;
+      console.log("Next session number:", nextSession);
+      
+      setSessionNumber(nextSession);
+      setSessionInitialized(true);
+    } catch (err) {
+      console.error("Error initializing session:", err);
+      setSessionNumber(1);
+      setSessionInitialized(true);
+    }
+  }, [childId, userId, sessionInitialized]);
+
   // Handle recording complete - receives audio base64 from microphone
   const handleRecordingComplete = async (audioBase64: string) => {
     console.log("Recording complete, audio length:", audioBase64.length);
@@ -119,7 +159,10 @@ export const useArticulationTestNew = (childId?: string) => {
       audioBase64,
       word.text,
       word.acceptedVariants || [],
-      childId
+      childId,
+      sessionNumber ?? 1,
+      currentWordIndex,
+      currentLetter
     );
 
     if (result) {
@@ -152,6 +195,8 @@ export const useArticulationTestNew = (childId?: string) => {
     setHasRecorded(false);
     setIsTestComplete(false);
     setTranscriptionResult(null);
+    setSessionNumber(null);
+    setSessionInitialized(false);
     resetTranscription();
   };
 
@@ -163,6 +208,7 @@ export const useArticulationTestNew = (childId?: string) => {
     isTestComplete,
     isTranscribing,
     transcriptionResult,
+    sessionNumber,
 
     // Current position info
     currentLetter,
@@ -180,5 +226,6 @@ export const useArticulationTestNew = (childId?: string) => {
     handleRecordingComplete,
     handleNext,
     resetTest,
+    initializeSession,
   };
 };
