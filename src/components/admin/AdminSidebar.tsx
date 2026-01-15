@@ -27,8 +27,8 @@ const navigation = [
 ];
 
 const secondaryNavigation = [
-  { name: 'Poročila', href: '/admin/reports', icon: FileText },
   { name: 'Uporabniki', href: '/admin/users', icon: Users },
+  { name: 'Poročila', href: '/admin/reports', icon: FileText },
   { name: 'Sporočila', href: '/admin/messages', icon: MessageSquare },
 ];
 
