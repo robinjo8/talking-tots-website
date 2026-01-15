@@ -22,7 +22,8 @@ export function ArticulationTestProfileSection() {
   };
 
   const handleStartSession = (sessionNumber: number) => {
-    navigate(`/artikulacijski-test?seja=${sessionNumber}`);
+    // Start at Ž (index 57) for testing - only 3 words
+    navigate(`/artikulacijski-test?seja=${sessionNumber}&start=57`);
   };
 
   if (isLoading) {

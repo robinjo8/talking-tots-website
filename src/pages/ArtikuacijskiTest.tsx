@@ -39,9 +39,11 @@ const ArtikuacijskiTest = () => {
   const childId = selectedChild?.id;
   const userId = user?.id;
   
-  // Read session number from URL parameter (for testing)
+  // Read session number and start index from URL parameters (for testing)
   const sejaParam = searchParams.get('seja');
+  const startParam = searchParams.get('start');
   const fixedSessionNumber = sejaParam ? parseInt(sejaParam, 10) : undefined;
+  const startIndex = startParam ? parseInt(startParam, 10) : 0;
 
   const {
     imageUrl,
@@ -62,7 +64,7 @@ const ArtikuacijskiTest = () => {
     handleNext,
     resetTest,
     initializeSession,
-  } = useArticulationTestNew(childId, userId, fixedSessionNumber);
+  } = useArticulationTestNew(childId, userId, fixedSessionNumber, startIndex);
 
   // Fetch background image
   useEffect(() => {
