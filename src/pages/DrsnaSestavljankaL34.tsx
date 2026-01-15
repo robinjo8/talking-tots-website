@@ -46,7 +46,12 @@ function DrsnaSestavljankaL34Content() {
     const isSmallScreen = Math.min(window.screen.width, window.screen.height) <= 900;
     return hasTouch && isSmallScreen;
   });
-  const [isPortrait, setIsPortrait] = useState(false);
+  const [isPortrait, setIsPortrait] = useState(() => {
+    if (typeof window !== 'undefined' && window.screen?.orientation) {
+      return window.screen.orientation.type.includes('portrait');
+    }
+    return typeof window !== 'undefined' ? window.innerHeight > window.innerWidth : false;
+  });
 
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
