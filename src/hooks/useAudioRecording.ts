@@ -54,13 +54,30 @@ export const useAudioRecording = (
         },
       });
 
-      // Set up audio analysis for silence detection
+      // Set up audio analysis with noise reduction filters
       const audioContext = new AudioContext();
       audioContextRef.current = audioContext;
       const source = audioContext.createMediaStreamSource(stream);
+      
+      // Highpass filter - remove frequencies below 80Hz (fan noise, rumble)
+      const highpassFilter = audioContext.createBiquadFilter();
+      highpassFilter.type = 'highpass';
+      highpassFilter.frequency.value = 80;
+      highpassFilter.Q.value = 0.7;
+      
+      // Lowpass filter - remove frequencies above 8000Hz (high-pitched noise)
+      const lowpassFilter = audioContext.createBiquadFilter();
+      lowpassFilter.type = 'lowpass';
+      lowpassFilter.frequency.value = 8000;
+      lowpassFilter.Q.value = 0.7;
+      
       const analyser = audioContext.createAnalyser();
       analyser.fftSize = 2048;
-      source.connect(analyser);
+      
+      // Chain: source -> highpass -> lowpass -> analyser
+      source.connect(highpassFilter);
+      highpassFilter.connect(lowpassFilter);
+      lowpassFilter.connect(analyser);
       analyserRef.current = analyser;
 
       // Start RMS sampling
