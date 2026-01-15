@@ -1114,6 +1114,13 @@ export type Database = {
           stars_total: number
         }[]
       }
+      get_parent_emails: {
+        Args: { parent_ids: string[] }
+        Returns: {
+          email: string
+          user_id: string
+        }[]
+      }
       grant_admin_role: {
         Args: {
           p_expires_at?: string
