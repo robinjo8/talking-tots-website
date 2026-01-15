@@ -6,9 +6,9 @@ import { useTranscription } from "./useTranscription";
 // Position labels in Slovenian
 const positionLabels = ["začetek", "sredina", "konec"];
 
-export const useArticulationTestNew = (childId?: string, userId?: string, fixedSessionNumber?: number) => {
-  // Start from the first word (index 0)
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+export const useArticulationTestNew = (childId?: string, userId?: string, fixedSessionNumber?: number, startIndex: number = 0) => {
+  // Start from startIndex (default 0, or 57 for testing with Ž only)
+  const [currentWordIndex, setCurrentWordIndex] = useState(startIndex);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasRecorded, setHasRecorded] = useState(false);
