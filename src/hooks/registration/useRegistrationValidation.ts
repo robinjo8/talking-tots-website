@@ -5,7 +5,8 @@ export function useRegistrationValidation() {
   const [error, setError] = useState<string | null>(null);
 
   const validateAccountInfo = async (
-    username: string, 
+    firstName: string,
+    lastName: string, 
     email: string, 
     password: string, 
     confirmPassword: string, 
@@ -13,13 +14,18 @@ export function useRegistrationValidation() {
     childBirthDate: Date | null,
     validateEmailSafely?: (email: string) => Promise<{ isValid: boolean; message?: string }>
   ): Promise<boolean> => {
-    if (!username || !email || !password || !confirmPassword) {
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
       setError("Prosimo, izpolnite vsa obvezna polja.");
       return false;
     }
     
-    if (username.length < 3) {
-      setError("Uporabniško ime mora vsebovati vsaj 3 znake.");
+    if (firstName.length < 2) {
+      setError("Ime mora vsebovati vsaj 2 znaka.");
+      return false;
+    }
+    
+    if (lastName.length < 2) {
+      setError("Priimek mora vsebovati vsaj 2 znaka.");
       return false;
     }
     
