@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { 
   ArrowLeft, 
   FileText, 
@@ -32,18 +31,39 @@ import {
 } from "@/components/ui/accordion";
 import { DocumentPreview } from '@/components/admin/DocumentPreview';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ReportTemplateEditor, generateReportText, ReportData } from '@/components/admin/ReportTemplateEditor';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { format } from 'date-fns';
+import { sl } from 'date-fns/locale';
 
 export default function AdminUserDetail() {
   const { parentId, childId } = useParams<{ parentId: string; childId: string }>();
   const navigate = useNavigate();
+  const { profile: logopedistProfile } = useAdminAuth();
   
-  const [childData, setChildData] = useState<{ name: string; age: number } | null>(null);
+  const [childData, setChildData] = useState<{ name: string; age: number; gender: string | null } | null>(null);
   const [parentData, setParentData] = useState<{ name: string; email: string } | null>(null);
-  const [reportText, setReportText] = useState('');
+  const [testDate, setTestDate] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [expandedDocId, setExpandedDocId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Report template state
+  const [reportData, setReportData] = useState<ReportData>({
+    parentName: '',
+    parentEmail: '',
+    childName: '',
+    childAge: null,
+    childGender: null,
+    testDate: null,
+    reportDate: format(new Date(), 'd. M. yyyy', { locale: sl }),
+    logopedistName: '',
+    anamneza: '',
+    ugotovitve: '',
+    predlogVaj: '',
+    opombe: '',
+  });
 
   const { 
     documents, 
@@ -64,10 +84,10 @@ export default function AdminUserDetail() {
     async function fetchUserData() {
       if (!childId || !parentId) return;
 
-      // Fetch child data
+      // Fetch child data with gender
       const { data: child, error: childError } = await supabase
         .from('children')
-        .select('name, age')
+        .select('name, age, gender')
         .eq('id', childId)
         .single();
 
@@ -84,18 +104,70 @@ export default function AdminUserDetail() {
         .eq('id', parentId)
         .single();
 
+      // Fetch parent email using RPC function
+      const { data: emailData, error: emailError } = await supabase
+        .rpc('get_parent_emails', { parent_ids: [parentId] });
+
+      let parentEmail = '';
+      if (!emailError && emailData && emailData.length > 0) {
+        parentEmail = emailData[0].email || '';
+      }
+
       if (profileError) {
         console.error('Error fetching profile:', profileError);
       } else {
         setParentData({
           name: [profile.first_name, profile.last_name].filter(Boolean).join(' ') || 'Neznano',
-          email: '',
+          email: parentEmail,
         });
+      }
+
+      // Fetch last articulation test date
+      const { data: testSession, error: testError } = await supabase
+        .from('articulation_test_sessions')
+        .select('submitted_at, completed_at, created_at')
+        .eq('child_id', childId)
+        .order('submitted_at', { ascending: false, nullsFirst: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!testError && testSession) {
+        const dateToUse = testSession.submitted_at || testSession.completed_at || testSession.created_at;
+        if (dateToUse) {
+          setTestDate(format(new Date(dateToUse), 'd. M. yyyy', { locale: sl }));
+        }
       }
     }
 
     fetchUserData();
   }, [childId, parentId]);
+
+  // Update reportData when fetched data changes
+  useEffect(() => {
+    const logopedistName = logopedistProfile 
+      ? [logopedistProfile.first_name, logopedistProfile.last_name].filter(Boolean).join(' ')
+      : '';
+
+    setReportData(prev => ({
+      ...prev,
+      parentName: parentData?.name || '',
+      parentEmail: parentData?.email || '',
+      childName: childData?.name || '',
+      childAge: childData?.age || null,
+      childGender: childData?.gender || null,
+      testDate: testDate,
+      logopedistName: logopedistName,
+    }));
+  }, [childData, parentData, testDate, logopedistProfile]);
+
+  const handleReportFieldChange = (field: 'anamneza' | 'ugotovitve' | 'predlogVaj' | 'opombe', value: string) => {
+    setReportData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const hasReportContent = () => {
+    return reportData.anamneza.trim() || reportData.ugotovitve.trim() || 
+           reportData.predlogVaj.trim() || reportData.opombe.trim();
+  };
 
   const handleViewDocument = async (file: StorageFile) => {
     const url = await getFileUrl(file.path);
@@ -121,8 +193,8 @@ export default function AdminUserDetail() {
   };
 
   const handleSaveReport = async () => {
-    if (!reportText.trim()) {
-      toast.error('Vnesite besedilo poročila');
+    if (!hasReportContent()) {
+      toast.error('Vnesite vsebino poročila');
       return;
     }
 
@@ -132,7 +204,8 @@ export default function AdminUserDetail() {
       const fileName = `porocilo-${timestamp}.txt`;
       const filePath = `${parentId}/${childId}/Porocila/${fileName}`;
 
-      const blob = new Blob([reportText], { type: 'text/plain' });
+      const fullReportText = generateReportText(reportData);
+      const blob = new Blob([fullReportText], { type: 'text/plain' });
       const { error: uploadError } = await supabase.storage
         .from('uporabniski-profili')
         .upload(filePath, blob, { upsert: true });
@@ -142,7 +215,14 @@ export default function AdminUserDetail() {
       }
 
       toast.success('Poročilo shranjeno');
-      setReportText('');
+      // Clear only editable fields
+      setReportData(prev => ({
+        ...prev,
+        anamneza: '',
+        ugotovitve: '',
+        predlogVaj: '',
+        opombe: '',
+      }));
       await refetchReports();
     } catch (err) {
       console.error('Error saving report:', err);
@@ -193,7 +273,21 @@ export default function AdminUserDetail() {
     try {
       const response = await fetch(url);
       const text = await response.text();
-      setReportText(text);
+      
+      // Parse the saved report and extract editable fields
+      const anamenzaMatch = text.match(/ANAMNEZA:\s*([\s\S]*?)(?=═{5,}|UGOTOVITVE:|$)/);
+      const ugotovitveMatch = text.match(/UGOTOVITVE:\s*([\s\S]*?)(?=═{5,}|PREDLOG ZA VAJE:|$)/);
+      const predlogMatch = text.match(/PREDLOG ZA VAJE:\s*([\s\S]*?)(?=═{5,}|OPOMBE:|$)/);
+      const opombeMatch = text.match(/OPOMBE:\s*([\s\S]*?)(?=═{5,}|Poročilo izdelal|$)/);
+
+      setReportData(prev => ({
+        ...prev,
+        anamneza: anamenzaMatch?.[1]?.trim().replace('(ni vnosa)', '') || '',
+        ugotovitve: ugotovitveMatch?.[1]?.trim().replace('(ni vnosa)', '') || '',
+        predlogVaj: predlogMatch?.[1]?.trim().replace('(ni vnosa)', '') || '',
+        opombe: opombeMatch?.[1]?.trim().replace('(ni vnosa)', '') || '',
+      }));
+      
       toast.success('Poročilo naloženo za urejanje');
     } catch (err) {
       console.error('Error loading report:', err);
@@ -403,19 +497,17 @@ export default function AdminUserDetail() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col space-y-4">
-                  {/* Text area for writing report - grows to fill space */}
-                  <Textarea
-                    placeholder="Vnesite poročilo..."
-                    value={reportText}
-                    onChange={(e) => setReportText(e.target.value)}
-                    className="resize-none flex-1 min-h-[200px]"
+                  {/* Structured report template editor */}
+                  <ReportTemplateEditor
+                    data={reportData}
+                    onFieldChange={handleReportFieldChange}
                   />
                   
                   {/* Action buttons */}
                   <div className="flex flex-wrap gap-2">
                     <Button 
                       onClick={handleSaveReport}
-                      disabled={isSaving || !reportText.trim()}
+                      disabled={isSaving || !hasReportContent()}
                     >
                       {isSaving ? (
                         <Loader2 className="h-4 w-4 mr-1 animate-spin" />
