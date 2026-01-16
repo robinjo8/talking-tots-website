@@ -21,6 +21,7 @@ export type ChildProfile = {
 export type Profile = {
   username: string | null;
   children?: ChildProfile[];
+  isLogopedist?: boolean;
 };
 
 type AuthContextType = {
@@ -46,6 +47,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const fetchUserProfile = async (userId: string) => {
     try {
       console.log("Fetching profile for user:", userId);
+      
+      // Check if user is a logopedist - skip parent profile fetch for logopedists
+      const { data: logopedistProfile } = await supabase
+        .from('logopedist_profiles')
+        .select('id')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (logopedistProfile) {
+        console.log('User is logopedist, skipping parent profile fetch');
+        setProfile({
+          username: null,
+          children: [],
+          isLogopedist: true
+        });
+        return;
+      }
       
       // First, try to fetch children from the database
       const { data: dbChildren, error: childrenError } = await supabase

@@ -5,6 +5,7 @@ import { Building2 } from "lucide-react";
 import { UserProfile } from "@/components/auth/UserProfile";
 import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
 import { SubscriptionRequiredModal } from "@/components/subscription/SubscriptionRequiredModal";
+import { useAuth } from "@/contexts/AuthContext";
 
 
 interface DesktopNavigationProps {
@@ -16,8 +17,36 @@ interface DesktopNavigationProps {
 export function DesktopNavigation({ user, onStartNow, onCenikNavigate }: DesktopNavigationProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { profile } = useAuth();
   const { isSubscribed, isLoading } = useSubscriptionContext();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+
+  // If user is a logopedist, show simplified navigation with admin portal link
+  if (user && profile?.isLogopedist) {
+    return (
+      <div className="hidden lg:flex items-center justify-between w-full">
+        {/* Left side - Logo */}
+        <Link 
+          to="/" 
+          className="flex items-center"
+        >
+          <div className="flex items-center">
+            <span className="text-2xl font-extrabold text-dragon-green uppercase">Tomi</span>
+            <span className="text-2xl font-extrabold text-app-orange uppercase">Talk</span>
+          </div>
+        </Link>
+        
+        {/* Right side - Admin portal button */}
+        <Button
+          onClick={() => navigate('/admin')}
+          className="rounded-full h-10 text-sm px-4 font-semibold uppercase bg-app-blue hover:bg-app-blue/90 text-white"
+        >
+          <Building2 className="h-4 w-4 mr-1" />
+          Admin portal
+        </Button>
+      </div>
+    );
+  }
 
   const handleNavigate = (path: string) => {
     navigate(path);
