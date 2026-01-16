@@ -17,7 +17,9 @@ import {
   ChevronDown,
   ChevronUp,
   Play,
-  File
+  File,
+  Pencil,
+  Sparkles
 } from 'lucide-react';
 import { useUserStorageFiles, StorageFile, SessionRecordings } from '@/hooks/useUserStorageFiles';
 import { supabase } from '@/integrations/supabase/client';
@@ -236,93 +238,143 @@ export default function AdminUserDetail() {
           <div className="text-center py-12 text-destructive">{error}</div>
         ) : (
           <>
-            {/* Top row: Documents and Reports */}
+            {/* Two column layout: Left (Dokumenti + Preverjanje) | Right (Poročila stretched) */}
             <div className="grid gap-6 lg:grid-cols-2">
-              {/* Documents Section */}
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-primary" />
-                    <CardTitle>Dokumenti</CardTitle>
-                  </div>
-                  <CardDescription>
-                    Naloženi dokumenti starša
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {documents.length === 0 ? (
-                    <p className="text-sm text-muted-foreground italic py-4">
-                      Ni naloženih dokumentov
-                    </p>
-                  ) : (
-                    <div className="space-y-2">
-                      {documents.map((doc, index) => {
-                        const isExpanded = expandedDocId === doc.path;
-                        return (
-                          <div 
-                            key={index}
-                            className="border rounded-lg overflow-hidden"
-                          >
-                            <div 
-                              className="flex items-center justify-between p-3 bg-muted/30 hover:bg-muted/50 transition-colors"
-                            >
-                              <div className="flex items-center gap-3 min-w-0">
-                                {getFileIcon(doc.name)}
-                                <span className="text-sm font-medium truncate">{doc.name}</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm"
-                                  onClick={() => toggleDocumentPreview(doc.path)}
-                                  title={isExpanded ? "Zapri predogled" : "Odpri predogled"}
-                                >
-                                  {isExpanded ? (
-                                    <ChevronUp className="h-4 w-4" />
-                                  ) : (
-                                    <Eye className="h-4 w-4" />
-                                  )}
-                                </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm"
-                                  onClick={() => handleDownloadDocument(doc)}
-                                  title="Prenesi"
-                                >
-                                  <Download className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </div>
-                            
-                            <AnimatePresence>
-                              {isExpanded && (
-                                <motion.div
-                                  initial={{ height: 0, opacity: 0 }}
-                                  animate={{ height: 'auto', opacity: 1 }}
-                                  exit={{ height: 0, opacity: 0 }}
-                                  transition={{ duration: 0.2 }}
-                                  className="overflow-hidden"
-                                >
-                                  <div className="p-4 border-t bg-background">
-                                    <DocumentPreview 
-                                      fileName={doc.name}
-                                      getSignedUrl={() => getFileUrl(doc.path)}
-                                      onDownload={() => handleDownloadDocument(doc)}
-                                    />
-                                  </div>
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-                          </div>
-                        );
-                      })}
+              {/* Left Column: Dokumenti + Preverjanje izgovorjave */}
+              <div className="space-y-6">
+                {/* Documents Section */}
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-5 w-5 text-primary" />
+                      <CardTitle>Dokumenti</CardTitle>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
+                    <CardDescription>
+                      Naloženi dokumenti starša
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {documents.length === 0 ? (
+                      <p className="text-sm text-muted-foreground italic py-4">
+                        Ni naloženih dokumentov
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {documents.map((doc, index) => {
+                          const isExpanded = expandedDocId === doc.path;
+                          return (
+                            <div 
+                              key={index}
+                              className="border rounded-lg overflow-hidden"
+                            >
+                              <div 
+                                className="flex items-center justify-between p-3 bg-muted/30 hover:bg-muted/50 transition-colors"
+                              >
+                                <div className="flex items-center gap-3 min-w-0">
+                                  {getFileIcon(doc.name)}
+                                  <span className="text-sm font-medium truncate">{doc.name}</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm"
+                                    onClick={() => toggleDocumentPreview(doc.path)}
+                                    title={isExpanded ? "Zapri predogled" : "Odpri predogled"}
+                                  >
+                                    {isExpanded ? (
+                                      <ChevronUp className="h-4 w-4" />
+                                    ) : (
+                                      <Eye className="h-4 w-4" />
+                                    )}
+                                  </Button>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm"
+                                    onClick={() => handleDownloadDocument(doc)}
+                                    title="Prenesi"
+                                  >
+                                    <Download className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                              
+                              <AnimatePresence>
+                                {isExpanded && (
+                                  <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="overflow-hidden"
+                                  >
+                                    <div className="p-4 border-t bg-background">
+                                      <DocumentPreview 
+                                        fileName={doc.name}
+                                        getSignedUrl={() => getFileUrl(doc.path)}
+                                        onDownload={() => handleDownloadDocument(doc)}
+                                      />
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
 
-              {/* Reports Section */}
-              <Card>
+                {/* Speech Recordings Section */}
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center gap-2">
+                      <Mic className="h-5 w-5 text-primary" />
+                      <CardTitle>Preverjanje izgovorjave</CardTitle>
+                    </div>
+                    <CardDescription>
+                      Posnetki artikulacijskega testa po sejah
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {recordings.length === 0 ? (
+                      <p className="text-sm text-muted-foreground italic py-4">
+                        Ni posnetkov preverjanja izgovorjave
+                      </p>
+                    ) : (
+                      <Accordion type="single" collapsible className="w-full">
+                        {recordings.map((session, sessionIndex) => (
+                          <AccordionItem key={sessionIndex} value={session.sessionName}>
+                            <AccordionTrigger className="hover:no-underline">
+                              <div className="flex items-center gap-2">
+                                <Play className="h-4 w-4 text-muted-foreground" />
+                                <span>{session.sessionName}</span>
+                                <span className="text-sm text-muted-foreground">
+                                  ({session.recordings.length} posnetkov)
+                                </span>
+                              </div>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              <div className="space-y-3 pt-2">
+                                {session.recordings.map((recording, recIndex) => (
+                                  <AudioPlayer 
+                                    key={recIndex}
+                                    recording={recording}
+                                    getFileUrl={getFileUrl}
+                                  />
+                                ))}
+                              </div>
+                            </AccordionContent>
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Right Column: Reports Section - stretched full height */}
+              <Card className="lg:row-span-2 flex flex-col">
                 <CardHeader>
                   <div className="flex items-center gap-2">
                     <ClipboardList className="h-5 w-5 text-primary" />
@@ -332,18 +384,17 @@ export default function AdminUserDetail() {
                     Poročila logopeda za tega uporabnika
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Text area for writing report */}
+                <CardContent className="flex-1 flex flex-col space-y-4">
+                  {/* Text area for writing report - grows to fill space */}
                   <Textarea
                     placeholder="Vnesite poročilo..."
                     value={reportText}
                     onChange={(e) => setReportText(e.target.value)}
-                    rows={4}
-                    className="resize-none"
+                    className="resize-none flex-1 min-h-[200px]"
                   />
                   
                   {/* Action buttons */}
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <Button 
                       onClick={handleSaveReport}
                       disabled={isSaving || !reportText.trim()}
@@ -366,6 +417,20 @@ export default function AdminUserDetail() {
                         <Upload className="h-4 w-4 mr-1" />
                       )}
                       Naloži dokument
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      onClick={() => toast.info('Funkcija Popravi bo dodana')}
+                    >
+                      <Pencil className="h-4 w-4 mr-1" />
+                      Popravi
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      onClick={() => toast.info('Funkcija Generiraj bo dodana')}
+                    >
+                      <Sparkles className="h-4 w-4 mr-1" />
+                      Generiraj
                     </Button>
                     <input
                       ref={fileInputRef}
@@ -416,53 +481,6 @@ export default function AdminUserDetail() {
                 </CardContent>
               </Card>
             </div>
-
-            {/* Speech Recordings Section - Full width */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Mic className="h-5 w-5 text-primary" />
-                  <CardTitle>Preverjanje izgovorjave</CardTitle>
-                </div>
-                <CardDescription>
-                  Posnetki artikulacijskega testa po sejah
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {recordings.length === 0 ? (
-                  <p className="text-sm text-muted-foreground italic py-4">
-                    Ni posnetkov preverjanja izgovorjave
-                  </p>
-                ) : (
-                  <Accordion type="single" collapsible className="w-full">
-                    {recordings.map((session, sessionIndex) => (
-                      <AccordionItem key={sessionIndex} value={session.sessionName}>
-                        <AccordionTrigger className="hover:no-underline">
-                          <div className="flex items-center gap-2">
-                            <Play className="h-4 w-4 text-muted-foreground" />
-                            <span>{session.sessionName}</span>
-                            <span className="text-sm text-muted-foreground">
-                              ({session.recordings.length} posnetkov)
-                            </span>
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          <div className="space-y-3 pt-2">
-                            {session.recordings.map((recording, recIndex) => (
-                              <AudioPlayer 
-                                key={recIndex}
-                                recording={recording}
-                                getFileUrl={getFileUrl}
-                              />
-                            ))}
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
-                )}
-              </CardContent>
-            </Card>
           </>
         )}
       </div>
