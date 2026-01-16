@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { useAdminUsers, ParentWithChildren, ChildData } from '@/hooks/useAdminUsers';
 import { Input } from '@/components/ui/input';
@@ -12,7 +13,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search, Users, Baby, Eye, FolderOpen, Loader2, ChevronDown } from 'lucide-react';
+import { Search, Users, Baby, Eye, Loader2, ChevronDown } from 'lucide-react';
 
 interface DisplayRow {
   parent: ParentWithChildren;
@@ -27,13 +28,15 @@ const UserCard = ({
   formatParentName, 
   formatGender,
   isExpanded,
-  onToggle
+  onToggle,
+  onNavigate
 }: { 
   row: DisplayRow; 
   formatParentName: (parent: ParentWithChildren) => string;
   formatGender: (gender: string | null) => string;
   isExpanded: boolean;
   onToggle: () => void;
+  onNavigate: (parentId: string, childId: string) => void;
 }) => {
   const parentName = formatParentName(row.parent);
   const gender = row.child ? formatGender(row.child.gender) : '';
@@ -90,14 +93,14 @@ const UserCard = ({
           
           {/* Actions */}
           <div className="flex items-center gap-2 pt-2 border-t">
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => row.child && onNavigate(row.parent.parent_id, row.child.id)}
+              disabled={!row.child}
+            >
               <Eye className="h-4 w-4 mr-1" /> Ogled
             </Button>
-            {row.child && (
-              <Button variant="outline" size="sm">
-                <FolderOpen className="h-4 w-4 mr-1" /> Dokumenti
-              </Button>
-            )}
           </div>
         </div>
       )}
@@ -106,6 +109,7 @@ const UserCard = ({
 };
 
 export default function AdminUsers() {
+  const navigate = useNavigate();
   const { data: users, isLoading, error } = useAdminUsers();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
@@ -340,14 +344,15 @@ export default function AdminUsers() {
                             </TableCell>
                             <TableCell className="text-right">
                               <div className="flex items-center justify-end gap-2">
-                                <Button variant="ghost" size="sm" title="Ogled podrobnosti">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  title="Ogled podrobnosti"
+                                  onClick={() => row.child && navigate(`/admin/users/${row.parent.parent_id}/${row.child.id}`)}
+                                  disabled={!row.child}
+                                >
                                   <Eye className="h-4 w-4" />
                                 </Button>
-                                {row.child && (
-                                  <Button variant="ghost" size="sm" title="Dokumenti">
-                                    <FolderOpen className="h-4 w-4" />
-                                  </Button>
-                                )}
                               </div>
                             </TableCell>
                           </TableRow>
@@ -377,6 +382,7 @@ export default function AdminUsers() {
                         formatGender={formatGender}
                         isExpanded={expandedCardId === rowKey}
                         onToggle={() => toggleCard(rowKey)}
+                        onNavigate={(parentId, childId) => navigate(`/admin/users/${parentId}/${childId}`)}
                       />
                     );
                   })
