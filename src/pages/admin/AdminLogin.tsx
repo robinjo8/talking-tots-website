@@ -58,7 +58,7 @@ export default function AdminLogin() {
       // SECURITY CHECK: Verify user is actually a logopedist in database
       const { data: logopedistProfile } = await supabase
         .from('logopedist_profiles')
-        .select('id')
+        .select('id, is_verified')
         .eq('user_id', currentUser.id)
         .maybeSingle();
 
@@ -67,6 +67,15 @@ export default function AdminLogin() {
         console.log('AdminLogin: User is not a logopedist, signing out');
         await signOut();
         toast.error('Ta račun ni registriran kot logoped. Za prijavo uporabite glavno stran.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Check if membership is verified
+      if (!logopedistProfile.is_verified) {
+        console.log('AdminLogin: Logopedist membership not verified yet');
+        await signOut();
+        toast.info('Vaše članstvo še ni potrjeno. Ko bo potrjeno, vas bomo obvestili po emailu.');
         setIsLoading(false);
         return;
       }

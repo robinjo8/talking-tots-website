@@ -14,7 +14,8 @@ import {
   MessageSquare,
   Settings,
   Bell,
-  LogOut
+  LogOut,
+  UserCheck
 } from 'lucide-react';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 
@@ -32,7 +33,7 @@ const secondaryNavigation = [
   { name: 'Sporočila', href: '/admin/messages', icon: MessageSquare },
 ];
 
-const settingsNavigation = [
+const baseSettingsNavigation = [
   { name: 'Nastavitve', href: '/admin/settings', icon: Settings },
   { name: 'Obvestila', href: '/admin/notifications', icon: Bell },
 ];
@@ -40,7 +41,13 @@ const settingsNavigation = [
 export function AdminSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { signOut, profile } = useAdminAuth();
+  const { signOut, profile, isSuperAdmin } = useAdminAuth();
+
+  // Dinamično sestavljen meni nastavitev - "Članstva" samo za super admina
+  const settingsNavigation = [
+    ...baseSettingsNavigation,
+    ...(isSuperAdmin ? [{ name: 'Članstva', href: '/admin/memberships', icon: UserCheck }] : []),
+  ];
 
   const handleSignOut = async () => {
     await signOut();
