@@ -1,16 +1,10 @@
 import jsPDF from 'jspdf';
 import { ReportData } from '@/components/admin/ReportTemplateEditor';
+import { SLOVENIAN_CHAR_MAP } from './fonts/robotoBase64';
 
-// Map Slovenian characters to ASCII equivalents for helvetica fallback
-const slovenianToAscii = (text: string): string => {
-  const charMap: Record<string, string> = {
-    'č': 'c', 'Č': 'C',
-    'š': 's', 'Š': 'S', 
-    'ž': 'z', 'Ž': 'Z',
-    'ć': 'c', 'Ć': 'C',
-    'đ': 'd', 'Đ': 'D'
-  };
-  return text.replace(/[čČšŠžŽćĆđĐ]/g, char => charMap[char] || char);
+// Convert Slovenian characters to ASCII for helvetica font compatibility
+const convertToAscii = (text: string): string => {
+  return text.replace(/[čČšŠžŽćĆđĐ]/g, char => SLOVENIAN_CHAR_MAP[char] || char);
 };
 
 export async function generateReportPdf(data: ReportData): Promise<Blob> {
@@ -24,19 +18,19 @@ export async function generateReportPdf(data: ReportData): Promise<Blob> {
     doc.setFont('helvetica', style);
   };
   
-  // Helper to add text with Slovenian character support
+  // Helper to add text - converts Slovenian characters for font compatibility
   const addText = (text: string, x: number, y: number, options?: { align?: 'left' | 'center' | 'right' }) => {
-    doc.text(slovenianToAscii(text), x, y, options);
+    doc.text(convertToAscii(text), x, y, options);
   };
   
-  // Helper to split text with Slovenian character support
+  // Helper to split text
   const splitText = (text: string, maxWidth: number): string[] => {
-    return doc.splitTextToSize(slovenianToAscii(text), maxWidth);
+    return doc.splitTextToSize(convertToAscii(text), maxWidth);
   };
   
-  // Helper to get text width with Slovenian character support
+  // Helper to get text width
   const getTextWidth = (text: string): number => {
-    return doc.getTextWidth(slovenianToAscii(text));
+    return doc.getTextWidth(convertToAscii(text));
   };
   
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -74,12 +68,12 @@ export async function generateReportPdf(data: ReportData): Promise<Blob> {
   setFont('bold');
   doc.setFontSize(18);
   doc.setTextColor(...blackColor);
-  addText('LOGOPEDSKO POROCILO - TOMITALK', pageWidth / 2, yPos, { align: 'center' });
+  addText('LOGOPEDSKO POROČILO - TOMITALK', pageWidth / 2, yPos, { align: 'center' });
   
   yPos += 8;
   
   // Title underline (orange)
-  const titleWidth = getTextWidth('LOGOPEDSKO POROCILO - TOMITALK');
+  const titleWidth = getTextWidth('LOGOPEDSKO POROČILO - TOMITALK');
   doc.setDrawColor(...orangeColor);
   doc.setLineWidth(1);
   doc.line((pageWidth - titleWidth) / 2, yPos, (pageWidth + titleWidth) / 2, yPos);
@@ -143,7 +137,7 @@ export async function generateReportPdf(data: ReportData): Promise<Blob> {
   
   // Parent box
   drawTwoLineInfoBox(
-    'PODATKI O STARSU / SKRBNIKU',
+    'PODATKI O STARŠU / SKRBNIKU',
     'Ime in priimek',
     data.parentName || 'Ni podatka',
     margin,
@@ -200,9 +194,9 @@ export async function generateReportPdf(data: ReportData): Promise<Blob> {
   const leftLabelWidth = getTextWidth('Datum preverjanja izgovorjave: ');
   addText(data.testDate || 'Ni podatka', margin + reviewBoxPadding + leftLabelWidth, reviewContentY);
   
-  // Right: Datum izdelave porocila
+  // Right: Datum izdelave poročila
   doc.setTextColor(...mediumGray);
-  const rightLabel = 'Datum izdelave porocila:';
+  const rightLabel = 'Datum izdelave poročila:';
   const rightLabelWidth = getTextWidth(rightLabel);
   const rightValue = data.reportDate || 'Ni podatka';
   const rightValueWidth = getTextWidth(' ' + rightValue);
@@ -335,14 +329,14 @@ export async function generateReportPdf(data: ReportData): Promise<Blob> {
   setFont('normal');
   doc.setFontSize(9);
   doc.setTextColor(...mediumGray);
-  addText(`Porocilo izdelal/a: ${data.logopedistName || 'Ni podatka'}`, pageWidth - margin, footerTextY, { align: 'right' });
+  addText(`Poročilo izdelal/a: ${data.logopedistName || 'Ni podatka'}`, pageWidth - margin, footerTextY, { align: 'right' });
   
   // Disclaimer
   const disclaimerY = footerTextY + 10;
   setFont('normal');
   doc.setFontSize(8);
   doc.setTextColor(...mediumGray);
-  const disclaimer = 'To porocilo je informativne narave in ne nadomesca strokovnega logopedskega pregleda.';
+  const disclaimer = 'To poročilo je informativne narave in ne nadomešča strokovnega logopedskega pregleda.';
   addText(disclaimer, pageWidth / 2, disclaimerY, { align: 'center' });
   
   return doc.output('blob');
