@@ -18,16 +18,19 @@ interface UseUserStorageFilesResult {
   documents: StorageFile[];
   recordings: SessionRecordings[];
   reports: StorageFile[];
+  generatedReports: StorageFile[];
   isLoading: boolean;
   error: string | null;
   getFileUrl: (path: string) => Promise<string | null>;
   refetchReports: () => Promise<void>;
+  refetchGeneratedReports: () => Promise<void>;
 }
 
 export function useUserStorageFiles(parentId: string, childId: string): UseUserStorageFilesResult {
   const [documents, setDocuments] = useState<StorageFile[]>([]);
   const [recordings, setRecordings] = useState<SessionRecordings[]>([]);
   const [reports, setReports] = useState<StorageFile[]>([]);
+  const [generatedReports, setGeneratedReports] = useState<StorageFile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -135,10 +138,40 @@ export function useUserStorageFiles(parentId: string, childId: string): UseUserS
     }
   }, [basePath]);
 
+  const fetchGeneratedReports = useCallback(async () => {
+    try {
+      const { data, error: listError } = await supabase.storage
+        .from('uporabniski-profili')
+        .list(`${basePath}/Generirana-porocila`);
+
+      if (listError) {
+        console.error('Error fetching generated reports:', listError);
+        return [];
+      }
+
+      return (data || [])
+        .filter(file => file.name !== '.emptyFolderPlaceholder')
+        .map(file => ({
+          name: file.name,
+          path: `${basePath}/Generirana-porocila/${file.name}`,
+          size: file.metadata?.size,
+          createdAt: file.created_at,
+        }));
+    } catch (err) {
+      console.error('Error in fetchGeneratedReports:', err);
+      return [];
+    }
+  }, [basePath]);
+
   const refetchReports = useCallback(async () => {
     const reps = await fetchReports();
     setReports(reps);
   }, [fetchReports]);
+
+  const refetchGeneratedReports = useCallback(async () => {
+    const genReps = await fetchGeneratedReports();
+    setGeneratedReports(genReps);
+  }, [fetchGeneratedReports]);
 
   useEffect(() => {
     async function fetchAllFiles() {
@@ -146,15 +179,17 @@ export function useUserStorageFiles(parentId: string, childId: string): UseUserS
       setError(null);
 
       try {
-        const [docs, recs, reps] = await Promise.all([
+        const [docs, recs, reps, genReps] = await Promise.all([
           fetchDocuments(),
           fetchRecordings(),
           fetchReports(),
+          fetchGeneratedReports(),
         ]);
 
         setDocuments(docs);
         setRecordings(recs);
         setReports(reps);
+        setGeneratedReports(genReps);
       } catch (err) {
         console.error('Error fetching files:', err);
         setError('Napaka pri nalaganju datotek');
@@ -166,7 +201,7 @@ export function useUserStorageFiles(parentId: string, childId: string): UseUserS
     if (parentId && childId) {
       fetchAllFiles();
     }
-  }, [parentId, childId, fetchDocuments, fetchRecordings, fetchReports]);
+  }, [parentId, childId, fetchDocuments, fetchRecordings, fetchReports, fetchGeneratedReports]);
 
   const getFileUrl = useCallback(async (path: string): Promise<string | null> => {
     try {
@@ -190,9 +225,11 @@ export function useUserStorageFiles(parentId: string, childId: string): UseUserS
     documents,
     recordings,
     reports,
+    generatedReports,
     isLoading,
     error,
     getFileUrl,
     refetchReports,
+    refetchGeneratedReports,
   };
 }

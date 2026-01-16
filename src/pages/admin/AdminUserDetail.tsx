@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useBlocker } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,12 +29,23 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { DocumentPreview } from '@/components/admin/DocumentPreview';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ReportTemplateEditor, generateReportText, ReportData } from '@/components/admin/ReportTemplateEditor';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
+import { generateReportPdf } from '@/utils/generateReportPdf';
 
 export default function AdminUserDetail() {
   const { parentId, childId } = useParams<{ parentId: string; childId: string }>();
@@ -46,7 +57,9 @@ export default function AdminUserDetail() {
   const [testSessions, setTestSessions] = useState<{ id: string; date: string; formattedDate: string }[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [expandedDocId, setExpandedDocId] = useState<string | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Report template state
@@ -69,11 +82,13 @@ export default function AdminUserDetail() {
   const { 
     documents, 
     recordings, 
-    reports, 
+    reports,
+    generatedReports,
     isLoading, 
     error, 
     getFileUrl,
-    refetchReports 
+    refetchReports,
+    refetchGeneratedReports,
   } = useUserStorageFiles(parentId || '', childId || '');
   
   const toggleDocumentPreview = useCallback((docPath: string) => {
@@ -203,7 +218,26 @@ export default function AdminUserDetail() {
 
   const handleReportFieldChange = (field: 'anamneza' | 'ugotovitve' | 'predlogVaj' | 'opombe', value: string) => {
     setReportData(prev => ({ ...prev, [field]: value }));
+    setHasUnsavedChanges(true);
   };
+
+  // Navigation blocker for unsaved changes
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      hasUnsavedChanges && currentLocation.pathname !== nextLocation.pathname
+  );
+
+  // Browser close/refresh warning
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
 
   const hasReportContent = () => {
     return reportData.anamneza.trim() || reportData.ugotovitve.trim() || 
@@ -256,6 +290,7 @@ export default function AdminUserDetail() {
       }
 
       toast.success('Poročilo shranjeno');
+      setHasUnsavedChanges(false);
       // Clear only editable fields
       setReportData(prev => ({
         ...prev,
@@ -270,6 +305,47 @@ export default function AdminUserDetail() {
       toast.error('Napaka pri shranjevanju poročila');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleGeneratePdf = async () => {
+    if (!hasReportContent()) {
+      toast.error('Vnesite vsebino poročila pred generiranjem PDF');
+      return;
+    }
+
+    setIsGeneratingPdf(true);
+    try {
+      const pdfBlob = await generateReportPdf(reportData);
+      const timestamp = new Date().toISOString().split('T')[0];
+      const safeChildName = (childData?.name || 'otrok').replace(/\s+/g, '-');
+      const fileName = `porocilo-${safeChildName}-${timestamp}.pdf`;
+      const filePath = `${parentId}/${childId}/Generirana-porocila/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('uporabniski-profili')
+        .upload(filePath, pdfBlob, { contentType: 'application/pdf', upsert: false });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      toast.success('PDF poročilo generirano in shranjeno');
+      setHasUnsavedChanges(false);
+      // Clear editable fields
+      setReportData(prev => ({
+        ...prev,
+        anamneza: '',
+        ugotovitve: '',
+        predlogVaj: '',
+        opombe: '',
+      }));
+      await refetchGeneratedReports();
+    } catch (err) {
+      console.error('Error generating PDF:', err);
+      toast.error('Napaka pri generiranju PDF poročila');
+    } finally {
+      setIsGeneratingPdf(false);
     }
   };
 
@@ -572,10 +648,16 @@ export default function AdminUserDetail() {
                       Naloži dokument
                     </Button>
                     <Button 
-                      variant="outline"
-                      onClick={() => toast.info('Funkcija Generiraj bo dodana')}
+                      variant="default"
+                      className="bg-dragon-green hover:bg-dragon-green/90"
+                      onClick={handleGeneratePdf}
+                      disabled={isGeneratingPdf || !hasReportContent()}
                     >
-                      <Sparkles className="h-4 w-4 mr-1" />
+                      {isGeneratingPdf ? (
+                        <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                      ) : (
+                        <Sparkles className="h-4 w-4 mr-1" />
+                      )}
                       Generiraj
                     </Button>
                     <input
@@ -587,7 +669,7 @@ export default function AdminUserDetail() {
                     />
                   </div>
 
-                  {/* List of saved reports */}
+                  {/* List of saved draft reports */}
                   {reports.length > 0 && (
                     <div className="pt-4 border-t">
                       <p className="text-sm font-medium text-muted-foreground mb-2">
@@ -636,12 +718,72 @@ export default function AdminUserDetail() {
                       </div>
                     </div>
                   )}
+
+                  {/* List of generated PDF reports */}
+                  {generatedReports.length > 0 && (
+                    <div className="pt-4 border-t">
+                      <p className="text-sm font-medium text-muted-foreground mb-2">
+                        Generirana poročila
+                      </p>
+                      <div className="space-y-2">
+                        {generatedReports.map((report, index) => (
+                          <div 
+                            key={index}
+                            className="flex items-center justify-between p-2 border rounded-lg bg-dragon-green/5"
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <FileText className="h-4 w-4 text-red-500" />
+                              <span className="text-sm truncate">{report.name}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => handleViewDocument(report)}
+                                title="Odpri v novem oknu"
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => handleDownloadDocument(report)}
+                                title="Prenesi"
+                              >
+                                <Download className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
           </>
         )}
       </div>
+
+      {/* Unsaved changes dialog */}
+      <AlertDialog open={blocker.state === 'blocked'}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Neshranjene spremembe</AlertDialogTitle>
+            <AlertDialogDescription>
+              Imate neshranjene spremembe v poročilu. Ali želite zapustiti stran brez shranjevanja?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => blocker.reset?.()}>
+              Ostani na strani
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={() => blocker.proceed?.()}>
+              Zapusti brez shranjevanja
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 }
