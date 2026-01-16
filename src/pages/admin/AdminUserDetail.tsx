@@ -43,7 +43,7 @@ export default function AdminUserDetail() {
   
   const [childData, setChildData] = useState<{ name: string; age: number; gender: string | null } | null>(null);
   const [parentData, setParentData] = useState<{ name: string; email: string } | null>(null);
-  const [testDate, setTestDate] = useState<string | null>(null);
+  const [testSessions, setTestSessions] = useState<{ id: string; date: string; formattedDate: string }[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [expandedDocId, setExpandedDocId] = useState<string | null>(null);
@@ -57,6 +57,7 @@ export default function AdminUserDetail() {
     childAge: null,
     childGender: null,
     testDate: null,
+    selectedSessionId: null,
     reportDate: format(new Date(), 'd. M. yyyy', { locale: sl }),
     logopedistName: '',
     anamneza: '',
@@ -122,20 +123,23 @@ export default function AdminUserDetail() {
         });
       }
 
-      // Fetch last articulation test date
-      const { data: testSession, error: testError } = await supabase
+      // Fetch all articulation test sessions
+      const { data: sessions, error: sessionsError } = await supabase
         .from('articulation_test_sessions')
-        .select('submitted_at, completed_at, created_at')
+        .select('id, submitted_at, completed_at, created_at')
         .eq('child_id', childId)
-        .order('submitted_at', { ascending: false, nullsFirst: false })
-        .limit(1)
-        .maybeSingle();
+        .order('submitted_at', { ascending: false, nullsFirst: false });
 
-      if (!testError && testSession) {
-        const dateToUse = testSession.submitted_at || testSession.completed_at || testSession.created_at;
-        if (dateToUse) {
-          setTestDate(format(new Date(dateToUse), 'd. M. yyyy', { locale: sl }));
-        }
+      if (!sessionsError && sessions && sessions.length > 0) {
+        const formattedSessions = sessions.map(session => {
+          const dateToUse = session.submitted_at || session.completed_at || session.created_at;
+          return {
+            id: session.id,
+            date: dateToUse || '',
+            formattedDate: dateToUse ? format(new Date(dateToUse), 'd. M. yyyy', { locale: sl }) : 'Ni datuma',
+          };
+        });
+        setTestSessions(formattedSessions);
       }
     }
 
@@ -155,10 +159,19 @@ export default function AdminUserDetail() {
       childName: childData?.name || '',
       childAge: childData?.age || null,
       childGender: childData?.gender || null,
-      testDate: testDate,
       logopedistName: logopedistName,
     }));
-  }, [childData, parentData, testDate, logopedistProfile]);
+  }, [childData, parentData, logopedistProfile]);
+
+  // Handle session selection
+  const handleSessionChange = (sessionId: string) => {
+    const selectedSession = testSessions.find(s => s.id === sessionId);
+    setReportData(prev => ({
+      ...prev,
+      selectedSessionId: sessionId,
+      testDate: selectedSession?.formattedDate || null,
+    }));
+  };
 
   const handleReportFieldChange = (field: 'anamneza' | 'ugotovitve' | 'predlogVaj' | 'opombe', value: string) => {
     setReportData(prev => ({ ...prev, [field]: value }));
@@ -500,7 +513,9 @@ export default function AdminUserDetail() {
                   {/* Structured report template editor */}
                   <ReportTemplateEditor
                     data={reportData}
+                    testSessions={testSessions}
                     onFieldChange={handleReportFieldChange}
+                    onSessionChange={handleSessionChange}
                   />
                   
                   {/* Action buttons */}

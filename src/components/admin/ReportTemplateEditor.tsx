@@ -2,6 +2,19 @@ import React from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
+export interface TestSession {
+  id: string;
+  date: string;
+  formattedDate: string;
+}
 
 interface ReportData {
   // Fixed fields (read-only)
@@ -11,6 +24,7 @@ interface ReportData {
   childAge: number | null;
   childGender: string | null;
   testDate: string | null;
+  selectedSessionId: string | null;
   reportDate: string;
   logopedistName: string;
   
@@ -23,10 +37,12 @@ interface ReportData {
 
 interface ReportTemplateEditorProps {
   data: ReportData;
+  testSessions: TestSession[];
   onFieldChange: (field: 'anamneza' | 'ugotovitve' | 'predlogVaj' | 'opombe', value: string) => void;
+  onSessionChange: (sessionId: string) => void;
 }
 
-export function ReportTemplateEditor({ data, onFieldChange }: ReportTemplateEditorProps) {
+export function ReportTemplateEditor({ data, testSessions, onFieldChange, onSessionChange }: ReportTemplateEditorProps) {
   const formatGender = (gender: string | null) => {
     if (!gender) return 'Ni podatka';
     if (gender.toLowerCase() === 'm' || gender.toLowerCase() === 'male') return 'M';
@@ -90,9 +106,27 @@ export function ReportTemplateEditor({ data, onFieldChange }: ReportTemplateEdit
         <h2 className="font-bold text-foreground uppercase text-xs tracking-wide border-b pb-1">
           PODATKI O PREVERJANJU
         </h2>
-        <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
+        <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm items-center">
           <span className="text-muted-foreground">Datum preverjanja izgovorjave:</span>
-          <span className="font-medium">{data.testDate || 'Ni podatka'}</span>
+          {testSessions.length > 0 ? (
+            <Select
+              value={data.selectedSessionId || ''}
+              onValueChange={onSessionChange}
+            >
+              <SelectTrigger className="w-[200px] h-8 text-sm">
+                <SelectValue placeholder="Izberite sejo" />
+              </SelectTrigger>
+              <SelectContent>
+                {testSessions.map((session, index) => (
+                  <SelectItem key={session.id} value={session.id}>
+                    {session.formattedDate} (seja {testSessions.length - index})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <span className="font-medium">Ni podatka</span>
+          )}
           <span className="text-muted-foreground">Datum izdelave poročila:</span>
           <span className="font-medium">{data.reportDate}</span>
         </div>
@@ -152,15 +186,13 @@ export function ReportTemplateEditor({ data, onFieldChange }: ReportTemplateEdit
 
       {/* Footer with signature */}
       <div className="border-t pt-4 mt-6">
-        <div className="text-right space-y-1">
-          <p className="text-sm">
-            <span className="text-muted-foreground">Poročilo izdelal/a:</span>{' '}
+        <div className="flex justify-end">
+          <div className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-1 text-sm text-right">
+            <span className="text-muted-foreground text-right">Poročilo izdelal/a:</span>
             <span className="font-medium">{data.logopedistName || 'Ni podatka'}</span>
-          </p>
-          <p className="text-sm">
-            <span className="text-muted-foreground">Datum:</span>{' '}
+            <span className="text-muted-foreground text-right">Datum:</span>
             <span className="font-medium">{data.reportDate}</span>
-          </p>
+          </div>
         </div>
       </div>
 
