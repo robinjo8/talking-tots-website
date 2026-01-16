@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,6 +15,7 @@ import {
   Save, 
   Loader2,
   ChevronDown,
+  ChevronUp,
   Play,
   File
 } from 'lucide-react';
@@ -27,6 +28,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { DocumentPreview } from '@/components/admin/DocumentPreview';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AdminUserDetail() {
   const { parentId, childId } = useParams<{ parentId: string; childId: string }>();
@@ -37,6 +40,7 @@ export default function AdminUserDetail() {
   const [reportText, setReportText] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [expandedDocId, setExpandedDocId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { 
@@ -48,6 +52,10 @@ export default function AdminUserDetail() {
     getFileUrl,
     refetchReports 
   } = useUserStorageFiles(parentId || '', childId || '');
+  
+  const toggleDocumentPreview = useCallback((docPath: string) => {
+    setExpandedDocId(prev => prev === docPath ? null : docPath);
+  }, []);
 
   // Fetch child and parent data
   useEffect(() => {
@@ -248,35 +256,66 @@ export default function AdminUserDetail() {
                     </p>
                   ) : (
                     <div className="space-y-2">
-                      {documents.map((doc, index) => (
-                        <div 
-                          key={index}
-                          className="flex items-center justify-between p-3 border rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
-                        >
-                          <div className="flex items-center gap-3 min-w-0">
-                            {getFileIcon(doc.name)}
-                            <span className="text-sm font-medium truncate">{doc.name}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => handleViewDocument(doc)}
-                              title="Ogled"
+                      {documents.map((doc, index) => {
+                        const isExpanded = expandedDocId === doc.path;
+                        return (
+                          <div 
+                            key={index}
+                            className="border rounded-lg overflow-hidden"
+                          >
+                            <div 
+                              className="flex items-center justify-between p-3 bg-muted/30 hover:bg-muted/50 transition-colors"
                             >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => handleDownloadDocument(doc)}
-                              title="Prenesi"
-                            >
-                              <Download className="h-4 w-4" />
-                            </Button>
+                              <div className="flex items-center gap-3 min-w-0">
+                                {getFileIcon(doc.name)}
+                                <span className="text-sm font-medium truncate">{doc.name}</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={() => toggleDocumentPreview(doc.path)}
+                                  title={isExpanded ? "Zapri predogled" : "Odpri predogled"}
+                                >
+                                  {isExpanded ? (
+                                    <ChevronUp className="h-4 w-4" />
+                                  ) : (
+                                    <Eye className="h-4 w-4" />
+                                  )}
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={() => handleDownloadDocument(doc)}
+                                  title="Prenesi"
+                                >
+                                  <Download className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                            
+                            <AnimatePresence>
+                              {isExpanded && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: 'auto', opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  transition={{ duration: 0.2 }}
+                                  className="overflow-hidden"
+                                >
+                                  <div className="p-4 border-t bg-background">
+                                    <DocumentPreview 
+                                      fileName={doc.name}
+                                      getSignedUrl={() => getFileUrl(doc.path)}
+                                      onDownload={() => handleDownloadDocument(doc)}
+                                    />
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </CardContent>
