@@ -1,5 +1,5 @@
-// Roboto fonts embedded as Base64 for reliable PDF generation with UTF-8 support
-// These fonts support Slovenian characters (č, š, ž, ć, đ)
+// Roboto fonts loaded dynamically for reliable PDF generation with UTF-8 support
+// These fonts support Slovenian characters (č, š, ž, ć, đ) for proper display
 
 // Import the fonts from a CDN and convert to base64 at runtime
 // This approach ensures the fonts are always available without bundling large files
