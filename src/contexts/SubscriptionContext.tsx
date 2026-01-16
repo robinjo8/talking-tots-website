@@ -1,3 +1,4 @@
+// Subscription context with safe fallback for SSR/initial render
 import { createContext, useContext, ReactNode } from 'react';
 import { useSubscription, SubscriptionState } from '@/hooks/useSubscription';
 import { PlanId } from '@/config/pricing';
