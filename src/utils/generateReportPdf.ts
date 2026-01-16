@@ -28,9 +28,10 @@ export async function generateReportPdf(data: ReportData): Promise<Blob> {
   
   // Load and register custom fonts with UTF-8 support
   try {
+    // Use fontsource CDN for more reliable font loading with full UTF-8 support
     const [robotoBase64, robotoBoldBase64] = await Promise.all([
-      loadFontWithRetry('https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5Q.ttf'),
-      loadFontWithRetry('https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmWUlfBBc4.ttf')
+      loadFontWithRetry('https://cdn.jsdelivr.net/fontsource/fonts/roboto@latest/latin-ext-400-normal.ttf'),
+      loadFontWithRetry('https://cdn.jsdelivr.net/fontsource/fonts/roboto@latest/latin-ext-700-normal.ttf')
     ]);
     
     if (robotoBase64 && robotoBoldBase64) {
@@ -93,9 +94,9 @@ export async function generateReportPdf(data: ReportData): Promise<Blob> {
   };
   
   // ===== DOCUMENT TITLE (no logo) =====
+  setFont('bold');
   doc.setFontSize(18);
   doc.setTextColor(...blackColor);
-  setFont('bold');
   doc.text('LOGOPEDSKO POROČILO - TOMITALK', pageWidth / 2, yPos, { align: 'center' });
   
   yPos += 8;
@@ -351,18 +352,23 @@ export async function generateReportPdf(data: ReportData): Promise<Blob> {
   doc.setLineWidth(0.5);
   doc.line(margin, actualFooterY, pageWidth - margin, actualFooterY);
   
-  // Footer content - date and author on same line
+  // Footer content - date and author on same line (consistent font)
   const footerTextY = actualFooterY + 10;
-  doc.setFontSize(9);
   setFont('normal');
+  doc.setFontSize(9);
   doc.setTextColor(...mediumGray);
   doc.text(`Datum: ${data.reportDate}`, margin, footerTextY);
+  
+  setFont('normal');
+  doc.setFontSize(9);
+  doc.setTextColor(...mediumGray);
   doc.text(`Poročilo izdelal/a: ${data.logopedistName || 'Ni podatka'}`, pageWidth - margin, footerTextY, { align: 'right' });
   
-  // Disclaimer
+  // Disclaimer (same font as footer text)
   const disclaimerY = footerTextY + 10;
+  setFont('normal');
   doc.setFontSize(8);
-  doc.setTextColor(...borderGray);
+  doc.setTextColor(...mediumGray);
   const disclaimer = 'To poročilo je informativne narave in ne nadomešča strokovnega logopedskega pregleda.';
   doc.text(disclaimer, pageWidth / 2, disclaimerY, { align: 'center' });
   
