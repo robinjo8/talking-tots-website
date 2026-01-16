@@ -534,7 +534,7 @@ export default function AdminUserDetail() {
                     <CardTitle>Poročila</CardTitle>
                   </div>
                   <CardDescription>
-                    Poročila logopeda za {childData?.name || 'otroka'}
+                    Poročilo za otroka <span className="font-semibold">{childData?.name || 'Neznano'}</span>
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col space-y-4">
