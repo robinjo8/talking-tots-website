@@ -183,6 +183,24 @@ export default function AdminUserDetail() {
     }
   };
 
+  const handleEditReport = async (file: StorageFile) => {
+    const url = await getFileUrl(file.path);
+    if (!url) {
+      toast.error('Napaka pri nalaganju poročila');
+      return;
+    }
+    
+    try {
+      const response = await fetch(url);
+      const text = await response.text();
+      setReportText(text);
+      toast.success('Poročilo naloženo za urejanje');
+    } catch (err) {
+      console.error('Error loading report:', err);
+      toast.error('Napaka pri branju poročila');
+    }
+  };
+
   const getFileIcon = (fileName: string) => {
     const ext = fileName.split('.').pop()?.toLowerCase();
     if (ext === 'pdf') return <FileText className="h-4 w-4 text-red-500" />;
@@ -238,10 +256,10 @@ export default function AdminUserDetail() {
           <div className="text-center py-12 text-destructive">{error}</div>
         ) : (
           <>
-            {/* Two column layout: Left (Dokumenti + Preverjanje) | Right (Poročila stretched) */}
-            <div className="grid gap-6 lg:grid-cols-2">
+            {/* Two column layout: Left (Dokumenti + Preverjanje) | Right (Poročila aligned) */}
+            <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
               {/* Left Column: Dokumenti + Preverjanje izgovorjave */}
-              <div className="space-y-6">
+              <div className="flex flex-col gap-6">
                 {/* Documents Section */}
                 <Card>
                   <CardHeader>
@@ -373,15 +391,15 @@ export default function AdminUserDetail() {
                 </Card>
               </div>
 
-              {/* Right Column: Reports Section - stretched full height */}
-              <Card className="lg:row-span-2 flex flex-col">
+              {/* Right Column: Reports Section - height aligned with left column */}
+              <Card className="flex flex-col">
                 <CardHeader>
                   <div className="flex items-center gap-2">
                     <ClipboardList className="h-5 w-5 text-primary" />
                     <CardTitle>Poročila</CardTitle>
                   </div>
                   <CardDescription>
-                    Poročila logopeda za tega uporabnika
+                    Poročila logopeda za {childData?.name || 'otroka'}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col space-y-4">
@@ -420,13 +438,6 @@ export default function AdminUserDetail() {
                     </Button>
                     <Button 
                       variant="outline"
-                      onClick={() => toast.info('Funkcija Popravi bo dodana')}
-                    >
-                      <Pencil className="h-4 w-4 mr-1" />
-                      Popravi
-                    </Button>
-                    <Button 
-                      variant="outline"
                       onClick={() => toast.info('Funkcija Generiraj bo dodana')}
                     >
                       <Sparkles className="h-4 w-4 mr-1" />
@@ -458,10 +469,21 @@ export default function AdminUserDetail() {
                               <span className="text-sm truncate">{report.name}</span>
                             </div>
                             <div className="flex items-center gap-1">
+                              {report.name.endsWith('.txt') && (
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={() => handleEditReport(report)}
+                                  title="Uredi poročilo"
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                </Button>
+                              )}
                               <Button 
                                 variant="ghost" 
                                 size="sm"
                                 onClick={() => handleViewDocument(report)}
+                                title="Odpri v novem oknu"
                               >
                                 <Eye className="h-4 w-4" />
                               </Button>
@@ -469,6 +491,7 @@ export default function AdminUserDetail() {
                                 variant="ghost" 
                                 size="sm"
                                 onClick={() => handleDownloadDocument(report)}
+                                title="Prenesi"
                               >
                                 <Download className="h-4 w-4" />
                               </Button>
