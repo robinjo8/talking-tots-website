@@ -1,36 +1,48 @@
 import jsPDF from 'jspdf';
 import { ReportData } from '@/components/admin/ReportTemplateEditor';
-import { SLOVENIAN_CHAR_MAP } from './fonts/robotoBase64';
-
-// Convert Slovenian characters to ASCII for helvetica font compatibility
-const convertToAscii = (text: string): string => {
-  return text.replace(/[čČšŠžŽćĆđĐ]/g, char => SLOVENIAN_CHAR_MAP[char] || char);
-};
+import { loadRobotoFonts } from './fonts/robotoBase64';
 
 export async function generateReportPdf(data: ReportData): Promise<Blob> {
   const doc = new jsPDF();
   
-  // Use helvetica - it's always available and works reliably
-  doc.setFont('helvetica');
+  // Load and register Roboto fonts for UTF-8 support (including Slovenian characters)
+  try {
+    const fonts = await loadRobotoFonts();
+    
+    doc.addFileToVFS('Roboto-Regular.ttf', fonts.regular);
+    doc.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
+    
+    doc.addFileToVFS('Roboto-Bold.ttf', fonts.bold);
+    doc.addFont('Roboto-Bold.ttf', 'Roboto', 'bold');
+    
+    doc.setFont('Roboto');
+  } catch (error) {
+    console.warn('Failed to load Roboto fonts, falling back to helvetica:', error);
+    doc.setFont('helvetica');
+  }
   
   // Helper to set font style
   const setFont = (style: 'normal' | 'bold') => {
-    doc.setFont('helvetica', style);
+    try {
+      doc.setFont('Roboto', style);
+    } catch {
+      doc.setFont('helvetica', style);
+    }
   };
   
-  // Helper to add text - converts Slovenian characters for font compatibility
+  // Helper to add text - now with proper UTF-8 support
   const addText = (text: string, x: number, y: number, options?: { align?: 'left' | 'center' | 'right' }) => {
-    doc.text(convertToAscii(text), x, y, options);
+    doc.text(text, x, y, options);
   };
   
   // Helper to split text
   const splitText = (text: string, maxWidth: number): string[] => {
-    return doc.splitTextToSize(convertToAscii(text), maxWidth);
+    return doc.splitTextToSize(text, maxWidth);
   };
   
   // Helper to get text width
   const getTextWidth = (text: string): number => {
-    return doc.getTextWidth(convertToAscii(text));
+    return doc.getTextWidth(text);
   };
   
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -53,7 +65,7 @@ export async function generateReportPdf(data: ReportData): Promise<Blob> {
     if (!gender) return 'Ni podatka';
     switch (gender.toLowerCase()) {
       case 'male': return 'M';
-      case 'female': return 'Z';
+      case 'female': return 'Ž';
       default: return gender.charAt(0).toUpperCase();
     }
   };
