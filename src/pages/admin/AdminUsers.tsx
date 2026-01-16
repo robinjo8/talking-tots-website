@@ -16,10 +16,78 @@ import { Search, Users, Baby, Eye, FolderOpen, Loader2 } from 'lucide-react';
 
 interface DisplayRow {
   parent: ParentWithChildren;
-  child: ChildData | null; // null for users without children
-  isFirstChild: boolean; // for rowspan styling
+  child: ChildData | null;
+  isFirstChild: boolean;
   childCount: number;
 }
+
+// Mobile card component for user display
+const UserCard = ({ 
+  row, 
+  formatParentName, 
+  formatGender 
+}: { 
+  row: DisplayRow; 
+  formatParentName: (parent: ParentWithChildren) => string;
+  formatGender: (gender: string | null) => string;
+}) => {
+  const parentName = formatParentName(row.parent);
+  const gender = row.child ? formatGender(row.child.gender) : '';
+  
+  return (
+    <div className="p-4 border rounded-lg bg-card space-y-3">
+      {/* Parent Name */}
+      <div>
+        <span className="text-xs text-muted-foreground">Ime in priimek starša</span>
+        <p className="font-medium">
+          {parentName || <span className="italic text-muted-foreground">Ni dodano v profilu</span>}
+        </p>
+      </div>
+      
+      {/* Email */}
+      <div>
+        <span className="text-xs text-muted-foreground">Elektronski naslov</span>
+        <p className="break-all">
+          {row.parent.email || <span className="italic text-muted-foreground">Ni emaila</span>}
+        </p>
+      </div>
+      
+      {/* Child Info */}
+      <div>
+        <span className="text-xs text-muted-foreground">Otrok</span>
+        <p>
+          {row.child ? (
+            <>
+              <span className="font-medium">{row.child.name}</span>
+              {row.child.age !== null && <span className="text-muted-foreground"> • {row.child.age} let</span>}
+              {gender && <span className="text-muted-foreground"> • {gender}</span>}
+            </>
+          ) : (
+            <span className="italic text-muted-foreground">Ni otroka</span>
+          )}
+        </p>
+      </div>
+      
+      {/* Status */}
+      <div>
+        <span className="text-xs text-muted-foreground">Status</span>
+        <p className="text-muted-foreground">-</p>
+      </div>
+      
+      {/* Actions */}
+      <div className="flex items-center gap-2 pt-2 border-t">
+        <Button variant="outline" size="sm">
+          <Eye className="h-4 w-4 mr-1" /> Ogled
+        </Button>
+        {row.child && (
+          <Button variant="outline" size="sm">
+            <FolderOpen className="h-4 w-4 mr-1" /> Dokumenti
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default function AdminUsers() {
   const { data: users, isLoading, error } = useAdminUsers();
@@ -154,7 +222,7 @@ export default function AdminUsers() {
           <CardContent>
             {/* Search */}
             <div className="flex items-center gap-4 mb-6">
-              <div className="relative flex-1 max-w-sm">
+              <div className="relative flex-1 md:max-w-sm">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Išči po emailu, imenu starša ali otroka..."
@@ -179,9 +247,9 @@ export default function AdminUsers() {
               </div>
             )}
 
-            {/* Table */}
+            {/* Desktop: Table */}
             {!isLoading && !error && (
-              <div className="rounded-md border overflow-x-auto">
+              <div className="hidden md:block rounded-md border overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -202,7 +270,7 @@ export default function AdminUsers() {
                         </TableCell>
                       </TableRow>
                     ) : (
-                      filteredRows.map((row, index) => {
+                      filteredRows.map((row) => {
                         const parentName = formatParentName(row.parent);
                         const gender = row.child ? formatGender(row.child.gender) : '';
                         const rowKey = row.child ? row.child.id : `${row.parent.parent_id}-no-child`;
@@ -267,6 +335,29 @@ export default function AdminUsers() {
                     )}
                   </TableBody>
                 </Table>
+              </div>
+            )}
+
+            {/* Mobile: Cards */}
+            {!isLoading && !error && (
+              <div className="md:hidden space-y-3">
+                {filteredRows.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    {searchQuery ? 'Ni rezultatov za iskalni niz' : 'Ni registriranih uporabnikov'}
+                  </div>
+                ) : (
+                  filteredRows.map((row) => {
+                    const rowKey = row.child ? row.child.id : `${row.parent.parent_id}-no-child`;
+                    return (
+                      <UserCard 
+                        key={rowKey} 
+                        row={row} 
+                        formatParentName={formatParentName}
+                        formatGender={formatGender}
+                      />
+                    );
+                  })
+                )}
               </div>
             )}
           </CardContent>
