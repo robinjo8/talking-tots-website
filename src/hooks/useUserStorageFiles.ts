@@ -172,7 +172,7 @@ export function useUserStorageFiles(parentId: string, childId: string): UseUserS
     try {
       const { data, error } = await supabase.storage
         .from('uporabniski-profili')
-        .createSignedUrl(path, 3600); // 1 hour expiry
+        .createSignedUrl(path, 3600, { download: false }); // 1 hour expiry, inline display
 
       if (error) {
         console.error('Error creating signed URL:', error);

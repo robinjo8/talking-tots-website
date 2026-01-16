@@ -80,11 +80,28 @@ export function DocumentPreview({ fileName, getSignedUrl, onDownload }: Document
   if (isPdf && signedUrl) {
     return (
       <div className="w-full">
-        <iframe
-          src={signedUrl}
+        <object
+          data={signedUrl}
+          type="application/pdf"
           className="w-full h-[500px] rounded-lg border bg-white"
-          title={`Predogled: ${fileName}`}
-        />
+        >
+          {/* Fallback če brskalnik blokira PDF */}
+          <div className="flex flex-col items-center justify-center h-[500px] bg-muted/20 rounded-lg border">
+            <FileWarning className="h-8 w-8 mb-2 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground mb-3">
+              Predogled PDF ni na voljo v brskalniku.
+            </p>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => window.open(signedUrl, '_blank')}>
+                Odpri v novem zavihku
+              </Button>
+              <Button variant="outline" size="sm" onClick={onDownload}>
+                <Download className="h-4 w-4 mr-1" />
+                Prenesi
+              </Button>
+            </div>
+          </div>
+        </object>
       </div>
     );
   }
