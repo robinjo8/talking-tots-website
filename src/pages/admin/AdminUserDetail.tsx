@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, useNavigate, useBlocker } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -220,12 +220,6 @@ export default function AdminUserDetail() {
     setReportData(prev => ({ ...prev, [field]: value }));
     setHasUnsavedChanges(true);
   };
-
-  // Navigation blocker for unsaved changes
-  const blocker = useBlocker(
-    ({ currentLocation, nextLocation }) =>
-      hasUnsavedChanges && currentLocation.pathname !== nextLocation.pathname
-  );
 
   // Browser close/refresh warning
   useEffect(() => {
@@ -764,26 +758,6 @@ export default function AdminUserDetail() {
           </>
         )}
       </div>
-
-      {/* Unsaved changes dialog */}
-      <AlertDialog open={blocker.state === 'blocked'}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Neshranjene spremembe</AlertDialogTitle>
-            <AlertDialogDescription>
-              Imate neshranjene spremembe v poročilu. Ali želite zapustiti stran brez shranjevanja?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => blocker.reset?.()}>
-              Ostani na strani
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={() => blocker.proceed?.()}>
-              Zapusti brez shranjevanja
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </AdminLayout>
   );
 }
