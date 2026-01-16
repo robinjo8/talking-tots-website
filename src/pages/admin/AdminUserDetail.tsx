@@ -18,7 +18,8 @@ import {
   Play,
   File,
   Pencil,
-  Sparkles
+  Sparkles,
+  Trash2
 } from 'lucide-react';
 import { useUserStorageFiles, StorageFile, SessionRecordings } from '@/hooks/useUserStorageFiles';
 import { supabase } from '@/integrations/supabase/client';
@@ -311,7 +312,7 @@ export default function AdminUserDetail() {
     setIsGeneratingPdf(true);
     try {
       const pdfBlob = await generateReportPdf(reportData);
-      const timestamp = new Date().toISOString().split('T')[0];
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       const safeChildName = (childData?.name || 'otrok').replace(/\s+/g, '-');
       const fileName = `porocilo-${safeChildName}-${timestamp}.pdf`;
       const filePath = `${parentId}/${childId}/Generirana-porocila/${fileName}`;
@@ -340,6 +341,22 @@ export default function AdminUserDetail() {
       toast.error('Napaka pri generiranju PDF poročila');
     } finally {
       setIsGeneratingPdf(false);
+    }
+  };
+
+  const handleDeleteGeneratedReport = async (file: StorageFile) => {
+    try {
+      const { error } = await supabase.storage
+        .from('uporabniski-profili')
+        .remove([file.path]);
+      
+      if (error) throw error;
+      
+      toast.success('Poročilo izbrisano');
+      await refetchGeneratedReports();
+    } catch (err) {
+      console.error('Error deleting report:', err);
+      toast.error('Napaka pri brisanju poročila');
     }
   };
 
@@ -745,6 +762,15 @@ export default function AdminUserDetail() {
                                 title="Prenesi"
                               >
                                 <Download className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => handleDeleteGeneratedReport(report)}
+                                title="Izbriši"
+                                className="text-destructive hover:text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
                           </div>
