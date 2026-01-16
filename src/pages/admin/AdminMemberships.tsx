@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { CheckCircle, XCircle, Clock, Users, AlertTriangle, Loader2 } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, Users, AlertTriangle, Loader2, Mail } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 
 interface LogopedistWithOrg {
@@ -17,6 +17,7 @@ interface LogopedistWithOrg {
   last_name: string;
   is_verified: boolean;
   created_at: string;
+  email?: string;
   organizations: {
     name: string;
     type: string;
@@ -50,6 +51,40 @@ export default function AdminMemberships() {
     enabled: isSuperAdmin,
   });
 
+  // Fetch email-ov za uporabnike
+  const { data: userEmails } = useQuery({
+    queryKey: ['admin-logopedist-emails', logopedists?.map(l => l.user_id)],
+    queryFn: async () => {
+      if (!logopedists || logopedists.length === 0) return {};
+      
+      const userIds = logopedists.map(l => l.user_id);
+      const { data, error } = await supabase
+        .rpc('get_parent_emails', { parent_ids: userIds });
+      
+      if (error) {
+        console.error('Error fetching emails:', error);
+        return {};
+      }
+      
+      // Pretvori v map user_id -> email
+      const emailMap: Record<string, string> = {};
+      data?.forEach((row: { user_id: string; email: string }) => {
+        emailMap[row.user_id] = row.email;
+      });
+      return emailMap;
+    },
+    enabled: !!logopedists && logopedists.length > 0,
+  });
+
+  // Združi logopediste z emaili
+  const logopedistsWithEmails = useMemo(() => {
+    if (!logopedists) return [];
+    return logopedists.map(l => ({
+      ...l,
+      email: userEmails?.[l.user_id] || undefined
+    }));
+  }, [logopedists, userEmails]);
+
   // Odobri članstvo
   const approveMutation = useMutation({
     mutationFn: async (profileId: string) => {
@@ -70,23 +105,33 @@ export default function AdminMemberships() {
     },
   });
 
-  // Zavrni članstvo (izbriši profil)
+  // Zavrni članstvo (izbriši uporabnika in profil)
   const rejectMutation = useMutation({
-    mutationFn: async (profileId: string) => {
-      const { error } = await supabase
-        .from('logopedist_profiles')
-        .delete()
-        .eq('id', profileId);
-      
-      if (error) throw error;
+    mutationFn: async (userId: string) => {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session?.access_token) {
+        throw new Error('Niste prijavljeni');
+      }
+
+      const response = await supabase.functions.invoke('delete-logopedist', {
+        body: { user_id: userId },
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message || 'Napaka pri brisanju');
+      }
+
+      if (!response.data?.success) {
+        throw new Error(response.data?.error || 'Napaka pri brisanju uporabnika');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-logopedists'] });
-      toast.success('Zahtevek za članstvo je bil zavrnjen.');
+      toast.success('Zahtevek za članstvo je bil zavrnjen in uporabnik izbrisan.');
     },
     onError: (error) => {
       console.error('Error rejecting membership:', error);
-      toast.error('Napaka pri zavrnitvi članstva');
+      toast.error('Napaka pri zavrnitvi članstva: ' + error.message);
     },
   });
 
@@ -107,8 +152,8 @@ export default function AdminMemberships() {
   }
 
   // Razdeli na čakajoče in aktivne
-  const pending = logopedists?.filter(l => !l.is_verified) || [];
-  const active = logopedists?.filter(l => l.is_verified) || [];
+  const pending = logopedistsWithEmails.filter(l => !l.is_verified);
+  const active = logopedistsWithEmails.filter(l => l.is_verified);
 
   return (
     <AdminLayout>
@@ -155,6 +200,12 @@ export default function AdminMemberships() {
                         <p className="font-medium text-foreground">
                           {logopedist.first_name} {logopedist.last_name}
                         </p>
+                        {logopedist.email && (
+                          <p className="text-sm text-muted-foreground flex items-center gap-1">
+                            <Mail className="h-3 w-3" />
+                            {logopedist.email}
+                          </p>
+                        )}
                         <p className="text-sm text-muted-foreground">
                           {logopedist.organizations?.name || 'Ni organizacije'}
                         </p>
@@ -188,8 +239,8 @@ export default function AdminMemberships() {
                           size="sm"
                           variant="destructive"
                           onClick={() => {
-                            if (confirm('Ali ste prepričani, da želite zavrniti to članstvo? Profil bo izbrisan.')) {
-                              rejectMutation.mutate(logopedist.id);
+                            if (confirm('Ali ste prepričani, da želite zavrniti to članstvo? Uporabnik in profil bosta izbrisana.')) {
+                              rejectMutation.mutate(logopedist.user_id);
                             }
                           }}
                           disabled={rejectMutation.isPending}
@@ -245,6 +296,12 @@ export default function AdminMemberships() {
                         <p className="font-medium text-foreground">
                           {logopedist.first_name} {logopedist.last_name}
                         </p>
+                        {logopedist.email && (
+                          <p className="text-sm text-muted-foreground flex items-center gap-1">
+                            <Mail className="h-3 w-3" />
+                            {logopedist.email}
+                          </p>
+                        )}
                         <p className="text-sm text-muted-foreground">
                           {logopedist.organizations?.name || 'Ni organizacije'}
                         </p>
