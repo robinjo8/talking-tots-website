@@ -1,11 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { FileText, Download, Trash2, CheckCircle2, Loader2, FileCheck, Upload, AlertCircle, ChevronDown } from "lucide-react";
+import { FileText, Download, Trash2, CheckCircle2, Loader2, FileCheck, AlertCircle, ChevronDown } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChildDocuments } from "@/hooks/useChildDocuments";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+
 type DocumentItem = {
   id: string;
   child_id: string;
@@ -20,29 +22,38 @@ type GroupedDocuments = {
   childName: string;
   documents: DocumentItem[];
 };
+
+type ReportFile = {
+  name: string;
+  path: string;
+  childName: string;
+};
+
 export function MyDocumentsSection() {
-  const {
-    profile
-  } = useAuth();
+  const { user, profile } = useAuth();
   const {
     fetchDocuments,
     deleteDocument,
     getDocumentUrl
   } = useChildDocuments();
   const [groupedDocuments, setGroupedDocuments] = useState<GroupedDocuments[]>([]);
+  const [reports, setReports] = useState<ReportFile[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploadedDocsOpen, setUploadedDocsOpen] = useState(true);
   const [reportsOpen, setReportsOpen] = useState(true);
   useEffect(() => {
     const loadAllDocuments = async () => {
-      if (!profile?.children) {
+      if (!profile?.children || !user?.id) {
         setLoading(false);
         return;
       }
       setLoading(true);
       const grouped: GroupedDocuments[] = [];
+      const allReports: ReportFile[] = [];
+      
       for (const child of profile.children) {
         if (child.id) {
+          // Fetch uploaded documents
           const docs = await fetchDocuments(child.id);
           if (docs.length > 0) {
             grouped.push({
@@ -51,13 +62,39 @@ export function MyDocumentsSection() {
               documents: docs
             });
           }
+          
+          // Fetch generated PDF reports from storage
+          const { data: reportFiles } = await supabase.storage
+            .from('uporabniski-profili')
+            .list(`${user.id}/${child.id}/Generirana-porocila`);
+          
+          if (reportFiles) {
+            const childReports = reportFiles
+              .filter(f => f.name !== '.emptyFolderPlaceholder')
+              .map(f => ({
+                name: f.name,
+                path: `${user.id}/${child.id}/Generirana-porocila/${f.name}`,
+                childName: child.name,
+              }));
+            allReports.push(...childReports);
+          }
         }
       }
       setGroupedDocuments(grouped);
+      setReports(allReports);
       setLoading(false);
     };
     loadAllDocuments();
-  }, [profile?.children, fetchDocuments]);
+  }, [profile?.children, user?.id, fetchDocuments]);
+
+  const handleDownloadReport = useCallback(async (path: string) => {
+    const { data } = await supabase.storage
+      .from('uporabniski-profili')
+      .createSignedUrl(path, 3600);
+    if (data?.signedUrl) {
+      window.open(data.signedUrl, '_blank');
+    }
+  }, []);
   const handleDownload = async (storagePath: string) => {
     const url = await getDocumentUrl(storagePath);
     if (url) window.open(url, '_blank');
@@ -189,13 +226,37 @@ export function MyDocumentsSection() {
             </CollapsibleTrigger>
             <CollapsibleContent>
               <div className="px-4 pb-4 pt-0 border-t border-gray-100">
-                <div className="text-center py-6 text-muted-foreground">
-                  <FileCheck className="h-10 w-10 mx-auto mb-3 opacity-30" />
-                  <p className="text-sm">Poročil še ni</p>
-                  <p className="text-xs mt-1">
-                    Tukaj bodo prikazana poročila logopedov
-                  </p>
-                </div>
+                {reports.length === 0 ? (
+                  <div className="text-center py-6 text-muted-foreground">
+                    <FileCheck className="h-10 w-10 mx-auto mb-3 opacity-30" />
+                    <p className="text-sm">Poročil še ni</p>
+                    <p className="text-xs mt-1">
+                      Tukaj bodo prikazana poročila logopedov
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3 pt-4">
+                    {reports.map((report, idx) => (
+                      <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <FileText className="h-4 w-4 text-red-500 shrink-0" />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium truncate">{report.name}</p>
+                            <p className="text-xs text-muted-foreground">za {report.childName}</p>
+                          </div>
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 w-8 p-0"
+                          onClick={() => handleDownloadReport(report.path)}
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </CollapsibleContent>
           </Collapsible>
