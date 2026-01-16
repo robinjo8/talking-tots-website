@@ -1,46 +1,65 @@
 import jsPDF from 'jspdf';
 import { ReportData } from '@/components/admin/ReportTemplateEditor';
 
-// Roboto Regular font with full UTF-8 support (Latin Extended for šumniki)
-const loadRobotoFont = async (): Promise<string> => {
-  const response = await fetch('https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5Q.ttf');
-  const arrayBuffer = await response.arrayBuffer();
-  const base64 = btoa(
-    new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
-  );
-  return base64;
-};
-
-// Roboto Bold font for section titles
-const loadRobotoBoldFont = async (): Promise<string> => {
-  const response = await fetch('https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmWUlfBBc4.ttf');
-  const arrayBuffer = await response.arrayBuffer();
-  const base64 = btoa(
-    new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
-  );
-  return base64;
+// Font loading with retry logic
+const loadFontWithRetry = async (url: string, retries = 3): Promise<string | null> => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const arrayBuffer = await response.arrayBuffer();
+      return btoa(
+        new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
+      );
+    } catch (error) {
+      console.warn(`Font load attempt ${i + 1} failed:`, error);
+      if (i === retries - 1) return null;
+      await new Promise(resolve => setTimeout(resolve, 500)); // Wait before retry
+    }
+  }
+  return null;
 };
 
 export async function generateReportPdf(data: ReportData): Promise<Blob> {
   const doc = new jsPDF();
   
+  // Track if custom fonts are available
+  let useCustomFont = false;
+  
   // Load and register custom fonts with UTF-8 support
   try {
     const [robotoBase64, robotoBoldBase64] = await Promise.all([
-      loadRobotoFont(),
-      loadRobotoBoldFont()
+      loadFontWithRetry('https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5Q.ttf'),
+      loadFontWithRetry('https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmWUlfBBc4.ttf')
     ]);
     
-    doc.addFileToVFS('Roboto-Regular.ttf', robotoBase64);
-    doc.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
-    
-    doc.addFileToVFS('Roboto-Bold.ttf', robotoBoldBase64);
-    doc.addFont('Roboto-Bold.ttf', 'Roboto', 'bold');
-    
-    doc.setFont('Roboto');
+    if (robotoBase64 && robotoBoldBase64) {
+      doc.addFileToVFS('Roboto-Regular.ttf', robotoBase64);
+      doc.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
+      
+      doc.addFileToVFS('Roboto-Bold.ttf', robotoBoldBase64);
+      doc.addFont('Roboto-Bold.ttf', 'Roboto', 'bold');
+      
+      doc.setFont('Roboto');
+      useCustomFont = true;
+      console.log('Custom fonts loaded successfully');
+    } else {
+      console.warn('Custom fonts not available, using helvetica');
+      doc.setFont('helvetica');
+    }
   } catch (error) {
-    console.warn('Failed to load custom font, falling back to default:', error);
+    console.warn('Failed to load custom fonts, falling back to helvetica:', error);
+    doc.setFont('helvetica');
   }
+  
+  // Helper to set font with fallback
+  const setFont = (style: 'normal' | 'bold') => {
+    if (useCustomFont) {
+      doc.setFont('Roboto', style);
+    } else {
+      doc.setFont('helvetica', style);
+    }
+  };
   
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -76,7 +95,7 @@ export async function generateReportPdf(data: ReportData): Promise<Blob> {
   // ===== DOCUMENT TITLE (no logo) =====
   doc.setFontSize(18);
   doc.setTextColor(...blackColor);
-  doc.setFont('Roboto', 'bold');
+  setFont('bold');
   doc.text('LOGOPEDSKO POROČILO - TOMITALK', pageWidth / 2, yPos, { align: 'center' });
   
   yPos += 8;
@@ -119,7 +138,7 @@ export async function generateReportPdf(data: ReportData): Promise<Blob> {
     
     // Header text
     doc.setFontSize(9);
-    doc.setFont('Roboto', 'normal');
+    setFont('normal');
     doc.setTextColor(255, 255, 255);
     doc.text(title, xPos + boxPadding, startY + 6);
     
@@ -188,7 +207,7 @@ export async function generateReportPdf(data: ReportData): Promise<Blob> {
   
   // Header text
   doc.setFontSize(9);
-  doc.setFont('Roboto', 'normal');
+  setFont('normal');
   doc.setTextColor(255, 255, 255);
   doc.text('PODATKI O PREVERJANJU', margin + reviewBoxPadding, yPos + 6);
   
@@ -272,7 +291,7 @@ export async function generateReportPdf(data: ReportData): Promise<Blob> {
     
     // Header text
     doc.setFontSize(10);
-    doc.setFont('Roboto', 'normal');
+    setFont('normal');
     doc.setTextColor(255, 255, 255);
     doc.text('ANALIZA', margin + boxPadding, currentY + 7);
     
@@ -288,13 +307,13 @@ export async function generateReportPdf(data: ReportData): Promise<Blob> {
       
       // Subsection title (bold black)
       doc.setFontSize(10);
-      doc.setFont('Roboto', 'bold');
+      setFont('bold');
       doc.setTextColor(...blackColor);
       doc.text(section.title, margin + boxPadding, currentY);
       currentY += subTitleHeight;
       
       // Subsection content
-      doc.setFont('Roboto', 'normal');
+      setFont('normal');
       doc.setFontSize(10);
       doc.setTextColor(...darkGray);
       
@@ -335,7 +354,7 @@ export async function generateReportPdf(data: ReportData): Promise<Blob> {
   // Footer content - date and author on same line
   const footerTextY = actualFooterY + 10;
   doc.setFontSize(9);
-  doc.setFont('Roboto', 'normal');
+  setFont('normal');
   doc.setTextColor(...mediumGray);
   doc.text(`Datum: ${data.reportDate}`, margin, footerTextY);
   doc.text(`Poročilo izdelal/a: ${data.logopedistName || 'Ni podatka'}`, pageWidth - margin, footerTextY, { align: 'right' });
