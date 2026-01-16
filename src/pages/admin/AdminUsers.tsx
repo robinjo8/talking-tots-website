@@ -186,8 +186,7 @@ export default function AdminUsers() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Ime in priimek starša</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Št. otrok</TableHead>
+                      <TableHead>Elektronski naslov</TableHead>
                       <TableHead>Ime otroka</TableHead>
                       <TableHead>Starost</TableHead>
                       <TableHead>Spol</TableHead>
@@ -198,7 +197,7 @@ export default function AdminUsers() {
                   <TableBody>
                     {filteredRows.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
+                        <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
                           {searchQuery ? 'Ni rezultatov za iskalni niz' : 'Ni registriranih uporabnikov'}
                         </TableCell>
                       </TableRow>
@@ -223,11 +222,6 @@ export default function AdminUsers() {
                               ) : (
                                 <span className="text-muted-foreground italic">Ni emaila</span>
                               )}
-                            </TableCell>
-                            <TableCell>
-                              <span className={row.childCount === 0 ? 'text-muted-foreground' : 'font-medium'}>
-                                {row.childCount}
-                              </span>
                             </TableCell>
                             <TableCell>
                               {row.child ? (
