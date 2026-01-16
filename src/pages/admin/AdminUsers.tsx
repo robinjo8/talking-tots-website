@@ -12,7 +12,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search, Users, Baby, Eye, FolderOpen, Loader2 } from 'lucide-react';
+import { Search, Users, Baby, Eye, FolderOpen, Loader2, ChevronDown } from 'lucide-react';
 
 interface DisplayRow {
   parent: ParentWithChildren;
@@ -21,70 +21,86 @@ interface DisplayRow {
   childCount: number;
 }
 
-// Mobile card component for user display
+// Mobile card component for user display with accordion behavior
 const UserCard = ({ 
   row, 
   formatParentName, 
-  formatGender 
+  formatGender,
+  isExpanded,
+  onToggle
 }: { 
   row: DisplayRow; 
   formatParentName: (parent: ParentWithChildren) => string;
   formatGender: (gender: string | null) => string;
+  isExpanded: boolean;
+  onToggle: () => void;
 }) => {
   const parentName = formatParentName(row.parent);
   const gender = row.child ? formatGender(row.child.gender) : '';
   
   return (
-    <div className="p-4 border rounded-lg bg-card space-y-3">
-      {/* Parent Name */}
-      <div>
-        <span className="text-xs text-muted-foreground">Ime in priimek starša</span>
-        <p className="font-medium">
+    <div className="border rounded-lg bg-card overflow-hidden">
+      {/* Header - always visible, clickable */}
+      <button
+        onClick={onToggle}
+        className="w-full p-4 flex items-center justify-between text-left hover:bg-muted/50 transition-colors"
+      >
+        <span className="font-medium">
           {parentName || <span className="italic text-muted-foreground">Ni dodano v profilu</span>}
-        </p>
-      </div>
+        </span>
+        <ChevronDown 
+          className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${
+            isExpanded ? 'rotate-180' : ''
+          }`} 
+        />
+      </button>
       
-      {/* Email */}
-      <div>
-        <span className="text-xs text-muted-foreground">Elektronski naslov</span>
-        <p className="break-all">
-          {row.parent.email || <span className="italic text-muted-foreground">Ni emaila</span>}
-        </p>
-      </div>
-      
-      {/* Child Info */}
-      <div>
-        <span className="text-xs text-muted-foreground">Otrok</span>
-        <p>
-          {row.child ? (
-            <>
-              <span className="font-medium">{row.child.name}</span>
-              {row.child.age !== null && <span className="text-muted-foreground"> • {row.child.age} let</span>}
-              {gender && <span className="text-muted-foreground"> • {gender}</span>}
-            </>
-          ) : (
-            <span className="italic text-muted-foreground">Ni otroka</span>
-          )}
-        </p>
-      </div>
-      
-      {/* Status */}
-      <div>
-        <span className="text-xs text-muted-foreground">Status</span>
-        <p className="text-muted-foreground">-</p>
-      </div>
-      
-      {/* Actions */}
-      <div className="flex items-center gap-2 pt-2 border-t">
-        <Button variant="outline" size="sm">
-          <Eye className="h-4 w-4 mr-1" /> Ogled
-        </Button>
-        {row.child && (
-          <Button variant="outline" size="sm">
-            <FolderOpen className="h-4 w-4 mr-1" /> Dokumenti
-          </Button>
-        )}
-      </div>
+      {/* Content - shown only when expanded */}
+      {isExpanded && (
+        <div className="px-4 pb-4 space-y-3 border-t">
+          {/* Email */}
+          <div className="pt-3">
+            <span className="text-xs text-muted-foreground">Elektronski naslov</span>
+            <p className="break-all">
+              {row.parent.email || <span className="italic text-muted-foreground">Ni emaila</span>}
+            </p>
+          </div>
+          
+          {/* Child Info */}
+          <div>
+            <span className="text-xs text-muted-foreground">Otrok</span>
+            <p>
+              {row.child ? (
+                <>
+                  <span className="font-medium">{row.child.name}</span>
+                  {row.child.age !== null && <span className="text-muted-foreground"> • {row.child.age} let</span>}
+                  {gender && <span className="text-muted-foreground"> • {gender}</span>}
+                </>
+              ) : (
+                <span className="italic text-muted-foreground">Ni otroka</span>
+              )}
+            </p>
+          </div>
+          
+          {/* Status */}
+          <div>
+            <span className="text-xs text-muted-foreground">Status</span>
+            <p className="text-muted-foreground">-</p>
+          </div>
+          
+          {/* Actions */}
+          <div className="flex items-center gap-2 pt-2 border-t">
+            <Button variant="outline" size="sm">
+              <Eye className="h-4 w-4 mr-1" /> Ogled
+            </Button>
+            {row.child && (
+              <Button variant="outline" size="sm">
+                <FolderOpen className="h-4 w-4 mr-1" /> Dokumenti
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -92,6 +108,11 @@ const UserCard = ({
 export default function AdminUsers() {
   const { data: users, isLoading, error } = useAdminUsers();
   const [searchQuery, setSearchQuery] = useState('');
+  const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
+
+  const toggleCard = (cardId: string) => {
+    setExpandedCardId(prev => prev === cardId ? null : cardId);
+  };
 
   // Flatten the data to have one row per child, or one row for users without children
   const flatRows = useMemo(() => {
@@ -354,6 +375,8 @@ export default function AdminUsers() {
                         row={row} 
                         formatParentName={formatParentName}
                         formatGender={formatGender}
+                        isExpanded={expandedCardId === rowKey}
+                        onToggle={() => toggleCard(rowKey)}
                       />
                     );
                   })
