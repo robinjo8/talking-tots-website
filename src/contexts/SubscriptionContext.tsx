@@ -50,7 +50,22 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 export function useSubscriptionContext() {
   const context = useContext(SubscriptionContext);
   if (context === undefined) {
-    throw new Error('useSubscriptionContext must be used within a SubscriptionProvider');
+    // Return safe defaults instead of throwing - this can happen during SSR or initial render
+    console.warn('useSubscriptionContext called outside SubscriptionProvider, returning defaults');
+    return {
+      isSubscribed: false,
+      planId: null,
+      productId: null,
+      subscriptionEnd: null,
+      isLoading: true,
+      isTrialing: false,
+      trialEnd: null,
+      refreshSubscription: async () => {},
+      isPro: false,
+      isStartOrPlus: false,
+      canAccessPremiumFeatures: false,
+      canAccessProFeatures: false,
+    } as SubscriptionContextType;
   }
   return context;
 }
