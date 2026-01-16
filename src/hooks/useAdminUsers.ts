@@ -17,6 +17,13 @@ export interface ParentWithChildren {
   children: ChildData[];
 }
 
+// Interface for auth user data returned from RPC
+interface AuthUserData {
+  user_id: string;
+  email: string;
+  display_name: string | null;
+}
+
 export function useAdminUsers() {
   return useQuery({
     queryKey: ['admin-users'],
@@ -59,10 +66,12 @@ export function useAdminUsers() {
         return str.includes('@') && str.includes('.');
       };
 
-      // 4. Get emails from auth.users for ALL profiles using RPC
+      // 4. Get emails AND display_name from auth.users for ALL profiles using RPC
       const profileIds = nonLogopedistProfiles.map(p => p.id);
 
       let authEmailMap = new Map<string, string>();
+      let authDisplayNameMap = new Map<string, string>();
+      
       const { data: authEmails, error: authEmailsError } = await supabase
         .rpc('get_parent_emails', { parent_ids: profileIds });
       
@@ -70,7 +79,12 @@ export function useAdminUsers() {
         console.error('Error fetching auth emails:', authEmailsError);
       } else if (authEmails) {
         authEmailMap = new Map(
-          authEmails.map((e: { user_id: string; email: string }) => [e.user_id, e.email])
+          authEmails.map((e: AuthUserData) => [e.user_id, e.email])
+        );
+        authDisplayNameMap = new Map(
+          authEmails
+            .filter((e: AuthUserData) => e.display_name)
+            .map((e: AuthUserData) => [e.user_id, e.display_name!])
         );
       }
 
@@ -109,15 +123,28 @@ export function useAdminUsers() {
         const email = authEmailMap.get(profile.id) || 
                       (isEmailFormat(profile.username) ? profile.username : null);
         
-        // NAME: first_name + last_name, or username if it's NOT email format
+        // NAME PRIORITY:
+        // 1. first_name + last_name from profiles table
+        // 2. username (if not email format)
+        // 3. display_name from auth.users (Google OAuth full_name/name)
         let firstName = profile.first_name || null;
         let lastName = profile.last_name || null;
         
-        // If no first/last name, try to extract from username (if not email format)
-        if (!firstName && !lastName && profile.username && !isEmailFormat(profile.username)) {
-          const parts = profile.username.split(' ');
-          firstName = parts[0] || null;
-          lastName = parts.slice(1).join(' ') || null;
+        if (!firstName && !lastName) {
+          if (profile.username && !isEmailFormat(profile.username)) {
+            // Use username if it's not an email
+            const parts = profile.username.split(' ');
+            firstName = parts[0] || null;
+            lastName = parts.slice(1).join(' ') || null;
+          } else {
+            // Fallback to display_name from auth.users (Google OAuth)
+            const displayName = authDisplayNameMap.get(profile.id);
+            if (displayName) {
+              const parts = displayName.split(' ');
+              firstName = parts[0] || null;
+              lastName = parts.slice(1).join(' ') || null;
+            }
+          }
         }
         
         return {
