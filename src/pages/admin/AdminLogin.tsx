@@ -169,13 +169,14 @@ export default function AdminLogin() {
                 )}
               </Button>
 
-              <Link 
-                to="/" 
+              <button
+                type="button"
+                onClick={() => window.location.href = '/'}
                 className="w-full h-11 inline-flex items-center justify-center gap-2 bg-white text-black rounded-md border border-gray-200 shadow-sm hover:bg-gray-100 transition-colors text-sm font-medium"
               >
                 <Home className="h-4 w-4" />
                 Nazaj na začetno stran
-              </Link>
+              </button>
             </form>
 
             <div className="mt-6 text-center text-sm text-muted-foreground">
