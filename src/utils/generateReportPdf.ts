@@ -1,20 +1,34 @@
 import jsPDF from 'jspdf';
 import { ReportData } from '@/components/admin/ReportTemplateEditor';
 
-// Font loading with retry logic
-const loadFontWithRetry = async (url: string, retries = 3): Promise<string | null> => {
-  for (let i = 0; i < retries; i++) {
+// Font loading with FileReader for reliable binary to Base64 conversion
+const loadFontAsBase64 = async (url: string, retries = 3): Promise<string | null> => {
+  for (let attempt = 0; attempt < retries; attempt++) {
     try {
       const response = await fetch(url);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const arrayBuffer = await response.arrayBuffer();
-      return btoa(
-        new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
-      );
+      
+      const blob = await response.blob();
+      
+      // Use FileReader for reliable binary to Base64 conversion
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          // Remove "data:application/octet-stream;base64," prefix
+          const result = reader.result as string;
+          const base64String = result.split(',')[1];
+          resolve(base64String);
+        };
+        reader.onerror = () => {
+          console.warn('FileReader error');
+          resolve(null);
+        };
+        reader.readAsDataURL(blob);
+      });
     } catch (error) {
-      console.warn(`Font load attempt ${i + 1} failed:`, error);
-      if (i === retries - 1) return null;
-      await new Promise(resolve => setTimeout(resolve, 500)); // Wait before retry
+      console.warn(`Font load attempt ${attempt + 1} failed:`, error);
+      if (attempt === retries - 1) return null;
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
   }
   return null;
@@ -30,8 +44,8 @@ export async function generateReportPdf(data: ReportData): Promise<Blob> {
   try {
     // Use fontsource CDN for more reliable font loading with full UTF-8 support
     const [robotoBase64, robotoBoldBase64] = await Promise.all([
-      loadFontWithRetry('https://cdn.jsdelivr.net/fontsource/fonts/roboto@latest/latin-ext-400-normal.ttf'),
-      loadFontWithRetry('https://cdn.jsdelivr.net/fontsource/fonts/roboto@latest/latin-ext-700-normal.ttf')
+      loadFontAsBase64('https://cdn.jsdelivr.net/fontsource/fonts/roboto@latest/latin-ext-400-normal.ttf'),
+      loadFontAsBase64('https://cdn.jsdelivr.net/fontsource/fonts/roboto@latest/latin-ext-700-normal.ttf')
     ]);
     
     if (robotoBase64 && robotoBoldBase64) {
