@@ -1117,6 +1117,7 @@ export type Database = {
       get_parent_emails: {
         Args: { parent_ids: string[] }
         Returns: {
+          display_name: string
           email: string
           user_id: string
         }[]
