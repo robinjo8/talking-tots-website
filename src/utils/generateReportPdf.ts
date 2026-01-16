@@ -1,16 +1,37 @@
 import jsPDF from 'jspdf';
 import { ReportData } from '@/components/admin/ReportTemplateEditor';
+import { supabase } from '@/integrations/supabase/client';
 
 // Roboto Regular font with full UTF-8 support (Latin Extended for šumniki)
-// This is a subset of Roboto that includes č, š, ž and other Slovenian characters
 const loadRobotoFont = async (): Promise<string> => {
-  // Fetch the font from Google Fonts CDN and convert to base64
   const response = await fetch('https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5Q.ttf');
   const arrayBuffer = await response.arrayBuffer();
   const base64 = btoa(
     new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
   );
   return base64;
+};
+
+// Load logo from Supabase storage
+const loadLogo = async (): Promise<string | null> => {
+  try {
+    const { data } = supabase.storage
+      .from('slike-ostalo')
+      .getPublicUrl('TomiTalk_logo.png');
+    
+    const response = await fetch(data.publicUrl);
+    const blob = await response.blob();
+    
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(blob);
+    });
+  } catch (error) {
+    console.warn('Failed to load logo:', error);
+    return null;
+  }
 };
 
 export async function generateReportPdf(data: ReportData): Promise<Blob> {
@@ -30,14 +51,14 @@ export async function generateReportPdf(data: ReportData): Promise<Blob> {
   const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 20;
   const contentWidth = pageWidth - 2 * margin;
-  let yPos = 20;
+  let yPos = 15;
   
   // Colors
   const greenColor: [number, number, number] = [76, 175, 80];
   const orangeColor: [number, number, number] = [255, 152, 0];
   const darkGray: [number, number, number] = [60, 60, 60];
   const mediumGray: [number, number, number] = [120, 120, 120];
-  const lightGray: [number, number, number] = [245, 245, 245];
+  const whiteColor: [number, number, number] = [255, 255, 255];
   const borderGray: [number, number, number] = [200, 200, 200];
   
   // Helper function for gender formatting
@@ -59,22 +80,28 @@ export async function generateReportPdf(data: ReportData): Promise<Blob> {
     return `${age} let`;
   };
   
-  // ===== HEADER - TomiTalk branding =====
-  doc.setFontSize(28);
-  doc.setTextColor(...greenColor);
-  doc.text('Tomi', margin, yPos);
-  const tomiWidth = doc.getTextWidth('Tomi');
-  doc.setTextColor(...orangeColor);
-  doc.text('Talk', margin + tomiWidth + 2, yPos);
-  
-  yPos += 12;
+  // ===== HEADER - TomiTalk logo from Supabase =====
+  const logoBase64 = await loadLogo();
+  if (logoBase64) {
+    doc.addImage(logoBase64, 'PNG', margin, yPos, 45, 15);
+    yPos += 20;
+  } else {
+    // Fallback to text if logo fails to load
+    doc.setFontSize(28);
+    doc.setTextColor(...greenColor);
+    doc.text('Tomi', margin, yPos + 10);
+    const tomiWidth = doc.getTextWidth('Tomi');
+    doc.setTextColor(...orangeColor);
+    doc.text('Talk', margin + tomiWidth + 2, yPos + 10);
+    yPos += 18;
+  }
   
   // Decorative line under logo
   doc.setDrawColor(...greenColor);
   doc.setLineWidth(2);
   doc.line(margin, yPos, margin + 60, yPos);
   
-  yPos += 15;
+  yPos += 12;
   
   // ===== DOCUMENT TITLE =====
   doc.setFontSize(18);
@@ -83,72 +110,135 @@ export async function generateReportPdf(data: ReportData): Promise<Blob> {
   
   yPos += 8;
   
-  // Title underline
+  // Title underline (orange)
   const titleWidth = doc.getTextWidth('LOGOPEDSKO POROČILO');
   doc.setDrawColor(...orangeColor);
   doc.setLineWidth(1);
   doc.line((pageWidth - titleWidth) / 2, yPos, (pageWidth + titleWidth) / 2, yPos);
   
-  yPos += 15;
+  yPos += 12;
   
-  // ===== HELPER: Draw info box with header =====
-  const drawInfoBox = (title: string, items: { label: string; value: string }[], startY: number): number => {
-    const boxPadding = 8;
-    const lineHeight = 7;
-    const headerHeight = 10;
-    const boxHeight = headerHeight + boxPadding + (items.length * lineHeight) + boxPadding;
+  // ===== HELPER: Draw info box with header (single column) =====
+  const drawInfoBoxColumn = (
+    title: string, 
+    items: { label: string; value: string }[], 
+    xPos: number,
+    startY: number, 
+    boxWidth: number,
+    minHeight?: number
+  ): number => {
+    const boxPadding = 6;
+    const lineHeight = 6;
+    const headerHeight = 9;
+    const calculatedHeight = headerHeight + boxPadding + (items.length * lineHeight) + boxPadding;
+    const boxHeight = minHeight ? Math.max(calculatedHeight, minHeight) : calculatedHeight;
     
-    // Box background
-    doc.setFillColor(...lightGray);
+    // Box background - WHITE
+    doc.setFillColor(...whiteColor);
     doc.setDrawColor(...borderGray);
     doc.setLineWidth(0.5);
-    doc.roundedRect(margin, startY, contentWidth, boxHeight, 3, 3, 'FD');
+    doc.roundedRect(xPos, startY, boxWidth, boxHeight, 3, 3, 'FD');
     
-    // Header background
+    // Header background (green)
     doc.setFillColor(...greenColor);
-    doc.roundedRect(margin, startY, contentWidth, headerHeight, 3, 3, 'F');
+    doc.roundedRect(xPos, startY, boxWidth, headerHeight, 3, 3, 'F');
     // Cover bottom corners of header
-    doc.rect(margin, startY + headerHeight - 3, contentWidth, 3, 'F');
+    doc.rect(xPos, startY + headerHeight - 3, boxWidth, 3, 'F');
     
     // Header text
-    doc.setFontSize(10);
+    doc.setFontSize(9);
     doc.setTextColor(255, 255, 255);
-    doc.text(title, margin + boxPadding, startY + 7);
+    doc.text(title, xPos + boxPadding, startY + 6);
     
     // Content
     let contentY = startY + headerHeight + boxPadding + 2;
-    doc.setFontSize(10);
+    doc.setFontSize(9);
     doc.setTextColor(...darkGray);
     
     items.forEach(item => {
       doc.setTextColor(...mediumGray);
-      doc.text(`${item.label}:`, margin + boxPadding, contentY);
+      doc.text(`${item.label}:`, xPos + boxPadding, contentY);
       doc.setTextColor(...darkGray);
       const labelWidth = doc.getTextWidth(`${item.label}: `);
-      doc.text(item.value, margin + boxPadding + labelWidth, contentY);
+      doc.text(item.value, xPos + boxPadding + labelWidth, contentY);
       contentY += lineHeight;
     });
     
-    return startY + boxHeight + 8;
+    return boxHeight;
   };
   
-  // ===== PARENT DATA SECTION =====
-  yPos = drawInfoBox('PODATKI O STARŠU / SKRBNIKU', [
+  // ===== TWO COLUMN LAYOUT: Parent + Child =====
+  const columnGap = 8;
+  const columnWidth = (contentWidth - columnGap) / 2;
+  
+  const parentItems = [
     { label: 'Ime in priimek', value: data.parentName || 'Ni podatka' },
     { label: 'E-poštni naslov', value: data.parentEmail || 'Ni podatka' }
-  ], yPos);
+  ];
   
-  // ===== CHILD DATA SECTION =====
-  yPos = drawInfoBox('PODATKI O OTROKU', [
+  const childItems = [
     { label: 'Ime', value: data.childName || 'Ni podatka' },
     { label: 'Starost', value: formatAge(data.childAge) },
     { label: 'Spol', value: formatGender(data.childGender) }
-  ], yPos);
+  ];
   
-  // ===== ASSESSMENT DATA SECTION =====
-  yPos = drawInfoBox('PODATKI O PREVERJANJU', [
-    { label: 'Datum preverjanja', value: data.testDate || 'Ni podatka' }
-  ], yPos);
+  // Calculate heights to make them equal
+  const parentHeight = 9 + 6 + (parentItems.length * 6) + 6;
+  const childHeight = 9 + 6 + (childItems.length * 6) + 6;
+  const maxHeight = Math.max(parentHeight, childHeight);
+  
+  // Draw both boxes side by side
+  drawInfoBoxColumn('PODATKI O STARŠU / SKRBNIKU', parentItems, margin, yPos, columnWidth, maxHeight);
+  drawInfoBoxColumn('PODATKI O OTROKU', childItems, margin + columnWidth + columnGap, yPos, columnWidth, maxHeight);
+  
+  yPos += maxHeight + 8;
+  
+  // ===== ASSESSMENT DATA SECTION (with two dates in one line) =====
+  const reviewBoxPadding = 6;
+  const reviewHeaderHeight = 9;
+  const reviewContentHeight = 8;
+  const reviewBoxHeight = reviewHeaderHeight + reviewBoxPadding + reviewContentHeight + reviewBoxPadding;
+  
+  // Box background - WHITE
+  doc.setFillColor(...whiteColor);
+  doc.setDrawColor(...borderGray);
+  doc.setLineWidth(0.5);
+  doc.roundedRect(margin, yPos, contentWidth, reviewBoxHeight, 3, 3, 'FD');
+  
+  // Header background (green)
+  doc.setFillColor(...greenColor);
+  doc.roundedRect(margin, yPos, contentWidth, reviewHeaderHeight, 3, 3, 'F');
+  doc.rect(margin, yPos + reviewHeaderHeight - 3, contentWidth, 3, 'F');
+  
+  // Header text
+  doc.setFontSize(9);
+  doc.setTextColor(255, 255, 255);
+  doc.text('PODATKI O PREVERJANJU', margin + reviewBoxPadding, yPos + 6);
+  
+  // Content - two dates in one line
+  const reviewContentY = yPos + reviewHeaderHeight + reviewBoxPadding + 4;
+  doc.setFontSize(9);
+  
+  // Left: Datum preverjanja izgovorjave
+  doc.setTextColor(...mediumGray);
+  doc.text('Datum preverjanja izgovorjave:', margin + reviewBoxPadding, reviewContentY);
+  doc.setTextColor(...darkGray);
+  const leftLabelWidth = doc.getTextWidth('Datum preverjanja izgovorjave: ');
+  doc.text(data.testDate || 'Ni podatka', margin + reviewBoxPadding + leftLabelWidth, reviewContentY);
+  
+  // Right: Datum izdelave poročila
+  doc.setTextColor(...mediumGray);
+  const rightLabel = 'Datum izdelave poročila:';
+  const rightLabelWidth = doc.getTextWidth(rightLabel);
+  const rightValue = data.reportDate || 'Ni podatka';
+  const rightValueWidth = doc.getTextWidth(' ' + rightValue);
+  const rightStartX = pageWidth - margin - reviewBoxPadding - rightLabelWidth - rightValueWidth;
+  
+  doc.text(rightLabel, rightStartX, reviewContentY);
+  doc.setTextColor(...darkGray);
+  doc.text(' ' + rightValue, rightStartX + rightLabelWidth, reviewContentY);
+  
+  yPos += reviewBoxHeight + 10;
   
   // ===== HELPER: Add text section with title =====
   const addTextSection = (title: string, content: string) => {
@@ -187,7 +277,7 @@ export async function generateReportPdf(data: ReportData): Promise<Blob> {
       yPos += 6;
     });
     
-    yPos += 8;
+    yPos += 6;
   };
   
   // ===== REPORT CONTENT SECTIONS =====
@@ -197,10 +287,8 @@ export async function generateReportPdf(data: ReportData): Promise<Blob> {
   addTextSection('OPOMBE', data.opombe);
   
   // ===== FOOTER =====
-  // Ensure footer is at bottom of page
   const footerY = Math.max(yPos + 15, pageHeight - 35);
   
-  // Check if footer fits on current page
   if (footerY > pageHeight - 20) {
     doc.addPage();
   }
