@@ -346,11 +346,16 @@ export default function AdminUserDetail() {
 
   const handleDeleteGeneratedReport = async (file: StorageFile) => {
     try {
-      const { error } = await supabase.storage
+      const { data, error } = await supabase.storage
         .from('uporabniski-profili')
         .remove([file.path]);
       
       if (error) throw error;
+      
+      // Preveri ali je bila datoteka res izbrisana
+      if (!data || data.length === 0) {
+        throw new Error('Datoteka ni bila izbrisana - preverite dovoljenja');
+      }
       
       toast.success('Poročilo izbrisano');
       await refetchGeneratedReports();
