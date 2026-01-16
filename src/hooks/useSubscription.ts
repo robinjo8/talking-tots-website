@@ -69,6 +69,29 @@ export function useSubscription() {
     try {
       console.log('Checking subscription for user:', user.id);
       
+      // Check if user is a logopedist - they get automatic Pro access
+      const { data: logopedistProfile } = await supabase
+        .from('logopedist_profiles')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (logopedistProfile) {
+        console.log('User is logopedist, granting Pro access');
+        lastCheckedUserIdRef.current = user.id;
+        setSubscription({
+          isSubscribed: true,
+          planId: 'pro',
+          productId: null,
+          subscriptionEnd: null,
+          isLoading: false,
+          isTrialing: false,
+          trialEnd: null,
+        });
+        isCheckingRef.current = false;
+        return;
+      }
+      
       const { data, error } = await supabase.functions.invoke('check-subscription', {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
