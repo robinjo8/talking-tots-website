@@ -15,6 +15,7 @@ import AdminRegister from "@/pages/admin/AdminRegister";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminUsers from "@/pages/admin/AdminUsers";
 import AdminUserDetail from "@/pages/admin/AdminUserDetail";
+import AdminMemberships from "@/pages/admin/AdminMemberships";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 import Profile from "@/pages/Profile";
 import MojaStran from "@/pages/MojaStran";
@@ -2081,6 +2082,7 @@ export function AppRoutes() {
       <Route path="/admin" element={<AdminAuthProvider><AdminDashboard /></AdminAuthProvider>} />
       <Route path="/admin/users" element={<AdminAuthProvider><AdminUsers /></AdminAuthProvider>} />
       <Route path="/admin/users/:parentId/:childId" element={<AdminAuthProvider><AdminUserDetail /></AdminAuthProvider>} />
+      <Route path="/admin/memberships" element={<AdminAuthProvider><AdminMemberships /></AdminAuthProvider>} />
 
       {/* Footer pages */}
       <Route path="/kontakt" element={<Kontakt />} />

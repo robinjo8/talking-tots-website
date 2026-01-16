@@ -1148,6 +1148,7 @@ export type Database = {
           }
       is_internal_logopedist: { Args: { _user_id: string }; Returns: boolean }
       is_logopedist: { Args: { _user_id: string }; Returns: boolean }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       log_child_access: {
         Args: {
           p_access_reason?: string

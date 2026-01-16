@@ -21,6 +21,7 @@ interface AdminAuthContextType {
   profile: LogopedistProfile | null;
   isLoading: boolean;
   isLogopedist: boolean;
+  isSuperAdmin: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, firstName: string, lastName: string, organizationId: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
@@ -35,6 +36,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<LogopedistProfile | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [isProfileLoading, setIsProfileLoading] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   const fetchLogopedistProfile = async (userId: string) => {
     setIsProfileLoading(true);
@@ -63,10 +65,22 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
           organization_name: data.organizations?.name,
           organization_type: data.organizations?.type,
         });
+
+        // Check if user is super admin
+        const { data: adminPerm } = await supabase
+          .from('admin_permissions')
+          .select('role')
+          .eq('user_id', userId)
+          .eq('role', 'super_admin')
+          .eq('is_active', true)
+          .maybeSingle();
+
+        setIsSuperAdmin(!!adminPerm);
       }
     } catch (err) {
       console.error('Error fetching logopedist profile:', err);
       setProfile(null);
+      setIsSuperAdmin(false);
     } finally {
       setIsProfileLoading(false);
     }
@@ -167,6 +181,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     setSession(null);
     setProfile(null);
+    setIsSuperAdmin(false);
     setIsProfileLoading(false);
   };
 
@@ -177,6 +192,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       profile,
       isLoading,
       isLogopedist,
+      isSuperAdmin,
       signIn,
       signUp,
       signOut,
