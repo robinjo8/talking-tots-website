@@ -123,28 +123,56 @@ export default function AdminUserDetail() {
         });
       }
 
-      // Fetch all articulation test sessions
-      const { data: sessions, error: sessionsError } = await supabase
-        .from('articulation_test_sessions')
-        .select('id, submitted_at, completed_at, created_at')
-        .eq('child_id', childId)
-        .order('submitted_at', { ascending: false, nullsFirst: false });
-
-      if (!sessionsError && sessions && sessions.length > 0) {
-        const formattedSessions = sessions.map(session => {
-          const dateToUse = session.submitted_at || session.completed_at || session.created_at;
-          return {
-            id: session.id,
-            date: dateToUse || '',
-            formattedDate: dateToUse ? format(new Date(dateToUse), 'd. M. yyyy', { locale: sl }) : 'Ni datuma',
-          };
-        });
-        setTestSessions(formattedSessions);
-      }
+      // Sessions will be extracted from storage recordings in a separate effect
     }
 
     fetchUserData();
   }, [childId, parentId]);
+
+  // Extract test sessions from storage recordings
+  useEffect(() => {
+    if (recordings.length === 0) return;
+
+    const sessionsMap: { [key: string]: { id: string; date: string; formattedDate: string } } = {};
+
+    recordings.forEach(session => {
+      // session.sessionName is like "Seja-1", "Seja-2", etc.
+      const sessionName = session.sessionName;
+      
+      // Get the earliest date from recordings in this session
+      if (session.recordings.length > 0) {
+        // Try to extract date from file names (format: Z-57-ZOGA-2026-01-15T17-32-57-092Z.webm)
+        let earliestDate: Date | null = null;
+        
+        session.recordings.forEach(file => {
+          const dateMatch = file.name.match(/(\d{4}-\d{2}-\d{2})T/);
+          if (dateMatch) {
+            const fileDate = new Date(dateMatch[1]);
+            if (!earliestDate || fileDate < earliestDate) {
+              earliestDate = fileDate;
+            }
+          }
+        });
+
+        if (earliestDate) {
+          sessionsMap[sessionName] = {
+            id: sessionName,
+            date: earliestDate.toISOString(),
+            formattedDate: format(earliestDate, 'd. M. yyyy', { locale: sl }),
+          };
+        }
+      }
+    });
+
+    // Sort sessions by number (Seja-1, Seja-2, etc.)
+    const sortedSessions = Object.values(sessionsMap).sort((a, b) => {
+      const numA = parseInt(a.id.replace('Seja-', ''));
+      const numB = parseInt(b.id.replace('Seja-', ''));
+      return numB - numA; // Descending (newest first)
+    });
+
+    setTestSessions(sortedSessions);
+  }, [recordings]);
 
   // Update reportData when fetched data changes
   useEffect(() => {
