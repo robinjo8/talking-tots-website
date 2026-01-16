@@ -187,11 +187,15 @@ export function ReportTemplateEditor({ data, testSessions, onFieldChange, onSess
       {/* Footer with signature */}
       <div className="border-t pt-4 mt-6">
         <div className="flex justify-end">
-          <div className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-1 text-sm text-right">
-            <span className="text-muted-foreground text-right">Poročilo izdelal/a:</span>
-            <span className="font-medium">{data.logopedistName || 'Ni podatka'}</span>
-            <span className="text-muted-foreground text-right">Datum:</span>
-            <span className="font-medium">{data.reportDate}</span>
+          <div className="text-sm">
+            <div className="flex gap-2">
+              <span className="text-muted-foreground">Poročilo izdelal/a:</span>
+              <span className="font-medium">{data.logopedistName || 'Ni podatka'}</span>
+            </div>
+            <div className="flex gap-2">
+              <span className="text-muted-foreground">Datum:</span>
+              <span className="font-medium ml-[76px]">{data.reportDate}</span>
+            </div>
           </div>
         </div>
       </div>
