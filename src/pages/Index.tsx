@@ -1,6 +1,3 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import { HeroSection } from "@/components/home/HeroSection";
 import { LearningOutcomesSection } from "@/components/home/LearningOutcomesSection";
@@ -14,15 +11,6 @@ import { CallToActionSection } from "@/components/home/CallToActionSection";
 import { FooterSection } from "@/components/home/FooterSection";
 
 const Index = () => {
-  const { user, profile, isLoading } = useAuth();
-  const navigate = useNavigate();
-
-  // Redirect logopedists to admin portal
-  useEffect(() => {
-    if (!isLoading && user && profile?.isLogopedist) {
-      navigate('/admin', { replace: true });
-    }
-  }, [isLoading, user, profile?.isLogopedist, navigate]);
   return (
     <div className="min-h-screen bg-background">
       <Header />
