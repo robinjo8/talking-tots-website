@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Play } from 'lucide-react';
 
 interface FortuneWheelProps {
   segmentCount: number;
@@ -142,16 +142,6 @@ export const FortuneWheel: React.FC<FortuneWheelProps> = ({
             );
           })}
 
-          {/* Center circle */}
-          <circle 
-            cx="50" 
-            cy="50" 
-            r="12" 
-            fill="url(#centerGradient)"
-            stroke="white"
-            strokeWidth="1"
-          />
-
           {/* Gradient definitions */}
           <defs>
             <radialGradient id="centerGradient">
@@ -160,18 +150,21 @@ export const FortuneWheel: React.FC<FortuneWheelProps> = ({
             </radialGradient>
           </defs>
         </svg>
-      </div>
 
-      {/* Spin Button - Below wheel */}
-      <div className="mt-6 flex justify-center">
-        <Button
+        {/* Center Spin Button - positioned absolutely in center */}
+        <button
           onClick={onSpin}
           disabled={isSpinning}
-          size="lg"
-          className="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-bold text-xl px-8 py-6 rounded-full shadow-lg transform transition-transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-orange-600 shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-70 disabled:cursor-not-allowed border-4 border-white ${!isSpinning ? 'animate-pulse' : ''}`}
+          style={{
+            boxShadow: '0 4px 20px rgba(251, 146, 60, 0.5), inset 0 2px 10px rgba(255, 255, 255, 0.3)',
+          }}
         >
-          {isSpinning ? 'VRTI SE...' : 'ZAVRTI KOLO'}
-        </Button>
+          <Play 
+            className={`w-8 h-8 md:w-10 md:h-10 text-white ml-1 ${isSpinning ? 'animate-spin' : ''}`} 
+            fill="white"
+          />
+        </button>
       </div>
     </div>
   );
