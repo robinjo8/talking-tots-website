@@ -171,7 +171,7 @@ export const FortuneWheel: React.FC<FortuneWheelProps> = ({
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-[24%] aspect-square rounded-full flex items-center justify-center transition-shadow duration-300 hover:shadow-[0_0_30px_rgba(251,146,60,0.8)] disabled:cursor-not-allowed border-4 border-white"
           style={{
             background: 'linear-gradient(135deg, hsl(40, 95%, 55%) 0%, hsl(25, 95%, 50%) 100%)',
-            boxShadow: '0 0 20px rgba(251, 146, 60, 0.6), 0 0 40px rgba(251, 146, 60, 0.3), 0 4px 15px rgba(0, 0, 0, 0.2)',
+            boxShadow: '0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(251, 146, 60, 0.9), 0 0 60px rgba(251, 146, 60, 0.6), 0 0 90px rgba(251, 146, 60, 0.4)',
           }}
         >
           <RotateCw 
