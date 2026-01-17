@@ -145,16 +145,6 @@ export const FortuneWheel: React.FC<FortuneWheelProps> = ({
               );
             })}
 
-            {/* Center cover circle - drawn LAST to be on top of segments */}
-            <circle 
-              cx="50" 
-              cy="50" 
-              r="13" 
-              fill="hsl(30, 95%, 50%)"
-              stroke="white"
-              strokeWidth="0.5"
-            />
-
             {/* Gradient definitions */}
             <defs>
               <radialGradient id="centerGradient">
@@ -165,13 +155,14 @@ export const FortuneWheel: React.FC<FortuneWheelProps> = ({
           </svg>
         </div>
 
-        {/* Center Spin Button - positioned outside rotating container */}
+        {/* Center Spin Button - single clean button that covers segment tips */}
         <button
           onClick={onSpin}
           disabled={isSpinning}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-orange-600 shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-70 disabled:cursor-not-allowed border-4 border-white"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-[22%] aspect-square rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-70 disabled:cursor-not-allowed border-4 border-white"
           style={{
-            boxShadow: '0 4px 20px rgba(251, 146, 60, 0.5), inset 0 2px 10px rgba(255, 255, 255, 0.3)',
+            background: 'linear-gradient(135deg, hsl(40, 95%, 55%) 0%, hsl(25, 95%, 50%) 100%)',
+            boxShadow: '0 4px 20px rgba(251, 146, 60, 0.5)',
           }}
         >
           <RotateCw 
