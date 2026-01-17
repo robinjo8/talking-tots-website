@@ -529,6 +529,83 @@ function generateLabirintRoutes(): JSX.Element[] {
 }
 
 // ============================================
+// URL-ENCODED ROUTES FOR DIACRITICS
+// When browser encodes č → %C4%8D, š → %C5%A0, ž → %C5%BD
+// ============================================
+function generateUrlEncodedRoutes(): JSX.Element[] {
+  return [
+    // Spomin - URL encoded
+    <Route key="spomin-č-enc" path="/govorne-igre/spomin/spomin-%C4%8D" element={<Navigate to="/govorne-igre/spomin/spomin-č" replace />} />,
+    <Route key="spomin-š-enc" path="/govorne-igre/spomin/spomin-%C5%A0" element={<Navigate to="/govorne-igre/spomin/spomin-š" replace />} />,
+    <Route key="spomin-ž-enc" path="/govorne-igre/spomin/spomin-%C5%BD" element={<Navigate to="/govorne-igre/spomin/spomin-ž" replace />} />,
+    
+    // Sestavljanke - URL encoded Č
+    <Route key="sest-č-enc" path="/govorne-igre/sestavljanke/%C4%8D" element={<Navigate to="/govorne-igre/sestavljanke/č" replace />} />,
+    <Route key="sest-č56-enc" path="/govorne-igre/sestavljanke/%C4%8D56" element={<Navigate to="/govorne-igre/sestavljanke/č56" replace />} />,
+    <Route key="sest-č78-enc" path="/govorne-igre/sestavljanke/%C4%8D78" element={<Navigate to="/govorne-igre/sestavljanke/č78" replace />} />,
+    <Route key="sest-č910-enc" path="/govorne-igre/sestavljanke/%C4%8D910" element={<Navigate to="/govorne-igre/sestavljanke/č910" replace />} />,
+    // Sestavljanke - URL encoded Š
+    <Route key="sest-š-enc" path="/govorne-igre/sestavljanke/%C5%A0" element={<Navigate to="/govorne-igre/sestavljanke/š" replace />} />,
+    <Route key="sest-š56-enc" path="/govorne-igre/sestavljanke/%C5%A056" element={<Navigate to="/govorne-igre/sestavljanke/š56" replace />} />,
+    <Route key="sest-š78-enc" path="/govorne-igre/sestavljanke/%C5%A078" element={<Navigate to="/govorne-igre/sestavljanke/š78" replace />} />,
+    <Route key="sest-š910-enc" path="/govorne-igre/sestavljanke/%C5%A0910" element={<Navigate to="/govorne-igre/sestavljanke/š910" replace />} />,
+    // Sestavljanke - URL encoded Ž
+    <Route key="sest-ž-enc" path="/govorne-igre/sestavljanke/%C5%BD" element={<Navigate to="/govorne-igre/sestavljanke/ž" replace />} />,
+    <Route key="sest-ž56-enc" path="/govorne-igre/sestavljanke/%C5%BD56" element={<Navigate to="/govorne-igre/sestavljanke/ž56" replace />} />,
+    <Route key="sest-ž78-enc" path="/govorne-igre/sestavljanke/%C5%BD78" element={<Navigate to="/govorne-igre/sestavljanke/ž78" replace />} />,
+    <Route key="sest-ž910-enc" path="/govorne-igre/sestavljanke/%C5%BD910" element={<Navigate to="/govorne-igre/sestavljanke/ž910" replace />} />,
+    
+    // Zaporedja - URL encoded Č
+    <Route key="zap-č-enc" path="/govorne-igre/zaporedja/%C4%8D" element={<Navigate to="/govorne-igre/zaporedja/č" replace />} />,
+    <Route key="zap-č56-enc" path="/govorne-igre/zaporedja/%C4%8D56" element={<Navigate to="/govorne-igre/zaporedja/č56" replace />} />,
+    <Route key="zap-č78-enc" path="/govorne-igre/zaporedja/%C4%8D78" element={<Navigate to="/govorne-igre/zaporedja/č78" replace />} />,
+    <Route key="zap-č910-enc" path="/govorne-igre/zaporedja/%C4%8D910" element={<Navigate to="/govorne-igre/zaporedja/č910" replace />} />,
+    // Zaporedja - URL encoded Š
+    <Route key="zap-š-enc" path="/govorne-igre/zaporedja/%C5%A0" element={<Navigate to="/govorne-igre/zaporedja/š" replace />} />,
+    <Route key="zap-š56-enc" path="/govorne-igre/zaporedja/%C5%A056" element={<Navigate to="/govorne-igre/zaporedja/š56" replace />} />,
+    <Route key="zap-š78-enc" path="/govorne-igre/zaporedja/%C5%A078" element={<Navigate to="/govorne-igre/zaporedja/š78" replace />} />,
+    <Route key="zap-š910-enc" path="/govorne-igre/zaporedja/%C5%A0910" element={<Navigate to="/govorne-igre/zaporedja/š910" replace />} />,
+    // Zaporedja - URL encoded Ž
+    <Route key="zap-ž-enc" path="/govorne-igre/zaporedja/%C5%BD" element={<Navigate to="/govorne-igre/zaporedja/ž" replace />} />,
+    <Route key="zap-ž56-enc" path="/govorne-igre/zaporedja/%C5%BD56" element={<Navigate to="/govorne-igre/zaporedja/ž56" replace />} />,
+    <Route key="zap-ž78-enc" path="/govorne-igre/zaporedja/%C5%BD78" element={<Navigate to="/govorne-igre/zaporedja/ž78" replace />} />,
+    <Route key="zap-ž910-enc" path="/govorne-igre/zaporedja/%C5%BD910" element={<Navigate to="/govorne-igre/zaporedja/ž910" replace />} />,
+    
+    // Drsna sestavljanka - URL encoded Č
+    <Route key="drsna-č34-enc" path="/govorne-igre/drsna-sestavljanka/%C4%8D34" element={<Navigate to="/govorne-igre/drsna-sestavljanka/č34" replace />} />,
+    <Route key="drsna-č56-enc" path="/govorne-igre/drsna-sestavljanka/%C4%8D56" element={<Navigate to="/govorne-igre/drsna-sestavljanka/č56" replace />} />,
+    <Route key="drsna-č78-enc" path="/govorne-igre/drsna-sestavljanka/%C4%8D78" element={<Navigate to="/govorne-igre/drsna-sestavljanka/č78" replace />} />,
+    <Route key="drsna-č910-enc" path="/govorne-igre/drsna-sestavljanka/%C4%8D910" element={<Navigate to="/govorne-igre/drsna-sestavljanka/č910" replace />} />,
+    // Drsna sestavljanka - URL encoded Š
+    <Route key="drsna-š34-enc" path="/govorne-igre/drsna-sestavljanka/%C5%A034" element={<Navigate to="/govorne-igre/drsna-sestavljanka/š34" replace />} />,
+    <Route key="drsna-š56-enc" path="/govorne-igre/drsna-sestavljanka/%C5%A056" element={<Navigate to="/govorne-igre/drsna-sestavljanka/š56" replace />} />,
+    <Route key="drsna-š78-enc" path="/govorne-igre/drsna-sestavljanka/%C5%A078" element={<Navigate to="/govorne-igre/drsna-sestavljanka/š78" replace />} />,
+    <Route key="drsna-š910-enc" path="/govorne-igre/drsna-sestavljanka/%C5%A0910" element={<Navigate to="/govorne-igre/drsna-sestavljanka/š910" replace />} />,
+    // Drsna sestavljanka - URL encoded Ž
+    <Route key="drsna-ž34-enc" path="/govorne-igre/drsna-sestavljanka/%C5%BD34" element={<Navigate to="/govorne-igre/drsna-sestavljanka/ž34" replace />} />,
+    <Route key="drsna-ž56-enc" path="/govorne-igre/drsna-sestavljanka/%C5%BD56" element={<Navigate to="/govorne-igre/drsna-sestavljanka/ž56" replace />} />,
+    <Route key="drsna-ž78-enc" path="/govorne-igre/drsna-sestavljanka/%C5%BD78" element={<Navigate to="/govorne-igre/drsna-sestavljanka/ž78" replace />} />,
+    <Route key="drsna-ž910-enc" path="/govorne-igre/drsna-sestavljanka/%C5%BD910" element={<Navigate to="/govorne-igre/drsna-sestavljanka/ž910" replace />} />,
+    
+    // Igra ujemanja - URL encoded Č
+    <Route key="uje-č-enc" path="/govorne-igre/igra-ujemanja/%C4%8D" element={<Navigate to="/govorne-igre/igra-ujemanja/č" replace />} />,
+    <Route key="uje-č56-enc" path="/govorne-igre/igra-ujemanja/%C4%8D56" element={<Navigate to="/govorne-igre/igra-ujemanja/č56" replace />} />,
+    <Route key="uje-č78-enc" path="/govorne-igre/igra-ujemanja/%C4%8D78" element={<Navigate to="/govorne-igre/igra-ujemanja/č78" replace />} />,
+    <Route key="uje-č910-enc" path="/govorne-igre/igra-ujemanja/%C4%8D910" element={<Navigate to="/govorne-igre/igra-ujemanja/č910" replace />} />,
+    // Igra ujemanja - URL encoded Š
+    <Route key="uje-š-enc" path="/govorne-igre/igra-ujemanja/%C5%A0" element={<Navigate to="/govorne-igre/igra-ujemanja/š" replace />} />,
+    <Route key="uje-š56-enc" path="/govorne-igre/igra-ujemanja/%C5%A056" element={<Navigate to="/govorne-igre/igra-ujemanja/š56" replace />} />,
+    <Route key="uje-š78-enc" path="/govorne-igre/igra-ujemanja/%C5%A078" element={<Navigate to="/govorne-igre/igra-ujemanja/š78" replace />} />,
+    <Route key="uje-š910-enc" path="/govorne-igre/igra-ujemanja/%C5%A0910" element={<Navigate to="/govorne-igre/igra-ujemanja/š910" replace />} />,
+    // Igra ujemanja - URL encoded Ž
+    <Route key="uje-ž-enc" path="/govorne-igre/igra-ujemanja/%C5%BD" element={<Navigate to="/govorne-igre/igra-ujemanja/ž" replace />} />,
+    <Route key="uje-ž56-enc" path="/govorne-igre/igra-ujemanja/%C5%BD56" element={<Navigate to="/govorne-igre/igra-ujemanja/ž56" replace />} />,
+    <Route key="uje-ž78-enc" path="/govorne-igre/igra-ujemanja/%C5%BD78" element={<Navigate to="/govorne-igre/igra-ujemanja/ž78" replace />} />,
+    <Route key="uje-ž910-enc" path="/govorne-igre/igra-ujemanja/%C5%BD910" element={<Navigate to="/govorne-igre/igra-ujemanja/ž910" replace />} />,
+  ];
+}
+
+// ============================================
 // LEGACY REDIRECTS
 // ============================================
 function generateLegacyRedirects(): JSX.Element[] {
@@ -556,6 +633,7 @@ export function GameRoutes(): JSX.Element[] {
     ...generateDrsnaSestavljankaRoutes(),
     ...generateIgraUjemanjaRoutes(),
     ...generateLabirintRoutes(),
+    ...generateUrlEncodedRoutes(),
     ...generateLegacyRedirects(),
   ];
 }
