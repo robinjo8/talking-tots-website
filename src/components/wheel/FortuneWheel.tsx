@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play } from 'lucide-react';
+import { RotateCw } from 'lucide-react';
 
 interface FortuneWheelProps {
   segmentCount: number;
@@ -155,14 +155,13 @@ export const FortuneWheel: React.FC<FortuneWheelProps> = ({
         <button
           onClick={onSpin}
           disabled={isSpinning}
-          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-orange-600 shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-70 disabled:cursor-not-allowed border-4 border-white ${!isSpinning ? 'animate-pulse' : ''}`}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-orange-600 shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-70 disabled:cursor-not-allowed border-4 border-white"
           style={{
             boxShadow: '0 4px 20px rgba(251, 146, 60, 0.5), inset 0 2px 10px rgba(255, 255, 255, 0.3)',
           }}
         >
-          <Play 
-            className={`w-8 h-8 md:w-10 md:h-10 text-white ml-1 ${isSpinning ? 'animate-spin' : ''}`} 
-            fill="white"
+          <RotateCw 
+            className="w-8 h-8 md:w-10 md:h-10 text-white"
           />
         </button>
       </div>
