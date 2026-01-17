@@ -84,6 +84,9 @@ export const HeroSection = () => {
                     className="w-full h-full object-contain animate-float"
                     style={{ transform: 'scaleX(-1)' }}
                     fetchPriority="high"
+                    width={320}
+                    height={380}
+                    decoding="async"
                   />
                 </div>
               </div>
@@ -135,6 +138,9 @@ export const HeroSection = () => {
                   className="w-full h-full object-contain animate-float"
                   style={{ transform: 'scaleX(-1)' }}
                   fetchPriority="high"
+                  width={512}
+                  height={609}
+                  decoding="async"
                 />
               </div>
             </div>
