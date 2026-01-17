@@ -44,6 +44,8 @@ function FeatureCard({ feature, onButtonClick }: { feature: typeof features[0]; 
           src={feature.image}
           alt={feature.title}
           className="w-full h-full object-cover"
+          loading="lazy"
+          decoding="async"
         />
       </div>
       <CardContent className="p-6 text-center">
