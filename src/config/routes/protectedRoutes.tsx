@@ -60,7 +60,6 @@ const MatchingGameLetter = lazy(() => import('@/pages/MatchingGameLetter'));
 const MatchingGameR3to4 = lazy(() => import('@/pages/MatchingGameR3to4'));
 
 // Routers
-const DrsnaSestavljanka34Router = lazy(() => import('@/pages/DrsnaSestavljanka34Router'));
 const LabirintX = lazy(() => import('@/pages/LabirintX'));
 const LabirintC = lazy(() => import('@/pages/LabirintC'));
 
@@ -150,7 +149,6 @@ export function ProtectedUserRoutes(): JSX.Element[] {
     <Route key="matching-r-3-4" path="/matching-game-r-3-to-4" element={<ProtectedRoute><MatchingGameR3to4 /></ProtectedRoute>} />,
     
     // Routers
-    <Route key="drsna-34-router" path="/drsna-sestavljanka-34/:letter" element={<ProtectedRoute><DrsnaSestavljanka34Router /></ProtectedRoute>} />,
     <Route key="labirint-x" path="/labirint-x/:letter" element={<ProtectedRoute><LabirintX /></ProtectedRoute>} />,
     <Route key="labirint-c-old" path="/labirint-c" element={<ProtectedRoute><LabirintC /></ProtectedRoute>} />,
   ];
