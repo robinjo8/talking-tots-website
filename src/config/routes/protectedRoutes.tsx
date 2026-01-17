@@ -2,7 +2,7 @@
  * Protected user page route definitions
  */
 import { lazy } from 'react';
-import { Route } from 'react-router-dom';
+import { Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 
 const Profile = lazy(() => import('@/pages/Profile'));
@@ -76,6 +76,8 @@ export function ProtectedUserRoutes(): JSX.Element[] {
     <Route key="moja-stran" path="/moja-stran" element={<ProtectedRoute><MojaStran /></ProtectedRoute>} />,
     <Route key="moje-aplikacije" path="/moje-aplikacije" element={<ProtectedRoute><MojeAplikacije /></ProtectedRoute>} />,
     <Route key="govornojezicovne-vaje" path="/govornojezicovne-vaje" element={<ProtectedRoute><GovornojezicovneVaje /></ProtectedRoute>} />,
+    <Route key="govorno-jezikovne-vaje" path="/govorno-jezikovne-vaje" element={<ProtectedRoute><GovornojezicovneVaje /></ProtectedRoute>} />,
+    <Route key="govorno-jezikovne-vaje-art" path="/govorno-jezikovne-vaje/artikulacija/:letter" element={<ProtectedRoute><ArtikulacijaVaje /></ProtectedRoute>} />,
     <Route key="vaje-motorike-govoril" path="/vaje-motorike-govoril" element={<ProtectedRoute><VajeMoториkeGovoril /></ProtectedRoute>} />,
     <Route key="art-izgovorjava" path="/art-izgovorjava" element={<ProtectedRoute><ArtIzgovorjavaPage /></ProtectedRoute>} />,
     <Route key="artikulacija-vaje" path="/artikulacija-vaje" element={<ProtectedRoute><ArtikulacijaVaje /></ProtectedRoute>} />,
