@@ -123,22 +123,25 @@ export default function SestavljankeGames() {
     const childAge = selectedChild.age;
     const ageGroup = getAgeGroup(childAge);
     
+    // Encode letter to handle special characters (č, š, ž)
+    const encodedLetter = encodeURIComponent(game.letter.toLowerCase());
+    
     let targetRoute = '';
     switch (ageGroup) {
       case '3-4':
-        targetRoute = `/govorne-igre/sestavljanke/${game.letter.toLowerCase()}`;
+        targetRoute = `/govorne-igre/sestavljanke/${encodedLetter}`;
         break;
       case '5-6':
-        targetRoute = `/govorne-igre/sestavljanke/${game.letter.toLowerCase()}56`;
+        targetRoute = `/govorne-igre/sestavljanke/${encodedLetter}56`;
         break;
       case '7-8':
-        targetRoute = `/govorne-igre/sestavljanke/${game.letter.toLowerCase()}78`;
+        targetRoute = `/govorne-igre/sestavljanke/${encodedLetter}78`;
         break;
       case '9-10':
-        targetRoute = `/govorne-igre/sestavljanke/${game.letter.toLowerCase()}910`;
+        targetRoute = `/govorne-igre/sestavljanke/${encodedLetter}910`;
         break;
       default:
-        targetRoute = `/govorne-igre/sestavljanke/${game.letter.toLowerCase()}`;
+        targetRoute = `/govorne-igre/sestavljanke/${encodedLetter}`;
     }
     
     navigate(targetRoute);

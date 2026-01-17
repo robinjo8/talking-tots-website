@@ -129,16 +129,17 @@ export default function Zaporedja() {
     
     const suffix = ageSuffixMap[ageGroup] || '';
     
+    // Use URL-encoded paths for special characters (č, š, ž)
     const letterMap: Record<string, string> = {
       'C': '/govorne-igre/zaporedja/c',
-      'Č': '/govorne-igre/zaporedja/č',
+      'Č': '/govorne-igre/zaporedja/%C4%8D',
       'K': '/govorne-igre/zaporedja/k',
       'L': '/govorne-igre/zaporedja/l',
       'R': '/govorne-igre/zaporedja/r',
       'S': '/govorne-igre/zaporedja/s',
-      'Š': '/govorne-igre/zaporedja/š',
+      'Š': '/govorne-igre/zaporedja/%C5%A1',
       'Z': '/govorne-igre/zaporedja/z',
-      'Ž': '/govorne-igre/zaporedja/ž'
+      'Ž': '/govorne-igre/zaporedja/%C5%BE'
     };
     
     const basePath = letterMap[game.letter];
