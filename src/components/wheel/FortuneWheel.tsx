@@ -80,82 +80,92 @@ export const FortuneWheel: React.FC<FortuneWheelProps> = ({
         />
       </div>
 
-      {/* Wheel Container */}
-      <div 
-        className="relative aspect-square"
-        style={{
-          transform: `rotate(${rotation}deg)`,
-          transition: isSpinning 
-            ? 'transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99)' 
-            : 'none',
-        }}
-      >
-        <svg 
-          viewBox="0 0 100 100" 
-          className="w-full h-full drop-shadow-2xl"
+      {/* Wheel Container - only the wheel rotates */}
+      <div className="relative aspect-square">
+        <div 
+          className="w-full h-full"
+          style={{
+            transform: `rotate(${rotation}deg)`,
+            transition: isSpinning 
+              ? 'transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99)' 
+              : 'none',
+          }}
         >
-          {/* Outer ring */}
-          <circle 
-            cx="50" 
-            cy="50" 
-            r="48" 
-            fill="none" 
-            stroke="hsl(35, 90%, 50%)" 
-            strokeWidth="3"
-            className="drop-shadow-lg"
-          />
-          
-          {/* Segments */}
-          {Array.from({ length: segmentCount }).map((_, index) => {
-            const textPos = getTextPosition(index);
-            const color = SEGMENT_COLORS[index % SEGMENT_COLORS.length];
-            const isSelected = selectedIndex === index && !isSpinning;
+          <svg 
+            viewBox="0 0 100 100" 
+            className="w-full h-full drop-shadow-2xl"
+          >
+            {/* Outer ring */}
+            <circle 
+              cx="50" 
+              cy="50" 
+              r="48" 
+              fill="none" 
+              stroke="hsl(35, 90%, 50%)" 
+              strokeWidth="3"
+              className="drop-shadow-lg"
+            />
             
-            return (
-              <g key={index}>
-                {/* Segment path */}
-                <path
-                  d={createSegmentPath(index)}
-                  fill={color}
-                  stroke="white"
-                  strokeWidth="0.5"
-                  className={isSelected ? 'brightness-125' : ''}
-                />
-                
-                {/* Segment number */}
-                <text
-                  x={textPos.x}
-                  y={textPos.y}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  fill="white"
-                  fontSize="5"
-                  fontWeight="bold"
-                  style={{
-                    textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
-                  }}
-                  transform={`rotate(${textPos.rotation}, ${textPos.x}, ${textPos.y})`}
-                >
-                  {index + 1}
-                </text>
-              </g>
-            );
-          })}
+            {/* Center circle to cover segment tips */}
+            <circle 
+              cx="50" 
+              cy="50" 
+              r="12" 
+              fill="hsl(35, 90%, 55%)"
+            />
+            
+            {/* Segments */}
+            {Array.from({ length: segmentCount }).map((_, index) => {
+              const textPos = getTextPosition(index);
+              const color = SEGMENT_COLORS[index % SEGMENT_COLORS.length];
+              const isSelected = selectedIndex === index && !isSpinning;
+              
+              return (
+                <g key={index}>
+                  {/* Segment path */}
+                  <path
+                    d={createSegmentPath(index)}
+                    fill={color}
+                    stroke="white"
+                    strokeWidth="0.5"
+                    className={isSelected ? 'brightness-125' : ''}
+                  />
+                  
+                  {/* Segment number */}
+                  <text
+                    x={textPos.x}
+                    y={textPos.y}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fill="white"
+                    fontSize="5"
+                    fontWeight="bold"
+                    style={{
+                      textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
+                    }}
+                    transform={`rotate(${textPos.rotation}, ${textPos.x}, ${textPos.y})`}
+                  >
+                    {index + 1}
+                  </text>
+                </g>
+              );
+            })}
 
-          {/* Gradient definitions */}
-          <defs>
-            <radialGradient id="centerGradient">
-              <stop offset="0%" stopColor="hsl(35, 95%, 60%)" />
-              <stop offset="100%" stopColor="hsl(25, 95%, 45%)" />
-            </radialGradient>
-          </defs>
-        </svg>
+            {/* Gradient definitions */}
+            <defs>
+              <radialGradient id="centerGradient">
+                <stop offset="0%" stopColor="hsl(35, 95%, 60%)" />
+                <stop offset="100%" stopColor="hsl(25, 95%, 45%)" />
+              </radialGradient>
+            </defs>
+          </svg>
+        </div>
 
-        {/* Center Spin Button - positioned absolutely in center */}
+        {/* Center Spin Button - positioned outside rotating container */}
         <button
           onClick={onSpin}
           disabled={isSpinning}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-orange-600 shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-70 disabled:cursor-not-allowed border-4 border-white"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-orange-600 shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-70 disabled:cursor-not-allowed border-4 border-white"
           style={{
             boxShadow: '0 4px 20px rgba(251, 146, 60, 0.5), inset 0 2px 10px rgba(255, 255, 255, 0.3)',
           }}
