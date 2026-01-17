@@ -23,37 +23,43 @@ export function ConnectionLine({ connections, containerRef }: ConnectionLineProp
       return;
     }
 
-    const container = containerRef.current;
-    const containerRect = container.getBoundingClientRect();
+    // Use requestAnimationFrame to batch layout reads and avoid forced reflow
+    const rafId = requestAnimationFrame(() => {
+      const container = containerRef.current;
+      if (!container) return;
 
-    const newLines: LineCoordinates[] = connections.map(connection => {
-      // Find the DOM elements for from and to positions
-      const fromElement = container.querySelector(
-        `[data-image-id="${connection.from.imageId}"][data-column="${connection.from.column}"][data-index="${connection.from.index}"]`
-      ) as HTMLElement;
-      
-      const toElement = container.querySelector(
-        `[data-image-id="${connection.to.imageId}"][data-column="${connection.to.column}"][data-index="${connection.to.index}"]`
-      ) as HTMLElement;
+      const containerRect = container.getBoundingClientRect();
 
-      if (!fromElement || !toElement) {
-        console.warn('Could not find elements for connection', connection);
-        return { x1: 0, y1: 0, x2: 0, y2: 0, id: connection.id };
-      }
+      const newLines: LineCoordinates[] = connections.map(connection => {
+        // Find the DOM elements for from and to positions
+        const fromElement = container.querySelector(
+          `[data-image-id="${connection.from.imageId}"][data-column="${connection.from.column}"][data-index="${connection.from.index}"]`
+        ) as HTMLElement;
+        
+        const toElement = container.querySelector(
+          `[data-image-id="${connection.to.imageId}"][data-column="${connection.to.column}"][data-index="${connection.to.index}"]`
+        ) as HTMLElement;
 
-      const fromRect = fromElement.getBoundingClientRect();
-      const toRect = toElement.getBoundingClientRect();
+        if (!fromElement || !toElement) {
+          return { x1: 0, y1: 0, x2: 0, y2: 0, id: connection.id };
+        }
 
-      // Calculate center points relative to container
-      const x1 = fromRect.left - containerRect.left + fromRect.width / 2;
-      const y1 = fromRect.top - containerRect.top + fromRect.height / 2;
-      const x2 = toRect.left - containerRect.left + toRect.width / 2;
-      const y2 = toRect.top - containerRect.top + toRect.height / 2;
+        const fromRect = fromElement.getBoundingClientRect();
+        const toRect = toElement.getBoundingClientRect();
 
-      return { x1, y1, x2, y2, id: connection.id };
+        // Calculate center points relative to container
+        const x1 = fromRect.left - containerRect.left + fromRect.width / 2;
+        const y1 = fromRect.top - containerRect.top + fromRect.height / 2;
+        const x2 = toRect.left - containerRect.left + toRect.width / 2;
+        const y2 = toRect.top - containerRect.top + toRect.height / 2;
+
+        return { x1, y1, x2, y2, id: connection.id };
+      });
+
+      setLines(newLines);
     });
 
-    setLines(newLines);
+    return () => cancelAnimationFrame(rafId);
   }, [connections, containerRef]);
 
   if (lines.length === 0) return null;
