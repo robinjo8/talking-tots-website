@@ -1980,6 +1980,7 @@ export function AppRoutes() {
         <Route path="/delovanje-test" element={<DelovanjeTest />} />
         
         {/* Admin Routes - wrapped with AdminAuthProvider */}
+        <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="/admin/login" element={
           <AdminAuthProvider>
             <AdminLogin />
