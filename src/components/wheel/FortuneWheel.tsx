@@ -43,7 +43,7 @@ export const FortuneWheel: React.FC<FortuneWheelProps> = ({
     const endRad = (endAngle * Math.PI) / 180;
     
     const outerRadius = 45; // Outer edge
-    const innerRadius = 12; // Inner edge - creates hole for button
+    const innerRadius = 10; // Inner edge - creates hole for button
     const centerX = 50;
     const centerY = 50;
     
@@ -168,7 +168,7 @@ export const FortuneWheel: React.FC<FortuneWheelProps> = ({
         <button
           onClick={onSpin}
           disabled={isSpinning}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-[22%] aspect-square rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-70 disabled:cursor-not-allowed border-4 border-white"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-[24%] aspect-square rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-70 disabled:cursor-not-allowed border-4 border-white"
           style={{
             background: 'linear-gradient(135deg, hsl(40, 95%, 55%) 0%, hsl(25, 95%, 50%) 100%)',
             boxShadow: '0 4px 20px rgba(251, 146, 60, 0.5)',
