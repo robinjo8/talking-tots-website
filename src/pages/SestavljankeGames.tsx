@@ -112,6 +112,14 @@ export default function SestavljankeGames() {
     }
   };
 
+  // Convert diacritics to ASCII digraphs for URL
+  const toAsciiUrl = (letter: string) => {
+    return letter.toLowerCase()
+      .replace('č', 'ch')
+      .replace('š', 'sh')
+      .replace('ž', 'zh');
+  };
+
   const handleCardClick = (game: typeof memoryGames[0]) => {
     if (!game.available) return;
     
@@ -123,25 +131,25 @@ export default function SestavljankeGames() {
     const childAge = selectedChild.age;
     const ageGroup = getAgeGroup(childAge);
     
-    // Encode letter to handle special characters (č, š, ž)
-    const encodedLetter = encodeURIComponent(game.letter.toLowerCase());
+    // Use ASCII digraphs for URL (ch, sh, zh instead of č, š, ž)
+    const asciiLetter = toAsciiUrl(game.letter);
     
     let targetRoute = '';
     switch (ageGroup) {
       case '3-4':
-        targetRoute = `/govorne-igre/sestavljanke/${encodedLetter}`;
+        targetRoute = `/govorne-igre/sestavljanke/${asciiLetter}`;
         break;
       case '5-6':
-        targetRoute = `/govorne-igre/sestavljanke/${encodedLetter}56`;
+        targetRoute = `/govorne-igre/sestavljanke/${asciiLetter}56`;
         break;
       case '7-8':
-        targetRoute = `/govorne-igre/sestavljanke/${encodedLetter}78`;
+        targetRoute = `/govorne-igre/sestavljanke/${asciiLetter}78`;
         break;
       case '9-10':
-        targetRoute = `/govorne-igre/sestavljanke/${encodedLetter}910`;
+        targetRoute = `/govorne-igre/sestavljanke/${asciiLetter}910`;
         break;
       default:
-        targetRoute = `/govorne-igre/sestavljanke/${encodedLetter}`;
+        targetRoute = `/govorne-igre/sestavljanke/${asciiLetter}`;
     }
     
     navigate(targetRoute);
