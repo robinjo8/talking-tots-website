@@ -106,13 +106,7 @@ export const FortuneWheel: React.FC<FortuneWheelProps> = ({
               className="drop-shadow-lg"
             />
             
-            {/* Center circle to cover segment tips */}
-            <circle 
-              cx="50" 
-              cy="50" 
-              r="12" 
-              fill="hsl(35, 90%, 55%)"
-            />
+            {/* Center circle to cover segment tips - drawn AFTER segments */}
             
             {/* Segments */}
             {Array.from({ length: segmentCount }).map((_, index) => {
@@ -150,6 +144,16 @@ export const FortuneWheel: React.FC<FortuneWheelProps> = ({
                 </g>
               );
             })}
+
+            {/* Center cover circle - drawn LAST to be on top of segments */}
+            <circle 
+              cx="50" 
+              cy="50" 
+              r="13" 
+              fill="hsl(30, 95%, 50%)"
+              stroke="white"
+              strokeWidth="0.5"
+            />
 
             {/* Gradient definitions */}
             <defs>
