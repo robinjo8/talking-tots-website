@@ -593,16 +593,9 @@ export function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        {/* Spomin Games - new nested paths */}
         <Route
-          path="/spomin-r" 
-          element={
-            <ProtectedRoute>
-              <SpominR />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/spomin-games" 
+          path="/govorne-igre/spomin" 
           element={
             <ProtectedRoute>
               <SpominGames />
@@ -610,31 +603,7 @@ export function AppRoutes() {
           }
         />
         <Route
-          path="/spomin-k" 
-          element={
-            <ProtectedRoute>
-              <SpominK />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/spomin-s" 
-          element={
-            <ProtectedRoute>
-              <SpominS />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/spomin-š" 
-          element={
-            <ProtectedRoute>
-              <SpominŠ />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/spomin-c" 
+          path="/govorne-igre/spomin/spomin-c" 
           element={
             <ProtectedRoute>
               <SpominC />
@@ -642,7 +611,7 @@ export function AppRoutes() {
           }
         />
         <Route
-          path="/spomin-č" 
+          path="/govorne-igre/spomin/spomin-č" 
           element={
             <ProtectedRoute>
               <SpominČ />
@@ -650,7 +619,47 @@ export function AppRoutes() {
           }
         />
         <Route
-          path="/spomin-z" 
+          path="/govorne-igre/spomin/spomin-k" 
+          element={
+            <ProtectedRoute>
+              <SpominK />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/govorne-igre/spomin/spomin-l" 
+          element={
+            <ProtectedRoute>
+              <SpominL />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/govorne-igre/spomin/spomin-r" 
+          element={
+            <ProtectedRoute>
+              <SpominR />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/govorne-igre/spomin/spomin-s" 
+          element={
+            <ProtectedRoute>
+              <SpominS />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/govorne-igre/spomin/spomin-š" 
+          element={
+            <ProtectedRoute>
+              <SpominŠ />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/govorne-igre/spomin/spomin-z" 
           element={
             <ProtectedRoute>
               <SpominZ />
@@ -658,21 +667,25 @@ export function AppRoutes() {
           }
         />
         <Route
-          path="/spomin-ž" 
+          path="/govorne-igre/spomin/spomin-ž" 
           element={
             <ProtectedRoute>
               <SpominŽ />
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/spomin-l" 
-          element={
-            <ProtectedRoute>
-              <SpominL />
-            </ProtectedRoute>
-          }
-        />
+        
+        {/* Legacy spomin routes - redirects for backward compatibility */}
+        <Route path="/spomin-games" element={<Navigate to="/govorne-igre/spomin" replace />} />
+        <Route path="/spomin-r" element={<Navigate to="/govorne-igre/spomin/spomin-r" replace />} />
+        <Route path="/spomin-k" element={<Navigate to="/govorne-igre/spomin/spomin-k" replace />} />
+        <Route path="/spomin-s" element={<Navigate to="/govorne-igre/spomin/spomin-s" replace />} />
+        <Route path="/spomin-š" element={<Navigate to="/govorne-igre/spomin/spomin-š" replace />} />
+        <Route path="/spomin-c" element={<Navigate to="/govorne-igre/spomin/spomin-c" replace />} />
+        <Route path="/spomin-č" element={<Navigate to="/govorne-igre/spomin/spomin-č" replace />} />
+        <Route path="/spomin-z" element={<Navigate to="/govorne-igre/spomin/spomin-z" replace />} />
+        <Route path="/spomin-ž" element={<Navigate to="/govorne-igre/spomin/spomin-ž" replace />} />
+        <Route path="/spomin-l" element={<Navigate to="/govorne-igre/spomin/spomin-l" replace />} />
         <Route
           path="/labirint/:letter" 
           element={
