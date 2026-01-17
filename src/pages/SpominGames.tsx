@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -10,6 +11,7 @@ import { FooterSection } from "@/components/FooterSection";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { useImagePrefetch } from "@/hooks/useImagePrefetch";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
 const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/ozadje_1.jpg`;
@@ -113,6 +115,10 @@ export default function SpominGames() {
   const targetActivities = 15;
   const percentage = Math.min((dailyActivities / targetActivities) * 100, 100);
 
+  // Prefetch all game images for faster loading
+  const gameImages = useMemo(() => memoryGames.map(g => g.image), []);
+  useImagePrefetch(gameImages);
+
   const handleSignOut = async () => {
     try {
       await signOut();
@@ -140,6 +146,8 @@ export default function SpominGames() {
             alt={`Črka ${game.letter}`}
             className={`object-contain group-hover:scale-110 transition-transform duration-300 ${isMobile ? 'w-[80%] h-[80%]' : 'w-full h-full'}`}
             style={{ mixBlendMode: 'multiply' }}
+            loading="lazy"
+            decoding="async"
           />
         </div>
       </div>
