@@ -278,6 +278,17 @@ const getComponent = (componentName: string): ComponentType<any> | null => {
   return ALL_COMPONENTS[componentName] || null;
 };
 
+// Helper za URL-enkodirane poti (šumniki)
+const ENCODED_LETTERS: Record<string, string> = {
+  'č': '%C4%8D',
+  'š': '%C5%A1',
+  'ž': '%C5%BE',
+};
+
+const getEncodedLetter = (letter: string): string | null => {
+  return ENCODED_LETTERS[letter] || null;
+};
+
 // ============================================
 // GENERATORJI ROUTOV
 // ============================================
@@ -297,6 +308,13 @@ function generateSpominRoutes(): JSX.Element[] {
       routes.push(
         <Route key={`spomin-${letter}`} path={`${config.basePath}/spomin-${letter}`} element={<ProtectedRoute><Component /></ProtectedRoute>} />
       );
+      // Dodatna pot za URL-enkodirane šumnike
+      const encodedLetter = getEncodedLetter(letter);
+      if (encodedLetter) {
+        routes.push(
+          <Route key={`spomin-${letter}-encoded`} path={`${config.basePath}/spomin-${encodedLetter}`} element={<ProtectedRoute><Component /></ProtectedRoute>} />
+        );
+      }
     }
   });
   
@@ -313,6 +331,7 @@ function generateSestavljankeRoutes(): JSX.Element[] {
   
   SUPPORTED_LETTERS.forEach(letter => {
     const letterName = letterToComponentName(letter);
+    const encodedLetter = getEncodedLetter(letter);
     
     // Base route (3-4 leta)
     const baseComponentName = `Sestavljanke${letterName}`;
@@ -321,6 +340,12 @@ function generateSestavljankeRoutes(): JSX.Element[] {
       routes.push(
         <Route key={`sestavljanke-${letter}`} path={`${config.basePath}/${letter}`} element={<ProtectedRoute><BaseComponent /></ProtectedRoute>} />
       );
+      // Enkodirana pot za šumnike
+      if (encodedLetter) {
+        routes.push(
+          <Route key={`sestavljanke-${letter}-encoded`} path={`${config.basePath}/${encodedLetter}`} element={<ProtectedRoute><BaseComponent /></ProtectedRoute>} />
+        );
+      }
     }
     
     // Age groups
@@ -332,6 +357,12 @@ function generateSestavljankeRoutes(): JSX.Element[] {
         routes.push(
           <Route key={`sestavljanke-${letter}-${ageGroup}`} path={`${config.basePath}/${letter}${ageGroup}`} element={<ProtectedRoute><Component /></ProtectedRoute>} />
         );
+        // Enkodirana pot za šumnike
+        if (encodedLetter) {
+          routes.push(
+            <Route key={`sestavljanke-${letter}-${ageGroup}-encoded`} path={`${config.basePath}/${encodedLetter}${ageGroup}`} element={<ProtectedRoute><Component /></ProtectedRoute>} />
+          );
+        }
       }
     });
   });
@@ -349,6 +380,7 @@ function generateZaporedjaRoutes(): JSX.Element[] {
   
   SUPPORTED_LETTERS.forEach(letter => {
     const letterName = letterToComponentName(letter);
+    const encodedLetter = getEncodedLetter(letter);
     
     // Base route
     const baseComponentName = `Zaporedja${letterName}`;
@@ -357,6 +389,11 @@ function generateZaporedjaRoutes(): JSX.Element[] {
       routes.push(
         <Route key={`zaporedja-${letter}`} path={`${config.basePath}/${letter}`} element={<ProtectedRoute><BaseComponent /></ProtectedRoute>} />
       );
+      if (encodedLetter) {
+        routes.push(
+          <Route key={`zaporedja-${letter}-encoded`} path={`${config.basePath}/${encodedLetter}`} element={<ProtectedRoute><BaseComponent /></ProtectedRoute>} />
+        );
+      }
     }
     
     // Age groups
@@ -368,6 +405,11 @@ function generateZaporedjaRoutes(): JSX.Element[] {
         routes.push(
           <Route key={`zaporedja-${letter}-${ageGroup}`} path={`${config.basePath}/${letter}${ageGroup}`} element={<ProtectedRoute><Component /></ProtectedRoute>} />
         );
+        if (encodedLetter) {
+          routes.push(
+            <Route key={`zaporedja-${letter}-${ageGroup}-encoded`} path={`${config.basePath}/${encodedLetter}${ageGroup}`} element={<ProtectedRoute><Component /></ProtectedRoute>} />
+          );
+        }
       }
     });
   });
@@ -386,6 +428,7 @@ function generateDrsnaSestavljankaRoutes(): JSX.Element[] {
   const ageGroups: AgeGroup[] = ['34', '56', '78', '910'];
   SUPPORTED_LETTERS.forEach(letter => {
     const letterName = letterToComponentName(letter);
+    const encodedLetter = getEncodedLetter(letter);
     ageGroups.forEach(ageGroup => {
       const componentName = `DrsnaSestavljanka${letterName}${ageGroup}`;
       const Component = getComponent(componentName);
@@ -393,6 +436,11 @@ function generateDrsnaSestavljankaRoutes(): JSX.Element[] {
         routes.push(
           <Route key={`drsna-${letter}-${ageGroup}`} path={`${config.basePath}/${letter}${ageGroup}`} element={<ProtectedRoute><Component /></ProtectedRoute>} />
         );
+        if (encodedLetter) {
+          routes.push(
+            <Route key={`drsna-${letter}-${ageGroup}-encoded`} path={`${config.basePath}/${encodedLetter}${ageGroup}`} element={<ProtectedRoute><Component /></ProtectedRoute>} />
+          );
+        }
       }
     });
   });
@@ -410,6 +458,7 @@ function generateIgraUjemanjaRoutes(): JSX.Element[] {
   
   SUPPORTED_LETTERS.forEach(letter => {
     const letterName = letterToComponentName(letter);
+    const encodedLetter = getEncodedLetter(letter);
     
     // Base route
     const baseComponentName = `IgraUjemanja${letterName}`;
@@ -418,6 +467,11 @@ function generateIgraUjemanjaRoutes(): JSX.Element[] {
       routes.push(
         <Route key={`ujemanja-${letter}`} path={`${config.basePath}/${letter}`} element={<ProtectedRoute><BaseComponent /></ProtectedRoute>} />
       );
+      if (encodedLetter) {
+        routes.push(
+          <Route key={`ujemanja-${letter}-encoded`} path={`${config.basePath}/${encodedLetter}`} element={<ProtectedRoute><BaseComponent /></ProtectedRoute>} />
+        );
+      }
     }
     
     // Age groups
@@ -429,6 +483,11 @@ function generateIgraUjemanjaRoutes(): JSX.Element[] {
         routes.push(
           <Route key={`ujemanja-${letter}-${ageGroup}`} path={`${config.basePath}/${letter}${ageGroup}`} element={<ProtectedRoute><Component /></ProtectedRoute>} />
         );
+        if (encodedLetter) {
+          routes.push(
+            <Route key={`ujemanja-${letter}-${ageGroup}-encoded`} path={`${config.basePath}/${encodedLetter}${ageGroup}`} element={<ProtectedRoute><Component /></ProtectedRoute>} />
+          );
+        }
       }
     });
   });
