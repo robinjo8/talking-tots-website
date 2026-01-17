@@ -686,38 +686,244 @@ export function AppRoutes() {
         <Route path="/spomin-z" element={<Navigate to="/govorne-igre/spomin/spomin-z" replace />} />
         <Route path="/spomin-ž" element={<Navigate to="/govorne-igre/spomin/spomin-ž" replace />} />
         <Route path="/spomin-l" element={<Navigate to="/govorne-igre/spomin/spomin-l" replace />} />
+        
+        {/* ============================================= */}
+        {/* SESTAVLJANKE - New nested paths */}
+        {/* ============================================= */}
         <Route
-          path="/labirint/:letter" 
+          path="/govorne-igre/sestavljanke" 
           element={
             <ProtectedRoute>
-              <LabirintX />
+              <SestavljankeGames />
             </ProtectedRoute>
           }
         />
+        {/* Sestavljanke - base letter routes (3-4 years) */}
+        <Route path="/govorne-igre/sestavljanke/c" element={<ProtectedRoute><SestavljankeC /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/č" element={<ProtectedRoute><SestavljankeČ /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/k" element={<ProtectedRoute><SestavljankeK /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/l" element={<ProtectedRoute><SestavljankeL /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/r" element={<ProtectedRoute><SestavljankeR /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/s" element={<ProtectedRoute><SestavljankeS /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/š" element={<ProtectedRoute><SestavljankeŠ /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/z" element={<ProtectedRoute><SestavljankeZ /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/ž" element={<ProtectedRoute><SestavljankeŽ /></ProtectedRoute>} />
+        {/* Sestavljanke - 5-6 years */}
+        <Route path="/govorne-igre/sestavljanke/c56" element={<ProtectedRoute><SestavljankeC56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/č56" element={<ProtectedRoute><SestavljankeČ56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/k56" element={<ProtectedRoute><SestavljankeK56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/l56" element={<ProtectedRoute><SestavljankeL56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/r56" element={<ProtectedRoute><SestavljankeR56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/s56" element={<ProtectedRoute><SestavljankeS56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/š56" element={<ProtectedRoute><SestavljankeŠ56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/z56" element={<ProtectedRoute><SestavljankeZ56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/ž56" element={<ProtectedRoute><SestavljankeŽ56 /></ProtectedRoute>} />
+        {/* Sestavljanke - 7-8 years */}
+        <Route path="/govorne-igre/sestavljanke/c78" element={<ProtectedRoute><SestavljankeC78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/č78" element={<ProtectedRoute><SestavljankeČ78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/k78" element={<ProtectedRoute><SestavljankeK78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/l78" element={<ProtectedRoute><SestavljankeL78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/r78" element={<ProtectedRoute><SestavljankeR78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/s78" element={<ProtectedRoute><SestavljankeS78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/š78" element={<ProtectedRoute><SestavljankeŠ78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/z78" element={<ProtectedRoute><SestavljankeZ78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/ž78" element={<ProtectedRoute><SestavljankeŽ78 /></ProtectedRoute>} />
+        {/* Sestavljanke - 9-10 years */}
+        <Route path="/govorne-igre/sestavljanke/c910" element={<ProtectedRoute><SestavljankeC910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/č910" element={<ProtectedRoute><SestavljankeČ910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/k910" element={<ProtectedRoute><SestavljankeK910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/l910" element={<ProtectedRoute><SestavljankeL910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/r910" element={<ProtectedRoute><SestavljankeR910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/s910" element={<ProtectedRoute><SestavljankeS910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/š910" element={<ProtectedRoute><SestavljankeŠ910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/z910" element={<ProtectedRoute><SestavljankeZ910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/sestavljanke/ž910" element={<ProtectedRoute><SestavljankeŽ910 /></ProtectedRoute>} />
+        {/* Legacy sestavljanke redirect */}
+        <Route path="/sestavljanke-games" element={<Navigate to="/govorne-igre/sestavljanke" replace />} />
+        
+        {/* ============================================= */}
+        {/* ZAPOREDJA - New nested paths */}
+        {/* ============================================= */}
         <Route
-          path="/labirint-c" 
+          path="/govorne-igre/zaporedja" 
           element={
             <ProtectedRoute>
-              <LabirintC />
+              <Zaporedja />
             </ProtectedRoute>
           }
         />
+        {/* Zaporedja - base letter routes (3-4 years) */}
+        <Route path="/govorne-igre/zaporedja/c" element={<ProtectedRoute><ZaporedjaC /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/č" element={<ProtectedRoute><ZaporedjaČ /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/k" element={<ProtectedRoute><ZaporedjaK /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/l" element={<ProtectedRoute><ZaporedjaL /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/r" element={<ProtectedRoute><ZaporedjaR /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/s" element={<ProtectedRoute><ZaporedjaS /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/š" element={<ProtectedRoute><ZaporedjaŠ /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/z" element={<ProtectedRoute><ZaporedjaZ /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/ž" element={<ProtectedRoute><ZaporedjaŽ /></ProtectedRoute>} />
+        {/* Zaporedja - 5-6 years */}
+        <Route path="/govorne-igre/zaporedja/c56" element={<ProtectedRoute><ZaporedjaC56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/č56" element={<ProtectedRoute><ZaporedjaČ56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/k56" element={<ProtectedRoute><ZaporedjaK56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/l56" element={<ProtectedRoute><ZaporedjaL56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/r56" element={<ProtectedRoute><ZaporedjaR56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/s56" element={<ProtectedRoute><ZaporedjaS56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/š56" element={<ProtectedRoute><ZaporedjaŠ56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/z56" element={<ProtectedRoute><ZaporedjaZ56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/ž56" element={<ProtectedRoute><ZaporedjaŽ56 /></ProtectedRoute>} />
+        {/* Zaporedja - 7-8 years */}
+        <Route path="/govorne-igre/zaporedja/c78" element={<ProtectedRoute><ZaporedjaC78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/č78" element={<ProtectedRoute><ZaporedjaČ78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/k78" element={<ProtectedRoute><ZaporedjaK78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/l78" element={<ProtectedRoute><ZaporedjaL78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/r78" element={<ProtectedRoute><ZaporedjaR78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/s78" element={<ProtectedRoute><ZaporedjaS78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/š78" element={<ProtectedRoute><ZaporedjaŠ78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/z78" element={<ProtectedRoute><ZaporedjaZ78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/ž78" element={<ProtectedRoute><ZaporedjaŽ78 /></ProtectedRoute>} />
+        {/* Zaporedja - 9-10 years */}
+        <Route path="/govorne-igre/zaporedja/c910" element={<ProtectedRoute><ZaporedjaC910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/č910" element={<ProtectedRoute><ZaporedjaČ910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/k910" element={<ProtectedRoute><ZaporedjaK910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/l910" element={<ProtectedRoute><ZaporedjaL910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/r910" element={<ProtectedRoute><ZaporedjaR910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/s910" element={<ProtectedRoute><ZaporedjaS910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/š910" element={<ProtectedRoute><ZaporedjaŠ910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/z910" element={<ProtectedRoute><ZaporedjaZ910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/zaporedja/ž910" element={<ProtectedRoute><ZaporedjaŽ910 /></ProtectedRoute>} />
+        
+        {/* ============================================= */}
+        {/* DRSNA SESTAVLJANKA - New nested paths */}
+        {/* ============================================= */}
         <Route
-          path="/labirint-letter/:letter" 
+          path="/govorne-igre/drsna-sestavljanka" 
           element={
             <ProtectedRoute>
-              <LabirintLetter />
+              <DrsnaSestavljanka />
             </ProtectedRoute>
           }
         />
+        {/* Drsna sestavljanka - 3-4 years */}
+        <Route path="/govorne-igre/drsna-sestavljanka/c34" element={<ProtectedRoute><DrsnaSestavljankaC34 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/č34" element={<ProtectedRoute><DrsnaSestavljankaČ34 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/k34" element={<ProtectedRoute><DrsnaSestavljankaK34 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/l34" element={<ProtectedRoute><DrsnaSestavljankaL34 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/r34" element={<ProtectedRoute><DrsnaSestavljankaR34 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/s34" element={<ProtectedRoute><DrsnaSestavljankaS34 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/š34" element={<ProtectedRoute><DrsnaSestavljankaŠ34 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/z34" element={<ProtectedRoute><DrsnaSestavljankaZ34 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/ž34" element={<ProtectedRoute><DrsnaSestavljankaŽ34 /></ProtectedRoute>} />
+        {/* Drsna sestavljanka - 5-6 years */}
+        <Route path="/govorne-igre/drsna-sestavljanka/c56" element={<ProtectedRoute><DrsnaSestavljankaC56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/č56" element={<ProtectedRoute><DrsnaSestavljankaČ56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/k56" element={<ProtectedRoute><DrsnaSestavljankaK56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/l56" element={<ProtectedRoute><DrsnaSestavljankaL56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/r56" element={<ProtectedRoute><DrsnaSestavljankaR56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/s56" element={<ProtectedRoute><DrsnaSestavljankaS56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/š56" element={<ProtectedRoute><DrsnaSestavljankaŠ56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/z56" element={<ProtectedRoute><DrsnaSestavljankaZ56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/ž56" element={<ProtectedRoute><DrsnaSestavljankaŽ56 /></ProtectedRoute>} />
+        {/* Drsna sestavljanka - 7-8 years */}
+        <Route path="/govorne-igre/drsna-sestavljanka/c78" element={<ProtectedRoute><DrsnaSestavljankaC78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/č78" element={<ProtectedRoute><DrsnaSestavljankaČ78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/k78" element={<ProtectedRoute><DrsnaSestavljankaK78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/l78" element={<ProtectedRoute><DrsnaSestavljankaL78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/r78" element={<ProtectedRoute><DrsnaSestavljankaR78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/s78" element={<ProtectedRoute><DrsnaSestavljankaS78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/š78" element={<ProtectedRoute><DrsnaSestavljankaŠ78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/z78" element={<ProtectedRoute><DrsnaSestavljankaZ78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/ž78" element={<ProtectedRoute><DrsnaSestavljankaŽ78 /></ProtectedRoute>} />
+        {/* Drsna sestavljanka - 9-10 years */}
+        <Route path="/govorne-igre/drsna-sestavljanka/c910" element={<ProtectedRoute><DrsnaSestavljankaC910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/č910" element={<ProtectedRoute><DrsnaSestavljankaČ910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/k910" element={<ProtectedRoute><DrsnaSestavljankaK910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/l910" element={<ProtectedRoute><DrsnaSestavljankaL910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/r910" element={<ProtectedRoute><DrsnaSestavljankaR910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/s910" element={<ProtectedRoute><DrsnaSestavljankaS910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/š910" element={<ProtectedRoute><DrsnaSestavljankaŠ910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/z910" element={<ProtectedRoute><DrsnaSestavljankaZ910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/drsna-sestavljanka/ž910" element={<ProtectedRoute><DrsnaSestavljankaŽ910 /></ProtectedRoute>} />
+        
+        {/* ============================================= */}
+        {/* IGRA UJEMANJA - New nested paths */}
+        {/* ============================================= */}
         <Route
-          path="/labirint" 
+          path="/govorne-igre/igra-ujemanja" 
+          element={
+            <ProtectedRoute>
+              <IgraUjemanja />
+            </ProtectedRoute>
+          }
+        />
+        {/* Igra ujemanja - base letter routes (3-4 years) */}
+        <Route path="/govorne-igre/igra-ujemanja/c" element={<ProtectedRoute><IgraUjemanjaC /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/č" element={<ProtectedRoute><IgraUjemanjaČ /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/k" element={<ProtectedRoute><IgraUjemanjaK /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/l" element={<ProtectedRoute><IgraUjemanjaL /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/r" element={<ProtectedRoute><IgraUjemanjaR /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/s" element={<ProtectedRoute><IgraUjemanjaS /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/š" element={<ProtectedRoute><IgraUjemanjaŠ /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/z" element={<ProtectedRoute><IgraUjemanjaZ /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/ž" element={<ProtectedRoute><IgraUjemanjaŽ /></ProtectedRoute>} />
+        {/* Igra ujemanja - 5-6 years */}
+        <Route path="/govorne-igre/igra-ujemanja/c56" element={<ProtectedRoute><IgraUjemanjaC56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/č56" element={<ProtectedRoute><IgraUjemanjaČ56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/k56" element={<ProtectedRoute><IgraUjemanjaK56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/l56" element={<ProtectedRoute><IgraUjemanjaL56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/r56" element={<ProtectedRoute><IgraUjemanjaR56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/s56" element={<ProtectedRoute><IgraUjemanjaS56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/š56" element={<ProtectedRoute><IgraUjemanjaŠ56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/z56" element={<ProtectedRoute><IgraUjemanjaZ56 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/ž56" element={<ProtectedRoute><IgraUjemanjaŽ56 /></ProtectedRoute>} />
+        {/* Igra ujemanja - 7-8 years */}
+        <Route path="/govorne-igre/igra-ujemanja/c78" element={<ProtectedRoute><IgraUjemanjaC78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/č78" element={<ProtectedRoute><IgraUjemanjaČ78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/k78" element={<ProtectedRoute><IgraUjemanjaK78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/l78" element={<ProtectedRoute><IgraUjemanjaL78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/r78" element={<ProtectedRoute><IgraUjemanjaR78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/s78" element={<ProtectedRoute><IgraUjemanjaS78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/š78" element={<ProtectedRoute><IgraUjemanjaŠ78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/z78" element={<ProtectedRoute><IgraUjemanjaZ78 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/ž78" element={<ProtectedRoute><IgraUjemanjaŽ78 /></ProtectedRoute>} />
+        {/* Igra ujemanja - 9-10 years */}
+        <Route path="/govorne-igre/igra-ujemanja/c910" element={<ProtectedRoute><IgraUjemanjaC910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/č910" element={<ProtectedRoute><IgraUjemanjaČ910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/k910" element={<ProtectedRoute><IgraUjemanjaK910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/l910" element={<ProtectedRoute><IgraUjemanjaL910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/r910" element={<ProtectedRoute><IgraUjemanjaR910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/s910" element={<ProtectedRoute><IgraUjemanjaS910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/š910" element={<ProtectedRoute><IgraUjemanjaŠ910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/z910" element={<ProtectedRoute><IgraUjemanjaZ910 /></ProtectedRoute>} />
+        <Route path="/govorne-igre/igra-ujemanja/ž910" element={<ProtectedRoute><IgraUjemanjaŽ910 /></ProtectedRoute>} />
+        
+        {/* ============================================= */}
+        {/* LABIRINT - New nested paths */}
+        {/* ============================================= */}
+        <Route
+          path="/govorne-igre/labirint" 
           element={
             <ProtectedRoute>
               <Labirint />
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/govorne-igre/labirint/:letter" 
+          element={
+            <ProtectedRoute>
+              <LabirintLetter />
+            </ProtectedRoute>
+          }
+        />
+        
+        {/* ============================================= */}
+        {/* LEGACY ROUTES - Redirects for backward compatibility */}
+        {/* ============================================= */}
+        <Route path="/labirint/:letter" element={<Navigate to="/govorne-igre/labirint/:letter" replace />} />
+        <Route path="/labirint-c" element={<Navigate to="/govorne-igre/labirint/c" replace />} />
+        <Route path="/labirint-letter/:letter" element={<Navigate to="/govorne-igre/labirint/:letter" replace />} />
+        <Route path="/labirint" element={<Navigate to="/govorne-igre/labirint" replace />} />
         <Route
           path="/artikulacijski-test" 
           element={
