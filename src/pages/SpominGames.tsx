@@ -32,7 +32,7 @@ const memoryGames = [
     gradient: "from-app-blue/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
     description: "Poišči pare slik s črko Č in nato ponovi besedo",
-    path: "/govorne-igre/spomin/spomin-%C4%8D",
+    path: "/govorne-igre/spomin/spomin-ch",
     available: true
   },
   { 
@@ -77,7 +77,7 @@ const memoryGames = [
     gradient: "from-app-blue/20 to-app-purple/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
     description: "Poišči pare slik s črko Š in nato ponovi besedo",
-    path: "/govorne-igre/spomin/spomin-%C5%A1",
+    path: "/govorne-igre/spomin/spomin-sh",
     available: true
   },
   { 
@@ -95,7 +95,7 @@ const memoryGames = [
     gradient: "from-app-purple/20 to-app-blue/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
     description: "Poišči pare slik s črko Ž in nato ponovi besedo",
-    path: "/govorne-igre/spomin/spomin-%C5%BE",
+    path: "/govorne-igre/spomin/spomin-zh",
     available: true
   },
 ];
