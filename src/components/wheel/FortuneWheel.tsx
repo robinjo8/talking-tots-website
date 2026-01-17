@@ -34,7 +34,7 @@ export const FortuneWheel: React.FC<FortuneWheelProps> = ({
 }) => {
   const segmentAngle = 360 / segmentCount;
   
-  // Create SVG path for each segment
+  // Create SVG path for each segment as a donut shape (not reaching center)
   const createSegmentPath = (index: number) => {
     const startAngle = index * segmentAngle - 90; // Start from top
     const endAngle = startAngle + segmentAngle;
@@ -42,18 +42,27 @@ export const FortuneWheel: React.FC<FortuneWheelProps> = ({
     const startRad = (startAngle * Math.PI) / 180;
     const endRad = (endAngle * Math.PI) / 180;
     
-    const radius = 45; // Percentage of viewBox
+    const outerRadius = 45; // Outer edge
+    const innerRadius = 12; // Inner edge - creates hole for button
     const centerX = 50;
     const centerY = 50;
     
-    const x1 = centerX + radius * Math.cos(startRad);
-    const y1 = centerY + radius * Math.sin(startRad);
-    const x2 = centerX + radius * Math.cos(endRad);
-    const y2 = centerY + radius * Math.sin(endRad);
+    // Outer arc points
+    const outerX1 = centerX + outerRadius * Math.cos(startRad);
+    const outerY1 = centerY + outerRadius * Math.sin(startRad);
+    const outerX2 = centerX + outerRadius * Math.cos(endRad);
+    const outerY2 = centerY + outerRadius * Math.sin(endRad);
+    
+    // Inner arc points
+    const innerX1 = centerX + innerRadius * Math.cos(startRad);
+    const innerY1 = centerY + innerRadius * Math.sin(startRad);
+    const innerX2 = centerX + innerRadius * Math.cos(endRad);
+    const innerY2 = centerY + innerRadius * Math.sin(endRad);
     
     const largeArcFlag = segmentAngle > 180 ? 1 : 0;
     
-    return `M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
+    // Path: inner start → outer start → outer arc → outer end → inner end → inner arc (reverse)
+    return `M ${innerX1} ${innerY1} L ${outerX1} ${outerY1} A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${outerX2} ${outerY2} L ${innerX2} ${innerY2} A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${innerX1} ${innerY1} Z`;
   };
 
   // Calculate text position for segment number
