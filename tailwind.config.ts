@@ -54,12 +54,12 @@ export default {
 				},
 				// Custom colors for our app
 				'dragon-green': {
-					DEFAULT: 'hsl(122, 39%, 49%)', // #4CAF50
+					DEFAULT: 'hsl(122, 39%, 49%)', // #4CAF50 converted to HSL
 					light: 'hsl(122, 39%, 85%)',
-					dark: 'hsl(122, 39%, 28%)',
+					dark: 'hsl(122, 39%, 35%)',
 				},
 				'app-orange': 'hsl(36, 100%, 50%)', // #FF9800
-				'app-blue': 'hsl(207, 90%, 54%)', // #2196F3
+				'app-blue': 'hsl(207, 90%, 54%)', // #2196F3  
 				'app-yellow': 'hsl(54, 100%, 62%)', // #FFEB3B
 				'app-purple': 'hsl(291, 64%, 42%)', // #9C27B0
 				'app-teal': 'hsl(174, 100%, 29%)', // #009688

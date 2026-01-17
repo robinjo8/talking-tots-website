@@ -112,14 +112,6 @@ export default function IgraUjemanja() {
     }
   };
 
-  // Convert diacritics to ASCII digraphs for URL
-  const toAsciiUrl = (letter: string) => {
-    return letter.toLowerCase()
-      .replace('č', 'ch')
-      .replace('š', 'sh')
-      .replace('ž', 'zh');
-  };
-
   const handleCardClick = (game: typeof matchingGames[0]) => {
     if (!game.available) return;
     
@@ -131,25 +123,22 @@ export default function IgraUjemanja() {
     const childAge = selectedChild.age;
     const ageGroup = getAgeGroup(childAge);
     
-    // Use ASCII digraphs for URL (ch, sh, zh instead of č, š, ž)
-    const asciiLetter = toAsciiUrl(game.letter);
-    
     let targetRoute = '';
     switch (ageGroup) {
       case '3-4':
-        targetRoute = `/govorne-igre/igra-ujemanja/${asciiLetter}`;
+        targetRoute = `/govorne-igre/igra-ujemanja/${game.letter.toLowerCase()}`;
         break;
       case '5-6':
-        targetRoute = `/govorne-igre/igra-ujemanja/${asciiLetter}56`;
+        targetRoute = `/govorne-igre/igra-ujemanja/${game.letter.toLowerCase()}56`;
         break;
       case '7-8':
-        targetRoute = `/govorne-igre/igra-ujemanja/${asciiLetter}78`;
+        targetRoute = `/govorne-igre/igra-ujemanja/${game.letter.toLowerCase()}78`;
         break;
       case '9-10':
-        targetRoute = `/govorne-igre/igra-ujemanja/${asciiLetter}910`;
+        targetRoute = `/govorne-igre/igra-ujemanja/${game.letter.toLowerCase()}910`;
         break;
       default:
-        targetRoute = `/govorne-igre/igra-ujemanja/${asciiLetter}`;
+        targetRoute = `/govorne-igre/igra-ujemanja/${game.letter.toLowerCase()}`;
     }
     
     navigate(targetRoute);

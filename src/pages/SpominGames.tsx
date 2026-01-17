@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,7 +10,6 @@ import { FooterSection } from "@/components/FooterSection";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { useImagePrefetch } from "@/hooks/useImagePrefetch";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
 const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/ozadje_1.jpg`;
@@ -32,7 +30,7 @@ const memoryGames = [
     gradient: "from-app-blue/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
     description: "Poišči pare slik s črko Č in nato ponovi besedo",
-    path: "/govorne-igre/spomin/spomin-ch",
+    path: "/govorne-igre/spomin/spomin-č",
     available: true
   },
   { 
@@ -77,7 +75,7 @@ const memoryGames = [
     gradient: "from-app-blue/20 to-app-purple/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
     description: "Poišči pare slik s črko Š in nato ponovi besedo",
-    path: "/govorne-igre/spomin/spomin-sh",
+    path: "/govorne-igre/spomin/spomin-š",
     available: true
   },
   { 
@@ -95,7 +93,7 @@ const memoryGames = [
     gradient: "from-app-purple/20 to-app-blue/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
     description: "Poišči pare slik s črko Ž in nato ponovi besedo",
-    path: "/govorne-igre/spomin/spomin-zh",
+    path: "/govorne-igre/spomin/spomin-ž",
     available: true
   },
 ];
@@ -114,10 +112,6 @@ export default function SpominGames() {
   
   const targetActivities = 15;
   const percentage = Math.min((dailyActivities / targetActivities) * 100, 100);
-
-  // Prefetch all game images for faster loading
-  const gameImages = useMemo(() => memoryGames.map(g => g.image), []);
-  useImagePrefetch(gameImages);
 
   const handleSignOut = async () => {
     try {
@@ -146,8 +140,6 @@ export default function SpominGames() {
             alt={`Črka ${game.letter}`}
             className={`object-contain group-hover:scale-110 transition-transform duration-300 ${isMobile ? 'w-[80%] h-[80%]' : 'w-full h-full'}`}
             style={{ mixBlendMode: 'multiply' }}
-            loading="lazy"
-            decoding="async"
           />
         </div>
       </div>

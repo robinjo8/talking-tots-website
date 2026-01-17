@@ -9,22 +9,13 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
-    // Check if splash was already shown in this session
-    const splashShown = sessionStorage.getItem('splashShown');
-    if (splashShown) {
-      onComplete();
-      return;
-    }
-    
-    sessionStorage.setItem('splashShown', 'true');
-    
     const timer = setTimeout(() => {
       setIsVisible(false);
-    }, 800); // Reduced from 1000ms
+    }, 1000); // 1 second duration
 
     const completeTimer = setTimeout(() => {
       onComplete();
-    }, 1100); // Reduced from 1500ms
+    }, 1500); // Extra time for fade out animation
 
     return () => {
       clearTimeout(timer);

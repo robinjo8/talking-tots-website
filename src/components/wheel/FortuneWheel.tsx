@@ -1,5 +1,5 @@
 import React from 'react';
-import { RotateCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface FortuneWheelProps {
   segmentCount: number;
@@ -34,7 +34,7 @@ export const FortuneWheel: React.FC<FortuneWheelProps> = ({
 }) => {
   const segmentAngle = 360 / segmentCount;
   
-  // Create SVG path for each segment as a donut shape (not reaching center)
+  // Create SVG path for each segment
   const createSegmentPath = (index: number) => {
     const startAngle = index * segmentAngle - 90; // Start from top
     const endAngle = startAngle + segmentAngle;
@@ -42,27 +42,18 @@ export const FortuneWheel: React.FC<FortuneWheelProps> = ({
     const startRad = (startAngle * Math.PI) / 180;
     const endRad = (endAngle * Math.PI) / 180;
     
-    const outerRadius = 45; // Outer edge
-    const innerRadius = 10; // Inner edge - creates hole for button
+    const radius = 45; // Percentage of viewBox
     const centerX = 50;
     const centerY = 50;
     
-    // Outer arc points
-    const outerX1 = centerX + outerRadius * Math.cos(startRad);
-    const outerY1 = centerY + outerRadius * Math.sin(startRad);
-    const outerX2 = centerX + outerRadius * Math.cos(endRad);
-    const outerY2 = centerY + outerRadius * Math.sin(endRad);
-    
-    // Inner arc points
-    const innerX1 = centerX + innerRadius * Math.cos(startRad);
-    const innerY1 = centerY + innerRadius * Math.sin(startRad);
-    const innerX2 = centerX + innerRadius * Math.cos(endRad);
-    const innerY2 = centerY + innerRadius * Math.sin(endRad);
+    const x1 = centerX + radius * Math.cos(startRad);
+    const y1 = centerY + radius * Math.sin(startRad);
+    const x2 = centerX + radius * Math.cos(endRad);
+    const y2 = centerY + radius * Math.sin(endRad);
     
     const largeArcFlag = segmentAngle > 180 ? 1 : 0;
     
-    // Path: inner start → outer start → outer arc → outer end → inner end → inner arc (reverse)
-    return `M ${innerX1} ${innerY1} L ${outerX1} ${outerY1} A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${outerX2} ${outerY2} L ${innerX2} ${innerY2} A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${innerX1} ${innerY1} Z`;
+    return `M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
   };
 
   // Calculate text position for segment number
@@ -89,95 +80,98 @@ export const FortuneWheel: React.FC<FortuneWheelProps> = ({
         />
       </div>
 
-      {/* Wheel Container - only the wheel rotates */}
-      <div className="relative aspect-square">
-        <div 
-          className="w-full h-full"
-          style={{
-            transform: `rotate(${rotation}deg)`,
-            transition: isSpinning 
-              ? 'transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99)' 
-              : 'none',
-          }}
+      {/* Wheel Container */}
+      <div 
+        className="relative aspect-square"
+        style={{
+          transform: `rotate(${rotation}deg)`,
+          transition: isSpinning 
+            ? 'transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99)' 
+            : 'none',
+        }}
+      >
+        <svg 
+          viewBox="0 0 100 100" 
+          className="w-full h-full drop-shadow-2xl"
         >
-          <svg 
-            viewBox="0 0 100 100" 
-            className="w-full h-full drop-shadow-2xl"
-          >
-            {/* Outer ring */}
-            <circle 
-              cx="50" 
-              cy="50" 
-              r="48" 
-              fill="none" 
-              stroke="hsl(35, 90%, 50%)" 
-              strokeWidth="3"
-              className="drop-shadow-lg"
-            />
+          {/* Outer ring */}
+          <circle 
+            cx="50" 
+            cy="50" 
+            r="48" 
+            fill="none" 
+            stroke="hsl(35, 90%, 50%)" 
+            strokeWidth="3"
+            className="drop-shadow-lg"
+          />
+          
+          {/* Segments */}
+          {Array.from({ length: segmentCount }).map((_, index) => {
+            const textPos = getTextPosition(index);
+            const color = SEGMENT_COLORS[index % SEGMENT_COLORS.length];
+            const isSelected = selectedIndex === index && !isSpinning;
             
-            {/* Center circle to cover segment tips - drawn AFTER segments */}
-            
-            {/* Segments */}
-            {Array.from({ length: segmentCount }).map((_, index) => {
-              const textPos = getTextPosition(index);
-              const color = SEGMENT_COLORS[index % SEGMENT_COLORS.length];
-              const isSelected = selectedIndex === index && !isSpinning;
-              
-              return (
-                <g key={index}>
-                  {/* Segment path */}
-                  <path
-                    d={createSegmentPath(index)}
-                    fill={color}
-                    stroke="white"
-                    strokeWidth="0.5"
-                    className={isSelected ? 'brightness-125' : ''}
-                  />
-                  
-                  {/* Segment number */}
-                  <text
-                    x={textPos.x}
-                    y={textPos.y}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fill="white"
-                    fontSize="5"
-                    fontWeight="bold"
-                    style={{
-                      textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
-                    }}
-                    transform={`rotate(${textPos.rotation}, ${textPos.x}, ${textPos.y})`}
-                  >
-                    {index + 1}
-                  </text>
-                </g>
-              );
-            })}
+            return (
+              <g key={index}>
+                {/* Segment path */}
+                <path
+                  d={createSegmentPath(index)}
+                  fill={color}
+                  stroke="white"
+                  strokeWidth="0.5"
+                  className={isSelected ? 'brightness-125' : ''}
+                />
+                
+                {/* Segment number */}
+                <text
+                  x={textPos.x}
+                  y={textPos.y}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fill="white"
+                  fontSize="5"
+                  fontWeight="bold"
+                  style={{
+                    textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
+                  }}
+                  transform={`rotate(${textPos.rotation}, ${textPos.x}, ${textPos.y})`}
+                >
+                  {index + 1}
+                </text>
+              </g>
+            );
+          })}
 
-            {/* Gradient definitions */}
-            <defs>
-              <radialGradient id="centerGradient">
-                <stop offset="0%" stopColor="hsl(35, 95%, 60%)" />
-                <stop offset="100%" stopColor="hsl(25, 95%, 45%)" />
-              </radialGradient>
-            </defs>
-          </svg>
-        </div>
+          {/* Center circle */}
+          <circle 
+            cx="50" 
+            cy="50" 
+            r="12" 
+            fill="url(#centerGradient)"
+            stroke="white"
+            strokeWidth="1"
+          />
 
-        {/* Center Spin Button - single clean button that covers segment tips */}
-        <button
+          {/* Gradient definitions */}
+          <defs>
+            <radialGradient id="centerGradient">
+              <stop offset="0%" stopColor="hsl(35, 95%, 60%)" />
+              <stop offset="100%" stopColor="hsl(25, 95%, 45%)" />
+            </radialGradient>
+          </defs>
+        </svg>
+      </div>
+
+      {/* Spin Button - Below wheel */}
+      <div className="mt-6 flex justify-center">
+        <Button
           onClick={onSpin}
           disabled={isSpinning}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-[24%] aspect-square rounded-full flex items-center justify-center transition-shadow duration-300 hover:shadow-[0_0_30px_rgba(251,146,60,0.8)] disabled:cursor-not-allowed border-4 border-white"
-          style={{
-            background: 'linear-gradient(135deg, hsl(40, 95%, 55%) 0%, hsl(25, 95%, 50%) 100%)',
-            boxShadow: '0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(251, 146, 60, 0.9), 0 0 60px rgba(251, 146, 60, 0.6), 0 0 90px rgba(251, 146, 60, 0.4)',
-          }}
+          size="lg"
+          className="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-bold text-xl px-8 py-6 rounded-full shadow-lg transform transition-transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <RotateCw 
-            className="w-8 h-8 md:w-10 md:h-10 text-white"
-          />
-        </button>
+          {isSpinning ? 'VRTI SE...' : 'ZAVRTI KOLO'}
+        </Button>
       </div>
     </div>
   );

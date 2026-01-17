@@ -15,36 +15,34 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main>
-        {/* Hero Section */}
-        <HeroSection />
+      {/* Hero Section */}
+      <HeroSection />
 
-        {/* Learning Outcomes Section */}
-        <div id="learning-outcomes">
-          <LearningOutcomesSection />
-        </div>
+      {/* Learning Outcomes Section */}
+      <div id="learning-outcomes">
+        <LearningOutcomesSection />
+      </div>
 
-        {/* Target Audience Section */}
-        <TargetAudienceSection />
+      {/* Target Audience Section */}
+      <TargetAudienceSection />
 
-        {/* Features Section */}
-        <FeaturesSection />
+      {/* Features Section */}
+      <FeaturesSection />
 
-        {/* Progress Comparison Section */}
-        <NewProgressComparisonSection />
+      {/* Progress Comparison Section */}
+      <NewProgressComparisonSection />
 
-        {/* Testimonials Section */}
-        <TestimonialsSection />
+      {/* Testimonials Section */}
+      <TestimonialsSection />
 
-        {/* Features Cards Section (replacing Pricing) */}
-        <FeaturesCardsSection />
+      {/* Features Cards Section (replacing Pricing) */}
+      <FeaturesCardsSection />
 
-        {/* FAQ Section */}
-        <FAQSection />
-        
-        {/* Call to Action Section */}
-        <CallToActionSection />
-      </main>
+      {/* FAQ Section */}
+      <FAQSection />
+      
+      {/* Call to Action Section */}
+      <CallToActionSection />
 
       {/* Footer */}
       <FooterSection />

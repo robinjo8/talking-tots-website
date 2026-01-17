@@ -13,12 +13,10 @@ export const CallToActionSection = () => {
           <div className="lg:order-last flex-shrink-0">
             <div className="relative w-44 h-44 md:w-52 md:h-52">
               <div className="relative w-full h-full">
-              <img
+                <img
                   alt="Tomi Talk Dragon Mascot"
                   className="w-full h-full object-contain"
                   src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_naslovna_1.png"
-                  loading="lazy"
-                  decoding="async"
                 />
               </div>
             </div>
