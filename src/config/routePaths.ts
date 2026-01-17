@@ -5,13 +5,14 @@
  * To preprečuje neskladja med komponentami in routami.
  */
 
-// Črke, ki jih podpiramo
-export const SUPPORTED_LETTERS = ['c', 'č', 'k', 'l', 'r', 's', 'š', 'z', 'ž'] as const;
-export type SupportedLetter = typeof SUPPORTED_LETTERS[number];
-
-// Starostne skupine
-export const AGE_GROUPS = ['34', '56', '78', '910'] as const;
-export type AgeGroup = typeof AGE_GROUPS[number];
+// Re-export from routeConfig for backward compatibility
+export { 
+  SUPPORTED_LETTERS, 
+  AGE_GROUPS, 
+  letterToComponentName,
+  type SupportedLetter,
+  type AgeGroup 
+} from './routes/routeConfig';
 
 // Bazne poti za igre
 export const GAME_ROUTES = {
@@ -30,31 +31,37 @@ export const GAME_ROUTES = {
 // Funkcije za generiranje poti do posameznih iger
 export const gamePathGenerators = {
   // Spomin igre
-  spomin: (letter: SupportedLetter) => 
+  spomin: (letter: string) => 
     `${GAME_ROUTES.SPOMIN}/spomin-${letter}` as const,
   
-  // Sestavljanke - 3-4 leta (drsne)
-  sestavljanke34: (letter: SupportedLetter) => 
-    `${GAME_ROUTES.DRSNA_SESTAVLJANKA}/${letter}34` as const,
+  // Sestavljanke - 3-4 leta (base)
+  sestavljankeBase: (letter: string) => 
+    `${GAME_ROUTES.SESTAVLJANKE}/${letter}` as const,
   
-  // Sestavljanke - 5-6, 7-8, 9-10 leta
-  sestavljanke: (letter: SupportedLetter, ageGroup?: AgeGroup) => 
+  // Sestavljanke - s starostno skupino
+  sestavljanke: (letter: string, ageGroup?: string) => 
     `${GAME_ROUTES.SESTAVLJANKE}/${letter}${ageGroup || ''}` as const,
   
   // Zaporedja
-  zaporedja: (letter: SupportedLetter, ageGroup?: AgeGroup) => 
+  zaporedjaBase: (letter: string) => 
+    `${GAME_ROUTES.ZAPOREDJA}/${letter}` as const,
+    
+  zaporedja: (letter: string, ageGroup?: string) => 
     `${GAME_ROUTES.ZAPOREDJA}/${letter}${ageGroup || ''}` as const,
   
   // Drsna sestavljanka
-  drsnaSestavljanka: (letter: SupportedLetter, ageGroup: AgeGroup) => 
+  drsnaSestavljanka: (letter: string, ageGroup: string) => 
     `${GAME_ROUTES.DRSNA_SESTAVLJANKA}/${letter}${ageGroup}` as const,
   
   // Igra ujemanja
-  igraUjemanja: (letter: SupportedLetter, ageGroup?: AgeGroup) => 
+  igraUjemanjaBase: (letter: string) => 
+    `${GAME_ROUTES.IGRA_UJEMANJA}/${letter}` as const,
+    
+  igraUjemanja: (letter: string, ageGroup?: string) => 
     `${GAME_ROUTES.IGRA_UJEMANJA}/${letter}${ageGroup || ''}` as const,
   
   // Labirint
-  labirint: (letter: SupportedLetter) => 
+  labirint: (letter: string) => 
     `${GAME_ROUTES.LABIRINT}/${letter}` as const,
 } as const;
 
@@ -77,70 +84,3 @@ export const LEGACY_TO_NEW_ROUTES: Record<string, string> = {
   [LEGACY_ROUTES.IGRA_UJEMANJA]: GAME_ROUTES.IGRA_UJEMANJA,
   [LEGACY_ROUTES.LABIRINT]: GAME_ROUTES.LABIRINT,
 };
-
-// Helper za generiranje vseh legacy poti -> nove poti za posamezne igre
-export function generateLegacyGameRedirects() {
-  const redirects: Array<{ from: string; to: string }> = [];
-  
-  // Spomin
-  SUPPORTED_LETTERS.forEach(letter => {
-    redirects.push({
-      from: `/spomin-${letter}`,
-      to: gamePathGenerators.spomin(letter),
-    });
-  });
-  
-  // Sestavljanke
-  SUPPORTED_LETTERS.forEach(letter => {
-    redirects.push({
-      from: `/sestavljanke-${letter}`,
-      to: gamePathGenerators.sestavljanke(letter),
-    });
-    AGE_GROUPS.filter(ag => ag !== '34').forEach(ageGroup => {
-      redirects.push({
-        from: `/sestavljanke-${letter}-${ageGroup}`,
-        to: gamePathGenerators.sestavljanke(letter, ageGroup),
-      });
-    });
-  });
-  
-  // Zaporedja
-  SUPPORTED_LETTERS.forEach(letter => {
-    redirects.push({
-      from: `/zaporedja-${letter}`,
-      to: gamePathGenerators.zaporedja(letter),
-    });
-    AGE_GROUPS.filter(ag => ag !== '34').forEach(ageGroup => {
-      redirects.push({
-        from: `/zaporedja-${letter}-${ageGroup}`,
-        to: gamePathGenerators.zaporedja(letter, ageGroup),
-      });
-    });
-  });
-  
-  // Drsna sestavljanka
-  SUPPORTED_LETTERS.forEach(letter => {
-    AGE_GROUPS.forEach(ageGroup => {
-      redirects.push({
-        from: `/drsna-sestavljanka-${letter}-${ageGroup}`,
-        to: gamePathGenerators.drsnaSestavljanka(letter, ageGroup),
-      });
-    });
-  });
-  
-  // Igra ujemanja
-  SUPPORTED_LETTERS.forEach(letter => {
-    redirects.push({
-      from: `/igra-ujemanja-${letter}`,
-      to: gamePathGenerators.igraUjemanja(letter),
-    });
-    AGE_GROUPS.filter(ag => ag !== '34').forEach(ageGroup => {
-      redirects.push({
-        from: `/igra-ujemanja-${letter}-${ageGroup}`,
-        to: gamePathGenerators.igraUjemanja(letter, ageGroup),
-      });
-    });
-  });
-  
-  return redirects;
-}
