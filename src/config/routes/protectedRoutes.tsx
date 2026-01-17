@@ -77,7 +77,30 @@ export function ProtectedUserRoutes(): JSX.Element[] {
     <Route key="moje-aplikacije" path="/moje-aplikacije" element={<ProtectedRoute><MojeAplikacije /></ProtectedRoute>} />,
     <Route key="govornojezicovne-vaje" path="/govornojezicovne-vaje" element={<ProtectedRoute><GovornojezicovneVaje /></ProtectedRoute>} />,
     <Route key="govorno-jezikovne-vaje" path="/govorno-jezikovne-vaje" element={<ProtectedRoute><GovornojezicovneVaje /></ProtectedRoute>} />,
-    <Route key="govorno-jezikovne-vaje-art" path="/govorno-jezikovne-vaje/artikulacija/:letter" element={<ProtectedRoute><ArtikulacijaVaje /></ProtectedRoute>} />,
+    <Route key="govorno-jezikovne-vaje-artikulacija" path="/govorno-jezikovne-vaje/artikulacija" element={<ProtectedRoute><ArtikulacijaVaje /></ProtectedRoute>} />,
+    
+    // Govorno-jezikovne-vaje/artikulacija - posamezne črke
+    <Route key="gjv-art-c" path="/govorno-jezikovne-vaje/artikulacija/c" element={<ProtectedRoute><ArtikulacijaVajeC /></ProtectedRoute>} />,
+    <Route key="gjv-art-č" path="/govorno-jezikovne-vaje/artikulacija/č" element={<ProtectedRoute><ArtikulacijaVajeČ /></ProtectedRoute>} />,
+    <Route key="gjv-art-k" path="/govorno-jezikovne-vaje/artikulacija/k" element={<ProtectedRoute><ArtikulacijaVajeK /></ProtectedRoute>} />,
+    <Route key="gjv-art-l" path="/govorno-jezikovne-vaje/artikulacija/l" element={<ProtectedRoute><ArtikulacijaVajeL /></ProtectedRoute>} />,
+    <Route key="gjv-art-r" path="/govorno-jezikovne-vaje/artikulacija/r" element={<ProtectedRoute><ArtikulacijaVajeR /></ProtectedRoute>} />,
+    <Route key="gjv-art-s" path="/govorno-jezikovne-vaje/artikulacija/s" element={<ProtectedRoute><ArtikulacijaVajeS /></ProtectedRoute>} />,
+    <Route key="gjv-art-š" path="/govorno-jezikovne-vaje/artikulacija/š" element={<ProtectedRoute><ArtikulacijaVajeŠ /></ProtectedRoute>} />,
+    <Route key="gjv-art-z" path="/govorno-jezikovne-vaje/artikulacija/z" element={<ProtectedRoute><ArtikulacijaVajeZ /></ProtectedRoute>} />,
+    <Route key="gjv-art-ž" path="/govorno-jezikovne-vaje/artikulacija/ž" element={<ProtectedRoute><ArtikulacijaVajeŽ /></ProtectedRoute>} />,
+    
+    // Govorno-jezikovne-vaje/artikulacija - sredina/konec
+    <Route key="gjv-art-c-sk" path="/govorno-jezikovne-vaje/artikulacija/c-sredina-konec" element={<ProtectedRoute><ArtikulacijaVajeCSredinaKonec /></ProtectedRoute>} />,
+    <Route key="gjv-art-č-sk" path="/govorno-jezikovne-vaje/artikulacija/č-sredina-konec" element={<ProtectedRoute><ArtikulacijaVajeČSredinaKonec /></ProtectedRoute>} />,
+    <Route key="gjv-art-k-sk" path="/govorno-jezikovne-vaje/artikulacija/k-sredina-konec" element={<ProtectedRoute><ArtikulacijaVajeKSredinaKonec /></ProtectedRoute>} />,
+    <Route key="gjv-art-l-sk" path="/govorno-jezikovne-vaje/artikulacija/l-sredina-konec" element={<ProtectedRoute><ArtikulacijaVajeLSredinaKonec /></ProtectedRoute>} />,
+    <Route key="gjv-art-r-sk" path="/govorno-jezikovne-vaje/artikulacija/r-sredina-konec" element={<ProtectedRoute><ArtikulacijaVajeRSredinaKonec /></ProtectedRoute>} />,
+    <Route key="gjv-art-s-sk" path="/govorno-jezikovne-vaje/artikulacija/s-sredina-konec" element={<ProtectedRoute><ArtikulacijaVajeSSredinaKonec /></ProtectedRoute>} />,
+    <Route key="gjv-art-š-sk" path="/govorno-jezikovne-vaje/artikulacija/š-sredina-konec" element={<ProtectedRoute><ArtikulacijaVajeŠSredinaKonec /></ProtectedRoute>} />,
+    <Route key="gjv-art-z-sk" path="/govorno-jezikovne-vaje/artikulacija/z-sredina-konec" element={<ProtectedRoute><ArtikulacijaVajeZSredinaKonec /></ProtectedRoute>} />,
+    <Route key="gjv-art-ž-sk" path="/govorno-jezikovne-vaje/artikulacija/ž-sredina-konec" element={<ProtectedRoute><ArtikulacijaVajeŽSredinaKonec /></ProtectedRoute>} />,
+    
     <Route key="vaje-motorike-govoril" path="/vaje-motorike-govoril" element={<ProtectedRoute><VajeMoториkeGovoril /></ProtectedRoute>} />,
     <Route key="art-izgovorjava" path="/art-izgovorjava" element={<ProtectedRoute><ArtIzgovorjavaPage /></ProtectedRoute>} />,
     <Route key="artikulacija-vaje" path="/artikulacija-vaje" element={<ProtectedRoute><ArtikulacijaVaje /></ProtectedRoute>} />,
