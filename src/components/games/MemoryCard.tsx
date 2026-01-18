@@ -36,7 +36,7 @@ export function MemoryCard({
   };
 
   return (
-    <div className="flip-card" onClick={handleCardClick}>
+    <div className="flip-card w-full h-full" onClick={handleCardClick}>
       <div className={cn("flip-card-inner", flipped || matched ? "flipped" : "")}>
         {/* Front side - Green with question mark */}
         <div className="flip-card-front">
