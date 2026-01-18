@@ -1,38 +1,25 @@
-import { AgeGatedRoute } from "@/components/auth/AgeGatedRoute";
-import { SlidingPuzzle910 } from "@/components/puzzle/SlidingPuzzle910";
-import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
-import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
 import { useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { Home, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
+import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
+import { SlidingPuzzle } from "@/components/puzzle/SlidingPuzzle";
+import { SlidingPuzzle78 } from "@/components/puzzle/SlidingPuzzle78";
+import { SlidingPuzzle910 } from "@/components/puzzle/SlidingPuzzle910";
+import { SlidingPuzzle34 } from "@/components/puzzle/SlidingPuzzle34";
+import { getImageUrl, type PuzzleImage } from "@/data/puzzleImages";
+import type { DrsnaSestavljankaGameConfig } from "@/data/drsnaSestavljankaConfig";
 
-const cImages = [
-  { filename: 'cedilo.png', word: 'CEDILO' },
-  { filename: 'cekin.png', word: 'CEKIN' },
-  { filename: 'cerkev.png', word: 'CERKEV' },
-  { filename: 'cesta.png', word: 'CESTA' },
-  { filename: 'cev.png', word: 'CEV' },
-  { filename: 'cirkus.png', word: 'CIRKUS' },
-  { filename: 'cisterna.png', word: 'CISTERNA' },
-  { filename: 'cokla.png', word: 'COKLA' },
-  { filename: 'copat.png', word: 'COPAT' },
-  { filename: 'cvet.png', word: 'CVET' }
-];
-
-export default function DrsnaSestavljankaC910() {
-  return (
-    <AgeGatedRoute requiredAgeGroup="9-10">
-      <DrsnaSestavljankaC910Content />
-    </AgeGatedRoute>
-  );
+interface GenericDrsnaSestavljankaGameProps {
+  config: DrsnaSestavljankaGameConfig;
 }
 
-function DrsnaSestavljankaC910Content() {
+export function GenericDrsnaSestavljankaGame({ config }: GenericDrsnaSestavljankaGameProps) {
   const navigate = useNavigate();
   const { recordGameCompletion } = useEnhancedProgress();
   const gameCompletedRef = useRef(false);
@@ -45,18 +32,23 @@ function DrsnaSestavljankaC910Content() {
   const [showNewGameDialog, setShowNewGameDialog] = useState(false);
   const [showNewGameButton, setShowNewGameButton] = useState(false);
 
-  const currentImage = useMemo(() => cImages[Math.floor(Math.random() * cImages.length)], [puzzleKey]);
-  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${currentImage.filename}`;
+  // Select random image for current puzzle
+  const currentImage = useMemo(() => {
+    const images = config.images;
+    return images[Math.floor(Math.random() * images.length)];
+  }, [puzzleKey, config.images]);
 
-  // Get 5 random images for completion dialog
+  const imageUrl = getImageUrl(currentImage.filename);
+
+  // Get random images for completion dialog
   const completionImages = useMemo(() => {
-    const shuffled = [...cImages].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, 5).map(img => ({
+    const shuffled = [...config.images].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, config.completionImageCount).map(img => ({
       word: img.word,
-      url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${img.filename}`,
+      url: getImageUrl(img.filename),
       filename: img.filename
     }));
-  }, [puzzleKey]);
+  }, [puzzleKey, config.images, config.completionImageCount]);
 
   const handleComplete = () => {
     if (!gameCompletedRef.current) {
@@ -72,15 +64,15 @@ function DrsnaSestavljankaC910Content() {
 
   const handleConfirmNewGame = () => {
     gameCompletedRef.current = false;
+    setShowNewGameButton(false);
     setPuzzleKey(prev => prev + 1);
     setShowNewGameDialog(false);
-    setShowNewGameButton(false);
   };
 
   const handleStartNewGameDirect = () => {
     gameCompletedRef.current = false;
-    setPuzzleKey(prev => prev + 1);
     setShowNewGameButton(false);
+    setPuzzleKey(prev => prev + 1);
   };
 
   const handleBack = () => {
@@ -89,14 +81,36 @@ function DrsnaSestavljankaC910Content() {
   };
 
   const handleStarClaimed = () => {
-    recordGameCompletion('sliding_puzzle', 'sliding_puzzle_c_9-10');
-    setShowCompletion(false);
+    recordGameCompletion('sliding_puzzle', config.trackingId);
     setShowNewGameButton(true);
   };
 
   const handleInstructions = () => {
     setMenuOpen(false);
     setShowInstructions(true);
+  };
+
+  // Render appropriate puzzle component based on age group
+  const renderPuzzle = () => {
+    const puzzleProps = {
+      key: puzzleKey,
+      imageUrl,
+      onComplete: handleComplete
+    };
+
+    switch (config.puzzleType) {
+      case '78':
+        return <SlidingPuzzle78 {...puzzleProps} />;
+      case '910':
+        return <SlidingPuzzle910 {...puzzleProps} />;
+      case '34':
+      default:
+        // Use SlidingPuzzle34 for 3-4 age group, SlidingPuzzle for 5-6
+        if (config.ageGroup === '34') {
+          return <SlidingPuzzle34 {...puzzleProps} />;
+        }
+        return <SlidingPuzzle {...puzzleProps} />;
+    }
   };
 
   return (
@@ -110,28 +124,17 @@ function DrsnaSestavljankaC910Content() {
       }}
     >
       <div className="min-h-full flex flex-col items-center justify-center p-4 pb-24">
-        <SlidingPuzzle910 
-          key={puzzleKey}
-          imageUrl={imageUrl}
-          onComplete={handleComplete}
-        />
+        {renderPuzzle()}
       </div>
 
       <div className="fixed bottom-4 left-4 z-50 flex items-center gap-3">
         <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
-            <button 
-              className="w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
-            >
+            <button className="w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform">
               <Home className="w-8 h-8 text-white" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent 
-            className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
-            align="start"
-            side="top"
-            sideOffset={8}
-          >
+          <DropdownMenuContent className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl" align="start" side="top" sideOffset={8}>
             <button onClick={handleBack} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors">
               <span className="text-xl">🏠</span>
               <span className="font-medium">Nazaj</span>
@@ -146,6 +149,7 @@ function DrsnaSestavljankaC910Content() {
             </button>
           </DropdownMenuContent>
         </DropdownMenu>
+        
         {showNewGameButton && (
           <Button 
             onClick={handleStartNewGameDirect} 
@@ -157,17 +161,39 @@ function DrsnaSestavljankaC910Content() {
         )}
       </div>
 
-      <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} type="sliding" />
+      <InstructionsModal 
+        isOpen={showInstructions} 
+        onClose={() => setShowInstructions(false)} 
+        type="sliding" 
+      />
+      
       <MatchingCompletionDialog 
         isOpen={showCompletion} 
-        onClose={() => setShowCompletion(false)}
+        onClose={() => setShowCompletion(false)} 
         images={completionImages}
-        onStarClaimed={handleStarClaimed}
-        instructionText="KLIKNI NA SPODNJE SLIKE IN PONOVI BESEDE"
-        autoPlayAudio={true}
+        onStarClaimed={handleStarClaimed} 
+        instructionText="KLIKNI NA SPODNJE SLIKE IN PONOVI BESEDE" 
+        autoPlayAudio={true} 
       />
-      <MemoryExitConfirmationDialog open={showExitDialog} onOpenChange={setShowExitDialog} onConfirm={() => navigate("/govorne-igre/drsna-sestavljanka")}><div /></MemoryExitConfirmationDialog>
-      <ConfirmDialog open={showNewGameDialog} onOpenChange={setShowNewGameDialog} title="Nova igra" description="Ali res želiš začeti novo igro?" confirmText="Da" cancelText="Ne" onConfirm={handleConfirmNewGame} onCancel={() => setShowNewGameDialog(false)} />
+      
+      <MemoryExitConfirmationDialog 
+        open={showExitDialog} 
+        onOpenChange={setShowExitDialog} 
+        onConfirm={() => navigate("/govorne-igre/drsna-sestavljanka")}
+      >
+        <div />
+      </MemoryExitConfirmationDialog>
+      
+      <ConfirmDialog 
+        open={showNewGameDialog} 
+        onOpenChange={setShowNewGameDialog} 
+        title="Nova igra" 
+        description="Ali res želiš začeti novo igro?" 
+        confirmText="Da" 
+        cancelText="Ne" 
+        onConfirm={handleConfirmNewGame} 
+        onCancel={() => setShowNewGameDialog(false)} 
+      />
     </div>
   );
 }
