@@ -44,7 +44,7 @@ export function MemoryGrid({
   
   // In landscape mode: 5 columns x 4 rows for better horizontal layout
   // In portrait/desktop mode: 4 columns x 5 rows
-  const columns = isLandscape ? 5 : (cardCount <= 16 ? 4 : 5);
+  const columns = isLandscape ? 5 : 4;
   const rows = Math.ceil(cardCount / columns);
   
   const gap = 8; // gap-2 = 8px
