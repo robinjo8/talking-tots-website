@@ -105,7 +105,8 @@ export function MemoryGrid({
             key={card.uniqueId || `${card.id}-${index}`} 
             className={cn(
               "transform transition-transform duration-200",
-              "hover:scale-[1.02]"
+              "hover:scale-[1.02]",
+              !isLandscape && "aspect-square"
             )}
             style={isLandscape && cardSize ? {
               width: cardSize,
