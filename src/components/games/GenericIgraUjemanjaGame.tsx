@@ -249,8 +249,109 @@ export function GenericIgraUjemanjaGame({ config }: GenericIgraUjemanjaGameProps
     }
   };
 
-  const showRotateMessage = isTouchDevice && isPortrait;
+  const forceRotation = isTouchDevice && isPortrait;
 
+  // Content to render (game + controls)
+  const gameContent = (
+    <>
+      <div className="h-full flex items-center justify-center">
+        {renderGame()}
+      </div>
+      
+      {renderInstructionsModal()}
+      
+      <MatchingCompletionDialog
+        isOpen={showCompletion}
+        onClose={() => setShowCompletion(false)}
+        images={getCompletionImages()}
+        onStarClaimed={handleStarClaimed}
+      />
+
+      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+        <DropdownMenuTrigger asChild>
+          <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform">
+            <Home className="w-8 h-8 text-white" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent 
+          align="start" 
+          side="top"
+          sideOffset={8}
+          className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+        >
+          <button 
+            onClick={handleBack} 
+            className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+          >
+            <span className="text-2xl">🏠</span>
+            <span>Nazaj</span>
+          </button>
+          <button 
+            onClick={handleNewGame} 
+            className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+          >
+            <span className="text-2xl">🔄</span>
+            <span>Nova igra</span>
+          </button>
+          <button 
+            onClick={() => { setMenuOpen(false); setShowInstructions(true); }} 
+            className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
+          >
+            <span className="text-2xl">📖</span>
+            <span>Navodila</span>
+          </button>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {isGameCompleted && (
+        <Button
+          onClick={handleNewGame}
+          className="fixed bottom-4 left-24 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+          size="icon"
+        >
+          <RefreshCw className="h-7 w-7 text-white" />
+        </Button>
+      )}
+
+      <MemoryExitConfirmationDialog
+        open={showExitDialog} 
+        onOpenChange={setShowExitDialog} 
+        onConfirm={handleConfirmExit}
+      >
+        <div />
+      </MemoryExitConfirmationDialog>
+    </>
+  );
+
+  // Force landscape with CSS rotation when phone is in portrait
+  if (forceRotation) {
+    return (
+      <div 
+        className="fixed inset-0 z-50 overflow-hidden"
+        style={{
+          transform: 'rotate(90deg)',
+          transformOrigin: 'left top',
+          width: '100vh',
+          height: '100vw',
+          marginLeft: '100vw',
+        }}
+      >
+        <div 
+          className="w-full h-full"
+          style={{
+            backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/oranzno_ozadje.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        >
+          {gameContent}
+        </div>
+      </div>
+    );
+  }
+
+  // Normal rendering for landscape mobile or desktop
   return (
     <div className="min-h-screen bg-background relative">
       <div 
@@ -262,84 +363,9 @@ export function GenericIgraUjemanjaGame({ config }: GenericIgraUjemanjaGameProps
           backgroundRepeat: 'no-repeat'
         }}
       />
-
-      {showRotateMessage ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-orange-400 to-amber-500">
-          <div className="text-center text-white p-8">
-            <div className="text-6xl mb-4">📱</div>
-            <p className="text-xl font-bold">Za igranje igre prosim obrni telefon v ležeči položaj</p>
-          </div>
-        </div>
-      ) : (
-        <>
-          <div className="h-full flex items-center justify-center relative z-10">
-            {renderGame()}
-          </div>
-          
-          {renderInstructionsModal()}
-          
-          <MatchingCompletionDialog
-            isOpen={showCompletion}
-            onClose={() => setShowCompletion(false)}
-            images={getCompletionImages()}
-            onStarClaimed={handleStarClaimed}
-          />
-
-          <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-            <DropdownMenuTrigger asChild>
-              <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform">
-                <Home className="w-8 h-8 text-white" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent 
-              align="start" 
-              side="top"
-              sideOffset={8}
-              className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
-            >
-              <button 
-                onClick={handleBack} 
-                className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
-              >
-                <span className="text-2xl">🏠</span>
-                <span>Nazaj</span>
-              </button>
-              <button 
-                onClick={handleNewGame} 
-                className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
-              >
-                <span className="text-2xl">🔄</span>
-                <span>Nova igra</span>
-              </button>
-              <button 
-                onClick={() => { setMenuOpen(false); setShowInstructions(true); }} 
-                className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
-              >
-                <span className="text-2xl">📖</span>
-                <span>Navodila</span>
-              </button>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {isGameCompleted && (
-            <Button
-              onClick={handleNewGame}
-              className="fixed bottom-4 left-24 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 shadow-lg border-2 border-white/50 backdrop-blur-sm"
-              size="icon"
-            >
-              <RefreshCw className="h-7 w-7 text-white" />
-            </Button>
-          )}
-
-          <MemoryExitConfirmationDialog
-            open={showExitDialog} 
-            onOpenChange={setShowExitDialog} 
-            onConfirm={handleConfirmExit}
-          >
-            <div />
-          </MemoryExitConfirmationDialog>
-        </>
-      )}
+      <div className="relative z-10">
+        {gameContent}
+      </div>
     </div>
   );
 }
