@@ -103,11 +103,11 @@ export function MemoryGrid({
         {cards.map((card, index) => (
           <div 
             key={card.uniqueId || `${card.id}-${index}`} 
-            className={cn(
-              "transform transition-transform duration-200",
-              "hover:scale-[1.02]",
-              !isLandscape && "aspect-square"
-            )}
+          className={cn(
+            "transform transition-transform duration-200",
+            "hover:scale-[1.02]",
+            !isLandscape && "aspect-square w-full"
+          )}
             style={isLandscape && cardSize ? {
               width: cardSize,
               height: cardSize,
