@@ -44,7 +44,7 @@ export function MemoryGrid({
   
   // In landscape mode: 5 columns x 4 rows for better horizontal layout
   // In portrait/desktop mode: 4 columns x 5 rows
-  const columns = isLandscape ? 5 : 4;
+  const columns = isLandscape ? 5 : (cardCount <= 16 ? 4 : 5);
   const rows = Math.ceil(cardCount / columns);
   
   const gap = 8; // gap-2 = 8px
@@ -86,7 +86,7 @@ export function MemoryGrid({
       <div 
         className={cn(
           "grid gap-2",
-          !isLandscape && "mx-auto w-full md:gap-3 px-4 md:px-0"
+          !isLandscape && "mx-auto w-full md:gap-3"
         )}
         style={isLandscape && cardSize ? {
           gridTemplateColumns: `repeat(${columns}, ${cardSize}px)`,
@@ -97,21 +97,22 @@ export function MemoryGrid({
         } : {
           gridTemplateColumns: `repeat(${columns}, 1fr)`,
           maxWidth: '900px',
-          width: '100%',
         }}
       >
         {cards.map((card, index) => (
           <div 
             key={card.uniqueId || `${card.id}-${index}`} 
-          className={cn(
-            "transform transition-transform duration-200",
-            "hover:scale-[1.02]",
-            !isLandscape && "aspect-square w-full"
-          )}
+            className={cn(
+              "transform transition-transform duration-200",
+              "hover:scale-[1.02]",
+              !isLandscape && "aspect-square"
+            )}
             style={isLandscape && cardSize ? {
               width: cardSize,
               height: cardSize,
-            } : undefined}
+            } : {
+              maxHeight: `calc((100vh - 120px) / ${rows})`,
+            }}
           >
             <MemoryCard
               id={card.id}
