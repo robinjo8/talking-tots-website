@@ -24,53 +24,13 @@ import GovornojezicovneVaje from "@/pages/GovornojezicovneVaje";
 import VajeMoториkeGovoril from "@/pages/VajeMoториkeGovoril";
 import ArtIzgovorjavaPage from "@/pages/ArtIzgovorjavaPage";
 import ArtikulacijaVaje from "@/pages/ArtikulacijaVaje";
-import ArtikulacijaVajeC from "@/pages/ArtikulacijaVajeC";
-import ArtikulacijaVajeČ from "@/pages/ArtikulacijaVajeČ";
-import ArtikulacijaVajeK from "@/pages/ArtikulacijaVajeK";
-import ArtikulacijaVajeL from "@/pages/ArtikulacijaVajeL";
-import ArtikulacijaVajeR from "@/pages/ArtikulacijaVajeR";
-import ArtikulacijaVajeRSredinaKonec from "@/pages/ArtikulacijaVajeRSredinaKonec";
-import ArtikulacijaVajeCSredinaKonec from "@/pages/ArtikulacijaVajeCSredinaKonec";
-import ArtikulacijaVajeČSredinaKonec from "@/pages/ArtikulacijaVajeČSredinaKonec";
-import ArtikulacijaVajeKSredinaKonec from "@/pages/ArtikulacijaVajeKSredinaKonec";
-import ArtikulacijaVajeLSredinaKonec from "@/pages/ArtikulacijaVajeLSredinaKonec";
-import ArtikulacijaVajeSSredinaKonec from "@/pages/ArtikulacijaVajeSSredinaKonec";
-import ArtikulacijaVajeŠSredinaKonec from "@/pages/ArtikulacijaVajeŠSredinaKonec";
-import ArtikulacijaVajeZSredinaKonec from "@/pages/ArtikulacijaVajeZSredinaKonec";
-import ArtikulacijaVajeŽSredinaKonec from "@/pages/ArtikulacijaVajeŽSredinaKonec";
-import ArtikulacijaVajeS from "@/pages/ArtikulacijaVajeS";
-import ArtikulacijaVajeŠ from "@/pages/ArtikulacijaVajeŠ";
-import ArtikulacijaVajeZ from "@/pages/ArtikulacijaVajeZ";
-import ArtikulacijaVajeŽ from "@/pages/ArtikulacijaVajeŽ";
 import GovorneIgre from "@/pages/GovorneIgre";
 import MojiIzzivi from "@/pages/MojiIzzivi";
 import VideoNavodila from "@/pages/VideoNavodila";
-import VideoNavodilaCrkaR from "@/pages/VideoNavodilaCrkaR";
-import VideoNavodilaCrkaC from "@/pages/VideoNavodilaCrkaC";
-import VideoNavodilaCrkaČ from "@/pages/VideoNavodilaCrkaČ";
-import VideoNavodilaCrkaK from "@/pages/VideoNavodilaCrkaK";
-import VideoNavodilaCrkaL from "@/pages/VideoNavodilaCrkaL";
-import VideoNavodilaCrkaS from "@/pages/VideoNavodilaCrkaS";
-import VideoNavodilaCrkaŠ from "@/pages/VideoNavodilaCrkaŠ";
-import VideoNavodilaCrkaZ from "@/pages/VideoNavodilaCrkaZ";
-import VideoNavodilaCrkaŽ from "@/pages/VideoNavodilaCrkaŽ";
 import LogopedskiKoticek from "@/pages/LogopedskiKoticek";
 import RazvojGovora from "@/pages/RazvojGovora";
-import SpominR from "@/pages/SpominR";
 import SpominGames from "@/pages/SpominGames";
-import SpominK from "@/pages/SpominK";
-import SpominS from "@/pages/SpominS";
-import SpominŠ from "@/pages/SpominŠ";
-import SpominC from "@/pages/SpominC";
-import SpominČ from "@/pages/SpominČ";
-import SpominZ from "@/pages/SpominZ";
-import SpominŽ from "@/pages/SpominŽ";
-import SpominL from "@/pages/SpominL";
-import LabirintX from "@/pages/LabirintX";
-import LabirintC from "@/pages/LabirintC";
-import LabirintLetter from "@/pages/LabirintLetter";
 import Labirint from "@/pages/Labirint";
-
 import ArtikuacijskiTest from "@/pages/ArtikuacijskiTest";
 import Sestavljanke from "@/pages/Sestavljanke";
 import DrsnaSestavljanka from "@/pages/DrsnaSestavljanka";
@@ -93,6 +53,10 @@ import PomocInPodpora from "@/pages/PomocInPodpora";
 import KakoDeluje from "@/pages/KakoDeluje";
 import Cenik from "@/pages/Cenik";
 import DelovanjeTest from "@/pages/DelovanjeTest";
+
+// New consolidated routers
+import ArtikulacijaVajeRouter from "@/components/routing/ArtikulacijaVajeRouter";
+import VideoNavodilaRouter from "@/components/routing/VideoNavodilaRouter";
 
 export function AppRoutes() {
   return (
@@ -163,150 +127,17 @@ export function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      
+      {/* Dynamic ArtikulacijaVaje routes - handles all letters and positions */}
       <Route 
-        path="/govorno-jezikovne-vaje/artikulacija/c" 
+        path="/govorno-jezikovne-vaje/artikulacija/:gameId" 
         element={
           <ProtectedRoute>
-            <ArtikulacijaVajeC />
+            <ArtikulacijaVajeRouter />
           </ProtectedRoute>
         }
       />
-      <Route 
-        path="/govorno-jezikovne-vaje/artikulacija/č" 
-        element={
-          <ProtectedRoute>
-            <ArtikulacijaVajeČ />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorno-jezikovne-vaje/artikulacija/k" 
-        element={
-          <ProtectedRoute>
-            <ArtikulacijaVajeK />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorno-jezikovne-vaje/artikulacija/l" 
-        element={
-          <ProtectedRoute>
-            <ArtikulacijaVajeL />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorno-jezikovne-vaje/artikulacija/r" 
-        element={
-          <ProtectedRoute>
-            <ArtikulacijaVajeR />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorno-jezikovne-vaje/artikulacija/r-sredina-konec" 
-        element={
-          <ProtectedRoute>
-            <ArtikulacijaVajeRSredinaKonec />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorno-jezikovne-vaje/artikulacija/c-sredina-konec" 
-        element={
-          <ProtectedRoute>
-            <ArtikulacijaVajeCSredinaKonec />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorno-jezikovne-vaje/artikulacija/č-sredina-konec" 
-        element={
-          <ProtectedRoute>
-            <ArtikulacijaVajeČSredinaKonec />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorno-jezikovne-vaje/artikulacija/k-sredina-konec" 
-        element={
-          <ProtectedRoute>
-            <ArtikulacijaVajeKSredinaKonec />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorno-jezikovne-vaje/artikulacija/l-sredina-konec" 
-        element={
-          <ProtectedRoute>
-            <ArtikulacijaVajeLSredinaKonec />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorno-jezikovne-vaje/artikulacija/s-sredina-konec" 
-        element={
-          <ProtectedRoute>
-            <ArtikulacijaVajeSSredinaKonec />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorno-jezikovne-vaje/artikulacija/š-sredina-konec" 
-        element={
-          <ProtectedRoute>
-            <ArtikulacijaVajeŠSredinaKonec />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorno-jezikovne-vaje/artikulacija/z-sredina-konec" 
-        element={
-          <ProtectedRoute>
-            <ArtikulacijaVajeZSredinaKonec />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorno-jezikovne-vaje/artikulacija/ž-sredina-konec" 
-        element={
-          <ProtectedRoute>
-            <ArtikulacijaVajeŽSredinaKonec />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/govorno-jezikovne-vaje/artikulacija/s" 
-        element={
-          <ProtectedRoute>
-            <ArtikulacijaVajeS />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorno-jezikovne-vaje/artikulacija/š" 
-        element={
-          <ProtectedRoute>
-            <ArtikulacijaVajeŠ />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorno-jezikovne-vaje/artikulacija/z" 
-        element={
-          <ProtectedRoute>
-            <ArtikulacijaVajeZ />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorno-jezikovne-vaje/artikulacija/ž" 
-        element={
-          <ProtectedRoute>
-            <ArtikulacijaVajeŽ />
-          </ProtectedRoute>
-        }
-      />
+      
       <Route 
         path="/artikulacija" 
         element={
@@ -361,7 +192,6 @@ export function AppRoutes() {
       />
       
       {/* Dynamic DrsnaSestavljanka routes - handles all letters and age groups */}
-      {/* ASCII URL mapping: č->ch, š->sh, ž->zh for reliable routing */}
       <Route 
         path="/govorne-igre/drsna-sestavljanka/:letterAndAge" 
         element={
@@ -372,7 +202,6 @@ export function AppRoutes() {
       />
       
       {/* Dynamic Sestavljanke routes - handles all letters and age groups */}
-      {/* ASCII URL mapping: č->ch, š->sh, ž->zh for reliable routing */}
       <Route 
         path="/govorne-igre/sestavljanke/:letterAndAge" 
         element={
@@ -382,94 +211,12 @@ export function AppRoutes() {
         }
       />
       
-      
-      {/* Spomin Game Routes */}
+      {/* Spomin Game Routes - Dynamic */}
       <Route 
         path="/govorne-igre/spomin" 
         element={
           <ProtectedRoute>
             <SpominGames />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route 
-        path="/govorne-igre/spomin/spomin-r" 
-        element={
-          <ProtectedRoute>
-            <SpominR />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route 
-        path="/govorne-igre/spomin/spomin-k" 
-        element={
-          <ProtectedRoute>
-            <SpominK />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route 
-        path="/govorne-igre/spomin/spomin-s" 
-        element={
-          <ProtectedRoute>
-            <SpominS />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route 
-        path="/govorne-igre/spomin/spomin-š" 
-        element={
-          <ProtectedRoute>
-            <SpominŠ />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route 
-        path="/govorne-igre/spomin/spomin-c" 
-        element={
-          <ProtectedRoute>
-            <SpominC />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route 
-        path="/govorne-igre/spomin/spomin-č" 
-        element={
-          <ProtectedRoute>
-            <SpominČ />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route 
-        path="/govorne-igre/spomin/spomin-z" 
-        element={
-          <ProtectedRoute>
-            <SpominZ />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route 
-        path="/govorne-igre/spomin/spomin-ž" 
-        element={
-          <ProtectedRoute>
-            <SpominŽ />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route 
-        path="/govorne-igre/spomin/spomin-l" 
-        element={
-          <ProtectedRoute>
-            <SpominL />
           </ProtectedRoute>
         }
       />
@@ -480,22 +227,6 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <Labirint />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorne-igre/labirint/x" 
-        element={
-          <ProtectedRoute>
-            <LabirintX />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorne-igre/labirint/:letter" 
-        element={
-          <ProtectedRoute>
-            <LabirintLetter />
           </ProtectedRoute>
         }
       />
@@ -628,78 +359,17 @@ export function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      
+      {/* Dynamic VideoNavodila routes - handles all letters */}
       <Route 
-        path="/video-navodila/crka-c" 
+        path="/video-navodila/:letter" 
         element={
           <ProtectedRoute>
-            <VideoNavodilaCrkaC />
+            <VideoNavodilaRouter />
           </ProtectedRoute>
         }
       />
-      <Route 
-        path="/video-navodila/crka-č" 
-        element={
-          <ProtectedRoute>
-            <VideoNavodilaCrkaČ />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/video-navodila/crka-k" 
-        element={
-          <ProtectedRoute>
-            <VideoNavodilaCrkaK />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/video-navodila/crka-l" 
-        element={
-          <ProtectedRoute>
-            <VideoNavodilaCrkaL />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/video-navodila/crka-r" 
-        element={
-          <ProtectedRoute>
-            <VideoNavodilaCrkaR />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/video-navodila/crka-s" 
-        element={
-          <ProtectedRoute>
-            <VideoNavodilaCrkaS />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/video-navodila/crka-š" 
-        element={
-          <ProtectedRoute>
-            <VideoNavodilaCrkaŠ />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/video-navodila/crka-z" 
-        element={
-          <ProtectedRoute>
-            <VideoNavodilaCrkaZ />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/video-navodila/crka-ž" 
-        element={
-          <ProtectedRoute>
-            <VideoNavodilaCrkaŽ />
-          </ProtectedRoute>
-        }
-      />
+      
       <Route 
         path="/logopedski-koticek" 
         element={
