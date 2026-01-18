@@ -30,6 +30,7 @@ import VideoNavodila from "@/pages/VideoNavodila";
 import LogopedskiKoticek from "@/pages/LogopedskiKoticek";
 import RazvojGovora from "@/pages/RazvojGovora";
 import SpominGames from "@/pages/SpominGames";
+import SpominRouter from "@/components/routing/SpominRouter";
 import Labirint from "@/pages/Labirint";
 import ArtikuacijskiTest from "@/pages/ArtikuacijskiTest";
 import Sestavljanke from "@/pages/Sestavljanke";
@@ -217,6 +218,16 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <SpominGames />
+          </ProtectedRoute>
+        }
+      />
+      
+      {/* Dynamic Spomin route for individual letter games */}
+      <Route 
+        path="/govorne-igre/spomin/:letter" 
+        element={
+          <ProtectedRoute>
+            <SpominRouter />
           </ProtectedRoute>
         }
       />
