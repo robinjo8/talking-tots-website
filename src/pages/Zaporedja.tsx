@@ -131,14 +131,14 @@ export default function Zaporedja() {
     
     const letterMap: Record<string, string> = {
       'C': '/govorne-igre/zaporedja/c',
-      'Č': '/govorne-igre/zaporedja/č',
+      'Č': '/govorne-igre/zaporedja/ch',
       'K': '/govorne-igre/zaporedja/k',
       'L': '/govorne-igre/zaporedja/l',
       'R': '/govorne-igre/zaporedja/r',
       'S': '/govorne-igre/zaporedja/s',
-      'Š': '/govorne-igre/zaporedja/š',
+      'Š': '/govorne-igre/zaporedja/sh',
       'Z': '/govorne-igre/zaporedja/z',
-      'Ž': '/govorne-igre/zaporedja/ž'
+      'Ž': '/govorne-igre/zaporedja/zh'
     };
     
     const basePath = letterMap[game.letter];
