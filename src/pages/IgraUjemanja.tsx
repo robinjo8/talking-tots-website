@@ -11,6 +11,7 @@ import { FooterSection } from "@/components/FooterSection";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { toAsciiUrl } from "@/data/igraUjemanjaConfig";
 
 const matchingGames = [
   {
@@ -123,22 +124,24 @@ export default function IgraUjemanja() {
     const childAge = selectedChild.age;
     const ageGroup = getAgeGroup(childAge);
     
+    const urlKey = toAsciiUrl(game.letter);
+    
     let targetRoute = '';
     switch (ageGroup) {
       case '3-4':
-        targetRoute = `/govorne-igre/igra-ujemanja/${game.letter.toLowerCase()}`;
+        targetRoute = `/govorne-igre/igra-ujemanja/${urlKey}`;
         break;
       case '5-6':
-        targetRoute = `/govorne-igre/igra-ujemanja/${game.letter.toLowerCase()}56`;
+        targetRoute = `/govorne-igre/igra-ujemanja/${urlKey}56`;
         break;
       case '7-8':
-        targetRoute = `/govorne-igre/igra-ujemanja/${game.letter.toLowerCase()}78`;
+        targetRoute = `/govorne-igre/igra-ujemanja/${urlKey}78`;
         break;
       case '9-10':
-        targetRoute = `/govorne-igre/igra-ujemanja/${game.letter.toLowerCase()}910`;
+        targetRoute = `/govorne-igre/igra-ujemanja/${urlKey}910`;
         break;
       default:
-        targetRoute = `/govorne-igre/igra-ujemanja/${game.letter.toLowerCase()}`;
+        targetRoute = `/govorne-igre/igra-ujemanja/${urlKey}`;
     }
     
     navigate(targetRoute);
