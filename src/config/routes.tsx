@@ -83,7 +83,6 @@ import MatchingGameLetter from "@/pages/MatchingGameLetter";
 import IgraUjemanja from "@/pages/IgraUjemanja";
 import Zaporedja from "@/pages/Zaporedja";
 import ZaporedjaRouter from "@/components/routing/ZaporedjaRouter";
-
 import IgraUjemanjaRouter from "@/components/routing/IgraUjemanjaRouter";
 import Kontakt from "@/pages/Kontakt";
 import SplosniPogoji from "@/pages/SplosniPogoji";
@@ -713,8 +712,6 @@ export function AppRoutes() {
           <RazvojGovora />
         }
       />
-
-      
 
       {/* Admin Portal Routes */}
       <Route path="/admin/login" element={<AdminAuthProvider><AdminLogin /></AdminAuthProvider>} />
