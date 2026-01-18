@@ -341,6 +341,7 @@ export function getLetterMatchingData(letter: string): ThreeColumnMatchingItem[]
     case 'c':
       return threeColumnMatchingDataC;
     case 'č':
+    case 'ch':
       return threeColumnMatchingDataČ;
     case 'k':
       return threeColumnMatchingDataK;
@@ -351,13 +352,16 @@ export function getLetterMatchingData(letter: string): ThreeColumnMatchingItem[]
     case 's':
       return threeColumnMatchingDataS;
     case 'š':
+    case 'sh':
       return threeColumnMatchingDataŠ;
     case 'z':
       return threeColumnMatchingDataZ;
     case 'ž':
+    case 'zh':
       return threeColumnMatchingDataŽ;
     default:
-      return threeColumnMatchingDataC; // Fallback to C
+      console.warn(`Unknown letter: ${letter}, falling back to C`);
+      return threeColumnMatchingDataC;
   }
 }
 
@@ -367,6 +371,7 @@ export function getFourColumnLetterData(letter: string): FourColumnMatchingItem[
     case 'c':
       return fourColumnMatchingDataC;
     case 'č':
+    case 'ch':
       return fourColumnMatchingDataČ;
     case 'k':
       return fourColumnMatchingDataK;
@@ -377,13 +382,16 @@ export function getFourColumnLetterData(letter: string): FourColumnMatchingItem[
     case 's':
       return fourColumnMatchingDataS;
     case 'š':
+    case 'sh':
       return fourColumnMatchingDataŠ;
     case 'z':
       return fourColumnMatchingDataZ;
     case 'ž':
+    case 'zh':
       return fourColumnMatchingDataŽ;
     default:
-      return fourColumnMatchingDataC; // Fallback to C
+      console.warn(`Unknown letter: ${letter}, falling back to C`);
+      return fourColumnMatchingDataC;
   }
 }
 
