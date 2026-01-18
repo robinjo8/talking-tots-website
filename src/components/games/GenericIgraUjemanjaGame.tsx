@@ -327,13 +327,16 @@ export function GenericIgraUjemanjaGame({ config }: GenericIgraUjemanjaGameProps
   if (forceRotation) {
     return (
       <div 
-        className="fixed inset-0 z-50 overflow-hidden"
+        className="fixed z-50 overflow-hidden"
         style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
           transform: 'rotate(90deg)',
-          transformOrigin: 'left top',
-          width: '100vh',
-          height: '100vw',
-          marginLeft: '100vw',
+          transformOrigin: 'top left',
+          width: '100dvh',
+          height: '100dvw',
+          marginLeft: '100dvw',
         }}
       >
         <div 
