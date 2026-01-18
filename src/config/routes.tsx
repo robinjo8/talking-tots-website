@@ -83,7 +83,7 @@ import MatchingGameLetter from "@/pages/MatchingGameLetter";
 import IgraUjemanja from "@/pages/IgraUjemanja";
 import Zaporedja from "@/pages/Zaporedja";
 import ZaporedjaRouter from "@/components/routing/ZaporedjaRouter";
-import AdminRemoveBackground from "@/pages/AdminRemoveBackground";
+
 import IgraUjemanjaRouter from "@/components/routing/IgraUjemanjaRouter";
 import Kontakt from "@/pages/Kontakt";
 import SplosniPogoji from "@/pages/SplosniPogoji";
@@ -714,7 +714,7 @@ export function AppRoutes() {
         }
       />
 
-      <Route path="/admin/remove-background" element={<AdminRemoveBackground />} />
+      
 
       {/* Admin Portal Routes */}
       <Route path="/admin/login" element={<AdminAuthProvider><AdminLogin /></AdminAuthProvider>} />
