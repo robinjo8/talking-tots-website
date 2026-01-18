@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEnhancedProgress } from "./useEnhancedProgress";
-import type { SpominGameConfig } from "@/data/spominConfig";
 
 export interface MemoryCard {
   id: string;
@@ -15,20 +14,7 @@ export interface MemoryCard {
   uniqueId?: string;
 }
 
-// Valid table names for type safety with Supabase
-type MemoryTableName = 
-  | 'memory_cards'
-  | 'memory_cards_c'
-  | 'memory_cards_Č'
-  | 'memory_cards_K'
-  | 'memory_cards_l'
-  | 'memory_cards_r'
-  | 'memory_cards_S'
-  | 'memory_cards_Š_duplicate'
-  | 'memory_cards_z'
-  | 'memory_cards_Ž';
-
-export const useGenericMemoryGame = (config: SpominGameConfig) => {
+export const useMemoryGameL = () => {
   const { recordGameCompletion } = useEnhancedProgress();
   const [cards, setCards] = useState<MemoryCard[]>([]);
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
@@ -40,11 +26,11 @@ export const useGenericMemoryGame = (config: SpominGameConfig) => {
   const gameCompletedRef = useRef(false);
 
   const { data: memoryCardsData, isLoading, error } = useQuery({
-    queryKey: [config.queryKey],
+    queryKey: ["memoryCardsL"],
     queryFn: async () => {
-      console.log(`Fetching memory cards for ${config.letter} from ${config.tableName}...`);
+      console.log("Fetching memory cards L from Supabase...");
       const { data, error } = await supabase
-        .from(config.tableName as MemoryTableName)
+        .from("memory_cards_l")
         .select("*")
         .limit(10);
       
@@ -53,7 +39,7 @@ export const useGenericMemoryGame = (config: SpominGameConfig) => {
         throw error;
       }
       
-      console.log(`Fetched memory cards for ${config.letter}:`, data);
+      console.log("Fetched memory cards:", data);
       return data || [];
     }
   });
@@ -84,7 +70,7 @@ export const useGenericMemoryGame = (config: SpominGameConfig) => {
     setGameCompleted(false);
     gameCompletedRef.current = false;
     
-    console.log(`Game ${config.letter} initialized with shuffled cards:`, shuffledCards);
+    console.log("Game initialized with shuffled cards:", shuffledCards);
   };
 
   const shuffleArray = <T,>(array: T[]): T[] => {
@@ -146,20 +132,20 @@ export const useGenericMemoryGame = (config: SpominGameConfig) => {
 
   useEffect(() => {
     if (memoryCardsData && memoryCardsData.length > 0) {
-      console.log(`Initializing game ${config.letter} with memory cards data:`, memoryCardsData);
+      console.log("Initializing game L with memory cards data:", memoryCardsData);
       initializeGame(memoryCardsData);
     }
   }, [memoryCardsData]);
 
   useEffect(() => {
     if (cards.length > 0 && matchedPairs.length === cards.length / 2 && !gameCompletedRef.current) {
-      console.log(`Game ${config.letter} completed!`);
+      console.log("Game completed!");
       setGameCompleted(true);
       gameCompletedRef.current = true;
-      // Record completion in progress system using the tracking ID
-      recordGameCompletion('memory', config.trackingId);
+      // Record completion in progress system
+      recordGameCompletion('memory', 'L');
     }
-  }, [matchedPairs, cards, config.trackingId]);
+  }, [matchedPairs, cards]);
 
   const resetGame = () => {
     if (memoryCardsData && memoryCardsData.length > 0) {
@@ -205,7 +191,6 @@ export const useGenericMemoryGame = (config: SpominGameConfig) => {
     showPairDialog,
     currentMatchedPair,
     handlePairDialogContinue,
-    handlePairUnmatch,
-    config  // Include config for access to letter, dragonImage, etc.
+    handlePairUnmatch
   };
 };

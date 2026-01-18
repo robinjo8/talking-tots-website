@@ -25,12 +25,12 @@ const memoryGames = [
     available: true
   },
   { 
-    id: "spomin-ch",
+    id: "spomin-č",
     letter: "Č",
     gradient: "from-app-blue/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
     description: "Poišči pare slik s črko Č in nato ponovi besedo",
-    path: "/govorne-igre/spomin/spomin-ch",
+    path: "/govorne-igre/spomin/spomin-č",
     available: true
   },
   { 
@@ -70,12 +70,12 @@ const memoryGames = [
     available: true
   },
   { 
-    id: "spomin-sh",
+    id: "spomin-š",
     letter: "Š",
     gradient: "from-app-blue/20 to-app-purple/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
     description: "Poišči pare slik s črko Š in nato ponovi besedo",
-    path: "/govorne-igre/spomin/spomin-sh",
+    path: "/govorne-igre/spomin/spomin-š",
     available: true
   },
   { 
@@ -88,12 +88,12 @@ const memoryGames = [
     available: true
   },
   { 
-    id: "spomin-zh",
+    id: "spomin-ž",
     letter: "Ž",
     gradient: "from-app-purple/20 to-app-blue/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
     description: "Poišči pare slik s črko Ž in nato ponovi besedo",
-    path: "/govorne-igre/spomin/spomin-zh",
+    path: "/govorne-igre/spomin/spomin-ž",
     available: true
   },
 ];
