@@ -249,13 +249,173 @@ export function GenericIgraUjemanjaGame({ config }: GenericIgraUjemanjaGameProps
     }
   };
 
-  const forceRotation = isTouchDevice && isPortrait;
+  const backgroundImageUrl = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/oranzno_ozadje.png';
 
-  // Content to render (game + controls)
-  const gameContent = (
-    <>
-      <div className="h-full flex items-center justify-center">
+  // Mobile fullscreen version (same as Zaporedja)
+  if (isTouchDevice) {
+    return (
+      <div className="fixed inset-0 overflow-hidden select-none">
+        {/* Full screen background */}
+        <div 
+          className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url('${backgroundImageUrl}')` }}
+        />
+        
+        {/* Game content */}
+        <div className="relative z-10 flex-1 flex items-center justify-center overflow-hidden h-full w-full p-2">
+          {!isPortrait ? (
+            <div className="w-full h-full flex flex-col items-center justify-center">
+              {renderGame()}
+            </div>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center px-6 text-center">
+              <p className="text-base font-semibold text-foreground">
+                Za igranje igre prosim obrni telefon v ležeči položaj.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Floating buttons container */}
+        <div className="fixed bottom-4 left-4 z-50 flex items-center gap-3">
+          {/* Home menu button */}
+          <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+            <DropdownMenuTrigger asChild>
+              <button className="w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform">
+                <Home className="w-8 h-8 text-white" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              align="start" 
+              side="top"
+              sideOffset={8}
+              className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+            >
+              <button
+                onClick={handleBack}
+                className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+              >
+                <span className="text-2xl">🏠</span>
+                <span>Nazaj</span>
+              </button>
+              <button
+                onClick={handleNewGame}
+                className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+              >
+                <span className="text-2xl">🔄</span>
+                <span>Nova igra</span>
+              </button>
+              <button
+                onClick={() => { setMenuOpen(false); setShowInstructions(true); }}
+                className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
+              >
+                <span className="text-2xl">📖</span>
+                <span>Navodila</span>
+              </button>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* New Game button - appears after game completion */}
+          {isGameCompleted && (
+            <Button 
+              onClick={handleNewGame}
+              className="rounded-full w-16 h-16 bg-sky-400 hover:bg-sky-500 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+              size="icon"
+            >
+              <RefreshCw className="h-7 w-7 text-white" />
+            </Button>
+          )}
+        </div>
+
+        {renderInstructionsModal()}
+        
+        <MatchingCompletionDialog
+          isOpen={showCompletion}
+          onClose={() => setShowCompletion(false)}
+          images={getCompletionImages()}
+          onStarClaimed={handleStarClaimed}
+          isMobileLandscape={true}
+        />
+
+        {/* Exit Confirmation Dialog */}
+        <MemoryExitConfirmationDialog
+          open={showExitDialog}
+          onOpenChange={setShowExitDialog}
+          onConfirm={handleConfirmExit}
+        >
+          <></>
+        </MemoryExitConfirmationDialog>
+      </div>
+    );
+  }
+
+  // Desktop version
+  return (
+    <div 
+      className="fixed inset-0 overflow-auto select-none"
+      style={{
+        backgroundImage: `url('${backgroundImageUrl}')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      {/* Main content */}
+      <div className="min-h-full flex flex-col items-center justify-center p-4 pb-24">
         {renderGame()}
+      </div>
+
+      {/* Floating buttons container */}
+      <div className="fixed bottom-4 left-4 z-50 flex items-center gap-3">
+        {/* Home menu button */}
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger asChild>
+            <button 
+              className="w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
+            >
+              <Home className="w-8 h-8 text-white" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+            align="start"
+            side="top"
+            sideOffset={8}
+          >
+            <button
+              onClick={handleBack}
+              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
+            >
+              <span className="text-xl">🏠</span>
+              <span className="font-medium">Nazaj</span>
+            </button>
+            <button
+              onClick={handleNewGame}
+              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
+            >
+              <span className="text-xl">🔄</span>
+              <span className="font-medium">Nova igra</span>
+            </button>
+            <button
+              onClick={() => { setMenuOpen(false); setShowInstructions(true); }}
+              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
+            >
+              <span className="text-xl">📖</span>
+              <span className="font-medium">Navodila</span>
+            </button>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* New Game button - appears after game completion */}
+        {isGameCompleted && (
+          <Button 
+            onClick={handleNewGame}
+            className="rounded-full w-16 h-16 bg-sky-400 hover:bg-sky-500 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+            size="icon"
+          >
+            <RefreshCw className="h-7 w-7 text-white" />
+          </Button>
+        )}
       </div>
       
       {renderInstructionsModal()}
@@ -265,110 +425,17 @@ export function GenericIgraUjemanjaGame({ config }: GenericIgraUjemanjaGameProps
         onClose={() => setShowCompletion(false)}
         images={getCompletionImages()}
         onStarClaimed={handleStarClaimed}
+        isMobileLandscape={false}
       />
 
-      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-        <DropdownMenuTrigger asChild>
-          <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform">
-            <Home className="w-8 h-8 text-white" />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent 
-          align="start" 
-          side="top"
-          sideOffset={8}
-          className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
-        >
-          <button 
-            onClick={handleBack} 
-            className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
-          >
-            <span className="text-2xl">🏠</span>
-            <span>Nazaj</span>
-          </button>
-          <button 
-            onClick={handleNewGame} 
-            className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
-          >
-            <span className="text-2xl">🔄</span>
-            <span>Nova igra</span>
-          </button>
-          <button 
-            onClick={() => { setMenuOpen(false); setShowInstructions(true); }} 
-            className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
-          >
-            <span className="text-2xl">📖</span>
-            <span>Navodila</span>
-          </button>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
-      {isGameCompleted && (
-        <Button
-          onClick={handleNewGame}
-          className="fixed bottom-4 left-24 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 shadow-lg border-2 border-white/50 backdrop-blur-sm"
-          size="icon"
-        >
-          <RefreshCw className="h-7 w-7 text-white" />
-        </Button>
-      )}
-
+      {/* Exit Confirmation Dialog */}
       <MemoryExitConfirmationDialog
-        open={showExitDialog} 
-        onOpenChange={setShowExitDialog} 
+        open={showExitDialog}
+        onOpenChange={setShowExitDialog}
         onConfirm={handleConfirmExit}
       >
-        <div />
+        <></>
       </MemoryExitConfirmationDialog>
-    </>
-  );
-
-  // Force landscape with CSS rotation when phone is in portrait
-  if (forceRotation) {
-    return (
-      <div 
-        className="fixed z-50 overflow-hidden"
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          transform: 'rotate(90deg)',
-          transformOrigin: 'top left',
-          width: '100dvh',
-          height: '100dvw',
-          marginLeft: '100dvw',
-        }}
-      >
-        <div 
-          className="w-full h-full"
-          style={{
-            backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/oranzno_ozadje.png)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
-          }}
-        >
-          {gameContent}
-        </div>
-      </div>
-    );
-  }
-
-  // Normal rendering for landscape mobile or desktop
-  return (
-    <div className="min-h-screen bg-background relative">
-      <div 
-        className="fixed inset-0 z-0"
-        style={{
-          backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/oranzno_ozadje.png)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      />
-      <div className="relative z-10">
-        {gameContent}
-      </div>
     </div>
   );
 }
