@@ -222,7 +222,7 @@ export function GenericIgraUjemanjaGame({ config }: GenericIgraUjemanjaGameProps
             key={gameKey}
             items={fourColumnItems}
             onGameComplete={handleFourColumnComplete}
-            isLandscape={true}
+            isLandscape={isTouchDevice}
           />
         );
     }
