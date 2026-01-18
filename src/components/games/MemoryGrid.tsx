@@ -105,15 +105,12 @@ export function MemoryGrid({
             key={card.uniqueId || `${card.id}-${index}`} 
             className={cn(
               "transform transition-transform duration-200",
-              "hover:scale-[1.02]",
-              !isLandscape && "aspect-square w-full"
+              "hover:scale-[1.02]"
             )}
             style={isLandscape && cardSize ? {
               width: cardSize,
               height: cardSize,
-            } : {
-              maxHeight: `calc((100vh - 120px) / ${rows})`,
-            }}
+            } : undefined}
           >
             <MemoryCard
               id={card.id}
