@@ -201,7 +201,7 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
       </div>
 
       {/* Game Grid */}
-      <div className={`flex items-center justify-center ${effectiveFullscreen ? 'h-[calc(100vh-80px)]' : 'py-8'}`}>
+      <div className={`flex items-center justify-center ${effectiveFullscreen ? 'h-[calc(100vh-80px)]' : 'py-8 w-full px-4'}`}>
         <MemoryGrid 
           cards={cards}
           onCardClick={flipCard}

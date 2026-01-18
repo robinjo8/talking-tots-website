@@ -86,7 +86,7 @@ export function MemoryGrid({
       <div 
         className={cn(
           "grid gap-2",
-          !isLandscape && "mx-auto w-full md:gap-3"
+          !isLandscape && "mx-auto w-full md:gap-3 px-4 md:px-0"
         )}
         style={isLandscape && cardSize ? {
           gridTemplateColumns: `repeat(${columns}, ${cardSize}px)`,
@@ -97,6 +97,7 @@ export function MemoryGrid({
         } : {
           gridTemplateColumns: `repeat(${columns}, 1fr)`,
           maxWidth: '900px',
+          width: '100%',
         }}
       >
         {cards.map((card, index) => (
@@ -105,7 +106,7 @@ export function MemoryGrid({
             className={cn(
               "transform transition-transform duration-200",
               "hover:scale-[1.02]",
-              !isLandscape && "aspect-square"
+              !isLandscape && "aspect-square w-full"
             )}
             style={isLandscape && cardSize ? {
               width: cardSize,
