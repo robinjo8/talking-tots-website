@@ -165,32 +165,6 @@ export function GenericSestavljankaGame({ config }: GenericSestavljankaGameProps
     ) : null
   );
 
-  // Shared dialogs
-  const Dialogs = () => (
-    <>
-      <MemoryExitConfirmationDialog 
-        open={showExitDialog} 
-        onOpenChange={setShowExitDialog} 
-        onConfirm={() => navigate("/govorne-igre/sestavljanke")}
-      >
-        <div />
-      </MemoryExitConfirmationDialog>
-
-      <InstructionsModal 
-        isOpen={showInstructions} 
-        onClose={() => setShowInstructions(false)} 
-      />
-
-      <PuzzleSuccessDialog
-        isOpen={showCompletion}
-        onOpenChange={setShowCompletion}
-        completedImage={currentImage}
-        allImages={config.images.map(enrichImageWithAudio)}
-        onStarClaimed={handleStarClaimed}
-      />
-    </>
-  );
-
   // Mobile fullscreen layout
   if (effectiveFullscreen) {
     return (
@@ -215,7 +189,27 @@ export function GenericSestavljankaGame({ config }: GenericSestavljankaGameProps
 
         <FloatingMenu />
         <NewGameButton />
-        <Dialogs />
+        
+        <MemoryExitConfirmationDialog 
+          open={showExitDialog} 
+          onOpenChange={setShowExitDialog} 
+          onConfirm={() => navigate("/govorne-igre/sestavljanke")}
+        >
+          <div />
+        </MemoryExitConfirmationDialog>
+
+        <InstructionsModal 
+          isOpen={showInstructions} 
+          onClose={() => setShowInstructions(false)} 
+        />
+
+        <PuzzleSuccessDialog
+          isOpen={showCompletion}
+          onOpenChange={setShowCompletion}
+          completedImage={currentImage}
+          allImages={config.images.map(enrichImageWithAudio)}
+          onStarClaimed={handleStarClaimed}
+        />
       </div>
     );
   }
@@ -245,7 +239,27 @@ export function GenericSestavljankaGame({ config }: GenericSestavljankaGameProps
 
         <FloatingMenu />
         <NewGameButton />
-        <Dialogs />
+        
+        <MemoryExitConfirmationDialog 
+          open={showExitDialog} 
+          onOpenChange={setShowExitDialog} 
+          onConfirm={() => navigate("/govorne-igre/sestavljanke")}
+        >
+          <div />
+        </MemoryExitConfirmationDialog>
+
+        <InstructionsModal 
+          isOpen={showInstructions} 
+          onClose={() => setShowInstructions(false)} 
+        />
+
+        <PuzzleSuccessDialog
+          isOpen={showCompletion}
+          onOpenChange={setShowCompletion}
+          completedImage={currentImage}
+          allImages={config.images.map(enrichImageWithAudio)}
+          onStarClaimed={handleStarClaimed}
+        />
       </div>
     </AppLayout>
   );
