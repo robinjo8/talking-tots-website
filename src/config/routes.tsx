@@ -21,12 +21,23 @@ function PageLoadingFallback() {
   );
 }
 
-// Helper component for lazy routes
+// Helper component for lazy routes (public)
 function LazyRoute({ children }: { children: React.ReactNode }) {
   return (
     <Suspense fallback={<PageLoadingFallback />}>
       {children}
     </Suspense>
+  );
+}
+
+// Helper component for protected lazy routes (combines ProtectedRoute + Suspense)
+function ProtectedLazyRoute({ children }: { children: React.ReactNode }) {
+  return (
+    <ProtectedRoute>
+      <Suspense fallback={<PageLoadingFallback />}>
+        {children}
+      </Suspense>
+    </ProtectedRoute>
   );
 }
 
@@ -43,6 +54,7 @@ const GovorneIgre = lazy(() => import("@/pages/GovorneIgre"));
 // Govorno-jezikovne vaje
 const GovornojezicovneVaje = lazy(() => import("@/pages/GovornojezicovneVaje"));
 const VajeMoториkeGovoril = lazy(() => import("@/pages/VajeMoториkeGovoril"));
+const VajeZaJezik = lazy(() => import("@/pages/VajeZaJezik"));
 const ArtikulacijaVaje = lazy(() => import("@/pages/ArtikulacijaVaje"));
 const ArtIzgovorjavaPage = lazy(() => import("@/pages/ArtIzgovorjavaPage"));
 
@@ -71,6 +83,7 @@ const PoveziPareRouter = lazy(() => import("@/components/routing/PoveziPareRoute
 const IgraUjemanjaRouter = lazy(() => import("@/components/routing/IgraUjemanjaRouter"));
 const ArtikulacijaVajeRouter = lazy(() => import("@/components/routing/ArtikulacijaVajeRouter"));
 const VideoNavodilaRouter = lazy(() => import("@/components/routing/VideoNavodilaRouter"));
+const LabirintRouter = lazy(() => import("@/components/routing/LabirintRouter"));
 const AdminRoutes = lazy(() => import("@/components/routing/AdminRoutes"));
 
 // Footer pages
@@ -100,258 +113,59 @@ export function AppRoutes() {
       <Route path="/payment-success" element={<LazyRoute><PaymentSuccess /></LazyRoute>} />
       <Route path="/payment-canceled" element={<LazyRoute><PaymentCanceled /></LazyRoute>} />
       
-      {/* Protected routes - lazy */}
-      <Route 
-        path="/dashboard" 
-        element={
-          <ProtectedRoute>
-            <Index />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/profile" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><Profile /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/moja-stran" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><MojaStran /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/moje-aplikacije" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><MojeAplikacije /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorno-jezikovne-vaje" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><GovornojezicovneVaje /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorno-jezikovne-vaje/vaje-motorike-govoril" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><VajeMoториkeGovoril /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorno-jezikovne-vaje/artikulacija" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><ArtikulacijaVaje /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
+      {/* Protected routes - using ProtectedLazyRoute helper */}
+      <Route path="/dashboard" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedLazyRoute><Profile /></ProtectedLazyRoute>} />
+      <Route path="/moja-stran" element={<ProtectedLazyRoute><MojaStran /></ProtectedLazyRoute>} />
+      <Route path="/moje-aplikacije" element={<ProtectedLazyRoute><MojeAplikacije /></ProtectedLazyRoute>} />
       
-      {/* Dynamic ArtikulacijaVaje routes */}
-      <Route 
-        path="/govorno-jezikovne-vaje/artikulacija/:gameId" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><ArtikulacijaVajeRouter /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
+      {/* Govorno-jezikovne vaje */}
+      <Route path="/govorno-jezikovne-vaje" element={<ProtectedLazyRoute><GovornojezicovneVaje /></ProtectedLazyRoute>} />
+      <Route path="/govorno-jezikovne-vaje/vaje-motorike-govoril" element={<ProtectedLazyRoute><VajeMoториkeGovoril /></ProtectedLazyRoute>} />
+      <Route path="/govorno-jezikovne-vaje/vaje-za-jezik" element={<ProtectedLazyRoute><VajeZaJezik /></ProtectedLazyRoute>} />
+      <Route path="/govorno-jezikovne-vaje/artikulacija" element={<ProtectedLazyRoute><ArtikulacijaVaje /></ProtectedLazyRoute>} />
+      <Route path="/govorno-jezikovne-vaje/artikulacija/:gameId" element={<ProtectedLazyRoute><ArtikulacijaVajeRouter /></ProtectedLazyRoute>} />
       
-      <Route 
-        path="/artikulacija" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><ArtIzgovorjavaPage /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/artikulacija/:letter" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><ArtIzgovorjavaPage /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
+      {/* Artikulacija routes */}
+      <Route path="/artikulacija" element={<ProtectedLazyRoute><ArtIzgovorjavaPage /></ProtectedLazyRoute>} />
+      <Route path="/artikulacija/:letter" element={<ProtectedLazyRoute><ArtIzgovorjavaPage /></ProtectedLazyRoute>} />
+      <Route path="/artikulacijski-test" element={<ProtectedLazyRoute><ArtikuacijskiTest /></ProtectedLazyRoute>} />
       
-      <Route 
-        path="/artikulacijski-test" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><ArtikuacijskiTest /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
+      {/* Govorne igre */}
+      <Route path="/govorne-igre" element={<ProtectedLazyRoute><GovorneIgre /></ProtectedLazyRoute>} />
       
-      <Route 
-        path="/govorne-igre" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><GovorneIgre /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
+      {/* Sestavljanke routes */}
+      <Route path="/govorne-igre/sestavljanke" element={<ProtectedLazyRoute><SestavljankeGames /></ProtectedLazyRoute>} />
+      <Route path="/govorne-igre/sestavljanke/:letterAndAge" element={<ProtectedLazyRoute><SestavljankeRouter /></ProtectedLazyRoute>} />
       
-      <Route 
-        path="/govorne-igre/sestavljanke" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><SestavljankeGames /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
+      {/* Drsna sestavljanka routes */}
+      <Route path="/govorne-igre/drsna-sestavljanka" element={<ProtectedLazyRoute><DrsnaSestavljanka /></ProtectedLazyRoute>} />
+      <Route path="/govorne-igre/drsna-sestavljanka/:letterAndAge" element={<ProtectedLazyRoute><DrsnaSestavljankaRouter /></ProtectedLazyRoute>} />
       
-      <Route 
-        path="/govorne-igre/drsna-sestavljanka" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><DrsnaSestavljanka /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
+      {/* Spomin routes */}
+      <Route path="/govorne-igre/spomin" element={<ProtectedLazyRoute><SpominGames /></ProtectedLazyRoute>} />
+      <Route path="/govorne-igre/spomin/:gameId" element={<ProtectedLazyRoute><SpominRouter /></ProtectedLazyRoute>} />
       
-      {/* Dynamic DrsnaSestavljanka routes */}
-      <Route 
-        path="/govorne-igre/drsna-sestavljanka/:letterAndAge" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><DrsnaSestavljankaRouter /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
+      {/* Labirint routes */}
+      <Route path="/govorne-igre/labirint" element={<ProtectedLazyRoute><Labirint /></ProtectedLazyRoute>} />
+      <Route path="/govorne-igre/labirint/:letter" element={<ProtectedLazyRoute><LabirintRouter /></ProtectedLazyRoute>} />
       
-      {/* Dynamic Sestavljanke routes */}
-      <Route 
-        path="/govorne-igre/sestavljanke/:letterAndAge" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><SestavljankeRouter /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
-      
-      {/* Spomin Game Routes */}
-      <Route 
-        path="/govorne-igre/spomin" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><SpominGames /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorne-igre/spomin/:gameId" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><SpominRouter /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
-      
-      {/* Labirint Routes */}
-      <Route 
-        path="/govorne-igre/labirint" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><Labirint /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
-      
-      {/* Povezi Pare Routes */}
-      <Route 
-        path="/govorne-igre/povezi-pare/:ageGroup" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><PoveziPareRouter /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorne-igre/povezi-pare/:ageGroup/:letter" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><PoveziPareRouter /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
+      {/* Povezi pare routes */}
+      <Route path="/govorne-igre/povezi-pare/:ageGroup" element={<ProtectedLazyRoute><PoveziPareRouter /></ProtectedLazyRoute>} />
+      <Route path="/govorne-igre/povezi-pare/:ageGroup/:letter" element={<ProtectedLazyRoute><PoveziPareRouter /></ProtectedLazyRoute>} />
 
-      {/* Igra Ujemanja Routes */}
-      <Route 
-        path="/govorne-igre/igra-ujemanja" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><IgraUjemanja /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
+      {/* Igra ujemanja routes */}
+      <Route path="/govorne-igre/igra-ujemanja" element={<ProtectedLazyRoute><IgraUjemanja /></ProtectedLazyRoute>} />
+      <Route path="/govorne-igre/igra-ujemanja/:letterAndAge" element={<ProtectedLazyRoute><IgraUjemanjaRouter /></ProtectedLazyRoute>} />
       
-      {/* Dynamic IgraUjemanja routes */}
-      <Route 
-        path="/govorne-igre/igra-ujemanja/:letterAndAge" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><IgraUjemanjaRouter /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/govorne-igre/zaporedja" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><Zaporedja /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
-      {/* Dynamic Zaporedja routes */}
-      <Route 
-        path="/govorne-igre/zaporedja/:letterAndAge" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><ZaporedjaRouter /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
-      
+      {/* Zaporedja routes */}
+      <Route path="/govorne-igre/zaporedja" element={<ProtectedLazyRoute><Zaporedja /></ProtectedLazyRoute>} />
+      <Route path="/govorne-igre/zaporedja/:letterAndAge" element={<ProtectedLazyRoute><ZaporedjaRouter /></ProtectedLazyRoute>} />
 
-      {/* Other Routes */}
-      <Route 
-        path="/moji-izzivi" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><MojiIzzivi /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/video-navodila" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><VideoNavodila /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
-      
-      {/* Dynamic VideoNavodila routes */}
-      <Route 
-        path="/video-navodila/:letter" 
-        element={
-          <ProtectedRoute>
-            <LazyRoute><VideoNavodilaRouter /></LazyRoute>
-          </ProtectedRoute>
-        }
-      />
+      {/* Other protected routes */}
+      <Route path="/moji-izzivi" element={<ProtectedLazyRoute><MojiIzzivi /></ProtectedLazyRoute>} />
+      <Route path="/video-navodila" element={<ProtectedLazyRoute><VideoNavodila /></ProtectedLazyRoute>} />
+      <Route path="/video-navodila/:letter" element={<ProtectedLazyRoute><VideoNavodilaRouter /></ProtectedLazyRoute>} />
       
       {/* Informational pages - lazy */}
       <Route path="/logopedski-koticek" element={<LazyRoute><LogopedskiKoticek /></LazyRoute>} />

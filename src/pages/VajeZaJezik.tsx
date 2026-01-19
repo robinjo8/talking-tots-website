@@ -1,20 +1,9 @@
-
-import { useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { TongueGymGame } from "@/components/games/TongueGymGame";
 
+// Auth protection is now handled by ProtectedRoute in routes.tsx
 const VajeZaJezik = () => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  
-  useEffect(() => {
-    if (!user) {
-      navigate("/login");
-    }
-  }, [user, navigate]);
 
   return (
     <div className="min-h-screen bg-background">
