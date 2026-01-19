@@ -102,9 +102,9 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
       }
     }
 
-    // Add 1-2 dead ends to make the maze more interesting
+    // Add 3-5 extra paths to make the maze more interesting with multiple routes
     const addDeadEnds = (grid: Cell[][]): void => {
-      const deadEndsToAdd = 1 + Math.floor(Math.random() * 2);
+      const deadEndsToAdd = 3 + Math.floor(Math.random() * 3);
       let deadEndsAdded = 0;
       
       for (let y = 1; y < ROWS - 1 && deadEndsAdded < deadEndsToAdd; y++) {
@@ -115,8 +115,8 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
             !cell.walls.bottom, !cell.walls.left
           ].filter(Boolean).length;
           
-          // If cell has only 1 opening, try to create a dead end branch
-          if (openings === 1 && Math.random() > 0.7) {
+          // If cell has 1-2 openings, try to create alternative paths
+          if (openings <= 2 && Math.random() > 0.4) {
             const directions: Array<{ dir: keyof Cell['walls'], dx: number, dy: number }> = [
               { dir: 'top', dx: 0, dy: -1 },
               { dir: 'right', dx: 1, dy: 0 },
