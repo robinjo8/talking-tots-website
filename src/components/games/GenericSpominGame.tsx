@@ -100,11 +100,11 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
 
   return (
     <div className={`min-h-screen ${isLandscape ? 'fixed inset-0 overflow-hidden' : ''}`}>
-      {/* Background */}
+      {/* Background - Green background like other games */}
       <div 
         className="fixed inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/ozadje_1.jpg)`
+          backgroundImage: `url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.png)`
         }}
       />
       
