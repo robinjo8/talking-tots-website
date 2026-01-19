@@ -16,8 +16,13 @@ interface GenericSpominGameProps {
 export function GenericSpominGame({ config }: GenericSpominGameProps) {
   const navigate = useNavigate();
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
-  const [isLandscape, setIsLandscape] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  
+  // Mobile detection and orientation state
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [isPortrait, setIsPortrait] = useState(false);
+  
+  const effectiveFullscreen = isTouchDevice;
 
   const {
     cards,
@@ -36,26 +41,86 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
     displayLetter
   } = useGenericMemoryGame(config);
 
-  // Detect landscape mode for mobile
+  // Reliable touch device detection
+  useEffect(() => {
+    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const isSmallScreen = Math.min(window.screen.width, window.screen.height) <= 900;
+    setIsTouchDevice(hasTouch && isSmallScreen);
+  }, []);
+
+  // Reliable orientation detection
   useEffect(() => {
     const checkOrientation = () => {
-      const isMobileDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-      if (isMobileDevice) {
-        setIsLandscape(window.innerWidth > window.innerHeight);
+      if (window.screen.orientation) {
+        setIsPortrait(window.screen.orientation.type.includes('portrait'));
+      } else {
+        setIsPortrait(window.screen.height > window.screen.width);
       }
     };
-
+    
     checkOrientation();
-    window.addEventListener('resize', checkOrientation);
-    window.addEventListener('orientationchange', () => {
+    
+    const handleOrientationChange = () => {
       setTimeout(checkOrientation, 100);
-    });
-
+    };
+    
+    window.addEventListener('orientationchange', handleOrientationChange);
+    if (window.screen.orientation) {
+      window.screen.orientation.addEventListener('change', checkOrientation);
+    }
+    
     return () => {
-      window.removeEventListener('resize', checkOrientation);
-      window.removeEventListener('orientationchange', checkOrientation);
+      window.removeEventListener('orientationchange', handleOrientationChange);
+      if (window.screen.orientation) {
+        window.screen.orientation.removeEventListener('change', checkOrientation);
+      }
     };
   }, []);
+
+  // Automatic fullscreen and landscape lock
+  useEffect(() => {
+    if (effectiveFullscreen) {
+      const requestFullscreen = async () => {
+        try {
+          if (document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen();
+          }
+        } catch (error) {
+          console.log('Fullscreen not supported:', error);
+        }
+      };
+
+      const lockLandscape = async () => {
+        try {
+          if (screen.orientation && 'lock' in screen.orientation) {
+            try {
+              await (screen.orientation as any).lock('landscape-primary');
+            } catch {
+              await (screen.orientation as any).lock('landscape');
+            }
+          }
+        } catch (error) {
+          console.log('Landscape lock not supported:', error);
+        }
+      };
+
+      requestFullscreen();
+      lockLandscape();
+        
+      return () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen?.();
+        }
+        try {
+          if (screen.orientation && 'unlock' in screen.orientation) {
+            (screen.orientation as any).unlock();
+          }
+        } catch (error) {
+          console.log('Portrait unlock not supported:', error);
+        }
+      };
+    }
+  }, [effectiveFullscreen]);
 
   const handleBack = () => {
     setMenuOpen(false);
@@ -99,38 +164,159 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
     );
   }
 
+  const backgroundImageUrl = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.png';
+
+  // Mobile fullscreen version
+  if (effectiveFullscreen) {
+    return (
+      <div className="fixed inset-0 overflow-hidden select-none">
+        <div 
+          className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url('${backgroundImageUrl}')` }}
+        />
+        
+        <div className="relative z-10 flex-1 flex items-center justify-center overflow-hidden h-full w-full p-2">
+          {!isPortrait ? (
+            <div className="w-full h-full flex flex-col items-center justify-center">
+              <MemoryGrid
+                cards={cards}
+                onCardClick={flipCard}
+                isCheckingMatch={isCheckingMatch}
+                isLandscape={true}
+              />
+            </div>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center px-6 text-center">
+              <p className="text-base font-semibold text-foreground">
+                Za igranje igre Spomin prosim obrni telefon v ležeči položaj.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Floating menu button */}
+        <div className="fixed bottom-4 left-4 z-50 flex items-center gap-3">
+          <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+            <DropdownMenuTrigger asChild>
+              <button className="w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform">
+                <Home className="w-8 h-8 text-white" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              align="start" 
+              side="top"
+              sideOffset={8}
+              className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+            >
+              <button
+                onClick={handleBack}
+                className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+              >
+                <span className="text-2xl">🏠</span>
+                <span>Nazaj</span>
+              </button>
+              <button
+                onClick={handleNewGame}
+                className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+              >
+                <span className="text-2xl">🔄</span>
+                <span>Nova igra</span>
+              </button>
+              <button
+                onClick={() => setMenuOpen(false)}
+                className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
+              >
+                <span className="text-2xl">📖</span>
+                <span>Navodila</span>
+              </button>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {/* Pair dialog */}
+        <MemoryPairDialog
+          isOpen={showPairDialog}
+          onClose={() => {}}
+          onContinue={handlePairDialogContinue}
+          onUnmatch={handlePairUnmatch}
+          pairNumber={matchedPairs.length}
+          totalPairs={totalPairs}
+          imageUrl={currentMatchedPair?.image_url || null}
+          word={currentMatchedPair?.word || null}
+          audioUrl={currentMatchedPair?.audio_url || null}
+        />
+
+        {/* Exit confirmation dialog */}
+        <MemoryExitConfirmationDialog
+          open={showExitConfirmation}
+          onOpenChange={setShowExitConfirmation}
+          onConfirm={handleConfirmExit}
+        >
+          <></>
+        </MemoryExitConfirmationDialog>
+
+        {/* Game completed overlay */}
+        {gameCompleted && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-2xl p-8 text-center max-w-sm mx-4">
+              <h2 className="text-3xl font-bold text-dragon-green mb-4">
+                🎉 Čestitke! 🎉
+              </h2>
+              <p className="text-lg text-muted-foreground mb-6">
+                Uspešno si zaključil igro spomina za črko {displayLetter}!
+              </p>
+              <div className="space-y-3">
+                <button
+                  onClick={resetGame}
+                  className="w-full px-6 py-3 bg-dragon-green text-white rounded-xl font-semibold hover:bg-dragon-green/90 transition-colors"
+                >
+                  🔄 Igraj znova
+                </button>
+                <button
+                  onClick={() => navigate("/govorne-igre/spomin")}
+                  className="w-full px-6 py-3 bg-app-orange text-white rounded-xl font-semibold hover:bg-app-orange/90 transition-colors"
+                >
+                  🏠 Nazaj na izbiro
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Desktop version
   return (
-    <div className={`min-h-screen ${isLandscape ? 'fixed inset-0 overflow-hidden' : ''}`}>
+    <div className="min-h-screen">
       {/* Background - Green background like other games */}
       <div 
         className="fixed inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.png)`
+          backgroundImage: `url(${backgroundImageUrl})`
         }}
       />
       
       {/* Game content */}
-      <div className={`relative z-10 ${isLandscape ? 'h-full' : 'min-h-screen p-4'}`}>
-        {/* Header with progress dots - only show in portrait/desktop mode */}
-        {!isLandscape && (
-          <div className="text-center pt-4">
-            <h1 className="text-2xl font-bold text-white drop-shadow-lg">
-              Spomin - Črka {displayLetter}
-            </h1>
-            <MemoryProgressIndicator 
-              matchedPairs={matchedPairs.length} 
-              totalPairs={totalPairs} 
-            />
-          </div>
-        )}
+      <div className="relative z-10 min-h-screen p-4">
+        {/* Header with progress dots */}
+        <div className="text-center pt-4">
+          <h1 className="text-2xl font-bold text-white drop-shadow-lg">
+            Spomin - Črka {displayLetter}
+          </h1>
+          <MemoryProgressIndicator 
+            matchedPairs={matchedPairs.length} 
+            totalPairs={totalPairs} 
+          />
+        </div>
 
         {/* Memory grid */}
-        <div className={isLandscape ? 'h-full' : 'max-w-4xl mx-auto'}>
+        <div className="max-w-4xl mx-auto">
           <MemoryGrid
             cards={cards}
             onCardClick={flipCard}
             isCheckingMatch={isCheckingMatch}
-            isLandscape={isLandscape}
+            isLandscape={false}
           />
         </div>
 
