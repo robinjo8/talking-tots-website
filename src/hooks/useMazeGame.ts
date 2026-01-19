@@ -153,6 +153,7 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
     addDeadEnds(grid);
 
     // Find positions for 4 stars (dead-ends or cells with few openings)
+    // IMPORTANT: Avoid placing stars near goal to ensure reachability without passing through goal
     const findStarPositions = (grid: Cell[][]): Position[] => {
       const candidates: { pos: Position; openings: number }[] = [];
       
@@ -160,6 +161,9 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
         for (let x = 0; x < COLS; x++) {
           // Skip start (0,0) and goal (COLS-1, ROWS-1)
           if ((x === 0 && y === 0) || (x === COLS - 1 && y === ROWS - 1)) continue;
+          
+          // Skip cells adjacent to goal to avoid unreachable stars
+          if ((x === COLS - 1 && y === ROWS - 2) || (x === COLS - 2 && y === ROWS - 1)) continue;
           
           const cell = grid[y][x];
           const openings = [
@@ -312,9 +316,17 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
         }
 
         // Check if reached goal (bottom-right corner cell only)
+        // BLOCK goal if not all 4 stars are collected
         if (nextPos.y === ROWS - 1 && nextPos.x === COLS - 1) {
-          setIsCompleted(true);
-          canMove = false;
+          if (collectedStars.length >= 4) {
+            // All stars collected - allow goal
+            setIsCompleted(true);
+            canMove = false;
+          } else {
+            // Not all stars - BLOCK movement to goal
+            canMove = false;
+            break; // Don't update position, stay where we are
+          }
         }
       }
     }
