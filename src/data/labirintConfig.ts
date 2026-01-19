@@ -1,6 +1,8 @@
 // Centralized configuration for Labirint (Maze) games
 // Uses ASCII-safe URL keys for Slovenian diacritics (č→ch, š→sh, ž→zh)
 
+import { PuzzleImage, cImages, čImages, kImages, lImages, rImages, sImages, šImages, zImages, žImages } from './puzzleImages';
+
 export interface LabirintConfig {
   letter: string;         // Original Slovenian letter
   displayLetter: string;  // Display version (uppercase)
@@ -8,6 +10,8 @@ export interface LabirintConfig {
   gradient: string;       // Tailwind gradient classes
   image: string;          // Dragon character image URL
   description: string;    // Slovenian description
+  images: PuzzleImage[];  // Images for completion dialog
+  trackingId: string;     // For progress tracking
 }
 
 export const labirintConfigs: LabirintConfig[] = [
@@ -17,7 +21,9 @@ export const labirintConfigs: LabirintConfig[] = [
     urlKey: 'c',
     gradient: 'from-dragon-green/20 to-dragon-green/20',
     image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png',
-    description: 'Poišči pot skozi labirint s črko C'
+    description: 'Poišči pot skozi labirint s črko C',
+    images: cImages,
+    trackingId: 'labirint-c'
   },
   {
     letter: 'č',
@@ -25,7 +31,9 @@ export const labirintConfigs: LabirintConfig[] = [
     urlKey: 'ch',
     gradient: 'from-app-blue/20 to-app-teal/20',
     image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png',
-    description: 'Poišči pot skozi labirint s črko Č'
+    description: 'Poišči pot skozi labirint s črko Č',
+    images: čImages,
+    trackingId: 'labirint-ch'
   },
   {
     letter: 'k',
@@ -33,7 +41,9 @@ export const labirintConfigs: LabirintConfig[] = [
     urlKey: 'k',
     gradient: 'from-app-orange/20 to-app-yellow/20',
     image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png',
-    description: 'Poišči pot skozi labirint s črko K'
+    description: 'Poišči pot skozi labirint s črko K',
+    images: kImages,
+    trackingId: 'labirint-k'
   },
   {
     letter: 'l',
@@ -41,7 +51,9 @@ export const labirintConfigs: LabirintConfig[] = [
     urlKey: 'l',
     gradient: 'from-app-purple/20 to-app-blue/20',
     image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png',
-    description: 'Poišči pot skozi labirint s črko L'
+    description: 'Poišči pot skozi labirint s črko L',
+    images: lImages,
+    trackingId: 'labirint-l'
   },
   {
     letter: 'r',
@@ -49,7 +61,9 @@ export const labirintConfigs: LabirintConfig[] = [
     urlKey: 'r',
     gradient: 'from-app-purple/20 to-app-teal/20',
     image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png',
-    description: 'Poišči pot skozi labirint s črko R'
+    description: 'Poišči pot skozi labirint s črko R',
+    images: rImages,
+    trackingId: 'labirint-r'
   },
   {
     letter: 's',
@@ -57,7 +71,9 @@ export const labirintConfigs: LabirintConfig[] = [
     urlKey: 's',
     gradient: 'from-dragon-green/20 to-app-teal/20',
     image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png',
-    description: 'Poišči pot skozi labirint s črko S'
+    description: 'Poišči pot skozi labirint s črko S',
+    images: sImages,
+    trackingId: 'labirint-s'
   },
   {
     letter: 'š',
@@ -65,7 +81,9 @@ export const labirintConfigs: LabirintConfig[] = [
     urlKey: 'sh',
     gradient: 'from-app-blue/20 to-app-purple/20',
     image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png',
-    description: 'Poišči pot skozi labirint s črko Š'
+    description: 'Poišči pot skozi labirint s črko Š',
+    images: šImages,
+    trackingId: 'labirint-sh'
   },
   {
     letter: 'z',
@@ -73,7 +91,9 @@ export const labirintConfigs: LabirintConfig[] = [
     urlKey: 'z',
     gradient: 'from-app-teal/20 to-dragon-green/20',
     image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png',
-    description: 'Poišči pot skozi labirint s črko Z'
+    description: 'Poišči pot skozi labirint s črko Z',
+    images: zImages,
+    trackingId: 'labirint-z'
   },
   {
     letter: 'ž',
@@ -81,7 +101,9 @@ export const labirintConfigs: LabirintConfig[] = [
     urlKey: 'zh',
     gradient: 'from-app-purple/20 to-app-blue/20',
     image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png',
-    description: 'Poišči pot skozi labirint s črko Ž'
+    description: 'Poišči pot skozi labirint s črko Ž',
+    images: žImages,
+    trackingId: 'labirint-zh'
   }
 ];
 
