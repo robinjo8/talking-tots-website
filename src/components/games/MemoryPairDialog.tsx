@@ -3,7 +3,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Mic, Star, Volume2 } from "lucide-react";
 import { useAudioPlayback } from '@/hooks/useAudioPlayback';
-import { useToast } from '@/hooks/use-toast';
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 interface MemoryPairDialogProps {
@@ -37,7 +36,6 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
   const [showCloseConfirmation, setShowCloseConfirmation] = useState(false);
   
   const { playAudio } = useAudioPlayback();
-  const { toast } = useToast();
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
 
   const isLastPair = pairNumber === totalPairs;
@@ -86,11 +84,6 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
 
   const handleContinue = () => {
     if (isLastPair) {
-      // This is the last pair, award star
-      toast({
-        title: "Odlično!",
-        description: "Prejel si zvezdico! ⭐"
-      });
       onStarClaimed?.();
     }
     onContinue();

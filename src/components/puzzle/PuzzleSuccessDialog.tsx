@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { Volume2, Mic, Star } from 'lucide-react';
 import { useAudioPlayback } from '@/hooks/useAudioPlayback';
-import { useToast } from '@/hooks/use-toast';
 
 interface ImageData {
   filename: string;
@@ -34,7 +33,6 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [displayImages, setDisplayImages] = useState<ImageData[]>([]);
   const { playAudio } = useAudioPlayback();
-  const { toast } = useToast();
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
 
   // Select 4 random images including the completed one when dialog opens
@@ -134,10 +132,6 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   const handleClaimStar = () => {
     setStarClaimed(true);
     onStarClaimed?.();
-    toast({
-      title: "Odlično!",
-      description: "Prejel si zvezdico! ⭐"
-    });
     setTimeout(() => {
       onOpenChange(false);
     }, 1500);

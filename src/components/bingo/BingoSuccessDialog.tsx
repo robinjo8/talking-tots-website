@@ -3,7 +3,6 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Volume2, Mic } from 'lucide-react';
 import { useAudioPlayback } from '@/hooks/useAudioPlayback';
-import { useToast } from '@/hooks/use-toast';
 import { BingoWord } from '@/data/bingoWordsR';
 
 interface BingoSuccessDialogProps {
@@ -26,7 +25,6 @@ export const BingoSuccessDialog: React.FC<BingoSuccessDialogProps> = ({
   const [hasRecorded, setHasRecorded] = useState(false);
 
   const { playAudio } = useAudioPlayback();
-  const { toast } = useToast();
 
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -103,10 +101,6 @@ export const BingoSuccessDialog: React.FC<BingoSuccessDialogProps> = ({
 
   const handleClaimStar = () => {
     onStarClaimed();
-    toast({
-      title: 'Čestitke! 🎉',
-      description: 'Zaključil si Bingo in prejel zvezdico! ⭐',
-    });
     setTimeout(() => {
       onClose();
     }, 1500);

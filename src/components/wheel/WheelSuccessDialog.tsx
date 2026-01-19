@@ -3,7 +3,6 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Volume2, Mic, Star } from 'lucide-react';
 import { useAudioPlayback } from '@/hooks/useAudioPlayback';
-import { useToast } from '@/hooks/use-toast';
 import { ProgressCircles } from './ProgressCircles';
 
 interface WheelSuccessDialogProps {
@@ -33,7 +32,6 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
   const [justRecorded, setJustRecorded] = useState(false);
 
   const { playAudio } = useAudioPlayback();
-  const { toast } = useToast();
 
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -166,10 +164,6 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
     console.log('[WheelSuccessDialog] claim star', { word: completedImage?.word, pronunciationCount });
     setStarClaimed(true);
     onStarClaimed();
-    toast({
-      title: 'Čestitke! 🎉',
-      description: 'Osvojil si to besedo in prejel zvezdico! ⭐',
-    });
     setTimeout(() => {
       onOpenChange(false);
     }, 1500);
