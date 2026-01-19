@@ -1,83 +1,54 @@
 import { useEffect, useState, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { AppLayout } from "@/components/AppLayout";
 import { MatchingGame } from '@/components/matching/MatchingGame';
 import { ThreeColumnGame } from '@/components/matching/ThreeColumnGame';
+import { FourColumnGame } from '@/components/matching/FourColumnGame';
 import { MatchingInstructionsModal } from '@/components/matching/MatchingInstructionsModal';
 import { MatchingCompletionDialog } from '@/components/matching/MatchingCompletionDialog';
 import { getLetterData, getImagesForAgeGroup } from '@/data/matchingGameData';
-import { getRandomThreeColumnItems } from '@/data/threeColumnMatchingData';
-import { getAgeGroup } from '@/utils/ageUtils';
+import { getRandomThreeColumnItems, getRandomFourColumnItems } from '@/data/threeColumnMatchingData';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, RotateCcw, BookOpen } from 'lucide-react';
+import { PoveziPareConfig } from '@/data/poveziPareConfig';
 
-export default function MatchingGameLetter() {
-  const { user, selectedChild } = useAuth();
+interface Props {
+  config: PoveziPareConfig;
+}
+
+export function GenericPoveziPareGame({ config }: Props) {
+  const { selectedChild } = useAuth();
   const navigate = useNavigate();
-  const { letter } = useParams<{ letter: string }>();
   const isMobile = useIsMobile();
   const [gameKey, setGameKey] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   const gameCompletedRef = useRef(false);
 
-  // Check authentication
-  useEffect(() => {
-    if (!user) {
-      navigate('/login');
-    }
-  }, [user, navigate]);
-
-  // Check age group access and get appropriate age group
-  const childAge = selectedChild?.age || 3;
-  const ageGroup = getAgeGroup(childAge);
-
   // Get letter data
-  const upperCaseLetter = letter?.toUpperCase();
-  const letterData = getLetterData(upperCaseLetter || '');
-  
-  if (!letterData || !upperCaseLetter) {
-    return (
-      <AppLayout>
-        <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Napaka</h1>
-            <p className="text-muted-foreground">Ni bilo mogoče naložiti podatkov za črko {upperCaseLetter}.</p>
-            <Button 
-              onClick={() => navigate('/govorne-igre')}
-              className="mt-4"
-            >
-              Nazaj na igre
-            </Button>
-          </div>
-        </div>
-      </AppLayout>
-    );
-  }
+  const letterData = getLetterData(config.letter);
 
-  
-  // For 5-6 age group, use ThreeColumnGame with different data
-  const isThreeColumnGame = ageGroup === '5-6';
-  const items = isThreeColumnGame ? getRandomThreeColumnItems(4, letter?.toLowerCase()) : [];
-  
-  // Get age-appropriate images for MatchingGame (non-5-6 age groups)
-  const images = !isThreeColumnGame ? getImagesForAgeGroup(letterData.images, ageGroup) : [];
-
-  // Determine number of columns based on age group (only for MatchingGame)
-  const getColumnsForAge = (age: string) => {
-    switch (age) {
-      case '3-4': return 2;
-      case '7-8': return 3;
-      case '9-10': return 4;
-      default: return 2;
+  // Get game items based on game type
+  const getGameItems = () => {
+    const letterKey = config.letter.toLowerCase();
+    
+    switch (config.gameType) {
+      case 'threeColumn':
+        return getRandomThreeColumnItems(4, letterKey);
+      case 'fourColumn':
+        return getRandomFourColumnItems(4, letterKey);
+      case 'matching':
+      default:
+        return letterData ? getImagesForAgeGroup(letterData.images, config.requiredAgeGroup) : [];
     }
   };
 
-  const numColumns = getColumnsForAge(ageGroup);
-  
-  console.log('MatchingGameLetter - Age group:', ageGroup, 'IsThreeColumn:', isThreeColumnGame, 'Items:', items, 'Images:', images);
+  const items = config.gameType !== 'matching' ? getGameItems() : [];
+  const images = config.gameType === 'matching' && letterData 
+    ? getImagesForAgeGroup(letterData.images, config.requiredAgeGroup) 
+    : [];
 
   // Handle game completion
   const handleGameComplete = (score: number) => {
@@ -94,7 +65,7 @@ export default function MatchingGameLetter() {
   };
 
   const handleBack = () => {
-    navigate(getBackPath());
+    navigate(`/govorne-igre/povezi-pare/${config.ageGroup}`);
   };
 
   const handleInstructions = () => {
@@ -115,16 +86,69 @@ export default function MatchingGameLetter() {
 
   const effectiveFullscreen = isMobile;
 
-  // Determine back navigation based on age group
-  const getBackPath = () => {
-    switch (ageGroup) {
-      case '3-4': return '/govorne-igre/povezi-pare-3-4';
-      case '5-6': return '/govorne-igre/povezi-pare-5-6';
-      case '7-8': return '/govorne-igre/povezi-pare-7-8';
-      case '9-10': return '/govorne-igre/povezi-pare-9-10';
-      default: return '/govorne-igre/povezi-pare-3-4';
+  // Get completion images for dialog
+  const getCompletionImages = () => {
+    if (config.gameType === 'matching') {
+      return images;
+    }
+    return (items as any[]).map(item => ({
+      word: item.word,
+      url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`,
+      filename: item.originalImage
+    }));
+  };
+
+  // Render the appropriate game component
+  const renderGame = () => {
+    switch (config.gameType) {
+      case 'threeColumn':
+        return (
+          <ThreeColumnGame
+            key={gameKey}
+            items={items as any[]}
+            onGameComplete={handleGameComplete}
+          />
+        );
+      case 'fourColumn':
+        return (
+          <FourColumnGame
+            key={gameKey}
+            items={items as any[]}
+            onGameComplete={handleGameComplete}
+          />
+        );
+      case 'matching':
+      default:
+        return (
+          <MatchingGame
+            key={gameKey}
+            images={images}
+            numColumns={config.numColumns}
+            onGameComplete={handleGameComplete}
+            className="h-full"
+          />
+        );
     }
   };
+
+  if (!letterData && config.gameType === 'matching') {
+    return (
+      <AppLayout>
+        <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">Napaka</h1>
+            <p className="text-muted-foreground">Ni bilo mogoče naložiti podatkov za črko {config.letter}.</p>
+            <Button 
+              onClick={() => navigate('/govorne-igre')}
+              className="mt-4"
+            >
+              Nazaj na igre
+            </Button>
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
 
   if (effectiveFullscreen) {
     return (
@@ -132,7 +156,7 @@ export default function MatchingGameLetter() {
         <div className="h-full flex flex-col">
           {/* Top Section - Buttons */}
           <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
-            <h2 className="text-lg font-bold mb-3 text-center">Igra ujemanja {upperCaseLetter}</h2>
+            <h2 className="text-lg font-bold mb-3 text-center">Povezi pare - {config.letter}</h2>
             <div className="flex justify-center gap-3">
               <Button
                 onClick={handleNewGame}
@@ -168,21 +192,7 @@ export default function MatchingGameLetter() {
 
           {/* Game Area with gray background */}
           <div className="flex-1 overflow-hidden bg-muted/30 p-4">
-            {isThreeColumnGame ? (
-              <ThreeColumnGame
-                key={gameKey}
-                items={items}
-                onGameComplete={handleGameComplete}
-              />
-            ) : (
-              <MatchingGame
-                key={gameKey}
-                images={images}
-                numColumns={numColumns}
-                onGameComplete={handleGameComplete}
-                className="h-full"
-              />
-            )}
+            {renderGame()}
           </div>
         </div>
         
@@ -194,10 +204,7 @@ export default function MatchingGameLetter() {
         <MatchingCompletionDialog
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
-          images={isThreeColumnGame 
-            ? items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))
-            : images
-          }
+          images={getCompletionImages()}
         />
       </div>
     );
@@ -222,21 +229,7 @@ export default function MatchingGameLetter() {
         </div>
         
         <div className="w-full bg-muted/30 flex justify-center items-center p-4 min-h-[calc(100vh-200px)]">
-          {isThreeColumnGame ? (
-            <ThreeColumnGame
-              key={gameKey}
-              items={items}
-              onGameComplete={handleGameComplete}
-            />
-          ) : (
-            <MatchingGame
-              key={gameKey}
-              images={images}
-              numColumns={numColumns}
-              onGameComplete={handleGameComplete}
-              className="w-full"
-            />
-          )}
+          {renderGame()}
         </div>
         
         <MatchingInstructionsModal
@@ -247,10 +240,7 @@ export default function MatchingGameLetter() {
         <MatchingCompletionDialog
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
-          images={isThreeColumnGame 
-            ? items.map(item => ({ word: item.word, url: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${item.originalImage}`, filename: item.originalImage }))
-            : images
-          }
+          images={getCompletionImages()}
         />
       </div>
     </AppLayout>
