@@ -54,18 +54,7 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
     }
   }, [isOpen, allImages, completedImage]);
 
-  // Auto-play audio when dialog opens
-  useEffect(() => {
-    if (isOpen && displayImages.length > 0) {
-      const normalizedWord = displayImages[0].word
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '');
-      const audioFilename = displayImages[0].audio || `${normalizedWord}.m4a`;
-      const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
-      playAudio(audioUrl);
-    }
-  }, [isOpen, displayImages, playAudio]);
+  // NOTE: Auto-play audio removed per user request
 
   // Cleanup on dialog close
   useEffect(() => {
@@ -230,8 +219,8 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
             </div>
 
             <div className="flex justify-center gap-3">
-              <Button onClick={handleReset} variant="outline" className="gap-2 flex-1 max-w-32">
-                PONOVI
+              <Button onClick={handleClose} variant="outline" className="gap-2 flex-1 max-w-32">
+                ZAPRI
               </Button>
               
               {allRecordingsComplete && !starClaimed && (
