@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
-import { AdminLayout } from '@/components/admin/AdminLayout';
 import { StatCard } from '@/components/admin/StatCard';
 import { TestsLineChart } from '@/components/admin/TestsLineChart';
 import { DifficultiesPieChart } from '@/components/admin/DifficultiesPieChart';
@@ -22,8 +21,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
+    <div className="space-y-6">
         {/* Welcome message */}
         <div>
           <h1 className="text-2xl font-bold text-foreground">
@@ -75,7 +73,6 @@ export default function AdminDashboard() {
           <TestsLineChart />
           <DifficultiesPieChart />
         </div>
-      </div>
-    </AdminLayout>
+    </div>
   );
 }

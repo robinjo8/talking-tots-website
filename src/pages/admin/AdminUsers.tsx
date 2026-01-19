@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AdminLayout } from '@/components/admin/AdminLayout';
 import { useAdminUsers, ParentWithChildren, ChildData } from '@/hooks/useAdminUsers';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -187,211 +186,209 @@ export default function AdminUsers() {
   };
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Uporabniki</h1>
-          <p className="text-muted-foreground">
-            Vsi registrirani uporabniki na portalu TomiTalk
-          </p>
-        </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Uporabniki</h1>
+        <p className="text-muted-foreground">
+          Vsi registrirani uporabniki na portalu TomiTalk
+        </p>
+      </div>
 
-        {/* Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-3">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Skupaj uporabnikov</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalUsers}</div>
-              <p className="text-xs text-muted-foreground">Vseh registriranih</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Uporabniki z otroki</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.usersWithChildren}</div>
-              <p className="text-xs text-muted-foreground">
-                {stats.totalUsers > 0 
-                  ? `${((stats.usersWithChildren / stats.totalUsers) * 100).toFixed(0)}% uporabnikov`
-                  : '0% uporabnikov'
-                }
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Skupaj otrok</CardTitle>
-              <Baby className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalChildren}</div>
-              <p className="text-xs text-muted-foreground">Registriranih otrok</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Search and Table */}
+      {/* Stats Cards */}
+      <div className="grid gap-4 md:grid-cols-3">
         <Card>
-          <CardHeader>
-            <CardTitle>Seznam uporabnikov</CardTitle>
-            <CardDescription>
-              Vsi registrirani uporabniki na portalu TomiTalk
-            </CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Skupaj uporabnikov</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            {/* Search */}
-            <div className="flex items-center gap-4 mb-6">
-              <div className="relative flex-1 md:max-w-sm">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Išči po emailu, imenu starša ali otroka..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-
-            {/* Loading State */}
-            {isLoading && (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-app-blue" />
-              </div>
-            )}
-
-            {/* Error State */}
-            {error && (
-              <div className="text-center py-12 text-destructive">
-                Napaka pri nalaganju podatkov. Prosimo, poskusite znova.
-              </div>
-            )}
-
-            {/* Desktop: Table */}
-            {!isLoading && !error && (
-              <div className="hidden md:block rounded-md border overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Ime in priimek starša</TableHead>
-                      <TableHead>Elektronski naslov</TableHead>
-                      <TableHead>Ime otroka</TableHead>
-                      <TableHead>Starost</TableHead>
-                      <TableHead>Spol</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Akcije</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredRows.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
-                          {searchQuery ? 'Ni rezultatov za iskalni niz' : 'Ni registriranih uporabnikov'}
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      filteredRows.map((row) => {
-                        const parentName = formatParentName(row.parent);
-                        const gender = row.child ? formatGender(row.child.gender) : '';
-                        const rowKey = row.child ? row.child.id : `${row.parent.parent_id}-no-child`;
-                        
-                        return (
-                          <TableRow key={rowKey}>
-                            <TableCell>
-                              {parentName ? (
-                                <span className="font-medium">{parentName}</span>
-                              ) : (
-                                <span className="text-muted-foreground italic">Ni dodano v profilu</span>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              {row.parent.email ? (
-                                <span>{row.parent.email}</span>
-                              ) : (
-                                <span className="text-muted-foreground italic">Ni emaila</span>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              {row.child ? (
-                                <span className="font-medium">{row.child.name}</span>
-                              ) : (
-                                <span className="text-muted-foreground italic">Ni otroka</span>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              {row.child && row.child.age !== null ? (
-                                `${row.child.age} let`
-                              ) : (
-                                <span className="text-muted-foreground">-</span>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              {gender ? (
-                                <span>{gender}</span>
-                              ) : (
-                                <span className="text-muted-foreground italic">
-                                  {row.child ? 'Ni določen' : '-'}
-                                </span>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              <span className="text-muted-foreground text-sm">-</span>
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex items-center justify-end gap-2">
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  title="Ogled podrobnosti"
-                                  onClick={() => row.child && navigate(`/admin/users/${row.parent.parent_id}/${row.child.id}`)}
-                                  disabled={!row.child}
-                                >
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-
-            {/* Mobile: Cards */}
-            {!isLoading && !error && (
-              <div className="md:hidden space-y-3">
-                {filteredRows.length === 0 ? (
-                  <div className="text-center py-12 text-muted-foreground">
-                    {searchQuery ? 'Ni rezultatov za iskalni niz' : 'Ni registriranih uporabnikov'}
-                  </div>
-                ) : (
-                  filteredRows.map((row) => {
-                    const rowKey = row.child ? row.child.id : `${row.parent.parent_id}-no-child`;
-                    return (
-                      <UserCard 
-                        key={rowKey} 
-                        row={row} 
-                        formatParentName={formatParentName}
-                        formatGender={formatGender}
-                        isExpanded={expandedCardId === rowKey}
-                        onToggle={() => toggleCard(rowKey)}
-                        onNavigate={(parentId, childId) => navigate(`/admin/users/${parentId}/${childId}`)}
-                      />
-                    );
-                  })
-                )}
-              </div>
-            )}
+            <div className="text-2xl font-bold">{stats.totalUsers}</div>
+            <p className="text-xs text-muted-foreground">Vseh registriranih</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Uporabniki z otroki</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.usersWithChildren}</div>
+            <p className="text-xs text-muted-foreground">
+              {stats.totalUsers > 0 
+                ? `${((stats.usersWithChildren / stats.totalUsers) * 100).toFixed(0)}% uporabnikov`
+                : '0% uporabnikov'
+              }
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Skupaj otrok</CardTitle>
+            <Baby className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalChildren}</div>
+            <p className="text-xs text-muted-foreground">Registriranih otrok</p>
           </CardContent>
         </Card>
       </div>
-    </AdminLayout>
+
+      {/* Search and Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Seznam uporabnikov</CardTitle>
+          <CardDescription>
+            Vsi registrirani uporabniki na portalu TomiTalk
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {/* Search */}
+          <div className="flex items-center gap-4 mb-6">
+            <div className="relative flex-1 md:max-w-sm">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Išči po emailu, imenu starša ali otroka..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+
+          {/* Loading State */}
+          {isLoading && (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-app-blue" />
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && (
+            <div className="text-center py-12 text-destructive">
+              Napaka pri nalaganju podatkov. Prosimo, poskusite znova.
+            </div>
+          )}
+
+          {/* Desktop: Table */}
+          {!isLoading && !error && (
+            <div className="hidden md:block rounded-md border overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Ime in priimek starša</TableHead>
+                    <TableHead>Elektronski naslov</TableHead>
+                    <TableHead>Ime otroka</TableHead>
+                    <TableHead>Starost</TableHead>
+                    <TableHead>Spol</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Akcije</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredRows.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
+                        {searchQuery ? 'Ni rezultatov za iskalni niz' : 'Ni registriranih uporabnikov'}
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredRows.map((row) => {
+                      const parentName = formatParentName(row.parent);
+                      const gender = row.child ? formatGender(row.child.gender) : '';
+                      const rowKey = row.child ? row.child.id : `${row.parent.parent_id}-no-child`;
+                      
+                      return (
+                        <TableRow key={rowKey}>
+                          <TableCell>
+                            {parentName ? (
+                              <span className="font-medium">{parentName}</span>
+                            ) : (
+                              <span className="text-muted-foreground italic">Ni dodano v profilu</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {row.parent.email ? (
+                              <span>{row.parent.email}</span>
+                            ) : (
+                              <span className="text-muted-foreground italic">Ni emaila</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {row.child ? (
+                              <span className="font-medium">{row.child.name}</span>
+                            ) : (
+                              <span className="text-muted-foreground italic">Ni otroka</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {row.child && row.child.age !== null ? (
+                              `${row.child.age} let`
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {gender ? (
+                              <span>{gender}</span>
+                            ) : (
+                              <span className="text-muted-foreground italic">
+                                {row.child ? 'Ni določen' : '-'}
+                              </span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-muted-foreground text-sm">-</span>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                title="Ogled podrobnosti"
+                                onClick={() => row.child && navigate(`/admin/users/${row.parent.parent_id}/${row.child.id}`)}
+                                disabled={!row.child}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+
+          {/* Mobile: Cards */}
+          {!isLoading && !error && (
+            <div className="md:hidden space-y-3">
+              {filteredRows.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  {searchQuery ? 'Ni rezultatov za iskalni niz' : 'Ni registriranih uporabnikov'}
+                </div>
+              ) : (
+                filteredRows.map((row) => {
+                  const rowKey = row.child ? row.child.id : `${row.parent.parent_id}-no-child`;
+                  return (
+                    <UserCard 
+                      key={rowKey} 
+                      row={row} 
+                      formatParentName={formatParentName}
+                      formatGender={formatGender}
+                      isExpanded={expandedCardId === rowKey}
+                      onToggle={() => toggleCard(rowKey)}
+                      onNavigate={(parentId, childId) => navigate(`/admin/users/${parentId}/${childId}`)}
+                    />
+                  );
+                })
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
