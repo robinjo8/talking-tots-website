@@ -8,7 +8,7 @@ import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
@@ -62,12 +62,12 @@ export function GenericSestavljankaGame({ config }: GenericSestavljankaGameProps
   const effectiveFullscreen = isMobile;
   const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/slike/${currentImage.filename}`;
 
-  const handleComplete = () => {
+  const handleComplete = useCallback(() => {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
       setShowCompletion(true);
     }
-  };
+  }, []);
 
   const handleStarClaimed = () => {
     recordGameCompletion('puzzle', config.trackingId);

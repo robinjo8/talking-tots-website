@@ -40,6 +40,7 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
   className = ""
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const completionCalledRef = useRef(false);
   const [pieces, setPieces] = useState<PuzzlePiece[]>([]);
   const [draggedPiece, setDraggedPiece] = useState<PuzzlePiece | null>(null);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -504,7 +505,8 @@ export const SimpleJigsaw: React.FC<SimpleJigsawProps> = ({
 
       // Check if puzzle is complete
       const allPlaced = pieces.every(p => p.isPlaced || p.id === piece.id);
-      if (allPlaced) {
+      if (allPlaced && !completionCalledRef.current) {
+        completionCalledRef.current = true;
         console.log('Puzzle completed!');
         setTimeout(() => {
           onComplete?.();
