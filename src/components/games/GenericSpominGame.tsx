@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MemoryGrid } from "@/components/games/MemoryGrid";
+import { MemoryProgressIndicator } from "@/components/games/MemoryProgressIndicator";
 import { MemoryPairDialog } from "@/components/games/MemoryPairDialog";
 import { useGenericMemoryGame } from "@/hooks/useGenericMemoryGame";
 import { SpominConfig } from "@/data/spominConfig";
@@ -110,15 +111,16 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
       
       {/* Game content */}
       <div className={`relative z-10 ${isLandscape ? 'h-full' : 'min-h-screen p-4'}`}>
-        {/* Header - only show in portrait mode */}
+        {/* Header with progress dots - only show in portrait/desktop mode */}
         {!isLandscape && (
-          <div className="text-center mb-4 pt-4">
+          <div className="text-center pt-4">
             <h1 className="text-2xl font-bold text-white drop-shadow-lg">
               Spomin - Črka {displayLetter}
             </h1>
-            <p className="text-white/80 mt-2">
-              Najdenih parov: {matchedPairs.length} / {totalPairs}
-            </p>
+            <MemoryProgressIndicator 
+              matchedPairs={matchedPairs.length} 
+              totalPairs={totalPairs} 
+            />
           </div>
         )}
 
