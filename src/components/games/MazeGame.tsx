@@ -66,6 +66,7 @@ export const MazeGame = ({
     isGenerating,
     movePlayer,
     starPositions,
+    isGoalUnlocked,
     COLS,
     ROWS
   } = useMazeGame({
@@ -240,10 +241,9 @@ export const MazeGame = ({
     const goalX = (COLS - 1) * CELL_SIZE + CELL_SIZE / 2 + PADDING;
     const goalY = (ROWS - 1) * CELL_SIZE + CELL_SIZE / 2 + PADDING;
     const flagSize = CELL_SIZE * 0.9;
-    const isGoalLocked = collectedStars.length < 4;
     
     ctx.save();
-    if (isGoalLocked) {
+    if (!isGoalUnlocked) {
       ctx.globalAlpha = 0.4; // Dimmed when locked
     }
     
@@ -270,7 +270,7 @@ export const MazeGame = ({
     ctx.restore();
     
     // Draw lock icon if goal is locked
-    if (isGoalLocked) {
+    if (!isGoalUnlocked) {
       ctx.font = `bold ${CELL_SIZE * 0.35}px sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -295,7 +295,7 @@ export const MazeGame = ({
       ctx.font = 'bold 20px sans-serif';
       ctx.fillText('🐲', playerX, playerY);
     }
-  }, [maze, playerPosition, COLS, ROWS, CELL_SIZE, isGenerating, dragonImageLoaded, flagImageLoaded, glowIntensity, starPositions, collectedStars]);
+  }, [maze, playerPosition, COLS, ROWS, CELL_SIZE, isGenerating, dragonImageLoaded, flagImageLoaded, glowIntensity, starPositions, collectedStars, isGoalUnlocked]);
 
   // Trigger completion callback (only once)
   useEffect(() => {
