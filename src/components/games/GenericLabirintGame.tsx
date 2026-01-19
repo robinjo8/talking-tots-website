@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Home, RefreshCw } from "lucide-react";
 import { MazeGame } from "@/components/games/MazeGame";
+import { StarCollectDialog } from "@/components/games/StarCollectDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
@@ -27,12 +28,6 @@ interface GenericLabirintGameProps {
   config: LabirintConfig;
 }
 
-// Helper to get random image from array
-const getRandomImage = (images: PuzzleImage[]): PuzzleImage => {
-  const randomIndex = Math.floor(Math.random() * images.length);
-  return images[randomIndex];
-};
-
 // Extend PuzzleImage with audio for the game
 interface GameImage extends PuzzleImage {
   audio?: string;
@@ -47,6 +42,12 @@ const enrichImageWithAudio = (image: PuzzleImage): GameImage => {
   };
 };
 
+// Get 4 random unique images from array
+const getRandomImages = (images: PuzzleImage[], count: number): GameImage[] => {
+  const shuffled = [...images].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count).map(enrichImageWithAudio);
+};
+
 export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
   const navigate = useNavigate();
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
@@ -54,18 +55,28 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   const [gameKey, setGameKey] = useState(0);
-  const [currentImage, setCurrentImage] = useState<GameImage>(() => 
-    enrichImageWithAudio(getRandomImage(config.images))
-  );
   const [showNewGameButton, setShowNewGameButton] = useState(false);
   const { recordGameCompletion } = useEnhancedProgress();
   const gameCompletedRef = useRef(false);
+  
+  // Star collection state
+  const [collectedStars, setCollectedStars] = useState<number[]>([]);
+  const [showStarDialog, setShowStarDialog] = useState(false);
+  const [currentStarIndex, setCurrentStarIndex] = useState<number | null>(null);
+  const [starImages, setStarImages] = useState<GameImage[]>([]);
   
   // Mobile detection and orientation state
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [isPortrait, setIsPortrait] = useState(false);
   
   const effectiveFullscreen = isTouchDevice;
+
+  // Initialize 4 random images for stars on mount/new game
+  useEffect(() => {
+    if (config.images.length >= 4) {
+      setStarImages(getRandomImages(config.images, 4));
+    }
+  }, [config.images, gameKey]);
 
   // Reliable touch device detection
   useEffect(() => {
@@ -160,13 +171,33 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
 
   const handleNewGame = () => {
     gameCompletedRef.current = false;
-    setCurrentImage(enrichImageWithAudio(getRandomImage(config.images)));
+    setCollectedStars([]);
+    setCurrentStarIndex(null);
+    setShowStarDialog(false);
+    setStarImages(getRandomImages(config.images, 4));
     setGameKey(prev => prev + 1);
     setShowCompletion(false);
     setShowNewGameButton(false);
     setMenuOpen(false);
   };
 
+  // Handle when player reaches a star
+  const handleStarCollect = useCallback((starIndex: number) => {
+    if (collectedStars.includes(starIndex)) return;
+    setCurrentStarIndex(starIndex);
+    setShowStarDialog(true);
+  }, [collectedStars]);
+
+  // Handle when star dialog recording is complete
+  const handleStarDialogComplete = useCallback(() => {
+    if (currentStarIndex !== null) {
+      setCollectedStars(prev => [...prev, currentStarIndex]);
+    }
+    setShowStarDialog(false);
+    setCurrentStarIndex(null);
+  }, [currentStarIndex]);
+
+  // Handle reaching the goal (checkered flag)
   const handleComplete = useCallback(() => {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
@@ -179,7 +210,12 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
     setShowNewGameButton(true);
   };
 
-  // Floating menu component (matching Sestavljanka style)
+  // Get the image for current star dialog
+  const currentStarImage = currentStarIndex !== null && starImages[currentStarIndex] 
+    ? starImages[currentStarIndex] 
+    : null;
+
+  // Floating menu component
   const FloatingMenu = () => (
     <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
       <DropdownMenuTrigger asChild>
@@ -221,7 +257,7 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
     </DropdownMenu>
   );
 
-  // New game button (appears after star claimed)
+  // New game button
   const NewGameButton = () => (
     showNewGameButton ? (
       <Button
@@ -241,7 +277,7 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
         <DialogHeader>
           <DialogTitle className="text-center text-2xl">📖 Navodila</DialogTitle>
           <DialogDescription className="text-center text-base pt-4">
-            Poišči pot skozi labirint do zvezdice! Uporabi puščice na tipkovnici ali povleci s prstom.
+            Poišči pot skozi labirint in poberi vse 4 zvezdice! Ob vsaki zvezdici ponovi besedo. Ko pobereš vse zvezdice, nadaljuj do cilja (zastavice).
           </DialogDescription>
         </DialogHeader>
         <div className="flex justify-center pt-4">
@@ -269,10 +305,23 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
     <>
       <ExitDialog />
       <InstructionsDialog />
+      
+      {/* Star collection dialog (intermediate) */}
+      {currentStarImage && (
+        <StarCollectDialog
+          isOpen={showStarDialog}
+          onOpenChange={setShowStarDialog}
+          image={currentStarImage}
+          starNumber={collectedStars.length + 1}
+          onComplete={handleStarDialogComplete}
+        />
+      )}
+      
+      {/* Final completion dialog */}
       <PuzzleSuccessDialog
         isOpen={showCompletion}
         onOpenChange={setShowCompletion}
-        completedImage={currentImage}
+        completedImage={starImages[0] || enrichImageWithAudio(config.images[0])}
         allImages={config.images.map(enrichImageWithAudio)}
         onStarClaimed={handleStarClaimed}
       />
@@ -281,12 +330,9 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
 
   // Mobile landscape view
   if (effectiveFullscreen) {
-    // Portrait mode - show rotate message
     if (isPortrait) {
       return (
-        <div 
-          className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-dragon-green to-app-teal p-8"
-        >
+        <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-dragon-green to-app-teal p-8">
           <div className="text-center text-white">
             <div className="text-6xl mb-4">📱</div>
             <h2 className="text-2xl font-bold mb-2">Obrni telefon</h2>
@@ -296,7 +342,6 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
       );
     }
 
-    // Landscape mode - full game
     return (
       <div 
         className="fixed inset-0 overflow-hidden select-none"
@@ -310,6 +355,8 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
         <MazeGame 
           key={gameKey}
           onComplete={handleComplete}
+          onStarCollect={handleStarCollect}
+          collectedStars={collectedStars}
           cols={16}
           rows={9}
           alignTop={false}
@@ -341,6 +388,8 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
         <MazeGame 
           key={gameKey}
           onComplete={handleComplete}
+          onStarCollect={handleStarCollect}
+          collectedStars={collectedStars}
           cols={16}
           rows={9}
           alignTop={true}

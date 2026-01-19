@@ -27,6 +27,8 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
   const [playerPosition, setPlayerPosition] = useState<Position>({ x: 0, y: 0 });
   const [isCompleted, setIsCompleted] = useState(false);
   const [isGenerating, setIsGenerating] = useState(true);
+  const [starPositions, setStarPositions] = useState<Position[]>([]);
+  const [collectedStars, setCollectedStars] = useState<number[]>([]);
 
   const COLS = cols;
   const ROWS = rows;
@@ -35,6 +37,7 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
   const generateMaze = useCallback(() => {
     console.log('MazeGame: generateMaze start', { cols: COLS, rows: ROWS });
     setIsGenerating(true);
+    setCollectedStars([]);
     
     // Initialize grid
     const grid: Cell[][] = [];
@@ -149,12 +152,97 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
 
     addDeadEnds(grid);
 
+    // Find positions for 4 stars (dead-ends or cells with few openings)
+    const findStarPositions = (grid: Cell[][]): Position[] => {
+      const candidates: { pos: Position; openings: number }[] = [];
+      
+      for (let y = 0; y < ROWS; y++) {
+        for (let x = 0; x < COLS; x++) {
+          // Skip start (0,0) and goal (COLS-1, ROWS-1)
+          if ((x === 0 && y === 0) || (x === COLS - 1 && y === ROWS - 1)) continue;
+          
+          const cell = grid[y][x];
+          const openings = [
+            !cell.walls.top, !cell.walls.right, 
+            !cell.walls.bottom, !cell.walls.left
+          ].filter(Boolean).length;
+          
+          candidates.push({ pos: { x, y }, openings });
+        }
+      }
+      
+      // Sort by openings (prefer dead-ends with 1 opening, then 2 openings)
+      candidates.sort((a, b) => a.openings - b.openings);
+      
+      // Select 4 positions spread across the maze
+      const selected: Position[] = [];
+      const quadrants = [
+        { minX: 0, maxX: Math.floor(COLS / 2), minY: 0, maxY: Math.floor(ROWS / 2) },           // top-left
+        { minX: Math.floor(COLS / 2), maxX: COLS, minY: 0, maxY: Math.floor(ROWS / 2) },        // top-right
+        { minX: 0, maxX: Math.floor(COLS / 2), minY: Math.floor(ROWS / 2), maxY: ROWS },        // bottom-left
+        { minX: Math.floor(COLS / 2), maxX: COLS, minY: Math.floor(ROWS / 2), maxY: ROWS }      // bottom-right
+      ];
+      
+      // Try to pick one star from each quadrant
+      for (const quadrant of quadrants) {
+        const quadrantCandidates = candidates.filter(c => 
+          c.pos.x >= quadrant.minX && c.pos.x < quadrant.maxX &&
+          c.pos.y >= quadrant.minY && c.pos.y < quadrant.maxY &&
+          !selected.some(s => s.x === c.pos.x && s.y === c.pos.y)
+        );
+        
+        if (quadrantCandidates.length > 0) {
+          // Pick a random one from the best candidates (lowest openings)
+          const bestOpenings = quadrantCandidates[0].openings;
+          const bestCandidates = quadrantCandidates.filter(c => c.openings <= bestOpenings + 1);
+          const chosen = bestCandidates[Math.floor(Math.random() * bestCandidates.length)];
+          selected.push(chosen.pos);
+        }
+      }
+      
+      // If we don't have 4, fill from remaining candidates
+      while (selected.length < 4 && candidates.length > 0) {
+        const remaining = candidates.filter(c => 
+          !selected.some(s => s.x === c.pos.x && s.y === c.pos.y)
+        );
+        if (remaining.length > 0) {
+          selected.push(remaining[0].pos);
+        } else {
+          break;
+        }
+      }
+      
+      return selected;
+    };
+
+    const stars = findStarPositions(grid);
+    setStarPositions(stars);
+
     setMaze(grid);
     setPlayerPosition({ x: 0, y: 0 });
     setIsCompleted(false);
-    console.log('MazeGame: generateMaze done', { cols: COLS, rows: ROWS });
+    console.log('MazeGame: generateMaze done', { cols: COLS, rows: ROWS, stars });
     setIsGenerating(false);
+  }, [COLS, ROWS]);
+
+  // Collect a star at given index
+  const collectStar = useCallback((starIndex: number) => {
+    setCollectedStars(prev => {
+      if (prev.includes(starIndex)) return prev;
+      return [...prev, starIndex];
+    });
   }, []);
+
+  // Check if player is on a star position
+  const getStarAtPosition = useCallback((pos: Position): number | null => {
+    const index = starPositions.findIndex(
+      star => star.x === pos.x && star.y === pos.y
+    );
+    if (index !== -1 && !collectedStars.includes(index)) {
+      return index;
+    }
+    return null;
+  }, [starPositions, collectedStars]);
 
   // Move player until hitting a wall or intersection
   const movePlayer = useCallback((direction: 'up' | 'down' | 'left' | 'right') => {
@@ -215,6 +303,14 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
           canMove = false; // Stop at intersection
         }
 
+        // Check if on a star position (stop to collect)
+        const starIndex = starPositions.findIndex(
+          star => star.x === nextPos.x && star.y === nextPos.y
+        );
+        if (starIndex !== -1 && !collectedStars.includes(starIndex)) {
+          canMove = false; // Stop at uncollected star
+        }
+
         // Check if reached goal (bottom-right corner cell only)
         if (nextPos.y === ROWS - 1 && nextPos.x === COLS - 1) {
           setIsCompleted(true);
@@ -224,7 +320,7 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
     }
 
     setPlayerPosition(newPos);
-  }, [maze, playerPosition, isCompleted]);
+  }, [maze, playerPosition, isCompleted, COLS, ROWS, starPositions, collectedStars]);
 
   // Generate maze on mount
   useEffect(() => {
@@ -238,6 +334,10 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
     isGenerating,
     movePlayer,
     generateMaze,
+    starPositions,
+    collectedStars,
+    collectStar,
+    getStarAtPosition,
     COLS,
     ROWS
   };

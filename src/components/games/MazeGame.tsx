@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useMazeGame } from '@/hooks/useMazeGame';
+import { useMazeGame, Position } from '@/hooks/useMazeGame';
 import dragonHead from '@/assets/zmajcek-glava.png';
-
-// Background is now handled by parent component (LabirintC)
+import checkeredFlag from '@/assets/checkered-flag.png';
 
 interface MazeGameProps {
   onComplete: () => void;
+  onStarCollect?: (starIndex: number) => void;
+  collectedStars?: number[];
   cols?: number;
   rows?: number;
   alignTop?: boolean;
@@ -49,8 +50,11 @@ const drawStar = (ctx: CanvasRenderingContext2D, cx: number, cy: number, spikes:
   ctx.lineWidth = 2;
   ctx.stroke();
 };
+
 export const MazeGame = ({
   onComplete,
+  onStarCollect,
+  collectedStars = [],
   cols,
   rows,
   alignTop
@@ -61,85 +65,59 @@ export const MazeGame = ({
     isCompleted,
     isGenerating,
     movePlayer,
+    starPositions,
     COLS,
     ROWS
   } = useMazeGame({
     cols,
     rows
   });
+  
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const touchStartRef = useRef<{
-    x: number;
-    y: number;
-  } | null>(null);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const dragonImageRef = useRef<HTMLImageElement | null>(null);
+  const flagImageRef = useRef<HTMLImageElement | null>(null);
   const [dragonImageLoaded, setDragonImageLoaded] = useState(false);
+  const [flagImageLoaded, setFlagImageLoaded] = useState(false);
   const [glowIntensity, setGlowIntensity] = useState(0.3);
-  const [containerSize, setContainerSize] = useState({
-    width: 0,
-    height: 0
-  });
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
   const completionCalledRef = useRef(false);
-  const WALL_WIDTH = 6; // Thinner stroke like fortune wheel
-  const PADDING = 2; // Minimal border around maze
+  const lastStarCheckRef = useRef<string>('');
+  
+  const WALL_WIDTH = 6;
+  const PADDING = 2;
 
   // Measure container size
   useEffect(() => {
     const updateSize = () => {
       if (alignTop) {
-        // Desktop: use window dimensions minus header
         const width = window.innerWidth;
-        const height = window.innerHeight - 80; // 80px for header
-        setContainerSize({
-          width,
-          height
-        });
-        console.log('MazeGame: updateSize desktop', {
-          width,
-          height
-        });
+        const height = window.innerHeight - 80;
+        setContainerSize({ width, height });
       } else {
-        // Mobile: use full window dimensions (fullscreen mode)
         const width = window.innerWidth;
         const height = window.innerHeight;
-        setContainerSize({
-          width,
-          height
-        });
-        console.log('MazeGame: updateSize mobile', {
-          width,
-          height
-        });
+        setContainerSize({ width, height });
       }
     };
     updateSize();
     window.addEventListener('resize', updateSize);
-    return () => {
-      window.removeEventListener('resize', updateSize);
-    };
+    return () => window.removeEventListener('resize', updateSize);
   }, [alignTop]);
 
   // Calculate cell size based on container dimensions
   const CELL_SIZE = useMemo(() => {
     if (containerSize.width === 0 || containerSize.height === 0) {
-      return null; // Don't render until we have measurements
+      return null;
     }
     const availableWidth = containerSize.width;
     const availableHeight = containerSize.height;
     const cellSizeByWidth = Math.floor((availableWidth - PADDING * 2) / COLS);
     const cellSizeByHeight = Math.floor((availableHeight - PADDING * 2) / ROWS);
     const maxCellSize = Math.min(cellSizeByWidth, cellSizeByHeight);
-
-    // Use 99% of calculated size to fill the space better
     return Math.floor(maxCellSize * 0.99);
   }, [containerSize, COLS, ROWS]);
-  console.log('MazeGame render state', {
-    alignTop,
-    isGenerating,
-    containerSize,
-    CELL_SIZE
-  });
 
   // Load dragon image
   useEffect(() => {
@@ -151,11 +129,25 @@ export const MazeGame = ({
     };
     img.onerror = () => {
       console.error('Failed to load dragon image');
-      setDragonImageLoaded(true); // Still allow game to continue with fallback
+      setDragonImageLoaded(true);
     };
   }, []);
 
-  // Animation effect for glowing star
+  // Load flag image
+  useEffect(() => {
+    const img = new Image();
+    img.src = checkeredFlag;
+    img.onload = () => {
+      flagImageRef.current = img;
+      setFlagImageLoaded(true);
+    };
+    img.onerror = () => {
+      console.error('Failed to load flag image');
+      setFlagImageLoaded(true);
+    };
+  }, []);
+
+  // Animation effect for glowing stars
   useEffect(() => {
     let direction = 1;
     const interval = setInterval(() => {
@@ -169,6 +161,23 @@ export const MazeGame = ({
     return () => clearInterval(interval);
   }, []);
 
+  // Check if player is on a star and trigger collection
+  useEffect(() => {
+    if (!starPositions.length || !onStarCollect) return;
+    
+    const posKey = `${playerPosition.x},${playerPosition.y}`;
+    if (posKey === lastStarCheckRef.current) return;
+    lastStarCheckRef.current = posKey;
+    
+    const starIndex = starPositions.findIndex(
+      star => star.x === playerPosition.x && star.y === playerPosition.y
+    );
+    
+    if (starIndex !== -1 && !collectedStars.includes(starIndex)) {
+      onStarCollect(starIndex);
+    }
+  }, [playerPosition, starPositions, collectedStars, onStarCollect]);
+
   // Draw maze
   useEffect(() => {
     if (!canvasRef.current || !maze.length || isGenerating || !dragonImageLoaded || !CELL_SIZE) return;
@@ -176,15 +185,12 @@ export const MazeGame = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Clear canvas (transparent - background is handled by parent)
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Enable high-quality image rendering
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
-    // Draw maze walls as round orange strokes (like fortune wheel)
-    ctx.strokeStyle = 'hsl(35, 90%, 50%)'; // Same orange as fortune wheel
+    // Draw maze walls
+    ctx.strokeStyle = 'hsl(35, 90%, 50%)';
     ctx.lineWidth = WALL_WIDTH;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
@@ -194,7 +200,6 @@ export const MazeGame = ({
         const startX = x * CELL_SIZE + PADDING;
         const startY = y * CELL_SIZE + PADDING;
         
-        // Draw walls as simple rounded strokes
         if (cell.walls.top) {
           ctx.beginPath();
           ctx.moveTo(startX, startY);
@@ -222,28 +227,51 @@ export const MazeGame = ({
       });
     });
 
-    // Draw glowing star at goal - bottom-right corner (single cell)
+    // Draw 4 collectible stars (if not collected)
+    starPositions.forEach((starPos, index) => {
+      if (!collectedStars.includes(index)) {
+        const starX = starPos.x * CELL_SIZE + CELL_SIZE / 2 + PADDING;
+        const starY = starPos.y * CELL_SIZE + CELL_SIZE / 2 + PADDING;
+        drawStar(ctx, starX, starY, 5, CELL_SIZE / 3, CELL_SIZE / 6, glowIntensity);
+      }
+    });
+
+    // Draw checkered flag at goal
     const goalX = (COLS - 1) * CELL_SIZE + CELL_SIZE / 2 + PADDING;
     const goalY = (ROWS - 1) * CELL_SIZE + CELL_SIZE / 2 + PADDING;
-    drawStar(ctx, goalX, goalY, 5, CELL_SIZE / 3, CELL_SIZE / 6, glowIntensity);
+    const flagSize = CELL_SIZE * 0.8;
+    
+    if (flagImageRef.current && flagImageLoaded) {
+      ctx.drawImage(
+        flagImageRef.current,
+        goalX - flagSize / 2,
+        goalY - flagSize / 2,
+        flagSize,
+        flagSize
+      );
+    } else {
+      // Fallback: draw a simple flag icon
+      ctx.fillStyle = '#22c55e';
+      ctx.beginPath();
+      ctx.moveTo(goalX - flagSize / 4, goalY - flagSize / 2);
+      ctx.lineTo(goalX + flagSize / 4, goalY - flagSize / 4);
+      ctx.lineTo(goalX - flagSize / 4, goalY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#713f12';
+      ctx.fillRect(goalX - flagSize / 4 - 2, goalY - flagSize / 2, 4, flagSize);
+    }
 
     // Draw player (dragon)
     const playerX = playerPosition.x * CELL_SIZE + CELL_SIZE / 2 + PADDING;
     const playerY = playerPosition.y * CELL_SIZE + CELL_SIZE / 2 + PADDING;
+    
     if (dragonImageRef.current) {
-      // Draw dragon image with high quality
-      const imgSize = CELL_SIZE * 1.2; // Larger size for better visibility
-
-      // Save context state
+      const imgSize = CELL_SIZE * 1.2;
       ctx.save();
-
-      // Draw with smooth scaling
       ctx.drawImage(dragonImageRef.current, playerX - imgSize / 2, playerY - imgSize / 2, imgSize, imgSize);
-
-      // Restore context state
       ctx.restore();
     } else {
-      // Fallback: Draw dragon circle with emoji
       ctx.fillStyle = 'hsl(var(--primary))';
       ctx.beginPath();
       ctx.arc(playerX, playerY, CELL_SIZE / 3, 0, Math.PI * 2);
@@ -252,7 +280,7 @@ export const MazeGame = ({
       ctx.font = 'bold 20px sans-serif';
       ctx.fillText('🐲', playerX, playerY);
     }
-  }, [maze, playerPosition, COLS, ROWS, CELL_SIZE, isGenerating, dragonImageLoaded, glowIntensity]);
+  }, [maze, playerPosition, COLS, ROWS, CELL_SIZE, isGenerating, dragonImageLoaded, flagImageLoaded, glowIntensity, starPositions, collectedStars]);
 
   // Trigger completion callback (only once)
   useEffect(() => {
@@ -305,9 +333,7 @@ export const MazeGame = ({
     const preventRefresh = (e: TouchEvent) => {
       e.preventDefault();
     };
-    canvas.addEventListener('touchmove', preventRefresh, {
-      passive: false
-    });
+    canvas.addEventListener('touchmove', preventRefresh, { passive: false });
     return () => {
       canvas.removeEventListener('touchmove', preventRefresh);
     };
@@ -316,17 +342,16 @@ export const MazeGame = ({
   // Touch/swipe controls
   const handleTouchStart = (e: React.TouchEvent) => {
     const touch = e.touches[0];
-    touchStartRef.current = {
-      x: touch.clientX,
-      y: touch.clientY
-    };
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
   };
+  
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (!touchStartRef.current) return;
     const touch = e.changedTouches[0];
     const deltaX = touch.clientX - touchStartRef.current.x;
     const deltaY = touch.clientY - touchStartRef.current.y;
     const threshold = 30;
+    
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
       if (deltaX > threshold) {
         movePlayer('right');
@@ -342,18 +367,40 @@ export const MazeGame = ({
     }
     touchStartRef.current = null;
   };
+
   if (isGenerating) {
-    return <div className="flex items-center justify-center h-64">
+    return (
+      <div className="flex items-center justify-center h-64">
         <p className="text-lg">Generiranje labirinta...</p>
-      </div>;
+      </div>
+    );
   }
-  return <div ref={containerRef} className={`w-full h-full flex justify-center ${alignTop ? 'items-start' : 'items-center'}`}>
-      {CELL_SIZE === null ? <div className="flex items-center justify-center h-64">
+
+  return (
+    <div 
+      ref={containerRef} 
+      className={`w-full h-full flex justify-center ${alignTop ? 'items-start' : 'items-center'}`}
+    >
+      {CELL_SIZE === null ? (
+        <div className="flex items-center justify-center h-64">
           <p className="text-lg">Generiranje labirinta...</p>
-        </div> : <div className="relative rounded-lg" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-          <canvas ref={canvasRef} width={COLS * CELL_SIZE + PADDING * 2} height={ROWS * CELL_SIZE + PADDING * 2} style={{
-        touchAction: 'none'
-      }} />
-        </div>}
-    </div>;
+        </div>
+      ) : (
+        <div className="relative rounded-lg" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+          {/* Star progress indicator */}
+          <div className="absolute top-2 right-2 z-10 bg-white/80 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1 shadow-md">
+            <span className="text-lg">⭐</span>
+            <span className="font-bold text-orange-600">{collectedStars.length}/4</span>
+          </div>
+          
+          <canvas
+            ref={canvasRef}
+            width={COLS * CELL_SIZE + PADDING * 2}
+            height={ROWS * CELL_SIZE + PADDING * 2}
+            style={{ touchAction: 'none' }}
+          />
+        </div>
+      )}
+    </div>
+  );
 };
