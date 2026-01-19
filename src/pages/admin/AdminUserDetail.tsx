@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
@@ -438,42 +437,39 @@ export default function AdminUserDetail() {
 
   if (!parentId || !childId) {
     return (
-      <AdminLayout>
-        <div className="text-center py-12 text-destructive">
-          Manjkajoči parametri URL-ja
-        </div>
-      </AdminLayout>
+      <div className="text-center py-12 text-destructive">
+        Manjkajoči parametri URL-ja
+      </div>
     );
   }
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        {/* Header with back navigation */}
-        <div className="flex items-start gap-4">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={() => navigate('/admin/users')}
-            className="mt-1"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Podrobnosti uporabnika</h1>
-            <p className="text-muted-foreground">
-              {childData ? (
-                <>
-                  Otrok: <span className="font-medium">{childData.name}</span>
-                  {childData.age && <> • {childData.age} let</>}
-                  {parentData?.name && <> • Starš: {parentData.name}</>}
-                </>
-              ) : (
-                'Nalaganje...'
-              )}
-            </p>
-          </div>
+    <div className="space-y-6">
+      {/* Header with back navigation */}
+      <div className="flex items-start gap-4">
+        <Button 
+          variant="ghost" 
+          size="icon"
+          onClick={() => navigate('/admin/users')}
+          className="mt-1"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Podrobnosti uporabnika</h1>
+          <p className="text-muted-foreground">
+            {childData ? (
+              <>
+                Otrok: <span className="font-medium">{childData.name}</span>
+                {childData.age && <> • {childData.age} let</>}
+                {parentData?.name && <> • Starš: {parentData.name}</>}
+              </>
+            ) : (
+              'Nalaganje...'
+            )}
+          </p>
         </div>
+      </div>
 
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
@@ -786,10 +782,9 @@ export default function AdminUserDetail() {
                 </CardContent>
               </Card>
             </div>
-          </>
-        )}
-      </div>
-    </AdminLayout>
+        </>
+      )}
+    </div>
   );
 }
 
