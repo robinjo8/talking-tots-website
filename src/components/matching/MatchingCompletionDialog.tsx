@@ -238,15 +238,9 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
                       handlePlayAudio(image);
                     }}
                     size="icon"
-                    className={`bg-green-500 hover:bg-green-600 text-white ${isMobileLandscape 
-                      ? isFiveImages ? "h-8 w-8" : "h-10 w-10" 
-                      : isFiveImages ? "h-7 w-7 md:h-10 md:w-10" : "h-8 w-8 md:h-12 md:h-12"
-                    }`}
+                    className="bg-green-500 hover:bg-green-600 text-white h-8 w-8"
                   >
-                    <Volume2 className={isMobileLandscape 
-                      ? isFiveImages ? "w-4 h-4" : "w-5 h-5" 
-                      : isFiveImages ? "w-3 h-3 md:w-5 md:h-5" : "w-4 h-4 md:w-6 md:h-6"
-                    } />
+                    <Volume2 className="w-4 h-4" />
                   </Button>
                 </div>;
           })}
@@ -255,8 +249,8 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
 
         {/* Action buttons - always visible at bottom */}
         <div className={`flex justify-center gap-3 flex-shrink-0 ${isMobileLandscape ? "pb-2" : ""}`}>
-          <Button onClick={handleReset} variant="outline" className={`gap-2 flex-1 max-w-32 ${isMobileLandscape ? "h-10" : ""}`}>
-            Ponovi
+          <Button onClick={handleClose} variant="outline" className={`gap-2 flex-1 max-w-32 ${isMobileLandscape ? "h-10" : ""}`}>
+            Zapri
           </Button>
           
           {completedRecordings.size === images.length && !starClaimed ? (
