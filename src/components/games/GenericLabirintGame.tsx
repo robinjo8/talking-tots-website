@@ -17,7 +17,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { LabirintConfig } from "@/data/labirintConfig";
-import backgroundImage from "@/assets/zeleno_ozadje.png";
+
+const backgroundImageUrl = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.png';
 
 interface GenericLabirintGameProps {
   config: LabirintConfig;
@@ -264,7 +265,7 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
       <div 
         className="fixed inset-0 overflow-hidden select-none"
         style={{
-          backgroundImage: `url('${backgroundImage}')`,
+          backgroundImage: `url('${backgroundImageUrl}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
@@ -289,7 +290,7 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
     <div 
       className="fixed inset-0 overflow-auto select-none"
       style={{
-        backgroundImage: `url('${backgroundImage}')`,
+        backgroundImage: `url('${backgroundImageUrl}')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
