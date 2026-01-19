@@ -283,6 +283,8 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
         <MazeGame 
           key={gameKey}
           onComplete={handleComplete}
+          cols={12}
+          rows={7}
           alignTop={false}
         />
         
@@ -313,6 +315,8 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
         <MazeGame 
           key={gameKey}
           onComplete={handleComplete}
+          cols={10}
+          rows={10}
           alignTop={true}
         />
       </div>

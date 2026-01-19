@@ -351,7 +351,7 @@ export const MazeGame = ({
         </div> : <div className="relative rounded-lg" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
           <canvas ref={canvasRef} width={COLS * CELL_SIZE + PADDING * 2} height={ROWS * CELL_SIZE + PADDING * 2} style={{
         touchAction: 'none'
-      }} className="my-[60px]" />
+      }} />
         </div>}
     </div>;
 };
