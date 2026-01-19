@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Home, RefreshCw } from "lucide-react";
 import { MazeGame } from "@/components/games/MazeGame";
@@ -167,12 +167,12 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
     setMenuOpen(false);
   };
 
-  const handleComplete = () => {
+  const handleComplete = useCallback(() => {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
       setShowCompletion(true);
     }
-  };
+  }, []);
 
   const handleStarClaimed = () => {
     recordGameCompletion('maze', config.trackingId);
