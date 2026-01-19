@@ -34,10 +34,13 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   const [displayImages, setDisplayImages] = useState<ImageData[]>([]);
   const { playAudio } = useAudioPlayback();
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
+  const imagesInitializedRef = useRef(false);
 
   // Select 4 random images including the completed one when dialog opens
+  // Use ref to prevent re-shuffling on re-renders (e.g., after claiming star)
   useEffect(() => {
-    if (isOpen && allImages && allImages.length > 0) {
+    if (isOpen && !imagesInitializedRef.current && allImages && allImages.length > 0) {
+      imagesInitializedRef.current = true;
       // Always include the completed image
       const otherImages = allImages.filter(img => img.filename !== completedImage.filename);
       
@@ -48,7 +51,8 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
       // Combine with completed image and shuffle the final array
       const combined = [completedImage, ...selected].sort(() => Math.random() - 0.5);
       setDisplayImages(combined);
-    } else if (isOpen && completedImage) {
+    } else if (isOpen && !imagesInitializedRef.current && completedImage) {
+      imagesInitializedRef.current = true;
       // Fallback: just show the completed image
       setDisplayImages([completedImage]);
     }
@@ -56,9 +60,10 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
 
   // NOTE: Auto-play audio removed per user request
 
-  // Cleanup on dialog close
+  // Cleanup on dialog close - reset ref so images are re-shuffled for next game
   useEffect(() => {
     if (!isOpen) {
+      imagesInitializedRef.current = false;
       setCompletedRecordings(new Set());
       setRecordingTimeLeft(3);
       setCurrentRecordingIndex(null);
