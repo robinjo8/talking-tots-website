@@ -5,7 +5,6 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Trophy, Mic, X, Star, Volume2, RefreshCw } from "lucide-react";
 import { MatchingGameImage } from "@/data/matchingGameData";
 import { useAudioPlayback } from '@/hooks/useAudioPlayback';
-import { useToast } from '@/hooks/use-toast';
 interface MatchingCompletionDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -39,9 +38,6 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
   const {
     playAudio
   } = useAudioPlayback();
-  const {
-    toast
-  } = useToast();
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
 
   // Cleanup on dialog close
@@ -151,10 +147,6 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
   const handleClaimStar = () => {
     setStarClaimed(true);
     onStarClaimed?.();
-    toast({
-      title: "Odlično!",
-      description: "Prejel si zvezdico! ⭐"
-    });
     // Don't auto-close if onNewGame is provided - let user choose Nova igra or close
     if (!onNewGame) {
       setTimeout(() => {
