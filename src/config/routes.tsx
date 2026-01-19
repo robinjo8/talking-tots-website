@@ -10,13 +10,7 @@ import UpdatePassword from "@/pages/UpdatePassword";
 import NotFound from "@/pages/NotFound";
 import PaymentSuccess from "@/pages/PaymentSuccess";
 import PaymentCanceled from "@/pages/PaymentCanceled";
-import AdminLogin from "@/pages/admin/AdminLogin";
-import AdminRegister from "@/pages/admin/AdminRegister";
-import AdminDashboard from "@/pages/admin/AdminDashboard";
-import AdminUsers from "@/pages/admin/AdminUsers";
-import AdminUserDetail from "@/pages/admin/AdminUserDetail";
-import AdminMemberships from "@/pages/admin/AdminMemberships";
-import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
+import AdminRoutes from "@/components/routing/AdminRoutes";
 import Profile from "@/pages/Profile";
 import MojaStran from "@/pages/MojaStran";
 import MojeAplikacije from "@/pages/MojeAplikacije";
@@ -335,13 +329,8 @@ export function AppRoutes() {
         }
       />
 
-      {/* Admin Portal Routes */}
-      <Route path="/admin/login" element={<AdminAuthProvider><AdminLogin /></AdminAuthProvider>} />
-      <Route path="/admin/register" element={<AdminAuthProvider><AdminRegister /></AdminAuthProvider>} />
-      <Route path="/admin" element={<AdminAuthProvider><AdminDashboard /></AdminAuthProvider>} />
-      <Route path="/admin/users" element={<AdminAuthProvider><AdminUsers /></AdminAuthProvider>} />
-      <Route path="/admin/users/:parentId/:childId" element={<AdminAuthProvider><AdminUserDetail /></AdminAuthProvider>} />
-      <Route path="/admin/memberships" element={<AdminAuthProvider><AdminMemberships /></AdminAuthProvider>} />
+      {/* Admin Portal Routes - nested with single AdminAuthProvider */}
+      <Route path="/admin/*" element={<AdminRoutes />} />
 
       {/* Footer pages */}
       <Route path="/kontakt" element={<Kontakt />} />
