@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMazeGame, Position } from '@/hooks/useMazeGame';
 import dragonHead from '@/assets/zmajcek-glava.png';
-import checkeredFlag from '@/assets/checkered-flag.png';
+import ciljBanner from '@/assets/cilj-banner.png';
 
 interface MazeGameProps {
   onComplete: () => void;
@@ -133,16 +133,16 @@ export const MazeGame = ({
     };
   }, []);
 
-  // Load flag image
+  // Load goal banner image
   useEffect(() => {
     const img = new Image();
-    img.src = checkeredFlag;
+    img.src = ciljBanner;
     img.onload = () => {
       flagImageRef.current = img;
       setFlagImageLoaded(true);
     };
     img.onerror = () => {
-      console.error('Failed to load flag image');
+      console.error('Failed to load goal banner image');
       setFlagImageLoaded(true);
     };
   }, []);
@@ -236,10 +236,16 @@ export const MazeGame = ({
       }
     });
 
-    // Draw checkered flag at goal
+    // Draw goal banner (locked if not all stars collected)
     const goalX = (COLS - 1) * CELL_SIZE + CELL_SIZE / 2 + PADDING;
     const goalY = (ROWS - 1) * CELL_SIZE + CELL_SIZE / 2 + PADDING;
-    const flagSize = CELL_SIZE * 0.8;
+    const flagSize = CELL_SIZE * 0.9;
+    const isGoalLocked = collectedStars.length < 4;
+    
+    ctx.save();
+    if (isGoalLocked) {
+      ctx.globalAlpha = 0.4; // Dimmed when locked
+    }
     
     if (flagImageRef.current && flagImageLoaded) {
       ctx.drawImage(
@@ -260,6 +266,15 @@ export const MazeGame = ({
       ctx.fill();
       ctx.fillStyle = '#713f12';
       ctx.fillRect(goalX - flagSize / 4 - 2, goalY - flagSize / 2, 4, flagSize);
+    }
+    ctx.restore();
+    
+    // Draw lock icon if goal is locked
+    if (isGoalLocked) {
+      ctx.font = `bold ${CELL_SIZE * 0.35}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🔒', goalX, goalY);
     }
 
     // Draw player (dragon)
@@ -387,12 +402,6 @@ export const MazeGame = ({
         </div>
       ) : (
         <div className="relative rounded-lg" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-          {/* Star progress indicator */}
-          <div className="absolute top-2 right-2 z-10 bg-white/80 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1 shadow-md">
-            <span className="text-lg">⭐</span>
-            <span className="font-bold text-orange-600">{collectedStars.length}/4</span>
-          </div>
-          
           <canvas
             ref={canvasRef}
             width={COLS * CELL_SIZE + PADDING * 2}
