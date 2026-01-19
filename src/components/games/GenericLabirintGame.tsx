@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Home, RotateCcw, BookOpen } from "lucide-react";
+import { Home, RefreshCw } from "lucide-react";
 import { MazeGame } from "@/components/games/MazeGame";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
+import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
+import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,12 +19,33 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { LabirintConfig } from "@/data/labirintConfig";
+import type { PuzzleImage } from "@/data/puzzleImages";
 
 const backgroundImageUrl = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/svetlomodro_ozadje.png';
 
 interface GenericLabirintGameProps {
   config: LabirintConfig;
 }
+
+// Helper to get random image from array
+const getRandomImage = (images: PuzzleImage[]): PuzzleImage => {
+  const randomIndex = Math.floor(Math.random() * images.length);
+  return images[randomIndex];
+};
+
+// Extend PuzzleImage with audio for the game
+interface GameImage extends PuzzleImage {
+  audio?: string;
+}
+
+// Add audio to image if not present (derive from filename)
+const enrichImageWithAudio = (image: PuzzleImage): GameImage => {
+  const baseName = image.filename.replace('.png', '');
+  return {
+    ...image,
+    audio: `${baseName}.m4a`
+  };
+};
 
 export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
   const navigate = useNavigate();
@@ -31,6 +54,12 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   const [gameKey, setGameKey] = useState(0);
+  const [currentImage, setCurrentImage] = useState<GameImage>(() => 
+    enrichImageWithAudio(getRandomImage(config.images))
+  );
+  const [showNewGameButton, setShowNewGameButton] = useState(false);
+  const { recordGameCompletion } = useEnhancedProgress();
+  const gameCompletedRef = useRef(false);
   
   // Mobile detection and orientation state
   const [isTouchDevice, setIsTouchDevice] = useState(false);
@@ -121,6 +150,7 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
 
   const handleBack = () => {
     setShowExitConfirmation(true);
+    setMenuOpen(false);
   };
 
   const handleConfirmExit = () => {
@@ -129,65 +159,79 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
   };
 
   const handleNewGame = () => {
+    gameCompletedRef.current = false;
+    setCurrentImage(enrichImageWithAudio(getRandomImage(config.images)));
     setGameKey(prev => prev + 1);
     setShowCompletion(false);
+    setShowNewGameButton(false);
     setMenuOpen(false);
   };
 
   const handleComplete = () => {
-    setShowCompletion(true);
+    if (!gameCompletedRef.current) {
+      gameCompletedRef.current = true;
+      setShowCompletion(true);
+    }
   };
 
-  const handleClaimStar = () => {
-    setShowCompletion(false);
-    // Optionally navigate back or start new game
-    handleNewGame();
+  const handleStarClaimed = () => {
+    recordGameCompletion('maze', config.trackingId);
+    setShowNewGameButton(true);
   };
 
-  // Floating menu component
+  // Floating menu component (matching Sestavljanka style)
   const FloatingMenu = () => (
-    <div className="fixed bottom-4 left-4 z-50 flex items-center gap-3">
-      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-        <DropdownMenuTrigger asChild>
-          <button 
-            className="w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
-          >
-            <Home className="w-8 h-8 text-white" />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent 
-          className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
-          align="start"
-          side="top"
-          sideOffset={8}
+    <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+      <DropdownMenuTrigger asChild>
+        <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform">
+          <Home className="w-8 h-8 text-white" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent 
+        align="start" 
+        side="top"
+        sideOffset={8}
+        className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+      >
+        <button
+          onClick={handleBack}
+          className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
         >
-          <button
-            onClick={handleBack}
-            className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
-          >
-            <span className="text-xl">🏠</span>
-            <span className="font-medium">Nazaj</span>
-          </button>
-          <button
-            onClick={handleNewGame}
-            className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
-          >
-            <RotateCcw className="w-5 h-5 text-orange-500" />
-            <span className="font-medium">Nova igra</span>
-          </button>
-          <button
-            onClick={() => {
-              setShowInstructions(true);
-              setMenuOpen(false);
-            }}
-            className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors"
-          >
-            <BookOpen className="w-5 h-5 text-orange-500" />
-            <span className="font-medium">Navodila</span>
-          </button>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+          <span className="text-2xl">🏠</span>
+          <span>Nazaj</span>
+        </button>
+        <button
+          onClick={handleNewGame}
+          className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+        >
+          <span className="text-2xl">🔄</span>
+          <span>Nova igra</span>
+        </button>
+        <button
+          onClick={() => {
+            setShowInstructions(true);
+            setMenuOpen(false);
+          }}
+          className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
+        >
+          <span className="text-2xl">📖</span>
+          <span>Navodila</span>
+        </button>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
+  // New game button (appears after star claimed)
+  const NewGameButton = () => (
+    showNewGameButton ? (
+      <Button
+        size="icon"
+        onClick={handleNewGame}
+        className="fixed bottom-4 left-24 z-50 bg-blue-500 hover:bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg"
+      >
+        <RefreshCw className="w-6 h-6" />
+      </Button>
+    ) : null
   );
 
   // Instructions dialog
@@ -209,38 +253,6 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
     </Dialog>
   );
 
-  // Completion dialog
-  const CompletionDialog = () => (
-    <Dialog open={showCompletion} onOpenChange={setShowCompletion}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-center text-2xl flex items-center justify-center gap-2">
-            <span>🎊</span> Čestitke!
-          </DialogTitle>
-          <DialogDescription className="text-center text-base pt-4">
-            Uspešno si prešel labirint s črko {config.displayLetter}!
-          </DialogDescription>
-        </DialogHeader>
-        <div className="flex flex-col items-center gap-4 pt-4">
-          <img 
-            src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/zvezdica_3d.png"
-            alt="Zvezdica"
-            className="w-24 h-24 object-contain"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
-          />
-          <Button 
-            onClick={handleClaimStar} 
-            className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold px-8 py-3 rounded-full"
-          >
-            Vzemi zvezdico
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-
   // Exit confirmation dialog
   const ExitDialog = () => (
     <MemoryExitConfirmationDialog
@@ -250,6 +262,21 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
     >
       <span />
     </MemoryExitConfirmationDialog>
+  );
+
+  // Shared dialogs
+  const Dialogs = () => (
+    <>
+      <ExitDialog />
+      <InstructionsDialog />
+      <PuzzleSuccessDialog
+        isOpen={showCompletion}
+        onOpenChange={setShowCompletion}
+        completedImage={currentImage}
+        allImages={config.images.map(enrichImageWithAudio)}
+        onStarClaimed={handleStarClaimed}
+      />
+    </>
   );
 
   // Mobile landscape view
@@ -289,9 +316,8 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
         />
         
         <FloatingMenu />
-        <InstructionsDialog />
-        <CompletionDialog />
-        <ExitDialog />
+        <NewGameButton />
+        <Dialogs />
       </div>
     );
   }
@@ -322,9 +348,8 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
       </div>
 
       <FloatingMenu />
-      <InstructionsDialog />
-      <CompletionDialog />
-      <ExitDialog />
+      <NewGameButton />
+      <Dialogs />
     </div>
   );
 }
