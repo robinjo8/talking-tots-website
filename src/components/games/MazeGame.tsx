@@ -80,6 +80,7 @@ export const MazeGame = ({
     width: 0,
     height: 0
   });
+  const completionCalledRef = useRef(false);
   const WALL_WIDTH = 6; // Thinner stroke like fortune wheel
   const PADDING = 2; // Minimal border around maze
 
@@ -253,9 +254,10 @@ export const MazeGame = ({
     }
   }, [maze, playerPosition, COLS, ROWS, CELL_SIZE, isGenerating, dragonImageLoaded, glowIntensity]);
 
-  // Trigger completion callback
+  // Trigger completion callback (only once)
   useEffect(() => {
-    if (isCompleted) {
+    if (isCompleted && !completionCalledRef.current) {
+      completionCalledRef.current = true;
       setTimeout(() => {
         onComplete();
       }, 500);
