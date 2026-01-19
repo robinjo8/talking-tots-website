@@ -18,7 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { LabirintConfig } from "@/data/labirintConfig";
 
-const backgroundImageUrl = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.png';
+const backgroundImageUrl = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/svetlomodro_ozadje.png';
 
 interface GenericLabirintGameProps {
   config: LabirintConfig;
@@ -214,16 +214,25 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
     <Dialog open={showCompletion} onOpenChange={setShowCompletion}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-center text-2xl">🎉 Čestitke!</DialogTitle>
+          <DialogTitle className="text-center text-2xl flex items-center justify-center gap-2">
+            <span>🎊</span> Čestitke!
+          </DialogTitle>
           <DialogDescription className="text-center text-base pt-4">
             Uspešno si prešel labirint s črko {config.displayLetter}!
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col items-center gap-4 pt-4">
-          <div className="text-6xl">⭐</div>
+          <img 
+            src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/zvezdica_3d.png"
+            alt="Zvezdica"
+            className="w-24 h-24 object-contain"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+            }}
+          />
           <Button 
             onClick={handleClaimStar} 
-            className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold px-8 py-3"
+            className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold px-8 py-3 rounded-full"
           >
             Vzemi zvezdico
           </Button>
