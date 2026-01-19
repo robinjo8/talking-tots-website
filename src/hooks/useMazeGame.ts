@@ -152,8 +152,24 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
 
     addDeadEnds(grid);
 
+    // BLOCK the goal cell by closing ALL walls around it
+    // This ensures goal is completely inaccessible until unlocked
+    const goalCell = grid[ROWS - 1][COLS - 1];
+    
+    // Close walls on the goal cell
+    goalCell.walls.top = true;
+    goalCell.walls.left = true;
+    
+    // Close corresponding walls on adjacent cells
+    if (ROWS > 1) {
+      grid[ROWS - 2][COLS - 1].walls.bottom = true; // Cell above goal
+    }
+    if (COLS > 1) {
+      grid[ROWS - 1][COLS - 2].walls.right = true; // Cell left of goal
+    }
+
     // Find positions for 4 stars (dead-ends or cells with few openings)
-    // IMPORTANT: Avoid placing stars near goal to ensure reachability without passing through goal
+    // Stars are placed OUTSIDE the goal zone since goal is now walled off
     const findStarPositions = (grid: Cell[][]): Position[] => {
       const candidates: { pos: Position; openings: number }[] = [];
       
@@ -162,29 +178,29 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
           // Skip start (0,0) and goal (COLS-1, ROWS-1)
           if ((x === 0 && y === 0) || (x === COLS - 1 && y === ROWS - 1)) continue;
           
-          // Skip cells adjacent to goal to avoid unreachable stars
-          if ((x === COLS - 1 && y === ROWS - 2) || (x === COLS - 2 && y === ROWS - 1)) continue;
-          
           const cell = grid[y][x];
           const openings = [
             !cell.walls.top, !cell.walls.right, 
             !cell.walls.bottom, !cell.walls.left
           ].filter(Boolean).length;
           
-          candidates.push({ pos: { x, y }, openings });
+          // Only consider cells that have at least one opening (are reachable)
+          if (openings > 0) {
+            candidates.push({ pos: { x, y }, openings });
+          }
         }
       }
       
       // Sort by openings (prefer dead-ends with 1 opening, then 2 openings)
       candidates.sort((a, b) => a.openings - b.openings);
       
-      // Select 4 positions spread across the maze
+      // Select 4 positions spread across the maze (excluding bottom-right quadrant near goal)
       const selected: Position[] = [];
       const quadrants = [
         { minX: 0, maxX: Math.floor(COLS / 2), minY: 0, maxY: Math.floor(ROWS / 2) },           // top-left
         { minX: Math.floor(COLS / 2), maxX: COLS, minY: 0, maxY: Math.floor(ROWS / 2) },        // top-right
         { minX: 0, maxX: Math.floor(COLS / 2), minY: Math.floor(ROWS / 2), maxY: ROWS },        // bottom-left
-        { minX: Math.floor(COLS / 2), maxX: COLS, minY: Math.floor(ROWS / 2), maxY: ROWS }      // bottom-right
+        { minX: Math.floor(COLS / 2), maxX: COLS - 1, minY: Math.floor(ROWS / 2), maxY: ROWS - 1 } // bottom-right (excluding goal row/col)
       ];
       
       // Try to pick one star from each quadrant
@@ -204,10 +220,11 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
         }
       }
       
-      // If we don't have 4, fill from remaining candidates
+      // If we don't have 4, fill from remaining candidates (excluding goal area)
       while (selected.length < 4 && candidates.length > 0) {
         const remaining = candidates.filter(c => 
-          !selected.some(s => s.x === c.pos.x && s.y === c.pos.y)
+          !selected.some(s => s.x === c.pos.x && s.y === c.pos.y) &&
+          !(c.pos.x === COLS - 1 && c.pos.y === ROWS - 1) // Exclude goal
         );
         if (remaining.length > 0) {
           selected.push(remaining[0].pos);
@@ -247,6 +264,38 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
     }
     return null;
   }, [starPositions, collectedStars]);
+
+  // Check if goal should be unlocked (all 4 stars collected)
+  const isGoalUnlocked = collectedStars.length >= 4;
+
+  // Unlock the goal by opening walls when all stars are collected
+  useEffect(() => {
+    if (!maze.length || !isGoalUnlocked) return;
+    
+    // Open the walls to the goal
+    setMaze(prevMaze => {
+      const newMaze = prevMaze.map(row => row.map(cell => ({
+        ...cell,
+        walls: { ...cell.walls }
+      })));
+      
+      const goalCell = newMaze[ROWS - 1][COLS - 1];
+      
+      // Open top wall of goal and bottom wall of cell above
+      if (ROWS > 1) {
+        goalCell.walls.top = false;
+        newMaze[ROWS - 2][COLS - 1].walls.bottom = false;
+      }
+      
+      // Open left wall of goal and right wall of cell to the left
+      if (COLS > 1) {
+        goalCell.walls.left = false;
+        newMaze[ROWS - 1][COLS - 2].walls.right = false;
+      }
+      
+      return newMaze;
+    });
+  }, [isGoalUnlocked, ROWS, COLS, maze.length]);
 
   // Move player until hitting a wall or intersection
   const movePlayer = useCallback((direction: 'up' | 'down' | 'left' | 'right') => {
@@ -316,17 +365,9 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
         }
 
         // Check if reached goal (bottom-right corner cell only)
-        // BLOCK goal if not all 4 stars are collected
         if (nextPos.y === ROWS - 1 && nextPos.x === COLS - 1) {
-          if (collectedStars.length >= 4) {
-            // All stars collected - allow goal
-            setIsCompleted(true);
-            canMove = false;
-          } else {
-            // Not all stars - BLOCK movement to goal
-            canMove = false;
-            break; // Don't update position, stay where we are
-          }
+          setIsCompleted(true);
+          canMove = false;
         }
       }
     }
@@ -350,6 +391,7 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
     collectedStars,
     collectStar,
     getStarAtPosition,
+    isGoalUnlocked,
     COLS,
     ROWS
   };
