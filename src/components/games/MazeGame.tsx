@@ -71,7 +71,8 @@ export const MazeGame = ({
     ROWS
   } = useMazeGame({
     cols,
-    rows
+    rows,
+    collectedStars
   });
   
   const canvasRef = useRef<HTMLCanvasElement>(null);

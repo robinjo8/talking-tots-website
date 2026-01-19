@@ -20,15 +20,19 @@ export interface Position {
 interface UseMazeGameProps {
   cols?: number;
   rows?: number;
+  collectedStars?: number[];
 }
 
-export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
+export const useMazeGame = ({ 
+  cols = 8, 
+  rows = 12,
+  collectedStars = []
+}: UseMazeGameProps = {}) => {
   const [maze, setMaze] = useState<Cell[][]>([]);
   const [playerPosition, setPlayerPosition] = useState<Position>({ x: 0, y: 0 });
   const [isCompleted, setIsCompleted] = useState(false);
   const [isGenerating, setIsGenerating] = useState(true);
   const [starPositions, setStarPositions] = useState<Position[]>([]);
-  const [collectedStars, setCollectedStars] = useState<number[]>([]);
 
   const COLS = cols;
   const ROWS = rows;
@@ -37,7 +41,6 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
   const generateMaze = useCallback(() => {
     console.log('MazeGame: generateMaze start', { cols: COLS, rows: ROWS });
     setIsGenerating(true);
-    setCollectedStars([]);
     
     // Initialize grid
     const grid: Cell[][] = [];
@@ -246,14 +249,6 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
     setIsGenerating(false);
   }, [COLS, ROWS]);
 
-  // Collect a star at given index
-  const collectStar = useCallback((starIndex: number) => {
-    setCollectedStars(prev => {
-      if (prev.includes(starIndex)) return prev;
-      return [...prev, starIndex];
-    });
-  }, []);
-
   // Check if player is on a star position
   const getStarAtPosition = useCallback((pos: Position): number | null => {
     const index = starPositions.findIndex(
@@ -267,12 +262,14 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
 
   // Check if goal should be unlocked (all 4 stars collected)
   const isGoalUnlocked = collectedStars.length >= 4;
+  
+  console.log('useMazeGame: collectedStars =', collectedStars, 'isGoalUnlocked =', isGoalUnlocked);
 
   // Unlock the goal by opening walls when all stars are collected
   useEffect(() => {
     if (!isGoalUnlocked || maze.length === 0) return;
     
-    console.log('🔓 Unlocking goal - opening walls!');
+    console.log('🔓 Unlocking goal - opening walls! collectedStars:', collectedStars.length);
     
     // Open the walls to the goal
     setMaze(prevMaze => {
@@ -392,8 +389,6 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
     movePlayer,
     generateMaze,
     starPositions,
-    collectedStars,
-    collectStar,
     getStarAtPosition,
     isGoalUnlocked,
     COLS,
