@@ -270,63 +270,6 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
     ) : null
   );
 
-  // Instructions dialog
-  const InstructionsDialog = () => (
-    <Dialog open={showInstructions} onOpenChange={setShowInstructions}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-center text-2xl">📖 Navodila</DialogTitle>
-          <DialogDescription className="text-center text-base pt-4">
-            Poišči pot skozi labirint in poberi vse 4 zvezdice! Ob vsaki zvezdici ponovi besedo. Ko pobereš vse zvezdice, nadaljuj do cilja (zastavice).
-          </DialogDescription>
-        </DialogHeader>
-        <div className="flex justify-center pt-4">
-          <Button onClick={() => setShowInstructions(false)} className="bg-app-orange hover:bg-app-orange/90">
-            Razumem
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-
-  // Exit confirmation dialog
-  const ExitDialog = () => (
-    <MemoryExitConfirmationDialog
-      open={showExitConfirmation}
-      onOpenChange={setShowExitConfirmation}
-      onConfirm={handleConfirmExit}
-    >
-      <span />
-    </MemoryExitConfirmationDialog>
-  );
-
-  // Shared dialogs
-  const Dialogs = () => (
-    <>
-      <ExitDialog />
-      <InstructionsDialog />
-      
-      {/* Star collection dialog (intermediate) */}
-      {currentStarImage && (
-        <StarCollectDialog
-          isOpen={showStarDialog}
-          onOpenChange={setShowStarDialog}
-          image={currentStarImage}
-          starNumber={collectedStars.length + 1}
-          onComplete={handleStarDialogComplete}
-        />
-      )}
-      
-      {/* Final completion dialog */}
-      <PuzzleSuccessDialog
-        isOpen={showCompletion}
-        onOpenChange={setShowCompletion}
-        completedImage={starImages[0] || enrichImageWithAudio(config.images[0])}
-        allImages={config.images.map(enrichImageWithAudio)}
-        onStarClaimed={handleStarClaimed}
-      />
-    </>
-  );
 
   // Mobile landscape view
   if (effectiveFullscreen) {
@@ -364,7 +307,48 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
         
         <FloatingMenu />
         <NewGameButton />
-        <Dialogs />
+        
+        <MemoryExitConfirmationDialog
+          open={showExitConfirmation}
+          onOpenChange={setShowExitConfirmation}
+          onConfirm={handleConfirmExit}
+        >
+          <span />
+        </MemoryExitConfirmationDialog>
+
+        <Dialog open={showInstructions} onOpenChange={setShowInstructions}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-center text-2xl">📖 Navodila</DialogTitle>
+              <DialogDescription className="text-center text-base pt-4">
+                Poišči pot skozi labirint in poberi vse 4 zvezdice! Ob vsaki zvezdici ponovi besedo. Ko pobereš vse zvezdice, nadaljuj do cilja (zastavice).
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex justify-center pt-4">
+              <Button onClick={() => setShowInstructions(false)} className="bg-app-orange hover:bg-app-orange/90">
+                Razumem
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {currentStarImage && (
+          <StarCollectDialog
+            isOpen={showStarDialog}
+            onOpenChange={setShowStarDialog}
+            image={currentStarImage}
+            starNumber={collectedStars.length + 1}
+            onComplete={handleStarDialogComplete}
+          />
+        )}
+
+        <PuzzleSuccessDialog
+          isOpen={showCompletion}
+          onOpenChange={setShowCompletion}
+          completedImage={starImages[0] || enrichImageWithAudio(config.images[0])}
+          allImages={config.images.map(enrichImageWithAudio)}
+          onStarClaimed={handleStarClaimed}
+        />
       </div>
     );
   }
@@ -398,7 +382,48 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
 
       <FloatingMenu />
       <NewGameButton />
-      <Dialogs />
+      
+      <MemoryExitConfirmationDialog
+        open={showExitConfirmation}
+        onOpenChange={setShowExitConfirmation}
+        onConfirm={handleConfirmExit}
+      >
+        <span />
+      </MemoryExitConfirmationDialog>
+
+      <Dialog open={showInstructions} onOpenChange={setShowInstructions}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center text-2xl">📖 Navodila</DialogTitle>
+            <DialogDescription className="text-center text-base pt-4">
+              Poišči pot skozi labirint in poberi vse 4 zvezdice! Ob vsaki zvezdici ponovi besedo. Ko pobereš vse zvezdice, nadaljuj do cilja (zastavice).
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-center pt-4">
+            <Button onClick={() => setShowInstructions(false)} className="bg-app-orange hover:bg-app-orange/90">
+              Razumem
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {currentStarImage && (
+        <StarCollectDialog
+          isOpen={showStarDialog}
+          onOpenChange={setShowStarDialog}
+          image={currentStarImage}
+          starNumber={collectedStars.length + 1}
+          onComplete={handleStarDialogComplete}
+        />
+      )}
+
+      <PuzzleSuccessDialog
+        isOpen={showCompletion}
+        onOpenChange={setShowCompletion}
+        completedImage={starImages[0] || enrichImageWithAudio(config.images[0])}
+        allImages={config.images.map(enrichImageWithAudio)}
+        onStarClaimed={handleStarClaimed}
+      />
     </div>
   );
 }
