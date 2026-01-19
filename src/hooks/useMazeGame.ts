@@ -270,7 +270,9 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
 
   // Unlock the goal by opening walls when all stars are collected
   useEffect(() => {
-    if (!maze.length || !isGoalUnlocked) return;
+    if (!isGoalUnlocked || maze.length === 0) return;
+    
+    console.log('🔓 Unlocking goal - opening walls!');
     
     // Open the walls to the goal
     setMaze(prevMaze => {
@@ -293,9 +295,11 @@ export const useMazeGame = ({ cols = 8, rows = 12 }: UseMazeGameProps = {}) => {
         newMaze[ROWS - 1][COLS - 2].walls.right = false;
       }
       
+      console.log('🔓 Goal walls opened:', goalCell.walls);
+      
       return newMaze;
     });
-  }, [isGoalUnlocked, ROWS, COLS, maze.length]);
+  }, [isGoalUnlocked, ROWS, COLS]);
 
   // Move player until hitting a wall or intersection
   const movePlayer = useCallback((direction: 'up' | 'down' | 'left' | 'right') => {
