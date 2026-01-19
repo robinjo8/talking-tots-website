@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
+// Use ASCII-safe URL keys for Slovenian diacritics (č→ch, š→sh, ž→zh)
 const labirintGames = [
   {
     id: "c",
@@ -27,7 +28,7 @@ const labirintGames = [
     gradient: "from-app-blue/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
     description: "Poišči pot skozi labirint s črko Č",
-    path: "/govorne-igre/labirint/č",
+    path: "/govorne-igre/labirint/ch",
     available: true
   },
   {
@@ -72,7 +73,7 @@ const labirintGames = [
     gradient: "from-app-blue/20 to-app-purple/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
     description: "Poišči pot skozi labirint s črko Š",
-    path: "/govorne-igre/labirint/š",
+    path: "/govorne-igre/labirint/sh",
     available: true
   },
   {
@@ -90,7 +91,7 @@ const labirintGames = [
     gradient: "from-app-purple/20 to-app-blue/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
     description: "Poišči pot skozi labirint s črko Ž",
-    path: "/govorne-igre/labirint/ž",
+    path: "/govorne-igre/labirint/zh",
     available: true
   }
 ];
