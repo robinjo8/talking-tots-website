@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { matchingGameData } from "@/data/matchingGameData";
 import { getAgeGroup } from "@/utils/ageUtils";
 import useEmblaCarousel from "embla-carousel-react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -12,35 +11,13 @@ import { Progress } from "@/components/ui/progress";
 import { useDailyProgress } from "@/hooks/useDailyProgress";
 import { FooterSection } from "@/components/FooterSection";
 import { toast } from "sonner";
+import { getLettersForAgeGroup, toAsciiUrl, getAgeGroupDisplayName, PoveziPareConfig } from "@/data/poveziPareConfig";
 
-const letterData = [
-  {
-    letter: "C",
-    gradient: "from-dragon-green/20 to-dragon-green/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
-    description: "Pomagaj Tomiju povezati pare s črko C",
-  },
-  {
-    letter: "Č",
-    gradient: "from-app-blue/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
-    description: "Pomagaj Tomiju povezati pare s črko Č",
-  },
-  {
-    letter: "K",
-    gradient: "from-app-orange/20 to-app-yellow/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png",
-    description: "Pomagaj Tomiju povezati pare s črko K",
-  },
-  {
-    letter: "L",
-    gradient: "from-app-purple/20 to-app-blue/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png",
-    description: "Pomagaj Tomiju povezati pare s črko L",
-  },
-];
+interface Props {
+  ageGroup: string; // "34", "56", "78", "910"
+}
 
-export default function MatchingGames3to4() {
+export function GenericPoveziPareSelection({ ageGroup }: Props) {
   const navigate = useNavigate();
   const { user, selectedChild, signOut } = useAuth();
   const childName = selectedChild?.name;
@@ -55,21 +32,25 @@ export default function MatchingGames3to4() {
   const targetActivities = 15;
   const percentage = Math.min((dailyActivities / targetActivities) * 100, 100);
 
+  // Get letters for this age group
+  const letterData = getLettersForAgeGroup(ageGroup);
+
   const handleSignOut = async () => {
     try {
       await signOut();
       navigate("/login");
     } catch (error) {
-      console.error("Error in MatchingGames3to4 handleSignOut:", error);
+      console.error("Error in GenericPoveziPareSelection handleSignOut:", error);
       toast.error("Napaka pri odjavi");
     }
   };
 
   // Check if child is in correct age group
   const childAge = selectedChild?.age || 3;
-  const ageGroup = getAgeGroup(childAge);
+  const currentAgeGroup = getAgeGroup(childAge);
+  const requiredAgeGroup = letterData[0]?.requiredAgeGroup || '3-4';
 
-  if (ageGroup !== '3-4') {
+  if (currentAgeGroup !== requiredAgeGroup) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -77,7 +58,7 @@ export default function MatchingGames3to4() {
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Dostop omejen</h1>
             <p className="text-muted-foreground">
-              Ta igra je namenjena otrokom starosti 3-4 leta.
+              Ta igra je namenjena otrokom starosti {getAgeGroupDisplayName(ageGroup)}.
             </p>
           </div>
         </div>
@@ -85,17 +66,17 @@ export default function MatchingGames3to4() {
     );
   }
 
-  const LetterCard = ({ letter }: { letter: typeof letterData[0] }) => (
+  const LetterCard = ({ config }: { config: PoveziPareConfig }) => (
     <div
       className="bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group border border-gray-200"
-      onClick={() => navigate(`/govorne-igre/povezi-pare-3-4/${letter.letter.toLowerCase()}`)}
+      onClick={() => navigate(`/govorne-igre/povezi-pare/${ageGroup}/${config.urlKey}`)}
     >
       {/* Card Image */}
-      <div className={`relative aspect-video overflow-hidden bg-gradient-to-br ${letter.gradient}`}>
+      <div className={`relative aspect-video overflow-hidden bg-gradient-to-br ${config.gradient}`}>
         <div className="w-full h-full flex items-center justify-center">
           <img 
-            src={letter.image}
-            alt={`Črka ${letter.letter}`}
+            src={config.image}
+            alt={`Črka ${config.letter}`}
             className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
             style={{ mixBlendMode: 'multiply' }}
           />
@@ -105,10 +86,10 @@ export default function MatchingGames3to4() {
       {/* Card Content */}
       <div className="p-6">
         <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
-          Črka {letter.letter}
+          Črka {config.letter}
         </h3>
         <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
-          {letter.description}
+          {config.description}
         </p>
       </div>
     </div>
@@ -184,17 +165,29 @@ export default function MatchingGames3to4() {
           {/* Letters grid */}
           <div className="mb-12">
             {isMobile ? (
-              /* Mobile: 2-column grid */
-              <div className="grid grid-cols-2 gap-4">
-                {letterData.map(letter => (
-                  <LetterCard key={letter.letter} letter={letter} />
-                ))}
-              </div>
+              /* Mobile: 2-column grid for 3-4, carousel for others */
+              ageGroup === '34' ? (
+                <div className="grid grid-cols-2 gap-4">
+                  {letterData.map(config => (
+                    <LetterCard key={config.letter} config={config} />
+                  ))}
+                </div>
+              ) : (
+                <div className="overflow-hidden -mx-4" ref={emblaRef}>
+                  <div className="flex gap-4 px-4">
+                    {letterData.map(config => (
+                      <div key={config.letter} className="flex-[0_0_85%] min-w-0">
+                        <LetterCard config={config} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
             ) : (
               /* Desktop: Grid layout */
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {letterData.map(letter => (
-                  <LetterCard key={letter.letter} letter={letter} />
+                {letterData.map(config => (
+                  <LetterCard key={config.letter} config={config} />
                 ))}
               </div>
             )}
