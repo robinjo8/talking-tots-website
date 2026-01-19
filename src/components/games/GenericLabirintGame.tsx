@@ -315,8 +315,8 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
         <MazeGame 
           key={gameKey}
           onComplete={handleComplete}
-          cols={10}
-          rows={10}
+          cols={16}
+          rows={9}
           alignTop={true}
         />
       </div>
