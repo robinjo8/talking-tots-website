@@ -117,7 +117,7 @@ export function GenericDrsnaSestavljankaGame({ config }: GenericDrsnaSestavljank
     <div 
       className="fixed inset-0 overflow-auto select-none"
       style={{
-        backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.png)',
+        backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.webp)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
