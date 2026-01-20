@@ -175,8 +175,8 @@ export function GenericIgraUjemanjaGame({ config }: GenericIgraUjemanjaGameProps
     recordGameCompletion('matching', config.trackingId);
   };
 
-  // Get completion images based on game type
-  const getCompletionImages = () => {
+  // Get completion images based on game type - memoized to prevent re-renders
+  const completionImages = useMemo(() => {
     if (config.gameType === 'matching') {
       return playedImages.length > 0 ? playedImages : gameImages;
     } else if (config.gameType === 'threeColumn') {
@@ -192,7 +192,7 @@ export function GenericIgraUjemanjaGame({ config }: GenericIgraUjemanjaGameProps
         filename: item.originalImage
       }));
     }
-  };
+  }, [config.gameType, playedImages, gameImages, threeColumnItems, fourColumnItems]);
 
   // Render appropriate game component
   const renderGame = () => {
@@ -281,7 +281,7 @@ export function GenericIgraUjemanjaGame({ config }: GenericIgraUjemanjaGameProps
           <MatchingCompletionDialog
             isOpen={showCompletion}
             onClose={() => setShowCompletion(false)}
-            images={getCompletionImages()}
+            images={completionImages}
             onStarClaimed={handleStarClaimed}
           />
 

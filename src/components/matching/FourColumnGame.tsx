@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Play, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FourColumnMatchingItem } from "@/data/threeColumnMatchingData";
@@ -54,10 +55,12 @@ export function FourColumnGame({ items, onGameComplete, isLandscape = false }: F
     return "text-xs sm:text-xs md:text-sm lg:text-base xl:text-lg";
   };
 
-  // Handle game completion
-  if (gameState.isComplete && onGameComplete) {
-    onGameComplete(gameState.score, items);
-  }
+  // Handle game completion with useEffect to avoid state update during render
+  useEffect(() => {
+    if (gameState.isComplete && onGameComplete) {
+      onGameComplete(gameState.score, items);
+    }
+  }, [gameState.isComplete, onGameComplete, gameState.score, items]);
 
   if (!items.length) {
     return <div className="text-center py-8">Loading game...</div>;
