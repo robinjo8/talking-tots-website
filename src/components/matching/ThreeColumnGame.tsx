@@ -19,7 +19,7 @@ export function ThreeColumnGame({ items, onGameComplete, isLandscape = false }: 
   };
 
   const baseTileClass = isLandscape 
-    ? "w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden bg-white"
+    ? "w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden bg-white"
     : "w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-40 lg:h-40 xl:w-44 xl:h-44 flex items-center justify-center border-2 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden bg-white shadow-md";
 
   const getAudioTileClass = (itemId: string) => {
@@ -30,7 +30,7 @@ export function ThreeColumnGame({ items, onGameComplete, isLandscape = false }: 
 
   const getImageTileClass = (itemId: string, column: 'shadow' | 'original') => {
     const baseImageClass = isLandscape 
-      ? "w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden"
+      ? "w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden"
       : "w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-40 lg:h-40 xl:w-44 xl:h-44 flex items-center justify-center border-2 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden";
     if (isItemCompleted(itemId)) return `${baseImageClass} bg-green-100 border-green-300 opacity-60`;
     if (isItemSelected(itemId, column)) return `${baseImageClass} bg-blue-100 border-blue-400 border-4`;
@@ -135,7 +135,7 @@ export function ThreeColumnGame({ items, onGameComplete, isLandscape = false }: 
         {/* Progress indicator */}
         {!gameState.isComplete && (
           <div className="mt-6 text-center">
-            <div className="w-full bg-muted rounded-full h-2">
+            <div className={`bg-white/80 rounded-full h-2 mx-auto ${isLandscape ? 'w-48' : 'w-full bg-muted'}`}>
               <div 
                 className="bg-dragon-green h-2 rounded-full transition-all duration-300"
                 style={{ 
