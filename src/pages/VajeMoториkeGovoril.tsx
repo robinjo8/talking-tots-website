@@ -64,7 +64,7 @@ const VajeMoториkeGovoril = () => {
       };
     }
   }, [effectiveFullscreen]);
-  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/oranzno_ozadje.png`;
+  const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/oranzno_ozadje.webp`;
   const gridClassName = isMobile ? "grid-cols-3" : "grid-cols-9";
   return <div className={`${effectiveFullscreen ? 'fixed inset-0 overflow-y-auto' : 'min-h-screen'} relative`}>
       {/* Background image layer */}

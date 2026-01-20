@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMazeGame, Position } from '@/hooks/useMazeGame';
-import dragonHead from '@/assets/zmajcek-glava.png';
-import ciljBanner from '@/assets/cilj-banner.png';
+
+// Use WebP images from Supabase storage
+const dragonHead = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/zmajcek-glava.webp';
+const ciljBanner = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/cilj-banner.webp';
 
 interface MazeGameProps {
   onComplete: () => void;

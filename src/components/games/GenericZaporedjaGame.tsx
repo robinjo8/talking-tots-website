@@ -247,7 +247,7 @@ export function GenericZaporedjaGame({ config }: GenericZaporedjaGameProps) {
     );
   };
 
-  const backgroundImageUrl = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.png';
+  const backgroundImageUrl = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.webp';
 
   // Mobile fullscreen version
   if (effectiveFullscreen) {

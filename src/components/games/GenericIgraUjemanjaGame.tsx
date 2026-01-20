@@ -271,7 +271,7 @@ export function GenericIgraUjemanjaGame({ config }: GenericIgraUjemanjaGameProps
       <div 
         className="fixed inset-0 z-0"
         style={{
-          backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/oranzno_ozadje.png)',
+          backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/oranzno_ozadje.webp)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'

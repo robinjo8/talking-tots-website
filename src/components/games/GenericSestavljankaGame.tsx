@@ -17,7 +17,7 @@ import type { SestavljankeGameConfig } from "@/data/sestavljankeGameConfig";
 import type { PuzzleImage } from "@/data/puzzleImages";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
-const BACKGROUND_URL = `${SUPABASE_URL}/storage/v1/object/public/ozadja/zeleno_ozadje.png`;
+const BACKGROUND_URL = `${SUPABASE_URL}/storage/v1/object/public/ozadja/zeleno_ozadje.webp`;
 
 interface GenericSestavljankaGameProps {
   config: SestavljankeGameConfig;

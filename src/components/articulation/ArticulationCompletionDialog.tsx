@@ -27,7 +27,7 @@ const ArticulationCompletionDialog = ({
     const fetchImage = async () => {
       const { data } = supabase.storage
         .from("zmajcki")
-        .getPublicUrl("Zmajcek_7.png");
+        .getPublicUrl("Zmajcek_7.webp");
       if (data) {
         setImageUrl(data.publicUrl);
       }

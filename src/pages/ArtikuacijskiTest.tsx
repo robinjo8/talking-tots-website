@@ -70,7 +70,7 @@ const ArtikuacijskiTest = () => {
   useEffect(() => {
     const { data } = supabase.storage
       .from("ozadja")
-      .getPublicUrl("svetlomodro_ozadje.png");
+      .getPublicUrl("svetlomodro_ozadje.webp");
     if (data) {
       setBackgroundUrl(data.publicUrl);
     }
