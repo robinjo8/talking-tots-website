@@ -86,6 +86,35 @@ export function GenericSestavljankaGame({ config }: GenericSestavljankaGameProps
     setMenuOpen(false);
   };
 
+  // Preload background image for faster LCP
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = BACKGROUND_URL;
+    link.type = 'image/webp';
+    document.head.appendChild(link);
+    
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, []);
+
+  // Preload current puzzle image for faster loading
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = imageUrl;
+    document.head.appendChild(link);
+    
+    return () => {
+      if (link.parentNode) {
+        document.head.removeChild(link);
+      }
+    };
+  }, [imageUrl]);
+
   // Fullscreen effect for mobile
   useEffect(() => {
     if (effectiveFullscreen) {
