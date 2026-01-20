@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tomitalk-v1.0.51';
+const CACHE_NAME = 'tomitalk-v1.0.52';
 const CACHE_VERSION = 13;
 
 // Essential files to cache for offline functionality - simplified paths without version params
@@ -108,11 +108,24 @@ self.addEventListener('fetch', (event) => {
   }
 });
 
-// Cache First strategy for static assets
+// Cache First strategy for static assets with stale-while-revalidate for images
 async function cacheFirst(request) {
   try {
     const cached = await caches.match(request);
+    const url = new URL(request.url);
+    const isImage = url.pathname.match(/\.(png|jpg|jpeg|webp|svg)$/);
+    
     if (cached) {
+      // For images, revalidate in background (stale-while-revalidate)
+      if (isImage) {
+        fetch(request).then(response => {
+          if (response.ok) {
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(request, response);
+            });
+          }
+        }).catch(() => {});
+      }
       return cached;
     }
     

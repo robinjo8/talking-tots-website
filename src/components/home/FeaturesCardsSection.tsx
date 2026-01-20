@@ -43,6 +43,9 @@ function FeatureCard({ feature, onButtonClick }: { feature: typeof features[0]; 
         <img
           src={feature.image}
           alt={feature.title}
+          loading="lazy"
+          width={400}
+          height={300}
           className="w-full h-full object-cover"
         />
       </div>
