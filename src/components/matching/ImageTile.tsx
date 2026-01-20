@@ -18,19 +18,21 @@ export function ImageTile({ image, isSelected, isMatched, onClick, className, ..
     <div
       onClick={onClick}
       className={cn(
-        "relative rounded-xl border-2 cursor-pointer transition-all duration-200 bg-white shadow-md",
-        "hover:scale-105 hover:shadow-lg",
-        isSelected && "border-app-purple shadow-lg scale-105",
+        // Base styles matching FourColumnGame
+        "flex items-center justify-center border-2 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden bg-white shadow-md",
+        // Size classes come from className prop
+        className,
+        // State-based styles
+        isSelected && "border-app-purple shadow-lg scale-105 border-4",
         isMatched && "border-dragon-green bg-dragon-green/10",
-        !isSelected && !isMatched && "border-gray-300 hover:border-app-purple/50",
-        className
+        !isSelected && !isMatched && "border-gray-300 hover:border-app-purple/50"
       )}
       {...dataProps}
     >
       <img
         src={image.url}
         alt={image.word}
-        className="w-full h-full object-contain p-1 rounded-lg"
+        className="w-full h-full object-contain p-1"
         onError={(e) => {
           console.error(`Failed to load image: ${image.url}`);
           e.currentTarget.style.display = 'none';
@@ -38,13 +40,13 @@ export function ImageTile({ image, isSelected, isMatched, onClick, className, ..
       />
       
       {isMatched && (
-        <div className="absolute inset-0 bg-dragon-green/20 rounded-lg flex items-center justify-center">
+        <div className="absolute inset-0 bg-dragon-green/20 rounded-xl flex items-center justify-center">
           <Check className="h-6 w-6 text-dragon-green" />
         </div>
       )}
       
       {isSelected && !isMatched && (
-        <div className="absolute inset-0 bg-app-purple/20 rounded-lg border-2 border-app-purple" />
+        <div className="absolute inset-0 bg-app-purple/20 rounded-xl" />
       )}
     </div>
   );
