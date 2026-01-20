@@ -9,7 +9,7 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
-import { useSubscription } from "@/hooks/useSubscription";
+import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
 import { SubscriptionRequiredModal } from "@/components/subscription/SubscriptionRequiredModal";
 
 const features = [
@@ -137,17 +137,23 @@ function MobileFeatureCarousel({
 export function FeaturesCardsSection() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isSubscribed, isLoading } = useSubscription();
+  const { isSubscribed, isLoading } = useSubscriptionContext();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
   const handleButtonClick = (action: string) => {
     if (action === "start") {
       if (!user) {
         navigate("/login");
-      } else if (isLoading) {
-        // Still checking subscription, do nothing
         return;
-      } else if (!isSubscribed) {
+      }
+      
+      // If still loading, navigate anyway - SubscriptionGate on target page will handle access
+      if (isLoading) {
+        navigate("/moje-aplikacije");
+        return;
+      }
+      
+      if (!isSubscribed) {
         setShowSubscriptionModal(true);
       } else {
         navigate("/moje-aplikacije");

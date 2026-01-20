@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Check } from "lucide-react";
 import { useBannerVisible } from "@/components/MissingChildBanner";
-import { useSubscription } from "@/hooks/useSubscription";
+import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
 import { SubscriptionRequiredModal } from "@/components/subscription/SubscriptionRequiredModal";
 import { useState } from "react";
 
@@ -13,16 +13,22 @@ export const HeroSection = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { isSubscribed, isLoading } = useSubscription();
+  const { isSubscribed, isLoading } = useSubscriptionContext();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
   const handleStartNow = () => {
     if (!user) {
       navigate("/login");
-    } else if (isLoading) {
-      // Still checking subscription, do nothing
       return;
-    } else if (!isSubscribed) {
+    }
+    
+    // If still loading, navigate anyway - SubscriptionGate on target page will handle access
+    if (isLoading) {
+      navigate("/moje-aplikacije");
+      return;
+    }
+    
+    if (!isSubscribed) {
       setShowSubscriptionModal(true);
     } else {
       navigate("/moje-aplikacije");
