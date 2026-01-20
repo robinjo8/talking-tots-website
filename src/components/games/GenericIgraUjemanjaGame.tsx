@@ -204,7 +204,7 @@ export function GenericIgraUjemanjaGame({ config }: GenericIgraUjemanjaGameProps
             images={gameImages}
             numColumns={config.numColumns}
             onGameComplete={handleMatchingComplete}
-            isLandscape={true}
+            isLandscape={isTouchDevice}
           />
         );
       case 'threeColumn':
@@ -213,7 +213,7 @@ export function GenericIgraUjemanjaGame({ config }: GenericIgraUjemanjaGameProps
             key={gameKey}
             items={threeColumnItems}
             onGameComplete={handleThreeColumnComplete}
-            isLandscape={true}
+            isLandscape={isTouchDevice}
           />
         );
       case 'fourColumn':
