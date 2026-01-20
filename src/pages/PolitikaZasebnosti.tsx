@@ -801,7 +801,7 @@ const PolitikaZasebnosti = () => {
             <div className="relative hidden md:block">
               <div className="relative w-full aspect-square max-w-md mx-auto">
                 <img
-                  src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_0.png"
+                  src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_0.webp"
                   alt="Zmajček maskota"
                   className="w-full h-full object-contain"
                 />
