@@ -40,6 +40,14 @@ const LogopedskiKoticek = () => {
       available: true,
     },
     {
+      id: 'motorika',
+      title: 'Motorika govoril in artikulacija',
+      description: 'Razumevanje povezave med motoriko govoril in artikulacijo. Kako gibanje govornih organov vpliva na pravilno izgovorjavo glasov.',
+      icon: sectionIcons.disorders,
+      articleUrl: '/clanki/motorika-govoril',
+      available: true,
+    },
+    {
       id: 'disorders',
       title: 'Najpogostejše govorne motnje',
       description: 'Opis in razlaga motenj, kot so: Dislalija, Fonološke motnje, Jecljanje, Zakasnitev v govoru. Vključitev primerov in nasvetov za prepoznavanje teh motenj.',
