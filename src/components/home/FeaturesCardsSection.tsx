@@ -16,7 +16,7 @@ const features = [
   {
     title: "Video navodila",
     description: "Poglej kako logoped pravilno izgovori posamezne črke.",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/Zmajcek_video_7.webp",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_video_7.webp",
     buttonText: "Začni zdaj",
     buttonAction: "start",
   },

@@ -32,7 +32,7 @@ const RazvojGovora = () => {
         {/* Featured Image */}
         <div className="mb-10 rounded-2xl overflow-hidden shadow-lg border-4 border-gray-100">
           <img
-            src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/logopedski-koticek/logoped_slika_2.webp"
+            src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/logopedski-koticek/logoped_slika_2.png"
             alt="Razvoj govora"
             className="w-full h-auto object-cover"
           />
