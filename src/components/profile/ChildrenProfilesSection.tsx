@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useSubscription } from "@/hooks/useSubscription";
+import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
 import { Button } from "@/components/ui/button";
 import { Users, Star, CreditCard } from "lucide-react";
 import { SimpleChildForm } from "@/components/profile/SimpleChildForm";
@@ -21,7 +21,7 @@ export function ChildrenProfilesSection({
   setEditingDevelopmentIndex
 }: ChildrenProfilesSectionProps) {
   const { profile } = useAuth();
-  const { isSubscribed, planId, isLoading } = useSubscription();
+  const { isSubscribed, planId, isLoading } = useSubscriptionContext();
   const [showDatabaseManager, setShowDatabaseManager] = useState(false);
 
   const hasNoChildren = !profile?.children || profile.children.length === 0;

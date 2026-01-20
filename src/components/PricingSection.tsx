@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useSubscription } from "@/hooks/useSubscription";
+import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
 import { 
   pricingPlans, 
   proExclusiveFeatures, 
@@ -24,7 +24,7 @@ export function PricingSection() {
   const [isCheckoutLoading, setIsCheckoutLoading] = useState<PlanId | null>(null);
   const navigate = useNavigate();
   const { user, session } = useAuth();
-  const { isSubscribed, planId: currentPlanId } = useSubscription();
+  const { isSubscribed, planId: currentPlanId } = useSubscriptionContext();
 
   const startPlan = pricingPlans.find(p => p.id === 'start')!;
   const plusPlan = pricingPlans.find(p => p.id === 'plus')!;

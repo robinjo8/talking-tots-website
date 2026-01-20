@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Lock, Crown } from "lucide-react";
 import { useArticulationTestStatus } from "@/hooks/useArticulationTestStatus";
-import { useSubscription } from "@/hooks/useSubscription";
+import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { sl } from "date-fns/locale";
@@ -12,7 +12,7 @@ const PRO_ONLY_ACTIVITIES = ['test', 'challenges'];
 export function ActivityOptions() {
   const navigate = useNavigate();
   const { isTestAvailable, nextTestDate, lastCompletedAt } = useArticulationTestStatus();
-  const { planId, isSubscribed } = useSubscription();
+  const { planId, isSubscribed } = useSubscriptionContext();
   
   const isPro = planId === 'pro';
   
