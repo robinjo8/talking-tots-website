@@ -29,10 +29,10 @@ const RazvojGovora = () => {
       {/* Blog Article */}
       <article className="container max-w-4xl mx-auto px-4 pb-20">
 
-        {/* Hero Section: Image + Intro Side by Side */}
-        <div className="flex flex-col md:flex-row gap-8 mb-10">
-          {/* Featured Image - Half width on desktop */}
-          <div className="md:w-1/2 flex-shrink-0">
+        {/* Hero Section: Image floats left, text wraps around */}
+        <div className="mb-10 clearfix">
+          {/* Featured Image - Float left */}
+          <div className="md:float-left md:w-1/2 md:mr-8 mb-6 md:mb-4">
             <div className="rounded-2xl overflow-hidden shadow-lg border-4 border-muted">
               <img
                 src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/logopedski-koticek/logoped_slika_2.png"
@@ -42,20 +42,18 @@ const RazvojGovora = () => {
             </div>
           </div>
 
-          {/* Intro Paragraphs - Next to image */}
-          <div className="md:w-1/2 flex flex-col justify-center">
-            <p className="text-base md:text-lg leading-relaxed text-foreground/80 font-light mb-4 text-justify">
-              Pred pojavom govorno-jezikovne komunikacije je potrebna ustrezno razvita fiziološka podlaga za govor. 
-              Ta vključuje razvoj splošne motorike telesa in govornih organov, razvoj slušnega in vidnega zaznavanja, 
-              razvoj koncentracije in pozornosti, razvoj kognitivnih sposobnosti, razvoj ustreznega odzivanja telesa 
-              z gibi ter na koncu razvoj odzivanja z glasom in govorom.
-            </p>
-            <p className="text-base md:text-lg leading-relaxed text-foreground/80 font-light text-justify">
-              Ključne značilnosti običajnega govorno-jezikovnega razvoja se med posameznimi otroki razlikujejo, 
-              lahko pa nam služijo kot pomoč pri spremljanju in učenju pridobivanja glasov, besed, slovničnih prvin 
-              ter pojmov, ki jih otrok še ni usvojil.
-            </p>
-          </div>
+          {/* Intro Paragraphs - Wrap around image */}
+          <p className="text-base md:text-lg leading-relaxed text-foreground/80 font-light mb-4 text-justify">
+            Pred pojavom govorno-jezikovne komunikacije je potrebna ustrezno razvita fiziološka podlaga za govor. 
+            Ta vključuje razvoj splošne motorike telesa in govornih organov, razvoj slušnega in vidnega zaznavanja, 
+            razvoj koncentracije in pozornosti, razvoj kognitivnih sposobnosti, razvoj ustreznega odzivanja telesa 
+            z gibi ter na koncu razvoj odzivanja z glasom in govorom.
+          </p>
+          <p className="text-base md:text-lg leading-relaxed text-foreground/80 font-light text-justify">
+            Ključne značilnosti običajnega govorno-jezikovnega razvoja se med posameznimi otroki razlikujejo, 
+            lahko pa nam služijo kot pomoč pri spremljanju in učenju pridobivanja glasov, besed, slovničnih prvin 
+            ter pojmov, ki jih otrok še ni usvojil.
+          </p>
         </div>
 
         {/* 1 leto */}
