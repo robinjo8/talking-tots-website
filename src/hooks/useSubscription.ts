@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { getPlanByProductId, type PlanId } from '@/config/pricing';
+import { type PlanId } from '@/config/pricing';
 
 export interface SubscriptionState {
   isSubscribed: boolean;
@@ -13,17 +13,19 @@ export interface SubscriptionState {
   trialEnd: string | null;
 }
 
+const defaultState: SubscriptionState = {
+  isSubscribed: false,
+  planId: null,
+  productId: null,
+  subscriptionEnd: null,
+  isLoading: true,
+  isTrialing: false,
+  trialEnd: null,
+};
+
 export function useSubscription() {
-  const { user, session } = useAuth();
-  const [subscription, setSubscription] = useState<SubscriptionState>({
-    isSubscribed: false,
-    planId: null,
-    productId: null,
-    subscriptionEnd: null,
-    isLoading: true,
-    isTrialing: false,
-    trialEnd: null,
-  });
+  const { user } = useAuth();
+  const [subscription, setSubscription] = useState<SubscriptionState>(defaultState);
   
   // Track if we've already checked for this user ID
   const lastCheckedUserIdRef = useRef<string | null>(null);
@@ -37,27 +39,18 @@ export function useSubscription() {
       return;
     }
 
-    if (!user || !session?.access_token) {
-      console.log('No user or session, setting not subscribed');
+    if (!user) {
+      console.log('No user, setting not subscribed');
       setSubscription(prev => {
-        // Only update if state actually needs to change
         if (prev.isLoading || prev.isSubscribed) {
-          return {
-            isSubscribed: false,
-            planId: null,
-            productId: null,
-            subscriptionEnd: null,
-            isLoading: false,
-            isTrialing: false,
-            trialEnd: null,
-          };
+          return { ...defaultState, isLoading: false };
         }
         return prev;
       });
       return;
     }
 
-    // Skip if we already checked for this user - use ref only, no state dependency
+    // Skip if we already checked for this user
     if (lastCheckedUserIdRef.current === user.id) {
       console.log('Already checked subscription for this user, skipping');
       return;
@@ -69,7 +62,7 @@ export function useSubscription() {
     try {
       console.log('Checking subscription for user:', user.id);
       
-      // Check if user is a logopedist - they get automatic Pro access
+      // 1. Check if user is a logopedist - they get automatic Pro access
       const { data: logopedistProfile } = await supabase
         .from('logopedist_profiles')
         .select('id')
@@ -92,62 +85,83 @@ export function useSubscription() {
         return;
       }
       
-      const { data, error } = await supabase.functions.invoke('check-subscription', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
+      // 2. Read subscription from database (NOT Stripe API!)
+      const { data: sub, error } = await supabase
+        .from('user_subscriptions')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
 
       if (error) {
-        console.error('Error checking subscription:', error);
-        setSubscription(prev => ({ ...prev, isLoading: false }));
+        console.error('Error fetching subscription from database:', error);
+        setSubscription({ ...defaultState, isLoading: false });
+        isCheckingRef.current = false;
         return;
       }
 
-      const plan = data.productId ? getPlanByProductId(data.productId) : null;
-      
       // Mark as checked for this user
       lastCheckedUserIdRef.current = user.id;
 
+      // No subscription record or inactive/canceled
+      if (!sub || sub.status === 'inactive') {
+        console.log('No active subscription found in database');
+        setSubscription({ ...defaultState, isLoading: false });
+        isCheckingRef.current = false;
+        return;
+      }
+
+      // Determine subscription state
+      const isActive = sub.status === 'active' || sub.status === 'trialing';
+      const isCanceled = sub.status === 'canceled' || sub.cancel_at_period_end;
+      
+      // If canceled but still in period, show as subscribed until period ends
+      const periodEnd = sub.current_period_end ? new Date(sub.current_period_end) : null;
+      const isStillInPeriod = periodEnd && periodEnd > new Date();
+      
+      const isSubscribed = isActive || (isCanceled && isStillInPeriod);
+
       console.log('Subscription check result:', { 
-        subscribed: data.subscribed, 
-        planId: plan?.id,
-        isTrialing: data.isTrialing 
+        status: sub.status,
+        planId: sub.plan_id,
+        isSubscribed,
+        isTrialing: sub.status === 'trialing',
+        cancelAtPeriodEnd: sub.cancel_at_period_end
       });
 
       setSubscription({
-        isSubscribed: data.subscribed || false,
-        planId: plan?.id || null,
-        productId: data.productId || null,
-        subscriptionEnd: data.subscriptionEnd || null,
+        isSubscribed,
+        planId: (sub.plan_id as PlanId) || null,
+        productId: sub.stripe_product_id || null,
+        subscriptionEnd: sub.current_period_end || null,
         isLoading: false,
-        isTrialing: data.isTrialing || false,
-        trialEnd: data.trialEnd || null,
+        isTrialing: sub.status === 'trialing',
+        trialEnd: sub.trial_end || null,
       });
     } catch (error) {
       console.error('Error checking subscription:', error);
-      setSubscription(prev => ({ ...prev, isLoading: false }));
+      setSubscription({ ...defaultState, isLoading: false });
     } finally {
       isCheckingRef.current = false;
     }
-  }, [user, session?.access_token]);
+  }, [user]);
 
-  // Check subscription when user and session are available
+  // Force refresh subscription (e.g., after checkout)
+  const refreshSubscription = useCallback(async () => {
+    // Reset the last checked user ID to force a re-check
+    lastCheckedUserIdRef.current = null;
+    await checkSubscription();
+  }, [checkSubscription]);
+
+  // Check subscription when user is available
   useEffect(() => {
-    // If no user, immediately set not loading
     if (!user) {
       setSubscription(prev => {
         if (prev.isLoading) {
-          return { ...prev, isLoading: false };
+          return { ...defaultState, isLoading: false };
         }
         return prev;
       });
       lastCheckedUserIdRef.current = null;
-      return;
-    }
-
-    // Wait for session to be available
-    if (!session?.access_token) {
       return;
     }
 
@@ -157,11 +171,10 @@ export function useSubscription() {
     }, 100);
     
     return () => clearTimeout(timeoutId);
-  }, [user?.id, session?.access_token, checkSubscription]);
-
+  }, [user?.id, checkSubscription]);
 
   return {
     ...subscription,
-    refreshSubscription: checkSubscription,
+    refreshSubscription,
   };
 }
