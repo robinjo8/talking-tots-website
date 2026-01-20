@@ -7,7 +7,7 @@ interface DragonDisplayProps {
 }
 
 // Single image URL - use same image for all dragons, CSS handles visual difference
-const DRAGON_IMAGE_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_6.png";
+const DRAGON_IMAGE_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_6.webp";
 
 export function DragonDisplay({ currentDragons, maxDragons = 10, animated = true }: DragonDisplayProps) {
   const dragons = Array.from({ length: maxDragons }, (_, index) => {

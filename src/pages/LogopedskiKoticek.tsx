@@ -118,7 +118,7 @@ const LogopedskiKoticek = () => {
               <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-app-blue/20 to-app-teal/20">
                 {section.id === 'development' ? (
                   <img
-                    src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/logopedski-koticek/logoped_slika_1.png"
+                    src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/logopedski-koticek/logoped_slika_1.webp"
                     alt={section.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />

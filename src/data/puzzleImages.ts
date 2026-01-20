@@ -8,162 +8,162 @@ export interface PuzzleImage {
 
 // C images (10 images)
 export const cImages: PuzzleImage[] = [
-  { filename: 'cedilo.png', word: 'CEDILO' },
-  { filename: 'cekin.png', word: 'CEKIN' },
-  { filename: 'cerkev.png', word: 'CERKEV' },
-  { filename: 'cesta.png', word: 'CESTA' },
-  { filename: 'cev.png', word: 'CEV' },
-  { filename: 'cirkus.png', word: 'CIRKUS' },
-  { filename: 'cisterna.png', word: 'CISTERNA' },
-  { filename: 'cokla.png', word: 'COKLA' },
-  { filename: 'copat.png', word: 'COPAT' },
-  { filename: 'cvet.png', word: 'CVET' }
+  { filename: 'cedilo.webp', word: 'CEDILO' },
+  { filename: 'cekin.webp', word: 'CEKIN' },
+  { filename: 'cerkev.webp', word: 'CERKEV' },
+  { filename: 'cesta.webp', word: 'CESTA' },
+  { filename: 'cev.webp', word: 'CEV' },
+  { filename: 'cirkus.webp', word: 'CIRKUS' },
+  { filename: 'cisterna.webp', word: 'CISTERNA' },
+  { filename: 'cokla.webp', word: 'COKLA' },
+  { filename: 'copat.webp', word: 'COPAT' },
+  { filename: 'cvet.webp', word: 'CVET' }
 ];
 
 // Č images (10 images)
 export const čImages: PuzzleImage[] = [
-  { filename: 'caj.png', word: 'ČAJ' },
-  { filename: 'casopis.png', word: 'ČASOPIS' },
-  { filename: 'cebela.png', word: 'ČEBELA' },
-  { filename: 'cebula.png', word: 'ČEBULA' },
-  { filename: 'cesen.png', word: 'ČESEN' },
-  { filename: 'cevlji.png', word: 'ČEVLJI' },
-  { filename: 'cokolada.png', word: 'ČOKOLADA' },
-  { filename: 'coln.png', word: 'ČOLN' },
-  { filename: 'copic.png', word: 'ČOPIČ' },
-  { filename: 'crke.png', word: 'ČRKE' }
+  { filename: 'caj.webp', word: 'ČAJ' },
+  { filename: 'casopis.webp', word: 'ČASOPIS' },
+  { filename: 'cebela.webp', word: 'ČEBELA' },
+  { filename: 'cebula.webp', word: 'ČEBULA' },
+  { filename: 'cesen.webp', word: 'ČESEN' },
+  { filename: 'cevlji.webp', word: 'ČEVLJI' },
+  { filename: 'cokolada.webp', word: 'ČOKOLADA' },
+  { filename: 'coln.webp', word: 'ČOLN' },
+  { filename: 'copic.webp', word: 'ČOPIČ' },
+  { filename: 'crke.webp', word: 'ČRKE' }
 ];
 
 // K images (26 images)
 export const kImages: PuzzleImage[] = [
-  { filename: 'kaca.png', word: 'KAČA' },
-  { filename: 'kapa.png', word: 'KAPA' },
-  { filename: 'kava.png', word: 'KAVA' },
-  { filename: 'klavir.png', word: 'KLAVIR' },
-  { filename: 'kljuc.png', word: 'KLJUČ' },
-  { filename: 'klop.png', word: 'KLOP' },
-  { filename: 'knjiga.png', word: 'KNJIGA' },
-  { filename: 'kocka.png', word: 'KOCKA' },
-  { filename: 'kokos_sadez.png', word: 'KOKOS' },
-  { filename: 'kokos.png', word: 'KOKOŠ' },
-  { filename: 'kolac.png', word: 'KOLAČ' },
-  { filename: 'kolo.png', word: 'KOLO' },
-  { filename: 'koruza.png', word: 'KORUZA' },
-  { filename: 'kost.png', word: 'KOST' },
-  { filename: 'kos.png', word: 'KOŠ' },
-  { filename: 'kosara.png', word: 'KOŠARA' },
-  { filename: 'koza.png', word: 'KOZA' },
-  { filename: 'kozarec.png', word: 'KOZAREC' },
-  { filename: 'koza_skin.png', word: 'KOŽA' },
-  { filename: 'krava.png', word: 'KRAVA' },
-  { filename: 'krof.png', word: 'KROF' },
-  { filename: 'krog.png', word: 'KROG' },
-  { filename: 'kroznik.png', word: 'KROŽNIK' },
-  { filename: 'kruh.png', word: 'KRUH' },
-  { filename: 'kumara.png', word: 'KUMARA' },
-  { filename: 'kuza.png', word: 'KUŽA' }
+  { filename: 'kaca.webp', word: 'KAČA' },
+  { filename: 'kapa.webp', word: 'KAPA' },
+  { filename: 'kava.webp', word: 'KAVA' },
+  { filename: 'klavir.webp', word: 'KLAVIR' },
+  { filename: 'kljuc.webp', word: 'KLJUČ' },
+  { filename: 'klop.webp', word: 'KLOP' },
+  { filename: 'knjiga.webp', word: 'KNJIGA' },
+  { filename: 'kocka.webp', word: 'KOCKA' },
+  { filename: 'kokos_sadez.webp', word: 'KOKOS' },
+  { filename: 'kokos.webp', word: 'KOKOŠ' },
+  { filename: 'kolac.webp', word: 'KOLAČ' },
+  { filename: 'kolo.webp', word: 'KOLO' },
+  { filename: 'koruza.webp', word: 'KORUZA' },
+  { filename: 'kost.webp', word: 'KOST' },
+  { filename: 'kos.webp', word: 'KOŠ' },
+  { filename: 'kosara.webp', word: 'KOŠARA' },
+  { filename: 'koza.webp', word: 'KOZA' },
+  { filename: 'kozarec.webp', word: 'KOZAREC' },
+  { filename: 'koza_skin.webp', word: 'KOŽA' },
+  { filename: 'krava.webp', word: 'KRAVA' },
+  { filename: 'krof.webp', word: 'KROF' },
+  { filename: 'krog.webp', word: 'KROG' },
+  { filename: 'kroznik.webp', word: 'KROŽNIK' },
+  { filename: 'kruh.webp', word: 'KRUH' },
+  { filename: 'kumara.webp', word: 'KUMARA' },
+  { filename: 'kuza.webp', word: 'KUŽA' }
 ];
 
 // L images (14 images)
 export const lImages: PuzzleImage[] = [
-  { filename: 'ladja.png', word: 'LADJA' },
-  { filename: 'lasje.png', word: 'LASJE' },
-  { filename: 'led.png', word: 'LED' },
-  { filename: 'lesnik.png', word: 'LEŠNIK' },
-  { filename: 'letalo.png', word: 'LETALO' },
-  { filename: 'lev.png', word: 'LEV' },
-  { filename: 'les.png', word: 'LES' },
-  { filename: 'list.png', word: 'LIST' },
-  { filename: 'lizika.png', word: 'LIZIKA' },
-  { filename: 'lonec.png', word: 'LONEC' },
-  { filename: 'lopar.png', word: 'LOPAR' },
-  { filename: 'lubenica.png', word: 'LUBENICA' },
-  { filename: 'luc.png', word: 'LUČ' },
-  { filename: 'luza.png', word: 'LUŽA' }
+  { filename: 'ladja.webp', word: 'LADJA' },
+  { filename: 'lasje.webp', word: 'LASJE' },
+  { filename: 'led.webp', word: 'LED' },
+  { filename: 'lesnik.webp', word: 'LEŠNIK' },
+  { filename: 'letalo.webp', word: 'LETALO' },
+  { filename: 'lev.webp', word: 'LEV' },
+  { filename: 'les.webp', word: 'LES' },
+  { filename: 'list.webp', word: 'LIST' },
+  { filename: 'lizika.webp', word: 'LIZIKA' },
+  { filename: 'lonec.webp', word: 'LONEC' },
+  { filename: 'lopar.webp', word: 'LOPAR' },
+  { filename: 'lubenica.webp', word: 'LUBENICA' },
+  { filename: 'luc.webp', word: 'LUČ' },
+  { filename: 'luza.webp', word: 'LUŽA' }
 ];
 
 // R images (17 images)
 export const rImages: PuzzleImage[] = [
-  { filename: 'raca.png', word: 'RACA' },
-  { filename: 'rak.png', word: 'RAK' },
-  { filename: 'raketa.png', word: 'RAKETA' },
-  { filename: 'ravnilo.png', word: 'RAVNILO' },
-  { filename: 'rep.png', word: 'REP' },
-  { filename: 'repa.png', word: 'REPA' },
-  { filename: 'riba.png', word: 'RIBA' },
-  { filename: 'ribez.png', word: 'RIBEZ' },
-  { filename: 'ribic.png', word: 'RIBIČ' },
-  { filename: 'ris.png', word: 'RIS' },
-  { filename: 'riz.png', word: 'RIŽ' },
-  { filename: 'robot.png', word: 'ROBOT' },
-  { filename: 'roka.png', word: 'ROKA' },
-  { filename: 'rokometas.png', word: 'ROKOMETAŠ' },
-  { filename: 'rolka.png', word: 'ROLKA' },
-  { filename: 'ropotuljica.png', word: 'ROPOTULJICA' },
-  { filename: 'roza.png', word: 'ROŽA' }
+  { filename: 'raca.webp', word: 'RACA' },
+  { filename: 'rak.webp', word: 'RAK' },
+  { filename: 'raketa.webp', word: 'RAKETA' },
+  { filename: 'ravnilo.webp', word: 'RAVNILO' },
+  { filename: 'rep.webp', word: 'REP' },
+  { filename: 'repa.webp', word: 'REPA' },
+  { filename: 'riba.webp', word: 'RIBA' },
+  { filename: 'ribez.webp', word: 'RIBEZ' },
+  { filename: 'ribic.webp', word: 'RIBIČ' },
+  { filename: 'ris.webp', word: 'RIS' },
+  { filename: 'riz.webp', word: 'RIŽ' },
+  { filename: 'robot.webp', word: 'ROBOT' },
+  { filename: 'roka.webp', word: 'ROKA' },
+  { filename: 'rokometas.webp', word: 'ROKOMETAŠ' },
+  { filename: 'rolka.webp', word: 'ROLKA' },
+  { filename: 'ropotuljica.webp', word: 'ROPOTULJICA' },
+  { filename: 'roza.webp', word: 'ROŽA' }
 ];
 
 // S images (16 images)
 export const sImages: PuzzleImage[] = [
-  { filename: 'sedem.png', word: 'SEDEM' },
-  { filename: 'sir.png', word: 'SIR' },
-  { filename: 'sladoled.png', word: 'SLADOLED' },
-  { filename: 'slika.png', word: 'SLIKA' },
-  { filename: 'slon.png', word: 'SLON' },
-  { filename: 'sluz.png', word: 'SLUZ' },
-  { filename: 'smreka.png', word: 'SMREKA' },
-  { filename: 'sneg.png', word: 'SNEG' },
-  { filename: 'snezak.png', word: 'SNEŽAK' },
-  { filename: 'snezinka.png', word: 'SNEŽINKA' },
-  { filename: 'sok.png', word: 'SOK' },
-  { filename: 'sonce.png', word: 'SONCE' },
-  { filename: 'sova.png', word: 'SOVA' },
-  { filename: 'stol.png', word: 'STOL' },
-  { filename: 'svetilka.png', word: 'SVETILKA' },
-  { filename: 'svincnik.png', word: 'SVINČNIK' }
+  { filename: 'sedem.webp', word: 'SEDEM' },
+  { filename: 'sir.webp', word: 'SIR' },
+  { filename: 'sladoled.webp', word: 'SLADOLED' },
+  { filename: 'slika.webp', word: 'SLIKA' },
+  { filename: 'slon.webp', word: 'SLON' },
+  { filename: 'sluz.webp', word: 'SLUZ' },
+  { filename: 'smreka.webp', word: 'SMREKA' },
+  { filename: 'sneg.webp', word: 'SNEG' },
+  { filename: 'snezak.webp', word: 'SNEŽAK' },
+  { filename: 'snezinka.webp', word: 'SNEŽINKA' },
+  { filename: 'sok.webp', word: 'SOK' },
+  { filename: 'sonce.webp', word: 'SONCE' },
+  { filename: 'sova.webp', word: 'SOVA' },
+  { filename: 'stol.webp', word: 'STOL' },
+  { filename: 'svetilka.webp', word: 'SVETILKA' },
+  { filename: 'svincnik.webp', word: 'SVINČNIK' }
 ];
 
 // Š images (10 images)
 export const šImages: PuzzleImage[] = [
-  { filename: 'sah.png', word: 'ŠAH' },
-  { filename: 'sal.png', word: 'ŠAL' },
-  { filename: 'scetka.png', word: 'ŠČETKA' },
-  { filename: 'skarje.png', word: 'ŠKARJE' },
-  { filename: 'skatla.png', word: 'ŠKATLA' },
-  { filename: 'skoljka.png', word: 'ŠKOLJKA' },
-  { filename: 'sopek.png', word: 'ŠOPEK' },
-  { filename: 'sotor.png', word: 'ŠOTOR' },
-  { filename: 'stampiljka.png', word: 'ŠTAMPILJKA' },
-  { filename: 'storklja.png', word: 'ŠTORKLJA' }
+  { filename: 'sah.webp', word: 'ŠAH' },
+  { filename: 'sal.webp', word: 'ŠAL' },
+  { filename: 'scetka.webp', word: 'ŠČETKA' },
+  { filename: 'skarje.webp', word: 'ŠKARJE' },
+  { filename: 'skatla.webp', word: 'ŠKATLA' },
+  { filename: 'skoljka.webp', word: 'ŠKOLJKA' },
+  { filename: 'sopek.webp', word: 'ŠOPEK' },
+  { filename: 'sotor.webp', word: 'ŠOTOR' },
+  { filename: 'stampiljka.webp', word: 'ŠTAMPILJKA' },
+  { filename: 'storklja.webp', word: 'ŠTORKLJA' }
 ];
 
 // Z images (11 images)
 export const zImages: PuzzleImage[] = [
-  { filename: 'zajec.png', word: 'ZAJEC' },
-  { filename: 'zaslon.png', word: 'ZASLON' },
-  { filename: 'zavesa.png', word: 'ZAVESA' },
-  { filename: 'zebra.png', word: 'ZEBRA' },
-  { filename: 'zlato.png', word: 'ZLATO' },
-  { filename: 'zmaj.png', word: 'ZMAJ' },
-  { filename: 'zob.png', word: 'ZOB' },
-  { filename: 'zobotrebec.png', word: 'ZOBOTREBEC' },
-  { filename: 'zvezda.png', word: 'ZVEZDA' },
-  { filename: 'zvezek.png', word: 'ZVEZEK' },
-  { filename: 'zvocnik.png', word: 'ZVOČNIK' }
+  { filename: 'zajec.webp', word: 'ZAJEC' },
+  { filename: 'zaslon.webp', word: 'ZASLON' },
+  { filename: 'zavesa.webp', word: 'ZAVESA' },
+  { filename: 'zebra.webp', word: 'ZEBRA' },
+  { filename: 'zlato.webp', word: 'ZLATO' },
+  { filename: 'zmaj.webp', word: 'ZMAJ' },
+  { filename: 'zob.webp', word: 'ZOB' },
+  { filename: 'zobotrebec.webp', word: 'ZOBOTREBEC' },
+  { filename: 'zvezda.webp', word: 'ZVEZDA' },
+  { filename: 'zvezek.webp', word: 'ZVEZEK' },
+  { filename: 'zvocnik.webp', word: 'ZVOČNIK' }
 ];
 
 // Ž images (10 images)
 export const žImages: PuzzleImage[] = [
-  { filename: 'zaba.png', word: 'ŽABA' },
-  { filename: 'zaga.png', word: 'ŽAGA' },
-  { filename: 'zarnica.png', word: 'ŽARNICA' },
-  { filename: 'zebelj.png', word: 'ŽEBELJ' },
-  { filename: 'zelva.png', word: 'ŽELVA' },
-  { filename: 'zerjav.png', word: 'ŽERJAV' },
-  { filename: 'zirafa.png', word: 'ŽIRAFA' },
-  { filename: 'zlica.png', word: 'ŽLICA' },
-  { filename: 'zoga.png', word: 'ŽOGA' },
-  { filename: 'zolna.png', word: 'ŽOLNA' }
+  { filename: 'zaba.webp', word: 'ŽABA' },
+  { filename: 'zaga.webp', word: 'ŽAGA' },
+  { filename: 'zarnica.webp', word: 'ŽARNICA' },
+  { filename: 'zebelj.webp', word: 'ŽEBELJ' },
+  { filename: 'zelva.webp', word: 'ŽELVA' },
+  { filename: 'zerjav.webp', word: 'ŽERJAV' },
+  { filename: 'zirafa.webp', word: 'ŽIRAFA' },
+  { filename: 'zlica.webp', word: 'ŽLICA' },
+  { filename: 'zoga.webp', word: 'ŽOGA' },
+  { filename: 'zolna.webp', word: 'ŽOLNA' }
 ];
 
 // Helper function to get random image from array

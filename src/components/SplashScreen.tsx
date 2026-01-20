@@ -133,7 +133,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
                   repeatDelay: 1,
                 },
               }}
-              src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_6.png"
+              src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_6.webp"
               alt="TomiTalk zmajček"
               className="w-64 h-64 md:w-80 md:h-80 object-contain"
               onError={(e) => {
