@@ -93,35 +93,50 @@ export function GenericIgraUjemanjaGame({ config }: GenericIgraUjemanjaGameProps
     };
   }, []);
 
-  // Request fullscreen and lock orientation on touch devices
+  // Request fullscreen and lock orientation on touch devices - triggers immediately like Spomin
   useEffect(() => {
-    if (isTouchDevice && !isPortrait) {
-      const requestFullscreenAndLock = async () => {
+    if (isTouchDevice) {
+      const requestFullscreen = async () => {
         try {
           if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
             await document.documentElement.requestFullscreen();
           }
-          if (screen.orientation && 'lock' in screen.orientation) {
-            await (screen.orientation as any).lock('landscape');
-          }
-        } catch (err) {
-          console.log('Fullscreen/orientation lock not available:', err);
+        } catch (error) {
+          console.log('Fullscreen not supported:', error);
         }
       };
-      requestFullscreenAndLock();
-    }
 
-    return () => {
-      if (document.fullscreenElement) {
-        document.exitFullscreen().catch(() => {});
-      }
-      if (screen.orientation && 'unlock' in screen.orientation) {
+      const lockLandscape = async () => {
         try {
-          (screen.orientation as any).unlock();
-        } catch (err) {}
-      }
-    };
-  }, [isTouchDevice, isPortrait]);
+          if (screen.orientation && 'lock' in screen.orientation) {
+            try {
+              await (screen.orientation as any).lock('landscape-primary');
+            } catch {
+              await (screen.orientation as any).lock('landscape');
+            }
+          }
+        } catch (error) {
+          console.log('Landscape lock not supported:', error);
+        }
+      };
+
+      requestFullscreen();
+      lockLandscape();
+
+      return () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen?.();
+        }
+        try {
+          if (screen.orientation && 'unlock' in screen.orientation) {
+            (screen.orientation as any).unlock();
+          }
+        } catch (error) {
+          console.log('Portrait unlock not supported:', error);
+        }
+      };
+    }
+  }, [isTouchDevice]);
 
   // Separate handlers for each game type
   const handleMatchingComplete = (score: number, images: MatchingGameImage[]) => {
