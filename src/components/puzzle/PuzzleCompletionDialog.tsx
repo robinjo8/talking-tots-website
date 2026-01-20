@@ -24,7 +24,12 @@ export function PuzzleCompletionDialog({
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
 
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${completedImage.filename}`;
-  const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/audio-besede/R/${completedImage.word.toLowerCase()}.mp3`;
+  const normalizedWord = completedImage.word
+    .toLowerCase()
+    .replace(/č/g, 'c')
+    .replace(/š/g, 's')
+    .replace(/ž/g, 'z');
+  const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${normalizedWord}.m4a`;
 
   // Play audio automatically when dialog opens and reset recording state
   useEffect(() => {

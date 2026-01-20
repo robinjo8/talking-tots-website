@@ -9,6 +9,6 @@ export const playAudio = (audioUrl: string, audioRef: React.RefObject<HTMLAudioE
 };
 
 export const handlePlayRozaAudio = (audioRef: React.RefObject<HTMLAudioElement>) => {
-  const audioUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/audio-besede//Roza.mp3";
+  const audioUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/roza.m4a";
   playAudio(audioUrl, audioRef);
 };
