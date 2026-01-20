@@ -45,10 +45,10 @@ export function MatchingGame({
     );
   }
 
-  // Dynamic tile sizing based on landscape mode
+  // Dynamic tile sizing based on landscape mode - matching FourColumnGame sizing
   const tileClass = isLandscape 
-    ? "mx-auto w-16 h-16 sm:w-20 sm:h-20" 
-    : "mx-auto w-24 h-24 md:w-48 md:h-48 lg:w-52 lg:h-52";
+    ? "mx-auto w-14 h-14 sm:w-16 sm:h-16" 
+    : "mx-auto w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-40 lg:h-40 xl:w-44 xl:h-44";
 
   return (
     <div className={cn("w-full h-full flex items-center justify-center", className)}>
