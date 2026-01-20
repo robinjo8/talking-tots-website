@@ -27,10 +27,6 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
-    logStep("Stripe key verified");
-
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       logStep("No authorization header, returning unsubscribed");
@@ -67,15 +63,66 @@ serve(async (req) => {
     const user = userData.user;
     logStep("User authenticated", { userId: user.id, email: user.email });
 
+    // PRIMARY: Check database first (synced by webhooks)
+    const { data: sub, error: subError } = await supabaseClient
+      .from('user_subscriptions')
+      .select('*')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (sub && sub.status !== 'inactive') {
+      logStep("Found subscription in database", { 
+        status: sub.status, 
+        planId: sub.plan_id 
+      });
+      
+      // Determine if still subscribed (active, trialing, or canceled but in period)
+      const isActive = sub.status === 'active' || sub.status === 'trialing';
+      const periodEnd = sub.current_period_end ? new Date(sub.current_period_end) : null;
+      const isStillInPeriod = periodEnd && periodEnd > new Date();
+      const isSubscribed = isActive || (sub.status === 'canceled' && isStillInPeriod);
+
+      return new Response(JSON.stringify({
+        subscribed: isSubscribed,
+        productId: sub.stripe_product_id,
+        subscriptionEnd: sub.current_period_end,
+        isTrialing: sub.status === 'trialing',
+        trialEnd: sub.trial_end
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
+    // FALLBACK: Check Stripe directly (for users not yet in database)
+    logStep("No subscription in database, checking Stripe as fallback");
+    
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    if (!stripeKey) {
+      logStep("STRIPE_SECRET_KEY not set, returning unsubscribed");
+      return new Response(JSON.stringify({ 
+        subscribed: false,
+        productId: null,
+        subscriptionEnd: null,
+        isTrialing: false,
+        trialEnd: null
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     
     if (customers.data.length === 0) {
-      logStep("No customer found, returning unsubscribed state");
+      logStep("No Stripe customer found, returning unsubscribed");
       return new Response(JSON.stringify({ 
         subscribed: false,
         productId: null,
-        subscriptionEnd: null
+        subscriptionEnd: null,
+        isTrialing: false,
+        trialEnd: null
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -85,14 +132,11 @@ serve(async (req) => {
     const customerId = customers.data[0].id;
     logStep("Found Stripe customer", { customerId });
 
-    // Check for active or trialing subscriptions
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
-      limit: 10, // Get more to find valid ones
+      limit: 10,
     });
     
-    // Filter to active or trialing subscriptions that are NOT canceled
-    // When user cancels, cancel_at_period_end becomes true - we treat this as unsubscribed
     const activeOrTrialingSub = subscriptions.data.find(
       sub => (sub.status === 'active' || sub.status === 'trialing') && !sub.cancel_at_period_end
     );
@@ -106,43 +150,36 @@ serve(async (req) => {
     if (hasActiveSub && activeOrTrialingSub) {
       const subscription = activeOrTrialingSub;
       isTrialing = subscription.status === 'trialing';
-      logStep("Subscription found", { 
-        subscriptionId: subscription.id, 
-        status: subscription.status,
-        isTrialing 
-      });
       
-      // Safely convert timestamps
       if (subscription.current_period_end && typeof subscription.current_period_end === 'number') {
-        try {
-          subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
-          logStep("Subscription end date", { subscriptionEnd });
-        } catch (e) {
-          logStep("Failed to parse subscription end date", { current_period_end: subscription.current_period_end });
-          subscriptionEnd = null;
-        }
+        subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
       }
       
-      // Get trial end date if trialing
       if (isTrialing && subscription.trial_end && typeof subscription.trial_end === 'number') {
-        try {
-          trialEnd = new Date(subscription.trial_end * 1000).toISOString();
-          logStep("Trial end date", { trialEnd });
-        } catch (e) {
-          logStep("Failed to parse trial end date", { trial_end: subscription.trial_end });
-          trialEnd = null;
-        }
+        trialEnd = new Date(subscription.trial_end * 1000).toISOString();
       }
       
-      // Get product ID from the subscription
       const subscriptionItem = subscription.items?.data?.[0];
       if (subscriptionItem?.price?.product) {
         const product = subscriptionItem.price.product;
         productId = typeof product === 'string' ? product : product?.id || null;
-        logStep("Determined subscription product", { productId });
       }
-    } else {
-      logStep("No active or trialing subscription found");
+
+      // Sync to database for future lookups
+      await supabaseClient.from("user_subscriptions").upsert({
+        user_id: user.id,
+        stripe_customer_id: customerId,
+        stripe_subscription_id: subscription.id,
+        stripe_product_id: productId,
+        status: subscription.status,
+        current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+        current_period_end: subscriptionEnd,
+        trial_end: trialEnd,
+        cancel_at_period_end: subscription.cancel_at_period_end,
+        updated_at: new Date().toISOString()
+      }, { onConflict: "user_id" });
+      
+      logStep("Synced Stripe subscription to database");
     }
 
     return new Response(JSON.stringify({

@@ -89,6 +89,20 @@ serve(async (req) => {
       logStep("Created new Stripe customer", { customerId });
     }
 
+    // Save customer ID to user_subscriptions table for webhook matching
+    const { error: upsertError } = await supabaseClient.from("user_subscriptions").upsert({
+      user_id: user.id,
+      stripe_customer_id: customerId,
+      status: 'inactive', // Will be updated by webhooks
+      updated_at: new Date().toISOString()
+    }, { onConflict: "user_id" });
+    
+    if (upsertError) {
+      logStep("Warning: Could not save customer ID to database", { error: upsertError.message });
+    } else {
+      logStep("Customer ID saved to database", { userId: user.id, customerId });
+    }
+
     // Create checkout session
     const origin = req.headers.get("origin") || "https://tomitalk.com";
     
@@ -113,8 +127,6 @@ serve(async (req) => {
     });
     
     logStep("Checkout session created with 7-day trial", { sessionId: session.id, url: session.url });
-
-    logStep("Checkout session created", { sessionId: session.id, url: session.url });
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
