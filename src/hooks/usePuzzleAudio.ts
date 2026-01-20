@@ -10,8 +10,7 @@ export function usePuzzleAudio() {
   const playRibaAudio = async () => {
     setIsAudioLoading(true);
     try {
-      // Since the bucket is public, we can access the file directly
-      const publicUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke/sestavljanka_riba.mp3";
+      const publicUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/riba.m4a";
       
       playAudio(publicUrl);
       toast({
@@ -33,7 +32,7 @@ export function usePuzzleAudio() {
   const playRokaAudio = async () => {
     setIsAudioLoading(true);
     try {
-      const publicUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke/sestavljanka_roka.mp4";
+      const publicUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/roka.m4a";
       
       playAudio(publicUrl);
       toast({
@@ -55,7 +54,7 @@ export function usePuzzleAudio() {
   const playRozaAudio = async () => {
     setIsAudioLoading(true);
     try {
-      const publicUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke/sestavljanka_roza.mp3";
+      const publicUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/roza.m4a";
       
       playAudio(publicUrl);
       toast({
