@@ -51,10 +51,10 @@ export function ThreeColumnGame({ items, onGameComplete, isLandscape = false }: 
   return (
     <div className="w-full h-full flex items-center justify-center">
       {/* Game area */}
-      <div className={`relative rounded-xl w-full max-w-4xl ${isLandscape ? 'p-2' : 'p-6'}`}>
-        <div className={`grid grid-cols-3 justify-center ${isLandscape ? 'gap-2' : 'gap-6'}`}>
+      <div className={`relative rounded-xl ${isLandscape ? 'w-full max-w-4xl p-1' : 'p-4 md:p-6 lg:p-8'}`}>
+        <div className={`grid grid-cols-3 justify-items-center ${isLandscape ? 'gap-1' : 'gap-2 sm:gap-3 md:gap-6 lg:gap-8 xl:gap-10'}`}>
           {/* Audio Column */}
-          <div className={`flex flex-col ${isLandscape ? 'gap-2' : 'gap-4'}`}>
+          <div className={`flex flex-col ${isLandscape ? 'gap-1' : 'gap-1 sm:gap-2 md:gap-4'}`}>
             {gameState.shuffledAudio.map((itemId, index) => {
               const item = items.find(i => i.id === itemId);
               if (!item) return null;
@@ -68,9 +68,9 @@ export function ThreeColumnGame({ items, onGameComplete, isLandscape = false }: 
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="p-2 pointer-events-none"
+                    className={isLandscape ? "p-0.5 pointer-events-none" : "p-2 md:p-3 pointer-events-none"}
                   >
-                    <Play className="w-6 h-6" />
+                    <Play className={isLandscape ? "w-3 h-3" : "w-5 h-5 sm:w-6 sm:h-6 md:w-10 md:h-10 lg:w-12 lg:h-12"} />
                   </Button>
                 </div>
               );
@@ -78,7 +78,7 @@ export function ThreeColumnGame({ items, onGameComplete, isLandscape = false }: 
           </div>
 
           {/* Shadow Images Column */}
-          <div className={`flex flex-col ${isLandscape ? 'gap-2' : 'gap-4'}`}>
+          <div className={`flex flex-col ${isLandscape ? 'gap-1' : 'gap-1 sm:gap-2 md:gap-4'}`}>
             {gameState.shuffledShadows.map((itemId, index) => {
               const item = items.find(i => i.id === itemId);
               if (!item) return null;
@@ -100,7 +100,7 @@ export function ThreeColumnGame({ items, onGameComplete, isLandscape = false }: 
           </div>
 
           {/* Original Images Column */}
-          <div className={`flex flex-col ${isLandscape ? 'gap-2' : 'gap-4'}`}>
+          <div className={`flex flex-col ${isLandscape ? 'gap-1' : 'gap-1 sm:gap-2 md:gap-4'}`}>
             {gameState.shuffledOriginals.map((itemId, index) => {
               const item = items.find(i => i.id === itemId);
               if (!item) return null;
