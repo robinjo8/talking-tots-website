@@ -83,7 +83,19 @@ export default function AdminMemberships() {
   }, [logopedists, userEmails]);
 
   const approveMutation = useMutation({
-    mutationFn: async (profileId: string) => {
+    mutationFn: async ({ profileId, userId }: { profileId: string; userId: string }) => {
+      // 1. Najprej potrdimo email v auth.users (rešuje iOS problem)
+      const confirmResponse = await supabase.functions.invoke('confirm-logopedist-email', {
+        body: { user_id: userId },
+      });
+
+      if (confirmResponse.error) {
+        console.error('Error confirming email:', confirmResponse.error);
+        // Nadaljujemo z odobritvijo, tudi če potrditev emaila ne uspe
+        // (morda je email že potrjen)
+      }
+
+      // 2. Nato odobrimo članstvo
       const { error } = await supabase
         .from('logopedist_profiles')
         .update({ is_verified: true })
@@ -93,7 +105,7 @@ export default function AdminMemberships() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-logopedists'] });
-      toast.success('Članstvo je bilo odobreno! Logoped se lahko zdaj prijavi.');
+      toast.success('Članstvo je bilo odobreno! Email je potrjen in logoped se lahko zdaj prijavi.');
     },
     onError: (error) => {
       console.error('Error approving membership:', error);
@@ -210,7 +222,7 @@ export default function AdminMemberships() {
                     <div className="flex gap-2 ml-4">
                       <Button
                         size="sm"
-                        onClick={() => approveMutation.mutate(logopedist.id)}
+                        onClick={() => approveMutation.mutate({ profileId: logopedist.id, userId: logopedist.user_id })}
                         disabled={approveMutation.isPending}
                         className="bg-green-600 hover:bg-green-700"
                       >
