@@ -15,6 +15,9 @@ export const CallToActionSection = () => {
               <div className="relative w-full h-full">
                 <img
                   alt="Tomi Talk Dragon Mascot"
+                  loading="lazy"
+                  width={208}
+                  height={208}
                   className="w-full h-full object-contain"
                   src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_naslovna_1.webp"
                 />
