@@ -23,7 +23,7 @@ export function PuzzleCompletionDialog({
   const { playAudio } = useAudioPlayback();
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
 
-  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/sestavljanke/${completedImage.filename}`;
+  const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${completedImage.filename}`;
   const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/audio-besede/R/${completedImage.word.toLowerCase()}.mp3`;
 
   // Play audio automatically when dialog opens and reset recording state
