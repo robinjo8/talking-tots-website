@@ -6,20 +6,20 @@ export interface BingoWord {
 }
 
 export const wordsDataČSredinaKonec: BingoWord[] = [
-  { word: "HLAČE", image: "hlace.png", audio: "hlace.m4a" },
-  { word: "KAČA", image: "kaca.png", audio: "kaca.m4a" },
-  { word: "KLJUČ", image: "kljuc.png", audio: "kljuc.m4a" },
-  { word: "KOLAČ", image: "kolac.png", audio: "kolac.m4a" },
-  { word: "LUČ", image: "luc.png", audio: "luc.m4a" },
-  { word: "OČALA", image: "ocala.png", audio: "ocala.m4a" },
-  { word: "OČI", image: "oci.png", audio: "oci.m4a" },
-  { word: "SVINČNIK", image: "svincnik.png", audio: "svincnik.m4a" },
-  { word: "ŠČETKA", image: "scetka.png", audio: "scetka.m4a" },
-  { word: "ZVOČNIK", image: "zvocnik.png", audio: "zvocnik.m4a" },
-  { word: "ČOPIČ", image: "copic.png", audio: "copic.m4a" },
-  { word: "NOČ", image: "noc.png", audio: "noc.m4a" },
-  { word: "OBROČ", image: "obroc.png", audio: "obroc.m4a" },
-  { word: "PEČ", image: "pec.png", audio: "pec.m4a" },
-  { word: "PTIČ", image: "ptic.png", audio: "ptic.m4a" },
-  { word: "RIBIČ", image: "ribic.png", audio: "ribic.m4a" }
+  { word: "HLAČE", image: "hlace.webp", audio: "hlace.m4a" },
+  { word: "KAČA", image: "kaca.webp", audio: "kaca.m4a" },
+  { word: "KLJUČ", image: "kljuc.webp", audio: "kljuc.m4a" },
+  { word: "KOLAČ", image: "kolac.webp", audio: "kolac.m4a" },
+  { word: "LUČ", image: "luc.webp", audio: "luc.m4a" },
+  { word: "OČALA", image: "ocala.webp", audio: "ocala.m4a" },
+  { word: "OČI", image: "oci.webp", audio: "oci.m4a" },
+  { word: "SVINČNIK", image: "svincnik.webp", audio: "svincnik.m4a" },
+  { word: "ŠČETKA", image: "scetka.webp", audio: "scetka.m4a" },
+  { word: "ZVOČNIK", image: "zvocnik.webp", audio: "zvocnik.m4a" },
+  { word: "ČOPIČ", image: "copic.webp", audio: "copic.m4a" },
+  { word: "NOČ", image: "noc.webp", audio: "noc.m4a" },
+  { word: "OBROČ", image: "obroc.webp", audio: "obroc.m4a" },
+  { word: "PEČ", image: "pec.webp", audio: "pec.m4a" },
+  { word: "PTIČ", image: "ptic.webp", audio: "ptic.m4a" },
+  { word: "RIBIČ", image: "ribic.webp", audio: "ribic.m4a" }
 ];

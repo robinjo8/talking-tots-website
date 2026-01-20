@@ -85,7 +85,7 @@ export const HeroSection = () => {
               <div className="relative -my-4">
                 <div className="relative w-full aspect-square max-w-xs mx-auto scale-[0.8]">
                 <img
-                    src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_0.png"
+                    src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_0.webp"
                     alt="Zmajček maskota"
                     className="w-full h-full object-contain animate-float"
                     style={{ transform: 'scaleX(-1)' }}
@@ -136,7 +136,7 @@ export const HeroSection = () => {
             <div className="relative">
               <div className="relative w-full aspect-square max-w-lg mx-auto">
               <img
-                  src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_0.png"
+                  src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_0.webp"
                   alt="Zmajček maskota"
                   className="w-full h-full object-contain animate-float"
                   style={{ transform: 'scaleX(-1)' }}

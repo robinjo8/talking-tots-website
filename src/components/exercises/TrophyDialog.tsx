@@ -10,7 +10,7 @@ interface TrophyDialogProps {
 }
 
 export const TrophyDialog = ({ isOpen, onClose, onClaimTrophy, childName, totalStars, trophyNumber }: TrophyDialogProps) => {
-  const trophyImageUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/Zmajcek_pokal.png";
+  const trophyImageUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/Zmajcek_pokal.webp";
 
   const handleClaimTrophy = () => {
     if (onClaimTrophy) {

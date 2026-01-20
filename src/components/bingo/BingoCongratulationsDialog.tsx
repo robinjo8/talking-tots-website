@@ -29,7 +29,7 @@ export const BingoCongratulationsDialog: React.FC<BingoCongratulationsDialogProp
           </h1>
           
           <img
-            src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_11.png"
+            src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_11.webp"
             alt="Zmajček"
             className="w-48 h-48 object-contain"
           />

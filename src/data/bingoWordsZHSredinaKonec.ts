@@ -6,20 +6,20 @@ export interface BingoWord {
 }
 
 export const wordsDataŽSredinaKonec: BingoWord[] = [
-  { word: "DEŽEVNIK", image: "dezevnik.png", audio: "dezevnik.m4a" },
-  { word: "DEŽNIK", image: "deznik.png", audio: "deznik.m4a" },
-  { word: "FIŽOL", image: "fizol.png", audio: "fizol.m4a" },
-  { word: "KROŽNIK", image: "kroznik.png", audio: "kroznik.m4a" },
-  { word: "KUŽA", image: "kuza.png", audio: "kuza.m4a" },
-  { word: "ROŽA", image: "roza.png", audio: "roza.m4a" },
-  { word: "SNEŽAK", image: "snezak.png", audio: "snezak.m4a" },
-  { word: "GARAŽA", image: "garaza.png", audio: "garaza.m4a" },
-  { word: "KOŽA", image: "koza.png", audio: "koza.m4a" },
-  { word: "LUŽA", image: "luza.png", audio: "luza.m4a" },
-  { word: "MOŽGANI", image: "mozgani.png", audio: "mozgani.m4a" },
-  { word: "MREŽA", image: "mreza.png", audio: "mreza.m4a" },
-  { word: "PARADIŽNIK", image: "paradiznik.png", audio: "paradiznik.m4a" },
-  { word: "POŽAR", image: "pozar.png", audio: "pozar.m4a" },
-  { word: "SNEŽINKA", image: "snezinka.png", audio: "snezinka.m4a" },
-  { word: "VERIŽICA", image: "verizica.png", audio: "verizica.m4a" }
+  { word: "DEŽEVNIK", image: "dezevnik.webp", audio: "dezevnik.m4a" },
+  { word: "DEŽNIK", image: "deznik.webp", audio: "deznik.m4a" },
+  { word: "FIŽOL", image: "fizol.webp", audio: "fizol.m4a" },
+  { word: "KROŽNIK", image: "kroznik.webp", audio: "kroznik.m4a" },
+  { word: "KUŽA", image: "kuza.webp", audio: "kuza.m4a" },
+  { word: "ROŽA", image: "roza.webp", audio: "roza.m4a" },
+  { word: "SNEŽAK", image: "snezak.webp", audio: "snezak.m4a" },
+  { word: "GARAŽA", image: "garaza.webp", audio: "garaza.m4a" },
+  { word: "KOŽA", image: "koza.webp", audio: "koza.m4a" },
+  { word: "LUŽA", image: "luza.webp", audio: "luza.m4a" },
+  { word: "MOŽGANI", image: "mozgani.webp", audio: "mozgani.m4a" },
+  { word: "MREŽA", image: "mreza.webp", audio: "mreza.m4a" },
+  { word: "PARADIŽNIK", image: "paradiznik.webp", audio: "paradiznik.m4a" },
+  { word: "POŽAR", image: "pozar.webp", audio: "pozar.m4a" },
+  { word: "SNEŽINKA", image: "snezinka.webp", audio: "snezinka.m4a" },
+  { word: "VERIŽICA", image: "verizica.webp", audio: "verizica.m4a" }
 ];
