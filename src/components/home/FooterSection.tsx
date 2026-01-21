@@ -1,6 +1,28 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
+import { SubscriptionRequiredModal } from "@/components/subscription/SubscriptionRequiredModal";
 
 export const FooterSection = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { isSubscribed, isLoading } = useSubscriptionContext();
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+
+  const handleProtectedNavigate = (path: string) => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    if (isLoading) return;
+    if (!isSubscribed) {
+      setShowSubscriptionModal(true);
+      return;
+    }
+    navigate(path);
+  };
+
   return (
     <footer className="py-10 px-4 md:px-10 bg-light-cloud w-full">
       <div className="max-w-7xl mx-auto">
@@ -17,24 +39,36 @@ export const FooterSection = () => {
             <h4 className="font-bold text-foreground mb-4">MOJE APLIKACIJE</h4>
             <ul className="space-y-2">
               <li>
-                <Link to="/moji-izzivi" className="text-muted-foreground hover:text-dragon-green transition-colors">
+                <button 
+                  onClick={() => handleProtectedNavigate("/moji-izzivi")}
+                  className="text-muted-foreground hover:text-dragon-green transition-colors text-left"
+                >
                   Moji izzivi
-                </Link>
+                </button>
               </li>
               <li>
-                <Link to="/govorne-igre" className="text-muted-foreground hover:text-dragon-green transition-colors">
+                <button 
+                  onClick={() => handleProtectedNavigate("/govorne-igre")}
+                  className="text-muted-foreground hover:text-dragon-green transition-colors text-left"
+                >
                   Govorne igre
-                </Link>
+                </button>
               </li>
               <li>
-                <Link to="/govorno-jezikovne-vaje" className="text-muted-foreground hover:text-dragon-green transition-colors">
+                <button 
+                  onClick={() => handleProtectedNavigate("/govorno-jezikovne-vaje")}
+                  className="text-muted-foreground hover:text-dragon-green transition-colors text-left"
+                >
                   Govorne vaje
-                </Link>
+                </button>
               </li>
               <li>
-                <Link to="/artikulacijski-test" className="text-muted-foreground hover:text-dragon-green transition-colors">
+                <button 
+                  onClick={() => handleProtectedNavigate("/artikulacijski-test")}
+                  className="text-muted-foreground hover:text-dragon-green transition-colors text-left"
+                >
                   Preverjanje izgovorjave
-                </Link>
+                </button>
               </li>
             </ul>
           </div>
@@ -101,9 +135,12 @@ export const FooterSection = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/video-navodila" className="text-muted-foreground hover:text-dragon-green transition-colors">
+                <button 
+                  onClick={() => handleProtectedNavigate("/video-navodila")}
+                  className="text-muted-foreground hover:text-dragon-green transition-colors text-left"
+                >
                   Video navodila
-                </Link>
+                </button>
               </li>
               <li>
                 <Link to="/logopedski-koticek" className="text-muted-foreground hover:text-dragon-green transition-colors">
@@ -146,6 +183,11 @@ export const FooterSection = () => {
           © 2025 Tomi Talk. Vse pravice pridržane.
         </div>
       </div>
+      
+      <SubscriptionRequiredModal 
+        open={showSubscriptionModal} 
+        onOpenChange={setShowSubscriptionModal}
+      />
     </footer>
   );
 };
