@@ -6,7 +6,8 @@ export const useBannerVisible = () => {
   const { user, profile } = useAuth();
   const { isSubscribed } = useSubscriptionContext();
   // Only show banner if user is logged in, HAS a subscription, but no children
-  return user && isSubscribed && (!profile?.children || profile.children.length === 0);
+  // Don't show to logopedists - they don't add children through this banner
+  return user && isSubscribed && !profile?.isLogopedist && (!profile?.children || profile.children.length === 0);
 };
 
 export const MissingChildBanner = () => {
@@ -14,7 +15,8 @@ export const MissingChildBanner = () => {
   const { isSubscribed } = useSubscriptionContext();
   
   // Only show if user has subscription but no children
-  const isVisible = user && isSubscribed && (!profile?.children || profile.children.length === 0);
+  // Don't show to logopedists - they don't add children through this banner
+  const isVisible = user && isSubscribed && !profile?.isLogopedist && (!profile?.children || profile.children.length === 0);
   
   if (!isVisible) return null;
   

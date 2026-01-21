@@ -21,7 +21,7 @@ export function DesktopNavigation({ user, onStartNow, onCenikNavigate }: Desktop
   const { isSubscribed, isLoading } = useSubscriptionContext();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
-  // If user is a logopedist, show simplified navigation with admin portal link
+  // If user is a logopedist, show simplified navigation with notification and organization button
   if (user && profile?.isLogopedist) {
     return (
       <div className="hidden lg:flex items-center justify-between w-full">
@@ -36,14 +36,23 @@ export function DesktopNavigation({ user, onStartNow, onCenikNavigate }: Desktop
           </div>
         </Link>
         
-        {/* Right side - Admin portal button */}
-        <Button
-          onClick={() => navigate('/admin')}
-          className="rounded-full h-10 text-sm px-4 font-semibold uppercase bg-app-blue hover:bg-app-blue/90 text-white"
-        >
-          <Building2 className="h-4 w-4 mr-1" />
-          Admin portal
-        </Button>
+        {/* Right side - Notification + Button */}
+        <div className="flex items-center gap-4">
+          {/* Obvestilo za logopedista */}
+          <div className="text-sm text-muted-foreground bg-accent px-4 py-2 rounded-lg border border-border">
+            Prijavljeni ste s profilom "<span className="font-semibold text-foreground">Za organizacije</span>". 
+            Za preusmeritev pritisnite gumb →
+          </div>
+          
+          {/* Gumb ZA ORGANIZACIJE */}
+          <Button
+            onClick={() => navigate('/admin')}
+            className="rounded-full h-10 text-sm px-4 font-semibold uppercase bg-app-blue hover:bg-app-blue/90 text-white"
+          >
+            <Building2 className="h-4 w-4 mr-1" />
+            Za organizacije
+          </Button>
+        </div>
       </div>
     );
   }
