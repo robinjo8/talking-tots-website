@@ -89,6 +89,31 @@ serve(async (req) => {
       logStep("Created new Stripe customer", { customerId });
     }
 
+    // Check for existing active or trialing subscriptions to prevent duplicates
+    const existingSubscriptions = await stripe.subscriptions.list({
+      customer: customerId,
+      status: 'active',
+      limit: 1
+    });
+
+    const trialingSubscriptions = await stripe.subscriptions.list({
+      customer: customerId,
+      status: 'trialing',
+      limit: 1
+    });
+
+    if (existingSubscriptions.data.length > 0 || trialingSubscriptions.data.length > 0) {
+      const existingSub = existingSubscriptions.data[0] || trialingSubscriptions.data[0];
+      logStep("User already has active subscription", { 
+        customerId, 
+        subscriptionId: existingSub.id,
+        status: existingSub.status
+      });
+      throw new Error("Že imate aktivno naročnino. Za spremembo paketa uporabite upravljanje naročnine.");
+    }
+    
+    logStep("No existing subscriptions found, proceeding with checkout");
+
     // Save customer ID to user_subscriptions table for webhook matching
     const { error: upsertError } = await supabaseClient.from("user_subscriptions").upsert({
       user_id: user.id,
