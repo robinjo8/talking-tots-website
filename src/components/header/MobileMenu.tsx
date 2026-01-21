@@ -32,7 +32,7 @@ export function MobileMenu({
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  // If user is a logopedist, show simplified menu with admin portal link
+  // If user is a logopedist, show simplified menu with organization button
   if (user && profile?.isLogopedist) {
     return (
       <div className="lg:hidden flex items-center gap-2">
@@ -44,11 +44,15 @@ export function MobileMenu({
           </SheetTrigger>
           <SheetContent side="right" className="p-0 w-80 flex flex-col h-full">
             <div className="flex flex-col p-6 space-y-6">
-              <div className="p-3 bg-blue-50 rounded-md">
-                <div className="font-medium text-base uppercase">Logoped</div>
-                <div className="text-sm text-muted-foreground">Prijavljen kot logoped</div>
+              {/* Obvestilo za logopedista */}
+              <div className="p-3 bg-accent rounded-md border border-border">
+                <div className="text-sm text-muted-foreground">
+                  Prijavljeni ste s profilom "<span className="font-semibold text-foreground">Za organizacije</span>". 
+                  Za preusmeritev pritisnite spodnji gumb.
+                </div>
               </div>
               
+              {/* Gumb ZA ORGANIZACIJE */}
               <Button
                 onClick={() => {
                   setIsOpen(false);
@@ -57,7 +61,7 @@ export function MobileMenu({
                 className="w-full h-12 rounded-full text-base font-semibold uppercase bg-app-blue hover:bg-app-blue/90 text-white"
               >
                 <Building2 className="h-4 w-4 mr-2" />
-                Admin portal
+                Za organizacije
               </Button>
               
               <Button 
@@ -66,7 +70,7 @@ export function MobileMenu({
                   setIsOpen(false);
                   onSignOut();
                 }} 
-                className="w-full justify-start text-left h-12 mt-4 text-red-600 uppercase"
+                className="w-full justify-start text-left h-12 mt-4 text-destructive uppercase"
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 Odjava
