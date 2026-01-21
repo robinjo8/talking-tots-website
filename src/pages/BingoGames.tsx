@@ -14,15 +14,15 @@ import { ArrowLeft } from "lucide-react";
 
 // Letter card data for Bingo (bingo games - sredina/konec)
 const bingoLetters = [
-  { id: "c", letter: "C", title: "Črka C - sredina/konec", gradient: "from-app-orange to-app-yellow", image: "c_zmaj.png", path: "/govorne-igre/bingo/c" },
-  { id: "ch", letter: "Č", title: "Črka Č - sredina/konec", gradient: "from-dragon-green to-app-teal", image: "ch_zmaj.png", path: "/govorne-igre/bingo/ch" },
-  { id: "k", letter: "K", title: "Črka K - sredina/konec", gradient: "from-app-purple to-app-blue", image: "k_zmaj.png", path: "/govorne-igre/bingo/k" },
-  { id: "l", letter: "L", title: "Črka L - sredina/konec", gradient: "from-app-orange to-app-yellow", image: "l_zmaj.png", path: "/govorne-igre/bingo/l" },
-  { id: "r", letter: "R", title: "Črka R - sredina/konec", gradient: "from-dragon-green to-app-teal", image: "r_zmaj.png", path: "/govorne-igre/bingo/r" },
-  { id: "s", letter: "S", title: "Črka S - sredina/konec", gradient: "from-app-purple to-app-blue", image: "s_zmaj.png", path: "/govorne-igre/bingo/s" },
-  { id: "sh", letter: "Š", title: "Črka Š - sredina/konec", gradient: "from-app-orange to-app-yellow", image: "sh_zmaj.png", path: "/govorne-igre/bingo/sh" },
-  { id: "z", letter: "Z", title: "Črka Z - sredina/konec", gradient: "from-dragon-green to-app-teal", image: "z_zmaj.png", path: "/govorne-igre/bingo/z" },
-  { id: "zh", letter: "Ž", title: "Črka Ž - sredina/konec", gradient: "from-app-purple to-app-blue", image: "zh_zmaj.png", path: "/govorne-igre/bingo/zh" },
+  { id: "c", letter: "C", title: "Črka C", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_C.png", path: "/govorne-igre/bingo/c" },
+  { id: "ch", letter: "Č", title: "Črka Č", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_Č.png", path: "/govorne-igre/bingo/ch" },
+  { id: "k", letter: "K", title: "Črka K", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_K.png", path: "/govorne-igre/bingo/k" },
+  { id: "l", letter: "L", title: "Črka L", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_L.png", path: "/govorne-igre/bingo/l" },
+  { id: "r", letter: "R", title: "Črka R", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_R.png", path: "/govorne-igre/bingo/r" },
+  { id: "s", letter: "S", title: "Črka S", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_S.png", path: "/govorne-igre/bingo/s" },
+  { id: "sh", letter: "Š", title: "Črka Š", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_Š.png", path: "/govorne-igre/bingo/sh" },
+  { id: "z", letter: "Z", title: "Črka Z", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_Z.png", path: "/govorne-igre/bingo/z" },
+  { id: "zh", letter: "Ž", title: "Črka Ž", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_Ž.png", path: "/govorne-igre/bingo/zh" },
 ];
 
 export default function BingoGames() {

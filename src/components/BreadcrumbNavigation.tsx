@@ -59,6 +59,30 @@ const breadcrumbConfig: BreadcrumbConfig[] = [
   { path: "/govorne-igre/zaporedja", label: "Zaporedja", parent: "/govorne-igre" },
   { path: "/govorne-igre/zaporedja/c", label: "C", parent: "/govorne-igre/zaporedja" },
   
+  // Kolo sreče
+  { path: "/govorne-igre/kolo-srece", label: "Kolo sreče", parent: "/govorne-igre" },
+  { path: "/govorne-igre/kolo-srece/c", label: "C", parent: "/govorne-igre/kolo-srece" },
+  { path: "/govorne-igre/kolo-srece/ch", label: "Č", parent: "/govorne-igre/kolo-srece" },
+  { path: "/govorne-igre/kolo-srece/k", label: "K", parent: "/govorne-igre/kolo-srece" },
+  { path: "/govorne-igre/kolo-srece/l", label: "L", parent: "/govorne-igre/kolo-srece" },
+  { path: "/govorne-igre/kolo-srece/r", label: "R", parent: "/govorne-igre/kolo-srece" },
+  { path: "/govorne-igre/kolo-srece/s", label: "S", parent: "/govorne-igre/kolo-srece" },
+  { path: "/govorne-igre/kolo-srece/sh", label: "Š", parent: "/govorne-igre/kolo-srece" },
+  { path: "/govorne-igre/kolo-srece/z", label: "Z", parent: "/govorne-igre/kolo-srece" },
+  { path: "/govorne-igre/kolo-srece/zh", label: "Ž", parent: "/govorne-igre/kolo-srece" },
+  
+  // Bingo
+  { path: "/govorne-igre/bingo", label: "Bingo", parent: "/govorne-igre" },
+  { path: "/govorne-igre/bingo/c", label: "C", parent: "/govorne-igre/bingo" },
+  { path: "/govorne-igre/bingo/ch", label: "Č", parent: "/govorne-igre/bingo" },
+  { path: "/govorne-igre/bingo/k", label: "K", parent: "/govorne-igre/bingo" },
+  { path: "/govorne-igre/bingo/l", label: "L", parent: "/govorne-igre/bingo" },
+  { path: "/govorne-igre/bingo/r", label: "R", parent: "/govorne-igre/bingo" },
+  { path: "/govorne-igre/bingo/s", label: "S", parent: "/govorne-igre/bingo" },
+  { path: "/govorne-igre/bingo/sh", label: "Š", parent: "/govorne-igre/bingo" },
+  { path: "/govorne-igre/bingo/z", label: "Z", parent: "/govorne-igre/bingo" },
+  { path: "/govorne-igre/bingo/zh", label: "Ž", parent: "/govorne-igre/bingo" },
+  
   // Govorno-jezikovne vaje hierarchy
   { path: "/govornojezicovne-vaje", label: "Govorno-jezikovne vaje", parent: "/moje-aplikacije" },
   { path: "/govorno-jezikovne-vaje", label: "Govorno-jezikovne vaje", parent: "/moje-aplikacije" },
