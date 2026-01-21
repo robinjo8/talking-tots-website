@@ -207,10 +207,33 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
 }
 
 async function upsertSubscription(userId: string, customerId: string) {
+  // First, check if a record already exists with an active/trialing status
+  const { data: existing } = await supabase
+    .from("user_subscriptions")
+    .select("status")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  // If subscription is already active or trialing, don't overwrite with inactive
+  if (existing && (existing.status === 'active' || existing.status === 'trialing')) {
+    logStep("Subscription already active, skipping upsert to prevent overwrite", { 
+      userId, 
+      currentStatus: existing.status 
+    });
+    // Still update stripe_customer_id if needed
+    await supabase.from("user_subscriptions")
+      .update({ 
+        stripe_customer_id: customerId,
+        updated_at: new Date().toISOString()
+      })
+      .eq("user_id", userId);
+    return;
+  }
+
   const { error } = await supabase.from("user_subscriptions").upsert({
     user_id: userId,
     stripe_customer_id: customerId,
-    status: 'inactive', // Will be updated by subscription.created/updated events
+    status: 'inactive', // Only set if no active subscription exists
     updated_at: new Date().toISOString()
   }, { 
     onConflict: "user_id" 
