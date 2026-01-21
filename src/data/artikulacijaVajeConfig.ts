@@ -377,3 +377,33 @@ export function getArtikulacijaConfig(urlParam: string): ArtikulacijaConfig | nu
   const key = getConfigKey(urlParam);
   return artikulacijaConfigs[key] || null;
 }
+
+// Get wheel config by letter (for Kolo sreče games under /govorne-igre)
+export function getWheelConfig(letter: string): ArtikulacijaConfig | null {
+  const key = getConfigKey(letter);
+  const config = artikulacijaConfigs[key];
+  return config?.gameType === 'wheel' ? config : null;
+}
+
+// Get bingo config by letter (for Bingo games under /govorne-igre)
+export function getBingoConfig(letter: string): ArtikulacijaConfig | null {
+  const key = getConfigKey(letter);
+  // For bingo, the key needs '-sredina-konec' suffix
+  const bingoKey = `${key}-sredina-konec`;
+  const config = artikulacijaConfigs[bingoKey];
+  return config?.gameType === 'bingo' ? config : null;
+}
+
+// Get all wheel configurations for letter selection page
+export function getAllWheelConfigs(): { key: string; config: ArtikulacijaConfig }[] {
+  return Object.entries(artikulacijaConfigs)
+    .filter(([_, config]) => config.gameType === 'wheel')
+    .map(([key, config]) => ({ key, config }));
+}
+
+// Get all bingo configurations for letter selection page
+export function getAllBingoConfigs(): { key: string; config: ArtikulacijaConfig }[] {
+  return Object.entries(artikulacijaConfigs)
+    .filter(([_, config]) => config.gameType === 'bingo')
+    .map(([key, config]) => ({ key, config }));
+}

@@ -24,9 +24,10 @@ interface GenericBingoGameProps {
   title: string;
   wordsData: BingoWordData[];
   exerciseId: string;
+  backPath?: string;
 }
 
-export function GenericBingoGame({ letter, displayLetter, title, wordsData, exerciseId }: GenericBingoGameProps) {
+export function GenericBingoGame({ letter, displayLetter, title, wordsData, exerciseId, backPath = '/govorno-jezikovne-vaje/artikulacija' }: GenericBingoGameProps) {
   const navigate = useNavigate();
   const [showInstructions, setShowInstructions] = useState(false);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
@@ -69,7 +70,7 @@ export function GenericBingoGame({ letter, displayLetter, title, wordsData, exer
   };
 
   const handleConfirmExit = () => {
-    navigate('/govorno-jezikovne-vaje/artikulacija');
+    navigate(backPath);
   };
 
   const handleNewGame = () => {

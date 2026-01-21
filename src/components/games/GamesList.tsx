@@ -3,6 +3,28 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 const otherGames = [
   {
+    id: "kolo-srece",
+    title: "KOLO SREČE",
+    description: "Zavrti kolo sreče in vadi izgovorjavo črk",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/kolo_srece_kartica.png",
+    gradient: "from-app-orange/20 to-app-yellow/20",
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
+    path: "/govorne-igre/kolo-srece",
+    available: true,
+    mobileImageSize: "90%"
+  },
+  {
+    id: "bingo",
+    title: "BINGO",
+    description: "Igraj bingo in vadi izgovorjavo črk",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/bingo_kartica.png",
+    gradient: "from-dragon-green/20 to-app-teal/20",
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
+    path: "/govorne-igre/bingo",
+    available: true,
+    mobileImageSize: "90%"
+  },
+  {
     id: "spomin",
     title: "SPOMIN",
     description: "Igraj spomin in vadi izgovorjavo",
