@@ -41,11 +41,12 @@ const LogopedskiKoticek = () => {
     },
     {
       id: 'motorika',
-      title: 'Motorika govoril in artikulacija',
-      description: 'Razumevanje povezave med motoriko govoril in artikulacijo. Kako gibanje govornih organov vpliva na pravilno izgovorjavo glasov.',
+      title: 'Motorika govoril in artikulacija – razumevanje povezave',
+      description: 'V logopediji sta izraza motorika govoril in artikulacija tesno povezana, vendar označujeta različne vidike govora.',
       icon: sectionIcons.disorders,
       articleUrl: '/clanki/motorika-govoril',
       available: true,
+      imageUrl: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/logopedski-koticek/Motorika%20govoril%20in%20artikulacija_v2%20dodano.webp',
     },
     {
       id: 'disorders',
@@ -127,6 +128,12 @@ const LogopedskiKoticek = () => {
                 {section.id === 'development' ? (
                   <img
                     src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/logopedski-koticek/logoped_slika_1%20(1).webp"
+                    alt={section.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                ) : section.imageUrl ? (
+                  <img
+                    src={section.imageUrl}
                     alt={section.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
