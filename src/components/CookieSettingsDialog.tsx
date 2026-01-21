@@ -65,9 +65,20 @@ export function CookieSettingsDialog({
                 <span className="text-xs text-dragon-green font-medium">Vedno aktivni</span>
               </div>
             </AccordionTrigger>
-            <AccordionContent className="text-sm text-muted-foreground">
-              Potrebni piškotki so ključni za osnovne funkcije spletne strani in spletna stran brez njih ne bo delovala na svoj predviden način. 
-              Ti piškotki ne shranjujejo nobenih osebnih podatkov, ki bi jih bilo mogoče identificirati.
+            <AccordionContent className="text-sm text-muted-foreground space-y-3">
+              <p>
+                Potrebni piškotki so ključni za osnovne funkcije spletne strani in spletna stran brez njih ne bo delovala na svoj predviden način. 
+                Ti piškotki ne shranjujejo nobenih osebnih podatkov, ki bi jih bilo mogoče identificirati.
+              </p>
+              <div className="bg-muted/50 rounded-md p-3 text-xs space-y-1">
+                <p className="font-medium text-foreground">Vključeni piškotki in tehnologije:</p>
+                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                  <li><code className="bg-muted px-1 rounded">sb-*-auth-token</code> – avtentikacija uporabnika (Supabase)</li>
+                  <li><code className="bg-muted px-1 rounded">sidebar:state</code> – stanje stranskega menija</li>
+                  <li><code className="bg-muted px-1 rounded">tomitalk-cookie-consent</code> – nastavitve soglasja piškotkov</li>
+                  <li><code className="bg-muted px-1 rounded">splashShown</code> – prikaz uvodnega zaslona (sessionStorage)</li>
+                </ul>
+              </div>
             </AccordionContent>
           </AccordionItem>
 
@@ -83,9 +94,21 @@ export function CookieSettingsDialog({
                 />
               </div>
             </AccordionTrigger>
-            <AccordionContent className="text-sm text-muted-foreground">
-              Funkcionalni piškotki pomagajo izvajati določene funkcionalnosti, kot so skupna raba vsebine spletnega mesta na 
-              platformah družbenih medijev, zbiranje povratnih informacij in druge funkcije tretjih oseb.
+            <AccordionContent className="text-sm text-muted-foreground space-y-3">
+              <p>
+                Funkcionalni piškotki omogočajo personalizirano uporabniško izkušnjo, kot so shranjevanje nastavitev teme, 
+                napredka pri vajah in drugih uporabniških preferenc.
+              </p>
+              <div className="bg-muted/50 rounded-md p-3 text-xs space-y-1">
+                <p className="font-medium text-foreground">Primeri:</p>
+                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                  <li><code className="bg-muted px-1 rounded">theme</code> – izbira teme (svetla/temna)</li>
+                  <li><code className="bg-muted px-1 rounded">pwa-install-dismissed</code> – zavrnitev PWA namestitve</li>
+                  <li><code className="bg-muted px-1 rounded">ios-install-dismissed</code> – zavrnitev iOS navodil</li>
+                  <li><code className="bg-muted px-1 rounded">articulation-progress-[črka]</code> – napredek pri vadbi izgovorjave</li>
+                  <li><code className="bg-muted px-1 rounded">trophy_claimed_[id]</code> – prejete trofeje</li>
+                </ul>
+              </div>
             </AccordionContent>
           </AccordionItem>
 

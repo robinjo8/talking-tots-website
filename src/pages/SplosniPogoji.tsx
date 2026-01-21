@@ -441,7 +441,29 @@ const SplosniPogoji = () => {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-foreground mb-4">15. KONČNE DOLOČBE</h2>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">15. PIŠKOTKI IN TEHNOLOGIJE SHRANJEVANJA</h2>
+            <p className="text-muted-foreground leading-relaxed">
+              Platforma TomiTalk za svoje delovanje uporablja piškotke in druge tehnologije shranjevanja podatkov (localStorage, sessionStorage). Te tehnologije omogočajo:
+            </p>
+            <ul className="list-disc list-inside text-muted-foreground space-y-2 mt-4">
+              <li>pravilno delovanje uporabniške seje in avtentikacije,</li>
+              <li>shranjevanje uporabniških nastavitev (npr. tema, stanje menija),</li>
+              <li>spremljanje napredka otroka pri vajah in igrah,</li>
+              <li>zagotavljanje boljše uporabniške izkušnje.</li>
+            </ul>
+            <p className="text-muted-foreground leading-relaxed mt-4">
+              Podrobne informacije o vrstah piškotkov, njihovem namenu, trajanju in možnostih upravljanja so na voljo v <a href="/politika-zasebnosti" className="text-dragon-green hover:underline">Politiki zasebnosti in piškotkov</a>.
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-4">
+              Uporabnik lahko ob prvem obisku Platforme poda privolitev za uporabo posameznih vrst piškotkov. Nujni piškotki, ki so potrebni za osnovno delovanje Platforme (npr. avtentikacija, nastavitve soglasja), se nameščajo ne glede na privolitev uporabnika, saj brez njih Platforma ne deluje pravilno.
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-4">
+              Uporabnik lahko svoje nastavitve glede piškotkov kadarkoli spremeni preko orodja za upravljanje piškotkov, ki se prikaže ob prvem obisku, ali preko nastavitev svojega spletnega brskalnika.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">16. KONČNE DOLOČBE</h2>
             <p className="text-muted-foreground leading-relaxed">
               Nosilec platforme si pridržuje pravico, da ponudbo Storitev kadarkoli spremeni, začasno omeji ali v celoti prekine ter da kadarkoli omeji ali onemogoči dostop do Platforme TomiTalk, tudi v primeru, ko Nosilec platforme presodi, da Uporabnik krši te Splošne pogoje.
             </p>
@@ -470,7 +492,7 @@ const SplosniPogoji = () => {
               Za splošno podporo in vprašanja v zvezi s Platformo TomiTalk se lahko obrnete na Nosilca platforme preko elektronskega naslova: <a href="mailto:info@tomitalk.si" className="text-dragon-green hover:underline">info@tomitalk.si</a>
             </p>
             <p className="text-muted-foreground leading-relaxed mt-6 text-sm italic">
-              Zadnja sprememba: 2.1.2026
+              Zadnja sprememba: 21. 1. 2026
             </p>
           </section>
         </div>
