@@ -15,15 +15,15 @@ import { getAllWheelConfigs } from "@/data/artikulacijaVajeConfig";
 
 // Letter card data for Kolo sreče (wheel games - začetek)
 const wheelLetters = [
-  { id: "c", letter: "C", title: "Črka C", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_C.png", path: "/govorne-igre/kolo-srece/c" },
-  { id: "ch", letter: "Č", title: "Črka Č", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_CH.png", path: "/govorne-igre/kolo-srece/ch" },
-  { id: "k", letter: "K", title: "Črka K", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_K.png", path: "/govorne-igre/kolo-srece/k" },
-  { id: "l", letter: "L", title: "Črka L", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_L.png", path: "/govorne-igre/kolo-srece/l" },
-  { id: "r", letter: "R", title: "Črka R", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_R.png", path: "/govorne-igre/kolo-srece/r" },
-  { id: "s", letter: "S", title: "Črka S", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_S.png", path: "/govorne-igre/kolo-srece/s" },
-  { id: "sh", letter: "Š", title: "Črka Š", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_SH.png", path: "/govorne-igre/kolo-srece/sh" },
-  { id: "z", letter: "Z", title: "Črka Z", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_Z.png", path: "/govorne-igre/kolo-srece/z" },
-  { id: "zh", letter: "Ž", title: "Črka Ž", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_ZH.png", path: "/govorne-igre/kolo-srece/zh" },
+  { id: "c", letter: "C", title: "Črka C", description: "Zavrti kolo sreče in vadi izgovorjavo črke C na začetku besed", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_C.png", path: "/govorne-igre/kolo-srece/c" },
+  { id: "ch", letter: "Č", title: "Črka Č", description: "Zavrti kolo sreče in vadi izgovorjavo črke Č na začetku besed", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_CH.png", path: "/govorne-igre/kolo-srece/ch" },
+  { id: "k", letter: "K", title: "Črka K", description: "Zavrti kolo sreče in vadi izgovorjavo črke K na začetku besed", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_K.png", path: "/govorne-igre/kolo-srece/k" },
+  { id: "l", letter: "L", title: "Črka L", description: "Zavrti kolo sreče in vadi izgovorjavo črke L na začetku besed", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_L.png", path: "/govorne-igre/kolo-srece/l" },
+  { id: "r", letter: "R", title: "Črka R", description: "Zavrti kolo sreče in vadi izgovorjavo črke R na začetku besed", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_R.png", path: "/govorne-igre/kolo-srece/r" },
+  { id: "s", letter: "S", title: "Črka S", description: "Zavrti kolo sreče in vadi izgovorjavo črke S na začetku besed", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_S.png", path: "/govorne-igre/kolo-srece/s" },
+  { id: "sh", letter: "Š", title: "Črka Š", description: "Zavrti kolo sreče in vadi izgovorjavo črke Š na začetku besed", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_SH.png", path: "/govorne-igre/kolo-srece/sh" },
+  { id: "z", letter: "Z", title: "Črka Z", description: "Zavrti kolo sreče in vadi izgovorjavo črke Z na začetku besed", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_Z.png", path: "/govorne-igre/kolo-srece/z" },
+  { id: "zh", letter: "Ž", title: "Črka Ž", description: "Zavrti kolo sreče in vadi izgovorjavo črke Ž na začetku besed", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_ZH.png", path: "/govorne-igre/kolo-srece/zh" },
 ];
 
 export default function KoloSreceGames() {
@@ -141,10 +141,15 @@ export default function KoloSreceGames() {
                   <div className={isMobile ? "p-3 flex flex-col flex-grow" : "p-6 flex flex-col flex-grow"}>
                     <h3 className={isMobile 
                       ? "text-base font-bold text-foreground mb-1 group-hover:text-app-blue transition-colors leading-tight text-center" 
-                      : "text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors min-h-[3.5rem] flex items-center"
+                      : "text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors"
                     }>
                       {item.title}
                     </h3>
+                    {!isMobile && (
+                      <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                        {item.description}
+                      </p>
+                    )}
                   </div>
                 </div>
               ))}

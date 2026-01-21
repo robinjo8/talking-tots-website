@@ -14,15 +14,15 @@ import { ArrowLeft } from "lucide-react";
 
 // Letter card data for Bingo (bingo games - sredina/konec)
 const bingoLetters = [
-  { id: "c", letter: "C", title: "Črka C", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_C.png", path: "/govorne-igre/bingo/c" },
-  { id: "ch", letter: "Č", title: "Črka Č", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_CH.png", path: "/govorne-igre/bingo/ch" },
-  { id: "k", letter: "K", title: "Črka K", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_K.png", path: "/govorne-igre/bingo/k" },
-  { id: "l", letter: "L", title: "Črka L", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_L.png", path: "/govorne-igre/bingo/l" },
-  { id: "r", letter: "R", title: "Črka R", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_R.png", path: "/govorne-igre/bingo/r" },
-  { id: "s", letter: "S", title: "Črka S", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_S.png", path: "/govorne-igre/bingo/s" },
-  { id: "sh", letter: "Š", title: "Črka Š", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_SH.png", path: "/govorne-igre/bingo/sh" },
-  { id: "z", letter: "Z", title: "Črka Z", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_Z.png", path: "/govorne-igre/bingo/z" },
-  { id: "zh", letter: "Ž", title: "Črka Ž", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_ZH.png", path: "/govorne-igre/bingo/zh" },
+  { id: "c", letter: "C", title: "Črka C", description: "Igraj bingo in vadi izgovorjavo črke C na sredini in koncu besed", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_C.png", path: "/govorne-igre/bingo/c" },
+  { id: "ch", letter: "Č", title: "Črka Č", description: "Igraj bingo in vadi izgovorjavo črke Č na sredini in koncu besed", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_CH.png", path: "/govorne-igre/bingo/ch" },
+  { id: "k", letter: "K", title: "Črka K", description: "Igraj bingo in vadi izgovorjavo črke K na sredini in koncu besed", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_K.png", path: "/govorne-igre/bingo/k" },
+  { id: "l", letter: "L", title: "Črka L", description: "Igraj bingo in vadi izgovorjavo črke L na sredini in koncu besed", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_L.png", path: "/govorne-igre/bingo/l" },
+  { id: "r", letter: "R", title: "Črka R", description: "Igraj bingo in vadi izgovorjavo črke R na sredini in koncu besed", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_R.png", path: "/govorne-igre/bingo/r" },
+  { id: "s", letter: "S", title: "Črka S", description: "Igraj bingo in vadi izgovorjavo črke S na sredini in koncu besed", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_S.png", path: "/govorne-igre/bingo/s" },
+  { id: "sh", letter: "Š", title: "Črka Š", description: "Igraj bingo in vadi izgovorjavo črke Š na sredini in koncu besed", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_SH.png", path: "/govorne-igre/bingo/sh" },
+  { id: "z", letter: "Z", title: "Črka Z", description: "Igraj bingo in vadi izgovorjavo črke Z na sredini in koncu besed", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_Z.png", path: "/govorne-igre/bingo/z" },
+  { id: "zh", letter: "Ž", title: "Črka Ž", description: "Igraj bingo in vadi izgovorjavo črke Ž na sredini in koncu besed", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_ZH.png", path: "/govorne-igre/bingo/zh" },
 ];
 
 export default function BingoGames() {
@@ -140,10 +140,15 @@ export default function BingoGames() {
                   <div className={isMobile ? "p-3 flex flex-col flex-grow" : "p-6 flex flex-col flex-grow"}>
                     <h3 className={isMobile 
                       ? "text-base font-bold text-foreground mb-1 group-hover:text-app-blue transition-colors leading-tight text-center" 
-                      : "text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors min-h-[3.5rem] flex items-center"
+                      : "text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors"
                     }>
                       {item.title}
                     </h3>
+                    {!isMobile && (
+                      <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                        {item.description}
+                      </p>
+                    )}
                   </div>
                 </div>
               ))}
