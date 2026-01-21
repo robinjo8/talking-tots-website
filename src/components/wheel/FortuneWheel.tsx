@@ -1,5 +1,4 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
 
 interface FortuneWheelProps {
   segmentCount: number;
@@ -142,16 +141,6 @@ export const FortuneWheel: React.FC<FortuneWheelProps> = ({
             );
           })}
 
-          {/* Center circle */}
-          <circle 
-            cx="50" 
-            cy="50" 
-            r="12" 
-            fill="url(#centerGradient)"
-            stroke="white"
-            strokeWidth="1"
-          />
-
           {/* Gradient definitions */}
           <defs>
             <radialGradient id="centerGradient">
@@ -162,17 +151,28 @@ export const FortuneWheel: React.FC<FortuneWheelProps> = ({
         </svg>
       </div>
 
-      {/* Spin Button - Below wheel */}
-      <div className="mt-6 flex justify-center">
-        <Button
-          onClick={onSpin}
-          disabled={isSpinning}
-          size="lg"
-          className="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-bold text-xl px-8 py-6 rounded-full shadow-lg transform transition-transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+      {/* Clickable Center Button - Fixed position, doesn't rotate */}
+      <button
+        onClick={onSpin}
+        disabled={isSpinning}
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[24%] aspect-square rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border-4 border-white shadow-xl flex items-center justify-center cursor-pointer hover:from-amber-500 hover:to-orange-600 transition-colors disabled:cursor-not-allowed disabled:opacity-70 z-10"
+        style={{
+          boxShadow: '0 0 20px rgba(251, 191, 36, 0.5), 0 4px 15px rgba(0, 0, 0, 0.3)',
+        }}
+      >
+        <svg 
+          viewBox="0 0 24 24" 
+          className={`w-1/2 h-1/2 text-white ${isSpinning ? 'animate-spin' : ''}`}
+          fill="none" 
+          stroke="currentColor" 
+          strokeWidth="2.5"
+          strokeLinecap="round" 
+          strokeLinejoin="round"
         >
-          {isSpinning ? 'VRTI SE...' : 'ZAVRTI KOLO'}
-        </Button>
-      </div>
+          <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+          <path d="M21 3v5h-5" />
+        </svg>
+      </button>
     </div>
   );
 };
