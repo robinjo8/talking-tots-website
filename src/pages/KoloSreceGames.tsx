@@ -16,14 +16,14 @@ import { getAllWheelConfigs } from "@/data/artikulacijaVajeConfig";
 // Letter card data for Kolo sreče (wheel games - začetek)
 const wheelLetters = [
   { id: "c", letter: "C", title: "Črka C", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_C.png", path: "/govorne-igre/kolo-srece/c" },
-  { id: "ch", letter: "Č", title: "Črka Č", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_Č.png", path: "/govorne-igre/kolo-srece/ch" },
+  { id: "ch", letter: "Č", title: "Črka Č", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_CH.png", path: "/govorne-igre/kolo-srece/ch" },
   { id: "k", letter: "K", title: "Črka K", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_K.png", path: "/govorne-igre/kolo-srece/k" },
   { id: "l", letter: "L", title: "Črka L", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_L.png", path: "/govorne-igre/kolo-srece/l" },
   { id: "r", letter: "R", title: "Črka R", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_R.png", path: "/govorne-igre/kolo-srece/r" },
   { id: "s", letter: "S", title: "Črka S", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_S.png", path: "/govorne-igre/kolo-srece/s" },
-  { id: "sh", letter: "Š", title: "Črka Š", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_Š.png", path: "/govorne-igre/kolo-srece/sh" },
+  { id: "sh", letter: "Š", title: "Črka Š", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_SH.png", path: "/govorne-igre/kolo-srece/sh" },
   { id: "z", letter: "Z", title: "Črka Z", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_Z.png", path: "/govorne-igre/kolo-srece/z" },
-  { id: "zh", letter: "Ž", title: "Črka Ž", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_Ž.png", path: "/govorne-igre/kolo-srece/zh" },
+  { id: "zh", letter: "Ž", title: "Črka Ž", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_ZH.png", path: "/govorne-igre/kolo-srece/zh" },
 ];
 
 export default function KoloSreceGames() {
