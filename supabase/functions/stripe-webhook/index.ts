@@ -3,8 +3,18 @@ import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
-  apiVersion: "2025-08-27.basil",
+  apiVersion: "2025-12-15.clover",
 });
+
+// Safe timestamp conversion to handle potential invalid values
+const safeTimestamp = (ts: number | null | undefined): string | null => {
+  if (!ts || typeof ts !== 'number' || isNaN(ts)) return null;
+  try {
+    return new Date(ts * 1000).toISOString();
+  } catch {
+    return null;
+  }
+};
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -134,11 +144,9 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     stripe_product_id: productId,
     plan_id: planId,
     status: effectiveStatus,
-    current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-    current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-    trial_end: subscription.trial_end 
-      ? new Date(subscription.trial_end * 1000).toISOString() 
-      : null,
+    current_period_start: safeTimestamp(subscription.current_period_start) || new Date().toISOString(),
+    current_period_end: safeTimestamp(subscription.current_period_end) || new Date().toISOString(),
+    trial_end: safeTimestamp(subscription.trial_end),
     cancel_at_period_end: subscription.cancel_at_period_end,
     updated_at: new Date().toISOString()
   }).eq("user_id", existingRecord.user_id);
