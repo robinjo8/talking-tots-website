@@ -70,6 +70,11 @@ export const FooterSection = () => {
                   Preverjanje izgovorjave
                 </button>
               </li>
+              <li>
+                <Link to="/logopedski-koticek" className="text-muted-foreground hover:text-dragon-green transition-colors">
+                  Logopedski nasveti
+                </Link>
+              </li>
             </ul>
           </div>
           
@@ -141,11 +146,6 @@ export const FooterSection = () => {
                 >
                   Video navodila
                 </button>
-              </li>
-              <li>
-                <Link to="/logopedski-koticek" className="text-muted-foreground hover:text-dragon-green transition-colors">
-                  Logopedski nasveti
-                </Link>
               </li>
               <li>
                 <Link to="/pomoc-in-podpora" className="text-muted-foreground hover:text-dragon-green transition-colors">
