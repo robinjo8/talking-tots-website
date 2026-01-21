@@ -22,9 +22,10 @@ interface GenericWheelGameProps {
   displayLetter: string;
   title: string;
   wordsData: WordData[];
+  backPath?: string;
 }
 
-export function GenericWheelGame({ letter, displayLetter, title, wordsData }: GenericWheelGameProps) {
+export function GenericWheelGame({ letter, displayLetter, title, wordsData, backPath = '/govorno-jezikovne-vaje/artikulacija' }: GenericWheelGameProps) {
   const navigate = useNavigate();
   const [showInstructions, setShowInstructions] = useState(false);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
@@ -38,7 +39,7 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData }: Ge
   const { progress, incrementProgress, getProgress, resetProgress, resetWordProgress } = useWordProgress(displayLetter, wordsList);
 
   const handleBack = () => { setMenuOpen(false); setShowExitConfirmation(true); };
-  const handleConfirmExit = () => { navigate('/govorno-jezikovne-vaje/artikulacija'); };
+  const handleConfirmExit = () => { navigate(backPath); };
   const handleNewGame = () => { setMenuOpen(false); setShowNewGameConfirmation(true); };
   const handleConfirmNewGame = () => { resetWheel(); resetProgress(); setShowNewGameConfirmation(false); };
   const handleInstructions = () => { setMenuOpen(false); setShowInstructions(true); };

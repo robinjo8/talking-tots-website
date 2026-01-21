@@ -66,6 +66,8 @@ const Sestavljanke = lazy(() => import("@/pages/Sestavljanke"));
 const DrsnaSestavljanka = lazy(() => import("@/pages/DrsnaSestavljanka"));
 const SestavljankeGames = lazy(() => import("@/pages/SestavljankeGames"));
 const Labirint = lazy(() => import("@/pages/Labirint"));
+const KoloSreceGames = lazy(() => import("@/pages/KoloSreceGames"));
+const BingoGames = lazy(() => import("@/pages/BingoGames"));
 const ArtikuacijskiTest = lazy(() => import("@/pages/ArtikuacijskiTest"));
 const MojiIzzivi = lazy(() => import("@/pages/MojiIzzivi"));
 const VideoNavodila = lazy(() => import("@/pages/VideoNavodila"));
@@ -85,6 +87,8 @@ const IgraUjemanjaRouter = lazy(() => import("@/components/routing/IgraUjemanjaR
 const ArtikulacijaVajeRouter = lazy(() => import("@/components/routing/ArtikulacijaVajeRouter"));
 const VideoNavodilaRouter = lazy(() => import("@/components/routing/VideoNavodilaRouter"));
 const LabirintRouter = lazy(() => import("@/components/routing/LabirintRouter"));
+const KoloSreceRouter = lazy(() => import("@/components/routing/KoloSreceRouter"));
+const BingoRouter = lazy(() => import("@/components/routing/BingoRouter"));
 const AdminRoutes = lazy(() => import("@/components/routing/AdminRoutes"));
 
 // Footer pages
@@ -134,6 +138,14 @@ export function AppRoutes() {
       
       {/* Govorne igre */}
       <Route path="/govorne-igre" element={<ProtectedLazyRoute><GovorneIgre /></ProtectedLazyRoute>} />
+      
+      {/* Kolo sreče routes */}
+      <Route path="/govorne-igre/kolo-srece" element={<ProtectedLazyRoute><KoloSreceGames /></ProtectedLazyRoute>} />
+      <Route path="/govorne-igre/kolo-srece/:letter" element={<ProtectedLazyRoute><KoloSreceRouter /></ProtectedLazyRoute>} />
+      
+      {/* Bingo routes */}
+      <Route path="/govorne-igre/bingo" element={<ProtectedLazyRoute><BingoGames /></ProtectedLazyRoute>} />
+      <Route path="/govorne-igre/bingo/:letter" element={<ProtectedLazyRoute><BingoRouter /></ProtectedLazyRoute>} />
       
       {/* Sestavljanke routes */}
       <Route path="/govorne-igre/sestavljanke" element={<ProtectedLazyRoute><SestavljankeGames /></ProtectedLazyRoute>} />
