@@ -649,6 +649,10 @@ const PolitikaZasebnosti = () => {
                 </thead>
                 <tbody>
                   <tr>
+                    <td className="border border-border px-4 py-2 text-muted-foreground">tomitalk-cookie-consent</td>
+                    <td className="border border-border px-4 py-2 text-muted-foreground">Shranjuje uporabnikove nastavitve soglasja za piškotke (nujni).</td>
+                  </tr>
+                  <tr>
                     <td className="border border-border px-4 py-2 text-muted-foreground">pwa-install-dismissed</td>
                     <td className="border border-border px-4 py-2 text-muted-foreground">Beleži, ali je uporabnik zavrnil poziv za namestitev aplikacije (PWA).</td>
                   </tr>
@@ -658,11 +662,15 @@ const PolitikaZasebnosti = () => {
                   </tr>
                   <tr>
                     <td className="border border-border px-4 py-2 text-muted-foreground">vaje-motorike-govoril-progress</td>
-                    <td className="border border-border px-4 py-2 text-muted-foreground">Shranjuje napredek otroka pri vajah.</td>
+                    <td className="border border-border px-4 py-2 text-muted-foreground">Shranjuje napredek otroka pri vajah motorike govoril.</td>
                   </tr>
                   <tr>
-                    <td className="border border-border px-4 py-2 text-muted-foreground">trophy_dialog_shown_[id]</td>
-                    <td className="border border-border px-4 py-2 text-muted-foreground">Beleži prikaz obvestila o doseženi trofeji.</td>
+                    <td className="border border-border px-4 py-2 text-muted-foreground">articulation-progress-[črka]</td>
+                    <td className="border border-border px-4 py-2 text-muted-foreground">Shranjuje napredek pri vadbi posamezne črke (npr. articulation-progress-r).</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-border px-4 py-2 text-muted-foreground">trophy_claimed_[childId]_[count]</td>
+                    <td className="border border-border px-4 py-2 text-muted-foreground">Beleži prejete trofeje za posameznega otroka.</td>
                   </tr>
                   <tr>
                     <td className="border border-border px-4 py-2 text-muted-foreground">expandSection</td>
@@ -734,7 +742,7 @@ const PolitikaZasebnosti = () => {
               Uporabnikom priporočamo, da občasno preverijo Politiko zasebnosti in piškotkov, da ostanejo seznanjeni z morebitnimi spremembami.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-6 text-sm italic">
-              Objavljeno dne: 3. 1. 2026
+              Zadnja sprememba: 21. 1. 2026
             </p>
           </section>
         </div>
