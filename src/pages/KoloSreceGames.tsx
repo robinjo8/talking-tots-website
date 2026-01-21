@@ -15,15 +15,15 @@ import { getAllWheelConfigs } from "@/data/artikulacijaVajeConfig";
 
 // Letter card data for Kolo sreče (wheel games - začetek)
 const wheelLetters = [
-  { id: "c", letter: "C", title: "Črka C - začetek", gradient: "from-app-orange to-app-yellow", image: "c_zmaj.png", path: "/govorne-igre/kolo-srece/c" },
-  { id: "ch", letter: "Č", title: "Črka Č - začetek", gradient: "from-dragon-green to-app-teal", image: "ch_zmaj.png", path: "/govorne-igre/kolo-srece/ch" },
-  { id: "k", letter: "K", title: "Črka K - začetek", gradient: "from-app-purple to-app-blue", image: "k_zmaj.png", path: "/govorne-igre/kolo-srece/k" },
-  { id: "l", letter: "L", title: "Črka L - začetek", gradient: "from-app-orange to-app-yellow", image: "l_zmaj.png", path: "/govorne-igre/kolo-srece/l" },
-  { id: "r", letter: "R", title: "Črka R - začetek", gradient: "from-dragon-green to-app-teal", image: "r_zmaj.png", path: "/govorne-igre/kolo-srece/r" },
-  { id: "s", letter: "S", title: "Črka S - začetek", gradient: "from-app-purple to-app-blue", image: "s_zmaj.png", path: "/govorne-igre/kolo-srece/s" },
-  { id: "sh", letter: "Š", title: "Črka Š - začetek", gradient: "from-app-orange to-app-yellow", image: "sh_zmaj.png", path: "/govorne-igre/kolo-srece/sh" },
-  { id: "z", letter: "Z", title: "Črka Z - začetek", gradient: "from-dragon-green to-app-teal", image: "z_zmaj.png", path: "/govorne-igre/kolo-srece/z" },
-  { id: "zh", letter: "Ž", title: "Črka Ž - začetek", gradient: "from-app-purple to-app-blue", image: "zh_zmaj.png", path: "/govorne-igre/kolo-srece/zh" },
+  { id: "c", letter: "C", title: "Črka C", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_C.png", path: "/govorne-igre/kolo-srece/c" },
+  { id: "ch", letter: "Č", title: "Črka Č", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_Č.png", path: "/govorne-igre/kolo-srece/ch" },
+  { id: "k", letter: "K", title: "Črka K", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_K.png", path: "/govorne-igre/kolo-srece/k" },
+  { id: "l", letter: "L", title: "Črka L", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_L.png", path: "/govorne-igre/kolo-srece/l" },
+  { id: "r", letter: "R", title: "Črka R", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_R.png", path: "/govorne-igre/kolo-srece/r" },
+  { id: "s", letter: "S", title: "Črka S", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_S.png", path: "/govorne-igre/kolo-srece/s" },
+  { id: "sh", letter: "Š", title: "Črka Š", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_Š.png", path: "/govorne-igre/kolo-srece/sh" },
+  { id: "z", letter: "Z", title: "Črka Z", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_Z.png", path: "/govorne-igre/kolo-srece/z" },
+  { id: "zh", letter: "Ž", title: "Črka Ž", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_Ž.png", path: "/govorne-igre/kolo-srece/zh" },
 ];
 
 export default function KoloSreceGames() {
