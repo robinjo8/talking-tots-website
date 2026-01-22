@@ -137,26 +137,26 @@ export function GenericMetKockeGame({
       }}
     >
       {/* Main content - centered */}
-      <div className="h-full flex flex-col items-center justify-center p-4">
+      <div className="h-full flex flex-col items-center justify-center p-2">
         {/* Title */}
-        <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg mb-3">
+        <h1 className="text-xl md:text-2xl font-bold text-white drop-shadow-lg mb-2">
           {title}
         </h1>
 
-        {/* Game grid */}
-        <div className="bg-white/90 backdrop-blur rounded-2xl shadow-xl p-3 md:p-4 max-w-3xl w-full">
+        {/* Game grid - constrained height */}
+        <div className="bg-white/90 backdrop-blur rounded-xl shadow-xl p-2 md:p-3 w-full" style={{ maxWidth: '600px' }}>
           {/* Grid header */}
-          <div className="grid grid-cols-4 gap-1 md:gap-2 mb-1">
-            <div className="text-center font-bold text-muted-foreground text-xs">KOCKA</div>
+          <div className="grid grid-cols-4 gap-1 mb-1">
+            <div className="text-center font-bold text-muted-foreground text-[10px]">KOCKA</div>
             {columns.map((col) => (
-              <div key={col} className="text-center font-bold text-foreground text-xs md:text-sm">
+              <div key={col} className="text-center font-bold text-foreground text-[10px] md:text-xs">
                 {col}
               </div>
             ))}
           </div>
 
-          {/* Grid rows */}
-          <div className="space-y-1">
+          {/* Grid rows - smaller cells */}
+          <div className="grid grid-rows-6 gap-0.5">
             {[1, 2, 3, 4, 5, 6].map((rowNum) => {
               const index = rowNum - 1;
               const bitjeItem = bitje[index];
@@ -168,23 +168,23 @@ export function GenericMetKockeGame({
               const isPredmetSelected = selectedPredmet === index;
 
               return (
-                <div key={rowNum} className="grid grid-cols-4 gap-1 md:gap-2 items-center">
+                <div key={rowNum} className="grid grid-cols-4 gap-1 items-center">
                   {/* Dice column */}
                   <div className="flex justify-center">
-                    <div className="w-8 h-8 md:w-10 md:h-10">
+                    <div className="w-6 h-6 md:w-8 md:h-8">
                       <DiceFace number={rowNum} />
                     </div>
                   </div>
                   
                   {/* BITJE column */}
                   <div 
-                    className={`rounded-lg p-0.5 transition-all duration-300 ${
+                    className={`rounded p-0.5 transition-all duration-300 ${
                       isBitjeSelected 
                         ? 'ring-2 ring-app-orange bg-app-orange/20 scale-105' 
                         : 'bg-muted'
                     }`}
                   >
-                    <div className="aspect-square rounded overflow-hidden bg-background">
+                    <div className="aspect-square rounded overflow-hidden bg-background" style={{ maxHeight: 'calc((100vh - 200px) / 7)' }}>
                       <img
                         src={`${SUPABASE_URL}/slike/${bitjeItem.image}`}
                         alt={bitjeItem.word}
@@ -195,13 +195,13 @@ export function GenericMetKockeGame({
                   
                   {/* POVEDEK column */}
                   <div 
-                    className={`rounded-lg p-0.5 transition-all duration-300 ${
+                    className={`rounded p-0.5 transition-all duration-300 ${
                       isPovedekSelected 
                         ? 'ring-2 ring-app-blue bg-app-blue/20 scale-105' 
                         : 'bg-muted'
                     }`}
                   >
-                    <div className="aspect-square rounded overflow-hidden bg-background">
+                    <div className="aspect-square rounded overflow-hidden bg-background" style={{ maxHeight: 'calc((100vh - 200px) / 7)' }}>
                       <img
                         src={`${SUPABASE_URL}/slike/${povedekItem.image}`}
                         alt={povedekItem.word}
@@ -212,13 +212,13 @@ export function GenericMetKockeGame({
                   
                   {/* PREDMET column */}
                   <div 
-                    className={`rounded-lg p-0.5 transition-all duration-300 ${
+                    className={`rounded p-0.5 transition-all duration-300 ${
                       isPredmetSelected 
                         ? 'ring-2 ring-dragon-green bg-dragon-green/20 scale-105' 
                         : 'bg-muted'
                     }`}
                   >
-                    <div className="aspect-square rounded overflow-hidden bg-background">
+                    <div className="aspect-square rounded overflow-hidden bg-background" style={{ maxHeight: 'calc((100vh - 200px) / 7)' }}>
                       <img
                         src={`${SUPABASE_URL}/slike/${predmetItem.image}`}
                         alt={predmetItem.word}
