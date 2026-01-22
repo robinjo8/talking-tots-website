@@ -47,12 +47,14 @@ export function DiceResultDialog({
             countdownRef.current = null;
           }
           setIsRecording(false);
+          // Close dialog after recording finishes
+          onClose();
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
-  }, [isRecording]);
+  }, [isRecording, onClose]);
 
   // Play audio sequence for all three words
   const playAudioSequence = useCallback(async () => {
@@ -175,7 +177,7 @@ export function DiceResultDialog({
             <Button
               onClick={playAudioSequence}
               disabled={isPlayingSequence || isRecording}
-              className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 uppercase font-medium"
+              className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 uppercase font-medium h-10 px-4"
             >
               <Volume2 className="w-4 h-4" />
               {isPlayingSequence ? "PREDVAJAM..." : "PREDVAJAJ"}
@@ -185,7 +187,7 @@ export function DiceResultDialog({
             <Button
               onClick={startRecording}
               disabled={isRecording || isPlayingSequence}
-              className="relative bg-app-orange hover:bg-app-orange/90 text-white gap-2 uppercase font-medium"
+              className="relative bg-app-orange hover:bg-app-orange/90 text-white gap-2 uppercase font-medium h-10 px-4"
             >
               <Mic className="w-4 h-4" />
               {isRecording ? "SNEMAM..." : "PONOVI"}
@@ -196,7 +198,7 @@ export function DiceResultDialog({
               )}
             </Button>
             
-            <Button onClick={onClose} variant="outline" className="gap-2 uppercase">
+            <Button onClick={onClose} variant="outline" className="gap-2 uppercase h-10 px-4">
               ZAPRI
             </Button>
           </div>
