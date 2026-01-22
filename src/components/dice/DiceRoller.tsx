@@ -176,11 +176,6 @@ export function DiceRoller({ isVisible, currentStep, onRollComplete }: DiceRolle
           </div>
         </div>
         
-        {!hasClicked && (
-          <p className="text-white text-center mt-4 text-lg font-medium animate-pulse pointer-events-none">
-            Klikni na kocko!
-          </p>
-        )}
       </div>
     </div>
   );
