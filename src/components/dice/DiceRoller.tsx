@@ -3,20 +3,9 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 interface DiceRollerProps {
   isVisible: boolean;
-  isRolling: boolean;
+  currentStep: number;
   onRollComplete: (result: number) => void;
-  onClose: () => void;
 }
-
-// Dice face configurations for CSS 3D cube
-const diceFaces = [
-  { dots: 1, rotation: 'rotateY(0deg)' },
-  { dots: 2, rotation: 'rotateY(-90deg)' },
-  { dots: 3, rotation: 'rotateX(90deg)' },
-  { dots: 4, rotation: 'rotateX(-90deg)' },
-  { dots: 5, rotation: 'rotateY(90deg)' },
-  { dots: 6, rotation: 'rotateY(180deg)' },
-];
 
 // Final rotations to show each number
 const finalRotations: Record<number, string> = {
@@ -27,6 +16,8 @@ const finalRotations: Record<number, string> = {
   5: 'rotateX(0deg) rotateY(-90deg)',
   6: 'rotateX(0deg) rotateY(180deg)',
 };
+
+const stepLabels = ['BITJE', 'POVEDEK', 'PREDMET'];
 
 function DiceDots({ count }: { count: number }) {
   const dotPositions: Record<number, string[]> = {
@@ -63,24 +54,23 @@ function DiceDots({ count }: { count: number }) {
   );
 }
 
-export function DiceRoller({ isVisible, isRolling, onRollComplete, onClose }: DiceRollerProps) {
+export function DiceRoller({ isVisible, currentStep, onRollComplete }: DiceRollerProps) {
   const [rotation, setRotation] = useState('rotateX(0deg) rotateY(0deg)');
-  const [result, setResult] = useState<number | null>(null);
+  const [isSpinning, setIsSpinning] = useState(false);
   const [hasClicked, setHasClicked] = useState(false);
 
   // Reset state when dialog opens
   useEffect(() => {
     if (isVisible) {
       setRotation('rotateX(0deg) rotateY(0deg)');
-      setResult(null);
+      setIsSpinning(false);
       setHasClicked(false);
     }
   }, [isVisible]);
 
-  // Handle rolling animation
+  // Handle spinning animation
   useEffect(() => {
-    if (isRolling && hasClicked) {
-      // Random spin animation
+    if (isSpinning) {
       let spinCount = 0;
       const maxSpins = 15 + Math.floor(Math.random() * 10);
       
@@ -95,8 +85,8 @@ export function DiceRoller({ isVisible, isRolling, onRollComplete, onClose }: Di
           
           // Generate final result
           const finalResult = Math.floor(Math.random() * 6) + 1;
-          setResult(finalResult);
           setRotation(finalRotations[finalResult]);
+          setIsSpinning(false);
           
           // Notify parent after animation settles
           setTimeout(() => {
@@ -107,17 +97,23 @@ export function DiceRoller({ isVisible, isRolling, onRollComplete, onClose }: Di
 
       return () => clearInterval(spinInterval);
     }
-  }, [isRolling, hasClicked, onRollComplete]);
+  }, [isSpinning, onRollComplete]);
 
   const handleDiceClick = useCallback(() => {
-    if (!hasClicked && !isRolling) {
+    if (!hasClicked && !isSpinning) {
       setHasClicked(true);
+      setIsSpinning(true);
     }
-  }, [hasClicked, isRolling]);
+  }, [hasClicked, isSpinning]);
 
   return (
-    <Dialog open={isVisible} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center max-w-none w-auto">
+    <Dialog open={isVisible} onOpenChange={() => {}}>
+      <DialogContent className="bg-transparent border-none shadow-none flex flex-col items-center justify-center max-w-none w-auto [&>button]:hidden">
+        {/* Step indicator */}
+        <p className="text-white text-center mb-4 text-xl font-bold drop-shadow-lg">
+          {currentStep + 1}. met: {stepLabels[currentStep]}
+        </p>
+        
         <div 
           className="cursor-pointer"
           onClick={handleDiceClick}
@@ -125,12 +121,12 @@ export function DiceRoller({ isVisible, isRolling, onRollComplete, onClose }: Di
           {/* 3D Dice Container */}
           <div className="relative" style={{ perspective: '600px' }}>
             <div
-              className="relative w-28 h-28 transition-transform"
+              className={`relative w-28 h-28 transition-transform ${!hasClicked ? 'animate-pulse' : ''}`}
               style={{
                 transformStyle: 'preserve-3d',
                 transform: rotation,
-                transitionDuration: isRolling ? '100ms' : '800ms',
-                transitionTimingFunction: isRolling ? 'linear' : 'ease-out',
+                transitionDuration: isSpinning ? '100ms' : '800ms',
+                transitionTimingFunction: isSpinning ? 'linear' : 'ease-out',
               }}
             >
               {/* Face 1 - Front */}
