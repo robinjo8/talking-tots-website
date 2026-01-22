@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import { Volume2, Mic, X, Star } from 'lucide-react';
+import { Volume2, Star } from 'lucide-react';
 import { MetKockeWord } from '@/data/metKockeConfig';
 
 interface DiceResultDialogProps {
@@ -24,11 +24,9 @@ export function DiceResultDialog({
   predmetWord,
   onRecordComplete,
 }: DiceResultDialogProps) {
-  const [completedRecordings, setCompletedRecordings] = useState<Set<number>>(new Set());
-  const [recordingTimeLeft, setRecordingTimeLeft] = useState(3);
-  const [currentRecordingIndex, setCurrentRecordingIndex] = useState<number | null>(null);
   const [starClaimed, setStarClaimed] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isPlayingSequence, setIsPlayingSequence] = useState(false);
   const [confirmDialogConfig, setConfirmDialogConfig] = useState<{
     title: string;
     description: string;
@@ -36,24 +34,66 @@ export function DiceResultDialog({
   } | null>(null);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const countdownRef = useRef<NodeJS.Timeout | null>(null);
+  const autoPlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hasAutoPlayedRef = useRef(false);
 
   const words = [bitjeWord, povedekWord, predmetWord].filter(Boolean) as MetKockeWord[];
 
-  // Reset state when dialog opens/closes
+  // Play audio sequence for all three words
+  const playAudioSequence = useCallback(async () => {
+    if (isPlayingSequence || words.length === 0) return;
+    
+    setIsPlayingSequence(true);
+    
+    for (const word of words) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      
+      await new Promise<void>((resolve) => {
+        audioRef.current = new Audio(`${SUPABASE_URL}/zvocni-posnetki/${word.audio}`);
+        audioRef.current.onended = () => resolve();
+        audioRef.current.onerror = () => resolve();
+        audioRef.current.play().catch(() => resolve());
+      });
+      
+      // Small delay between words
+      await new Promise(resolve => setTimeout(resolve, 300));
+    }
+    
+    setIsPlayingSequence(false);
+  }, [words, isPlayingSequence]);
+
+  // Auto-play audio sequence 1.5 seconds after dialog opens
+  useEffect(() => {
+    if (isOpen && words.length > 0 && !hasAutoPlayedRef.current) {
+      autoPlayTimeoutRef.current = setTimeout(() => {
+        hasAutoPlayedRef.current = true;
+        playAudioSequence();
+      }, 1500);
+    }
+    
+    return () => {
+      if (autoPlayTimeoutRef.current) {
+        clearTimeout(autoPlayTimeoutRef.current);
+        autoPlayTimeoutRef.current = null;
+      }
+    };
+  }, [isOpen, words.length, playAudioSequence]);
+
+  // Reset state when dialog closes
   useEffect(() => {
     if (!isOpen) {
-      setCompletedRecordings(new Set());
-      setRecordingTimeLeft(3);
-      setCurrentRecordingIndex(null);
       setStarClaimed(false);
-      if (countdownRef.current) {
-        clearInterval(countdownRef.current);
-        countdownRef.current = null;
-      }
+      setIsPlayingSequence(false);
+      hasAutoPlayedRef.current = false;
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;
+      }
+      if (autoPlayTimeoutRef.current) {
+        clearTimeout(autoPlayTimeoutRef.current);
+        autoPlayTimeoutRef.current = null;
       }
     }
   }, [isOpen]);
@@ -65,58 +105,17 @@ export function DiceResultDialog({
         audioRef.current.pause();
         audioRef.current = null;
       }
-      if (countdownRef.current) {
-        clearInterval(countdownRef.current);
+      if (autoPlayTimeoutRef.current) {
+        clearTimeout(autoPlayTimeoutRef.current);
       }
     };
   }, []);
 
-  const playAudio = useCallback((word: MetKockeWord) => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
-    audioRef.current = new Audio(`${SUPABASE_URL}/zvocni-posnetki/${word.audio}`);
-    audioRef.current.play().catch(console.error);
-  }, []);
-
-  const startRecording = useCallback((imageIndex: number) => {
-    if (completedRecordings.has(imageIndex) || currentRecordingIndex !== null) return;
-    
-    setCurrentRecordingIndex(imageIndex);
-    setRecordingTimeLeft(3);
-
-    countdownRef.current = setInterval(() => {
-      setRecordingTimeLeft(prev => {
-        if (prev <= 1) {
-          if (countdownRef.current) {
-            clearInterval(countdownRef.current);
-            countdownRef.current = null;
-          }
-          setCompletedRecordings(prevCompleted => new Set([...prevCompleted, imageIndex]));
-          setCurrentRecordingIndex(null);
-          return 3;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  }, [completedRecordings, currentRecordingIndex]);
-
   const handleClose = useCallback(() => {
-    const allCompleted = completedRecordings.size === words.length;
-    if (allCompleted && !starClaimed) {
+    if (!starClaimed) {
       setConfirmDialogConfig({
-        title: "Zapri igro",
-        description: "Če zapreš igro, ne boš prejel zvezdice. Ali si prepričan?",
-        onConfirm: () => {
-          setShowConfirmDialog(false);
-          onClose();
-        }
-      });
-      setShowConfirmDialog(true);
-    } else if (!allCompleted) {
-      setConfirmDialogConfig({
-        title: "Zapri okno",
-        description: "Ali ste prepričani, da se želite zapreti okno? Niste še končali vseh posnetkov.",
+        title: "ZAPRI IGRO",
+        description: "ČE ZAPREŠ IGRO, NE BOŠ PREJEL ZVEZDICE. ALI SI PREPRIČAN?",
         onConfirm: () => {
           setShowConfirmDialog(false);
           onClose();
@@ -126,7 +125,7 @@ export function DiceResultDialog({
     } else {
       onClose();
     }
-  }, [completedRecordings.size, words.length, starClaimed, onClose]);
+  }, [starClaimed, onClose]);
 
   const handleClaimStar = useCallback(() => {
     setStarClaimed(true);
@@ -136,13 +135,6 @@ export function DiceResultDialog({
     }, 1500);
   }, [onRecordComplete, onClose]);
 
-  const handleImageClick = useCallback((imageIndex: number) => {
-    if (completedRecordings.has(imageIndex) || currentRecordingIndex !== null) {
-      return;
-    }
-    startRecording(imageIndex);
-  }, [completedRecordings, currentRecordingIndex, startRecording]);
-
   if (!bitjeWord || !povedekWord || !predmetWord) return null;
 
   return (
@@ -150,94 +142,70 @@ export function DiceResultDialog({
       <Dialog open={isOpen} onOpenChange={handleClose}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle className="font-bold text-dragon-green text-center text-lg md:text-2xl">
-              Odlično!
+            <DialogTitle className="font-bold text-dragon-green text-center text-lg md:text-2xl uppercase">
+              ODLIČNO!
             </DialogTitle>
           </DialogHeader>
           
-          <div className="space-y-2 md:space-y-4 py-2 md:py-4">
-            <p className="text-black text-center uppercase text-xs md:text-sm">
-              KLIKNI NA SPODNJE SLIKE IN PONOVI BESEDE
+          <div className="space-y-3 md:space-y-4 py-2 md:py-4">
+            <p className="text-black text-center uppercase text-xs md:text-sm font-medium">
+              POSLUŠAJ IN PONOVI BESEDE
             </p>
             
             {/* Three images in a row */}
             <div className="flex justify-center gap-3 md:gap-4">
-              {words.map((word, index) => {
-                const isRecording = currentRecordingIndex === index;
-                const isCompleted = completedRecordings.has(index);
-                
-                return (
-                  <div key={index} className="flex flex-col items-center space-y-1 md:space-y-2">
-                    <div 
-                      className={`cursor-pointer transition-all ${isCompleted ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
-                      onClick={() => handleImageClick(index)}
-                    >
-                      <div className="relative">
-                        <div className={`w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden border-2 bg-gray-50 ${
-                          isCompleted ? 'border-gray-400 grayscale' : isRecording ? 'border-red-500' : 'border-dragon-green'
-                        }`}>
-                          <img
-                            src={`${SUPABASE_URL}/slike/${word.image}`}
-                            alt={word.word}
-                            className="w-full h-full object-contain"
-                          />
-                        </div>
-                        {isRecording && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-xl">
-                            <div className="bg-red-500 text-white rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
-                              <Mic className="w-3 h-3 md:w-4 md:h-4" />
-                            </div>
-                          </div>
-                        )}
-                        {isRecording && (
-                          <div className="absolute -top-1 -right-1 md:-top-2 md:-right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 md:w-6 md:h-6 flex items-center justify-center">
-                            {recordingTimeLeft}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <span className={`font-medium text-center text-xs md:text-sm ${isCompleted ? 'text-gray-400' : 'text-black'}`}>
-                      {word.word.toUpperCase()}
-                    </span>
-                    <Button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        playAudio(word);
-                      }}
-                      size="icon"
-                      className="bg-green-500 hover:bg-green-600 text-white h-8 w-8"
-                    >
-                      <Volume2 className="w-4 h-4" />
-                    </Button>
+              {words.map((word, index) => (
+                <div key={index} className="flex flex-col items-center space-y-1 md:space-y-2">
+                  <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden border-2 border-dragon-green bg-gray-50">
+                    <img
+                      src={`${SUPABASE_URL}/slike/${word.image}`}
+                      alt={word.word}
+                      className="w-full h-full object-contain"
+                    />
                   </div>
-                );
-              })}
+                  <span className="font-medium text-center text-xs md:text-sm text-black uppercase">
+                    {word.word.toUpperCase()}
+                  </span>
+                </div>
+              ))}
             </div>
             
             {/* Sentence text */}
-            <p className="text-base md:text-lg font-semibold text-gray-800 text-center">
-              "{bitjeWord.word} {povedekWord.word} {predmetWord.word}"
+            <p className="text-base md:text-lg font-semibold text-gray-800 text-center uppercase">
+              "{bitjeWord.word.toUpperCase()} {povedekWord.word.toUpperCase()} {predmetWord.word.toUpperCase()}"
             </p>
+
+            {/* Play button */}
+            <div className="flex justify-center">
+              <Button
+                onClick={playAudioSequence}
+                disabled={isPlayingSequence}
+                className="bg-green-500 hover:bg-green-600 text-white gap-2 uppercase font-medium"
+              >
+                <Volume2 className="w-4 h-4" />
+                {isPlayingSequence ? "PREDVAJAM..." : "PREDVAJAJ"}
+              </Button>
+            </div>
           </div>
 
           {/* Action buttons */}
           <div className="flex justify-center gap-3">
-            <Button onClick={handleClose} variant="outline" className="gap-2 flex-1 max-w-32">
-              Zapri
+            <Button onClick={handleClose} variant="outline" className="gap-2 flex-1 max-w-32 uppercase">
+              ZAPRI
             </Button>
             
-            {completedRecordings.size === words.length && !starClaimed ? (
+            {!starClaimed ? (
               <Button 
                 onClick={handleClaimStar} 
-                className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 flex-1 max-w-36"
+                className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 flex-1 max-w-40 uppercase"
               >
                 <Star className="w-4 h-4" />
-                Vzemi zvezdico
+                VZEMI ZVEZDICO
               </Button>
             ) : (
-              <Button onClick={handleClose} className="bg-dragon-green hover:bg-dragon-green/90 gap-2 flex-1 max-w-32">
-                <X className="w-4 h-4" />
-                Zapri
+              <Button className="bg-dragon-green hover:bg-dragon-green/90 gap-2 flex-1 max-w-32 uppercase" disabled>
+                <Star className="w-4 h-4" />
+                PREJETO!
               </Button>
             )}
           </div>
@@ -249,8 +217,8 @@ export function DiceResultDialog({
         onOpenChange={setShowConfirmDialog}
         title={confirmDialogConfig?.title || ""}
         description={confirmDialogConfig?.description || ""}
-        confirmText="V redu"
-        cancelText="Prekliči"
+        confirmText="V REDU"
+        cancelText="PREKLIČI"
         onConfirm={() => confirmDialogConfig?.onConfirm()}
         onCancel={() => setShowConfirmDialog(false)}
       />
