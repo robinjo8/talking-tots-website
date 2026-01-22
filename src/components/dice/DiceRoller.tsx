@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 interface DiceRollerProps {
   isVisible: boolean;
@@ -109,86 +108,86 @@ export function DiceRoller({ isVisible, currentStep, onRollComplete }: DiceRolle
     }
   }, [hasClicked, isSpinning]);
 
+  if (!isVisible) return null;
+
   return (
-    <Dialog open={isVisible} onOpenChange={() => {}}>
-      <DialogContent className="bg-transparent border-none shadow-none flex flex-col items-center justify-center max-w-none w-auto [&>button]:hidden">
-        {/* Step indicator */}
-        <p className="text-white text-center mb-4 text-xl font-bold drop-shadow-lg">
-          {currentStep + 1}. met: {stepLabels[currentStep]}
-        </p>
-        
-        <div 
-          className="cursor-pointer"
-          onClick={handleDiceClick}
-        >
-          {/* 3D Dice Container */}
-          <div className="relative" style={{ perspective: '600px' }}>
-            <div
-              className={`relative w-28 h-28 transition-transform ${!hasClicked ? 'animate-pulse' : ''}`}
-              style={{
-                transformStyle: 'preserve-3d',
-                transform: rotation,
-                transitionDuration: isSpinning ? '100ms' : '800ms',
-                transitionTimingFunction: isSpinning ? 'linear' : 'ease-out',
-              }}
+    <div className="fixed inset-0 z-40 flex flex-col items-center justify-center pointer-events-none">
+      {/* Step indicator */}
+      <p className="text-white text-center mb-4 text-xl font-bold drop-shadow-lg pointer-events-none">
+        {currentStep + 1}. met: {stepLabels[currentStep]}
+      </p>
+      
+      <div 
+        className="cursor-pointer pointer-events-auto"
+        onClick={handleDiceClick}
+      >
+        {/* 3D Dice Container */}
+        <div className="relative" style={{ perspective: '600px' }}>
+          <div
+            className={`relative w-28 h-28 transition-transform ${!hasClicked ? 'animate-pulse' : ''}`}
+            style={{
+              transformStyle: 'preserve-3d',
+              transform: rotation,
+              transitionDuration: isSpinning ? '100ms' : '800ms',
+              transitionTimingFunction: isSpinning ? 'linear' : 'ease-out',
+            }}
+          >
+            {/* Face 1 - Front */}
+            <div 
+              className="absolute w-28 h-28 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
+              style={{ transform: 'translateZ(56px)' }}
             >
-              {/* Face 1 - Front */}
-              <div 
-                className="absolute w-28 h-28 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
-                style={{ transform: 'translateZ(56px)' }}
-              >
-                <DiceDots count={1} />
-              </div>
-              
-              {/* Face 6 - Back */}
-              <div 
-                className="absolute w-28 h-28 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
-                style={{ transform: 'rotateY(180deg) translateZ(56px)' }}
-              >
-                <DiceDots count={6} />
-              </div>
-              
-              {/* Face 2 - Right */}
-              <div 
-                className="absolute w-28 h-28 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
-                style={{ transform: 'rotateY(90deg) translateZ(56px)' }}
-              >
-                <DiceDots count={2} />
-              </div>
-              
-              {/* Face 5 - Left */}
-              <div 
-                className="absolute w-28 h-28 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
-                style={{ transform: 'rotateY(-90deg) translateZ(56px)' }}
-              >
-                <DiceDots count={5} />
-              </div>
-              
-              {/* Face 3 - Top */}
-              <div 
-                className="absolute w-28 h-28 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
-                style={{ transform: 'rotateX(90deg) translateZ(56px)' }}
-              >
-                <DiceDots count={3} />
-              </div>
-              
-              {/* Face 4 - Bottom */}
-              <div 
-                className="absolute w-28 h-28 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
-                style={{ transform: 'rotateX(-90deg) translateZ(56px)' }}
-              >
-                <DiceDots count={4} />
-              </div>
+              <DiceDots count={1} />
+            </div>
+            
+            {/* Face 6 - Back */}
+            <div 
+              className="absolute w-28 h-28 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
+              style={{ transform: 'rotateY(180deg) translateZ(56px)' }}
+            >
+              <DiceDots count={6} />
+            </div>
+            
+            {/* Face 2 - Right */}
+            <div 
+              className="absolute w-28 h-28 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
+              style={{ transform: 'rotateY(90deg) translateZ(56px)' }}
+            >
+              <DiceDots count={2} />
+            </div>
+            
+            {/* Face 5 - Left */}
+            <div 
+              className="absolute w-28 h-28 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
+              style={{ transform: 'rotateY(-90deg) translateZ(56px)' }}
+            >
+              <DiceDots count={5} />
+            </div>
+            
+            {/* Face 3 - Top */}
+            <div 
+              className="absolute w-28 h-28 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
+              style={{ transform: 'rotateX(90deg) translateZ(56px)' }}
+            >
+              <DiceDots count={3} />
+            </div>
+            
+            {/* Face 4 - Bottom */}
+            <div 
+              className="absolute w-28 h-28 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
+              style={{ transform: 'rotateX(-90deg) translateZ(56px)' }}
+            >
+              <DiceDots count={4} />
             </div>
           </div>
-          
-          {!hasClicked && (
-            <p className="text-white text-center mt-4 text-lg font-medium animate-pulse">
-              Klikni na kocko!
-            </p>
-          )}
         </div>
-      </DialogContent>
-    </Dialog>
+        
+        {!hasClicked && (
+          <p className="text-white text-center mt-4 text-lg font-medium animate-pulse pointer-events-none">
+            Klikni na kocko!
+          </p>
+        )}
+      </div>
+    </div>
   );
 }
