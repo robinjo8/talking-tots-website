@@ -158,15 +158,13 @@ export function GamesList() {
                       }}
                     />
                   )}
-                  {/* Image on top - 100% opacity */}
-                  <div className="relative w-full h-full flex items-center justify-center p-2">
+                  {/* Image on top - fixed size container */}
+                  <div className="absolute inset-0 flex items-center justify-center p-3">
                     <img 
                       src={game.image}
                       alt={game.title}
-                      className="object-contain group-hover:scale-110 transition-transform duration-300"
+                      className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-300"
                       style={{
-                        width: "95%",
-                        height: "95%",
                         ...(['zaporedja', 'povezi-pare-matching', 'labirint'].includes(game.id) ? { mixBlendMode: 'multiply' } : {})
                       }}
                     />
