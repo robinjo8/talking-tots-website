@@ -71,6 +71,7 @@ const BingoGames = lazy(() => import("@/pages/BingoGames"));
 const ArtikuacijskiTest = lazy(() => import("@/pages/ArtikuacijskiTest"));
 const MojiIzzivi = lazy(() => import("@/pages/MojiIzzivi"));
 const VideoNavodila = lazy(() => import("@/pages/VideoNavodila"));
+const MetKockeGames = lazy(() => import("@/pages/MetKockeGames"));
 
 // Informational pages
 const LogopedskiKoticek = lazy(() => import("@/pages/LogopedskiKoticek"));
@@ -89,6 +90,7 @@ const VideoNavodilaRouter = lazy(() => import("@/components/routing/VideoNavodil
 const LabirintRouter = lazy(() => import("@/components/routing/LabirintRouter"));
 const KoloSreceRouter = lazy(() => import("@/components/routing/KoloSreceRouter"));
 const BingoRouter = lazy(() => import("@/components/routing/BingoRouter"));
+const MetKockeRouter = lazy(() => import("@/components/routing/MetKockeRouter"));
 const AdminRoutes = lazy(() => import("@/components/routing/AdminRoutes"));
 
 // Footer pages
@@ -162,6 +164,10 @@ export function AppRoutes() {
       {/* Labirint routes */}
       <Route path="/govorne-igre/labirint" element={<ProtectedLazyRoute><Labirint /></ProtectedLazyRoute>} />
       <Route path="/govorne-igre/labirint/:letter" element={<ProtectedLazyRoute><LabirintRouter /></ProtectedLazyRoute>} />
+      
+      {/* Met kocke routes */}
+      <Route path="/govorne-igre/met-kocke" element={<ProtectedLazyRoute><MetKockeGames /></ProtectedLazyRoute>} />
+      <Route path="/govorne-igre/met-kocke/:letter" element={<ProtectedLazyRoute><MetKockeRouter /></ProtectedLazyRoute>} />
       
       {/* Povezi pare routes */}
       <Route path="/govorne-igre/povezi-pare/:ageGroup" element={<ProtectedLazyRoute><PoveziPareRouter /></ProtectedLazyRoute>} />

@@ -91,6 +91,17 @@ const otherGames = [
     mobileImageSize: "70%"
   },
   {
+    id: "met-kocke",
+    title: "MET KOCKE",
+    description: "Vrzi kocko in sestavi smešne povedi",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/met_kocke.webp",
+    gradient: "from-app-purple/20 to-dragon-green/20",
+    customBackground: "radial-gradient(ellipse at center, hsl(120, 60%, 95%) 0%, hsl(120, 50%, 85%) 30%, hsl(120, 40%, 75%) 60%, hsl(120, 35%, 65%) 100%)",
+    path: "/govorne-igre/met-kocke",
+    available: true,
+    mobileImageSize: "90%"
+  },
+  {
     id: "pobarvanke",
     title: "POBARVANKE",
     description: "Kmalu na voljo",
