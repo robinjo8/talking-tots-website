@@ -159,13 +159,14 @@ export function GamesList() {
                     />
                   )}
                   {/* Image on top - 100% opacity */}
-                  <div className="relative w-full h-full flex items-center justify-center">
+                  <div className="relative w-full h-full flex items-center justify-center p-2">
                     <img 
                       src={game.image}
                       alt={game.title}
-                      className={isMobile ? `object-contain group-hover:scale-110 transition-transform duration-300` : "w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"}
+                      className="object-contain group-hover:scale-110 transition-transform duration-300"
                       style={{
-                        ...(isMobile ? { width: game.mobileImageSize || "90%", height: game.mobileImageSize || "90%" } : {}),
+                        width: "95%",
+                        height: "95%",
                         ...(['zaporedja', 'povezi-pare-matching', 'labirint'].includes(game.id) ? { mixBlendMode: 'multiply' } : {})
                       }}
                     />
