@@ -49,18 +49,18 @@ export const metKockeS: MetKockeLetterConfig = {
   ],
 };
 
-// Konfiguracija za črko C
-export const metKockeC: MetKockeLetterConfig = {
-  letter: "c",
-  displayLetter: "C",
-  title: "GLAS C",
+// Konfiguracija za črko Z
+export const metKockeZ: MetKockeLetterConfig = {
+  letter: "z",
+  displayLetter: "Z",
+  title: "GLAS Z",
   bitje: [
-    { word: "cica", image: "cica.webp", audio: "cica.m4a" },
-    { word: "cvet", image: "cvet.webp", audio: "cvet.m4a" },
     { word: "zajec", image: "zajec.webp", audio: "zajec.m4a" },
-    { word: "palec", image: "palec.webp", audio: "palec.m4a" },
-    { word: "muca", image: "muca.webp", audio: "muca.m4a" },
-    { word: "ovca", image: "ovca.webp", audio: "ovca.m4a" },
+    { word: "zebra", image: "zebra.webp", audio: "zebra.m4a" },
+    { word: "zmaj", image: "zmaj.webp", audio: "zmaj.m4a" },
+    { word: "koza", image: "koza.webp", audio: "koza.m4a" },
+    { word: "meduza", image: "meduza.webp", audio: "meduza.m4a" },
+    { word: "dinozaver", image: "dinozaver.webp", audio: "dinozaver.m4a" },
   ],
   povedek: stickmanPovedek,
   predmet: [
@@ -73,6 +73,78 @@ export const metKockeC: MetKockeLetterConfig = {
   ],
 };
 
+// Konfiguracija za črko C
+export const metKockeC: MetKockeLetterConfig = {
+  letter: "c",
+  displayLetter: "C",
+  title: "GLAS C",
+  bitje: [
+    { word: "raca", image: "raca.webp", audio: "raca.m4a" },
+    { word: "zajec", image: "zajec.webp", audio: "zajec.m4a" },
+    { word: "opica", image: "opica.webp", audio: "opica.m4a" },
+    { word: "vrabec", image: "vrabec.webp", audio: "vrabec.m4a" },
+    { word: "muca", image: "muca.webp", audio: "muca.m4a" },
+    { word: "lovec", image: "lovec.webp", audio: "lovec.m4a" },
+  ],
+  povedek: stickmanPovedek,
+  predmet: [
+    { word: "cekin", image: "cekin.webp", audio: "cekin.m4a" },
+    { word: "copat", image: "copat.webp", audio: "copat.m4a" },
+    { word: "lubenico", image: "lubenica.webp", audio: "lubenico.m4a" },
+    { word: "pico", image: "pica.webp", audio: "pico.m4a" },
+    { word: "cvet", image: "cvet.webp", audio: "cvet.m4a" },
+    { word: "kocko", image: "kocka.webp", audio: "kocko.m4a" },
+  ],
+};
+
+// Konfiguracija za črko Š
+export const metKockeSH: MetKockeLetterConfig = {
+  letter: "sh",
+  displayLetter: "Š",
+  title: "GLAS Š",
+  bitje: [
+    { word: "štorklja", image: "storklja.webp", audio: "storklja.m4a" },
+    { word: "kokoš", image: "kokos.webp", audio: "kokos.m4a" },
+    { word: "miš", image: "mis.webp", audio: "mis.m4a" },
+    { word: "nogometaš", image: "nogometas.webp", audio: "nogometas.m4a" },
+    { word: "rokometaš", image: "rokometas.webp", audio: "rokometas.m4a" },
+    { word: "šofer", image: "sofer.webp", audio: "sofer.m4a" },
+  ],
+  povedek: stickmanPovedek,
+  predmet: [
+    { word: "škatlo", image: "skatla.webp", audio: "skatlo.m4a" },
+    { word: "piškot", image: "piskot.webp", audio: "piskot.m4a" },
+    { word: "škarje", image: "skarje.webp", audio: "skarje.m4a" },
+    { word: "šopek", image: "sopek.webp", audio: "sopek.m4a" },
+    { word: "hruško", image: "hruska.webp", audio: "hrusko.m4a" },
+    { word: "koš", image: "kos.webp", audio: "kos.m4a" },
+  ],
+};
+
+// Konfiguracija za črko Ž
+export const metKockeZH: MetKockeLetterConfig = {
+  letter: "zh",
+  displayLetter: "Ž",
+  title: "GLAS Ž",
+  bitje: [
+    { word: "žaba", image: "zaba.webp", audio: "zaba.m4a" },
+    { word: "želva", image: "zelva.webp", audio: "zelva.m4a" },
+    { word: "žirafa", image: "zirafa.webp", audio: "zirafa.m4a" },
+    { word: "žolna", image: "zolna.webp", audio: "zolna.m4a" },
+    { word: "deževnik", image: "dezevnik.webp", audio: "dezevnik.m4a" },
+    { word: "kuža", image: "kuza.webp", audio: "kuza.m4a" },
+  ],
+  povedek: stickmanPovedek,
+  predmet: [
+    { word: "fižol", image: "fizol.webp", audio: "fizol.m4a" },
+    { word: "rožo", image: "roza.webp", audio: "rozo.m4a" },
+    { word: "dežnik", image: "deznik.webp", audio: "deznik.m4a" },
+    { word: "žogo", image: "zoga.webp", audio: "zogo.m4a" },
+    { word: "žlico", image: "zlica.webp", audio: "zlico.m4a" },
+    { word: "krožnik", image: "kroznik.webp", audio: "kroznik.m4a" },
+  ],
+};
+
 // Konfiguracija za črko Č
 export const metKockeCH: MetKockeLetterConfig = {
   letter: "ch",
@@ -80,11 +152,11 @@ export const metKockeCH: MetKockeLetterConfig = {
   title: "GLAS Č",
   bitje: [
     { word: "čebela", image: "cebela.webp", audio: "cebela.m4a" },
-    { word: "črv", image: "crv.webp", audio: "crv.m4a" },
-    { word: "račka", image: "racka.webp", audio: "racka.m4a" },
-    { word: "sestrič", image: "sestric.webp", audio: "sestric.m4a" },
-    { word: "bratič", image: "bratic.webp", audio: "bratic.m4a" },
-    { word: "princeska", image: "princeska.webp", audio: "princeska.m4a" },
+    { word: "kača", image: "kaca.webp", audio: "kaca.m4a" },
+    { word: "ptič", image: "ptic.webp", audio: "ptic.m4a" },
+    { word: "ribič", image: "ribic.webp", audio: "ribic.m4a" },
+    { word: "čebelar", image: "cebelar.webp", audio: "cebelar.m4a" },
+    { word: "čarovnik", image: "carovnik.webp", audio: "carovnik.m4a" },
   ],
   povedek: stickmanPovedek,
   predmet: [
@@ -97,54 +169,6 @@ export const metKockeCH: MetKockeLetterConfig = {
   ],
 };
 
-// Konfiguracija za črko Š
-export const metKockeSH: MetKockeLetterConfig = {
-  letter: "sh",
-  displayLetter: "Š",
-  title: "GLAS Š",
-  bitje: [
-    { word: "škrat", image: "skrat.webp", audio: "skrat.m4a" },
-    { word: "miška", image: "miska.webp", audio: "miska.m4a" },
-    { word: "muška", image: "muska.webp", audio: "muska.m4a" },
-    { word: "gasilec", image: "gasilec.webp", audio: "gasilec.m4a" },
-    { word: "koš", image: "kos.webp", audio: "kos.m4a" },
-    { word: "pikapolonica", image: "pikapolonica.webp", audio: "pikapolonica.m4a" },
-  ],
-  povedek: stickmanPovedek,
-  predmet: [
-    { word: "škatlo", image: "skatla.webp", audio: "skatlo.m4a" },
-    { word: "piškot", image: "piskot.webp", audio: "piskot.m4a" },
-    { word: "škarje", image: "skarje.webp", audio: "skarje.m4a" },
-    { word: "šopek", image: "sopek.webp", audio: "sopek.m4a" },
-    { word: "hruško", image: "hruska.webp", audio: "hrusko.m4a" },
-    { word: "fižol", image: "fizol.webp", audio: "fizol.m4a" },
-  ],
-};
-
-// Konfiguracija za črko Ž
-export const metKockeZH: MetKockeLetterConfig = {
-  letter: "zh",
-  displayLetter: "Ž",
-  title: "GLAS Ž",
-  bitje: [
-    { word: "žaba", image: "zaba.webp", audio: "zaba.m4a" },
-    { word: "jež", image: "jez.webp", audio: "jez.m4a" },
-    { word: "morž", image: "morz.webp", audio: "morz.m4a" },
-    { word: "mož", image: "moz.webp", audio: "moz.m4a" },
-    { word: "strežaj", image: "strezaj.webp", audio: "strezaj.m4a" },
-    { word: "klovn", image: "klovn.webp", audio: "klovn.m4a" },
-  ],
-  povedek: stickmanPovedek,
-  predmet: [
-    { word: "rožo", image: "roza.webp", audio: "rozo.m4a" },
-    { word: "dežnik", image: "deznik.webp", audio: "deznik.m4a" },
-    { word: "žogo", image: "zoga.webp", audio: "zogo.m4a" },
-    { word: "žlico", image: "zlica.webp", audio: "zlico.m4a" },
-    { word: "krožnik", image: "kroznik.webp", audio: "kroznik.m4a" },
-    { word: "cekin", image: "cekin.webp", audio: "cekin.m4a" },
-  ],
-};
-
 // Konfiguracija za črko L
 export const metKockeL: MetKockeLetterConfig = {
   letter: "l",
@@ -152,11 +176,11 @@ export const metKockeL: MetKockeLetterConfig = {
   title: "GLAS L",
   bitje: [
     { word: "lev", image: "lev.webp", audio: "lev.m4a" },
-    { word: "lokomotiva", image: "lokomotiva.webp", audio: "lokomotiva.m4a" },
-    { word: "ladjica", image: "ladjica.webp", audio: "ladjica.m4a" },
-    { word: "pilot", image: "pilot.webp", audio: "pilot.m4a" },
-    { word: "osel", image: "osel.webp", audio: "osel.m4a" },
-    { word: "gel", image: "gel.webp", audio: "gel.m4a" },
+    { word: "čebela", image: "cebela.webp", audio: "cebela.m4a" },
+    { word: "slon", image: "slon.webp", audio: "slon.m4a" },
+    { word: "štorklja", image: "storklja.webp", audio: "storklja.m4a" },
+    { word: "želva", image: "zelva.webp", audio: "zelva.m4a" },
+    { word: "lisica", image: "lisica.webp", audio: "lisica.m4a" },
   ],
   povedek: stickmanPovedek,
   predmet: [
@@ -175,12 +199,12 @@ export const metKockeR: MetKockeLetterConfig = {
   displayLetter: "R",
   title: "GLAS R",
   bitje: [
+    { word: "raca", image: "raca.webp", audio: "raca.m4a" },
     { word: "rak", image: "rak.webp", audio: "rak.m4a" },
     { word: "riba", image: "riba.webp", audio: "riba.m4a" },
-    { word: "srna", image: "srna.webp", audio: "srna.m4a" },
-    { word: "tiger", image: "tiger.webp", audio: "tiger.m4a" },
-    { word: "prav", image: "prav.webp", audio: "prav.m4a" },
-    { word: "labrador", image: "labrador.webp", audio: "labrador.m4a" },
+    { word: "robot", image: "robot.webp", audio: "robot.m4a" },
+    { word: "bober", image: "bober.webp", audio: "bober.m4a" },
+    { word: "mrož", image: "mroz.webp", audio: "mroz.m4a" },
   ],
   povedek: stickmanPovedek,
   predmet: [
@@ -199,12 +223,12 @@ export const metKockeK: MetKockeLetterConfig = {
   displayLetter: "K",
   title: "GLAS K",
   bitje: [
+    { word: "kača", image: "kaca.webp", audio: "kaca.m4a" },
+    { word: "kokoš", image: "kokos.webp", audio: "kokos.m4a" },
+    { word: "koza", image: "koza.webp", audio: "koza.m4a" },
     { word: "krava", image: "krava.webp", audio: "krava.m4a" },
-    { word: "kos", image: "kos_ptica.webp", audio: "kos.m4a" },
-    { word: "krtek", image: "krtek.webp", audio: "krtek.m4a" },
-    { word: "rak", image: "rak.webp", audio: "rak.m4a" },
+    { word: "bik", image: "bik.webp", audio: "bik.m4a" },
     { word: "pajek", image: "pajek.webp", audio: "pajek.m4a" },
-    { word: "polk", image: "polk.webp", audio: "polk.m4a" },
   ],
   povedek: stickmanPovedek,
   predmet: [
@@ -217,41 +241,17 @@ export const metKockeK: MetKockeLetterConfig = {
   ],
 };
 
-// Konfiguracija za črko Z
-export const metKockeZ: MetKockeLetterConfig = {
-  letter: "z",
-  displayLetter: "Z",
-  title: "GLAS Z",
-  bitje: [
-    { word: "zajec", image: "zajec.webp", audio: "zajec.m4a" },
-    { word: "zebra", image: "zebra.webp", audio: "zebra.m4a" },
-    { word: "zmaj", image: "zmaj.webp", audio: "zmaj.m4a" },
-    { word: "koza", image: "koza.webp", audio: "koza.m4a" },
-    { word: "puž", image: "puz.webp", audio: "puz.m4a" },
-    { word: "medved", image: "medved.webp", audio: "medved.m4a" },
-  ],
-  povedek: stickmanPovedek,
-  predmet: [
-    { word: "copat", image: "copat.webp", audio: "copat.m4a" },
-    { word: "lubenico", image: "lubenica.webp", audio: "lubenico.m4a" },
-    { word: "pico", image: "pica.webp", audio: "pico.m4a" },
-    { word: "cvet", image: "cvet.webp", audio: "cvet.m4a" },
-    { word: "kocko", image: "kocka.webp", audio: "kocko.m4a" },
-    { word: "vazo", image: "vaza.webp", audio: "vazo.m4a" },
-  ],
-};
-
 // Mapa vseh konfiguracij
 export const metKockeConfigs: Record<string, MetKockeLetterConfig> = {
   s: metKockeS,
+  z: metKockeZ,
   c: metKockeC,
-  ch: metKockeCH,
   sh: metKockeSH,
   zh: metKockeZH,
+  ch: metKockeCH,
   l: metKockeL,
   r: metKockeR,
   k: metKockeK,
-  z: metKockeZ,
 };
 
 // Funkcija za pridobitev konfiguracije
