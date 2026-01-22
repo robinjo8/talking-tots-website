@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminUsers, ParentWithChildren, ChildData } from '@/hooks/useAdminUsers';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,7 +13,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search, Users, Baby, Eye, Loader2, ChevronDown } from 'lucide-react';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { useToast } from '@/hooks/use-toast';
+import { Search, Users, Baby, Eye, Loader2, ChevronDown, Trash2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface DisplayRow {
   parent: ParentWithChildren;
@@ -100,6 +104,16 @@ const UserCard = ({
             >
               <Eye className="h-4 w-4 mr-1" /> Ogled
             </Button>
+            {row.isFirstChild && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => window.dispatchEvent(new CustomEvent('delete-user', { detail: row.parent }))}
+                className="text-destructive border-destructive/50 hover:bg-destructive/10"
+              >
+                <Trash2 className="h-4 w-4 mr-1" /> Izbriši
+              </Button>
+            )}
           </div>
         </div>
       )}
@@ -109,12 +123,70 @@ const UserCard = ({
 
 export default function AdminUsers() {
   const navigate = useNavigate();
-  const { data: users, isLoading, error } = useAdminUsers();
+  const { data: users, isLoading, error, refetch } = useAdminUsers();
+  const { isSuperAdmin } = useAdminAuth();
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<ParentWithChildren | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const toggleCard = (cardId: string) => {
     setExpandedCardId(prev => prev === cardId ? null : cardId);
+  };
+
+  const handleDeleteClick = (parent: ParentWithChildren) => {
+    setUserToDelete(parent);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!userToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      
+      const response = await fetch(
+        `https://ecmtctwovkheohqwahvt.supabase.co/functions/v1/archive-and-delete-user`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${sessionData.session?.access_token}`,
+          },
+          body: JSON.stringify({
+            user_id: userToDelete.parent_id,
+            deletion_reason: 'Izbris preko admin portala',
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Napaka pri brisanju uporabnika');
+      }
+
+      toast({
+        title: 'Uporabnik arhiviran',
+        description: `Uporabnik bo trajno izbrisan čez 90 dni. ID arhiva: ${result.archive_id?.slice(0, 8)}...`,
+      });
+
+      setDeleteDialogOpen(false);
+      setUserToDelete(null);
+      refetch();
+    } catch (err: any) {
+      console.error('Delete error:', err);
+      toast({
+        title: 'Napaka',
+        description: err.message || 'Napaka pri brisanju uporabnika',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   // Flatten the data to have one row per child, or one row for users without children
@@ -351,6 +423,17 @@ export default function AdminUsers() {
                               >
                                 <Eye className="h-4 w-4" />
                               </Button>
+                              {isSuperAdmin && row.isFirstChild && (
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  title="Izbriši uporabnika"
+                                  onClick={() => handleDeleteClick(row.parent)}
+                                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              )}
                             </div>
                           </TableCell>
                         </TableRow>
@@ -389,6 +472,23 @@ export default function AdminUsers() {
           )}
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Izbriši uporabnika"
+        description={
+          userToDelete 
+            ? `Ali ste prepričani, da želite izbrisati uporabnika "${formatParentName(userToDelete) || userToDelete.email || 'Neznani uporabnik'}"? Podatki bodo arhivirani in trajno izbrisani čez 90 dni.`
+            : 'Ali ste prepričani, da želite izbrisati tega uporabnika?'
+        }
+        confirmText="Izbriši"
+        cancelText="Prekliči"
+        confirmVariant="destructive"
+        isLoading={isDeleting}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 }

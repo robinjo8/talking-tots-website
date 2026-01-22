@@ -44,6 +44,139 @@ export type Database = {
         }
         Relationships: []
       }
+      archived_children: {
+        Row: {
+          age: number | null
+          archive_id: string | null
+          birth_date: string | null
+          gender: string | null
+          id: string
+          name: string | null
+          original_child_id: string
+          speech_development: Json | null
+          speech_difficulties: string[] | null
+          speech_difficulties_description: string | null
+        }
+        Insert: {
+          age?: number | null
+          archive_id?: string | null
+          birth_date?: string | null
+          gender?: string | null
+          id?: string
+          name?: string | null
+          original_child_id: string
+          speech_development?: Json | null
+          speech_difficulties?: string[] | null
+          speech_difficulties_description?: string | null
+        }
+        Update: {
+          age?: number | null
+          archive_id?: string | null
+          birth_date?: string | null
+          gender?: string | null
+          id?: string
+          name?: string | null
+          original_child_id?: string
+          speech_development?: Json | null
+          speech_difficulties?: string[] | null
+          speech_difficulties_description?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "archived_children_archive_id_fkey"
+            columns: ["archive_id"]
+            isOneToOne: false
+            referencedRelation: "archived_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      archived_test_sessions: {
+        Row: {
+          archive_id: string | null
+          assigned_to: string | null
+          child_name: string | null
+          completed_at: string | null
+          id: string
+          original_child_id: string | null
+          original_session_id: string
+          status: string | null
+          submitted_at: string | null
+          test_data: Json | null
+        }
+        Insert: {
+          archive_id?: string | null
+          assigned_to?: string | null
+          child_name?: string | null
+          completed_at?: string | null
+          id?: string
+          original_child_id?: string | null
+          original_session_id: string
+          status?: string | null
+          submitted_at?: string | null
+          test_data?: Json | null
+        }
+        Update: {
+          archive_id?: string | null
+          assigned_to?: string | null
+          child_name?: string | null
+          completed_at?: string | null
+          id?: string
+          original_child_id?: string | null
+          original_session_id?: string
+          status?: string | null
+          submitted_at?: string | null
+          test_data?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "archived_test_sessions_archive_id_fkey"
+            columns: ["archive_id"]
+            isOneToOne: false
+            referencedRelation: "archived_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      archived_users: {
+        Row: {
+          archived_at: string | null
+          archived_by: string
+          deletion_reason: string | null
+          email: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          original_user_id: string
+          scheduled_deletion_at: string | null
+          username: string | null
+        }
+        Insert: {
+          archived_at?: string | null
+          archived_by: string
+          deletion_reason?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          original_user_id: string
+          scheduled_deletion_at?: string | null
+          username?: string | null
+        }
+        Update: {
+          archived_at?: string | null
+          archived_by?: string
+          deletion_reason?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          original_user_id?: string
+          scheduled_deletion_at?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
       articulation_test_results: {
         Row: {
           child_id: string
