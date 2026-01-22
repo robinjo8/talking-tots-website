@@ -7,14 +7,17 @@ interface DiceRollerProps {
   onRollComplete: (result: number) => void;
 }
 
-// Final rotations to show each number
+// Final rotations to show each number (matching the 3D cube faces)
+// Face 1 = Front (translateZ), Face 6 = Back (rotateY 180deg)
+// Face 2 = Right (rotateY 90deg), Face 5 = Left (rotateY -90deg)  
+// Face 3 = Top (rotateX 90deg), Face 4 = Bottom (rotateX -90deg)
 const finalRotations: Record<number, string> = {
-  1: 'rotateX(0deg) rotateY(0deg)',
-  2: 'rotateX(0deg) rotateY(90deg)',
-  3: 'rotateX(-90deg) rotateY(0deg)',
-  4: 'rotateX(90deg) rotateY(0deg)',
-  5: 'rotateX(0deg) rotateY(-90deg)',
-  6: 'rotateX(0deg) rotateY(180deg)',
+  1: 'rotateX(0deg) rotateY(0deg)',      // Show front face (1)
+  2: 'rotateX(0deg) rotateY(-90deg)',    // Show right face (2)
+  3: 'rotateX(-90deg) rotateY(0deg)',    // Show top face (3)
+  4: 'rotateX(90deg) rotateY(0deg)',     // Show bottom face (4)
+  5: 'rotateX(0deg) rotateY(90deg)',     // Show left face (5)
+  6: 'rotateX(0deg) rotateY(180deg)',    // Show back face (6)
 };
 
 const stepLabels = ['BITJE', 'POVEDEK', 'PREDMET'];
