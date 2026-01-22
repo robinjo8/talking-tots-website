@@ -11,7 +11,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/kolo-srece",
     available: true,
-    mobileImageSize: "90%"
+    mobileImageSize: "95%"
   },
   {
     id: "bingo",
@@ -22,7 +22,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/bingo",
     available: true,
-    mobileImageSize: "90%"
+    mobileImageSize: "95%"
   },
   {
     id: "spomin",
@@ -33,7 +33,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/spomin",
     available: true,
-    mobileImageSize: "90%"
+    mobileImageSize: "95%"
   },
   {
     id: "sestavljanke",
@@ -44,7 +44,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/sestavljanke",
     available: true,
-    mobileImageSize: "90%"
+    mobileImageSize: "95%"
   },
   {
     id: "zaporedja",
@@ -55,7 +55,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/zaporedja",
     available: true,
-    mobileImageSize: "85%"
+    mobileImageSize: "95%"
   },
   {
     id: "drsna-sestavljanka",
@@ -77,7 +77,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/igra-ujemanja",
     available: true,
-    mobileImageSize: "70%"
+    mobileImageSize: "95%"
   },
   {
     id: "labirint",
@@ -88,7 +88,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/labirint",
     available: true,
-    mobileImageSize: "70%"
+    mobileImageSize: "95%"
   },
   {
     id: "met-kocke",
@@ -99,7 +99,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(120, 60%, 95%) 0%, hsl(120, 50%, 85%) 30%, hsl(120, 40%, 75%) 60%, hsl(120, 35%, 65%) 100%)",
     path: "/govorne-igre/met-kocke",
     available: true,
-    mobileImageSize: "90%"
+    mobileImageSize: "95%"
   },
   {
     id: "pobarvanke",
