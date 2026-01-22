@@ -10,6 +10,7 @@ const AdminDashboard = lazy(() => import('@/pages/admin/AdminDashboard'));
 const AdminUsers = lazy(() => import('@/pages/admin/AdminUsers'));
 const AdminUserDetail = lazy(() => import('@/pages/admin/AdminUserDetail'));
 const AdminMemberships = lazy(() => import('@/pages/admin/AdminMemberships'));
+const AdminTests = lazy(() => import('@/pages/admin/AdminTests'));
 
 // Loading fallback for admin pages
 function AdminLoadingFallback() {
@@ -83,6 +84,14 @@ export function AdminRoutes() {
           element={
             <AdminLayoutWrapper>
               <AdminMemberships />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="tests" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminTests />
             </AdminLayoutWrapper>
           } 
         />
