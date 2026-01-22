@@ -26,3 +26,6 @@ verify_jwt = false
 
 [functions.confirm-logopedist-email]
 verify_jwt = false
+
+[functions.archive-and-delete-user]
+verify_jwt = false
