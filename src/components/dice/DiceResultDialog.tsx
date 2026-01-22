@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Volume2, Mic } from 'lucide-react';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { Volume2, Mic, X, Star } from 'lucide-react';
 import { MetKockeWord } from '@/data/metKockeConfig';
 
 interface DiceResultDialogProps {
@@ -23,23 +24,37 @@ export function DiceResultDialog({
   predmetWord,
   onRecordComplete,
 }: DiceResultDialogProps) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const [recordingTimeLeft, setRecordingTimeLeft] = useState(5);
-  const [hasRecorded, setHasRecorded] = useState(false);
+  const [completedRecordings, setCompletedRecordings] = useState<Set<number>>(new Set());
+  const [recordingTimeLeft, setRecordingTimeLeft] = useState(3);
+  const [currentRecordingIndex, setCurrentRecordingIndex] = useState<number | null>(null);
   const [starClaimed, setStarClaimed] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [confirmDialogConfig, setConfirmDialogConfig] = useState<{
+    title: string;
+    description: string;
+    onConfirm: () => void;
+  } | null>(null);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const countdownRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Reset state when dialog opens
+  const words = [bitjeWord, povedekWord, predmetWord].filter(Boolean) as MetKockeWord[];
+
+  // Reset state when dialog opens/closes
   useEffect(() => {
-    if (isOpen) {
-      setIsPlaying(false);
-      setIsRecording(false);
-      setRecordingTimeLeft(5);
-      setHasRecorded(false);
+    if (!isOpen) {
+      setCompletedRecordings(new Set());
+      setRecordingTimeLeft(3);
+      setCurrentRecordingIndex(null);
       setStarClaimed(false);
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+        countdownRef.current = null;
+      }
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
     }
   }, [isOpen]);
 
@@ -50,163 +65,195 @@ export function DiceResultDialog({
         audioRef.current.pause();
         audioRef.current = null;
       }
-      if (recordingIntervalRef.current) {
-        clearInterval(recordingIntervalRef.current);
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
       }
     };
   }, []);
 
-  const playSequence = useCallback(async () => {
-    if (isPlaying || !bitjeWord || !povedekWord || !predmetWord) return;
-    
-    setIsPlaying(true);
-    
-    const words = [bitjeWord, povedekWord, predmetWord];
-    
-    for (const word of words) {
-      await new Promise<void>((resolve) => {
-        const audio = new Audio(`${SUPABASE_URL}/zvocni-posnetki/${word.audio}`);
-        audioRef.current = audio;
-        
-        audio.onended = () => resolve();
-        audio.onerror = () => resolve();
-        audio.play().catch(() => resolve());
-      });
-      
-      // Small pause between words
-      await new Promise(resolve => setTimeout(resolve, 300));
+  const playAudio = useCallback((word: MetKockeWord) => {
+    if (audioRef.current) {
+      audioRef.current.pause();
     }
-    
-    setIsPlaying(false);
-  }, [isPlaying, bitjeWord, povedekWord, predmetWord]);
+    audioRef.current = new Audio(`${SUPABASE_URL}/zvocni-posnetki/${word.audio}`);
+    audioRef.current.play().catch(console.error);
+  }, []);
 
-  const startRecording = useCallback(() => {
-    if (isRecording) return;
+  const startRecording = useCallback((imageIndex: number) => {
+    if (completedRecordings.has(imageIndex) || currentRecordingIndex !== null) return;
     
-    setIsRecording(true);
-    setRecordingTimeLeft(5);
-    
-    recordingIntervalRef.current = setInterval(() => {
+    setCurrentRecordingIndex(imageIndex);
+    setRecordingTimeLeft(3);
+
+    countdownRef.current = setInterval(() => {
       setRecordingTimeLeft(prev => {
         if (prev <= 1) {
-          if (recordingIntervalRef.current) {
-            clearInterval(recordingIntervalRef.current);
+          if (countdownRef.current) {
+            clearInterval(countdownRef.current);
+            countdownRef.current = null;
           }
-          setIsRecording(false);
-          setHasRecorded(true);
-          return 5;
+          setCompletedRecordings(prevCompleted => new Set([...prevCompleted, imageIndex]));
+          setCurrentRecordingIndex(null);
+          return 3;
         }
         return prev - 1;
       });
     }, 1000);
-  }, [isRecording]);
+  }, [completedRecordings, currentRecordingIndex]);
+
+  const handleClose = useCallback(() => {
+    const allCompleted = completedRecordings.size === words.length;
+    if (allCompleted && !starClaimed) {
+      setConfirmDialogConfig({
+        title: "Zapri igro",
+        description: "Če zapreš igro, ne boš prejel zvezdice. Ali si prepričan?",
+        onConfirm: () => {
+          setShowConfirmDialog(false);
+          onClose();
+        }
+      });
+      setShowConfirmDialog(true);
+    } else if (!allCompleted) {
+      setConfirmDialogConfig({
+        title: "Zapri okno",
+        description: "Ali ste prepričani, da se želite zapreti okno? Niste še končali vseh posnetkov.",
+        onConfirm: () => {
+          setShowConfirmDialog(false);
+          onClose();
+        }
+      });
+      setShowConfirmDialog(true);
+    } else {
+      onClose();
+    }
+  }, [completedRecordings.size, words.length, starClaimed, onClose]);
 
   const handleClaimStar = useCallback(() => {
     setStarClaimed(true);
     onRecordComplete();
-    
-    // Close dialog after short delay
     setTimeout(() => {
       onClose();
-    }, 500);
+    }, 1500);
   }, [onRecordComplete, onClose]);
+
+  const handleImageClick = useCallback((imageIndex: number) => {
+    if (completedRecordings.has(imageIndex) || currentRecordingIndex !== null) {
+      return;
+    }
+    startRecording(imageIndex);
+  }, [completedRecordings, currentRecordingIndex, startRecording]);
 
   if (!bitjeWord || !povedekWord || !predmetWord) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="bg-white rounded-3xl border-4 border-app-orange max-w-lg mx-auto p-6">
-        <div className="text-center space-y-6">
-          {/* Title */}
-          <h2 className="text-2xl font-bold text-gray-800">
-            Tvoja smešna poved:
-          </h2>
+    <>
+      <Dialog open={isOpen} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="font-bold text-dragon-green text-center text-lg md:text-2xl">
+              Odlično!
+            </DialogTitle>
+          </DialogHeader>
           
-          {/* Three images in a row */}
-          <div className="flex justify-center items-center gap-4">
-            <div className="flex flex-col items-center">
-              <div className="w-24 h-24 rounded-xl overflow-hidden border-2 border-gray-200 bg-gray-50">
-                <img
-                  src={`${SUPABASE_URL}/slike/${bitjeWord.image}`}
-                  alt={bitjeWord.word}
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <span className="mt-2 text-sm font-medium text-gray-700">{bitjeWord.word}</span>
+          <div className="space-y-2 md:space-y-4 py-2 md:py-4">
+            <p className="text-black text-center uppercase text-xs md:text-sm">
+              KLIKNI NA SPODNJE SLIKE IN PONOVI BESEDE
+            </p>
+            
+            {/* Three images in a row */}
+            <div className="flex justify-center gap-3 md:gap-4">
+              {words.map((word, index) => {
+                const isRecording = currentRecordingIndex === index;
+                const isCompleted = completedRecordings.has(index);
+                
+                return (
+                  <div key={index} className="flex flex-col items-center space-y-1 md:space-y-2">
+                    <div 
+                      className={`cursor-pointer transition-all ${isCompleted ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
+                      onClick={() => handleImageClick(index)}
+                    >
+                      <div className="relative">
+                        <div className={`w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden border-2 bg-gray-50 ${
+                          isCompleted ? 'border-gray-400 grayscale' : isRecording ? 'border-red-500' : 'border-dragon-green'
+                        }`}>
+                          <img
+                            src={`${SUPABASE_URL}/slike/${word.image}`}
+                            alt={word.word}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                        {isRecording && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-xl">
+                            <div className="bg-red-500 text-white rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
+                              <Mic className="w-3 h-3 md:w-4 md:h-4" />
+                            </div>
+                          </div>
+                        )}
+                        {isRecording && (
+                          <div className="absolute -top-1 -right-1 md:-top-2 md:-right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 md:w-6 md:h-6 flex items-center justify-center">
+                            {recordingTimeLeft}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <span className={`font-medium text-center text-xs md:text-sm ${isCompleted ? 'text-gray-400' : 'text-black'}`}>
+                      {word.word.toUpperCase()}
+                    </span>
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        playAudio(word);
+                      }}
+                      size="icon"
+                      className="bg-green-500 hover:bg-green-600 text-white h-8 w-8"
+                    >
+                      <Volume2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                );
+              })}
             </div>
             
-            <div className="flex flex-col items-center">
-              <div className="w-24 h-24 rounded-xl overflow-hidden border-2 border-gray-200 bg-gray-50">
-                <img
-                  src={`${SUPABASE_URL}/slike/${povedekWord.image}`}
-                  alt={povedekWord.word}
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <span className="mt-2 text-sm font-medium text-gray-700">{povedekWord.word}</span>
-            </div>
-            
-            <div className="flex flex-col items-center">
-              <div className="w-24 h-24 rounded-xl overflow-hidden border-2 border-gray-200 bg-gray-50">
-                <img
-                  src={`${SUPABASE_URL}/slike/${predmetWord.image}`}
-                  alt={predmetWord.word}
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <span className="mt-2 text-sm font-medium text-gray-700">{predmetWord.word}</span>
-            </div>
+            {/* Sentence text */}
+            <p className="text-base md:text-lg font-semibold text-gray-800 text-center">
+              "{bitjeWord.word} {povedekWord.word} {predmetWord.word}"
+            </p>
           </div>
-          
-          {/* Sentence text */}
-          <p className="text-xl font-semibold text-gray-800">
-            "{bitjeWord.word} {povedekWord.word} {predmetWord.word}"
-          </p>
-          
+
           {/* Action buttons */}
-          <div className="flex justify-center gap-4">
-            {/* Play button */}
-            <Button
-              onClick={playSequence}
-              disabled={isPlaying || isRecording}
-              className="flex items-center gap-2 bg-app-blue hover:bg-app-blue/90 text-white px-6 py-3 rounded-xl"
-            >
-              <Volume2 className={`w-5 h-5 ${isPlaying ? 'animate-pulse' : ''}`} />
-              {isPlaying ? 'Predvajam...' : 'Predvajaj'}
+          <div className="flex justify-center gap-3">
+            <Button onClick={handleClose} variant="outline" className="gap-2 flex-1 max-w-32">
+              Zapri
             </Button>
             
-            {/* Record button */}
-            <Button
-              onClick={startRecording}
-              disabled={isRecording || isPlaying || hasRecorded}
-              className={`flex items-center gap-2 px-6 py-3 rounded-xl ${
-                isRecording 
-                  ? 'bg-red-500 hover:bg-red-600' 
-                  : hasRecorded 
-                    ? 'bg-green-500 hover:bg-green-600'
-                    : 'bg-app-orange hover:bg-app-orange/90'
-              } text-white`}
-            >
-              <Mic className={`w-5 h-5 ${isRecording ? 'animate-pulse' : ''}`} />
-              {isRecording 
-                ? `Snemam... ${recordingTimeLeft}s` 
-                : hasRecorded 
-                  ? 'Posneto!' 
-                  : 'Snemaj'}
-            </Button>
+            {completedRecordings.size === words.length && !starClaimed ? (
+              <Button 
+                onClick={handleClaimStar} 
+                className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 flex-1 max-w-36"
+              >
+                <Star className="w-4 h-4" />
+                Vzemi zvezdico
+              </Button>
+            ) : (
+              <Button onClick={handleClose} className="bg-dragon-green hover:bg-dragon-green/90 gap-2 flex-1 max-w-32">
+                <X className="w-4 h-4" />
+                Zapri
+              </Button>
+            )}
           </div>
-          
-          {/* Continue / Claim star button */}
-          {hasRecorded && !starClaimed && (
-            <Button
-              onClick={handleClaimStar}
-              className="w-full bg-gradient-to-r from-app-orange to-app-yellow text-white font-bold py-4 rounded-xl text-lg hover:opacity-90 transition-opacity"
-            >
-              ⭐ VZEMI ZVEZDICO ⭐
-            </Button>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+      
+      <ConfirmDialog
+        open={showConfirmDialog}
+        onOpenChange={setShowConfirmDialog}
+        title={confirmDialogConfig?.title || ""}
+        description={confirmDialogConfig?.description || ""}
+        confirmText="V redu"
+        cancelText="Prekliči"
+        onConfirm={() => confirmDialogConfig?.onConfirm()}
+        onCancel={() => setShowConfirmDialog(false)}
+      />
+    </>
   );
 }

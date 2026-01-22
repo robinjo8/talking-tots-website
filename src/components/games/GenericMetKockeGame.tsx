@@ -1,11 +1,9 @@
 import { useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Home } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { MemoryExitConfirmationDialog } from '@/components/games/MemoryExitConfirmationDialog';
@@ -42,7 +40,7 @@ const DiceFace = ({ number }: { number: number }) => {
   };
 
   return (
-    <svg viewBox="0 0 100 100" className="w-10 h-10">
+    <svg viewBox="0 0 100 100" className="w-full h-full">
       <rect x="5" y="5" width="90" height="90" rx="10" fill="white" stroke="#374151" strokeWidth="3" />
       {dotPositions[number]?.map(([cx, cy], i) => (
         <circle key={i} cx={cx} cy={cy} r="8" fill="#374151" />
@@ -130,33 +128,35 @@ export function GenericMetKockeGame({
 
   return (
     <div 
-      className="min-h-screen bg-cover bg-center bg-no-repeat relative"
+      className="fixed inset-0 overflow-hidden select-none"
       style={{
         backgroundImage: `url(${SUPABASE_URL}/ozadja/zeleno_ozadje.webp)`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
       }}
     >
-      {/* Header */}
-      <div className="absolute top-4 left-0 right-0 text-center">
-        <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
+      {/* Main content - centered */}
+      <div className="h-full flex flex-col items-center justify-center p-4">
+        {/* Title */}
+        <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg mb-3">
           {title}
         </h1>
-      </div>
 
-      {/* Main grid content */}
-      <div className="pt-20 pb-24 px-4 flex items-center justify-center min-h-screen">
-        <div className="bg-white/90 backdrop-blur rounded-2xl shadow-xl p-4 md:p-6 max-w-4xl w-full">
+        {/* Game grid */}
+        <div className="bg-white/90 backdrop-blur rounded-2xl shadow-xl p-3 md:p-4 max-w-3xl w-full">
           {/* Grid header */}
-          <div className="grid grid-cols-4 gap-2 mb-2">
-            <div className="text-center font-bold text-muted-foreground text-sm">KOCKA</div>
+          <div className="grid grid-cols-4 gap-1 md:gap-2 mb-1">
+            <div className="text-center font-bold text-muted-foreground text-xs">KOCKA</div>
             {columns.map((col) => (
-              <div key={col} className="text-center font-bold text-foreground text-sm md:text-base">
+              <div key={col} className="text-center font-bold text-foreground text-xs md:text-sm">
                 {col}
               </div>
             ))}
           </div>
 
           {/* Grid rows */}
-          <div className="space-y-2">
+          <div className="space-y-1">
             {[1, 2, 3, 4, 5, 6].map((rowNum) => {
               const index = rowNum - 1;
               const bitjeItem = bitje[index];
@@ -168,21 +168,23 @@ export function GenericMetKockeGame({
               const isPredmetSelected = selectedPredmet === index;
 
               return (
-                <div key={rowNum} className="grid grid-cols-4 gap-2 items-center">
+                <div key={rowNum} className="grid grid-cols-4 gap-1 md:gap-2 items-center">
                   {/* Dice column */}
                   <div className="flex justify-center">
-                    <DiceFace number={rowNum} />
+                    <div className="w-8 h-8 md:w-10 md:h-10">
+                      <DiceFace number={rowNum} />
+                    </div>
                   </div>
                   
                   {/* BITJE column */}
                   <div 
-                    className={`rounded-xl p-1 transition-all duration-300 ${
+                    className={`rounded-lg p-0.5 transition-all duration-300 ${
                       isBitjeSelected 
-                        ? 'ring-4 ring-app-orange bg-app-orange/20 scale-105' 
+                        ? 'ring-2 ring-app-orange bg-app-orange/20 scale-105' 
                         : 'bg-muted'
                     }`}
                   >
-                    <div className="aspect-square rounded-lg overflow-hidden bg-background">
+                    <div className="aspect-square rounded overflow-hidden bg-background">
                       <img
                         src={`${SUPABASE_URL}/slike/${bitjeItem.image}`}
                         alt={bitjeItem.word}
@@ -193,13 +195,13 @@ export function GenericMetKockeGame({
                   
                   {/* POVEDEK column */}
                   <div 
-                    className={`rounded-xl p-1 transition-all duration-300 ${
+                    className={`rounded-lg p-0.5 transition-all duration-300 ${
                       isPovedekSelected 
-                        ? 'ring-4 ring-app-blue bg-app-blue/20 scale-105' 
+                        ? 'ring-2 ring-app-blue bg-app-blue/20 scale-105' 
                         : 'bg-muted'
                     }`}
                   >
-                    <div className="aspect-square rounded-lg overflow-hidden bg-background">
+                    <div className="aspect-square rounded overflow-hidden bg-background">
                       <img
                         src={`${SUPABASE_URL}/slike/${povedekItem.image}`}
                         alt={povedekItem.word}
@@ -210,13 +212,13 @@ export function GenericMetKockeGame({
                   
                   {/* PREDMET column */}
                   <div 
-                    className={`rounded-xl p-1 transition-all duration-300 ${
+                    className={`rounded-lg p-0.5 transition-all duration-300 ${
                       isPredmetSelected 
-                        ? 'ring-4 ring-dragon-green bg-dragon-green/20 scale-105' 
+                        ? 'ring-2 ring-dragon-green bg-dragon-green/20 scale-105' 
                         : 'bg-muted'
                     }`}
                   >
-                    <div className="aspect-square rounded-lg overflow-hidden bg-background">
+                    <div className="aspect-square rounded overflow-hidden bg-background">
                       <img
                         src={`${SUPABASE_URL}/slike/${predmetItem.image}`}
                         alt={predmetItem.word}
@@ -246,35 +248,28 @@ export function GenericMetKockeGame({
       <div className="fixed bottom-4 left-4 z-50">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              className="w-14 h-14 rounded-full bg-gradient-to-br from-app-orange to-app-yellow shadow-lg hover:scale-105 transition-transform"
-            >
-              <Home className="w-7 h-7 text-white" />
-            </Button>
+            <button className="w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform">
+              <Home className="w-8 h-8 text-white" />
+            </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent 
+            className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl" 
             align="start" 
             side="top" 
-            className="mb-2 bg-background rounded-xl shadow-xl border-2 border-border"
+            sideOffset={8}
           >
-            <DropdownMenuItem 
-              onClick={handleBack}
-              className="text-lg py-3 px-4 cursor-pointer hover:bg-muted"
-            >
-              🏠 Nazaj
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={handleNewGame}
-              className="text-lg py-3 px-4 cursor-pointer hover:bg-muted"
-            >
-              🔄 Nova igra
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => setShowInstructions(true)}
-              className="text-lg py-3 px-4 cursor-pointer hover:bg-muted"
-            >
-              📖 Navodila
-            </DropdownMenuItem>
+            <button onClick={handleBack} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors">
+              <span className="text-xl">🏠</span>
+              <span className="font-medium">Nazaj</span>
+            </button>
+            <button onClick={handleNewGame} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors">
+              <span className="text-xl">🔄</span>
+              <span className="font-medium">Nova igra</span>
+            </button>
+            <button onClick={() => setShowInstructions(true)} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 rounded-lg transition-colors">
+              <span className="text-xl">📖</span>
+              <span className="font-medium">Navodila</span>
+            </button>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
