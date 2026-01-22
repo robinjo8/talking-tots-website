@@ -135,16 +135,15 @@ export function GenericMetKockeGame({
         backgroundRepeat: 'no-repeat',
       }}
     >
-      {/* Header with progress indicator */}
-      <div className="fixed top-0 left-0 right-0 z-30 bg-[#4ade80] rounded-b-3xl px-4 py-2 shadow-lg">
+      {/* Header with progress indicator - floating style like Spomin */}
+      <div className="absolute top-0 left-0 right-0 z-30 pt-4">
         <div className="text-center">
-          <h1 className="text-lg md:text-xl font-bold text-white drop-shadow-lg">
+          <h1 className="text-2xl font-bold text-white drop-shadow-lg">
             {title}
           </h1>
           <MemoryProgressIndicator 
             matchedPairs={completedRounds % 5} 
             totalPairs={5} 
-            className="py-1"
           />
         </div>
       </div>
