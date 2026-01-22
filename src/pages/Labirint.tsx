@@ -98,15 +98,9 @@ const labirintGames = [
 
 export default function Labirint() {
   const navigate = useNavigate();
-  const { user, selectedChild, signOut } = useAuth();
-  const childName = selectedChild?.name;
+  const { selectedChild, signOut } = useAuth();
   const isMobile = useIsMobile();
-  const { dailyActivities, isLoading } = useDailyProgress();
-  const [emblaRef] = useEmblaCarousel({ 
-    align: 'start',
-    dragFree: true,
-    containScroll: 'trimSnaps'
-  });
+  const { dailyActivities } = useDailyProgress();
   
   const targetActivities = 15;
   const percentage = Math.min((dailyActivities / targetActivities) * 100, 100);
