@@ -11,7 +11,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/kolo-srece",
     available: true,
-    mobileImageSize: "95%"
+    imageScale: "75%"
   },
   {
     id: "bingo",
@@ -22,7 +22,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/bingo",
     available: true,
-    mobileImageSize: "95%"
+    imageScale: "75%"
   },
   {
     id: "spomin",
@@ -33,7 +33,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/spomin",
     available: true,
-    mobileImageSize: "95%"
+    imageScale: "90%"
   },
   {
     id: "sestavljanke",
@@ -44,7 +44,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/sestavljanke",
     available: true,
-    mobileImageSize: "95%"
+    imageScale: "75%"
   },
   {
     id: "zaporedja",
@@ -55,7 +55,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/zaporedja",
     available: true,
-    mobileImageSize: "95%"
+    imageScale: "90%"
   },
   {
     id: "drsna-sestavljanka",
@@ -66,7 +66,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/drsna-sestavljanka",
     available: true,
-    mobileImageSize: "95%"
+    imageScale: "75%"
   },
   {
     id: "povezi-pare-matching",
@@ -77,7 +77,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/igra-ujemanja",
     available: true,
-    mobileImageSize: "95%"
+    imageScale: "90%"
   },
   {
     id: "labirint",
@@ -88,7 +88,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/labirint",
     available: true,
-    mobileImageSize: "95%"
+    imageScale: "75%"
   },
   {
     id: "met-kocke",
@@ -99,7 +99,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(120, 60%, 95%) 0%, hsl(120, 50%, 85%) 30%, hsl(120, 40%, 75%) 60%, hsl(120, 35%, 65%) 100%)",
     path: "/govorne-igre/met-kocke",
     available: true,
-    mobileImageSize: "95%"
+    imageScale: "75%"
   },
   {
     id: "pobarvanke",
@@ -158,13 +158,15 @@ export function GamesList() {
                       }}
                     />
                   )}
-                  {/* Image on top - fixed size container */}
-                  <div className="absolute inset-0 flex items-center justify-center p-3">
+                  {/* Image on top - scaled per game */}
+                  <div className="absolute inset-0 flex items-center justify-center p-2">
                     <img 
                       src={game.image}
                       alt={game.title}
-                      className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-300"
+                      className="object-contain group-hover:scale-110 transition-transform duration-300"
                       style={{
+                        maxWidth: game.imageScale || "90%",
+                        maxHeight: game.imageScale || "90%",
                         ...(['zaporedja', 'povezi-pare-matching', 'labirint'].includes(game.id) ? { mixBlendMode: 'multiply' } : {})
                       }}
                     />
