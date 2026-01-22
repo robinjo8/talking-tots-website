@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Volume2 } from 'lucide-react';
+import { Volume2, Mic } from 'lucide-react';
 import { MetKockeWord } from '@/data/metKockeConfig';
 
 interface DiceResultDialogProps {
@@ -22,12 +22,37 @@ export function DiceResultDialog({
   predmetWord,
 }: DiceResultDialogProps) {
   const [isPlayingSequence, setIsPlayingSequence] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTimeLeft, setRecordingTimeLeft] = useState(0);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const autoPlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hasAutoPlayedRef = useRef(false);
+  const countdownRef = useRef<NodeJS.Timeout | null>(null);
 
   const words = [bitjeWord, povedekWord, predmetWord].filter(Boolean) as MetKockeWord[];
+
+  // Start simulated recording with 3 second countdown
+  const startRecording = useCallback(() => {
+    if (isRecording) return;
+    
+    setIsRecording(true);
+    setRecordingTimeLeft(3);
+
+    countdownRef.current = setInterval(() => {
+      setRecordingTimeLeft(prev => {
+        if (prev <= 1) {
+          if (countdownRef.current) {
+            clearInterval(countdownRef.current);
+            countdownRef.current = null;
+          }
+          setIsRecording(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }, [isRecording]);
 
   // Play audio sequence for all three words
   const playAudioSequence = useCallback(async () => {
@@ -72,6 +97,8 @@ export function DiceResultDialog({
   useEffect(() => {
     if (!isOpen) {
       setIsPlayingSequence(false);
+      setIsRecording(false);
+      setRecordingTimeLeft(0);
       hasAutoPlayedRef.current = false;
       if (audioRef.current) {
         audioRef.current.pause();
@@ -80,6 +107,10 @@ export function DiceResultDialog({
       if (autoPlayTimeoutRef.current) {
         clearTimeout(autoPlayTimeoutRef.current);
         autoPlayTimeoutRef.current = null;
+      }
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+        countdownRef.current = null;
       }
     }
   }, [isOpen]);
@@ -93,6 +124,9 @@ export function DiceResultDialog({
       }
       if (autoPlayTimeoutRef.current) {
         clearTimeout(autoPlayTimeoutRef.current);
+      }
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
       }
     };
   }, []);
@@ -140,11 +174,26 @@ export function DiceResultDialog({
           <div className="flex justify-center gap-3 pt-2">
             <Button
               onClick={playAudioSequence}
-              disabled={isPlayingSequence}
-              className="bg-green-500 hover:bg-green-600 text-white gap-2 uppercase font-medium"
+              disabled={isPlayingSequence || isRecording}
+              className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 uppercase font-medium"
             >
               <Volume2 className="w-4 h-4" />
               {isPlayingSequence ? "PREDVAJAM..." : "PREDVAJAJ"}
+            </Button>
+            
+            {/* PONOVI button with countdown */}
+            <Button
+              onClick={startRecording}
+              disabled={isRecording || isPlayingSequence}
+              className="relative bg-app-orange hover:bg-app-orange/90 text-white gap-2 uppercase font-medium"
+            >
+              <Mic className="w-4 h-4" />
+              {isRecording ? "SNEMAM..." : "PONOVI"}
+              {isRecording && (
+                <span className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                  {recordingTimeLeft}
+                </span>
+              )}
             </Button>
             
             <Button onClick={onClose} variant="outline" className="gap-2 uppercase">

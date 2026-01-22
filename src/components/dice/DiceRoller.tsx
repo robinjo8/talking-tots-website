@@ -19,8 +19,6 @@ const finalRotations: Record<number, string> = {
   6: 'rotateX(0deg) rotateY(180deg)',    // Show back face (6)
 };
 
-const stepLabels = ['BITJE', 'POVEDEK', 'PREDMET'];
-
 function DiceDots({ count }: { count: number }) {
   const dotPositions: Record<number, string[]> = {
     1: ['center'],
@@ -112,10 +110,6 @@ export function DiceRoller({ isVisible, currentStep, onRollComplete }: DiceRolle
 
   return (
     <div className="fixed inset-0 z-40 flex flex-col items-center justify-center pointer-events-none">
-      {/* Step indicator */}
-      <p className="text-white text-center mb-4 text-xl font-bold drop-shadow-lg pointer-events-none">
-        {currentStep + 1}. met: {stepLabels[currentStep]}
-      </p>
       
       <div 
         className="cursor-pointer pointer-events-auto"
