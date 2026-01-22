@@ -5,7 +5,7 @@ import { CheckCircle, XCircle, AlertCircle } from "lucide-react";
 interface InstructionsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  type?: "jigsaw" | "sliding" | "articulation" | "maze" | "bingo" | "sequence";
+  type?: "jigsaw" | "sliding" | "articulation" | "maze" | "bingo" | "sequence" | "dice";
 }
 
 type InstructionItem = {
@@ -64,6 +64,16 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
         { text: "Zapolni vseh 16 polj, da osvojiš zvezdico!" },
         { text: "Zvezdica se bo zabeležila pod VAJE na tvoji strani." }
       ]
+    : type === "dice"
+    ? [
+        { text: "Klikni na gumb 'VRZI KOCKO' da vržeš kocko." },
+        { text: "Kocka bo pokazala številko od 1 do 6." },
+        { text: "Ta številka določi, katera slika se bo izbrala v stolpcu." },
+        { text: "Vrzi kocko trikrat - za BITJE, POVEDEK in PREDMET." },
+        { text: "Ko so vse tri slike izbrane, se prikaže smešna poved." },
+        { text: "Poslušaj poved in jo ponovi s snemanjem." },
+        { text: "Za vsako uspešno poved dobiš zvezdico!" }
+      ]
     : [
         { text: "Sestavljaj sliko, dokler ni cela." },
         { text: "Ko bo slika končana, se bo predvajal posnetek logopeda." },
@@ -81,6 +91,8 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
     ? "Navodila za labirint"
     : type === "bingo"
     ? "Navodila za Bingo"
+    : type === "dice"
+    ? "Navodila za Met kocke"
     : "Navodila za igro Sestavljanka";
 
   const getIcon = (icon?: "green" | "yellow" | "red") => {
