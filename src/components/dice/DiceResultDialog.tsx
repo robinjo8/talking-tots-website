@@ -56,9 +56,6 @@ export function DiceResultDialog({
         audioRef.current.onerror = () => resolve();
         audioRef.current.play().catch(() => resolve());
       });
-      
-      // Minimal delay between words (50ms)
-      await new Promise(resolve => setTimeout(resolve, 50));
     }
     
     setIsPlayingSequence(false);
