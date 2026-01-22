@@ -179,7 +179,7 @@ export function GenericMetKockeGame({
                 <div key={rowNum} className="grid grid-cols-4 gap-1 items-center">
                   {/* Dice column */}
                   <div className="flex justify-center">
-                    <div className="w-6 h-6 md:w-8 md:h-8">
+                    <div className="w-10 h-10 md:w-12 md:h-12">
                       <DiceFace number={rowNum} />
                     </div>
                   </div>
