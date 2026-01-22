@@ -1,9 +1,42 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Recursive function to list all files in storage (including subdirectories)
+async function listAllFiles(
+  client: SupabaseClient,
+  bucket: string,
+  folder: string
+): Promise<string[]> {
+  const files: string[] = [];
+
+  const { data: items, error } = await client.storage
+    .from(bucket)
+    .list(folder);
+
+  if (error || !items) {
+    console.error(`Failed to list ${folder}:`, error);
+    return files;
+  }
+
+  for (const item of items) {
+    const path = `${folder}/${item.name}`;
+
+    if (item.id === null) {
+      // This is a folder - recurse into it
+      const subFiles = await listAllFiles(client, bucket, path);
+      files.push(...subFiles);
+    } else {
+      // This is a file
+      files.push(path);
+    }
+  }
+
+  return files;
+}
 
 Deno.serve(async (req) => {
   // Handle CORS preflight
@@ -213,25 +246,25 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 9. Move storage files from uporabniski-profili to uporabniski-profili-arhiv
-    const { data: storageFiles } = await adminClient.storage
-      .from("uporabniski-profili")
-      .list(targetUserId);
+    // 9. Move storage files from uporabniski-profili to uporabniski-profili-arhiv (recursive)
+    const allFiles = await listAllFiles(adminClient, "uporabniski-profili", targetUserId);
+    let filesArchived = 0;
 
-    if (storageFiles && storageFiles.length > 0) {
-      console.log(`Found ${storageFiles.length} storage files to move`);
+    if (allFiles.length > 0) {
+      console.log(`Found ${allFiles.length} storage files to archive`);
       
-      for (const file of storageFiles) {
-        const sourcePath = `${targetUserId}/${file.name}`;
-        const destPath = `${archive.id}/${file.name}`;
+      for (const filePath of allFiles) {
+        // Preserve folder structure: userId/childId/Dokumenti/file.pdf -> archiveId/childId/Dokumenti/file.pdf
+        const relativePath = filePath.replace(`${targetUserId}/`, '');
+        const destPath = `${archive.id}/${relativePath}`;
         
         // Download file
         const { data: fileData, error: downloadError } = await adminClient.storage
           .from("uporabniski-profili")
-          .download(sourcePath);
+          .download(filePath);
         
         if (downloadError) {
-          console.error(`Failed to download ${sourcePath}:`, downloadError);
+          console.error(`Failed to download ${filePath}:`, downloadError);
           continue;
         }
 
@@ -239,7 +272,7 @@ Deno.serve(async (req) => {
         const { error: uploadError } = await adminClient.storage
           .from("uporabniski-profili-arhiv")
           .upload(destPath, fileData, {
-            contentType: file.metadata?.mimetype || "application/octet-stream",
+            contentType: "application/octet-stream",
           });
 
         if (uploadError) {
@@ -250,14 +283,19 @@ Deno.serve(async (req) => {
         // Delete original
         const { error: deleteError } = await adminClient.storage
           .from("uporabniski-profili")
-          .remove([sourcePath]);
+          .remove([filePath]);
 
         if (deleteError) {
-          console.error(`Failed to delete original ${sourcePath}:`, deleteError);
+          console.error(`Failed to delete original ${filePath}:`, deleteError);
+        } else {
+          filesArchived++;
+          console.log(`Archived: ${filePath} -> ${destPath}`);
         }
       }
       
-      console.log("Storage files moved to archive");
+      console.log(`Storage files archived: ${filesArchived}/${allFiles.length}`);
+    } else {
+      console.log("No storage files found for user");
     }
 
     // 10. Delete word results first (no FK constraint but good practice)
@@ -297,8 +335,8 @@ Deno.serve(async (req) => {
 
     console.log("Successfully archived and deleted user:", targetUserId);
 
-    // 13. Log to audit_logs
-    await adminClient
+    // 13. Log to audit_logs with proper await and error handling
+    const { error: auditError } = await adminClient
       .from("audit_logs")
       .insert({
         actor_id: user.id,
@@ -310,10 +348,15 @@ Deno.serve(async (req) => {
           archive_id: archive.id,
           children_count: children?.length || 0,
           sessions_count: testSessions?.length || 0,
+          files_archived: filesArchived,
           scheduled_deletion_at: archive.scheduled_deletion_at,
           deletion_reason: deletion_reason,
         },
       });
+
+    if (auditError) {
+      console.error("Failed to write audit log:", auditError);
+    }
 
     return new Response(
       JSON.stringify({ 
