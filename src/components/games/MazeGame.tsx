@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useMazeGame, Position } from '@/hooks/useMazeGame';
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useMazeGame, Position } from "@/hooks/useMazeGame";
 
 // Use WebP images from Supabase storage
-const dragonHead = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_glava.webp';
-const ciljBanner = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/Cilj.webp';
+const dragonHead = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_glava_1.webp";
+const ciljBanner = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/Cilj.webp";
 
 interface MazeGameProps {
   onComplete: () => void;
@@ -15,8 +15,16 @@ interface MazeGameProps {
 }
 
 // Helper function to draw a star with glow
-const drawStar = (ctx: CanvasRenderingContext2D, cx: number, cy: number, spikes: number, outerRadius: number, innerRadius: number, glowIntensity: number) => {
-  let rot = Math.PI / 2 * 3;
+const drawStar = (
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  spikes: number,
+  outerRadius: number,
+  innerRadius: number,
+  glowIntensity: number,
+) => {
+  let rot = (Math.PI / 2) * 3;
   let x = cx;
   let y = cy;
   const step = Math.PI / spikes;
@@ -43,7 +51,7 @@ const drawStar = (ctx: CanvasRenderingContext2D, cx: number, cy: number, spikes:
   ctx.closePath();
 
   // Fill with golden yellow
-  ctx.fillStyle = '#fbbf24';
+  ctx.fillStyle = "#fbbf24";
   ctx.fill();
   ctx.restore();
 
@@ -53,30 +61,14 @@ const drawStar = (ctx: CanvasRenderingContext2D, cx: number, cy: number, spikes:
   ctx.stroke();
 };
 
-export const MazeGame = ({
-  onComplete,
-  onStarCollect,
-  collectedStars = [],
-  cols,
-  rows,
-  alignTop
-}: MazeGameProps) => {
-  const {
-    maze,
-    playerPosition,
-    isCompleted,
-    isGenerating,
-    movePlayer,
-    starPositions,
-    isGoalUnlocked,
-    COLS,
-    ROWS
-  } = useMazeGame({
-    cols,
-    rows,
-    collectedStars
-  });
-  
+export const MazeGame = ({ onComplete, onStarCollect, collectedStars = [], cols, rows, alignTop }: MazeGameProps) => {
+  const { maze, playerPosition, isCompleted, isGenerating, movePlayer, starPositions, isGoalUnlocked, COLS, ROWS } =
+    useMazeGame({
+      cols,
+      rows,
+      collectedStars,
+    });
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
@@ -87,8 +79,8 @@ export const MazeGame = ({
   const [glowIntensity, setGlowIntensity] = useState(0.3);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
   const completionCalledRef = useRef(false);
-  const lastStarCheckRef = useRef<string>('');
-  
+  const lastStarCheckRef = useRef<string>("");
+
   const WALL_WIDTH = 6;
   const PADDING = 2;
 
@@ -106,8 +98,8 @@ export const MazeGame = ({
       }
     };
     updateSize();
-    window.addEventListener('resize', updateSize);
-    return () => window.removeEventListener('resize', updateSize);
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
   }, [alignTop]);
 
   // Calculate cell size based on container dimensions
@@ -132,7 +124,7 @@ export const MazeGame = ({
       setDragonImageLoaded(true);
     };
     img.onerror = () => {
-      console.error('Failed to load dragon image');
+      console.error("Failed to load dragon image");
       setDragonImageLoaded(true);
     };
   }, []);
@@ -146,7 +138,7 @@ export const MazeGame = ({
       setFlagImageLoaded(true);
     };
     img.onerror = () => {
-      console.error('Failed to load goal banner image');
+      console.error("Failed to load goal banner image");
       setFlagImageLoaded(true);
     };
   }, []);
@@ -155,7 +147,7 @@ export const MazeGame = ({
   useEffect(() => {
     let direction = 1;
     const interval = setInterval(() => {
-      setGlowIntensity(prev => {
+      setGlowIntensity((prev) => {
         const next = prev + 0.02 * direction;
         if (next >= 1) direction = -1;
         if (next <= 0.3) direction = 1;
@@ -168,15 +160,13 @@ export const MazeGame = ({
   // Check if player is on a star and trigger collection
   useEffect(() => {
     if (!starPositions.length || !onStarCollect) return;
-    
+
     const posKey = `${playerPosition.x},${playerPosition.y}`;
     if (posKey === lastStarCheckRef.current) return;
     lastStarCheckRef.current = posKey;
-    
-    const starIndex = starPositions.findIndex(
-      star => star.x === playerPosition.x && star.y === playerPosition.y
-    );
-    
+
+    const starIndex = starPositions.findIndex((star) => star.x === playerPosition.x && star.y === playerPosition.y);
+
     if (starIndex !== -1 && !collectedStars.includes(starIndex)) {
       onStarCollect(starIndex);
     }
@@ -186,24 +176,24 @@ export const MazeGame = ({
   useEffect(() => {
     if (!canvasRef.current || !maze.length || isGenerating || !dragonImageLoaded || !CELL_SIZE) return;
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
+    ctx.imageSmoothingQuality = "high";
 
     // Draw maze walls
-    ctx.strokeStyle = 'hsl(35, 90%, 50%)';
+    ctx.strokeStyle = "hsl(35, 90%, 50%)";
     ctx.lineWidth = WALL_WIDTH;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
 
     maze.forEach((row, y) => {
       row.forEach((cell, x) => {
         const startX = x * CELL_SIZE + PADDING;
         const startY = y * CELL_SIZE + PADDING;
-        
+
         if (cell.walls.top) {
           ctx.beginPath();
           ctx.moveTo(startX, startY);
@@ -244,61 +234,68 @@ export const MazeGame = ({
     const goalX = (COLS - 1) * CELL_SIZE + CELL_SIZE / 2 + PADDING;
     const goalY = (ROWS - 1) * CELL_SIZE + CELL_SIZE / 2 + PADDING;
     const flagSize = CELL_SIZE * 0.9;
-    
+
     ctx.save();
     if (!isGoalUnlocked) {
       ctx.globalAlpha = 0.4; // Dimmed when locked
     }
-    
+
     if (flagImageRef.current && flagImageLoaded) {
-      ctx.drawImage(
-        flagImageRef.current,
-        goalX - flagSize / 2,
-        goalY - flagSize / 2,
-        flagSize,
-        flagSize
-      );
+      ctx.drawImage(flagImageRef.current, goalX - flagSize / 2, goalY - flagSize / 2, flagSize, flagSize);
     } else {
       // Fallback: draw a simple flag icon
-      ctx.fillStyle = '#22c55e';
+      ctx.fillStyle = "#22c55e";
       ctx.beginPath();
       ctx.moveTo(goalX - flagSize / 4, goalY - flagSize / 2);
       ctx.lineTo(goalX + flagSize / 4, goalY - flagSize / 4);
       ctx.lineTo(goalX - flagSize / 4, goalY);
       ctx.closePath();
       ctx.fill();
-      ctx.fillStyle = '#713f12';
+      ctx.fillStyle = "#713f12";
       ctx.fillRect(goalX - flagSize / 4 - 2, goalY - flagSize / 2, 4, flagSize);
     }
     ctx.restore();
-    
+
     // Draw lock icon if goal is locked
     if (!isGoalUnlocked) {
       ctx.font = `bold ${CELL_SIZE * 0.35}px sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('🔒', goalX, goalY);
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("🔒", goalX, goalY);
     }
 
     // Draw player (dragon)
     const playerX = playerPosition.x * CELL_SIZE + CELL_SIZE / 2 + PADDING;
     const playerY = playerPosition.y * CELL_SIZE + CELL_SIZE / 2 + PADDING;
-    
+
     if (dragonImageRef.current) {
       const imgSize = CELL_SIZE * 1.2;
       ctx.save();
       ctx.drawImage(dragonImageRef.current, playerX - imgSize / 2, playerY - imgSize / 2, imgSize, imgSize);
       ctx.restore();
     } else {
-      ctx.fillStyle = 'hsl(var(--primary))';
+      ctx.fillStyle = "hsl(var(--primary))";
       ctx.beginPath();
       ctx.arc(playerX, playerY, CELL_SIZE / 3, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = 'white';
-      ctx.font = 'bold 20px sans-serif';
-      ctx.fillText('🐲', playerX, playerY);
+      ctx.fillStyle = "white";
+      ctx.font = "bold 20px sans-serif";
+      ctx.fillText("🐲", playerX, playerY);
     }
-  }, [maze, playerPosition, COLS, ROWS, CELL_SIZE, isGenerating, dragonImageLoaded, flagImageLoaded, glowIntensity, starPositions, collectedStars, isGoalUnlocked]);
+  }, [
+    maze,
+    playerPosition,
+    COLS,
+    ROWS,
+    CELL_SIZE,
+    isGenerating,
+    dragonImageLoaded,
+    flagImageLoaded,
+    glowIntensity,
+    starPositions,
+    collectedStars,
+    isGoalUnlocked,
+  ]);
 
   // Trigger completion callback (only once)
   useEffect(() => {
@@ -314,34 +311,34 @@ export const MazeGame = ({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       switch (e.key) {
-        case 'ArrowUp':
-        case 'w':
-        case 'W':
+        case "ArrowUp":
+        case "w":
+        case "W":
           e.preventDefault();
-          movePlayer('up');
+          movePlayer("up");
           break;
-        case 'ArrowDown':
-        case 's':
-        case 'S':
+        case "ArrowDown":
+        case "s":
+        case "S":
           e.preventDefault();
-          movePlayer('down');
+          movePlayer("down");
           break;
-        case 'ArrowLeft':
-        case 'a':
-        case 'A':
+        case "ArrowLeft":
+        case "a":
+        case "A":
           e.preventDefault();
-          movePlayer('left');
+          movePlayer("left");
           break;
-        case 'ArrowRight':
-        case 'd':
-        case 'D':
+        case "ArrowRight":
+        case "d":
+        case "D":
           e.preventDefault();
-          movePlayer('right');
+          movePlayer("right");
           break;
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [movePlayer]);
 
   // Prevent pull-to-refresh on mobile
@@ -351,9 +348,9 @@ export const MazeGame = ({
     const preventRefresh = (e: TouchEvent) => {
       e.preventDefault();
     };
-    canvas.addEventListener('touchmove', preventRefresh, { passive: false });
+    canvas.addEventListener("touchmove", preventRefresh, { passive: false });
     return () => {
-      canvas.removeEventListener('touchmove', preventRefresh);
+      canvas.removeEventListener("touchmove", preventRefresh);
     };
   }, []);
 
@@ -362,25 +359,25 @@ export const MazeGame = ({
     const touch = e.touches[0];
     touchStartRef.current = { x: touch.clientX, y: touch.clientY };
   };
-  
+
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (!touchStartRef.current) return;
     const touch = e.changedTouches[0];
     const deltaX = touch.clientX - touchStartRef.current.x;
     const deltaY = touch.clientY - touchStartRef.current.y;
     const threshold = 30;
-    
+
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
       if (deltaX > threshold) {
-        movePlayer('right');
+        movePlayer("right");
       } else if (deltaX < -threshold) {
-        movePlayer('left');
+        movePlayer("left");
       }
     } else {
       if (deltaY > threshold) {
-        movePlayer('down');
+        movePlayer("down");
       } else if (deltaY < -threshold) {
-        movePlayer('up');
+        movePlayer("up");
       }
     }
     touchStartRef.current = null;
@@ -395,9 +392,9 @@ export const MazeGame = ({
   }
 
   return (
-    <div 
-      ref={containerRef} 
-      className={`w-full h-full flex justify-center ${alignTop ? 'items-start' : 'items-center'}`}
+    <div
+      ref={containerRef}
+      className={`w-full h-full flex justify-center ${alignTop ? "items-start" : "items-center"}`}
     >
       {CELL_SIZE === null ? (
         <div className="flex items-center justify-center h-64">
@@ -409,7 +406,7 @@ export const MazeGame = ({
             ref={canvasRef}
             width={COLS * CELL_SIZE + PADDING * 2}
             height={ROWS * CELL_SIZE + PADDING * 2}
-            style={{ touchAction: 'none' }}
+            style={{ touchAction: "none" }}
           />
         </div>
       )}
