@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { MetKockeWord } from '@/data/metKockeConfig';
 
 interface UseMetKockeProps {
@@ -16,11 +16,9 @@ interface UseMetKockeReturn {
   selectedPredmet: number | null;
   showDice: boolean;
   showResult: boolean;
-  isRolling: boolean;
   completedRounds: number;
   
   // Akcije
-  startRoll: () => void;
   handleRollComplete: (result: number) => void;
   closeResult: () => void;
   resetGame: () => void;
@@ -36,55 +34,58 @@ export function useMetKocke({ bitje, povedek, predmet, onPlayAudio }: UseMetKock
   const [selectedPredmet, setSelectedPredmet] = useState<number | null>(null);
   const [showDice, setShowDice] = useState(false);
   const [showResult, setShowResult] = useState(false);
-  const [isRolling, setIsRolling] = useState(false);
   const [completedRounds, setCompletedRounds] = useState(0);
   
-  const rollCompleteTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const startRoll = useCallback(() => {
-    setShowDice(true);
-    setIsRolling(true);
+  // Ob zagonu igre prikaži kocko
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowDice(true);
+    }, 500);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleRollComplete = useCallback((result: number) => {
     // result je 1-6, pretvorimo v indeks 0-5
     const index = result - 1;
     
-    setIsRolling(false);
+    // Najprej zapri kocko
+    setShowDice(false);
     
-    // Počakaj malo preden zapreš kocko in predvajaš zvok
-    rollCompleteTimeoutRef.current = setTimeout(() => {
-      setShowDice(false);
-      
-      if (currentStep === 0) {
-        // Prvi met - BITJE
-        setSelectedBitje(index);
-        const word = bitje[index];
-        if (word) {
-          onPlayAudio(`${SUPABASE_URL}/zvocni-posnetki/${word.audio}`);
-        }
-        setCurrentStep(1);
-      } else if (currentStep === 1) {
-        // Drugi met - POVEDEK
-        setSelectedPovedek(index);
-        const word = povedek[index];
-        if (word) {
-          onPlayAudio(`${SUPABASE_URL}/zvocni-posnetki/${word.audio}`);
-        }
-        setCurrentStep(2);
-      } else if (currentStep === 2) {
-        // Tretji met - PREDMET
-        setSelectedPredmet(index);
-        const word = predmet[index];
-        if (word) {
-          onPlayAudio(`${SUPABASE_URL}/zvocni-posnetki/${word.audio}`);
-        }
-        // Po kratkem zamiku odpri rezultat dialog
-        setTimeout(() => {
-          setShowResult(true);
-        }, 1500);
+    if (currentStep === 0) {
+      // Prvi met - BITJE
+      setSelectedBitje(index);
+      const word = bitje[index];
+      if (word) {
+        onPlayAudio(`${SUPABASE_URL}/zvocni-posnetki/${word.audio}`);
       }
-    }, 500);
+      setCurrentStep(1);
+      // Po kratkem zamiku znova prikaži kocko za naslednji met
+      timeoutRef.current = setTimeout(() => setShowDice(true), 1200);
+      
+    } else if (currentStep === 1) {
+      // Drugi met - POVEDEK
+      setSelectedPovedek(index);
+      const word = povedek[index];
+      if (word) {
+        onPlayAudio(`${SUPABASE_URL}/zvocni-posnetki/${word.audio}`);
+      }
+      setCurrentStep(2);
+      timeoutRef.current = setTimeout(() => setShowDice(true), 1200);
+      
+    } else if (currentStep === 2) {
+      // Tretji met - PREDMET
+      setSelectedPredmet(index);
+      const word = predmet[index];
+      if (word) {
+        onPlayAudio(`${SUPABASE_URL}/zvocni-posnetki/${word.audio}`);
+      }
+      // Po kratkem zamiku odpri rezultat dialog
+      timeoutRef.current = setTimeout(() => {
+        setShowResult(true);
+      }, 1500);
+    }
   }, [currentStep, bitje, povedek, predmet, onPlayAudio]);
 
   const closeResult = useCallback(() => {
@@ -94,6 +95,8 @@ export function useMetKocke({ bitje, povedek, predmet, onPlayAudio }: UseMetKock
     setSelectedPovedek(null);
     setSelectedPredmet(null);
     setCurrentStep(0);
+    // Prikaži kocko za nov krog
+    timeoutRef.current = setTimeout(() => setShowDice(true), 500);
   }, []);
 
   const handleRecordComplete = useCallback(() => {
@@ -107,12 +110,23 @@ export function useMetKocke({ bitje, povedek, predmet, onPlayAudio }: UseMetKock
     setSelectedPredmet(null);
     setShowDice(false);
     setShowResult(false);
-    setIsRolling(false);
     setCompletedRounds(0);
     
-    if (rollCompleteTimeoutRef.current) {
-      clearTimeout(rollCompleteTimeoutRef.current);
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
     }
+    
+    // Po resetu prikaži kocko
+    timeoutRef.current = setTimeout(() => setShowDice(true), 500);
+  }, []);
+
+  // Cleanup
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
   }, []);
 
   return {
@@ -122,9 +136,7 @@ export function useMetKocke({ bitje, povedek, predmet, onPlayAudio }: UseMetKock
     selectedPredmet,
     showDice,
     showResult,
-    isRolling,
     completedRounds,
-    startRoll,
     handleRollComplete,
     closeResult,
     resetGame,

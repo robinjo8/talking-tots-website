@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Home, Dices } from 'lucide-react';
+import { Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -95,9 +95,7 @@ export function GenericMetKockeGame({
     selectedPredmet,
     showDice,
     showResult,
-    isRolling,
     completedRounds,
-    startRoll,
     handleRollComplete,
     closeResult,
     resetGame,
@@ -233,18 +231,6 @@ export function GenericMetKockeGame({
         </div>
       </div>
 
-      {/* Roll dice button - centered bottom */}
-      <div className="fixed bottom-20 left-1/2 -translate-x-1/2">
-        <Button
-          onClick={startRoll}
-          disabled={showResult}
-          className="bg-gradient-to-r from-app-orange to-app-yellow hover:opacity-90 text-white font-bold px-8 py-4 rounded-2xl text-lg shadow-lg flex items-center gap-3"
-        >
-          <Dices className="w-6 h-6" />
-          VRZI KOCKO ({currentStep + 1}/3)
-        </Button>
-      </div>
-
       {/* Progress indicator */}
       <div className="fixed bottom-4 right-4">
         <button 
@@ -296,9 +282,8 @@ export function GenericMetKockeGame({
       {/* Dice roller modal */}
       <DiceRoller
         isVisible={showDice}
-        isRolling={isRolling}
+        currentStep={currentStep}
         onRollComplete={handleRollComplete}
-        onClose={() => {}}
       />
 
       {/* Result dialog */}
