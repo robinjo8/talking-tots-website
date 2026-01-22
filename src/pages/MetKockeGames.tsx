@@ -1,15 +1,14 @@
-import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import { toast } from "sonner";
-import { useAuth } from "@/contexts/AuthContext";
-import { useDailyProgress } from "@/hooks/useDailyProgress";
 import Header from "@/components/Header";
-import { FooterSection } from "@/components/FooterSection";
-import { Progress } from "@/components/ui/progress";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
+import { Progress } from "@/components/ui/progress";
+import { useDailyProgress } from "@/hooks/useDailyProgress";
+import { FooterSection } from "@/components/FooterSection";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { metKockeLetters } from "@/data/metKockeConfig";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public";
@@ -27,127 +26,147 @@ const letterToImage: Record<string, string> = {
   'zh': 'zmajcek_crka_ZH.png',
 };
 
+// Game configuration for Met kocke
+const metKockeGames = metKockeLetters.map(item => ({
+  id: item.id,
+  letter: item.letter,
+  gradient: item.gradient,
+  image: `${SUPABASE_URL}/zmajcki/${letterToImage[item.id]}`,
+  description: `Vrzi kocko in sestavi smešne povedi s črko ${item.letter}`,
+  path: item.path,
+  available: true
+}));
+
 export default function MetKockeGames() {
   const navigate = useNavigate();
-  const { user, selectedChild, signOut, isLoading } = useAuth();
-  const { dailyActivities } = useDailyProgress();
+  const { user, selectedChild, signOut } = useAuth();
   const isMobile = useIsMobile();
-
-  useEffect(() => {
-    if (!isLoading && !user) {
-      navigate("/login");
-    }
-  }, [user, isLoading, navigate]);
+  const { dailyActivities, isLoading } = useDailyProgress();
+  
+  const targetActivities = 15;
+  const percentage = Math.min((dailyActivities / targetActivities) * 100, 100);
 
   const handleSignOut = async () => {
     try {
       await signOut();
       navigate("/login");
     } catch (error) {
+      console.error("Error in MetKockeGames handleSignOut:", error);
       toast.error("Napaka pri odjavi");
     }
   };
 
-  const handleLetterClick = (path: string) => {
-    navigate(path);
+  const handleLetterClick = (game: typeof metKockeGames[0]) => {
+    navigate(game.path);
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-app-blue" />
+  const LetterCard = ({ game }: { game: typeof metKockeGames[0] }) => (
+    <div
+      className="bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group border border-gray-200"
+      onClick={() => handleLetterClick(game)}
+    >
+      {/* Card Image */}
+      <div className={`relative overflow-hidden bg-gradient-to-br ${game.gradient} ${isMobile ? 'aspect-square' : 'aspect-video'}`}>
+        <div className="w-full h-full flex items-center justify-center">
+          <img 
+            src={game.image}
+            alt={`Črka ${game.letter}`}
+            className={`object-contain group-hover:scale-110 transition-transform duration-300 ${isMobile ? 'w-[80%] h-[80%]' : 'w-full h-full'}`}
+            style={{ mixBlendMode: 'multiply' }}
+          />
+        </div>
       </div>
-    );
-  }
 
-  const percentage = Math.min((dailyActivities / 15) * 100, 100);
+      {/* Card Content */}
+      <div className={`p-6 ${isMobile ? 'text-center' : ''}`}>
+        <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
+          Črka {game.letter}
+        </h3>
+        {!isMobile && (
+          <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+            {game.description}
+          </p>
+        )}
+      </div>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#e8f4fc] via-[#d1e9f9] to-[#b8dff5]">
+    <div className="min-h-screen bg-background">
       <Header />
       
-      {/* Mobile back button */}
+      {/* Mobile Back Button */}
       {isMobile && (
-        <div className="fixed top-20 left-4 z-40">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate('/govorne-igre')}
-            className="rounded-full bg-background/80 backdrop-blur shadow-md"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-        </div>
+        <Button
+          onClick={() => navigate("/govorne-igre")}
+          className="fixed bottom-6 left-6 z-50 h-14 w-14 rounded-full bg-app-orange hover:bg-app-orange/90 shadow-lg"
+          size="icon"
+        >
+          <ArrowLeft className="h-6 w-6 text-white" />
+        </Button>
       )}
       
-      {/* Hero Section */}
-      <div className="pt-24 md:pt-28 pb-8 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Met kocke 🎲
-          </h1>
+      {/* Hero sekcija */}
+      <section className="bg-dragon-green py-12 md:py-16 pt-24 md:pt-28">
+        <div className="container max-w-6xl mx-auto px-4">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              Met kocke{selectedChild ? `, ${selectedChild.name}` : ''}!
+            </h1>
+            <p className="text-xl text-white/90">
+              Izberi črko in vrzi kocko za smešne povedi
+            </p>
+          </div>
+          
           {selectedChild && (
-            <div className="space-y-2">
-              <p className="text-lg text-muted-foreground">
-                Izberi črko in vrzi kocko, {selectedChild.name}!
-              </p>
-              <div className="max-w-xs mx-auto">
-                <Progress value={percentage} className="h-3" />
-                <p className="text-sm text-muted-foreground mt-1">
-                  Dnevni napredek: {dailyActivities}/15 aktivnosti
-                </p>
+            <div className="max-w-md mx-auto">
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-white text-sm font-medium">Tvoj dnevni napredek</span>
+                  <span className="text-white font-bold text-sm">{dailyActivities}/{targetActivities} ⭐</span>
+                </div>
+                <Progress 
+                  value={percentage} 
+                  className="h-3 bg-white/20 [&>div]:bg-app-orange"
+                />
               </div>
             </div>
           )}
         </div>
-      </div>
-
-      {/* Main content */}
-      <main className="flex-grow px-4 pb-8">
-        <div className="max-w-5xl mx-auto">
-          {!isMobile && <BreadcrumbNavigation />}
+      </section>
+      
+      {/* Bela sekcija */}
+      <section 
+        className="py-12 bg-white min-h-screen" 
+        style={{ backgroundColor: 'white' }}
+      >
+        <div className="container max-w-6xl mx-auto px-4">
+          {/* Breadcrumb */}
+          <div className="mb-8">
+            <BreadcrumbNavigation />
+          </div>
           
-          {selectedChild ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
-              {metKockeLetters.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => handleLetterClick(item.path)}
-                  className={`
-                    group relative overflow-hidden rounded-2xl shadow-lg 
-                    transition-all duration-300 hover:scale-105 hover:shadow-xl
-                    bg-gradient-to-br ${item.gradient} p-4
-                  `}
-                >
-                  <div className="aspect-square flex flex-col items-center justify-center">
-                    <img
-                      src={`${SUPABASE_URL}/zmajcki/${letterToImage[item.id]}`}
-                      alt={`Zmajček ${item.letter}`}
-                      className="w-3/4 h-3/4 object-contain mb-2"
-                    />
-                    <h3 className="text-xl md:text-2xl font-bold text-foreground">
-                      {item.title}
-                    </h3>
-                  </div>
-                </button>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-lg text-muted-foreground">
-                Za igranje dodaj profil otroka v nastavitvah.
-              </p>
-              <Button 
-                onClick={() => navigate('/profile')} 
-                className="mt-4 bg-app-orange hover:bg-app-orange/90"
-              >
-                Dodaj profil otroka
-              </Button>
-            </div>
-          )}
+          {/* Letters grid */}
+          <div className="mb-12">
+            {isMobile ? (
+              /* Mobile: 2-column grid */
+              <div className="grid grid-cols-2 gap-4">
+                {metKockeGames.map(game => (
+                  <LetterCard key={game.id} game={game} />
+                ))}
+              </div>
+            ) : (
+              /* Desktop: Grid layout */
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {metKockeGames.map(game => (
+                  <LetterCard key={game.id} game={game} />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      </main>
-
+      </section>
+      
       <FooterSection handleSignOut={handleSignOut} />
     </div>
   );
