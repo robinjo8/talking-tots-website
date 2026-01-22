@@ -177,20 +177,20 @@ export function DiceResultDialog({
             <Button
               onClick={playAudioSequence}
               disabled={isPlayingSequence || isRecording}
-              className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 uppercase font-medium h-10 px-4"
+              className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 uppercase font-medium h-10 w-32"
             >
               <Volume2 className="w-4 h-4" />
-              {isPlayingSequence ? "PREDVAJAM..." : "PREDVAJAJ"}
+              {isPlayingSequence ? "..." : "PREDVAJAJ"}
             </Button>
             
             {/* PONOVI button with countdown */}
             <Button
               onClick={startRecording}
               disabled={isRecording || isPlayingSequence}
-              className="relative bg-app-orange hover:bg-app-orange/90 text-white gap-2 uppercase font-medium h-10 px-4"
+              className="relative bg-app-orange hover:bg-app-orange/90 text-white gap-2 uppercase font-medium h-10 w-32"
             >
               <Mic className="w-4 h-4" />
-              {isRecording ? "SNEMAM..." : "PONOVI"}
+              {isRecording ? "..." : "PONOVI"}
               {isRecording && (
                 <span className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
                   {recordingTimeLeft}
@@ -198,7 +198,7 @@ export function DiceResultDialog({
               )}
             </Button>
             
-            <Button onClick={onClose} variant="outline" className="gap-2 uppercase h-10 px-4">
+            <Button onClick={onClose} variant="outline" className="uppercase h-10 w-32">
               ZAPRI
             </Button>
           </div>
