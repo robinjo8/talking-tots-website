@@ -16,13 +16,14 @@ interface UseMetKockeReturn {
   selectedPredmet: number | null;
   showDice: boolean;
   showResult: boolean;
+  showStarDialog: boolean;
   completedRounds: number;
   
   // Akcije
   handleRollComplete: (result: number) => void;
   closeResult: () => void;
   resetGame: () => void;
-  handleRecordComplete: () => void;
+  closeStarDialog: () => void;
 }
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public";
@@ -34,6 +35,7 @@ export function useMetKocke({ bitje, povedek, predmet, onPlayAudio }: UseMetKock
   const [selectedPredmet, setSelectedPredmet] = useState<number | null>(null);
   const [showDice, setShowDice] = useState(false);
   const [showResult, setShowResult] = useState(false);
+  const [showStarDialog, setShowStarDialog] = useState(false);
   const [completedRounds, setCompletedRounds] = useState(0);
   
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -90,6 +92,27 @@ export function useMetKocke({ bitje, povedek, predmet, onPlayAudio }: UseMetKock
 
   const closeResult = useCallback(() => {
     setShowResult(false);
+    
+    // Povečaj completedRounds
+    const newRounds = completedRounds + 1;
+    setCompletedRounds(newRounds);
+    
+    // Preveri če je dosegel 5 krogov za zvezdico
+    if (newRounds % 5 === 0) {
+      setShowStarDialog(true);
+    } else {
+      // Reset za nov krog
+      setSelectedBitje(null);
+      setSelectedPovedek(null);
+      setSelectedPredmet(null);
+      setCurrentStep(0);
+      // Prikaži kocko za nov krog
+      timeoutRef.current = setTimeout(() => setShowDice(true), 500);
+    }
+  }, [completedRounds]);
+
+  const closeStarDialog = useCallback(() => {
+    setShowStarDialog(false);
     // Reset za nov krog
     setSelectedBitje(null);
     setSelectedPovedek(null);
@@ -99,10 +122,6 @@ export function useMetKocke({ bitje, povedek, predmet, onPlayAudio }: UseMetKock
     timeoutRef.current = setTimeout(() => setShowDice(true), 500);
   }, []);
 
-  const handleRecordComplete = useCallback(() => {
-    setCompletedRounds(prev => prev + 1);
-  }, []);
-
   const resetGame = useCallback(() => {
     setCurrentStep(0);
     setSelectedBitje(null);
@@ -110,6 +129,7 @@ export function useMetKocke({ bitje, povedek, predmet, onPlayAudio }: UseMetKock
     setSelectedPredmet(null);
     setShowDice(false);
     setShowResult(false);
+    setShowStarDialog(false);
     setCompletedRounds(0);
     
     if (timeoutRef.current) {
@@ -136,10 +156,11 @@ export function useMetKocke({ bitje, povedek, predmet, onPlayAudio }: UseMetKock
     selectedPredmet,
     showDice,
     showResult,
+    showStarDialog,
     completedRounds,
     handleRollComplete,
     closeResult,
     resetGame,
-    handleRecordComplete,
+    closeStarDialog,
   };
 }

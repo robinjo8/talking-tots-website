@@ -9,9 +9,10 @@ import {
 import { MemoryExitConfirmationDialog } from '@/components/games/MemoryExitConfirmationDialog';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { InstructionsModal } from '@/components/puzzle/InstructionsModal';
-import { ProgressModal } from '@/components/wheel/ProgressModal';
 import { DiceRoller } from '@/components/dice/DiceRoller';
 import { DiceResultDialog } from '@/components/dice/DiceResultDialog';
+import { StarEarnedDialog } from '@/components/dice/StarEarnedDialog';
+import { MemoryProgressIndicator } from '@/components/games/MemoryProgressIndicator';
 import { useMetKocke } from '@/hooks/useMetKocke';
 import { MetKockeWord } from '@/data/metKockeConfig';
 import { useWordProgress } from '@/hooks/useWordProgress';
@@ -65,13 +66,10 @@ export function GenericMetKockeGame({
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [showNewGameDialog, setShowNewGameDialog] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
-  const [showProgress, setShowProgress] = useState(false);
 
   // Progress tracking
   const wordsList = bitje.map(b => b.word);
-  const wordsData = bitje; // For ProgressModal which expects WordData[]
   const { 
-    progress, 
     incrementProgress, 
     resetProgress,
   } = useWordProgress(displayLetter, wordsList);
@@ -93,25 +91,18 @@ export function GenericMetKockeGame({
     selectedPredmet,
     showDice,
     showResult,
+    showStarDialog,
     completedRounds,
     handleRollComplete,
     closeResult,
     resetGame,
-    handleRecordComplete: hookRecordComplete,
+    closeStarDialog,
   } = useMetKocke({
     bitje,
     povedek,
     predmet,
     onPlayAudio: playAudio,
   });
-
-  // Handle record completion
-  const handleRecordComplete = useCallback(() => {
-    hookRecordComplete();
-    if (selectedBitje !== null) {
-      incrementProgress(bitje[selectedBitje].word);
-    }
-  }, [hookRecordComplete, selectedBitje, bitje, incrementProgress]);
 
   // Navigation handlers
   const handleBack = useCallback(() => setShowExitDialog(true), []);
@@ -122,6 +113,14 @@ export function GenericMetKockeGame({
     resetProgress();
     setShowNewGameDialog(false);
   }, [resetGame, resetProgress]);
+
+  // Star claim handler
+  const handleClaimStar = useCallback(() => {
+    if (selectedBitje !== null) {
+      incrementProgress(bitje[selectedBitje].word);
+    }
+    closeStarDialog();
+  }, [selectedBitje, bitje, incrementProgress, closeStarDialog]);
 
   // Column headers
   const columns = ['BITJE', 'POVEDEK', 'PREDMET'];
@@ -136,12 +135,22 @@ export function GenericMetKockeGame({
         backgroundRepeat: 'no-repeat',
       }}
     >
+      {/* Header with progress indicator */}
+      <div className="fixed top-0 left-0 right-0 z-30 bg-[#4ade80] rounded-b-3xl px-4 py-2 shadow-lg">
+        <div className="text-center">
+          <h1 className="text-lg md:text-xl font-bold text-white drop-shadow-lg">
+            {title}
+          </h1>
+          <MemoryProgressIndicator 
+            matchedPairs={completedRounds % 5} 
+            totalPairs={5} 
+            className="py-1"
+          />
+        </div>
+      </div>
+
       {/* Main content - centered */}
-      <div className="h-full flex flex-col items-center justify-center p-2">
-        {/* Title */}
-        <h1 className="text-xl md:text-2xl font-bold text-white drop-shadow-lg mb-2">
-          {title}
-        </h1>
+      <div className="h-full flex flex-col items-center justify-center p-2 pt-20">
 
         {/* Game grid - constrained height */}
         <div className="bg-white/90 backdrop-blur rounded-xl shadow-xl p-2 md:p-3 w-full" style={{ maxWidth: '600px' }}>
@@ -233,16 +242,6 @@ export function GenericMetKockeGame({
         </div>
       </div>
 
-      {/* Progress indicator */}
-      <div className="fixed bottom-4 right-4">
-        <button 
-          onClick={() => setShowProgress(true)}
-          className="bg-background/90 backdrop-blur rounded-full px-4 py-2 shadow-lg flex items-center gap-2"
-        >
-          <span className="text-2xl">⭐</span>
-          <span className="font-bold text-foreground">{completedRounds}</span>
-        </button>
-      </div>
 
       {/* Home menu button - bottom left */}
       <div className="fixed bottom-4 left-4 z-50">
@@ -288,7 +287,12 @@ export function GenericMetKockeGame({
         bitjeWord={selectedBitje !== null ? bitje[selectedBitje] : null}
         povedekWord={selectedPovedek !== null ? povedek[selectedPovedek] : null}
         predmetWord={selectedPredmet !== null ? predmet[selectedPredmet] : null}
-        onRecordComplete={handleRecordComplete}
+      />
+
+      {/* Star earned dialog */}
+      <StarEarnedDialog
+        isOpen={showStarDialog}
+        onClaimStar={handleClaimStar}
       />
 
       {/* Exit confirmation dialog */}
@@ -314,15 +318,6 @@ export function GenericMetKockeGame({
         isOpen={showInstructions}
         onClose={() => setShowInstructions(false)}
         type="dice"
-      />
-
-      {/* Progress modal */}
-      <ProgressModal
-        isOpen={showProgress}
-        onClose={() => setShowProgress(false)}
-        words={wordsData}
-        progress={progress}
-        letter={displayLetter}
       />
     </div>
   );
