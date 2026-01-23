@@ -1,54 +1,120 @@
 
 
-# Načrt: Popravek manjkajoče seje za Žaka
+# Načrt: Poenostavljen mobilni header z logom
 
-## Problem
+## Povzetek sprememb
 
-Test za otroka **Žaka** (uporabnik kujavec.robert@gmail.com) je bil opravljen **pred** posodobitvijo kode, zato seja ni bila ustvarjena v tabeli `articulation_test_sessions`. Posledično se test ne prikaže v admin portalu pod "V čakanju".
+Header na telefonu bo imel sledečo postavitev:
+- **Levo**: Hamburger meni (tri črtice)
+- **Desno od menija**: Logo TomiTalk (brez oznake "Admin")
+- **Desno od loga**: Zvonček (obvestila)
+- **Skrajno desno**: Ikona uporabnika
 
-## Rešitev
+Iskalnik bo odstranjen iz headerja - dodan bo na posamezne strani, kjer je potreben.
 
-### 1. Ročno ustvarjanje manjkajoče seje
+---
 
-Izvedli bomo SQL INSERT, ki bo ustvaril manjkajočo sejo za Žaka:
+## Vizualna struktura
 
-```sql
-INSERT INTO articulation_test_sessions (
-  child_id,
-  parent_id,
-  status,
-  submitted_at
-) VALUES (
-  '0e054bde-ab83-4728-b55d-e02134e6d35b',  -- Žak
-  '1a8e5513-a13f-4a8f-b34a-f48ed4992825',  -- kujavec.robert@gmail.com
-  'pending',
-  '2026-01-23T14:00:45.577Z'  -- Čas originalnega testa
-);
+### Mobilni header (nov):
+```text
+┌────────────────────────────────────────┐
+│  ☰   TomiTalk              🔔     👤   │
+└────────────────────────────────────────┘
 ```
 
-Ta seja bo takoj vidna v zavihku "V čakanju" za logopede.
+### Desktop header (ostane podobno, brez iskalnika):
+```text
+┌────────────────────────────────────────────────────────┐
+│                                    🔔   👤 Ime Priimek │
+└────────────────────────────────────────────────────────┘
+```
 
-### 2. Preverjanje delovanja za nove teste
+---
 
-Po ustvarjanju seje predlagam, da opravite **nov test** za drugega otroka ali uporabnika, da preverimo, ali nova koda pravilno ustvarja seje.
+## Spremembe
+
+### 1. AdminHeader.tsx
+
+**Odstrani:**
+- Celoten iskalnik (Input komponenta)
+- `useState` za searchQuery (ni več potreben)
+
+**Dodaj:**
+- Logo TomiTalk takoj za hamburger menijem
+- Logo viden samo na mobilnih napravah (`lg:hidden`)
+- Stil loga: "Tomi" v zeleni (dragon-green), "Talk" v oranžni (app-orange)
+
+**Posodobi:**
+- Header postane `fixed` za fiksno pozicijo med scrollanjem
+- Manjši gap med elementi na mobilnem za boljšo razporeditev
+
+**Nova struktura:**
+```tsx
+<header className="fixed top-0 left-0 right-0 z-30 flex h-16 items-center justify-between border-b border-border bg-card px-4 lg:px-6">
+  {/* Leva stran: hamburger + logo */}
+  <div className="flex items-center gap-3">
+    {/* Hamburger meni - samo mobile */}
+    <Sheet>...</Sheet>
+    
+    {/* Logo - samo mobile */}
+    <div className="lg:hidden flex items-center">
+      <span className="text-lg font-extrabold text-dragon-green">Tomi</span>
+      <span className="text-lg font-extrabold text-app-orange">Talk</span>
+    </div>
+  </div>
+
+  {/* Desna stran: obvestila + uporabnik */}
+  <div className="flex items-center gap-2 lg:gap-4">
+    <Button>🔔</Button>
+    <div>👤</div>
+  </div>
+</header>
+```
+
+### 2. AdminLayout.tsx
+
+**Dodaj:**
+- `pt-16` na vsebinski wrapper za kompenzacijo fiksnega headerja (64px)
+
+**Posodobi:**
+```tsx
+<div className="lg:pl-64 pt-16">
+  <AdminHeader />
+  <main className="p-6">
+    {children}
+  </main>
+</div>
+```
 
 ---
 
 ## Tehnične podrobnosti
 
-### Podatki za insert
+### Spremembe v AdminHeader.tsx
 
-| Polje | Vrednost | Opis |
-|-------|----------|------|
-| child_id | `0e054bde-ab83-4728-b55d-e02134e6d35b` | ID otroka Žak |
-| parent_id | `1a8e5513-a13f-4a8f-b34a-f48ed4992825` | ID starša (kujavec.robert@gmail.com) |
-| status | `pending` | Čaka na obravnavo |
-| submitted_at | `2026-01-23T14:00:45.577Z` | Čas izvedbe originalnega testa |
+| Element | Prej | Potem |
+|---------|------|-------|
+| Pozicija | `sticky top-0` | `fixed top-0 left-0 right-0` |
+| Iskalnik | Prisoten | Odstranjen |
+| Logo | Ni bil | Dodan (samo mobile) |
+| Gap | `gap-4` | `gap-2 lg:gap-4` (manjši na mobile) |
+| Padding | `px-6` | `px-4 lg:px-6` (manjši na mobile) |
 
-### Rezultat
+### Razporeditev elementov
 
-Po izvedbi bo:
-- Žak viden v zavihku **"V čakanju"** (`/admin/pending`)
-- Logoped bo lahko kliknil **"Prevzemi"** za prevzem primera
-- Po prevzemu bo primer viden v **"Moji pregledi"** (`/admin/my-reviews`)
+```text
+Mobile:  [☰] [TomiTalk]  ←spacer→  [🔔] [👤]
+Desktop: ←spacer→                  [🔔] [👤 + Ime]
+```
+
+---
+
+## Rezultat
+
+Po implementaciji:
+- Header bo fiksen med scrollanjem na vseh napravah
+- Na telefonu bo jasno viden logo TomiTalk
+- Čista, preprosta navigacija brez nepotrebnih elementov
+- Iskalnik se bo dodal na posamezne strani po potrebi
 
