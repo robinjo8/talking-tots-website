@@ -63,15 +63,6 @@ const PogostaVprasanja = () => {
 
       {/* Article Content */}
       <article className="container max-w-4xl mx-auto px-4 pb-20">
-        {/* Hero Image */}
-        <div className="mb-10">
-          <img
-            src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/Stickman_FAQ.webp"
-            alt="Pogosta vprašanja in odgovori"
-            className="w-full max-w-md mx-auto rounded-2xl shadow-lg"
-          />
-        </div>
-
         {/* Intro */}
         <div className="prose prose-lg max-w-none mb-10">
           <p className="text-lg text-muted-foreground leading-relaxed">
