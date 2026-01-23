@@ -14,24 +14,42 @@ import {
   Settings,
   Bell,
   LogOut,
-  UserCheck
+  UserCheck,
+  LucideIcon
 } from 'lucide-react';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { useAdminCounts } from '@/hooks/useAdminCounts';
 
-const navigation = [
+interface NavItem {
+  name: string;
+  href: string;
+  icon: LucideIcon;
+  count?: number;
+}
+
+function NotificationBadge({ count }: { count: number }) {
+  if (count === 0) return null;
+  return (
+    <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-app-orange text-[10px] font-bold text-white px-1">
+      {count > 99 ? '99+' : count}
+    </span>
+  );
+}
+
+const baseNavigation: NavItem[] = [
   { name: 'Moj portal', href: '/admin', icon: LayoutDashboard },
   { name: 'Vsa preverjanja', href: '/admin/all-tests', icon: ClipboardList },
   { name: 'V čakanju', href: '/admin/pending', icon: Clock },
   { name: 'Moji pregledi', href: '/admin/my-reviews', icon: User },
 ];
 
-const secondaryNavigation = [
+const secondaryNavigation: NavItem[] = [
   { name: 'Uporabniki', href: '/admin/users', icon: Users },
   { name: 'Poročila', href: '/admin/reports', icon: FileText },
   { name: 'Sporočila', href: '/admin/messages', icon: MessageSquare },
 ];
 
-const baseSettingsNavigation = [
+const baseSettingsNavigation: NavItem[] = [
   { name: 'Nastavitve', href: '/admin/settings', icon: Settings },
   { name: 'Obvestila', href: '/admin/notifications', icon: Bell },
 ];
@@ -40,9 +58,21 @@ export function AdminSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut, profile, isSuperAdmin } = useAdminAuth();
+  const { pendingCount, myReviewsCount } = useAdminCounts();
+
+  // Navigation with dynamic counts
+  const navigation: NavItem[] = baseNavigation.map(item => {
+    if (item.href === '/admin/pending') {
+      return { ...item, count: pendingCount };
+    }
+    if (item.href === '/admin/my-reviews') {
+      return { ...item, count: myReviewsCount };
+    }
+    return item;
+  });
 
   // Dinamično sestavljen meni nastavitev - "Članstva" samo za super admina
-  const settingsNavigation = [
+  const settingsNavigation: NavItem[] = [
     ...baseSettingsNavigation,
     ...(isSuperAdmin ? [{ name: 'Članstva', href: '/admin/memberships', icon: UserCheck }] : []),
   ];
@@ -103,6 +133,9 @@ export function AdminSidebar() {
                           )}
                         />
                         {item.name}
+                        {item.count !== undefined && item.count > 0 && (
+                          <NotificationBadge count={item.count} />
+                        )}
                       </Link>
                     </li>
                   ))}

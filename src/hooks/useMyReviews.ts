@@ -17,12 +17,12 @@ export interface MyReviewSession {
 }
 
 export function useMyReviews() {
-  const { user } = useAdminAuth();
+  const { profile } = useAdminAuth();
 
   return useQuery({
-    queryKey: ['admin-my-reviews', user?.id],
+    queryKey: ['admin-my-reviews', profile?.id],
     queryFn: async (): Promise<MyReviewSession[]> => {
-      if (!user?.id) {
+      if (!profile?.id) {
         return [];
       }
 
@@ -30,7 +30,7 @@ export function useMyReviews() {
       const { data: sessions, error: sessionsError } = await supabase
         .from('articulation_test_sessions')
         .select('id, status, submitted_at, assigned_at, child_id, parent_id')
-        .eq('assigned_to', user.id)
+        .eq('assigned_to', profile.id)
         .in('status', ['assigned', 'in_review'])
         .order('assigned_at', { ascending: false });
 
@@ -97,6 +97,6 @@ export function useMyReviews() {
 
       return result;
     },
-    enabled: !!user?.id,
+    enabled: !!profile?.id,
   });
 }
