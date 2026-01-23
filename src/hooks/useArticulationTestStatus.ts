@@ -79,16 +79,39 @@ export const useArticulationTestStatus = () => {
     if (!selectedChild?.id) return false;
 
     try {
-      const { error } = await supabase
+      // Get current user for parent_id
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.error('No authenticated user found');
+        return false;
+      }
+
+      // 1. Save to articulation_test_results (for internal tracking)
+      const { error: resultError } = await supabase
         .from('articulation_test_results')
         .insert({
           child_id: selectedChild.id,
           completed_at: new Date().toISOString(),
         });
 
-      if (error) {
-        console.error('Error saving articulation test result:', error);
+      if (resultError) {
+        console.error('Error saving articulation test result:', resultError);
         return false;
+      }
+
+      // 2. Also create a session for the admin portal
+      const { error: sessionError } = await supabase
+        .from('articulation_test_sessions')
+        .insert({
+          child_id: selectedChild.id,
+          parent_id: user.id,
+          status: 'pending',
+          submitted_at: new Date().toISOString(),
+        });
+
+      if (sessionError) {
+        console.error('Error creating articulation test session:', sessionError);
+        // Don't return false here - the result was saved, session is for admin portal
       }
 
       // Refresh status after saving
