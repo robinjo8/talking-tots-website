@@ -1,85 +1,154 @@
 
-# Načrt: Popravek napake pri prevzemu primera
+# Načrt: Popravek "Moji pregledi" in dodajanje notification značk
 
-## Problem
+## Problem 1: Prevzeta seja se ne prikaže v "Moji pregledi"
 
-Ko kliknete "Prevzemi", dobite napako:
-> "insert or update on table 'articulation_test_sessions' violates foreign key constraint 'articulation_test_sessions_assigned_to_fkey'"
+Hook `useClaimTestSession` zdaj pravilno shranjuje `profile.id` v `assigned_to`, vendar hook `useMyReviews` še vedno išče po `user.id`. To je neujemanje!
 
-**Vzrok**: Hook `useClaimTestSession` poskuša shraniti `user.id` (ID uporabnika iz avtentikacije) v stolpec `assigned_to`, vendar ta stolpec zahteva ID iz tabele `logopedist_profiles`.
+**Stanje v bazi:**
+- Session ima `assigned_to: 6837d765-...` (profile.id)
+- Hook išče po `user.id: 1ba88ef8-...` (auth user id)
+- Zato ni zadetkov!
+
+## Problem 2: Manjkajo notification značke
+
+Zavihka "V čakanju" in "Moji pregledi" potrebujeta oranžne kroge s številkami, ki prikazujejo število primerov.
+
+---
 
 ## Rešitev
 
-Spremeniti moramo hook, da namesto `user.id` uporabi `profile.id`:
+### 1. Popravek useMyReviews.ts
 
-### Sprememba v useClaimTestSession.ts
+Spremeniti iskanje iz `user.id` v `profile.id`:
 
-**Prej:**
 ```typescript
+// Prej:
 const { user } = useAdminAuth();
-// ...
-assigned_to: user.id,
+.eq('assigned_to', user.id)
+enabled: !!user?.id
+
+// Potem:
+const { profile } = useAdminAuth();
+.eq('assigned_to', profile.id)
+enabled: !!profile?.id
 ```
 
-**Potem:**
+### 2. Nov hook za štetje primerov
+
+Ustvariti `useAdminCounts.ts` hook, ki vrne:
+- `pendingCount` - število čakajočih primerov
+- `myReviewsCount` - število mojih pregledov
+
 ```typescript
-const { profile } = useAdminAuth();
-// ...
-assigned_to: profile.id,
+export function useAdminCounts() {
+  const { profile } = useAdminAuth();
+  
+  // Poizvedba za pending count
+  const pendingQuery = useQuery({
+    queryKey: ['admin-pending-count'],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from('articulation_test_sessions')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending')
+        .is('assigned_to', null);
+      return count || 0;
+    }
+  });
+  
+  // Poizvedba za my reviews count
+  const myReviewsQuery = useQuery({
+    queryKey: ['admin-my-reviews-count', profile?.id],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from('articulation_test_sessions')
+        .select('*', { count: 'exact', head: true })
+        .eq('assigned_to', profile.id)
+        .in('status', ['assigned', 'in_review']);
+      return count || 0;
+    },
+    enabled: !!profile?.id
+  });
+  
+  return {
+    pendingCount: pendingQuery.data || 0,
+    myReviewsCount: myReviewsQuery.data || 0
+  };
+}
+```
+
+### 3. Posodobitev AdminSidebar.tsx
+
+Dodati notification badge komponento in jo uporabiti na ustreznih zavihkih:
+
+```tsx
+// Nova badge komponenta
+function NotificationBadge({ count }: { count: number }) {
+  if (count === 0) return null;
+  return (
+    <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-app-orange text-[10px] font-bold text-white">
+      {count > 99 ? '99+' : count}
+    </span>
+  );
+}
+
+// V navigaciji
+const { pendingCount, myReviewsCount } = useAdminCounts();
+
+const navigation = [
+  { name: 'Moj portal', href: '/admin', icon: LayoutDashboard, count: 0 },
+  { name: 'Vsa preverjanja', href: '/admin/all-tests', icon: ClipboardList, count: 0 },
+  { name: 'V čakanju', href: '/admin/pending', icon: Clock, count: pendingCount },
+  { name: 'Moji pregledi', href: '/admin/my-reviews', icon: User, count: myReviewsCount },
+];
+
+// V renderju
+{item.name}
+{item.count > 0 && <NotificationBadge count={item.count} />}
+```
+
+### 4. Posodobitev AdminMobileNav.tsx
+
+Enako kot pri sidebar - dodati notification badge na mobilni navigaciji.
+
+---
+
+## Vizualni rezultat
+
+### Desktop sidebar:
+```
+┌─────────────────────────────┐
+│ V čakanju         🟠 2      │
+│ Moji pregledi     🟠 1      │
+└─────────────────────────────┘
+```
+
+### Mobile nav:
+```
+┌─────────────────────────────┐
+│ 🕐 V čakanju       🟠 2     │
+│ 👤 Moji pregledi   🟠 1     │
+└─────────────────────────────┘
 ```
 
 ---
 
-## Tehnične podrobnosti
-
-### Zakaj se to zgodi?
-
-Tabela `articulation_test_sessions` ima definiran tuji ključ:
-```sql
-assigned_to UUID REFERENCES public.logopedist_profiles(id)
-```
-
-To pomeni, da mora vrednost `assigned_to` obstajati v tabeli `logopedist_profiles.id`.
-
-Tabela `logopedist_profiles` ima svojo strukturo:
-- `id` - unikatni ID profila logopeda (ta ID potrebujemo!)
-- `user_id` - referenco na `auth.users.id`
-
-### Spremembe v kodi
+## Datoteke za spremembo
 
 | Datoteka | Sprememba |
 |----------|-----------|
-| `src/hooks/useClaimTestSession.ts` | Uporabi `profile.id` namesto `user.id` |
-
-### Posodobljena koda
-
-```typescript
-export function useClaimTestSession() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const { profile } = useAdminAuth();  // <-- spremenjeno iz user
-  const queryClient = useQueryClient();
-
-  const claimSession = async (sessionId: string) => {
-    if (!profile?.id) {  // <-- spremenjeno iz user?.id
-      return { success: false, error: 'Niste prijavljeni kot logoped' };
-    }
-
-    // ... ostala koda ...
-
-    .update({
-      assigned_to: profile.id,  // <-- spremenjeno iz user.id
-      // ...
-    })
-  };
-}
-```
+| `src/hooks/useMyReviews.ts` | Zamenjaj `user.id` s `profile.id` |
+| `src/hooks/useAdminCounts.ts` | Nova datoteka - hook za štetje |
+| `src/components/admin/AdminSidebar.tsx` | Dodaj notification badges |
+| `src/components/admin/AdminMobileNav.tsx` | Dodaj notification badges |
 
 ---
 
 ## Rezultat
 
 Po implementaciji:
-- Gumb "Prevzemi" bo pravilno deloval
-- Seja bo dodeljena logopedovemu profilu
-- Primer se bo pojavil v zavihku "Moji pregledi"
+- Prevzeti primeri se bodo pravilno prikazali v "Moji pregledi"
+- Zavihek "V čakanju" bo imel oranžno številko (npr. 2)
+- Zavihek "Moji pregledi" bo imel oranžno številko (npr. 1)
+- Značke se bodo avtomatsko posodabljale ob spremembah
