@@ -1,7 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { articulationData } from "@/data/articulationTestData";
 import { useTranscription } from "./useTranscription";
+
+// Fonetični vrstni red glasov za artikulacijski test
+const PHONETIC_ORDER = ['P', 'B', 'M', 'T', 'D', 'K', 'G', 'N', 'H', 'V', 'J', 'F', 'L', 'S', 'Z', 'C', 'Š', 'Ž', 'Č', 'R'];
 
 // Position labels in Slovenian
 const positionLabels = ["začetek", "sredina", "konec"];
@@ -23,20 +26,31 @@ export const useArticulationTestNew = (childId?: string, userId?: string, fixedS
 
   const { transcribe, isTranscribing, resetTranscription } = useTranscription();
 
+  // Sort articulation data by phonetic order
+  const sortedArticulationData = useMemo(() => {
+    return [...articulationData].sort((a, b) => {
+      const indexA = PHONETIC_ORDER.indexOf(a.letter.toUpperCase());
+      const indexB = PHONETIC_ORDER.indexOf(b.letter.toUpperCase());
+      const orderA = indexA === -1 ? 999 : indexA;
+      const orderB = indexB === -1 ? 999 : indexB;
+      return orderA - orderB;
+    });
+  }, []);
+
   // Total words across all letters
-  const totalWords = articulationData.reduce(
+  const totalWords = sortedArticulationData.reduce(
     (count, group) => count + group.words.length,
     0
   );
 
-  // All letters in order
-  const allLetters = articulationData.map((group) => group.letter);
+  // All letters in phonetic order
+  const allLetters = sortedArticulationData.map((group) => group.letter);
 
   // Calculate which letter and word position we're at based on currentWordIndex
   const getCurrentLetterAndPosition = () => {
     let wordCount = 0;
-    for (let letterIdx = 0; letterIdx < articulationData.length; letterIdx++) {
-      const group = articulationData[letterIdx];
+    for (let letterIdx = 0; letterIdx < sortedArticulationData.length; letterIdx++) {
+      const group = sortedArticulationData[letterIdx];
       for (let wordIdx = 0; wordIdx < group.words.length; wordIdx++) {
         if (wordCount === currentWordIndex) {
           return {
@@ -63,8 +77,8 @@ export const useArticulationTestNew = (childId?: string, userId?: string, fixedS
     const completed: number[] = new Array(allLetters.length).fill(0);
     let wordCount = 0;
 
-    for (let letterIdx = 0; letterIdx < articulationData.length; letterIdx++) {
-      const group = articulationData[letterIdx];
+    for (let letterIdx = 0; letterIdx < sortedArticulationData.length; letterIdx++) {
+      const group = sortedArticulationData[letterIdx];
       for (let wordIdx = 0; wordIdx < group.words.length; wordIdx++) {
         if (wordCount < currentWordIndex) {
           completed[letterIdx]++;
@@ -74,7 +88,7 @@ export const useArticulationTestNew = (childId?: string, userId?: string, fixedS
     }
 
     return completed;
-  }, [currentWordIndex, allLetters.length]);
+  }, [currentWordIndex, allLetters.length, sortedArticulationData]);
 
   // Fetch image when word changes
   useEffect(() => {
