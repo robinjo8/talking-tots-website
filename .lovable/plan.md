@@ -1,155 +1,136 @@
 
-# Načrt: Implementacija strani za pregled artikulacijske seje
+# Načrt: Popravek grupiranja posnetkov po črkah
 
 ## Problem
 
-Ko klikneš "Ogled" na strani `/admin/my-reviews`, se odpre URL `/admin/tests/:sessionId`, ampak prikaže se seznam vseh testov (Vsa preverjanja) namesto strani za pregled posamezne seje. To se dogaja, ker:
+Posnetki za črke Č, Š, Ž se ne prikazujejo pravilno, ker:
 
-1. Ruta `tests/:sessionId` v `AdminRoutes.tsx` še vedno kaže na `AdminAllTests` komponento
-2. Nova stran `AdminSessionReview.tsx` še ni bila ustvarjena
-3. Vse komponente in hooki iz načrta še niso implementirani
+1. Pri shranjevanju se imena datotek **sanitizirajo**: `Ž` → `Z`, `Š` → `S`, `Č` → `C`
+2. Primer: `ŽOGA` se shrani kot `Z-57-ZOGA-...webm`
+3. Pri parsanju se črka `Z` prebere iz imena datoteke
+4. Posnetek se zato prikaže pod accordion za črko **Z** namesto **Ž**
 
 ## Rešitev
 
-Implementirati vse manjkajoče dele iz odobrenega načrta.
+Uporabiti **wordIndex** iz imena datoteke za določitev pravilne črke, saj je wordIndex unikaten in zaporeden po fonetičnem vrstnem redu.
+
+### Logika mapiranja
+
+V `articulationTestData.ts` je 20 črk, vsaka s 3 besedami = 60 besed total.
+
+Fonetični vrstni red: `P, B, M, T, D, K, G, N, H, V, J, F, L, S, Z, C, Š, Ž, Č, R`
+
+| Črka | Indeksi besed |
+|------|---------------|
+| P    | 0, 1, 2       |
+| B    | 3, 4, 5       |
+| M    | 6, 7, 8       |
+| ...  | ...           |
+| Š    | 48, 49, 50    |
+| **Ž**| **51, 52, 53**|
+| Č    | 54, 55, 56    |
+| R    | 57, 58, 59    |
+
+**Opomba**: Glede na sliko uporabnika ima Ž indekse 57, 58, 59 - kar pomeni, da je vrstni red v bazi drugačen. Moramo preveriti dejanski vrstni red.
 
 ---
 
-## Datoteke za ustvariti
+## Datoteke za spremeniti
 
 ### 1. `src/data/evaluationOptions.ts`
-Definicije check boxov za ocenjevanje po črkah:
-- Za črko S: specifične možnosti (izgovarja kot Š, ne izgovarja, prehitro, prepočasi)
-- Za vse ostale črke: 4x "V pripravi" (onemogočeno)
 
-### 2. `src/hooks/useSessionReview.ts`
-Hook ki:
-- Pridobi podatke o seji iz `articulation_test_sessions`
-- Pridobi podatke o otroku iz `children`
-- Pridobi podatke o staršu iz `profiles`
-- Pridobi posnetke iz Supabase Storage
-- Grupira posnetke po črkah v fonetičnem vrstnem redu
-- Pridobi obstoječe ocene iz `articulation_evaluations`
+Dodaj helper funkcijo za mapiranje wordIndex → prava črka:
 
-### 3. `src/components/admin/RecordingPlayer.tsx`
-Preprost predvajalnik zvoka z gumbi Play/Pause/Stop
+```typescript
+// Mapiranje wordIndex na pravilno črko (upošteva sanitizacijo imen datotek)
+export function getLetterFromWordIndex(wordIndex: number): string {
+  // Vsaka črka ima 3 besede
+  const letterIndex = Math.floor(wordIndex / 3);
+  return PHONETIC_ORDER[letterIndex] || 'X';
+}
+```
 
-### 4. `src/components/admin/EvaluationCheckboxes.tsx`
-Check boxi za ocenjevanje z možnostjo komentarja
+Posodobi `parseRecordingFilename`:
 
-### 5. `src/components/admin/LetterAccordion.tsx`
-Zložljiva sekcija za vsako črko ki vsebuje:
-- 3 posnetke
-- Check boxe
-- Polje za komentar
-
-### 6. `src/components/admin/SessionReviewHeader.tsx`
-Header z podatki otroka (ime, starost, datum preverjanja)
-
-### 7. `src/pages/admin/AdminSessionReview.tsx`
-Glavna stran ki:
-- Uporabi `useSessionReview` hook
-- Prikaže header z podatki otroka
-- Prikaže 20 zložljivih sekcij po črkah
-- Omogoča shranjevanje ocen
-
-### 8. Posodobitev `AdminRoutes.tsx`
-- Uvozi novo komponento `AdminSessionReview`
-- Spremeni ruto `tests/:sessionId` da kaže na novo komponento
+```typescript
+export function parseRecordingFilename(filename: string): {
+  letter: string;
+  wordIndex: number;
+  word: string;
+} | null {
+  const match = filename.match(/^([A-ZČŠŽ]+)-(\d+)-([A-ZČŠŽ]+)-/i);
+  if (!match) return null;
+  
+  const wordIndex = parseInt(match[2], 10);
+  
+  // Uporabi wordIndex za določitev prave črke (obide sanitizacijo imen)
+  const actualLetter = getLetterFromWordIndex(wordIndex);
+  
+  return {
+    letter: actualLetter,
+    wordIndex: wordIndex,
+    word: match[3].toUpperCase(),
+  };
+}
+```
 
 ---
 
 ## Vizualni rezultat
 
-```text
-┌─────────────────────────────────────────────────────────────┐
-│  ← Nazaj                                                     │
-│                                                              │
-│  Pregled preverjanja                                         │
-│  Otrok: Žak  •  Starost: 5 let  •  Oddano: 23. 1. 2026      │
-└─────────────────────────────────────────────────────────────┘
+**Prej** (napačno):
+- Črka Z: 6 posnetkov (3 za Z + 3 sanitizirane za Ž)
+- Črka Ž: 0 posnetkov
 
-┌─────────────────────────────────────────────────────────────┐
-│  ČRKA P  ▼                                                   │
-│  ├─ PAJEK   [▶]                                              │
-│  ├─ KAPA    [▶]                                              │
-│  └─ REP     [▶]                                              │
-│                                                              │
-│  □ V pripravi    □ V pripravi                                │
-│  □ V pripravi    □ V pripravi                                │
-│  Komentar: [___________________________]                      │
-└─────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────┐
-│  ČRKA S  ▼                                                   │
-│  ├─ SOK    [▶]                                               │
-│  ├─ OSA    [▶]                                               │
-│  └─ NOS    [▶]                                               │
-│                                                              │
-│  ☑ Črko S izgovarja kot Š    □ Črke S ne izgovarja          │
-│  □ Prehitro izgovarja        □ Prepočasi izgovarja          │
-│  Komentar: [___________________________]                      │
-└─────────────────────────────────────────────────────────────┘
-
-... (18 dodatnih črk) ...
-
-┌─────────────────────────────────────────────────────────────┐
-│  [Shrani ocene]              [Zaključi pregled]              │
-└─────────────────────────────────────────────────────────────┘
-```
+**Potem** (pravilno):
+- Črka Z: 3 posnetki (Z-ZORA, Z-KOZA, Z-OBRAZ)
+- Črka Ž: 3 posnetki (Ž-ŽOGA, Ž-ROŽA, Ž-JEŽ)
 
 ---
 
-## Fonetični vrstni red
+## Preveritev vrstnega reda
 
-Črke bodo prikazane v tem vrstnem redu:
-P → B → M → T → D → K → G → N → H → V → J → F → L → S → Z → C → Š → Ž → Č → R
+Pred implementacijo moramo preveriti:
+1. Kakšen je dejanski vrstni red črk v `articulationTestData.ts`
+2. Kakšni so wordIndex-i za posamezne črke
 
----
+Iz slike uporabnika:
+- `Z-57-ZOGA` → wordIndex 57 za ŽOGA
+- `Z-58-ROZA` → wordIndex 58 za ROŽA
+- `Z-59-JEZ` → wordIndex 59 za JEŽ
 
-## Tehnične podrobnosti
+To pomeni, da je Ž na poziciji 19 (indeksi 57-59), kar ustreza vrstnemu redu če je Ž na koncu.
 
-### Parsanje imen posnetkov
+**Dejanski fonetični vrstni red v kodi:**
+`P, B, M, T, D, K, G, N, H, V, J, F, L, S, Z, C, Š, Ž, Č, R`
 
-Ime datoteke: `S-39-SOK-2026-01-15T17-32-57-092Z.webm`
+- Ž je na indeksu 17 → besede bi morale imeti indekse 51, 52, 53
+- Ampak datoteke imajo 57, 58, 59
+
+To nakazuje, da `articulationTestData.ts` **NI sortiran po fonetičnem vrstnem redu** ampak je v drugačnem vrstnem redu (verjetno abecednem).
+
+### Rešitev: Dinamično mapiranje
+
+Namesto statičnega izračuna, preberi dejanske indekse iz `articulationTestData.ts`:
 
 ```typescript
-function parseRecordingFilename(filename: string) {
-  const match = filename.match(/^([A-ZČŠŽ]+)-(\d+)-([A-ZČŠŽ]+)-/i);
-  if (!match) return null;
-  return {
-    letter: match[1].toUpperCase(),  // S
-    wordIndex: parseInt(match[2]),   // 39
-    word: match[3].toUpperCase(),    // SOK
-  };
+import { articulationData } from '@/data/articulationTestData';
+
+// Ustvari mapiranje wordIndex → črka iz dejanskih podatkov
+const wordIndexToLetterMap = new Map<number, string>();
+
+let currentIndex = 0;
+articulationData.forEach(letterData => {
+  letterData.words.forEach(() => {
+    wordIndexToLetterMap.set(currentIndex, letterData.letter);
+    currentIndex++;
+  });
+});
+
+export function getLetterFromWordIndex(wordIndex: number): string {
+  return wordIndexToLetterMap.get(wordIndex) || 'X';
 }
 ```
-
-### Shranjevanje ocen
-
-Uporaba `UPSERT` (insert on conflict update) za shranjevanje ocen:
-
-```typescript
-await supabase
-  .from('articulation_evaluations')
-  .upsert({
-    session_id: sessionId,
-    letter: 'S',
-    selected_options: ['s_as_sh', 's_too_fast'],
-    comment: 'Dodatne opombe...',
-  }, { onConflict: 'session_id,letter' });
-```
-
-### Pridobivanje posnetkov iz Storage
-
-Pot do posnetkov:
-`uporabniski-profili/{parentId}/{childId}/Preverjanje-izgovorjave/Seja-{N}/`
-
-Hook bo:
-1. Iz seje dobil `parent_id` in `child_id`
-2. Poizvedoval po vseh `Seja-X` mapah v Storage
-3. Poiskal sejo ki ustreza času oddaje (`submitted_at`)
-4. Grupiral posnetke po črkah
 
 ---
 
@@ -157,11 +138,6 @@ Hook bo:
 
 | Datoteka | Operacija |
 |----------|-----------|
-| `src/data/evaluationOptions.ts` | USTVARI |
-| `src/hooks/useSessionReview.ts` | USTVARI |
-| `src/components/admin/RecordingPlayer.tsx` | USTVARI |
-| `src/components/admin/EvaluationCheckboxes.tsx` | USTVARI |
-| `src/components/admin/LetterAccordion.tsx` | USTVARI |
-| `src/components/admin/SessionReviewHeader.tsx` | USTVARI |
-| `src/pages/admin/AdminSessionReview.tsx` | USTVARI |
-| `src/components/routing/AdminRoutes.tsx` | POSODOBI |
+| `src/data/evaluationOptions.ts` | POSODOBI - dodaj dinamično mapiranje wordIndex → črka |
+
+Ena datoteka za spremeniti, enostavna rešitev.
