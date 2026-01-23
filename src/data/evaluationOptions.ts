@@ -1,7 +1,24 @@
+import { articulationData } from '@/data/articulationTestData';
+
 // Fonetični vrstni red črk
 export const PHONETIC_ORDER = ['P', 'B', 'M', 'T', 'D', 'K', 'G', 'N', 'H', 'V', 'J', 'F', 'L', 'S', 'Z', 'C', 'Š', 'Ž', 'Č', 'R'] as const;
 
 export type PhoneticLetter = typeof PHONETIC_ORDER[number];
+
+// Dinamično mapiranje wordIndex → črka iz articulationTestData
+// articulationTestData je v abecednem vrstnem redu, ne fonetičnem
+const wordIndexToLetterMap = new Map<number, string>();
+let currentIndex = 0;
+articulationData.forEach(letterData => {
+  letterData.words.forEach(() => {
+    wordIndexToLetterMap.set(currentIndex, letterData.letter);
+    currentIndex++;
+  });
+});
+
+export function getLetterFromWordIndex(wordIndex: number): string {
+  return wordIndexToLetterMap.get(wordIndex) || 'X';
+}
 
 export interface EvaluationOption {
   id: string;
@@ -50,9 +67,16 @@ export function parseRecordingFilename(filename: string): {
   // Format: S-39-SOK-2026-01-15T17-32-57-092Z.webm
   const match = filename.match(/^([A-ZČŠŽ]+)-(\d+)-([A-ZČŠŽ]+)-/i);
   if (!match) return null;
+  
+  const wordIndex = parseInt(match[2], 10);
+  
+  // Uporabi wordIndex za določitev prave črke (obide sanitizacijo imen datotek)
+  // Npr. Ž se sanitizira v Z, ampak wordIndex 57-59 pravilno mapirata na Ž
+  const actualLetter = getLetterFromWordIndex(wordIndex);
+  
   return {
-    letter: match[1].toUpperCase(),
-    wordIndex: parseInt(match[2], 10),
+    letter: actualLetter,
+    wordIndex: wordIndex,
     word: match[3].toUpperCase(),
   };
 }
