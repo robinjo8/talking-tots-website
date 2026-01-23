@@ -6,16 +6,16 @@ const MotorikaGovoril = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      {/* Page Title and Breadcrumb */}
-      <div className="container max-w-4xl mx-auto px-4 pt-28 md:pt-32 pb-4">
+      {/* Breadcrumb */}
+      <div className="pt-24 md:pt-28">
+        <BreadcrumbNavigation />
+      </div>
+
+      {/* Page Title */}
+      <div className="container max-w-4xl mx-auto px-4 pt-4 pb-4">
         <h1 className="text-4xl md:text-5xl font-bold text-center text-foreground mb-6">
           Motorika govoril in artikulacija – razumevanje povezave
         </h1>
-        
-        {/* Breadcrumb */}
-        <div className="mb-4">
-          <BreadcrumbNavigation />
-        </div>
       </div>
 
       {/* Blog Article */}
