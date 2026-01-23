@@ -11,12 +11,12 @@ interface ClaimSessionResult {
 export function useClaimTestSession() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { user } = useAdminAuth();
+  const { profile } = useAdminAuth();
   const queryClient = useQueryClient();
 
   const claimSession = async (sessionId: string): Promise<ClaimSessionResult> => {
-    if (!user?.id) {
-      return { success: false, error: 'Niste prijavljeni' };
+    if (!profile?.id) {
+      return { success: false, error: 'Niste prijavljeni kot logoped' };
     }
 
     setIsLoading(true);
@@ -26,7 +26,7 @@ export function useClaimTestSession() {
       const { error: updateError } = await supabase
         .from('articulation_test_sessions')
         .update({
-          assigned_to: user.id,
+          assigned_to: profile.id,
           assigned_at: new Date().toISOString(),
           status: 'in_review',
         })
