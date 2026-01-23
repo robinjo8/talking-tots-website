@@ -1,11 +1,5 @@
 import Header from "@/components/Header";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 
 const PogostaVprasanja = () => {
   const faqData = [
@@ -87,33 +81,18 @@ const PogostaVprasanja = () => {
           </p>
         </div>
 
-        {/* FAQ Accordion */}
-        <div className="max-w-4xl mx-auto">
-          <Accordion type="single" collapsible className="space-y-4">
-            {faqData.map((faq, index) => (
-              <AccordionItem 
-                key={index} 
-                value={`item-${index}`}
-                className="bg-card border border-border rounded-lg shadow-sm"
-              >
-                <AccordionTrigger className="w-full px-6 py-4 text-left hover:bg-muted/50 transition-colors duration-200 rounded-lg [&[data-state=open]>div>svg]:rotate-180">
-                  <div className="flex items-center justify-between w-full">
-                    <h3 className="text-lg font-semibold text-foreground pr-4">
-                      {faq.question}
-                    </h3>
-                  </div>
-                </AccordionTrigger>
-                
-                <AccordionContent>
-                  <div className="px-6 pb-4">
-                    <p className="text-muted-foreground leading-relaxed">
-                      {faq.answer}
-                    </p>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+        {/* FAQ as text document */}
+        <div className="space-y-8">
+          {faqData.map((faq, index) => (
+            <div key={index} className="space-y-2">
+              <h3 className="text-lg font-bold text-foreground">
+                {faq.question}
+              </h3>
+              <p className="text-muted-foreground leading-relaxed">
+                {faq.answer}
+              </p>
+            </div>
+          ))}
         </div>
 
         {/* Contact CTA */}
