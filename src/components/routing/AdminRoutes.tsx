@@ -10,7 +10,9 @@ const AdminDashboard = lazy(() => import('@/pages/admin/AdminDashboard'));
 const AdminUsers = lazy(() => import('@/pages/admin/AdminUsers'));
 const AdminUserDetail = lazy(() => import('@/pages/admin/AdminUserDetail'));
 const AdminMemberships = lazy(() => import('@/pages/admin/AdminMemberships'));
-const AdminTests = lazy(() => import('@/pages/admin/AdminTests'));
+const AdminAllTests = lazy(() => import('@/pages/admin/AdminTests'));
+const AdminPending = lazy(() => import('@/pages/admin/AdminPending'));
+const AdminMyReviews = lazy(() => import('@/pages/admin/AdminMyReviews'));
 
 // Loading fallback for admin pages
 function AdminLoadingFallback() {
@@ -88,10 +90,34 @@ export function AdminRoutes() {
           } 
         />
         <Route 
-          path="tests" 
+          path="all-tests" 
           element={
             <AdminLayoutWrapper>
-              <AdminTests />
+              <AdminAllTests />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="pending" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminPending />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="my-reviews" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminMyReviews />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="tests/:sessionId" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminAllTests />
             </AdminLayoutWrapper>
           } 
         />
