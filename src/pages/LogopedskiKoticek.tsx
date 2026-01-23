@@ -46,7 +46,7 @@ const LogopedskiKoticek = () => {
       icon: sectionIcons.disorders,
       articleUrl: '/clanki/motorika-govoril',
       available: true,
-      imageUrl: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/logopedski-koticek/Motorika%20govoril%20in%20artikulacija_v2%20dodano.webp',
+      imageUrl: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/logopedski-koticek/Motorika%20govoril%20in%20artikulacija_razumevanje%20povezave_naslovna.webp',
     },
     {
       id: 'disorders',
@@ -127,7 +127,7 @@ const LogopedskiKoticek = () => {
               <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-app-blue/20 to-app-teal/20">
                 {section.id === 'development' ? (
                   <img
-                    src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/logopedski-koticek/logoped_slika_1%20(1).webp"
+                    src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/logopedski-koticek/Razvoj%20govora_naslovna.webp"
                     alt={section.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />

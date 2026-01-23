@@ -27,7 +27,7 @@ const MotorikaGovoril = () => {
           <div className="md:float-left md:w-1/2 md:mr-8 mb-6 md:mb-4">
             <div className="rounded-2xl overflow-hidden shadow-lg border-4 border-muted">
               <img
-                src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/logopedski-koticek/Motorika%20govoril%20in%20artikulacija_v2%20dodano.webp"
+                src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/logopedski-koticek/Motorika%20govoril%20in%20artikulacija_razumevanje%20povezave_clanek.webp"
                 alt="Motorika govoril in artikulacija"
                 className="w-full h-auto object-cover"
               />
