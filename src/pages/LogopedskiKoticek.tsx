@@ -38,6 +38,7 @@ const LogopedskiKoticek = () => {
       icon: sectionIcons.development,
       articleUrl: '/clanki/razvoj-govora',
       available: true,
+      imageUrl: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/logopedski-koticek/Razvoj%20govora_naslovna.webp',
     },
     {
       id: 'motorika',
@@ -49,24 +50,6 @@ const LogopedskiKoticek = () => {
       imageUrl: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/logopedski-koticek/Motorika%20govoril%20in%20artikulacija_razumevanje%20povezave_naslovna.webp',
     },
     {
-      id: 'disorders',
-      title: 'Najpogostejše govorne motnje',
-      description: 'Opis in razlaga motenj, kot so: Dislalija, Fonološke motnje, Jecljanje, Zakasnitev v govoru. Vključitev primerov in nasvetov za prepoznavanje teh motenj.',
-      icon: sectionIcons.disorders,
-    },
-    {
-      id: 'parent_tips',
-      title: 'Nasveti za starše',
-      description: 'Kako doma spodbujati razvoj govora pri otroku. Vključitev vsakodnevnih dejavnosti, ki lahko pomagajo pri govornem razvoju. Pomembnost igre in interakcije pri učenju jezika.',
-      icon: sectionIcons.parent_tips,
-    },
-    {
-      id: 'home_activities',
-      title: 'Vaje in dejavnosti za domačo uporabo',
-      description: 'Predlogi za enostavne vaje, ki jih starši lahko izvajajo z otroki doma. Uporaba pesmi, rim in zgodbic za spodbujanje govora. Ustvarjalne dejavnosti, kot so risanje in igranje vlog, ki spodbujajo jezikovni razvoj.',
-      icon: sectionIcons.home_activities,
-    },
-    {
       id: 'faq',
       title: 'Pogosta vprašanja in odgovori',
       description: 'Odgovori na najpogostejša vprašanja o aplikaciji TomiTalk – od namena aplikacije, vrst vaj in iger, do spremljanja napredka in varnosti za otroke.',
@@ -74,19 +57,8 @@ const LogopedskiKoticek = () => {
       articleUrl: '/clanki/pogosta-vprasanja',
       available: true,
       imageUrl: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/Stickman_FAQ.webp',
+      imagePosition: 'object-top',
     },
-    {
-      id: 'articles',
-      title: 'Strokovni članki in raziskave',
-      description: 'Povzetki najnovejših raziskav na področju logopedije. Članki strokovnjakov o različnih vidikih govornega razvoja in terapije.',
-      icon: sectionIcons.articles,
-    },
-    {
-      id: 'resources',
-      title: 'Povezave do dodatnih virov',
-      description: 'Seznam priporočenih knjig, spletnih strani in aplikacij za podporo govornemu razvoju. Informacije o lokalnih logopedskih storitvah in podpornih skupinah.',
-      icon: sectionIcons.resources,
-    }
   ];
 
   const handleSectionSelect = (section: any) => {
@@ -123,22 +95,20 @@ const LogopedskiKoticek = () => {
           {contentSections.map((section) => (
             <div
               key={section.id}
-              className="bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group"
+              className={`bg-card rounded-xl shadow-md transition-all duration-300 overflow-hidden group ${
+                section.available 
+                  ? 'hover:shadow-xl cursor-pointer' 
+                  : 'opacity-60 cursor-not-allowed'
+              }`}
               onClick={() => handleSectionSelect(section)}
             >
               {/* Card Image */}
               <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-app-blue/20 to-app-teal/20">
-                {section.id === 'development' ? (
-                  <img
-                    src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/logopedski-koticek/Razvoj%20govora_naslovna.webp"
-                    alt={section.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
-                ) : section.imageUrl ? (
+                {section.imageUrl ? (
                   <img
                     src={section.imageUrl}
                     alt={section.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    className={`w-full h-full object-cover group-hover:scale-110 transition-transform duration-300 ${section.imagePosition || 'object-center'}`}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
