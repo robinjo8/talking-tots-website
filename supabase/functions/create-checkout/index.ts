@@ -114,6 +114,34 @@ serve(async (req) => {
     
     logStep("No existing subscriptions found, proceeding with checkout");
 
+    // Check if user has ever had a trial before (to prevent trial abuse)
+    let hasUsedTrialBefore = false;
+
+    const allSubscriptions = await stripe.subscriptions.list({
+      customer: customerId,
+      status: "all", // Include all statuses: active, canceled, trialing, etc.
+      limit: 100,
+    });
+
+    // Check if any subscription has trial_start set
+    for (const sub of allSubscriptions.data) {
+      if (sub.trial_start !== null) {
+        hasUsedTrialBefore = true;
+        logStep("User has previously used trial", { 
+          subscriptionId: sub.id, 
+          trialStart: new Date(sub.trial_start * 1000).toISOString(),
+          status: sub.status 
+        });
+        break;
+      }
+    }
+
+    if (hasUsedTrialBefore) {
+      logStep("Trial abuse prevention: User will be charged immediately");
+    } else {
+      logStep("User eligible for 7-day trial");
+    }
+
     // Save customer ID to user_subscriptions table for webhook matching
     const { error: upsertError } = await supabaseClient.from("user_subscriptions").upsert({
       user_id: user.id,
@@ -140,8 +168,8 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
-      subscription_data: {
-        trial_period_days: 7, // 7-dnevno brezplačno obdobje
+      subscription_data: hasUsedTrialBefore ? {} : {
+        trial_period_days: 7, // 7-day free trial only for first-time users
       },
       success_url: `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/payment-canceled`,
@@ -151,7 +179,10 @@ serve(async (req) => {
       },
     });
     
-    logStep("Checkout session created with 7-day trial", { sessionId: session.id, url: session.url });
+    logStep(hasUsedTrialBefore 
+      ? "Checkout session created WITHOUT trial (immediate charge)" 
+      : "Checkout session created with 7-day trial", 
+      { sessionId: session.id, url: session.url, hasUsedTrialBefore });
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
