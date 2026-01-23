@@ -2,6 +2,9 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+// Fonetični vrstni red glasov za artikulacijski test
+const PHONETIC_ORDER = ['P', 'B', 'M', 'T', 'D', 'K', 'G', 'N', 'H', 'V', 'J', 'F', 'L', 'S', 'Z', 'C', 'Š', 'Ž', 'Č', 'R'];
+
 interface TestWord {
   id: string;
   word: string;
@@ -59,7 +62,17 @@ export const useArtikuacijskiTest = () => {
           });
         });
 
-        setAllLettersData(groupedData.sort((a, b) => a.letter.localeCompare(b.letter)));
+        // Sort by phonetic order instead of alphabetically
+        const sortedData = groupedData.sort((a, b) => {
+          const indexA = PHONETIC_ORDER.indexOf(a.letter.toUpperCase());
+          const indexB = PHONETIC_ORDER.indexOf(b.letter.toUpperCase());
+          // If letter not found in order, put it at the end
+          const orderA = indexA === -1 ? 999 : indexA;
+          const orderB = indexB === -1 ? 999 : indexB;
+          return orderA - orderB;
+        });
+
+        setAllLettersData(sortedData);
       } catch (error) {
         console.error("Error in fetchTestData:", error);
       }
