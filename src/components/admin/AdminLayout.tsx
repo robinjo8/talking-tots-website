@@ -43,7 +43,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <div className="min-h-screen bg-muted/30">
       <AdminSidebar />
-      <div className="lg:pl-64">
+      <div className="lg:pl-64 pt-16">
         <AdminHeader />
         <main className="p-6">
           {children}
