@@ -13,6 +13,7 @@ const AdminMemberships = lazy(() => import('@/pages/admin/AdminMemberships'));
 const AdminAllTests = lazy(() => import('@/pages/admin/AdminTests'));
 const AdminPending = lazy(() => import('@/pages/admin/AdminPending'));
 const AdminMyReviews = lazy(() => import('@/pages/admin/AdminMyReviews'));
+const AdminSessionReview = lazy(() => import('@/pages/admin/AdminSessionReview'));
 
 // Loading fallback for admin pages
 function AdminLoadingFallback() {
@@ -117,7 +118,7 @@ export function AdminRoutes() {
           path="tests/:sessionId" 
           element={
             <AdminLayoutWrapper>
-              <AdminAllTests />
+              <AdminSessionReview />
             </AdminLayoutWrapper>
           } 
         />

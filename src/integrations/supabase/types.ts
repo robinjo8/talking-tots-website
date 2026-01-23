@@ -177,6 +177,54 @@ export type Database = {
         }
         Relationships: []
       }
+      articulation_evaluations: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          evaluated_by: string | null
+          id: string
+          letter: string
+          selected_options: string[] | null
+          session_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          evaluated_by?: string | null
+          id?: string
+          letter: string
+          selected_options?: string[] | null
+          session_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          evaluated_by?: string | null
+          id?: string
+          letter?: string
+          selected_options?: string[] | null
+          session_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "articulation_evaluations_evaluated_by_fkey"
+            columns: ["evaluated_by"]
+            isOneToOne: false
+            referencedRelation: "logopedist_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "articulation_evaluations_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "articulation_test_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       articulation_test_results: {
         Row: {
           child_id: string
