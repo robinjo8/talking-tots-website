@@ -69,8 +69,11 @@ const LogopedskiKoticek = () => {
     {
       id: 'faq',
       title: 'Pogosta vprašanja in odgovori',
-      description: 'Odgovori na najpogostejše vprašanja staršev glede govornega razvoja. Nasveti, kako ravnati v določenih situacijah, npr. če otrok ne govori ali ima težave z izgovorjavo določenih glasov.',
+      description: 'Odgovori na najpogostejša vprašanja o aplikaciji TomiTalk – od namena aplikacije, vrst vaj in iger, do spremljanja napredka in varnosti za otroke.',
       icon: sectionIcons.faq,
+      articleUrl: '/clanki/pogosta-vprasanja',
+      available: true,
+      imageUrl: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/Stickman_FAQ.webp',
     },
     {
       id: 'articles',

@@ -77,6 +77,7 @@ const MetKockeGames = lazy(() => import("@/pages/MetKockeGames"));
 const LogopedskiKoticek = lazy(() => import("@/pages/LogopedskiKoticek"));
 const RazvojGovora = lazy(() => import("@/pages/RazvojGovora"));
 const MotorikaGovoril = lazy(() => import("@/pages/MotorikaGovoril"));
+const PogostaVprasanja = lazy(() => import("@/pages/clanki/PogostaVprasanja"));
 
 // Game routers
 const SpominRouter = lazy(() => import("@/components/routing/SpominRouter"));
@@ -190,6 +191,7 @@ export function AppRoutes() {
       <Route path="/logopedski-koticek" element={<LazyRoute><LogopedskiKoticek /></LazyRoute>} />
       <Route path="/clanki/razvoj-govora" element={<LazyRoute><RazvojGovora /></LazyRoute>} />
       <Route path="/clanki/motorika-govoril" element={<LazyRoute><MotorikaGovoril /></LazyRoute>} />
+      <Route path="/clanki/pogosta-vprasanja" element={<LazyRoute><PogostaVprasanja /></LazyRoute>} />
 
       {/* Admin Portal Routes */}
       <Route path="/admin/*" element={<LazyRoute><AdminRoutes /></LazyRoute>} />
