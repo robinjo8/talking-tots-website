@@ -35,7 +35,7 @@ const RazvojGovora = () => {
           <div className="md:float-left md:w-1/2 md:mr-8 mb-6 md:mb-4">
             <div className="rounded-2xl overflow-hidden shadow-lg border-4 border-muted">
               <img
-                src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/logopedski-koticek/logoped_slika_2.png"
+                src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/logopedski-koticek/Razvoj%20govora_clanek.webp"
                 alt="Razvoj govora"
                 className="w-full h-auto object-cover"
               />
