@@ -40,8 +40,8 @@ export interface LetterEvaluationConfig {
 // Specifične možnosti za črko Ž
 const zOptions: EvaluationOption[] = [
   { id: 'z_as_z', label: 'Ž izgovarja kot Z' },
-  { id: 'z_missing', label: 'Ne izgovarja' },
   { id: 'z_excellent', label: 'Odlično izgovarja' },
+  { id: 'z_missing', label: 'Ne izgovarja' },
   { id: 'z_as_s', label: 'Zamenjuje za Š' },
 ];
 
