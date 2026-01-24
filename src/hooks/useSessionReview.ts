@@ -13,6 +13,7 @@ export interface Recording {
 export interface LetterEvaluation {
   selectedOptions: string[];
   comment: string;
+  rating?: number;
 }
 
 export interface SessionReviewData {
@@ -113,26 +114,38 @@ async function fetchSessionReviewData(sessionId: string): Promise<SessionReviewD
     }
 
     if (files) {
-      recordings = files
-        .filter(file => file.name.endsWith('.webm') || file.name.endsWith('.mp3') || file.name.endsWith('.wav'))
-        .map(file => {
-          const parsed = parseRecordingFilename(file.name);
-          if (!parsed) return null;
+      // Pridobi signed URLs za vse datoteke vzporedno
+      const audioFiles = files.filter(file => 
+        file.name.endsWith('.webm') || 
+        file.name.endsWith('.mp3') || 
+        file.name.endsWith('.wav')
+      );
 
-          // Ustvari signed URL za posnetek
-          const { data: urlData } = supabase.storage
-            .from('uporabniski-profili')
-            .getPublicUrl(`${targetFolder}/${file.name}`);
+      const signedUrlPromises = audioFiles.map(async file => {
+        const parsed = parseRecordingFilename(file.name);
+        if (!parsed) return null;
 
-          return {
-            letter: parsed.letter,
-            word: parsed.word,
-            wordIndex: parsed.wordIndex,
-            filename: file.name,
-            url: urlData.publicUrl,
-          };
-        })
-        .filter((r): r is Recording => r !== null);
+        // Uporabi signed URL za zasebni bucket
+        const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+          .from('uporabniski-profili')
+          .createSignedUrl(`${targetFolder}/${file.name}`, 3600); // 1 ura veljavnosti
+
+        if (signedUrlError) {
+          console.error('Napaka pri ustvarjanju signed URL:', signedUrlError);
+          return null;
+        }
+
+        return {
+          letter: parsed.letter,
+          word: parsed.word, // Zdaj je že pravilna beseda s šumniki
+          wordIndex: parsed.wordIndex,
+          filename: file.name,
+          url: signedUrlData.signedUrl,
+        };
+      });
+
+      const results = await Promise.all(signedUrlPromises);
+      recordings = results.filter((r): r is Recording => r !== null);
     }
   }
 
@@ -168,6 +181,7 @@ async function fetchSessionReviewData(sessionId: string): Promise<SessionReviewD
       evaluations.set(eval_.letter, {
         selectedOptions: eval_.selected_options || [],
         comment: eval_.comment || '',
+        rating: eval_.rating ?? undefined,
       });
     });
   }
@@ -207,7 +221,8 @@ export async function saveEvaluation(
   sessionId: string,
   letter: string,
   selectedOptions: string[],
-  comment: string
+  comment: string,
+  rating?: number
 ): Promise<{ success: boolean; error?: string }> {
   const { error } = await supabase
     .from('articulation_evaluations')
@@ -217,6 +232,7 @@ export async function saveEvaluation(
         letter: letter,
         selected_options: selectedOptions,
         comment: comment,
+        rating: rating ?? null,
       },
       { onConflict: 'session_id,letter' }
     );

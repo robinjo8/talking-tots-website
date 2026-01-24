@@ -19,7 +19,7 @@ interface SessionAccordionProps {
   hasData: boolean;
   recordingsByLetter: Map<string, Recording[]>;
   evaluations: Map<string, LetterEvaluation>;
-  onEvaluationChange: (letter: string, selectedOptions: string[], comment: string) => void;
+  onEvaluationChange: (letter: string, selectedOptions: string[], comment: string, rating?: number) => void;
   onSaveLetter: (letter: string) => Promise<void>;
   onSaveAll: () => Promise<void>;
   onCompleteReview?: () => Promise<void>;
@@ -136,7 +136,7 @@ export function SessionAccordion({
               {/* Letter accordions */}
               {PHONETIC_ORDER.map(letter => {
                 const recordings = recordingsByLetter.get(letter) || [];
-                const evaluation = evaluations.get(letter) || { selectedOptions: [], comment: '' };
+                const evaluation = evaluations.get(letter) || { selectedOptions: [], comment: '', rating: undefined };
 
                 return (
                   <LetterAccordion
@@ -147,6 +147,7 @@ export function SessionAccordion({
                     onEvaluationChange={onEvaluationChange}
                     onSave={() => onSaveLetter(letter)}
                     isSaving={savingLetter === letter}
+                    isReadOnly={isReadOnly}
                   />
                 );
               })}

@@ -184,6 +184,7 @@ export type Database = {
           evaluated_by: string | null
           id: string
           letter: string
+          rating: number | null
           selected_options: string[] | null
           session_id: string
           updated_at: string | null
@@ -194,6 +195,7 @@ export type Database = {
           evaluated_by?: string | null
           id?: string
           letter: string
+          rating?: number | null
           selected_options?: string[] | null
           session_id: string
           updated_at?: string | null
@@ -204,6 +206,7 @@ export type Database = {
           evaluated_by?: string | null
           id?: string
           letter?: string
+          rating?: number | null
           selected_options?: string[] | null
           session_id?: string
           updated_at?: string | null

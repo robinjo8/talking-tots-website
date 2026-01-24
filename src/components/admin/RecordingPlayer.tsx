@@ -12,7 +12,6 @@ export function RecordingPlayer({ word, url }: RecordingPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -53,24 +52,10 @@ export function RecordingPlayer({ word, url }: RecordingPlayerProps) {
     }
   };
 
-  const handleVolumeChange = (value: number[]) => {
-    if (audioRef.current) {
-      const newVolume = value[0];
-      audioRef.current.volume = newVolume;
-      setVolume(newVolume);
-      setIsMuted(newVolume === 0);
-    }
-  };
-
   const toggleMute = () => {
     if (audioRef.current) {
-      if (isMuted) {
-        audioRef.current.volume = volume || 1;
-        setIsMuted(false);
-      } else {
-        audioRef.current.volume = 0;
-        setIsMuted(true);
-      }
+      audioRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
     }
   };
 
@@ -82,7 +67,7 @@ export function RecordingPlayer({ word, url }: RecordingPlayerProps) {
   };
 
   return (
-    <div className="flex items-center gap-3 p-3 border rounded-lg bg-muted/30">
+    <div className="flex items-center gap-2 p-2 border rounded-md bg-muted/30">
       <audio
         ref={audioRef}
         src={url}
@@ -90,30 +75,30 @@ export function RecordingPlayer({ word, url }: RecordingPlayerProps) {
       />
       
       {/* Word label */}
-      <span className="font-medium text-foreground min-w-[80px]">{word}</span>
+      <span className="font-medium text-foreground text-sm min-w-[60px]">{word}</span>
       
       {/* Play/Pause button */}
       <Button
         variant="outline"
         size="sm"
         onClick={handlePlayPause}
-        className="h-8 w-8 p-0 shrink-0"
+        className="h-7 w-7 p-0 shrink-0"
         aria-label={isPlaying ? 'Pavza' : 'Predvajaj'}
       >
         {isPlaying ? (
-          <Pause className="h-4 w-4" />
+          <Pause className="h-3 w-3" />
         ) : (
-          <Play className="h-4 w-4" />
+          <Play className="h-3 w-3" />
         )}
       </Button>
 
       {/* Time display */}
-      <span className="text-xs text-muted-foreground w-10 shrink-0">
+      <span className="text-xs text-muted-foreground w-8 shrink-0 text-center">
         {formatTime(currentTime)}
       </span>
       
       {/* Progress slider */}
-      <div className="flex-1 min-w-[100px]">
+      <div className="flex-1 min-w-[60px] max-w-[120px]">
         <Slider
           value={[currentTime]}
           max={duration || 100}
@@ -124,35 +109,24 @@ export function RecordingPlayer({ word, url }: RecordingPlayerProps) {
       </div>
 
       {/* Duration display */}
-      <span className="text-xs text-muted-foreground w-10 shrink-0">
+      <span className="text-xs text-muted-foreground w-8 shrink-0 text-center">
         {formatTime(duration)}
       </span>
       
-      {/* Volume control */}
-      <div className="hidden sm:flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={toggleMute}
-          className="h-8 w-8 p-0"
-          aria-label={isMuted ? 'Vklopi zvok' : 'Izklopi zvok'}
-        >
-          {isMuted ? (
-            <VolumeX className="h-4 w-4" />
-          ) : (
-            <Volume2 className="h-4 w-4" />
-          )}
-        </Button>
-        <div className="w-16">
-          <Slider
-            value={[isMuted ? 0 : volume]}
-            max={1}
-            step={0.1}
-            onValueChange={handleVolumeChange}
-            className="cursor-pointer"
-          />
-        </div>
-      </div>
+      {/* Mute button */}
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={toggleMute}
+        className="h-7 w-7 p-0 shrink-0"
+        aria-label={isMuted ? 'Vklopi zvok' : 'Izklopi zvok'}
+      >
+        {isMuted ? (
+          <VolumeX className="h-3 w-3" />
+        ) : (
+          <Volume2 className="h-3 w-3" />
+        )}
+      </Button>
     </div>
   );
 }

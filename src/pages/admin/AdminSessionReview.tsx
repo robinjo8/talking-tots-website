@@ -65,10 +65,10 @@ export default function AdminSessionReview() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [hasUnsavedChanges]);
 
-  const handleEvaluationChange = (letter: string, selectedOptions: string[], comment: string) => {
+  const handleEvaluationChange = (letter: string, selectedOptions: string[], comment: string, rating?: number) => {
     setLocalEvaluations(prev => {
       const newMap = new Map(prev);
-      newMap.set(letter, { selectedOptions, comment });
+      newMap.set(letter, { selectedOptions, comment, rating });
       return newMap;
     });
   };
@@ -78,13 +78,14 @@ export default function AdminSessionReview() {
     if (!sessionId) return;
     
     setSavingLetter(letter);
-    const evaluation = localEvaluations.get(letter) || { selectedOptions: [], comment: '' };
+    const evaluation = localEvaluations.get(letter) || { selectedOptions: [], comment: '', rating: undefined };
     
     const result = await saveEvaluation(
       sessionId,
       letter,
       evaluation.selectedOptions,
-      evaluation.comment
+      evaluation.comment,
+      evaluation.rating
     );
 
     setSavingLetter(null);
@@ -113,12 +114,13 @@ export default function AdminSessionReview() {
       const saved = savedEvaluations.get(letter);
       const hasChanged = !saved || JSON.stringify(evaluation) !== JSON.stringify(saved);
       
-      if (hasChanged && (evaluation.selectedOptions.length > 0 || evaluation.comment.trim())) {
+      if (hasChanged && (evaluation.selectedOptions.length > 0 || evaluation.comment.trim() || evaluation.rating)) {
         const result = await saveEvaluation(
           sessionId,
           letter,
           evaluation.selectedOptions,
-          evaluation.comment
+          evaluation.comment,
+          evaluation.rating
         );
         if (!result.success) {
           hasError = true;

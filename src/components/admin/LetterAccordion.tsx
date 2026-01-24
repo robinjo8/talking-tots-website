@@ -15,9 +15,10 @@ interface LetterAccordionProps {
   letter: PhoneticLetter;
   recordings: Recording[];
   evaluation: LetterEvaluation;
-  onEvaluationChange: (letter: string, selectedOptions: string[], comment: string) => void;
+  onEvaluationChange: (letter: string, selectedOptions: string[], comment: string, rating?: number) => void;
   onSave?: () => Promise<void>;
   isSaving?: boolean;
+  isReadOnly?: boolean;
 }
 
 export function LetterAccordion({
@@ -27,16 +28,24 @@ export function LetterAccordion({
   onEvaluationChange,
   onSave,
   isSaving = false,
+  isReadOnly = false,
 }: LetterAccordionProps) {
   const config = getEvaluationConfig(letter);
   const hasRecordings = recordings.length > 0;
 
   const handleOptionsChange = (options: string[]) => {
-    onEvaluationChange(letter, options, evaluation.comment);
+    if (isReadOnly) return;
+    onEvaluationChange(letter, options, evaluation.comment, evaluation.rating);
   };
 
   const handleCommentChange = (comment: string) => {
-    onEvaluationChange(letter, evaluation.selectedOptions, comment);
+    if (isReadOnly) return;
+    onEvaluationChange(letter, evaluation.selectedOptions, comment, evaluation.rating);
+  };
+
+  const handleRatingChange = (rating: number | undefined) => {
+    if (isReadOnly) return;
+    onEvaluationChange(letter, evaluation.selectedOptions, evaluation.comment, rating);
   };
 
   return (
@@ -79,19 +88,22 @@ export function LetterAccordion({
             </p>
           )}
 
-          {/* Check boxi in komentar */}
+          {/* Check boxi, lestvica in komentar */}
           {config && (
             <EvaluationCheckboxes
               options={config.options}
               selectedOptions={evaluation.selectedOptions}
               comment={evaluation.comment}
+              rating={evaluation.rating}
               onOptionsChange={handleOptionsChange}
               onCommentChange={handleCommentChange}
+              onRatingChange={handleRatingChange}
+              disabled={isReadOnly}
             />
           )}
 
           {/* Gumb za shranjevanje */}
-          {onSave && (
+          {onSave && !isReadOnly && (
             <div className="pt-3 mt-3 border-t flex justify-end">
               <Button
                 variant="outline"
