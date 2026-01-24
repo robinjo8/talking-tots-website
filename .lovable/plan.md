@@ -1,190 +1,133 @@
 
 
-# Plan: Posodobitev ocenjevalnega sistema na strani za pregled preverjanja izgovorjave
+# Plan: Posodobitev dizajna ocenjevalnega dela
 
-## Povzetek
+## Povzetek sprememb
 
-Posodobiti stran `/admin/tests/:sessionId` z:
-1. Novimi checkboxi za črko Ž (in druge črke)
-2. 5-stopenjsko ocenjevalno lestvico v obliki razširljivih (collapsible) sekcij
-3. Krajšim audio predvajalnikom
-4. Popravkom prikaza besed s šumniki (ŽOGA namesto ZOGA)
-5. Popravkom predvajanja zvoka (signed URL)
-
----
-
-## 1. Posodobitev checkboxov za črko Ž
-
-**Datoteka:** `src/data/evaluationOptions.ts`
-
-Dodati specifične checkboxe za črko Ž:
-- Ž izgovarja kot Z
-- ne izgovarja  
-- odlično izgovarja
-- zamenjuje za Š
-
-Enako strukturo uporabiti za ostale črke (npr. S, Š, Č itd.) po potrebi.
+Posodobiti postavitev ocenjevalnega dela na strani za pregled preverjanja izgovorjave tako, da bodo:
+- Checkboxi za specifične napake na **levi strani**
+- 5-stopenjska lestvica na **desni strani**
+- Komentar **pod obema** sekcijama
+- Naslov preimenovan iz "Ocena artikulacije" v "Ocena preverjanja izgovorjave"
 
 ---
 
-## 2. Nova 5-stopenjska ocenjevalna lestvica
+## Vizualni prikaz nove postavitve
 
-**Nova komponenta:** `src/components/admin/ArticulationRatingScale.tsx`
-
-Lestvica bo sestavljena iz 5 razširljivih sekcij (collapsible), vsaka z:
-- Checkbox za izbiro
-- Kratek naslov
-- Razširljiv opis s podrobnostmi
-
-| Stopnja | Naslov | Podrobnosti (ob razširitvi) |
-|---------|--------|------------------------------|
-| 1 | Neizvedljivo / odsotno | Glasu ne tvori, otrok glasu sploh ne izvede, nadomesti z drugim glasom ali ga izpusti |
-| 2 | Močno odstopanje | Nepravilen glas, artikulacija je napačna, glas je težko prepoznaven, pogosta zamenjava (npr. /s/ → /š/) |
-| 3 | Delno pravilno | Delno pravilen glas, osnovna oblika glasu je prepoznavna, napaka je prisotna (lega, zven, napetost …), razumljivost je srednja |
-| 4 | Skoraj pravilno | Skoraj pravilen glas, manjša netočnost, pravilna artikulacija večino časa, napaka se pojavi občasno ali v težjih položajih |
-| 5 | Pravilno | Pravilna artikulacija, glas je jasno in stabilno izveden, ustrezen položaj govornega aparata, brez opaznih napak |
-
-**Oblika UI:**
-- Uporaba `Collapsible` komponente iz Radix UI
-- Vsaka stopnja je vrstica z checkboxom, naslovom in puščico za razširitev
-- Ob kliku na puščico/naslov se prikaže podroben opis
-- Samo ena stopnja je lahko izbrana (radio-button vedenje)
-
----
-
-## 3. Posodobitev EvaluationCheckboxes komponente
-
-**Datoteka:** `src/components/admin/EvaluationCheckboxes.tsx`
-
-Struktura komponente:
 ```text
-┌─────────────────────────────────────────┐
-│ CHECKBOXI (2x2 mreža)                   │
-│ ☐ Ž izgovarja kot Z   ☐ ne izgovarja   │
-│ ☐ odlično izgovarja   ☐ zamenjuje za Š │
-├─────────────────────────────────────────┤
-│ 5-STOPENJSKA LESTVICA                   │
-│ ☐ 1 Neizvedljivo / odsotno        ▼    │
-│    └─ Glasu ne tvori, otrok...          │
-│ ☐ 2 Močno odstopanje              ▼    │
-│ ☐ 3 Delno pravilno                ▼    │
-│ ☐ 4 Skoraj pravilno               ▼    │
-│ ☐ 5 Pravilno                      ▼    │
-├─────────────────────────────────────────┤
-│ KOMENTAR                                │
-│ [Textarea za dodatne opombe...]         │
-└─────────────────────────────────────────┘
-```
-
-- Props razširiti za `rating?: number` in `onRatingChange: (rating: number | undefined) => void`
-
----
-
-## 4. Krajši audio predvajalnik
-
-**Datoteka:** `src/components/admin/RecordingPlayer.tsx`
-
-Spremembe:
-- Odstraniti slider za glasnost (obdržati samo mute gumb)
-- Kompaktnejša oblika v eni vrstici
-- Zmanjšati padding in margins
-
-Pred:
-```text
-[BESEDA] [▶] [0:00] [━━━━━━━━━━━━━━━━━━━━━━━━] [0:05] [🔊] [━━━━━━]
-```
-
-Po:
-```text
-[BESEDA] [▶] [0:00] [━━━━━━━━━━━] [0:05] [🔊]
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Ocena preverjanja izgovorjave                                               │
+├─────────────────────────────────┬───────────────────────────────────────────┤
+│ LEVA STRAN (checkboxi)          │ DESNA STRAN (5-stopenjska lestvica)       │
+│                                 │                                           │
+│ ☐ Ž izgovarja kot Z             │ ☐ 1️⃣ Neizvedljivo / odsotno         ▼    │
+│ ☐ Odlično izgovarja             │ ☐ 2️⃣ Močno odstopanje              ▼    │
+│ ☐ Ne izgovarja                  │ ☐ 3️⃣ Delno pravilno                ▼    │
+│ ☐ Zamenjuje za Š                │ ☐ 4️⃣ Skoraj pravilno               ▼    │
+│                                 │ ☐ 5️⃣ Pravilno                      ▼    │
+├─────────────────────────────────┴───────────────────────────────────────────┤
+│ Komentar                                                                    │
+│ ┌─────────────────────────────────────────────────────────────────────────┐ │
+│ │ Dodatne opombe...                                                       │ │
+│ └─────────────────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 5. Popravek prikaza besed s šumniki
+## Datoteke za posodobitev
 
-**Datoteka:** `src/data/evaluationOptions.ts`
+### 1. `src/components/admin/EvaluationCheckboxes.tsx`
 
-Dodati novo funkcijo za pridobitev pravilnega imena besede:
-```typescript
-const wordIndexToWordMap = new Map<number, string>();
-// Iz articulationData zgraditi mapiranje wordIndex → pravilna beseda
+Spremeniti layout iz vertikalnega v horizontalni (grid z dvema stolpcema):
 
-export function getWordFromWordIndex(wordIndex: number): string {
-  return wordIndexToWordMap.get(wordIndex) || 'NEZNANO';
-}
-```
+**Spremembe:**
+- Dodati skupen naslov "Ocena preverjanja izgovorjave" na vrhu
+- Uporabiti `grid grid-cols-1 md:grid-cols-2 gap-6` za razdelitev na levo in desno stran
+- Levi stolpec: checkboxi (vertikalna lista namesto 2x2 mreže)
+- Desni stolpec: 5-stopenjska lestvica
+- Pod gridom: polje za komentar
 
-**Datoteka:** `src/hooks/useSessionReview.ts`
+### 2. `src/components/admin/ArticulationRatingScale.tsx`
 
-Uporabiti `getWordFromWordIndex(parsed.wordIndex)` namesto `parsed.word` za prikaz pravilnih besed:
-- ŽOGA namesto ZOGA
-- ROŽA namesto ROZA  
-- JEŽ namesto JEZ
+**Spremembe:**
+- Odstraniti naslov "Ocena artikulacije" (bo na višjem nivoju v `EvaluationCheckboxes`)
+- Ohraniti collapsible funkcionalnost
 
 ---
 
-## 6. Popravek predvajanja zvoka
+## Podrobnosti implementacije
 
-**Datoteka:** `src/hooks/useSessionReview.ts`
+### EvaluationCheckboxes.tsx - nova struktura
 
-Problem: `getPublicUrl` vrne javni URL, ki ne deluje če bucket ni javno dostopen.
-
-Rešitev: Uporabiti `createSignedUrl` za pridobitev začasnega avtoriziranega URL-ja:
-```typescript
-const { data: signedUrlData } = await supabase.storage
-  .from('uporabniski-profili')
-  .createSignedUrl(`${targetFolder}/${file.name}`, 3600); // 1 ura veljavnosti
+```tsx
+return (
+  <div className="space-y-4 pt-4 border-t border-border">
+    {/* Skupen naslov */}
+    <span className="text-sm font-medium text-foreground">
+      Ocena preverjanja izgovorjave
+    </span>
+    
+    {/* Grid z dvema stolpcema */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Levi stolpec - checkboxi */}
+      <div className="space-y-2">
+        {options.map(option => (
+          <div key={option.id} className="flex items-center space-x-2">
+            <Checkbox ... />
+            <Label ...>{option.label}</Label>
+          </div>
+        ))}
+      </div>
+      
+      {/* Desni stolpec - 5-stopenjska lestvica */}
+      <ArticulationRatingScale
+        selectedRating={rating}
+        onRatingChange={onRatingChange}
+        disabled={disabled}
+      />
+    </div>
+    
+    {/* Komentar pod obema */}
+    <div className="space-y-2">
+      <Label>Komentar</Label>
+      <Textarea ... />
+    </div>
+  </div>
+);
 ```
+
+### ArticulationRatingScale.tsx - odstranitev naslova
+
+Odstraniti vrstico 40:
+```tsx
+<span className="text-sm font-medium text-foreground">Ocena artikulacije</span>
+```
+
+Ker bo naslov "Ocena preverjanja izgovorjave" zdaj na višjem nivoju v `EvaluationCheckboxes.tsx`.
 
 ---
 
-## 7. Posodobitev podatkovne strukture
+## Odzivni dizajn
 
-**Datoteka:** `src/hooks/useSessionReview.ts`
-
-Razširiti vmesnik `LetterEvaluation`:
-```typescript
-export interface LetterEvaluation {
-  selectedOptions: string[];
-  comment: string;
-  rating?: number; // 1-5 stopenjska ocena
-}
-```
-
-**Datoteka:** `src/pages/admin/AdminSessionReview.tsx`
-
-Posodobiti `handleEvaluationChange` za vključitev ratinga.
+- Na manjših zaslonih (mobilni) bo grid imel en stolpec (`grid-cols-1`)
+- Na večjih zaslonih (md: 768px+) bosta dva stolpca drug ob drugem (`md:grid-cols-2`)
 
 ---
 
-## Vrstni red implementacije
+## Vrstni red checkboxov
 
-1. `src/data/evaluationOptions.ts` - Dodati checkboxe za Ž + funkcijo za pravilna imena besed
-2. `src/hooks/useSessionReview.ts` - Signed URL + pravilna imena besed + rating v vmesniku
-3. `src/components/admin/ArticulationRatingScale.tsx` - Nova komponenta za 5-stopenjsko lestvico
-4. `src/components/admin/EvaluationCheckboxes.tsx` - Integracija lestvice
-5. `src/components/admin/RecordingPlayer.tsx` - Kompaktnejša oblika
-6. `src/components/admin/LetterAccordion.tsx` - Posodobitev za rating
-7. `src/pages/admin/AdminSessionReview.tsx` - Posodobitev za shranjevanje ratinga
+Na sliki vidim vrstni red:
+1. Ž izgovarja kot Z
+2. Odlično izgovarja
+3. Ne izgovarja
+4. Zamenjuje za Š
 
----
+Trenutni vrstni red v `evaluationOptions.ts`:
+1. Ž izgovarja kot Z
+2. Ne izgovarja
+3. Odlično izgovarja
+4. Zamenjuje za Š
 
-## Tehnični detajli
-
-### Shranjevanje ratinga v bazo
-
-Preveriti ali tabela `articulation_evaluations` že ima stolpec `rating`. Če ne, bo potrebno:
-```sql
-ALTER TABLE articulation_evaluations ADD COLUMN rating INTEGER;
-```
-
-Posodobiti `saveEvaluation` funkcijo za vključitev ratinga.
-
-### Stiliranje
-
-Uporabiti obstoječe Tailwind klase in komponente:
-- `Collapsible`, `CollapsibleTrigger`, `CollapsibleContent` iz `@radix-ui/react-collapsible`
-- `Checkbox` iz `src/components/ui/checkbox.tsx`
-- `ChevronDown` ikona iz `lucide-react` za indikacijo razširitve
+Posodobiti vrstni red v datoteki `src/data/evaluationOptions.ts` da se ujema s sliko.
 
