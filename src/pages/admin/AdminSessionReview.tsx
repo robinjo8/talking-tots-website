@@ -5,7 +5,7 @@ import { SessionReviewHeader } from '@/components/admin/SessionReviewHeader';
 import { SessionAccordion } from '@/components/admin/SessionAccordion';
 import { UnsavedChangesDialog } from '@/components/admin/UnsavedChangesDialog';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function AdminSessionReview() {
@@ -234,31 +234,17 @@ export default function AdminSessionReview() {
               onEvaluationChange={isReadOnly ? () => {} : handleEvaluationChange}
               onSaveLetter={isReadOnly ? async () => {} : handleSaveLetter}
               onSaveAll={isReadOnly ? async () => {} : handleSaveAll}
+              onCompleteReview={hasSessionData ? handleCompleteReview : undefined}
               isSaving={isSaving}
               savingLetter={savingLetter}
+              isCompleting={isCompleting}
               hasUnsavedChanges={hasSessionData ? hasUnsavedChanges : false}
+              isReadOnly={isReadOnly}
             />
           );
         })}
       </div>
 
-      {/* Akcijski gumbi */}
-      {!isReadOnly && (
-        <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
-          <Button
-            onClick={handleCompleteReview}
-            disabled={isSaving || isCompleting}
-            className="gap-2"
-          >
-            {isCompleting ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <CheckCircle className="h-4 w-4" />
-            )}
-            Zaključi pregled
-          </Button>
-        </div>
-      )}
 
       {/* Dialog za neshranjene spremembe */}
       <UnsavedChangesDialog
