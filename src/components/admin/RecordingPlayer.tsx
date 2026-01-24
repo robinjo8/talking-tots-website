@@ -12,6 +12,7 @@ export function RecordingPlayer({ word, url }: RecordingPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -52,10 +53,25 @@ export function RecordingPlayer({ word, url }: RecordingPlayerProps) {
     }
   };
 
+  const handleVolumeChange = (value: number[]) => {
+    if (audioRef.current) {
+      const newVolume = value[0];
+      audioRef.current.volume = newVolume;
+      setVolume(newVolume);
+      setIsMuted(newVolume === 0);
+    }
+  };
+
   const toggleMute = () => {
     if (audioRef.current) {
-      audioRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
+      if (isMuted) {
+        audioRef.current.volume = volume || 1;
+        audioRef.current.muted = false;
+        setIsMuted(false);
+      } else {
+        audioRef.current.muted = true;
+        setIsMuted(true);
+      }
     }
   };
 
@@ -75,7 +91,7 @@ export function RecordingPlayer({ word, url }: RecordingPlayerProps) {
       />
       
       {/* Word label */}
-      <span className="font-medium text-foreground text-sm min-w-[60px]">{word}</span>
+      <span className="text-foreground text-sm min-w-[60px]">{word}</span>
       
       {/* Play/Pause button */}
       <Button
@@ -98,7 +114,7 @@ export function RecordingPlayer({ word, url }: RecordingPlayerProps) {
       </span>
       
       {/* Progress slider */}
-      <div className="flex-1 min-w-[60px] max-w-[120px]">
+      <div className="flex-1 min-w-[80px]">
         <Slider
           value={[currentTime]}
           max={duration || 100}
@@ -127,6 +143,17 @@ export function RecordingPlayer({ word, url }: RecordingPlayerProps) {
           <Volume2 className="h-3 w-3" />
         )}
       </Button>
+
+      {/* Volume slider */}
+      <div className="w-16 shrink-0">
+        <Slider
+          value={[isMuted ? 0 : volume]}
+          max={1}
+          step={0.1}
+          onValueChange={handleVolumeChange}
+          className="cursor-pointer"
+        />
+      </div>
     </div>
   );
 }

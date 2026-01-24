@@ -55,7 +55,7 @@ export function EvaluationCheckboxes({
               />
               <Label
                 htmlFor={option.id}
-                className={`text-sm cursor-pointer ${(option.disabled || disabled) ? 'text-muted-foreground opacity-60' : 'text-foreground'}`}
+                className={`text-sm font-normal cursor-pointer ${(option.disabled || disabled) ? 'text-muted-foreground opacity-60' : 'text-foreground'}`}
               >
                 {option.label}
               </Label>
