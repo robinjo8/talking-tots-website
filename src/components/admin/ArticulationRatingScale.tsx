@@ -62,11 +62,10 @@ export function ArticulationRatingScale({
                   className={cn(
                     'flex items-center gap-2 text-left text-sm cursor-pointer',
                     disabled && 'opacity-60 cursor-not-allowed',
-                    isSelected ? 'text-primary font-medium' : 'text-foreground'
+                    isSelected ? 'text-primary' : 'text-foreground'
                   )}
                   disabled={disabled}
                 >
-                  <span>{level.value}️⃣</span>
                   <span>{level.title}</span>
                   <ChevronDown
                     className={cn(
