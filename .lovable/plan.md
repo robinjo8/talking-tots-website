@@ -1,351 +1,504 @@
 
-# Obsežna prenova sistema za pregled artikulacijskih preverjanj
 
-## Povzetek projekta
+# Priročnik za Admin Portal TomiTalk - Celovita dokumentacija
 
-Ta načrt zajema obsežno prenovo admin portala za logopede. Vključuje:
-1. Preoblikovanje strani za pregled sej (`/admin/tests/:sessionId`)
-2. Razširitev podrobnosti uporabnika (`/admin/users/:parentId/:childId`)
-3. Nova stran "Poročila" za arhiv vseh generiranih poročil logopeda
-4. Sistem opozarjanja pri neshranjenih spremembah
-5. Gumb "Popravi" za zaključene preglede
+## Pregled sistema
+
+Admin portal TomiTalk je namenjen logopedom za upravljanje preverjanj izgovorjave, pregledovanje uporabnikov, pisanje poročil in spremljanje napredka otrok. Portal je dostopen na `/admin` in zahteva prijavo z logopedskim računom.
 
 ---
 
-## FAZA 1: Preoblikovanje strani za pregled seje
+## STRUKTURA NAVIGACIJE
 
-### 1.1 Header prenova
+Portal ima tri glavne sekcije v stranskem meniju:
 
-**Trenutno stanje:**
-- Naslov "Pregled preverjanja"
-- Prikaz: ime otroka, spol, starost, "Oddano: datum"
+### Delovni prostor
+1. **Moj portal** (`/admin`) - Nadzorna plošča
+2. **Vsa preverjanja** (`/admin/all-tests`) - Seznam vseh preverjanj
+3. **V čakanju** (`/admin/pending`) - Neprevzeti primeri (z oranžnim številom)
+4. **Moji pregledi** (`/admin/my-reviews`) - Prevzeti primeri (z oranžnim številom)
 
-**Novo stanje:**
-- Naslov spremeni v "Pregled preverjanja izgovorjave"
-- Odstrani "Oddano" iz header-ja (bo prikazano znotraj posamezne seje)
+### Upravljanje
+5. **Uporabniki** (`/admin/users`) - Seznam vseh uporabnikov
+6. **Poročila** (`/admin/reports`) - Arhiv generiranih poročil logopeda
+7. **Sporočila** (`/admin/messages`) - (Še ni implementirano)
 
-**Datoteke:**
-- `src/components/admin/SessionReviewHeader.tsx`
+### Nastavitve
+8. **Nastavitve** (`/admin/settings`) - (Še ni implementirano)
+9. **Obvestila** (`/admin/notifications`) - (Še ni implementirano)
+10. **Članstva** (`/admin/memberships`) - Samo za Super Admina
 
 ---
 
-### 1.2 Struktura sejin (Seja-1 do Seja-5)
+## PODROBNA DOKUMENTACIJA PO STRANEH
 
-Trenutno so črke prikazane direktno pod header-jem. Nova struktura zahteva vmesno raven - seje.
+---
 
+### 1. MOJ PORTAL (Nadzorna plošča)
+**URL:** `/admin` ali `/admin/dashboard`
+
+#### Kaj se vidi:
+- **Pozdravno sporočilo** z imenom in priimkom logopeda
+- **4 statistične kartice:**
+  - "Vsa preverjanja" - skupno število vseh opravljenih preverjanj
+  - "V čakanju na pregled" - število nepregledanih preverjanj
+  - "Moji pregledi" - število preverjanj v obravnavi tega logopeda
+  - "Zaključeni pregledi" - število preverjanj z oddanim poročilom
+- **2 grafa:**
+  - Črtni graf preverjanj skozi čas
+  - Tortni diagram težav
+
+#### Kaj lahko logoped počne:
+- Klikne na katero koli statistično kartico za navigacijo na ustrezno stran
+- Pregled splošne statistike sistema
+
+#### Povezava z uporabniškim portalom:
+- Podatki se črpajo iz tabele `articulation_test_sessions` v bazi
+- Ko uporabnik odda preverjanje na uporabniškem portalu, se števec "V čakanju" poveča
+
+---
+
+### 2. VSA PREVERJANJA
+**URL:** `/admin/all-tests`
+
+#### Kaj se vidi:
+- **4 statistične kartice:** Vsa preverjanja, V čakanju, V obdelavi, Zaključeni
+- **Iskalno polje** za iskanje po imenu starša ali otroka
+- **Tabela z vsemi preverjanji:**
+  - Ime in priimek starša
+  - Ime otroka
+  - Starost otroka
+  - Spol otroka
+  - Status (V čakanju / V obdelavi / Zaključeno)
+  - Datum oddaje
+  - Akcijski gumbi
+
+#### Kaj lahko logoped počne:
+- **Išči** po imenu starša ali otroka
+- **Ogled** (`Eye` ikona) - odpre podrobnosti preverjanja
+- **Popravi** (`Pencil` ikona) - pojavi se samo pri zaključenih preverjanjih, omogoča urejanje
+
+#### Statusi preverjanj:
+| Status | Značka | Opis |
+|--------|--------|------|
+| `pending` | "V čakanju" (oranžna) | Novo preverjanje, še ni prevzeto |
+| `assigned` / `in_review` | "V obdelavi" (modra) | Logoped je prevzel primer |
+| `completed` | "Zaključeno" (zelena) | Pregled končan, poročilo oddano |
+
+---
+
+### 3. V ČAKANJU
+**URL:** `/admin/pending`
+
+#### Kaj se vidi:
+- **Statistična kartica** s številom neprevzetih primerov
+- **Tabela/kartice čakajočih preverjanj:**
+  - Ime starša
+  - Ime otroka
+  - Starost
+  - Spol
+  - Datum oddaje
+  - Gumb "Prevzemi"
+
+#### Kaj lahko logoped počne:
+- **Prevzemi primer** - Klik na "Prevzemi" odpre potrditveno okno. Po potrditvi:
+  1. Status seje se spremeni v `assigned`
+  2. Polje `assigned_to` se nastavi na ID logopeda
+  3. Primer se premakne v "Moji pregledi"
+  4. Uporabnik je preusmerjen na `/admin/my-reviews`
+
+#### Povezava z uporabniškim portalom:
+- Ko starš odda preverjanje izgovorjave na uporabniškem portalu, se seja pojavi tukaj s statusom `pending`
+
+---
+
+### 4. MOJI PREGLEDI
+**URL:** `/admin/my-reviews`
+
+#### Kaj se vidi:
+- **Statistična kartica** s številom aktivnih pregledov
+- **Tabela/kartice prevzetih preverjanj:**
+  - Ime starša
+  - Ime otroka
+  - Starost, Spol
+  - Status (V pregledu / Zaključen)
+  - Datum prevzema
+  - Akcijski gumbi
+
+#### Kaj lahko logoped počne:
+- **Ogled** - Odpre stran za pregled seje (`/admin/tests/:sessionId`)
+- **Popravi** - Pojavi se samo pri zaključenih preverjanjih, odpre stran z možnostjo urejanja (`?edit=true`)
+
+#### Prazen seznam:
+- Če logoped nima aktivnih pregledov, se prikaže sporočilo z gumbom "Pojdi na V čakanju"
+
+---
+
+### 5. PREGLED PREVERJANJA IZGOVORJAVE
+**URL:** `/admin/tests/:sessionId`
+
+To je ključna stran za delo logopeda.
+
+#### Kaj se vidi:
+- **Header:**
+  - Naslov: "Pregled preverjanja izgovorjave"
+  - Podatki o otroku: Ime (Spol) • Starost let
+
+- **5 zložljivih sekcij (Seja-1 do Seja-5):**
+  - **Seja-1:** Prikaže dejanski datum oddaje in dejanske posnetke
+  - **Seja-2:** Predvideni datum (+3 mesece od Seja-1)
+  - **Seja-3:** Predvideni datum (+6 mesecev od Seja-1)
+  - **Seja-4:** Predvideni datum (+9 mesecev od Seja-1)
+  - **Seja-5:** Predvideni datum (1 teden pred koncem enega leta)
+
+- **Znotraj vsake seje (ko ima podatke):**
+  - 20 črk v fonetičnem vrstnem redu: P, B, M, T, D, K, G, N, H, V, J, F, L, S, Z, C, Š, Ž, Č, R
+  - Vsaka črka je zložljiva in vsebuje:
+    - Audio posnetke besed (3 besede na črko = 60 besed skupaj)
+    - Audio predvajalnik z napredkom in glasnostjo
+    - Diagnostične checkboxe za oceno izgovorjave
+    - Polje za komentar
+    - Gumb "Shrani" za shranjevanje ocene te črke
+
+- **Akcijski gumbi na dnu:**
+  - "Zaključi pregled" - Shrani vse ocene in spremeni status v `completed`
+
+#### Kaj lahko logoped počne:
+1. **Predvaja posnetke** - vsaka beseda ima svoj audio predvajalnik
+2. **Označi diagnoze** - checkboxi za vrsto govorne napake
+3. **Piše komentarje** - prosto besedilo za vsako črko
+4. **Shrani posamezne ocene** - gumb "Shrani" znotraj vsake črke
+5. **Zaključi pregled** - spremeni status v zaključeno
+
+#### Varnostni mehanizmi:
+- **Opozorilo ob neshranjenih spremembah:** Če logoped poskuša zapustiti stran z neshranjeni podatki, se pojavi opozorilo brskalnika
+- **Način samo za branje:** Zaključena preverjanja so v načinu samo za branje, razen če je dodan `?edit=true`
+
+#### Kam se shranjujejo ocene:
+- V tabelo `articulation_evaluations` v bazi podatkov
+- Vsaka vrstica vsebuje: `session_id`, `letter`, `selected_options`, `comment`
+
+---
+
+### 6. UPORABNIKI
+**URL:** `/admin/users`
+
+#### Kaj se vidi:
+- **3 statistične kartice:**
+  - Skupaj uporabnikov
+  - Uporabniki z otroki
+  - Skupaj otrok
+- **Iskalno polje** za iskanje po emailu, imenu starša ali otroka
+- **Tabela uporabnikov:**
+  - Ime in priimek starša
+  - Elektronski naslov
+  - Ime otroka
+  - Starost
+  - Spol
+  - Status
+  - Akcijski gumbi
+
+#### Kaj lahko logoped počne:
+- **Išči** po uporabnikih
+- **Ogled** (`Eye` ikona) - odpre podrobnosti uporabnika
+
+#### Kaj lahko Super Admin počne dodatno:
+- **Izbriši** uporabnika - arhivira uporabnika za 90 dni (soft delete)
+
+---
+
+### 7. PODROBNOSTI UPORABNIKA
+**URL:** `/admin/users/:parentId/:childId`
+
+To je osrednja stran za delo z uporabnikom in pisanje poročil.
+
+#### Kaj se vidi:
+**Razdelitev na dva stolpca:**
+
+**LEVI STOLPEC:**
+
+1. **Dokumenti:**
+   - Seznam vseh naloženih dokumentov starša
+   - Avtomatsko generirani dokumenti ob registraciji:
+     - `opis-govornih-tezav-{timestamp}.txt` - opis govornih težav
+     - `{childId}-osnovni-vprasalnik.txt` - odgovori na vprašalnik
+   - Ročno naloženi dokumenti (PDF, TXT)
+   - Gumbi: Predogled, Prenos
+
+2. **Preverjanje izgovorjave:**
+   - Accordion s sejami (Seja-1, Seja-2, itd.)
+   - Znotraj vsake seje so audio posnetki
+   - Gumbi: Predvajaj
+
+**DESNI STOLPEC:**
+
+3. **Poročila:**
+   - **Predloga poročila** z razdelki:
+     - Podatki o staršu (ime, email) - samodejno izpolnjeno
+     - Podatki o otroku (ime, starost, spol) - samodejno izpolnjeno
+     - Izbira seje (dropdown)
+     - Datum pregleda
+     - **Vnosna polja:**
+       - ANAMNEZA
+       - UGOTOVITVE
+       - PREDLOG ZA VAJE
+       - OPOMBE
+     - Ime logopeda - samodejno izpolnjeno
+   
+   - **Akcijski gumbi:**
+     - "Shrani" - shrani kot .txt datoteko v Storage
+     - "Naloži dokument" - naloži obstoječ dokument
+     - "Generiraj" - generira PDF poročilo
+   
+   - **Shranjena poročila:** Seznam osnutkov (.txt)
+   - **Generirana poročila:** Seznam PDF-jev z možnostjo:
+     - Odpri, Prenesi, Izbriši
+
+#### Kaj lahko logoped počne:
+1. **Pregleda vse dokumente** o otroku
+2. **Posluša posnetke** preverjanja izgovorjave
+3. **Piše poročilo** z uporabo strukturirane predloge
+4. **Shrani osnutek** poročila kot .txt
+5. **Generira PDF** poročilo
+6. **Naloži obstoječe** dokumente
+7. **Ureja** shranjena poročila
+8. **Izbriše** generirana poročila
+
+#### Kam se shranjujejo dokumenti:
+Supabase Storage bucket: `uporabniski-profili`
 ```text
-┌─────────────────────────────────────────────────────────────┐
-│  Pregled preverjanja izgovorjave                             │
-│  Otrok: Žak (Fant) • 5 let                                   │
-└─────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────┐
-│  ▶ Seja-1  •  Oddano: 23. 1. 2026                            │
-│  ────────────────────────────────────────────────────────    │
-│    ▶ Črka P (3 posnetkov)                                    │
-│    ▶ Črka B (3 posnetkov)                                    │
-│    ...                                                       │
-│    [Shrani ocene za Seja-1]                                  │
-└─────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────┐
-│  ▶ Seja-2  •  Predvideno: 23. 4. 2026                        │
-│  (prazno - še ni podatkov)                                   │
-└─────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────┐
-│  ▶ Seja-3  •  Predvideno: 23. 7. 2026                        │
-│  (prazno)                                                    │
-└─────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────┐
-│  ▶ Seja-4  •  Predvideno: 23. 10. 2026                       │
-│  (prazno)                                                    │
-└─────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────┐
-│  ▶ Seja-5  •  Predvideno: 16. 1. 2027  (1 teden pred koncem) │
-│  (prazno)                                                    │
-└─────────────────────────────────────────────────────────────┘
-
-[Zaključi pregled]
+{parentId}/{childId}/
+├── Dokumenti/           <- Dokumenti starša in avtomatski
+├── Preverjanje-izgovorjave/
+│   ├── Seja-1/          <- Audio posnetki
+│   └── Seja-2/
+├── Porocila/            <- Shranjeni osnutki (.txt)
+└── Generirana-porocila/ <- PDF poročila
 ```
 
-**Logika izračuna datumov:**
-- Seja-1: dejanski datum oddaje (iz `submitted_at`)
-- Seja-2: +3 mesece od Seja-1
-- Seja-3: +6 mesecev od Seja-1
-- Seja-4: +9 mesecev od Seja-1
-- Seja-5: 1 teden pred iztekom enega leta (11 mesecev + 3 tedni)
-
-**Nova komponenta:**
-- `src/components/admin/SessionAccordion.tsx` - zavihek za posamezno sejo
-
 ---
 
-### 1.3 Prenova predvajalnika zvoka
-
-Trenutni predvajalnik ima gumba Play/Stop. Novo oblikovanje po vzoru slike uporabnika:
-
-```text
-┌──────────────────────────────────────────────────────────┐
-│  ▶   0:00 ─────────────────────────────────────── 🔊      │
-└──────────────────────────────────────────────────────────┘
-```
-
-**Funkcionalnosti:**
-- Play/Pause gumb
-- Časovna vrstica s kazalcem napredka
-- Ikona za glasnost
-
-**Datoteke:**
-- `src/components/admin/RecordingPlayer.tsx` - popolna prenova
-
----
-
-### 1.4 Shranjevanje po črkah
-
-Znotraj vsake črke dodaj gumb "Shrani" za takojšnje shranjevanje te specifične ocene.
-
-**Datoteke:**
-- `src/components/admin/LetterAccordion.tsx`
-- `src/components/admin/EvaluationCheckboxes.tsx`
-
----
-
-### 1.5 Opozorilo ob neshranjenih spremembah
-
-Ko ima uporabnik neshranjene spremembe in poskuša zapustiti stran:
-1. Browser `beforeunload` event za osvežitev/zapiranje
-2. React Router `useBlocker` za navigacijo znotraj aplikacije
-
-**Datoteke:**
-- `src/pages/admin/AdminSessionReview.tsx`
-- Nova komponenta: `src/components/admin/UnsavedChangesDialog.tsx`
-
----
-
-### 1.6 Zaključitev pregleda
-
-**Trenutno:** Gumb "Zaključi pregled" na dnu strani.
-
-**Novo obnašanje:**
-1. Preveri, če so vse ocene shranjene
-2. Posodobi status v bazi na `completed`
-3. Shrani poročilo v Storage (opcijsko)
-4. Preusmeri na `/admin/my-reviews`
-
----
-
-## FAZA 2: Gumb "Popravi" za zaključene preglede
-
-### 2.1 Spremembe na straneh seznamov
-
-Na straneh `/admin/all-tests` in `/admin/my-reviews`:
-- Ko je status `completed`, prikaži dva gumba:
-  - **Ogled** (obstoječ) - samo ogled brez urejanja
-  - **Popravi** (nov) - odpre stran za urejanje
-
-**Datoteke:**
-- `src/pages/admin/AdminTests.tsx`
-- `src/pages/admin/AdminMyReviews.tsx`
-
-### 2.2 Način urejanja na strani pregleda
-
-Ko logoped klikne "Popravi", se odpre ista stran ampak z možnostjo urejanja. Lahko uporabimo query parameter `?edit=true`.
-
----
-
-## FAZA 3: Razširitev podrobnosti uporabnika
-
-### 3.1 Integracija ocen iz pregleda
-
-Na strani `/admin/users/:parentId/:childId` dodaj sekcijo ki prikaže ocene iz `articulation_evaluations` tabele.
-
-**Datoteke:**
-- `src/pages/admin/AdminUserDetail.tsx`
-
-### 3.2 Razširjeno polje za poročilo
-
-Trenutno: `max-h-[600px]` z scrollom znotraj okna.
-Novo: Odstrani omejitev višine, polje se razteza glede na vsebino.
-
-**Datoteke:**
-- `src/components/admin/ReportTemplateEditor.tsx`
-
-### 3.3 Shranjevanje na stran Poročila
-
-Ko logoped klikne "Generiraj", se PDF shrani tudi na novo stran Poročila.
-
----
-
-## FAZA 4: Nova stran "Poročila"
-
-### 4.1 Nova ruta in komponenta
-
+### 8. POROČILA (Arhiv logopeda)
 **URL:** `/admin/reports`
 
-**Funkcionalnost:**
-- Seznam vseh PDF poročil ki jih je ustvaril trenutni logoped
-- Filtriranje po imenu otroka, datumu
-- Možnost prenosa, ogleda, brisanja
+#### Kaj se vidi:
+- **3 statistične kartice:**
+  - Skupaj poročil
+  - Oddana poročila
+  - Ta mesec (nova poročila)
+- **Iskalno polje** za iskanje po imenu otroka, starša ali povzetku
+- **Tabela poročil:**
+  - Ime otroka
+  - Ime starša
+  - Povzetek
+  - Status (Osnutek / Revidirano / Oddano)
+  - Datum ustvaritve
+  - Akcijski gumbi
 
-**Datoteke:**
-- Nova: `src/pages/admin/AdminReports.tsx`
-- Posodobitev: `src/components/routing/AdminRoutes.tsx`
+#### Kaj lahko logoped počne:
+- **Odpri PDF** - odpre v novem zavihku
+- **Prenesi PDF** - prenese na računalnik
+- **Izbriši poročilo** - s potrditvenim dialogom
 
-### 4.2 Shranjevanje metapodatkov poročil
-
-Za sledenje poročil po logopedu potrebujemo tabelo v bazi:
-
-```sql
-CREATE TABLE logopedist_reports (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  logopedist_id UUID REFERENCES logopedist_profiles(id),
-  child_id UUID REFERENCES children(id),
-  parent_id UUID,
-  session_id UUID REFERENCES articulation_test_sessions(id),
-  file_path TEXT NOT NULL,
-  file_name TEXT NOT NULL,
-  report_type TEXT DEFAULT 'pdf',
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-```
+#### Pomembno:
+- **Vsak logoped vidi samo svoja poročila** (RLS politika)
+- Poročila se shranjujejo v tabelo `logopedist_reports`
+- PDF datoteke so v Storage bucket `uporabniski-profili`
 
 ---
 
-## FAZA 5: Posodobitev navigacije
+### 9. ČLANSTVA (Samo Super Admin)
+**URL:** `/admin/memberships`
 
-### 5.1 Navigacija v sidebarju
+Ta stran je vidna samo Super Adminu (robert.kujavec@gmail.com).
 
-Stran "Poročila" že obstaja v meniju ampak kaže na neobstoječo ruto.
+#### Kaj se vidi:
+- **Zahtevki za nova članstva:**
+  - Seznam neodobrenih logopedov
+  - Za vsakega: Ime, Email, Organizacija, Datum registracije
+  - Gumba: "Odobri" (zeleno), "Zavrni" (rdeče)
 
-**Datoteke:**
-- `src/components/admin/AdminSidebar.tsx` - potrdi da `/admin/reports` obstaja
+- **Aktivni člani:**
+  - Seznam vseh odobrenih logopedov
+  - Za vsakega: Ime, Email, Organizacija, Status "Aktiven"
 
----
+#### Kaj lahko Super Admin počne:
+1. **Odobri članstvo:**
+   - Potrdi email logopeda (preko Edge funkcije `confirm-logopedist-email`)
+   - Nastavi `is_verified = true` v `logopedist_profiles`
+   - Logoped se lahko zdaj prijavi
 
-## Tehnična implementacija
-
-### Nove datoteke
-
-| Datoteka | Namen |
-|----------|-------|
-| `src/components/admin/SessionAccordion.tsx` | Accordion za posamezno sejo (1-5) |
-| `src/components/admin/UnsavedChangesDialog.tsx` | Dialog za opozorilo ob neshranjenih spremembah |
-| `src/pages/admin/AdminReports.tsx` | Nova stran za seznam poročil logopeda |
-| `src/hooks/useLogopedistReports.ts` | Hook za pridobivanje poročil logopeda |
-
-### Posodobljene datoteke
-
-| Datoteka | Spremembe |
-|----------|-----------|
-| `src/pages/admin/AdminSessionReview.tsx` | Popolna prenova z sejami, opozorili, shranjevanjem |
-| `src/components/admin/SessionReviewHeader.tsx` | Odstrani "Oddano", spremeni naslov |
-| `src/components/admin/RecordingPlayer.tsx` | Nov dizajn z progress bar |
-| `src/components/admin/LetterAccordion.tsx` | Dodaj gumb Shrani znotraj črke |
-| `src/pages/admin/AdminTests.tsx` | Dodaj gumb "Popravi" za zaključene |
-| `src/pages/admin/AdminMyReviews.tsx` | Dodaj gumb "Popravi" za zaključene |
-| `src/pages/admin/AdminUserDetail.tsx` | Integracija ocen, razširjeno poročilo |
-| `src/components/admin/ReportTemplateEditor.tsx` | Odstrani max-h omejitev |
-| `src/components/routing/AdminRoutes.tsx` | Dodaj ruto za /admin/reports |
-| `src/hooks/useSessionReview.ts` | Razširi za vse seje (1-5) |
-
-### Migracija baze
-
-```sql
--- Tabela za sledenje poročil po logopedu
-CREATE TABLE IF NOT EXISTS logopedist_reports (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  logopedist_id UUID NOT NULL REFERENCES logopedist_profiles(id) ON DELETE CASCADE,
-  child_id UUID NOT NULL REFERENCES children(id) ON DELETE CASCADE,
-  parent_id UUID NOT NULL,
-  session_id UUID REFERENCES articulation_test_sessions(id) ON DELETE SET NULL,
-  file_path TEXT NOT NULL,
-  file_name TEXT NOT NULL,
-  report_type TEXT DEFAULT 'pdf',
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
--- RLS politika: logoped vidi samo svoja poročila
-ALTER TABLE logopedist_reports ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Logopedists can view own reports"
-  ON logopedist_reports FOR SELECT
-  USING (logopedist_id IN (
-    SELECT id FROM logopedist_profiles WHERE user_id = auth.uid()
-  ));
-
-CREATE POLICY "Logopedists can insert own reports"
-  ON logopedist_reports FOR INSERT
-  WITH CHECK (logopedist_id IN (
-    SELECT id FROM logopedist_profiles WHERE user_id = auth.uid()
-  ));
-
-CREATE POLICY "Logopedists can delete own reports"
-  ON logopedist_reports FOR DELETE
-  USING (logopedist_id IN (
-    SELECT id FROM logopedist_profiles WHERE user_id = auth.uid()
-  ));
-```
+2. **Zavrne članstvo:**
+   - Izbriše uporabnika iz `auth.users`
+   - Izbriše profil iz `logopedist_profiles` (CASCADE DELETE)
+   - Logoped ne more več dostopati do portala
 
 ---
 
-## Vizualna shema komponent
+## POVEZAVE MED UPORABNIŠKIM IN ADMIN PORTALOM
+
+### 1. Registracija uporabnika → Dokumenti na admin portalu
 
 ```text
-AdminSessionReview (stran)
-├── SessionReviewHeader
-│   ├── Naslov: "Pregled preverjanja izgovorjave"
-│   └── Info: Ime otroka (spol) • starost
-│
-├── SessionAccordion (x5)
-│   ├── Header: "Seja-1" • Datum (oddano/predvideno)
-│   ├── LetterAccordion (x20 za vsako črko)
-│   │   ├── RecordingPlayer (x3 za vsako besedo)
-│   │   ├── EvaluationCheckboxes
-│   │   └── [Shrani] gumb
-│   └── Stanje: prazno / s podatki
-│
-├── [Zaključi pregled] gumb
-│
-└── UnsavedChangesDialog (modal ob poskusu odhoda)
+UPORABNIŠKI PORTAL                          ADMIN PORTAL
+─────────────────                          ─────────────
+Starš registrira otroka                    
+     ↓                                     
+Izpolni vprašalnik                         
+     ↓                                     
+Vpiše opis govornih težav                  
+     ↓                                     
+[AddChildForm.tsx]                         
+     ↓                                     
+Generira .txt datoteke:                    
+• opis-govornih-tezav-{timestamp}.txt     →  Vidno v Dokumenti
+• {childId}-osnovni-vprasalnik.txt        →  Vidno v Dokumenti
+     ↓                                     
+Shranjeno v Storage:                       
+uporabniski-profili/{userId}/{childId}/Dokumenti/
+```
+
+### 2. Preverjanje izgovorjave → Pregled na admin portalu
+
+```text
+UPORABNIŠKI PORTAL                          ADMIN PORTAL
+─────────────────                          ─────────────
+Starš začne preverjanje                    
+     ↓                                     
+Otrok izgovarja 60 besed                   
+     ↓                                     
+Vsaka beseda se posname                    
+     ↓                                     
+Posnetki se shranjujejo v:                 
+uporabniski-profili/{userId}/{childId}/    
+  Preverjanje-izgovorjave/Seja-1/          
+     ↓                                     
+Starš oddaj preverjanje                    
+     ↓                                     
+Ustvari se zapis v:                        
+articulation_test_sessions                  
+(status: pending)                          
+     ↓                                     
+                                           Logoped vidi v "V čakanju"
+                                                ↓
+                                           Prevzame primer
+                                                ↓
+                                           Status: assigned
+                                                ↓
+                                           Posluša posnetke v:
+                                           /admin/tests/:sessionId
+                                                ↓
+                                           Označi diagnoze
+                                                ↓
+                                           Shranjeno v:
+                                           articulation_evaluations
+                                                ↓
+                                           Zaključi pregled
+                                                ↓
+                                           Status: completed
+```
+
+### 3. Poročilo → Dostop staršu
+
+```text
+ADMIN PORTAL                               UPORABNIŠKI PORTAL
+────────────                               ─────────────────
+Logoped odpre:                             
+/admin/users/:parentId/:childId            
+     ↓                                     
+Piše poročilo v predlogi                   
+     ↓                                     
+Klikne "Generiraj"                         
+     ↓                                     
+PDF se shrani v:                           
+uporabniski-profili/{parentId}/{childId}/  
+  Generirana-porocila/                     
+     ↓                                     
+Metapodatki v tabelo:                      
+logopedist_reports                         
+     ↓                                     
+                                           Starš dostopa do poročila
+                                           (prihodnja funkcionalnost)
 ```
 
 ---
 
-## Zaporedje implementacije
+## STRUKTURA PODATKOV V BAZI
 
-1. **Migracija baze** - ustvari `logopedist_reports` tabelo
-2. **SessionReviewHeader** - prenova naslova, odstrani Oddano
-3. **RecordingPlayer** - nov dizajn s progress bar
-4. **SessionAccordion** - nova komponenta za seje
-5. **LetterAccordion** - dodaj gumb Shrani
-6. **AdminSessionReview** - popolna prenova s sejami
-7. **UnsavedChangesDialog** - opozorilo pri odhodu
-8. **AdminReports** - nova stran za poročila
-9. **AdminTests/AdminMyReviews** - gumb Popravi
-10. **AdminUserDetail** - integracija ocen, razširjeno poročilo
-11. **Integracija** - shranjevanje na stran Poročila
+### Glavne tabele:
+
+| Tabela | Namen |
+|--------|-------|
+| `profiles` | Uporabniški profili (starši) |
+| `children` | Otroci staršev |
+| `child_documents` | Metapodatki dokumentov otrok |
+| `articulation_test_sessions` | Seje preverjanja izgovorjave |
+| `articulation_evaluations` | Ocene logogedov za vsako črko |
+| `logopedist_profiles` | Profili logopedov |
+| `logopedist_reports` | Metapodatki poročil logopedov |
+| `organizations` | Organizacije logopedov |
+| `admin_permissions` | Super admin pravice |
+
+### Supabase Storage bucket:
+
+**`uporabniski-profili`:**
+```text
+{parentId}/
+└── {childId}/
+    ├── Dokumenti/
+    │   ├── opis-govornih-tezav-{timestamp}.txt
+    │   ├── {childId}-osnovni-vprasalnik.txt
+    │   └── ... (naloženi PDF-ji)
+    ├── Preverjanje-izgovorjave/
+    │   ├── Seja-1/
+    │   │   ├── P-01-PERO-2026-01-15T10-30-00.webm
+    │   │   ├── P-02-KAPA-2026-01-15T10-30-15.webm
+    │   │   └── ... (60 posnetkov)
+    │   └── Seja-2/
+    ├── Porocila/
+    │   └── porocilo-2026-01-15.txt
+    └── Generirana-porocila/
+        └── porocilo-Zak-2026-01-15T12-00-00.pdf
+```
 
 ---
 
-## Časovna ocena
+## FONETIČNI VRSTNI RED ČRK
 
-| Faza | Ocenjen čas |
-|------|-------------|
-| Faza 1: Prenova strani za pregled | 60% dela |
-| Faza 2: Gumb Popravi | 5% dela |
-| Faza 3: Razširitev podrobnosti uporabnika | 15% dela |
-| Faza 4: Nova stran Poročila | 15% dela |
-| Faza 5: Navigacija | 5% dela |
+Pri preverjanju izgovorjave se uporablja natančno določen fonetični vrstni red:
+
+**P → B → M → T → D → K → G → N → H → V → J → F → L → S → Z → C → Š → Ž → Č → R**
+
+Za vsako črko so 3 besede, skupaj 60 besed.
 
 ---
 
-## Opombe
+## STATUSI PREVERJANJ
 
-- Vsi teksti so v slovenščini
-- Oblikovanje sledi obstoječemu admin designu
-- Fonetični vrstni red črk ostane nespremenjen: P, B, M, T, D, K, G, N, H, V, J, F, L, S, Z, C, Š, Ž, Č, R
-- Seja-5 ima poseben izračun (1 teden pred koncem leta)
-- Shranjevanje ocen poteka preko obstoječega `articulation_evaluations` sistema
+| Status | Opis | Kdo vidi |
+|--------|------|----------|
+| `pending` | Novo, čaka na prevzem | Vsi logopedi v "V čakanju" |
+| `assigned` | Logoped prevzel | Samo dodeljen logoped v "Moji pregledi" |
+| `in_review` | V pregledu | Samo dodeljen logoped |
+| `completed` | Zaključeno | Vsi logopedi, z možnostjo "Popravi" |
+
+---
+
+## VARNOSTNI VIDIKI
+
+1. **Avtentikacija:** Vse strani zahtevajo prijavo z logopedskim računom
+2. **Odobritev:** Novi logopedi morajo biti odobreni s strani Super Admina
+3. **RLS politike:** Poročila so vidna samo logopedu, ki jih je ustvaril
+4. **Soft delete:** Izbrisani uporabniki so arhivirani za 90 dni
+5. **Opozorila:** Pri neshranjenih spremembah uporabnik dobi opozorilo
+
+---
+
+## OPOMBE ZA LOGOPEDE
+
+1. **Vedno prevzemite primer** preden začnete s pregledom
+2. **Shranjujte sproti** - uporabljajte gumb "Shrani" pri vsaki črki
+3. **Ne zapirajte brskalnika** z neshranjeni podatki - pojavilo se bo opozorilo
+4. **Po zaključku** lahko še vedno popravite oceno z gumbom "Popravi"
+5. **Generirana poročila** so shranjena tako v uporabnikovi mapi kot v vašem arhivu
+
