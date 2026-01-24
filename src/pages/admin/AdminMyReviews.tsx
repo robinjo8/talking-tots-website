@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
-import { User, Baby, Calendar, Eye, ChevronDown, ChevronUp, ClipboardList } from 'lucide-react';
+import { User, Baby, Calendar, Eye, ChevronDown, ChevronUp, ClipboardList, Pencil } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -110,13 +110,24 @@ function ReviewCard({
                 Starost: {session.child_age} let
               </div>
             )}
-            <Button 
-              className="w-full" 
-              onClick={() => onNavigate(session.id)}
-            >
-              <Eye className="h-4 w-4 mr-2" />
-              Ogled
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                className="flex-1" 
+                onClick={() => onNavigate(session.id)}
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                Ogled
+              </Button>
+              {session.status === 'completed' && (
+                <Button 
+                  variant="outline"
+                  onClick={() => onNavigate(session.id + '?edit=true')}
+                >
+                  <Pencil className="h-4 w-4 mr-1" />
+                  Popravi
+                </Button>
+              )}
+            </div>
           </div>
         )}
       </CardContent>
@@ -229,14 +240,26 @@ export default function AdminMyReviews() {
                         </TableCell>
                         <TableCell>{formatDate(session.assigned_at)}</TableCell>
                         <TableCell className="text-right">
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => handleNavigate(session.id)}
-                          >
-                            <Eye className="h-4 w-4 mr-1" />
-                            Ogled
-                          </Button>
+                          <div className="flex items-center justify-end gap-2">
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => handleNavigate(session.id)}
+                            >
+                              <Eye className="h-4 w-4 mr-1" />
+                              Ogled
+                            </Button>
+                            {session.status === 'completed' && (
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => handleNavigate(session.id + '?edit=true')}
+                              >
+                                <Pencil className="h-4 w-4 mr-1" />
+                                Popravi
+                              </Button>
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}

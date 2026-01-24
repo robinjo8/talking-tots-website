@@ -4,17 +4,20 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { Button } from '@/components/ui/button';
 import { RecordingPlayer } from './RecordingPlayer';
 import { EvaluationCheckboxes } from './EvaluationCheckboxes';
 import { Recording, LetterEvaluation } from '@/hooks/useSessionReview';
 import { getEvaluationConfig, PhoneticLetter } from '@/data/evaluationOptions';
-import { Volume2, VolumeX } from 'lucide-react';
+import { Volume2, VolumeX, Save, Loader2 } from 'lucide-react';
 
 interface LetterAccordionProps {
   letter: PhoneticLetter;
   recordings: Recording[];
   evaluation: LetterEvaluation;
   onEvaluationChange: (letter: string, selectedOptions: string[], comment: string) => void;
+  onSave?: () => Promise<void>;
+  isSaving?: boolean;
 }
 
 export function LetterAccordion({
@@ -22,6 +25,8 @@ export function LetterAccordion({
   recordings,
   evaluation,
   onEvaluationChange,
+  onSave,
+  isSaving = false,
 }: LetterAccordionProps) {
   const config = getEvaluationConfig(letter);
   const hasRecordings = recordings.length > 0;
@@ -83,6 +88,26 @@ export function LetterAccordion({
               onOptionsChange={handleOptionsChange}
               onCommentChange={handleCommentChange}
             />
+          )}
+
+          {/* Gumb za shranjevanje */}
+          {onSave && (
+            <div className="pt-3 mt-3 border-t flex justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onSave}
+                disabled={isSaving}
+                className="gap-2"
+              >
+                {isSaving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
+                Shrani oceno
+              </Button>
+            </div>
           )}
         </AccordionContent>
       </AccordionItem>

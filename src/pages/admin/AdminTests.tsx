@@ -13,7 +13,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search, ClipboardList, Clock, UserCheck, CheckCircle, Eye, Loader2, ChevronDown } from 'lucide-react';
+import { Search, ClipboardList, Clock, UserCheck, CheckCircle, Eye, Loader2, ChevronDown, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
 
@@ -126,6 +126,15 @@ const TestCard = ({
             >
               <Eye className="h-4 w-4 mr-1" /> Ogled
             </Button>
+            {session.status === 'completed' && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => onNavigate(session.id + '?edit=true')}
+              >
+                <Pencil className="h-4 w-4 mr-1" /> Popravi
+              </Button>
+            )}
           </div>
         </div>
       )}
@@ -350,6 +359,16 @@ export default function AdminTests() {
                               >
                                 <Eye className="h-4 w-4" />
                               </Button>
+                              {session.status === 'completed' && (
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  title="Popravi"
+                                  onClick={() => navigate(`/admin/tests/${session.id}?edit=true`)}
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                </Button>
+                              )}
                             </div>
                           </TableCell>
                         </TableRow>
