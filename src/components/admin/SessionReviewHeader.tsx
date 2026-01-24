@@ -1,28 +1,19 @@
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Calendar, User, Clock } from 'lucide-react';
+import { ArrowLeft, User, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
-import { sl } from 'date-fns/locale';
 
 interface SessionReviewHeaderProps {
   childName: string;
   childAge: number | null;
   childGender: string | null;
-  submittedAt: string | null;
 }
 
 export function SessionReviewHeader({
   childName,
   childAge,
   childGender,
-  submittedAt,
 }: SessionReviewHeaderProps) {
   const navigate = useNavigate();
-
-  const formatDate = (date: string | null): string => {
-    if (!date) return 'Ni podatka';
-    return format(new Date(date), 'd. M. yyyy', { locale: sl });
-  };
 
   const formatGender = (gender: string | null): string => {
     if (!gender) return '';
@@ -61,7 +52,7 @@ export function SessionReviewHeader({
 
       {/* Naslov */}
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Pregled preverjanja</h1>
+        <h1 className="text-2xl font-bold text-foreground">Pregled preverjanja izgovorjave</h1>
       </div>
 
       {/* Podatki otroka */}
@@ -80,11 +71,6 @@ export function SessionReviewHeader({
             <span className="text-foreground">{formatAge(childAge)}</span>
           </div>
         )}
-
-        <div className="flex items-center gap-2">
-          <Calendar className="h-4 w-4 text-muted-foreground" />
-          <span className="text-foreground">Oddano: {formatDate(submittedAt)}</span>
-        </div>
       </div>
     </div>
   );

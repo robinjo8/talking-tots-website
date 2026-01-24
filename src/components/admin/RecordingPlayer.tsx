@@ -1,6 +1,7 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, Square } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
 
 interface RecordingPlayerProps {
   word: string;
@@ -9,75 +10,149 @@ interface RecordingPlayerProps {
 
 export function RecordingPlayer({ word, url }: RecordingPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const handlePlay = () => {
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
+    const handleLoadedMetadata = () => setDuration(audio.duration);
+    const handleEnded = () => setIsPlaying(false);
+
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('ended', handleEnded);
+
+    return () => {
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('ended', handleEnded);
+    };
+  }, []);
+
+  const handlePlayPause = () => {
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
-        setIsPlaying(false);
       } else {
         audioRef.current.play();
-        setIsPlaying(true);
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const handleSeek = (value: number[]) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = value[0];
+      setCurrentTime(value[0]);
+    }
+  };
+
+  const handleVolumeChange = (value: number[]) => {
+    if (audioRef.current) {
+      const newVolume = value[0];
+      audioRef.current.volume = newVolume;
+      setVolume(newVolume);
+      setIsMuted(newVolume === 0);
+    }
+  };
+
+  const toggleMute = () => {
+    if (audioRef.current) {
+      if (isMuted) {
+        audioRef.current.volume = volume || 1;
+        setIsMuted(false);
+      } else {
+        audioRef.current.volume = 0;
+        setIsMuted(true);
       }
     }
   };
 
-  const handleStop = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      setIsPlaying(false);
-    }
-  };
-
-  const handleEnded = () => {
-    setIsPlaying(false);
+  const formatTime = (time: number): string => {
+    if (!isFinite(time) || isNaN(time)) return '0:00';
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
   return (
-    <div className="flex items-center gap-3 py-2">
+    <div className="flex items-center gap-3 p-3 border rounded-lg bg-muted/30">
       <audio
         ref={audioRef}
         src={url}
-        onEnded={handleEnded}
         preload="metadata"
       />
       
+      {/* Word label */}
       <span className="font-medium text-foreground min-w-[80px]">{word}</span>
       
-      <div className="flex gap-1">
+      {/* Play/Pause button */}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handlePlayPause}
+        className="h-8 w-8 p-0 shrink-0"
+        aria-label={isPlaying ? 'Pavza' : 'Predvajaj'}
+      >
+        {isPlaying ? (
+          <Pause className="h-4 w-4" />
+        ) : (
+          <Play className="h-4 w-4" />
+        )}
+      </Button>
+
+      {/* Time display */}
+      <span className="text-xs text-muted-foreground w-10 shrink-0">
+        {formatTime(currentTime)}
+      </span>
+      
+      {/* Progress slider */}
+      <div className="flex-1 min-w-[100px]">
+        <Slider
+          value={[currentTime]}
+          max={duration || 100}
+          step={0.1}
+          onValueChange={handleSeek}
+          className="cursor-pointer"
+        />
+      </div>
+
+      {/* Duration display */}
+      <span className="text-xs text-muted-foreground w-10 shrink-0">
+        {formatTime(duration)}
+      </span>
+      
+      {/* Volume control */}
+      <div className="hidden sm:flex items-center gap-2">
         <Button
-          variant="outline"
+          variant="ghost"
           size="sm"
-          onClick={handlePlay}
+          onClick={toggleMute}
           className="h-8 w-8 p-0"
-          aria-label={isPlaying ? 'Pavza' : 'Predvajaj'}
+          aria-label={isMuted ? 'Vklopi zvok' : 'Izklopi zvok'}
         >
-          {isPlaying ? (
-            <Pause className="h-4 w-4" />
+          {isMuted ? (
+            <VolumeX className="h-4 w-4" />
           ) : (
-            <Play className="h-4 w-4" />
+            <Volume2 className="h-4 w-4" />
           )}
         </Button>
-        
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleStop}
-          className="h-8 w-8 p-0"
-          aria-label="Ustavi"
-        >
-          <Square className="h-3 w-3" />
-        </Button>
-      </div>
-      
-      {isPlaying && (
-        <div className="flex items-center gap-1">
-          <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-          <span className="text-xs text-muted-foreground">Predvaja...</span>
+        <div className="w-16">
+          <Slider
+            value={[isMuted ? 0 : volume]}
+            max={1}
+            step={0.1}
+            onValueChange={handleVolumeChange}
+            className="cursor-pointer"
+          />
         </div>
-      )}
+      </div>
     </div>
   );
 }

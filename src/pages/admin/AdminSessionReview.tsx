@@ -1,29 +1,83 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { useParams, useNavigate, useSearchParams, useBlocker } from 'react-router-dom';
 import { useSessionReview, saveEvaluation, completeReview, LetterEvaluation } from '@/hooks/useSessionReview';
-import { PHONETIC_ORDER, PhoneticLetter } from '@/data/evaluationOptions';
 import { SessionReviewHeader } from '@/components/admin/SessionReviewHeader';
-import { LetterAccordion } from '@/components/admin/LetterAccordion';
+import { SessionAccordion } from '@/components/admin/SessionAccordion';
+import { UnsavedChangesDialog } from '@/components/admin/UnsavedChangesDialog';
 import { Button } from '@/components/ui/button';
-import { Save, CheckCircle, Loader2 } from 'lucide-react';
+import { CheckCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function AdminSessionReview() {
   const { sessionId } = useParams<{ sessionId: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { data, isLoading, error } = useSessionReview(sessionId);
+  const isEditMode = searchParams.get('edit') === 'true';
   
   // Lokalno stanje za ocene (za optimistične posodobitve)
   const [localEvaluations, setLocalEvaluations] = useState<Map<string, LetterEvaluation>>(new Map());
+  const [savedEvaluations, setSavedEvaluations] = useState<Map<string, LetterEvaluation>>(new Map());
   const [isSaving, setIsSaving] = useState(false);
+  const [savingLetter, setSavingLetter] = useState<string | null>(null);
   const [isCompleting, setIsCompleting] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<(() => void) | null>(null);
 
   // Inicializiraj lokalne ocene iz podatkov
   useEffect(() => {
     if (data?.evaluations) {
       setLocalEvaluations(new Map(data.evaluations));
+      setSavedEvaluations(new Map(data.evaluations));
     }
   }, [data?.evaluations]);
+
+  // Preveri spremembe
+  const checkForChanges = useCallback(() => {
+    for (const [letter, evaluation] of localEvaluations.entries()) {
+      const saved = savedEvaluations.get(letter);
+      if (!saved) {
+        if (evaluation.selectedOptions.length > 0 || evaluation.comment.trim()) {
+          return true;
+        }
+      } else {
+        if (JSON.stringify(evaluation) !== JSON.stringify(saved)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }, [localEvaluations, savedEvaluations]);
+
+  useEffect(() => {
+    setHasUnsavedChanges(checkForChanges());
+  }, [checkForChanges]);
+
+  // Browser beforeunload opozorilo
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
+  // React Router blocker
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      hasUnsavedChanges && currentLocation.pathname !== nextLocation.pathname
+  );
+
+  useEffect(() => {
+    if (blocker.state === 'blocked') {
+      setShowUnsavedDialog(true);
+      setPendingNavigation(() => () => blocker.proceed());
+    }
+  }, [blocker]);
 
   const handleEvaluationChange = (letter: string, selectedOptions: string[], comment: string) => {
     setLocalEvaluations(prev => {
@@ -33,15 +87,47 @@ export default function AdminSessionReview() {
     });
   };
 
+  // Shrani posamezno črko
+  const handleSaveLetter = async (letter: string) => {
+    if (!sessionId) return;
+    
+    setSavingLetter(letter);
+    const evaluation = localEvaluations.get(letter) || { selectedOptions: [], comment: '' };
+    
+    const result = await saveEvaluation(
+      sessionId,
+      letter,
+      evaluation.selectedOptions,
+      evaluation.comment
+    );
+
+    setSavingLetter(null);
+
+    if (result.success) {
+      setSavedEvaluations(prev => {
+        const newMap = new Map(prev);
+        newMap.set(letter, evaluation);
+        return newMap;
+      });
+      toast.success(`Ocena za črko ${letter} shranjena`);
+    } else {
+      toast.error(`Napaka pri shranjevanju ocene za črko ${letter}`);
+    }
+  };
+
+  // Shrani vse ocene za sejo
   const handleSaveAll = async () => {
     if (!sessionId) return;
     
     setIsSaving(true);
     let hasError = false;
+    let savedCount = 0;
 
-    // Shrani vse ocene ki imajo vsaj eno izbrano možnost ali komentar
     for (const [letter, evaluation] of localEvaluations.entries()) {
-      if (evaluation.selectedOptions.length > 0 || evaluation.comment.trim()) {
+      const saved = savedEvaluations.get(letter);
+      const hasChanged = !saved || JSON.stringify(evaluation) !== JSON.stringify(saved);
+      
+      if (hasChanged && (evaluation.selectedOptions.length > 0 || evaluation.comment.trim())) {
         const result = await saveEvaluation(
           sessionId,
           letter,
@@ -51,14 +137,23 @@ export default function AdminSessionReview() {
         if (!result.success) {
           hasError = true;
           toast.error(`Napaka pri shranjevanju ocene za črko ${letter}`);
+        } else {
+          savedCount++;
+          setSavedEvaluations(prev => {
+            const newMap = new Map(prev);
+            newMap.set(letter, evaluation);
+            return newMap;
+          });
         }
       }
     }
 
     setIsSaving(false);
     
-    if (!hasError) {
-      toast.success('Ocene uspešno shranjene');
+    if (!hasError && savedCount > 0) {
+      toast.success(`${savedCount} ocen uspešno shranjenih`);
+    } else if (savedCount === 0 && !hasError) {
+      toast.info('Ni novih sprememb za shranjevanje');
     }
   };
 
@@ -80,6 +175,22 @@ export default function AdminSessionReview() {
       navigate('/admin/my-reviews');
     } else {
       toast.error('Napaka pri zaključevanju pregleda');
+    }
+  };
+
+  const handleDialogConfirm = () => {
+    setShowUnsavedDialog(false);
+    if (pendingNavigation) {
+      pendingNavigation();
+      setPendingNavigation(null);
+    }
+  };
+
+  const handleDialogCancel = () => {
+    setShowUnsavedDialog(false);
+    setPendingNavigation(null);
+    if (blocker.state === 'blocked') {
+      blocker.reset();
     }
   };
 
@@ -110,6 +221,9 @@ export default function AdminSessionReview() {
     );
   }
 
+  // Ali je to zaključen pregled, ki ni v načinu urejanja?
+  const isReadOnly = data.session.status === 'completed' && !isEditMode;
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -117,56 +231,63 @@ export default function AdminSessionReview() {
         childName={data.child.name}
         childAge={data.child.age}
         childGender={data.child.gender}
-        submittedAt={data.session.submittedAt}
       />
 
-      {/* Accordion za vsako črko */}
-      <div className="space-y-3">
-        {PHONETIC_ORDER.map(letter => {
-          const recordings = data.recordingsByLetter.get(letter) || [];
-          const evaluation = localEvaluations.get(letter) || { selectedOptions: [], comment: '' };
+      {/* Info za read-only način */}
+      {isReadOnly && (
+        <div className="bg-muted/50 border rounded-lg p-4 text-sm text-muted-foreground">
+          Ta pregled je zaključen. Za urejanje uporabite gumb "Popravi".
+        </div>
+      )}
 
+      {/* Sejin - trenutno samo Seja-1 z dejanskimi podatki */}
+      <div className="space-y-4">
+        {[1, 2, 3, 4, 5].map(sessionNum => {
+          const hasSessionData = sessionNum === 1; // Trenutno samo Seja-1 ima podatke
+          
           return (
-            <LetterAccordion
-              key={letter}
-              letter={letter as PhoneticLetter}
-              recordings={recordings}
-              evaluation={evaluation}
-              onEvaluationChange={handleEvaluationChange}
+            <SessionAccordion
+              key={sessionNum}
+              sessionNumber={sessionNum}
+              baseDate={data.session.submittedAt}
+              hasData={hasSessionData}
+              recordingsByLetter={hasSessionData ? data.recordingsByLetter : new Map()}
+              evaluations={hasSessionData ? localEvaluations : new Map()}
+              onEvaluationChange={isReadOnly ? () => {} : handleEvaluationChange}
+              onSaveLetter={isReadOnly ? async () => {} : handleSaveLetter}
+              onSaveAll={isReadOnly ? async () => {} : handleSaveAll}
+              isSaving={isSaving}
+              savingLetter={savingLetter}
+              hasUnsavedChanges={hasSessionData ? hasUnsavedChanges : false}
             />
           );
         })}
       </div>
 
       {/* Akcijski gumbi */}
-      <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
-        <Button
-          variant="outline"
-          onClick={handleSaveAll}
-          disabled={isSaving || isCompleting}
-          className="gap-2"
-        >
-          {isSaving ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Save className="h-4 w-4" />
-          )}
-          Shrani ocene
-        </Button>
+      {!isReadOnly && (
+        <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
+          <Button
+            onClick={handleCompleteReview}
+            disabled={isSaving || isCompleting}
+            className="gap-2"
+          >
+            {isCompleting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <CheckCircle className="h-4 w-4" />
+            )}
+            Zaključi pregled
+          </Button>
+        </div>
+      )}
 
-        <Button
-          onClick={handleCompleteReview}
-          disabled={isSaving || isCompleting}
-          className="gap-2"
-        >
-          {isCompleting ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <CheckCircle className="h-4 w-4" />
-          )}
-          Zaključi pregled
-        </Button>
-      </div>
+      {/* Dialog za neshranjene spremembe */}
+      <UnsavedChangesDialog
+        open={showUnsavedDialog}
+        onConfirm={handleDialogConfirm}
+        onCancel={handleDialogCancel}
+      />
     </div>
   );
 }
