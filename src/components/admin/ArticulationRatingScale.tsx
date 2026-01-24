@@ -36,8 +36,7 @@ export function ArticulationRatingScale({
   };
 
   return (
-    <div className="space-y-1 pt-3 border-t">
-      <span className="text-sm font-medium text-foreground">Ocena artikulacije</span>
+    <div className="space-y-1">
       <div className="space-y-1">
         {RATING_SCALE.map((level) => {
           const isExpanded = expandedItems.includes(level.value);
