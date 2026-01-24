@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate, useSearchParams, useBlocker } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSessionReview, saveEvaluation, completeReview, LetterEvaluation } from '@/hooks/useSessionReview';
 import { SessionReviewHeader } from '@/components/admin/SessionReviewHeader';
 import { SessionAccordion } from '@/components/admin/SessionAccordion';
@@ -23,7 +23,6 @@ export default function AdminSessionReview() {
   const [isCompleting, setIsCompleting] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
-  const [pendingNavigation, setPendingNavigation] = useState<(() => void) | null>(null);
 
   // Inicializiraj lokalne ocene iz podatkov
   useEffect(() => {
@@ -65,19 +64,6 @@ export default function AdminSessionReview() {
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [hasUnsavedChanges]);
-
-  // React Router blocker
-  const blocker = useBlocker(
-    ({ currentLocation, nextLocation }) =>
-      hasUnsavedChanges && currentLocation.pathname !== nextLocation.pathname
-  );
-
-  useEffect(() => {
-    if (blocker.state === 'blocked') {
-      setShowUnsavedDialog(true);
-      setPendingNavigation(() => () => blocker.proceed());
-    }
-  }, [blocker]);
 
   const handleEvaluationChange = (letter: string, selectedOptions: string[], comment: string) => {
     setLocalEvaluations(prev => {
@@ -180,18 +166,10 @@ export default function AdminSessionReview() {
 
   const handleDialogConfirm = () => {
     setShowUnsavedDialog(false);
-    if (pendingNavigation) {
-      pendingNavigation();
-      setPendingNavigation(null);
-    }
   };
 
   const handleDialogCancel = () => {
     setShowUnsavedDialog(false);
-    setPendingNavigation(null);
-    if (blocker.state === 'blocked') {
-      blocker.reset();
-    }
   };
 
   // Loading state
