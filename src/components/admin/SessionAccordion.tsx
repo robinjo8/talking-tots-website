@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { LetterAccordion } from './LetterAccordion';
 import { Recording, LetterEvaluation } from '@/hooks/useSessionReview';
 import { PHONETIC_ORDER, PhoneticLetter } from '@/data/evaluationOptions';
-import { Calendar, Save, Loader2, Volume2 } from 'lucide-react';
+import { Calendar, Save, Loader2, Volume2, CheckCircle } from 'lucide-react';
 import { format, addMonths, addWeeks } from 'date-fns';
 import { sl } from 'date-fns/locale';
 
@@ -22,9 +22,12 @@ interface SessionAccordionProps {
   onEvaluationChange: (letter: string, selectedOptions: string[], comment: string) => void;
   onSaveLetter: (letter: string) => Promise<void>;
   onSaveAll: () => Promise<void>;
+  onCompleteReview?: () => Promise<void>;
   isSaving: boolean;
   savingLetter: string | null;
+  isCompleting?: boolean;
   hasUnsavedChanges: boolean;
+  isReadOnly?: boolean;
 }
 
 export function SessionAccordion({
@@ -36,9 +39,12 @@ export function SessionAccordion({
   onEvaluationChange,
   onSaveLetter,
   onSaveAll,
+  onCompleteReview,
   isSaving,
   savingLetter,
+  isCompleting,
   hasUnsavedChanges,
+  isReadOnly,
 }: SessionAccordionProps) {
   const [openLetters, setOpenLetters] = useState<string[]>([]);
 
@@ -145,9 +151,10 @@ export function SessionAccordion({
                 );
               })}
 
-              {/* Save all button for this session */}
-              <div className="pt-4 border-t flex justify-end">
+              {/* Action buttons for this session */}
+              <div className="pt-4 border-t flex flex-col sm:flex-row gap-3 justify-end">
                 <Button
+                  variant="outline"
                   onClick={onSaveAll}
                   disabled={isSaving || !hasUnsavedChanges}
                   className="gap-2"
@@ -157,8 +164,23 @@ export function SessionAccordion({
                   ) : (
                     <Save className="h-4 w-4" />
                   )}
-                  Shrani vse ocene za Seja-{sessionNumber}
+                  Shrani vse ocene
                 </Button>
+                
+                {onCompleteReview && !isReadOnly && (
+                  <Button
+                    onClick={onCompleteReview}
+                    disabled={isSaving || isCompleting}
+                    className="gap-2"
+                  >
+                    {isCompleting ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <CheckCircle className="h-4 w-4" />
+                    )}
+                    Zaključi pregled Seja-{sessionNumber}
+                  </Button>
+                )}
               </div>
             </div>
           ) : (
