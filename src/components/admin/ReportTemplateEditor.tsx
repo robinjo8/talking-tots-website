@@ -59,7 +59,7 @@ export function ReportTemplateEditor({ data, testSessions, onFieldChange, onSess
   };
 
   return (
-    <div className="bg-white border rounded-lg p-6 space-y-6 text-sm print:text-xs overflow-auto max-h-[600px]">
+    <div className="bg-white border rounded-lg p-6 space-y-6 text-sm print:text-xs">
       {/* Header with Logo */}
       <div className="flex items-start justify-between border-b pb-4">
         <div className="flex items-center gap-1">
