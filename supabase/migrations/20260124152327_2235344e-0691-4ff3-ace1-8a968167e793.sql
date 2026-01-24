@@ -1,0 +1,1 @@
+ALTER TABLE public.articulation_evaluations ADD COLUMN rating INTEGER CHECK (rating >= 1 AND rating <= 5);
