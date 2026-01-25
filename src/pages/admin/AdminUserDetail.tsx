@@ -18,9 +18,11 @@ import {
   File,
   Pencil,
   Sparkles,
-  Trash2
+  Trash2,
+  CheckCircle
 } from 'lucide-react';
 import { useUserStorageFiles, StorageFile, SessionRecordings } from '@/hooks/useUserStorageFiles';
+import { useChildEvaluations } from '@/hooks/useChildEvaluations';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
@@ -40,12 +42,14 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { DocumentPreview } from '@/components/admin/DocumentPreview';
+import { EvaluationSummary } from '@/components/admin/EvaluationSummary';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ReportTemplateEditor, generateReportText, ReportData } from '@/components/admin/ReportTemplateEditor';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
 import { generateReportPdf } from '@/utils/generateReportPdf';
+import { Badge } from '@/components/ui/badge';
 
 export default function AdminUserDetail() {
   const { parentId, childId } = useParams<{ parentId: string; childId: string }>();
@@ -90,6 +94,9 @@ export default function AdminUserDetail() {
     refetchReports,
     refetchGeneratedReports,
   } = useUserStorageFiles(parentId || '', childId || '');
+
+  // Pridobi ocene za tega otroka
+  const { data: childEvaluations, isLoading: evaluationsLoading } = useChildEvaluations(childId);
   
   const toggleDocumentPreview = useCallback((docPath: string) => {
     setExpandedDocId(prev => prev === docPath ? null : docPath);
@@ -578,36 +585,61 @@ export default function AdminUserDetail() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    {recordings.length === 0 ? (
+                    {recordings.length === 0 && (!childEvaluations || childEvaluations.length === 0) ? (
                       <p className="text-sm text-muted-foreground italic py-4">
                         Ni posnetkov preverjanja izgovorjave
                       </p>
                     ) : (
                       <Accordion type="single" collapsible className="w-full">
-                        {recordings.map((session, sessionIndex) => (
-                          <AccordionItem key={sessionIndex} value={session.sessionName}>
-                            <AccordionTrigger className="hover:no-underline">
-                              <div className="flex items-center gap-2">
-                                <Play className="h-4 w-4 text-muted-foreground" />
-                                <span>{session.sessionName}</span>
-                                <span className="text-sm text-muted-foreground">
-                                  ({session.recordings.length} posnetkov)
-                                </span>
-                              </div>
-                            </AccordionTrigger>
-                            <AccordionContent>
-                              <div className="space-y-3 pt-2">
-                                {session.recordings.map((recording, recIndex) => (
-                                  <AudioPlayer 
-                                    key={recIndex}
-                                    recording={recording}
-                                    getFileUrl={getFileUrl}
-                                  />
-                                ))}
-                              </div>
-                            </AccordionContent>
-                          </AccordionItem>
-                        ))}
+                        {recordings.map((session, sessionIndex) => {
+                          // Poišči ustrezno oceno za to sejo
+                          const matchingEvaluation = childEvaluations?.find(e => {
+                            // Poskusi ujemanje preko datuma ali ID-ja
+                            return e.status === 'completed' || e.evaluations.size > 0;
+                          });
+                          
+                          return (
+                            <AccordionItem key={sessionIndex} value={session.sessionName}>
+                              <AccordionTrigger className="hover:no-underline">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <Play className="h-4 w-4 text-muted-foreground" />
+                                  <span>{session.sessionName}</span>
+                                  <span className="text-sm text-muted-foreground">
+                                    ({session.recordings.length} posnetkov)
+                                  </span>
+                                  {matchingEvaluation?.status === 'completed' && (
+                                    <Badge variant="outline" className="gap-1 text-green-600 border-green-600">
+                                      <CheckCircle className="h-3 w-3" />
+                                      Zaključeno
+                                    </Badge>
+                                  )}
+                                </div>
+                              </AccordionTrigger>
+                              <AccordionContent>
+                                <div className="space-y-4 pt-2">
+                                  {/* Povzetek ocen */}
+                                  {matchingEvaluation && matchingEvaluation.evaluations.size > 0 && (
+                                    <div className="border-b pb-4">
+                                      <EvaluationSummary sessionData={matchingEvaluation} />
+                                    </div>
+                                  )}
+                                  
+                                  {/* Posnetki */}
+                                  <div className="space-y-3">
+                                    <p className="text-sm font-medium text-muted-foreground">Posnetki:</p>
+                                    {session.recordings.map((recording, recIndex) => (
+                                      <AudioPlayer 
+                                        key={recIndex}
+                                        recording={recording}
+                                        getFileUrl={getFileUrl}
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
+                              </AccordionContent>
+                            </AccordionItem>
+                          );
+                        })}
                       </Accordion>
                     )}
                   </CardContent>
