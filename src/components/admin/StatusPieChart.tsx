@@ -1,10 +1,17 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { useAdminChartData } from '@/hooks/useAdminChartData';
+import { useAdminStats } from '@/hooks/useAdminStats';
 
 export function StatusPieChart() {
-  const { statusDistribution, isLoading } = useAdminChartData();
+  const { stats, isLoading } = useAdminStats();
+  
+  // Build personal stats distribution for pie chart
+  const statusDistribution = [
+    { name: 'V pregledu', value: stats.myInReviewCount, color: 'hsl(var(--app-blue))' },
+    { name: 'Pregledano', value: stats.myReviewedCount, color: 'hsl(280, 70%, 50%)' },
+    { name: 'Zaključeno', value: stats.myCompletedCount, color: 'hsl(var(--dragon-green))' },
+  ];
 
   if (isLoading) {
     return (
@@ -29,9 +36,9 @@ export function StatusPieChart() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          📈 Razdelitev statusov
+          📊 Moji pregledi
         </CardTitle>
-        <CardDescription>Trenutno stanje vseh preverjanj</CardDescription>
+        <CardDescription>Razdelitev mojih prevzetih primerov</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="h-[300px]">

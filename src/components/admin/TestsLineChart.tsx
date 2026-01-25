@@ -109,7 +109,8 @@ export function TestsLineChart() {
                   name={line.name}
                   stroke={line.color} 
                   strokeWidth={2}
-                  dot={{ fill: line.color }}
+                  dot={false}
+                  activeDot={{ r: 4, fill: line.color }}
                 />
               ))}
             </LineChart>
