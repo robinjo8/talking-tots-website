@@ -1,111 +1,243 @@
 
-# Plan: Popravek statusa "Pregledano" vs "Zaključeno"
 
-## Ugotovljen problem
+# Načrt: Posodobitev strani "Moji pregledi" in "Moj portal"
 
-V bazi podatkov za sejo `d3742796-ad32-4880-90b3-f89767dfdb33` je:
-- `status: completed`
-- `reviewed_at: NULL` (manjka!)
-- `completed_at: NULL`
+## Povzetek
 
-Ko je bil izveden prejšnji plan, spremembe **niso bile pravilno aplicirane**. Funkcija `completeReview` še vedno nastavlja samo `status: 'completed'` brez `reviewed_at`.
+Potrebno je posodobiti dve strani:
+1. **`/admin/my-reviews`** - Dodati 4 statistične kartice za logopedove lastne preglede
+2. **`/admin` (Moj portal)** - Razširiti z dvema nivojema kartic (organizacija + osebno) ter interaktivnimi grafi
 
-## Potrebne spremembe
+---
 
-### 1. Funkcija `completeReview` v `useSessionReview.ts`
+## 1. Stran `/admin/my-reviews` - Statistične kartice
 
-**Problem:** Funkcija ne nastavlja `reviewed_at` ob zaključku pregleda.
+### Trenutno stanje
+Stran prikazuje samo eno kartico "Aktivni pregledi" s skupnim številom.
 
-**Rešitev:** Posodobiti update stavek na vrsticah 294-298:
+### Nove kartice (4 kartice v vrsti)
+
+| Kartica | Podatek | Ikona | Barva | Opis |
+|---------|---------|-------|-------|------|
+| **Moji pregledi** | Skupno število prevzetih primerov | User | Modra | Vsi primeri, ki ste jih prevzeli |
+| **V pregledu** | Število s statusom "V obdelavi" | Clock | Oranžna | Primeri, ki jih aktivno pregledujete |
+| **Pregledano** | Število s statusom "Pregledano" | CheckCircle | Vijolična | Primeri z oddanimi ocenami |
+| **Zaključeno** | Število s statusom "Zaključeno" | FileCheck | Zelena | Primeri z generiranim poročilom |
+
+### Izračun podatkov
+
+Iz obstoječih podatkov v `useMyReviews`:
 ```typescript
-// TRENUTNO:
-.update({ status: 'completed' })
-
-// NOVO:
-.update({ 
-  status: 'completed',
-  reviewed_at: new Date().toISOString() 
-})
-```
-
-### 2. Hook `useMyReviews.ts` - manjkajoča polja
-
-**Problem:** Query ne pridobiva `reviewed_at` in `completed_at` polj, zato UI ne more ločiti statusov.
-
-**Rešitev:**
-- Razširiti interface `MyReviewSession` z novima poljema
-- Posodobiti select query (vrstica 32) da vključi ti polji
-- Dodati mapiranje v rezultat (vrstice 83-95)
-
-### 3. Hook `useAdminTests.ts` - manjkajoča polja
-
-**Problem:** Enako - query ne pridobiva potrebnih polj za prikaz statusa.
-
-**Rešitev:**
-- Razširiti interface `TestSessionData`
-- Posodobiti select query (vrstica 32)
-- Posodobiti `calculateTestStats` funkcijo za pravilno štetje
-
-### 4. `StatusBadge` v `AdminMyReviews.tsx`
-
-**Problem:** Komponenta gleda samo `status` polje, ne razlikuje med "Pregledano" in "Zaključeno".
-
-**Rešitev:** Spremeniti logiko da upošteva `reviewed_at` in `completed_at`:
-- Če je `completed_at` nastavljen → "Zaključeno" (zelena)
-- Če je `reviewed_at` nastavljen ALI status = 'completed' → "Pregledano" (vijolična)
-- Sicer → "V pregledu" (modra)
-
-### 5. `StatusBadge` v `AdminTests.tsx`
-
-**Problem:** Enaka logika manjka.
-
-**Rešitev:** Dodati novo statusno logiko z dodatnim stanjem "Pregledano" (vijolična).
-
-### 6. Štetje odprtih primerov v `useAdminCounts.ts`
-
-**Problem:** Query šteje samo `assigned` in `in_review`, ne pa tudi `completed` brez `completed_at`.
-
-**Rešitev:** Spremeniti query (vrstice 33-37) da šteje vse seje brez končnega poročila:
-```typescript
-// Štej vse seje ki so dodeljene meni IN nimajo completed_at
-.eq('assigned_to', profile.id)
-.is('completed_at', null)
-```
-
-### 7. Filter za status na strani `/admin/all-tests`
-
-**Problem:** Filter ima samo "Zaključeno", manjka "Pregledano".
-
-**Rešitev:** Dodati novo opcijo v Select in posodobiti logiko filtriranja.
-
-### 8. Popravek obstoječega zapisa v bazi
-
-Za sejo, ki je že bila zaključena brez `reviewed_at`, bom dodal SQL migracijo:
-```sql
-UPDATE articulation_test_sessions 
-SET reviewed_at = updated_at 
-WHERE status = 'completed' AND reviewed_at IS NULL;
+const totalMyReviews = myReviews.length;
+const inReviewCount = myReviews.filter(s => 
+  s.status !== 'completed' || (!s.reviewed_at && !s.completed_at)
+).length;
+const reviewedCount = myReviews.filter(s => 
+  (s.reviewed_at || s.status === 'completed') && !s.completed_at
+).length;
+const completedCount = myReviews.filter(s => !!s.completed_at).length;
 ```
 
 ---
 
-## Vizualna predstavitev statusa
+## 2. Stran `/admin` (Moj portal) - Razširjena nadzorna plošča
 
-| Pogoj | Status | Barva |
-|-------|--------|-------|
-| `status = 'pending'` | V čakanju | Oranžna |
-| `status IN ('assigned', 'in_review')` | V obdelavi | Modra |
-| `status = 'completed' AND completed_at IS NULL` | Pregledano | Vijolična |
-| `completed_at IS NOT NULL` | Zaključeno | Zelena |
+### Nova struktura strani
+
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  Dobrodošli, Robert Kujavec                                                 │
+│  TomiTalk logoped • Preglejte status preverjanj izgovorjave                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  📊 ORGANIZACIJA (TomiTalk logoped)                                         │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐                │
+│  │    12      │ │     5      │ │     4      │ │     3      │                │
+│  │ Vsa prev.  │ │ V čakanju  │ │ Pregledano │ │ Zaključeno │                │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘                │
+│                                                                             │
+│  👤 MOJE DELO                                                               │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐                │
+│  │     4      │ │     2      │ │     1      │ │     1      │                │
+│  │ Moji pregl.│ │ V pregledu │ │ Pregledano │ │ Zaključeno │                │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘                │
+│                                                                             │
+│  📈 GRAFI                                                                   │
+│  ┌─────────────────────────────────┐ ┌─────────────────────────────────┐    │
+│  │ Statistika preverjanj          │ │ Tortni graf statusov           │    │
+│  │ (Linijski graf)                │ │                                 │    │
+│  │ ☑ Nova preverjanja             │ │    [Tortni diagram]             │    │
+│  │ ☑ V čakanju                    │ │                                 │    │
+│  │ ☐ Pregledano                   │ │                                 │    │
+│  │ ☐ Zaključeno                   │ │                                 │    │
+│  └─────────────────────────────────┘ └─────────────────────────────────┘    │
+│                                                                             │
+│  🧠 NAJPOGOSTEJŠI GOVORNI IZZIVI                                            │
+│  ┌─────────────────────────────────────────────────────────────────────────┐│
+│  │                    [Tortni graf po črkah]                               ││
+│  └─────────────────────────────────────────────────────────────────────────┘│
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Kartice za organizacijo (zgornja vrstica)
+
+| Kartica | Podatek | Ikona | Barva | Opis |
+|---------|---------|-------|-------|------|
+| **Vsa preverjanja** | Število vseh preverjanj v organizaciji | ClipboardList | Modra | Skupno število opravljenih preverjanj |
+| **V čakanju** | Vsi neprevzeti pregledi organizacije | Clock | Oranžna | Pregledi, ki čakajo na prevzem |
+| **Pregledano** | Vsi pregledani s strani organizacije | Eye | Vijolična | Pregledi z oddanimi ocenami |
+| **Zaključeno** | Vsi zaključeni v organizaciji | CheckCircle | Zelena | Pregledi z generiranimi poročili |
+
+### Kartice za osebno delo (spodnja vrstica)
+
+Enake kot na strani `/admin/my-reviews` (glej zgoraj).
+
+### Interaktivni linijski graf
+
+Graf bo imel kljukice (checkboxi) za izbiro katerih linij naj prikazuje:
+- ☑ Nova preverjanja (modra)
+- ☑ V čakanju (oranžna)
+- ☐ Pregledano (vijolična)
+- ☐ Zaključeno (zelena)
+
+Logoped lahko vklopi/izklopi posamezne parametre.
+
+### Tortni graf statusov
+
+Desno od linijskega grafa bo tortni graf z razdelitvijo:
+- Nova preverjanja
+- V čakanju
+- V pregledu
+- Pregledano
+- Zaključeno
+
+Podatki se ujemajo s karticami organizacije.
+
+### Graf govornih izzivov
+
+Premakne se pod glavna grafa in ostane nespremenjen.
+
+---
+
+## Tehnične spremembe
+
+### Nove/posodobljene datoteke
+
+**1. `src/hooks/useAdminStats.ts`**
+
+Razširiti za nove statistike:
+```typescript
+interface AdminStats {
+  // Organizacija
+  orgTotalTests: number;
+  orgPendingTests: number;
+  orgReviewedTests: number;  // NOVO
+  orgCompletedTests: number;
+  
+  // Osebno
+  myTotalReviews: number;
+  myInReviewCount: number;   // NOVO
+  myReviewedCount: number;   // NOVO
+  myCompletedCount: number;  // NOVO
+}
+```
+
+**2. `src/hooks/useAdminChartData.ts`**
+
+Razširiti za dodatne linije:
+```typescript
+interface TestsDataPoint {
+  date: string;
+  new: number;
+  pending: number;    // NOVO
+  reviewed: number;   // NOVO
+  completed: number;
+}
+
+interface StatusDistribution {  // NOVO
+  name: string;
+  value: number;
+  color: string;
+}
+```
+
+**3. `src/components/admin/TestsLineChart.tsx`**
+
+- Dodati checkboxe za vklop/izklop linij
+- Uporabiti state za sledenje aktivnim linijam
+- Prikazati le izbrane linije
+
+**4. `src/components/admin/StatusPieChart.tsx`** (NOVA DATOTEKA)
+
+Nova komponenta za tortni graf statusov.
+
+**5. `src/pages/admin/AdminDashboard.tsx`**
+
+- Dodati razdelek "Organizacija" z 4 karticami
+- Dodati razdelek "Moje delo" z 4 karticami
+- Postaviti grafe v mrežo (linijski + tortni)
+- Premakniti graf govornih izzivov pod glavna grafa
+
+**6. `src/pages/admin/AdminMyReviews.tsx`**
+
+- Zamenjati eno kartico s 4 karticami v vrsti
+- Uporabiti obstoječe podatke za izračun statistik
+
+---
+
+## Vizualni predogled
+
+### Stran `/admin/my-reviews`:
+
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  Moji pregledi                                                              │
+│  Preverjanja, ki ste jih prevzeli v obdelavo                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐                │
+│  │ 👤    4    │ │ 🕐    2    │ │ ✅    1    │ │ 📄    1    │                │
+│  │ Moji      │ │ V pregledu │ │ Pregledano │ │ Zaključeno │                │
+│  │ pregledi  │ │            │ │            │ │            │                │
+│  │ Vsi       │ │ Aktivno    │ │ Ocene      │ │ Poročila   │                │
+│  │ prevzeti  │ │ pregleduj. │ │ oddane     │ │ generirana │                │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘                │
+│                                                                             │
+│  [Tabela pregledov - nespremenjena]                                         │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Stran `/admin` (Moj portal) - grafi:
+
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  📈 Statistika preverjanj           │  📊 Razdelitev statusov              │
+├─────────────────────────────────────┼─────────────────────────────────────┤
+│                                     │                                     │
+│  Izberi prikaz:                     │         ┌──────────┐                │
+│  ☑ Nova preverjanja                 │      ┌──┤V čakanju │                │
+│  ☑ V čakanju                        │   ┌──┤  └──────────┘                │
+│  ☐ Pregledano                       │   │  │                              │
+│  ☐ Zaključeno                       │   │  └──Pregledano                  │
+│                                     │   │                                 │
+│  ▄▄▄▄▄                              │   └────Zaključeno                   │
+│      ▄▄▄                            │                                     │
+│         ▄▄▄▄                        │                                     │
+│  ───────────────                    │                                     │
+│                                     │                                     │
+└─────────────────────────────────────┴─────────────────────────────────────┘
+```
 
 ---
 
 ## Datoteke za posodobitev
 
-1. **`src/hooks/useSessionReview.ts`** - popraviti `completeReview` funkcijo
-2. **`src/hooks/useMyReviews.ts`** - dodati `reviewed_at`, `completed_at` polja
-3. **`src/hooks/useAdminTests.ts`** - dodati `reviewed_at`, `completed_at` polja
-4. **`src/hooks/useAdminCounts.ts`** - popraviti query za štetje odprtih primerov
-5. **`src/pages/admin/AdminMyReviews.tsx`** - posodobiti `StatusBadge` logiko
-6. **`src/pages/admin/AdminTests.tsx`** - posodobiti `StatusBadge` logiko in filter
-7. **Nova SQL migracija** - popraviti obstoječe seje brez `reviewed_at`
+1. **`src/hooks/useAdminStats.ts`** - Razširiti s podrobnejšimi statistikami
+2. **`src/hooks/useAdminChartData.ts`** - Dodati podatke za nove grafe
+3. **`src/components/admin/TestsLineChart.tsx`** - Dodati interaktivne checkboxe
+4. **`src/components/admin/StatusPieChart.tsx`** - Nova komponenta za tortni graf
+5. **`src/pages/admin/AdminDashboard.tsx`** - Celotna prenova z dvema nivojema kartic
+6. **`src/pages/admin/AdminMyReviews.tsx`** - Dodati 4 statistične kartice
+
