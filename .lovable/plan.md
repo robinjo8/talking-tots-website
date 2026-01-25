@@ -1,94 +1,172 @@
 
+# Načrt: Prestavitev generiranih poročil in prikaz vseh poročil organizacije
 
-# Načrt: Popravki nadzorne plošče in filtri na straneh
+## Povzetek ugotovitev
 
-## 1. Spremembe na strani /admin/dashboard
+### Trenutno stanje
 
-### 1.1 Preimenovanje kartice
-- "Vsa preverjanja" → "Preverjanja"
+1. **Generirana poročila na strani Podrobnosti uporabnika:**
+   - Sekcija "Generirana poročila" je trenutno del desnega stolpca pod "Poročila" (vrstice 774-821)
+   - Uporabnik želi to prestaviti pod "Dokumenti" na levi strani z naslovom "Generirana poročila logopeda"
 
-### 1.2 Skrivanje ikon na mobilnih napravah
-V `StatCard.tsx` bom dodal responsivno klaso za skrivanje ikone na manjših zaslonih:
-- Ikona se bo prikazovala samo na `md:` (768px+) napravah
-- Na mobilnih napravah bo kartica vsebovala samo besedilo
+2. **Zakaj poročila niso vidna na /admin/reports:**
+   - Ko generirate PDF, se datoteka shrani SAMO v Supabase Storage (`uporabniski-profili` bucket)
+   - V tabelo `logopedist_reports` se NE vstavi noben zapis
+   - Stran `/admin/reports` bere podatke iz tabele `logopedist_reports`, ki je prazna
 
-### 1.3 Popravek navigacije ob kliku na kartice
+3. **Omejitev RLS politik:**
+   - Trenutna RLS politika dovoljuje logopedu vpogled SAMO v svoja poročila
+   - Potrebna je sprememba za vpogled v vsa poročila znotraj organizacije
 
-**Organizacija (leva stran):**
-| Kartica | Trenutna pot | Nova pot |
-|---------|--------------|----------|
-| Preverjanja | /admin/tests | /admin/all-tests |
-| V čakanju | /admin/tests?status=pending | /admin/pending |
-| Pregledano | /admin/tests?status=reviewed | /admin/all-tests?status=reviewed |
-| Zaključeno | /admin/tests?status=completed | /admin/all-tests?status=completed |
+---
 
-**Moje delo (desna stran):**
-| Kartica | Trenutna pot | Nova pot |
-|---------|--------------|----------|
-| Moji pregledi | /admin/my-reviews | /admin/my-reviews |
-| V pregledu | /admin/my-reviews | /admin/my-reviews?status=in_review |
-| Pregledano | /admin/my-reviews | /admin/my-reviews?status=reviewed |
-| Zaključeno | /admin/my-reviews | /admin/my-reviews?status=completed |
+## Spremembe
 
-## 2. Dodajanje filtrov na strani
+### 1. Prestavitev sekcije "Generirana poročila" pod "Dokumenti"
 
-Bom ustvaril skupno komponento `TestFilters` ki jo bom lahko ponovno uporabil na vseh straneh.
+V datoteki `AdminUserDetail.tsx`:
+- Odstrani sekcijo "Generirana poročila" iz desnega stolpca (pod "Poročila")
+- Dodaj novo sekcijo "Generirana poročila logopeda" v levem stolpcu, pod "Dokumenti" kartice
+- Uporabi enak slog prikaza kot trenutno (zeleno ozadje, ikone za ogled/prenos/bris)
 
-### 2.1 Nova komponenta `TestFilters.tsx`
-Komponenta bo vsebovala:
-- **Starost**: Vse starosti, 3 leta, 4 leta, 5 let, 6 let, 7+ let
-- **Spol**: Vsi, Moški, Ženski
-- **Status**: Vsi statusi, V čakanju, V obdelavi, Pregledano, Zaključeno
-- **Datum oddaje**: Vsi datumi, Danes, Zadnji teden, Zadnji mesec, Zadnje leto
+**Nova postavitev:**
+```text
+┌─────────────────────────────────────────────────────────────────────┐
+│  Levi stolpec                    │  Desni stolpec                  │
+├──────────────────────────────────┼──────────────────────────────────┤
+│  📄 Dokumenti                    │  📋 Poročila                     │
+│     - dokument1.pdf              │     [Urejevalnik poročila]       │
+│     - dokument2.pdf              │     [Gumbi: Shrani, Naloži,      │
+│                                  │      Generiraj]                  │
+│  📝 Generirana poročila logopeda │     Shranjena poročila:          │
+│     - porocilo-zak-2026.pdf      │     - osnutek1.txt               │
+│                                  │                                  │
+│  🎤 Preverjanje izgovorjave      │                                  │
+│     [Posnetki...]                │                                  │
+└──────────────────────────────────┴──────────────────────────────────┘
+```
 
-### 2.2 Integracija na straneh
+### 2. Shranjevanje poročila v bazo ob generiranju PDF
 
-| Stran | Filtri |
-|-------|--------|
-| /admin/pending | Starost, Spol, Datum (Status ni potreben - vedno "pending") |
-| /admin/my-reviews | Starost, Spol, Status (brez "V čakanju"), Datum |
-| /admin/users | Starost, Spol |
-| /admin/reports | Status (Osnutek, Revidirano, Oddano), Datum |
+V funkciji `handleGeneratePdf` v `AdminUserDetail.tsx`:
+- Po uspešnem nalaganju PDF v storage, vstavi zapis v tabelo `logopedist_reports`
+- Shrani: `logopedist_id`, `session_id`, `summary`, `pdf_url`, `status: 'draft'`
 
-## 3. Datoteke za spremembo
+```typescript
+// Po uploadu PDF-ja v storage:
+const { data: reportRecord, error: insertError } = await supabase
+  .from('logopedist_reports')
+  .insert({
+    logopedist_id: logopedistProfile.id,
+    session_id: reportData.selectedSessionId,
+    summary: reportData.ugotovitve?.substring(0, 200) || '',
+    findings: { anamneza: reportData.anamneza, ugotovitve: reportData.ugotovitve },
+    recommendations: reportData.predlogVaj || '',
+    next_steps: reportData.opombe || '',
+    pdf_url: filePath,
+    status: 'draft'
+  })
+  .select()
+  .single();
+```
+
+### 3. RLS politika za vpogled v poročila organizacije
+
+Nova SQL migracija za posodobitev RLS politike:
+
+```sql
+-- Odstrani staro politiko
+DROP POLICY IF EXISTS "Logopedists can view own reports" ON public.logopedist_reports;
+
+-- Nova politika: logoped vidi vsa poročila v svoji organizaciji
+CREATE POLICY "Logopedists can view organization reports"
+  ON public.logopedist_reports FOR SELECT
+  USING (
+    logopedist_id IN (
+      SELECT lp.id 
+      FROM public.logopedist_profiles lp
+      WHERE lp.organization_id = public.get_user_organization_id(auth.uid())
+    )
+  );
+```
+
+### 4. Posodobitev hook-a za pridobivanje poročil organizacije
+
+V `useLogopedistReports.ts`:
+- Namesto filtriranja po `logopedist_id = profile.id`
+- Pridobi vse logopedist_id-je v isti organizaciji in filtriraj po njih
+- Dodaj ime logopeda k vsakemu poročilu za razločevanje
+
+```typescript
+// Pridobi vse logopede v organizaciji
+const { data: orgLogopedists } = await supabase
+  .from('logopedist_profiles')
+  .select('id, first_name, last_name')
+  .eq('organization_id', profile.organization_id);
+
+const logopedistIds = orgLogopedists?.map(l => l.id) || [profile.id];
+
+// Pridobi vsa poročila za te logopede
+const { data: reports } = await supabase
+  .from('logopedist_reports')
+  .select('*')
+  .in('logopedist_id', logopedistIds)
+  .order('created_at', { ascending: false });
+```
+
+---
+
+## Datoteke za spremembo
 
 | Datoteka | Akcija | Opis |
 |----------|--------|------|
-| `src/components/admin/StatCard.tsx` | Posodobitev | Skrij ikono na mobilnih napravah z `hidden md:flex` |
-| `src/pages/admin/AdminDashboard.tsx` | Posodobitev | Spremeni "Vsa preverjanja" v "Preverjanja", popravi URL-je |
-| `src/components/admin/TestFilters.tsx` | Nova | Skupna komponenta za filtre |
-| `src/pages/admin/AdminPending.tsx` | Posodobitev | Dodaj filtre za starost, spol, datum |
-| `src/pages/admin/AdminMyReviews.tsx` | Posodobitev | Dodaj filtre za starost, spol, status, datum |
-| `src/pages/admin/AdminUsers.tsx` | Posodobitev | Dodaj filtre za starost, spol |
-| `src/pages/admin/AdminReports.tsx` | Posodobitev | Dodaj filtre za status, datum |
+| `src/pages/admin/AdminUserDetail.tsx` | Posodobi | 1) Prestavi sekcijo generiranih poročil pod Dokumenti, 2) Dodaj vstavljanje v bazo ob generiranju PDF |
+| `src/hooks/useLogopedistReports.ts` | Posodobi | Pridobivaj vsa poročila v organizaciji, dodaj ime logopeda |
+| Nova migracija | Ustvari | Posodobi RLS politiko za vpogled v poročila organizacije |
+| `src/pages/admin/AdminReports.tsx` | Posodobi | Dodaj stolpec "Logoped" za prikaz avtorja poročila |
 
-## 4. Tehnična implementacija
+---
 
-### StatCard - responsivna ikona
-```tsx
-{/* Ikona - skrita na mobilnih, vidna na md+ */}
-<div className={cn(
-  'hidden md:flex h-12 w-12 rounded-full items-center justify-center', 
-  classes.bg
-)}>
-  <Icon className={cn('h-6 w-6', classes.text)} />
-</div>
+## Tehnični diagram
+
+```text
+┌──────────────────────────────────────────────────────────────────────────┐
+│  Generiranje PDF poročila                                                │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  1. Uporabnik klikne "Generiraj"                                         │
+│           │                                                              │
+│           ▼                                                              │
+│  2. generateReportPdf() → ustvari PDF blob                               │
+│           │                                                              │
+│           ▼                                                              │
+│  3. Upload v Supabase Storage                                            │
+│     (uporabniski-profili/{parentId}/{childId}/Generirana-porocila/)      │
+│           │                                                              │
+│           ▼                                                              │
+│  4. INSERT v logopedist_reports tabelo ← NOVO!                           │
+│     (logopedist_id, session_id, pdf_url, summary, status)                │
+│           │                                                              │
+│           ▼                                                              │
+│  5. Poročilo vidno na /admin/reports                                     │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
-### TestFilters komponenta
-```tsx
-interface TestFiltersProps {
-  ageFilter?: string;
-  setAgeFilter?: (value: string) => void;
-  genderFilter?: string;
-  setGenderFilter?: (value: string) => void;
-  statusFilter?: string;
-  setStatusFilter?: (value: string) => void;
-  dateFilter?: string;
-  setDateFilter?: (value: string) => void;
-  statusOptions?: { value: string; label: string }[];
-}
+```text
+┌──────────────────────────────────────────────────────────────────────────┐
+│  Prikaz poročil na /admin/reports                                        │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  Trenutno:                                                               │
+│  useLogopedistReports → WHERE logopedist_id = moj_id                     │
+│  Rezultat: Samo moja poročila                                            │
+│                                                                          │
+│  Po spremembi:                                                           │
+│  useLogopedistReports → WHERE logopedist_id IN (vsi v moji org.)         │
+│  Rezultat: Vsa poročila v organizaciji                                   │
+│                                                                          │
+│  + RLS politika omogoča branje poročil celotne organizacije              │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
-
-Komponenta bo omogočala prilagoditev, kateri filtri so prikazani in kakšne so možnosti za status (različne strani potrebujejo različne statusne opcije).
-
