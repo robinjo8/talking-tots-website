@@ -1,4 +1,3 @@
-
 import Header from "@/components/Header";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { useNavigate } from "react-router-dom";
@@ -8,55 +7,46 @@ import { useIsMobile } from "@/hooks/use-mobile";
 const videoLetters = [
   { 
     letter: "C", 
-    gradient: "from-dragon-green/20 to-dragon-green/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
     description: "Poglej video navodila za pravilno izgovorjavo črke C"
   },
   { 
     letter: "Č", 
-    gradient: "from-app-blue/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
     description: "Poglej video navodila za pravilno izgovorjavo črke Č"
   },
   { 
     letter: "K", 
-    gradient: "from-app-orange/20 to-app-yellow/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png",
     description: "Poglej video navodila za pravilno izgovorjavo črke K"
   },
   { 
     letter: "L", 
-    gradient: "from-app-purple/20 to-app-blue/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png",
     description: "Poglej video navodila za pravilno izgovorjavo črke L"
   },
   { 
     letter: "R", 
-    gradient: "from-app-purple/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
     description: "Poglej video navodila za pravilno izgovorjavo črke R"
   },
   { 
     letter: "S", 
-    gradient: "from-dragon-green/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
     description: "Poglej video navodila za pravilno izgovorjavo črke S"
   },
   { 
     letter: "Š", 
-    gradient: "from-app-blue/20 to-app-purple/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
     description: "Poglej video navodila za pravilno izgovorjavo črke Š"
   },
   { 
     letter: "Z", 
-    gradient: "from-app-teal/20 to-dragon-green/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
     description: "Poglej video navodila za pravilno izgovorjavo črke Z"
   },
   { 
     letter: "Ž", 
-    gradient: "from-app-purple/20 to-app-blue/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
     description: "Poglej video navodila za pravilno izgovorjavo črke Ž"
   },
@@ -85,12 +75,18 @@ const VideoNavodila = () => {
 
   const LetterCard = ({ letter }: { letter: typeof videoLetters[0] }) => (
     <div
-      className="bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group border border-gray-200"
+      className="bg-white rounded-xl shadow-xl border border-gray-200 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group"
       onClick={() => handleLetterClick(letter.letter)}
     >
-      {/* Card Image */}
-      <div className={`relative aspect-video overflow-hidden bg-gradient-to-br ${letter.gradient}`}>
-        <div className="w-full h-full flex items-center justify-center">
+      {/* Card Image - Orange gradient background like Kolo sreče */}
+      <div className={isMobile ? "relative aspect-square overflow-hidden" : "relative aspect-video overflow-hidden"}>
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)'
+          }}
+        />
+        <div className="relative w-full h-full flex items-center justify-center">
           <img 
             src={letter.image}
             alt={`Črka ${letter.letter}`}
@@ -101,13 +97,18 @@ const VideoNavodila = () => {
       </div>
 
       {/* Card Content */}
-      <div className="p-6">
-        <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
+      <div className={isMobile ? "p-3 flex flex-col flex-grow" : "p-6 flex flex-col flex-grow"}>
+        <h3 className={isMobile 
+          ? "text-base font-bold text-foreground mb-1 group-hover:text-app-blue transition-colors leading-tight text-center" 
+          : "text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors"
+        }>
           Črka {letter.letter}
         </h3>
-        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
-          {letter.description}
-        </p>
+        {!isMobile && (
+          <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+            {letter.description}
+          </p>
+        )}
       </div>
     </div>
   );
@@ -116,16 +117,16 @@ const VideoNavodila = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container max-w-5xl mx-auto pt-28 md:pt-32 pb-20 px-4">
+      <div className="container max-w-6xl mx-auto pt-28 md:pt-32 pb-20 px-4">
         {/* Page Title */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-6">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
             Video navodila
           </h1>
           <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full"></div>
         </div>
         
-        {/* Breadcrumb */}
+        {/* Breadcrumb - positioned like LogopedskiKoticek */}
         <div className="mb-8">
           <BreadcrumbNavigation />
         </div>
@@ -133,15 +134,11 @@ const VideoNavodila = () => {
         {/* Letters grid/carousel */}
         <div className="mb-12">
           {isMobile ? (
-            /* Mobile: Horizontal scroll carousel */
-            <div className="overflow-hidden -mx-4" ref={emblaRef}>
-              <div className="flex gap-4 px-4">
-                {videoLetters.map(letter => (
-                  <div key={letter.letter} className="flex-[0_0_85%] min-w-0">
-                    <LetterCard letter={letter} />
-                  </div>
-                ))}
-              </div>
+            /* Mobile: 2-column grid like Kolo sreče */
+            <div className="grid grid-cols-2 gap-4">
+              {videoLetters.map(letter => (
+                <LetterCard key={letter.letter} letter={letter} />
+              ))}
             </div>
           ) : (
             /* Desktop: Grid layout */
