@@ -1,152 +1,156 @@
 
-# Načrt: Ločitev admin in uporabniškega portala pri odjavi
+# Načrt: Popravek sistema obvestil za uporabnika
 
-## Ugotovljen problem
+## Ugotovljeni problemi
 
-### Arhitektura
-Oba konteksta (`AuthContext` in `AdminAuthContext`) uporabljata **isti Supabase klient**, kar pomeni:
-- Ista localStorage seja za oba portala
-- Oba konteksta poslušata `onAuthStateChange` dogodke
-- Odjava iz enega portala vpliva na drugega
-
-### Specifični problemi
-
-1. **Mešanje sej**: Ko ste bili vpisani kot `kujavec.robert@gmail.com` na uporabniškem portalu in ste odprli admin portal, je `AdminAuthContext` prebral isto sejo in poiskal logopedist profil. Če ima ta email tudi logopedist profil pod drugim računom, to povzroči zmedo.
-
-2. **Nepopolna odjava**: V `AdminAuthContext.signOut()` se localStorage žeton počisti **samo ob napaki** (v catch bloku), ne pa vedno. To pomeni, da `AuthContext` še vedno vidi "živo" sejo.
-
-3. **AuthContext reagira na odjavo**: Ko admin portal pokliče `signOut()`, `AuthContext` (ki je globalno ovit okoli celotne aplikacije) prejme `SIGNED_OUT` dogodek in nastavi `profile: null`, kar lahko povzroči čudno obnašanje.
+1. **Zvonček se ne prikazuje na namizju** - komponenta `UserNotificationBell` je dodana samo v `MobileMenu.tsx`, manjka v `DesktopNavigation.tsx`
+2. **Obvestilo samo prenese datoteko** - namesto da preusmeri uporabnika na `/profile?expandSection=myDocuments`
+3. **Obvestila se ne označijo kot prebrana** ko uporabnik odpre zavihek "Moji dokumenti"
 
 ---
 
-## Rešitev
+## Vizualni cilj
 
-### 1. AdminAuthContext.tsx - Vedno počisti localStorage
+```text
+┌─────────────────────────────────────────────────────────────────────────┐
+│  DESKTOP HEADER                                                         │
+├─────────────────────────────────────────────────────────────────────────┤
+│  TomiTalk | Cenik | Logopedski nasveti | ...      [🔔 2] [Avatar ŽAK ▾] │
+│                                                     ↑                   │
+│                                            Zvonček z števcem            │
+└─────────────────────────────────────────────────────────────────────────┘
 
-Trenutna koda (napačna):
-```typescript
-const signOut = async () => {
-  try {
-    await supabase.auth.signOut();
-  } catch (error) {
-    console.warn('SignOut error (ignored):', error);
-    // PROBLEM: Samo tu se počisti localStorage
-    localStorage.removeItem('sb-ecmtctwovkheohqwahvt-auth-token');
-  }
-  // ...
-};
+┌─────────────────────────────────────────────────────────────────────────┐
+│  MOBILE HEADER                                                          │
+├─────────────────────────────────────────────────────────────────────────┤
+│  TomiTalk                                       [🔔 2] [ŽAK] [☰]        │
+│                                                   ↑                     │
+│                                          Zvonček levo od imena          │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
-Popravljena koda:
+---
+
+## Spremembe
+
+### 1. DesktopNavigation.tsx - Dodaj zvonček
+
+Dodaj `UserNotificationBell` levo od uporabniškega profila:
+
 ```typescript
-const signOut = async () => {
-  // VEDNO počisti localStorage - preden kličemo Supabase
-  localStorage.removeItem('sb-ecmtctwovkheohqwahvt-auth-token');
+import { UserNotificationBell } from "./UserNotificationBell";
+
+// V return statement, desno pred UserProfile:
+<div className="flex items-center gap-2">
+  {user && <UserNotificationBell />}
+  {user ? (
+    <UserProfile />
+  ) : (
+    // ... login buttons
+  )}
+</div>
+```
+
+### 2. UserNotificationBell.tsx - Preusmeri na "Moji dokumenti"
+
+Namesto prenosa datoteke, preusmeri uporabnika na stran `/profile` z odprtim zavihkom "Moji dokumenti":
+
+```typescript
+import { useNavigate } from 'react-router-dom';
+
+function NotificationItem({ notification, onMarkAsRead, onClose }: NotificationItemProps) {
+  const navigate = useNavigate();
   
-  try {
-    await supabase.auth.signOut();
-  } catch (error) {
-    console.warn('SignOut error (ignored):', error);
-  }
-  
-  // Počisti lokalno stanje
-  setUser(null);
-  setSession(null);
-  setProfile(null);
-  setIsSuperAdmin(false);
-  setIsProfileLoading(false);
-};
-```
-
-### 2. AdminSidebar.tsx in AdminMobileNav.tsx - Počisti tudi sessionStorage
-
-Popravljen `handleSignOut`:
-```typescript
-const handleSignOut = async () => {
-  try {
-    await signOut();
-  } catch (error) {
-    console.warn('SignOut failed, redirecting anyway:', error);
-  }
-  // Dodatno počisti sessionStorage za splash screen
-  sessionStorage.removeItem('splashShown');
-  // Vedno preusmeri s trdo osveževanje
-  window.location.href = '/admin/login';
-};
-```
-
-### 3. AdminAuthContext - Ignoriraj če smo že v procesu odjave
-
-Dodaj zastavico, ki prepreči da `onAuthStateChange` ponovno nastavi uporabnika med odjavo:
-
-```typescript
-const [isSigningOut, setIsSigningOut] = useState(false);
-
-// V onAuthStateChange:
-const { data: { subscription } } = supabase.auth.onAuthStateChange(
-  (event, session) => {
-    // Ignoriraj vse dogodke med odjavo
-    if (isSigningOut) {
-      console.log('AdminAuthContext: Ignoring event during signout:', event);
-      return;
+  const handleClick = () => {
+    // Označi kot prebrano
+    if (!notification.is_read) {
+      onMarkAsRead(notification.id);
     }
-    // ... ostala logika
-  }
-);
+    // Zapri popover
+    onClose?.();
+    // Preusmeri na Moji dokumenti
+    navigate('/profile?expandSection=myDocuments');
+  };
 
-// V signOut:
-const signOut = async () => {
-  setIsSigningOut(true);
-  localStorage.removeItem('sb-ecmtctwovkheohqwahvt-auth-token');
-  // ...
-};
+  return (
+    <div onClick={handleClick}>
+      {/* ... vsebina obvestila ... */}
+      <p>Logopedsko poročilo je bilo naloženo</p>
+    </div>
+  );
+}
+```
+
+### 3. MyDocumentsSection.tsx - Označi vsa obvestila kot prebrana
+
+Ko uporabnik odpre zavihek "Moji dokumenti", označi vsa obvestila kot prebrana:
+
+```typescript
+import { useUserNotifications } from '@/hooks/useUserNotifications';
+
+export function MyDocumentsSection() {
+  const { markAllAsRead } = useUserNotifications();
+
+  // Ko se komponenta prikaže, označi vsa obvestila kot prebrana
+  useEffect(() => {
+    markAllAsRead();
+  }, [markAllAsRead]);
+  
+  // ... ostala koda
+}
+```
+
+### 4. Izboljšaj izgled obvestila
+
+Besedilo obvestila naj bo bolj jasno:
+
+```text
+┌─────────────────────────────────────────────────────┐
+│  🟠  📄  Logopedsko poročilo naloženo               │
+│           Za otroka: Žak                            │
+│           pred 2 h                                  │
+│                                          [Odpri →] │
+└─────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## Datoteke za spremembo
 
-| Datoteka | Sprememba |
-|----------|-----------|
-| `src/contexts/AdminAuthContext.tsx` | 1. Premakni `localStorage.removeItem()` pred `supabase.auth.signOut()` 2. Dodaj `isSigningOut` zastavico za preprečevanje ponovne prijave |
-| `src/components/admin/AdminSidebar.tsx` | Počisti tudi `sessionStorage` pred preusmeritvijo |
-| `src/components/admin/AdminMobileNav.tsx` | Enako kot AdminSidebar |
+| Datoteka | Akcija | Opis |
+|----------|--------|------|
+| `src/components/header/DesktopNavigation.tsx` | Posodobi | Dodaj `UserNotificationBell` levo od `UserProfile` |
+| `src/components/header/UserNotificationBell.tsx` | Posodobi | Spremeni klik na navigacijo namesto prenosa, izboljšaj besedilo |
+| `src/components/profile/MyDocumentsSection.tsx` | Posodobi | Dodaj `useEffect` za označitev vseh obvestil kot prebrana |
 
 ---
 
-## Diagram toka (popravljeno)
+## Tok uporabnika (po popravku)
 
 ```text
-┌─────────────────────────────────────────────────────────────────────────┐
-│  SCENARIJ: Odjava iz admin portala                                      │
-├─────────────────────────────────────────────────────────────────────────┤
-│  1. Uporabnik klikne "Odjava"                                           │
-│  2. handleSignOut() nastavi isSigningOut = true                         │
-│  3. localStorage.removeItem() TAKOJ počisti žeton                       │
-│  4. supabase.auth.signOut() poskusi počistiti sejo na strežniku         │
-│  5. onAuthStateChange prejme SIGNED_OUT - ignorira zaradi zastavice     │
-│  6. Počisti lokalno stanje (user, session, profile)                     │
-│  7. sessionStorage.removeItem('splashShown')                            │
-│  8. window.location.href = '/admin/login' - trda preusmeritev           │
-│  9. Nova seja - uporabnik je popolnoma odjavljen                        │
-└─────────────────────────────────────────────────────────────────────────┘
+1. Uporabnik prejme novo poročilo logopeda
+   ↓
+2. Zvonček v headerju prikaže število (npr. "1")
+   ↓
+3. Uporabnik klikne na zvonček → odpre se popover
+   ↓
+4. V popover-ju vidi: "Logopedsko poročilo naloženo - Za otroka: Žak"
+   ↓
+5. Klikne na obvestilo → preusmeri na /profile?expandSection=myDocuments
+   ↓
+6. Zavihek "Moji dokumenti" se odpre
+   ↓
+7. Ob odprtju zavihka se vsa obvestila označijo kot prebrana
+   ↓
+8. Število na zvončku izgine
 ```
 
 ---
 
 ## Pričakovani rezultat
 
-Po popravku:
-1. Odjava iz admin portala bo vedno uspela
-2. LocalStorage žeton bo počiščen takoj na začetku
-3. `onAuthStateChange` ne bo znova nastavil uporabnika med odjavo
-4. Trda preusmeritev bo zagotovila čisto stanje brskalnika
-5. Admin in uporabniški portal ne bosta več vmešana
-
----
-
-## Tehnični povzetek
-
-- **Vzrok**: Deljen Supabase klient = deljena seja v localStorage
-- **Simptom**: Odjava ne deluje ker se uporabnik takoj znova prijavi
-- **Rešitev**: Počisti localStorage takoj, uporabi zastavico za ignoriranje dogodkov, trda preusmeritev
+- Zvonček je viden na **namizju IN mobilni napravi**
+- Obvestilo prikaže jasno sporočilo "Logopedsko poročilo naloženo"
+- Klik na obvestilo preusmeri na zavihek "Moji dokumenti"
+- Ob odprtju zavihka se obvestila **samodejno označijo kot prebrana**
+- Število na zvončku izgine, ko uporabnik pregleda dokumente
