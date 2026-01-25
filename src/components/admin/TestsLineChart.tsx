@@ -16,10 +16,10 @@ export function TestsLineChart() {
   const { testsData, isLoading } = useAdminChartData();
   
   const [lines, setLines] = useState<LineConfig[]>([
-    { key: 'new', name: 'Nova preverjanja', color: 'hsl(var(--app-blue))', enabled: true },
+    { key: 'new', name: 'Vsa preverjanja', color: 'hsl(var(--app-blue))', enabled: true },
     { key: 'pending', name: 'V čakanju', color: 'hsl(var(--app-orange))', enabled: true },
     { key: 'reviewed', name: 'Pregledano', color: 'hsl(280, 70%, 50%)', enabled: false },
-    { key: 'completed', name: 'Zaključeno', color: 'hsl(var(--dragon-green))', enabled: false },
+    { key: 'completed', name: 'Vsi zaključeni pregledi', color: 'hsl(var(--dragon-green))', enabled: false },
   ]);
 
   const toggleLine = (key: string) => {
