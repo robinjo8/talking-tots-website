@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
 import { User, Baby, Calendar, Eye, ChevronDown, ChevronUp, ClipboardList, Pencil, Clock, CheckCircle, FileCheck } from 'lucide-react';
@@ -15,6 +15,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { StatCard } from '@/components/admin/StatCard';
+import { TestFilters } from '@/components/admin/TestFilters';
 import { useMyReviews, MyReviewSession } from '@/hooks/useMyReviews';
 
 function formatParentName(session: MyReviewSession): string {
@@ -156,8 +157,23 @@ function ReviewCard({
 
 export default function AdminMyReviews() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { data: sessions, isLoading, error } = useMyReviews();
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  
+  // Filter states - initialize from URL params
+  const [ageFilter, setAgeFilter] = useState('all');
+  const [genderFilter, setGenderFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState(() => searchParams.get('status') || 'all');
+  const [dateFilter, setDateFilter] = useState('all');
+  
+  // Update status filter when URL changes
+  useEffect(() => {
+    const urlStatus = searchParams.get('status');
+    if (urlStatus) {
+      setStatusFilter(urlStatus);
+    }
+  }, [searchParams]);
 
   const handleNavigate = (sessionId: string) => {
     navigate(`/admin/tests/${sessionId}`);
@@ -183,17 +199,84 @@ export default function AdminMyReviews() {
     );
   }
 
-  const myReviews = sessions || [];
+  const myReviews = useMemo(() => {
+    if (!sessions) return [];
+    
+    return sessions.filter(session => {
+      // Age filter
+      if (ageFilter !== 'all') {
+        if (ageFilter === '7+') {
+          if (!session.child_age || session.child_age < 7) return false;
+        } else {
+          if (session.child_age !== Number(ageFilter)) return false;
+        }
+      }
+      
+      // Gender filter
+      if (genderFilter !== 'all') {
+        const gender = session.child_gender?.toLowerCase();
+        if (genderFilter === 'm' && !['m', 'male', 'moški'].includes(gender || '')) return false;
+        if (genderFilter === 'f' && !['f', 'female', 'ženski', 'ž', 'z'].includes(gender || '')) return false;
+      }
+      
+      // Status filter
+      if (statusFilter !== 'all') {
+        if (statusFilter === 'in_review') {
+          // V obdelavi = no reviewed_at and no completed_at
+          if (session.reviewed_at || session.completed_at || session.status === 'completed') return false;
+        } else if (statusFilter === 'reviewed') {
+          // Pregledano = has reviewed_at OR status completed, but no completed_at
+          if ((!session.reviewed_at && session.status !== 'completed') || session.completed_at) return false;
+        } else if (statusFilter === 'completed') {
+          // Zaključeno = has completed_at
+          if (!session.completed_at) return false;
+        }
+      }
+      
+      // Date filter
+      if (dateFilter !== 'all' && session.assigned_at) {
+        const assignedDate = new Date(session.assigned_at);
+        const now = new Date();
+        
+        switch (dateFilter) {
+          case 'today':
+            if (assignedDate.toDateString() !== now.toDateString()) return false;
+            break;
+          case 'week':
+            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            if (assignedDate < weekAgo) return false;
+            break;
+          case 'month':
+            const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+            if (assignedDate < monthAgo) return false;
+            break;
+          case 'year':
+            const yearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+            if (assignedDate < yearAgo) return false;
+            break;
+        }
+      }
+      
+      return true;
+    });
+  }, [sessions, ageFilter, genderFilter, statusFilter, dateFilter]);
   
-  // Calculate stats from data
-  const totalMyReviews = myReviews.length;
-  const inReviewCount = myReviews.filter(s => 
+  // Calculate stats from data (using unfiltered sessions)
+  const totalMyReviews = sessions?.length || 0;
+  const inReviewCount = sessions?.filter(s => 
     !s.reviewed_at && s.status !== 'completed' && !s.completed_at
-  ).length;
-  const reviewedCount = myReviews.filter(s => 
+  ).length || 0;
+  const reviewedCount = sessions?.filter(s => 
     (s.reviewed_at || s.status === 'completed') && !s.completed_at
-  ).length;
-  const completedCount = myReviews.filter(s => !!s.completed_at).length;
+  ).length || 0;
+  const completedCount = sessions?.filter(s => !!s.completed_at).length || 0;
+  
+  const myReviewsStatusOptions = [
+    { value: 'all', label: 'Vsi statusi' },
+    { value: 'in_review', label: 'V obdelavi' },
+    { value: 'reviewed', label: 'Pregledano' },
+    { value: 'completed', label: 'Zaključeno' },
+  ];
 
   return (
     <div className="space-y-6">
@@ -236,6 +319,23 @@ export default function AdminMyReviews() {
           color="green"
         />
       </div>
+
+      {/* Filters */}
+      <TestFilters
+        ageFilter={ageFilter}
+        setAgeFilter={setAgeFilter}
+        showAgeFilter={true}
+        genderFilter={genderFilter}
+        setGenderFilter={setGenderFilter}
+        showGenderFilter={true}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        showStatusFilter={true}
+        statusOptions={myReviewsStatusOptions}
+        dateFilter={dateFilter}
+        setDateFilter={setDateFilter}
+        showDateFilter={true}
+      />
 
       {myReviews.length === 0 ? (
         <Card>

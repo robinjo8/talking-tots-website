@@ -17,6 +17,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Search, Users, Baby, Eye, Loader2, ChevronDown, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { TestFilters } from '@/components/admin/TestFilters';
 
 interface DisplayRow {
   parent: ParentWithChildren;
@@ -131,6 +132,10 @@ export default function AdminUsers() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<ParentWithChildren | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  
+  // Filter states
+  const [ageFilter, setAgeFilter] = useState('all');
+  const [genderFilter, setGenderFilter] = useState('all');
 
   const toggleCard = (cardId: string) => {
     setExpandedCardId(prev => prev === cardId ? null : cardId);
@@ -218,18 +223,38 @@ export default function AdminUsers() {
     return rows;
   }, [users]);
 
-  // Filter based on search
+  // Filter based on search and filters
   const filteredRows = useMemo(() => {
-    if (!searchQuery) return flatRows;
-    const searchLower = searchQuery.toLowerCase();
     return flatRows.filter(row => {
-      const emailMatch = row.parent.email?.toLowerCase().includes(searchLower);
-      const nameMatch = row.parent.first_name?.toLowerCase().includes(searchLower) || 
-                        row.parent.last_name?.toLowerCase().includes(searchLower);
-      const childMatch = row.child?.name.toLowerCase().includes(searchLower);
-      return emailMatch || nameMatch || childMatch;
+      // Search filter
+      if (searchQuery) {
+        const searchLower = searchQuery.toLowerCase();
+        const emailMatch = row.parent.email?.toLowerCase().includes(searchLower);
+        const nameMatch = row.parent.first_name?.toLowerCase().includes(searchLower) || 
+                          row.parent.last_name?.toLowerCase().includes(searchLower);
+        const childMatch = row.child?.name.toLowerCase().includes(searchLower);
+        if (!emailMatch && !nameMatch && !childMatch) return false;
+      }
+      
+      // Age filter
+      if (ageFilter !== 'all' && row.child) {
+        if (ageFilter === '7+') {
+          if (!row.child.age || row.child.age < 7) return false;
+        } else {
+          if (row.child.age !== Number(ageFilter)) return false;
+        }
+      }
+      
+      // Gender filter
+      if (genderFilter !== 'all' && row.child) {
+        const gender = row.child.gender?.toLowerCase();
+        if (genderFilter === 'm' && !['m', 'male', 'moški'].includes(gender || '')) return false;
+        if (genderFilter === 'f' && !['f', 'female', 'ženski', 'ž', 'z'].includes(gender || '')) return false;
+      }
+      
+      return true;
     });
-  }, [flatRows, searchQuery]);
+  }, [flatRows, searchQuery, ageFilter, genderFilter]);
 
   // Stats calculations
   const stats = useMemo(() => {
@@ -315,8 +340,8 @@ export default function AdminUsers() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Search */}
-          <div className="flex items-center gap-4 mb-6">
+          {/* Filters */}
+          <div className="mb-6 space-y-4">
             <div className="relative flex-1 md:max-w-sm">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -326,6 +351,14 @@ export default function AdminUsers() {
                 className="pl-10"
               />
             </div>
+            <TestFilters
+              ageFilter={ageFilter}
+              setAgeFilter={setAgeFilter}
+              showAgeFilter={true}
+              genderFilter={genderFilter}
+              setGenderFilter={setGenderFilter}
+              showGenderFilter={true}
+            />
           </div>
 
           {/* Loading State */}

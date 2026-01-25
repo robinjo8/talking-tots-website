@@ -44,7 +44,7 @@ export default function AdminDashboard() {
           </h2>
           <div className="grid grid-cols-2 gap-4">
             <StatCard
-              title="Vsa preverjanja"
+              title="Preverjanja"
               value={stats.orgTotalTests}
               description="Skupno število opravljenih preverjanj"
               icon={ClipboardList}
@@ -57,7 +57,7 @@ export default function AdminDashboard() {
               description="Pregledi, ki čakajo na prevzem"
               icon={Clock}
               color="orange"
-              onClick={() => navigate('/admin/tests?status=pending')}
+              onClick={() => navigate('/admin/pending')}
             />
             <StatCard
               title="Pregledano"
@@ -99,7 +99,7 @@ export default function AdminDashboard() {
               description="Primeri, ki jih aktivno pregledujete"
               icon={Clock}
               color="orange"
-              onClick={() => navigate('/admin/my-reviews')}
+              onClick={() => navigate('/admin/my-reviews?status=in_review')}
             />
             <StatCard
               title="Pregledano"
@@ -107,7 +107,7 @@ export default function AdminDashboard() {
               description="Primeri z oddanimi ocenami"
               icon={Eye}
               color="purple"
-              onClick={() => navigate('/admin/my-reviews')}
+              onClick={() => navigate('/admin/my-reviews?status=reviewed')}
             />
             <StatCard
               title="Zaključeno"
@@ -115,7 +115,7 @@ export default function AdminDashboard() {
               description="Primeri z generiranim poročilom"
               icon={FileCheck}
               color="green"
-              onClick={() => navigate('/admin/my-reviews')}
+              onClick={() => navigate('/admin/my-reviews?status=completed')}
             />
           </div>
           <StatusPieChart />
