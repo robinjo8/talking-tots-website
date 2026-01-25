@@ -1,6 +1,7 @@
 import { User, Users, CircleDollarSign, CreditCard, Shield, FileText, ClipboardCheck, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
+import { useUserNotifications } from "@/hooks/useUserNotifications";
 
 type ProfileSidebarProps = {
   activeSection: string;
@@ -20,6 +21,7 @@ const menuItems = [
 
 export function ProfileSidebar({ activeSection, setActiveSection, childrenCount }: ProfileSidebarProps) {
   const { isPro } = useSubscriptionContext();
+  const { unreadCount } = useUserNotifications();
   return (
     <div className="bg-white rounded-lg shadow-sm border border-dragon-green/20 overflow-hidden sticky top-28">
       {/* Header */}
@@ -49,10 +51,15 @@ export function ProfileSidebar({ activeSection, setActiveSection, childrenCount 
               )}
             >
               <Icon className={cn("h-5 w-5 shrink-0", isLocked && "text-gray-300")} />
-              <div className="flex flex-col">
-                <span className="font-medium">
+              <div className="flex flex-col flex-1">
+                <span className="font-medium flex items-center gap-2">
                   {item.label}
                   {item.showCount && ` (${childrenCount})`}
+                  {item.id === 'myDocuments' && unreadCount > 0 && (
+                    <span className="h-5 min-w-5 px-1.5 rounded-full bg-app-orange text-[10px] font-medium text-white flex items-center justify-center">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
                 </span>
                 {isLocked && (
                   <span className="text-xs text-gray-400 flex items-center gap-1">
