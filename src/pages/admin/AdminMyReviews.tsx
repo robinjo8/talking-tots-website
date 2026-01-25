@@ -42,24 +42,39 @@ function formatDate(date: string | null): string {
   return format(new Date(date), 'd. MMM yyyy', { locale: sl });
 }
 
-function StatusBadge({ status }: { status: MyReviewSession['status'] }) {
-  switch (status) {
-    case 'in_review':
-    case 'assigned':
-      return (
-        <Badge className="bg-app-blue/10 text-app-blue border-app-blue/20">
-          V pregledu
-        </Badge>
-      );
-    case 'completed':
-      return (
-        <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">
-          Zaključen
-        </Badge>
-      );
-    default:
-      return <Badge variant="secondary">{status}</Badge>;
+function StatusBadge({ 
+  status, 
+  reviewedAt, 
+  completedAt 
+}: { 
+  status: MyReviewSession['status'];
+  reviewedAt?: string | null;
+  completedAt?: string | null;
+}) {
+  // Zaključeno = poročilo generirano (completed_at nastavljen)
+  if (completedAt) {
+    return (
+      <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">
+        Zaključeno
+      </Badge>
+    );
   }
+  
+  // Pregledano = ocene oddane, brez poročila (reviewed_at nastavljen ALI status = completed)
+  if (reviewedAt || status === 'completed') {
+    return (
+      <Badge className="bg-purple-100 text-purple-700 border-purple-200">
+        Pregledano
+      </Badge>
+    );
+  }
+  
+  // V obdelavi = assigned ali in_review
+  return (
+    <Badge className="bg-app-blue/10 text-app-blue border-app-blue/20">
+      V obdelavi
+    </Badge>
+  );
 }
 
 // Mobile card component
@@ -82,7 +97,11 @@ function ReviewCard({
             <div className="flex items-center gap-2 mb-1">
               <Baby className="h-4 w-4 text-muted-foreground" />
               <span className="font-medium">{session.child_name}</span>
-              <StatusBadge status={session.status} />
+              <StatusBadge 
+                status={session.status} 
+                reviewedAt={session.reviewed_at}
+                completedAt={session.completed_at}
+              />
             </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <User className="h-3 w-3" />
@@ -235,7 +254,11 @@ export default function AdminMyReviews() {
                         </TableCell>
                         <TableCell>{formatGender(session.child_gender)}</TableCell>
                         <TableCell>
-                          <StatusBadge status={session.status} />
+                        <StatusBadge 
+                          status={session.status} 
+                          reviewedAt={session.reviewed_at}
+                          completedAt={session.completed_at}
+                        />
                         </TableCell>
                         <TableCell>{formatDate(session.assigned_at)}</TableCell>
                         <TableCell className="text-right">

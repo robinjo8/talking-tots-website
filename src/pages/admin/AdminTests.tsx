@@ -25,30 +25,48 @@ import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
 
 // Status badge component
-const StatusBadge = ({ status }: { status: TestSessionData['status'] }) => {
-  switch (status) {
-    case 'pending':
-      return (
-        <Badge variant="outline" className="border-amber-500 text-amber-700 bg-amber-50 dark:bg-amber-950 dark:text-amber-300">
-          V čakanju
-        </Badge>
-      );
-    case 'assigned':
-    case 'in_review':
-      return (
-        <Badge variant="outline" className="border-blue-500 text-blue-700 bg-blue-50 dark:bg-blue-950 dark:text-blue-300">
-          V obdelavi
-        </Badge>
-      );
-    case 'completed':
-      return (
-        <Badge variant="outline" className="border-emerald-500 text-emerald-700 bg-emerald-50 dark:bg-emerald-950 dark:text-emerald-300">
-          Zaključeno
-        </Badge>
-      );
-    default:
-      return <Badge variant="secondary">Neznano</Badge>;
+const StatusBadge = ({ 
+  status, 
+  reviewedAt, 
+  completedAt 
+}: { 
+  status: TestSessionData['status'];
+  reviewedAt?: string | null;
+  completedAt?: string | null;
+}) => {
+  // V čakanju
+  if (status === 'pending') {
+    return (
+      <Badge variant="outline" className="border-amber-500 text-amber-700 bg-amber-50 dark:bg-amber-950 dark:text-amber-300">
+        V čakanju
+      </Badge>
+    );
   }
+  
+  // Zaključeno = poročilo generirano (completed_at nastavljen)
+  if (completedAt) {
+    return (
+      <Badge variant="outline" className="border-emerald-500 text-emerald-700 bg-emerald-50 dark:bg-emerald-950 dark:text-emerald-300">
+        Zaključeno
+      </Badge>
+    );
+  }
+  
+  // Pregledano = ocene oddane, brez poročila (reviewed_at nastavljen ALI status = completed)
+  if (reviewedAt || status === 'completed') {
+    return (
+      <Badge variant="outline" className="border-purple-500 text-purple-700 bg-purple-50 dark:bg-purple-950 dark:text-purple-300">
+        Pregledano
+      </Badge>
+    );
+  }
+  
+  // V obdelavi = assigned ali in_review
+  return (
+    <Badge variant="outline" className="border-blue-500 text-blue-700 bg-blue-50 dark:bg-blue-950 dark:text-blue-300">
+      V obdelavi
+    </Badge>
+  );
 };
 
 // Mobile card component for test display with accordion behavior
@@ -86,7 +104,7 @@ const TestCard = ({
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <StatusBadge status={session.status} />
+          <StatusBadge status={session.status} reviewedAt={session.reviewed_at} completedAt={session.completed_at} />
           <ChevronDown 
             className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${
               isExpanded ? 'rotate-180' : ''
@@ -200,6 +218,12 @@ export default function AdminTests() {
       if (statusFilter !== 'all') {
         if (statusFilter === 'in_review') {
           if (!['assigned', 'in_review'].includes(session.status)) return false;
+        } else if (statusFilter === 'reviewed') {
+          // Pregledano = completed status BREZ completed_at
+          if (session.status !== 'completed' || session.completed_at) return false;
+        } else if (statusFilter === 'completed') {
+          // Zaključeno = ima completed_at
+          if (!session.completed_at) return false;
         } else {
           if (session.status !== statusFilter) return false;
         }
@@ -383,6 +407,7 @@ export default function AdminTests() {
                 <SelectItem value="all">Vsi statusi</SelectItem>
                 <SelectItem value="pending">V čakanju</SelectItem>
                 <SelectItem value="in_review">V obdelavi</SelectItem>
+                <SelectItem value="reviewed">Pregledano</SelectItem>
                 <SelectItem value="completed">Zaključeno</SelectItem>
               </SelectContent>
             </Select>
@@ -471,7 +496,7 @@ export default function AdminTests() {
                             )}
                           </TableCell>
                           <TableCell>
-                            <StatusBadge status={session.status} />
+                            <StatusBadge status={session.status} reviewedAt={session.reviewed_at} completedAt={session.completed_at} />
                           </TableCell>
                           <TableCell>
                             {formatDate(session.submitted_at)}
