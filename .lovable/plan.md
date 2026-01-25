@@ -1,70 +1,112 @@
 
-# Načrt: Popravek napake pri generiranju poročila in nalaganju podatkov
 
-## Ugotovitve
+# Načrt: Poenostavitev statusov poročil
 
-### Problem 1: Napaka pri vstavljanju v bazo
-**Napaka:** `"invalid input syntax for type uuid: """`
+## Pregled sprememb
 
-**Vzrok:** V funkciji `handleGeneratePdf` (vrstica 383) se pošilja:
-```typescript
-session_id: sessionId || ''
-```
-Ko `sessionId` ni na voljo, se pošlje prazen string `''`, kar ni veljaven UUID. PostgreSQL zavrne prazen string kot UUID.
+### Nova logika statusov
 
-### Problem 2: Podatki se ne naložijo pri popravljanju
-**Vzrok:** Ker vstavljanje v bazo ne uspe (zaradi napake #1), se zapis nikoli ne ustvari. Ko nato uporabnik klikne "Popravi", funkcija `handleEditGeneratedReport` išče poročilo v bazi po `pdf_url`, vendar ga ne najde, ker ni bil nikoli ustvarjen.
+| Status | Slovensko ime | Pomen |
+|--------|---------------|-------|
+| `submitted` | **Oddano** | Končno, aktivno poročilo, ki je vidno staršem |
+| `revised` | **Popravljena** | Prejšnja verzija poročila, ki je bila nadomeščena z novo |
+
+> Status `draft` (Osnutek) se odstrani iz uporabe - vsa generirana poročila bodo takoj označena kot "Oddano".
 
 ---
 
-## Rešitev
+## Diagram toka dela
 
-### 1. Sprememba sheme baze - session_id mora biti nullable
+```text
+┌─────────────────────────────────────────────────────────────────────────┐
+│  SCENARIJ 1: Novo poročilo                                              │
+├─────────────────────────────────────────────────────────────────────────┤
+│  1. Logoped napiše poročilo                                             │
+│  2. Klikne "Generiraj"                                                  │
+│  3. Ustvari se PDF + zapis v bazi s status = 'submitted' (Oddano)       │
+│  4. Poročilo je takoj vidno staršem                                     │
+└─────────────────────────────────────────────────────────────────────────┘
 
-Ustvariti SQL migracijo, ki spremeni stolpec `session_id` iz obveznega v opcijskega (nullable):
-
-```sql
--- Spremeni session_id da dovoli NULL vrednosti
-ALTER TABLE public.logopedist_reports 
-ALTER COLUMN session_id DROP NOT NULL;
+┌─────────────────────────────────────────────────────────────────────────┐
+│  SCENARIJ 2: Popravljanje obstoječega poročila                          │
+├─────────────────────────────────────────────────────────────────────────┤
+│  1. Logoped klikne "Popravi" na obstoječem poročilu (Oddano)            │
+│  2. Podatki se naložijo v urejevalnik                                   │
+│  3. Logoped naredi popravke                                             │
+│  4. Klikne "Generiraj"                                                  │
+│  5. STARO poročilo dobi status = 'revised' (Popravljena)                │
+│  6. NOVO poročilo dobi status = 'submitted' (Oddano)                    │
+│  7. Starš vidi le novo poročilo                                         │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
-### 2. Popravek kode v AdminUserDetail.tsx
+---
 
-Spremeniti vrstico 383 iz:
+## Tehnične spremembe
+
+### 1. AdminUserDetail.tsx - handleGeneratePdf
+
+**Trenutna koda (vrstica 393):**
 ```typescript
-session_id: sessionId || '',
+status: editingReportName ? 'revised' as const : 'draft' as const,
 ```
 
-Na:
+**Nova koda:**
 ```typescript
-session_id: sessionId || null,
-```
-
-S tem se pošlje `null` namesto praznega stringa, kar je veljavna vrednost za nullable UUID polje.
-
-Prav tako je potrebno popraviti logiko pridobivanja `session_id`. Trenutna koda (vrstice 364-376) ni pravilna - pogoj `reportData.selectedSessionId` ne deluje pravilno.
-
-**Popravljena logika za pridobivanje session_id:**
-```typescript
-// Find session ID - use selected session or find first session for child
-let sessionId: string | null = null;
-if (reportData.selectedSessionId) {
-  sessionId = reportData.selectedSessionId;
-} else if (recordings.length > 0) {
-  // Try to find any session for this child
-  const { data: sessionData } = await supabase
-    .from('articulation_test_sessions')
-    .select('id')
-    .eq('child_id', childId)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .single();
+// Če popravljamo obstoječe poročilo, najprej posodobimo staro na 'revised'
+if (editingReportName) {
+  const { error: updateError } = await supabase
+    .from('logopedist_reports')
+    .update({ status: 'revised' })
+    .ilike('pdf_url', `%${editingReportName.replace('.pdf', '')}%`);
   
-  if (sessionData) {
-    sessionId = sessionData.id;
+  if (updateError) {
+    console.error('Error updating old report status:', updateError);
   }
 }
+
+// Novo poročilo vedno dobi status 'submitted'
+const { error: insertError } = await supabase
+  .from('logopedist_reports')
+  .insert({
+    // ... ostala polja ...
+    status: 'submitted' as const,
+  });
+```
+
+### 2. AdminReports.tsx - Posodobitev oznak statusov
+
+**Sprememba v reportStatusOptions (vrstice 43-48):**
+```typescript
+const reportStatusOptions = [
+  { value: 'all', label: 'Vsi statusi' },
+  { value: 'submitted', label: 'Oddano' },
+  { value: 'revised', label: 'Popravljena' },
+];
+```
+
+**Sprememba v getStatusBadge (vrstice 154-165):**
+```typescript
+const getStatusBadge = (status: string) => {
+  switch (status) {
+    case 'revised':
+      return <Badge variant="outline" className="text-orange-600 border-orange-300">Popravljena</Badge>;
+    case 'submitted':
+      return <Badge className="bg-green-600">Oddano</Badge>;
+    default:
+      // Za morebitne stare 'draft' zapise prikaži kot "Oddano"
+      return <Badge className="bg-green-600">Oddano</Badge>;
+  }
+};
+```
+
+### 3. Migracija obstoječih podatkov (opcijsko)
+
+SQL za pretvorbo obstoječih `draft` zapisov v `submitted`:
+```sql
+UPDATE public.logopedist_reports 
+SET status = 'submitted' 
+WHERE status = 'draft';
 ```
 
 ---
@@ -73,43 +115,32 @@ if (reportData.selectedSessionId) {
 
 | Datoteka | Akcija | Opis |
 |----------|--------|------|
-| Nova SQL migracija | Ustvari | `ALTER TABLE ... DROP NOT NULL` za session_id |
-| `src/pages/admin/AdminUserDetail.tsx` | Posodobi | 1) Popravek `sessionId || null` namesto `sessionId || ''`, 2) Popravek logike za pridobivanje session_id |
+| `src/pages/admin/AdminUserDetail.tsx` | Posodobi | 1) Pred vstavljanjem novega poročila posodobi staro na 'revised', 2) Nova poročila vedno dobijo status 'submitted' |
+| `src/pages/admin/AdminReports.tsx` | Posodobi | 1) Odstrani 'draft' iz filtrov, 2) Spremeni oznako iz "Revidirano" v "Popravljena", 3) Posodobi barve značk |
+| Nova SQL migracija | Ustvari | Pretvori obstoječe 'draft' zapise v 'submitted' |
 
 ---
 
-## Diagram toka popravka
+## Vizualni prikaz sprememb
 
-```text
-PREJ (napaka):
-┌─────────────────────────────────────────────────────────────┐
-│  1. Generiraj PDF                                           │
-│  2. Upload v Storage ✓                                      │
-│  3. INSERT v bazo:                                          │
-│     session_id = '' (prazen string)                         │
-│     → NAPAKA: "invalid input syntax for type uuid"          │
-│  4. Zapis NI ustvarjen                                      │
-│  5. Popravi → išče v bazi → NE NAJDE → prazna polja        │
-└─────────────────────────────────────────────────────────────┘
+### Značke statusov (pred/po)
 
-POTEM (popravek):
-┌─────────────────────────────────────────────────────────────┐
-│  1. Generiraj PDF                                           │
-│  2. Upload v Storage ✓                                      │
-│  3. INSERT v bazo:                                          │
-│     session_id = null (veljavna vrednost)                   │
-│     → USPEH ✓                                               │
-│  4. Zapis JE ustvarjen                                      │
-│  5. Popravi → išče v bazi → NAJDE → naloži podatke ✓       │
-└─────────────────────────────────────────────────────────────┘
-```
+**PREJ:**
+- Osnutek: siva značka
+- Revidirano: obroba
+- Oddano: primarna barva
+
+**POTEM:**
+- Popravljena: oranžna obroba (za stare verzije)
+- Oddano: zelena značka (za aktivna poročila)
 
 ---
 
 ## Pričakovani rezultat
 
 Po implementaciji:
-1. PDF generiranje bo uspešno ustvarilo zapis v tabeli `logopedist_reports`
-2. Poročila bodo vidna na strani `/admin/reports`
-3. Klik na "Popravi" bo uspešno naložil vse podatke (anamneza, ugotovitve, predlog za vaje, opombe) v urejevalnik
-4. Popravljeno poročilo se bo shranilo z ustreznim statusom "revised"
+1. Vsako generirano poročilo (novo ali popravljeno) bo takoj označeno kot "Oddano"
+2. Ko logoped popravi poročilo, se stara verzija označi kot "Popravljena"
+3. Starši vidijo le poročila s statusom "Oddano" (aktivna poročila)
+4. Logopedi lahko v arhivu vidijo tudi "Popravljena" poročila za zgodovino
+
