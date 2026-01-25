@@ -1,296 +1,221 @@
 
-# Plan: Posodobitev strani /admin/my-reviews in /admin/all-tests
 
-## Povzetek sprememb
+# Načrt: Izboljšave pregleda sej in prikaz ocen na strani uporabnika
 
-### 1. Stran /admin/my-reviews
-- **Zaključeni pregledi morajo ostati vidni** - Spremeniti hook `useMyReviews.ts` da vključuje tudi status `completed`
-- **Gumb "Popravi"** mora biti vedno prikazan (ne samo za completed), levo od "Ogled"
+## Povzetek ugotovitev in predlaganih sprememb
 
-### 2. Stran /admin/all-tests (Vsa preverjanja)
-- **Odstraniti gumb "Popravi"** (Pencil) - samo read-only pregled
-- **Gumb "Ogled"** - dodati napis "Ogled" poleg ikone Eye
-- **Filtriranje** - dodati filtre za: Starost, Spol, Status, Oddano
-- **Paginacija** - 10 zapisov na stran, z možnostjo izbire 10/20/50/100
+### 1. Popravek sporočila na strani /admin/tests/:sessionId
+
+**Trenutno stanje:**
+```
+Ta pregled je zaključen. Za urejanje uporabite gumb "Popravi".
+```
+
+**Novo sporočilo:** Vključevalo bo:
+- Datum zaključka (iz `session.completed_at` ali iz statusa)
+- Ime logopeda (iz `assigned_to` → `logopedist_profiles`)
+- Organizacijo logopeda
+
+Primer: *"Ta pregled je bil zaključen 25. 1. 2026 s strani logopeda Robert Kujavec (TomiTalk logoped). Za urejanje uporabite gumb "Popravi"."*
 
 ---
 
-## Datoteke za posodobitev
+### 2. Gumb "Popravi" na strani /admin/tests/:sessionId
 
-### 1. `src/hooks/useMyReviews.ts`
+Gumb bo dodan levo od "Shrani vse ocene" v glavi pregleda.
 
-Sprememba v vrstici 34:
-```typescript
-// PRED:
-.in('status', ['assigned', 'in_review'])
+**Obnašanje glede na vlogo:**
 
-// PO:
-.in('status', ['assigned', 'in_review', 'completed'])
-```
+| Scenarij | Rezultat |
+|----------|----------|
+| Logoped, ki je dodeljen temu pregledu | Lahko ureja vse ocene |
+| Logoped iz **iste organizacije**, ki NI dodeljen | Lahko "prevzame" primer in nato ureja |
+| Logoped iz **druge organizacije** | Ne vidi tega pregleda (RLS ga blokira) |
 
-### 2. `src/pages/admin/AdminMyReviews.tsx`
+**Predlog: Funkcija "Prevzemi primer"**
 
-Spremembe:
-- Preurediti gumbe: "Popravi" levo, "Ogled" desno
-- "Popravi" gumb prikazan vedno (ne samo za completed)
-
-```tsx
-// Desktop tabela - vrstica ~243:
-<div className="flex items-center justify-end gap-2">
-  <Button size="sm" variant="outline" onClick={() => handleNavigate(session.id + '?edit=true')}>
-    <Pencil className="h-4 w-4 mr-1" />
-    Popravi
-  </Button>
-  <Button size="sm" variant="outline" onClick={() => handleNavigate(session.id)}>
-    <Eye className="h-4 w-4 mr-1" />
-    Ogled
-  </Button>
-</div>
-```
-
-### 3. `src/pages/admin/AdminTests.tsx`
-
-Večje spremembe:
-
-**a) Odstranitev gumba "Popravi"** (vrstice 362-371, 129-137)
-
-**b) Dodajanje napisa "Ogled" poleg ikone** (vrstica 360)
-```tsx
-<Button variant="ghost" size="sm">
-  <Eye className="h-4 w-4 mr-1" />
-  Ogled
-</Button>
-```
-
-**c) Dodajanje filtrov** - pod iskalnikom:
-```tsx
-<div className="flex flex-wrap gap-4 mb-4">
-  {/* Filter: Starost */}
-  <Select value={ageFilter} onValueChange={setAgeFilter}>
-    <SelectTrigger className="w-[140px]">
-      <SelectValue placeholder="Starost" />
-    </SelectTrigger>
-    <SelectContent>
-      <SelectItem value="all">Vse starosti</SelectItem>
-      <SelectItem value="3">3 leta</SelectItem>
-      <SelectItem value="4">4 leta</SelectItem>
-      <SelectItem value="5">5 let</SelectItem>
-      <SelectItem value="6">6 let</SelectItem>
-      <SelectItem value="7+">7+ let</SelectItem>
-    </SelectContent>
-  </Select>
-
-  {/* Filter: Spol */}
-  <Select value={genderFilter} onValueChange={setGenderFilter}>
-    <SelectTrigger className="w-[120px]">
-      <SelectValue placeholder="Spol" />
-    </SelectTrigger>
-    <SelectContent>
-      <SelectItem value="all">Vsi</SelectItem>
-      <SelectItem value="m">Moški</SelectItem>
-      <SelectItem value="f">Ženski</SelectItem>
-    </SelectContent>
-  </Select>
-
-  {/* Filter: Status */}
-  <Select value={statusFilter} onValueChange={setStatusFilter}>
-    <SelectTrigger className="w-[140px]">
-      <SelectValue placeholder="Status" />
-    </SelectTrigger>
-    <SelectContent>
-      <SelectItem value="all">Vsi statusi</SelectItem>
-      <SelectItem value="pending">V čakanju</SelectItem>
-      <SelectItem value="in_review">V obdelavi</SelectItem>
-      <SelectItem value="completed">Zaključeno</SelectItem>
-    </SelectContent>
-  </Select>
-
-  {/* Filter: Oddano (datumsko obdobje) */}
-  <Select value={dateFilter} onValueChange={setDateFilter}>
-    <SelectTrigger className="w-[160px]">
-      <SelectValue placeholder="Oddano" />
-    </SelectTrigger>
-    <SelectContent>
-      <SelectItem value="all">Vsi datumi</SelectItem>
-      <SelectItem value="today">Danes</SelectItem>
-      <SelectItem value="week">Zadnji teden</SelectItem>
-      <SelectItem value="month">Zadnji mesec</SelectItem>
-      <SelectItem value="year">Zadnje leto</SelectItem>
-    </SelectContent>
-  </Select>
-</div>
-```
-
-**d) Paginacija** - nova logika in UI:
-
-Novi state:
-```typescript
-const [currentPage, setCurrentPage] = useState(1);
-const [itemsPerPage, setItemsPerPage] = useState(10);
-```
-
-Izračun paginiranih podatkov:
-```typescript
-const paginatedSessions = useMemo(() => {
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  return filteredSessions.slice(startIndex, startIndex + itemsPerPage);
-}, [filteredSessions, currentPage, itemsPerPage]);
-
-const totalPages = Math.ceil(filteredSessions.length / itemsPerPage);
-```
-
-UI za paginacijo pod tabelo:
-```tsx
-<div className="flex items-center justify-between mt-4 px-2">
-  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-    <span>Prikazujem {startIndex + 1}-{Math.min(endIndex, total)} od {total}</span>
-  </div>
-  
-  <div className="flex items-center gap-4">
-    {/* Izbira na stran */}
-    <div className="flex items-center gap-2">
-      <span className="text-sm">Na stran:</span>
-      <Select value={String(itemsPerPage)} onValueChange={(v) => setItemsPerPage(Number(v))}>
-        <SelectTrigger className="w-[70px] h-8">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="10">10</SelectItem>
-          <SelectItem value="20">20</SelectItem>
-          <SelectItem value="50">50</SelectItem>
-          <SelectItem value="100">100</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
-    
-    {/* Navigacija strani */}
-    <div className="flex items-center gap-1">
-      <Button variant="outline" size="sm" disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)}>
-        <ChevronLeft className="h-4 w-4" />
-      </Button>
-      <span className="text-sm px-2">{currentPage} / {totalPages}</span>
-      <Button variant="outline" size="sm" disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)}>
-        <ChevronRight className="h-4 w-4" />
-      </Button>
-    </div>
-  </div>
-</div>
-```
+Ko logoped iz iste organizacije klikne "Popravi" na primeru, ki mu ni dodeljen:
+1. Prikaže se potrditveno okno: *"Ta primer je trenutno dodeljen logopedu [Ime]. Ali želite prevzeti ta primer?"*
+2. Ob potrditvi se `assigned_to` posodobi na novega logopeda
+3. Dodati bi morali polje `reassigned_at` in `reassigned_from` za sledenje
 
 ---
 
-## Vizualna struktura filtriranja na /admin/all-tests
+### 3. Zakaj podatki niso vidni na strani /admin/users/.../...
+
+**Vzrok:** Stran `AdminUserDetail.tsx` trenutno **NE pridobiva ocen** iz tabele `articulation_evaluations`. Prikazuje samo surove posnetke iz Storage-a.
+
+**Rešitev:** Razširiti stran, da:
+1. Pridobi vse `articulation_test_sessions` za tega otroka
+2. Za vsako sejo pridobi ocene iz `articulation_evaluations`
+3. Prikaže povzetek ocen (izbrane možnosti, komentarje, ocene 1-5) poleg posnetkov
+
+---
+
+### 4. Logika statusa: "Zaključen pregled" vs "Končno poročilo"
+
+**Trenutno stanje:**
+- Status `completed` = logoped je poslušal posnetke in ocenil črke
+
+**Predlog za nov status "Poročilo generirano":**
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ [🔍 Išči po imenu starša ali otroka...                               ]      │
+│                        DELOVNI TOK LOGOPEDA                                 │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ [Starost ▼] [Spol ▼] [Status ▼] [Oddano ▼]                                  │
+│                                                                             │
+│  pending → assigned → in_review → completed → report_generated              │
+│     │         │           │           │              │                      │
+│   Čaka    Dodeljen    Logoped     Pregled        Poročilo                   │
+│           logopedu    pregleduje  posnetkov      generirano                 │
+│                       posnetke    zaključen      in shranjeno               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Implementacija:**
+- Dodati novo polje `report_generated_at` v tabelo `articulation_test_sessions`
+- Ko logoped na strani `/admin/users/:parentId/:childId` generira PDF poročilo, se ta datum nastavi
+- Status ostane `completed`, ampak `report_generated_at` pove, da je bil primer v celoti zaključen
+
+---
+
+### 5. Vidnost zavihka "Uporabniki" za vse logopede
+
+**Trenutna logika (po RLS pravilih):**
+
+| Tabela | Kdo vidi | Pogoj |
+|--------|----------|-------|
+| `articulation_test_sessions` | Interni logopedi | `is_internal_logopedist(auth.uid())` = vsi interni |
+| `articulation_evaluations` | Samo dodeljeni logoped | `assigned_to = moj logopedist_profile.id` |
+
+**Problem:** Vsi logopedi iz organizacije "internal" vidijo vse seje, ampak ocene lahko bere in ureja **samo dodeljeni logoped**.
+
+**Predlog za ureditev:**
+
+Možnost A: **Ocene vidijo vsi interni logopedi (read-only)**
+- Posodobiti RLS politiko za `articulation_evaluations`:
+  ```sql
+  ... OR is_internal_logopedist(auth.uid())
+  ```
+- Urejanje ostane omejeno na dodeljenega logopeda
+
+Možnost B: **Na strani uporabnika prikažemo ocene samo, če je primer dodeljen meni**
+- Če nisem dodeljen, vidim uporabnika, ampak ocene so prazne
+- To preprečuje zmedo, ampak omejuje preglednost
+
+**Priporočilo:** Možnost A - transparentnost znotraj organizacije
+
+---
+
+## Tehnične spremembe
+
+### Datoteke za posodobitev:
+
+**1. `src/hooks/useSessionReview.ts`**
+- Dodati query za logopeda in organizacijo dodeljenega logopeda
+- Vrniti podatke o `completedAt`, `assignedLogopedistName`, `organizationName`
+
+**2. `src/pages/admin/AdminSessionReview.tsx`**
+- Posodobiti info sporočilo z datumom, logopedistom in organizacijo
+- Dodati gumb "Popravi" v glavo (levo od "Shrani vse ocene")
+- Dodati logiko za prevzem primera
+
+**3. `src/pages/admin/AdminUserDetail.tsx`**
+- Dodati pridobivanje ocen iz `articulation_evaluations` za vse seje otroka
+- Prikazati povzetek ocen pod vsako sejo v sekciji "Preverjanje izgovorjave"
+
+**4. Baza podatkov (opcijsko)**
+- Dodati polji `report_generated_at`, `reassigned_at`, `reassigned_from` v `articulation_test_sessions`
+- Posodobiti RLS za `articulation_evaluations`, da interni logopedi lahko berejo vse ocene
+
+---
+
+## Vizualni predogled sprememb
+
+### Stran /admin/tests/:sessionId (zaključen pregled):
+
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  ⬅ Nazaj                                                                    │
+│                                                                             │
+│  PREGLED PREVERJANJA IZGOVORJAVE                                            │
+│  Žak Kujavec • 5 let • Moški                                                │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────────┐│
+│  │ ℹ Ta pregled je bil zaključen 25. 1. 2026 s strani logopeda             ││
+│  │   Robert Kujavec (TomiTalk logoped). Za urejanje uporabite gumb         ││
+│  │   "Popravi".                                                            ││
+│  └─────────────────────────────────────────────────────────────────────────┘│
+│                                                                             │
+│  ┌── Seja-1 (15. 1. 2026) ────────────────────────────────────────────────┐ │
+│  │                                                                        │ │
+│  │  [✏ Popravi]  [💾 Shrani vse ocene]  [✅ Zaključi pregled]              │ │
+│  │                                                                        │ │
+│  │  ▸ P - PURAN, ŠAPA,STOP                                               │ │
+│  │  ▸ B - BANANA, NEBO, ROB                                               │ │
+│  │  ...                                                                   │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Stran /admin/users/:parentId/:childId - sekcija "Preverjanje izgovorjave":
+
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  🎤 Preverjanje izgovorjave                                                 │
+│  Posnetki artikulacijskega testa po sejah                                   │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ Ime starša │ Ime otroka │ Starost │ Spol │ Status │ Oddano │ Akcije        │
-├────────────┼────────────┼─────────┼──────┼────────┼────────┼───────────────┤
-│ ...        │ ...        │ ...     │ ...  │ ...    │ ...    │ 👁 Ogled      │
-├────────────┴────────────┴─────────┴──────┴────────┴────────┴───────────────┤
-│ Prikazujem 1-10 od 45                      Na stran: [10▼]  [◀] 1/5 [▶]    │
+│                                                                             │
+│  ▼ Seja-1 (20 posnetkov) - Zaključeno 25. 1. 2026                           │
+│    ┌─────────────────────────────────────────────────────────────────────┐  │
+│    │ 📊 POVZETEK OCEN:                                                   │  │
+│    │                                                                     │  │
+│    │ Ž: ⭐⭐⭐⭐⭐ (5/5) - "brez težav"                                     │  │
+│    │    ☑ Odlično izgovarja                                              │  │
+│    │                                                                     │  │
+│    │ R: ⭐⭐⭐ (3/5) - "potrebuje več vaje"                                │  │
+│    │    ☑ R izgovarja kot L                                              │  │
+│    │    ☑ Delno pravilno                                                 │  │
+│    │                                                                     │  │
+│    │ ... (ostale črke z ocenami)                                         │  │
+│    └─────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│    🔊 Posnetki:                                                             │
+│    ├── Z-57-ZOGA-2026-01-15.webm  [▶ Predvajaj]                             │
+│    ├── Z-58-ZEBRA-2026-01-15.webm [▶ Predvajaj]                             │
+│    └── ...                                                                  │
+│                                                                             │
+│  ▸ Seja-2 (predvideno: 15. 4. 2026) - Ni posnetkov                          │
+│  ▸ Seja-3 (predvideno: 15. 7. 2026) - Ni posnetkov                          │
+│                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Novi importi za AdminTests.tsx
+## Odgovori na vaša vprašanja
 
-```typescript
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-```
+### 1. Kaj se zgodi, ko logoped, ki mu je dodeljen primer, klikne "Popravi"?
+Preprosto preide v način urejanja (`?edit=true`) in lahko spreminja ocene.
 
----
+### 2. Kaj se zgodi, ko logoped iz iste organizacije, ki MU NI dodeljen primer, klikne "Popravi"?
+Po trenutni RLS politiki ta logoped **vidi sejo** (ker je internal), ampak **ne more brati/pisati ocen** (ker ni `assigned_to`). 
 
-## Logika filtriranja
+**Predlog:** Implementirati funkcijo "Prevzemi primer", ki:
+- Prikaže opozorilo o prenosu
+- Ob potrditvi posodobi `assigned_to` na novega logopeda
+- Zabeleži prvotnega logopeda v `reassigned_from`
 
-Razširiti `filteredSessions` useMemo:
+### 3. Zakaj podatki niso prikazani na strani uporabnika?
+Ker stran trenutno ne pridobiva ocen iz baze - samo prikazuje surove posnetke iz Storage-a. To bomo popravili.
 
-```typescript
-const filteredSessions = useMemo(() => {
-  if (!sessions) return [];
-  
-  return sessions.filter(session => {
-    // Iskanje
-    if (searchQuery) {
-      const searchLower = searchQuery.toLowerCase();
-      const parentMatch = session.parent_first_name?.toLowerCase().includes(searchLower) ||
-                          session.parent_last_name?.toLowerCase().includes(searchLower);
-      const childMatch = session.child_name.toLowerCase().includes(searchLower);
-      if (!parentMatch && !childMatch) return false;
-    }
-    
-    // Filter: Starost
-    if (ageFilter !== 'all') {
-      if (ageFilter === '7+') {
-        if (!session.child_age || session.child_age < 7) return false;
-      } else {
-        if (session.child_age !== Number(ageFilter)) return false;
-      }
-    }
-    
-    // Filter: Spol
-    if (genderFilter !== 'all') {
-      const gender = session.child_gender?.toLowerCase();
-      if (genderFilter === 'm' && !['m', 'male', 'moški'].includes(gender || '')) return false;
-      if (genderFilter === 'f' && !['f', 'female', 'ženski', 'ž', 'z'].includes(gender || '')) return false;
-    }
-    
-    // Filter: Status
-    if (statusFilter !== 'all') {
-      if (statusFilter === 'in_review') {
-        if (!['assigned', 'in_review'].includes(session.status)) return false;
-      } else {
-        if (session.status !== statusFilter) return false;
-      }
-    }
-    
-    // Filter: Datum
-    if (dateFilter !== 'all' && session.submitted_at) {
-      const submittedDate = new Date(session.submitted_at);
-      const now = new Date();
-      
-      switch (dateFilter) {
-        case 'today':
-          if (submittedDate.toDateString() !== now.toDateString()) return false;
-          break;
-        case 'week':
-          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-          if (submittedDate < weekAgo) return false;
-          break;
-        case 'month':
-          const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-          if (submittedDate < monthAgo) return false;
-          break;
-        case 'year':
-          const yearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
-          if (submittedDate < yearAgo) return false;
-          break;
-      }
-    }
-    
-    return true;
-  });
-}, [sessions, searchQuery, ageFilter, genderFilter, statusFilter, dateFilter]);
-```
+### 4. Kako ločiti "Zaključen pregled" od "Končno poročilo generirano"?
+Z dodatnim poljem `report_generated_at`. Ko je to polje nastavljeno, pomeni, da je logoped na strani uporabnika generiral PDF poročilo.
 
----
+### 5. Ali je logično, da vsi logopedi vidijo zavihek Uporabniki?
+Da, če so iz iste organizacije (internal). Priporočam, da:
+- Vsi interni logopedi **vidijo** vse uporabnike in ocene (read-only)
+- **Urejajo** lahko samo tisti, ki jim je primer dodeljen
+- Možnost "prevzema" primera omogoča fleksibilnost
 
-## Reset paginacije ob spremembi filtrov
-
-```typescript
-// Ko se filtri spremenijo, ponastavi na stran 1
-useEffect(() => {
-  setCurrentPage(1);
-}, [searchQuery, ageFilter, genderFilter, statusFilter, dateFilter]);
-```
