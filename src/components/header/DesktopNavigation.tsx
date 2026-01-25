@@ -6,6 +6,7 @@ import { UserProfile } from "@/components/auth/UserProfile";
 import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
 import { SubscriptionRequiredModal } from "@/components/subscription/SubscriptionRequiredModal";
 import { useAuth } from "@/contexts/AuthContext";
+import { UserNotificationBell } from "./UserNotificationBell";
 
 
 interface DesktopNavigationProps {
@@ -155,7 +156,10 @@ export function DesktopNavigation({ user, onStartNow, onCenikNavigate }: Desktop
         {/* Right side - user profile or login buttons */}
         <div className="flex items-center gap-2">
           {user ? (
-            <UserProfile />
+            <>
+              <UserNotificationBell />
+              <UserProfile />
+            </>
           ) : (
             <div className="hidden lg:flex items-center gap-2">
               <Link to="/admin/login">
