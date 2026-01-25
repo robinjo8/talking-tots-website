@@ -182,6 +182,8 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       await supabase.auth.signOut();
     } catch (error) {
       console.warn('SignOut error (ignored):', error);
+      // Prisilno počisti localStorage žetone, če signOut ne uspe
+      localStorage.removeItem('sb-ecmtctwovkheohqwahvt-auth-token');
     }
     // Vedno počisti lokalno stanje, ne glede na napako
     setUser(null);
