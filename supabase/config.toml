@@ -29,3 +29,6 @@ verify_jwt = false
 
 [functions.archive-and-delete-user]
 verify_jwt = false
+
+[functions.check-old-pending-tests]
+verify_jwt = false
