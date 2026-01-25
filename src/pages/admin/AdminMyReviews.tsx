@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
-import { User, Baby, Calendar, Eye, ChevronDown, ChevronUp, ClipboardList, Pencil } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { User, Baby, Calendar, Eye, ChevronDown, ChevronUp, ClipboardList, Pencil, Clock, CheckCircle, FileCheck } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { StatCard } from '@/components/admin/StatCard';
 import { useMyReviews, MyReviewSession } from '@/hooks/useMyReviews';
 
 function formatParentName(session: MyReviewSession): string {
@@ -183,6 +184,16 @@ export default function AdminMyReviews() {
   }
 
   const myReviews = sessions || [];
+  
+  // Calculate stats from data
+  const totalMyReviews = myReviews.length;
+  const inReviewCount = myReviews.filter(s => 
+    !s.reviewed_at && s.status !== 'completed' && !s.completed_at
+  ).length;
+  const reviewedCount = myReviews.filter(s => 
+    (s.reviewed_at || s.status === 'completed') && !s.completed_at
+  ).length;
+  const completedCount = myReviews.filter(s => !!s.completed_at).length;
 
   return (
     <div className="space-y-6">
@@ -194,20 +205,37 @@ export default function AdminMyReviews() {
         </p>
       </div>
 
-      {/* Stats Card */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <ClipboardList className="h-5 w-5 text-app-blue" />
-            Aktivni pregledi
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold text-app-blue">
-            {myReviews.length}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Stats Cards - 4 in a row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          title="Moji pregledi"
+          value={totalMyReviews}
+          description="Vsi primeri, ki ste jih prevzeli"
+          icon={ClipboardList}
+          color="blue"
+        />
+        <StatCard
+          title="V pregledu"
+          value={inReviewCount}
+          description="Primeri, ki jih aktivno pregledujete"
+          icon={Clock}
+          color="orange"
+        />
+        <StatCard
+          title="Pregledano"
+          value={reviewedCount}
+          description="Primeri z oddanimi ocenami"
+          icon={CheckCircle}
+          color="purple"
+        />
+        <StatCard
+          title="Zaključeno"
+          value={completedCount}
+          description="Primeri z generiranim poročilom"
+          icon={FileCheck}
+          color="green"
+        />
+      </div>
 
       {myReviews.length === 0 ? (
         <Card>

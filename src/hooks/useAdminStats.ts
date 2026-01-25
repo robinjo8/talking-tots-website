@@ -3,18 +3,29 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 
 interface AdminStats {
-  totalTests: number;
-  pendingTests: number;
-  myReviews: number;
-  completedTests: number;
+  // Organization stats
+  orgTotalTests: number;
+  orgPendingTests: number;
+  orgReviewedTests: number;
+  orgCompletedTests: number;
+  
+  // Personal stats
+  myTotalReviews: number;
+  myInReviewCount: number;
+  myReviewedCount: number;
+  myCompletedCount: number;
 }
 
 export function useAdminStats() {
   const [stats, setStats] = useState<AdminStats>({
-    totalTests: 0,
-    pendingTests: 0,
-    myReviews: 0,
-    completedTests: 0,
+    orgTotalTests: 0,
+    orgPendingTests: 0,
+    orgReviewedTests: 0,
+    orgCompletedTests: 0,
+    myTotalReviews: 0,
+    myInReviewCount: 0,
+    myReviewedCount: 0,
+    myCompletedCount: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
   const { profile } = useAdminAuth();
@@ -27,34 +38,64 @@ export function useAdminStats() {
       }
 
       try {
-        // Total tests
-        const { count: totalCount } = await supabase
+        // Organization stats - all tests in the system
+        const { count: orgTotalCount } = await supabase
           .from('articulation_test_sessions')
           .select('*', { count: 'exact', head: true });
 
-        // Pending tests
-        const { count: pendingCount } = await supabase
+        // Organization - pending tests (status = pending)
+        const { count: orgPendingCount } = await supabase
           .from('articulation_test_sessions')
           .select('*', { count: 'exact', head: true })
           .eq('status', 'pending');
 
-        // My reviews (assigned to me or in_review by me)
-        const { count: myCount } = await supabase
+        // Organization - reviewed tests (reviewed_at set, completed_at NOT set)
+        const { data: orgReviewedData } = await supabase
+          .from('articulation_test_sessions')
+          .select('id, reviewed_at, completed_at, status')
+          .is('completed_at', null);
+        
+        const orgReviewedCount = orgReviewedData?.filter(s => 
+          s.reviewed_at || s.status === 'completed'
+        ).length || 0;
+
+        // Organization - completed tests (completed_at IS set)
+        const { count: orgCompletedCount } = await supabase
           .from('articulation_test_sessions')
           .select('*', { count: 'exact', head: true })
+          .not('completed_at', 'is', null);
+
+        // Personal stats - my assigned reviews
+        const { data: myReviews } = await supabase
+          .from('articulation_test_sessions')
+          .select('id, status, reviewed_at, completed_at')
           .eq('assigned_to', profile.id);
 
-        // Completed tests
-        const { count: completedCount } = await supabase
-          .from('articulation_test_sessions')
-          .select('*', { count: 'exact', head: true })
-          .eq('status', 'completed');
+        const myData = myReviews || [];
+        const myTotalReviews = myData.length;
+        
+        // In review = assigned but not reviewed yet
+        const myInReviewCount = myData.filter(s => 
+          !s.reviewed_at && s.status !== 'completed' && !s.completed_at
+        ).length;
+        
+        // Reviewed = has reviewed_at OR status=completed, but NO completed_at
+        const myReviewedCount = myData.filter(s => 
+          (s.reviewed_at || s.status === 'completed') && !s.completed_at
+        ).length;
+        
+        // Completed = has completed_at (report generated)
+        const myCompletedCount = myData.filter(s => !!s.completed_at).length;
 
         setStats({
-          totalTests: totalCount || 0,
-          pendingTests: pendingCount || 0,
-          myReviews: myCount || 0,
-          completedTests: completedCount || 0,
+          orgTotalTests: orgTotalCount || 0,
+          orgPendingTests: orgPendingCount || 0,
+          orgReviewedTests: orgReviewedCount,
+          orgCompletedTests: orgCompletedCount || 0,
+          myTotalReviews,
+          myInReviewCount,
+          myReviewedCount,
+          myCompletedCount,
         });
       } catch (error) {
         console.error('Error fetching admin stats:', error);
