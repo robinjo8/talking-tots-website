@@ -22,6 +22,7 @@ export default function VideoNavodilaRouter() {
     <GenericVideoNavodila
       title={config.title}
       videoUrl={config.videoUrl}
+      displayLetter={config.displayLetter}
     />
   );
 }
