@@ -1022,6 +1022,86 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_reads: {
+        Row: {
+          id: string
+          notification_id: string
+          read_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          notification_id: string
+          read_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          notification_id?: string
+          read_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_reads_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "notifications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          link: string | null
+          message: string
+          organization_id: string
+          recipient_id: string | null
+          related_session_id: string | null
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          link?: string | null
+          message: string
+          organization_id: string
+          recipient_id?: string | null
+          related_session_id?: string | null
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          link?: string | null
+          message?: string
+          organization_id?: string
+          recipient_id?: string | null
+          related_session_id?: string | null
+          title?: string
+          type?: Database["public"]["Enums"]["notification_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_related_session_id_fkey"
+            columns: ["related_session_id"]
+            isOneToOne: false
+            referencedRelation: "articulation_test_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           created_at: string | null
@@ -1354,6 +1434,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_user_organization_id: { Args: { _user_id: string }; Returns: string }
       grant_admin_role: {
         Args: {
           p_expires_at?: string
@@ -1408,6 +1489,12 @@ export type Database = {
     Enums: {
       activity_type: "exercise" | "memory_game" | "puzzle"
       admin_role_type: "super_admin" | "support_admin" | "data_analyst"
+      notification_type:
+        | "new_test"
+        | "assigned"
+        | "reminder"
+        | "completed_report"
+        | "system"
       organization_type: "internal" | "school" | "kindergarten" | "private"
       report_status: "draft" | "submitted" | "revised"
       test_session_status: "pending" | "assigned" | "in_review" | "completed"
@@ -1542,6 +1629,13 @@ export const Constants = {
     Enums: {
       activity_type: ["exercise", "memory_game", "puzzle"],
       admin_role_type: ["super_admin", "support_admin", "data_analyst"],
+      notification_type: [
+        "new_test",
+        "assigned",
+        "reminder",
+        "completed_report",
+        "system",
+      ],
       organization_type: ["internal", "school", "kindergarten", "private"],
       report_status: ["draft", "submitted", "revised"],
       test_session_status: ["pending", "assigned", "in_review", "completed"],
