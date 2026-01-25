@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { FileText, Download, Trash2, CheckCircle2, Loader2, FileCheck, AlertCircle, ChevronDown } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChildDocuments } from "@/hooks/useChildDocuments";
+import { useUserNotifications } from "@/hooks/useUserNotifications";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
@@ -36,11 +37,22 @@ export function MyDocumentsSection() {
     deleteDocument,
     getDocumentUrl
   } = useChildDocuments();
+  const { markAllAsRead } = useUserNotifications();
   const [groupedDocuments, setGroupedDocuments] = useState<GroupedDocuments[]>([]);
   const [reports, setReports] = useState<ReportFile[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploadedDocsOpen, setUploadedDocsOpen] = useState(true);
   const [reportsOpen, setReportsOpen] = useState(true);
+  const hasMarkedAsRead = useRef(false);
+
+  // Označi vsa obvestila kot prebrana ob prikazu komponente
+  useEffect(() => {
+    if (!hasMarkedAsRead.current) {
+      markAllAsRead();
+      hasMarkedAsRead.current = true;
+    }
+  }, [markAllAsRead]);
+
   useEffect(() => {
     const loadAllDocuments = async () => {
       if (!profile?.children || !user?.id) {

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Bell, CheckCheck, FileText, Download } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Bell, CheckCheck, FileText, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -9,7 +10,6 @@ import {
 } from '@/components/ui/popover';
 import { useUserNotifications, UserNotification } from '@/hooks/useUserNotifications';
 import { cn } from '@/lib/utils';
-import { supabase } from '@/integrations/supabase/client';
 
 function formatRelativeTime(dateString: string): string {
   const date = new Date(dateString);
@@ -34,17 +34,17 @@ interface NotificationItemProps {
 }
 
 function NotificationItem({ notification, onMarkAsRead, onClose }: NotificationItemProps) {
-  const handleDownload = async () => {
-    const { data } = await supabase.storage
-      .from('uporabniski-profili')
-      .createSignedUrl(notification.path, 3600);
-    if (data?.signedUrl) {
-      window.open(data.signedUrl, '_blank');
-    }
+  const navigate = useNavigate();
+  
+  const handleClick = () => {
+    // Označi kot prebrano
     if (!notification.is_read) {
       onMarkAsRead(notification.id);
     }
+    // Zapri popover
     onClose?.();
+    // Preusmeri na Moji dokumenti
+    navigate('/profile?expandSection=myDocuments');
   };
 
   return (
@@ -55,7 +55,7 @@ function NotificationItem({ notification, onMarkAsRead, onClose }: NotificationI
           ? 'bg-transparent hover:bg-muted/50' 
           : 'bg-primary/5 hover:bg-primary/10'
       )}
-      onClick={handleDownload}
+      onClick={handleClick}
     >
       {/* Unread indicator */}
       <div className="flex-shrink-0 mt-1">
@@ -76,28 +76,20 @@ function NotificationItem({ notification, onMarkAsRead, onClose }: NotificationI
           'text-sm',
           notification.is_read ? 'font-normal text-muted-foreground' : 'font-medium text-foreground'
         )}>
-          Novo poročilo za {notification.child_name}
+          Logopedsko poročilo naloženo
         </p>
-        <p className="text-xs text-muted-foreground mt-0.5 truncate">
-          {notification.report_name}
+        <p className="text-xs text-muted-foreground mt-0.5">
+          Za otroka: {notification.child_name}
         </p>
         <p className="text-xs text-muted-foreground/70 mt-1">
           {formatRelativeTime(notification.created_at)}
         </p>
       </div>
 
-      {/* Download button */}
-      <Button
-        variant="ghost"
-        size="sm"
-        className="h-8 w-8 p-0 shrink-0"
-        onClick={(e) => {
-          e.stopPropagation();
-          handleDownload();
-        }}
-      >
-        <Download className="h-4 w-4" />
-      </Button>
+      {/* Arrow indicator */}
+      <div className="flex-shrink-0 self-center">
+        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+      </div>
     </div>
   );
 }
