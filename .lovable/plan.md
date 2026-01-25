@@ -1,117 +1,70 @@
 
-# Načrt: Prestavitev generiranih poročil in prikaz vseh poročil organizacije
+# Načrt: Popravek napake pri generiranju poročila in nalaganju podatkov
 
-## Povzetek ugotovitev
+## Ugotovitve
 
-### Trenutno stanje
+### Problem 1: Napaka pri vstavljanju v bazo
+**Napaka:** `"invalid input syntax for type uuid: """`
 
-1. **Generirana poročila na strani Podrobnosti uporabnika:**
-   - Sekcija "Generirana poročila" je trenutno del desnega stolpca pod "Poročila" (vrstice 774-821)
-   - Uporabnik želi to prestaviti pod "Dokumenti" na levi strani z naslovom "Generirana poročila logopeda"
+**Vzrok:** V funkciji `handleGeneratePdf` (vrstica 383) se pošilja:
+```typescript
+session_id: sessionId || ''
+```
+Ko `sessionId` ni na voljo, se pošlje prazen string `''`, kar ni veljaven UUID. PostgreSQL zavrne prazen string kot UUID.
 
-2. **Zakaj poročila niso vidna na /admin/reports:**
-   - Ko generirate PDF, se datoteka shrani SAMO v Supabase Storage (`uporabniski-profili` bucket)
-   - V tabelo `logopedist_reports` se NE vstavi noben zapis
-   - Stran `/admin/reports` bere podatke iz tabele `logopedist_reports`, ki je prazna
-
-3. **Omejitev RLS politik:**
-   - Trenutna RLS politika dovoljuje logopedu vpogled SAMO v svoja poročila
-   - Potrebna je sprememba za vpogled v vsa poročila znotraj organizacije
+### Problem 2: Podatki se ne naložijo pri popravljanju
+**Vzrok:** Ker vstavljanje v bazo ne uspe (zaradi napake #1), se zapis nikoli ne ustvari. Ko nato uporabnik klikne "Popravi", funkcija `handleEditGeneratedReport` išče poročilo v bazi po `pdf_url`, vendar ga ne najde, ker ni bil nikoli ustvarjen.
 
 ---
 
-## Spremembe
+## Rešitev
 
-### 1. Prestavitev sekcije "Generirana poročila" pod "Dokumenti"
+### 1. Sprememba sheme baze - session_id mora biti nullable
 
-V datoteki `AdminUserDetail.tsx`:
-- Odstrani sekcijo "Generirana poročila" iz desnega stolpca (pod "Poročila")
-- Dodaj novo sekcijo "Generirana poročila logopeda" v levem stolpcu, pod "Dokumenti" kartice
-- Uporabi enak slog prikaza kot trenutno (zeleno ozadje, ikone za ogled/prenos/bris)
-
-**Nova postavitev:**
-```text
-┌─────────────────────────────────────────────────────────────────────┐
-│  Levi stolpec                    │  Desni stolpec                  │
-├──────────────────────────────────┼──────────────────────────────────┤
-│  📄 Dokumenti                    │  📋 Poročila                     │
-│     - dokument1.pdf              │     [Urejevalnik poročila]       │
-│     - dokument2.pdf              │     [Gumbi: Shrani, Naloži,      │
-│                                  │      Generiraj]                  │
-│  📝 Generirana poročila logopeda │     Shranjena poročila:          │
-│     - porocilo-zak-2026.pdf      │     - osnutek1.txt               │
-│                                  │                                  │
-│  🎤 Preverjanje izgovorjave      │                                  │
-│     [Posnetki...]                │                                  │
-└──────────────────────────────────┴──────────────────────────────────┘
-```
-
-### 2. Shranjevanje poročila v bazo ob generiranju PDF
-
-V funkciji `handleGeneratePdf` v `AdminUserDetail.tsx`:
-- Po uspešnem nalaganju PDF v storage, vstavi zapis v tabelo `logopedist_reports`
-- Shrani: `logopedist_id`, `session_id`, `summary`, `pdf_url`, `status: 'draft'`
-
-```typescript
-// Po uploadu PDF-ja v storage:
-const { data: reportRecord, error: insertError } = await supabase
-  .from('logopedist_reports')
-  .insert({
-    logopedist_id: logopedistProfile.id,
-    session_id: reportData.selectedSessionId,
-    summary: reportData.ugotovitve?.substring(0, 200) || '',
-    findings: { anamneza: reportData.anamneza, ugotovitve: reportData.ugotovitve },
-    recommendations: reportData.predlogVaj || '',
-    next_steps: reportData.opombe || '',
-    pdf_url: filePath,
-    status: 'draft'
-  })
-  .select()
-  .single();
-```
-
-### 3. RLS politika za vpogled v poročila organizacije
-
-Nova SQL migracija za posodobitev RLS politike:
+Ustvariti SQL migracijo, ki spremeni stolpec `session_id` iz obveznega v opcijskega (nullable):
 
 ```sql
--- Odstrani staro politiko
-DROP POLICY IF EXISTS "Logopedists can view own reports" ON public.logopedist_reports;
-
--- Nova politika: logoped vidi vsa poročila v svoji organizaciji
-CREATE POLICY "Logopedists can view organization reports"
-  ON public.logopedist_reports FOR SELECT
-  USING (
-    logopedist_id IN (
-      SELECT lp.id 
-      FROM public.logopedist_profiles lp
-      WHERE lp.organization_id = public.get_user_organization_id(auth.uid())
-    )
-  );
+-- Spremeni session_id da dovoli NULL vrednosti
+ALTER TABLE public.logopedist_reports 
+ALTER COLUMN session_id DROP NOT NULL;
 ```
 
-### 4. Posodobitev hook-a za pridobivanje poročil organizacije
+### 2. Popravek kode v AdminUserDetail.tsx
 
-V `useLogopedistReports.ts`:
-- Namesto filtriranja po `logopedist_id = profile.id`
-- Pridobi vse logopedist_id-je v isti organizaciji in filtriraj po njih
-- Dodaj ime logopeda k vsakemu poročilu za razločevanje
-
+Spremeniti vrstico 383 iz:
 ```typescript
-// Pridobi vse logopede v organizaciji
-const { data: orgLogopedists } = await supabase
-  .from('logopedist_profiles')
-  .select('id, first_name, last_name')
-  .eq('organization_id', profile.organization_id);
+session_id: sessionId || '',
+```
 
-const logopedistIds = orgLogopedists?.map(l => l.id) || [profile.id];
+Na:
+```typescript
+session_id: sessionId || null,
+```
 
-// Pridobi vsa poročila za te logopede
-const { data: reports } = await supabase
-  .from('logopedist_reports')
-  .select('*')
-  .in('logopedist_id', logopedistIds)
-  .order('created_at', { ascending: false });
+S tem se pošlje `null` namesto praznega stringa, kar je veljavna vrednost za nullable UUID polje.
+
+Prav tako je potrebno popraviti logiko pridobivanja `session_id`. Trenutna koda (vrstice 364-376) ni pravilna - pogoj `reportData.selectedSessionId` ne deluje pravilno.
+
+**Popravljena logika za pridobivanje session_id:**
+```typescript
+// Find session ID - use selected session or find first session for child
+let sessionId: string | null = null;
+if (reportData.selectedSessionId) {
+  sessionId = reportData.selectedSessionId;
+} else if (recordings.length > 0) {
+  // Try to find any session for this child
+  const { data: sessionData } = await supabase
+    .from('articulation_test_sessions')
+    .select('id')
+    .eq('child_id', childId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+  
+  if (sessionData) {
+    sessionId = sessionData.id;
+  }
+}
 ```
 
 ---
@@ -120,53 +73,43 @@ const { data: reports } = await supabase
 
 | Datoteka | Akcija | Opis |
 |----------|--------|------|
-| `src/pages/admin/AdminUserDetail.tsx` | Posodobi | 1) Prestavi sekcijo generiranih poročil pod Dokumenti, 2) Dodaj vstavljanje v bazo ob generiranju PDF |
-| `src/hooks/useLogopedistReports.ts` | Posodobi | Pridobivaj vsa poročila v organizaciji, dodaj ime logopeda |
-| Nova migracija | Ustvari | Posodobi RLS politiko za vpogled v poročila organizacije |
-| `src/pages/admin/AdminReports.tsx` | Posodobi | Dodaj stolpec "Logoped" za prikaz avtorja poročila |
+| Nova SQL migracija | Ustvari | `ALTER TABLE ... DROP NOT NULL` za session_id |
+| `src/pages/admin/AdminUserDetail.tsx` | Posodobi | 1) Popravek `sessionId || null` namesto `sessionId || ''`, 2) Popravek logike za pridobivanje session_id |
 
 ---
 
-## Tehnični diagram
+## Diagram toka popravka
 
 ```text
-┌──────────────────────────────────────────────────────────────────────────┐
-│  Generiranje PDF poročila                                                │
-├──────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│  1. Uporabnik klikne "Generiraj"                                         │
-│           │                                                              │
-│           ▼                                                              │
-│  2. generateReportPdf() → ustvari PDF blob                               │
-│           │                                                              │
-│           ▼                                                              │
-│  3. Upload v Supabase Storage                                            │
-│     (uporabniski-profili/{parentId}/{childId}/Generirana-porocila/)      │
-│           │                                                              │
-│           ▼                                                              │
-│  4. INSERT v logopedist_reports tabelo ← NOVO!                           │
-│     (logopedist_id, session_id, pdf_url, summary, status)                │
-│           │                                                              │
-│           ▼                                                              │
-│  5. Poročilo vidno na /admin/reports                                     │
-│                                                                          │
-└──────────────────────────────────────────────────────────────────────────┘
+PREJ (napaka):
+┌─────────────────────────────────────────────────────────────┐
+│  1. Generiraj PDF                                           │
+│  2. Upload v Storage ✓                                      │
+│  3. INSERT v bazo:                                          │
+│     session_id = '' (prazen string)                         │
+│     → NAPAKA: "invalid input syntax for type uuid"          │
+│  4. Zapis NI ustvarjen                                      │
+│  5. Popravi → išče v bazi → NE NAJDE → prazna polja        │
+└─────────────────────────────────────────────────────────────┘
+
+POTEM (popravek):
+┌─────────────────────────────────────────────────────────────┐
+│  1. Generiraj PDF                                           │
+│  2. Upload v Storage ✓                                      │
+│  3. INSERT v bazo:                                          │
+│     session_id = null (veljavna vrednost)                   │
+│     → USPEH ✓                                               │
+│  4. Zapis JE ustvarjen                                      │
+│  5. Popravi → išče v bazi → NAJDE → naloži podatke ✓       │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-```text
-┌──────────────────────────────────────────────────────────────────────────┐
-│  Prikaz poročil na /admin/reports                                        │
-├──────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│  Trenutno:                                                               │
-│  useLogopedistReports → WHERE logopedist_id = moj_id                     │
-│  Rezultat: Samo moja poročila                                            │
-│                                                                          │
-│  Po spremembi:                                                           │
-│  useLogopedistReports → WHERE logopedist_id IN (vsi v moji org.)         │
-│  Rezultat: Vsa poročila v organizaciji                                   │
-│                                                                          │
-│  + RLS politika omogoča branje poročil celotne organizacije              │
-│                                                                          │
-└──────────────────────────────────────────────────────────────────────────┘
-```
+---
+
+## Pričakovani rezultat
+
+Po implementaciji:
+1. PDF generiranje bo uspešno ustvarilo zapis v tabeli `logopedist_reports`
+2. Poročila bodo vidna na strani `/admin/reports`
+3. Klik na "Popravi" bo uspešno naložil vse podatke (anamneza, ugotovitve, predlog za vaje, opombe) v urejevalnik
+4. Popravljeno poročilo se bo shranilo z ustreznim statusom "revised"
