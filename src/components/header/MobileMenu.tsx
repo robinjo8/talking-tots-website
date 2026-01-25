@@ -9,7 +9,7 @@ import { ProfileSelector } from "./ProfileSelector";
 import { Profile } from "@/contexts/AuthContext";
 import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
 import { SubscriptionRequiredModal } from "@/components/subscription/SubscriptionRequiredModal";
-
+import { UserNotificationBell } from "./UserNotificationBell";
 interface MobileMenuProps {
   user: any;
   profile: Profile | null;
@@ -122,7 +122,10 @@ export function MobileMenu({
   };
 
   return <div className="lg:hidden flex items-center gap-2">
-      {/* Show selected child first (left side) */}
+      {/* Notification bell - only for logged in users */}
+      {user && <UserNotificationBell />}
+      
+      {/* Show selected child (left side of hamburger) */}
       {selectedChild && <div className="flex items-center gap-2">
           {selectedChild.avatarId > 0 && <Avatar className="h-6 w-6 border border-green-200">
               <AvatarImage src={selectedChild.avatarUrl || getAvatarSrc(selectedChild.avatarId)} alt={selectedChild.name} className="object-contain" />
@@ -220,11 +223,7 @@ export function MobileMenu({
                       Moja naročnina
                     </Button>
                     
-                    {/* Obvestila */}
-                    <Button variant="ghost" className="w-full justify-start text-left h-12 uppercase opacity-50 cursor-not-allowed" disabled={true}>
-                      <Bell className="h-4 w-4 mr-2" />
-                      Obvestila
-                    </Button>
+                    {/* Obvestila - removed, now in header bell */}
                     
                     {/* Cenik */}
                     <Button variant="ghost" className="w-full justify-start text-left h-12 uppercase" onClick={handleCenikClick}>

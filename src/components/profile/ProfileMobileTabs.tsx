@@ -7,6 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
+import { useUserNotifications } from "@/hooks/useUserNotifications";
 import { cn } from "@/lib/utils";
 
 type ProfileMobileTabsProps = {
@@ -27,6 +28,7 @@ const tabs = [
 
 export function ProfileMobileTabs({ activeSection, setActiveSection, childrenCount }: ProfileMobileTabsProps) {
   const { isPro } = useSubscriptionContext();
+  const { unreadCount } = useUserNotifications();
   const activeTab = tabs.find(tab => tab.id === activeSection);
   const ActiveIcon = activeTab?.icon || User;
   
@@ -57,10 +59,15 @@ export function ProfileMobileTabs({ activeSection, setActiveSection, childrenCou
             >
               <div className="flex items-center gap-2">
                 <Icon className={cn("h-4 w-4", isLocked ? "text-gray-400" : "text-dragon-green")} />
-                <div className="flex flex-col">
-                  <span className={isLocked ? "text-gray-400" : ""}>
+                <div className="flex flex-col flex-1">
+                  <span className={cn("flex items-center gap-2", isLocked ? "text-gray-400" : "")}>
                     {tab.label}
                     {tab.showCount && ` (${childrenCount})`}
+                    {tab.id === 'myDocuments' && unreadCount > 0 && (
+                      <span className="h-4 min-w-4 px-1 rounded-full bg-app-orange text-[9px] font-medium text-white flex items-center justify-center">
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </span>
+                    )}
                   </span>
                   {isLocked && (
                     <span className="text-xs text-gray-400 flex items-center gap-1">
