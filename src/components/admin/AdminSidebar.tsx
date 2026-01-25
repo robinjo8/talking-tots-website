@@ -78,8 +78,12 @@ export function AdminSidebar() {
   ];
 
   const handleSignOut = async () => {
-    await signOut();
-    // Use window.location for clean navigation without React state interference
+    try {
+      await signOut();
+    } catch (error) {
+      console.warn('SignOut failed, redirecting anyway:', error);
+    }
+    // Vedno preusmeri, tudi če pride do napake
     window.location.href = '/admin/login';
   };
 

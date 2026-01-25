@@ -79,8 +79,13 @@ export function AdminMobileNav() {
   ];
 
   const handleSignOut = async () => {
-    await signOut();
-    navigate('/admin/login');
+    try {
+      await signOut();
+    } catch (error) {
+      console.warn('SignOut failed, redirecting anyway:', error);
+    }
+    // Vedno preusmeri, tudi če pride do napake
+    window.location.href = '/admin/login';
   };
 
   const isActive = (href: string) => {

@@ -177,7 +177,13 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const isLoading = isAuthLoading || isProfileLoading;
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    // Ignoriraj napake - tudi če seja ne obstaja, počisti lokalno stanje
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.warn('SignOut error (ignored):', error);
+    }
+    // Vedno počisti lokalno stanje, ne glede na napako
     setUser(null);
     setSession(null);
     setProfile(null);
