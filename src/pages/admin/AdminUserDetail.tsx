@@ -64,6 +64,7 @@ export default function AdminUserDetail() {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [expandedDocId, setExpandedDocId] = useState<string | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [editingReportName, setEditingReportName] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Report template state
@@ -323,22 +324,37 @@ export default function AdminUserDetail() {
     setIsGeneratingPdf(true);
     try {
       const pdfBlob = await generateReportPdf(reportData);
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      // Sanitize child name: replace Slovenian characters and spaces
-      const safeChildName = (childData?.name || 'otrok')
-        .replace(/č/gi, 'c')
-        .replace(/š/gi, 's')
-        .replace(/ž/gi, 'z')
-        .replace(/đ/gi, 'd')
-        .replace(/ć/gi, 'c')
-        .replace(/\s+/g, '-')
-        .replace(/[^a-zA-Z0-9-]/g, ''); // Remove any remaining special characters
-      const fileName = `porocilo-${safeChildName}-${timestamp}.pdf`;
+      
+      let fileName: string;
+      if (editingReportName) {
+        // If editing an existing report, prepend "popravljeno-"
+        // Remove the path prefix if present, keep just the filename
+        const originalName = editingReportName.split('/').pop() || editingReportName;
+        // Check if already has "popravljeno-" prefix
+        if (originalName.startsWith('popravljeno-')) {
+          fileName = originalName;
+        } else {
+          fileName = `popravljeno-${originalName}`;
+        }
+      } else {
+        // New report: generate fresh filename
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const safeChildName = (childData?.name || 'otrok')
+          .replace(/č/gi, 'c')
+          .replace(/š/gi, 's')
+          .replace(/ž/gi, 'z')
+          .replace(/đ/gi, 'd')
+          .replace(/ć/gi, 'c')
+          .replace(/\s+/g, '-')
+          .replace(/[^a-zA-Z0-9-]/g, '');
+        fileName = `porocilo-${safeChildName}-${timestamp}.pdf`;
+      }
+      
       const filePath = `${parentId}/${childId}/Generirana-porocila/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('uporabniski-profili')
-        .upload(filePath, pdfBlob, { contentType: 'application/pdf', upsert: false });
+        .upload(filePath, pdfBlob, { contentType: 'application/pdf', upsert: true });
 
       if (uploadError) {
         throw uploadError;
@@ -347,7 +363,6 @@ export default function AdminUserDetail() {
       // Find session ID from recordings if available
       let sessionId: string | null = null;
       if (reportData.selectedSessionId && recordings.length > 0) {
-        // Try to find a matching session from articulation_test_sessions
         const { data: sessionData } = await supabase
           .from('articulation_test_sessions')
           .select('id')
@@ -371,18 +386,18 @@ export default function AdminUserDetail() {
           recommendations: reportData.predlogVaj || '',
           next_steps: reportData.opombe || '',
           pdf_url: filePath,
-          status: 'draft' as const,
+          status: editingReportName ? 'revised' as const : 'draft' as const,
         });
 
       if (insertError) {
         console.error('Error inserting report record:', insertError);
-        // Still show success for storage, but warn about DB insert
         toast.warning('PDF shranjeno, vendar ni bilo mogoče ustvariti zapisa v bazi');
       } else {
-        toast.success('PDF poročilo generirano in shranjeno');
+        toast.success(editingReportName ? 'Popravljeno poročilo shranjeno' : 'PDF poročilo generirano in shranjeno');
       }
 
       setHasUnsavedChanges(false);
+      setEditingReportName(null);
       // Clear editable fields
       setReportData(prev => ({
         ...prev,
@@ -398,6 +413,37 @@ export default function AdminUserDetail() {
     } finally {
       setIsGeneratingPdf(false);
     }
+  };
+
+  const handleEditGeneratedReport = async (file: StorageFile) => {
+    // Try to find the report in the database to load its content
+    const { data: reportData, error } = await supabase
+      .from('logopedist_reports')
+      .select('*')
+      .eq('pdf_url', file.path)
+      .single();
+
+    if (error || !reportData) {
+      // If not in database, just set the editing name and let user fill in fields
+      toast.info('Poročilo naloženo za popravljanje. Vnesite novo vsebino.');
+      setEditingReportName(file.name);
+      setHasUnsavedChanges(true);
+      return;
+    }
+
+    // Load the report data into the editor
+    const findings = reportData.findings as { anamneza?: string; ugotovitve?: string } | null;
+    setReportData(prev => ({
+      ...prev,
+      anamneza: findings?.anamneza || '',
+      ugotovitve: findings?.ugotovitve || reportData.summary || '',
+      predlogVaj: reportData.recommendations || '',
+      opombe: reportData.next_steps || '',
+    }));
+    
+    setEditingReportName(file.name);
+    setHasUnsavedChanges(true);
+    toast.success('Poročilo naloženo za popravljanje');
   };
 
   const handleDeleteGeneratedReport = async (file: StorageFile) => {
@@ -650,6 +696,14 @@ export default function AdminUserDetail() {
                               <Button 
                                 variant="ghost" 
                                 size="sm"
+                                onClick={() => handleEditGeneratedReport(report)}
+                                title="Popravi poročilo"
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
                                 onClick={() => handleViewDocument(report)}
                                 title="Odpri v novem oknu"
                               >
@@ -765,6 +819,36 @@ export default function AdminUserDetail() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col space-y-4">
+                  {/* Editing indicator */}
+                  {editingReportName && (
+                    <div className="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <Pencil className="h-4 w-4 text-amber-600" />
+                        <span className="text-sm text-amber-800 dark:text-amber-200">
+                          Popravljate: <span className="font-medium">{editingReportName}</span>
+                        </span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setEditingReportName(null);
+                          setReportData(prev => ({
+                            ...prev,
+                            anamneza: '',
+                            ugotovitve: '',
+                            predlogVaj: '',
+                            opombe: '',
+                          }));
+                          setHasUnsavedChanges(false);
+                        }}
+                        className="text-amber-700 hover:text-amber-800 dark:text-amber-300"
+                      >
+                        Prekliči
+                      </Button>
+                    </div>
+                  )}
+
                   {/* Structured report template editor */}
                   <ReportTemplateEditor
                     data={reportData}
@@ -809,7 +893,7 @@ export default function AdminUserDetail() {
                       ) : (
                         <Sparkles className="h-4 w-4 mr-1" />
                       )}
-                      Generiraj
+                      {editingReportName ? 'Generiraj popravljeno' : 'Generiraj'}
                     </Button>
                     <input
                       ref={fileInputRef}
