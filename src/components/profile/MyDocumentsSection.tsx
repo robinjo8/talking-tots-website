@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { FileText, Download, Trash2, CheckCircle2, Loader2, FileCheck, AlertCircle, ChevronDown, Eye } from "lucide-react";
+import { FileText, Download, Trash2, CheckCircle2, Loader2, FileCheck, AlertCircle, ChevronDown, Eye, ChevronUp } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChildDocuments } from "@/hooks/useChildDocuments";
 import { useUserNotifications } from "@/hooks/useUserNotifications";
@@ -8,7 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
-
+import { AnimatePresence, motion } from "framer-motion";
+import { DocumentPreview } from "@/components/admin/DocumentPreview";
 type DocumentItem = {
   id: string;
   child_id: string;
@@ -43,7 +44,12 @@ export function MyDocumentsSection() {
   const [loading, setLoading] = useState(true);
   const [uploadedDocsOpen, setUploadedDocsOpen] = useState(true);
   const [reportsOpen, setReportsOpen] = useState(true);
+  const [expandedDocId, setExpandedDocId] = useState<string | null>(null);
   const hasMarkedAsRead = useRef(false);
+
+  const toggleDocumentPreview = useCallback((docPath: string) => {
+    setExpandedDocId(prev => prev === docPath ? null : docPath);
+  }, []);
 
   // Označi vsa obvestila kot prebrana ob prikazu komponente
   useEffect(() => {
@@ -190,38 +196,72 @@ export function MyDocumentsSection() {
                       Dokumente lahko naložite pri profilu otroka
                     </p>
                   </div> : <div className="space-y-4 pt-4">
-                    {groupedDocuments.map(group => <div key={group.childId} className="space-y-3">
-                        
+                    {groupedDocuments.map(group => (
+                      <div key={group.childId} className="space-y-3">
                         <div className="space-y-2 pl-4">
-                          {group.documents.map(doc => <div key={doc.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
-                              <div className="flex items-center gap-3 min-w-0 flex-1">
-                                <FileText className="h-4 w-4 text-gray-500 shrink-0" />
-                                <div className="min-w-0 flex-1">
-                                  <p className="text-sm font-medium truncate">
-                                    {doc.original_filename}
-                                  </p>
-                                  <div className="flex items-center gap-2 mt-1 flex-wrap">
-                                    <span className="text-xs text-muted-foreground">
-                                      {getDocumentTypeLabel(doc.document_type)}
-                                    </span>
-                                    {getStatusBadge(doc.virus_scan_status)}
+                          {group.documents.map(doc => {
+                            const isExpanded = expandedDocId === doc.storage_path;
+                            return (
+                              <div key={doc.id} className="border border-gray-100 rounded-lg overflow-hidden">
+                                <div className="flex items-center justify-between p-3 bg-gray-50">
+                                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                                    <FileText className="h-4 w-4 text-gray-500 shrink-0" />
+                                    <div className="min-w-0 flex-1">
+                                      <p className="text-sm font-medium truncate">
+                                        {doc.original_filename}
+                                      </p>
+                                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                        <span className="text-xs text-muted-foreground">
+                                          {getDocumentTypeLabel(doc.document_type)}
+                                        </span>
+                                        {getStatusBadge(doc.virus_scan_status)}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="flex gap-1 shrink-0">
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      onClick={() => toggleDocumentPreview(doc.storage_path)} 
+                                      className="h-8 w-8 p-0" 
+                                      title={isExpanded ? "Zapri predogled" : "Ogled"}
+                                    >
+                                      {isExpanded ? <ChevronUp className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </Button>
+                                    <Button variant="ghost" size="sm" onClick={() => handleDownload(doc.storage_path)} className="h-8 w-8 p-0" title="Prenesi">
+                                      <Download className="h-4 w-4" />
+                                    </Button>
+                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive hover:text-destructive" onClick={() => handleDelete(doc.id, doc.storage_path, group.childId)} title="Izbriši">
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
                                   </div>
                                 </div>
+                                
+                                <AnimatePresence>
+                                  {isExpanded && (
+                                    <motion.div
+                                      initial={{ height: 0, opacity: 0 }}
+                                      animate={{ height: 'auto', opacity: 1 }}
+                                      exit={{ height: 0, opacity: 0 }}
+                                      transition={{ duration: 0.2 }}
+                                      className="overflow-hidden"
+                                    >
+                                      <div className="p-4 border-t bg-background">
+                                        <DocumentPreview 
+                                          fileName={doc.original_filename}
+                                          getSignedUrl={() => getDocumentUrl(doc.storage_path)}
+                                          onDownload={() => handleDownload(doc.storage_path)}
+                                        />
+                                      </div>
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
                               </div>
-                              <div className="flex gap-1 shrink-0">
-                                <Button variant="ghost" size="sm" onClick={() => handleDownload(doc.storage_path)} className="h-8 w-8 p-0" title="Ogled">
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                                <Button variant="ghost" size="sm" onClick={() => handleDownload(doc.storage_path)} className="h-8 w-8 p-0" title="Prenesi">
-                                  <Download className="h-4 w-4" />
-                                </Button>
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive hover:text-destructive" onClick={() => handleDelete(doc.id, doc.storage_path, group.childId)} title="Izbriši">
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </div>)}
+                            );
+                          })}
                         </div>
-                      </div>)}
+                      </div>
+                    ))}
                   </div>}
               </div>
             </CollapsibleContent>
@@ -251,37 +291,67 @@ export function MyDocumentsSection() {
                   </div>
                 ) : (
                   <div className="space-y-3 pt-4">
-                    {reports.map((report, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
-                        <div className="flex items-center gap-3 min-w-0 flex-1">
-                          <FileText className="h-4 w-4 text-red-500 shrink-0" />
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium truncate">{report.name}</p>
-                            <p className="text-xs text-muted-foreground">za {report.childName}</p>
+                    {reports.map((report, idx) => {
+                      const isExpanded = expandedDocId === report.path;
+                      return (
+                        <div key={idx} className="border border-gray-100 rounded-lg overflow-hidden">
+                          <div className="flex items-center justify-between p-3 bg-gray-50">
+                            <div className="flex items-center gap-3 min-w-0 flex-1">
+                              <FileText className="h-4 w-4 text-red-500 shrink-0" />
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-medium truncate">{report.name}</p>
+                                <p className="text-xs text-muted-foreground">za {report.childName}</p>
+                              </div>
+                            </div>
+                            <div className="flex gap-1 shrink-0">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-8 w-8 p-0"
+                                onClick={() => toggleDocumentPreview(report.path)}
+                                title={isExpanded ? "Zapri predogled" : "Ogled"}
+                              >
+                                {isExpanded ? <ChevronUp className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-8 w-8 p-0"
+                                onClick={() => handleDownloadReport(report.path)}
+                                title="Prenesi"
+                              >
+                                <Download className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </div>
+                          
+                          <AnimatePresence>
+                            {isExpanded && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="overflow-hidden"
+                              >
+                                <div className="p-4 border-t bg-background">
+                                  <DocumentPreview 
+                                    fileName={report.name}
+                                    getSignedUrl={async () => {
+                                      const { data } = await supabase.storage
+                                        .from('uporabniski-profili')
+                                        .createSignedUrl(report.path, 3600);
+                                      return data?.signedUrl || null;
+                                    }}
+                                    onDownload={() => handleDownloadReport(report.path)}
+                                  />
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
-                        <div className="flex gap-1 shrink-0">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-8 w-8 p-0"
-                            onClick={() => handleDownloadReport(report.path)}
-                            title="Ogled"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-8 w-8 p-0"
-                            onClick={() => handleDownloadReport(report.path)}
-                            title="Prenesi"
-                          >
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
