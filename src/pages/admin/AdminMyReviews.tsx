@@ -112,21 +112,20 @@ function ReviewCard({
             )}
             <div className="flex gap-2">
               <Button 
+                variant="outline"
+                className="flex-1"
+                onClick={() => onNavigate(session.id + '?edit=true')}
+              >
+                <Pencil className="h-4 w-4 mr-2" />
+                Popravi
+              </Button>
+              <Button 
                 className="flex-1" 
                 onClick={() => onNavigate(session.id)}
               >
                 <Eye className="h-4 w-4 mr-2" />
                 Ogled
               </Button>
-              {session.status === 'completed' && (
-                <Button 
-                  variant="outline"
-                  onClick={() => onNavigate(session.id + '?edit=true')}
-                >
-                  <Pencil className="h-4 w-4 mr-1" />
-                  Popravi
-                </Button>
-              )}
             </div>
           </div>
         )}
@@ -244,21 +243,19 @@ export default function AdminMyReviews() {
                             <Button 
                               size="sm" 
                               variant="outline"
+                              onClick={() => handleNavigate(session.id + '?edit=true')}
+                            >
+                              <Pencil className="h-4 w-4 mr-1" />
+                              Popravi
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline"
                               onClick={() => handleNavigate(session.id)}
                             >
                               <Eye className="h-4 w-4 mr-1" />
                               Ogled
                             </Button>
-                            {session.status === 'completed' && (
-                              <Button 
-                                size="sm" 
-                                variant="outline"
-                                onClick={() => handleNavigate(session.id + '?edit=true')}
-                              >
-                                <Pencil className="h-4 w-4 mr-1" />
-                                Popravi
-                              </Button>
-                            )}
                           </div>
                         </TableCell>
                       </TableRow>
