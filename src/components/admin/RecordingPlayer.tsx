@@ -83,7 +83,7 @@ export function RecordingPlayer({ word, url }: RecordingPlayerProps) {
   };
 
   return (
-    <div className="flex items-center gap-2 p-2 border rounded-md bg-muted/30">
+    <div className="flex items-center gap-2 p-2 border rounded-md bg-muted/30 max-w-md">
       <audio
         ref={audioRef}
         src={url}
