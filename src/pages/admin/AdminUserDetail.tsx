@@ -379,7 +379,19 @@ export default function AdminUserDetail() {
         }
       }
 
-      // Insert record into logopedist_reports table
+      // Če popravljamo obstoječe poročilo, najprej posodobimo staro na 'revised'
+      if (editingReportName) {
+        const { error: updateError } = await supabase
+          .from('logopedist_reports')
+          .update({ status: 'revised' as const })
+          .ilike('pdf_url', `%${editingReportName.replace('.pdf', '')}%`);
+        
+        if (updateError) {
+          console.error('Error updating old report status:', updateError);
+        }
+      }
+
+      // Insert record into logopedist_reports table - vedno status 'submitted'
       const { error: insertError } = await supabase
         .from('logopedist_reports')
         .insert({
@@ -390,7 +402,7 @@ export default function AdminUserDetail() {
           recommendations: reportData.predlogVaj || '',
           next_steps: reportData.opombe || '',
           pdf_url: filePath,
-          status: editingReportName ? 'revised' as const : 'draft' as const,
+          status: 'submitted' as const,
         });
 
       if (insertError) {
