@@ -1,245 +1,111 @@
 
+# Plan: Popravek statusa "Pregledano" vs "Zaključeno"
 
-# Načrt: Nova statusna logika "Pregledano" vs "Zaključeno"
+## Ugotovljen problem
 
-## Povzetek sprememb
+V bazi podatkov za sejo `d3742796-ad32-4880-90b3-f89767dfdb33` je:
+- `status: completed`
+- `reviewed_at: NULL` (manjka!)
+- `completed_at: NULL`
 
-Trenutno imamo en sam končni status `completed`, ki označuje vse. Želimo ločiti:
+Ko je bil izveden prejšnji plan, spremembe **niso bile pravilno aplicirane**. Funkcija `completeReview` še vedno nastavlja samo `status: 'completed'` brez `reviewed_at`.
 
-| Status | Pomen | Kdaj se nastavi |
-|--------|-------|-----------------|
-| **Pregledano** | Logoped je poslušal posnetke in ocenil črke | Ko klikne "Zaključi pregled" na `/admin/tests/:id` |
-| **Zaključeno** | Logoped je generiral končno poročilo | Ko generira PDF poročilo na `/admin/users/:parentId/:childId` |
+## Potrebne spremembe
 
-### Tehnična implementacija
+### 1. Funkcija `completeReview` v `useSessionReview.ts`
 
-Ker že obstaja polje `reviewed_at` v tabeli `articulation_test_sessions`, bomo uporabili:
-- `reviewed_at` = datum ko je logoped ocenil posnetke ("Pregledano")
-- `completed_at` = datum ko je generirano končno poročilo ("Zaključeno")
+**Problem:** Funkcija ne nastavlja `reviewed_at` ob zaključku pregleda.
 
-Status `completed` v bazi ostane, ampak UI ga interpretira glede na:
-- Če je `reviewed_at` nastavljen in `completed_at` NI → prikaži "Pregledano"
-- Če je `completed_at` nastavljen → prikaži "Zaključeno"
-
----
-
-## Datoteke za posodobitev
-
-### 1. `src/hooks/useSessionReview.ts` (vrstica ~297)
-
-Spremeniti funkcijo `completeReview`:
-
+**Rešitev:** Posodobiti update stavek na vrsticah 294-298:
 ```typescript
-// PRED:
+// TRENUTNO:
 .update({ status: 'completed' })
 
-// PO:
+// NOVO:
 .update({ 
   status: 'completed',
   reviewed_at: new Date().toISOString() 
 })
 ```
 
-### 2. `src/hooks/useAdminCounts.ts` (vrstica 37)
+### 2. Hook `useMyReviews.ts` - manjkajoča polja
 
-Spremeniti query za `myReviewsQuery` da šteje vse odprte primere (brez končnega poročila):
+**Problem:** Query ne pridobiva `reviewed_at` in `completed_at` polj, zato UI ne more ločiti statusov.
 
+**Rešitev:**
+- Razširiti interface `MyReviewSession` z novima poljema
+- Posodobiti select query (vrstica 32) da vključi ti polji
+- Dodati mapiranje v rezultat (vrstice 83-95)
+
+### 3. Hook `useAdminTests.ts` - manjkajoča polja
+
+**Problem:** Enako - query ne pridobiva potrebnih polj za prikaz statusa.
+
+**Rešitev:**
+- Razširiti interface `TestSessionData`
+- Posodobiti select query (vrstica 32)
+- Posodobiti `calculateTestStats` funkcijo za pravilno štetje
+
+### 4. `StatusBadge` v `AdminMyReviews.tsx`
+
+**Problem:** Komponenta gleda samo `status` polje, ne razlikuje med "Pregledano" in "Zaključeno".
+
+**Rešitev:** Spremeniti logiko da upošteva `reviewed_at` in `completed_at`:
+- Če je `completed_at` nastavljen → "Zaključeno" (zelena)
+- Če je `reviewed_at` nastavljen ALI status = 'completed' → "Pregledano" (vijolična)
+- Sicer → "V pregledu" (modra)
+
+### 5. `StatusBadge` v `AdminTests.tsx`
+
+**Problem:** Enaka logika manjka.
+
+**Rešitev:** Dodati novo statusno logiko z dodatnim stanjem "Pregledano" (vijolična).
+
+### 6. Štetje odprtih primerov v `useAdminCounts.ts`
+
+**Problem:** Query šteje samo `assigned` in `in_review`, ne pa tudi `completed` brez `completed_at`.
+
+**Rešitev:** Spremeniti query (vrstice 33-37) da šteje vse seje brez končnega poročila:
 ```typescript
-// PRED:
-.in('status', ['assigned', 'in_review'])
-
-// PO - vključi tudi completed BREZ completed_at:
-const { count, error } = await supabase
-  .from('articulation_test_sessions')
-  .select('*', { count: 'exact', head: true })
-  .eq('assigned_to', profile.id)
-  .or('status.in.(assigned,in_review),and(status.eq.completed,completed_at.is.null)');
+// Štej vse seje ki so dodeljene meni IN nimajo completed_at
+.eq('assigned_to', profile.id)
+.is('completed_at', null)
 ```
 
-Alternativna enostavnejša rešitev - štej vse razen tistih s `completed_at`:
-```typescript
-const { count } = await supabase
-  .from('articulation_test_sessions')
-  .select('*', { count: 'exact', head: true })
-  .eq('assigned_to', profile.id)
-  .is('completed_at', null);
-```
+### 7. Filter za status na strani `/admin/all-tests`
 
-### 3. `src/pages/admin/AdminMyReviews.tsx` (vrstica 45-62)
+**Problem:** Filter ima samo "Zaključeno", manjka "Pregledano".
 
-Posodobiti `StatusBadge` komponento:
+**Rešitev:** Dodati novo opcijo v Select in posodobiti logiko filtriranja.
 
-```typescript
-function StatusBadge({ status, reviewedAt, completedAt }: { 
-  status: MyReviewSession['status'];
-  reviewedAt?: string | null;
-  completedAt?: string | null;
-}) {
-  // Če je completed_at nastavljen → Zaključeno
-  if (completedAt) {
-    return (
-      <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">
-        Zaključeno
-      </Badge>
-    );
-  }
-  
-  // Če je reviewed_at nastavljen (status = completed, ampak brez poročila) → Pregledano
-  if (reviewedAt || status === 'completed') {
-    return (
-      <Badge className="bg-purple-100 text-purple-700 border-purple-200">
-        Pregledano
-      </Badge>
-    );
-  }
-  
-  // assigned ali in_review → V pregledu
-  return (
-    <Badge className="bg-app-blue/10 text-app-blue border-app-blue/20">
-      V pregledu
-    </Badge>
-  );
-}
-```
+### 8. Popravek obstoječega zapisa v bazi
 
-### 4. `src/pages/admin/AdminTests.tsx` (vrstica 27-52)
-
-Enaka posodobitev za `StatusBadge`:
-
-```typescript
-const StatusBadge = ({ status, reviewedAt, completedAt }: { 
-  status: TestSessionData['status'];
-  reviewedAt?: string | null;
-  completedAt?: string | null;
-}) => {
-  // V čakanju
-  if (status === 'pending') {
-    return (
-      <Badge variant="outline" className="border-amber-500 text-amber-700 bg-amber-50">
-        V čakanju
-      </Badge>
-    );
-  }
-  
-  // Zaključeno (poročilo generirano)
-  if (completedAt) {
-    return (
-      <Badge variant="outline" className="border-emerald-500 text-emerald-700 bg-emerald-50">
-        Zaključeno
-      </Badge>
-    );
-  }
-  
-  // Pregledano (ocene oddane, brez poročila)
-  if (reviewedAt || status === 'completed') {
-    return (
-      <Badge variant="outline" className="border-purple-500 text-purple-700 bg-purple-50">
-        Pregledano
-      </Badge>
-    );
-  }
-  
-  // V obdelavi
-  return (
-    <Badge variant="outline" className="border-blue-500 text-blue-700 bg-blue-50">
-      V obdelavi
-    </Badge>
-  );
-};
-```
-
-### 5. `src/hooks/useMyReviews.ts`
-
-Dodati `reviewed_at` in `completed_at` v query in interface:
-
-```typescript
-// Interface razširitev
-export interface MyReviewSession {
-  // ... obstoječa polja
-  reviewed_at: string | null;
-  completed_at: string | null;
-}
-
-// Query razširitev (vrstica 32)
-.select('id, status, submitted_at, assigned_at, child_id, parent_id, reviewed_at, completed_at')
-```
-
-### 6. `src/hooks/useAdminTests.ts`
-
-Enake spremembe - dodati `reviewed_at` in `completed_at`:
-
-```typescript
-export interface TestSessionData {
-  // ... obstoječa polja
-  reviewed_at: string | null;
-  completed_at: string | null;
-}
-
-// Query (vrstica ~31)
-.select('id, status, submitted_at, child_id, parent_id, assigned_to, reviewed_at, completed_at')
-```
-
-### 7. Filter na strani `/admin/all-tests`
-
-Posodobiti filter opcije za status:
-
-```typescript
-<SelectItem value="pending">V čakanju</SelectItem>
-<SelectItem value="in_review">V obdelavi</SelectItem>
-<SelectItem value="reviewed">Pregledano</SelectItem>  // NOVO
-<SelectItem value="completed">Zaključeno</SelectItem>
-```
-
-In logiko filtriranja:
-
-```typescript
-if (statusFilter === 'reviewed') {
-  // Pregledano = completed status BREz completed_at
-  if (session.status !== 'completed' || session.completed_at) return false;
-}
-if (statusFilter === 'completed') {
-  // Zaključeno = ima completed_at
-  if (!session.completed_at) return false;
-}
+Za sejo, ki je že bila zaključena brez `reviewed_at`, bom dodal SQL migracijo:
+```sql
+UPDATE articulation_test_sessions 
+SET reviewed_at = updated_at 
+WHERE status = 'completed' AND reviewed_at IS NULL;
 ```
 
 ---
 
-## Vizualni pregled statusov
+## Vizualna predstavitev statusa
 
-```text
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                          DELOVNI TOK                                        │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│   pending ──► assigned ──► in_review ──► completed ──► completed            │
-│      │           │            │              │              │               │
-│  "V čakanju"  ─────"V obdelavi"─────    "Pregledano"   "Zaključeno"         │
-│                                          reviewed_at    completed_at        │
-│                                          nastavljen     nastavljen          │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
+| Pogoj | Status | Barva |
+|-------|--------|-------|
+| `status = 'pending'` | V čakanju | Oranžna |
+| `status IN ('assigned', 'in_review')` | V obdelavi | Modra |
+| `status = 'completed' AND completed_at IS NULL` | Pregledano | Vijolična |
+| `completed_at IS NOT NULL` | Zaključeno | Zelena |
 
 ---
 
-## Štetje odprtih primerov v "Moji pregledi"
+## Datoteke za posodobitev
 
-Številka v zavihku prikazuje vse primere BREZ končnega poročila:
-- `assigned` ✓
-- `in_review` ✓  
-- `completed` z `reviewed_at` BREZ `completed_at` ✓
-
-Ko logoped generira poročilo in se nastavi `completed_at`, primer "izgine" iz števca.
-
----
-
-## Barvna shema statusov
-
-| Status | Barva | Hex |
-|--------|-------|-----|
-| V čakanju | Amber/Oranžna | `#F59E0B` |
-| V obdelavi | Modra | `#3B82F6` |
-| Pregledano | Vijolična | `#8B5CF6` |
-| Zaključeno | Zelena | `#10B981` |
-
+1. **`src/hooks/useSessionReview.ts`** - popraviti `completeReview` funkcijo
+2. **`src/hooks/useMyReviews.ts`** - dodati `reviewed_at`, `completed_at` polja
+3. **`src/hooks/useAdminTests.ts`** - dodati `reviewed_at`, `completed_at` polja
+4. **`src/hooks/useAdminCounts.ts`** - popraviti query za štetje odprtih primerov
+5. **`src/pages/admin/AdminMyReviews.tsx`** - posodobiti `StatusBadge` logiko
+6. **`src/pages/admin/AdminTests.tsx`** - posodobiti `StatusBadge` logiko in filter
+7. **Nova SQL migracija** - popraviti obstoječe seje brez `reviewed_at`
