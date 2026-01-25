@@ -360,13 +360,17 @@ export default function AdminUserDetail() {
         throw uploadError;
       }
 
-      // Find session ID from recordings if available
+      // Find session ID - use selected session or find first session for child
       let sessionId: string | null = null;
-      if (reportData.selectedSessionId && recordings.length > 0) {
+      if (reportData.selectedSessionId) {
+        sessionId = reportData.selectedSessionId;
+      } else if (recordings.length > 0) {
+        // Try to find any session for this child
         const { data: sessionData } = await supabase
           .from('articulation_test_sessions')
           .select('id')
           .eq('child_id', childId)
+          .order('created_at', { ascending: false })
           .limit(1)
           .single();
         
@@ -380,7 +384,7 @@ export default function AdminUserDetail() {
         .from('logopedist_reports')
         .insert({
           logopedist_id: logopedistProfile.id,
-          session_id: sessionId || '',
+          session_id: sessionId,
           summary: reportData.ugotovitve?.substring(0, 200) || '',
           findings: { anamneza: reportData.anamneza, ugotovitve: reportData.ugotovitve },
           recommendations: reportData.predlogVaj || '',
