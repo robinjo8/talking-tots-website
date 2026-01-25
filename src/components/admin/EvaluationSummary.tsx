@@ -1,9 +1,22 @@
 import { SessionEvaluationData, EvaluationData } from '@/hooks/useChildEvaluations';
-import { PHONETIC_ORDER } from '@/data/evaluationOptions';
-import { Star, MessageSquare, CheckCircle2 } from 'lucide-react';
+import { PHONETIC_ORDER, getEvaluationConfig } from '@/data/evaluationOptions';
+import { Star, MessageSquare, CheckCircle2, CheckSquare } from 'lucide-react';
 
 interface EvaluationSummaryProps {
   sessionData: SessionEvaluationData;
+}
+
+// Pretvorba ID-ja opcije v slovensko oznako
+function getOptionLabel(optionId: string, letter: string): string {
+  const config = getEvaluationConfig(letter);
+  if (config) {
+    const option = config.options.find(o => o.id === optionId);
+    if (option) {
+      return option.label;
+    }
+  }
+  // Če ni najdeno, vrni ID brez podčrtajev
+  return optionId.replace(/_/g, ' ');
 }
 
 export function EvaluationSummary({ sessionData }: EvaluationSummaryProps) {
@@ -80,14 +93,15 @@ function EvaluationLetterRow({ letter, evaluation }: EvaluationLetterRowProps) {
       </div>
       
       {selectedOptions.length > 0 && (
-        <div className="flex flex-wrap gap-1">
-          {selectedOptions.map((option, idx) => (
-            <span
+        <div className="space-y-1">
+          {selectedOptions.map((optionId, idx) => (
+            <div
               key={idx}
-              className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full"
+              className="flex items-center gap-2 text-sm text-muted-foreground"
             >
-              {option}
-            </span>
+              <CheckSquare className="h-3.5 w-3.5 shrink-0 text-primary" />
+              <span>{getOptionLabel(optionId, letter)}</span>
+            </div>
           ))}
         </div>
       )}
