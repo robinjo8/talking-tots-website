@@ -1,113 +1,76 @@
 
+# Načrt: Popravek odjave (Logout)
 
-# Načrt: Poenostavitev statusov poročil
+## Ugotovitev problema
 
-## Pregled sprememb
+Napaka `session_not_found` (403) iz Supabase pomeni, da seja na strežniku ne obstaja več (je potekla ali bila že izbrisana), vendar ima brskalnik še vedno stare žetone v pomnilniku.
 
-### Nova logika statusov
+**Vzrok:** Funkcija `signOut` v `AdminAuthContext.tsx` kliče `await supabase.auth.signOut()`. Če Supabase vrne napako (ker seja ne obstaja), lahko to prekine normalen tok odjave.
 
-| Status | Slovensko ime | Pomen |
-|--------|---------------|-------|
-| `submitted` | **Oddano** | Končno, aktivno poročilo, ki je vidno staršem |
-| `revised` | **Popravljena** | Prejšnja verzija poročila, ki je bila nadomeščena z novo |
-
-> Status `draft` (Osnutek) se odstrani iz uporabe - vsa generirana poročila bodo takoj označena kot "Oddano".
+**To NI posledica mojih zadnjih sprememb** - spremenil sem samo kodo za poročila, ne za avtentikacijo.
 
 ---
 
-## Diagram toka dela
+## Rešitev
 
-```text
-┌─────────────────────────────────────────────────────────────────────────┐
-│  SCENARIJ 1: Novo poročilo                                              │
-├─────────────────────────────────────────────────────────────────────────┤
-│  1. Logoped napiše poročilo                                             │
-│  2. Klikne "Generiraj"                                                  │
-│  3. Ustvari se PDF + zapis v bazi s status = 'submitted' (Oddano)       │
-│  4. Poročilo je takoj vidno staršem                                     │
-└─────────────────────────────────────────────────────────────────────────┘
+### 1. AdminAuthContext.tsx - signOut funkcija mora ignorirati napake
 
-┌─────────────────────────────────────────────────────────────────────────┐
-│  SCENARIJ 2: Popravljanje obstoječega poročila                          │
-├─────────────────────────────────────────────────────────────────────────┤
-│  1. Logoped klikne "Popravi" na obstoječem poročilu (Oddano)            │
-│  2. Podatki se naložijo v urejevalnik                                   │
-│  3. Logoped naredi popravke                                             │
-│  4. Klikne "Generiraj"                                                  │
-│  5. STARO poročilo dobi status = 'revised' (Popravljena)                │
-│  6. NOVO poročilo dobi status = 'submitted' (Oddano)                    │
-│  7. Starš vidi le novo poročilo                                         │
-└─────────────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## Tehnične spremembe
-
-### 1. AdminUserDetail.tsx - handleGeneratePdf
-
-**Trenutna koda (vrstica 393):**
+Trenutna koda:
 ```typescript
-status: editingReportName ? 'revised' as const : 'draft' as const,
-```
-
-**Nova koda:**
-```typescript
-// Če popravljamo obstoječe poročilo, najprej posodobimo staro na 'revised'
-if (editingReportName) {
-  const { error: updateError } = await supabase
-    .from('logopedist_reports')
-    .update({ status: 'revised' })
-    .ilike('pdf_url', `%${editingReportName.replace('.pdf', '')}%`);
-  
-  if (updateError) {
-    console.error('Error updating old report status:', updateError);
-  }
-}
-
-// Novo poročilo vedno dobi status 'submitted'
-const { error: insertError } = await supabase
-  .from('logopedist_reports')
-  .insert({
-    // ... ostala polja ...
-    status: 'submitted' as const,
-  });
-```
-
-### 2. AdminReports.tsx - Posodobitev oznak statusov
-
-**Sprememba v reportStatusOptions (vrstice 43-48):**
-```typescript
-const reportStatusOptions = [
-  { value: 'all', label: 'Vsi statusi' },
-  { value: 'submitted', label: 'Oddano' },
-  { value: 'revised', label: 'Popravljena' },
-];
-```
-
-**Sprememba v getStatusBadge (vrstice 154-165):**
-```typescript
-const getStatusBadge = (status: string) => {
-  switch (status) {
-    case 'revised':
-      return <Badge variant="outline" className="text-orange-600 border-orange-300">Popravljena</Badge>;
-    case 'submitted':
-      return <Badge className="bg-green-600">Oddano</Badge>;
-    default:
-      // Za morebitne stare 'draft' zapise prikaži kot "Oddano"
-      return <Badge className="bg-green-600">Oddano</Badge>;
-  }
+const signOut = async () => {
+  await supabase.auth.signOut();
+  setUser(null);
+  setSession(null);
+  setProfile(null);
+  setIsSuperAdmin(false);
+  setIsProfileLoading(false);
 };
 ```
 
-### 3. Migracija obstoječih podatkov (opcijsko)
-
-SQL za pretvorbo obstoječih `draft` zapisov v `submitted`:
-```sql
-UPDATE public.logopedist_reports 
-SET status = 'submitted' 
-WHERE status = 'draft';
+Nova koda:
+```typescript
+const signOut = async () => {
+  // Ignoriraj napake - tudi če seja ne obstaja, počisti lokalno stanje
+  try {
+    await supabase.auth.signOut();
+  } catch (error) {
+    console.warn('SignOut error (ignored):', error);
+  }
+  // Vedno počisti lokalno stanje, ne glede na napako
+  setUser(null);
+  setSession(null);
+  setProfile(null);
+  setIsSuperAdmin(false);
+  setIsProfileLoading(false);
+};
 ```
+
+### 2. AdminSidebar.tsx - handleSignOut mora vedno preusmeriti
+
+Trenutna koda:
+```typescript
+const handleSignOut = async () => {
+  await signOut();
+  window.location.href = '/admin/login';
+};
+```
+
+Nova koda (za večjo zanesljivost):
+```typescript
+const handleSignOut = async () => {
+  try {
+    await signOut();
+  } catch (error) {
+    console.warn('SignOut failed, redirecting anyway:', error);
+  }
+  // Vedno preusmeri, tudi če pride do napake
+  window.location.href = '/admin/login';
+};
+```
+
+### 3. AdminMobileNav.tsx - enak popravek
+
+Enak vzorec za mobilno navigacijo.
 
 ---
 
@@ -115,32 +78,15 @@ WHERE status = 'draft';
 
 | Datoteka | Akcija | Opis |
 |----------|--------|------|
-| `src/pages/admin/AdminUserDetail.tsx` | Posodobi | 1) Pred vstavljanjem novega poročila posodobi staro na 'revised', 2) Nova poročila vedno dobijo status 'submitted' |
-| `src/pages/admin/AdminReports.tsx` | Posodobi | 1) Odstrani 'draft' iz filtrov, 2) Spremeni oznako iz "Revidirano" v "Popravljena", 3) Posodobi barve značk |
-| Nova SQL migracija | Ustvari | Pretvori obstoječe 'draft' zapise v 'submitted' |
-
----
-
-## Vizualni prikaz sprememb
-
-### Značke statusov (pred/po)
-
-**PREJ:**
-- Osnutek: siva značka
-- Revidirano: obroba
-- Oddano: primarna barva
-
-**POTEM:**
-- Popravljena: oranžna obroba (za stare verzije)
-- Oddano: zelena značka (za aktivna poročila)
+| `src/contexts/AdminAuthContext.tsx` | Posodobi | Ovij `supabase.auth.signOut()` v try-catch |
+| `src/components/admin/AdminSidebar.tsx` | Posodobi | Ovij `await signOut()` v try-catch |
+| `src/components/admin/AdminMobileNav.tsx` | Posodobi | Ovij `await signOut()` v try-catch |
 
 ---
 
 ## Pričakovani rezultat
 
-Po implementaciji:
-1. Vsako generirano poročilo (novo ali popravljeno) bo takoj označeno kot "Oddano"
-2. Ko logoped popravi poročilo, se stara verzija označi kot "Popravljena"
-3. Starši vidijo le poročila s statusom "Oddano" (aktivna poročila)
-4. Logopedi lahko v arhivu vidijo tudi "Popravljena" poročila za zgodovino
-
+Po popravku:
+1. Odjava bo vedno uspela, tudi če seja na Supabase strežniku ne obstaja
+2. Lokalno stanje se bo počistilo
+3. Uporabnik bo preusmerjen na `/admin/login`
