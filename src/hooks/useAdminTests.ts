@@ -5,6 +5,8 @@ export interface TestSessionData {
   id: string;
   status: 'pending' | 'assigned' | 'in_review' | 'completed';
   submitted_at: string | null;
+  reviewed_at: string | null;
+  completed_at: string | null;
   child_id: string;
   child_name: string;
   child_age: number | null;
@@ -29,7 +31,7 @@ export function useAdminTests() {
       // 1. Get all test sessions
       const { data: sessions, error: sessionsError } = await supabase
         .from('articulation_test_sessions')
-        .select('id, status, submitted_at, child_id, parent_id, assigned_to')
+        .select('id, status, submitted_at, reviewed_at, completed_at, child_id, parent_id, assigned_to')
         .order('submitted_at', { ascending: false });
 
       if (sessionsError) {
@@ -82,6 +84,8 @@ export function useAdminTests() {
           id: session.id,
           status: (session.status || 'pending') as TestSessionData['status'],
           submitted_at: session.submitted_at,
+          reviewed_at: session.reviewed_at,
+          completed_at: session.completed_at,
           child_id: session.child_id,
           child_name: child?.name || 'Neznano',
           child_age: child?.age || null,
@@ -98,11 +102,16 @@ export function useAdminTests() {
   });
 }
 
-export function calculateTestStats(sessions: TestSessionData[]): TestSessionStats {
+export interface TestSessionStatsExtended extends TestSessionStats {
+  reviewed: number;
+}
+
+export function calculateTestStats(sessions: TestSessionData[]): TestSessionStatsExtended {
   return {
     total: sessions.length,
     pending: sessions.filter(s => s.status === 'pending').length,
     inReview: sessions.filter(s => s.status === 'assigned' || s.status === 'in_review').length,
-    completed: sessions.filter(s => s.status === 'completed').length,
+    reviewed: sessions.filter(s => s.status === 'completed' && !s.completed_at).length,
+    completed: sessions.filter(s => !!s.completed_at).length,
   };
 }

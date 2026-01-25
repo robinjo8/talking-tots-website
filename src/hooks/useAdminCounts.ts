@@ -30,11 +30,12 @@ export function useAdminCounts() {
     queryFn: async () => {
       if (!profile?.id) return 0;
 
+      // Štej vse seje dodeljene meni BREZ končnega poročila (completed_at IS NULL)
       const { count, error } = await supabase
         .from('articulation_test_sessions')
         .select('*', { count: 'exact', head: true })
         .eq('assigned_to', profile.id)
-        .in('status', ['assigned', 'in_review']);
+        .is('completed_at', null);
 
       if (error) {
         console.error('Error fetching my reviews count:', error);

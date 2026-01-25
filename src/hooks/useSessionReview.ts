@@ -294,7 +294,10 @@ export async function saveEvaluation(
 export async function completeReview(sessionId: string): Promise<{ success: boolean; error?: string }> {
   const { error } = await supabase
     .from('articulation_test_sessions')
-    .update({ status: 'completed' })
+    .update({ 
+      status: 'completed',
+      reviewed_at: new Date().toISOString() 
+    })
     .eq('id', sessionId);
 
   if (error) {

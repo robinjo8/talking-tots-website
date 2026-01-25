@@ -7,6 +7,8 @@ export interface MyReviewSession {
   status: 'assigned' | 'in_review' | 'completed';
   submitted_at: string | null;
   assigned_at: string | null;
+  reviewed_at: string | null;
+  completed_at: string | null;
   child_id: string;
   child_name: string;
   child_age: number | null;
@@ -29,7 +31,7 @@ export function useMyReviews() {
       // 1. Get sessions assigned to current logopedist
       const { data: sessions, error: sessionsError } = await supabase
         .from('articulation_test_sessions')
-        .select('id, status, submitted_at, assigned_at, child_id, parent_id')
+        .select('id, status, submitted_at, assigned_at, reviewed_at, completed_at, child_id, parent_id')
         .eq('assigned_to', profile.id)
         .in('status', ['assigned', 'in_review', 'completed'])
         .order('assigned_at', { ascending: false });
@@ -85,6 +87,8 @@ export function useMyReviews() {
           status: (session.status || 'in_review') as MyReviewSession['status'],
           submitted_at: session.submitted_at,
           assigned_at: session.assigned_at,
+          reviewed_at: session.reviewed_at,
+          completed_at: session.completed_at,
           child_id: session.child_id,
           child_name: child?.name || 'Neznano',
           child_age: child?.age || null,
