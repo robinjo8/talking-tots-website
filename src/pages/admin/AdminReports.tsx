@@ -293,6 +293,7 @@ export default function AdminReports() {
                     <TableRow>
                       <TableHead>Otrok</TableHead>
                       <TableHead>Starš</TableHead>
+                      <TableHead>Logoped</TableHead>
                       <TableHead>Povzetek</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Ustvarjeno</TableHead>
@@ -304,6 +305,7 @@ export default function AdminReports() {
                       <TableRow key={report.id}>
                         <TableCell className="font-medium">{report.child_name}</TableCell>
                         <TableCell>{report.parent_name}</TableCell>
+                        <TableCell>{report.logopedist_name}</TableCell>
                         <TableCell className="max-w-[200px] truncate">
                           {report.summary || <span className="text-muted-foreground italic">Ni povzetka</span>}
                         </TableCell>
@@ -361,6 +363,7 @@ export default function AdminReports() {
                       <div>
                         <p className="font-medium">{report.child_name}</p>
                         <p className="text-sm text-muted-foreground">{report.parent_name}</p>
+                        <p className="text-xs text-muted-foreground">Logoped: {report.logopedist_name}</p>
                       </div>
                       {getStatusBadge(report.status)}
                     </div>

@@ -20,21 +20,40 @@ export interface LogopedistReport {
   // Joined data
   child_name?: string;
   parent_name?: string;
+  logopedist_name?: string;
 }
 
 export function useLogopedistReports() {
   const { profile } = useAdminAuth();
 
   return useQuery({
-    queryKey: ['logopedist-reports', profile?.id],
+    queryKey: ['logopedist-reports', profile?.organization_id],
     queryFn: async (): Promise<LogopedistReport[]> => {
-      if (!profile?.id) return [];
+      if (!profile?.organization_id) return [];
 
-      // First get the reports
+      // Get all logopedists in the same organization
+      const { data: orgLogopedists, error: logopedistsError } = await supabase
+        .from('logopedist_profiles')
+        .select('id, first_name, last_name')
+        .eq('organization_id', profile.organization_id);
+
+      if (logopedistsError) {
+        console.error('Error fetching organization logopedists:', logopedistsError);
+        throw logopedistsError;
+      }
+
+      const logopedistIds = orgLogopedists?.map(l => l.id) || [profile.id];
+      
+      // Create a map of logopedist names
+      const logopedistMap = new Map(
+        orgLogopedists?.map(l => [l.id, [l.first_name, l.last_name].filter(Boolean).join(' ')]) || []
+      );
+
+      // Get all reports for these logopedists
       const { data: reports, error } = await supabase
         .from('logopedist_reports')
         .select('*')
-        .eq('logopedist_id', profile.id)
+        .in('logopedist_id', logopedistIds)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -47,12 +66,13 @@ export function useLogopedistReports() {
       // Get unique session IDs to fetch child/parent info
       const sessionIds = [...new Set(reports.map(r => r.session_id).filter(Boolean))] as string[];
 
-      // If no sessions, return reports without child/parent info
+      // If no sessions, return reports with logopedist name only
       if (sessionIds.length === 0) {
         return reports.map(report => ({
           ...report,
           child_name: 'Neznano',
           parent_name: 'Neznano',
+          logopedist_name: logopedistMap.get(report.logopedist_id) || 'Neznano',
         }));
       }
 
@@ -67,6 +87,7 @@ export function useLogopedistReports() {
           ...report,
           child_name: 'Neznano',
           parent_name: 'Neznano',
+          logopedist_name: logopedistMap.get(report.logopedist_id) || 'Neznano',
         }));
       }
 
@@ -99,10 +120,11 @@ export function useLogopedistReports() {
           ...report,
           child_name: session ? childMap.get(session.child_id) || 'Neznano' : 'Neznano',
           parent_name: session ? parentMap.get(session.parent_id) || 'Neznano' : 'Neznano',
+          logopedist_name: logopedistMap.get(report.logopedist_id) || 'Neznano',
         };
       });
     },
-    enabled: !!profile?.id,
+    enabled: !!profile?.organization_id,
   });
 }
 
