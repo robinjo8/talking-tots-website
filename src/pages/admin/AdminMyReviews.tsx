@@ -175,30 +175,6 @@ export default function AdminMyReviews() {
     }
   }, [searchParams]);
 
-  const handleNavigate = (sessionId: string) => {
-    navigate(`/admin/tests/${sessionId}`);
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-app-blue" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="p-6">
-        <Card className="border-destructive">
-          <CardContent className="p-6 text-center text-destructive">
-            Napaka pri nalaganju podatkov
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   const myReviews = useMemo(() => {
     if (!sessions) return [];
     
@@ -222,13 +198,10 @@ export default function AdminMyReviews() {
       // Status filter
       if (statusFilter !== 'all') {
         if (statusFilter === 'in_review') {
-          // V obdelavi = no reviewed_at and no completed_at
           if (session.reviewed_at || session.completed_at || session.status === 'completed') return false;
         } else if (statusFilter === 'reviewed') {
-          // Pregledano = has reviewed_at OR status completed, but no completed_at
           if ((!session.reviewed_at && session.status !== 'completed') || session.completed_at) return false;
         } else if (statusFilter === 'completed') {
-          // Zaključeno = has completed_at
           if (!session.completed_at) return false;
         }
       }
@@ -261,7 +234,7 @@ export default function AdminMyReviews() {
     });
   }, [sessions, ageFilter, genderFilter, statusFilter, dateFilter]);
   
-  // Calculate stats from data (using unfiltered sessions)
+  // Calculate stats from unfiltered sessions
   const totalMyReviews = sessions?.length || 0;
   const inReviewCount = sessions?.filter(s => 
     !s.reviewed_at && s.status !== 'completed' && !s.completed_at
@@ -277,6 +250,30 @@ export default function AdminMyReviews() {
     { value: 'reviewed', label: 'Pregledano' },
     { value: 'completed', label: 'Zaključeno' },
   ];
+
+  const handleNavigate = (sessionId: string) => {
+    navigate(`/admin/tests/${sessionId}`);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-app-blue" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <Card className="border-destructive">
+          <CardContent className="p-6 text-center text-destructive">
+            Napaka pri nalaganju podatkov
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
