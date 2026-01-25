@@ -271,6 +271,70 @@ const SplosniPogoji = () => {
             <p className="text-muted-foreground leading-relaxed mt-4">
               V obvestilu o prenehanju delovanja Platforme mora Nosilec platforme Naročniku posredovati datum prenehanja delovanja Platforme, ki hkrati pomeni tudi datum prenehanja naročniškega razmerja ter vseh medsebojnih pravic in obveznosti, ki izhajajo iz naročniške pogodbe.
             </p>
+
+            <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">9.4 Brezplačno obdobje (7-dnevni preizkus)</h3>
+            
+            <h4 className="text-lg font-medium text-foreground mb-2 mt-4">Upravičenost do brezplačnega obdobja</h4>
+            <p className="text-muted-foreground leading-relaxed">
+              Vsak nov uporabnik Platforme TomiTalk je upravičen do enega (1) brezplačnega preizkusnega obdobja v trajanju sedmih (7) zaporednih dni (v nadaljevanju: brezplačno obdobje).
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-4">
+              Brezplačno obdobje je na voljo ob prvi sklenitvi naročniškega razmerja in se lahko koristi za katerikoli naročniški paket Platforme TomiTalk (TomiTalk Start, TomiTalk Plus ali TomiTalk Pro).
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-4">
+              Uporabnik, ki je brezplačno obdobje že koristil v preteklosti, do ponovne uporabe brezplačnega obdobja ni upravičen, ne glede na to, ali je naročnino vmes prekinil, zamenjal naročniški paket ali ponovno ustvaril uporabniški račun.
+            </p>
+
+            <h4 className="text-lg font-medium text-foreground mb-2 mt-4">Obseg storitev v brezplačnem obdobju</h4>
+            <p className="text-muted-foreground leading-relaxed">
+              V času brezplačnega obdobja ima uporabnik poln dostop do vseh funkcionalnosti izbranega naročniškega paketa, v enakem obsegu kot plačljivi naročniki istega paketa.
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-4">
+              Brezplačno obdobje vključuje tudi dostop do vseh vsebin in funkcionalnosti Platforme, ki so sicer namenjene izključno plačljivim naročnikom, vključno z zaprtimi deli platforme, pregledom napredka, igrami, vajami in drugimi digitalnimi vsebinami.
+            </p>
+
+            <h4 className="text-lg font-medium text-foreground mb-2 mt-4">Iztek brezplačnega obdobja in obračun naročnine</h4>
+            <p className="text-muted-foreground leading-relaxed">
+              Po izteku brezplačnega obdobja se naročnina samodejno nadaljuje v plačljivo naročniško razmerje, če ima uporabnik ob izteku brezplačnega obdobja v sistemu evidentirano veljavno plačilno sredstvo.
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-4">
+              V tem primeru se ob izteku brezplačnega obdobja začne redno obračunsko obdobje (mesečno ali letno, skladno z izbranim paketom), naročnina pa se obračuna v skladu z veljavnim cenikom.
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-4">
+              Če ob izteku brezplačnega obdobja uporabnik nima veljavnega plačilnega sredstva ali je plačilne podatke odstranil, se naročnina samodejno prekine, status naročnine se spremeni v neaktivno stanje, dostop do plačljivih vsebin pa se takoj onemogoči.
+            </p>
+
+            <h4 className="text-lg font-medium text-foreground mb-2 mt-4">Prekinitev naročnine v času brezplačnega obdobja</h4>
+            <p className="text-muted-foreground leading-relaxed">
+              Uporabnik lahko kadarkoli v času brezplačnega obdobja prekine naročnino prek nastavitev uporabniškega profila ali prek uradnega portala za upravljanje naročnin.
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-4">
+              V primeru prekinitve naročnine med brezplačnim obdobjem:
+            </p>
+            <ul className="list-disc list-inside text-muted-foreground space-y-2 mt-2">
+              <li>uporabniku ne bo zaračunan noben znesek,</li>
+              <li>uporabnik ohrani dostop do vseh funkcionalnosti izbranega paketa do izteka prvotnega sedemdnevnega brezplačnega obdobja,</li>
+              <li>po izteku brezplačnega obdobja naročnina preneha veljati in dostop do plačljivih vsebin se onemogoči.</li>
+            </ul>
+            <p className="text-muted-foreground leading-relaxed mt-4">
+              Uporabnik, ki je izkoristil brezplačno obdobje in nato prekinil naročnino, ob morebitni ponovni sklenitvi naročniškega razmerja ni več upravičen do novega brezplačnega obdobja in se mu naročnina obračuna takoj.
+            </p>
+
+            <h4 className="text-lg font-medium text-foreground mb-2 mt-4">Preverjanje upravičenosti do brezplačnega obdobja</h4>
+            <p className="text-muted-foreground leading-relaxed">
+              Upravičenost do brezplačnega obdobja se preverja avtomatizirano na podlagi elektronskega naslova uporabnika. Sistem ob vsaki novi naročnini preveri celotno zgodovino naročniških razmerij uporabnika, vključno s prekinjenimi ali preklicanimi naročninami. Če je bila pri katerikoli pretekli naročnini zabeležena uporaba brezplačnega obdobja, se brezplačni preizkus ob novi naročnini ne omogoči in se naročnina obračuna takoj.
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-4">
+              Nosilec platforme si pridržuje pravico do uvedbe dodatnih tehničnih ali organizacijskih ukrepov za preprečevanje zlorab brezplačnega obdobja.
+            </p>
+
+            <h4 className="text-lg font-medium text-foreground mb-2 mt-4">Zamenjava naročniškega paketa v brezplačnem obdobju</h4>
+            <p className="text-muted-foreground leading-relaxed">
+              V času brezplačnega obdobja lahko uporabnik zamenja naročniški paket. V tem primeru se naročniško razmerje obravnava kot enotna naročnina, brez ustvarjanja dodatnih ali podvojenih naročniških razmerij.
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-4">
+              Zamenjava naročniškega paketa se izvede prek funkcije za upravljanje naročnine. Zamenjava paketa ne vpliva na trajanje brezplačnega obdobja, ki se izteče po sedmih (7) dneh od začetka brezplačnega preizkusa.
+            </p>
           </section>
 
           <section>
