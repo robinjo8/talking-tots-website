@@ -20,20 +20,42 @@ export function RecordingPlayer({ word, url }: RecordingPlayerProps) {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
-    const handleLoadedMetadata = () => setDuration(audio.duration);
-    const handleEnded = () => setIsPlaying(false);
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+    };
+    
+    const handleLoadedMetadata = () => {
+      setDuration(audio.duration);
+    };
+    
+    const handleEnded = () => {
+      setIsPlaying(false);
+      setCurrentTime(0);
+    };
+
+    const handleDurationChange = () => {
+      if (audio.duration && isFinite(audio.duration)) {
+        setDuration(audio.duration);
+      }
+    };
 
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('durationchange', handleDurationChange);
     audio.addEventListener('ended', handleEnded);
+
+    // If metadata is already loaded
+    if (audio.readyState >= 1 && audio.duration && isFinite(audio.duration)) {
+      setDuration(audio.duration);
+    }
 
     return () => {
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('durationchange', handleDurationChange);
       audio.removeEventListener('ended', handleEnded);
     };
-  }, []);
+  }, [url]);
 
   const handlePlayPause = () => {
     if (audioRef.current) {
