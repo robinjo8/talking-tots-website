@@ -60,7 +60,7 @@ export function StatCard({ title, value, description, icon: Icon, color, onClick
               {description}
             </p>
           </div>
-          <div className={cn('h-12 w-12 rounded-full flex items-center justify-center', classes.bg)}>
+          <div className={cn('hidden md:flex h-12 w-12 rounded-full items-center justify-center', classes.bg)}>
             <Icon className={cn('h-6 w-6', classes.text)} />
           </div>
         </div>

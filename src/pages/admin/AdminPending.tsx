@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
@@ -25,6 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { TestFilters } from '@/components/admin/TestFilters';
 import { usePendingTests, PendingTestSession } from '@/hooks/usePendingTests';
 import { useClaimTestSession } from '@/hooks/useClaimTestSession';
 import { toast } from 'sonner';
@@ -142,6 +143,59 @@ export default function AdminPending() {
   const { data: sessions, isLoading, error } = usePendingTests();
   const { claimSession, isLoading: isClaimLoading } = useClaimTestSession();
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  
+  // Filter states
+  const [ageFilter, setAgeFilter] = useState('all');
+  const [genderFilter, setGenderFilter] = useState('all');
+  const [dateFilter, setDateFilter] = useState('all');
+
+  const pendingSessions = useMemo(() => {
+    if (!sessions) return [];
+    
+    return sessions.filter(session => {
+      // Age filter
+      if (ageFilter !== 'all') {
+        if (ageFilter === '7+') {
+          if (!session.child_age || session.child_age < 7) return false;
+        } else {
+          if (session.child_age !== Number(ageFilter)) return false;
+        }
+      }
+      
+      // Gender filter
+      if (genderFilter !== 'all') {
+        const gender = session.child_gender?.toLowerCase();
+        if (genderFilter === 'm' && !['m', 'male', 'moški'].includes(gender || '')) return false;
+        if (genderFilter === 'f' && !['f', 'female', 'ženski', 'ž', 'z'].includes(gender || '')) return false;
+      }
+      
+      // Date filter
+      if (dateFilter !== 'all' && session.submitted_at) {
+        const submittedDate = new Date(session.submitted_at);
+        const now = new Date();
+        
+        switch (dateFilter) {
+          case 'today':
+            if (submittedDate.toDateString() !== now.toDateString()) return false;
+            break;
+          case 'week':
+            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            if (submittedDate < weekAgo) return false;
+            break;
+          case 'month':
+            const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+            if (submittedDate < monthAgo) return false;
+            break;
+          case 'year':
+            const yearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+            if (submittedDate < yearAgo) return false;
+            break;
+        }
+      }
+      
+      return true;
+    });
+  }, [sessions, ageFilter, genderFilter, dateFilter]);
 
   const handleClaim = async (sessionId: string) => {
     const result = await claimSession(sessionId);
@@ -173,8 +227,6 @@ export default function AdminPending() {
     );
   }
 
-  const pendingSessions = sessions || [];
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -199,6 +251,19 @@ export default function AdminPending() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Filters */}
+      <TestFilters
+        ageFilter={ageFilter}
+        setAgeFilter={setAgeFilter}
+        showAgeFilter={true}
+        genderFilter={genderFilter}
+        setGenderFilter={setGenderFilter}
+        showGenderFilter={true}
+        dateFilter={dateFilter}
+        setDateFilter={setDateFilter}
+        showDateFilter={true}
+      />
 
       {pendingSessions.length === 0 ? (
         <Card>

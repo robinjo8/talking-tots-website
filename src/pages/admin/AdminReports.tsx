@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,7 @@ import { useLogopedistReports, useDeleteLogopedistReport, getReportFileUrl, Logo
 import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { TestFilters } from '@/components/admin/TestFilters';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,15 +35,61 @@ export default function AdminReports() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [reportToDelete, setReportToDelete] = useState<LogopedistReport | null>(null);
   const [isDownloading, setIsDownloading] = useState<string | null>(null);
+  
+  // Filter states
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [dateFilter, setDateFilter] = useState('all');
+  
+  const reportStatusOptions = [
+    { value: 'all', label: 'Vsi statusi' },
+    { value: 'draft', label: 'Osnutek' },
+    { value: 'revised', label: 'Revidirano' },
+    { value: 'submitted', label: 'Oddano' },
+  ];
 
-  const filteredReports = reports.filter(report => {
-    const query = searchQuery.toLowerCase();
-    return (
-      report.child_name?.toLowerCase().includes(query) ||
-      report.parent_name?.toLowerCase().includes(query) ||
-      report.summary?.toLowerCase().includes(query)
-    );
-  });
+  const filteredReports = useMemo(() => {
+    return reports.filter(report => {
+      // Search filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        const childMatch = report.child_name?.toLowerCase().includes(query);
+        const parentMatch = report.parent_name?.toLowerCase().includes(query);
+        const summaryMatch = report.summary?.toLowerCase().includes(query);
+        if (!childMatch && !parentMatch && !summaryMatch) return false;
+      }
+      
+      // Status filter
+      if (statusFilter !== 'all') {
+        if (report.status !== statusFilter) return false;
+      }
+      
+      // Date filter
+      if (dateFilter !== 'all' && report.created_at) {
+        const createdDate = new Date(report.created_at);
+        const now = new Date();
+        
+        switch (dateFilter) {
+          case 'today':
+            if (createdDate.toDateString() !== now.toDateString()) return false;
+            break;
+          case 'week':
+            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            if (createdDate < weekAgo) return false;
+            break;
+          case 'month':
+            const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+            if (createdDate < monthAgo) return false;
+            break;
+          case 'year':
+            const yearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+            if (createdDate < yearAgo) return false;
+            break;
+        }
+      }
+      
+      return true;
+    });
+  }, [reports, searchQuery, statusFilter, dateFilter]);
 
   const handleView = async (report: LogopedistReport) => {
     if (!report.pdf_url) {
@@ -201,14 +248,25 @@ export default function AdminReports() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Search */}
-          <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Išči po imenu otroka, starša ali povzetku..."
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              className="pl-10"
+          {/* Filters */}
+          <div className="mb-6 space-y-4">
+            <div className="relative flex-1 md:max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Išči po imenu otroka, starša ali povzetku..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <TestFilters
+              statusFilter={statusFilter}
+              setStatusFilter={setStatusFilter}
+              showStatusFilter={true}
+              statusOptions={reportStatusOptions}
+              dateFilter={dateFilter}
+              setDateFilter={setDateFilter}
+              showDateFilter={true}
             />
           </div>
 
