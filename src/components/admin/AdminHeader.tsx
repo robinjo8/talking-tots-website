@@ -1,9 +1,10 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Bell, Menu, User } from 'lucide-react';
+import { Menu, User } from 'lucide-react';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { AdminMobileNav } from './AdminMobileNav';
+import { NotificationDropdown } from './NotificationDropdown';
 
 export function AdminHeader() {
   const { profile } = useAdminAuth();
@@ -34,12 +35,7 @@ export function AdminHeader() {
       {/* Desna stran: obvestila + uporabnik */}
       <div className="flex items-center gap-2 lg:gap-4">
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-app-orange text-[10px] font-medium text-white flex items-center justify-center">
-            3
-          </span>
-        </Button>
+        <NotificationDropdown />
 
         {/* User info */}
         <div className="flex items-center gap-3">
