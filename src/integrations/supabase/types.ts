@@ -692,7 +692,7 @@ export type Database = {
           next_steps: string | null
           pdf_url: string | null
           recommendations: string | null
-          session_id: string
+          session_id: string | null
           status: Database["public"]["Enums"]["report_status"] | null
           submitted_at: string | null
           summary: string | null
@@ -707,7 +707,7 @@ export type Database = {
           next_steps?: string | null
           pdf_url?: string | null
           recommendations?: string | null
-          session_id: string
+          session_id?: string | null
           status?: Database["public"]["Enums"]["report_status"] | null
           submitted_at?: string | null
           summary?: string | null
@@ -722,7 +722,7 @@ export type Database = {
           next_steps?: string | null
           pdf_url?: string | null
           recommendations?: string | null
-          session_id?: string
+          session_id?: string | null
           status?: Database["public"]["Enums"]["report_status"] | null
           submitted_at?: string | null
           summary?: string | null
