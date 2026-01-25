@@ -21,7 +21,7 @@ export const videoNavodilaConfigs: Record<string, VideoNavodilaConfig> = {
     letter: 'Č',
     displayLetter: 'Č',
     title: 'Video navodila - Č',
-    videoUrl: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/video-navodila/Glas%20%C4%8C%20(video).mp4'
+    videoUrl: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/video-navodila/Glas%20C_1(video).mp4'
   },
   'k': {
     letter: 'K',
@@ -51,7 +51,7 @@ export const videoNavodilaConfigs: Record<string, VideoNavodilaConfig> = {
     letter: 'Š',
     displayLetter: 'Š',
     title: 'Video navodila - Š',
-    videoUrl: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/video-navodila/Glas%20%C5%A0%20(video).mp4'
+    videoUrl: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/video-navodila/Glas%20S1%20(video).mp4'
   },
   'z': {
     letter: 'Z',
@@ -63,7 +63,7 @@ export const videoNavodilaConfigs: Record<string, VideoNavodilaConfig> = {
     letter: 'Ž',
     displayLetter: 'Ž',
     title: 'Video navodila - Ž',
-    videoUrl: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/video-navodila/Glas%20%C5%BD%20(video).mp4'
+    videoUrl: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/video-navodila/Glas%20Z1%20(video).mp4'
   }
 };
 
