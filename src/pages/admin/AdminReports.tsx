@@ -42,9 +42,8 @@ export default function AdminReports() {
   
   const reportStatusOptions = [
     { value: 'all', label: 'Vsi statusi' },
-    { value: 'draft', label: 'Osnutek' },
-    { value: 'revised', label: 'Revidirano' },
     { value: 'submitted', label: 'Oddano' },
+    { value: 'revised', label: 'Popravljena' },
   ];
 
   const filteredReports = useMemo(() => {
@@ -153,14 +152,13 @@ export default function AdminReports() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'draft':
-        return <Badge variant="secondary">Osnutek</Badge>;
       case 'revised':
-        return <Badge variant="outline">Revidirano</Badge>;
+        return <Badge variant="outline" className="text-orange-600 border-orange-300">Popravljena</Badge>;
       case 'submitted':
-        return <Badge className="bg-primary">Oddano</Badge>;
+        return <Badge className="bg-green-600">Oddano</Badge>;
       default:
-        return <Badge variant="secondary">{status}</Badge>;
+        // Za morebitne stare 'draft' zapise prikaži kot "Oddano"
+        return <Badge className="bg-green-600">Oddano</Badge>;
     }
   };
 
