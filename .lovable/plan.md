@@ -1,243 +1,68 @@
 
 
-# Načrt: Posodobitev strani "Moji pregledi" in "Moj portal"
+# Načrt: Popravek barv v tortnih grafih
 
-## Povzetek
+## Problem
 
-Potrebno je posodobiti dve strani:
-1. **`/admin/my-reviews`** - Dodati 4 statistične kartice za logopedove lastne preglede
-2. **`/admin` (Moj portal)** - Razširiti z dvema nivojema kartic (organizacija + osebno) ter interaktivnimi grafi
+Recharts komponente ne morejo pravilno interpretirati CSS spremenljivk kot `hsl(var(--app-orange))`. Zaradi tega se barve prikazujejo napačno (črna namesto oranžne).
 
----
+## Rešitev
 
-## 1. Stran `/admin/my-reviews` - Statistične kartice
+Uporabiti dejanske HSL vrednosti namesto CSS spremenljivk v obeh tortnih grafih.
 
-### Trenutno stanje
-Stran prikazuje samo eno kartico "Aktivni pregledi" s skupnim številom.
+## Spremembe
 
-### Nove kartice (4 kartice v vrsti)
+### 1. `OrganizationPieChart.tsx` - Graf za organizacijo
 
-| Kartica | Podatek | Ikona | Barva | Opis |
-|---------|---------|-------|-------|------|
-| **Moji pregledi** | Skupno število prevzetih primerov | User | Modra | Vsi primeri, ki ste jih prevzeli |
-| **V pregledu** | Število s statusom "V obdelavi" | Clock | Oranžna | Primeri, ki jih aktivno pregledujete |
-| **Pregledano** | Število s statusom "Pregledano" | CheckCircle | Vijolična | Primeri z oddanimi ocenami |
-| **Zaključeno** | Število s statusom "Zaključeno" | FileCheck | Zelena | Primeri z generiranim poročilom |
-
-### Izračun podatkov
-
-Iz obstoječih podatkov v `useMyReviews`:
+**Trenutna napačna koda:**
 ```typescript
-const totalMyReviews = myReviews.length;
-const inReviewCount = myReviews.filter(s => 
-  s.status !== 'completed' || (!s.reviewed_at && !s.completed_at)
-).length;
-const reviewedCount = myReviews.filter(s => 
-  (s.reviewed_at || s.status === 'completed') && !s.completed_at
-).length;
-const completedCount = myReviews.filter(s => !!s.completed_at).length;
+const statusDistribution = [
+  { name: 'V čakanju', value: stats.orgPendingTests, color: 'hsl(var(--app-orange))' },
+  { name: 'Pregledano', value: stats.orgReviewedTests, color: 'hsl(45, 93%, 47%)' },
+  { name: 'Zaključeno', value: stats.orgCompletedTests, color: 'hsl(var(--dragon-green))' },
+];
 ```
 
----
-
-## 2. Stran `/admin` (Moj portal) - Razširjena nadzorna plošča
-
-### Nova struktura strani
-
-```text
-┌─────────────────────────────────────────────────────────────────────────────┐
-│  Dobrodošli, Robert Kujavec                                                 │
-│  TomiTalk logoped • Preglejte status preverjanj izgovorjave                 │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│  📊 ORGANIZACIJA (TomiTalk logoped)                                         │
-│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐                │
-│  │    12      │ │     5      │ │     4      │ │     3      │                │
-│  │ Vsa prev.  │ │ V čakanju  │ │ Pregledano │ │ Zaključeno │                │
-│  └────────────┘ └────────────┘ └────────────┘ └────────────┘                │
-│                                                                             │
-│  👤 MOJE DELO                                                               │
-│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐                │
-│  │     4      │ │     2      │ │     1      │ │     1      │                │
-│  │ Moji pregl.│ │ V pregledu │ │ Pregledano │ │ Zaključeno │                │
-│  └────────────┘ └────────────┘ └────────────┘ └────────────┘                │
-│                                                                             │
-│  📈 GRAFI                                                                   │
-│  ┌─────────────────────────────────┐ ┌─────────────────────────────────┐    │
-│  │ Statistika preverjanj          │ │ Tortni graf statusov           │    │
-│  │ (Linijski graf)                │ │                                 │    │
-│  │ ☑ Nova preverjanja             │ │    [Tortni diagram]             │    │
-│  │ ☑ V čakanju                    │ │                                 │    │
-│  │ ☐ Pregledano                   │ │                                 │    │
-│  │ ☐ Zaključeno                   │ │                                 │    │
-│  └─────────────────────────────────┘ └─────────────────────────────────┘    │
-│                                                                             │
-│  🧠 NAJPOGOSTEJŠI GOVORNI IZZIVI                                            │
-│  ┌─────────────────────────────────────────────────────────────────────────┐│
-│  │                    [Tortni graf po črkah]                               ││
-│  └─────────────────────────────────────────────────────────────────────────┘│
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
-### Kartice za organizacijo (zgornja vrstica)
-
-| Kartica | Podatek | Ikona | Barva | Opis |
-|---------|---------|-------|-------|------|
-| **Vsa preverjanja** | Število vseh preverjanj v organizaciji | ClipboardList | Modra | Skupno število opravljenih preverjanj |
-| **V čakanju** | Vsi neprevzeti pregledi organizacije | Clock | Oranžna | Pregledi, ki čakajo na prevzem |
-| **Pregledano** | Vsi pregledani s strani organizacije | Eye | Vijolična | Pregledi z oddanimi ocenami |
-| **Zaključeno** | Vsi zaključeni v organizaciji | CheckCircle | Zelena | Pregledi z generiranimi poročili |
-
-### Kartice za osebno delo (spodnja vrstica)
-
-Enake kot na strani `/admin/my-reviews` (glej zgoraj).
-
-### Interaktivni linijski graf
-
-Graf bo imel kljukice (checkboxi) za izbiro katerih linij naj prikazuje:
-- ☑ Nova preverjanja (modra)
-- ☑ V čakanju (oranžna)
-- ☐ Pregledano (vijolična)
-- ☐ Zaključeno (zelena)
-
-Logoped lahko vklopi/izklopi posamezne parametre.
-
-### Tortni graf statusov
-
-Desno od linijskega grafa bo tortni graf z razdelitvijo:
-- Nova preverjanja
-- V čakanju
-- V pregledu
-- Pregledano
-- Zaključeno
-
-Podatki se ujemajo s karticami organizacije.
-
-### Graf govornih izzivov
-
-Premakne se pod glavna grafa in ostane nespremenjen.
-
----
-
-## Tehnične spremembe
-
-### Nove/posodobljene datoteke
-
-**1. `src/hooks/useAdminStats.ts`**
-
-Razširiti za nove statistike:
+**Popravljena koda:**
 ```typescript
-interface AdminStats {
-  // Organizacija
-  orgTotalTests: number;
-  orgPendingTests: number;
-  orgReviewedTests: number;  // NOVO
-  orgCompletedTests: number;
-  
-  // Osebno
-  myTotalReviews: number;
-  myInReviewCount: number;   // NOVO
-  myReviewedCount: number;   // NOVO
-  myCompletedCount: number;  // NOVO
-}
+const statusDistribution = [
+  { name: 'V čakanju', value: stats.orgPendingTests, color: 'hsl(36, 100%, 50%)' },      // Oranžna
+  { name: 'Pregledano', value: stats.orgReviewedTests, color: 'hsl(54, 100%, 62%)' },   // Rumena
+  { name: 'Zaključeno', value: stats.orgCompletedTests, color: 'hsl(122, 39%, 49%)' },  // Zelena
+];
 ```
 
-**2. `src/hooks/useAdminChartData.ts`**
+### 2. `StatusPieChart.tsx` - Graf za moje delo
 
-Razširiti za dodatne linije:
+**Trenutna napačna koda:**
 ```typescript
-interface TestsDataPoint {
-  date: string;
-  new: number;
-  pending: number;    // NOVO
-  reviewed: number;   // NOVO
-  completed: number;
-}
-
-interface StatusDistribution {  // NOVO
-  name: string;
-  value: number;
-  color: string;
-}
+const statusDistribution = [
+  { name: 'V obdelavi', value: stats.myInReviewCount, color: 'hsl(var(--app-blue))' },
+  { name: 'Pregledano', value: stats.myReviewedCount, color: 'hsl(280, 70%, 50%)' },
+  { name: 'Zaključeno', value: stats.myCompletedCount, color: 'hsl(var(--dragon-green))' },
+];
 ```
 
-**3. `src/components/admin/TestsLineChart.tsx`**
-
-- Dodati checkboxe za vklop/izklop linij
-- Uporabiti state za sledenje aktivnim linijam
-- Prikazati le izbrane linije
-
-**4. `src/components/admin/StatusPieChart.tsx`** (NOVA DATOTEKA)
-
-Nova komponenta za tortni graf statusov.
-
-**5. `src/pages/admin/AdminDashboard.tsx`**
-
-- Dodati razdelek "Organizacija" z 4 karticami
-- Dodati razdelek "Moje delo" z 4 karticami
-- Postaviti grafe v mrežo (linijski + tortni)
-- Premakniti graf govornih izzivov pod glavna grafa
-
-**6. `src/pages/admin/AdminMyReviews.tsx`**
-
-- Zamenjati eno kartico s 4 karticami v vrsti
-- Uporabiti obstoječe podatke za izračun statistik
-
----
-
-## Vizualni predogled
-
-### Stran `/admin/my-reviews`:
-
-```text
-┌─────────────────────────────────────────────────────────────────────────────┐
-│  Moji pregledi                                                              │
-│  Preverjanja, ki ste jih prevzeli v obdelavo                                │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐                │
-│  │ 👤    4    │ │ 🕐    2    │ │ ✅    1    │ │ 📄    1    │                │
-│  │ Moji      │ │ V pregledu │ │ Pregledano │ │ Zaključeno │                │
-│  │ pregledi  │ │            │ │            │ │            │                │
-│  │ Vsi       │ │ Aktivno    │ │ Ocene      │ │ Poročila   │                │
-│  │ prevzeti  │ │ pregleduj. │ │ oddane     │ │ generirana │                │
-│  └────────────┘ └────────────┘ └────────────┘ └────────────┘                │
-│                                                                             │
-│  [Tabela pregledov - nespremenjena]                                         │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
+**Popravljena koda:**
+```typescript
+const statusDistribution = [
+  { name: 'V obdelavi', value: stats.myInReviewCount, color: 'hsl(207, 90%, 54%)' },    // Modra
+  { name: 'Pregledano', value: stats.myReviewedCount, color: 'hsl(280, 70%, 50%)' },    // Vijolična
+  { name: 'Zaključeno', value: stats.myCompletedCount, color: 'hsl(122, 39%, 49%)' },   // Zelena
+];
 ```
 
-### Stran `/admin` (Moj portal) - grafi:
+## Barve iz tailwind.config.ts
 
-```text
-┌─────────────────────────────────────────────────────────────────────────────┐
-│  📈 Statistika preverjanj           │  📊 Razdelitev statusov              │
-├─────────────────────────────────────┼─────────────────────────────────────┤
-│                                     │                                     │
-│  Izberi prikaz:                     │         ┌──────────┐                │
-│  ☑ Nova preverjanja                 │      ┌──┤V čakanju │                │
-│  ☑ V čakanju                        │   ┌──┤  └──────────┘                │
-│  ☐ Pregledano                       │   │  │                              │
-│  ☐ Zaključeno                       │   │  └──Pregledano                  │
-│                                     │   │                                 │
-│  ▄▄▄▄▄                              │   └────Zaključeno                   │
-│      ▄▄▄                            │                                     │
-│         ▄▄▄▄                        │                                     │
-│  ───────────────                    │                                     │
-│                                     │                                     │
-└─────────────────────────────────────┴─────────────────────────────────────┘
-```
-
----
+| Ime | HSL vrednost | Barva |
+|-----|--------------|-------|
+| app-orange | `hsl(36, 100%, 50%)` | Oranžna |
+| app-yellow | `hsl(54, 100%, 62%)` | Rumena |
+| dragon-green | `hsl(122, 39%, 49%)` | Zelena |
+| app-blue | `hsl(207, 90%, 54%)` | Modra |
 
 ## Datoteke za posodobitev
 
-1. **`src/hooks/useAdminStats.ts`** - Razširiti s podrobnejšimi statistikami
-2. **`src/hooks/useAdminChartData.ts`** - Dodati podatke za nove grafe
-3. **`src/components/admin/TestsLineChart.tsx`** - Dodati interaktivne checkboxe
-4. **`src/components/admin/StatusPieChart.tsx`** - Nova komponenta za tortni graf
-5. **`src/pages/admin/AdminDashboard.tsx`** - Celotna prenova z dvema nivojema kartic
-6. **`src/pages/admin/AdminMyReviews.tsx`** - Dodati 4 statistične kartice
+1. **`src/components/admin/OrganizationPieChart.tsx`** - zamenjati CSS spremenljivke z dejanskimi HSL vrednostmi
+2. **`src/components/admin/StatusPieChart.tsx`** - zamenjati CSS spremenljivke z dejanskimi HSL vrednostmi
 
