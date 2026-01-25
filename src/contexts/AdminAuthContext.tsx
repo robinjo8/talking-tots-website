@@ -37,6 +37,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [isProfileLoading, setIsProfileLoading] = useState(false);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   const fetchLogopedistProfile = async (userId: string) => {
     setIsProfileLoading(true);
@@ -96,6 +97,12 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        // Ignoriraj vse dogodke med odjavo
+        if (isSigningOut) {
+          console.log('AdminAuthContext: Ignoring auth event during signout:', event);
+          return;
+        }
+        
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -177,20 +184,25 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const isLoading = isAuthLoading || isProfileLoading;
 
   const signOut = async () => {
-    // Ignoriraj napake - tudi če seja ne obstaja, počisti lokalno stanje
+    // Nastavi zastavico, da onAuthStateChange ignorira dogodke
+    setIsSigningOut(true);
+    
+    // VEDNO počisti localStorage žeton TAKOJ - preden kličemo Supabase
+    localStorage.removeItem('sb-ecmtctwovkheohqwahvt-auth-token');
+    
     try {
       await supabase.auth.signOut();
     } catch (error) {
       console.warn('SignOut error (ignored):', error);
-      // Prisilno počisti localStorage žetone, če signOut ne uspe
-      localStorage.removeItem('sb-ecmtctwovkheohqwahvt-auth-token');
     }
-    // Vedno počisti lokalno stanje, ne glede na napako
+    
+    // Počisti lokalno stanje
     setUser(null);
     setSession(null);
     setProfile(null);
     setIsSuperAdmin(false);
     setIsProfileLoading(false);
+    // NE resetiraj isSigningOut - window.location.href bo tako ali tako osvežil stran
   };
 
   return (
