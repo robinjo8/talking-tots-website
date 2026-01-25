@@ -75,7 +75,7 @@ const RazvojGovora = () => {
             <li>Otrok se začne izražati v stavkih, sestavljenih iz samostalnika in glagola, na primer <em>Ema pia (pila)</em> ali <em>Tim gaja (nagaja)</em>.</li>
             <li>Do drugega leta ima besedni zaklad približno 200 ali več besed.</li>
             <li>Otrok se odziva na enostavna navodila in razume preprosta vprašanja.</li>
-            <li>V govoru uporablja vse samoglasnike in nekatere soglasnike (p, b, m, t, d, k, g).</li>
+            <li>V govoru uporablja vse samoglasnike in nekatere soglasnike (p, b, m, n, j, t, d).</li>
           </ul>
         </section>
 
@@ -90,7 +90,7 @@ const RazvojGovora = () => {
             <li>Razume in odgovarja na enostavna vprašanja, začne razumeti predloge, nasprotja, časovne pojme, pridevnike in zaimke.</li>
             <li>Zna pokazati poimenovane dele telesa in dlje časa ohranja slušno pozornost.</li>
             <li>Do tretjega leta obsega besedni zaklad 250–450 besed.</li>
-            <li>V govoru uporablja vse samoglasnike in večino soglasnikov (p, b, m, n, t, d, g, h, j, k).</li>
+            <li>V govoru uporablja vse samoglasnike in večino soglasnikov (p, b, m, n, j, t, d, k, g, h, f, v).</li>
           </ul>
         </section>
 
