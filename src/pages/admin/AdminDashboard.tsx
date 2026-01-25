@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { StatCard } from '@/components/admin/StatCard';
-import { TestsLineChart } from '@/components/admin/TestsLineChart';
+import { OrganizationPieChart } from '@/components/admin/OrganizationPieChart';
 import { StatusPieChart } from '@/components/admin/StatusPieChart';
 import { DifficultiesPieChart } from '@/components/admin/DifficultiesPieChart';
 import { ClipboardList, Clock, Eye, CheckCircle, User, FileCheck } from 'lucide-react';
@@ -117,9 +117,9 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Charts - Line chart and Status pie chart side by side */}
+      {/* Charts - Organization pie chart and Personal status pie chart side by side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <TestsLineChart />
+        <OrganizationPieChart />
         <StatusPieChart />
       </div>
 
