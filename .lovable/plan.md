@@ -1,116 +1,162 @@
 
-# Načrt: Popravek sistema obvestil za uporabnika
+# Načrt: Prikaz pokala (100 zvezdic) takoj po igri
 
-## Ugotovljeni problemi
+## Trenutno stanje
 
-1. **Zvonček se ne prikazuje na namizju** - komponenta `UserNotificationBell` je dodana samo v `MobileMenu.tsx`, manjka v `DesktopNavigation.tsx`
-2. **Obvestilo samo prenese datoteko** - namesto da preusmeri uporabnika na `/profile?expandSection=myDocuments`
-3. **Obvestila se ne označijo kot prebrana** ko uporabnik odpre zavihek "Moji dokumenti"
+### Kako trenutno deluje:
+1. Otrok dokonča igro → prejme zvezdico
+2. Sistem zabeleži napredek v bazo podatkov
+3. `TrophyDialog` se prikaže **samo na strani /moja-stran**
+4. Otrok mora **zapustiti igro** in **iti na Moja stran** da vidi čestitke za pokal
 
----
-
-## Vizualni cilj
-
-```text
-┌─────────────────────────────────────────────────────────────────────────┐
-│  DESKTOP HEADER                                                         │
-├─────────────────────────────────────────────────────────────────────────┤
-│  TomiTalk | Cenik | Logopedski nasveti | ...      [🔔 2] [Avatar ŽAK ▾] │
-│                                                     ↑                   │
-│                                            Zvonček z števcem            │
-└─────────────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────────────┐
-│  MOBILE HEADER                                                          │
-├─────────────────────────────────────────────────────────────────────────┤
-│  TomiTalk                                       [🔔 2] [ŽAK] [☰]        │
-│                                                   ↑                     │
-│                                          Zvonček levo od imena          │
-└─────────────────────────────────────────────────────────────────────────┘
-```
+### Vsebina TrophyDialog:
+- Naslov: "ČESTITKE!"  
+- Besedilo: "Čestitamo **[Ime]** za osvojeni pokal!"
+- Slika: Zmajček s pokalom (Zmajcek_pokal.webp)
+- Prikaz: "⭐ [število] ZVEZD ⭐"
+- Zaporedna številka: "Bravo, to je tvoj **[n]**. pokal!"
+- Gumb: "Vzemi pokal"
 
 ---
 
-## Spremembe
+## Predlagana rešitev
 
-### 1. DesktopNavigation.tsx - Dodaj zvonček
+### Pristop: Globalni TrophyDialog provider
 
-Dodaj `UserNotificationBell` levo od uporabniškega profila:
+Namesto da imamo TrophyDialog samo v UnifiedProgressDisplay, bomo ustvarili **globalni kontekst**, ki bo spremljal napredek in prikazal pop-up **kjerkoli v aplikaciji** - vključno znotraj iger.
 
-```typescript
-import { UserNotificationBell } from "./UserNotificationBell";
+---
 
-// V return statement, desno pred UserProfile:
-<div className="flex items-center gap-2">
-  {user && <UserNotificationBell />}
-  {user ? (
-    <UserProfile />
-  ) : (
-    // ... login buttons
-  )}
-</div>
-```
+## Koraki implementacije
 
-### 2. UserNotificationBell.tsx - Preusmeri na "Moji dokumenti"
+### 1. Ustvari nov hook `useTrophyCheck`
 
-Namesto prenosa datoteke, preusmeri uporabnika na stran `/profile` z odprtim zavihkom "Moji dokumenti":
+Nov hook, ki ga kličejo igre PO beleženju zvezdice:
 
 ```typescript
-import { useNavigate } from 'react-router-dom';
+// src/hooks/useTrophyCheck.ts
+export function useTrophyCheck() {
+  const { selectedChild } = useAuth();
+  const queryClient = useQueryClient();
+  const [showTrophy, setShowTrophy] = useState(false);
+  const [trophyData, setTrophyData] = useState<TrophyData | null>(null);
 
-function NotificationItem({ notification, onMarkAsRead, onClose }: NotificationItemProps) {
-  const navigate = useNavigate();
-  
-  const handleClick = () => {
-    // Označi kot prebrano
-    if (!notification.is_read) {
-      onMarkAsRead(notification.id);
+  const checkForNewTrophy = async () => {
+    // 1. Osveži podatke o napredku
+    await queryClient.invalidateQueries(['enhancedProgress']);
+    
+    // 2. Preberi sveže podatke
+    const progress = await fetchProgress(selectedChild.id);
+    
+    // 3. Preveri če je nov pokal
+    const storageKey = `trophy_claimed_${selectedChild.id}_${progress.totalTrophies}`;
+    if (progress.totalTrophies > 0 && !localStorage.getItem(storageKey)) {
+      setTrophyData({
+        childName: selectedChild.name,
+        totalStars: progress.totalStars,
+        trophyNumber: progress.totalTrophies
+      });
+      setShowTrophy(true);
     }
-    // Zapri popover
-    onClose?.();
-    // Preusmeri na Moji dokumenti
-    navigate('/profile?expandSection=myDocuments');
   };
 
+  const claimTrophy = () => {
+    localStorage.setItem(`trophy_claimed_${selectedChild.id}_${trophyData.trophyNumber}`, 'true');
+    setShowTrophy(false);
+  };
+
+  return { showTrophy, trophyData, checkForNewTrophy, claimTrophy };
+}
+```
+
+### 2. Ustvari TrophyProvider kontekst
+
+Globalni provider, ki ovija celotno aplikacijo:
+
+```typescript
+// src/contexts/TrophyContext.tsx
+export function TrophyProvider({ children }) {
+  const { showTrophy, trophyData, claimTrophy } = useTrophyCheck();
+
   return (
-    <div onClick={handleClick}>
-      {/* ... vsebina obvestila ... */}
-      <p>Logopedsko poročilo je bilo naloženo</p>
-    </div>
+    <TrophyContext.Provider value={{ checkForNewTrophy }}>
+      {children}
+      <TrophyDialog 
+        isOpen={showTrophy}
+        childName={trophyData?.childName}
+        totalStars={trophyData?.totalStars}
+        trophyNumber={trophyData?.trophyNumber}
+        onClaimTrophy={claimTrophy}
+      />
+    </TrophyContext.Provider>
   );
 }
 ```
 
-### 3. MyDocumentsSection.tsx - Označi vsa obvestila kot prebrana
+### 3. Posodobi vse igre da kličejo `checkForNewTrophy`
 
-Ko uporabnik odpre zavihek "Moji dokumenti", označi vsa obvestila kot prebrana:
+V vsaki igri/vaji, PO beleženju zvezdice:
 
 ```typescript
-import { useUserNotifications } from '@/hooks/useUserNotifications';
+// Primer: GenericSestavljankaGame.tsx
+const { checkForNewTrophy } = useTrophyContext();
 
-export function MyDocumentsSection() {
-  const { markAllAsRead } = useUserNotifications();
-
-  // Ko se komponenta prikaže, označi vsa obvestila kot prebrana
-  useEffect(() => {
-    markAllAsRead();
-  }, [markAllAsRead]);
+const handleStarClaimed = async () => {
+  recordGameCompletion('puzzle', config.letter);
   
-  // ... ostala koda
-}
+  // Počakaj da se napredek shrani
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // Preveri za nov pokal
+  await checkForNewTrophy();
+};
 ```
 
-### 4. Izboljšaj izgled obvestila
+### 4. Ovij App.tsx s TrophyProvider
 
-Besedilo obvestila naj bo bolj jasno:
+```typescript
+// src/App.tsx
+<TrophyProvider>
+  <RouterProvider router={router} />
+</TrophyProvider>
+```
+
+### 5. Odstrani duplicirano logiko iz UnifiedProgressDisplay
+
+Po implementaciji globalnega providerja ni več potrebe za TrophyDialog v UnifiedProgressDisplay - odstrani dvojno preverjanje.
+
+---
+
+## Tok uporabnika (po spremembi)
 
 ```text
-┌─────────────────────────────────────────────────────┐
-│  🟠  📄  Logopedsko poročilo naloženo               │
-│           Za otroka: Žak                            │
-│           pred 2 h                                  │
-│                                          [Odpri →] │
-└─────────────────────────────────────────────────────┘
+1. Otrok igra igro Spomin
+   ↓
+2. Najde zadnji par → BRAVO dialog → Vzemi zvezdico
+   ↓
+3. recordGameCompletion() beleži 100. zvezdico
+   ↓
+4. checkForNewTrophy() preveri: totalTrophies = 1, ni claimed
+   ↓
+5. TrophyDialog se prikaže TAKOJ v igri:
+   ┌────────────────────────────────────┐
+   │      🎉 ČESTITKE! 🎉              │
+   │                                    │
+   │  Čestitamo ŽAK za osvojeni pokal! │
+   │                                    │
+   │      [Zmajček s pokalom]          │
+   │                                    │
+   │       ⭐ 100 ZVEZD ⭐              │
+   │  Bravo, to je tvoj 1. pokal!      │
+   │                                    │
+   │       [ Vzemi pokal ]             │
+   └────────────────────────────────────┘
+   ↓
+6. Otrok klikne "Vzemi pokal"
+   ↓
+7. localStorage označi pokal kot prevzet
+   ↓
+8. Otrok nadaljuje z igro ali zapusti
 ```
 
 ---
@@ -119,38 +165,26 @@ Besedilo obvestila naj bo bolj jasno:
 
 | Datoteka | Akcija | Opis |
 |----------|--------|------|
-| `src/components/header/DesktopNavigation.tsx` | Posodobi | Dodaj `UserNotificationBell` levo od `UserProfile` |
-| `src/components/header/UserNotificationBell.tsx` | Posodobi | Spremeni klik na navigacijo namesto prenosa, izboljšaj besedilo |
-| `src/components/profile/MyDocumentsSection.tsx` | Posodobi | Dodaj `useEffect` za označitev vseh obvestil kot prebrana |
+| `src/hooks/useTrophyCheck.ts` | Nova | Hook za preverjanje in prikaz pokala |
+| `src/contexts/TrophyContext.tsx` | Nova | Globalni provider za TrophyDialog |
+| `src/App.tsx` | Posodobi | Ovij z TrophyProvider |
+| `src/components/games/GenericSestavljankaGame.tsx` | Posodobi | Dodaj checkForNewTrophy po beleženju |
+| `src/components/games/GenericSpominGame.tsx` | Posodobi | Dodaj checkForNewTrophy |
+| `src/components/games/GenericLabirintGame.tsx` | Posodobi | Dodaj checkForNewTrophy |
+| `src/components/games/GenericBingoGame.tsx` | Posodobi | Dodaj checkForNewTrophy |
+| `src/components/games/GenericMetKockeGame.tsx` | Posodobi | Dodaj checkForNewTrophy |
+| `src/components/games/GenericWheelGame.tsx` | Posodobi | Dodaj checkForNewTrophy |
+| `src/components/games/GenericDrsnaSestavljankaGame.tsx` | Posodobi | Dodaj checkForNewTrophy |
+| `src/components/games/GenericIgraUjemanjaGame.tsx` | Posodobi | Dodaj checkForNewTrophy |
+| `src/components/games/GenericZaporedjaGame.tsx` | Posodobi | Dodaj checkForNewTrophy |
+| `src/components/games/TongueGymGame.tsx` | Posodobi | Dodaj checkForNewTrophy |
+| `src/components/progress/UnifiedProgressDisplay.tsx` | Posodobi | Odstrani duplicirano TrophyDialog logiko |
 
 ---
 
-## Tok uporabnika (po popravku)
+## Tehnični povzetek
 
-```text
-1. Uporabnik prejme novo poročilo logopeda
-   ↓
-2. Zvonček v headerju prikaže število (npr. "1")
-   ↓
-3. Uporabnik klikne na zvonček → odpre se popover
-   ↓
-4. V popover-ju vidi: "Logopedsko poročilo naloženo - Za otroka: Žak"
-   ↓
-5. Klikne na obvestilo → preusmeri na /profile?expandSection=myDocuments
-   ↓
-6. Zavihek "Moji dokumenti" se odpre
-   ↓
-7. Ob odprtju zavihka se vsa obvestila označijo kot prebrana
-   ↓
-8. Število na zvončku izgine
-```
-
----
-
-## Pričakovani rezultat
-
-- Zvonček je viden na **namizju IN mobilni napravi**
-- Obvestilo prikaže jasno sporočilo "Logopedsko poročilo naloženo"
-- Klik na obvestilo preusmeri na zavihek "Moji dokumenti"
-- Ob odprtju zavihka se obvestila **samodejno označijo kot prebrana**
-- Število na zvončku izgine, ko uporabnik pregleda dokumente
+- **Problem**: TrophyDialog se prikaže samo na /moja-stran
+- **Rešitev**: Globalni TrophyProvider, ki prikaže dialog kjerkoli
+- **Prednost**: Otrok vidi čestitke TAKOJ ko doseže mejnik
+- **Ključni mehanizem**: `checkForNewTrophy()` se kliče po vsaki osvojeni zvezdici
