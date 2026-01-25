@@ -417,28 +417,49 @@ export default function AdminUserDetail() {
 
   const handleEditGeneratedReport = async (file: StorageFile) => {
     // Try to find the report in the database to load its content
-    const { data: reportData, error } = await supabase
+    // Search by pdf_url containing the filename (since path might vary)
+    const fileName = file.name;
+    const { data: reportsData, error } = await supabase
       .from('logopedist_reports')
       .select('*')
-      .eq('pdf_url', file.path)
-      .single();
+      .ilike('pdf_url', `%${fileName}%`)
+      .order('created_at', { ascending: false })
+      .limit(1);
 
-    if (error || !reportData) {
-      // If not in database, just set the editing name and let user fill in fields
-      toast.info('Poročilo naloženo za popravljanje. Vnesite novo vsebino.');
+    const reportRecord = reportsData?.[0];
+
+    if (error || !reportRecord) {
+      // Report not in database - try to find a matching saved .txt report
+      const matchingTxtReport = reports.find(r => {
+        // Match by date pattern in filename
+        const pdfDateMatch = file.name.match(/(\d{4}-\d{2}-\d{2})/);
+        const txtDateMatch = r.name.match(/(\d{4}-\d{2}-\d{2})/);
+        return pdfDateMatch && txtDateMatch && pdfDateMatch[1] === txtDateMatch[1];
+      });
+
+      if (matchingTxtReport) {
+        // Load content from matching .txt file
+        await handleEditReport(matchingTxtReport);
+        setEditingReportName(file.name);
+        toast.info('Vsebina naložena iz shranjenega osnutka. Preglejte in popravite.');
+        return;
+      }
+
+      // No matching content found - user needs to enter manually
+      toast.warning('Podatki poročila niso na voljo v bazi. Prosimo, vnesite vsebino ročno.');
       setEditingReportName(file.name);
       setHasUnsavedChanges(true);
       return;
     }
 
-    // Load the report data into the editor
-    const findings = reportData.findings as { anamneza?: string; ugotovitve?: string } | null;
+    // Load the report data from database into the editor
+    const findings = reportRecord.findings as { anamneza?: string; ugotovitve?: string } | null;
     setReportData(prev => ({
       ...prev,
       anamneza: findings?.anamneza || '',
-      ugotovitve: findings?.ugotovitve || reportData.summary || '',
-      predlogVaj: reportData.recommendations || '',
-      opombe: reportData.next_steps || '',
+      ugotovitve: findings?.ugotovitve || reportRecord.summary || '',
+      predlogVaj: reportRecord.recommendations || '',
+      opombe: reportRecord.next_steps || '',
     }));
     
     setEditingReportName(file.name);
