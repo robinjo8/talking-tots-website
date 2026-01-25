@@ -2,6 +2,7 @@ import { useState, useRef, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
+import { useTrophyContext } from "@/contexts/TrophyContext";
 import { Home, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -27,6 +28,7 @@ export function GenericIgraUjemanjaGame({ config }: GenericIgraUjemanjaGameProps
   const navigate = useNavigate();
   const { user } = useAuth();
   const { recordGameCompletion } = useEnhancedProgress();
+  const { checkForNewTrophy } = useTrophyContext();
   const gameCompletedRef = useRef(false);
 
   const [gameKey, setGameKey] = useState(0);
@@ -186,8 +188,11 @@ export function GenericIgraUjemanjaGame({ config }: GenericIgraUjemanjaGameProps
     navigate('/govorne-igre/igra-ujemanja');
   };
 
-  const handleStarClaimed = () => {
+  const handleStarClaimed = async () => {
     recordGameCompletion('matching', config.trackingId);
+    // Check for trophy after claiming star
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await checkForNewTrophy();
   };
 
   // Get completion images based on game type - memoized to prevent re-renders

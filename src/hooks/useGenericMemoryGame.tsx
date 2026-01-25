@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEnhancedProgress } from "./useEnhancedProgress";
+import { useTrophyContext } from "@/contexts/TrophyContext";
 import { SpominConfig } from "@/data/spominConfig";
 
 export interface MemoryCard {
@@ -17,6 +18,7 @@ export interface MemoryCard {
 
 export const useGenericMemoryGame = (config: SpominConfig) => {
   const { recordGameCompletion } = useEnhancedProgress();
+  const { checkForNewTrophy } = useTrophyContext();
   const [cards, setCards] = useState<MemoryCard[]>([]);
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
   const [matchedPairs, setMatchedPairs] = useState<string[]>([]);
@@ -145,8 +147,12 @@ export const useGenericMemoryGame = (config: SpominConfig) => {
       gameCompletedRef.current = true;
       // Record completion in progress system
       recordGameCompletion('memory', config.displayLetter);
+      // Check for trophy after short delay
+      setTimeout(async () => {
+        await checkForNewTrophy();
+      }, 500);
     }
-  }, [matchedPairs, cards]);
+  }, [matchedPairs, cards, checkForNewTrophy, recordGameCompletion, config.displayLetter]);
 
   const resetGame = () => {
     if (memoryCardsData && memoryCardsData.length > 0) {

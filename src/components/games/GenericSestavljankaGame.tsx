@@ -12,6 +12,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
+import { useTrophyContext } from "@/contexts/TrophyContext";
 import { Home, RefreshCw } from "lucide-react";
 import type { SestavljankeGameConfig } from "@/data/sestavljankeGameConfig";
 import type { PuzzleImage } from "@/data/puzzleImages";
@@ -57,6 +58,7 @@ export function GenericSestavljankaGame({ config }: GenericSestavljankaGameProps
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { recordGameCompletion } = useEnhancedProgress();
+  const { checkForNewTrophy } = useTrophyContext();
   const gameCompletedRef = useRef(false);
   
   const effectiveFullscreen = isMobile;
@@ -69,9 +71,12 @@ export function GenericSestavljankaGame({ config }: GenericSestavljankaGameProps
     }
   }, []);
 
-  const handleStarClaimed = () => {
+  const handleStarClaimed = async () => {
     recordGameCompletion('puzzle', config.trackingId);
     setShowNewGameButton(true);
+    // Check for trophy after short delay to allow progress to save
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await checkForNewTrophy();
   };
 
   const handleNewGame = () => {

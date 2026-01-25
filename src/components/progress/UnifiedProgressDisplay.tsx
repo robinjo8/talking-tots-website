@@ -1,14 +1,11 @@
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EnhancedProgressSummary } from "@/hooks/useEnhancedProgress";
 import { ProgressChart } from "./ProgressChart";
 import { StarDisplay } from "./StarDisplay";
 import { DragonDisplay } from "./DragonDisplay";
-import { TrophyDialog } from "../exercises/TrophyDialog";
 import { InfoButton } from "./InfoButton";
-import { useAuth } from "@/contexts/AuthContext";
 
 interface UnifiedProgressDisplayProps {
   progressData: EnhancedProgressSummary;
@@ -16,9 +13,6 @@ interface UnifiedProgressDisplayProps {
 }
 
 export function UnifiedProgressDisplay({ progressData, recordCompletion }: UnifiedProgressDisplayProps) {
-  const { selectedChild } = useAuth();
-  const [showTrophyDialog, setShowTrophyDialog] = useState(false);
-  
   // Safe access to unified data with fallback
   const unified = progressData?.unified ?? {
     totalStars: 0,
@@ -37,51 +31,15 @@ export function UnifiedProgressDisplay({ progressData, recordCompletion }: Unifi
     }
   };
   
-  // Check if we've earned 10 dragons and haven't claimed the trophy yet
-  // This creates a unique key for each trophy earned
-  useEffect(() => {
-    // Prevent duplicate triggers
-    if (showTrophyDialog) return;
-    
-    if (!selectedChild?.id || unified.totalTrophies === 0) return;
-    
-    // Check if the CURRENT trophy has been claimed
-    // totalTrophies > 0 means user has earned at least 1 trophy
-    const storageKey = `trophy_claimed_${selectedChild.id}_${unified.totalTrophies}`;
-    const hasClaimed = localStorage.getItem(storageKey);
-    
-    // Show dialog when:
-    // 1. We have at least 1 trophy (totalTrophies > 0)
-    // 2. This trophy hasn't been claimed yet
-    if (!hasClaimed) {
-      setShowTrophyDialog(true);
-    }
-  }, [unified.totalTrophies, selectedChild?.id, showTrophyDialog]);
-
-  const handleClaimTrophy = () => {
-    if (!selectedChild?.id) return;
-    
-    // Mark the CURRENT trophy as claimed
-    const storageKey = `trophy_claimed_${selectedChild.id}_${unified.totalTrophies}`;
-    localStorage.setItem(storageKey, 'true');
-    setShowTrophyDialog(false);
-  };
-  
   // Add single test star
   const addOneStar = () => {
     recordCompletion('game', 'test');
   };
 
+  // TrophyDialog is now managed globally by TrophyProvider
+
   return (
     <>
-      <TrophyDialog 
-        isOpen={showTrophyDialog}
-        onClose={() => {}}
-        onClaimTrophy={handleClaimTrophy}
-        childName={selectedChild?.name || ""}
-        totalStars={unified.totalStars}
-        trophyNumber={unified.totalTrophies}
-      />
       
       <div className="space-y-6">
         {/* POKALI Section */}
