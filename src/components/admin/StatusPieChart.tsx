@@ -8,9 +8,9 @@ export function StatusPieChart() {
   
   // Build personal stats distribution for pie chart
   const statusDistribution = [
-    { name: 'V obdelavi', value: stats.myInReviewCount, color: 'hsl(var(--app-blue))' },
-    { name: 'Pregledano', value: stats.myReviewedCount, color: 'hsl(280, 70%, 50%)' },
-    { name: 'Zaključeno', value: stats.myCompletedCount, color: 'hsl(var(--dragon-green))' },
+    { name: 'V obdelavi', value: stats.myInReviewCount, color: 'hsl(207, 90%, 54%)' },    // Modra
+    { name: 'Pregledano', value: stats.myReviewedCount, color: 'hsl(280, 70%, 50%)' },    // Vijolična
+    { name: 'Zaključeno', value: stats.myCompletedCount, color: 'hsl(122, 39%, 49%)' },   // Zelena
   ];
 
   if (isLoading) {
