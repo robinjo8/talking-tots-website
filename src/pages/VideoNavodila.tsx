@@ -76,8 +76,16 @@ const VideoNavodila = () => {
     containScroll: 'trimSnaps'
   });
 
+  // Pretvorba šumnikov v ASCII za URL
+  const toAsciiUrl = (letter: string): string => {
+    return letter.toLowerCase()
+      .replace('č', 'ch')
+      .replace('š', 'sh')
+      .replace('ž', 'zh');
+  };
+
   const handleLetterClick = (letter: string) => {
-    navigate(`/video-navodila/crka-${letter.toLowerCase()}`);
+    navigate(`/video-navodila/${toAsciiUrl(letter)}`);
   };
 
   const LetterCard = ({ letter }: { letter: typeof videoLetters[0] }) => (
