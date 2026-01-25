@@ -1,94 +1,140 @@
 
-# Načrt: Popravek navigacije za Video navodila
+# Načrt: Prenova strani Video navodila in podstrani
 
-## Ugotovljen problem
+## Povzetek
 
-Navigacija na strani `/video-navodila` ne deluje zaradi **dveh težav**:
+Prenova dizajna strani `/video-navodila` in `/video-navodila/:letter` z naslednjimi spremembami:
+1. Postavitev navigacijske poti enako kot na `/logopedski-koticek`
+2. Odstranitev zelenega polja "HEJ, ŽAK!"
+3. Prilagoditev kartic zmajčkov
+4. Modern dizajn glave na podstraneh z videom
 
-### 1. Neskladnost v URL poti
-- **Navigacija** ustvari pot: `/video-navodila/crka-č`
-- **Konfiguracija** pričakuje: `/video-navodila/ch`
-- Predpona `crka-` povzroča, da router ne najde ujemajočega ključa
+---
 
-### 2. Šumniki v URL-ju
-- Navigacija pošilja šumnike (`č`, `š`, `ž`)
-- Konfiguracija ima ključe v ASCII obliki (`ch`, `sh`, `zh`)
-- Funkcija `getVideoConfigKey` sicer pretvori šumnike, ampak ne odstrani predpone `crka-`
+## Primerjava postavitve
 
+### Trenutno stanje `/video-navodila`:
 ```text
-Trenutni tok:
-┌──────────────────┐     ┌─────────────────────────┐     ┌──────────────────┐
-│ Klik na črko "Č" │ ──► │ navigate(/video-navodila│ ──► │ Router prejme    │
-│                  │     │ /crka-č)                │     │ letter = "crka-č"│
-└──────────────────┘     └─────────────────────────┘     └────────┬─────────┘
-                                                                  │
-                                                                  ▼
-                         ┌─────────────────────────┐     ┌──────────────────┐
-                         │ Preusmeritev nazaj na   │ ◄── │ Config = null    │
-                         │ /video-navodila         │     │ (ključ "crka-ch" │
-                         └─────────────────────────┘     │ ne obstaja)      │
-                                                         └──────────────────┘
+┌────────────────────────────────────────────────────────────────┐
+│                        HEADER                                   │
+├────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│                    Video navodila                               │
+│                    ═══════════════                              │
+│                                                                  │
+│          Domov > Moje aplikacije > Video navodila               │
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  HEJ, ŽAK! IZBERI ČRKO IN POGLEJ SI VIDEO NAVODILA...  │   │
+│  │  Z VAJAMI POSTAJAMO VEDNO BOLJŠI!                       │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                  │
+│    ┌──────────┐  ┌──────────┐  ┌──────────┐                     │
+│    │  Zmajček │  │  Zmajček │  │  Zmajček │                     │
+│    │    C     │  │    Č     │  │    K     │                     │
+│    └──────────┘  └──────────┘  └──────────┘                     │
+└────────────────────────────────────────────────────────────────┘
 ```
 
----
-
-## Rešitev
-
-Obstajata dve možni rešitvi:
-
-**Rešitev A** (priporočena): Popraviti navigacijo, da se ujema s konfiguracijo
-**Rešitev B**: Posodobiti konfiguracijo in router za podporo `crka-` predpone
-
-Priporočam **Rešitev A**, ker:
-- Je preprostejša (sprememba samo ene datoteke)
-- Sledi standardiziranemu vzorcu ASCII URL-jev, ki se uporablja drugod v aplikaciji
-- Je skladna s spominskimi zapisi o ASCII URL standardizaciji
-
----
-
-## Tehnična implementacija
-
-### Sprememba v datoteki `src/pages/VideoNavodila.tsx`
-
-**Trenutna koda (vrstica 79-81):**
-```typescript
-const handleLetterClick = (letter: string) => {
-  navigate(`/video-navodila/crka-${letter.toLowerCase()}`);
-};
-```
-
-**Popravljena koda:**
-```typescript
-// Funkcija za pretvorbo šumnikov v ASCII
-const toAsciiUrl = (letter: string): string => {
-  return letter.toLowerCase()
-    .replace('č', 'ch')
-    .replace('š', 'sh')
-    .replace('ž', 'zh');
-};
-
-const handleLetterClick = (letter: string) => {
-  navigate(`/video-navodila/${toAsciiUrl(letter)}`);
-};
-```
-
----
-
-## Potek po popravku
-
+### Želeno stanje (enako kot `/logopedski-koticek`):
 ```text
-Popravljen tok:
-┌──────────────────┐     ┌─────────────────────────┐     ┌──────────────────┐
-│ Klik na črko "Č" │ ──► │ navigate(/video-navodila│ ──► │ Router prejme    │
-│                  │     │ /ch)                    │     │ letter = "ch"    │
-└──────────────────┘     └─────────────────────────┘     └────────┬─────────┘
-                                                                  │
-                                                                  ▼
-                         ┌─────────────────────────┐     ┌──────────────────┐
-                         │ Prikaže se video        │ ◄── │ Config najden!   │
-                         │ stran za črko Č         │     │ videoNavodilaConfigs['ch']
-                         └─────────────────────────┘     └──────────────────┘
+┌────────────────────────────────────────────────────────────────┐
+│                        HEADER                                   │
+├────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│                    Video navodila                               │
+│                    ═══════════════                              │
+│                                                                  │
+│          Domov > Moje aplikacije > Video navodila               │
+│                                                                  │
+│    ┌──────────┐  ┌──────────┐  ┌──────────┐                     │
+│    │  Zmajček │  │  Zmajček │  │  Zmajček │                     │
+│    │    C     │  │    Č     │  │    K     │                     │
+│    │ Opis... │  │ Opis... │  │ Opis... │                     │
+│    └──────────┘  └──────────┘  └──────────┘                     │
+└────────────────────────────────────────────────────────────────┘
 ```
+
+---
+
+## 1. Spremembe v `VideoNavodila.tsx`
+
+### 1.1 Odstranitev zelenega polja
+Odstrani celoten blok `Card` z "HEJ, ŽAK!" (vrstice 139-159).
+
+### 1.2 Ohranitev iste strukture kot LogopedskiKoticek
+Struktura ostane enaka:
+- Naslov na sredini z rumeno črto
+- Breadcrumb pod naslovom
+- Kartice v mreži
+
+### 1.3 Odstranitev neuporabljenih importov
+- Odstrani `Card, CardContent, CardHeader, CardTitle`
+- Odstrani `MessageSquare`
+- Odstrani `useAuth` (ker ne potrebujemo več `childName`)
+
+---
+
+## 2. Prenova podstrani `/video-navodila/:letter`
+
+### Trenutni dizajn:
+```text
+┌────────────────────────────────────────────────────────────────┐
+│                        HEADER                                   │
+├────────────────────────────────────────────────────────────────┤
+│  ←  │           Video navodila - C            │      │        │
+├────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │                      VIDEO PLAYER                         │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────────────┘
+```
+
+### Nov moderni dizajn:
+```text
+┌────────────────────────────────────────────────────────────────┐
+│                        HEADER                                   │
+├────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   Domov > Moje aplikacije > Video navodila > C                 │
+│                                                                  │
+│                      Črka C                                     │
+│              Poglej video navodila za                          │
+│          pravilno izgovorjavo črke C                           │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │                      VIDEO PLAYER                         │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────────────┘
+```
+
+#### Značilnosti novega dizajna:
+- Odstranitev starega `PageHeader` z ←
+- Dodajanje breadcrumb navigacije na vrhu
+- Velik naslov črke na sredini
+- Podnaslov z opisom
+- Čist, minimalističen izgled
+
+---
+
+## 3. Posodobitev BreadcrumbNavigation
+
+### 3.1 Posodobitev konfiguracije za nove URL-je
+Ker so URL-ji sedaj brez "crka-" predpone, je treba posodobiti:
+
+```typescript
+// Staro (ne deluje več):
+{ path: "/video-navodila/crka-c", label: "Črka C", parent: "/video-navodila" },
+
+// Novo (pravilni URL-ji):
+{ path: "/video-navodila/c", label: "C", parent: "/video-navodila" },
+{ path: "/video-navodila/ch", label: "Č", parent: "/video-navodila" },
+// ... itd.
+```
+
+### 3.2 Odstranitev iz excludedPaths
+Odstrani `/video-navodila/crka-` iz seznama izključenih poti, da se breadcrumb prikaže na video straneh.
 
 ---
 
@@ -96,31 +142,54 @@ Popravljen tok:
 
 | Datoteka | Akcija | Opis |
 |----------|--------|------|
-| `src/pages/VideoNavodila.tsx` | Posodobi | Odstrani predpono `crka-` in dodaj pretvorbo šumnikov v ASCII |
+| `src/pages/VideoNavodila.tsx` | Posodobi | Odstrani zeleno polje, očisti importe |
+| `src/components/games/GenericVideoNavodila.tsx` | Posodobi | Nov moderni dizajn z breadcrumb in naslovom |
+| `src/components/BreadcrumbNavigation.tsx` | Posodobi | Posodobi konfiguracijo za nove URL-je |
 
 ---
 
-## Preslikava črk
+## Tehnične podrobnosti
 
-Po popravku bodo URL-ji sledeči:
+### `src/pages/VideoNavodila.tsx`
+- Odstrani vrstice 139-159 (zeleno polje)
+- Odstrani neuporabljene importe: `Card, CardContent, CardHeader, CardTitle, MessageSquare, useAuth`
+- Ohrani strukturo: naslov → breadcrumb → kartice
 
-| Črka | Trenutni URL (ne deluje) | Popravljen URL |
-|------|--------------------------|----------------|
-| C | /video-navodila/crka-c | /video-navodila/c |
-| Č | /video-navodila/crka-č | /video-navodila/ch |
-| K | /video-navodila/crka-k | /video-navodila/k |
-| L | /video-navodila/crka-l | /video-navodila/l |
-| R | /video-navodila/crka-r | /video-navodila/r |
-| S | /video-navodila/crka-s | /video-navodila/s |
-| Š | /video-navodila/crka-š | /video-navodila/sh |
-| Z | /video-navodila/crka-z | /video-navodila/z |
-| Ž | /video-navodila/crka-ž | /video-navodila/zh |
+### `src/components/games/GenericVideoNavodila.tsx`
+- Zamenjaj `PageHeader` z novim dizajnom:
+  - Breadcrumb navigacija
+  - Naslov črke (npr. "Črka C")
+  - Opis pod naslovom
+- Prenesi podatke o črki iz `videoNavodilaConfig` za prikaz
+
+### `src/components/BreadcrumbNavigation.tsx`
+- Posodobi poti za video navodila:
+  ```typescript
+  { path: "/video-navodila/c", label: "C", parent: "/video-navodila" },
+  { path: "/video-navodila/ch", label: "Č", parent: "/video-navodila" },
+  { path: "/video-navodila/k", label: "K", parent: "/video-navodila" },
+  { path: "/video-navodila/l", label: "L", parent: "/video-navodila" },
+  { path: "/video-navodila/r", label: "R", parent: "/video-navodila" },
+  { path: "/video-navodila/s", label: "S", parent: "/video-navodila" },
+  { path: "/video-navodila/sh", label: "Š", parent: "/video-navodila" },
+  { path: "/video-navodila/z", label: "Z", parent: "/video-navodila" },
+  { path: "/video-navodila/zh", label: "Ž", parent: "/video-navodila" },
+  ```
+- Odstrani `/video-navodila/crka-` iz `excludedPaths`
+- Odstrani stare `/video-navodila/crka-*` vnose
 
 ---
 
-## Končni rezultat
+## Vizualni rezultat
 
-Po implementaciji bo:
-1. Klik na katerokoli črko pravilno navigiral na video stran
-2. URL-ji bodo standardizirani in skladni z ostalimi igrami v aplikaciji
-3. Šumniki bodo pravilno pretvorjeni v ASCII obliko za zanesljivo delovanje
+### Stran `/video-navodila`:
+- Čista stran brez zelenega polja
+- Enaka postavitev kot `/logopedski-koticek`
+- Kartice z zmajčki so takoj vidne
+
+### Stran `/video-navodila/c`:
+- Elegantna glava z breadcrumb navigacijo
+- Velik naslov "Črka C" na sredini
+- Opis pod naslovom
+- Video predvajalnik pod opisom
+- Brez starega "← Video navodila - C" dizajna
