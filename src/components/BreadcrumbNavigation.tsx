@@ -93,15 +93,15 @@ const breadcrumbConfig: BreadcrumbConfig[] = [
   
   // Video navodila hierarchy
   { path: "/video-navodila", label: "Video navodila", parent: "/moje-aplikacije" },
-  { path: "/video-navodila/crka-c", label: "Crka C", parent: "/video-navodila" },
-  { path: "/video-navodila/crka-k", label: "Crka K", parent: "/video-navodila" },
-  { path: "/video-navodila/crka-l", label: "Crka L", parent: "/video-navodila" },
-  { path: "/video-navodila/crka-r", label: "Crka R", parent: "/video-navodila" },
-  { path: "/video-navodila/crka-s", label: "Crka S", parent: "/video-navodila" },
-  { path: "/video-navodila/crka-z", label: "Crka Z", parent: "/video-navodila" },
-  { path: "/video-navodila/crka-č", label: "Crka Č", parent: "/video-navodila" },
-  { path: "/video-navodila/crka-š", label: "Crka Š", parent: "/video-navodila" },
-  { path: "/video-navodila/crka-ž", label: "Crka Ž", parent: "/video-navodila" },
+  { path: "/video-navodila/c", label: "C", parent: "/video-navodila" },
+  { path: "/video-navodila/ch", label: "Č", parent: "/video-navodila" },
+  { path: "/video-navodila/k", label: "K", parent: "/video-navodila" },
+  { path: "/video-navodila/l", label: "L", parent: "/video-navodila" },
+  { path: "/video-navodila/r", label: "R", parent: "/video-navodila" },
+  { path: "/video-navodila/s", label: "S", parent: "/video-navodila" },
+  { path: "/video-navodila/sh", label: "Š", parent: "/video-navodila" },
+  { path: "/video-navodila/z", label: "Z", parent: "/video-navodila" },
+  { path: "/video-navodila/zh", label: "Ž", parent: "/video-navodila" },
   
   // Artikulacija vaje
   { path: "/artikulacija-vaje", label: "Artikulacija vaje", parent: "/moje-aplikacije" },
@@ -126,7 +126,6 @@ const excludedPaths = [
   "/artikulacija-vaje/",
   "/vaje-za-jezik",
   "/artikulacijski-test",
-  "/video-navodila/crka-",
   "/art-izgovorjava",
 ];
 
