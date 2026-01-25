@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminTests, TestSessionData, calculateTestStats } from '@/hooks/useAdminTests';
 import { Input } from '@/components/ui/input';
@@ -13,7 +13,14 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search, ClipboardList, Clock, UserCheck, CheckCircle, Eye, Loader2, ChevronDown, Pencil } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Search, ClipboardList, Clock, UserCheck, CheckCircle, Eye, Loader2, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
 
@@ -117,7 +124,7 @@ const TestCard = ({
             <p>{formatDate(session.submitted_at)}</p>
           </div>
           
-          {/* Actions */}
+          {/* Actions - read only */}
           <div className="flex items-center gap-2 pt-2 border-t">
             <Button 
               variant="outline" 
@@ -126,15 +133,6 @@ const TestCard = ({
             >
               <Eye className="h-4 w-4 mr-1" /> Ogled
             </Button>
-            {session.status === 'completed' && (
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => onNavigate(session.id + '?edit=true')}
-              >
-                <Pencil className="h-4 w-4 mr-1" /> Popravi
-              </Button>
-            )}
           </div>
         </div>
       )}
@@ -147,25 +145,99 @@ export default function AdminTests() {
   const { data: sessions, isLoading, error } = useAdminTests();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
+  
+  // Filter states
+  const [ageFilter, setAgeFilter] = useState('all');
+  const [genderFilter, setGenderFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [dateFilter, setDateFilter] = useState('all');
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const toggleCard = (cardId: string) => {
     setExpandedCardId(prev => prev === cardId ? null : cardId);
   };
 
-  // Filter based on search
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, ageFilter, genderFilter, statusFilter, dateFilter]);
+
+  // Filter based on search and filters
   const filteredSessions = useMemo(() => {
     if (!sessions) return [];
-    if (!searchQuery) return sessions;
     
-    const searchLower = searchQuery.toLowerCase();
     return sessions.filter(session => {
-      const parentNameMatch = 
-        session.parent_first_name?.toLowerCase().includes(searchLower) || 
-        session.parent_last_name?.toLowerCase().includes(searchLower);
-      const childNameMatch = session.child_name.toLowerCase().includes(searchLower);
-      return parentNameMatch || childNameMatch;
+      // Search filter
+      if (searchQuery) {
+        const searchLower = searchQuery.toLowerCase();
+        const parentNameMatch = 
+          session.parent_first_name?.toLowerCase().includes(searchLower) || 
+          session.parent_last_name?.toLowerCase().includes(searchLower);
+        const childNameMatch = session.child_name.toLowerCase().includes(searchLower);
+        if (!parentNameMatch && !childNameMatch) return false;
+      }
+      
+      // Age filter
+      if (ageFilter !== 'all') {
+        if (ageFilter === '7+') {
+          if (!session.child_age || session.child_age < 7) return false;
+        } else {
+          if (session.child_age !== Number(ageFilter)) return false;
+        }
+      }
+      
+      // Gender filter
+      if (genderFilter !== 'all') {
+        const gender = session.child_gender?.toLowerCase();
+        if (genderFilter === 'm' && !['m', 'male', 'moški'].includes(gender || '')) return false;
+        if (genderFilter === 'f' && !['f', 'female', 'ženski', 'ž', 'z'].includes(gender || '')) return false;
+      }
+      
+      // Status filter
+      if (statusFilter !== 'all') {
+        if (statusFilter === 'in_review') {
+          if (!['assigned', 'in_review'].includes(session.status)) return false;
+        } else {
+          if (session.status !== statusFilter) return false;
+        }
+      }
+      
+      // Date filter
+      if (dateFilter !== 'all' && session.submitted_at) {
+        const submittedDate = new Date(session.submitted_at);
+        const now = new Date();
+        
+        switch (dateFilter) {
+          case 'today':
+            if (submittedDate.toDateString() !== now.toDateString()) return false;
+            break;
+          case 'week':
+            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            if (submittedDate < weekAgo) return false;
+            break;
+          case 'month':
+            const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+            if (submittedDate < monthAgo) return false;
+            break;
+          case 'year':
+            const yearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+            if (submittedDate < yearAgo) return false;
+            break;
+        }
+      }
+      
+      return true;
     });
-  }, [sessions, searchQuery]);
+  }, [sessions, searchQuery, ageFilter, genderFilter, statusFilter, dateFilter]);
+
+  // Pagination calculations
+  const totalPages = Math.max(1, Math.ceil(filteredSessions.length / itemsPerPage));
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedSessions = filteredSessions.slice(startIndex, endIndex);
 
   // Stats calculations
   const stats = useMemo(() => {
@@ -264,7 +336,7 @@ export default function AdminTests() {
         </CardHeader>
         <CardContent>
           {/* Search */}
-          <div className="flex items-center gap-4 mb-6">
+          <div className="flex items-center gap-4 mb-4">
             <div className="relative flex-1 md:max-w-sm">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -274,6 +346,59 @@ export default function AdminTests() {
                 className="pl-10"
               />
             </div>
+          </div>
+
+          {/* Filters */}
+          <div className="flex flex-wrap gap-3 mb-6">
+            <Select value={ageFilter} onValueChange={setAgeFilter}>
+              <SelectTrigger className="w-[130px]">
+                <SelectValue placeholder="Starost" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Vse starosti</SelectItem>
+                <SelectItem value="3">3 leta</SelectItem>
+                <SelectItem value="4">4 leta</SelectItem>
+                <SelectItem value="5">5 let</SelectItem>
+                <SelectItem value="6">6 let</SelectItem>
+                <SelectItem value="7+">7+ let</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={genderFilter} onValueChange={setGenderFilter}>
+              <SelectTrigger className="w-[110px]">
+                <SelectValue placeholder="Spol" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Vsi</SelectItem>
+                <SelectItem value="m">Moški</SelectItem>
+                <SelectItem value="f">Ženski</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[130px]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Vsi statusi</SelectItem>
+                <SelectItem value="pending">V čakanju</SelectItem>
+                <SelectItem value="in_review">V obdelavi</SelectItem>
+                <SelectItem value="completed">Zaključeno</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={dateFilter} onValueChange={setDateFilter}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Oddano" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Vsi datumi</SelectItem>
+                <SelectItem value="today">Danes</SelectItem>
+                <SelectItem value="week">Zadnji teden</SelectItem>
+                <SelectItem value="month">Zadnji mesec</SelectItem>
+                <SelectItem value="year">Zadnje leto</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Loading State */}
@@ -306,14 +431,16 @@ export default function AdminTests() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredSessions.length === 0 ? (
+                  {paginatedSessions.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
-                        {searchQuery ? 'Ni rezultatov za iskalni niz' : 'Ni opravljenih preverjanj'}
+                        {searchQuery || ageFilter !== 'all' || genderFilter !== 'all' || statusFilter !== 'all' || dateFilter !== 'all' 
+                          ? 'Ni rezultatov za izbrane filtre' 
+                          : 'Ni opravljenih preverjanj'}
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredSessions.map((session) => {
+                    paginatedSessions.map((session) => {
                       const parentName = formatParentName(session);
                       const gender = formatGender(session.child_gender);
                       
@@ -350,26 +477,15 @@ export default function AdminTests() {
                             {formatDate(session.submitted_at)}
                           </TableCell>
                           <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                title="Ogled podrobnosti"
-                                onClick={() => navigate(`/admin/tests/${session.id}`)}
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                              {session.status === 'completed' && (
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  title="Popravi"
-                                  onClick={() => navigate(`/admin/tests/${session.id}?edit=true`)}
-                                >
-                                  <Pencil className="h-4 w-4" />
-                                </Button>
-                              )}
-                            </div>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              title="Ogled podrobnosti"
+                              onClick={() => navigate(`/admin/tests/${session.id}`)}
+                            >
+                              <Eye className="h-4 w-4 mr-1" />
+                              Ogled
+                            </Button>
                           </TableCell>
                         </TableRow>
                       );
@@ -380,15 +496,71 @@ export default function AdminTests() {
             </div>
           )}
 
+          {/* Pagination */}
+          {!isLoading && !error && filteredSessions.length > 0 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-4 border-t">
+              <div className="text-sm text-muted-foreground">
+                Prikazujem {startIndex + 1}-{Math.min(endIndex, filteredSessions.length)} od {filteredSessions.length}
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Na stran:</span>
+                  <Select 
+                    value={String(itemsPerPage)} 
+                    onValueChange={(v) => {
+                      setItemsPerPage(Number(v));
+                      setCurrentPage(1);
+                    }}
+                  >
+                    <SelectTrigger className="w-[70px] h-8">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="20">20</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
+                      <SelectItem value="100">100</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="flex items-center gap-1">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    disabled={currentPage === 1} 
+                    onClick={() => setCurrentPage(p => p - 1)}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <span className="text-sm px-2 min-w-[60px] text-center">
+                    {currentPage} / {totalPages}
+                  </span>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    disabled={currentPage === totalPages} 
+                    onClick={() => setCurrentPage(p => p + 1)}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Mobile: Cards */}
           {!isLoading && !error && (
             <div className="md:hidden space-y-3">
-              {filteredSessions.length === 0 ? (
+              {paginatedSessions.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
-                  {searchQuery ? 'Ni rezultatov za iskalni niz' : 'Ni opravljenih preverjanj'}
+                  {searchQuery || ageFilter !== 'all' || genderFilter !== 'all' || statusFilter !== 'all' || dateFilter !== 'all'
+                    ? 'Ni rezultatov za izbrane filtre' 
+                    : 'Ni opravljenih preverjanj'}
                 </div>
               ) : (
-                filteredSessions.map((session) => (
+                paginatedSessions.map((session) => (
                   <TestCard 
                     key={session.id} 
                     session={session} 

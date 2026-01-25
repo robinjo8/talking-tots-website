@@ -31,7 +31,7 @@ export function useMyReviews() {
         .from('articulation_test_sessions')
         .select('id, status, submitted_at, assigned_at, child_id, parent_id')
         .eq('assigned_to', profile.id)
-        .in('status', ['assigned', 'in_review'])
+        .in('status', ['assigned', 'in_review', 'completed'])
         .order('assigned_at', { ascending: false });
 
       if (sessionsError) {
