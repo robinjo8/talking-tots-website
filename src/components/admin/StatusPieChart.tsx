@@ -52,8 +52,6 @@ export function StatusPieChart() {
                 outerRadius={100}
                 paddingAngle={2}
                 dataKey="value"
-                label={({ name, value }) => `${name}: ${value}`}
-                labelLine={true}
               >
                 {filteredData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
@@ -67,7 +65,12 @@ export function StatusPieChart() {
                   borderRadius: '8px',
                 }}
               />
-              <Legend />
+              <Legend 
+                formatter={(value, entry) => {
+                  const item = filteredData.find(d => d.name === value);
+                  return `${value}: ${item?.value || 0}`;
+                }}
+              />
             </PieChart>
           </ResponsiveContainer>
         </div>
