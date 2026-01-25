@@ -319,7 +319,15 @@ export default function AdminUserDetail() {
     try {
       const pdfBlob = await generateReportPdf(reportData);
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const safeChildName = (childData?.name || 'otrok').replace(/\s+/g, '-');
+      // Sanitize child name: replace Slovenian characters and spaces
+      const safeChildName = (childData?.name || 'otrok')
+        .replace(/č/gi, 'c')
+        .replace(/š/gi, 's')
+        .replace(/ž/gi, 'z')
+        .replace(/đ/gi, 'd')
+        .replace(/ć/gi, 'c')
+        .replace(/\s+/g, '-')
+        .replace(/[^a-zA-Z0-9-]/g, ''); // Remove any remaining special characters
       const fileName = `porocilo-${safeChildName}-${timestamp}.pdf`;
       const filePath = `${parentId}/${childId}/Generirana-porocila/${fileName}`;
 
