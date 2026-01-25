@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { FileText, Download, Trash2, CheckCircle2, Loader2, FileCheck, AlertCircle, ChevronDown } from "lucide-react";
+import { FileText, Download, Trash2, CheckCircle2, Loader2, FileCheck, AlertCircle, ChevronDown, Eye } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChildDocuments } from "@/hooks/useChildDocuments";
 import { useUserNotifications } from "@/hooks/useUserNotifications";
@@ -209,10 +209,13 @@ export function MyDocumentsSection() {
                                 </div>
                               </div>
                               <div className="flex gap-1 shrink-0">
-                                <Button variant="ghost" size="sm" onClick={() => handleDownload(doc.storage_path)} className="h-8 w-8 p-0">
+                                <Button variant="ghost" size="sm" onClick={() => handleDownload(doc.storage_path)} className="h-8 w-8 p-0" title="Ogled">
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="sm" onClick={() => handleDownload(doc.storage_path)} className="h-8 w-8 p-0" title="Prenesi">
                                   <Download className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive hover:text-destructive" onClick={() => handleDelete(doc.id, doc.storage_path, group.childId)}>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive hover:text-destructive" onClick={() => handleDelete(doc.id, doc.storage_path, group.childId)} title="Izbriši">
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
@@ -257,14 +260,26 @@ export function MyDocumentsSection() {
                             <p className="text-xs text-muted-foreground">za {report.childName}</p>
                           </div>
                         </div>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-8 w-8 p-0"
-                          onClick={() => handleDownloadReport(report.path)}
-                        >
-                          <Download className="h-4 w-4" />
-                        </Button>
+                        <div className="flex gap-1 shrink-0">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 w-8 p-0"
+                            onClick={() => handleDownloadReport(report.path)}
+                            title="Ogled"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 w-8 p-0"
+                            onClick={() => handleDownloadReport(report.path)}
+                            title="Prenesi"
+                          >
+                            <Download className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                     ))}
                   </div>
