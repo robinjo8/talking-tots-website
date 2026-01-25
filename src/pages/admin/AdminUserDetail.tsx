@@ -315,6 +315,11 @@ export default function AdminUserDetail() {
       return;
     }
 
+    if (!logopedistProfile?.id) {
+      toast.error('Napaka: profil logopeda ni na voljo');
+      return;
+    }
+
     setIsGeneratingPdf(true);
     try {
       const pdfBlob = await generateReportPdf(reportData);
@@ -339,7 +344,44 @@ export default function AdminUserDetail() {
         throw uploadError;
       }
 
-      toast.success('PDF poročilo generirano in shranjeno');
+      // Find session ID from recordings if available
+      let sessionId: string | null = null;
+      if (reportData.selectedSessionId && recordings.length > 0) {
+        // Try to find a matching session from articulation_test_sessions
+        const { data: sessionData } = await supabase
+          .from('articulation_test_sessions')
+          .select('id')
+          .eq('child_id', childId)
+          .limit(1)
+          .single();
+        
+        if (sessionData) {
+          sessionId = sessionData.id;
+        }
+      }
+
+      // Insert record into logopedist_reports table
+      const { error: insertError } = await supabase
+        .from('logopedist_reports')
+        .insert({
+          logopedist_id: logopedistProfile.id,
+          session_id: sessionId || '',
+          summary: reportData.ugotovitve?.substring(0, 200) || '',
+          findings: { anamneza: reportData.anamneza, ugotovitve: reportData.ugotovitve },
+          recommendations: reportData.predlogVaj || '',
+          next_steps: reportData.opombe || '',
+          pdf_url: filePath,
+          status: 'draft' as const,
+        });
+
+      if (insertError) {
+        console.error('Error inserting report record:', insertError);
+        // Still show success for storage, but warn about DB insert
+        toast.warning('PDF shranjeno, vendar ni bilo mogoče ustvariti zapisa v bazi');
+      } else {
+        toast.success('PDF poročilo generirano in shranjeno');
+      }
+
       setHasUnsavedChanges(false);
       // Clear editable fields
       setReportData(prev => ({
@@ -581,6 +623,63 @@ export default function AdminUserDetail() {
                   </CardContent>
                 </Card>
 
+                {/* Generated Reports Section - moved from right column */}
+                {generatedReports.length > 0 && (
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="h-5 w-5 text-primary" />
+                        <CardTitle className="text-base">Generirana poročila logopeda</CardTitle>
+                      </div>
+                      <CardDescription>
+                        PDF poročila generirana za tega otroka
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        {generatedReports.map((report, index) => (
+                          <div 
+                            key={index}
+                            className="flex items-center justify-between p-2 border rounded-lg bg-primary/5"
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <FileText className="h-4 w-4 text-red-500" />
+                              <span className="text-sm truncate">{report.name}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => handleViewDocument(report)}
+                                title="Odpri v novem oknu"
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => handleDownloadDocument(report)}
+                                title="Prenesi"
+                              >
+                                <Download className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => handleDeleteGeneratedReport(report)}
+                                title="Izbriši"
+                                className="text-destructive hover:text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
                 {/* Speech Recordings Section */}
                 <Card>
                   <CardHeader>
@@ -763,55 +862,6 @@ export default function AdminUserDetail() {
                                 title="Prenesi"
                               >
                                 <Download className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* List of generated PDF reports */}
-                  {generatedReports.length > 0 && (
-                    <div className="pt-4 border-t">
-                      <p className="text-sm font-medium text-muted-foreground mb-2">
-                        Generirana poročila
-                      </p>
-                      <div className="space-y-2">
-                        {generatedReports.map((report, index) => (
-                          <div 
-                            key={index}
-                            className="flex items-center justify-between p-2 border rounded-lg bg-dragon-green/5"
-                          >
-                            <div className="flex items-center gap-2 min-w-0">
-                              <FileText className="h-4 w-4 text-red-500" />
-                              <span className="text-sm truncate">{report.name}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                onClick={() => handleViewDocument(report)}
-                                title="Odpri v novem oknu"
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                onClick={() => handleDownloadDocument(report)}
-                                title="Prenesi"
-                              >
-                                <Download className="h-4 w-4" />
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                onClick={() => handleDeleteGeneratedReport(report)}
-                                title="Izbriši"
-                                className="text-destructive hover:text-destructive"
-                              >
-                                <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
                           </div>
