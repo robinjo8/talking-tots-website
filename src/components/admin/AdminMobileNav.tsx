@@ -84,7 +84,9 @@ export function AdminMobileNav() {
     } catch (error) {
       console.warn('SignOut failed, redirecting anyway:', error);
     }
-    // Vedno preusmeri, tudi če pride do napake
+    // Počisti tudi sessionStorage za splash screen
+    sessionStorage.removeItem('splashShown');
+    // Vedno preusmeri s trdo osveževanje - zagotovi čisto stanje
     window.location.href = '/admin/login';
   };
 
