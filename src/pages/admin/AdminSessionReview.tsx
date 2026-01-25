@@ -5,14 +5,20 @@ import { SessionReviewHeader } from '@/components/admin/SessionReviewHeader';
 import { SessionAccordion } from '@/components/admin/SessionAccordion';
 import { UnsavedChangesDialog } from '@/components/admin/UnsavedChangesDialog';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Pencil, Info } from 'lucide-react';
 import { toast } from 'sonner';
+import { format } from 'date-fns';
+import { sl } from 'date-fns/locale';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 
 export default function AdminSessionReview() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { data, isLoading, error } = useSessionReview(sessionId);
+  const { data, isLoading, error, refetch } = useSessionReview(sessionId);
+  const { profile: logopedistProfile } = useAdminAuth();
   const isEditMode = searchParams.get('edit') === 'true';
   
   // Lokalno stanje za ocene (za optimistične posodobitve)
@@ -23,6 +29,8 @@ export default function AdminSessionReview() {
   const [isCompleting, setIsCompleting] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+  const [showTakeoverDialog, setShowTakeoverDialog] = useState(false);
+  const [isTakingOver, setIsTakingOver] = useState(false);
 
   // Inicializiraj lokalne ocene iz podatkov
   useEffect(() => {
@@ -174,6 +182,47 @@ export default function AdminSessionReview() {
     setShowUnsavedDialog(false);
   };
 
+  // Preveri ali je trenutni logoped dodeljen temu primeru
+  const isAssignedToMe = logopedistProfile && data?.session.assignedTo === logopedistProfile.id;
+  
+  // Funkcija za prevzem primera
+  const handleTakeoverCase = async () => {
+    if (!sessionId || !logopedistProfile) return;
+    
+    setIsTakingOver(true);
+    
+    const { error: updateError } = await supabase
+      .from('articulation_test_sessions')
+      .update({
+        assigned_to: logopedistProfile.id,
+      })
+      .eq('id', sessionId);
+    
+    setIsTakingOver(false);
+    setShowTakeoverDialog(false);
+    
+    if (updateError) {
+      console.error('Napaka pri prevzemu primera:', updateError);
+      toast.error('Napaka pri prevzemu primera');
+    } else {
+      toast.success('Primer uspešno prevzet');
+      refetch();
+      // Preklopi v način urejanja
+      navigate(`/admin/tests/${sessionId}?edit=true`);
+    }
+  };
+
+  // Handler za klik na "Popravi" gumb
+  const handleEditClick = () => {
+    if (isAssignedToMe) {
+      // Če je primer dodeljen meni, preklopi v način urejanja
+      navigate(`/admin/tests/${sessionId}?edit=true`);
+    } else {
+      // Če primer ni dodeljen meni, prikaži dialog za prevzem
+      setShowTakeoverDialog(true);
+    }
+  };
+
   // Loading state
   if (isLoading) {
     return (
@@ -213,10 +262,39 @@ export default function AdminSessionReview() {
         childGender={data.child.gender}
       />
 
-      {/* Info za read-only način */}
+      {/* Info za read-only način z gumbom Popravi */}
       {isReadOnly && (
-        <div className="bg-muted/50 border rounded-lg p-4 text-sm text-muted-foreground">
-          Ta pregled je zaključen. Za urejanje uporabite gumb "Popravi".
+        <div className="bg-muted/50 border rounded-lg p-4 flex items-start gap-3">
+          <Info className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
+          <div className="flex-1 space-y-2">
+            <p className="text-sm text-muted-foreground">
+              Ta pregled je bil zaključen{' '}
+              {data.session.completedAt && (
+                <span className="font-medium text-foreground">
+                  {format(new Date(data.session.completedAt), 'd. M. yyyy', { locale: sl })}
+                </span>
+              )}
+              {data.assignedLogopedist && (
+                <>
+                  {' '}s strani logopeda{' '}
+                  <span className="font-medium text-foreground">
+                    {data.assignedLogopedist.firstName} {data.assignedLogopedist.lastName}
+                  </span>
+                  {' '}({data.assignedLogopedist.organizationName})
+                </>
+              )}
+              .
+            </p>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleEditClick}
+              className="gap-2"
+            >
+              <Pencil className="h-4 w-4" />
+              Popravi
+            </Button>
+          </div>
         </div>
       )}
 
@@ -247,12 +325,27 @@ export default function AdminSessionReview() {
         })}
       </div>
 
-
       {/* Dialog za neshranjene spremembe */}
       <UnsavedChangesDialog
         open={showUnsavedDialog}
         onConfirm={handleDialogConfirm}
         onCancel={handleDialogCancel}
+      />
+
+      {/* Dialog za prevzem primera */}
+      <ConfirmDialog
+        open={showTakeoverDialog}
+        onOpenChange={setShowTakeoverDialog}
+        title="Prevzem primera"
+        description={
+          data.assignedLogopedist
+            ? `Ta primer je trenutno dodeljen logopedu ${data.assignedLogopedist.firstName} ${data.assignedLogopedist.lastName}. Ali želite prevzeti ta primer?`
+            : 'Ali želite prevzeti ta primer?'
+        }
+        confirmText="Prevzemi"
+        cancelText="Prekliči"
+        onConfirm={handleTakeoverCase}
+        isLoading={isTakingOver}
       />
     </div>
   );

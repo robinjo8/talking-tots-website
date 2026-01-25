@@ -23,6 +23,8 @@ export interface SessionReviewData {
     parentId: string;
     status: string;
     submittedAt: string | null;
+    completedAt: string | null;
+    assignedTo: string | null;
   };
   child: {
     name: string;
@@ -33,6 +35,12 @@ export interface SessionReviewData {
     firstName: string | null;
     lastName: string | null;
   };
+  assignedLogopedist: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    organizationName: string;
+  } | null;
   recordingsByLetter: Map<string, Recording[]>;
   evaluations: Map<string, LetterEvaluation>;
 }
@@ -69,6 +77,40 @@ async function fetchSessionReviewData(sessionId: string): Promise<SessionReviewD
 
   if (parentError) {
     console.error('Napaka pri pridobivanju starša:', parentError);
+  }
+
+  // 4. Pridobi podatke o dodeljenem logopedu
+  let assignedLogopedist: SessionReviewData['assignedLogopedist'] = null;
+  if (session.assigned_to) {
+    const { data: logopedist, error: logopedistError } = await supabase
+      .from('logopedist_profiles')
+      .select('id, first_name, last_name, organization_id')
+      .eq('id', session.assigned_to)
+      .single();
+
+    if (logopedistError) {
+      console.error('Napaka pri pridobivanju logopeda:', logopedistError);
+    }
+
+    if (logopedist) {
+      // Pridobi ime organizacije
+      const { data: organization, error: orgError } = await supabase
+        .from('organizations')
+        .select('name')
+        .eq('id', logopedist.organization_id)
+        .single();
+
+      if (orgError) {
+        console.error('Napaka pri pridobivanju organizacije:', orgError);
+      }
+
+      assignedLogopedist = {
+        id: logopedist.id,
+        firstName: logopedist.first_name,
+        lastName: logopedist.last_name,
+        organizationName: organization?.name || 'Neznana organizacija',
+      };
+    }
   }
 
   // 4. Pridobi posnetke iz Storage
@@ -193,6 +235,8 @@ async function fetchSessionReviewData(sessionId: string): Promise<SessionReviewD
       parentId: session.parent_id,
       status: session.status,
       submittedAt: session.submitted_at,
+      completedAt: session.completed_at || null,
+      assignedTo: session.assigned_to || null,
     },
     child: {
       name: child?.name || 'Neznano',
@@ -203,6 +247,7 @@ async function fetchSessionReviewData(sessionId: string): Promise<SessionReviewD
       firstName: parent?.first_name || null,
       lastName: parent?.last_name || null,
     },
+    assignedLogopedist,
     recordingsByLetter,
     evaluations,
   };
