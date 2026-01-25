@@ -1,133 +1,296 @@
 
-
-# Plan: Posodobitev dizajna ocenjevalnega dela
+# Plan: Posodobitev strani /admin/my-reviews in /admin/all-tests
 
 ## Povzetek sprememb
 
-Posodobiti postavitev ocenjevalnega dela na strani za pregled preverjanja izgovorjave tako, da bodo:
-- Checkboxi za specifične napake na **levi strani**
-- 5-stopenjska lestvica na **desni strani**
-- Komentar **pod obema** sekcijama
-- Naslov preimenovan iz "Ocena artikulacije" v "Ocena preverjanja izgovorjave"
+### 1. Stran /admin/my-reviews
+- **Zaključeni pregledi morajo ostati vidni** - Spremeniti hook `useMyReviews.ts` da vključuje tudi status `completed`
+- **Gumb "Popravi"** mora biti vedno prikazan (ne samo za completed), levo od "Ogled"
 
----
-
-## Vizualni prikaz nove postavitve
-
-```text
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ Ocena preverjanja izgovorjave                                               │
-├─────────────────────────────────┬───────────────────────────────────────────┤
-│ LEVA STRAN (checkboxi)          │ DESNA STRAN (5-stopenjska lestvica)       │
-│                                 │                                           │
-│ ☐ Ž izgovarja kot Z             │ ☐ 1️⃣ Neizvedljivo / odsotno         ▼    │
-│ ☐ Odlično izgovarja             │ ☐ 2️⃣ Močno odstopanje              ▼    │
-│ ☐ Ne izgovarja                  │ ☐ 3️⃣ Delno pravilno                ▼    │
-│ ☐ Zamenjuje za Š                │ ☐ 4️⃣ Skoraj pravilno               ▼    │
-│                                 │ ☐ 5️⃣ Pravilno                      ▼    │
-├─────────────────────────────────┴───────────────────────────────────────────┤
-│ Komentar                                                                    │
-│ ┌─────────────────────────────────────────────────────────────────────────┐ │
-│ │ Dodatne opombe...                                                       │ │
-│ └─────────────────────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
+### 2. Stran /admin/all-tests (Vsa preverjanja)
+- **Odstraniti gumb "Popravi"** (Pencil) - samo read-only pregled
+- **Gumb "Ogled"** - dodati napis "Ogled" poleg ikone Eye
+- **Filtriranje** - dodati filtre za: Starost, Spol, Status, Oddano
+- **Paginacija** - 10 zapisov na stran, z možnostjo izbire 10/20/50/100
 
 ---
 
 ## Datoteke za posodobitev
 
-### 1. `src/components/admin/EvaluationCheckboxes.tsx`
+### 1. `src/hooks/useMyReviews.ts`
 
-Spremeniti layout iz vertikalnega v horizontalni (grid z dvema stolpcema):
+Sprememba v vrstici 34:
+```typescript
+// PRED:
+.in('status', ['assigned', 'in_review'])
 
-**Spremembe:**
-- Dodati skupen naslov "Ocena preverjanja izgovorjave" na vrhu
-- Uporabiti `grid grid-cols-1 md:grid-cols-2 gap-6` za razdelitev na levo in desno stran
-- Levi stolpec: checkboxi (vertikalna lista namesto 2x2 mreže)
-- Desni stolpec: 5-stopenjska lestvica
-- Pod gridom: polje za komentar
+// PO:
+.in('status', ['assigned', 'in_review', 'completed'])
+```
 
-### 2. `src/components/admin/ArticulationRatingScale.tsx`
+### 2. `src/pages/admin/AdminMyReviews.tsx`
 
-**Spremembe:**
-- Odstraniti naslov "Ocena artikulacije" (bo na višjem nivoju v `EvaluationCheckboxes`)
-- Ohraniti collapsible funkcionalnost
-
----
-
-## Podrobnosti implementacije
-
-### EvaluationCheckboxes.tsx - nova struktura
+Spremembe:
+- Preurediti gumbe: "Popravi" levo, "Ogled" desno
+- "Popravi" gumb prikazan vedno (ne samo za completed)
 
 ```tsx
-return (
-  <div className="space-y-4 pt-4 border-t border-border">
-    {/* Skupen naslov */}
-    <span className="text-sm font-medium text-foreground">
-      Ocena preverjanja izgovorjave
-    </span>
-    
-    {/* Grid z dvema stolpcema */}
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {/* Levi stolpec - checkboxi */}
-      <div className="space-y-2">
-        {options.map(option => (
-          <div key={option.id} className="flex items-center space-x-2">
-            <Checkbox ... />
-            <Label ...>{option.label}</Label>
-          </div>
-        ))}
-      </div>
-      
-      {/* Desni stolpec - 5-stopenjska lestvica */}
-      <ArticulationRatingScale
-        selectedRating={rating}
-        onRatingChange={onRatingChange}
-        disabled={disabled}
-      />
+// Desktop tabela - vrstica ~243:
+<div className="flex items-center justify-end gap-2">
+  <Button size="sm" variant="outline" onClick={() => handleNavigate(session.id + '?edit=true')}>
+    <Pencil className="h-4 w-4 mr-1" />
+    Popravi
+  </Button>
+  <Button size="sm" variant="outline" onClick={() => handleNavigate(session.id)}>
+    <Eye className="h-4 w-4 mr-1" />
+    Ogled
+  </Button>
+</div>
+```
+
+### 3. `src/pages/admin/AdminTests.tsx`
+
+Večje spremembe:
+
+**a) Odstranitev gumba "Popravi"** (vrstice 362-371, 129-137)
+
+**b) Dodajanje napisa "Ogled" poleg ikone** (vrstica 360)
+```tsx
+<Button variant="ghost" size="sm">
+  <Eye className="h-4 w-4 mr-1" />
+  Ogled
+</Button>
+```
+
+**c) Dodajanje filtrov** - pod iskalnikom:
+```tsx
+<div className="flex flex-wrap gap-4 mb-4">
+  {/* Filter: Starost */}
+  <Select value={ageFilter} onValueChange={setAgeFilter}>
+    <SelectTrigger className="w-[140px]">
+      <SelectValue placeholder="Starost" />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value="all">Vse starosti</SelectItem>
+      <SelectItem value="3">3 leta</SelectItem>
+      <SelectItem value="4">4 leta</SelectItem>
+      <SelectItem value="5">5 let</SelectItem>
+      <SelectItem value="6">6 let</SelectItem>
+      <SelectItem value="7+">7+ let</SelectItem>
+    </SelectContent>
+  </Select>
+
+  {/* Filter: Spol */}
+  <Select value={genderFilter} onValueChange={setGenderFilter}>
+    <SelectTrigger className="w-[120px]">
+      <SelectValue placeholder="Spol" />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value="all">Vsi</SelectItem>
+      <SelectItem value="m">Moški</SelectItem>
+      <SelectItem value="f">Ženski</SelectItem>
+    </SelectContent>
+  </Select>
+
+  {/* Filter: Status */}
+  <Select value={statusFilter} onValueChange={setStatusFilter}>
+    <SelectTrigger className="w-[140px]">
+      <SelectValue placeholder="Status" />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value="all">Vsi statusi</SelectItem>
+      <SelectItem value="pending">V čakanju</SelectItem>
+      <SelectItem value="in_review">V obdelavi</SelectItem>
+      <SelectItem value="completed">Zaključeno</SelectItem>
+    </SelectContent>
+  </Select>
+
+  {/* Filter: Oddano (datumsko obdobje) */}
+  <Select value={dateFilter} onValueChange={setDateFilter}>
+    <SelectTrigger className="w-[160px]">
+      <SelectValue placeholder="Oddano" />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value="all">Vsi datumi</SelectItem>
+      <SelectItem value="today">Danes</SelectItem>
+      <SelectItem value="week">Zadnji teden</SelectItem>
+      <SelectItem value="month">Zadnji mesec</SelectItem>
+      <SelectItem value="year">Zadnje leto</SelectItem>
+    </SelectContent>
+  </Select>
+</div>
+```
+
+**d) Paginacija** - nova logika in UI:
+
+Novi state:
+```typescript
+const [currentPage, setCurrentPage] = useState(1);
+const [itemsPerPage, setItemsPerPage] = useState(10);
+```
+
+Izračun paginiranih podatkov:
+```typescript
+const paginatedSessions = useMemo(() => {
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  return filteredSessions.slice(startIndex, startIndex + itemsPerPage);
+}, [filteredSessions, currentPage, itemsPerPage]);
+
+const totalPages = Math.ceil(filteredSessions.length / itemsPerPage);
+```
+
+UI za paginacijo pod tabelo:
+```tsx
+<div className="flex items-center justify-between mt-4 px-2">
+  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+    <span>Prikazujem {startIndex + 1}-{Math.min(endIndex, total)} od {total}</span>
+  </div>
+  
+  <div className="flex items-center gap-4">
+    {/* Izbira na stran */}
+    <div className="flex items-center gap-2">
+      <span className="text-sm">Na stran:</span>
+      <Select value={String(itemsPerPage)} onValueChange={(v) => setItemsPerPage(Number(v))}>
+        <SelectTrigger className="w-[70px] h-8">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="10">10</SelectItem>
+          <SelectItem value="20">20</SelectItem>
+          <SelectItem value="50">50</SelectItem>
+          <SelectItem value="100">100</SelectItem>
+        </SelectContent>
+      </Select>
     </div>
     
-    {/* Komentar pod obema */}
-    <div className="space-y-2">
-      <Label>Komentar</Label>
-      <Textarea ... />
+    {/* Navigacija strani */}
+    <div className="flex items-center gap-1">
+      <Button variant="outline" size="sm" disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)}>
+        <ChevronLeft className="h-4 w-4" />
+      </Button>
+      <span className="text-sm px-2">{currentPage} / {totalPages}</span>
+      <Button variant="outline" size="sm" disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)}>
+        <ChevronRight className="h-4 w-4" />
+      </Button>
     </div>
   </div>
-);
+</div>
 ```
-
-### ArticulationRatingScale.tsx - odstranitev naslova
-
-Odstraniti vrstico 40:
-```tsx
-<span className="text-sm font-medium text-foreground">Ocena artikulacije</span>
-```
-
-Ker bo naslov "Ocena preverjanja izgovorjave" zdaj na višjem nivoju v `EvaluationCheckboxes.tsx`.
 
 ---
 
-## Odzivni dizajn
+## Vizualna struktura filtriranja na /admin/all-tests
 
-- Na manjših zaslonih (mobilni) bo grid imel en stolpec (`grid-cols-1`)
-- Na večjih zaslonih (md: 768px+) bosta dva stolpca drug ob drugem (`md:grid-cols-2`)
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ [🔍 Išči po imenu starša ali otroka...                               ]      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ [Starost ▼] [Spol ▼] [Status ▼] [Oddano ▼]                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Ime starša │ Ime otroka │ Starost │ Spol │ Status │ Oddano │ Akcije        │
+├────────────┼────────────┼─────────┼──────┼────────┼────────┼───────────────┤
+│ ...        │ ...        │ ...     │ ...  │ ...    │ ...    │ 👁 Ogled      │
+├────────────┴────────────┴─────────┴──────┴────────┴────────┴───────────────┤
+│ Prikazujem 1-10 od 45                      Na stran: [10▼]  [◀] 1/5 [▶]    │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## Vrstni red checkboxov
+## Novi importi za AdminTests.tsx
 
-Na sliki vidim vrstni red:
-1. Ž izgovarja kot Z
-2. Odlično izgovarja
-3. Ne izgovarja
-4. Zamenjuje za Š
+```typescript
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+```
 
-Trenutni vrstni red v `evaluationOptions.ts`:
-1. Ž izgovarja kot Z
-2. Ne izgovarja
-3. Odlično izgovarja
-4. Zamenjuje za Š
+---
 
-Posodobiti vrstni red v datoteki `src/data/evaluationOptions.ts` da se ujema s sliko.
+## Logika filtriranja
 
+Razširiti `filteredSessions` useMemo:
+
+```typescript
+const filteredSessions = useMemo(() => {
+  if (!sessions) return [];
+  
+  return sessions.filter(session => {
+    // Iskanje
+    if (searchQuery) {
+      const searchLower = searchQuery.toLowerCase();
+      const parentMatch = session.parent_first_name?.toLowerCase().includes(searchLower) ||
+                          session.parent_last_name?.toLowerCase().includes(searchLower);
+      const childMatch = session.child_name.toLowerCase().includes(searchLower);
+      if (!parentMatch && !childMatch) return false;
+    }
+    
+    // Filter: Starost
+    if (ageFilter !== 'all') {
+      if (ageFilter === '7+') {
+        if (!session.child_age || session.child_age < 7) return false;
+      } else {
+        if (session.child_age !== Number(ageFilter)) return false;
+      }
+    }
+    
+    // Filter: Spol
+    if (genderFilter !== 'all') {
+      const gender = session.child_gender?.toLowerCase();
+      if (genderFilter === 'm' && !['m', 'male', 'moški'].includes(gender || '')) return false;
+      if (genderFilter === 'f' && !['f', 'female', 'ženski', 'ž', 'z'].includes(gender || '')) return false;
+    }
+    
+    // Filter: Status
+    if (statusFilter !== 'all') {
+      if (statusFilter === 'in_review') {
+        if (!['assigned', 'in_review'].includes(session.status)) return false;
+      } else {
+        if (session.status !== statusFilter) return false;
+      }
+    }
+    
+    // Filter: Datum
+    if (dateFilter !== 'all' && session.submitted_at) {
+      const submittedDate = new Date(session.submitted_at);
+      const now = new Date();
+      
+      switch (dateFilter) {
+        case 'today':
+          if (submittedDate.toDateString() !== now.toDateString()) return false;
+          break;
+        case 'week':
+          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          if (submittedDate < weekAgo) return false;
+          break;
+        case 'month':
+          const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          if (submittedDate < monthAgo) return false;
+          break;
+        case 'year':
+          const yearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+          if (submittedDate < yearAgo) return false;
+          break;
+      }
+    }
+    
+    return true;
+  });
+}, [sessions, searchQuery, ageFilter, genderFilter, statusFilter, dateFilter]);
+```
+
+---
+
+## Reset paginacije ob spremembi filtrov
+
+```typescript
+// Ko se filtri spremenijo, ponastavi na stran 1
+useEffect(() => {
+  setCurrentPage(1);
+}, [searchQuery, ageFilter, genderFilter, statusFilter, dateFilter]);
+```
