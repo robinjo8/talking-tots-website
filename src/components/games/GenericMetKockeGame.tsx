@@ -14,6 +14,7 @@ import { DiceResultDialog } from '@/components/dice/DiceResultDialog';
 import { StarEarnedDialog } from '@/components/dice/StarEarnedDialog';
 import { MemoryProgressIndicator } from '@/components/games/MemoryProgressIndicator';
 import { useMetKocke } from '@/hooks/useMetKocke';
+import { useTrophyContext } from '@/contexts/TrophyContext';
 import { MetKockeWord } from '@/data/metKockeConfig';
 import { useWordProgress } from '@/hooks/useWordProgress';
 
@@ -73,6 +74,7 @@ export function GenericMetKockeGame({
     incrementProgress, 
     resetProgress,
   } = useWordProgress(displayLetter, wordsList);
+  const { checkForNewTrophy } = useTrophyContext();
 
   // Audio playback
   const playAudio = useCallback((url: string) => {
@@ -115,12 +117,15 @@ export function GenericMetKockeGame({
   }, [resetGame, resetProgress]);
 
   // Star claim handler
-  const handleClaimStar = useCallback(() => {
+  const handleClaimStar = useCallback(async () => {
     if (selectedBitje !== null) {
       incrementProgress(bitje[selectedBitje].word);
     }
     closeStarDialog();
-  }, [selectedBitje, bitje, incrementProgress, closeStarDialog]);
+    // Check for trophy after claiming star
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await checkForNewTrophy();
+  }, [selectedBitje, bitje, incrementProgress, closeStarDialog, checkForNewTrophy]);
 
   // Column headers
   const columns = ['BITJE', 'POVEDEK', 'PREDMET'];

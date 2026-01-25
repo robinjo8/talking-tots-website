@@ -1,6 +1,7 @@
 import { useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
+import { useTrophyContext } from "@/contexts/TrophyContext";
 import { Home, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -22,6 +23,7 @@ interface GenericDrsnaSestavljankaGameProps {
 export function GenericDrsnaSestavljankaGame({ config }: GenericDrsnaSestavljankaGameProps) {
   const navigate = useNavigate();
   const { recordGameCompletion } = useEnhancedProgress();
+  const { checkForNewTrophy } = useTrophyContext();
   const gameCompletedRef = useRef(false);
 
   const [showInstructions, setShowInstructions] = useState(false);
@@ -80,9 +82,12 @@ export function GenericDrsnaSestavljankaGame({ config }: GenericDrsnaSestavljank
     setShowExitDialog(true);
   };
 
-  const handleStarClaimed = () => {
+  const handleStarClaimed = async () => {
     recordGameCompletion('sliding_puzzle', config.trackingId);
     setShowNewGameButton(true);
+    // Check for trophy after claiming star
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await checkForNewTrophy();
   };
 
   const handleInstructions = () => {

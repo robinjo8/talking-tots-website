@@ -6,6 +6,7 @@ import { StarCollectDialog } from "@/components/games/StarCollectDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
+import { useTrophyContext } from "@/contexts/TrophyContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -57,6 +58,7 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
   const [gameKey, setGameKey] = useState(0);
   const [showNewGameButton, setShowNewGameButton] = useState(false);
   const { recordGameCompletion } = useEnhancedProgress();
+  const { checkForNewTrophy } = useTrophyContext();
   const gameCompletedRef = useRef(false);
   
   // Star collection state
@@ -205,9 +207,12 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
     }
   }, []);
 
-  const handleStarClaimed = () => {
+  const handleStarClaimed = async () => {
     recordGameCompletion('maze', config.trackingId);
     setShowNewGameButton(true);
+    // Check for trophy after claiming star
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await checkForNewTrophy();
   };
 
   // Get the image for current star dialog

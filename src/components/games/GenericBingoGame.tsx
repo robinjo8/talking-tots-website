@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Home, RefreshCw } from "lucide-react";
 import { useBingoGame } from "@/hooks/useBingoGame";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
+import { useTrophyContext } from "@/contexts/TrophyContext";
 import { BingoGrid } from "@/components/bingo/BingoGrid";
 import { BingoReel } from "@/components/bingo/BingoReel";
 import { BingoSuccessDialog } from "@/components/bingo/BingoSuccessDialog";
@@ -36,8 +37,8 @@ export function GenericBingoGame({ letter, displayLetter, title, wordsData, exer
   const [menuOpen, setMenuOpen] = useState(false);
   const [showNewGameButton, setShowNewGameButton] = useState(false);
   const [starClaimed, setStarClaimed] = useState(false);
-
   const { recordExerciseCompletion } = useEnhancedProgress();
+  const { checkForNewTrophy } = useTrophyContext();
 
   const {
     grid,
@@ -94,11 +95,14 @@ export function GenericBingoGame({ letter, displayLetter, title, wordsData, exer
     closePopup();
   };
 
-  const handleStarClaimed = () => {
+  const handleStarClaimed = async () => {
     recordExerciseCompletion(exerciseId);
     setStarClaimed(true);
     setShowCongratulations(false);
     setShowNewGameButton(true);
+    // Check for trophy after claiming star
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await checkForNewTrophy();
   };
 
   return (

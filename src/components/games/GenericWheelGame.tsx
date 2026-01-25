@@ -5,6 +5,7 @@ import { Home, HelpCircle } from "lucide-react";
 import { FortuneWheel } from "@/components/wheel/FortuneWheel";
 import { useFortuneWheel } from "@/hooks/useFortuneWheel";
 import { useWordProgress } from "@/hooks/useWordProgress";
+import { useTrophyContext } from "@/contexts/TrophyContext";
 import { WheelSuccessDialog } from "@/components/wheel/WheelSuccessDialog";
 import { ProgressModal } from "@/components/wheel/ProgressModal";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
@@ -37,6 +38,7 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
   
   const { isSpinning, rotation, selectedWord, selectedIndex, showResult, spinWheel, resetWheel, closeResult } = useFortuneWheel({ wordsData });
   const { progress, incrementProgress, getProgress, resetProgress, resetWordProgress } = useWordProgress(displayLetter, wordsList);
+  const { checkForNewTrophy } = useTrophyContext();
 
   const handleBack = () => { setMenuOpen(false); setShowExitConfirmation(true); };
   const handleConfirmExit = () => { navigate(backPath); };
@@ -44,7 +46,13 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
   const handleConfirmNewGame = () => { resetWheel(); resetProgress(); setShowNewGameConfirmation(false); };
   const handleInstructions = () => { setMenuOpen(false); setShowInstructions(true); };
   const handleRecordComplete = () => { if (selectedWord) incrementProgress(selectedWord.word); };
-  const handleStarClaimed = () => { if (selectedWord) resetWordProgress(selectedWord.word); closeResult(); };
+  const handleStarClaimed = async () => { 
+    if (selectedWord) resetWordProgress(selectedWord.word); 
+    closeResult(); 
+    // Check for trophy after claiming star
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await checkForNewTrophy();
+  };
 
   const currentWordProgress = selectedWord ? getProgress(selectedWord.word) : 0;
 

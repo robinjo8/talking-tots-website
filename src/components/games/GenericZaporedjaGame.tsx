@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
+import { useTrophyContext } from "@/contexts/TrophyContext";
 import { Home, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -44,6 +45,7 @@ interface GenericZaporedjaGameProps {
 export function GenericZaporedjaGame({ config }: GenericZaporedjaGameProps) {
   const navigate = useNavigate();
   const { recordGameCompletion } = useEnhancedProgress();
+  const { checkForNewTrophy } = useTrophyContext();
   const gameCompletedRef = useRef(false);
 
   const [gameKey, setGameKey] = useState(0);
@@ -190,10 +192,13 @@ export function GenericZaporedjaGame({ config }: GenericZaporedjaGameProps) {
     navigate('/govorne-igre/zaporedja');
   };
 
-  const handleStarClaimed = () => {
+  const handleStarClaimed = async () => {
     recordGameCompletion('memory', config.trackingId);
     setShowCompletion(false);
     setShowNewGameButton(true);
+    // Check for trophy after claiming star
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await checkForNewTrophy();
   };
 
   // Render the appropriate game component based on config
