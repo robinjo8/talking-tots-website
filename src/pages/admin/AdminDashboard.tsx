@@ -49,7 +49,7 @@ export default function AdminDashboard() {
               description="Skupno število opravljenih preverjanj"
               icon={ClipboardList}
               color="blue"
-              onClick={() => navigate('/admin/tests')}
+              onClick={() => navigate('/admin/all-tests')}
             />
             <StatCard
               title="V čakanju"
@@ -65,7 +65,7 @@ export default function AdminDashboard() {
               description="Pregledi z oddanimi ocenami"
               icon={Eye}
               color="purple"
-              onClick={() => navigate('/admin/tests?status=reviewed')}
+              onClick={() => navigate('/admin/all-tests?status=reviewed')}
             />
             <StatCard
               title="Zaključeno"
@@ -73,7 +73,7 @@ export default function AdminDashboard() {
               description="Pregledi z generiranimi poročili"
               icon={CheckCircle}
               color="green"
-              onClick={() => navigate('/admin/tests?status=completed')}
+              onClick={() => navigate('/admin/all-tests?status=completed')}
             />
           </div>
           <OrganizationPieChart />
