@@ -8,8 +8,8 @@ export function OrganizationPieChart() {
   
   // Build organization stats distribution for pie chart
   const statusDistribution = [
-    { name: 'V čakanju', value: stats.orgPendingTests, color: 'hsl(36, 100%, 50%)' },      // Oranžna
-    { name: 'Pregledano', value: stats.orgReviewedTests, color: 'hsl(54, 100%, 62%)' },   // Rumena
+    { name: 'V čakanju', value: stats.orgPendingTests, color: 'hsl(0, 84%, 60%)' },        // Rdeča
+    { name: 'Pregledano', value: stats.orgReviewedTests, color: 'hsl(36, 100%, 50%)' },   // Oranžna
     { name: 'Zaključeno', value: stats.orgCompletedTests, color: 'hsl(122, 39%, 49%)' },  // Zelena
   ];
 
