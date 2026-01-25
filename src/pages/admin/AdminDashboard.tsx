@@ -35,92 +35,91 @@ export default function AdminDashboard() {
         </p>
       </div>
 
-      {/* Organization stats section */}
-      <div>
-        <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
-          📊 Organizacija ({organizationName})
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            title="Vsa preverjanja"
-            value={stats.orgTotalTests}
-            description="Skupno število opravljenih preverjanj"
-            icon={ClipboardList}
-            color="blue"
-            onClick={() => navigate('/admin/tests')}
-          />
-          <StatCard
-            title="V čakanju"
-            value={stats.orgPendingTests}
-            description="Pregledi, ki čakajo na prevzem"
-            icon={Clock}
-            color="orange"
-            onClick={() => navigate('/admin/tests?status=pending')}
-          />
-          <StatCard
-            title="Pregledano"
-            value={stats.orgReviewedTests}
-            description="Pregledi z oddanimi ocenami"
-            icon={Eye}
-            color="purple"
-            onClick={() => navigate('/admin/tests?status=reviewed')}
-          />
-          <StatCard
-            title="Zaključeno"
-            value={stats.orgCompletedTests}
-            description="Pregledi z generiranimi poročili"
-            icon={CheckCircle}
-            color="green"
-            onClick={() => navigate('/admin/tests?status=completed')}
-          />
-        </div>
-      </div>
-
-      {/* Personal stats section */}
-      <div>
-        <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
-          👤 Moje delo
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            title="Moji pregledi"
-            value={stats.myTotalReviews}
-            description="Vsi primeri, ki ste jih prevzeli"
-            icon={User}
-            color="blue"
-            onClick={() => navigate('/admin/my-reviews')}
-          />
-          <StatCard
-            title="V pregledu"
-            value={stats.myInReviewCount}
-            description="Primeri, ki jih aktivno pregledujete"
-            icon={Clock}
-            color="orange"
-            onClick={() => navigate('/admin/my-reviews')}
-          />
-          <StatCard
-            title="Pregledano"
-            value={stats.myReviewedCount}
-            description="Primeri z oddanimi ocenami"
-            icon={Eye}
-            color="purple"
-            onClick={() => navigate('/admin/my-reviews')}
-          />
-          <StatCard
-            title="Zaključeno"
-            value={stats.myCompletedCount}
-            description="Primeri z generiranim poročilom"
-            icon={FileCheck}
-            color="green"
-            onClick={() => navigate('/admin/my-reviews')}
-          />
-        </div>
-      </div>
-
-      {/* Charts - Organization pie chart and Personal status pie chart side by side */}
+      {/* Two-column layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <OrganizationPieChart />
-        <StatusPieChart />
+        {/* LEFT COLUMN - Organization */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+            📊 Organizacija ({organizationName})
+          </h2>
+          <div className="grid grid-cols-2 gap-4">
+            <StatCard
+              title="Vsa preverjanja"
+              value={stats.orgTotalTests}
+              description="Skupno število opravljenih preverjanj"
+              icon={ClipboardList}
+              color="blue"
+              onClick={() => navigate('/admin/tests')}
+            />
+            <StatCard
+              title="V čakanju"
+              value={stats.orgPendingTests}
+              description="Pregledi, ki čakajo na prevzem"
+              icon={Clock}
+              color="orange"
+              onClick={() => navigate('/admin/tests?status=pending')}
+            />
+            <StatCard
+              title="Pregledano"
+              value={stats.orgReviewedTests}
+              description="Pregledi z oddanimi ocenami"
+              icon={Eye}
+              color="purple"
+              onClick={() => navigate('/admin/tests?status=reviewed')}
+            />
+            <StatCard
+              title="Zaključeno"
+              value={stats.orgCompletedTests}
+              description="Pregledi z generiranimi poročili"
+              icon={CheckCircle}
+              color="green"
+              onClick={() => navigate('/admin/tests?status=completed')}
+            />
+          </div>
+          <OrganizationPieChart />
+        </div>
+
+        {/* RIGHT COLUMN - My Work */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+            👤 Moje delo
+          </h2>
+          <div className="grid grid-cols-2 gap-4">
+            <StatCard
+              title="Moji pregledi"
+              value={stats.myTotalReviews}
+              description="Vsi primeri, ki ste jih prevzeli"
+              icon={User}
+              color="blue"
+              onClick={() => navigate('/admin/my-reviews')}
+            />
+            <StatCard
+              title="V pregledu"
+              value={stats.myInReviewCount}
+              description="Primeri, ki jih aktivno pregledujete"
+              icon={Clock}
+              color="orange"
+              onClick={() => navigate('/admin/my-reviews')}
+            />
+            <StatCard
+              title="Pregledano"
+              value={stats.myReviewedCount}
+              description="Primeri z oddanimi ocenami"
+              icon={Eye}
+              color="purple"
+              onClick={() => navigate('/admin/my-reviews')}
+            />
+            <StatCard
+              title="Zaključeno"
+              value={stats.myCompletedCount}
+              description="Primeri z generiranim poročilom"
+              icon={FileCheck}
+              color="green"
+              onClick={() => navigate('/admin/my-reviews')}
+            />
+          </div>
+          <StatusPieChart />
+        </div>
       </div>
 
       {/* Difficulties pie chart - full width below */}
