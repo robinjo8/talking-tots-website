@@ -1,76 +1,86 @@
 
 
-# Načrt: Popravki slik in velikosti na strani /govorne-igre
+# Načrt: Popravek nakupa na Apple napravah (Safari popup blokada)
 
-## Povzetek sprememb
+## Analiza problema
 
-Posodobitev konfiguracij iger v `GamesList.tsx` z novimi slikami, ozadji in povečanimi velikostmi slik.
+**Vzrok napake:** Safari (in drugi Apple brskalniki) blokirajo `window.open()` klice, ki niso neposredno sproženi ob uporabniškem kliku. Ker je med klikom in odprtjem okna asinhrona operacija (`supabase.functions.invoke`), Safari to zazna kot popup in ga blokira.
+
+**Trenutno stanje v kodi:**
+- `src/components/PricingSection.tsx` (vrstica 80): `window.open(data.url, '_blank')`
+- `src/components/profile/SubscriptionSection.tsx` (vrstica 73): `window.open(data.url, '_blank')`
+- `src/components/profile/SubscriptionSection.tsx` (vrstica 105): `window.open(data.url, '_blank')` (customer portal)
+
+**Rešitev:** Zamenjati `window.open(data.url, '_blank')` z `window.location.href = data.url` za preusmeritev v istem oknu, kar Safari ne blokira.
 
 ---
 
 ## Spremembe
 
-### 1. SMEŠNE POVEDI (met-kocke)
-- **Nova slika**: `Smesne_besede_2.webp` (namesto `Smesne_besede.webp`)
-- **Oranžno ozadje**: Zamenjava zelenega ozadja z oranžnim gradientom (kot pri drugih karticah)
-
-### 2. SESTAVLJANKE
-- **Nova slika**: `sestavljanka_21.webp` (namesto `sestavljanka_nova_2.webp`)
-
-### 3. Povečanje slik na karticah
-Spremeni `imageScale` iz `75%` na `90%` za naslednje igre (da bodo enake velikosti kot SPOMIN):
-
-| Igra | Trenutno | Novo |
-|------|----------|------|
-| KOLO BESED | 75% | 90% |
-| BINGO | 75% | 90% |
-| SESTAVLJANKE | 75% | 90% |
-| DRSNA IGRA | 75% | 90% |
-| LABIRINT | 75% | 90% |
-
----
-
-## Datoteka za spremembo
-
-| Datoteka | Akcija | Opis |
-|----------|--------|------|
-| `src/components/games/GamesList.tsx` | Posodobi | Zamenjaj slike, ozadje in imageScale vrednosti |
+| Datoteka | Vrstica | Sprememba |
+|----------|---------|-----------|
+| `src/components/PricingSection.tsx` | 80 | `window.open(data.url, '_blank')` → `window.location.href = data.url` |
+| `src/components/profile/SubscriptionSection.tsx` | 73 | `window.open(data.url, '_blank')` → `window.location.href = data.url` |
+| `src/components/profile/SubscriptionSection.tsx` | 105 | `window.open(data.url, '_blank')` → `window.location.href = data.url` |
 
 ---
 
 ## Tehnična implementacija
 
-### Spremembe v konfiguraciji iger:
+### PricingSection.tsx (vrstica 78-81)
 
 ```typescript
-// KOLO BESED - povečaj sliko
-imageScale: "90%"  // bilo: 75%
+// Pred:
+if (data?.url) {
+  window.open(data.url, '_blank');
+}
 
-// BINGO - povečaj sliko
-imageScale: "90%"  // bilo: 75%
+// Po:
+if (data?.url) {
+  window.location.href = data.url;
+}
+```
 
-// SESTAVLJANKE - nova slika + povečaj
-image: ".../sestavljanka_21.webp"  // bilo: sestavljanka_nova_2.webp
-imageScale: "90%"  // bilo: 75%
+### SubscriptionSection.tsx (vrstica 72-74)
 
-// DRSNA IGRA - povečaj sliko
-imageScale: "90%"  // bilo: 75%
+```typescript
+// Pred:
+if (data?.url) {
+  window.open(data.url, '_blank');
+}
 
-// LABIRINT - povečaj sliko
-imageScale: "90%"  // bilo: 75%
+// Po:
+if (data?.url) {
+  window.location.href = data.url;
+}
+```
 
-// SMEŠNE POVEDI - nova slika + oranžno ozadje
-image: ".../Smesne_besede_2.webp"  // bilo: Smesne_besede.webp
-customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)"  
-// bilo: zeleno ozadje s hsl(120, ...)
+### SubscriptionSection.tsx (vrstica 104-106 - customer portal)
+
+```typescript
+// Pred:
+if (data?.url) {
+  window.open(data.url, '_blank');
+}
+
+// Po:
+if (data?.url) {
+  window.location.href = data.url;
+}
 ```
 
 ---
 
-## Končni rezultat
+## Prednosti rešitve
 
-Po implementaciji bodo vse kartice imele:
-- Poenotene velikosti slik (90%) za boljšo vidnost
-- SMEŠNE POVEDI bo imela oranžno ozadje kot ostale kartice
-- SESTAVLJANKE bo uporabljala novo sliko sestavljanka_21.webp
+1. **Safari kompatibilnost** - preusmeritev v istem oknu ni blokirana
+2. **iOS kompatibilnost** - deluje tudi na iPhone in iPad napravah
+3. **Konsistentnost** - enako obnašanje na vseh brskalnikih
+4. **Enostavnost** - minimalna sprememba kode
+
+---
+
+## Opomba
+
+Po uspešnem plačilu na Stripe se uporabnik vrne na `success_url` (trenutno `/payment-success`), kar je že pravilno nastavljeno v edge funkciji `create-checkout`.
 
