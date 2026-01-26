@@ -61,8 +61,8 @@ const breadcrumbConfig: BreadcrumbConfig[] = [
   { path: "/govorne-igre/zaporedja", label: "Zaporedja", parent: "/govorne-igre" },
   { path: "/govorne-igre/zaporedja/c", label: "C", parent: "/govorne-igre/zaporedja" },
   
-  // Kolo sreče
-  { path: "/govorne-igre/kolo-srece", label: "Kolo sreče", parent: "/govorne-igre" },
+  // Kolo besed
+  { path: "/govorne-igre/kolo-srece", label: "Kolo besed", parent: "/govorne-igre" },
   { path: "/govorne-igre/kolo-srece/c", label: "C", parent: "/govorne-igre/kolo-srece" },
   { path: "/govorne-igre/kolo-srece/ch", label: "Č", parent: "/govorne-igre/kolo-srece" },
   { path: "/govorne-igre/kolo-srece/k", label: "K", parent: "/govorne-igre/kolo-srece" },
@@ -72,6 +72,18 @@ const breadcrumbConfig: BreadcrumbConfig[] = [
   { path: "/govorne-igre/kolo-srece/sh", label: "Š", parent: "/govorne-igre/kolo-srece" },
   { path: "/govorne-igre/kolo-srece/z", label: "Z", parent: "/govorne-igre/kolo-srece" },
   { path: "/govorne-igre/kolo-srece/zh", label: "Ž", parent: "/govorne-igre/kolo-srece" },
+  
+  // Smešne povedi (Met kocke)
+  { path: "/govorne-igre/met-kocke", label: "Smešne povedi", parent: "/govorne-igre" },
+  { path: "/govorne-igre/met-kocke/c", label: "C", parent: "/govorne-igre/met-kocke" },
+  { path: "/govorne-igre/met-kocke/ch", label: "Č", parent: "/govorne-igre/met-kocke" },
+  { path: "/govorne-igre/met-kocke/k", label: "K", parent: "/govorne-igre/met-kocke" },
+  { path: "/govorne-igre/met-kocke/l", label: "L", parent: "/govorne-igre/met-kocke" },
+  { path: "/govorne-igre/met-kocke/r", label: "R", parent: "/govorne-igre/met-kocke" },
+  { path: "/govorne-igre/met-kocke/s", label: "S", parent: "/govorne-igre/met-kocke" },
+  { path: "/govorne-igre/met-kocke/sh", label: "Š", parent: "/govorne-igre/met-kocke" },
+  { path: "/govorne-igre/met-kocke/z", label: "Z", parent: "/govorne-igre/met-kocke" },
+  { path: "/govorne-igre/met-kocke/zh", label: "Ž", parent: "/govorne-igre/met-kocke" },
   
   // Bingo
   { path: "/govorne-igre/bingo", label: "Bingo", parent: "/govorne-igre" },
