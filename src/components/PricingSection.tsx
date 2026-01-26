@@ -76,8 +76,8 @@ export function PricingSection() {
       }
 
       if (data?.url) {
-        // Open Stripe checkout in new tab
-        window.open(data.url, '_blank');
+        // Redirect to Stripe checkout (same window for Safari compatibility)
+        window.location.href = data.url;
       }
     } catch (error) {
       console.error('Checkout error:', error);

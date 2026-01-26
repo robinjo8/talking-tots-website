@@ -70,7 +70,8 @@ export function SubscriptionSection() {
       }
 
       if (data?.url) {
-        window.open(data.url, '_blank');
+        // Redirect to Stripe checkout (same window for Safari compatibility)
+        window.location.href = data.url;
       }
     } catch (error) {
       console.error('Checkout error:', error);
@@ -102,7 +103,8 @@ export function SubscriptionSection() {
       }
 
       if (data?.url) {
-        window.open(data.url, '_blank');
+        // Redirect to Stripe portal (same window for Safari compatibility)
+        window.location.href = data.url;
       }
     } catch (error) {
       console.error('Portal error:', error);
