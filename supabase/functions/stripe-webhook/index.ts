@@ -86,30 +86,43 @@ serve(async (req) => {
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   logStep("Processing checkout.session.completed", { sessionId: session.id });
   
-  // Get user_id from metadata (set during checkout creation)
   const userId = session.metadata?.userId;
   const customerId = session.customer as string;
   
-  if (!userId) {
-    logStep("No userId in session metadata, attempting to find by email");
-    
-    // Try to find user by customer email
-    if (session.customer_email) {
-      const { data: users } = await supabase.auth.admin.listUsers();
-      const user = users?.users?.find(u => u.email === session.customer_email);
-      
-      if (user) {
-        await upsertSubscription(user.id, customerId);
-        logStep("Created subscription record for user found by email", { userId: user.id });
-      } else {
-        logStep("Could not find user by email", { email: session.customer_email });
-      }
-    }
+  if (!userId && !session.customer_email) {
+    logStep("No userId in metadata and no customer_email, cannot process");
     return;
   }
-  
-  await upsertSubscription(userId, customerId);
-  logStep("Subscription record created/updated", { userId, customerId });
+
+  // Find user_id if not in metadata
+  let targetUserId = userId;
+  if (!targetUserId && session.customer_email) {
+    const { data: users } = await supabase.auth.admin.listUsers();
+    const user = users?.users?.find(u => u.email === session.customer_email);
+    if (user) {
+      targetUserId = user.id;
+    } else {
+      logStep("Could not find user by email", { email: session.customer_email });
+      return;
+    }
+  }
+
+  // Only update stripe_customer_id, don't touch status
+  // subscription.created webhook handles status update
+  const { error } = await supabase
+    .from("user_subscriptions")
+    .update({ 
+      stripe_customer_id: customerId,
+      updated_at: new Date().toISOString()
+    })
+    .eq("user_id", targetUserId);
+
+  if (error) {
+    logStep("Error updating customer ID", { error: error.message });
+    // Don't throw - this is not critical if subscription.created already ran
+  } else {
+    logStep("Customer ID updated", { userId: targetUserId, customerId });
+  }
 }
 
 async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
@@ -206,41 +219,4 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
   logStep("Subscription marked as past_due", { customerId });
 }
 
-async function upsertSubscription(userId: string, customerId: string) {
-  // First, check if a record already exists with an active/trialing status
-  const { data: existing } = await supabase
-    .from("user_subscriptions")
-    .select("status")
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  // If subscription is already active or trialing, don't overwrite with inactive
-  if (existing && (existing.status === 'active' || existing.status === 'trialing')) {
-    logStep("Subscription already active, skipping upsert to prevent overwrite", { 
-      userId, 
-      currentStatus: existing.status 
-    });
-    // Still update stripe_customer_id if needed
-    await supabase.from("user_subscriptions")
-      .update({ 
-        stripe_customer_id: customerId,
-        updated_at: new Date().toISOString()
-      })
-      .eq("user_id", userId);
-    return;
-  }
-
-  const { error } = await supabase.from("user_subscriptions").upsert({
-    user_id: userId,
-    stripe_customer_id: customerId,
-    status: 'inactive', // Only set if no active subscription exists
-    updated_at: new Date().toISOString()
-  }, { 
-    onConflict: "user_id" 
-  });
-
-  if (error) {
-    logStep("Error upserting subscription", { error: error.message });
-    throw error;
-  }
-}
+// upsertSubscription removed - subscription.created webhook handles all status updates
