@@ -44,7 +44,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/sestavljanke",
     available: true,
-    imageScale: "90%"
+    imageScale: "85%"
   },
   {
     id: "zaporedja",
