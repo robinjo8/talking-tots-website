@@ -1,17 +1,29 @@
 
-
-# Načrt: Popravek nakupa na Apple napravah (Safari popup blokada)
+# Načrt: Popravek race condition pri webhook obdelavi
 
 ## Analiza problema
 
-**Vzrok napake:** Safari (in drugi Apple brskalniki) blokirajo `window.open()` klice, ki niso neposredno sproženi ob uporabniškem kliku. Ker je med klikom in odprtjem okna asinhrona operacija (`supabase.functions.invoke`), Safari to zazna kot popup in ga blokira.
+**Vzrok:** Race condition med Stripe webhook eventi `customer.subscription.created` in `checkout.session.completed`.
 
-**Trenutno stanje v kodi:**
-- `src/components/PricingSection.tsx` (vrstica 80): `window.open(data.url, '_blank')`
-- `src/components/profile/SubscriptionSection.tsx` (vrstica 73): `window.open(data.url, '_blank')`
-- `src/components/profile/SubscriptionSection.tsx` (vrstica 105): `window.open(data.url, '_blank')` (customer portal)
+**Časovnica napake:**
+```text
+09:33:00 - subscription.created → začne procesiranje, nastavi status: trialing
+09:33:00 - checkout.completed → začne procesiranje skoraj istočasno
+09:33:01 - subscription.created → zapiše "trialing" v bazo
+09:33:01 - checkout.completed → upsertSubscription PREPIŠE z "inactive"
+```
 
-**Rešitev:** Zamenjati `window.open(data.url, '_blank')` z `window.location.href = data.url` za preusmeritev v istem oknu, kar Safari ne blokira.
+**Rezultat:** Končni status v bazi je `inactive` namesto `trialing`, kar blokira dostop do vsebine.
+
+---
+
+## Rešitev
+
+Odstraniti `upsertSubscription` klic iz `checkout.session.completed` handlerja, ker:
+
+1. `customer.subscription.created` webhook že pravilno nastavi vse podatke (status, plan, obdobje)
+2. `create-checkout` funkcija že ustvari začetni zapis pred Stripe checkout-om
+3. `checkout.session.completed` ne potrebuje posodabljati statusa - to je naloga `subscription.created`
 
 ---
 
@@ -19,68 +31,88 @@
 
 | Datoteka | Vrstica | Sprememba |
 |----------|---------|-----------|
-| `src/components/PricingSection.tsx` | 80 | `window.open(data.url, '_blank')` → `window.location.href = data.url` |
-| `src/components/profile/SubscriptionSection.tsx` | 73 | `window.open(data.url, '_blank')` → `window.location.href = data.url` |
-| `src/components/profile/SubscriptionSection.tsx` | 105 | `window.open(data.url, '_blank')` → `window.location.href = data.url` |
+| `supabase/functions/stripe-webhook/index.ts` | 86-113 | Poenostavi `handleCheckoutCompleted` - samo posodobi `stripe_customer_id`, ne kliči `upsertSubscription` |
 
 ---
 
 ## Tehnična implementacija
 
-### PricingSection.tsx (vrstica 78-81)
+### Nova verzija handleCheckoutCompleted:
 
 ```typescript
-// Pred:
-if (data?.url) {
-  window.open(data.url, '_blank');
-}
+async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
+  logStep("Processing checkout.session.completed", { sessionId: session.id });
+  
+  const userId = session.metadata?.userId;
+  const customerId = session.customer as string;
+  
+  if (!userId && !session.customer_email) {
+    logStep("No userId in metadata and no customer_email, cannot process");
+    return;
+  }
 
-// Po:
-if (data?.url) {
-  window.location.href = data.url;
+  // Find user_id if not in metadata
+  let targetUserId = userId;
+  if (!targetUserId && session.customer_email) {
+    const { data: users } = await supabase.auth.admin.listUsers();
+    const user = users?.users?.find(u => u.email === session.customer_email);
+    if (user) {
+      targetUserId = user.id;
+    } else {
+      logStep("Could not find user by email", { email: session.customer_email });
+      return;
+    }
+  }
+
+  // Only update stripe_customer_id, don't touch status
+  // subscription.created webhook handles status update
+  const { error } = await supabase
+    .from("user_subscriptions")
+    .update({ 
+      stripe_customer_id: customerId,
+      updated_at: new Date().toISOString()
+    })
+    .eq("user_id", targetUserId);
+
+  if (error) {
+    logStep("Error updating customer ID", { error: error.message });
+    // Don't throw - this is not critical if subscription.created already ran
+  } else {
+    logStep("Customer ID updated", { userId: targetUserId, customerId });
+  }
 }
 ```
 
-### SubscriptionSection.tsx (vrstica 72-74)
+### Odstrani upsertSubscription funkcijo:
 
-```typescript
-// Pred:
-if (data?.url) {
-  window.open(data.url, '_blank');
-}
+Funkcija `upsertSubscription` (vrstice 209-246) ni več potrebna in jo lahko odstranimo.
 
-// Po:
-if (data?.url) {
-  window.location.href = data.url;
-}
-```
+---
 
-### SubscriptionSection.tsx (vrstica 104-106 - customer portal)
+## Zakaj ta rešitev deluje
 
-```typescript
-// Pred:
-if (data?.url) {
-  window.open(data.url, '_blank');
-}
+1. **`create-checkout`** ustvari začetni zapis z `stripe_customer_id` in `status: inactive`
+2. **`subscription.created` webhook** posodobi na pravi status (`trialing` ali `active`) s polnimi podatki
+3. **`checkout.completed` webhook** samo zabeleži customer ID (če še ni) brez poseganja v status
+4. Ni več race condition - samo en webhook upravlja status
 
-// Po:
-if (data?.url) {
-  window.location.href = data.url;
-}
+---
+
+## Takojšnji popravek za uporabnika
+
+Za uporabnika `qjavec@gmail.com` je potrebno ročno popraviti status v bazi:
+
+```sql
+UPDATE user_subscriptions 
+SET status = 'trialing', updated_at = NOW()
+WHERE user_id = '9a1b1694-83ed-4bbd-8043-9c9e1deed538';
 ```
 
 ---
 
-## Prednosti rešitve
+## Končni rezultat
 
-1. **Safari kompatibilnost** - preusmeritev v istem oknu ni blokirana
-2. **iOS kompatibilnost** - deluje tudi na iPhone in iPad napravah
-3. **Konsistentnost** - enako obnašanje na vseh brskalnikih
-4. **Enostavnost** - minimalna sprememba kode
-
----
-
-## Opomba
-
-Po uspešnem plačilu na Stripe se uporabnik vrne na `success_url` (trenutno `/payment-success`), kar je že pravilno nastavljeno v edge funkciji `create-checkout`.
-
+Po implementaciji:
+- Webhook eventi ne bodo več prepisovali drug drugega
+- Status naročnine bo pravilno nastavljen ob nakupu
+- Uporabniki bodo imeli takojšen dostop do vsebine po plačilu
