@@ -104,7 +104,7 @@ export function GenericPoveziPareSelection({ ageGroup }: Props) {
         <div className="container max-w-6xl mx-auto px-4">
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Povezi pare{selectedChild ? `, ${selectedChild.name}` : ''}!
+              Povezi pare
             </h1>
             <p className="text-xl text-white/90">
               Izberi črko in poveži pare slik
