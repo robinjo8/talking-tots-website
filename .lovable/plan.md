@@ -1,40 +1,32 @@
 
-# Načrt: Posodobitev slik in imen kartic na strani /govorne-igre
 
-## Povzetek
+# Načrt: Popravki slik in velikosti na strani /govorne-igre
 
-Posodobitev konfiguracij iger v `GamesList.tsx` z novimi slikami in preimenovanji.
+## Povzetek sprememb
 
----
-
-## Ugotovljene slike v Supabase storage (bucket: slike-ostalo)
-
-Vse zahtevane slike so potrjene:
-- `kolo_srece_nova_2.webp`
-- `bingo_nova_2.webp`
-- `spomin_nova_2.webp`
-- `sestavljanka_nova_2.webp`
-- `zaporedja_nova_2.webp`
-- `drsna_sestavljanka_nova_2.webp`
-- `igra_ujemanja_2.webp`
-- `labirint_nova_2.webp` (za LABIRINT - pravilna slika namesto igra_ujemanja_2.webp)
-- `Smesne_besede.webp`
+Posodobitev konfiguracij iger v `GamesList.tsx` z novimi slikami, ozadji in povečanimi velikostmi slik.
 
 ---
 
 ## Spremembe
 
-| Igra | Staro ime | Novo ime | Stara slika | Nova slika |
-|------|-----------|----------|-------------|------------|
-| kolo-srece | KOLO SREČE | **KOLO BESED** | kolo_srece_nova_1.webp | kolo_srece_nova_2.webp |
-| bingo | BINGO | BINGO | bingo_nova_1.webp | bingo_nova_2.webp |
-| spomin | SPOMIN | SPOMIN | spomin_nova_2.webp | spomin_nova_2.webp (že pravilna) |
-| sestavljanke | SESTAVLJANKE | SESTAVLJANKE | sestavljanka_nova_1.webp | sestavljanka_nova_2.webp |
-| zaporedja | ZAPOREDJA | ZAPOREDJA | zaporedja_nova_1.webp | zaporedja_nova_2.webp |
-| drsna-sestavljanka | DRSNA IGRA | DRSNA IGRA | drsna_sestavljanka_nova_1.webp | drsna_sestavljanka_nova_2.webp |
-| povezi-pare-matching | IGRA UJEMANJA | IGRA UJEMANJA | igra_ujemanja_1.webp | igra_ujemanja_2.webp |
-| labirint | LABIRINT | LABIRINT | labirint_nova_1.webp | labirint_nova_2.webp |
-| met-kocke | MET KOCKE | **SMEŠNE POVEDI** | met_kocke.webp | Smesne_besede.webp |
+### 1. SMEŠNE POVEDI (met-kocke)
+- **Nova slika**: `Smesne_besede_2.webp` (namesto `Smesne_besede.webp`)
+- **Oranžno ozadje**: Zamenjava zelenega ozadja z oranžnim gradientom (kot pri drugih karticah)
+
+### 2. SESTAVLJANKE
+- **Nova slika**: `sestavljanka_21.webp` (namesto `sestavljanka_nova_2.webp`)
+
+### 3. Povečanje slik na karticah
+Spremeni `imageScale` iz `75%` na `90%` za naslednje igre (da bodo enake velikosti kot SPOMIN):
+
+| Igra | Trenutno | Novo |
+|------|----------|------|
+| KOLO BESED | 75% | 90% |
+| BINGO | 75% | 90% |
+| SESTAVLJANKE | 75% | 90% |
+| DRSNA IGRA | 75% | 90% |
+| LABIRINT | 75% | 90% |
 
 ---
 
@@ -42,78 +34,43 @@ Vse zahtevane slike so potrjene:
 
 | Datoteka | Akcija | Opis |
 |----------|--------|------|
-| `src/components/games/GamesList.tsx` | Posodobi | Zamenjaj slike in imena (vrstice 4-103) |
+| `src/components/games/GamesList.tsx` | Posodobi | Zamenjaj slike, ozadje in imageScale vrednosti |
 
 ---
 
 ## Tehnična implementacija
 
-### Spremembe v `GamesList.tsx`
+### Spremembe v konfiguraciji iger:
 
 ```typescript
-// KOLO SREČE → KOLO BESED
-{
-  id: "kolo-srece",
-  title: "KOLO BESED",  // Spremenjeno
-  image: ".../kolo_srece_nova_2.webp",  // Spremenjeno
-  ...
-}
+// KOLO BESED - povečaj sliko
+imageScale: "90%"  // bilo: 75%
 
-// BINGO
-{
-  id: "bingo",
-  image: ".../bingo_nova_2.webp",  // Spremenjeno
-  ...
-}
+// BINGO - povečaj sliko
+imageScale: "90%"  // bilo: 75%
 
-// SPOMIN - že ima pravilno sliko (spomin_nova_2.webp)
+// SESTAVLJANKE - nova slika + povečaj
+image: ".../sestavljanka_21.webp"  // bilo: sestavljanka_nova_2.webp
+imageScale: "90%"  // bilo: 75%
 
-// SESTAVLJANKE
-{
-  id: "sestavljanke",
-  image: ".../sestavljanka_nova_2.webp",  // Spremenjeno
-  ...
-}
+// DRSNA IGRA - povečaj sliko
+imageScale: "90%"  // bilo: 75%
 
-// ZAPOREDJA
-{
-  id: "zaporedja",
-  image: ".../zaporedja_nova_2.webp",  // Spremenjeno
-  ...
-}
+// LABIRINT - povečaj sliko
+imageScale: "90%"  // bilo: 75%
 
-// DRSNA IGRA
-{
-  id: "drsna-sestavljanka",
-  image: ".../drsna_sestavljanka_nova_2.webp",  // Spremenjeno
-  ...
-}
-
-// IGRA UJEMANJA
-{
-  id: "povezi-pare-matching",
-  image: ".../igra_ujemanja_2.webp",  // Spremenjeno
-  ...
-}
-
-// LABIRINT
-{
-  id: "labirint",
-  image: ".../labirint_nova_2.webp",  // Spremenjeno (pravilna slika)
-  ...
-}
-
-// MET KOCKE → SMEŠNE POVEDI
-{
-  id: "met-kocke",
-  title: "SMEŠNE POVEDI",  // Spremenjeno
-  image: ".../Smesne_besede.webp",  // Spremenjeno
-  ...
-}
+// SMEŠNE POVEDI - nova slika + oranžno ozadje
+image: ".../Smesne_besede_2.webp"  // bilo: Smesne_besede.webp
+customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)"  
+// bilo: zeleno ozadje s hsl(120, ...)
 ```
 
 ---
 
-## Opomba
+## Končni rezultat
 
-Za LABIRINT sem uporabil `labirint_nova_2.webp` namesto `igra_ujemanja_2.webp`, ki si jo omenil - to je bila verjetno napaka v zahtevi, saj `labirint_nova_2.webp` obstaja v storage in je logična izbira za to igro.
+Po implementaciji bodo vse kartice imele:
+- Poenotene velikosti slik (90%) za boljšo vidnost
+- SMEŠNE POVEDI bo imela oranžno ozadje kot ostale kartice
+- SESTAVLJANKE bo uporabljala novo sliko sestavljanka_21.webp
+
