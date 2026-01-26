@@ -62,24 +62,33 @@ export default function MetKockeGames() {
 
   const LetterCard = ({ game }: { game: typeof metKockeGames[0] }) => (
     <div
-      className="bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group border border-gray-200"
+      className="bg-white rounded-xl shadow-xl border border-gray-200 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group"
       onClick={() => handleLetterClick(game)}
     >
-      {/* Card Image */}
-      <div className={`relative overflow-hidden bg-gradient-to-br ${game.gradient} ${isMobile ? 'aspect-square' : 'aspect-video'}`}>
-        <div className="w-full h-full flex items-center justify-center">
+      {/* Card Image - Orange gradient like Kolo besed */}
+      <div className={isMobile ? "relative aspect-square overflow-hidden" : "relative aspect-video overflow-hidden"}>
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)'
+          }}
+        />
+        <div className="relative w-full h-full flex items-center justify-center">
           <img 
             src={game.image}
             alt={`Črka ${game.letter}`}
-            className={`object-contain group-hover:scale-110 transition-transform duration-300 ${isMobile ? 'w-[80%] h-[80%]' : 'w-full h-full'}`}
+            className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
             style={{ mixBlendMode: 'multiply' }}
           />
         </div>
       </div>
 
       {/* Card Content */}
-      <div className={`p-6 ${isMobile ? 'text-center' : ''}`}>
-        <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
+      <div className={isMobile ? "p-3 flex flex-col flex-grow" : "p-6 flex flex-col flex-grow"}>
+        <h3 className={isMobile 
+          ? "text-base font-bold text-foreground mb-1 group-hover:text-app-blue transition-colors leading-tight text-center" 
+          : "text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors"
+        }>
           Črka {game.letter}
         </h3>
         {!isMobile && (
@@ -111,10 +120,10 @@ export default function MetKockeGames() {
         <div className="container max-w-6xl mx-auto px-4">
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Met kocke
+              Smešne povedi
             </h1>
             <p className="text-xl text-white/90">
-              Izberi črko in vrzi kocko za smešne povedi
+              Izberi črko in vrži kocko za smešne povedi
             </p>
           </div>
           
