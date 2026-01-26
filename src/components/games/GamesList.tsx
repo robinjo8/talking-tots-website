@@ -11,7 +11,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/kolo-srece",
     available: true,
-    imageScale: "75%"
+    imageScale: "90%"
   },
   {
     id: "bingo",
@@ -22,7 +22,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/bingo",
     available: true,
-    imageScale: "75%"
+    imageScale: "90%"
   },
   {
     id: "spomin",
@@ -39,12 +39,12 @@ const otherGames = [
     id: "sestavljanke",
     title: "SESTAVLJANKE",
     description: "Igraj sestavljanke in vadi logično razmišljanje",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/sestavljanka_nova_2.webp",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/sestavljanka_21.webp",
     gradient: "from-app-teal/20 to-dragon-green/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/sestavljanke",
     available: true,
-    imageScale: "75%"
+    imageScale: "90%"
   },
   {
     id: "zaporedja",
@@ -66,7 +66,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/drsna-sestavljanka",
     available: true,
-    imageScale: "75%"
+    imageScale: "90%"
   },
   {
     id: "povezi-pare-matching",
@@ -88,18 +88,18 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/labirint",
     available: true,
-    imageScale: "75%"
+    imageScale: "90%"
   },
   {
     id: "met-kocke",
     title: "SMEŠNE POVEDI",
     description: "Vrzi kocko in sestavi smešne povedi",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/Smesne_besede.webp",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/Smesne_besede_2.webp",
     gradient: "from-app-purple/20 to-dragon-green/20",
-    customBackground: "radial-gradient(ellipse at center, hsl(120, 60%, 95%) 0%, hsl(120, 50%, 85%) 30%, hsl(120, 40%, 75%) 60%, hsl(120, 35%, 65%) 100%)",
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/met-kocke",
     available: true,
-    imageScale: "75%"
+    imageScale: "90%"
   },
   {
     id: "pobarvanke",
