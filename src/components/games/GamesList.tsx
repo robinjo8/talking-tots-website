@@ -22,7 +22,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/bingo",
     available: true,
-    imageScale: "90%"
+    imageScale: "95%"
   },
   {
     id: "spomin",
@@ -39,7 +39,7 @@ const otherGames = [
     id: "sestavljanke",
     title: "SESTAVLJANKE",
     description: "Igraj sestavljanke in vadi logično razmišljanje",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/sestavljanka_21.webp",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/sestavljanka_nova_1.webp",
     gradient: "from-app-teal/20 to-dragon-green/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/sestavljanke",
@@ -55,7 +55,7 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/zaporedja",
     available: true,
-    imageScale: "90%"
+    imageScale: "95%"
   },
   {
     id: "drsna-sestavljanka",
@@ -88,13 +88,13 @@ const otherGames = [
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/labirint",
     available: true,
-    imageScale: "90%"
+    imageScale: "95%"
   },
   {
     id: "met-kocke",
     title: "SMEŠNE POVEDI",
     description: "Vrzi kocko in sestavi smešne povedi",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/Smesne_besede_2.webp",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/Smesne_besede_21.webp",
     gradient: "from-app-purple/20 to-dragon-green/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/met-kocke",
