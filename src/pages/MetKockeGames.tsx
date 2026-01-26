@@ -111,7 +111,7 @@ export default function MetKockeGames() {
         <div className="container max-w-6xl mx-auto px-4">
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Met kocke{selectedChild ? `, ${selectedChild.name}` : ''}!
+              Met kocke
             </h1>
             <p className="text-xl text-white/90">
               Izberi črko in vrzi kocko za smešne povedi

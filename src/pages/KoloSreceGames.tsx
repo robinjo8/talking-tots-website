@@ -79,7 +79,7 @@ export default function KoloSreceGames() {
         <div className="container max-w-6xl mx-auto px-4">
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Kolo sreče{selectedChild ? `, ${selectedChild.name}` : ''}!
+              Kolo sreče
             </h1>
             <p className="text-xl text-white/90">
               Izberi črko in zavrti kolo sreče!

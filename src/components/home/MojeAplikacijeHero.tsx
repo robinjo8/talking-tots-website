@@ -23,7 +23,7 @@ export const MojeAplikacijeHero = () => {
         {/* Naslov & Podnaslov */}
         <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Izberi aktivnost{selectedChild ? `, ${selectedChild.name}` : ''}!
+            Izberi aktivnost
           </h1>
           <p className="text-xl text-white/90">
             Kaj bi rad danes vadil?

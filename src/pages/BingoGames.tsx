@@ -78,7 +78,7 @@ export default function BingoGames() {
         <div className="container max-w-6xl mx-auto px-4">
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Bingo{selectedChild ? `, ${selectedChild.name}` : ''}!
+              Bingo
             </h1>
             <p className="text-xl text-white/90">
               Izberi črko in igraj bingo!

@@ -63,7 +63,7 @@ export default function GovorneIgre() {
         <div className="container max-w-6xl mx-auto px-4">
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Govorne igre{selectedChild ? `, ${selectedChild.name}` : ''}!
+              Govorne igre
             </h1>
             <p className="text-xl text-white/90">
               Izberi igro in se zabavaj pri učenju!

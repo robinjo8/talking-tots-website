@@ -205,7 +205,7 @@ export default function SestavljankeGames() {
         <div className="container max-w-6xl mx-auto px-4">
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Sestavljanke{selectedChild ? `, ${selectedChild.name}` : ''}!
+              Sestavljanke
             </h1>
             <p className="text-xl text-white/90">
               Izberi črko za sestavljanko
