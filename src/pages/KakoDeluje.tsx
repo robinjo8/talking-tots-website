@@ -722,7 +722,13 @@ const KakoDeluje = () => {
               <li>dolgoročno motivacijo za uspeh.</li>
             </ul>
 
-            <h4 className="text-lg font-medium text-foreground mb-2 mt-6">Varnost, motivacija in dostopnost aplikacije</h4>
+          </section>
+
+          {/* 14. Varnost, motivacija in dostopnost aplikacije */}
+          <section>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">
+              14. Varnost, motivacija in dostopnost aplikacije
+            </h2>
             <p className="text-muted-foreground leading-relaxed">
               Pri razvoju aplikacije TomiTalk je bila posebna pozornost namenjena varni, spodbudni in otrokom prijazni uporabniški izkušnji, ob hkratnem zagotavljanju nadzora in zaupanja za starše.
             </p>
