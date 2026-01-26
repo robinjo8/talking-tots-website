@@ -1,195 +1,119 @@
 
-# Načrt: Prenova strani Video navodila in podstrani
+# Načrt: Posodobitev slik in imen kartic na strani /govorne-igre
 
 ## Povzetek
 
-Prenova dizajna strani `/video-navodila` in `/video-navodila/:letter` z naslednjimi spremembami:
-1. Postavitev navigacijske poti enako kot na `/logopedski-koticek`
-2. Odstranitev zelenega polja "HEJ, ŽAK!"
-3. Prilagoditev kartic zmajčkov
-4. Modern dizajn glave na podstraneh z videom
+Posodobitev konfiguracij iger v `GamesList.tsx` z novimi slikami in preimenovanji.
 
 ---
 
-## Primerjava postavitve
+## Ugotovljene slike v Supabase storage (bucket: slike-ostalo)
 
-### Trenutno stanje `/video-navodila`:
-```text
-┌────────────────────────────────────────────────────────────────┐
-│                        HEADER                                   │
-├────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│                    Video navodila                               │
-│                    ═══════════════                              │
-│                                                                  │
-│          Domov > Moje aplikacije > Video navodila               │
-│                                                                  │
-│  ┌─────────────────────────────────────────────────────────┐   │
-│  │  HEJ, ŽAK! IZBERI ČRKO IN POGLEJ SI VIDEO NAVODILA...  │   │
-│  │  Z VAJAMI POSTAJAMO VEDNO BOLJŠI!                       │   │
-│  └─────────────────────────────────────────────────────────┘   │
-│                                                                  │
-│    ┌──────────┐  ┌──────────┐  ┌──────────┐                     │
-│    │  Zmajček │  │  Zmajček │  │  Zmajček │                     │
-│    │    C     │  │    Č     │  │    K     │                     │
-│    └──────────┘  └──────────┘  └──────────┘                     │
-└────────────────────────────────────────────────────────────────┘
-```
-
-### Želeno stanje (enako kot `/logopedski-koticek`):
-```text
-┌────────────────────────────────────────────────────────────────┐
-│                        HEADER                                   │
-├────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│                    Video navodila                               │
-│                    ═══════════════                              │
-│                                                                  │
-│          Domov > Moje aplikacije > Video navodila               │
-│                                                                  │
-│    ┌──────────┐  ┌──────────┐  ┌──────────┐                     │
-│    │  Zmajček │  │  Zmajček │  │  Zmajček │                     │
-│    │    C     │  │    Č     │  │    K     │                     │
-│    │ Opis... │  │ Opis... │  │ Opis... │                     │
-│    └──────────┘  └──────────┘  └──────────┘                     │
-└────────────────────────────────────────────────────────────────┘
-```
+Vse zahtevane slike so potrjene:
+- `kolo_srece_nova_2.webp`
+- `bingo_nova_2.webp`
+- `spomin_nova_2.webp`
+- `sestavljanka_nova_2.webp`
+- `zaporedja_nova_2.webp`
+- `drsna_sestavljanka_nova_2.webp`
+- `igra_ujemanja_2.webp`
+- `labirint_nova_2.webp` (za LABIRINT - pravilna slika namesto igra_ujemanja_2.webp)
+- `Smesne_besede.webp`
 
 ---
 
-## 1. Spremembe v `VideoNavodila.tsx`
+## Spremembe
 
-### 1.1 Odstranitev zelenega polja
-Odstrani celoten blok `Card` z "HEJ, ŽAK!" (vrstice 139-159).
-
-### 1.2 Ohranitev iste strukture kot LogopedskiKoticek
-Struktura ostane enaka:
-- Naslov na sredini z rumeno črto
-- Breadcrumb pod naslovom
-- Kartice v mreži
-
-### 1.3 Odstranitev neuporabljenih importov
-- Odstrani `Card, CardContent, CardHeader, CardTitle`
-- Odstrani `MessageSquare`
-- Odstrani `useAuth` (ker ne potrebujemo več `childName`)
+| Igra | Staro ime | Novo ime | Stara slika | Nova slika |
+|------|-----------|----------|-------------|------------|
+| kolo-srece | KOLO SREČE | **KOLO BESED** | kolo_srece_nova_1.webp | kolo_srece_nova_2.webp |
+| bingo | BINGO | BINGO | bingo_nova_1.webp | bingo_nova_2.webp |
+| spomin | SPOMIN | SPOMIN | spomin_nova_2.webp | spomin_nova_2.webp (že pravilna) |
+| sestavljanke | SESTAVLJANKE | SESTAVLJANKE | sestavljanka_nova_1.webp | sestavljanka_nova_2.webp |
+| zaporedja | ZAPOREDJA | ZAPOREDJA | zaporedja_nova_1.webp | zaporedja_nova_2.webp |
+| drsna-sestavljanka | DRSNA IGRA | DRSNA IGRA | drsna_sestavljanka_nova_1.webp | drsna_sestavljanka_nova_2.webp |
+| povezi-pare-matching | IGRA UJEMANJA | IGRA UJEMANJA | igra_ujemanja_1.webp | igra_ujemanja_2.webp |
+| labirint | LABIRINT | LABIRINT | labirint_nova_1.webp | labirint_nova_2.webp |
+| met-kocke | MET KOCKE | **SMEŠNE POVEDI** | met_kocke.webp | Smesne_besede.webp |
 
 ---
 
-## 2. Prenova podstrani `/video-navodila/:letter`
-
-### Trenutni dizajn:
-```text
-┌────────────────────────────────────────────────────────────────┐
-│                        HEADER                                   │
-├────────────────────────────────────────────────────────────────┤
-│  ←  │           Video navodila - C            │      │        │
-├────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │                      VIDEO PLAYER                         │  │
-│  └──────────────────────────────────────────────────────────┘  │
-└────────────────────────────────────────────────────────────────┘
-```
-
-### Nov moderni dizajn:
-```text
-┌────────────────────────────────────────────────────────────────┐
-│                        HEADER                                   │
-├────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│   Domov > Moje aplikacije > Video navodila > C                 │
-│                                                                  │
-│                      Črka C                                     │
-│              Poglej video navodila za                          │
-│          pravilno izgovorjavo črke C                           │
-│                                                                  │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │                      VIDEO PLAYER                         │  │
-│  └──────────────────────────────────────────────────────────┘  │
-└────────────────────────────────────────────────────────────────┘
-```
-
-#### Značilnosti novega dizajna:
-- Odstranitev starega `PageHeader` z ←
-- Dodajanje breadcrumb navigacije na vrhu
-- Velik naslov črke na sredini
-- Podnaslov z opisom
-- Čist, minimalističen izgled
-
----
-
-## 3. Posodobitev BreadcrumbNavigation
-
-### 3.1 Posodobitev konfiguracije za nove URL-je
-Ker so URL-ji sedaj brez "crka-" predpone, je treba posodobiti:
-
-```typescript
-// Staro (ne deluje več):
-{ path: "/video-navodila/crka-c", label: "Črka C", parent: "/video-navodila" },
-
-// Novo (pravilni URL-ji):
-{ path: "/video-navodila/c", label: "C", parent: "/video-navodila" },
-{ path: "/video-navodila/ch", label: "Č", parent: "/video-navodila" },
-// ... itd.
-```
-
-### 3.2 Odstranitev iz excludedPaths
-Odstrani `/video-navodila/crka-` iz seznama izključenih poti, da se breadcrumb prikaže na video straneh.
-
----
-
-## Datoteke za spremembo
+## Datoteka za spremembo
 
 | Datoteka | Akcija | Opis |
 |----------|--------|------|
-| `src/pages/VideoNavodila.tsx` | Posodobi | Odstrani zeleno polje, očisti importe |
-| `src/components/games/GenericVideoNavodila.tsx` | Posodobi | Nov moderni dizajn z breadcrumb in naslovom |
-| `src/components/BreadcrumbNavigation.tsx` | Posodobi | Posodobi konfiguracijo za nove URL-je |
+| `src/components/games/GamesList.tsx` | Posodobi | Zamenjaj slike in imena (vrstice 4-103) |
 
 ---
 
-## Tehnične podrobnosti
+## Tehnična implementacija
 
-### `src/pages/VideoNavodila.tsx`
-- Odstrani vrstice 139-159 (zeleno polje)
-- Odstrani neuporabljene importe: `Card, CardContent, CardHeader, CardTitle, MessageSquare, useAuth`
-- Ohrani strukturo: naslov → breadcrumb → kartice
+### Spremembe v `GamesList.tsx`
 
-### `src/components/games/GenericVideoNavodila.tsx`
-- Zamenjaj `PageHeader` z novim dizajnom:
-  - Breadcrumb navigacija
-  - Naslov črke (npr. "Črka C")
-  - Opis pod naslovom
-- Prenesi podatke o črki iz `videoNavodilaConfig` za prikaz
+```typescript
+// KOLO SREČE → KOLO BESED
+{
+  id: "kolo-srece",
+  title: "KOLO BESED",  // Spremenjeno
+  image: ".../kolo_srece_nova_2.webp",  // Spremenjeno
+  ...
+}
 
-### `src/components/BreadcrumbNavigation.tsx`
-- Posodobi poti za video navodila:
-  ```typescript
-  { path: "/video-navodila/c", label: "C", parent: "/video-navodila" },
-  { path: "/video-navodila/ch", label: "Č", parent: "/video-navodila" },
-  { path: "/video-navodila/k", label: "K", parent: "/video-navodila" },
-  { path: "/video-navodila/l", label: "L", parent: "/video-navodila" },
-  { path: "/video-navodila/r", label: "R", parent: "/video-navodila" },
-  { path: "/video-navodila/s", label: "S", parent: "/video-navodila" },
-  { path: "/video-navodila/sh", label: "Š", parent: "/video-navodila" },
-  { path: "/video-navodila/z", label: "Z", parent: "/video-navodila" },
-  { path: "/video-navodila/zh", label: "Ž", parent: "/video-navodila" },
-  ```
-- Odstrani `/video-navodila/crka-` iz `excludedPaths`
-- Odstrani stare `/video-navodila/crka-*` vnose
+// BINGO
+{
+  id: "bingo",
+  image: ".../bingo_nova_2.webp",  // Spremenjeno
+  ...
+}
+
+// SPOMIN - že ima pravilno sliko (spomin_nova_2.webp)
+
+// SESTAVLJANKE
+{
+  id: "sestavljanke",
+  image: ".../sestavljanka_nova_2.webp",  // Spremenjeno
+  ...
+}
+
+// ZAPOREDJA
+{
+  id: "zaporedja",
+  image: ".../zaporedja_nova_2.webp",  // Spremenjeno
+  ...
+}
+
+// DRSNA IGRA
+{
+  id: "drsna-sestavljanka",
+  image: ".../drsna_sestavljanka_nova_2.webp",  // Spremenjeno
+  ...
+}
+
+// IGRA UJEMANJA
+{
+  id: "povezi-pare-matching",
+  image: ".../igra_ujemanja_2.webp",  // Spremenjeno
+  ...
+}
+
+// LABIRINT
+{
+  id: "labirint",
+  image: ".../labirint_nova_2.webp",  // Spremenjeno (pravilna slika)
+  ...
+}
+
+// MET KOCKE → SMEŠNE POVEDI
+{
+  id: "met-kocke",
+  title: "SMEŠNE POVEDI",  // Spremenjeno
+  image: ".../Smesne_besede.webp",  // Spremenjeno
+  ...
+}
+```
 
 ---
 
-## Vizualni rezultat
+## Opomba
 
-### Stran `/video-navodila`:
-- Čista stran brez zelenega polja
-- Enaka postavitev kot `/logopedski-koticek`
-- Kartice z zmajčki so takoj vidne
-
-### Stran `/video-navodila/c`:
-- Elegantna glava z breadcrumb navigacijo
-- Velik naslov "Črka C" na sredini
-- Opis pod naslovom
-- Video predvajalnik pod opisom
-- Brez starega "← Video navodila - C" dizajna
+Za LABIRINT sem uporabil `labirint_nova_2.webp` namesto `igra_ujemanja_2.webp`, ki si jo omenil - to je bila verjetno napaka v zahtevi, saj `labirint_nova_2.webp` obstaja v storage in je logična izbira za to igro.
