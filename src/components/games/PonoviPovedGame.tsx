@@ -55,7 +55,9 @@ const STONE_IMAGES = {
 // Dragon images
 const DRAGON_RIGHT = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_4.png";
 const DRAGON_LEFT = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_4_1.png";
-const DRAGON_JUMP_BUTTON = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_111.PNG";
+
+// Jump button image from slike-ostalo bucket
+const JUMP_BUTTON_IMAGE = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/gumb_modri.png";
 
 // Stone positions in zigzag grid (x: column 0-3, y: row 0-4 from bottom)
 // 17 stones total: START + 4 sentences (4 stones each) - NO extra top goal stone
@@ -70,9 +72,10 @@ interface StonePosition {
 }
 
 // Build the zigzag path: 17 positions total (removed extra top stone)
+// Desktop version: START stone is at x: -1, y: 1 (left of first green stone)
 const STONE_POSITIONS: StonePosition[] = [
-  // Row 0: START (gray)
-  { x: 0, y: 0, type: 'gray', isRest: false },
+  // Row 1: START (gray) - positioned LEFT of first green stone for desktop
+  { x: -1, y: 1, type: 'gray', isRest: false },
   
   // Row 1: Sentence 1 - moving RIGHT (green, red, yellow, gray rest)
   { x: 0, y: 1, type: 'green', isRest: false, sentenceIndex: 0, wordIndex: 0 },
@@ -135,21 +138,22 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       return null;
     }
     
-    // DESKTOP: Logično prilagojene velikosti za zaslon
+    // DESKTOP: Pomanjšane velikosti - da se kartice besed prikazujejo nad igro brez prekrivanja
     if (!isMobile) {
-      const stoneWidth = 140;   // Zmanjšano iz 200
-      const stoneHeight = 105;  // Zmanjšano iz 150
-      const gapX = 175;         // Zmanjšano iz 250
-      const gapY = 155;         // Zmanjšano iz 200
-      const dragonSize = 130;   // Zmanjšano iz 180
+      const stoneWidth = 120;   // Pomanjšano iz 140
+      const stoneHeight = 90;   // Pomanjšano iz 105
+      const gapX = 150;         // Pomanjšano iz 175
+      const gapY = 130;         // Pomanjšano iz 155
+      const dragonSize = 110;   // Pomanjšano iz 130
       
-      // Calculate grid dimensions for centering
-      const gridWidth = 3 * gapX + stoneWidth;
+      // Grid zavzema manj prostora - več prostora za kartice zgoraj
+      // 4 stolpcev (vključno z START na x: -1)
+      const gridWidth = 4 * gapX + stoneWidth;
       const gridHeight = 4 * gapY + stoneHeight;
       
-      // Center horizontally and vertically
-      const offsetX = (containerSize.width - gridWidth) / 2;
-      const offsetY = 120; // Spodnji offset za gumb SKOK
+      // Zamik za START kamen na x: -1 (dodamo gapX da centriramo)
+      const offsetX = (containerSize.width - gridWidth) / 2 + gapX;
+      const offsetY = 100; // Nižji offset - igra je bolj spodaj
       
       return {
         stoneWidth,
@@ -158,7 +162,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
         gapY,
         dragonSize,
         offsetX: Math.max(offsetX, 20),
-        offsetY: Math.max(offsetY, 80),
+        offsetY: Math.max(offsetY, 60),
       };
     }
     
@@ -574,26 +578,31 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
         </div>
       </div>
       
-      {/* BOTTOM CENTER: SKOK button - WHITE CIRCLE with dragon */}
+      {/* BOTTOM CENTER: SKOK button - gumb_modri.png with pulse animation, no text */}
       <div className="fixed bottom-6 md:bottom-8 left-1/2 transform -translate-x-1/2 z-20">
         <button
           onClick={handleNext}
           disabled={isJumping || phase === "complete" || showSentenceDialog}
-          className={`flex flex-col items-center justify-center transition-all
+          className={`transition-all
             ${isJumping || phase === "complete" || showSentenceDialog
               ? 'opacity-50 cursor-not-allowed'
               : 'hover:scale-105 active:scale-95'
             }`}
         >
-          {/* White circle container */}
-          <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-white shadow-lg flex items-center justify-center">
-            <img
-              src={DRAGON_JUMP_BUTTON}
-              alt="Skok"
-              className="w-14 h-14 md:w-18 md:h-18 object-contain"
-            />
-          </div>
-          <span className="text-gray-700 font-bold text-sm md:text-base mt-2 uppercase">SKOK</span>
+          <motion.img
+            src={JUMP_BUTTON_IMAGE}
+            alt="Skok"
+            className="w-24 h-24 md:w-28 md:h-28 object-contain drop-shadow-lg"
+            animate={{ 
+              scale: [1, 1.08, 1],
+              opacity: [1, 0.85, 1]
+            }}
+            transition={{ 
+              duration: 1.5, 
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
         </button>
       </div>
       
