@@ -143,11 +143,11 @@ const wordsDataZ: WordData[] = [
   { word: "ZAVESA", image: "zavesa1.webp", audio: "zavesa.m4a" },
   { word: "ZEBRA", image: "zebra1.webp", audio: "zebra.m4a" },
   { word: "ZLATO", image: "zlato1.webp", audio: "zlato.m4a" },
-  { word: "ZMAJ", image: "zmaj.webp", audio: "zmaj.m4a" },
+  { word: "ZMAJ", image: "zmaj1.webp", audio: "zmaj.m4a" },
   { word: "ZOB", image: "zob1.webp", audio: "zob.m4a" },
   { word: "ZOBOTREBEC", image: "zobotrebec1.webp", audio: "zobotrebec.m4a" },
   { word: "ZVEZEK", image: "zvezek1.webp", audio: "zvezek.m4a" },
-  { word: "ZVEZDA", image: "zvezda.webp", audio: "zvezda.m4a" },
+  { word: "ZVEZDA", image: "zvezda1.webp", audio: "zvezda.m4a" },
   { word: "ZVOČNIK", image: "zvocnik1.webp", audio: "zvocnik.m4a" }
 ];
 
@@ -199,8 +199,8 @@ const bingoDataCHSredinaKonec: BingoWordData[] = [
   { word: "NOČ", image: "noc1.webp", audio: "noc.m4a" },
   { word: "OBROČ", image: "obroc1.webp", audio: "obroc.m4a" },
   { word: "PEČ", image: "pec1.webp", audio: "pec.m4a" },
-  { word: "PTIČ", image: "ptic.webp", audio: "ptic.m4a" },
-  { word: "RIBIČ", image: "ribic.webp", audio: "ribic.m4a" }
+  { word: "PTIČ", image: "ptic1.webp", audio: "ptic.m4a" },
+  { word: "RIBIČ", image: "ribic1.webp", audio: "ribic.m4a" }
 ];
 
 const bingoDataKSredinaKonec: BingoWordData[] = [
@@ -291,10 +291,10 @@ const bingoDataSHSredinaKonec: BingoWordData[] = [
   { word: "TUŠ", image: "tus1.webp", audio: "tus.m4a" },
   { word: "LEŠNIK", image: "lesnik1.webp", audio: "lesnik.m4a" },
   { word: "MUŠNICA", image: "musnica1.webp", audio: "musnica.m4a" },
-  { word: "NOGOMETAŠ", image: "nogometas.webp", audio: "nogometas.m4a" },
+  { word: "NOGOMETAŠ", image: "nogometas1.webp", audio: "nogometas.m4a" },
   { word: "OBEŠALNIK", image: "obesalnik1.webp", audio: "obesalnik.m4a" },
   { word: "PAŠTETA", image: "pasteta1.webp", audio: "pasteta.m4a" },
-  { word: "ROKOMETAŠ", image: "rokometas.webp", audio: "rokometas.m4a" },
+  { word: "ROKOMETAŠ", image: "rokometas1.webp", audio: "rokometas.m4a" },
   { word: "VIŠNJA", image: "visnja1.webp", audio: "visnja.m4a" }
 ];
 
@@ -308,7 +308,7 @@ const bingoDataZSredinaKonec: BingoWordData[] = [
   { word: "SLUZ", image: "sluz1.webp", audio: "sluz.m4a" },
   { word: "VAZA", image: "vaza1.webp", audio: "vaza.m4a" },
   { word: "ZVEZEK", image: "zvezek1.webp", audio: "zvezek.m4a" },
-  { word: "ZVEZDA", image: "zvezda.webp", audio: "zvezda.m4a" },
+  { word: "ZVEZDA", image: "zvezda1.webp", audio: "zvezda.m4a" },
   { word: "DINOZAVER", image: "dinozaver1.webp", audio: "dinozaver.m4a" },
   { word: "GNEZDO", image: "gnezdo1.webp", audio: "gnezdo.m4a" },
   { word: "GROZDJE", image: "grozdje1.webp", audio: "grozdje.m4a" },

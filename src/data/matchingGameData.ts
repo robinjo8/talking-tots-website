@@ -138,10 +138,10 @@ export const matchingGameData: LetterData[] = [
       { word: "ZAVESA", filename: "zavesa1.webp", url: `${SUPABASE_STORAGE_URL}/zavesa1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/zavesa.m4a` },
       { word: "ZEBRA", filename: "zebra1.webp", url: `${SUPABASE_STORAGE_URL}/zebra1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/zebra.m4a` },
       { word: "ZLATO", filename: "zlato1.webp", url: `${SUPABASE_STORAGE_URL}/zlato1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/zlato.m4a` },
-      { word: "ZMAJ", filename: "zmaj.webp", url: `${SUPABASE_STORAGE_URL}/zmaj.webp`, audio_url: `${SUPABASE_AUDIO_URL}/zmaj.m4a` },
+      { word: "ZMAJ", filename: "zmaj1.webp", url: `${SUPABASE_STORAGE_URL}/zmaj1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/zmaj.m4a` },
       { word: "ZOB", filename: "zob1.webp", url: `${SUPABASE_STORAGE_URL}/zob1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/zob.m4a` },
       { word: "ZOBOTREBEC", filename: "zobotrebec1.webp", url: `${SUPABASE_STORAGE_URL}/zobotrebec1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/zobotrebec.m4a` },
-      { word: "ZVEZDA", filename: "zvezda.webp", url: `${SUPABASE_STORAGE_URL}/zvezda.webp`, audio_url: `${SUPABASE_AUDIO_URL}/zvezda.m4a` },
+      { word: "ZVEZDA", filename: "zvezda1.webp", url: `${SUPABASE_STORAGE_URL}/zvezda1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/zvezda.m4a` },
       { word: "ZVEZEK", filename: "zvezek1.webp", url: `${SUPABASE_STORAGE_URL}/zvezek1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/zvezek.m4a` },
       { word: "ZVOČNIK", filename: "zvocnik1.webp", url: `${SUPABASE_STORAGE_URL}/zvocnik1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/zvocnik.m4a` }
     ]
@@ -172,12 +172,12 @@ export const matchingGameData: LetterData[] = [
       { word: "REPA", filename: "repa1.webp", url: `${SUPABASE_STORAGE_URL}/repa1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/repa.m4a` },
       { word: "RIBA", filename: "riba1.webp", url: `${SUPABASE_STORAGE_URL}/riba1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/riba.m4a` },
       { word: "RIBEZ", filename: "ribez1.webp", url: `${SUPABASE_STORAGE_URL}/ribez1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/ribez.m4a` },
-      { word: "RIBIČ", filename: "ribic.webp", url: `${SUPABASE_STORAGE_URL}/ribic.webp`, audio_url: `${SUPABASE_AUDIO_URL}/ribic.m4a` },
+      { word: "RIBIČ", filename: "ribic1.webp", url: `${SUPABASE_STORAGE_URL}/ribic1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/ribic.m4a` },
       { word: "RIS", filename: "ris1.webp", url: `${SUPABASE_STORAGE_URL}/ris1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/ris.m4a` },
-      { word: "RIŽ", filename: "riz.webp", url: `${SUPABASE_STORAGE_URL}/riz.webp`, audio_url: `${SUPABASE_AUDIO_URL}/riz.m4a` },
+      { word: "RIŽ", filename: "riz1.webp", url: `${SUPABASE_STORAGE_URL}/riz1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/riz.m4a` },
       { word: "ROBOT", filename: "robot1.webp", url: `${SUPABASE_STORAGE_URL}/robot1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/robot.m4a` },
       { word: "ROKA", filename: "roka1.webp", url: `${SUPABASE_STORAGE_URL}/roka1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/roka.m4a` },
-      { word: "ROKOMETAŠ", filename: "rokometas.webp", url: `${SUPABASE_STORAGE_URL}/rokometas.webp`, audio_url: `${SUPABASE_AUDIO_URL}/rokometas.m4a` },
+      { word: "ROKOMETAŠ", filename: "rokometas1.webp", url: `${SUPABASE_STORAGE_URL}/rokometas1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/rokometas.m4a` },
       { word: "ROLKA", filename: "rolka1.webp", url: `${SUPABASE_STORAGE_URL}/rolka1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/rolka.m4a` },
       { word: "ROPOTULJICA", filename: "ropotuljica1.webp", url: `${SUPABASE_STORAGE_URL}/ropotuljica1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/ropotuljica.m4a` },
       { word: "ROŽA", filename: "roza1.webp", url: `${SUPABASE_STORAGE_URL}/roza1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/roza.m4a` }
