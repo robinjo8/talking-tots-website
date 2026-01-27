@@ -31,25 +31,30 @@ export const useGenericMemoryGame = (config: SpominConfig) => {
   const { data: memoryCardsData, isLoading, error } = useQuery({
     queryKey: [config.queryKey],
     queryFn: async () => {
-      console.log(`Fetching memory cards for ${config.displayLetter} from ${config.tableName}...`);
+      console.log(`Fetching ALL memory cards for ${config.displayLetter} from ${config.tableName}...`);
       const { data, error } = await supabase
         .from(config.tableName as any)
-        .select("*")
-        .limit(10);
+        .select("*");
       
       if (error) {
         console.error("Error fetching memory cards:", error);
         throw error;
       }
       
-      console.log("Fetched memory cards:", data);
+      console.log(`Fetched ${data?.length || 0} memory cards for ${config.displayLetter}`);
       return data || [];
     }
   });
 
   const initializeGame = (cardData: any[]) => {
+    // Shuffle all available cards and select 10 random ones for the game
+    const shuffledAvailable = shuffleArray([...cardData]);
+    const selectedCards = shuffledAvailable.slice(0, 10);
+    
+    console.log(`Selected ${selectedCards.length} random cards from ${cardData.length} available`);
+    
     // Create pairs using the Supabase row ID as the pair identifier
-    const cardPairs = cardData.flatMap((card) => [
+    const cardPairs = selectedCards.flatMap((card) => [
       {
         ...card,
         flipped: false,
