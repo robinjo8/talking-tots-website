@@ -1,290 +1,226 @@
 
-# Načrt: Popolna prenova igre "Ponovi Poved"
+# Načrt: Popolna vizualna prenova igre "Ponovi Poved"
 
 ## Analiza referenčne slike
 
-Na podlagi priložene slike sem identificiral naslednje zahteve:
+Na podlagi slike sem identificiral naslednje zahteve za popolno prenovo:
 
-### Postavitev elementov:
-1. **Pot kamnov**: Cik-cak postavitev od spodaj levo navzgor, z večjimi kamni
-2. **Zmajček**: Stoji NA kamnu (ne lebdi v zraku)
-3. **Gumb hiška**: Spodaj levo, oranžni okrogli gumb, ločen od ostalih elementov
-4. **Gumb za skok**: Spodaj desno na modri podlagi, z ikono zmajčka
-5. **Kartice besed**: Na sredini spodaj, med gumbom hiške in gumbom za skok
-6. **Ozadje**: svetlomodro_ozadje.webp iz bucketa "ozadja"
+### 1. Struktura poti (17 kamnov namesto 18)
+Odstrani čisto zgornji siv kamen - CILJ je sivi kamen v 5. vrstici, ne posebna 6. vrstica.
 
-### Razmerja velikosti:
-- Kamni so veliko večji (cca 100-120px širine)
-- Zmajček je proporcionalno večji
-- Kartice besed so večje (cca 80-100px)
-- Celoten grid zapolni večino zaslona
+| Pozicija | Vrstica | Tip | Oznaka |
+|----------|---------|-----|--------|
+| 0 | 0 | siv | START |
+| 1-4 | 1 | rumena, rdeč, zelen, siv | Poved 1 |
+| 5-8 | 2 | rumena, rdeč, zelen, siv | Poved 2 |
+| 9-12 | 3 | rumena, rdeč, zelen, siv | Poved 3 |
+| 13-16 | 4 | rumena, rdeč, zelen, siv | Poved 4 (CILJ na sivi) |
 
----
-
-## Tehnične spremembe
-
-### 1. Ozadje strani
+### 2. Nove slike kamnov
+Zamenjava starih .webp slik z novimi preglednimi slikami:
 ```typescript
-const BACKGROUND_URL = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/svetlomodro_ozadje.webp';
-
-// V return:
-<div 
-  className="min-h-screen w-full fixed inset-0 flex flex-col"
-  style={{
-    backgroundImage: `url(${BACKGROUND_URL})`,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    backgroundRepeat: "no-repeat",
-  }}
->
+const STONE_IMAGES = {
+  gray: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/kamen_siv-Photoroom.png",
+  yellow: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/kamen_rumen-Photoroom.png",
+  red: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/kamen_rdec-Photoroom.png",
+  green: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/kamen_zelen-Photoroom.png",
+};
 ```
 
-### 2. Povečanje velikosti elementov
+### 3. Slika zmajčka za gumb SKOK
+```typescript
+const DRAGON_JUMP_BUTTON = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_111.png";
+```
 
-**Desktop (768px+):**
-| Element | Trenutno | Novo |
-|---------|----------|------|
-| Kamni | 64x48px | 120x90px |
-| Zmajček | 70x70px | 110x110px |
-| Kartice besed | 96x112px | 100x120px |
-| Gap X | 80px | 140px |
-| Gap Y | 70px | 100px |
-
-**Mobilno (<768px):**
-| Element | Velikost |
-|---------|----------|
-| Kamni | 80x60px |
-| Zmajček | 80x80px |
-| Kartice | 80x100px |
-| Gap X | 90px |
-| Gap Y | 75px |
-
-### 3. Pozicija zmajčka na kamnu
-
-Trenutno zmajček lebdi 50px nad kamnom. Nova logika:
+### 4. Pozicija zmajčka NA kamnu
+Trenutno zmajček lebdi v zraku. Popravek:
 ```typescript
 const getDragonPixelPosition = () => {
   const pos = getStonePixelPosition(dragonPosition);
   return {
-    left: pos.left + stoneWidth/2 - dragonWidth/2,  // Centriraj horizontalno
-    bottom: pos.bottom + stoneHeight - 10,  // Sedi na kamnu, ne lebdi
+    left: pos.left + stoneWidth / 2 - dragonSize / 2,
+    bottom: pos.bottom + stoneHeight * 0.6,  // Zmaj sedi na sredini kamna
   };
 };
 ```
 
-### 4. Popravek slike zmajčka za levo smer
+### 5. Dinamične velikosti glede na zaslon
 
-Trenutna koda pravilno referira `Zmajcek_4_1.PNG`, vendar je potrebno preveriti ali obstaja v bucketu. Uporabim malo črko:
+**Desktop (polni zaslon):**
 ```typescript
-const DRAGON_LEFT = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_4_1.png";
+// Izračun na podlagi velikosti okna (podobno kot MemoryGrid)
+const stoneWidth = Math.floor(Math.min(
+  (window.innerWidth - 200) / 5,  // 5 stolpcev z margino
+  (window.innerHeight - 200) / 6  // 6 vrstic z margino
+) * 1.2);
+
+const stoneHeight = stoneWidth * 0.75;  // Razmerje stranic
+const gapX = stoneWidth * 1.15;
+const gapY = stoneHeight * 1.2;
+const dragonSize = stoneWidth * 0.9;
 ```
 
-### 5. Nova postavitev spodnjega dela
+**Mobilno (<768px):**
+- Manjše vrednosti, prilagojene za portrait/landscape
+- Fullscreen in landscape lock kot pri igri Spomin
 
-```text
-┌─────────────────────────────────────────────────────────────────┐
-│                                                                 │
-│  ┌──────┐                                         ┌───────────┐ │
-│  │ 🏠   │    ┌────┐ ┌────┐ ┌────┐                 │   🐉      │ │
-│  │      │    │Kača│ │ima │ │kapo│                 │   SKOK    │ │
-│  └──────┘    └────┘ └────┘ └────┘                 │  (modro)  │ │
-│  (oranžno)      (kartice na sredini)               └───────────┘ │
-└─────────────────────────────────────────────────────────────────┘
+### 6. Odstranitev pokala in zgornjega sivega kamna
+- STONE_POSITIONS bo imel 17 elementov (0-16) namesto 18
+- Zadnji sivi kamen (pozicija 16) bo CILJ
+- Odstrani "🏆" in "CILJ" oznako iz renderiranja
+- CILJ oznaka ostane samo na zadnjem sivem kamnu
+
+### 7. Gumb hiška - OKROGEL (ne kvadraten)
+```tsx
+<Button
+  className="h-14 w-14 rounded-full bg-app-orange hover:bg-app-orange/90 shadow-lg"
+  size="icon"
+>
+  <Home className="h-7 w-7 text-white" />
+</Button>
 ```
 
-**CSS struktura:**
-```jsx
-{/* Spodnji del - fixed pozicija */}
-<div className="fixed bottom-0 left-0 right-0 p-4 flex items-end justify-between">
-  {/* Levo: Gumb hiška */}
-  <DropdownMenu>
-    <DropdownMenuTrigger asChild>
-      <Button className="h-14 w-14 rounded-xl bg-app-orange hover:bg-app-orange/90 shadow-lg">
-        <Home className="h-7 w-7 text-white" />
-      </Button>
-    </DropdownMenuTrigger>
-    ...
-  </DropdownMenu>
-  
-  {/* Sredina: Kartice besed */}
-  <div className="flex-1 flex justify-center gap-3 mx-4">
-    {collectedWords.map((word) => (
-      <div className="w-20 h-24 md:w-24 md:h-28 bg-white rounded-xl border-2 border-dragon-green shadow-md flex flex-col items-center justify-center p-2">
-        <img src={getImageUrl(word.image)} className="w-14 h-14 md:w-16 md:h-16 object-contain" />
-        <p className="text-xs md:text-sm font-bold text-gray-700">{word.word}</p>
-      </div>
-    ))}
-  </div>
-  
-  {/* Desno: Gumb za skok na modri podlagi */}
-  <div className="bg-sky-400 rounded-xl p-2 shadow-lg">
-    <button
-      onClick={handleNext}
-      className="w-20 h-24 md:w-24 md:h-28 bg-gradient-to-b from-green-400 to-green-600 rounded-xl flex flex-col items-center justify-center"
-    >
-      <img src={DRAGON_RIGHT} className="w-16 h-16 md:w-18 md:h-18 object-contain" />
-      <span className="text-white font-bold text-xs">SKOK</span>
-    </button>
-  </div>
+### 8. Gumb SKOK - z Zmajcek_111.png
+```tsx
+<div className="bg-sky-400 rounded-xl p-3 shadow-lg">
+  <button
+    onClick={handleNext}
+    disabled={isJumping || phase === "complete" || showSentenceDialog}
+    className="w-24 h-28 md:w-28 md:h-32 rounded-xl flex flex-col items-center justify-center
+      bg-gradient-to-b from-green-400 to-green-600"
+  >
+    <img
+      src={DRAGON_JUMP_BUTTON}
+      alt="Skok"
+      className="w-16 h-16 md:w-20 md:h-20 object-contain"
+    />
+    <span className="text-white font-bold text-sm mt-1">SKOK</span>
+  </button>
 </div>
 ```
 
-### 6. Pop-up dialog (stil "Smešne Povedi")
+### 9. Razporeditev čez celoten ekran
 
-Prevzamem dizajn iz `DiceResultDialog.tsx`:
-
-```jsx
-<Dialog open={showSentenceDialog} onOpenChange={() => {}}>
-  <DialogContent className="sm:max-w-lg">
-    <DialogHeader>
-      <DialogTitle className="font-bold text-dragon-green text-center text-lg md:text-2xl uppercase">
-        ODLIČNO!
-      </DialogTitle>
-    </DialogHeader>
-    
-    <div className="space-y-3 md:space-y-4 py-2 md:py-4">
-      <p className="text-black text-center uppercase text-xs md:text-sm font-medium">
-        POSLUŠAJ IN PONOVI POVED
-      </p>
-      
-      {/* Tri slike v vrsti */}
-      <div className="flex justify-center gap-3 md:gap-4">
-        {currentSentence?.words.map((word, idx) => (
-          <div key={idx} className="flex flex-col items-center space-y-1 md:space-y-2">
-            <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden border-2 border-dragon-green bg-gray-50">
-              <img
-                src={getImageUrl(word.image)}
-                alt={word.word}
-                className="w-full h-full object-contain"
-              />
-            </div>
-            <span className="font-medium text-center text-xs md:text-sm text-black uppercase">
-              {word.word.toUpperCase()}
-            </span>
-          </div>
-        ))}
-      </div>
-      
-      {/* Tekst povedi */}
-      <p className="text-base md:text-lg font-semibold text-gray-800 text-center uppercase">
-        "{currentSentence?.fullSentence.toUpperCase()}"
-      </p>
-
-      {/* Gumbi */}
-      <div className="flex justify-center gap-3 pt-2">
-        <Button
-          onClick={playSentenceAudio}
-          className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 uppercase font-medium h-10 w-32"
-        >
-          <Volume2 className="w-4 h-4" />
-          PREDVAJAJ
-        </Button>
-        
-        <Button
-          onClick={handleRepeat}
-          disabled={isRecording}
-          className="relative bg-app-orange hover:bg-app-orange/90 text-white gap-2 uppercase font-medium h-10 w-32"
-        >
-          <Mic className="w-4 h-4" />
-          {isRecording ? "..." : "PONOVI"}
-          {isRecording && (
-            <span className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
-              {countdown}
-            </span>
-          )}
-        </Button>
-        
-        <Button onClick={handleContinueFromDialog} variant="outline" className="uppercase h-10 w-32">
-          NAPREJ
-        </Button>
-      </div>
-    </div>
-  </DialogContent>
-</Dialog>
-```
-
-### 7. Responzivnost (Desktop vs. Mobilno)
-
-Uporabim hook `useIsMobile()`:
+Uporaba podobnega pristopa kot MemoryGrid - dinamično izračunavanje velikosti na podlagi razpoložljivega prostora:
 
 ```typescript
-import { useIsMobile } from "@/hooks/use-mobile";
+const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
-const isMobile = useIsMobile();
+useEffect(() => {
+  const updateSize = () => {
+    setContainerSize({
+      width: window.innerWidth,
+      height: window.innerHeight - 160  // Odštej spodnji del za kontrole
+    });
+  };
+  updateSize();
+  window.addEventListener('resize', updateSize);
+  return () => window.removeEventListener('resize', updateSize);
+}, []);
 
 // Dinamične velikosti
-const stoneWidth = isMobile ? 80 : 120;
-const stoneHeight = isMobile ? 60 : 90;
-const gapX = isMobile ? 90 : 140;
-const gapY = isMobile ? 75 : 100;
-const dragonSize = isMobile ? 80 : 110;
-const offsetX = isMobile ? 30 : 60;
-const offsetY = isMobile ? 60 : 100;
+const columns = 4;  // 4 stolpci (START + 3 besede)
+const rows = 5;     // 5 vrstic (START + 4 povedi)
+
+const calculatedStoneSize = useMemo(() => {
+  if (containerSize.width === 0) return null;
+  
+  const availableWidth = containerSize.width - 100;  // Margine
+  const availableHeight = containerSize.height - 100;
+  
+  const sizeByWidth = Math.floor(availableWidth / columns / 1.15);
+  const sizeByHeight = Math.floor(availableHeight / rows / 1.2);
+  
+  return Math.min(sizeByWidth, sizeByHeight, isMobile ? 100 : 140);
+}, [containerSize, isMobile]);
 ```
 
-### 8. Odstranitev glave (header)
-
-Referenčna slika nima zelenega naslova na vrhu. Odstranimo header za čist dizajn:
-
-```jsx
-// ODSTRANI:
-{/* Header */}
-<div className="bg-dragon-green text-white py-3 px-4 shadow-md">
-  <h1 className="text-xl font-bold text-center">
-    Ponovi poved - Črka {config.displayLetter}
-  </h1>
-</div>
-```
+### 10. Mobilna verzija - landscape fullscreen
+Podobno kot pri Spomin igri:
+- Avtomatsko fullscreen in landscape lock
+- Prilagojena velikost elementov
+- Prikaz sporočila za obračanje telefona, če je v portrait načinu
 
 ---
 
-## Struktura datotek za spremembe
+## Spremembe v datoteki
 
-| Datoteka | Sprememba |
-|----------|-----------|
-| `src/components/games/PonoviPovedGame.tsx` | Popolna prenova vizualnega prikaza |
+**Datoteka:** `src/components/games/PonoviPovedGame.tsx`
+
+### Povzetek vseh sprememb:
+
+1. **STONE_POSITIONS**: Zmanjšaj na 17 elementov (odstrani zadnji sivi kamen)
+2. **STONE_IMAGES**: Zamenjaj URL-je z novimi `-Photoroom.png` slikami
+3. **DRAGON_JUMP_BUTTON**: Dodaj konstanto za `Zmajcek_111.png`
+4. **getDragonPixelPosition**: Popravi, da zmaj sedi na kamnu
+5. **containerSize + useEffect**: Dodaj dinamično merjenje velikosti okna
+6. **calculatedStoneSize**: Izračunaj velikost na podlagi prostora
+7. **Home gumb**: Spremeni iz `rounded-xl` v `rounded-full`
+8. **SKOK gumb**: Uporabi `DRAGON_JUMP_BUTTON` sliko
+9. **Odstrani pokal**: Odstrani "🏆" in "CILJ" iz zgornjega kamna
+10. **Mobilna podpora**: Dodaj fullscreen/landscape lock kot pri Spomin
 
 ---
 
 ## Vizualizacija končnega rezultata
 
 ```text
-┌─────────────────────────────────────────────────────────────┐
-│                 svetlomodro_ozadje.webp                     │
-│                                                             │
-│     [SIV]                                                   │
-│      CILJ                                                   │
-│                                                             │
-│     [RUM] [RDEČ] [ZEL]  [SIV]                              │
-│                                                             │
-│     [SIV]  [ZEL] [RDEČ] [RUM]                              │
-│                                                             │
-│     [RUM] [RDEČ] [ZEL]  [SIV]                              │
-│                                                             │
-│  🐉                                                         │
-│ [SIV]  [RUM] [RDEČ] [ZEL]  [SIV]                           │
-│ START                                                       │
-│                                                             │
-│ ┌────┐    ┌────┐┌────┐┌────┐           ┌────────────┐     │
-│ │ 🏠 │    │Kača││ima ││kapo│           │▓▓▓▓▓▓▓▓▓▓▓▓│     │
-│ └────┘    └────┘└────┘└────┘           │ 🐉 SKOK   │     │
-│ oranžno    kartice besed               │ (modro)   │     │
-│                                         └────────────┘     │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                    svetlomodro_ozadje.webp                          │
+│                                                                     │
+│   [SIV]  - samo CILJ oznaka, brez pokala                           │
+│     ↑                                                               │
+│   [RUM] [RDEČ] [ZEL] [SIV]  ← 4. poved                             │
+│                                                                     │
+│   [SIV] [ZEL] [RDEČ] [RUM]  ← 3. poved                             │
+│                                                                     │
+│   [RUM] [RDEČ] [ZEL] [SIV]  ← 2. poved                             │
+│      🐉                                                             │
+│   [ZEL] [RDEČ] [RUM] [SIV]  ← 1. poved                             │
+│                                                                     │
+│   [SIV] START                                                       │
+│                                                                     │
+│ ┌───┐      ┌───────┐┌───────┐┌───────┐           ┌──────────────┐  │
+│ │🏠│      │ KUŽA  ││ VIDI  ││ KOST  │           │   🐉         │  │
+│ └───┘      └───────┘└───────┘└───────┘           │   SKOK       │  │
+│ okroglo                                          └──────────────┘  │
+│ oranžno     kartice na sredini                   zeleno na modrem │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Povzetek sprememb
+## Tehnična struktura
 
-1. **Ozadje**: svetlomodro_ozadje.webp na celotni strani
-2. **Velikost**: Vse povečano za ~50-80%
-3. **Gumb hiška**: Spodaj levo, ločen, oranžni okrogli gumb
-4. **Gumb skok**: Spodaj desno na modri podlagi
-5. **Kartice**: Na sredini spodaj
-6. **Zmajček**: Sedi na kamnu (ne lebdi)
-7. **Zmajček levo**: Popravljena slika Zmajcek_4_1.png
-8. **Pop-up**: Stil enak kot "Smešne Povedi" (DiceResultDialog)
-9. **Brez glave**: Čist dizajn brez zelenega naslova
-10. **Responzivno**: Prilagojeno za desktop in mobilno
+### Nova pot (17 kamnov):
+```typescript
+const STONE_POSITIONS: StonePosition[] = [
+  { x: 0, y: 0, type: 'gray', isRest: false },  // START
+  
+  // Poved 1 (desno)
+  { x: 0, y: 1, type: 'green', isRest: false, sentenceIndex: 0, wordIndex: 0 },
+  { x: 1, y: 1, type: 'red', isRest: false, sentenceIndex: 0, wordIndex: 1 },
+  { x: 2, y: 1, type: 'yellow', isRest: false, sentenceIndex: 0, wordIndex: 2 },
+  { x: 3, y: 1, type: 'gray', isRest: true, sentenceIndex: 0 },
+  
+  // Poved 2 (levo) - začne od sive na desni
+  { x: 3, y: 2, type: 'yellow', isRest: false, sentenceIndex: 1, wordIndex: 0 },
+  { x: 2, y: 2, type: 'red', isRest: false, sentenceIndex: 1, wordIndex: 1 },
+  { x: 1, y: 2, type: 'green', isRest: false, sentenceIndex: 1, wordIndex: 2 },
+  { x: 0, y: 2, type: 'gray', isRest: true, sentenceIndex: 1 },
+  
+  // Poved 3 (desno)
+  { x: 0, y: 3, type: 'green', isRest: false, sentenceIndex: 2, wordIndex: 0 },
+  { x: 1, y: 3, type: 'red', isRest: false, sentenceIndex: 2, wordIndex: 1 },
+  { x: 2, y: 3, type: 'yellow', isRest: false, sentenceIndex: 2, wordIndex: 2 },
+  { x: 3, y: 3, type: 'gray', isRest: true, sentenceIndex: 2 },
+  
+  // Poved 4 (levo) - CILJ na sivi
+  { x: 3, y: 4, type: 'yellow', isRest: false, sentenceIndex: 3, wordIndex: 0 },
+  { x: 2, y: 4, type: 'red', isRest: false, sentenceIndex: 3, wordIndex: 1 },
+  { x: 1, y: 4, type: 'green', isRest: false, sentenceIndex: 3, wordIndex: 2 },
+  { x: 0, y: 4, type: 'gray', isRest: true, sentenceIndex: 3 },  // CILJ
+];
+```
 
+**Opomba:** Glede na referenčno sliko je vrstni red barv: zelena → rdeča → rumena → siva (za vsako poved), ne rumena → rdeča → zelena kot je trenutno.
