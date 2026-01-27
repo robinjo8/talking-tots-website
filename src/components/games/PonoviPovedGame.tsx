@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -44,19 +44,21 @@ interface PonoviPovedGameProps {
 // Background from ozadja bucket
 const BACKGROUND_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/svetlomodro_ozadje.webp";
 
-// Stone images from Supabase bucket
+// NEW: Stone images with transparent backgrounds (-Photoroom.png)
 const STONE_IMAGES = {
-  gray: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/kamen_siv.webp",
-  yellow: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/kamen_rumen.webp",
-  red: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/kamen_rdec.webp",
-  green: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/kamen_zelen.webp",
+  gray: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/kamen_siv-Photoroom.png",
+  yellow: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/kamen_rumen-Photoroom.png",
+  red: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/kamen_rdec-Photoroom.png",
+  green: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/kamen_zelen-Photoroom.png",
 };
 
 // Dragon images
 const DRAGON_RIGHT = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_4.png";
 const DRAGON_LEFT = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_4_1.png";
+const DRAGON_JUMP_BUTTON = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_111.png";
 
-// Stone positions in zigzag grid (x: column 0-4, y: row 0-5 from bottom)
+// Stone positions in zigzag grid (x: column 0-3, y: row 0-4 from bottom)
+// 17 stones total: START + 4 sentences (4 stones each) - NO extra top goal stone
 type StoneType = 'gray' | 'yellow' | 'red' | 'green';
 interface StonePosition {
   x: number;
@@ -67,15 +69,15 @@ interface StonePosition {
   wordIndex?: number;
 }
 
-// Build the zigzag path: 18 positions total
+// Build the zigzag path: 17 positions total (removed extra top stone)
 const STONE_POSITIONS: StonePosition[] = [
   // Row 0: START (gray)
   { x: 0, y: 0, type: 'gray', isRest: false },
   
-  // Row 1: Sentence 1 - moving RIGHT (yellow, red, green, gray rest)
-  { x: 0, y: 1, type: 'yellow', isRest: false, sentenceIndex: 0, wordIndex: 0 },
+  // Row 1: Sentence 1 - moving RIGHT (green, red, yellow, gray rest)
+  { x: 0, y: 1, type: 'green', isRest: false, sentenceIndex: 0, wordIndex: 0 },
   { x: 1, y: 1, type: 'red', isRest: false, sentenceIndex: 0, wordIndex: 1 },
-  { x: 2, y: 1, type: 'green', isRest: false, sentenceIndex: 0, wordIndex: 2 },
+  { x: 2, y: 1, type: 'yellow', isRest: false, sentenceIndex: 0, wordIndex: 2 },
   { x: 3, y: 1, type: 'gray', isRest: true, sentenceIndex: 0 },
   
   // Row 2: Sentence 2 - moving LEFT (start from right, gray rest on left)
@@ -85,19 +87,16 @@ const STONE_POSITIONS: StonePosition[] = [
   { x: 0, y: 2, type: 'gray', isRest: true, sentenceIndex: 1 },
   
   // Row 3: Sentence 3 - moving RIGHT
-  { x: 0, y: 3, type: 'yellow', isRest: false, sentenceIndex: 2, wordIndex: 0 },
+  { x: 0, y: 3, type: 'green', isRest: false, sentenceIndex: 2, wordIndex: 0 },
   { x: 1, y: 3, type: 'red', isRest: false, sentenceIndex: 2, wordIndex: 1 },
-  { x: 2, y: 3, type: 'green', isRest: false, sentenceIndex: 2, wordIndex: 2 },
+  { x: 2, y: 3, type: 'yellow', isRest: false, sentenceIndex: 2, wordIndex: 2 },
   { x: 3, y: 3, type: 'gray', isRest: true, sentenceIndex: 2 },
   
-  // Row 4: Sentence 4 - moving LEFT
+  // Row 4: Sentence 4 - moving LEFT - GOAL is on last gray stone
   { x: 3, y: 4, type: 'yellow', isRest: false, sentenceIndex: 3, wordIndex: 0 },
   { x: 2, y: 4, type: 'red', isRest: false, sentenceIndex: 3, wordIndex: 1 },
   { x: 1, y: 4, type: 'green', isRest: false, sentenceIndex: 3, wordIndex: 2 },
-  { x: 0, y: 4, type: 'gray', isRest: true, sentenceIndex: 3 },
-  
-  // Row 5: GOAL (gray)
-  { x: 0, y: 5, type: 'gray', isRest: false },
+  { x: 0, y: 4, type: 'gray', isRest: true, sentenceIndex: 3 },  // GOAL
 ];
 
 export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
@@ -107,14 +106,74 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
   const completionCalledRef = useRef(false);
   const isMobile = useIsMobile();
   
-  // Responsive sizes
-  const stoneWidth = isMobile ? 80 : 120;
-  const stoneHeight = isMobile ? 60 : 90;
-  const gapX = isMobile ? 90 : 140;
-  const gapY = isMobile ? 75 : 100;
-  const dragonSize = isMobile ? 80 : 110;
-  const offsetX = isMobile ? 30 : 60;
-  const offsetY = isMobile ? 80 : 120;
+  // Dynamic window size measurement (like MemoryGrid)
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+  
+  useEffect(() => {
+    const updateSize = () => {
+      setContainerSize({
+        width: window.innerWidth,
+        height: window.innerHeight - 160 // Space for bottom controls
+      });
+    };
+    
+    const handleOrientationChange = () => setTimeout(updateSize, 100);
+    
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    window.addEventListener('orientationchange', handleOrientationChange);
+    
+    return () => {
+      window.removeEventListener('resize', updateSize);
+      window.removeEventListener('orientationchange', handleOrientationChange);
+    };
+  }, []);
+  
+  // Calculate dynamic sizes based on screen (like MemoryGrid)
+  const calculatedSizes = useMemo(() => {
+    if (containerSize.width === 0 || containerSize.height === 0) {
+      return null;
+    }
+    
+    const columns = 4; // 4 columns for stones
+    const rows = 5;    // 5 rows (START + 4 sentences)
+    
+    const PADDING = isMobile ? 40 : 80;
+    
+    const availableWidth = containerSize.width - PADDING;
+    const availableHeight = containerSize.height - PADDING;
+    
+    // Calculate stone size based on available space
+    const sizeByWidth = Math.floor(availableWidth / columns / 1.3);
+    const sizeByHeight = Math.floor(availableHeight / rows / 1.35);
+    
+    const stoneWidth = Math.min(sizeByWidth, sizeByHeight, isMobile ? 90 : 140);
+    const stoneHeight = Math.floor(stoneWidth * 0.75);
+    const gapX = Math.floor(stoneWidth * 1.25);
+    const gapY = Math.floor(stoneHeight * 1.35);
+    const dragonSize = Math.floor(stoneWidth * 0.9);
+    const offsetX = Math.floor((containerSize.width - (columns - 1) * gapX - stoneWidth) / 2);
+    const offsetY = Math.floor(stoneHeight * 0.5);
+    
+    return {
+      stoneWidth,
+      stoneHeight,
+      gapX,
+      gapY,
+      dragonSize,
+      offsetX,
+      offsetY,
+    };
+  }, [containerSize, isMobile]);
+  
+  // Use calculated sizes or fallback
+  const stoneWidth = calculatedSizes?.stoneWidth ?? (isMobile ? 80 : 120);
+  const stoneHeight = calculatedSizes?.stoneHeight ?? (isMobile ? 60 : 90);
+  const gapX = calculatedSizes?.gapX ?? (isMobile ? 90 : 140);
+  const gapY = calculatedSizes?.gapY ?? (isMobile ? 75 : 100);
+  const dragonSize = calculatedSizes?.dragonSize ?? (isMobile ? 80 : 110);
+  const offsetX = calculatedSizes?.offsetX ?? (isMobile ? 30 : 60);
+  const offsetY = calculatedSizes?.offsetY ?? (isMobile ? 40 : 60);
   
   // Game state
   const [phase, setPhase] = useState<GamePhase>("start");
@@ -229,22 +288,16 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     setShowSentenceDialog(false);
     setCollectedWords([]);
     
-    // Check if this was the last sentence
-    if (dragonPosition === STONE_POSITIONS.length - 2) {
-      // Move to goal
-      setIsJumping(true);
-      setDragonPosition(STONE_POSITIONS.length - 1);
+    // Check if this was the last sentence (position 16 is the goal)
+    if (dragonPosition === STONE_POSITIONS.length - 1) {
+      setPhase("complete");
       
-      setTimeout(async () => {
-        setIsJumping(false);
-        setPhase("complete");
-        
-        if (!completionCalledRef.current) {
-          completionCalledRef.current = true;
-          await recordProgress();
+      if (!completionCalledRef.current) {
+        completionCalledRef.current = true;
+        recordProgress().then(() => {
           setShowSuccessDialog(true);
-        }
-      }, 600);
+        });
+      }
     }
   }, [dragonPosition]);
 
@@ -281,15 +334,6 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
         
         // Play word audio
         await playAudio(word.audio);
-      } else if (nextPosition === STONE_POSITIONS.length - 1) {
-        // Reached goal
-        setPhase("complete");
-        
-        if (!completionCalledRef.current) {
-          completionCalledRef.current = true;
-          await recordProgress();
-          setShowSuccessDialog(true);
-        }
       }
     }, 600);
   }, [dragonPosition, isJumping, showSentenceDialog, config.sentences, playAudio, playSentenceAudio]);
@@ -348,16 +392,32 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     };
   };
 
-  // Get dragon pixel position - sits ON the stone
+  // Get dragon pixel position - sits ON the stone (not floating)
   const getDragonPixelPosition = () => {
     const pos = getStonePixelPosition(dragonPosition);
     return {
       left: pos.left + stoneWidth / 2 - dragonSize / 2,
-      bottom: pos.bottom + stoneHeight - 15, // Dragon sits on top of the stone
+      bottom: pos.bottom + stoneHeight * 0.6, // Dragon sits on top of the stone
     };
   };
 
   const dragonPos = getDragonPixelPosition();
+
+  // Don't render until we have proper dimensions
+  if (!calculatedSizes) {
+    return (
+      <div 
+        className="min-h-screen w-full fixed inset-0 flex items-center justify-center"
+        style={{
+          backgroundImage: `url(${BACKGROUND_URL})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="animate-pulse text-white text-xl font-bold">Nalaganje...</div>
+      </div>
+    );
+  }
 
   return (
     <div 
@@ -392,8 +452,8 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
                   width: stoneWidth,
                   height: stoneHeight,
                 }}
-                animate={isActive ? { scale: [1, 1.1, 1] } : { scale: 1 }}
-                transition={{ duration: 0.5, repeat: isActive ? Infinity : 0 }}
+                animate={isActive ? { scale: [1, 1.05, 1] } : { scale: 1 }}
+                transition={{ duration: 0.8, repeat: isActive ? Infinity : 0 }}
               >
                 <img
                   src={STONE_IMAGES[stone.type]}
@@ -401,10 +461,14 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
                   className="w-full h-full object-contain drop-shadow-lg"
                 />
                 {isStart && (
-                  <span className="text-xs md:text-sm font-bold text-gray-700 mt-1 bg-white/70 px-2 rounded">START</span>
+                  <span className="absolute -bottom-5 text-xs md:text-sm font-bold text-gray-700 bg-white/80 px-2 py-0.5 rounded shadow">
+                    START
+                  </span>
                 )}
                 {isGoal && (
-                  <span className="text-xs md:text-sm font-bold text-yellow-700 mt-1 bg-white/70 px-2 rounded">CILJ 🏆</span>
+                  <span className="absolute -bottom-5 text-xs md:text-sm font-bold text-yellow-700 bg-white/80 px-2 py-0.5 rounded shadow">
+                    CILJ
+                  </span>
                 )}
               </motion.div>
             );
@@ -436,11 +500,11 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       
       {/* Bottom controls - fixed */}
       <div className="fixed bottom-0 left-0 right-0 p-3 md:p-4 flex items-end justify-between z-20">
-        {/* Left: Home menu button */}
+        {/* Left: Home menu button - ROUNDED FULL */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              className="h-12 w-12 md:h-14 md:w-14 rounded-xl bg-app-orange hover:bg-app-orange/90 shadow-lg flex-shrink-0"
+              className="h-12 w-12 md:h-14 md:w-14 rounded-full bg-app-orange hover:bg-app-orange/90 shadow-lg flex-shrink-0"
               size="icon"
             >
               <Home className="h-6 w-6 md:h-7 md:w-7 text-white" />
@@ -483,8 +547,8 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
           </AnimatePresence>
         </div>
         
-        {/* Right: Jump button on blue background */}
-        <div className="bg-sky-400 rounded-xl p-2 shadow-lg flex-shrink-0">
+        {/* Right: Jump button on blue background with Zmajcek_111.png */}
+        <div className="bg-sky-400 rounded-xl p-2 md:p-3 shadow-lg flex-shrink-0">
           <button
             onClick={handleNext}
             disabled={isJumping || phase === "complete" || showSentenceDialog}
@@ -495,9 +559,9 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
               }`}
           >
             <img
-              src={DRAGON_RIGHT}
+              src={DRAGON_JUMP_BUTTON}
               alt="Skok"
-              className="w-14 h-14 md:w-16 md:h-16 object-contain"
+              className="w-14 h-14 md:w-18 md:h-18 object-contain"
             />
             <span className="text-white font-bold text-xs md:text-sm mt-1">SKOK</span>
           </button>
@@ -605,9 +669,9 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
             <AlertDialogTitle>Navodila</AlertDialogTitle>
             <AlertDialogDescription className="text-left space-y-2">
               <p>🐉 Zmajček skače po barvnih kamnih.</p>
-              <p>🟡 Na rumenem kamnu izgovori prvo besedo.</p>
+              <p>🟢 Na zelenem kamnu izgovori prvo besedo.</p>
               <p>🔴 Na rdečem kamnu izgovori drugo besedo.</p>
-              <p>🟢 Na zelenem kamnu izgovori tretjo besedo.</p>
+              <p>🟡 Na rumenem kamnu izgovori tretjo besedo.</p>
               <p>⬜ Na sivem kamnu ponovi celo poved!</p>
               <p>🏆 Cilj je priti do vrha!</p>
             </AlertDialogDescription>
