@@ -1,155 +1,369 @@
 
-# Načrt: Vključitev vseh slik v vse igre
 
-## Pregled problema
+# Načrt: Nova igra "Ponovi Poved" (Repeat the Sentence)
 
-Po temeljiti analizi sem odkril naslednje težave:
+## Pregled igre
 
-### 1. Supabase tabele za Spomin/Zaporedja imajo premalo slik
-
-| Tabela | Trenutno | Zahtevano |
-|--------|----------|-----------|
-| memory_cards_c | 10 slik | 10 slik (OK) |
-| memory_cards_Č | 10 slik | 12 slik (manjka: čarovnik, čebelar) |
-| memory_cards_K | 10 slik | 26 slik (manjka 16) |
-| memory_cards_l | 10 slik | 16 slik (manjka: lisica, lovec, les, lesnik, lasje, luža) |
-| memory_cards_r | 17 slik | 17 slik (OK) |
-| memory_cards_S | 10 slik | 16 slik (manjka: sedem, sir, sluz, snežinka, sova, svinčnik) |
-| memory_cards_Š | 10 slik | 11 slik (manjka: šofer) |
-| memory_cards_z | 10 slik | 11 slik (manjka: zvezek) |
-| memory_cards_Ž | 10 slik | 10 slik (OK) |
-
-### 2. Hook za Spomin ima omejitev `.limit(10)`
-
-Trenutna logika v `useGenericMemoryGame.tsx`:
-```typescript
-// Trenutno (napačno)
-.limit(10)  // Vedno vrne prvih 10 slik
-```
-
-Igra potrebuje nalaganje VSEH slik iz tabele, nato naključno izbiro 10 za igro.
-
-### 3. Manjkajoče slike v konfiguracijskih datotekah
-
-Nekatere slike manjkajo v lokalnih konfiguracijah:
-
-**matchingGameData.ts** (Povezi Pare):
-- Črka L: manjkata `lisica1.webp` in `lovec1.webp`
-- Črka Č: manjkata `carovnik1.webp` in `cebelar1.webp`
-- Črka Š: manjka `sofer1.webp`
-
-**threeColumnMatchingData.ts**:
-- Podobne manjkajoče slike za L, Č, Š
-
-**puzzleImages.ts** (Sestavljanke):
-- Črka L: manjkata `lisica1.webp` in `lovec1.webp`
-- Črka Č: manjkata `carovnik1.webp` in `cebelar1.webp`
+Nova govorna terapevtska igra za otroke 3+, kjer otrok vadi ponavljanje tri-besednih povedi. Zmajček skače po barvnih kamnih vzdolž linearne poti, otrok pa ponavlja posamezne besede in nato cele povedi.
 
 ---
 
-## Rešitev
+## Tehnična arhitektura
 
-### Del 1: Posodobitev Supabase tabel
+### Struktura datotek za implementacijo
 
-Dodati manjkajoče slike v tabele `memory_cards_*`:
-
-**Tabela memory_cards_Č** - dodati 2 sliki:
-```sql
-INSERT INTO "memory_cards_Č" (word, image_url, audio_url) VALUES
-('ČAROVNIK', 'https://...slike/carovnik1.webp', NULL),
-('ČEBELAR', 'https://...slike/cebelar1.webp', NULL);
+```text
+src/
+├── data/
+│   └── ponoviPovedConfig.ts          # Konfiguracija povedi za vsako črko
+├── pages/
+│   └── PonoviPoved.tsx               # Izbira črke (kot Labirint.tsx)
+├── components/
+│   ├── games/
+│   │   └── PonoviPovedGame.tsx       # Glavna komponenta igre
+│   └── routing/
+│       └── PonoviPovedRouter.tsx     # Dinamični router
+└── config/
+    └── routes.tsx                    # Nove poti
 ```
 
-**Tabela memory_cards_K** - dodati 16 slik:
-```sql
-INSERT INTO "memory_cards_K" (word, image_url, audio_url) VALUES
-('KAČA', 'https://...slike/kaca1.webp', '...kaca.m4a'),
-('KAVA', 'https://...slike/kava1.webp', '...kava.m4a'),
--- ... ostale manjkajoče K slike
-```
+---
 
-**Podobno za tabele L, S, Š, Z.**
+## Del 1: Posodobitev GamesList.tsx
 
-### Del 2: Sprememba logike v useGenericMemoryGame.tsx
-
-Namesto `.limit(10)` naložiti VSE slike, nato naključno izbrati 10:
+Dodati novo kartico za igro:
 
 ```typescript
-// NOVO (pravilno)
-const { data, error } = await supabase
-  .from(config.tableName as any)
-  .select("*");
-// Brez .limit() - naloži vse slike
-
-// Nato v initializeGame():
-const shuffled = shuffleArray([...cardData]);
-const selected10 = shuffled.slice(0, 10); // Naključnih 10
+{
+  id: "ponovi-poved",
+  title: "PONOVI POVED",
+  description: "Ponovi tri-besedne povedi in vadi izgovorjavo",
+  image: "[slika zmajčka]",
+  gradient: "from-dragon-green/20 to-app-teal/20",
+  customBackground: "radial-gradient(...)",
+  path: "/govorne-igre/ponovi-poved",
+  available: true,
+  imageScale: "90%"
+}
 ```
 
-### Del 3: Posodobitev lokalnih konfiguracij
+---
 
-Dodati manjkajoče slike v:
-- `matchingGameData.ts` (za Povezi Pare)
-- `threeColumnMatchingData.ts` (za Povezi Pare 5-6, 7-8)
-- `puzzleImages.ts` (za Sestavljanke)
+## Del 2: Konfiguracija povedi (ponoviPovedConfig.ts)
+
+Za črko K (začetna implementacija):
+
+```typescript
+export interface SentenceWord {
+  word: string;       // Beseda za prikaz
+  image: string;      // Slika v bucketu 'slike'
+  audio: string;      // Zvok v bucketu 'zvocni-posnetki'
+}
+
+export interface Sentence {
+  words: [SentenceWord, SentenceWord, SentenceWord];  // 3 besede
+  fullSentence: string;  // "Kača ima kapo."
+  audio: string;         // Zvok cele povedi
+}
+
+export interface PonoviPovedConfig {
+  letter: string;
+  displayLetter: string;
+  sentences: Sentence[];  // 4 povedi
+}
+
+// Povedi za K
+export const ponoviPovedK: PonoviPovedConfig = {
+  letter: "k",
+  displayLetter: "K",
+  sentences: [
+    {
+      words: [
+        { word: "Kača", image: "kaca1.webp", audio: "kaca.m4a" },
+        { word: "ima", image: "Stickman_imeti.webp", audio: "ima.m4a" },
+        { word: "kapo", image: "kapa1.webp", audio: "kapo.m4a" }
+      ],
+      fullSentence: "Kača ima kapo.",
+      audio: "kaca_ima_kapo.m4a"  // Potrebno posneti
+    },
+    {
+      words: [
+        { word: "Kuža", image: "kuza1.webp", audio: "kuza.m4a" },
+        { word: "vidi", image: "Stickman_gledati.webp", audio: "vidi.m4a" },
+        { word: "kost", image: "kost1.webp", audio: "kost.m4a" }
+      ],
+      fullSentence: "Kuža vidi kost.",
+      audio: "kuza_vidi_kost.m4a"
+    },
+    {
+      words: [
+        { word: "Koza", image: "koza1.webp", audio: "koza.m4a" },
+        { word: "riše", image: "Stickman_risati.webp", audio: "rise.m4a" },
+        { word: "krog", image: "krog1.webp", audio: "krog.m4a" }
+      ],
+      fullSentence: "Koza riše krog.",
+      audio: "koza_rise_krog.m4a"
+    },
+    {
+      words: [
+        { word: "Kokoš", image: "kokos1.webp", audio: "kokos.m4a" },
+        { word: "je", image: "Stickman_jesti.webp", audio: "je.m4a" },
+        { word: "koruzo", image: "koruza1.webp", audio: "koruzo.m4a" }
+      ],
+      fullSentence: "Kokoš je koruzo.",
+      audio: "kokos_je_koruzo.m4a"
+    }
+  ]
+};
+```
+
+### Razpoložljive slike v bucketu 'slike':
+
+| Beseda | Slika | Obstaja |
+|--------|-------|---------|
+| Kača | kaca1.webp | Da |
+| Kapo (kapa) | kapa1.webp | Da |
+| Kuža | kuza1.webp | Da |
+| Kost | kost1.webp | Da |
+| Koza | koza1.webp | Da |
+| Krog | krog1.webp | Da |
+| Kokoš | kokos1.webp | Da |
+| Koruzo (koruza) | koruza1.webp | Da |
+| ima | Stickman_imeti.webp | Da |
+| vidi | Stickman_gledati.webp | Da |
+| riše | Stickman_risati.webp | Da |
+| je | Stickman_jesti.webp | Da |
 
 ---
 
-## Povzetek sprememb
+## Del 3: Stran za izbiro črke (PonoviPoved.tsx)
 
-| Komponenta | Vrsta spremembe | Število |
-|------------|-----------------|---------|
-| Supabase tabele | SQL INSERT | ~45 novih vrstic |
-| useGenericMemoryGame.tsx | Odstranitev .limit(10), naključna izbira | 1 datoteka |
-| matchingGameData.ts | Dodane manjkajoče slike | ~15 novih vnosov |
-| threeColumnMatchingData.ts | Dodane manjkajoče slike | ~15 novih vnosov |
-| puzzleImages.ts | Dodane manjkajoče slike | ~10 novih vnosov |
+Enaka struktura kot `Labirint.tsx`:
+- Zelena hero sekcija z naslovom "Ponovi poved"
+- Progress bar za dnevni napredek
+- Bela sekcija z 9 karticami črk (C, Č, K, L, R, S, Š, Z, Ž)
+- Vsaka kartica vodi na `/govorne-igre/ponovi-poved/:letter`
 
 ---
 
-## Seznam vseh slik po črkah (za referenco)
+## Del 4: Glavna komponenta igre (PonoviPovedGame.tsx)
 
-### C (10 slik) - KOMPLETNO
-cedilo, cekin, cerkev, cesta, cev, cirkus, cisterna, cokla, copat, cvet
+### Vizualni elementi
 
-### Č (12 slik) - MANJKATA 2
-čaj, čarovnik, časopis, čebela, **čebelar**, čebula, česen, čevlji, čokolada, čoln, čopič, črke
+```text
+┌─────────────────────────────────────────────────────────────┐
+│                       Belo ozadje                           │
+│                                                             │
+│  START ──── ○ ──── ○ ──── ○ ──── 🌿 ──── ...               │
+│              1      2      3   (poved)                      │
+│   🐉                                                        │
+│  zmaj                                                       │
+│                                                             │
+│                    [Slika besede]                           │
+│                                                             │
+│              ▶ NAPREJ                                       │
+└─────────────────────────────────────────────────────────────┘
+```
 
-### K (26 slik) - MANJKA 16
-kača, kapa, kava, klavir, ključ, klop, knjiga, kocka, **kokos (sadež)**, kokoš, kolač, kolo, koruza, koš, košara, kost, **koza**, **koža**, kozarec, krava, krof, krog, krožnik, kruh, kumara, kuža
+### Elementi poti (12 kamni + 4 "počivališča"):
 
-### L (16 slik) - MANJKA 6
-ladja, lasje, led, les, lešnik, letalo, lev, **lisica**, list, lizika, lonec, lopar, **lovec**, lubenica, luč, luža
+```text
+START → Kamen1 → Kamen2 → Kamen3 → Počivališče1 →
+        Kamen4 → Kamen5 → Kamen6 → Počivališče2 →
+        Kamen7 → Kamen8 → Kamen9 → Počivališče3 →
+        Kamen10 → Kamen11 → Kamen12 → CILJ
+```
 
-### R (17 slik) - KOMPLETNO
-raca, rak, raketa, ravnilo, rep, repa, riba, ribez, ribič, ris, riž, robot, roka, rokometaš, rolka, ropotuljica, roža
+### Stanje igre (State Machine)
 
-### S (16 slik) - MANJKA 6
-sedem, sir, sladoled, slika, slon, sluz, smreka, sneg, snežak, **snežinka**, sok, sonce, **sova**, stol, svetilka, svinčnik
+```typescript
+type GamePhase = 
+  | "start"           // Zmaj na START poziciji
+  | "word"            // Zmaj na kamnu, prikaže sliko + predvaja besedo
+  | "sentence"        // Zmaj na počivališču, predvaja celo poved
+  | "complete";       // Igra končana
 
-### Š (11 slik) - MANJKA 1
-šah, šal, ščetka, škarje, škatla, školjka, **šofer**, šopek, šotor, štampiljka, štorklja
+interface GameState {
+  phase: GamePhase;
+  currentSentence: number;  // 0-3
+  currentWord: number;      // 0-2 (znotraj povedi)
+  dragonPosition: number;   // 0-15 (vseh pozicij)
+}
+```
 
-### Z (11 slik) - MANJKA 1
-zajec, zaslon, zavesa, zebra, zlato, zmaj, zob, zobotrebec, zvezda, **zvezek**, zvočnik
+### Animacija zmaja (framer-motion)
 
-### Ž (10 slik) - KOMPLETNO
-žaba, žaga, žarnica, žebelj, želva, žerjav, žirafa, žlica, žoga, žolna
+```typescript
+// Skok z lokom (arc trajectory)
+const jumpVariants = {
+  jump: {
+    x: [0, targetX/2, targetX],
+    y: [0, -80, 0],  // Lok navzgor
+    transition: {
+      duration: 0.6,
+      ease: "easeInOut"
+    }
+  }
+};
+```
+
+### Logika korakov
+
+1. **Korak besede (Word Step)**:
+   - Zmaj skoči na naslednji kamen
+   - Prikaže se slika besede (npr. kača)
+   - Predvaja se zvok besede
+   - Gumb "NAPREJ" čaka na pritisk
+
+2. **Korak povedi (Sentence Step)**:
+   - Po 3 besedah zmaj skoči na "počivališče" (travnik)
+   - Predvaja se celotna poved
+   - Otrok ponovi celo poved
+   - Gumb "NAPREJ" za naslednji sklop
+
+3. **Zaključek**:
+   - Po 4 povedih prikaže PuzzleSuccessDialog
+   - Zvezdica in napredek se beležita
 
 ---
 
-## Opomba o igri Bingo
+## Del 5: Router (PonoviPovedRouter.tsx)
 
-Igra Bingo uporablja **posebne slike** za besede na sredini/koncu (npr. `borovnice`, `hlače`, `pica`) in NI del tega popravka - to ostane nespremenjeno, kot zahtevano.
+```typescript
+export default function PonoviPovedRouter() {
+  const { letter } = useParams<{ letter: string }>();
+  
+  if (!letter) {
+    return <Navigate to="/govorne-igre/ponovi-poved" replace />;
+  }
+  
+  const config = getPonoviPovedConfig(letter);
+  
+  if (!config) {
+    return <Navigate to="/govorne-igre/ponovi-poved" replace />;
+  }
+  
+  return <PonoviPovedGame config={config} />;
+}
+```
 
 ---
 
-## Tehnični koraki implementacije
+## Del 6: Posodobitev routes.tsx
 
-1. **SQL migracija** za dodajanje manjkajočih slik v Supabase tabele
-2. **useGenericMemoryGame.tsx** - odstranitev `.limit(10)`, dodajanje naključne izbire 10 slik
-3. **matchingGameData.ts** - dodajanje manjkajočih slik za vsako črko
-4. **threeColumnMatchingData.ts** - dodajanje manjkajočih slik
-5. **puzzleImages.ts** - dodajanje manjkajočih slik
+```typescript
+// V lazy loaded sekciji
+const PonoviPoved = lazy(() => import("@/pages/PonoviPoved"));
+const PonoviPovedRouter = lazy(() => import("@/components/routing/PonoviPovedRouter"));
 
-Po teh spremembah bodo vse igre (razen Bingo) uporabljale celoten nabor slik, Spomin pa bo pri vsaki igri naključno izbral 10 parov izmed vseh razpoložljivih.
+// V Routes
+<Route path="/govorne-igre/ponovi-poved" element={<ProtectedLazyRoute><PonoviPoved /></ProtectedLazyRoute>} />
+<Route path="/govorne-igre/ponovi-poved/:letter" element={<ProtectedLazyRoute><PonoviPovedRouter /></ProtectedLazyRoute>} />
+```
+
+---
+
+## Vizualni stil
+
+### Ozadje
+- Belo ozadje (kot zahtevano)
+- Čista, preprosta postavitev
+
+### Kamni (stones)
+- Barviti okrogli/ovalni elementi
+- Barve: zelena, modra, roza, oranžna (izmenjevanje)
+- Animacija utripanja pri aktivnem kamnu
+
+### Počivališča (meadows)
+- Manjši travnik/trata med skupinami
+- Svetlo zelena barva
+- Rahlo večji od kamnov
+
+### Zmaj
+- `Zmajcek_1.webp` iz bucketa 'zmajcki'
+- Velikost prilagojena mobilnim/namiznim napravam
+- Animiran skok (arc trajectory)
+
+### Slika besede
+- Centrirana na zaslonu
+- Bel okvir s senco
+- Responsive velikost
+
+---
+
+## Zvočni elementi
+
+### Obstoječi zvoki (v bucketu 'zvocni-posnetki')
+- Vse posamezne besede: kaca.m4a, kapa.m4a, kuza.m4a, itd.
+- Glagoli: ima.m4a, vidi.m4a, rise.m4a, je.m4a
+
+### Potrebni novi zvoki (za snemanje)
+Za vsako poved je potreben posnetek celotne povedi:
+- kaca_ima_kapo.m4a
+- kuza_vidi_kost.m4a
+- koza_rise_krog.m4a
+- kokos_je_koruzo.m4a
+
+Če teh posnetkov še ni, igra lahko začasno predvaja vse 3 besede zaporedoma.
+
+---
+
+## Responzivnost
+
+### Mobilne naprave
+- Landscape način (zaklep orientacije)
+- Fullscreen način
+- Kamni manjši, pot bolj kompaktna
+- Slika besede manjša
+
+### Namizje
+- Pot čez celotno širino zaslona
+- Večje slike in kamni
+- Naslov igre na vrhu
+
+---
+
+## Floating meni (kot pri drugih igrah)
+
+- Oranžni okrogli gumb spodaj levo
+- Opcije:
+  - 🏠 Nazaj (potrditveni dialog)
+  - 🔄 Nova igra
+  - 📖 Navodila
+
+---
+
+## Povzetek implementacije
+
+| Korak | Datoteka | Opis |
+|-------|----------|------|
+| 1 | ponoviPovedConfig.ts | Konfiguracija povedi za K (osnova) |
+| 2 | GamesList.tsx | Nova kartica za igro |
+| 3 | PonoviPoved.tsx | Stran za izbiro črke |
+| 4 | PonoviPovedGame.tsx | Glavna komponenta igre |
+| 5 | PonoviPovedRouter.tsx | Dinamični router |
+| 6 | routes.tsx | Nove poti |
+| 7 | BreadcrumbNavigation.tsx | Drobtinice za novo igro |
+
+---
+
+## Začetna implementacija (samo črka K)
+
+Prvo implementiram samo za črko K s 4 povedmi:
+1. Kača ima kapo.
+2. Kuža vidi kost.
+3. Koza riše krog.
+4. Kokoš je koruzo.
+
+Ostale črke (C, Č, L, R, S, Š, Z, Ž) bodo dodane v prihodnjih iteracijah.
+
+---
+
+## Opomba o zvočnih posnetkih
+
+Trenutno manjkajo zvočni posnetki celih povedi. Implementacija bo uporabila:
+1. **Če obstaja posnetek celotne povedi** → predvaja ga
+2. **Če ne obstaja** → predvaja vse 3 besede zaporedoma z zamikom 500ms
+
+To omogoča takojšnje delovanje igre, medtem ko se posnetki dodajajo.
+
