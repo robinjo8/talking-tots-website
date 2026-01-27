@@ -102,6 +102,17 @@ const otherGames = [
     imageScale: "90%"
   },
   {
+    id: "ponovi-poved",
+    title: "PONOVI POVED",
+    description: "Ponovi tri-besedne povedi in vadi izgovorjavo",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_1.webp",
+    gradient: "from-dragon-green/20 to-app-teal/20",
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
+    path: "/govorne-igre/ponovi-poved",
+    available: true,
+    imageScale: "85%"
+  },
+  {
     id: "pobarvanke",
     title: "POBARVANKE",
     description: "Kmalu na voljo",
