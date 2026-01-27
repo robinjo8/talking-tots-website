@@ -8,11 +8,11 @@ const App = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [hasShownSplash, setHasShownSplash] = useState(false);
 
-  // Service Worker update listener - auto refresh when new version is available
+  // Service Worker update listener - notify user instead of auto-refresh
   useEffect(() => {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.ready.then(registration => {
-        // Check for updates
+        // Check for updates periodically
         registration.update();
         
         registration.addEventListener('updatefound', () => {
@@ -20,11 +20,8 @@ const App = () => {
           if (newWorker) {
             newWorker.addEventListener('statechange', () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                console.log('[App] New service worker installed, reloading...');
-                // Tell SW to skip waiting and activate immediately
-                newWorker.postMessage({ type: 'SKIP_WAITING' });
-                // Reload the page to use new version
-                window.location.reload();
+                console.log('[App] New service worker installed - user will be notified via UpdatePrompt');
+                // Don't auto-reload - let UpdatePrompt handle it
               }
             });
           }
