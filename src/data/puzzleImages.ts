@@ -20,11 +20,13 @@ export const cImages: PuzzleImage[] = [
   { filename: 'cvet1.webp', word: 'CVET' }
 ];
 
-// Č images (10 images)
+// Č images (12 images)
 export const čImages: PuzzleImage[] = [
   { filename: 'caj1.webp', word: 'ČAJ' },
+  { filename: 'carovnik1.webp', word: 'ČAROVNIK' },
   { filename: 'casopis1.webp', word: 'ČASOPIS' },
   { filename: 'cebela1.webp', word: 'ČEBELA' },
+  { filename: 'cebelar1.webp', word: 'ČEBELAR' },
   { filename: 'cebula1.webp', word: 'ČEBULA' },
   { filename: 'cesen1.webp', word: 'ČESEN' },
   { filename: 'cevlji1.webp', word: 'ČEVLJI' },
@@ -64,19 +66,21 @@ export const kImages: PuzzleImage[] = [
   { filename: 'kuza1.webp', word: 'KUŽA' }
 ];
 
-// L images (14 images)
+// L images (16 images)
 export const lImages: PuzzleImage[] = [
   { filename: 'ladja1.webp', word: 'LADJA' },
   { filename: 'lasje1.webp', word: 'LASJE' },
   { filename: 'led1.webp', word: 'LED' },
+  { filename: 'les1.webp', word: 'LES' },
   { filename: 'lesnik1.webp', word: 'LEŠNIK' },
   { filename: 'letalo1.webp', word: 'LETALO' },
   { filename: 'lev1.webp', word: 'LEV' },
-  { filename: 'les1.webp', word: 'LES' },
+  { filename: 'lisica1.webp', word: 'LISICA' },
   { filename: 'list1.webp', word: 'LIST' },
   { filename: 'lizika1.webp', word: 'LIZIKA' },
   { filename: 'lonec1.webp', word: 'LONEC' },
   { filename: 'lopar1.webp', word: 'LOPAR' },
+  { filename: 'lovec1.webp', word: 'LOVEC' },
   { filename: 'lubenica1.webp', word: 'LUBENICA' },
   { filename: 'luc1.webp', word: 'LUČ' },
   { filename: 'luza1.webp', word: 'LUŽA' }
@@ -123,7 +127,7 @@ export const sImages: PuzzleImage[] = [
   { filename: 'svincnik1.webp', word: 'SVINČNIK' }
 ];
 
-// Š images (10 images)
+// Š images (11 images)
 export const šImages: PuzzleImage[] = [
   { filename: 'sah1.webp', word: 'ŠAH' },
   { filename: 'sal1.webp', word: 'ŠAL' },
@@ -131,6 +135,7 @@ export const šImages: PuzzleImage[] = [
   { filename: 'skarje1.webp', word: 'ŠKARJE' },
   { filename: 'skatla1.webp', word: 'ŠKATLA' },
   { filename: 'skoljka1.webp', word: 'ŠKOLJKA' },
+  { filename: 'sofer1.webp', word: 'ŠOFER' },
   { filename: 'sopek1.webp', word: 'ŠOPEK' },
   { filename: 'sotor1.webp', word: 'ŠOTOR' },
   { filename: 'stampiljka1.webp', word: 'ŠTAMPILJKA' },
