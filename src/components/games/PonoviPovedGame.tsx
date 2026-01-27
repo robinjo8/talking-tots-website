@@ -55,7 +55,7 @@ const STONE_IMAGES = {
 // Dragon images
 const DRAGON_RIGHT = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_4.png";
 const DRAGON_LEFT = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_4_1.png";
-const DRAGON_JUMP_BUTTON = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_111.png";
+const DRAGON_JUMP_BUTTON = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_111.PNG";
 
 // Stone positions in zigzag grid (x: column 0-3, y: row 0-4 from bottom)
 // 17 stones total: START + 4 sentences (4 stones each) - NO extra top goal stone
@@ -135,21 +135,21 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       return null;
     }
     
-    // DESKTOP: DOUBLE THE SIZE - fixed values for clarity
+    // DESKTOP: Logično prilagojene velikosti za zaslon
     if (!isMobile) {
-      const stoneWidth = 200;   // 2x from ~100
-      const stoneHeight = 150;  // 2x from ~75
-      const gapX = 250;         // 2x from ~125
-      const gapY = 200;         // 2x from ~100
-      const dragonSize = 180;   // 2x from ~90
+      const stoneWidth = 140;   // Zmanjšano iz 200
+      const stoneHeight = 105;  // Zmanjšano iz 150
+      const gapX = 175;         // Zmanjšano iz 250
+      const gapY = 155;         // Zmanjšano iz 200
+      const dragonSize = 130;   // Zmanjšano iz 180
       
       // Calculate grid dimensions for centering
       const gridWidth = 3 * gapX + stoneWidth;
       const gridHeight = 4 * gapY + stoneHeight;
       
-      // Center horizontally and vertically (account for top cards ~120px and bottom button ~160px)
+      // Center horizontally and vertically
       const offsetX = (containerSize.width - gridWidth) / 2;
-      const offsetY = (containerSize.height - gridHeight - 120 - 160) / 2 + 160; // Push up to make room for bottom button
+      const offsetY = 120; // Spodnji offset za gumb SKOK
       
       return {
         stoneWidth,
@@ -458,8 +458,8 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       {/* Audio element */}
       <audio ref={audioRef} />
       
-      {/* TOP LEFT: Home menu button - ROUNDED FULL */}
-      <div className="fixed top-4 left-4 z-30">
+      {/* BOTTOM LEFT: Home menu button - ROUNDED FULL */}
+      <div className="fixed bottom-6 left-4 z-30">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -545,16 +545,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
                   alt={`Kamen ${stone.type}`}
                   className="w-full h-full object-contain drop-shadow-lg"
                 />
-                {isStart && (
-                  <span className="absolute -bottom-6 md:-bottom-8 text-xs md:text-sm font-bold text-gray-700 bg-white/80 px-2 py-0.5 rounded shadow">
-                    START
-                  </span>
-                )}
-                {isGoal && (
-                  <span className="absolute -bottom-6 md:-bottom-8 text-xs md:text-sm font-bold text-yellow-700 bg-white/80 px-2 py-0.5 rounded shadow">
-                    CILJ
-                  </span>
-                )}
+                {/* START and CILJ labels removed per design */}
               </motion.div>
             );
           })}
@@ -583,26 +574,27 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
         </div>
       </div>
       
-      {/* BOTTOM CENTER: Elegant SKOK button */}
+      {/* BOTTOM CENTER: SKOK button - WHITE CIRCLE with dragon */}
       <div className="fixed bottom-6 md:bottom-8 left-1/2 transform -translate-x-1/2 z-20">
-        <div className="bg-sky-400 rounded-2xl p-3 md:p-4 shadow-xl">
-          <button
-            onClick={handleNext}
-            disabled={isJumping || phase === "complete" || showSentenceDialog}
-            className={`w-28 h-32 md:w-32 md:h-36 rounded-xl flex flex-col items-center justify-center transition-all
-              ${isJumping || phase === "complete" || showSentenceDialog
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-gradient-to-b from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 active:scale-95 shadow-lg'
-              }`}
-          >
+        <button
+          onClick={handleNext}
+          disabled={isJumping || phase === "complete" || showSentenceDialog}
+          className={`flex flex-col items-center justify-center transition-all
+            ${isJumping || phase === "complete" || showSentenceDialog
+              ? 'opacity-50 cursor-not-allowed'
+              : 'hover:scale-105 active:scale-95'
+            }`}
+        >
+          {/* White circle container */}
+          <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-white shadow-lg flex items-center justify-center">
             <img
               src={DRAGON_JUMP_BUTTON}
               alt="Skok"
-              className="w-16 h-16 md:w-20 md:h-20 object-contain"
+              className="w-14 h-14 md:w-18 md:h-18 object-contain"
             />
-            <span className="text-white font-bold text-sm md:text-lg mt-1">SKOK</span>
-          </button>
-        </div>
+          </div>
+          <span className="text-gray-700 font-bold text-sm md:text-base mt-2 uppercase">SKOK</span>
+        </button>
       </div>
       
       {/* Sentence dialog - styled like Smešne Povedi */}
