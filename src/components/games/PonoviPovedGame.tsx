@@ -1,8 +1,8 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Home, Volume2 } from "lucide-react";
+import { Home, Volume2, Mic } from "lucide-react";
 import { 
   PonoviPovedConfig, 
   SentenceWord,
@@ -30,14 +30,19 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type GamePhase = "start" | "word" | "sentence" | "complete";
 
 interface PonoviPovedGameProps {
   config: PonoviPovedConfig;
 }
+
+// Background from ozadja bucket
+const BACKGROUND_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/svetlomodro_ozadje.webp";
 
 // Stone images from Supabase bucket
 const STONE_IMAGES = {
@@ -49,7 +54,7 @@ const STONE_IMAGES = {
 
 // Dragon images
 const DRAGON_RIGHT = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_4.png";
-const DRAGON_LEFT = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_4_1.PNG";
+const DRAGON_LEFT = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_4_1.png";
 
 // Stone positions in zigzag grid (x: column 0-4, y: row 0-5 from bottom)
 type StoneType = 'gray' | 'yellow' | 'red' | 'green';
@@ -100,6 +105,16 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
   const { selectedChild } = useAuth();
   const audioRef = useRef<HTMLAudioElement>(null);
   const completionCalledRef = useRef(false);
+  const isMobile = useIsMobile();
+  
+  // Responsive sizes
+  const stoneWidth = isMobile ? 80 : 120;
+  const stoneHeight = isMobile ? 60 : 90;
+  const gapX = isMobile ? 90 : 140;
+  const gapY = isMobile ? 75 : 100;
+  const dragonSize = isMobile ? 80 : 110;
+  const offsetX = isMobile ? 30 : 60;
+  const offsetY = isMobile ? 80 : 120;
   
   // Game state
   const [phase, setPhase] = useState<GamePhase>("start");
@@ -326,11 +341,6 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
   // Calculate pixel positions for stones
   const getStonePixelPosition = (index: number) => {
     const stone = STONE_POSITIONS[index];
-    const stoneSize = 64;
-    const gapX = 80;
-    const gapY = 70;
-    const offsetX = 40;
-    const offsetY = 40;
     
     return {
       left: offsetX + stone.x * gapX,
@@ -338,31 +348,32 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     };
   };
 
-  // Get dragon pixel position
+  // Get dragon pixel position - sits ON the stone
   const getDragonPixelPosition = () => {
     const pos = getStonePixelPosition(dragonPosition);
     return {
-      left: pos.left,
-      bottom: pos.bottom + 50, // Dragon sits above the stone
+      left: pos.left + stoneWidth / 2 - dragonSize / 2,
+      bottom: pos.bottom + stoneHeight - 15, // Dragon sits on top of the stone
     };
   };
 
   const dragonPos = getDragonPixelPosition();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-200 to-sky-100 flex flex-col">
+    <div 
+      className="min-h-screen w-full fixed inset-0 flex flex-col"
+      style={{
+        backgroundImage: `url(${BACKGROUND_URL})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
       {/* Audio element */}
       <audio ref={audioRef} />
       
-      {/* Header */}
-      <div className="bg-dragon-green text-white py-3 px-4 shadow-md">
-        <h1 className="text-xl font-bold text-center">
-          Ponovi poved - Črka {config.displayLetter}
-        </h1>
-      </div>
-      
       {/* Main game area - Stone grid */}
-      <div className="flex-1 relative overflow-hidden" style={{ minHeight: '500px' }}>
+      <div className="flex-1 relative overflow-hidden">
         {/* Stones grid */}
         <div className="absolute inset-0">
           {STONE_POSITIONS.map((stone, index) => {
@@ -378,8 +389,8 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
                 style={{
                   left: pos.left,
                   bottom: pos.bottom,
-                  width: 64,
-                  height: 48,
+                  width: stoneWidth,
+                  height: stoneHeight,
                 }}
                 animate={isActive ? { scale: [1, 1.1, 1] } : { scale: 1 }}
                 transition={{ duration: 0.5, repeat: isActive ? Infinity : 0 }}
@@ -387,13 +398,13 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
                 <img
                   src={STONE_IMAGES[stone.type]}
                   alt={`Kamen ${stone.type}`}
-                  className="w-16 h-12 object-contain drop-shadow-lg"
+                  className="w-full h-full object-contain drop-shadow-lg"
                 />
                 {isStart && (
-                  <span className="text-xs font-bold text-gray-600 mt-1">START</span>
+                  <span className="text-xs md:text-sm font-bold text-gray-700 mt-1 bg-white/70 px-2 rounded">START</span>
                 )}
                 {isGoal && (
-                  <span className="text-xs font-bold text-yellow-600 mt-1">CILJ 🏆</span>
+                  <span className="text-xs md:text-sm font-bold text-yellow-700 mt-1 bg-white/70 px-2 rounded">CILJ 🏆</span>
                 )}
               </motion.div>
             );
@@ -402,9 +413,9 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
           {/* Dragon */}
           <motion.div
             className="absolute z-10"
-            style={{ width: 70, height: 70 }}
+            style={{ width: dragonSize, height: dragonSize }}
             animate={{
-              left: dragonPos.left - 3,
+              left: dragonPos.left,
               bottom: dragonPos.bottom,
             }}
             transition={{
@@ -416,126 +427,152 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
               src={getDragonImage()}
               alt="Zmajček"
               className="w-full h-full object-contain drop-shadow-xl"
-              animate={isJumping ? { y: [0, -30, 0] } : { y: 0 }}
+              animate={isJumping ? { y: [0, -40, 0] } : { y: 0 }}
               transition={{ duration: 0.6, ease: "easeInOut" }}
             />
           </motion.div>
         </div>
       </div>
       
-      {/* Bottom cards section */}
-      <div className="bg-white border-t-2 border-gray-200 p-4">
-        <div className="flex items-center gap-3 overflow-x-auto pb-2">
-          {/* Dragon jump button */}
-          <button
-            onClick={handleNext}
-            disabled={isJumping || phase === "complete" || showSentenceDialog}
-            className={`flex-shrink-0 w-24 h-28 rounded-xl shadow-lg flex flex-col items-center justify-center transition-all
-              ${isJumping || phase === "complete" || showSentenceDialog
-                ? 'bg-gray-300 cursor-not-allowed'
-                : 'bg-gradient-to-b from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 hover:scale-105 active:scale-95'
-              }`}
-          >
-            <img
-              src={DRAGON_RIGHT}
-              alt="Skok"
-              className="w-16 h-16 object-contain"
-            />
-            <span className="text-white font-bold text-sm mt-1">SKOK</span>
-          </button>
-          
-          {/* Collected word cards */}
+      {/* Bottom controls - fixed */}
+      <div className="fixed bottom-0 left-0 right-0 p-3 md:p-4 flex items-end justify-between z-20">
+        {/* Left: Home menu button */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              className="h-12 w-12 md:h-14 md:w-14 rounded-xl bg-app-orange hover:bg-app-orange/90 shadow-lg flex-shrink-0"
+              size="icon"
+            >
+              <Home className="h-6 w-6 md:h-7 md:w-7 text-white" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-48">
+            <DropdownMenuItem onClick={() => setShowExitDialog(true)}>
+              <span className="mr-2">🏠</span> Nazaj
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleReset}>
+              <span className="mr-2">🔄</span> Nova igra
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setShowInstructions(true)}>
+              <span className="mr-2">📖</span> Navodila
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        
+        {/* Center: Collected word cards */}
+        <div className="flex-1 flex justify-center gap-2 md:gap-3 mx-3 md:mx-4">
           <AnimatePresence>
             {collectedWords.map((word, idx) => (
               <motion.div
                 key={`${word.word}-${idx}`}
-                initial={{ opacity: 0, scale: 0.5, x: -20 }}
-                animate={{ opacity: 1, scale: 1, x: 0 }}
+                initial={{ opacity: 0, scale: 0.5, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.5 }}
-                className="flex-shrink-0 w-24 h-28 bg-white rounded-xl border-3 border-green-500 shadow-md flex flex-col items-center justify-center p-2"
-                style={{ borderWidth: '3px' }}
+                className="flex-shrink-0 w-20 h-24 md:w-24 md:h-28 bg-white rounded-xl border-2 border-dragon-green shadow-lg flex flex-col items-center justify-center p-2"
               >
                 <img
                   src={getImageUrl(word.image)}
                   alt={word.word}
-                  className="w-14 h-14 object-contain"
+                  className="w-12 h-12 md:w-14 md:h-14 object-contain"
                 />
-                <p className="text-sm font-bold text-gray-700 mt-1 text-center truncate w-full">
+                <p className="text-xs md:text-sm font-bold text-gray-700 mt-1 text-center truncate w-full uppercase">
                   {word.word}
                 </p>
               </motion.div>
             ))}
           </AnimatePresence>
         </div>
+        
+        {/* Right: Jump button on blue background */}
+        <div className="bg-sky-400 rounded-xl p-2 shadow-lg flex-shrink-0">
+          <button
+            onClick={handleNext}
+            disabled={isJumping || phase === "complete" || showSentenceDialog}
+            className={`w-20 h-24 md:w-24 md:h-28 rounded-xl flex flex-col items-center justify-center transition-all
+              ${isJumping || phase === "complete" || showSentenceDialog
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-gradient-to-b from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 active:scale-95'
+              }`}
+          >
+            <img
+              src={DRAGON_RIGHT}
+              alt="Skok"
+              className="w-14 h-14 md:w-16 md:h-16 object-contain"
+            />
+            <span className="text-white font-bold text-xs md:text-sm mt-1">SKOK</span>
+          </button>
+        </div>
       </div>
       
-      {/* Floating menu button */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            className="fixed bottom-28 left-4 z-50 h-12 w-12 rounded-full bg-app-orange hover:bg-app-orange/90 shadow-lg"
-            size="icon"
-          >
-            <Home className="h-5 w-5 text-white" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-48">
-          <DropdownMenuItem onClick={() => setShowExitDialog(true)}>
-            <span className="mr-2">🏠</span> Nazaj
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleReset}>
-            <span className="mr-2">🔄</span> Nova igra
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setShowInstructions(true)}>
-            <span className="mr-2">📖</span> Navodila
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-      
-      {/* Sentence dialog */}
+      {/* Sentence dialog - styled like Smešne Povedi */}
       <Dialog open={showSentenceDialog} onOpenChange={() => {}}>
-        <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
-          <DialogTitle className="sr-only">Ponovi poved</DialogTitle>
-          <div className="flex flex-col items-center p-4">
-            {/* Word images */}
-            <div className="flex gap-4 justify-center mb-4">
+        <DialogContent className="sm:max-w-lg" onInteractOutside={(e) => e.preventDefault()}>
+          <DialogHeader>
+            <DialogTitle className="font-bold text-dragon-green text-center text-lg md:text-2xl uppercase">
+              ODLIČNO!
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-3 md:space-y-4 py-2 md:py-4">
+            <p className="text-black text-center uppercase text-xs md:text-sm font-medium">
+              POSLUŠAJ IN PONOVI POVED
+            </p>
+            
+            {/* Three word images in a row */}
+            <div className="flex justify-center gap-3 md:gap-4">
               {currentSentence?.words.map((word, idx) => (
-                <div key={idx} className="flex flex-col items-center">
-                  <div className="w-20 h-20 bg-white rounded-xl border-2 border-gray-200 shadow-sm flex items-center justify-center p-2">
+                <div key={idx} className="flex flex-col items-center space-y-1 md:space-y-2">
+                  <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden border-2 border-dragon-green bg-gray-50">
                     <img
                       src={getImageUrl(word.image)}
                       alt={word.word}
                       className="w-full h-full object-contain"
                     />
                   </div>
-                  <p className="text-sm font-semibold text-gray-700 mt-1">{word.word}</p>
+                  <span className="font-medium text-center text-xs md:text-sm text-black uppercase">
+                    {word.word.toUpperCase()}
+                  </span>
                 </div>
               ))}
             </div>
             
             {/* Full sentence text */}
-            <p className="text-xl font-bold text-dragon-green text-center mb-6">
-              "{currentSentence?.fullSentence}"
+            <p className="text-base md:text-lg font-semibold text-gray-800 text-center uppercase">
+              "{currentSentence?.fullSentence.toUpperCase()}"
             </p>
             
-            {/* Repeat button with countdown */}
-            <Button
-              onClick={handleRepeat}
-              disabled={isRecording}
-              className="w-full mb-3 bg-app-orange hover:bg-app-orange/90 text-white font-bold py-3"
-            >
-              <Volume2 className="w-5 h-5 mr-2" />
-              {isRecording ? `SNEMAM... ${countdown}` : 'PONOVI'}
-            </Button>
-            
-            {/* Continue button */}
-            <Button
-              onClick={handleContinueFromDialog}
-              variant="outline"
-              className="w-full border-2 border-dragon-green text-dragon-green hover:bg-dragon-green hover:text-white font-bold py-3"
-            >
-              NAPREJ
-            </Button>
+            {/* Action buttons */}
+            <div className="flex justify-center gap-2 md:gap-3 pt-2 flex-wrap">
+              <Button
+                onClick={playSentenceAudio}
+                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 uppercase font-medium h-10 w-28 md:w-32"
+              >
+                <Volume2 className="w-4 h-4" />
+                PREDVAJAJ
+              </Button>
+              
+              <Button
+                onClick={handleRepeat}
+                disabled={isRecording}
+                className="relative bg-app-orange hover:bg-app-orange/90 text-white gap-2 uppercase font-medium h-10 w-28 md:w-32"
+              >
+                <Mic className="w-4 h-4" />
+                {isRecording ? "..." : "PONOVI"}
+                {isRecording && (
+                  <span className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                    {countdown}
+                  </span>
+                )}
+              </Button>
+              
+              <Button 
+                onClick={handleContinueFromDialog} 
+                variant="outline" 
+                className="uppercase h-10 w-28 md:w-32 border-2 border-dragon-green text-dragon-green hover:bg-dragon-green hover:text-white"
+              >
+                NAPREJ
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
