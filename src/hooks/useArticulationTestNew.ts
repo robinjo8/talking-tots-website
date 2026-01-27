@@ -100,7 +100,7 @@ export const useArticulationTestNew = (childId?: string, userId?: string, fixedS
 
       try {
         const { data } = supabase.storage
-          .from("artikulacijski-test")
+          .from("slike")
           .getPublicUrl(currentData.word.image);
 
         if (data) {
