@@ -85,6 +85,18 @@ const breadcrumbConfig: BreadcrumbConfig[] = [
   { path: "/govorne-igre/met-kocke/z", label: "Z", parent: "/govorne-igre/met-kocke" },
   { path: "/govorne-igre/met-kocke/zh", label: "Ž", parent: "/govorne-igre/met-kocke" },
   
+  // Ponovi poved
+  { path: "/govorne-igre/ponovi-poved", label: "Ponovi poved", parent: "/govorne-igre" },
+  { path: "/govorne-igre/ponovi-poved/c", label: "C", parent: "/govorne-igre/ponovi-poved" },
+  { path: "/govorne-igre/ponovi-poved/ch", label: "Č", parent: "/govorne-igre/ponovi-poved" },
+  { path: "/govorne-igre/ponovi-poved/k", label: "K", parent: "/govorne-igre/ponovi-poved" },
+  { path: "/govorne-igre/ponovi-poved/l", label: "L", parent: "/govorne-igre/ponovi-poved" },
+  { path: "/govorne-igre/ponovi-poved/r", label: "R", parent: "/govorne-igre/ponovi-poved" },
+  { path: "/govorne-igre/ponovi-poved/s", label: "S", parent: "/govorne-igre/ponovi-poved" },
+  { path: "/govorne-igre/ponovi-poved/sh", label: "Š", parent: "/govorne-igre/ponovi-poved" },
+  { path: "/govorne-igre/ponovi-poved/z", label: "Z", parent: "/govorne-igre/ponovi-poved" },
+  { path: "/govorne-igre/ponovi-poved/zh", label: "Ž", parent: "/govorne-igre/ponovi-poved" },
+  
   // Bingo
   { path: "/govorne-igre/bingo", label: "Bingo", parent: "/govorne-igre" },
   { path: "/govorne-igre/bingo/c", label: "C", parent: "/govorne-igre/bingo" },
