@@ -2,121 +2,119 @@
 
 # Nacrt: Popravki desktop verzije igre "Ponovi Poved"
 
-## Analiza problema
+## Pregled zahtev
 
-Na podlagi posnetka zaslona sem identificiral naslednje tezave in zahteve:
-
-### Trenutne tezave:
-1. Elementi so preveliki - kamni, zmajcek in razmiki so predimenzijonirani
-2. Gumb hiska je zgoraj levo namesto spodaj levo
-3. Gumb SKOK ima modro podlago namesto bele
-4. Besedi "START" in "CILJ" sta prikazani na kamnih
-5. Slika zmajcka v gumbu se ne nalaga pravilno (vidno kot "Skok" brez slike)
+1. **Sivi kamen (START)** - premakni levo od prvega zelenega kamna (oba v isti vrstici spodaj)
+2. **Gumb SKOK** - uporabi sliko `gumb_modri.png` iz bucket `slike-ostalo`, dodaj utripanje (pulsing animacija), odstrani napis "SKOK"
+3. **Gumb spodaj na sredini** - ohrani pozicijo
+4. **Pomanjsaj/premakni igro navzdol** - da se slike kartic prikazujejo nad igro brez prekrivanja
+5. **Samo desktop verzija** - mobilna ostane nespremenjena
 
 ---
 
 ## Tehnicne spremembe
 
-### 1. Zmanjsanje velikosti elementov za Desktop
+### 1. Nova struktura STONE_POSITIONS za desktop
 
-Trenutne (prevelike) vrednosti:
-| Element | Trenutno | Novo (logicno prilagojeno) |
-|---------|----------|---------------------------|
-| stoneWidth | 200px | 140px |
-| stoneHeight | 150px | 105px |
-| gapX | 250px | 175px |
-| gapY | 200px | 155px |
-| dragonSize | 180px | 130px |
+Trenutno je START kamen na poziciji `{x: 0, y: 0}` sam v svoji vrstici. Nova postavitev:
 
 ```typescript
-// v calculatedSizes useMemo - DESKTOP del
-if (!isMobile) {
-  const stoneWidth = 140;   // Zmanjsano iz 200
-  const stoneHeight = 105;  // Zmanjsano iz 150
-  const gapX = 175;         // Zmanjsano iz 250
-  const gapY = 155;         // Zmanjsano iz 200
-  const dragonSize = 130;   // Zmanjsano iz 180
-  
-  // Izracun za boljse centriranje - grid zapolni zaslon proporcionalno
-  const gridWidth = 3 * gapX + stoneWidth;
-  const gridHeight = 4 * gapY + stoneHeight;
-  
-  const offsetX = (containerSize.width - gridWidth) / 2;
-  const offsetY = 120; // Spodnji offset za gumb SKOK
-  
-  return { stoneWidth, stoneHeight, gapX, gapY, dragonSize, offsetX, offsetY };
-}
+// Sprememba: START kamen je LEVO od prvega zelenega (x: -1, y: 1)
+// Posodobljen vrstni red za desktop verzijo
+
+// Stara struktura:
+// Row 0: { x: 0, y: 0 } START (sam)
+// Row 1: { x: 0, y: 1 } zeleni, { x: 1, y: 1 } rdeci...
+
+// NOVA struktura za desktop:
+// START bo na x: -1, y: 1 (levo od zelenega)
+// Pozicije se zamaknejo tako da je START v isti vrstici kot prva poved
 ```
 
-### 2. Gumb hiska - premakni SPODAJ LEVO
-
-Iz:
-```tsx
-<div className="fixed top-4 left-4 z-30">
+Sprememba v `STONE_POSITIONS[0]`:
+```typescript
+{ x: -1, y: 1, type: 'gray', isRest: false },  // START - levo od zelenega
 ```
 
-V:
-```tsx
-<div className="fixed bottom-6 left-4 z-30">
+### 2. Nova slika za gumb SKOK
+
+```typescript
+// Dodaj novo konstanto
+const JUMP_BUTTON_IMAGE = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/gumb_modri.png";
 ```
 
-### 3. Gumb SKOK - bel krog z zmajckom
-
-Preoblikovanje gumba SKOK:
-- Odstrani modro podlago (`bg-sky-400`)
-- Bel okrogel gumb z zmajckom notri
-- Napis "SKOK" pod sliko
-- Popravek URL slike: `Zmajcek_111.PNG` (veliko P)
+### 3. Gumb SKOK z utripanjem (brez napisa)
 
 ```tsx
-{/* BOTTOM CENTER: SKOK button - WHITE CIRCLE with dragon */}
+{/* BOTTOM CENTER: SKOK button - use gumb_modri.png with pulse animation */}
 <div className="fixed bottom-6 md:bottom-8 left-1/2 transform -translate-x-1/2 z-20">
   <button
     onClick={handleNext}
     disabled={isJumping || phase === "complete" || showSentenceDialog}
-    className={`flex flex-col items-center justify-center transition-all
+    className={`transition-all
       ${isJumping || phase === "complete" || showSentenceDialog
         ? 'opacity-50 cursor-not-allowed'
         : 'hover:scale-105 active:scale-95'
       }`}
   >
-    {/* White circle container */}
-    <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-white shadow-lg flex items-center justify-center">
-      <img
-        src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_111.PNG"
-        alt="Skok"
-        className="w-14 h-14 md:w-18 md:h-18 object-contain"
-      />
-    </div>
-    <span className="text-gray-700 font-bold text-sm md:text-base mt-2 uppercase">SKOK</span>
+    <motion.img
+      src={JUMP_BUTTON_IMAGE}
+      alt="Skok"
+      className="w-24 h-24 md:w-28 md:h-28 object-contain drop-shadow-lg"
+      animate={{ 
+        scale: [1, 1.08, 1],
+        opacity: [1, 0.85, 1]
+      }}
+      transition={{ 
+        duration: 1.5, 
+        repeat: Infinity,
+        ease: "easeInOut"
+      }}
+    />
+    {/* Napis SKOK odstranjen */}
   </button>
 </div>
 ```
 
-### 4. Odstrani "START" in "CILJ" napisa
+### 4. Pomanjsanje/premik igre navzdol (samo desktop)
 
-Odstrani obe besedi iz renderiranja kamnov (vrstice 548-557):
-
-```tsx
-// ODSTRANI to kodo:
-{isStart && (
-  <span className="absolute -bottom-6 md:-bottom-8 text-xs md:text-sm font-bold text-gray-700 bg-white/80 px-2 py-0.5 rounded shadow">
-    START
-  </span>
-)}
-{isGoal && (
-  <span className="absolute -bottom-6 md:-bottom-8 text-xs md:text-sm font-bold text-yellow-700 bg-white/80 px-2 py-0.5 rounded shadow">
-    CILJ
-  </span>
-)}
-```
-
-### 5. Posodobitev URL za sliko zmajcka v gumbu
+Posodobitev `calculatedSizes` za desktop:
 
 ```typescript
-// Sprememba konstante - uporabi .PNG namesto .png
-const DRAGON_JUMP_BUTTON = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_111.PNG";
+if (!isMobile) {
+  const stoneWidth = 120;   // Pomanjsano iz 140
+  const stoneHeight = 90;   // Pomanjsano iz 105
+  const gapX = 150;         // Pomanjsano iz 175
+  const gapY = 130;         // Pomanjsano iz 155
+  const dragonSize = 110;   // Pomanjsano iz 130
+  
+  // Grid zavzema manj prostora - vec prostora za kartice zgoraj
+  const gridWidth = 4 * gapX + stoneWidth;  // 4 stolpcev (vkljucno z START na -1)
+  const gridHeight = 4 * gapY + stoneHeight; // 4 vrstice (brez dodatne vrstice 0)
+  
+  const offsetX = (containerSize.width - gridWidth) / 2 + gapX; // Zamik za START na -1
+  const offsetY = 100; // Nizji offset - igra je bolj spodaj
+  
+  return { stoneWidth, stoneHeight, gapX, gapY, dragonSize, offsetX, offsetY };
+}
 ```
+
+### 5. Prilagoditev pozicije START kamna
+
+Ker START gremo na `x: -1`, moramo prilagoditi izracun pozicije:
+
+```typescript
+const getStonePixelPosition = (index: number) => {
+  const stone = STONE_POSITIONS[index];
+  
+  return {
+    left: offsetX + stone.x * gapX,  // Deluje tudi za x: -1
+    bottom: offsetY + stone.y * gapY,
+  };
+};
+```
+
+To ze deluje, ker `stone.x * gapX` za `x = -1` vrne negativno vrednost, kar postavi kamen levo.
 
 ---
 
@@ -125,42 +123,39 @@ const DRAGON_JUMP_BUTTON = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/
 ```text
 +------------------------------------------------------------------+
 |                                                                  |
-|        [Zbrane besede...] <- zgoraj na sredini                   |
+|        [Kartice besed - brez prekrivanja]                        |
 |                                                                  |
-|                  [SIV] <- CILJ (brez napisa)                     |
-|          [RUM] [RDEC] [ZEL] [SIV]                               |
-|      [SIV] [ZEL] [RDEC] [RUM]                                   |
-|          [RUM] [RDEC] [ZEL] [SIV]                               |
-|       ZM [ZEL] [RDEC] [RUM] [SIV]                               |
-|          [SIV] <- START (brez napisa)                            |
 |                                                                  |
-|                      ( O )   <- bel krog z zmajckom              |
-|                      SKOK                                         |
+|      [SIV] [ZEL] [RDEC] [RUM]  <- Poved 4 (CILJ)                |
+|  [RUM] [RDEC] [ZEL] [SIV]      <- Poved 3                       |
+|      [SIV] [ZEL] [RDEC] [RUM]  <- Poved 2                       |
+| [SIV][ZEL] [RDEC] [RUM] [SIV]  <- Poved 1 + START levo          |
+|  START 🐉                                                        |
+|                                                                  |
+|                    (modri gumb utripa)                           |
 |                                                                  |
 | [HOME]                                                           |
-| (spodaj levo)                                                    |
 +------------------------------------------------------------------+
 ```
 
 ---
 
-## Struktura sprememb
+## Spremembe v datoteki
 
 | Lokacija | Sprememba |
 |----------|-----------|
-| Vrstica 58 | Spremeni `.png` v `.PNG` za DRAGON_JUMP_BUTTON |
-| Vrstice 139-162 | Zmanjsaj velikosti za desktop |
-| Vrstica 462 | Premakni home gumb iz `top-4` v `bottom-6` |
-| Vrstice 548-557 | Odstrani START in CILJ napisa |
-| Vrstice 586-606 | Preoblikuj gumb SKOK v bel krog |
+| Nova konstanta | Dodaj `JUMP_BUTTON_IMAGE` URL |
+| STONE_POSITIONS[0] | Spremeni `{x: 0, y: 0}` v `{x: -1, y: 1}` |
+| calculatedSizes (desktop) | Pomanjsaj velikosti in prilagodi offsete |
+| Gumb SKOK (vrstice 577-598) | Uporabi novo sliko z utripanjem, odstrani napis |
 
 ---
 
-## Povzetek sprememb
+## Povzetek
 
-1. **Zmanjsanje velikosti** - kamni 140x105px, zmajcek 130px, razmiki 175x155px
-2. **Gumb hiska spodaj levo** - fixed bottom-6 left-4
-3. **Gumb SKOK v belem krogu** - bel okrogel gumb z Zmajcek_111.PNG
-4. **Odstrani START/CILJ** - brez napisov na kamnih
-5. **Popravek URL** - .PNG namesto .png za pravilno nalaganje slike
+1. **START kamen levo** - `{x: -1, y: 1}` namesto `{x: 0, y: 0}`
+2. **Gumb SKOK** - slika `gumb_modri.png` z `motion.img` utripanjem
+3. **Brez napisa SKOK** - odstranjena `<span>` za tekst
+4. **Manjsa igra** - kamni 120x90px, gap-i 150x130px, offsetY: 100
+5. **Samo desktop** - mobilna verzija ostane nespremenjena
 
