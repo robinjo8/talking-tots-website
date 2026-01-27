@@ -1,134 +1,137 @@
 
-# Načrt: Popravek imen slik v vseh konfiguracijskih datotekah
 
-## Identificiran problem
+# Načrt: Popravek slik za vse igre (končni popravek)
 
-Slike v Supabase bucketu `slike` so poimenovane z **"1" pred končnico** (npr. `cvet1.webp`), ampak vse konfiguracijske datoteke uporabljajo napačna imena (npr. `cvet.webp` ali `cvet.png`).
+## Identificirana problema
 
-### Primeri napačnih preslikav
+### Problem 1: Supabase tabele za Spomin/Zaporedja uporabljajo NAPAČEN bucket in format
 
-| V kodi | V Supabase bucketu | Status |
-|--------|-------------------|--------|
-| `cvet.webp` | `cvet1.webp` | NAPAČNO |
-| `pica.png` | `pica1.webp` | NAPAČNO |
-| `kocka.webp` | `kocka1.webp` | NAPAČNO |
+Tabele `memory_cards_*` vsebujejo **stare URL-je** z napačnim bucketom in formatom:
 
-### Izjeme (slike brez "1")
+| Tabela | Trenutni URL primer | Pravilni URL |
+|--------|---------------------|--------------|
+| `memory_cards_c` | `.../slike/cedilo.png` | `.../slike/cedilo1.webp` |
+| `memory_cards_r` | `.../zaporedja/r/raca.png` | `.../slike/raca1.webp` |
 
-Nekatere slike NIMAJO "1" v imenu:
-- `nogometas.webp` (NE `nogometas1.webp`)
-- `ptic.webp` (NE `ptic1.webp`)
-- `ribic.webp` (NE `ribic1.webp`)
-- `riz.webp` (NE `riz1.webp`)
-- `rokometas.webp` (NE `rokometas1.webp`)
-- `zmaj.webp` (NE `zmaj1.webp`)
-- `zvezda.webp` (NE `zvezda1.webp`)
-- `Stickman_*.webp` slike (posebne slike za Met Kocke)
-- `kokos_sadez*.webp` in `koza_skin*.webp` (posebni primeri)
+**To je glavni vzrok zakaj Spomin in Zaporedja ne prikazujeta slik!**
 
----
+### Problem 2: Konfiguracijske datoteke še vedno uporabljajo stara imena za 7 izjem
 
-## Datoteke za posodobitev
+Ker si dodal nove slike s sufiksom "1" za:
+- `nogometas1.webp`
+- `ptic1.webp`
+- `ribic1.webp`
+- `riz1.webp`
+- `rokometas1.webp`
+- `zmaj1.webp`
+- `zvezda1.webp`
 
-Potrebno je posodobiti **17 konfiguracijskih datotek**:
-
-### Skupina 1: Kolo Sreče in Bingo konfiguracija
-| Datoteka | Število slik | Format |
-|----------|-------------|--------|
-| `src/data/artikulacijaVajeConfig.ts` | ~200 slik | `.png` -> `.webp` + dodaj "1" |
-
-### Skupina 2: Bingo datoteke (lokalne)
-| Datoteka | Število slik | Format |
-|----------|-------------|--------|
-| `src/data/bingoWordsCSredinaKonec.ts` | 16 slik | `.webp` -> `1.webp` |
-| `src/data/bingoWordsCHSredinaKonec.ts` | 16 slik | `.webp` -> `1.webp` |
-| `src/data/bingoWordsKSredinaKonec.ts` | 16 slik | `.webp` -> `1.webp` |
-| `src/data/bingoWordsLSredinaKonec.ts` | 16 slik | `.webp` -> `1.webp` |
-| `src/data/bingoWordsR.ts` | 16 slik | `.webp` -> `1.webp` |
-| `src/data/bingoWordsSHSredinaKonec.ts` | 16 slik | `.webp` -> `1.webp` |
-| `src/data/bingoWordsSSredinaKonec.ts` | 16 slik | `.webp` -> `1.webp` |
-| `src/data/bingoWordsZHSredinaKonec.ts` | 16 slik | `.webp` -> `1.webp` |
-| `src/data/bingoWordsZSredinaKonec.ts` | 16 slik | `.webp` -> `1.webp` |
-
-### Skupina 3: Sestavljanke in Igre ujemanja
-| Datoteka | Število slik | Format |
-|----------|-------------|--------|
-| `src/data/puzzleImages.ts` | ~120 slik | `.webp` -> `1.webp` |
-| `src/data/matchingGameData.ts` | ~130 slik | `.webp` -> `1.webp` |
-| `src/data/threeColumnMatchingData.ts` | ~170 slik | `.webp` -> `1.webp` |
-
-### Skupina 4: Met Kocke in Artikulacijski test
-| Datoteka | Število slik | Format |
-|----------|-------------|--------|
-| `src/data/metKockeConfig.ts` | ~80 slik | `.webp` -> `1.webp` |
-| `src/data/articulationTestData.ts` | 60 slik | `.webp` -> `1.webp` |
+Je potrebno posodobiti konfiguracijske datoteke, ki še uporabljajo stara imena.
 
 ---
 
-## Tehnična implementacija
+## Datoteke za posodobitev (lokalne konfiguracije)
 
-### Pravilo za zamenjavo
+| Datoteka | Slike za popravek |
+|----------|-------------------|
+| `src/data/artikulacijaVajeConfig.ts` | `ptic.webp`, `ribic.webp`, `nogometas.webp`, `rokometas.webp`, `zmaj.webp`, `zvezda.webp` |
+| `src/data/metKockeConfig.ts` | `ptic.webp`, `ribic.webp`, `nogometas.webp`, `rokometas.webp`, `zmaj.webp`, `zvezda.webp` |
+| `src/data/puzzleImages.ts` | `ribic.webp`, `riz.webp`, `rokometas.webp`, `zmaj.webp`, `zvezda.webp` |
+| `src/data/matchingGameData.ts` | `ribic.webp`, `riz.webp`, `rokometas.webp`, `zmaj.webp`, `zvezda.webp` |
+| `src/data/threeColumnMatchingData.ts` | `ribic.webp`, `riz.webp`, `rokometas.webp` |
+| `src/data/bingoWordsSHSredinaKonec.ts` | `nogometas.webp`, `rokometas.webp` |
 
-Za vsako sliko v konfiguraciji:
+---
 
+## Supabase tabele za posodobitev (Spomin in Zaporedja)
+
+### 9 tabel za posodobitev:
+
+1. `memory_cards_c`
+2. `memory_cards_Č`
+3. `memory_cards_K`
+4. `memory_cards_l`
+5. `memory_cards_r`
+6. `memory_cards_S`
+7. `memory_cards_Š_duplicate`
+8. `memory_cards_z`
+9. `memory_cards_Ž`
+
+### Potrebna sprememba v vsaki tabeli:
+
+Zamenjati `image_url` iz:
 ```
-STARO: beseda.webp  ali  beseda.png
-NOVO:  beseda1.webp
+https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/beseda.png
+```
+ali
+```
+https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zaporedja/r/beseda.png
 ```
 
-### Izjeme (NE dodaj "1"):
-
-Te slike ohranijo originalno ime:
-- `nogometas.webp`
-- `ptic.webp`
-- `ribic.webp`
-- `riz.webp`
-- `rokometas.webp`
-- `zmaj.webp`
-- `zvezda.webp`
-- Vse `Stickman_*.webp` slike
-- `kokos_sadez1.webp` -> uporabi `kokos_sadez1.webp`
-- `koza_skin1.webp` -> uporabi `koza_skin1.webp`
-
-### Primer spremembe
-
-```typescript
-// PREJ (napačno)
-{ word: "CVET", image: "cvet.webp", audio: "cvet.m4a" }
-
-// PO (pravilno)
-{ word: "CVET", image: "cvet1.webp", audio: "cvet.m4a" }
+V:
+```
+https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/beseda1.webp
 ```
 
 ---
 
-## Povzetek sprememb
+## Povzetek vseh zamenjav za konfiguracijske datoteke
 
-| Tip spremembe | Število datotek | Število slik |
-|---------------|-----------------|--------------|
-| `.png` -> `1.webp` | 1 | ~200 |
-| `.webp` -> `1.webp` | 16 | ~750 |
-| **SKUPAJ** | **17 datotek** | **~950 preslikav** |
+| Staro ime | Novo ime |
+|-----------|----------|
+| `ptic.webp` | `ptic1.webp` |
+| `ribic.webp` | `ribic1.webp` |
+| `riz.webp` | `riz1.webp` |
+| `nogometas.webp` | `nogometas1.webp` |
+| `rokometas.webp` | `rokometas1.webp` |
+| `zmaj.webp` | `zmaj1.webp` |
+| `zvezda.webp` | `zvezda1.webp` |
 
 ---
 
-## Posledice popravka
+## Tehnični koraki
 
-Po tej spremembi bodo vse igre pravilno prikazovale slike:
+### Korak 1: Posodobitev lokalnih konfiguracijskih datotek
+
+6 datotek z zamenjavami za 7 slik (ptic, ribic, riz, nogometas, rokometas, zmaj, zvezda).
+
+### Korak 2: Posodobitev Supabase tabel
+
+Za vsako od 9 tabel bom pripravil SQL UPDATE stavke, ki bodo:
+1. Zamenjale bucket iz `zaporedja/*` v `slike`
+2. Zamenjale format iz `.png` v `.webp`
+3. Dodale sufiks `1` pred končnico
+
+Primer SQL za tabelo `memory_cards_c`:
+```sql
+UPDATE memory_cards_c 
+SET image_url = REPLACE(
+  REPLACE(image_url, '.png', '1.webp'),
+  '/slike/', '/slike/'
+);
+```
+
+Za tabele kot `memory_cards_r` ki uporabljajo bucket `zaporedja`:
+```sql
+UPDATE memory_cards_r 
+SET image_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/' 
+  || LOWER(word) || '1.webp';
+```
+
+---
+
+## Vrstni red implementacije
+
+1. Najprej popravim 6 lokalnih konfiguracijskih datotek
+2. Nato posodobim 9 Supabase tabel z SQL UPDATE stavki
+
+Po tej spremembi bodo delovale vse igre:
 - Kolo Sreče (Kolo Besed)
 - Bingo
 - Spomin
 - Zaporedja
 - Sestavljanke
-- Drsna Sestavljanka
 - Povezi Pare
-- Igra Ujemanja
-- Met Kocke (Smešne Povedi)
+- Met Kocke
 - Artikulacijski Test
-- Labirint
 
----
-
-## Opomba o Supabase tabelah
-
-Igre **Spomin** in **Zaporedja** uporabljajo podatke iz Supabase tabel (`memory_cards_c`, `memory_cards_Č`, itd.). Te tabele bodo prav tako potrebovale posodobitev neposredno v Supabase, kar je ločen korak po popravku konfiguracijskih datotek.
