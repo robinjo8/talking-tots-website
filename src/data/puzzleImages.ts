@@ -92,12 +92,12 @@ export const rImages: PuzzleImage[] = [
   { filename: 'repa1.webp', word: 'REPA' },
   { filename: 'riba1.webp', word: 'RIBA' },
   { filename: 'ribez1.webp', word: 'RIBEZ' },
-  { filename: 'ribic.webp', word: 'RIBIČ' },
+  { filename: 'ribic1.webp', word: 'RIBIČ' },
   { filename: 'ris1.webp', word: 'RIS' },
-  { filename: 'riz.webp', word: 'RIŽ' },
+  { filename: 'riz1.webp', word: 'RIŽ' },
   { filename: 'robot1.webp', word: 'ROBOT' },
   { filename: 'roka1.webp', word: 'ROKA' },
-  { filename: 'rokometas.webp', word: 'ROKOMETAŠ' },
+  { filename: 'rokometas1.webp', word: 'ROKOMETAŠ' },
   { filename: 'rolka1.webp', word: 'ROLKA' },
   { filename: 'ropotuljica1.webp', word: 'ROPOTULJICA' },
   { filename: 'roza1.webp', word: 'ROŽA' }
@@ -144,10 +144,10 @@ export const zImages: PuzzleImage[] = [
   { filename: 'zavesa1.webp', word: 'ZAVESA' },
   { filename: 'zebra1.webp', word: 'ZEBRA' },
   { filename: 'zlato1.webp', word: 'ZLATO' },
-  { filename: 'zmaj.webp', word: 'ZMAJ' },
+  { filename: 'zmaj1.webp', word: 'ZMAJ' },
   { filename: 'zob1.webp', word: 'ZOB' },
   { filename: 'zobotrebec1.webp', word: 'ZOBOTREBEC' },
-  { filename: 'zvezda.webp', word: 'ZVEZDA' },
+  { filename: 'zvezda1.webp', word: 'ZVEZDA' },
   { filename: 'zvezek1.webp', word: 'ZVEZEK' },
   { filename: 'zvocnik1.webp', word: 'ZVOČNIK' }
 ];

@@ -101,12 +101,12 @@ export const threeColumnMatchingDataR: ThreeColumnMatchingItem[] = [
   { id: 'repa', word: 'REPA', audioFile: 'repa.m4a', shadowImage: 'repa_senca.png', originalImage: 'repa1.webp' },
   { id: 'riba', word: 'RIBA', audioFile: 'riba.m4a', shadowImage: 'riba_senca.png', originalImage: 'riba1.webp' },
   { id: 'ribez', word: 'RIBEZ', audioFile: 'ribez.m4a', shadowImage: 'ribez_senca.png', originalImage: 'ribez1.webp' },
-  { id: 'ribic', word: 'RIBIČ', audioFile: 'ribic.m4a', shadowImage: 'ribic_senca.png', originalImage: 'ribic.webp' },
+  { id: 'ribic', word: 'RIBIČ', audioFile: 'ribic.m4a', shadowImage: 'ribic_senca.png', originalImage: 'ribic1.webp' },
   { id: 'ris', word: 'RIS', audioFile: 'ris.m4a', shadowImage: 'ris_senca.png', originalImage: 'ris1.webp' },
-  { id: 'riz', word: 'RIŽ', audioFile: 'riz.m4a', shadowImage: 'riz_senca.png', originalImage: 'riz.webp' },
+  { id: 'riz', word: 'RIŽ', audioFile: 'riz.m4a', shadowImage: 'riz_senca.png', originalImage: 'riz1.webp' },
   { id: 'robot', word: 'ROBOT', audioFile: 'robot.m4a', shadowImage: 'robot_senca.png', originalImage: 'robot1.webp' },
   { id: 'roka', word: 'ROKA', audioFile: 'roka.m4a', shadowImage: 'roka_senca.png', originalImage: 'roka1.webp' },
-  { id: 'rokometas', word: 'ROKOMETAŠ', audioFile: 'rokometas.m4a', shadowImage: 'rokometas_senca.png', originalImage: 'rokometas.webp' },
+  { id: 'rokometas', word: 'ROKOMETAŠ', audioFile: 'rokometas.m4a', shadowImage: 'rokometas_senca.png', originalImage: 'rokometas1.webp' },
   { id: 'rolka', word: 'ROLKA', audioFile: 'rolka.m4a', shadowImage: 'rolka_senca.png', originalImage: 'rolka1.webp' },
   { id: 'ropotuljica', word: 'ROPOTULJICA', audioFile: 'ropotuljica.m4a', shadowImage: 'ropotuljica_senca.png', originalImage: 'ropotuljica1.webp' },
   { id: 'roza', word: 'ROŽA', audioFile: 'roza.m4a', shadowImage: 'roza_senca.png', originalImage: 'roza1.webp' }
@@ -153,10 +153,10 @@ export const threeColumnMatchingDataZ: ThreeColumnMatchingItem[] = [
   { id: 'zavesa', word: 'ZAVESA', audioFile: 'zavesa.m4a', shadowImage: 'zavesa_senca.png', originalImage: 'zavesa1.webp' },
   { id: 'zebra', word: 'ZEBRA', audioFile: 'zebra.m4a', shadowImage: 'zebra_senca.png', originalImage: 'zebra1.webp' },
   { id: 'zlato', word: 'ZLATO', audioFile: 'zlato.m4a', shadowImage: 'zlato_senca.png', originalImage: 'zlato1.webp' },
-  { id: 'zmaj', word: 'ZMAJ', audioFile: 'zmaj.m4a', shadowImage: 'zmaj_senca.png', originalImage: 'zmaj.webp' },
+  { id: 'zmaj', word: 'ZMAJ', audioFile: 'zmaj.m4a', shadowImage: 'zmaj_senca.png', originalImage: 'zmaj1.webp' },
   { id: 'zob', word: 'ZOB', audioFile: 'zob.m4a', shadowImage: 'zob_senca.png', originalImage: 'zob1.webp' },
   { id: 'zobotrebec', word: 'ZOBOTREBEC', audioFile: 'zobotrebec.m4a', shadowImage: 'zobotrebec_senca.png', originalImage: 'zobotrebec1.webp' },
-  { id: 'zvezda', word: 'ZVEZDA', audioFile: 'zvezda.m4a', shadowImage: 'zvezda_senca.png', originalImage: 'zvezda.webp' },
+  { id: 'zvezda', word: 'ZVEZDA', audioFile: 'zvezda.m4a', shadowImage: 'zvezda_senca.png', originalImage: 'zvezda1.webp' },
   { id: 'zvezek', word: 'ZVEZEK', audioFile: 'zvezek.m4a', shadowImage: 'zvezek_senca.png', originalImage: 'zvezek1.webp' },
   { id: 'zvocnik', word: 'ZVOČNIK', audioFile: 'zvocnik.m4a', shadowImage: 'zvocnik_senca.png', originalImage: 'zvocnik1.webp' }
 ];

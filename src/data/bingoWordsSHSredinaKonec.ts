@@ -17,9 +17,9 @@ export const wordsDataŠSredinaKonec: BingoWord[] = [
   { word: "TUŠ", image: "tus1.webp", audio: "tus.m4a" },
   { word: "LEŠNIK", image: "lesnik1.webp", audio: "lesnik.m4a" },
   { word: "MUŠNICA", image: "musnica1.webp", audio: "musnica.m4a" },
-  { word: "NOGOMETAŠ", image: "nogometas.webp", audio: "nogometas.m4a" },
+  { word: "NOGOMETAŠ", image: "nogometas1.webp", audio: "nogometas.m4a" },
   { word: "OBEŠALNIK", image: "obesalnik1.webp", audio: "obesalnik.m4a" },
   { word: "PAŠTETA", image: "pasteta1.webp", audio: "pasteta.m4a" },
-  { word: "ROKOMETAŠ", image: "rokometas.webp", audio: "rokometas.m4a" },
+  { word: "ROKOMETAŠ", image: "rokometas1.webp", audio: "rokometas.m4a" },
   { word: "VIŠNJA", image: "visnja1.webp", audio: "visnja.m4a" }
 ];
