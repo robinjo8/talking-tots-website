@@ -1,369 +1,318 @@
 
 
-# Načrt: Nova igra "Ponovi Poved" (Repeat the Sentence)
+# Načrt: Prenova dizajna igre "Ponovi Poved"
 
-## Pregled igre
+## Pregled zahtev
 
-Nova govorna terapevtska igra za otroke 3+, kjer otrok vadi ponavljanje tri-besednih povedi. Zmajček skače po barvnih kamnih vzdolž linearne poti, otrok pa ponavlja posamezne besede in nato cele povedi.
+Na podlagi referenčne slike je potrebna popolna prenova vizualnega dizajna in interakcijske logike igre. Glavne spremembe vključujejo:
 
----
-
-## Tehnična arhitektura
-
-### Struktura datotek za implementacijo
-
-```text
-src/
-├── data/
-│   └── ponoviPovedConfig.ts          # Konfiguracija povedi za vsako črko
-├── pages/
-│   └── PonoviPoved.tsx               # Izbira črke (kot Labirint.tsx)
-├── components/
-│   ├── games/
-│   │   └── PonoviPovedGame.tsx       # Glavna komponenta igre
-│   └── routing/
-│       └── PonoviPovedRouter.tsx     # Dinamični router
-└── config/
-    └── routes.tsx                    # Nove poti
-```
+1. **Cik-cak pot navzgor** (namesto linearne poti)
+2. **Uporaba slik kamnov** iz bucketa `slike`
+3. **Menjava slike zmaja** glede na smer gibanja
+4. **Kartice besed spodaj** ki se kumulativno prikazujejo
+5. **Pop-up dialog za poved** z odštevanjem za "snemanje"
+6. **Zeleni gumb za skok** z ikono zmaja
 
 ---
 
-## Del 1: Posodobitev GamesList.tsx
-
-Dodati novo kartico za igro:
-
-```typescript
-{
-  id: "ponovi-poved",
-  title: "PONOVI POVED",
-  description: "Ponovi tri-besedne povedi in vadi izgovorjavo",
-  image: "[slika zmajčka]",
-  gradient: "from-dragon-green/20 to-app-teal/20",
-  customBackground: "radial-gradient(...)",
-  path: "/govorne-igre/ponovi-poved",
-  available: true,
-  imageScale: "90%"
-}
-```
-
----
-
-## Del 2: Konfiguracija povedi (ponoviPovedConfig.ts)
-
-Za črko K (začetna implementacija):
-
-```typescript
-export interface SentenceWord {
-  word: string;       // Beseda za prikaz
-  image: string;      // Slika v bucketu 'slike'
-  audio: string;      // Zvok v bucketu 'zvocni-posnetki'
-}
-
-export interface Sentence {
-  words: [SentenceWord, SentenceWord, SentenceWord];  // 3 besede
-  fullSentence: string;  // "Kača ima kapo."
-  audio: string;         // Zvok cele povedi
-}
-
-export interface PonoviPovedConfig {
-  letter: string;
-  displayLetter: string;
-  sentences: Sentence[];  // 4 povedi
-}
-
-// Povedi za K
-export const ponoviPovedK: PonoviPovedConfig = {
-  letter: "k",
-  displayLetter: "K",
-  sentences: [
-    {
-      words: [
-        { word: "Kača", image: "kaca1.webp", audio: "kaca.m4a" },
-        { word: "ima", image: "Stickman_imeti.webp", audio: "ima.m4a" },
-        { word: "kapo", image: "kapa1.webp", audio: "kapo.m4a" }
-      ],
-      fullSentence: "Kača ima kapo.",
-      audio: "kaca_ima_kapo.m4a"  // Potrebno posneti
-    },
-    {
-      words: [
-        { word: "Kuža", image: "kuza1.webp", audio: "kuza.m4a" },
-        { word: "vidi", image: "Stickman_gledati.webp", audio: "vidi.m4a" },
-        { word: "kost", image: "kost1.webp", audio: "kost.m4a" }
-      ],
-      fullSentence: "Kuža vidi kost.",
-      audio: "kuza_vidi_kost.m4a"
-    },
-    {
-      words: [
-        { word: "Koza", image: "koza1.webp", audio: "koza.m4a" },
-        { word: "riše", image: "Stickman_risati.webp", audio: "rise.m4a" },
-        { word: "krog", image: "krog1.webp", audio: "krog.m4a" }
-      ],
-      fullSentence: "Koza riše krog.",
-      audio: "koza_rise_krog.m4a"
-    },
-    {
-      words: [
-        { word: "Kokoš", image: "kokos1.webp", audio: "kokos.m4a" },
-        { word: "je", image: "Stickman_jesti.webp", audio: "je.m4a" },
-        { word: "koruzo", image: "koruza1.webp", audio: "koruzo.m4a" }
-      ],
-      fullSentence: "Kokoš je koruzo.",
-      audio: "kokos_je_koruzo.m4a"
-    }
-  ]
-};
-```
-
-### Razpoložljive slike v bucketu 'slike':
-
-| Beseda | Slika | Obstaja |
-|--------|-------|---------|
-| Kača | kaca1.webp | Da |
-| Kapo (kapa) | kapa1.webp | Da |
-| Kuža | kuza1.webp | Da |
-| Kost | kost1.webp | Da |
-| Koza | koza1.webp | Da |
-| Krog | krog1.webp | Da |
-| Kokoš | kokos1.webp | Da |
-| Koruzo (koruza) | koruza1.webp | Da |
-| ima | Stickman_imeti.webp | Da |
-| vidi | Stickman_gledati.webp | Da |
-| riše | Stickman_risati.webp | Da |
-| je | Stickman_jesti.webp | Da |
-
----
-
-## Del 3: Stran za izbiro črke (PonoviPoved.tsx)
-
-Enaka struktura kot `Labirint.tsx`:
-- Zelena hero sekcija z naslovom "Ponovi poved"
-- Progress bar za dnevni napredek
-- Bela sekcija z 9 karticami črk (C, Č, K, L, R, S, Š, Z, Ž)
-- Vsaka kartica vodi na `/govorne-igre/ponovi-poved/:letter`
-
----
-
-## Del 4: Glavna komponenta igre (PonoviPovedGame.tsx)
-
-### Vizualni elementi
+## Vizualna postavitev (po referenčni sliki)
 
 ```text
 ┌─────────────────────────────────────────────────────────────┐
-│                       Belo ozadje                           │
 │                                                             │
-│  START ──── ○ ──── ○ ──── ○ ──── 🌿 ──── ...               │
-│              1      2      3   (poved)                      │
-│   🐉                                                        │
-│  zmaj                                                       │
+│    [SIV]  ←─────────────────────────────────────── CILJ     │
 │                                                             │
-│                    [Slika besede]                           │
+│    [RUMEN] [RDEC] [ZELEN] [SIV]    ← 4. poved (vrstica 4)   │
 │                                                             │
-│              ▶ NAPREJ                                       │
+│    [SIV] [ZELEN] [RDEC] [RUMEN]    ← 3. poved (vrstica 3)   │
+│                                                             │
+│    [RUMEN] [RDEC] [ZELEN] [SIV]    ← 2. poved (vrstica 2)   │
+│                                                             │
+│    🐉 [RUMEN] [RDEC] [ZELEN] [SIV] ← 1. poved (vrstica 1)   │
+│   [SIV]                                                     │
+│   START                                                     │
+│                                                             │
+│  ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐               │
+│  │ 🐉     │ │ Kača   │ │  ima   │ │  kapo  │  ← Kartice   │
+│  │(gumb)  │ │        │ │        │ │        │    besed     │
+│  └────────┘ └────────┘ └────────┘ └────────┘               │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Elementi poti (12 kamni + 4 "počivališča"):
+---
 
-```text
-START → Kamen1 → Kamen2 → Kamen3 → Počivališče1 →
-        Kamen4 → Kamen5 → Kamen6 → Počivališče2 →
-        Kamen7 → Kamen8 → Kamen9 → Počivališče3 →
-        Kamen10 → Kamen11 → Kamen12 → CILJ
-```
+## Logika poti (20 pozicij)
 
-### Stanje igre (State Machine)
+### Struktura poti:
 
+| Pozicija | Vrstica | Tip | Kamen | Smer |
+|----------|---------|-----|-------|------|
+| 0 | 0 | START | siv | - |
+| 1 | 1 | beseda 1 | rumen | desno → |
+| 2 | 1 | beseda 2 | rdeč | desno → |
+| 3 | 1 | beseda 3 | zelen | desno → |
+| 4 | 1 | POVED 1 | siv | desno → |
+| 5 | 2 | beseda 1 | rumen | ← levo |
+| 6 | 2 | beseda 2 | rdeč | ← levo |
+| 7 | 2 | beseda 3 | zelen | ← levo |
+| 8 | 2 | POVED 2 | siv | ← levo |
+| 9 | 3 | beseda 1 | rumen | desno → |
+| 10 | 3 | beseda 2 | rdeč | desno → |
+| 11 | 3 | beseda 3 | zelen | desno → |
+| 12 | 3 | POVED 3 | siv | desno → |
+| 13 | 4 | beseda 1 | rumen | ← levo |
+| 14 | 4 | beseda 2 | rdeč | ← levo |
+| 15 | 4 | beseda 3 | zelen | ← levo |
+| 16 | 4 | POVED 4 | siv | ← levo |
+| 17 | 5 | CILJ | siv | - |
+
+### Vizualizacija smeri po vrsticah:
+
+- **Vrstica 1 (poved 1)**: START → levo, potem desno → [rumen] → [rdeč] → [zelen] → [siv REST]
+- **Vrstica 2 (poved 2)**: ← levo [siv REST] ← [zelen] ← [rdeč] ← [rumen]
+- **Vrstica 3 (poved 3)**: desno → [rumen] → [rdeč] → [zelen] → [siv REST]
+- **Vrstica 4 (poved 4)**: ← levo [siv REST] ← [zelen] ← [rdeč] ← [rumen]
+- **Vrstica 5**: CILJ [siv]
+
+---
+
+## Slike kamnov (iz bucket `slike`)
+
+| Tip kamna | Datoteka | Uporaba |
+|-----------|----------|---------|
+| Siv | `kamen_siv.webp` | START, počivališča (po vsaki povedi), CILJ |
+| Rumen | `kamen_rumen.webp` | 1. beseda (osebek) |
+| Rdeč | `kamen_rdec.webp` | 2. beseda (povedek) |
+| Zelen | `kamen_zelen.webp` | 3. beseda (predmet) |
+
+**URL-ji:**
 ```typescript
-type GamePhase = 
-  | "start"           // Zmaj na START poziciji
-  | "word"            // Zmaj na kamnu, prikaže sliko + predvaja besedo
-  | "sentence"        // Zmaj na počivališču, predvaja celo poved
-  | "complete";       // Igra končana
-
-interface GameState {
-  phase: GamePhase;
-  currentSentence: number;  // 0-3
-  currentWord: number;      // 0-2 (znotraj povedi)
-  dragonPosition: number;   // 0-15 (vseh pozicij)
-}
-```
-
-### Animacija zmaja (framer-motion)
-
-```typescript
-// Skok z lokom (arc trajectory)
-const jumpVariants = {
-  jump: {
-    x: [0, targetX/2, targetX],
-    y: [0, -80, 0],  // Lok navzgor
-    transition: {
-      duration: 0.6,
-      ease: "easeInOut"
-    }
-  }
+const STONE_IMAGES = {
+  gray: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/kamen_siv.webp",
+  yellow: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/kamen_rumen.webp",
+  red: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/kamen_rdec.webp",
+  green: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/kamen_zelen.webp",
 };
 ```
 
-### Logika korakov
-
-1. **Korak besede (Word Step)**:
-   - Zmaj skoči na naslednji kamen
-   - Prikaže se slika besede (npr. kača)
-   - Predvaja se zvok besede
-   - Gumb "NAPREJ" čaka na pritisk
-
-2. **Korak povedi (Sentence Step)**:
-   - Po 3 besedah zmaj skoči na "počivališče" (travnik)
-   - Predvaja se celotna poved
-   - Otrok ponovi celo poved
-   - Gumb "NAPREJ" za naslednji sklop
-
-3. **Zaključek**:
-   - Po 4 povedih prikaže PuzzleSuccessDialog
-   - Zvezdica in napredek se beležita
-
 ---
 
-## Del 5: Router (PonoviPovedRouter.tsx)
+## Slike zmaja (iz bucket `zmajcki`)
 
+| Situacija | Datoteka | Opis |
+|-----------|----------|------|
+| Gibanje desno | `Zmajcek_4.png` | Zmaj gleda v desno |
+| Pristal desno (počivališče na desni) | `Zmajcek_4_1.PNG` | Zmaj gleda v levo |
+| Gibanje levo | `Zmajcek_4_1.PNG` | Zmaj gleda v levo |
+| Pristal levo (počivališče na levi) | `Zmajcek_4.png` | Zmaj gleda v desno |
+
+**Logika menjave:**
 ```typescript
-export default function PonoviPovedRouter() {
-  const { letter } = useParams<{ letter: string }>();
+const getDragonImage = () => {
+  const isOnRightSide = [4, 12].includes(dragonPosition); // Siva počivališča na desni
+  const isOnLeftSide = [8, 16].includes(dragonPosition);  // Siva počivališča na levi
+  const isMovingRight = currentRow % 2 === 1;  // Lihe vrstice = desno
   
-  if (!letter) {
-    return <Navigate to="/govorne-igre/ponovi-poved" replace />;
+  if (isOnRightSide || !isMovingRight) {
+    return "Zmajcek_4_1.PNG"; // Gleda levo
   }
-  
-  const config = getPonoviPovedConfig(letter);
-  
-  if (!config) {
-    return <Navigate to="/govorne-igre/ponovi-poved" replace />;
-  }
-  
-  return <PonoviPovedGame config={config} />;
-}
+  return "Zmajcek_4.png"; // Gleda desno
+};
 ```
 
 ---
 
-## Del 6: Posodobitev routes.tsx
+## Kartice besed (spodnji del)
+
+### Struktura kartic:
+1. **Kartica zmaja (gumb za skok)** - zeleno ozadje z ikono zmaja
+2. **Kartice besed** - bel okvir, slika + beseda pod sliko
+
+### Prikaz kartic:
+- Na začetku: samo kartica zmaja (gumb)
+- Po 1. skoku: kartica zmaja + kartica 1. besede
+- Po 2. skoku: kartica zmaja + kartica 1. + kartica 2. besede
+- Po 3. skoku: kartica zmaja + vse 3 kartice → odpre se pop-up
 
 ```typescript
-// V lazy loaded sekciji
-const PonoviPoved = lazy(() => import("@/pages/PonoviPoved"));
-const PonoviPovedRouter = lazy(() => import("@/components/routing/PonoviPovedRouter"));
-
-// V Routes
-<Route path="/govorne-igre/ponovi-poved" element={<ProtectedLazyRoute><PonoviPoved /></ProtectedLazyRoute>} />
-<Route path="/govorne-igre/ponovi-poved/:letter" element={<ProtectedLazyRoute><PonoviPovedRouter /></ProtectedLazyRoute>} />
+// Kartice ki so vidne
+const visibleCards = phase === "start" 
+  ? [] 
+  : currentSentence.words.slice(0, currentWordIndex + 1);
 ```
 
 ---
 
-## Vizualni stil
+## Pop-up dialog za poved (na sivem kamnu)
 
-### Ozadje
-- Belo ozadje (kot zahtevano)
-- Čista, preprosta postavitev
+Ko zmaj pristane na sivem kamnu (počivališče), se odpre dialog:
 
-### Kamni (stones)
-- Barviti okrogli/ovalni elementi
-- Barve: zelena, modra, roza, oranžna (izmenjevanje)
-- Animacija utripanja pri aktivnem kamnu
+```text
+┌─────────────────────────────────────────┐
+│                                         │
+│   ┌─────┐  ┌─────┐  ┌─────┐            │
+│   │ 🐍  │  │ ima │  │ 🧢  │            │
+│   │Kača │  │     │  │kapo │            │
+│   └─────┘  └─────┘  └─────┘            │
+│                                         │
+│   "Kača ima kapo."                      │
+│                                         │
+│   ┌─────────────────────┐               │
+│   │  🔊 PONOVI (3s)     │               │
+│   └─────────────────────┘               │
+│                                         │
+│   ┌─────────────────────┐               │
+│   │      NAPREJ         │               │
+│   └─────────────────────┘               │
+│                                         │
+└─────────────────────────────────────────┘
+```
 
-### Počivališča (meadows)
-- Manjši travnik/trata med skupinami
-- Svetlo zelena barva
-- Rahlo večji od kamnov
+### Logika gumba "PONOVI":
+1. Ob kliku začne 3-sekundno odštevanje (3... 2... 1...)
+2. Med odštevanjem je gumb onemogočen
+3. Po koncu odštevanja se dialog samodejno zapre (ali ostane odprt za klik "NAPREJ")
 
-### Zmaj
-- `Zmajcek_1.webp` iz bucketa 'zmajcki'
-- Velikost prilagojena mobilnim/namiznim napravam
-- Animiran skok (arc trajectory)
+```typescript
+const [isRecording, setIsRecording] = useState(false);
+const [countdown, setCountdown] = useState(3);
 
-### Slika besede
-- Centrirana na zaslonu
-- Bel okvir s senco
-- Responsive velikost
-
----
-
-## Zvočni elementi
-
-### Obstoječi zvoki (v bucketu 'zvocni-posnetki')
-- Vse posamezne besede: kaca.m4a, kapa.m4a, kuza.m4a, itd.
-- Glagoli: ima.m4a, vidi.m4a, rise.m4a, je.m4a
-
-### Potrebni novi zvoki (za snemanje)
-Za vsako poved je potreben posnetek celotne povedi:
-- kaca_ima_kapo.m4a
-- kuza_vidi_kost.m4a
-- koza_rise_krog.m4a
-- kokos_je_koruzo.m4a
-
-Če teh posnetkov še ni, igra lahko začasno predvaja vse 3 besede zaporedoma.
-
----
-
-## Responzivnost
-
-### Mobilne naprave
-- Landscape način (zaklep orientacije)
-- Fullscreen način
-- Kamni manjši, pot bolj kompaktna
-- Slika besede manjša
-
-### Namizje
-- Pot čez celotno širino zaslona
-- Večje slike in kamni
-- Naslov igre na vrhu
+const handleRepeat = () => {
+  setIsRecording(true);
+  setCountdown(3);
+  
+  const interval = setInterval(() => {
+    setCountdown(prev => {
+      if (prev <= 1) {
+        clearInterval(interval);
+        setIsRecording(false);
+        return 3;
+      }
+      return prev - 1;
+    });
+  }, 1000);
+};
+```
 
 ---
 
-## Floating meni (kot pri drugih igrah)
+## Gumb za skok (kartica zmaja)
 
-- Oranžni okrogli gumb spodaj levo
-- Opcije:
-  - 🏠 Nazaj (potrditveni dialog)
-  - 🔄 Nova igra
-  - 📖 Navodila
+Namesto klasičnega gumba "NAPREJ" uporabimo kartico z zmajčkom:
 
----
-
-## Povzetek implementacije
-
-| Korak | Datoteka | Opis |
-|-------|----------|------|
-| 1 | ponoviPovedConfig.ts | Konfiguracija povedi za K (osnova) |
-| 2 | GamesList.tsx | Nova kartica za igro |
-| 3 | PonoviPoved.tsx | Stran za izbiro črke |
-| 4 | PonoviPovedGame.tsx | Glavna komponenta igre |
-| 5 | PonoviPovedRouter.tsx | Dinamični router |
-| 6 | routes.tsx | Nove poti |
-| 7 | BreadcrumbNavigation.tsx | Drobtinice za novo igro |
+```jsx
+<button 
+  onClick={handleNext}
+  disabled={isJumping}
+  className="w-24 h-32 bg-gradient-to-b from-green-300 to-green-500 
+             rounded-xl shadow-lg flex items-center justify-center
+             hover:scale-105 transition-transform"
+>
+  <img 
+    src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_4.png"
+    alt="Skok"
+    className="w-20 h-20 object-contain"
+  />
+</button>
+```
 
 ---
 
-## Začetna implementacija (samo črka K)
+## Tehnična implementacija
 
-Prvo implementiram samo za črko K s 4 povedmi:
-1. Kača ima kapo.
-2. Kuža vidi kost.
-3. Koza riše krog.
-4. Kokoš je koruzo.
+### Spremembe v `PonoviPovedGame.tsx`:
 
-Ostale črke (C, Č, L, R, S, Š, Z, Ž) bodo dodane v prihodnjih iteracijah.
+1. **Novi state-i:**
+```typescript
+const [showSentenceDialog, setShowSentenceDialog] = useState(false);
+const [isRecording, setIsRecording] = useState(false);
+const [countdown, setCountdown] = useState(3);
+const [collectedWords, setCollectedWords] = useState<SentenceWord[]>([]);
+```
+
+2. **Izračun pozicije zmaja (grid namesto linearne poti):**
+```typescript
+// Pozicije kamnov v mreži
+const STONE_POSITIONS = [
+  { x: 0, y: 4, type: 'gray' },   // 0: START
+  { x: 1, y: 3, type: 'yellow' }, // 1: beseda 1
+  { x: 2, y: 3, type: 'red' },    // 2: beseda 2
+  { x: 3, y: 3, type: 'green' },  // 3: beseda 3
+  { x: 4, y: 3, type: 'gray' },   // 4: počivališče 1
+  { x: 3, y: 2, type: 'yellow' }, // 5: beseda 1 (nazaj)
+  // ... itd.
+];
+```
+
+3. **Renderiranje mreže kamnov:**
+```typescript
+const renderStoneGrid = () => {
+  return STONE_POSITIONS.map((pos, index) => (
+    <div
+      key={index}
+      style={{
+        position: 'absolute',
+        left: `${pos.x * 100}px`,
+        bottom: `${pos.y * 80}px`,
+      }}
+    >
+      <img 
+        src={STONE_IMAGES[pos.type]}
+        alt="kamen"
+        className="w-16 h-12 object-contain"
+      />
+    </div>
+  ));
+};
+```
+
+4. **Kartice besed spodaj:**
+```typescript
+<div className="fixed bottom-4 left-4 right-4 flex gap-4">
+  {/* Gumb zmaj */}
+  <button onClick={handleNext} className="...">
+    <img src={dragonJumpButtonImage} />
+  </button>
+  
+  {/* Kartice zbranih besed */}
+  {collectedWords.map((word, idx) => (
+    <div key={idx} className="bg-white rounded-xl border-2 border-green-500 p-2">
+      <img src={getImageUrl(word.image)} className="w-20 h-20" />
+      <p className="text-center font-bold">{word.word}</p>
+    </div>
+  ))}
+</div>
+```
 
 ---
 
-## Opomba o zvočnih posnetkih
+## Struktura datotek za spremembe
 
-Trenutno manjkajo zvočni posnetki celih povedi. Implementacija bo uporabila:
-1. **Če obstaja posnetek celotne povedi** → predvaja ga
-2. **Če ne obstaja** → predvaja vse 3 besede zaporedoma z zamikom 500ms
+| Datoteka | Sprememba |
+|----------|-----------|
+| `src/components/games/PonoviPovedGame.tsx` | Popolna prenova vizualnega prikaza in logike |
+| `src/data/ponoviPovedConfig.ts` | Brez sprememb (podatki ostajajo enaki) |
 
-To omogoča takojšnje delovanje igre, medtem ko se posnetki dodajajo.
+---
+
+## Povzetek glavnih sprememb
+
+1. **Pot**: Iz linearne v cik-cak mrežo (5 vrstic × 5 stolpcev)
+2. **Kamni**: Iz CSS krogov v slike (`kamen_*.webp`)
+3. **Zmaj**: Menjava slike glede na smer (`Zmajcek_4.png` ↔ `Zmajcek_4_1.PNG`)
+4. **Gumb za skok**: Zelena kartica z zmajčkom namesto "NAPREJ" gumba
+5. **Kartice besed**: Kumulativni prikaz spodaj
+6. **Pop-up za poved**: Dialog s 3-sekundnim odštevanjem za "snemanje"
+7. **Animacija skoka**: Premik v mrežni koordinatni sistem
+
+---
+
+## Predviden rezultat
+
+Po implementaciji bo igra vizualno ustrezala referenčni sliki:
+- Zmajček bo začel na sivem kamnu spodaj levo
+- Skakal bo po barvnih kamnih navzgor v cik-cak vzorcu
+- Kartice besed se bodo nabirale spodaj
+- Na vsakem sivem kamnu (počivališču) se bo odprl pop-up za ponavljanje povedi
+- Zmaj bo spreminjal orientacijo glede na smer gibanja
 
