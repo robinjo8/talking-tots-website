@@ -48,7 +48,7 @@ export const useArticulationTest = () => {
       const word = articulationData[letterIndex].words[wordIndex];
       try {
         const { data } = await supabase.storage
-          .from('artikulacijski-test')
+          .from('slike')
           .getPublicUrl(word.image);
           
         if (data) {
