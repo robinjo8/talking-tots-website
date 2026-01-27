@@ -1,100 +1,134 @@
 
-
-# Nacrt: Popravek nalaganja slik v vseh igrah
+# Načrt: Popravek imen slik v vseh konfiguracijskih datotekah
 
 ## Identificiran problem
 
-Po temeljiti analizi sem odkril glavni vzrok, zakaj se slike ne prikazujejo v nobeni igri:
+Slike v Supabase bucketu `slike` so poimenovane z **"1" pred končnico** (npr. `cvet1.webp`), ampak vse konfiguracijske datoteke uporabljajo napačna imena (npr. `cvet.webp` ali `cvet.png`).
 
-### Artikulacijski test - NAPACEN BUCKET
+### Primeri napačnih preslikav
 
-Oba hooka za artikulacijski test uporabljata napacen Supabase bucket:
+| V kodi | V Supabase bucketu | Status |
+|--------|-------------------|--------|
+| `cvet.webp` | `cvet1.webp` | NAPAČNO |
+| `pica.png` | `pica1.webp` | NAPAČNO |
+| `kocka.webp` | `kocka1.webp` | NAPAČNO |
 
-```text
-+---------------------------------------+---------------------------+
-| Datoteka                              | Bucket (napacen)          |
-+---------------------------------------+---------------------------+
-| src/hooks/useArticulationTestNew.ts   | "artikulacijski-test"     |
-| src/hooks/useArticulationTest.ts      | "artikulacijski-test"     |
-+---------------------------------------+---------------------------+
-```
+### Izjeme (slike brez "1")
 
-**Pravilni bucket za vse slike je `"slike"`**, ki ga uporabljajo ostale igre (Bingo, Sestavljanke, Povezi Pare).
-
-### Kako slike nalagajo druge igre (pravilno)
-
-| Igra | Datoteka | Bucket |
-|------|----------|--------|
-| Sestavljanke | GenericSestavljankaGame.tsx | `slike` |
-| Bingo | BingoGrid.tsx, BingoReel.tsx | `slike` |
-| Povezi Pare | matchingGameData.ts | `slike` |
-
-### Zakaj se problem pojavlja
-
-Ko sem posodobil `articulationTestData.ts` in zamenjal `.png` v `.webp`, so slike ostale v bucketu `"slike"`, ampak hook isce v napacnem bucketu `"artikulacijski-test"`.
+Nekatere slike NIMAJO "1" v imenu:
+- `nogometas.webp` (NE `nogometas1.webp`)
+- `ptic.webp` (NE `ptic1.webp`)
+- `ribic.webp` (NE `ribic1.webp`)
+- `riz.webp` (NE `riz1.webp`)
+- `rokometas.webp` (NE `rokometas1.webp`)
+- `zmaj.webp` (NE `zmaj1.webp`)
+- `zvezda.webp` (NE `zvezda1.webp`)
+- `Stickman_*.webp` slike (posebne slike za Met Kocke)
+- `kokos_sadez*.webp` in `koza_skin*.webp` (posebni primeri)
 
 ---
 
-## Resitev
+## Datoteke za posodobitev
 
-### 1. Popravek `useArticulationTestNew.ts`
+Potrebno je posodobiti **17 konfiguracijskih datotek**:
 
-Zamenjati bucket iz `"artikulacijski-test"` v `"slike"`:
+### Skupina 1: Kolo Sreče in Bingo konfiguracija
+| Datoteka | Število slik | Format |
+|----------|-------------|--------|
+| `src/data/artikulacijaVajeConfig.ts` | ~200 slik | `.png` -> `.webp` + dodaj "1" |
+
+### Skupina 2: Bingo datoteke (lokalne)
+| Datoteka | Število slik | Format |
+|----------|-------------|--------|
+| `src/data/bingoWordsCSredinaKonec.ts` | 16 slik | `.webp` -> `1.webp` |
+| `src/data/bingoWordsCHSredinaKonec.ts` | 16 slik | `.webp` -> `1.webp` |
+| `src/data/bingoWordsKSredinaKonec.ts` | 16 slik | `.webp` -> `1.webp` |
+| `src/data/bingoWordsLSredinaKonec.ts` | 16 slik | `.webp` -> `1.webp` |
+| `src/data/bingoWordsR.ts` | 16 slik | `.webp` -> `1.webp` |
+| `src/data/bingoWordsSHSredinaKonec.ts` | 16 slik | `.webp` -> `1.webp` |
+| `src/data/bingoWordsSSredinaKonec.ts` | 16 slik | `.webp` -> `1.webp` |
+| `src/data/bingoWordsZHSredinaKonec.ts` | 16 slik | `.webp` -> `1.webp` |
+| `src/data/bingoWordsZSredinaKonec.ts` | 16 slik | `.webp` -> `1.webp` |
+
+### Skupina 3: Sestavljanke in Igre ujemanja
+| Datoteka | Število slik | Format |
+|----------|-------------|--------|
+| `src/data/puzzleImages.ts` | ~120 slik | `.webp` -> `1.webp` |
+| `src/data/matchingGameData.ts` | ~130 slik | `.webp` -> `1.webp` |
+| `src/data/threeColumnMatchingData.ts` | ~170 slik | `.webp` -> `1.webp` |
+
+### Skupina 4: Met Kocke in Artikulacijski test
+| Datoteka | Število slik | Format |
+|----------|-------------|--------|
+| `src/data/metKockeConfig.ts` | ~80 slik | `.webp` -> `1.webp` |
+| `src/data/articulationTestData.ts` | 60 slik | `.webp` -> `1.webp` |
+
+---
+
+## Tehnična implementacija
+
+### Pravilo za zamenjavo
+
+Za vsako sliko v konfiguraciji:
+
+```
+STARO: beseda.webp  ali  beseda.png
+NOVO:  beseda1.webp
+```
+
+### Izjeme (NE dodaj "1"):
+
+Te slike ohranijo originalno ime:
+- `nogometas.webp`
+- `ptic.webp`
+- `ribic.webp`
+- `riz.webp`
+- `rokometas.webp`
+- `zmaj.webp`
+- `zvezda.webp`
+- Vse `Stickman_*.webp` slike
+- `kokos_sadez1.webp` -> uporabi `kokos_sadez1.webp`
+- `koza_skin1.webp` -> uporabi `koza_skin1.webp`
+
+### Primer spremembe
 
 ```typescript
-// Vrstica 102-104 - PREJ (napacno)
-const { data } = supabase.storage
-  .from("artikulacijski-test")
-  .getPublicUrl(currentData.word.image);
+// PREJ (napačno)
+{ word: "CVET", image: "cvet.webp", audio: "cvet.m4a" }
 
-// PO POPRAVKU (pravilno)
-const { data } = supabase.storage
-  .from("slike")
-  .getPublicUrl(currentData.word.image);
-```
-
-### 2. Popravek `useArticulationTest.ts`
-
-Enaka sprememba (vrstica 50-52):
-
-```typescript
-// PREJ (napacno)
-const { data } = await supabase.storage
-  .from('artikulacijski-test')
-  .getPublicUrl(word.image);
-
-// PO POPRAVKU (pravilno)
-const { data } = await supabase.storage
-  .from('slike')
-  .getPublicUrl(word.image);
+// PO (pravilno)
+{ word: "CVET", image: "cvet1.webp", audio: "cvet.m4a" }
 ```
 
 ---
 
-## Datoteke za spremembo
+## Povzetek sprememb
 
-| Datoteka | Vrstica | Sprememba |
-|----------|---------|-----------|
-| `src/hooks/useArticulationTestNew.ts` | 103 | `"artikulacijski-test"` -> `"slike"` |
-| `src/hooks/useArticulationTest.ts` | 51 | `"artikulacijski-test"` -> `"slike"` |
+| Tip spremembe | Število datotek | Število slik |
+|---------------|-----------------|--------------|
+| `.png` -> `1.webp` | 1 | ~200 |
+| `.webp` -> `1.webp` | 16 | ~750 |
+| **SKUPAJ** | **17 datotek** | **~950 preslikav** |
 
 ---
 
-## Povzetek
+## Posledice popravka
 
-Po tej spremembi bodo vse igre uporabljale isti bucket `"slike"` za nalaganje slik:
+Po tej spremembi bodo vse igre pravilno prikazovale slike:
+- Kolo Sreče (Kolo Besed)
+- Bingo
+- Spomin
+- Zaporedja
+- Sestavljanke
+- Drsna Sestavljanka
+- Povezi Pare
+- Igra Ujemanja
+- Met Kocke (Smešne Povedi)
+- Artikulacijski Test
+- Labirint
 
-```text
-+------------------------+--------+
-| Komponenta             | Bucket |
-+------------------------+--------+
-| Artikulacijski test    | slike  |  <-- POPRAVLJENO
-| Sestavljanke           | slike  |
-| Bingo                  | slike  |
-| Povezi Pare            | slike  |
-| Spomin                 | slike  |
-+------------------------+--------+
-```
+---
 
-Ta popravek bo odpravil problem s prikazovanjem slik v artikulacijskem testu in zagotovil konsistentno delovanje preko vseh iger.
+## Opomba o Supabase tabelah
 
+Igre **Spomin** in **Zaporedja** uporabljajo podatke iz Supabase tabel (`memory_cards_c`, `memory_cards_Č`, itd.). Te tabele bodo prav tako potrebovale posodobitev neposredno v Supabase, kar je ločen korak po popravku konfiguracijskih datotek.
