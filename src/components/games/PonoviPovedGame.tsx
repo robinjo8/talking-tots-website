@@ -113,7 +113,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     const updateSize = () => {
       setContainerSize({
         width: window.innerWidth,
-        height: window.innerHeight - 160 // Space for bottom controls
+        height: window.innerHeight
       });
     };
     
@@ -129,31 +129,57 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     };
   }, []);
   
-  // Calculate dynamic sizes based on screen (like MemoryGrid)
+  // Calculate dynamic sizes based on screen - DESKTOP IS 2X BIGGER
   const calculatedSizes = useMemo(() => {
     if (containerSize.width === 0 || containerSize.height === 0) {
       return null;
     }
     
-    const columns = 4; // 4 columns for stones
-    const rows = 5;    // 5 rows (START + 4 sentences)
+    // DESKTOP: DOUBLE THE SIZE - fixed values for clarity
+    if (!isMobile) {
+      const stoneWidth = 200;   // 2x from ~100
+      const stoneHeight = 150;  // 2x from ~75
+      const gapX = 250;         // 2x from ~125
+      const gapY = 200;         // 2x from ~100
+      const dragonSize = 180;   // 2x from ~90
+      
+      // Calculate grid dimensions for centering
+      const gridWidth = 3 * gapX + stoneWidth;
+      const gridHeight = 4 * gapY + stoneHeight;
+      
+      // Center horizontally and vertically (account for top cards ~120px and bottom button ~160px)
+      const offsetX = (containerSize.width - gridWidth) / 2;
+      const offsetY = (containerSize.height - gridHeight - 120 - 160) / 2 + 160; // Push up to make room for bottom button
+      
+      return {
+        stoneWidth,
+        stoneHeight,
+        gapX,
+        gapY,
+        dragonSize,
+        offsetX: Math.max(offsetX, 20),
+        offsetY: Math.max(offsetY, 80),
+      };
+    }
     
-    const PADDING = isMobile ? 40 : 80;
+    // MOBILE: Keep smaller sizes
+    const columns = 4;
+    const rows = 5;
+    const PADDING = 40;
     
     const availableWidth = containerSize.width - PADDING;
-    const availableHeight = containerSize.height - PADDING;
+    const availableHeight = containerSize.height - PADDING - 200; // Space for controls
     
-    // Calculate stone size based on available space
     const sizeByWidth = Math.floor(availableWidth / columns / 1.3);
     const sizeByHeight = Math.floor(availableHeight / rows / 1.35);
     
-    const stoneWidth = Math.min(sizeByWidth, sizeByHeight, isMobile ? 90 : 140);
+    const stoneWidth = Math.min(sizeByWidth, sizeByHeight, 90);
     const stoneHeight = Math.floor(stoneWidth * 0.75);
     const gapX = Math.floor(stoneWidth * 1.25);
     const gapY = Math.floor(stoneHeight * 1.35);
     const dragonSize = Math.floor(stoneWidth * 0.9);
     const offsetX = Math.floor((containerSize.width - (columns - 1) * gapX - stoneWidth) / 2);
-    const offsetY = Math.floor(stoneHeight * 0.5);
+    const offsetY = Math.floor(stoneHeight * 0.5) + 80; // Account for bottom controls
     
     return {
       stoneWidth,
@@ -167,13 +193,13 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
   }, [containerSize, isMobile]);
   
   // Use calculated sizes or fallback
-  const stoneWidth = calculatedSizes?.stoneWidth ?? (isMobile ? 80 : 120);
-  const stoneHeight = calculatedSizes?.stoneHeight ?? (isMobile ? 60 : 90);
-  const gapX = calculatedSizes?.gapX ?? (isMobile ? 90 : 140);
-  const gapY = calculatedSizes?.gapY ?? (isMobile ? 75 : 100);
-  const dragonSize = calculatedSizes?.dragonSize ?? (isMobile ? 80 : 110);
-  const offsetX = calculatedSizes?.offsetX ?? (isMobile ? 30 : 60);
-  const offsetY = calculatedSizes?.offsetY ?? (isMobile ? 40 : 60);
+  const stoneWidth = calculatedSizes?.stoneWidth ?? (isMobile ? 80 : 200);
+  const stoneHeight = calculatedSizes?.stoneHeight ?? (isMobile ? 60 : 150);
+  const gapX = calculatedSizes?.gapX ?? (isMobile ? 90 : 250);
+  const gapY = calculatedSizes?.gapY ?? (isMobile ? 75 : 200);
+  const dragonSize = calculatedSizes?.dragonSize ?? (isMobile ? 80 : 180);
+  const offsetX = calculatedSizes?.offsetX ?? (isMobile ? 30 : 100);
+  const offsetY = calculatedSizes?.offsetY ?? (isMobile ? 100 : 180);
   
   // Game state
   const [phase, setPhase] = useState<GamePhase>("start");
@@ -432,6 +458,65 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       {/* Audio element */}
       <audio ref={audioRef} />
       
+      {/* TOP LEFT: Home menu button - ROUNDED FULL */}
+      <div className="fixed top-4 left-4 z-30">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              className="h-14 w-14 rounded-full bg-app-orange hover:bg-app-orange/90 shadow-lg"
+              size="icon"
+            >
+              <Home className="h-7 w-7 text-white" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-48">
+            <DropdownMenuItem onClick={() => setShowExitDialog(true)}>
+              <span className="mr-2">🏠</span> Nazaj
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleReset}>
+              <span className="mr-2">🔄</span> Nova igra
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setShowInstructions(true)}>
+              <span className="mr-2">📖</span> Navodila
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      
+      {/* TOP: Collected word cards in light blue container - positioned at center top */}
+      <div className="fixed top-4 left-0 right-0 z-20 flex justify-center px-4 pointer-events-none">
+        <div className={`bg-sky-100/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg transition-all duration-300 pointer-events-auto ${collectedWords.length > 0 ? 'min-w-[300px] md:min-w-[400px]' : 'min-w-[200px]'}`}>
+          <div className="flex justify-center gap-4 md:gap-6 min-h-[80px] md:min-h-[100px] items-center">
+            {collectedWords.length === 0 && (
+              <p className="text-gray-500 text-sm font-medium">Zbrane besede...</p>
+            )}
+            <AnimatePresence>
+              {collectedWords.map((word, idx) => (
+                <motion.div
+                  key={`${word.word}-${idx}`}
+                  initial={{ opacity: 0, scale: 0.5, y: -20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.5 }}
+                  className="flex flex-col items-center"
+                >
+                  {/* White rounded container without border */}
+                  <div className="w-16 h-16 md:w-24 md:h-24 rounded-xl bg-white shadow-md flex items-center justify-center p-2">
+                    <img
+                      src={getImageUrl(word.image)}
+                      alt={word.word}
+                      className="w-12 h-12 md:w-16 md:h-16 object-contain"
+                    />
+                  </div>
+                  <p className="text-xs md:text-sm font-bold text-gray-800 mt-2 uppercase">
+                    {word.word}
+                  </p>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+      
       {/* Main game area - Stone grid */}
       <div className="flex-1 relative overflow-hidden">
         {/* Stones grid */}
@@ -461,12 +546,12 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
                   className="w-full h-full object-contain drop-shadow-lg"
                 />
                 {isStart && (
-                  <span className="absolute -bottom-5 text-xs md:text-sm font-bold text-gray-700 bg-white/80 px-2 py-0.5 rounded shadow">
+                  <span className="absolute -bottom-6 md:-bottom-8 text-xs md:text-sm font-bold text-gray-700 bg-white/80 px-2 py-0.5 rounded shadow">
                     START
                   </span>
                 )}
                 {isGoal && (
-                  <span className="absolute -bottom-5 text-xs md:text-sm font-bold text-yellow-700 bg-white/80 px-2 py-0.5 rounded shadow">
+                  <span className="absolute -bottom-6 md:-bottom-8 text-xs md:text-sm font-bold text-yellow-700 bg-white/80 px-2 py-0.5 rounded shadow">
                     CILJ
                   </span>
                 )}
@@ -498,72 +583,24 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
         </div>
       </div>
       
-      {/* Bottom controls - fixed */}
-      <div className="fixed bottom-0 left-0 right-0 p-3 md:p-4 flex items-end justify-between z-20">
-        {/* Left: Home menu button - ROUNDED FULL */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              className="h-12 w-12 md:h-14 md:w-14 rounded-full bg-app-orange hover:bg-app-orange/90 shadow-lg flex-shrink-0"
-              size="icon"
-            >
-              <Home className="h-6 w-6 md:h-7 md:w-7 text-white" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48">
-            <DropdownMenuItem onClick={() => setShowExitDialog(true)}>
-              <span className="mr-2">🏠</span> Nazaj
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleReset}>
-              <span className="mr-2">🔄</span> Nova igra
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setShowInstructions(true)}>
-              <span className="mr-2">📖</span> Navodila
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        
-        {/* Center: Collected word cards */}
-        <div className="flex-1 flex justify-center gap-2 md:gap-3 mx-3 md:mx-4">
-          <AnimatePresence>
-            {collectedWords.map((word, idx) => (
-              <motion.div
-                key={`${word.word}-${idx}`}
-                initial={{ opacity: 0, scale: 0.5, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.5 }}
-                className="flex-shrink-0 w-20 h-24 md:w-24 md:h-28 bg-white rounded-xl border-2 border-dragon-green shadow-lg flex flex-col items-center justify-center p-2"
-              >
-                <img
-                  src={getImageUrl(word.image)}
-                  alt={word.word}
-                  className="w-12 h-12 md:w-14 md:h-14 object-contain"
-                />
-                <p className="text-xs md:text-sm font-bold text-gray-700 mt-1 text-center truncate w-full uppercase">
-                  {word.word}
-                </p>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-        
-        {/* Right: Jump button on blue background with Zmajcek_111.png */}
-        <div className="bg-sky-400 rounded-xl p-2 md:p-3 shadow-lg flex-shrink-0">
+      {/* BOTTOM CENTER: Elegant SKOK button */}
+      <div className="fixed bottom-6 md:bottom-8 left-1/2 transform -translate-x-1/2 z-20">
+        <div className="bg-sky-400 rounded-2xl p-3 md:p-4 shadow-xl">
           <button
             onClick={handleNext}
             disabled={isJumping || phase === "complete" || showSentenceDialog}
-            className={`w-20 h-24 md:w-24 md:h-28 rounded-xl flex flex-col items-center justify-center transition-all
+            className={`w-28 h-32 md:w-32 md:h-36 rounded-xl flex flex-col items-center justify-center transition-all
               ${isJumping || phase === "complete" || showSentenceDialog
                 ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-gradient-to-b from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 active:scale-95'
+                : 'bg-gradient-to-b from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 active:scale-95 shadow-lg'
               }`}
           >
             <img
               src={DRAGON_JUMP_BUTTON}
               alt="Skok"
-              className="w-14 h-14 md:w-18 md:h-18 object-contain"
+              className="w-16 h-16 md:w-20 md:h-20 object-contain"
             />
-            <span className="text-white font-bold text-xs md:text-sm mt-1">SKOK</span>
+            <span className="text-white font-bold text-sm md:text-lg mt-1">SKOK</span>
           </button>
         </div>
       </div>
