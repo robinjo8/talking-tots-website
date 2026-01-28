@@ -311,45 +311,41 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     }
     
     // MOBILE: U-shaped layout (3 columns x 8 rows, y from 0 to 7)
-    // Properly centered horizontally and vertically
+    // POPRAVEK: Simetrična horizontalna postavitev + večja vertikalna raztegnitev
     const rows = 8;
     
-    // Calculate available space - use more vertical space
-    const topCardHeight = 100; // Reduced space for word cards at top
-    const bottomButtonSpace = 90; // Space for jump button at bottom
+    // Calculate available space
+    const topCardHeight = 100;
+    const bottomButtonSpace = 100;
     const availableHeight = containerSize.height - topCardHeight - bottomButtonSpace;
     const availableWidth = containerSize.width;
     
-    // Calculate stone size - BIGGER stones
-    const maxStoneHeight = Math.floor(availableHeight / rows * 0.95);
-    const stoneHeight = Math.min(maxStoneHeight, 58); // Increased to 58
-    const stoneWidth = Math.floor(stoneHeight * 1.4); // Aspect ratio 1.4:1
+    // POPRAVEK 1: Večji razmak od robov za simetrijo
+    const edgeMargin = 35;
     
-    // Vertical gap - use full available height, stretch upward
+    // POPRAVEK 2: Manjši kamni = več prostora za gapY = večja vertikalna raztegnitev
+    const maxStoneHeight = Math.floor(availableHeight / (rows + 2));
+    const stoneHeight = Math.min(maxStoneHeight, 50);
+    const stoneWidth = Math.floor(stoneHeight * 1.4);
+    
+    // POPRAVEK 3: gapY se izračuna tako da zapolni celotno višino
     const totalStonesHeight = stoneHeight * rows;
     const gapY = Math.floor((availableHeight - totalStonesHeight) / (rows - 1));
     
-    // Horizontal positioning - equal distance from left and right edges
-    // Fixed margin from each edge
-    const edgeMargin = 25; // Equal margin from both edges
-    const leftColumnX = edgeMargin + stoneWidth / 2; // Center of left column
-    const rightColumnX = availableWidth - edgeMargin - stoneWidth / 2; // Center of right column
-    const centerColumnX = availableWidth / 2; // Center column exactly in middle
+    // POPRAVEK 4: Simetrična horizontalna postavitev
+    const leftColumnCenter = edgeMargin + stoneWidth / 2;
+    const rightColumnCenter = availableWidth - edgeMargin - stoneWidth / 2;
+    const centerColumnCenter = availableWidth / 2;
+    const gapX = (rightColumnCenter - leftColumnCenter) / 2;
     
-    // gapX represents distance between column centers
-    const gapX = (rightColumnX - leftColumnX) / 2;
+    // POPRAVEK 5: Večji zmajček
+    const dragonSize = Math.floor(stoneWidth * 1.2);
     
-    const dragonSize = Math.floor(stoneWidth * 1.1); // Bigger dragon
+    // offsetX je center levega stolpca (za uporabo v getStonePixelPosition)
+    const offsetX = leftColumnCenter;
     
-    // Calculate total grid dimensions
-    const totalGridWidth = rightColumnX - leftColumnX;
-    const totalGridHeight = totalStonesHeight + gapY * (rows - 1);
-    
-    // offsetX is the left edge of the left column stones
-    const offsetX = leftColumnX;
-    
-    // Vertical offset - stretch upward, less bottom padding
-    const offsetY = bottomButtonSpace + stoneHeight / 2;
+    // Vertical offset - začni nad gumbom
+    const offsetY = bottomButtonSpace;
     
     return {
       stoneWidth,
@@ -359,6 +355,8 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       dragonSize,
       offsetX,
       offsetY,
+      // Dodamo edgeMargin za uporabo v getStonePixelPosition
+      edgeMargin,
     };
   }, [containerSize, isMobile]);
   
@@ -650,15 +648,16 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     }
     
     // MOBILE: U-shaped path - y from 0 to 7
-    // Use direct column positions for proper alignment
-    const columnPositions = [
-      offsetX, // Left column (x=0)
-      containerSize.width / 2, // Center column (x=1)
-      containerSize.width - 25 - stoneWidth / 2, // Right column (x=2)
+    // POPRAVEK: Uporabi isto edgeMargin za obe strani (simetrija!)
+    const edgeMargin = calculatedSizes?.edgeMargin ?? 35;
+    const columnCenters = [
+      edgeMargin + stoneWidth / 2,                           // Levi stolpec (x=0)
+      containerSize.width / 2,                                // Srednji stolpec (x=1)
+      containerSize.width - edgeMargin - stoneWidth / 2,     // Desni stolpec (x=2) - POPRAVEK!
     ];
     
     return {
-      left: columnPositions[stone.x] - stoneWidth / 2,
+      left: columnCenters[stone.x] - stoneWidth / 2,
       bottom: offsetY + stone.y * gapY,
     };
   };
