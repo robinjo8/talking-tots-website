@@ -739,7 +739,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
           {/* Larger word container - scaled 1.5x */}
           <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border-3 border-dragon-green/30 w-[480px] h-[195px] flex items-center justify-center p-4">
             {collectedWords.length === 0 ? (
-              <p className="text-gray-400 text-lg font-medium italic">Pritisni kocko za skok...</p>
+              <p className="text-gray-400 text-lg font-medium italic">Pritisni gumb za skok...</p>
             ) : (
               <div className="flex gap-6 items-center justify-center">
                 <AnimatePresence>
