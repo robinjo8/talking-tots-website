@@ -79,16 +79,20 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
       ]
     : type === "wheel"
     ? [
-        { text: "Zavrti kolo - Pritisni na oranžni gumb v sredini kolesa, da zavrtiš kolo besed." },
-        { text: "Počakaj na rezultat - Kolo se bo zavrtelo in se ustavilo na naključni besedi. Med vrtenjem boš slišal zvoke tikanja." },
-        { text: "Ponovi besedo - Ko se kolo ustavi, se prikaže okno z izbrano besedo in sliko:" },
-        { text: "• Klikni na sliko, da začneš snemanje (3 sekunde)" },
-        { text: "• Ponovi besedo glasno in razločno" },
-        { text: "• Lahko tudi klikneš zeleni gumb z zvočnikom, da slišiš pravilno izgovorjavo" },
-        { text: "Zberi 3 ponovitve - Vsako besedo moraš ponoviti 3-krat, da osvojiš zvezdico. Po vsaki ponovitvi se kolo znova zavrti na isto ali drugo besedo." },
-        { text: "Vzemi zvezdico - Ko dosežeš 3 ponovitve iste besede, se pojavi zlati gumb 'VZEMI ZVEZDICO'. Klikni nanj, da si zabeležiš nagrado." },
-        { text: "Nova igra - Po osvojeni zvezdici se pojavi modri gumb za novo igro (levo spodaj). Lahko tudi klikneš gumb Hiška za meni z možnostmi nazaj, nova igra ali navodila." },
-        { text: "Cilj igre: Vaditi izgovorjavo posamezne črke (npr. C, Č, K...) na začetku besed s pomočjo zabavnega vrtenja kolesa in zbiranja zvezdic!" }
+        { text: "Zavrti kolo" },
+        { text: "Pritisni oranžni gumb v sredini kolesa, da zavrtiš kolo besed." },
+        { text: "Počakaj na rezultat" },
+        { text: "Kolo se bo zavrtelo in se ustavilo na naključni besedi. Med vrtenjem se sliši zvok tikanja." },
+        { text: "Ponovi besedo" },
+        { text: "Ko se kolo ustavi, se prikaže okno z izbrano besedo in sliko. Klikni na sliko, da začneš snemanje (3 sekunde), in besedo ponovi glasno in razločno. Lahko tudi klikneš zeleni gumb z zvočnikom, da slišiš pravilno izgovorjavo." },
+        { text: "Zberi 3 ponovitve" },
+        { text: "Vsako besedo moraš ponoviti trikrat, da osvojiš zvezdico. Po vsaki ponovitvi se kolo znova zavrti na isto ali drugo besedo." },
+        { text: "Vzemi zvezdico" },
+        { text: "Ko dosežeš tri ponovitve iste besede, se pojavi zlati gumb VZEMI ZVEZDICO. Klikni nanj, da se nagrada zabeleži." },
+        { text: "Nova igra / izhod" },
+        { text: "S klikom na gumb Hiška se vrnete v meni." },
+        { text: "Cilj igre" },
+        { text: "Vaditi izgovorjavo posamezne črke (na primer C, Č, K) na začetku besed s pomočjo vrtenja kolesa in zbiranja zvezdic." }
       ]
     : [
         { text: "Sestavljaj sliko, dokler ni cela." },
