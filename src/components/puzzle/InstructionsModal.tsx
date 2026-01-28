@@ -143,7 +143,7 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
           <div className="space-y-4">
             {content.map((item, index) => (
               <div key={index} className={`flex items-start gap-3 ${item.bold ? 'mt-2' : ''}`}>
-                {!item.bold && getIcon(item.icon)}
+                {item.icon && getIcon(item.icon)}
                 <p className={`leading-relaxed text-sm ${item.bold ? 'font-bold text-base text-foreground' : 'text-foreground'}`}>
                   {item.text}
                 </p>
