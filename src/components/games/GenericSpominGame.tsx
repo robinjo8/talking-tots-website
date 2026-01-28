@@ -7,7 +7,7 @@ import { useGenericMemoryGame } from "@/hooks/useGenericMemoryGame";
 import { SpominConfig } from "@/data/spominConfig";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent } from "@/components/ui/dropdown-menu";
-import { Loader, Home } from "lucide-react";
+import { Loader, Home, RefreshCw } from "lucide-react";
 
 interface GenericSpominGameProps {
   config: SpominConfig;
@@ -17,6 +17,7 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
   const navigate = useNavigate();
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showNewGameButton, setShowNewGameButton] = useState(false);
   
   // Mobile detection and orientation state
   const [isTouchDevice, setIsTouchDevice] = useState(false);
@@ -134,6 +135,12 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
 
   const handleNewGame = () => {
     setMenuOpen(false);
+    setShowNewGameButton(false);
+    resetGame();
+  };
+
+  const handleNewGameDirect = () => {
+    setShowNewGameButton(false);
     resetGame();
   };
 
@@ -231,6 +238,15 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
               </button>
             </DropdownMenuContent>
           </DropdownMenu>
+
+          {showNewGameButton && (
+            <button
+              onClick={handleNewGameDirect}
+              className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
+            >
+              <RefreshCw className="h-7 w-7 text-white" />
+            </button>
+          )}
         </div>
 
         {/* Pair dialog */}
@@ -256,7 +272,7 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
         </MemoryExitConfirmationDialog>
 
         {/* Game completed overlay */}
-        {gameCompleted && (
+        {gameCompleted && !showNewGameButton && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-white rounded-2xl p-8 text-center max-w-sm mx-4">
               <h2 className="text-3xl font-bold text-dragon-green mb-4">
@@ -267,16 +283,10 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
               </p>
               <div className="space-y-3">
                 <button
-                  onClick={resetGame}
+                  onClick={() => setShowNewGameButton(true)}
                   className="w-full px-6 py-3 bg-dragon-green text-white rounded-xl font-semibold hover:bg-dragon-green/90 transition-colors"
                 >
-                  🔄 Igraj znova
-                </button>
-                <button
-                  onClick={() => navigate("/govorne-igre/spomin")}
-                  className="w-full px-6 py-3 bg-app-orange text-white rounded-xl font-semibold hover:bg-app-orange/90 transition-colors"
-                >
-                  🏠 Nazaj na izbiro
+                  ⭐ Poberi zvezdico
                 </button>
               </div>
             </div>
@@ -357,6 +367,15 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
           </DropdownMenuContent>
         </DropdownMenu>
 
+        {showNewGameButton && (
+          <button
+            onClick={handleNewGameDirect}
+            className="fixed bottom-4 left-24 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
+          >
+            <RefreshCw className="h-7 w-7 text-white" />
+          </button>
+        )}
+
         {/* Pair dialog */}
         <MemoryPairDialog
           isOpen={showPairDialog}
@@ -380,7 +399,7 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
         </MemoryExitConfirmationDialog>
 
         {/* Game completed overlay */}
-        {gameCompleted && (
+        {gameCompleted && !showNewGameButton && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-white rounded-2xl p-8 text-center max-w-sm mx-4">
               <h2 className="text-3xl font-bold text-dragon-green mb-4">
@@ -391,16 +410,10 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
               </p>
               <div className="space-y-3">
                 <button
-                  onClick={resetGame}
+                  onClick={() => setShowNewGameButton(true)}
                   className="w-full px-6 py-3 bg-dragon-green text-white rounded-xl font-semibold hover:bg-dragon-green/90 transition-colors"
                 >
-                  🔄 Igraj znova
-                </button>
-                <button
-                  onClick={() => navigate("/govorne-igre/spomin")}
-                  className="w-full px-6 py-3 bg-app-orange text-white rounded-xl font-semibold hover:bg-app-orange/90 transition-colors"
-                >
-                  🏠 Nazaj na izbiro
+                  ⭐ Poberi zvezdico
                 </button>
               </div>
             </div>

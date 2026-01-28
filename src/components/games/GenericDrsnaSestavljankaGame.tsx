@@ -156,13 +156,12 @@ export function GenericDrsnaSestavljankaGame({ config }: GenericDrsnaSestavljank
         </DropdownMenu>
         
         {showNewGameButton && (
-          <Button 
-            onClick={handleStartNewGameDirect} 
-            className="rounded-full w-16 h-16 bg-sky-400 hover:bg-sky-500 shadow-lg border-2 border-white/50 backdrop-blur-sm" 
-            size="icon"
+          <button
+            onClick={handleStartNewGameDirect}
+            className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
           >
             <RefreshCw className="h-7 w-7 text-white" />
-          </Button>
+          </button>
         )}
       </div>
 

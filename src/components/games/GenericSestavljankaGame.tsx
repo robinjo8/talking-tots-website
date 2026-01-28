@@ -189,13 +189,12 @@ export function GenericSestavljankaGame({ config }: GenericSestavljankaGameProps
   // New game button (appears after star claimed)
   const NewGameButton = () => (
     showNewGameButton ? (
-      <Button
-        size="icon"
+      <button
         onClick={handleNewGame}
-        className="fixed bottom-4 left-24 z-50 bg-blue-500 hover:bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg"
+        className="fixed bottom-4 left-24 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
       >
-        <RefreshCw className="w-6 h-6" />
-      </Button>
+        <RefreshCw className="h-7 w-7 text-white" />
+      </button>
     ) : null
   );
 

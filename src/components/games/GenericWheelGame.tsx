@@ -1,7 +1,7 @@
 // Generic Fortune Wheel game component for ArtikulacijaVaje
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Home, HelpCircle } from "lucide-react";
+import { Home, HelpCircle, RefreshCw } from "lucide-react";
 import { FortuneWheel } from "@/components/wheel/FortuneWheel";
 import { useFortuneWheel } from "@/hooks/useFortuneWheel";
 import { useWordProgress } from "@/hooks/useWordProgress";
@@ -33,6 +33,7 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
   const [showNewGameConfirmation, setShowNewGameConfirmation] = useState(false);
   const [showProgressModal, setShowProgressModal] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showNewGameButton, setShowNewGameButton] = useState(false);
 
   const wordsList = wordsData.map(w => w.word);
   
@@ -43,12 +44,14 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
   const handleBack = () => { setMenuOpen(false); setShowExitConfirmation(true); };
   const handleConfirmExit = () => { navigate(backPath); };
   const handleNewGame = () => { setMenuOpen(false); setShowNewGameConfirmation(true); };
-  const handleConfirmNewGame = () => { resetWheel(); resetProgress(); setShowNewGameConfirmation(false); };
+  const handleConfirmNewGame = () => { resetWheel(); resetProgress(); setShowNewGameConfirmation(false); setShowNewGameButton(false); };
+  const handleNewGameDirect = () => { resetWheel(); resetProgress(); setShowNewGameButton(false); };
   const handleInstructions = () => { setMenuOpen(false); setShowInstructions(true); };
   const handleRecordComplete = () => { if (selectedWord) incrementProgress(selectedWord.word); };
   const handleStarClaimed = async () => { 
     if (selectedWord) resetWordProgress(selectedWord.word); 
     closeResult(); 
+    setShowNewGameButton(true);
     // Check for trophy after claiming star
     await new Promise(resolve => setTimeout(resolve, 500));
     await checkForNewTrophy();
@@ -97,6 +100,15 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
           </button>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {showNewGameButton && (
+        <button
+          onClick={handleNewGameDirect}
+          className="fixed bottom-4 left-24 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
+        >
+          <RefreshCw className="h-7 w-7 text-white" />
+        </button>
+      )}
 
       <button 
         onClick={() => setShowProgressModal(true)} 

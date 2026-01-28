@@ -183,9 +183,9 @@ export function GenericBingoGame({ letter, displayLetter, title, wordsData, exer
             setStarClaimed(false);
             resetGame();
           }}
-          className="fixed bottom-4 left-24 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-blue-400 to-blue-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
+          className="fixed bottom-4 left-24 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
         >
-          <RefreshCw className="w-8 h-8 text-white" />
+          <RefreshCw className="h-7 w-7 text-white" />
         </button>
       )}
 
