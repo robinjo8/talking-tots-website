@@ -1,243 +1,243 @@
 
-
-# Načrt: Popravki pozicije kartic in zamenjava gumba s kocko
+# Načrt: Nova mobilna postavitev U-oblike za igro "Ponovi Poved"
 
 ## Pregled sprememb
 
-1. **Slike/kartice znotraj kamnov** - premakni okvir s karticami iz fiksnega `fixed` pozicioniranja v koordinatni sistem kamnov (med x=0 in x=6 pri y=1)
-2. **Zamenjava gumba s 3D kocko** - uporabi popolnoma enako `DiceRoller` komponento kot na strani `/govorne-igre/met-kocke/c`
+Potrebno je popolnoma spremeniti mobilno postavitev kamnov iz sedanje cik-cak oblike v U-obliko, kot je prikazano na referenčni sliki. Desktop verzija ostane nespremenjena.
 
 ---
 
-## 1. Pozicija kartic znotraj kamnov
+## 1. Nova struktura poti kamnov (U-oblika)
 
-### Trenutno stanje (napačno):
-```tsx
-<div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
-```
-To postavi okvir na sredino **zaslona**, ne pa na sredino **med kamni**.
-
-### Nova rešitev:
-Izračunaj pozicijo okvirja glede na koordinatni sistem kamnov:
-
-```typescript
-// Izračunaj pozicijo za okvir (med levim in desnim srednjim kamnom)
-const getCardContainerPosition = useMemo(() => {
-  if (!calculatedSizes || isMobile) return null;
-  
-  // Levi srednji kamen je na (x=0, y=1)
-  // Desni srednji kamen je na (x=6, y=1)
-  
-  const leftStonePos = {
-    left: offsetX + 0 * gapX,
-    bottom: offsetY + 1 * gapY,
-  };
-  
-  const rightStonePos = {
-    left: offsetX + 6 * gapX,
-    bottom: offsetY + 1 * gapY,
-  };
-  
-  // Okvir naj bo na sredini med njima
-  const containerWidth = 360; // Fiksna širina okvirja
-  const containerLeft = leftStonePos.left + stoneWidth + 20; // 20px od levega kamna
-  const containerBottom = leftStonePos.bottom; // Ista višina kot srednji kamni
-  
-  return {
-    left: containerLeft,
-    bottom: containerBottom,
-  };
-}, [calculatedSizes, isMobile, offsetX, offsetY, gapX, gapY, stoneWidth]);
-```
-
-### Nova JSX struktura:
-```tsx
-{/* DESKTOP: Word cards + Dice positioned WITHIN the grid (between middle stones) */}
-{!isMobile && getCardContainerPosition && (
-  <div 
-    className="absolute z-20 flex items-center gap-4"
-    style={{
-      left: getCardContainerPosition.left,
-      bottom: getCardContainerPosition.bottom,
-    }}
-  >
-    {/* Fixed size word container */}
-    <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border-2 border-dragon-green/30 w-[320px] h-[130px] flex items-center justify-center p-3">
-      {/* ... vsebina kartic ... */}
-    </div>
-    
-    {/* 3D Dice */}
-    <JumpDice onClick={handleNext} disabled={isJumping || showSentenceDialog} />
-  </div>
-)}
-```
-
----
-
-## 2. Zamenjava JumpButton s 3D kocko (DiceRoller stil)
-
-### Nova komponenta `JumpDice`:
-Uporabimo popolnoma enak stil kot `DiceRoller`, samo brez vrtenja - fiksna kocka, ki ob kliku sproži skok:
-
-```tsx
-// JumpDice component - 3D dice identical to DiceRoller from Met Kocke
-function JumpDice({ onClick, disabled }: { onClick: () => void; disabled: boolean }) {
-  const [isHovered, setIsHovered] = useState(false);
-
-  // Dice dots helper (same as DiceRoller)
-  const DiceDots = ({ count }: { count: number }) => {
-    const dotPositions: Record<number, string[]> = {
-      1: ['center'],
-      2: ['top-right', 'bottom-left'],
-      3: ['top-right', 'center', 'bottom-left'],
-      4: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
-      5: ['top-left', 'top-right', 'center', 'bottom-left', 'bottom-right'],
-      6: ['top-left', 'top-right', 'middle-left', 'middle-right', 'bottom-left', 'bottom-right'],
-    };
-
-    const getPositionClass = (pos: string) => {
-      switch (pos) {
-        case 'center': return 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2';
-        case 'top-left': return 'top-2 left-2';
-        case 'top-right': return 'top-2 right-2';
-        case 'bottom-left': return 'bottom-2 left-2';
-        case 'bottom-right': return 'bottom-2 right-2';
-        case 'middle-left': return 'top-1/2 left-2 -translate-y-1/2';
-        case 'middle-right': return 'top-1/2 right-2 -translate-y-1/2';
-        default: return '';
-      }
-    };
-
-    return (
-      <>
-        {dotPositions[count]?.map((pos, i) => (
-          <div
-            key={i}
-            className={`absolute w-3 h-3 rounded-full bg-gray-800 ${getPositionClass(pos)}`}
-          />
-        ))}
-      </>
-    );
-  };
-
-  return (
-    <div 
-      className={`cursor-pointer ${disabled ? 'pointer-events-none opacity-50' : ''}`}
-      style={{ perspective: '600px' }}
-      onClick={disabled ? undefined : onClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {/* 3D Dice Container - identical to DiceRoller */}
-      <div
-        className={`relative w-24 h-24 transition-transform ${!disabled ? 'animate-pulse' : ''}`}
-        style={{
-          transformStyle: 'preserve-3d',
-          transform: isHovered && !disabled ? 'rotateY(10deg) rotateX(-5deg)' : 'rotateY(0deg)',
-          transitionDuration: '300ms',
-        }}
-      >
-        {/* Face 1 - Front */}
-        <div 
-          className="absolute w-24 h-24 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
-          style={{ transform: 'translateZ(48px)' }}
-        >
-          <DiceDots count={1} />
-        </div>
-        
-        {/* Face 6 - Back */}
-        <div 
-          className="absolute w-24 h-24 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
-          style={{ transform: 'rotateY(180deg) translateZ(48px)' }}
-        >
-          <DiceDots count={6} />
-        </div>
-        
-        {/* Face 2 - Right */}
-        <div 
-          className="absolute w-24 h-24 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
-          style={{ transform: 'rotateY(90deg) translateZ(48px)' }}
-        >
-          <DiceDots count={2} />
-        </div>
-        
-        {/* Face 5 - Left */}
-        <div 
-          className="absolute w-24 h-24 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
-          style={{ transform: 'rotateY(-90deg) translateZ(48px)' }}
-        >
-          <DiceDots count={5} />
-        </div>
-        
-        {/* Face 3 - Top */}
-        <div 
-          className="absolute w-24 h-24 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
-          style={{ transform: 'rotateX(90deg) translateZ(48px)' }}
-        >
-          <DiceDots count={3} />
-        </div>
-        
-        {/* Face 4 - Bottom */}
-        <div 
-          className="absolute w-24 h-24 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
-          style={{ transform: 'rotateX(-90deg) translateZ(48px)' }}
-        >
-          <DiceDots count={4} />
-        </div>
-      </div>
-    </div>
-  );
-}
-```
-
----
-
-## 3. Prilagoditve velikosti za boljši prikaz
-
-Za boljši prikaz med kamni:
-- Zmanjšaj širino okvirja s karticami: `w-[320px]` namesto `w-[360px]`
-- Zmanjšaj višino: `h-[120px]` namesto `h-[140px]`
-- Kocka: `w-20 h-20` namesto `w-28 h-28` (da se prilega prostoru)
-
----
-
-## Vizualizacija končnega rezultata
+Pot gre po naslednjih korakih (17 kamnov skupaj + START):
 
 ```text
-+------------------------------------------------------------------------+
-|                                                                        |
-| [HOME]                                                                 |
-|                                                                        |
-|  [RUM] [ZEL] [SIV] [RDEC] [RUM] [ZEL] [SIV]   <- zgornja vrstica      |
-|                                                                        |
-|         +------------------------+  +----+                             |
-|  [RDEC] |  [KAČA] [IMA] [KAPO]  |  | 🎲 |  [RDEC]  <- srednja vrstica |
-|         +------------------------+  +----+                             |
-|          (znotraj grid sistema)     3D kocka                           |
-|                                     (kot Met Kocke)                    |
-|                                                                        |
-| 🐉[SIV] [ZEL] [RUM] [RDEC] [SIV] [ZEL] [RUM]   <- spodnja vrstica     |
-|  START                                                                 |
-|                                                                        |
-+------------------------------------------------------------------------+
+                    Zgoraj sredina
+                   +-----------+
+                   |   ZELEN   |
+                   +-----------+
+                   /             \
+  LEVA STRAN      /               \      DESNA STRAN
+  (od spodaj gor)                       (od zgoraj dol)
+  
+  RUMEN  y=6                              y=6  RUMEN
+  RDEČ   y=5                              y=5  RDEČ  
+  SIV    y=4  <-- zmajček se obrne        y=4  SIV
+  ZELEN  y=3                              y=3  ZELEN
+  RUMEN  y=2                              y=2  RUMEN
+  RDEČ   y=1                              y=1  RDEČ
+  SIV    y=0 (START🐉)                    y=0  SIV
+                   \             /
+                   +-----------+
+                   |   ZELEN   |  <- spodaj sredina
+                   +-----------+
+                  (gumb na sredini)
+```
+
+### Koordinatni sistem (x, y):
+- **Levi stolpec (x=0)**: y od 0 do 6 (7 kamnov)
+- **Sredina zgoraj (x=1, y=7)**: 1 zelen kamen
+- **Desni stolpec (x=2)**: y od 6 do 0 (7 kamnov, navzdol)
+- **Sredina spodaj (x=1, y=-1)**: 1 zelen kamen (START pozicija)
+
+---
+
+## 2. Definicija nove STONE_POSITIONS_MOBILE
+
+```typescript
+// MOBILE: U-shaped path - left column UP, across top, right column DOWN
+const STONE_POSITIONS_MOBILE: StonePosition[] = [
+  // START - bottom center green stone
+  { x: 1, y: -1, type: 'green', isRest: false },
+  
+  // Sentence 1: Left column - going UP (3 word stones + 1 rest)
+  { x: 0, y: 0, type: 'gray', isRest: false, sentenceIndex: 0, wordIndex: 0 },   // 1st word
+  { x: 0, y: 1, type: 'red', isRest: false, sentenceIndex: 0, wordIndex: 1 },    // 2nd word
+  { x: 0, y: 2, type: 'yellow', isRest: false, sentenceIndex: 0, wordIndex: 2 }, // 3rd word
+  { x: 0, y: 3, type: 'green', isRest: true, sentenceIndex: 0 },                 // Repeat sentence 1
+  
+  // Sentence 2: Continue left column UP + cross to top (3 word stones + 1 rest)
+  { x: 0, y: 4, type: 'gray', isRest: false, sentenceIndex: 1, wordIndex: 0 },   // 1st word
+  { x: 0, y: 5, type: 'red', isRest: false, sentenceIndex: 1, wordIndex: 1 },    // 2nd word
+  { x: 0, y: 6, type: 'yellow', isRest: false, sentenceIndex: 1, wordIndex: 2 }, // 3rd word
+  { x: 1, y: 7, type: 'green', isRest: true, sentenceIndex: 1 },                 // Top center - Repeat sentence 2
+  
+  // Sentence 3: Right column - going DOWN (3 word stones + 1 rest)
+  { x: 2, y: 6, type: 'yellow', isRest: false, sentenceIndex: 2, wordIndex: 0 }, // 1st word
+  { x: 2, y: 5, type: 'red', isRest: false, sentenceIndex: 2, wordIndex: 1 },    // 2nd word
+  { x: 2, y: 4, type: 'gray', isRest: true, sentenceIndex: 2 },                  // Repeat sentence 3 (zmajček se obrne)
+  
+  // Sentence 4: Continue right column DOWN (3 word stones + finish)
+  { x: 2, y: 3, type: 'green', isRest: false, sentenceIndex: 3, wordIndex: 0 },  // 1st word
+  { x: 2, y: 2, type: 'yellow', isRest: false, sentenceIndex: 3, wordIndex: 1 }, // 2nd word
+  { x: 2, y: 1, type: 'red', isRest: false, sentenceIndex: 3, wordIndex: 2 },    // 3rd word
+  { x: 2, y: 0, type: 'gray', isRest: true, sentenceIndex: 3 },                  // GOAL - Repeat sentence 4
+];
 ```
 
 ---
 
-## Tehnične spremembe v datoteki
+## 3. Prilagoditev izračuna velikosti za mobilno verzijo
+
+```typescript
+// MOBILE: U-shaped layout (3 columns x 9 rows including top/bottom center)
+const columns = 3;
+const rows = 9; // y from -1 to 7
+
+const availableWidth = containerSize.width - 40; // padding
+const availableHeight = containerSize.height - 200; // space for word cards at top + button at bottom
+
+// Calculate stone size to fit the grid
+const sizeByWidth = Math.floor(availableWidth / columns / 1.4);
+const sizeByHeight = Math.floor(availableHeight / rows / 1.2);
+
+const stoneWidth = Math.min(sizeByWidth, sizeByHeight, 70);
+const stoneHeight = Math.floor(stoneWidth * 0.75);
+
+// Gaps between stones
+const gapX = Math.floor((availableWidth - stoneWidth * 3) / 2); // horizontal gap
+const gapY = Math.floor(stoneHeight * 1.1); // vertical gap
+
+// Offsets to center the grid
+const offsetX = Math.floor((containerSize.width - (2 * gapX + stoneWidth * 3)) / 2);
+const offsetY = Math.floor(stoneHeight * 1.5); // space at bottom for button
+```
+
+---
+
+## 4. Prilagoditev getStonePixelPosition za negativne y vrednosti
+
+```typescript
+const getStonePixelPosition = (index: number) => {
+  const stone = STONE_POSITIONS[index];
+  
+  if (!isMobile) {
+    // Desktop logic - unchanged
+    let extraYOffset = 0;
+    if (stone.y === 1) extraYOffset = gapY * 0.3;
+    else if (stone.y === 2) extraYOffset = gapY * 0.5;
+    
+    return {
+      left: offsetX + stone.x * gapX,
+      bottom: offsetY + stone.y * gapY + extraYOffset,
+    };
+  }
+  
+  // MOBILE: Handle y from -1 to 7 (shift by +1 for bottom calculation)
+  const adjustedY = stone.y + 1; // Shift so -1 becomes 0
+  
+  return {
+    left: offsetX + stone.x * gapX,
+    bottom: offsetY + adjustedY * gapY,
+  };
+};
+```
+
+---
+
+## 5. Prilagoditev logike obračanja zmajčka
+
+Zmajček se obrne na sivem kamnu desno zgoraj (x=2, y=4 - to je rest stone za sentence 3):
+
+```typescript
+const getDragonImage = useCallback(() => {
+  const stone = STONE_POSITIONS[dragonPosition];
+  if (!stone) return DRAGON_RIGHT;
+  
+  if (!isMobile) {
+    // Desktop logic - unchanged
+    // ...
+  }
+  
+  // MOBILE: U-shaped path logic
+  // Left column (x=0): going UP → facing right
+  if (stone.x === 0) return DRAGON_RIGHT;
+  
+  // Top center (x=1, y=7): facing right (crossing to right side)
+  if (stone.x === 1 && stone.y === 7) return DRAGON_RIGHT;
+  
+  // Right column (x=2): going DOWN → facing left
+  // Dragon turns left at gray rest stone (y=4) and continues facing left
+  if (stone.x === 2) return DRAGON_LEFT;
+  
+  // Bottom center (x=1, y=-1): START position → facing right
+  if (stone.x === 1 && stone.y === -1) return DRAGON_RIGHT;
+  
+  return DRAGON_RIGHT;
+}, [dragonPosition, isMobile, STONE_POSITIONS]);
+```
+
+---
+
+## 6. Premik gumba na sredino
+
+Gumb je že na sredini (`left-1/2 transform -translate-x-1/2`), samo je potrebno preveriti, da je pravilno pozicioniran glede na nov grid:
+
+```tsx
+{/* MOBILE: Center jump button */}
+<div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-20">
+  <JumpButton 
+    onClick={handleNext} 
+    disabled={isJumping || phase === "complete" || showSentenceDialog}
+    size={80} // Slightly smaller for mobile
+  />
+</div>
+```
+
+---
+
+## 7. Vizualizacija končnega rezultata (mobilna verzija)
+
+```text
++----------------------------------+
+|     +------------------------+   |
+|     | [KOZA] [RIŠE] [KROG]  |   |  <- Word cards (unchanged)
+|     +------------------------+   |
+|                                  |
+|  [RUMEN]            [RUMEN]     |  y=6
+|                                  |
+|  [RDEČ]              [RDEČ]     |  y=5
+|                                  |
+|  [SIV]  <-(obrne)    [SIV]      |  y=4  (rest stones)
+|                                  |
+|  [ZELEN]            [ZELEN]     |  y=3  (rest stones)
+|                                  |
+|  [RUMEN]            [RUMEN]     |  y=2
+|                                  |
+|  [RDEČ]              [RDEČ]     |  y=1
+|                                  |
+|  [SIV]               [SIV]      |  y=0
+|                                  |
+|         🐉[ZELEN]               |  y=-1 (START)
+|                                  |
+|           +------+               |
+|           |  ↑   |               |  <- Jump button (center)
+|           +------+               |
+|                                  |
+| [HOME]                           |
++----------------------------------+
+```
+
+---
+
+## Tehnični povzetek sprememb
 
 | Komponenta | Sprememba |
 |------------|-----------|
-| `JumpButton` | **Odstrani** - zamenjana z `JumpDice` |
-| `JumpDice` | **Nova** - 3D kocka identična `DiceRoller` iz Met Kocke |
-| Desktop UI | Pozicija okvirja in kocke izračunana iz grid sistema (ne `fixed`) |
-| `getCardContainerPosition` | **Nov** useMemo za izračun pozicije med srednjima kamnoma |
+| `STONE_POSITIONS_MOBILE` | Nova U-oblika z 16 kamni (3 stolpci, y od -1 do 7) |
+| `calculatedSizes` (mobile) | Prilagojeno za 3 stolpce x 9 vrstic |
+| `getStonePixelPosition` | Podpora za negativne y vrednosti |
+| `getDragonImage` | Zmajček se obrne na desnem sivem kamnu (x=2, y=4) |
+| Gumb | Ostane na sredini, morda manjši (80px) |
+| Desktop verzija | **BREZ SPREMEMB** |
 
 ---
 
-## Povzetek
+## Ključne točke
 
-1. **Kartice znotraj kamnov** - namesto `fixed top-1/2 left-1/2` uporabimo izračunano pozicijo znotraj grid sistema kamnov
-2. **3D kocka** - popolnoma enaka kot `DiceRoller` komponenta iz igre Met Kocke, samo brez vrtenja
-3. **Samo desktop** - mobilna verzija ostane nespremenjena
-
+1. **Barve kamnov ustrezajo sliki** - levi/desni stolpec: siv-rdeč-rumen-zelen-siv-rdeč-rumen
+2. **Zelen kamen na sredini spodaj** - START pozicija
+3. **Zelen kamen na sredini zgoraj** - povezuje levi in desni stolpec
+4. **Zmajček se obrne na desnem sivem kamnu** (y=4) - to je rest stone za sentence 3
+5. **Gumb na sredini** - med levim in desnim stolpcem
+6. **Odzivna postavitev** - prilagaja se vsem velikostim mobilnih zaslonov
