@@ -314,7 +314,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     const rows = 7; // 7 vrstic (y od 0 do 6)
     
     // Prostor za UI elemente
-    const topCardHeight = 120;
+    const topCardHeight = 180; // Več prostora za zmajčka na zgornji vrstici
     const bottomButtonSpace = 130; // Nad gumbom (vrh gumba ~104px + 26px razmaka)
     const availableHeight = containerSize.height - topCardHeight - bottomButtonSpace;
     const availableWidth = containerSize.width;
