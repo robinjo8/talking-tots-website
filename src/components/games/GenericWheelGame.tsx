@@ -139,7 +139,7 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
       <InstructionsModal 
         isOpen={showInstructions} 
         onClose={() => setShowInstructions(false)} 
-        type="articulation" 
+        type="wheel" 
       />
       
       <MemoryExitConfirmationDialog 

@@ -248,13 +248,9 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
               </div>
             </div>
 
-            {/* Progress circles and count */}
+            {/* Progress circles */}
             <div className="flex flex-col items-center space-y-1 sm:space-y-2">
               <ProgressCircles count={displayCount} size="lg" animate={false} />
-              <span className="text-xs sm:text-sm text-muted-foreground uppercase">
-                IZGOVORIL SI {displayCount}/3 KRAT
-                {!showClaimButton && ` (ŠE ${3 - displayCount}X ZA ZVEZDICO)`}
-              </span>
             </div>
 
             {/* Audio playback button */}

@@ -5,7 +5,7 @@ import { CheckCircle, XCircle, AlertCircle } from "lucide-react";
 interface InstructionsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  type?: "jigsaw" | "sliding" | "articulation" | "maze" | "bingo" | "sequence" | "dice";
+  type?: "jigsaw" | "sliding" | "articulation" | "maze" | "bingo" | "sequence" | "dice" | "wheel";
 }
 
 type InstructionItem = {
@@ -74,6 +74,19 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
         { text: "Poslušaj poved in jo ponovi s snemanjem." },
         { text: "Za vsako uspešno poved dobiš zvezdico!" }
       ]
+    : type === "wheel"
+    ? [
+        { text: "Zavrti kolo - Pritisni na oranžni gumb v sredini kolesa, da zavrtiš kolo besed." },
+        { text: "Počakaj na rezultat - Kolo se bo zavrtelo in se ustavilo na naključni besedi. Med vrtenjem boš slišal zvoke tikanja." },
+        { text: "Ponovi besedo - Ko se kolo ustavi, se prikaže okno z izbrano besedo in sliko:" },
+        { text: "• Klikni na sliko, da začneš snemanje (3 sekunde)" },
+        { text: "• Ponovi besedo glasno in razločno" },
+        { text: "• Lahko tudi klikneš zeleni gumb z zvočnikom, da slišiš pravilno izgovorjavo" },
+        { text: "Zberi 3 ponovitve - Vsako besedo moraš ponoviti 3-krat, da osvojiš zvezdico. Po vsaki ponovitvi se kolo znova zavrti na isto ali drugo besedo." },
+        { text: "Vzemi zvezdico - Ko dosežeš 3 ponovitve iste besede, se pojavi zlati gumb 'VZEMI ZVEZDICO'. Klikni nanj, da si zabeležiš nagrado." },
+        { text: "Nova igra - Po osvojeni zvezdici se pojavi modri gumb za novo igro (levo spodaj). Lahko tudi klikneš gumb Hiška za meni z možnostmi nazaj, nova igra ali navodila." },
+        { text: "Cilj igre: Vaditi izgovorjavo posamezne črke (npr. C, Č, K...) na začetku besed s pomočjo zabavnega vrtenja kolesa in zbiranja zvezdic!" }
+      ]
     : [
         { text: "Sestavljaj sliko, dokler ni cela." },
         { text: "Ko bo slika končana, se bo predvajal posnetek logopeda." },
@@ -93,6 +106,8 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
     ? "Navodila za Bingo"
     : type === "dice"
     ? "Navodila za Met kocke"
+    : type === "wheel"
+    ? "Navodila za igro"
     : "Navodila za igro Sestavljanka";
 
   const getIcon = (icon?: "green" | "yellow" | "red") => {
