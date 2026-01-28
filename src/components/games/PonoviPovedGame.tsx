@@ -71,41 +71,44 @@ interface StonePosition {
 }
 
 // ============================================================================
-// DESKTOP: Rectangular path (16 steps in a loop)
-// Path: START (bottom-left gray) → 2x UP → 6x RIGHT → 2x DOWN → 6x LEFT → back to START
+// DESKTOP: Rectangular path with 7 stones on top/bottom rows, 2 in middle
 // 
-//      [SIV] [ZEL] [RDEC] [RUM] [SIV] [ZEL]  ← top row (y=2)
-//        ↑                               ↓
-//      [ZEL]                           [RDEC] ← middle (y=1)
-//        ↑                               ↓
-//   🐉 [SIV] [ZEL] [RDEC] [RUM] [SIV] [ZEL]  ← bottom row (y=0)
-//      START                            
+//      [RUM] [ZEL] [SIV] [RDEC] [RUM] [ZEL] [SIV]  ← top row (7 stones, y=2)
+//        ↑                                     ↓
+//                 +-- WORD CARDS --+  [BTN]
+//      [RDEC]     |               |          [RDEC] ← middle row (2 stones, y=1)
+//                 +---------------+
+//        ↑                                     ↓
+//   🐉 [SIV] [ZEL] [RUM] [RDEC] [SIV] [ZEL] [RUM]  ← bottom row (7 stones, y=0)
+//      START/GOAL                            
 // ============================================================================
 const STONE_POSITIONS_DESKTOP: StonePosition[] = [
-  // START - bottom left gray stone
+  // START - bottom left gray stone (x=0, y=0)
   { x: 0, y: 0, type: 'gray', isRest: false },
   
-  // Sentence 1: 2x UP + 1x RIGHT + gray (repeat)
-  { x: 0, y: 1, type: 'green', isRest: false, sentenceIndex: 0, wordIndex: 0 },  // 1st word
-  { x: 0, y: 2, type: 'red', isRest: false, sentenceIndex: 0, wordIndex: 1 },    // 2nd word
-  { x: 1, y: 2, type: 'yellow', isRest: false, sentenceIndex: 0, wordIndex: 2 }, // 3rd word
+  // Sentence 1: UP (x=0,y=1), UP (x=0,y=2), RIGHT (x=1,y=2), GRAY (x=2,y=2)
+  { x: 0, y: 1, type: 'red', isRest: false, sentenceIndex: 0, wordIndex: 0 },    // 1st word
+  { x: 0, y: 2, type: 'yellow', isRest: false, sentenceIndex: 0, wordIndex: 1 }, // 2nd word
+  { x: 1, y: 2, type: 'green', isRest: false, sentenceIndex: 0, wordIndex: 2 },  // 3rd word
   { x: 2, y: 2, type: 'gray', isRest: true, sentenceIndex: 0 },                  // Repeat sentence 1
   
-  // Sentence 2: 3 stones RIGHT + gray
-  { x: 3, y: 2, type: 'green', isRest: false, sentenceIndex: 1, wordIndex: 0 },
-  { x: 4, y: 2, type: 'red', isRest: false, sentenceIndex: 1, wordIndex: 1 },
-  { x: 5, y: 2, type: 'yellow', isRest: false, sentenceIndex: 1, wordIndex: 2 },
-  { x: 5, y: 1, type: 'gray', isRest: true, sentenceIndex: 1 },                  // Repeat sentence 2
+  // Sentence 2: 3x RIGHT + GRAY
+  { x: 3, y: 2, type: 'red', isRest: false, sentenceIndex: 1, wordIndex: 0 },
+  { x: 4, y: 2, type: 'yellow', isRest: false, sentenceIndex: 1, wordIndex: 1 },
+  { x: 5, y: 2, type: 'green', isRest: false, sentenceIndex: 1, wordIndex: 2 },
+  { x: 6, y: 2, type: 'gray', isRest: true, sentenceIndex: 1 },                  // Repeat sentence 2
   
-  // Sentence 3: 2x DOWN + 1x LEFT + gray
-  { x: 5, y: 0, type: 'green', isRest: false, sentenceIndex: 2, wordIndex: 0 },
-  { x: 4, y: 0, type: 'red', isRest: false, sentenceIndex: 2, wordIndex: 1 },
-  { x: 3, y: 0, type: 'yellow', isRest: false, sentenceIndex: 2, wordIndex: 2 },
-  { x: 2, y: 0, type: 'gray', isRest: true, sentenceIndex: 2 },                  // Repeat sentence 3
+  // Sentence 3: DOWN (x=6,y=1), DOWN (x=6,y=0), LEFT (x=5,y=0), GRAY (x=4,y=0)
+  { x: 6, y: 1, type: 'red', isRest: false, sentenceIndex: 2, wordIndex: 0 },
+  { x: 6, y: 0, type: 'yellow', isRest: false, sentenceIndex: 2, wordIndex: 1 },
+  { x: 5, y: 0, type: 'green', isRest: false, sentenceIndex: 2, wordIndex: 2 },
+  { x: 4, y: 0, type: 'gray', isRest: true, sentenceIndex: 2 },                  // Repeat sentence 3
   
-  // Sentence 4: 2 stones LEFT + back to START (complete)
-  { x: 1, y: 0, type: 'green', isRest: false, sentenceIndex: 3, wordIndex: 0 },
-  // Last two words of sentence 4 happen when dragon returns to START
+  // Sentence 4: 3x LEFT back to START
+  { x: 3, y: 0, type: 'red', isRest: false, sentenceIndex: 3, wordIndex: 0 },
+  { x: 2, y: 0, type: 'yellow', isRest: false, sentenceIndex: 3, wordIndex: 1 },
+  { x: 1, y: 0, type: 'green', isRest: false, sentenceIndex: 3, wordIndex: 2 },
+  // Dragon returns to START (0,0) for final repeat of sentence 4
 ];
 
 // MOBILE: Keep original zigzag path
@@ -138,38 +141,57 @@ const STONE_POSITIONS_MOBILE: StonePosition[] = [
   { x: 0, y: 4, type: 'gray', isRest: true, sentenceIndex: 3 },  // GOAL
 ];
 
-// JumpButton component - elegant 3D button like dice in Smešne Povedi
+// JumpButton component - 3D button similar to dice in Smešne Povedi
 function JumpButton({ onClick, disabled }: { onClick: () => void; disabled: boolean }) {
   const [isHovered, setIsHovered] = useState(false);
-  
+
   return (
     <div 
-      className="relative cursor-pointer pointer-events-auto ml-4"
+      className={`cursor-pointer ${disabled ? 'pointer-events-none' : 'pointer-events-auto'}`}
       style={{ perspective: '600px' }}
       onClick={disabled ? undefined : onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <motion.div
-        className={`relative w-20 h-20 md:w-24 md:h-24 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-        animate={!disabled ? { 
-          scale: [1, 1.05, 1],
-          rotateY: isHovered ? 10 : 0,
-        } : {}}
-        transition={{ 
-          scale: { duration: 1.5, repeat: Infinity, ease: "easeInOut" },
-          rotateY: { duration: 0.3 }
+      {/* 3D Button Container - similar to dice cube styling */}
+      <div
+        className={`relative w-24 h-24 transition-transform ${!disabled ? 'animate-pulse' : ''} ${disabled ? 'opacity-50' : ''}`}
+        style={{
+          transformStyle: 'preserve-3d',
+          transform: isHovered && !disabled ? 'rotateY(10deg) rotateX(-5deg)' : 'rotateY(0deg) rotateX(0deg)',
+          transitionDuration: '300ms',
         }}
       >
-        {/* Elegant rounded button with dragon */}
-        <div className="w-full h-full rounded-2xl bg-gradient-to-br from-dragon-green to-green-600 shadow-xl border-4 border-white flex items-center justify-center">
+        {/* Front face - main button */}
+        <div 
+          className="absolute w-24 h-24 bg-gradient-to-br from-dragon-green to-green-600 rounded-xl border-4 border-white shadow-2xl flex items-center justify-center"
+          style={{ transform: 'translateZ(12px)' }}
+        >
           <img 
             src={JUMP_DRAGON_IMAGE}
             alt="Skok"
-            className="w-14 h-14 md:w-16 md:h-16 object-contain drop-shadow-md"
+            className="w-16 h-16 object-contain drop-shadow-md"
           />
         </div>
-      </motion.div>
+        
+        {/* Back face - shadow */}
+        <div 
+          className="absolute w-24 h-24 bg-green-800 rounded-xl"
+          style={{ transform: 'translateZ(-4px)' }}
+        />
+        
+        {/* Right edge for 3D effect */}
+        <div 
+          className="absolute top-1 right-0 w-3 h-[calc(100%-8px)] bg-gradient-to-r from-green-600 to-green-700 rounded-r-xl"
+          style={{ transform: 'translateZ(4px)' }}
+        />
+        
+        {/* Bottom edge for 3D effect */}
+        <div 
+          className="absolute bottom-0 left-1 w-[calc(100%-8px)] h-3 bg-gradient-to-b from-green-600 to-green-700 rounded-b-xl"
+          style={{ transform: 'translateZ(4px)' }}
+        />
+      </div>
     </div>
   );
 }
@@ -213,21 +235,21 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       return null;
     }
     
-    // DESKTOP: Rectangular path layout (6 columns x 3 rows)
+    // DESKTOP: Rectangular path layout (7 columns x 3 rows)
     if (!isMobile) {
-      const stoneWidth = 100;
-      const stoneHeight = 75;
-      const gapX = 120;
-      const gapY = 120;
-      const dragonSize = 100;
+      const stoneWidth = 80;    // Smaller stones for 7 columns
+      const stoneHeight = 60;
+      const gapX = 95;          // Smaller gap for 7 columns
+      const gapY = 120;         // Larger vertical gap for 3 rows
+      const dragonSize = 85;
       
-      // 6 columns (x: 0-5), 3 rows (y: 0-2)
-      const gridWidth = 5 * gapX + stoneWidth;
+      // 7 columns (x: 0-6), 3 rows (y: 0-2)
+      const gridWidth = 6 * gapX + stoneWidth;
       const gridHeight = 2 * gapY + stoneHeight;
       
-      // Center the grid, push down for word cards above
+      // Center the grid
       const offsetX = (containerSize.width - gridWidth) / 2;
-      const offsetY = 80; // Lower offset - more space for cards above
+      const offsetY = 60;
       
       return {
         stoneWidth,
@@ -236,7 +258,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
         gapY,
         dragonSize,
         offsetX: Math.max(offsetX, 20),
-        offsetY: Math.max(offsetY, 60),
+        offsetY: Math.max(offsetY, 50),
       };
     }
     
@@ -303,23 +325,23 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     const stone = STONE_POSITIONS[dragonPosition];
     if (!stone) return DRAGON_RIGHT;
     
-    // DESKTOP: Rectangular path logic
+    // DESKTOP: Rectangular path logic with 7 columns
     if (!isMobile) {
       // Left side (x=0): moving UP → facing right
       if (stone.x === 0) return DRAGON_RIGHT;
       
-      // Top row (y=2): first half moving right, second half moving down
-      if (stone.y === 2 && stone.x <= 2) return DRAGON_RIGHT;
-      if (stone.y === 2 && stone.x >= 3) return DRAGON_LEFT;
+      // Top row (y=2): first half moving right (x <= 3), second half (x >= 4) → facing left
+      if (stone.y === 2 && stone.x <= 3) return DRAGON_RIGHT;
+      if (stone.y === 2 && stone.x >= 4) return DRAGON_LEFT;
       
-      // Right side (x=5): moving DOWN → facing left
-      if (stone.x === 5) return DRAGON_LEFT;
+      // Right side (x=6): moving DOWN → facing left
+      if (stone.x === 6) return DRAGON_LEFT;
       
-      // Bottom row (y=0): moving LEFT → facing left
+      // Bottom row (y=0): moving LEFT → facing left (except START)
       if (stone.y === 0 && dragonPosition > 0) return DRAGON_LEFT;
       
-      // Middle right (y=1, x=5): facing left
-      if (stone.y === 1 && stone.x === 5) return DRAGON_LEFT;
+      // Middle right (y=1, x=6): facing left
+      if (stone.y === 1 && stone.x === 6) return DRAGON_LEFT;
       
       return DRAGON_RIGHT;
     }
@@ -611,42 +633,42 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
         </DropdownMenu>
       </div>
       
-      {/* DESKTOP: Word cards in CENTER with jump button to the right */}
+      {/* DESKTOP: Word cards + Jump button in CENTER of the screen */}
       {!isMobile && (
-        <div className="fixed top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none">
-          <div className="flex items-center justify-center">
-            {/* Word cards container */}
-            <div className={`bg-sky-100/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg transition-all duration-300 ${collectedWords.length > 0 ? 'min-w-[300px]' : 'min-w-[200px]'}`}>
-              <div className="flex justify-center gap-4 min-h-[100px] items-center">
-                {collectedWords.length === 0 && (
-                  <p className="text-gray-500 text-sm font-medium">Zbrane besede...</p>
-                )}
-                <AnimatePresence>
-                  {collectedWords.map((word, idx) => (
-                    <motion.div
-                      key={`${word.word}-${idx}`}
-                      initial={{ opacity: 0, scale: 0.5, y: -20 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.5 }}
-                      className="flex flex-col items-center"
-                    >
-                      <div className="w-20 h-20 rounded-xl bg-white shadow-md flex items-center justify-center p-2">
-                        <img
-                          src={getImageUrl(word.image)}
-                          alt={word.word}
-                          className="w-16 h-16 object-contain"
-                        />
-                      </div>
-                      <p className="text-sm font-bold text-gray-800 mt-2 uppercase">
-                        {word.word}
-                      </p>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </div>
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
+          <div className="flex items-center gap-4">
+            {/* Fixed size word container - always same size */}
+            <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border-2 border-dragon-green/30 w-[360px] h-[140px] flex items-center justify-center p-4">
+              {collectedWords.length === 0 ? (
+                <p className="text-gray-400 text-sm font-medium italic">Pritisni gumb za skok...</p>
+              ) : (
+                <div className="flex gap-4 items-center justify-center">
+                  <AnimatePresence>
+                    {collectedWords.map((word, idx) => (
+                      <motion.div
+                        key={`${word.word}-${idx}`}
+                        initial={{ opacity: 0, scale: 0.5 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex flex-col items-center"
+                      >
+                        <div className="w-20 h-20 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center p-2">
+                          <img
+                            src={getImageUrl(word.image)}
+                            alt={word.word}
+                            className="w-16 h-16 object-contain"
+                          />
+                        </div>
+                        <p className="text-sm font-bold text-gray-800 mt-1 uppercase">
+                          {word.word}
+                        </p>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              )}
             </div>
             
-            {/* Jump button - RIGHT of word cards */}
+            {/* 3D Jump button - right of word cards */}
             <JumpButton 
               onClick={handleNext} 
               disabled={isJumping || phase === "complete" || showSentenceDialog} 
