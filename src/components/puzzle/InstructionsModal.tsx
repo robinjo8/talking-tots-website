@@ -58,15 +58,24 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
       ]
     : type === "bingo"
     ? [
-        { text: "Zavrti kolut – Pritisni oranžni gumb ZAVRTI, da zavrtiš kolut z besedami." },
-        { text: "Počakaj na rezultat – Kolut se bo zavrtel in se ustavil na naključni sliki. Med vrtenjem se sliši zvok tikanja." },
-        { text: "Najdi sliko na mreži (4 × 4) – Ko se kolut ustavi, poišči na mreži vse slike, ki ustrezajo izbrani besedi. Pod kolutom je zapisano: Najdi: [BESEDA]." },
-        { text: "Klikni na pravilne slike – Klikni na vse slike, ki prikazujejo izbrano besedo. Ista beseda se lahko pojavi na več mestih." },
-        { text: "Ponovi besedo – Ko najdeš vse pravilne slike, se odpre okno. Klikni na sliko, začne se 3-sekundno imitirano snemanje, in glasno ponovi besedo. Igra se nadaljuje, dokler ne dokončaš celotne vrstice ali stolpca (4 slike v vrsti)." },
-        { text: "BINGO – Ko dosežeš BINGO, se prikaže čestitka. Klikni VZEMI ZVEZDICO, da se nagrada zabeleži." },
-        { text: "Namig – Če besede ne najdeš v 10 sekundah, pravilne slike začnejo utripati." },
-        { text: "Nova igra / izhod – Po osvojeni zvezdici se pojavi moder gumb za novo igro (levo spodaj). S klikom na gumb Hiška se vrnete v meni." },
-        { text: "Cilj igre: Vaditi izgovorjavo posamezne črke (na primer C, Č, K) na sredini in na koncu besed s pomočjo igre Bingo in zbiranja zvezdic." }
+        { text: "Zavrti kolut", bold: true },
+        { text: "Pritisni oranžni gumb ZAVRTI, da zavrtiš kolut z besedami." },
+        { text: "Počakaj na rezultat", bold: true },
+        { text: "Kolut se bo zavrtel in se ustavil na naključni sliki. Med vrtenjem se sliši zvok tikanja." },
+        { text: "Najdi sliko na mreži (4 × 4)", bold: true },
+        { text: "Ko se kolut ustavi, poišči na mreži vse slike, ki ustrezajo izbrani besedi. Pod kolutom je zapisano: Najdi: [BESEDA]." },
+        { text: "Klikni na pravilne slike", bold: true },
+        { text: "Klikni na vse slike, ki prikazujejo izbrano besedo. Ista beseda se lahko pojavi na več mestih." },
+        { text: "Ponovi besedo", bold: true },
+        { text: "Ko najdeš vse pravilne slike, se odpre okno. Klikni na sliko, začne se 3-sekundno imitirano snemanje, in glasno ponovi besedo. Igra se nadaljuje, dokler ne dokončaš celotne vrstice ali stolpca (4 slike v vrsti)." },
+        { text: "BINGO", bold: true },
+        { text: "Ko dosežeš BINGO, se prikaže čestitka. Klikni VZEMI ZVEZDICO, da se nagrada zabeleži." },
+        { text: "Namig", bold: true },
+        { text: "Če besede ne najdeš v 10 sekundah, pravilne slike začnejo utripati." },
+        { text: "Nova igra / izhod", bold: true },
+        { text: "Po osvojeni zvezdici se pojavi moder gumb za novo igro (levo spodaj). S klikom na gumb Hiška se vrnete v meni." },
+        { text: "Cilj igre", bold: true },
+        { text: "Vaditi izgovorjavo posamezne črke (na primer C, Č, K) na sredini in na koncu besed s pomočjo igre Bingo in zbiranja zvezdic." }
       ]
     : type === "dice"
     ? [
