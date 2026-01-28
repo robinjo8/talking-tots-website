@@ -1,87 +1,66 @@
 
-# Načrt: Popravek mobilne postavitve - pravilno centriranje in raztegnitev
 
-## Natančna analiza težav na sliki
+# Načrt: Popravek mobilne postavitve - 4 konkretne spremembe
 
-### Težava 1: Vertikalni razmak je PREMAJHEN
-Kamni so stisnjeni v spodnjo polovico zaslona. Razlog:
-- `stoneHeight` je omejen na max 58px
-- 8 kamnov × 58px = 464px
-- Če je zaslon visok 700px, ostane samo ~50px za 7 razmakov = ~7px na razmak
+## Tvoje zahteve
 
-**Popravek:** Odstraniti omejitev `stoneHeight` in pustiti, da se kamni raztegnejo čez celotno razpoložljivo višino.
-
-### Težava 2: Horizontalna ASIMETRIJA
-Levi stolpec je bližje levemu robu kot desni stolpec desnemu.
-
-**Problem v kodi:**
-```typescript
-// Levi stolpec uporablja: offsetX = edgeMargin + stoneWidth/2
-// Desni stolpec uporablja: containerSize.width - 25 - stoneWidth/2
-// NAPAKA: "25" je hardkodirano namesto da bi uporabil edgeMargin!
-```
-
-**Popravek:** Uporabiti isto `edgeMargin` vrednost za obe strani.
+1. **Igra bolj na sredini zaslona** - vertikalno centriranje
+2. **Kamni se začnejo nad gumbom** - spodnji kamni tik nad gumbom
+3. **Simetrično od leve in desne** - enako `edgeMargin` na obeh straneh
+4. **Razmak med kamni v višino = 30px** - fiksna vrednost namesto dinamične
 
 ---
 
-## Popravki v calculatedSizes
+## Trenutno stanje vs. zahteve
+
+| Element | Trenutno | Zahtevano |
+|---------|----------|-----------|
+| `gapY` | Dinamičen (~14-20px) | Fiksnih **30px** |
+| Vertikalno | Stisnjen spodaj | **Centrirano** |
+| Horizontalno | edgeMargin = 35px obojestransko | Ostane enako (OK) |
+| Začetek | `offsetY = bottomButtonSpace` (100px) | **Nad gumbom** |
+
+---
+
+## Popravki v `calculatedSizes`
 
 ```typescript
 // MOBILE: U-shaped layout (3 columns x 8 rows)
 const rows = 8;
 
-// Calculate available space
-const topCardHeight = 100;
-const bottomButtonSpace = 100;
+// ZAHTEVA 4: Fiksni razmak med kamni v višino
+const gapY = 30; // FIKSNO 30px
+
+// Izračunaj velikost kamnov glede na razpoložljiv prostor
+// Celotna višina grida = 8 kamnov + 7 razmakov (7 × 30px = 210px)
+const bottomButtonSpace = 110; // Prostor za gumb
+const topCardHeight = 100; // Prostor za kartice besed
 const availableHeight = containerSize.height - topCardHeight - bottomButtonSpace;
-const availableWidth = containerSize.width;
 
-// POPRAVEK 1: Večji razmak od robov za simetrijo
-const edgeMargin = 35; // Večji margin od robov
-
-// POPRAVEK 2: Kamni se raztegnejo čez celotno višino
-// Najprej izračunaj razpoložljiv prostor, nato velikost kamnov
-const maxStoneHeight = Math.floor(availableHeight / (rows + 2)); // Manjši kamni = več prostora za gapY
-const stoneHeight = Math.min(maxStoneHeight, 50);
+// Višina kamnov se izračuna iz preostalega prostora
+// totalGridHeight = stoneHeight × 8 + gapY × 7
+// totalGridHeight = stoneHeight × 8 + 210
+// Želimo da je grid centriran, torej:
+const totalGapsHeight = gapY * (rows - 1); // 7 × 30 = 210px
+const remainingForStones = availableHeight - totalGapsHeight;
+const stoneHeight = Math.floor(remainingForStones / rows);
 const stoneWidth = Math.floor(stoneHeight * 1.4);
 
-// POPRAVEK 3: gapY se izračuna tako da zapolni celotno višino
-const totalStonesHeight = stoneHeight * rows;
-const gapY = Math.floor((availableHeight - totalStonesHeight) / (rows - 1));
+// Celotna višina grida
+const totalGridHeight = stoneHeight * rows + totalGapsHeight;
 
-// POPRAVEK 4: Simetrična horizontalna postavitev
+// ZAHTEVA 1 & 2: Vertikalno centriranje + začetek nad gumbom
+// offsetY = prostor od spodaj do prvega kamna
+const verticalPadding = (availableHeight - totalGridHeight) / 2;
+const offsetY = bottomButtonSpace + verticalPadding;
+
+// ZAHTEVA 3: Simetrično od leve in desne (že OK)
+const edgeMargin = 35;
 const leftColumnCenter = edgeMargin + stoneWidth / 2;
-const rightColumnCenter = availableWidth - edgeMargin - stoneWidth / 2;
-const centerColumnCenter = availableWidth / 2;
-const gapX = (rightColumnCenter - leftColumnCenter) / 2;
+const rightColumnCenter = containerSize.width - edgeMargin - stoneWidth / 2;
+const centerColumnCenter = containerSize.width / 2;
 
 const dragonSize = Math.floor(stoneWidth * 1.2);
-
-// Shrani vse tri pozicije stolpcev za uporabo v getStonePixelPosition
-const columnCenters = [leftColumnCenter, centerColumnCenter, rightColumnCenter];
-
-// Vertical offset - začni nad gumbom
-const offsetY = bottomButtonSpace;
-```
-
----
-
-## Popravki v getStonePixelPosition
-
-```typescript
-// MOBILE: Uporabi izračunane pozicije stolpcev
-// Ne več hardkodirane vrednosti!
-const columnCenters = [
-  edgeMargin + stoneWidth / 2,  // Levi stolpec
-  containerSize.width / 2,       // Srednji stolpec
-  containerSize.width - edgeMargin - stoneWidth / 2,  // Desni stolpec (POPRAVEK!)
-];
-
-return {
-  left: columnCenters[stone.x] - stoneWidth / 2,
-  bottom: offsetY + stone.y * gapY,
-};
 ```
 
 ---
@@ -94,47 +73,50 @@ return {
 |     |   Zbrane besede...    |   |  ← topCardHeight (100px)
 |     +------------------------+   |
 |                                  |
+|         ↑ verticalPadding ↑      |  ← CENTRIRANJE
+|                                  |
 |    [RUMEN]   [SIV]   [RUMEN]    |  ← y=7 (zgornji 3)
-|          ↑ gapY ↑                |
+|              ↑ 30px ↑            |
 |    [RDEČ]           [RDEČ]      |  ← y=6
-|          ↑ gapY ↑                |
+|              ↑ 30px ↑            |
 |    [SIV]             [SIV]      |  ← y=5
-|          ↑ gapY ↑                |
+|              ↑ 30px ↑            |
 |    [ZELEN]         [ZELEN]      |  ← y=4
-|          ↑ gapY ↑                |
+|              ↑ 30px ↑            |
 |    [RUMEN]         [RUMEN]      |  ← y=3
-|          ↑ gapY ↑                |
+|              ↑ 30px ↑            |
 |    [RDEČ]           [RDEČ]      |  ← y=2
-|          ↑ gapY ↑                |
+|              ↑ 30px ↑            |
 |    [SIV]             [SIV]      |  ← y=1
-|          ↑ gapY ↑                |
+|              ↑ 30px ↑            |
 | 🐉 [SIV]   [ZELEN]   [SIV]      |  ← y=0 (spodnji 3)
-|  ↑                         ↑     |
-|  edgeMargin=35    edgeMargin=35 |  ← SIMETRIČNO!
+|                                  |
+|         ↓ verticalPadding ↓      |  ← CENTRIRANJE
+|                                  |
 |           +------+               |
-|           |  ↑   |               |  ← bottomButtonSpace (100px)
+|           |  ↑   |               |  ← Gumb (bottomButtonSpace)
 |           +------+               |
 | [HOME]                           |
 +----------------------------------+
+     ↑                        ↑
+  edgeMargin=35         edgeMargin=35
 ```
 
 ---
 
 ## Tehnični povzetek sprememb
 
-| Lokacija | Trenutno | Popravek |
-|----------|----------|----------|
-| `edgeMargin` | 25px | 35px (več prostora od robov) |
-| `stoneHeight` max | 58px | 50px (manjši kamni = večji gapY) |
-| Desni stolpec | Hardkodirano `25` | Uporabi `edgeMargin` |
-| `gapY` formula | Pravilna | Ostane enako, bo deloval z manjšimi kamni |
-| `dragonSize` | 110% | 120% za boljšo vidljivost |
+| Sprememba | Vrednost |
+|-----------|----------|
+| `gapY` | Fiksnih **30px** (namesto dinamičen) |
+| `stoneHeight` | Izračunan iz preostalega prostora |
+| `offsetY` | `bottomButtonSpace + verticalPadding` (CENTRIRANJE) |
+| `edgeMargin` | 35px (enako na obeh straneh - že OK) |
+| `dragonSize` | 120% velikosti kamna |
 
 ---
 
-## Ključne točke
+## Datoteka za spremembo
 
-1. **Simetrija** - Obe strani uporabljata isto `edgeMargin` vrednost
-2. **Vertikalna raztegnitev** - Manjši kamni = več prostora za gapY = raztegnitev navzgor
-3. **Večji zmajček** - 120% velikosti kamna za boljšo vidljivost
-4. **Konsistentna logika** - Ni več hardkodiranih vrednosti za pozicioniranje
+`src/components/games/PonoviPovedGame.tsx` - samo `calculatedSizes` useMemo hook (vrstice ~313-360)
+
