@@ -1011,30 +1011,66 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       </AlertDialog>
       
       {/* Success dialog */}
-      <AlertDialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-center text-2xl">🎉 ČESTITKE! 🎉</AlertDialogTitle>
-            <AlertDialogDescription className="text-center text-lg">
-              Odlično si ponovil vse povedi! Zaslužil si zvezdico! ⭐
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex-col gap-2 sm:flex-col">
-            <AlertDialogAction
-              className="w-full bg-dragon-green text-white hover:bg-dragon-green/90"
-              onClick={handleReset}
-            >
-              🔄 Igraj znova
-            </AlertDialogAction>
-            <AlertDialogAction
-              className="w-full bg-app-orange text-white hover:bg-app-orange/90"
-              onClick={() => navigate("/govorne-igre/ponovi-poved")}
-            >
-              🏠 Nazaj na izbiro
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Dialog open={showSuccessDialog} onOpenChange={() => {}}>
+        <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
+          <div className="space-y-6 py-6 flex flex-col items-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-dragon-green text-center uppercase">
+              ČESTITKE!
+            </h1>
+            
+            <p className="text-center text-base md:text-lg uppercase font-medium">
+              Odlično si ponovil vse povedi!
+            </p>
+            
+            <img
+              src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_zvezdica.webp"
+              alt="Zmajček z zvezdico"
+              className="w-40 h-40 md:w-48 md:h-48 object-contain"
+            />
+            
+            <div className="flex gap-3 w-full justify-center">
+              <Button
+                onClick={() => {
+                  setShowSuccessDialog(false);
+                  navigate("/govorne-igre/ponovi-poved");
+                }}
+                variant="outline"
+                className="uppercase font-bold px-6"
+              >
+                Zapri
+              </Button>
+              
+              <Button
+                onClick={async () => {
+                  // Save star to database
+                  if (selectedChild?.id) {
+                    try {
+                      await supabase.from("progress").insert({
+                        child_id: selectedChild.id,
+                        exercise_id: "00000000-0000-0000-0000-000000000000",
+                        activity_type: "exercise",
+                        activity_subtype: `ponovi-poved-${config.letter}`,
+                        score: 100,
+                        correct_answers: 4,
+                        total_questions: 4,
+                        duration: 0,
+                        stars_earned: 1,
+                      });
+                    } catch (error) {
+                      console.error("Error saving star:", error);
+                    }
+                  }
+                  setShowSuccessDialog(false);
+                  navigate("/govorne-igre/ponovi-poved");
+                }}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 uppercase font-bold px-6"
+              >
+                ⭐ Vzemi zvezdico
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
