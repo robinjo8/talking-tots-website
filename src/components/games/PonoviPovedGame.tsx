@@ -44,7 +44,7 @@ interface PonoviPovedGameProps {
 // Background from ozadja bucket
 const BACKGROUND_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/svetlomodro_ozadje.webp";
 
-// NEW: Stone images with transparent backgrounds (-Photoroom.png)
+// Stone images with transparent backgrounds
 const STONE_IMAGES = {
   gray: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/kamen_siv-Photoroom.png",
   yellow: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/kamen_rumen-Photoroom.png",
@@ -52,15 +52,14 @@ const STONE_IMAGES = {
   green: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/kamen_zelen-Photoroom.png",
 };
 
-// Dragon images
-const DRAGON_RIGHT = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_4.png";
+// Dragon images - right and left facing
+const DRAGON_RIGHT = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_4.webp";
 const DRAGON_LEFT = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_4_1.png";
 
-// Jump button image from slike-ostalo bucket
-const JUMP_BUTTON_IMAGE = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/gumb_modri.png";
+// Jump button dragon image
+const JUMP_DRAGON_IMAGE = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_111.PNG";
 
-// Stone positions in zigzag grid (x: column 0-3, y: row 0-4 from bottom)
-// 17 stones total: START + 4 sentences (4 stones each) - NO extra top goal stone
+// Stone positions in grid
 type StoneType = 'gray' | 'yellow' | 'red' | 'green';
 interface StonePosition {
   x: number;
@@ -71,36 +70,109 @@ interface StonePosition {
   wordIndex?: number;
 }
 
-// Build the zigzag path: 17 positions total (removed extra top stone)
-// Desktop version: START stone is at x: -1, y: 1 (left of first green stone)
-const STONE_POSITIONS: StonePosition[] = [
-  // Row 1: START (gray) - positioned LEFT of first green stone for desktop
-  { x: -1, y: 1, type: 'gray', isRest: false },
+// ============================================================================
+// DESKTOP: Rectangular path (16 steps in a loop)
+// Path: START (bottom-left gray) → 2x UP → 6x RIGHT → 2x DOWN → 6x LEFT → back to START
+// 
+//      [SIV] [ZEL] [RDEC] [RUM] [SIV] [ZEL]  ← top row (y=2)
+//        ↑                               ↓
+//      [ZEL]                           [RDEC] ← middle (y=1)
+//        ↑                               ↓
+//   🐉 [SIV] [ZEL] [RDEC] [RUM] [SIV] [ZEL]  ← bottom row (y=0)
+//      START                            
+// ============================================================================
+const STONE_POSITIONS_DESKTOP: StonePosition[] = [
+  // START - bottom left gray stone
+  { x: 0, y: 0, type: 'gray', isRest: false },
   
-  // Row 1: Sentence 1 - moving RIGHT (green, red, yellow, gray rest)
-  { x: 0, y: 1, type: 'green', isRest: false, sentenceIndex: 0, wordIndex: 0 },
-  { x: 1, y: 1, type: 'red', isRest: false, sentenceIndex: 0, wordIndex: 1 },
-  { x: 2, y: 1, type: 'yellow', isRest: false, sentenceIndex: 0, wordIndex: 2 },
+  // Sentence 1: 2x UP + 1x RIGHT + gray (repeat)
+  { x: 0, y: 1, type: 'green', isRest: false, sentenceIndex: 0, wordIndex: 0 },  // 1st word
+  { x: 0, y: 2, type: 'red', isRest: false, sentenceIndex: 0, wordIndex: 1 },    // 2nd word
+  { x: 1, y: 2, type: 'yellow', isRest: false, sentenceIndex: 0, wordIndex: 2 }, // 3rd word
+  { x: 2, y: 2, type: 'gray', isRest: true, sentenceIndex: 0 },                  // Repeat sentence 1
+  
+  // Sentence 2: 3 stones RIGHT + gray
+  { x: 3, y: 2, type: 'green', isRest: false, sentenceIndex: 1, wordIndex: 0 },
+  { x: 4, y: 2, type: 'red', isRest: false, sentenceIndex: 1, wordIndex: 1 },
+  { x: 5, y: 2, type: 'yellow', isRest: false, sentenceIndex: 1, wordIndex: 2 },
+  { x: 5, y: 1, type: 'gray', isRest: true, sentenceIndex: 1 },                  // Repeat sentence 2
+  
+  // Sentence 3: 2x DOWN + 1x LEFT + gray
+  { x: 5, y: 0, type: 'green', isRest: false, sentenceIndex: 2, wordIndex: 0 },
+  { x: 4, y: 0, type: 'red', isRest: false, sentenceIndex: 2, wordIndex: 1 },
+  { x: 3, y: 0, type: 'yellow', isRest: false, sentenceIndex: 2, wordIndex: 2 },
+  { x: 2, y: 0, type: 'gray', isRest: true, sentenceIndex: 2 },                  // Repeat sentence 3
+  
+  // Sentence 4: 2 stones LEFT + back to START (complete)
+  { x: 1, y: 0, type: 'green', isRest: false, sentenceIndex: 3, wordIndex: 0 },
+  // Last two words of sentence 4 happen when dragon returns to START
+];
+
+// MOBILE: Keep original zigzag path
+const STONE_POSITIONS_MOBILE: StonePosition[] = [
+  // Row 1: START (gray)
+  { x: 0, y: 0, type: 'gray', isRest: false },
+  
+  // Row 1: Sentence 1 - moving RIGHT
+  { x: 1, y: 0, type: 'green', isRest: false, sentenceIndex: 0, wordIndex: 0 },
+  { x: 2, y: 0, type: 'red', isRest: false, sentenceIndex: 0, wordIndex: 1 },
+  { x: 3, y: 0, type: 'yellow', isRest: false, sentenceIndex: 0, wordIndex: 2 },
   { x: 3, y: 1, type: 'gray', isRest: true, sentenceIndex: 0 },
   
-  // Row 2: Sentence 2 - moving LEFT (start from right, gray rest on left)
-  { x: 3, y: 2, type: 'yellow', isRest: false, sentenceIndex: 1, wordIndex: 0 },
-  { x: 2, y: 2, type: 'red', isRest: false, sentenceIndex: 1, wordIndex: 1 },
-  { x: 1, y: 2, type: 'green', isRest: false, sentenceIndex: 1, wordIndex: 2 },
+  // Row 2: Sentence 2 - moving LEFT
+  { x: 2, y: 1, type: 'green', isRest: false, sentenceIndex: 1, wordIndex: 0 },
+  { x: 1, y: 1, type: 'red', isRest: false, sentenceIndex: 1, wordIndex: 1 },
+  { x: 0, y: 1, type: 'yellow', isRest: false, sentenceIndex: 1, wordIndex: 2 },
   { x: 0, y: 2, type: 'gray', isRest: true, sentenceIndex: 1 },
   
   // Row 3: Sentence 3 - moving RIGHT
-  { x: 0, y: 3, type: 'green', isRest: false, sentenceIndex: 2, wordIndex: 0 },
-  { x: 1, y: 3, type: 'red', isRest: false, sentenceIndex: 2, wordIndex: 1 },
-  { x: 2, y: 3, type: 'yellow', isRest: false, sentenceIndex: 2, wordIndex: 2 },
+  { x: 1, y: 2, type: 'green', isRest: false, sentenceIndex: 2, wordIndex: 0 },
+  { x: 2, y: 2, type: 'red', isRest: false, sentenceIndex: 2, wordIndex: 1 },
+  { x: 3, y: 2, type: 'yellow', isRest: false, sentenceIndex: 2, wordIndex: 2 },
   { x: 3, y: 3, type: 'gray', isRest: true, sentenceIndex: 2 },
   
-  // Row 4: Sentence 4 - moving LEFT - GOAL is on last gray stone
-  { x: 3, y: 4, type: 'yellow', isRest: false, sentenceIndex: 3, wordIndex: 0 },
-  { x: 2, y: 4, type: 'red', isRest: false, sentenceIndex: 3, wordIndex: 1 },
-  { x: 1, y: 4, type: 'green', isRest: false, sentenceIndex: 3, wordIndex: 2 },
+  // Row 4: Sentence 4 - moving LEFT - GOAL
+  { x: 2, y: 3, type: 'green', isRest: false, sentenceIndex: 3, wordIndex: 0 },
+  { x: 1, y: 3, type: 'red', isRest: false, sentenceIndex: 3, wordIndex: 1 },
+  { x: 0, y: 3, type: 'yellow', isRest: false, sentenceIndex: 3, wordIndex: 2 },
   { x: 0, y: 4, type: 'gray', isRest: true, sentenceIndex: 3 },  // GOAL
 ];
+
+// JumpButton component - elegant 3D button like dice in Smešne Povedi
+function JumpButton({ onClick, disabled }: { onClick: () => void; disabled: boolean }) {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  return (
+    <div 
+      className="relative cursor-pointer pointer-events-auto ml-4"
+      style={{ perspective: '600px' }}
+      onClick={disabled ? undefined : onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <motion.div
+        className={`relative w-20 h-20 md:w-24 md:h-24 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+        animate={!disabled ? { 
+          scale: [1, 1.05, 1],
+          rotateY: isHovered ? 10 : 0,
+        } : {}}
+        transition={{ 
+          scale: { duration: 1.5, repeat: Infinity, ease: "easeInOut" },
+          rotateY: { duration: 0.3 }
+        }}
+      >
+        {/* Elegant rounded button with dragon */}
+        <div className="w-full h-full rounded-2xl bg-gradient-to-br from-dragon-green to-green-600 shadow-xl border-4 border-white flex items-center justify-center">
+          <img 
+            src={JUMP_DRAGON_IMAGE}
+            alt="Skok"
+            className="w-14 h-14 md:w-16 md:h-16 object-contain drop-shadow-md"
+          />
+        </div>
+      </motion.div>
+    </div>
+  );
+}
 
 export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
   const navigate = useNavigate();
@@ -109,7 +181,10 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
   const completionCalledRef = useRef(false);
   const isMobile = useIsMobile();
   
-  // Dynamic window size measurement (like MemoryGrid)
+  // Select positions based on device
+  const STONE_POSITIONS = isMobile ? STONE_POSITIONS_MOBILE : STONE_POSITIONS_DESKTOP;
+  
+  // Dynamic window size measurement
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
   
   useEffect(() => {
@@ -132,28 +207,27 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     };
   }, []);
   
-  // Calculate dynamic sizes based on screen - DESKTOP IS 2X BIGGER
+  // Calculate dynamic sizes based on screen
   const calculatedSizes = useMemo(() => {
     if (containerSize.width === 0 || containerSize.height === 0) {
       return null;
     }
     
-    // DESKTOP: Pomanjšane velikosti - da se kartice besed prikazujejo nad igro brez prekrivanja
+    // DESKTOP: Rectangular path layout (6 columns x 3 rows)
     if (!isMobile) {
-      const stoneWidth = 120;   // Pomanjšano iz 140
-      const stoneHeight = 90;   // Pomanjšano iz 105
-      const gapX = 150;         // Pomanjšano iz 175
-      const gapY = 130;         // Pomanjšano iz 155
-      const dragonSize = 110;   // Pomanjšano iz 130
+      const stoneWidth = 100;
+      const stoneHeight = 75;
+      const gapX = 120;
+      const gapY = 120;
+      const dragonSize = 100;
       
-      // Grid zavzema manj prostora - več prostora za kartice zgoraj
-      // 4 stolpcev (vključno z START na x: -1)
-      const gridWidth = 4 * gapX + stoneWidth;
-      const gridHeight = 4 * gapY + stoneHeight;
+      // 6 columns (x: 0-5), 3 rows (y: 0-2)
+      const gridWidth = 5 * gapX + stoneWidth;
+      const gridHeight = 2 * gapY + stoneHeight;
       
-      // Zamik za START kamen na x: -1 (dodamo gapX da centriramo)
-      const offsetX = (containerSize.width - gridWidth) / 2 + gapX;
-      const offsetY = 100; // Nižji offset - igra je bolj spodaj
+      // Center the grid, push down for word cards above
+      const offsetX = (containerSize.width - gridWidth) / 2;
+      const offsetY = 80; // Lower offset - more space for cards above
       
       return {
         stoneWidth,
@@ -172,7 +246,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     const PADDING = 40;
     
     const availableWidth = containerSize.width - PADDING;
-    const availableHeight = containerSize.height - PADDING - 200; // Space for controls
+    const availableHeight = containerSize.height - PADDING - 200;
     
     const sizeByWidth = Math.floor(availableWidth / columns / 1.3);
     const sizeByHeight = Math.floor(availableHeight / rows / 1.35);
@@ -183,7 +257,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     const gapY = Math.floor(stoneHeight * 1.35);
     const dragonSize = Math.floor(stoneWidth * 0.9);
     const offsetX = Math.floor((containerSize.width - (columns - 1) * gapX - stoneWidth) / 2);
-    const offsetY = Math.floor(stoneHeight * 0.5) + 80; // Account for bottom controls
+    const offsetY = Math.floor(stoneHeight * 0.5) + 80;
     
     return {
       stoneWidth,
@@ -197,13 +271,13 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
   }, [containerSize, isMobile]);
   
   // Use calculated sizes or fallback
-  const stoneWidth = calculatedSizes?.stoneWidth ?? (isMobile ? 80 : 200);
-  const stoneHeight = calculatedSizes?.stoneHeight ?? (isMobile ? 60 : 150);
-  const gapX = calculatedSizes?.gapX ?? (isMobile ? 90 : 250);
-  const gapY = calculatedSizes?.gapY ?? (isMobile ? 75 : 200);
-  const dragonSize = calculatedSizes?.dragonSize ?? (isMobile ? 80 : 180);
+  const stoneWidth = calculatedSizes?.stoneWidth ?? (isMobile ? 80 : 100);
+  const stoneHeight = calculatedSizes?.stoneHeight ?? (isMobile ? 60 : 75);
+  const gapX = calculatedSizes?.gapX ?? (isMobile ? 90 : 120);
+  const gapY = calculatedSizes?.gapY ?? (isMobile ? 75 : 120);
+  const dragonSize = calculatedSizes?.dragonSize ?? (isMobile ? 80 : 100);
   const offsetX = calculatedSizes?.offsetX ?? (isMobile ? 30 : 100);
-  const offsetY = calculatedSizes?.offsetY ?? (isMobile ? 100 : 180);
+  const offsetY = calculatedSizes?.offsetY ?? (isMobile ? 100 : 80);
   
   // Game state
   const [phase, setPhase] = useState<GamePhase>("start");
@@ -217,47 +291,59 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
   const [countdown, setCountdown] = useState(3);
   const [collectedWords, setCollectedWords] = useState<SentenceWord[]>([]);
   const [startTime] = useState(Date.now());
+  const [currentSentenceForDialog, setCurrentSentenceForDialog] = useState(0);
 
   // Get current stone info
   const currentStone = STONE_POSITIONS[dragonPosition];
   const currentSentenceIndex = currentStone?.sentenceIndex ?? 0;
-  const currentWordIndex = currentStone?.wordIndex ?? 0;
   const currentSentence = config.sentences[currentSentenceIndex];
-  const currentWord = currentSentence?.words[currentWordIndex];
 
-  // Determine dragon image based on position and direction
+  // Determine dragon image based on position and direction (DESKTOP RECTANGULAR PATH)
   const getDragonImage = useCallback(() => {
     const stone = STONE_POSITIONS[dragonPosition];
     if (!stone) return DRAGON_RIGHT;
     
+    // DESKTOP: Rectangular path logic
+    if (!isMobile) {
+      // Left side (x=0): moving UP → facing right
+      if (stone.x === 0) return DRAGON_RIGHT;
+      
+      // Top row (y=2): first half moving right, second half moving down
+      if (stone.y === 2 && stone.x <= 2) return DRAGON_RIGHT;
+      if (stone.y === 2 && stone.x >= 3) return DRAGON_LEFT;
+      
+      // Right side (x=5): moving DOWN → facing left
+      if (stone.x === 5) return DRAGON_LEFT;
+      
+      // Bottom row (y=0): moving LEFT → facing left
+      if (stone.y === 0 && dragonPosition > 0) return DRAGON_LEFT;
+      
+      // Middle right (y=1, x=5): facing left
+      if (stone.y === 1 && stone.x === 5) return DRAGON_LEFT;
+      
+      return DRAGON_RIGHT;
+    }
+    
+    // MOBILE: Original zigzag logic
     const row = stone.y;
     
-    // Start position - facing right
     if (dragonPosition === 0) return DRAGON_RIGHT;
-    
-    // Goal position - facing right (finished)
     if (dragonPosition === STONE_POSITIONS.length - 1) return DRAGON_RIGHT;
     
-    // Row 1 and 3: moving RIGHT -> dragon faces right
-    // Row 2 and 4: moving LEFT -> dragon faces left
-    // When on rest positions: look towards next direction
-    
     if (stone.isRest) {
-      // On rest (gray) stones, look in opposite direction (ready for next row)
-      if (row === 1 || row === 3) {
-        return DRAGON_LEFT; // Was moving right, now looks left for next row
+      if (row === 0 || row === 2) {
+        return DRAGON_LEFT;
       } else {
-        return DRAGON_RIGHT; // Was moving left, now looks right for next row
+        return DRAGON_RIGHT;
       }
     }
     
-    // During movement in row
-    if (row === 1 || row === 3) {
-      return DRAGON_RIGHT; // Moving right
+    if (row === 0 || row === 2) {
+      return DRAGON_RIGHT;
     } else {
-      return DRAGON_LEFT; // Moving left
+      return DRAGON_LEFT;
     }
-  }, [dragonPosition]);
+  }, [dragonPosition, isMobile, STONE_POSITIONS]);
 
   // Play audio helper
   const playAudio = useCallback(async (audioFile: string) => {
@@ -271,12 +357,11 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     }
   }, []);
 
-  // Play sentence audio (all 3 words sequentially)
+  // Play sentence audio
   const playSentenceAudio = useCallback(async () => {
-    const sentence = config.sentences[currentSentenceIndex];
+    const sentence = config.sentences[currentSentenceForDialog];
     if (!sentence) return;
     
-    // Try to play full sentence audio first
     try {
       if (audioRef.current) {
         audioRef.current.src = getAudioUrl(sentence.audio);
@@ -287,14 +372,13 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       console.log("Full sentence audio not found, playing individual words");
     }
     
-    // Fallback: play individual words with delays
     for (let i = 0; i < sentence.words.length; i++) {
       await playAudio(sentence.words[i].audio);
       if (i < sentence.words.length - 1) {
         await new Promise(resolve => setTimeout(resolve, 500));
       }
     }
-  }, [currentSentenceIndex, config.sentences, playAudio]);
+  }, [currentSentenceForDialog, config.sentences, playAudio]);
 
   // Handle repeat button in sentence dialog
   const handleRepeat = useCallback(() => {
@@ -318,8 +402,8 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     setShowSentenceDialog(false);
     setCollectedWords([]);
     
-    // Check if this was the last sentence (position 16 is the goal)
-    if (dragonPosition === STONE_POSITIONS.length - 1) {
+    // Check if this was the last sentence (sentence index 3 completed)
+    if (currentSentenceForDialog === 3) {
       setPhase("complete");
       
       if (!completionCalledRef.current) {
@@ -329,7 +413,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
         });
       }
     }
-  }, [dragonPosition]);
+  }, [currentSentenceForDialog]);
 
   // Handle next/jump button click
   const handleNext = useCallback(async () => {
@@ -337,6 +421,32 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     
     setIsJumping(true);
     const nextPosition = dragonPosition + 1;
+    
+    // DESKTOP: Check if we completed the loop (position 14 = last word of sentence 4)
+    // After position 14, dragon jumps back to position 0 (START) for final repeat
+    if (!isMobile && nextPosition > STONE_POSITIONS.length - 1) {
+      // Jump back to START for final sentence repeat
+      setDragonPosition(0);
+      
+      setTimeout(async () => {
+        setIsJumping(false);
+        // Show final sentence dialog
+        setCurrentSentenceForDialog(3);
+        setPhase("sentence");
+        setShowSentenceDialog(true);
+        
+        const sentence = config.sentences[3];
+        if (sentence && audioRef.current) {
+          try {
+            audioRef.current.src = getAudioUrl(sentence.audio);
+            await audioRef.current.play();
+          } catch (error) {
+            console.log("Playing individual words");
+          }
+        }
+      }, 600);
+      return;
+    }
     
     if (nextPosition >= STONE_POSITIONS.length) {
       setIsJumping(false);
@@ -351,9 +461,19 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       
       if (nextStone.isRest) {
         // Landed on rest stone - show sentence dialog
+        setCurrentSentenceForDialog(nextStone.sentenceIndex ?? 0);
         setPhase("sentence");
         setShowSentenceDialog(true);
-        await playSentenceAudio();
+        
+        const sentence = config.sentences[nextStone.sentenceIndex ?? 0];
+        if (sentence && audioRef.current) {
+          try {
+            audioRef.current.src = getAudioUrl(sentence.audio);
+            await audioRef.current.play();
+          } catch (error) {
+            console.log("Playing individual words");
+          }
+        }
       } else if (nextStone.wordIndex !== undefined) {
         // Landed on word stone
         setPhase("word");
@@ -366,7 +486,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
         await playAudio(word.audio);
       }
     }, 600);
-  }, [dragonPosition, isJumping, showSentenceDialog, config.sentences, playAudio, playSentenceAudio]);
+  }, [dragonPosition, isJumping, showSentenceDialog, config.sentences, playAudio, isMobile, STONE_POSITIONS]);
 
   // Record progress to database
   const recordProgress = async () => {
@@ -409,6 +529,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     setCollectedWords([]);
     setIsRecording(false);
     setCountdown(3);
+    setCurrentSentenceForDialog(0);
     completionCalledRef.current = false;
   };
 
@@ -422,16 +543,19 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     };
   };
 
-  // Get dragon pixel position - sits ON the stone (not floating)
+  // Get dragon pixel position
   const getDragonPixelPosition = () => {
     const pos = getStonePixelPosition(dragonPosition);
     return {
       left: pos.left + stoneWidth / 2 - dragonSize / 2,
-      bottom: pos.bottom + stoneHeight * 0.6, // Dragon sits on top of the stone
+      bottom: pos.bottom + stoneHeight * 0.6,
     };
   };
 
   const dragonPos = getDragonPixelPosition();
+
+  // Get sentence for dialog display
+  const dialogSentence = config.sentences[currentSentenceForDialog];
 
   // Don't render until we have proper dimensions
   if (!calculatedSizes) {
@@ -462,7 +586,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       {/* Audio element */}
       <audio ref={audioRef} />
       
-      {/* BOTTOM LEFT: Home menu button - ROUNDED FULL */}
+      {/* BOTTOM LEFT: Home menu button */}
       <div className="fixed bottom-6 left-4 z-30">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -487,39 +611,94 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
         </DropdownMenu>
       </div>
       
-      {/* TOP: Collected word cards in light blue container - positioned at center top */}
-      <div className="fixed top-4 left-0 right-0 z-20 flex justify-center px-4 pointer-events-none">
-        <div className={`bg-sky-100/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg transition-all duration-300 pointer-events-auto ${collectedWords.length > 0 ? 'min-w-[300px] md:min-w-[400px]' : 'min-w-[200px]'}`}>
-          <div className="flex justify-center gap-4 md:gap-6 min-h-[80px] md:min-h-[100px] items-center">
-            {collectedWords.length === 0 && (
-              <p className="text-gray-500 text-sm font-medium">Zbrane besede...</p>
-            )}
-            <AnimatePresence>
-              {collectedWords.map((word, idx) => (
-                <motion.div
-                  key={`${word.word}-${idx}`}
-                  initial={{ opacity: 0, scale: 0.5, y: -20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.5 }}
-                  className="flex flex-col items-center"
-                >
-                  {/* White rounded container without border */}
-                  <div className="w-16 h-16 md:w-24 md:h-24 rounded-xl bg-white shadow-md flex items-center justify-center p-2">
-                    <img
-                      src={getImageUrl(word.image)}
-                      alt={word.word}
-                      className="w-12 h-12 md:w-16 md:h-16 object-contain"
-                    />
-                  </div>
-                  <p className="text-xs md:text-sm font-bold text-gray-800 mt-2 uppercase">
-                    {word.word}
-                  </p>
-                </motion.div>
-              ))}
-            </AnimatePresence>
+      {/* DESKTOP: Word cards in CENTER with jump button to the right */}
+      {!isMobile && (
+        <div className="fixed top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none">
+          <div className="flex items-center justify-center">
+            {/* Word cards container */}
+            <div className={`bg-sky-100/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg transition-all duration-300 ${collectedWords.length > 0 ? 'min-w-[300px]' : 'min-w-[200px]'}`}>
+              <div className="flex justify-center gap-4 min-h-[100px] items-center">
+                {collectedWords.length === 0 && (
+                  <p className="text-gray-500 text-sm font-medium">Zbrane besede...</p>
+                )}
+                <AnimatePresence>
+                  {collectedWords.map((word, idx) => (
+                    <motion.div
+                      key={`${word.word}-${idx}`}
+                      initial={{ opacity: 0, scale: 0.5, y: -20 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.5 }}
+                      className="flex flex-col items-center"
+                    >
+                      <div className="w-20 h-20 rounded-xl bg-white shadow-md flex items-center justify-center p-2">
+                        <img
+                          src={getImageUrl(word.image)}
+                          alt={word.word}
+                          className="w-16 h-16 object-contain"
+                        />
+                      </div>
+                      <p className="text-sm font-bold text-gray-800 mt-2 uppercase">
+                        {word.word}
+                      </p>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            </div>
+            
+            {/* Jump button - RIGHT of word cards */}
+            <JumpButton 
+              onClick={handleNext} 
+              disabled={isJumping || phase === "complete" || showSentenceDialog} 
+            />
           </div>
         </div>
-      </div>
+      )}
+      
+      {/* MOBILE: Original top word cards + bottom jump button */}
+      {isMobile && (
+        <>
+          <div className="fixed top-4 left-0 right-0 z-20 flex justify-center px-4 pointer-events-none">
+            <div className={`bg-sky-100/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg transition-all duration-300 pointer-events-auto ${collectedWords.length > 0 ? 'min-w-[300px]' : 'min-w-[200px]'}`}>
+              <div className="flex justify-center gap-4 min-h-[80px] items-center">
+                {collectedWords.length === 0 && (
+                  <p className="text-gray-500 text-sm font-medium">Zbrane besede...</p>
+                )}
+                <AnimatePresence>
+                  {collectedWords.map((word, idx) => (
+                    <motion.div
+                      key={`${word.word}-${idx}`}
+                      initial={{ opacity: 0, scale: 0.5, y: -20 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.5 }}
+                      className="flex flex-col items-center"
+                    >
+                      <div className="w-16 h-16 rounded-xl bg-white shadow-md flex items-center justify-center p-2">
+                        <img
+                          src={getImageUrl(word.image)}
+                          alt={word.word}
+                          className="w-12 h-12 object-contain"
+                        />
+                      </div>
+                      <p className="text-xs font-bold text-gray-800 mt-2 uppercase">
+                        {word.word}
+                      </p>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            </div>
+          </div>
+          
+          {/* MOBILE: Bottom center jump button */}
+          <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-20">
+            <JumpButton 
+              onClick={handleNext} 
+              disabled={isJumping || phase === "complete" || showSentenceDialog} 
+            />
+          </div>
+        </>
+      )}
       
       {/* Main game area - Stone grid */}
       <div className="flex-1 relative overflow-hidden">
@@ -527,8 +706,6 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
         <div className="absolute inset-0">
           {STONE_POSITIONS.map((stone, index) => {
             const pos = getStonePixelPosition(index);
-            const isStart = index === 0;
-            const isGoal = index === STONE_POSITIONS.length - 1;
             const isActive = dragonPosition === index;
             
             return (
@@ -549,7 +726,6 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
                   alt={`Kamen ${stone.type}`}
                   className="w-full h-full object-contain drop-shadow-lg"
                 />
-                {/* START and CILJ labels removed per design */}
               </motion.div>
             );
           })}
@@ -578,35 +754,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
         </div>
       </div>
       
-      {/* BOTTOM CENTER: SKOK button - gumb_modri.png with pulse animation, no text */}
-      <div className="fixed bottom-6 md:bottom-8 left-1/2 transform -translate-x-1/2 z-20">
-        <button
-          onClick={handleNext}
-          disabled={isJumping || phase === "complete" || showSentenceDialog}
-          className={`transition-all
-            ${isJumping || phase === "complete" || showSentenceDialog
-              ? 'opacity-50 cursor-not-allowed'
-              : 'hover:scale-105 active:scale-95'
-            }`}
-        >
-          <motion.img
-            src={JUMP_BUTTON_IMAGE}
-            alt="Skok"
-            className="w-24 h-24 md:w-28 md:h-28 object-contain drop-shadow-lg"
-            animate={{ 
-              scale: [1, 1.08, 1],
-              opacity: [1, 0.85, 1]
-            }}
-            transition={{ 
-              duration: 1.5, 
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-        </button>
-      </div>
-      
-      {/* Sentence dialog - styled like Smešne Povedi */}
+      {/* Sentence dialog */}
       <Dialog open={showSentenceDialog} onOpenChange={() => {}}>
         <DialogContent className="sm:max-w-lg" onInteractOutside={(e) => e.preventDefault()}>
           <DialogHeader>
@@ -622,7 +770,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
             
             {/* Three word images in a row */}
             <div className="flex justify-center gap-3 md:gap-4">
-              {currentSentence?.words.map((word, idx) => (
+              {dialogSentence?.words.map((word, idx) => (
                 <div key={idx} className="flex flex-col items-center space-y-1 md:space-y-2">
                   <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden border-2 border-dragon-green bg-gray-50">
                     <img
@@ -640,7 +788,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
             
             {/* Full sentence text */}
             <p className="text-base md:text-lg font-semibold text-gray-800 text-center uppercase">
-              "{currentSentence?.fullSentence.toUpperCase()}"
+              "{dialogSentence?.fullSentence.toUpperCase()}"
             </p>
             
             {/* Action buttons */}
@@ -711,7 +859,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
               <p>🔴 Na rdečem kamnu izgovori drugo besedo.</p>
               <p>🟡 Na rumenem kamnu izgovori tretjo besedo.</p>
               <p>⬜ Na sivem kamnu ponovi celo poved!</p>
-              <p>🏆 Cilj je priti do vrha!</p>
+              <p>🏆 Cilj je obkrožiti vse kamne in ponoviti vse 4 povedi!</p>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
