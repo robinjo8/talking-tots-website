@@ -134,6 +134,13 @@ export function GenericBingoGame({ letter, displayLetter, title, wordsData, exer
           onCellClick={handleCellClick}
           winningLine={winningLine?.cells || null}
         />
+
+        {/* Drawn word label - below grid */}
+        {drawnWord && !isSpinning && (
+          <div className="text-lg md:text-xl font-bold text-white drop-shadow-lg text-center">
+            Najdi: <span className="text-yellow-300">{drawnWord.word}</span>
+          </div>
+        )}
       </div>
 
       {/* Floating Menu Button - Left */}
