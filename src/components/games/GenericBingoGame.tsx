@@ -135,12 +135,14 @@ export function GenericBingoGame({ letter, displayLetter, title, wordsData, exer
           winningLine={winningLine?.cells || null}
         />
 
-        {/* Drawn word label - below grid */}
-        {drawnWord && !isSpinning && (
-          <div className="text-lg md:text-xl font-bold text-white drop-shadow-lg text-center">
-            Najdi: <span className="text-yellow-300">{drawnWord.word}</span>
-          </div>
-        )}
+        {/* Drawn word label - below grid, fixed height to prevent layout shift */}
+        <div className="h-8 md:h-10 flex items-center justify-center">
+          {drawnWord && !isSpinning && (
+            <div className="text-lg md:text-xl font-bold text-white drop-shadow-lg text-center">
+              Najdi: <span className="text-yellow-300">{drawnWord.word}</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Floating Menu Button - Left */}
