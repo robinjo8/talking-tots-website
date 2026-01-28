@@ -131,24 +131,24 @@ const STONE_POSITIONS_MOBILE: StonePosition[] = [
   { x: 0, y: 1, type: 'red', isRest: false, sentenceIndex: 0, wordIndex: 0 },    // 1st word
   { x: 0, y: 2, type: 'yellow', isRest: false, sentenceIndex: 0, wordIndex: 1 }, // 2nd word
   { x: 0, y: 3, type: 'green', isRest: false, sentenceIndex: 0, wordIndex: 2 },  // 3rd word
-  { x: 0, y: 4, type: 'gray', isRest: true, sentenceIndex: 0 },                  // Pop-up for sentence 1
+  { x: 0, y: 3, type: 'gray', isRest: true, sentenceIndex: 0 },                  // Pop-up for sentence 1
   
   // Sentence 2: Continue left column UP + cross to top center (3 word stones + 1 rest)
-  { x: 0, y: 5, type: 'red', isRest: false, sentenceIndex: 1, wordIndex: 0 },    // 1st word
-  { x: 0, y: 6, type: 'yellow', isRest: false, sentenceIndex: 1, wordIndex: 1 }, // 2nd word
-  { x: 0, y: 7, type: 'green', isRest: false, sentenceIndex: 1, wordIndex: 2 },  // 3rd word (top left)
-  { x: 1, y: 7, type: 'gray', isRest: true, sentenceIndex: 1 },                  // Top center - Pop-up for sentence 2
+  { x: 0, y: 4, type: 'red', isRest: false, sentenceIndex: 1, wordIndex: 0 },    // 1st word
+  { x: 0, y: 5, type: 'yellow', isRest: false, sentenceIndex: 1, wordIndex: 1 }, // 2nd word
+  { x: 0, y: 6, type: 'green', isRest: false, sentenceIndex: 1, wordIndex: 2 },  // 3rd word (top left)
+  { x: 1, y: 6, type: 'gray', isRest: true, sentenceIndex: 1 },                  // Top center - Pop-up for sentence 2
   
   // Sentence 3: Right column - going DOWN (3 word stones + 1 rest)
-  { x: 2, y: 7, type: 'green', isRest: false, sentenceIndex: 2, wordIndex: 0 },  // 1st word (top right)
-  { x: 2, y: 6, type: 'yellow', isRest: false, sentenceIndex: 2, wordIndex: 1 }, // 2nd word
-  { x: 2, y: 5, type: 'red', isRest: false, sentenceIndex: 2, wordIndex: 2 },    // 3rd word
-  { x: 2, y: 4, type: 'gray', isRest: true, sentenceIndex: 2 },                  // Pop-up for sentence 3 (dragon turns here)
+  { x: 2, y: 6, type: 'green', isRest: false, sentenceIndex: 2, wordIndex: 0 },  // 1st word (top right)
+  { x: 2, y: 5, type: 'yellow', isRest: false, sentenceIndex: 2, wordIndex: 1 }, // 2nd word
+  { x: 2, y: 4, type: 'red', isRest: false, sentenceIndex: 2, wordIndex: 2 },    // 3rd word
+  { x: 2, y: 3, type: 'gray', isRest: true, sentenceIndex: 2 },                  // Pop-up for sentence 3 (dragon turns here)
   
   // Sentence 4: Continue right column DOWN (3 word stones + final rest)
-  { x: 2, y: 3, type: 'green', isRest: false, sentenceIndex: 3, wordIndex: 0 },  // 1st word
-  { x: 2, y: 2, type: 'yellow', isRest: false, sentenceIndex: 3, wordIndex: 1 }, // 2nd word
-  { x: 2, y: 1, type: 'red', isRest: false, sentenceIndex: 3, wordIndex: 2 },    // 3rd word
+  { x: 2, y: 2, type: 'green', isRest: false, sentenceIndex: 3, wordIndex: 0 },  // 1st word
+  { x: 2, y: 1, type: 'yellow', isRest: false, sentenceIndex: 3, wordIndex: 1 }, // 2nd word
+  { x: 2, y: 0, type: 'red', isRest: false, sentenceIndex: 3, wordIndex: 2 },    // 3rd word
   { x: 2, y: 0, type: 'gray', isRest: true, sentenceIndex: 3 },                  // GOAL - Pop-up for sentence 4
 ];
 
@@ -311,7 +311,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     }
     
     // MOBILE: U-shaped layout (3 columns x 8 rows, y from 0 to 7)
-    const rows = 8;
+    const rows = 7; // 7 vrstic (y od 0 do 6)
     
     // Prostor za UI elemente
     const topCardHeight = 80;
@@ -324,8 +324,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     const stoneWidth = Math.floor(stoneHeight * 1.4);
     
     // DINAMIČEN gapY - raztegne grid čez celoten razpoložljiv prostor
-    // Grid gre od y=0 do y=7, torej 7 razmakov med 8 vrsticami
-    // Odštejemo 2px za manjši razmak
+    // Grid gre od y=0 do y=6, torej 6 razmakov med 7 vrsticami
     const gapY = Math.floor((availableHeight - stoneHeight) / (rows - 1));
     
     // offsetY = tik nad gumbom
