@@ -315,7 +315,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     
     // Prostor za UI elemente
     const topCardHeight = 80;
-    const bottomButtonSpace = 100;
+    const bottomButtonSpace = 90; // Zmanjšano za 10%
     const availableHeight = containerSize.height - topCardHeight - bottomButtonSpace;
     const availableWidth = containerSize.width;
     
@@ -325,7 +325,8 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     
     // DINAMIČEN gapY - raztegne grid čez celoten razpoložljiv prostor
     // Grid gre od y=0 do y=7, torej 7 razmakov med 8 vrsticami
-    const gapY = Math.floor((availableHeight - stoneHeight) / (rows - 1));
+    // Odštejemo 2px za manjši razmak
+    const gapY = Math.floor((availableHeight - stoneHeight) / (rows - 1)) - 2;
     
     // offsetY = tik nad gumbom
     const offsetY = bottomButtonSpace;
