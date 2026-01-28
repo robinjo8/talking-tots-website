@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Home } from 'lucide-react';
+import { Home, RefreshCw } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -67,6 +67,7 @@ export function GenericMetKockeGame({
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [showNewGameDialog, setShowNewGameDialog] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [showNewGameButton, setShowNewGameButton] = useState(false);
 
   // Progress tracking
   const wordsList = bitje.map(b => b.word);
@@ -114,6 +115,13 @@ export function GenericMetKockeGame({
     resetGame();
     resetProgress();
     setShowNewGameDialog(false);
+    setShowNewGameButton(false);
+  }, [resetGame, resetProgress]);
+
+  const handleNewGameDirect = useCallback(() => {
+    resetGame();
+    resetProgress();
+    setShowNewGameButton(false);
   }, [resetGame, resetProgress]);
 
   // Star claim handler
@@ -122,6 +130,7 @@ export function GenericMetKockeGame({
       incrementProgress(bitje[selectedBitje].word);
     }
     closeStarDialog();
+    setShowNewGameButton(true);
     // Check for trophy after claiming star
     await new Promise(resolve => setTimeout(resolve, 500));
     await checkForNewTrophy();
@@ -276,6 +285,16 @@ export function GenericMetKockeGame({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      {/* New game button - appears after star claimed */}
+      {showNewGameButton && (
+        <button
+          onClick={handleNewGameDirect}
+          className="fixed bottom-4 left-24 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
+        >
+          <RefreshCw className="h-7 w-7 text-white" />
+        </button>
+      )}
 
       {/* Dice roller modal */}
       <DiceRoller

@@ -8,10 +8,16 @@ import { ThreeColumnGame } from '@/components/matching/ThreeColumnGame';
 import { FourColumnGame } from '@/components/matching/FourColumnGame';
 import { MatchingInstructionsModal } from '@/components/matching/MatchingInstructionsModal';
 import { MatchingCompletionDialog } from '@/components/matching/MatchingCompletionDialog';
+import { MemoryExitConfirmationDialog } from '@/components/games/MemoryExitConfirmationDialog';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { getLetterData, getImagesForAgeGroup } from '@/data/matchingGameData';
 import { getRandomThreeColumnItems, getRandomFourColumnItems } from '@/data/threeColumnMatchingData';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, RotateCcw, BookOpen } from 'lucide-react';
+import { Home, RefreshCw } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { PoveziPareConfig } from '@/data/poveziPareConfig';
 
 interface Props {
@@ -25,6 +31,10 @@ export function GenericPoveziPareGame({ config }: Props) {
   const [gameKey, setGameKey] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
+  const [showExitConfirmation, setShowExitConfirmation] = useState(false);
+  const [showNewGameConfirmation, setShowNewGameConfirmation] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [showNewGameButton, setShowNewGameButton] = useState(false);
   const gameCompletedRef = useRef(false);
 
   // Get letter data
@@ -60,16 +70,39 @@ export function GenericPoveziPareGame({ config }: Props) {
   };
 
   const handleNewGame = () => {
+    setMenuOpen(false);
+    setShowNewGameConfirmation(true);
+  };
+
+  const handleConfirmNewGame = () => {
     gameCompletedRef.current = false;
+    setShowNewGameButton(false);
+    setGameKey(prev => prev + 1);
+    setShowNewGameConfirmation(false);
+  };
+
+  const handleNewGameDirect = () => {
+    gameCompletedRef.current = false;
+    setShowNewGameButton(false);
     setGameKey(prev => prev + 1);
   };
 
   const handleBack = () => {
+    setMenuOpen(false);
+    setShowExitConfirmation(true);
+  };
+
+  const handleConfirmExit = () => {
     navigate(`/govorne-igre/povezi-pare/${config.ageGroup}`);
   };
 
   const handleInstructions = () => {
+    setMenuOpen(false);
     setShowInstructions(true);
+  };
+
+  const handleStarClaimed = () => {
+    setShowNewGameButton(true);
   };
 
   // Fullscreen handling for mobile
@@ -131,6 +164,57 @@ export function GenericPoveziPareGame({ config }: Props) {
     }
   };
 
+  // Floating menu component
+  const FloatingMenu = () => (
+    <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+      <DropdownMenuTrigger asChild>
+        <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform">
+          <Home className="w-8 h-8 text-white" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent 
+        align="start" 
+        side="top"
+        sideOffset={8}
+        className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+      >
+        <button
+          onClick={handleBack}
+          className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+        >
+          <span className="text-2xl">🏠</span>
+          <span>Nazaj</span>
+        </button>
+        <button
+          onClick={handleNewGame}
+          className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+        >
+          <span className="text-2xl">🔄</span>
+          <span>Nova igra</span>
+        </button>
+        <button
+          onClick={handleInstructions}
+          className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
+        >
+          <span className="text-2xl">📖</span>
+          <span>Navodila</span>
+        </button>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
+  // New game button component
+  const NewGameButton = () => (
+    showNewGameButton ? (
+      <button
+        onClick={handleNewGameDirect}
+        className="fixed bottom-4 left-24 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
+      >
+        <RefreshCw className="h-7 w-7 text-white" />
+      </button>
+    ) : null
+  );
+
   if (!letterData && config.gameType === 'matching') {
     return (
       <AppLayout>
@@ -138,12 +222,12 @@ export function GenericPoveziPareGame({ config }: Props) {
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Napaka</h1>
             <p className="text-muted-foreground">Ni bilo mogoče naložiti podatkov za črko {config.letter}.</p>
-            <Button 
+            <button 
               onClick={() => navigate('/govorne-igre')}
-              className="mt-4"
+              className="mt-4 px-4 py-2 bg-dragon-green text-white rounded-lg hover:bg-dragon-green/90"
             >
               Nazaj na igre
-            </Button>
+            </button>
           </div>
         </div>
       </AppLayout>
@@ -152,49 +236,29 @@ export function GenericPoveziPareGame({ config }: Props) {
 
   if (effectiveFullscreen) {
     return (
-      <div className="fixed inset-0 bg-background overflow-hidden select-none">
+      <div 
+        className="fixed inset-0 overflow-hidden select-none"
+        style={{
+          backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.webp)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
         <div className="h-full flex flex-col">
-          {/* Top Section - Buttons */}
-          <div className="bg-dragon-green/5 p-3 flex-shrink-0 border-b">
-            <h2 className="text-lg font-bold mb-3 text-center">Povezi pare - {config.letter}</h2>
-            <div className="flex justify-center gap-3">
-              <Button
-                onClick={handleNewGame}
-                size="sm"
-                className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2"
-                variant="default"
-              >
-                <RotateCcw className="h-4 w-4" />
-                Nova igra
-              </Button>
-              
-              <Button
-                variant="outline"
-                onClick={handleBack}
-                size="sm"
-                className="gap-2"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Nazaj
-              </Button>
-              
-              <Button
-                variant="outline"
-                onClick={handleInstructions}
-                size="sm"
-                className="gap-2"
-              >
-                <BookOpen className="h-4 w-4" />
-                Navodila
-              </Button>
-            </div>
+          {/* Header */}
+          <div className="p-3 flex-shrink-0">
+            <h2 className="text-lg font-bold text-center text-white drop-shadow-lg">Povezi pare - {config.letter}</h2>
           </div>
 
-          {/* Game Area with gray background */}
-          <div className="flex-1 overflow-hidden bg-muted/30 p-4">
+          {/* Game Area */}
+          <div className="flex-1 overflow-hidden p-4">
             {renderGame()}
           </div>
         </div>
+        
+        <FloatingMenu />
+        <NewGameButton />
         
         <MatchingInstructionsModal
           isOpen={showInstructions}
@@ -205,44 +269,84 @@ export function GenericPoveziPareGame({ config }: Props) {
           isOpen={showCompletion}
           onClose={() => setShowCompletion(false)}
           images={getCompletionImages()}
+          onStarClaimed={handleStarClaimed}
+        />
+
+        <MemoryExitConfirmationDialog
+          open={showExitConfirmation}
+          onOpenChange={setShowExitConfirmation}
+          onConfirm={handleConfirmExit}
+        >
+          <span />
+        </MemoryExitConfirmationDialog>
+
+        <ConfirmDialog
+          open={showNewGameConfirmation}
+          onOpenChange={setShowNewGameConfirmation}
+          title="Nova igra"
+          description="Ali res želiš začeti novo igro?"
+          confirmText="Da"
+          cancelText="Ne"
+          onConfirm={handleConfirmNewGame}
+          onCancel={() => setShowNewGameConfirmation(false)}
         />
       </div>
     );
   }
 
   return (
-    <AppLayout>
-      <div className="w-full min-h-screen bg-background">
-        <div className="flex justify-center gap-4 p-4">
-          <Button onClick={handleNewGame} variant="outline" className="gap-2">
-            <RotateCcw className="h-4 w-4" />
-            Nova igra
-          </Button>
-          <Button onClick={handleInstructions} variant="outline" className="gap-2">
-            <BookOpen className="h-4 w-4" />
-            Navodila
-          </Button>
-          <Button onClick={handleBack} variant="outline" className="gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Nazaj
-          </Button>
-        </div>
+    <div 
+      className="fixed inset-0 overflow-auto select-none"
+      style={{
+        backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.webp)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <div className="min-h-full flex flex-col items-center justify-center p-4 pb-24">
+        <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 md:mb-8 text-center drop-shadow-lg">
+          POVEŽI PARE - {config.letter}
+        </h1>
         
-        <div className="w-full bg-muted/30 flex justify-center items-center p-4 min-h-[calc(100vh-200px)]">
+        <div className="w-full max-w-4xl">
           {renderGame()}
         </div>
-        
-        <MatchingInstructionsModal
-          isOpen={showInstructions}
-          onClose={() => setShowInstructions(false)}
-        />
-        
-        <MatchingCompletionDialog
-          isOpen={showCompletion}
-          onClose={() => setShowCompletion(false)}
-          images={getCompletionImages()}
-        />
       </div>
-    </AppLayout>
+
+      <FloatingMenu />
+      <NewGameButton />
+      
+      <MatchingInstructionsModal
+        isOpen={showInstructions}
+        onClose={() => setShowInstructions(false)}
+      />
+      
+      <MatchingCompletionDialog
+        isOpen={showCompletion}
+        onClose={() => setShowCompletion(false)}
+        images={getCompletionImages()}
+        onStarClaimed={handleStarClaimed}
+      />
+
+      <MemoryExitConfirmationDialog
+        open={showExitConfirmation}
+        onOpenChange={setShowExitConfirmation}
+        onConfirm={handleConfirmExit}
+      >
+        <span />
+      </MemoryExitConfirmationDialog>
+
+      <ConfirmDialog
+        open={showNewGameConfirmation}
+        onOpenChange={setShowNewGameConfirmation}
+        title="Nova igra"
+        description="Ali res želiš začeti novo igro?"
+        confirmText="Da"
+        cancelText="Ne"
+        onConfirm={handleConfirmNewGame}
+        onCancel={() => setShowNewGameConfirmation(false)}
+      />
+    </div>
   );
 }
