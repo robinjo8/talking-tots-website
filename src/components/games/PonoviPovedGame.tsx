@@ -373,10 +373,12 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
   const [showInstructions, setShowInstructions] = useState(false);
   const [showSentenceDialog, setShowSentenceDialog] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [countdown, setCountdown] = useState(3);
+  const [countdown, setCountdown] = useState(5);
   const [collectedWords, setCollectedWords] = useState<SentenceWord[]>([]);
   const [startTime] = useState(Date.now());
   const [currentSentenceForDialog, setCurrentSentenceForDialog] = useState(0);
+  const [repeatCompleted, setRepeatCompleted] = useState(false);
+  const [showSentenceExitWarning, setShowSentenceExitWarning] = useState(false);
 
   // Get current stone info
   const currentStone = STONE_POSITIONS[dragonPosition];
@@ -471,14 +473,15 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
   // Handle repeat button in sentence dialog
   const handleRepeat = useCallback(() => {
     setIsRecording(true);
-    setCountdown(3);
+    setCountdown(5);
     
     const interval = setInterval(() => {
       setCountdown(prev => {
         if (prev <= 1) {
           clearInterval(interval);
           setIsRecording(false);
-          return 3;
+          setRepeatCompleted(true);
+          return 5;
         }
         return prev - 1;
       });
@@ -489,6 +492,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
   const handleContinueFromDialog = useCallback(() => {
     setShowSentenceDialog(false);
     setCollectedWords([]);
+    setRepeatCompleted(false);
     
     // Check if this was the last sentence (sentence index 3 completed)
     if (currentSentenceForDialog === 3) {
@@ -502,6 +506,22 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       }
     }
   }, [currentSentenceForDialog]);
+
+  const handleSentenceDialogClose = useCallback(() => {
+    setShowSentenceExitWarning(true);
+  }, []);
+  
+  const handleConfirmSentenceExit = useCallback(() => {
+    setShowSentenceExitWarning(false);
+    setShowSentenceDialog(false);
+    setRepeatCompleted(false);
+    // Reset game state
+    setDragonPosition(0);
+    setPhase("start");
+    setCollectedWords([]);
+    setCurrentSentenceForDialog(0);
+    completionCalledRef.current = false;
+  }, []);
 
   // Handle next/jump button click
   const handleNext = useCallback(async () => {
@@ -895,8 +915,12 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       </div>
       
       {/* Sentence dialog */}
-      <Dialog open={showSentenceDialog} onOpenChange={() => {}}>
-        <DialogContent className="sm:max-w-lg" onInteractOutside={(e) => e.preventDefault()}>
+      <Dialog open={showSentenceDialog} onOpenChange={(open) => {
+        if (!open) {
+          handleSentenceDialogClose();
+        }
+      }}>
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="font-bold text-dragon-green text-center text-lg md:text-2xl uppercase">
               ODLIČNO!
@@ -912,14 +936,14 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
             <div className="flex justify-center gap-3 md:gap-4">
               {dialogSentence?.words.map((word, idx) => (
                 <div key={idx} className="flex flex-col items-center space-y-1 md:space-y-2">
-                  <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden border-2 border-dragon-green bg-gray-50">
+                  <div className={`w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden border-2 bg-gray-50 transition-all ${repeatCompleted ? 'border-gray-300 grayscale' : 'border-dragon-green'}`}>
                     <img
                       src={getImageUrl(word.image)}
                       alt={word.word}
                       className="w-full h-full object-contain"
                     />
                   </div>
-                  <span className="font-medium text-center text-xs md:text-sm text-black uppercase">
+                  <span className={`font-medium text-center text-xs md:text-sm uppercase transition-colors ${repeatCompleted ? 'text-gray-400' : 'text-black'}`}>
                     {word.word.toUpperCase()}
                   </span>
                 </div>
@@ -927,45 +951,68 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
             </div>
             
             {/* Full sentence text */}
-            <p className="text-base md:text-lg font-semibold text-gray-800 text-center uppercase">
+            <p className={`text-base md:text-lg font-semibold text-center uppercase transition-colors ${repeatCompleted ? 'text-gray-400' : 'text-gray-800'}`}>
               "{dialogSentence?.fullSentence.toUpperCase()}"
             </p>
             
             {/* Action buttons */}
-            <div className="flex justify-center gap-2 md:gap-3 pt-2 flex-wrap">
+            <div className="flex justify-center gap-2 md:gap-3 pt-2">
               <Button
                 onClick={playSentenceAudio}
+                disabled={isRecording}
                 className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 uppercase font-medium h-10 w-28 md:w-32"
               >
                 <Volume2 className="w-4 h-4" />
                 PREDVAJAJ
               </Button>
               
-              <Button
-                onClick={handleRepeat}
-                disabled={isRecording}
-                className="relative bg-app-orange hover:bg-app-orange/90 text-white gap-2 uppercase font-medium h-10 w-28 md:w-32"
-              >
-                <Mic className="w-4 h-4" />
-                {isRecording ? "..." : "PONOVI"}
-                {isRecording && (
-                  <span className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
-                    {countdown}
-                  </span>
-                )}
-              </Button>
-              
-              <Button 
-                onClick={handleContinueFromDialog} 
-                variant="outline" 
-                className="uppercase h-10 w-28 md:w-32 border-2 border-dragon-green text-dragon-green hover:bg-dragon-green hover:text-white"
-              >
-                NAPREJ
-              </Button>
+              {!repeatCompleted ? (
+                <Button
+                  onClick={handleRepeat}
+                  disabled={isRecording}
+                  className="relative bg-app-orange hover:bg-app-orange/90 text-white gap-2 uppercase font-medium h-10 w-28 md:w-32"
+                >
+                  <Mic className="w-4 h-4" />
+                  {isRecording ? "..." : "PONOVI"}
+                  {isRecording && (
+                    <span className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                      {countdown}
+                    </span>
+                  )}
+                </Button>
+              ) : (
+                <Button 
+                  onClick={handleContinueFromDialog} 
+                  className="bg-dragon-green hover:bg-dragon-green/90 text-white uppercase font-medium h-10 w-28 md:w-32"
+                >
+                  NAPREJ
+                </Button>
+              )}
             </div>
           </div>
         </DialogContent>
       </Dialog>
+      
+      {/* Sentence exit warning dialog */}
+      <AlertDialog open={showSentenceExitWarning} onOpenChange={setShowSentenceExitWarning}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Opozorilo</AlertDialogTitle>
+            <AlertDialogDescription>
+              Če zapreš okno, se bo igra začela od začetka. Ali si prepričan/a?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-dragon-green text-white hover:bg-dragon-green/90">Ne</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-500 text-white hover:bg-red-600"
+              onClick={handleConfirmSentenceExit}
+            >
+              Da
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       
       {/* Exit confirmation dialog */}
       <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
