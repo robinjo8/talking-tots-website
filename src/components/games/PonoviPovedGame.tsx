@@ -208,7 +208,7 @@ function JumpButton({ onClick, disabled, size = 96 }: { onClick: () => void; dis
       }}
     >
       <div 
-        className={`w-full h-full bg-white rounded-xl border-4 border-gray-300 shadow-xl flex items-center justify-center ${!disabled ? 'animate-pulse' : ''}`}
+        className={`w-full h-full bg-white rounded-full border-4 border-gray-300 shadow-xl flex items-center justify-center ${!disabled ? 'animate-pulse' : ''}`}
         style={{
           boxShadow: isPressed 
             ? '0 2px 8px rgba(0,0,0,0.2)' 
@@ -857,8 +857,8 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
             </div>
           </div>
           
-          {/* MOBILE: Bottom center jump button */}
-          <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-20">
+          {/* MOBILE: Bottom right jump button */}
+          <div className="fixed bottom-4 right-4 z-20">
             <JumpButton 
               onClick={handleNext} 
               disabled={isJumping || phase === "complete" || showSentenceDialog}
