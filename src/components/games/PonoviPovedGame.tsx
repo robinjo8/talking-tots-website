@@ -56,9 +56,6 @@ const STONE_IMAGES = {
 const DRAGON_RIGHT = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_4.webp";
 const DRAGON_LEFT = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_4_1.png";
 
-// Jump button dragon image
-const JUMP_DRAGON_IMAGE = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_111.PNG";
-
 // Stone positions in grid
 type StoneType = 'gray' | 'yellow' | 'red' | 'green';
 interface StonePosition {
@@ -141,56 +138,110 @@ const STONE_POSITIONS_MOBILE: StonePosition[] = [
   { x: 0, y: 4, type: 'gray', isRest: true, sentenceIndex: 3 },  // GOAL
 ];
 
-// JumpButton component - 3D button similar to dice in Smešne Povedi
-function JumpButton({ onClick, disabled }: { onClick: () => void; disabled: boolean }) {
+// DiceDots helper component for 3D dice faces
+function DiceDots({ count }: { count: number }) {
+  const dotPositions: Record<number, string[]> = {
+    1: ['center'],
+    2: ['top-right', 'bottom-left'],
+    3: ['top-right', 'center', 'bottom-left'],
+    4: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+    5: ['top-left', 'top-right', 'center', 'bottom-left', 'bottom-right'],
+    6: ['top-left', 'top-right', 'middle-left', 'middle-right', 'bottom-left', 'bottom-right'],
+  };
+
+  const getPositionClass = (pos: string) => {
+    switch (pos) {
+      case 'center': return 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2';
+      case 'top-left': return 'top-2 left-2';
+      case 'top-right': return 'top-2 right-2';
+      case 'bottom-left': return 'bottom-2 left-2';
+      case 'bottom-right': return 'bottom-2 right-2';
+      case 'middle-left': return 'top-1/2 left-2 -translate-y-1/2';
+      case 'middle-right': return 'top-1/2 right-2 -translate-y-1/2';
+      default: return '';
+    }
+  };
+
+  return (
+    <>
+      {dotPositions[count]?.map((pos, i) => (
+        <div
+          key={i}
+          className={`absolute w-3 h-3 rounded-full bg-gray-800 ${getPositionClass(pos)}`}
+        />
+      ))}
+    </>
+  );
+}
+
+// JumpDice component - 3D dice identical to DiceRoller from Met Kocke
+function JumpDice({ onClick, disabled }: { onClick: () => void; disabled: boolean }) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
     <div 
-      className={`cursor-pointer ${disabled ? 'pointer-events-none' : 'pointer-events-auto'}`}
+      className={`cursor-pointer ${disabled ? 'pointer-events-none opacity-50' : ''}`}
       style={{ perspective: '600px' }}
       onClick={disabled ? undefined : onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* 3D Button Container - similar to dice cube styling */}
+      {/* 3D Dice Container - identical to DiceRoller */}
       <div
-        className={`relative w-24 h-24 transition-transform ${!disabled ? 'animate-pulse' : ''} ${disabled ? 'opacity-50' : ''}`}
+        className={`relative w-24 h-24 transition-transform ${!disabled ? 'animate-pulse' : ''}`}
         style={{
           transformStyle: 'preserve-3d',
-          transform: isHovered && !disabled ? 'rotateY(10deg) rotateX(-5deg)' : 'rotateY(0deg) rotateX(0deg)',
+          transform: isHovered && !disabled ? 'rotateY(10deg) rotateX(-5deg)' : 'rotateY(0deg)',
           transitionDuration: '300ms',
         }}
       >
-        {/* Front face - main button */}
+        {/* Face 1 - Front */}
         <div 
-          className="absolute w-24 h-24 bg-gradient-to-br from-dragon-green to-green-600 rounded-xl border-4 border-white shadow-2xl flex items-center justify-center"
-          style={{ transform: 'translateZ(12px)' }}
+          className="absolute w-24 h-24 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
+          style={{ transform: 'translateZ(48px)' }}
         >
-          <img 
-            src={JUMP_DRAGON_IMAGE}
-            alt="Skok"
-            className="w-16 h-16 object-contain drop-shadow-md"
-          />
+          <DiceDots count={1} />
         </div>
         
-        {/* Back face - shadow */}
+        {/* Face 6 - Back */}
         <div 
-          className="absolute w-24 h-24 bg-green-800 rounded-xl"
-          style={{ transform: 'translateZ(-4px)' }}
-        />
+          className="absolute w-24 h-24 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
+          style={{ transform: 'rotateY(180deg) translateZ(48px)' }}
+        >
+          <DiceDots count={6} />
+        </div>
         
-        {/* Right edge for 3D effect */}
+        {/* Face 2 - Right */}
         <div 
-          className="absolute top-1 right-0 w-3 h-[calc(100%-8px)] bg-gradient-to-r from-green-600 to-green-700 rounded-r-xl"
-          style={{ transform: 'translateZ(4px)' }}
-        />
+          className="absolute w-24 h-24 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
+          style={{ transform: 'rotateY(90deg) translateZ(48px)' }}
+        >
+          <DiceDots count={2} />
+        </div>
         
-        {/* Bottom edge for 3D effect */}
+        {/* Face 5 - Left */}
         <div 
-          className="absolute bottom-0 left-1 w-[calc(100%-8px)] h-3 bg-gradient-to-b from-green-600 to-green-700 rounded-b-xl"
-          style={{ transform: 'translateZ(4px)' }}
-        />
+          className="absolute w-24 h-24 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
+          style={{ transform: 'rotateY(-90deg) translateZ(48px)' }}
+        >
+          <DiceDots count={5} />
+        </div>
+        
+        {/* Face 3 - Top */}
+        <div 
+          className="absolute w-24 h-24 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
+          style={{ transform: 'rotateX(90deg) translateZ(48px)' }}
+        >
+          <DiceDots count={3} />
+        </div>
+        
+        {/* Face 4 - Bottom */}
+        <div 
+          className="absolute w-24 h-24 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
+          style={{ transform: 'rotateX(-90deg) translateZ(48px)' }}
+        >
+          <DiceDots count={4} />
+        </div>
       </div>
     </div>
   );
@@ -633,47 +684,52 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
         </DropdownMenu>
       </div>
       
-      {/* DESKTOP: Word cards + Jump button in CENTER of the screen */}
-      {!isMobile && (
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
-          <div className="flex items-center gap-4">
-            {/* Fixed size word container - always same size */}
-            <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border-2 border-dragon-green/30 w-[360px] h-[140px] flex items-center justify-center p-4">
-              {collectedWords.length === 0 ? (
-                <p className="text-gray-400 text-sm font-medium italic">Pritisni gumb za skok...</p>
-              ) : (
-                <div className="flex gap-4 items-center justify-center">
-                  <AnimatePresence>
-                    {collectedWords.map((word, idx) => (
-                      <motion.div
-                        key={`${word.word}-${idx}`}
-                        initial={{ opacity: 0, scale: 0.5 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="flex flex-col items-center"
-                      >
-                        <div className="w-20 h-20 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center p-2">
-                          <img
-                            src={getImageUrl(word.image)}
-                            alt={word.word}
-                            className="w-16 h-16 object-contain"
-                          />
-                        </div>
-                        <p className="text-sm font-bold text-gray-800 mt-1 uppercase">
-                          {word.word}
-                        </p>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </div>
-              )}
-            </div>
-            
-            {/* 3D Jump button - right of word cards */}
-            <JumpButton 
-              onClick={handleNext} 
-              disabled={isJumping || phase === "complete" || showSentenceDialog} 
-            />
+      {/* DESKTOP: Word cards + Dice positioned WITHIN the grid (between middle stones) */}
+      {!isMobile && calculatedSizes && (
+        <div 
+          className="absolute z-20 flex items-center gap-4"
+          style={{
+            // Position between middle stones (x=0, y=1) and (x=6, y=1)
+            left: offsetX + stoneWidth + 20, // 20px after left middle stone
+            bottom: offsetY + gapY + (stoneHeight / 2) - 65, // Vertically centered at y=1
+          }}
+        >
+          {/* Fixed size word container */}
+          <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border-2 border-dragon-green/30 w-[320px] h-[130px] flex items-center justify-center p-3">
+            {collectedWords.length === 0 ? (
+              <p className="text-gray-400 text-sm font-medium italic">Pritisni kocko za skok...</p>
+            ) : (
+              <div className="flex gap-4 items-center justify-center">
+                <AnimatePresence>
+                  {collectedWords.map((word, idx) => (
+                    <motion.div
+                      key={`${word.word}-${idx}`}
+                      initial={{ opacity: 0, scale: 0.5 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="flex flex-col items-center"
+                    >
+                      <div className="w-20 h-20 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center p-2">
+                        <img
+                          src={getImageUrl(word.image)}
+                          alt={word.word}
+                          className="w-16 h-16 object-contain"
+                        />
+                      </div>
+                      <p className="text-sm font-bold text-gray-800 mt-1 uppercase">
+                        {word.word}
+                      </p>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            )}
           </div>
+          
+          {/* 3D Dice - identical to DiceRoller from Met Kocke */}
+          <JumpDice 
+            onClick={handleNext} 
+            disabled={isJumping || phase === "complete" || showSentenceDialog} 
+          />
         </div>
       )}
       
@@ -712,9 +768,9 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
             </div>
           </div>
           
-          {/* MOBILE: Bottom center jump button */}
+          {/* MOBILE: Bottom center jump dice */}
           <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-20">
-            <JumpButton 
+            <JumpDice 
               onClick={handleNext} 
               disabled={isJumping || phase === "complete" || showSentenceDialog} 
             />
