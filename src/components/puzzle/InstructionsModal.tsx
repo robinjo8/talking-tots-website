@@ -57,12 +57,15 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
       ]
     : type === "bingo"
     ? [
-        { text: "Klikni na gumb ZAVRTI, da se izžreba naključna slika." },
-        { text: "Poišči vse izžrebane slike na svoji mreži in jih klikni." },
-        { text: "Če po 10 sekundah ne najdeš vseh slik, ti bo pomagala pomoč z utripajočim robom." },
-        { text: "Ko najdeš vse slike, ponovi besedo v mikrofon." },
-        { text: "Zapolni vseh 16 polj, da osvojiš zvezdico!" },
-        { text: "Zvezdica se bo zabeležila pod VAJE na tvoji strani." }
+        { text: "Zavrti kolut – Pritisni oranžni gumb ZAVRTI, da zavrtiš kolut z besedami." },
+        { text: "Počakaj na rezultat – Kolut se bo zavrtel in se ustavil na naključni sliki. Med vrtenjem se sliši zvok tikanja." },
+        { text: "Najdi sliko na mreži (4 × 4) – Ko se kolut ustavi, poišči na mreži vse slike, ki ustrezajo izbrani besedi. Pod kolutom je zapisano: Najdi: [BESEDA]." },
+        { text: "Klikni na pravilne slike – Klikni na vse slike, ki prikazujejo izbrano besedo. Ista beseda se lahko pojavi na več mestih." },
+        { text: "Ponovi besedo – Ko najdeš vse pravilne slike, se odpre okno. Klikni na sliko, začne se 3-sekundno imitirano snemanje, in glasno ponovi besedo. Igra se nadaljuje, dokler ne dokončaš celotne vrstice ali stolpca (4 slike v vrsti)." },
+        { text: "BINGO – Ko dosežeš BINGO, se prikaže čestitka. Klikni VZEMI ZVEZDICO, da se nagrada zabeleži." },
+        { text: "Namig – Če besede ne najdeš v 10 sekundah, pravilne slike začnejo utripati." },
+        { text: "Nova igra / izhod – Po osvojeni zvezdici se pojavi moder gumb za novo igro (levo spodaj). S klikom na gumb Hiška se vrnete v meni." },
+        { text: "Cilj igre: Vaditi izgovorjavo posamezne črke (na primer C, Č, K) na sredini in na koncu besed s pomočjo igre Bingo in zbiranja zvezdic." }
       ]
     : type === "dice"
     ? [
