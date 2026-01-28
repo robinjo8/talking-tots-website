@@ -1,155 +1,134 @@
 
-# Načrt: Dodajanje konfiguracij za igro "Ponovi poved" za vse črke
 
-## Pregled
+# Analiza gumbov "Hiška" in "Nova igra" po vseh igrah
 
-Igra "Ponovi poved" trenutno deluje samo za črko K. Potrebno je dodati konfiguracije za 8 dodatnih črk: **L, R, S, Z, C, Š, Ž, Č**.
+## Povzetek
 
-Za vsako črko so potrebne 4 povedi s po 3 besedami. Vsaka beseda potrebuje:
-- Besedilo za prikaz
-- Sliko iz bucketa `slike`
-- Zvočni posnetek iz bucketa `zvocni-posnetki`
+Analiza primerja implementacijo gumbov "Hiška" (Home) in "Nova igra" (RefreshCw po zaključku) v vseh igrah glede na referenco na strani `/govorne-igre/igra-ujemanja/ch56`.
 
 ---
 
-## Preslikava besed na obstoječe slike
+## Referenčni stil (GenericIgraUjemanjaGame.tsx)
 
-Na podlagi analize obstoječih podatkov in bucket `slike` so identificirane naslednje slike:
+### Gumb "Hiška":
+- Pozicija: `fixed bottom-4 left-4 z-50`
+- Velikost: `w-16 h-16`
+- Oblika: `rounded-full`
+- Barva: `bg-gradient-to-r from-amber-400 to-orange-500`
+- Obroba: `border-2 border-white/50`
+- Senca: `shadow-lg backdrop-blur-sm`
+- Animacija: `hover:scale-105 transition-transform`
+- Ikona: `Home` (lucide-react), `w-8 h-8 text-white`
 
-### GLAS L
-| Poved | Beseda 1 | Slika | Beseda 2 | Slika | Beseda 3 | Slika |
-|-------|----------|-------|----------|-------|----------|-------|
-| Lisica je list. | Lisica | lisica1.webp | je | Stickman_jesti.webp | list | list1.webp |
-| Lev nese led. | Lev | lev1.webp | nese | Stickman_nesti.webp | led | led1.webp |
-| Lovec vidi letalo. | Lovec | lovec1.webp | vidi | Stickman_gledati.webp | letalo | letalo1.webp |
-| Slon ima liziko. | Slon | slon1.webp | ima | Stickman_imeti.webp | liziko | lizika1.webp |
-
-### GLAS R
-| Poved | Beseda 1 | Slika | Beseda 2 | Slika | Beseda 3 | Slika |
-|-------|----------|-------|----------|-------|----------|-------|
-| Riba vidi raka. | Riba | riba1.webp | vidi | Stickman_gledati.webp | raka | rak1.webp |
-| Raca je repo. | Raca | raca1.webp | je | Stickman_jesti.webp | repo | repa1.webp |
-| Ris riše rožo. | Ris | ris1.webp | riše | Stickman_risati.webp | rožo | roza1.webp |
-| Robot ima rolko. | Robot | robot1.webp | ima | Stickman_imeti.webp | rolko | rolka1.webp |
-
-### GLAS S
-| Poved | Beseda 1 | Slika | Beseda 2 | Slika | Beseda 3 | Slika |
-|-------|----------|-------|----------|-------|----------|-------|
-| Sova nese sir. | Sova | sova1.webp | nese | Stickman_nesti.webp | sir | sir1.webp |
-| Slon je sladoled. | Slon | slon1.webp | je | Stickman_jesti.webp | sladoled | sladoled1.webp |
-| Snežak vidi sneg. | Snežak | snezak1.webp | vidi | Stickman_gledati.webp | sneg | sneg1.webp |
-| Osa ima sok. | Osa | osa1.webp | ima | Stickman_imeti.webp | sok | sok1.webp |
-
-### GLAS Z
-| Poved | Beseda 1 | Slika | Beseda 2 | Slika | Beseda 3 | Slika |
-|-------|----------|-------|----------|-------|----------|-------|
-| Zajec ima zob. | Zajec | zajec1.webp | ima | Stickman_imeti.webp | zob | zob1.webp |
-| Zmaj nese zlato. | Zmaj | zmaj1.webp | nese | Stickman_nesti.webp | zlato | zlato1.webp |
-| Zebra vidi zvezdo. | Zebra | zebra1.webp | vidi | Stickman_gledati.webp | zvezdo | zvezda1.webp |
-| Meduza je grozdje. | Meduza | meduza1.webp | je | Stickman_jesti.webp | grozdje | grozdje1.webp |
-
-### GLAS C
-| Poved | Beseda 1 | Slika | Beseda 2 | Slika | Beseda 3 | Slika |
-|-------|----------|-------|----------|-------|----------|-------|
-| Raca nese cekin. | Raca | raca1.webp | nese | Stickman_nesti.webp | cekin | cekin1.webp |
-| Muca je cvet. | Muca | muca1.webp | je | Stickman_jesti.webp | cvet | cvet1.webp |
-| Lovec ima copat. | Lovec | lovec1.webp | ima | Stickman_imeti.webp | copat | copat1.webp |
-| Opica vidi cirkus. | Opica | opica1.webp | vidi | Stickman_gledati.webp | cirkus | cirkus1.webp |
-
-### GLAS Š
-| Poved | Beseda 1 | Slika | Beseda 2 | Slika | Beseda 3 | Slika |
-|-------|----------|-------|----------|-------|----------|-------|
-| Šofer nese šopek. | Šofer | sofer1.webp | nese | Stickman_nesti.webp | šopek | sopek1.webp |
-| Štorklja je školjko. | Štorklja | storklja1.webp | je | Stickman_jesti.webp | školjko | skoljka1.webp |
-| Kokoš ima šal. | Kokoš | kokos1.webp | ima | Stickman_imeti.webp | šal | sal1.webp |
-| Miš vidi šotor. | Miš | mis1.webp | vidi | Stickman_gledati.webp | šotor | sotor1.webp |
-
-### GLAS Ž
-| Poved | Beseda 1 | Slika | Beseda 2 | Slika | Beseda 3 | Slika |
-|-------|----------|-------|----------|-------|----------|-------|
-| Žaba želi žago. | Žaba | zaba1.webp | želi | Stickman_zeleti.png.webp | žago | zaga1.webp |
-| Želva nese žogo. | Želva | zelva1.webp | nese | Stickman_nesti.webp | žogo | zoga1.webp |
-| Žirafa vidi žerjav. | Žirafa | zirafa1.webp | vidi | Stickman_gledati.webp | žerjav | zerjav1.webp |
-| Žolna ima žlico. | Žolna | zolna1.webp | ima | Stickman_imeti.webp | žlico | zlica1.webp |
-
-### GLAS Č
-| Poved | Beseda 1 | Slika | Beseda 2 | Slika | Beseda 3 | Slika |
-|-------|----------|-------|----------|-------|----------|-------|
-| Čarovnik ima čoln. | Čarovnik | carovnik1.webp | ima | Stickman_imeti.webp | čoln | coln1.webp |
-| Čarovnik nese čopič. | Čarovnik | carovnik1.webp | nese | Stickman_nesti.webp | čopič | copic1.webp |
-| Čebela vidi čebulo. | Čebela | cebela1.webp | vidi | Stickman_gledati.webp | čebulo | cebula1.webp |
-| Kača je čokolado. | Kača | kaca1.webp | je | Stickman_jesti.webp | čokolado | cokolada1.webp |
-
-**Opomba**: Beseda "čuvaj" ne obstaja med slikami, zato sem jo zamenjal s "čarovnik" (carovnik1.webp).
+### Gumb "Nova igra" (po zaključku):
+- Pozicija: `fixed bottom-4 left-24 z-50`
+- Velikost: `w-16 h-16`
+- Oblika: `rounded-full`
+- Barva: `bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700`
+- Obroba: `border-2 border-white/50`
+- Senca: `shadow-lg backdrop-blur-sm`
+- Ikona: `RefreshCw` (lucide-react), `h-7 w-7 text-white`
+- Pogoj prikaza: `isGameCompleted` state
 
 ---
 
-## Tehnična implementacija
+## Status po igrah
 
-### Datoteka za posodobitev
-`src/data/ponoviPovedConfig.ts`
+### ✅ Popolnoma pravilno (2 igri)
 
-### Spremembe
+| Igra | Datoteka |
+|------|----------|
+| Igra ujemanja | `GenericIgraUjemanjaGame.tsx` |
+| Ponovi poved | `PonoviPovedGame.tsx` |
 
-1. **Dodaj 8 novih konfiguracij** po vzoru obstoječe `ponoviPovedK`:
-   - `ponoviPovedL` (črka L, URL ključ: `l`)
-   - `ponoviPovedR` (črka R, URL ključ: `r`)
-   - `ponoviPovedS` (črka S, URL ključ: `s`)
-   - `ponoviPovedZ` (črka Z, URL ključ: `z`)
-   - `ponoviPovedC` (črka C, URL ključ: `c`)
-   - `ponoviPovedSH` (črka Š, URL ključ: `sh`)
-   - `ponoviPovedZH` (črka Ž, URL ključ: `zh`)
-   - `ponoviPovedCH` (črka Č, URL ključ: `ch`)
+### ⚠️ Hiška pravilna, Nova igra napačen stil (5 iger)
 
-2. **Posodobi `configMap`** z novimi konfiguracijami:
-```text
-const configMap: Record<string, PonoviPovedConfig> = {
-  k: ponoviPovedK,
-  l: ponoviPovedL,
-  r: ponoviPovedR,
-  s: ponoviPovedS,
-  z: ponoviPovedZ,
-  c: ponoviPovedC,
-  sh: ponoviPovedSH,
-  zh: ponoviPovedZH,
-  ch: ponoviPovedCH,
-};
-```
+| Igra | Datoteka | Problem |
+|------|----------|---------|
+| Sestavljanke | `GenericSestavljankaGame.tsx` | Gumb: `bg-blue-500`, `w-14 h-14` namesto gradientne modre in `w-16 h-16` |
+| Drsna sestavljanka | `GenericDrsnaSestavljankaGame.tsx` | Gumb: `bg-sky-400` namesto gradientne modre |
+| Zaporedja | `GenericZaporedjaGame.tsx` | Gumb: `bg-sky-400` namesto gradientne modre |
+| Labirint | `GenericLabirintGame.tsx` | Gumb: `bg-blue-500`, `w-14 h-14` namesto gradientne modre in `w-16 h-16` |
+| Bingo | `GenericBingoGame.tsx` | Gumb: `from-blue-400 to-blue-500`, manjka `border-white/50` |
 
-### Format zvočnih posnetkov
+### ❌ Manjka gumb "Nova igra" po zaključku (3 igre)
 
-Za vsako besedo bo zvočni posnetek sledil vzorcu:
-- Osnovne besede: `beseda.m4a` (npr. `lisica.m4a`, `lev.m4a`)
-- Sklanjane besede: `beseda.m4a` z osnovno obliko (npr. `liziko` → `lizika.m4a`)
-- Glagoli: obstoječi Stickman posnetki (`je.m4a`, `vidi.m4a`, `ima.m4a`, `rise.m4a`, `nese.m4a`, `zeli.m4a`)
-- Celotne povedi: `beseda1_beseda2_beseda3.m4a` (npr. `lisica_je_list.m4a`)
+| Igra | Datoteka | Opis |
+|------|----------|------|
+| Spomin | `GenericSpominGame.tsx` | Ni `isGameCompleted` stanja, ni plovočega gumba |
+| Met kocke | `GenericMetKockeGame.tsx` | Ni `isGameCompleted` stanja, ni plovočega gumba |
+| Kolo sreče | `GenericWheelGame.tsx` | Ni plovočega gumba po zaključku |
+
+### ❌ Popolnoma drugačna implementacija (1 igra)
+
+| Igra | Datoteka | Opis |
+|------|----------|------|
+| Poveži pare | `GenericPoveziPareGame.tsx` | Uporablja navadne gumbe v headerju namesto plovočega menija |
 
 ---
 
-## Navigacija
+## Potrebne spremembe
 
-Po implementaciji bodo vse kartice na strani `/govorne-igre/ponovi-poved` aktivne in bodo vodile do ustreznih iger:
+### 1. GenericSpominGame.tsx
+- Dodaj stanje `isGameCompleted`
+- Dodaj plavajoči modri gumb po zaključku igre
 
-| Črka | URL pot |
-|------|---------|
-| C | `/govorne-igre/ponovi-poved/c` |
-| Č | `/govorne-igre/ponovi-poved/ch` |
-| K | `/govorne-igre/ponovi-poved/k` |
-| L | `/govorne-igre/ponovi-poved/l` |
-| R | `/govorne-igre/ponovi-poved/r` |
-| S | `/govorne-igre/ponovi-poved/s` |
-| Š | `/govorne-igre/ponovi-poved/sh` |
-| Z | `/govorne-igre/ponovi-poved/z` |
-| Ž | `/govorne-igre/ponovi-poved/zh` |
+### 2. GenericSestavljankaGame.tsx
+- Spremeni stil gumba iz `bg-blue-500 w-14 h-14` v:
+  ```
+  bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 w-16 h-16 border-2 border-white/50 backdrop-blur-sm
+  ```
 
-Stran `PonoviPoved.tsx` že uporablja `hasPonoviPovedConfig()` za preverjanje dostopnosti, zato bodo kartice samodejno odkljenjene po dodajanju konfiguracij.
+### 3. GenericDrsnaSestavljankaGame.tsx
+- Spremeni stil gumba iz `bg-sky-400` v:
+  ```
+  bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700
+  ```
+
+### 4. GenericZaporedjaGame.tsx
+- Spremeni stil gumba (na dveh mestih - mobile in desktop) iz `bg-sky-400` v:
+  ```
+  bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700
+  ```
+
+### 5. GenericLabirintGame.tsx
+- Spremeni stil gumba iz `bg-blue-500 w-14 h-14` v:
+  ```
+  bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 w-16 h-16 border-2 border-white/50 backdrop-blur-sm
+  ```
+
+### 6. GenericMetKockeGame.tsx
+- Dodaj stanje `isGameCompleted`
+- Dodaj logiko za prikaz po zaključku runde
+- Dodaj plavajoči modri gumb
+
+### 7. GenericWheelGame.tsx
+- Dodaj stanje `isGameCompleted` ali `showNewGameButton`
+- Dodaj plavajoči modri gumb po zaključku
+
+### 8. GenericBingoGame.tsx
+- Dodaj `border-2 border-white/50 backdrop-blur-sm` in popravi hover stanje
+
+### 9. GenericPoveziPareGame.tsx (največja sprememba)
+- Zamenjaj headerske gumbe s plovočim Home menijem
+- Dodaj plavajoči modri gumb po zaključku
+- Uskladi z referenčnim stilom
 
 ---
 
-## Povzetek sprememb
+## Tehnični povzetek
 
-| Komponenta | Sprememba |
-|------------|-----------|
-| `src/data/ponoviPovedConfig.ts` | Dodaj 8 novih konfiguracij za črke L, R, S, Z, C, Š, Ž, Č |
-| Navigacija | Samodejno odklenjena (brez sprememb) |
-| UI | Brez sprememb (obstoječa logika že podpira dinamično nalaganje) |
+| Komponenta | Št. vrstic za spremembo | Prioriteta |
+|------------|--------------------------|------------|
+| GenericSestavljankaGame.tsx | ~5 | Nizka |
+| GenericDrsnaSestavljankaGame.tsx | ~5 | Nizka |
+| GenericZaporedjaGame.tsx | ~10 | Nizka |
+| GenericLabirintGame.tsx | ~10 | Nizka |
+| GenericBingoGame.tsx | ~5 | Nizka |
+| GenericSpominGame.tsx | ~20 | Srednja |
+| GenericMetKockeGame.tsx | ~20 | Srednja |
+| GenericWheelGame.tsx | ~15 | Srednja |
+| GenericPoveziPareGame.tsx | ~50 | Visoka |
+
+**Skupno: 9 datotek za posodobitev**
+
