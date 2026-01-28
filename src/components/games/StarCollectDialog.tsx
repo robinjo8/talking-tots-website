@@ -128,8 +128,8 @@ export const StarCollectDialog: React.FC<StarCollectDialogProps> = ({
             {renderStars()}
           </div>
           
-          <h2 className="text-xl font-bold text-dragon-green text-center">
-            Odlično! Pobral si {starNumber}. zvezdico!
+          <h2 className="text-xl font-bold text-dragon-green text-center uppercase">
+            ODLIČNO! POBRAL SI {starNumber}. ZVEZDICO!
           </h2>
           
           <p className="text-sm text-black text-center uppercase">

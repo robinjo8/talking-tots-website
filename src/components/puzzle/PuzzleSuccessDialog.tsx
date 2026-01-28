@@ -155,7 +155,7 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
       <Dialog open={isOpen} onOpenChange={handleClose}>
         <DialogContent className="sm:max-w-lg">
           <div className="space-y-4 py-4">
-            <h2 className="text-2xl font-bold text-dragon-green text-center">Odlično!</h2>
+            <h2 className="text-2xl font-bold text-dragon-green text-center uppercase">ODLIČNO!</h2>
             
             <p className="text-sm text-black text-center uppercase">
               KLIKNI NA SPODNJE SLIKE IN PONOVI BESEDE
@@ -246,10 +246,10 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
       <ConfirmDialog
         open={showConfirmDialog}
         onOpenChange={setShowConfirmDialog}
-        title="Zapri igro"
-        description="Če zapreš igro, ne boš prejel zvezdice. Ali si prepričan?"
-        confirmText="V redu"
-        cancelText="Prekliči"
+        title="ZAPRI IGRO"
+        description="ČE ZAPREŠ IGRO, NE BOŠ PREJEL ZVEZDICE. ALI SI PREPRIČAN?"
+        confirmText="V REDU"
+        cancelText="PREKLIČI"
         onConfirm={handleConfirmClose}
         onCancel={() => setShowConfirmDialog(false)}
       />

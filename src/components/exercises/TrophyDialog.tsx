@@ -39,8 +39,8 @@ export const TrophyDialog = ({ isOpen, onClose, onClaimTrophy, childName, totalS
           <DialogTitle className="text-2xl font-bold text-yellow-800 dark:text-yellow-200 text-center">
             🎉 ČESTITKE! 🎉
           </DialogTitle>
-          <DialogDescription className="text-lg text-yellow-700 dark:text-yellow-300 text-center">
-            Čestitamo <span className="font-bold text-orange-500">{childName}</span> za osvojeni pokal!
+          <DialogDescription className="text-lg text-yellow-700 dark:text-yellow-300 text-center uppercase">
+            ČESTITAMO <span className="font-bold text-orange-500">{childName?.toUpperCase()}</span> ZA OSVOJENI POKAL!
           </DialogDescription>
         </DialogHeader>
 
@@ -63,16 +63,16 @@ export const TrophyDialog = ({ isOpen, onClose, onClaimTrophy, childName, totalS
                 ⭐ {totalStars} ZVEZD ⭐
               </p>
             )}
-            <p className="text-base text-yellow-600 dark:text-yellow-400 mt-2">
-              Bravo, to je tvoj <span className="font-bold text-orange-500">{trophyNumber}.</span> pokal!
+            <p className="text-base text-yellow-600 dark:text-yellow-400 mt-2 uppercase">
+              BRAVO, TO JE TVOJ <span className="font-bold text-orange-500">{trophyNumber}.</span> POKAL!
             </p>
           </div>
 
           <button
             onClick={handleClaimTrophy}
-            className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-medium transition-colors text-lg shadow-md"
+            className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-medium transition-colors text-lg shadow-md uppercase"
           >
-            {onClaimTrophy ? "Vzemi pokal" : "Nadaljuj z vajami"}
+            {onClaimTrophy ? "VZEMI POKAL" : "NADALJUJ Z VAJAMI"}
           </button>
         </div>
       </DialogContent>

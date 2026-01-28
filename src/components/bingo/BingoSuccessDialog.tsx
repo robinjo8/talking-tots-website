@@ -112,8 +112,8 @@ export const BingoSuccessDialog: React.FC<BingoSuccessDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={() => {}}>
       <DialogContent className="sm:max-w-lg" onPointerDownOutside={(e) => e.preventDefault()}>
         <div className="space-y-4 py-4">
-          <h2 className="text-2xl font-bold text-dragon-green text-center">
-            {isLastWord && hasRecorded ? '🎉 Čestitke! 🎉' : 'Odlično!'}
+          <h2 className="text-2xl font-bold text-dragon-green text-center uppercase">
+            {isLastWord && hasRecorded ? '🎉 ČESTITKE! 🎉' : 'ODLIČNO!'}
           </h2>
 
           {!hasRecorded && (

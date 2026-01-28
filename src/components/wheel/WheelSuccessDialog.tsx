@@ -199,8 +199,8 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
       <Dialog open={isOpen} onOpenChange={handleClose}>
         <DialogContent className="max-w-[95vw] max-h-[90vh] sm:max-w-lg overflow-y-auto p-4 sm:p-6">
           <div className="space-y-2 sm:space-y-4 py-1 sm:py-4">
-            <h2 className="text-lg sm:text-2xl font-bold text-dragon-green text-center">
-              {showClaimButton ? '🎉 Čestitke! 🎉' : 'Odlično!'}
+            <h2 className="text-lg sm:text-2xl font-bold text-dragon-green text-center uppercase">
+              {showClaimButton ? '🎉 ČESTITKE! 🎉' : 'ODLIČNO!'}
             </h2>
 
             {!showClaimButton && (
@@ -251,9 +251,9 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
             {/* Progress circles and count */}
             <div className="flex flex-col items-center space-y-1 sm:space-y-2">
               <ProgressCircles count={displayCount} size="lg" animate={false} />
-              <span className="text-xs sm:text-sm text-muted-foreground">
-                Izgovoril si {displayCount}/3 krat
-                {!showClaimButton && ` (še ${3 - displayCount}x za zvezdico)`}
+              <span className="text-xs sm:text-sm text-muted-foreground uppercase">
+                IZGOVORIL SI {displayCount}/3 KRAT
+                {!showClaimButton && ` (ŠE ${3 - displayCount}X ZA ZVEZDICO)`}
               </span>
             </div>
 

@@ -122,8 +122,8 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
       <Dialog open={isOpen} onOpenChange={(open) => !open && handleCloseAttempt()}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-dragon-green text-center">
-            Par {pairNumber} od {totalPairs}
+          <DialogTitle className="text-2xl font-bold text-dragon-green text-center uppercase">
+            PAR {pairNumber} OD {totalPairs}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-6 py-4">
@@ -196,7 +196,7 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
               className="gap-2 flex-1 max-w-28"
               disabled={!hasRecorded}
             >
-              Ponovi
+              PONOVI
             </Button>
             <Button 
               onClick={handleContinue}
@@ -210,10 +210,10 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
               {isLastPair ? (
                 <>
                   <Star className="w-4 h-4" />
-                  Vzemi zvezdico
+                  VZEMI ZVEZDICO
                 </>
               ) : (
-                'Nadaljuj'
+                'NADALJUJ'
               )}
             </Button>
           </div>
@@ -224,10 +224,10 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
     <ConfirmDialog
       open={showCloseConfirmation}
       onOpenChange={setShowCloseConfirmation}
-      title="Zapuščaš igro"
-      description="Ali res želiš zapreti okno? Tvoj posnetek ne bo shranjen."
-      confirmText="Zapri"
-      cancelText="Nadaljuj z igro"
+        title="ZAPUŠČAŠ IGRO"
+        description="ALI RES ŽELIŠ ZAPRETI OKNO? TVOJ POSNETEK NE BO SHRANJEN."
+        confirmText="ZAPRI"
+        cancelText="NADALJUJ Z IGRO"
       confirmVariant="destructive"
       onConfirm={handleConfirmClose}
       onCancel={handleCancelClose}
