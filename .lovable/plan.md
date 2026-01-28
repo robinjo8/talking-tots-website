@@ -1,131 +1,118 @@
 
-# Načrt: Popravek mobilne postavitve - pravilno centriranje in poravnava
+# Načrt: Popravek mobilne postavitve - pravilno centriranje in raztegnitev
 
-## Težave identificirane na sliki
+## Natančna analiza težav na sliki
 
-1. **Grid ni centriran** - kamni so premaknjeni v levo
-2. **Manjka srednji spodnji zeleni kamen** - spodaj bi morali biti 3 kamni v liniji (SIV, ZELEN, SIV)
-3. **Zgornji 3 kamni niso poravnani** - manjka pravilna poravnava
-4. **Premalo prostora med stolpcema** - gumb je preblizu kamnov
+### Težava 1: Vertikalni razmak je PREMAJHEN
+Kamni so stisnjeni v spodnjo polovico zaslona. Razlog:
+- `stoneHeight` je omejen na max 58px
+- 8 kamnov × 58px = 464px
+- Če je zaslon visok 700px, ostane samo ~50px za 7 razmakov = ~7px na razmak
 
----
+**Popravek:** Odstraniti omejitev `stoneHeight` in pustiti, da se kamni raztegnejo čez celotno razpoložljivo višino.
 
-## 1. Posodobitev STONE_POSITIONS_MOBILE
+### Težava 2: Horizontalna ASIMETRIJA
+Levi stolpec je bližje levemu robu kot desni stolpec desnemu.
 
-Dodaj vizualni srednji zeleni kamen spodaj (y=0, x=1). Ta kamen **ni del poti** zmajčka, ampak je samo vizualni element za simetrijo:
-
+**Problem v kodi:**
 ```typescript
-// Dodatni vizualni kamni za simetrijo (niso del poti)
-const MOBILE_DECORATIVE_STONES: StonePosition[] = [
-  { x: 1, y: 0, type: 'green', isRest: false }, // Spodnji srednji
-];
+// Levi stolpec uporablja: offsetX = edgeMargin + stoneWidth/2
+// Desni stolpec uporablja: containerSize.width - 25 - stoneWidth/2
+// NAPAKA: "25" je hardkodirano namesto da bi uporabil edgeMargin!
 ```
 
+**Popravek:** Uporabiti isto `edgeMargin` vrednost za obe strani.
+
 ---
 
-## 2. Popravek calculatedSizes za mobilno verzijo
-
-Glavna težava je v izračunu `offsetX` in `gapX`. Potrebujemo:
+## Popravki v calculatedSizes
 
 ```typescript
-// MOBILE: 3-column layout, properly centered
-const columns = 3;
+// MOBILE: U-shaped layout (3 columns x 8 rows)
 const rows = 8;
 
-// Izračunaj razpoložljivo višino (med karticami besed in gumbom)
-const topCardHeight = 130; // Prostor za kartice besed zgoraj
-const bottomButtonSpace = 110; // Prostor za gumb spodaj
+// Calculate available space
+const topCardHeight = 100;
+const bottomButtonSpace = 100;
 const availableHeight = containerSize.height - topCardHeight - bottomButtonSpace;
-const availableWidth = containerSize.width - 60; // Padding levo/desno
+const availableWidth = containerSize.width;
 
-// Izračunaj velikost kamnov glede na višino
-const maxStoneHeight = Math.floor(availableHeight / rows * 0.85);
-const stoneHeight = Math.min(maxStoneHeight, 45); // Max 45px višine
-const stoneWidth = Math.floor(stoneHeight * 1.4); // Razmerje 1.4:1
+// POPRAVEK 1: Večji razmak od robov za simetrijo
+const edgeMargin = 35; // Večji margin od robov
 
-// Razmik med kamni
-const gapY = Math.floor((availableHeight - stoneHeight * rows) / (rows - 1));
+// POPRAVEK 2: Kamni se raztegnejo čez celotno višino
+// Najprej izračunaj razpoložljiv prostor, nato velikost kamnov
+const maxStoneHeight = Math.floor(availableHeight / (rows + 2)); // Manjši kamni = več prostora za gapY
+const stoneHeight = Math.min(maxStoneHeight, 50);
+const stoneWidth = Math.floor(stoneHeight * 1.4);
 
-// Horizontalni razmik - trije stolpci, razporejeni enakomerno
-// Levi stolpec (x=0), sredina (x=1), desni stolpec (x=2)
-const gapX = Math.floor(availableWidth / 2); // Polovica širine med stolpci
+// POPRAVEK 3: gapY se izračuna tako da zapolni celotno višino
+const totalStonesHeight = stoneHeight * rows;
+const gapY = Math.floor((availableHeight - totalStonesHeight) / (rows - 1));
 
-// Izračunaj offset za centriranje celotnega grida
-const totalGridWidth = 2 * gapX; // Od x=0 do x=2
-const offsetX = (containerSize.width - totalGridWidth) / 2;
+// POPRAVEK 4: Simetrična horizontalna postavitev
+const leftColumnCenter = edgeMargin + stoneWidth / 2;
+const rightColumnCenter = availableWidth - edgeMargin - stoneWidth / 2;
+const centerColumnCenter = availableWidth / 2;
+const gapX = (rightColumnCenter - leftColumnCenter) / 2;
 
-// Vertikalni offset - centriranje z upoštevanjem gumba
-const totalGridHeight = (rows - 1) * gapY + stoneHeight * rows;
-const offsetY = bottomButtonSpace + (availableHeight - totalGridHeight) / 2 + stoneHeight;
+const dragonSize = Math.floor(stoneWidth * 1.2);
+
+// Shrani vse tri pozicije stolpcev za uporabo v getStonePixelPosition
+const columnCenters = [leftColumnCenter, centerColumnCenter, rightColumnCenter];
+
+// Vertical offset - začni nad gumbom
+const offsetY = bottomButtonSpace;
 ```
 
 ---
 
-## 3. Popravek getStonePixelPosition za pravilno centriranje
+## Popravki v getStonePixelPosition
 
 ```typescript
-// MOBILE: Properly centered columns
+// MOBILE: Uporabi izračunane pozicije stolpcev
+// Ne več hardkodirane vrednosti!
+const columnCenters = [
+  edgeMargin + stoneWidth / 2,  // Levi stolpec
+  containerSize.width / 2,       // Srednji stolpec
+  containerSize.width - edgeMargin - stoneWidth / 2,  // Desni stolpec (POPRAVEK!)
+];
+
 return {
-  left: offsetX + stone.x * gapX - stoneWidth / 2, // Center each stone
+  left: columnCenters[stone.x] - stoneWidth / 2,
   bottom: offsetY + stone.y * gapY,
 };
 ```
 
 ---
 
-## 4. Renderiranje dodatnih dekorativnih kamnov
-
-V JSX del za mobilno verzijo dodaj:
-
-```tsx
-{/* Dekorativni srednji zeleni kamen spodaj */}
-{isMobile && (
-  <div
-    className="absolute"
-    style={{
-      left: offsetX + 1 * gapX - stoneWidth / 2,
-      bottom: offsetY,
-      width: stoneWidth,
-      height: stoneHeight,
-    }}
-  >
-    <img
-      src={STONE_IMAGES.green}
-      alt="Dekorativni kamen"
-      className="w-full h-full object-contain drop-shadow-lg opacity-60"
-    />
-  </div>
-)}
-```
-
----
-
-## 5. Vizualizacija končnega rezultata
+## Vizualizacija končnega rezultata
 
 ```text
 +----------------------------------+
 |     +------------------------+   |
-|     | [KOZA] [RIŠE] [KROG]  |   |  ← Kartice besed (zgoraj)
+|     |   Zbrane besede...    |   |  ← topCardHeight (100px)
 |     +------------------------+   |
 |                                  |
-|  [RUMEN]   [SIV]     [RUMEN]    |  ← y=7 (zgornji 3 v liniji)
-|                                  |
-|  [RDEČ]              [RDEČ]     |  ← y=6
-|                                  |
-|  [SIV]                [SIV]     |  ← y=5
-|                                  |
-|  [ZELEN]            [ZELEN]     |  ← y=4 (rest)
-|                                  |
-|  [RUMEN]            [RUMEN]     |  ← y=3
-|                                  |
-|  [RDEČ]              [RDEČ]     |  ← y=2
-|                                  |
-|  [SIV]               [SIV]      |  ← y=1
-|                                  |
-|🐉[SIV]    [ZELEN]    [SIV]      |  ← y=0 (spodnji 3 v liniji)
-|                                  |
+|    [RUMEN]   [SIV]   [RUMEN]    |  ← y=7 (zgornji 3)
+|          ↑ gapY ↑                |
+|    [RDEČ]           [RDEČ]      |  ← y=6
+|          ↑ gapY ↑                |
+|    [SIV]             [SIV]      |  ← y=5
+|          ↑ gapY ↑                |
+|    [ZELEN]         [ZELEN]      |  ← y=4
+|          ↑ gapY ↑                |
+|    [RUMEN]         [RUMEN]      |  ← y=3
+|          ↑ gapY ↑                |
+|    [RDEČ]           [RDEČ]      |  ← y=2
+|          ↑ gapY ↑                |
+|    [SIV]             [SIV]      |  ← y=1
+|          ↑ gapY ↑                |
+| 🐉 [SIV]   [ZELEN]   [SIV]      |  ← y=0 (spodnji 3)
+|  ↑                         ↑     |
+|  edgeMargin=35    edgeMargin=35 |  ← SIMETRIČNO!
 |           +------+               |
-|           |  ↑   |               |  ← Gumb (sredina)
+|           |  ↑   |               |  ← bottomButtonSpace (100px)
 |           +------+               |
 | [HOME]                           |
 +----------------------------------+
@@ -133,22 +120,21 @@ V JSX del za mobilno verzijo dodaj:
 
 ---
 
-## 6. Tehnični povzetek sprememb
+## Tehnični povzetek sprememb
 
-| Komponenta | Sprememba |
-|------------|-----------|
-| `calculatedSizes` | Nov izračun offsetX, gapX za pravilno centriranje 3 stolpcev |
-| `getStonePixelPosition` | Centriranje posameznega kamna s `- stoneWidth/2` |
-| JSX | Dodaten dekorativni zeleni kamen na sredini spodaj |
-| Desktop | **BREZ SPREMEMB** |
+| Lokacija | Trenutno | Popravek |
+|----------|----------|----------|
+| `edgeMargin` | 25px | 35px (več prostora od robov) |
+| `stoneHeight` max | 58px | 50px (manjši kamni = večji gapY) |
+| Desni stolpec | Hardkodirano `25` | Uporabi `edgeMargin` |
+| `gapY` formula | Pravilna | Ostane enako, bo deloval z manjšimi kamni |
+| `dragonSize` | 110% | 120% za boljšo vidljivost |
 
 ---
 
-## Ključne točke popravkov
+## Ključne točke
 
-1. **Pravilno centriranje** - `offsetX` izračunan tako, da je grid horizontalno sredinan
-2. **Trije stolpci enakomerno razporejeni** - `gapX` je polovica razpoložljive širine
-3. **Spodnja vrstica 3 kamni** - dodan dekorativni zeleni kamen na (x=1, y=0)
-4. **Zgornja vrstica 3 kamni** - že obstajajo v definiciji (y=7, x=0,1,2)
-5. **Grid nad gumbom** - `offsetY` pravilno izračunan z upoštevanjem prostora za gumb
-6. **Odziven dizajn** - vsi izračuni relativni na `containerSize`
+1. **Simetrija** - Obe strani uporabljata isto `edgeMargin` vrednost
+2. **Vertikalna raztegnitev** - Manjši kamni = več prostora za gapY = raztegnitev navzgor
+3. **Večji zmajček** - 120% velikosti kamna za boljšo vidljivost
+4. **Konsistentna logika** - Ni več hardkodiranih vrednosti za pozicioniranje
