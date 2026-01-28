@@ -128,13 +128,13 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-lg max-h-[85vh] flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="text-xl font-bold text-center mb-4">
             {title}
           </DialogTitle>
         </DialogHeader>
-        <div className="px-2 pb-4">
+        <div className="px-2 pb-4 overflow-y-auto flex-1">
           <div className="space-y-4">
             {content.map((item, index) => (
               <div key={index} className="flex items-start gap-3">
