@@ -16,22 +16,22 @@ export function MemoryExitConfirmationDialog({ children, onConfirm, open, onOpen
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-center">Opozorilo</AlertDialogTitle>
-          <AlertDialogDescription className="text-center">
-            Ali res želite prekiniti igro?
+          <AlertDialogTitle className="text-center uppercase">OPOZORILO</AlertDialogTitle>
+          <AlertDialogDescription className="text-center uppercase">
+            ALI RES ŽELITE PREKINITI IGRO?
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex flex-row justify-center sm:justify-center items-center gap-4 mt-6">
           <AlertDialogAction 
             onClick={onConfirm}
-            className="bg-green-500 hover:bg-green-600 text-white rounded-lg px-8 py-3 text-base font-medium min-w-[100px]"
+            className="bg-green-500 hover:bg-green-600 text-white rounded-lg px-8 py-3 text-base font-medium min-w-[100px] uppercase"
           >
             <Check className="w-5 h-5 mr-2" />
-            Da
+            DA
           </AlertDialogAction>
-          <AlertDialogCancel className="bg-red-500 hover:bg-red-600 text-white border-red-500 hover:border-red-600 rounded-lg px-8 py-3 text-base font-medium min-w-[100px]">
+          <AlertDialogCancel className="bg-red-500 hover:bg-red-600 text-white border-red-500 hover:border-red-600 rounded-lg px-8 py-3 text-base font-medium min-w-[100px] uppercase">
             <X className="w-5 h-5 mr-2" />
-            Ne
+            NE
           </AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>

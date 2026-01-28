@@ -186,8 +186,8 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
         : "sm:max-w-lg"
       }>
         <DialogHeader className={isMobileLandscape ? "pb-0 flex-shrink-0" : ""}>
-          <DialogTitle className={`font-bold text-dragon-green text-center ${isMobileLandscape ? "text-xl" : "text-lg md:text-2xl"}`}>
-            Odlično!
+          <DialogTitle className={`font-bold text-dragon-green text-center uppercase ${isMobileLandscape ? "text-xl" : "text-lg md:text-2xl"}`}>
+            ODLIČNO!
           </DialogTitle>
         </DialogHeader>
         <div className={isMobileLandscape 
@@ -250,7 +250,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
         {/* Action buttons - always visible at bottom */}
         <div className={`flex justify-center gap-3 flex-shrink-0 ${isMobileLandscape ? "pb-2" : ""}`}>
           <Button onClick={handleClose} variant="outline" className={`gap-2 flex-1 max-w-32 ${isMobileLandscape ? "h-10" : ""}`}>
-            Zapri
+            ZAPRI
           </Button>
           
           {completedRecordings.size === images.length && !starClaimed ? (
@@ -259,7 +259,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
               className={`bg-yellow-500 hover:bg-yellow-600 text-white gap-2 flex-1 max-w-36 ${isMobileLandscape ? "h-10" : ""}`}
             >
               <Star className="w-4 h-4" />
-              Vzemi zvezdico
+              VZEMI ZVEZDICO
             </Button>
           ) : starClaimed && onNewGame ? (
             <Button 
@@ -270,12 +270,12 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
               className={`bg-blue-500 hover:bg-blue-600 text-white gap-2 flex-1 max-w-36 ${isMobileLandscape ? "h-10" : ""}`}
             >
               <RefreshCw className="w-4 h-4" />
-              Nova igra
+              NOVA IGRA
             </Button>
           ) : (
             <Button onClick={handleClose} className={`bg-dragon-green hover:bg-dragon-green/90 gap-2 flex-1 max-w-32 ${isMobileLandscape ? "h-10" : ""}`}>
               <X className="w-4 h-4" />
-              Zapri
+              ZAPRI
             </Button>
           )}
         </div>
@@ -284,10 +284,10 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       <ConfirmDialog
         open={showConfirmDialog}
         onOpenChange={setShowConfirmDialog}
-        title={confirmDialogConfig?.title || ""}
-        description={confirmDialogConfig?.description || ""}
-        confirmText="V redu"
-        cancelText="Prekliči"
+        title={confirmDialogConfig?.title?.toUpperCase() || ""}
+        description={confirmDialogConfig?.description?.toUpperCase() || ""}
+        confirmText="V REDU"
+        cancelText="PREKLIČI"
         onConfirm={() => confirmDialogConfig?.onConfirm()}
         onCancel={() => setShowConfirmDialog(false)}
       />

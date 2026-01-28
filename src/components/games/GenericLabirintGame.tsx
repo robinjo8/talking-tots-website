@@ -323,14 +323,14 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
         <Dialog open={showInstructions} onOpenChange={setShowInstructions}>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle className="text-center text-2xl">📖 Navodila</DialogTitle>
-              <DialogDescription className="text-center text-base pt-4">
-                Poišči pot skozi labirint in poberi vse 4 zvezdice! Ob vsaki zvezdici ponovi besedo. Ko pobereš vse zvezdice, nadaljuj do cilja (zastavice).
+              <DialogTitle className="text-center text-2xl uppercase">📖 NAVODILA</DialogTitle>
+              <DialogDescription className="text-center text-base pt-4 uppercase">
+                POIŠČI POT SKOZI LABIRINT IN POBERI VSE 4 ZVEZDICE! OB VSAKI ZVEZDICI PONOVI BESEDO. KO POBEREŠ VSE ZVEZDICE, NADALJUJ DO CILJA (ZASTAVICE).
               </DialogDescription>
             </DialogHeader>
             <div className="flex justify-center pt-4">
-              <Button onClick={() => setShowInstructions(false)} className="bg-app-orange hover:bg-app-orange/90">
-                Razumem
+              <Button onClick={() => setShowInstructions(false)} className="bg-app-orange hover:bg-app-orange/90 uppercase">
+                RAZUMEM
               </Button>
             </div>
           </DialogContent>
@@ -398,16 +398,16 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
       <Dialog open={showInstructions} onOpenChange={setShowInstructions}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-center text-2xl">📖 Navodila</DialogTitle>
-            <DialogDescription className="text-center text-base pt-4">
-              Poišči pot skozi labirint in poberi vse 4 zvezdice! Ob vsaki zvezdici ponovi besedo. Ko pobereš vse zvezdice, nadaljuj do cilja (zastavice).
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-center pt-4">
-            <Button onClick={() => setShowInstructions(false)} className="bg-app-orange hover:bg-app-orange/90">
-              Razumem
-            </Button>
-          </div>
+              <DialogTitle className="text-center text-2xl uppercase">📖 NAVODILA</DialogTitle>
+              <DialogDescription className="text-center text-base pt-4 uppercase">
+                POIŠČI POT SKOZI LABIRINT IN POBERI VSE 4 ZVEZDICE! OB VSAKI ZVEZDICI PONOVI BESEDO. KO POBEREŠ VSE ZVEZDICE, NADALJUJ DO CILJA (ZASTAVICE).
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex justify-center pt-4">
+              <Button onClick={() => setShowInstructions(false)} className="bg-app-orange hover:bg-app-orange/90 uppercase">
+                RAZUMEM
+              </Button>
+            </div>
         </DialogContent>
       </Dialog>
 

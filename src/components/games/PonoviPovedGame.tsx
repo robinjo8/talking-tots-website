@@ -1023,18 +1023,18 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       <AlertDialog open={showSentenceExitWarning} onOpenChange={setShowSentenceExitWarning}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Opozorilo</AlertDialogTitle>
-            <AlertDialogDescription>
-              Če zapreš okno, se bo igra začela od začetka. Ali si prepričan/a?
+            <AlertDialogTitle className="uppercase">OPOZORILO</AlertDialogTitle>
+            <AlertDialogDescription className="uppercase">
+              ČE ZAPREŠ OKNO, SE BO IGRA ZAČELA OD ZAČETKA. ALI SI PREPRIČAN/A?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-dragon-green text-white hover:bg-dragon-green/90">Ne</AlertDialogCancel>
+            <AlertDialogCancel className="bg-dragon-green text-white hover:bg-dragon-green/90 uppercase">NE</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-500 text-white hover:bg-red-600"
+              className="bg-red-500 text-white hover:bg-red-600 uppercase"
               onClick={handleConfirmSentenceExit}
             >
-              Da
+              DA
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1044,18 +1044,18 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Opozorilo</AlertDialogTitle>
-            <AlertDialogDescription>
-              Ali res želiš zapustiti igro? Tvoj napredek ne bo shranjen.
+            <AlertDialogTitle className="uppercase">OPOZORILO</AlertDialogTitle>
+            <AlertDialogDescription className="uppercase">
+              ALI RES ŽELIŠ ZAPUSTITI IGRO? TVOJ NAPREDEK NE BO SHRANJEN.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-red-500 text-white hover:bg-red-600">Ne</AlertDialogCancel>
+            <AlertDialogCancel className="bg-red-500 text-white hover:bg-red-600 uppercase">NE</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-dragon-green text-white hover:bg-dragon-green/90"
+              className="bg-dragon-green text-white hover:bg-dragon-green/90 uppercase"
               onClick={() => navigate("/govorne-igre/ponovi-poved")}
             >
-              Da
+              DA
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1065,19 +1065,19 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       <AlertDialog open={showInstructions} onOpenChange={setShowInstructions}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Navodila</AlertDialogTitle>
-            <AlertDialogDescription className="text-left space-y-2">
-              <p>🐉 Zmajček skače po barvnih kamnih.</p>
-              <p>🟢 Na zelenem kamnu izgovori prvo besedo.</p>
-              <p>🔴 Na rdečem kamnu izgovori drugo besedo.</p>
-              <p>🟡 Na rumenem kamnu izgovori tretjo besedo.</p>
-              <p>⬜ Na sivem kamnu ponovi celo poved!</p>
-              <p>🏆 Cilj je obkrožiti vse kamne in ponoviti vse 4 povedi!</p>
+            <AlertDialogTitle className="uppercase">NAVODILA</AlertDialogTitle>
+            <AlertDialogDescription className="text-left space-y-2 uppercase">
+              <p>🐉 ZMAJČEK SKAČE PO BARVNIH KAMNIH.</p>
+              <p>🟢 NA ZELENEM KAMNU IZGOVORI PRVO BESEDO.</p>
+              <p>🔴 NA RDEČEM KAMNU IZGOVORI DRUGO BESEDO.</p>
+              <p>🟡 NA RUMENEM KAMNU IZGOVORI TRETJO BESEDO.</p>
+              <p>⬜ NA SIVEM KAMNU PONOVI CELO POVED!</p>
+              <p>🏆 CILJ JE OBKROŽITI VSE KAMNE IN PONOVITI VSE 4 POVEDI!</p>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction className="bg-dragon-green text-white hover:bg-dragon-green/90">
-              Razumem
+            <AlertDialogAction className="bg-dragon-green text-white hover:bg-dragon-green/90 uppercase">
+              RAZUMEM
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1096,7 +1096,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
             </h1>
             
             <p className="text-center text-base md:text-lg uppercase font-medium">
-              Odlično si ponovil/a vse povedi!
+              ODLIČNO SI PONOVIL/A VSE POVEDI!
             </p>
             
             <img
@@ -1130,7 +1130,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
               }}
               className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 uppercase font-bold px-8"
             >
-              ⭐ Vzemi zvezdico
+              ⭐ VZEMI ZVEZDICO
             </Button>
           </div>
         </DialogContent>
