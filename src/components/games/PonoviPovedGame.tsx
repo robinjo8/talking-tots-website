@@ -311,33 +311,38 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     }
     
     // MOBILE: U-shaped layout (3 columns x 8 rows, y from 0 to 7)
-    const columns = 3;
+    // Properly centered horizontally and vertically
     const rows = 8;
     
-    const availableWidth = containerSize.width - 40; // padding
-    const availableHeight = containerSize.height - 180; // space for word cards at top + button at bottom
+    // Calculate available space
+    const topCardHeight = 130; // Space for word cards at top
+    const bottomButtonSpace = 110; // Space for jump button at bottom
+    const availableHeight = containerSize.height - topCardHeight - bottomButtonSpace;
+    const availableWidth = containerSize.width - 60; // Padding left/right
     
-    // Calculate stone size - larger for better visibility
-    const sizeByWidth = Math.floor(availableWidth / columns / 1.3);
-    const sizeByHeight = Math.floor(availableHeight / rows / 1.1);
+    // Calculate stone size based on available height
+    const maxStoneHeight = Math.floor(availableHeight / rows * 0.85);
+    const stoneHeight = Math.min(maxStoneHeight, 45);
+    const stoneWidth = Math.floor(stoneHeight * 1.4); // Aspect ratio 1.4:1
     
-    const stoneWidth = Math.min(sizeByWidth, sizeByHeight, 55);
-    const stoneHeight = Math.floor(stoneWidth * 0.75);
-    
-    // Gaps between stones - calculate for proper centering
-    const totalStoneWidth = stoneWidth * 3;
-    const gapX = Math.floor((availableWidth - totalStoneWidth) / 2);
+    // Vertical gap between stones
     const gapY = Math.floor((availableHeight - stoneHeight * rows) / (rows - 1));
+    
+    // Horizontal gap - evenly distribute 3 columns
+    // gapX is the distance between column centers
+    const gapX = Math.floor(availableWidth / 2);
     
     const dragonSize = Math.floor(stoneWidth * 0.9);
     
-    // Calculate grid dimensions for centering
-    const totalGridWidth = stoneWidth * 3 + gapX * 2;
+    // Calculate total grid dimensions
+    const totalGridWidth = 2 * gapX; // From x=0 to x=2
     const totalGridHeight = stoneHeight * rows + gapY * (rows - 1);
     
-    // Center horizontally and vertically, with space for button at bottom
-    const offsetX = Math.floor((containerSize.width - totalGridWidth) / 2) + stoneWidth / 2;
-    const offsetY = Math.floor((containerSize.height - totalGridHeight) / 2) - 30; // Shift up for button space
+    // Center the grid horizontally
+    const offsetX = (containerSize.width - totalGridWidth) / 2;
+    
+    // Center vertically with space for button at bottom
+    const offsetY = bottomButtonSpace + (availableHeight - totalGridHeight) / 2 + stoneHeight;
     
     return {
       stoneWidth,
@@ -638,9 +643,9 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     }
     
     // MOBILE: U-shaped path - y from 0 to 7
-    // No adjustment needed since y starts at 0
+    // Center each stone on its column by subtracting half the stone width
     return {
-      left: offsetX + stone.x * gapX,
+      left: offsetX + stone.x * gapX - stoneWidth / 2,
       bottom: offsetY + stone.y * gapY,
     };
   };
@@ -813,6 +818,25 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       <div className="flex-1 relative overflow-hidden">
         {/* Stones grid */}
         <div className="absolute inset-0">
+          {/* Decorative bottom center green stone (mobile only, not part of path) */}
+          {isMobile && (
+            <div
+              className="absolute"
+              style={{
+                left: offsetX + 1 * gapX - stoneWidth / 2,
+                bottom: offsetY,
+                width: stoneWidth,
+                height: stoneHeight,
+              }}
+            >
+              <img
+                src={STONE_IMAGES.green}
+                alt="Dekorativni kamen"
+                className="w-full h-full object-contain drop-shadow-lg opacity-60"
+              />
+            </div>
+          )}
+          
           {STONE_POSITIONS.map((stone, index) => {
             const pos = getStonePixelPosition(index);
             const isActive = dragonPosition === index;
