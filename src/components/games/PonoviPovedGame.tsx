@@ -311,41 +311,42 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     }
     
     // MOBILE: U-shaped layout (3 columns x 8 rows, y from 0 to 7)
-    // POPRAVEK: Simetrična horizontalna postavitev + večja vertikalna raztegnitev
     const rows = 8;
+    
+    // ZAHTEVA 4: Fiksni razmak med kamni v višino
+    const gapY = 30; // FIKSNO 30px
     
     // Calculate available space
     const topCardHeight = 100;
-    const bottomButtonSpace = 100;
+    const bottomButtonSpace = 110;
     const availableHeight = containerSize.height - topCardHeight - bottomButtonSpace;
     const availableWidth = containerSize.width;
     
-    // POPRAVEK 1: Večji razmak od robov za simetrijo
-    const edgeMargin = 35;
-    
-    // POPRAVEK 2: Manjši kamni = več prostora za gapY = večja vertikalna raztegnitev
-    const maxStoneHeight = Math.floor(availableHeight / (rows + 2));
-    const stoneHeight = Math.min(maxStoneHeight, 50);
+    // Izračunaj velikost kamnov glede na razpoložljiv prostor
+    const totalGapsHeight = gapY * (rows - 1); // 7 × 30 = 210px
+    const remainingForStones = availableHeight - totalGapsHeight;
+    const stoneHeight = Math.floor(remainingForStones / rows);
     const stoneWidth = Math.floor(stoneHeight * 1.4);
     
-    // POPRAVEK 3: gapY se izračuna tako da zapolni celotno višino
-    const totalStonesHeight = stoneHeight * rows;
-    const gapY = Math.floor((availableHeight - totalStonesHeight) / (rows - 1));
+    // Celotna višina grida
+    const totalGridHeight = stoneHeight * rows + totalGapsHeight;
     
-    // POPRAVEK 4: Simetrična horizontalna postavitev
+    // ZAHTEVA 1 & 2: Vertikalno centriranje + začetek nad gumbom
+    const verticalPadding = (availableHeight - totalGridHeight) / 2;
+    const offsetY = bottomButtonSpace + verticalPadding;
+    
+    // ZAHTEVA 3: Simetrično od leve in desne
+    const edgeMargin = 35;
     const leftColumnCenter = edgeMargin + stoneWidth / 2;
     const rightColumnCenter = availableWidth - edgeMargin - stoneWidth / 2;
     const centerColumnCenter = availableWidth / 2;
     const gapX = (rightColumnCenter - leftColumnCenter) / 2;
     
-    // POPRAVEK 5: Večji zmajček
+    // Zmajček 120% velikosti kamna
     const dragonSize = Math.floor(stoneWidth * 1.2);
     
-    // offsetX je center levega stolpca (za uporabo v getStonePixelPosition)
+    // offsetX je center levega stolpca
     const offsetX = leftColumnCenter;
-    
-    // Vertical offset - začni nad gumbom
-    const offsetY = bottomButtonSpace;
     
     return {
       stoneWidth,
@@ -355,7 +356,6 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       dragonSize,
       offsetX,
       offsetY,
-      // Dodamo edgeMargin za uporabo v getStonePixelPosition
       edgeMargin,
     };
   }, [containerSize, isMobile]);
