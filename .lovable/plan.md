@@ -1,262 +1,278 @@
 
-# Nacrt: Preoblikovanje igre "Ponovi Poved" - Pravokotna pot
 
-## Pregled zahtevane postavitve
+# Nacrt: Popravki desktop verzije igre "Ponovi Poved" - 7 kamnov
 
-Na podlagi referenčne slike in opisa je jasna nova struktura:
+## Pregled pravilne strukture
+
+Na podlagi referenčne slike je jasna struktura pravokotnika:
 
 ```text
-      [RUM] [SIV] [RDEC] [RUM] [ZEL] [SIV]  <- zgornja vrstica (kamni 7-12)
-        ^                               |
-        |                               v
-      [SIV]                           [RDEC]
-        ^                               |
-        |                               v
-      [ZEL]                           [RUM]
-        ^                               |
-        |                               v
-   🐉 [SIV] [ZEL] [RDEC] [RUM] [SIV] [ZEL]  <- spodnja vrstica (kamni 0-6)
-        ^                               
+      [RUM] [ZEL] [SIV] [RDEC] [RUM] [ZEL] [SIV]  <- zgornja vrstica (7 kamnov, y=2)
+        ^                                     |
+        |                                     v
+                +---------------------------+  +-------+
+                |  [KAČA]  [IMA]  [KAPO]    |  |  🐉   |
+      [RDEC]    | (fiksna sirina okvirja)  |  | (gumb)|   [RDEC]  <- srednja vrstica (y=1)
+                +---------------------------+  +-------+
+                                               3D stil
+        ^                                                  |
+        |                                                  v
+   🐉 [SIV] [ZEL] [RUM] [RDEC] [SIV] [ZEL] [RUM]  <- spodnja vrstica (7 kamnov, y=0)
      START/CILJ
 ```
 
-### Nova pot zmajcka (16 korakov v krogu):
-1. **START** na levem spodnjem sivem kamnu
-2. **2x GOR** (leva stran - vertikalno)
-3. **6x DESNO** (zgornja vrstica - horizontalno)
-4. **Ko pride na desni zgornji siv kamen**: zmeni sliko iz `Zmajcek_4.webp` v `Zmajcek_4_1.png` (gleda levo)
-5. **2x DOL** (desna stran - vertikalno)
-6. **6x LEVO** (spodnja vrstica nazaj do starta)
-7. **KONEC** na istem sivem kamnu kot START
-
-### Logika besed in povedi:
-- **Skok 1 (gor)**: 1. beseda
-- **Skok 2 (gor)**: 2. beseda
-- **Skok 3 (desno)**: 3. beseda
-- **Skok 4 (desno)**: PONOVI POVED 1
-- ...in tako naprej za vse 4 povedi
+### Kljucne tocke:
+- **Zgornja vrstica**: 7 kamnov (x: 0-6, y: 2)
+- **Srednja vrstica**: SAMO 2 kamna - levi (x: 0, y: 1) in desni (x: 6, y: 1)
+- **Spodnja vrstica**: 7 kamnov (x: 0-6, y: 0)
+- **Okvir za slike**: Na sredini zaslona med srednjima kamnoma, fiksna velikost od zacetka
+- **Gumb za skok**: Desno od okvirja, 3D stil podoben kocki v Smesne Povedi
 
 ---
 
 ## Tehnicne spremembe
 
-### 1. Nova definicija STONE_POSITIONS (pravokotna pot)
+### 1. Nova definicija STONE_POSITIONS_DESKTOP (17 kamnov)
 
-Pot bo potekala v obliki pravokotnika:
-- 18 kamnov (ne vec 17): START + 4 povedi x 4 kamni + CILJ = START
+Pot: START (0,0) → 2x GOR → 7x DESNO → 2x DOL → 7x LEVO → nazaj na START
 
 ```typescript
-// Pravokotna pot: 18 pozicij
-// Spodnja vrstica: x=0 do x=5, y=0
-// Leva stran: x=0, y=0 do y=2
-// Zgornja vrstica: x=0 do x=5, y=2
-// Desna stran: x=5, y=2 do y=0
-
-const STONE_POSITIONS: StonePosition[] = [
-  // START - levi spodnji sivi kamen
+const STONE_POSITIONS_DESKTOP: StonePosition[] = [
+  // START - spodaj levo (x=0, y=0) - SIV
   { x: 0, y: 0, type: 'gray', isRest: false },
   
-  // Poved 1: 2x gor + 1 desno + sivi (ponovi)
-  { x: 0, y: 1, type: 'green', isRest: false, sentenceIndex: 0, wordIndex: 0 },  // 1. beseda
-  { x: 0, y: 2, type: 'red', isRest: false, sentenceIndex: 0, wordIndex: 1 },    // 2. beseda
-  { x: 1, y: 2, type: 'yellow', isRest: false, sentenceIndex: 0, wordIndex: 2 }, // 3. beseda
-  { x: 2, y: 2, type: 'gray', isRest: true, sentenceIndex: 0 },                  // Ponovi poved 1
+  // Poved 1: GOR (x=0, y=1), GOR (x=0, y=2), DESNO (x=1, y=2), SIV (x=2, y=2)
+  { x: 0, y: 1, type: 'red', isRest: false, sentenceIndex: 0, wordIndex: 0 },   // 1. beseda
+  { x: 0, y: 2, type: 'yellow', isRest: false, sentenceIndex: 0, wordIndex: 1 },// 2. beseda  
+  { x: 1, y: 2, type: 'green', isRest: false, sentenceIndex: 0, wordIndex: 2 }, // 3. beseda
+  { x: 2, y: 2, type: 'gray', isRest: true, sentenceIndex: 0 },                 // Ponovi poved 1
   
-  // Poved 2: 3 kamni desno + sivi
-  { x: 3, y: 2, type: 'green', isRest: false, sentenceIndex: 1, wordIndex: 0 },
-  { x: 4, y: 2, type: 'red', isRest: false, sentenceIndex: 1, wordIndex: 1 },
-  { x: 5, y: 2, type: 'yellow', isRest: false, sentenceIndex: 1, wordIndex: 2 },
-  { x: 5, y: 1, type: 'gray', isRest: true, sentenceIndex: 1 },                  // Ponovi poved 2
+  // Poved 2: 3x DESNO + SIV
+  { x: 3, y: 2, type: 'red', isRest: false, sentenceIndex: 1, wordIndex: 0 },
+  { x: 4, y: 2, type: 'yellow', isRest: false, sentenceIndex: 1, wordIndex: 1 },
+  { x: 5, y: 2, type: 'green', isRest: false, sentenceIndex: 1, wordIndex: 2 },
+  { x: 6, y: 2, type: 'gray', isRest: true, sentenceIndex: 1 },                 // Ponovi poved 2
   
-  // Poved 3: 2x dol + 1 levo + sivi
-  { x: 5, y: 0, type: 'green', isRest: false, sentenceIndex: 2, wordIndex: 0 },
-  { x: 4, y: 0, type: 'red', isRest: false, sentenceIndex: 2, wordIndex: 1 },
-  { x: 3, y: 0, type: 'yellow', isRest: false, sentenceIndex: 2, wordIndex: 2 },
-  { x: 2, y: 0, type: 'gray', isRest: true, sentenceIndex: 2 },                  // Ponovi poved 3
+  // Poved 3: DOL (x=6, y=1), DOL (x=6, y=0), LEVO (x=5, y=0), SIV (x=4, y=0)
+  { x: 6, y: 1, type: 'red', isRest: false, sentenceIndex: 2, wordIndex: 0 },
+  { x: 6, y: 0, type: 'yellow', isRest: false, sentenceIndex: 2, wordIndex: 1 },
+  { x: 5, y: 0, type: 'green', isRest: false, sentenceIndex: 2, wordIndex: 2 },
+  { x: 4, y: 0, type: 'gray', isRest: true, sentenceIndex: 2 },                 // Ponovi poved 3
   
-  // Poved 4: 2 kamni levo + CILJ (START)
-  { x: 1, y: 0, type: 'green', isRest: false, sentenceIndex: 3, wordIndex: 0 },
-  // CILJ = START kamen (pozicija 0) - krog je zakljucen
+  // Poved 4: 3x LEVO nazaj na START
+  { x: 3, y: 0, type: 'red', isRest: false, sentenceIndex: 3, wordIndex: 0 },
+  { x: 2, y: 0, type: 'yellow', isRest: false, sentenceIndex: 3, wordIndex: 1 },
+  { x: 1, y: 0, type: 'green', isRest: false, sentenceIndex: 3, wordIndex: 2 },
+  // Zmajcek se vrne na START (0,0) za koncno ponovitev povedi 4
 ];
-
-// Skupaj 14 kamnov + START = 15, zadnji je na sivem START kamnu
 ```
 
-**Popravek**: Glede na opis uporabnika:
-- 2x gor, 6x desno, 2x dol, 6x levo = 16 skokov
-- Vsaka poved ima 3 besede + 1 ponovi = 4 skoki
-- 4 povedi x 4 skoki = 16 skokov
-
-### 2. Sprememba slike zmajcka glede na smer
+### 2. Posodobitev calculatedSizes za 7 stolpcev
 
 ```typescript
-const getDragonImage = useCallback(() => {
-  const stone = STONE_POSITIONS[dragonPosition];
-  if (!stone) return DRAGON_RIGHT;
+if (!isMobile) {
+  const stoneWidth = 80;    // Manjsi kamni za 7 stolpcev
+  const stoneHeight = 60;
+  const gapX = 95;          // Manjsi razmik za 7 stolpcev
+  const gapY = 120;         // Vecji vertikalni razmik (3 vrstice)
+  const dragonSize = 85;
   
-  // Določi smer gibanja
-  // Leva stran (x=0): gibanje GOR -> gleda desno (DRAGON_RIGHT)
-  // Zgornja vrstica (y=2): gibanje DESNO -> gleda desno, nato po sivem gleda LEVO
-  // Desna stran (x=5): gibanje DOL -> gleda levo (DRAGON_LEFT)
-  // Spodnja vrstica (y=0): gibanje LEVO -> gleda levo (DRAGON_LEFT)
+  // 7 stolpcev (x: 0-6), 3 vrstice (y: 0-2)
+  const gridWidth = 6 * gapX + stoneWidth;
+  const gridHeight = 2 * gapY + stoneHeight;
   
-  if (stone.x === 0) return DRAGON_RIGHT;      // Leva stran - gleda desno
-  if (stone.y === 2 && stone.x <= 2) return DRAGON_RIGHT; // Zgornja leva
-  if (stone.y === 2 && stone.x >= 3) return DRAGON_LEFT;  // Zgornja desna (po obratu)
-  if (stone.x === 5) return DRAGON_LEFT;       // Desna stran
-  if (stone.y === 0) return DRAGON_LEFT;       // Spodnja vrstica
+  const offsetX = (containerSize.width - gridWidth) / 2;
+  const offsetY = 60;
   
-  return DRAGON_RIGHT;
-}, [dragonPosition]);
+  return { stoneWidth, stoneHeight, gapX, gapY, dragonSize, offsetX, offsetY };
+}
 ```
 
-### 3. Prikaz kartic besed na sredini
+### 3. Fiksna velikost okvirja za slike
 
-Kartice besed bodo prikazane na **sredini zaslona**, ne zgoraj:
+Okvir ima fiksno velikost `w-[360px] h-[140px]` od zacetka igre:
 
 ```tsx
-{/* CENTER: Collected word cards - displayed horizontally in the middle */}
-<div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 flex justify-center items-center pointer-events-none">
-  <div className="flex gap-4 items-center">
-    {/* Word cards */}
-    <div className="flex gap-2 md:gap-4">
+{/* Word cards container - FIXED SIZE */}
+<div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border-2 border-dragon-green/30 w-[360px] h-[140px] flex items-center justify-center">
+  {collectedWords.length === 0 ? (
+    <p className="text-gray-400 text-sm font-medium italic">Pritisni gumb za skok...</p>
+  ) : (
+    <div className="flex gap-4 items-center">
       <AnimatePresence>
         {collectedWords.map((word, idx) => (
           <motion.div
             key={`${word.word}-${idx}`}
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="flex flex-col items-center bg-white rounded-xl p-2 shadow-lg border-2 border-dragon-green"
+            className="flex flex-col items-center"
           >
-            <img
-              src={getImageUrl(word.image)}
-              alt={word.word}
-              className="w-16 h-16 md:w-20 md:h-20 object-contain"
-            />
-            <p className="text-xs md:text-sm font-bold text-gray-800 mt-1 uppercase">
+            <div className="w-20 h-20 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center p-2">
+              <img
+                src={getImageUrl(word.image)}
+                alt={word.word}
+                className="w-16 h-16 object-contain"
+              />
+            </div>
+            <p className="text-sm font-bold text-gray-800 mt-1 uppercase">
               {word.word}
             </p>
           </motion.div>
         ))}
       </AnimatePresence>
     </div>
-    
-    {/* Jump button - RIGHT of word cards */}
-    {collectedWords.length > 0 && (
-      <JumpButton onClick={handleNext} disabled={isJumping || showSentenceDialog} />
-    )}
-  </div>
+  )}
 </div>
 ```
 
-### 4. Nov gumb za skok (podoben kocki v Smešne Povedi)
+### 4. Nov 3D gumb za skok (podoben kocki v Smesne Povedi)
 
-Namesto modrega gumba bo nov eleganten gumb z zmajčkovo tačko/nogo, ki bo vizualno podoben 3D kocki:
+Eleganten 3D gumb z zmajckom, uporabim podoben stil kot DiceRoller:
 
 ```tsx
-// Nova komponenta JumpButton
 function JumpButton({ onClick, disabled }: { onClick: () => void; disabled: boolean }) {
   const [isHovered, setIsHovered] = useState(false);
-  
+
   return (
     <div 
-      className="relative cursor-pointer pointer-events-auto"
+      className={`cursor-pointer ${disabled ? 'pointer-events-none' : 'pointer-events-auto'}`}
       style={{ perspective: '600px' }}
       onClick={disabled ? undefined : onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <motion.div
-        className={`relative w-20 h-20 md:w-24 md:h-24 ${disabled ? 'opacity-50' : ''}`}
-        animate={!disabled ? { 
-          scale: [1, 1.05, 1],
-          rotateY: isHovered ? 10 : 0,
-        } : {}}
-        transition={{ 
-          scale: { duration: 1.5, repeat: Infinity, ease: "easeInOut" },
-          rotateY: { duration: 0.3 }
+      {/* 3D Button Container - similar to dice cube styling */}
+      <div
+        className={`relative w-24 h-24 transition-transform ${!disabled ? 'animate-pulse' : ''} ${disabled ? 'opacity-50' : ''}`}
+        style={{
+          transformStyle: 'preserve-3d',
+          transform: isHovered && !disabled ? 'rotateY(10deg) rotateX(-5deg)' : 'rotateY(0deg) rotateX(0deg)',
+          transitionDuration: '300ms',
         }}
       >
-        {/* Eleganten okrogel gumb z zmajčkom */}
-        <div className="w-full h-full rounded-2xl bg-gradient-to-br from-dragon-green to-green-600 shadow-xl border-4 border-white flex items-center justify-center">
+        {/* Front face - main button */}
+        <div 
+          className="absolute w-24 h-24 bg-gradient-to-br from-dragon-green to-green-600 rounded-xl border-4 border-white shadow-2xl flex items-center justify-center"
+          style={{ transform: 'translateZ(12px)' }}
+        >
           <img 
-            src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_111.PNG"
+            src={JUMP_DRAGON_IMAGE}
             alt="Skok"
-            className="w-14 h-14 md:w-16 md:h-16 object-contain drop-shadow-md"
+            className="w-16 h-16 object-contain drop-shadow-md"
           />
         </div>
-      </motion.div>
+        
+        {/* Back face - shadow */}
+        <div 
+          className="absolute w-24 h-24 bg-green-800 rounded-xl"
+          style={{ transform: 'translateZ(-4px)' }}
+        />
+        
+        {/* Right edge */}
+        <div 
+          className="absolute top-1 right-0 w-3 h-[calc(100%-8px)] bg-gradient-to-r from-green-600 to-green-700 rounded-r-xl"
+          style={{ transform: 'translateZ(4px)' }}
+        />
+        
+        {/* Bottom edge */}
+        <div 
+          className="absolute bottom-0 left-1 w-[calc(100%-8px)] h-3 bg-gradient-to-b from-green-600 to-green-700 rounded-b-xl"
+          style={{ transform: 'translateZ(4px)' }}
+        />
+      </div>
     </div>
   );
 }
 ```
 
-### 5. Prilagoditev velikosti in pozicije za desktop
+### 5. Pozicija okvirja in gumba - na sredini med srednjima kamnoma
 
-```typescript
-// DESKTOP verzija - pravokotna pot
-if (!isMobile) {
-  const stoneWidth = 100;
-  const stoneHeight = 75;
-  const gapX = 120;  // Horizontalni razmik
-  const gapY = 150;  // Vertikalni razmik (večji za 3 vrstice)
-  const dragonSize = 100;
-  
-  // 6 stolpcev (x: 0-5), 3 vrstice (y: 0-2)
-  const gridWidth = 5 * gapX + stoneWidth;
-  const gridHeight = 2 * gapY + stoneHeight;
-  
-  const offsetX = (containerSize.width - gridWidth) / 2;
-  const offsetY = (containerSize.height - gridHeight) / 2 - 50; // Centriranje
-  
-  return { stoneWidth, stoneHeight, gapX, gapY, dragonSize, offsetX, offsetY };
-}
+```tsx
+{/* DESKTOP: Word cards + Jump button in CENTER of the screen */}
+{!isMobile && (
+  <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
+    <div className="flex items-center gap-4">
+      {/* Fixed size word container */}
+      <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border-2 border-dragon-green/30 w-[360px] h-[140px] flex items-center justify-center p-4">
+        {/* ... vsebina ... */}
+      </div>
+      
+      {/* 3D Jump button */}
+      <JumpButton 
+        onClick={handleNext} 
+        disabled={isJumping || phase === "complete" || showSentenceDialog} 
+      />
+    </div>
+  </div>
+)}
 ```
 
-### 6. Odstranitev modrega gumba spodaj
+### 6. Posodobitev getDragonImage za nove koordinate
 
-Modri gumb na sredini spodaj se odstrani in nadomesti z gumbom desno od kartic.
-
----
-
-## Struktura datotek
-
-| Datoteka | Spremembe |
-|----------|-----------|
-| `src/components/games/PonoviPovedGame.tsx` | Celotna preoblikovanje poti, UI in logike |
+```typescript
+const getDragonImage = useCallback(() => {
+  const stone = STONE_POSITIONS[dragonPosition];
+  if (!stone) return DRAGON_RIGHT;
+  
+  if (!isMobile) {
+    // Leva stran (x=0): gibanje GOR -> gleda desno
+    if (stone.x === 0) return DRAGON_RIGHT;
+    
+    // Zgornja vrstica do sredine (x <= 3) -> gleda desno
+    if (stone.y === 2 && stone.x <= 3) return DRAGON_RIGHT;
+    
+    // Zgornja vrstica od sredine naprej (x >= 4) -> gleda levo
+    if (stone.y === 2 && stone.x >= 4) return DRAGON_LEFT;
+    
+    // Desna stran (x=6): gibanje DOL -> gleda levo
+    if (stone.x === 6) return DRAGON_LEFT;
+    
+    // Spodnja vrstica (y=0) razen START -> gleda levo
+    if (stone.y === 0 && dragonPosition > 0) return DRAGON_LEFT;
+    
+    return DRAGON_RIGHT;
+  }
+  
+  // MOBILE: nespremenjena logika
+  // ...
+}, [dragonPosition, isMobile, STONE_POSITIONS]);
+```
 
 ---
 
 ## Vizualizacija koncnega rezultata
 
 ```text
-+------------------------------------------------------------------+
-|                                                                  |
-| [HOME]                                                           |
-|                                                                  |
-|   [SIV] [ZEL] [RDEC] [RUM] [SIV] [ZEL]   <- zgornja vrstica     |
-|                                    |                             |
-|   [RDEC]                        [RDEC]   <- srednja vrstica     |
-|     |                              |                             |
-|   [ZEL]                          [RUM]                          |
-|     |                              |                             |
-|  🐉[SIV] [ZEL] [RDEC] [RUM] [SIV] [ZEL]   <- spodnja vrstica    |
-|   START                                                          |
-|                                                                  |
-|              [KAČA] [IMA] [KAPO]  [🐉]  <- kartice + gumb SKOK   |
-|               (bela okvirja)      (zelen gumb)                   |
-|                                                                  |
-+------------------------------------------------------------------+
++------------------------------------------------------------------------+
+|                                                                        |
+| [HOME]                                                                 |
+|                                                                        |
+|  [RUM] [ZEL] [SIV] [RDEC] [RUM] [ZEL] [SIV]   <- zgornja vrstica (7)  |
+|    ^                                      |                            |
+|    |                                      v                            |
+|         +----------------------------+  +------+                       |
+|  [RDEC] | [KAČA] [IMA] [KAPO]       | |  🐉  |  [RDEC]  <- srednja    |
+|         | (fiksna velikost 360x140) | | gumb |                         |
+|         +----------------------------+  +------+                       |
+|    ^                                                  |                |
+|    |                                                  v                |
+| 🐉[SIV] [ZEL] [RUM] [RDEC] [SIV] [ZEL] [RUM]   <- spodnja vrstica (7) |
+|  START                                                                 |
+|                                                                        |
++------------------------------------------------------------------------+
 ```
 
 ---
 
 ## Povzetek sprememb
 
-1. **Nova pravokotna pot** - 16 skokov v krogu (2 gor, 6 desno, 2 dol, 6 levo)
-2. **START = CILJ** - levi spodnji sivi kamen
-3. **Sprememba smeri zmajčka** - `Zmajcek_4.webp` za desno, `Zmajcek_4_1.png` za levo
-4. **Kartice besed na sredini** - ena zraven druge horizontalno
-5. **Gumb SKOK desno od kartic** - eleganten zelen gumb z zmajčkom (podoben kocki)
-6. **Odstranitev modrega gumba** - ni več na sredini spodaj
-7. **Samo desktop verzija** - mobilna ostane nespremenjena
+| Sprememba | Opis |
+|-----------|------|
+| **STONE_POSITIONS_DESKTOP** | 17 pozicij: 7 kamnov zgoraj, 2 v sredini, 7 spodaj |
+| **calculatedSizes** | Prilagojeno za 7 stolpcev (x: 0-6) z manjsimi kamni (80x60px) |
+| **Okvir za slike** | Fiksna velikost `w-[360px] h-[140px]` od zacetka igre |
+| **JumpButton** | 3D stil s `perspective` in `preserve-3d`, podoben kocki v Smesne Povedi |
+| **Pozicija UI** | Okvir + gumb na sredini zaslona (`top-1/2 left-1/2`) |
+| **getDragonImage** | Posodobljena logika za koordinate x: 0-6 |
+| **Samo desktop** | Vsi popravki obveljajo samo za `!isMobile` |
+
