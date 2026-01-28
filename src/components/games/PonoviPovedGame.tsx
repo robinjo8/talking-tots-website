@@ -315,28 +315,32 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     const rows = 8;
     
     // Calculate available space
-    const topCardHeight = 130; // Space for word cards at top
-    const bottomButtonSpace = 110; // Space for jump button at bottom
+    const topCardHeight = 120; // Space for word cards at top
+    const bottomButtonSpace = 100; // Space for jump button at bottom
     const availableHeight = containerSize.height - topCardHeight - bottomButtonSpace;
-    const availableWidth = containerSize.width - 60; // Padding left/right
+    const availableWidth = containerSize.width;
     
-    // Calculate stone size based on available height
-    const maxStoneHeight = Math.floor(availableHeight / rows * 0.85);
-    const stoneHeight = Math.min(maxStoneHeight, 45);
+    // Calculate stone size - LARGER for better visibility
+    // Use more of the available height
+    const maxStoneHeight = Math.floor(availableHeight / rows * 0.9);
+    const stoneHeight = Math.min(maxStoneHeight, 52); // Increased from 45 to 52
     const stoneWidth = Math.floor(stoneHeight * 1.4); // Aspect ratio 1.4:1
     
-    // Vertical gap between stones
-    const gapY = Math.floor((availableHeight - stoneHeight * rows) / (rows - 1));
+    // Vertical gap - proportionally distributed across the full height
+    const totalStonesHeight = stoneHeight * rows;
+    const gapY = Math.floor((availableHeight - totalStonesHeight) / (rows - 1));
     
-    // Horizontal gap - evenly distribute 3 columns
-    // gapX is the distance between column centers
-    const gapX = Math.floor(availableWidth / 2);
+    // Horizontal gap - bring columns CLOSER to center (away from edges)
+    // Use 65% of screen width for the grid, centered
+    const gridWidthRatio = 0.65;
+    const gridWidth = Math.floor(availableWidth * gridWidthRatio);
+    const gapX = Math.floor(gridWidth / 2); // Distance between column centers
     
-    const dragonSize = Math.floor(stoneWidth * 0.9);
+    const dragonSize = Math.floor(stoneWidth * 1.0); // Increased dragon size
     
     // Calculate total grid dimensions
     const totalGridWidth = 2 * gapX; // From x=0 to x=2
-    const totalGridHeight = stoneHeight * rows + gapY * (rows - 1);
+    const totalGridHeight = totalStonesHeight + gapY * (rows - 1);
     
     // Center the grid horizontally
     const offsetX = (containerSize.width - totalGridWidth) / 2;
