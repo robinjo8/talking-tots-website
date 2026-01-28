@@ -340,15 +340,15 @@ const bingoDataZHSredinaKonec: BingoWordData[] = [
 // Uses ASCII digraphs for diacritics: č->ch, š->sh, ž->zh
 export const artikulacijaConfigs: Record<string, ArtikulacijaConfig> = {
   // Wheel games (začetek)
-  'c': { letter: 'C', displayLetter: 'C', gameType: 'wheel', title: 'KOLO SREČE - C', wordsData: wordsDataC },
-  'ch': { letter: 'Č', displayLetter: 'Č', gameType: 'wheel', title: 'KOLO SREČE - Č', wordsData: wordsDataCH },
-  'k': { letter: 'K', displayLetter: 'K', gameType: 'wheel', title: 'KOLO SREČE - K', wordsData: wordsDataK },
-  'l': { letter: 'L', displayLetter: 'L', gameType: 'wheel', title: 'KOLO SREČE - L', wordsData: wordsDataL },
-  'r': { letter: 'R', displayLetter: 'R', gameType: 'wheel', title: 'KOLO SREČE - R', wordsData: wordsDataR },
-  's': { letter: 'S', displayLetter: 'S', gameType: 'wheel', title: 'KOLO SREČE - S', wordsData: wordsDataS },
-  'sh': { letter: 'Š', displayLetter: 'Š', gameType: 'wheel', title: 'KOLO SREČE - Š', wordsData: wordsDataSH },
-  'z': { letter: 'Z', displayLetter: 'Z', gameType: 'wheel', title: 'KOLO SREČE - Z', wordsData: wordsDataZ },
-  'zh': { letter: 'Ž', displayLetter: 'Ž', gameType: 'wheel', title: 'KOLO SREČE - Ž', wordsData: wordsDataZH },
+  'c': { letter: 'C', displayLetter: 'C', gameType: 'wheel', title: 'KOLO BESED - C', wordsData: wordsDataC },
+  'ch': { letter: 'Č', displayLetter: 'Č', gameType: 'wheel', title: 'KOLO BESED - Č', wordsData: wordsDataCH },
+  'k': { letter: 'K', displayLetter: 'K', gameType: 'wheel', title: 'KOLO BESED - K', wordsData: wordsDataK },
+  'l': { letter: 'L', displayLetter: 'L', gameType: 'wheel', title: 'KOLO BESED - L', wordsData: wordsDataL },
+  'r': { letter: 'R', displayLetter: 'R', gameType: 'wheel', title: 'KOLO BESED - R', wordsData: wordsDataR },
+  's': { letter: 'S', displayLetter: 'S', gameType: 'wheel', title: 'KOLO BESED - S', wordsData: wordsDataS },
+  'sh': { letter: 'Š', displayLetter: 'Š', gameType: 'wheel', title: 'KOLO BESED - Š', wordsData: wordsDataSH },
+  'z': { letter: 'Z', displayLetter: 'Z', gameType: 'wheel', title: 'KOLO BESED - Z', wordsData: wordsDataZ },
+  'zh': { letter: 'Ž', displayLetter: 'Ž', gameType: 'wheel', title: 'KOLO BESED - Ž', wordsData: wordsDataZH },
   
   // Bingo games (sredina/konec)
   'c-sredina-konec': { letter: 'C', displayLetter: 'C', gameType: 'bingo', title: 'BINGO - C', wordsData: bingoDataCSredinaKonec, exerciseId: 'artikulacija_bingo_c' },
