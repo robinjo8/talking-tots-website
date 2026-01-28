@@ -174,12 +174,11 @@ function DiceDots({ count }: { count: number }) {
   );
 }
 
-// JumpDice component - 3D dice with arrow icon
+// JumpDice component - 3D cube with arrow icon (no dots)
 function JumpDice({ onClick, disabled, size = 96 }: { onClick: () => void; disabled: boolean; size?: number }) {
   const [isHovered, setIsHovered] = useState(false);
   
   const halfSize = size / 2;
-  const dotSize = Math.max(8, size / 8);
 
   return (
     <div 
@@ -189,7 +188,7 @@ function JumpDice({ onClick, disabled, size = 96 }: { onClick: () => void; disab
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* 3D Dice Container */}
+      {/* 3D Cube Container */}
       <div
         className={`relative transition-transform ${!disabled ? 'animate-pulse' : ''}`}
         style={{
@@ -200,7 +199,7 @@ function JumpDice({ onClick, disabled, size = 96 }: { onClick: () => void; disab
           transitionDuration: '300ms',
         }}
       >
-        {/* Face 1 - Front - with ARROW UP icon */}
+        {/* Face - Front - with BLACK ARROW UP icon */}
         <div 
           className="absolute bg-white rounded-xl border-4 border-gray-300 shadow-lg flex items-center justify-center"
           style={{ 
@@ -210,70 +209,90 @@ function JumpDice({ onClick, disabled, size = 96 }: { onClick: () => void; disab
           }}
         >
           <ArrowUp 
-            className="text-dragon-green drop-shadow-md" 
+            className="text-gray-900 drop-shadow-md" 
             style={{ width: size * 0.5, height: size * 0.5 }}
             strokeWidth={3}
           />
         </div>
         
-        {/* Face 6 - Back */}
+        {/* Face - Back */}
         <div 
-          className="absolute bg-white rounded-xl border-4 border-gray-300 shadow-lg"
+          className="absolute bg-white rounded-xl border-4 border-gray-300 shadow-lg flex items-center justify-center"
           style={{ 
             width: size, 
             height: size,
             transform: `rotateY(180deg) translateZ(${halfSize}px)` 
           }}
         >
-          <DiceDots count={6} />
+          <ArrowUp 
+            className="text-gray-900 drop-shadow-md" 
+            style={{ width: size * 0.5, height: size * 0.5 }}
+            strokeWidth={3}
+          />
         </div>
         
-        {/* Face 2 - Right */}
+        {/* Face - Right */}
         <div 
-          className="absolute bg-white rounded-xl border-4 border-gray-300 shadow-lg"
+          className="absolute bg-white rounded-xl border-4 border-gray-300 shadow-lg flex items-center justify-center"
           style={{ 
             width: size, 
             height: size,
             transform: `rotateY(90deg) translateZ(${halfSize}px)` 
           }}
         >
-          <DiceDots count={2} />
+          <ArrowUp 
+            className="text-gray-900 drop-shadow-md" 
+            style={{ width: size * 0.5, height: size * 0.5 }}
+            strokeWidth={3}
+          />
         </div>
         
-        {/* Face 5 - Left */}
+        {/* Face - Left */}
         <div 
-          className="absolute bg-white rounded-xl border-4 border-gray-300 shadow-lg"
+          className="absolute bg-white rounded-xl border-4 border-gray-300 shadow-lg flex items-center justify-center"
           style={{ 
             width: size, 
             height: size,
             transform: `rotateY(-90deg) translateZ(${halfSize}px)` 
           }}
         >
-          <DiceDots count={5} />
+          <ArrowUp 
+            className="text-gray-900 drop-shadow-md" 
+            style={{ width: size * 0.5, height: size * 0.5 }}
+            strokeWidth={3}
+          />
         </div>
         
-        {/* Face 3 - Top */}
+        {/* Face - Top */}
         <div 
-          className="absolute bg-white rounded-xl border-4 border-gray-300 shadow-lg"
+          className="absolute bg-white rounded-xl border-4 border-gray-300 shadow-lg flex items-center justify-center"
           style={{ 
             width: size, 
             height: size,
             transform: `rotateX(90deg) translateZ(${halfSize}px)` 
           }}
         >
-          <DiceDots count={3} />
+          <ArrowUp 
+            className="text-gray-900 drop-shadow-md" 
+            style={{ width: size * 0.5, height: size * 0.5 }}
+            strokeWidth={3}
+          />
         </div>
         
-        {/* Face 4 - Bottom */}
+        {/* Face - Bottom */}
         <div 
-          className="absolute bg-white rounded-xl border-4 border-gray-300 shadow-lg"
+          className="absolute bg-white rounded-xl border-4 border-gray-300 shadow-lg flex items-center justify-center"
           style={{ 
             width: size, 
             height: size,
             transform: `rotateX(-90deg) translateZ(${halfSize}px)` 
           }}
         >
-          <DiceDots count={4} />
+          <ArrowUp 
+            className="text-gray-900 drop-shadow-md" 
+            style={{ width: size * 0.5, height: size * 0.5 }}
+            strokeWidth={3}
+          />
         </div>
       </div>
     </div>
@@ -350,9 +369,9 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       const scaledGridWidth = 6 * gapX + stoneWidth;
       const scaledGridHeight = 2 * gapY + stoneHeight;
       
-      // Center horizontally and vertically
+      // Center horizontally and push UP more (changed from -40 to -80)
       const offsetX = (containerSize.width - scaledGridWidth) / 2;
-      const offsetY = (containerSize.height - scaledGridHeight) / 2 - 40;
+      const offsetY = (containerSize.height - scaledGridHeight) / 2 - 80;
       
       return {
         stoneWidth,
@@ -429,22 +448,28 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     if (!stone) return DRAGON_RIGHT;
     
     // DESKTOP: Rectangular path logic with 7 columns
+    // Dragon turns LEFT only on gray stone at top-right corner (x=6, y=2) and beyond
     if (!isMobile) {
       // Left side (x=0): moving UP → facing right
       if (stone.x === 0) return DRAGON_RIGHT;
       
-      // Top row (y=2): first half moving right (x <= 3), second half (x >= 4) → facing left
-      if (stone.y === 2 && stone.x <= 3) return DRAGON_RIGHT;
-      if (stone.y === 2 && stone.x >= 4) return DRAGON_LEFT;
+      // Top row (y=2): facing right until reaching gray stone at x=6
+      // Only turn left AFTER reaching the gray rest stone at (6,2)
+      if (stone.y === 2) {
+        // Gray rest stone at (6,2) is position 8 in STONE_POSITIONS_DESKTOP
+        // Turn left only at and after this position
+        if (stone.x === 6 && stone.isRest) return DRAGON_LEFT;
+        return DRAGON_RIGHT;
+      }
       
-      // Right side (x=6): moving DOWN → facing left
-      if (stone.x === 6) return DRAGON_LEFT;
+      // Right side (x=6, y=1): moving DOWN → facing left
+      if (stone.x === 6 && stone.y === 1) return DRAGON_LEFT;
+      
+      // Right side (x=6, y=0): moving DOWN → facing left
+      if (stone.x === 6 && stone.y === 0) return DRAGON_LEFT;
       
       // Bottom row (y=0): moving LEFT → facing left (except START)
       if (stone.y === 0 && dragonPosition > 0) return DRAGON_LEFT;
-      
-      // Middle right (y=1, x=6): facing left
-      if (stone.y === 1 && stone.x === 6) return DRAGON_LEFT;
       
       return DRAGON_RIGHT;
     }
