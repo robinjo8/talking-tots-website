@@ -510,15 +510,15 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     setIsJumping(true);
     const nextPosition = dragonPosition + 1;
     
-    // DESKTOP: Check if we completed the loop (position 14 = last word of sentence 4)
-    // After position 14, dragon jumps back to position 0 (START) for final repeat
-    if (!isMobile && nextPosition > STONE_POSITIONS.length - 1) {
+    // Check if we completed the path (last position reached)
+    // After last stone, dragon jumps back to position 0 (START) for final repeat
+    if (nextPosition > STONE_POSITIONS.length - 1) {
       // Jump back to START for final sentence repeat
       setDragonPosition(0);
       
       setTimeout(async () => {
         setIsJumping(false);
-        // Show final sentence dialog
+        // Show final sentence dialog (sentence 4 = index 3)
         setCurrentSentenceForDialog(3);
         setPhase("sentence");
         setShowSentenceDialog(true);
