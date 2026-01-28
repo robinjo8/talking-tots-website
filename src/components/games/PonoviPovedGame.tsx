@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Home, Volume2, Mic, ArrowUp } from "lucide-react";
+import { Home, Volume2, Mic, ArrowUp, RefreshCw } from "lucide-react";
 import { 
   PonoviPovedConfig, 
   SentenceWord,
@@ -379,6 +379,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
   const [currentSentenceForDialog, setCurrentSentenceForDialog] = useState(0);
   const [repeatCompleted, setRepeatCompleted] = useState(false);
   const [showSentenceExitWarning, setShowSentenceExitWarning] = useState(false);
+  const [isGameCompleted, setIsGameCompleted] = useState(false);
 
   // Get current stone info
   const currentStone = STONE_POSITIONS[dragonPosition];
@@ -497,6 +498,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     // Check if this was the last sentence (sentence index 3 completed)
     if (currentSentenceForDialog === 3) {
       setPhase("complete");
+      setIsGameCompleted(true);
       
       if (!completionCalledRef.current) {
         completionCalledRef.current = true;
@@ -636,8 +638,9 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     setShowSentenceDialog(false);
     setCollectedWords([]);
     setIsRecording(false);
-    setCountdown(3);
+    setCountdown(5);
     setCurrentSentenceForDialog(0);
+    setIsGameCompleted(false);
     completionCalledRef.current = false;
   };
 
@@ -720,30 +723,53 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       {/* Audio element */}
       <audio ref={audioRef} />
       
-      {/* BOTTOM LEFT: Home menu button */}
-      <div className="fixed bottom-6 left-4 z-30">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              className="h-14 w-14 rounded-full bg-app-orange hover:bg-app-orange/90 shadow-lg"
-              size="icon"
-            >
-              <Home className="h-7 w-7 text-white" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48">
-            <DropdownMenuItem onClick={() => setShowExitDialog(true)}>
-              <span className="mr-2">🏠</span> Nazaj
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleReset}>
-              <span className="mr-2">🔄</span> Nova igra
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setShowInstructions(true)}>
-              <span className="mr-2">📖</span> Navodila
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+      {/* BOTTOM LEFT: Home menu button - matching igra-ujemanja style */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform">
+            <Home className="w-8 h-8 text-white" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent 
+          align="start" 
+          side="top"
+          sideOffset={8}
+          className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl"
+        >
+          <button 
+            onClick={() => setShowExitDialog(true)} 
+            className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+          >
+            <span className="text-2xl">🏠</span>
+            <span>Nazaj</span>
+          </button>
+          <button 
+            onClick={handleReset} 
+            className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
+          >
+            <span className="text-2xl">🔄</span>
+            <span>Nova igra</span>
+          </button>
+          <button 
+            onClick={() => setShowInstructions(true)} 
+            className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
+          >
+            <span className="text-2xl">📖</span>
+            <span>Navodila</span>
+          </button>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      
+      {/* Blue "Nova igra" button - appears after game completion */}
+      {isGameCompleted && (
+        <Button
+          onClick={handleReset}
+          className="fixed bottom-4 left-24 z-50 rounded-full w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 shadow-lg border-2 border-white/50 backdrop-blur-sm"
+          size="icon"
+        >
+          <RefreshCw className="h-7 w-7 text-white" />
+        </Button>
+      )}
       
       {/* DESKTOP: Word cards + Dice CENTERED on screen between middle row stones */}
       {!isMobile && calculatedSizes && (
@@ -1061,7 +1087,6 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       <Dialog open={showSuccessDialog} onOpenChange={(open) => {
         if (!open) {
           setShowSuccessDialog(false);
-          navigate("/govorne-igre/ponovi-poved");
         }
       }}>
         <DialogContent className="sm:max-w-md">
@@ -1100,8 +1125,8 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
                     console.error("Error saving star:", error);
                   }
                 }
+                // Just close the dialog - don't navigate
                 setShowSuccessDialog(false);
-                navigate("/govorne-igre/ponovi-poved");
               }}
               className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 uppercase font-bold px-8"
             >
