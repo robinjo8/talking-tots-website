@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Home, Volume2, Mic } from "lucide-react";
+import { Home, Volume2, Mic, ArrowUp } from "lucide-react";
 import { 
   PonoviPovedConfig, 
   SentenceWord,
@@ -174,71 +174,104 @@ function DiceDots({ count }: { count: number }) {
   );
 }
 
-// JumpDice component - 3D dice identical to DiceRoller from Met Kocke
-function JumpDice({ onClick, disabled }: { onClick: () => void; disabled: boolean }) {
+// JumpDice component - 3D dice with arrow icon
+function JumpDice({ onClick, disabled, size = 96 }: { onClick: () => void; disabled: boolean; size?: number }) {
   const [isHovered, setIsHovered] = useState(false);
+  
+  const halfSize = size / 2;
+  const dotSize = Math.max(8, size / 8);
 
   return (
     <div 
       className={`cursor-pointer ${disabled ? 'pointer-events-none opacity-50' : ''}`}
-      style={{ perspective: '600px' }}
+      style={{ perspective: '800px' }}
       onClick={disabled ? undefined : onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* 3D Dice Container - identical to DiceRoller */}
+      {/* 3D Dice Container */}
       <div
-        className={`relative w-24 h-24 transition-transform ${!disabled ? 'animate-pulse' : ''}`}
+        className={`relative transition-transform ${!disabled ? 'animate-pulse' : ''}`}
         style={{
+          width: size,
+          height: size,
           transformStyle: 'preserve-3d',
           transform: isHovered && !disabled ? 'rotateY(10deg) rotateX(-5deg)' : 'rotateY(0deg)',
           transitionDuration: '300ms',
         }}
       >
-        {/* Face 1 - Front */}
+        {/* Face 1 - Front - with ARROW UP icon */}
         <div 
-          className="absolute w-24 h-24 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
-          style={{ transform: 'translateZ(48px)' }}
+          className="absolute bg-white rounded-xl border-4 border-gray-300 shadow-lg flex items-center justify-center"
+          style={{ 
+            width: size, 
+            height: size,
+            transform: `translateZ(${halfSize}px)` 
+          }}
         >
-          <DiceDots count={1} />
+          <ArrowUp 
+            className="text-dragon-green drop-shadow-md" 
+            style={{ width: size * 0.5, height: size * 0.5 }}
+            strokeWidth={3}
+          />
         </div>
         
         {/* Face 6 - Back */}
         <div 
-          className="absolute w-24 h-24 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
-          style={{ transform: 'rotateY(180deg) translateZ(48px)' }}
+          className="absolute bg-white rounded-xl border-4 border-gray-300 shadow-lg"
+          style={{ 
+            width: size, 
+            height: size,
+            transform: `rotateY(180deg) translateZ(${halfSize}px)` 
+          }}
         >
           <DiceDots count={6} />
         </div>
         
         {/* Face 2 - Right */}
         <div 
-          className="absolute w-24 h-24 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
-          style={{ transform: 'rotateY(90deg) translateZ(48px)' }}
+          className="absolute bg-white rounded-xl border-4 border-gray-300 shadow-lg"
+          style={{ 
+            width: size, 
+            height: size,
+            transform: `rotateY(90deg) translateZ(${halfSize}px)` 
+          }}
         >
           <DiceDots count={2} />
         </div>
         
         {/* Face 5 - Left */}
         <div 
-          className="absolute w-24 h-24 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
-          style={{ transform: 'rotateY(-90deg) translateZ(48px)' }}
+          className="absolute bg-white rounded-xl border-4 border-gray-300 shadow-lg"
+          style={{ 
+            width: size, 
+            height: size,
+            transform: `rotateY(-90deg) translateZ(${halfSize}px)` 
+          }}
         >
           <DiceDots count={5} />
         </div>
         
         {/* Face 3 - Top */}
         <div 
-          className="absolute w-24 h-24 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
-          style={{ transform: 'rotateX(90deg) translateZ(48px)' }}
+          className="absolute bg-white rounded-xl border-4 border-gray-300 shadow-lg"
+          style={{ 
+            width: size, 
+            height: size,
+            transform: `rotateX(90deg) translateZ(${halfSize}px)` 
+          }}
         >
           <DiceDots count={3} />
         </div>
         
         {/* Face 4 - Bottom */}
         <div 
-          className="absolute w-24 h-24 bg-white rounded-xl border-4 border-gray-300 shadow-lg"
-          style={{ transform: 'rotateX(-90deg) translateZ(48px)' }}
+          className="absolute bg-white rounded-xl border-4 border-gray-300 shadow-lg"
+          style={{ 
+            width: size, 
+            height: size,
+            transform: `rotateX(-90deg) translateZ(${halfSize}px)` 
+          }}
         >
           <DiceDots count={4} />
         </div>
@@ -286,21 +319,40 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       return null;
     }
     
-    // DESKTOP: Rectangular path layout (7 columns x 3 rows)
+    // DESKTOP: Rectangular path layout (7 columns x 3 rows) - SCALED 1.5x
     if (!isMobile) {
-      const stoneWidth = 80;    // Smaller stones for 7 columns
-      const stoneHeight = 60;
-      const gapX = 95;          // Smaller gap for 7 columns
-      const gapY = 120;         // Larger vertical gap for 3 rows
-      const dragonSize = 85;
+      // Base sizes scaled by 1.5
+      const baseStoneWidth = 120;   // 80 * 1.5
+      const baseStoneHeight = 90;   // 60 * 1.5
+      const baseGapX = 142;         // 95 * 1.5
+      const baseGapY = 180;         // 120 * 1.5
+      const baseDragonSize = 128;   // 85 * 1.5
       
-      // 7 columns (x: 0-6), 3 rows (y: 0-2)
-      const gridWidth = 6 * gapX + stoneWidth;
-      const gridHeight = 2 * gapY + stoneHeight;
+      // Calculate grid dimensions
+      const gridWidth = 6 * baseGapX + baseStoneWidth;
+      const gridHeight = 2 * baseGapY + baseStoneHeight;
       
-      // Center the grid
-      const offsetX = (containerSize.width - gridWidth) / 2;
-      const offsetY = 60;
+      // Check if grid fits on screen, scale down if needed
+      const availableWidth = containerSize.width - 40;
+      const availableHeight = containerSize.height - 100;
+      
+      const scaleX = Math.min(1, availableWidth / gridWidth);
+      const scaleY = Math.min(1, availableHeight / gridHeight);
+      const scale = Math.min(scaleX, scaleY);
+      
+      const stoneWidth = Math.floor(baseStoneWidth * scale);
+      const stoneHeight = Math.floor(baseStoneHeight * scale);
+      const gapX = Math.floor(baseGapX * scale);
+      const gapY = Math.floor(baseGapY * scale);
+      const dragonSize = Math.floor(baseDragonSize * scale);
+      
+      // Recalculate with scaled values
+      const scaledGridWidth = 6 * gapX + stoneWidth;
+      const scaledGridHeight = 2 * gapY + stoneHeight;
+      
+      // Center horizontally and vertically
+      const offsetX = (containerSize.width - scaledGridWidth) / 2;
+      const offsetY = (containerSize.height - scaledGridHeight) / 2 - 40;
       
       return {
         stoneWidth,
@@ -309,7 +361,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
         gapY,
         dragonSize,
         offsetX: Math.max(offsetX, 20),
-        offsetY: Math.max(offsetY, 50),
+        offsetY: Math.max(offsetY, 40),
       };
     }
     
@@ -684,22 +736,23 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
         </DropdownMenu>
       </div>
       
-      {/* DESKTOP: Word cards + Dice positioned WITHIN the grid (between middle stones) */}
+      {/* DESKTOP: Word cards + Dice CENTERED on screen between middle row stones */}
       {!isMobile && calculatedSizes && (
         <div 
-          className="absolute z-20 flex items-center gap-4"
+          className="fixed z-20 flex items-center gap-6"
           style={{
-            // Position between middle stones (x=0, y=1) and (x=6, y=1)
-            left: offsetX + stoneWidth + 20, // 20px after left middle stone
-            bottom: offsetY + gapY + (stoneHeight / 2) - 65, // Vertically centered at y=1
+            // Center horizontally and vertically on screen
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
           }}
         >
-          {/* Fixed size word container */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border-2 border-dragon-green/30 w-[320px] h-[130px] flex items-center justify-center p-3">
+          {/* Larger word container - scaled 1.5x */}
+          <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border-3 border-dragon-green/30 w-[480px] h-[195px] flex items-center justify-center p-4">
             {collectedWords.length === 0 ? (
-              <p className="text-gray-400 text-sm font-medium italic">Pritisni kocko za skok...</p>
+              <p className="text-gray-400 text-lg font-medium italic">Pritisni kocko za skok...</p>
             ) : (
-              <div className="flex gap-4 items-center justify-center">
+              <div className="flex gap-6 items-center justify-center">
                 <AnimatePresence>
                   {collectedWords.map((word, idx) => (
                     <motion.div
@@ -708,14 +761,14 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
                       animate={{ opacity: 1, scale: 1 }}
                       className="flex flex-col items-center"
                     >
-                      <div className="w-20 h-20 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center p-2">
+                      <div className="w-28 h-28 rounded-xl bg-gray-50 border-2 border-gray-200 flex items-center justify-center p-3">
                         <img
                           src={getImageUrl(word.image)}
                           alt={word.word}
-                          className="w-16 h-16 object-contain"
+                          className="w-24 h-24 object-contain"
                         />
                       </div>
-                      <p className="text-sm font-bold text-gray-800 mt-1 uppercase">
+                      <p className="text-base font-bold text-gray-800 mt-2 uppercase">
                         {word.word}
                       </p>
                     </motion.div>
@@ -725,10 +778,11 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
             )}
           </div>
           
-          {/* 3D Dice - identical to DiceRoller from Met Kocke */}
+          {/* 3D Dice - scaled 1.5x (144px = 96 * 1.5) */}
           <JumpDice 
             onClick={handleNext} 
-            disabled={isJumping || phase === "complete" || showSentenceDialog} 
+            disabled={isJumping || phase === "complete" || showSentenceDialog}
+            size={144}
           />
         </div>
       )}
