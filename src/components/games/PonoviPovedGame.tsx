@@ -108,34 +108,48 @@ const STONE_POSITIONS_DESKTOP: StonePosition[] = [
   // Dragon returns to START (0,0) for final repeat of sentence 4
 ];
 
-// MOBILE: Keep original zigzag path
+// ============================================================================
+// MOBILE: U-shaped path - left column UP, across top, right column DOWN
+// 
+//                    [ZELEN] ← top center (y=7)
+//                   /       \
+//   [RUMEN] y=6             y=6 [RUMEN]
+//   [RDEČ]  y=5             y=5 [RDEČ]
+//   [SIV]   y=4 (obrne)     y=4 [SIV]  ← zmajček se obrne
+//   [ZELEN] y=3             y=3 [ZELEN]
+//   [RUMEN] y=2             y=2 [RUMEN]
+//   [RDEČ]  y=1             y=1 [RDEČ]
+//   [SIV]   y=0             y=0 [SIV]
+//                   \       /
+//              🐉[ZELEN] ← bottom center (y=-1, START)
+//                  [BTN]
+// ============================================================================
 const STONE_POSITIONS_MOBILE: StonePosition[] = [
-  // Row 1: START (gray)
-  { x: 0, y: 0, type: 'gray', isRest: false },
+  // START - bottom center green stone
+  { x: 1, y: -1, type: 'green', isRest: false },
   
-  // Row 1: Sentence 1 - moving RIGHT
-  { x: 1, y: 0, type: 'green', isRest: false, sentenceIndex: 0, wordIndex: 0 },
-  { x: 2, y: 0, type: 'red', isRest: false, sentenceIndex: 0, wordIndex: 1 },
-  { x: 3, y: 0, type: 'yellow', isRest: false, sentenceIndex: 0, wordIndex: 2 },
-  { x: 3, y: 1, type: 'gray', isRest: true, sentenceIndex: 0 },
+  // Sentence 1: Left column - going UP (3 word stones + 1 rest)
+  { x: 0, y: 0, type: 'gray', isRest: false, sentenceIndex: 0, wordIndex: 0 },   // 1st word
+  { x: 0, y: 1, type: 'red', isRest: false, sentenceIndex: 0, wordIndex: 1 },    // 2nd word
+  { x: 0, y: 2, type: 'yellow', isRest: false, sentenceIndex: 0, wordIndex: 2 }, // 3rd word
+  { x: 0, y: 3, type: 'green', isRest: true, sentenceIndex: 0 },                 // Repeat sentence 1
   
-  // Row 2: Sentence 2 - moving LEFT
-  { x: 2, y: 1, type: 'green', isRest: false, sentenceIndex: 1, wordIndex: 0 },
-  { x: 1, y: 1, type: 'red', isRest: false, sentenceIndex: 1, wordIndex: 1 },
-  { x: 0, y: 1, type: 'yellow', isRest: false, sentenceIndex: 1, wordIndex: 2 },
-  { x: 0, y: 2, type: 'gray', isRest: true, sentenceIndex: 1 },
+  // Sentence 2: Continue left column UP + cross to top (3 word stones + 1 rest)
+  { x: 0, y: 4, type: 'gray', isRest: false, sentenceIndex: 1, wordIndex: 0 },   // 1st word
+  { x: 0, y: 5, type: 'red', isRest: false, sentenceIndex: 1, wordIndex: 1 },    // 2nd word
+  { x: 0, y: 6, type: 'yellow', isRest: false, sentenceIndex: 1, wordIndex: 2 }, // 3rd word
+  { x: 1, y: 7, type: 'green', isRest: true, sentenceIndex: 1 },                 // Top center - Repeat sentence 2
   
-  // Row 3: Sentence 3 - moving RIGHT
-  { x: 1, y: 2, type: 'green', isRest: false, sentenceIndex: 2, wordIndex: 0 },
-  { x: 2, y: 2, type: 'red', isRest: false, sentenceIndex: 2, wordIndex: 1 },
-  { x: 3, y: 2, type: 'yellow', isRest: false, sentenceIndex: 2, wordIndex: 2 },
-  { x: 3, y: 3, type: 'gray', isRest: true, sentenceIndex: 2 },
+  // Sentence 3: Right column - going DOWN (3 word stones + 1 rest)
+  { x: 2, y: 6, type: 'yellow', isRest: false, sentenceIndex: 2, wordIndex: 0 }, // 1st word
+  { x: 2, y: 5, type: 'red', isRest: false, sentenceIndex: 2, wordIndex: 1 },    // 2nd word
+  { x: 2, y: 4, type: 'gray', isRest: true, sentenceIndex: 2 },                  // Repeat sentence 3 (zmajček se obrne)
   
-  // Row 4: Sentence 4 - moving LEFT - GOAL
-  { x: 2, y: 3, type: 'green', isRest: false, sentenceIndex: 3, wordIndex: 0 },
-  { x: 1, y: 3, type: 'red', isRest: false, sentenceIndex: 3, wordIndex: 1 },
-  { x: 0, y: 3, type: 'yellow', isRest: false, sentenceIndex: 3, wordIndex: 2 },
-  { x: 0, y: 4, type: 'gray', isRest: true, sentenceIndex: 3 },  // GOAL
+  // Sentence 4: Continue right column DOWN (3 word stones + finish)
+  { x: 2, y: 3, type: 'green', isRest: false, sentenceIndex: 3, wordIndex: 0 },  // 1st word
+  { x: 2, y: 2, type: 'yellow', isRest: false, sentenceIndex: 3, wordIndex: 1 }, // 2nd word
+  { x: 2, y: 1, type: 'red', isRest: false, sentenceIndex: 3, wordIndex: 2 },    // 3rd word
+  { x: 2, y: 0, type: 'gray', isRest: true, sentenceIndex: 3 },                  // GOAL - Repeat sentence 4
 ];
 
 // DiceDots helper component for 3D dice faces
@@ -296,24 +310,29 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       };
     }
     
-    // MOBILE: Keep smaller sizes
-    const columns = 4;
-    const rows = 5;
-    const PADDING = 40;
+    // MOBILE: U-shaped layout (3 columns x 9 rows including top/bottom center)
+    const columns = 3;
+    const rows = 9; // y from -1 to 7
     
-    const availableWidth = containerSize.width - PADDING;
-    const availableHeight = containerSize.height - PADDING - 200;
+    const availableWidth = containerSize.width - 40; // padding
+    const availableHeight = containerSize.height - 200; // space for word cards at top + button at bottom
     
-    const sizeByWidth = Math.floor(availableWidth / columns / 1.3);
-    const sizeByHeight = Math.floor(availableHeight / rows / 1.35);
+    // Calculate stone size to fit the grid
+    const sizeByWidth = Math.floor(availableWidth / columns / 1.4);
+    const sizeByHeight = Math.floor(availableHeight / rows / 1.2);
     
-    const stoneWidth = Math.min(sizeByWidth, sizeByHeight, 90);
+    const stoneWidth = Math.min(sizeByWidth, sizeByHeight, 70);
     const stoneHeight = Math.floor(stoneWidth * 0.75);
-    const gapX = Math.floor(stoneWidth * 1.25);
-    const gapY = Math.floor(stoneHeight * 1.35);
-    const dragonSize = Math.floor(stoneWidth * 0.9);
-    const offsetX = Math.floor((containerSize.width - (columns - 1) * gapX - stoneWidth) / 2);
-    const offsetY = Math.floor(stoneHeight * 0.5) + 80;
+    
+    // Gaps between stones
+    const gapX = Math.floor((availableWidth - stoneWidth * 3) / 2); // horizontal gap between columns
+    const gapY = Math.floor(stoneHeight * 1.1); // vertical gap
+    
+    const dragonSize = Math.floor(stoneWidth * 0.85);
+    
+    // Offsets to center the grid
+    const offsetX = Math.floor((containerSize.width - (2 * gapX + stoneWidth * 3)) / 2) + stoneWidth / 2;
+    const offsetY = Math.floor(stoneHeight * 1.5); // space at bottom for button
     
     return {
       stoneWidth,
@@ -386,25 +405,21 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       return DRAGON_RIGHT;
     }
     
-    // MOBILE: Original zigzag logic
-    const row = stone.y;
+    // MOBILE: U-shaped path logic
+    // Left column (x=0): going UP → facing right
+    if (stone.x === 0) return DRAGON_RIGHT;
     
-    if (dragonPosition === 0) return DRAGON_RIGHT;
-    if (dragonPosition === STONE_POSITIONS.length - 1) return DRAGON_RIGHT;
+    // Top center (x=1, y=7): facing right (crossing to right side)
+    if (stone.x === 1 && stone.y === 7) return DRAGON_RIGHT;
     
-    if (stone.isRest) {
-      if (row === 0 || row === 2) {
-        return DRAGON_LEFT;
-      } else {
-        return DRAGON_RIGHT;
-      }
-    }
+    // Right column (x=2): going DOWN → facing left
+    // Dragon turns left at gray rest stone (y=4) and continues facing left
+    if (stone.x === 2) return DRAGON_LEFT;
     
-    if (row === 0 || row === 2) {
-      return DRAGON_RIGHT;
-    } else {
-      return DRAGON_LEFT;
-    }
+    // Bottom center (x=1, y=-1): START position → facing right
+    if (stone.x === 1 && stone.y === -1) return DRAGON_RIGHT;
+    
+    return DRAGON_RIGHT;
   }, [dragonPosition, isMobile, STONE_POSITIONS]);
 
   // Play audio helper
@@ -596,23 +611,33 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
   };
 
   // Calculate pixel positions for stones
-  // Middle row (y=1) and top row (y=2) are pushed UP proportionally
+  // Middle row (y=1) and top row (y=2) are pushed UP proportionally (desktop only)
+  // Mobile: Handle y from -1 to 7 (U-shaped path)
   const getStonePixelPosition = (index: number) => {
     const stone = STONE_POSITIONS[index];
     
-    // Extra vertical offset for middle and top rows (desktop only)
-    let extraYOffset = 0;
     if (!isMobile) {
+      // DESKTOP: Original logic with extra vertical offset
+      let extraYOffset = 0;
       if (stone.y === 1) {
         extraYOffset = gapY * 0.3;  // Middle row: push up 30% of gapY
       } else if (stone.y === 2) {
         extraYOffset = gapY * 0.5;  // Top row: push up 50% of gapY
       }
+      
+      return {
+        left: offsetX + stone.x * gapX,
+        bottom: offsetY + stone.y * gapY + extraYOffset,
+      };
     }
+    
+    // MOBILE: U-shaped path - handle y from -1 to 7
+    // Shift y by +1 so -1 becomes 0 for bottom calculation
+    const adjustedY = stone.y + 1;
     
     return {
       left: offsetX + stone.x * gapX,
-      bottom: offsetY + stone.y * gapY + extraYOffset,
+      bottom: offsetY + adjustedY * gapY,
     };
   };
 
