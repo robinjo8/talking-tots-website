@@ -1011,15 +1011,20 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       </AlertDialog>
       
       {/* Success dialog */}
-      <Dialog open={showSuccessDialog} onOpenChange={() => {}}>
-        <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
+      <Dialog open={showSuccessDialog} onOpenChange={(open) => {
+        if (!open) {
+          setShowSuccessDialog(false);
+          navigate("/govorne-igre/ponovi-poved");
+        }
+      }}>
+        <DialogContent className="sm:max-w-md">
           <div className="space-y-6 py-6 flex flex-col items-center">
             <h1 className="text-3xl md:text-4xl font-bold text-dragon-green text-center uppercase">
               ČESTITKE!
             </h1>
             
             <p className="text-center text-base md:text-lg uppercase font-medium">
-              Odlično si ponovil vse povedi!
+              Odlično si ponovil/a vse povedi!
             </p>
             
             <img
@@ -1028,46 +1033,33 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
               className="w-40 h-40 md:w-48 md:h-48 object-contain"
             />
             
-            <div className="flex gap-3 w-full justify-center">
-              <Button
-                onClick={() => {
-                  setShowSuccessDialog(false);
-                  navigate("/govorne-igre/ponovi-poved");
-                }}
-                variant="outline"
-                className="uppercase font-bold px-6"
-              >
-                Zapri
-              </Button>
-              
-              <Button
-                onClick={async () => {
-                  // Save star to database
-                  if (selectedChild?.id) {
-                    try {
-                      await supabase.from("progress").insert({
-                        child_id: selectedChild.id,
-                        exercise_id: "00000000-0000-0000-0000-000000000000",
-                        activity_type: "exercise",
-                        activity_subtype: `ponovi-poved-${config.letter}`,
-                        score: 100,
-                        correct_answers: 4,
-                        total_questions: 4,
-                        duration: 0,
-                        stars_earned: 1,
-                      });
-                    } catch (error) {
-                      console.error("Error saving star:", error);
-                    }
+            <Button
+              onClick={async () => {
+                // Save star to database
+                if (selectedChild?.id) {
+                  try {
+                    await supabase.from("progress").insert({
+                      child_id: selectedChild.id,
+                      exercise_id: "00000000-0000-0000-0000-000000000000",
+                      activity_type: "exercise",
+                      activity_subtype: `ponovi-poved-${config.letter}`,
+                      score: 100,
+                      correct_answers: 4,
+                      total_questions: 4,
+                      duration: 0,
+                      stars_earned: 1,
+                    });
+                  } catch (error) {
+                    console.error("Error saving star:", error);
                   }
-                  setShowSuccessDialog(false);
-                  navigate("/govorne-igre/ponovi-poved");
-                }}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 uppercase font-bold px-6"
-              >
-                ⭐ Vzemi zvezdico
-              </Button>
-            </div>
+                }
+                setShowSuccessDialog(false);
+                navigate("/govorne-igre/ponovi-poved");
+              }}
+              className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 uppercase font-bold px-8"
+            >
+              ⭐ Vzemi zvezdico
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
