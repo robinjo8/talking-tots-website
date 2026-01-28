@@ -11,6 +11,7 @@ interface InstructionsModalProps {
 type InstructionItem = {
   text: string;
   icon?: "green" | "yellow" | "red";
+  bold?: boolean;
 };
 
 export const InstructionsModal: React.FC<InstructionsModalProps> = ({
@@ -79,19 +80,19 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
       ]
     : type === "wheel"
     ? [
-        { text: "Zavrti kolo" },
+        { text: "Zavrti kolo", bold: true },
         { text: "Pritisni oranžni gumb v sredini kolesa, da zavrtiš kolo besed." },
-        { text: "Počakaj na rezultat" },
+        { text: "Počakaj na rezultat", bold: true },
         { text: "Kolo se bo zavrtelo in se ustavilo na naključni besedi. Med vrtenjem se sliši zvok tikanja." },
-        { text: "Ponovi besedo" },
+        { text: "Ponovi besedo", bold: true },
         { text: "Ko se kolo ustavi, se prikaže okno z izbrano besedo in sliko. Klikni na sliko, da začneš snemanje (3 sekunde), in besedo ponovi glasno in razločno. Lahko tudi klikneš zeleni gumb z zvočnikom, da slišiš pravilno izgovorjavo." },
-        { text: "Zberi 3 ponovitve" },
+        { text: "Zberi 3 ponovitve", bold: true },
         { text: "Vsako besedo moraš ponoviti trikrat, da osvojiš zvezdico. Po vsaki ponovitvi se kolo znova zavrti na isto ali drugo besedo." },
-        { text: "Vzemi zvezdico" },
+        { text: "Vzemi zvezdico", bold: true },
         { text: "Ko dosežeš tri ponovitve iste besede, se pojavi zlati gumb VZEMI ZVEZDICO. Klikni nanj, da se nagrada zabeleži." },
-        { text: "Nova igra / izhod" },
+        { text: "Nova igra / izhod", bold: true },
         { text: "S klikom na gumb Hiška se vrnete v meni." },
-        { text: "Cilj igre" },
+        { text: "Cilj igre", bold: true },
         { text: "Vaditi izgovorjavo posamezne črke (na primer C, Č, K) na začetku besed s pomočjo vrtenja kolesa in zbiranja zvezdic." }
       ]
     : [
@@ -141,9 +142,11 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
         <div className="px-2 pb-4 overflow-y-auto flex-1">
           <div className="space-y-4">
             {content.map((item, index) => (
-              <div key={index} className="flex items-start gap-3">
-                {getIcon(item.icon)}
-                <p className="text-foreground leading-relaxed text-sm">{item.text}</p>
+              <div key={index} className={`flex items-start gap-3 ${item.bold ? 'mt-2' : ''}`}>
+                {!item.bold && getIcon(item.icon)}
+                <p className={`leading-relaxed text-sm ${item.bold ? 'font-bold text-base text-foreground' : 'text-foreground'}`}>
+                  {item.text}
+                </p>
               </div>
             ))}
           </div>
