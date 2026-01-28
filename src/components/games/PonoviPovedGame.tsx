@@ -124,32 +124,32 @@ const STONE_POSITIONS_DESKTOP: StonePosition[] = [
 //                                [BTN]
 // ============================================================================
 const STONE_POSITIONS_MOBILE: StonePosition[] = [
-  // START - bottom left gray stone (dragon starts here)
-  { x: 0, y: 0, type: 'gray', isRest: false },
+  // START/CILJ - sredina spodaj (zmajček začne in konča tukaj)
+  { x: 1, y: 0, type: 'gray', isRest: false },
   
-  // Sentence 1: Left column - going UP (3 word stones + 1 rest)
-  { x: 0, y: 1, type: 'red', isRest: false, sentenceIndex: 0, wordIndex: 0 },    // 1st word
-  { x: 0, y: 2, type: 'yellow', isRest: false, sentenceIndex: 0, wordIndex: 1 }, // 2nd word
-  { x: 0, y: 3, type: 'green', isRest: false, sentenceIndex: 0, wordIndex: 2 },  // 3rd word
-  { x: 0, y: 3, type: 'gray', isRest: true, sentenceIndex: 0 },                  // Pop-up for sentence 1
+  // Poved 1: Levi stolpec gor (rdeč, rumen, zelen, siv)
+  { x: 0, y: 0, type: 'red', isRest: false, sentenceIndex: 0, wordIndex: 0 },
+  { x: 0, y: 1, type: 'yellow', isRest: false, sentenceIndex: 0, wordIndex: 1 },
+  { x: 0, y: 2, type: 'green', isRest: false, sentenceIndex: 0, wordIndex: 2 },
+  { x: 0, y: 3, type: 'gray', isRest: true, sentenceIndex: 0 },
   
-  // Sentence 2: Continue left column UP + cross to top center (3 word stones + 1 rest)
-  { x: 0, y: 4, type: 'red', isRest: false, sentenceIndex: 1, wordIndex: 0 },    // 1st word
-  { x: 0, y: 5, type: 'yellow', isRest: false, sentenceIndex: 1, wordIndex: 1 }, // 2nd word
-  { x: 0, y: 6, type: 'green', isRest: false, sentenceIndex: 1, wordIndex: 2 },  // 3rd word (top left)
-  { x: 1, y: 6, type: 'gray', isRest: true, sentenceIndex: 1 },                  // Top center - Pop-up for sentence 2
+  // Poved 2: Levi stolpec gor + prehod zgoraj (rdeč, rumen, zelen, siv)
+  { x: 0, y: 4, type: 'red', isRest: false, sentenceIndex: 1, wordIndex: 0 },
+  { x: 0, y: 5, type: 'yellow', isRest: false, sentenceIndex: 1, wordIndex: 1 },
+  { x: 0, y: 6, type: 'green', isRest: false, sentenceIndex: 1, wordIndex: 2 },
+  { x: 1, y: 6, type: 'gray', isRest: true, sentenceIndex: 1 },
   
-  // Sentence 3: Right column - going DOWN (3 word stones + 1 rest)
-  { x: 2, y: 6, type: 'green', isRest: false, sentenceIndex: 2, wordIndex: 0 },  // 1st word (top right)
-  { x: 2, y: 5, type: 'yellow', isRest: false, sentenceIndex: 2, wordIndex: 1 }, // 2nd word
-  { x: 2, y: 4, type: 'red', isRest: false, sentenceIndex: 2, wordIndex: 2 },    // 3rd word
-  { x: 2, y: 3, type: 'gray', isRest: true, sentenceIndex: 2 },                  // Pop-up for sentence 3 (dragon turns here)
+  // Poved 3: Desni stolpec dol (rdeč, rumen, zelen, siv)
+  { x: 2, y: 6, type: 'red', isRest: false, sentenceIndex: 2, wordIndex: 0 },
+  { x: 2, y: 5, type: 'yellow', isRest: false, sentenceIndex: 2, wordIndex: 1 },
+  { x: 2, y: 4, type: 'green', isRest: false, sentenceIndex: 2, wordIndex: 2 },
+  { x: 2, y: 3, type: 'gray', isRest: true, sentenceIndex: 2 },
   
-  // Sentence 4: Continue right column DOWN (3 word stones + final rest)
-  { x: 2, y: 2, type: 'green', isRest: false, sentenceIndex: 3, wordIndex: 0 },  // 1st word
-  { x: 2, y: 1, type: 'yellow', isRest: false, sentenceIndex: 3, wordIndex: 1 }, // 2nd word
-  { x: 2, y: 0, type: 'red', isRest: false, sentenceIndex: 3, wordIndex: 2 },    // 3rd word
-  { x: 2, y: 0, type: 'gray', isRest: true, sentenceIndex: 3 },                  // GOAL - Pop-up for sentence 4
+  // Poved 4: Desni stolpec dol do cilja (rdeč, rumen, zelen)
+  // Zmajček se nato vrne na START (1,0) za ponovitev povedi 4
+  { x: 2, y: 2, type: 'red', isRest: false, sentenceIndex: 3, wordIndex: 0 },
+  { x: 2, y: 1, type: 'yellow', isRest: false, sentenceIndex: 3, wordIndex: 1 },
+  { x: 2, y: 0, type: 'green', isRest: false, sentenceIndex: 3, wordIndex: 2 },
 ];
 
 // DiceDots helper component for 3D dice faces
@@ -314,7 +314,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     const rows = 7; // 7 vrstic (y od 0 do 6)
     
     // Prostor za UI elemente
-    const topCardHeight = 80;
+    const topCardHeight = 120;
     const bottomButtonSpace = 130; // Nad gumbom (vrh gumba ~104px + 26px razmaka)
     const availableHeight = containerSize.height - topCardHeight - bottomButtonSpace;
     const availableWidth = containerSize.width;
