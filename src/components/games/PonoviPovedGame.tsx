@@ -314,39 +314,42 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     // Properly centered horizontally and vertically
     const rows = 8;
     
-    // Calculate available space
-    const topCardHeight = 120; // Space for word cards at top
-    const bottomButtonSpace = 100; // Space for jump button at bottom
+    // Calculate available space - use more vertical space
+    const topCardHeight = 100; // Reduced space for word cards at top
+    const bottomButtonSpace = 90; // Space for jump button at bottom
     const availableHeight = containerSize.height - topCardHeight - bottomButtonSpace;
     const availableWidth = containerSize.width;
     
-    // Calculate stone size - LARGER for better visibility
-    // Use more of the available height
-    const maxStoneHeight = Math.floor(availableHeight / rows * 0.9);
-    const stoneHeight = Math.min(maxStoneHeight, 52); // Increased from 45 to 52
+    // Calculate stone size - BIGGER stones
+    const maxStoneHeight = Math.floor(availableHeight / rows * 0.95);
+    const stoneHeight = Math.min(maxStoneHeight, 58); // Increased to 58
     const stoneWidth = Math.floor(stoneHeight * 1.4); // Aspect ratio 1.4:1
     
-    // Vertical gap - proportionally distributed across the full height
+    // Vertical gap - use full available height, stretch upward
     const totalStonesHeight = stoneHeight * rows;
     const gapY = Math.floor((availableHeight - totalStonesHeight) / (rows - 1));
     
-    // Horizontal gap - bring columns CLOSER to center (away from edges)
-    // Use 65% of screen width for the grid, centered
-    const gridWidthRatio = 0.65;
-    const gridWidth = Math.floor(availableWidth * gridWidthRatio);
-    const gapX = Math.floor(gridWidth / 2); // Distance between column centers
+    // Horizontal positioning - equal distance from left and right edges
+    // Fixed margin from each edge
+    const edgeMargin = 25; // Equal margin from both edges
+    const leftColumnX = edgeMargin + stoneWidth / 2; // Center of left column
+    const rightColumnX = availableWidth - edgeMargin - stoneWidth / 2; // Center of right column
+    const centerColumnX = availableWidth / 2; // Center column exactly in middle
     
-    const dragonSize = Math.floor(stoneWidth * 1.0); // Increased dragon size
+    // gapX represents distance between column centers
+    const gapX = (rightColumnX - leftColumnX) / 2;
+    
+    const dragonSize = Math.floor(stoneWidth * 1.1); // Bigger dragon
     
     // Calculate total grid dimensions
-    const totalGridWidth = 2 * gapX; // From x=0 to x=2
+    const totalGridWidth = rightColumnX - leftColumnX;
     const totalGridHeight = totalStonesHeight + gapY * (rows - 1);
     
-    // Center the grid horizontally
-    const offsetX = (containerSize.width - totalGridWidth) / 2;
+    // offsetX is the left edge of the left column stones
+    const offsetX = leftColumnX;
     
-    // Center vertically with space for button at bottom
-    const offsetY = bottomButtonSpace + (availableHeight - totalGridHeight) / 2 + stoneHeight;
+    // Vertical offset - stretch upward, less bottom padding
+    const offsetY = bottomButtonSpace + stoneHeight / 2;
     
     return {
       stoneWidth,
@@ -647,9 +650,15 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     }
     
     // MOBILE: U-shaped path - y from 0 to 7
-    // Center each stone on its column by subtracting half the stone width
+    // Use direct column positions for proper alignment
+    const columnPositions = [
+      offsetX, // Left column (x=0)
+      containerSize.width / 2, // Center column (x=1)
+      containerSize.width - 25 - stoneWidth / 2, // Right column (x=2)
+    ];
+    
     return {
-      left: offsetX + stone.x * gapX - stoneWidth / 2,
+      left: columnPositions[stone.x] - stoneWidth / 2,
       bottom: offsetY + stone.y * gapY,
     };
   };
@@ -827,7 +836,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
             <div
               className="absolute"
               style={{
-                left: offsetX + 1 * gapX - stoneWidth / 2,
+                left: containerSize.width / 2 - stoneWidth / 2,
                 bottom: offsetY,
                 width: stoneWidth,
                 height: stoneHeight,
