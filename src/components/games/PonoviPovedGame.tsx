@@ -313,29 +313,24 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     // MOBILE: U-shaped layout (3 columns x 8 rows, y from 0 to 7)
     const rows = 8;
     
-    // ZAHTEVA 4: Fiksni razmak med kamni v višino
-    const gapY = 30; // FIKSNO 30px
-    
-    // Calculate available space
-    const topCardHeight = 100;
-    const bottomButtonSpace = 110;
+    // Prostor za UI elemente
+    const topCardHeight = 80;
+    const bottomButtonSpace = 100;
     const availableHeight = containerSize.height - topCardHeight - bottomButtonSpace;
     const availableWidth = containerSize.width;
     
-    // Izračunaj velikost kamnov glede na razpoložljiv prostor
-    const totalGapsHeight = gapY * (rows - 1); // 7 × 30 = 210px
-    const remainingForStones = availableHeight - totalGapsHeight;
-    const stoneHeight = Math.floor(remainingForStones / rows);
+    // Fiksna velikost kamnov
+    const stoneHeight = 45;
     const stoneWidth = Math.floor(stoneHeight * 1.4);
     
-    // Celotna višina grida
-    const totalGridHeight = stoneHeight * rows + totalGapsHeight;
+    // DINAMIČEN gapY - raztegne grid čez celoten razpoložljiv prostor
+    // Grid gre od y=0 do y=7, torej 7 razmakov med 8 vrsticami
+    const gapY = Math.floor((availableHeight - stoneHeight) / (rows - 1));
     
-    // ZAHTEVA 1 & 2: Vertikalno centriranje + začetek nad gumbom
-    const verticalPadding = (availableHeight - totalGridHeight) / 2;
-    const offsetY = bottomButtonSpace + verticalPadding;
+    // offsetY = tik nad gumbom
+    const offsetY = bottomButtonSpace;
     
-    // ZAHTEVA 3: Simetrično od leve in desne
+    // Simetrična horizontalna postavitev
     const edgeMargin = 35;
     const leftColumnCenter = edgeMargin + stoneWidth / 2;
     const rightColumnCenter = availableWidth - edgeMargin - stoneWidth / 2;
