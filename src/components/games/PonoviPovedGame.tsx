@@ -174,128 +174,40 @@ function DiceDots({ count }: { count: number }) {
   );
 }
 
-// JumpDice component - 3D cube with arrow icon (no dots)
-function JumpDice({ onClick, disabled, size = 96 }: { onClick: () => void; disabled: boolean; size?: number }) {
-  const [isHovered, setIsHovered] = useState(false);
-  
-  const halfSize = size / 2;
+// JumpButton component - simple pressable button with arrow (not a 3D rotating cube)
+function JumpButton({ onClick, disabled, size = 96 }: { onClick: () => void; disabled: boolean; size?: number }) {
+  const [isPressed, setIsPressed] = useState(false);
 
   return (
-    <div 
-      className={`cursor-pointer ${disabled ? 'pointer-events-none opacity-50' : ''}`}
-      style={{ perspective: '800px' }}
+    <button 
+      className={`cursor-pointer transition-all duration-150 ${disabled ? 'pointer-events-none opacity-50' : ''}`}
       onClick={disabled ? undefined : onClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseDown={() => setIsPressed(true)}
+      onMouseUp={() => setIsPressed(false)}
+      onMouseLeave={() => setIsPressed(false)}
+      disabled={disabled}
+      style={{ 
+        width: size, 
+        height: size,
+        transform: isPressed ? 'scale(0.95) translateY(4px)' : 'scale(1)',
+        transition: 'transform 150ms ease-out',
+      }}
     >
-      {/* 3D Cube Container */}
-      <div
-        className={`relative transition-transform ${!disabled ? 'animate-pulse' : ''}`}
+      <div 
+        className={`w-full h-full bg-white rounded-xl border-4 border-gray-300 shadow-xl flex items-center justify-center ${!disabled ? 'animate-pulse' : ''}`}
         style={{
-          width: size,
-          height: size,
-          transformStyle: 'preserve-3d',
-          transform: isHovered && !disabled ? 'rotateY(10deg) rotateX(-5deg)' : 'rotateY(0deg)',
-          transitionDuration: '300ms',
+          boxShadow: isPressed 
+            ? '0 2px 8px rgba(0,0,0,0.2)' 
+            : '0 8px 24px rgba(0,0,0,0.2), 0 4px 8px rgba(0,0,0,0.1)',
         }}
       >
-        {/* Face - Front - with BLACK ARROW UP icon */}
-        <div 
-          className="absolute bg-white rounded-xl border-4 border-gray-300 shadow-lg flex items-center justify-center"
-          style={{ 
-            width: size, 
-            height: size,
-            transform: `translateZ(${halfSize}px)` 
-          }}
-        >
-          <ArrowUp 
-            className="text-gray-900 drop-shadow-md" 
-            style={{ width: size * 0.5, height: size * 0.5 }}
-            strokeWidth={3}
-          />
-        </div>
-        
-        {/* Face - Back */}
-        <div 
-          className="absolute bg-white rounded-xl border-4 border-gray-300 shadow-lg flex items-center justify-center"
-          style={{ 
-            width: size, 
-            height: size,
-            transform: `rotateY(180deg) translateZ(${halfSize}px)` 
-          }}
-        >
-          <ArrowUp 
-            className="text-gray-900 drop-shadow-md" 
-            style={{ width: size * 0.5, height: size * 0.5 }}
-            strokeWidth={3}
-          />
-        </div>
-        
-        {/* Face - Right */}
-        <div 
-          className="absolute bg-white rounded-xl border-4 border-gray-300 shadow-lg flex items-center justify-center"
-          style={{ 
-            width: size, 
-            height: size,
-            transform: `rotateY(90deg) translateZ(${halfSize}px)` 
-          }}
-        >
-          <ArrowUp 
-            className="text-gray-900 drop-shadow-md" 
-            style={{ width: size * 0.5, height: size * 0.5 }}
-            strokeWidth={3}
-          />
-        </div>
-        
-        {/* Face - Left */}
-        <div 
-          className="absolute bg-white rounded-xl border-4 border-gray-300 shadow-lg flex items-center justify-center"
-          style={{ 
-            width: size, 
-            height: size,
-            transform: `rotateY(-90deg) translateZ(${halfSize}px)` 
-          }}
-        >
-          <ArrowUp 
-            className="text-gray-900 drop-shadow-md" 
-            style={{ width: size * 0.5, height: size * 0.5 }}
-            strokeWidth={3}
-          />
-        </div>
-        
-        {/* Face - Top */}
-        <div 
-          className="absolute bg-white rounded-xl border-4 border-gray-300 shadow-lg flex items-center justify-center"
-          style={{ 
-            width: size, 
-            height: size,
-            transform: `rotateX(90deg) translateZ(${halfSize}px)` 
-          }}
-        >
-          <ArrowUp 
-            className="text-gray-900 drop-shadow-md" 
-            style={{ width: size * 0.5, height: size * 0.5 }}
-            strokeWidth={3}
-          />
-        </div>
-        
-        {/* Face - Bottom */}
-        <div 
-          className="absolute bg-white rounded-xl border-4 border-gray-300 shadow-lg flex items-center justify-center"
-          style={{ 
-            width: size, 
-            height: size,
-            transform: `rotateX(-90deg) translateZ(${halfSize}px)` 
-          }}
-        >
-          <ArrowUp 
-            className="text-gray-900 drop-shadow-md" 
-            style={{ width: size * 0.5, height: size * 0.5 }}
-            strokeWidth={3}
-          />
-        </div>
+        <ArrowUp 
+          className="text-gray-900 drop-shadow-md" 
+          style={{ width: size * 0.5, height: size * 0.5 }}
+          strokeWidth={3}
+        />
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -684,12 +596,23 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
   };
 
   // Calculate pixel positions for stones
+  // Middle row (y=1) and top row (y=2) are pushed UP proportionally
   const getStonePixelPosition = (index: number) => {
     const stone = STONE_POSITIONS[index];
     
+    // Extra vertical offset for middle and top rows (desktop only)
+    let extraYOffset = 0;
+    if (!isMobile) {
+      if (stone.y === 1) {
+        extraYOffset = gapY * 0.3;  // Middle row: push up 30% of gapY
+      } else if (stone.y === 2) {
+        extraYOffset = gapY * 0.5;  // Top row: push up 50% of gapY
+      }
+    }
+    
     return {
       left: offsetX + stone.x * gapX,
-      bottom: offsetY + stone.y * gapY,
+      bottom: offsetY + stone.y * gapY + extraYOffset,
     };
   };
 
@@ -803,8 +726,8 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
             )}
           </div>
           
-          {/* 3D Dice - scaled 1.5x (144px = 96 * 1.5) */}
-          <JumpDice 
+          {/* Jump button - scaled 1.5x (144px = 96 * 1.5) */}
+          <JumpButton 
             onClick={handleNext} 
             disabled={isJumping || phase === "complete" || showSentenceDialog}
             size={144}
@@ -847,11 +770,11 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
             </div>
           </div>
           
-          {/* MOBILE: Bottom center jump dice */}
+          {/* MOBILE: Bottom center jump button */}
           <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-20">
-            <JumpDice 
+            <JumpButton 
               onClick={handleNext} 
-              disabled={isJumping || phase === "complete" || showSentenceDialog} 
+              disabled={isJumping || phase === "complete" || showSentenceDialog}
             />
           </div>
         </>
