@@ -135,22 +135,17 @@ export const BingoReel: React.FC<BingoReelProps> = ({
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-yellow-400" />
       </div>
       
-      {/* Drawn word label and spin button in row */}
-      <div className="flex items-center gap-4">
-        <Button
-          onClick={onSpin}
-          disabled={isSpinning || disabled}
-          className="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-bold text-sm md:text-base px-4 py-2 h-auto rounded-full shadow-lg"
-        >
-          {isSpinning ? '🎰 VRTENJE...' : '🎰 ZAVRTI'}
-        </Button>
-        
-        {drawnWord && !isSpinning && (
-          <div className="text-base md:text-lg font-bold text-white drop-shadow-lg">
-            Najdi: <span className="text-yellow-300">{drawnWord.word}</span>
-          </div>
-        )}
-      </div>
+      {/* Spin button only */}
+      <Button
+        onClick={onSpin}
+        disabled={isSpinning || disabled}
+        className="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-bold text-sm md:text-base px-4 py-2 h-auto rounded-full shadow-lg"
+      >
+        {isSpinning ? 'VRTENJE...' : 'ZAVRTI'}
+      </Button>
     </div>
   );
 };
+
+// Export drawn word for parent to use
+export type { BingoReelProps };
