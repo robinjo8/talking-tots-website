@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { Trophy, Mic, X, Star, Volume2, RefreshCw } from "lucide-react";
+import { Mic, X, Volume2 } from "lucide-react";
 import { MatchingGameImage } from "@/data/matchingGameData";
 import { useAudioPlayback } from '@/hooks/useAudioPlayback';
+
 interface MatchingCompletionDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -15,6 +16,7 @@ interface MatchingCompletionDialogProps {
   autoPlayAudio?: boolean;
   isMobileLandscape?: boolean;
 }
+
 export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> = ({
   isOpen,
   onClose,
@@ -28,8 +30,8 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
   const [completedRecordings, setCompletedRecordings] = useState<Set<number>>(new Set());
   const [recordingTimeLeft, setRecordingTimeLeft] = useState(3);
   const [currentRecordingIndex, setCurrentRecordingIndex] = useState<number | null>(null);
-  const [starClaimed, setStarClaimed] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showBravoDialog, setShowBravoDialog] = useState(false);
   const [confirmDialogConfig, setConfirmDialogConfig] = useState<{
     title: string;
     description: string;
@@ -39,6 +41,19 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     playAudio
   } = useAudioPlayback();
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
+  const hasAutoTransitionedRef = useRef(false);
+
+  // Auto-transition to BRAVO dialog when all recordings complete
+  useEffect(() => {
+    if (images.length > 0 && completedRecordings.size === images.length && !hasAutoTransitionedRef.current) {
+      hasAutoTransitionedRef.current = true;
+      // Small delay for smooth transition
+      setTimeout(() => {
+        setShowBravoDialog(true);
+        onStarClaimed?.();
+      }, 500);
+    }
+  }, [completedRecordings.size, images.length, onStarClaimed]);
 
   // Cleanup on dialog close
   useEffect(() => {
@@ -46,7 +61,8 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       setCompletedRecordings(new Set());
       setRecordingTimeLeft(3);
       setCurrentRecordingIndex(null);
-      setStarClaimed(false);
+      setShowBravoDialog(false);
+      hasAutoTransitionedRef.current = false;
       if (countdownRef.current) {
         clearInterval(countdownRef.current);
         countdownRef.current = null;
@@ -54,38 +70,33 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     }
   }, [isOpen]);
 
-  // Auto-play audio when dialog opens (but NOT when star is claimed)
+  // Auto-play audio when dialog opens
   useEffect(() => {
-    if (isOpen && autoPlayAudio && images.length > 0 && !starClaimed) {
+    if (isOpen && autoPlayAudio && images.length > 0 && !showBravoDialog) {
       const playAudioForImage = async () => {
         try {
-          // Construct audio URL based on the word
           const word = images[0].word;
-          // Normalize word to remove diacritics (č, š, ž, etc.)
           const normalizedWord = word
             .toLowerCase()
             .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, ''); // Remove diacritics
-          // Use .m4a format like in regular puzzles
+            .replace(/[\u0300-\u036f]/g, '');
           const audioFilename = `${normalizedWord}.m4a`;
           const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
           
-          console.log('Playing audio:', audioUrl); // Debug log
           const audio = new Audio(audioUrl);
           audio.play().catch(error => {
             console.warn('Auto-play failed:', error);
-            // Auto-play might be blocked by browser policy
           });
         } catch (error) {
           console.error('Error playing audio:', error);
         }
       };
       
-      // Small delay to ensure dialog is fully rendered
       setTimeout(playAudioForImage, 300);
     }
-  }, [isOpen, autoPlayAudio, images, starClaimed]);
-  // Simulated recording - visual countdown only, no actual audio recording
+  }, [isOpen, autoPlayAudio, images, showBravoDialog]);
+
+  // Simulated recording - visual countdown only
   const startRecording = (imageIndex: number, word: string) => {
     if (completedRecordings.has(imageIndex)) return;
     
@@ -99,7 +110,6 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
             clearInterval(countdownRef.current);
             countdownRef.current = null;
           }
-          // Mark as completed immediately for UI feedback
           setCompletedRecordings(prevCompleted => new Set([...prevCompleted, imageIndex]));
           setCurrentRecordingIndex(null);
           return 0;
@@ -109,27 +119,9 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     }, 1000);
   };
 
-  const stopRecording = () => {
-    if (countdownRef.current) {
-      clearInterval(countdownRef.current);
-      countdownRef.current = null;
-    }
-    setCurrentRecordingIndex(null);
-  };
-
   const handleClose = () => {
     const allCompleted = completedRecordings.size === images.length;
-    if (allCompleted && !starClaimed) {
-      setConfirmDialogConfig({
-        title: "Zapri igro",
-        description: "Če zapreš igro, ne boš prejel zvezdice. Ali si prepričan?",
-        onConfirm: () => {
-          setShowConfirmDialog(false);
-          onClose();
-        }
-      });
-      setShowConfirmDialog(true);
-    } else if (!allCompleted) {
+    if (!allCompleted) {
       setConfirmDialogConfig({
         title: "Zapri okno",
         description: "Ali ste prepričani, da se želite zapreti okno? Niste še končali vseh posnetkov.",
@@ -144,35 +136,16 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     }
   };
 
-  const handleClaimStar = () => {
-    setStarClaimed(true);
-    onStarClaimed?.();
-    // Don't auto-close if onNewGame is provided - let user choose Nova igra or close
-    if (!onNewGame) {
-      setTimeout(() => {
-        onClose();
-      }, 1500);
-    }
+  const handleBravoClose = () => {
+    setShowBravoDialog(false);
+    onClose();
   };
 
   const handleImageClick = (imageIndex: number, word: string) => {
-    // Prevent clicking if already completed or currently recording
     if (completedRecordings.has(imageIndex) || currentRecordingIndex !== null) {
       return;
     }
     startRecording(imageIndex, word);
-  };
-
-  const handleReset = () => {
-    // Clear any running countdown timer
-    if (countdownRef.current) {
-      clearInterval(countdownRef.current);
-      countdownRef.current = null;
-    }
-    // Reset all recordings to allow re-recording
-    setCompletedRecordings(new Set());
-    setCurrentRecordingIndex(null);
-    setRecordingTimeLeft(3);
   };
 
   const handlePlayAudio = (image: MatchingGameImage) => {
@@ -180,116 +153,129 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       playAudio(image.audio_url);
     }
   };
-  return <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className={isMobileLandscape 
-        ? "w-[60vw] h-screen max-h-screen rounded-none flex flex-col justify-between py-4" 
-        : "sm:max-w-lg"
-      }>
-        <DialogHeader className={isMobileLandscape ? "pb-0 flex-shrink-0" : ""}>
-          <DialogTitle className={`font-bold text-dragon-green text-center uppercase ${isMobileLandscape ? "text-xl" : "text-lg md:text-2xl"}`}>
-            ODLIČNO!
-          </DialogTitle>
-        </DialogHeader>
-        <div className={isMobileLandscape 
-          ? "flex-1 flex flex-col justify-center items-center space-y-3 py-2" 
-          : "space-y-2 md:space-y-6 py-2 md:py-4"
-        }>
-          <p className={`text-black text-center uppercase ${isMobileLandscape ? "text-sm" : "text-xs md:text-sm"}`}>{instructionText}</p>
-          
-          {/* Display images - centered grid based on count */}
-          <div className={images.length === 1 
-            ? "flex justify-center" 
-            : `flex justify-center flex-wrap gap-2 md:gap-4`
-          }>
-            {images.map((image, index) => {
-            const isRecording = currentRecordingIndex === index;
-            const isCompleted = completedRecordings.has(index);
-            // For 5 images, use smaller sizes to fit
-            const isFiveImages = images.length === 5;
-            return <div key={index} className={`flex flex-col items-center ${isMobileLandscape ? "space-y-1" : "space-y-1 md:space-y-2"}`}>
-                  <div 
-                    className={`cursor-pointer transition-all ${isCompleted ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
-                    onClick={() => handleImageClick(index, image.word)}
-                  >
-                    <div className="relative">
-                      <img src={image.url} alt={image.word} className={`object-cover rounded-xl border-2 ${isMobileLandscape 
-                        ? isFiveImages ? "w-14 h-14" : "w-16 h-16" 
-                        : isFiveImages ? "w-12 h-12 md:w-16 md:h-16" : "w-14 h-14 md:w-20 md:h-20"
-                      } ${isCompleted ? 'border-gray-400 grayscale' : isRecording ? 'border-red-500' : 'border-dragon-green'}`} />
-                      {isRecording && <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-xl">
-                          <div className="bg-red-500 text-white rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
-                            <Mic className="w-3 h-3 md:w-4 md:h-4" />
-                          </div>
-                        </div>}
-                      {isRecording && <div className="absolute -top-1 -right-1 md:-top-2 md:-right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 md:w-6 md:h-6 flex items-center justify-center">
-                          {recordingTimeLeft}
-                        </div>}
-                    </div>
-                  </div>
-                  <span className={`font-medium text-center ${isMobileLandscape 
-                    ? isFiveImages ? "text-[10px]" : "text-xs" 
-                    : isFiveImages ? "text-[10px] md:text-xs" : "text-xs md:text-sm"
-                  } ${isCompleted ? 'text-gray-400' : 'text-black'}`}>
-                    {image.word.toUpperCase()}
-                  </span>
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handlePlayAudio(image);
-                    }}
-                    size="icon"
-                    className="bg-green-500 hover:bg-green-600 text-white h-8 w-8"
-                  >
-                    <Volume2 className="w-4 h-4" />
-                  </Button>
-                </div>;
-          })}
-          </div>
-        </div>
 
-        {/* Action buttons - always visible at bottom */}
-        <div className={`flex justify-center gap-3 flex-shrink-0 ${isMobileLandscape ? "pb-2" : ""}`}>
-          <Button onClick={handleClose} variant="outline" className={`gap-2 flex-1 max-w-32 ${isMobileLandscape ? "h-10" : ""}`}>
-            ZAPRI
-          </Button>
-          
-          {completedRecordings.size === images.length && !starClaimed ? (
-            <Button 
-              onClick={handleClaimStar} 
-              className={`bg-yellow-500 hover:bg-yellow-600 text-white gap-2 flex-1 max-w-36 ${isMobileLandscape ? "h-10" : ""}`}
-            >
-              <Star className="w-4 h-4" />
-              VZEMI ZVEZDICO
-            </Button>
-          ) : starClaimed && onNewGame ? (
-            <Button 
-              onClick={() => {
-                onClose();
-                onNewGame();
-              }} 
-              className={`bg-blue-500 hover:bg-blue-600 text-white gap-2 flex-1 max-w-36 ${isMobileLandscape ? "h-10" : ""}`}
-            >
-              <RefreshCw className="w-4 h-4" />
-              NOVA IGRA
-            </Button>
-          ) : (
-            <Button onClick={handleClose} className={`bg-dragon-green hover:bg-dragon-green/90 gap-2 flex-1 max-w-32 ${isMobileLandscape ? "h-10" : ""}`}>
-              <X className="w-4 h-4" />
+  return (
+    <>
+      {/* Main ODLIČNO dialog - hide when BRAVO is shown */}
+      <Dialog open={isOpen && !showBravoDialog} onOpenChange={handleClose}>
+        <DialogContent className={isMobileLandscape 
+          ? "w-[60vw] h-screen max-h-screen rounded-none flex flex-col justify-between py-4" 
+          : "sm:max-w-lg"
+        }>
+          <DialogHeader className={isMobileLandscape ? "pb-0 flex-shrink-0" : ""}>
+            <DialogTitle className={`font-bold text-dragon-green text-center uppercase ${isMobileLandscape ? "text-xl" : "text-lg md:text-2xl"}`}>
+              ODLIČNO!
+            </DialogTitle>
+          </DialogHeader>
+          <div className={isMobileLandscape 
+            ? "flex-1 flex flex-col justify-center items-center space-y-3 py-2" 
+            : "space-y-2 md:space-y-6 py-2 md:py-4"
+          }>
+            <p className={`text-black text-center uppercase ${isMobileLandscape ? "text-sm" : "text-xs md:text-sm"}`}>{instructionText}</p>
+            
+            {/* Display images */}
+            <div className={images.length === 1 
+              ? "flex justify-center" 
+              : `flex justify-center flex-wrap gap-2 md:gap-4`
+            }>
+              {images.map((image, index) => {
+                const isRecording = currentRecordingIndex === index;
+                const isCompleted = completedRecordings.has(index);
+                const isFiveImages = images.length === 5;
+                return (
+                  <div key={index} className={`flex flex-col items-center ${isMobileLandscape ? "space-y-1" : "space-y-1 md:space-y-2"}`}>
+                    <div 
+                      className={`cursor-pointer transition-all ${isCompleted ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
+                      onClick={() => handleImageClick(index, image.word)}
+                    >
+                      <div className="relative">
+                        <img 
+                          src={image.url} 
+                          alt={image.word} 
+                          className={`object-cover rounded-xl border-2 ${isMobileLandscape 
+                            ? isFiveImages ? "w-14 h-14" : "w-16 h-16" 
+                            : isFiveImages ? "w-12 h-12 md:w-16 md:h-16" : "w-14 h-14 md:w-20 md:h-20"
+                          } ${isCompleted ? 'border-gray-400 grayscale' : isRecording ? 'border-red-500' : 'border-dragon-green'}`} 
+                        />
+                        {isRecording && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-xl">
+                            <div className="bg-red-500 text-white rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
+                              <Mic className="w-3 h-3 md:w-4 md:h-4" />
+                            </div>
+                          </div>
+                        )}
+                        {isRecording && (
+                          <div className="absolute -top-1 -right-1 md:-top-2 md:-right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 md:w-6 md:h-6 flex items-center justify-center">
+                            {recordingTimeLeft}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <span className={`font-medium text-center ${isMobileLandscape 
+                      ? isFiveImages ? "text-[10px]" : "text-xs" 
+                      : isFiveImages ? "text-[10px] md:text-xs" : "text-xs md:text-sm"
+                    } ${isCompleted ? 'text-gray-400' : 'text-black'}`}>
+                      {image.word.toUpperCase()}
+                    </span>
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePlayAudio(image);
+                      }}
+                      size="icon"
+                      className="bg-green-500 hover:bg-green-600 text-white h-8 w-8"
+                    >
+                      <Volume2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Action buttons - only ZAPRI, no VZEMI ZVEZDICO */}
+          <div className={`flex justify-center flex-shrink-0 ${isMobileLandscape ? "pb-2" : ""}`}>
+            <Button onClick={handleClose} variant="outline" className={`gap-2 max-w-32 ${isMobileLandscape ? "h-10" : ""}`}>
               ZAPRI
             </Button>
-          )}
-        </div>
-      </DialogContent>
-      
-      <ConfirmDialog
-        open={showConfirmDialog}
-        onOpenChange={setShowConfirmDialog}
-        title={confirmDialogConfig?.title?.toUpperCase() || ""}
-        description={confirmDialogConfig?.description?.toUpperCase() || ""}
-        confirmText="V REDU"
-        cancelText="PREKLIČI"
-        onConfirm={() => confirmDialogConfig?.onConfirm()}
-        onCancel={() => setShowConfirmDialog(false)}
-      />
-    </Dialog>;
+          </div>
+        </DialogContent>
+        
+        <ConfirmDialog
+          open={showConfirmDialog}
+          onOpenChange={setShowConfirmDialog}
+          title={confirmDialogConfig?.title?.toUpperCase() || ""}
+          description={confirmDialogConfig?.description?.toUpperCase() || ""}
+          confirmText="V REDU"
+          cancelText="PREKLIČI"
+          onConfirm={() => confirmDialogConfig?.onConfirm()}
+          onCancel={() => setShowConfirmDialog(false)}
+        />
+      </Dialog>
+
+      {/* BRAVO Dialog with Zmajček */}
+      <Dialog open={showBravoDialog} onOpenChange={handleBravoClose}>
+        <DialogContent className="sm:max-w-md">
+          <div className="flex flex-col items-center justify-center py-6 space-y-6">
+            <h1 className="text-5xl md:text-6xl font-bold text-dragon-green drop-shadow-lg">
+              BRAVO!
+            </h1>
+            
+            <img 
+              src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_11.webp" 
+              alt="Zmajček" 
+              className="w-32 h-32 md:w-40 md:h-40 object-contain"
+            />
+            
+            <Button
+              onClick={handleBravoClose}
+              className="bg-yellow-500 hover:bg-yellow-600 text-white text-lg px-8 py-3 h-auto"
+            >
+              ⭐ VZEMI ZVEZDICO
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 };

@@ -166,16 +166,19 @@ export const SequenceGameČ = ({ onGameComplete, isLandscape = false }: Sequence
         </div>
       </div>
 
-      <div className={`text-center ${isLandscape ? 'py-1' : 'py-1 md:py-0'}`}>
-        <h3 className={`font-bold text-white drop-shadow-lg uppercase ${isLandscape ? 'text-sm mb-0' : 'text-base md:text-2xl mb-0.5 md:mb-2'}`}>
-          {isComplete ? "✨ ČESTITAM! ✨" : "PREMIKAJ ME"}
-        </h3>
-        {!isLandscape && (
-          <p className="text-xs md:text-base text-white/90 drop-shadow uppercase">
-            {isComplete ? "PRAVILNO SI RAZPOREDIL/-A SLIKE!" : "POVLECI IN SPUSTI SLIKE, DA JIH RAZVRSTIŠ"}
-          </p>
-        )}
-      </div>
+      {/* Middle text */}
+      {!isComplete && (
+        <div className={`text-center ${isLandscape ? 'py-1' : 'py-1 md:py-0'}`}>
+          <h3 className={`font-bold text-white drop-shadow-lg uppercase ${isLandscape ? 'text-sm mb-0' : 'text-base md:text-2xl mb-0.5 md:mb-2'}`}>
+            PREMIKAJ ME
+          </h3>
+          {!isLandscape && (
+            <p className="text-xs md:text-base text-white/90 drop-shadow uppercase">
+              POVLECI IN SPUSTI SLIKE, DA JIH RAZVRSTIŠ
+            </p>
+          )}
+        </div>
+      )}
 
       <div className="relative">
         <div 
@@ -208,16 +211,6 @@ export const SequenceGameČ = ({ onGameComplete, isLandscape = false }: Sequence
           </div>
         )}
       </div>
-
-      {isComplete && !isLandscape && (
-        <div className="text-center py-2 md:py-4">
-          <div className="inline-flex items-center gap-1.5 md:gap-2 bg-white/20 backdrop-blur-sm text-white px-4 md:px-6 py-2 md:py-3 rounded-full border-2 border-white/30">
-            <span className="text-lg md:text-2xl">🎉</span>
-            <span className="text-sm md:text-base font-semibold drop-shadow uppercase">IGRA JE KONČANA!</span>
-            <span className="text-lg md:text-2xl">🎉</span>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
