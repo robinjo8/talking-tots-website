@@ -276,24 +276,24 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
           <></>
         </MemoryExitConfirmationDialog>
 
-        {/* Game completed overlay */}
+        {/* Game completed overlay - Bingo style */}
         {gameCompleted && !showNewGameButton && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-2xl p-8 text-center max-w-sm mx-4">
-              <h2 className="text-3xl font-bold text-dragon-green mb-4">
-                🎉 Čestitke! 🎉
-              </h2>
-              <p className="text-lg text-muted-foreground mb-6">
-                Uspešno si zaključil igro spomina za črko {displayLetter}!
-              </p>
-              <div className="space-y-3">
-                <button
-                  onClick={() => setShowNewGameButton(true)}
-                  className="w-full px-6 py-3 bg-dragon-green text-white rounded-xl font-semibold hover:bg-dragon-green/90 transition-colors"
-                >
-                  ⭐ Poberi zvezdico
-                </button>
-              </div>
+            <div className="bg-white rounded-2xl p-8 text-center max-w-md mx-4">
+              <h1 className="text-5xl font-bold text-dragon-green mb-6">
+                BRAVO!
+              </h1>
+              <img
+                src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_11.webp"
+                alt="Zmajček"
+                className="w-48 h-48 object-contain mx-auto mb-6"
+              />
+              <button
+                onClick={() => setShowNewGameButton(true)}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-8 py-3 rounded-lg text-lg transition-colors"
+              >
+                ⭐ VZEMI ZVEZDICO
+              </button>
             </div>
           </div>
         )}
@@ -413,24 +413,24 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
           <></>
         </MemoryExitConfirmationDialog>
 
-        {/* Game completed overlay */}
+        {/* Game completed overlay - Bingo style */}
         {gameCompleted && !showNewGameButton && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-2xl p-8 text-center max-w-sm mx-4">
-              <h2 className="text-3xl font-bold text-dragon-green mb-4">
-                🎉 Čestitke! 🎉
-              </h2>
-              <p className="text-lg text-muted-foreground mb-6">
-                Uspešno si zaključil igro spomina za črko {displayLetter}!
-              </p>
-              <div className="space-y-3">
-                <button
-                  onClick={() => setShowNewGameButton(true)}
-                  className="w-full px-6 py-3 bg-dragon-green text-white rounded-xl font-semibold hover:bg-dragon-green/90 transition-colors"
-                >
-                  ⭐ Poberi zvezdico
-                </button>
-              </div>
+            <div className="bg-white rounded-2xl p-8 text-center max-w-md mx-4">
+              <h1 className="text-5xl font-bold text-dragon-green mb-6">
+                BRAVO!
+              </h1>
+              <img
+                src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_11.webp"
+                alt="Zmajček"
+                className="w-48 h-48 object-contain mx-auto mb-6"
+              />
+              <button
+                onClick={() => setShowNewGameButton(true)}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-8 py-3 rounded-lg text-lg transition-colors"
+              >
+                ⭐ VZEMI ZVEZDICO
+              </button>
             </div>
           </div>
         )}
