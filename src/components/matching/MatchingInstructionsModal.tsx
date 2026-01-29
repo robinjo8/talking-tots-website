@@ -9,36 +9,48 @@ interface MatchingInstructionsModalProps {
 
 const instructionContent = [
   {
+    title: "",
+    text: "Igra Ujemanja je prilagojena različnim starostnim skupinam (3–4 let, 5–6 let, 7–8 let in 9–10 let). Z naraščajočo starostjo se povečuje število stolpcev in zahtevnost povezovanja."
+  },
+  {
     title: "Osnovni koncept",
-    text: "Igra Ujemanja je igra povezovanja enakih slik. Cilj igre je, da igralec v dveh stolpcih poišče in poveže vse pare enakih slik. Vsaka slika prikazuje besedo, ki se začne z izbrano črko."
+    text: "Igra Ujemanja je igra povezovanja enakih elementov med stolpci. Cilj igre je, da igralec v vseh stolpcih poišče in izbere elemente, ki predstavljajo isto besedo. Vsaka beseda se začne z izbrano črko (na primer C)."
   },
   {
     title: "Začetek igre",
-    text: "Na zaslonu se prikažeta dva stolpca s slikami. V vsakem stolpcu so enake slike, vendar v različnem vrstnem redu. Vsak stolpec vsebuje toliko slik, kolikor je parov za povezovanje."
+    text: "Na zaslonu se prikažejo stolpci z elementi. Vsak stolpec vsebuje enake besede v drugačnem vrstnem redu ali obliki (slike, besedilo, sence, zvočni posnetki). Igralec mora v vsakem stolpcu najti element, ki pripada isti besedi."
   },
   {
-    title: "Izbiranje slik",
-    text: "Igralec klikne na sliko v enem stolpcu, da jo izbere. Izbrana slika je označena z modro obrobo. Nato igralec klikne na enako sliko v drugem stolpcu. Če sta sliki enaki, se par poveže in obe sliki se obarvata zeleno."
+    title: "Izbiranje elementov",
+    text: "Igralec klikne na element v enem stolpcu, da ga izbere. Izbran element je označen z modro obrobo. Nato igralec klikne na ustrezne elemente v preostalih stolpcih. Ko so izbrani vsi elementi iste besede, se povežejo in obarvajo zeleno."
   },
   {
     title: "Pravila povezovanja",
-    text: "Povezati je mogoče le slike iz različnih stolpcev. Če igralec klikne na dve različni sliki, se izbira ponastavi. Če igralec klikne na isto sliko dvakrat, se izbira prekliče."
+    text: "Povezati je mogoče le elemente iz različnih stolpcev. Če igralec izbere napačne elemente, se izbira ponastavi. Igralec mora pravilno povezati vse elemente iste besede, preden lahko nadaljuje z naslednjo."
   },
   {
     title: "Zaključek igre",
-    text: "Ko igralec pravilno poveže vse pare, se odpre pogovorno okno z napisom ODLIČNO! V oknu so prikazane vse slike iz igre. Pod vsako sliko je zapisana beseda in gumb za predvajanje zvočnega posnetka."
+    text: "Ko igralec pravilno poveže vse pare oziroma skupine, se odpre pogovorno okno z napisom ODLIČNO! Igralec mora klikniti na vsako sliko in ponoviti besedo s 3-sekundnim snemanjem. Ko so vse besede ponovljene, se prikaže rumen gumb VZEMI ZVEZDICO, s katerim se shrani napredek in zaključi igra."
   },
   {
-    title: "Ponovitev besed",
-    text: "Igralec klikne na vsako sliko, kar sproži 3-sekundno snemanje z vizualnim odštevalnikom 3–2–1. Po končanem snemanju se slika obarva sivo. Igralec lahko za vsako besedo predvaja zvočni posnetek s klikom na gumb z zvočnikom."
+    title: "Razlike med starostnimi skupinami",
+    text: ""
   },
   {
-    title: "Vzemi zvezdico",
-    text: "Ko igralec ponovi vse besede, se samodejno odpre zaslon z napisom BRAVO! in sliko zmajčka. S klikom na rumen gumb VZEMI ZVEZDICO se napredek shrani."
+    title: "Starost 3–4 leta",
+    text: "Prikazana sta 2 stolpca s slikami. V vsakem stolpcu so enake slike v različnem vrstnem redu. Igralec poveže par s klikom na enako sliko v obeh stolpcih. Ob pravilnem paru se predvaja zvočni posnetek besede."
   },
   {
-    title: "Nova igra / izhod",
-    text: "Po osvojeni zvezdici se pojavi moder gumb za novo igro (levo spodaj). S klikom na gumb Hiška se odpre meni za vrnitev nazaj."
+    title: "Starost 5–6 let",
+    text: "Prikazani so 3 stolpci: zvočni posnetek (ikona zvočnika), zapisana beseda in slika. Igralec mora izbrati vse tri elemente iste besede. Najprej klikne na zvočnik, da sliši besedo, nato izbere ustrezno zapisano besedo in sliko."
+  },
+  {
+    title: "Starost 7–8 let",
+    text: "Prikazani so 3 stolpci: zvočni posnetek, zapisana beseda in slika. Potek igre je enak kot pri starostni skupini 5–6 let."
+  },
+  {
+    title: "Starost 9–10 let",
+    text: "Prikazani so 4 stolpci: zvočni posnetek, zapisana beseda, senčna slika in originalna slika. Igralec mora izbrati vse štiri elemente iste besede. To zahteva višjo stopnjo koncentracije in prepoznavanja."
   }
 ];
 
@@ -55,7 +67,7 @@ export const MatchingInstructionsModal: React.FC<MatchingInstructionsModalProps>
         <div className="py-4">
           {instructionContent.map((section, index) => (
             <div key={index}>
-              <p className="font-bold text-sm">{section.title}</p>
+              {section.title && <p className="font-bold text-sm">{section.title}</p>}
               {section.text && (
                 <p className="text-sm text-muted-foreground">{section.text}</p>
               )}
