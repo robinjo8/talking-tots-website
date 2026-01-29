@@ -145,9 +145,6 @@ const ArtikuacijskiTest = () => {
           <h2 className="text-xl md:text-2xl font-bold text-white drop-shadow-md">
             {currentLetter} - {positionLabel}
           </h2>
-          <p className="text-sm text-white/80 mt-1">
-            {currentWordIndex + 1} / {totalWords}
-          </p>
         </div>
 
         {/* Word and Image Card */}
