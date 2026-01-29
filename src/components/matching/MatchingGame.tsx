@@ -3,7 +3,7 @@ import { MatchingGameImage } from '@/data/matchingGameData';
 import { useMatchingGame } from '@/hooks/useMatchingGame';
 import { ImageTile } from './ImageTile';
 import { ConnectionLine } from './ConnectionLine';
-import { Trophy } from 'lucide-react';
+
 import { cn } from '@/lib/utils';
 
 interface MatchingGameProps {
@@ -88,15 +88,6 @@ export function MatchingGame({
           ))}
         </div>
 
-        {/* Game completion indicator */}
-        {gameState.isComplete && (
-          <div className="mt-6 text-center">
-            <div className="flex items-center justify-center gap-2 text-dragon-green font-bold text-lg">
-              <Trophy className="h-6 w-6" />
-              <span>Uspešno dokončano!</span>
-            </div>
-          </div>
-        )}
 
         {/* Progress indicator */}
         {!gameState.isComplete && (

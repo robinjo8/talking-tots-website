@@ -1,5 +1,5 @@
 import React from "react";
-import { Play, Trophy } from "lucide-react";
+import { Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ThreeColumnMatchingItem } from "@/data/threeColumnMatchingData";
@@ -122,15 +122,6 @@ export function ThreeColumnGame({ items, onGameComplete, isLandscape = false }: 
           </div>
         </div>
 
-        {/* Game completion indicator */}
-        {gameState.isComplete && (
-          <div className="mt-6 text-center">
-            <div className="flex items-center justify-center gap-2 text-dragon-green font-bold text-lg">
-              <Trophy className="h-6 w-6" />
-              <span>Uspešno dokončano!</span>
-            </div>
-          </div>
-        )}
 
         {/* Progress indicator */}
         {!gameState.isComplete && (
