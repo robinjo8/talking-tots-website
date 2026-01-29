@@ -5,7 +5,7 @@ import { useTrophyContext } from "@/contexts/TrophyContext";
 import { Home, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MatchingInstructionsModal } from "@/components/matching/MatchingInstructionsModal";
+import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { SequenceGameBase, SequenceGameConfig } from "@/components/exercises/SequenceGameBase";
@@ -324,9 +324,10 @@ export function GenericZaporedjaGame({ config }: GenericZaporedjaGameProps) {
           )}
         </div>
 
-        <MatchingInstructionsModal
+        <InstructionsModal
           isOpen={showInstructions}
           onClose={() => setShowInstructions(false)}
+          type="sequence"
         />
         
         <MatchingCompletionDialog
@@ -425,9 +426,10 @@ export function GenericZaporedjaGame({ config }: GenericZaporedjaGameProps) {
         )}
       </div>
       
-      <MatchingInstructionsModal
+      <InstructionsModal
         isOpen={showInstructions}
         onClose={() => setShowInstructions(false)}
+        type="sequence"
       />
       
       <MatchingCompletionDialog
