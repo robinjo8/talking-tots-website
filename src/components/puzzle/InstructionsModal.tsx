@@ -5,7 +5,7 @@ import { CheckCircle, XCircle, AlertCircle } from "lucide-react";
 interface InstructionsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  type?: "jigsaw" | "sliding" | "articulation" | "maze" | "bingo" | "sequence" | "dice" | "wheel";
+  type?: "jigsaw" | "sliding" | "articulation" | "maze" | "bingo" | "sequence" | "dice" | "wheel" | "spomin";
 }
 
 type InstructionItem = {
@@ -104,6 +104,27 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
         { text: "Cilj igre", bold: true },
         { text: "Vaditi izgovorjavo posamezne črke (na primer C, Č, K) na začetku besed s pomočjo vrtenja kolesa in zbiranja zvezdic." }
       ]
+    : type === "spomin"
+    ? [
+        { text: "Osnovni koncept", bold: true },
+        { text: "Igra Spomin je klasična igra iskanja parov. Igralec mora najti vse pare enakih slik med 20 obrnjenimi karticami (10 parov). Vsaka kartica vsebuje sliko in zvočni posnetek besede, ki se začne z izbrano črko." },
+        { text: "Začetek igre", bold: true },
+        { text: "Na zaslonu se prikaže mreža 20 kartic (5 × 4 ali 4 × 5), ki so obrnjene z zeleno stranjo navzgor in prikazujejo znak vprašaja. Kartice so ob vsakem zagonu igre naključno premešane. Na vrhu zaslona je prikazan indikator napredka z 10 belimi pikicami, ki predstavljajo 10 parov." },
+        { text: "Obračanje kartic", bold: true },
+        { text: "Igralec pritisne na poljubno kartico, da jo obrne. Ko se kartica obrne, se prikaže slika in predvaja zvočni posnetek besede. Igralec lahko hkrati obrne največ dve kartici." },
+        { text: "Preverjanje ujemanja", bold: true },
+        { text: "Če sta obe kartici enaki (isti par), ostaneta obrnjeni in se odpre pogovorno okno. Če se kartici ne ujemata, se po 1,5 sekunde samodejno obrneta nazaj." },
+        { text: "Pogovorno okno ob najdenem paru", bold: true },
+        { text: "Ko igralec najde par, se prikaže okno z napisom PAR X OD 10. V oknu sta prikazana slika in beseda. Pod sliko je gumb za predvajanje zvočnega posnetka. Prikazano je navodilo: KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO." },
+        { text: "Snemanje besede", bold: true },
+        { text: "Igralec klikne na sliko, kar sproži 3-sekundno snemanje z vizualnim odštevalnikom 3–2–1. Po končanem snemanju se slika obarva sivo, aktivirata pa se gumba PONOVI in NADALJUJ. Gumb PONOVI ponastavi snemanje za isto besedo. Gumb NADALJUJ zapre okno in omogoči iskanje naslednjega para." },
+        { text: "Indikator napredka", bold: true },
+        { text: "Indikator napredka na vrhu zaslona se posodobi tako, da se ena pikica obarva oranžno za vsak najden par." },
+        { text: "Zadnji par", bold: true },
+        { text: "Ko igralec najde zadnji (deseti) par, se namesto gumba NADALJUJ prikaže rumen gumb VZEMI ZVEZDICO." },
+        { text: "Zaključek igre", bold: true },
+        { text: "Ko igralec pobere vse pare, se prikaže zaključno okno z napisom Čestitke! Gumb Poberi zvezdico shrani napredek in prikaže možnost za novo igro." }
+      ]
     : [
         { text: "Sestavljaj sliko, dokler ni cela." },
         { text: "Ko bo slika končana, se bo predvajal posnetek logopeda." },
@@ -125,6 +146,8 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
     ? "Navodila za Met kocke"
     : type === "wheel"
     ? "Navodila za igro"
+    : type === "spomin"
+    ? "Navodila za igro Spomin"
     : "Navodila za igro Sestavljanka";
 
   const getIcon = (icon?: "green" | "yellow" | "red") => {
