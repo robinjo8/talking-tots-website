@@ -169,14 +169,9 @@ export const SequenceGameŠ = ({ onGameComplete, isLandscape = false }: Sequence
       {/* Middle text */}
       {!isComplete && (
         <div className={`text-center ${isLandscape ? 'py-1' : 'py-1 md:py-0'}`}>
-          <h3 className={`font-bold text-white drop-shadow-lg uppercase ${isLandscape ? 'text-sm mb-0' : 'text-base md:text-2xl mb-0.5 md:mb-2'}`}>
-            PREMIKAJ ME
-          </h3>
-          {!isLandscape && (
-            <p className="text-xs md:text-base text-white/90 drop-shadow uppercase">
-              POVLECI IN SPUSTI SLIKE, DA JIH RAZVRSTIŠ
-            </p>
-          )}
+          <p className={`font-bold text-white drop-shadow-lg uppercase ${isLandscape ? 'text-sm' : 'text-xs md:text-base'}`}>
+            POVLECI IN SPUSTI SLIKE, DA JIH RAZVRSTIŠ
+          </p>
         </div>
       )}
 
