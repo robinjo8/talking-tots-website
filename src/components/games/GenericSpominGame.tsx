@@ -6,6 +6,7 @@ import { MemoryPairDialog } from "@/components/games/MemoryPairDialog";
 import { useGenericMemoryGame } from "@/hooks/useGenericMemoryGame";
 import { SpominConfig } from "@/data/spominConfig";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
+import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent } from "@/components/ui/dropdown-menu";
 import { Loader, Home, RefreshCw } from "lucide-react";
 
@@ -18,6 +19,7 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showNewGameButton, setShowNewGameButton] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
   
   // Mobile detection and orientation state
   const [isTouchDevice, setIsTouchDevice] = useState(false);
@@ -230,7 +232,10 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
                 <span>Nova igra</span>
               </button>
               <button
-                onClick={() => setMenuOpen(false)}
+                onClick={() => {
+                  setMenuOpen(false);
+                  setShowInstructions(true);
+                }}
                 className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
               >
                 <span className="text-2xl">📖</span>
@@ -292,6 +297,13 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
             </div>
           </div>
         )}
+
+        {/* Instructions modal */}
+        <InstructionsModal
+          isOpen={showInstructions}
+          onClose={() => setShowInstructions(false)}
+          type="spomin"
+        />
       </div>
     );
   }
@@ -358,7 +370,10 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
               <span>Nova igra</span>
             </button>
             <button
-              onClick={() => setMenuOpen(false)}
+              onClick={() => {
+                setMenuOpen(false);
+                setShowInstructions(true);
+              }}
               className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
             >
               <span className="text-xl">📖</span>
@@ -419,6 +434,13 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
             </div>
           </div>
         )}
+
+        {/* Instructions modal */}
+        <InstructionsModal
+          isOpen={showInstructions}
+          onClose={() => setShowInstructions(false)}
+          type="spomin"
+        />
       </div>
     </div>
   );
