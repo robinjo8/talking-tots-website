@@ -322,11 +322,7 @@ export const SequenceGame56Base = ({ onGameComplete, isLandscape = false, tableN
               </div>
             )}
           </div>
-        ) : isComplete ? (
-          <h3 className={`font-bold text-white drop-shadow-lg uppercase ${isLandscape ? 'text-sm mb-0' : 'text-base md:text-2xl mb-0.5 md:mb-2'}`}>
-            ✨ ČESTITAM! ✨
-          </h3>
-        ) : gamePhase === "arrange" ? (
+        ) : isComplete ? null : gamePhase === "arrange" ? (
           <>
             <h3 className={`font-bold text-white drop-shadow-lg uppercase ${isLandscape ? 'text-sm mb-0' : 'text-base md:text-2xl mb-0.5 md:mb-2'}`}>
               UREDI SLIKE V PRAVILNI VRSTNI RED
