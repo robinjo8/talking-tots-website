@@ -9,7 +9,14 @@ const PHONETIC_ORDER = ['P', 'B', 'M', 'T', 'D', 'K', 'G', 'N', 'H', 'V', 'J', '
 // Position labels in Slovenian
 const positionLabels = ["začetek", "sredina", "konec"];
 
-export const useArticulationTestNew = (childId?: string, userId?: string, fixedSessionNumber?: number, startIndex: number = 0) => {
+export const useArticulationTestNew = (
+  childId?: string, 
+  userId?: string, 
+  fixedSessionNumber?: number, 
+  startIndex: number = 0,
+  difficulty: string = "srednja",
+  onSaveProgress?: (childId: string, sessionNumber: number, currentWordIndex: number) => void
+) => {
   // Start from startIndex (default 0, or 57 for testing with Ž only)
   const [currentWordIndex, setCurrentWordIndex] = useState(startIndex);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -184,7 +191,8 @@ export const useArticulationTestNew = (childId?: string, userId?: string, fixedS
       childId,
       sessionNumber ?? 1,
       currentWordIndex,
-      currentLetter
+      currentLetter,
+      difficulty
     );
 
     if (result) {
@@ -201,10 +209,16 @@ export const useArticulationTestNew = (childId?: string, userId?: string, fixedS
   // Handle next word
   const handleNext = () => {
     if (currentWordIndex < totalWords - 1) {
-      setCurrentWordIndex((prev) => prev + 1);
+      const nextIndex = currentWordIndex + 1;
+      setCurrentWordIndex(nextIndex);
       setHasRecorded(false);
       setTranscriptionResult(null);
       resetTranscription();
+      
+      // Save progress after moving to next word
+      if (childId && sessionNumber && onSaveProgress) {
+        onSaveProgress(childId, sessionNumber, nextIndex);
+      }
     } else {
       // Test is complete
       setIsTestComplete(true);

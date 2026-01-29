@@ -69,13 +69,27 @@ function sanitizeForStorage(text: string): string {
     .replace(/[^a-zA-Z0-9\-_]/g, '');
 }
 
+// Get dynamic threshold based on word length and difficulty
+function getThresholdForWord(wordLength: number, difficulty: string): number {
+  const thresholds: Record<string, Record<number, number>> = {
+    nizka:   { 3: 0.33, 4: 0.25, 5: 0.35, 6: 0.30 },
+    srednja: { 3: 0.65, 4: 0.50, 5: 0.50, 6: 0.50 },
+    visoka:  { 3: 0.65, 4: 0.70, 5: 0.75, 6: 0.65 },
+  };
+  // Clamp word length to supported range (3-6)
+  const len = Math.min(Math.max(wordLength, 3), 6);
+  return thresholds[difficulty]?.[len] ?? thresholds.srednja[len];
+}
+
 // Check if transcribed word matches target or variants
 function isWordAccepted(
   transcribed: string,
   targetWord: string,
   acceptedVariants: string[],
-  similarityThreshold: number = 0.7
+  difficulty: string = "srednja"
 ): { accepted: boolean; matchType: string; confidence: number } {
+  const normalizedTarget = normalizeText(targetWord);
+  const similarityThreshold = getThresholdForWord(normalizedTarget.length, difficulty);
   const normalizedTranscribed = normalizeText(transcribed);
   const normalizedTarget = normalizeText(targetWord);
   
@@ -153,10 +167,11 @@ serve(async (req) => {
       userId,
       sessionNumber,
       wordIndex,
-      letter
+      letter,
+      difficulty = "srednja"
     } = await req.json();
 
-    console.log(`Transcription request for word: ${targetWord}, letter: ${letter}, index: ${wordIndex}, session: ${sessionNumber}`);
+    console.log(`Transcription request for word: ${targetWord}, letter: ${letter}, index: ${wordIndex}, session: ${sessionNumber}, difficulty: ${difficulty}`);
 
     if (!audio) {
       throw new Error('No audio data provided');
@@ -221,8 +236,8 @@ serve(async (req) => {
       );
     }
 
-    // Check if word is accepted
-    const matchResult = isWordAccepted(transcribedText, targetWord, acceptedVariants);
+    // Check if word is accepted (using dynamic threshold based on difficulty)
+    const matchResult = isWordAccepted(transcribedText, targetWord, acceptedVariants, difficulty);
     console.log(`Match result:`, matchResult);
 
     // Save recording to Supabase Storage ONLY if word was accepted (correct pronunciation)

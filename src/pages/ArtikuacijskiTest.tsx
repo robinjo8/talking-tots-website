@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Home } from "lucide-react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { Home, Settings } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -8,10 +8,14 @@ import ArticulationRecordButton from "@/components/articulation/ArticulationReco
 import ArticulationCompletionDialog from "@/components/articulation/ArticulationCompletionDialog";
 import ArticulationTestInfoDialog from "@/components/articulation/ArticulationTestInfoDialog";
 import ArticulationTestInstructionsDialog from "@/components/articulation/ArticulationTestInstructionsDialog";
+import ArticulationSettingsDialog from "@/components/articulation/ArticulationSettingsDialog";
+import ArticulationResumeDialog from "@/components/articulation/ArticulationResumeDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { useArticulationTestNew } from "@/hooks/useArticulationTestNew";
+import { useArticulationSettings } from "@/hooks/useArticulationSettings";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
+import { articulationData } from "@/data/articulationTestData";
 
 const positiveFeedbackMessages = [
   "BRAVO! LAHKO NADALJUJEŠ.",
@@ -26,24 +30,72 @@ const positiveFeedbackMessages = [
   "SUPER! LAHKO NADALJUJEŠ.",
 ];
 
+// Phonetic order for word lookup
+const PHONETIC_ORDER = ['P', 'B', 'M', 'T', 'D', 'K', 'G', 'N', 'H', 'V', 'J', 'F', 'L', 'S', 'Z', 'C', 'Š', 'Ž', 'Č', 'R'];
+
 const ArtikuacijskiTest = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user, selectedChild } = useAuth();
   const [showInfoDialog, setShowInfoDialog] = useState(true);
   const [showInstructionsDialog, setShowInstructionsDialog] = useState(false);
+  const [showSettingsDialog, setShowSettingsDialog] = useState(false);
+  const [showResumeDialog, setShowResumeDialog] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [backgroundUrl, setBackgroundUrl] = useState<string | null>(null);
+  const [resumeWordIndex, setResumeWordIndex] = useState<number>(0);
+  const [resumeTimestamp, setResumeTimestamp] = useState<number>(0);
 
   const childId = selectedChild?.id;
   const userId = user?.id;
+  
+  // Settings hook
+  const {
+    difficulty,
+    setDifficulty,
+    recordingDuration,
+    saveProgress,
+    loadProgress,
+    clearProgress,
+    getTimeAgo,
+  } = useArticulationSettings();
   
   // Read session number and start index from URL parameters (for testing)
   const sejaParam = searchParams.get('seja');
   const startParam = searchParams.get('start');
   const fixedSessionNumber = sejaParam ? parseInt(sejaParam, 10) : undefined;
   const startIndex = startParam ? parseInt(startParam, 10) : 0;
+  
+  // Sort articulation data by phonetic order (same as hook)
+  const sortedArticulationData = useMemo(() => {
+    return [...articulationData].sort((a, b) => {
+      const indexA = PHONETIC_ORDER.indexOf(a.letter.toUpperCase());
+      const indexB = PHONETIC_ORDER.indexOf(b.letter.toUpperCase());
+      const orderA = indexA === -1 ? 999 : indexA;
+      const orderB = indexB === -1 ? 999 : indexB;
+      return orderA - orderB;
+    });
+  }, []);
+
+  // Get word by index (for resume dialog display)
+  const getWordByIndex = useCallback((index: number): string => {
+    let wordCount = 0;
+    for (const group of sortedArticulationData) {
+      for (const word of group.words) {
+        if (wordCount === index) {
+          return word.text;
+        }
+        wordCount++;
+      }
+    }
+    return "";
+  }, [sortedArticulationData]);
+
+  // Total words for resume dialog
+  const totalWordsCount = useMemo(() => {
+    return sortedArticulationData.reduce((count, group) => count + group.words.length, 0);
+  }, [sortedArticulationData]);
 
   const {
     imageUrl,
@@ -64,7 +116,20 @@ const ArtikuacijskiTest = () => {
     handleNext,
     resetTest,
     initializeSession,
-  } = useArticulationTestNew(childId, userId, fixedSessionNumber, startIndex);
+  } = useArticulationTestNew(childId, userId, fixedSessionNumber, startIndex, difficulty, saveProgress);
+
+  // Check for saved progress on mount
+  useEffect(() => {
+    if (childId) {
+      const savedProgress = loadProgress(childId);
+      if (savedProgress && savedProgress.currentWordIndex > 0) {
+        setResumeWordIndex(savedProgress.currentWordIndex);
+        setResumeTimestamp(savedProgress.timestamp);
+        setShowResumeDialog(true);
+        setShowInfoDialog(false);
+      }
+    }
+  }, [childId, loadProgress]);
 
   // Fetch background image
   useEffect(() => {
@@ -76,7 +141,25 @@ const ArtikuacijskiTest = () => {
     }
   }, []);
 
+  // Handle resume dialog actions
+  const handleResume = () => {
+    setShowResumeDialog(false);
+    // The hook will start from resumeWordIndex via startIndex prop
+    // We need to reload the page with the correct start index
+    const params = new URLSearchParams();
+    if (fixedSessionNumber) params.set('seja', String(fixedSessionNumber));
+    params.set('start', String(resumeWordIndex));
+    navigate(`/artikulacijski-test?${params.toString()}`, { replace: true });
+  };
+
+  const handleStartOver = () => {
+    clearProgress();
+    setShowResumeDialog(false);
+    setShowInfoDialog(true);
+  };
+
   const handleCloseCompletion = () => {
+    clearProgress();
     resetTest();
     navigate("/moja-stran");
   };
@@ -111,6 +194,25 @@ const ArtikuacijskiTest = () => {
       <ArticulationTestInstructionsDialog
         open={showInstructionsDialog}
         onClose={() => setShowInstructionsDialog(false)}
+      />
+
+      {/* Settings Dialog */}
+      <ArticulationSettingsDialog
+        open={showSettingsDialog}
+        onClose={() => setShowSettingsDialog(false)}
+        difficulty={difficulty}
+        onDifficultyChange={setDifficulty}
+      />
+
+      {/* Resume Dialog */}
+      <ArticulationResumeDialog
+        open={showResumeDialog}
+        onResume={handleResume}
+        onStartOver={handleStartOver}
+        wordName={getWordByIndex(resumeWordIndex)}
+        wordIndex={resumeWordIndex}
+        totalWords={totalWordsCount}
+        timeAgo={getTimeAgo(resumeTimestamp)}
       />
 
       {/* Exit Confirmation Dialog */}
@@ -172,7 +274,6 @@ const ArtikuacijskiTest = () => {
             )}
           </div>
 
-          {/* Fixed height container for feedback + button */}
           <div className="min-h-[140px] flex flex-col items-center justify-center">
             <ArticulationRecordButton
               onRecordingComplete={handleRecordingComplete}
@@ -182,6 +283,7 @@ const ArtikuacijskiTest = () => {
               wrongWord={hasRecorded && !isTranscribing && transcriptionResult?.accepted === false && transcriptionResult.transcribedText ? transcriptionResult.transcribedText : undefined}
               isNoise={hasRecorded && !isTranscribing && transcriptionResult?.accepted === false && !transcriptionResult?.transcribedText}
               isTranscribing={isTranscribing}
+              recordingDuration={recordingDuration}
               feedbackMessage={transcriptionResult?.accepted 
                 ? (transcriptionResult.matchType === 'exact' 
                     ? positiveFeedbackMessages[Math.floor(Math.random() * positiveFeedbackMessages.length)] 
@@ -215,9 +317,18 @@ const ArtikuacijskiTest = () => {
                 setMenuOpen(false); 
                 setShowInstructionsDialog(true); 
               }} 
-              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium border-b border-orange-100"
             >
               <span className="text-2xl">📖</span><span>Navodila</span>
+            </button>
+            <button 
+              onClick={() => { 
+                setMenuOpen(false); 
+                setShowSettingsDialog(true); 
+              }} 
+              className="w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center gap-3 text-base font-medium"
+            >
+              <span className="text-2xl">⚙️</span><span>Nastavitve</span>
             </button>
           </DropdownMenuContent>
         </DropdownMenu>
