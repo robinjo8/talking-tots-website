@@ -33,7 +33,7 @@ const WordDisplay = ({
       </div>
       
       {/* Image container with aspect ratio */}
-      <div className="w-full bg-white rounded-xl shadow-md overflow-hidden mb-6">
+      <div className="w-full bg-white rounded-xl shadow-md overflow-hidden mb-3">
         <AspectRatio ratio={1/1}>
           {loading ? (
             <div className="w-full h-full animate-pulse bg-gray-200 rounded-xl flex items-center justify-center">
