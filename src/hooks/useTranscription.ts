@@ -21,7 +21,8 @@ export const useTranscription = () => {
     childId?: string,
     sessionNumber?: number,
     wordIndex?: number,
-    letter?: string
+    letter?: string,
+    difficulty?: string
   ): Promise<TranscriptionResult | null> => {
     setIsTranscribing(true);
     setError(null);
@@ -44,6 +45,7 @@ export const useTranscription = () => {
             sessionNumber,
             wordIndex,
             letter,
+            difficulty,
           },
         }
       );
