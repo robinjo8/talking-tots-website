@@ -50,10 +50,10 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
       // Small delay for smooth transition
       setTimeout(() => {
         setShowBravoDialog(true);
-        onStarClaimed?.();
+        // NOTE: onStarClaimed is called when user clicks "VZEMI ZVEZDICO" button, not here
       }, 500);
     }
-  }, [completedRecordings.size, images.length, onStarClaimed]);
+  }, [completedRecordings.size, images.length]);
 
   // Cleanup on dialog close
   useEffect(() => {
@@ -138,6 +138,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
 
   const handleBravoClose = () => {
     setShowBravoDialog(false);
+    onStarClaimed?.(); // Call when user claims the star
     onClose();
   };
 
