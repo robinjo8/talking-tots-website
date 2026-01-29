@@ -126,10 +126,18 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
         { text: "Ko igralec pobere vse pare, se prikaže zaključno okno z napisom Čestitke! Gumb Poberi zvezdico shrani napredek in prikaže možnost za novo igro." }
       ]
     : [
-        { text: "Sestavljaj sliko, dokler ni cela." },
-        { text: "Ko bo slika končana, se bo predvajal posnetek logopeda." },
-        { text: "Dobro poslušaj, kako logoped izgovori besedo." },
-        { text: "Nato besedo jasno in glasno ponovi." }
+        { text: "Osnovni koncept", bold: true },
+        { text: "Igra Sestavljanka je klasična igra sestavljanja slike iz kosov. Igralec mora pravilno sestaviti celotno sliko z vlečenjem posameznih kosov na prava mesta. Vsaka slika prikazuje besedo, ki se začne z izbrano črko." },
+        { text: "Začetek igre", bold: true },
+        { text: "Na zaslonu se prikaže okvir za sestavljanko. Na mobilnih napravah je okvir prikazan spodaj, na namiznih napravah pa na sredini zaslona. Kosi sestavljanke so raztreseni po zaslonu izven okvirja. V okvirju je vidna bleda senca slike, ki služi kot pomoč pri sestavljanju." },
+        { text: "Premikanje kosov", bold: true },
+        { text: "Igralec pritisne na poljuben kos in ga povleče na želeno mesto. Kos, ki ga igralec trenutno premika, je označen z modro obrobo. Ko igralec spusti kos dovolj blizu pravilnega položaja, se kos samodejno zaskoči na svoje pravo mesto. Pravilno postavljeni kosi dobijo zeleno obrobo in jih ni več mogoče premikati." },
+        { text: "Zaključek sestavljanke", bold: true },
+        { text: "Ko igralec pravilno postavi vse kose, se odpre pogovorno okno z napisom ODLIČNO! V oknu so prikazane štiri naključne slike, med katerimi je tudi pravkar sestavljena slika. Pod vsako sliko je zapisana beseda in gumb za predvajanje zvočnega posnetka." },
+        { text: "Ponovitev besed", bold: true },
+        { text: "Igralec klikne na vsako sliko, kar sproži 3-sekundno snemanje z vizualnim odštevalnikom 3–2–1. Po končanem snemanju se slika obarva sivo. Igralec lahko za vsako besedo predvaja zvočni posnetek s klikom na gumb z zvočnikom." },
+        { text: "Vzemi zvezdico", bold: true },
+        { text: "Ko igralec ponovi vse štiri besede, se prikaže rumen gumb VZEMI ZVEZDICO. S klikom na gumb se napredek shrani in prikaže se zaključno okno z napisom BRAVO!" }
       ];
   
   const title = type === "sequence"
