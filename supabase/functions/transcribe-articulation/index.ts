@@ -88,10 +88,9 @@ function isWordAccepted(
   acceptedVariants: string[],
   difficulty: string = "srednja"
 ): { accepted: boolean; matchType: string; confidence: number } {
-  const normalizedTarget = normalizeText(targetWord);
-  const similarityThreshold = getThresholdForWord(normalizedTarget.length, difficulty);
   const normalizedTranscribed = normalizeText(transcribed);
   const normalizedTarget = normalizeText(targetWord);
+  const similarityThreshold = getThresholdForWord(normalizedTarget.length, difficulty);
   
   // Check exact match with target
   if (normalizedTranscribed === normalizedTarget) {
