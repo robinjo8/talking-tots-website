@@ -1,171 +1,253 @@
 
 
-## Implementacija nastavitev za preverjanje izgovorjave
+## Dinamično prilagajanje strani `/artikulacijski-test` brez scrollanja
 
-### Povzetek sprememb
+### Povzetek rešitve
 
-Dodajamo sistem nastavitev s tremi stopnjami zahtevnosti (nizka, srednja, visoka), ki prilagaja:
-1. Čas snemanja (5s, 4s, 3s)
-2. Levenshtein prag glede na dolžino besede
-3. Avtomatsko shranjevanje napredka za nadaljevanje testa
+Uporabimo enako logiko kot `MemoryGrid.tsx` - dinamično izračunavanje velikosti elementov glede na razpoložljivo višino zaslona. Vsi elementi se bodo proporcionalno prilagajali, tako da bo celotna vsebina vedno vidna na enem zaslonu brez scrollanja.
 
 ---
 
-### Stopnje zahtevnosti
+### Ključna logika iz MemoryGrid
 
-| Zahtevnost | Čas snemanja | 3 črke | 4 črke | 5 črk | 6 črk |
-|------------|--------------|--------|--------|-------|-------|
-| **Nizka**  | 5 sekund     | ≥33%   | ≥25%   | ≥35%  | ≥30%  |
-| **Srednja** (privzeto) | 4 sekunde | ≥65% | ≥50% | ≥50% | ≥50% |
-| **Visoka** | 3 sekunde    | ≥65%   | ≥70%   | ≥75%  | ≥65%  |
+```typescript
+// 1. Merjenje velikosti okna
+const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+
+useEffect(() => {
+  const updateSize = () => {
+    setContainerSize({
+      width: window.innerWidth,
+      height: window.innerHeight
+    });
+  };
+  updateSize();
+  window.addEventListener('resize', updateSize);
+  return () => window.removeEventListener('resize', updateSize);
+}, []);
+
+// 2. Dinamični izračun velikosti
+const cardSize = useMemo(() => {
+  const availableHeight = containerSize.height - PADDING;
+  const sizeByHeight = Math.floor(availableHeight / rows);
+  return Math.min(sizeByWidth, sizeByHeight);
+}, [containerSize]);
+
+// 3. Eksplicitne dimenzije
+style={{ width: cardSize, height: cardSize }}
+```
 
 ---
 
-### Datoteke za ustvarjanje
+### Implementacija za Articulacijski test
 
-#### 1. `src/hooks/useArticulationSettings.ts`
-Nov hook za upravljanje nastavitev:
-- Shranjuje izbrano zahtevnost v localStorage
-- Privzeta vrednost: "srednja"
-- Vrača: trajanje snemanja, pragove za Levenshtein
+#### Nova logika v `ArtikuacijskiTest.tsx`
 
 ```text
-useArticulationSettings()
-├── difficulty: "nizka" | "srednja" | "visoka"
-├── setDifficulty(value)
-├── recordingDuration: 5 | 4 | 3
-└── getThresholdForWordLength(length): number
+┌─────────────────────────────────────────────────────────────────┐
+│ IZRAČUN RAZPOLOŽLJIVEGA PROSTORA                                │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Višina zaslona (100vh)                                         │
+│  ├── Naslov: 60px (fiksno)                                      │
+│  ├── Progress Grid: dinamično (8-12% višine)                    │
+│  ├── Črka/Pozicija: 40px (fiksno, samo desktop)                 │
+│  ├── Word Card: PREOSTALA VIŠINA                                │
+│  │   ├── Beseda: 10% kartice                                    │
+│  │   ├── Slika: 50-60% kartice                                  │
+│  │   └── Gumb: 20-25% kartice                                   │
+│  └── Bottom padding: 80px (za floating gumb)                    │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-#### 2. `src/components/articulation/ArticulationSettingsDialog.tsx`
-Dialog za izbiro zahtevnosti:
-- Radio group z 3 opcijami
-- Razlaga za vsako stopnjo
-- Gumb "Shrani"
+#### Struktura sprememb
 
-```text
-┌─────────────────────────────────────────────────┐
-│  ⚙️  Nastavitve preverjanja                     │
-├─────────────────────────────────────────────────┤
-│                                                 │
-│  Izberite zahtevnost preverjanja:               │
-│                                                 │
-│  ○ Nizka                                        │
-│    Za otroke z večjimi govornimi težavami       │
-│    Čas snemanja: 5 sekund                       │
-│                                                 │
-│  ● Srednja (priporočeno)                        │
-│    Za večino otrok                              │
-│    Čas snemanja: 4 sekunde                      │
-│                                                 │
-│  ○ Visoka                                       │
-│    Za otroke brez večjih težav                  │
-│    Čas snemanja: 3 sekunde                      │
-│                                                 │
-│            ┌────────────┐                       │
-│            │   Shrani   │                       │
-│            └────────────┘                       │
-└─────────────────────────────────────────────────┘
+```typescript
+// 1. Dodaj state za merjenje okna
+const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+
+// 2. Dodaj useEffect za merjenje
+useEffect(() => {
+  const updateSize = () => {
+    setWindowSize({
+      width: window.innerWidth,
+      height: window.innerHeight
+    });
+  };
+  
+  updateSize();
+  window.addEventListener('resize', updateSize);
+  window.addEventListener('orientationchange', () => setTimeout(updateSize, 100));
+  
+  return () => {
+    window.removeEventListener('resize', updateSize);
+    window.removeEventListener('orientationchange', ...);
+  };
+}, []);
+
+// 3. Izračunaj dinamične velikosti
+const dimensions = useMemo(() => {
+  if (windowSize.height === 0) return null;
+  
+  const vh = windowSize.height;
+  const isMobile = windowSize.width < 768;
+  
+  // Fiksni elementi
+  const titleHeight = 60;
+  const bottomPadding = 80;
+  const letterInfoHeight = isMobile ? 0 : 50;
+  
+  // Razpoložljiva višina za vsebino
+  const availableHeight = vh - titleHeight - bottomPadding - letterInfoHeight;
+  
+  // Progress grid: 15% razpoložljive višine
+  const progressGridHeight = Math.min(Math.floor(availableHeight * 0.15), 120);
+  
+  // Preostalo za kartico z besedo
+  const cardHeight = availableHeight - progressGridHeight - 20; // 20px gap
+  
+  // Znotraj kartice
+  const wordHeight = Math.floor(cardHeight * 0.12);
+  const imageHeight = Math.floor(cardHeight * 0.50);
+  const buttonHeight = Math.floor(cardHeight * 0.25);
+  const cardPadding = Math.floor(cardHeight * 0.05);
+  
+  return {
+    progressGridHeight,
+    cardHeight,
+    wordHeight,
+    imageHeight,
+    buttonHeight,
+    cardPadding,
+    wordFontSize: Math.max(18, Math.min(32, Math.floor(wordHeight * 0.8))),
+  };
+}, [windowSize]);
 ```
 
-#### 3. `src/components/articulation/ArticulationResumeDialog.tsx`
-Dialog za nadaljevanje testa:
-- Prikaže se ob vstopu če obstaja shranjen napredek
-- Gumba "Nadaljuj" in "Začni znova"
+---
+
+### Vizualni prikaz prilagajanja
 
 ```text
-┌─────────────────────────────────────────────────┐
-│        🔄 Nadaljevanje preverjanja              │
-│                                                 │
-│   Zaznali smo nedokončano preverjanje.          │
-│   Ali želite nadaljevati?                       │
-│                                                 │
-│   📍 Zadnja beseda: OBLAK (2/60)                │
-│   ⏱️  Shranjeno: pred 2 urama                    │
-│                                                 │
-│   ┌──────────────┐  ┌─────────────────┐         │
-│   │  Nadaljuj    │  │  Začni znova    │         │
-│   └──────────────┘  └─────────────────┘         │
-└─────────────────────────────────────────────────┘
+VELIK ZASLON (1080px višina):          MANJŠI ZASLON (700px višina):
+┌─────────────────────────┐            ┌─────────────────────────┐
+│  PREVERJANJE IZGOVOR..  │ 60px       │  PREVERJANJE IZGOVOR..  │ 60px
+├─────────────────────────┤            ├─────────────────────────┤
+│  ┌───────────────────┐  │            │  ┌───────────────────┐  │
+│  │ P B M T D K G N H │  │ 100px      │  │ P B M T D K G N H │  │ 70px
+│  │ V J F L S Z C Š Ž │  │            │  │ V J F L S Z C Š Ž │  │
+│  └───────────────────┘  │            │  └───────────────────┘  │
+│        Č - ZAČETEK      │ 50px       ├─────────────────────────┤
+├─────────────────────────┤            │  ┌───────────────────┐  │
+│  ┌───────────────────┐  │            │  │      PAJEK        │  │ 30px
+│  │       PAJEK       │  │ 50px       │  │                   │  │
+│  │                   │  │            │  │      [slika]      │  │ 180px
+│  │                   │  │            │  │                   │  │
+│  │      [slika]      │  │ 280px      │  │  ┌─────────────┐  │  │
+│  │                   │  │            │  │  │Izgovori bes.│  │  │ 70px
+│  │                   │  │            │  │  └─────────────┘  │  │
+│  │  ┌─────────────┐  │  │            │  └───────────────────┘  │
+│  │  │Izgovori bes.│  │  │ 100px      ├─────────────────────────┤
+│  │  └─────────────┘  │  │            │         [🏠]            │ 80px
+│  └───────────────────┘  │            └─────────────────────────┘
+├─────────────────────────┤
+│         [🏠]            │ 80px
+└─────────────────────────┘
 ```
 
 ---
 
 ### Datoteke za posodobitev
 
-#### 4. `src/pages/ArtikuacijskiTest.tsx`
-- Uvoz novih komponent in hookov
-- Dodaj state za `showSettingsDialog` in `showResumeDialog`
-- Dodaj gumb "Nastavitve" v dropdown menu (za "Navodila")
-- Integracija z `useArticulationSettings` hook
-- Prikaz `ArticulationResumeDialog` ob zagonu
+#### 1. `src/pages/ArtikuacijskiTest.tsx`
 
-```typescript
-// Dodaj v dropdown menu:
-<button onClick={() => setShowSettingsDialog(true)}>
-  <span>⚙️</span><span>Nastavitve</span>
-</button>
+**Dodane spremembe:**
+
+| Vrstica | Sprememba |
+|---------|-----------|
+| ~35 | Dodaj `windowSize` state |
+| ~50 | Dodaj `useEffect` za merjenje okna |
+| ~70 | Dodaj `useMemo` za `dimensions` izračun |
+| 168-169 | Zamenjaj kontejner z `min-h-screen h-screen overflow-hidden` |
+| 228-232 | Dinamična višina naslova |
+| 237 | Dinamična višina progress grida s `style` |
+| 253 | Dinamična višina kartice s `style` |
+| 255 | Dinamična velikost pisave besede |
+| 260 | Dinamična višina slike |
+| 277 | Dinamična višina gumba |
+
+**Ključne spremembe v JSX:**
+
+```tsx
+// Glavni kontejner
+<div className="h-screen w-full flex flex-col overflow-hidden" ...>
+
+// Progress grid z dinamično višino
+<div 
+  className="w-full max-w-lg bg-white/90 ..."
+  style={{ maxHeight: dimensions?.progressGridHeight }}
+>
+
+// Kartica z besedo
+<div 
+  className="w-full max-w-sm bg-white/95 ..."
+  style={{ height: dimensions?.cardHeight }}
+>
+
+// Beseda z dinamično pisavo
+<h3 
+  className="font-bold text-center text-gray-800"
+  style={{ fontSize: dimensions?.wordFontSize }}
+>
+
+// Slika z dinamično višino
+<div 
+  className="relative w-full flex items-center justify-center"
+  style={{ height: dimensions?.imageHeight }}
+>
+  <img className="max-h-full max-w-full object-contain" ... />
+</div>
+
+// Gumb z dinamično višino
+<div 
+  className="flex flex-col items-center justify-center"
+  style={{ height: dimensions?.buttonHeight }}
+>
 ```
 
-#### 5. `src/hooks/useArticulationTestNew.ts`
-- Shranjevanje napredka v localStorage po vsaki besedi
-- Nalaganje shranjenega napredka ob inicializaciji
-- Brisanje napredka ob zaključku testa
-- Nova funkcija `loadSavedProgress()` in `clearProgress()`
+#### 2. `src/components/articulation/ArticulationProgressGrid.tsx`
 
-```typescript
-// localStorage struktura:
-{
-  childId: string,
-  sessionNumber: number,
-  currentWordIndex: number,
-  timestamp: number, // za preverjanje veljavnosti (max 7 dni)
-  difficulty: "nizka" | "srednja" | "visoka"
-}
+**Manjše prilagoditve:**
+- Dodaj prop `compact?: boolean` za manjše zaslone
+- Zmanjšaj velikost črkovnih polj na kompaktnih zaslonih
+
+```tsx
+// Dinamična velikost polj
+className={cn(
+  "relative rounded-md flex items-center justify-center font-bold transition-all",
+  compact ? "w-6 h-6 text-xs" : "w-8 h-8 md:w-10 md:h-10 text-sm md:text-base"
+)}
 ```
 
-#### 6. `src/components/articulation/ArticulationRecordButton.tsx`
-- Sprejme nov prop `recordingDuration` (namesto fiksnih 3 sekund)
-- Posodobi `useAudioRecording` klic z dinamičnim trajanjem
-- Posodobi progress bar izračun
+#### 3. `src/components/articulation/ArticulationRecordButton.tsx`
 
-```typescript
-// Sprememba:
-const { ... } = useAudioRecording(recordingDuration, onRecordingComplete);
-const progressPercent = ((recordingDuration - countdown) / recordingDuration) * 100;
-```
+**Manjše prilagoditve:**
+- Dodaj prop `compact?: boolean`
+- Zmanjšaj višine elementov na kompaktnih zaslonih
 
-#### 7. `src/hooks/useTranscription.ts`
-- Dodaj parameter `difficulty` v klic edge funkcije
-- Pošlje zahtevnost skupaj z avdio podatki
+```tsx
+// Dinamični container
+<div className={cn(
+  "flex flex-col items-center gap-2",
+  compact ? "min-h-[80px]" : "min-h-[100px]"
+)}>
 
-```typescript
-body: {
-  audio: audioBase64,
-  targetWord,
-  acceptedVariants,
-  difficulty, // NOVO
-  ...
-}
-```
-
-#### 8. `supabase/functions/transcribe-articulation/index.ts`
-- Sprejme `difficulty` parameter iz requesta
-- Nova funkcija `getThresholdForWord(wordLength, difficulty)`
-- Uporabi dinamični prag namesto fiksnih 70%
-
-```typescript
-// Nova logika:
-function getThresholdForWord(wordLength: number, difficulty: string): number {
-  const thresholds = {
-    nizka:   { 3: 0.33, 4: 0.25, 5: 0.35, 6: 0.30 },
-    srednja: { 3: 0.65, 4: 0.50, 5: 0.50, 6: 0.50 },
-    visoka:  { 3: 0.65, 4: 0.70, 5: 0.75, 6: 0.65 }
-  };
-  // Za besede krajše od 3 ali daljše od 6: uporabi najbližjo
-  const len = Math.min(Math.max(wordLength, 3), 6);
-  return thresholds[difficulty]?.[len] ?? thresholds.srednja[len];
-}
+// Dinamična velikost gumba
+className={cn(
+  "rounded-full font-medium shadow-lg",
+  compact ? "w-[180px] h-11 text-base" : "w-[220px] h-14 text-lg"
+)}
 ```
 
 ---
@@ -174,68 +256,51 @@ function getThresholdForWord(wordLength: number, difficulty: string): number {
 
 ```text
 ┌─────────────────────────────────────────────────────────────────┐
-│                    VSTOP NA STRAN                               │
+│                    NALAGANJE STRANI                             │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│  1. Preveri localStorage za shranjen napredek                   │
-│     │                                                           │
-│     ├── Če obstaja in < 7 dni → Prikaži ResumeDialog            │
-│     │   ├── [Nadaljuj] → Nastavi currentWordIndex               │
-│     │   └── [Začni znova] → Počisti localStorage                │
-│     │                                                           │
-│     └── Če ne obstaja → Prikaži InfoDialog (kot doslej)         │
+│  1. Izmeri window.innerWidth in window.innerHeight              │
 │                                                                 │
-│  2. Med testom                                                  │
-│     │                                                           │
-│     ├── Snemanje: uporabi trajanje glede na zahtevnost          │
-│     │                                                           │
-│     ├── Transkripcija: pošlje zahtevnost v edge funkcijo        │
-│     │                                                           │
-│     ├── Validacija: dinamični Levenshtein prag                  │
-│     │   └── getThresholdForWord(dolžina, zahtevnost)            │
-│     │                                                           │
-│     └── Po vsaki besedi: shrani napredek v localStorage         │
+│  2. Izračunaj dimensions z useMemo:                             │
+│     ├── progressGridHeight = min(15% višine, 120px)             │
+│     ├── cardHeight = preostala višina - 20px gap                │
+│     ├── imageHeight = 50% kartice                               │
+│     ├── buttonHeight = 25% kartice                              │
+│     └── wordFontSize = max(18px, min(32px, 80% wordHeight))     │
 │                                                                 │
-│  3. Ob zaključku                                                │
-│     └── Počisti localStorage (napredek)                         │
+│  3. Uporabi dimensions v style atributih                        │
+│                                                                 │
+│  4. Ob resize/orientation change: ponovi korake 1-3             │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-### Zaporedje implementacije
+### Dodatna obravnava: Besedilo "PAJEK" na Apple napravah
 
-| Korak | Opis | Odvisnosti |
-|-------|------|------------|
-| 1 | Ustvari `useArticulationSettings.ts` hook | - |
-| 2 | Ustvari `ArticulationSettingsDialog.tsx` | Korak 1 |
-| 3 | Ustvari `ArticulationResumeDialog.tsx` | - |
-| 4 | Posodobi `ArticulationRecordButton.tsx` za dinamično trajanje | Korak 1 |
-| 5 | Posodobi `useTranscription.ts` za pošiljanje zahtevnosti | Korak 1 |
-| 6 | Posodobi edge funkcijo z dinamičnimi pragi | - |
-| 7 | Posodobi `useArticulationTestNew.ts` za shranjevanje napredka | Korak 1 |
-| 8 | Posodobi `ArtikuacijskiTest.tsx` z vsemi novimi komponentami | Koraki 1-7 |
+Poleg dinamičnega prilagajanja dodamo zaščito proti odrezanju besedila:
+
+```tsx
+<h3 
+  className="font-bold text-center text-gray-800 leading-relaxed"
+  style={{ 
+    fontSize: dimensions?.wordFontSize,
+    paddingBottom: '0.25rem', // Prostor za descenders
+    lineHeight: 1.3,
+  }}
+>
+  {getCurrentWord().toUpperCase()}
+</h3>
+```
 
 ---
 
-### Tehnične podrobnosti
+### Testiranje
 
-**localStorage ključi:**
-- `articulation_settings` - shrani izbrano zahtevnost
-- `articulation_progress` - shrani napredek testa
-
-**Validacija napredka:**
-- Max starost: 7 dni (604800000 ms)
-- Preveri ujemanje `childId` s trenutnim otrokom
-- Če ne ustreza, napredek ignorira
-
-**Levenshtein tabela (max dovoljene napake):**
-
-| Dolžina | Nizka | Srednja | Visoka |
-|---------|-------|---------|--------|
-| 3 črke  | d ≤ 2 | d ≤ 1   | d ≤ 1  |
-| 4 črke  | d ≤ 3 | d ≤ 2   | d ≤ 1  |
-| 5 črk   | d ≤ 3 | d ≤ 2   | d ≤ 1  |
-| 6 črk   | d ≤ 4 | d ≤ 3   | d ≤ 2  |
+Po implementaciji preverite na:
+1. **Manjših zaslonih** (1280x720, 1366x768) - vse vidno brez scrollanja
+2. **Apple napravah** (Safari) - beseda ni odrezana
+3. **Ob spremembi velikosti okna** - elementi se dinamično prilagodijo
+4. **Mobilnih napravah** - portrait in landscape delujeta
 
