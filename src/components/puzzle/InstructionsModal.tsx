@@ -140,6 +140,37 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
     }
   };
 
+  // Group items: bold items start a new section, non-bold items follow immediately
+  const renderContent = () => {
+    const elements: React.ReactNode[] = [];
+    let sectionIndex = 0;
+    
+    for (let i = 0; i < content.length; i++) {
+      const item = content[i];
+      const nextItem = content[i + 1];
+      const isLastInSection = !nextItem || nextItem.bold;
+      
+      if (item.bold) {
+        // Add spacing before new section (except first)
+        if (sectionIndex > 0) {
+          elements.push(<div key={`spacer-${i}`} className="h-3" />);
+        }
+        sectionIndex++;
+      }
+      
+      elements.push(
+        <div key={i} className="flex items-start gap-3">
+          {item.icon && getIcon(item.icon)}
+          <p className={`leading-relaxed text-sm ${item.bold ? 'font-bold text-base text-foreground' : 'text-foreground'}`}>
+            {item.text}
+          </p>
+        </div>
+      );
+    }
+    
+    return elements;
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg max-h-[85vh] flex flex-col">
@@ -149,15 +180,8 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
           </DialogTitle>
         </DialogHeader>
         <div className="px-2 pb-4 overflow-y-auto flex-1">
-          <div className="space-y-4">
-            {content.map((item, index) => (
-              <div key={index} className={`flex items-start gap-3 ${item.bold ? 'mt-2' : ''}`}>
-                {item.icon && getIcon(item.icon)}
-                <p className={`leading-relaxed text-sm ${item.bold ? 'font-bold text-base text-foreground' : 'text-foreground'}`}>
-                  {item.text}
-                </p>
-              </div>
-            ))}
+          <div className="space-y-1">
+            {renderContent()}
           </div>
         </div>
       </DialogContent>
