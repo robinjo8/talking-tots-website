@@ -9,40 +9,40 @@ interface MatchingInstructionsModalProps {
 
 const instructionContent = [
   {
-    title: "OSNOVNI KONCEPT",
-    text: "IGRA ZAPOREDJA JE IGRA RAZVRŠČANJA SLIK V PRAVILNI VRSTNI RED. CILJ IGRE JE, DA IGRALEC SLIKE V SPODNJI VRSTICI RAZPOREDI TAKO, DA SE UJEMAJO S PRAVILNIM VRSTNIM REDOM. VSAKA SLIKA PRIKAZUJE BESEDO, KI SE ZAČNE Z IZBRANO ČRKO."
+    title: "Osnovni koncept",
+    text: "Igra Zaporedja je igra razvrščanja slik v pravilni vrstni red. Cilj igre je, da igralec slike v spodnji vrstici razporedi tako, da se ujemajo s pravilnim vrstnim redom. Vsaka slika prikazuje besedo, ki se začne z izbrano črko."
   },
   {
-    title: "ZAČETEK IGRE",
-    text: "PRED ZAČETKOM IGRE SE PRIKAŽE ODŠTEVANJE OD 5 DO 1. PO ODŠTEVANJU SE NA ZASLONU PRIKAŽETA DVE VRSTICI S SLIKAMI. ZGORNJA VRSTICA PREDSTAVLJA PRAVILNI VRSTNI RED IN JE ZAKLENJENA. SPODNJA VRSTICA VSEBUJE ISTE SLIKE, VENDAR V NAKLJUČNEM VRSTNEM REDU. PRI STAREJŠIH STAROSTNIH SKUPINAH SE SLIKE V ZGORNJI VRSTICI NAJPREJ PRIKAŽEJO ZA OMEJEN ČAS, NATO PA SE SKRIJEJO."
+    title: "Začetek igre",
+    text: "Pred začetkom igre se prikaže odštevanje od 5 do 1. Po odštevanju se na zaslonu prikažeta dve vrstici s slikami. Zgornja vrstica predstavlja pravilni vrstni red in je zaklenjena. Spodnja vrstica vsebuje iste slike, vendar v naključnem vrstnem redu. Pri starejših starostnih skupinah se slike v zgornji vrstici najprej prikažejo za omejen čas, nato pa se skrijejo."
   },
   {
-    title: "PREMIKANJE SLIK",
-    text: "IGRALEC PRIME SLIKO V SPODNJI VRSTICI IN JO POVLEČE NA DRUGO MESTO. MED PREMIKANJEM JE SLIKA OZNAČENA Z MODRO OBROBO. KO IGRALEC SLIKO SPUSTI, SE TA ZAMENJA Z DRUGO SLIKO NA IZBRANEM MESTU. PRI NAPREDNEJŠIH RAZLIČICAH IGRALEC SLIKE NAJPREJ IZBIRA IZ NABORA IN JIH NATO RAZVRŠČA S POMOČJO GUMBOV ZA PREMIK LEVO IN DESNO."
+    title: "Premikanje slik",
+    text: "Igralec prime sliko v spodnji vrstici in jo povleče na drugo mesto. Med premikanjem je slika označena z modro obrobo. Ko igralec sliko spusti, se ta zamenja z drugo sliko na izbranem mestu. Pri naprednejših različicah igralec slike najprej izbira iz nabora in jih nato razvršča s pomočjo gumbov za premik levo in desno."
   },
   {
-    title: "ZAKLJUČEK IGRE",
-    text: "KO IGRALEC PRAVILNO RAZVRSTI VSE SLIKE, SE ODPRE POGOVORNO OKNO Z NASLOVOM ODLIČNO! IGRALEC MORA KLIKNITI NA VSAKO SLIKO IN PONOVITI BESEDO S 3-SEKUNDNIM SNEMANJEM. KO SO VSE BESEDE PONOVLJENE, SE PRIKAŽE RUMEN GUMB VZEMI ZVEZDICO, S KATERIM SE SHRANI NAPREDEK IN ZAKLJUČI IGRA."
+    title: "Zaključek igre",
+    text: "Ko igralec pravilno razvrsti vse slike, se odpre pogovorno okno z naslovom ODLIČNO! Igralec mora klikniti na vsako sliko in ponoviti besedo s 3-sekundnim snemanjem. Ko so vse besede ponovljene, se prikaže zaključno okno z napisom BRAVO! in rumenim gumbom VZEMI ZVEZDICO."
   },
   {
-    title: "RAZLIKE MED STAROSTNIMI SKUPINAMI",
+    title: "Razlike med starostnimi skupinami",
     text: ""
   },
   {
-    title: "STAROST 3–4 LETA",
-    text: "PRIKAZANE SO 4 SLIKE. ZGORNJA VRSTICA S PRAVILNIM VRSTNIM REDOM JE VES ČAS VIDNA IN ZAKLENJENA. IGRALEC SAMO PREMIKA SLIKE V SPODNJI VRSTICI, DOKLER SE VRSTNI RED NE UJEMA."
+    title: "Starost 3–4 leta",
+    text: "Prikazane so 4 slike. Zgornja vrstica s pravilnim vrstnim redom je ves čas vidna in zaklenjena. Igralec samo premika slike v spodnji vrstici, dokler se vrstni red ne ujema."
   },
   {
-    title: "STAROST 5–6 LET",
-    text: "IGRALEC SI MORA NAJPREJ ZAPOMNITI VRSTNI RED SLIK. SLIKE V ZGORNJI VRSTICI SO PRIKAZANE 10 SEKUND, NATO SE SKRIJEJO. IGRALEC MORA NAJPREJ IZBRATI PRAVILNE SLIKE IZ NABORA (4 PRAVILNE IN 4 NAPAČNE). NATO MORA IZBRANE SLIKE RAZVRSTITI V PRAVILEN VRSTNI RED. NA VOLJO JE ENA UPORABA POMOČI, KI ZA 5 SEKUND PONOVNO PRIKAŽE PRAVILNI VRSTNI RED."
+    title: "Starost 5–6 let",
+    text: "Igralec si mora najprej zapomniti vrstni red slik. Slike v zgornji vrstici so prikazane 10 sekund, nato se skrijejo. Igralec mora najprej izbrati pravilne slike iz nabora (4 pravilne in 4 napačne). Nato mora izbrane slike razvrstiti v pravilen vrstni red. Na voljo je ena uporaba pomoči, ki za 5 sekund ponovno prikaže pravilni vrstni red."
   },
   {
-    title: "STAROST 7–8 LET",
-    text: "PRIKAZANIH JE 5 SLIK. ČAS ZA POMNJENJE JE 10 SEKUND. NA VOLJO STA DVE UPORABI POMOČI. POTEK IGRE JE SICER ENAK KOT PRI STAROSTNI SKUPINI 5–6 LET."
+    title: "Starost 7–8 let",
+    text: "Prikazanih je 5 slik. Čas za pomnjenje je 10 sekund. Na voljo sta dve uporabi pomoči. Potek igre je sicer enak kot pri starostni skupini 5–6 let."
   },
   {
-    title: "STAROST 9–10 LET",
-    text: "PRIKAZANIH JE 5 SLIK. ČAS ZA POMNJENJE JE SKRAJŠAN NA 7 SEKUND. NA VOLJO JE ENA UPORABA POMOČI. POTEK IGRE JE ENAK KOT PRI STAROSTNI SKUPINI 5–6 LET, VENDAR Z VEČJO ZAHTEVNOSTJO."
+    title: "Starost 9–10 let",
+    text: "Prikazanih je 5 slik. Čas za pomnjenje je skrajšan na 7 sekund. Na voljo je ena uporaba pomoči. Potek igre je enak kot pri starostni skupini 5–6 let, vendar z večjo zahtevnostjo."
   }
 ];
 
@@ -54,7 +54,7 @@ export const MatchingInstructionsModal: React.FC<MatchingInstructionsModalProps>
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-center uppercase">NAVODILA ZA IGRO ZAPOREDJA</DialogTitle>
+          <DialogTitle className="text-xl font-bold text-center">Navodila za igro Zaporedja</DialogTitle>
         </DialogHeader>
         <div className="py-4">
           {instructionContent.map((section, index) => (
