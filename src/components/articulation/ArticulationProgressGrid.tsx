@@ -68,30 +68,30 @@ const ArticulationProgressGrid = ({
   return (
     <div className={cn(
       "flex flex-col items-center",
-      compact ? "gap-1" : "gap-2"
+      compact ? "gap-0.5" : "gap-1.5"
     )}>
-      {/* First row - P to Z */}
-      <div className={cn("flex", compact ? "gap-0.5" : "gap-1 md:gap-2")}>
+      {/* First row */}
+      <div className={cn("flex", compact ? "gap-0.5" : "gap-1 md:gap-1.5")}>
         {firstRow.map((letter, index) => renderLetterBox(letter, index))}
       </div>
-      {/* Second row - Č to J */}
-      <div className={cn("flex", compact ? "gap-0.5" : "gap-1 md:gap-2")}>
+      {/* Second row */}
+      <div className={cn("flex", compact ? "gap-0.5" : "gap-1 md:gap-1.5")}>
         {secondRow.map((letter, index) => renderLetterBox(letter, index + 10))}
       </div>
       
-      {/* Legend - hide on compact */}
+      {/* Legend - separate row, smaller text */}
       {!compact && (
-        <div className="flex items-center gap-4 mt-2 text-xs text-gray-600">
+        <div className="flex items-center justify-center gap-3 mt-1 text-[10px] text-gray-500">
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 border border-gray-300 rounded-sm bg-white"></div>
+            <div className="w-2.5 h-2.5 border border-gray-300 rounded-sm bg-white"></div>
             <span>Ni izgovorjeno</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-sm" style={{ background: 'linear-gradient(to top, hsl(142, 76%, 45%) 50%, white 50%)' }}></div>
+            <div className="w-2.5 h-2.5 rounded-sm" style={{ background: 'linear-gradient(to top, hsl(142, 76%, 45%) 50%, white 50%)' }}></div>
             <span>V teku</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-sm bg-green-500"></div>
+            <div className="w-2.5 h-2.5 rounded-sm bg-green-500"></div>
             <span>Končano</span>
           </div>
         </div>
