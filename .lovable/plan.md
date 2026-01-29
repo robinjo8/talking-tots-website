@@ -1,76 +1,44 @@
 
+# Načrt za popravek igre Igra Ujemanja
 
-## Popravek manjkajočih slik v igri Spomin - Črka R
+## Problem
+Pri igri `/govorne-igre/igra-ujemanja/c` se pojavi veliko zeleno polje in uporabnik ne more izbrati vseh slik.
 
-### Ugotovljen problem
+## Vzrok napake
+V komponenti `ImageTile.tsx` manjka `relative` pozicioniranje na glavnem elementu. Ko je slika označena kot "matched" (ujemanje najdeno), se prikaže zelena prekrivna plast z `absolute inset-0` stilom. Problem je, da ta absolutna pozicionirana plast potrebuje starševski element z `relative` pozicioniranjem, da ostane omejena znotraj kartice slike.
 
-V tabeli `memory_cards_r` imajo 4 slike **napačne URL-je s šumniki**, ki jih brskalnik ne more najti. Dejanske datoteke v bucketu `slike` uporabljajo ASCII znake (brez šumnikov).
+Brez `relative` na starševskem elementu se zelena prekrivna plast raztegne na prvi nadrejeni element z `relative` pozicioniranjem - v tem primeru na celotno igralno območje, kar ustvari "veliko zeleno polje" in blokira klikanje na druge slike.
 
-### Seznam napačnih URL-jev
+## Rešitev
+Dodati `relative` v className glavnega div elementa v komponenti `ImageTile.tsx`.
 
-| Beseda | Napačen URL | Pravilen URL |
-|--------|-------------|--------------|
-| Ribič | `ribič1.webp` | `ribic1.webp` |
-| Riž | `riž1.webp` | `riz1.webp` |
-| Rokometaš | `rokometaš1.webp` | `rokometas1.webp` |
-| Roža | `roža1.webp` | `roza1.webp` |
+### Spremembe v datoteki
 
-### Stanje ostalih tabel
+**src/components/matching/ImageTile.tsx** (vrstica 20-22):
 
-Preveril sem vse ostale tabele za igro Spomin in nobena nima enakih težav:
-- `memory_cards_c` - OK
-- `memory_cards_Č` - OK
-- `memory_cards_K` - OK
-- `memory_cards_l` - OK
-- `memory_cards_S` - OK
-- `memory_cards_z` - OK
-- `memory_cards_Š_duplicate` - OK
-- `memory_cards_Ž` - OK
-
-### Rešitev
-
-Potrebno je posodobiti 4 zapise v tabeli `memory_cards_r` z naslednjimi SQL ukazi:
-
-```sql
--- Popravek URL-jev za slike s šumniki v tabeli memory_cards_r
-UPDATE memory_cards_r 
-SET image_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/ribic1.webp' 
-WHERE word = 'Ribič';
-
-UPDATE memory_cards_r 
-SET image_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/riz1.webp' 
-WHERE word = 'Riž';
-
-UPDATE memory_cards_r 
-SET image_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/rokometas1.webp' 
-WHERE word = 'Rokometaš';
-
-UPDATE memory_cards_r 
-SET image_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/roza1.webp' 
-WHERE word = 'Roža';
+Trenutna koda:
+```tsx
+<div
+  onClick={onClick}
+  className={cn(
+    "flex items-center justify-center border-2 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden bg-white shadow-md",
 ```
 
-### Vizualni prikaz
-
-```text
-PREJ (napačno):                         POTEM (pravilno):
-┌─────────────────────────┐            ┌─────────────────────────┐
-│  ribič1.webp ❌          │            │  ribic1.webp ✅          │
-│  riž1.webp ❌            │   ────>    │  riz1.webp ✅            │
-│  rokometaš1.webp ❌      │            │  rokometas1.webp ✅      │
-│  roža1.webp ❌           │            │  roza1.webp ✅           │
-└─────────────────────────┘            └─────────────────────────┘
+Nova koda:
+```tsx
+<div
+  onClick={onClick}
+  className={cn(
+    "relative flex items-center justify-center border-2 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden bg-white shadow-md",
 ```
 
-### Koraki za implementacijo
+## Tehnični povzetek
+- **Napaka**: Absolutno pozicionirane prekrivne plasti (overlay) za stanje "matched" in "selected" niso pravilno omejene
+- **Rešitev**: Ena vrstica spremembe - dodajanje `relative` v className
+- **Prizadete komponente**: Vse igre tipa "Igra ujemanja" za vse starostne skupine (3-4, 5-6, 7-8, 9-10) in vse črke (C, Č, K, L, R, S, Š, Z, Ž)
 
-1. Ustvari SQL migracijo za popravek 4 URL-jev
-2. Zaženi migracijo
-
-### Testiranje
-
-Po implementaciji preverite:
-1. Odprite igro Spomin - Črka R (`/govorne-igre/spomin/spomin-r`)
-2. Vse kartice morajo prikazati slike (nobena več ne sme prikazati "Spominska kartica")
-3. Odigrajte igro do konca za potrditev delovanja
-
+## Pričakovani rezultat
+Po popravku:
+- Zelena kljukica in prekrivna plast bosta omejena samo na posamezno kartico slike
+- Uporabnik bo lahko kliknil na vse slike v igri
+- Igra bo normalno delovala do zaključka
