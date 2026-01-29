@@ -19,7 +19,7 @@ export function ImageTile({ image, isSelected, isMatched, onClick, className, ..
       onClick={onClick}
       className={cn(
         // Base styles matching FourColumnGame
-        "flex items-center justify-center border-2 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden bg-white shadow-md",
+        "relative flex items-center justify-center border-2 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden bg-white shadow-md",
         // Size classes come from className prop
         className,
         // State-based styles
