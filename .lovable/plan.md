@@ -1,99 +1,76 @@
 
 
-## Popravek kritične napake v Edge funkciji
+## Popravek manjkajočih slik v igri Spomin - Črka R
 
-### Problem
+### Ugotovljen problem
 
-Edge funkcija `transcribe-articulation` ima **sintaktično napako** - spremenljivka `normalizedTarget` je deklarirana dvakrat v funkciji `isWordAccepted`.
+V tabeli `memory_cards_r` imajo 4 slike **napačne URL-je s šumniki**, ki jih brskalnik ne more najti. Dejanske datoteke v bucketu `slike` uporabljajo ASCII znake (brez šumnikov).
 
-To je bila **moja napaka** pri implementaciji dinamičnih pragov za zahtevnost. Dodal sem novo vrstico za izračun praga, vendar sem pozabil odstraniti staro deklaracijo.
+### Seznam napačnih URL-jev
 
-### Napaka v kodi (vrstice 91-94)
+| Beseda | Napačen URL | Pravilen URL |
+|--------|-------------|--------------|
+| Ribič | `ribič1.webp` | `ribic1.webp` |
+| Riž | `riž1.webp` | `riz1.webp` |
+| Rokometaš | `rokometaš1.webp` | `rokometas1.webp` |
+| Roža | `roža1.webp` | `roza1.webp` |
 
-```typescript
-// TRENUTNO (NAPAČNO):
-const normalizedTarget = normalizeText(targetWord);  // 1. deklaracija
-const similarityThreshold = getThresholdForWord(normalizedTarget.length, difficulty);
-const normalizedTranscribed = normalizeText(transcribed);
-const normalizedTarget = normalizeText(targetWord);  // 2. deklaracija - PODVOJENA!
+### Stanje ostalih tabel
+
+Preveril sem vse ostale tabele za igro Spomin in nobena nima enakih težav:
+- `memory_cards_c` - OK
+- `memory_cards_Č` - OK
+- `memory_cards_K` - OK
+- `memory_cards_l` - OK
+- `memory_cards_S` - OK
+- `memory_cards_z` - OK
+- `memory_cards_Š_duplicate` - OK
+- `memory_cards_Ž` - OK
+
+### Rešitev
+
+Potrebno je posodobiti 4 zapise v tabeli `memory_cards_r` z naslednjimi SQL ukazi:
+
+```sql
+-- Popravek URL-jev za slike s šumniki v tabeli memory_cards_r
+UPDATE memory_cards_r 
+SET image_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/ribic1.webp' 
+WHERE word = 'Ribič';
+
+UPDATE memory_cards_r 
+SET image_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/riz1.webp' 
+WHERE word = 'Riž';
+
+UPDATE memory_cards_r 
+SET image_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/rokometas1.webp' 
+WHERE word = 'Rokometaš';
+
+UPDATE memory_cards_r 
+SET image_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/roza1.webp' 
+WHERE word = 'Roža';
 ```
 
-### Popravek
-
-```typescript
-// PRAVILNO:
-const normalizedTranscribed = normalizeText(transcribed);
-const normalizedTarget = normalizeText(targetWord);  // Samo ena deklaracija
-const similarityThreshold = getThresholdForWord(normalizedTarget.length, difficulty);
-```
-
-### Potek napake
+### Vizualni prikaz
 
 ```text
-Uporabnik izgovori besedo
-        │
-        ▼
-Edge funkcija se poskusi zagnati
-        │
-        ▼
-┌─────────────────────────────────────────┐
-│ SyntaxError: Identifier 'normalizedTarget' │
-│ has already been declared                   │
-└─────────────────────────────────────────┘
-        │
-        ▼
-Funkcija vrne napako (500)
-        │
-        ▼
-transcriptionResult = null
-        │
-        ▼
-hasRecorded = true, ampak accepted = undefined
-        │
-        ▼
-showNext = false (ker transcriptionResult?.accepted !== true)
-        │
-        ▼
-Gumb "Naprej" se NE prikaže, slika postane siva
+PREJ (napačno):                         POTEM (pravilno):
+┌─────────────────────────┐            ┌─────────────────────────┐
+│  ribič1.webp ❌          │            │  ribic1.webp ✅          │
+│  riž1.webp ❌            │   ────>    │  riz1.webp ✅            │
+│  rokometaš1.webp ❌      │            │  rokometas1.webp ✅      │
+│  roža1.webp ❌           │            │  roza1.webp ✅           │
+└─────────────────────────┘            └─────────────────────────┘
 ```
 
----
+### Koraki za implementacijo
 
-### Datoteke za posodobitev
-
-**`supabase/functions/transcribe-articulation/index.ts`**
-
-Odstrani podvojeno deklaracijo in popravi vrstni red:
-
-| Vrstica | Sprememba |
-|---------|-----------|
-| 91-94 | Odstrani prvo `const normalizedTarget`, ohrani samo drugo |
-
-### Pravilna koda funkcije `isWordAccepted`
-
-```typescript
-function isWordAccepted(
-  transcribed: string,
-  targetWord: string,
-  acceptedVariants: string[],
-  difficulty: string = "srednja"
-): { accepted: boolean; matchType: string; confidence: number } {
-  const normalizedTranscribed = normalizeText(transcribed);
-  const normalizedTarget = normalizeText(targetWord);  // SAMO ENKRAT
-  const similarityThreshold = getThresholdForWord(normalizedTarget.length, difficulty);
-  
-  // ... ostala logika ostane enaka
-}
-```
-
----
+1. Ustvari SQL migracijo za popravek 4 URL-jev
+2. Zaženi migracijo
 
 ### Testiranje
 
-Po popravku:
-1. Uporabnik izgovori besedo "PAJEK"
-2. Edge funkcija uspesno transkribira
-3. `transcriptionResult.accepted = true` (ali false z besedilom)
-4. Prikaže se gumb "Naprej" ali sporočilo z napačno besedo
-5. Uporabnik lahko nadaljuje na naslednjo besedo
+Po implementaciji preverite:
+1. Odprite igro Spomin - Črka R (`/govorne-igre/spomin/spomin-r`)
+2. Vse kartice morajo prikazati slike (nobena več ne sme prikazati "Spominska kartica")
+3. Odigrajte igro do konca za potrditev delovanja
 
