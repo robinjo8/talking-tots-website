@@ -41,11 +41,20 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
       ]
     : type === "sliding" 
     ? [
-        { text: "Sestavljanka je razdeljena na kvadrate, pri čemer je en kvadrat prazen." },
-        { text: "Premikaj posamezne dele slike tako, da klikneš na polje, ki ga želiš premakniti." },
-        { text: "Cilj je, da s premikanjem vseh delov slike sestaviš celotno sliko v pravilni obliki." },
-        { text: "Ko bo igra končana, se bo predvajal posnetek logopeda." },
-        { text: "Dobro poslušaj, nato pa ponovi besedo." }
+        { text: "Osnovni koncept", bold: true },
+        { text: "Igra Drsna sestavljanka je sestavljena iz mreže kvadratov, ki prikazujejo dele slike. En kvadrat je prazen in omogoča premikanje ostalih delov. Cilj je, da s premikanjem kosov sestaviš celotno sliko. Vsaka slika prikazuje besedo, ki se začne z izbrano črko." },
+        { text: "Začetek igre", bold: true },
+        { text: "Na zaslonu se prikaže mreža z razmetanimi deli slike. En kvadrat je prazen (sive barve). V ozadju je vidna bleda senca celotne slike, ki služi kot pomoč pri sestavljanju. Na vsakem kosu je prikazana številka za lažje sledenje." },
+        { text: "Premikanje kosov", bold: true },
+        { text: "Igralec klikne na kos, ki je ob praznem polju, da ga premakne na prazen prostor. Premikati je mogoče le kose, ki so neposredno ob praznem polju (levo, desno, zgoraj ali spodaj). Ko kos pravilno postaviš, se obroba obarva zeleno." },
+        { text: "Zaključek sestavljanke", bold: true },
+        { text: "Ko igralec pravilno postavi vse kose, se odpre pogovorno okno z napisom ODLIČNO! V oknu so prikazane štiri naključne slike, med katerimi je tudi pravkar sestavljena slika. Pod vsako sliko je zapisana beseda in gumb za predvajanje zvočnega posnetka." },
+        { text: "Ponovitev besed", bold: true },
+        { text: "Igralec klikne na vsako sliko, kar sproži 3-sekundno snemanje z vizualnim odštevalnikom 3–2–1. Po končanem snemanju se slika obarva sivo. Igralec lahko za vsako besedo predvaja zvočni posnetek s klikom na gumb z zvočnikom." },
+        { text: "Vzemi zvezdico", bold: true },
+        { text: "Ko igralec ponovi vse štiri besede, se samodejno odpre zaslon z napisom BRAVO! in sliko zmajčka. S klikom na rumen gumb VZEMI ZVEZDICO se napredek shrani." },
+        { text: "Nova igra / izhod", bold: true },
+        { text: "Po osvojeni zvezdici se pojavi moder gumb za novo igro (levo spodaj). S klikom na gumb Hiška se vrnete v meni." }
       ]
     : type === "maze"
     ? [
@@ -145,7 +154,7 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
     : type === "articulation" 
     ? "Navodila za vajo" 
     : type === "sliding" 
-    ? "Drsna igra"
+    ? "Navodila za Drsno sestavljanko"
     : type === "maze"
     ? "Navodila za labirint"
     : type === "bingo"
