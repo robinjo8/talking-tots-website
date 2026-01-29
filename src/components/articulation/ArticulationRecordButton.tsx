@@ -14,6 +14,7 @@ interface ArticulationRecordButtonProps {
   isTranscribing?: boolean;
   feedbackMessage?: string;
   recordingDuration?: number;
+  compact?: boolean;
 }
 
 const ArticulationRecordButton = ({
@@ -27,6 +28,7 @@ const ArticulationRecordButton = ({
   isTranscribing = false,
   feedbackMessage,
   recordingDuration = 4,
+  compact = false,
 }: ArticulationRecordButtonProps) => {
   const {
     isRecording,
@@ -54,18 +56,19 @@ const ArticulationRecordButton = ({
     }
   }, [isSilent, onSilenceDetected]);
 
-  // Wrapper for consistent height
+  // Button and spacer dimensions based on compact mode
+  const buttonClass = compact ? "w-[180px] h-11 text-base" : "w-[220px] h-14 text-lg";
+  const spacerClass = compact ? "h-[32px]" : "h-[44px]";
 
-  // Wrapper for consistent height
   const renderContent = () => {
     // Transcribing state
     if (isTranscribing) {
       return (
         <>
-          <div className="h-[44px]" />
-          <div className="w-[220px] h-14 flex items-center justify-center gap-2">
+          <div className={spacerClass} />
+          <div className={cn(buttonClass, "flex items-center justify-center gap-2")}>
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-teal-500"></div>
-            <span className="text-gray-600">Preverjam...</span>
+            <span className="text-gray-600 text-sm">Preverjam...</span>
           </div>
         </>
       );
@@ -75,7 +78,7 @@ const ArticulationRecordButton = ({
     if (isSilent && !isRecording && !showNext) {
       return (
         <>
-          <div className="h-[44px] flex items-center justify-center">
+          <div className={cn(spacerClass, "flex items-center justify-center")}>
             <p className="text-red-600 font-medium text-sm">Zvok ni bil zaznan</p>
           </div>
           <button
@@ -85,9 +88,9 @@ const ArticulationRecordButton = ({
             }}
             className={cn(
               "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600",
-              "text-white rounded-full text-lg font-medium shadow-lg",
+              "text-white rounded-full font-medium shadow-lg",
               "transition-all duration-300 hover:scale-105",
-              "w-[220px] h-14 flex items-center justify-center"
+              buttonClass, "flex items-center justify-center"
             )}
           >
             Poskusi znova
@@ -100,7 +103,7 @@ const ArticulationRecordButton = ({
     if (isNoise && !isRecording) {
       return (
         <>
-          <div className="h-[44px] flex items-center justify-center">
+          <div className={cn(spacerClass, "flex items-center justify-center")}>
             <p className="text-red-600 font-medium text-sm">Zaznan je bil šum</p>
           </div>
           <button
@@ -110,9 +113,9 @@ const ArticulationRecordButton = ({
             }}
             className={cn(
               "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600",
-              "text-white rounded-full text-lg font-medium shadow-lg",
+              "text-white rounded-full font-medium shadow-lg",
               "transition-all duration-300 hover:scale-105",
-              "w-[220px] h-14 flex items-center justify-center"
+              buttonClass, "flex items-center justify-center"
             )}
           >
             Poskusi znova
@@ -125,7 +128,7 @@ const ArticulationRecordButton = ({
     if (wrongWord && !isRecording) {
       return (
         <>
-          <div className="h-[44px] flex items-center justify-center">
+          <div className={cn(spacerClass, "flex items-center justify-center")}>
             <p className="text-red-600 font-medium text-sm">
               Slišano: "{wrongWord}"
             </p>
@@ -137,9 +140,9 @@ const ArticulationRecordButton = ({
             }}
             className={cn(
               "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600",
-              "text-white rounded-full text-lg font-medium shadow-lg",
+              "text-white rounded-full font-medium shadow-lg",
               "transition-all duration-300 hover:scale-105",
-              "w-[220px] h-14 flex items-center justify-center"
+              buttonClass, "flex items-center justify-center"
             )}
           >
             Poskusi znova
@@ -151,12 +154,12 @@ const ArticulationRecordButton = ({
     if (error) {
       return (
         <>
-          <div className="h-[44px]" />
+          <div className={spacerClass} />
           <div
             className={cn(
               "bg-gradient-to-r from-red-500 to-red-600",
               "text-white rounded-full text-sm font-medium shadow-lg",
-              "w-[220px] h-14 flex items-center justify-center gap-2 px-4"
+              buttonClass, "flex items-center justify-center gap-2 px-4"
             )}
           >
             <AlertCircle className="w-5 h-5 flex-shrink-0" />
@@ -179,11 +182,14 @@ const ArticulationRecordButton = ({
     if (showNext) {
       return (
         <>
-          <div className="h-[44px] flex items-center justify-center">
+          <div className={cn(spacerClass, "flex items-center justify-center")}>
             {feedbackMessage && (
-              <div className="flex items-center justify-center gap-2 py-2 px-4 rounded-full bg-green-100 text-green-700">
-                <Check className="w-5 h-5" />
-                <span className="font-medium text-sm">{feedbackMessage}</span>
+              <div className={cn(
+                "flex items-center justify-center gap-2 py-1.5 px-3 rounded-full bg-green-100 text-green-700",
+                compact && "py-1 px-2"
+              )}>
+                <Check className={compact ? "w-4 h-4" : "w-5 h-5"} />
+                <span className={cn("font-medium", compact ? "text-xs" : "text-sm")}>{feedbackMessage}</span>
               </div>
             )}
           </div>
@@ -191,13 +197,13 @@ const ArticulationRecordButton = ({
             onClick={onNext}
             className={cn(
               "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700",
-              "text-white rounded-full text-lg font-medium shadow-lg",
+              "text-white rounded-full font-medium shadow-lg",
               "transition-all duration-300 hover:scale-105",
-              "w-[220px] h-14 flex items-center justify-center"
+              buttonClass, "flex items-center justify-center"
             )}
           >
             Naprej
-            <ArrowRight className="w-5 h-5 ml-2" />
+            <ArrowRight className={compact ? "w-4 h-4 ml-1" : "w-5 h-5 ml-2"} />
           </button>
         </>
       );
@@ -207,11 +213,11 @@ const ArticulationRecordButton = ({
     if (isRecording) {
       return (
         <>
-          <div className="h-[44px]" />
+          <div className={spacerClass} />
           <div
             className={cn(
-              "relative overflow-hidden rounded-full shadow-lg",
-              "w-[220px] h-14 bg-gray-200"
+              "relative overflow-hidden rounded-full shadow-lg bg-gray-200",
+              buttonClass
             )}
           >
             <div
@@ -219,7 +225,7 @@ const ArticulationRecordButton = ({
               style={{ width: `${progressPercent}%` }}
             />
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-2xl font-bold text-white drop-shadow-md">
+              <span className={cn("font-bold text-white drop-shadow-md", compact ? "text-xl" : "text-2xl")}>
                 {countdown}
               </span>
             </div>
@@ -231,19 +237,19 @@ const ArticulationRecordButton = ({
     // Default - start recording button
     return (
       <>
-        <div className="h-[44px]" />
+        <div className={spacerClass} />
         <button
           onClick={startRecording}
           disabled={disabled || isRecording}
           className={cn(
             "bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700",
-            "text-white rounded-full text-lg font-medium shadow-lg",
+            "text-white rounded-full font-medium shadow-lg",
             "transition-all duration-300 hover:scale-105",
-            "w-[220px] h-14 flex items-center justify-center",
+            buttonClass, "flex items-center justify-center",
             (disabled || isRecording) && "opacity-50 cursor-not-allowed"
           )}
         >
-          <Mic className="w-5 h-5 mr-2" />
+          <Mic className={compact ? "w-4 h-4 mr-1" : "w-5 h-5 mr-2"} />
           Izgovori besedo
         </button>
       </>
@@ -251,7 +257,10 @@ const ArticulationRecordButton = ({
   };
 
   return (
-    <div className="flex flex-col items-center gap-2 min-h-[100px]">
+    <div className={cn(
+      "flex flex-col items-center gap-1",
+      compact ? "min-h-[70px]" : "min-h-[100px]"
+    )}>
       {renderContent()}
     </div>
   );

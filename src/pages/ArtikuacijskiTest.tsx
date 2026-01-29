@@ -47,6 +47,71 @@ const ArtikuacijskiTest = () => {
   const [resumeWordIndex, setResumeWordIndex] = useState<number>(0);
   const [resumeTimestamp, setResumeTimestamp] = useState<number>(0);
 
+  // Window size tracking for dynamic scaling (like MemoryGrid)
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const updateSize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+    
+    const handleOrientationChange = () => setTimeout(updateSize, 100);
+    
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    window.addEventListener('orientationchange', handleOrientationChange);
+    
+    return () => {
+      window.removeEventListener('resize', updateSize);
+      window.removeEventListener('orientationchange', handleOrientationChange);
+    };
+  }, []);
+
+  // Calculate dynamic dimensions based on viewport
+  const dimensions = useMemo(() => {
+    if (windowSize.height === 0) return null;
+    
+    const vh = windowSize.height;
+    const isMobile = windowSize.width < 768;
+    
+    // Fixed elements
+    const titleHeight = 60;
+    const bottomPadding = 80;
+    const letterInfoHeight = isMobile ? 0 : 50;
+    
+    // Available height for content
+    const availableHeight = vh - titleHeight - bottomPadding - letterInfoHeight;
+    
+    // Progress grid: 15% of available height, max 120px
+    const progressGridHeight = Math.min(Math.floor(availableHeight * 0.15), 120);
+    
+    // Remaining for word card
+    const cardHeight = availableHeight - progressGridHeight - 20; // 20px gap
+    
+    // Inside card proportions
+    const wordHeight = Math.floor(cardHeight * 0.12);
+    const imageHeight = Math.floor(cardHeight * 0.50);
+    const buttonHeight = Math.floor(cardHeight * 0.28);
+    const cardPadding = Math.max(12, Math.floor(cardHeight * 0.04));
+    
+    // Compact mode for very small screens
+    const isCompact = vh < 700;
+    
+    return {
+      progressGridHeight,
+      cardHeight,
+      wordHeight,
+      imageHeight,
+      buttonHeight,
+      cardPadding,
+      wordFontSize: Math.max(18, Math.min(32, Math.floor(wordHeight * 0.9))),
+      isCompact,
+    };
+  }, [windowSize]);
+
   const childId = selectedChild?.id;
   const userId = user?.id;
   
@@ -166,7 +231,7 @@ const ArtikuacijskiTest = () => {
 
   return (
     <div
-      className="min-h-screen w-full fixed inset-0 flex flex-col"
+      className="h-screen w-full flex flex-col overflow-hidden"
       style={{
         backgroundImage: backgroundUrl ? `url(${backgroundUrl})` : undefined,
         backgroundSize: "cover",
@@ -225,39 +290,69 @@ const ArtikuacijskiTest = () => {
       </MemoryExitConfirmationDialog>
 
       {/* Title */}
-      <div className="pt-6 pb-2 text-center">
-        <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-md">
+      <div className="pt-4 pb-2 text-center flex-shrink-0">
+        <h1 className={cn(
+          "font-bold text-white drop-shadow-md",
+          dimensions?.isCompact ? "text-xl" : "text-2xl md:text-3xl"
+        )}>
           PREVERJANJE IZGOVORJAVE
         </h1>
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col items-center justify-start px-4 pb-8 overflow-hidden">
+      <div className="flex-1 flex flex-col items-center justify-start px-4 overflow-hidden">
         {/* Progress Grid */}
-        <div className="w-full max-w-lg bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-lg mb-4">
+        <div 
+          className="w-full max-w-lg bg-white/90 backdrop-blur-sm rounded-xl shadow-lg mb-3 flex-shrink-0"
+          style={{ 
+            padding: dimensions?.isCompact ? '8px' : '16px',
+            maxHeight: dimensions?.progressGridHeight 
+          }}
+        >
           <ArticulationProgressGrid
             letters={allLetters}
             completedWords={completedWords}
             currentLetterIndex={currentLetterIndex}
+            compact={dimensions?.isCompact}
           />
         </div>
 
         {/* Current letter and position - hidden on mobile */}
-        <div className="hidden md:block text-center mb-4">
-          <h2 className="text-xl md:text-2xl font-bold text-white drop-shadow-md">
+        <div className="hidden md:block text-center mb-2 flex-shrink-0">
+          <h2 className={cn(
+            "font-bold text-white drop-shadow-md",
+            dimensions?.isCompact ? "text-lg" : "text-xl md:text-2xl"
+          )}>
             {currentLetter} - {positionLabel}
           </h2>
         </div>
 
         {/* Word and Image Card */}
-        <div className="w-full max-w-sm bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
+        <div 
+          className="w-full max-w-sm bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl flex flex-col flex-shrink-0"
+          style={{ 
+            padding: dimensions?.cardPadding,
+            height: dimensions?.cardHeight,
+            minHeight: 0,
+          }}
+        >
           {/* Word display */}
-          <h3 className="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-4">
+          <h3 
+            className="font-bold text-center text-gray-800 leading-relaxed flex-shrink-0"
+            style={{ 
+              fontSize: dimensions?.wordFontSize,
+              paddingBottom: '0.25rem',
+              lineHeight: 1.3,
+            }}
+          >
             {getCurrentWord().toUpperCase()}
           </h3>
 
           {/* Image display */}
-          <div className="relative w-full aspect-square max-h-48 md:max-h-64 flex items-center justify-center mb-6">
+          <div 
+            className="relative w-full flex items-center justify-center flex-shrink-0"
+            style={{ height: dimensions?.imageHeight }}
+          >
             {loading ? (
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-teal-500"></div>
             ) : imageUrl ? (
@@ -274,7 +369,10 @@ const ArtikuacijskiTest = () => {
             )}
           </div>
 
-          <div className="min-h-[140px] flex flex-col items-center justify-center">
+          <div 
+            className="flex flex-col items-center justify-center flex-1"
+            style={{ minHeight: dimensions?.buttonHeight }}
+          >
             <ArticulationRecordButton
               onRecordingComplete={handleRecordingComplete}
               onNext={handleNext}
@@ -284,6 +382,7 @@ const ArtikuacijskiTest = () => {
               isNoise={hasRecorded && !isTranscribing && transcriptionResult?.accepted === false && !transcriptionResult?.transcribedText}
               isTranscribing={isTranscribing}
               recordingDuration={recordingDuration}
+              compact={dimensions?.isCompact}
               feedbackMessage={transcriptionResult?.accepted 
                 ? (transcriptionResult.matchType === 'exact' 
                     ? positiveFeedbackMessages[Math.floor(Math.random() * positiveFeedbackMessages.length)] 

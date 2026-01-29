@@ -4,12 +4,14 @@ interface ArticulationProgressGridProps {
   letters: string[];
   completedWords: number[]; // 0-3 for each letter
   currentLetterIndex: number;
+  compact?: boolean;
 }
 
 const ArticulationProgressGrid = ({
   letters,
   completedWords,
   currentLetterIndex,
+  compact = false,
 }: ArticulationProgressGridProps) => {
   // Split letters into two rows of 10
   const firstRow = letters.slice(0, 10);
@@ -42,7 +44,10 @@ const ArticulationProgressGrid = ({
       <div
         key={`${letter}-${index}`}
         className={cn(
-          "relative w-8 h-8 md:w-10 md:h-10 rounded-md flex items-center justify-center font-bold text-sm md:text-base transition-all duration-300 border-2",
+          "relative rounded-md flex items-center justify-center font-bold transition-all duration-300 border-2",
+          compact 
+            ? "w-6 h-6 text-xs" 
+            : "w-8 h-8 md:w-10 md:h-10 text-sm md:text-base",
           isCurrent
             ? "border-orange-500 shadow-lg shadow-orange-500/30 scale-110 z-10"
             : "border-gray-300",
@@ -61,31 +66,36 @@ const ArticulationProgressGrid = ({
   };
 
   return (
-    <div className="flex flex-col items-center gap-2 mb-6">
+    <div className={cn(
+      "flex flex-col items-center",
+      compact ? "gap-1" : "gap-2"
+    )}>
       {/* First row - P to Z */}
-      <div className="flex gap-1 md:gap-2">
+      <div className={cn("flex", compact ? "gap-0.5" : "gap-1 md:gap-2")}>
         {firstRow.map((letter, index) => renderLetterBox(letter, index))}
       </div>
       {/* Second row - Č to J */}
-      <div className="flex gap-1 md:gap-2">
+      <div className={cn("flex", compact ? "gap-0.5" : "gap-1 md:gap-2")}>
         {secondRow.map((letter, index) => renderLetterBox(letter, index + 10))}
       </div>
       
-      {/* Legend */}
-      <div className="flex items-center gap-4 mt-2 text-xs text-gray-600">
-        <div className="flex items-center gap-1">
-          <div className="w-3 h-3 border border-gray-300 rounded-sm bg-white"></div>
-          <span>Ni izgovorjeno</span>
+      {/* Legend - hide on compact */}
+      {!compact && (
+        <div className="flex items-center gap-4 mt-2 text-xs text-gray-600">
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 border border-gray-300 rounded-sm bg-white"></div>
+            <span>Ni izgovorjeno</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 rounded-sm" style={{ background: 'linear-gradient(to top, hsl(142, 76%, 45%) 50%, white 50%)' }}></div>
+            <span>V teku</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 rounded-sm bg-green-500"></div>
+            <span>Končano</span>
+          </div>
         </div>
-        <div className="flex items-center gap-1">
-          <div className="w-3 h-3 rounded-sm" style={{ background: 'linear-gradient(to top, hsl(142, 76%, 45%) 50%, white 50%)' }}></div>
-          <span>V teku</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <div className="w-3 h-3 rounded-sm bg-green-500"></div>
-          <span>Končano</span>
-        </div>
-      </div>
+      )}
     </div>
   );
 };
