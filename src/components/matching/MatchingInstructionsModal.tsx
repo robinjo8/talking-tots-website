@@ -10,39 +10,35 @@ interface MatchingInstructionsModalProps {
 const instructionContent = [
   {
     title: "Osnovni koncept",
-    text: "Igra Zaporedja je igra razvrščanja slik v pravilni vrstni red. Cilj igre je, da igralec slike v spodnji vrstici razporedi tako, da se ujemajo s pravilnim vrstnim redom. Vsaka slika prikazuje besedo, ki se začne z izbrano črko."
+    text: "Igra Ujemanja je igra povezovanja enakih slik. Cilj igre je, da igralec v dveh stolpcih poišče in poveže vse pare enakih slik. Vsaka slika prikazuje besedo, ki se začne z izbrano črko."
   },
   {
     title: "Začetek igre",
-    text: "Pred začetkom igre se prikaže odštevanje od 5 do 1. Po odštevanju se na zaslonu prikažeta dve vrstici s slikami. Zgornja vrstica predstavlja pravilni vrstni red in je zaklenjena. Spodnja vrstica vsebuje iste slike, vendar v naključnem vrstnem redu. Pri starejših starostnih skupinah se slike v zgornji vrstici najprej prikažejo za omejen čas, nato pa se skrijejo."
+    text: "Na zaslonu se prikažeta dva stolpca s slikami. V vsakem stolpcu so enake slike, vendar v različnem vrstnem redu. Vsak stolpec vsebuje toliko slik, kolikor je parov za povezovanje."
   },
   {
-    title: "Premikanje slik",
-    text: "Igralec prime sliko v spodnji vrstici in jo povleče na drugo mesto. Med premikanjem je slika označena z modro obrobo. Ko igralec sliko spusti, se ta zamenja z drugo sliko na izbranem mestu. Pri naprednejših različicah igralec slike najprej izbira iz nabora in jih nato razvršča s pomočjo gumbov za premik levo in desno."
+    title: "Izbiranje slik",
+    text: "Igralec klikne na sliko v enem stolpcu, da jo izbere. Izbrana slika je označena z modro obrobo. Nato igralec klikne na enako sliko v drugem stolpcu. Če sta sliki enaki, se par poveže in obe sliki se obarvata zeleno."
+  },
+  {
+    title: "Pravila povezovanja",
+    text: "Povezati je mogoče le slike iz različnih stolpcev. Če igralec klikne na dve različni sliki, se izbira ponastavi. Če igralec klikne na isto sliko dvakrat, se izbira prekliče."
   },
   {
     title: "Zaključek igre",
-    text: "Ko igralec pravilno razvrsti vse slike, se odpre pogovorno okno z naslovom ODLIČNO! Igralec mora klikniti na vsako sliko in ponoviti besedo s 3-sekundnim snemanjem. Ko so vse besede ponovljene, se prikaže zaključno okno z napisom BRAVO! in rumenim gumbom VZEMI ZVEZDICO."
+    text: "Ko igralec pravilno poveže vse pare, se odpre pogovorno okno z napisom ODLIČNO! V oknu so prikazane vse slike iz igre. Pod vsako sliko je zapisana beseda in gumb za predvajanje zvočnega posnetka."
   },
   {
-    title: "Razlike med starostnimi skupinami",
-    text: ""
+    title: "Ponovitev besed",
+    text: "Igralec klikne na vsako sliko, kar sproži 3-sekundno snemanje z vizualnim odštevalnikom 3–2–1. Po končanem snemanju se slika obarva sivo. Igralec lahko za vsako besedo predvaja zvočni posnetek s klikom na gumb z zvočnikom."
   },
   {
-    title: "Starost 3–4 leta",
-    text: "Prikazane so 4 slike. Zgornja vrstica s pravilnim vrstnim redom je ves čas vidna in zaklenjena. Igralec samo premika slike v spodnji vrstici, dokler se vrstni red ne ujema."
+    title: "Vzemi zvezdico",
+    text: "Ko igralec ponovi vse besede, se samodejno odpre zaslon z napisom BRAVO! in sliko zmajčka. S klikom na rumen gumb VZEMI ZVEZDICO se napredek shrani."
   },
   {
-    title: "Starost 5–6 let",
-    text: "Igralec si mora najprej zapomniti vrstni red slik. Slike v zgornji vrstici so prikazane 10 sekund, nato se skrijejo. Igralec mora najprej izbrati pravilne slike iz nabora (4 pravilne in 4 napačne). Nato mora izbrane slike razvrstiti v pravilen vrstni red. Na voljo je ena uporaba pomoči, ki za 5 sekund ponovno prikaže pravilni vrstni red."
-  },
-  {
-    title: "Starost 7–8 let",
-    text: "Prikazanih je 5 slik. Čas za pomnjenje je 10 sekund. Na voljo sta dve uporabi pomoči. Potek igre je sicer enak kot pri starostni skupini 5–6 let."
-  },
-  {
-    title: "Starost 9–10 let",
-    text: "Prikazanih je 5 slik. Čas za pomnjenje je skrajšan na 7 sekund. Na voljo je ena uporaba pomoči. Potek igre je enak kot pri starostni skupini 5–6 let, vendar z večjo zahtevnostjo."
+    title: "Nova igra / izhod",
+    text: "Po osvojeni zvezdici se pojavi moder gumb za novo igro (levo spodaj). S klikom na gumb Hiška se odpre meni za vrnitev nazaj."
   }
 ];
 
@@ -54,7 +50,7 @@ export const MatchingInstructionsModal: React.FC<MatchingInstructionsModalProps>
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-center">Navodila za igro Zaporedja</DialogTitle>
+          <DialogTitle className="text-xl font-bold text-center">Navodila za Igro ujemanja</DialogTitle>
         </DialogHeader>
         <div className="py-4">
           {instructionContent.map((section, index) => (
