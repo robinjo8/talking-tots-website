@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import { Volume2, Mic, Star } from 'lucide-react';
+import { Volume2, Mic } from 'lucide-react';
 import { useAudioPlayback } from '@/hooks/useAudioPlayback';
 
 interface ImageData {
@@ -36,6 +36,19 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   const { playAudio } = useAudioPlayback();
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
   const imagesInitializedRef = useRef(false);
+  const hasAutoTransitionedRef = useRef(false);
+
+  // Auto-transition to BRAVO dialog when all recordings complete
+  useEffect(() => {
+    if (displayImages.length > 0 && completedRecordings.size === displayImages.length && !hasAutoTransitionedRef.current) {
+      hasAutoTransitionedRef.current = true;
+      // Small delay for smooth transition
+      setTimeout(() => {
+        setShowBravoDialog(true);
+        onStarClaimed?.();
+      }, 500);
+    }
+  }, [completedRecordings.size, displayImages.length, onStarClaimed]);
 
   // Select 4 random images including the completed one when dialog opens
   // Use ref to prevent re-shuffling on re-renders (e.g., after claiming star)
@@ -65,6 +78,7 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   useEffect(() => {
     if (!isOpen) {
       imagesInitializedRef.current = false;
+      hasAutoTransitionedRef.current = false;
       setCompletedRecordings(new Set());
       setRecordingTimeLeft(3);
       setCurrentRecordingIndex(null);
@@ -125,14 +139,9 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
     onOpenChange(false);
   };
 
-  const handleClaimStar = () => {
-    setStarClaimed(true);
-    setShowBravoDialog(true);
-    onStarClaimed?.();
-  };
-
   const handleBravoClose = () => {
     setShowBravoDialog(false);
+    setStarClaimed(true);
     onOpenChange(false);
   };
 
@@ -152,8 +161,6 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
     }
     startRecording(imageIndex, word);
   };
-
-  const allRecordingsComplete = displayImages.length > 0 && completedRecordings.size === displayImages.length;
 
   return (
     <>
@@ -228,21 +235,10 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
               })}
             </div>
 
-            <div className="flex justify-center gap-3">
-              <Button onClick={handleClose} variant="outline" className="gap-2 flex-1 max-w-32">
+            <div className="flex justify-center">
+              <Button onClick={handleClose} variant="outline" className="gap-2 max-w-32">
                 ZAPRI
               </Button>
-              
-              {allRecordingsComplete && !starClaimed && (
-                <Button 
-                  onClick={handleClaimStar}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 flex-1 max-w-44"
-                  disabled={starClaimed}
-                >
-                  <Star className="w-4 h-4" />
-                  VZEMI ZVEZDICO
-                </Button>
-              )}
             </div>
           </div>
         </DialogContent>
