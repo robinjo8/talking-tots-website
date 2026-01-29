@@ -1,6 +1,6 @@
 import { MatchingGameImage } from '@/data/matchingGameData';
 import { cn } from '@/lib/utils';
-import { Check } from 'lucide-react';
+
 
 interface ImageTileProps {
   image: MatchingGameImage;
@@ -40,9 +40,7 @@ export function ImageTile({ image, isSelected, isMatched, onClick, className, ..
       />
       
       {isMatched && (
-        <div className="absolute inset-0 bg-dragon-green/20 rounded-xl flex items-center justify-center">
-          <Check className="h-6 w-6 text-dragon-green" />
-        </div>
+        <div className="absolute inset-0 bg-dragon-green/20 rounded-xl" />
       )}
       
       {isSelected && !isMatched && (
