@@ -21,14 +21,24 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
 }) => {
   const content: InstructionItem[] = type === "sequence"
     ? [
-        { text: "Na začetku se prikažejo 4 slike za 10 sekund. Zapomni si vrstni red!" },
-        { text: "Ko se čas izteče, slike izginejo. Klikni na prazno polje in izberi pravilno sliko." },
-        { text: "Slike se obarvajo glede na pravilnost:" },
-        { text: "Pravilna slika na pravem mestu", icon: "green" },
-        { text: "Pravilna slika na napačnem mestu", icon: "yellow" },
-        { text: "Napačna slika", icon: "red" },
-        { text: "Ko izbereš vse pravilne slike, premikaj slike levo in desno, da jih razporediš v pravilen vrstni red." },
-        { text: "Pomoč (ikona očesa) ti za 5 sekund prikaže pravilni vrstni red. Uporabiš jo lahko 3-krat." }
+        { text: "Igra Zaporedja je prilagojena različnim starostnim skupinam (3–4 let, 5–6 let, 7–8 let in 9–10 let). Z naraščajočo starostjo se povečuje zahtevnost igre, čas za pomnenje se krajša in dodajajo se dodatni koraki." },
+        { text: "Osnovni koncept", bold: true },
+        { text: "Igra Zaporedja je igra razvrščanja slik v pravilni vrstni red. Cilj igre je, da igralec slike v spodnji vrstici razporedi tako, da se ujemajo s pravilnim vrstnim redom. Vsaka slika prikazuje besedo, ki se začne z izbrano črko (na primer C)." },
+        { text: "Začetek igre", bold: true },
+        { text: "Pred začetkom igre se prikaže odštevanje od 5 do 1. Po odštevanju se na zaslonu prikažeta dve vrstici s slikami. Zgornja vrstica predstavlja pravilni vrstni red in je zaklenjena. Spodnja vrstica vsebuje iste slike, vendar v naključnem vrstnem redu. Pri starejših starostnih skupinah se slike v zgornji vrstici najprej prikažejo za omejen čas, nato pa se skrijejo." },
+        { text: "Premikanje slik", bold: true },
+        { text: "Igralec prime sliko v spodnji vrstici in jo povleče na drugo mesto. Med premikanjem je slika označena z modro obrobo. Ko igralec sliko spusti, se ta zamenja z drugo sliko na izbranem mestu. Pri naprednejših različicah igralec slike najprej izbira iz nabora in jih nato razvršča s pomočjo gumbov za premik levo in desno." },
+        { text: "Zaključek igre", bold: true },
+        { text: "Ko igralec pravilno razvrsti vse slike, se prikaže napis ČESTITAM! Odpre se pogovorno okno z naslovom ODLIČNO! Igralec mora klikniti na vsako sliko in ponoviti besedo s 3-sekundnim snemanjem. Ko so vse besede ponovljene, se prikaže rumen gumb VZEMI ZVEZDICO, s katerim se shrani napredek in zaključi igra." },
+        { text: "Razlike med starostnimi skupinami", bold: true },
+        { text: "Starost 3–4 leta", bold: true },
+        { text: "Prikazane so 4 slike. Zgornja vrstica s pravilnim vrstnim redom je ves čas vidna in zaklenjena. Igralec samo premika slike v spodnji vrstici, dokler se vrstni red ne ujema." },
+        { text: "Starost 5–6 let", bold: true },
+        { text: "Igralec si mora najprej zapomniti vrstni red slik. Slike v zgornji vrstici so prikazane 10 sekund, nato se skrijejo. Igralec mora najprej izbrati pravilne slike iz nabora (4 pravilne in 4 napačne). Nato mora izbrane slike razvrstiti v pravilen vrstni red. Na voljo je ena uporaba pomoči, ki za 5 sekund ponovno prikaže pravilni vrstni red." },
+        { text: "Starost 7–8 let", bold: true },
+        { text: "Prikazanih je 5 slik. Čas za pomnjenje je 10 sekund. Na voljo sta dve uporabi pomoči. Potek igre je sicer enak kot pri starostni skupini 5–6 let." },
+        { text: "Starost 9–10 let", bold: true },
+        { text: "Prikazanih je 5 slik. Čas za pomnjenje je skrajšan na 7 sekund. Na voljo je ena uporaba pomoči. Potek igre je enak kot pri starostni skupini 5–6 let, vendar z večjo zahtevnostjo." }
       ]
     : type === "articulation"
     ? [
