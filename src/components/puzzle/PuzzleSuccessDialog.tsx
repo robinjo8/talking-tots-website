@@ -30,6 +30,7 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   const [recordingTimeLeft, setRecordingTimeLeft] = useState(3);
   const [currentRecordingIndex, setCurrentRecordingIndex] = useState<number | null>(null);
   const [starClaimed, setStarClaimed] = useState(false);
+  const [showBravoDialog, setShowBravoDialog] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [displayImages, setDisplayImages] = useState<ImageData[]>([]);
   const { playAudio } = useAudioPlayback();
@@ -68,6 +69,7 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
       setRecordingTimeLeft(3);
       setCurrentRecordingIndex(null);
       setStarClaimed(false);
+      setShowBravoDialog(false);
       if (countdownRef.current) {
         clearInterval(countdownRef.current);
         countdownRef.current = null;
@@ -125,10 +127,13 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
 
   const handleClaimStar = () => {
     setStarClaimed(true);
+    setShowBravoDialog(true);
     onStarClaimed?.();
-    setTimeout(() => {
-      onOpenChange(false);
-    }, 1500);
+  };
+
+  const handleBravoClose = () => {
+    setShowBravoDialog(false);
+    onOpenChange(false);
   };
 
   const handlePlayAudio = (image: ImageData) => {
@@ -152,7 +157,7 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={handleClose}>
+      <Dialog open={isOpen && !showBravoDialog} onOpenChange={handleClose}>
         <DialogContent className="sm:max-w-lg">
           <div className="space-y-4 py-4">
             <h2 className="text-2xl font-bold text-dragon-green text-center uppercase">ODLIČNO!</h2>
@@ -239,6 +244,28 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
                 </Button>
               )}
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* BRAVO dialog - shown after claiming star */}
+      <Dialog open={showBravoDialog} onOpenChange={handleBravoClose}>
+        <DialogContent className="sm:max-w-md">
+          <div className="text-center py-6">
+            <h1 className="text-5xl font-bold text-dragon-green mb-6">
+              BRAVO!
+            </h1>
+            <img
+              src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_11.webp"
+              alt="Zmajček"
+              className="w-48 h-48 object-contain mx-auto mb-6"
+            />
+            <Button
+              onClick={handleBravoClose}
+              className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-8 py-3 text-lg"
+            >
+              ⭐ VZEMI ZVEZDICO
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
