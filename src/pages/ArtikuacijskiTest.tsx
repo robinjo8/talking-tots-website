@@ -303,10 +303,9 @@ const ArtikuacijskiTest = () => {
       <div className="flex-1 flex flex-col items-center justify-start px-4 overflow-hidden">
         {/* Progress Grid */}
         <div 
-          className="w-full max-w-lg bg-white/90 backdrop-blur-sm rounded-xl shadow-lg mb-3 flex-shrink-0"
+          className="w-full max-w-lg bg-white/90 backdrop-blur-sm rounded-xl shadow-lg mb-2 flex-shrink-0"
           style={{ 
-            padding: dimensions?.isCompact ? '8px' : '16px',
-            maxHeight: dimensions?.progressGridHeight 
+            padding: dimensions?.isCompact ? '8px' : '12px',
           }}
         >
           <ArticulationProgressGrid
@@ -317,11 +316,11 @@ const ArtikuacijskiTest = () => {
           />
         </div>
 
-        {/* Current letter and position - hidden on mobile */}
-        <div className="hidden md:block text-center mb-2 flex-shrink-0">
+        {/* Current letter and position */}
+        <div className="text-center mb-2 flex-shrink-0">
           <h2 className={cn(
             "font-bold text-white drop-shadow-md",
-            dimensions?.isCompact ? "text-lg" : "text-xl md:text-2xl"
+            dimensions?.isCompact ? "text-base" : "text-lg md:text-xl"
           )}>
             {currentLetter} - {positionLabel}
           </h2>
