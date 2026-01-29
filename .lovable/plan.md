@@ -1,218 +1,241 @@
 
-# Načrt: Vse besedilo v pop-up oknih z velikimi tiskanimi črkami
 
-## Pregled
+## Implementacija nastavitev za preverjanje izgovorjave
 
-Potrebno je pregledati vse pop-up dialoge znotraj iger in zagotoviti, da je VSE besedilo napisano z velikimi tiskanimi črkami (uppercase).
+### Povzetek sprememb
 
----
-
-## Analiza dialošnih komponent
-
-### 1. StarCollectDialog.tsx (Labirint - pobiranje zvezd)
-**Lokacija:** `src/components/games/StarCollectDialog.tsx`
-
-| Vrstica | Trenutno besedilo | Potrebna sprememba |
-|---------|-------------------|---------------------|
-| 132 | `Odlično! Pobral si {starNumber}. zvezdico!` | `ODLIČNO! POBRAL SI {starNumber}. ZVEZDICO!` |
-| 136 | `KLIKNI NA SLIKO IN PONOVI BESEDO` | ✅ Že uppercase |
-| 191-192 | `PREDVAJAJ` | ✅ Že uppercase |
+Dodajamo sistem nastavitev s tremi stopnjami zahtevnosti (nizka, srednja, visoka), ki prilagaja:
+1. Čas snemanja (5s, 4s, 3s)
+2. Levenshtein prag glede na dolžino besede
+3. Avtomatsko shranjevanje napredka za nadaljevanje testa
 
 ---
 
-### 2. MemoryPairDialog.tsx (Spomin - par dialog)
-**Lokacija:** `src/components/games/MemoryPairDialog.tsx`
+### Stopnje zahtevnosti
 
-| Vrstica | Trenutno besedilo | Potrebna sprememba |
-|---------|-------------------|---------------------|
-| 126 | `Par {pairNumber} od {totalPairs}` | `PAR {pairNumber} OD {totalPairs}` |
-| 131 | `KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO` | ✅ Že uppercase |
-| 199 | `Ponovi` | `PONOVI` |
-| 214 | `Vzemi zvezdico` | `VZEMI ZVEZDICO` |
-| 216 | `Nadaljuj` | `NADALJUJ` |
+| Zahtevnost | Čas snemanja | 3 črke | 4 črke | 5 črk | 6 črk |
+|------------|--------------|--------|--------|-------|-------|
+| **Nizka**  | 5 sekund     | ≥33%   | ≥25%   | ≥35%  | ≥30%  |
+| **Srednja** (privzeto) | 4 sekunde | ≥65% | ≥50% | ≥50% | ≥50% |
+| **Visoka** | 3 sekunde    | ≥65%   | ≥70%   | ≥75%  | ≥65%  |
 
 ---
 
-### 3. BingoSuccessDialog.tsx (Bingo)
-**Lokacija:** `src/components/bingo/BingoSuccessDialog.tsx`
+### Datoteke za ustvarjanje
 
-| Vrstica | Trenutno besedilo | Potrebna sprememba |
-|---------|-------------------|---------------------|
-| 116 | `🎉 Čestitke! 🎉` / `Odlično!` | `🎉 ČESTITKE! 🎉` / `ODLIČNO!` |
-| 120 | `KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO` | ✅ Že uppercase |
-| 189 | `⭐ VZEMI ZVEZDICO` | ✅ Že uppercase |
-| 195 | `NADALJUJ` | ✅ Že uppercase |
+#### 1. `src/hooks/useArticulationSettings.ts`
+Nov hook za upravljanje nastavitev:
+- Shranjuje izbrano zahtevnost v localStorage
+- Privzeta vrednost: "srednja"
+- Vrača: trajanje snemanja, pragove za Levenshtein
 
----
+```text
+useArticulationSettings()
+├── difficulty: "nizka" | "srednja" | "visoka"
+├── setDifficulty(value)
+├── recordingDuration: 5 | 4 | 3
+└── getThresholdForWordLength(length): number
+```
 
-### 4. BingoCongratulationsDialog.tsx
-**Lokacija:** `src/components/bingo/BingoCongratulationsDialog.tsx`
+#### 2. `src/components/articulation/ArticulationSettingsDialog.tsx`
+Dialog za izbiro zahtevnosti:
+- Radio group z 3 opcijami
+- Razlaga za vsako stopnjo
+- Gumb "Shrani"
 
-| Vrstica | Trenutno besedilo | Potrebna sprememba |
-|---------|-------------------|---------------------|
-| 25 | `BRAVO!` | ✅ Že uppercase |
-| 36 | `⭐ VZEMI ZVEZDICO` | ✅ Že uppercase |
+```text
+┌─────────────────────────────────────────────────┐
+│  ⚙️  Nastavitve preverjanja                     │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│  Izberite zahtevnost preverjanja:               │
+│                                                 │
+│  ○ Nizka                                        │
+│    Za otroke z večjimi govornimi težavami       │
+│    Čas snemanja: 5 sekund                       │
+│                                                 │
+│  ● Srednja (priporočeno)                        │
+│    Za večino otrok                              │
+│    Čas snemanja: 4 sekunde                      │
+│                                                 │
+│  ○ Visoka                                       │
+│    Za otroke brez večjih težav                  │
+│    Čas snemanja: 3 sekunde                      │
+│                                                 │
+│            ┌────────────┐                       │
+│            │   Shrani   │                       │
+│            └────────────┘                       │
+└─────────────────────────────────────────────────┘
+```
 
----
+#### 3. `src/components/articulation/ArticulationResumeDialog.tsx`
+Dialog za nadaljevanje testa:
+- Prikaže se ob vstopu če obstaja shranjen napredek
+- Gumba "Nadaljuj" in "Začni znova"
 
-### 5. PuzzleSuccessDialog.tsx (Sestavljanke, Drsna, Poveži)
-**Lokacija:** `src/components/puzzle/PuzzleSuccessDialog.tsx`
-
-| Vrstica | Trenutno besedilo | Potrebna sprememba |
-|---------|-------------------|---------------------|
-| 158 | `Odlično!` | `ODLIČNO!` |
-| 161 | `KLIKNI NA SPODNJE SLIKE IN PONOVI BESEDE` | ✅ Že uppercase |
-| 228 | `ZAPRI` | ✅ Že uppercase |
-| 238 | `VZEMI ZVEZDICO` | ✅ Že uppercase |
-
----
-
-### 6. WheelSuccessDialog.tsx (Kolo sreče)
-**Lokacija:** `src/components/wheel/WheelSuccessDialog.tsx`
-
-| Vrstica | Trenutno besedilo | Potrebna sprememba |
-|---------|-------------------|---------------------|
-| 203 | `🎉 Čestitke! 🎉` / `Odlično!` | `🎉 ČESTITKE! 🎉` / `ODLIČNO!` |
-| 207 | `KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO` | ✅ Že uppercase |
-| 255 | `Izgovoril si {displayCount}/3 krat` | `IZGOVORIL SI {displayCount}/3 KRAT` |
-| 256 | `(še ${3 - displayCount}x za zvezdico)` | `(ŠE ${3 - displayCount}X ZA ZVEZDICO)` |
-| 280 | `VZEMI ZVEZDICO` | ✅ Že uppercase |
-| 284 | `NADALJUJ` | ✅ Že uppercase |
-
----
-
-### 7. StarEarnedDialog.tsx (Met kocke - zvezdica)
-**Lokacija:** `src/components/dice/StarEarnedDialog.tsx`
-
-| Vrstica | Trenutno besedilo | Potrebna sprememba |
-|---------|-------------------|---------------------|
-| 19 | `BRAVO!` | ✅ Že uppercase |
-| 23 | `OSVOJIL SI ZVEZDICO!` | ✅ Že uppercase |
-| 35 | `VZEMI ZVEZDICO` | ✅ Že uppercase |
-
----
-
-### 8. DiceResultDialog.tsx (Met kocke - rezultat)
-**Lokacija:** `src/components/dice/DiceResultDialog.tsx`
-
-| Vrstica | Trenutno besedilo | Potrebna sprememba |
-|---------|-------------------|---------------------|
-| 143 | `ODLIČNO!` | ✅ Že uppercase |
-| 148-149 | `POSLUŠAJ IN PONOVI BESEDE` | ✅ Že uppercase |
-| 163-165 | Besede `.toUpperCase()` | ✅ Že uppercase |
-| 171-172 | Poved `.toUpperCase()` | ✅ Že uppercase |
-| 183 | `PREDVAJAJ` | ✅ Že uppercase |
-| 192 | `PONOVI` | ✅ Že uppercase |
-| 201 | `ZAPRI` | ✅ Že uppercase |
+```text
+┌─────────────────────────────────────────────────┐
+│        🔄 Nadaljevanje preverjanja              │
+│                                                 │
+│   Zaznali smo nedokončano preverjanje.          │
+│   Ali želite nadaljevati?                       │
+│                                                 │
+│   📍 Zadnja beseda: OBLAK (2/60)                │
+│   ⏱️  Shranjeno: pred 2 urama                    │
+│                                                 │
+│   ┌──────────────┐  ┌─────────────────┐         │
+│   │  Nadaljuj    │  │  Začni znova    │         │
+│   └──────────────┘  └─────────────────┘         │
+└─────────────────────────────────────────────────┘
+```
 
 ---
 
-### 9. MatchingCompletionDialog.tsx (Igra ujemanja)
-**Lokacija:** `src/components/matching/MatchingCompletionDialog.tsx`
+### Datoteke za posodobitev
 
-| Vrstica | Trenutno besedilo | Potrebna sprememba |
-|---------|-------------------|---------------------|
-| 189 | `Odlično!` | `ODLIČNO!` |
-| 252 | `Zapri` | `ZAPRI` |
-| 262 | `Vzemi zvezdico` | `VZEMI ZVEZDICO` |
-| 273 | `Nova igra` | `NOVA IGRA` |
-| 278 | `Zapri` | `ZAPRI` |
+#### 4. `src/pages/ArtikuacijskiTest.tsx`
+- Uvoz novih komponent in hookov
+- Dodaj state za `showSettingsDialog` in `showResumeDialog`
+- Dodaj gumb "Nastavitve" v dropdown menu (za "Navodila")
+- Integracija z `useArticulationSettings` hook
+- Prikaz `ArticulationResumeDialog` ob zagonu
 
----
+```typescript
+// Dodaj v dropdown menu:
+<button onClick={() => setShowSettingsDialog(true)}>
+  <span>⚙️</span><span>Nastavitve</span>
+</button>
+```
 
-### 10. TrophyDialog.tsx (Pokal ob 100 zvezdicah)
-**Lokacija:** `src/components/exercises/TrophyDialog.tsx`
+#### 5. `src/hooks/useArticulationTestNew.ts`
+- Shranjevanje napredka v localStorage po vsaki besedi
+- Nalaganje shranjenega napredka ob inicializaciji
+- Brisanje napredka ob zaključku testa
+- Nova funkcija `loadSavedProgress()` in `clearProgress()`
 
-| Vrstica | Trenutno besedilo | Potrebna sprememba |
-|---------|-------------------|---------------------|
-| 40 | `🎉 ČESTITKE! 🎉` | ✅ Že uppercase |
-| 43 | `Čestitamo {childName} za osvojeni pokal!` | `ČESTITAMO {childName} ZA OSVOJENI POKAL!` |
-| 63 | `⭐ {totalStars} ZVEZD ⭐` | ✅ Že uppercase |
-| 67 | `Bravo, to je tvoj {trophyNumber}. pokal!` | `BRAVO, TO JE TVOJ {trophyNumber}. POKAL!` |
-| 75 | `Vzemi pokal` / `Nadaljuj z vajami` | `VZEMI POKAL` / `NADALJUJ Z VAJAMI` |
+```typescript
+// localStorage struktura:
+{
+  childId: string,
+  sessionNumber: number,
+  currentWordIndex: number,
+  timestamp: number, // za preverjanje veljavnosti (max 7 dni)
+  difficulty: "nizka" | "srednja" | "visoka"
+}
+```
 
----
+#### 6. `src/components/articulation/ArticulationRecordButton.tsx`
+- Sprejme nov prop `recordingDuration` (namesto fiksnih 3 sekund)
+- Posodobi `useAudioRecording` klic z dinamičnim trajanjem
+- Posodobi progress bar izračun
 
-### 11. PonoviPovedGame.tsx - Sentence Dialog & Success Dialog
-**Lokacija:** `src/components/games/PonoviPovedGame.tsx`
+```typescript
+// Sprememba:
+const { ... } = useAudioRecording(recordingDuration, onRecordingComplete);
+const progressPercent = ((recordingDuration - countdown) / recordingDuration) * 100;
+```
 
-| Vrstica | Trenutno besedilo | Potrebna sprememba |
-|---------|-------------------|---------------------|
-| 952 | `ODLIČNO!` | ✅ Že uppercase |
-| 957-958 | `POSLUŠAJ IN PONOVI POVED` | ✅ Že uppercase |
-| 1002 | `PONOVI` | ✅ Že uppercase |
-| 1014 | `NAPREJ` | ✅ Že uppercase |
-| 1026 | `Opozorilo` | `OPOZORILO` |
-| 1028 | `Če zapreš okno, se bo igra začela od začetka...` | `ČE ZAPREŠ OKNO, SE BO IGRA ZAČELA OD ZAČETKA...` |
-| 1032 | `Ne` | `NE` |
-| 1037 | `Da` | `DA` |
-| 1047 | `Opozorilo` | `OPOZORILO` |
-| 1049 | `Ali res želiš zapustiti igro?...` | `ALI RES ŽELIŠ ZAPUSTITI IGRO?...` |
-| 1053 | `Ne` | `NE` |
-| 1058 | `Da` | `DA` |
-| 1068 | `Navodila` | `NAVODILA` |
-| 1069-1075 | Navodilno besedilo | Uppercase za vse |
-| 1080 | `Razumem` | `RAZUMEM` |
-| 1094-1095 | `ČESTITKE!` | ✅ Že uppercase |
-| 1099 | `Odlično si ponovil/a vse povedi!` | `ODLIČNO SI PONOVIL/A VSE POVEDI!` |
-| 1133 | `⭐ Vzemi zvezdico` | `⭐ VZEMI ZVEZDICO` |
+#### 7. `src/hooks/useTranscription.ts`
+- Dodaj parameter `difficulty` v klic edge funkcije
+- Pošlje zahtevnost skupaj z avdio podatki
 
----
+```typescript
+body: {
+  audio: audioBase64,
+  targetWord,
+  acceptedVariants,
+  difficulty, // NOVO
+  ...
+}
+```
 
-### 12. GenericLabirintGame.tsx - Instructions Dialog
-**Lokacija:** `src/components/games/GenericLabirintGame.tsx`
+#### 8. `supabase/functions/transcribe-articulation/index.ts`
+- Sprejme `difficulty` parameter iz requesta
+- Nova funkcija `getThresholdForWord(wordLength, difficulty)`
+- Uporabi dinamični prag namesto fiksnih 70%
 
-| Vrstica | Trenutno besedilo | Potrebna sprememba |
-|---------|-------------------|---------------------|
-| 326 | `📖 Navodila` | `📖 NAVODILA` |
-| 328 | `Poišči pot skozi labirint...` | `POIŠČI POT SKOZI LABIRINT...` |
-| 333 | `Razumem` | `RAZUMEM` |
-| 401-403 | (Enako kot zgoraj) | Enako |
-| 407-408 | `Razumem` | `RAZUMEM` |
-
----
-
-### 13. ConfirmDialog.tsx (Splošni potrditveni dialog)
-**Lokacija:** `src/components/ui/confirm-dialog.tsx`
-
-Ta komponenta prejema `title` in `description` kot props. Besedilo se nastavi v starševski komponenti - posodobiti je treba klice te komponente.
-
----
-
-### 14. MemoryExitConfirmationDialog.tsx
-**Lokacija:** `src/components/games/MemoryExitConfirmationDialog.tsx`
-
-| Vrstica | Trenutno besedilo | Potrebna sprememba |
-|---------|-------------------|---------------------|
-| 18 | `Opozorilo` | `OPOZORILO` |
-| 20 | `Ali res želite prekiniti igro?` | `ALI RES ŽELITE PREKINITI IGRO?` |
-| 27 | `Da` | `DA` |
-| 31 | `Ne` | `NE` |
+```typescript
+// Nova logika:
+function getThresholdForWord(wordLength: number, difficulty: string): number {
+  const thresholds = {
+    nizka:   { 3: 0.33, 4: 0.25, 5: 0.35, 6: 0.30 },
+    srednja: { 3: 0.65, 4: 0.50, 5: 0.50, 6: 0.50 },
+    visoka:  { 3: 0.65, 4: 0.70, 5: 0.75, 6: 0.65 }
+  };
+  // Za besede krajše od 3 ali daljše od 6: uporabi najbližjo
+  const len = Math.min(Math.max(wordLength, 3), 6);
+  return thresholds[difficulty]?.[len] ?? thresholds.srednja[len];
+}
+```
 
 ---
 
-## Povzetek sprememb
+### Diagram poteka
 
-| Datoteka | Število sprememb |
-|----------|------------------|
-| `StarCollectDialog.tsx` | 1 |
-| `MemoryPairDialog.tsx` | 4 |
-| `BingoSuccessDialog.tsx` | 1 |
-| `PuzzleSuccessDialog.tsx` | 1 |
-| `WheelSuccessDialog.tsx` | 3 |
-| `MatchingCompletionDialog.tsx` | 5 |
-| `TrophyDialog.tsx` | 4 |
-| `PonoviPovedGame.tsx` | ~15 |
-| `GenericLabirintGame.tsx` | 6 (na 2 mestih) |
-| `MemoryExitConfirmationDialog.tsx` | 4 |
-
-**Skupno: 10 datotek, ~44 besedilnih sprememb**
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│                    VSTOP NA STRAN                               │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  1. Preveri localStorage za shranjen napredek                   │
+│     │                                                           │
+│     ├── Če obstaja in < 7 dni → Prikaži ResumeDialog            │
+│     │   ├── [Nadaljuj] → Nastavi currentWordIndex               │
+│     │   └── [Začni znova] → Počisti localStorage                │
+│     │                                                           │
+│     └── Če ne obstaja → Prikaži InfoDialog (kot doslej)         │
+│                                                                 │
+│  2. Med testom                                                  │
+│     │                                                           │
+│     ├── Snemanje: uporabi trajanje glede na zahtevnost          │
+│     │                                                           │
+│     ├── Transkripcija: pošlje zahtevnost v edge funkcijo        │
+│     │                                                           │
+│     ├── Validacija: dinamični Levenshtein prag                  │
+│     │   └── getThresholdForWord(dolžina, zahtevnost)            │
+│     │                                                           │
+│     └── Po vsaki besedi: shrani napredek v localStorage         │
+│                                                                 │
+│  3. Ob zaključku                                                │
+│     └── Počisti localStorage (napredek)                         │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## Tehnična implementacija
+### Zaporedje implementacije
 
-Za vsako besedilo bo potrebno:
-1. Zamenjati male črke z velikimi
-2. Za dinamične vrednosti (npr. `{pairNumber}`) ohraniti interpolacijo
-3. Uporabiti `.toUpperCase()` za dinamične stringe kjer je primerno
+| Korak | Opis | Odvisnosti |
+|-------|------|------------|
+| 1 | Ustvari `useArticulationSettings.ts` hook | - |
+| 2 | Ustvari `ArticulationSettingsDialog.tsx` | Korak 1 |
+| 3 | Ustvari `ArticulationResumeDialog.tsx` | - |
+| 4 | Posodobi `ArticulationRecordButton.tsx` za dinamično trajanje | Korak 1 |
+| 5 | Posodobi `useTranscription.ts` za pošiljanje zahtevnosti | Korak 1 |
+| 6 | Posodobi edge funkcijo z dinamičnimi pragi | - |
+| 7 | Posodobi `useArticulationTestNew.ts` za shranjevanje napredka | Korak 1 |
+| 8 | Posodobi `ArtikuacijskiTest.tsx` z vsemi novimi komponentami | Koraki 1-7 |
+
+---
+
+### Tehnične podrobnosti
+
+**localStorage ključi:**
+- `articulation_settings` - shrani izbrano zahtevnost
+- `articulation_progress` - shrani napredek testa
+
+**Validacija napredka:**
+- Max starost: 7 dni (604800000 ms)
+- Preveri ujemanje `childId` s trenutnim otrokom
+- Če ne ustreza, napredek ignorira
+
+**Levenshtein tabela (max dovoljene napake):**
+
+| Dolžina | Nizka | Srednja | Visoka |
+|---------|-------|---------|--------|
+| 3 črke  | d ≤ 2 | d ≤ 1   | d ≤ 1  |
+| 4 črke  | d ≤ 3 | d ≤ 2   | d ≤ 1  |
+| 5 črk   | d ≤ 3 | d ≤ 2   | d ≤ 1  |
+| 6 črk   | d ≤ 4 | d ≤ 3   | d ≤ 2  |
+
