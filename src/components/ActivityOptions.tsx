@@ -21,7 +21,7 @@ export function ActivityOptions() {
   const activities = [
     {
       id: 'challenges',
-      title: 'Moji izzivi',
+      title: 'Moj osebni načrt',
       description: 'Priporočila pametnega asistenta.',
       image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_izzivi_6.png',
       gradient: 'from-app-orange/20 to-app-yellow/20',
@@ -128,7 +128,7 @@ export function ActivityOptions() {
             >
             {/* Card Image */}
             <div className={`relative aspect-video overflow-hidden bg-gradient-to-br ${activity.gradient}`}>
-              {/* Recommended badge - static on Moji izzivi */}
+              {/* Recommended badge - static on Moj osebni načrt */}
               {activity.id === 'challenges' && !isProLocked && (
                 <div className="absolute top-4 left-4 bg-dragon-green text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-1 z-10">
                   ⭐ Priporočeno

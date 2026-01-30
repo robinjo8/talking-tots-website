@@ -43,7 +43,7 @@ export const FooterSection = () => {
                   onClick={() => handleProtectedNavigate("/moji-izzivi")}
                   className="text-muted-foreground hover:text-dragon-green transition-colors text-left"
                 >
-                  Moji izzivi
+                  Moj osebni načrt
                 </button>
               </li>
               <li>

@@ -27,9 +27,9 @@ export default function MojiIzzivi() {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6 pb-4 flex-grow text-center">
-              <h3 className="text-lg font-semibold mb-2 text-app-orange">Moji izzivi</h3>
+              <h3 className="text-lg font-semibold mb-2 text-app-orange">Moj osebni načrt</h3>
               <p className="text-sm text-gray-600">
-                Tukaj boš našel svoje govorne izzive, ki jih lahko opraviš za dodatne točke!
+                Tukaj boš našel svoj osebni načrt za vadbo govora!
               </p>
             </CardContent>
           </Card>
