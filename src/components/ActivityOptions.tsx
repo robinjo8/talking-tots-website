@@ -23,7 +23,7 @@ export function ActivityOptions() {
       id: 'challenges',
       title: 'Moj osebni načrt',
       description: 'Priporočila pametnega asistenta.',
-      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_izzivi_6.png',
+      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_izzivi_6.webp',
       gradient: 'from-app-orange/20 to-app-yellow/20',
       badge: '⭐',
       url: '/moji-izzivi'
@@ -32,7 +32,7 @@ export function ActivityOptions() {
       id: 'games',
       title: 'Govorne igre',
       description: 'Zabavne igre za izboljšanje izgovorjave.',
-      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_igre_4.png',
+      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_igre_4.webp',
       gradient: 'from-dragon-green/20 to-dragon-green/20',
       badge: '🎮',
       url: '/govorne-igre'
@@ -41,7 +41,7 @@ export function ActivityOptions() {
       id: 'exercises',
       title: 'Govorne vaje',
       description: 'Prilagojene aktivnosti za izboljšanje izgovorjave.',
-      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_vaje_6.png',
+      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_vaje_6.webp',
       gradient: 'from-app-blue/20 to-app-teal/20',
       badge: '📝',
       url: '/govorno-jezikovne-vaje'
