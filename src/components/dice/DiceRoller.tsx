@@ -93,7 +93,7 @@ export function DiceRoller({ isVisible, currentStep, onRollComplete }: DiceRolle
             onRollComplete(finalResult);
           }, 400);
         }
-      }, 50);
+      }, 60);
 
       return () => clearInterval(spinInterval);
     }
