@@ -75,9 +75,6 @@ export const MatchingInstructionsModal: React.FC<MatchingInstructionsModalProps>
             </div>
           ))}
         </div>
-        <div className="flex justify-end">
-          <Button onClick={onClose}>RAZUMEM</Button>
-        </div>
       </DialogContent>
     </Dialog>
   );
