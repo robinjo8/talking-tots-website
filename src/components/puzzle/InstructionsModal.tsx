@@ -104,13 +104,24 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
       ]
     : type === "dice"
     ? [
-        { text: "Klikni na gumb 'VRZI KOCKO' da vržeš kocko." },
-        { text: "Kocka bo pokazala številko od 1 do 6." },
-        { text: "Ta številka določi, katera slika se bo izbrala v stolpcu." },
-        { text: "Vrzi kocko trikrat - za BITJE, POVEDEK in PREDMET." },
-        { text: "Ko so vse tri slike izbrane, se prikaže smešna poved." },
-        { text: "Poslušaj poved in jo ponovi s snemanjem." },
-        { text: "Za vsako uspešno poved dobiš zvezdico!" }
+        { text: "Osnovni koncept", bold: true },
+        { text: "Igra Smešne povedi je igra sestavljanja smešnih povedi s pomočjo meta kocke. Cilj je, da igralec z metanjem kocke izbere tri slike iz stolpcev BITJE, POVEDEK in PREDMET ter sestavi smešno poved. Vse besede se začnejo z izbrano črko." },
+        { text: "Začetek igre", bold: true },
+        { text: "Na zaslonu se prikaže mreža s tremi stolpci (BITJE, POVEDEK, PREDMET) in šestimi vrsticami. Vsaka vrstica ustreza eni stranici kocke (1–6). Na levi strani so prikazane ikone kock s pikami." },
+        { text: "Metanje kocke", bold: true },
+        { text: "Kocka se najprej avtomatsko vrže za stolpec BITJE. Po pristanku se označi ustrezna vrstica v prvem stolpcu. Nato se kocka samodejno vrže za POVEDEK in nato še za PREDMET." },
+        { text: "Prikaz povedi", bold: true },
+        { text: "Ko so vse tri slike izbrane, se odpre pogovorno okno s tremi slikami in sestavljena povedjo. Igralec si lahko ogleda celotno poved in posluša zvočni posnetek." },
+        { text: "Ponovitev povedi", bold: true },
+        { text: "Igralec klikne gumb PONOVI, kar sproži 3-sekundno snemanje z vizualnim odštevalnikom 3–2–1. Igralec glasno ponovi celotno poved." },
+        { text: "Indikator napredka", bold: true },
+        { text: "Na vrhu zaslona je prikazan indikator napredka s 5 belimi pikami. Po vsaki uspešno zaključeni povedi se ena pika obarva oranžno." },
+        { text: "Vzemi zvezdico", bold: true },
+        { text: "Po 5 uspešno zaključenih povedih se prikaže okno z napisom BRAVO! in sliko zmajčka. S klikom na rumen gumb VZEMI ZVEZDICO se napredek shrani." },
+        { text: "Nova igra / izhod", bold: true },
+        { text: "Po osvojeni zvezdici se pojavi moder gumb za novo igro (levo spodaj). S klikom na gumb Hiška se vrnete v meni." },
+        { text: "Cilj igre", bold: true },
+        { text: "Vaditi izgovorjavo posamezne črke (na primer C, Č, K) s pomočjo sestavljanja smešnih povedi in zbiranja zvezdic." }
       ]
     : type === "wheel"
     ? [
@@ -176,7 +187,7 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
     : type === "bingo"
     ? "Navodila za Bingo"
     : type === "dice"
-    ? "Navodila za Met kocke"
+    ? "Navodila za igro Smešne povedi"
     : type === "wheel"
     ? "Navodila za igro"
     : type === "spomin"
