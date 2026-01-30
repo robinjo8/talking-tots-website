@@ -68,12 +68,18 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
       ]
     : type === "maze"
     ? [
-        { text: "Premikaj zmajčka z miško (podrsaj) ali s puščičnimi tipkami." },
-        { text: "Zmajček se premakne do naslednjega križišča ali zidu." },
-        { text: "Cilj je priti od starta (zgoraj) do cilja (spodaj)." },
-        { text: "Ko prideš do cilja, se bo prikazala slika besede na črko." },
-        { text: "Poslušaj besedo in jo ponovi v mikrofon." },
-        { text: "Osvoji zvezdo za vsak uspešno opravljen labirint!" }
+        { text: "Osnovni koncept", bold: true },
+        { text: "Igra Labirint je igra iskanja poti skozi labirint. Cilj je, da zmajček pobere vse 4 zvezdice in pride do cilja (zastavice). Ob vsaki zvezdici mora igralec ponoviti besedo, ki se začne z izbrano črko." },
+        { text: "Premikanje zmajčka", bold: true },
+        { text: "Na mobilnih napravah igralec podrsne po zaslonu v želeno smer. Na namiznih napravah uporablja puščične tipke ali klikne/podrsne z miško. Zmajček se premakne do naslednjega križišča ali zidu." },
+        { text: "Pobiranje zvezdic", bold: true },
+        { text: "Ko zmajček pride do zvezdice, se odpre pogovorno okno s sliko in besedo. Igralec klikne na sliko, kar sproži 3-sekundno snemanje z vizualnim odštevalnikom 3–2–1. Po končanem snemanju se zvezdica zabeleži in igralec nadaljuje pot." },
+        { text: "Odklepanje cilja", bold: true },
+        { text: "Cilj (zastavica) je na začetku zaklenjen. Ko igralec pobere vse 4 zvezdice, se zid pred ciljem odpre in zmajček lahko nadaljuje do zastavice." },
+        { text: "Zaključek igre", bold: true },
+        { text: "Ko zmajček pride do cilja, se odpre pogovorno okno z napisom ODLIČNO! Igralec ponovi še 4 besede. Po vseh ponovitvah se prikaže rumen gumb VZEMI ZVEZDICO, s katerim se shrani napredek." },
+        { text: "Nova igra / izhod", bold: true },
+        { text: "Po osvojeni zvezdici se pojavi moder gumb za novo igro (levo spodaj). S klikom na gumb Hiška se vrnete v meni." }
       ]
     : type === "bingo"
     ? [
@@ -166,7 +172,7 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
     : type === "sliding" 
     ? "Navodila za Drsno sestavljanko"
     : type === "maze"
-    ? "Navodila za labirint"
+    ? "Navodila za igro Labirint"
     : type === "bingo"
     ? "Navodila za Bingo"
     : type === "dice"
