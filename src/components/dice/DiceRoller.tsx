@@ -88,10 +88,10 @@ export function DiceRoller({ isVisible, currentStep, onRollComplete }: DiceRolle
           setRotation(finalRotations[finalResult]);
           setIsSpinning(false);
           
-          // Notify parent after animation settles
+          // Notify parent after animation settles - 1200ms for user to see the result
           setTimeout(() => {
             onRollComplete(finalResult);
-          }, 400);
+          }, 1200);
         }
       }, 60);
 
