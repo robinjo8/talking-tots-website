@@ -27,6 +27,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import {
   Dialog,
   DialogContent,
@@ -1042,25 +1043,13 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       </AlertDialog>
       
       {/* Exit confirmation dialog */}
-      <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="uppercase">OPOZORILO</AlertDialogTitle>
-            <AlertDialogDescription className="uppercase">
-              ALI RES ŽELIŠ ZAPUSTITI IGRO? TVOJ NAPREDEK NE BO SHRANJEN.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="bg-red-500 text-white hover:bg-red-600 uppercase">NE</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-dragon-green text-white hover:bg-dragon-green/90 uppercase"
-              onClick={() => navigate("/govorne-igre/ponovi-poved")}
-            >
-              DA
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <MemoryExitConfirmationDialog 
+        open={showExitDialog} 
+        onOpenChange={setShowExitDialog} 
+        onConfirm={() => navigate("/govorne-igre/ponovi-poved")}
+      >
+        <div />
+      </MemoryExitConfirmationDialog>
       
       {/* Instructions modal */}
       <InstructionsModal 
