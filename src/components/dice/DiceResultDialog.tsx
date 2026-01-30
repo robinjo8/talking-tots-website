@@ -78,21 +78,12 @@ export function DiceResultDialog({
     setIsPlayingSequence(false);
   }, [words, isPlayingSequence]);
 
-  // Auto-play audio sequence 1.5 seconds after dialog opens
+  // Auto-play audio sequence immediately when dialog opens (no delay, no gaps)
   useEffect(() => {
     if (isOpen && words.length > 0 && !hasAutoPlayedRef.current) {
-      autoPlayTimeoutRef.current = setTimeout(() => {
-        hasAutoPlayedRef.current = true;
-        playAudioSequence();
-      }, 1500);
+      hasAutoPlayedRef.current = true;
+      playAudioSequence();
     }
-    
-    return () => {
-      if (autoPlayTimeoutRef.current) {
-        clearTimeout(autoPlayTimeoutRef.current);
-        autoPlayTimeoutRef.current = null;
-      }
-    };
   }, [isOpen, words.length, playAudioSequence]);
 
   // Reset state when dialog closes
