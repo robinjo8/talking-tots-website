@@ -104,8 +104,9 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
       ]
     : type === "dice"
     ? [
+        { text: "Igra Smešne povedi je prilagojena za starostne skupine 5–6, 7–8 in 9–10 let." },
         { text: "Osnovni koncept", bold: true },
-        { text: "Igra Smešne povedi je igra sestavljanja smešnih povedi s pomočjo meta kocke. Cilj je, da igralec z metanjem kocke izbere tri slike iz stolpcev BITJE, POVEDEK in PREDMET ter sestavi smešno poved. Vse besede se začnejo z izbrano črko." },
+        { text: "Igra Smešne povedi je igra sestavljanja smešnih povedi s pomočjo meta kocke. Cilj je, da igralec z metanjem kocke izbere tri slike iz stolpcev BITJE, POVEDEK in PREDMET ter sestavi smešno poved. Vse besede vključujejo izbrano črko." },
         { text: "Začetek igre", bold: true },
         { text: "Na zaslonu se prikaže mreža s tremi stolpci (BITJE, POVEDEK, PREDMET) in šestimi vrsticami. Vsaka vrstica ustreza eni stranici kocke (1–6). Na levi strani so prikazane ikone kock s pikami." },
         { text: "Metanje kocke", bold: true },
