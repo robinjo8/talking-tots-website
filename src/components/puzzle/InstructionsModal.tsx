@@ -5,7 +5,7 @@ import { CheckCircle, XCircle, AlertCircle } from "lucide-react";
 interface InstructionsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  type?: "jigsaw" | "sliding" | "articulation" | "maze" | "bingo" | "sequence" | "dice" | "wheel" | "spomin";
+  type?: "jigsaw" | "sliding" | "articulation" | "maze" | "bingo" | "sequence" | "dice" | "wheel" | "spomin" | "ponoviPoved";
 }
 
 type InstructionItem = {
@@ -162,6 +162,25 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
         { text: "Zaključek igre", bold: true },
         { text: "Ko igralec pobere vse pare, se prikaže zaključno okno z napisom Čestitke! Gumb Poberi zvezdico shrani napredek in prikaže možnost za novo igro." }
       ]
+    : type === "ponoviPoved"
+    ? [
+        { text: "Osnovni koncept", bold: true },
+        { text: "Igra Ponovi poved je igra ponavljanja povedi iz treh besed. Zmajček skače po barvnih kamnih in ob vsakem skoku mora igralec ponoviti besedo ali celotno poved. Vse besede vsebujejo izbrano črko." },
+        { text: "Začetek igre", bold: true },
+        { text: "Na zaslonu se prikaže pot iz barvnih kamnov. Zmajček stoji na začetnem sivem kamnu. Na sredini zaslona je prikazan okrogel gumb s puščico za skok. Igralec pritisne gumb, da zmajček skoči na naslednji kamen." },
+        { text: "Barvni kamni", bold: true },
+        { text: "Pot je sestavljena iz barvnih kamnov, ki predstavljajo posamezne besede v povedi. Rdeči kamen pomeni prvo besedo, rumeni kamen drugo besedo in zeleni kamen tretjo besedo. Sivi kamen označuje mesto za ponovitev celotne povedi." },
+        { text: "Skok na kamen", bold: true },
+        { text: "Ko zmajček skoči na barvni kamen (rdeč, rumen ali zelen), se odpre pogovorno okno s sliko in besedo. Igralec mora klikniti gumb PONOVI, kar sproži 5-sekundno snemanje z vizualnim odštevalnikom. Po končanem snemanju se aktivira gumb NAPREJ." },
+        { text: "Ponovitev celotne povedi", bold: true },
+        { text: "Ko zmajček pride na sivi kamen, mora igralec ponoviti celotno poved iz treh besed. V pogovornem oknu so prikazane vse tri slike in celotna poved. Igralec klikne PONOVI in ponovi celotno poved." },
+        { text: "Štiri povedi", bold: true },
+        { text: "Igra obsega štiri povedi. Zmajček obkroži celotno pot in se vrne na začetek. Vsaka poved je sestavljena iz treh besed, ki vsebujejo izbrano črko." },
+        { text: "Zaključek igre", bold: true },
+        { text: "Ko igralec ponovi vse štiri povedi, se prikaže zaključno okno z napisom ČESTITKE! in sliko zmajčka. S klikom na rumen gumb VZEMI ZVEZDICO se napredek shrani." },
+        { text: "Nova igra / izhod", bold: true },
+        { text: "Po osvojeni zvezdici se pojavi moder gumb za novo igro (levo spodaj). S klikom na gumb Hiška se vrnete v meni." }
+      ]
     : [
         { text: "Osnovni koncept", bold: true },
         { text: "Igra Sestavljanka je klasična igra sestavljanja slike iz kosov. Igralec mora pravilno sestaviti celotno sliko z vlečenjem posameznih kosov na prava mesta. Vsaka slika prikazuje besedo, ki se začne z izbrano črko." },
@@ -193,6 +212,8 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
     ? "Navodila za igro"
     : type === "spomin"
     ? "Navodila za igro Spomin"
+    : type === "ponoviPoved"
+    ? "Navodila za igro Ponovi poved"
     : "Navodila za igro Sestavljanka";
 
   const getIcon = (icon?: "green" | "yellow" | "red") => {

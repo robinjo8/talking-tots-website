@@ -34,6 +34,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 
 type GamePhase = "start" | "word" | "sentence" | "complete";
 
@@ -1061,27 +1062,12 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
         </AlertDialogContent>
       </AlertDialog>
       
-      {/* Instructions dialog */}
-      <AlertDialog open={showInstructions} onOpenChange={setShowInstructions}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="uppercase">NAVODILA</AlertDialogTitle>
-            <AlertDialogDescription className="text-left space-y-2 uppercase">
-              <p>🐉 ZMAJČEK SKAČE PO BARVNIH KAMNIH.</p>
-              <p>🟢 NA ZELENEM KAMNU IZGOVORI PRVO BESEDO.</p>
-              <p>🔴 NA RDEČEM KAMNU IZGOVORI DRUGO BESEDO.</p>
-              <p>🟡 NA RUMENEM KAMNU IZGOVORI TRETJO BESEDO.</p>
-              <p>⬜ NA SIVEM KAMNU PONOVI CELO POVED!</p>
-              <p>🏆 CILJ JE OBKROŽITI VSE KAMNE IN PONOVITI VSE 4 POVEDI!</p>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction className="bg-dragon-green text-white hover:bg-dragon-green/90 uppercase">
-              RAZUMEM
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Instructions modal */}
+      <InstructionsModal 
+        isOpen={showInstructions} 
+        onClose={() => setShowInstructions(false)} 
+        type="ponoviPoved" 
+      />
       
       {/* Success dialog */}
       <Dialog open={showSuccessDialog} onOpenChange={(open) => {
