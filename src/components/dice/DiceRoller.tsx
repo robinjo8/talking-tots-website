@@ -72,7 +72,7 @@ export function DiceRoller({ isVisible, currentStep, onRollComplete }: DiceRolle
   useEffect(() => {
     if (isSpinning) {
       let spinCount = 0;
-      const maxSpins = 15 + Math.floor(Math.random() * 10);
+      const maxSpins = 8 + Math.floor(Math.random() * 5);
       
       const spinInterval = setInterval(() => {
         const randomX = Math.floor(Math.random() * 360);
@@ -91,9 +91,9 @@ export function DiceRoller({ isVisible, currentStep, onRollComplete }: DiceRolle
           // Notify parent after animation settles
           setTimeout(() => {
             onRollComplete(finalResult);
-          }, 800);
+          }, 400);
         }
-      }, 100);
+      }, 50);
 
       return () => clearInterval(spinInterval);
     }
