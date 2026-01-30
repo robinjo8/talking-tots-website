@@ -10,7 +10,6 @@ import { MatchingGame } from "@/components/matching/MatchingGame";
 import { ThreeColumnGame } from "@/components/matching/ThreeColumnGame";
 import { FourColumnGame } from "@/components/matching/FourColumnGame";
 import { MatchingInstructionsModal } from "@/components/matching/MatchingInstructionsModal";
-import { FourColumnInstructionsModal } from "@/components/matching/FourColumnInstructionsModal";
 import { MatchingCompletionDialog } from "@/components/matching/MatchingCompletionDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { getLetterData, getImagesForAgeGroup, type MatchingGameImage } from "@/data/matchingGameData";
@@ -248,26 +247,13 @@ export function GenericIgraUjemanjaGame({ config }: GenericIgraUjemanjaGameProps
     }
   };
 
-  // Render appropriate instructions modal
-  const renderInstructionsModal = () => {
-    switch (config.gameType) {
-      case 'matching':
-      case 'threeColumn':
-        return (
-          <MatchingInstructionsModal
-            isOpen={showInstructions}
-            onClose={() => setShowInstructions(false)}
-          />
-        );
-      case 'fourColumn':
-        return (
-          <FourColumnInstructionsModal
-            isOpen={showInstructions}
-            onClose={() => setShowInstructions(false)}
-          />
-        );
-    }
-  };
+  // Instructions modal - same for all game types
+  const renderInstructionsModal = () => (
+    <MatchingInstructionsModal
+      isOpen={showInstructions}
+      onClose={() => setShowInstructions(false)}
+    />
+  );
 
   const showRotateMessage = isTouchDevice && isPortrait;
 
