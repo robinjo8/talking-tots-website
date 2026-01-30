@@ -129,7 +129,7 @@ export const StarCollectDialog: React.FC<StarCollectDialogProps> = ({
           </div>
           
           <h2 className="text-xl font-bold text-dragon-green text-center uppercase">
-            ODLIČNO! POBRAL SI {starNumber}. ZVEZDICO!
+            ODLIČNO! {starNumber}. ZVEZDICA JE TVOJA!
           </h2>
           
           <p className="text-sm text-black text-center uppercase">
