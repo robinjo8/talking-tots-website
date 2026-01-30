@@ -146,7 +146,7 @@ export function DiceResultDialog({
         
         <div className="space-y-3 md:space-y-4 py-2 md:py-4">
           <p className="text-black text-center uppercase text-xs md:text-sm font-medium">
-            POSLUŠAJ IN PONOVI BESEDE
+            POSLUŠAJ IN PONOVI POVED
           </p>
           
           {/* Three images in a row */}
