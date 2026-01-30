@@ -5,6 +5,7 @@ import { MazeGame } from "@/components/games/MazeGame";
 import { StarCollectDialog } from "@/components/games/StarCollectDialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
+import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { useTrophyContext } from "@/contexts/TrophyContext";
 import {
@@ -12,14 +13,6 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { LabirintConfig } from "@/data/labirintConfig";
 import type { PuzzleImage } from "@/data/puzzleImages";
 
@@ -320,21 +313,11 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
           <span />
         </MemoryExitConfirmationDialog>
 
-        <Dialog open={showInstructions} onOpenChange={setShowInstructions}>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle className="text-center text-2xl uppercase">📖 NAVODILA</DialogTitle>
-              <DialogDescription className="text-center text-base pt-4 uppercase">
-                POIŠČI POT SKOZI LABIRINT IN POBERI VSE 4 ZVEZDICE! OB VSAKI ZVEZDICI PONOVI BESEDO. KO POBEREŠ VSE ZVEZDICE, NADALJUJ DO CILJA (ZASTAVICE).
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex justify-center pt-4">
-              <Button onClick={() => setShowInstructions(false)} className="bg-app-orange hover:bg-app-orange/90 uppercase">
-                RAZUMEM
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <InstructionsModal
+          isOpen={showInstructions}
+          onClose={() => setShowInstructions(false)}
+          type="maze"
+        />
 
         {currentStarImage && (
           <StarCollectDialog
@@ -395,21 +378,11 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
         <span />
       </MemoryExitConfirmationDialog>
 
-      <Dialog open={showInstructions} onOpenChange={setShowInstructions}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-              <DialogTitle className="text-center text-2xl uppercase">📖 NAVODILA</DialogTitle>
-              <DialogDescription className="text-center text-base pt-4 uppercase">
-                POIŠČI POT SKOZI LABIRINT IN POBERI VSE 4 ZVEZDICE! OB VSAKI ZVEZDICI PONOVI BESEDO. KO POBEREŠ VSE ZVEZDICE, NADALJUJ DO CILJA (ZASTAVICE).
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex justify-center pt-4">
-              <Button onClick={() => setShowInstructions(false)} className="bg-app-orange hover:bg-app-orange/90 uppercase">
-                RAZUMEM
-              </Button>
-            </div>
-        </DialogContent>
-      </Dialog>
+      <InstructionsModal
+        isOpen={showInstructions}
+        onClose={() => setShowInstructions(false)}
+        type="maze"
+      />
 
       {currentStarImage && (
         <StarCollectDialog
