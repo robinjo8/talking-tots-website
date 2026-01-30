@@ -1,44 +1,30 @@
 
-# Načrt za popravek igre Igra Ujemanja
+# Plan: Izboljšanje kvalitete slik na /moje-aplikacije
 
 ## Problem
-Pri igri `/govorne-igre/igra-ujemanja/c` se pojavi veliko zeleno polje in uporabnik ne more izbrati vseh slik.
+Na strani `/moje-aplikacije` tri kartice uporabljajo PNG slike iz bucketa `zmajcki`, ki so slabše kvalitete:
+- **Moj osebni načrt**: `Zmajcek_izzivi_6.png`
+- **Govorne igre**: `Zmajcek_igre_4.png`
+- **Govorne vaje**: `Zmajcek_vaje_6.png`
 
-## Vzrok napake
-V komponenti `ImageTile.tsx` manjka `relative` pozicioniranje na glavnem elementu. Ko je slika označena kot "matched" (ujemanje najdeno), se prikaže zelena prekrivna plast z `absolute inset-0` stilom. Problem je, da ta absolutna pozicionirana plast potrebuje starševski element z `relative` pozicioniranjem, da ostane omejena znotraj kartice slike.
-
-Brez `relative` na starševskem elementu se zelena prekrivna plast raztegne na prvi nadrejeni element z `relative` pozicioniranjem - v tem primeru na celotno igralno območje, kar ustvari "veliko zeleno polje" in blokira klikanje na druge slike.
+Kartica **Video navodila** ima boljšo kvaliteto, ker uporablja sliko iz drugega bucketa (`slike-ostalo`).
 
 ## Rešitev
-Dodati `relative` v className glavnega div elementa v komponenti `ImageTile.tsx`.
+Zamenjal bom `.png` končnice z `.webp` za vse tri problematične slike v datoteki `ActivityOptions.tsx`. WebP format zagotavlja boljšo kvaliteto slik pri manjši velikosti datoteke.
 
-### Spremembe v datoteki
+## Spremembe
 
-**src/components/matching/ImageTile.tsx** (vrstica 20-22):
+### Datoteka: `src/components/ActivityOptions.tsx`
 
-Trenutna koda:
-```tsx
-<div
-  onClick={onClick}
-  className={cn(
-    "flex items-center justify-center border-2 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden bg-white shadow-md",
-```
+Zamenjam tri URL-je slik:
 
-Nova koda:
-```tsx
-<div
-  onClick={onClick}
-  className={cn(
-    "relative flex items-center justify-center border-2 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden bg-white shadow-md",
-```
+| Aktivnost | Trenutna slika | Nova slika |
+|-----------|----------------|------------|
+| Moj osebni načrt | `Zmajcek_izzivi_6.png` | `Zmajcek_izzivi_6.webp` |
+| Govorne igre | `Zmajcek_igre_4.png` | `Zmajcek_igre_4.webp` |
+| Govorne vaje | `Zmajcek_vaje_6.png` | `Zmajcek_vaje_6.webp` |
 
-## Tehnični povzetek
-- **Napaka**: Absolutno pozicionirane prekrivne plasti (overlay) za stanje "matched" in "selected" niso pravilno omejene
-- **Rešitev**: Ena vrstica spremembe - dodajanje `relative` v className
-- **Prizadete komponente**: Vse igre tipa "Igra ujemanja" za vse starostne skupine (3-4, 5-6, 7-8, 9-10) in vse črke (C, Č, K, L, R, S, Š, Z, Ž)
-
-## Pričakovani rezultat
-Po popravku:
-- Zelena kljukica in prekrivna plast bosta omejena samo na posamezno kartico slike
-- Uporabnik bo lahko kliknil na vse slike v igri
-- Igra bo normalno delovala do zaključka
+## Tehnične podrobnosti
+- WebP format je že uporabljen v `FeaturesCardsSection.tsx` za iste zmajčke, kar potrjuje, da WebP verzije obstajajo v bucketu
+- PNG -> WebP zamenjava izboljša kvaliteto slike in zmanjša čas nalaganja
+- Ni potrebnih sprememb v drugih datotekah
