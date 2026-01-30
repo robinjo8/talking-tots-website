@@ -1,30 +1,41 @@
 
-# Plan: Izboljšanje kvalitete slik na /moje-aplikacije
+# Plan: Podaljšanje prikaza končne številke na kocki
 
 ## Problem
-Na strani `/moje-aplikacije` tri kartice uporabljajo PNG slike iz bucketa `zmajcki`, ki so slabše kvalitete:
-- **Moj osebni načrt**: `Zmajcek_izzivi_6.png`
-- **Govorne igre**: `Zmajcek_igre_4.png`
-- **Govorne vaje**: `Zmajcek_vaje_6.png`
-
-Kartica **Video navodila** ima boljšo kvaliteto, ker uporablja sliko iz drugega bucketa (`slike-ostalo`).
+Ko kocka konča vrtenje, se prehitro skrije (po samo 400ms). Uporabnik nima dovolj časa videti, katera številka je padla, preden se kocka umakne in označi slika v stolpcu.
 
 ## Rešitev
-Zamenjal bom `.png` končnice z `.webp` za vse tri problematične slike v datoteki `ActivityOptions.tsx`. WebP format zagotavlja boljšo kvaliteto slik pri manjši velikosti datoteke.
+Podaljšati čas med končno rotacijo kocke in njenim skrivanjem, da uporabnik jasno vidi rezultat.
 
-## Spremembe
+## Tehnični detajli
 
-### Datoteka: `src/components/ActivityOptions.tsx`
+### 1. DiceRoller.tsx - podaljšaj timeout pred klicem onRollComplete
+**Datoteka:** `src/components/dice/DiceRoller.tsx`
 
-Zamenjam tri URL-je slik:
+Trenutno (vrstica 92-94):
+```tsx
+setTimeout(() => {
+  onRollComplete(finalResult);
+}, 400);
+```
 
-| Aktivnost | Trenutna slika | Nova slika |
-|-----------|----------------|------------|
-| Moj osebni načrt | `Zmajcek_izzivi_6.png` | `Zmajcek_izzivi_6.webp` |
-| Govorne igre | `Zmajcek_igre_4.png` | `Zmajcek_igre_4.webp` |
-| Govorne vaje | `Zmajcek_vaje_6.png` | `Zmajcek_vaje_6.webp` |
+Sprememba na **1200ms** (1.2 sekunde), da ima uporabnik dovolj časa videti številko:
+```tsx
+setTimeout(() => {
+  onRollComplete(finalResult);
+}, 1200);
+```
 
-## Tehnične podrobnosti
-- WebP format je že uporabljen v `FeaturesCardsSection.tsx` za iste zmajčke, kar potrjuje, da WebP verzije obstajajo v bucketu
-- PNG -> WebP zamenjava izboljša kvaliteto slike in zmanjša čas nalaganja
-- Ni potrebnih sprememb v drugih datotekah
+## Zakaj 1200ms?
+- 400ms je bilo prekratko - kocka je izginila, preden je uporabnik sploh opazil številko
+- 1200ms omogoča:
+  - 800ms za gladko animacijo rotacije do končne pozicije
+  - 400ms dodatnega časa za uporabnika, da jasno vidi rezultat
+- Skupaj z animacijo vrtenja (60ms × 8-13 = ~500-780ms) bo celoten met trajal približno 1.7-2 sekundi
+
+## Rezultat
+Uporabnik bo jasno videl:
+1. Kocka se vrti
+2. Kocka se ustavi na številki (npr. 4)
+3. Številka je vidna 1.2 sekunde
+4. Kocka izgine in slika se označi
