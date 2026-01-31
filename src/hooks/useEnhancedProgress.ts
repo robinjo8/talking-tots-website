@@ -198,12 +198,12 @@ export const useEnhancedProgress = () => {
     });
   };
 
-  const recordExerciseCompletion = (exerciseType: string = 'vaje_motorike_govoril') => {
+  const recordExerciseCompletion = (exerciseType: string = 'vaje_motorike_govoril', starsCount: number = 1) => {
     recordProgressMutation.mutate({
       activityType: 'exercise',
       activitySubtype: exerciseType,
-      starsEarned: 1,
-      sessionMetadata: { exerciseType }
+      starsEarned: starsCount,
+      sessionMetadata: { exerciseType, starsCount }
     });
   };
 

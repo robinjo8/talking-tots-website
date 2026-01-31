@@ -6,6 +6,7 @@ import { FortuneWheel } from "@/components/wheel/FortuneWheel";
 import { useFortuneWheel } from "@/hooks/useFortuneWheel";
 import { useWordProgress } from "@/hooks/useWordProgress";
 import { useTrophyContext } from "@/contexts/TrophyContext";
+import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { WheelSuccessDialog } from "@/components/wheel/WheelSuccessDialog";
 import { ProgressModal } from "@/components/wheel/ProgressModal";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
@@ -39,6 +40,7 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
   const { isSpinning, rotation, selectedWord, selectedIndex, showResult, spinWheel, resetWheel, closeResult } = useFortuneWheel({ wordsData });
   const { progress, incrementProgress, getProgress, resetProgress, resetWordProgress } = useWordProgress(displayLetter, wordsList);
   const { checkForNewTrophy } = useTrophyContext();
+  const { recordExerciseCompletion } = useEnhancedProgress();
 
   const handleBack = () => { setMenuOpen(false); setShowExitConfirmation(true); };
   const handleConfirmExit = () => { navigate(backPath); };
@@ -47,6 +49,8 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
   const handleInstructions = () => { setMenuOpen(false); setShowInstructions(true); };
   const handleRecordComplete = () => { if (selectedWord) incrementProgress(selectedWord.word); };
   const handleStarClaimed = async () => { 
+    // Record star to Supabase
+    recordExerciseCompletion(`kolo-besed-${letter}`);
     if (selectedWord) resetWordProgress(selectedWord.word); 
     closeResult(); 
     // Check for trophy after claiming star
