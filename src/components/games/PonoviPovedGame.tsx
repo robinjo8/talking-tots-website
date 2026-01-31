@@ -10,7 +10,8 @@ import {
   getAudioUrl 
 } from "@/data/ponoviPovedConfig";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
+import { useTrophyContext } from "@/contexts/TrophyContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -230,8 +231,9 @@ function JumpButton({ onClick, disabled, size = 96 }: { onClick: () => void; dis
 export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
   const navigate = useNavigate();
   const { selectedChild } = useAuth();
+  const { recordExerciseCompletion } = useEnhancedProgress();
+  const { checkForNewTrophy } = useTrophyContext();
   const audioRef = useRef<HTMLAudioElement>(null);
-  const completionCalledRef = useRef(false);
   const isMobile = useIsMobile();
   
   // Select positions based on device
@@ -517,17 +519,11 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
           setCollectedWords([]);
           setRepeatCompleted(false);
           
-          // Preveri če je bila to zadnja poved
+          // Preveri če je bila to zadnja poved - prikaži success dialog BREZ shranjevanja
           if (currentSentenceForDialog === 3) {
             setPhase("complete");
             setIsGameCompleted(true);
-            
-            if (!completionCalledRef.current) {
-              completionCalledRef.current = true;
-              recordProgress().then(() => {
-                setShowSuccessDialog(true);
-              });
-            }
+            setShowSuccessDialog(true);
           }
           
           return 5;
@@ -547,13 +543,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     if (currentSentenceForDialog === 3) {
       setPhase("complete");
       setIsGameCompleted(true);
-      
-      if (!completionCalledRef.current) {
-        completionCalledRef.current = true;
-        recordProgress().then(() => {
-          setShowSuccessDialog(true);
-        });
-      }
+      setShowSuccessDialog(true);
     }
   }, [currentSentenceForDialog]);
 
@@ -570,7 +560,6 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     setPhase("start");
     setCollectedWords([]);
     setCurrentSentenceForDialog(0);
-    completionCalledRef.current = false;
   }, []);
 
   // Handle next/jump button click
@@ -646,37 +635,6 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     }, 600);
   }, [dragonPosition, isJumping, showSentenceDialog, config.sentences, playAudio, isMobile, STONE_POSITIONS]);
 
-  // Record progress to database
-  const recordProgress = async () => {
-    if (!selectedChild) return;
-    
-    const duration = Math.floor((Date.now() - startTime) / 1000);
-    
-    try {
-      const { error } = await supabase.from("progress").insert({
-        child_id: selectedChild.id,
-        exercise_id: "00000000-0000-0000-0000-000000000001",
-        score: 100,
-        correct_answers: 4,
-        total_questions: 4,
-        duration: duration,
-        activity_type: "exercise",
-        activity_subtype: `ponovi-poved-${config.letter}`,
-        stars_earned: 1,
-        session_metadata: {
-          letter: config.letter,
-          sentences_completed: 4
-        }
-      });
-      
-      if (error) {
-        console.error("Error recording progress:", error);
-      }
-    } catch (error) {
-      console.error("Error recording progress:", error);
-    }
-  };
-
   // Reset game
   const handleReset = () => {
     setPhase("start");
@@ -689,7 +647,6 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     setCountdown(5);
     setCurrentSentenceForDialog(0);
     setIsGameCompleted(false);
-    completionCalledRef.current = false;
   };
 
   // Calculate pixel positions for stones
@@ -1118,25 +1075,14 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
             
             <Button
               onClick={async () => {
-                // Save star to database
-                if (selectedChild?.id) {
-                  try {
-                    await supabase.from("progress").insert({
-                      child_id: selectedChild.id,
-                      exercise_id: "00000000-0000-0000-0000-000000000000",
-                      activity_type: "exercise",
-                      activity_subtype: `ponovi-poved-${config.letter}`,
-                      score: 100,
-                      correct_answers: 4,
-                      total_questions: 4,
-                      duration: 0,
-                      stars_earned: 1,
-                    });
-                  } catch (error) {
-                    console.error("Error saving star:", error);
-                  }
-                }
-                // Just close the dialog - don't navigate
+                // Shrani napredek s poenotenim sistemom
+                recordExerciseCompletion(`ponovi-poved-${config.letter}`);
+                
+                // Preveri za nov pokal
+                await new Promise(resolve => setTimeout(resolve, 500));
+                await checkForNewTrophy();
+                
+                // Zapri dialog
                 setShowSuccessDialog(false);
               }}
               className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 uppercase font-bold px-8"
