@@ -370,6 +370,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
   const [phase, setPhase] = useState<GamePhase>("start");
   const [dragonPosition, setDragonPosition] = useState(0);
   const [isJumping, setIsJumping] = useState(false);
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
@@ -438,40 +439,67 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
     return DRAGON_RIGHT;
   }, [dragonPosition, isMobile, STONE_POSITIONS]);
 
-  // Play audio helper
-  const playAudio = useCallback(async (audioFile: string) => {
-    if (audioRef.current) {
-      try {
-        audioRef.current.src = getAudioUrl(audioFile);
-        await audioRef.current.play();
-      } catch (error) {
-        console.error("Error playing audio:", error);
+  // Play audio helper - returns Promise that resolves when audio ends
+  const playAudio = useCallback((audioFile: string): Promise<void> => {
+    return new Promise((resolve) => {
+      if (audioRef.current) {
+        try {
+          setIsPlayingAudio(true);
+          audioRef.current.src = getAudioUrl(audioFile);
+          
+          // Wait for audio to finish
+          audioRef.current.onended = () => {
+            setIsPlayingAudio(false);
+            resolve();
+          };
+          
+          audioRef.current.onerror = () => {
+            setIsPlayingAudio(false);
+            resolve();
+          };
+          
+          audioRef.current.play().catch(() => {
+            setIsPlayingAudio(false);
+            resolve();
+          });
+        } catch (error) {
+          console.error("Error playing audio:", error);
+          setIsPlayingAudio(false);
+          resolve();
+        }
+      } else {
+        resolve();
       }
-    }
+    });
   }, []);
 
-  // Play sentence audio
+  // Play sentence audio - plays all three words sequentially with 0ms delay
   const playSentenceAudio = useCallback(async () => {
     const sentence = config.sentences[currentSentenceForDialog];
     if (!sentence) return;
     
-    try {
-      if (audioRef.current) {
-        audioRef.current.src = getAudioUrl(sentence.audio);
-        await audioRef.current.play();
-        return;
-      }
-    } catch (error) {
-      console.log("Full sentence audio not found, playing individual words");
-    }
-    
+    // Play all three words sequentially with 0ms delay
     for (let i = 0; i < sentence.words.length; i++) {
       await playAudio(sentence.words[i].audio);
-      if (i < sentence.words.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-      }
+      // No delay between words (0ms)
     }
   }, [currentSentenceForDialog, config.sentences, playAudio]);
+
+  // Automatically play all three words when dialog opens
+  useEffect(() => {
+    const sentence = config.sentences[currentSentenceForDialog];
+    if (showSentenceDialog && sentence) {
+      // Short delay for dialog to render
+      const timer = setTimeout(async () => {
+        for (let i = 0; i < sentence.words.length; i++) {
+          await playAudio(sentence.words[i].audio);
+          // No delay between words (0ms)
+        }
+      }, 300);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [showSentenceDialog, currentSentenceForDialog, config.sentences, playAudio]);
 
   // Handle repeat button in sentence dialog
   const handleRepeat = useCallback(() => {
@@ -817,7 +845,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
           {/* Jump button - scaled 1.5x (144px = 96 * 1.5) */}
           <JumpButton 
             onClick={handleNext} 
-            disabled={isJumping || phase === "complete" || showSentenceDialog}
+            disabled={isJumping || phase === "complete" || showSentenceDialog || isPlayingAudio}
             size={144}
           />
         </div>
@@ -862,7 +890,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
           <div className="fixed bottom-4 right-4 z-20">
             <JumpButton 
               onClick={handleNext} 
-              disabled={isJumping || phase === "complete" || showSentenceDialog}
+              disabled={isJumping || phase === "complete" || showSentenceDialog || isPlayingAudio}
             />
           </div>
         </>
