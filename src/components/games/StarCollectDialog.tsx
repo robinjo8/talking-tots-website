@@ -183,13 +183,13 @@ export const StarCollectDialog: React.FC<StarCollectDialogProps> = ({
               {image.word.toUpperCase()}
             </span>
             
-            <Button
+            <button
               onClick={handlePlayAudio}
-              className="bg-green-500 hover:bg-green-600 text-white gap-2"
+              className="p-2 rounded-full bg-dragon-green hover:bg-dragon-green/90 transition-colors"
+              aria-label="Predvajaj besedo"
             >
-              <Volume2 className="w-4 h-4" />
-              PREDVAJAJ
-            </Button>
+              <Volume2 className="w-6 h-6 text-white" />
+            </button>
           </div>
         </div>
       </DialogContent>
