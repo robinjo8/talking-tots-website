@@ -1,5 +1,5 @@
 // Generic Fortune Wheel game component for ArtikulacijaVaje
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Home, HelpCircle } from "lucide-react";
 import { FortuneWheel } from "@/components/wheel/FortuneWheel";
@@ -33,6 +33,29 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
   const [showNewGameConfirmation, setShowNewGameConfirmation] = useState(false);
   const [showProgressModal, setShowProgressModal] = useState(false);
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+
+  // Track window size for dynamic scaling
+  useEffect(() => {
+    const updateSize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+
+  // Calculate dynamic scale factor based on viewport height
+  const scaleFactor = useMemo(() => {
+    if (windowSize.height === 0) return 1;
+    const baseHeight = 600; // wheel + title + padding
+    const availableHeight = windowSize.height - 120;
+    const scale = Math.min(availableHeight / baseHeight, 1);
+    return Math.max(0.7, scale);
+  }, [windowSize.height]);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const wordsList = wordsData.map(w => w.word);
@@ -70,11 +93,14 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
         backgroundRepeat: 'no-repeat' 
       }}
     >
-      <div className="min-h-full flex flex-col items-center justify-center p-4 pb-24">
+      <div 
+        className="min-h-full flex flex-col items-center justify-center p-4 pb-24"
+        style={{ transform: `scale(${scaleFactor})`, transformOrigin: 'center center' }}
+      >
         <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 md:mb-8 text-center drop-shadow-lg">
           {title}
         </h1>
-        <FortuneWheel 
+        <FortuneWheel
           segmentCount={wordsData.length} 
           rotation={rotation} 
           isSpinning={isSpinning} 
