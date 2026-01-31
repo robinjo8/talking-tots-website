@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Volume2, Mic, Star } from 'lucide-react';
 import { useAudioPlayback } from '@/hooks/useAudioPlayback';
 import { ProgressCircles } from './ProgressCircles';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 
 interface WheelSuccessDialogProps {
   isOpen: boolean;
@@ -30,6 +31,7 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
   const [recordingTimeLeft, setRecordingTimeLeft] = useState(3);
   const [starClaimed, setStarClaimed] = useState(false);
   const [justRecorded, setJustRecorded] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const { playAudio } = useAudioPlayback();
 
@@ -194,14 +196,23 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
     : pronunciationCount;
   const showClaimButton = displayCount >= 3;
 
+  const handleBravoClose = () => {
+    if (!starClaimed) {
+      setShowConfirmDialog(true);
+    } else {
+      onOpenChange(false);
+    }
+  };
+
   // If star can be claimed, show simple Bingo-style congratulations dialog
   if (showClaimButton) {
     return (
-      <Dialog open={isOpen} onOpenChange={() => {}}>
-        <DialogContent 
-          className="sm:max-w-md" 
-          onPointerDownOutside={(e) => e.preventDefault()}
-        >
+      <>
+        <Dialog open={isOpen} onOpenChange={handleBravoClose}>
+          <DialogContent 
+            className="sm:max-w-md" 
+            onPointerDownOutside={(e) => e.preventDefault()}
+          >
           <div className="space-y-6 py-6 flex flex-col items-center">
             <h1 className="text-5xl font-bold text-dragon-green text-center">
               BRAVO!
@@ -223,6 +234,21 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
           </div>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={showConfirmDialog}
+        onOpenChange={setShowConfirmDialog}
+        title="OPOZORILO"
+        description="ALI RES ŽELIŠ ZAPRET OKNO? NE BOŠ PREJEL ZVEZDICE."
+        confirmText="DA"
+        cancelText="NE"
+        onConfirm={() => {
+          setShowConfirmDialog(false);
+          onOpenChange(false);
+        }}
+        onCancel={() => setShowConfirmDialog(false)}
+      />
+      </>
     );
   }
 

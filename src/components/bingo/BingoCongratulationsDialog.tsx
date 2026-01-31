@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 
 interface BingoCongratulationsDialogProps {
   isOpen: boolean;
@@ -13,16 +14,29 @@ export const BingoCongratulationsDialog: React.FC<BingoCongratulationsDialogProp
   onClose,
   onStarClaimed
 }) => {
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [starClaimed, setStarClaimed] = useState(false);
+
   const handleClaimStar = () => {
+    setStarClaimed(true);
     onStarClaimed();
   };
 
+  const handleDialogClose = () => {
+    if (!starClaimed) {
+      setShowConfirmDialog(true);
+    } else {
+      onClose();
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={() => {}}>
-      <DialogContent 
-        className="sm:max-w-md" 
-        onPointerDownOutside={(e) => e.preventDefault()}
-      >
+    <>
+      <Dialog open={isOpen} onOpenChange={handleDialogClose}>
+        <DialogContent 
+          className="sm:max-w-md" 
+          onPointerDownOutside={(e) => e.preventDefault()}
+        >
         <div className="space-y-6 py-6 flex flex-col items-center">
           <h1 className="text-5xl font-bold text-dragon-green text-center">
             BRAVO!
@@ -43,5 +57,20 @@ export const BingoCongratulationsDialog: React.FC<BingoCongratulationsDialogProp
         </div>
       </DialogContent>
     </Dialog>
+
+    <ConfirmDialog
+      open={showConfirmDialog}
+      onOpenChange={setShowConfirmDialog}
+      title="OPOZORILO"
+      description="ALI RES ŽELIŠ ZAPRET OKNO? NE BOŠ PREJEL ZVEZDICE."
+      confirmText="DA"
+      cancelText="NE"
+      onConfirm={() => {
+        setShowConfirmDialog(false);
+        onClose();
+      }}
+      onCancel={() => setShowConfirmDialog(false)}
+    />
+    </>
   );
 };
