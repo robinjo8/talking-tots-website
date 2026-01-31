@@ -218,16 +218,16 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
                     } ${isCompleted ? 'text-gray-400' : 'text-black'}`}>
                       {image.word.toUpperCase()}
                     </span>
-                    <Button
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handlePlayAudio(image);
                       }}
-                      size="icon"
-                      className="bg-green-500 hover:bg-green-600 text-white h-8 w-8"
+                      className="p-2 rounded-full bg-dragon-green hover:bg-dragon-green/90 transition-colors"
+                      aria-label="Predvajaj besedo"
                     >
-                      <Volume2 className="w-4 h-4" />
-                    </Button>
+                      <Volume2 className="w-6 h-6 text-white" />
+                    </button>
                   </div>
                 );
               })}
