@@ -41,6 +41,7 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
     currentMatchedPair,
     handlePairDialogContinue,
     handlePairUnmatch,
+    handleClaimStar,
     displayLetter
   } = useGenericMemoryGame(config);
 
@@ -289,7 +290,10 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
                 className="w-48 h-48 object-contain mx-auto mb-6"
               />
               <button
-                onClick={() => setShowNewGameButton(true)}
+                onClick={async () => {
+                  await handleClaimStar();
+                  setShowNewGameButton(true);
+                }}
                 className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-8 py-3 rounded-lg text-lg transition-colors"
               >
                 ⭐ VZEMI ZVEZDICO
@@ -426,7 +430,10 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
                 className="w-48 h-48 object-contain mx-auto mb-6"
               />
               <button
-                onClick={() => setShowNewGameButton(true)}
+                onClick={async () => {
+                  await handleClaimStar();
+                  setShowNewGameButton(true);
+                }}
                 className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-8 py-3 rounded-lg text-lg transition-colors"
               >
                 ⭐ VZEMI ZVEZDICO
