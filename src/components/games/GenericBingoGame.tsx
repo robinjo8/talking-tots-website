@@ -1,5 +1,5 @@
 // Generic Bingo game component for ArtikulacijaVaje (sredina/konec)
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Home, RefreshCw } from "lucide-react";
 import { useBingoGame } from "@/hooks/useBingoGame";
@@ -37,8 +37,32 @@ export function GenericBingoGame({ letter, displayLetter, title, wordsData, exer
   const [menuOpen, setMenuOpen] = useState(false);
   const [showNewGameButton, setShowNewGameButton] = useState(false);
   const [starClaimed, setStarClaimed] = useState(false);
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
   const { recordExerciseCompletion } = useEnhancedProgress();
   const { checkForNewTrophy } = useTrophyContext();
+
+  // Track window size for dynamic scaling
+  useEffect(() => {
+    const updateSize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+
+  // Calculate dynamic scale factor based on viewport height
+  const scaleFactor = useMemo(() => {
+    if (windowSize.height === 0) return 1;
+    // Reel: ~80px, Grid: ~400px, Label: ~40px, Gaps: ~40px = ~560px base
+    const baseHeight = 560;
+    const availableHeight = windowSize.height - 80; // padding
+    const scale = Math.min(availableHeight / baseHeight, 1.2);
+    return Math.max(0.7, scale); // minimum 0.7, maximum 1.2
+  }, [windowSize.height]);
 
   const {
     grid,
@@ -115,8 +139,11 @@ export function GenericBingoGame({ letter, displayLetter, title, wordsData, exer
         backgroundRepeat: 'no-repeat'
       }}
     >
-      {/* Main content - flex layout to fit viewport */}
-      <div className="h-full flex flex-col items-center justify-center p-2 md:p-4 gap-1 md:gap-2 md:scale-[1.2] md:origin-center">
+      {/* Main content - flex layout to fit viewport with dynamic scaling */}
+      <div 
+        className="h-full flex flex-col items-center justify-center p-2 md:p-4 gap-1 md:gap-2"
+        style={{ transform: `scale(${scaleFactor})`, transformOrigin: 'center center' }}
+      >
         {/* Reel */}
         <BingoReel
           words={wordsData}
