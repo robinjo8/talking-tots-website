@@ -45,10 +45,10 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
       // Small delay for smooth transition
       setTimeout(() => {
         setShowBravoDialog(true);
-        onStarClaimed?.();
+        // NOTE: onStarClaimed is called when user clicks "VZEMI ZVEZDICO" button, not here
       }, 500);
     }
-  }, [completedRecordings.size, displayImages.length, onStarClaimed]);
+  }, [completedRecordings.size, displayImages.length]);
 
   // Select 4 random images including the completed one when dialog opens
   // Use ref to prevent re-shuffling on re-renders (e.g., after claiming star)
@@ -142,6 +142,7 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
   const handleBravoClose = () => {
     setShowBravoDialog(false);
     setStarClaimed(true);
+    onStarClaimed?.(); // Trigger star claim and trophy check when user clicks the button
     onOpenChange(false);
   };
 
