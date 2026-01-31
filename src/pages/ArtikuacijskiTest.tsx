@@ -284,7 +284,7 @@ const ArtikuacijskiTest = () => {
       <MemoryExitConfirmationDialog 
         open={showExitDialog} 
         onOpenChange={setShowExitDialog} 
-        onConfirm={() => navigate("/moja-stran")}
+        onConfirm={() => navigate("/moje-aplikacije")}
       >
         <div />
       </MemoryExitConfirmationDialog>
