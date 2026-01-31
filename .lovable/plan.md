@@ -1,194 +1,114 @@
 
-# Plan: Popravki sistema "Vzemi zvezdico" za Kolo besed, Smešne povedi in Vaje motorike govoril
+# Plan: Popravek vrstnega reda zvezdice in pokala
 
-## Povzetek analize
+## Opis problema
 
-Po pregledu kode sem ugotovil naslednje:
+Ko ima uporabnik 399 zvezdic in konča sestavljanko:
+1. Prikaže se dialog "ODLIČNO!" za ponovitev besed
+2. Ko izgovori vse 4 besede, se avtomatsko odpre "BRAVO!" dialog
+3. **NAPAKA:** Še preden uporabnik klikne "VZEMI ZVEZDICO", se že sproži `checkForNewTrophy()` 
+4. To povzroči, da se pokal prikaže NAD dialogom "BRAVO!" in uporabnik ne more vzeti zvezdice
 
-### Igre, ki PRAVILNO shranjujejo zvezdice:
-| Igra | Komponenta | Klic za shranjevanje |
-|------|-----------|---------------------|
-| Spomin | `useMemoryGame*.tsx` | `recordGameCompletion('memory', letter)` |
-| Sestavljanka | `GenericSestavljankaGame.tsx` | `recordGameCompletion()` |
-| Drsna sestavljanka | `GenericDrsnaSestavljankaGame.tsx` | `recordGameCompletion('sliding_puzzle', ...)` |
-| Labirint | `GenericLabirintGame.tsx` | `recordGameCompletion('maze', ...)` |
-| Zaporedja | `GenericZaporedjaGame.tsx` | `recordGameCompletion('memory', ...)` |
-| Igra ujemanja | `GenericIgraUjemanjaGame.tsx` | `recordGameCompletion('matching', ...)` |
-| Bingo | `GenericBingoGame.tsx` | `recordExerciseCompletion()` |
-| Ponovi poved | `PonoviPovedGame.tsx` | Direkten insert v `progress` tabelo |
-| Vaje motorike govoril | `useExerciseProgress.ts` | `recordExerciseCompletion('vaje_motorike_govoril')` - **DELUJE, ampak dodeli 1 zvezdico** |
+## Vzrok napake
 
-### Igre z NAPAKO - NE shranjujejo zvezdic:
-
-#### 1. KOLO BESED (`GenericWheelGame.tsx`)
-**Problem:** Funkcija `handleStarClaimed` (vrstice 49-55) NE kliče `recordExerciseCompletion`. Hook `useWordProgress` shranjuje samo v `localStorage`, ne v Supabase.
-
-#### 2. SMEŠNE POVEDI (`GenericMetKockeGame.tsx`)
-**Problem:** Funkcija `handleClaimStar` (vrstice 128-137) uporablja `incrementProgress` iz `useWordProgress`, ki shranjuje samo v `localStorage`.
-
-#### 3. POVEZI PARE - tole je ločena igra od "Igra ujemanja"!
-**Problem:** Funkcija `handleStarClaimed` (vrstica 104-106) samo nastavi gumb za novo igro, brez klica za shranjevanje v bazo.
-
-### Posebna zahteva: Vaje motorike govoril
-Trenutno ta vaja pri zaključku vseh 27 kartic dodeli **1 zvezdico**. Uporabnik želi, da dodeli **3 zvezdice**.
-
----
-
-## Tehnične spremembe
-
-### 1. Kolo besed - `GenericWheelGame.tsx`
-
-Dodati import in uporabo `useEnhancedProgress`:
+V datoteki `src/components/puzzle/PuzzleSuccessDialog.tsx` (vrstice 42-51):
 
 ```tsx
-import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-
-// V komponenti:
-const { recordExerciseCompletion } = useEnhancedProgress();
-
-// Popraviti handleStarClaimed:
-const handleStarClaimed = async () => { 
-  recordExerciseCompletion(`kolo-besed-${letter}`);  // DODANO
-  if (selectedWord) resetWordProgress(selectedWord.word); 
-  closeResult(); 
-  await new Promise(resolve => setTimeout(resolve, 500));
-  await checkForNewTrophy();
-};
-```
-
----
-
-### 2. Smešne povedi - `GenericMetKockeGame.tsx`
-
-Dodati import in uporabo `useEnhancedProgress`:
-
-```tsx
-import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-
-// V komponenti:
-const { recordExerciseCompletion } = useEnhancedProgress();
-
-// Popraviti handleClaimStar:
-const handleClaimStar = useCallback(async () => {
-  recordExerciseCompletion(`smesne-povedi-${letter}`);  // DODANO
-  if (selectedBitje !== null) {
-    incrementProgress(bitje[selectedBitje].word);
+// Auto-transition to BRAVO dialog when all recordings complete
+useEffect(() => {
+  if (displayImages.length > 0 && completedRecordings.size === displayImages.length && !hasAutoTransitionedRef.current) {
+    hasAutoTransitionedRef.current = true;
+    setTimeout(() => {
+      setShowBravoDialog(true);
+      onStarClaimed?.();  // ❌ NAPAKA: Kliče se TUKAJ namesto ob kliku gumba
+    }, 500);
   }
-  closeStarDialog();
-  setShowNewGameButton(true);
-  await new Promise(resolve => setTimeout(resolve, 500));
-  await checkForNewTrophy();
-}, [recordExerciseCompletion, letter, selectedBitje, bitje, incrementProgress, closeStarDialog, checkForNewTrophy]);
+}, ...);
 ```
 
----
+`onStarClaimed()` se kliče takoj ko se prikaže BRAVO dialog, namesto ko uporabnik dejansko klikne gumb "VZEMI ZVEZDICO".
 
-### 3. Povezi pare - `GenericPoveziPareGame.tsx`
+## Primerjava s pravilno implementacijo
 
-Dodati import in uporabo `useEnhancedProgress` ter `useTrophyContext`:
+V `MatchingCompletionDialog.tsx` je pravilno implementirano:
 
 ```tsx
-import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { useTrophyContext } from "@/contexts/TrophyContext";
+// Prehod v BRAVO dialog - NE kliče onStarClaimed
+setTimeout(() => {
+  setShowBravoDialog(true);
+  // NOTE: onStarClaimed is called when user clicks "VZEMI ZVEZDICO" button, not here
+}, 500);
 
-// V komponenti:
-const { recordGameCompletion } = useEnhancedProgress();
-const { checkForNewTrophy } = useTrophyContext();
-
-// Popraviti handleStarClaimed:
-const handleStarClaimed = async () => {
-  recordGameCompletion('matching', config.trackingId);  // DODANO
-  setShowNewGameButton(true);
-  await new Promise(resolve => setTimeout(resolve, 500));
-  await checkForNewTrophy();  // DODANO
+// Klik na gumb - TUKAJ se kliče onStarClaimed
+const handleBravoClose = () => {
+  setShowBravoDialog(false);
+  onStarClaimed?.(); // ✅ PRAVILNO: Kliče se ob kliku gumba
+  onClose();
 };
 ```
 
----
+## Tehnična sprememba
 
-### 4. Vaje motorike govoril - 3 zvezdice namesto 1
+### Datoteka: `src/components/puzzle/PuzzleSuccessDialog.tsx`
 
-**Datoteka:** `src/hooks/useExerciseProgress.ts`
-
-Spremeniti klic `recordExerciseCompletion` tako, da pošlje 3 zvezdice:
+**1. Odstrani `onStarClaimed` iz useEffect (vrstice 42-51):**
 
 ```tsx
-// Trenutno (vrstica 67):
-recordExerciseCompletion('vaje_motorike_govoril');
-
-// Potrebno spremeniti v triple klic ALI spremeniti useEnhancedProgress
+// Auto-transition to BRAVO dialog when all recordings complete
+useEffect(() => {
+  if (displayImages.length > 0 && completedRecordings.size === displayImages.length && !hasAutoTransitionedRef.current) {
+    hasAutoTransitionedRef.current = true;
+    setTimeout(() => {
+      setShowBravoDialog(true);
+      // NE kliči onStarClaimed tukaj - kliče se ob kliku gumba
+    }, 500);
+  }
+}, [completedRecordings.size, displayImages.length]); // Odstrani onStarClaimed iz dependencies
 ```
 
-**MOŽNOST A:** Klicati 3x zapored:
-```tsx
-recordExerciseCompletion('vaje_motorike_govoril');
-recordExerciseCompletion('vaje_motorike_govoril');
-recordExerciseCompletion('vaje_motorike_govoril');
-```
+**2. Dodaj `onStarClaimed` v `handleBravoClose` (vrstice 142-146):**
 
-**MOŽNOST B (boljša):** Dodati parameter za število zvezdic v `useEnhancedProgress`:
-
-V `useEnhancedProgress.ts` spremeniti funkcijo:
 ```tsx
-const recordExerciseCompletion = (exerciseType: string = 'vaje_motorike_govoril', starsCount: number = 1) => {
-  recordProgressMutation.mutate({
-    activityType: 'exercise',
-    activitySubtype: exerciseType,
-    starsEarned: starsCount,  // Uporabi parameter
-    sessionMetadata: { exerciseType, starsCount }
-  });
+const handleBravoClose = () => {
+  setShowBravoDialog(false);
+  setStarClaimed(true);
+  onStarClaimed?.();  // DODANO: Kliče se ob kliku gumba
+  onOpenChange(false);
 };
 ```
 
-Nato v `useExerciseProgress.ts`:
-```tsx
-recordExerciseCompletion('vaje_motorike_govoril', 3);  // Dodeli 3 zvezdice
-```
-
----
-
-## Diagram popravkov
+## Diagram pravilnega toka
 
 ```text
-┌─────────────────────────────────────────────────────────────────┐
-│                      KOLO BESED                                  │
-│  handleStarClaimed() ──► recordExerciseCompletion()  ──► DB    │
-└─────────────────────────────────────────────────────────────────┘
+PRED POPRAVKOM (napačno):
+┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
+│  4 besede        │────►│  BRAVO dialog    │────►│  POKAL dialog    │
+│  izgovorjene     │     │  + onStarClaimed │     │  (prekrije BRAVO)│
+└──────────────────┘     │  + checkTrophy   │     └──────────────────┘
+                         └──────────────────┘
 
-┌─────────────────────────────────────────────────────────────────┐
-│                    SMEŠNE POVEDI                                 │
-│  handleClaimStar() ──► recordExerciseCompletion()  ──► DB      │
-└─────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│                    POVEZI PARE                                   │
-│  handleStarClaimed() ──► recordGameCompletion()  ──► DB        │
-│                      ──► checkForNewTrophy()                    │
-└─────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│               VAJE MOTORIKE GOVORIL                              │
-│  completeCard(27) ──► recordExerciseCompletion(*, 3)  ──► DB   │
-│                        ⭐⭐⭐ 3 zvezdice                        │
-└─────────────────────────────────────────────────────────────────┘
+PO POPRAVKU (pravilno):
+┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
+│  4 besede        │────►│  BRAVO dialog    │────►│  Klik VZEMI      │────►│  POKAL dialog    │
+│  izgovorjene     │     │  (samo prikaz)   │     │  ZVEZDICO        │     │  (pravilno)      │
+└──────────────────┘     └──────────────────┘     │  + onStarClaimed │     └──────────────────┘
+                                                  │  + checkTrophy   │
+                                                  └──────────────────┘
 ```
 
----
+## Prizadete igre
 
-## Vrstni red implementacije
+Ta popravek vpliva na vse igre, ki uporabljajo `PuzzleSuccessDialog`:
+- Sestavljanke (vse črke in starostne skupine)
+- Labirint (vse črke in starostne skupine)
 
-1. **useEnhancedProgress.ts** - dodati parameter `starsCount` v `recordExerciseCompletion`
-2. **GenericWheelGame.tsx** (Kolo besed) - dodati klic za shranjevanje
-3. **GenericMetKockeGame.tsx** (Smešne povedi) - dodati klic za shranjevanje
-4. **GenericPoveziPareGame.tsx** (Povezi pare) - dodati klic za shranjevanje + checkForNewTrophy
-5. **useExerciseProgress.ts** (Vaje motorike govoril) - spremeniti na 3 zvezdice
-
----
+Druge igre (Zaporedja, Drsna sestavljanka, Igra ujemanja) uporabljajo `MatchingCompletionDialog`, ki je že pravilno implementiran.
 
 ## Testiranje
 
-Po implementaciji je potrebno preveriti:
-1. Odigrati vsako igro/vajo do konca
-2. Klikniti "VZEMI ZVEZDICO"
-3. Odpreti `/moja-stran` in preveriti, da se zvezdica prikaže
-4. Posebej preveriti, da Vaje motorike govoril doda 3 zvezdice
+Po implementaciji:
+1. Nastavi zvezdice na 99 (ali 199, 299...)
+2. Odigraj Sestavljanko do konca
+3. Izgovori vse 4 besede
+4. Preveri, da se prikaže BRAVO dialog z gumbom "VZEMI ZVEZDICO"
+5. Šele po kliku na gumb naj se prikaže pokal dialog
