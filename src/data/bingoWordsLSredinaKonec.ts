@@ -10,7 +10,7 @@ export const wordsDataLSredinaKonec: BingoWord[] = [
   { word: "ANGEL", image: "angel1.webp", audio: "angel.m4a" },
   { word: "BALON", image: "balon1.webp", audio: "balon.m4a" },
   { word: "CEDILO", image: "cedilo1.webp", audio: "cedilo.m4a" },
-  { word: "ČOKLA", image: "cokla1.webp", audio: "cokla.m4a" },
+  { word: "COKLA", image: "cokla1.webp", audio: "cokla.m4a" },
   { word: "ČEBELA", image: "cebela1.webp", audio: "cebela.m4a" },
   { word: "ČEBULA", image: "cebula1.webp", audio: "cebula.m4a" },
   { word: "ČEVLJI", image: "cevlji1.webp", audio: "cevlji.m4a" },
