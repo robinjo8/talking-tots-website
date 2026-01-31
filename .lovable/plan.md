@@ -1,203 +1,157 @@
 
-# Plan: Popravek igre Ponovi Poved
+# Plan: Popravki za igro Ponovi Poved
 
-## Opis problemov
+## Opis zahtev
 
-### Problem 1: Gumb za skok mora biti onemogočen med predvajanjem zvoka
-Trenutno se ob skoku na barvni kamen (beseda) zvok začne predvajati, vendar je gumb za skok takoj spet aktiven. Uporabnik lahko klikne na gumb preden se zvok konča, kar povzroči prekrivanje zvokov.
+### Zahteva 1: Gumb "ponovi" mora biti onemogočen med predvajanjem zvoka
+Trenutno je gumb "ponovi" onemogočen samo med snemanjem (`isRecording`). Mora biti onemogočen tudi med avtomatskim predvajanjem vseh treh besed (`isPlayingAudio`).
 
-**Rešitev:** Dodati stanje `isPlayingAudio` ki onemogočid gumb za skok dokler se zvok ne konča predvajati.
+### Zahteva 2: Odstrani gumb "Naprej" in samodejno zapri pop-up po končanem snemanju
+Ko uporabnik klikne gumb "ponovi" in se odštevanje konča (5 sekund), se trenutno prikaže gumb "Naprej". Ta gumb je potrebno odstraniti - namesto tega naj se pop-up samodejno zapre, da lahko uporabnik nadaljuje z igro.
 
-### Problem 2: V pop-up oknu se morajo vse tri besede avtomatsko predvajati zaporedno
-Trenutno se ob odprtju dialoga predvaja polna poved (celotna audio datoteka). Zahteva je, da se ob odprtju dialoga avtomatsko predvajajo vse tri besede zaporedno brez zamika (0ms).
-
-**Rešitev:** Uporabiti `onended` event na audio elementu za zaporedno predvajanje vseh treh besed.
+### Zahteva 3: Popravi zvočni posnetek za besedo "liziko" (črka L)
+V konfiguraciji za črko L je beseda "liziko", vendar je uporabljen napačen zvočni posnetek `lizika.m4a`. Pravilni posnetek je `liziko.m4a`.
 
 ## Tehnične spremembe
 
-### Sprememba 1: Dodaj novo stanje za sledenje predvajanja zvoka
+### Sprememba 1: Onemogočitev gumba "ponovi" med predvajanjem zvoka
 
 **Datoteka:** `src/components/games/PonoviPovedGame.tsx`
 
-**Lokacija:** Vrstica ~370-385 (med obstoječimi stanji)
-
-```tsx
-// Obstoječa stanja
-const [phase, setPhase] = useState<GamePhase>("start");
-const [dragonPosition, setDragonPosition] = useState(0);
-const [isJumping, setIsJumping] = useState(false);
-// NOVO: Dodaj stanje za sledenje predvajanja zvoka
-const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-```
-
-### Sprememba 2: Posodobi playAudio funkcijo da nastavi stanje
-
-**Lokacija:** Vrstica ~441-451
+**Lokacija:** Vrstice 1024-1037 (gumb "ponovi")
 
 Trenutna koda:
 ```tsx
-const playAudio = useCallback(async (audioFile: string) => {
-  if (audioRef.current) {
-    try {
-      audioRef.current.src = getAudioUrl(audioFile);
-      await audioRef.current.play();
-    } catch (error) {
-      console.error("Error playing audio:", error);
-    }
-  }
-}, []);
+<Button
+  onClick={handleRepeat}
+  disabled={isRecording}
+  className="relative bg-app-orange hover:bg-app-orange/90 text-white gap-2 uppercase font-medium h-10 w-28 md:w-32"
+>
 ```
 
 Nova koda:
 ```tsx
-const playAudio = useCallback((audioFile: string): Promise<void> => {
-  return new Promise((resolve) => {
-    if (audioRef.current) {
-      try {
-        setIsPlayingAudio(true);
-        audioRef.current.src = getAudioUrl(audioFile);
-        
-        // Počakaj da se zvok konča
-        audioRef.current.onended = () => {
-          setIsPlayingAudio(false);
-          resolve();
-        };
-        
-        audioRef.current.onerror = () => {
-          setIsPlayingAudio(false);
-          resolve();
-        };
-        
-        audioRef.current.play().catch(() => {
-          setIsPlayingAudio(false);
-          resolve();
-        });
-      } catch (error) {
-        console.error("Error playing audio:", error);
-        setIsPlayingAudio(false);
-        resolve();
-      }
-    } else {
-      resolve();
-    }
-  });
-}, []);
+<Button
+  onClick={handleRepeat}
+  disabled={isRecording || isPlayingAudio}
+  className="relative bg-app-orange hover:bg-app-orange/90 text-white gap-2 uppercase font-medium h-10 w-28 md:w-32"
+>
 ```
 
-### Sprememba 3: Posodobi playSentenceAudio da predvaja vse tri besede zaporedno z 0ms zamikom
+### Sprememba 2: Onemogočitev gumba "Predvajaj" med predvajanjem in snemanjem
 
-**Lokacija:** Vrstica ~454-474
+**Lokacija:** Vrstice 1015-1022 (gumb "Predvajaj")
 
 Trenutna koda:
 ```tsx
-const playSentenceAudio = useCallback(async () => {
-  const sentence = config.sentences[currentSentenceForDialog];
-  if (!sentence) return;
-  
-  try {
-    if (audioRef.current) {
-      audioRef.current.src = getAudioUrl(sentence.audio);
-      await audioRef.current.play();
-      return;
-    }
-  } catch (error) {
-    console.log("Full sentence audio not found, playing individual words");
-  }
-  
-  for (let i = 0; i < sentence.words.length; i++) {
-    await playAudio(sentence.words[i].audio);
-    if (i < sentence.words.length - 1) {
-      await new Promise(resolve => setTimeout(resolve, 500));
-    }
-  }
-}, [currentSentenceForDialog, config.sentences, playAudio]);
+<Button
+  onClick={playSentenceAudio}
+  disabled={isRecording}
+  className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 uppercase font-medium h-10 w-28 md:w-32"
+>
 ```
 
 Nova koda:
 ```tsx
-const playSentenceAudio = useCallback(async () => {
-  const sentence = config.sentences[currentSentenceForDialog];
-  if (!sentence) return;
-  
-  // Predvajaj vse tri besede zaporedno brez zamika (0ms)
-  for (let i = 0; i < sentence.words.length; i++) {
-    await playAudio(sentence.words[i].audio);
-    // Brez zamika med besedami (0ms)
-  }
-}, [currentSentenceForDialog, config.sentences, playAudio]);
+<Button
+  onClick={playSentenceAudio}
+  disabled={isRecording || isPlayingAudio}
+  className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 uppercase font-medium h-10 w-28 md:w-32"
+>
 ```
 
-### Sprememba 4: Dodaj useEffect za avtomatsko predvajanje ob odprtju dialoga
+### Sprememba 3: Samodejno zaprtje pop-upa po končanem snemanju
 
-**Lokacija:** Za `playSentenceAudio` funkcijo (nova koda)
+**Lokacija:** Vrstice 504-520 (funkcija `handleRepeat`)
 
+Trenutna koda:
 ```tsx
-// Avtomatsko predvajaj vse tri besede ko se dialog odpre
-useEffect(() => {
-  if (showSentenceDialog && dialogSentence) {
-    // Počakaj kratek čas da se dialog odpre
-    const timer = setTimeout(async () => {
-      for (let i = 0; i < dialogSentence.words.length; i++) {
-        await playAudio(dialogSentence.words[i].audio);
-        // Brez zamika med besedami (0ms)
+const handleRepeat = useCallback(() => {
+  setIsRecording(true);
+  setCountdown(5);
+  
+  const interval = setInterval(() => {
+    setCountdown(prev => {
+      if (prev <= 1) {
+        clearInterval(interval);
+        setIsRecording(false);
+        setRepeatCompleted(true);
+        return 5;
       }
-    }, 300);
-    
-    return () => clearTimeout(timer);
-  }
-}, [showSentenceDialog, dialogSentence, playAudio]);
+      return prev - 1;
+    });
+  }, 1000);
+}, []);
 ```
 
-### Sprememba 5: Posodobi onemogočitev gumba za skok
-
-**Lokacija desktop gumba:** Vrstica ~818-822
-**Lokacija mobile gumba:** Vrstica ~863-866
-
-Desktop:
+Nova koda - samodejno zapri dialog in nadaljuj z igro:
 ```tsx
-<JumpButton 
-  onClick={handleNext} 
-  disabled={isJumping || phase === "complete" || showSentenceDialog || isPlayingAudio}
-  size={144}
-/>
-```
-
-Mobile:
-```tsx
-<JumpButton 
-  onClick={handleNext} 
-  disabled={isJumping || phase === "complete" || showSentenceDialog || isPlayingAudio}
-/>
-```
-
-### Sprememba 6: Odstrani stari code za predvajanje v handleNext
-
-**Lokacija:** Vrstica ~571-601
-
-V `handleNext` funkciji odstrani staro logiko predvajanja zvoka, saj se bo zdaj izvajala preko `playAudio` z await:
-
-```tsx
-setTimeout(async () => {
-  setIsJumping(false);
+const handleRepeat = useCallback(() => {
+  setIsRecording(true);
+  setCountdown(5);
   
-  if (nextStone.isRest) {
-    // Landed on rest stone - show sentence dialog
-    setCurrentSentenceForDialog(nextStone.sentenceIndex ?? 0);
-    setPhase("sentence");
-    setShowSentenceDialog(true);
-    // Odstrani staro predvajanje - useEffect bo to naredil
-  } else if (nextStone.wordIndex !== undefined) {
-    // Landed on word stone
-    setPhase("word");
-    const word = config.sentences[nextStone.sentenceIndex!].words[nextStone.wordIndex];
-    
-    // Add to collected words
-    setCollectedWords(prev => [...prev, word]);
-    
-    // Play word audio - await zagotovi da se gumb omogoči šele ko se zvok konča
-    await playAudio(word.audio);
-  }
-}, 600);
+  const interval = setInterval(() => {
+    setCountdown(prev => {
+      if (prev <= 1) {
+        clearInterval(interval);
+        setIsRecording(false);
+        
+        // Samodejno zapri dialog in nadaljuj z igro
+        setShowSentenceDialog(false);
+        setCollectedWords([]);
+        setRepeatCompleted(false);
+        
+        // Preveri če je bila to zadnja poved
+        if (currentSentenceForDialog === 3) {
+          setPhase("complete");
+          setIsGameCompleted(true);
+          
+          if (!completionCalledRef.current) {
+            completionCalledRef.current = true;
+            recordProgress().then(() => {
+              setShowSuccessDialog(true);
+            });
+          }
+        }
+        
+        return 5;
+      }
+      return prev - 1;
+    });
+  }, 1000);
+}, [currentSentenceForDialog]);
+```
+
+### Sprememba 4: Odstrani gumb "Naprej"
+
+**Lokacija:** Vrstice 1038-1045
+
+Odstrani celoten pogojni blok za gumb "Naprej":
+```tsx
+) : (
+  <Button 
+    onClick={handleContinueFromDialog} 
+    className="bg-dragon-green hover:bg-dragon-green/90 text-white uppercase font-medium h-10 w-28 md:w-32"
+  >
+    NAPREJ
+  </Button>
+)}
+```
+
+### Sprememba 5: Popravi zvočni posnetek za "liziko"
+
+**Datoteka:** `src/data/ponoviPovedConfig.ts`
+
+**Lokacija:** Vrstica 112
+
+Trenutna koda:
+```tsx
+{ word: "liziko", image: "lizika1.webp", audio: "lizika.m4a" }
+```
+
+Nova koda:
+```tsx
+{ word: "liziko", image: "lizika1.webp", audio: "liziko.m4a" }
 ```
 
 ## Diagram spremembe
@@ -205,33 +159,42 @@ setTimeout(async () => {
 ```text
 PRED POPRAVKOM:
 ┌────────────────────────────────────────────────┐
-│ Klik na gumb → Skok → Zvok začne → Gumb aktiven│
-│                        ↓                       │
-│              Uporabnik lahko klikne spet       │
-│              (zvoki se prekrivajo)             │
+│ Dialog se odpre → Zvok predvaja                │
+│                   ↓                            │
+│ Gumb "ponovi" aktiven (napaka!)                │
+│                   ↓                            │
+│ Uporabnik klikne → Odštevanje 5s               │
+│                   ↓                            │
+│ Prikaže se gumb "Naprej" → Klik → Dialog zaprt │
 └────────────────────────────────────────────────┘
 
 PO POPRAVKU:
 ┌────────────────────────────────────────────────┐
-│ Klik na gumb → Skok → Zvok začne → Gumb onemog.│
-│                        ↓                       │
-│              Zvok se konča predvajati          │
-│                        ↓                       │
-│              Gumb spet aktiven                 │
-└────────────────────────────────────────────────┘
-
-POP-UP OKNO:
-┌────────────────────────────────────────────────┐
-│ Dialog se odpre → Beseda 1 → Beseda 2 → Beseda 3│
-│                   (0ms)      (0ms)             │
-│              Avtomatsko zaporedno predvajanje  │
+│ Dialog se odpre → Zvok predvaja                │
+│                   ↓                            │
+│ Gumb "ponovi" ONEMOGOČEN                       │
+│                   ↓                            │
+│ Zvok se konča → Gumb "ponovi" aktiven          │
+│                   ↓                            │
+│ Uporabnik klikne → Odštevanje 5s               │
+│                   ↓                            │
+│ Odštevanje končano → Dialog se SAMODEJNO ZAPRE│
 └────────────────────────────────────────────────┘
 ```
 
+## Prizadete datoteke
+
+| Datoteka | Sprememba |
+|----------|-----------|
+| `src/components/games/PonoviPovedGame.tsx` | Onemogočitev gumbov, samodejno zaprtje dialoga |
+| `src/data/ponoviPovedConfig.ts` | Popravek audio datoteke za "liziko" |
+
 ## Testiranje
 
-1. Odpri igro `/govorne-igre/ponovi-poved/c`
-2. Klikni na gumb za skok
-3. Preveri, da je gumb onemogočen dokler se zvok ne konča predvajati
-4. Ko zmajček pristane na sivem kamnu, preveri da se pop-up odpre
-5. V pop-up oknu preveri, da se vse tri besede samodejno predvajajo zaporedno brez zamika
+1. Odpri igro `/govorne-igre/ponovi-poved/l`
+2. Skoči do sivega kamna da se odpre pop-up okno
+3. Preveri, da je gumb "ponovi" onemogočen med predvajanjem vseh treh besed
+4. Ko se predvajanje konča, klikni gumb "ponovi"
+5. Počakaj da se odštevanje konča (5 sekund)
+6. Preveri, da se pop-up samodejno zapre brez prikaza gumba "Naprej"
+7. Preveri, da se za besedo "liziko" predvaja pravilen zvočni posnetek
