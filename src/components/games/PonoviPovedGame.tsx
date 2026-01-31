@@ -511,13 +511,31 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
         if (prev <= 1) {
           clearInterval(interval);
           setIsRecording(false);
-          setRepeatCompleted(true);
+          
+          // Samodejno zapri dialog in nadaljuj z igro
+          setShowSentenceDialog(false);
+          setCollectedWords([]);
+          setRepeatCompleted(false);
+          
+          // Preveri če je bila to zadnja poved
+          if (currentSentenceForDialog === 3) {
+            setPhase("complete");
+            setIsGameCompleted(true);
+            
+            if (!completionCalledRef.current) {
+              completionCalledRef.current = true;
+              recordProgress().then(() => {
+                setShowSuccessDialog(true);
+              });
+            }
+          }
+          
           return 5;
         }
         return prev - 1;
       });
     }, 1000);
-  }, []);
+  }, [currentSentenceForDialog]);
 
   // Handle continue from sentence dialog
   const handleContinueFromDialog = useCallback(() => {
@@ -1014,35 +1032,26 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
             <div className="flex justify-center gap-2 md:gap-3 pt-2">
               <Button
                 onClick={playSentenceAudio}
-                disabled={isRecording}
+                disabled={isRecording || isPlayingAudio}
                 className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 uppercase font-medium h-10 w-28 md:w-32"
               >
                 <Volume2 className="w-4 h-4" />
                 PREDVAJAJ
               </Button>
               
-              {!repeatCompleted ? (
-                <Button
-                  onClick={handleRepeat}
-                  disabled={isRecording}
-                  className="relative bg-app-orange hover:bg-app-orange/90 text-white gap-2 uppercase font-medium h-10 w-28 md:w-32"
-                >
-                  <Mic className="w-4 h-4" />
-                  {isRecording ? "..." : "PONOVI"}
-                  {isRecording && (
-                    <span className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
-                      {countdown}
-                    </span>
-                  )}
-                </Button>
-              ) : (
-                <Button 
-                  onClick={handleContinueFromDialog} 
-                  className="bg-dragon-green hover:bg-dragon-green/90 text-white uppercase font-medium h-10 w-28 md:w-32"
-                >
-                  NAPREJ
-                </Button>
-              )}
+              <Button
+                onClick={handleRepeat}
+                disabled={isRecording || isPlayingAudio}
+                className="relative bg-app-orange hover:bg-app-orange/90 text-white gap-2 uppercase font-medium h-10 w-28 md:w-32"
+              >
+                <Mic className="w-4 h-4" />
+                {isRecording ? "..." : "PONOVI"}
+                {isRecording && (
+                  <span className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                    {countdown}
+                  </span>
+                )}
+              </Button>
             </div>
           </div>
         </DialogContent>

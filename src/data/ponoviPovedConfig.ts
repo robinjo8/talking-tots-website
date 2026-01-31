@@ -109,7 +109,7 @@ export const ponoviPovedL: PonoviPovedConfig = {
       words: [
         { word: "Slon", image: "slon1.webp", audio: "slon.m4a" },
         { word: "ima", image: "Stickman_imeti.webp", audio: "ima.m4a" },
-        { word: "liziko", image: "lizika1.webp", audio: "lizika.m4a" }
+        { word: "liziko", image: "lizika1.webp", audio: "liziko.m4a" }
       ],
       fullSentence: "Slon ima liziko.",
       audio: "slon_ima_liziko.m4a"
