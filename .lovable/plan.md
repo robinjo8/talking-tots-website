@@ -1,268 +1,164 @@
 
 
-# Plan: Poenotenje gumba za zvočnik v vseh igrah
+# Plan: Dinamično prilagajanje velikosti za igre na Desktop verziji
 
 ## Opis problema
 
-Gumb za predvajanje zvoka (ikona zvočnika) ni enak v vseh igrah:
-- **Labirint (StarCollectDialog):** Okrogel zelen gumb z barvo `dragon-green`
-- **Ostale igre:** Kvadraten gumb z barvo `green-500`, različne velikosti
+Pri igri Bingo (in nekaterih drugih igrah) je na manjših računalniških zaslonih zgornja vrstica (tekoči trak/reel) odrezana. Problem je v tem, da se vsebina ne prilagaja velikosti zaslona - uporablja se le statični `md:scale-[1.2]`, ki ne upošteva dejanske višine okna.
 
-## Ciljna oblika
+Pri `/artikulacijski-test` je ta problem že rešen z dinamičnim izračunom višin na osnovi `windowSize`, kar zagotavlja, da se vsa vsebina prilega v vidno območje.
 
-Vse igre morajo uporabljati enako obliko kot Labirint:
+## Rešitev
 
-```tsx
-<button
-  onClick={handlePlayAudio}
-  className="p-2 rounded-full bg-dragon-green hover:bg-dragon-green/90 transition-colors"
-  aria-label="Predvajaj besedo"
->
-  <Volume2 className="w-6 h-6 text-white" />
-</button>
-```
+Implementacija viewport-based scaling pristopa iz `/artikulacijski-test` v vse igre, ki imajo ta problem:
 
-**Lastnosti:**
-- Okrogel gumb (`rounded-full`)
-- Barva `dragon-green` (namesto `green-500`)
-- Padding `p-2` (namesto fiksne višine/širine)
-- Ikona velikosti `w-6 h-6` z belo barvo
-- Hover efekt: `hover:bg-dragon-green/90`
-- Prehod: `transition-colors`
+1. **GenericBingoGame** - Dodati dinamično skaliranje
+2. **GenericWheelGame** - Dodati `overflow-auto` in `min-h-full` za drsenje
+3. **GenericSpominGame** - Preveriti layout (že ima `min-h-screen`)
+4. **GenericIgraUjemanjaGame** - Preveriti layout
+5. **GenericZaporedjaGame** - Preveriti layout
+6. **GenericLabirintGame** - Že ima `overflow-auto` in `min-h-full`
+7. **GenericSestavljankaGame** - Že ima `min-h-screen`
 
 ## Tehnične spremembe
 
-### 1. BingoSuccessDialog.tsx
-**Lokacija:** Vrstica ~170-178
+### Sprememba 1: GenericBingoGame.tsx
 
-Spremeni:
+Trenutna struktura:
 ```tsx
-<Button
-  onClick={handlePlayAudio}
-  size="icon"
-  className="bg-green-500 hover:bg-green-600 text-white h-12 w-12"
->
-  <Volume2 className="w-6 h-6" />
-</Button>
+<div className="fixed inset-0 overflow-hidden select-none">
+  <div className="h-full flex flex-col items-center justify-center p-2 md:p-4 gap-1 md:gap-2 md:scale-[1.2] md:origin-center">
 ```
 
-V:
+Problem: `md:scale-[1.2]` povečuje vsebino za 20% na srednje velikih zaslonih, kar povzroči, da se elementi pomaknejo izven vidnega območja.
+
+Nova struktura z dinamičnim skaliranjem:
 ```tsx
-<button
-  onClick={handlePlayAudio}
-  className="p-2 rounded-full bg-dragon-green hover:bg-dragon-green/90 transition-colors"
-  aria-label="Predvajaj besedo"
->
-  <Volume2 className="w-6 h-6 text-white" />
-</button>
+// Dodaj window size tracking
+const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+
+useEffect(() => {
+  const updateSize = () => {
+    setWindowSize({
+      width: window.innerWidth,
+      height: window.innerHeight
+    });
+  };
+  updateSize();
+  window.addEventListener('resize', updateSize);
+  return () => window.removeEventListener('resize', updateSize);
+}, []);
+
+// Izračunaj dinamični scale factor
+const scaleFactor = useMemo(() => {
+  if (windowSize.height === 0) return 1;
+  // Reel: ~80px, Grid: ~400px, Label: ~40px, Gaps: ~40px = ~560px base
+  const baseHeight = 560;
+  const availableHeight = windowSize.height - 80; // padding
+  const scale = Math.min(availableHeight / baseHeight, 1.2);
+  return Math.max(0.7, scale); // minimum 0.7, maximum 1.2
+}, [windowSize.height]);
 ```
 
-### 2. WheelSuccessDialog.tsx (Kolo sreče)
-**Lokacija:** Vrstica ~284-291
-
-Spremeni:
+Layout:
 ```tsx
-<Button
-  onClick={handlePlayAudio}
-  size="icon"
-  className="bg-green-500 hover:bg-green-600 text-white h-10 w-10 sm:h-12 sm:w-12"
->
-  <Volume2 className="w-5 h-5 sm:w-6 sm:h-6" />
-</Button>
+<div className="fixed inset-0 overflow-hidden select-none">
+  <div 
+    className="h-full flex flex-col items-center justify-center p-2 md:p-4 gap-1 md:gap-2"
+    style={{ transform: `scale(${scaleFactor})`, transformOrigin: 'center center' }}
+  >
 ```
 
-V:
+### Sprememba 2: GenericWheelGame.tsx
+
+Trenutna struktura je že dobra z `overflow-auto` in `min-h-full`, vendar bi morala imeti tudi dinamično prilagajanje za manjše zaslone.
+
+Dodaj podobno logiko kot pri Bingo:
 ```tsx
-<button
-  onClick={handlePlayAudio}
-  className="p-2 rounded-full bg-dragon-green hover:bg-dragon-green/90 transition-colors"
-  aria-label="Predvajaj besedo"
->
-  <Volume2 className="w-6 h-6 text-white" />
-</button>
+const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+
+useEffect(() => {
+  const updateSize = () => {
+    setWindowSize({
+      width: window.innerWidth,
+      height: window.innerHeight
+    });
+  };
+  updateSize();
+  window.addEventListener('resize', updateSize);
+  return () => window.removeEventListener('resize', updateSize);
+}, []);
+
+const scaleFactor = useMemo(() => {
+  if (windowSize.height === 0) return 1;
+  const baseHeight = 600; // wheel + title + padding
+  const availableHeight = windowSize.height - 120;
+  const scale = Math.min(availableHeight / baseHeight, 1);
+  return Math.max(0.7, scale);
+}, [windowSize.height]);
 ```
 
-### 3. MatchingCompletionDialog.tsx (Igra ujemanja / Zaporedja)
-**Lokacija:** Vrstica ~221-230
+### Sprememba 3: Igra Ujemanja in Zaporedja
 
-Spremeni:
-```tsx
-<Button
-  onClick={(e) => {
-    e.stopPropagation();
-    handlePlayAudio(image);
-  }}
-  size="icon"
-  className="bg-green-500 hover:bg-green-600 text-white h-8 w-8"
->
-  <Volume2 className="w-4 h-4" />
-</Button>
-```
+Te igre že imajo `min-h-screen` in `overflow-auto`, kar pomeni, da se lahko drsi. Vendar bi lahko dodali tudi dinamično skaliranje za boljšo uporabniško izkušnjo.
 
-V:
-```tsx
-<button
-  onClick={(e) => {
-    e.stopPropagation();
-    handlePlayAudio(image);
-  }}
-  className="p-2 rounded-full bg-dragon-green hover:bg-dragon-green/90 transition-colors"
-  aria-label="Predvajaj besedo"
->
-  <Volume2 className="w-6 h-6 text-white" />
-</button>
-```
-
-### 4. PuzzleSuccessDialog.tsx (Sestavljanke zaključek)
-**Lokacija:** Vrstica ~224-233
-
-Spremeni:
-```tsx
-<Button
-  onClick={(e) => {
-    e.stopPropagation();
-    handlePlayAudio(image);
-  }}
-  size="icon"
-  className="bg-green-500 hover:bg-green-600 text-white h-8 w-8"
->
-  <Volume2 className="w-4 h-4" />
-</Button>
-```
-
-V:
-```tsx
-<button
-  onClick={(e) => {
-    e.stopPropagation();
-    handlePlayAudio(image);
-  }}
-  className="p-2 rounded-full bg-dragon-green hover:bg-dragon-green/90 transition-colors"
-  aria-label="Predvajaj besedo"
->
-  <Volume2 className="w-6 h-6 text-white" />
-</button>
-```
-
-### 5. MemoryPairDialog.tsx (Spomin)
-**Lokacija:** Vrstica ~180-187
-
-Spremeni:
-```tsx
-<Button
-  onClick={() => audioUrl && playAudio(audioUrl)}
-  disabled={!audioUrl}
-  size="icon"
-  className="bg-green-500 hover:bg-green-600 text-white h-12 w-12"
->
-  <Volume2 className="w-6 h-6" />
-</Button>
-```
-
-V:
-```tsx
-<button
-  onClick={() => audioUrl && playAudio(audioUrl)}
-  disabled={!audioUrl}
-  className="p-2 rounded-full bg-dragon-green hover:bg-dragon-green/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-  aria-label="Predvajaj besedo"
->
-  <Volume2 className="w-6 h-6 text-white" />
-</button>
-```
-
-### 6. PuzzleCompletionDialog.tsx (Stari dialog)
-**Lokacija:** Vrstica ~104-111
-
-Spremeni:
-```tsx
-<Button
-  onClick={handlePlayAudio}
-  size="icon"
-  className="bg-green-500 hover:bg-green-600 text-white h-12 w-12"
->
-  <Volume2 className="w-6 h-6" />
-</Button>
-```
-
-V:
-```tsx
-<button
-  onClick={handlePlayAudio}
-  className="p-2 rounded-full bg-dragon-green hover:bg-dragon-green/90 transition-colors"
-  aria-label="Predvajaj besedo"
->
-  <Volume2 className="w-6 h-6 text-white" />
-</button>
-```
-
-### 7. AudioPracticeDialog.tsx
-**Lokacija:** Vrstica ~37-48
-
-Spremeni:
-```tsx
-<Button 
-  onClick={onPlayAudio}
-  disabled={isAudioLoading}
-  size="icon"
-  className="bg-green-500 hover:bg-green-600 text-white h-12 w-12"
->
-  {isAudioLoading ? (
-    <div className="w-6 h-6 animate-spin rounded-full border-2 border-white border-t-transparent" />
-  ) : (
-    <Volume2 className="w-6 h-6" />
-  )}
-</Button>
-```
-
-V:
-```tsx
-<button
-  onClick={onPlayAudio}
-  disabled={isAudioLoading}
-  className="p-2 rounded-full bg-dragon-green hover:bg-dragon-green/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-  aria-label="Predvajaj besedo"
->
-  {isAudioLoading ? (
-    <div className="w-6 h-6 animate-spin rounded-full border-2 border-white border-t-transparent" />
-  ) : (
-    <Volume2 className="w-6 h-6 text-white" />
-  )}
-</button>
-```
-
-## Vizualna primerjava
+## Diagram spremembe
 
 ```text
 PRED POPRAVKOM:
-┌────────────┐
-│  ┌──────┐  │  ← Kvadrat, bg-green-500
-│  │ 🔊  │  │    Različne velikosti (h-8, h-10, h-12)
-│  └──────┘  │
-└────────────┘
+┌─────────────────────────┐
+│     [ODREZANO]          │ ← Reel ni viden
+├─────────────────────────┤
+│                         │
+│    ┌───┬───┬───┬───┐   │
+│    │   │   │   │   │   │
+│    ├───┼───┼───┼───┤   │
+│    │   │   │   │   │   │
+│    ├───┼───┼───┼───┤   │
+│    │   │   │   │   │   │
+│    ├───┼───┼───┼───┤   │
+│    │   │   │   │   │   │
+│    └───┴───┴───┴───┘   │
+│                         │
+│    NAJDI: BESEDA        │
+└─────────────────────────┘
 
-PO POPRAVKU:
-┌────────────┐
-│    ⭕      │  ← Krog, bg-dragon-green
-│   🔊       │    Enotna velikost (p-2, w-6 h-6)
-│            │
-└────────────┘
+PO POPRAVKU (dinamično skaliranje):
+┌─────────────────────────┐
+│  [🖼️][🖼️][🖼️][🖼️][🖼️]    │ ← Reel viden
+│      [ZAVRTI]           │
+│                         │
+│    ┌───┬───┬───┬───┐   │
+│    │   │   │   │   │   │
+│    ├───┼───┼───┼───┤   │
+│    │   │   │   │   │   │
+│    ├───┼───┼───┼───┤   │
+│    │   │   │   │   │   │
+│    ├───┼───┼───┼───┤   │
+│    │   │   │   │   │   │
+│    └───┴───┴───┴───┘   │
+│                         │
+│    NAJDI: BESEDA        │
+└─────────────────────────┘
 ```
 
 ## Prizadete igre
 
-- **Bingo** (vse črke)
-- **Kolo besed** (vse črke)
-- **Igra ujemanja / Zaporedja** (vse starostne skupine)
-- **Sestavljanke** (zaključni dialog)
-- **Spomin** (dialog za pare)
-- **Govorna vaja** (AudioPracticeDialog)
+| Igra | Datoteka | Potrebna sprememba |
+|------|----------|-------------------|
+| Bingo | `GenericBingoGame.tsx` | Dinamično skaliranje |
+| Kolo besed | `GenericWheelGame.tsx` | Dinamično skaliranje |
+| Spomin | `GenericSpominGame.tsx` | Že ima min-h-screen |
+| Igra ujemanja | `GenericIgraUjemanjaGame.tsx` | Že ima min-h-screen |
+| Zaporedja | `GenericZaporedjaGame.tsx` | Že ima fixed inset-0 |
+| Labirint | `GenericLabirintGame.tsx` | Že ima overflow-auto |
+| Sestavljanke | `GenericSestavljankaGame.tsx` | Že ima min-h-screen |
 
 ## Testiranje
 
-1. Odpri igro Bingo (`/govorne-igre/bingo/c`) in preveri gumb za zvočnik
-2. Odpri igro Kolo besed in preveri gumb
-3. Odpri igro Spomin in najdi par, da se prikaže dialog
-4. Odpri igro Sestavljanka in jo zaključi
-5. Preveri, da je v vseh primerih gumb okrogel in zelene barve (dragon-green)
+1. Odpri igro Bingo na manjšem zaslonu (1366x768 ali manjši)
+2. Preveri, da je tekoči trak (reel) v celoti viden
+3. Preveri, da se vsa vsebina prilega v vidno območje brez odrezanja
+4. Ponovi za igro Kolo besed
+5. Testiraj na različnih velikostih zaslona (1920x1080, 1366x768, 1280x720)
 
