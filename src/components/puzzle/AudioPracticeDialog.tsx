@@ -34,18 +34,18 @@ export function AudioPracticeDialog({
           <div className="text-center">
             <h4 className="font-medium mb-3">Poslušajte in ponovite besedo:</h4>
             <div className="flex justify-center gap-3">
-              <Button 
+              <button 
                 onClick={onPlayAudio}
                 disabled={isAudioLoading}
-                size="icon"
-                className="bg-green-500 hover:bg-green-600 text-white h-12 w-12"
+                className="p-2 rounded-full bg-dragon-green hover:bg-dragon-green/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Predvajaj besedo"
               >
                 {isAudioLoading ? (
                   <div className="w-6 h-6 animate-spin rounded-full border-2 border-white border-t-transparent" />
                 ) : (
-                  <Volume2 className="w-6 h-6" />
+                  <Volume2 className="w-6 h-6 text-white" />
                 )}
-              </Button>
+              </button>
               
               <Button 
                 onClick={onStartRecording}

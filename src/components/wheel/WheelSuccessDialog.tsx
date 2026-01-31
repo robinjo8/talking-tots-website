@@ -282,13 +282,13 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
 
           {/* Audio playback button */}
           <div className="flex justify-center">
-            <Button
+            <button
               onClick={handlePlayAudio}
-              size="icon"
-              className="bg-green-500 hover:bg-green-600 text-white h-10 w-10 sm:h-12 sm:w-12"
+              className="p-2 rounded-full bg-dragon-green hover:bg-dragon-green/90 transition-colors"
+              aria-label="Predvajaj besedo"
             >
-              <Volume2 className="w-5 h-5 sm:w-6 sm:h-6" />
-            </Button>
+              <Volume2 className="w-6 h-6 text-white" />
+            </button>
           </div>
 
         </div>
