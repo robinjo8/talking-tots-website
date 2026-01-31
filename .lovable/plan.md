@@ -1,164 +1,237 @@
 
+# Plan: Popravek igre Ponovi Poved
 
-# Plan: Dinamično prilagajanje velikosti za igre na Desktop verziji
+## Opis problemov
 
-## Opis problema
+### Problem 1: Gumb za skok mora biti onemogočen med predvajanjem zvoka
+Trenutno se ob skoku na barvni kamen (beseda) zvok začne predvajati, vendar je gumb za skok takoj spet aktiven. Uporabnik lahko klikne na gumb preden se zvok konča, kar povzroči prekrivanje zvokov.
 
-Pri igri Bingo (in nekaterih drugih igrah) je na manjših računalniških zaslonih zgornja vrstica (tekoči trak/reel) odrezana. Problem je v tem, da se vsebina ne prilagaja velikosti zaslona - uporablja se le statični `md:scale-[1.2]`, ki ne upošteva dejanske višine okna.
+**Rešitev:** Dodati stanje `isPlayingAudio` ki onemogočid gumb za skok dokler se zvok ne konča predvajati.
 
-Pri `/artikulacijski-test` je ta problem že rešen z dinamičnim izračunom višin na osnovi `windowSize`, kar zagotavlja, da se vsa vsebina prilega v vidno območje.
+### Problem 2: V pop-up oknu se morajo vse tri besede avtomatsko predvajati zaporedno
+Trenutno se ob odprtju dialoga predvaja polna poved (celotna audio datoteka). Zahteva je, da se ob odprtju dialoga avtomatsko predvajajo vse tri besede zaporedno brez zamika (0ms).
 
-## Rešitev
-
-Implementacija viewport-based scaling pristopa iz `/artikulacijski-test` v vse igre, ki imajo ta problem:
-
-1. **GenericBingoGame** - Dodati dinamično skaliranje
-2. **GenericWheelGame** - Dodati `overflow-auto` in `min-h-full` za drsenje
-3. **GenericSpominGame** - Preveriti layout (že ima `min-h-screen`)
-4. **GenericIgraUjemanjaGame** - Preveriti layout
-5. **GenericZaporedjaGame** - Preveriti layout
-6. **GenericLabirintGame** - Že ima `overflow-auto` in `min-h-full`
-7. **GenericSestavljankaGame** - Že ima `min-h-screen`
+**Rešitev:** Uporabiti `onended` event na audio elementu za zaporedno predvajanje vseh treh besed.
 
 ## Tehnične spremembe
 
-### Sprememba 1: GenericBingoGame.tsx
+### Sprememba 1: Dodaj novo stanje za sledenje predvajanja zvoka
 
-Trenutna struktura:
+**Datoteka:** `src/components/games/PonoviPovedGame.tsx`
+
+**Lokacija:** Vrstica ~370-385 (med obstoječimi stanji)
+
 ```tsx
-<div className="fixed inset-0 overflow-hidden select-none">
-  <div className="h-full flex flex-col items-center justify-center p-2 md:p-4 gap-1 md:gap-2 md:scale-[1.2] md:origin-center">
+// Obstoječa stanja
+const [phase, setPhase] = useState<GamePhase>("start");
+const [dragonPosition, setDragonPosition] = useState(0);
+const [isJumping, setIsJumping] = useState(false);
+// NOVO: Dodaj stanje za sledenje predvajanja zvoka
+const [isPlayingAudio, setIsPlayingAudio] = useState(false);
 ```
 
-Problem: `md:scale-[1.2]` povečuje vsebino za 20% na srednje velikih zaslonih, kar povzroči, da se elementi pomaknejo izven vidnega območja.
+### Sprememba 2: Posodobi playAudio funkcijo da nastavi stanje
 
-Nova struktura z dinamičnim skaliranjem:
+**Lokacija:** Vrstica ~441-451
+
+Trenutna koda:
 ```tsx
-// Dodaj window size tracking
-const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
-
-useEffect(() => {
-  const updateSize = () => {
-    setWindowSize({
-      width: window.innerWidth,
-      height: window.innerHeight
-    });
-  };
-  updateSize();
-  window.addEventListener('resize', updateSize);
-  return () => window.removeEventListener('resize', updateSize);
+const playAudio = useCallback(async (audioFile: string) => {
+  if (audioRef.current) {
+    try {
+      audioRef.current.src = getAudioUrl(audioFile);
+      await audioRef.current.play();
+    } catch (error) {
+      console.error("Error playing audio:", error);
+    }
+  }
 }, []);
-
-// Izračunaj dinamični scale factor
-const scaleFactor = useMemo(() => {
-  if (windowSize.height === 0) return 1;
-  // Reel: ~80px, Grid: ~400px, Label: ~40px, Gaps: ~40px = ~560px base
-  const baseHeight = 560;
-  const availableHeight = windowSize.height - 80; // padding
-  const scale = Math.min(availableHeight / baseHeight, 1.2);
-  return Math.max(0.7, scale); // minimum 0.7, maximum 1.2
-}, [windowSize.height]);
 ```
 
-Layout:
+Nova koda:
 ```tsx
-<div className="fixed inset-0 overflow-hidden select-none">
-  <div 
-    className="h-full flex flex-col items-center justify-center p-2 md:p-4 gap-1 md:gap-2"
-    style={{ transform: `scale(${scaleFactor})`, transformOrigin: 'center center' }}
-  >
-```
-
-### Sprememba 2: GenericWheelGame.tsx
-
-Trenutna struktura je že dobra z `overflow-auto` in `min-h-full`, vendar bi morala imeti tudi dinamično prilagajanje za manjše zaslone.
-
-Dodaj podobno logiko kot pri Bingo:
-```tsx
-const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
-
-useEffect(() => {
-  const updateSize = () => {
-    setWindowSize({
-      width: window.innerWidth,
-      height: window.innerHeight
-    });
-  };
-  updateSize();
-  window.addEventListener('resize', updateSize);
-  return () => window.removeEventListener('resize', updateSize);
+const playAudio = useCallback((audioFile: string): Promise<void> => {
+  return new Promise((resolve) => {
+    if (audioRef.current) {
+      try {
+        setIsPlayingAudio(true);
+        audioRef.current.src = getAudioUrl(audioFile);
+        
+        // Počakaj da se zvok konča
+        audioRef.current.onended = () => {
+          setIsPlayingAudio(false);
+          resolve();
+        };
+        
+        audioRef.current.onerror = () => {
+          setIsPlayingAudio(false);
+          resolve();
+        };
+        
+        audioRef.current.play().catch(() => {
+          setIsPlayingAudio(false);
+          resolve();
+        });
+      } catch (error) {
+        console.error("Error playing audio:", error);
+        setIsPlayingAudio(false);
+        resolve();
+      }
+    } else {
+      resolve();
+    }
+  });
 }, []);
-
-const scaleFactor = useMemo(() => {
-  if (windowSize.height === 0) return 1;
-  const baseHeight = 600; // wheel + title + padding
-  const availableHeight = windowSize.height - 120;
-  const scale = Math.min(availableHeight / baseHeight, 1);
-  return Math.max(0.7, scale);
-}, [windowSize.height]);
 ```
 
-### Sprememba 3: Igra Ujemanja in Zaporedja
+### Sprememba 3: Posodobi playSentenceAudio da predvaja vse tri besede zaporedno z 0ms zamikom
 
-Te igre že imajo `min-h-screen` in `overflow-auto`, kar pomeni, da se lahko drsi. Vendar bi lahko dodali tudi dinamično skaliranje za boljšo uporabniško izkušnjo.
+**Lokacija:** Vrstica ~454-474
+
+Trenutna koda:
+```tsx
+const playSentenceAudio = useCallback(async () => {
+  const sentence = config.sentences[currentSentenceForDialog];
+  if (!sentence) return;
+  
+  try {
+    if (audioRef.current) {
+      audioRef.current.src = getAudioUrl(sentence.audio);
+      await audioRef.current.play();
+      return;
+    }
+  } catch (error) {
+    console.log("Full sentence audio not found, playing individual words");
+  }
+  
+  for (let i = 0; i < sentence.words.length; i++) {
+    await playAudio(sentence.words[i].audio);
+    if (i < sentence.words.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+  }
+}, [currentSentenceForDialog, config.sentences, playAudio]);
+```
+
+Nova koda:
+```tsx
+const playSentenceAudio = useCallback(async () => {
+  const sentence = config.sentences[currentSentenceForDialog];
+  if (!sentence) return;
+  
+  // Predvajaj vse tri besede zaporedno brez zamika (0ms)
+  for (let i = 0; i < sentence.words.length; i++) {
+    await playAudio(sentence.words[i].audio);
+    // Brez zamika med besedami (0ms)
+  }
+}, [currentSentenceForDialog, config.sentences, playAudio]);
+```
+
+### Sprememba 4: Dodaj useEffect za avtomatsko predvajanje ob odprtju dialoga
+
+**Lokacija:** Za `playSentenceAudio` funkcijo (nova koda)
+
+```tsx
+// Avtomatsko predvajaj vse tri besede ko se dialog odpre
+useEffect(() => {
+  if (showSentenceDialog && dialogSentence) {
+    // Počakaj kratek čas da se dialog odpre
+    const timer = setTimeout(async () => {
+      for (let i = 0; i < dialogSentence.words.length; i++) {
+        await playAudio(dialogSentence.words[i].audio);
+        // Brez zamika med besedami (0ms)
+      }
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }
+}, [showSentenceDialog, dialogSentence, playAudio]);
+```
+
+### Sprememba 5: Posodobi onemogočitev gumba za skok
+
+**Lokacija desktop gumba:** Vrstica ~818-822
+**Lokacija mobile gumba:** Vrstica ~863-866
+
+Desktop:
+```tsx
+<JumpButton 
+  onClick={handleNext} 
+  disabled={isJumping || phase === "complete" || showSentenceDialog || isPlayingAudio}
+  size={144}
+/>
+```
+
+Mobile:
+```tsx
+<JumpButton 
+  onClick={handleNext} 
+  disabled={isJumping || phase === "complete" || showSentenceDialog || isPlayingAudio}
+/>
+```
+
+### Sprememba 6: Odstrani stari code za predvajanje v handleNext
+
+**Lokacija:** Vrstica ~571-601
+
+V `handleNext` funkciji odstrani staro logiko predvajanja zvoka, saj se bo zdaj izvajala preko `playAudio` z await:
+
+```tsx
+setTimeout(async () => {
+  setIsJumping(false);
+  
+  if (nextStone.isRest) {
+    // Landed on rest stone - show sentence dialog
+    setCurrentSentenceForDialog(nextStone.sentenceIndex ?? 0);
+    setPhase("sentence");
+    setShowSentenceDialog(true);
+    // Odstrani staro predvajanje - useEffect bo to naredil
+  } else if (nextStone.wordIndex !== undefined) {
+    // Landed on word stone
+    setPhase("word");
+    const word = config.sentences[nextStone.sentenceIndex!].words[nextStone.wordIndex];
+    
+    // Add to collected words
+    setCollectedWords(prev => [...prev, word]);
+    
+    // Play word audio - await zagotovi da se gumb omogoči šele ko se zvok konča
+    await playAudio(word.audio);
+  }
+}, 600);
+```
 
 ## Diagram spremembe
 
 ```text
 PRED POPRAVKOM:
-┌─────────────────────────┐
-│     [ODREZANO]          │ ← Reel ni viden
-├─────────────────────────┤
-│                         │
-│    ┌───┬───┬───┬───┐   │
-│    │   │   │   │   │   │
-│    ├───┼───┼───┼───┤   │
-│    │   │   │   │   │   │
-│    ├───┼───┼───┼───┤   │
-│    │   │   │   │   │   │
-│    ├───┼───┼───┼───┤   │
-│    │   │   │   │   │   │
-│    └───┴───┴───┴───┘   │
-│                         │
-│    NAJDI: BESEDA        │
-└─────────────────────────┘
+┌────────────────────────────────────────────────┐
+│ Klik na gumb → Skok → Zvok začne → Gumb aktiven│
+│                        ↓                       │
+│              Uporabnik lahko klikne spet       │
+│              (zvoki se prekrivajo)             │
+└────────────────────────────────────────────────┘
 
-PO POPRAVKU (dinamično skaliranje):
-┌─────────────────────────┐
-│  [🖼️][🖼️][🖼️][🖼️][🖼️]    │ ← Reel viden
-│      [ZAVRTI]           │
-│                         │
-│    ┌───┬───┬───┬───┐   │
-│    │   │   │   │   │   │
-│    ├───┼───┼───┼───┤   │
-│    │   │   │   │   │   │
-│    ├───┼───┼───┼───┤   │
-│    │   │   │   │   │   │
-│    ├───┼───┼───┼───┤   │
-│    │   │   │   │   │   │
-│    └───┴───┴───┴───┘   │
-│                         │
-│    NAJDI: BESEDA        │
-└─────────────────────────┘
+PO POPRAVKU:
+┌────────────────────────────────────────────────┐
+│ Klik na gumb → Skok → Zvok začne → Gumb onemog.│
+│                        ↓                       │
+│              Zvok se konča predvajati          │
+│                        ↓                       │
+│              Gumb spet aktiven                 │
+└────────────────────────────────────────────────┘
+
+POP-UP OKNO:
+┌────────────────────────────────────────────────┐
+│ Dialog se odpre → Beseda 1 → Beseda 2 → Beseda 3│
+│                   (0ms)      (0ms)             │
+│              Avtomatsko zaporedno predvajanje  │
+└────────────────────────────────────────────────┘
 ```
-
-## Prizadete igre
-
-| Igra | Datoteka | Potrebna sprememba |
-|------|----------|-------------------|
-| Bingo | `GenericBingoGame.tsx` | Dinamično skaliranje |
-| Kolo besed | `GenericWheelGame.tsx` | Dinamično skaliranje |
-| Spomin | `GenericSpominGame.tsx` | Že ima min-h-screen |
-| Igra ujemanja | `GenericIgraUjemanjaGame.tsx` | Že ima min-h-screen |
-| Zaporedja | `GenericZaporedjaGame.tsx` | Že ima fixed inset-0 |
-| Labirint | `GenericLabirintGame.tsx` | Že ima overflow-auto |
-| Sestavljanke | `GenericSestavljankaGame.tsx` | Že ima min-h-screen |
 
 ## Testiranje
 
-1. Odpri igro Bingo na manjšem zaslonu (1366x768 ali manjši)
-2. Preveri, da je tekoči trak (reel) v celoti viden
-3. Preveri, da se vsa vsebina prilega v vidno območje brez odrezanja
-4. Ponovi za igro Kolo besed
-5. Testiraj na različnih velikostih zaslona (1920x1080, 1366x768, 1280x720)
-
+1. Odpri igro `/govorne-igre/ponovi-poved/c`
+2. Klikni na gumb za skok
+3. Preveri, da je gumb onemogočen dokler se zvok ne konča predvajati
+4. Ko zmajček pristane na sivem kamnu, preveri da se pop-up odpre
+5. V pop-up oknu preveri, da se vse tri besede samodejno predvajajo zaporedno brez zamika
