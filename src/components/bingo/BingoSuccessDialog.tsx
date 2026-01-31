@@ -62,7 +62,10 @@ export const BingoSuccessDialog: React.FC<BingoSuccessDialogProps> = ({
     setIsRecording(false);
     setRecordingTimeLeft(3);
     setHasRecorded(true);
-  }, []);
+    
+    // Auto-close dialog when recording finishes
+    onClose();
+  }, [onClose]);
 
   // Simulated recording - visual countdown only, no actual audio recording
   const startRecording = () => {
@@ -178,26 +181,17 @@ export const BingoSuccessDialog: React.FC<BingoSuccessDialogProps> = ({
             </div>
           )}
 
-          {/* Action buttons */}
-          <div className="flex justify-center gap-3">
-            {hasRecorded && (
-              isLastWord ? (
-                <Button
-                  onClick={handleClaimStar}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 px-8"
-                >
-                  ⭐ VZEMI ZVEZDICO
-                </Button>
-              ) : (
-                <Button 
-                  onClick={handleContinue} 
-                  className="bg-dragon-green hover:bg-dragon-green/90 text-white"
-                >
-                  NADALJUJ
-                </Button>
-              )
-            )}
-          </div>
+          {/* Action buttons - only show for last word */}
+          {hasRecorded && isLastWord && (
+            <div className="flex justify-center gap-3">
+              <Button
+                onClick={handleClaimStar}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 px-8"
+              >
+                ⭐ VZEMI ZVEZDICO
+              </Button>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
