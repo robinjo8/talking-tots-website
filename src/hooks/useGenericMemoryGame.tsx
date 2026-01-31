@@ -150,14 +150,17 @@ export const useGenericMemoryGame = (config: SpominConfig) => {
       console.log("Game completed!");
       setGameCompleted(true);
       gameCompletedRef.current = true;
-      // Record completion in progress system
-      recordGameCompletion('memory', config.displayLetter);
-      // Check for trophy after short delay
-      setTimeout(async () => {
-        await checkForNewTrophy();
-      }, 500);
+      // Progress is now saved via handleClaimStar when user clicks "VZEMI ZVEZDICO"
     }
-  }, [matchedPairs, cards, checkForNewTrophy, recordGameCompletion, config.displayLetter]);
+  }, [matchedPairs, cards]);
+
+  const handleClaimStar = async () => {
+    // Record completion in progress system
+    recordGameCompletion('memory', config.displayLetter);
+    // Check for trophy after short delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await checkForNewTrophy();
+  };
 
   const resetGame = () => {
     if (memoryCardsData && memoryCardsData.length > 0) {
@@ -204,6 +207,7 @@ export const useGenericMemoryGame = (config: SpominConfig) => {
     currentMatchedPair,
     handlePairDialogContinue,
     handlePairUnmatch,
+    handleClaimStar,
     displayLetter: config.displayLetter
   };
 };

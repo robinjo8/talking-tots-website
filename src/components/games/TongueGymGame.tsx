@@ -1,8 +1,6 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { 
   ChevronLeft, 
@@ -14,6 +12,8 @@ import {
   Target
 } from "lucide-react";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
+import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
+import { useTrophyContext } from "@/contexts/TrophyContext";
 
 interface TongueExercise {
   id: number;
@@ -89,7 +89,11 @@ export function TongueGymGame() {
   const [earnedStars, setEarnedStars] = useState(0);
   const [isExerciseActive, setIsExerciseActive] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(0);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [starClaimed, setStarClaimed] = useState(false);
   const { playAudio } = useAudioPlayback();
+  const { recordExerciseCompletion } = useEnhancedProgress();
+  const { checkForNewTrophy } = useTrophyContext();
 
   const currentCard = tongueExercises[currentExercise];
   const progress = (completedExercises.size / tongueExercises.length) * 100;
@@ -147,7 +151,24 @@ export function TongueGymGame() {
       setEarnedStars(prev => prev + 1);
       setShowReward(true);
       setTimeout(() => setShowReward(false), 2000);
+      
+      // If all exercises completed, show success dialog
+      if (newCompleted.size === tongueExercises.length && !starClaimed) {
+        setTimeout(() => setShowSuccessDialog(true), 2500);
+      }
     }
+  };
+
+  const handleClaimStar = async () => {
+    // Save progress with 3 stars for completing all exercises
+    recordExerciseCompletion('vaje_za_jezik', 3);
+    
+    // Check for trophy after short delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await checkForNewTrophy();
+    
+    setStarClaimed(true);
+    setShowSuccessDialog(false);
   };
 
   const handleReset = () => {
@@ -307,8 +328,8 @@ export function TongueGymGame() {
         </Button>
       </div>
 
-      {/* Completion Reward */}
-      {allCompleted && (
+      {/* Completion Reward Card */}
+      {allCompleted && starClaimed && (
         <Card className="bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200">
           <CardContent className="pt-6 text-center space-y-4">
             <Trophy className="h-16 w-16 text-yellow-500 mx-auto" />
@@ -330,6 +351,31 @@ export function TongueGymGame() {
             </Button>
           </CardContent>
         </Card>
+      )}
+
+      {/* Success Dialog - BRAVO! */}
+      {showSuccessDialog && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 text-center max-w-md mx-4">
+            <h1 className="text-5xl font-bold text-dragon-green mb-6">
+              BRAVO!
+            </h1>
+            <img
+              src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_11.webp"
+              alt="Zmajček"
+              className="w-48 h-48 object-contain mx-auto mb-6"
+            />
+            <p className="text-lg text-muted-foreground mb-6">
+              OPRAVIL/A SI VSE VAJE ZA JEZIK!
+            </p>
+            <button
+              onClick={handleClaimStar}
+              className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-8 py-3 rounded-lg text-lg transition-colors"
+            >
+              ⭐ VZEMI ZVEZDICO
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
