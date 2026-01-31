@@ -291,14 +291,6 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
             </Button>
           </div>
 
-          {/* Action buttons */}
-          <div className="flex justify-center gap-2 sm:gap-3">
-            {justRecorded && (
-              <Button onClick={() => onOpenChange(false)} className="bg-dragon-green hover:bg-dragon-green/90 text-white text-sm sm:text-base h-9 sm:h-10">
-                NADALJUJ
-              </Button>
-            )}
-          </div>
         </div>
       </DialogContent>
     </Dialog>
