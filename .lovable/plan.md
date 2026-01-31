@@ -1,90 +1,62 @@
 
-# Plan: Popravki za igro Ponovi Poved
 
-## Opis zahtev
+# Plan: Popravek shranjevanja zvezdic pri igri Ponovi Poved
 
-### Zahteva 1: Gumb "ponovi" mora biti onemogočen med predvajanjem zvoka
-Trenutno je gumb "ponovi" onemogočen samo med snemanjem (`isRecording`). Mora biti onemogočen tudi med avtomatskim predvajanjem vseh treh besed (`isPlayingAudio`).
+## Analiza problema
 
-### Zahteva 2: Odstrani gumb "Naprej" in samodejno zapri pop-up po končanem snemanju
-Ko uporabnik klikne gumb "ponovi" in se odštevanje konča (5 sekund), se trenutno prikaže gumb "Naprej". Ta gumb je potrebno odstraniti - namesto tega naj se pop-up samodejno zapre, da lahko uporabnik nadaljuje z igro.
+Po pregledu kode sem odkril **tri kritične težave**:
 
-### Zahteva 3: Popravi zvočni posnetek za besedo "liziko" (črka L)
-V konfiguraciji za črko L je beseda "liziko", vendar je uporabljen napačen zvočni posnetek `lizika.m4a`. Pravilni posnetek je `liziko.m4a`.
+### Problem 1: Dvojno shranjevanje napredka
+Napredek se trenutno shranjuje **dvakrat**:
+- Prvič: V funkciji `recordProgress()` ko se odštevanje konča (vrstica 527)
+- Drugič: V `onClick` handlerju gumba "VZEMI ZVEZDICO" (vrstica 1124)
+
+### Problem 2: Ni invalidacije cache-a
+Po shranjevanju napredka se ne invalidira `enhancedProgress` cache, zato se stran `/moja-stran` ne osveži takoj. Uporabnik mora osvežiti stran ročno.
+
+### Problem 3: Ni preverjanja pokala
+Funkcija `checkForNewTrophy()` se ne kliče, zato se pokal ne prikaže ob doseženih 100 zvezdicah.
+
+### Dokaz problema
+V bazi ni nobenega zapisa za igro "ponovi-poved", kar pomeni da se koda za shranjevanje ne izvaja pravilno ali pa igra še ni bila testirana do konca.
+
+## Rešitev
+
+Poenoviti igro Ponovi Poved z drugimi igrami - uporabiti `useEnhancedProgress` hook in slediti vzorcu drugih iger.
 
 ## Tehnične spremembe
 
-### Sprememba 1: Onemogočitev gumba "ponovi" med predvajanjem zvoka
+### Sprememba 1: Dodaj import in uporabi useEnhancedProgress
 
 **Datoteka:** `src/components/games/PonoviPovedGame.tsx`
 
-**Lokacija:** Vrstice 1024-1037 (gumb "ponovi")
+**Lokacija:** Vrstica ~12 (med importi)
 
-Trenutna koda:
 ```tsx
-<Button
-  onClick={handleRepeat}
-  disabled={isRecording}
-  className="relative bg-app-orange hover:bg-app-orange/90 text-white gap-2 uppercase font-medium h-10 w-28 md:w-32"
->
+import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
+import { useTrophyContext } from "@/contexts/TrophyContext";
 ```
 
-Nova koda:
+**Lokacija:** Vrstica ~232 (med hooki)
+
 ```tsx
-<Button
-  onClick={handleRepeat}
-  disabled={isRecording || isPlayingAudio}
-  className="relative bg-app-orange hover:bg-app-orange/90 text-white gap-2 uppercase font-medium h-10 w-28 md:w-32"
->
+const { selectedChild } = useAuth();
+const { recordExerciseCompletion } = useEnhancedProgress();
+const { checkForNewTrophy } = useTrophyContext();
 ```
 
-### Sprememba 2: Onemogočitev gumba "Predvajaj" med predvajanjem in snemanjem
+### Sprememba 2: Odstrani lokalno funkcijo recordProgress
 
-**Lokacija:** Vrstice 1015-1022 (gumb "Predvajaj")
+**Lokacija:** Vrstice 649-678
 
-Trenutna koda:
-```tsx
-<Button
-  onClick={playSentenceAudio}
-  disabled={isRecording}
-  className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 uppercase font-medium h-10 w-28 md:w-32"
->
-```
+Celotno funkcijo `recordProgress` je potrebno odstraniti, saj bo zamenjana z `recordExerciseCompletion`.
 
-Nova koda:
-```tsx
-<Button
-  onClick={playSentenceAudio}
-  disabled={isRecording || isPlayingAudio}
-  className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 uppercase font-medium h-10 w-28 md:w-32"
->
-```
+### Sprememba 3: Posodobi handleRepeat - SAMO zapri dialog, NE shranjuj
 
-### Sprememba 3: Samodejno zaprtje pop-upa po končanem snemanju
+**Lokacija:** Vrstice 504-538
 
-**Lokacija:** Vrstice 504-520 (funkcija `handleRepeat`)
+Funkcija `handleRepeat` naj samo zapre dialog in ne shranjuje napredka. Napredek naj se shrani šele ob kliku na "VZEMI ZVEZDICO".
 
-Trenutna koda:
-```tsx
-const handleRepeat = useCallback(() => {
-  setIsRecording(true);
-  setCountdown(5);
-  
-  const interval = setInterval(() => {
-    setCountdown(prev => {
-      if (prev <= 1) {
-        clearInterval(interval);
-        setIsRecording(false);
-        setRepeatCompleted(true);
-        return 5;
-      }
-      return prev - 1;
-    });
-  }, 1000);
-}, []);
-```
-
-Nova koda - samodejno zapri dialog in nadaljuj z igro:
 ```tsx
 const handleRepeat = useCallback(() => {
   setIsRecording(true);
@@ -96,7 +68,7 @@ const handleRepeat = useCallback(() => {
         clearInterval(interval);
         setIsRecording(false);
         
-        // Samodejno zapri dialog in nadaljuj z igro
+        // Samodejno zapri dialog
         setShowSentenceDialog(false);
         setCollectedWords([]);
         setRepeatCompleted(false);
@@ -105,13 +77,7 @@ const handleRepeat = useCallback(() => {
         if (currentSentenceForDialog === 3) {
           setPhase("complete");
           setIsGameCompleted(true);
-          
-          if (!completionCalledRef.current) {
-            completionCalledRef.current = true;
-            recordProgress().then(() => {
-              setShowSuccessDialog(true);
-            });
-          }
+          setShowSuccessDialog(true); // Odpri success dialog BREZ shranjevanja
         }
         
         return 5;
@@ -122,79 +88,72 @@ const handleRepeat = useCallback(() => {
 }, [currentSentenceForDialog]);
 ```
 
-### Sprememba 4: Odstrani gumb "Naprej"
+### Sprememba 4: Posodobi gumb "VZEMI ZVEZDICO" - uporabi useEnhancedProgress
 
-**Lokacija:** Vrstice 1038-1045
+**Lokacija:** Vrstice 1119-1145
 
-Odstrani celoten pogojni blok za gumb "Naprej":
 ```tsx
-) : (
-  <Button 
-    onClick={handleContinueFromDialog} 
-    className="bg-dragon-green hover:bg-dragon-green/90 text-white uppercase font-medium h-10 w-28 md:w-32"
-  >
-    NAPREJ
-  </Button>
-)}
+<Button
+  onClick={async () => {
+    // Shrani napredek s poenotenim sistemom
+    recordExerciseCompletion(`ponovi-poved-${config.letter}`);
+    
+    // Preveri za nov pokal
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await checkForNewTrophy();
+    
+    // Zapri dialog
+    setShowSuccessDialog(false);
+  }}
+  className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 uppercase font-bold px-8"
+>
+  ⭐ VZEMI ZVEZDICO
+</Button>
 ```
 
-### Sprememba 5: Popravi zvočni posnetek za "liziko"
+### Sprememba 5: Odstrani odvečno completionCalledRef logiko
 
-**Datoteka:** `src/data/ponoviPovedConfig.ts`
+Ker se shranjevanje zdaj izvaja samo ob kliku na gumb, `completionCalledRef` ni več potreben za preprečevanje dvojnega shranjevanja.
 
-**Lokacija:** Vrstica 112
-
-Trenutna koda:
-```tsx
-{ word: "liziko", image: "lizika1.webp", audio: "lizika.m4a" }
-```
-
-Nova koda:
-```tsx
-{ word: "liziko", image: "lizika1.webp", audio: "liziko.m4a" }
-```
-
-## Diagram spremembe
+## Diagram toka
 
 ```text
 PRED POPRAVKOM:
 ┌────────────────────────────────────────────────┐
-│ Dialog se odpre → Zvok predvaja                │
-│                   ↓                            │
-│ Gumb "ponovi" aktiven (napaka!)                │
-│                   ↓                            │
-│ Uporabnik klikne → Odštevanje 5s               │
-│                   ↓                            │
-│ Prikaže se gumb "Naprej" → Klik → Dialog zaprt │
+│ Odštevanje končano → recordProgress() [1x]     │
+│                    ↓                           │
+│ VZEMI ZVEZDICO → supabase.insert() [2x]        │
+│                    ↓                           │
+│ Napredek shranjen DVAKRAT                      │
+│ NI invalidacije cache                          │
+│ NI preverjanja pokala                          │
 └────────────────────────────────────────────────┘
 
 PO POPRAVKU:
 ┌────────────────────────────────────────────────┐
-│ Dialog se odpre → Zvok predvaja                │
-│                   ↓                            │
-│ Gumb "ponovi" ONEMOGOČEN                       │
-│                   ↓                            │
-│ Zvok se konča → Gumb "ponovi" aktiven          │
-│                   ↓                            │
-│ Uporabnik klikne → Odštevanje 5s               │
-│                   ↓                            │
-│ Odštevanje končano → Dialog se SAMODEJNO ZAPRE│
+│ Odštevanje končano → showSuccessDialog(true)   │
+│                    ↓                           │
+│ VZEMI ZVEZDICO → recordExerciseCompletion()    │
+│                    ↓                           │
+│ Napredek shranjen 1x                           │
+│ Cache invalidiran avtomatsko                   │
+│ checkForNewTrophy() kliče za pokal            │
 └────────────────────────────────────────────────┘
 ```
+
+## Testiranje
+
+1. Odpri igro `/govorne-igre/ponovi-poved/c`
+2. Dokončaj vse 4 povedi (skoči čez vse kamne)
+3. Preveri, da se ob koncu prikaže "BRAVO!" dialog
+4. Klikni "VZEMI ZVEZDICO"
+5. Pojdi na `/moja-stran`
+6. Preveri, da se je število zvezdic povečalo za 1
+7. Preveri v bazi: `SELECT * FROM progress WHERE activity_subtype LIKE 'ponovi-poved%'`
 
 ## Prizadete datoteke
 
 | Datoteka | Sprememba |
 |----------|-----------|
-| `src/components/games/PonoviPovedGame.tsx` | Onemogočitev gumbov, samodejno zaprtje dialoga |
-| `src/data/ponoviPovedConfig.ts` | Popravek audio datoteke za "liziko" |
+| `src/components/games/PonoviPovedGame.tsx` | Poenotenje z useEnhancedProgress |
 
-## Testiranje
-
-1. Odpri igro `/govorne-igre/ponovi-poved/l`
-2. Skoči do sivega kamna da se odpre pop-up okno
-3. Preveri, da je gumb "ponovi" onemogočen med predvajanjem vseh treh besed
-4. Ko se predvajanje konča, klikni gumb "ponovi"
-5. Počakaj da se odštevanje konča (5 sekund)
-6. Preveri, da se pop-up samodejno zapre brez prikaza gumba "Naprej"
-7. Preveri, da se za besedo "liziko" predvaja pravilen zvočni posnetek
