@@ -1,92 +1,123 @@
 
 
-# Plan: Popravek shranjevanja zvezdic za igro Spomin in Vaje za jezik
+# Plan: Popravek zvočnih posnetkov za igro Spomin
 
-## Povzetek analize
+## Analiza problema
 
-Po pregledu vseh iger v aplikaciji sem odkril **dve težavi**:
+Po pregledu baze podatkov sem odkril, da **49 besed** v tabelah memory_cards nima nastavljenih zvočnih posnetkov (audio_url). Koda za predvajanje zvoka je pravilna, težava je v podatkih.
 
-### Težava 1: Igra Spomin - avtomatsko shranjevanje
-Igra Spomin shranjuje napredek **avtomatsko** ob zaključku igre, namesto ob kliku na gumb "VZEMI ZVEZDICO". To ni skladno s standardom projekta in lahko povzroči podvojeno shranjevanje ali prikaz pokala ob napačnem času.
+## Stanje tabel memory_cards
 
-### Težava 2: Vaje za jezik - manjkajoče shranjevanje
-Igra "Vaje za jezik" sploh **ne shranjuje** zvezdic v bazo. Napredek ostaja samo v lokalnem stanju komponente.
+| Tabela | Besede brez zvoka |
+|--------|------------------|
+| memory_cards_c | 0 |
+| memory_cards_Č | 2 (ČAROVNIK, ČEBELAR) |
+| memory_cards_K | 16 (KAČA, KAVA, KLJUČ, KLOP, KOKOŠ, KOLAČ, KORUZA, KOŠ, KOST, KOZA, KOŽA, KOZAREC, KRAVA, KROF, KROG, KROŽNIK) |
+| memory_cards_l | 6 (LASJE, LES, LEŠNIK, LISICA, LOVEC, LUŽA) |
+| memory_cards_r | 17 (VSE besede nimajo zvoka!) |
+| memory_cards_S | 6 (SEDEM, SIR, SLUZ, SNEG, SNEŽINKA, SOK) |
+| memory_cards_Š_duplicate | 1 (ŠOFER) |
+| memory_cards_z | 1 (ZVEZEK - ima napačen zvok test.m4a) |
+| memory_cards_Ž | 0 |
 
----
+## Dodatne težave
+- ZVOČNIK v tabeli memory_cards_z ima napačen bucket: `memory-game-voices/test.m4a` namesto `zvocni-posnetki/zvocnik.m4a`
 
-## Pregled vseh iger
+## Rešitev
 
-| Igra | Shranjevanje | Pokal | Status |
-|------|-------------|-------|--------|
-| Spomin | ✅ | ✅ | ⚠️ Napačen sprožilec |
-| Bingo | ✅ | ✅ | ✅ Pravilno |
-| Kolo besed | ✅ | ✅ | ✅ Pravilno |
-| Smešne povedi | ✅ | ✅ | ✅ Pravilno |
-| Labirint | ✅ | ✅ | ✅ Pravilno |
-| Sestavljanka | ✅ | ✅ | ✅ Pravilno |
-| Drsna sestavljanka | ✅ | ✅ | ✅ Pravilno |
-| Zaporedja | ✅ | ✅ | ✅ Pravilno |
-| Povezi pare | ✅ | ✅ | ✅ Pravilno |
-| Igra ujemanja | ✅ | ✅ | ✅ Pravilno |
-| Ponovi poved | ✅ | ✅ | ✅ Pravilno |
-| Vaje za jezik | ❌ | ❌ | ❌ Ne shranjuje |
+Izvesti SQL UPDATE poizvedbe za vse tabele, ki nimajo pravilnih audio_url vrednosti. Zvočni posnetki so v bucketu `zvocni-posnetki` s formatom `{beseda}.m4a`, kjer so šumniki (č, š, ž) pretvorjeni v ASCII (c, s, z).
 
----
+## SQL ukazi za popravek
 
-## Tehnične spremembe
+### 1. Tabela memory_cards_r (17 besed)
 
-### Sprememba 1: Popravek igre Spomin
+```sql
+UPDATE memory_cards_r SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/raca.m4a' WHERE word = 'Raca';
+UPDATE memory_cards_r SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/rak.m4a' WHERE word = 'Rak';
+UPDATE memory_cards_r SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/raketa.m4a' WHERE word = 'Raketa';
+UPDATE memory_cards_r SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/ravnilo.m4a' WHERE word = 'Ravnilo';
+UPDATE memory_cards_r SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/rep.m4a' WHERE word = 'Rep';
+UPDATE memory_cards_r SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/repa.m4a' WHERE word = 'Repa';
+UPDATE memory_cards_r SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/riba.m4a' WHERE word = 'Riba';
+UPDATE memory_cards_r SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/robot.m4a' WHERE word = 'Robot';
+UPDATE memory_cards_r SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/roka.m4a' WHERE word = 'Roka';
+UPDATE memory_cards_r SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/rolka.m4a' WHERE word = 'Rolka';
+UPDATE memory_cards_r SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/ropotuljica.m4a' WHERE word = 'Ropotuljica';
+UPDATE memory_cards_r SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/roza.m4a' WHERE word = 'Roža';
+```
 
-**Datoteka:** `src/hooks/useGenericMemoryGame.tsx`
+**Opomba:** Besede Ribez, Ribič, Ris, Riž, Rokometaš niso na uporabnikovem seznamu in nimajo zvočnih posnetkov v bucketu.
 
-Odstrani avtomatsko shranjevanje iz `useEffect` in dodaj callback za gumb "VZEMI ZVEZDICO":
+### 2. Tabela memory_cards_K (10 besed s seznama)
 
-1. Odstrani `recordGameCompletion` in `checkForNewTrophy` iz `useEffect`
-2. Dodaj novo funkcijo `handleClaimStar` ki jo vrne hook
-3. Posodobi `GenericSpominGame.tsx` da kliče `handleClaimStar` ob kliku na gumb
+```sql
+UPDATE "memory_cards_K" SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/kaca.m4a' WHERE word = 'KAČA';
+UPDATE "memory_cards_K" SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/kava.m4a' WHERE word = 'KAVA';
+UPDATE "memory_cards_K" SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/kljuc.m4a' WHERE word = 'KLJUČ';
+UPDATE "memory_cards_K" SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/klop.m4a' WHERE word = 'KLOP';
+UPDATE "memory_cards_K" SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/kokos_1.m4a' WHERE word = 'KOKOŠ';
+UPDATE "memory_cards_K" SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/kost.m4a' WHERE word = 'KOŠ';
+UPDATE "memory_cards_K" SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/kosara.m4a' WHERE word = 'KOST';
+UPDATE "memory_cards_K" SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/koza.m4a' WHERE word = 'KOZA';
+UPDATE "memory_cards_K" SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/krava.m4a' WHERE word = 'KRAVA';
+UPDATE "memory_cards_K" SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/krof.m4a' WHERE word = 'KROF';
+UPDATE "memory_cards_K" SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/krog.m4a' WHERE word = 'KROG';
+```
 
-**Datoteka:** `src/components/games/GenericSpominGame.tsx`
+**Opomba:** Besede KOLAČ, KORUZA, KOŽA, KOZAREC, KROŽNIK niso na uporabnikovem seznamu.
 
-Posodobi gumb "VZEMI ZVEZDICO" da pokliče `handleClaimStar` funkcijo iz hooka.
+### 3. Tabela memory_cards_l (4 besede s seznama - Ladja je že pravilna)
 
-### Sprememba 2: Dodaj shranjevanje za Vaje za jezik
+```sql
+-- Besede LASJE, LES, LEŠNIK, LISICA, LOVEC, LUŽA niso na uporabnikovem seznamu
+-- Vse besede na seznamu (Ladja, Led, Letalo, Lev, List, Lizika, Lonec, Lopar, Lubenica, Luč) že imajo pravilne audio_url
+```
 
-**Datoteka:** `src/components/games/TongueGymGame.tsx`
+### 4. Tabela memory_cards_S (3 besede s seznama)
 
-1. Dodaj importe za `useEnhancedProgress` in `useTrophyContext`
-2. Ob zaključku vseh vaj (ko `allCompleted = true`) prikaži "BRAVO!" dialog
-3. Ob kliku na "VZEMI ZVEZDICO" shrani napredek s `recordExerciseCompletion('vaje_za_jezik', 3)` (3 zvezdice za vse vaje)
-4. Pokliči `checkForNewTrophy()`
+```sql
+UPDATE "memory_cards_S" SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/sedem.m4a' WHERE word = 'SEDEM';
+UPDATE "memory_cards_S" SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/sir.m4a' WHERE word = 'SIR';
+UPDATE "memory_cards_S" SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/sneg.m4a' WHERE word = 'SNEG';
+UPDATE "memory_cards_S" SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/sok.m4a' WHERE word = 'SOK';
+```
 
----
+**Opomba:** SLUZ in SNEŽINKA niso na seznamu.
 
-## Prizadete datoteke
+### 5. Tabela memory_cards_z (popravek ZVOČNIK)
 
-| Datoteka | Sprememba |
-|----------|-----------|
-| `src/hooks/useGenericMemoryGame.tsx` | Prestavi shranjevanje iz avtomatskega v callback |
-| `src/components/games/GenericSpominGame.tsx` | Posodobi gumb VZEMI ZVEZDICO |
-| `src/components/games/TongueGymGame.tsx` | Dodaj shranjevanje napredka |
+```sql
+UPDATE memory_cards_z SET audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/zvocnik.m4a' WHERE word = 'ZVOČNIK';
+```
 
----
+### 6. Tabele Č in Š
 
-## Testiranje
+Besede ČAROVNIK, ČEBELAR ter ŠOFER niso na uporabnikovem seznamu, zato jih ne posodabljam.
 
-### Test 1: Spomin
-1. Odpri igro `/govorne-igre/spomin/c`
-2. Zaključi igro (najdi vseh 10 parov)
-3. Preveri, da se zvezdica NE shrani dokler ne klikneš "VZEMI ZVEZDICO"
-4. Klikni "VZEMI ZVEZDICO"
-5. Preveri na `/moja-stran` da se je zvezdica prištela
+## Besede brez posnetkov na seznamu
 
-### Test 2: Vaje za jezik
-1. Odpri `/vaje-za-jezik`
-2. Zaključi vse vaje
-3. Preveri, da se prikaže zaključni dialog
-4. Klikni "VZEMI ZVEZDICO"
-5. Preveri na `/moja-stran` da so se prištele 3 zvezdice
+Naslednje besede so na uporabnikovem seznamu, vendar nimajo zvočnih posnetkov v bucketu:
+- Ribez, Ribič, Ris, Riž, Rokometaš (R)
+- KOLAČ, KORUZA, KOŽA, KOZAREC, KROŽNIK (K)
+- LASJE, LES, LEŠNIK, LISICA, LOVEC, LUŽA (L)
+- SLUZ, SNEŽINKA (S)
+- ČAROVNIK, ČEBELAR (Č)
+- ŠOFER (Š)
+- ZVEZEK (Z)
 
-### Test 3: Pokal
-1. Doseži 100 zvezdic
-2. Preveri, da se pokal prikaže ob kliku na "VZEMI ZVEZDICO" (ne prej)
+Te besede bodo brez zvoka, dokler se posnetki ne dodajo v bucket.
+
+## Povzetek sprememb
+
+| Tabela | Št. posodobitev |
+|--------|----------------|
+| memory_cards_r | 12 |
+| memory_cards_K | 11 |
+| memory_cards_S | 4 |
+| memory_cards_z | 1 |
+| **Skupaj** | **28 posodobitev** |
+
+## Izvedba
+
+Ker gre za posodobitve podatkov v bazi (ne za spremembe kode), bo potrebno izvesti SQL ukaze neposredno v Supabase Cloud View > Run SQL.
 
