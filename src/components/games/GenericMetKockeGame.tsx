@@ -17,6 +17,7 @@ import { useMetKocke } from '@/hooks/useMetKocke';
 import { useTrophyContext } from '@/contexts/TrophyContext';
 import { MetKockeWord } from '@/data/metKockeConfig';
 import { useWordProgress } from '@/hooks/useWordProgress';
+import { useEnhancedProgress } from '@/hooks/useEnhancedProgress';
 
 interface GenericMetKockeGameProps {
   letter: string;
@@ -76,6 +77,7 @@ export function GenericMetKockeGame({
     resetProgress,
   } = useWordProgress(displayLetter, wordsList);
   const { checkForNewTrophy } = useTrophyContext();
+  const { recordExerciseCompletion } = useEnhancedProgress();
 
   // Audio playback
   const playAudio = useCallback((url: string) => {
@@ -126,6 +128,8 @@ export function GenericMetKockeGame({
 
   // Star claim handler
   const handleClaimStar = useCallback(async () => {
+    // Record star to Supabase
+    recordExerciseCompletion(`smesne-povedi-${letter}`);
     if (selectedBitje !== null) {
       incrementProgress(bitje[selectedBitje].word);
     }
@@ -134,7 +138,7 @@ export function GenericMetKockeGame({
     // Check for trophy after claiming star
     await new Promise(resolve => setTimeout(resolve, 500));
     await checkForNewTrophy();
-  }, [selectedBitje, bitje, incrementProgress, closeStarDialog, checkForNewTrophy]);
+  }, [recordExerciseCompletion, letter, selectedBitje, bitje, incrementProgress, closeStarDialog, checkForNewTrophy]);
 
   // Column headers
   const columns = ['BITJE', 'POVEDEK', 'PREDMET'];

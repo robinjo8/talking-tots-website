@@ -2,6 +2,8 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useEnhancedProgress } from '@/hooks/useEnhancedProgress';
+import { useTrophyContext } from '@/contexts/TrophyContext';
 import { AppLayout } from "@/components/AppLayout";
 import { MatchingGame } from '@/components/matching/MatchingGame';
 import { ThreeColumnGame } from '@/components/matching/ThreeColumnGame';
@@ -28,6 +30,8 @@ export function GenericPoveziPareGame({ config }: Props) {
   const { selectedChild } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { recordGameCompletion } = useEnhancedProgress();
+  const { checkForNewTrophy } = useTrophyContext();
   const [gameKey, setGameKey] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
@@ -101,8 +105,13 @@ export function GenericPoveziPareGame({ config }: Props) {
     setShowInstructions(true);
   };
 
-  const handleStarClaimed = () => {
+  const handleStarClaimed = async () => {
+    // Record star to Supabase
+    recordGameCompletion('matching', `povezi-pare-${config.letter}`);
     setShowNewGameButton(true);
+    // Check for trophy after claiming star
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await checkForNewTrophy();
   };
 
   // Fullscreen handling for mobile

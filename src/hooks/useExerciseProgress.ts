@@ -63,8 +63,8 @@ export const useExerciseProgress = () => {
       if (cardNumber === 27 && prev.completedCards.length === 26) {
         console.log("Completing full cycle, incrementing completion count");
         
-        // Only record exercise completion when all 27 cards are done
-        recordExerciseCompletion('vaje_motorike_govoril');
+        // Only record exercise completion when all 27 cards are done - awards 3 stars
+        recordExerciseCompletion('vaje_motorike_govoril', 3);
         
         const newState = {
           currentUnlockedCard: 1,
