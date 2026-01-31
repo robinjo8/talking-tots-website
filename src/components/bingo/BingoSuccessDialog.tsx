@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Volume2, Mic } from 'lucide-react';
 import { useAudioPlayback } from '@/hooks/useAudioPlayback';
 import { BingoWord } from '@/data/bingoWordsR';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 
 interface BingoSuccessDialogProps {
   isOpen: boolean;
@@ -23,6 +24,7 @@ export const BingoSuccessDialog: React.FC<BingoSuccessDialogProps> = ({
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTimeLeft, setRecordingTimeLeft] = useState(3);
   const [hasRecorded, setHasRecorded] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const { playAudio } = useAudioPlayback();
 
@@ -111,8 +113,17 @@ export const BingoSuccessDialog: React.FC<BingoSuccessDialogProps> = ({
 
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${word.image}`;
 
+  const handleDialogClose = () => {
+    if (!hasRecorded) {
+      setShowConfirmDialog(true);
+    } else {
+      onClose();
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={() => {}}>
+    <>
+      <Dialog open={isOpen} onOpenChange={handleDialogClose}>
       <DialogContent className="sm:max-w-lg" onPointerDownOutside={(e) => e.preventDefault()}>
         <div className="space-y-4 py-4">
           <h2 className="text-2xl font-bold text-dragon-green text-center uppercase">
@@ -195,5 +206,20 @@ export const BingoSuccessDialog: React.FC<BingoSuccessDialogProps> = ({
         </div>
       </DialogContent>
     </Dialog>
+
+    <ConfirmDialog
+      open={showConfirmDialog}
+      onOpenChange={setShowConfirmDialog}
+      title="OPOZORILO"
+      description="ALI RES ŽELIŠ ZAPRET OKNO? NE BOŠ PREJEL ZVEZDICE."
+      confirmText="DA"
+      cancelText="NE"
+      onConfirm={() => {
+        setShowConfirmDialog(false);
+        onClose();
+      }}
+      onCancel={() => setShowConfirmDialog(false)}
+    />
+    </>
   );
 };

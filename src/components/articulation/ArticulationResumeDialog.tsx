@@ -27,8 +27,13 @@ const ArticulationResumeDialog = ({
   totalWords,
   timeAgo,
 }: ArticulationResumeDialogProps) => {
+  const handleClose = () => {
+    // X button triggers "start over" behavior - returning to previous page
+    onStartOver();
+  };
+
   return (
-    <Dialog open={open} onOpenChange={() => {}}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md" onPointerDownOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">

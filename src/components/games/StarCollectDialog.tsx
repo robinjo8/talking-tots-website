@@ -3,6 +3,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Volume2, Mic, Star } from 'lucide-react';
 import { useAudioPlayback } from '@/hooks/useAudioPlayback';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 
 interface ImageData {
   filename: string;
@@ -28,6 +29,7 @@ export const StarCollectDialog: React.FC<StarCollectDialogProps> = ({
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTimeLeft, setRecordingTimeLeft] = useState(3);
   const [recordingComplete, setRecordingComplete] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const { playAudio } = useAudioPlayback();
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
   const completedRef = useRef(false);
@@ -106,6 +108,14 @@ export const StarCollectDialog: React.FC<StarCollectDialogProps> = ({
 
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${image.filename}`;
 
+  const handleClose = () => {
+    if (!recordingComplete) {
+      setShowConfirmDialog(true);
+    } else {
+      onOpenChange(false);
+    }
+  };
+
   // Render star icons
   const renderStars = () => {
     const stars = [];
@@ -121,8 +131,9 @@ export const StarCollectDialog: React.FC<StarCollectDialogProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => {}}>
-      <DialogContent className="sm:max-w-md" onPointerDownOutside={(e) => e.preventDefault()}>
+    <>
+      <Dialog open={isOpen} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-md" onPointerDownOutside={(e) => e.preventDefault()}>
         <div className="space-y-4 py-4">
           <div className="flex justify-center gap-1">
             {renderStars()}
@@ -194,5 +205,20 @@ export const StarCollectDialog: React.FC<StarCollectDialogProps> = ({
         </div>
       </DialogContent>
     </Dialog>
+
+    <ConfirmDialog
+      open={showConfirmDialog}
+      onOpenChange={setShowConfirmDialog}
+      title="OPOZORILO"
+      description="ALI RES ŽELIŠ ZAPRET OKNO? NE BOŠ PREJEL ZVEZDICE."
+      confirmText="DA"
+      cancelText="NE"
+      onConfirm={() => {
+        setShowConfirmDialog(false);
+        onOpenChange(false);
+      }}
+      onCancel={() => setShowConfirmDialog(false)}
+    />
+    </>
   );
 };
