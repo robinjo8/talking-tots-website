@@ -150,9 +150,20 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
   };
 
   const handlePlayAudio = (image: MatchingGameImage) => {
+    let audioUrl: string;
+    
     if (image.audio_url) {
-      playAudio(image.audio_url);
+      audioUrl = image.audio_url;
+    } else {
+      // Fallback: generiraj URL iz besede
+      const normalizedWord = image.word
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+      audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${normalizedWord}.m4a`;
     }
+    
+    playAudio(audioUrl);
   };
 
   return (
@@ -219,6 +230,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
                       {image.word.toUpperCase()}
                     </span>
                     <button
+                      type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         handlePlayAudio(image);
