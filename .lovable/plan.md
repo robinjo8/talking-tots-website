@@ -1,139 +1,141 @@
 
-# Plan: Popravek igre Labirint - nedosegljive zvezdice in gumb za zvok
+# Povzetek: Stanje gumbov za predvajanje zvoka v vseh 10 igrah
 
-## Povzetek težav
+## Analiza vseh 10 iger
 
-### Težava 1: Zvezdice na nedosegljivih lokacijah
-Na posnetku zaslona je vidno, da se zvezdica nahaja v celici, do katere uporabnik ne more priti. Algoritem za postavljanje zvezdic trenutno samo preveri, ali ima celica vsaj eno odprtino, vendar NE preveri, ali je ta celica dejansko dosegljiva iz začetne pozicije (0,0) preko poti skozi labirint.
-
-### Težava 2: Gumb za predvajanje zvoka ne deluje
-Gumb z zvočnikom v pop-up oknu ob pobiranju zvezdic ne predvaja zvoka. Možni vzroki:
-- Manjkajoči `type="button"` atribut
-- Morebitna napaka pri gradnji URL-ja zvočnega posnetka
-- Problem z referenco funkcije v pogovornem oknu
+| # | Igra | Dialog komponenta | Gumb za zvok | Status | Problem |
+|---|------|-------------------|--------------|--------|---------|
+| 1 | **Drsna sestavljanka** | MatchingCompletionDialog | ✅ Prisoten | **NE DELA** | Preverja `audio_url`, ki ne obstaja |
+| 2 | **Sestavljanka** | PuzzleSuccessDialog | ✅ Prisoten | **DELA** | Generira URL iz besede |
+| 3 | **Povezi pare** | MatchingCompletionDialog | ✅ Prisoten | **DELA** | Ima `audio_url` iz podatkov |
+| 4 | **Igra ujemanja** | MatchingCompletionDialog | ✅ Prisoten | **DELA** | Ima `audio_url` iz podatkov |
+| 5 | **Zaporedja** | MatchingCompletionDialog | ✅ Prisoten | **NE DELA** | Enaka težava kot Drsna sestavljanka |
+| 6 | **Labirint** | StarCollectDialog | ✅ Prisoten | **DELA** | Pravkar popravljeno |
+| 7 | **Spomin** | StarCollectDialog | ✅ Prisoten | **DELA** | Ista komponenta kot Labirint |
+| 8 | **Bingo** | BingoSuccessDialog | ✅ Prisoten | **DELA** | Uporablja `word.audio` |
+| 9 | **Kolo besed** | WheelSuccessDialog | ✅ Prisoten | **DELA** | Generira URL iz besede |
+| 10 | **Smešne povedi** | DiceResultDialog | ❌ NI gumba | N/A | Ima samo gumb PREDVAJAJ/PONOVI |
+| - | **Ponovi poved** | Dialog v igri | ✅ Prisoten | **DELA** | Ima PREDVAJAJ gumb |
 
 ---
 
-## Rešitev 1: Preverjanje dosegljivosti zvezdic z algoritmom BFS
+## Podrobna analiza težav
 
-Dodati funkcijo `isReachable` v `useMazeGame.ts`, ki uporabi algoritem BFS (Breadth-First Search) za preverjanje, ali je celica dosegljiva iz začetne pozicije.
+### Težava 1: MatchingCompletionDialog (vrstice 152-156)
 
-### Spremembe v `src/hooks/useMazeGame.ts`:
-
-1. **Dodati funkcijo `isReachable`**:
 ```typescript
-// Check if position is reachable from start using BFS
-const isReachable = (grid: Cell[][], target: Position): boolean => {
-  const visited = new Set<string>();
-  const queue: Position[] = [{ x: 0, y: 0 }];
-  
-  while (queue.length > 0) {
-    const current = queue.shift()!;
-    const key = `${current.x},${current.y}`;
-    
-    if (visited.has(key)) continue;
-    visited.add(key);
-    
-    if (current.x === target.x && current.y === target.y) {
-      return true;
-    }
-    
-    const cell = grid[current.y][current.x];
-    
-    // Check all 4 directions
-    if (!cell.walls.top && current.y > 0) {
-      queue.push({ x: current.x, y: current.y - 1 });
-    }
-    if (!cell.walls.bottom && current.y < ROWS - 1) {
-      queue.push({ x: current.x, y: current.y + 1 });
-    }
-    if (!cell.walls.left && current.x > 0) {
-      queue.push({ x: current.x - 1, y: current.y });
-    }
-    if (!cell.walls.right && current.x < COLS - 1) {
-      queue.push({ x: current.x + 1, y: current.y });
-    }
+const handlePlayAudio = (image: MatchingGameImage) => {
+  if (image.audio_url) {      // <-- Preverja audio_url
+    playAudio(image.audio_url);
   }
-  
-  return false;
+  // Če audio_url ne obstaja, se ne zgodi NIČ!
 };
 ```
 
-2. **Posodobiti funkcijo `findStarPositions`**:
-V zanki za izbiro kandidatov dodati preverjanje dosegljivosti:
+**Prizadete igre:**
+- **Drsna sestavljanka** - posreduje slike brez `audio_url`
+- **Zaporedja** - posreduje slike brez `audio_url`
+
+**Igre, ki delujejo:**
+- **Povezi pare** - slike iz baze imajo `audio_url`
+- **Igra ujemanja** - slike iz baze imajo `audio_url`
+
+### Rešitev
+
+Komponenta `MatchingCompletionDialog` potrebuje fallback logiko:
+
 ```typescript
-// Only consider cells that are actually reachable from start
-if (openings > 0 && isReachable(grid, { x, y })) {
-  candidates.push({ pos: { x, y }, openings });
-}
+const handlePlayAudio = (image: MatchingGameImage) => {
+  let audioUrl: string;
+  
+  if (image.audio_url) {
+    audioUrl = image.audio_url;
+  } else {
+    // Fallback: generiraj URL iz besede
+    const normalizedWord = image.word
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+    audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${normalizedWord}.m4a`;
+  }
+  
+  playAudio(audioUrl);
+};
 ```
 
 ---
 
-## Rešitev 2: Popravek gumba za predvajanje zvoka
+## Plan popravkov
 
-### Spremembe v `src/components/games/StarCollectDialog.tsx`:
+### Datoteka: `src/components/matching/MatchingCompletionDialog.tsx`
 
-1. **Dodati `type="button"` atribut** na gumb za zvok, da se prepreči morebitno privzeto vedenje:
+1. Posodobiti funkcijo `handlePlayAudio` (vrstice 152-156) z fallback logiko
+2. Dodati `type="button"` na gumb za konsistentnost
+
+**Sprememba:**
+```typescript
+// PREJ:
+const handlePlayAudio = (image: MatchingGameImage) => {
+  if (image.audio_url) {
+    playAudio(image.audio_url);
+  }
+};
+
+// POTEM:
+const handlePlayAudio = (image: MatchingGameImage) => {
+  let audioUrl: string;
+  
+  if (image.audio_url) {
+    audioUrl = image.audio_url;
+  } else {
+    const normalizedWord = image.word
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+    audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${normalizedWord}.m4a`;
+  }
+  
+  playAudio(audioUrl);
+};
+```
+
+3. Posodobiti JSX za gumb (vrstica 221):
 ```typescript
 <button
-  type="button"
-  onClick={handlePlayAudio}
+  type="button"   // Dodano
+  onClick={(e) => {
+    e.stopPropagation();
+    handlePlayAudio(image);
+  }}
   className="p-2 rounded-full bg-dragon-green hover:bg-dragon-green/90 transition-colors"
   aria-label="Predvajaj besedo"
 >
 ```
 
-2. **Dodati preverjanje veljavnosti `image` prop** pred klicem:
-```typescript
-const handlePlayAudio = () => {
-  if (!image?.word) {
-    console.error('No image or word available for audio playback');
-    return;
-  }
-  const normalizedWord = image.word
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
-  const audioFilename = image.audio || `${normalizedWord}.m4a`;
-  const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
-  console.log('Playing audio:', audioUrl);
-  playAudio(audioUrl);
-};
-```
-
-3. **Dodati onemogočanje gumba med snemanjem**:
-```typescript
-<button
-  type="button"
-  onClick={handlePlayAudio}
-  disabled={isRecording}
-  className={`p-2 rounded-full bg-dragon-green hover:bg-dragon-green/90 transition-colors ${
-    isRecording ? 'opacity-50 cursor-not-allowed' : ''
-  }`}
-  aria-label="Predvajaj besedo"
->
-```
-
 ---
 
-## Povzetek sprememb datotek
+## Povzetek sprememb
 
 | Datoteka | Sprememba |
 |----------|-----------|
-| `src/hooks/useMazeGame.ts` | Dodati funkcijo `isReachable` (BFS algoritem) in jo uporabiti pri izbiri pozicij zvezdic |
-| `src/components/games/StarCollectDialog.tsx` | Dodati `type="button"`, preverjanje veljavnosti `image` in onemogočanje med snemanjem |
+| `src/components/matching/MatchingCompletionDialog.tsx` | Dodati fallback za generiranje audio URL-ja iz besede |
 
 ---
 
-## Tehnične podrobnosti
+## Rezultat po popravku
 
-### Algoritem BFS za preverjanje dosegljivosti
-BFS (Breadth-First Search) je idealen za iskanje poti v labirintu, ker:
-- Pregleda vse sosednje celice po nivojih
-- Uporablja vrsto (queue) za sledenje celicam za pregled
-- Uporabi set za označevanje že obiskanih celic
-- Upošteva stene med celicami
+| # | Igra | Status po popravku |
+|---|------|--------------------|
+| 1 | Drsna sestavljanka | ✅ POPRAVLJENO |
+| 2 | Sestavljanka | ✅ Že dela |
+| 3 | Povezi pare | ✅ Že dela |
+| 4 | Igra ujemanja | ✅ Že dela |
+| 5 | Zaporedja | ✅ POPRAVLJENO |
+| 6 | Labirint | ✅ Že dela |
+| 7 | Spomin | ✅ Že dela |
+| 8 | Bingo | ✅ Že dela |
+| 9 | Kolo besed | ✅ Že dela |
+| 10 | Smešne povedi | N/A (ni gumba za posamezno besedo) |
 
-### Zakaj je to potrebno?
-Čeprav recursive backtracker algoritem zagotavlja, da so vse celice povezane, funkcija `addDeadEnds` naknadno dodaja poti. V kombinaciji z zaklepanjem cilja lahko nastanejo situacije, kjer nekatere celice niso več dosegljive iz začetka. BFS preverjanje zagotavlja, da se zvezdice vedno postavijo na dosegljiva mesta.
+Ta en sam popravek bo odpravil težavo v dveh igrah (Drsna sestavljanka in Zaporedja).
+
