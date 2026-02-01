@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, CheckCheck, FileText, ChevronRight, X } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -164,8 +165,7 @@ export function UserNotificationBell() {
   const [open, setOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Check if mobile
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+  const isMobile = useIsMobile();
 
   const handleBellClick = () => {
     if (isMobile) {
@@ -228,7 +228,7 @@ export function UserNotificationBell() {
             onClick={() => setMobileOpen(false)}
           >
             <div 
-              className="bg-background rounded-xl shadow-xl w-[90vw] max-w-[350px] max-h-[80vh] overflow-hidden"
+              className="relative bg-background rounded-xl shadow-xl w-[90vw] max-w-[350px] max-h-[80vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close button */}
