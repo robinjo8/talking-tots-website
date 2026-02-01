@@ -203,14 +203,15 @@ export function GenericMetKockeGame({
                   </div>
                   
                   {/* BITJE column */}
-                  <div 
-                    className={`rounded p-0.5 transition-all duration-300 ${
-                      isBitjeSelected 
-                        ? 'ring-2 ring-app-orange bg-app-orange/20 scale-105' 
-                        : 'bg-muted'
-                    }`}
-                  >
-                    <div className="aspect-square rounded overflow-hidden bg-background" style={{ maxHeight: 'calc((100vh - 200px) / 7)' }}>
+                  <div className="flex justify-center">
+                    <div 
+                      className={`aspect-square rounded overflow-hidden bg-background transition-all duration-300 ${
+                        isBitjeSelected 
+                          ? 'ring-2 ring-app-orange scale-105' 
+                          : ''
+                      }`}
+                      style={{ maxHeight: 'calc((100vh - 200px) / 7)', maxWidth: 'calc((100vh - 200px) / 7)' }}
+                    >
                       <img
                         src={`${SUPABASE_URL}/slike/${bitjeItem.image}`}
                         alt={bitjeItem.word}
@@ -220,14 +221,15 @@ export function GenericMetKockeGame({
                   </div>
                   
                   {/* POVEDEK column */}
-                  <div 
-                    className={`rounded p-0.5 transition-all duration-300 ${
-                      isPovedekSelected 
-                        ? 'ring-2 ring-app-blue bg-app-blue/20 scale-105' 
-                        : 'bg-muted'
-                    }`}
-                  >
-                    <div className="aspect-square rounded overflow-hidden bg-background" style={{ maxHeight: 'calc((100vh - 200px) / 7)' }}>
+                  <div className="flex justify-center">
+                    <div 
+                      className={`aspect-square rounded overflow-hidden bg-background transition-all duration-300 ${
+                        isPovedekSelected 
+                          ? 'ring-2 ring-app-blue scale-105' 
+                          : ''
+                      }`}
+                      style={{ maxHeight: 'calc((100vh - 200px) / 7)', maxWidth: 'calc((100vh - 200px) / 7)' }}
+                    >
                       <img
                         src={`${SUPABASE_URL}/slike/${povedekItem.image}`}
                         alt={povedekItem.word}
@@ -237,14 +239,15 @@ export function GenericMetKockeGame({
                   </div>
                   
                   {/* PREDMET column */}
-                  <div 
-                    className={`rounded p-0.5 transition-all duration-300 ${
-                      isPredmetSelected 
-                        ? 'ring-2 ring-dragon-green bg-dragon-green/20 scale-105' 
-                        : 'bg-muted'
-                    }`}
-                  >
-                    <div className="aspect-square rounded overflow-hidden bg-background" style={{ maxHeight: 'calc((100vh - 200px) / 7)' }}>
+                  <div className="flex justify-center">
+                    <div 
+                      className={`aspect-square rounded overflow-hidden bg-background transition-all duration-300 ${
+                        isPredmetSelected 
+                          ? 'ring-2 ring-dragon-green scale-105' 
+                          : ''
+                      }`}
+                      style={{ maxHeight: 'calc((100vh - 200px) / 7)', maxWidth: 'calc((100vh - 200px) / 7)' }}
+                    >
                       <img
                         src={`${SUPABASE_URL}/slike/${predmetItem.image}`}
                         alt={predmetItem.word}
