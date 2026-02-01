@@ -32,12 +32,12 @@ export function DiceResultDialog({
 
   const words = [bitjeWord, povedekWord, predmetWord].filter(Boolean) as MetKockeWord[];
 
-  // Start simulated recording with 3 second countdown
+  // Start simulated recording with 5 second countdown
   const startRecording = useCallback(() => {
     if (isRecording) return;
     
     setIsRecording(true);
-    setRecordingTimeLeft(3);
+    setRecordingTimeLeft(5);
 
     countdownRef.current = setInterval(() => {
       setRecordingTimeLeft(prev => {
