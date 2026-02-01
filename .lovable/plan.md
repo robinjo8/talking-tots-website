@@ -1,137 +1,139 @@
 
-# Plan: Popravek gumba X v pogovornih oknih iger
+# Plan: Popravek igre Labirint - nedosegljive zvezdice in gumb za zvok
 
-## Povzetek težave
+## Povzetek težav
 
-V igri Labirint (in več drugih igrah) gumb **X** v zgornjem desnem kotu pop-up okna ne dela ničesar. Težava je v tem, da je `onOpenChange` nastavljen na prazno funkcijo `() => {}`, ki ne izvede nobenega dejanja.
+### Težava 1: Zvezdice na nedosegljivih lokacijah
+Na posnetku zaslona je vidno, da se zvezdica nahaja v celici, do katere uporabnik ne more priti. Algoritem za postavljanje zvezdic trenutno samo preveri, ali ima celica vsaj eno odprtino, vendar NE preveri, ali je ta celica dejansko dosegljiva iz začetne pozicije (0,0) preko poti skozi labirint.
 
-## Prizadeta okna
+### Težava 2: Gumb za predvajanje zvoka ne deluje
+Gumb z zvočnikom v pop-up oknu ob pobiranju zvezdic ne predvaja zvoka. Možni vzroki:
+- Manjkajoči `type="button"` atribut
+- Morebitna napaka pri gradnji URL-ja zvočnega posnetka
+- Problem z referenco funkcije v pogovornem oknu
 
-| Komponenta | Igra | Problem |
-|------------|------|---------|
-| StarCollectDialog.tsx | Labirint | X gumb ne dela |
-| BingoSuccessDialog.tsx | Bingo | X gumb ne dela |
-| BingoCongratulationsDialog.tsx | Bingo | X gumb ne dela |
-| WheelSuccessDialog.tsx (BRAVO del) | Kolo besed | X gumb ne dela |
-| StarEarnedDialog.tsx | Met kocke | X gumb je skrit |
-| ArticulationResumeDialog.tsx | Preverjanje izgovorjave | X gumb ne dela |
+---
 
-## Pravilno delovanje (vzor)
+## Rešitev 1: Preverjanje dosegljivosti zvezdic z algoritmom BFS
 
-Komponenta **MatchingCompletionDialog** pravilno implementira logiko:
+Dodati funkcijo `isReachable` v `useMazeGame.ts`, ki uporabi algoritem BFS (Breadth-First Search) za preverjanje, ali je celica dosegljiva iz začetne pozicije.
 
-```text
-┌─────────────────────────────────────────┐
-│  Uporabnik klikne X                     │
-├─────────────────────────────────────────┤
-│  Ali so vse naloge opravljene?          │
-│     │                                   │
-│     ├── NE → Prikaži opozorilo          │
-│     │        "Ali res želite zapret?"   │
-│     │        [DA] [NE]                  │
-│     │                                   │
-│     └── DA → Zapri okno                 │
-└─────────────────────────────────────────┘
-```
+### Spremembe v `src/hooks/useMazeGame.ts`:
 
-## Rešitev
-
-### 1. StarCollectDialog.tsx (Labirint)
-
-Dodati:
-- State za prikaz potrditvenega dialoga
-- Funkcijo `handleClose` ki preveri, če je snemanje končano
-- ConfirmDialog komponento z vprašanjem
-
-### 2. BingoSuccessDialog.tsx
-
-Dodati:
-- State za prikaz potrditvenega dialoga
-- Funkcijo `handleClose` ki preveri, če je snemanje končano
-- ConfirmDialog komponento
-
-### 3. BingoCongratulationsDialog.tsx
-
-Dodati:
-- State za prikaz potrditvenega dialoga
-- Funkcijo `handleClose` ki preveri, če uporabnik ni prejel zvezdice
-- ConfirmDialog komponento
-
-### 4. WheelSuccessDialog.tsx (BRAVO del)
-
-Dodati:
-- V "BRAVO" delu dialoga (vrstica 200) zamenjati `onOpenChange={() => {}}` z ustrezno funkcijo
-- Prikazati opozorilo če uporabnik ni prejel zvezdice
-
-### 5. StarEarnedDialog.tsx
-
-- Odstraniti skriti X gumb (`[&>button]:hidden`)
-- Dodati potrditveni dialog
-
-### 6. ArticulationResumeDialog.tsx
-
-- Ta dialog je poseben primer - uporabnik mora izbrati med "Nadaljuj" in "Začni znova"
-- X gumb bi moral zapreti dialog brez dejanja (vrnitev na prejšnjo stran)
-
-## Tehnične podrobnosti
-
-Za vsako komponento bo potrebno:
-
-1. Uvoziti `ConfirmDialog` in `useState`:
+1. **Dodati funkcijo `isReachable`**:
 ```typescript
-import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-```
-
-2. Dodati state:
-```typescript
-const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-```
-
-3. Implementirati `handleClose`:
-```typescript
-const handleClose = () => {
-  if (!recordingComplete) {
-    setShowConfirmDialog(true);
-  } else {
-    onOpenChange(false);
+// Check if position is reachable from start using BFS
+const isReachable = (grid: Cell[][], target: Position): boolean => {
+  const visited = new Set<string>();
+  const queue: Position[] = [{ x: 0, y: 0 }];
+  
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    const key = `${current.x},${current.y}`;
+    
+    if (visited.has(key)) continue;
+    visited.add(key);
+    
+    if (current.x === target.x && current.y === target.y) {
+      return true;
+    }
+    
+    const cell = grid[current.y][current.x];
+    
+    // Check all 4 directions
+    if (!cell.walls.top && current.y > 0) {
+      queue.push({ x: current.x, y: current.y - 1 });
+    }
+    if (!cell.walls.bottom && current.y < ROWS - 1) {
+      queue.push({ x: current.x, y: current.y + 1 });
+    }
+    if (!cell.walls.left && current.x > 0) {
+      queue.push({ x: current.x - 1, y: current.y });
+    }
+    if (!cell.walls.right && current.x < COLS - 1) {
+      queue.push({ x: current.x + 1, y: current.y });
+    }
   }
+  
+  return false;
 };
 ```
 
-4. Zamenjati `onOpenChange={() => {}}` z `onOpenChange={handleClose}`
-
-5. Dodati ConfirmDialog v JSX:
+2. **Posodobiti funkcijo `findStarPositions`**:
+V zanki za izbiro kandidatov dodati preverjanje dosegljivosti:
 ```typescript
-<ConfirmDialog
-  open={showConfirmDialog}
-  onOpenChange={setShowConfirmDialog}
-  title="OPOZORILO"
-  description="ALI RES ŽELITE ZAPRET OKNO? NE BOSTE PREJELI ZVEZDICE."
-  confirmText="DA"
-  cancelText="NE"
-  onConfirm={() => {
-    setShowConfirmDialog(false);
-    onOpenChange(false);
-  }}
-  onCancel={() => setShowConfirmDialog(false)}
-/>
+// Only consider cells that are actually reachable from start
+if (openings > 0 && isReachable(grid, { x, y })) {
+  candidates.push({ pos: { x, y }, openings });
+}
 ```
 
-## Spremembe datotek
+---
+
+## Rešitev 2: Popravek gumba za predvajanje zvoka
+
+### Spremembe v `src/components/games/StarCollectDialog.tsx`:
+
+1. **Dodati `type="button"` atribut** na gumb za zvok, da se prepreči morebitno privzeto vedenje:
+```typescript
+<button
+  type="button"
+  onClick={handlePlayAudio}
+  className="p-2 rounded-full bg-dragon-green hover:bg-dragon-green/90 transition-colors"
+  aria-label="Predvajaj besedo"
+>
+```
+
+2. **Dodati preverjanje veljavnosti `image` prop** pred klicem:
+```typescript
+const handlePlayAudio = () => {
+  if (!image?.word) {
+    console.error('No image or word available for audio playback');
+    return;
+  }
+  const normalizedWord = image.word
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+  const audioFilename = image.audio || `${normalizedWord}.m4a`;
+  const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
+  console.log('Playing audio:', audioUrl);
+  playAudio(audioUrl);
+};
+```
+
+3. **Dodati onemogočanje gumba med snemanjem**:
+```typescript
+<button
+  type="button"
+  onClick={handlePlayAudio}
+  disabled={isRecording}
+  className={`p-2 rounded-full bg-dragon-green hover:bg-dragon-green/90 transition-colors ${
+    isRecording ? 'opacity-50 cursor-not-allowed' : ''
+  }`}
+  aria-label="Predvajaj besedo"
+>
+```
+
+---
+
+## Povzetek sprememb datotek
 
 | Datoteka | Sprememba |
 |----------|-----------|
-| src/components/games/StarCollectDialog.tsx | Dodati potrditveni dialog |
-| src/components/bingo/BingoSuccessDialog.tsx | Dodati potrditveni dialog |
-| src/components/bingo/BingoCongratulationsDialog.tsx | Dodati potrditveni dialog |
-| src/components/wheel/WheelSuccessDialog.tsx | Popraviti BRAVO del |
-| src/components/dice/StarEarnedDialog.tsx | Pokazati X in dodati potrditveni dialog |
-| src/components/articulation/ArticulationResumeDialog.tsx | Omogočiti X za zaprtje |
+| `src/hooks/useMazeGame.ts` | Dodati funkcijo `isReachable` (BFS algoritem) in jo uporabiti pri izbiri pozicij zvezdic |
+| `src/components/games/StarCollectDialog.tsx` | Dodati `type="button"`, preverjanje veljavnosti `image` in onemogočanje med snemanjem |
 
-## Besedilo opozoril (v slovenščini, VELIKE ČRKE)
+---
 
-- **StarCollectDialog**: "ALI RES ŽELIŠ ZAPRET OKNO? NE BOŠ PREJEL ZVEZDICE."
-- **BingoSuccessDialog**: "ALI RES ŽELIŠ ZAPRET OKNO? NE BOŠ PREJEL ZVEZDICE."
-- **BingoCongratulationsDialog**: "ALI RES ŽELIŠ ZAPRET OKNO? NE BOŠ PREJEL ZVEZDICE."
-- **WheelSuccessDialog**: "ALI RES ŽELIŠ ZAPRET OKNO? NE BOŠ PREJEL ZVEZDICE."
-- **StarEarnedDialog**: "ALI RES ŽELIŠ ZAPRET OKNO? NE BOŠ PREJEL ZVEZDICE."
+## Tehnične podrobnosti
+
+### Algoritem BFS za preverjanje dosegljivosti
+BFS (Breadth-First Search) je idealen za iskanje poti v labirintu, ker:
+- Pregleda vse sosednje celice po nivojih
+- Uporablja vrsto (queue) za sledenje celicam za pregled
+- Uporabi set za označevanje že obiskanih celic
+- Upošteva stene med celicami
+
+### Zakaj je to potrebno?
+Čeprav recursive backtracker algoritem zagotavlja, da so vse celice povezane, funkcija `addDeadEnds` naknadno dodaja poti. V kombinaciji z zaklepanjem cilja lahko nastanejo situacije, kjer nekatere celice niso več dosegljive iz začetka. BFS preverjanje zagotavlja, da se zvezdice vedno postavijo na dosegljiva mesta.
