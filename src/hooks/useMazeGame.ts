@@ -171,6 +171,42 @@ export const useMazeGame = ({
       grid[ROWS - 1][COLS - 2].walls.right = true; // Cell left of goal
     }
 
+    // Check if position is reachable from start using BFS
+    const isReachable = (grid: Cell[][], target: Position): boolean => {
+      const visited = new Set<string>();
+      const queue: Position[] = [{ x: 0, y: 0 }];
+      
+      while (queue.length > 0) {
+        const current = queue.shift()!;
+        const key = `${current.x},${current.y}`;
+        
+        if (visited.has(key)) continue;
+        visited.add(key);
+        
+        if (current.x === target.x && current.y === target.y) {
+          return true;
+        }
+        
+        const cell = grid[current.y][current.x];
+        
+        // Check all 4 directions respecting walls
+        if (!cell.walls.top && current.y > 0) {
+          queue.push({ x: current.x, y: current.y - 1 });
+        }
+        if (!cell.walls.bottom && current.y < ROWS - 1) {
+          queue.push({ x: current.x, y: current.y + 1 });
+        }
+        if (!cell.walls.left && current.x > 0) {
+          queue.push({ x: current.x - 1, y: current.y });
+        }
+        if (!cell.walls.right && current.x < COLS - 1) {
+          queue.push({ x: current.x + 1, y: current.y });
+        }
+      }
+      
+      return false;
+    };
+
     // Find positions for 4 stars (dead-ends or cells with few openings)
     // Stars are placed OUTSIDE the goal zone since goal is now walled off
     const findStarPositions = (grid: Cell[][]): Position[] => {
@@ -187,8 +223,8 @@ export const useMazeGame = ({
             !cell.walls.bottom, !cell.walls.left
           ].filter(Boolean).length;
           
-          // Only consider cells that have at least one opening (are reachable)
-          if (openings > 0) {
+          // Only consider cells that are actually reachable from start using BFS
+          if (openings > 0 && isReachable(grid, { x, y })) {
             candidates.push({ pos: { x, y }, openings });
           }
         }
