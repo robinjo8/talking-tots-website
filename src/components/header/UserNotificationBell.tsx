@@ -111,7 +111,7 @@ export function UserNotificationBell() {
         </Button>
       </PopoverTrigger>
       <PopoverContent 
-        className="w-80 p-0" 
+        className="w-80 p-0 max-sm:fixed max-sm:left-1/2 max-sm:top-1/2 max-sm:-translate-x-1/2 max-sm:-translate-y-1/2 max-sm:w-[90vw] max-sm:max-w-[350px] z-50 bg-background border shadow-lg" 
         align="end" 
         sideOffset={8}
       >
