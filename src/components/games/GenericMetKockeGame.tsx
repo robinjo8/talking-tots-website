@@ -163,17 +163,20 @@ export function GenericMetKockeGame({
             matchedPairs={completedRounds % 5} 
             totalPairs={5} 
           />
+          <p className="text-white font-medium text-sm mt-2 drop-shadow-lg">
+            3X VRŽI KOCKO IN PONOVI POVED
+          </p>
         </div>
       </div>
 
       {/* Main content - centered */}
-      <div className="h-full flex flex-col items-center justify-center p-2 pt-20">
+      <div className="h-full flex flex-col items-center justify-center p-2 pt-24">
 
         {/* Game grid - constrained height */}
         <div className="bg-white/90 backdrop-blur rounded-xl shadow-xl p-2 md:p-3 w-full" style={{ maxWidth: '600px' }}>
           {/* Grid header */}
           <div className="grid grid-cols-4 gap-1 mb-1">
-            <div className="text-center font-bold text-muted-foreground text-[10px]">KOCKA</div>
+            <div></div>
             {columns.map((col) => (
               <div key={col} className="text-center font-bold text-foreground text-[10px] md:text-xs">
                 {col}
