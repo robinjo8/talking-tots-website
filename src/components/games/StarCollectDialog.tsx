@@ -97,12 +97,17 @@ export const StarCollectDialog: React.FC<StarCollectDialogProps> = ({
   };
 
   const handlePlayAudio = () => {
+    if (!image?.word) {
+      console.error('No image or word available for audio playback');
+      return;
+    }
     const normalizedWord = image.word
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '');
     const audioFilename = image.audio || `${normalizedWord}.m4a`;
     const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
+    console.log('StarCollectDialog: Playing audio:', audioUrl);
     playAudio(audioUrl);
   };
 
@@ -195,8 +200,12 @@ export const StarCollectDialog: React.FC<StarCollectDialogProps> = ({
             </span>
             
             <button
+              type="button"
               onClick={handlePlayAudio}
-              className="p-2 rounded-full bg-dragon-green hover:bg-dragon-green/90 transition-colors"
+              disabled={isRecording}
+              className={`p-2 rounded-full bg-dragon-green hover:bg-dragon-green/90 transition-colors ${
+                isRecording ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
               aria-label="Predvajaj besedo"
             >
               <Volume2 className="w-6 h-6 text-white" />
