@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, CheckCheck, FileText, ChevronRight } from 'lucide-react';
+import { Bell, CheckCheck, FileText, ChevronRight, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -94,14 +94,125 @@ function NotificationItem({ notification, onMarkAsRead, onClose }: NotificationI
   );
 }
 
+// Shared content component
+function NotificationContent({ 
+  notifications, 
+  unreadCount, 
+  isLoading, 
+  markAsRead, 
+  markAllAsRead,
+  onClose 
+}: {
+  notifications: UserNotification[];
+  unreadCount: number;
+  isLoading: boolean;
+  markAsRead: (id: string) => void;
+  markAllAsRead: () => void;
+  onClose: () => void;
+}) {
+  return (
+    <>
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b border-border">
+        <h3 className="font-semibold text-foreground">Obvestila</h3>
+        {unreadCount > 0 && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-auto py-1 px-2 text-xs text-muted-foreground hover:text-foreground"
+            onClick={markAllAsRead}
+          >
+            <CheckCheck className="h-3.5 w-3.5 mr-1" />
+            Označi vse
+          </Button>
+        )}
+      </div>
+
+      {/* Notifications list */}
+      <ScrollArea className="h-[320px]">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          </div>
+        ) : notifications.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+            <Bell className="h-10 w-10 mb-2 opacity-20" />
+            <p className="text-sm">Ni novih obvestil</p>
+            <p className="text-xs mt-1 text-center px-4">
+              Tukaj bodo prikazana poročila logopedov
+            </p>
+          </div>
+        ) : (
+          <div className="p-2 space-y-1">
+            {notifications.map((notification) => (
+              <NotificationItem
+                key={notification.id}
+                notification={notification}
+                onMarkAsRead={markAsRead}
+                onClose={onClose}
+              />
+            ))}
+          </div>
+        )}
+      </ScrollArea>
+    </>
+  );
+}
+
 export function UserNotificationBell() {
   const { notifications, unreadCount, isLoading, markAsRead, markAllAsRead } = useUserNotifications();
   const [open, setOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Check if mobile
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+
+  const handleBellClick = () => {
+    if (isMobile) {
+      setMobileOpen(true);
+    }
+  };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative h-8 w-8">
+    <>
+      {/* Desktop: Popover */}
+      <div className="hidden sm:block">
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" size="icon" className="relative h-8 w-8">
+              <Bell className="h-5 w-5 text-muted-foreground" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-app-orange text-[10px] font-medium text-white flex items-center justify-center">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent 
+            className="w-80 p-0 z-50 bg-background border shadow-lg" 
+            align="end" 
+            sideOffset={8}
+          >
+            <NotificationContent
+              notifications={notifications}
+              unreadCount={unreadCount}
+              isLoading={isLoading}
+              markAsRead={markAsRead}
+              markAllAsRead={markAllAsRead}
+              onClose={() => setOpen(false)}
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      {/* Mobile: Button + centered modal */}
+      <div className="sm:hidden">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="relative h-8 w-8"
+          onClick={handleBellClick}
+        >
           <Bell className="h-5 w-5 text-muted-foreground" />
           {unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-app-orange text-[10px] font-medium text-white flex items-center justify-center">
@@ -109,56 +220,37 @@ export function UserNotificationBell() {
             </span>
           )}
         </Button>
-      </PopoverTrigger>
-      <PopoverContent 
-        className="w-80 p-0 max-sm:fixed max-sm:left-1/2 max-sm:top-1/2 max-sm:-translate-x-1/2 max-sm:-translate-y-1/2 max-sm:w-[90vw] max-sm:max-w-[350px] z-50 bg-background border shadow-lg" 
-        align="end" 
-        sideOffset={8}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <h3 className="font-semibold text-foreground">Obvestila</h3>
-          {unreadCount > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-auto py-1 px-2 text-xs text-muted-foreground hover:text-foreground"
-              onClick={markAllAsRead}
-            >
-              <CheckCheck className="h-3.5 w-3.5 mr-1" />
-              Označi vse
-            </Button>
-          )}
-        </div>
 
-        {/* Notifications list */}
-        <ScrollArea className="h-[320px]">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        {/* Mobile modal overlay */}
+        {mobileOpen && (
+          <div 
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            onClick={() => setMobileOpen(false)}
+          >
+            <div 
+              className="bg-background rounded-xl shadow-xl w-[90vw] max-w-[350px] max-h-[80vh] overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close button */}
+              <button
+                onClick={() => setMobileOpen(false)}
+                className="absolute top-3 right-3 p-1 rounded-full hover:bg-muted z-10"
+              >
+                <X className="h-5 w-5 text-muted-foreground" />
+              </button>
+              
+              <NotificationContent
+                notifications={notifications}
+                unreadCount={unreadCount}
+                isLoading={isLoading}
+                markAsRead={markAsRead}
+                markAllAsRead={markAllAsRead}
+                onClose={() => setMobileOpen(false)}
+              />
             </div>
-          ) : notifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-              <Bell className="h-10 w-10 mb-2 opacity-20" />
-              <p className="text-sm">Ni novih obvestil</p>
-              <p className="text-xs mt-1 text-center px-4">
-                Tukaj bodo prikazana poročila logopedov
-              </p>
-            </div>
-          ) : (
-            <div className="p-2 space-y-1">
-              {notifications.map((notification) => (
-                <NotificationItem
-                  key={notification.id}
-                  notification={notification}
-                  onMarkAsRead={markAsRead}
-                  onClose={() => setOpen(false)}
-                />
-              ))}
-            </div>
-          )}
-        </ScrollArea>
-      </PopoverContent>
-    </Popover>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
