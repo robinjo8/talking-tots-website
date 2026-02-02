@@ -182,6 +182,7 @@ export const useArticulationTestNew = (
   }, [childId, userId, sessionInitialized, fixedSessionNumber]);
 
   // Handle recording complete - receives audio base64 from microphone
+  // Ob uspešnem snemanju shrani napredek TAKOJ (ne ob kliku na "Naprej")
   const handleRecordingComplete = async (audioBase64: string) => {
     console.log("Recording complete, audio length:", audioBase64.length);
     
@@ -206,12 +207,18 @@ export const useArticulationTestNew = (
         transcribedText: result.transcribedText,
         matchType: result.matchType,
       });
+
+      // Če je transkripcija uspela, shrani napredek TAKOJ
+      // current_word_index = zadnja uspešno izgovorjena beseda
+      if (result.accepted && childId && sessionNumber && onSaveProgress) {
+        onSaveProgress(childId, sessionNumber, currentWordIndex);
+      }
     }
 
     setHasRecorded(true);
   };
 
-  // Handle next word
+  // Handle next word - NE shranjuj napredka tukaj, shrani se ob uspešnem snemanju
   const handleNext = () => {
     if (currentWordIndex < totalWords - 1) {
       const nextIndex = currentWordIndex + 1;
@@ -219,11 +226,7 @@ export const useArticulationTestNew = (
       setHasRecorded(false);
       setTranscriptionResult(null);
       resetTranscription();
-      
-      // Save progress after moving to next word
-      if (childId && sessionNumber && onSaveProgress) {
-        onSaveProgress(childId, sessionNumber, nextIndex);
-      }
+      // Napredek se NE shranjuje tukaj - shrani se v handleRecordingComplete
     } else {
       // Test is complete
       setIsTestComplete(true);
