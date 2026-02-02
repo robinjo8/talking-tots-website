@@ -1,226 +1,138 @@
 
+# Načrt: Popravek sistema za nadaljevanje seje
 
-# Načrt: Sistem za upravljanje sej preverjanja izgovorjave
+## Ugotovljeni problemi
 
-## Razumljiva razlaga problema
+### Problem 1: Dvojno inkrementiranje indeksa besede
 
-### Trenutno stanje (kako deluje zdaj)
+Trenutna logika ima napako v štetju:
 
-Predstavljaj si, da imaš mapo "Seja-1" kamor shranjuješ posnetke otroka. Trenutni sistem deluje tako:
+```
+Ko uporabnik izgovori ROŽA (indeks 57) in pritisne NAPREJ:
+1. handleNext() izračuna nextIndex = 57 + 1 = 58
+2. handleNext() pokliče onSaveProgress(childId, sessionNumber, 58)
+3. updateProgress(58) shrani current_word_index = 58 + 1 = 59  ❌ NAPAKA
 
-1. **Ko začneš test**: Sistem pogleda koliko map "Seja-X" že obstaja in uporabi naslednjo
-2. **Med testom**: Vsak posnetek se shrani v trenutno mapo (npr. Seja-1)
-3. **Progress (kje je otrok ostal)**: Shranjeno v brskalnik (localStorage) - če zamenjaš računalnik ali brskalnik, se podatek izgubi
-4. **Ko končaš test**: Ni nobene oznake da je seja "zaključena"
+Rezultat: V bazi je shranjeno 59 (SIR), čeprav bi moralo biti 58 (URA)
+```
 
-### Problem
+**Vzrok:** Funkcija `updateProgress` doda +1, ampak prejme že inkrementirano vrednost.
 
-Ker sistem ne ve, ali je seja dokončana (vseh 60 besed) ali ne, se lahko zgodi:
-- Začneš test, otrok izgovori 5 besed, potem zapreš
-- Naslednjič se lahko zgodi, da sistem ustvari novo mapo "Seja-2" ali pa nadaljuje v Seja-1 - odvisno od tega ali si na istem brskalniku
+### Problem 2: Dialog prikaže napačno besedo
 
-To je povzročilo, da je "PAJEK" (iz starega testa) ostal v isti mapi kot novi posnetki "R".
+Dialog prikaže besedo na indeksu `current_word_index` iz baze. Ker je tam 59, se prikaže SIR (60/60) namesto URA.
+
+**Pravilna logika:**
+- `current_word_index` naj pomeni "naslednja beseda za izgovorjavo" (ne "že izgovorjena beseda + 1")
+- Dialog naj prikaže "Zadnja izgovorjena beseda" = beseda na indeksu `current_word_index - 1`
+
+### Problem 3: Gumb "Začni znova" ne briše seje
+
+Trenutno `handleStartOver` samo zapre dialog in pokaže info dialog, ampak seje v bazi ne ponastavi.
 
 ---
 
-## Kako bo delovalo po popravku
+## Rešitev
 
-### Nov tok delovanja
+### Sprememba 1: Popravek `updateProgress` v `useLogopedistSessionManager.ts`
 
-```text
-┌─────────────────────────────────────────────────────────┐
-│                    ZAČETEK TESTA                        │
-└─────────────────────────────────────────────────────────┘
-                            │
-                            ▼
-              ┌─────────────────────────┐
-              │ Ali obstaja nedokončana│
-              │ seja za tega otroka?   │
-              │ (preveri v BAZI)       │
-              └─────────────────────────┘
-                     │           │
-                    DA          NE
-                     │           │
-                     ▼           ▼
-        ┌─────────────────┐  ┌─────────────────┐
-        │ Nadaljuj        │  │ Ustvari NOVO    │
-        │ obstoječo sejo  │  │ sejo v bazi     │
-        │ od zadnje       │  │ (status:        │
-        │ shranjene besede│  │  "in_progress") │
-        └─────────────────┘  └─────────────────┘
-                     │           │
-                     └─────┬─────┘
-                           ▼
-              ┌─────────────────────────┐
-              │ Otrok izgovarja besede  │
-              │ (1, 2, 3... do 60)     │
-              │                         │
-              │ Ob vsaki besedi se v   │
-              │ BAZO shrani napredek   │
-              │ (current_word_index)   │
-              └─────────────────────────┘
-                           │
-                           ▼
-              ┌─────────────────────────┐
-              │ Ali je bila izgovorjena│
-              │ 60. beseda (zadnja)?   │
-              └─────────────────────────┘
-                     │           │
-                    DA          NE
-                     │           │
-                     ▼           ▼
-        ┌─────────────────┐  ┌─────────────────┐
-        │ Seja se označi  │  │ Seja ostane     │
-        │ kot ZAKLJUČENA  │  │ "in_progress"   │
-        │ (status:        │  │                 │
-        │  "completed")   │  │ Naslednjič se   │
-        │                 │  │ nadaljuje       │
-        │ Naslednji test  │  │ od te besede    │
-        │ = Seja-2        │  └─────────────────┘
-        └─────────────────┘
-```
-
-### Ključna pravila
-
-1. **Seja se ne more "pomešati"**: Ko je seja zaključena (60 besed), se zaklene - nobeni novi posnetki ne morejo več priti vanjo
-2. **Progress v bazi**: Namesto v brskalnik se progress shranjuje v bazo - deluje na vseh napravah
-3. **Avtomatsko nadaljevanje**: Če prekinete test, boste naslednjič avtomatsko nadaljevali od zadnje besede
-4. **Nova seja samo po zaključku**: Seja-2 se začne ŠELE ko je Seja-1 popolnoma dokončana
-
----
-
-## Tehnična implementacija
-
-### 1. Sprememba sheme baze podatkov
-
-Dodati nova polja v tabelo `articulation_test_sessions`:
-
-| Polje | Tip | Namen |
-|-------|-----|-------|
-| `current_word_index` | integer | Shranjuje napredek (0-59) |
-| `total_words` | integer | Število besed v testu (60) |
-| `is_completed` | boolean | Ali je seja zaključena |
-
-SQL migracija:
-```sql
-ALTER TABLE articulation_test_sessions 
-ADD COLUMN current_word_index integer DEFAULT 0,
-ADD COLUMN total_words integer DEFAULT 60,
-ADD COLUMN is_completed boolean DEFAULT false;
-```
-
-### 2. Nov hook: useLogopedistSessionManager
-
-Nadomesti trenutno logiko z novim hookom:
+Odstraniti podvajanje +1:
 
 ```typescript
-// Ob začetku testa
-const initializeSession = async (childId: string) => {
-  // 1. Preveri če obstaja nedokončana seja
-  const { data: existingSession } = await supabase
-    .from('articulation_test_sessions')
-    .select('*')
-    .eq('logopedist_child_id', childId)
-    .eq('is_completed', false)
-    .single();
+// PREJ (narobe):
+.update({ current_word_index: wordIndex + 1 })
 
-  if (existingSession) {
-    // Nadaljuj obstoječo sejo
-    return {
-      sessionId: existingSession.id,
-      sessionNumber: existingSession.session_number,
-      startIndex: existingSession.current_word_index,
-      isResume: true
-    };
-  }
+// POTEM (pravilno):
+.update({ current_word_index: wordIndex })
+```
 
-  // 2. Določi novo številko seje
-  const { data: completedSessions } = await supabase
-    .from('articulation_test_sessions')
-    .select('session_number')
-    .eq('logopedist_child_id', childId)
-    .eq('is_completed', true);
+**Zakaj:** `handleNext` že pošlje `nextIndex` ki je inkrementirano. Ni potrebe za še eno inkrementiranje.
+
+### Sprememba 2: Popravek dialoga v `AdminArtikulacijskiTest.tsx`
+
+Dialog mora prikazati **zadnjo izgovorjeno besedo**, ne naslednjo:
+
+```typescript
+// PREJ:
+setResumeWordIndex(existingSession.startIndex);
+
+// POTEM:
+// startIndex je "naslednja beseda za izgovorjavo"
+// Za prikaz "zadnje izgovorjene" uporabimo startIndex - 1
+const lastSpokenWordIndex = existingSession.startIndex > 0 
+  ? existingSession.startIndex - 1 
+  : 0;
+setResumeWordIndex(lastSpokenWordIndex);
+```
+
+### Sprememba 3: Poenostavitev dialoga `ArticulationResumeDialog.tsx`
+
+Po zahtevi uporabnika odstraniti:
+- Ikono 📍 in ⏱️
+- Tekst "(60/60)"
+- Tekst "Shranjeno: prejšnja seja"
+
+Nova vsebina:
+
+```
+🔄 Nadaljevanje preverjanja
+
+Zaznali smo nedokončano preverjanje. Ali želite nadaljevati?
+
+Zadnja izgovorjena beseda je bila: [BESEDA]
+
+[Začni znova]  [Nadaljuj]
+```
+
+### Sprememba 4: Implementacija "Začni znova" v `useLogopedistSessionManager.ts`
+
+Dodati novo funkcijo `resetSession` za ponastavitev seje:
+
+```typescript
+const resetSession = useCallback(async (childId: string): Promise<SessionInfo | null> => {
+  if (!sessionInfo) return null;
   
-  const nextSessionNumber = (completedSessions?.length || 0) + 1;
-
-  // 3. Ustvari novo sejo
-  const { data: newSession } = await supabase
-    .from('articulation_test_sessions')
-    .insert({
-      logopedist_child_id: childId,
-      session_number: nextSessionNumber,
-      current_word_index: 0,
-      is_completed: false,
-      status: 'in_progress'
-    })
-    .select()
-    .single();
-
-  return {
-    sessionId: newSession.id,
-    sessionNumber: nextSessionNumber,
-    startIndex: 0,
-    isResume: false
-  };
-};
-```
-
-### 3. Posodobitev napredka med testom
-
-Ob vsaki uspešni izgovorjavi:
-
-```typescript
-const updateProgress = async (sessionId: string, wordIndex: number) => {
+  // Izbriši trenutno nedokončano sejo
   await supabase
     .from('articulation_test_sessions')
-    .update({ current_word_index: wordIndex + 1 })
-    .eq('id', sessionId);
-};
+    .delete()
+    .eq('id', sessionInfo.sessionId);
+  
+  // Ustvari novo sejo od začetka
+  setSessionInfo(null);
+  return initializeSession(childId, sessionInfo.totalWords);
+}, [sessionInfo, initializeSession]);
 ```
 
-### 4. Zaključek seje
-
-Ko otrok izgovori 60. besedo:
+### Sprememba 5: Povezava "Začni znova" v `AdminArtikulacijskiTest.tsx`
 
 ```typescript
-const completeSession = async (sessionId: string) => {
-  await supabase
-    .from('articulation_test_sessions')
-    .update({ 
-      is_completed: true,
-      status: 'pending',
-      current_word_index: 60,
-      completed_at: new Date().toISOString()
-    })
-    .eq('id', sessionId);
+const handleStartOver = async () => {
+  if (childId) {
+    // Ponastavi sejo v bazi in začni od začetka
+    await resetSession(childId);
+  }
+  setShowResumeDialog(false);
+  setShowInfoDialog(true);
 };
 ```
 
 ---
 
-## Spremembe datotek
+## Povzetek sprememb
 
-| Datoteka | Sprememba | Status |
-|----------|-----------|--------|
-| SQL migracija | Dodaj `current_word_index`, `total_words`, `is_completed` | ✅ Dokončano |
-| `src/hooks/useLogopedistSessionManager.ts` | Nov hook za upravljanje sej | ✅ Dokončano |
-| `src/hooks/useArticulationTestNew.ts` | Uporabi nov session manager namesto storage-based logike | ✅ Dokončano |
-| `src/pages/admin/AdminArtikulacijskiTest.tsx` | Integracija novega session managerja | ✅ Dokončano |
-| `src/components/admin/articulation/AdminArticulationCompletionDialog.tsx` | Kliče completeSession ob zaključku | ✅ Dokončano |
-| `src/hooks/useLogopedistArticulationSession.ts` | Ohranjen za referenco, vendar ni več v uporabi | ⚠️ Lahko se izbriše |
+| Datoteka | Sprememba |
+|----------|-----------|
+| `src/hooks/useLogopedistSessionManager.ts` | Odstrani +1 v `updateProgress`, dodaj `resetSession` funkcijo |
+| `src/pages/admin/AdminArtikulacijskiTest.tsx` | Popravi izračun `resumeWordIndex`, uporabi `resetSession` za "Začni znova" |
+| `src/components/articulation/ArticulationResumeDialog.tsx` | Poenostavi prikaz - odstrani ikone, (X/Y), "Shranjeno" tekst |
 
 ---
 
-## Rezultat po implementaciji
+## Končni rezultat
 
-- **Seja-1**: Ko otrok začne preverjanje, se ustvari seja v bazi. Če prekine po 10 besedah, se shrani `current_word_index = 10`. Naslednjič nadaljuje od 11. besede. Ko izgovori 60. besedo, se seja zaklene.
-- **Seja-2**: Začne se ŠELE ko je Seja-1 popolnoma zaključena (60 besed).
-- **Ni mešanja**: Posnetki iz ene seje nikoli ne morejo priti v mapo druge seje.
-- **Deluje na vseh napravah**: Progress je v bazi, ne v brskalniku.
-
----
-
-## Opomba glede obstoječih podatkov
-
-Obstoječi posnetek "PAJEK" v mapi Seja-1 je ostal iz prejšnjega nedokončanega testa. Po implementaciji tega sistema se takšno mešanje ne bo več dogajalo. Obstoječe posnetke bo potrebno ročno očistiti.
-
+Po popravku:
+1. **Pravilno shranjevanje:** Če izgovoriš ROŽA in greš na URA, se v bazo shrani `current_word_index = 58` (URA)
+2. **Pravilno nadaljevanje:** Dialog prikaže "Zadnja izgovorjena beseda je bila: ROŽA" in test nadaljuje od URA
+3. **Pravilno resetiranje:** Gumb "Začni znova" pobriše sejo in začne od prve besede
+4. **Enostavnejši dialog:** Brez odvečnih informacij, samo bistvo
