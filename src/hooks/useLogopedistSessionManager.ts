@@ -5,7 +5,8 @@ import { useAdminAuth } from '@/contexts/AdminAuthContext';
 interface SessionInfo {
   sessionId: string;
   sessionNumber: number;
-  startIndex: number;
+  startIndex: number;        // Naslednja beseda za izgovorjavo (current_word_index + 1)
+  lastSpokenIndex: number;   // Zadnja uspešno izgovorjena beseda (za prikaz v dialogu)
   isResume: boolean;
   totalWords: number;
 }
@@ -69,12 +70,16 @@ export const useLogopedistSessionManager = (): UseLogopedistSessionManagerResult
 
       if (existingSession) {
         // Resume the existing session
+        // current_word_index pomeni "zadnja uspešno izgovorjena beseda"
+        // startIndex = current_word_index + 1 (naslednja beseda za izgovorjavo)
         console.log('Resuming existing session:', existingSession);
+        const lastSpoken = existingSession.current_word_index ?? 0;
         const info: SessionInfo = {
           sessionId: existingSession.id,
           sessionNumber: existingSession.session_number ?? 1,
-          startIndex: existingSession.current_word_index ?? 0,
-          isResume: (existingSession.current_word_index ?? 0) > 0,
+          startIndex: lastSpoken + 1,  // Naslednja beseda za izgovorjavo
+          lastSpokenIndex: lastSpoken,  // Zadnja izgovorjena beseda (za dialog)
+          isResume: lastSpoken > 0,
           totalWords: existingSession.total_words ?? totalWords,
         };
         setSessionInfo(info);
@@ -137,6 +142,7 @@ export const useLogopedistSessionManager = (): UseLogopedistSessionManagerResult
         sessionId: newSession.id,
         sessionNumber: newSession.session_number ?? nextSessionNumber,
         startIndex: 0,
+        lastSpokenIndex: -1,  // Nobena beseda še ni bila izgovorjena
         isResume: false,
         totalWords: newSession.total_words ?? totalWords,
       };

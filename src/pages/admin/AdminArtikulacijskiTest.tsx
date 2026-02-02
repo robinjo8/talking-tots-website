@@ -206,10 +206,9 @@ export default function AdminArtikulacijskiTest() {
     const checkExistingSession = async () => {
       if (childId && !sessionInfo && !isInitializing) {
         const existingSession = await initSessionManager(childId, testMaxWords ?? 60);
-        if (existingSession && existingSession.isResume && existingSession.startIndex > 0) {
-          // Show the LAST SPOKEN word (startIndex - 1), not the next word to speak
-          const lastSpokenWordIndex = existingSession.startIndex - 1;
-          setResumeWordIndex(lastSpokenWordIndex);
+        if (existingSession && existingSession.isResume && existingSession.lastSpokenIndex >= 0) {
+          // Uporabi lastSpokenIndex za prikaz zadnje izgovorjene besede
+          setResumeWordIndex(existingSession.lastSpokenIndex);
           setShowResumeDialog(true);
           setShowInfoDialog(false);
         }
