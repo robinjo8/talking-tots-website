@@ -241,6 +241,7 @@ export default function AdminArtikulacijskiTest() {
           await initializeSession();
           setShowInfoDialog(false);
         }}
+        onBack={() => navigate(`/admin/children/${childId}/workspace`)}
       />
 
       {/* Completion Dialog */}
