@@ -1,133 +1,154 @@
 
 
-# Načrt: Odstranitev zapisa "Govorne težave" in testni način za OŠ Test
+# Načrt: Popravek napake pri shranjevanju seje za logopediste
 
-## 1. Problem
+## Problem
 
-### 1.1 Zapis "Govorne težave" na karticah otrok
-Na strani `/admin/children` se pri vsakem otroku prikazuje zapis "📝 Govorne težave." pod osnovnimi podatki. Ta informacija ni potrebna v tem pogledu.
+Pri shranjevanju preverjanja izgovorjave za otroka, ki ga upravlja logoped, se pojavi napaka:
 
-### 1.2 Testni način za organizacijo OŠ Test
-Za namen testiranja je potrebno, da uporabniki iz organizacije "OŠ Test" pri preverjanju izgovorjave izgovarjajo samo zadnjo črko (R), kar pomeni 3 besede namesto vseh 60.
+```
+insert or update on table "articulation_test_sessions" violates foreign key constraint 
+"articulation_test_sessions_child_id_fkey"
+```
+
+### Vzrok napake
+
+Tabela `articulation_test_sessions` ima dve ločeni polji:
+- `child_id` (NOT NULL) → referencira tabelo `children` (otroci staršev)
+- `logopedist_child_id` (nullable) → referencira tabelo `logopedist_children` (otroci logopedov)
+
+Trenutna koda v `useLogopedistArticulationSession.ts` naredi napako na vrstici 47:
+
+```typescript
+child_id: logopedistChildId,  // NAPAKA: UUID iz logopedist_children se vstavi v child_id
+```
+
+To ne deluje, ker UUID otroka logopeda ne obstaja v tabeli `children`, kar krši foreign key constraint.
 
 ---
 
-## 2. Rešitev
+## Rešitev
 
-### 2.1 Odstranitev prikaza "Govorne težave"
+### Možnost 1: Spremeniti shemo baze (child_id → nullable)
 
-V datoteki `src/pages/admin/AdminChildren.tsx` bom **odstranil** celoten blok, ki prikazuje `child.notes`:
+Spremeniti `child_id` v nullable polje:
+- PRO: Čista arhitektura - seje za logopedove otroke nimajo `child_id`
+- CONTRA: Potrebna migracija, lahko poruši drugo kodo
 
-```typescript
-// ODSTRANI TE VRSTICE (252-258):
-{child.notes && (
-  <div className="mt-3 pt-3 border-t">
-    <p className="text-sm text-muted-foreground line-clamp-2">
-      📝 {child.notes}
-    </p>
-  </div>
-)}
-```
+### Možnost 2: Uporabiti placeholder UUID ✅ PRIPOROČENO
 
-### 2.2 Testni način za OŠ Test (samo zadnja črka R)
-
-V datoteki `src/pages/admin/AdminArtikulacijskiTest.tsx` bom dodal pogojno logiko, ki preveri organizacijo logopeda:
-
-```typescript
-// Preveri, ali je logoped iz organizacije "OŠ Test"
-const isTestOrganization = profile?.organization_name === "OŠ Test";
-
-// Izračunaj začetni index za zadnjo črko R (besede 57, 58, 59)
-const testModeStartIndex = isTestOrganization ? 57 : 0;
-```
-
-Nato bo ta `startIndex` posredovan v hook `useArticulationTestNew`, skupaj z ustrezno omejitvijo `totalWords`.
-
-Za to moram posodobiti hook `useArticulationTestNew.ts`, da bo sprejel opcijski parameter `endAtLetter`, ki omeji test na eno črko.
-
-**Logika:**
-- Če je `organization_name === "OŠ Test"`:
-  - Test se začne pri indeksu 57 (prva beseda črke R: ROŽA)
-  - Test se konča po 3 besedah (ROŽA, URA, SIR)
-  - Progress grid prikazuje samo črko R
+Uporabiti poseben "placeholder" UUID za seje logopedov:
+- PRO: Ni potrebna sprememba sheme
+- PRO: Hitro za implementacijo
+- CONTRA: "Hack" rešitev, vendar bo delovala
 
 ---
 
-## 3. Spremembe datotek
+## Implementacija (Možnost 2)
 
-| Datoteka | Sprememba |
-|----------|-----------|
-| `src/pages/admin/AdminChildren.tsx` | Odstrani blok s prikazom `child.notes` (vrstice 251-258) |
-| `src/pages/admin/AdminArtikulacijskiTest.tsx` | Dodaj pogoj za organizacijo "OŠ Test" - nastavi startIndex in endIndex |
-| `src/hooks/useArticulationTestNew.ts` | Dodaj opcijski parameter `maxWords` za omejitev števila besed v testu |
+### Datoteka: `src/hooks/useLogopedistArticulationSession.ts`
+
+Najprej ustvarim placeholder otroka v tabeli `children` z posebnim imenom, ki označuje da je placeholder za logopedove seje. Nato uporabim ta UUID kot `child_id`.
+
+**Sprememba:**
+
+```typescript
+// KONSTANTA - placeholder child za logopediste
+const LOGOPEDIST_PLACEHOLDER_CHILD_ID = '00000000-0000-0000-0000-000000000001';
+
+const saveSession = useCallback(async (
+  logopedistChildId: string,
+  sessionNumber: number
+): Promise<SaveSessionResult> => {
+  if (!profile || !user) {
+    return { success: false, error: 'Ni prijavljenega logopeda' };
+  }
+
+  setIsSaving(true);
+
+  try {
+    const { data: sessionData, error: sessionError } = await supabase
+      .from('articulation_test_sessions')
+      .insert({
+        // Uporabimo placeholder child_id za logopediste
+        // (ta otrok mora obstajati v tabeli children)
+        child_id: LOGOPEDIST_PLACEHOLDER_CHILD_ID,
+        parent_id: user.id,
+        logopedist_child_id: logopedistChildId,  // Pravi ID otroka
+        organization_id: profile.organization_id,
+        source_type: 'logopedist',
+        status: 'pending',
+        session_number: sessionNumber,
+        submitted_at: new Date().toISOString(),
+      })
+      .select('id')
+      .single();
+    // ...
+  }
+}, [profile, user]);
+```
+
+### Potrebna SQL migracija
+
+Ustvariti placeholder otroka v tabeli `children`:
+
+```sql
+-- Vstavi placeholder otroka za logopediste
+INSERT INTO public.children (
+  id, 
+  parent_id, 
+  name, 
+  age, 
+  gender
+) VALUES (
+  '00000000-0000-0000-0000-000000000001',
+  '00000000-0000-0000-0000-000000000000',  -- System user
+  '_LOGOPEDIST_PLACEHOLDER',
+  0,
+  NULL
+) ON CONFLICT (id) DO NOTHING;
+```
+
+**OPOMBA:** Potreben bo tudi sistemski uporabnik za `parent_id` ali uporaba dejanskega auth.uid() logopeda.
 
 ---
 
-## 4. Tehnična implementacija
+## Alternativna implementacija (boljša dolgoročno)
 
-### 4.1 Sprememba useArticulationTestNew.ts
+Namesto placeholder-ja lahko spremenimo shemo baze:
 
-Dodaj parameter `maxWords`, ki omeji število besed v testu:
-
-```typescript
-export const useArticulationTestNew = (
-  childId?: string, 
-  userId?: string, 
-  fixedSessionNumber?: number, 
-  startIndex: number = 0,
-  difficulty: string = "srednja",
-  onSaveProgress?: (...) => void,
-  logopedistId?: string,
-  maxWords?: number  // NOVO - opcijska omejitev
-) => {
-  // ...
-  
-  // Uporabi maxWords če je podano, sicer vseh 60 besed
-  const effectiveTotalWords = maxWords ? Math.min(startIndex + maxWords, totalWords) : totalWords;
-  
-  // Prilagodi handleNext za končanje ob effectiveTotalWords
-  const handleNext = () => {
-    if (currentWordIndex < effectiveTotalWords - 1) {
-      // ...
-    } else {
-      setIsTestComplete(true);
-    }
-  };
-}
+```sql
+-- Naredi child_id nullable
+ALTER TABLE articulation_test_sessions 
+ALTER COLUMN child_id DROP NOT NULL;
 ```
 
-### 4.2 Sprememba AdminArtikulacijskiTest.tsx
+Nato v kodi:
 
 ```typescript
-// Preverba organizacije
-const isTestOrganization = profile?.organization_name === "OŠ Test";
-
-// Če je OŠ Test, začni pri R (index 57) in testiraj le 3 besede
-const effectiveStartIndex = isTestOrganization ? 57 : startIndex;
-const testMaxWords = isTestOrganization ? 3 : undefined;
-
-// Posreduj v hook
-const { ... } = useArticulationTestNew(
-  childId, 
-  undefined, 
-  fixedSessionNumber, 
-  effectiveStartIndex, 
-  difficulty, 
-  saveProgress, 
-  profile?.id,
-  testMaxWords  // NOVO
-);
+const { data: sessionData, error: sessionError } = await supabase
+  .from('articulation_test_sessions')
+  .insert({
+    child_id: null,  // NULL za logopedove otroke
+    parent_id: user.id,
+    logopedist_child_id: logopedistChildId,
+    // ...
+  })
 ```
 
 ---
 
-## 5. Rezultat
+## Povzetek sprememb
 
-### Po implementaciji:
-- ✅ Kartice otrok na `/admin/children` ne bodo več prikazovale "📝 Govorne težave."
-- ✅ Logopedi iz organizacije "OŠ Test" bodo pri preverjanju izgovorjave testirali samo 3 besede (črka R: ROŽA, URA, SIR)
-- ✅ Druga organizacije bodo imele polni test z vsemi 60 besedami
+| Datoteka/Akcija | Sprememba |
+|-----------------|-----------|
+| SQL migracija | Dodaj placeholder otroka ALI naredi `child_id` nullable |
+| `src/hooks/useLogopedistArticulationSession.ts` | Uporabi placeholder UUID ali null za `child_id` |
 
-### Opomba za kasnejšo odstranitev:
-Ko bo testiranje zaključeno, bo potrebno odstraniti pogoje za "OŠ Test" iz obeh datotek.
+## Rezultat
+
+Po popravku:
+- Logopedi bodo lahko uspešno shranjevali seje preverjanja izgovorjave
+- Seje bodo pravilno označene z `logopedist_child_id` in `organization_id`
+- Foreign key constraint ne bo več kršen
 
