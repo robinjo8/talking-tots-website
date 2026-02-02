@@ -257,11 +257,14 @@ export type Database = {
           completed_at: string | null
           created_at: string | null
           id: string
+          logopedist_child_id: string | null
           notes: string | null
+          organization_id: string | null
           parent_id: string
           priority: string | null
           reviewed_at: string | null
           session_number: number | null
+          source_type: string | null
           status: Database["public"]["Enums"]["test_session_status"] | null
           submitted_at: string | null
           test_version: string | null
@@ -273,11 +276,14 @@ export type Database = {
           completed_at?: string | null
           created_at?: string | null
           id?: string
+          logopedist_child_id?: string | null
           notes?: string | null
+          organization_id?: string | null
           parent_id: string
           priority?: string | null
           reviewed_at?: string | null
           session_number?: number | null
+          source_type?: string | null
           status?: Database["public"]["Enums"]["test_session_status"] | null
           submitted_at?: string | null
           test_version?: string | null
@@ -289,11 +295,14 @@ export type Database = {
           completed_at?: string | null
           created_at?: string | null
           id?: string
+          logopedist_child_id?: string | null
           notes?: string | null
+          organization_id?: string | null
           parent_id?: string
           priority?: string | null
           reviewed_at?: string | null
           session_number?: number | null
+          source_type?: string | null
           status?: Database["public"]["Enums"]["test_session_status"] | null
           submitted_at?: string | null
           test_version?: string | null
@@ -326,6 +335,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "children_analytics_admin"
             referencedColumns: ["child_id"]
+          },
+          {
+            foreignKeyName: "articulation_test_sessions_logopedist_child_id_fkey"
+            columns: ["logopedist_child_id"]
+            isOneToOne: false
+            referencedRelation: "logopedist_children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "articulation_test_sessions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
           },
         ]
       }

@@ -19,6 +19,7 @@ const AdminReports = lazy(() => import('@/pages/admin/AdminReports'));
 const AdminChildren = lazy(() => import('@/pages/admin/AdminChildren'));
 const AdminChildWorkspace = lazy(() => import('@/pages/admin/AdminChildWorkspace'));
 const AdminChildProgress = lazy(() => import('@/pages/admin/AdminChildProgress'));
+const AdminLogopedistChildDetail = lazy(() => import('@/pages/admin/AdminLogopedistChildDetail'));
 
 // Admin exercise pages
 const AdminGovorneVaje = lazy(() => import('@/pages/admin/AdminGovorneVaje'));
@@ -202,6 +203,14 @@ export function AdminRoutes() {
           element={
             <AdminLayoutWrapper>
               <AdminChildProgress />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="children/:childId/details" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminLogopedistChildDetail />
             </AdminLayoutWrapper>
           } 
         />
