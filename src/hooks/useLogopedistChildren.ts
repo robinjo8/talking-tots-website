@@ -26,8 +26,10 @@ export interface CreateChildInput {
   age: number;
   gender?: 'male' | 'female';
   birth_date?: string;
+  avatar_url?: string;
   speech_difficulties?: string[];
   speech_difficulties_description?: string;
+  speech_development?: Record<string, string>;
   notes?: string;
   external_id?: string;
 }
@@ -79,8 +81,10 @@ export function useLogopedistChildren() {
           age: input.age,
           gender: input.gender || null,
           birth_date: input.birth_date || null,
+          avatar_url: input.avatar_url || null,
           speech_difficulties: input.speech_difficulties || null,
           speech_difficulties_description: input.speech_difficulties_description || null,
+          speech_development: input.speech_development || null,
           notes: input.notes || null,
           external_id: input.external_id || null,
         })
