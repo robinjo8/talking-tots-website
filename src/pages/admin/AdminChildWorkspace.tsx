@@ -7,7 +7,7 @@ import { useLogopedistChild, useLogopedistChildren } from '@/hooks/useLogopedist
 import { ChildSwitcher } from '@/components/admin/children/ChildSwitcher';
 import { cn } from '@/lib/utils';
 
-// Aktivnosti - enake kot v uporabniškem portalu
+// Aktivnosti za admin portal (brez Logopedski nasveti)
 const activities = [
   {
     id: 'games',
@@ -16,7 +16,6 @@ const activities = [
     image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_igre_4.webp',
     gradient: 'from-dragon-green/20 to-dragon-green/20',
     badge: '🎮',
-    url: '/govorne-igre'
   },
   {
     id: 'exercises',
@@ -25,7 +24,6 @@ const activities = [
     image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_vaje_6.webp',
     gradient: 'from-app-blue/20 to-app-teal/20',
     badge: '📝',
-    url: '/govorno-jezikovne-vaje'
   },
   {
     id: 'test',
@@ -34,7 +32,6 @@ const activities = [
     image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_artikulacija_4.png',
     gradient: 'from-app-purple/20 to-app-teal/20',
     badge: '🎯',
-    url: '/artikulacijski-test'
   },
   {
     id: 'video',
@@ -43,16 +40,6 @@ const activities = [
     image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/Zmajcek_video_7.png',
     gradient: 'from-app-teal/20 to-dragon-green/20',
     badge: '🎥',
-    url: '/video-navodila'
-  },
-  {
-    id: 'advice',
-    title: 'Logopedski nasveti',
-    description: 'Koristni nasveti in informacije o govornem razvoju.',
-    image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_logoped_4.png',
-    gradient: 'from-app-purple/20 to-app-blue/20',
-    badge: '💡',
-    url: '/logopedski-koticek'
   },
   {
     id: 'challenges',
@@ -61,7 +48,6 @@ const activities = [
     image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_izzivi_6.webp',
     gradient: 'from-app-orange/20 to-app-yellow/20',
     badge: '⭐',
-    url: '/moji-izzivi'
   },
 ];
 
@@ -74,21 +60,18 @@ export default function AdminChildWorkspace() {
   const [showSwitcher, setShowSwitcher] = useState(false);
 
   const handleActivityClick = (activity: typeof activities[0]) => {
-    // Map activities to internal admin routes
+    // All activities now have internal admin routes
     const activityPathMap: Record<string, string> = {
       'games': `/admin/children/${childId}/games`,
-      // TODO: Add more activities when implemented
-      // 'exercises': `/admin/children/${childId}/exercises`,
-      // 'test': `/admin/children/${childId}/test`,
+      'exercises': `/admin/children/${childId}/exercises`,
+      'test': `/admin/children/${childId}/test`,
+      'video': `/admin/children/${childId}/video-navodila`,
+      'challenges': `/admin/children/${childId}/osebni-nacrt`,
     };
     
     const targetPath = activityPathMap[activity.id];
     if (targetPath) {
       navigate(targetPath);
-    } else {
-      // Fallback: open in new tab with query parameter for activities not yet migrated
-      const targetUrl = `${activity.url}?logopedistChildId=${childId}`;
-      window.open(targetUrl, '_blank');
     }
   };
 
