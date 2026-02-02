@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, CheckCheck, FileText, ChevronRight, X } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -38,13 +38,10 @@ function NotificationItem({ notification, onMarkAsRead, onClose }: NotificationI
   const navigate = useNavigate();
   
   const handleClick = () => {
-    // Označi kot prebrano
     if (!notification.is_read) {
       onMarkAsRead(notification.id);
     }
-    // Zapri popover
     onClose?.();
-    // Preusmeri na Moji dokumenti
     navigate('/profile?expandSection=myDocuments');
   };
 
@@ -58,7 +55,6 @@ function NotificationItem({ notification, onMarkAsRead, onClose }: NotificationI
       )}
       onClick={handleClick}
     >
-      {/* Unread indicator */}
       <div className="flex-shrink-0 mt-1">
         {!notification.is_read && (
           <div className="w-2 h-2 rounded-full bg-app-orange" />
@@ -66,12 +62,10 @@ function NotificationItem({ notification, onMarkAsRead, onClose }: NotificationI
         {notification.is_read && <div className="w-2 h-2" />}
       </div>
 
-      {/* Icon */}
       <div className="flex-shrink-0 mt-0.5 text-destructive">
         <FileText className="h-5 w-5" />
       </div>
 
-      {/* Content */}
       <div className="flex-1 min-w-0">
         <p className={cn(
           'text-sm',
@@ -87,7 +81,6 @@ function NotificationItem({ notification, onMarkAsRead, onClose }: NotificationI
         </p>
       </div>
 
-      {/* Arrow indicator */}
       <div className="flex-shrink-0 self-center">
         <ChevronRight className="h-4 w-4 text-muted-foreground" />
       </div>
@@ -95,7 +88,6 @@ function NotificationItem({ notification, onMarkAsRead, onClose }: NotificationI
   );
 }
 
-// Shared content component
 function NotificationContent({ 
   notifications, 
   unreadCount, 
@@ -113,7 +105,6 @@ function NotificationContent({
 }) {
   return (
     <>
-      {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border">
         <h3 className="font-semibold text-foreground">Obvestila</h3>
         {unreadCount > 0 && (
@@ -129,7 +120,6 @@ function NotificationContent({
         )}
       </div>
 
-      {/* Notifications list */}
       <ScrollArea className="h-[320px]">
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
@@ -164,22 +154,54 @@ export function UserNotificationBell() {
   const { notifications, unreadCount, isLoading, markAsRead, markAllAsRead } = useUserNotifications();
   const [open, setOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-
   const isMobile = useIsMobile();
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const handleBellClick = () => {
     if (isMobile) {
       setMobileOpen(true);
+    } else {
+      setOpen(prev => !prev);
+    }
+  };
+
+  const handleClose = () => {
+    if (isMobile) {
+      setMobileOpen(false);
+    } else {
+      setOpen(false);
     }
   };
 
   return (
     <>
-      {/* Desktop: Popover */}
-      <div className="hidden sm:block">
+      {/* Single bell button - no CSS breakpoint logic */}
+      {isMobile ? (
+        // Mobile: Just a button that opens the modal
+        <Button 
+          ref={buttonRef}
+          variant="ghost" 
+          size="icon" 
+          className="relative h-8 w-8"
+          onClick={handleBellClick}
+        >
+          <Bell className="h-5 w-5 text-muted-foreground" />
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-app-orange text-[10px] font-medium text-white flex items-center justify-center">
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </span>
+          )}
+        </Button>
+      ) : (
+        // Desktop: Button wrapped in Popover
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative h-8 w-8">
+            <Button 
+              ref={buttonRef}
+              variant="ghost" 
+              size="icon" 
+              className="relative h-8 w-8"
+            >
               <Bell className="h-5 w-5 text-muted-foreground" />
               {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-app-orange text-[10px] font-medium text-white flex items-center justify-center">
@@ -199,58 +221,40 @@ export function UserNotificationBell() {
               isLoading={isLoading}
               markAsRead={markAsRead}
               markAllAsRead={markAllAsRead}
-              onClose={() => setOpen(false)}
+              onClose={handleClose}
             />
           </PopoverContent>
         </Popover>
-      </div>
+      )}
 
-      {/* Mobile: Button + centered modal */}
-      <div className="sm:hidden">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="relative h-8 w-8"
-          onClick={handleBellClick}
+      {/* Mobile: Centered modal overlay */}
+      {mobileOpen && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          onClick={() => setMobileOpen(false)}
         >
-          <Bell className="h-5 w-5 text-muted-foreground" />
-          {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-app-orange text-[10px] font-medium text-white flex items-center justify-center">
-              {unreadCount > 99 ? '99+' : unreadCount}
-            </span>
-          )}
-        </Button>
-
-        {/* Mobile modal overlay */}
-        {mobileOpen && (
           <div 
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-            onClick={() => setMobileOpen(false)}
+            className="relative bg-background rounded-xl shadow-xl w-[90vw] max-w-[350px] max-h-[80vh] overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
           >
-            <div 
-              className="relative bg-background rounded-xl shadow-xl w-[90vw] max-w-[350px] max-h-[80vh] overflow-hidden"
-              onClick={(e) => e.stopPropagation()}
+            <button
+              onClick={() => setMobileOpen(false)}
+              className="absolute top-3 right-3 p-1 rounded-full hover:bg-muted z-10"
             >
-              {/* Close button */}
-              <button
-                onClick={() => setMobileOpen(false)}
-                className="absolute top-3 right-3 p-1 rounded-full hover:bg-muted z-10"
-              >
-                <X className="h-5 w-5 text-muted-foreground" />
-              </button>
-              
-              <NotificationContent
-                notifications={notifications}
-                unreadCount={unreadCount}
-                isLoading={isLoading}
-                markAsRead={markAsRead}
-                markAllAsRead={markAllAsRead}
-                onClose={() => setMobileOpen(false)}
-              />
-            </div>
+              <X className="h-5 w-5 text-muted-foreground" />
+            </button>
+            
+            <NotificationContent
+              notifications={notifications}
+              unreadCount={unreadCount}
+              isLoading={isLoading}
+              markAsRead={markAsRead}
+              markAllAsRead={markAllAsRead}
+              onClose={() => setMobileOpen(false)}
+            />
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </>
   );
 }
