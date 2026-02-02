@@ -1,6 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, CheckCheck, FileText, ChevronRight, X } from 'lucide-react';
+import { Bell, CheckCheck, FileText, ChevronRight } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+} from '@/components/ui/dialog';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -155,7 +159,6 @@ export function UserNotificationBell() {
   const [open, setOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const isMobile = useIsMobile();
-  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const handleBellClick = () => {
     if (isMobile) {
@@ -177,9 +180,8 @@ export function UserNotificationBell() {
     <>
       {/* Single bell button - no CSS breakpoint logic */}
       {isMobile ? (
-        // Mobile: Just a button that opens the modal
+        // Mobile: Just a button that opens the Dialog
         <Button 
-          ref={buttonRef}
           variant="ghost" 
           size="icon" 
           className="relative h-8 w-8"
@@ -197,7 +199,6 @@ export function UserNotificationBell() {
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button 
-              ref={buttonRef}
               variant="ghost" 
               size="icon" 
               className="relative h-8 w-8"
@@ -227,34 +228,19 @@ export function UserNotificationBell() {
         </Popover>
       )}
 
-      {/* Mobile: Centered modal overlay */}
-      {mobileOpen && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-          onClick={() => setMobileOpen(false)}
-        >
-          <div 
-            className="relative bg-background rounded-xl shadow-xl w-[90vw] max-w-[350px] max-h-[80vh] overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setMobileOpen(false)}
-              className="absolute top-3 right-3 p-1 rounded-full hover:bg-muted z-10"
-            >
-              <X className="h-5 w-5 text-muted-foreground" />
-            </button>
-            
-            <NotificationContent
-              notifications={notifications}
-              unreadCount={unreadCount}
-              isLoading={isLoading}
-              markAsRead={markAsRead}
-              markAllAsRead={markAllAsRead}
-              onClose={() => setMobileOpen(false)}
-            />
-          </div>
-        </div>
-      )}
+      {/* Mobile: Dialog - centriran na sredini zaslona */}
+      <Dialog open={mobileOpen} onOpenChange={setMobileOpen}>
+        <DialogContent className="w-[90vw] max-w-[350px] max-h-[80vh] p-0 overflow-hidden">
+          <NotificationContent
+            notifications={notifications}
+            unreadCount={unreadCount}
+            isLoading={isLoading}
+            markAsRead={markAsRead}
+            markAllAsRead={markAllAsRead}
+            onClose={() => setMobileOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
