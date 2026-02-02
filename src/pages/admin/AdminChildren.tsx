@@ -185,10 +185,10 @@ export default function AdminChildren() {
                       <h3 className="font-semibold truncate">{child.name}</h3>
                       <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                         <span>Starost: {child.age} {child.age === 1 ? 'leto' : child.age < 5 ? 'leta' : 'let'}</span>
-                        {child.speech_difficulties && child.speech_difficulties.length > 0 && (
+                        {child.gender && (
                           <>
                             <span>•</span>
-                            <span>Govorne težave: {child.speech_difficulties.map(getSpeechDifficultyLabel).join(', ')}</span>
+                            <span>{child.gender === 'male' ? 'Deček' : 'Deklica'}</span>
                           </>
                         )}
                       </div>
