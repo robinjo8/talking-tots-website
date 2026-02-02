@@ -66,11 +66,16 @@ export async function uploadLogopedistChildDocuments(
   }
 
   // 2. Upload questionnaire
+  console.log('Questionnaire data received:', speechDevelopment);
+  console.log('Questionnaire keys:', speechDevelopment ? Object.keys(speechDevelopment) : 'undefined');
+  
   if (speechDevelopment && Object.keys(speechDevelopment).length > 0) {
     try {
       const questionnaireText = formatQuestionnaireAsText(speechDevelopment, childName);
+      console.log('Questionnaire text generated:', questionnaireText.substring(0, 200));
       const questionnaireBlob = new Blob([questionnaireText], { type: 'text/plain' });
       const fileName = `${childId}-osnovni-vprasalnik.txt`;
+      console.log('Uploading questionnaire to:', `${basePath}/${fileName}`);
       
       const { error } = await supabase.storage
         .from('uporabniski-profili')
