@@ -247,15 +247,6 @@ export default function AdminChildren() {
                     </Button>
                   </div>
                 </div>
-
-                {/* Zapiski */}
-                {child.notes && (
-                  <div className="mt-3 pt-3 border-t">
-                    <p className="text-sm text-muted-foreground line-clamp-2">
-                      📝 {child.notes}
-                    </p>
-                  </div>
-                )}
               </CardContent>
             </Card>
           ))}

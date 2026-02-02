@@ -126,7 +126,12 @@ export default function AdminArtikulacijskiTest() {
   const sejaParam = searchParams.get('seja');
   const startParam = searchParams.get('start');
   const fixedSessionNumber = sejaParam ? parseInt(sejaParam, 10) : undefined;
-  const startIndex = startParam ? parseInt(startParam, 10) : 0;
+  const urlStartIndex = startParam ? parseInt(startParam, 10) : 0;
+  
+  // Test mode for "OŠ Test" organization - only test letter R (last 3 words: index 57, 58, 59)
+  const isTestOrganization = profile?.organization_name === "OŠ Test";
+  const startIndex = isTestOrganization ? 57 : urlStartIndex;
+  const testMaxWords = isTestOrganization ? 3 : undefined;
   
   // Sort articulation data by phonetic order
   const sortedArticulationData = useMemo(() => {
@@ -176,7 +181,7 @@ export default function AdminArtikulacijskiTest() {
     handleNext,
     resetTest,
     initializeSession,
-  } = useArticulationTestNew(childId, undefined, fixedSessionNumber, startIndex, difficulty, saveProgress, profile?.id);
+  } = useArticulationTestNew(childId, undefined, fixedSessionNumber, startIndex, difficulty, saveProgress, profile?.id, testMaxWords);
 
   // Check for saved progress on mount
   useEffect(() => {

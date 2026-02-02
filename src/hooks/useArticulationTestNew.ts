@@ -16,7 +16,8 @@ export const useArticulationTestNew = (
   startIndex: number = 0,
   difficulty: string = "srednja",
   onSaveProgress?: (childId: string, sessionNumber: number, currentWordIndex: number) => void,
-  logopedistId?: string  // For logopedist-managed children storage path
+  logopedistId?: string,  // For logopedist-managed children storage path
+  maxWords?: number  // Optional limit for test mode (e.g., only 3 words for testing)
 ) => {
   // Start from startIndex (default 0, or 57 for testing with Ž only)
   const [currentWordIndex, setCurrentWordIndex] = useState(startIndex);
@@ -46,14 +47,16 @@ export const useArticulationTestNew = (
   }, []);
 
   // Total words across all letters
-  const totalWords = sortedArticulationData.reduce(
+  const totalWordsAll = sortedArticulationData.reduce(
     (count, group) => count + group.words.length,
     0
   );
+  
+  // Effective total words (limited by maxWords if provided)
+  const totalWords = maxWords ? Math.min(startIndex + maxWords, totalWordsAll) : totalWordsAll;
 
   // All letters in phonetic order
   const allLetters = sortedArticulationData.map((group) => group.letter);
-
   // Calculate which letter and word position we're at based on currentWordIndex
   const getCurrentLetterAndPosition = () => {
     let wordCount = 0;
