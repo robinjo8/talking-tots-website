@@ -1,335 +1,237 @@
 
+# Načrt: Izboljšan postopek dodajanja otroka v admin portalu
 
-# Načrt: Dodajanje Govornih vaj, Preverjanja izgovorjave, Video navodil in Osebnega načrta v Admin portal
+## Povzetek problema
 
-## Povzetek
+Trenutno logopedi v admin portalu dodajajo otroka preko preproste modalne forme, ki vsebuje le osnovne podatke (ime, starost, spol, oznake govornih težav). Ta postopek se bistveno razlikuje od celovitega postopka v uporabniškem portalu za TomiTalk Pro, ki vključuje:
 
-Trenutno ko logoped v delovnem prostoru otroka klikne na "Govorne vaje", "Preverjanje izgovorjave", "Video navodila" ali "Moj osebni načrt", se odpre nov zavihek v uporabniškem portalu. To je treba spremeniti tako, da logoped ostane znotraj admin portala - enako kot smo naredili za "Govorne igre".
+1. **Osnovni podatki** - ime, spol, datum rojstva
+2. **Izbira avatarja** - 15 različnih zmajčkov
+3. **Govorne težave** - podrobna opredelitev s tekstovnim opisom in možnostjo nalaganja PDF
+4. **Osnovni vprašalnik** - 7 vprašanj z izbiro + 2 tekstovni vprašanji
+5. **Potrditev** - pregled vnesenih podatkov
 
-Poleg tega bomo odstranili "Logopedski nasveti" iz admin portala, ker ta vsebina ni relevantna za logopedov delovni tok z otrokom.
+## Rešitev
+
+Zamenjati enostavni `AddChildModal` z večkoračnim čarovnikom, ki sledi enakemu postopku kot uporabniški portal.
 
 ---
 
-## 1. Posodobitev AdminChildWorkspace.tsx
+## Koraki implementacije
 
-Odstraniti "Logopedski nasveti" in dodati interne poti za vse aktivnosti:
+### 1. Nova komponenta: AdminAddChildWizard
+
+Večkoračni čarovnik z naslednjimi koraki:
+
+| Korak | Vsebina | Komponente za uporabo |
+|-------|---------|----------------------|
+| 1 | Osnovni podatki (ime, spol, datum rojstva, zapiski, zunanji ID) | Nova forma |
+| 2 | Izbira avatarja | `AvatarSelector` |
+| 3 | Govorne težave | `SpeechDifficultiesStep` |
+| 4 | Osnovni vprašalnik | `SpeechDevelopmentQuestions` |
+| 5 | Potrditev | `ChildCompletedView` (prilagojen) |
+
+### 2. Posodobitev CreateChildInput v hooku
+
+Potrebno je razširiti vmesnik `CreateChildInput`:
 
 ```typescript
-// Odstrani 'advice' aktivnost iz seznama
-const activities = [
-  // ... ostane games, exercises, test, video, challenges
-  // BREZ 'advice' (Logopedski nasveti)
-];
-
-// Posodobi handleActivityClick za interne poti
-const activityPathMap: Record<string, string> = {
-  'games': `/admin/children/${childId}/games`,
-  'exercises': `/admin/children/${childId}/exercises`,
-  'test': `/admin/children/${childId}/test`,
-  'video': `/admin/children/${childId}/video-navodila`,
-  'challenges': `/admin/children/${childId}/osebni-nacrt`,
-};
-```
-
----
-
-## 2. Nove admin strani
-
-### 2.1 Govorne vaje
-
-| Datoteka | Opis |
-|----------|------|
-| `src/pages/admin/AdminGovorneVaje.tsx` | Glavna stran za govorne vaje (enako kot `GovornojezicovneVaje.tsx`, brez Header/Footer) |
-| `src/pages/admin/exercises/AdminVajeMotorikeGovoril.tsx` | Vaje motorike govoril za admin |
-| `src/pages/admin/exercises/AdminArtikulacijaVaje.tsx` | Vaje za izgovorjavo glasov za admin |
-
-### 2.2 Video navodila
-
-| Datoteka | Opis |
-|----------|------|
-| `src/pages/admin/AdminVideoNavodila.tsx` | Seznam črk za video navodila |
-
-### 2.3 Preverjanje izgovorjave
-
-| Datoteka | Opis |
-|----------|------|
-| `src/pages/admin/AdminArtikulacijskiTest.tsx` | Celozaslonski test izgovorjave za admin |
-
-### 2.4 Osebni načrt
-
-| Datoteka | Opis |
-|----------|------|
-| `src/pages/admin/AdminOsebniNacrt.tsx` | Osebni načrt za admin |
-
----
-
-## 3. Novi admin routerji
-
-| Datoteka | Opis |
-|----------|------|
-| `src/components/routing/admin/AdminVideoNavodilaRouter.tsx` | Router za video navodila (črka) |
-
----
-
-## 4. Posodobitve AdminRoutes.tsx
-
-Dodati nove poti:
-
-```typescript
-// Lazy load nove strani
-const AdminGovorneVaje = lazy(() => import('@/pages/admin/AdminGovorneVaje'));
-const AdminVajeMotorikeGovoril = lazy(() => import('@/pages/admin/exercises/AdminVajeMotorikeGovoril'));
-const AdminArtikulacijaVaje = lazy(() => import('@/pages/admin/exercises/AdminArtikulacijaVaje'));
-const AdminVideoNavodila = lazy(() => import('@/pages/admin/AdminVideoNavodila'));
-const AdminVideoNavodilaRouter = lazy(() => import('@/components/routing/admin/AdminVideoNavodilaRouter'));
-const AdminArtikulacijskiTest = lazy(() => import('@/pages/admin/AdminArtikulacijskiTest'));
-const AdminOsebniNacrt = lazy(() => import('@/pages/admin/AdminOsebniNacrt'));
-
-// Nove poti:
-// Govorne vaje
-<Route path="children/:childId/exercises" element={<AdminLayoutWrapper><AdminGovorneVaje /></AdminLayoutWrapper>} />
-<Route path="children/:childId/exercises/vaje-motorike-govoril" element={<AdminGameFullscreenRoute><AdminVajeMotorikeGovoril /></AdminGameFullscreenRoute>} />
-<Route path="children/:childId/exercises/artikulacija" element={<AdminLayoutWrapper><AdminArtikulacijaVaje /></AdminLayoutWrapper>} />
-
-// Video navodila
-<Route path="children/:childId/video-navodila" element={<AdminLayoutWrapper><AdminVideoNavodila /></AdminLayoutWrapper>} />
-<Route path="children/:childId/video-navodila/:letter" element={<AdminLayoutWrapper><AdminVideoNavodilaRouter /></AdminLayoutWrapper>} />
-
-// Preverjanje izgovorjave
-<Route path="children/:childId/test" element={<AdminGameFullscreenRoute><AdminArtikulacijskiTest /></AdminGameFullscreenRoute>} />
-
-// Osebni načrt
-<Route path="children/:childId/osebni-nacrt" element={<AdminLayoutWrapper><AdminOsebniNacrt /></AdminLayoutWrapper>} />
-```
-
----
-
-## 5. Podrobnosti novih komponent
-
-### 5.1 AdminGovorneVaje.tsx (Govorne vaje - izbira)
-
-Podobno kot `GovornojezicovneVaje.tsx`, ampak:
-- Brez `Header` in `FooterSection`
-- Ovito v `AdminGameWrapper`
-- Navigacija na interne admin poti
-
-```typescript
-// Primer strukture
-export default function AdminGovorneVaje() {
-  const navigate = useNavigate();
-  const { childId } = useParams();
-
-  const exerciseTypes = [
-    {
-      id: "vaje-motorike-govoril",
-      title: "VAJE MOTORIKE GOVORIL",
-      path: `/admin/children/${childId}/exercises/vaje-motorike-govoril`,
-      available: true
-    },
-    {
-      id: "motnja-izreke",
-      title: "VAJE ZA IZGOVORJAVO GLASOV",
-      path: `/admin/children/${childId}/exercises/artikulacija`,
-      available: true
-    },
-    // ... ostale neaktivne vaje
-  ];
-
-  return (
-    <AdminGameWrapper 
-      title="Govorne vaje"
-      backPath={`/admin/children/${childId}/workspace`}
-    >
-      {/* Grid kartic kot v originalu */}
-    </AdminGameWrapper>
-  );
+export interface CreateChildInput {
+  name: string;
+  age: number;
+  gender?: 'male' | 'female';
+  birth_date?: string;
+  avatar_url?: string;                           // NOVO
+  speech_difficulties?: string[];
+  speech_difficulties_description?: string;
+  speech_development?: Record<string, string>;   // NOVO
+  notes?: string;
+  external_id?: string;
 }
 ```
 
-### 5.2 AdminVajeMotorikeGovoril.tsx (Vaje motorike govoril)
-
-Podobno kot `VajeMotorikeGovoril.tsx`, ampak:
-- Uporablja `GameModeContext` za pravilno shranjevanje napredka
-- Gumb "Nazaj" vodi na admin pot
-
-```typescript
-export default function AdminVajeMotorikeGovoril() {
-  const { childId } = useParams();
-  const navigate = useNavigate();
-  
-  const handleConfirmExit = () => {
-    navigate(`/admin/children/${childId}/exercises`);
-  };
-  
-  return (
-    <GameModeProvider mode="logopedist" logopedistChildId={childId}>
-      {/* Enaka vsebina kot original, samo z admin navigacijo */}
-    </GameModeProvider>
-  );
-}
-```
-
-### 5.3 AdminVideoNavodila.tsx (Video navodila - izbira črk)
-
-Podobno kot `VideoNavodila.tsx`, ampak:
-- Brez `Header`
-- Ovito v `AdminGameWrapper`
-- Navigacija na admin poti
-
-### 5.4 AdminVideoNavodilaRouter.tsx (Router za posamezni video)
-
-```typescript
-export default function AdminVideoNavodilaRouter() {
-  const { childId, letter } = useParams();
-  const config = getVideoNavodilaConfig(letter);
-  
-  if (!config) {
-    return <Navigate to={`/admin/children/${childId}/video-navodila`} replace />;
-  }
-
-  return (
-    <AdminGameWrapper 
-      title={`Video navodila - ${config.displayLetter}`}
-      backPath={`/admin/children/${childId}/video-navodila`}
-    >
-      {/* Video player vsebina */}
-    </AdminGameWrapper>
-  );
-}
-```
-
-### 5.5 AdminArtikulacijskiTest.tsx (Preverjanje izgovorjave)
-
-Podobno kot `ArtikuacijskiTest.tsx`, ampak:
-- Celozaslonski prikaz (brez admin layouta)
-- Uporablja `logopedist_child_id` za shranjevanje rezultatov
-- Gumb "Nazaj" vodi na admin workspace
-
-### 5.6 AdminOsebniNacrt.tsx (Osebni načrt)
-
-Enostavna stran z informacijo, da je osebni načrt na voljo:
-- Ovita v `AdminGameWrapper`
-- Prikaz izzivov za otroka (če so na voljo)
-
----
-
-## 6. Posodobitve obstoječih hookov
-
-### 6.1 useExerciseProgress.ts
-
-Dodati podporo za `logopedist_child_id`:
-
-```typescript
-export const useExerciseProgress = (logopedistChildId?: string) => {
-  const { recordExerciseCompletion } = useEnhancedProgress();
-  const { logopedistChildId: contextChildId } = useGameMode();
-  
-  const effectiveLogopedistChildId = logopedistChildId || contextChildId;
-  
-  // V completeCard() uporabi effectiveLogopedistChildId
-  recordExerciseCompletion('vaje_motorike_govoril', 3, effectiveLogopedistChildId);
-};
-```
-
-### 6.2 useArticulationTestNew.ts
-
-Dodati podporo za `logopedist_child_id`:
-
-```typescript
-export const useArticulationTestNew = (
-  childId?: string, 
-  userId?: string, 
-  fixedSessionNumber?: number, 
-  startIndex: number = 0,
-  difficulty: string = "srednja",
-  onSaveProgress?: Function,
-  logopedistChildId?: string  // NOV parameter
-) => {
-  // Pri shranjevanju posnetkov uporabi logopedistChildId
-};
-```
-
----
-
-## 7. Koraki implementacije
-
-1. **Posodobi `AdminChildWorkspace.tsx`** - odstrani "Logopedski nasveti", dodaj interne poti
-2. **Ustvari `AdminGovorneVaje.tsx`** - glavna stran za govorne vaje
-3. **Ustvari `AdminVajeMotorikeGovoril.tsx`** - celozaslonske vaje motorike govoril
-4. **Ustvari `AdminArtikulacijaVaje.tsx`** - vaje za izgovorjavo
-5. **Ustvari `AdminVideoNavodila.tsx`** - izbira črk za video
-6. **Ustvari `AdminVideoNavodilaRouter.tsx`** - router za posamezni video
-7. **Ustvari `AdminArtikulacijskiTest.tsx`** - celozaslonski test izgovorjave
-8. **Ustvari `AdminOsebniNacrt.tsx`** - osebni načrt
-9. **Posodobi `AdminRoutes.tsx`** - dodaj vse nove poti
-10. **Posodobi `useExerciseProgress.ts`** - podpora za logopedist_child_id
-11. **Posodobi `useArticulationTestNew.ts`** - podpora za logopedist_child_id
-
----
-
-## 8. Vizualni rezultat
-
-Po implementaciji bo logoped ostal v admin portalu:
+### 3. Struktura nove komponente
 
 ```text
-/admin/children/:id/workspace
-  → klik na "Govorne vaje"
-/admin/children/:id/exercises
-  → klik na "Vaje motorike govoril"
-/admin/children/:id/exercises/vaje-motorike-govoril
-  → Celozaslonske vaje (kot v uporabniškem portalu)
-  → Gumb "Nazaj" vodi na /admin/children/:id/exercises
-
-/admin/children/:id/workspace
-  → klik na "Preverjanje izgovorjave"
-/admin/children/:id/test
-  → Celozaslonski test (kot v uporabniškem portalu)
-  → Napredek se shranjuje pod logopedist_child_id
-  → Gumb "Nazaj" vodi na /admin/children/:id/workspace
-
-/admin/children/:id/workspace
-  → klik na "Video navodila"
-/admin/children/:id/video-navodila
-  → Seznam črk za video
-  → klik na "Črka C"
-/admin/children/:id/video-navodila/c
-  → Video predvajalnik
-
-/admin/children/:id/workspace
-  → klik na "Moj osebni načrt"
-/admin/children/:id/osebni-nacrt
-  → Osebni načrt otroka
+AdminAddChildWizard
+├── Korak 1: AdminChildBasicInfoStep
+│   ├── Ime otroka
+│   ├── Datum rojstva (z izračunom starosti)
+│   ├── Spol
+│   ├── Zapiski (opcijsko)
+│   └── Zunanji ID (opcijsko)
+│
+├── Korak 2: AvatarSelector (obstoječa komponenta)
+│
+├── Korak 3: SpeechDifficultiesStep (obstoječa komponenta)
+│
+├── Korak 4: SpeechDevelopmentQuestions (obstoječa komponenta)
+│
+└── Korak 5: AdminChildCompletedView
+    ├── Pregled vseh vnesenih podatkov
+    ├── Gumb "Dodaj drugega otroka"
+    └── Gumb "Zaključi"
 ```
 
 ---
 
-## 9. Seznam novih datotek
+## Datoteke za ustvariti
 
 | Datoteka | Opis |
 |----------|------|
-| `src/pages/admin/AdminGovorneVaje.tsx` | Izbira govornih vaj |
-| `src/pages/admin/exercises/AdminVajeMotorikeGovoril.tsx` | Celozaslonske vaje motorike |
-| `src/pages/admin/exercises/AdminArtikulacijaVaje.tsx` | Vaje za izgovorjavo |
-| `src/pages/admin/AdminVideoNavodila.tsx` | Izbira črk za video |
-| `src/pages/admin/AdminArtikulacijskiTest.tsx` | Celozaslonski test izgovorjave |
-| `src/pages/admin/AdminOsebniNacrt.tsx` | Osebni načrt |
-| `src/components/routing/admin/AdminVideoNavodilaRouter.tsx` | Router za video |
+| `src/components/admin/children/AdminAddChildWizard.tsx` | Glavni čarovnik z vodenjem korakov |
+| `src/components/admin/children/steps/AdminChildBasicInfoStep.tsx` | Korak 1: osnovni podatki |
+| `src/components/admin/children/steps/AdminChildAvatarStep.tsx` | Korak 2: izbira avatarja |
+| `src/components/admin/children/AdminChildCompletedView.tsx` | Korak 5: zaključek |
 
-## 10. Seznam datotek za posodobitev
+## Datoteke za posodobiti
 
 | Datoteka | Sprememba |
 |----------|-----------|
-| `src/pages/admin/AdminChildWorkspace.tsx` | Odstrani "Logopedski nasveti", dodaj interne poti |
-| `src/components/routing/AdminRoutes.tsx` | Dodaj nove poti |
-| `src/hooks/useExerciseProgress.ts` | Podpora za logopedist_child_id |
-| `src/hooks/useArticulationTestNew.ts` | Podpora za logopedist_child_id |
+| `src/pages/admin/AdminChildren.tsx` | Zamenjaj `AddChildModal` z `AdminAddChildWizard` |
+| `src/hooks/useLogopedistChildren.ts` | Razširi `CreateChildInput` z `avatar_url` in `speech_development` |
+| `src/components/admin/children/AddChildModal.tsx` | Odstrani (zamenjano z čarovnikom) |
 
 ---
 
-## 11. Ključna načela
+## Podrobnosti novih komponent
 
-1. **Uporabniški portal ostane nedotaknjen** - nobena sprememba ne vpliva na obstoječe strani
-2. **Admin portal uporablja ločene komponente** - jasna ločitev
-3. **Ponovna uporaba logike** - isti hooki in komponente, le z admin kontekstom
-4. **GameModeContext za navigacijo in shranjevanje** - pravilno sledenje napredku
+### AdminAddChildWizard.tsx
 
+```typescript
+enum WizardStep {
+  BASIC_INFO = 0,
+  AVATAR = 1,
+  SPEECH_DIFFICULTIES = 2,
+  SPEECH_DEVELOPMENT = 3,
+  COMPLETED = 4
+}
+
+// State za shranjevanje podatkov med koraki
+interface ChildData {
+  name: string;
+  birthDate: Date | null;
+  gender: 'male' | 'female' | null;
+  notes: string;
+  externalId: string;
+  avatarId: number;
+  speechDifficulties: string[];
+  speechDifficultiesDescription: string;
+  speechDevelopment: Record<string, string>;
+}
+```
+
+### AdminChildBasicInfoStep.tsx
+
+Vsebuje:
+- Input za ime otroka (obvezno)
+- Koledar za datum rojstva (obvezno)
+- Radio gumbi za spol
+- Textarea za zapiske (opcijsko)
+- Input za zunanji ID (opcijsko)
+
+Preveri validnost pred nadaljevanjem (ime + datum rojstva).
+
+### AdminChildAvatarStep.tsx
+
+Uporabi obstoječo komponento `AvatarSelector` z variant="grid".
+
+### Uporaba obstoječih komponent
+
+- **SpeechDifficultiesStep** - uporabi neposredno s prilagojenimi propsi
+- **SpeechDevelopmentQuestions** - uporabi neposredno s prilagojenimi propsi
+
+### AdminChildCompletedView.tsx
+
+Podobno kot `ChildCompletedView`, ampak prilagojeno za admin portal:
+- Prikaz vseh vnesenih podatkov
+- Gumb "Dodaj drugega otroka" za ponastavitev čarovnika
+- Gumb "Zaključi" za zaprtje čarovnika
+
+---
+
+## Shranjevanje v bazo
+
+Pri zadnjem koraku (po vprašalniku) se kliče mutacija `createChild` z vsemi zbranimi podatki:
+
+```typescript
+await createChild.mutateAsync({
+  name: childData.name,
+  age: calculateAge(childData.birthDate),
+  gender: childData.gender,
+  birth_date: childData.birthDate?.toISOString().split('T')[0],
+  avatar_url: avatarOptions[childData.avatarId]?.src || null,
+  speech_difficulties: childData.speechDifficulties,
+  speech_difficulties_description: childData.speechDifficultiesDescription,
+  speech_development: childData.speechDevelopment,
+  notes: childData.notes,
+  external_id: childData.externalId
+});
+```
+
+---
+
+## Vizualni tok
+
+```text
+[Dodaj otroka] → Modal se odpre
+       ↓
+┌─────────────────────────────────────┐
+│  Korak 1/5: Osnovni podatki         │
+│  ─────────────────────────────────  │
+│  Ime otroka: [_______________]      │
+│  Datum rojstva: [📅 Izberi]         │
+│  Spol: ○ Deček  ○ Deklica           │
+│  Zapiski: [_______________]         │
+│  Zunanji ID: [_______________]      │
+│                                     │
+│         [Naprej]                    │
+└─────────────────────────────────────┘
+       ↓
+┌─────────────────────────────────────┐
+│  Korak 2/5: Izberi avatarja         │
+│  ─────────────────────────────────  │
+│  [🐲1] [🐲2] [🐲3]                  │
+│  [🐲4] [🐲5] [🐲6]                  │
+│  ...                                │
+│                                     │
+│  [Nazaj]              [Naprej]      │
+└─────────────────────────────────────┘
+       ↓
+┌─────────────────────────────────────┐
+│  Korak 3/5: Govorne težave          │
+│  ─────────────────────────────────  │
+│  (SpeechDifficultiesStep)           │
+│                                     │
+│  [Nazaj]              [Naprej]      │
+└─────────────────────────────────────┘
+       ↓
+┌─────────────────────────────────────┐
+│  Korak 4/5: Osnovni vprašalnik      │
+│  ─────────────────────────────────  │
+│  (SpeechDevelopmentQuestions)       │
+│                                     │
+│  [Nazaj]              [Naprej]      │
+└─────────────────────────────────────┘
+       ↓
+┌─────────────────────────────────────┐
+│  ✓ Profil uspešno ustvarjen!        │
+│  ─────────────────────────────────  │
+│  Ime: Žan Novak                     │
+│  Starost: 5 let                     │
+│  Govorne težave: R, L, S            │
+│  ...                                │
+│                                     │
+│  [Dodaj drugega]      [Zaključi]    │
+└─────────────────────────────────────┘
+```
+
+---
+
+## Ključne točke
+
+1. **Ponovna uporaba komponent** - `AvatarSelector`, `SpeechDifficultiesStep`, `SpeechDevelopmentQuestions` so obstoječe komponente
+2. **Enoten tok** - logoped in starš imata enako izkušnjo pri dodajanju otroka
+3. **Celoviti podatki** - zbrani so vsi potrebni podatki za strokovno delo
+4. **Ohranjena združljivost** - obstoječa baza `logopedist_children` že podpira vsa potrebna polja
+5. **Brez izgube funkcionalnosti** - zapiski in zunanji ID ostanejo na voljo
