@@ -219,37 +219,39 @@ export function AdminSidebar() {
                 </ul>
               </li>
 
-              {/* Secondary navigation */}
-              <li>
-                <div className="text-xs font-semibold leading-6 text-muted-foreground uppercase tracking-wider mb-2">
-                  Upravljanje
-                </div>
-                <ul role="list" className="-mx-2 space-y-1">
-                  {secondaryNavigation.map((item) => (
-                    <li key={item.name}>
-                      <Link
-                        to={item.href}
-                        className={cn(
-                          'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-medium transition-colors',
-                          isActive(item.href)
-                            ? 'bg-app-blue/10 text-app-blue'
-                            : 'text-foreground hover:bg-muted hover:text-foreground'
-                        )}
-                      >
-                        <item.icon
+              {/* Secondary navigation - samo za interno organizacijo (TomiTalk) */}
+              {profile?.organization_type === 'internal' && (
+                <li>
+                  <div className="text-xs font-semibold leading-6 text-muted-foreground uppercase tracking-wider mb-2">
+                    Upravljanje
+                  </div>
+                  <ul role="list" className="-mx-2 space-y-1">
+                    {secondaryNavigation.map((item) => (
+                      <li key={item.name}>
+                        <Link
+                          to={item.href}
                           className={cn(
-                            'h-5 w-5 shrink-0',
+                            'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-medium transition-colors',
                             isActive(item.href)
-                              ? 'text-app-blue'
-                              : 'text-muted-foreground group-hover:text-foreground'
+                              ? 'bg-app-blue/10 text-app-blue'
+                              : 'text-foreground hover:bg-muted hover:text-foreground'
                           )}
-                        />
-                        {item.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </li>
+                        >
+                          <item.icon
+                            className={cn(
+                              'h-5 w-5 shrink-0',
+                              isActive(item.href)
+                                ? 'text-app-blue'
+                                : 'text-muted-foreground group-hover:text-foreground'
+                            )}
+                          />
+                          {item.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              )}
 
               {/* Settings navigation */}
               <li>
