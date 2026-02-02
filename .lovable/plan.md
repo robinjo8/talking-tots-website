@@ -1,171 +1,198 @@
 
 
-# Načrt: Dodajanje manjkajočih Admin routerjev za igre
+# Načrt: Dodajanje plavajočega gumba "Hiška" v admin igre
 
 ## Problem
 
-Ko logoped na strani `/admin/children/:id/games/kolo-srece` klikne na kartico za črko (npr. "C"), se preusmeri na pot `/admin/children/:id/games/kolo-srece/c`, ki **ne obstaja v routerju**. Trenutno so v `AdminRoutes.tsx` definirane samo izbirne strani za igre, manjkajo pa **dejanski routerji** ki renderirajo igre.
+V admin portalu igre manjka plavajoči gumb "Hiška" (Home) z dropdown menijem, ki vsebuje:
+- **Nazaj** - vrni se na izbiro črk
+- **Nova igra** - ponastavi igro
+- **Navodila** - prikaži navodila za igro
 
-### Manjkajoči routerji v `AdminRoutes.tsx`:
+### Vzrok problema
 
-| Igra | Izbira (obstaja) | Router za igro (manjka) |
-|------|------------------|------------------------|
-| Spomin | `.../spomin` ✅ | `.../spomin/:gameId` ✅ |
-| Kolo besed | `.../kolo-srece` ✅ | `.../kolo-srece/:letter` ❌ |
-| Bingo | `.../bingo` ✅ | `.../bingo/:letter` ❌ |
-| Labirint | `.../labirint` ✅ | `.../labirint/:letter` ❌ |
-| Zaporedja | `.../zaporedja` ✅ | `.../zaporedja/:letterAndAge` ❌ |
-| Sestavljanke | `.../sestavljanke` ✅ | `.../sestavljanke/:letterAndAge` ❌ |
-| Drsna sestavljanka | `.../drsna-sestavljanka` ✅ | `.../drsna-sestavljanka/:letterAndAge` ❌ |
-| Igra ujemanja | `.../igra-ujemanja` ✅ | `.../igra-ujemanja/:letterAndAge` ❌ |
-| Met kocke | `.../met-kocke` ✅ | `.../met-kocke/:letter` ❌ |
-| Ponovi poved | `.../ponovi-poved` ✅ | `.../ponovi-poved/:letter` ❌ |
+Igre v admin portalu so ovite v `AdminLayoutWrapper` → `AdminLayout`, ki vsebuje:
+- `AdminSidebar` (levo)
+- `AdminHeader` (zgoraj)
+- `<main className="p-6">` (vsebina s paddingom)
 
-## Rešitev
+Igre pa uporabljajo `fixed inset-0` za celozaslonski prikaz, kar je v konfliktu z admin layoutom. V uporabniškem portalu igre nimajo layouta (samo `ProtectedLazyRoute`), zato delujejo pravilno.
 
-Ustvariti **admin routerje** za vsako igro, ki bodo:
-1. Brali URL parametre
-2. Naložili ustrezno konfiguracijo igre
-3. Ovilili igro v `AdminGameWrapper` (ki nastavi `GameModeContext`)
-4. Renderirali obstoječo Generic*Game komponento
+### Trenutno stanje
 
-### Pomembno pravilo (poudaril si ga)
-**Admin igre ne smejo vplivati na uporabniški portal!** Zato bomo:
-- Ustvarili **ločene admin routerje** v mapi `src/components/routing/admin/`
-- Originalni routerji v `src/components/routing/` ostanejo **nedotaknjeni**
-- Igre (Generic*Game komponente) bodo uporabile `GameModeContext` za pravilno navigacijo nazaj
+Komponente iger (`GenericWheelGame`, `GenericBingoGame`, itd.) že vsebujejo plavajoči gumb "Hiška":
+
+```tsx
+<DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+  <DropdownMenuTrigger asChild>
+    <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 ...">
+      <Home className="w-8 h-8 text-white" />
+    </button>
+  </DropdownMenuTrigger>
+  ...
+</DropdownMenu>
+```
+
+Gumb obstaja, ampak je prekrit z admin layoutom (sidebar, header, padding).
 
 ---
 
-## Nove datoteke
+## Rešitev
 
-### 1. Admin routerji (v `src/components/routing/admin/`)
+Ustvariti **ločene poti za admin igre BREZ AdminLayout wrappa**. Igre v admin portalu morajo biti celozaslonske, tako kot v uporabniškem portalu.
 
-| Datoteka | Namen |
-|----------|-------|
-| `AdminKoloSreceRouter.tsx` | Router za Kolo besed |
-| `AdminBingoRouter.tsx` | Router za Bingo |
-| `AdminLabirintRouter.tsx` | Router za Labirint |
-| `AdminZaporedjaRouter.tsx` | Router za Zaporedja |
-| `AdminSestavljankeRouter.tsx` | Router za Sestavljanke |
-| `AdminDrsnaSestavljankaRouter.tsx` | Router za Drsno sestavljanko |
-| `AdminIgraUjemanjaRouter.tsx` | Router za Igro ujemanja |
-| `AdminMetKockeRouter.tsx` | Router za Met kocke (Smešne povedi) |
-| `AdminPonoviPovedRouter.tsx` | Router za Ponovi poved |
+### Pristop
 
-### Primer: `AdminKoloSreceRouter.tsx`
+1. **Ustvari nov wrapper brez layouta**: `AdminGameFullscreenWrapper`
+   - Samo avtentikacija (preveri ali je logopedist)
+   - `GameModeProvider` za kontekst
+   - BREZ sidebar, header, padding - celozaslonski prikaz
 
-```typescript
-import { useParams, Navigate } from "react-router-dom";
-import { getWheelConfig, type WordData } from "@/data/artikulacijaVajeConfig";
-import { GenericWheelGame } from "@/components/games/GenericWheelGame";
-import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
+2. **Posodobi AdminRoutes.tsx**:
+   - Poti za igre (npr. `.../games/kolo-srece/:letter`) uporabijo nov fullscreen wrapper namesto `AdminLayoutWrapper`
 
-export default function AdminKoloSreceRouter() {
-  const { childId, letter } = useParams<{ childId: string; letter: string }>();
-  
-  if (!letter || !childId) {
-    return <Navigate to={`/admin/children/${childId}/games/kolo-srece`} replace />;
+3. **AdminGameWrapper ostane enak**:
+   - Uporablja se za izbirne strani (npr. `.../games/kolo-srece`) kjer želimo admin layout
+   - Za dejanske igre uporabimo `AdminGameFullscreenWrapper`
+
+---
+
+## Tehnična implementacija
+
+### Nova komponenta: `AdminGameFullscreenWrapper.tsx`
+
+```tsx
+// src/components/admin/games/AdminGameFullscreenWrapper.tsx
+import React from 'react';
+import { useParams, useNavigate, Navigate } from 'react-router-dom';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { GameModeProvider } from '@/contexts/GameModeContext';
+import { useLogopedistChild } from '@/hooks/useLogopedistChildren';
+import { Loader } from 'lucide-react';
+
+interface Props {
+  children: React.ReactNode;
+}
+
+export function AdminGameFullscreenWrapper({ children }: Props) {
+  const { childId } = useParams<{ childId: string }>();
+  const { user, isLogopedist, isLoading: authLoading } = useAdminAuth();
+  const { data: child, isLoading: childLoading } = useLogopedistChild(childId);
+
+  // Auth check
+  if (authLoading || childLoading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-background">
+        <Loader className="w-8 h-8 animate-spin text-dragon-green" />
+      </div>
+    );
   }
 
-  const config = getWheelConfig(letter);
-  
-  if (!config) {
-    return <Navigate to={`/admin/children/${childId}/games/kolo-srece`} replace />;
+  if (!user || !isLogopedist) {
+    return <Navigate to="/admin/login" replace />;
   }
 
+  if (!child || !childId) {
+    return <Navigate to="/admin/children" replace />;
+  }
+
+  // Fullscreen game - no layout, just auth + context
   return (
-    <AdminGameWrapper 
-      showBackButton={false}
-      backPath={`/admin/children/${childId}/games/kolo-srece`}
+    <GameModeProvider 
+      mode="logopedist" 
+      logopedistChildId={childId}
+      childName={child.name}
     >
-      <GenericWheelGame
-        letter={config.letter}
-        displayLetter={config.displayLetter}
-        title={config.title}
-        wordsData={config.wordsData as WordData[]}
-        backPath={`/admin/children/${childId}/games/kolo-srece`}
-      />
-    </AdminGameWrapper>
+      {children}
+    </GameModeProvider>
   );
 }
 ```
 
----
+### Posodobitev: `AdminRoutes.tsx`
 
-## Posodobitve obstoječih datotek
+Sprememba poti za dejanske igre (ne izbirne strani):
 
-### 1. `AdminRoutes.tsx` - Dodaj manjkajoče poti
+```tsx
+// Nova funkcija - fullscreen wrapper za igre
+function AdminGameFullscreenRoute({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<AdminLoadingFallback />}>
+      <AdminGameFullscreenWrapper>
+        {children}
+      </AdminGameFullscreenWrapper>
+    </Suspense>
+  );
+}
 
-Dodati je treba:
+// Sprememba poti za igre:
+// PREJ:
+<Route path="children/:childId/games/kolo-srece/:letter" 
+       element={<AdminLayoutWrapper><AdminKoloSreceRouter /></AdminLayoutWrapper>} />
 
-```typescript
-// Lazy load admin game routers
-const AdminKoloSreceRouter = lazy(() => import('@/components/routing/admin/AdminKoloSreceRouter'));
-const AdminBingoRouter = lazy(() => import('@/components/routing/admin/AdminBingoRouter'));
-const AdminLabirintRouter = lazy(() => import('@/components/routing/admin/AdminLabirintRouter'));
-const AdminZaporedjaRouter = lazy(() => import('@/components/routing/admin/AdminZaporedjaRouter'));
-const AdminSestavljankeRouter = lazy(() => import('@/components/routing/admin/AdminSestavljankeRouter'));
-const AdminDrsnaSestavljankaRouter = lazy(() => import('@/components/routing/admin/AdminDrsnaSestavljankaRouter'));
-const AdminIgraUjemanjaRouter = lazy(() => import('@/components/routing/admin/AdminIgraUjemanjaRouter'));
-const AdminMetKockeRouter = lazy(() => import('@/components/routing/admin/AdminMetKockeRouter'));
-const AdminPonoviPovedRouter = lazy(() => import('@/components/routing/admin/AdminPonoviPovedRouter'));
-
-// ... in dodati poti:
-<Route path="children/:childId/games/kolo-srece/:letter" element={<AdminLayoutWrapper><AdminKoloSreceRouter /></AdminLayoutWrapper>} />
-<Route path="children/:childId/games/bingo/:letter" element={<AdminLayoutWrapper><AdminBingoRouter /></AdminLayoutWrapper>} />
-<Route path="children/:childId/games/labirint/:letter" element={<AdminLayoutWrapper><AdminLabirintRouter /></AdminLayoutWrapper>} />
-<Route path="children/:childId/games/zaporedja/:letterAndAge" element={<AdminLayoutWrapper><AdminZaporedjaRouter /></AdminLayoutWrapper>} />
-<Route path="children/:childId/games/sestavljanke/:letterAndAge" element={<AdminLayoutWrapper><AdminSestavljankeRouter /></AdminLayoutWrapper>} />
-<Route path="children/:childId/games/drsna-sestavljanka/:letterAndAge" element={<AdminLayoutWrapper><AdminDrsnaSestavljankaRouter /></AdminLayoutWrapper>} />
-<Route path="children/:childId/games/igra-ujemanja/:letterAndAge" element={<AdminLayoutWrapper><AdminIgraUjemanjaRouter /></AdminLayoutWrapper>} />
-<Route path="children/:childId/games/met-kocke/:letter" element={<AdminLayoutWrapper><AdminMetKockeRouter /></AdminLayoutWrapper>} />
-<Route path="children/:childId/games/ponovi-poved/:letter" element={<AdminLayoutWrapper><AdminPonoviPovedRouter /></AdminLayoutWrapper>} />
+// POTEM:
+<Route path="children/:childId/games/kolo-srece/:letter" 
+       element={<AdminGameFullscreenRoute><AdminKoloSreceRouter /></AdminGameFullscreenRoute>} />
 ```
 
-### 2. Posodobitev Generic*Game komponent
+### Posodobitev: Admin routerji
 
-Igre kot `GenericWheelGame`, `GenericBingoGame` itd. morajo uporabljati `useGameMode()` za pravilno navigacijo nazaj. Trenutno nekatere igre imajo hardkodirano pot (npr. `backPath="/govorne-igre/kolo-srece"`).
+Admin routerji (`AdminKoloSreceRouter`, `AdminBingoRouter`, itd.) morajo biti posodobljeni:
+- Odstrani `AdminGameWrapper` - ni več potreben, ker fullscreen wrapper nastavi kontekst
+- Ali pa poenostavi `AdminGameWrapper` da ne dodaja UI elementov
 
-Posodobitev bo vključevala:
-- Uporabo `useGameNavigation()` za dinamično generiranje poti
-- Ali pa prevzem `backPath` prop iz admin routerja (hitrejša opcija)
+---
 
-**Hitrejša opcija**: Admin routerji že pošiljajo `backPath` prop igram. Preveriti je potrebno, da igre ta prop upoštevajo in ne uporabljajo hardkodirane vrednosti.
+## Datoteke za ustvariti
+
+| Datoteka | Namen |
+|----------|-------|
+| `src/components/admin/games/AdminGameFullscreenWrapper.tsx` | Celozaslonski wrapper za igre |
+
+## Datoteke za posodobiti
+
+| Datoteka | Sprememba |
+|----------|-----------|
+| `src/components/routing/AdminRoutes.tsx` | Poti za igre uporabijo fullscreen wrapper |
+| `src/components/routing/admin/AdminKoloSreceRouter.tsx` | Poenostavi - odstrani redundantni wrapper |
+| `src/components/routing/admin/AdminBingoRouter.tsx` | Poenostavi |
+| `src/components/routing/admin/AdminLabirintRouter.tsx` | Poenostavi |
+| `src/components/routing/admin/AdminSpominRouter.tsx` | Poenostavi |
+| `src/components/routing/admin/AdminZaporedjaRouter.tsx` | Poenostavi |
+| `src/components/routing/admin/AdminSestavljankeRouter.tsx` | Poenostavi |
+| `src/components/routing/admin/AdminDrsnaSestavljankaRouter.tsx` | Poenostavi |
+| `src/components/routing/admin/AdminIgraUjemanjaRouter.tsx` | Poenostavi |
+| `src/components/routing/admin/AdminMetKockeRouter.tsx` | Poenostavi |
+| `src/components/routing/admin/AdminPonoviPovedRouter.tsx` | Poenostavi |
 
 ---
 
 ## Koraki implementacije
 
-1. **Ustvari `AdminKoloSreceRouter.tsx`** - Router za Kolo besed
-2. **Ustvari `AdminBingoRouter.tsx`** - Router za Bingo
-3. **Ustvari `AdminLabirintRouter.tsx`** - Router za Labirint
-4. **Ustvari `AdminZaporedjaRouter.tsx`** - Router za Zaporedja
-5. **Ustvari `AdminSestavljankeRouter.tsx`** - Router za Sestavljanke
-6. **Ustvari `AdminDrsnaSestavljankaRouter.tsx`** - Router za Drsno sestavljanko
-7. **Ustvari `AdminIgraUjemanjaRouter.tsx`** - Router za Igro ujemanja
-8. **Ustvari `AdminMetKockeRouter.tsx`** - Router za Met kocke
-9. **Ustvari `AdminPonoviPovedRouter.tsx`** - Router za Ponovi poved
-10. **Posodobi `AdminRoutes.tsx`** - Dodaj lazy loade in Route elemente
-11. **Preveri delovanje** - Test navigacije in shranjevanja napredka
+1. **Ustvari `AdminGameFullscreenWrapper.tsx`** - celozaslonski wrapper
+2. **Posodobi `AdminRoutes.tsx`** - dodaj `AdminGameFullscreenRoute` funkcijo in posodobi poti za igre
+3. **Poenostavi admin routerje** - odstrani redundantni `AdminGameWrapper` iz routerjev za igre
+4. **Testiraj** - preveri da se plavajoči gumb prikaže in deluje pravilno
 
 ---
 
-## Vizualni rezultat po implementaciji
+## Vizualni rezultat
 
-```text
-/admin/children/abc123/games/kolo-srece
-  → klik na kartico "Črka C"
-/admin/children/abc123/games/kolo-srece/c
-  → GenericWheelGame se renderira znotraj AdminGameWrapper
-  → Gumb "Nazaj" vodi na /admin/children/abc123/games/kolo-srece
-  → Napredek se shranjuje v progress.logopedist_child_id
+Po implementaciji:
+
+```
+/admin/children/:id/games/kolo-srece/:letter
+└─ AdminGameFullscreenWrapper (avtentikacija + kontekst)
+   └─ GenericWheelGame (celozaslonsko)
+      └─ Plavajoči gumb "Hiška" v levem spodnjem kotu ✓
+         ├─ Nazaj → vrne na izbiro črk
+         ├─ Nova igra → ponastavi igro
+         └─ Navodila → prikaže navodila
 ```
 
-## Ključna načela
+## Pomembno
 
-1. **Uporabniški portal ostane nedotaknjen** - Vsi originalni routerji in igre delujejo kot prej
-2. **Admin portal uporablja ločene routerje** - V mapi `admin/` za jasno ločitev
-3. **Ponovna uporaba komponent** - Generic*Game komponente se ponovno uporabijo, le ovite so v AdminGameWrapper
-4. **GameModeContext za navigacijo** - Igre vedo kam navigirati glede na kontekst
+- **Uporabniški portal ostane nedotaknjen** - nobena sprememba ne vpliva na obstoječe igre
+- **Izbirne strani ohranijo admin layout** - npr. `/admin/children/:id/games/kolo-srece` prikazuje seznam črk z admin UI
+- **Dejanske igre so celozaslonske** - npr. `/admin/children/:id/games/kolo-srece/c` prikazuje igro brez admin UI
 
