@@ -1,154 +1,225 @@
 
 
-# Načrt: Popravek napake pri shranjevanju seje za logopediste
+# Načrt: Sistem za upravljanje sej preverjanja izgovorjave
 
-## Problem
+## Razumljiva razlaga problema
 
-Pri shranjevanju preverjanja izgovorjave za otroka, ki ga upravlja logoped, se pojavi napaka:
+### Trenutno stanje (kako deluje zdaj)
 
-```
-insert or update on table "articulation_test_sessions" violates foreign key constraint 
-"articulation_test_sessions_child_id_fkey"
-```
+Predstavljaj si, da imaš mapo "Seja-1" kamor shranjuješ posnetke otroka. Trenutni sistem deluje tako:
 
-### Vzrok napake
+1. **Ko začneš test**: Sistem pogleda koliko map "Seja-X" že obstaja in uporabi naslednjo
+2. **Med testom**: Vsak posnetek se shrani v trenutno mapo (npr. Seja-1)
+3. **Progress (kje je otrok ostal)**: Shranjeno v brskalnik (localStorage) - če zamenjaš računalnik ali brskalnik, se podatek izgubi
+4. **Ko končaš test**: Ni nobene oznake da je seja "zaključena"
 
-Tabela `articulation_test_sessions` ima dve ločeni polji:
-- `child_id` (NOT NULL) → referencira tabelo `children` (otroci staršev)
-- `logopedist_child_id` (nullable) → referencira tabelo `logopedist_children` (otroci logopedov)
+### Problem
 
-Trenutna koda v `useLogopedistArticulationSession.ts` naredi napako na vrstici 47:
+Ker sistem ne ve, ali je seja dokončana (vseh 60 besed) ali ne, se lahko zgodi:
+- Začneš test, otrok izgovori 5 besed, potem zapreš
+- Naslednjič se lahko zgodi, da sistem ustvari novo mapo "Seja-2" ali pa nadaljuje v Seja-1 - odvisno od tega ali si na istem brskalniku
 
-```typescript
-child_id: logopedistChildId,  // NAPAKA: UUID iz logopedist_children se vstavi v child_id
-```
-
-To ne deluje, ker UUID otroka logopeda ne obstaja v tabeli `children`, kar krši foreign key constraint.
+To je povzročilo, da je "PAJEK" (iz starega testa) ostal v isti mapi kot novi posnetki "R".
 
 ---
 
-## Rešitev
+## Kako bo delovalo po popravku
 
-### Možnost 1: Spremeniti shemo baze (child_id → nullable)
+### Nov tok delovanja
 
-Spremeniti `child_id` v nullable polje:
-- PRO: Čista arhitektura - seje za logopedove otroke nimajo `child_id`
-- CONTRA: Potrebna migracija, lahko poruši drugo kodo
+```text
+┌─────────────────────────────────────────────────────────┐
+│                    ZAČETEK TESTA                        │
+└─────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+              ┌─────────────────────────┐
+              │ Ali obstaja nedokončana│
+              │ seja za tega otroka?   │
+              │ (preveri v BAZI)       │
+              └─────────────────────────┘
+                     │           │
+                    DA          NE
+                     │           │
+                     ▼           ▼
+        ┌─────────────────┐  ┌─────────────────┐
+        │ Nadaljuj        │  │ Ustvari NOVO    │
+        │ obstoječo sejo  │  │ sejo v bazi     │
+        │ od zadnje       │  │ (status:        │
+        │ shranjene besede│  │  "in_progress") │
+        └─────────────────┘  └─────────────────┘
+                     │           │
+                     └─────┬─────┘
+                           ▼
+              ┌─────────────────────────┐
+              │ Otrok izgovarja besede  │
+              │ (1, 2, 3... do 60)     │
+              │                         │
+              │ Ob vsaki besedi se v   │
+              │ BAZO shrani napredek   │
+              │ (current_word_index)   │
+              └─────────────────────────┘
+                           │
+                           ▼
+              ┌─────────────────────────┐
+              │ Ali je bila izgovorjena│
+              │ 60. beseda (zadnja)?   │
+              └─────────────────────────┘
+                     │           │
+                    DA          NE
+                     │           │
+                     ▼           ▼
+        ┌─────────────────┐  ┌─────────────────┐
+        │ Seja se označi  │  │ Seja ostane     │
+        │ kot ZAKLJUČENA  │  │ "in_progress"   │
+        │ (status:        │  │                 │
+        │  "completed")   │  │ Naslednjič se   │
+        │                 │  │ nadaljuje       │
+        │ Naslednji test  │  │ od te besede    │
+        │ = Seja-2        │  └─────────────────┘
+        └─────────────────┘
+```
 
-### Možnost 2: Uporabiti placeholder UUID ✅ PRIPOROČENO
+### Ključna pravila
 
-Uporabiti poseben "placeholder" UUID za seje logopedov:
-- PRO: Ni potrebna sprememba sheme
-- PRO: Hitro za implementacijo
-- CONTRA: "Hack" rešitev, vendar bo delovala
+1. **Seja se ne more "pomešati"**: Ko je seja zaključena (60 besed), se zaklene - nobeni novi posnetki ne morejo več priti vanjo
+2. **Progress v bazi**: Namesto v brskalnik se progress shranjuje v bazo - deluje na vseh napravah
+3. **Avtomatsko nadaljevanje**: Če prekinete test, boste naslednjič avtomatsko nadaljevali od zadnje besede
+4. **Nova seja samo po zaključku**: Seja-2 se začne ŠELE ko je Seja-1 popolnoma dokončana
 
 ---
 
-## Implementacija (Možnost 2)
+## Tehnična implementacija
 
-### Datoteka: `src/hooks/useLogopedistArticulationSession.ts`
+### 1. Sprememba sheme baze podatkov
 
-Najprej ustvarim placeholder otroka v tabeli `children` z posebnim imenom, ki označuje da je placeholder za logopedove seje. Nato uporabim ta UUID kot `child_id`.
+Dodati nova polja v tabelo `articulation_test_sessions`:
 
-**Sprememba:**
+| Polje | Tip | Namen |
+|-------|-----|-------|
+| `current_word_index` | integer | Shranjuje napredek (0-59) |
+| `total_words` | integer | Število besed v testu (60) |
+| `is_completed` | boolean | Ali je seja zaključena |
 
-```typescript
-// KONSTANTA - placeholder child za logopediste
-const LOGOPEDIST_PLACEHOLDER_CHILD_ID = '00000000-0000-0000-0000-000000000001';
-
-const saveSession = useCallback(async (
-  logopedistChildId: string,
-  sessionNumber: number
-): Promise<SaveSessionResult> => {
-  if (!profile || !user) {
-    return { success: false, error: 'Ni prijavljenega logopeda' };
-  }
-
-  setIsSaving(true);
-
-  try {
-    const { data: sessionData, error: sessionError } = await supabase
-      .from('articulation_test_sessions')
-      .insert({
-        // Uporabimo placeholder child_id za logopediste
-        // (ta otrok mora obstajati v tabeli children)
-        child_id: LOGOPEDIST_PLACEHOLDER_CHILD_ID,
-        parent_id: user.id,
-        logopedist_child_id: logopedistChildId,  // Pravi ID otroka
-        organization_id: profile.organization_id,
-        source_type: 'logopedist',
-        status: 'pending',
-        session_number: sessionNumber,
-        submitted_at: new Date().toISOString(),
-      })
-      .select('id')
-      .single();
-    // ...
-  }
-}, [profile, user]);
-```
-
-### Potrebna SQL migracija
-
-Ustvariti placeholder otroka v tabeli `children`:
-
+SQL migracija:
 ```sql
--- Vstavi placeholder otroka za logopediste
-INSERT INTO public.children (
-  id, 
-  parent_id, 
-  name, 
-  age, 
-  gender
-) VALUES (
-  '00000000-0000-0000-0000-000000000001',
-  '00000000-0000-0000-0000-000000000000',  -- System user
-  '_LOGOPEDIST_PLACEHOLDER',
-  0,
-  NULL
-) ON CONFLICT (id) DO NOTHING;
-```
-
-**OPOMBA:** Potreben bo tudi sistemski uporabnik za `parent_id` ali uporaba dejanskega auth.uid() logopeda.
-
----
-
-## Alternativna implementacija (boljša dolgoročno)
-
-Namesto placeholder-ja lahko spremenimo shemo baze:
-
-```sql
--- Naredi child_id nullable
 ALTER TABLE articulation_test_sessions 
-ALTER COLUMN child_id DROP NOT NULL;
+ADD COLUMN current_word_index integer DEFAULT 0,
+ADD COLUMN total_words integer DEFAULT 60,
+ADD COLUMN is_completed boolean DEFAULT false;
 ```
 
-Nato v kodi:
+### 2. Nov hook: useLogopedistSessionManager
+
+Nadomesti trenutno logiko z novim hookom:
 
 ```typescript
-const { data: sessionData, error: sessionError } = await supabase
-  .from('articulation_test_sessions')
-  .insert({
-    child_id: null,  // NULL za logopedove otroke
-    parent_id: user.id,
-    logopedist_child_id: logopedistChildId,
-    // ...
-  })
+// Ob začetku testa
+const initializeSession = async (childId: string) => {
+  // 1. Preveri če obstaja nedokončana seja
+  const { data: existingSession } = await supabase
+    .from('articulation_test_sessions')
+    .select('*')
+    .eq('logopedist_child_id', childId)
+    .eq('is_completed', false)
+    .single();
+
+  if (existingSession) {
+    // Nadaljuj obstoječo sejo
+    return {
+      sessionId: existingSession.id,
+      sessionNumber: existingSession.session_number,
+      startIndex: existingSession.current_word_index,
+      isResume: true
+    };
+  }
+
+  // 2. Določi novo številko seje
+  const { data: completedSessions } = await supabase
+    .from('articulation_test_sessions')
+    .select('session_number')
+    .eq('logopedist_child_id', childId)
+    .eq('is_completed', true);
+  
+  const nextSessionNumber = (completedSessions?.length || 0) + 1;
+
+  // 3. Ustvari novo sejo
+  const { data: newSession } = await supabase
+    .from('articulation_test_sessions')
+    .insert({
+      logopedist_child_id: childId,
+      session_number: nextSessionNumber,
+      current_word_index: 0,
+      is_completed: false,
+      status: 'in_progress'
+    })
+    .select()
+    .single();
+
+  return {
+    sessionId: newSession.id,
+    sessionNumber: nextSessionNumber,
+    startIndex: 0,
+    isResume: false
+  };
+};
+```
+
+### 3. Posodobitev napredka med testom
+
+Ob vsaki uspešni izgovorjavi:
+
+```typescript
+const updateProgress = async (sessionId: string, wordIndex: number) => {
+  await supabase
+    .from('articulation_test_sessions')
+    .update({ current_word_index: wordIndex + 1 })
+    .eq('id', sessionId);
+};
+```
+
+### 4. Zaključek seje
+
+Ko otrok izgovori 60. besedo:
+
+```typescript
+const completeSession = async (sessionId: string) => {
+  await supabase
+    .from('articulation_test_sessions')
+    .update({ 
+      is_completed: true,
+      status: 'pending',
+      current_word_index: 60,
+      completed_at: new Date().toISOString()
+    })
+    .eq('id', sessionId);
+};
 ```
 
 ---
 
-## Povzetek sprememb
+## Spremembe datotek
 
-| Datoteka/Akcija | Sprememba |
-|-----------------|-----------|
-| SQL migracija | Dodaj placeholder otroka ALI naredi `child_id` nullable |
-| `src/hooks/useLogopedistArticulationSession.ts` | Uporabi placeholder UUID ali null za `child_id` |
+| Datoteka | Sprememba |
+|----------|-----------|
+| SQL migracija | Dodaj `current_word_index`, `total_words`, `is_completed` |
+| `src/hooks/useLogopedistSessionManager.ts` | Nov hook za upravljanje sej |
+| `src/hooks/useArticulationTestNew.ts` | Uporabi nov session manager namesto storage-based logike |
+| `src/pages/admin/AdminArtikulacijskiTest.tsx` | Integracija novega session managerja |
+| `src/hooks/useArticulationSettings.ts` | Ohrani za nastavitve, odstrani localStorage progress (opcijsko) |
 
-## Rezultat
+---
 
-Po popravku:
-- Logopedi bodo lahko uspešno shranjevali seje preverjanja izgovorjave
-- Seje bodo pravilno označene z `logopedist_child_id` in `organization_id`
-- Foreign key constraint ne bo več kršen
+## Rezultat po implementaciji
+
+- **Seja-1**: Ko otrok začne preverjanje, se ustvari seja v bazi. Če prekine po 10 besedah, se shrani `current_word_index = 10`. Naslednjič nadaljuje od 11. besede. Ko izgovori 60. besedo, se seja zaklene.
+- **Seja-2**: Začne se ŠELE ko je Seja-1 popolnoma zaključena (60 besed).
+- **Ni mešanja**: Posnetki iz ene seje nikoli ne morejo priti v mapo druge seje.
+- **Deluje na vseh napravah**: Progress je v bazi, ne v brskalniku.
+
+---
+
+## Opomba glede obstoječih podatkov
+
+Obstoječi posnetek "PAJEK" v mapi Seja-1 je ostal iz prejšnjega nedokončanega testa. Po implementaciji tega sistema se takšno mešanje ne bo več dogajalo. Obstoječe posnetke bo potrebno ročno očistiti.
 
