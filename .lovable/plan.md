@@ -1,131 +1,85 @@
 
-# Popravek napačnega mapiranja posnetkov in datumov preverjanja izgovorjave
 
-## Identificirani problemi
+# Popravek podatkov za uporabnika kujavec.robert@gmail.com
 
-### 1. Neskladje wordIndex med fonetičnim in abecednim vrstnim redom
+## Trenutno stanje
 
-**Vzrok**: Pri snemanju se uporablja `currentWordIndex` iz fonetično sortiranih podatkov (P, B, M, T, D, ...), pri parsiranju imen datotek v admin portalu pa se wordIndex mapira nazaj na abecedni vrstni red (B, C, Č, D, F, ...).
+| Seja ID | Datum | session_number | Status | Posnetki v Storage |
+|---------|-------|----------------|--------|-------------------|
+| d3742796-ad32-4880-90b3-f89767dfdb33 | 23.1.2026 | 1 | completed | Seja-1 (0 posnetkov - testna) |
+| fc3dd757-5bd2-40e6-a0c6-e19aab3ffc03 | 28.1.2026 | 2 | pending | Seja-2 (60 posnetkov) |
 
-**Primer**:
-- Uporabnik posname besedo "PAJEK" (črka P), ki ima v fonetičnem redu wordIndex = 0
-- Shrani se kot `P-0-PAJEK-timestamp.webm`
-- Admin portal parsira wordIndex 0 in ga mapira na abecedni vrstni red → črka B (namesto P)
-- Zato se posnetek predvaja pod napačno črko
+## Problem
 
-### 2. Dve ločeni seji za istega otroka
-
-V bazi obstajata dve seji za otroka Žak:
-| Seja ID | Datum | Status | Posnetki v Storage |
-|---------|-------|--------|-------------------|
-| d3742796-ad32-4880-90b3-f89767dfdb33 | 23.1.2026 | completed | Seja-1 (3 posnetki) |
-| fc3dd757-5bd2-40e6-a0c6-e19aab3ffc03 | 28.1.2026 | pending | Seja-2 (60 posnetkov) |
-
-Admin portal prikazuje sejo od 23.1. ker je to URL ki se pregleduje. Posnetki od 28.1. pripadajo drugi seji.
-
-### 3. Nalaganje napačne mape posnetkov
-
-Hook `useSessionReview.ts` išče posnetke v `Preverjanje-izgovorjave/` in vzame **zadnjo** (najnovejšo) mapo Seja-X. To pomeni, da za sejo od 23.1. prikazuje posnetke iz Seja-2 (od 28.1.) - napačna seja!
-
----
+Admin portal pregleduje sejo od 23.1. (`session_number=1`) in išče posnetke v mapi `Seja-1`, ki je prazna. Dejanski posnetki (60) so v mapi `Seja-2`.
 
 ## Rešitev
 
-### Korak 1: Popravi mapiranje wordIndex v evaluationOptions.ts
+### Korak 1: Izbriši testno sejo od 23.1.
 
-Spremeniti je potrebno funkcijo za generiranje mapiranja, da uporablja **fonetični** vrstni red namesto abecednega:
+Izbriši staro testno sejo, ki ne bi smela obstajati:
 
-```typescript
-// evaluationOptions.ts
-
-// Fonetični vrstni red - enak kot v useArticulationTestNew
-const PHONETIC_LETTER_ORDER = ['P', 'B', 'M', 'T', 'D', 'K', 'G', 'N', 'H', 'V', 'J', 'F', 'L', 'S', 'Z', 'C', 'Š', 'Ž', 'Č', 'R'];
-
-// Sortiraj articulationData po fonetičnem redu pred generiranjem mapiranja
-const sortedArticulationData = [...articulationData].sort((a, b) => {
-  const indexA = PHONETIC_LETTER_ORDER.indexOf(a.letter.toUpperCase());
-  const indexB = PHONETIC_LETTER_ORDER.indexOf(b.letter.toUpperCase());
-  return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
-});
-
-// Dinamično mapiranje wordIndex → črka iz sortiranih podatkov
-const wordIndexToLetterMap = new Map<number, string>();
-const wordIndexToWordMap = new Map<number, string>();
-let currentIndex = 0;
-sortedArticulationData.forEach(letterData => {
-  letterData.words.forEach(word => {
-    wordIndexToLetterMap.set(currentIndex, letterData.letter);
-    wordIndexToWordMap.set(currentIndex, word.text);
-    currentIndex++;
-  });
-});
-```
-
-### Korak 2: Poveži sejo z ustrezno mapo posnetkov
-
-V `useSessionReview.ts` je potrebno najti pravilno mapo Seja-X glede na **sessionNumber** shranjeno v seji, ne pa kar najnovejšo mapo.
-
-**Opcija A**: Dodaj polje `session_number` v tabelo `articulation_test_sessions`
-
-**Opcija B**: Uporabi datum seje za določitev pravilne mape (Seja-1 za prvo, Seja-2 za drugo, itd.)
-
-Priporočam Opcijo A za jasnost in zanesljivost.
-
-### Korak 3: Dodaj session_number v tabelo sej
-
-Migracija:
 ```sql
-ALTER TABLE articulation_test_sessions 
-ADD COLUMN session_number INTEGER DEFAULT 1;
+DELETE FROM articulation_evaluations 
+WHERE session_id = 'd3742796-ad32-4880-90b3-f89767dfdb33';
 
--- Posodobi obstoječe seje glede na vrstni red
-UPDATE articulation_test_sessions ats
-SET session_number = subq.rn
-FROM (
-  SELECT id, ROW_NUMBER() OVER (PARTITION BY child_id ORDER BY created_at) as rn
-  FROM articulation_test_sessions
-) subq
-WHERE ats.id = subq.id;
+DELETE FROM articulation_test_sessions 
+WHERE id = 'd3742796-ad32-4880-90b3-f89767dfdb33';
 ```
 
-### Korak 4: Posodobi useSessionReview.ts za uporabo session_number
+### Korak 2: Posodobi pravo sejo od 28.1.
 
-```typescript
-// V fetchSessionReviewData funkciji:
-const sessionNumber = session.session_number || 1;
-const targetFolder = `${storagePath}/Seja-${sessionNumber}`;
+Posodobi sejo od 28.1. tako da bo imela `session_number=1`:
 
-// Direktno uporabi to mapo namesto iskanja najnovejše
-const { data: files, error: filesError } = await supabase.storage
-  .from('uporabniski-profili')
-  .list(targetFolder);
+```sql
+UPDATE articulation_test_sessions 
+SET session_number = 1
+WHERE id = 'fc3dd757-5bd2-40e6-a0c6-e19aab3ffc03';
 ```
 
-### Korak 5: Posodobi Edge funkcijo in hook za shranjevanje session_number
+### Korak 3: Premakni posnetke iz Seja-2 v Seja-1
 
-Pri ustvarjanju nove seje v bazi, shrani tudi `session_number`:
+Ker hook `useSessionReview.ts` zdaj uporablja `session_number` za določitev mape, moram premakniti posnetke iz `Seja-2` v `Seja-1`:
 
-```typescript
-// Pri ustvarjanju seje
-const { data: newSession } = await supabase
-  .from('articulation_test_sessions')
-  .insert({
-    child_id: childId,
-    parent_id: userId,
-    session_number: sessionNumber, // Dodaj to polje
-    status: 'pending'
-  });
+```
+Iz: uporabniski-profili/{userId}/{childId}/Preverjanje-izgovorjave/Seja-2/
+V:  uporabniski-profili/{userId}/{childId}/Preverjanje-izgovorjave/Seja-1/
 ```
 
----
+To se naredi ročno v Supabase Storage dashboardu ali z skripto, ker Supabase Storage nima direktne "premakni" funkcije - potrebno je kopirati in izbrisati.
+
+### Korak 4 (alternativa): Posodobi logiko, da bere iz Seja-2
+
+Namesto premikanja datotek, lahko posodobim `session_number` na 2, da se ujema s storage mapo:
+
+```sql
+-- Alternativa: ohrani posnetke kjer so in nastavi session_number=2
+UPDATE articulation_test_sessions 
+SET session_number = 2
+WHERE id = 'fc3dd757-5bd2-40e6-a0c6-e19aab3ffc03';
+
+-- Izbriši testno sejo
+DELETE FROM articulation_evaluations 
+WHERE session_id = 'd3742796-ad32-4880-90b3-f89767dfdb33';
+
+DELETE FROM articulation_test_sessions 
+WHERE id = 'd3742796-ad32-4880-90b3-f89767dfdb33';
+```
+
+Tako bo admin portal za sejo od 28.1. iskal posnetke v `Seja-2` kjer dejansko so.
+
+## Priporočena rešitev
+
+**Opcija B** (Korak 4) je boljša, ker:
+- Ne zahteva premikanja 60 datotek v storage
+- Ohrani konsistentnost (session_number se ujema z imenom mape)
+- Je hitrejša in varnejša
 
 ## Rezultat po popravku
 
-1. Posnetki se bodo pravilno prikazovali pod ustreznimi črkami v admin portalu
-2. Vsaka seja bo povezana s pravilno mapo posnetkov (Seja-1, Seja-2, ...)
-3. Admin portal bo prikazoval pravilne datume in posnetke za vsako sejo posebej
-4. Ne bo več zmede med različnimi sejami istega otroka
+Po izvedbi migracije:
+- V bazi bo samo ena seja za otroka Žak (od 28.1.2026)
+- Ta seja bo imela `session_number=2`
+- Admin portal bo prikazal sejo z vsemi 60 posnetki v pravilnem vrstnem redu
+- URL za pregled bo: `/admin/tests/fc3dd757-5bd2-40e6-a0c6-e19aab3ffc03`
 
-## Obstoječi podatki
-
-Posnetki shranjeni pred popravkom (wordIndex 51-59 v Seja-2) bodo še vedno napačno mapirani. Za te je potrebna ročna korekcija ali posebna migracija, ki preslika wordIndex iz fonetičnega v pravilni vrstni red.
