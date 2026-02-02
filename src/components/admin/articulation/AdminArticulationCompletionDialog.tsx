@@ -6,7 +6,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { useLogopedistArticulationSession } from "@/hooks/useLogopedistArticulationSession";
 import { toast } from "sonner";
 
 interface AdminArticulationCompletionDialogProps {
@@ -14,6 +13,7 @@ interface AdminArticulationCompletionDialogProps {
   onClose: () => void;
   childId: string;
   sessionNumber: number;
+  onComplete?: () => Promise<void>;
 }
 
 /**
@@ -26,10 +26,11 @@ const AdminArticulationCompletionDialog = ({
   onClose,
   childId,
   sessionNumber,
+  onComplete,
 }: AdminArticulationCompletionDialogProps) => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const navigate = useNavigate();
-  const { saveSession, isSaving } = useLogopedistArticulationSession();
 
   useEffect(() => {
     const fetchImage = async () => {
@@ -44,17 +45,18 @@ const AdminArticulationCompletionDialog = ({
   }, []);
 
   const handleClose = async () => {
+    setIsSaving(true);
     try {
-      const result = await saveSession(childId, sessionNumber);
-      if (result.success) {
-        toast.success("Preverjanje izgovorjave je bilo uspešno shranjeno!");
-      } else {
-        toast.error("Napaka pri shranjevanju: " + (result.error || "Neznana napaka"));
+      // Call the completion callback to mark session as complete in database
+      if (onComplete) {
+        await onComplete();
       }
+      toast.success("Preverjanje izgovorjave je bilo uspešno shranjeno!");
     } catch (error) {
       console.error("Error saving test result:", error);
       toast.error("Napaka pri shranjevanju preverjanja");
     } finally {
+      setIsSaving(false);
       onClose();
     }
   };

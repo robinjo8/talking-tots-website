@@ -256,7 +256,9 @@ export type Database = {
           child_id: string | null
           completed_at: string | null
           created_at: string | null
+          current_word_index: number | null
           id: string
+          is_completed: boolean | null
           logopedist_child_id: string | null
           notes: string | null
           organization_id: string | null
@@ -268,6 +270,7 @@ export type Database = {
           status: Database["public"]["Enums"]["test_session_status"] | null
           submitted_at: string | null
           test_version: string | null
+          total_words: number | null
         }
         Insert: {
           assigned_at?: string | null
@@ -275,7 +278,9 @@ export type Database = {
           child_id?: string | null
           completed_at?: string | null
           created_at?: string | null
+          current_word_index?: number | null
           id?: string
+          is_completed?: boolean | null
           logopedist_child_id?: string | null
           notes?: string | null
           organization_id?: string | null
@@ -287,6 +292,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["test_session_status"] | null
           submitted_at?: string | null
           test_version?: string | null
+          total_words?: number | null
         }
         Update: {
           assigned_at?: string | null
@@ -294,7 +300,9 @@ export type Database = {
           child_id?: string | null
           completed_at?: string | null
           created_at?: string | null
+          current_word_index?: number | null
           id?: string
+          is_completed?: boolean | null
           logopedist_child_id?: string | null
           notes?: string | null
           organization_id?: string | null
@@ -306,6 +314,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["test_session_status"] | null
           submitted_at?: string | null
           test_version?: string | null
+          total_words?: number | null
         }
         Relationships: [
           {

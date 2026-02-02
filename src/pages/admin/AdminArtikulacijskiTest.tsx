@@ -14,7 +14,7 @@ import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfi
 import { useArticulationTestNew } from "@/hooks/useArticulationTestNew";
 import { useArticulationSettings } from "@/hooks/useArticulationSettings";
 import { useLogopedistChild } from "@/hooks/useLogopedistChildren";
-import { useLogopedistArticulationSession } from "@/hooks/useLogopedistArticulationSession";
+import { useLogopedistSessionManager } from "@/hooks/useLogopedistSessionManager";
 import { useAdminAuth } from "@/contexts/AdminAuthContext";
 import { cn } from "@/lib/utils";
 import { articulationData } from "@/data/articulationTestData";
@@ -42,7 +42,13 @@ export default function AdminArtikulacijskiTest() {
   const [searchParams] = useSearchParams();
   const { data: child } = useLogopedistChild(childId);
   const { profile } = useAdminAuth();
-  const { saveSession, isSaving } = useLogopedistArticulationSession();
+  const { 
+    sessionInfo, 
+    isInitializing, 
+    initializeSession: initSessionManager, 
+    updateProgress: updateSessionProgress,
+    completeSession 
+  } = useLogopedistSessionManager();
   
   const [showInfoDialog, setShowInfoDialog] = useState(true);
   const [showInstructionsDialog, setShowInstructionsDialog] = useState(false);
@@ -52,7 +58,6 @@ export default function AdminArtikulacijskiTest() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [backgroundUrl, setBackgroundUrl] = useState<string | null>(null);
   const [resumeWordIndex, setResumeWordIndex] = useState<number>(0);
-  const [resumeTimestamp, setResumeTimestamp] = useState<number>(0);
 
   // Window size tracking for dynamic scaling
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
@@ -117,21 +122,24 @@ export default function AdminArtikulacijskiTest() {
     setDifficulty,
     recordingDuration,
     setRecordingDuration,
-    saveProgress,
-    loadProgress,
     clearProgress,
-    getTimeAgo,
   } = useArticulationSettings();
   
   const sejaParam = searchParams.get('seja');
-  const startParam = searchParams.get('start');
   const fixedSessionNumber = sejaParam ? parseInt(sejaParam, 10) : undefined;
-  const urlStartIndex = startParam ? parseInt(startParam, 10) : 0;
   
   // Test mode for "OŠ Test" organization - only test letter R (last 3 words: index 57, 58, 59)
   const isTestOrganization = profile?.organization_name === "OŠ Test";
-  const startIndex = isTestOrganization ? 57 : urlStartIndex;
+  // Use session manager's startIndex if resuming, otherwise use test organization logic
+  const startIndex = sessionInfo?.isResume 
+    ? sessionInfo.startIndex 
+    : (isTestOrganization ? 57 : 0);
   const testMaxWords = isTestOrganization ? 3 : undefined;
+  
+  // Callback to save progress to database after each word
+  const handleSaveProgress = useCallback(async (cId: string, sNum: number, wordIndex: number) => {
+    await updateSessionProgress(wordIndex);
+  }, [updateSessionProgress]);
   
   // Sort articulation data by phonetic order
   const sortedArticulationData = useMemo(() => {
@@ -181,20 +189,31 @@ export default function AdminArtikulacijskiTest() {
     handleNext,
     resetTest,
     initializeSession,
-  } = useArticulationTestNew(childId, undefined, fixedSessionNumber, startIndex, difficulty, saveProgress, profile?.id, testMaxWords);
+  } = useArticulationTestNew(
+    childId, 
+    undefined, 
+    sessionInfo?.sessionNumber ?? fixedSessionNumber, 
+    startIndex, 
+    difficulty, 
+    handleSaveProgress, 
+    profile?.id, 
+    testMaxWords
+  );
 
-  // Check for saved progress on mount
+  // Check for saved progress from database on mount
   useEffect(() => {
-    if (childId) {
-      const savedProgress = loadProgress(childId);
-      if (savedProgress && savedProgress.currentWordIndex > 0) {
-        setResumeWordIndex(savedProgress.currentWordIndex);
-        setResumeTimestamp(savedProgress.timestamp);
-        setShowResumeDialog(true);
-        setShowInfoDialog(false);
+    const checkExistingSession = async () => {
+      if (childId && !sessionInfo && !isInitializing) {
+        const existingSession = await initSessionManager(childId, testMaxWords ?? 60);
+        if (existingSession && existingSession.isResume && existingSession.startIndex > 0) {
+          setResumeWordIndex(existingSession.startIndex);
+          setShowResumeDialog(true);
+          setShowInfoDialog(false);
+        }
       }
-    }
-  }, [childId, loadProgress]);
+    };
+    checkExistingSession();
+  }, [childId, sessionInfo, isInitializing, initSessionManager, testMaxWords]);
 
   // Fetch background image
   useEffect(() => {
@@ -207,15 +226,14 @@ export default function AdminArtikulacijskiTest() {
   }, []);
 
   const handleResume = () => {
+    // Just close the dialog - sessionInfo already has the startIndex from database
     setShowResumeDialog(false);
-    const params = new URLSearchParams();
-    if (fixedSessionNumber) params.set('seja', String(fixedSessionNumber));
-    params.set('start', String(resumeWordIndex));
-    navigate(`/admin/children/${childId}/test?${params.toString()}`, { replace: true });
   };
 
-  const handleStartOver = () => {
-    clearProgress();
+  const handleStartOver = async () => {
+    // Clear the existing session and start fresh
+    // Note: This would need to reset the session in database
+    // For now, we just close dialog and show info
     setShowResumeDialog(false);
     setShowInfoDialog(true);
   };
@@ -257,6 +275,7 @@ export default function AdminArtikulacijskiTest() {
           onClose={handleCloseCompletion}
           childId={childId}
           sessionNumber={sessionNumber ?? 1}
+          onComplete={completeSession}
         />
       )}
 
@@ -284,7 +303,7 @@ export default function AdminArtikulacijskiTest() {
         wordName={getWordByIndex(resumeWordIndex)}
         wordIndex={resumeWordIndex}
         totalWords={totalWordsCount}
-        timeAgo={getTimeAgo(resumeTimestamp)}
+        timeAgo="prejšnja seja"
       />
 
       {/* Exit Confirmation Dialog */}

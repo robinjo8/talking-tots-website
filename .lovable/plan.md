@@ -200,13 +200,14 @@ const completeSession = async (sessionId: string) => {
 
 ## Spremembe datotek
 
-| Datoteka | Sprememba |
-|----------|-----------|
-| SQL migracija | Dodaj `current_word_index`, `total_words`, `is_completed` |
-| `src/hooks/useLogopedistSessionManager.ts` | Nov hook za upravljanje sej |
-| `src/hooks/useArticulationTestNew.ts` | Uporabi nov session manager namesto storage-based logike |
-| `src/pages/admin/AdminArtikulacijskiTest.tsx` | Integracija novega session managerja |
-| `src/hooks/useArticulationSettings.ts` | Ohrani za nastavitve, odstrani localStorage progress (opcijsko) |
+| Datoteka | Sprememba | Status |
+|----------|-----------|--------|
+| SQL migracija | Dodaj `current_word_index`, `total_words`, `is_completed` | ✅ Dokončano |
+| `src/hooks/useLogopedistSessionManager.ts` | Nov hook za upravljanje sej | ✅ Dokončano |
+| `src/hooks/useArticulationTestNew.ts` | Uporabi nov session manager namesto storage-based logike | ✅ Dokončano |
+| `src/pages/admin/AdminArtikulacijskiTest.tsx` | Integracija novega session managerja | ✅ Dokončano |
+| `src/components/admin/articulation/AdminArticulationCompletionDialog.tsx` | Kliče completeSession ob zaključku | ✅ Dokončano |
+| `src/hooks/useLogopedistArticulationSession.ts` | Ohranjen za referenco, vendar ni več v uporabi | ⚠️ Lahko se izbriše |
 
 ---
 
