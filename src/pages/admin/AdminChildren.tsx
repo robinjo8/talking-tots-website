@@ -11,7 +11,8 @@ import {
   Trash2, 
   AlertCircle,
   Crown,
-  User
+  User,
+  FileText
 } from 'lucide-react';
 import { useLogopedistChildren, LogopedistChild } from '@/hooks/useLogopedistChildren';
 import { useLogopedistLicense } from '@/hooks/useLogopedistLicense';
@@ -48,6 +49,10 @@ export default function AdminChildren() {
 
   const handleViewProgress = (childId: string) => {
     navigate(`/admin/children/${childId}/progress`);
+  };
+
+  const handleViewDetails = (childId: string) => {
+    navigate(`/admin/children/${childId}/details`);
   };
 
   // Prikaz za logopede brez licence
@@ -197,6 +202,15 @@ export default function AdminChildren() {
 
                   {/* Akcije */}
                   <div className="flex items-center gap-2 flex-shrink-0">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleViewDetails(child.id)}
+                    >
+                      <FileText className="h-4 w-4 mr-1" />
+                      <span className="hidden sm:inline">Podrobnosti</span>
+                    </Button>
+                    
                     <Button
                       variant="outline"
                       size="sm"
