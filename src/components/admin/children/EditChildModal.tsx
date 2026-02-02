@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon } from 'lucide-react';
@@ -22,10 +21,6 @@ import { useLogopedistChildren, LogopedistChild, UpdateChildInput } from '@/hook
 import { GenderSelector } from '@/components/GenderSelector';
 import { AvatarSelector, avatarOptions } from '@/components/AvatarSelector';
 import { calculateAge } from '@/utils/childUtils';
-
-const SPEECH_DIFFICULTIES_OPTIONS = [
-  'Š', 'Ž', 'Č', 'C', 'S', 'Z', 'R', 'L', 'K', 'G', 'P', 'B', 'M', 'N', 'T', 'D'
-];
 
 interface EditChildModalProps {
   child: LogopedistChild;
@@ -62,9 +57,7 @@ export function EditChildModal({ child, open, onOpenChange }: EditChildModalProp
   );
   const [gender, setGender] = useState<string>(genderToDisplay(child.gender));
   const [avatarId, setAvatarId] = useState<number>(avatarUrlToId(child.avatar_url));
-  const [speechDifficulties, setSpeechDifficulties] = useState<string[]>(child.speech_difficulties || []);
   const [notes, setNotes] = useState(child.notes || '');
-  const [externalId, setExternalId] = useState(child.external_id || '');
   
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -74,9 +67,7 @@ export function EditChildModal({ child, open, onOpenChange }: EditChildModalProp
     setBirthDate(child.birth_date ? new Date(child.birth_date) : undefined);
     setGender(genderToDisplay(child.gender));
     setAvatarId(avatarUrlToId(child.avatar_url));
-    setSpeechDifficulties(child.speech_difficulties || []);
     setNotes(child.notes || '');
-    setExternalId(child.external_id || '');
   }, [child]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -100,9 +91,7 @@ export function EditChildModal({ child, open, onOpenChange }: EditChildModalProp
         gender: displayToGender(gender),
         birth_date: birthDate ? birthDate.toISOString().split('T')[0] : undefined,
         avatar_url: avatarUrl || undefined,
-        speech_difficulties: speechDifficulties.length > 0 ? speechDifficulties : undefined,
         notes: notes.trim() || undefined,
-        external_id: externalId.trim() || undefined,
       };
       
       await updateChild.mutateAsync(input);
@@ -112,14 +101,6 @@ export function EditChildModal({ child, open, onOpenChange }: EditChildModalProp
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const toggleDifficulty = (difficulty: string) => {
-    setSpeechDifficulties(prev => 
-      prev.includes(difficulty)
-        ? prev.filter(d => d !== difficulty)
-        : [...prev, difficulty]
-    );
   };
 
   return (
@@ -195,25 +176,6 @@ export function EditChildModal({ child, open, onOpenChange }: EditChildModalProp
             variant="dropdown"
           />
 
-          {/* Govorni izzivi */}
-          <div className="space-y-2">
-            <Label>Govorni izzivi (opcijsko)</Label>
-            <div className="flex flex-wrap gap-2">
-              {SPEECH_DIFFICULTIES_OPTIONS.map((difficulty) => (
-                <label
-                  key={difficulty}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border cursor-pointer hover:bg-muted transition-colors"
-                >
-                  <Checkbox
-                    checked={speechDifficulties.includes(difficulty)}
-                    onCheckedChange={() => toggleDifficulty(difficulty)}
-                  />
-                  <span className="text-sm font-medium">{difficulty}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
           {/* Zapiski */}
           <div className="space-y-2">
             <Label htmlFor="edit-notes">Notranji zapiski (opcijsko)</Label>
@@ -224,20 +186,6 @@ export function EditChildModal({ child, open, onOpenChange }: EditChildModalProp
               placeholder="Npr. diagnoza, frekvenca obiskov, posebnosti..."
               rows={3}
             />
-          </div>
-
-          {/* Zunanji ID */}
-          <div className="space-y-2">
-            <Label htmlFor="edit-externalId">Zunanji ID (opcijsko)</Label>
-            <Input
-              id="edit-externalId"
-              value={externalId}
-              onChange={(e) => setExternalId(e.target.value)}
-              placeholder="Npr. PAC-2024-042"
-            />
-            <p className="text-xs text-muted-foreground">
-              ID iz vaše prakse za lažje sledenje
-            </p>
           </div>
 
           <DialogFooter>
