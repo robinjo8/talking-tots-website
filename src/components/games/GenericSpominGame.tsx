@@ -9,6 +9,7 @@ import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfi
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent } from "@/components/ui/dropdown-menu";
 import { Loader, Home, RefreshCw } from "lucide-react";
+import { useGameMode, useGameNavigation } from "@/contexts/GameModeContext";
 
 interface GenericSpominGameProps {
   config: SpominConfig;
@@ -16,6 +17,7 @@ interface GenericSpominGameProps {
 
 export function GenericSpominGame({ config }: GenericSpominGameProps) {
   const navigate = useNavigate();
+  const { getGameListPath } = useGameNavigation();
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showNewGameButton, setShowNewGameButton] = useState(false);
@@ -133,7 +135,8 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
 
   const handleConfirmExit = () => {
     setShowExitConfirmation(false);
-    navigate("/govorne-igre/spomin");
+    // Use GameModeContext-aware navigation
+    navigate(getGameListPath('spomin'));
   };
 
   const handleNewGame = () => {
@@ -160,11 +163,11 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-100 to-red-200">
-        <div className="text-center p-6 bg-white rounded-xl shadow-lg">
-          <p className="text-lg text-red-600 mb-4">Napaka pri nalaganju igre</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-destructive/10 to-destructive/20">
+        <div className="text-center p-6 bg-card rounded-xl shadow-lg">
+          <p className="text-lg text-destructive mb-4">Napaka pri nalaganju igre</p>
           <button 
-            onClick={() => navigate("/govorne-igre/spomin")}
+            onClick={() => navigate(getGameListPath('spomin'))}
             className="px-4 py-2 bg-dragon-green text-white rounded-lg hover:bg-dragon-green/90"
           >
             Nazaj na izbiro
