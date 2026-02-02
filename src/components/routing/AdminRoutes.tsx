@@ -19,6 +19,22 @@ const AdminChildren = lazy(() => import('@/pages/admin/AdminChildren'));
 const AdminChildWorkspace = lazy(() => import('@/pages/admin/AdminChildWorkspace'));
 const AdminChildProgress = lazy(() => import('@/pages/admin/AdminChildProgress'));
 
+// Admin game pages
+const AdminGovorneIgre = lazy(() => import('@/pages/admin/AdminGovorneIgre'));
+const AdminSpominGames = lazy(() => import('@/pages/admin/games/AdminSpominGames'));
+const AdminBingoGames = lazy(() => import('@/pages/admin/games/AdminBingoGames'));
+const AdminKoloSreceGames = lazy(() => import('@/pages/admin/games/AdminKoloSreceGames'));
+const AdminLabirintGames = lazy(() => import('@/pages/admin/games/AdminLabirintGames'));
+const AdminZaporedjaGames = lazy(() => import('@/pages/admin/games/AdminZaporedjaGames'));
+const AdminSestavljankeGames = lazy(() => import('@/pages/admin/games/AdminSestavljankeGames'));
+const AdminDrsnaSestavljankaGames = lazy(() => import('@/pages/admin/games/AdminDrsnaSestavljankaGames'));
+const AdminIgraUjemanjaGames = lazy(() => import('@/pages/admin/games/AdminIgraUjemanjaGames'));
+const AdminMetKockeGames = lazy(() => import('@/pages/admin/games/AdminMetKockeGames'));
+const AdminPonoviPovedGames = lazy(() => import('@/pages/admin/games/AdminPonoviPovedGames'));
+
+// Admin game routers
+const AdminSpominRouter = lazy(() => import('@/components/routing/admin/AdminSpominRouter'));
+
 // Loading fallback for admin pages
 function AdminLoadingFallback() {
   return (
@@ -155,6 +171,104 @@ export function AdminRoutes() {
           element={
             <AdminLayoutWrapper>
               <AdminChildProgress />
+            </AdminLayoutWrapper>
+          } 
+        />
+        
+        {/* Admin game routes */}
+        <Route 
+          path="children/:childId/games" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminGovorneIgre />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="children/:childId/games/spomin" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminSpominGames />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="children/:childId/games/spomin/:gameId" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminSpominRouter />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="children/:childId/games/bingo" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminBingoGames />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="children/:childId/games/kolo-srece" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminKoloSreceGames />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="children/:childId/games/labirint" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminLabirintGames />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="children/:childId/games/zaporedja" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminZaporedjaGames />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="children/:childId/games/sestavljanke" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminSestavljankeGames />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="children/:childId/games/drsna-sestavljanka" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminDrsnaSestavljankaGames />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="children/:childId/games/igra-ujemanja" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminIgraUjemanjaGames />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="children/:childId/games/met-kocke" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminMetKockeGames />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="children/:childId/games/ponovi-poved" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminPonoviPovedGames />
             </AdminLayoutWrapper>
           } 
         />

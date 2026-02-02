@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEnhancedProgress } from "./useEnhancedProgress";
 import { useTrophyContext } from "@/contexts/TrophyContext";
+import { useGameMode } from "@/contexts/GameModeContext";
 import { SpominConfig } from "@/data/spominConfig";
 
 export interface MemoryCard {
@@ -17,6 +18,7 @@ export interface MemoryCard {
 }
 
 export const useGenericMemoryGame = (config: SpominConfig) => {
+  const gameMode = useGameMode();
   const { recordGameCompletion } = useEnhancedProgress();
   const { checkForNewTrophy } = useTrophyContext();
   const [cards, setCards] = useState<MemoryCard[]>([]);
@@ -155,11 +157,15 @@ export const useGenericMemoryGame = (config: SpominConfig) => {
   }, [matchedPairs, cards]);
 
   const handleClaimStar = async () => {
-    // Record completion in progress system
-    recordGameCompletion('memory', config.displayLetter);
-    // Check for trophy after short delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    await checkForNewTrophy();
+    // Record completion in progress system - use logopedistChildId if in logopedist mode
+    const logopedistChildId = gameMode.mode === 'logopedist' ? gameMode.logopedistChildId : undefined;
+    recordGameCompletion('memory', config.displayLetter, logopedistChildId || undefined);
+    
+    // Check for trophy after short delay (only for user mode)
+    if (gameMode.mode === 'user') {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await checkForNewTrophy();
+    }
   };
 
   const resetGame = () => {

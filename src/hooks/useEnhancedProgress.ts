@@ -144,15 +144,22 @@ export const useEnhancedProgress = () => {
     enabled: !!selectedChild?.id
   });
 
-  // Mutation to record progress
+  // Mutation to record progress - supports both user children and logopedist children
   const recordProgressMutation = useMutation({
     mutationFn: async (params: {
       activityType: 'exercise' | 'memory_game' | 'puzzle';
       activitySubtype?: string;
       starsEarned?: number;
       sessionMetadata?: any;
+      logopedistChildId?: string; // New: for logopedist mode
     }) => {
-      if (!selectedChild?.id) throw new Error("No child selected");
+      // Either selectedChild or logopedistChildId must be provided
+      const childId = params.logopedistChildId ? null : selectedChild?.id;
+      const logopedistChildId = params.logopedistChildId || null;
+      
+      if (!childId && !logopedistChildId) {
+        throw new Error("No child selected");
+      }
 
       // Map activity subtypes to proper exercise IDs
       const exerciseIdMap: Record<string, string> = {
@@ -162,12 +169,13 @@ export const useEnhancedProgress = () => {
 
       const exerciseId = exerciseIdMap[params.activitySubtype || 'general'] || exerciseIdMap['general'];
 
-      console.log("Recording progress:", params);
+      console.log("Recording progress:", { ...params, childId, logopedistChildId });
 
       const { data, error } = await supabase
         .from('progress')
         .insert({
-          child_id: selectedChild.id,
+          child_id: childId,
+          logopedist_child_id: logopedistChildId,
           exercise_id: exerciseId,
           activity_type: params.activityType,
           activity_subtype: params.activitySubtype,
@@ -182,37 +190,56 @@ export const useEnhancedProgress = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["enhancedProgress", selectedChild?.id] });
+    onSuccess: (_, variables) => {
+      // Invalidate the correct query based on mode
+      if (variables.logopedistChildId) {
+        queryClient.invalidateQueries({ queryKey: ["enhancedProgress", "logopedist", variables.logopedistChildId] });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["enhancedProgress", selectedChild?.id] });
+      }
     }
   });
 
-  // Helper functions
-  const recordGameCompletion = (gameType: string, subtype: string = 'general') => {
+  // Helper functions - now support optional logopedistChildId
+  const recordGameCompletion = (
+    gameType: string, 
+    subtype: string = 'general',
+    logopedistChildId?: string
+  ) => {
     const activityType = gameType === 'memory' ? 'memory_game' : 'puzzle';
     recordProgressMutation.mutate({
       activityType,
       activitySubtype: subtype,
       starsEarned: 1,
-      sessionMetadata: { gameType, subtype }
+      sessionMetadata: { gameType, subtype },
+      logopedistChildId
     });
   };
 
-  const recordExerciseCompletion = (exerciseType: string = 'vaje_motorike_govoril', starsCount: number = 1) => {
+  const recordExerciseCompletion = (
+    exerciseType: string = 'vaje_motorike_govoril', 
+    starsCount: number = 1,
+    logopedistChildId?: string
+  ) => {
     recordProgressMutation.mutate({
       activityType: 'exercise',
       activitySubtype: exerciseType,
       starsEarned: starsCount,
-      sessionMetadata: { exerciseType, starsCount }
+      sessionMetadata: { exerciseType, starsCount },
+      logopedistChildId
     });
   };
 
   // New unified recording function
-  const recordCompletion = (type: 'game' | 'exercise', subtype?: string) => {
+  const recordCompletion = (
+    type: 'game' | 'exercise', 
+    subtype?: string,
+    logopedistChildId?: string
+  ) => {
     if (type === 'game') {
-      recordGameCompletion('memory', subtype || 'general');
+      recordGameCompletion('memory', subtype || 'general', logopedistChildId);
     } else {
-      recordExerciseCompletion(subtype || 'vaje_motorike_govoril');
+      recordExerciseCompletion(subtype || 'vaje_motorike_govoril', 1, logopedistChildId);
     }
   };
 

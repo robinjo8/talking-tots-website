@@ -74,10 +74,22 @@ export default function AdminChildWorkspace() {
   const [showSwitcher, setShowSwitcher] = useState(false);
 
   const handleActivityClick = (activity: typeof activities[0]) => {
-    // TODO: V prihodnosti implementirati vgrajen način dela z aktivnostjo
-    // Za zdaj preusmeri na uporabniško stran z query parametrom za logopeda
-    const targetUrl = `${activity.url}?logopedistChildId=${childId}`;
-    window.open(targetUrl, '_blank');
+    // Map activities to internal admin routes
+    const activityPathMap: Record<string, string> = {
+      'games': `/admin/children/${childId}/games`,
+      // TODO: Add more activities when implemented
+      // 'exercises': `/admin/children/${childId}/exercises`,
+      // 'test': `/admin/children/${childId}/test`,
+    };
+    
+    const targetPath = activityPathMap[activity.id];
+    if (targetPath) {
+      navigate(targetPath);
+    } else {
+      // Fallback: open in new tab with query parameter for activities not yet migrated
+      const targetUrl = `${activity.url}?logopedistChildId=${childId}`;
+      window.open(targetUrl, '_blank');
+    }
   };
 
   const handleSwitchChild = (newChildId: string) => {
