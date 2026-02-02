@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import ArticulationProgressGrid from "@/components/articulation/ArticulationProgressGrid";
 import ArticulationRecordButton from "@/components/articulation/ArticulationRecordButton";
-import ArticulationCompletionDialog from "@/components/articulation/ArticulationCompletionDialog";
+import AdminArticulationCompletionDialog from "@/components/admin/articulation/AdminArticulationCompletionDialog";
 import ArticulationTestInfoDialog from "@/components/articulation/ArticulationTestInfoDialog";
 import ArticulationTestInstructionsDialog from "@/components/articulation/ArticulationTestInstructionsDialog";
 import ArticulationSettingsDialog from "@/components/articulation/ArticulationSettingsDialog";
@@ -14,8 +14,11 @@ import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfi
 import { useArticulationTestNew } from "@/hooks/useArticulationTestNew";
 import { useArticulationSettings } from "@/hooks/useArticulationSettings";
 import { useLogopedistChild } from "@/hooks/useLogopedistChildren";
+import { useLogopedistArticulationSession } from "@/hooks/useLogopedistArticulationSession";
+import { useAdminAuth } from "@/contexts/AdminAuthContext";
 import { cn } from "@/lib/utils";
 import { articulationData } from "@/data/articulationTestData";
+import { toast } from "sonner";
 
 const positiveFeedbackMessages = [
   "BRAVO! LAHKO NADALJUJEŠ.",
@@ -38,6 +41,8 @@ export default function AdminArtikulacijskiTest() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { data: child } = useLogopedistChild(childId);
+  const { profile } = useAdminAuth();
+  const { saveSession, isSaving } = useLogopedistArticulationSession();
   
   const [showInfoDialog, setShowInfoDialog] = useState(true);
   const [showInstructionsDialog, setShowInstructionsDialog] = useState(false);
@@ -157,6 +162,7 @@ export default function AdminArtikulacijskiTest() {
     isTestComplete,
     isTranscribing,
     transcriptionResult,
+    sessionNumber,
     currentLetter,
     currentLetterIndex,
     positionLabel,
@@ -169,7 +175,7 @@ export default function AdminArtikulacijskiTest() {
     handleNext,
     resetTest,
     initializeSession,
-  } = useArticulationTestNew(childId, undefined, fixedSessionNumber, startIndex, difficulty, saveProgress);
+  } = useArticulationTestNew(childId, undefined, fixedSessionNumber, startIndex, difficulty, saveProgress, profile?.id);
 
   // Check for saved progress on mount
   useEffect(() => {
@@ -238,10 +244,14 @@ export default function AdminArtikulacijskiTest() {
       />
 
       {/* Completion Dialog */}
-      <ArticulationCompletionDialog
-        open={isTestComplete}
-        onClose={handleCloseCompletion}
-      />
+      {childId && (
+        <AdminArticulationCompletionDialog
+          open={isTestComplete}
+          onClose={handleCloseCompletion}
+          childId={childId}
+          sessionNumber={sessionNumber ?? 1}
+        />
+      )}
 
       {/* Instructions Dialog */}
       <ArticulationTestInstructionsDialog

@@ -167,10 +167,11 @@ serve(async (req) => {
       sessionNumber,
       wordIndex,
       letter,
-      difficulty = "srednja"
+      difficulty = "srednja",
+      logopedistId  // For logopedist-managed children - different storage path
     } = await req.json();
 
-    console.log(`Transcription request for word: ${targetWord}, letter: ${letter}, index: ${wordIndex}, session: ${sessionNumber}, difficulty: ${difficulty}`);
+    console.log(`Transcription request for word: ${targetWord}, letter: ${letter}, index: ${wordIndex}, session: ${sessionNumber}, difficulty: ${difficulty}, logopedistId: ${logopedistId || 'none'}`);
 
     if (!audio) {
       throw new Error('No audio data provided');
@@ -253,8 +254,15 @@ serve(async (req) => {
         const safeWord = sanitizeForStorage(targetWord);
         // Construct session folder from sessionNumber parameter
         const sessionFolder = `Seja-${sessionNumber || 1}`;
-        // Storage structure: uporabniski-profili/{user_id}/{child_id}/Preverjanje-izgovorjave/Seja-X/
-        storagePath = `${userId}/${childId}/Preverjanje-izgovorjave/${sessionFolder}/${safeLetter}-${wordIndex}-${safeWord}-${timestamp}.webm`;
+        
+        // Determine storage path based on whether this is a logopedist-managed child
+        // Logopedist children: logopedist-children/{logopedist_id}/{child_id}/Preverjanje-izgovorjave/Seja-X/
+        // Parent children: {parent_id}/{child_id}/Preverjanje-izgovorjave/Seja-X/
+        if (logopedistId) {
+          storagePath = `logopedist-children/${logopedistId}/${childId}/Preverjanje-izgovorjave/${sessionFolder}/${safeLetter}-${wordIndex}-${safeWord}-${timestamp}.webm`;
+        } else {
+          storagePath = `${userId}/${childId}/Preverjanje-izgovorjave/${sessionFolder}/${safeLetter}-${wordIndex}-${safeWord}-${timestamp}.webm`;
+        }
 
         console.log(`Attempting to save recording to: ${storagePath}`);
 

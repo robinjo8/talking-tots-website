@@ -15,7 +15,8 @@ export const useArticulationTestNew = (
   fixedSessionNumber?: number, 
   startIndex: number = 0,
   difficulty: string = "srednja",
-  onSaveProgress?: (childId: string, sessionNumber: number, currentWordIndex: number) => void
+  onSaveProgress?: (childId: string, sessionNumber: number, currentWordIndex: number) => void,
+  logopedistId?: string  // For logopedist-managed children storage path
 ) => {
   // Start from startIndex (default 0, or 57 for testing with Ž only)
   const [currentWordIndex, setCurrentWordIndex] = useState(startIndex);
@@ -192,7 +193,8 @@ export const useArticulationTestNew = (
       sessionNumber ?? 1,
       currentWordIndex,
       currentLetter,
-      difficulty
+      difficulty,
+      logopedistId  // Pass logopedist ID for new storage path
     );
 
     if (result) {
