@@ -47,7 +47,8 @@ export default function AdminArtikulacijskiTest() {
     isInitializing, 
     initializeSession: initSessionManager, 
     updateProgress: updateSessionProgress,
-    completeSession 
+    completeSession,
+    resetSession,
   } = useLogopedistSessionManager();
   
   const [showInfoDialog, setShowInfoDialog] = useState(true);
@@ -206,7 +207,9 @@ export default function AdminArtikulacijskiTest() {
       if (childId && !sessionInfo && !isInitializing) {
         const existingSession = await initSessionManager(childId, testMaxWords ?? 60);
         if (existingSession && existingSession.isResume && existingSession.startIndex > 0) {
-          setResumeWordIndex(existingSession.startIndex);
+          // Show the LAST SPOKEN word (startIndex - 1), not the next word to speak
+          const lastSpokenWordIndex = existingSession.startIndex - 1;
+          setResumeWordIndex(lastSpokenWordIndex);
           setShowResumeDialog(true);
           setShowInfoDialog(false);
         }
@@ -231,9 +234,10 @@ export default function AdminArtikulacijskiTest() {
   };
 
   const handleStartOver = async () => {
-    // Clear the existing session and start fresh
-    // Note: This would need to reset the session in database
-    // For now, we just close dialog and show info
+    // Reset the session in database and start fresh
+    if (childId) {
+      await resetSession(childId);
+    }
     setShowResumeDialog(false);
     setShowInfoDialog(true);
   };
@@ -301,9 +305,6 @@ export default function AdminArtikulacijskiTest() {
         onResume={handleResume}
         onStartOver={handleStartOver}
         wordName={getWordByIndex(resumeWordIndex)}
-        wordIndex={resumeWordIndex}
-        totalWords={totalWordsCount}
-        timeAgo="prejšnja seja"
       />
 
       {/* Exit Confirmation Dialog */}

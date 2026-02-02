@@ -278,9 +278,6 @@ const ArtikuacijskiTest = () => {
         onResume={handleResume}
         onStartOver={handleStartOver}
         wordName={getWordByIndex(resumeWordIndex)}
-        wordIndex={resumeWordIndex}
-        totalWords={totalWordsCount}
-        timeAgo={getTimeAgo(resumeTimestamp)}
       />
 
       {/* Exit Confirmation Dialog */}
