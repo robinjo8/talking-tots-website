@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 
 export type DifficultyLevel = "nizka" | "srednja" | "visoka";
+export type RecordingDuration = 3 | 4 | 5;
 
 interface ArticulationSettings {
   difficulty: DifficultyLevel;
+  recordingDuration: RecordingDuration;
 }
 
 interface ArticulationProgress {
@@ -18,13 +20,6 @@ const SETTINGS_KEY = "articulation_settings";
 const PROGRESS_KEY = "articulation_progress";
 const PROGRESS_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
-// Recording durations per difficulty
-const RECORDING_DURATIONS: Record<DifficultyLevel, number> = {
-  nizka: 5,
-  srednja: 4,
-  visoka: 3,
-};
-
 // Similarity thresholds per word length and difficulty
 const SIMILARITY_THRESHOLDS: Record<DifficultyLevel, Record<number, number>> = {
   nizka: { 3: 0.33, 4: 0.25, 5: 0.35, 6: 0.30 },
@@ -34,6 +29,7 @@ const SIMILARITY_THRESHOLDS: Record<DifficultyLevel, Record<number, number>> = {
 
 export const useArticulationSettings = () => {
   const [difficulty, setDifficultyState] = useState<DifficultyLevel>("srednja");
+  const [recordingDuration, setRecordingDurationState] = useState<RecordingDuration>(4);
 
   // Load settings from localStorage on mount
   useEffect(() => {
@@ -44,25 +40,42 @@ export const useArticulationSettings = () => {
         if (settings.difficulty && ["nizka", "srednja", "visoka"].includes(settings.difficulty)) {
           setDifficultyState(settings.difficulty);
         }
+        if (settings.recordingDuration && [3, 4, 5].includes(settings.recordingDuration)) {
+          setRecordingDurationState(settings.recordingDuration);
+        }
       }
     } catch (error) {
       console.error("Error loading articulation settings:", error);
     }
   }, []);
 
-  // Save difficulty to localStorage
-  const setDifficulty = useCallback((newDifficulty: DifficultyLevel) => {
-    setDifficultyState(newDifficulty);
+  // Helper to save settings
+  const saveSettings = useCallback((newDifficulty: DifficultyLevel, newDuration: RecordingDuration) => {
     try {
-      const settings: ArticulationSettings = { difficulty: newDifficulty };
+      const settings: ArticulationSettings = { difficulty: newDifficulty, recordingDuration: newDuration };
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
     } catch (error) {
       console.error("Error saving articulation settings:", error);
     }
   }, []);
 
-  // Get recording duration based on difficulty
-  const recordingDuration = RECORDING_DURATIONS[difficulty];
+  // Save difficulty to localStorage
+  const setDifficulty = useCallback((newDifficulty: DifficultyLevel) => {
+    setDifficultyState(newDifficulty);
+    setRecordingDurationState(prev => {
+      saveSettings(newDifficulty, prev);
+      return prev;
+    });
+  }, [saveSettings]);
+
+  // Save recording duration to localStorage
+  const setRecordingDuration = useCallback((newDuration: RecordingDuration) => {
+    setRecordingDurationState(newDuration);
+    setDifficultyState(prev => {
+      saveSettings(prev, newDuration);
+      return prev;
+    });
+  }, [saveSettings]);
 
   // Get similarity threshold for a specific word length
   const getThresholdForWordLength = useCallback(
@@ -150,6 +163,7 @@ export const useArticulationSettings = () => {
     difficulty,
     setDifficulty,
     recordingDuration,
+    setRecordingDuration,
     getThresholdForWordLength,
     saveProgress,
     loadProgress,
