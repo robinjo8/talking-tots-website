@@ -1,165 +1,147 @@
 
-# Načrt: Odstranitev sekcije starša in prikaz dokumentov za otroke logopeda
+# Načrt: Dodajanje RLS politik za storage pot logopedist-children
 
-## Povzetek problemov
+## Problem
 
-Na strani `/admin/children/:id/details` sta dva problema:
+Ko logoped ustvari otroka na strani `/admin/children`, se dokumenti (opis govornih težav in osnovni vprašalnik) ne naložijo v storage bucket `uporabniski-profili`.
 
-1. **Sekcija "PODATKI O STARŠU / SKRBNIKU"** - Ta sekcija je nepotrebna za otroke logopeda, ker jih logoped dodaja sam brez starša
-2. **Dokumenti se ne prikazujejo** - Ko logoped ustvari otroka (npr. "Tian") in vnese opis govornih težav ter osnovni vprašalnik, se ti podatki shranijo le v bazo podatkov, NE pa v storage (mapo Dokumenti)
-
----
-
-## 1. Odstranitev sekcije starša
-
-### Problem
-
-Komponenta `ReportTemplateEditor` je deljena med:
-- TomiTalk logopedi (imajo podatke o staršu - prikazati)
-- Logopedi zunanjih organizacij (nimajo starša - ne prikazati)
-
-### Rešitev
-
-Dodati prop `hideParentSection` v komponento `ReportTemplateEditor`:
-
-```typescript
-interface ReportTemplateEditorProps {
-  data: ReportData;
-  testSessions: TestSession[];
-  hideParentSection?: boolean;  // NOVO
-  onFieldChange: ...
-  onSessionChange: ...
+**Napaka v konzoli:**
+```json
+{
+  "statusCode": "403",
+  "error": "Unauthorized", 
+  "message": "new row violates row-level security policy"
 }
 ```
 
-V komponenti pogojno prikazati sekcijo:
+## Analiza vzroka
 
-```typescript
-{/* Parent/Guardian Data - samo če ni skrita */}
-{!hideParentSection && (
-  <div className="space-y-2">
-    <h2>PODATKI O STARŠU / SKRBNIKU</h2>
-    ...
-  </div>
-)}
+Pot za shranjevanje dokumentov otrok logopeda je:
+```
+logopedist-children/{logopedist_id}/{child_id}/Dokumenti/
 ```
 
-V `AdminLogopedistChildDetail.tsx` uporabiti:
-```typescript
-<ReportTemplateEditor
-  data={reportData}
-  testSessions={testSessions}
-  hideParentSection={true}  // Skrij sekcijo starša
-  onFieldChange={handleReportFieldChange}
-  onSessionChange={handleSessionChange}
-/>
+Obstoječe RLS politike za bucket `uporabniski-profili`:
+
+| Politika | Dovoljeno | Pot |
+|----------|-----------|-----|
+| Users can upload | Uporabniki | `{auth.uid()}/...` |
+| Logopedists can upload reports | Logopedi | `.../.../Porocila/...` |
+| Logopedists can upload generated | Logopedi | `.../.../Generirana-porocila/...` |
+
+**Manjka politika za pot `logopedist-children/`!**
+
+---
+
+## Rešitev
+
+Ustvariti nove RLS politike, ki bodo logopedom dovolile:
+1. **Nalaganje** datotek v svojo mapo `logopedist-children/{logopedist_id}/...`
+2. **Branje** datotek iz svoje mape
+3. **Posodabljanje** datotek v svoji mapi
+4. **Brisanje** datotek iz svoje mape
+
+### Varnostna logika
+
+Logoped lahko dostopa SAMO do datotek, kjer:
+- Pot se začne z `logopedist-children/`
+- Drugi del poti (`logopedist_id`) se ujema z ID-jem logopedovega profila
+
+```sql
+-- Preveri, da je uporabnik logoped in da je drugi del poti njegov ID
+bucket_id = 'uporabniski-profili'
+AND (storage.foldername(name))[1] = 'logopedist-children'
+AND (storage.foldername(name))[2] = (
+  SELECT id::text FROM logopedist_profiles 
+  WHERE user_id = auth.uid()
+)
 ```
 
 ---
 
-## 2. Prikaz dokumentov iz baze podatkov
+## Tehnične podrobnosti
 
-### Problem
+### Nova migracija SQL
 
-Ko logoped doda otroka preko čarovnika (`AdminAddChildWizard`), se podatki shranijo v bazo:
-- `speech_difficulties_description` → opis govornih težav
-- `speech_development` → odgovori na vprašalnik
+```sql
+-- 1. Logopedi lahko nalagajo v svojo mapo logopedist-children
+CREATE POLICY "Logopedists can upload to own logopedist-children folder"
+ON storage.objects
+FOR INSERT
+TO authenticated
+WITH CHECK (
+  bucket_id = 'uporabniski-profili'
+  AND public.is_logopedist(auth.uid())
+  AND (storage.foldername(name))[1] = 'logopedist-children'
+  AND (storage.foldername(name))[2] = (
+    SELECT id::text FROM public.logopedist_profiles 
+    WHERE user_id = auth.uid()
+  )
+);
 
-AMPAK dokumenti se NE naložijo v storage, zato `useLogopedistChildStorageFiles` ne najde ničesar.
+-- 2. Logopedi lahko berejo iz svoje mape logopedist-children
+CREATE POLICY "Logopedists can view own logopedist-children folder"
+ON storage.objects
+FOR SELECT
+TO authenticated
+USING (
+  bucket_id = 'uporabniski-profili'
+  AND public.is_logopedist(auth.uid())
+  AND (storage.foldername(name))[1] = 'logopedist-children'
+  AND (storage.foldername(name))[2] = (
+    SELECT id::text FROM public.logopedist_profiles 
+    WHERE user_id = auth.uid()
+  )
+);
 
-### Primerjava z uporabniškim portalom
+-- 3. Logopedi lahko posodabljajo v svoji mapi
+CREATE POLICY "Logopedists can update own logopedist-children folder"
+ON storage.objects
+FOR UPDATE
+TO authenticated
+USING (
+  bucket_id = 'uporabniski-profili'
+  AND public.is_logopedist(auth.uid())
+  AND (storage.foldername(name))[1] = 'logopedist-children'
+  AND (storage.foldername(name))[2] = (
+    SELECT id::text FROM public.logopedist_profiles 
+    WHERE user_id = auth.uid()
+  )
+);
 
-| Korak | Uporabniški portal (`AddChildForm.tsx`) | Admin portal (`AdminAddChildWizard.tsx`) |
-|-------|----------------------------------------|------------------------------------------|
-| 1. Shrani v bazo | ✅ Da | ✅ Da |
-| 2. Naloži v storage | ✅ Da - `opis-govornih-tezav.txt`, `osnovni-vprasalnik.txt` | ❌ Ne |
-
-### Rešitev A: Naložiti dokumente v storage ob ustvarjanju otroka (PRIPOROČENO)
-
-Posodobiti `AdminAddChildWizard.tsx` ali hook `useLogopedistChildren.ts`, da po uspešnem ustvarjanju otroka naloži dokumente v storage:
-
-```typescript
-// Po uspešnem createChild.mutateAsync(input):
-const newChild = await createChild.mutateAsync(input);
-
-// Pot za storage
-const basePath = `logopedist-children/${logopedistId}/${newChild.id}/Dokumenti`;
-
-// 1. Naloži opis govornih težav
-if (childData.speechDifficultiesDescription) {
-  const textBlob = new Blob([childData.speechDifficultiesDescription], { type: 'text/plain' });
-  await supabase.storage
-    .from('uporabniski-profili')
-    .upload(`${basePath}/opis-govornih-tezav-${Date.now()}.txt`, textBlob);
-}
-
-// 2. Naloži vprašalnik
-if (Object.keys(childData.speechDevelopment).length > 0) {
-  const questionnaireText = formatQuestionnaireAsText(childData.speechDevelopment, childData.name);
-  const questionnaireBlob = new Blob([questionnaireText], { type: 'text/plain' });
-  await supabase.storage
-    .from('uporabniski-profili')
-    .upload(`${basePath}/${newChild.id}-osnovni-vprasalnik.txt`, questionnaireBlob);
-}
+-- 4. Logopedi lahko brišejo iz svoje mape
+CREATE POLICY "Logopedists can delete own logopedist-children folder"
+ON storage.objects
+FOR DELETE
+TO authenticated
+USING (
+  bucket_id = 'uporabniski-profili'
+  AND public.is_logopedist(auth.uid())
+  AND (storage.foldername(name))[1] = 'logopedist-children'
+  AND (storage.foldername(name))[2] = (
+    SELECT id::text FROM public.logopedist_profiles 
+    WHERE user_id = auth.uid()
+  )
+);
 ```
-
-### Rešitev B: Prikazati podatke iz baze namesto storage (ALTERNATIVA)
-
-Če ne želimo podvajati podatkov v storage, lahko `AdminLogopedistChildDetail.tsx` prikaže podatke direktno iz baze:
-
-```typescript
-// Prikaz iz baze namesto storage
-{childData?.speech_difficulties_description && (
-  <div className="border rounded-lg p-3">
-    <span>📄 Opis govornih težav</span>
-    <pre className="text-sm whitespace-pre-wrap mt-2">
-      {childData.speech_difficulties_description}
-    </pre>
-  </div>
-)}
-
-{childData?.speech_development && (
-  <div className="border rounded-lg p-3">
-    <span>📄 Osnovni vprašalnik</span>
-    <pre className="text-sm whitespace-pre-wrap mt-2">
-      {formatQuestionnaireAsText(childData.speech_development)}
-    </pre>
-  </div>
-)}
-```
-
-**Priporočam Rešitev A**, ker je bolj konsistentna z obstoječim sistemom in omogoča enoten prikaz dokumentov.
 
 ---
 
-## Datoteke za posodobiti
+## Rezultat po implementaciji
+
+| Akcija | Pred | Po |
+|--------|------|-----|
+| Ustvarjanje otroka | Dokumenti se ne naložijo (403 error) | Dokumenti se uspešno naložijo |
+| Pregled dokumentov | Prazna lista | Prikazani dokumenti |
+| Brisanje dokumentov | Ni mogoče | Deluje |
+
+---
+
+## Povzetek sprememb
 
 | Datoteka | Sprememba |
 |----------|-----------|
-| `src/components/admin/ReportTemplateEditor.tsx` | Dodaj prop `hideParentSection` za pogojno skrivanje sekcije starša |
-| `src/utils/generateReportPdf.ts` | Posodobi PDF generiranje za pogojno vključitev sekcije starša |
-| `src/pages/admin/AdminLogopedistChildDetail.tsx` | Uporabi `hideParentSection={true}` |
-| `src/components/admin/children/AdminAddChildWizard.tsx` | Dodaj nalaganje dokumentov v storage po ustvarjanju otroka |
+| `supabase/migrations/XXXXXXXX_logopedist_children_storage_policies.sql` | Nova migracija z RLS politikami za pot `logopedist-children/` |
 
----
-
-## Rezultat
-
-### Pred spremembo:
-```text
-PODATKI O STARŠU / SKRBNIKU
-Ime in priimek: Ni podatka
-E-poštni naslov: Ni podatka
-
-DOKUMENTI
-Ni naloženih dokumentov
-```
-
-### Po spremembi:
-```text
-(Sekcija starša je skrita)
-
-DOKUMENTI
-📄 opis-govornih-tezav-1738501234567.txt  [👁️] [⬇️]
-📄 aac44986-1077-4c55-9804-2aa9a3682dd2-osnovni-vprasalnik.txt  [👁️] [⬇️]
-```
+### Časovni okvir
+- Enostavna sprememba - samo ena nova SQL migracija
