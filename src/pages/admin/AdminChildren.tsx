@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { useLogopedistChildren, LogopedistChild } from '@/hooks/useLogopedistChildren';
 import { useLogopedistLicense } from '@/hooks/useLogopedistLicense';
-import { AddChildModal } from '@/components/admin/children/AddChildModal';
+import { AdminAddChildWizard } from '@/components/admin/children/AdminAddChildWizard';
 import { EditChildModal } from '@/components/admin/children/EditChildModal';
 import { DeleteChildDialog } from '@/components/admin/children/DeleteChildDialog';
 import { cn } from '@/lib/utils';
@@ -230,7 +230,7 @@ export default function AdminChildren() {
       )}
 
       {/* Modali */}
-      <AddChildModal 
+      <AdminAddChildWizard 
         open={showAddModal} 
         onOpenChange={setShowAddModal} 
       />
