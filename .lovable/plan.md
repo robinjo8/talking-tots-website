@@ -1,191 +1,267 @@
 
-# Načrt: Prikaz avatarja, prevod govornih težav in izboljšano urejanje otroka
+# Načrt: Podrobnosti otroka in integracija z artikulacijskim testom za zunanje organizacije
 
-## Povzetek problema
+## Povzetek zahteve
 
-Na strani `/admin/children` so trije problemi:
+Logopedi iz zunanjih organizacij (npr. "OŠ Test") morajo imeti enako funkcionalnost kot interni TomiTalk logopedi:
 
-1. **Avatar se ne prikazuje** - Namesto shranjene slike avatarja (`child.avatar_url`) se prikaže privzeti emoji
-2. **Govorne težave so v angleščini** - Prikazuje se `articulation` namesto slovenskega prevoda "Motnja izreke / artikulacije"
-3. **Urejanje ni enako kot na uporabniški strani** - Admin modal je preprost, uporabniška stran pa ima polno formo z avatarjem, datumom rojstva in spol selektorjem
+1. **Gumb "Podrobnosti"** na kartici otroka v `/admin/children` - odpre enako stran kot `/admin/users/:userId/:childId`
+2. **Artikulacijski testi** otrok logopeda morajo:
+   - Ustvariti sejo v "V čakanju" za vse logopede iste organizacije
+   - Biti prevzeti in pregledani s strani logopedov organizacije
+   - Podatki morajo biti popolnoma izolirani med organizacijami
 
----
+## Ključni tehnični izzivi
 
-## 1. Prikaz avatarja na kartici otroka
+### Problem 1: Struktura tabele `articulation_test_sessions`
 
-### Trenutno stanje (vrstice 151-158):
-```typescript
-<div className={cn(
-  "h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0",
-  child.gender === 'male' ? 'bg-app-blue/10' : 'bg-app-pink/10'
-)}>
-  <span className="text-xl">
-    {child.gender === 'male' ? '🧒' : '👧'}
-  </span>
-</div>
-```
+Trenutna struktura:
+- `child_id` - referenca na tabelo `children` (otroci staršev)
+- `parent_id` - referenca na starša
 
-### Rešitev:
-Preveriti, če ima otrok `avatar_url` - če ga ima, prikazati sliko avatarja, sicer prikazati privzeti emoji.
+Za otroke logopedov potrebujemo:
+- `logopedist_child_id` - referenca na tabelo `logopedist_children`
+- `organization_id` - za filtriranje po organizaciji
 
-```typescript
-<div className={cn(
-  "h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden",
-  child.gender === 'male' ? 'bg-app-blue/10' : 'bg-app-pink/10'
-)}>
-  {child.avatar_url ? (
-    <img 
-      src={child.avatar_url} 
-      alt={child.name} 
-      className="h-full w-full object-contain"
-    />
-  ) : (
-    <span className="text-xl">
-      {child.gender === 'male' ? '🧒' : '👧'}
-    </span>
-  )}
-</div>
-```
+### Problem 2: Izolacija podatkov po organizacijah
+
+Trenutno "V čakanju" prikazuje VSE pending seje. Potrebna je sprememba za:
+- TomiTalk (internal) logopedi vidijo seje iz tabele `children` (starši)
+- Zunanje organizacije (OŠ Test itd.) vidijo SAMO seje svojih otrok
 
 ---
 
-## 2. Prevod govornih težav v slovenščino
+## Arhitekturna rešitev
 
-### Trenutno stanje (vrstica 167):
-```typescript
-<span>Težave: {child.speech_difficulties.join(', ')}</span>
-```
-Prikazuje: `Težave: articulation, stuttering`
+### Opcija A: Razširitev obstoječe tabele (PRIPOROČENO)
 
-### Rešitev:
-Uporabiti model `SPEECH_DIFFICULTIES` za prevod ID-jev v slovenske naslove.
+Razširimo tabelo `articulation_test_sessions` z dodatnimi stolpci:
 
-```typescript
-import { SPEECH_DIFFICULTIES } from "@/models/SpeechDifficulties";
-
-// Helper funkcija za prevod
-const getSpeechDifficultyLabel = (difficultyId: string): string => {
-  const difficulty = SPEECH_DIFFICULTIES.find(d => d.id === difficultyId);
-  if (difficulty) {
-    // Vzemi samo prvo besedo naslova za krajši prikaz
-    return difficulty.title.split('–')[0].trim();
-  }
-  return difficultyId; // Fallback na ID če ni najden
-};
-
-// Uporaba
-<span>Govorne težave: {child.speech_difficulties.map(getSpeechDifficultyLabel).join(', ')}</span>
+```sql
+ALTER TABLE articulation_test_sessions 
+ADD COLUMN logopedist_child_id UUID REFERENCES logopedist_children(id),
+ADD COLUMN organization_id UUID REFERENCES organizations(id),
+ADD COLUMN source_type TEXT DEFAULT 'parent' CHECK (source_type IN ('parent', 'logopedist'));
 ```
 
-Prikazuje: `Govorne težave: Motnja izreke / artikulacije, Motnja ritma in tempa govora`
+**Prednosti:**
+- Ohrani obstoječo logiko
+- Minimalne spremembe v obstoječih hooki in komponentah
+- Enostavno filtriranje po organizaciji
 
 ---
 
-## 3. Izboljšano urejanje otroka (enako kot uporabniška stran)
+## Koraki implementacije
 
-### Trenutno stanje:
-Admin `EditChildModal` ima le:
-- Ime
-- Starost (število)
-- Spol (radio gumbi)
-- Govorne težave (checkboxi za črke: Š, Ž, Č...)
-- Zapiski
-- Zunanji ID
+### 1. Shema baze podatkov
 
-### Uporabniška stran ima:
-- Ime
-- Datum rojstva (s koledarjem)
-- Spol (z `GenderSelector`)
-- Izbira avatarja (z `AvatarSelector`)
+Razširitev tabele `articulation_test_sessions`:
 
-### Rešitev:
-Posodobiti `EditChildModal` da uporablja enake komponente kot uporabniška stran:
+```text
+articulation_test_sessions
+├── id (obstoječe)
+├── child_id (obstoječe, NULL za otroke logopedov)
+├── parent_id (obstoječe, NULL za otroke logopedov)
+├── logopedist_child_id (NOVO, NULL za otroke staršev)
+├── organization_id (NOVO, vedno izpolnjeno)
+├── source_type (NOVO: 'parent' | 'logopedist')
+├── status, assigned_to, ...
+```
 
-| Polje | Trenutno | Po spremembi |
-|-------|----------|--------------|
-| Ime | Input | Input (brez spremembe) |
-| Datum rojstva | ❌ | Koledar s `Calendar` komponento |
-| Starost | Input (število) | Samodejno izračunano iz datuma rojstva |
-| Spol | RadioGroup | `GenderSelector` komponenta |
-| Avatar | ❌ | `AvatarSelector` z variant="dropdown" |
-| Govorne težave | Checkboxi za črke | Brez spremembe |
-| Zapiski | Textarea | Brez spremembe |
-| Zunanji ID | Input | Brez spremembe |
+### 2. RLS politike
 
----
+Posodobitev RLS politik za filtriranje po organizaciji:
 
-## Datoteke za posodobiti
+```sql
+-- Logopedisti vidijo samo seje svoje organizacije
+CREATE POLICY "logopedists_see_own_org_sessions" ON articulation_test_sessions
+FOR SELECT USING (
+  EXISTS (
+    SELECT 1 FROM logopedist_profiles lp
+    WHERE lp.user_id = auth.uid()
+    AND lp.organization_id = articulation_test_sessions.organization_id
+  )
+);
+
+-- Logopedisti lahko prevzamejo seje svoje organizacije
+CREATE POLICY "logopedists_claim_own_org_pending" ON articulation_test_sessions
+FOR UPDATE USING (
+  status = 'pending' 
+  AND assigned_to IS NULL
+  AND EXISTS (
+    SELECT 1 FROM logopedist_profiles lp
+    WHERE lp.user_id = auth.uid()
+    AND lp.organization_id = articulation_test_sessions.organization_id
+  )
+);
+```
+
+### 3. Nove datoteke
+
+| Datoteka | Opis |
+|----------|------|
+| `src/pages/admin/AdminLogopedistChildDetail.tsx` | Stran za podrobnosti otroka logopeda (podobna AdminUserDetail) |
+| `src/hooks/useLogopedistChildStorageFiles.ts` | Hook za pridobivanje dokumentov in posnetkov otroka logopeda |
+| `src/hooks/useLogopedistChildPendingTests.ts` | Hook za pending teste po organizaciji |
+
+### 4. Posodobitve obstoječih datotek
 
 | Datoteka | Sprememba |
 |----------|-----------|
-| `src/pages/admin/AdminChildren.tsx` | 1) Prikaz avatarja namesto emojija, 2) Prevod govornih težav v SLO |
-| `src/components/admin/children/EditChildModal.tsx` | Dodaj AvatarSelector, GenderSelector, datum rojstva |
-| `src/hooks/useLogopedistChildren.ts` | Posodobi `UpdateChildInput` da podpira `avatar_url` in `birth_date` |
+| `src/pages/admin/AdminChildren.tsx` | Dodaj gumb "Podrobnosti" |
+| `src/hooks/usePendingTests.ts` | Filtriranje po organizaciji in source_type |
+| `src/hooks/useArticulationTestNew.ts` | Podpora za logopedist_child_id in organization_id |
+| `src/config/routes.tsx` | Nova ruta `/admin/children/:childId/details` |
 
 ---
 
-## Tehnične podrobnosti
+## Podrobnosti implementacije
 
-### AdminChildren.tsx
-- Dodaj import za `SPEECH_DIFFICULTIES`
-- Dodaj helper funkcijo `getSpeechDifficultyLabel`
-- Spremeni prikaz avatarja na kartici (pogojni prikaz slike ali emojija)
-- Spremeni prikaz govornih težav (uporabi prevod)
+### AdminChildren.tsx - Gumb "Podrobnosti"
 
-### EditChildModal.tsx
-- Dodaj importe: `AvatarSelector`, `GenderSelector`, `Calendar`, `Popover`
-- Dodaj state za `birthDate` in `avatarId`
-- Zamenjaj RadioGroup za spol z `GenderSelector`
-- Dodaj `AvatarSelector` z variant="dropdown"
-- Dodaj koledar za datum rojstva
-- Odstrani input za starost (se izračuna iz datuma rojstva)
-- Posodobi `handleSubmit` za shranjevanje novih polj
+```typescript
+// Dodaj gumb levo od "Napredek"
+<Button
+  variant="outline"
+  size="sm"
+  onClick={() => navigate(`/admin/children/${child.id}/details`)}
+>
+  <FileText className="h-4 w-4 mr-1" />
+  <span className="hidden sm:inline">Podrobnosti</span>
+</Button>
+```
 
-### useLogopedistChildren.ts (UpdateChildInput)
-Preveri, da vmesnik že podpira:
-- `avatar_url`
-- `birth_date`
+### AdminLogopedistChildDetail.tsx
+
+Nova stran z dvema stolpcema (enako kot AdminUserDetail):
+
+**Levi stolpec:**
+- Dokumenti otroka (iz storage)
+- Preverjanje izgovorjave (posnetki po sejah)
+
+**Desni stolpec:**
+- Poročila (generator PDF, obstoječa poročila)
+
+### usePendingTests.ts - Filtriranje po organizaciji
+
+```typescript
+// Obstoječa logika za 'internal' organizacije
+if (profile?.organization_type === 'internal') {
+  // Prikaži seje iz 'children' tabele (starši)
+  query = query.eq('source_type', 'parent');
+} else {
+  // Prikaži samo seje iz logopedist_children za svojo organizacijo
+  query = query
+    .eq('source_type', 'logopedist')
+    .eq('organization_id', profile.organization_id);
+}
+```
+
+### Shranjevanje posnetkov za otroke logopeda
+
+Obstoječa pot: `{parent_id}/{child_id}/Preverjanje-izgovorjave/Seja-X/`
+
+Nova pot za otroke logopeda: `logopedist-children/{logopedist_id}/{child_id}/Preverjanje-izgovorjave/Seja-X/`
 
 ---
 
-## Vizualni rezultat
+## Vizualni tok
 
-### Kartica otroka (po spremembi):
+### Kartica otroka (posodobljena)
+
 ```text
 ┌─────────────────────────────────────────────────────────────────────┐
-│  [🐲 Avatar]  Žan Novak                              [Napredek] [▶] │
+│  [🐲 Avatar]  Otrok Ena                                             │
 │               Starost: 5 let • Govorne težave: Motnja izreke       │
-│               ID: PAC-2024-042                        [✏️] [🗑️]    │
+│                                                                     │
+│  [📋 Podrobnosti]  [📊 Napredek]  [▶ Začni delo]  [✏️] [🗑️]         │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### Modal za urejanje (po spremembi):
+### Stran podrobnosti (`/admin/children/:id/details`)
+
 ```text
-┌─────────────────────────────────────────────────────────────────────┐
-│  Uredi otroka                                                       │
-│  ─────────────────────────────────────────────────────────────────  │
-│                                                                     │
-│  Ime otroka *                                                       │
-│  [Žan Novak                                      ]                  │
-│                                                                     │
-│  Datum rojstva *                                                    │
-│  [📅 15.03.2019                                  ]                  │
-│                                                                     │
-│  Spol                                                               │
-│  [🧑 Deček] [👧 Deklica]                                            │
-│                                                                     │
-│  Izberi avatarja                                                    │
-│  [🐲 Izbrani avatar                              ▼]                 │
-│                                                                     │
-│  Govorni izzivi (opcijsko)                                          │
-│  [Š] [Ž] [Č] [C] [S] [Z] [R] [L] ...                               │
-│                                                                     │
-│  Zapiski (opcijsko)                                                 │
-│  [                                               ]                  │
-│                                                                     │
-│  Zunanji ID (opcijsko)                                              │
-│  [PAC-2024-042                                   ]                  │
-│                                                                     │
-│                            [Prekliči]  [Shrani spremembe]           │
-└─────────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────┐
+│ ← Nazaj                                                                    │
+│                                                                            │
+│ Podrobnosti otroka                                                         │
+│ Otrok: Otrok Ena • 5 let • Logoped: Janez Novak                           │
+├──────────────────────────────────┬─────────────────────────────────────────┤
+│ 📄 Dokumenti                     │ 📋 Poročila                              │
+│ Naloženi dokumenti               │ Poročilo za otroka Otrok Ena            │
+│                                  │                                         │
+│ ┌──────────────────────────────┐ │ ┌─────────────────────────────────────┐ │
+│ │ 📄 opis-tezav.pdf    👁️ ⬇️  │ │ │ TOMITALK LOGOPEDSKO POROČILO        │ │
+│ │ 📄 vprašalnik.txt    👁️ ⬇️  │ │ │                                     │ │
+│ └──────────────────────────────┘ │ │ Datum preverjanja: [Izberite]       │ │
+│                                  │ │ Datum poročila: 2. 2. 2026          │ │
+│ 🎙️ Preverjanje izgovorjave      │ │                                     │ │
+│ Posnetki artikulacijskega testa │ │ ANAMNEZA:                           │ │
+│                                  │ │ [___________________________]       │ │
+│ ▶ Seja-1 (3 posnetkov)          │ │                                     │ │
+│ ▶ Seja-2 (60 posnetkov)         │ │ [💾 Shrani]  [📄 Generiraj PDF]     │ │
+│                                  │ └─────────────────────────────────────┘ │
+│ ✨ Generirana poročila           │                                         │
+│ ┌──────────────────────────────┐ │                                         │
+│ │ 📄 porocilo.pdf   ✏️ 👁️ ⬇️🗑│ │                                         │
+│ └──────────────────────────────┘ │                                         │
+└──────────────────────────────────┴─────────────────────────────────────────┘
 ```
+
+---
+
+## Tok podatkov - artikulacijski test
+
+```text
+1. Logoped začne test za otroka "Otrok Ena"
+                    ↓
+2. Test se izvede v /admin/children/:id/test
+                    ↓
+3. Ob zaključku se ustvari seja v articulation_test_sessions:
+   - logopedist_child_id: "ad1d4d05-..."
+   - organization_id: "4bd0b8b8-..." (OŠ Test)
+   - source_type: "logopedist"
+   - status: "pending"
+                    ↓
+4. Seja se pojavi v "V čakanju" za VSE logopede organizacije OŠ Test
+                    ↓
+5. Logoped (Janez ali drug iz OŠ Test) prevzame sejo
+                    ↓
+6. Seja se premakne v "Moji pregledi" za tega logopeda
+                    ↓
+7. Logoped oceni izgovorjavo in generira poročilo
+```
+
+---
+
+## Varnostna izolacija podatkov
+
+| Scenarij | Rezultat |
+|----------|----------|
+| Logoped iz OŠ Test odpre "V čakanju" | Vidi SAMO pending seje otrok iz OŠ Test |
+| Logoped iz TomiTalk odpre "V čakanju" | Vidi SAMO pending seje iz uporabniških profilov (starši) |
+| Logoped iz OŠ Test poskusi dostopati do otroka TomiTalk | RLS blokira dostop |
+| Logoped iz OŠ Test poskusi dostopati do otroka druge šole | RLS blokira dostop |
+
+---
+
+## Prioriteta implementacije
+
+1. **Faza 1 - Baza podatkov**
+   - Dodaj stolpce v `articulation_test_sessions`
+   - Ustvari RLS politike za izolacijo organizacij
+   - Migriraj obstoječe podatke (nastavi organization_id za TomiTalk)
+
+2. **Faza 2 - Stran podrobnosti**
+   - Ustvari `AdminLogopedistChildDetail.tsx`
+   - Dodaj gumb "Podrobnosti" v `AdminChildren.tsx`
+   - Dodaj ruto v `routes.tsx`
+
+3. **Faza 3 - Integracija artikulacijskega testa**
+   - Posodobi `useArticulationTestNew.ts` za shranjevanje v novo strukturo
+   - Posodobi `transcribe-articulation` edge funkcijo za novo pot storage
+
+4. **Faza 4 - Pending testi**
+   - Posodobi `usePendingTests.ts` za filtriranje po organizaciji
+   - Posodobi `AdminPending.tsx` za prikaz otrok logopedov
+   - Posodobi `useClaimTestSession.ts` za podporo novih stolpcev
