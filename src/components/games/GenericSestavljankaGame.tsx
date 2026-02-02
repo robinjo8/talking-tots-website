@@ -22,6 +22,7 @@ const BACKGROUND_URL = `${SUPABASE_URL}/storage/v1/object/public/ozadja/zeleno_o
 
 interface GenericSestavljankaGameProps {
   config: SestavljankeGameConfig;
+  backPath?: string;
 }
 
 // Helper to get random image from array
@@ -44,7 +45,7 @@ const enrichImageWithAudio = (image: PuzzleImage): GameImage => {
   };
 };
 
-export function GenericSestavljankaGame({ config }: GenericSestavljankaGameProps) {
+export function GenericSestavljankaGame({ config, backPath = '/govorne-igre/sestavljanke' }: GenericSestavljankaGameProps) {
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -226,7 +227,7 @@ export function GenericSestavljankaGame({ config }: GenericSestavljankaGameProps
         <MemoryExitConfirmationDialog 
           open={showExitDialog} 
           onOpenChange={setShowExitDialog} 
-          onConfirm={() => navigate("/govorne-igre/sestavljanke")}
+          onConfirm={() => navigate(backPath)}
         >
           <div />
         </MemoryExitConfirmationDialog>
@@ -276,7 +277,7 @@ export function GenericSestavljankaGame({ config }: GenericSestavljankaGameProps
         <MemoryExitConfirmationDialog 
           open={showExitDialog} 
           onOpenChange={setShowExitDialog} 
-          onConfirm={() => navigate("/govorne-igre/sestavljanke")}
+          onConfirm={() => navigate(backPath)}
         >
           <div />
         </MemoryExitConfirmationDialog>

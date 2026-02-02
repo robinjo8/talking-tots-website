@@ -20,6 +20,7 @@ const backgroundImageUrl = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/
 
 interface GenericLabirintGameProps {
   config: LabirintConfig;
+  backPath?: string;
 }
 
 // Extend PuzzleImage with audio for the game
@@ -45,7 +46,7 @@ const getRandomImages = (images: PuzzleImage[], count: number): GameImage[] => {
   return shuffled.slice(0, count).map(enrichImageWithAudio);
 };
 
-export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
+export function GenericLabirintGame({ config, backPath = '/govorne-igre/labirint' }: GenericLabirintGameProps) {
   const navigate = useNavigate();
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -164,7 +165,7 @@ export function GenericLabirintGame({ config }: GenericLabirintGameProps) {
 
   const handleConfirmExit = () => {
     setShowExitConfirmation(false);
-    navigate("/govorne-igre/labirint");
+    navigate(backPath);
   };
 
   const handleNewGame = () => {

@@ -34,6 +34,15 @@ const AdminPonoviPovedGames = lazy(() => import('@/pages/admin/games/AdminPonovi
 
 // Admin game routers
 const AdminSpominRouter = lazy(() => import('@/components/routing/admin/AdminSpominRouter'));
+const AdminKoloSreceRouter = lazy(() => import('@/components/routing/admin/AdminKoloSreceRouter'));
+const AdminBingoRouter = lazy(() => import('@/components/routing/admin/AdminBingoRouter'));
+const AdminLabirintRouter = lazy(() => import('@/components/routing/admin/AdminLabirintRouter'));
+const AdminZaporedjaRouter = lazy(() => import('@/components/routing/admin/AdminZaporedjaRouter'));
+const AdminSestavljankeRouter = lazy(() => import('@/components/routing/admin/AdminSestavljankeRouter'));
+const AdminDrsnaSestavljankaRouter = lazy(() => import('@/components/routing/admin/AdminDrsnaSestavljankaRouter'));
+const AdminIgraUjemanjaRouter = lazy(() => import('@/components/routing/admin/AdminIgraUjemanjaRouter'));
+const AdminMetKockeRouter = lazy(() => import('@/components/routing/admin/AdminMetKockeRouter'));
+const AdminPonoviPovedRouter = lazy(() => import('@/components/routing/admin/AdminPonoviPovedRouter'));
 
 // Loading fallback for admin pages
 function AdminLoadingFallback() {
@@ -209,10 +218,26 @@ export function AdminRoutes() {
           } 
         />
         <Route 
+          path="children/:childId/games/bingo/:letter" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminBingoRouter />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
           path="children/:childId/games/kolo-srece" 
           element={
             <AdminLayoutWrapper>
               <AdminKoloSreceGames />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="children/:childId/games/kolo-srece/:letter" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminKoloSreceRouter />
             </AdminLayoutWrapper>
           } 
         />
@@ -225,10 +250,26 @@ export function AdminRoutes() {
           } 
         />
         <Route 
+          path="children/:childId/games/labirint/:letter" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminLabirintRouter />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
           path="children/:childId/games/zaporedja" 
           element={
             <AdminLayoutWrapper>
               <AdminZaporedjaGames />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="children/:childId/games/zaporedja/:letterAndAge" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminZaporedjaRouter />
             </AdminLayoutWrapper>
           } 
         />
@@ -241,10 +282,26 @@ export function AdminRoutes() {
           } 
         />
         <Route 
+          path="children/:childId/games/sestavljanke/:letterAndAge" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminSestavljankeRouter />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
           path="children/:childId/games/drsna-sestavljanka" 
           element={
             <AdminLayoutWrapper>
               <AdminDrsnaSestavljankaGames />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="children/:childId/games/drsna-sestavljanka/:letterAndAge" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminDrsnaSestavljankaRouter />
             </AdminLayoutWrapper>
           } 
         />
@@ -257,6 +314,14 @@ export function AdminRoutes() {
           } 
         />
         <Route 
+          path="children/:childId/games/igra-ujemanja/:letterAndAge" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminIgraUjemanjaRouter />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
           path="children/:childId/games/met-kocke" 
           element={
             <AdminLayoutWrapper>
@@ -265,10 +330,26 @@ export function AdminRoutes() {
           } 
         />
         <Route 
+          path="children/:childId/games/met-kocke/:letter" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminMetKockeRouter />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
           path="children/:childId/games/ponovi-poved" 
           element={
             <AdminLayoutWrapper>
               <AdminPonoviPovedGames />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="children/:childId/games/ponovi-poved/:letter" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminPonoviPovedRouter />
             </AdminLayoutWrapper>
           } 
         />

@@ -19,11 +19,12 @@ import { digraphToLetter } from "@/data/igraUjemanjaConfig";
 
 interface GenericIgraUjemanjaGameProps {
   config: IgraUjemanjaGameConfig;
+  backPath?: string;
 }
 
 const SUPABASE_STORAGE_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike";
 
-export function GenericIgraUjemanjaGame({ config }: GenericIgraUjemanjaGameProps) {
+export function GenericIgraUjemanjaGame({ config, backPath = '/govorne-igre/igra-ujemanja' }: GenericIgraUjemanjaGameProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { recordGameCompletion } = useEnhancedProgress();
@@ -184,7 +185,7 @@ export function GenericIgraUjemanjaGame({ config }: GenericIgraUjemanjaGameProps
   };
 
   const handleConfirmExit = () => {
-    navigate('/govorne-igre/igra-ujemanja');
+    navigate(backPath);
   };
 
   const handleStarClaimed = async () => {

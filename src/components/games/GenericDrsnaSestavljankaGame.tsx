@@ -18,9 +18,10 @@ import type { DrsnaSestavljankaGameConfig } from "@/data/drsnaSestavljankaConfig
 
 interface GenericDrsnaSestavljankaGameProps {
   config: DrsnaSestavljankaGameConfig;
+  backPath?: string;
 }
 
-export function GenericDrsnaSestavljankaGame({ config }: GenericDrsnaSestavljankaGameProps) {
+export function GenericDrsnaSestavljankaGame({ config, backPath = '/govorne-igre/drsna-sestavljanka' }: GenericDrsnaSestavljankaGameProps) {
   const navigate = useNavigate();
   const { recordGameCompletion } = useEnhancedProgress();
   const { checkForNewTrophy } = useTrophyContext();
@@ -183,7 +184,7 @@ export function GenericDrsnaSestavljankaGame({ config }: GenericDrsnaSestavljank
       <MemoryExitConfirmationDialog 
         open={showExitDialog} 
         onOpenChange={setShowExitDialog} 
-        onConfirm={() => navigate("/govorne-igre/drsna-sestavljanka")}
+        onConfirm={() => navigate(backPath)}
       >
         <div />
       </MemoryExitConfirmationDialog>
