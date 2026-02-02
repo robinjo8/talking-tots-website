@@ -1,103 +1,100 @@
 
 
-# Načrt: Popravek predvajanja zvoka v igrah
+# Načrt: Popravek nadaljevanja seje in gumba "Nazaj" v admin preverjanju izgovorjave
 
-## Problem
+## Identificirana problema
 
-Gumb zvočnika v dialogih iger ne predvaja besed. Napaka v konzoli:
-```
-NotSupportedError: Failed to load because no supported source was found.
-Audio URL that failed: .../zvocni-posnetki/cekin1.m4a
-```
+### Problem 1: Gumb "Nazaj" ne deluje v pop-up oknu
 
-## Vzrok napake
+V komponenti `ArticulationTestInfoDialog.tsx` gumb "Nazaj" uporablja:
 
-Slike v bucketu `slike` imajo v imenih datoteke sufiks "1" (npr. `cekin1.webp`, `cisterna1.webp`), medtem ko zvočne datoteke v bucketu `zvocni-posnetki` tega sufiksa nimajo (npr. `cekin.m4a`, `cisterna.m4a`).
-
-Funkcija `enrichImageWithAudio` v nekaterih igrah generira napačen URL za zvok:
 ```typescript
-// NAPAČNO - generira "cekin1.m4a"
-const baseName = image.filename.replace('.webp', '').replace('.png', '');
-audio: `${baseName}.m4a`
-
-// PRAVILNO - generira "cekin.m4a"
-baseName = baseName.replace(/1$/, '');  // Odstrani zaključno "1"
-audio: `${baseName}.m4a`
+const handleBack = () => {
+  navigate(-1);
+};
 ```
 
-## Prizadete komponente
+Ta pristop ima težavo: ko je dialog odprt, `navigate(-1)` ne deluje pravilno, ker dialog blokira dogodke in stran se ne spremeni. Dialog potrebuje callback prop `onBack`, ki ga starševska komponenta lahko uporabi za pravilno navigacijo.
 
-| Datoteka | Status | Opis |
-|----------|--------|------|
-| `GenericSestavljankaGame.tsx` | Napaka | `enrichImageWithAudio` ne odstranjuje sufiksa "1" |
-| `GenericLabirintGame.tsx` | OK | Pravilno odstranjuje sufiks "1" |
-| `PuzzleSuccessDialog.tsx` | Delno | Uporablja `image.audio` ali normalizira besedo - lahko manjka "1" odstranitev |
-| `MatchingCompletionDialog.tsx` | Delno | Fallback normalizacija besede je pravilna, vendar ne pokriva vseh primerov |
-| `StarCollectDialog.tsx` | Delno | Uporablja `image.audio` ali normalizira besedo |
+### Problem 2: Nadaljevanje seje ne deluje
+
+Sistem shranjevanja napredka že obstaja v `useArticulationSettings`, vendar ima logika za admin stran pomanjkljivost:
+
+- `loadProgress` preverja `childId`, vendar v admin kontekstu se ključ v localStorage shranjuje generično brez ločevanja med admin in user portalom
+- Če se napredek shranjuje v localStorage z istim ključem za vse otroke, se lahko zgodi konflikt
+
+---
 
 ## Rešitev
 
-### 1. Popravek GenericSestavljankaGame.tsx
+### 1. Popravek gumba "Nazaj" v ArticulationTestInfoDialog
 
-Posodobiti funkcijo `enrichImageWithAudio`, da odstrani zaključno "1":
+Dodati prop `onBack` v komponento, ki se kliče ob kliku na gumb "Nazaj":
+
+**Datoteka:** `src/components/articulation/ArticulationTestInfoDialog.tsx`
 
 ```typescript
-const enrichImageWithAudio = (image: PuzzleImage): GameImage => {
-  let baseName = image.filename.replace('.webp', '').replace('.png', '');
-  // Odstrani zaključno "1" (npr. "cekin1" → "cekin")
-  baseName = baseName.replace(/1$/, '');
-  return {
-    ...image,
-    audio: `${baseName}.m4a`
-  };
+// PRED
+interface ArticulationTestInfoDialogProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+const handleBack = () => {
+  navigate(-1);  // Ne deluje, ker je dialog odprt
 };
-```
 
-### 2. Popravek PuzzleSuccessDialog.tsx
+// PO
+interface ArticulationTestInfoDialogProps {
+  open: boolean;
+  onClose: () => void;
+  onBack?: () => void;  // Opcijski callback za navigacijo nazaj
+}
 
-Posodobiti funkcijo `handlePlayAudio`, da pravilno normalizira besedo in odstrani morebitno "1":
-
-```typescript
-const handlePlayAudio = (image: ImageData) => {
-  let normalizedWord = image.word
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
-  const audioFilename = image.audio || `${normalizedWord}.m4a`;
-  // Preverimo, da audio ne vsebuje "1" na koncu
-  const cleanAudioFilename = audioFilename.replace(/1\.m4a$/, '.m4a');
-  const audioUrl = `.../${cleanAudioFilename}`;
-  playAudio(audioUrl);
-};
-```
-
-### 3. Popravek MatchingCompletionDialog.tsx
-
-Posodobiti `handlePlayAudio` funkcijo z enako logiko čiščenja:
-
-```typescript
-const handlePlayAudio = (image: MatchingGameImage) => {
-  let audioUrl: string;
-  
-  if (image.audio_url) {
-    audioUrl = image.audio_url;
+const handleBack = () => {
+  if (onBack) {
+    onBack();
   } else {
-    const normalizedWord = image.word
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '');
-    // Odstrani potencialni "1" na koncu
-    const cleanWord = normalizedWord.replace(/1$/, '');
-    audioUrl = `.../${cleanWord}.m4a`;
+    navigate(-1);  // Fallback za obstoječo uporabo
   }
-  
-  playAudio(audioUrl);
 };
 ```
 
-### 4. Popravek StarCollectDialog.tsx in WheelSuccessDialog.tsx
+**Datoteka:** `src/pages/admin/AdminArtikulacijskiTest.tsx`
 
-Enaka logika čiščenja za generiranje zvočnega URL-ja.
+Posredovati `onBack` prop v dialog:
+
+```typescript
+<ArticulationTestInfoDialog
+  open={showInfoDialog}
+  onClose={async () => {
+    await initializeSession();
+    setShowInfoDialog(false);
+  }}
+  onBack={() => navigate(`/admin/children/${childId}/workspace`)}
+/>
+```
+
+### 2. Potrditev delovanja shranjevanja napredka
+
+Pregledam trenutno logiko v `AdminArtikulacijskiTest.tsx`:
+
+```typescript
+// Na vrstici 178:
+} = useArticulationTestNew(childId, undefined, fixedSessionNumber, startIndex, difficulty, saveProgress, profile?.id);
+```
+
+Hook prejme `saveProgress` in ga kliče v `handleNext()`. Težava je, da `loadProgress` v `useArticulationSettings` primerja `childId`, kar bi moralo delovati pravilno.
+
+**Datoteka:** `src/hooks/useArticulationSettings.ts`
+
+Ključ v localStorage (`articulation_progress`) shrani tudi `childId`, kar pomeni, da:
+- Vsak otrok ima svoj shranjen napredek
+- Napredek se pravilno naloži ob vračanju na stran
+
+**Preverjanje:** Napredek se shranjuje ob vsakem `handleNext()` klicu (vrstica 221 v hooku). To bi moralo delovati.
+
+**Morebitna težava:** V admin kontekstu se `loadProgress(childId)` kliče z ustreznim childId, vendar moramo zagotoviti, da se dialog prikaže pravilno.
 
 ---
 
@@ -105,19 +102,36 @@ Enaka logika čiščenja za generiranje zvočnega URL-ja.
 
 | Datoteka | Sprememba |
 |----------|-----------|
-| `src/components/games/GenericSestavljankaGame.tsx` | Dodaj `baseName.replace(/1$/, '')` v `enrichImageWithAudio` |
-| `src/components/puzzle/PuzzleSuccessDialog.tsx` | Posodobi `handlePlayAudio` za čiščenje audio URL |
-| `src/components/matching/MatchingCompletionDialog.tsx` | Posodobi `handlePlayAudio` za čiščenje audio URL |
-| `src/components/games/StarCollectDialog.tsx` | Posodobi audio URL generiranje |
-| `src/components/wheel/WheelSuccessDialog.tsx` | Posodobi audio URL generiranje |
+| `src/components/articulation/ArticulationTestInfoDialog.tsx` | Dodaj opcijski `onBack` prop in ga uporabi v `handleBack` funkciji |
+| `src/pages/admin/AdminArtikulacijskiTest.tsx` | Posreduj `onBack` prop v `ArticulationTestInfoDialog` z navigacijo na workspace |
+
+---
+
+## Tehnična podrobnost
+
+Shranjevanje napredka poteka takole:
+
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│  Uporabnik klikne "Naprej"                                      │
+│              ↓                                                   │
+│  handleNext() v useArticulationTestNew                          │
+│              ↓                                                   │
+│  onSaveProgress(childId, sessionNumber, nextWordIndex)          │
+│              ↓                                                   │
+│  saveProgress() v useArticulationSettings                       │
+│              ↓                                                   │
+│  localStorage.setItem("articulation_progress", JSON.stringify({ │
+│    childId, sessionNumber, currentWordIndex, timestamp          │
+│  }))                                                             │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+Ob ponovnem obisku strani se preveri localStorage in prikaže ArticulationResumeDialog.
 
 ## Rezultat
 
-Pred popravkom:
-- Zvočnik ne predvaja zvoka (napaka 403 ali "no supported source")
-- URL išče: `cekin1.m4a` (ne obstaja)
-
 Po popravku:
-- Zvočnik predvaja besedo pravilno
-- URL išče: `cekin.m4a` (obstaja)
+- ✅ Gumb "Nazaj" v info dialogu bo pravilno navigiral na workspace otroka
+- ✅ Nadaljevanje seje bo delovalo kot pričakovano - če uporabnik prekine test, bo ob naslednjem obisku videl dialog za nadaljevanje
 
