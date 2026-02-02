@@ -1,137 +1,168 @@
 
+# Načrt: Ločitev težavnosti in časa snemanja v nastavitvah preverjanja
 
-# Načrt: Popravek nadaljevanja seje in gumba "Nazaj" v admin preverjanju izgovorjave
+## Trenutno stanje
 
-## Identificirana problema
+Trenutno so nastavitve združene v eno izbiro:
+- Nizka = nižji Levenshtein pragi + 5 sekund
+- Srednja = srednji pragi + 4 sekunde  
+- Visoka = višji pragi + 3 sekunde
 
-### Problem 1: Gumb "Nazaj" ne deluje v pop-up oknu
-
-V komponenti `ArticulationTestInfoDialog.tsx` gumb "Nazaj" uporablja:
-
-```typescript
-const handleBack = () => {
-  navigate(-1);
-};
-```
-
-Ta pristop ima težavo: ko je dialog odprt, `navigate(-1)` ne deluje pravilno, ker dialog blokira dogodke in stran se ne spremeni. Dialog potrebuje callback prop `onBack`, ki ga starševska komponenta lahko uporabi za pravilno navigacijo.
-
-### Problem 2: Nadaljevanje seje ne deluje
-
-Sistem shranjevanja napredka že obstaja v `useArticulationSettings`, vendar ima logika za admin stran pomanjkljivost:
-
-- `loadProgress` preverja `childId`, vendar v admin kontekstu se ključ v localStorage shranjuje generično brez ločevanja med admin in user portalom
-- Če se napredek shranjuje v localStorage z istim ključem za vse otroke, se lahko zgodi konflikt
-
----
+Uporabnik ne more izbrati npr. srednje težavnosti z 5 sekundami snemanja.
 
 ## Rešitev
 
-### 1. Popravek gumba "Nazaj" v ArticulationTestInfoDialog
+Ločiti nastavitve v dva neodvisna stolpca:
 
-Dodati prop `onBack` v komponento, ki se kliče ob kliku na gumb "Nazaj":
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│  ⚙️ Nastavitve preverjanja                                      │
+│  Izberite zahtevnost preverjanja glede na sposobnosti otroka.  │
+├─────────────────────────────┬───────────────────────────────────┤
+│  ZAHTEVNOST PREVERJANJA     │  ČAS SNEMANJA                     │
+│  ─────────────────────────  │  ─────────────────────────        │
+│  ○ Nizka                    │  ○ 3 sekunde                      │
+│    Lažje preverjanje        │    Za hitrejše otroke             │
+│                             │                                   │
+│  ● Srednja (priporočeno)    │  ● 4 sekunde (priporočeno)        │
+│    Za večino otrok          │    Za večino otrok                │
+│                             │                                   │
+│  ○ Visoka                   │  ○ 5 sekund                       │
+│    Strožje preverjanje      │    Za otroke z večjimi težavami   │
+├─────────────────────────────┴───────────────────────────────────┤
+│                                              [Shrani]           │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-**Datoteka:** `src/components/articulation/ArticulationTestInfoDialog.tsx`
+## Tehnične spremembe
+
+### 1. Posodobitev useArticulationSettings.ts
+
+Dodati nov tip in stanje za čas snemanja:
 
 ```typescript
-// PRED
-interface ArticulationTestInfoDialogProps {
-  open: boolean;
-  onClose: () => void;
+export type DifficultyLevel = "nizka" | "srednja" | "visoka";
+export type RecordingDuration = 3 | 4 | 5;  // NOVO
+
+interface ArticulationSettings {
+  difficulty: DifficultyLevel;
+  recordingDuration: RecordingDuration;  // NOVO - ločeno od težavnosti
 }
 
-const handleBack = () => {
-  navigate(-1);  // Ne deluje, ker je dialog odprt
-};
-
-// PO
-interface ArticulationTestInfoDialogProps {
-  open: boolean;
-  onClose: () => void;
-  onBack?: () => void;  // Opcijski callback za navigacijo nazaj
-}
-
-const handleBack = () => {
-  if (onBack) {
-    onBack();
-  } else {
-    navigate(-1);  // Fallback za obstoječo uporabo
-  }
+// Odstrani povezavo med difficulty in duration
+const useArticulationSettings = () => {
+  const [difficulty, setDifficultyState] = useState<DifficultyLevel>("srednja");
+  const [recordingDuration, setRecordingDurationState] = useState<RecordingDuration>(4);  // NOVO
+  
+  // Shranjevanje obeh vrednosti v localStorage
+  const setDifficulty = useCallback((newDifficulty: DifficultyLevel) => {
+    setDifficultyState(newDifficulty);
+    saveSettings({ difficulty: newDifficulty, recordingDuration });
+  }, [recordingDuration]);
+  
+  const setRecordingDuration = useCallback((newDuration: RecordingDuration) => {  // NOVO
+    setRecordingDurationState(newDuration);
+    saveSettings({ difficulty, recordingDuration: newDuration });
+  }, [difficulty]);
+  
+  return {
+    difficulty,
+    setDifficulty,
+    recordingDuration,
+    setRecordingDuration,  // NOVO
+    getThresholdForWordLength,
+    // ...
+  };
 };
 ```
 
-**Datoteka:** `src/pages/admin/AdminArtikulacijskiTest.tsx`
+### 2. Posodobitev ArticulationSettingsDialog.tsx
 
-Posredovati `onBack` prop v dialog:
+Spremeniti layout v dva stolpca z ločenimi RadioGroup komponentami:
 
 ```typescript
-<ArticulationTestInfoDialog
-  open={showInfoDialog}
-  onClose={async () => {
-    await initializeSession();
-    setShowInfoDialog(false);
-  }}
-  onBack={() => navigate(`/admin/children/${childId}/workspace`)}
+interface ArticulationSettingsDialogProps {
+  open: boolean;
+  onClose: () => void;
+  difficulty: DifficultyLevel;
+  onDifficultyChange: (value: DifficultyLevel) => void;
+  recordingDuration: RecordingDuration;  // NOVO
+  onRecordingDurationChange: (value: RecordingDuration) => void;  // NOVO
+}
+
+// Ločene opcije za težavnost
+const difficultyOptions = [
+  { value: "nizka", label: "Nizka", description: "Lažje preverjanje" },
+  { value: "srednja", label: "Srednja (priporočeno)", description: "Za večino otrok" },
+  { value: "visoka", label: "Visoka", description: "Strožje preverjanje" },
+];
+
+// Ločene opcije za čas snemanja
+const durationOptions = [
+  { value: 3, label: "3 sekunde", description: "Za hitrejše otroke" },
+  { value: 4, label: "4 sekunde (priporočeno)", description: "Za večino otrok" },
+  { value: 5, label: "5 sekund", description: "Za otroke z večjimi težavami" },
+];
+
+// Layout v dva stolpca
+<div className="grid grid-cols-2 gap-6 py-4">
+  <div>
+    <h3 className="font-medium mb-3">Zahtevnost preverjanja</h3>
+    <RadioGroup value={difficulty} onValueChange={onDifficultyChange}>
+      {difficultyOptions.map(...)}
+    </RadioGroup>
+  </div>
+  <div>
+    <h3 className="font-medium mb-3">Čas snemanja</h3>
+    <RadioGroup value={recordingDuration} onValueChange={onRecordingDurationChange}>
+      {durationOptions.map(...)}
+    </RadioGroup>
+  </div>
+</div>
+```
+
+### 3. Posodobitev AdminArtikulacijskiTest.tsx
+
+Dodati nove props za dialog:
+
+```typescript
+const { 
+  difficulty, 
+  setDifficulty, 
+  recordingDuration,
+  setRecordingDuration  // NOVO
+} = useArticulationSettings();
+
+<ArticulationSettingsDialog
+  open={showSettingsDialog}
+  onClose={() => setShowSettingsDialog(false)}
+  difficulty={difficulty}
+  onDifficultyChange={setDifficulty}
+  recordingDuration={recordingDuration}  // NOVO
+  onRecordingDurationChange={setRecordingDuration}  // NOVO
 />
 ```
 
-### 2. Potrditev delovanja shranjevanja napredka
+### 4. Posodobitev ArtikuacijskiTest.tsx (uporabniški portal)
 
-Pregledam trenutno logiko v `AdminArtikulacijskiTest.tsx`:
-
-```typescript
-// Na vrstici 178:
-} = useArticulationTestNew(childId, undefined, fixedSessionNumber, startIndex, difficulty, saveProgress, profile?.id);
-```
-
-Hook prejme `saveProgress` in ga kliče v `handleNext()`. Težava je, da `loadProgress` v `useArticulationSettings` primerja `childId`, kar bi moralo delovati pravilno.
-
-**Datoteka:** `src/hooks/useArticulationSettings.ts`
-
-Ključ v localStorage (`articulation_progress`) shrani tudi `childId`, kar pomeni, da:
-- Vsak otrok ima svoj shranjen napredek
-- Napredek se pravilno naloži ob vračanju na stran
-
-**Preverjanje:** Napredek se shranjuje ob vsakem `handleNext()` klicu (vrstica 221 v hooku). To bi moralo delovati.
-
-**Morebitna težava:** V admin kontekstu se `loadProgress(childId)` kliče z ustreznim childId, vendar moramo zagotoviti, da se dialog prikaže pravilno.
-
----
+Enake spremembe kot za admin portal.
 
 ## Povzetek sprememb
 
 | Datoteka | Sprememba |
 |----------|-----------|
-| `src/components/articulation/ArticulationTestInfoDialog.tsx` | Dodaj opcijski `onBack` prop in ga uporabi v `handleBack` funkciji |
-| `src/pages/admin/AdminArtikulacijskiTest.tsx` | Posreduj `onBack` prop v `ArticulationTestInfoDialog` z navigacijo na workspace |
-
----
-
-## Tehnična podrobnost
-
-Shranjevanje napredka poteka takole:
-
-```text
-┌─────────────────────────────────────────────────────────────────┐
-│  Uporabnik klikne "Naprej"                                      │
-│              ↓                                                   │
-│  handleNext() v useArticulationTestNew                          │
-│              ↓                                                   │
-│  onSaveProgress(childId, sessionNumber, nextWordIndex)          │
-│              ↓                                                   │
-│  saveProgress() v useArticulationSettings                       │
-│              ↓                                                   │
-│  localStorage.setItem("articulation_progress", JSON.stringify({ │
-│    childId, sessionNumber, currentWordIndex, timestamp          │
-│  }))                                                             │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-Ob ponovnem obisku strani se preveri localStorage in prikaže ArticulationResumeDialog.
+| `src/hooks/useArticulationSettings.ts` | Dodaj `RecordingDuration` tip, loči stanje in shranjevanje |
+| `src/components/articulation/ArticulationSettingsDialog.tsx` | Preoblikuj v dva stolpca z ločenimi RadioGroup |
+| `src/pages/admin/AdminArtikulacijskiTest.tsx` | Dodaj nove props za dialog |
+| `src/pages/ArtikuacijskiTest.tsx` | Dodaj nove props za dialog |
 
 ## Rezultat
 
-Po popravku:
-- ✅ Gumb "Nazaj" v info dialogu bo pravilno navigiral na workspace otroka
-- ✅ Nadaljevanje seje bo delovalo kot pričakovano - če uporabnik prekine test, bo ob naslednjem obisku videl dialog za nadaljevanje
+Pred:
+- Uporabnik izbere en paket (težavnost + čas skupaj)
+- Ni možnosti kombinacij
 
+Po:
+- Uporabnik neodvisno izbere zahtevnost preverjanja (Levenshtein pragi)
+- Uporabnik neodvisno izbere čas snemanja (3/4/5 sekund)
+- Vsaka kombinacija je mogoča (npr. srednja zahtevnost + 5 sekund)
