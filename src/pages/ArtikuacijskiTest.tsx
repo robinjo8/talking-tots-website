@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { Home, Settings } from "lucide-react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Home } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import ArticulationProgressGrid from "@/components/articulation/ArticulationProgressGrid";
@@ -13,6 +13,7 @@ import ArticulationResumeDialog from "@/components/articulation/ArticulationResu
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { useArticulationTestNew } from "@/hooks/useArticulationTestNew";
 import { useArticulationSettings } from "@/hooks/useArticulationSettings";
+import { useUserSessionManager } from "@/hooks/useUserSessionManager";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { articulationData } from "@/data/articulationTestData";
@@ -35,7 +36,6 @@ const PHONETIC_ORDER = ['P', 'B', 'M', 'T', 'D', 'K', 'G', 'N', 'H', 'V', 'J', '
 
 const ArtikuacijskiTest = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const { user, selectedChild } = useAuth();
   const [showInfoDialog, setShowInfoDialog] = useState(true);
   const [showInstructionsDialog, setShowInstructionsDialog] = useState(false);
@@ -45,7 +45,7 @@ const ArtikuacijskiTest = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [backgroundUrl, setBackgroundUrl] = useState<string | null>(null);
   const [resumeWordIndex, setResumeWordIndex] = useState<number>(0);
-  const [resumeTimestamp, setResumeTimestamp] = useState<number>(0);
+  const [effectiveStartIndex, setEffectiveStartIndex] = useState<number>(0);
 
   // Window size tracking for dynamic scaling (like MemoryGrid)
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
@@ -121,17 +121,23 @@ const ArtikuacijskiTest = () => {
     setDifficulty,
     recordingDuration,
     setRecordingDuration,
-    saveProgress,
-    loadProgress,
-    clearProgress,
-    getTimeAgo,
   } = useArticulationSettings();
-  
-  // Read session number and start index from URL parameters (for testing)
-  const sejaParam = searchParams.get('seja');
-  const startParam = searchParams.get('start');
-  const fixedSessionNumber = sejaParam ? parseInt(sejaParam, 10) : undefined;
-  const startIndex = startParam ? parseInt(startParam, 10) : 0;
+
+  // Session manager hook - uses database for persistence (like admin portal)
+  const {
+    sessionInfo,
+    isInitializing,
+    initializeSession: initSessionManager,
+    updateProgress,
+    completeSession,
+  } = useUserSessionManager();
+
+  // Update effectiveStartIndex when session loads
+  useEffect(() => {
+    if (sessionInfo) {
+      setEffectiveStartIndex(sessionInfo.startIndex);
+    }
+  }, [sessionInfo]);
   
   // Sort articulation data by phonetic order (same as hook)
   const sortedArticulationData = useMemo(() => {
@@ -163,6 +169,16 @@ const ArtikuacijskiTest = () => {
     return sortedArticulationData.reduce((count, group) => count + group.words.length, 0);
   }, [sortedArticulationData]);
 
+  // Handle saving progress to database
+  const handleSaveProgress = useCallback(async (
+    _childId: string | undefined, 
+    _sessionNumber: number, 
+    wordIndex: number
+  ) => {
+    // Save to database via session manager
+    await updateProgress(wordIndex);
+  }, [updateProgress]);
+
   const {
     imageUrl,
     loading,
@@ -182,20 +198,30 @@ const ArtikuacijskiTest = () => {
     handleNext,
     resetTest,
     initializeSession,
-  } = useArticulationTestNew(childId, userId, fixedSessionNumber, startIndex, difficulty, saveProgress);
+  } = useArticulationTestNew(
+    childId, 
+    userId, 
+    sessionInfo?.sessionNumber, 
+    effectiveStartIndex, 
+    difficulty, 
+    handleSaveProgress
+  );
 
-  // Check for saved progress on mount
+  // Check for existing session on mount (using database, not localStorage)
   useEffect(() => {
-    if (childId) {
-      const savedProgress = loadProgress(childId);
-      if (savedProgress && savedProgress.currentWordIndex > 0) {
-        setResumeWordIndex(savedProgress.currentWordIndex);
-        setResumeTimestamp(savedProgress.timestamp);
-        setShowResumeDialog(true);
-        setShowInfoDialog(false);
+    const checkExistingSession = async () => {
+      if (childId && !sessionInfo && !isInitializing) {
+        const existingSession = await initSessionManager(childId, totalWordsCount);
+        if (existingSession && existingSession.isResume && existingSession.lastSpokenIndex >= 0) {
+          // Show resume dialog with the last spoken word
+          setResumeWordIndex(existingSession.lastSpokenIndex);
+          setShowResumeDialog(true);
+          setShowInfoDialog(false);
+        }
       }
-    }
-  }, [childId, loadProgress]);
+    };
+    checkExistingSession();
+  }, [childId, sessionInfo, isInitializing, initSessionManager, totalWordsCount]);
 
   // Fetch background image
   useEffect(() => {
@@ -209,23 +235,17 @@ const ArtikuacijskiTest = () => {
 
   // Handle resume dialog actions
   const handleResume = () => {
+    // Just close the dialog - sessionInfo already has the startIndex from database
     setShowResumeDialog(false);
-    // The hook will start from resumeWordIndex via startIndex prop
-    // We need to reload the page with the correct start index
-    const params = new URLSearchParams();
-    if (fixedSessionNumber) params.set('seja', String(fixedSessionNumber));
-    params.set('start', String(resumeWordIndex));
-    navigate(`/artikulacijski-test?${params.toString()}`, { replace: true });
   };
 
-  const handleStartOver = () => {
-    clearProgress();
-    setShowResumeDialog(false);
-    setShowInfoDialog(true);
+  const handleCloseResumeDialog = () => {
+    // X button - go back to apps
+    navigate("/moje-aplikacije");
   };
 
-  const handleCloseCompletion = () => {
-    clearProgress();
+  const handleCloseCompletion = async () => {
+    await completeSession();
     resetTest();
     navigate("/moja-stran");
   };
@@ -276,7 +296,7 @@ const ArtikuacijskiTest = () => {
       <ArticulationResumeDialog
         open={showResumeDialog}
         onResume={handleResume}
-        onStartOver={handleStartOver}
+        onClose={handleCloseResumeDialog}
         wordName={getWordByIndex(resumeWordIndex)}
       />
 

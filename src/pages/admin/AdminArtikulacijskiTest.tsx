@@ -244,13 +244,9 @@ export default function AdminArtikulacijskiTest() {
     setShowResumeDialog(false);
   };
 
-  const handleStartOver = async () => {
-    // Reset the session in database and start fresh
-    if (childId) {
-      await resetSession(childId);
-    }
-    setShowResumeDialog(false);
-    setShowInfoDialog(true);
+  const handleCloseResumeDialog = async () => {
+    // X button - go back to workspace
+    navigate(`/admin/children/${childId}/workspace`);
   };
 
   const handleCloseCompletion = () => {
@@ -314,7 +310,7 @@ export default function AdminArtikulacijskiTest() {
       <ArticulationResumeDialog
         open={showResumeDialog}
         onResume={handleResume}
-        onStartOver={handleStartOver}
+        onClose={handleCloseResumeDialog}
         wordName={getWordByIndex(resumeWordIndex)}
       />
 
