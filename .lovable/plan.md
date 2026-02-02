@@ -1,267 +1,165 @@
 
-# Načrt: Podrobnosti otroka in integracija z artikulacijskim testom za zunanje organizacije
+# Načrt: Odstranitev sekcije starša in prikaz dokumentov za otroke logopeda
 
-## Povzetek zahteve
+## Povzetek problemov
 
-Logopedi iz zunanjih organizacij (npr. "OŠ Test") morajo imeti enako funkcionalnost kot interni TomiTalk logopedi:
+Na strani `/admin/children/:id/details` sta dva problema:
 
-1. **Gumb "Podrobnosti"** na kartici otroka v `/admin/children` - odpre enako stran kot `/admin/users/:userId/:childId`
-2. **Artikulacijski testi** otrok logopeda morajo:
-   - Ustvariti sejo v "V čakanju" za vse logopede iste organizacije
-   - Biti prevzeti in pregledani s strani logopedov organizacije
-   - Podatki morajo biti popolnoma izolirani med organizacijami
-
-## Ključni tehnični izzivi
-
-### Problem 1: Struktura tabele `articulation_test_sessions`
-
-Trenutna struktura:
-- `child_id` - referenca na tabelo `children` (otroci staršev)
-- `parent_id` - referenca na starša
-
-Za otroke logopedov potrebujemo:
-- `logopedist_child_id` - referenca na tabelo `logopedist_children`
-- `organization_id` - za filtriranje po organizaciji
-
-### Problem 2: Izolacija podatkov po organizacijah
-
-Trenutno "V čakanju" prikazuje VSE pending seje. Potrebna je sprememba za:
-- TomiTalk (internal) logopedi vidijo seje iz tabele `children` (starši)
-- Zunanje organizacije (OŠ Test itd.) vidijo SAMO seje svojih otrok
+1. **Sekcija "PODATKI O STARŠU / SKRBNIKU"** - Ta sekcija je nepotrebna za otroke logopeda, ker jih logoped dodaja sam brez starša
+2. **Dokumenti se ne prikazujejo** - Ko logoped ustvari otroka (npr. "Tian") in vnese opis govornih težav ter osnovni vprašalnik, se ti podatki shranijo le v bazo podatkov, NE pa v storage (mapo Dokumenti)
 
 ---
 
-## Arhitekturna rešitev
+## 1. Odstranitev sekcije starša
 
-### Opcija A: Razširitev obstoječe tabele (PRIPOROČENO)
+### Problem
 
-Razširimo tabelo `articulation_test_sessions` z dodatnimi stolpci:
+Komponenta `ReportTemplateEditor` je deljena med:
+- TomiTalk logopedi (imajo podatke o staršu - prikazati)
+- Logopedi zunanjih organizacij (nimajo starša - ne prikazati)
 
-```sql
-ALTER TABLE articulation_test_sessions 
-ADD COLUMN logopedist_child_id UUID REFERENCES logopedist_children(id),
-ADD COLUMN organization_id UUID REFERENCES organizations(id),
-ADD COLUMN source_type TEXT DEFAULT 'parent' CHECK (source_type IN ('parent', 'logopedist'));
-```
+### Rešitev
 
-**Prednosti:**
-- Ohrani obstoječo logiko
-- Minimalne spremembe v obstoječih hooki in komponentah
-- Enostavno filtriranje po organizaciji
-
----
-
-## Koraki implementacije
-
-### 1. Shema baze podatkov
-
-Razširitev tabele `articulation_test_sessions`:
-
-```text
-articulation_test_sessions
-├── id (obstoječe)
-├── child_id (obstoječe, NULL za otroke logopedov)
-├── parent_id (obstoječe, NULL za otroke logopedov)
-├── logopedist_child_id (NOVO, NULL za otroke staršev)
-├── organization_id (NOVO, vedno izpolnjeno)
-├── source_type (NOVO: 'parent' | 'logopedist')
-├── status, assigned_to, ...
-```
-
-### 2. RLS politike
-
-Posodobitev RLS politik za filtriranje po organizaciji:
-
-```sql
--- Logopedisti vidijo samo seje svoje organizacije
-CREATE POLICY "logopedists_see_own_org_sessions" ON articulation_test_sessions
-FOR SELECT USING (
-  EXISTS (
-    SELECT 1 FROM logopedist_profiles lp
-    WHERE lp.user_id = auth.uid()
-    AND lp.organization_id = articulation_test_sessions.organization_id
-  )
-);
-
--- Logopedisti lahko prevzamejo seje svoje organizacije
-CREATE POLICY "logopedists_claim_own_org_pending" ON articulation_test_sessions
-FOR UPDATE USING (
-  status = 'pending' 
-  AND assigned_to IS NULL
-  AND EXISTS (
-    SELECT 1 FROM logopedist_profiles lp
-    WHERE lp.user_id = auth.uid()
-    AND lp.organization_id = articulation_test_sessions.organization_id
-  )
-);
-```
-
-### 3. Nove datoteke
-
-| Datoteka | Opis |
-|----------|------|
-| `src/pages/admin/AdminLogopedistChildDetail.tsx` | Stran za podrobnosti otroka logopeda (podobna AdminUserDetail) |
-| `src/hooks/useLogopedistChildStorageFiles.ts` | Hook za pridobivanje dokumentov in posnetkov otroka logopeda |
-| `src/hooks/useLogopedistChildPendingTests.ts` | Hook za pending teste po organizaciji |
-
-### 4. Posodobitve obstoječih datotek
-
-| Datoteka | Sprememba |
-|----------|-----------|
-| `src/pages/admin/AdminChildren.tsx` | Dodaj gumb "Podrobnosti" |
-| `src/hooks/usePendingTests.ts` | Filtriranje po organizaciji in source_type |
-| `src/hooks/useArticulationTestNew.ts` | Podpora za logopedist_child_id in organization_id |
-| `src/config/routes.tsx` | Nova ruta `/admin/children/:childId/details` |
-
----
-
-## Podrobnosti implementacije
-
-### AdminChildren.tsx - Gumb "Podrobnosti"
+Dodati prop `hideParentSection` v komponento `ReportTemplateEditor`:
 
 ```typescript
-// Dodaj gumb levo od "Napredek"
-<Button
-  variant="outline"
-  size="sm"
-  onClick={() => navigate(`/admin/children/${child.id}/details`)}
->
-  <FileText className="h-4 w-4 mr-1" />
-  <span className="hidden sm:inline">Podrobnosti</span>
-</Button>
-```
-
-### AdminLogopedistChildDetail.tsx
-
-Nova stran z dvema stolpcema (enako kot AdminUserDetail):
-
-**Levi stolpec:**
-- Dokumenti otroka (iz storage)
-- Preverjanje izgovorjave (posnetki po sejah)
-
-**Desni stolpec:**
-- Poročila (generator PDF, obstoječa poročila)
-
-### usePendingTests.ts - Filtriranje po organizaciji
-
-```typescript
-// Obstoječa logika za 'internal' organizacije
-if (profile?.organization_type === 'internal') {
-  // Prikaži seje iz 'children' tabele (starši)
-  query = query.eq('source_type', 'parent');
-} else {
-  // Prikaži samo seje iz logopedist_children za svojo organizacijo
-  query = query
-    .eq('source_type', 'logopedist')
-    .eq('organization_id', profile.organization_id);
+interface ReportTemplateEditorProps {
+  data: ReportData;
+  testSessions: TestSession[];
+  hideParentSection?: boolean;  // NOVO
+  onFieldChange: ...
+  onSessionChange: ...
 }
 ```
 
-### Shranjevanje posnetkov za otroke logopeda
+V komponenti pogojno prikazati sekcijo:
 
-Obstoječa pot: `{parent_id}/{child_id}/Preverjanje-izgovorjave/Seja-X/`
-
-Nova pot za otroke logopeda: `logopedist-children/{logopedist_id}/{child_id}/Preverjanje-izgovorjave/Seja-X/`
-
----
-
-## Vizualni tok
-
-### Kartica otroka (posodobljena)
-
-```text
-┌─────────────────────────────────────────────────────────────────────┐
-│  [🐲 Avatar]  Otrok Ena                                             │
-│               Starost: 5 let • Govorne težave: Motnja izreke       │
-│                                                                     │
-│  [📋 Podrobnosti]  [📊 Napredek]  [▶ Začni delo]  [✏️] [🗑️]         │
-└─────────────────────────────────────────────────────────────────────┘
+```typescript
+{/* Parent/Guardian Data - samo če ni skrita */}
+{!hideParentSection && (
+  <div className="space-y-2">
+    <h2>PODATKI O STARŠU / SKRBNIKU</h2>
+    ...
+  </div>
+)}
 ```
 
-### Stran podrobnosti (`/admin/children/:id/details`)
-
-```text
-┌────────────────────────────────────────────────────────────────────────────┐
-│ ← Nazaj                                                                    │
-│                                                                            │
-│ Podrobnosti otroka                                                         │
-│ Otrok: Otrok Ena • 5 let • Logoped: Janez Novak                           │
-├──────────────────────────────────┬─────────────────────────────────────────┤
-│ 📄 Dokumenti                     │ 📋 Poročila                              │
-│ Naloženi dokumenti               │ Poročilo za otroka Otrok Ena            │
-│                                  │                                         │
-│ ┌──────────────────────────────┐ │ ┌─────────────────────────────────────┐ │
-│ │ 📄 opis-tezav.pdf    👁️ ⬇️  │ │ │ TOMITALK LOGOPEDSKO POROČILO        │ │
-│ │ 📄 vprašalnik.txt    👁️ ⬇️  │ │ │                                     │ │
-│ └──────────────────────────────┘ │ │ Datum preverjanja: [Izberite]       │ │
-│                                  │ │ Datum poročila: 2. 2. 2026          │ │
-│ 🎙️ Preverjanje izgovorjave      │ │                                     │ │
-│ Posnetki artikulacijskega testa │ │ ANAMNEZA:                           │ │
-│                                  │ │ [___________________________]       │ │
-│ ▶ Seja-1 (3 posnetkov)          │ │                                     │ │
-│ ▶ Seja-2 (60 posnetkov)         │ │ [💾 Shrani]  [📄 Generiraj PDF]     │ │
-│                                  │ └─────────────────────────────────────┘ │
-│ ✨ Generirana poročila           │                                         │
-│ ┌──────────────────────────────┐ │                                         │
-│ │ 📄 porocilo.pdf   ✏️ 👁️ ⬇️🗑│ │                                         │
-│ └──────────────────────────────┘ │                                         │
-└──────────────────────────────────┴─────────────────────────────────────────┘
+V `AdminLogopedistChildDetail.tsx` uporabiti:
+```typescript
+<ReportTemplateEditor
+  data={reportData}
+  testSessions={testSessions}
+  hideParentSection={true}  // Skrij sekcijo starša
+  onFieldChange={handleReportFieldChange}
+  onSessionChange={handleSessionChange}
+/>
 ```
 
 ---
 
-## Tok podatkov - artikulacijski test
+## 2. Prikaz dokumentov iz baze podatkov
 
-```text
-1. Logoped začne test za otroka "Otrok Ena"
-                    ↓
-2. Test se izvede v /admin/children/:id/test
-                    ↓
-3. Ob zaključku se ustvari seja v articulation_test_sessions:
-   - logopedist_child_id: "ad1d4d05-..."
-   - organization_id: "4bd0b8b8-..." (OŠ Test)
-   - source_type: "logopedist"
-   - status: "pending"
-                    ↓
-4. Seja se pojavi v "V čakanju" za VSE logopede organizacije OŠ Test
-                    ↓
-5. Logoped (Janez ali drug iz OŠ Test) prevzame sejo
-                    ↓
-6. Seja se premakne v "Moji pregledi" za tega logopeda
-                    ↓
-7. Logoped oceni izgovorjavo in generira poročilo
+### Problem
+
+Ko logoped doda otroka preko čarovnika (`AdminAddChildWizard`), se podatki shranijo v bazo:
+- `speech_difficulties_description` → opis govornih težav
+- `speech_development` → odgovori na vprašalnik
+
+AMPAK dokumenti se NE naložijo v storage, zato `useLogopedistChildStorageFiles` ne najde ničesar.
+
+### Primerjava z uporabniškim portalom
+
+| Korak | Uporabniški portal (`AddChildForm.tsx`) | Admin portal (`AdminAddChildWizard.tsx`) |
+|-------|----------------------------------------|------------------------------------------|
+| 1. Shrani v bazo | ✅ Da | ✅ Da |
+| 2. Naloži v storage | ✅ Da - `opis-govornih-tezav.txt`, `osnovni-vprasalnik.txt` | ❌ Ne |
+
+### Rešitev A: Naložiti dokumente v storage ob ustvarjanju otroka (PRIPOROČENO)
+
+Posodobiti `AdminAddChildWizard.tsx` ali hook `useLogopedistChildren.ts`, da po uspešnem ustvarjanju otroka naloži dokumente v storage:
+
+```typescript
+// Po uspešnem createChild.mutateAsync(input):
+const newChild = await createChild.mutateAsync(input);
+
+// Pot za storage
+const basePath = `logopedist-children/${logopedistId}/${newChild.id}/Dokumenti`;
+
+// 1. Naloži opis govornih težav
+if (childData.speechDifficultiesDescription) {
+  const textBlob = new Blob([childData.speechDifficultiesDescription], { type: 'text/plain' });
+  await supabase.storage
+    .from('uporabniski-profili')
+    .upload(`${basePath}/opis-govornih-tezav-${Date.now()}.txt`, textBlob);
+}
+
+// 2. Naloži vprašalnik
+if (Object.keys(childData.speechDevelopment).length > 0) {
+  const questionnaireText = formatQuestionnaireAsText(childData.speechDevelopment, childData.name);
+  const questionnaireBlob = new Blob([questionnaireText], { type: 'text/plain' });
+  await supabase.storage
+    .from('uporabniski-profili')
+    .upload(`${basePath}/${newChild.id}-osnovni-vprasalnik.txt`, questionnaireBlob);
+}
 ```
 
+### Rešitev B: Prikazati podatke iz baze namesto storage (ALTERNATIVA)
+
+Če ne želimo podvajati podatkov v storage, lahko `AdminLogopedistChildDetail.tsx` prikaže podatke direktno iz baze:
+
+```typescript
+// Prikaz iz baze namesto storage
+{childData?.speech_difficulties_description && (
+  <div className="border rounded-lg p-3">
+    <span>📄 Opis govornih težav</span>
+    <pre className="text-sm whitespace-pre-wrap mt-2">
+      {childData.speech_difficulties_description}
+    </pre>
+  </div>
+)}
+
+{childData?.speech_development && (
+  <div className="border rounded-lg p-3">
+    <span>📄 Osnovni vprašalnik</span>
+    <pre className="text-sm whitespace-pre-wrap mt-2">
+      {formatQuestionnaireAsText(childData.speech_development)}
+    </pre>
+  </div>
+)}
+```
+
+**Priporočam Rešitev A**, ker je bolj konsistentna z obstoječim sistemom in omogoča enoten prikaz dokumentov.
+
 ---
 
-## Varnostna izolacija podatkov
+## Datoteke za posodobiti
 
-| Scenarij | Rezultat |
-|----------|----------|
-| Logoped iz OŠ Test odpre "V čakanju" | Vidi SAMO pending seje otrok iz OŠ Test |
-| Logoped iz TomiTalk odpre "V čakanju" | Vidi SAMO pending seje iz uporabniških profilov (starši) |
-| Logoped iz OŠ Test poskusi dostopati do otroka TomiTalk | RLS blokira dostop |
-| Logoped iz OŠ Test poskusi dostopati do otroka druge šole | RLS blokira dostop |
+| Datoteka | Sprememba |
+|----------|-----------|
+| `src/components/admin/ReportTemplateEditor.tsx` | Dodaj prop `hideParentSection` za pogojno skrivanje sekcije starša |
+| `src/utils/generateReportPdf.ts` | Posodobi PDF generiranje za pogojno vključitev sekcije starša |
+| `src/pages/admin/AdminLogopedistChildDetail.tsx` | Uporabi `hideParentSection={true}` |
+| `src/components/admin/children/AdminAddChildWizard.tsx` | Dodaj nalaganje dokumentov v storage po ustvarjanju otroka |
 
 ---
 
-## Prioriteta implementacije
+## Rezultat
 
-1. **Faza 1 - Baza podatkov**
-   - Dodaj stolpce v `articulation_test_sessions`
-   - Ustvari RLS politike za izolacijo organizacij
-   - Migriraj obstoječe podatke (nastavi organization_id za TomiTalk)
+### Pred spremembo:
+```text
+PODATKI O STARŠU / SKRBNIKU
+Ime in priimek: Ni podatka
+E-poštni naslov: Ni podatka
 
-2. **Faza 2 - Stran podrobnosti**
-   - Ustvari `AdminLogopedistChildDetail.tsx`
-   - Dodaj gumb "Podrobnosti" v `AdminChildren.tsx`
-   - Dodaj ruto v `routes.tsx`
+DOKUMENTI
+Ni naloženih dokumentov
+```
 
-3. **Faza 3 - Integracija artikulacijskega testa**
-   - Posodobi `useArticulationTestNew.ts` za shranjevanje v novo strukturo
-   - Posodobi `transcribe-articulation` edge funkcijo za novo pot storage
+### Po spremembi:
+```text
+(Sekcija starša je skrita)
 
-4. **Faza 4 - Pending testi**
-   - Posodobi `usePendingTests.ts` za filtriranje po organizaciji
-   - Posodobi `AdminPending.tsx` za prikaz otrok logopedov
-   - Posodobi `useClaimTestSession.ts` za podporo novih stolpcev
+DOKUMENTI
+📄 opis-govornih-tezav-1738501234567.txt  [👁️] [⬇️]
+📄 aac44986-1077-4c55-9804-2aa9a3682dd2-osnovni-vprasalnik.txt  [👁️] [⬇️]
+```
