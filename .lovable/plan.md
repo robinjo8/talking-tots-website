@@ -1,85 +1,383 @@
 
 
-# Popravek podatkov za uporabnika kujavec.robert@gmail.com
+# Podroben načrt: Modul "Moji otroci" za logopede
 
-## Trenutno stanje
+## Vizualna predstavitev navigacije
 
-| Seja ID | Datum | session_number | Status | Posnetki v Storage |
-|---------|-------|----------------|--------|-------------------|
-| d3742796-ad32-4880-90b3-f89767dfdb33 | 23.1.2026 | 1 | completed | Seja-1 (0 posnetkov - testna) |
-| fc3dd757-5bd2-40e6-a0c6-e19aab3ffc03 | 28.1.2026 | 2 | pending | Seja-2 (60 posnetkov) |
+### Trenutni admin sidebar
+```text
+┌─────────────────────────────┐
+│ 🐲 TomiTalk [Admin]         │
+├─────────────────────────────┤
+│ DELOVNI PROSTOR             │
+│  ├─ Moj portal              │
+│  ├─ Vsa preverjanja         │
+│  ├─ V čakanju          [3]  │
+│  └─ Moji pregledi      [2]  │
+├─────────────────────────────┤
+│ UPRAVLJANJE                 │
+│  ├─ Uporabniki              │
+│  ├─ Poročila                │
+│  └─ Sporočila               │
+├─────────────────────────────┤
+│ NASTAVITVE                  │
+│  ├─ Nastavitve              │
+│  ├─ Obvestila               │
+│  └─ Članstva (admin)        │
+└─────────────────────────────┘
+```
 
-## Problem
+### Predlagan sidebar z novim modulom
+```text
+┌─────────────────────────────┐
+│ 🐲 TomiTalk [Admin]         │
+├─────────────────────────────┤
+│ DELOVNI PROSTOR             │
+│  ├─ Moj portal              │
+│  ├─ Vsa preverjanja         │
+│  ├─ V čakanju          [3]  │
+│  └─ Moji pregledi      [2]  │
+├─────────────────────────────┤
+│ 🆕 TERAPEVTSKO DELO         │ ← Nova sekcija
+│  └─ Moji otroci        [5/10]│ ← Prikazuje število/omejitev
+├─────────────────────────────┤
+│ UPRAVLJANJE                 │
+│  ├─ Uporabniki              │
+│  ├─ Poročila                │
+│  └─ Sporočila               │
+├─────────────────────────────┤
+│ NASTAVITVE                  │
+│  └─ ...                     │
+└─────────────────────────────┘
+```
 
-Admin portal pregleduje sejo od 23.1. (`session_number=1`) in išče posnetke v mapi `Seja-1`, ki je prazna. Dejanski posnetki (60) so v mapi `Seja-2`.
+---
 
-## Rešitev
+## Kaj se zgodi ko logoped klikne "Moji otroci"?
 
-### Korak 1: Izbriši testno sejo od 23.1.
+### Stran 1: Seznam otrok (`/admin/children`)
 
-Izbriši staro testno sejo, ki ne bi smela obstajati:
+```text
+┌────────────────────────────────────────────────────────────────────┐
+│  Moji otroci                                      [+ Dodaj otroka] │
+│  Aktivna licenca: Standard (5/25 otrok)                            │
+├────────────────────────────────────────────────────────────────────┤
+│                                                                    │
+│  ┌──────────────────────────────────────────────────────────────┐  │
+│  │ 🧒 Žak Novak                                                 │  │
+│  │    Starost: 5 let • Težave: Š, Ž, R                          │  │
+│  │    Zadnja seja: 28.1.2026                                    │  │
+│  │                                                              │  │
+│  │    [📊 Napredek]  [🎮 Začni delo]  [✏️ Uredi]  [🗑️]          │  │
+│  └──────────────────────────────────────────────────────────────┘  │
+│                                                                    │
+│  ┌──────────────────────────────────────────────────────────────┐  │
+│  │ 👧 Lana Horvat                                               │  │
+│  │    Starost: 6 let • Težave: C, S, Z                          │  │
+│  │    Zadnja seja: 25.1.2026                                    │  │
+│  │                                                              │  │
+│  │    [📊 Napredek]  [🎮 Začni delo]  [✏️ Uredi]  [🗑️]          │  │
+│  └──────────────────────────────────────────────────────────────┘  │
+│                                                                    │
+│  ┌──────────────────────────────────────────────────────────────┐  │
+│  │ 🧒 Matic Krajnc                                              │  │
+│  │    Starost: 4 leta • Težave: P, B, M                         │  │
+│  │    Nova seja - ni podatkov                                   │  │
+│  │                                                              │  │
+│  │    [📊 Napredek]  [🎮 Začni delo]  [✏️ Uredi]  [🗑️]          │  │
+│  └──────────────────────────────────────────────────────────────┘  │
+│                                                                    │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+**Funkcionalnosti na tej strani:**
+- **Dodaj otroka**: Odpre modal za vnos novega otroka (ime, starost, spol, govorni izzivi)
+- **Napredek**: Odpre podroben pregled napredka otroka (grafi, zgodovina)
+- **Začni delo**: Odpre delovni prostor za tega otroka
+- **Uredi**: Urejanje podatkov otroka
+- **Briši**: Odstrani otroka (sprosti mesto v licenci)
+
+---
+
+### Stran 2: Delovni prostor otroka (`/admin/children/:id/workspace`)
+
+Ko logoped klikne **"Začni delo"**, se odpre ta stran:
+
+```text
+┌────────────────────────────────────────────────────────────────────┐
+│  ← Nazaj na seznam                                                 │
+├────────────────────────────────────────────────────────────────────┤
+│                                                                    │
+│  ┌──────────────────────────────────────────────────────────────┐  │
+│  │  🧒 Aktivni otrok: Žak Novak                        [Zamenjaj]│  │
+│  │      Starost: 5 let • Težave: Š, Ž, R • ⭐ 15 zvezdic danes  │  │
+│  └──────────────────────────────────────────────────────────────┘  │
+│                                                                    │
+│  ╔════════════════════════════════════════════════════════════════╗│
+│  ║                    IZBERI AKTIVNOST                            ║│
+│  ╠════════════════════════════════════════════════════════════════╣│
+│  ║                                                                ║│
+│  ║  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐            ║│
+│  ║  │   🎮        │  │   📝        │  │   🎯        │            ║│
+│  ║  │ Govorne     │  │ Govorne     │  │ Preverjanje │            ║│
+│  ║  │ igre        │  │ vaje        │  │ izgovorjave │            ║│
+│  ║  │             │  │             │  │             │            ║│
+│  ║  └─────────────┘  └─────────────┘  └─────────────┘            ║│
+│  ║                                                                ║│
+│  ║  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐            ║│
+│  ║  │   🎥        │  │   💡        │  │   ⭐        │            ║│
+│  ║  │ Video       │  │ Logopedski  │  │ Moj osebni  │            ║│
+│  ║  │ navodila    │  │ nasveti     │  │ načrt       │            ║│
+│  ║  │             │  │             │  │             │            ║│
+│  ║  └─────────────┘  └─────────────┘  └─────────────┘            ║│
+│  ║                                                                ║│
+│  ╚════════════════════════════════════════════════════════════════╝│
+│                                                                    │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+**Funkcionalnosti:**
+- **Aktivni otrok v glavi**: Vedno vidiš s katerim otrokom delaš
+- **Gumb "Zamenjaj"**: Hitro preklapljanje med otroki (dropdown ali modal)
+- **Kartice aktivnosti**: Enake kot na uporabniški strani za starše
+- Klik na aktivnost odpre **vgrajen iFrame** ali **komponento** z igro/vajo
+
+---
+
+### Stran 3: Igra/vaja v kontekstu otroka
+
+Ko logoped izbere igro (npr. "Spomin za črko Š"):
+
+```text
+┌────────────────────────────────────────────────────────────────────┐
+│  ← Nazaj                   🧒 Žak Novak              [Zamenjaj]    │
+├────────────────────────────────────────────────────────────────────┤
+│                                                                    │
+│  ╔════════════════════════════════════════════════════════════════╗│
+│  ║                                                                ║│
+│  ║              [GOVORNA IGRA - SPOMIN ZA Š]                      ║│
+│  ║                                                                ║│
+│  ║     ┌────┐  ┌────┐  ┌────┐  ┌────┐                            ║│
+│  ║     │ ?  │  │ 🐘 │  │ ?  │  │ ?  │                            ║│
+│  ║     └────┘  └────┘  └────┘  └────┘                            ║│
+│  ║                                                                ║│
+│  ║     ┌────┐  ┌────┐  ┌────┐  ┌────┐                            ║│
+│  ║     │ ?  │  │ ?  │  │ ?  │  │ 🎒 │                            ║│
+│  ║     └────┘  └────┘  └────┘  └────┘                            ║│
+│  ║                                                                ║│
+│  ║              ⭐⭐⭐ (3 zvezdice)                               ║│
+│  ║                                                                ║│
+│  ╚════════════════════════════════════════════════════════════════╝│
+│                                                                    │
+│  📊 Rezultat se bo shranil v napredek otroka Žak                   │
+│                                                                    │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+**Kako deluje shranjevanje:**
+- Komponenta igre prejme `logopedistChildId` namesto `childId`
+- Napredek se shranjuje v tabelo `progress` s poljem `logopedist_child_id`
+- Logoped vidi rezultate v pregledu napredka otroka
+
+---
+
+### Stran 4: Napredek otroka (`/admin/children/:id/progress`)
+
+```text
+┌────────────────────────────────────────────────────────────────────┐
+│  ← Nazaj                   Napredek: Žak Novak                     │
+├────────────────────────────────────────────────────────────────────┤
+│                                                                    │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │  📊 STATISTIKA                                               │   │
+│  │                                                              │   │
+│  │   Skupaj sej: 12     Zvezdice: 156 ⭐    Povprečje: 85%     │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                    │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │  📈 NAPREDEK PO ČRKAH                                       │   │
+│  │                                                              │   │
+│  │   Š: ████████████░░░░░░░░  60%  (izboljšanje +15%)          │   │
+│  │   Ž: █████████░░░░░░░░░░░  45%  (izboljšanje +10%)          │   │
+│  │   R: ██████░░░░░░░░░░░░░░  30%  (začetek)                   │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                    │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │  📅 ZGODOVINA AKTIVNOSTI                                     │   │
+│  │                                                              │   │
+│  │   28.1.2026  Spomin Š       ⭐⭐⭐   85%                     │   │
+│  │   28.1.2026  Vaja izgovorj. ⭐⭐     70%                     │   │
+│  │   25.1.2026  Bingo Ž        ⭐⭐⭐   90%                     │   │
+│  │   ...                                                        │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                    │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │  🎯 PREVERJANJA IZGOVORJAVE                                  │   │
+│  │                                                              │   │
+│  │   28.1.2026  Seja 1  [Pregledano] [Odpri poročilo]          │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                    │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Dodajanje otroka - Modal
+
+```text
+┌─────────────────────────────────────────────────────┐
+│  Dodaj novega otroka                           [✕]  │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│  Ime otroka *                                       │
+│  ┌─────────────────────────────────────────────┐    │
+│  │                                             │    │
+│  └─────────────────────────────────────────────┘    │
+│                                                     │
+│  Datum rojstva / Starost *                          │
+│  ┌─────────────────────────────────────────────┐    │
+│  │  5 let                                      │    │
+│  └─────────────────────────────────────────────┘    │
+│                                                     │
+│  Spol                                               │
+│  ○ Deček   ○ Deklica                               │
+│                                                     │
+│  Govorni izzivi (izberi več)                        │
+│  ☑ Š   ☑ Ž   ☐ Č   ☐ C   ☐ S   ☐ Z                │
+│  ☐ R   ☐ L   ☐ K   ☐ G   ☐ P   ☐ B                │
+│                                                     │
+│  Notranji zapiski (opcijsko)                        │
+│  ┌─────────────────────────────────────────────┐    │
+│  │ Diagnoza: dislalija, obiskuje 2x tedensko   │    │
+│  └─────────────────────────────────────────────┘    │
+│                                                     │
+│  Zunanji ID (opcijsko - iz vaše prakse)             │
+│  ┌─────────────────────────────────────────────┐    │
+│  │ PAC-2024-042                                │    │
+│  └─────────────────────────────────────────────┘    │
+│                                                     │
+│                          [Prekliči]  [💾 Shrani]    │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+---
+
+## Hitro preklapljanje med otroki
+
+Med delom z vajo/igro logoped lahko hitro zamenja otroka:
+
+```text
+┌──────────────────────────────────────────┐
+│  Izberi otroka                      [✕]  │
+├──────────────────────────────────────────┤
+│  🔍 Išči...                              │
+├──────────────────────────────────────────┤
+│  🧒 Žak Novak (5 let)          ← aktiven │
+│  👧 Lana Horvat (6 let)                  │
+│  🧒 Matic Krajnc (4 leta)                │
+│  👧 Ana Kovač (5 let)                    │
+│  🧒 Tim Zupan (7 let)                    │
+└──────────────────────────────────────────┘
+```
+
+---
+
+## Licenčni prikaz v navigaciji
+
+V sidebartu bo vidno stanje licence:
+
+```text
+│ TERAPEVTSKO DELO              │
+│  └─ Moji otroci  [5/10] ← Zasedenost licence
+```
+
+Če je licenca skoraj polna, se prikaže opozorilo:
+
+```text
+│  └─ Moji otroci  [9/10] ⚠️  ← Oranžno opozorilo
+```
+
+Če je licenca polna:
+
+```text
+│  └─ Moji otroci  [10/10] 🔒 ← Rdeče, klik na "Dodaj" prikaže nadgradnjo
+```
+
+---
+
+## Tehnična implementacija (povzetek)
+
+### Nove datoteke
+
+| Datoteka | Namen |
+|----------|-------|
+| `src/pages/admin/AdminChildren.tsx` | Seznam otrok logopeda |
+| `src/pages/admin/AdminChildWorkspace.tsx` | Delovni prostor z aktivnostmi |
+| `src/pages/admin/AdminChildProgress.tsx` | Napredek otroka |
+| `src/components/admin/AddChildModal.tsx` | Modal za dodajanje otroka |
+| `src/components/admin/ChildCard.tsx` | Kartica otroka v seznamu |
+| `src/components/admin/ChildSwitcher.tsx` | Dropdown za menjavo otroka |
+| `src/contexts/LogopedistChildContext.tsx` | Kontekst aktivnega otroka |
+| `src/hooks/useLogopedistChildren.ts` | Hook za CRUD operacije |
+| `src/hooks/useLogopedistLicense.ts` | Hook za preverjanje licence |
+
+### Spremembe obstoječih datotek
+
+| Datoteka | Sprememba |
+|----------|-----------|
+| `AdminSidebar.tsx` | Dodaj sekcijo "Terapevtsko delo" z menijem "Moji otroci" |
+| `AdminRoutes.tsx` | Dodaj nove poti za otroke |
+| `ActivityOptions.tsx` | Dodaj prop `mode` in `logopedistChildId` |
+| `progress` tabela | Dodaj stolpec `logopedist_child_id` |
+
+### Baza podatkov
 
 ```sql
-DELETE FROM articulation_evaluations 
-WHERE session_id = 'd3742796-ad32-4880-90b3-f89767dfdb33';
+-- Nova tabela za otroke logopeda
+CREATE TABLE logopedist_children (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  logopedist_id UUID REFERENCES logopedist_profiles(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  age INTEGER NOT NULL,
+  gender TEXT,
+  avatar_url TEXT,
+  speech_difficulties TEXT[],
+  notes TEXT,           -- Interni zapiski
+  external_id TEXT,     -- ID iz logopedove prakse
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
 
-DELETE FROM articulation_test_sessions 
-WHERE id = 'd3742796-ad32-4880-90b3-f89767dfdb33';
+-- Licenčni sistemi
+CREATE TABLE license_tiers (
+  id UUID PRIMARY KEY,
+  name TEXT,          -- 'basic', 'standard', 'premium'
+  max_children INTEGER,
+  price_eur INTEGER   -- v centih
+);
+
+CREATE TABLE logopedist_licenses (
+  id UUID PRIMARY KEY,
+  logopedist_id UUID REFERENCES logopedist_profiles(id),
+  license_tier_id UUID REFERENCES license_tiers(id),
+  status TEXT DEFAULT 'active',
+  current_period_end TIMESTAMPTZ
+);
+
+-- Razširitev tabele progress
+ALTER TABLE progress 
+ADD COLUMN logopedist_child_id UUID REFERENCES logopedist_children(id);
 ```
 
-### Korak 2: Posodobi pravo sejo od 28.1.
+---
 
-Posodobi sejo od 28.1. tako da bo imela `session_number=1`:
+## Prednosti te rešitve
 
-```sql
-UPDATE articulation_test_sessions 
-SET session_number = 1
-WHERE id = 'fc3dd757-5bd2-40e6-a0c6-e19aab3ffc03';
-```
-
-### Korak 3: Premakni posnetke iz Seja-2 v Seja-1
-
-Ker hook `useSessionReview.ts` zdaj uporablja `session_number` za določitev mape, moram premakniti posnetke iz `Seja-2` v `Seja-1`:
-
-```
-Iz: uporabniski-profili/{userId}/{childId}/Preverjanje-izgovorjave/Seja-2/
-V:  uporabniski-profili/{userId}/{childId}/Preverjanje-izgovorjave/Seja-1/
-```
-
-To se naredi ročno v Supabase Storage dashboardu ali z skripto, ker Supabase Storage nima direktne "premakni" funkcije - potrebno je kopirati in izbrisati.
-
-### Korak 4 (alternativa): Posodobi logiko, da bere iz Seja-2
-
-Namesto premikanja datotek, lahko posodobim `session_number` na 2, da se ujema s storage mapo:
-
-```sql
--- Alternativa: ohrani posnetke kjer so in nastavi session_number=2
-UPDATE articulation_test_sessions 
-SET session_number = 2
-WHERE id = 'fc3dd757-5bd2-40e6-a0c6-e19aab3ffc03';
-
--- Izbriši testno sejo
-DELETE FROM articulation_evaluations 
-WHERE session_id = 'd3742796-ad32-4880-90b3-f89767dfdb33';
-
-DELETE FROM articulation_test_sessions 
-WHERE id = 'd3742796-ad32-4880-90b3-f89767dfdb33';
-```
-
-Tako bo admin portal za sejo od 28.1. iskal posnetke v `Seja-2` kjer dejansko so.
-
-## Priporočena rešitev
-
-**Opcija B** (Korak 4) je boljša, ker:
-- Ne zahteva premikanja 60 datotek v storage
-- Ohrani konsistentnost (session_number se ujema z imenom mape)
-- Je hitrejša in varnejša
-
-## Rezultat po popravku
-
-Po izvedbi migracije:
-- V bazi bo samo ena seja za otroka Žak (od 28.1.2026)
-- Ta seja bo imela `session_number=2`
-- Admin portal bo prikazal sejo z vsemi 60 posnetki v pravilnem vrstnem redu
-- URL za pregled bo: `/admin/tests/fc3dd757-5bd2-40e6-a0c6-e19aab3ffc03`
+1. **Jasna ločitev** - Otroci staršev in otroci logopedov so popolnoma ločeni
+2. **Ponovna uporaba komponent** - Igre in vaje ostanejo iste, samo kontekst se spremeni
+3. **Enostavno preklapljanje** - Logoped hitro menja med otroki med seansami
+4. **Sledljivost** - Vsaka aktivnost se beleži pod pravim otrokom
+5. **Licenčni nadzor** - Jasno vidno koliko mest ima še na voljo
+6. **Notranji zapiski** - Logoped lahko doda opombe za vsakega otroka
 
