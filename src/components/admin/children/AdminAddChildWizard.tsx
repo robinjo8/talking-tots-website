@@ -82,10 +82,13 @@ export function AdminAddChildWizard({ open, onOpenChange }: AdminAddChildWizardP
     onOpenChange(false);
   };
 
-  const handleSaveChild = async () => {
+  const handleSaveChild = async (speechDevelopmentAnswers?: Record<string, string>) => {
     if (!childData.birthDate || !logopedistId) return;
 
     setIsSubmitting(true);
+
+    // Use parameter directly to avoid React setState race condition
+    const speechDevelopmentData = speechDevelopmentAnswers || childData.speechDevelopment;
 
     try {
       const avatar = avatarOptions.find(a => a.id === childData.avatarId);
@@ -98,7 +101,7 @@ export function AdminAddChildWizard({ open, onOpenChange }: AdminAddChildWizardP
         avatar_url: avatar?.src || undefined,
         speech_difficulties: childData.speechDifficulties.length > 0 ? childData.speechDifficulties : undefined,
         speech_difficulties_description: childData.speechDifficultiesDescription || undefined,
-        speech_development: Object.keys(childData.speechDevelopment).length > 0 ? childData.speechDevelopment : undefined,
+        speech_development: Object.keys(speechDevelopmentData).length > 0 ? speechDevelopmentData : undefined,
         notes: childData.notes.trim() || undefined,
         external_id: childData.externalId.trim() || undefined,
       };
@@ -112,7 +115,7 @@ export function AdminAddChildWizard({ open, onOpenChange }: AdminAddChildWizardP
           newChild.id,
           childData.name.trim(),
           childData.speechDifficultiesDescription,
-          Object.keys(childData.speechDevelopment).length > 0 ? childData.speechDevelopment : undefined
+          Object.keys(speechDevelopmentData).length > 0 ? speechDevelopmentData : undefined
         );
         
         if (errors.length > 0) {
@@ -209,13 +212,13 @@ export function AdminAddChildWizard({ open, onOpenChange }: AdminAddChildWizardP
               childName={childData.name}
               initialAnswers={childData.speechDevelopment}
               onBack={() => setCurrentStep(WizardStep.SPEECH_DIFFICULTIES)}
-              onSubmit={(answers) => {
-                setChildData(prev => ({
-                  ...prev,
-                  speechDevelopment: answers,
-                }));
-                handleSaveChild();
-              }}
+            onSubmit={(answers) => {
+              setChildData(prev => ({
+                ...prev,
+                speechDevelopment: answers,
+              }));
+              handleSaveChild(answers);
+            }}
             />
             {isSubmitting && (
               <div className="flex items-center justify-center py-4">
