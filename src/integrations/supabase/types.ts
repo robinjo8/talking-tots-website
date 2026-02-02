@@ -253,7 +253,7 @@ export type Database = {
         Row: {
           assigned_at: string | null
           assigned_to: string | null
-          child_id: string
+          child_id: string | null
           completed_at: string | null
           created_at: string | null
           id: string
@@ -272,7 +272,7 @@ export type Database = {
         Insert: {
           assigned_at?: string | null
           assigned_to?: string | null
-          child_id: string
+          child_id?: string | null
           completed_at?: string | null
           created_at?: string | null
           id?: string
@@ -291,7 +291,7 @@ export type Database = {
         Update: {
           assigned_at?: string | null
           assigned_to?: string | null
-          child_id?: string
+          child_id?: string | null
           completed_at?: string | null
           created_at?: string | null
           id?: string
