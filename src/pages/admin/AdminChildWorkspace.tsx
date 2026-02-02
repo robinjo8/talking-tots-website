@@ -119,12 +119,20 @@ export default function AdminChildWorkspace() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className={cn(
-                "h-12 w-12 rounded-full flex items-center justify-center",
+                "h-12 w-12 rounded-full flex items-center justify-center overflow-hidden",
                 child.gender === 'male' ? 'bg-app-blue/10' : 'bg-app-pink/10'
               )}>
-                <span className="text-2xl">
-                  {child.gender === 'male' ? '🧒' : '👧'}
-                </span>
+                {child.avatar_url ? (
+                  <img 
+                    src={child.avatar_url} 
+                    alt={child.name} 
+                    className="h-full w-full object-contain"
+                  />
+                ) : (
+                  <span className="text-2xl">
+                    {child.gender === 'male' ? '🧒' : '👧'}
+                  </span>
+                )}
               </div>
               
               <div>
@@ -133,9 +141,6 @@ export default function AdminChildWorkspace() {
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Starost: {child.age} {child.age === 1 ? 'leto' : child.age < 5 ? 'leta' : 'let'}
-                  {child.speech_difficulties && child.speech_difficulties.length > 0 && (
-                    <> • Težave: {child.speech_difficulties.join(', ')}</>
-                  )}
                 </p>
               </div>
             </div>
