@@ -116,6 +116,7 @@ export default function AdminArtikulacijskiTest() {
     difficulty,
     setDifficulty,
     recordingDuration,
+    setRecordingDuration,
     saveProgress,
     loadProgress,
     clearProgress,
@@ -266,6 +267,8 @@ export default function AdminArtikulacijskiTest() {
         onClose={() => setShowSettingsDialog(false)}
         difficulty={difficulty}
         onDifficultyChange={setDifficulty}
+        recordingDuration={recordingDuration}
+        onRecordingDurationChange={setRecordingDuration}
       />
 
       {/* Resume Dialog */}

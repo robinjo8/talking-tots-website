@@ -120,6 +120,7 @@ const ArtikuacijskiTest = () => {
     difficulty,
     setDifficulty,
     recordingDuration,
+    setRecordingDuration,
     saveProgress,
     loadProgress,
     clearProgress,
@@ -267,6 +268,8 @@ const ArtikuacijskiTest = () => {
         onClose={() => setShowSettingsDialog(false)}
         difficulty={difficulty}
         onDifficultyChange={setDifficulty}
+        recordingDuration={recordingDuration}
+        onRecordingDurationChange={setRecordingDuration}
       />
 
       {/* Resume Dialog */}
