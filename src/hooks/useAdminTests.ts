@@ -15,6 +15,10 @@ export interface TestSessionData {
   parent_first_name: string | null;
   parent_last_name: string | null;
   assigned_to: string | null;
+  // New fields for organization filtering
+  source_type: 'parent' | 'logopedist';
+  logopedist_child_id: string | null;
+  organization_id: string | null;
 }
 
 export interface TestSessionStats {
@@ -31,7 +35,7 @@ export function useAdminTests() {
       // 1. Get all test sessions
       const { data: sessions, error: sessionsError } = await supabase
         .from('articulation_test_sessions')
-        .select('id, status, submitted_at, reviewed_at, completed_at, child_id, parent_id, assigned_to')
+        .select('id, status, submitted_at, reviewed_at, completed_at, child_id, parent_id, assigned_to, source_type, logopedist_child_id, organization_id')
         .order('submitted_at', { ascending: false });
 
       if (sessionsError) {
@@ -94,6 +98,9 @@ export function useAdminTests() {
           parent_first_name: parent?.first_name || null,
           parent_last_name: parent?.last_name || null,
           assigned_to: session.assigned_to,
+          source_type: (session.source_type || 'parent') as 'parent' | 'logopedist',
+          logopedist_child_id: session.logopedist_child_id,
+          organization_id: session.organization_id,
         };
       });
 

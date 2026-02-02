@@ -31,6 +31,10 @@ import { useClaimTestSession } from '@/hooks/useClaimTestSession';
 import { toast } from 'sonner';
 
 function formatParentName(session: PendingTestSession): string {
+  // For logopedist children, there's no parent - show "Logoped"
+  if (session.source_type === 'logopedist') {
+    return 'Logoped';
+  }
   if (session.parent_first_name || session.parent_last_name) {
     return `${session.parent_first_name || ''} ${session.parent_last_name || ''}`.trim();
   }
