@@ -20,6 +20,14 @@ const AdminChildren = lazy(() => import('@/pages/admin/AdminChildren'));
 const AdminChildWorkspace = lazy(() => import('@/pages/admin/AdminChildWorkspace'));
 const AdminChildProgress = lazy(() => import('@/pages/admin/AdminChildProgress'));
 
+// Admin exercise pages
+const AdminGovorneVaje = lazy(() => import('@/pages/admin/AdminGovorneVaje'));
+const AdminVajeMotorikeGovoril = lazy(() => import('@/pages/admin/exercises/AdminVajeMotorikeGovoril'));
+const AdminArtikulacijaVaje = lazy(() => import('@/pages/admin/exercises/AdminArtikulacijaVaje'));
+const AdminVideoNavodila = lazy(() => import('@/pages/admin/AdminVideoNavodila'));
+const AdminArtikulacijskiTest = lazy(() => import('@/pages/admin/AdminArtikulacijskiTest'));
+const AdminOsebniNacrt = lazy(() => import('@/pages/admin/AdminOsebniNacrt'));
+
 // Admin game pages
 const AdminGovorneIgre = lazy(() => import('@/pages/admin/AdminGovorneIgre'));
 const AdminSpominGames = lazy(() => import('@/pages/admin/games/AdminSpominGames'));
@@ -44,6 +52,8 @@ const AdminDrsnaSestavljankaRouter = lazy(() => import('@/components/routing/adm
 const AdminIgraUjemanjaRouter = lazy(() => import('@/components/routing/admin/AdminIgraUjemanjaRouter'));
 const AdminMetKockeRouter = lazy(() => import('@/components/routing/admin/AdminMetKockeRouter'));
 const AdminPonoviPovedRouter = lazy(() => import('@/components/routing/admin/AdminPonoviPovedRouter'));
+const AdminVideoNavodilaRouter = lazy(() => import('@/components/routing/admin/AdminVideoNavodilaRouter'));
+const AdminArtikulacijaVajeRouter = lazy(() => import('@/components/routing/admin/AdminArtikulacijaVajeRouter'));
 
 // Loading fallback for admin pages
 function AdminLoadingFallback() {
@@ -363,6 +373,78 @@ export function AdminRoutes() {
             <AdminGameFullscreenRoute>
               <AdminPonoviPovedRouter />
             </AdminGameFullscreenRoute>
+          } 
+        />
+        
+        {/* Admin exercise routes */}
+        <Route 
+          path="children/:childId/exercises" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminGovorneVaje />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="children/:childId/exercises/vaje-motorike-govoril" 
+          element={
+            <AdminGameFullscreenRoute>
+              <AdminVajeMotorikeGovoril />
+            </AdminGameFullscreenRoute>
+          } 
+        />
+        <Route 
+          path="children/:childId/exercises/artikulacija" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminArtikulacijaVaje />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="children/:childId/exercises/artikulacija/:gameId" 
+          element={
+            <AdminGameFullscreenRoute>
+              <AdminArtikulacijaVajeRouter />
+            </AdminGameFullscreenRoute>
+          } 
+        />
+        
+        {/* Admin video navodila routes */}
+        <Route 
+          path="children/:childId/video-navodila" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminVideoNavodila />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="children/:childId/video-navodila/:letter" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminVideoNavodilaRouter />
+            </AdminLayoutWrapper>
+          } 
+        />
+        
+        {/* Admin test route */}
+        <Route 
+          path="children/:childId/test" 
+          element={
+            <AdminGameFullscreenRoute>
+              <AdminArtikulacijskiTest />
+            </AdminGameFullscreenRoute>
+          } 
+        />
+        
+        {/* Admin osebni nacrt route */}
+        <Route 
+          path="children/:childId/osebni-nacrt" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminOsebniNacrt />
+            </AdminLayoutWrapper>
           } 
         />
         
