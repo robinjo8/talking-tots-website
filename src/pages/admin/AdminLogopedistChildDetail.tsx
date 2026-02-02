@@ -254,7 +254,7 @@ export default function AdminLogopedistChildDetail() {
 
     setIsGeneratingPdf(true);
     try {
-      const pdfBlob = await generateReportPdf(reportData);
+      const pdfBlob = await generateReportPdf(reportData, { hideParentSection: true });
       
       let fileName: string;
       if (editingReportName) {
@@ -739,6 +739,7 @@ export default function AdminLogopedistChildDetail() {
                 <ReportTemplateEditor
                   data={reportData}
                   testSessions={testSessions}
+                  hideParentSection={true}
                   onFieldChange={handleReportFieldChange}
                   onSessionChange={handleSessionChange}
                 />

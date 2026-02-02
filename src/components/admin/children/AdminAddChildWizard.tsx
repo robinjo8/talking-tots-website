@@ -7,11 +7,14 @@ import {
 } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { useLogopedistChildren, CreateChildInput } from '@/hooks/useLogopedistChildren';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { avatarOptions } from '@/components/AvatarSelector';
 import { SpeechDifficultiesStep, SpeechDevelopmentQuestions } from '@/components/speech';
 import { AdminChildBasicInfoStep } from './steps/AdminChildBasicInfoStep';
 import { AdminChildAvatarStep } from './steps/AdminChildAvatarStep';
 import { AdminChildCompletedView } from './AdminChildCompletedView';
+import { uploadLogopedistChildDocuments } from '@/utils/logopedistChildDocuments';
+import { toast } from 'sonner';
 
 enum WizardStep {
   BASIC_INFO = 0,
@@ -52,9 +55,12 @@ interface AdminAddChildWizardProps {
 
 export function AdminAddChildWizard({ open, onOpenChange }: AdminAddChildWizardProps) {
   const { createChild } = useLogopedistChildren();
+  const { profile } = useAdminAuth();
   const [currentStep, setCurrentStep] = useState<WizardStep>(WizardStep.BASIC_INFO);
   const [childData, setChildData] = useState<ChildData>(initialChildData);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const logopedistId = profile?.id;
 
   const calculateAge = (date: Date): number => {
     const today = new Date();
@@ -77,7 +83,7 @@ export function AdminAddChildWizard({ open, onOpenChange }: AdminAddChildWizardP
   };
 
   const handleSaveChild = async () => {
-    if (!childData.birthDate) return;
+    if (!childData.birthDate || !logopedistId) return;
 
     setIsSubmitting(true);
 
@@ -97,7 +103,23 @@ export function AdminAddChildWizard({ open, onOpenChange }: AdminAddChildWizardP
         external_id: childData.externalId.trim() || undefined,
       };
 
-      await createChild.mutateAsync(input);
+      const newChild = await createChild.mutateAsync(input);
+      
+      // Upload documents to storage after child is created
+      if (newChild?.id) {
+        const { errors } = await uploadLogopedistChildDocuments(
+          logopedistId,
+          newChild.id,
+          childData.name.trim(),
+          childData.speechDifficultiesDescription,
+          Object.keys(childData.speechDevelopment).length > 0 ? childData.speechDevelopment : undefined
+        );
+        
+        if (errors.length > 0) {
+          toast.warning('Otrok ustvarjen, vendar dokumenti niso bili naloženi');
+        }
+      }
+      
       setCurrentStep(WizardStep.COMPLETED);
     } catch (error) {
       // Error is already handled in the hook
