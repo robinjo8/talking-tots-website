@@ -1,7 +1,6 @@
 import { useParams, Navigate } from "react-router-dom";
 import { GenericIgraUjemanjaGame } from "@/components/games/GenericIgraUjemanjaGame";
 import { parseIgraUjemanjaUrlParam, igraUjemanjaConfigByUrlKey } from "@/data/igraUjemanjaConfig";
-import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
 
 export default function AdminIgraUjemanjaRouter() {
   const { childId, letterAndAge } = useParams<{ childId: string; letterAndAge: string }>();
@@ -40,12 +39,5 @@ export default function AdminIgraUjemanjaRouter() {
 
   const backPath = `/admin/children/${childId}/games/igra-ujemanja`;
 
-  return (
-    <AdminGameWrapper 
-      showBackButton={false}
-      backPath={backPath}
-    >
-      <GenericIgraUjemanjaGame config={config} backPath={backPath} />
-    </AdminGameWrapper>
-  );
+  return <GenericIgraUjemanjaGame config={config} backPath={backPath} />;
 }

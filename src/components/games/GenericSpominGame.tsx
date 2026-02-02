@@ -11,13 +11,17 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent } from "@/compon
 import { Loader, Home, RefreshCw } from "lucide-react";
 import { useGameMode, useGameNavigation } from "@/contexts/GameModeContext";
 
-interface GenericSpominGameProps {
+export interface GenericSpominGameProps {
   config: SpominConfig;
+  backPath?: string;
 }
 
-export function GenericSpominGame({ config }: GenericSpominGameProps) {
+export function GenericSpominGame({ config, backPath }: GenericSpominGameProps) {
   const navigate = useNavigate();
   const { getGameListPath } = useGameNavigation();
+  
+  // Use provided backPath or fall back to context-aware path
+  const effectiveBackPath = backPath || getGameListPath('spomin');
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showNewGameButton, setShowNewGameButton] = useState(false);
@@ -135,8 +139,8 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
 
   const handleConfirmExit = () => {
     setShowExitConfirmation(false);
-    // Use GameModeContext-aware navigation
-    navigate(getGameListPath('spomin'));
+    // Use provided backPath or context-aware navigation
+    navigate(effectiveBackPath);
   };
 
   const handleNewGame = () => {
@@ -167,7 +171,7 @@ export function GenericSpominGame({ config }: GenericSpominGameProps) {
         <div className="text-center p-6 bg-card rounded-xl shadow-lg">
           <p className="text-lg text-destructive mb-4">Napaka pri nalaganju igre</p>
           <button 
-            onClick={() => navigate(getGameListPath('spomin'))}
+            onClick={() => navigate(effectiveBackPath)}
             className="px-4 py-2 bg-dragon-green text-white rounded-lg hover:bg-dragon-green/90"
           >
             Nazaj na izbiro

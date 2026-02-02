@@ -1,7 +1,6 @@
 import { useParams, Navigate } from "react-router-dom";
 import { GenericSestavljankaGame } from "@/components/games/GenericSestavljankaGame";
 import { parseUrlParam, configByUrlKey } from "@/data/sestavljankeGameConfig";
-import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
 
 export default function AdminSestavljankeRouter() {
   const { childId, letterAndAge } = useParams<{ childId: string; letterAndAge: string }>();
@@ -34,12 +33,5 @@ export default function AdminSestavljankeRouter() {
 
   const backPath = `/admin/children/${childId}/games/sestavljanke`;
 
-  return (
-    <AdminGameWrapper 
-      showBackButton={false}
-      backPath={backPath}
-    >
-      <GenericSestavljankaGame config={config} backPath={backPath} />
-    </AdminGameWrapper>
-  );
+  return <GenericSestavljankaGame config={config} backPath={backPath} />;
 }

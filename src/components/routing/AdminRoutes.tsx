@@ -2,6 +2,7 @@ import { Route, Routes, Navigate } from 'react-router-dom';
 import { AdminAuthProvider } from '@/contexts/AdminAuthContext';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { lazy, Suspense } from 'react';
+import { AdminGameFullscreenWrapper } from '@/components/admin/games/AdminGameFullscreenWrapper';
 
 // Lazy load admin pages for better performance
 const AdminLogin = lazy(() => import('@/pages/admin/AdminLogin'));
@@ -61,6 +62,17 @@ function AdminLayoutWrapper({ children }: { children: React.ReactNode }) {
         {children}
       </Suspense>
     </AdminLayout>
+  );
+}
+
+// Fullscreen wrapper for games (no admin layout - games need full screen)
+function AdminGameFullscreenRoute({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<AdminLoadingFallback />}>
+      <AdminGameFullscreenWrapper>
+        {children}
+      </AdminGameFullscreenWrapper>
+    </Suspense>
   );
 }
 
@@ -204,9 +216,9 @@ export function AdminRoutes() {
         <Route 
           path="children/:childId/games/spomin/:gameId" 
           element={
-            <AdminLayoutWrapper>
+            <AdminGameFullscreenRoute>
               <AdminSpominRouter />
-            </AdminLayoutWrapper>
+            </AdminGameFullscreenRoute>
           } 
         />
         <Route 
@@ -220,9 +232,9 @@ export function AdminRoutes() {
         <Route 
           path="children/:childId/games/bingo/:letter" 
           element={
-            <AdminLayoutWrapper>
+            <AdminGameFullscreenRoute>
               <AdminBingoRouter />
-            </AdminLayoutWrapper>
+            </AdminGameFullscreenRoute>
           } 
         />
         <Route 
@@ -236,9 +248,9 @@ export function AdminRoutes() {
         <Route 
           path="children/:childId/games/kolo-srece/:letter" 
           element={
-            <AdminLayoutWrapper>
+            <AdminGameFullscreenRoute>
               <AdminKoloSreceRouter />
-            </AdminLayoutWrapper>
+            </AdminGameFullscreenRoute>
           } 
         />
         <Route 
@@ -252,9 +264,9 @@ export function AdminRoutes() {
         <Route 
           path="children/:childId/games/labirint/:letter" 
           element={
-            <AdminLayoutWrapper>
+            <AdminGameFullscreenRoute>
               <AdminLabirintRouter />
-            </AdminLayoutWrapper>
+            </AdminGameFullscreenRoute>
           } 
         />
         <Route 
@@ -268,9 +280,9 @@ export function AdminRoutes() {
         <Route 
           path="children/:childId/games/zaporedja/:letterAndAge" 
           element={
-            <AdminLayoutWrapper>
+            <AdminGameFullscreenRoute>
               <AdminZaporedjaRouter />
-            </AdminLayoutWrapper>
+            </AdminGameFullscreenRoute>
           } 
         />
         <Route 
@@ -284,9 +296,9 @@ export function AdminRoutes() {
         <Route 
           path="children/:childId/games/sestavljanke/:letterAndAge" 
           element={
-            <AdminLayoutWrapper>
+            <AdminGameFullscreenRoute>
               <AdminSestavljankeRouter />
-            </AdminLayoutWrapper>
+            </AdminGameFullscreenRoute>
           } 
         />
         <Route 
@@ -300,9 +312,9 @@ export function AdminRoutes() {
         <Route 
           path="children/:childId/games/drsna-sestavljanka/:letterAndAge" 
           element={
-            <AdminLayoutWrapper>
+            <AdminGameFullscreenRoute>
               <AdminDrsnaSestavljankaRouter />
-            </AdminLayoutWrapper>
+            </AdminGameFullscreenRoute>
           } 
         />
         <Route 
@@ -316,9 +328,9 @@ export function AdminRoutes() {
         <Route 
           path="children/:childId/games/igra-ujemanja/:letterAndAge" 
           element={
-            <AdminLayoutWrapper>
+            <AdminGameFullscreenRoute>
               <AdminIgraUjemanjaRouter />
-            </AdminLayoutWrapper>
+            </AdminGameFullscreenRoute>
           } 
         />
         <Route 
@@ -332,9 +344,9 @@ export function AdminRoutes() {
         <Route 
           path="children/:childId/games/met-kocke/:letter" 
           element={
-            <AdminLayoutWrapper>
+            <AdminGameFullscreenRoute>
               <AdminMetKockeRouter />
-            </AdminLayoutWrapper>
+            </AdminGameFullscreenRoute>
           } 
         />
         <Route 
@@ -348,9 +360,9 @@ export function AdminRoutes() {
         <Route 
           path="children/:childId/games/ponovi-poved/:letter" 
           element={
-            <AdminLayoutWrapper>
+            <AdminGameFullscreenRoute>
               <AdminPonoviPovedRouter />
-            </AdminLayoutWrapper>
+            </AdminGameFullscreenRoute>
           } 
         />
         
