@@ -11,9 +11,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { sl } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
 import { useLogopedistChildren, LogopedistChild, UpdateChildInput } from '@/hooks/useLogopedistChildren';
+import { GenderSelector } from '@/components/GenderSelector';
+import { AvatarSelector, avatarOptions } from '@/components/AvatarSelector';
+import { calculateAge } from '@/utils/childUtils';
 
 const SPEECH_DIFFICULTIES_OPTIONS = [
   'Š', 'Ž', 'Č', 'C', 'S', 'Z', 'R', 'L', 'K', 'G', 'P', 'B', 'M', 'N', 'T', 'D'
@@ -25,12 +33,35 @@ interface EditChildModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
+// Helper za pretvorbo spola iz 'male'/'female' v 'M'/'Ž' in obratno
+const genderToDisplay = (gender: 'male' | 'female' | null): string => {
+  if (gender === 'male') return 'M';
+  if (gender === 'female') return 'Ž';
+  return 'N';
+};
+
+const displayToGender = (display: string): 'male' | 'female' | undefined => {
+  if (display === 'M') return 'male';
+  if (display === 'Ž') return 'female';
+  return undefined;
+};
+
+// Helper za pretvorbo avatar_url v avatarId
+const avatarUrlToId = (url: string | null): number => {
+  if (!url) return 0;
+  const avatar = avatarOptions.find(a => a.src === url);
+  return avatar?.id || 0;
+};
+
 export function EditChildModal({ child, open, onOpenChange }: EditChildModalProps) {
   const { updateChild } = useLogopedistChildren();
   
   const [name, setName] = useState(child.name);
-  const [age, setAge] = useState(child.age.toString());
-  const [gender, setGender] = useState<'male' | 'female'>(child.gender || 'male');
+  const [birthDate, setBirthDate] = useState<Date | undefined>(
+    child.birth_date ? new Date(child.birth_date) : undefined
+  );
+  const [gender, setGender] = useState<string>(genderToDisplay(child.gender));
+  const [avatarId, setAvatarId] = useState<number>(avatarUrlToId(child.avatar_url));
   const [speechDifficulties, setSpeechDifficulties] = useState<string[]>(child.speech_difficulties || []);
   const [notes, setNotes] = useState(child.notes || '');
   const [externalId, setExternalId] = useState(child.external_id || '');
@@ -40,8 +71,9 @@ export function EditChildModal({ child, open, onOpenChange }: EditChildModalProp
   // Posodobi stanje ob spremembi otroka
   useEffect(() => {
     setName(child.name);
-    setAge(child.age.toString());
-    setGender(child.gender || 'male');
+    setBirthDate(child.birth_date ? new Date(child.birth_date) : undefined);
+    setGender(genderToDisplay(child.gender));
+    setAvatarId(avatarUrlToId(child.avatar_url));
     setSpeechDifficulties(child.speech_difficulties || []);
     setNotes(child.notes || '');
     setExternalId(child.external_id || '');
@@ -50,16 +82,24 @@ export function EditChildModal({ child, open, onOpenChange }: EditChildModalProp
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name.trim() || !age) return;
+    if (!name.trim()) return;
     
     setIsSubmitting(true);
     
     try {
+      // Izračunaj starost iz datuma rojstva ali uporabi obstoječo
+      const age = birthDate ? calculateAge(birthDate) : child.age;
+      
+      // Pridobi avatar URL iz avatarId
+      const avatarUrl = avatarId > 0 ? avatarOptions[avatarId]?.src : null;
+      
       const input: UpdateChildInput = {
         id: child.id,
         name: name.trim(),
-        age: parseInt(age, 10),
-        gender,
+        age,
+        gender: displayToGender(gender),
+        birth_date: birthDate ? birthDate.toISOString().split('T')[0] : undefined,
+        avatar_url: avatarUrl || undefined,
         speech_difficulties: speechDifficulties.length > 0 ? speechDifficulties : undefined,
         notes: notes.trim() || undefined,
         external_id: externalId.trim() || undefined,
@@ -84,7 +124,7 @@ export function EditChildModal({ child, open, onOpenChange }: EditChildModalProp
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Uredi otroka</DialogTitle>
           <DialogDescription>
@@ -92,7 +132,7 @@ export function EditChildModal({ child, open, onOpenChange }: EditChildModalProp
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           {/* Ime */}
           <div className="space-y-2">
             <Label htmlFor="edit-name">Ime otroka *</Label>
@@ -105,38 +145,55 @@ export function EditChildModal({ child, open, onOpenChange }: EditChildModalProp
             />
           </div>
 
-          {/* Starost */}
+          {/* Datum rojstva */}
           <div className="space-y-2">
-            <Label htmlFor="edit-age">Starost *</Label>
-            <Input
-              id="edit-age"
-              type="number"
-              min="1"
-              max="18"
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
-              required
-            />
+            <Label>Datum rojstva</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !birthDate && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {birthDate ? format(birthDate, "d. MMMM yyyy", { locale: sl }) : "Izberi datum"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={birthDate}
+                  onSelect={setBirthDate}
+                  disabled={(date) =>
+                    date > new Date() || date < new Date("2000-01-01")
+                  }
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                  locale={sl}
+                />
+              </PopoverContent>
+            </Popover>
+            {birthDate && (
+              <p className="text-xs text-muted-foreground">
+                Starost: {calculateAge(birthDate)} {calculateAge(birthDate) === 1 ? 'leto' : calculateAge(birthDate) < 5 ? 'leta' : 'let'}
+              </p>
+            )}
           </div>
 
           {/* Spol */}
-          <div className="space-y-2">
-            <Label>Spol</Label>
-            <RadioGroup
-              value={gender}
-              onValueChange={(value) => setGender(value as 'male' | 'female')}
-              className="flex gap-4"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="male" id="edit-male" />
-                <Label htmlFor="edit-male" className="font-normal cursor-pointer">Deček</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="female" id="edit-female" />
-                <Label htmlFor="edit-female" className="font-normal cursor-pointer">Deklica</Label>
-              </div>
-            </RadioGroup>
-          </div>
+          <GenderSelector
+            selectedGender={gender}
+            onGenderChange={setGender}
+          />
+
+          {/* Avatar */}
+          <AvatarSelector
+            selectedAvatarId={avatarId}
+            onAvatarSelect={setAvatarId}
+            variant="dropdown"
+          />
 
           {/* Govorni izzivi */}
           <div className="space-y-2">
@@ -194,7 +251,7 @@ export function EditChildModal({ child, open, onOpenChange }: EditChildModalProp
             </Button>
             <Button 
               type="submit" 
-              disabled={isSubmitting || !name.trim() || !age}
+              disabled={isSubmitting || !name.trim()}
               className="bg-dragon-green hover:bg-dragon-green/90"
             >
               {isSubmitting ? 'Shranjevanje...' : 'Shrani spremembe'}

@@ -19,6 +19,17 @@ import { AdminAddChildWizard } from '@/components/admin/children/AdminAddChildWi
 import { EditChildModal } from '@/components/admin/children/EditChildModal';
 import { DeleteChildDialog } from '@/components/admin/children/DeleteChildDialog';
 import { cn } from '@/lib/utils';
+import { SPEECH_DIFFICULTIES } from '@/models/SpeechDifficulties';
+
+// Helper funkcija za prevod ID-jev govornih težav v slovenske naslove
+const getSpeechDifficultyLabel = (difficultyId: string): string => {
+  const difficulty = SPEECH_DIFFICULTIES.find(d => d.id === difficultyId);
+  if (difficulty) {
+    // Vzemi samo del pred pomišljajem za krajši prikaz
+    return difficulty.title.split('–')[0].trim();
+  }
+  return difficultyId; // Fallback na ID če ni najden
+};
 
 export default function AdminChildren() {
   const navigate = useNavigate();
@@ -149,12 +160,20 @@ export default function AdminChildren() {
                   {/* Avatar in osnovni podatki */}
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     <div className={cn(
-                      "h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0",
+                      "h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden",
                       child.gender === 'male' ? 'bg-app-blue/10' : 'bg-app-pink/10'
                     )}>
-                      <span className="text-xl">
-                        {child.gender === 'male' ? '🧒' : '👧'}
-                      </span>
+                      {child.avatar_url ? (
+                        <img 
+                          src={child.avatar_url} 
+                          alt={child.name} 
+                          className="h-full w-full object-contain"
+                        />
+                      ) : (
+                        <span className="text-xl">
+                          {child.gender === 'male' ? '🧒' : '👧'}
+                        </span>
+                      )}
                     </div>
                     
                     <div className="min-w-0 flex-1">
@@ -164,7 +183,7 @@ export default function AdminChildren() {
                         {child.speech_difficulties && child.speech_difficulties.length > 0 && (
                           <>
                             <span>•</span>
-                            <span>Težave: {child.speech_difficulties.join(', ')}</span>
+                            <span>Govorne težave: {child.speech_difficulties.map(getSpeechDifficultyLabel).join(', ')}</span>
                           </>
                         )}
                       </div>
