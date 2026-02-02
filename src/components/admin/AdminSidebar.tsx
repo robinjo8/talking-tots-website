@@ -15,16 +15,22 @@ import {
   Bell,
   LogOut,
   UserCheck,
-  LucideIcon
+  Baby,
+  LucideIcon,
+  AlertCircle,
+  Lock
 } from 'lucide-react';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { useAdminCounts } from '@/hooks/useAdminCounts';
+import { useLogopedistLicense } from '@/hooks/useLogopedistLicense';
 
 interface NavItem {
   name: string;
   href: string;
   icon: LucideIcon;
   count?: number;
+  badge?: string;
+  badgeVariant?: 'default' | 'warning' | 'danger';
 }
 
 function NotificationBadge({ count }: { count: number }) {
@@ -32,6 +38,19 @@ function NotificationBadge({ count }: { count: number }) {
   return (
     <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-app-orange text-[10px] font-bold text-white px-1">
       {count > 99 ? '99+' : count}
+    </span>
+  );
+}
+
+function LicenseBadge({ used, max, variant }: { used: number; max: number; variant?: 'default' | 'warning' | 'danger' }) {
+  return (
+    <span className={cn(
+      "ml-auto flex h-5 items-center justify-center rounded-full text-[10px] font-bold px-1.5",
+      variant === 'danger' ? 'bg-destructive/10 text-destructive' :
+      variant === 'warning' ? 'bg-app-orange/10 text-app-orange' :
+      'bg-muted text-muted-foreground'
+    )}>
+      {used}/{max}
     </span>
   );
 }
@@ -59,6 +78,7 @@ export function AdminSidebar() {
   const navigate = useNavigate();
   const { signOut, profile, isSuperAdmin } = useAdminAuth();
   const { pendingCount, myReviewsCount } = useAdminCounts();
+  const { license, hasLicense, isNearLimit, isAtLimit } = useLogopedistLicense();
 
   // Navigation with dynamic counts
   const navigation: NavItem[] = baseNavigation.map(item => {
@@ -70,6 +90,15 @@ export function AdminSidebar() {
     }
     return item;
   });
+
+  // Terapevtsko delo navigacija
+  const therapyNavigation: NavItem[] = [
+    { 
+      name: 'Moji otroci', 
+      href: '/admin/children', 
+      icon: Baby,
+    },
+  ];
 
   // Dinamično sestavljen meni nastavitev - "Članstva" samo za super admina
   const settingsNavigation: NavItem[] = [
@@ -141,6 +170,48 @@ export function AdminSidebar() {
                         {item.name}
                         {item.count !== undefined && item.count > 0 && (
                           <NotificationBadge count={item.count} />
+                        )}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+
+              {/* Terapevtsko delo - nova sekcija */}
+              <li>
+                <div className="text-xs font-semibold leading-6 text-muted-foreground uppercase tracking-wider mb-2">
+                  Terapevtsko delo
+                </div>
+                <ul role="list" className="-mx-2 space-y-1">
+                  {therapyNavigation.map((item) => (
+                    <li key={item.name}>
+                      <Link
+                        to={item.href}
+                        className={cn(
+                          'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-medium transition-colors',
+                          isActive(item.href)
+                            ? 'bg-app-blue/10 text-app-blue'
+                            : 'text-foreground hover:bg-muted hover:text-foreground'
+                        )}
+                      >
+                        <item.icon
+                          className={cn(
+                            'h-5 w-5 shrink-0',
+                            isActive(item.href)
+                              ? 'text-app-blue'
+                              : 'text-muted-foreground group-hover:text-foreground'
+                          )}
+                        />
+                        {item.name}
+                        {license && (
+                          <LicenseBadge 
+                            used={license.usedSlots} 
+                            max={license.maxChildren}
+                            variant={isAtLimit ? 'danger' : isNearLimit ? 'warning' : 'default'}
+                          />
+                        )}
+                        {!hasLicense && (
+                          <Lock className="ml-auto h-4 w-4 text-muted-foreground" />
                         )}
                       </Link>
                     </li>

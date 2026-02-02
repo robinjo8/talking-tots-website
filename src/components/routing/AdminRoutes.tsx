@@ -15,6 +15,9 @@ const AdminPending = lazy(() => import('@/pages/admin/AdminPending'));
 const AdminMyReviews = lazy(() => import('@/pages/admin/AdminMyReviews'));
 const AdminSessionReview = lazy(() => import('@/pages/admin/AdminSessionReview'));
 const AdminReports = lazy(() => import('@/pages/admin/AdminReports'));
+const AdminChildren = lazy(() => import('@/pages/admin/AdminChildren'));
+const AdminChildWorkspace = lazy(() => import('@/pages/admin/AdminChildWorkspace'));
+const AdminChildProgress = lazy(() => import('@/pages/admin/AdminChildProgress'));
 
 // Loading fallback for admin pages
 function AdminLoadingFallback() {
@@ -128,6 +131,30 @@ export function AdminRoutes() {
           element={
             <AdminLayoutWrapper>
               <AdminReports />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="children" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminChildren />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="children/:childId/workspace" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminChildWorkspace />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="children/:childId/progress" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminChildProgress />
             </AdminLayoutWrapper>
           } 
         />
