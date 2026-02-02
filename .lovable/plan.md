@@ -1,383 +1,265 @@
 
 
-# Podroben načrt: Modul "Moji otroci" za logopede
+# Implementacijski načrt: Vgraditev iger v admin portal za logopede
 
-## Vizualna predstavitev navigacije
+## Povzetek problema
 
-### Trenutni admin sidebar
-```text
-┌─────────────────────────────┐
-│ 🐲 TomiTalk [Admin]         │
-├─────────────────────────────┤
-│ DELOVNI PROSTOR             │
-│  ├─ Moj portal              │
-│  ├─ Vsa preverjanja         │
-│  ├─ V čakanju          [3]  │
-│  └─ Moji pregledi      [2]  │
-├─────────────────────────────┤
-│ UPRAVLJANJE                 │
-│  ├─ Uporabniki              │
-│  ├─ Poročila                │
-│  └─ Sporočila               │
-├─────────────────────────────┤
-│ NASTAVITVE                  │
-│  ├─ Nastavitve              │
-│  ├─ Obvestila               │
-│  └─ Članstva (admin)        │
-└─────────────────────────────┘
-```
+Ko logoped iz delovnega prostora otroka klikne na "Govorne igre", se odpre uporabniški portal, ki pričakuje otroka iz tabele `children` (preko `AuthContext.selectedChild`). Logopedovi otroci so v tabeli `logopedist_children` in niso dostopni preko tega konteksta.
 
-### Predlagan sidebar z novim modulom
-```text
-┌─────────────────────────────┐
-│ 🐲 TomiTalk [Admin]         │
-├─────────────────────────────┤
-│ DELOVNI PROSTOR             │
-│  ├─ Moj portal              │
-│  ├─ Vsa preverjanja         │
-│  ├─ V čakanju          [3]  │
-│  └─ Moji pregledi      [2]  │
-├─────────────────────────────┤
-│ 🆕 TERAPEVTSKO DELO         │ ← Nova sekcija
-│  └─ Moji otroci        [5/10]│ ← Prikazuje število/omejitev
-├─────────────────────────────┤
-│ UPRAVLJANJE                 │
-│  ├─ Uporabniki              │
-│  ├─ Poročila                │
-│  └─ Sporočila               │
-├─────────────────────────────┤
-│ NASTAVITVE                  │
-│  └─ ...                     │
-└─────────────────────────────┘
-```
+## Rešitev
+
+Ustvariti **GameModeContext** ki bo zagotovil informacije o načinu delovanja (user/logopedist) in ID otroka. Komponente iger bodo preverjale ta kontekst in shranjevale napredek v ustrezno polje (`child_id` ali `logopedist_child_id`).
 
 ---
 
-## Kaj se zgodi ko logoped klikne "Moji otroci"?
+## Tehnična implementacija
 
-### Stran 1: Seznam otrok (`/admin/children`)
+### 1. Nov kontekst: `GameModeContext.tsx`
 
-```text
-┌────────────────────────────────────────────────────────────────────┐
-│  Moji otroci                                      [+ Dodaj otroka] │
-│  Aktivna licenca: Standard (5/25 otrok)                            │
-├────────────────────────────────────────────────────────────────────┤
-│                                                                    │
-│  ┌──────────────────────────────────────────────────────────────┐  │
-│  │ 🧒 Žak Novak                                                 │  │
-│  │    Starost: 5 let • Težave: Š, Ž, R                          │  │
-│  │    Zadnja seja: 28.1.2026                                    │  │
-│  │                                                              │  │
-│  │    [📊 Napredek]  [🎮 Začni delo]  [✏️ Uredi]  [🗑️]          │  │
-│  └──────────────────────────────────────────────────────────────┘  │
-│                                                                    │
-│  ┌──────────────────────────────────────────────────────────────┐  │
-│  │ 👧 Lana Horvat                                               │  │
-│  │    Starost: 6 let • Težave: C, S, Z                          │  │
-│  │    Zadnja seja: 25.1.2026                                    │  │
-│  │                                                              │  │
-│  │    [📊 Napredek]  [🎮 Začni delo]  [✏️ Uredi]  [🗑️]          │  │
-│  └──────────────────────────────────────────────────────────────┘  │
-│                                                                    │
-│  ┌──────────────────────────────────────────────────────────────┐  │
-│  │ 🧒 Matic Krajnc                                              │  │
-│  │    Starost: 4 leta • Težave: P, B, M                         │  │
-│  │    Nova seja - ni podatkov                                   │  │
-│  │                                                              │  │
-│  │    [📊 Napredek]  [🎮 Začni delo]  [✏️ Uredi]  [🗑️]          │  │
-│  └──────────────────────────────────────────────────────────────┘  │
-│                                                                    │
-└────────────────────────────────────────────────────────────────────┘
+```typescript
+// src/contexts/GameModeContext.tsx
+interface GameModeContextType {
+  mode: 'user' | 'logopedist';
+  childId: string | null;           // Za uporabniški način (parent's child)
+  logopedistChildId: string | null; // Za logopedistov način
+  childName: string | null;
+  basePath: string;                  // '/govorne-igre' ali '/admin/children/:id/games'
+}
 ```
 
-**Funkcionalnosti na tej strani:**
-- **Dodaj otroka**: Odpre modal za vnos novega otroka (ime, starost, spol, govorni izzivi)
-- **Napredek**: Odpre podroben pregled napredka otroka (grafi, zgodovina)
-- **Začni delo**: Odpre delovni prostor za tega otroka
-- **Uredi**: Urejanje podatkov otroka
-- **Briši**: Odstrani otroka (sprosti mesto v licenci)
+Ta kontekst bo omogočil:
+- Igram, da vedo ali shranjujejo v `child_id` ali `logopedist_child_id`
+- Navigacijskim gumbom, da vedo kam se vrnejo (uporabniški ali admin portal)
 
----
+### 2. Posodobitev `useEnhancedProgress.ts`
 
-### Stran 2: Delovni prostor otroka (`/admin/children/:id/workspace`)
+Razširitev hooka za podporo logopedistovim otrokom:
 
-Ko logoped klikne **"Začni delo"**, se odpre ta stran:
-
-```text
-┌────────────────────────────────────────────────────────────────────┐
-│  ← Nazaj na seznam                                                 │
-├────────────────────────────────────────────────────────────────────┤
-│                                                                    │
-│  ┌──────────────────────────────────────────────────────────────┐  │
-│  │  🧒 Aktivni otrok: Žak Novak                        [Zamenjaj]│  │
-│  │      Starost: 5 let • Težave: Š, Ž, R • ⭐ 15 zvezdic danes  │  │
-│  └──────────────────────────────────────────────────────────────┘  │
-│                                                                    │
-│  ╔════════════════════════════════════════════════════════════════╗│
-│  ║                    IZBERI AKTIVNOST                            ║│
-│  ╠════════════════════════════════════════════════════════════════╣│
-│  ║                                                                ║│
-│  ║  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐            ║│
-│  ║  │   🎮        │  │   📝        │  │   🎯        │            ║│
-│  ║  │ Govorne     │  │ Govorne     │  │ Preverjanje │            ║│
-│  ║  │ igre        │  │ vaje        │  │ izgovorjave │            ║│
-│  ║  │             │  │             │  │             │            ║│
-│  ║  └─────────────┘  └─────────────┘  └─────────────┘            ║│
-│  ║                                                                ║│
-│  ║  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐            ║│
-│  ║  │   🎥        │  │   💡        │  │   ⭐        │            ║│
-│  ║  │ Video       │  │ Logopedski  │  │ Moj osebni  │            ║│
-│  ║  │ navodila    │  │ nasveti     │  │ načrt       │            ║│
-│  ║  │             │  │             │  │             │            ║│
-│  ║  └─────────────┘  └─────────────┘  └─────────────┘            ║│
-│  ║                                                                ║│
-│  ╚════════════════════════════════════════════════════════════════╝│
-│                                                                    │
-└────────────────────────────────────────────────────────────────────┘
+```typescript
+// Dodaj parameter za logopedist način
+const recordGameCompletion = (
+  gameType: string, 
+  subtype: string = 'general',
+  logopedistChildId?: string  // Nov opcijski parameter
+) => {
+  // Če je podan logopedistChildId, uporabi to namesto child_id
+  const progressEntry = {
+    child_id: logopedistChildId ? null : selectedChild?.id,
+    logopedist_child_id: logopedistChildId || null,
+    // ... ostalo
+  };
+};
 ```
 
-**Funkcionalnosti:**
-- **Aktivni otrok v glavi**: Vedno vidiš s katerim otrokom delaš
-- **Gumb "Zamenjaj"**: Hitro preklapljanje med otroki (dropdown ali modal)
-- **Kartice aktivnosti**: Enake kot na uporabniški strani za starše
-- Klik na aktivnost odpre **vgrajen iFrame** ali **komponento** z igro/vajo
-
----
-
-### Stran 3: Igra/vaja v kontekstu otroka
-
-Ko logoped izbere igro (npr. "Spomin za črko Š"):
-
-```text
-┌────────────────────────────────────────────────────────────────────┐
-│  ← Nazaj                   🧒 Žak Novak              [Zamenjaj]    │
-├────────────────────────────────────────────────────────────────────┤
-│                                                                    │
-│  ╔════════════════════════════════════════════════════════════════╗│
-│  ║                                                                ║│
-│  ║              [GOVORNA IGRA - SPOMIN ZA Š]                      ║│
-│  ║                                                                ║│
-│  ║     ┌────┐  ┌────┐  ┌────┐  ┌────┐                            ║│
-│  ║     │ ?  │  │ 🐘 │  │ ?  │  │ ?  │                            ║│
-│  ║     └────┘  └────┘  └────┘  └────┘                            ║│
-│  ║                                                                ║│
-│  ║     ┌────┐  ┌────┐  ┌────┐  ┌────┐                            ║│
-│  ║     │ ?  │  │ ?  │  │ ?  │  │ 🎒 │                            ║│
-│  ║     └────┘  └────┘  └────┘  └────┘                            ║│
-│  ║                                                                ║│
-│  ║              ⭐⭐⭐ (3 zvezdice)                               ║│
-│  ║                                                                ║│
-│  ╚════════════════════════════════════════════════════════════════╝│
-│                                                                    │
-│  📊 Rezultat se bo shranil v napredek otroka Žak                   │
-│                                                                    │
-└────────────────────────────────────────────────────────────────────┘
-```
-
-**Kako deluje shranjevanje:**
-- Komponenta igre prejme `logopedistChildId` namesto `childId`
-- Napredek se shranjuje v tabelo `progress` s poljem `logopedist_child_id`
-- Logoped vidi rezultate v pregledu napredka otroka
-
----
-
-### Stran 4: Napredek otroka (`/admin/children/:id/progress`)
-
-```text
-┌────────────────────────────────────────────────────────────────────┐
-│  ← Nazaj                   Napredek: Žak Novak                     │
-├────────────────────────────────────────────────────────────────────┤
-│                                                                    │
-│  ┌─────────────────────────────────────────────────────────────┐   │
-│  │  📊 STATISTIKA                                               │   │
-│  │                                                              │   │
-│  │   Skupaj sej: 12     Zvezdice: 156 ⭐    Povprečje: 85%     │   │
-│  └─────────────────────────────────────────────────────────────┘   │
-│                                                                    │
-│  ┌─────────────────────────────────────────────────────────────┐   │
-│  │  📈 NAPREDEK PO ČRKAH                                       │   │
-│  │                                                              │   │
-│  │   Š: ████████████░░░░░░░░  60%  (izboljšanje +15%)          │   │
-│  │   Ž: █████████░░░░░░░░░░░  45%  (izboljšanje +10%)          │   │
-│  │   R: ██████░░░░░░░░░░░░░░  30%  (začetek)                   │   │
-│  └─────────────────────────────────────────────────────────────┘   │
-│                                                                    │
-│  ┌─────────────────────────────────────────────────────────────┐   │
-│  │  📅 ZGODOVINA AKTIVNOSTI                                     │   │
-│  │                                                              │   │
-│  │   28.1.2026  Spomin Š       ⭐⭐⭐   85%                     │   │
-│  │   28.1.2026  Vaja izgovorj. ⭐⭐     70%                     │   │
-│  │   25.1.2026  Bingo Ž        ⭐⭐⭐   90%                     │   │
-│  │   ...                                                        │   │
-│  └─────────────────────────────────────────────────────────────┘   │
-│                                                                    │
-│  ┌─────────────────────────────────────────────────────────────┐   │
-│  │  🎯 PREVERJANJA IZGOVORJAVE                                  │   │
-│  │                                                              │   │
-│  │   28.1.2026  Seja 1  [Pregledano] [Odpri poročilo]          │   │
-│  └─────────────────────────────────────────────────────────────┘   │
-│                                                                    │
-└────────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## Dodajanje otroka - Modal
-
-```text
-┌─────────────────────────────────────────────────────┐
-│  Dodaj novega otroka                           [✕]  │
-├─────────────────────────────────────────────────────┤
-│                                                     │
-│  Ime otroka *                                       │
-│  ┌─────────────────────────────────────────────┐    │
-│  │                                             │    │
-│  └─────────────────────────────────────────────┘    │
-│                                                     │
-│  Datum rojstva / Starost *                          │
-│  ┌─────────────────────────────────────────────┐    │
-│  │  5 let                                      │    │
-│  └─────────────────────────────────────────────┘    │
-│                                                     │
-│  Spol                                               │
-│  ○ Deček   ○ Deklica                               │
-│                                                     │
-│  Govorni izzivi (izberi več)                        │
-│  ☑ Š   ☑ Ž   ☐ Č   ☐ C   ☐ S   ☐ Z                │
-│  ☐ R   ☐ L   ☐ K   ☐ G   ☐ P   ☐ B                │
-│                                                     │
-│  Notranji zapiski (opcijsko)                        │
-│  ┌─────────────────────────────────────────────┐    │
-│  │ Diagnoza: dislalija, obiskuje 2x tedensko   │    │
-│  └─────────────────────────────────────────────┘    │
-│                                                     │
-│  Zunanji ID (opcijsko - iz vaše prakse)             │
-│  ┌─────────────────────────────────────────────┐    │
-│  │ PAC-2024-042                                │    │
-│  └─────────────────────────────────────────────┘    │
-│                                                     │
-│                          [Prekliči]  [💾 Shrani]    │
-│                                                     │
-└─────────────────────────────────────────────────────┘
-```
-
----
-
-## Hitro preklapljanje med otroki
-
-Med delom z vajo/igro logoped lahko hitro zamenja otroka:
-
-```text
-┌──────────────────────────────────────────┐
-│  Izberi otroka                      [✕]  │
-├──────────────────────────────────────────┤
-│  🔍 Išči...                              │
-├──────────────────────────────────────────┤
-│  🧒 Žak Novak (5 let)          ← aktiven │
-│  👧 Lana Horvat (6 let)                  │
-│  🧒 Matic Krajnc (4 leta)                │
-│  👧 Ana Kovač (5 let)                    │
-│  🧒 Tim Zupan (7 let)                    │
-└──────────────────────────────────────────┘
-```
-
----
-
-## Licenčni prikaz v navigaciji
-
-V sidebartu bo vidno stanje licence:
-
-```text
-│ TERAPEVTSKO DELO              │
-│  └─ Moji otroci  [5/10] ← Zasedenost licence
-```
-
-Če je licenca skoraj polna, se prikaže opozorilo:
-
-```text
-│  └─ Moji otroci  [9/10] ⚠️  ← Oranžno opozorilo
-```
-
-Če je licenca polna:
-
-```text
-│  └─ Moji otroci  [10/10] 🔒 ← Rdeče, klik na "Dodaj" prikaže nadgradnjo
-```
-
----
-
-## Tehnična implementacija (povzetek)
-
-### Nove datoteke
+### 3. Nove admin strani za igre
 
 | Datoteka | Namen |
 |----------|-------|
-| `src/pages/admin/AdminChildren.tsx` | Seznam otrok logopeda |
-| `src/pages/admin/AdminChildWorkspace.tsx` | Delovni prostor z aktivnostmi |
-| `src/pages/admin/AdminChildProgress.tsx` | Napredek otroka |
-| `src/components/admin/AddChildModal.tsx` | Modal za dodajanje otroka |
-| `src/components/admin/ChildCard.tsx` | Kartica otroka v seznamu |
-| `src/components/admin/ChildSwitcher.tsx` | Dropdown za menjavo otroka |
-| `src/contexts/LogopedistChildContext.tsx` | Kontekst aktivnega otroka |
-| `src/hooks/useLogopedistChildren.ts` | Hook za CRUD operacije |
-| `src/hooks/useLogopedistLicense.ts` | Hook za preverjanje licence |
+| `src/pages/admin/AdminGovorneIgre.tsx` | Seznam iger (brez Header/Footer) |
+| `src/pages/admin/games/AdminSpominGames.tsx` | Izbira črk za Spomin |
+| `src/pages/admin/games/AdminKoloSreceGames.tsx` | Izbira črk za Kolo besed |
+| `src/pages/admin/games/AdminBingoGames.tsx` | Izbira črk za Bingo |
+| `src/pages/admin/games/AdminLabirintGames.tsx` | Izbira črk za Labirint |
+| ... (ostale igre) |
 
-### Spremembe obstoječih datotek
+### 4. Admin routerji za igre
 
-| Datoteka | Sprememba |
-|----------|-----------|
-| `AdminSidebar.tsx` | Dodaj sekcijo "Terapevtsko delo" z menijem "Moji otroci" |
-| `AdminRoutes.tsx` | Dodaj nove poti za otroke |
-| `ActivityOptions.tsx` | Dodaj prop `mode` in `logopedistChildId` |
-| `progress` tabela | Dodaj stolpec `logopedist_child_id` |
+| Datoteka | Namen |
+|----------|-------|
+| `src/components/routing/AdminSpominRouter.tsx` | Router za Spomin igro |
+| `src/components/routing/AdminKoloSreceRouter.tsx` | Router za Kolo besed |
+| ... (ostali routerji) |
 
-### Baza podatkov
+### 5. Wrapper komponenta: `AdminGameWrapper.tsx`
 
-```sql
--- Nova tabela za otroke logopeda
-CREATE TABLE logopedist_children (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  logopedist_id UUID REFERENCES logopedist_profiles(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  age INTEGER NOT NULL,
-  gender TEXT,
-  avatar_url TEXT,
-  speech_difficulties TEXT[],
-  notes TEXT,           -- Interni zapiski
-  external_id TEXT,     -- ID iz logopedove prakse
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now()
-);
+```typescript
+// src/components/admin/games/AdminGameWrapper.tsx
+// Wrapper ki nastavi GameModeContext in prikaže info o otroku
 
--- Licenčni sistemi
-CREATE TABLE license_tiers (
-  id UUID PRIMARY KEY,
-  name TEXT,          -- 'basic', 'standard', 'premium'
-  max_children INTEGER,
-  price_eur INTEGER   -- v centih
-);
+interface Props {
+  children: React.ReactNode;
+  showBackButton?: boolean;
+}
 
-CREATE TABLE logopedist_licenses (
-  id UUID PRIMARY KEY,
-  logopedist_id UUID REFERENCES logopedist_profiles(id),
-  license_tier_id UUID REFERENCES license_tiers(id),
-  status TEXT DEFAULT 'active',
-  current_period_end TIMESTAMPTZ
-);
+export function AdminGameWrapper({ children, showBackButton = true }: Props) {
+  const { childId } = useParams();
+  const { data: child } = useLogopedistChild(childId);
+  
+  return (
+    <GameModeProvider mode="logopedist" logopedistChildId={childId}>
+      <div className="space-y-4">
+        {showBackButton && (
+          <div className="flex items-center justify-between">
+            <Button variant="ghost" onClick={() => navigate(-1)}>
+              <ArrowLeft /> Nazaj
+            </Button>
+            <ChildSwitcherCompact child={child} />
+          </div>
+        )}
+        {children}
+      </div>
+    </GameModeProvider>
+  );
+}
+```
 
--- Razširitev tabele progress
-ALTER TABLE progress 
-ADD COLUMN logopedist_child_id UUID REFERENCES logopedist_children(id);
+### 6. Posodobitev `AdminRoutes.tsx`
+
+```typescript
+// Dodaj nove poti za igre
+<Route path="children/:childId/games" element={<AdminLayoutWrapper><AdminGovorneIgre /></AdminLayoutWrapper>} />
+<Route path="children/:childId/games/spomin" element={<AdminLayoutWrapper><AdminSpominGames /></AdminLayoutWrapper>} />
+<Route path="children/:childId/games/spomin/:gameId" element={<AdminLayoutWrapper><AdminSpominRouter /></AdminLayoutWrapper>} />
+<Route path="children/:childId/games/kolo-srece" element={<AdminLayoutWrapper><AdminKoloSreceGames /></AdminLayoutWrapper>} />
+<Route path="children/:childId/games/kolo-srece/:letter" element={<AdminLayoutWrapper><AdminKoloSreceRouter /></AdminLayoutWrapper>} />
+<Route path="children/:childId/games/bingo" element={<AdminLayoutWrapper><AdminBingoGames /></AdminLayoutWrapper>} />
+<Route path="children/:childId/games/bingo/:letter" element={<AdminLayoutWrapper><AdminBingoRouter /></AdminLayoutWrapper>} />
+// ... vse ostale igre
+```
+
+### 7. Posodobitev `AdminChildWorkspace.tsx`
+
+Sprememba navigacije iz `window.open()` v interno navigacijo:
+
+```typescript
+const handleActivityClick = (activity: typeof activities[0]) => {
+  // Mapiranje aktivnosti na admin poti
+  const activityPathMap: Record<string, string> = {
+    'games': `/admin/children/${childId}/games`,
+    'exercises': `/admin/children/${childId}/exercises`,
+    'test': `/admin/children/${childId}/test`,
+    // ... ostale aktivnosti
+  };
+  
+  const targetPath = activityPathMap[activity.id];
+  if (targetPath) {
+    navigate(targetPath);
+  }
+};
+```
+
+### 8. Posodobitev hook-ov za igre
+
+Vsak hook za igro (npr. `useGenericMemoryGame.tsx`) mora biti posodobljen:
+
+```typescript
+export const useGenericMemoryGame = (config: SpominConfig) => {
+  const gameMode = useGameModeContext();
+  const { recordGameCompletion } = useEnhancedProgress();
+  
+  const handleClaimStar = async () => {
+    if (gameMode.mode === 'logopedist' && gameMode.logopedistChildId) {
+      // Shrani za logopedistovega otroka
+      recordGameCompletion('memory', config.displayLetter, gameMode.logopedistChildId);
+    } else {
+      // Standardno shranjevanje za uporabnika
+      recordGameCompletion('memory', config.displayLetter);
+    }
+  };
+};
+```
+
+### 9. Posodobitev igre komponente (primer `GenericSpominGame.tsx`)
+
+Sprememba navigacije nazaj:
+
+```typescript
+const handleConfirmExit = () => {
+  const gameMode = useGameModeContext();
+  setShowExitConfirmation(false);
+  
+  if (gameMode.mode === 'logopedist') {
+    navigate(`/admin/children/${gameMode.logopedistChildId}/games/spomin`);
+  } else {
+    navigate("/govorne-igre/spomin");
+  }
+};
 ```
 
 ---
 
-## Prednosti te rešitve
+## Seznam vseh novih datotek
 
-1. **Jasna ločitev** - Otroci staršev in otroci logopedov so popolnoma ločeni
-2. **Ponovna uporaba komponent** - Igre in vaje ostanejo iste, samo kontekst se spremeni
-3. **Enostavno preklapljanje** - Logoped hitro menja med otroki med seansami
-4. **Sledljivost** - Vsaka aktivnost se beleži pod pravim otrokom
-5. **Licenčni nadzor** - Jasno vidno koliko mest ima še na voljo
-6. **Notranji zapiski** - Logoped lahko doda opombe za vsakega otroka
+| Datoteka | Opis |
+|----------|------|
+| `src/contexts/GameModeContext.tsx` | Kontekst za način delovanja iger |
+| `src/components/admin/games/AdminGameWrapper.tsx` | Wrapper za admin igre |
+| `src/pages/admin/AdminGovorneIgre.tsx` | Seznam iger za admin |
+| `src/pages/admin/games/AdminSpominGames.tsx` | Izbira črk za Spomin |
+| `src/pages/admin/games/AdminKoloSreceGames.tsx` | Izbira črk za Kolo besed |
+| `src/pages/admin/games/AdminBingoGames.tsx` | Izbira črk za Bingo |
+| `src/pages/admin/games/AdminLabirintGames.tsx` | Izbira za Labirint |
+| `src/pages/admin/games/AdminZaporedjaGames.tsx` | Izbira za Zaporedja |
+| `src/pages/admin/games/AdminSestavljankeGames.tsx` | Izbira za Sestavljanke |
+| `src/pages/admin/games/AdminDrsnaSestavljankaGames.tsx` | Izbira za Drsno sestavljanko |
+| `src/pages/admin/games/AdminMetKockeGames.tsx` | Izbira za Met kocke |
+| `src/pages/admin/games/AdminPonoviPovedGames.tsx` | Izbira za Ponovi poved |
+| `src/pages/admin/games/AdminIgraUjemanjaGames.tsx` | Izbira za Igro ujemanja |
+| `src/components/routing/admin/AdminSpominRouter.tsx` | Router za Spomin |
+| `src/components/routing/admin/AdminKoloSreceRouter.tsx` | Router za Kolo besed |
+| `src/components/routing/admin/AdminBingoRouter.tsx` | Router za Bingo |
+| `src/components/routing/admin/AdminLabirintRouter.tsx` | Router za Labirint |
+| ... (ostali routerji) |
+
+## Seznam datotek za posodobitev
+
+| Datoteka | Sprememba |
+|----------|-----------|
+| `src/hooks/useEnhancedProgress.ts` | Dodaj podporo za `logopedist_child_id` |
+| `src/hooks/useGenericMemoryGame.tsx` | Uporabi `GameModeContext` |
+| `src/components/games/GenericSpominGame.tsx` | Uporabi `GameModeContext` za navigacijo |
+| `src/components/games/GenericBingoGame.tsx` | Uporabi `GameModeContext` |
+| `src/components/games/GenericWheelGame.tsx` | Uporabi `GameModeContext` |
+| `src/components/games/GenericLabirintGame.tsx` | Uporabi `GameModeContext` |
+| `src/components/games/GenericMetKockeGame.tsx` | Uporabi `GameModeContext` |
+| `src/components/games/GenericZaporedjaGame.tsx` | Uporabi `GameModeContext` |
+| `src/components/games/GenericSestavljankaGame.tsx` | Uporabi `GameModeContext` |
+| `src/components/games/GenericDrsnaSestavljankaGame.tsx` | Uporabi `GameModeContext` |
+| `src/components/games/GenericIgraUjemanjaGame.tsx` | Uporabi `GameModeContext` |
+| `src/components/games/PonoviPovedGame.tsx` | Uporabi `GameModeContext` |
+| `src/components/games/TongueGymGame.tsx` | Uporabi `GameModeContext` |
+| `src/pages/admin/AdminChildWorkspace.tsx` | Spremeni navigacijo |
+| `src/components/routing/AdminRoutes.tsx` | Dodaj nove poti |
+
+---
+
+## Koraki implementacije
+
+1. **Ustvari `GameModeContext.tsx`** - kontekst za način delovanja
+2. **Posodobi `useEnhancedProgress.ts`** - dodaj podporo za `logopedist_child_id`
+3. **Ustvari `AdminGameWrapper.tsx`** - wrapper za admin igre
+4. **Ustvari `AdminGovorneIgre.tsx`** - seznam iger za admin
+5. **Ustvari admin izbirne strani** - za vsako igro posebej
+6. **Ustvari admin routerje** - za vsako igro posebej
+7. **Posodobi `AdminRoutes.tsx`** - dodaj vse nove poti
+8. **Posodobi `AdminChildWorkspace.tsx`** - spremeni navigacijo
+9. **Posodobi vse Generic*Game komponente** - uporabi GameModeContext
+10. **Posodobi vse hook-e za igre** - uporabi GameModeContext za shranjevanje
+
+---
+
+## Vizualni rezultat
+
+Po implementaciji bo logoped ostal v admin portalu:
+
+```text
+/admin/children/abc123/workspace
+  → klik na "Govorne igre"
+/admin/children/abc123/games
+  → klik na "Spomin"
+/admin/children/abc123/games/spomin
+  → klik na "Črka Š"
+/admin/children/abc123/games/spomin/spomin-sh
+  → igra se izvaja
+  → ob zaključku se napredek shrani v progress.logopedist_child_id
+  → klik nazaj vodi na /admin/children/abc123/games/spomin
+```
+
+## Prednosti
+
+1. **Popolna ločitev** - Logoped ostane v admin portalu
+2. **Ponovna uporaba** - Dejanske igre (Generic*Game) ostanejo iste
+3. **Pravilno sledenje** - Napredek se shranjuje pod `logopedist_child_id`
+4. **Konsistentna navigacija** - Vsi gumbi "nazaj" vodijo na prave strani
+5. **Enostavno preklapljanje** - Logoped lahko hitro zamenja otroka
 
