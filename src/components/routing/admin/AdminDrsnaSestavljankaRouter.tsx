@@ -1,7 +1,6 @@
 import { useParams, Navigate } from "react-router-dom";
 import { GenericDrsnaSestavljankaGame } from "@/components/games/GenericDrsnaSestavljankaGame";
 import { parseDrsnaSestavljankaUrlParam, drsnaSestavljankaConfigByUrlKey } from "@/data/drsnaSestavljankaConfig";
-import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
 
 export default function AdminDrsnaSestavljankaRouter() {
   const { childId, letterAndAge } = useParams<{ childId: string; letterAndAge: string }>();
@@ -40,12 +39,5 @@ export default function AdminDrsnaSestavljankaRouter() {
 
   const backPath = `/admin/children/${childId}/games/drsna-sestavljanka`;
 
-  return (
-    <AdminGameWrapper 
-      showBackButton={false}
-      backPath={backPath}
-    >
-      <GenericDrsnaSestavljankaGame config={config} backPath={backPath} />
-    </AdminGameWrapper>
-  );
+  return <GenericDrsnaSestavljankaGame config={config} backPath={backPath} />;
 }

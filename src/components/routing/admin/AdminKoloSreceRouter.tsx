@@ -1,7 +1,6 @@
 import { useParams, Navigate } from "react-router-dom";
 import { getWheelConfig, type WordData } from "@/data/artikulacijaVajeConfig";
 import { GenericWheelGame } from "@/components/games/GenericWheelGame";
-import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
 
 export default function AdminKoloSreceRouter() {
   const { childId, letter } = useParams<{ childId: string; letter: string }>();
@@ -20,17 +19,12 @@ export default function AdminKoloSreceRouter() {
   const backPath = `/admin/children/${childId}/games/kolo-srece`;
 
   return (
-    <AdminGameWrapper 
-      showBackButton={false}
+    <GenericWheelGame
+      letter={config.letter}
+      displayLetter={config.displayLetter}
+      title={config.title}
+      wordsData={config.wordsData as WordData[]}
       backPath={backPath}
-    >
-      <GenericWheelGame
-        letter={config.letter}
-        displayLetter={config.displayLetter}
-        title={config.title}
-        wordsData={config.wordsData as WordData[]}
-        backPath={backPath}
-      />
-    </AdminGameWrapper>
+    />
   );
 }

@@ -1,7 +1,6 @@
 import { useParams, Navigate } from "react-router-dom";
 import { GenericZaporedjaGame } from "@/components/games/GenericZaporedjaGame";
 import { findZaporedjaConfig, parseZaporedjaUrlParam } from "@/data/zaporedjaConfig";
-import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
 
 export default function AdminZaporedjaRouter() {
   const { childId, letterAndAge } = useParams<{ childId: string; letterAndAge: string }>();
@@ -24,12 +23,5 @@ export default function AdminZaporedjaRouter() {
 
   const backPath = `/admin/children/${childId}/games/zaporedja`;
 
-  return (
-    <AdminGameWrapper 
-      showBackButton={false}
-      backPath={backPath}
-    >
-      <GenericZaporedjaGame config={config} backPath={backPath} />
-    </AdminGameWrapper>
-  );
+  return <GenericZaporedjaGame config={config} backPath={backPath} />;
 }

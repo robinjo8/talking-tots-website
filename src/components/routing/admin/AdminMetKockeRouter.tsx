@@ -1,7 +1,6 @@
 import { useParams, Navigate } from 'react-router-dom';
 import { GenericMetKockeGame } from '@/components/games/GenericMetKockeGame';
 import { getMetKockeConfig } from '@/data/metKockeConfig';
-import { AdminGameWrapper } from '@/components/admin/games/AdminGameWrapper';
 
 export default function AdminMetKockeRouter() {
   const { childId, letter } = useParams<{ childId: string; letter: string }>();
@@ -20,19 +19,14 @@ export default function AdminMetKockeRouter() {
   const backPath = `/admin/children/${childId}/games/met-kocke`;
 
   return (
-    <AdminGameWrapper 
-      showBackButton={false}
+    <GenericMetKockeGame
+      letter={config.letter}
+      displayLetter={config.displayLetter}
+      title={config.title}
+      bitje={config.bitje}
+      povedek={config.povedek}
+      predmet={config.predmet}
       backPath={backPath}
-    >
-      <GenericMetKockeGame
-        letter={config.letter}
-        displayLetter={config.displayLetter}
-        title={config.title}
-        bitje={config.bitje}
-        povedek={config.povedek}
-        predmet={config.predmet}
-        backPath={backPath}
-      />
-    </AdminGameWrapper>
+    />
   );
 }

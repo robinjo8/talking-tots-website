@@ -1,7 +1,6 @@
 import { useParams, Navigate } from "react-router-dom";
 import { getBingoConfig, type BingoWordData } from "@/data/artikulacijaVajeConfig";
 import { GenericBingoGame } from "@/components/games/GenericBingoGame";
-import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
 
 export default function AdminBingoRouter() {
   const { childId, letter } = useParams<{ childId: string; letter: string }>();
@@ -20,18 +19,13 @@ export default function AdminBingoRouter() {
   const backPath = `/admin/children/${childId}/games/bingo`;
 
   return (
-    <AdminGameWrapper 
-      showBackButton={false}
+    <GenericBingoGame
+      letter={config.letter}
+      displayLetter={config.displayLetter}
+      title={config.title}
+      wordsData={config.wordsData as BingoWordData[]}
+      exerciseId={config.exerciseId || `bingo-${letter}`}
       backPath={backPath}
-    >
-      <GenericBingoGame
-        letter={config.letter}
-        displayLetter={config.displayLetter}
-        title={config.title}
-        wordsData={config.wordsData as BingoWordData[]}
-        exerciseId={config.exerciseId || `bingo-${letter}`}
-        backPath={backPath}
-      />
-    </AdminGameWrapper>
+    />
   );
 }

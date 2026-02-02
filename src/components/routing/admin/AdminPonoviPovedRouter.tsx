@@ -1,7 +1,6 @@
 import { useParams, Navigate } from "react-router-dom";
 import { PonoviPovedGame } from "@/components/games/PonoviPovedGame";
 import { getPonoviPovedConfig } from "@/data/ponoviPovedConfig";
-import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
 
 export default function AdminPonoviPovedRouter() {
   const { childId, letter } = useParams<{ childId: string; letter: string }>();
@@ -19,12 +18,5 @@ export default function AdminPonoviPovedRouter() {
 
   const backPath = `/admin/children/${childId}/games/ponovi-poved`;
 
-  return (
-    <AdminGameWrapper 
-      showBackButton={false}
-      backPath={backPath}
-    >
-      <PonoviPovedGame config={config} backPath={backPath} />
-    </AdminGameWrapper>
-  );
+  return <PonoviPovedGame config={config} backPath={backPath} />;
 }

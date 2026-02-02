@@ -1,7 +1,6 @@
 import { useParams, Navigate } from "react-router-dom";
 import { GenericSpominGame } from "@/components/games/GenericSpominGame";
 import { getSpominConfigFromGameId } from "@/data/spominConfig";
-import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
 
 export default function AdminSpominRouter() {
   const { childId, gameId } = useParams<{ childId: string; gameId: string }>();
@@ -18,12 +17,7 @@ export default function AdminSpominRouter() {
     return <Navigate to={`/admin/children/${childId}/games/spomin`} replace />;
   }
 
-  return (
-    <AdminGameWrapper 
-      showBackButton={false}
-      backPath={`/admin/children/${childId}/games/spomin`}
-    >
-      <GenericSpominGame config={config} />
-    </AdminGameWrapper>
-  );
+  const backPath = `/admin/children/${childId}/games/spomin`;
+
+  return <GenericSpominGame config={config} backPath={backPath} />;
 }
