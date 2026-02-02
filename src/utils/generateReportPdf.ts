@@ -2,7 +2,12 @@ import jsPDF from 'jspdf';
 import { ReportData } from '@/components/admin/ReportTemplateEditor';
 import { loadRobotoFonts } from './fonts/robotoBase64';
 
-export async function generateReportPdf(data: ReportData): Promise<Blob> {
+export interface GenerateReportPdfOptions {
+  hideParentSection?: boolean;
+}
+
+export async function generateReportPdf(data: ReportData, options: GenerateReportPdfOptions = {}): Promise<Blob> {
+  const { hideParentSection = false } = options;
   const doc = new jsPDF();
   
   // Load and register Roboto fonts for UTF-8 support (including Slovenian characters)
@@ -140,37 +145,53 @@ export async function generateReportPdf(data: ReportData): Promise<Blob> {
     return boxHeight;
   };
   
-  // ===== TWO COLUMN LAYOUT: Parent + Child =====
+  // ===== TWO COLUMN LAYOUT: Parent + Child OR Just Child =====
   const columnGap = 8;
-  const columnWidth = (contentWidth - columnGap) / 2;
   
-  // Calculate common height for both boxes
-  const boxHeight = 9 + 6 + (2 * 6) + 6 + 2; // header + padding + 2 lines + padding + extra
-  
-  // Parent box
-  drawTwoLineInfoBox(
-    'PODATKI O STARŠU / SKRBNIKU',
-    'Ime in priimek',
-    data.parentName || 'Ni podatka',
-    margin,
-    yPos,
-    columnWidth,
-    boxHeight
-  );
-  
-  // Child box
-  const childValueLine = `${data.childName || 'Ni podatka'} / ${formatAgeShort(data.childAge)} / ${formatGenderShort(data.childGender)}`;
-  drawTwoLineInfoBox(
-    'PODATKI O OTROKU',
-    'Ime, starost, spol:',
-    childValueLine,
-    margin + columnWidth + columnGap,
-    yPos,
-    columnWidth,
-    boxHeight
-  );
-  
-  yPos += boxHeight + 8;
+  if (hideParentSection) {
+    // Single column for child only
+    const childValueLine = `${data.childName || 'Ni podatka'} / ${formatAgeShort(data.childAge)} / ${formatGenderShort(data.childGender)}`;
+    const boxHeight = 9 + 6 + (2 * 6) + 6 + 2;
+    drawTwoLineInfoBox(
+      'PODATKI O OTROKU',
+      'Ime, starost, spol:',
+      childValueLine,
+      margin,
+      yPos,
+      contentWidth,
+      boxHeight
+    );
+    yPos += boxHeight + 8;
+  } else {
+    // Two columns: Parent + Child
+    const columnWidth = (contentWidth - columnGap) / 2;
+    const boxHeight = 9 + 6 + (2 * 6) + 6 + 2;
+    
+    // Parent box
+    drawTwoLineInfoBox(
+      'PODATKI O STARŠU / SKRBNIKU',
+      'Ime in priimek',
+      data.parentName || 'Ni podatka',
+      margin,
+      yPos,
+      columnWidth,
+      boxHeight
+    );
+    
+    // Child box
+    const childValueLine = `${data.childName || 'Ni podatka'} / ${formatAgeShort(data.childAge)} / ${formatGenderShort(data.childGender)}`;
+    drawTwoLineInfoBox(
+      'PODATKI O OTROKU',
+      'Ime, starost, spol:',
+      childValueLine,
+      margin + columnWidth + columnGap,
+      yPos,
+      columnWidth,
+      boxHeight
+    );
+    
+    yPos += boxHeight + 8;
+  }
   
   // ===== ASSESSMENT DATA SECTION =====
   const reviewBoxPadding = 6;

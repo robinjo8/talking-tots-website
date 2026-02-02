@@ -38,11 +38,12 @@ interface ReportData {
 interface ReportTemplateEditorProps {
   data: ReportData;
   testSessions: TestSession[];
+  hideParentSection?: boolean;
   onFieldChange: (field: 'anamneza' | 'ugotovitve' | 'predlogVaj' | 'opombe', value: string) => void;
   onSessionChange: (sessionId: string) => void;
 }
 
-export function ReportTemplateEditor({ data, testSessions, onFieldChange, onSessionChange }: ReportTemplateEditorProps) {
+export function ReportTemplateEditor({ data, testSessions, hideParentSection = false, onFieldChange, onSessionChange }: ReportTemplateEditorProps) {
   const formatGender = (gender: string | null) => {
     if (!gender) return 'Ni podatka';
     if (gender.toLowerCase() === 'm' || gender.toLowerCase() === 'male') return 'M';
@@ -75,18 +76,20 @@ export function ReportTemplateEditor({ data, testSessions, onFieldChange, onSess
         </h1>
       </div>
 
-      {/* Parent/Guardian Data */}
-      <div className="space-y-2">
-        <h2 className="font-bold text-foreground uppercase text-xs tracking-wide border-b pb-1">
-          PODATKI O STARŠU / SKRBNIKU
-        </h2>
-        <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
-          <span className="text-muted-foreground">Ime in priimek:</span>
-          <span className="font-medium">{data.parentName || 'Ni podatka'}</span>
-          <span className="text-muted-foreground">E-poštni naslov:</span>
-          <span className="font-medium">{data.parentEmail || 'Ni podatka'}</span>
+      {/* Parent/Guardian Data - samo če ni skrita */}
+      {!hideParentSection && (
+        <div className="space-y-2">
+          <h2 className="font-bold text-foreground uppercase text-xs tracking-wide border-b pb-1">
+            PODATKI O STARŠU / SKRBNIKU
+          </h2>
+          <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
+            <span className="text-muted-foreground">Ime in priimek:</span>
+            <span className="font-medium">{data.parentName || 'Ni podatka'}</span>
+            <span className="text-muted-foreground">E-poštni naslov:</span>
+            <span className="font-medium">{data.parentEmail || 'Ni podatka'}</span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Child Data */}
       <div className="space-y-2">
@@ -225,12 +228,6 @@ export function generateReportText(data: ReportData): string {
   };
 
   return `LOGOPEDSKO POROČILO – TomiTalk
-
-══════════════════════════════════════════════════════════════
-
-PODATKI O STARŠU / SKRBNIKU
-Ime in priimek: ${data.parentName || 'Ni podatka'}
-E-poštni naslov: ${data.parentEmail || 'Ni podatka'}
 
 ══════════════════════════════════════════════════════════════
 
