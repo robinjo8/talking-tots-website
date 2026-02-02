@@ -42,14 +42,14 @@ export function AdminHeader() {
           <div className="h-9 w-9 rounded-full bg-app-blue/10 flex items-center justify-center">
             <User className="h-5 w-5 text-app-blue" />
           </div>
-          <div className="hidden md:flex flex-col">
-            <span className="text-sm font-medium text-foreground">
-              {profile?.first_name} {profile?.last_name}
-            </span>
-            <span className="text-xs text-muted-foreground">
-              TomiTalk logoped
-            </span>
-          </div>
+        <div className="hidden md:flex flex-col">
+          <span className="text-sm font-medium text-foreground">
+            {profile?.first_name} {profile?.last_name}
+          </span>
+          <span className="text-xs text-muted-foreground">
+            {profile?.organization_name || 'Logoped'}
+          </span>
+        </div>
         </div>
       </div>
     </header>
