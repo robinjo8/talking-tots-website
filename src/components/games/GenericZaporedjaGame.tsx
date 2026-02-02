@@ -40,9 +40,10 @@ const config910: SequenceGameConfig = {
 
 interface GenericZaporedjaGameProps {
   config: ZaporedjaGameConfig;
+  backPath?: string;
 }
 
-export function GenericZaporedjaGame({ config }: GenericZaporedjaGameProps) {
+export function GenericZaporedjaGame({ config, backPath = '/govorne-igre/zaporedja' }: GenericZaporedjaGameProps) {
   const navigate = useNavigate();
   const { recordGameCompletion } = useEnhancedProgress();
   const { checkForNewTrophy } = useTrophyContext();
@@ -189,7 +190,7 @@ export function GenericZaporedjaGame({ config }: GenericZaporedjaGameProps) {
   };
 
   const handleConfirmExit = () => {
-    navigate('/govorne-igre/zaporedja');
+    navigate(backPath);
   };
 
   const handleStarClaimed = async () => {

@@ -42,6 +42,7 @@ type GamePhase = "start" | "word" | "sentence" | "complete";
 
 interface PonoviPovedGameProps {
   config: PonoviPovedConfig;
+  backPath?: string;
 }
 
 // Background from ozadja bucket
@@ -228,7 +229,7 @@ function JumpButton({ onClick, disabled, size = 96 }: { onClick: () => void; dis
   );
 }
 
-export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
+export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved' }: PonoviPovedGameProps) {
   const navigate = useNavigate();
   const { selectedChild } = useAuth();
   const { recordExerciseCompletion } = useEnhancedProgress();
@@ -1039,7 +1040,7 @@ export function PonoviPovedGame({ config }: PonoviPovedGameProps) {
       <MemoryExitConfirmationDialog 
         open={showExitDialog} 
         onOpenChange={setShowExitDialog} 
-        onConfirm={() => navigate("/govorne-igre/ponovi-poved")}
+        onConfirm={() => navigate(backPath)}
       >
         <div />
       </MemoryExitConfirmationDialog>
