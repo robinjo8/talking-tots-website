@@ -8,11 +8,13 @@ import { useNavigate } from "react-router-dom";
 interface ArticulationTestInfoDialogProps {
   open: boolean;
   onClose: () => void;
+  onBack?: () => void;
 }
 
 const ArticulationTestInfoDialog = ({
   open,
-  onClose
+  onClose,
+  onBack
 }: ArticulationTestInfoDialogProps) => {
   const [readAgreement, setReadAgreement] = useState(false);
   const [termsAgreement, setTermsAgreement] = useState(false);
@@ -63,7 +65,11 @@ const ArticulationTestInfoDialog = ({
   };
 
   const handleBack = () => {
-    navigate(-1);
+    if (onBack) {
+      onBack();
+    } else {
+      navigate(-1);
+    }
   };
 
   return (
