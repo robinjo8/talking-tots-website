@@ -261,6 +261,7 @@ export type Database = {
           parent_id: string
           priority: string | null
           reviewed_at: string | null
+          session_number: number | null
           status: Database["public"]["Enums"]["test_session_status"] | null
           submitted_at: string | null
           test_version: string | null
@@ -276,6 +277,7 @@ export type Database = {
           parent_id: string
           priority?: string | null
           reviewed_at?: string | null
+          session_number?: number | null
           status?: Database["public"]["Enums"]["test_session_status"] | null
           submitted_at?: string | null
           test_version?: string | null
@@ -291,6 +293,7 @@ export type Database = {
           parent_id?: string
           priority?: string | null
           reviewed_at?: string | null
+          session_number?: number | null
           status?: Database["public"]["Enums"]["test_session_status"] | null
           submitted_at?: string | null
           test_version?: string | null

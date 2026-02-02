@@ -5,12 +5,19 @@ export const PHONETIC_ORDER = ['P', 'B', 'M', 'T', 'D', 'K', 'G', 'N', 'H', 'V',
 
 export type PhoneticLetter = typeof PHONETIC_ORDER[number];
 
-// Dinamično mapiranje wordIndex → črka iz articulationTestData
-// articulationTestData je v abecednem vrstnem redu, ne fonetičnem
+// Sortiraj articulationData po fonetičnem vrstnem redu (P, B, M, T, D, ...)
+// da se wordIndex mapiranje ujema s tistim iz useArticulationTestNew
+const sortedArticulationData = [...articulationData].sort((a, b) => {
+  const indexA = PHONETIC_ORDER.indexOf(a.letter.toUpperCase() as PhoneticLetter);
+  const indexB = PHONETIC_ORDER.indexOf(b.letter.toUpperCase() as PhoneticLetter);
+  return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+});
+
+// Dinamično mapiranje wordIndex → črka iz fonetično sortiranih podatkov
 const wordIndexToLetterMap = new Map<number, string>();
 const wordIndexToWordMap = new Map<number, string>();
 let currentIndex = 0;
-articulationData.forEach(letterData => {
+sortedArticulationData.forEach(letterData => {
   letterData.words.forEach(word => {
     wordIndexToLetterMap.set(currentIndex, letterData.letter);
     wordIndexToWordMap.set(currentIndex, word.text);

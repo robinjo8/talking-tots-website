@@ -116,79 +116,55 @@ async function fetchSessionReviewData(sessionId: string): Promise<SessionReviewD
   // 4. Pridobi posnetke iz Storage
   const storagePath = `${session.parent_id}/${session.child_id}/Preverjanje-izgovorjave`;
   
-  // Najprej poiščemo vse mape Seja-X
-  const { data: sessionFolders, error: folderError } = await supabase.storage
-    .from('uporabniski-profili')
-    .list(storagePath);
-
-  if (folderError) {
-    console.error('Napaka pri pridobivanju map sej:', folderError);
-  }
-
-  // Poiščemo ustrezno mapo seje - uporabimo prvo Seja-X mapo ki jo najdemo
-  // ali če imamo submitted_at, poiščemo zadnjo sejo
-  let targetFolder = '';
-  if (sessionFolders && sessionFolders.length > 0) {
-    // Filtriraj samo Seja-X mape in jih uredi po številki
-    const sejaFolders = sessionFolders
-      .filter(f => f.name.startsWith('Seja-'))
-      .sort((a, b) => {
-        const numA = parseInt(a.name.replace('Seja-', ''));
-        const numB = parseInt(b.name.replace('Seja-', ''));
-        return numB - numA; // Padajoče - najnovejša seja prva
-      });
-    
-    if (sejaFolders.length > 0) {
-      // Uporabi najnovejšo sejo
-      targetFolder = `${storagePath}/${sejaFolders[0].name}`;
-    }
-  }
+  // Uporabi session_number za določitev pravilne mape posnetkov
+  const sessionNumber = (session as any).session_number || 1;
+  const targetFolder = `${storagePath}/Seja-${sessionNumber}`;
+  
+  console.log('Nalagam posnetke iz mape:', targetFolder, 'session_number:', sessionNumber);
 
   // Pridobi posnetke iz mape
   let recordings: Recording[] = [];
-  if (targetFolder) {
-    const { data: files, error: filesError } = await supabase.storage
-      .from('uporabniski-profili')
-      .list(targetFolder);
+  const { data: files, error: filesError } = await supabase.storage
+    .from('uporabniski-profili')
+    .list(targetFolder);
 
-    if (filesError) {
-      console.error('Napaka pri pridobivanju posnetkov:', filesError);
-    }
+  if (filesError) {
+    console.error('Napaka pri pridobivanju posnetkov:', filesError);
+  }
 
-    if (files) {
-      // Pridobi signed URLs za vse datoteke vzporedno
-      const audioFiles = files.filter(file => 
-        file.name.endsWith('.webm') || 
-        file.name.endsWith('.mp3') || 
-        file.name.endsWith('.wav')
-      );
+  if (files) {
+    // Pridobi signed URLs za vse datoteke vzporedno
+    const audioFiles = files.filter(file => 
+      file.name.endsWith('.webm') || 
+      file.name.endsWith('.mp3') || 
+      file.name.endsWith('.wav')
+    );
 
-      const signedUrlPromises = audioFiles.map(async file => {
-        const parsed = parseRecordingFilename(file.name);
-        if (!parsed) return null;
+    const signedUrlPromises = audioFiles.map(async file => {
+      const parsed = parseRecordingFilename(file.name);
+      if (!parsed) return null;
 
-        // Uporabi signed URL za zasebni bucket
-        const { data: signedUrlData, error: signedUrlError } = await supabase.storage
-          .from('uporabniski-profili')
-          .createSignedUrl(`${targetFolder}/${file.name}`, 3600); // 1 ura veljavnosti
+      // Uporabi signed URL za zasebni bucket
+      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+        .from('uporabniski-profili')
+        .createSignedUrl(`${targetFolder}/${file.name}`, 3600); // 1 ura veljavnosti
 
-        if (signedUrlError) {
-          console.error('Napaka pri ustvarjanju signed URL:', signedUrlError);
-          return null;
-        }
+      if (signedUrlError) {
+        console.error('Napaka pri ustvarjanju signed URL:', signedUrlError);
+        return null;
+      }
 
-        return {
-          letter: parsed.letter,
-          word: parsed.word, // Zdaj je že pravilna beseda s šumniki
-          wordIndex: parsed.wordIndex,
-          filename: file.name,
-          url: signedUrlData.signedUrl,
-        };
-      });
+      return {
+        letter: parsed.letter,
+        word: parsed.word, // Zdaj je že pravilna beseda s šumniki
+        wordIndex: parsed.wordIndex,
+        filename: file.name,
+        url: signedUrlData.signedUrl,
+      };
+    });
 
-      const results = await Promise.all(signedUrlPromises);
-      recordings = results.filter((r): r is Recording => r !== null);
-    }
+    const results = await Promise.all(signedUrlPromises);
+    recordings = results.filter((r): r is Recording => r !== null);
   }
 
   // 5. Grupiraj posnetke po črkah
