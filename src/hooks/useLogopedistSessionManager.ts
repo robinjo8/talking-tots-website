@@ -16,6 +16,7 @@ interface UseLogopedistSessionManagerResult {
   initializeSession: (childId: string, totalWords?: number) => Promise<SessionInfo | null>;
   updateProgress: (wordIndex: number) => Promise<void>;
   completeSession: () => Promise<void>;
+  resetSession: (childId: string) => Promise<SessionInfo | null>;
 }
 
 /**
@@ -163,18 +164,52 @@ export const useLogopedistSessionManager = (): UseLogopedistSessionManagerResult
     try {
       const { error } = await supabase
         .from('articulation_test_sessions')
-        .update({ current_word_index: wordIndex + 1 })
+        .update({ current_word_index: wordIndex })
         .eq('id', sessionInfo.sessionId);
 
       if (error) {
         console.error('Error updating progress:', error);
       } else {
-        console.log('Progress updated to word index:', wordIndex + 1);
+        console.log('Progress updated to word index:', wordIndex);
       }
     } catch (err) {
       console.error('Error in updateProgress:', err);
     }
   }, [sessionInfo]);
+
+  /**
+   * Reset session - delete current incomplete session and start fresh.
+   */
+  const resetSession = useCallback(async (childId: string): Promise<SessionInfo | null> => {
+    if (!sessionInfo) {
+      console.error('No session to reset');
+      return null;
+    }
+
+    try {
+      // Delete the current incomplete session
+      const { error: deleteError } = await supabase
+        .from('articulation_test_sessions')
+        .delete()
+        .eq('id', sessionInfo.sessionId);
+
+      if (deleteError) {
+        console.error('Error deleting session:', deleteError);
+        return null;
+      }
+
+      console.log('Deleted session:', sessionInfo.sessionId);
+
+      // Clear current session info
+      setSessionInfo(null);
+
+      // Initialize a new session from scratch
+      return initializeSession(childId, sessionInfo.totalWords);
+    } catch (err) {
+      console.error('Error in resetSession:', err);
+      return null;
+    }
+  }, [sessionInfo, initializeSession]);
 
   /**
    * Mark the session as completed.
@@ -222,5 +257,6 @@ export const useLogopedistSessionManager = (): UseLogopedistSessionManagerResult
     initializeSession,
     updateProgress,
     completeSession,
+    resetSession,
   };
 };

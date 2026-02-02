@@ -13,9 +13,6 @@ interface ArticulationResumeDialogProps {
   onResume: () => void;
   onStartOver: () => void;
   wordName: string;
-  wordIndex: number;
-  totalWords: number;
-  timeAgo: string;
 }
 
 const ArticulationResumeDialog = ({
@@ -23,9 +20,6 @@ const ArticulationResumeDialog = ({
   onResume,
   onStartOver,
   wordName,
-  wordIndex,
-  totalWords,
-  timeAgo,
 }: ArticulationResumeDialogProps) => {
   const handleClose = () => {
     // X button triggers "start over" behavior - returning to previous page
@@ -44,23 +38,11 @@ const ArticulationResumeDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="py-6">
-          <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-            <div className="flex items-center gap-2 text-gray-700">
-              <span className="text-lg">📍</span>
-              <span>
-                Zadnja beseda:{" "}
-                <span className="font-semibold">{wordName.toUpperCase()}</span>{" "}
-                <span className="text-gray-500">
-                  ({wordIndex + 1}/{totalWords})
-                </span>
-              </span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-500 text-sm">
-              <span className="text-lg">⏱️</span>
-              <span>Shranjeno: {timeAgo}</span>
-            </div>
-          </div>
+        <div className="py-4">
+          <p className="text-base text-gray-700">
+            Zadnja izgovorjena beseda je bila:{" "}
+            <span className="font-semibold">{wordName.toUpperCase()}</span>
+          </p>
         </div>
 
         <div className="flex gap-3">
