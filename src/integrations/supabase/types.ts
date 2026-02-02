@@ -642,6 +642,152 @@ export type Database = {
         }
         Relationships: []
       }
+      license_tiers: {
+        Row: {
+          created_at: string | null
+          display_name: string
+          features: Json | null
+          id: string
+          is_active: boolean | null
+          max_children: number
+          name: string
+          price_eur: number
+        }
+        Insert: {
+          created_at?: string | null
+          display_name: string
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          max_children: number
+          name: string
+          price_eur: number
+        }
+        Update: {
+          created_at?: string | null
+          display_name?: string
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          max_children?: number
+          name?: string
+          price_eur?: number
+        }
+        Relationships: []
+      }
+      logopedist_children: {
+        Row: {
+          age: number
+          avatar_url: string | null
+          birth_date: string | null
+          created_at: string | null
+          external_id: string | null
+          gender: string | null
+          id: string
+          is_active: boolean | null
+          logopedist_id: string
+          name: string
+          notes: string | null
+          speech_development: Json | null
+          speech_difficulties: string[] | null
+          speech_difficulties_description: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          age: number
+          avatar_url?: string | null
+          birth_date?: string | null
+          created_at?: string | null
+          external_id?: string | null
+          gender?: string | null
+          id?: string
+          is_active?: boolean | null
+          logopedist_id: string
+          name: string
+          notes?: string | null
+          speech_development?: Json | null
+          speech_difficulties?: string[] | null
+          speech_difficulties_description?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          age?: number
+          avatar_url?: string | null
+          birth_date?: string | null
+          created_at?: string | null
+          external_id?: string | null
+          gender?: string | null
+          id?: string
+          is_active?: boolean | null
+          logopedist_id?: string
+          name?: string
+          notes?: string | null
+          speech_development?: Json | null
+          speech_difficulties?: string[] | null
+          speech_difficulties_description?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "logopedist_children_logopedist_id_fkey"
+            columns: ["logopedist_id"]
+            isOneToOne: false
+            referencedRelation: "logopedist_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      logopedist_licenses: {
+        Row: {
+          created_at: string | null
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          license_tier_id: string
+          logopedist_id: string
+          status: string | null
+          stripe_subscription_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          license_tier_id: string
+          logopedist_id: string
+          status?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          license_tier_id?: string
+          logopedist_id?: string
+          status?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "logopedist_licenses_license_tier_id_fkey"
+            columns: ["license_tier_id"]
+            isOneToOne: false
+            referencedRelation: "license_tiers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "logopedist_licenses_logopedist_id_fkey"
+            columns: ["logopedist_id"]
+            isOneToOne: true
+            referencedRelation: "logopedist_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       logopedist_profiles: {
         Row: {
           created_at: string | null
@@ -1184,6 +1330,7 @@ export type Database = {
           duration: number
           exercise_id: string
           id: string
+          logopedist_child_id: string | null
           score: number
           session_metadata: Json | null
           stars_earned: number | null
@@ -1198,6 +1345,7 @@ export type Database = {
           duration: number
           exercise_id: string
           id?: string
+          logopedist_child_id?: string | null
           score: number
           session_metadata?: Json | null
           stars_earned?: number | null
@@ -1212,6 +1360,7 @@ export type Database = {
           duration?: number
           exercise_id?: string
           id?: string
+          logopedist_child_id?: string | null
           score?: number
           session_metadata?: Json | null
           stars_earned?: number | null
@@ -1244,6 +1393,13 @@ export type Database = {
             columns: ["exercise_id"]
             isOneToOne: false
             referencedRelation: "exercises"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "progress_logopedist_child_id_fkey"
+            columns: ["logopedist_child_id"]
+            isOneToOne: false
+            referencedRelation: "logopedist_children"
             referencedColumns: ["id"]
           },
         ]
@@ -1427,6 +1583,17 @@ export type Database = {
           last_activity_at: string
           sessions_count: number
           stars_total: number
+        }[]
+      }
+      get_logopedist_license_stats: {
+        Args: { p_user_id: string }
+        Returns: {
+          available_slots: number
+          expires_at: string
+          license_name: string
+          max_children: number
+          status: string
+          used_slots: number
         }[]
       }
       get_parent_emails: {
