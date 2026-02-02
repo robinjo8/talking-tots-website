@@ -131,11 +131,23 @@ export default function AdminArtikulacijskiTest() {
   
   // Test mode for "OŠ Test" organization - only test letter R (last 3 words: index 57, 58, 59)
   const isTestOrganization = profile?.organization_name === "OŠ Test";
-  // Use session manager's startIndex if resuming, otherwise use test organization logic
-  const startIndex = sessionInfo?.isResume 
-    ? sessionInfo.startIndex 
-    : (isTestOrganization ? 57 : 0);
   const testMaxWords = isTestOrganization ? 3 : undefined;
+  
+  // Dynamic start index - updates when session info loads
+  // Use session manager's startIndex if resuming, otherwise use test organization logic
+  const [effectiveStartIndex, setEffectiveStartIndex] = useState<number>(isTestOrganization ? 57 : 0);
+  
+  // Update start index when session info becomes available
+  useEffect(() => {
+    if (sessionInfo?.isResume) {
+      // startIndex is the NEXT word to speak (lastSpokenIndex + 1)
+      setEffectiveStartIndex(sessionInfo.startIndex);
+    } else if (isTestOrganization) {
+      setEffectiveStartIndex(57);
+    } else {
+      setEffectiveStartIndex(0);
+    }
+  }, [sessionInfo, isTestOrganization]);
   
   // Callback to save progress to database after each word
   const handleSaveProgress = useCallback(async (cId: string, sNum: number, wordIndex: number) => {
@@ -194,7 +206,7 @@ export default function AdminArtikulacijskiTest() {
     childId, 
     undefined, 
     sessionInfo?.sessionNumber ?? fixedSessionNumber, 
-    startIndex, 
+    effectiveStartIndex, 
     difficulty, 
     handleSaveProgress, 
     profile?.id, 

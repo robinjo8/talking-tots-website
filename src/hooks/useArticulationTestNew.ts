@@ -35,6 +35,11 @@ export const useArticulationTestNew = (
 
   const { transcribe, isTranscribing, resetTranscription } = useTranscription();
 
+  // Sync currentWordIndex when startIndex changes (e.g., on session resume)
+  useEffect(() => {
+    setCurrentWordIndex(startIndex);
+  }, [startIndex]);
+
   // Sort articulation data by phonetic order
   const sortedArticulationData = useMemo(() => {
     return [...articulationData].sort((a, b) => {
