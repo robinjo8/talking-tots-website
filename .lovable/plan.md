@@ -1,198 +1,335 @@
 
 
-# Načrt: Dodajanje plavajočega gumba "Hiška" v admin igre
+# Načrt: Dodajanje Govornih vaj, Preverjanja izgovorjave, Video navodil in Osebnega načrta v Admin portal
 
-## Problem
+## Povzetek
 
-V admin portalu igre manjka plavajoči gumb "Hiška" (Home) z dropdown menijem, ki vsebuje:
-- **Nazaj** - vrni se na izbiro črk
-- **Nova igra** - ponastavi igro
-- **Navodila** - prikaži navodila za igro
+Trenutno ko logoped v delovnem prostoru otroka klikne na "Govorne vaje", "Preverjanje izgovorjave", "Video navodila" ali "Moj osebni načrt", se odpre nov zavihek v uporabniškem portalu. To je treba spremeniti tako, da logoped ostane znotraj admin portala - enako kot smo naredili za "Govorne igre".
 
-### Vzrok problema
+Poleg tega bomo odstranili "Logopedski nasveti" iz admin portala, ker ta vsebina ni relevantna za logopedov delovni tok z otrokom.
 
-Igre v admin portalu so ovite v `AdminLayoutWrapper` → `AdminLayout`, ki vsebuje:
-- `AdminSidebar` (levo)
-- `AdminHeader` (zgoraj)
-- `<main className="p-6">` (vsebina s paddingom)
+---
 
-Igre pa uporabljajo `fixed inset-0` za celozaslonski prikaz, kar je v konfliktu z admin layoutom. V uporabniškem portalu igre nimajo layouta (samo `ProtectedLazyRoute`), zato delujejo pravilno.
+## 1. Posodobitev AdminChildWorkspace.tsx
 
-### Trenutno stanje
+Odstraniti "Logopedski nasveti" in dodati interne poti za vse aktivnosti:
 
-Komponente iger (`GenericWheelGame`, `GenericBingoGame`, itd.) že vsebujejo plavajoči gumb "Hiška":
+```typescript
+// Odstrani 'advice' aktivnost iz seznama
+const activities = [
+  // ... ostane games, exercises, test, video, challenges
+  // BREZ 'advice' (Logopedski nasveti)
+];
 
-```tsx
-<DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-  <DropdownMenuTrigger asChild>
-    <button className="fixed bottom-4 left-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 ...">
-      <Home className="w-8 h-8 text-white" />
-    </button>
-  </DropdownMenuTrigger>
-  ...
-</DropdownMenu>
+// Posodobi handleActivityClick za interne poti
+const activityPathMap: Record<string, string> = {
+  'games': `/admin/children/${childId}/games`,
+  'exercises': `/admin/children/${childId}/exercises`,
+  'test': `/admin/children/${childId}/test`,
+  'video': `/admin/children/${childId}/video-navodila`,
+  'challenges': `/admin/children/${childId}/osebni-nacrt`,
+};
 ```
 
-Gumb obstaja, ampak je prekrit z admin layoutom (sidebar, header, padding).
+---
+
+## 2. Nove admin strani
+
+### 2.1 Govorne vaje
+
+| Datoteka | Opis |
+|----------|------|
+| `src/pages/admin/AdminGovorneVaje.tsx` | Glavna stran za govorne vaje (enako kot `GovornojezicovneVaje.tsx`, brez Header/Footer) |
+| `src/pages/admin/exercises/AdminVajeMotorikeGovoril.tsx` | Vaje motorike govoril za admin |
+| `src/pages/admin/exercises/AdminArtikulacijaVaje.tsx` | Vaje za izgovorjavo glasov za admin |
+
+### 2.2 Video navodila
+
+| Datoteka | Opis |
+|----------|------|
+| `src/pages/admin/AdminVideoNavodila.tsx` | Seznam črk za video navodila |
+
+### 2.3 Preverjanje izgovorjave
+
+| Datoteka | Opis |
+|----------|------|
+| `src/pages/admin/AdminArtikulacijskiTest.tsx` | Celozaslonski test izgovorjave za admin |
+
+### 2.4 Osebni načrt
+
+| Datoteka | Opis |
+|----------|------|
+| `src/pages/admin/AdminOsebniNacrt.tsx` | Osebni načrt za admin |
 
 ---
 
-## Rešitev
+## 3. Novi admin routerji
 
-Ustvariti **ločene poti za admin igre BREZ AdminLayout wrappa**. Igre v admin portalu morajo biti celozaslonske, tako kot v uporabniškem portalu.
-
-### Pristop
-
-1. **Ustvari nov wrapper brez layouta**: `AdminGameFullscreenWrapper`
-   - Samo avtentikacija (preveri ali je logopedist)
-   - `GameModeProvider` za kontekst
-   - BREZ sidebar, header, padding - celozaslonski prikaz
-
-2. **Posodobi AdminRoutes.tsx**:
-   - Poti za igre (npr. `.../games/kolo-srece/:letter`) uporabijo nov fullscreen wrapper namesto `AdminLayoutWrapper`
-
-3. **AdminGameWrapper ostane enak**:
-   - Uporablja se za izbirne strani (npr. `.../games/kolo-srece`) kjer želimo admin layout
-   - Za dejanske igre uporabimo `AdminGameFullscreenWrapper`
+| Datoteka | Opis |
+|----------|------|
+| `src/components/routing/admin/AdminVideoNavodilaRouter.tsx` | Router za video navodila (črka) |
 
 ---
 
-## Tehnična implementacija
+## 4. Posodobitve AdminRoutes.tsx
 
-### Nova komponenta: `AdminGameFullscreenWrapper.tsx`
+Dodati nove poti:
 
-```tsx
-// src/components/admin/games/AdminGameFullscreenWrapper.tsx
-import React from 'react';
-import { useParams, useNavigate, Navigate } from 'react-router-dom';
-import { useAdminAuth } from '@/contexts/AdminAuthContext';
-import { GameModeProvider } from '@/contexts/GameModeContext';
-import { useLogopedistChild } from '@/hooks/useLogopedistChildren';
-import { Loader } from 'lucide-react';
+```typescript
+// Lazy load nove strani
+const AdminGovorneVaje = lazy(() => import('@/pages/admin/AdminGovorneVaje'));
+const AdminVajeMotorikeGovoril = lazy(() => import('@/pages/admin/exercises/AdminVajeMotorikeGovoril'));
+const AdminArtikulacijaVaje = lazy(() => import('@/pages/admin/exercises/AdminArtikulacijaVaje'));
+const AdminVideoNavodila = lazy(() => import('@/pages/admin/AdminVideoNavodila'));
+const AdminVideoNavodilaRouter = lazy(() => import('@/components/routing/admin/AdminVideoNavodilaRouter'));
+const AdminArtikulacijskiTest = lazy(() => import('@/pages/admin/AdminArtikulacijskiTest'));
+const AdminOsebniNacrt = lazy(() => import('@/pages/admin/AdminOsebniNacrt'));
 
-interface Props {
-  children: React.ReactNode;
-}
+// Nove poti:
+// Govorne vaje
+<Route path="children/:childId/exercises" element={<AdminLayoutWrapper><AdminGovorneVaje /></AdminLayoutWrapper>} />
+<Route path="children/:childId/exercises/vaje-motorike-govoril" element={<AdminGameFullscreenRoute><AdminVajeMotorikeGovoril /></AdminGameFullscreenRoute>} />
+<Route path="children/:childId/exercises/artikulacija" element={<AdminLayoutWrapper><AdminArtikulacijaVaje /></AdminLayoutWrapper>} />
 
-export function AdminGameFullscreenWrapper({ children }: Props) {
-  const { childId } = useParams<{ childId: string }>();
-  const { user, isLogopedist, isLoading: authLoading } = useAdminAuth();
-  const { data: child, isLoading: childLoading } = useLogopedistChild(childId);
+// Video navodila
+<Route path="children/:childId/video-navodila" element={<AdminLayoutWrapper><AdminVideoNavodila /></AdminLayoutWrapper>} />
+<Route path="children/:childId/video-navodila/:letter" element={<AdminLayoutWrapper><AdminVideoNavodilaRouter /></AdminLayoutWrapper>} />
 
-  // Auth check
-  if (authLoading || childLoading) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-background">
-        <Loader className="w-8 h-8 animate-spin text-dragon-green" />
-      </div>
-    );
-  }
+// Preverjanje izgovorjave
+<Route path="children/:childId/test" element={<AdminGameFullscreenRoute><AdminArtikulacijskiTest /></AdminGameFullscreenRoute>} />
 
-  if (!user || !isLogopedist) {
-    return <Navigate to="/admin/login" replace />;
-  }
+// Osebni načrt
+<Route path="children/:childId/osebni-nacrt" element={<AdminLayoutWrapper><AdminOsebniNacrt /></AdminLayoutWrapper>} />
+```
 
-  if (!child || !childId) {
-    return <Navigate to="/admin/children" replace />;
-  }
+---
 
-  // Fullscreen game - no layout, just auth + context
+## 5. Podrobnosti novih komponent
+
+### 5.1 AdminGovorneVaje.tsx (Govorne vaje - izbira)
+
+Podobno kot `GovornojezicovneVaje.tsx`, ampak:
+- Brez `Header` in `FooterSection`
+- Ovito v `AdminGameWrapper`
+- Navigacija na interne admin poti
+
+```typescript
+// Primer strukture
+export default function AdminGovorneVaje() {
+  const navigate = useNavigate();
+  const { childId } = useParams();
+
+  const exerciseTypes = [
+    {
+      id: "vaje-motorike-govoril",
+      title: "VAJE MOTORIKE GOVORIL",
+      path: `/admin/children/${childId}/exercises/vaje-motorike-govoril`,
+      available: true
+    },
+    {
+      id: "motnja-izreke",
+      title: "VAJE ZA IZGOVORJAVO GLASOV",
+      path: `/admin/children/${childId}/exercises/artikulacija`,
+      available: true
+    },
+    // ... ostale neaktivne vaje
+  ];
+
   return (
-    <GameModeProvider 
-      mode="logopedist" 
-      logopedistChildId={childId}
-      childName={child.name}
+    <AdminGameWrapper 
+      title="Govorne vaje"
+      backPath={`/admin/children/${childId}/workspace`}
     >
-      {children}
+      {/* Grid kartic kot v originalu */}
+    </AdminGameWrapper>
+  );
+}
+```
+
+### 5.2 AdminVajeMotorikeGovoril.tsx (Vaje motorike govoril)
+
+Podobno kot `VajeMotorikeGovoril.tsx`, ampak:
+- Uporablja `GameModeContext` za pravilno shranjevanje napredka
+- Gumb "Nazaj" vodi na admin pot
+
+```typescript
+export default function AdminVajeMotorikeGovoril() {
+  const { childId } = useParams();
+  const navigate = useNavigate();
+  
+  const handleConfirmExit = () => {
+    navigate(`/admin/children/${childId}/exercises`);
+  };
+  
+  return (
+    <GameModeProvider mode="logopedist" logopedistChildId={childId}>
+      {/* Enaka vsebina kot original, samo z admin navigacijo */}
     </GameModeProvider>
   );
 }
 ```
 
-### Posodobitev: `AdminRoutes.tsx`
+### 5.3 AdminVideoNavodila.tsx (Video navodila - izbira črk)
 
-Sprememba poti za dejanske igre (ne izbirne strani):
+Podobno kot `VideoNavodila.tsx`, ampak:
+- Brez `Header`
+- Ovito v `AdminGameWrapper`
+- Navigacija na admin poti
 
-```tsx
-// Nova funkcija - fullscreen wrapper za igre
-function AdminGameFullscreenRoute({ children }: { children: React.ReactNode }) {
+### 5.4 AdminVideoNavodilaRouter.tsx (Router za posamezni video)
+
+```typescript
+export default function AdminVideoNavodilaRouter() {
+  const { childId, letter } = useParams();
+  const config = getVideoNavodilaConfig(letter);
+  
+  if (!config) {
+    return <Navigate to={`/admin/children/${childId}/video-navodila`} replace />;
+  }
+
   return (
-    <Suspense fallback={<AdminLoadingFallback />}>
-      <AdminGameFullscreenWrapper>
-        {children}
-      </AdminGameFullscreenWrapper>
-    </Suspense>
+    <AdminGameWrapper 
+      title={`Video navodila - ${config.displayLetter}`}
+      backPath={`/admin/children/${childId}/video-navodila`}
+    >
+      {/* Video player vsebina */}
+    </AdminGameWrapper>
   );
 }
-
-// Sprememba poti za igre:
-// PREJ:
-<Route path="children/:childId/games/kolo-srece/:letter" 
-       element={<AdminLayoutWrapper><AdminKoloSreceRouter /></AdminLayoutWrapper>} />
-
-// POTEM:
-<Route path="children/:childId/games/kolo-srece/:letter" 
-       element={<AdminGameFullscreenRoute><AdminKoloSreceRouter /></AdminGameFullscreenRoute>} />
 ```
 
-### Posodobitev: Admin routerji
+### 5.5 AdminArtikulacijskiTest.tsx (Preverjanje izgovorjave)
 
-Admin routerji (`AdminKoloSreceRouter`, `AdminBingoRouter`, itd.) morajo biti posodobljeni:
-- Odstrani `AdminGameWrapper` - ni več potreben, ker fullscreen wrapper nastavi kontekst
-- Ali pa poenostavi `AdminGameWrapper` da ne dodaja UI elementov
+Podobno kot `ArtikuacijskiTest.tsx`, ampak:
+- Celozaslonski prikaz (brez admin layouta)
+- Uporablja `logopedist_child_id` za shranjevanje rezultatov
+- Gumb "Nazaj" vodi na admin workspace
+
+### 5.6 AdminOsebniNacrt.tsx (Osebni načrt)
+
+Enostavna stran z informacijo, da je osebni načrt na voljo:
+- Ovita v `AdminGameWrapper`
+- Prikaz izzivov za otroka (če so na voljo)
 
 ---
 
-## Datoteke za ustvariti
+## 6. Posodobitve obstoječih hookov
 
-| Datoteka | Namen |
-|----------|-------|
-| `src/components/admin/games/AdminGameFullscreenWrapper.tsx` | Celozaslonski wrapper za igre |
+### 6.1 useExerciseProgress.ts
 
-## Datoteke za posodobiti
+Dodati podporo za `logopedist_child_id`:
+
+```typescript
+export const useExerciseProgress = (logopedistChildId?: string) => {
+  const { recordExerciseCompletion } = useEnhancedProgress();
+  const { logopedistChildId: contextChildId } = useGameMode();
+  
+  const effectiveLogopedistChildId = logopedistChildId || contextChildId;
+  
+  // V completeCard() uporabi effectiveLogopedistChildId
+  recordExerciseCompletion('vaje_motorike_govoril', 3, effectiveLogopedistChildId);
+};
+```
+
+### 6.2 useArticulationTestNew.ts
+
+Dodati podporo za `logopedist_child_id`:
+
+```typescript
+export const useArticulationTestNew = (
+  childId?: string, 
+  userId?: string, 
+  fixedSessionNumber?: number, 
+  startIndex: number = 0,
+  difficulty: string = "srednja",
+  onSaveProgress?: Function,
+  logopedistChildId?: string  // NOV parameter
+) => {
+  // Pri shranjevanju posnetkov uporabi logopedistChildId
+};
+```
+
+---
+
+## 7. Koraki implementacije
+
+1. **Posodobi `AdminChildWorkspace.tsx`** - odstrani "Logopedski nasveti", dodaj interne poti
+2. **Ustvari `AdminGovorneVaje.tsx`** - glavna stran za govorne vaje
+3. **Ustvari `AdminVajeMotorikeGovoril.tsx`** - celozaslonske vaje motorike govoril
+4. **Ustvari `AdminArtikulacijaVaje.tsx`** - vaje za izgovorjavo
+5. **Ustvari `AdminVideoNavodila.tsx`** - izbira črk za video
+6. **Ustvari `AdminVideoNavodilaRouter.tsx`** - router za posamezni video
+7. **Ustvari `AdminArtikulacijskiTest.tsx`** - celozaslonski test izgovorjave
+8. **Ustvari `AdminOsebniNacrt.tsx`** - osebni načrt
+9. **Posodobi `AdminRoutes.tsx`** - dodaj vse nove poti
+10. **Posodobi `useExerciseProgress.ts`** - podpora za logopedist_child_id
+11. **Posodobi `useArticulationTestNew.ts`** - podpora za logopedist_child_id
+
+---
+
+## 8. Vizualni rezultat
+
+Po implementaciji bo logoped ostal v admin portalu:
+
+```text
+/admin/children/:id/workspace
+  → klik na "Govorne vaje"
+/admin/children/:id/exercises
+  → klik na "Vaje motorike govoril"
+/admin/children/:id/exercises/vaje-motorike-govoril
+  → Celozaslonske vaje (kot v uporabniškem portalu)
+  → Gumb "Nazaj" vodi na /admin/children/:id/exercises
+
+/admin/children/:id/workspace
+  → klik na "Preverjanje izgovorjave"
+/admin/children/:id/test
+  → Celozaslonski test (kot v uporabniškem portalu)
+  → Napredek se shranjuje pod logopedist_child_id
+  → Gumb "Nazaj" vodi na /admin/children/:id/workspace
+
+/admin/children/:id/workspace
+  → klik na "Video navodila"
+/admin/children/:id/video-navodila
+  → Seznam črk za video
+  → klik na "Črka C"
+/admin/children/:id/video-navodila/c
+  → Video predvajalnik
+
+/admin/children/:id/workspace
+  → klik na "Moj osebni načrt"
+/admin/children/:id/osebni-nacrt
+  → Osebni načrt otroka
+```
+
+---
+
+## 9. Seznam novih datotek
+
+| Datoteka | Opis |
+|----------|------|
+| `src/pages/admin/AdminGovorneVaje.tsx` | Izbira govornih vaj |
+| `src/pages/admin/exercises/AdminVajeMotorikeGovoril.tsx` | Celozaslonske vaje motorike |
+| `src/pages/admin/exercises/AdminArtikulacijaVaje.tsx` | Vaje za izgovorjavo |
+| `src/pages/admin/AdminVideoNavodila.tsx` | Izbira črk za video |
+| `src/pages/admin/AdminArtikulacijskiTest.tsx` | Celozaslonski test izgovorjave |
+| `src/pages/admin/AdminOsebniNacrt.tsx` | Osebni načrt |
+| `src/components/routing/admin/AdminVideoNavodilaRouter.tsx` | Router za video |
+
+## 10. Seznam datotek za posodobitev
 
 | Datoteka | Sprememba |
 |----------|-----------|
-| `src/components/routing/AdminRoutes.tsx` | Poti za igre uporabijo fullscreen wrapper |
-| `src/components/routing/admin/AdminKoloSreceRouter.tsx` | Poenostavi - odstrani redundantni wrapper |
-| `src/components/routing/admin/AdminBingoRouter.tsx` | Poenostavi |
-| `src/components/routing/admin/AdminLabirintRouter.tsx` | Poenostavi |
-| `src/components/routing/admin/AdminSpominRouter.tsx` | Poenostavi |
-| `src/components/routing/admin/AdminZaporedjaRouter.tsx` | Poenostavi |
-| `src/components/routing/admin/AdminSestavljankeRouter.tsx` | Poenostavi |
-| `src/components/routing/admin/AdminDrsnaSestavljankaRouter.tsx` | Poenostavi |
-| `src/components/routing/admin/AdminIgraUjemanjaRouter.tsx` | Poenostavi |
-| `src/components/routing/admin/AdminMetKockeRouter.tsx` | Poenostavi |
-| `src/components/routing/admin/AdminPonoviPovedRouter.tsx` | Poenostavi |
+| `src/pages/admin/AdminChildWorkspace.tsx` | Odstrani "Logopedski nasveti", dodaj interne poti |
+| `src/components/routing/AdminRoutes.tsx` | Dodaj nove poti |
+| `src/hooks/useExerciseProgress.ts` | Podpora za logopedist_child_id |
+| `src/hooks/useArticulationTestNew.ts` | Podpora za logopedist_child_id |
 
 ---
 
-## Koraki implementacije
+## 11. Ključna načela
 
-1. **Ustvari `AdminGameFullscreenWrapper.tsx`** - celozaslonski wrapper
-2. **Posodobi `AdminRoutes.tsx`** - dodaj `AdminGameFullscreenRoute` funkcijo in posodobi poti za igre
-3. **Poenostavi admin routerje** - odstrani redundantni `AdminGameWrapper` iz routerjev za igre
-4. **Testiraj** - preveri da se plavajoči gumb prikaže in deluje pravilno
-
----
-
-## Vizualni rezultat
-
-Po implementaciji:
-
-```
-/admin/children/:id/games/kolo-srece/:letter
-└─ AdminGameFullscreenWrapper (avtentikacija + kontekst)
-   └─ GenericWheelGame (celozaslonsko)
-      └─ Plavajoči gumb "Hiška" v levem spodnjem kotu ✓
-         ├─ Nazaj → vrne na izbiro črk
-         ├─ Nova igra → ponastavi igro
-         └─ Navodila → prikaže navodila
-```
-
-## Pomembno
-
-- **Uporabniški portal ostane nedotaknjen** - nobena sprememba ne vpliva na obstoječe igre
-- **Izbirne strani ohranijo admin layout** - npr. `/admin/children/:id/games/kolo-srece` prikazuje seznam črk z admin UI
-- **Dejanske igre so celozaslonske** - npr. `/admin/children/:id/games/kolo-srece/c` prikazuje igro brez admin UI
+1. **Uporabniški portal ostane nedotaknjen** - nobena sprememba ne vpliva na obstoječe strani
+2. **Admin portal uporablja ločene komponente** - jasna ločitev
+3. **Ponovna uporaba logike** - isti hooki in komponente, le z admin kontekstom
+4. **GameModeContext za navigacijo in shranjevanje** - pravilno sledenje napredku
 
