@@ -42,9 +42,9 @@ export const useLogopedistArticulationSession = () => {
       const { data: sessionData, error: sessionError } = await supabase
         .from('articulation_test_sessions')
         .insert({
-          // Set child_id to a dummy UUID since it's required - not null constraint
-          // We use a placeholder that won't conflict with real children
-          child_id: logopedistChildId,
+          // child_id is now nullable - we set it to null for logopedist sessions
+          // The actual child reference is stored in logopedist_child_id
+          child_id: null,
           parent_id: user.id,
           logopedist_child_id: logopedistChildId,
           organization_id: profile.organization_id,
