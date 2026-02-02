@@ -176,7 +176,9 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '');
-    const audioFilename = completedImage.audio || `${normalizedWord}.m4a`;
+    let audioFilename = completedImage.audio || `${normalizedWord}.m4a`;
+    // Remove trailing "1" before .m4a if present (e.g., "cekin1.m4a" → "cekin.m4a")
+    audioFilename = audioFilename.replace(/1\.m4a$/, '.m4a');
     const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
     playAudio(audioUrl);
   };

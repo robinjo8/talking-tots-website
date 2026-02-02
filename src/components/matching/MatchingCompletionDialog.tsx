@@ -153,13 +153,16 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     let audioUrl: string;
     
     if (image.audio_url) {
-      audioUrl = image.audio_url;
+      // Remove trailing "1" before .m4a if present
+      audioUrl = image.audio_url.replace(/1\.m4a$/, '.m4a');
     } else {
       // Fallback: generiraj URL iz besede
-      const normalizedWord = image.word
+      let normalizedWord = image.word
         .toLowerCase()
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '');
+      // Remove trailing "1" if present
+      normalizedWord = normalizedWord.replace(/1$/, '');
       audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${normalizedWord}.m4a`;
     }
     
