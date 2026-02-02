@@ -1,120 +1,138 @@
 
-# Načrt: Popravek sistema za nadaljevanje seje
+# Načrt: Popravek shranjevanja napredka ob snemanju
 
-## Ugotovljeni problemi
+## Ugotovljen problem
 
-### Problem 1: Dvojno inkrementiranje indeksa besede
+### Trenutni tok (napačen)
 
-Trenutna logika ima napako v štetju:
-
+```text
+1. Uporabnik izgovori ROŽA (indeks 57) ✓ 
+2. Transkripcija uspe ✓
+3. Uporabnik klikne "NAPREJ"
+4. handleNext() se izvede:
+   - setCurrentWordIndex(58)  → premik na URA
+   - onSaveProgress(58)       → shrani 58 v bazo   ← NAPAKA!
+5. Uporabnik vidi URA, a je NE izgovori
+6. Uporabnik zapusti test
+7. V bazi: current_word_index = 58 (URA)
+8. Ob vrnitvi: Dialog prikaže "Zadnja izgovorjena: URA" ← NAROBE!
 ```
-Ko uporabnik izgovori ROŽA (indeks 57) in pritisne NAPREJ:
-1. handleNext() izračuna nextIndex = 57 + 1 = 58
-2. handleNext() pokliče onSaveProgress(childId, sessionNumber, 58)
-3. updateProgress(58) shrani current_word_index = 58 + 1 = 59  ❌ NAPAKA
 
-Rezultat: V bazi je shranjeno 59 (SIR), čeprav bi moralo biti 58 (URA)
+**Problem:** Napredek se shrani ob kliku na "Naprej", ne ob uspešnem snemanju. Zato se v bazo shrani naslednja beseda (ki še ni bila izgovorjena), namesto zadnje izgovorjene.
+
+### Pravilen tok (željen)
+
+```text
+1. Uporabnik izgovori ROŽA (indeks 57) ✓
+2. Transkripcija uspe ✓
+3. onSaveProgress(57) → shrani 57 v bazo   ← TAKOJ po uspešnem snemanju!
+4. Uporabnik klikne "NAPREJ"
+5. handleNext() se izvede:
+   - setCurrentWordIndex(58) → premik na URA
+   - (NE shrani napredka tukaj)
+6. Uporabnik vidi URA, a je NE izgovori
+7. Uporabnik zapusti test
+8. V bazi: current_word_index = 57 (ROŽA)
+9. Ob vrnitvi: 
+   - Dialog prikaže "Zadnja izgovorjena: ROŽA" ✓
+   - Test nadaljuje od besede 58 (URA) ✓
 ```
-
-**Vzrok:** Funkcija `updateProgress` doda +1, ampak prejme že inkrementirano vrednost.
-
-### Problem 2: Dialog prikaže napačno besedo
-
-Dialog prikaže besedo na indeksu `current_word_index` iz baze. Ker je tam 59, se prikaže SIR (60/60) namesto URA.
-
-**Pravilna logika:**
-- `current_word_index` naj pomeni "naslednja beseda za izgovorjavo" (ne "že izgovorjena beseda + 1")
-- Dialog naj prikaže "Zadnja izgovorjena beseda" = beseda na indeksu `current_word_index - 1`
-
-### Problem 3: Gumb "Začni znova" ne briše seje
-
-Trenutno `handleStartOver` samo zapre dialog in pokaže info dialog, ampak seje v bazi ne ponastavi.
 
 ---
 
 ## Rešitev
 
-### Sprememba 1: Popravek `updateProgress` v `useLogopedistSessionManager.ts`
+### Sprememba 1: Shrani napredek ob uspešnem snemanju, ne ob kliku na "Naprej"
 
-Odstraniti podvajanje +1:
-
-```typescript
-// PREJ (narobe):
-.update({ current_word_index: wordIndex + 1 })
-
-// POTEM (pravilno):
-.update({ current_word_index: wordIndex })
-```
-
-**Zakaj:** `handleNext` že pošlje `nextIndex` ki je inkrementirano. Ni potrebe za še eno inkrementiranje.
-
-### Sprememba 2: Popravek dialoga v `AdminArtikulacijskiTest.tsx`
-
-Dialog mora prikazati **zadnjo izgovorjeno besedo**, ne naslednjo:
+V `useArticulationTestNew.ts`:
 
 ```typescript
-// PREJ:
-setResumeWordIndex(existingSession.startIndex);
-
-// POTEM:
-// startIndex je "naslednja beseda za izgovorjavo"
-// Za prikaz "zadnje izgovorjene" uporabimo startIndex - 1
-const lastSpokenWordIndex = existingSession.startIndex > 0 
-  ? existingSession.startIndex - 1 
-  : 0;
-setResumeWordIndex(lastSpokenWordIndex);
-```
-
-### Sprememba 3: Poenostavitev dialoga `ArticulationResumeDialog.tsx`
-
-Po zahtevi uporabnika odstraniti:
-- Ikono 📍 in ⏱️
-- Tekst "(60/60)"
-- Tekst "Shranjeno: prejšnja seja"
-
-Nova vsebina:
-
-```
-🔄 Nadaljevanje preverjanja
-
-Zaznali smo nedokončano preverjanje. Ali želite nadaljevati?
-
-Zadnja izgovorjena beseda je bila: [BESEDA]
-
-[Začni znova]  [Nadaljuj]
-```
-
-### Sprememba 4: Implementacija "Začni znova" v `useLogopedistSessionManager.ts`
-
-Dodati novo funkcijo `resetSession` za ponastavitev seje:
-
-```typescript
-const resetSession = useCallback(async (childId: string): Promise<SessionInfo | null> => {
-  if (!sessionInfo) return null;
-  
-  // Izbriši trenutno nedokončano sejo
-  await supabase
-    .from('articulation_test_sessions')
-    .delete()
-    .eq('id', sessionInfo.sessionId);
-  
-  // Ustvari novo sejo od začetka
-  setSessionInfo(null);
-  return initializeSession(childId, sessionInfo.totalWords);
-}, [sessionInfo, initializeSession]);
-```
-
-### Sprememba 5: Povezava "Začni znova" v `AdminArtikulacijskiTest.tsx`
-
-```typescript
-const handleStartOver = async () => {
-  if (childId) {
-    // Ponastavi sejo v bazi in začni od začetka
-    await resetSession(childId);
+// PREJ (v handleNext):
+const handleNext = () => {
+  if (currentWordIndex < totalWords - 1) {
+    const nextIndex = currentWordIndex + 1;
+    setCurrentWordIndex(nextIndex);
+    // ... 
+    if (childId && sessionNumber && onSaveProgress) {
+      onSaveProgress(childId, sessionNumber, nextIndex);  // ← NAROBE
+    }
   }
-  setShowResumeDialog(false);
-  setShowInfoDialog(true);
 };
+
+// POTEM (v handleRecordingComplete):
+const handleRecordingComplete = async (audioBase64: string) => {
+  // ... transkripcija ...
+  
+  if (result && result.accepted) {
+    // Uspešno snemanje - shrani napredek TAKOJ
+    if (childId && sessionNumber && onSaveProgress) {
+      onSaveProgress(childId, sessionNumber, currentWordIndex);  // ← PRAVILNO
+    }
+  }
+  
+  setHasRecorded(true);
+};
+
+// V handleNext odstranimo shranjevanje:
+const handleNext = () => {
+  if (currentWordIndex < totalWords - 1) {
+    const nextIndex = currentWordIndex + 1;
+    setCurrentWordIndex(nextIndex);
+    setHasRecorded(false);
+    // NE shranjujemo več tukaj!
+  }
+};
+```
+
+### Sprememba 2: Sprememba pomena `current_word_index`
+
+Prej: `current_word_index` = "naslednja beseda za izgovorjavo"  
+Potem: `current_word_index` = "zadnja uspešno izgovorjena beseda"
+
+To pomeni, da se ob vrnitvi test nadaljuje od `current_word_index + 1`.
+
+### Sprememba 3: Popravek logike nadaljevanja v `AdminArtikulacijskiTest.tsx`
+
+```typescript
+// Ob preverjanju obstoječe seje:
+if (existingSession && existingSession.isResume && existingSession.startIndex > 0) {
+  // startIndex je "zadnja izgovorjena beseda"
+  // Za prikaz dialoga uporabimo direktno startIndex
+  setResumeWordIndex(existingSession.startIndex);  // ← Zadnja izgovorjena
+  
+  // Za nadaljevanje testa moramo začeti od startIndex + 1
+  // To bo potrebno popraviti v useArticulationTestNew
+}
+```
+
+### Sprememba 4: Popravek `startIndex` za hook
+
+V `useLogopedistSessionManager.ts` - `initializeSession`:
+
+```typescript
+// Če nadaljujemo sejo, startIndex naj bo current_word_index + 1
+// (ker current_word_index zdaj pomeni "zadnja izgovorjena", ne "naslednja za izgovorjavo")
+return {
+  sessionId: existingSession.id,
+  sessionNumber: existingSession.session_number ?? 1,
+  startIndex: (existingSession.current_word_index ?? 0) + 1,  // +1 za nadaljevanje
+  lastSpokenIndex: existingSession.current_word_index ?? 0,   // Za prikaz dialoga
+  isResume: (existingSession.current_word_index ?? 0) > 0,
+  totalWords: existingSession.total_words ?? totalWords,
+};
+```
+
+### Sprememba 5: Dodaj `lastSpokenIndex` v `SessionInfo`
+
+```typescript
+interface SessionInfo {
+  sessionId: string;
+  sessionNumber: number;
+  startIndex: number;        // Naslednja beseda za izgovorjavo
+  lastSpokenIndex: number;   // NOVO: Zadnja izgovorjena beseda (za dialog)
+  isResume: boolean;
+  totalWords: number;
+}
 ```
 
 ---
@@ -123,16 +141,18 @@ const handleStartOver = async () => {
 
 | Datoteka | Sprememba |
 |----------|-----------|
-| `src/hooks/useLogopedistSessionManager.ts` | Odstrani +1 v `updateProgress`, dodaj `resetSession` funkcijo |
-| `src/pages/admin/AdminArtikulacijskiTest.tsx` | Popravi izračun `resumeWordIndex`, uporabi `resetSession` za "Začni znova" |
-| `src/components/articulation/ArticulationResumeDialog.tsx` | Poenostavi prikaz - odstrani ikone, (X/Y), "Shranjeno" tekst |
+| `useArticulationTestNew.ts` | Premakni `onSaveProgress` iz `handleNext` v `handleRecordingComplete` |
+| `useLogopedistSessionManager.ts` | Dodaj `lastSpokenIndex` v SessionInfo, nastavi `startIndex = current_word_index + 1` |
+| `AdminArtikulacijskiTest.tsx` | Uporabi `lastSpokenIndex` za prikaz dialoga |
 
 ---
 
 ## Končni rezultat
 
-Po popravku:
-1. **Pravilno shranjevanje:** Če izgovoriš ROŽA in greš na URA, se v bazo shrani `current_word_index = 58` (URA)
-2. **Pravilno nadaljevanje:** Dialog prikaže "Zadnja izgovorjena beseda je bila: ROŽA" in test nadaljuje od URA
-3. **Pravilno resetiranje:** Gumb "Začni znova" pobriše sejo in začne od prve besede
-4. **Enostavnejši dialog:** Brez odvečnih informacij, samo bistvo
+1. **Uporabnik izgovori ROŽA** → `current_word_index = 57` (shrani se takoj ob uspešnem snemanju)
+2. **Uporabnik klikne Naprej** → UI se premakne na URA (indeks 58), baza se NE posodobi
+3. **Uporabnik zapusti test brez izgovorjave URA**
+4. **Ob vrnitvi:**
+   - Dialog: "Zadnja izgovorjena beseda je bila: ROŽA" ✓
+   - Test nadaljuje od URA (indeks 58) ✓
+   - V ozadju je slika URA ✓
