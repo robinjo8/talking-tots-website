@@ -1,138 +1,83 @@
 
-# Načrt: Popravek shranjevanja napredka ob snemanju
+# Načrt: Popravek prikaza slike in indikatorja ob nadaljevanju
 
-## Ugotovljen problem
+## Ugotovljena problema
 
-### Trenutni tok (napačen)
+### Problem 1: Slika v ozadju prikazuje ROŽA namesto URA
 
-```text
-1. Uporabnik izgovori ROŽA (indeks 57) ✓ 
-2. Transkripcija uspe ✓
-3. Uporabnik klikne "NAPREJ"
-4. handleNext() se izvede:
-   - setCurrentWordIndex(58)  → premik na URA
-   - onSaveProgress(58)       → shrani 58 v bazo   ← NAPAKA!
-5. Uporabnik vidi URA, a je NE izgovori
-6. Uporabnik zapusti test
-7. V bazi: current_word_index = 58 (URA)
-8. Ob vrnitvi: Dialog prikaže "Zadnja izgovorjena: URA" ← NAROBE!
+**Vzrok:** Ko se komponenta `AdminArtikulacijskiTest` naloži, `sessionInfo` še ne obstaja. Hook `useArticulationTestNew` se inicializira z:
+```typescript
+const startIndex = sessionInfo?.isResume 
+  ? sessionInfo.startIndex 
+  : (isTestOrganization ? 57 : 0);  // → vrne 0, ker sessionInfo je undefined
 ```
 
-**Problem:** Napredek se shrani ob kliku na "Naprej", ne ob uspešnem snemanju. Zato se v bazo shrani naslednja beseda (ki še ni bila izgovorjena), namesto zadnje izgovorjene.
+Šele potem se izvede `checkExistingSession`, ki nastavi `sessionInfo`, ampak hook je že inicializiran z `currentWordIndex = 0`.
 
-### Pravilen tok (željen)
+### Problem 2: Indikator črke R ni 1/3 obarvan z zeleno
 
-```text
-1. Uporabnik izgovori ROŽA (indeks 57) ✓
-2. Transkripcija uspe ✓
-3. onSaveProgress(57) → shrani 57 v bazo   ← TAKOJ po uspešnem snemanju!
-4. Uporabnik klikne "NAPREJ"
-5. handleNext() se izvede:
-   - setCurrentWordIndex(58) → premik na URA
-   - (NE shrani napredka tukaj)
-6. Uporabnik vidi URA, a je NE izgovori
-7. Uporabnik zapusti test
-8. V bazi: current_word_index = 57 (ROŽA)
-9. Ob vrnitvi: 
-   - Dialog prikaže "Zadnja izgovorjena: ROŽA" ✓
-   - Test nadaljuje od besede 58 (URA) ✓
+**Vzrok:** Funkcija `getCompletedWords()` šteje besede do `currentWordIndex`:
+```typescript
+if (wordCount < currentWordIndex) {
+  completed[letterIdx]++;
+}
 ```
+
+Če je `currentWordIndex = 57`, potem za črko R (indeksi 57, 58, 59) ni nobena beseda označena kot dokončana, ker `57 < 57` je false. Ob nadaljevanju pa bi morala biti ROŽA (57) že dokončana.
 
 ---
 
 ## Rešitev
 
-### Sprememba 1: Shrani napredek ob uspešnem snemanju, ne ob kliku na "Naprej"
+### Sprememba 1: Uporabi `key` prop za ponoven render hooka
+
+Ko se `sessionInfo` spremeni, moramo zagotoviti, da se hook `useArticulationTestNew` ponovno inicializira s pravilnim `startIndex`. To lahko dosežemo z React `key` propom.
+
+V `AdminArtikulacijskiTest.tsx`:
+```typescript
+// Ustvari ključ, ki se spremeni ko se seja inicializira
+const hookKey = sessionInfo?.sessionId ?? 'initial';
+
+const {
+  imageUrl,
+  loading,
+  // ...
+} = useArticulationTestNew(
+  // ... parametri ostanejo enaki
+);
+```
+
+Ampak ker hook ni komponenta, moramo drugače pristopiti - uporabiti bomo morali **state za startIndex**, ki se posodobi ko se seja inicializira.
+
+### Sprememba 2: Dinamična posodobitev startIndex v hooku
+
+Namesto da hook prebere `startIndex` samo ob inicializaciji, bo imel `useEffect`, ki se sproži ob spremembi `startIndex` prop-a:
 
 V `useArticulationTestNew.ts`:
-
 ```typescript
-// PREJ (v handleNext):
-const handleNext = () => {
-  if (currentWordIndex < totalWords - 1) {
-    const nextIndex = currentWordIndex + 1;
-    setCurrentWordIndex(nextIndex);
-    // ... 
-    if (childId && sessionNumber && onSaveProgress) {
-      onSaveProgress(childId, sessionNumber, nextIndex);  // ← NAROBE
-    }
-  }
-};
-
-// POTEM (v handleRecordingComplete):
-const handleRecordingComplete = async (audioBase64: string) => {
-  // ... transkripcija ...
-  
-  if (result && result.accepted) {
-    // Uspešno snemanje - shrani napredek TAKOJ
-    if (childId && sessionNumber && onSaveProgress) {
-      onSaveProgress(childId, sessionNumber, currentWordIndex);  // ← PRAVILNO
-    }
-  }
-  
-  setHasRecorded(true);
-};
-
-// V handleNext odstranimo shranjevanje:
-const handleNext = () => {
-  if (currentWordIndex < totalWords - 1) {
-    const nextIndex = currentWordIndex + 1;
-    setCurrentWordIndex(nextIndex);
-    setHasRecorded(false);
-    // NE shranjujemo več tukaj!
-  }
-};
+// Posodobi currentWordIndex ko se startIndex spremeni (npr. ob nadaljevanju seje)
+useEffect(() => {
+  setCurrentWordIndex(startIndex);
+}, [startIndex]);
 ```
 
-### Sprememba 2: Sprememba pomena `current_word_index`
+### Sprememba 3: Pravilno nastavi startIndex v AdminArtikulacijskiTest
 
-Prej: `current_word_index` = "naslednja beseda za izgovorjavo"  
-Potem: `current_word_index` = "zadnja uspešno izgovorjena beseda"
-
-To pomeni, da se ob vrnitvi test nadaljuje od `current_word_index + 1`.
-
-### Sprememba 3: Popravek logike nadaljevanja v `AdminArtikulacijskiTest.tsx`
+Ko se seja inicializira, se mora `startIndex` posodobiti. Za to potrebujemo state:
 
 ```typescript
-// Ob preverjanju obstoječe seje:
-if (existingSession && existingSession.isResume && existingSession.startIndex > 0) {
-  // startIndex je "zadnja izgovorjena beseda"
-  // Za prikaz dialoga uporabimo direktno startIndex
-  setResumeWordIndex(existingSession.startIndex);  // ← Zadnja izgovorjena
-  
-  // Za nadaljevanje testa moramo začeti od startIndex + 1
-  // To bo potrebno popraviti v useArticulationTestNew
-}
-```
+const [effectiveStartIndex, setEffectiveStartIndex] = useState<number>(0);
 
-### Sprememba 4: Popravek `startIndex` za hook
-
-V `useLogopedistSessionManager.ts` - `initializeSession`:
-
-```typescript
-// Če nadaljujemo sejo, startIndex naj bo current_word_index + 1
-// (ker current_word_index zdaj pomeni "zadnja izgovorjena", ne "naslednja za izgovorjavo")
-return {
-  sessionId: existingSession.id,
-  sessionNumber: existingSession.session_number ?? 1,
-  startIndex: (existingSession.current_word_index ?? 0) + 1,  // +1 za nadaljevanje
-  lastSpokenIndex: existingSession.current_word_index ?? 0,   // Za prikaz dialoga
-  isResume: (existingSession.current_word_index ?? 0) > 0,
-  totalWords: existingSession.total_words ?? totalWords,
-};
-```
-
-### Sprememba 5: Dodaj `lastSpokenIndex` v `SessionInfo`
-
-```typescript
-interface SessionInfo {
-  sessionId: string;
-  sessionNumber: number;
-  startIndex: number;        // Naslednja beseda za izgovorjavo
-  lastSpokenIndex: number;   // NOVO: Zadnja izgovorjena beseda (za dialog)
-  isResume: boolean;
-  totalWords: number;
-}
+// Ko se seja inicializira, posodobi startIndex
+useEffect(() => {
+  if (sessionInfo?.isResume) {
+    setEffectiveStartIndex(sessionInfo.startIndex);
+  } else if (isTestOrganization) {
+    setEffectiveStartIndex(57);
+  } else {
+    setEffectiveStartIndex(0);
+  }
+}, [sessionInfo, isTestOrganization]);
 ```
 
 ---
@@ -141,18 +86,13 @@ interface SessionInfo {
 
 | Datoteka | Sprememba |
 |----------|-----------|
-| `useArticulationTestNew.ts` | Premakni `onSaveProgress` iz `handleNext` v `handleRecordingComplete` |
-| `useLogopedistSessionManager.ts` | Dodaj `lastSpokenIndex` v SessionInfo, nastavi `startIndex = current_word_index + 1` |
-| `AdminArtikulacijskiTest.tsx` | Uporabi `lastSpokenIndex` za prikaz dialoga |
+| `useArticulationTestNew.ts` | Dodaj `useEffect` za posodobitev `currentWordIndex` ob spremembi `startIndex` |
+| `AdminArtikulacijskiTest.tsx` | Uporabi state `effectiveStartIndex` za pravilno posodobitev ob inicializaciji seje |
 
 ---
 
 ## Končni rezultat
 
-1. **Uporabnik izgovori ROŽA** → `current_word_index = 57` (shrani se takoj ob uspešnem snemanju)
-2. **Uporabnik klikne Naprej** → UI se premakne na URA (indeks 58), baza se NE posodobi
-3. **Uporabnik zapusti test brez izgovorjave URA**
-4. **Ob vrnitvi:**
-   - Dialog: "Zadnja izgovorjena beseda je bila: ROŽA" ✓
-   - Test nadaljuje od URA (indeks 58) ✓
-   - V ozadju je slika URA ✓
+1. **Slika:** Ko se seja naloži in `sessionInfo.startIndex = 58` (URA), se hook posodobi in prikaže pravilno sliko (URA)
+2. **Indikator:** `completedWords` pravilno izračuna, da je za R dokončana 1 beseda (ROŽA), ker je `currentWordIndex = 58`, in `57 < 58` je true
+3. **Dialog:** Ostane enak - prikaže "Zadnja izgovorjena beseda je bila: ROŽA"
