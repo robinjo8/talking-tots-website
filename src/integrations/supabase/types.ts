@@ -1617,6 +1617,15 @@ export type Database = {
           stars_total: number
         }[]
       }
+      get_logopedist_child_activity_summary: {
+        Args: { logopedist_child_uuid: string }
+        Returns: {
+          activity_subtype: string
+          activity_type: Database["public"]["Enums"]["activity_type"]
+          completion_count: number
+          total_stars: number
+        }[]
+      }
       get_logopedist_license_stats: {
         Args: { p_user_id: string }
         Returns: {
