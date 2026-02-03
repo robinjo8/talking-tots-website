@@ -1356,7 +1356,7 @@ export type Database = {
         Row: {
           activity_subtype: string | null
           activity_type: Database["public"]["Enums"]["activity_type"] | null
-          child_id: string
+          child_id: string | null
           completed_at: string
           correct_answers: number
           duration: number
@@ -1371,7 +1371,7 @@ export type Database = {
         Insert: {
           activity_subtype?: string | null
           activity_type?: Database["public"]["Enums"]["activity_type"] | null
-          child_id: string
+          child_id?: string | null
           completed_at?: string
           correct_answers: number
           duration: number
@@ -1386,7 +1386,7 @@ export type Database = {
         Update: {
           activity_subtype?: string | null
           activity_type?: Database["public"]["Enums"]["activity_type"] | null
-          child_id?: string
+          child_id?: string | null
           completed_at?: string
           correct_answers?: number
           duration?: number
