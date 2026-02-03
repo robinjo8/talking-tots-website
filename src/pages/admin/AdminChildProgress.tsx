@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Star, Activity, Calendar } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ArrowLeft, Star, Activity, Calendar, ChevronDown } from 'lucide-react';
 import { useLogopedistChild } from '@/hooks/useLogopedistChildren';
 import { useLogopedistProgress } from '@/hooks/useLogopedistProgress';
 import { useQuery } from '@tanstack/react-query';
@@ -11,6 +12,8 @@ import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { UnifiedProgressDisplay } from '@/components/progress/UnifiedProgressDisplay';
+import { ActivityBreakdownCard } from '@/components/progress/ActivityBreakdownCard';
+import { aggregateActivities } from '@/utils/activityAggregation';
 
 interface ProgressEntry {
   id: string;
@@ -26,6 +29,7 @@ export default function AdminChildProgress() {
   const { childId } = useParams<{ childId: string }>();
   const navigate = useNavigate();
   const { data: child, isLoading: childLoading } = useLogopedistChild(childId);
+  const [historyOpen, setHistoryOpen] = useState(false);
   
   // Use the new hook for unified progress display
   const { progressData, isLoading: progressDataLoading } = useLogopedistProgress(childId);
@@ -52,6 +56,9 @@ export default function AdminChildProgress() {
     },
     enabled: !!childId,
   });
+
+  // Aggregate activities for breakdown display
+  const aggregatedData = useMemo(() => aggregateActivities(history), [history]);
 
   const isLoading = childLoading || progressDataLoading || historyLoading;
 
@@ -115,64 +122,85 @@ export default function AdminChildProgress() {
         showTestButtons={false}
       />
 
-      {/* Activity History */}
+      {/* Activity Breakdown - new aggregated view */}
+      <ActivityBreakdownCard 
+        games={aggregatedData.games}
+        exercises={aggregatedData.exercises}
+        total={aggregatedData.total}
+      />
+
+      {/* Collapsible Activity History */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            Zgodovina aktivnosti
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {history.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <Activity className="h-12 w-12 mx-auto mb-3 opacity-50" />
-              <p>Še ni zabeleženih aktivnosti.</p>
-              <Button 
-                variant="link" 
-                onClick={() => navigate(`/admin/children/${childId}/workspace`)}
-              >
-                Začni delo z otrokom
-              </Button>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {history.map((entry) => (
-                <div 
-                  key={entry.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="text-sm text-muted-foreground w-24">
-                      {format(new Date(entry.completed_at), 'd. MMM yyyy', { locale: sl })}
-                    </div>
-                    <div>
-                      <p className="font-medium">
-                        {entry.activity_subtype || entry.activity_type}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {entry.activity_type}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <p className="font-semibold">{entry.score}%</p>
-                    </div>
-                    {entry.stars_earned !== null && entry.stars_earned > 0 && (
-                      <div className="flex items-center gap-1 text-app-orange">
-                        {Array.from({ length: entry.stars_earned }).map((_, i) => (
-                          <Star key={i} className="h-4 w-4 fill-current" />
-                        ))}
-                      </div>
-                    )}
-                  </div>
+        <Collapsible open={historyOpen} onOpenChange={setHistoryOpen}>
+          <CollapsibleTrigger asChild>
+            <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
+                  Zgodovina aktivnosti
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
+                <ChevronDown 
+                  className={cn(
+                    "h-5 w-5 text-muted-foreground transition-transform",
+                    historyOpen && "rotate-180"
+                  )} 
+                />
+              </CardTitle>
+            </CardHeader>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <CardContent>
+              {history.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Activity className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p>Še ni zabeleženih aktivnosti.</p>
+                  <Button 
+                    variant="link" 
+                    onClick={() => navigate(`/admin/children/${childId}/workspace`)}
+                  >
+                    Začni delo z otrokom
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {history.map((entry) => (
+                    <div 
+                      key={entry.id}
+                      className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="text-sm text-muted-foreground w-24">
+                          {format(new Date(entry.completed_at), 'd. MMM yyyy', { locale: sl })}
+                        </div>
+                        <div>
+                          <p className="font-medium">
+                            {entry.activity_subtype || entry.activity_type}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {entry.activity_type}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <p className="font-semibold">{entry.score}%</p>
+                        </div>
+                        {entry.stars_earned !== null && entry.stars_earned > 0 && (
+                          <div className="flex items-center gap-1 text-app-orange">
+                            {Array.from({ length: entry.stars_earned }).map((_, i) => (
+                              <Star key={i} className="h-4 w-4 fill-current" />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </CollapsibleContent>
+        </Collapsible>
       </Card>
 
       {/* Action button */}
