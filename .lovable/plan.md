@@ -1,125 +1,103 @@
 
-# Načrt: Popravek shranjevanja napredka za logopedistove otroke v igrah
+
+# Načrt: Popravek NOT NULL constraint za tabelo progress
 
 ## Ugotovljen problem
 
-Ob igranju igre **Sestavljanka** za otroka Tian (ID: `81135446-a352-4446-95ba-c899f2d252f5`), se napredek ni shranil v bazo. Razlog:
+Pri igranju igre Sestavljanka za logopedistovega otroka Tian se napredek **ne shrani** v bazo. Omrežni log jasno kaže napako:
 
-Komponente iger ne uporabljajo `useGameMode()` konteksta za pridobitev `logopedistChildId`. Zato kličejo:
-```typescript
-recordGameCompletion('puzzle', config.trackingId);
-// Brez tretjega parametra logopedistChildId!
+```json
+{
+  "code": "23502",
+  "message": "null value in column \"child_id\" of relation \"progress\" violates not-null constraint"
+}
 ```
 
-To povzroči, da se napredek shrani v `child_id` (uporabniški portal), ne pa v `logopedist_child_id` (admin portal).
+### Vzrok
+Stolpec `child_id` v tabeli `progress` ima **NOT NULL constraint**, kar preprečuje shranjevanje napredka za logopedistove otroke, kjer je `child_id = null`.
 
----
-
-## Prizadete komponente
-
-| Komponenta | Igra | Status |
-|------------|------|--------|
-| `GenericSestavljankaGame.tsx` | Sestavljanke | ❌ Manjka |
-| `GenericDrsnaSestavljankaGame.tsx` | Drsne sestavljanke | ❌ Manjka |
-| `GenericLabirintGame.tsx` | Labirint | ❌ Manjka |
-| `GenericIgraUjemanjaGame.tsx` | Povezi pare | ❌ Manjka |
-| `GenericZaporedjaGame.tsx` | Zaporedja | ❌ Manjka |
-| `useGenericMemoryGame.tsx` | Spomin | ✅ Pravilno |
+| Stolpec | Trenutno stanje | Zahtevano stanje |
+|---------|-----------------|------------------|
+| `child_id` | NOT NULL | **NULLABLE** |
+| `logopedist_child_id` | NULLABLE | NULLABLE |
 
 ---
 
 ## Rešitev
 
-Za vsako prizadeto komponento dodaj:
+### 1. Migracija baze: Spremeni `child_id` v nullable
 
-1. **Import `useGameMode`** iz `GameModeContext`
-2. **Pridobi kontekst** na začetku komponente
-3. **Posreduj `logopedistChildId`** v `recordGameCompletion`
-4. **Onemogočij pokal preverbo** za logopedist mode (pokali so samo za uporabniški portal)
-
-### Vzorec spremembe (za vse igre enako)
-
-```typescript
-// Pred spremembo:
-import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { useTrophyContext } from "@/contexts/TrophyContext";
-
-// ...
-
-const { recordGameCompletion } = useEnhancedProgress();
-const { checkForNewTrophy } = useTrophyContext();
-
-const handleStarClaimed = async () => {
-  recordGameCompletion('puzzle', config.trackingId);
-  await checkForNewTrophy();
-};
+```sql
+ALTER TABLE public.progress 
+ALTER COLUMN child_id DROP NOT NULL;
 ```
 
-```typescript
-// Po spremembi:
-import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
-import { useTrophyContext } from "@/contexts/TrophyContext";
-import { useGameMode } from "@/contexts/GameModeContext";
+### 2. Dodaj CHECK constraint za veljavnost podatkov
 
-// ...
+Zagotoviti moramo, da ima vsak zapis vsaj enega od dveh stolpcev:
+- `child_id` (za uporabniški portal)
+- `logopedist_child_id` (za admin portal)
 
-const gameMode = useGameMode();
-const { recordGameCompletion } = useEnhancedProgress();
-const { checkForNewTrophy } = useTrophyContext();
-
-const handleStarClaimed = async () => {
-  const logopedistChildId = gameMode.mode === 'logopedist' 
-    ? gameMode.logopedistChildId 
-    : undefined;
-  
-  recordGameCompletion('puzzle', config.trackingId, logopedistChildId);
-  
-  // Pokal samo za uporabniški portal
-  if (gameMode.mode === 'user') {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    await checkForNewTrophy();
-  }
-};
+```sql
+ALTER TABLE public.progress
+ADD CONSTRAINT progress_child_check 
+CHECK (
+  child_id IS NOT NULL OR logopedist_child_id IS NOT NULL
+);
 ```
-
----
-
-## Seznam sprememb
-
-| Datoteka | Sprememba |
-|----------|-----------|
-| `src/components/games/GenericSestavljankaGame.tsx` | Dodaj `useGameMode`, posreduj `logopedistChildId` |
-| `src/components/games/GenericDrsnaSestavljankaGame.tsx` | Dodaj `useGameMode`, posreduj `logopedistChildId` |
-| `src/components/games/GenericLabirintGame.tsx` | Dodaj `useGameMode`, posreduj `logopedistChildId` |
-| `src/components/games/GenericIgraUjemanjaGame.tsx` | Dodaj `useGameMode`, posreduj `logopedistChildId` |
-| `src/components/games/GenericZaporedjaGame.tsx` | Dodaj `useGameMode`, posreduj `logopedistChildId` |
 
 ---
 
 ## Rezultat po popravku
 
-Ko logoped igra igro Sestavljanka z otrokom Tian:
-1. `useGameMode()` vrne `{ mode: 'logopedist', logopedistChildId: '81135446-...' }`
-2. `recordGameCompletion('puzzle', 'puzzle_c_12', '81135446-...')` shrani v bazo
-3. Progress tabela dobi zapis z `logopedist_child_id = '81135446-...'`
-4. Stran `/admin/children/:id/progress` prikaže zvezdico
+### Pred popravkom
+```
+POST /rest/v1/progress
+Body: { "child_id": null, "logopedist_child_id": "81135446-..." }
+Response: 400 - "null value in column child_id violates not-null constraint"
+```
+
+### Po popravku
+```
+POST /rest/v1/progress
+Body: { "child_id": null, "logopedist_child_id": "81135446-..." }
+Response: 201 - Success ✅
+```
 
 ---
 
-## Tehnični diagram
+## Datoteke za spremembo
 
-```text
-AdminGameFullscreenWrapper
-         │
-         ├── GameModeProvider (mode: 'logopedist', logopedistChildId: 'xxx')
-         │
-         └── GenericSestavljankaGame
-                    │
-                    ├── useGameMode() → { mode: 'logopedist', logopedistChildId: 'xxx' }
-                    │
-                    └── recordGameCompletion('puzzle', 'tracking_id', 'xxx')
-                                   │
-                                   ▼
-                        progress tabela
-                        (logopedist_child_id = 'xxx')
+| Datoteka | Akcija |
+|----------|--------|
+| `supabase/migrations/xxx_fix_progress_child_id_nullable.sql` | Nova migracija |
+
+---
+
+## Migracija
+
+```sql
+-- Omogoči null vrednost za child_id
+-- To omogoča shranjevanje napredka za logopedistove otroke
+ALTER TABLE public.progress 
+ALTER COLUMN child_id DROP NOT NULL;
+
+-- Dodaj constraint, ki zagotavlja, da ima vsak zapis 
+-- vsaj child_id ALI logopedist_child_id
+ALTER TABLE public.progress
+ADD CONSTRAINT progress_child_check 
+CHECK (
+  child_id IS NOT NULL OR logopedist_child_id IS NOT NULL
+);
 ```
+
+---
+
+## Varnostna analiza
+
+Ta sprememba je **varna**, ker:
+
+1. **Obstoječi podatki** - Vsi obstoječi zapisi imajo `child_id` nastavljen, zato CHECK constraint ne bo povzročil težav
+2. **RLS politike** - RLS že ločuje dostop glede na `child_id` in `logopedist_child_id`
+3. **Backward compatibility** - Uporabniški portal bo še vedno deloval enako (nastavi `child_id`, pusti `logopedist_child_id = null`)
+
