@@ -15,10 +15,13 @@ import {
   Bell,
   LogOut,
   UserCheck,
+  Baby,
+  Lock,
   LucideIcon
 } from 'lucide-react';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { useAdminCounts } from '@/hooks/useAdminCounts';
+import { useLogopedistLicense } from '@/hooks/useLogopedistLicense';
 import { SheetClose } from '@/components/ui/sheet';
 
 interface NavItem {
@@ -36,6 +39,21 @@ function NotificationBadge({ count }: { count: number }) {
     </span>
   );
 }
+
+function LicenseBadge({ used, max, hasLicense }: { used: number; max: number; hasLicense: boolean }) {
+  if (!hasLicense) {
+    return <Lock className="ml-auto h-4 w-4 text-muted-foreground" />;
+  }
+  return (
+    <span className="ml-auto text-xs text-muted-foreground">
+      {used}/{max}
+    </span>
+  );
+}
+
+const therapyNavigation: NavItem[] = [
+  { name: 'Moji otroci', href: '/admin/children', icon: Baby },
+];
 
 const baseNavigation: NavItem[] = [
   { name: 'Moj portal', href: '/admin', icon: LayoutDashboard },
@@ -60,6 +78,7 @@ export function AdminMobileNav() {
   const navigate = useNavigate();
   const { signOut, profile, isSuperAdmin } = useAdminAuth();
   const { pendingCount, myReviewsCount } = useAdminCounts();
+  const { license, hasLicense } = useLogopedistLicense();
 
   // Navigation with dynamic counts
   const navigation: NavItem[] = baseNavigation.map(item => {
@@ -150,7 +169,44 @@ export function AdminMobileNav() {
               </ul>
             </li>
 
-            {/* Secondary navigation - samo za interno organizacijo (TomiTalk) */}
+            {/* Therapy navigation - za vse logopede */}
+            <li>
+              <div className="text-xs font-semibold leading-6 text-muted-foreground uppercase tracking-wider mb-2">
+                Terapevtsko delo
+              </div>
+              <ul role="list" className="-mx-2 space-y-1">
+                {therapyNavigation.map((item) => (
+                  <li key={item.name}>
+                    <SheetClose asChild>
+                      <Link
+                        to={item.href}
+                        className={cn(
+                          'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-medium transition-colors',
+                          isActive(item.href)
+                            ? 'bg-app-blue/10 text-app-blue'
+                            : 'text-foreground hover:bg-muted hover:text-foreground'
+                        )}
+                      >
+                        <item.icon
+                          className={cn(
+                            'h-5 w-5 shrink-0',
+                            isActive(item.href)
+                              ? 'text-app-blue'
+                              : 'text-muted-foreground group-hover:text-foreground'
+                          )}
+                        />
+                        {item.name}
+                        <LicenseBadge 
+                          used={license?.usedSlots ?? 0} 
+                          max={license?.maxChildren ?? 0} 
+                          hasLicense={hasLicense} 
+                        />
+                      </Link>
+                    </SheetClose>
+                  </li>
+                ))}
+              </ul>
+            </li>
             {profile?.organization_type === 'internal' && (
               <li>
                 <div className="text-xs font-semibold leading-6 text-muted-foreground uppercase tracking-wider mb-2">
