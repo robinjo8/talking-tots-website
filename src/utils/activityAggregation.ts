@@ -12,7 +12,7 @@ interface ProgressEntry {
   activity_type: string;
 }
 
-// All 10 games + 3 exercises with their patterns
+// All 10 games + 1 exercise with their patterns
 const categoryPatterns = [
   // Games (10)
   { pattern: /^puzzle_/, key: 'puzzle', name: 'Sestavljanka', type: 'game' as const, color: 'purple' },
@@ -20,15 +20,13 @@ const categoryPatterns = [
   { pattern: /^labirint-/, key: 'labirint', name: 'Labirint', type: 'game' as const, color: 'green' },
   { pattern: /^(C|Č|K|L|R|S|Š|Z|Ž)$/, key: 'memory', name: 'Spomin', type: 'game' as const, color: 'orange' },
   { pattern: /^sequence_/, key: 'sequence', name: 'Zaporedja', type: 'game' as const, color: 'teal' },
-  { pattern: /^povezi-pare-/, key: 'povezi_pare', name: 'Povezi pare', type: 'game' as const, color: 'pink' },
   { pattern: /^matching_/, key: 'igra_ujemanja', name: 'Igra ujemanja', type: 'game' as const, color: 'rose' },
-  { pattern: /^wheel-/, key: 'wheel', name: 'Vrti kolo', type: 'game' as const, color: 'amber' },
+  { pattern: /^wheel-/, key: 'wheel', name: 'Kolo besed', type: 'game' as const, color: 'amber' },
   { pattern: /^artikulacija_bingo_/, key: 'bingo', name: 'Bingo', type: 'game' as const, color: 'yellow' },
-  { pattern: /^smesne-povedi-/, key: 'met_kocke', name: 'Met kocke', type: 'game' as const, color: 'indigo' },
-  // Exercises (3)
+  { pattern: /^smesne-povedi-/, key: 'smesne_povedi', name: 'Smešne povedi', type: 'game' as const, color: 'indigo' },
+  { pattern: /^ponovi-poved-/, key: 'ponovi_poved', name: 'Ponovi poved', type: 'game' as const, color: 'cyan' },
+  // Exercises (1)
   { pattern: /^vaje_motorike_govoril$/, key: 'tongue_gym', name: 'Vaje za jezik', type: 'exercise' as const, color: 'red' },
-  { pattern: /^ponovi-poved-/, key: 'ponovi_poved', name: 'Ponovi poved', type: 'exercise' as const, color: 'cyan' },
-  { pattern: /^video-navodila-/, key: 'video', name: 'Video navodila', type: 'exercise' as const, color: 'slate' },
 ];
 
 function matchCategory(subtype: string | null): typeof categoryPatterns[0] | null {

@@ -1,24 +1,68 @@
+import { useNavigate, useParams } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
-import { useParams } from "react-router-dom";
 
-// Placeholder - the actual game will start directly without letter selection
+const ponoviPovedLetters = [
+  { id: "c", letter: "C", description: "Ponovi povedi s črko C", image: "zmajcek_crka_C.png" },
+  { id: "ch", letter: "Č", description: "Ponovi povedi s črko Č", image: "zmajcek_crka_CH.png" },
+  { id: "k", letter: "K", description: "Ponovi povedi s črko K", image: "zmajcek_crka_K.png" },
+  { id: "l", letter: "L", description: "Ponovi povedi s črko L", image: "zmajcek_crka_L.png" },
+  { id: "r", letter: "R", description: "Ponovi povedi s črko R", image: "zmajcek_crka_R.png" },
+  { id: "s", letter: "S", description: "Ponovi povedi s črko S", image: "zmajcek_crka_S.png" },
+  { id: "sh", letter: "Š", description: "Ponovi povedi s črko Š", image: "zmajcek_crka_SH.png" },
+  { id: "z", letter: "Z", description: "Ponovi povedi s črko Z", image: "zmajcek_crka_Z.png" },
+  { id: "zh", letter: "Ž", description: "Ponovi povedi s črko Ž", image: "zmajcek_crka_ZH.png" },
+];
+
 export default function AdminPonoviPovedGames() {
+  const navigate = useNavigate();
   const { childId } = useParams<{ childId: string }>();
-  
+  const isMobile = useIsMobile();
+
+  const handleLetterClick = (letterId: string) => {
+    navigate(`/admin/children/${childId}/games/ponovi-poved/${letterId}`);
+  };
+
   return (
     <AdminGameWrapper 
-      title="Ponovi poved"
+      title="Ponovi poved - izberi črko"
       backPath={`/admin/children/${childId}/games`}
     >
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <p className="text-lg text-muted-foreground mb-4">
-            Ta igra se zažene neposredno.
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Igra bo implementirana v naslednjem koraku.
-          </p>
-        </div>
+      <div className={isMobile ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"}>
+        {ponoviPovedLetters.map((item) => (
+          <div
+            key={item.id}
+            onClick={() => handleLetterClick(item.id)}
+            className="bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group border border-border"
+          >
+            <div className={isMobile ? "relative aspect-square overflow-hidden" : "relative aspect-video overflow-hidden"}>
+              <div 
+                className="absolute inset-0"
+                style={{
+                  background: 'radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)'
+                }}
+              />
+              <div className="relative w-full h-full flex items-center justify-center">
+                <img 
+                  src={`https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/${item.image}`}
+                  alt={`Črka ${item.letter}`}
+                  className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+                  style={{ mixBlendMode: 'multiply' }}
+                />
+              </div>
+            </div>
+            <div className={isMobile ? "p-3 text-center" : "p-4"}>
+              <h3 className="text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
+                Črka {item.letter}
+              </h3>
+              {!isMobile && (
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                  {item.description}
+                </p>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
     </AdminGameWrapper>
   );

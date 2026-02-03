@@ -98,12 +98,20 @@ export default function AdminChildProgress() {
       {/* Child info */}
       <div className="flex items-center gap-4">
         <div className={cn(
-          "h-14 w-14 rounded-full flex items-center justify-center",
+          "h-14 w-14 rounded-full flex items-center justify-center overflow-hidden",
           child.gender === 'male' ? 'bg-app-blue/10' : 'bg-app-pink/10'
         )}>
-          <span className="text-2xl">
-            {child.gender === 'male' ? '🧒' : '👧'}
-          </span>
+          {child.avatar_url ? (
+            <img 
+              src={child.avatar_url} 
+              alt={child.name}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <span className="text-2xl">
+              {child.gender === 'male' ? '🧒' : '👧'}
+            </span>
+          )}
         </div>
         <div>
           <h1 className="text-2xl font-bold">Napredek: {child.name}</h1>
