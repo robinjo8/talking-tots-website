@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { useTrophyContext } from "@/contexts/TrophyContext";
+import { useGameMode } from "@/contexts/GameModeContext";
 import { Home, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -27,6 +28,7 @@ const SUPABASE_STORAGE_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v
 export function GenericIgraUjemanjaGame({ config, backPath = '/govorne-igre/igra-ujemanja' }: GenericIgraUjemanjaGameProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const gameMode = useGameMode();
   const { recordGameCompletion } = useEnhancedProgress();
   const { checkForNewTrophy } = useTrophyContext();
   const gameCompletedRef = useRef(false);
@@ -189,10 +191,15 @@ export function GenericIgraUjemanjaGame({ config, backPath = '/govorne-igre/igra
   };
 
   const handleStarClaimed = async () => {
-    recordGameCompletion('matching', config.trackingId);
-    // Check for trophy after claiming star
-    await new Promise(resolve => setTimeout(resolve, 500));
-    await checkForNewTrophy();
+    const logopedistChildId = gameMode.mode === 'logopedist' 
+      ? gameMode.logopedistChildId 
+      : undefined;
+    recordGameCompletion('matching', config.trackingId, logopedistChildId);
+    // Check for trophy only in user mode
+    if (gameMode.mode === 'user') {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await checkForNewTrophy();
+    }
   };
 
   // Get completion images based on game type - memoized to prevent re-renders

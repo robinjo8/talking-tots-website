@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { useTrophyContext } from "@/contexts/TrophyContext";
+import { useGameMode } from "@/contexts/GameModeContext";
 import { Home, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -45,6 +46,7 @@ interface GenericZaporedjaGameProps {
 
 export function GenericZaporedjaGame({ config, backPath = '/govorne-igre/zaporedja' }: GenericZaporedjaGameProps) {
   const navigate = useNavigate();
+  const gameMode = useGameMode();
   const { recordGameCompletion } = useEnhancedProgress();
   const { checkForNewTrophy } = useTrophyContext();
   const gameCompletedRef = useRef(false);
@@ -194,12 +196,17 @@ export function GenericZaporedjaGame({ config, backPath = '/govorne-igre/zapored
   };
 
   const handleStarClaimed = async () => {
-    recordGameCompletion('memory', config.trackingId);
+    const logopedistChildId = gameMode.mode === 'logopedist' 
+      ? gameMode.logopedistChildId 
+      : undefined;
+    recordGameCompletion('memory', config.trackingId, logopedistChildId);
     setShowCompletion(false);
     setShowNewGameButton(true);
-    // Check for trophy after claiming star
-    await new Promise(resolve => setTimeout(resolve, 500));
-    await checkForNewTrophy();
+    // Check for trophy only in user mode
+    if (gameMode.mode === 'user') {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await checkForNewTrophy();
+    }
   };
 
   // Render the appropriate game component based on config
