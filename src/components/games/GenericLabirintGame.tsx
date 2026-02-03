@@ -8,6 +8,7 @@ import { PuzzleSuccessDialog } from "@/components/puzzle/PuzzleSuccessDialog";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { useTrophyContext } from "@/contexts/TrophyContext";
+import { useGameMode } from "@/contexts/GameModeContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,6 +55,7 @@ export function GenericLabirintGame({ config, backPath = '/govorne-igre/labirint
   const [showCompletion, setShowCompletion] = useState(false);
   const [gameKey, setGameKey] = useState(0);
   const [showNewGameButton, setShowNewGameButton] = useState(false);
+  const gameMode = useGameMode();
   const { recordGameCompletion } = useEnhancedProgress();
   const { checkForNewTrophy } = useTrophyContext();
   const gameCompletedRef = useRef(false);
@@ -205,11 +207,16 @@ export function GenericLabirintGame({ config, backPath = '/govorne-igre/labirint
   }, []);
 
   const handleStarClaimed = async () => {
-    recordGameCompletion('maze', config.trackingId);
+    const logopedistChildId = gameMode.mode === 'logopedist' 
+      ? gameMode.logopedistChildId 
+      : undefined;
+    recordGameCompletion('maze', config.trackingId, logopedistChildId);
     setShowNewGameButton(true);
-    // Check for trophy after claiming star
-    await new Promise(resolve => setTimeout(resolve, 500));
-    await checkForNewTrophy();
+    // Check for trophy only in user mode
+    if (gameMode.mode === 'user') {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await checkForNewTrophy();
+    }
   };
 
   // Get the image for current star dialog

@@ -2,6 +2,7 @@ import { useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { useTrophyContext } from "@/contexts/TrophyContext";
+import { useGameMode } from "@/contexts/GameModeContext";
 import { Home, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -25,6 +26,7 @@ export function GenericDrsnaSestavljankaGame({ config, backPath = '/govorne-igre
   const navigate = useNavigate();
   const { recordGameCompletion } = useEnhancedProgress();
   const { checkForNewTrophy } = useTrophyContext();
+  const gameMode = useGameMode();
   const gameCompletedRef = useRef(false);
 
   const [showInstructions, setShowInstructions] = useState(false);
@@ -84,11 +86,16 @@ export function GenericDrsnaSestavljankaGame({ config, backPath = '/govorne-igre
   };
 
   const handleStarClaimed = async () => {
-    recordGameCompletion('sliding_puzzle', config.trackingId);
+    const logopedistChildId = gameMode.mode === 'logopedist' 
+      ? gameMode.logopedistChildId 
+      : undefined;
+    recordGameCompletion('sliding_puzzle', config.trackingId, logopedistChildId);
     setShowNewGameButton(true);
-    // Check for trophy after claiming star
-    await new Promise(resolve => setTimeout(resolve, 500));
-    await checkForNewTrophy();
+    // Check for trophy only in user mode
+    if (gameMode.mode === 'user') {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await checkForNewTrophy();
+    }
   };
 
   const handleInstructions = () => {

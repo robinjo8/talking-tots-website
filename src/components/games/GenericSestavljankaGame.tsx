@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { useTrophyContext } from "@/contexts/TrophyContext";
+import { useGameMode } from "@/contexts/GameModeContext";
 import { Home, RefreshCw } from "lucide-react";
 import type { SestavljankeGameConfig } from "@/data/sestavljankeGameConfig";
 import type { PuzzleImage } from "@/data/puzzleImages";
@@ -60,6 +61,7 @@ export function GenericSestavljankaGame({ config, backPath = '/govorne-igre/sest
   
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const gameMode = useGameMode();
   const { recordGameCompletion } = useEnhancedProgress();
   const { checkForNewTrophy } = useTrophyContext();
   const gameCompletedRef = useRef(false);
@@ -75,11 +77,16 @@ export function GenericSestavljankaGame({ config, backPath = '/govorne-igre/sest
   }, []);
 
   const handleStarClaimed = async () => {
-    recordGameCompletion('puzzle', config.trackingId);
+    const logopedistChildId = gameMode.mode === 'logopedist' 
+      ? gameMode.logopedistChildId 
+      : undefined;
+    recordGameCompletion('puzzle', config.trackingId, logopedistChildId);
     setShowNewGameButton(true);
-    // Check for trophy after short delay to allow progress to save
-    await new Promise(resolve => setTimeout(resolve, 500));
-    await checkForNewTrophy();
+    // Check for trophy only in user mode
+    if (gameMode.mode === 'user') {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await checkForNewTrophy();
+    }
   };
 
   const handleNewGame = () => {
