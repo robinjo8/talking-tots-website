@@ -1,126 +1,87 @@
 
 
-# Načrt: Popravki na strani napredka otroka
+# Načrt: Dodaj "Moji otroci" v mobilno navigacijo admin portala
 
-## Povzetek sprememb
+## Problem
 
-### 1. Preimenovanja in reorganizacija kategorij v `activityAggregation.ts`
+Sekcija **"Terapevtsko delo"** z zavihkom **"Moji otroci"** je prisotna v desktop navigaciji (`AdminSidebar.tsx`), vendar manjka v mobilni navigaciji (`AdminMobileNav.tsx`).
 
-| Trenutno ime | Novo ime | Akcija |
-|--------------|----------|--------|
-| Vrti kolo | Kolo besed | Preimenuj |
-| Met kocke | Smešne povedi | Preimenuj |
-| Ponovi poved | Ponovi poved | Premakni iz VAJE v IGRE |
-| Povezi pare | - | Odstrani |
-| Video navodila | - | Odstrani |
+To pomeni, da logopedi (npr. robert.kujavec@outlook.com iz organizacije OŠ Test) na mobilnih napravah ne morejo dostopati do modula za upravljanje svojih otrok.
 
-### 2. Končni seznam iger (11) in vaj (1)
+## Primerjava
 
-**IGRE (11)**
-1. Sestavljanka
-2. Drsna sestavljanka
-3. Labirint
-4. Spomin
-5. Zaporedja
-6. Igra ujemanja
-7. Kolo besed (prej Vrti kolo)
-8. Bingo
-9. Smešne povedi (prej Met kocke)
-10. Ponovi poved (premaknjeno iz VAJ)
+| Sekcija | Desktop (AdminSidebar) | Mobilno (AdminMobileNav) |
+|---------|------------------------|--------------------------|
+| Delovni prostor | ✅ | ✅ |
+| **Terapevtsko delo** | ✅ | ❌ MANJKA |
+| Upravljanje | ✅ (samo internal) | ✅ (samo internal) |
+| Nastavitve | ✅ | ✅ |
 
-**VAJE (1)**
-1. Vaje za jezik
+## Rešitev
 
-### 3. Popravek strani za izbor črk pri igri Ponovi poved
-
-Trenutno `AdminPonoviPovedGames.tsx` prikazuje placeholder besedilo. Potrebno ga je zamenjati z mrežo kartic za izbor črk (enako kot AdminLabirintGames.tsx).
-
-### 4. Popravek avatarja otroka na strani napredka
-
-Trenutno se prikazuje emoji (🧒 ali 👧) namesto dejanskega avatarja (`avatar_url`). Potrebno je popraviti prikaz, da se uporabi slika iz `child.avatar_url`.
-
----
+Dodaj sekcijo **"Terapevtsko delo"** v `AdminMobileNav.tsx` z:
+- Zavihek "Moji otroci" s povezavo na `/admin/children`
+- Prikaz licence (število otrok) - enako kot na desktopu
+- Ikona ključavnice, če licenca ni aktivna
 
 ## Tehnične spremembe
 
-### Datoteka 1: `src/utils/activityAggregation.ts`
+### Datoteka: `src/components/admin/AdminMobileNav.tsx`
 
-Spremembe v `categoryPatterns`:
-- Preimenuj `'Vrti kolo'` v `'Kolo besed'`
-- Preimenuj `'Met kocke'` v `'Smešne povedi'`
-- Spremeni `type` pri `ponovi_poved` iz `'exercise'` v `'game'`
-- Odstrani vnos za `povezi_pare`
-- Odstrani vnos za `video`
+1. Uvozi manjkajoče komponente:
+   - `Baby` ikono iz lucide-react
+   - `Lock` ikono iz lucide-react
+   - `useLogopedistLicense` hook
 
+2. Dodaj `LicenseBadge` komponento (kopija iz AdminSidebar)
+
+3. Dodaj `therapyNavigation` array:
 ```typescript
-const categoryPatterns = [
-  // Games (11)
-  { pattern: /^puzzle_/, key: 'puzzle', name: 'Sestavljanka', type: 'game', color: 'purple' },
-  { pattern: /^sliding_puzzle_/, key: 'sliding_puzzle', name: 'Drsna sestavljanka', type: 'game', color: 'blue' },
-  { pattern: /^labirint-/, key: 'labirint', name: 'Labirint', type: 'game', color: 'green' },
-  { pattern: /^(C|Č|K|L|R|S|Š|Z|Ž)$/, key: 'memory', name: 'Spomin', type: 'game', color: 'orange' },
-  { pattern: /^sequence_/, key: 'sequence', name: 'Zaporedja', type: 'game', color: 'teal' },
-  { pattern: /^matching_/, key: 'igra_ujemanja', name: 'Igra ujemanja', type: 'game', color: 'rose' },
-  { pattern: /^wheel-/, key: 'wheel', name: 'Kolo besed', type: 'game', color: 'amber' },
-  { pattern: /^artikulacija_bingo_/, key: 'bingo', name: 'Bingo', type: 'game', color: 'yellow' },
-  { pattern: /^smesne-povedi-/, key: 'smesne_povedi', name: 'Smešne povedi', type: 'game', color: 'indigo' },
-  { pattern: /^ponovi-poved-/, key: 'ponovi_poved', name: 'Ponovi poved', type: 'game', color: 'cyan' },
-  // Exercises (1)
-  { pattern: /^vaje_motorike_govoril$/, key: 'tongue_gym', name: 'Vaje za jezik', type: 'exercise', color: 'red' },
+const therapyNavigation: NavItem[] = [
+  { 
+    name: 'Moji otroci', 
+    href: '/admin/children', 
+    icon: Baby,
+  },
 ];
 ```
 
-### Datoteka 2: `src/pages/admin/games/AdminPonoviPovedGames.tsx`
-
-Zamenjaj placeholder z mrežo kartic za izbor črk (po vzoru AdminLabirintGames.tsx):
-- Uporabi `hasPonoviPovedConfig()` za preverjanje dostopnosti črke
-- Prikaži kartice z zmajčki za vsako črko
-- Navigiraj na `/admin/children/${childId}/games/ponovi-poved/${letter}`
-
-### Datoteka 3: `src/pages/admin/AdminChildProgress.tsx`
-
-Popravek prikaza avatarja:
-- Namesto emoji-ja (🧒/👧) uporabi `child.avatar_url`
-- Če `avatar_url` ni nastavljen, prikaži privzeti emoji
-
+4. Dodaj sekcijo "Terapevtsko delo" v JSX (med "Delovni prostor" in "Upravljanje"):
 ```tsx
-// Trenutno:
-<span className="text-2xl">
-  {child.gender === 'male' ? '🧒' : '👧'}
-</span>
-
-// Novo:
-{child.avatar_url ? (
-  <img 
-    src={child.avatar_url} 
-    alt={child.name}
-    className="w-full h-full object-cover rounded-full"
-  />
-) : (
-  <span className="text-2xl">
-    {child.gender === 'male' ? '🧒' : '👧'}
-  </span>
-)}
+<li>
+  <div className="text-xs font-semibold ...">
+    Terapevtsko delo
+  </div>
+  <ul>
+    {therapyNavigation.map((item) => (
+      <li key={item.name}>
+        <SheetClose asChild>
+          <Link to={item.href}>
+            <item.icon />
+            {item.name}
+            {/* Prikaz licence ali ključavnice */}
+          </Link>
+        </SheetClose>
+      </li>
+    ))}
+  </ul>
+</li>
 ```
 
----
-
-## Seznam datotek za spremembo
+## Seznam datotek
 
 | Datoteka | Akcija |
 |----------|--------|
-| `src/utils/activityAggregation.ts` | Posodobi - preimenovanja, premik kategorij, odstranitve |
-| `src/pages/admin/games/AdminPonoviPovedGames.tsx` | Posodobi - zamenjaj placeholder z mrežo črk |
-| `src/pages/admin/AdminChildProgress.tsx` | Posodobi - prikaži avatar namesto emoji-ja |
-
----
+| `src/components/admin/AdminMobileNav.tsx` | Posodobi - dodaj sekcijo Terapevtsko delo |
 
 ## Rezultat
 
-Po popravkih:
-1. Stran napredka bo prikazovala pravilne nazive iger (Kolo besed, Smešne povedi)
-2. Ponovi poved bo v razdelku IGRE
-3. Povezi pare in Video navodila ne bosta več prikazana
-4. Igra Ponovi poved bo imela delujoč izbor črk
-5. Avatar otroka bo pravilno prikazan namesto generičnega emoji-ja
+Po popravku bo mobilna navigacija vsebovala:
+
+1. **Delovni prostor** - Moj portal, Vsa preverjanja, V čakanju, Moji pregledi
+2. **Terapevtsko delo** - Moji otroci (z licenco X/Y)
+3. **Upravljanje** - samo za interno organizacijo
+4. **Nastavitve** - Nastavitve, Obvestila, (Članstva za super admina)
+
+Vsi logopedi, ne glede na organizacijo, bodo na mobilnih napravah videli zavihek "Moji otroci".
 
