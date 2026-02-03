@@ -9,10 +9,11 @@ import { InfoButton } from "./InfoButton";
 
 interface UnifiedProgressDisplayProps {
   progressData: EnhancedProgressSummary;
-  recordCompletion: (type: 'game' | 'exercise', subtype?: string) => void;
+  recordCompletion?: (type: 'game' | 'exercise', subtype?: string) => void;
+  showTestButtons?: boolean;
 }
 
-export function UnifiedProgressDisplay({ progressData, recordCompletion }: UnifiedProgressDisplayProps) {
+export function UnifiedProgressDisplay({ progressData, recordCompletion, showTestButtons = false }: UnifiedProgressDisplayProps) {
   // Safe access to unified data with fallback
   const unified = progressData?.unified ?? {
     totalStars: 0,
@@ -149,23 +150,25 @@ export function UnifiedProgressDisplay({ progressData, recordCompletion }: Unifi
                 Skupaj zvezdic: <span className="font-bold">{unified.totalStars}</span>
               </div>
               
-              {/* Test buttons */}
-              <div className="flex gap-2 mt-4">
-                <Button 
-                  onClick={addOneStar}
-                  size="sm"
-                  className="flex-1 bg-app-blue hover:bg-app-blue/80"
-                >
-                  +1 zvezdica (test)
-                </Button>
-                <Button 
-                  onClick={addTestStars}
-                  size="sm"
-                  className="flex-1 bg-app-blue hover:bg-app-blue/80"
-                >
-                  +9 zvezdic (test)
-                </Button>
-              </div>
+              {/* Test buttons - only shown when explicitly enabled */}
+              {showTestButtons && recordCompletion && (
+                <div className="flex gap-2 mt-4">
+                  <Button 
+                    onClick={addOneStar}
+                    size="sm"
+                    className="flex-1 bg-app-blue hover:bg-app-blue/80"
+                  >
+                    +1 zvezdica (test)
+                  </Button>
+                  <Button 
+                    onClick={addTestStars}
+                    size="sm"
+                    className="flex-1 bg-app-blue hover:bg-app-blue/80"
+                  >
+                    +9 zvezdic (test)
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </motion.div>

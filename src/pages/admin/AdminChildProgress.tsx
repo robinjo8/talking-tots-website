@@ -2,13 +2,15 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Star, Activity, Calendar, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Star, Activity, Calendar } from 'lucide-react';
 import { useLogopedistChild } from '@/hooks/useLogopedistChildren';
+import { useLogopedistProgress } from '@/hooks/useLogopedistProgress';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { UnifiedProgressDisplay } from '@/components/progress/UnifiedProgressDisplay';
 
 interface ProgressEntry {
   id: string;
@@ -24,10 +26,13 @@ export default function AdminChildProgress() {
   const { childId } = useParams<{ childId: string }>();
   const navigate = useNavigate();
   const { data: child, isLoading: childLoading } = useLogopedistChild(childId);
+  
+  // Use the new hook for unified progress display
+  const { progressData, isLoading: progressDataLoading } = useLogopedistProgress(childId);
 
-  // Pridobi napredek otroka
-  const { data: progress = [], isLoading: progressLoading } = useQuery({
-    queryKey: ['logopedist-child-progress', childId],
+  // Fetch activity history
+  const { data: history = [], isLoading: historyLoading } = useQuery({
+    queryKey: ['logopedist-child-history', childId],
     queryFn: async (): Promise<ProgressEntry[]> => {
       if (!childId) return [];
 
@@ -39,7 +44,7 @@ export default function AdminChildProgress() {
         .limit(50);
 
       if (error) {
-        console.error('Error fetching progress:', error);
+        console.error('Error fetching progress history:', error);
         return [];
       }
 
@@ -48,23 +53,7 @@ export default function AdminChildProgress() {
     enabled: !!childId,
   });
 
-  const isLoading = childLoading || progressLoading;
-
-  // Izračunaj statistike
-  const stats = React.useMemo(() => {
-    if (progress.length === 0) return null;
-
-    const totalStars = progress.reduce((sum, p) => sum + (p.stars_earned || 0), 0);
-    const avgScore = Math.round(progress.reduce((sum, p) => sum + p.score, 0) / progress.length);
-    const totalDuration = progress.reduce((sum, p) => sum + p.duration, 0);
-
-    return {
-      totalSessions: progress.length,
-      totalStars,
-      avgScore,
-      totalMinutes: Math.round(totalDuration / 60),
-    };
-  }, [progress]);
+  const isLoading = childLoading || progressDataLoading || historyLoading;
 
   if (isLoading) {
     return (
@@ -99,7 +88,7 @@ export default function AdminChildProgress() {
         </Button>
       </div>
 
-      {/* Info o otroku */}
+      {/* Child info */}
       <div className="flex items-center gap-4">
         <div className={cn(
           "h-14 w-14 rounded-full flex items-center justify-center",
@@ -120,60 +109,13 @@ export default function AdminChildProgress() {
         </div>
       </div>
 
-      {/* Statistika */}
-      {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <Activity className="h-8 w-8 text-app-blue" />
-                <div>
-                  <p className="text-2xl font-bold">{stats.totalSessions}</p>
-                  <p className="text-sm text-muted-foreground">Skupaj sej</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+      {/* Unified Progress Display - same as user portal */}
+      <UnifiedProgressDisplay 
+        progressData={progressData} 
+        showTestButtons={false}
+      />
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <Star className="h-8 w-8 text-app-orange" />
-                <div>
-                  <p className="text-2xl font-bold">{stats.totalStars}</p>
-                  <p className="text-sm text-muted-foreground">Zvezdice</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <TrendingUp className="h-8 w-8 text-dragon-green" />
-                <div>
-                  <p className="text-2xl font-bold">{stats.avgScore}%</p>
-                  <p className="text-sm text-muted-foreground">Povprečje</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <Calendar className="h-8 w-8 text-app-purple" />
-                <div>
-                  <p className="text-2xl font-bold">{stats.totalMinutes} min</p>
-                  <p className="text-sm text-muted-foreground">Skupni čas</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Zgodovina aktivnosti */}
+      {/* Activity History */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -182,7 +124,7 @@ export default function AdminChildProgress() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {progress.length === 0 ? (
+          {history.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <Activity className="h-12 w-12 mx-auto mb-3 opacity-50" />
               <p>Še ni zabeleženih aktivnosti.</p>
@@ -195,7 +137,7 @@ export default function AdminChildProgress() {
             </div>
           ) : (
             <div className="space-y-3">
-              {progress.map((entry) => (
+              {history.map((entry) => (
                 <div 
                   key={entry.id}
                   className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
@@ -233,7 +175,7 @@ export default function AdminChildProgress() {
         </CardContent>
       </Card>
 
-      {/* Gumb za delo */}
+      {/* Action button */}
       <div className="flex justify-center">
         <Button
           size="lg"
