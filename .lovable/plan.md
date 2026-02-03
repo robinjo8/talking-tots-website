@@ -1,87 +1,159 @@
 
-
-# Načrt: Dodaj "Moji otroci" v mobilno navigacijo admin portala
+# Načrt: Popravek filtriranja nedokončanih sej v "V čakanju"
 
 ## Problem
 
-Sekcija **"Terapevtsko delo"** z zavihkom **"Moji otroci"** je prisotna v desktop navigaciji (`AdminSidebar.tsx`), vendar manjka v mobilni navigaciji (`AdminMobileNav.tsx`).
+Trenutno se **nedokončane seje** preverjanja izgovorjave prikazujejo logopedom v razdelku "V čakanju", čeprav otrok še ni izgovoril vseh besed.
 
-To pomeni, da logopedi (npr. robert.kujavec@outlook.com iz organizacije OŠ Test) na mobilnih napravah ne morejo dostopati do modula za upravljanje svojih otrok.
+### Primer problematičnega scenarija:
+1. Otrok začne preverjanje izgovorjave na uporabniškem portalu
+2. Izgovori 10 besed od 60
+3. Zapusti test (zapre aplikacijo ali navigira stran)
+4. Seja z `status: 'pending'` in `is_completed: false` se takoj prikaže logopedu v "V čakanju"
+5. Logoped vidi nepopolno sejo brez vseh posnetkov
 
-## Primerjava
-
-| Sekcija | Desktop (AdminSidebar) | Mobilno (AdminMobileNav) |
-|---------|------------------------|--------------------------|
-| Delovni prostor | ✅ | ✅ |
-| **Terapevtsko delo** | ✅ | ❌ MANJKA |
-| Upravljanje | ✅ (samo internal) | ✅ (samo internal) |
-| Nastavitve | ✅ | ✅ |
+### Zakaj se to dogaja:
+- Seja se ustvari **takoj ob začetku testa** s `status: 'pending'` in `is_completed: false`
+- Query za "V čakanju" filtrira samo po `status = 'pending'` in `assigned_to IS NULL`
+- **Ne** preverja, ali je seja dejansko dokončana (`is_completed = true`)
 
 ## Rešitev
 
-Dodaj sekcijo **"Terapevtsko delo"** v `AdminMobileNav.tsx` z:
-- Zavihek "Moji otroci" s povezavo na `/admin/children`
-- Prikaz licence (število otrok) - enako kot na desktopu
-- Ikona ključavnice, če licenca ni aktivna
+Dodaj filter `.eq('is_completed', true)` v vse query-je, ki prikazujejo seje logopedom:
+
+1. **`usePendingTests.ts`** - seznam sej v "V čakanju"
+2. **`useAdminCounts.ts`** - število v navigation badge-u
+3. **`check-old-pending-tests`** Edge funkcija - obvestila o starih sejah
 
 ## Tehnične spremembe
 
-### Datoteka: `src/components/admin/AdminMobileNav.tsx`
+### Datoteka 1: `src/hooks/usePendingTests.ts`
 
-1. Uvozi manjkajoče komponente:
-   - `Baby` ikono iz lucide-react
-   - `Lock` ikono iz lucide-react
-   - `useLogopedistLicense` hook
+Dodaj filter za dokončane seje:
 
-2. Dodaj `LicenseBadge` komponento (kopija iz AdminSidebar)
-
-3. Dodaj `therapyNavigation` array:
 ```typescript
-const therapyNavigation: NavItem[] = [
-  { 
-    name: 'Moji otroci', 
-    href: '/admin/children', 
-    icon: Baby,
-  },
-];
+// Trenutno (NAPAČNO):
+let query = supabase
+  .from('articulation_test_sessions')
+  .select('...')
+  .eq('status', 'pending')
+  .is('assigned_to', null)
+  .order('submitted_at', { ascending: true });
+
+// Novo (PRAVILNO):
+let query = supabase
+  .from('articulation_test_sessions')
+  .select('...')
+  .eq('status', 'pending')
+  .eq('is_completed', true)  // <-- DODAJ TO
+  .is('assigned_to', null)
+  .order('submitted_at', { ascending: true });
 ```
 
-4. Dodaj sekcijo "Terapevtsko delo" v JSX (med "Delovni prostor" in "Upravljanje"):
-```tsx
-<li>
-  <div className="text-xs font-semibold ...">
-    Terapevtsko delo
-  </div>
-  <ul>
-    {therapyNavigation.map((item) => (
-      <li key={item.name}>
-        <SheetClose asChild>
-          <Link to={item.href}>
-            <item.icon />
-            {item.name}
-            {/* Prikaz licence ali ključavnice */}
-          </Link>
-        </SheetClose>
-      </li>
-    ))}
-  </ul>
-</li>
+### Datoteka 2: `src/hooks/useAdminCounts.ts`
+
+Dodaj filter v pending count query:
+
+```typescript
+// Trenutno (NAPAČNO):
+const { count, error } = await supabase
+  .from('articulation_test_sessions')
+  .select('*', { count: 'exact', head: true })
+  .eq('status', 'pending')
+  .is('assigned_to', null);
+
+// Novo (PRAVILNO):
+const { count, error } = await supabase
+  .from('articulation_test_sessions')
+  .select('*', { count: 'exact', head: true })
+  .eq('status', 'pending')
+  .eq('is_completed', true)  // <-- DODAJ TO
+  .is('assigned_to', null);
 ```
 
-## Seznam datotek
+### Datoteka 3: `supabase/functions/check-old-pending-tests/index.ts`
+
+Dodaj filter v Edge funkcijo za obvestila:
+
+```typescript
+// Trenutno (NAPAČNO):
+const { data: oldSessions, error: sessionsError } = await supabase
+  .from('articulation_test_sessions')
+  .select('...')
+  .eq('status', 'pending')
+  .is('assigned_to', null)
+  .lt('submitted_at', sevenDaysAgo.toISOString())
+
+// Novo (PRAVILNO):
+const { data: oldSessions, error: sessionsError } = await supabase
+  .from('articulation_test_sessions')
+  .select('...')
+  .eq('status', 'pending')
+  .eq('is_completed', true)  // <-- DODAJ TO
+  .is('assigned_to', null)
+  .lt('submitted_at', sevenDaysAgo.toISOString())
+```
+
+## Seznam datotek za spremembo
 
 | Datoteka | Akcija |
 |----------|--------|
-| `src/components/admin/AdminMobileNav.tsx` | Posodobi - dodaj sekcijo Terapevtsko delo |
+| `src/hooks/usePendingTests.ts` | Dodaj `.eq('is_completed', true)` |
+| `src/hooks/useAdminCounts.ts` | Dodaj `.eq('is_completed', true)` |
+| `supabase/functions/check-old-pending-tests/index.ts` | Dodaj `.eq('is_completed', true)` |
 
 ## Rezultat
 
-Po popravku bo mobilna navigacija vsebovala:
+Po popravku:
 
-1. **Delovni prostor** - Moj portal, Vsa preverjanja, V čakanju, Moji pregledi
-2. **Terapevtsko delo** - Moji otroci (z licenco X/Y)
-3. **Upravljanje** - samo za interno organizacijo
-4. **Nastavitve** - Nastavitve, Obvestila, (Članstva za super admina)
+1. **Nedokončane seje** (kjer je otrok izgovoril npr. 10 besed) **NE** bodo prikazane v "V čakanju"
+2. **Dokončane seje** (kjer je otrok izgovoril vse besede) **BODO** prikazane v "V čakanju"
+3. Navigation badge bo prikazoval samo število **pravih** sej, ki čakajo na pregled
+4. Obvestila o starih sejah se bodo pošiljala samo za **dokončane** seje
 
-Vsi logopedi, ne glede na organizacijo, bodo na mobilnih napravah videli zavihek "Moji otroci".
+## Diagram poteka
 
+```text
+┌─────────────────────────────────────────────────────────────────────┐
+│                    UPORABNIŠKI PORTAL                                │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  Otrok začne test                                                   │
+│        │                                                            │
+│        ▼                                                            │
+│  ┌─────────────────────────────────────────┐                        │
+│  │ SEJA USTVARJENA                         │                        │
+│  │ status: 'pending'                       │                        │
+│  │ is_completed: FALSE                     │  ◀── NI vidna logopedu │
+│  │ current_word_index: 0                   │                        │
+│  └─────────────────────────────────────────┘                        │
+│        │                                                            │
+│        ▼                                                            │
+│  Otrok izgovori besede (1...59)                                     │
+│  └─► current_word_index se posodablja      │  ◀── NI vidna logopedu │
+│        │                                                            │
+│        ▼                                                            │
+│  Otrok izgovori ZADNJO besedo (60)                                  │
+│        │                                                            │
+│        ▼                                                            │
+│  ┌─────────────────────────────────────────┐                        │
+│  │ SEJA DOKONČANA                          │                        │
+│  │ status: 'pending'                       │                        │
+│  │ is_completed: TRUE                      │  ◀── ZDAJ vidna logopedu│
+│  │ submitted_at: [timestamp]               │                        │
+│  └─────────────────────────────────────────┘                        │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                     ADMIN PORTAL (Logoped)                          │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  "V čakanju" prikazuje SAMO seje kjer:                              │
+│    • status = 'pending'                                             │
+│    • is_completed = TRUE   ◀── NOV FILTER                           │
+│    • assigned_to IS NULL                                            │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
