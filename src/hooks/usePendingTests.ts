@@ -36,6 +36,7 @@ export function usePendingTests() {
         .from('articulation_test_sessions')
         .select('id, status, submitted_at, child_id, parent_id, source_type, logopedist_child_id, organization_id')
         .eq('status', 'pending')
+        .eq('is_completed', true)
         .is('assigned_to', null)
         .order('submitted_at', { ascending: true });
 

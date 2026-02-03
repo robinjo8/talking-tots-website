@@ -13,6 +13,7 @@ export function useAdminCounts() {
         .from('articulation_test_sessions')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'pending')
+        .eq('is_completed', true)
         .is('assigned_to', null);
 
       if (error) {

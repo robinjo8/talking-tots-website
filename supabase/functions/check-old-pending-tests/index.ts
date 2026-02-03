@@ -30,6 +30,7 @@ Deno.serve(async (req) => {
         children:child_id (name, age)
       `)
       .eq('status', 'pending')
+      .eq('is_completed', true)
       .is('assigned_to', null)
       .lt('submitted_at', sevenDaysAgo.toISOString())
 
