@@ -305,6 +305,8 @@ const ArtikuacijskiTest = () => {
         open={showExitDialog} 
         onOpenChange={setShowExitDialog} 
         onConfirm={() => navigate("/moje-aplikacije")}
+        title="OBVESTILO"
+        description="Preverjanje izgovorjave bo samodejno shranjeno in lahko nadaljujete naslednjič. Ali res želite prekiniti preverjanje izgovorjave?"
       >
         <div />
       </MemoryExitConfirmationDialog>

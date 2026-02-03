@@ -319,6 +319,8 @@ export default function AdminArtikulacijskiTest() {
         open={showExitDialog} 
         onOpenChange={setShowExitDialog} 
         onConfirm={handleConfirmExit}
+        title="OBVESTILO"
+        description="Preverjanje izgovorjave bo samodejno shranjeno in lahko nadaljujete naslednjič. Ali res želite prekiniti preverjanje izgovorjave?"
       >
         <div />
       </MemoryExitConfirmationDialog>

@@ -6,9 +6,18 @@ interface MemoryExitConfirmationDialogProps {
   onConfirm: () => void;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  title?: string;
+  description?: string;
 }
 
-export function MemoryExitConfirmationDialog({ children, onConfirm, open, onOpenChange }: MemoryExitConfirmationDialogProps) {
+export function MemoryExitConfirmationDialog({ 
+  children, 
+  onConfirm, 
+  open, 
+  onOpenChange,
+  title = "OPOZORILO",
+  description = "ALI RES ŽELITE PREKINITI IGRO?"
+}: MemoryExitConfirmationDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogTrigger asChild>
@@ -16,9 +25,9 @@ export function MemoryExitConfirmationDialog({ children, onConfirm, open, onOpen
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-center uppercase">OPOZORILO</AlertDialogTitle>
-          <AlertDialogDescription className="text-center uppercase">
-            ALI RES ŽELITE PREKINITI IGRO?
+          <AlertDialogTitle className="text-center uppercase">{title}</AlertDialogTitle>
+          <AlertDialogDescription className="text-center">
+            {description}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex flex-row justify-center sm:justify-center items-center gap-4 mt-6">
