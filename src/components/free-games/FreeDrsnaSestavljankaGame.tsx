@@ -40,6 +40,13 @@ export default function FreeDrsnaSestavljankaGame() {
     images: kImages
   };
 
+  // Handle game completion
+  const handleGameComplete = () => {
+    if (!hasRecordedThisSession) {
+      recordGamePlayed();
+    }
+  };
+
   if (!canPlay) {
     return <FreeLimitReachedDialog open={true} onOpenChange={() => {}} />;
   }
@@ -48,6 +55,7 @@ export default function FreeDrsnaSestavljankaGame() {
     <GenericDrsnaSestavljankaGame 
       config={config}
       backPath="/brezplacne-igre"
+      onGameComplete={handleGameComplete}
     />
   );
 }

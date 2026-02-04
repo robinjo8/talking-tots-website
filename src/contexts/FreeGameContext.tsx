@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { useFreeGameLimit, AgeGroup } from '@/hooks/useFreeGameLimit';
 
+const FREE_GAMES_LIMIT = 3;
+
 interface FreeGameContextType {
   isFreeGameMode: boolean;
   setFreeGameMode: (mode: boolean) => void;
@@ -29,8 +31,6 @@ export function FreeGameProvider({ children }: FreeGameProviderProps) {
   
   const {
     gamesPlayed,
-    canPlayFreeGame,
-    getRemainingGames,
     recordFreeGamePlayed,
     childAge,
     setChildAge,
@@ -53,11 +53,12 @@ export function FreeGameProvider({ children }: FreeGameProviderProps) {
     setHasRecordedThisSession(false);
   }, []);
 
+  // Calculate canPlay and remainingGames reactively based on gamesPlayed
   const value: FreeGameContextType = {
     isFreeGameMode,
     setFreeGameMode,
-    canPlay: canPlayFreeGame(),
-    remainingGames: getRemainingGames(),
+    canPlay: gamesPlayed < FREE_GAMES_LIMIT,
+    remainingGames: Math.max(0, FREE_GAMES_LIMIT - gamesPlayed),
     gamesPlayed,
     recordGamePlayed,
     hasRecordedThisSession,

@@ -24,6 +24,7 @@ const BACKGROUND_URL = `${SUPABASE_URL}/storage/v1/object/public/ozadja/zeleno_o
 interface GenericSestavljankaGameProps {
   config: SestavljankeGameConfig;
   backPath?: string;
+  onGameComplete?: () => void;
 }
 
 // Helper to get random image from array
@@ -48,7 +49,7 @@ const enrichImageWithAudio = (image: PuzzleImage): GameImage => {
   };
 };
 
-export function GenericSestavljankaGame({ config, backPath = '/govorne-igre/sestavljanke' }: GenericSestavljankaGameProps) {
+export function GenericSestavljankaGame({ config, backPath = '/govorne-igre/sestavljanke', onGameComplete }: GenericSestavljankaGameProps) {
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -82,6 +83,7 @@ export function GenericSestavljankaGame({ config, backPath = '/govorne-igre/sest
       : undefined;
     recordGameCompletion('puzzle', config.trackingId, logopedistChildId);
     setShowNewGameButton(true);
+    onGameComplete?.();
     // Check for trophy only in user mode
     if (gameMode.mode === 'user') {
       await new Promise(resolve => setTimeout(resolve, 500));

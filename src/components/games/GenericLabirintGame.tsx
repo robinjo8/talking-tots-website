@@ -22,6 +22,7 @@ const backgroundImageUrl = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/
 interface GenericLabirintGameProps {
   config: LabirintConfig;
   backPath?: string;
+  onGameComplete?: () => void;
 }
 
 // Extend PuzzleImage with audio for the game
@@ -47,7 +48,7 @@ const getRandomImages = (images: PuzzleImage[], count: number): GameImage[] => {
   return shuffled.slice(0, count).map(enrichImageWithAudio);
 };
 
-export function GenericLabirintGame({ config, backPath = '/govorne-igre/labirint' }: GenericLabirintGameProps) {
+export function GenericLabirintGame({ config, backPath = '/govorne-igre/labirint', onGameComplete }: GenericLabirintGameProps) {
   const navigate = useNavigate();
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -212,6 +213,7 @@ export function GenericLabirintGame({ config, backPath = '/govorne-igre/labirint
       : undefined;
     recordGameCompletion('maze', config.trackingId, logopedistChildId);
     setShowNewGameButton(true);
+    onGameComplete?.();
     // Check for trophy only in user mode
     if (gameMode.mode === 'user') {
       await new Promise(resolve => setTimeout(resolve, 500));

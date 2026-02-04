@@ -21,11 +21,12 @@ import { digraphToLetter } from "@/data/igraUjemanjaConfig";
 interface GenericIgraUjemanjaGameProps {
   config: IgraUjemanjaGameConfig;
   backPath?: string;
+  onGameComplete?: () => void;
 }
 
 const SUPABASE_STORAGE_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike";
 
-export function GenericIgraUjemanjaGame({ config, backPath = '/govorne-igre/igra-ujemanja' }: GenericIgraUjemanjaGameProps) {
+export function GenericIgraUjemanjaGame({ config, backPath = '/govorne-igre/igra-ujemanja', onGameComplete }: GenericIgraUjemanjaGameProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const gameMode = useGameMode();
@@ -195,6 +196,7 @@ export function GenericIgraUjemanjaGame({ config, backPath = '/govorne-igre/igra
       ? gameMode.logopedistChildId 
       : undefined;
     recordGameCompletion('matching', config.trackingId, logopedistChildId);
+    onGameComplete?.();
     // Check for trophy only in user mode
     if (gameMode.mode === 'user') {
       await new Promise(resolve => setTimeout(resolve, 500));

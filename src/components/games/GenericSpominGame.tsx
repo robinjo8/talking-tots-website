@@ -14,9 +14,10 @@ import { useGameMode, useGameNavigation } from "@/contexts/GameModeContext";
 export interface GenericSpominGameProps {
   config: SpominConfig;
   backPath?: string;
+  onGameComplete?: () => void;
 }
 
-export function GenericSpominGame({ config, backPath }: GenericSpominGameProps) {
+export function GenericSpominGame({ config, backPath, onGameComplete }: GenericSpominGameProps) {
   const navigate = useNavigate();
   const { getGameListPath } = useGameNavigation();
   
@@ -299,6 +300,7 @@ export function GenericSpominGame({ config, backPath }: GenericSpominGameProps) 
               <button
                 onClick={async () => {
                   await handleClaimStar();
+                  onGameComplete?.();
                   setShowNewGameButton(true);
                 }}
                 className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-8 py-3 rounded-lg text-lg transition-colors"
@@ -439,6 +441,7 @@ export function GenericSpominGame({ config, backPath }: GenericSpominGameProps) 
               <button
                 onClick={async () => {
                   await handleClaimStar();
+                  onGameComplete?.();
                   setShowNewGameButton(true);
                 }}
                 className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-8 py-3 rounded-lg text-lg transition-colors"

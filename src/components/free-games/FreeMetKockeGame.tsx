@@ -32,12 +32,19 @@ const predmetK = [
 ];
 
 export default function FreeMetKockeGame() {
-  const { canPlay, resetSessionRecording } = useFreeGameContext();
+  const { canPlay, recordGamePlayed, hasRecordedThisSession, resetSessionRecording } = useFreeGameContext();
 
   // Reset session recording when component mounts
   useEffect(() => {
     resetSessionRecording();
   }, [resetSessionRecording]);
+
+  // Handle game completion
+  const handleGameComplete = () => {
+    if (!hasRecordedThisSession) {
+      recordGamePlayed();
+    }
+  };
 
   if (!canPlay) {
     return <FreeLimitReachedDialog open={true} onOpenChange={() => {}} />;
@@ -52,6 +59,7 @@ export default function FreeMetKockeGame() {
       povedek={povedekK}
       predmet={predmetK}
       backPath="/brezplacne-igre"
+      onGameComplete={handleGameComplete}
     />
   );
 }
