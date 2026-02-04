@@ -134,13 +134,13 @@ export function PricingSection() {
                 <Check className="h-4 w-4 text-app-blue absolute -top-1 -right-1" />
               )}
             </TabsTrigger>
-            <TabsTrigger value="pro" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 relative text-sm md:text-base">
+            <TabsTrigger value="pro" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 relative text-sm md:text-base flex items-center gap-1.5">
               <span className="md:hidden">{proPlan.shortName}</span>
               <span className="hidden md:inline">{proPlan.name}</span>
               {isSubscribed && currentPlanId === 'pro' ? (
-                <Check className="h-4 w-4 text-dragon-green absolute -top-1 -right-1" />
+                <Check className="h-4 w-4 text-dragon-green" />
               ) : (
-                <span className="absolute -top-2 -right-2 bg-app-orange text-white text-xs px-2 py-0.5 rounded-full font-medium border border-app-orange">
+                <span className="bg-white text-app-orange text-xs px-1.5 py-0.5 rounded font-medium border border-app-orange">
                   -41%
                 </span>
               )}
