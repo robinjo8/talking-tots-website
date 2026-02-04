@@ -45,7 +45,7 @@ export default function AdminSestavljankeGames() {
               <div className="relative w-full h-full flex items-center justify-center">
                 <img 
                   src={`https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/${item.image}`}
-                  alt={`Črka ${item.letter}`}
+                  alt={`Glas ${item.letter}`}
                   className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
                   style={{ mixBlendMode: 'multiply' }}
                 />
@@ -53,7 +53,7 @@ export default function AdminSestavljankeGames() {
             </div>
             <div className={isMobile ? "p-3 text-center" : "p-4"}>
               <h3 className="text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
-                Črka {item.letter}
+                Glas {item.letter}
               </h3>
               {!isMobile && (
                 <p className="text-sm text-muted-foreground line-clamp-2">

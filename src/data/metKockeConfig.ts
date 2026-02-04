@@ -262,13 +262,13 @@ export function getMetKockeConfig(letter: string): MetKockeLetterConfig | null {
 
 // Seznam črk za selekcijsko stran
 export const metKockeLetters = [
-  { id: "c", letter: "C", title: "Črka C", path: "/govorne-igre/met-kocke/c", gradient: "from-app-blue/30 to-app-purple/30" },
-  { id: "ch", letter: "Č", title: "Črka Č", path: "/govorne-igre/met-kocke/ch", gradient: "from-app-orange/30 to-app-yellow/30" },
-  { id: "k", letter: "K", title: "Črka K", path: "/govorne-igre/met-kocke/k", gradient: "from-dragon-green/30 to-app-teal/30" },
-  { id: "l", letter: "L", title: "Črka L", path: "/govorne-igre/met-kocke/l", gradient: "from-app-purple/30 to-app-blue/30" },
-  { id: "r", letter: "R", title: "Črka R", path: "/govorne-igre/met-kocke/r", gradient: "from-app-orange/30 to-app-yellow/30" },
-  { id: "s", letter: "S", title: "Črka S", path: "/govorne-igre/met-kocke/s", gradient: "from-app-blue/30 to-app-purple/30" },
-  { id: "sh", letter: "Š", title: "Črka Š", path: "/govorne-igre/met-kocke/sh", gradient: "from-dragon-green/30 to-app-teal/30" },
-  { id: "z", letter: "Z", title: "Črka Z", path: "/govorne-igre/met-kocke/z", gradient: "from-app-purple/30 to-app-blue/30" },
-  { id: "zh", letter: "Ž", title: "Črka Ž", path: "/govorne-igre/met-kocke/zh", gradient: "from-app-orange/30 to-app-yellow/30" },
+  { id: "c", letter: "C", title: "Glas C", path: "/govorne-igre/met-kocke/c", gradient: "from-app-blue/30 to-app-purple/30" },
+  { id: "ch", letter: "Č", title: "Glas Č", path: "/govorne-igre/met-kocke/ch", gradient: "from-app-orange/30 to-app-yellow/30" },
+  { id: "k", letter: "K", title: "Glas K", path: "/govorne-igre/met-kocke/k", gradient: "from-dragon-green/30 to-app-teal/30" },
+  { id: "l", letter: "L", title: "Glas L", path: "/govorne-igre/met-kocke/l", gradient: "from-app-purple/30 to-app-blue/30" },
+  { id: "r", letter: "R", title: "Glas R", path: "/govorne-igre/met-kocke/r", gradient: "from-app-orange/30 to-app-yellow/30" },
+  { id: "s", letter: "S", title: "Glas S", path: "/govorne-igre/met-kocke/s", gradient: "from-app-blue/30 to-app-purple/30" },
+  { id: "sh", letter: "Š", title: "Glas Š", path: "/govorne-igre/met-kocke/sh", gradient: "from-dragon-green/30 to-app-teal/30" },
+  { id: "z", letter: "Z", title: "Glas Z", path: "/govorne-igre/met-kocke/z", gradient: "from-app-purple/30 to-app-blue/30" },
+  { id: "zh", letter: "Ž", title: "Glas Ž", path: "/govorne-igre/met-kocke/zh", gradient: "from-app-orange/30 to-app-yellow/30" },
 ];

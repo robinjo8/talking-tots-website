@@ -94,7 +94,7 @@ export default function AdminSpominGames() {
               <div className="w-full h-full flex items-center justify-center">
                 <img 
                   src={game.image}
-                  alt={`Črka ${game.letter}`}
+                  alt={`Glas ${game.letter}`}
                   className={`object-contain group-hover:scale-110 transition-transform duration-300 ${isMobile ? 'w-[80%] h-[80%]' : 'w-full h-full'}`}
                   style={{ mixBlendMode: 'multiply' }}
                 />
@@ -104,7 +104,7 @@ export default function AdminSpominGames() {
             {/* Card Content */}
             <div className={`p-4 ${isMobile ? 'text-center' : ''}`}>
               <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-app-blue transition-colors">
-                Črka {game.letter}
+                Glas {game.letter}
               </h3>
               {!isMobile && (
                 <p className="text-sm text-muted-foreground line-clamp-2">

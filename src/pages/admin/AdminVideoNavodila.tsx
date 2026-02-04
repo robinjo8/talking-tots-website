@@ -83,7 +83,7 @@ export default function AdminVideoNavodila() {
         <div className="relative w-full h-full flex items-center justify-center">
           <img 
             src={letter.image}
-            alt={`Črka ${letter.letter}`}
+            alt={`Glas ${letter.letter}`}
             className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
             style={{ mixBlendMode: 'multiply' }}
           />
@@ -95,7 +95,7 @@ export default function AdminVideoNavodila() {
           ? "text-base font-bold text-foreground mb-1 group-hover:text-app-blue transition-colors leading-tight text-center" 
           : "text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors"
         }>
-          Črka {letter.letter}
+          Glas {letter.letter}
         </h3>
         {!isMobile && (
           <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
