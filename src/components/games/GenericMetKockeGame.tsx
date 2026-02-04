@@ -141,7 +141,7 @@ export function GenericMetKockeGame({
   }, [recordExerciseCompletion, letter, selectedBitje, bitje, incrementProgress, closeStarDialog, checkForNewTrophy]);
 
   // Column headers
-  const columns = ['BITJE', 'POVEDEK', 'PREDMET'];
+  const columns = ['OSEBEK', 'POVEDEK', 'PREDMET'];
 
   return (
     <div 
