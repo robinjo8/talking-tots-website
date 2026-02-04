@@ -52,7 +52,7 @@ export default function ArtikulacijaVaje() {
         <div className="w-full h-full flex items-center justify-center">
           <img 
             src={letter.image}
-            alt={`Črka ${letter.letter}`}
+            alt={`Glas ${letter.letter}`}
             className={`object-contain group-hover:scale-110 transition-transform duration-300 ${isMobile ? 'w-[80%] h-[80%]' : 'w-full h-full'}`}
             style={{ mixBlendMode: 'multiply' }}
           />

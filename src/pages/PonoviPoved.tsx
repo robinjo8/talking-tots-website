@@ -145,7 +145,7 @@ export default function PonoviPoved() {
           <div className="w-full h-full flex items-center justify-center">
             <img 
               src={letter.image}
-              alt={`Črka ${letter.letter}`}
+              alt={`Glas ${letter.letter}`}
               className={`object-contain group-hover:scale-110 transition-transform duration-300 ${isMobile ? 'w-[80%] h-[80%]' : 'w-full h-full'} ${!isAvailable ? 'grayscale-[30%]' : ''}`}
               style={{ mixBlendMode: 'multiply' }}
             />
@@ -155,7 +155,7 @@ export default function PonoviPoved() {
         {/* Card Content */}
         <div className={`p-6 ${isMobile ? 'text-center' : ''}`}>
           <h3 className={`text-xl font-bold mb-3 group-hover:text-app-blue transition-colors ${!isAvailable ? 'text-gray-500' : 'text-foreground'}`}>
-            Črka {letter.letter}
+            Glas {letter.letter}
           </h3>
           {!isMobile && (
             <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">

@@ -129,7 +129,7 @@ export const getLettersForAgeGroup = (ageGroup: string): PoveziPareConfig[] => {
       numColumns: settings.numColumns,
       gradient: visual?.gradient || 'from-gray-200 to-gray-300',
       image: visual?.image || '',
-      description: visual?.description || `Črka ${letter}`
+      description: visual?.description || `Glas ${letter}`
     };
   });
 };
@@ -156,7 +156,7 @@ export const findPoveziPareConfig = (ageGroup: string, urlKey: string): PoveziPa
     numColumns: settings.numColumns,
     gradient: visual?.gradient || 'from-gray-200 to-gray-300',
     image: visual?.image || '',
-    description: visual?.description || `Črka ${letter}`
+    description: visual?.description || `Glas ${letter}`
   };
 };
 

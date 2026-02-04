@@ -49,7 +49,7 @@ export default function AdminArtikulacijaVaje() {
                 <div className="relative w-full h-full flex items-center justify-center">
                   <img 
                     src={letter.image}
-                    alt={`Črka ${letter.displayLetter}`}
+                    alt={`Glas ${letter.displayLetter}`}
                     className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
                     style={{ mixBlendMode: 'multiply' }}
                   />
@@ -57,7 +57,7 @@ export default function AdminArtikulacijaVaje() {
               </div>
               <div className="p-3 flex flex-col flex-grow">
                 <h3 className="text-base font-bold text-foreground mb-1 group-hover:text-app-blue transition-colors leading-tight text-center">
-                  Črka {letter.displayLetter}
+                  Glas {letter.displayLetter}
                 </h3>
               </div>
             </div>
@@ -81,7 +81,7 @@ export default function AdminArtikulacijaVaje() {
                 <div className="relative w-full h-full flex items-center justify-center">
                   <img 
                     src={letter.image}
-                    alt={`Črka ${letter.displayLetter}`}
+                    alt={`Glas ${letter.displayLetter}`}
                     className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
                     style={{ mixBlendMode: 'multiply' }}
                   />
@@ -89,7 +89,7 @@ export default function AdminArtikulacijaVaje() {
               </div>
               <div className="p-6 flex flex-col flex-grow">
                 <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
-                  Črka {letter.displayLetter}
+                  Glas {letter.displayLetter}
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
                   Vaje za izgovorjavo črke {letter.displayLetter}
