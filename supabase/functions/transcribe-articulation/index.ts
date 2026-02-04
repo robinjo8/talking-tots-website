@@ -72,8 +72,8 @@ function sanitizeForStorage(text: string): string {
 // Get dynamic threshold based on word length and difficulty
 function getThresholdForWord(wordLength: number, difficulty: string): number {
   const thresholds: Record<string, Record<number, number>> = {
-    nizka:   { 3: 0.33, 4: 0.25, 5: 0.35, 6: 0.30 },
-    srednja: { 3: 0.65, 4: 0.50, 5: 0.50, 6: 0.50 },
+    nizka:   { 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.0 },
+    srednja: { 3: 0.33, 4: 0.50, 5: 0.50, 6: 0.50 },
     visoka:  { 3: 0.65, 4: 0.70, 5: 0.75, 6: 0.65 },
   };
   // Clamp word length to supported range (3-6)
