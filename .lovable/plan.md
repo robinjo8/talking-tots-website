@@ -1,62 +1,55 @@
 
-# Načrt: Popravek podvojene slike v igri Spomin za črko K
+# Popravek: -41% oznaka mora biti vedno vidna
 
-## Ugotovljen problem
+## Problem
 
-V tabeli `memory_cards_K` sta dve vrstici, ki uporabljata **isto sliko** `kokos1.webp`:
+Trenutna koda prikazuje bodisi kljukico (če si naročen na Pro) bodisi -41% oznako (če nisi naročen). Ker si ti naročen na Pro, se prikazuje samo kljukica.
 
-| ID | Beseda | Trenutna slika | Trenutni zvok |
-|----|--------|----------------|---------------|
-| `424423f9-...` | kokos (sadež) | `kokos1.webp` ❌ | `kokos_1.m4a` ❌ |
-| `c1a84a3e-...` | KOKOŠ (kokoška) | `kokos1.webp` ✅ | `kokos_1.m4a` ✅ |
+## Rešitev
 
-## Pravilne vrednosti
+Spremeniti logiko tako, da se -41% oznaka prikazuje **vedno**, kljukica pa se doda poleg, če si naročen.
 
-Na podlagi ostalih konfiguracijskih datotek (`matchingGameData.ts`, `puzzleImages.ts`, `threeColumnMatchingData.ts`):
+## Spremembe
 
-| Beseda | Pravilna slika | Pravilni zvok |
-|--------|----------------|---------------|
-| **KOKOŠ** (hen) | `kokos1.webp` | `kokos_1.m4a` |
-| **KOKOS** (coconut) | `kokos_sadez1.webp` | `kokos_sadez.m4a` |
+### 1. `src/components/PricingSection.tsx` (vrstice 137-147)
 
-## Potrebna sprememba
-
-**Posodobitev vrstice v Supabase** za besedo "kokos" (ID: `424423f9-932d-404a-aad5-67fd80488f92`):
-
-```sql
-UPDATE "memory_cards_K"
-SET 
-  image_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/kokos_sadez1.webp',
-  audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/kokos_sadez.m4a'
-WHERE id = '424423f9-932d-404a-aad5-67fd80488f92';
+**Iz:**
+```tsx
+<TabsTrigger value="pro" className="... flex items-center gap-1.5">
+  <span className="md:hidden">{proPlan.shortName}</span>
+  <span className="hidden md:inline">{proPlan.name}</span>
+  {isSubscribed && currentPlanId === 'pro' ? (
+    <Check className="h-4 w-4 text-dragon-green" />
+  ) : (
+    <span className="bg-white text-app-orange ...">-41%</span>
+  )}
+</TabsTrigger>
 ```
 
-## Preverjanje ostalih tabel
+**V:**
+```tsx
+<TabsTrigger value="pro" className="... flex items-center gap-1.5">
+  <span className="md:hidden">{proPlan.shortName}</span>
+  <span className="hidden md:inline">{proPlan.name}</span>
+  {isSubscribed && currentPlanId === 'pro' && (
+    <Check className="h-4 w-4 text-dragon-green" />
+  )}
+  <span className="bg-white text-app-orange ...">-41%</span>
+</TabsTrigger>
+```
 
-Preveril sem vse ostale tabele za igro Spomin:
-- `memory_cards_c` ✅ Brez podvojenih slik
-- `memory_cards_Č` ✅ Brez podvojenih slik
-- `memory_cards_l` ✅ Brez podvojenih slik
-- `memory_cards_r` ✅ Brez podvojenih slik
-- `memory_cards_S` ✅ Brez podvojenih slik
-- `memory_cards_Š_duplicate` ✅ Brez podvojenih slik
-- `memory_cards_z` ✅ Brez podvojenih slik
-- `memory_cards_Ž` ✅ Brez podvojenih slik
+Zdaj bo kljukica prikazana **poleg** -41% oznake, ne **namesto** nje.
 
-**Edina napaka je v tabeli `memory_cards_K`** za besedo "kokos".
+### 2. `src/components/profile/SubscriptionSection.tsx` (enaka sprememba)
+
+Ista popravka za profil stran.
+
+---
 
 ## Vizualni rezultat
 
-Po popravku bodo v igri Spomin za črko K prikazane pravilne slike:
+| Stanje | Pred | Po |
+|--------|------|-----|
+| Ni naročen | "TomiTalk Pro -41%" | "TomiTalk Pro -41%" |
+| Naročen na Pro | "TomiTalk Pro ✓" | "TomiTalk Pro ✓ -41%" |
 
-```text
-┌─────────────┐     ┌─────────────┐
-│  🥥 KOKOS   │     │  🐔 KOKOŠ   │
-│  (sadež)    │     │  (kokoška)  │
-│ kokos_sadez │     │   kokos1    │
-└─────────────┘     └─────────────┘
-```
-
-## Tehnična opomba
-
-Ta popravek je izključno v podatkovni bazi (Supabase). Koda aplikacije ne potrebuje sprememb - logika v `useGenericMemoryGame.tsx` pravilno uporablja `pairId` za ujemanje parov, slika pa se naloži iz polja `image_url` v tabeli.
