@@ -14,15 +14,15 @@ import { ArrowLeft } from "lucide-react";
 
 // Letter card data for Bingo (bingo games - sredina/konec)
 const bingoLetters = [
+  { id: "s", letter: "S", title: "Glas S", description: "Igraj bingo in vadi izgovorjavo črke S na sredini in koncu besed", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_S.png", path: "/govorne-igre/bingo/s" },
+  { id: "z", letter: "Z", title: "Glas Z", description: "Igraj bingo in vadi izgovorjavo črke Z na sredini in koncu besed", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_Z.png", path: "/govorne-igre/bingo/z" },
   { id: "c", letter: "C", title: "Glas C", description: "Igraj bingo in vadi izgovorjavo črke C na sredini in koncu besed", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_C.png", path: "/govorne-igre/bingo/c" },
+  { id: "sh", letter: "Š", title: "Glas Š", description: "Igraj bingo in vadi izgovorjavo črke Š na sredini in koncu besed", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_SH.png", path: "/govorne-igre/bingo/sh" },
+  { id: "zh", letter: "Ž", title: "Glas Ž", description: "Igraj bingo in vadi izgovorjavo črke Ž na sredini in koncu besed", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_ZH.png", path: "/govorne-igre/bingo/zh" },
   { id: "ch", letter: "Č", title: "Glas Č", description: "Igraj bingo in vadi izgovorjavo črke Č na sredini in koncu besed", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_CH.png", path: "/govorne-igre/bingo/ch" },
   { id: "k", letter: "K", title: "Glas K", description: "Igraj bingo in vadi izgovorjavo črke K na sredini in koncu besed", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_K.png", path: "/govorne-igre/bingo/k" },
   { id: "l", letter: "L", title: "Glas L", description: "Igraj bingo in vadi izgovorjavo črke L na sredini in koncu besed", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_L.png", path: "/govorne-igre/bingo/l" },
   { id: "r", letter: "R", title: "Glas R", description: "Igraj bingo in vadi izgovorjavo črke R na sredini in koncu besed", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_R.png", path: "/govorne-igre/bingo/r" },
-  { id: "s", letter: "S", title: "Glas S", description: "Igraj bingo in vadi izgovorjavo črke S na sredini in koncu besed", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_S.png", path: "/govorne-igre/bingo/s" },
-  { id: "sh", letter: "Š", title: "Glas Š", description: "Igraj bingo in vadi izgovorjavo črke Š na sredini in koncu besed", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_SH.png", path: "/govorne-igre/bingo/sh" },
-  { id: "z", letter: "Z", title: "Glas Z", description: "Igraj bingo in vadi izgovorjavo črke Z na sredini in koncu besed", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_Z.png", path: "/govorne-igre/bingo/z" },
-  { id: "zh", letter: "Ž", title: "Glas Ž", description: "Igraj bingo in vadi izgovorjavo črke Ž na sredini in koncu besed", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_ZH.png", path: "/govorne-igre/bingo/zh" },
 ];
 
 export default function BingoGames() {

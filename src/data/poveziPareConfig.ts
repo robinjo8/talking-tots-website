@@ -16,9 +16,9 @@ export interface PoveziPareConfig {
 // Letters available for each age group
 const lettersByAge: Record<string, string[]> = {
   '34': ['C', 'Č', 'K', 'L'],
-  '56': ['C', 'Č', 'K', 'L', 'R', 'S', 'Š', 'Z', 'Ž'],
-  '78': ['C', 'Č', 'K', 'L', 'R', 'S', 'Š', 'Z', 'Ž'],
-  '910': ['C', 'Č', 'K', 'L', 'R', 'S', 'Š', 'Z', 'Ž']
+  '56': ['S', 'Z', 'C', 'Š', 'Ž', 'Č', 'K', 'L', 'R'],
+  '78': ['S', 'Z', 'C', 'Š', 'Ž', 'Č', 'K', 'L', 'R'],
+  '910': ['S', 'Z', 'C', 'Š', 'Ž', 'Č', 'K', 'L', 'R']
 };
 
 // Game type settings by age group

@@ -3,15 +3,15 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
 
 const drsnaSestavljankaLetters = [
+  { id: "s", letter: "S", description: "Drsna sestavljanka s črko S", image: "zmajcek_crka_S.png" },
+  { id: "z", letter: "Z", description: "Drsna sestavljanka s črko Z", image: "zmajcek_crka_Z.png" },
   { id: "c", letter: "C", description: "Drsna sestavljanka s črko C", image: "zmajcek_crka_C.png" },
+  { id: "sh", letter: "Š", description: "Drsna sestavljanka s črko Š", image: "zmajcek_crka_SH.png" },
+  { id: "zh", letter: "Ž", description: "Drsna sestavljanka s črko Ž", image: "zmajcek_crka_ZH.png" },
   { id: "ch", letter: "Č", description: "Drsna sestavljanka s črko Č", image: "zmajcek_crka_CH.png" },
   { id: "k", letter: "K", description: "Drsna sestavljanka s črko K", image: "zmajcek_crka_K.png" },
   { id: "l", letter: "L", description: "Drsna sestavljanka s črko L", image: "zmajcek_crka_L.png" },
   { id: "r", letter: "R", description: "Drsna sestavljanka s črko R", image: "zmajcek_crka_R.png" },
-  { id: "s", letter: "S", description: "Drsna sestavljanka s črko S", image: "zmajcek_crka_S.png" },
-  { id: "sh", letter: "Š", description: "Drsna sestavljanka s črko Š", image: "zmajcek_crka_SH.png" },
-  { id: "z", letter: "Z", description: "Drsna sestavljanka s črko Z", image: "zmajcek_crka_Z.png" },
-  { id: "zh", letter: "Ž", description: "Drsna sestavljanka s črko Ž", image: "zmajcek_crka_ZH.png" },
 ];
 
 export default function AdminDrsnaSestavljankaGames() {

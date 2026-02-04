@@ -14,11 +14,43 @@ import { ArrowLeft } from "lucide-react";
 
 const memoryGames = [
   {
+    id: "sestavljanke-s",
+    letter: "S",
+    gradient: "from-dragon-green/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
+    description: "Sestavi sliko s črko S in nato glasno ponovi besedo",
+    available: true
+  },
+  {
+    id: "sestavljanke-z",
+    letter: "Z",
+    gradient: "from-app-teal/20 to-dragon-green/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
+    description: "Sestavi sliko s črko Z in nato glasno ponovi besedo",
+    available: true
+  },
+  {
     id: "sestavljanke-c",
     letter: "C",
     gradient: "from-dragon-green/20 to-dragon-green/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
     description: "Sestavi sliko s črko C in nato glasno ponovi besedo",
+    available: true
+  },
+  {
+    id: "sestavljanke-š",
+    letter: "Š",
+    gradient: "from-app-blue/20 to-app-purple/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
+    description: "Sestavi sliko s črko Š in nato glasno ponovi besedo",
+    available: true
+  },
+  {
+    id: "sestavljanke-ž",
+    letter: "Ž",
+    gradient: "from-app-purple/20 to-app-blue/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
+    description: "Sestavi sliko s črko Ž in nato glasno ponovi besedo",
     available: true
   },
   {
@@ -51,38 +83,6 @@ const memoryGames = [
     gradient: "from-app-purple/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
     description: "Sestavi sliko s črko R in nato glasno ponovi besedo",
-    available: true
-  },
-  {
-    id: "sestavljanke-s",
-    letter: "S",
-    gradient: "from-dragon-green/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
-    description: "Sestavi sliko s črko S in nato glasno ponovi besedo",
-    available: true
-  },
-  {
-    id: "sestavljanke-š",
-    letter: "Š",
-    gradient: "from-app-blue/20 to-app-purple/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
-    description: "Sestavi sliko s črko Š in nato glasno ponovi besedo",
-    available: true
-  },
-  {
-    id: "sestavljanke-z",
-    letter: "Z",
-    gradient: "from-app-teal/20 to-dragon-green/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
-    description: "Sestavi sliko s črko Z in nato glasno ponovi besedo",
-    available: true
-  },
-  {
-    id: "sestavljanke-ž",
-    letter: "Ž",
-    gradient: "from-app-purple/20 to-app-blue/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
-    description: "Sestavi sliko s črko Ž in nato glasno ponovi besedo",
     available: true
   }
 ];
