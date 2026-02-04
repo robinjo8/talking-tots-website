@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -11,12 +12,15 @@ import { Button } from "@/components/ui/button";
 interface AgeSelectionDialogProps {
   open: boolean;
   onAgeSelected: (age: number) => void;
+  onClose?: () => void;
+  hasExistingAge?: boolean;
 }
 
 const AGES = [3, 4, 5, 6, 7, 8, 9, 10];
 
-export function AgeSelectionDialog({ open, onAgeSelected }: AgeSelectionDialogProps) {
+export function AgeSelectionDialog({ open, onAgeSelected, onClose, hasExistingAge }: AgeSelectionDialogProps) {
   const [selectedAge, setSelectedAge] = useState<number | null>(null);
+  const navigate = useNavigate();
 
   const handleConfirm = () => {
     if (selectedAge !== null) {
@@ -24,8 +28,20 @@ export function AgeSelectionDialog({ open, onAgeSelected }: AgeSelectionDialogPr
     }
   };
 
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      // If user has existing age, just close the dialog
+      if (hasExistingAge && onClose) {
+        onClose();
+      } else {
+        // If no age set yet, navigate back to home
+        navigate('/');
+      }
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={() => {}}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md" onPointerDownOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold text-dragon-green">
@@ -51,7 +67,7 @@ export function AgeSelectionDialog({ open, onAgeSelected }: AgeSelectionDialogPr
                   w-14 h-14 rounded-xl font-bold text-lg transition-all
                   ${selectedAge === age 
                     ? 'bg-dragon-green text-white scale-110 shadow-lg' 
-                    : 'bg-gray-100 text-foreground hover:bg-gray-200 hover:scale-105'
+                    : 'bg-muted text-foreground hover:bg-muted/80 hover:scale-105'
                   }
                 `}
               >
