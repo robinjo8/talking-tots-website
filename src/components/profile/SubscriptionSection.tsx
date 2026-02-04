@@ -12,7 +12,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { 
   pricingPlans, 
   proExclusiveFeatures, 
-  plusIncludedFeatures,
+  startIncludedFeatures,
   getColorClass,
   getPlanById,
   type PlanId 
@@ -115,7 +115,6 @@ export function SubscriptionSection() {
   };
 
   const startPlan = pricingPlans.find(p => p.id === 'start')!;
-  const plusPlan = pricingPlans.find(p => p.id === 'plus')!;
   const proPlan = pricingPlans.find(p => p.id === 'pro')!;
 
   const currentPlan = currentPlanId ? getPlanById(currentPlanId) : null;
@@ -209,17 +208,11 @@ export function SubscriptionSection() {
         <div className="max-w-2xl mx-auto">
           {/* Plan Toggle */}
           <Tabs value={selectedPlan} onValueChange={(value) => setSelectedPlan(value as PlanId)} className="w-full mb-8">
-            <TabsList className="grid w-full grid-cols-3 bg-gray-100 h-12">
+            <TabsList className="grid w-full grid-cols-2 bg-gray-100 h-12">
               <TabsTrigger value="start" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 relative">
                 {startPlan.shortName}
                 {isSubscribed && currentPlanId === 'start' && (
                   <Check className="h-4 w-4 text-app-blue absolute -top-1 -right-1" />
-                )}
-              </TabsTrigger>
-              <TabsTrigger value="plus" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 relative">
-                {plusPlan.shortName}
-                {isSubscribed && currentPlanId === 'plus' && (
-                  <Check className="h-4 w-4 text-app-orange absolute -top-1 -right-1" />
                 )}
               </TabsTrigger>
               <TabsTrigger value="pro" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 relative">
@@ -284,56 +277,6 @@ export function SubscriptionSection() {
               </Card>
             </TabsContent>
 
-            {/* TomiTalk Plus */}
-            <TabsContent value="plus" className="mt-6">
-              <Card className={cn(
-                "relative border-2 transition-all duration-300 hover:shadow-lg h-[580px] shadow-md",
-                getColorClass(plusPlan.color, 'border'),
-                isSubscribed && currentPlanId === 'plus' && "ring-2 ring-app-orange ring-offset-2"
-              )}>
-                <CardContent className="p-8 flex flex-col h-full">
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className={cn(
-                      "text-white text-sm px-4 py-1 rounded-full font-medium whitespace-nowrap",
-                      getColorClass(plusPlan.color, 'bg')
-                    )}>
-                      {isSubscribed && currentPlanId === 'plus' ? 'Vaš paket' : plusPlan.badge}
-                    </span>
-                  </div>
-                  
-                  <div className="text-center mb-6 mt-2 h-[88px]">
-                    <h3 className={cn("text-2xl font-bold mb-2", getColorClass(plusPlan.color, 'text'))}>
-                      {plusPlan.name}
-                    </h3>
-                    <div className="flex items-baseline justify-center gap-1 mb-2">
-                      <span className="text-4xl font-bold">{plusPlan.price} €</span>
-                      <span className="text-gray-500">/mesec</span>
-                    </div>
-                    <p className="text-sm text-gray-600">{plusPlan.billingLabel}</p>
-                  </div>
-
-                  <div className="text-center mb-6">
-                    <p className="text-lg font-medium text-gray-700 mb-4">
-                      {plusPlan.tagline}
-                    </p>
-                  </div>
-
-                  <div className="flex justify-center mb-6">
-                    <div className="inline-flex flex-col items-start space-y-3">
-                      {plusPlan.features.map((feature, index) => (
-                        <div key={index} className="flex items-center gap-3 text-sm">
-                          <div className={cn("h-2 w-2 rounded-full flex-shrink-0", getColorClass(plusPlan.color, 'bg'))} />
-                          <span>{feature}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {renderPlanButton(plusPlan)}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
             {/* TomiTalk Pro */}
             <TabsContent value="pro" className="mt-6">
               <Card className={cn(
@@ -355,9 +298,12 @@ export function SubscriptionSection() {
                     <h3 className={cn("text-2xl font-bold mb-2", getColorClass(proPlan.color, 'text'))}>
                       {proPlan.name}
                     </h3>
-                    <div className="flex items-baseline justify-center gap-1 mb-2">
+                    <div className="flex items-baseline justify-center gap-2 mb-2">
                       <span className="text-4xl font-bold">{proPlan.price} €</span>
                       <span className="text-gray-500">/mesec</span>
+                      <span className="bg-dragon-green text-white text-xs px-2 py-0.5 rounded-full font-medium">
+                        -41%
+                      </span>
                     </div>
                     <p className="text-sm text-gray-600">{proPlan.billingLabel}</p>
                   </div>
@@ -406,15 +352,15 @@ export function SubscriptionSection() {
           </div>
           
           <div className="p-4">
-            {/* TomiTalk Plus section */}
-            <div className="bg-app-orange/10 border-2 border-app-orange rounded-lg p-3 mb-4">
-              <p className="font-bold text-app-orange text-sm mb-2 text-center">
-                ✓ Vse iz TomiTalk Plus:
+            {/* TomiTalk Start section */}
+            <div className="bg-app-blue/10 border-2 border-app-blue rounded-lg p-3 mb-4">
+              <p className="font-bold text-app-blue text-sm mb-2 text-center">
+                ✓ Vse iz TomiTalk Start:
               </p>
               <ul className="space-y-1.5">
-                {plusIncludedFeatures.map((item, i) => (
+                {startIncludedFeatures.map((item, i) => (
                   <li key={i} className="flex items-center gap-2 text-xs">
-                    <div className="h-1.5 w-1.5 rounded-full bg-app-orange flex-shrink-0" />
+                    <div className="h-1.5 w-1.5 rounded-full bg-app-blue flex-shrink-0" />
                     <span>{item}</span>
                   </li>
                 ))}

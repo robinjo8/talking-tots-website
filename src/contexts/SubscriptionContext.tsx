@@ -7,7 +7,7 @@ export interface SubscriptionContextType extends SubscriptionState {
   refreshSubscription: () => Promise<void>;
   // Helper functions
   isPro: boolean;
-  isStartOrPlus: boolean;
+  isStart: boolean;
   canAccessPremiumFeatures: boolean;
   canAccessProFeatures: boolean;
 }
@@ -29,14 +29,14 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   
   // Derive helper values
   const isPro = subscription.planId === 'pro';
-  const isStartOrPlus = subscription.planId === 'start' || subscription.planId === 'plus';
+  const isStart = subscription.planId === 'start';
   const canAccessPremiumFeatures = subscription.isSubscribed;
   const canAccessProFeatures = isPro;
   
   const value: SubscriptionContextType = {
     ...subscription,
     isPro,
-    isStartOrPlus,
+    isStart,
     canAccessPremiumFeatures,
     canAccessProFeatures,
   };
@@ -63,7 +63,7 @@ export function useSubscriptionContext() {
       trialEnd: null,
       refreshSubscription: async () => {},
       isPro: false,
-      isStartOrPlus: false,
+      isStart: false,
       canAccessPremiumFeatures: false,
       canAccessProFeatures: false,
     } as SubscriptionContextType;

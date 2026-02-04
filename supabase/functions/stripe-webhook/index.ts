@@ -21,10 +21,9 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 );
 
-// Map Stripe product IDs to plan IDs
+// Map Stripe product IDs to plan IDs (2-tier model: Start + Pro)
 const productToPlan: Record<string, string> = {
-  'prod_TmbXrf2SNJLlHM': 'start',
-  'prod_TmbXaM32ndD11d': 'plus',
+  'prod_TuvCF2Vlvmvp3M': 'start',
   'prod_TmbZ19RhCaSzrp': 'pro'
 };
 
@@ -218,5 +217,3 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
 
   logStep("Subscription marked as past_due", { customerId });
 }
-
-// upsertSubscription removed - subscription.created webhook handles all status updates
