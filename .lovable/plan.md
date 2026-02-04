@@ -1,159 +1,167 @@
 
-# Načrt: Popravek filtriranja nedokončanih sej v "V čakanju"
 
-## Problem
+# Nacrt: Zamenjava "Crka" z "Glas" na vseh straneh
 
-Trenutno se **nedokončane seje** preverjanja izgovorjave prikazujejo logopedom v razdelku "V čakanju", čeprav otrok še ni izgovoril vseh besed.
+## Povzetek
 
-### Primer problematičnega scenarija:
-1. Otrok začne preverjanje izgovorjave na uporabniškem portalu
-2. Izgovori 10 besed od 60
-3. Zapusti test (zapre aplikacijo ali navigira stran)
-4. Seja z `status: 'pending'` in `is_completed: false` se takoj prikaže logopedu v "V čakanju"
-5. Logoped vidi nepopolno sejo brez vseh posnetkov
+Zamenjati je potrebno vse pojave "Crka X" z "Glas X" (npr. "Crka C" -> "Glas C") za vse crke: C, C, K, L, R, S, S, Z, Z.
 
-### Zakaj se to dogaja:
-- Seja se ustvari **takoj ob začetku testa** s `status: 'pending'` in `is_completed: false`
-- Query za "V čakanju" filtrira samo po `status = 'pending'` in `assigned_to IS NULL`
-- **Ne** preverja, ali je seja dejansko dokončana (`is_completed = true`)
+## Ugotovitve iz raziskave
 
-## Rešitev
+Nasli smo **359 pojavov** besede "Crka" v **39 datotekah**. Spremembe so razdeljene na dve vrsti:
 
-Dodaj filter `.eq('is_completed', true)` v vse query-je, ki prikazujejo seje logopedom:
+### Tip 1: Staticni naslovi v konfiguracijah (title: "Crka X")
+Te datoteke vsebujejo hardkodane naslove v data arrayih:
 
-1. **`usePendingTests.ts`** - seznam sej v "V čakanju"
-2. **`useAdminCounts.ts`** - število v navigation badge-u
-3. **`check-old-pending-tests`** Edge funkcija - obvestila o starih sejah
+| Datoteka | Stevilo zamenjav |
+|----------|------------------|
+| `src/pages/KoloSreceGames.tsx` | 9x |
+| `src/pages/BingoGames.tsx` | 9x |
+| `src/pages/admin/games/AdminKoloSreceGames.tsx` | 9x |
+| `src/pages/admin/games/AdminBingoGames.tsx` | 9x |
+| `src/data/metKockeConfig.ts` | 9x |
 
-## Tehnične spremembe
+### Tip 2: Dinamicni napisi z template literali
+Te datoteke uporabljajo obliko `` `Crka ${letter}` `` ali "Crka {game.letter}":
 
-### Datoteka 1: `src/hooks/usePendingTests.ts`
+| Datoteka | Lokacija |
+|----------|----------|
+| `src/pages/SpominGames.tsx` | h3 naslov + alt atribut |
+| `src/pages/admin/games/AdminSpominGames.tsx` | h3 naslov + alt atribut |
+| `src/pages/VideoNavodila.tsx` | h3 naslov + alt atribut |
+| `src/pages/admin/AdminVideoNavodila.tsx` | h3 naslov + alt atribut |
+| `src/pages/Zaporedja.tsx` | h3 naslov + alt atribut |
+| `src/pages/SestavljankeGames.tsx` | h3 naslov + alt atribut |
+| `src/pages/DrsnaSestavljanka.tsx` | h3 naslov + alt atribut |
+| `src/pages/IgraUjemanja.tsx` | h3 naslov + alt atribut |
+| `src/pages/MetKockeGames.tsx` | alt atribut |
+| `src/pages/PonoviPoved.tsx` | h3 naslov + alt atribut |
+| `src/pages/ArtikulacijaVaje.tsx` | alt atribut |
+| `src/pages/admin/games/AdminSestavljankeGames.tsx` | h3 naslov + alt atribut |
+| `src/pages/admin/games/AdminLabirintGames.tsx` | h3 naslov + alt atribut |
+| `src/pages/admin/games/AdminZaporedjaGames.tsx` | h3 naslov + alt atribut |
+| `src/pages/admin/games/AdminDrsnaSestavljankaGames.tsx` | h3 naslov + alt atribut |
+| `src/pages/admin/games/AdminPonoviPovedGames.tsx` | h3 naslov + alt atribut |
+| `src/pages/admin/games/AdminIgraUjemanjaGames.tsx` | h3 naslov + alt atribut |
+| `src/pages/admin/exercises/AdminArtikulacijaVaje.tsx` | h3 naslov + alt atribut |
+| `src/data/poveziPareConfig.ts` | fallback description |
 
-Dodaj filter za dokončane seje:
+### Datoteke BREZ sprememb
+Te vsebujejo kontekstualne omembe (npr. navodila, komentarji) in ne bodo spremenjene:
+- `src/components/articulation/ArticulationTestInstructionsDialog.tsx` - navodila za test
+- `src/components/CookieSettingsDialog.tsx` - tehnicni opis
+- `src/components/admin/LetterAccordion.tsx` - uporablja "CRKA" (druga oblika)
+- `src/hooks/useSessionReview.ts` - komentar v kodi
 
-```typescript
-// Trenutno (NAPAČNO):
-let query = supabase
-  .from('articulation_test_sessions')
-  .select('...')
-  .eq('status', 'pending')
-  .is('assigned_to', null)
-  .order('submitted_at', { ascending: true });
+## Seznam sprememb po datotekah
 
-// Novo (PRAVILNO):
-let query = supabase
-  .from('articulation_test_sessions')
-  .select('...')
-  .eq('status', 'pending')
-  .eq('is_completed', true)  // <-- DODAJ TO
-  .is('assigned_to', null)
-  .order('submitted_at', { ascending: true });
-```
+### Uporabniski portal (8 datotek)
 
-### Datoteka 2: `src/hooks/useAdminCounts.ts`
+1. **`src/pages/SpominGames.tsx`**
+   - Vrstica 140: `alt={`Crka ${game.letter}`}` -> `alt={`Glas ${game.letter}`}`
+   - Vrstica 150: `Crka {game.letter}` -> `Glas {game.letter}`
 
-Dodaj filter v pending count query:
+2. **`src/pages/KoloSreceGames.tsx`**
+   - Vrstice 18-26: `title: "Crka X"` -> `title: "Glas X"` (9x za vse crke)
 
-```typescript
-// Trenutno (NAPAČNO):
-const { count, error } = await supabase
-  .from('articulation_test_sessions')
-  .select('*', { count: 'exact', head: true })
-  .eq('status', 'pending')
-  .is('assigned_to', null);
+3. **`src/pages/BingoGames.tsx`**
+   - Vrstice 17-25: `title: "Crka X"` -> `title: "Glas X"` (9x za vse crke)
 
-// Novo (PRAVILNO):
-const { count, error } = await supabase
-  .from('articulation_test_sessions')
-  .select('*', { count: 'exact', head: true })
-  .eq('status', 'pending')
-  .eq('is_completed', true)  // <-- DODAJ TO
-  .is('assigned_to', null);
-```
+4. **`src/pages/VideoNavodila.tsx`**
+   - Vrstica 92: `alt={`Crka ${letter.letter}`}` -> `alt={`Glas ${letter.letter}`}`
+   - Vrstica 105: `Crka {letter.letter}` -> `Glas {letter.letter}`
 
-### Datoteka 3: `supabase/functions/check-old-pending-tests/index.ts`
+5. **`src/pages/Zaporedja.tsx`**
+   - Vrstica 161: `alt={`Crka ${game.letter}`}` -> `alt={`Glas ${game.letter}`}`
+   - Vrstica 171: `Crka {game.letter}` -> `Glas {game.letter}`
 
-Dodaj filter v Edge funkcijo za obvestila:
+6. **`src/pages/SestavljankeGames.tsx`**
+   - Vrstica 167: `alt={`Crka ${game.letter}`}` -> `alt={`Glas ${game.letter}`}`
+   - Vrstica 177: `Crka {game.letter}` -> `Glas {game.letter}`
 
-```typescript
-// Trenutno (NAPAČNO):
-const { data: oldSessions, error: sessionsError } = await supabase
-  .from('articulation_test_sessions')
-  .select('...')
-  .eq('status', 'pending')
-  .is('assigned_to', null)
-  .lt('submitted_at', sevenDaysAgo.toISOString())
+7. **`src/pages/DrsnaSestavljanka.tsx`**
+   - Vrstica 161: `alt={`Crka ${game.letter}`}` -> `alt={`Glas ${game.letter}`}`
+   - Vrstica 171: `Crka {game.letter}` -> `Glas {game.letter}`
 
-// Novo (PRAVILNO):
-const { data: oldSessions, error: sessionsError } = await supabase
-  .from('articulation_test_sessions')
-  .select('...')
-  .eq('status', 'pending')
-  .eq('is_completed', true)  // <-- DODAJ TO
-  .is('assigned_to', null)
-  .lt('submitted_at', sevenDaysAgo.toISOString())
-```
+8. **`src/pages/IgraUjemanja.tsx`**
+   - Vrstica 160: `alt={`Crka ${game.letter}`}` -> `alt={`Glas ${game.letter}`}`
+   - Vrstica 170: `Crka {game.letter}` -> `Glas {game.letter}`
 
-## Seznam datotek za spremembo
+9. **`src/pages/MetKockeGames.tsx`**
+   - Vrstica 79: `alt={`Crka ${game.letter}`}` -> `alt={`Glas ${game.letter}`}`
 
-| Datoteka | Akcija |
-|----------|--------|
-| `src/hooks/usePendingTests.ts` | Dodaj `.eq('is_completed', true)` |
-| `src/hooks/useAdminCounts.ts` | Dodaj `.eq('is_completed', true)` |
-| `supabase/functions/check-old-pending-tests/index.ts` | Dodaj `.eq('is_completed', true)` |
+10. **`src/pages/PonoviPoved.tsx`**
+    - Vrstica 148: `alt={`Crka ${letter.letter}`}` -> `alt={`Glas ${letter.letter}`}`
+    - Vrstica 158: `Crka {letter.letter}` -> `Glas {letter.letter}`
 
-## Rezultat
+11. **`src/pages/ArtikulacijaVaje.tsx`**
+    - Vrstica 55: `alt={`Crka ${letter.letter}`}` -> `alt={`Glas ${letter.letter}`}`
 
-Po popravku:
+### Admin portal (9 datotek)
 
-1. **Nedokončane seje** (kjer je otrok izgovoril npr. 10 besed) **NE** bodo prikazane v "V čakanju"
-2. **Dokončane seje** (kjer je otrok izgovoril vse besede) **BODO** prikazane v "V čakanju"
-3. Navigation badge bo prikazoval samo število **pravih** sej, ki čakajo na pregled
-4. Obvestila o starih sejah se bodo pošiljala samo za **dokončane** seje
+12. **`src/pages/admin/games/AdminSpominGames.tsx`**
+    - Vrstica 97: `alt={`Crka ${game.letter}`}` -> `alt={`Glas ${game.letter}`}`
+    - Vrstica 107: `Crka {game.letter}` -> `Glas {game.letter}`
 
-## Diagram poteka
+13. **`src/pages/admin/games/AdminKoloSreceGames.tsx`**
+    - Vrstice 6-14: `title: "Crka X"` -> `title: "Glas X"` (9x)
 
-```text
-┌─────────────────────────────────────────────────────────────────────┐
-│                    UPORABNIŠKI PORTAL                                │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                     │
-│  Otrok začne test                                                   │
-│        │                                                            │
-│        ▼                                                            │
-│  ┌─────────────────────────────────────────┐                        │
-│  │ SEJA USTVARJENA                         │                        │
-│  │ status: 'pending'                       │                        │
-│  │ is_completed: FALSE                     │  ◀── NI vidna logopedu │
-│  │ current_word_index: 0                   │                        │
-│  └─────────────────────────────────────────┘                        │
-│        │                                                            │
-│        ▼                                                            │
-│  Otrok izgovori besede (1...59)                                     │
-│  └─► current_word_index se posodablja      │  ◀── NI vidna logopedu │
-│        │                                                            │
-│        ▼                                                            │
-│  Otrok izgovori ZADNJO besedo (60)                                  │
-│        │                                                            │
-│        ▼                                                            │
-│  ┌─────────────────────────────────────────┐                        │
-│  │ SEJA DOKONČANA                          │                        │
-│  │ status: 'pending'                       │                        │
-│  │ is_completed: TRUE                      │  ◀── ZDAJ vidna logopedu│
-│  │ submitted_at: [timestamp]               │                        │
-│  └─────────────────────────────────────────┘                        │
-│                                                                     │
-└─────────────────────────────────────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                     ADMIN PORTAL (Logoped)                          │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                     │
-│  "V čakanju" prikazuje SAMO seje kjer:                              │
-│    • status = 'pending'                                             │
-│    • is_completed = TRUE   ◀── NOV FILTER                           │
-│    • assigned_to IS NULL                                            │
-│                                                                     │
-└─────────────────────────────────────────────────────────────────────┘
-```
+14. **`src/pages/admin/games/AdminBingoGames.tsx`**
+    - Vrstice 6-14: `title: "Crka X"` -> `title: "Glas X"` (9x)
+
+15. **`src/pages/admin/AdminVideoNavodila.tsx`**
+    - Vrstica 86: `alt={`Crka ${letter.letter}`}` -> `alt={`Glas ${letter.letter}`}`
+    - Vrstica 98: `Crka {letter.letter}` -> `Glas {letter.letter}`
+
+16. **`src/pages/admin/games/AdminSestavljankeGames.tsx`**
+    - Vrstica 48: `alt={`Crka ${item.letter}`}` -> `alt={`Glas ${item.letter}`}`
+    - Vrstica 56: `Crka {item.letter}` -> `Glas {item.letter}`
+
+17. **`src/pages/admin/games/AdminLabirintGames.tsx`**
+    - Vrstica 48: `alt={`Crka ${item.letter}`}` -> `alt={`Glas ${item.letter}`}`
+    - Vrstica 56: `Crka {item.letter}` -> `Glas {item.letter}`
+
+18. **`src/pages/admin/games/AdminZaporedjaGames.tsx`**
+    - Vrstica 48: `alt={`Crka ${item.letter}`}` -> `alt={`Glas ${item.letter}`}`
+    - Vrstica 56: `Crka {item.letter}` -> `Glas {item.letter}`
+
+19. **`src/pages/admin/games/AdminDrsnaSestavljankaGames.tsx`**
+    - Vrstica 48: `alt={`Crka ${item.letter}`}` -> `alt={`Glas ${item.letter}`}`
+    - Vrstica 56: `Crka {item.letter}` -> `Glas {item.letter}`
+
+20. **`src/pages/admin/games/AdminPonoviPovedGames.tsx`**
+    - Vrstica 48: `alt={`Crka ${item.letter}`}` -> `alt={`Glas ${item.letter}`}`
+    - Vrstica 56: `Crka {item.letter}` -> `Glas {item.letter}`
+
+21. **`src/pages/admin/games/AdminIgraUjemanjaGames.tsx`**
+    - Vrstica 48: `alt={`Crka ${item.letter}`}` -> `alt={`Glas ${item.letter}`}`
+
+22. **`src/pages/admin/exercises/AdminArtikulacijaVaje.tsx`**
+    - Vrstice 52, 60, 84: zamenjave alt in h3
+
+### Konfiguracijske datoteke (2 datoteki)
+
+23. **`src/data/metKockeConfig.ts`**
+    - Vrstice 265-273: `title: "Crka X"` -> `title: "Glas X"` (9x)
+
+24. **`src/data/poveziPareConfig.ts`**
+    - Vrstice 132, 159: `description: ... `Crka ${letter}`` -> `description: ... `Glas ${letter}``
+
+## Skupaj
+
+| Kategorija | St. datotek | St. zamenjav |
+|------------|-------------|--------------|
+| Uporabniski portal | 11 | ~40 |
+| Admin portal | 11 | ~40 |
+| Konfiguracije | 2 | ~30 |
+| **SKUPAJ** | **24** | **~110** |
+
+## Vizualni rezultat
+
+| Prej | Potem |
+|------|-------|
+| Crka C | Glas C |
+| Crka C | Glas C |
+| Crka K | Glas K |
+| ... | ... |
+
