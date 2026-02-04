@@ -6,9 +6,29 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 const videoLetters = [
   { 
+    letter: "S", 
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
+    description: "Poglej video navodila za pravilno izgovorjavo črke S"
+  },
+  { 
+    letter: "Z", 
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
+    description: "Poglej video navodila za pravilno izgovorjavo črke Z"
+  },
+  { 
     letter: "C", 
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
     description: "Poglej video navodila za pravilno izgovorjavo črke C"
+  },
+  { 
+    letter: "Š", 
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
+    description: "Poglej video navodila za pravilno izgovorjavo črke Š"
+  },
+  { 
+    letter: "Ž", 
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
+    description: "Poglej video navodila za pravilno izgovorjavo črke Ž"
   },
   { 
     letter: "Č", 
@@ -29,26 +49,6 @@ const videoLetters = [
     letter: "R", 
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
     description: "Poglej video navodila za pravilno izgovorjavo črke R"
-  },
-  { 
-    letter: "S", 
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
-    description: "Poglej video navodila za pravilno izgovorjavo črke S"
-  },
-  { 
-    letter: "Š", 
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
-    description: "Poglej video navodila za pravilno izgovorjavo črke Š"
-  },
-  { 
-    letter: "Z", 
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
-    description: "Poglej video navodila za pravilno izgovorjavo črke Z"
-  },
-  { 
-    letter: "Ž", 
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
-    description: "Poglej video navodila za pravilno izgovorjavo črke Ž"
   },
 ];
 

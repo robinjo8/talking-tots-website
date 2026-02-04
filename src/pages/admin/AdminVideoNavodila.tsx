@@ -4,10 +4,34 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 const videoLetters = [
   { 
+    letter: "S", 
+    urlKey: "s",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
+    description: "Poglej video navodila za pravilno izgovorjavo črke S"
+  },
+  { 
+    letter: "Z", 
+    urlKey: "z",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
+    description: "Poglej video navodila za pravilno izgovorjavo črke Z"
+  },
+  { 
     letter: "C", 
     urlKey: "c",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
     description: "Poglej video navodila za pravilno izgovorjavo črke C"
+  },
+  { 
+    letter: "Š", 
+    urlKey: "sh",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
+    description: "Poglej video navodila za pravilno izgovorjavo črke Š"
+  },
+  { 
+    letter: "Ž", 
+    urlKey: "zh",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
+    description: "Poglej video navodila za pravilno izgovorjavo črke Ž"
   },
   { 
     letter: "Č", 
@@ -32,30 +56,6 @@ const videoLetters = [
     urlKey: "r",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
     description: "Poglej video navodila za pravilno izgovorjavo črke R"
-  },
-  { 
-    letter: "S", 
-    urlKey: "s",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
-    description: "Poglej video navodila za pravilno izgovorjavo črke S"
-  },
-  { 
-    letter: "Š", 
-    urlKey: "sh",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
-    description: "Poglej video navodila za pravilno izgovorjavo črke Š"
-  },
-  { 
-    letter: "Z", 
-    urlKey: "z",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
-    description: "Poglej video navodila za pravilno izgovorjavo črke Z"
-  },
-  { 
-    letter: "Ž", 
-    urlKey: "zh",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
-    description: "Poglej video navodila za pravilno izgovorjavo črke Ž"
   },
 ];
 
