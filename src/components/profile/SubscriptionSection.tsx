@@ -220,7 +220,7 @@ export function SubscriptionSection() {
                 {isSubscribed && currentPlanId === 'pro' && (
                   <Check className="h-4 w-4 text-dragon-green" />
                 )}
-                <span className="bg-app-orange text-white text-xs px-1.5 py-0.5 rounded font-medium">
+                <span className="bg-app-orange text-black text-xs px-1.5 py-0.5 rounded font-medium">
                   -41%
                 </span>
               </TabsTrigger>
@@ -298,11 +298,9 @@ export function SubscriptionSection() {
                       {proPlan.name}
                     </h3>
                     <div className="flex items-baseline justify-center gap-2 mb-2">
+                      <span className="text-gray-400 line-through text-xl">{startPlan.price} €</span>
                       <span className="text-4xl font-bold">{proPlan.price} €</span>
                       <span className="text-gray-500">/mesec</span>
-                      <span className="bg-dragon-green text-white text-xs px-2 py-0.5 rounded-full font-medium">
-                        -41%
-                      </span>
                     </div>
                     <p className="text-sm text-gray-600">{proPlan.billingLabel}</p>
                   </div>
