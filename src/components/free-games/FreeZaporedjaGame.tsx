@@ -33,6 +33,13 @@ export default function FreeZaporedjaGame() {
     gameType: ageGroup as '34' | '56' | '78' | '910'
   };
 
+  // Handle game completion
+  const handleGameComplete = () => {
+    if (!hasRecordedThisSession) {
+      recordGamePlayed();
+    }
+  };
+
   if (!canPlay) {
     return <FreeLimitReachedDialog open={true} onOpenChange={() => {}} />;
   }
@@ -41,6 +48,7 @@ export default function FreeZaporedjaGame() {
     <GenericZaporedjaGame 
       config={config}
       backPath="/brezplacne-igre"
+      onGameComplete={handleGameComplete}
     />
   );
 }

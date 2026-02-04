@@ -27,6 +27,7 @@ interface GenericMetKockeGameProps {
   povedek: MetKockeWord[];
   predmet: MetKockeWord[];
   backPath?: string;
+  onGameComplete?: () => void;
 }
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public";
@@ -60,6 +61,7 @@ export function GenericMetKockeGame({
   povedek,
   predmet,
   backPath = '/govorne-igre/met-kocke',
+  onGameComplete,
 }: GenericMetKockeGameProps) {
   const navigate = useNavigate();
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -135,10 +137,11 @@ export function GenericMetKockeGame({
     }
     closeStarDialog();
     setShowNewGameButton(true);
+    onGameComplete?.();
     // Check for trophy after claiming star
     await new Promise(resolve => setTimeout(resolve, 500));
     await checkForNewTrophy();
-  }, [recordExerciseCompletion, letter, selectedBitje, bitje, incrementProgress, closeStarDialog, checkForNewTrophy]);
+  }, [recordExerciseCompletion, letter, selectedBitje, bitje, incrementProgress, closeStarDialog, checkForNewTrophy, onGameComplete]);
 
   // Column headers
   const columns = ['OSEBEK', 'POVEDEK', 'PREDMET'];

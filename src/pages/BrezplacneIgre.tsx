@@ -51,7 +51,7 @@ export default function BrezplacneIgre() {
             <div className="text-center">
               <h1 className="text-xl font-bold text-dragon-green">BREZPLAČNE IGRE</h1>
               <p className="text-sm text-muted-foreground">
-                Preostale igre danes: <span className="font-bold text-dragon-green">{remainingGames}/3</span>
+                Preostale igre danes: <span className="font-bold text-dragon-green">{remainingGames}</span>
               </p>
             </div>
 

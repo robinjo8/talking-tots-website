@@ -20,9 +20,10 @@ import type { DrsnaSestavljankaGameConfig } from "@/data/drsnaSestavljankaConfig
 interface GenericDrsnaSestavljankaGameProps {
   config: DrsnaSestavljankaGameConfig;
   backPath?: string;
+  onGameComplete?: () => void;
 }
 
-export function GenericDrsnaSestavljankaGame({ config, backPath = '/govorne-igre/drsna-sestavljanka' }: GenericDrsnaSestavljankaGameProps) {
+export function GenericDrsnaSestavljankaGame({ config, backPath = '/govorne-igre/drsna-sestavljanka', onGameComplete }: GenericDrsnaSestavljankaGameProps) {
   const navigate = useNavigate();
   const { recordGameCompletion } = useEnhancedProgress();
   const { checkForNewTrophy } = useTrophyContext();
@@ -91,6 +92,7 @@ export function GenericDrsnaSestavljankaGame({ config, backPath = '/govorne-igre
       : undefined;
     recordGameCompletion('sliding_puzzle', config.trackingId, logopedistChildId);
     setShowNewGameButton(true);
+    onGameComplete?.();
     // Check for trophy only in user mode
     if (gameMode.mode === 'user') {
       await new Promise(resolve => setTimeout(resolve, 500));

@@ -20,7 +20,7 @@ export default function FreeSpominGame() {
     queryKey: 'memoryCardsK',
   };
 
-  // Handle game completion (when all pairs found)
+  // Handle game completion (when star claimed)
   const handleGameComplete = () => {
     if (!hasRecordedThisSession) {
       recordGamePlayed();
@@ -35,6 +35,7 @@ export default function FreeSpominGame() {
     <GenericSpominGame 
       config={config}
       backPath="/brezplacne-igre"
+      onGameComplete={handleGameComplete}
     />
   );
 }

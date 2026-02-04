@@ -15,6 +15,13 @@ export default function FreeLabirintGame() {
   // K letter configuration for free games
   const config = getLabirintConfig('k');
 
+  // Handle game completion
+  const handleGameComplete = () => {
+    if (!hasRecordedThisSession) {
+      recordGamePlayed();
+    }
+  };
+
   if (!canPlay || !config) {
     return <FreeLimitReachedDialog open={true} onOpenChange={() => {}} />;
   }
@@ -23,6 +30,7 @@ export default function FreeLabirintGame() {
     <GenericLabirintGame 
       config={config}
       backPath="/brezplacne-igre"
+      onGameComplete={handleGameComplete}
     />
   );
 }

@@ -40,6 +40,13 @@ export default function FreeIgraUjemanjaGame() {
     trackingId: `free_matching_k_${settings.requiredAgeGroup}`
   };
 
+  // Handle game completion
+  const handleGameComplete = () => {
+    if (!hasRecordedThisSession) {
+      recordGamePlayed();
+    }
+  };
+
   if (!canPlay) {
     return <FreeLimitReachedDialog open={true} onOpenChange={() => {}} />;
   }
@@ -48,6 +55,7 @@ export default function FreeIgraUjemanjaGame() {
     <GenericIgraUjemanjaGame 
       config={config}
       backPath="/brezplacne-igre"
+      onGameComplete={handleGameComplete}
     />
   );
 }

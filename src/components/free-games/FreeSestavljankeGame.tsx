@@ -42,6 +42,13 @@ export default function FreeSestavljankeGame() {
     images: kImages
   };
 
+  // Handle game completion
+  const handleGameComplete = () => {
+    if (!hasRecordedThisSession) {
+      recordGamePlayed();
+    }
+  };
+
   if (!canPlay) {
     return <FreeLimitReachedDialog open={true} onOpenChange={() => {}} />;
   }
@@ -50,6 +57,7 @@ export default function FreeSestavljankeGame() {
     <GenericSestavljankaGame 
       config={config}
       backPath="/brezplacne-igre"
+      onGameComplete={handleGameComplete}
     />
   );
 }

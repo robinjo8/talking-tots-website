@@ -42,9 +42,10 @@ const config910: SequenceGameConfig = {
 interface GenericZaporedjaGameProps {
   config: ZaporedjaGameConfig;
   backPath?: string;
+  onGameComplete?: () => void;
 }
 
-export function GenericZaporedjaGame({ config, backPath = '/govorne-igre/zaporedja' }: GenericZaporedjaGameProps) {
+export function GenericZaporedjaGame({ config, backPath = '/govorne-igre/zaporedja', onGameComplete }: GenericZaporedjaGameProps) {
   const navigate = useNavigate();
   const gameMode = useGameMode();
   const { recordGameCompletion } = useEnhancedProgress();
@@ -202,6 +203,7 @@ export function GenericZaporedjaGame({ config, backPath = '/govorne-igre/zapored
     recordGameCompletion('memory', config.trackingId, logopedistChildId);
     setShowCompletion(false);
     setShowNewGameButton(true);
+    onGameComplete?.();
     // Check for trophy only in user mode
     if (gameMode.mode === 'user') {
       await new Promise(resolve => setTimeout(resolve, 500));

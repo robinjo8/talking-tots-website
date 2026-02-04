@@ -5,12 +5,19 @@ import { PonoviPovedGame } from "@/components/games/PonoviPovedGame";
 import { ponoviPovedK } from "@/data/ponoviPovedConfig";
 
 export default function FreePonoviPovedGame() {
-  const { canPlay, resetSessionRecording } = useFreeGameContext();
+  const { canPlay, recordGamePlayed, hasRecordedThisSession, resetSessionRecording } = useFreeGameContext();
 
   // Reset session recording when component mounts
   useEffect(() => {
     resetSessionRecording();
   }, [resetSessionRecording]);
+
+  // Handle game completion
+  const handleGameComplete = () => {
+    if (!hasRecordedThisSession) {
+      recordGamePlayed();
+    }
+  };
 
   if (!canPlay) {
     return <FreeLimitReachedDialog open={true} onOpenChange={() => {}} />;
@@ -20,6 +27,7 @@ export default function FreePonoviPovedGame() {
     <PonoviPovedGame 
       config={ponoviPovedK}
       backPath="/brezplacne-igre"
+      onGameComplete={handleGameComplete}
     />
   );
 }

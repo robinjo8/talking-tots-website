@@ -26,9 +26,10 @@ interface GenericBingoGameProps {
   wordsData: BingoWordData[];
   exerciseId: string;
   backPath?: string;
+  onGameComplete?: () => void;
 }
 
-export function GenericBingoGame({ letter, displayLetter, title, wordsData, exerciseId, backPath = '/govorno-jezikovne-vaje/artikulacija' }: GenericBingoGameProps) {
+export function GenericBingoGame({ letter, displayLetter, title, wordsData, exerciseId, backPath = '/govorno-jezikovne-vaje/artikulacija', onGameComplete }: GenericBingoGameProps) {
   const navigate = useNavigate();
   const [showInstructions, setShowInstructions] = useState(false);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
@@ -124,6 +125,7 @@ export function GenericBingoGame({ letter, displayLetter, title, wordsData, exer
     setStarClaimed(true);
     setShowCongratulations(false);
     setShowNewGameButton(true);
+    onGameComplete?.();
     // Check for trophy after claiming star
     await new Promise(resolve => setTimeout(resolve, 500));
     await checkForNewTrophy();

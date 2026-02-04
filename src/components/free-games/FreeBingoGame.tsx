@@ -33,7 +33,7 @@ const bingoWordsK = [
 ];
 
 export default function FreeBingoGame() {
-  const { canPlay, resetSessionRecording } = useFreeGameContext();
+  const { canPlay, recordGamePlayed, hasRecordedThisSession, resetSessionRecording } = useFreeGameContext();
 
   // Reset session recording when component mounts
   useEffect(() => {
@@ -45,6 +45,13 @@ export default function FreeBingoGame() {
     const shuffled = [...bingoWordsK].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, 25);
   }, []);
+
+  // Handle game completion
+  const handleGameComplete = () => {
+    if (!hasRecordedThisSession) {
+      recordGamePlayed();
+    }
+  };
 
   if (!canPlay) {
     return <FreeLimitReachedDialog open={true} onOpenChange={() => {}} />;
@@ -58,6 +65,7 @@ export default function FreeBingoGame() {
       wordsData={wordsData}
       exerciseId="free-bingo-k"
       backPath="/brezplacne-igre"
+      onGameComplete={handleGameComplete}
     />
   );
 }
