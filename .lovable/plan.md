@@ -1,76 +1,62 @@
 
+# Načrt: Popravek podvojene slike v igri Spomin za črko K
 
-# Načrt: Posodobitev pragov težavnosti za Levenshtein podobnost
+## Ugotovljen problem
 
-## Povzetek
+V tabeli `memory_cards_K` sta dve vrstici, ki uporabljata **isto sliko** `kokos1.webp`:
 
-Posodobitev pragov podobnosti za preverjanje izgovorjave na novih vrednostih:
+| ID | Beseda | Trenutna slika | Trenutni zvok |
+|----|--------|----------------|---------------|
+| `424423f9-...` | kokos (sadež) | `kokos1.webp` ❌ | `kokos_1.m4a` ❌ |
+| `c1a84a3e-...` | KOKOŠ (kokoška) | `kokos1.webp` ✅ | `kokos_1.m4a` ✅ |
 
-| Dolžina besede | NIZKA | SREDNJA | VISOKA |
-|----------------|-------|---------|--------|
-| 3 črke | 0.0 (0%) | 0.33 (33%) | 0.65 (65%) |
-| 4 črke | 0.0 (0%) | 0.50 (50%) | 0.70 (70%) |
-| 5 črk | 0.0 (0%) | 0.50 (50%) | 0.75 (75%) |
-| 6 črk | 0.0 (0%) | 0.50 (50%) | 0.65 (65%) |
+## Pravilne vrednosti
 
-## Spremembe
+Na podlagi ostalih konfiguracijskih datotek (`matchingGameData.ts`, `puzzleImages.ts`, `threeColumnMatchingData.ts`):
 
-### 1. Frontend hook (src/hooks/useArticulationSettings.ts)
+| Beseda | Pravilna slika | Pravilni zvok |
+|--------|----------------|---------------|
+| **KOKOŠ** (hen) | `kokos1.webp` | `kokos_1.m4a` |
+| **KOKOS** (coconut) | `kokos_sadez1.webp` | `kokos_sadez.m4a` |
 
-**Vrstica 24-28** - Posodobitev konstante `SIMILARITY_THRESHOLDS`:
+## Potrebna sprememba
 
-```typescript
-// PREJ:
-const SIMILARITY_THRESHOLDS: Record<DifficultyLevel, Record<number, number>> = {
-  nizka: { 3: 0.33, 4: 0.25, 5: 0.35, 6: 0.30 },
-  srednja: { 3: 0.65, 4: 0.50, 5: 0.50, 6: 0.50 },
-  visoka: { 3: 0.65, 4: 0.70, 5: 0.75, 6: 0.65 },
-};
+**Posodobitev vrstice v Supabase** za besedo "kokos" (ID: `424423f9-932d-404a-aad5-67fd80488f92`):
 
-// POTEM:
-const SIMILARITY_THRESHOLDS: Record<DifficultyLevel, Record<number, number>> = {
-  nizka: { 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.0 },
-  srednja: { 3: 0.33, 4: 0.50, 5: 0.50, 6: 0.50 },
-  visoka: { 3: 0.65, 4: 0.70, 5: 0.75, 6: 0.65 },
-};
+```sql
+UPDATE "memory_cards_K"
+SET 
+  image_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/kokos_sadez1.webp',
+  audio_url = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/kokos_sadez.m4a'
+WHERE id = '424423f9-932d-404a-aad5-67fd80488f92';
 ```
 
-### 2. Backend Edge function (supabase/functions/transcribe-articulation/index.ts)
+## Preverjanje ostalih tabel
 
-**Vrstica 74-78** - Posodobitev funkcije `getThresholdForWord`:
+Preveril sem vse ostale tabele za igro Spomin:
+- `memory_cards_c` ✅ Brez podvojenih slik
+- `memory_cards_Č` ✅ Brez podvojenih slik
+- `memory_cards_l` ✅ Brez podvojenih slik
+- `memory_cards_r` ✅ Brez podvojenih slik
+- `memory_cards_S` ✅ Brez podvojenih slik
+- `memory_cards_Š_duplicate` ✅ Brez podvojenih slik
+- `memory_cards_z` ✅ Brez podvojenih slik
+- `memory_cards_Ž` ✅ Brez podvojenih slik
 
-```typescript
-// PREJ:
-const thresholds: Record<string, Record<number, number>> = {
-  nizka:   { 3: 0.33, 4: 0.25, 5: 0.35, 6: 0.30 },
-  srednja: { 3: 0.65, 4: 0.50, 5: 0.50, 6: 0.50 },
-  visoka:  { 3: 0.65, 4: 0.70, 5: 0.75, 6: 0.65 },
-};
+**Edina napaka je v tabeli `memory_cards_K`** za besedo "kokos".
 
-// POTEM:
-const thresholds: Record<string, Record<number, number>> = {
-  nizka:   { 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.0 },
-  srednja: { 3: 0.33, 4: 0.50, 5: 0.50, 6: 0.50 },
-  visoka:  { 3: 0.65, 4: 0.70, 5: 0.75, 6: 0.65 },
-};
+## Vizualni rezultat
+
+Po popravku bodo v igri Spomin za črko K prikazane pravilne slike:
+
+```text
+┌─────────────┐     ┌─────────────┐
+│  🥥 KOKOS   │     │  🐔 KOKOŠ   │
+│  (sadež)    │     │  (kokoška)  │
+│ kokos_sadez │     │   kokos1    │
+└─────────────┘     └─────────────┘
 ```
 
-## Vpliv sprememb
+## Tehnična opomba
 
-| Težavnost | Učinek |
-|-----------|--------|
-| **Nizka** | Vsaka izgovorjena beseda bo sprejeta (0% prag) - idealno za mlajše otroke |
-| **Srednja** | Zmeren prag - 33% za kratke besede, 50% za daljše |
-| **Visoka** | Strožji prag - 65-75% podobnosti |
-
-## Datoteke za spremembo
-
-| Datoteka | Vrstice | Sprememba |
-|----------|---------|-----------|
-| `src/hooks/useArticulationSettings.ts` | 24-28 | Posodobitev pragov |
-| `supabase/functions/transcribe-articulation/index.ts` | 74-78 | Posodobitev pragov |
-
-## Opomba
-
-Po spremembi Edge funkcije bo potrebno ponovno uvesti funkcijo (deploy), da se spremembe uveljavijo na strežniku.
-
+Ta popravek je izključno v podatkovni bazi (Supabase). Koda aplikacije ne potrebuje sprememb - logika v `useGenericMemoryGame.tsx` pravilno uporablja `pairId` za ujemanje parov, slika pa se naloži iz polja `image_url` v tabeli.
