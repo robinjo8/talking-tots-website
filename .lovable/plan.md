@@ -1,167 +1,127 @@
 
 
-# Nacrt: Zamenjava "Crka" z "Glas" na vseh straneh
+# Načrt: Sprememba vrstnega reda črk na S Z C Š Ž Č K L R
 
 ## Povzetek
 
-Zamenjati je potrebno vse pojave "Crka X" z "Glas X" (npr. "Crka C" -> "Glas C") za vse crke: C, C, K, L, R, S, S, Z, Z.
+Zamenjati je potrebno vrstni red črk v vseh izbirnikih za igre in video navodila:
 
-## Ugotovitve iz raziskave
+| Trenutni vrstni red | Novi vrstni red |
+|---------------------|-----------------|
+| C, Č, K, L, R, S, Š, Z, Ž | **S, Z, C, Š, Ž, Č, K, L, R** |
 
-Nasli smo **359 pojavov** besede "Crka" v **39 datotekah**. Spremembe so razdeljene na dve vrsti:
+## Prizadete datoteke
 
-### Tip 1: Staticni naslovi v konfiguracijah (title: "Crka X")
-Te datoteke vsebujejo hardkodane naslove v data arrayih:
+Spremembe se nanašajo na **20 datotek** (10 uporabniških + 9 admin + 1 konfiguracija):
 
-| Datoteka | Stevilo zamenjav |
-|----------|------------------|
-| `src/pages/KoloSreceGames.tsx` | 9x |
-| `src/pages/BingoGames.tsx` | 9x |
-| `src/pages/admin/games/AdminKoloSreceGames.tsx` | 9x |
-| `src/pages/admin/games/AdminBingoGames.tsx` | 9x |
-| `src/data/metKockeConfig.ts` | 9x |
+### Uporabniški portal (10 datotek)
 
-### Tip 2: Dinamicni napisi z template literali
-Te datoteke uporabljajo obliko `` `Crka ${letter}` `` ali "Crka {game.letter}":
-
-| Datoteka | Lokacija |
-|----------|----------|
-| `src/pages/SpominGames.tsx` | h3 naslov + alt atribut |
-| `src/pages/admin/games/AdminSpominGames.tsx` | h3 naslov + alt atribut |
-| `src/pages/VideoNavodila.tsx` | h3 naslov + alt atribut |
-| `src/pages/admin/AdminVideoNavodila.tsx` | h3 naslov + alt atribut |
-| `src/pages/Zaporedja.tsx` | h3 naslov + alt atribut |
-| `src/pages/SestavljankeGames.tsx` | h3 naslov + alt atribut |
-| `src/pages/DrsnaSestavljanka.tsx` | h3 naslov + alt atribut |
-| `src/pages/IgraUjemanja.tsx` | h3 naslov + alt atribut |
-| `src/pages/MetKockeGames.tsx` | alt atribut |
-| `src/pages/PonoviPoved.tsx` | h3 naslov + alt atribut |
-| `src/pages/ArtikulacijaVaje.tsx` | alt atribut |
-| `src/pages/admin/games/AdminSestavljankeGames.tsx` | h3 naslov + alt atribut |
-| `src/pages/admin/games/AdminLabirintGames.tsx` | h3 naslov + alt atribut |
-| `src/pages/admin/games/AdminZaporedjaGames.tsx` | h3 naslov + alt atribut |
-| `src/pages/admin/games/AdminDrsnaSestavljankaGames.tsx` | h3 naslov + alt atribut |
-| `src/pages/admin/games/AdminPonoviPovedGames.tsx` | h3 naslov + alt atribut |
-| `src/pages/admin/games/AdminIgraUjemanjaGames.tsx` | h3 naslov + alt atribut |
-| `src/pages/admin/exercises/AdminArtikulacijaVaje.tsx` | h3 naslov + alt atribut |
-| `src/data/poveziPareConfig.ts` | fallback description |
-
-### Datoteke BREZ sprememb
-Te vsebujejo kontekstualne omembe (npr. navodila, komentarji) in ne bodo spremenjene:
-- `src/components/articulation/ArticulationTestInstructionsDialog.tsx` - navodila za test
-- `src/components/CookieSettingsDialog.tsx` - tehnicni opis
-- `src/components/admin/LetterAccordion.tsx` - uporablja "CRKA" (druga oblika)
-- `src/hooks/useSessionReview.ts` - komentar v kodi
-
-## Seznam sprememb po datotekah
-
-### Uporabniski portal (8 datotek)
-
-1. **`src/pages/SpominGames.tsx`**
-   - Vrstica 140: `alt={`Crka ${game.letter}`}` -> `alt={`Glas ${game.letter}`}`
-   - Vrstica 150: `Crka {game.letter}` -> `Glas {game.letter}`
-
-2. **`src/pages/KoloSreceGames.tsx`**
-   - Vrstice 18-26: `title: "Crka X"` -> `title: "Glas X"` (9x za vse crke)
-
-3. **`src/pages/BingoGames.tsx`**
-   - Vrstice 17-25: `title: "Crka X"` -> `title: "Glas X"` (9x za vse crke)
-
-4. **`src/pages/VideoNavodila.tsx`**
-   - Vrstica 92: `alt={`Crka ${letter.letter}`}` -> `alt={`Glas ${letter.letter}`}`
-   - Vrstica 105: `Crka {letter.letter}` -> `Glas {letter.letter}`
-
-5. **`src/pages/Zaporedja.tsx`**
-   - Vrstica 161: `alt={`Crka ${game.letter}`}` -> `alt={`Glas ${game.letter}`}`
-   - Vrstica 171: `Crka {game.letter}` -> `Glas {game.letter}`
-
-6. **`src/pages/SestavljankeGames.tsx`**
-   - Vrstica 167: `alt={`Crka ${game.letter}`}` -> `alt={`Glas ${game.letter}`}`
-   - Vrstica 177: `Crka {game.letter}` -> `Glas {game.letter}`
-
-7. **`src/pages/DrsnaSestavljanka.tsx`**
-   - Vrstica 161: `alt={`Crka ${game.letter}`}` -> `alt={`Glas ${game.letter}`}`
-   - Vrstica 171: `Crka {game.letter}` -> `Glas {game.letter}`
-
-8. **`src/pages/IgraUjemanja.tsx`**
-   - Vrstica 160: `alt={`Crka ${game.letter}`}` -> `alt={`Glas ${game.letter}`}`
-   - Vrstica 170: `Crka {game.letter}` -> `Glas {game.letter}`
-
-9. **`src/pages/MetKockeGames.tsx`**
-   - Vrstica 79: `alt={`Crka ${game.letter}`}` -> `alt={`Glas ${game.letter}`}`
-
-10. **`src/pages/PonoviPoved.tsx`**
-    - Vrstica 148: `alt={`Crka ${letter.letter}`}` -> `alt={`Glas ${letter.letter}`}`
-    - Vrstica 158: `Crka {letter.letter}` -> `Glas {letter.letter}`
-
-11. **`src/pages/ArtikulacijaVaje.tsx`**
-    - Vrstica 55: `alt={`Crka ${letter.letter}`}` -> `alt={`Glas ${letter.letter}`}`
+| Datoteka | Array za preureditev | Št. vrstic |
+|----------|---------------------|-------------|
+| `src/pages/KoloSreceGames.tsx` | `wheelLetters` | vrstice 17-27 |
+| `src/pages/BingoGames.tsx` | `bingoLetters` | vrstice 16-26 |
+| `src/pages/SpominGames.tsx` | `memoryGames` | vrstice 17-99 |
+| `src/pages/VideoNavodila.tsx` | `videoLetters` | vrstice 7-53 |
+| `src/pages/Zaporedja.tsx` | `sequenceGames` | vrstice 15-88 |
+| `src/pages/SestavljankeGames.tsx` | `memoryGames` | vrstice 15-88 |
+| `src/pages/DrsnaSestavljanka.tsx` | `memoryGames` | vrstice 16-89 |
+| `src/pages/IgraUjemanja.tsx` | `matchingGames` | vrstice 16-89 |
+| `src/pages/MetKockeGames.tsx` | uporablja `metKockeConfig.ts` | - |
+| `src/pages/PonoviPoved.tsx` | `ponoviPovedLetters` | vrstice 15-97 |
 
 ### Admin portal (9 datotek)
 
-12. **`src/pages/admin/games/AdminSpominGames.tsx`**
-    - Vrstica 97: `alt={`Crka ${game.letter}`}` -> `alt={`Glas ${game.letter}`}`
-    - Vrstica 107: `Crka {game.letter}` -> `Glas {game.letter}`
+| Datoteka | Array za preureditev |
+|----------|---------------------|
+| `src/pages/admin/games/AdminKoloSreceGames.tsx` | `wheelLetters` |
+| `src/pages/admin/games/AdminBingoGames.tsx` | `bingoLetters` |
+| `src/pages/admin/games/AdminSpominGames.tsx` | `memoryGames` |
+| `src/pages/admin/AdminVideoNavodila.tsx` | `videoLetters` |
+| `src/pages/admin/games/AdminSestavljankeGames.tsx` | `sestavljankeLetters` |
+| `src/pages/admin/games/AdminLabirintGames.tsx` | `labirintLetters` |
+| `src/pages/admin/games/AdminZaporedjaGames.tsx` | `zaporedjaLetters` |
+| `src/pages/admin/games/AdminDrsnaSestavljankaGames.tsx` | `drsnaSestavljankaLetters` |
+| `src/pages/admin/games/AdminPonoviPovedGames.tsx` | `ponoviPovedLetters` |
+| `src/pages/admin/games/AdminIgraUjemanjaGames.tsx` | `igraUjemanjaLetters` |
 
-13. **`src/pages/admin/games/AdminKoloSreceGames.tsx`**
-    - Vrstice 6-14: `title: "Crka X"` -> `title: "Glas X"` (9x)
+### Konfiguracijska datoteka (1 datoteka)
 
-14. **`src/pages/admin/games/AdminBingoGames.tsx`**
-    - Vrstice 6-14: `title: "Crka X"` -> `title: "Glas X"` (9x)
+| Datoteka | Array za preureditev |
+|----------|---------------------|
+| `src/data/metKockeConfig.ts` | `metKockeLetters` (vrstice 264-274) |
+| `src/data/poveziPareConfig.ts` | `lettersByAge` arraye |
 
-15. **`src/pages/admin/AdminVideoNavodila.tsx`**
-    - Vrstica 86: `alt={`Crka ${letter.letter}`}` -> `alt={`Glas ${letter.letter}`}`
-    - Vrstica 98: `Crka {letter.letter}` -> `Glas {letter.letter}`
+## Primer spremembe
 
-16. **`src/pages/admin/games/AdminSestavljankeGames.tsx`**
-    - Vrstica 48: `alt={`Crka ${item.letter}`}` -> `alt={`Glas ${item.letter}`}`
-    - Vrstica 56: `Crka {item.letter}` -> `Glas {item.letter}`
+### Prej (KoloSreceGames.tsx):
+```typescript
+const wheelLetters = [
+  { id: "c", letter: "C", ... },
+  { id: "ch", letter: "Č", ... },
+  { id: "k", letter: "K", ... },
+  { id: "l", letter: "L", ... },
+  { id: "r", letter: "R", ... },
+  { id: "s", letter: "S", ... },
+  { id: "sh", letter: "Š", ... },
+  { id: "z", letter: "Z", ... },
+  { id: "zh", letter: "Ž", ... },
+];
+```
 
-17. **`src/pages/admin/games/AdminLabirintGames.tsx`**
-    - Vrstica 48: `alt={`Crka ${item.letter}`}` -> `alt={`Glas ${item.letter}`}`
-    - Vrstica 56: `Crka {item.letter}` -> `Glas {item.letter}`
+### Potem:
+```typescript
+const wheelLetters = [
+  { id: "s", letter: "S", ... },   // 1. S
+  { id: "z", letter: "Z", ... },   // 2. Z
+  { id: "c", letter: "C", ... },   // 3. C
+  { id: "sh", letter: "Š", ... },  // 4. Š
+  { id: "zh", letter: "Ž", ... },  // 5. Ž
+  { id: "ch", letter: "Č", ... },  // 6. Č
+  { id: "k", letter: "K", ... },   // 7. K
+  { id: "l", letter: "L", ... },   // 8. L
+  { id: "r", letter: "R", ... },   // 9. R
+];
+```
 
-18. **`src/pages/admin/games/AdminZaporedjaGames.tsx`**
-    - Vrstica 48: `alt={`Crka ${item.letter}`}` -> `alt={`Glas ${item.letter}`}`
-    - Vrstica 56: `Crka {item.letter}` -> `Glas {item.letter}`
+## Posebni primeri
 
-19. **`src/pages/admin/games/AdminDrsnaSestavljankaGames.tsx`**
-    - Vrstica 48: `alt={`Crka ${item.letter}`}` -> `alt={`Glas ${item.letter}`}`
-    - Vrstica 56: `Crka {item.letter}` -> `Glas {item.letter}`
+### 1. poveziPareConfig.ts - Starostna skupina 3-4
 
-20. **`src/pages/admin/games/AdminPonoviPovedGames.tsx`**
-    - Vrstica 48: `alt={`Crka ${item.letter}`}` -> `alt={`Glas ${item.letter}`}`
-    - Vrstica 56: `Crka {item.letter}` -> `Glas {item.letter}`
+Ta skupina ima samo 4 črke. Novi vrstni red bo:
 
-21. **`src/pages/admin/games/AdminIgraUjemanjaGames.tsx`**
-    - Vrstica 48: `alt={`Crka ${item.letter}`}` -> `alt={`Glas ${item.letter}`}`
+| Trenutno | Novo |
+|----------|------|
+| C, Č, K, L | **C, Č, K, L** (brez sprememb - te črke niso v prvih 5 novega reda) |
 
-22. **`src/pages/admin/exercises/AdminArtikulacijaVaje.tsx`**
-    - Vrstice 52, 60, 84: zamenjave alt in h3
+Ker se črke S, Z, Š, Ž ne pojavljajo pri starostni skupini 3-4, bo vrstni red ostal:
+- **C, Č, K, L** (iz novega reda vzamemo samo te, ki so na voljo)
 
-### Konfiguracijske datoteke (2 datoteki)
+### 2. metKockeConfig.ts
 
-23. **`src/data/metKockeConfig.ts`**
-    - Vrstice 265-273: `title: "Crka X"` -> `title: "Glas X"` (9x)
-
-24. **`src/data/poveziPareConfig.ts`**
-    - Vrstice 132, 159: `description: ... `Crka ${letter}`` -> `description: ... `Glas ${letter}``
+Ta datoteka vsebuje `metKockeLetters` array, ki ga uporablja MetKockeGames.tsx.
 
 ## Skupaj
 
-| Kategorija | St. datotek | St. zamenjav |
-|------------|-------------|--------------|
-| Uporabniski portal | 11 | ~40 |
-| Admin portal | 11 | ~40 |
-| Konfiguracije | 2 | ~30 |
-| **SKUPAJ** | **24** | **~110** |
+| Kategorija | Št. datotek |
+|------------|-------------|
+| Uporabniški portal | 10 |
+| Admin portal | 10 |
+| Konfiguracije | 2 |
+| **SKUPAJ** | **22** |
 
 ## Vizualni rezultat
 
-| Prej | Potem |
-|------|-------|
-| Crka C | Glas C |
-| Crka C | Glas C |
-| Crka K | Glas K |
-| ... | ... |
+Po spremembi bodo kartice na vseh straneh prikazane v tem vrstnem redu:
+
+```text
+┌───┐ ┌───┐ ┌───┐
+│ S │ │ Z │ │ C │
+└───┘ └───┘ └───┘
+┌───┐ ┌───┐ ┌───┐
+│ Š │ │ Ž │ │ Č │
+└───┘ └───┘ └───┘
+┌───┐ ┌───┐ ┌───┐
+│ K │ │ L │ │ R │
+└───┘ └───┘ └───┘
+```
 
