@@ -218,7 +218,6 @@ export function PricingSection() {
                     {proPlan.name}
                   </h3>
                   <div className="flex items-baseline justify-center gap-2 mb-1 md:mb-2">
-                    <span className="text-gray-400 line-through text-lg md:text-xl">{startPlan.price} €</span>
                     <span className="text-3xl md:text-4xl font-bold">{proPlan.price} €</span>
                     <span className="text-gray-500 text-sm md:text-base">/mesec</span>
                   </div>

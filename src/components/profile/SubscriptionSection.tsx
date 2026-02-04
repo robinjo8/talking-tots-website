@@ -298,7 +298,6 @@ export function SubscriptionSection() {
                       {proPlan.name}
                     </h3>
                     <div className="flex items-baseline justify-center gap-2 mb-2">
-                      <span className="text-gray-400 line-through text-xl">{startPlan.price} €</span>
                       <span className="text-4xl font-bold">{proPlan.price} €</span>
                       <span className="text-gray-500">/mesec</span>
                     </div>
