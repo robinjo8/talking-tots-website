@@ -112,6 +112,17 @@ export const HeroSection = () => {
               >
                 {user ? "Izvedite več" : "Kupi TomiTalk"}
               </Button>
+
+              {user && !isSubscribed && !isLoading && (
+                <Button
+                  onClick={() => navigate("/brezplacne-igre")}
+                  size="lg"
+                  variant="outline"
+                  className="border-2 border-app-orange text-app-orange hover:bg-app-orange/10 font-semibold px-8 py-5 md:py-6 text-lg"
+                >
+                  Brezplačne igre
+                </Button>
+              )}
             </div>
 
             {/* Trust Badges - Hidden on mobile */}
