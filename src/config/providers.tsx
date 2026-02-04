@@ -9,6 +9,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { PWAProvider } from "@/components/pwa/PWAProvider";
 import { TrophyProvider } from "@/contexts/TrophyContext";
+import { FreeGameProvider } from "@/contexts/FreeGameContext";
 
 const queryClient = new QueryClient();
 
@@ -25,11 +26,13 @@ export function AppProviders({ children }: AppProvidersProps) {
             <AuthProvider>
               <SubscriptionProvider>
                 <TrophyProvider>
-                  <PWAProvider>
-                    <Toaster />
-                    <Sonner />
-                    {children}
-                  </PWAProvider>
+                  <FreeGameProvider>
+                    <PWAProvider>
+                      <Toaster />
+                      <Sonner />
+                      {children}
+                    </PWAProvider>
+                  </FreeGameProvider>
                 </TrophyProvider>
               </SubscriptionProvider>
             </AuthProvider>

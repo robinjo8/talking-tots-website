@@ -51,6 +51,20 @@ const MojaStran = lazy(() => import("@/pages/MojaStran"));
 const MojeAplikacije = lazy(() => import("@/pages/MojeAplikacije"));
 const GovorneIgre = lazy(() => import("@/pages/GovorneIgre"));
 
+// Free games page
+const BrezplacneIgre = lazy(() => import("@/pages/BrezplacneIgre"));
+
+// Free game wrappers
+const FreeSpominGame = lazy(() => import("@/components/free-games/FreeSpominGame"));
+const FreeSestavljankeGame = lazy(() => import("@/components/free-games/FreeSestavljankeGame"));
+const FreeLabirintGame = lazy(() => import("@/components/free-games/FreeLabirintGame"));
+const FreeZaporedjaGame = lazy(() => import("@/components/free-games/FreeZaporedjaGame"));
+const FreeDrsnaSestavljankaGame = lazy(() => import("@/components/free-games/FreeDrsnaSestavljankaGame"));
+const FreeIgraUjemanjaGame = lazy(() => import("@/components/free-games/FreeIgraUjemanjaGame"));
+const FreeBingoGame = lazy(() => import("@/components/free-games/FreeBingoGame"));
+const FreeMetKockeGame = lazy(() => import("@/components/free-games/FreeMetKockeGame"));
+const FreePonoviPovedGame = lazy(() => import("@/components/free-games/FreePonoviPovedGame"));
+
 // Govorno-jezikovne vaje
 const GovornojezicovneVaje = lazy(() => import("@/pages/GovornojezicovneVaje"));
 const VajeMotorikeGovoril = lazy(() => import("@/pages/VajeMotorikeGovoril"));
@@ -129,6 +143,18 @@ export function AppRoutes() {
       <Route path="/profile" element={<ProtectedLazyRoute><Profile /></ProtectedLazyRoute>} />
       <Route path="/moja-stran" element={<ProtectedLazyRoute><MojaStran /></ProtectedLazyRoute>} />
       <Route path="/moje-aplikacije" element={<ProtectedLazyRoute><MojeAplikacije /></ProtectedLazyRoute>} />
+      
+      {/* Brezplačne igre routes - for registered users without subscription */}
+      <Route path="/brezplacne-igre" element={<ProtectedLazyRoute><BrezplacneIgre /></ProtectedLazyRoute>} />
+      <Route path="/brezplacne-igre/spomin" element={<ProtectedLazyRoute><FreeSpominGame /></ProtectedLazyRoute>} />
+      <Route path="/brezplacne-igre/sestavljanke" element={<ProtectedLazyRoute><FreeSestavljankeGame /></ProtectedLazyRoute>} />
+      <Route path="/brezplacne-igre/labirint" element={<ProtectedLazyRoute><FreeLabirintGame /></ProtectedLazyRoute>} />
+      <Route path="/brezplacne-igre/zaporedja" element={<ProtectedLazyRoute><FreeZaporedjaGame /></ProtectedLazyRoute>} />
+      <Route path="/brezplacne-igre/drsna-sestavljanka" element={<ProtectedLazyRoute><FreeDrsnaSestavljankaGame /></ProtectedLazyRoute>} />
+      <Route path="/brezplacne-igre/igra-ujemanja" element={<ProtectedLazyRoute><FreeIgraUjemanjaGame /></ProtectedLazyRoute>} />
+      <Route path="/brezplacne-igre/bingo" element={<ProtectedLazyRoute><FreeBingoGame /></ProtectedLazyRoute>} />
+      <Route path="/brezplacne-igre/met-kocke" element={<ProtectedLazyRoute><FreeMetKockeGame /></ProtectedLazyRoute>} />
+      <Route path="/brezplacne-igre/ponovi-poved" element={<ProtectedLazyRoute><FreePonoviPovedGame /></ProtectedLazyRoute>} />
       
       {/* Govorno-jezikovne vaje */}
       <Route path="/govorno-jezikovne-vaje" element={<ProtectedLazyRoute><GovornojezicovneVaje /></ProtectedLazyRoute>} />
