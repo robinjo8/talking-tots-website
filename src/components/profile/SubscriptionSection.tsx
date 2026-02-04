@@ -220,8 +220,8 @@ export function SubscriptionSection() {
                 {isSubscribed && currentPlanId === 'pro' ? (
                   <Check className="h-4 w-4 text-dragon-green absolute -top-1 -right-1" />
                 ) : (
-                  <span className="absolute -top-2 -right-2 bg-dragon-green text-white text-xs px-2 py-0.5 rounded-full font-medium">
-                    Naj izbira
+                  <span className="absolute -top-2 -right-2 bg-app-orange text-white text-xs px-2 py-0.5 rounded-full font-medium border border-app-orange">
+                    -41%
                   </span>
                 )}
               </TabsTrigger>
