@@ -1,7 +1,7 @@
 // Centralna konfiguracija cenovnih paketov TomiTalk
 // Uporablja se v /cenik (PricingSection) in /profile (SubscriptionSection)
 
-export type PlanId = 'start' | 'plus' | 'pro';
+export type PlanId = 'start' | 'pro';
 
 export interface PricingPlan {
   id: PlanId;
@@ -12,7 +12,7 @@ export interface PricingPlan {
   billingLabel: string;
   tagline: string;
   badge: string | null;
-  color: 'app-blue' | 'app-orange' | 'dragon-green';
+  color: 'app-blue' | 'dragon-green';
   features: string[];
   isPopular?: boolean;
   stripePriceId: string;
@@ -25,21 +25,20 @@ export interface ProFeature {
   hasInfo: boolean;
 }
 
-// Funkcije vključene v TomiTalk Plus (prikazane v Pro info dialogu)
-export const plusIncludedFeatures = [
+// Funkcije vključene v TomiTalk Start (prikazane v Pro info dialogu)
+export const startIncludedFeatures = [
   "Interaktivne govornih igre",
   "Vaje za izgovorjavo glasov",
   "Vaje motorike govoril",
   "Video navodila logopeda",
   "Logopedski nasveti za starše",
   "Spodbujevalni model nagrajevanja",
-  "Dostop do vseh novih vsebin",
-  "Razširjene igre"
+  "Dostop do vseh novih vsebin"
 ];
 
 // Ekskluzivne Pro funkcije
 export const proExclusiveFeatures: ProFeature[] = [
-  { text: "Vse iz TomiTalk Plus", isBold: true, hasInfo: true },
+  { text: "Vse iz TomiTalk Start", isBold: true, hasInfo: true },
   { text: "Prilagojen osebni načrt", isBold: false, hasInfo: false },
   { text: "Preverjanje izgovorjave", isBold: false, hasInfo: false },
   { text: "Strokovna obravnava govora", isBold: false, hasInfo: false },
@@ -51,8 +50,7 @@ export const proExclusiveFeatures: ProFeature[] = [
 
 // Stripe tier mapping - maps product IDs to plan IDs
 export const stripeTiers: Record<string, PlanId> = {
-  'prod_TmbXrf2SNJLlHM': 'start',
-  'prod_TmbXaM32ndD11d': 'plus',
+  'prod_TuvCF2Vlvmvp3M': 'start',
   'prod_TmbZ19RhCaSzrp': 'pro'
 };
 
@@ -62,38 +60,16 @@ export const pricingPlans: PricingPlan[] = [
     id: 'start',
     name: 'TomiTalk Start',
     shortName: 'Start',
-    price: 17,
+    price: 22,
     billingPeriod: 'monthly',
     billingLabel: 'zaračunano mesečno',
     tagline: '"Vse, kar potrebuje otrok, da izboljša govor!"',
     badge: 'Fleksibilno',
     color: 'app-blue',
-    features: [
-      "Interaktivne govornih igre",
-      "Vaje za izgovorjavo glasov",
-      "Vaje motorike govoril",
-      "Video navodila logopeda",
-      "Logopedski nasveti za starše",
-      "Spodbujevalni model nagrajevanja"
-    ],
+    features: startIncludedFeatures,
     isPopular: false,
-    stripePriceId: 'price_1Sp2K9GncjlOci0kLq14l1pk',
-    stripeProductId: 'prod_TmbXrf2SNJLlHM'
-  },
-  {
-    id: 'plus',
-    name: 'TomiTalk Plus',
-    shortName: 'Plus',
-    price: 8,
-    billingPeriod: 'yearly',
-    billingLabel: 'zaračunano letno',
-    tagline: '"Vse, kar potrebuje otrok, da izboljša govor!"',
-    badge: 'Prihranek',
-    color: 'app-orange',
-    features: plusIncludedFeatures,
-    isPopular: false,
-    stripePriceId: 'price_1Sp2KqGncjlOci0krAzeJdIn',
-    stripeProductId: 'prod_TmbXaM32ndD11d'
+    stripePriceId: 'price_1Sx5LdGncjlOci0kzyrETHm7',
+    stripeProductId: 'prod_TuvCF2Vlvmvp3M'
   },
   {
     id: 'pro',
@@ -124,7 +100,6 @@ export const getPlanByProductId = (productId: string): PricingPlan | undefined =
 export const getColorClass = (color: PricingPlan['color'], type: 'text' | 'bg' | 'border'): string => {
   const colorMap = {
     'app-blue': { text: 'text-app-blue', bg: 'bg-app-blue', border: 'border-app-blue' },
-    'app-orange': { text: 'text-app-orange', bg: 'bg-app-orange', border: 'border-app-orange' },
     'dragon-green': { text: 'text-dragon-green', bg: 'bg-dragon-green', border: 'border-dragon-green' }
   };
   return colorMap[color][type];
