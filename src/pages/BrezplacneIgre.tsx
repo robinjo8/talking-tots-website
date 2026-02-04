@@ -75,6 +75,8 @@ export default function BrezplacneIgre() {
         <AgeSelectionDialog
           open={showAgeDialog}
           onAgeSelected={handleAgeSelected}
+          onClose={() => setShowAgeDialog(false)}
+          hasExistingAge={childAge !== null}
         />
       </div>
     </AppLayout>
