@@ -466,7 +466,7 @@ export default function AdminTests() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Izvor</TableHead>
+                    <TableHead>Uporabnik</TableHead>
                     <TableHead>Ime otroka</TableHead>
                     <TableHead>Starost</TableHead>
                     <TableHead>Spol</TableHead>
