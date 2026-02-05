@@ -1,185 +1,165 @@
 
-# Plan: Popravek prikaza stolpca "Starš" in manjkajočih podatkov o otrocih
+# Plan: Popravek pridobivanja posnetkov za organizacijske otroke v useSessionReview
 
 ## Povzetek problema
 
-Na straneh `/admin/pending`, `/admin/my-reviews` in `/admin/all-tests` se pojavljajo naslednje težave:
+Na strani `/admin/tests/{sessionId}` (AdminSessionReview) se za otroka Tian iz organizacije OŠ Test prikazuje **0 posnetkov**, medtem ko na strani `/admin/children/{childId}/details` prikazuje pravilno **10 posnetkov**.
 
-| Stran | Problem |
-|-------|---------|
-| AdminPending | Za organizacijske otroke prikaže "Logoped" namesto imena organizacije + logopeda |
-| AdminMyReviews | Ime otroka "Neznano", manjka starost in spol za organizacijske otroke |
-| AdminAllTests | Enako kot MyReviews - manjkajoči podatki za organizacijske otroke |
+### Vzrok
 
-## Vzrok problema
+Hook `useSessionReview.ts` ima dve napaki za organizacijske otroke (`source_type === 'logopedist'`):
 
-### 1. Hooki ne upoštevajo `source_type === 'logopedist'`
+| Problem | Trenutna koda | Pravilna koda |
+|---------|---------------|---------------|
+| **1. Pot do posnetkov** | `${session.parent_id}/${session.child_id}/...` | `logopedist-children/${logopedist_id}/${logopedist_child_id}/...` |
+| **2. Podatki o otroku** | Išče v tabeli `children` (vrne null) | Mora iskati v tabeli `logopedist_children` |
 
-Hooki `useMyReviews` in `useAdminTests` vedno iščejo podatke o otroku v tabeli `children`:
-```typescript
-// Trenutna koda v useMyReviews.ts
-const { data: children } = await supabase
-  .from('children')  // ← Išče samo v parent tabeli
-  .select('id, name, age, gender')
-  .in('id', childIds);
+### Dokaz iz baze
+
+```text
+articulation_test_sessions (id: d4bb9391-21bc-4063-9db0-9eeb112164cf):
+├── child_id: NULL ← organizacijski otroci nimajo child_id
+├── logopedist_child_id: 81135446-a352-4446-95ba-c899f2d252f5
+├── parent_id: ed15e179-951f-465c-930f-8f93b49ceed7 (user_id logopeda)
+└── source_type: 'logopedist'
+
+logopedist_children (id: 81135446-a352-4446-95ba-c899f2d252f5):
+├── name: "Tian"
+├── logopedist_id: e187a584-9c80-4515-8914-4cee5eff2548
+└── (logopedist_profiles.id)
 ```
 
-Za organizacijske otroke pa so podatki v tabeli `logopedist_children`, zato dobimo:
-- `child_name: "Neznano"`
-- `child_age: null`
-- `child_gender: null`
+**Trenutna napačna pot:**
+```
+ed15e179-951f-465c-930f-8f93b49ceed7/null/Preverjanje-izgovorjave/Seja-1
+```
 
-### 2. Napačen prikaz v stolpcu "Starš"
-
-- Stolpec se imenuje "Starš", kar je za organizacijske otroke zavajujoče
-- `usePendingTests` pravilno pridobi podatke iz obeh tabel, vendar UI prikaže samo "Logoped"
+**Pravilna pot:**
+```
+logopedist-children/e187a584-9c80-4515-8914-4cee5eff2548/81135446-a352-4446-95ba-c899f2d252f5/Preverjanje-izgovorjave/Seja-1
+```
 
 ## Predlagana rešitev
 
-### Pristop za prikaz "Izvor"
+### Spremembe v `src/hooks/useSessionReview.ts`
 
-Namesto stolpca "Starš" uvedemo stolpec **"Izvor"** z dvema vrsticama:
+#### 1. Razširi interface SessionReviewData
 
-| source_type | Prva vrstica | Druga vrstica |
-|-------------|--------------|---------------|
-| `parent` | Ime in priimek starša | *prazno ali "Uporabniški portal"* |
-| `logopedist` | Ime organizacije (OŠ Test) | Ime logopeda (Janez Novak) |
-
-### Vizualni prikaz
-
-```text
-┌─────────────────────────────────────────────────────────────────┐
-│ IZVOR              │ OTROK     │ STAROST │ SPOL │ DATUM ODDAJE │
-├────────────────────┼───────────┼─────────┼──────┼──────────────┤
-│ OŠ Test            │ Tian      │ 3 leta  │ M    │ 4. feb 2026  │
-│ Janez Novak        │           │         │      │              │
-├────────────────────┼───────────┼─────────┼──────┼──────────────┤
-│ Ana Kovač          │ Luka      │ 5 let   │ M    │ 3. feb 2026  │
-│                    │           │         │      │              │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-## Spremembe po datotekah
-
-### 1. Hook: `src/hooks/useMyReviews.ts`
-
-Spremembe:
-- Dodaj poizvedbo za `logopedist_children` (poleg `children`)
-- Dodaj poizvedbo za `organizations` (za ime organizacije)
-- Dodaj poizvedbo za `logopedist_profiles` (za ime logopeda, ki je otroka dodal)
-- Razširi interface `MyReviewSession` z novimi polji
-
-Nova polja v interface:
+Dodaj polja za organizacijske otroke:
 ```typescript
-export interface MyReviewSession {
-  // ... obstoječa polja ...
-  source_type: 'parent' | 'logopedist';
-  logopedist_child_id: string | null;
-  organization_id: string | null;
-  organization_name: string | null;      // NOVO
-  logopedist_first_name: string | null;  // NOVO (kdo je dodal otroka)
-  logopedist_last_name: string | null;   // NOVO
+interface SessionReviewData {
+  session: {
+    // ... obstoječa polja ...
+    sourceType: 'parent' | 'logopedist';
+    logopedistChildId: string | null;
+    organizationId: string | null;
+  };
+  // ...
 }
 ```
 
-### 2. Hook: `src/hooks/useAdminTests.ts`
+#### 2. Posodobi pridobivanje podatkov o otroku
 
-Enake spremembe kot useMyReviews:
-- Dodaj poizvedbo za `logopedist_children`
-- Dodaj poizvedbo za `organizations`
-- Dodaj poizvedbo za `logopedist_profiles` (za ime logopeda, ki je dodal)
-- Razširi interface `TestSessionData`
-
-### 3. Hook: `src/hooks/usePendingTests.ts`
-
-Spremembe:
-- Dodaj poizvedbo za `organizations` (za ime organizacije)
-- Dodaj poizvedbo za `logopedist_profiles` (za ime logopeda, ki je dodal)
-- Razširi interface `PendingTestSession` z `organization_name`, `logopedist_first_name`, `logopedist_last_name`
-
-### 4. UI: `src/pages/admin/AdminPending.tsx`
-
-Spremembe:
-- Preimenuj stolpec "Starš" v "Izvor"
-- Posodobi funkcijo `formatParentName` → `formatSource` za prikaz dveh vrstic
-- Mobile kartice: posodobi prikaz izvora
-
-Nova funkcija:
 ```typescript
-function formatSource(session: PendingTestSession) {
-  if (session.source_type === 'logopedist') {
-    return {
-      line1: session.organization_name || 'Organizacija',
-      line2: [session.logopedist_first_name, session.logopedist_last_name]
-        .filter(Boolean).join(' ') || null,
+// 2. Pridobi podatke o otroku - glede na source_type
+let child = { name: 'Neznano', age: null, gender: null };
+
+if (session.source_type === 'logopedist' && session.logopedist_child_id) {
+  // Organizacijski otrok - išči v logopedist_children
+  const { data: logopedistChild } = await supabase
+    .from('logopedist_children')
+    .select('name, age, gender, logopedist_id')
+    .eq('id', session.logopedist_child_id)
+    .single();
+  
+  if (logopedistChild) {
+    child = {
+      name: logopedistChild.name,
+      age: logopedistChild.age,
+      gender: logopedistChild.gender,
     };
   }
-  // Parent
-  const parentName = [session.parent_first_name, session.parent_last_name]
-    .filter(Boolean).join(' ');
-  return {
-    line1: parentName || 'Neznano',
-    line2: null,
-  };
+} else if (session.child_id) {
+  // Parent otrok - išči v children
+  const { data: parentChild } = await supabase
+    .from('children')
+    .select('name, age, gender')
+    .eq('id', session.child_id)
+    .single();
+  
+  if (parentChild) {
+    child = parentChild;
+  }
 }
 ```
 
-### 5. UI: `src/pages/admin/AdminMyReviews.tsx`
+#### 3. Posodobi gradnjo poti do posnetkov
 
-Spremembe:
-- Preimenuj stolpec "Starš" v "Izvor"
-- Uporabi novo funkcijo `formatSource` za prikaz dveh vrstic
-- Posodobi mobile kartice
+```typescript
+// 4. Pridobi posnetke iz Storage - glede na source_type
+let storagePath: string;
 
-### 6. UI: `src/pages/admin/AdminTests.tsx` (AdminAllTests)
+if (session.source_type === 'logopedist' && session.logopedist_child_id) {
+  // Za organizacijske otroke: logopedist-children/{logopedist_id}/{child_id}/...
+  // Potrebujemo logopedist_id iz logopedist_children tabele
+  const { data: logopedistChild } = await supabase
+    .from('logopedist_children')
+    .select('logopedist_id')
+    .eq('id', session.logopedist_child_id)
+    .single();
+  
+  if (logopedistChild) {
+    storagePath = `logopedist-children/${logopedistChild.logopedist_id}/${session.logopedist_child_id}/Preverjanje-izgovorjave`;
+  } else {
+    storagePath = ''; // Fallback - ne bo našlo posnetkov
+  }
+} else {
+  // Za parent otroke: {parent_id}/{child_id}/...
+  storagePath = `${session.parent_id}/${session.child_id}/Preverjanje-izgovorjave`;
+}
+```
 
-Spremembe:
-- Preimenuj stolpec "Ime in priimek starša" v "Izvor"
-- Uporabi novo funkcijo `formatSource`
-- Posodobi mobile TestCard komponento
-
-## Diagram toka podatkov
+## Diagram toka
 
 ```text
-articulation_test_sessions
-├── source_type: 'parent'
-│   ├── child_id → children (name, age, gender)
-│   └── parent_id → profiles (first_name, last_name)
-│
-└── source_type: 'logopedist'
-    ├── logopedist_child_id → logopedist_children (name, age, gender)
-    │                         └── logopedist_id → logopedist_profiles (first_name, last_name)
-    └── organization_id → organizations (name)
+AdminSessionReview
+└── useSessionReview(sessionId)
+    └── fetchSessionReviewData()
+        ├── 1. Pridobi articulation_test_sessions
+        │
+        ├── 2. Preveri source_type
+        │   ├── 'logopedist' → pridobi iz logopedist_children
+        │   └── 'parent' → pridobi iz children
+        │
+        ├── 3. Gradi storage pot
+        │   ├── 'logopedist' → logopedist-children/{logopedist_id}/{logopedist_child_id}/...
+        │   └── 'parent' → {parent_id}/{child_id}/...
+        │
+        └── 4. Pridobi posnetke iz pravilne mape
 ```
 
 ## Datoteke za spremembo
 
 | Datoteka | Tip spremembe |
 |----------|---------------|
-| `src/hooks/usePendingTests.ts` | Dodaj org/logopedist podatke |
-| `src/hooks/useMyReviews.ts` | Dodaj podporo za logopedist_children + org/logopedist podatke |
-| `src/hooks/useAdminTests.ts` | Dodaj podporo za logopedist_children + org/logopedist podatke |
-| `src/pages/admin/AdminPending.tsx` | Preimenuj stolpec, posodobi prikaz |
-| `src/pages/admin/AdminMyReviews.tsx` | Preimenuj stolpec, posodobi prikaz |
-| `src/pages/admin/AdminTests.tsx` | Preimenuj stolpec, posodobi prikaz |
+| `src/hooks/useSessionReview.ts` | Posodobi logiko za organizacijske otroke |
 
 ## Rezultat po spremembi
 
 | Scenarij | Prej | Potem |
 |----------|------|-------|
-| Org otrok (OŠ Test, Tian) - Izvor | "Logoped" | "OŠ Test" + "Janez Novak" |
-| Org otrok (OŠ Test, Tian) - Ime otroka | "Neznano" | "Tian" |
-| Org otrok (OŠ Test, Tian) - Starost | "-" | "3 leta" |
-| Org otrok (OŠ Test, Tian) - Spol | "-" | "M" |
-| Parent otrok - Izvor | "Ana Kovač" | "Ana Kovač" (brez spremembe) |
+| Org otrok Tian - Ime otroka | "Neznano" | "Tian" |
+| Org otrok Tian - Starost | null | 3 |
+| Org otrok Tian - Spol | null | "M" |
+| Org otrok Tian - Posnetki | 0 | 10 (enako kot na details strani) |
+| Parent otrok - brez sprememb | Deluje | Deluje |
 
 ## Testiranje po implementaciji
 
-1. Prijavi se kot logoped v organizaciji OŠ Test
-2. Pojdi na `/admin/pending` - preveri, da je izvor pravilno prikazan
-3. Pojdi na `/admin/my-reviews` - preveri:
-   - Ime otroka ni več "Neznano"
+1. Odpri `/admin/tests/d4bb9391-21bc-4063-9db0-9eeb112164cf`
+2. Preveri, da:
+   - Ime otroka je "Tian" (ne "Neznano")
    - Starost in spol sta prikazana
-   - Izvor prikazuje ime organizacije + logopeda
-4. Pojdi na `/admin/all-tests` - enako preverjanje
-5. Prijavi se kot interni TomiTalk logoped in preveri, da parent otroke še vedno pravilno prikazuje
+   - Seja-1 ima 10 posnetkov (enako kot na details strani)
+   - Posnetki se pravilno predvajajo
+3. Preveri parent otroke - še vedno morajo delovati pravilno
