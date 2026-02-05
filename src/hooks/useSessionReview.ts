@@ -19,12 +19,15 @@ export interface LetterEvaluation {
 export interface SessionReviewData {
   session: {
     id: string;
-    childId: string;
+    childId: string | null;
     parentId: string;
     status: string;
     submittedAt: string | null;
     completedAt: string | null;
     assignedTo: string | null;
+    sourceType: 'parent' | 'logopedist';
+    logopedistChildId: string | null;
+    organizationId: string | null;
   };
   child: {
     name: string;
@@ -57,15 +60,49 @@ async function fetchSessionReviewData(sessionId: string): Promise<SessionReviewD
     throw new Error('Seja ni bila najdena');
   }
 
-  // 2. Pridobi podatke o otroku
-  const { data: child, error: childError } = await supabase
-    .from('children')
-    .select('*')
-    .eq('id', session.child_id)
-    .single();
+  // 2. Pridobi podatke o otroku - glede na source_type
+  let childData: { name: string; age: number | null; gender: string | null } = { 
+    name: 'Neznano', 
+    age: null, 
+    gender: null 
+  };
+  let logopedistId: string | null = null;
 
-  if (childError) {
-    console.error('Napaka pri pridobivanju otroka:', childError);
+  if (session.source_type === 'logopedist' && session.logopedist_child_id) {
+    // Organizacijski otrok - išči v logopedist_children
+    const { data: logopedistChild, error: logopedistChildError } = await supabase
+      .from('logopedist_children')
+      .select('name, age, gender, logopedist_id')
+      .eq('id', session.logopedist_child_id)
+      .single();
+
+    if (logopedistChildError) {
+      console.error('Napaka pri pridobivanju organizacijskega otroka:', logopedistChildError);
+    }
+
+    if (logopedistChild) {
+      childData = {
+        name: logopedistChild.name,
+        age: logopedistChild.age,
+        gender: logopedistChild.gender,
+      };
+      logopedistId = logopedistChild.logopedist_id;
+    }
+  } else if (session.child_id) {
+    // Parent otrok - išči v children
+    const { data: parentChild, error: childError } = await supabase
+      .from('children')
+      .select('name, age, gender')
+      .eq('id', session.child_id)
+      .single();
+
+    if (childError) {
+      console.error('Napaka pri pridobivanju otroka:', childError);
+    }
+
+    if (parentChild) {
+      childData = parentChild;
+    }
   }
 
   // 3. Pridobi podatke o staršu
@@ -113,14 +150,22 @@ async function fetchSessionReviewData(sessionId: string): Promise<SessionReviewD
     }
   }
 
-  // 4. Pridobi posnetke iz Storage
-  const storagePath = `${session.parent_id}/${session.child_id}/Preverjanje-izgovorjave`;
+  // 4. Pridobi posnetke iz Storage - glede na source_type
+  let storagePath: string;
+
+  if (session.source_type === 'logopedist' && session.logopedist_child_id && logopedistId) {
+    // Za organizacijske otroke: logopedist-children/{logopedist_id}/{child_id}/...
+    storagePath = `logopedist-children/${logopedistId}/${session.logopedist_child_id}/Preverjanje-izgovorjave`;
+  } else {
+    // Za parent otroke: {parent_id}/{child_id}/...
+    storagePath = `${session.parent_id}/${session.child_id}/Preverjanje-izgovorjave`;
+  }
   
   // Uporabi session_number za določitev pravilne mape posnetkov
   const sessionNumber = (session as any).session_number || 1;
   const targetFolder = `${storagePath}/Seja-${sessionNumber}`;
   
-  console.log('Nalagam posnetke iz mape:', targetFolder, 'session_number:', sessionNumber);
+  console.log('Nalagam posnetke iz mape:', targetFolder, 'session_number:', sessionNumber, 'source_type:', session.source_type);
 
   // Pridobi posnetke iz mape
   let recordings: Recording[] = [];
@@ -213,11 +258,14 @@ async function fetchSessionReviewData(sessionId: string): Promise<SessionReviewD
       submittedAt: session.submitted_at,
       completedAt: session.completed_at || null,
       assignedTo: session.assigned_to || null,
+      sourceType: (session.source_type as 'parent' | 'logopedist') || 'parent',
+      logopedistChildId: session.logopedist_child_id || null,
+      organizationId: session.organization_id || null,
     },
     child: {
-      name: child?.name || 'Neznano',
-      age: child?.age || null,
-      gender: child?.gender || null,
+      name: childData.name,
+      age: childData.age,
+      gender: childData.gender,
     },
     parent: {
       firstName: parent?.first_name || null,
