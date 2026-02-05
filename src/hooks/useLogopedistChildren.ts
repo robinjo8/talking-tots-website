@@ -227,11 +227,19 @@ export function useLogopedistChild(childId: string | undefined) {
     queryFn: async (): Promise<LogopedistChild | null> => {
       if (!childId || !profile?.id) return null;
 
+      // RLS politika na bazi že skrbi za organizacijsko vidnost
+      // Odstranjen filter .eq('logopedist_id', profile.id)
       const { data, error } = await supabase
         .from('logopedist_children')
-        .select('*')
+        .select(`
+          *,
+          logopedist_profiles!inner(
+            id,
+            first_name,
+            last_name
+          )
+        `)
         .eq('id', childId)
-        .eq('logopedist_id', profile.id)
         .eq('is_active', true)
         .single();
 
@@ -240,7 +248,14 @@ export function useLogopedistChild(childId: string | undefined) {
         return null;
       }
 
-      return data as LogopedistChild;
+      // Dodaj metadata za UI
+      return {
+        ...data,
+        logopedist_name: data.logopedist_profiles 
+          ? `${data.logopedist_profiles.first_name} ${data.logopedist_profiles.last_name}`
+          : undefined,
+        is_own_child: data.logopedist_id === profile.id,
+      } as LogopedistChild;
     },
     enabled: !!childId && !!profile?.id,
   });
