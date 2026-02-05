@@ -24,6 +24,29 @@ import { Search, ClipboardList, Clock, UserCheck, CheckCircle, Eye, Loader2, Che
 import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
 
+interface SourceDisplay {
+  line1: string;
+  line2: string | null;
+}
+
+function formatSource(session: TestSessionData): SourceDisplay {
+  if (session.source_type === 'logopedist') {
+    const logopedistName = [session.logopedist_first_name, session.logopedist_last_name]
+      .filter(Boolean).join(' ') || null;
+    return {
+      line1: session.organization_name || 'Organizacija',
+      line2: logopedistName,
+    };
+  }
+  // Parent
+  const parentName = [session.parent_first_name, session.parent_last_name]
+    .filter(Boolean).join(' ');
+  return {
+    line1: parentName || '',
+    line2: null,
+  };
+}
+
 // Status badge component
 const StatusBadge = ({ 
   status, 
@@ -72,7 +95,6 @@ const StatusBadge = ({
 // Mobile card component for test display with accordion behavior
 const TestCard = ({ 
   session, 
-  formatParentName, 
   formatGender,
   formatDate,
   isExpanded,
@@ -80,14 +102,13 @@ const TestCard = ({
   onNavigate
 }: { 
   session: TestSessionData; 
-  formatParentName: (session: TestSessionData) => string;
   formatGender: (gender: string | null) => string;
   formatDate: (date: string | null) => string;
   isExpanded: boolean;
   onToggle: () => void;
   onNavigate: (sessionId: string) => void;
 }) => {
-  const parentName = formatParentName(session);
+  const source = formatSource(session);
   const gender = formatGender(session.child_gender);
   
   return (
@@ -99,9 +120,12 @@ const TestCard = ({
       >
         <div className="flex flex-col gap-1">
           <span className="font-medium">{session.child_name}</span>
-          <span className="text-sm text-muted-foreground">
-            {parentName || <span className="italic">Ni podatka o staršu</span>}
-          </span>
+          <div className="text-sm text-muted-foreground">
+            <span>{source.line1 || <span className="italic">Ni podatka</span>}</span>
+            {source.line2 && (
+              <span className="block text-xs">{source.line2}</span>
+            )}
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <StatusBadge status={session.status} reviewedAt={session.reviewed_at} completedAt={session.completed_at} />
@@ -188,14 +212,18 @@ export default function AdminTests() {
     if (!sessions) return [];
     
     return sessions.filter(session => {
-      // Search filter
+      // Search filter - search in parent name, child name, org name, logopedist name
       if (searchQuery) {
         const searchLower = searchQuery.toLowerCase();
         const parentNameMatch = 
           session.parent_first_name?.toLowerCase().includes(searchLower) || 
           session.parent_last_name?.toLowerCase().includes(searchLower);
         const childNameMatch = session.child_name.toLowerCase().includes(searchLower);
-        if (!parentNameMatch && !childNameMatch) return false;
+        const orgNameMatch = session.organization_name?.toLowerCase().includes(searchLower);
+        const logopedistNameMatch = 
+          session.logopedist_first_name?.toLowerCase().includes(searchLower) ||
+          session.logopedist_last_name?.toLowerCase().includes(searchLower);
+        if (!parentNameMatch && !childNameMatch && !orgNameMatch && !logopedistNameMatch) return false;
       }
       
       // Age filter
@@ -268,14 +296,6 @@ export default function AdminTests() {
     if (!sessions) return { total: 0, pending: 0, inReview: 0, completed: 0 };
     return calculateTestStats(sessions);
   }, [sessions]);
-
-  // Helper function to format parent name
-  const formatParentName = (session: TestSessionData): string => {
-    if (session.parent_first_name || session.parent_last_name) {
-      return [session.parent_first_name, session.parent_last_name].filter(Boolean).join(' ');
-    }
-    return '';
-  };
 
   // Helper to format gender
   const formatGender = (gender: string | null): string => {
@@ -364,7 +384,7 @@ export default function AdminTests() {
             <div className="relative flex-1 md:max-w-sm">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Išči po imenu starša ali otroka..."
+                placeholder="Išči po imenu, organizaciji..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -446,7 +466,7 @@ export default function AdminTests() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Ime in priimek starša</TableHead>
+                    <TableHead>Izvor</TableHead>
                     <TableHead>Ime otroka</TableHead>
                     <TableHead>Starost</TableHead>
                     <TableHead>Spol</TableHead>
@@ -466,14 +486,19 @@ export default function AdminTests() {
                     </TableRow>
                   ) : (
                     paginatedSessions.map((session) => {
-                      const parentName = formatParentName(session);
+                      const source = formatSource(session);
                       const gender = formatGender(session.child_gender);
                       
                       return (
                         <TableRow key={session.id}>
                           <TableCell>
-                            {parentName ? (
-                              <span className="font-medium">{parentName}</span>
+                            {source.line1 ? (
+                              <div className="flex flex-col">
+                                <span className="font-medium">{source.line1}</span>
+                                {source.line2 && (
+                                  <span className="text-sm text-muted-foreground">{source.line2}</span>
+                                )}
+                              </div>
                             ) : (
                               <span className="text-muted-foreground italic">Ni podatka</span>
                             )}
@@ -589,7 +614,6 @@ export default function AdminTests() {
                   <TestCard 
                     key={session.id} 
                     session={session} 
-                    formatParentName={formatParentName}
                     formatGender={formatGender}
                     formatDate={formatDate}
                     isExpanded={expandedCardId === session.id}

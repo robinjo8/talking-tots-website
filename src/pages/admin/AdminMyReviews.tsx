@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
-import { User, Baby, Calendar, Eye, ChevronDown, ChevronUp, ClipboardList, Pencil, Clock, CheckCircle, FileCheck } from 'lucide-react';
+import { User, Baby, Calendar, Eye, ChevronDown, ChevronUp, ClipboardList, Pencil, Clock, CheckCircle, FileCheck, Building2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,11 +18,30 @@ import { StatCard } from '@/components/admin/StatCard';
 import { TestFilters } from '@/components/admin/TestFilters';
 import { useMyReviews, MyReviewSession } from '@/hooks/useMyReviews';
 
-function formatParentName(session: MyReviewSession): string {
-  if (session.parent_first_name || session.parent_last_name) {
-    return `${session.parent_first_name || ''} ${session.parent_last_name || ''}`.trim();
+interface SourceDisplay {
+  line1: string;
+  line2: string | null;
+  isOrganization: boolean;
+}
+
+function formatSource(session: MyReviewSession): SourceDisplay {
+  if (session.source_type === 'logopedist') {
+    const logopedistName = [session.logopedist_first_name, session.logopedist_last_name]
+      .filter(Boolean).join(' ') || null;
+    return {
+      line1: session.organization_name || 'Organizacija',
+      line2: logopedistName,
+      isOrganization: true,
+    };
   }
-  return 'Neznano';
+  // Parent
+  const parentName = [session.parent_first_name, session.parent_last_name]
+    .filter(Boolean).join(' ');
+  return {
+    line1: parentName || 'Neznano',
+    line2: null,
+    isOrganization: false,
+  };
 }
 
 function formatGender(gender: string | null): string {
@@ -91,6 +110,8 @@ function ReviewCard({
   onToggle: () => void;
   onNavigate: (sessionId: string) => void;
 }) {
+  const source = formatSource(session);
+  
   return (
     <Card className="mb-3">
       <CardContent className="p-4">
@@ -106,8 +127,17 @@ function ReviewCard({
               />
             </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <User className="h-3 w-3" />
-              <span>{formatParentName(session)}</span>
+              {source.isOrganization ? (
+                <Building2 className="h-3 w-3" />
+              ) : (
+                <User className="h-3 w-3" />
+              )}
+              <div className="flex flex-col">
+                <span>{source.line1}</span>
+                {source.line2 && (
+                  <span className="text-xs">{source.line2}</span>
+                )}
+              </div>
             </div>
           </div>
           <Button
@@ -358,7 +388,7 @@ export default function AdminMyReviews() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Starš</TableHead>
+                      <TableHead>Izvor</TableHead>
                       <TableHead>Otrok</TableHead>
                       <TableHead>Starost</TableHead>
                       <TableHead>Spol</TableHead>
@@ -368,46 +398,54 @@ export default function AdminMyReviews() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {myReviews.map((session) => (
-                      <TableRow key={session.id}>
-                        <TableCell className="font-medium">
-                          {formatParentName(session)}
-                        </TableCell>
-                        <TableCell>{session.child_name}</TableCell>
-                        <TableCell>
-                          {session.child_age ? `${session.child_age} let` : '-'}
-                        </TableCell>
-                        <TableCell>{formatGender(session.child_gender)}</TableCell>
-                        <TableCell>
-                        <StatusBadge 
-                          status={session.status} 
-                          reviewedAt={session.reviewed_at}
-                          completedAt={session.completed_at}
-                        />
-                        </TableCell>
-                        <TableCell>{formatDate(session.assigned_at)}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <Button 
-                              size="sm" 
-                              variant="outline"
-                              onClick={() => handleNavigate(session.id + '?edit=true')}
-                            >
-                              <Pencil className="h-4 w-4 mr-1" />
-                              Popravi
-                            </Button>
-                            <Button 
-                              size="sm" 
-                              variant="outline"
-                              onClick={() => handleNavigate(session.id)}
-                            >
-                              <Eye className="h-4 w-4 mr-1" />
-                              Ogled
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {myReviews.map((session) => {
+                      const source = formatSource(session);
+                      return (
+                        <TableRow key={session.id}>
+                          <TableCell className="font-medium">
+                            <div className="flex flex-col">
+                              <span>{source.line1}</span>
+                              {source.line2 && (
+                                <span className="text-sm text-muted-foreground">{source.line2}</span>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>{session.child_name}</TableCell>
+                          <TableCell>
+                            {session.child_age ? `${session.child_age} let` : '-'}
+                          </TableCell>
+                          <TableCell>{formatGender(session.child_gender)}</TableCell>
+                          <TableCell>
+                          <StatusBadge 
+                            status={session.status} 
+                            reviewedAt={session.reviewed_at}
+                            completedAt={session.completed_at}
+                          />
+                          </TableCell>
+                          <TableCell>{formatDate(session.assigned_at)}</TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => handleNavigate(session.id + '?edit=true')}
+                              >
+                                <Pencil className="h-4 w-4 mr-1" />
+                                Popravi
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => handleNavigate(session.id)}
+                              >
+                                <Eye className="h-4 w-4 mr-1" />
+                                Ogled
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </CardContent>

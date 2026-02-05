@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
-import { Clock, User, Baby, Calendar, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { Clock, User, Baby, Calendar, ArrowRight, ChevronDown, ChevronUp, Building2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -30,15 +30,30 @@ import { usePendingTests, PendingTestSession } from '@/hooks/usePendingTests';
 import { useClaimTestSession } from '@/hooks/useClaimTestSession';
 import { toast } from 'sonner';
 
-function formatParentName(session: PendingTestSession): string {
-  // For logopedist children, there's no parent - show "Logoped"
+interface SourceDisplay {
+  line1: string;
+  line2: string | null;
+  isOrganization: boolean;
+}
+
+function formatSource(session: PendingTestSession): SourceDisplay {
   if (session.source_type === 'logopedist') {
-    return 'Logoped';
+    const logopedistName = [session.logopedist_first_name, session.logopedist_last_name]
+      .filter(Boolean).join(' ') || null;
+    return {
+      line1: session.organization_name || 'Organizacija',
+      line2: logopedistName,
+      isOrganization: true,
+    };
   }
-  if (session.parent_first_name || session.parent_last_name) {
-    return `${session.parent_first_name || ''} ${session.parent_last_name || ''}`.trim();
-  }
-  return 'Neznano';
+  // Parent
+  const parentName = [session.parent_first_name, session.parent_last_name]
+    .filter(Boolean).join(' ');
+  return {
+    line1: parentName || 'Neznano',
+    line2: null,
+    isOrganization: false,
+  };
 }
 
 function formatGender(gender: string | null): string {
@@ -74,6 +89,8 @@ function PendingCard({
   onClaim: (sessionId: string) => void;
   isClaimLoading: boolean;
 }) {
+  const source = formatSource(session);
+  
   return (
     <Card className="mb-3">
       <CardContent className="p-4">
@@ -89,8 +106,17 @@ function PendingCard({
               )}
             </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <User className="h-3 w-3" />
-              <span>{formatParentName(session)}</span>
+              {source.isOrganization ? (
+                <Building2 className="h-3 w-3" />
+              ) : (
+                <User className="h-3 w-3" />
+              )}
+              <div className="flex flex-col">
+                <span>{source.line1}</span>
+                {source.line2 && (
+                  <span className="text-xs">{source.line2}</span>
+                )}
+              </div>
             </div>
           </div>
           <Button
@@ -290,7 +316,7 @@ export default function AdminPending() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Starš</TableHead>
+                      <TableHead>Izvor</TableHead>
                       <TableHead>Otrok</TableHead>
                       <TableHead>Starost</TableHead>
                       <TableHead>Spol</TableHead>
@@ -299,44 +325,52 @@ export default function AdminPending() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {pendingSessions.map((session) => (
-                      <TableRow key={session.id}>
-                        <TableCell className="font-medium">
-                          {formatParentName(session)}
-                        </TableCell>
-                        <TableCell>{session.child_name}</TableCell>
-                        <TableCell>
-                          {session.child_age ? `${session.child_age} let` : '-'}
-                        </TableCell>
-                        <TableCell>{formatGender(session.child_gender)}</TableCell>
-                        <TableCell>{formatDate(session.submitted_at)}</TableCell>
-                        <TableCell className="text-right">
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button size="sm" disabled={isClaimLoading}>
-                                <ArrowRight className="h-4 w-4 mr-1" />
-                                Prevzemi
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Prevzemi primer</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Ali želite prevzeti preverjanje za otroka <strong>{session.child_name}</strong>? 
-                                  Po prevzemu bo primer viden v zavihku "Moji pregledi".
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Prekliči</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleClaim(session.id)}>
+                    {pendingSessions.map((session) => {
+                      const source = formatSource(session);
+                      return (
+                        <TableRow key={session.id}>
+                          <TableCell className="font-medium">
+                            <div className="flex flex-col">
+                              <span>{source.line1}</span>
+                              {source.line2 && (
+                                <span className="text-sm text-muted-foreground">{source.line2}</span>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>{session.child_name}</TableCell>
+                          <TableCell>
+                            {session.child_age ? `${session.child_age} let` : '-'}
+                          </TableCell>
+                          <TableCell>{formatGender(session.child_gender)}</TableCell>
+                          <TableCell>{formatDate(session.submitted_at)}</TableCell>
+                          <TableCell className="text-right">
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button size="sm" disabled={isClaimLoading}>
+                                  <ArrowRight className="h-4 w-4 mr-1" />
                                   Prevzemi
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Prevzemi primer</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Ali želite prevzeti preverjanje za otroka <strong>{session.child_name}</strong>? 
+                                    Po prevzemu bo primer viden v zavihku "Moji pregledi".
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Prekliči</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => handleClaim(session.id)}>
+                                    Prevzemi
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </CardContent>
