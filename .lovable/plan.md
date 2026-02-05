@@ -1,120 +1,146 @@
 
-# Plan: Popravek PWA in Touch Event Težave
+# Plan: Popravek organizacijske vidnosti otrok v useLogopedistChild hook
 
-## Analiza problema
+## Povzetek problema
 
-### Kaj se je zgodilo
-Pri zadnji spremembi (preprečitev pull-to-refresh) sem dodal preveč agresivne CSS in JavaScript omejitve, ki so zlomile PWA:
+Hook `useLogopedistChild(childId)` trenutno filtrira po `.eq('logopedist_id', profile.id)`, kar pomeni:
+- Logoped v organizaciji "OŠ Test" NE more odpreti podrobnosti otroka, ki ga je dodal kolega
+- Strani kot Workspace, Podrobnosti, Artikulacijski test prikažejo "Otrok ni bil najden"
 
-1. **CSS `touch-action: pan-x pinch-zoom`** - preprečuje vertikalno scrollanje in lahko blokira osnovne touch evente
-2. **Tailwind `touch-none` razred** - popolnoma onemogoči vse touch interakcije na elementu
-3. **JavaScript touchmove listener na `document`** - preveč agresivno blokira touch evente na celotnem dokumentu
+## Prizadete strani
 
-### Zakaj PWA ne deluje
-Ko uporabnik odpre PWA:
-- Brskalnik poskuša procesirati touch evente za navigacijo
-- CSS `touch-action: pan-x pinch-zoom` in `touch-none` blokirata te evente
-- JavaScript listener še dodatno blokira touchmove
-- Rezultat: PWA se ne zažene pravilno ali se zatakne
+| Stran | Pot | Kaj se zgodi |
+|-------|-----|--------------|
+| AdminChildWorkspace | `/admin/children/{childId}/workspace` | "Otrok ni bil najden." |
+| AdminLogopedistChildDetail | `/admin/children/{childId}` | Prazni podatki |
+| AdminArtikulacijskiTest | `/admin/children/{childId}/test` | Manjkajoči podatki otroka |
+| AdminGameWrapper | Vse igre | "Otrok ni bil najden." |
+| AdminGameFullscreenWrapper | Celozaslonske igre | Preusmeritev na /admin/children |
 
-## Rešitev
+## Zakaj je popravek varen
 
-### 1. Popravek CSS v `src/index.css`
-
-Namesto agresivnega `touch-action: pan-x pinch-zoom` uporabim bolj ciljano rešitev:
-
-```css
-/* PREJ (problematično) */
-.game-container {
-  overscroll-behavior-y: contain;
-  touch-action: pan-x pinch-zoom;
-  -webkit-overflow-scrolling: auto;
-}
-
-/* POTEM (pravilno) */
-.game-container {
-  overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: auto;
-}
-
-/* Ločen razred samo za elemente ki potrebujejo blokiranje */
-.prevent-pull-refresh {
-  overscroll-behavior-y: contain;
-}
-```
-
-`overscroll-behavior-y: contain` je dovolj za preprečitev pull-to-refresh brez blokiranja drugih touch eventov.
-
-### 2. Popravek `GenericMetKockeGame.tsx`
-
-Odstrani `touch-none` razred in popravi JavaScript listener:
+### RLS politike (že implementirane v bazi)
 
 ```text
-PREJ:
-<div className="... game-container touch-none" ...>
+SELECT (organizacijska vidnost):
+- LASTNI otroci: logopedist_id IN (SELECT id FROM logopedist_profiles WHERE user_id = auth.uid())
+- ALI organizacijski: EXISTS (aktivna organization_license IN isti organizaciji)
 
-POTEM:
-<div className="... game-container" ...>
+UPDATE: samo logopedist_id = moj id (lastnik)
+DELETE: samo logopedist_id = moj id (lastnik)
+INSERT: samo za sebe
 ```
 
-Za JavaScript listener - namesto da dodaja na `document`, naj dodaja samo na svoj element:
+Baza že skrbi za varnost - če odstranim filter v hook-u, RLS politika še vedno prepreči dostop nepooblaščenim uporabnikom.
 
-```tsx
-// PREJ (agresivno - na document)
-document.addEventListener('touchmove', handleTouchMove, { passive: false });
+## Sprememba
 
-// POTEM (ciljano - na element igre)
-const gameElement = useRef<HTMLDivElement>(null);
-// Listener samo na element igre, ne na cel dokument
+### Datoteka: `src/hooks/useLogopedistChildren.ts`
+
+**Trenutna koda (vrstica 222-246):**
+```typescript
+export function useLogopedistChild(childId: string | undefined) {
+  const { profile } = useAdminAuth();
+
+  return useQuery({
+    queryKey: ['logopedist-child', childId],
+    queryFn: async (): Promise<LogopedistChild | null> => {
+      if (!childId || !profile?.id) return null;
+
+      const { data, error } = await supabase
+        .from('logopedist_children')
+        .select('*')
+        .eq('id', childId)
+        .eq('logopedist_id', profile.id)  // ← PROBLEM: blokira organizacijske otroke
+        .eq('is_active', true)
+        .single();
+      // ...
+    },
+  });
+}
 ```
 
-### 3. Enake popravke za ostale igre
+**Nova koda:**
+```typescript
+export function useLogopedistChild(childId: string | undefined) {
+  const { profile } = useAdminAuth();
 
-Odstrani `touch-none` iz vseh iger kjer sem ga dodal:
-- GenericSpominGame.tsx
-- GenericLabirintGame.tsx
-- GenericBingoGame.tsx
-- GenericZaporedjaGame.tsx
-- GenericDrsnaSestavljankaGame.tsx
-- GenericIgraUjemanjaGame.tsx
-- GenericWheelGame.tsx
-- PonoviPovedGame.tsx
+  return useQuery({
+    queryKey: ['logopedist-child', childId],
+    queryFn: async (): Promise<LogopedistChild | null> => {
+      if (!childId || !profile?.id) return null;
+
+      // RLS politika na bazi že skrbi za organizacijsko vidnost
+      // Odstranjen filter .eq('logopedist_id', profile.id)
+      const { data, error } = await supabase
+        .from('logopedist_children')
+        .select(`
+          *,
+          logopedist_profiles!inner(
+            id,
+            first_name,
+            last_name
+          )
+        `)
+        .eq('id', childId)
+        .eq('is_active', true)
+        .single();
+
+      if (error) {
+        console.error('Error fetching child:', error);
+        return null;
+      }
+
+      // Dodaj metadata za UI
+      return {
+        ...data,
+        logopedist_name: data.logopedist_profiles 
+          ? `${data.logopedist_profiles.first_name} ${data.logopedist_profiles.last_name}`
+          : undefined,
+        is_own_child: data.logopedist_id === profile.id,
+      } as LogopedistChild;
+    },
+    enabled: !!childId && !!profile?.id,
+  });
+}
+```
+
+## Kaj se spremeni
+
+| Scenarij | Prej | Potem |
+|----------|------|-------|
+| Logoped A odpre otroka, ki ga je dodal sam | Deluje ✓ | Deluje ✓ |
+| Logoped A odpre otroka, ki ga je dodal kolega B v isti org | "Otrok ni bil najden" ✗ | Deluje ✓ |
+| Logoped iz druge organizacije poskuša dostopati | RLS blokira ✓ | RLS blokira ✓ |
+| Neprijavljen uporabnik | Preusmeritev ✓ | Preusmeritev ✓ |
+
+## Dodatne informacije v UI
+
+Po spremembi bo hook vrnil tudi:
+- `logopedist_name` - ime logopeda, ki je otroka dodal
+- `is_own_child` - boolean, ali je to tvoj otrok
+
+To omogoča prikaz informacije "Dodal: Janez Novak" na strani podrobnosti.
+
+## Tveganja in mitigacija
+
+| Tveganje | Verjetnost | Mitigacija |
+|----------|------------|------------|
+| Nepooblaščen dostop | Nizka | RLS politika v bazi je aktivna in testirana |
+| Urejanje tujega otroka | Nizka | UPDATE RLS politika še vedno zahteva lastništvo |
+| Brisanje tujega otroka | Nizka | DELETE RLS politika še vedno zahteva lastništvo |
 
 ## Datoteke za spremembo
 
 | Datoteka | Sprememba |
 |----------|-----------|
-| `src/index.css` | Odstrani `touch-action: pan-x pinch-zoom`, ohrani samo `overscroll-behavior-y: contain` |
-| `src/components/games/GenericMetKockeGame.tsx` | Odstrani `touch-none`, popravi JS listener |
-| `src/components/games/GenericSpominGame.tsx` | Odstrani `touch-none` |
-| `src/components/games/GenericLabirintGame.tsx` | Odstrani `touch-none` |
-| `src/components/games/GenericBingoGame.tsx` | Odstrani `touch-none` |
-| `src/components/games/GenericZaporedjaGame.tsx` | Odstrani `touch-none` |
-| `src/components/games/GenericDrsnaSestavljankaGame.tsx` | Odstrani `touch-none` |
-| `src/components/games/GenericIgraUjemanjaGame.tsx` | Odstrani `touch-none` |
-| `src/components/games/GenericWheelGame.tsx` | Odstrani `touch-none` |
-| `src/components/games/PonoviPovedGame.tsx` | Odstrani `touch-none`, popravi JS listener |
+| `src/hooks/useLogopedistChildren.ts` | Odstrani `.eq('logopedist_id', profile.id)` iz `useLogopedistChild`, dodaj JOIN za ime logopeda |
 
-## Tehnična razlaga
+## Testiranje po implementaciji
 
-### Zakaj `overscroll-behavior-y: contain` zadostuje
-
-Ta CSS lastnost pove brskalniku:
-- "Ko uporabnik doseže rob elementa s scrollanjem, NE aktiviraj privzetega obnašanja brskalnika (pull-to-refresh)"
-- NE blokira normalnih touch eventov
-- NE vpliva na PWA zagon
-- Podprt v vseh modernih brskalnikih
-
-### Zakaj `touch-action` in `touch-none` sta problematična
-
-- `touch-none` = "brskalnik, ignoriraj VSE touch evente na tem elementu"
-- `touch-action: pan-x pinch-zoom` = "dovoli samo horizontalno premikanje in zoom"
-- Oba blokirata osnovno interakcijo ki jo PWA potrebuje
-
-## Rezultat
-
-Po popravku:
-- PWA se bo normalno zagnala na telefonu
-- Pull-to-refresh bo še vedno preprečen v igrah (preko `overscroll-behavior-y: contain`)
-- Vse touch interakcije bodo delovale normalno
-- Dialog gumbi bodo dostopni (popravek iz prejšnjega koraka ostane)
+1. Prijavi se kot logoped v organizaciji "OŠ Test" (NE Janez Novak)
+2. Pojdi na "Moji otroci" - moral bi videti otroka Tian
+3. Klikni na otroka Tian - Workspace mora delovati
+4. Odpri "Podrobnosti" - podatki morajo biti vidni
+5. Poskusi "Preverjanje izgovorjave" - test mora delovati
+6. Poskusi urediti otroka - bi moralo biti onemogočeno (ker ni tvoj otrok)
