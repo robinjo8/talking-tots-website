@@ -1,132 +1,120 @@
 
+# Plan: Popravek PWA in Touch Event Težave
 
-# Plan: Optimizacija DiceResultDialog in preprečitev osveževanja strani
+## Analiza problema
 
-## Pregled sprememb
+### Kaj se je zgodilo
+Pri zadnji spremembi (preprečitev pull-to-refresh) sem dodal preveč agresivne CSS in JavaScript omejitve, ki so zlomile PWA:
 
-### 1. DiceResultDialog - mobilna optimizacija
+1. **CSS `touch-action: pan-x pinch-zoom`** - preprečuje vertikalno scrollanje in lahko blokira osnovne touch evente
+2. **Tailwind `touch-none` razred** - popolnoma onemogoči vse touch interakcije na elementu
+3. **JavaScript touchmove listener na `document`** - preveč agresivno blokira touch evente na celotnem dokumentu
 
-**Odstrani gumb ZAPRI:**
-- Uporabnik bo zaprl dialog s klikom na X križec v zgornjem desnem kotu
-- Dialog se samodejno zapre po končanem 5-sekundnem snemanju (že deluje)
+### Zakaj PWA ne deluje
+Ko uporabnik odpre PWA:
+- Brskalnik poskuša procesirati touch evente za navigacijo
+- CSS `touch-action: pan-x pinch-zoom` in `touch-none` blokirata te evente
+- JavaScript listener še dodatno blokira touchmove
+- Rezultat: PWA se ne zažene pravilno ali se zatakne
 
-**Gumba PREDVAJAJ in PONOVI v eni vrstici:**
-- Na mobilnih napravah bosta gumba prikazana eden poleg drugega
-- Širina gumbov prilagojena za mobilni zaslon
+## Rešitev
 
-**Dodatne mobilne prilagoditve:**
-- Manjše slike na mobilnih napravah
-- Manjši razmiki
-- `max-h-[90vh] overflow-y-auto` za preprečitev prelivanja
+### 1. Popravek CSS v `src/index.css`
 
-Vizualni rezultat:
-```text
-┌─────────────────────────────────┐
-│                             [X] │
-│           ODLIČNO!              │
-│    POSLUŠAJ IN PONOVI POVED     │
-│  ┌─────┐ ┌─────┐ ┌─────┐       │
-│  │slika│ │slika│ │slika│       │
-│  └─────┘ └─────┘ └─────┘       │
-│  KAČA     NESE   KORUZO         │
-│ "KAČA NESE KORUZO"              │
-│   [PREDVAJAJ]  [PONOVI]         │
-└─────────────────────────────────┘
-```
-
-### 2. Preprečitev Pull-to-Refresh v igrah
-
-**Problem:**
-Na telefonu, ko uporabnik podrsne navzdol v igri, se stran osveži in prekine igro.
-
-**Rešitev:**
-1. V `src/index.css` dodaj globalni CSS razred `.game-container`
-2. V `GenericMetKockeGame.tsx` dodaj ta razred in JavaScript handler
-3. Enako naredim za vse ostale igre
-
----
-
-## Datoteke za spremembo
-
-| Datoteka | Sprememba |
-|----------|-----------|
-| `src/components/dice/DiceResultDialog.tsx` | Odstrani ZAPRI gumb, prilagodi za mobilni zaslon |
-| `src/index.css` | Dodaj `.game-container` razred |
-| `src/components/games/GenericMetKockeGame.tsx` | Dodaj zaščito pred pull-to-refresh |
-| `src/components/games/GenericSpominGame.tsx` | Preveri in dodaj zaščito |
-| `src/components/games/GenericSestavljankaGame.tsx` | Preveri in dodaj zaščito |
-| `src/components/games/GenericLabirintGame.tsx` | Preveri in dodaj zaščito |
-| `src/components/games/GenericBingoGame.tsx` | Preveri in dodaj zaščito |
-| `src/components/games/GenericZaporedjaGame.tsx` | Preveri in dodaj zaščito |
-| `src/components/games/GenericDrsnaSestavljankaGame.tsx` | Preveri in dodaj zaščito |
-| `src/components/games/GenericIgraUjemanjaGame.tsx` | Preveri in dodaj zaščito |
-| `src/components/games/GenericWheelGame.tsx` | Preveri in dodaj zaščito |
-| `src/components/games/PonoviPovedGame.tsx` | Preveri in dodaj zaščito |
-
----
-
-## Tehnični detajli
-
-### DiceResultDialog.tsx spremembe
-
-```tsx
-<DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-  {/* ... vsebina ... */}
-  
-  {/* Samo dva gumba v vrsti */}
-  <div className="flex justify-center gap-3 pt-2">
-    <Button className="bg-dragon-green h-10 w-28 sm:w-32">
-      <Volume2 /> PREDVAJAJ
-    </Button>
-    <Button className="bg-app-orange h-10 w-28 sm:w-32">
-      <Mic /> PONOVI
-    </Button>
-    {/* ZAPRI gumb odstranjen - uporabi X v kotu */}
-  </div>
-</DialogContent>
-```
-
-### index.css spremembe
+Namesto agresivnega `touch-action: pan-x pinch-zoom` uporabim bolj ciljano rešitev:
 
 ```css
-/* Prepreči pull-to-refresh na igrah */
+/* PREJ (problematično) */
 .game-container {
   overscroll-behavior-y: contain;
   touch-action: pan-x pinch-zoom;
   -webkit-overflow-scrolling: auto;
 }
+
+/* POTEM (pravilno) */
+.game-container {
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: auto;
+}
+
+/* Ločen razred samo za elemente ki potrebujejo blokiranje */
+.prevent-pull-refresh {
+  overscroll-behavior-y: contain;
+}
 ```
 
-### GenericMetKockeGame.tsx spremembe
+`overscroll-behavior-y: contain` je dovolj za preprečitev pull-to-refresh brez blokiranja drugih touch eventov.
+
+### 2. Popravek `GenericMetKockeGame.tsx`
+
+Odstrani `touch-none` razred in popravi JavaScript listener:
+
+```text
+PREJ:
+<div className="... game-container touch-none" ...>
+
+POTEM:
+<div className="... game-container" ...>
+```
+
+Za JavaScript listener - namesto da dodaja na `document`, naj dodaja samo na svoj element:
 
 ```tsx
-// Dodaj useEffect za preprečitev pull-to-refresh
-useEffect(() => {
-  const preventRefresh = (e: TouchEvent) => {
-    // Prepreči samo če je uporabnik na vrhu strani in drsa navzdol
-    if (e.touches.length === 1 && window.scrollY === 0) {
-      const touch = e.touches[0];
-      const startY = touch.clientY;
-      
-      const handleMove = (moveEvent: TouchEvent) => {
-        const currentY = moveEvent.touches[0].clientY;
-        if (currentY > startY) {
-          moveEvent.preventDefault();
-        }
-      };
-      
-      document.addEventListener('touchmove', handleMove, { passive: false });
-      document.addEventListener('touchend', () => {
-        document.removeEventListener('touchmove', handleMove);
-      }, { once: true });
-    }
-  };
-  
-  document.addEventListener('touchstart', preventRefresh, { passive: true });
-  return () => document.removeEventListener('touchstart', preventRefresh);
-}, []);
+// PREJ (agresivno - na document)
+document.addEventListener('touchmove', handleTouchMove, { passive: false });
 
-// Glavni wrapper dobi razred game-container
-<div className="fixed inset-0 overflow-hidden select-none game-container touch-none">
+// POTEM (ciljano - na element igre)
+const gameElement = useRef<HTMLDivElement>(null);
+// Listener samo na element igre, ne na cel dokument
 ```
 
+### 3. Enake popravke za ostale igre
+
+Odstrani `touch-none` iz vseh iger kjer sem ga dodal:
+- GenericSpominGame.tsx
+- GenericLabirintGame.tsx
+- GenericBingoGame.tsx
+- GenericZaporedjaGame.tsx
+- GenericDrsnaSestavljankaGame.tsx
+- GenericIgraUjemanjaGame.tsx
+- GenericWheelGame.tsx
+- PonoviPovedGame.tsx
+
+## Datoteke za spremembo
+
+| Datoteka | Sprememba |
+|----------|-----------|
+| `src/index.css` | Odstrani `touch-action: pan-x pinch-zoom`, ohrani samo `overscroll-behavior-y: contain` |
+| `src/components/games/GenericMetKockeGame.tsx` | Odstrani `touch-none`, popravi JS listener |
+| `src/components/games/GenericSpominGame.tsx` | Odstrani `touch-none` |
+| `src/components/games/GenericLabirintGame.tsx` | Odstrani `touch-none` |
+| `src/components/games/GenericBingoGame.tsx` | Odstrani `touch-none` |
+| `src/components/games/GenericZaporedjaGame.tsx` | Odstrani `touch-none` |
+| `src/components/games/GenericDrsnaSestavljankaGame.tsx` | Odstrani `touch-none` |
+| `src/components/games/GenericIgraUjemanjaGame.tsx` | Odstrani `touch-none` |
+| `src/components/games/GenericWheelGame.tsx` | Odstrani `touch-none` |
+| `src/components/games/PonoviPovedGame.tsx` | Odstrani `touch-none`, popravi JS listener |
+
+## Tehnična razlaga
+
+### Zakaj `overscroll-behavior-y: contain` zadostuje
+
+Ta CSS lastnost pove brskalniku:
+- "Ko uporabnik doseže rob elementa s scrollanjem, NE aktiviraj privzetega obnašanja brskalnika (pull-to-refresh)"
+- NE blokira normalnih touch eventov
+- NE vpliva na PWA zagon
+- Podprt v vseh modernih brskalnikih
+
+### Zakaj `touch-action` in `touch-none` sta problematična
+
+- `touch-none` = "brskalnik, ignoriraj VSE touch evente na tem elementu"
+- `touch-action: pan-x pinch-zoom` = "dovoli samo horizontalno premikanje in zoom"
+- Oba blokirata osnovno interakcijo ki jo PWA potrebuje
+
+## Rezultat
+
+Po popravku:
+- PWA se bo normalno zagnala na telefonu
+- Pull-to-refresh bo še vedno preprečen v igrah (preko `overscroll-behavior-y: contain`)
+- Vse touch interakcije bodo delovale normalno
+- Dialog gumbi bodo dostopni (popravek iz prejšnjega koraka ostane)
