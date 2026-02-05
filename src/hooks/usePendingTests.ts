@@ -17,6 +17,10 @@ export interface PendingTestSession {
   source_type: 'parent' | 'logopedist';
   logopedist_child_id: string | null;
   organization_id: string | null;
+  // New fields for source display
+  organization_name: string | null;
+  logopedist_first_name: string | null;
+  logopedist_last_name: string | null;
 }
 
 export function usePendingTests() {
@@ -69,17 +73,21 @@ export function usePendingTests() {
         .filter(s => s.source_type === 'logopedist' && s.logopedist_child_id)
         .map(s => s.logopedist_child_id);
       const parentIds = [...new Set(sessions.filter(s => s.parent_id).map(s => s.parent_id))];
+      const organizationIds = [...new Set(sessions.filter(s => s.organization_id).map(s => s.organization_id))];
 
-      // Fetch children data from both tables in parallel
-      const [childrenResult, logopedistChildrenResult, profilesResult] = await Promise.all([
+      // Fetch all data in parallel
+      const [childrenResult, logopedistChildrenResult, profilesResult, organizationsResult] = await Promise.all([
         parentChildIds.length > 0
           ? supabase.from('children').select('id, name, age, gender').in('id', parentChildIds)
           : Promise.resolve({ data: [], error: null }),
         logopedistChildIds.length > 0
-          ? supabase.from('logopedist_children').select('id, name, age, gender').in('id', logopedistChildIds)
+          ? supabase.from('logopedist_children').select('id, name, age, gender, logopedist_id').in('id', logopedistChildIds)
           : Promise.resolve({ data: [], error: null }),
         parentIds.length > 0
           ? supabase.from('profiles').select('id, first_name, last_name').in('id', parentIds)
+          : Promise.resolve({ data: [], error: null }),
+        organizationIds.length > 0
+          ? supabase.from('organizations').select('id, name').in('id', organizationIds)
           : Promise.resolve({ data: [], error: null }),
       ]);
 
@@ -92,6 +100,25 @@ export function usePendingTests() {
       if (profilesResult.error) {
         console.error('Error fetching profiles:', profilesResult.error);
       }
+      if (organizationsResult.error) {
+        console.error('Error fetching organizations:', organizationsResult.error);
+      }
+
+      // Get logopedist IDs from logopedist_children to fetch their names
+      const logopedistIds = [...new Set(
+        (logopedistChildrenResult.data || [])
+          .map(c => c.logopedist_id)
+          .filter(Boolean)
+      )];
+
+      // Fetch logopedist profiles for the ones who added the children
+      const logopedistProfilesResult = logopedistIds.length > 0
+        ? await supabase.from('logopedist_profiles').select('id, first_name, last_name').in('id', logopedistIds)
+        : { data: [], error: null };
+
+      if (logopedistProfilesResult.error) {
+        console.error('Error fetching logopedist profiles:', logopedistProfilesResult.error);
+      }
 
       // Create lookup maps
       const childrenMap = new Map(
@@ -103,18 +130,29 @@ export function usePendingTests() {
       const profilesMap = new Map(
         (profilesResult.data || []).map(p => [p.id, p])
       );
+      const organizationsMap = new Map(
+        (organizationsResult.data || []).map(o => [o.id, o])
+      );
+      const logopedistProfilesMap = new Map(
+        (logopedistProfilesResult.data || []).map(lp => [lp.id, lp])
+      );
 
       // Build result
       const result: PendingTestSession[] = sessions.map(session => {
-        let childData: { name: string; age: number | null; gender: string | null } | undefined;
+        let childData: { name: string; age: number | null; gender: string | null; logopedist_id?: string } | undefined;
+        let logopedistProfile: { first_name: string; last_name: string } | undefined;
         
         if (session.source_type === 'logopedist' && session.logopedist_child_id) {
           childData = logopedistChildrenMap.get(session.logopedist_child_id);
+          if (childData?.logopedist_id) {
+            logopedistProfile = logopedistProfilesMap.get(childData.logopedist_id);
+          }
         } else if (session.child_id) {
           childData = childrenMap.get(session.child_id);
         }
 
         const parent = session.parent_id ? profilesMap.get(session.parent_id) : null;
+        const organization = session.organization_id ? organizationsMap.get(session.organization_id) : null;
 
         return {
           id: session.id,
@@ -130,6 +168,9 @@ export function usePendingTests() {
           source_type: (session.source_type || 'parent') as 'parent' | 'logopedist',
           logopedist_child_id: session.logopedist_child_id,
           organization_id: session.organization_id,
+          organization_name: organization?.name || null,
+          logopedist_first_name: logopedistProfile?.first_name || null,
+          logopedist_last_name: logopedistProfile?.last_name || null,
         };
       });
 

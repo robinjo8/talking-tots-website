@@ -16,6 +16,13 @@ export interface MyReviewSession {
   parent_id: string;
   parent_first_name: string | null;
   parent_last_name: string | null;
+  // New fields for source display
+  source_type: 'parent' | 'logopedist';
+  logopedist_child_id: string | null;
+  organization_id: string | null;
+  organization_name: string | null;
+  logopedist_first_name: string | null;
+  logopedist_last_name: string | null;
 }
 
 export function useMyReviews() {
@@ -31,7 +38,7 @@ export function useMyReviews() {
       // 1. Get sessions assigned to current logopedist
       const { data: sessions, error: sessionsError } = await supabase
         .from('articulation_test_sessions')
-        .select('id, status, submitted_at, assigned_at, reviewed_at, completed_at, child_id, parent_id')
+        .select('id, status, submitted_at, assigned_at, reviewed_at, completed_at, child_id, parent_id, source_type, logopedist_child_id, organization_id')
         .eq('assigned_to', profile.id)
         .in('status', ['assigned', 'in_review', 'completed'])
         .order('assigned_at', { ascending: false });
@@ -45,42 +52,93 @@ export function useMyReviews() {
         return [];
       }
 
-      // 2. Get unique child IDs and parent IDs
-      const childIds = [...new Set(sessions.map(s => s.child_id))];
+      // 2. Get unique IDs for both parent and logopedist children
+      const parentChildIds = sessions
+        .filter(s => s.source_type !== 'logopedist' && s.child_id)
+        .map(s => s.child_id);
+      const logopedistChildIds = sessions
+        .filter(s => s.source_type === 'logopedist' && s.logopedist_child_id)
+        .map(s => s.logopedist_child_id);
       const parentIds = [...new Set(sessions.map(s => s.parent_id))];
+      const organizationIds = [...new Set(sessions.filter(s => s.organization_id).map(s => s.organization_id))];
 
-      // 3. Fetch children data
-      const { data: children, error: childrenError } = await supabase
-        .from('children')
-        .select('id, name, age, gender')
-        .in('id', childIds);
+      // 3. Fetch all data in parallel
+      const [childrenResult, logopedistChildrenResult, profilesResult, organizationsResult] = await Promise.all([
+        parentChildIds.length > 0
+          ? supabase.from('children').select('id, name, age, gender').in('id', parentChildIds)
+          : Promise.resolve({ data: [], error: null }),
+        logopedistChildIds.length > 0
+          ? supabase.from('logopedist_children').select('id, name, age, gender, logopedist_id').in('id', logopedistChildIds)
+          : Promise.resolve({ data: [], error: null }),
+        parentIds.length > 0
+          ? supabase.from('profiles').select('id, first_name, last_name').in('id', parentIds)
+          : Promise.resolve({ data: [], error: null }),
+        organizationIds.length > 0
+          ? supabase.from('organizations').select('id, name').in('id', organizationIds)
+          : Promise.resolve({ data: [], error: null }),
+      ]);
 
-      if (childrenError) {
-        console.error('Error fetching children:', childrenError);
+      if (childrenResult.error) {
+        console.error('Error fetching children:', childrenResult.error);
+      }
+      if (logopedistChildrenResult.error) {
+        console.error('Error fetching logopedist children:', logopedistChildrenResult.error);
+      }
+      if (profilesResult.error) {
+        console.error('Error fetching profiles:', profilesResult.error);
+      }
+      if (organizationsResult.error) {
+        console.error('Error fetching organizations:', organizationsResult.error);
       }
 
-      // 4. Fetch parent profiles
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, first_name, last_name')
-        .in('id', parentIds);
+      // 4. Get logopedist IDs from logopedist_children to fetch their names
+      const logopedistIds = [...new Set(
+        (logopedistChildrenResult.data || [])
+          .map(c => c.logopedist_id)
+          .filter(Boolean)
+      )];
 
-      if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
+      const logopedistProfilesResult = logopedistIds.length > 0
+        ? await supabase.from('logopedist_profiles').select('id, first_name, last_name').in('id', logopedistIds)
+        : { data: [], error: null };
+
+      if (logopedistProfilesResult.error) {
+        console.error('Error fetching logopedist profiles:', logopedistProfilesResult.error);
       }
 
       // 5. Create lookup maps
       const childrenMap = new Map(
-        (children || []).map(c => [c.id, c])
+        (childrenResult.data || []).map(c => [c.id, c])
+      );
+      const logopedistChildrenMap = new Map(
+        (logopedistChildrenResult.data || []).map(c => [c.id, c])
       );
       const profilesMap = new Map(
-        (profiles || []).map(p => [p.id, p])
+        (profilesResult.data || []).map(p => [p.id, p])
+      );
+      const organizationsMap = new Map(
+        (organizationsResult.data || []).map(o => [o.id, o])
+      );
+      const logopedistProfilesMap = new Map(
+        (logopedistProfilesResult.data || []).map(lp => [lp.id, lp])
       );
 
       // 6. Build result
       const result: MyReviewSession[] = sessions.map(session => {
-        const child = childrenMap.get(session.child_id);
+        let childData: { name: string; age: number | null; gender: string | null; logopedist_id?: string } | undefined;
+        let logopedistProfile: { first_name: string; last_name: string } | undefined;
+
+        if (session.source_type === 'logopedist' && session.logopedist_child_id) {
+          childData = logopedistChildrenMap.get(session.logopedist_child_id);
+          if (childData?.logopedist_id) {
+            logopedistProfile = logopedistProfilesMap.get(childData.logopedist_id);
+          }
+        } else if (session.child_id) {
+          childData = childrenMap.get(session.child_id);
+        }
+
         const parent = profilesMap.get(session.parent_id);
+        const organization = session.organization_id ? organizationsMap.get(session.organization_id) : null;
 
         return {
           id: session.id,
@@ -90,12 +148,18 @@ export function useMyReviews() {
           reviewed_at: session.reviewed_at,
           completed_at: session.completed_at,
           child_id: session.child_id,
-          child_name: child?.name || 'Neznano',
-          child_age: child?.age || null,
-          child_gender: child?.gender || null,
+          child_name: childData?.name || 'Neznano',
+          child_age: childData?.age || null,
+          child_gender: childData?.gender || null,
           parent_id: session.parent_id,
           parent_first_name: parent?.first_name || null,
           parent_last_name: parent?.last_name || null,
+          source_type: (session.source_type || 'parent') as 'parent' | 'logopedist',
+          logopedist_child_id: session.logopedist_child_id,
+          organization_id: session.organization_id,
+          organization_name: organization?.name || null,
+          logopedist_first_name: logopedistProfile?.first_name || null,
+          logopedist_last_name: logopedistProfile?.last_name || null,
         };
       });
 
