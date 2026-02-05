@@ -85,7 +85,7 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
 
   return (
     <div 
-      className="fixed inset-0 overflow-auto select-none" 
+      className="fixed inset-0 overflow-auto select-none game-container" 
       style={{ 
         backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.webp)', 
         backgroundSize: 'cover', 

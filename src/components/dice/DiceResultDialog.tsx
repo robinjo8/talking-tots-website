@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Volume2, Mic } from 'lucide-react';
+import { Volume2, Mic, X } from 'lucide-react';
 import { MetKockeWord } from '@/data/metKockeConfig';
 
 interface DiceResultDialogProps {
@@ -128,30 +128,30 @@ export function DiceResultDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle className="font-bold text-dragon-green text-center text-lg md:text-2xl uppercase">
+          <DialogTitle className="font-bold text-dragon-green text-center text-base sm:text-lg md:text-2xl uppercase">
             ODLIČNO!
           </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-3 md:space-y-4 py-2 md:py-4">
-          <p className="text-black text-center uppercase text-xs md:text-sm font-medium">
+        <div className="space-y-2 sm:space-y-3 md:space-y-4 py-1 sm:py-2 md:py-4">
+          <p className="text-black text-center uppercase text-[10px] sm:text-xs md:text-sm font-medium">
             POSLUŠAJ IN PONOVI POVED
           </p>
           
           {/* Three images in a row */}
-          <div className="flex justify-center gap-3 md:gap-4">
+          <div className="flex justify-center gap-2 sm:gap-3 md:gap-4">
             {words.map((word, index) => (
-              <div key={index} className="flex flex-col items-center space-y-1 md:space-y-2">
-                <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden border-2 border-dragon-green bg-gray-50">
+              <div key={index} className="flex flex-col items-center space-y-0.5 sm:space-y-1 md:space-y-2">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-xl overflow-hidden border-2 border-dragon-green bg-gray-50">
                   <img
                     src={`${SUPABASE_URL}/slike/${word.image}`}
                     alt={word.word}
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <span className="font-medium text-center text-xs md:text-sm text-black uppercase">
+                <span className="font-medium text-center text-[10px] sm:text-xs md:text-sm text-black uppercase">
                   {word.word.toUpperCase()}
                 </span>
               </div>
@@ -159,18 +159,18 @@ export function DiceResultDialog({
           </div>
           
           {/* Sentence text */}
-          <p className="text-base md:text-lg font-semibold text-gray-800 text-center uppercase">
+          <p className="text-sm sm:text-base md:text-lg font-semibold text-gray-800 text-center uppercase">
             "{bitjeWord.word.toUpperCase()} {povedekWord.word.toUpperCase()} {predmetWord.word.toUpperCase()}"
           </p>
 
           {/* Action buttons */}
-          <div className="flex justify-center gap-3 pt-2">
+          <div className="flex justify-center gap-2 sm:gap-3 pt-2">
             <Button
               onClick={playAudioSequence}
               disabled={isPlayingSequence || isRecording}
-              className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-2 uppercase font-medium h-10 w-32"
+              className="bg-dragon-green hover:bg-dragon-green/90 text-white gap-1 sm:gap-2 uppercase font-medium h-9 sm:h-10 w-28 sm:w-32 text-xs sm:text-sm"
             >
-              <Volume2 className="w-4 h-4" />
+              <Volume2 className="w-3 h-3 sm:w-4 sm:h-4" />
               {isPlayingSequence ? "..." : "PREDVAJAJ"}
             </Button>
             
@@ -178,19 +178,15 @@ export function DiceResultDialog({
             <Button
               onClick={startRecording}
               disabled={isRecording || isPlayingSequence}
-              className="relative bg-app-orange hover:bg-app-orange/90 text-white gap-2 uppercase font-medium h-10 w-32"
+              className="relative bg-app-orange hover:bg-app-orange/90 text-white gap-1 sm:gap-2 uppercase font-medium h-9 sm:h-10 w-28 sm:w-32 text-xs sm:text-sm"
             >
-              <Mic className="w-4 h-4" />
+              <Mic className="w-3 h-3 sm:w-4 sm:h-4" />
               {isRecording ? "..." : "PONOVI"}
               {isRecording && (
-                <span className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                <span className="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 w-5 h-5 sm:w-6 sm:h-6 bg-red-500 text-white text-[10px] sm:text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
                   {recordingTimeLeft}
                 </span>
               )}
-            </Button>
-            
-            <Button onClick={onClose} variant="outline" className="uppercase h-10 w-32">
-              ZAPRI
             </Button>
           </div>
         </div>

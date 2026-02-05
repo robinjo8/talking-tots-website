@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Home, RefreshCw } from 'lucide-react';
 import {
@@ -146,9 +146,42 @@ export function GenericMetKockeGame({
   // Column headers
   const columns = ['OSEBEK', 'POVEDEK', 'PREDMET'];
 
+  // Prevent pull-to-refresh on mobile
+  useEffect(() => {
+    const preventPullToRefresh = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return;
+      
+      const touch = e.touches[0];
+      const startY = touch.clientY;
+      
+      const handleTouchMove = (moveEvent: TouchEvent) => {
+        const currentY = moveEvent.touches[0].clientY;
+        // Only prevent if scrolling down from top of page
+        if (window.scrollY === 0 && currentY > startY) {
+          moveEvent.preventDefault();
+        }
+      };
+      
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      
+      const cleanup = () => {
+        document.removeEventListener('touchmove', handleTouchMove);
+      };
+      
+      document.addEventListener('touchend', cleanup, { once: true });
+      document.addEventListener('touchcancel', cleanup, { once: true });
+    };
+    
+    document.addEventListener('touchstart', preventPullToRefresh, { passive: true });
+    
+    return () => {
+      document.removeEventListener('touchstart', preventPullToRefresh);
+    };
+  }, []);
+
   return (
     <div 
-      className="fixed inset-0 overflow-hidden select-none"
+      className="fixed inset-0 overflow-hidden select-none game-container touch-none"
       style={{
         backgroundImage: `url(${SUPABASE_URL}/ozadja/zeleno_ozadje.webp)`,
         backgroundSize: 'cover',
