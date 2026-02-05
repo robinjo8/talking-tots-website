@@ -316,7 +316,7 @@ export default function AdminPending() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Izvor</TableHead>
+                      <TableHead>Uporabnik</TableHead>
                       <TableHead>Otrok</TableHead>
                       <TableHead>Starost</TableHead>
                       <TableHead>Spol</TableHead>

@@ -388,7 +388,7 @@ export default function AdminMyReviews() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Izvor</TableHead>
+                      <TableHead>Uporabnik</TableHead>
                       <TableHead>Otrok</TableHead>
                       <TableHead>Starost</TableHead>
                       <TableHead>Spol</TableHead>
