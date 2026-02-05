@@ -1,167 +1,185 @@
 
-
-# Plan: Popravek RLS politike na tabeli `progress` za organizacijsko vidnost
+# Plan: Popravek prikaza stolpca "Starš" in manjkajočih podatkov o otrocih
 
 ## Povzetek problema
 
-Logopedi v isti organizaciji (npr. OŠ Test) lahko zdaj vidijo otroka, ki ga je dodal kolega, vendar **ne morejo videti njegovega napredka (progress)**. To pomeni:
-- Na strani "Napredek" (`/admin/children/{childId}/progress`) vidijo prazen seznam
-- Zgodovina aktivnosti je prazna
-- Statistika zvezdic/zmajev ni vidna
+Na straneh `/admin/pending`, `/admin/my-reviews` in `/admin/all-tests` se pojavljajo naslednje težave:
 
-## Analiza trenutnega stanja
+| Stran | Problem |
+|-------|---------|
+| AdminPending | Za organizacijske otroke prikaže "Logoped" namesto imena organizacije + logopeda |
+| AdminMyReviews | Ime otroka "Neznano", manjka starost in spol za organizacijske otroke |
+| AdminAllTests | Enako kot MyReviews - manjkajoči podatki za organizacijske otroke |
 
-### Trenutne RLS politike na tabeli `progress`
+## Vzrok problema
 
-| Politika | Ukaz | Pogoj |
-|----------|------|-------|
-| Logopedists can manage own children progress | ALL (*) | `logopedist_child_id` pripada otroku, kjer je `lp.user_id = auth.uid()` |
-| Parents can view their children's progress | SELECT | `child_id` pripada staršu |
-| Parents can add progress | INSERT | `child_id` pripada staršu |
+### 1. Hooki ne upoštevajo `source_type === 'logopedist'`
 
-**Problem:** Politika za logopede preverja samo `logopedist_id = auth.uid()`, ne pa organizacijske pripadnosti.
+Hooki `useMyReviews` in `useAdminTests` vedno iščejo podatke o otroku v tabeli `children`:
+```typescript
+// Trenutna koda v useMyReviews.ts
+const { data: children } = await supabase
+  .from('children')  // ← Išče samo v parent tabeli
+  .select('id, name, age, gender')
+  .in('id', childIds);
+```
 
-### Kako deluje pridobivanje napredka
+Za organizacijske otroke pa so podatki v tabeli `logopedist_children`, zato dobimo:
+- `child_name: "Neznano"`
+- `child_age: null`
+- `child_gender: null`
+
+### 2. Napačen prikaz v stolpcu "Starš"
+
+- Stolpec se imenuje "Starš", kar je za organizacijske otroke zavajujoče
+- `usePendingTests` pravilno pridobi podatke iz obeh tabel, vendar UI prikaže samo "Logoped"
+
+## Predlagana rešitev
+
+### Pristop za prikaz "Izvor"
+
+Namesto stolpca "Starš" uvedemo stolpec **"Izvor"** z dvema vrsticama:
+
+| source_type | Prva vrstica | Druga vrstica |
+|-------------|--------------|---------------|
+| `parent` | Ime in priimek starša | *prazno ali "Uporabniški portal"* |
+| `logopedist` | Ime organizacije (OŠ Test) | Ime logopeda (Janez Novak) |
+
+### Vizualni prikaz
 
 ```text
-AdminChildProgress.tsx
-├── useLogopedistProgress(childId)
-│   └── RPC: get_logopedist_child_activity_summary  ← SECURITY DEFINER ✓
-│       └── Obide RLS, deluje pravilno
+┌─────────────────────────────────────────────────────────────────┐
+│ IZVOR              │ OTROK     │ STAROST │ SPOL │ DATUM ODDAJE │
+├────────────────────┼───────────┼─────────┼──────┼──────────────┤
+│ OŠ Test            │ Tian      │ 3 leta  │ M    │ 4. feb 2026  │
+│ Janez Novak        │           │         │      │              │
+├────────────────────┼───────────┼─────────┼──────┼──────────────┤
+│ Ana Kovač          │ Luka      │ 5 let   │ M    │ 3. feb 2026  │
+│                    │           │         │      │              │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## Spremembe po datotekah
+
+### 1. Hook: `src/hooks/useMyReviews.ts`
+
+Spremembe:
+- Dodaj poizvedbo za `logopedist_children` (poleg `children`)
+- Dodaj poizvedbo za `organizations` (za ime organizacije)
+- Dodaj poizvedbo za `logopedist_profiles` (za ime logopeda, ki je otroka dodal)
+- Razširi interface `MyReviewSession` z novimi polji
+
+Nova polja v interface:
+```typescript
+export interface MyReviewSession {
+  // ... obstoječa polja ...
+  source_type: 'parent' | 'logopedist';
+  logopedist_child_id: string | null;
+  organization_id: string | null;
+  organization_name: string | null;      // NOVO
+  logopedist_first_name: string | null;  // NOVO (kdo je dodal otroka)
+  logopedist_last_name: string | null;   // NOVO
+}
+```
+
+### 2. Hook: `src/hooks/useAdminTests.ts`
+
+Enake spremembe kot useMyReviews:
+- Dodaj poizvedbo za `logopedist_children`
+- Dodaj poizvedbo za `organizations`
+- Dodaj poizvedbo za `logopedist_profiles` (za ime logopeda, ki je dodal)
+- Razširi interface `TestSessionData`
+
+### 3. Hook: `src/hooks/usePendingTests.ts`
+
+Spremembe:
+- Dodaj poizvedbo za `organizations` (za ime organizacije)
+- Dodaj poizvedbo za `logopedist_profiles` (za ime logopeda, ki je dodal)
+- Razširi interface `PendingTestSession` z `organization_name`, `logopedist_first_name`, `logopedist_last_name`
+
+### 4. UI: `src/pages/admin/AdminPending.tsx`
+
+Spremembe:
+- Preimenuj stolpec "Starš" v "Izvor"
+- Posodobi funkcijo `formatParentName` → `formatSource` za prikaz dveh vrstic
+- Mobile kartice: posodobi prikaz izvora
+
+Nova funkcija:
+```typescript
+function formatSource(session: PendingTestSession) {
+  if (session.source_type === 'logopedist') {
+    return {
+      line1: session.organization_name || 'Organizacija',
+      line2: [session.logopedist_first_name, session.logopedist_last_name]
+        .filter(Boolean).join(' ') || null,
+    };
+  }
+  // Parent
+  const parentName = [session.parent_first_name, session.parent_last_name]
+    .filter(Boolean).join(' ');
+  return {
+    line1: parentName || 'Neznano',
+    line2: null,
+  };
+}
+```
+
+### 5. UI: `src/pages/admin/AdminMyReviews.tsx`
+
+Spremembe:
+- Preimenuj stolpec "Starš" v "Izvor"
+- Uporabi novo funkcijo `formatSource` za prikaz dveh vrstic
+- Posodobi mobile kartice
+
+### 6. UI: `src/pages/admin/AdminTests.tsx` (AdminAllTests)
+
+Spremembe:
+- Preimenuj stolpec "Ime in priimek starša" v "Izvor"
+- Uporabi novo funkcijo `formatSource`
+- Posodobi mobile TestCard komponento
+
+## Diagram toka podatkov
+
+```text
+articulation_test_sessions
+├── source_type: 'parent'
+│   ├── child_id → children (name, age, gender)
+│   └── parent_id → profiles (first_name, last_name)
 │
-└── Direktna poizvedba na 'progress' tabelo  ← BLOKIRANA za org otroke ✗
-    └── SELECT ... WHERE logopedist_child_id = childId
+└── source_type: 'logopedist'
+    ├── logopedist_child_id → logopedist_children (name, age, gender)
+    │                         └── logopedist_id → logopedist_profiles (first_name, last_name)
+    └── organization_id → organizations (name)
 ```
-
-**Ugotovitev:**
-- `useLogopedistProgress` uporablja RPC funkcijo z `SECURITY DEFINER`, ki obide RLS → **DELUJE**
-- Direktna poizvedba v `AdminChildProgress.tsx` za zgodovino → **BLOKIRANA**
-
-## Kaj je potrebno popraviti
-
-Potrebno je posodobiti RLS politiko za `SELECT` na tabeli `progress`, da dovoli branje tudi za otroke iz iste organizacije.
-
-## Nova RLS politika
-
-### Politika za branje (SELECT)
-
-```sql
--- Odstrani staro politiko
-DROP POLICY IF EXISTS "Logopedists can manage own children progress" ON public.progress;
-
--- Nova SELECT politika z organizacijsko vidnostjo
-CREATE POLICY "Logopedists can view org children progress"
-ON public.progress FOR SELECT
-USING (
-  -- Dovoli če je logopedist_child_id NULL (parent progress)
-  logopedist_child_id IS NULL
-  OR
-  -- ALI če je logopedist lastnik otroka
-  logopedist_child_id IN (
-    SELECT lc.id 
-    FROM logopedist_children lc
-    JOIN logopedist_profiles lp ON lc.logopedist_id = lp.id
-    WHERE lp.user_id = auth.uid()
-  )
-  OR
-  -- ALI če je logopedist v isti organizaciji z aktivno licenco
-  logopedist_child_id IN (
-    SELECT lc.id
-    FROM logopedist_children lc
-    JOIN logopedist_profiles owner_lp ON lc.logopedist_id = owner_lp.id
-    JOIN logopedist_profiles my_lp ON my_lp.user_id = auth.uid()
-    JOIN organization_licenses ol ON ol.organization_id = my_lp.organization_id
-    WHERE owner_lp.organization_id = my_lp.organization_id
-      AND ol.status = 'active'
-  )
-);
-```
-
-### Politiki za pisanje (INSERT, UPDATE, DELETE) - ostanejo restriktivne
-
-```sql
--- INSERT: samo za lastne otroke
-CREATE POLICY "Logopedists can insert own children progress"
-ON public.progress FOR INSERT
-WITH CHECK (
-  logopedist_child_id IS NULL
-  OR
-  logopedist_child_id IN (
-    SELECT lc.id 
-    FROM logopedist_children lc
-    JOIN logopedist_profiles lp ON lc.logopedist_id = lp.id
-    WHERE lp.user_id = auth.uid()
-  )
-);
-
--- UPDATE: samo za lastne otroke
-CREATE POLICY "Logopedists can update own children progress"
-ON public.progress FOR UPDATE
-USING (
-  logopedist_child_id IS NULL
-  OR
-  logopedist_child_id IN (
-    SELECT lc.id 
-    FROM logopedist_children lc
-    JOIN logopedist_profiles lp ON lc.logopedist_id = lp.id
-    WHERE lp.user_id = auth.uid()
-  )
-);
-
--- DELETE: samo za lastne otroke
-CREATE POLICY "Logopedists can delete own children progress"
-ON public.progress FOR DELETE
-USING (
-  logopedist_child_id IS NULL
-  OR
-  logopedist_child_id IN (
-    SELECT lc.id 
-    FROM logopedist_children lc
-    JOIN logopedist_profiles lp ON lc.logopedist_id = lp.id
-    WHERE lp.user_id = auth.uid()
-  )
-);
-```
-
-## Kaj se spremeni
-
-| Scenarij | Prej | Potem |
-|----------|------|-------|
-| Logoped A vidi napredek svojega otroka | ✓ Deluje | ✓ Deluje |
-| Logoped A vidi napredek otroka kolega B (ista org) | ✗ Prazen seznam | ✓ Vidi napredek |
-| Logoped A dodaja napredek za otroka kolega B | ✗ Blokirano | ✗ Še vedno blokirano |
-| Logoped A briše napredek otroka kolega B | ✗ Blokirano | ✗ Še vedno blokirano |
-| Logoped iz druge organizacije | ✗ Blokirano | ✗ Še vedno blokirano |
-
-## Varnostna analiza
-
-| Vidik | Status | Razlaga |
-|-------|--------|---------|
-| Branje tujega napredka | Omejeno na org | Samo člani iste organizacije z aktivno licenco |
-| Pisanje v tuj napredek | Blokirano | INSERT/UPDATE/DELETE zahtevajo lastništvo |
-| Brez organizacije | Blokirano | Če ni `organization_licenses` z `status = 'active'` |
 
 ## Datoteke za spremembo
 
-| Tip | Datoteka/Lokacija | Sprememba |
-|-----|-------------------|-----------|
-| SQL Migracija | Nova migracija | Posodobi RLS politike na `progress` tabeli |
+| Datoteka | Tip spremembe |
+|----------|---------------|
+| `src/hooks/usePendingTests.ts` | Dodaj org/logopedist podatke |
+| `src/hooks/useMyReviews.ts` | Dodaj podporo za logopedist_children + org/logopedist podatke |
+| `src/hooks/useAdminTests.ts` | Dodaj podporo za logopedist_children + org/logopedist podatke |
+| `src/pages/admin/AdminPending.tsx` | Preimenuj stolpec, posodobi prikaz |
+| `src/pages/admin/AdminMyReviews.tsx` | Preimenuj stolpec, posodobi prikaz |
+| `src/pages/admin/AdminTests.tsx` | Preimenuj stolpec, posodobi prikaz |
 
-## Koraki implementacije
+## Rezultat po spremembi
 
-1. Ustvari SQL migracijo, ki:
-   - Odstrani obstoječo politiko "Logopedists can manage own children progress"
-   - Doda novo SELECT politiko z organizacijsko vidnostjo
-   - Doda ločene INSERT/UPDATE/DELETE politike za lastništvo
-
-2. Preveri, da politike za starše ostanejo nespremenjene
+| Scenarij | Prej | Potem |
+|----------|------|-------|
+| Org otrok (OŠ Test, Tian) - Izvor | "Logoped" | "OŠ Test" + "Janez Novak" |
+| Org otrok (OŠ Test, Tian) - Ime otroka | "Neznano" | "Tian" |
+| Org otrok (OŠ Test, Tian) - Starost | "-" | "3 leta" |
+| Org otrok (OŠ Test, Tian) - Spol | "-" | "M" |
+| Parent otrok - Izvor | "Ana Kovač" | "Ana Kovač" (brez spremembe) |
 
 ## Testiranje po implementaciji
 
-1. Prijavi se kot logoped v organizaciji OŠ Test (ne Janez Novak)
-2. Odpri otroka Tian na strani "Napredek"
-3. Preveri, da:
-   - Vidiš statistiko zvezdic/zmajev (UnifiedProgressDisplay)
-   - Vidiš zgodovino aktivnosti (če obstaja)
-4. Poskusi dodati napredek za tujega otroka - mora biti blokirano
-
+1. Prijavi se kot logoped v organizaciji OŠ Test
+2. Pojdi na `/admin/pending` - preveri, da je izvor pravilno prikazan
+3. Pojdi na `/admin/my-reviews` - preveri:
+   - Ime otroka ni več "Neznano"
+   - Starost in spol sta prikazana
+   - Izvor prikazuje ime organizacije + logopeda
+4. Pojdi na `/admin/all-tests` - enako preverjanje
+5. Prijavi se kot interni TomiTalk logoped in preveri, da parent otroke še vedno pravilno prikazuje
