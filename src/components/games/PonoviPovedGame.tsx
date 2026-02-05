@@ -264,38 +264,6 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
     };
   }, []);
   
-  // Prevent pull-to-refresh on mobile
-  useEffect(() => {
-    const preventPullToRefresh = (e: TouchEvent) => {
-      if (e.touches.length !== 1) return;
-      
-      const touch = e.touches[0];
-      const startY = touch.clientY;
-      
-      const handleTouchMove = (moveEvent: TouchEvent) => {
-        const currentY = moveEvent.touches[0].clientY;
-        if (window.scrollY === 0 && currentY > startY) {
-          moveEvent.preventDefault();
-        }
-      };
-      
-      document.addEventListener('touchmove', handleTouchMove, { passive: false });
-      
-      const cleanup = () => {
-        document.removeEventListener('touchmove', handleTouchMove);
-      };
-      
-      document.addEventListener('touchend', cleanup, { once: true });
-      document.addEventListener('touchcancel', cleanup, { once: true });
-    };
-    
-    document.addEventListener('touchstart', preventPullToRefresh, { passive: true });
-    
-    return () => {
-      document.removeEventListener('touchstart', preventPullToRefresh);
-    };
-  }, []);
-  
   // Calculate dynamic sizes based on screen
   const calculatedSizes = useMemo(() => {
     if (containerSize.width === 0 || containerSize.height === 0) {
@@ -751,7 +719,7 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
 
   return (
     <div 
-      className="min-h-screen w-full fixed inset-0 flex flex-col"
+      className="min-h-screen w-full fixed inset-0 flex flex-col game-container"
       style={{
         backgroundImage: `url(${BACKGROUND_URL})`,
         backgroundSize: "cover",
