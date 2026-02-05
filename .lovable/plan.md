@@ -1,146 +1,167 @@
 
-# Plan: Popravek organizacijske vidnosti otrok v useLogopedistChild hook
+
+# Plan: Popravek RLS politike na tabeli `progress` za organizacijsko vidnost
 
 ## Povzetek problema
 
-Hook `useLogopedistChild(childId)` trenutno filtrira po `.eq('logopedist_id', profile.id)`, kar pomeni:
-- Logoped v organizaciji "OŠ Test" NE more odpreti podrobnosti otroka, ki ga je dodal kolega
-- Strani kot Workspace, Podrobnosti, Artikulacijski test prikažejo "Otrok ni bil najden"
+Logopedi v isti organizaciji (npr. OŠ Test) lahko zdaj vidijo otroka, ki ga je dodal kolega, vendar **ne morejo videti njegovega napredka (progress)**. To pomeni:
+- Na strani "Napredek" (`/admin/children/{childId}/progress`) vidijo prazen seznam
+- Zgodovina aktivnosti je prazna
+- Statistika zvezdic/zmajev ni vidna
 
-## Prizadete strani
+## Analiza trenutnega stanja
 
-| Stran | Pot | Kaj se zgodi |
-|-------|-----|--------------|
-| AdminChildWorkspace | `/admin/children/{childId}/workspace` | "Otrok ni bil najden." |
-| AdminLogopedistChildDetail | `/admin/children/{childId}` | Prazni podatki |
-| AdminArtikulacijskiTest | `/admin/children/{childId}/test` | Manjkajoči podatki otroka |
-| AdminGameWrapper | Vse igre | "Otrok ni bil najden." |
-| AdminGameFullscreenWrapper | Celozaslonske igre | Preusmeritev na /admin/children |
+### Trenutne RLS politike na tabeli `progress`
 
-## Zakaj je popravek varen
+| Politika | Ukaz | Pogoj |
+|----------|------|-------|
+| Logopedists can manage own children progress | ALL (*) | `logopedist_child_id` pripada otroku, kjer je `lp.user_id = auth.uid()` |
+| Parents can view their children's progress | SELECT | `child_id` pripada staršu |
+| Parents can add progress | INSERT | `child_id` pripada staršu |
 
-### RLS politike (že implementirane v bazi)
+**Problem:** Politika za logopede preverja samo `logopedist_id = auth.uid()`, ne pa organizacijske pripadnosti.
+
+### Kako deluje pridobivanje napredka
 
 ```text
-SELECT (organizacijska vidnost):
-- LASTNI otroci: logopedist_id IN (SELECT id FROM logopedist_profiles WHERE user_id = auth.uid())
-- ALI organizacijski: EXISTS (aktivna organization_license IN isti organizaciji)
-
-UPDATE: samo logopedist_id = moj id (lastnik)
-DELETE: samo logopedist_id = moj id (lastnik)
-INSERT: samo za sebe
+AdminChildProgress.tsx
+├── useLogopedistProgress(childId)
+│   └── RPC: get_logopedist_child_activity_summary  ← SECURITY DEFINER ✓
+│       └── Obide RLS, deluje pravilno
+│
+└── Direktna poizvedba na 'progress' tabelo  ← BLOKIRANA za org otroke ✗
+    └── SELECT ... WHERE logopedist_child_id = childId
 ```
 
-Baza že skrbi za varnost - če odstranim filter v hook-u, RLS politika še vedno prepreči dostop nepooblaščenim uporabnikom.
+**Ugotovitev:**
+- `useLogopedistProgress` uporablja RPC funkcijo z `SECURITY DEFINER`, ki obide RLS → **DELUJE**
+- Direktna poizvedba v `AdminChildProgress.tsx` za zgodovino → **BLOKIRANA**
 
-## Sprememba
+## Kaj je potrebno popraviti
 
-### Datoteka: `src/hooks/useLogopedistChildren.ts`
+Potrebno je posodobiti RLS politiko za `SELECT` na tabeli `progress`, da dovoli branje tudi za otroke iz iste organizacije.
 
-**Trenutna koda (vrstica 222-246):**
-```typescript
-export function useLogopedistChild(childId: string | undefined) {
-  const { profile } = useAdminAuth();
+## Nova RLS politika
 
-  return useQuery({
-    queryKey: ['logopedist-child', childId],
-    queryFn: async (): Promise<LogopedistChild | null> => {
-      if (!childId || !profile?.id) return null;
+### Politika za branje (SELECT)
 
-      const { data, error } = await supabase
-        .from('logopedist_children')
-        .select('*')
-        .eq('id', childId)
-        .eq('logopedist_id', profile.id)  // ← PROBLEM: blokira organizacijske otroke
-        .eq('is_active', true)
-        .single();
-      // ...
-    },
-  });
-}
+```sql
+-- Odstrani staro politiko
+DROP POLICY IF EXISTS "Logopedists can manage own children progress" ON public.progress;
+
+-- Nova SELECT politika z organizacijsko vidnostjo
+CREATE POLICY "Logopedists can view org children progress"
+ON public.progress FOR SELECT
+USING (
+  -- Dovoli če je logopedist_child_id NULL (parent progress)
+  logopedist_child_id IS NULL
+  OR
+  -- ALI če je logopedist lastnik otroka
+  logopedist_child_id IN (
+    SELECT lc.id 
+    FROM logopedist_children lc
+    JOIN logopedist_profiles lp ON lc.logopedist_id = lp.id
+    WHERE lp.user_id = auth.uid()
+  )
+  OR
+  -- ALI če je logopedist v isti organizaciji z aktivno licenco
+  logopedist_child_id IN (
+    SELECT lc.id
+    FROM logopedist_children lc
+    JOIN logopedist_profiles owner_lp ON lc.logopedist_id = owner_lp.id
+    JOIN logopedist_profiles my_lp ON my_lp.user_id = auth.uid()
+    JOIN organization_licenses ol ON ol.organization_id = my_lp.organization_id
+    WHERE owner_lp.organization_id = my_lp.organization_id
+      AND ol.status = 'active'
+  )
+);
 ```
 
-**Nova koda:**
-```typescript
-export function useLogopedistChild(childId: string | undefined) {
-  const { profile } = useAdminAuth();
+### Politiki za pisanje (INSERT, UPDATE, DELETE) - ostanejo restriktivne
 
-  return useQuery({
-    queryKey: ['logopedist-child', childId],
-    queryFn: async (): Promise<LogopedistChild | null> => {
-      if (!childId || !profile?.id) return null;
+```sql
+-- INSERT: samo za lastne otroke
+CREATE POLICY "Logopedists can insert own children progress"
+ON public.progress FOR INSERT
+WITH CHECK (
+  logopedist_child_id IS NULL
+  OR
+  logopedist_child_id IN (
+    SELECT lc.id 
+    FROM logopedist_children lc
+    JOIN logopedist_profiles lp ON lc.logopedist_id = lp.id
+    WHERE lp.user_id = auth.uid()
+  )
+);
 
-      // RLS politika na bazi že skrbi za organizacijsko vidnost
-      // Odstranjen filter .eq('logopedist_id', profile.id)
-      const { data, error } = await supabase
-        .from('logopedist_children')
-        .select(`
-          *,
-          logopedist_profiles!inner(
-            id,
-            first_name,
-            last_name
-          )
-        `)
-        .eq('id', childId)
-        .eq('is_active', true)
-        .single();
+-- UPDATE: samo za lastne otroke
+CREATE POLICY "Logopedists can update own children progress"
+ON public.progress FOR UPDATE
+USING (
+  logopedist_child_id IS NULL
+  OR
+  logopedist_child_id IN (
+    SELECT lc.id 
+    FROM logopedist_children lc
+    JOIN logopedist_profiles lp ON lc.logopedist_id = lp.id
+    WHERE lp.user_id = auth.uid()
+  )
+);
 
-      if (error) {
-        console.error('Error fetching child:', error);
-        return null;
-      }
-
-      // Dodaj metadata za UI
-      return {
-        ...data,
-        logopedist_name: data.logopedist_profiles 
-          ? `${data.logopedist_profiles.first_name} ${data.logopedist_profiles.last_name}`
-          : undefined,
-        is_own_child: data.logopedist_id === profile.id,
-      } as LogopedistChild;
-    },
-    enabled: !!childId && !!profile?.id,
-  });
-}
+-- DELETE: samo za lastne otroke
+CREATE POLICY "Logopedists can delete own children progress"
+ON public.progress FOR DELETE
+USING (
+  logopedist_child_id IS NULL
+  OR
+  logopedist_child_id IN (
+    SELECT lc.id 
+    FROM logopedist_children lc
+    JOIN logopedist_profiles lp ON lc.logopedist_id = lp.id
+    WHERE lp.user_id = auth.uid()
+  )
+);
 ```
 
 ## Kaj se spremeni
 
 | Scenarij | Prej | Potem |
 |----------|------|-------|
-| Logoped A odpre otroka, ki ga je dodal sam | Deluje ✓ | Deluje ✓ |
-| Logoped A odpre otroka, ki ga je dodal kolega B v isti org | "Otrok ni bil najden" ✗ | Deluje ✓ |
-| Logoped iz druge organizacije poskuša dostopati | RLS blokira ✓ | RLS blokira ✓ |
-| Neprijavljen uporabnik | Preusmeritev ✓ | Preusmeritev ✓ |
+| Logoped A vidi napredek svojega otroka | ✓ Deluje | ✓ Deluje |
+| Logoped A vidi napredek otroka kolega B (ista org) | ✗ Prazen seznam | ✓ Vidi napredek |
+| Logoped A dodaja napredek za otroka kolega B | ✗ Blokirano | ✗ Še vedno blokirano |
+| Logoped A briše napredek otroka kolega B | ✗ Blokirano | ✗ Še vedno blokirano |
+| Logoped iz druge organizacije | ✗ Blokirano | ✗ Še vedno blokirano |
 
-## Dodatne informacije v UI
+## Varnostna analiza
 
-Po spremembi bo hook vrnil tudi:
-- `logopedist_name` - ime logopeda, ki je otroka dodal
-- `is_own_child` - boolean, ali je to tvoj otrok
-
-To omogoča prikaz informacije "Dodal: Janez Novak" na strani podrobnosti.
-
-## Tveganja in mitigacija
-
-| Tveganje | Verjetnost | Mitigacija |
-|----------|------------|------------|
-| Nepooblaščen dostop | Nizka | RLS politika v bazi je aktivna in testirana |
-| Urejanje tujega otroka | Nizka | UPDATE RLS politika še vedno zahteva lastništvo |
-| Brisanje tujega otroka | Nizka | DELETE RLS politika še vedno zahteva lastništvo |
+| Vidik | Status | Razlaga |
+|-------|--------|---------|
+| Branje tujega napredka | Omejeno na org | Samo člani iste organizacije z aktivno licenco |
+| Pisanje v tuj napredek | Blokirano | INSERT/UPDATE/DELETE zahtevajo lastništvo |
+| Brez organizacije | Blokirano | Če ni `organization_licenses` z `status = 'active'` |
 
 ## Datoteke za spremembo
 
-| Datoteka | Sprememba |
-|----------|-----------|
-| `src/hooks/useLogopedistChildren.ts` | Odstrani `.eq('logopedist_id', profile.id)` iz `useLogopedistChild`, dodaj JOIN za ime logopeda |
+| Tip | Datoteka/Lokacija | Sprememba |
+|-----|-------------------|-----------|
+| SQL Migracija | Nova migracija | Posodobi RLS politike na `progress` tabeli |
+
+## Koraki implementacije
+
+1. Ustvari SQL migracijo, ki:
+   - Odstrani obstoječo politiko "Logopedists can manage own children progress"
+   - Doda novo SELECT politiko z organizacijsko vidnostjo
+   - Doda ločene INSERT/UPDATE/DELETE politike za lastništvo
+
+2. Preveri, da politike za starše ostanejo nespremenjene
 
 ## Testiranje po implementaciji
 
-1. Prijavi se kot logoped v organizaciji "OŠ Test" (NE Janez Novak)
-2. Pojdi na "Moji otroci" - moral bi videti otroka Tian
-3. Klikni na otroka Tian - Workspace mora delovati
-4. Odpri "Podrobnosti" - podatki morajo biti vidni
-5. Poskusi "Preverjanje izgovorjave" - test mora delovati
-6. Poskusi urediti otroka - bi moralo biti onemogočeno (ker ni tvoj otrok)
+1. Prijavi se kot logoped v organizaciji OŠ Test (ne Janez Novak)
+2. Odpri otroka Tian na strani "Napredek"
+3. Preveri, da:
+   - Vidiš statistiko zvezdic/zmajev (UnifiedProgressDisplay)
+   - Vidiš zgodovino aktivnosti (če obstaja)
+4. Poskusi dodati napredek za tujega otroka - mora biti blokirano
+
