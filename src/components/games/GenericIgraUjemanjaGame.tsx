@@ -268,7 +268,7 @@ export function GenericIgraUjemanjaGame({ config, backPath = '/govorne-igre/igra
   const showRotateMessage = isTouchDevice && isPortrait;
 
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className="min-h-screen bg-background relative game-container">
       <div 
         className="fixed inset-0 z-0"
         style={{

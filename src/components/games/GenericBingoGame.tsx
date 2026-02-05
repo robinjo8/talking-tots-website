@@ -133,7 +133,7 @@ export function GenericBingoGame({ letter, displayLetter, title, wordsData, exer
 
   return (
     <div 
-      className="fixed inset-0 overflow-hidden select-none"
+      className="fixed inset-0 overflow-hidden select-none game-container"
       style={{
         backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.webp)',
         backgroundSize: 'cover',

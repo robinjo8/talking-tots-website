@@ -285,7 +285,7 @@ export function GenericLabirintGame({ config, backPath = '/govorne-igre/labirint
   if (effectiveFullscreen) {
     if (isPortrait) {
       return (
-        <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-dragon-green to-app-teal p-8">
+        <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-dragon-green to-app-teal p-8 game-container">
           <div className="text-center text-white">
             <div className="text-6xl mb-4">📱</div>
             <h2 className="text-2xl font-bold mb-2">Obrni telefon</h2>
@@ -297,7 +297,7 @@ export function GenericLabirintGame({ config, backPath = '/govorne-igre/labirint
 
     return (
       <div 
-        className="fixed inset-0 overflow-hidden select-none"
+        className="fixed inset-0 overflow-hidden select-none game-container"
         style={{
           backgroundImage: `url('${backgroundImageUrl}')`,
           backgroundSize: 'cover',
@@ -356,7 +356,7 @@ export function GenericLabirintGame({ config, backPath = '/govorne-igre/labirint
   // Desktop view
   return (
     <div 
-      className="fixed inset-0 overflow-auto select-none"
+      className="fixed inset-0 overflow-auto select-none game-container"
       style={{
         backgroundImage: `url('${backgroundImageUrl}')`,
         backgroundSize: 'cover',

@@ -267,7 +267,7 @@ export function GenericZaporedjaGame({ config, backPath = '/govorne-igre/zapored
   // Mobile fullscreen version
   if (effectiveFullscreen) {
     return (
-      <div className="fixed inset-0 overflow-hidden select-none">
+      <div className="fixed inset-0 overflow-hidden select-none game-container">
         <div 
           className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url('${backgroundImageUrl}')` }}
@@ -371,7 +371,7 @@ export function GenericZaporedjaGame({ config, backPath = '/govorne-igre/zapored
   // Desktop version
   return (
     <div 
-      className="fixed inset-0 overflow-auto select-none"
+      className="fixed inset-0 overflow-auto select-none game-container"
       style={{
         backgroundImage: `url('${backgroundImageUrl}')`,
         backgroundSize: 'cover',
