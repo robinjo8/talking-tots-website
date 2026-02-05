@@ -232,6 +232,4 @@
 /* Prevent pull-to-refresh on game containers */
 .game-container {
   overscroll-behavior-y: contain;
-  touch-action: pan-x pinch-zoom;
-  -webkit-overflow-scrolling: auto;
 }
