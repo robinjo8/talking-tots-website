@@ -13,6 +13,7 @@ interface LogopedistChildContextType {
   isNearLimit: boolean;
   isAtLimit: boolean;
   refetch: () => void;
+  isOrganizationLicense: boolean;
 }
 
 const LogopedistChildContext = createContext<LogopedistChildContextType | undefined>(undefined);
@@ -65,6 +66,7 @@ export function LogopedistChildProvider({ children: childrenProp }: { children: 
         isNearLimit,
         isAtLimit,
         refetch,
+        isOrganizationLicense: license?.isOrganizationLicense ?? false,
       }}
     >
       {childrenProp}

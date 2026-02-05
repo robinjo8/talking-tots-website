@@ -1283,6 +1283,57 @@ export type Database = {
           },
         ]
       }
+      organization_licenses: {
+        Row: {
+          created_at: string | null
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          license_tier_id: string
+          organization_id: string
+          status: string
+          stripe_subscription_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          license_tier_id: string
+          organization_id: string
+          status?: string
+          stripe_subscription_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          license_tier_id?: string
+          organization_id?: string
+          status?: string
+          stripe_subscription_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_licenses_license_tier_id_fkey"
+            columns: ["license_tier_id"]
+            isOneToOne: false
+            referencedRelation: "license_tiers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_licenses_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           created_at: string | null
@@ -1633,6 +1684,19 @@ export type Database = {
           expires_at: string
           license_name: string
           max_children: number
+          status: string
+          used_slots: number
+        }[]
+      }
+      get_organization_license_stats: {
+        Args: { p_user_id: string }
+        Returns: {
+          available_slots: number
+          expires_at: string
+          is_organization_license: boolean
+          license_name: string
+          max_children: number
+          organization_name: string
           status: string
           used_slots: number
         }[]

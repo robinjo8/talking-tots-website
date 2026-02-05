@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { toast } from 'sonner';
+import { useLogopedistLicense } from './useLogopedistLicense';
 
 export interface LogopedistChild {
   id: string;
@@ -19,6 +20,9 @@ export interface LogopedistChild {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  // Dodatna polja za organizacijsko vidnost
+  logopedist_name?: string;
+  is_own_child?: boolean;
 }
 
 export interface CreateChildInput {
@@ -41,28 +45,63 @@ export interface UpdateChildInput extends Partial<CreateChildInput> {
 export function useLogopedistChildren() {
   const { profile } = useAdminAuth();
   const queryClient = useQueryClient();
+  const { license } = useLogopedistLicense();
 
   const logopedistId = profile?.id;
+  const isOrgLicense = license?.isOrganizationLicense ?? false;
 
   // Pridobi vse otroke logopeda
   const { data: children = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['logopedist-children', logopedistId],
+    queryKey: ['logopedist-children', logopedistId, isOrgLicense],
     queryFn: async (): Promise<LogopedistChild[]> => {
       if (!logopedistId) return [];
 
-      const { data, error } = await supabase
-        .from('logopedist_children')
-        .select('*')
-        .eq('logopedist_id', logopedistId)
-        .eq('is_active', true)
-        .order('name', { ascending: true });
+      if (isOrgLicense) {
+        // Organizacijska licenca - pridobi vse otroke z imeni logopedov
+        const { data, error } = await supabase
+          .from('logopedist_children')
+          .select(`
+            *,
+            logopedist_profiles!inner(
+              id,
+              first_name,
+              last_name
+            )
+          `)
+          .eq('is_active', true)
+          .order('name', { ascending: true });
 
-      if (error) {
-        console.error('Error fetching children:', error);
-        throw error;
+        if (error) {
+          console.error('Error fetching org children:', error);
+          throw error;
+        }
+
+        return (data || []).map((child: any) => ({
+          ...child,
+          logopedist_name: child.logopedist_profiles 
+            ? `${child.logopedist_profiles.first_name} ${child.logopedist_profiles.last_name}`
+            : undefined,
+          is_own_child: child.logopedist_id === logopedistId,
+        })) as LogopedistChild[];
+      } else {
+        // Individualna licenca - samo svoje otroke
+        const { data, error } = await supabase
+          .from('logopedist_children')
+          .select('*')
+          .eq('logopedist_id', logopedistId)
+          .eq('is_active', true)
+          .order('name', { ascending: true });
+
+        if (error) {
+          console.error('Error fetching children:', error);
+          throw error;
+        }
+
+        return (data || []).map(child => ({
+          ...child,
+          is_own_child: true,
+        })) as LogopedistChild[];
       }
-
-      return (data || []) as LogopedistChild[];
     },
     enabled: !!logopedistId,
     staleTime: 30000,
