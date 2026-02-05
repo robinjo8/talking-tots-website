@@ -9,6 +9,8 @@ export interface LicenseStats {
   availableSlots: number;
   expiresAt: string | null;
   status: string;
+  isOrganizationLicense: boolean;
+  organizationName: string | null;
 }
 
 export function useLogopedistLicense() {
@@ -19,6 +21,25 @@ export function useLogopedistLicense() {
     queryFn: async (): Promise<LicenseStats | null> => {
       if (!user?.id) return null;
 
+      // Najprej poskusi novo organizacijsko funkcijo
+      const { data: orgData, error: orgError } = await supabase
+        .rpc('get_organization_license_stats', { p_user_id: user.id });
+
+      if (!orgError && orgData && orgData.length > 0) {
+        const row = orgData[0];
+        return {
+          licenseName: row.license_name,
+          maxChildren: row.max_children,
+          usedSlots: row.used_slots,
+          availableSlots: row.available_slots,
+          expiresAt: row.expires_at,
+          status: row.status,
+          isOrganizationLicense: row.is_organization_license,
+          organizationName: row.organization_name,
+        };
+      }
+
+      // Fallback na staro funkcijo če nova ne vrne rezultatov
       const { data, error } = await supabase
         .rpc('get_logopedist_license_stats', { p_user_id: user.id });
 
@@ -39,6 +60,8 @@ export function useLogopedistLicense() {
         availableSlots: row.available_slots,
         expiresAt: row.expires_at,
         status: row.status,
+        isOrganizationLicense: false,
+        organizationName: null,
       };
     },
     enabled: !!user?.id,

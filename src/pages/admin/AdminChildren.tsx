@@ -12,7 +12,8 @@ import {
   AlertCircle,
   Crown,
   User,
-  FileText
+  FileText,
+  Building2
 } from 'lucide-react';
 import { useLogopedistChildren, LogopedistChild } from '@/hooks/useLogopedistChildren';
 import { useLogopedistLicense } from '@/hooks/useLogopedistLicense';
@@ -42,6 +43,7 @@ export default function AdminChildren() {
   const [deletingChild, setDeletingChild] = useState<LogopedistChild | null>(null);
 
   const isLoading = childrenLoading || licenseLoading;
+  const isOrgLicense = license?.isOrganizationLicense ?? false;
 
   const handleStartWork = (childId: string) => {
     navigate(`/admin/children/${childId}/workspace`);
@@ -87,12 +89,22 @@ export default function AdminChildren() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Moji otroci</h1>
+          <h1 className="text-2xl font-bold">
+            {isOrgLicense ? 'Otroci organizacije' : 'Moji otroci'}
+          </h1>
           {license && (
-            <p className="text-muted-foreground mt-1">
-              Aktivna licenca: <span className="font-medium text-foreground">{license.licenseName}</span>
-              {' '}({license.usedSlots}/{license.maxChildren} otrok)
-            </p>
+            <div className="text-muted-foreground mt-1">
+              {isOrgLicense && license.organizationName && (
+                <p className="flex items-center gap-1">
+                  <Building2 className="h-4 w-4" />
+                  <span className="font-medium text-foreground">{license.organizationName}</span>
+                </p>
+              )}
+              <p>
+                Licenca: <span className="font-medium text-foreground">{license.licenseName}</span>
+                {' '}({license.usedSlots}/{license.maxChildren} otrok)
+              </p>
+            </div>
           )}
         </div>
         
@@ -191,6 +203,14 @@ export default function AdminChildren() {
                             <span>{child.gender === 'male' ? 'Deček' : 'Deklica'}</span>
                           </>
                         )}
+                        {isOrgLicense && child.logopedist_name && (
+                          <>
+                            <span>•</span>
+                            <span className={child.is_own_child ? 'text-dragon-green font-medium' : ''}>
+                              {child.is_own_child ? 'Moj otrok' : child.logopedist_name}
+                            </span>
+                          </>
+                        )}
                       </div>
                       {child.external_id && (
                         <p className="text-xs text-muted-foreground mt-0.5">
@@ -233,6 +253,8 @@ export default function AdminChildren() {
                       variant="ghost"
                       size="icon"
                       onClick={() => setEditingChild(child)}
+                      disabled={isOrgLicense && !child.is_own_child}
+                      title={isOrgLicense && !child.is_own_child ? 'Lahko urejate samo svoje otroke' : undefined}
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
@@ -242,6 +264,8 @@ export default function AdminChildren() {
                       size="icon"
                       className="text-destructive hover:text-destructive"
                       onClick={() => setDeletingChild(child)}
+                      disabled={isOrgLicense && !child.is_own_child}
+                      title={isOrgLicense && !child.is_own_child ? 'Lahko brišete samo svoje otroke' : undefined}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
