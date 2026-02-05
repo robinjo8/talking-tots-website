@@ -212,11 +212,24 @@ async function fetchSessionReviewData(sessionId: string): Promise<SessionReviewD
     recordings = results.filter((r): r is Recording => r !== null);
   }
 
-  // 5. Grupiraj posnetke po črkah
+  // 5. Dedupliciraj posnetke - ohrani samo ZADNJI posnetek za vsak wordIndex
+  // Ker imajo posnetki timestamp v imenu (npr. R-57-ROZA-2026-02-05T10-30-00-123Z.webm),
+  // sortiramo po imenu datoteke (timestamp) in vzamemo zadnjega za vsak wordIndex
+  const deduplicatedRecordings = new Map<number, Recording>();
+  const sortedByTimestamp = [...recordings].sort((a, b) => 
+    a.filename.localeCompare(b.filename)
+  );
+  sortedByTimestamp.forEach(recording => {
+    // Vedno prepiše s kasnejšim (sortirano naraščajoče po timestampu)
+    deduplicatedRecordings.set(recording.wordIndex, recording);
+  });
+  const uniqueRecordings = Array.from(deduplicatedRecordings.values());
+
+  // 6. Grupiraj posnetke po črkah
   const recordingsByLetter = new Map<string, Recording[]>();
   PHONETIC_ORDER.forEach(letter => recordingsByLetter.set(letter, []));
 
-  recordings.forEach(recording => {
+  uniqueRecordings.forEach(recording => {
     const letterRecordings = recordingsByLetter.get(recording.letter) || [];
     letterRecordings.push(recording);
     recordingsByLetter.set(recording.letter, letterRecordings);
