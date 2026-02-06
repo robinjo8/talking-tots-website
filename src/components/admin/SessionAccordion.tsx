@@ -45,7 +45,7 @@ export function SessionAccordion({
   hasUnsavedChanges,
   isReadOnly,
 }: SessionAccordionProps) {
-  const [openLetters, setOpenLetters] = useState<string[]>([]);
+  
 
   // Calculate session date based on session number
   const getSessionDate = (): { label: string; date: string } => {
