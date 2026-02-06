@@ -141,7 +141,7 @@ export function ReportTemplateEditor({ data, testSessions, hideParentSection = f
       {/* Anamneza Section */}
       <div className="space-y-2">
         <h2 className="font-bold text-foreground uppercase text-xs tracking-wide">
-          ANAMNEZA:
+          ANAMNEZA: <span className="text-red-500">*</span>
         </h2>
         <Textarea
           placeholder="Vnesite anamnezo..."
@@ -154,7 +154,7 @@ export function ReportTemplateEditor({ data, testSessions, hideParentSection = f
       {/* Ugotovitve Section */}
       <div className="space-y-2">
         <h2 className="font-bold text-foreground uppercase text-xs tracking-wide">
-          UGOTOVITVE:
+          UGOTOVITVE: <span className="text-red-500">*</span>
         </h2>
         <Textarea
           placeholder="Vnesite ugotovitve..."
@@ -167,7 +167,7 @@ export function ReportTemplateEditor({ data, testSessions, hideParentSection = f
       {/* Predlog za igre in vaje Section */}
       <div className="space-y-2">
         <h2 className="font-bold text-foreground uppercase text-xs tracking-wide">
-          PREDLOG ZA IGRE IN VAJE:
+          PREDLOG ZA IGRE IN VAJE: <span className="text-red-500">*</span>
         </h2>
         <LetterSelector
           selectedLetters={data.recommendedLetters}
