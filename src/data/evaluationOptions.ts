@@ -57,7 +57,7 @@ const universalOptions: EvaluationOption[] = [
 // Generiranje konfiguracije za vse črke
 export const evaluationConfigs: LetterEvaluationConfig[] = PHONETIC_ORDER.map(letter => ({
   letter,
-  options: letterOptionsMap[letter] || defaultOptions,
+  options: universalOptions,
 }));
 
 // Helper funkcija za pridobitev konfiguracije za določeno črko
