@@ -108,13 +108,18 @@ export function useNotifications() {
     }
   }, [user?.id, notifications]);
 
-  // Mark all notifications as read
+  // Mark all notifications as read (optimistic update)
   const markAllAsRead = useCallback(async () => {
     if (!user?.id) return;
 
     const unreadNotifications = notifications.filter(n => !n.is_read);
     if (unreadNotifications.length === 0) return;
 
+    // Optimistically update state immediately
+    setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+    setUnreadCount(0);
+
+    // Write to DB in background
     try {
       const inserts = unreadNotifications.map(n => ({
         notification_id: n.id,
@@ -125,12 +130,25 @@ export function useNotifications() {
         .from('notification_reads')
         .upsert(inserts, { onConflict: 'notification_id,user_id' });
 
-      if (error) throw error;
-
-      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
-      setUnreadCount(0);
+      if (error) {
+        // Rollback on error
+        setNotifications(prev =>
+          prev.map(n => {
+            const wasUnread = unreadNotifications.some(u => u.id === n.id);
+            return wasUnread ? { ...n, is_read: false } : n;
+          })
+        );
+        setUnreadCount(unreadNotifications.length);
+      }
     } catch (error) {
-      console.error('Error marking all notifications as read:', error);
+      // Rollback on error
+      setNotifications(prev =>
+        prev.map(n => {
+          const wasUnread = unreadNotifications.some(u => u.id === n.id);
+          return wasUnread ? { ...n, is_read: false } : n;
+        })
+      );
+      setUnreadCount(unreadNotifications.length);
     }
   }, [notifications, user?.id]);
 
