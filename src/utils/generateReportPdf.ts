@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import { ReportData } from '@/components/admin/ReportTemplateEditor';
 import { loadRobotoFonts } from './fonts/robotoBase64';
+import { formatRecommendedLettersText } from '@/components/admin/LetterSelector';
 
 export interface GenerateReportPdfOptions {
   hideParentSection?: boolean;
@@ -255,10 +256,16 @@ export async function generateReportPdf(data: ReportData, options: GenerateRepor
     const lineHeight = 5;
     
     // Calculate total height needed
+    // Build predlog content with recommended letters
+    const recommendedText = data.recommendedLetters && data.recommendedLetters.length > 0
+      ? formatRecommendedLettersText(data.recommendedLetters)
+      : '';
+    const fullPredlog = [recommendedText, predlogVaj.trim()].filter(Boolean).join('\n') || '(ni vnosa)';
+
     const sections = [
       { title: 'Anamneza', content: anamneza.trim() || '(ni vnosa)' },
       { title: 'Ugotovitve', content: ugotovitve.trim() || '(ni vnosa)' },
-      { title: 'Predlog za vaje', content: predlogVaj.trim() || '(ni vnosa)' },
+      { title: 'Predlog za igre in vaje', content: fullPredlog },
       { title: 'Opombe', content: opombe.trim() || '(ni vnosa)' }
     ];
     

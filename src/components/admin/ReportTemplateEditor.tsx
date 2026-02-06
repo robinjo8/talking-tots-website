@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { LetterSelector, formatRecommendedLettersText } from './LetterSelector';
 
 export interface TestSession {
   id: string;
@@ -33,6 +34,7 @@ interface ReportData {
   ugotovitve: string;
   predlogVaj: string;
   opombe: string;
+  recommendedLetters: string[];
 }
 
 interface ReportTemplateEditorProps {
@@ -41,9 +43,10 @@ interface ReportTemplateEditorProps {
   hideParentSection?: boolean;
   onFieldChange: (field: 'anamneza' | 'ugotovitve' | 'predlogVaj' | 'opombe', value: string) => void;
   onSessionChange: (sessionId: string) => void;
+  onRecommendedLettersChange: (letters: string[]) => void;
 }
 
-export function ReportTemplateEditor({ data, testSessions, hideParentSection = false, onFieldChange, onSessionChange }: ReportTemplateEditorProps) {
+export function ReportTemplateEditor({ data, testSessions, hideParentSection = false, onFieldChange, onSessionChange, onRecommendedLettersChange }: ReportTemplateEditorProps) {
   const formatGender = (gender: string | null) => {
     if (!gender) return 'Ni podatka';
     if (gender.toLowerCase() === 'm' || gender.toLowerCase() === 'male') return 'M';
@@ -161,16 +164,20 @@ export function ReportTemplateEditor({ data, testSessions, hideParentSection = f
         />
       </div>
 
-      {/* Predlog za vaje Section */}
+      {/* Predlog za igre in vaje Section */}
       <div className="space-y-2">
         <h2 className="font-bold text-foreground uppercase text-xs tracking-wide">
-          PREDLOG ZA VAJE:
+          PREDLOG ZA IGRE IN VAJE:
         </h2>
+        <LetterSelector
+          selectedLetters={data.recommendedLetters}
+          onLettersChange={onRecommendedLettersChange}
+        />
         <Textarea
-          placeholder="Vnesite predlog za vaje..."
+          placeholder="Dodatne opombe k predlogu za igre in vaje..."
           value={data.predlogVaj}
           onChange={(e) => onFieldChange('predlogVaj', e.target.value)}
-          className="resize-none min-h-[80px] text-sm"
+          className="resize-none min-h-[60px] text-sm"
         />
       </div>
 
@@ -227,6 +234,11 @@ export function generateReportText(data: ReportData): string {
     return `${age} let`;
   };
 
+  const recommendedText = data.recommendedLetters && data.recommendedLetters.length > 0
+    ? formatRecommendedLettersText(data.recommendedLetters)
+    : '';
+  const predlogContent = [recommendedText, data.predlogVaj].filter(Boolean).join('\n') || '(ni vnosa)';
+
   return `LOGOPEDSKO POROČILO – TomiTalk
 
 ══════════════════════════════════════════════════════════════
@@ -252,8 +264,8 @@ ${data.ugotovitve || '(ni vnosa)'}
 
 ══════════════════════════════════════════════════════════════
 
-PREDLOG ZA VAJE:
-${data.predlogVaj || '(ni vnosa)'}
+PREDLOG ZA IGRE IN VAJE:
+${predlogContent}
 
 ══════════════════════════════════════════════════════════════
 
