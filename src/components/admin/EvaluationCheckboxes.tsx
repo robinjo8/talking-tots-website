@@ -2,7 +2,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { EvaluationOption } from '@/data/evaluationOptions';
-import { ArticulationRatingScale } from './ArticulationRatingScale';
 
 interface EvaluationCheckboxesProps {
   options: EvaluationOption[];
@@ -41,34 +40,24 @@ export function EvaluationCheckboxes({
         Ocena preverjanja izgovorjave
       </span>
 
-      {/* Grid z dvema stolpcema */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Levi stolpec - checkboxi */}
-        <div className="space-y-2">
-          {options.map(option => (
-            <div key={option.id} className="flex items-center space-x-2">
-              <Checkbox
-                id={option.id}
-                checked={selectedOptions.includes(option.id)}
-                onCheckedChange={(checked) => handleCheckboxChange(option.id, checked as boolean)}
-                disabled={option.disabled || disabled}
-              />
-              <Label
-                htmlFor={option.id}
-                className={`text-sm font-normal cursor-pointer ${(option.disabled || disabled) ? 'text-muted-foreground opacity-60' : 'text-foreground'}`}
-              >
-                {option.label}
-              </Label>
-            </div>
-          ))}
-        </div>
-
-        {/* Desni stolpec - 5-stopenjska lestvica */}
-        <ArticulationRatingScale
-          selectedRating={rating}
-          onRatingChange={onRatingChange}
-          disabled={disabled}
-        />
+      {/* Grid z dvema stolpcema checkboxov */}
+      <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+        {options.map(option => (
+          <div key={option.id} className="flex items-center space-x-2">
+            <Checkbox
+              id={option.id}
+              checked={selectedOptions.includes(option.id)}
+              onCheckedChange={(checked) => handleCheckboxChange(option.id, checked as boolean)}
+              disabled={option.disabled || disabled}
+            />
+            <Label
+              htmlFor={option.id}
+              className={`text-sm font-normal cursor-pointer ${(option.disabled || disabled) ? 'text-muted-foreground opacity-60' : 'text-foreground'}`}
+            >
+              {option.label}
+            </Label>
+          </div>
+        ))}
       </div>
 
       {/* Komentar pod obema */}
