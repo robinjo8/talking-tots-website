@@ -600,6 +600,74 @@ export type Database = {
           },
         ]
       }
+      child_monthly_plans: {
+        Row: {
+          child_id: string
+          created_at: string
+          focus_letters: string[] | null
+          id: string
+          month: number
+          plan_data: Json
+          report_id: string | null
+          status: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          child_id: string
+          created_at?: string
+          focus_letters?: string[] | null
+          id?: string
+          month: number
+          plan_data?: Json
+          report_id?: string | null
+          status?: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          child_id?: string
+          created_at?: string
+          focus_letters?: string[] | null
+          id?: string
+          month?: number
+          plan_data?: Json
+          report_id?: string | null
+          status?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "child_monthly_plans_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "child_monthly_plans_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children_analytics"
+            referencedColumns: ["child_id"]
+          },
+          {
+            foreignKeyName: "child_monthly_plans_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children_analytics_admin"
+            referencedColumns: ["child_id"]
+          },
+          {
+            foreignKeyName: "child_monthly_plans_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "logopedist_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       children: {
         Row: {
           age: number

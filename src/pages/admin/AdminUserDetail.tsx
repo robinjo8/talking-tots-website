@@ -418,7 +418,7 @@ export default function AdminUserDetail() {
       }
 
       // Insert record into logopedist_reports table - vedno status 'submitted'
-      const { error: insertError } = await supabase
+      const { data: insertedReport, error: insertError } = await supabase
         .from('logopedist_reports')
         .insert({
           logopedist_id: logopedistProfile.id,
@@ -430,13 +430,25 @@ export default function AdminUserDetail() {
           next_steps: reportData.opombe || '',
           pdf_url: filePath,
           status: 'submitted' as const,
-        });
+        })
+        .select('id')
+        .single();
 
       if (insertError) {
         console.error('Error inserting report record:', insertError);
         toast.warning('PDF shranjeno, vendar ni bilo mogoče ustvariti zapisa v bazi');
       } else {
         toast.success(editingReportName ? 'Popravljeno poročilo shranjeno' : 'PDF poročilo generirano in shranjeno');
+        
+        // Fire-and-forget: generate monthly plan
+        if (insertedReport?.id) {
+          supabase.functions.invoke('generate-monthly-plan', {
+            body: { reportId: insertedReport.id }
+          }).then(res => {
+            if (res.error) console.error('Monthly plan generation failed:', res.error);
+            else console.log('Monthly plan generation triggered');
+          });
+        }
       }
 
       setHasUnsavedChanges(false);
