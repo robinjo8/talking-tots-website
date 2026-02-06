@@ -1,158 +1,154 @@
 
 
-# Plan: Takojšnje zmanjšanje števca obvestil ob kliku
+# Plan: AI Klepet - kontekst otroka, premik v meni, zgodovina pogovorov
 
-## Povzetek problema
+## Povzetek
 
-Ko uporabnik (admin ali starš) klikne na obvestilo v zvončku, se številka nad zvončkom ne zmanjša takoj, ker admin hook (`useNotifications.ts`) počaka na odgovor iz baze (Supabase), preden posodobi lokalno stanje. Vmes se popover zapre in uporabnik vidi staro številko.
+Tri spremembe:
+1. Chat bo vedel za tocno dolocenega otroka starsa (ime, starost, spol, govorne tezave, vprasalnik o govornem razvoju)
+2. Chat se premakne iz strani "Moja stran" v Nastavitve (Profile) pod nov zavihek "AI Klepet"
+3. Shranjevanje zgodovine pogovorov v bazo - prikaz zadnjih 5 pogovorov
 
-## Analiza obeh portalov
+---
 
-### Admin portal (`useNotifications.ts`)
+## 1. Kontekst otroka
 
-**Problem:** `markAsRead` je asinhrona funkcija, ki **najprej piše v bazo**, nato šele posodobi lokalni state:
+### Kaj se poslje AI-ju
+
+Iz tabele `children` (za otroka trenutnega starsa) se preberejo podatki in posljejo edge funkciji:
+
+| Podatek | Vir | Primer |
+|---------|-----|--------|
+| Ime | `child.name` | "Masa" |
+| Spol | `child.gender` | "F" -> "Deklica" |
+| Starost | Izracun iz `child.birth_date` | "4 leta" |
+| Govorne tezave | `child.speech_difficulties` | ["articulation"] -> "Motnja izreke / artikulacije - dislalija" |
+| Opis tezav | `child.speech_difficulties_description` | "R izgovarja kot L" |
+| Vprasalnik | `child.speech_development` | Berljiv povzetek iz SPEECH_DEVELOPMENT_QUESTIONS modela |
+
+### Kako deluje
+
+- `AIChatSection` (nova komponenta) prebere `selectedChild` iz `useAuth()` (prvi otrok - en stars ima vedno samo enega otroka)
+- Sestavi `childContext` objekt s prevedenimi vrednostmi (npr. "articulation" -> "Motnja izreke / artikulacije - dislalija", speech development kljuci -> slovensko besedilo vprasanj)
+- Starost se izracuna iz `birth_date` v letih
+- `childContext` se poslje v `useChatAssistant` hook, ki ga doda v request body ob vsakem sporocilu
+- Edge funkcija vstavi kontekst v system instructions kot dodaten blok na koncu
+
+### Primer konteksta v edge funkciji
 
 ```text
-1. Klik na obvestilo
-2. markAsRead() se pokliče
-3. await supabase.insert(...)   ← ČAKA na bazo (200-500ms)
-4. setUnreadCount(prev - 1)     ← Šele zdaj se posodobi števec
-5. onClose()                    ← Popover se zapre
+PODATKI O OTROKU UPORABNIKA:
+- Ime: Masa
+- Spol: Deklica
+- Starost: 4 leta
+- Govorne tezave: Motnja izreke / artikulacije - dislalija
+- Podroben opis tezav: R izgovarja kot L
+- Vprasalnik o govornem razvoju:
+  * Ali druge osebe razumejo otrokov govor: Da
+  * Otrok lahko rece: Vec kot 200 besed
+  * Ali zna tvoriti povedi: Da
+  * Ali jasno izgovarja besede: Ne
+  * Pogosta vnetja uses: Ne
+  * Tezave z zvecenjem: Ne
+  * Ali obiskuje logopeda: Da
+
+VEDNO uporabi te podatke. NE ugibaj starosti ali govornih tezav otroka.
+Ce uporabnik sprasi o otroku, odgovarjaj na podlagi teh podatkov.
 ```
 
-Uporabnik vidi staro številko, ker se popover zapre preden se čakanje na bazo konča.
+### Dinamicne suggested questions
 
-### Uporabniški portal (`useUserNotifications.ts`)
+Namesto fiksnega "Katere vaje so primerne za 4-letnika?" se uporabi dejanska starost otroka iz profila.
 
-**Stanje:** Deluje pravilno, ker je `markAsRead` sinhrona funkcija (localStorage). Števec se posodobi takoj.
+---
 
-## Rešitev: Optimistično posodabljanje (Optimistic Update)
+## 2. Premik chata v Nastavitve
 
-Spremenimo vrstni red operacij v admin hooku - **najprej posodobimo lokalno stanje** (takoj), **nato zapišemo v bazo**. Če zapis v bazo ne uspe, povrnemo staro stanje.
+### Spremembe
 
-### Spremembe v `src/hooks/useNotifications.ts`
+- **MojaStran.tsx**: Odstranitev AI chat kartice (vrstice 59-77) in neuporabljenih importov (`MessageCircle`, `Button`)
+- **ProfileSidebar.tsx**: Nov meni element `{ id: "aiChat", label: "AI Klepet", icon: MessageCircle }` - dodan med "Preverjanje izgovorjave" in "Narocnina"
+- **ProfileMobileTabs.tsx**: Isti element za mobilni meni
+- **Profile.tsx**: Dodana sekcija `{activeSection === 'aiChat' && <AIChatSection />}`
+- **AIChatSection.tsx** (nova): Wrapper komponenta ki sestavi childContext in renderira ChatInterface z ustrezno visino
 
-#### `markAsRead` - nova logika:
+Stran `/pomoc-chat` (PomocChat.tsx) in njena ruta se ohranita kot alternativni dostop.
+
+---
+
+## 3. Zgodovina pogovorov (zadnjih 5)
+
+### Supabase tabele (nova migracija)
+
+**Tabela `chat_conversations`:**
+
+| Stolpec | Tip | Opis |
+|---------|-----|------|
+| id | uuid PK (gen_random_uuid) | ID pogovora |
+| user_id | uuid FK -> auth.users | Lastnik |
+| title | text | Avtomatski naslov (prvih ~50 znakov prvega vprasanja) |
+| created_at | timestamptz | Cas ustvarjanja |
+| updated_at | timestamptz | Cas zadnjega sporocila |
+
+**Tabela `chat_messages`:**
+
+| Stolpec | Tip | Opis |
+|---------|-----|------|
+| id | uuid PK | ID sporocila |
+| conversation_id | uuid FK -> chat_conversations (ON DELETE CASCADE) | Kateri pogovor |
+| role | text CHECK (role IN ('user','assistant')) | Vloga |
+| content | text | Vsebina |
+| created_at | timestamptz | Cas |
+
+**RLS politike:**
+- `chat_conversations`: SELECT, INSERT, UPDATE, DELETE le kjer `user_id = auth.uid()`
+- `chat_messages`: SELECT, INSERT le za sporocila, ki pripadajo pogovorom uporabnika (prek JOIN na `chat_conversations.user_id = auth.uid()`)
+
+### Logika v frontend-u
+
+`useChatAssistant` hook se razsiri:
+- `conversations` - seznam zadnjih 5 pogovorov (iz baze, urejeni po `updated_at DESC`)
+- `activeConversationId` - ID trenutnega pogovora (ali `null` za novega)
+- `loadConversation(id)` - nalozi sporocila iz baze za izbrani pogovor
+- `startNewConversation()` - ponastavi sporocila in `activeConversationId`
+- Ob posiljanju prvega sporocila se ustvari nov zapis v `chat_conversations` (naslov = prvih ~50 znakov vprasanja)
+- Ob vsakem poslanem/prejetem sporocilu se shrani v `chat_messages`
+- Ob zakljucku asistentovega odgovora se posodobi `updated_at` na pogovoru
+
+### UI prikaz
+
+V `ChatInterface` se nad pogovorom doda:
+- Gumb "+ Nov pogovor"
+- Seznam zadnjih 5 pogovorov (naslov + datum) kot klikljivi elementi
+- Ko uporabnik klikne na pogovor, se nalozijo vsa sporocila tega pogovora
+- Ko uporabnik klikne "Nov pogovor", se zacne prazen pogovor
 
 ```text
-1. Klik na obvestilo
-2. markAsRead() se pokliče
-3. setUnreadCount(prev - 1)     ← TAKOJ posodobi števec
-4. setNotifications(...)        ← TAKOJ označi kot prebrano
-5. supabase.insert(...)         ← V ozadju zapiši v bazo
-6. Če napaka → povrni stanje   ← Rollback pri napaki
++------------------------------------------+
+| [+ Nov pogovor]                          |
+| > Kdaj naj bi otrok izgovarjal R?  3.2. |
+| > Vaje za motoriko govoril        1.2.  |
+|------------------------------------------|
+|          Trenutni pogovor                |
+|  [sporocila...]                          |
+|  [vnos sporocila]                        |
++------------------------------------------+
 ```
 
-Konkretno:
+---
 
-```typescript
-const markAsRead = useCallback(async (notificationId: string) => {
-  if (!user?.id) return;
+## Tehnicne podrobnosti - datoteke
 
-  // 1. Preveri ali je že prebrano (prepreči dvojno zmanjšanje)
-  const notification = notifications.find(n => n.id === notificationId);
-  if (!notification || notification.is_read) return;
-
-  // 2. Optimistično posodobi stanje TAKOJ
-  setNotifications(prev =>
-    prev.map(n => n.id === notificationId ? { ...n, is_read: true } : n)
-  );
-  setUnreadCount(prev => Math.max(0, prev - 1));
-
-  // 3. Zapiši v bazo v ozadju
-  try {
-    const { error } = await supabase
-      .from('notification_reads')
-      .insert({ notification_id: notificationId, user_id: user.id });
-
-    if (error && error.code !== '23505') {
-      // Povrni stanje pri napaki
-      setNotifications(prev =>
-        prev.map(n => n.id === notificationId ? { ...n, is_read: false } : n)
-      );
-      setUnreadCount(prev => prev + 1);
-    }
-  } catch (error) {
-    // Povrni stanje pri napaki
-    setNotifications(prev =>
-      prev.map(n => n.id === notificationId ? { ...n, is_read: false } : n)
-    );
-    setUnreadCount(prev => prev + 1);
-  }
-}, [user?.id, notifications]);
-```
-
-#### `markAllAsRead` - nova logika:
-
-Enako - najprej posodobi stanje, nato zapiši v bazo:
-
-```typescript
-const markAllAsRead = useCallback(async () => {
-  if (!user?.id) return;
-
-  const unreadNotifications = notifications.filter(n => !n.is_read);
-  if (unreadNotifications.length === 0) return;
-
-  // 1. Optimistično posodobi TAKOJ
-  setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
-  setUnreadCount(0);
-
-  // 2. V ozadju zapiši v bazo
-  try {
-    const inserts = unreadNotifications.map(n => ({
-      notification_id: n.id,
-      user_id: user.id,
-    }));
-
-    const { error } = await supabase
-      .from('notification_reads')
-      .upsert(inserts, { onConflict: 'notification_id,user_id' });
-
-    if (error) {
-      // Povrni stanje
-      setNotifications(prev =>
-        prev.map(n => {
-          const wasUnread = unreadNotifications.some(u => u.id === n.id);
-          return wasUnread ? { ...n, is_read: false } : n;
-        })
-      );
-      setUnreadCount(unreadNotifications.length);
-    }
-  } catch (error) {
-    // Povrni stanje
-    setNotifications(prev =>
-      prev.map(n => {
-        const wasUnread = unreadNotifications.some(u => u.id === n.id);
-        return wasUnread ? { ...n, is_read: false } : n;
-      })
-    );
-    setUnreadCount(unreadNotifications.length);
-  }
-}, [notifications, user?.id]);
-```
-
-## Datoteke za spremembo
-
-| Datoteka | Sprememba |
-|----------|-----------|
-| `src/hooks/useNotifications.ts` | Optimistično posodabljanje v `markAsRead` in `markAllAsRead` |
-
-Uporabniški portal (`useUserNotifications.ts`) **ne potrebuje sprememb** - tam je `markAsRead` že sinhrona in deluje pravilno.
-
-## Rezultat
-
-| Scenarij | Prej | Potem |
-|----------|------|-------|
-| Admin klikne 1 obvestilo | Števec se posodobi z zamikom (200-500ms) | Števec se posodobi takoj |
-| Admin klikne "Označi vse" | Števec se posodobi z zamikom | Števec se posodobi takoj |
-| Napaka pri zapisu v bazo | Števec se ne posodobi (ostane stara vrednost) | Števec se takoj posodobi, ob napaki se povrne nazaj |
-| Uporabniški portal | Deluje pravilno (brez sprememb) | Deluje pravilno (brez sprememb) |
-
-## Testiranje
-
-1. Prijavi se kot logoped v admin portal
-2. Klikni zvonček - preveri, da so obvestila prikazana
-3. Klikni na eno obvestilo - preveri, da se števec nad zvončkom takoj zmanjša za 1
-4. Klikni "Označi vse" - preveri, da števec takoj pokaže 0
-5. Prijavi se kot starš - preveri, da tudi tam obvestila pravilno delujejo
+| Datoteka | Akcija | Opis |
+|----------|--------|------|
+| Nova migracija SQL | Nova | Tabeli `chat_conversations` + `chat_messages` z RLS |
+| `src/components/profile/AIChatSection.tsx` | Nova | Wrapper - sestavi childContext iz selectedChild, posreduje ChatInterface |
+| `src/hooks/useChatAssistant.ts` | Sprememba | Doda `childContext` parameter, shranjevanje/nalaganje iz baze, conversations state |
+| `src/components/chat/ChatInterface.tsx` | Sprememba | Prejme childContext, dinamicne suggested questions, seznam zgodovine pogovorov |
+| `supabase/functions/chat-assistant/index.ts` | Sprememba | Sprejme `childContext` iz body in vstavi v system instructions |
+| `src/components/profile/ProfileSidebar.tsx` | Sprememba | Doda "AI Klepet" meni element |
+| `src/components/profile/ProfileMobileTabs.tsx` | Sprememba | Doda "AI Klepet" tab |
+| `src/pages/Profile.tsx` | Sprememba | Doda prikaz AIChatSection |
+| `src/pages/MojaStran.tsx` | Sprememba | Odstrani chat kartico in neuporabljene importe |
+| `src/integrations/supabase/types.ts` | Sprememba | Doda tipe za novi tabeli |
 
