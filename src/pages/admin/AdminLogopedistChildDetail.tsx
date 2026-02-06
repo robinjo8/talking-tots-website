@@ -67,6 +67,7 @@ export default function AdminLogopedistChildDetail() {
     ugotovitve: '',
     predlogVaj: '',
     opombe: '',
+    recommendedLetters: [],
   });
 
   const { 
@@ -231,6 +232,7 @@ export default function AdminLogopedistChildDetail() {
         ugotovitve: '',
         predlogVaj: '',
         opombe: '',
+        recommendedLetters: [],
       }));
       await refetchReports();
     } catch (err) {
@@ -292,10 +294,11 @@ export default function AdminLogopedistChildDetail() {
         .from('logopedist_reports')
         .insert({
           logopedist_id: logopedistProfile.id,
-          session_id: null, // Will link to articulation sessions later
+          session_id: null,
           summary: reportData.ugotovitve?.substring(0, 200) || '',
           findings: { anamneza: reportData.anamneza, ugotovitve: reportData.ugotovitve },
           recommendations: reportData.predlogVaj || '',
+          recommended_letters: reportData.recommendedLetters.length > 0 ? reportData.recommendedLetters : null,
           next_steps: reportData.opombe || '',
           pdf_url: filePath,
           status: 'submitted' as const,
@@ -316,6 +319,7 @@ export default function AdminLogopedistChildDetail() {
         ugotovitve: '',
         predlogVaj: '',
         opombe: '',
+        recommendedLetters: [],
       }));
       await refetchGeneratedReports();
     } catch (err) {
@@ -345,12 +349,14 @@ export default function AdminLogopedistChildDetail() {
     }
 
     const findings = reportRecord.findings as { anamneza?: string; ugotovitve?: string } | null;
+    const recLetters = (reportRecord as any).recommended_letters as string[] | null;
     setReportData(prev => ({
       ...prev,
       anamneza: findings?.anamneza || '',
       ugotovitve: findings?.ugotovitve || reportRecord.summary || '',
       predlogVaj: reportRecord.recommendations || '',
       opombe: reportRecord.next_steps || '',
+      recommendedLetters: recLetters || [],
     }));
     
     setEditingReportName(file.name);
@@ -421,15 +427,15 @@ export default function AdminLogopedistChildDetail() {
       const text = await response.text();
       
       const anamenzaMatch = text.match(/ANAMNEZA:\s*([\s\S]*?)(?=═{5,}|UGOTOVITVE:|$)/);
-      const ugotovitveMatch = text.match(/UGOTOVITVE:\s*([\s\S]*?)(?=═{5,}|PREDLOG ZA VAJE:|$)/);
-      const predlogMatch = text.match(/PREDLOG ZA VAJE:\s*([\s\S]*?)(?=═{5,}|OPOMBE:|$)/);
+      const ugotovitveMatch = text.match(/UGOTOVITVE:\s*([\s\S]*?)(?=═{5,}|PREDLOG ZA (IGRE IN )?VAJE:|$)/);
+      const predlogMatch = text.match(/PREDLOG ZA (IGRE IN )?VAJE:\s*([\s\S]*?)(?=═{5,}|OPOMBE:|$)/);
       const opombeMatch = text.match(/OPOMBE:\s*([\s\S]*?)(?=═{5,}|Poročilo izdelal|$)/);
 
       setReportData(prev => ({
         ...prev,
         anamneza: anamenzaMatch?.[1]?.trim().replace('(ni vnosa)', '') || '',
         ugotovitve: ugotovitveMatch?.[1]?.trim().replace('(ni vnosa)', '') || '',
-        predlogVaj: predlogMatch?.[1]?.trim().replace('(ni vnosa)', '') || '',
+        predlogVaj: predlogMatch?.[2]?.trim().replace('(ni vnosa)', '') || '',
         opombe: opombeMatch?.[1]?.trim().replace('(ni vnosa)', '') || '',
       }));
       
@@ -742,6 +748,10 @@ export default function AdminLogopedistChildDetail() {
                   hideParentSection={true}
                   onFieldChange={handleReportFieldChange}
                   onSessionChange={handleSessionChange}
+                  onRecommendedLettersChange={(letters) => {
+                    setReportData(prev => ({ ...prev, recommendedLetters: letters }));
+                    setHasUnsavedChanges(true);
+                  }}
                 />
                 
                 {/* Action buttons */}
