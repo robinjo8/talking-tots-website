@@ -1,5 +1,4 @@
 import {
-  Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
@@ -49,80 +48,79 @@ export function LetterAccordion({
   };
 
   return (
-    <Accordion type="single" collapsible className="w-full">
-      <AccordionItem value={letter} className="border rounded-lg bg-card">
-        <AccordionTrigger className="px-4 hover:no-underline">
-          <div className="flex items-center gap-3">
-            {hasRecordings ? (
-              <Volume2 className="h-4 w-4 text-primary" />
-            ) : (
-              <VolumeX className="h-4 w-4 text-muted-foreground" />
-            )}
-            <span className="font-semibold text-foreground">ČRKA {letter}</span>
-            {!hasRecordings && (
-              <span className="text-xs text-muted-foreground">(ni posnetkov)</span>
-            )}
-            {hasRecordings && (
-              <span className="text-xs text-muted-foreground">
-                ({recordings.length} {recordings.length === 1 ? 'posnetek' : recordings.length === 2 ? 'posnetka' : 'posnetki'})
-              </span>
-            )}
-          </div>
-        </AccordionTrigger>
-        
-        <AccordionContent className="px-4 pb-4">
-          {/* Posnetki */}
+    <AccordionItem value={letter} className="border rounded-lg bg-card">
+      <AccordionTrigger className="px-4 hover:no-underline">
+        <div className="flex items-center gap-3">
           {hasRecordings ? (
-            <div className="space-y-1">
-              {recordings.map((recording, index) => (
-                <RecordingPlayer
-                  key={`${recording.filename}-${index}`}
-                  word={recording.word}
-                  url={recording.url}
-                />
-              ))}
-            </div>
+            <Volume2 className="h-4 w-4 text-primary" />
           ) : (
-            <p className="text-sm text-muted-foreground py-2">
-              Za to črko ni bilo shranjenih posnetkov.
-            </p>
+            <VolumeX className="h-4 w-4 text-muted-foreground" />
           )}
+          <span className="font-semibold text-foreground">ČRKA {letter}</span>
+          {!hasRecordings && (
+            <span className="text-xs text-muted-foreground">(ni posnetkov)</span>
+          )}
+          {hasRecordings && (
+            <span className="text-xs text-muted-foreground">
+              ({recordings.length} {recordings.length === 1 ? 'posnetek' : recordings.length === 2 ? 'posnetka' : 'posnetki'})
+            </span>
+          )}
+        </div>
+      </AccordionTrigger>
+      
+      <AccordionContent className="px-4 pb-4">
+        {/* Posnetki */}
+        {hasRecordings ? (
+          <div className="space-y-1">
+            {recordings.map((recording, index) => (
+              <RecordingPlayer
+                key={`${recording.filename}-${index}`}
+                word={recording.word}
+                url={recording.url}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground py-2">
+            Za to črko ni bilo shranjenih posnetkov.
+          </p>
+        )}
 
-          {/* Check boxi, lestvica in komentar */}
-          {config && (
-            <EvaluationCheckboxes
-              options={config.options}
-              selectedOptions={evaluation.selectedOptions}
-              comment={evaluation.comment}
-              rating={evaluation.rating}
-              onOptionsChange={handleOptionsChange}
-              onCommentChange={handleCommentChange}
-              onRatingChange={handleRatingChange}
-              disabled={isReadOnly}
-            />
-          )}
+        {/* Check boxi in komentar */}
+        {config && (
+          <EvaluationCheckboxes
+            options={config.options}
+            selectedOptions={evaluation.selectedOptions}
+            comment={evaluation.comment}
+            rating={evaluation.rating}
+            onOptionsChange={handleOptionsChange}
+            onCommentChange={handleCommentChange}
+            onRatingChange={handleRatingChange}
+            disabled={isReadOnly}
+          />
+        )}
 
-          {/* Gumb za shranjevanje */}
-          {onSave && !isReadOnly && (
-            <div className="pt-3 mt-3 border-t flex justify-end">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onSave}
-                disabled={isSaving}
-                className="gap-2"
-              >
-                {isSaving ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Save className="h-4 w-4" />
-                )}
-                Shrani oceno
-              </Button>
-            </div>
-          )}
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
+        {/* Gumb za shranjevanje */}
+        {onSave && !isReadOnly && (
+          <div className="pt-3 mt-3 border-t flex justify-end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onSave}
+              disabled={isSaving}
+              className="gap-2"
+            >
+              {isSaving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
+              Shrani oceno
+            </Button>
+          </div>
+        )}
+      </AccordionContent>
+    </AccordionItem>
   );
 }
+
