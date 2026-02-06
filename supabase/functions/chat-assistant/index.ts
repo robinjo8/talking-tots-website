@@ -22,7 +22,7 @@ serve(async (req) => {
       throw new Error("OPENAI_VECTOR_STORE_ID is not configured");
     }
 
-    const { messages } = await req.json();
+    const { messages, childContext } = await req.json();
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return new Response(
@@ -72,6 +72,30 @@ You do not contradict established speech-language development principles. You do
 
 Your communication style is professional, structured, calm, and reassuring. Your goal is to support parents in understanding their child's speech development and in using the TomiTalk application effectively.`;
 
+    // Build child context block if available
+    let childContextBlock = "";
+    if (childContext && typeof childContext === "object") {
+      const parts: string[] = [];
+      if (childContext.name)
+        parts.push(`- Ime: ${childContext.name}`);
+      if (childContext.gender)
+        parts.push(`- Spol: ${childContext.gender}`);
+      if (childContext.age !== null && childContext.age !== undefined)
+        parts.push(`- Starost: ${childContext.age} let`);
+      if (childContext.speechDifficulties && childContext.speechDifficulties !== "Ni podatka")
+        parts.push(`- Govorne težave: ${childContext.speechDifficulties}`);
+      if (childContext.speechDifficultiesDescription)
+        parts.push(`- Podroben opis govornih težav: ${childContext.speechDifficultiesDescription}`);
+      if (childContext.speechDevelopmentSummary && childContext.speechDevelopmentSummary !== "Ni podatka")
+        parts.push(`- Vprašalnik o govornem razvoju:\n  ${childContext.speechDevelopmentSummary}`);
+
+      if (parts.length > 0) {
+        childContextBlock = `\n\nPODATKI O OTROKU UPORABNIKA:\n${parts.join("\n")}\n\nVEDNO uporabi te podatke. NE ugibaj starosti ali govornih težav otroka.\nČe uporabnik vpraša o otroku, odgovarjaj na podlagi teh podatkov.`;
+      }
+    }
+
+    const finalInstructions = systemInstructions + childContextBlock;
+
     // Build input array for Responses API
     const input = messages.map((m: { role: string; content: string }) => ({
       role: m.role === "assistant" ? "assistant" : "user",
@@ -86,7 +110,7 @@ Your communication style is professional, structured, calm, and reassuring. Your
       },
       body: JSON.stringify({
         model: "gpt-4.1",
-        instructions: systemInstructions,
+        instructions: finalInstructions,
         input,
         tools: [
           {
