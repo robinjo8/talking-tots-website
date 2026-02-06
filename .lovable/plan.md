@@ -1,325 +1,198 @@
 
 
-# Plan: AI mesecni nacrt vaj na podlagi logopedskega porocila
+# Plan: Prenova strani /moji-izzivi
 
-## Povzetek
+## Povzetek sprememb
 
-Ko logopedinja shrani PDF porocilo, se avtomatsko poklice edge funkcija `generate-monthly-plan`, ki na podlagi porocila, ocen glasov in starosti otroka generira personaliziran 4-tedenski nacrt vaj in iger. Nacrt se prikaze staršem na strani `/moji-izzivi` kot interaktiven koledar s povezavami do iger.
-
-Trenutno stanje: **nic od tega ne obstaja** - ni edge funkcije, ni tabele v bazi, ni prikaza na uporabniski strani. Stran `/moji-izzivi` je prazna kartica brez logike.
+Stran /moji-izzivi bo popolnoma prenovljena: namesto 4 tednov po 7 dni bo prikazovala dejanske koledarske dni meseca, vsak dan bo imel motoriko + 4 razlicne igre, zvezdice bodo prikazane namesto trajanja, aktivnosti bodo oznacene kot opravljene, in slog bo usklajen z /moja-stran.
 
 ---
 
-## A. Podatkovna baza
+## A. Spremembe edge funkcije (generate-monthly-plan)
 
-### Nova tabela: `child_monthly_plans`
+### Struktura nacrta: dejanski dni v mesecu
 
-| Stolpec | Tip | Opis |
-|---------|-----|------|
-| id | uuid PK | ID nacrta |
-| child_id | uuid FK -> children | Otrok |
-| report_id | uuid FK -> logopedist_reports | Porocilo ki je sprozilo nacrt |
-| plan_data | jsonb | Strukturiran mesecni nacrt (4 tedni x 7 dni x 3-4 aktivnosti) |
-| focus_letters | text[] | Glasovi na katere se nacrt osredotoca |
-| month | integer | Mesec (1-12) |
-| year | integer | Leto |
-| status | text | 'generating', 'active', 'archived' |
-| created_at | timestamptz | Cas ustvarjanja |
-| updated_at | timestamptz | Cas posodobitve |
+Trenutno AI generira 4 tedne po 7 dni (= 28 dni). Nova logika:
+- Edge funkcija izracuna stevilo dni v tekocemu mesecu (npr. februar 2026 = 28 dni, marec = 31 dni)
+- AI generira nacrt za TOCNO toliko dni, kolikor jih ima mesec
+- Namesto `weeks` -> `days` strukture bo flat seznam dni z dejanskimi datumi
 
-### RLS politike
+### Nova pravila za AI
 
-- **SELECT za starse**: `auth.uid() = (SELECT parent_id FROM children WHERE id = child_id)`
-- **SELECT za logopedinje**: prek `is_logopedist(auth.uid())` ali `is_internal_logopedist(auth.uid())`
-- **INSERT/UPDATE**: samo prek service role (edge funkcija) - ni direktnega uporabniskega dostopa za pisanje
+- **Motorika + 4 razlicne igre na dan** (namesto motorika + 2 igri)
+- **Ista igra se NE SME ponoviti na isti dan** - npr. ne sme biti Igra ujemanja za S in Igra ujemanja za Z isti dan
+- Odstranjena polja: `theme` (teme tednov), `duration` (trajanje)
+- Dodano polje: `date` (dejanski datum, npr. "2026-02-07")
 
-### Struktura `plan_data` (JSONB)
+### Nova plan_data struktura
 
 ```text
 {
-  "summary": "Nacrt se osredotoca na glasove S in Z...",
+  "summary": "Nacrt za februar 2026...",
   "targetLetters": ["S", "Z"],
   "childAge": 9,
   "ageGroup": "9-10",
-  "weeks": [
+  "totalDays": 28,
+  "days": [
     {
-      "weekNumber": 1,
-      "theme": "Uvajanje glasov S in Z",
-      "days": [
+      "date": "2026-02-01",
+      "dayName": "Nedelja",
+      "activities": [
         {
-          "dayNumber": 1,
-          "dayName": "Ponedeljek",
-          "activities": [
-            {
-              "type": "motorika",
-              "title": "Vaje motorike govoril",
-              "description": "Izvedite 5 minut vaj za ustnice in jezik",
-              "path": "/govorno-jezikovne-vaje/vaje-motorike-govoril",
-              "duration": "5 min"
-            },
-            {
-              "type": "igra",
-              "title": "Sestavljanke - crka S",
-              "description": "Sestavi sestavljanko in izgovori besede",
-              "path": "/govorne-igre/sestavljanke/s910",
-              "letter": "S",
-              "duration": "10 min"
-            },
-            {
-              "type": "igra",
-              "title": "Labirint - crka Z",
-              "description": "Poisci pot skozi labirint",
-              "path": "/govorne-igre/labirint/z",
-              "letter": "Z",
-              "duration": "10 min"
-            }
-          ]
+          "type": "motorika",
+          "title": "Vaje za motoriko govoril",
+          "path": "/govorno-jezikovne-vaje/vaje-motorike-govoril"
+        },
+        {
+          "type": "igra",
+          "title": "Kolo besed",
+          "path": "/govorne-igre/kolo-srece/sh",
+          "letter": "S",
+          "gameId": "kolo-srece"
+        },
+        {
+          "type": "igra",
+          "title": "Bingo",
+          "path": "/govorne-igre/bingo/zh",
+          "letter": "Z",
+          "gameId": "bingo"
+        },
+        {
+          "type": "igra",
+          "title": "Labirint",
+          "path": "/govorne-igre/labirint/sh",
+          "letter": "S",
+          "gameId": "labirint"
+        },
+        {
+          "type": "igra",
+          "title": "Sestavljanke",
+          "path": "/govorne-igre/sestavljanke/zh910",
+          "letter": "Z",
+          "gameId": "sestavljanke"
         }
-        // ... 7 dni
       ]
     }
-    // ... 4 tedni
+    // ... vsi dnevi meseca
   ]
 }
 ```
 
----
-
-## B. Edge funkcija: `generate-monthly-plan`
-
-### Tok izvajanja
-
-1. Prejme `reportId` kot parameter
-2. Iz baze nalozi:
-   - Porocilo (`logopedist_reports`) -> `recommended_letters`, `session_id`
-   - Ocene glasov (`articulation_evaluations` prek `session_id`) -> vse crke ki nimajo `acquired`
-   - Otroka (`children` prek `articulation_test_sessions.child_id`) -> `birth_date` za izracun starosti
-3. Iz `birth_date` izracuna starost in doloci starostno skupino (3-4, 5-6, 7-8, 9-10)
-4. Doloci ciljne crke:
-   - Primarno iz `recommended_letters` (kar je logopedinja izbrala v porocilu)
-   - Sekundarno iz `articulation_evaluations` ki nimajo `acquired` oznake
-   - Odstrani duplikate
-5. Sestavi prompt za OpenAI API z:
-   - Seznamom ciljnih crk
-   - Starostno skupino
-   - Kompletnim katalogom razpolozljivih iger z dejanskimi URL-ji
-6. Poklice OpenAI API (`gpt-4.1`, isti model kot chat-assistant) s **tool calling** za strukturiran izhod
-7. Arhivira morebitni prejsnji aktivni nacrt (status -> 'archived')
-8. Shrani nov nacrt v `child_monthly_plans`
-
-### Katalog iger za AI (dejanske poti iz kode)
-
-AI dobi ta katalog in SME dodeliti samo igre iz tega seznama za crke ki so v njem podprte:
-
-```text
-KOLO BESED (brez starostnih variant):
-  /govorne-igre/kolo-srece/{urlKey}
-  Crke: S(s), Z(z), C(c), S(sh), Z(zh), C(ch), K(k), L(l), R(r)
-
-BINGO (brez starostnih variant):
-  /govorne-igre/bingo/{urlKey}
-  Crke: S(s), Z(z), C(c), S(sh), Z(zh), C(ch), K(k), L(l), R(r)
-
-SPOMIN (brez starostnih variant):
-  /govorne-igre/spomin/spomin-{urlKey}
-  Crke: S(s), Z(z), C(c), S(sh), Z(zh), C(ch), K(k), L(l), R(r)
-
-SESTAVLJANKE (s starostnimi varianti):
-  /govorne-igre/sestavljanke/{urlKey}      (3-4)
-  /govorne-igre/sestavljanke/{urlKey}56    (5-6)
-  /govorne-igre/sestavljanke/{urlKey}78    (7-8)
-  /govorne-igre/sestavljanke/{urlKey}910   (9-10)
-  Crke: S(s), Z(z), C(c), S(sh), Z(zh), C(ch), K(k), L(l), R(r)
-
-DRSNA IGRA (s starostnimi varianti - enako kot sestavljanke):
-  /govorne-igre/drsna-sestavljanka/{urlKey}{ageKey}
-  Crke: C(c), C(ch), K(k), L(l), R(r), S(s), S(sh), Z(z), Z(zh)
-
-ZAPOREDJA (s starostnimi varianti - enako):
-  /govorne-igre/zaporedja/{urlKey}{ageKey}
-  Crke: C(c), C(ch), K(k), L(l), R(r), S(s), S(sh), Z(z), Z(zh)
-
-IGRA UJEMANJA (s starostnimi varianti):
-  /govorne-igre/igra-ujemanja/{urlKey}{ageKey}
-  Crke: C(c), C(ch), K(k), L(l), R(r), S(s), S(sh), Z(z), Z(zh)
-
-LABIRINT (brez starostnih variant):
-  /govorne-igre/labirint/{urlKey}
-  Crke: C(c), C(ch), K(k), L(l), R(r), S(s), S(sh), Z(z), Z(zh)
-
-SMESNE POVEDI (brez starostnih variant):
-  /govorne-igre/met-kocke/{urlKey}
-  Crke: S(s), Z(z), C(c), S(sh), Z(zh), C(ch), L(l), R(r), K(k)
-
-PONOVI POVED (brez starostnih variant):
-  /govorne-igre/ponovi-poved/{urlKey}
-  Crke: K(k), L(l), R(r), S(s), Z(z), C(c), S(sh), Z(zh), C(ch)
-
-MOTORIKA GOVORIL (brez crk):
-  /govorno-jezikovne-vaje/vaje-motorike-govoril
-```
-
-### Pretvorba crk v URL kljuce
-
-```text
-Crka -> urlKey:
-C -> c   | C -> ch  | S -> sh  | Z -> zh
-K -> k   | L -> l   | R -> r   | S -> s
-Z -> z   | P,B,M,T,D,G,N,H,V,J,F -> nimajo iger
-```
-
-Za crke brez razpolozljivih iger (P, B, M, T, D, G, N, H, V, J, F) AI dodeli samo motoriko govoril in splosne vaje brez specificne crke.
-
-### Starostne skupine za igre
-
-```text
-3-4 let -> ageKey "" (samo urlKey brez stevilke, npr. /sestavljanke/s)
-5-6 let -> ageKey "56" (npr. /sestavljanke/s56)
-7-8 let -> ageKey "78"
-9-10 let -> ageKey "910"
-```
-
-### Strukturiran izhod (Tool Calling)
-
-Namesto prostega JSON-a se uporabi OpenAI tool calling:
-
-```text
-tool: create_monthly_plan
-parameters:
-  summary: string
-  weeks: array (4 tedni) of {
-    weekNumber: number
-    theme: string
-    days: array (7 dni) of {
-      dayNumber: number
-      dayName: string (Ponedeljek-Nedelja)
-      activities: array (3-4 aktivnosti) of {
-        type: "motorika" | "igra"
-        title: string
-        description: string
-        path: string (MORA biti iz kataloga)
-        letter: string (opcijsko)
-        duration: string
-      }
-    }
-  }
-```
-
-### Pravila za AI
-
-- Vsak dan se zacne z motoriko govoril (5 min)
-- Sledita 2-3 igre (po 10 min), razporejene enakomerno med ciljnimi crkami
-- Igre se razlikujejo med dnevi (ne ista igra vsak dan)
-- Skupno trajanje dneva: 25-35 min
-- 7 dni na teden, 4 tedni
-- Poti morajo biti iz kataloga - AI ne sme izmisliti poti
+Dodano polje `gameId` (npr. "kolo-srece", "bingo", "spomin") za prikaz pravilne slike igre na frontendu in za pravilo unikatnosti (isti gameId se ne sme ponoviti na isti dan).
 
 ---
 
-## C. Prozenje iz admin portala
+## B. Nova tabela: `plan_activity_completions`
 
-Po uspesnem insertu porocila v `handleGeneratePdf` se doda klic edge funkcije. To se doda v **dveh datotekah**:
+Za belezenje opravljenih aktivnosti iz nacrta:
 
-### AdminUserDetail.tsx (vrstica ~433)
+| Stolpec | Tip | Opis |
+|---------|-----|------|
+| id | uuid PK | ID zapisa |
+| plan_id | uuid FK -> child_monthly_plans | Nacrt |
+| child_id | uuid FK -> children | Otrok |
+| day_date | date | Datum dneva (npr. 2026-02-07) |
+| activity_index | integer | Indeks aktivnosti v dnevu (0-4) |
+| completed_at | timestamptz | Cas zakljucka |
 
-Po uspesnem insertu v `logopedist_reports`:
+RLS politike:
+- SELECT/INSERT: samo stars otroka (`auth.uid() = (SELECT parent_id FROM children WHERE id = child_id)`)
 
-```text
-// Po uspesnem insertu porocila:
-if (!insertError) {
-  // Pridobi ID vstavljenega porocila
-  // Spremeniti insert v .insert(...).select('id').single()
-  
-  // Fire-and-forget klic za generiranje mesecnega nacrta
-  supabase.functions.invoke('generate-monthly-plan', {
-    body: { reportId: insertedReportId }
-  }).then(res => {
-    if (res.error) console.error('Monthly plan generation failed:', res.error);
-  });
-  
-  toast.success('Porocilo shranjeno. Mesecni nacrt se generira...');
-}
-```
-
-### AdminLogopedistChildDetail.tsx (vrstica ~333)
-
-Enaka logika. Tukaj je `session_id: null`, zato mora edge funkcija znati najti otroka tudi brez session_id - prek `pdf_url` poti ki vsebuje child_id, ali pa dodamo `child_id` parameter v klic.
+S to tabelo lahko na frontendu takoj vidimo, katere aktivnosti so opravljene za vsak dan.
 
 ---
 
-## D. Uporabniska stran `/moji-izzivi`
+## C. Frontend: MojiIzzivi.tsx - popolna prenova
 
-### Celoten preobrazba MojiIzzivi.tsx
+### Glava nacrta
+- Odstraniti sive krogce s crkami (S, Z) - ker je ze v besedilu napisano
+- Odstraniti teme tednov
+- Ohraniti naslov "Moj osebni nacrt" in povzetek
 
-1. Pridobi `selectedChild` iz AuthContext
-2. Poizvedba v `child_monthly_plans` za aktivni nacrt tega otroka
-3. Ce nacrt ne obstaja: prikazi sporocilo "Tvoj osebni nacrt bo na voljo po prvem preverjanju izgovorjave pri logopedu."
-4. Ce nacrt se generira (status = 'generating'): spinner z "Nacrt se pripravlja..."
-5. Ce nacrt obstaja (status = 'active'): prikazi mesecni koledar
+### Navigacija po dnevih
+- Namesto 4 tedenskih zavihkov: seznam koledarskih dni z scroll navigacijo
+- Ob odprtju strani se samodejno premakne na **danasnji dan**
+- Vsak dan je kartica z datumom (npr. "7. februar - Petek")
 
-### Vizualni prikaz
+### Prikaz dneva
 
 ```text
 +--------------------------------------------------+
-|  MOJ OSEBNI NACRT                                |
-|  Vadimo glasove: S, Z                            |
+| 7. FEBRUAR - PETEK                               |
+| [*][*][*][*][*][*][*][*][*][*]  <- 10 zvezdic    |
 +--------------------------------------------------+
-|  [Teden 1]  [Teden 2]  [Teden 3]  [Teden 4]    |
-+--------------------------------------------------+
-|                                                   |
-|  PONEDELJEK                                       |
-|  +--------------------------------------------+  |
-|  | Vaje motorike govoril      5 min   [Igraj] |  |
-|  +--------------------------------------------+  |
-|  | Sestavljanke - glas S     10 min   [Igraj] |  |
-|  +--------------------------------------------+  |
-|  | Labirint - glas Z         10 min   [Igraj] |  |
-|  +--------------------------------------------+  |
-|                                                   |
-|  TOREK                                            |
-|  +--------------------------------------------+  |
-|  | Vaje motorike govoril      5 min   [Igraj] |  |
-|  +--------------------------------------------+  |
-|  | Kolo besed - glas S       10 min   [Igraj] |  |
-|  +--------------------------------------------+  |
-|  | Bingo - glas Z            10 min   [Igraj] |  |
-|  +--------------------------------------------+  |
-|  ...                                              |
+| [slika] Vaje za motoriko govoril    [kljukica]   |
+| [slika] Kolo besed - S              [kljukica]   |
+| [slika] Bingo - Z                                |
+| [slika] Labirint - S                             |
+| [slika] Sestavljanke - Z                         |
 +--------------------------------------------------+
 ```
 
-- 4 zavihki za tedne (Teden 1-4) s preklapljanjem
-- Za vsak dan (Pon-Ned) seznam aktivnosti
-- Vsaka aktivnost je kartica z ikono, naslovom, trajanjem in gumbom "[Igraj]" ki odpre igro
+- **10 zvezdic** v glavi vsakega dne (kot StarDisplay na /moja-stran) - sive ko se ni nic, rumene ko se osvojene
+- **Dejanske slike iger** namesto ikon (iz GamesList - enake slike kot na /govorne-igre)
+- **Kljukica** (checkmark) ko je aktivnost opravljena
+- **Pogoj za zakljucen dan**: ko otrok zbere 10 zvezdic (celoten dan se oznaci kot zakljucen)
+- Brez prikaza trajanja ("5 min" / "10 min" se odstrani)
 
-### Nov hook: `useMonthlyPlan.ts`
+### Mapiranje slik iger
+
+Iz obstojecega GamesList.tsx se uporabijo iste slike:
 
 ```text
-// Pridobi aktivni nacrt za otroka
-const { data: plan, isLoading } = useQuery({
-  queryKey: ['monthly-plan', childId],
-  queryFn: async () => {
-    const { data } = await supabase
-      .from('child_monthly_plans')
-      .select('*')
-      .eq('child_id', childId)
-      .eq('status', 'active')
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    return data;
-  }
-});
+gameId -> slika:
+"kolo-srece"          -> kolo_srece_nova_2.webp
+"bingo"               -> bingo_nova_2.webp
+"spomin"              -> spomin_nova_2.webp
+"sestavljanke"        -> sestavljanka_nova_1.webp
+"zaporedja"           -> zaporedja_nova_2.webp
+"drsna-sestavljanka"  -> drsna_sestavljanka_nova_2.webp
+"igra-ujemanja"       -> igra_ujemanja_2.webp
+"labirint"            -> labirint_nova_2.webp
+"met-kocke"           -> Smesne_besede_21.webp
+"ponovi-poved"        -> Zmajcek_1.webp
+"motorika"            -> posebna ikona ali slika za motoriko
 ```
+
+### Sledenje opravljenih aktivnosti
+
+Ko otrok klikne "Igraj" in se vrne nazaj na stran:
+- Pred navigacijo se v `localStorage` shrani katera aktivnost je bila odprta (planId, dayDate, activityIndex)
+- Ob vracanju na stran se preveri, ali je bil v vmesnem casu dodan nov zapis v tabelo `progress`
+- Ce da, se aktivnost oznaci kot opravljena (insert v `plan_activity_completions`)
+- Stran ob nalaganju poizve opravljene aktivnosti za trenutni mesec
+
+### Stil usklajen z /moja-stran
+
+- Enake barve, gradiente, in kartice kot na /moja-stran
+- Uporaba obstojecih komponent: Card, CardContent, motion animacije
+- Stil gumbov in tipografije usklajen
 
 ---
 
-## E. Posodobitev `supabase/config.toml`
+## D. Zvezdice za motoriko: iz 3 na 2
+
+V `src/hooks/useExerciseProgress.ts` na vrstici 67:
 
 ```text
-[functions.generate-monthly-plan]
-verify_jwt = false
+// Trenutno:
+recordExerciseCompletion('vaje_motorike_govoril', 3);
+
+// Novo:
+recordExerciseCompletion('vaje_motorike_govoril', 2);
 ```
+
+Ko otrok opravi vseh 27 kartic motorike govoril, dobi 2 zvezdici namesto 3.
+
+---
+
+## E. Dnevni zvezdice na nacrtni strani
+
+Za prikaz zvezdic za posamezen dan (ne samo danes, ampak tudi pretekle dni):
+
+- Nova RPC funkcija `get_child_stars_by_date` ki vrne stevilo zvezdic po dnevih za obdobje (mesec)
+- Poizvedba: `SELECT completed_at::date as day, SUM(stars_earned) FROM progress WHERE child_id = X AND completed_at BETWEEN start AND end GROUP BY day`
+- Na frontendu se za vsak dan prikaze 10 zvezdic (od 0 do 10 zapolnjenih)
 
 ---
 
@@ -327,23 +200,10 @@ verify_jwt = false
 
 | Datoteka | Akcija | Opis |
 |----------|--------|------|
-| SQL migracija | Nova | Tabela `child_monthly_plans` z RLS politikami |
-| `supabase/functions/generate-monthly-plan/index.ts` | Nova | Edge funkcija ki poklice OpenAI in generira nacrt |
-| `supabase/config.toml` | Sprememba | Dodaj novo funkcijo |
-| `src/pages/MojiIzzivi.tsx` | Sprememba | Celoten UI za prikaz mesecnega nacrta |
-| `src/hooks/useMonthlyPlan.ts` | Nova | Hook za nalaganje nacrta iz baze |
-| `src/pages/admin/AdminUserDetail.tsx` | Sprememba | Klic edge funkcije po shranjevanju porocila (+ `.select('id').single()`) |
-| `src/pages/admin/AdminLogopedistChildDetail.tsx` | Sprememba | Enako kot zgoraj |
-
----
-
-## Tehnicne podrobnosti
-
-- **OpenAI model**: gpt-4.1 (isti kot za chat-assistant, ze konfiguriran OPENAI_API_KEY)
-- **Metoda**: Tool calling za zanesljiv strukturiran JSON izhod
-- **Cas generiranja**: ~10-20 sekund (asinhrono - logopedinja ne caka)
-- **Stroski**: ~0.01-0.05 EUR na generiran nacrt
-- **Izolacija**: RLS na nivoju otroka, edge funkcija prek service_role_key
-- **Arhiviranje**: Ob vsakem novem porocilu se prejsnji nacrt arhivira (status -> 'archived')
-- **Testni primer**: Otrok Zak (9 let, skupina 9-10), crke S in Z iz `recommended_letters`, dodane bodo se crke iz ocen ki nimajo `acquired` oznake (Ž in Š)
+| SQL migracija | Nova | Tabela `plan_activity_completions` + RLS + RPC funkcija |
+| `supabase/functions/generate-monthly-plan/index.ts` | Sprememba | Nova struktura (dejanski dnevi, 5 aktivnosti, brez tem/trajanja, gameId polje) |
+| `src/pages/MojiIzzivi.tsx` | Sprememba | Popolna prenova UI |
+| `src/hooks/useMonthlyPlan.ts` | Sprememba | Posodobitev tipov za novo strukturo |
+| `src/hooks/useExerciseProgress.ts` | Sprememba | 3 zvezdice -> 2 zvezdice |
+| `src/hooks/usePlanProgress.ts` | Nova | Hook za belezenje in branje opravljenih aktivnosti |
 
