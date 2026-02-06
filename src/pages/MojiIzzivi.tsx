@@ -111,17 +111,25 @@ export default function MojiIzzivi() {
   const days = useMemo(() => {
     if (!planData) return [];
     if (planData.days) return planData.days;
-    // Legacy format conversion
-    if (planData.weeks) {
+    // Legacy format conversion with actual dates
+    if (planData.weeks && plan) {
+      let dayCounter = 0;
       return planData.weeks.flatMap((week) =>
-        week.days.map((day) => ({
-          ...day,
-          date: day.date || `legacy-${day.dayNumber || 0}`,
-        }))
+        week.days.map((day) => {
+          dayCounter++;
+          const actualDate = `${plan.year}-${String(plan.month).padStart(2, "0")}-${String(dayCounter).padStart(2, "0")}`;
+          const dateObj = new Date(plan.year, plan.month - 1, dayCounter);
+          const dayNames = ["Nedelja", "Ponedeljek", "Torek", "Sreda", "Četrtek", "Petek", "Sobota"];
+          return {
+            ...day,
+            date: actualDate,
+            dayName: day.dayName || dayNames[dateObj.getDay()],
+          };
+        })
       );
     }
     return [];
-  }, [planData]);
+  }, [planData, plan]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -153,9 +161,10 @@ export default function MojiIzzivi() {
             </motion.div>
 
             {/* Day cards */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               {days.map((day) => {
                 const isToday = day.date === todayStr;
+                const isPast = day.date < todayStr;
                 const dayCompletions = completionsByDay.get(day.date) || new Set<number>();
                 const dayStars = starsMap.get(day.date) || 0;
 
@@ -168,8 +177,10 @@ export default function MojiIzzivi() {
                       starsForDay={dayStars}
                       completedIndices={dayCompletions}
                       isToday={isToday}
+                      isPast={isPast}
                       planId={plan!.id}
                       childId={selectedChild!.id}
+                      childAvatarUrl={selectedChild?.avatarUrl}
                       onActivityPlay={(activityIndex, path) =>
                         handleActivityPlay(day.date, activityIndex, path)
                       }
