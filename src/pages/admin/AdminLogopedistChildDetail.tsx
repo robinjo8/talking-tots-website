@@ -86,46 +86,61 @@ export default function AdminLogopedistChildDetail() {
     setExpandedDocId(prev => prev === docPath ? null : docPath);
   }, []);
 
-  // Extract test sessions from storage recordings
+  // Extract test sessions from storage recordings and map to real DB UUIDs
   useEffect(() => {
     if (recordings.length === 0) return;
 
-    const sessionsMap: { [key: string]: { id: string; date: string; formattedDate: string } } = {};
+    async function mapSessionsToUUIDs() {
+      // Fetch real session UUIDs from database (logopedist children use logopedist_child_id)
+      const { data: dbSessions } = await supabase
+        .from('articulation_test_sessions')
+        .select('id, session_number')
+        .eq('logopedist_child_id', childId);
 
-    recordings.forEach(session => {
-      const sessionName = session.sessionName;
-      
-      if (session.recordings.length > 0) {
-        let earliestDate: Date | null = null;
+      const dbSessionMap = new Map(
+        dbSessions?.map(s => [s.session_number, s.id]) || []
+      );
+
+      const sessionsMap: { [key: string]: { id: string; date: string; formattedDate: string; sessionNum: number } } = {};
+
+      recordings.forEach(session => {
+        const sessionName = session.sessionName;
+        const sessionNum = parseInt(sessionName.replace('Seja-', ''));
         
-        session.recordings.forEach(file => {
-          const dateMatch = file.name.match(/(\d{4}-\d{2}-\d{2})T/);
-          if (dateMatch) {
-            const fileDate = new Date(dateMatch[1]);
-            if (!earliestDate || fileDate < earliestDate) {
-              earliestDate = fileDate;
+        if (session.recordings.length > 0) {
+          let earliestDate: Date | null = null;
+          
+          session.recordings.forEach(file => {
+            const dateMatch = file.name.match(/(\d{4}-\d{2}-\d{2})T/);
+            if (dateMatch) {
+              const fileDate = new Date(dateMatch[1]);
+              if (!earliestDate || fileDate < earliestDate) {
+                earliestDate = fileDate;
+              }
             }
+          });
+
+          if (earliestDate) {
+            const dbSessionId = dbSessionMap.get(sessionNum);
+            sessionsMap[sessionName] = {
+              id: dbSessionId || sessionName,
+              date: earliestDate.toISOString(),
+              formattedDate: format(earliestDate, 'd. M. yyyy', { locale: sl }),
+              sessionNum,
+            };
           }
-        });
-
-        if (earliestDate) {
-          sessionsMap[sessionName] = {
-            id: sessionName,
-            date: earliestDate.toISOString(),
-            formattedDate: format(earliestDate, 'd. M. yyyy', { locale: sl }),
-          };
         }
-      }
-    });
+      });
 
-    const sortedSessions = Object.values(sessionsMap).sort((a, b) => {
-      const numA = parseInt(a.id.replace('Seja-', ''));
-      const numB = parseInt(b.id.replace('Seja-', ''));
-      return numB - numA;
-    });
+      const sortedSessions = Object.values(sessionsMap).sort((a, b) => {
+        return b.sessionNum - a.sessionNum;
+      });
 
-    setTestSessions(sortedSessions);
-  }, [recordings]);
+      setTestSessions(sortedSessions);
+    }
+
+    mapSessionsToUUIDs();
+  }, [recordings, childId]);
 
   // Update reportData when fetched data changes
   useEffect(() => {
@@ -244,8 +259,21 @@ export default function AdminLogopedistChildDetail() {
   };
 
   const handleGeneratePdf = async () => {
-    if (!hasReportContent()) {
-      toast.error('Vnesite vsebino poročila pred generiranjem PDF');
+    // Strict validation for PDF generation
+    if (!reportData.selectedSessionId) {
+      toast.error('Izberite datum preverjanja izgovorjave');
+      return;
+    }
+    if (!reportData.anamneza.trim()) {
+      toast.error('Vnesite anamnezo');
+      return;
+    }
+    if (!reportData.ugotovitve.trim()) {
+      toast.error('Vnesite ugotovitve');
+      return;
+    }
+    if (!reportData.recommendedLetters || reportData.recommendedLetters.length === 0) {
+      toast.error('Izberite vsaj eno črko v razdelku "Priporočamo igre in vaje za"');
       return;
     }
 
