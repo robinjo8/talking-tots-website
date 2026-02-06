@@ -44,7 +44,7 @@ export function EvaluationCheckboxes({
       {/* Grid z dvema stolpcema */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Levi stolpec - checkboxi */}
-        <div className="space-y-2">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-2">
           {options.map(option => (
             <div key={option.id} className="flex items-center space-x-2">
               <Checkbox
