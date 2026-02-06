@@ -72,27 +72,41 @@ export function useNotifications() {
     }
   }, [profile?.organization_id, user?.id]);
 
-  // Mark single notification as read
+  // Mark single notification as read (optimistic update)
   const markAsRead = useCallback(async (notificationId: string) => {
     if (!user?.id) return;
 
+    // Prevent double-decrement if already read
+    const notification = notifications.find(n => n.id === notificationId);
+    if (!notification || notification.is_read) return;
+
+    // Optimistically update state immediately
+    setNotifications(prev =>
+      prev.map(n => n.id === notificationId ? { ...n, is_read: true } : n)
+    );
+    setUnreadCount(prev => Math.max(0, prev - 1));
+
+    // Write to DB in background
     try {
       const { error } = await supabase
         .from('notification_reads')
         .insert({ notification_id: notificationId, user_id: user.id });
 
-      if (error && error.code !== '23505') throw error; // Ignore duplicate key error
-
-      setNotifications(prev =>
-        prev.map(n =>
-          n.id === notificationId ? { ...n, is_read: true } : n
-        )
-      );
-      setUnreadCount(prev => Math.max(0, prev - 1));
+      if (error && error.code !== '23505') {
+        // Rollback on error
+        setNotifications(prev =>
+          prev.map(n => n.id === notificationId ? { ...n, is_read: false } : n)
+        );
+        setUnreadCount(prev => prev + 1);
+      }
     } catch (error) {
-      console.error('Error marking notification as read:', error);
+      // Rollback on error
+      setNotifications(prev =>
+        prev.map(n => n.id === notificationId ? { ...n, is_read: false } : n)
+      );
+      setUnreadCount(prev => prev + 1);
     }
-  }, [user?.id]);
+  }, [user?.id, notifications]);
 
   // Mark all notifications as read
   const markAllAsRead = useCallback(async () => {
