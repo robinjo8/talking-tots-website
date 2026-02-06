@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Check, Play, ChevronDown } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { DayStarDisplay } from "./DayStarDisplay";
@@ -90,75 +89,71 @@ export function PlanDayCard({
             </button>
           </CollapsibleTrigger>
 
-          {/* Activities - collapsible */}
+          {/* Activities - collapsible grid of clickable cards */}
           <CollapsibleContent>
-            <CardContent className="p-0 divide-y divide-border">
-              {activities.map((activity, index) => {
-                const isCompleted = completedIndices.has(index);
-                const effectiveGameId = activity.gameId || deriveGameIdFromPath(activity.path);
-                const gameImage = getGameImage(effectiveGameId, activity.type);
+            <CardContent className="p-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+                {activities.map((activity, index) => {
+                  const isCompleted = completedIndices.has(index);
+                  const effectiveGameId = activity.gameId || deriveGameIdFromPath(activity.path);
+                  const gameImage = getGameImage(effectiveGameId, activity.type);
 
-                // For motorika, use child avatar if available
-                const displayImage = activity.type === "motorika" && childAvatarUrl
-                  ? childAvatarUrl
-                  : gameImage;
+                  const displayImage = activity.type === "motorika" && childAvatarUrl
+                    ? childAvatarUrl
+                    : gameImage;
 
-                // Determine if letter should be shown (avoid duplication)
-                const showLetter = activity.letter && !activity.title.includes(activity.letter);
+                  const showLetter = activity.letter && !activity.title.includes(activity.letter);
+                  const label = showLetter ? `${activity.title} ${activity.letter}` : activity.title;
+                  const isDisabled = !isToday || isCompleted;
 
-                return (
-                  <div
-                    key={index}
-                    className={`flex items-center gap-3 px-4 py-2.5 transition-colors ${
-                      isCompleted ? "bg-accent/5" : "hover:bg-muted/30"
-                    }`}
-                  >
-                    {/* Game image */}
-                    <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 bg-muted">
-                      {displayImage ? (
-                        <img
-                          src={displayImage}
-                          alt={activity.title}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-lg">
-                          {activity.type === "motorika" ? "🏋️" : "🎮"}
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => onActivityPlay(index, activity.path)}
+                      disabled={isDisabled}
+                      className="text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xl disabled:cursor-default"
+                    >
+                      <div className={`relative rounded-xl border-2 overflow-hidden transition-all ${
+                        isCompleted
+                          ? "border-green-400 bg-green-50 dark:bg-green-950/30 dark:border-green-600"
+                          : isToday
+                            ? "border-border shadow-sm hover:shadow-md hover:scale-[1.03] cursor-pointer"
+                            : "border-border opacity-50"
+                      }`}>
+                        {/* Game image */}
+                        <div className="aspect-square bg-muted/50 p-2">
+                          {displayImage ? (
+                            <img
+                              src={displayImage}
+                              alt={label}
+                              className="w-full h-full object-contain rounded-lg"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-3xl">
+                              {activity.type === "motorika" ? "🏋️" : "🎮"}
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
 
-                    {/* Title */}
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-medium truncate ${isCompleted ? "text-accent-foreground" : "text-foreground"}`}>
-                        {activity.title}
-                        {showLetter && (
-                          <span className="text-muted-foreground font-normal"> - {activity.letter}</span>
+                        {/* Completed overlay */}
+                        {isCompleted && (
+                          <div className="absolute inset-0 bg-green-200/40 dark:bg-green-800/40 flex items-center justify-center">
+                            <Check className="h-10 w-10 text-green-600 dark:text-green-400 drop-shadow" />
+                          </div>
                         )}
-                      </p>
-                    </div>
 
-                    {/* Completion indicator or play button */}
-                    {isCompleted ? (
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center">
-                        <Check className="h-4 w-4 text-accent-foreground" />
+                        {/* Label */}
+                        <div className="px-1.5 py-1.5 text-center bg-background/80">
+                          <p className="text-[11px] font-semibold truncate text-foreground leading-tight">
+                            {label}
+                          </p>
+                        </div>
                       </div>
-                    ) : (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex-shrink-0 rounded-xl gap-1.5 text-xs h-8"
-                        disabled={!isToday}
-                        onClick={() => onActivityPlay(index, activity.path)}
-                      >
-                        <Play className="h-3 w-3" />
-                        Igraj
-                      </Button>
-                    )}
-                  </div>
-                );
-              })}
+                    </button>
+                  );
+                })}
+              </div>
             </CardContent>
           </CollapsibleContent>
         </Card>
