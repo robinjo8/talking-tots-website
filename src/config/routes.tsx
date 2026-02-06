@@ -87,6 +87,7 @@ const MojiIzzivi = lazy(() => import("@/pages/MojiIzzivi"));
 const VideoNavodila = lazy(() => import("@/pages/VideoNavodila"));
 const MetKockeGames = lazy(() => import("@/pages/MetKockeGames"));
 const PonoviPoved = lazy(() => import("@/pages/PonoviPoved"));
+const PomocChat = lazy(() => import("@/pages/PomocChat"));
 
 // Informational pages
 const LogopedskiKoticek = lazy(() => import("@/pages/LogopedskiKoticek"));
@@ -219,6 +220,7 @@ export function AppRoutes() {
       <Route path="/moji-izzivi" element={<ProtectedLazyRoute><MojiIzzivi /></ProtectedLazyRoute>} />
       <Route path="/video-navodila" element={<ProtectedLazyRoute><VideoNavodila /></ProtectedLazyRoute>} />
       <Route path="/video-navodila/:letter" element={<ProtectedLazyRoute><VideoNavodilaRouter /></ProtectedLazyRoute>} />
+      <Route path="/pomoc-chat" element={<ProtectedLazyRoute><PomocChat /></ProtectedLazyRoute>} />
       
       {/* Informational pages - lazy */}
       <Route path="/logopedski-koticek" element={<LazyRoute><LogopedskiKoticek /></LazyRoute>} />
