@@ -1485,6 +1485,62 @@ export type Database = {
         }
         Relationships: []
       }
+      plan_activity_completions: {
+        Row: {
+          activity_index: number
+          child_id: string
+          completed_at: string
+          day_date: string
+          id: string
+          plan_id: string
+        }
+        Insert: {
+          activity_index: number
+          child_id: string
+          completed_at?: string
+          day_date: string
+          id?: string
+          plan_id: string
+        }
+        Update: {
+          activity_index?: number
+          child_id?: string
+          completed_at?: string
+          day_date?: string
+          id?: string
+          plan_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_activity_completions_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_activity_completions_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children_analytics"
+            referencedColumns: ["child_id"]
+          },
+          {
+            foreignKeyName: "plan_activity_completions_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children_analytics_admin"
+            referencedColumns: ["child_id"]
+          },
+          {
+            foreignKeyName: "plan_activity_completions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "child_monthly_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           address: string | null
@@ -1782,6 +1838,13 @@ export type Database = {
       get_child_daily_activities: {
         Args: { child_uuid: string }
         Returns: number
+      }
+      get_child_stars_by_date: {
+        Args: { child_uuid: string; end_date: string; start_date: string }
+        Returns: {
+          day: string
+          stars: number
+        }[]
       }
       get_child_total_stars: { Args: { child_uuid: string }; Returns: number }
       get_children_analytics: {
