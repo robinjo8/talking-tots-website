@@ -1,209 +1,103 @@
 
 
-# Plan: Prenova strani /moji-izzivi
+# Plan: Popravki strani /moji-izzivi (7 tezav)
 
-## Povzetek sprememb
+## Vzrok problemov
 
-Stran /moji-izzivi bo popolnoma prenovljena: namesto 4 tednov po 7 dni bo prikazovala dejanske koledarske dni meseca, vsak dan bo imel motoriko + 4 razlicne igre, zvezdice bodo prikazane namesto trajanja, aktivnosti bodo oznacene kot opravljene, in slog bo usklajen z /moja-stran.
+Trenutni nacrt v bazi uporablja **staro strukturo** (`weeks` z `dayNumber` namesto `days` z dejanskimi datumi). Edge funkcija je bila posodobljena, a nacrt za testnega otroka ni bil ponovno generiran. Poleg tega ima stari nacrt samo 2 igri na dan brez polja `gameId`, kar povzroca vecino vizualnih napak.
 
 ---
 
-## A. Spremembe edge funkcije (generate-monthly-plan)
+## Popravki
 
-### Struktura nacrta: dejanski dni v mesecu
+### 1. Regeneracija nacrta
 
-Trenutno AI generira 4 tedne po 7 dni (= 28 dni). Nova logika:
-- Edge funkcija izracuna stevilo dni v tekocemu mesecu (npr. februar 2026 = 28 dni, marec = 31 dni)
-- AI generira nacrt za TOCNO toliko dni, kolikor jih ima mesec
-- Namesto `weeks` -> `days` strukture bo flat seznam dni z dejanskimi datumi
+Po vseh popravkih se bo za testnega otroka Zak sprozen nov klic edge funkcije, da se ustvari nacrt z novo strukturo (dejanski datumi, 5 aktivnosti, gameId polja).
 
-### Nova pravila za AI
+### 2. Edge funkcija - strožja validacija (generate-monthly-plan)
 
-- **Motorika + 4 razlicne igre na dan** (namesto motorika + 2 igri)
-- **Ista igra se NE SME ponoviti na isti dan** - npr. ne sme biti Igra ujemanja za S in Igra ujemanja za Z isti dan
-- Odstranjena polja: `theme` (teme tednov), `duration` (trajanje)
-- Dodano polje: `date` (dejanski datum, npr. "2026-02-07")
+Dodati post-processing korak, ki po odgovoru AI-ja preveri in popravi:
+- Ce ima dan manj kot 4 igre, doda manjkajoce iz kataloga
+- Ce se gameId ponovi na isti dan, zamenja ponavljajocega z drugimi iz kataloga
+- Ce naslov ze vsebuje crko (npr. "Kolo besed S"), se polje `letter` ne podvoji v naslovu
 
-### Nova plan_data struktura
+To zagotovi, da tudi ce AI naredi napako, se podatki pred shranjevanjem popravijo.
+
+### 3. PlanDayCard - format glave kartice
+
+Sprememba iz "9. februar - Ponedeljek" v **"PONEDELJEK, 9.2.2026"**:
 
 ```text
-{
-  "summary": "Nacrt za februar 2026...",
-  "targetLetters": ["S", "Z"],
-  "childAge": 9,
-  "ageGroup": "9-10",
-  "totalDays": 28,
-  "days": [
-    {
-      "date": "2026-02-01",
-      "dayName": "Nedelja",
-      "activities": [
-        {
-          "type": "motorika",
-          "title": "Vaje za motoriko govoril",
-          "path": "/govorno-jezikovne-vaje/vaje-motorike-govoril"
-        },
-        {
-          "type": "igra",
-          "title": "Kolo besed",
-          "path": "/govorne-igre/kolo-srece/sh",
-          "letter": "S",
-          "gameId": "kolo-srece"
-        },
-        {
-          "type": "igra",
-          "title": "Bingo",
-          "path": "/govorne-igre/bingo/zh",
-          "letter": "Z",
-          "gameId": "bingo"
-        },
-        {
-          "type": "igra",
-          "title": "Labirint",
-          "path": "/govorne-igre/labirint/sh",
-          "letter": "S",
-          "gameId": "labirint"
-        },
-        {
-          "type": "igra",
-          "title": "Sestavljanke",
-          "path": "/govorne-igre/sestavljanke/zh910",
-          "letter": "Z",
-          "gameId": "sestavljanke"
-        }
-      ]
-    }
-    // ... vsi dnevi meseca
-  ]
-}
+// PREJ:  "9. februar - Ponedeljek"
+// POTEM: "PONEDELJEK, 9.2.2026"
 ```
 
-Dodano polje `gameId` (npr. "kolo-srece", "bingo", "spomin") za prikaz pravilne slike igre na frontendu in za pravilo unikatnosti (isti gameId se ne sme ponoviti na isti dan).
+### 4. PlanDayCard - odprava dvojne crke v naslovu
 
----
+Trenutno se prikaze "Kolo besed S - S" ker:
+- AI nastavi `title: "Kolo besed S"` (ze vsebuje crko)
+- PlanDayCard doda `- {activity.letter}` (se enkrat doda crko)
 
-## B. Nova tabela: `plan_activity_completions`
+Popravek: ce `title` ze vsebuje besedilo crke, se `letter` ne prikaze dodatno.
 
-Za belezenje opravljenih aktivnosti iz nacrta:
+### 5. PlanDayCard - slika za motoriko = otrokov avatar
 
-| Stolpec | Tip | Opis |
-|---------|-----|------|
-| id | uuid PK | ID zapisa |
-| plan_id | uuid FK -> child_monthly_plans | Nacrt |
-| child_id | uuid FK -> children | Otrok |
-| day_date | date | Datum dneva (npr. 2026-02-07) |
-| activity_index | integer | Indeks aktivnosti v dnevu (0-4) |
-| completed_at | timestamptz | Cas zakljucka |
+Za aktivnost tipa "motorika" se namesto genericne slike uporabi slika zmajcka, ki ga ima otrok izbranega kot avatar. MojiIzzivi bo posredoval `avatarUrl` iz `selectedChild` v PlanDayCard.
 
-RLS politike:
-- SELECT/INSERT: samo stars otroka (`auth.uid() = (SELECT parent_id FROM children WHERE id = child_id)`)
+### 6. PlanDayCard - dejanske slike iger iz GameImageMap
 
-S to tabelo lahko na frontendu takoj vidimo, katere aktivnosti so opravljene za vsak dan.
+Ce aktivnost nima polja `gameId` (stari format), se ga izloci iz polja `path`:
+- `/govorne-igre/kolo-srece/sh` -> gameId = `kolo-srece`
+- `/govorne-igre/bingo/zh` -> gameId = `bingo`
+- `/govorne-igre/spomin/spomin-sh` -> gameId = `spomin`
 
----
+To zagotovi pravilne slike tudi za stare nacrte.
 
-## C. Frontend: MojiIzzivi.tsx - popolna prenova
+### 7. Zložljive kartice - samo danes odprt
 
-### Glava nacrta
-- Odstraniti sive krogce s crkami (S, Z) - ker je ze v besedilu napisano
-- Odstraniti teme tednov
-- Ohraniti naslov "Moj osebni nacrt" in povzetek
+- Vsak dan je **zlozen (collapsed)** razen ce je danes
+- Danasnji dan je samodejno razprt in ima oznako "Danes"
+- Pretekli dnevi z 10+ zvezdicami: zelena obroba, zlozen
+- Pretekli dnevi brez 10 zvezdic: osivljeni, zlozeni
+- Prihodnji dnevi: osivljeni, zlozeni
+- Gumb "Igraj" je **onemogocen** za vse dni razen danasnjega (otrok ne more igrati iger za drug dan)
+- Ob kliku na glavo kartice se kartica razpre/zlozi (za pregled, ne za igranje)
 
-### Navigacija po dnevih
-- Namesto 4 tedenskih zavihkov: seznam koledarskih dni z scroll navigacijo
-- Ob odprtju strani se samodejno premakne na **danasnji dan**
-- Vsak dan je kartica z datumom (npr. "7. februar - Petek")
-
-### Prikaz dneva
+Vizualni prikaz:
 
 ```text
-+--------------------------------------------------+
-| 7. FEBRUAR - PETEK                               |
-| [*][*][*][*][*][*][*][*][*][*]  <- 10 zvezdic    |
-+--------------------------------------------------+
-| [slika] Vaje za motoriko govoril    [kljukica]   |
-| [slika] Kolo besed - S              [kljukica]   |
-| [slika] Bingo - Z                                |
-| [slika] Labirint - S                             |
-| [slika] Sestavljanke - Z                         |
-+--------------------------------------------------+
++--[zelena obroba]------------------------------+
+| SREDA, 4.2.2026   [*][*][*][*][*]...[*] (10) |  <- zlozen, 10 zvezdic
++------------------------------------------------+
+
++--[zelena obroba]------------------------------+
+| CETRTEK, 5.2.2026 [*][*][*][*][*]...[*] (10) |  <- zlozen, 10 zvezdic
++------------------------------------------------+
+
++--[modra obroba, odprt, Danes]------------------+
+| PETEK, 6.2.2026   [*][*][*][ ][ ]...[ ] (3)   |
+| -----------------------------------------------+
+| [avatar] Vaje za motoriko govoril    [Igraj]   |
+| [slika]  Kolo besed              [kljukica]    |
+| [slika]  Bingo                       [Igraj]   |
+| [slika]  Labirint                    [Igraj]   |
+| [slika]  Sestavljanke               [Igraj]   |
++-------------------------------------------------+
+
++--[siva obroba]---------------------------------+
+| SOBOTA, 7.2.2026   [ ][ ][ ][ ][ ]...[ ] (0)  |  <- zlozen, prihodnji
++------------------------------------------------+
 ```
-
-- **10 zvezdic** v glavi vsakega dne (kot StarDisplay na /moja-stran) - sive ko se ni nic, rumene ko se osvojene
-- **Dejanske slike iger** namesto ikon (iz GamesList - enake slike kot na /govorne-igre)
-- **Kljukica** (checkmark) ko je aktivnost opravljena
-- **Pogoj za zakljucen dan**: ko otrok zbere 10 zvezdic (celoten dan se oznaci kot zakljucen)
-- Brez prikaza trajanja ("5 min" / "10 min" se odstrani)
-
-### Mapiranje slik iger
-
-Iz obstojecega GamesList.tsx se uporabijo iste slike:
-
-```text
-gameId -> slika:
-"kolo-srece"          -> kolo_srece_nova_2.webp
-"bingo"               -> bingo_nova_2.webp
-"spomin"              -> spomin_nova_2.webp
-"sestavljanke"        -> sestavljanka_nova_1.webp
-"zaporedja"           -> zaporedja_nova_2.webp
-"drsna-sestavljanka"  -> drsna_sestavljanka_nova_2.webp
-"igra-ujemanja"       -> igra_ujemanja_2.webp
-"labirint"            -> labirint_nova_2.webp
-"met-kocke"           -> Smesne_besede_21.webp
-"ponovi-poved"        -> Zmajcek_1.webp
-"motorika"            -> posebna ikona ali slika za motoriko
-```
-
-### Sledenje opravljenih aktivnosti
-
-Ko otrok klikne "Igraj" in se vrne nazaj na stran:
-- Pred navigacijo se v `localStorage` shrani katera aktivnost je bila odprta (planId, dayDate, activityIndex)
-- Ob vracanju na stran se preveri, ali je bil v vmesnem casu dodan nov zapis v tabelo `progress`
-- Ce da, se aktivnost oznaci kot opravljena (insert v `plan_activity_completions`)
-- Stran ob nalaganju poizve opravljene aktivnosti za trenutni mesec
-
-### Stil usklajen z /moja-stran
-
-- Enake barve, gradiente, in kartice kot na /moja-stran
-- Uporaba obstojecih komponent: Card, CardContent, motion animacije
-- Stil gumbov in tipografije usklajen
-
----
-
-## D. Zvezdice za motoriko: iz 3 na 2
-
-V `src/hooks/useExerciseProgress.ts` na vrstici 67:
-
-```text
-// Trenutno:
-recordExerciseCompletion('vaje_motorike_govoril', 3);
-
-// Novo:
-recordExerciseCompletion('vaje_motorike_govoril', 2);
-```
-
-Ko otrok opravi vseh 27 kartic motorike govoril, dobi 2 zvezdici namesto 3.
-
----
-
-## E. Dnevni zvezdice na nacrtni strani
-
-Za prikaz zvezdic za posamezen dan (ne samo danes, ampak tudi pretekle dni):
-
-- Nova RPC funkcija `get_child_stars_by_date` ki vrne stevilo zvezdic po dnevih za obdobje (mesec)
-- Poizvedba: `SELECT completed_at::date as day, SUM(stars_earned) FROM progress WHERE child_id = X AND completed_at BETWEEN start AND end GROUP BY day`
-- Na frontendu se za vsak dan prikaze 10 zvezdic (od 0 do 10 zapolnjenih)
 
 ---
 
 ## Datoteke za spremembo
 
-| Datoteka | Akcija | Opis |
-|----------|--------|------|
-| SQL migracija | Nova | Tabela `plan_activity_completions` + RLS + RPC funkcija |
-| `supabase/functions/generate-monthly-plan/index.ts` | Sprememba | Nova struktura (dejanski dnevi, 5 aktivnosti, brez tem/trajanja, gameId polje) |
-| `src/pages/MojiIzzivi.tsx` | Sprememba | Popolna prenova UI |
-| `src/hooks/useMonthlyPlan.ts` | Sprememba | Posodobitev tipov za novo strukturo |
-| `src/hooks/useExerciseProgress.ts` | Sprememba | 3 zvezdice -> 2 zvezdice |
-| `src/hooks/usePlanProgress.ts` | Nova | Hook za belezenje in branje opravljenih aktivnosti |
+| Datoteka | Sprememba |
+|----------|-----------|
+| `supabase/functions/generate-monthly-plan/index.ts` | Post-processing validacija (4 unikatne igre, brez podvajanja gameId) |
+| `src/components/plan/PlanDayCard.tsx` | Zložljive kartice, nov format glave, popravek dvojne crke, avatar za motoriko, onemogocen gumb za ne-danasnje dni |
+| `src/components/plan/GameImageMap.ts` | Nova funkcija `deriveGameIdFromPath()` za stare nacrte brez gameId |
+| `src/pages/MojiIzzivi.tsx` | Posredovanje avatarUrl v PlanDayCard, izboljsana legacy pretvorba z dejanskimi datumi |
+| `src/hooks/useMonthlyPlan.ts` | Brez sprememb |
 
