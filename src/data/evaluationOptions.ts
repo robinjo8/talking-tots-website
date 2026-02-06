@@ -44,71 +44,15 @@ export interface LetterEvaluationConfig {
   options: EvaluationOption[];
 }
 
-// Specifične možnosti za črko Ž
-const zOptions: EvaluationOption[] = [
-  { id: 'z_as_z', label: 'Ž izgovarja kot Z' },
-  { id: 'z_excellent', label: 'Odlično izgovarja' },
-  { id: 'z_missing', label: 'Ne izgovarja' },
-  { id: 'z_as_s', label: 'Zamenjuje za Š' },
+// Univerzalne opcije za vse črke
+const universalOptions: EvaluationOption[] = [
+  { id: 'acquired', label: 'Glas je usvojen' },
+  { id: 'not_automated', label: 'Glas ni avtomatiziran' },
+  { id: 'not_acquired', label: 'Glas ni usvojen' },
+  { id: 'distorted', label: 'Glas je neustrezno usvojen (popačen)' },
+  { id: 'omitted', label: 'Glas je izpuščen' },
+  { id: 'substituted', label: 'Glas je zamenjan z drugim glasom' },
 ];
-
-// Specifične možnosti za črko S
-const sOptions: EvaluationOption[] = [
-  { id: 's_as_sh', label: 'S izgovarja kot Š' },
-  { id: 's_missing', label: 'Ne izgovarja' },
-  { id: 's_excellent', label: 'Odlično izgovarja' },
-  { id: 's_as_z', label: 'Zamenjuje za Z' },
-];
-
-// Specifične možnosti za črko Š
-const shOptions: EvaluationOption[] = [
-  { id: 'sh_as_s', label: 'Š izgovarja kot S' },
-  { id: 'sh_missing', label: 'Ne izgovarja' },
-  { id: 'sh_excellent', label: 'Odlično izgovarja' },
-  { id: 'sh_as_z', label: 'Zamenjuje za Ž' },
-];
-
-// Specifične možnosti za črko Č
-const chOptions: EvaluationOption[] = [
-  { id: 'ch_as_c', label: 'Č izgovarja kot C' },
-  { id: 'ch_missing', label: 'Ne izgovarja' },
-  { id: 'ch_excellent', label: 'Odlično izgovarja' },
-  { id: 'ch_as_t', label: 'Zamenjuje za T' },
-];
-
-// Specifične možnosti za črko C
-const cOptions: EvaluationOption[] = [
-  { id: 'c_as_s', label: 'C izgovarja kot S' },
-  { id: 'c_missing', label: 'Ne izgovarja' },
-  { id: 'c_excellent', label: 'Odlično izgovarja' },
-  { id: 'c_as_ch', label: 'Zamenjuje za Č' },
-];
-
-// Specifične možnosti za črko R
-const rOptions: EvaluationOption[] = [
-  { id: 'r_as_l', label: 'R izgovarja kot L' },
-  { id: 'r_missing', label: 'Ne izgovarja' },
-  { id: 'r_excellent', label: 'Odlično izgovarja' },
-  { id: 'r_guttural', label: 'Grlen R' },
-];
-
-// Privzete možnosti za ostale črke
-const defaultOptions: EvaluationOption[] = [
-  { id: 'missing', label: 'Ne izgovarja' },
-  { id: 'excellent', label: 'Odlično izgovarja' },
-  { id: 'substitution', label: 'Zamenjuje z drugim glasom' },
-  { id: 'distortion', label: 'Popačen glas' },
-];
-
-// Mapiranje črk na opcije
-const letterOptionsMap: Record<string, EvaluationOption[]> = {
-  'Ž': zOptions,
-  'S': sOptions,
-  'Š': shOptions,
-  'Č': chOptions,
-  'C': cOptions,
-  'R': rOptions,
-};
 
 // Generiranje konfiguracije za vse črke
 export const evaluationConfigs: LetterEvaluationConfig[] = PHONETIC_ORDER.map(letter => ({
