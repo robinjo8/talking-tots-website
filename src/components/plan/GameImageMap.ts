@@ -29,6 +29,22 @@ export const GAME_TITLE_MAP: Record<string, string> = {
   "motorika": "Vaje za motoriko govoril",
 };
 
+/**
+ * Derive gameId from the activity path for legacy plans that lack explicit gameId field.
+ * E.g. "/govorne-igre/kolo-srece/sh" -> "kolo-srece"
+ */
+export function deriveGameIdFromPath(path: string): string | undefined {
+  const match = path.match(/^\/govorne-igre\/([^/]+)\//);
+  if (match) {
+    const segment = match[1];
+    // "spomin" path is /govorne-igre/spomin/spomin-sh
+    if (segment === "spomin") return "spomin";
+    return segment;
+  }
+  if (path.includes("vaje-motorike-govoril")) return "motorika";
+  return undefined;
+}
+
 export function getGameImage(gameId: string | undefined, type: string): string {
   if (type === "motorika") return GAME_IMAGE_MAP["motorika"] || "";
   if (gameId && GAME_IMAGE_MAP[gameId]) return GAME_IMAGE_MAP[gameId];

@@ -451,6 +451,111 @@ Ustvari raznolik načrt z ${totalDays} dnevi. Vsak dan ima motoriko + 4 razlicne
       });
     }
 
+    // POST-PROCESSING: Validate and fix AI output
+    const ageKey = getAgeKey(ageGroup);
+    const supportedTargetsForFix = targetLetters.filter((l: string) => SUPPORTED_LETTERS.includes(l));
+
+    if (planData.days && Array.isArray(planData.days)) {
+      for (const day of planData.days) {
+        if (!day.activities || !Array.isArray(day.activities)) continue;
+
+        // Ensure motorika is first
+        const hasMotor = day.activities.some((a: any) => a.type === "motorika");
+        if (!hasMotor) {
+          day.activities.unshift({
+            type: "motorika",
+            title: "Vaje za motoriko govoril",
+            path: "/govorno-jezikovne-vaje/vaje-motorike-govoril",
+          });
+        }
+
+        // Get game activities and check for duplicate gameIds
+        const games = day.activities.filter((a: any) => a.type === "igra");
+        const usedGameIds = new Set<string>();
+        const validGames: any[] = [];
+
+        for (const game of games) {
+          if (game.gameId && !usedGameIds.has(game.gameId)) {
+            usedGameIds.add(game.gameId);
+            validGames.push(game);
+          }
+          // Skip duplicates
+        }
+
+        // Fill up to 4 unique games if needed
+        if (validGames.length < 4 && supportedTargetsForFix.length > 0) {
+          const availableGameIds = ALL_GAME_IDS.filter((gid) => !usedGameIds.has(gid));
+          let letterIdx = 0;
+
+          while (validGames.length < 4 && availableGameIds.length > 0) {
+            const gid = availableGameIds.shift()!;
+            const letter = supportedTargetsForFix[letterIdx % supportedTargetsForFix.length];
+            const urlKey = LETTER_URL_MAP[letter];
+            letterIdx++;
+
+            // Build path based on game type
+            let path = "";
+            const noAgeIds = ["kolo-srece", "bingo", "spomin", "labirint", "met-kocke", "ponovi-poved"];
+            if (noAgeIds.includes(gid)) {
+              if (gid === "spomin") {
+                path = `/govorne-igre/spomin/spomin-${urlKey}`;
+              } else {
+                path = `/govorne-igre/${gid}/${urlKey}`;
+              }
+            } else {
+              path = `/govorne-igre/${gid}/${urlKey}${ageKey}`;
+            }
+
+            const GAME_TITLES: Record<string, string> = {
+              "kolo-srece": "Kolo besed",
+              "bingo": "Bingo",
+              "spomin": "Spomin",
+              "sestavljanke": "Sestavljanke",
+              "zaporedja": "Zaporedja",
+              "drsna-sestavljanka": "Drsna igra",
+              "igra-ujemanja": "Igra ujemanja",
+              "labirint": "Labirint",
+              "met-kocke": "Smešne povedi",
+              "ponovi-poved": "Ponovi poved",
+            };
+
+            validGames.push({
+              type: "igra",
+              title: GAME_TITLES[gid] || gid,
+              path,
+              letter,
+              gameId: gid,
+            });
+            usedGameIds.add(gid);
+          }
+        }
+
+        // Fix title/letter duplication: if title already contains the letter, clear the letter field display
+        for (const game of validGames) {
+          if (game.letter && game.title) {
+            // Remove letter from title if it's appended (e.g., "Kolo besed Š" -> "Kolo besed")
+            const letterSuffix = ` ${game.letter}`;
+            if (game.title.endsWith(letterSuffix)) {
+              game.title = game.title.slice(0, -letterSuffix.length);
+            }
+          }
+        }
+
+        // Reconstruct activities: motorika first, then exactly 4 games
+        const motorActivity = day.activities.find((a: any) => a.type === "motorika");
+        day.activities = [
+          motorActivity || {
+            type: "motorika",
+            title: "Vaje za motoriko govoril",
+            path: "/govorno-jezikovne-vaje/vaje-motorike-govoril",
+          },
+          ...validGames.slice(0, 4),
+        ];
+      }
+    }
+
+    console.log(`Post-processing complete. Validated ${planData.days?.length || 0} days.`);
+
     // Enrich plan_data with metadata
     const fullPlanData = {
       ...planData,
