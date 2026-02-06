@@ -1,152 +1,158 @@
 
-# Plan: Deduplikacija posnetkov - ohrani samo zadnji posnetek za vsako besedo
+
+# Plan: Takojšnje zmanjšanje števca obvestil ob kliku
 
 ## Povzetek problema
 
-Pri večkratnem testiranju preverjanja izgovorjave se za isto besedo shrani več posnetkov. Na primer za črko R v Seja-1:
-- 4x ROŽA (namesto 1x)
-- 2x URA (namesto 1x)
-- 3x SIR (namesto 1x)
+Ko uporabnik (admin ali starš) klikne na obvestilo v zvončku, se številka nad zvončkom ne zmanjša takoj, ker admin hook (`useNotifications.ts`) počaka na odgovor iz baze (Supabase), preden posodobi lokalno stanje. Vmes se popover zapre in uporabnik vidi staro številko.
 
-To se dogaja, ker:
-1. Edge funkcija `transcribe-articulation` shrani vsak uspešen posnetek z unikatnim timestampom
-2. Ni logike za preverjanje ali posnetek za to besedo že obstaja
-3. Ni deduplikacije pri prikazu posnetkov
+## Analiza obeh portalov
 
-## Predlagana rešitev
+### Admin portal (`useNotifications.ts`)
 
-**Ohranimo zadnji posnetek** za vsako besedo (najnovejši timestamp), ker predstavlja najnovejši poizkus uporabnika.
-
-### Možnost 1: Deduplikacija pri prikazu (priporočeno)
-
-Spremenimo `useSessionReview.ts`, da filtrira posnetke in ohrani samo **zadnji posnetek za vsak wordIndex**.
-
-**Prednosti:**
-- Ne spreminja obstoječih podatkov v Storage
-- Hitrejša implementacija
-- Zgodovinski posnetki ostanejo shranjeni (če bi jih kdaj potrebovali)
-
-### Možnost 2: Preverjanje pred shranjevanjem
-
-Spremenimo edge funkcijo, da najprej preveri če posnetek za ta wordIndex že obstaja in ga nadomesti (upsert).
-
-**Slabosti:**
-- Zahteva spremembo edge funkcije
-- Potrebna dodatna logika za list + delete starih posnetkov
-
-## Izbrana rešitev: Možnost 1
-
-Implementiramo deduplikacijo pri prikazu v `useSessionReview.ts`.
-
-## Spremembe v kodi
-
-### Datoteka: `src/hooks/useSessionReview.ts`
-
-#### Trenutna koda (vrstice 215-230)
-
-```typescript
-// 5. Grupiraj posnetke po črkah
-const recordingsByLetter = new Map<string, Recording[]>();
-PHONETIC_ORDER.forEach(letter => recordingsByLetter.set(letter, []));
-
-recordings.forEach(recording => {
-  const letterRecordings = recordingsByLetter.get(recording.letter) || [];
-  letterRecordings.push(recording);
-  recordingsByLetter.set(recording.letter, letterRecordings);
-});
-
-// Sortiraj posnetke znotraj vsake črke po wordIndex
-recordingsByLetter.forEach((recs, letter) => {
-  recs.sort((a, b) => a.wordIndex - b.wordIndex);
-  recordingsByLetter.set(letter, recs);
-});
-```
-
-#### Nova koda z deduplikacijo
-
-```typescript
-// 5. Dedupliciraj posnetke - ohrani samo ZADNJI posnetek za vsak wordIndex
-// Ker imajo posnetki timestamp v imenu (npr. R-57-ROZA-2026-02-05T10-30-00-123Z.webm),
-// sortiramo po imenu datoteke (timestamp) in vzamemo zadnjega za vsak wordIndex
-const deduplicatedRecordings = new Map<number, Recording>();
-const sortedByTimestamp = [...recordings].sort((a, b) => 
-  a.filename.localeCompare(b.filename)
-);
-sortedByTimestamp.forEach(recording => {
-  // Vedno prepiše s kasnejšim (sortirano naraščajoče po timestampu)
-  deduplicatedRecordings.set(recording.wordIndex, recording);
-});
-const uniqueRecordings = Array.from(deduplicatedRecordings.values());
-
-// 6. Grupiraj posnetke po črkah
-const recordingsByLetter = new Map<string, Recording[]>();
-PHONETIC_ORDER.forEach(letter => recordingsByLetter.set(letter, []));
-
-uniqueRecordings.forEach(recording => {
-  const letterRecordings = recordingsByLetter.get(recording.letter) || [];
-  letterRecordings.push(recording);
-  recordingsByLetter.set(recording.letter, letterRecordings);
-});
-
-// Sortiraj posnetke znotraj vsake črke po wordIndex
-recordingsByLetter.forEach((recs, letter) => {
-  recs.sort((a, b) => a.wordIndex - b.wordIndex);
-  recordingsByLetter.set(letter, recs);
-});
-```
-
-## Logika deduplikacije
+**Problem:** `markAsRead` je asinhrona funkcija, ki **najprej piše v bazo**, nato šele posodobi lokalni state:
 
 ```text
-Primer posnetkov za črko R v Seja-1:
-
-Vhod (9 posnetkov):
-├── R-57-ROZA-2026-02-04T09-00-00.webm  (wordIndex: 57)
-├── R-57-ROZA-2026-02-04T10-30-00.webm  (wordIndex: 57)  ← kasnejši
-├── R-57-ROZA-2026-02-05T08-00-00.webm  (wordIndex: 57)  ← najnovejši ✓
-├── R-57-ROZA-2026-02-05T09-15-00.webm  (wordIndex: 57)
-├── R-58-URA-2026-02-04T09-01-00.webm   (wordIndex: 58)
-├── R-58-URA-2026-02-05T08-01-00.webm   (wordIndex: 58)  ← najnovejši ✓
-├── R-59-SIR-2026-02-04T09-02-00.webm   (wordIndex: 59)
-├── R-59-SIR-2026-02-05T08-02-00.webm   (wordIndex: 59)
-└── R-59-SIR-2026-02-05T09-16-00.webm   (wordIndex: 59)  ← najnovejši ✓
-
-Izhod (3 posnetki - po 1 za vsako besedo):
-├── R-57-ROZA-2026-02-05T09-15-00.webm  (zadnji ROŽA)
-├── R-58-URA-2026-02-05T08-01-00.webm   (zadnji URA)
-└── R-59-SIR-2026-02-05T09-16-00.webm   (zadnji SIR)
+1. Klik na obvestilo
+2. markAsRead() se pokliče
+3. await supabase.insert(...)   ← ČAKA na bazo (200-500ms)
+4. setUnreadCount(prev - 1)     ← Šele zdaj se posodobi števec
+5. onClose()                    ← Popover se zapre
 ```
 
-## Zakaj zadnji posnetek?
+Uporabnik vidi staro številko, ker se popover zapre preden se čakanje na bazo konča.
 
-1. **Najnovejši poizkus**: Uporabnik je lahko popravil izgovorjavo
-2. **Relevantnost**: Starejši posnetki so manj aktualni
-3. **Konsistentnost**: Vedno isti pristop - zadnji zmaga
+### Uporabniški portal (`useUserNotifications.ts`)
+
+**Stanje:** Deluje pravilno, ker je `markAsRead` sinhrona funkcija (localStorage). Števec se posodobi takoj.
+
+## Rešitev: Optimistično posodabljanje (Optimistic Update)
+
+Spremenimo vrstni red operacij v admin hooku - **najprej posodobimo lokalno stanje** (takoj), **nato zapišemo v bazo**. Če zapis v bazo ne uspe, povrnemo staro stanje.
+
+### Spremembe v `src/hooks/useNotifications.ts`
+
+#### `markAsRead` - nova logika:
+
+```text
+1. Klik na obvestilo
+2. markAsRead() se pokliče
+3. setUnreadCount(prev - 1)     ← TAKOJ posodobi števec
+4. setNotifications(...)        ← TAKOJ označi kot prebrano
+5. supabase.insert(...)         ← V ozadju zapiši v bazo
+6. Če napaka → povrni stanje   ← Rollback pri napaki
+```
+
+Konkretno:
+
+```typescript
+const markAsRead = useCallback(async (notificationId: string) => {
+  if (!user?.id) return;
+
+  // 1. Preveri ali je že prebrano (prepreči dvojno zmanjšanje)
+  const notification = notifications.find(n => n.id === notificationId);
+  if (!notification || notification.is_read) return;
+
+  // 2. Optimistično posodobi stanje TAKOJ
+  setNotifications(prev =>
+    prev.map(n => n.id === notificationId ? { ...n, is_read: true } : n)
+  );
+  setUnreadCount(prev => Math.max(0, prev - 1));
+
+  // 3. Zapiši v bazo v ozadju
+  try {
+    const { error } = await supabase
+      .from('notification_reads')
+      .insert({ notification_id: notificationId, user_id: user.id });
+
+    if (error && error.code !== '23505') {
+      // Povrni stanje pri napaki
+      setNotifications(prev =>
+        prev.map(n => n.id === notificationId ? { ...n, is_read: false } : n)
+      );
+      setUnreadCount(prev => prev + 1);
+    }
+  } catch (error) {
+    // Povrni stanje pri napaki
+    setNotifications(prev =>
+      prev.map(n => n.id === notificationId ? { ...n, is_read: false } : n)
+    );
+    setUnreadCount(prev => prev + 1);
+  }
+}, [user?.id, notifications]);
+```
+
+#### `markAllAsRead` - nova logika:
+
+Enako - najprej posodobi stanje, nato zapiši v bazo:
+
+```typescript
+const markAllAsRead = useCallback(async () => {
+  if (!user?.id) return;
+
+  const unreadNotifications = notifications.filter(n => !n.is_read);
+  if (unreadNotifications.length === 0) return;
+
+  // 1. Optimistično posodobi TAKOJ
+  setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+  setUnreadCount(0);
+
+  // 2. V ozadju zapiši v bazo
+  try {
+    const inserts = unreadNotifications.map(n => ({
+      notification_id: n.id,
+      user_id: user.id,
+    }));
+
+    const { error } = await supabase
+      .from('notification_reads')
+      .upsert(inserts, { onConflict: 'notification_id,user_id' });
+
+    if (error) {
+      // Povrni stanje
+      setNotifications(prev =>
+        prev.map(n => {
+          const wasUnread = unreadNotifications.some(u => u.id === n.id);
+          return wasUnread ? { ...n, is_read: false } : n;
+        })
+      );
+      setUnreadCount(unreadNotifications.length);
+    }
+  } catch (error) {
+    // Povrni stanje
+    setNotifications(prev =>
+      prev.map(n => {
+        const wasUnread = unreadNotifications.some(u => u.id === n.id);
+        return wasUnread ? { ...n, is_read: false } : n;
+      })
+    );
+    setUnreadCount(unreadNotifications.length);
+  }
+}, [notifications, user?.id]);
+```
 
 ## Datoteke za spremembo
 
-| Datoteka | Tip spremembe |
-|----------|---------------|
-| `src/hooks/useSessionReview.ts` | Dodaj deduplikacijo pred grupiranjem |
+| Datoteka | Sprememba |
+|----------|-----------|
+| `src/hooks/useNotifications.ts` | Optimistično posodabljanje v `markAsRead` in `markAllAsRead` |
 
-## Rezultat po spremembi
+Uporabniški portal (`useUserNotifications.ts`) **ne potrebuje sprememb** - tam je `markAsRead` že sinhrona in deluje pravilno.
+
+## Rezultat
 
 | Scenarij | Prej | Potem |
 |----------|------|-------|
-| Črka R, Seja-1 | 9 posnetkov (4+2+3) | 3 posnetki (1 ROŽA, 1 URA, 1 SIR) |
-| Skupaj v seji | Podvojeni posnetki | Natanko 1 posnetek na besedo |
+| Admin klikne 1 obvestilo | Števec se posodobi z zamikom (200-500ms) | Števec se posodobi takoj |
+| Admin klikne "Označi vse" | Števec se posodobi z zamikom | Števec se posodobi takoj |
+| Napaka pri zapisu v bazo | Števec se ne posodobi (ostane stara vrednost) | Števec se takoj posodobi, ob napaki se povrne nazaj |
+| Uporabniški portal | Deluje pravilno (brez sprememb) | Deluje pravilno (brez sprememb) |
 
-## Opomba glede strani `/admin/children/{childId}/details`
+## Testiranje
 
-Ta stran uporablja `useLogopedistChildStorageFiles`, ki vrne surovo število posnetkov iz Storage. Po tej spremembi:
-- **details stran**: Še vedno prikaže "10 posnetkov" (vsi v Storage)
-- **tests stran**: Prikaže "3 posnetke" (deduplicirani za prikaz)
+1. Prijavi se kot logoped v admin portal
+2. Klikni zvonček - preveri, da so obvestila prikazana
+3. Klikni na eno obvestilo - preveri, da se števec nad zvončkom takoj zmanjša za 1
+4. Klikni "Označi vse" - preveri, da števec takoj pokaže 0
+5. Prijavi se kot starš - preveri, da tudi tam obvestila pravilno delujejo
 
-Če želiš tudi na details strani enako deduplikacijo, je potrebno posodobiti tudi `useLogopedistChildStorageFiles`. Povej, če to tudi potrebuješ.
-
-## Testiranje po implementaciji
-
-1. Odpri `/admin/tests/d4bb9391-21bc-4063-9db0-9eeb112164cf`
-2. Preveri, da črka R prikazuje natanko 3 posnetke (ROŽA, URA, SIR)
-3. Preveri, da se predvaja zadnji (najnovejši) posnetek
-4. Preveri ostale črke - vsaka beseda mora imeti natanko 1 posnetek
