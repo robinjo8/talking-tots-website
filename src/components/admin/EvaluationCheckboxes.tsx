@@ -2,7 +2,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { EvaluationOption } from '@/data/evaluationOptions';
-import { ArticulationRatingScale } from './ArticulationRatingScale';
 
 interface EvaluationCheckboxesProps {
   options: EvaluationOption[];
