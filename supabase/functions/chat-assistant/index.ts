@@ -90,7 +90,7 @@ Your communication style is professional, structured, calm, and reassuring. Your
         parts.push(`- Vprašalnik o govornem razvoju:\n  ${childContext.speechDevelopmentSummary}`);
 
       if (parts.length > 0) {
-        childContextBlock = `\n\nPODATKI O OTROKU UPORABNIKA:\n${parts.join("\n")}\n\nVEDNO uporabi te podatke. NE ugibaj starosti ali govornih težav otroka.\nČe uporabnik vpraša o otroku, odgovarjaj na podlagi teh podatkov.`;
+        childContextBlock = `\n\nPODATKI O OTROKU UPORABNIKA:\n${parts.join("\n")}\n\nTe podatke IMAŠ na voljo kot ozadje. Uporabi jih SAMO kadar so neposredno relevantni za vprašanje uporabnika.\nNE omenjaj imena otroka, starosti ali govornih težav v VSAKEM odgovoru.\nČe uporabnik postavi splošno vprašanje (npr. o tehnikah, vajah, sodelovanju z vzgojitelji), odgovori splošno brez omenjanja specifičnih podatkov otroka.\nČe uporabnik vprašanje neposredno nanaša na svojega otroka ali na specifične govorne težave, TAKRAT uporabi te podatke za personaliziran odgovor.\nNE ugibaj ali dodajaj podatkov ki niso na voljo.`;
       }
     }
 
