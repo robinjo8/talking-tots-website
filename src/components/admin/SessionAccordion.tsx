@@ -96,14 +96,6 @@ export function SessionAccordion({
     0
   );
 
-  const handleLetterAccordionChange = (value: string) => {
-    setOpenLetters(prev => {
-      if (prev.includes(value)) {
-        return prev.filter(v => v !== value);
-      }
-      return [...prev, value];
-    });
-  };
 
   return (
     <Accordion type="single" collapsible className="w-full">
