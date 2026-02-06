@@ -123,6 +123,5 @@ export function LetterAccordion({
           )}
         </AccordionContent>
       </AccordionItem>
-    </Accordion>
   );
 }

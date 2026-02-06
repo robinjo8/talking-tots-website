@@ -133,24 +133,26 @@ export function SessionAccordion({
         <AccordionContent className="px-4 pb-4">
           {hasData ? (
             <div className="space-y-3">
-              {/* Letter accordions */}
-              {PHONETIC_ORDER.map(letter => {
-                const recordings = recordingsByLetter.get(letter) || [];
-                const evaluation = evaluations.get(letter) || { selectedOptions: [], comment: '', rating: undefined };
+              {/* Letter accordions - only one open at a time */}
+              <Accordion type="single" collapsible className="w-full space-y-3">
+                {PHONETIC_ORDER.map(letter => {
+                  const recordings = recordingsByLetter.get(letter) || [];
+                  const evaluation = evaluations.get(letter) || { selectedOptions: [], comment: '', rating: undefined };
 
-                return (
-                  <LetterAccordion
-                    key={letter}
-                    letter={letter as PhoneticLetter}
-                    recordings={recordings}
-                    evaluation={evaluation}
-                    onEvaluationChange={onEvaluationChange}
-                    onSave={() => onSaveLetter(letter)}
-                    isSaving={savingLetter === letter}
-                    isReadOnly={isReadOnly}
-                  />
-                );
-              })}
+                  return (
+                    <LetterAccordion
+                      key={letter}
+                      letter={letter as PhoneticLetter}
+                      recordings={recordings}
+                      evaluation={evaluation}
+                      onEvaluationChange={onEvaluationChange}
+                      onSave={() => onSaveLetter(letter)}
+                      isSaving={savingLetter === letter}
+                      isReadOnly={isReadOnly}
+                    />
+                  );
+                })}
+              </Accordion>
 
               {/* Action buttons for this session */}
               <div className="pt-4 border-t flex flex-col sm:flex-row gap-3 justify-end">
