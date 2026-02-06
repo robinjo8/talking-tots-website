@@ -1,29 +1,131 @@
-import { useState } from "react";
+import { useEffect, useRef, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { useMonthlyPlan, type PlanWeek, type PlanActivity } from "@/hooks/useMonthlyPlan";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { useMonthlyPlan } from "@/hooks/useMonthlyPlan";
+import { usePlanCompletions, useStarsByDate, useCompleteActivity } from "@/hooks/usePlanProgress";
+import { PlanDayCard } from "@/components/plan/PlanDayCard";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Loader2, Play, Dumbbell, Gamepad2, Calendar, Sparkles } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Loader2, Calendar, Sparkles } from "lucide-react";
+import { motion } from "framer-motion";
+
+const PLAN_ACTIVITY_STORAGE_KEY = "plan-activity-tracking";
 
 export default function MojiIzzivi() {
   const { selectedChild } = useAuth();
   const { data: plan, isLoading } = useMonthlyPlan(selectedChild?.id);
-  const [activeWeek, setActiveWeek] = useState(0);
   const navigate = useNavigate();
+  const todayRef = useRef<HTMLDivElement>(null);
 
   const isGenerating = plan?.status === "generating";
   const isActive = plan?.status === "active";
   const planData = plan?.plan_data;
 
+  // Calculate date range for stars query
+  const dateRange = useMemo(() => {
+    if (!plan) return { start: "", end: "" };
+    const year = plan.year;
+    const month = plan.month;
+    const daysInMonth = new Date(year, month, 0).getDate();
+    return {
+      start: `${year}-${String(month).padStart(2, "0")}-01`,
+      end: `${year}-${String(month).padStart(2, "0")}-${String(daysInMonth).padStart(2, "0")}`,
+    };
+  }, [plan]);
+
+  const { data: completions = [] } = usePlanCompletions(plan?.id, selectedChild?.id);
+  const { data: starsByDate = [] } = useStarsByDate(
+    selectedChild?.id,
+    dateRange.start,
+    dateRange.end
+  );
+  const completeActivity = useCompleteActivity();
+
+  // Build lookup maps
+  const completionsByDay = useMemo(() => {
+    const map = new Map<string, Set<number>>();
+    for (const c of completions) {
+      const key = c.day_date;
+      if (!map.has(key)) map.set(key, new Set());
+      map.get(key)!.add(c.activity_index);
+    }
+    return map;
+  }, [completions]);
+
+  const starsMap = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const s of starsByDate) {
+      map.set(s.day, Number(s.stars));
+    }
+    return map;
+  }, [starsByDate]);
+
+  // Check for returning from a game
+  useEffect(() => {
+    const stored = localStorage.getItem(PLAN_ACTIVITY_STORAGE_KEY);
+    if (stored && plan?.id && selectedChild?.id) {
+      try {
+        const { planId, dayDate, activityIndex } = JSON.parse(stored);
+        if (planId === plan.id) {
+          completeActivity.mutate({
+            planId,
+            childId: selectedChild.id,
+            dayDate,
+            activityIndex,
+          });
+        }
+      } catch (e) {
+        console.error("Failed to parse activity tracking:", e);
+      }
+      localStorage.removeItem(PLAN_ACTIVITY_STORAGE_KEY);
+    }
+  }, [plan?.id, selectedChild?.id]);
+
+  // Scroll to today on mount
+  useEffect(() => {
+    if (isActive && todayRef.current) {
+      setTimeout(() => {
+        todayRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 300);
+    }
+  }, [isActive, planData]);
+
+  const handleActivityPlay = useCallback((dayDate: string, activityIndex: number, path: string) => {
+    if (plan?.id) {
+      localStorage.setItem(
+        PLAN_ACTIVITY_STORAGE_KEY,
+        JSON.stringify({ planId: plan.id, dayDate, activityIndex })
+      );
+    }
+    navigate(path);
+  }, [plan?.id, navigate]);
+
+  // Get today's date string
+  const todayStr = useMemo(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  }, []);
+
+  // Get days from plan (new format: flat days, legacy: weeks)
+  const days = useMemo(() => {
+    if (!planData) return [];
+    if (planData.days) return planData.days;
+    // Legacy format conversion
+    if (planData.weeks) {
+      return planData.weeks.flatMap((week) =>
+        week.days.map((day) => ({
+          ...day,
+          date: day.date || `legacy-${day.dayNumber || 0}`,
+        }))
+      );
+    }
+    return [];
+  }, [planData]);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
-
       <div className="container max-w-5xl mx-auto pt-28 md:pt-32 pb-20 px-4">
         <div className="mb-8">
           <BreadcrumbNavigation />
@@ -33,14 +135,50 @@ export default function MojiIzzivi() {
           <PlanSkeleton />
         ) : isGenerating ? (
           <GeneratingState />
-        ) : isActive && planData ? (
-          <ActivePlan
-            planData={planData}
-            activeWeek={activeWeek}
-            setActiveWeek={setActiveWeek}
-            focusLetters={plan.focus_letters}
-            onNavigate={navigate}
-          />
+        ) : isActive && planData && days.length > 0 ? (
+          <div className="space-y-6">
+            {/* Header */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-2xl p-6 border border-primary/20"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <Sparkles className="h-6 w-6 text-primary" />
+                <h1 className="text-2xl font-bold">Moj osebni načrt</h1>
+              </div>
+              {planData.summary && (
+                <p className="text-muted-foreground text-sm mt-1">{planData.summary}</p>
+              )}
+            </motion.div>
+
+            {/* Day cards */}
+            <div className="space-y-4">
+              {days.map((day) => {
+                const isToday = day.date === todayStr;
+                const dayCompletions = completionsByDay.get(day.date) || new Set<number>();
+                const dayStars = starsMap.get(day.date) || 0;
+
+                return (
+                  <div key={day.date} ref={isToday ? todayRef : undefined}>
+                    <PlanDayCard
+                      date={day.date}
+                      dayName={day.dayName}
+                      activities={day.activities}
+                      starsForDay={dayStars}
+                      completedIndices={dayCompletions}
+                      isToday={isToday}
+                      planId={plan!.id}
+                      childId={selectedChild!.id}
+                      onActivityPlay={(activityIndex, path) =>
+                        handleActivityPlay(day.date, activityIndex, path)
+                      }
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         ) : (
           <EmptyState />
         )}
@@ -83,172 +221,11 @@ function PlanSkeleton() {
   return (
     <div className="space-y-6">
       <Skeleton className="h-24 w-full rounded-2xl" />
-      <Skeleton className="h-12 w-96 rounded-xl" />
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-40 w-full rounded-2xl" />
+          <Skeleton key={i} className="h-48 w-full rounded-2xl" />
         ))}
       </div>
-    </div>
-  );
-}
-
-interface ActivePlanProps {
-  planData: {
-    summary?: string;
-    targetLetters?: string[];
-    childAge?: number;
-    ageGroup?: string;
-    weeks?: PlanWeek[];
-  };
-  activeWeek: number;
-  setActiveWeek: (week: number) => void;
-  focusLetters: string[];
-  onNavigate: (path: string) => void;
-}
-
-function ActivePlan({ planData, activeWeek, setActiveWeek, focusLetters, onNavigate }: ActivePlanProps) {
-  const weeks = planData.weeks || [];
-  const currentWeek = weeks[activeWeek];
-
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-2xl p-6 border border-primary/20">
-        <div className="flex items-center gap-3 mb-2">
-          <Sparkles className="h-6 w-6 text-primary" />
-          <h1 className="text-2xl font-bold">Moj osebni načrt</h1>
-        </div>
-        {planData.summary && (
-          <p className="text-muted-foreground text-sm mt-1">{planData.summary}</p>
-        )}
-        <div className="flex flex-wrap gap-2 mt-3">
-          {focusLetters.map((letter) => (
-            <span
-              key={letter}
-              className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-primary/15 text-primary"
-            >
-              {letter}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* Week tabs */}
-      {weeks.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto pb-1">
-          {weeks.map((week, index) => (
-            <button
-              key={index}
-              onClick={() => setActiveWeek(index)}
-              className={`flex-shrink-0 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                activeWeek === index
-                  ? "bg-primary text-primary-foreground shadow-md"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
-              }`}
-            >
-              Teden {week.weekNumber}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Week theme */}
-      {currentWeek?.theme && (
-        <p className="text-sm font-medium text-muted-foreground px-1">
-          {currentWeek.theme}
-        </p>
-      )}
-
-      {/* Days */}
-      <AnimatePresence mode="wait">
-        {currentWeek && (
-          <motion.div
-            key={activeWeek}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="space-y-4"
-          >
-            {currentWeek.days.map((day) => (
-              <DayCard key={day.dayNumber} day={day} onNavigate={onNavigate} />
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-interface DayCardProps {
-  day: { dayNumber: number; dayName: string; activities: PlanActivity[] };
-  onNavigate: (path: string) => void;
-}
-
-function DayCard({ day, onNavigate }: DayCardProps) {
-  return (
-    <Card className="rounded-2xl border overflow-hidden">
-      <div className="bg-muted/50 px-5 py-3 border-b">
-        <h3 className="font-semibold text-sm uppercase tracking-wide">
-          {day.dayName}
-        </h3>
-      </div>
-      <CardContent className="p-0 divide-y">
-        {day.activities.map((activity, index) => (
-          <ActivityRow
-            key={index}
-            activity={activity}
-            onNavigate={onNavigate}
-          />
-        ))}
-      </CardContent>
-    </Card>
-  );
-}
-
-interface ActivityRowProps {
-  activity: PlanActivity;
-  onNavigate: (path: string) => void;
-}
-
-function ActivityRow({ activity, onNavigate }: ActivityRowProps) {
-  const isMotor = activity.type === "motorika";
-
-  return (
-    <div className="flex items-center gap-3 px-5 py-3 hover:bg-muted/30 transition-colors">
-      <div
-        className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
-          isMotor
-            ? "bg-orange-100 text-orange-600"
-            : "bg-blue-100 text-blue-600"
-        }`}
-      >
-        {isMotor ? <Dumbbell className="h-4 w-4" /> : <Gamepad2 className="h-4 w-4" />}
-      </div>
-
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">{activity.title}</p>
-        {activity.description && (
-          <p className="text-xs text-muted-foreground truncate">
-            {activity.description}
-          </p>
-        )}
-      </div>
-
-      <span className="text-xs text-muted-foreground flex-shrink-0 mr-2">
-        {activity.duration}
-      </span>
-
-      <Button
-        size="sm"
-        variant="outline"
-        className="flex-shrink-0 rounded-xl gap-1.5 text-xs h-8"
-        onClick={() => onNavigate(activity.path)}
-      >
-        <Play className="h-3 w-3" />
-        Igraj
-      </Button>
     </div>
   );
 }

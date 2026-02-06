@@ -20,10 +20,16 @@ const LETTER_URL_MAP: Record<string, string> = {
   R: "r",
 };
 
-// Letters that have games available
 const SUPPORTED_LETTERS = Object.keys(LETTER_URL_MAP);
 
-// Age group to age key mapping for games with age variants
+const DAY_NAMES = ["Nedelja", "Ponedeljek", "Torek", "Sreda", "Četrtek", "Petek", "Sobota"];
+
+// All available game IDs for uniqueness constraint
+const ALL_GAME_IDS = [
+  "kolo-srece", "bingo", "spomin", "sestavljanke", "zaporedja",
+  "drsna-sestavljanka", "igra-ujemanja", "labirint", "met-kocke", "ponovi-poved"
+];
+
 function getAgeKey(ageGroup: string): string {
   switch (ageGroup) {
     case "3-4": return "";
@@ -52,12 +58,25 @@ function calculateAge(birthDate: string): number {
   return age;
 }
 
+function getDaysInMonth(year: number, month: number): number {
+  return new Date(year, month, 0).getDate();
+}
+
+function formatDate(year: number, month: number, day: number): string {
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
+function getDayName(year: number, month: number, day: number): string {
+  const date = new Date(year, month - 1, day);
+  return DAY_NAMES[date.getDay()];
+}
+
 function buildGameCatalog(targetLetters: string[], ageGroup: string): string {
   const ageKey = getAgeKey(ageGroup);
   const supportedTargets = targetLetters.filter((l) => SUPPORTED_LETTERS.includes(l));
 
   let catalog = `RAZPOLOŽLJIVE IGRE IN VAJE:\n\n`;
-  catalog += `MOTORIKA GOVORIL (brez črk, za vsakodnevno ogrevanje):\n`;
+  catalog += `MOTORIKA GOVORIL (gameId: "motorika", brez črk, za vsakodnevno ogrevanje):\n`;
   catalog += `  Pot: /govorno-jezikovne-vaje/vaje-motorike-govoril\n\n`;
 
   if (supportedTargets.length === 0) {
@@ -70,26 +89,24 @@ function buildGameCatalog(targetLetters: string[], ageGroup: string): string {
     urlKey: LETTER_URL_MAP[l],
   }));
 
-  // Games without age variants
   const noAgeGames = [
-    { name: "KOLO BESED", pathTemplate: "/govorne-igre/kolo-srece/{urlKey}" },
-    { name: "BINGO", pathTemplate: "/govorne-igre/bingo/{urlKey}" },
-    { name: "SPOMIN", pathTemplate: "/govorne-igre/spomin/spomin-{urlKey}" },
-    { name: "LABIRINT", pathTemplate: "/govorne-igre/labirint/{urlKey}" },
-    { name: "SMEŠNE POVEDI", pathTemplate: "/govorne-igre/met-kocke/{urlKey}" },
-    { name: "PONOVI POVED", pathTemplate: "/govorne-igre/ponovi-poved/{urlKey}" },
+    { name: "KOLO BESED", gameId: "kolo-srece", pathTemplate: "/govorne-igre/kolo-srece/{urlKey}" },
+    { name: "BINGO", gameId: "bingo", pathTemplate: "/govorne-igre/bingo/{urlKey}" },
+    { name: "SPOMIN", gameId: "spomin", pathTemplate: "/govorne-igre/spomin/spomin-{urlKey}" },
+    { name: "LABIRINT", gameId: "labirint", pathTemplate: "/govorne-igre/labirint/{urlKey}" },
+    { name: "SMEŠNE POVEDI", gameId: "met-kocke", pathTemplate: "/govorne-igre/met-kocke/{urlKey}" },
+    { name: "PONOVI POVED", gameId: "ponovi-poved", pathTemplate: "/govorne-igre/ponovi-poved/{urlKey}" },
   ];
 
-  // Games with age variants
   const ageGames = [
-    { name: "SESTAVLJANKE", pathTemplate: `/govorne-igre/sestavljanke/{urlKey}${ageKey}` },
-    { name: "DRSNA IGRA", pathTemplate: `/govorne-igre/drsna-sestavljanka/{urlKey}${ageKey}` },
-    { name: "ZAPOREDJA", pathTemplate: `/govorne-igre/zaporedja/{urlKey}${ageKey}` },
-    { name: "IGRA UJEMANJA", pathTemplate: `/govorne-igre/igra-ujemanja/{urlKey}${ageKey}` },
+    { name: "SESTAVLJANKE", gameId: "sestavljanke", pathTemplate: `/govorne-igre/sestavljanke/{urlKey}${ageKey}` },
+    { name: "DRSNA IGRA", gameId: "drsna-sestavljanka", pathTemplate: `/govorne-igre/drsna-sestavljanka/{urlKey}${ageKey}` },
+    { name: "ZAPOREDJA", gameId: "zaporedja", pathTemplate: `/govorne-igre/zaporedja/{urlKey}${ageKey}` },
+    { name: "IGRA UJEMANJA", gameId: "igra-ujemanja", pathTemplate: `/govorne-igre/igra-ujemanja/{urlKey}${ageKey}` },
   ];
 
   for (const game of noAgeGames) {
-    catalog += `${game.name} (brez starostnih variant):\n`;
+    catalog += `${game.name} (gameId: "${game.gameId}", brez starostnih variant):\n`;
     for (const { letter, urlKey } of urlKeys) {
       const path = game.pathTemplate.replace("{urlKey}", urlKey);
       catalog += `  Črka ${letter}: ${path}\n`;
@@ -98,7 +115,7 @@ function buildGameCatalog(targetLetters: string[], ageGroup: string): string {
   }
 
   for (const game of ageGames) {
-    catalog += `${game.name} (starostna skupina ${ageGroup}):\n`;
+    catalog += `${game.name} (gameId: "${game.gameId}", starostna skupina ${ageGroup}):\n`;
     for (const { letter, urlKey } of urlKeys) {
       const path = game.pathTemplate.replace("{urlKey}", urlKey);
       catalog += `  Črka ${letter}: ${path}\n`;
@@ -146,7 +163,6 @@ serve(async (req) => {
 
     // 2. Find child through session
     let childId: string | null = null;
-    let childBirthDate: string | null = null;
 
     if (report.session_id) {
       const { data: session } = await supabase
@@ -162,13 +178,10 @@ serve(async (req) => {
 
     // Fallback: try to extract child_id from pdf_url path
     if (!childId && report.pdf_url) {
-      // Path format: parentId/childId/...
       const parts = report.pdf_url.split("/");
       if (parts.length >= 2) {
-        // Try the second segment as childId (UUID format)
         const potentialChildId = parts[1];
         if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(potentialChildId)) {
-          // Verify this child exists
           const { data: child } = await supabase
             .from("children")
             .select("id")
@@ -201,19 +214,16 @@ serve(async (req) => {
       });
     }
 
-    childBirthDate = child.birth_date;
-    const childAge = childBirthDate ? calculateAge(childBirthDate) : (child.age || 5);
+    const childAge = child.birth_date ? calculateAge(child.birth_date) : (child.age || 5);
     const ageGroup = getAgeGroup(childAge);
 
     // 4. Determine target letters
     let targetLetters: string[] = [];
 
-    // Primary: from recommended_letters in report
     if (report.recommended_letters && Array.isArray(report.recommended_letters)) {
       targetLetters = [...report.recommended_letters];
     }
 
-    // Secondary: from articulation evaluations (non-acquired)
     if (report.session_id) {
       const { data: evaluations } = await supabase
         .from("articulation_evaluations")
@@ -222,7 +232,6 @@ serve(async (req) => {
 
       if (evaluations) {
         for (const eval_ of evaluations) {
-          // Check if letter is NOT acquired (rating indicates issues)
           const options = eval_.selected_options || [];
           const isAcquired = options.includes("acquired") || options.includes("Usvojeno");
           if (!isAcquired && !targetLetters.includes(eval_.letter)) {
@@ -232,7 +241,6 @@ serve(async (req) => {
       }
     }
 
-    // Remove duplicates
     targetLetters = [...new Set(targetLetters)];
 
     if (targetLetters.length === 0) {
@@ -243,24 +251,28 @@ serve(async (req) => {
       });
     }
 
-    // 5. Create placeholder record with 'generating' status
+    // 5. Calculate actual days in current month
     const now = new Date();
     const currentMonth = now.getMonth() + 1;
     const currentYear = now.getFullYear();
+    const totalDays = getDaysInMonth(currentYear, currentMonth);
 
-    // Archive any existing active plans for this child
+    // Build day list with actual dates and day names
+    const daysList: { date: string; dayName: string; dayNumber: number }[] = [];
+    for (let d = 1; d <= totalDays; d++) {
+      daysList.push({
+        date: formatDate(currentYear, currentMonth, d),
+        dayName: getDayName(currentYear, currentMonth, d),
+        dayNumber: d,
+      });
+    }
+
+    // Archive any existing active/generating plans
     await supabase
       .from("child_monthly_plans")
       .update({ status: "archived" })
       .eq("child_id", childId)
-      .eq("status", "active");
-
-    // Also clean up any stuck 'generating' plans
-    await supabase
-      .from("child_monthly_plans")
-      .update({ status: "archived" })
-      .eq("child_id", childId)
-      .eq("status", "generating");
+      .in("status", ["active", "generating"]);
 
     const { data: planRecord, error: planInsertError } = await supabase
       .from("child_monthly_plans")
@@ -289,37 +301,44 @@ serve(async (req) => {
     const supportedTargets = targetLetters.filter((l) => SUPPORTED_LETTERS.includes(l));
     const unsupportedTargets = targetLetters.filter((l) => !SUPPORTED_LETTERS.includes(l));
 
-    const systemPrompt = `Si logopedski asistent, ki ustvarja mesečne načrte vaj za otroke z govornimi težavami. Tvoj cilj je ustvariti raznolik, zabaven in učinkovit 4-tedenski načrt vaj.
+    const monthNames = ["januar", "februar", "marec", "april", "maj", "junij", "julij", "avgust", "september", "oktober", "november", "december"];
+    const monthName = monthNames[currentMonth - 1];
+
+    const daysListStr = daysList.map(d => `  ${d.date} (${d.dayName})`).join("\n");
+
+    const systemPrompt = `Si logopedski asistent, ki ustvarja mesečne načrte vaj za otroke z govornimi težavami. Ustvari načrt za ${monthName} ${currentYear} (${totalDays} dni).
 
 PRAVILA:
-- Vsak dan se ZAČNE z motoriko govoril (5 min): pot /govorno-jezikovne-vaje/vaje-motorike-govoril
-- Po motoriki sledita 2-3 igre (po 10 min vsaka)
+- Načrt mora vsebovati TOČNO ${totalDays} dni z dejanskimi datumi
+- Vsak dan ima TOČNO 5 aktivnosti: 1x motorika + 4x različne igre
+- KRITIČNO: Na isti dan se NE SME ponoviti isti gameId! Npr. ne sme biti "bingo" za S in "bingo" za Z na isti dan.
+- Vsak dan mora imeti 4 RAZLIČNE gameId-je med igrami
 - Igre razporedi ENAKOMERNO med ciljnimi črkami
-- RAZLIKUJ igre med dnevi - ne ponavljaj iste igre vsak dan
-- Skupno trajanje dneva: 25-35 min
-- 7 dni na teden (Ponedeljek-Nedelja), 4 tedni
+- RAZLIKUJ igre med dnevi - ne ponavljaj istega vzorca vsak dan
 - POTI MORAJO BITI TOČNO IZ KATALOGA - ne izmišljuj poti!
-- Vsak teden naj ima tematski naslov v slovenščini
-- Opisi aktivnosti naj bodo kratki in v slovenščini, napisani za starše
+- Opisi niso potrebni, nastavi jih na prazen string
+- Polje "letter" je obvezno za igre in pomeni katero črko otrok vadi
+- Polje "gameId" je obvezno za igre - mora biti iz seznama: ${ALL_GAME_IDS.join(", ")}
 ${unsupportedTargets.length > 0 ? `- Za črke ${unsupportedTargets.join(", ")} NI specifičnih iger - za te črke dodeli SAMO motoriko govoril` : ""}
-${supportedTargets.length > 0 ? `- Za črke ${supportedTargets.join(", ")} uporabi igre iz kataloga spodaj` : ""}
+
+DNEVI ZA NAČRT:
+${daysListStr}
 
 ${gameCatalog}`;
 
-    const userPrompt = `Ustvari 4-tedenski mesečni načrt vaj za otroka:
+    const userPrompt = `Ustvari mesečni načrt za ${monthName} ${currentYear} za otroka:
 - Ime: ${child.name}
 - Starost: ${childAge} let (starostna skupina: ${ageGroup})
-- Ciljne črke za vadbo: ${targetLetters.join(", ")}
+- Ciljne črke: ${targetLetters.join(", ")}
 ${supportedTargets.length > 0 ? `- Črke s podporo iger: ${supportedTargets.join(", ")}` : ""}
-${unsupportedTargets.length > 0 ? `- Črke brez specifičnih iger (samo motorika): ${unsupportedTargets.join(", ")}` : ""}
 
-Ustvari raznolik načrt, kjer se igre razlikujejo med dnevi in tedni.`;
+Ustvari raznolik načrt z ${totalDays} dnevi. Vsak dan ima motoriko + 4 razlicne igre (4 različni gameId-ji).`;
 
     const toolDefinition = {
       type: "function",
       function: {
         name: "create_monthly_plan",
-        description: "Ustvari strukturiran mesečni načrt vaj za otroka",
+        description: "Ustvari strukturiran mesečni načrt vaj za otroka z dejanskimi koledarskimi dnevi",
         parameters: {
           type: "object",
           properties: {
@@ -327,57 +346,46 @@ Ustvari raznolik načrt, kjer se igre razlikujejo med dnevi in tedni.`;
               type: "string",
               description: "Kratek povzetek načrta v slovenščini (1-2 stavka)",
             },
-            weeks: {
+            days: {
               type: "array",
+              description: `Seznam vseh ${totalDays} dni v mesecu`,
               items: {
                 type: "object",
                 properties: {
-                  weekNumber: { type: "number" },
-                  theme: { type: "string", description: "Tematski naslov tedna v slovenščini" },
-                  days: {
+                  date: { type: "string", description: "Datum v formatu YYYY-MM-DD" },
+                  dayName: {
+                    type: "string",
+                    enum: ["Ponedeljek", "Torek", "Sreda", "Četrtek", "Petek", "Sobota", "Nedelja"],
+                  },
+                  activities: {
                     type: "array",
+                    description: "Točno 5 aktivnosti: 1 motorika + 4 različne igre",
                     items: {
                       type: "object",
                       properties: {
-                        dayNumber: { type: "number" },
-                        dayName: {
-                          type: "string",
-                          enum: ["Ponedeljek", "Torek", "Sreda", "Četrtek", "Petek", "Sobota", "Nedelja"],
-                        },
-                        activities: {
-                          type: "array",
-                          items: {
-                            type: "object",
-                            properties: {
-                              type: { type: "string", enum: ["motorika", "igra"] },
-                              title: { type: "string" },
-                              description: { type: "string" },
-                              path: { type: "string" },
-                              letter: { type: "string" },
-                              duration: { type: "string" },
-                            },
-                            required: ["type", "title", "description", "path", "duration"],
-                            additionalProperties: false,
-                          },
-                        },
+                        type: { type: "string", enum: ["motorika", "igra"] },
+                        title: { type: "string" },
+                        path: { type: "string" },
+                        letter: { type: "string", description: "Ciljna črka za igro" },
+                        gameId: { type: "string", description: "ID igre iz kataloga (npr. kolo-srece, bingo)" },
                       },
-                      required: ["dayNumber", "dayName", "activities"],
+                      required: ["type", "title", "path"],
                       additionalProperties: false,
                     },
                   },
                 },
-                required: ["weekNumber", "theme", "days"],
+                required: ["date", "dayName", "activities"],
                 additionalProperties: false,
               },
             },
           },
-          required: ["summary", "weeks"],
+          required: ["summary", "days"],
           additionalProperties: false,
         },
       },
     };
 
-    console.log(`Calling OpenAI for child ${child.name}, letters: ${targetLetters.join(",")}, age: ${childAge}`);
+    console.log(`Calling OpenAI for child ${child.name}, letters: ${targetLetters.join(",")}, age: ${childAge}, days: ${totalDays}`);
 
     const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -400,8 +408,6 @@ Ustvari raznolik načrt, kjer se igre razlikujejo med dnevi in tedni.`;
     if (!openaiResponse.ok) {
       const errorText = await openaiResponse.text();
       console.error("OpenAI API error:", openaiResponse.status, errorText);
-
-      // Mark plan as failed (archive it)
       await supabase
         .from("child_monthly_plans")
         .update({ status: "archived" })
@@ -445,15 +451,16 @@ Ustvari raznolik načrt, kjer se igre razlikujejo med dnevi in tedni.`;
       });
     }
 
-    // 7. Enrich plan_data with metadata
+    // Enrich plan_data with metadata
     const fullPlanData = {
       ...planData,
       targetLetters,
       childAge,
       ageGroup,
+      totalDays,
     };
 
-    // 8. Update plan record with generated data
+    // Update plan record with generated data
     const { error: updateError } = await supabase
       .from("child_monthly_plans")
       .update({
@@ -470,7 +477,7 @@ Ustvari raznolik načrt, kjer se igre razlikujejo med dnevi in tedni.`;
       });
     }
 
-    console.log(`Monthly plan generated successfully for child ${child.name} (${planRecord.id})`);
+    console.log(`Monthly plan generated successfully for child ${child.name} (${planRecord.id}), ${totalDays} days`);
 
     return new Response(
       JSON.stringify({
@@ -478,6 +485,7 @@ Ustvari raznolik načrt, kjer se igre razlikujejo med dnevi in tedni.`;
         planId: planRecord.id,
         targetLetters,
         ageGroup,
+        totalDays,
       }),
       {
         status: 200,

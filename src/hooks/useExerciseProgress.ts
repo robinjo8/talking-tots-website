@@ -64,7 +64,7 @@ export const useExerciseProgress = () => {
         console.log("Completing full cycle, incrementing completion count");
         
         // Only record exercise completion when all 27 cards are done - awards 3 stars
-        recordExerciseCompletion('vaje_motorike_govoril', 3);
+        recordExerciseCompletion('vaje_motorike_govoril', 2);
         
         const newState = {
           currentUnlockedCard: 1,

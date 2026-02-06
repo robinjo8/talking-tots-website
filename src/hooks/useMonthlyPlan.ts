@@ -4,18 +4,23 @@ import { supabase } from "@/integrations/supabase/client";
 export interface PlanActivity {
   type: "motorika" | "igra";
   title: string;
-  description: string;
   path: string;
   letter?: string;
-  duration: string;
+  gameId?: string;
+  // Legacy fields (kept for backward compatibility)
+  description?: string;
+  duration?: string;
 }
 
 export interface PlanDay {
-  dayNumber: number;
+  date: string;
   dayName: string;
   activities: PlanActivity[];
+  // Legacy fields
+  dayNumber?: number;
 }
 
+// Legacy types kept for backward compatibility
 export interface PlanWeek {
   weekNumber: number;
   theme: string;
@@ -27,7 +32,10 @@ export interface MonthlyPlanData {
   targetLetters: string[];
   childAge: number;
   ageGroup: string;
-  weeks: PlanWeek[];
+  totalDays?: number;
+  days?: PlanDay[];
+  // Legacy
+  weeks?: PlanWeek[];
 }
 
 export interface MonthlyPlan {
@@ -67,7 +75,6 @@ export function useMonthlyPlan(childId: string | undefined) {
     },
     enabled: !!childId,
     refetchInterval: (query) => {
-      // Poll every 5 seconds while plan is generating
       const plan = query.state.data as MonthlyPlan | null | undefined;
       if (plan?.status === "generating") return 5000;
       return false;
