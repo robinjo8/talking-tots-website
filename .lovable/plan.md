@@ -1,93 +1,99 @@
 
 
-# Plan: Popravki strani /moji-izzivi (7 tezav)
+# Plan: Vizualna prenova kartic na /moji-izzivi
 
-## Vzrok problemov
+## Povzetek
 
-Trenutni nacrt v bazi uporablja **staro strukturo** (`weeks` z `dayNumber` namesto `days` z dejanskimi datumi). Edge funkcija je bila posodobljena, a nacrt za testnega otroka ni bil ponovno generiran. Poleg tega ima stari nacrt samo 2 igri na dan brez polja `gameId`, kar povzroca vecino vizualnih napak.
+Trenutno so aktivnosti prikazane kot seznam z majhnimi ikonami in gumbi "Igraj". Prenova jih bo spremenila v vizualno privlacne kartice z velikimi slikami iger, po vzoru referencne slike, ki jih otrok klikne za vstop v igro.
 
 ---
 
-## Popravki
+## Spremembe v PlanDayCard.tsx
 
-### 1. Regeneracija nacrta
+### Odprava seznamskega prikaza
 
-Po vseh popravkih se bo za testnega otroka Zak sprozen nov klic edge funkcije, da se ustvari nacrt z novo strukturo (dejanski datumi, 5 aktivnosti, gameId polja).
-
-### 2. Edge funkcija - strožja validacija (generate-monthly-plan)
-
-Dodati post-processing korak, ki po odgovoru AI-ja preveri in popravi:
-- Ce ima dan manj kot 4 igre, doda manjkajoce iz kataloga
-- Ce se gameId ponovi na isti dan, zamenja ponavljajocega z drugimi iz kataloga
-- Ce naslov ze vsebuje crko (npr. "Kolo besed S"), se polje `letter` ne podvoji v naslovu
-
-To zagotovi, da tudi ce AI naredi napako, se podatki pred shranjevanjem popravijo.
-
-### 3. PlanDayCard - format glave kartice
-
-Sprememba iz "9. februar - Ponedeljek" v **"PONEDELJEK, 9.2.2026"**:
+Namesto vertikalnega seznama z malimi ikonami in gumbi "Igraj" se aktivnosti prikazejo kot **horizontalna mreza kartic** (grid ali flex-wrap):
 
 ```text
-// PREJ:  "9. februar - Ponedeljek"
-// POTEM: "PONEDELJEK, 9.2.2026"
+Trenutno (seznam):
+  [ikona 10px] Kolo besed - S   [Igraj]
+  [ikona 10px] Bingo - Z        [Igraj]
+  ...
+
+Novo (kartice v mrezi):
+  +------------+  +------------+  +------------+  +------------+  +------------+
+  |            |  |            |  |            |  |            |  |            |
+  |  [velika   |  |  [velika   |  |  [velika   |  |  [velika   |  |  [velika   |
+  |   slika]   |  |   slika]   |  |   slika]   |  |   slika]   |  |   slika]   |
+  |            |  |            |  |            |  |            |  |            |
+  | Vaje za    |  | Kolo besed |  | Labirint S |  | Sestav. Z  |  | Zaporedja  |
+  | motoriko   |  |     S      |  |            |  |            |  |     S      |
+  +------------+  +------------+  +------------+  +------------+  +------------+
 ```
 
-### 4. PlanDayCard - odprava dvojne crke v naslovu
+### Lastnosti posamezne kartice
 
-Trenutno se prikaze "Kolo besed S - S" ker:
-- AI nastavi `title: "Kolo besed S"` (ze vsebuje crko)
-- PlanDayCard doda `- {activity.letter}` (se enkrat doda crko)
+- **Velika slika igre** (iz GameImageMap ali otrokov avatar za motoriko) - zapolni vecino kartice
+- **Napis pod sliko** z imenom igre in crko (npr. "Kolo besed S", "Labirint Z")
+- **Celotna kartica je klikabilna** - otrok klikne na sliko/kartico za vstop v igro (brez locenaga gumba "Igraj")
+- **Zaobljeni robovi** (rounded-xl) z rahlim sencem
+- **Onemogocen klik** za ne-danasnje dni (kartica je siva, neklikabilna)
 
-Popravek: ce `title` ze vsebuje besedilo crke, se `letter` ne prikaze dodatno.
+### Stanja kartice
 
-### 5. PlanDayCard - slika za motoriko = otrokov avatar
+1. **Nedokoncana (aktivna)**: normalen prikaz, klikabilna, rahla senca
+2. **Dokoncana (completed)**: svetlo zeleno ozadje (bg-green-100), obroba zelena, rahlo prosojno prekritje s kljukico - kartica je onemogocena (ne mores igrati znova)
+3. **Prihodnji/pretekli dan**: siva, onemogocena, neklikabilna
 
-Za aktivnost tipa "motorika" se namesto genericne slike uporabi slika zmajcka, ki ga ima otrok izbranega kot avatar. MojiIzzivi bo posredoval `avatarUrl` iz `selectedChild` v PlanDayCard.
+### Glava dnevne kartice
 
-### 6. PlanDayCard - dejanske slike iger iz GameImageMap
+Ohraniti obstojecko strukturo:
+- Oznaka "Danes" (ce je danes)
+- "PONEDELJEK, 9.2.2026" format
+- 10 zvezdic (DayStarDisplay) desno
+- ChevronDown za zlaganje
 
-Ce aktivnost nima polja `gameId` (stari format), se ga izloci iz polja `path`:
-- `/govorne-igre/kolo-srece/sh` -> gameId = `kolo-srece`
-- `/govorne-igre/bingo/zh` -> gameId = `bingo`
-- `/govorne-igre/spomin/spomin-sh` -> gameId = `spomin`
+### Vsebina dnevne kartice (ko je odprta)
 
-To zagotovi pravilne slike tudi za stare nacrte.
+Namesto `divide-y divide-border` seznama:
+- CSS grid: `grid grid-cols-5 gap-3` na desktopu, `grid grid-cols-3 gap-2` na tablici, `grid grid-cols-2 gap-2` na telefonu
+- Vsaka celica je samostojna kartica z sliko in napisom
 
-### 7. Zložljive kartice - samo danes odprt
+---
 
-- Vsak dan je **zlozen (collapsed)** razen ce je danes
-- Danasnji dan je samodejno razprt in ima oznako "Danes"
-- Pretekli dnevi z 10+ zvezdicami: zelena obroba, zlozen
-- Pretekli dnevi brez 10 zvezdic: osivljeni, zlozeni
-- Prihodnji dnevi: osivljeni, zlozeni
-- Gumb "Igraj" je **onemogocen** za vse dni razen danasnjega (otrok ne more igrati iger za drug dan)
-- Ob kliku na glavo kartice se kartica razpre/zlozi (za pregled, ne za igranje)
-
-Vizualni prikaz:
+## Struktura posamezne aktivnostne kartice
 
 ```text
-+--[zelena obroba]------------------------------+
-| SREDA, 4.2.2026   [*][*][*][*][*]...[*] (10) |  <- zlozen, 10 zvezdic
-+------------------------------------------------+
-
-+--[zelena obroba]------------------------------+
-| CETRTEK, 5.2.2026 [*][*][*][*][*]...[*] (10) |  <- zlozen, 10 zvezdic
-+------------------------------------------------+
-
-+--[modra obroba, odprt, Danes]------------------+
-| PETEK, 6.2.2026   [*][*][*][ ][ ]...[ ] (3)   |
-| -----------------------------------------------+
-| [avatar] Vaje za motoriko govoril    [Igraj]   |
-| [slika]  Kolo besed              [kljukica]    |
-| [slika]  Bingo                       [Igraj]   |
-| [slika]  Labirint                    [Igraj]   |
-| [slika]  Sestavljanke               [Igraj]   |
-+-------------------------------------------------+
-
-+--[siva obroba]---------------------------------+
-| SOBOTA, 7.2.2026   [ ][ ][ ][ ][ ]...[ ] (0)  |  <- zlozen, prihodnji
-+------------------------------------------------+
+<button onClick={() => onActivityPlay(index, path)} disabled={!isToday || isCompleted}>
+  <div class="relative rounded-xl border-2 overflow-hidden shadow-sm 
+              hover:shadow-md transition-all cursor-pointer
+              {isCompleted ? 'border-green-400 bg-green-50' : 'border-border'}
+              {!isToday ? 'opacity-50 pointer-events-none' : ''}">
+    
+    <!-- Slika igre -->
+    <div class="aspect-square bg-muted p-2">
+      <img src={gameImage} class="w-full h-full object-contain rounded-lg" />
+    </div>
+    
+    <!-- Ce dokoncano: zeleni overlay s kljukico -->
+    {isCompleted && (
+      <div class="absolute inset-0 bg-green-200/40 flex items-center justify-center">
+        <Check class="h-10 w-10 text-green-600" />
+      </div>
+    )}
+    
+    <!-- Napis pod sliko -->
+    <div class="px-1 py-1.5 text-center">
+      <p class="text-xs font-semibold truncate">Kolo besed S</p>
+    </div>
+  </div>
+</button>
 ```
+
+### Motorika kartica
+
+- Namesto genericne slike motorike uporabi **otrokov avatar** (childAvatarUrl iz selectedChild)
+- Napis: "Vaje za motoriko govoril"
 
 ---
 
@@ -95,9 +101,18 @@ Vizualni prikaz:
 
 | Datoteka | Sprememba |
 |----------|-----------|
-| `supabase/functions/generate-monthly-plan/index.ts` | Post-processing validacija (4 unikatne igre, brez podvajanja gameId) |
-| `src/components/plan/PlanDayCard.tsx` | Zložljive kartice, nov format glave, popravek dvojne crke, avatar za motoriko, onemogocen gumb za ne-danasnje dni |
-| `src/components/plan/GameImageMap.ts` | Nova funkcija `deriveGameIdFromPath()` za stare nacrte brez gameId |
-| `src/pages/MojiIzzivi.tsx` | Posredovanje avatarUrl v PlanDayCard, izboljsana legacy pretvorba z dejanskimi datumi |
-| `src/hooks/useMonthlyPlan.ts` | Brez sprememb |
+| `src/components/plan/PlanDayCard.tsx` | Zamenjava seznamskega prikaza z mrezo klikabilnih kartic. Odstranitev gumba "Igraj", celotna kartica postane klikabilna. Zeleno ozadje za dokoncane aktivnosti. |
+
+Nobena druga datoteka se ne spreminja - MojiIzzivi.tsx, GameImageMap.ts, DayStarDisplay.tsx, usePlanProgress.ts ostanejo enake.
+
+---
+
+## Tehnicne podrobnosti
+
+- Responsive grid: `grid-cols-5` na desktopu (5 kartic v vrsti za 5 aktivnosti), `grid-cols-3` na tablici, `grid-cols-2` na telefonu z zadnjo kartico cez polno sirino
+- Slike iger iz GameImageMap se prikazejo v `aspect-square` z `object-contain` za ohranjanje razmerij
+- Klik na kartico poklice obstojecko `onActivityPlay(activityIndex, path)` funkcijo
+- Za dokoncane kartice: `pointer-events-none` + zeleno prekritje + kljukica ikona
+- Za ne-danasnje dni: `opacity-50 pointer-events-none` na celotni kartici
+- Napis pod sliko prikazuje `activity.title` + crko (ce ni ze v naslovu)
 
