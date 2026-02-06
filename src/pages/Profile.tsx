@@ -16,6 +16,7 @@ import { SubscriptionSection } from "@/components/profile/SubscriptionSection";
 import { PaymentMethodsSection } from "@/components/profile/PaymentMethodsSection";
 import { MyDocumentsSection } from "@/components/profile/MyDocumentsSection";
 import { ArticulationTestProfileSection } from "@/components/profile/ArticulationTestProfileSection";
+import { AIChatSection } from "@/components/profile/AIChatSection";
 import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
 import { ProfileMobileTabs } from "@/components/profile/ProfileMobileTabs";
 
@@ -228,6 +229,8 @@ export default function Profile() {
             )}
             
             {activeSection === 'articulationTest' && <ArticulationTestProfileSection />}
+            
+            {activeSection === 'aiChat' && <AIChatSection />}
             
             {activeSection === 'subscription' && (
               <div data-section="subscription">

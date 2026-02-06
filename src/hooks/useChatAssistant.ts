@@ -1,17 +1,88 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+
+export type ChildContext = {
+  name: string;
+  gender: string;
+  age: number | null;
+  speechDifficulties: string;
+  speechDifficultiesDescription: string;
+  speechDevelopmentSummary: string;
+};
 
 export type ChatMessage = {
   role: "user" | "assistant";
   content: string;
 };
 
-const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-assistant`;
+export type Conversation = {
+  id: string;
+  title: string;
+  updated_at: string;
+};
 
-export function useChatAssistant() {
+const CHAT_URL =
+  "https://ecmtctwovkheohqwahvt.supabase.co/functions/v1/chat-assistant";
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjbXRjdHdvdmtoZW9ocXdhaHZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ2MzMyMjMsImV4cCI6MjA2MDIwOTIyM30.Re8dNeVSGlD461sR19MnNEKQr65euPUsNATJVg9UgZI";
+
+export function useChatAssistant(childContext?: ChildContext) {
+  const { user } = useAuth();
+  const userId = user?.id;
+
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+
   const abortControllerRef = useRef<AbortController | null>(null);
+  const activeConvIdRef = useRef<string | null>(null);
+
+  // Keep ref in sync
+  useEffect(() => {
+    activeConvIdRef.current = activeConversationId;
+  }, [activeConversationId]);
+
+  // Load last 5 conversations
+  const loadConversations = useCallback(async () => {
+    if (!userId) return;
+    const { data } = await supabase
+      .from("chat_conversations")
+      .select("id, title, updated_at")
+      .eq("user_id", userId)
+      .order("updated_at", { ascending: false })
+      .limit(5);
+    if (data) setConversations(data as unknown as Conversation[]);
+  }, [userId]);
+
+  useEffect(() => {
+    loadConversations();
+  }, [loadConversations]);
+
+  // Load a specific conversation's messages
+  const loadConversation = useCallback(async (conversationId: string) => {
+    const { data } = await supabase
+      .from("chat_messages")
+      .select("role, content")
+      .eq("conversation_id", conversationId)
+      .order("created_at", { ascending: true });
+    if (data) {
+      setMessages(
+        (data as unknown as { role: string; content: string }[]).map((m) => ({
+          role: m.role as "user" | "assistant",
+          content: m.content,
+        }))
+      );
+      setActiveConversationId(conversationId);
+    }
+  }, []);
+
+  const startNewConversation = useCallback(() => {
+    setMessages([]);
+    setActiveConversationId(null);
+  }, []);
 
   const stopStreaming = useCallback(() => {
     if (abortControllerRef.current) {
@@ -30,9 +101,39 @@ export function useChatAssistant() {
       setMessages(updatedMessages);
       setIsLoading(true);
 
+      // Persist: create conversation if needed, save user message
+      let convId = activeConvIdRef.current;
+      if (userId) {
+        try {
+          if (!convId) {
+            const title = input.trim().substring(0, 50);
+            const { data: conv } = await supabase
+              .from("chat_conversations")
+              .insert({ user_id: userId, title } as any)
+              .select("id")
+              .single();
+            if (conv) {
+              convId = (conv as any).id;
+              setActiveConversationId(convId);
+              activeConvIdRef.current = convId;
+            }
+          }
+          if (convId) {
+            await supabase
+              .from("chat_messages")
+              .insert({
+                conversation_id: convId,
+                role: "user",
+                content: input.trim(),
+              } as any);
+          }
+        } catch (err) {
+          console.error("Error saving user message:", err);
+        }
+      }
+
       const controller = new AbortController();
       abortControllerRef.current = controller;
-
       let assistantContent = "";
 
       try {
@@ -40,9 +141,13 @@ export function useChatAssistant() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+            apikey: SUPABASE_ANON_KEY,
           },
-          body: JSON.stringify({ messages: updatedMessages }),
+          body: JSON.stringify({
+            messages: updatedMessages,
+            ...(childContext ? { childContext } : {}),
+          }),
           signal: controller.signal,
         });
 
@@ -50,13 +155,13 @@ export function useChatAssistant() {
           const errorData = await resp.json().catch(() => null);
           const errorMsg =
             errorData?.error || "Napaka pri komunikaciji z asistentom.";
-
           if (resp.status === 429) {
-            toast.error("Preveč zahtev. Počakajte trenutek in poskusite znova.");
+            toast.error(
+              "Preveč zahtev. Počakajte trenutek in poskusite znova."
+            );
           } else {
             toast.error(errorMsg);
           }
-
           setIsLoading(false);
           return;
         }
@@ -107,8 +212,6 @@ export function useChatAssistant() {
             try {
               const parsed = JSON.parse(jsonStr);
 
-              // Handle Responses API streaming events
-              // Text delta events
               if (parsed.type === "response.output_text.delta") {
                 const delta = parsed.delta;
                 if (delta) {
@@ -117,7 +220,6 @@ export function useChatAssistant() {
                 }
               }
 
-              // Also handle completed event to get final text
               if (parsed.type === "response.completed") {
                 const output = parsed.response?.output;
                 if (output && Array.isArray(output)) {
@@ -138,7 +240,6 @@ export function useChatAssistant() {
                 }
               }
 
-              // Handle errors from the API
               if (parsed.type === "error") {
                 console.error("Stream error:", parsed);
                 toast.error("Napaka pri generiranju odgovora.");
@@ -146,7 +247,6 @@ export function useChatAssistant() {
                 break;
               }
             } catch {
-              // Incomplete JSON, put it back
               textBuffer = line + "\n" + textBuffer;
               break;
             }
@@ -164,7 +264,10 @@ export function useChatAssistant() {
             if (jsonStr === "[DONE]") continue;
             try {
               const parsed = JSON.parse(jsonStr);
-              if (parsed.type === "response.output_text.delta" && parsed.delta) {
+              if (
+                parsed.type === "response.output_text.delta" &&
+                parsed.delta
+              ) {
                 assistantContent += parsed.delta;
                 updateAssistant(assistantContent);
               }
@@ -183,13 +286,34 @@ export function useChatAssistant() {
       } finally {
         setIsLoading(false);
         abortControllerRef.current = null;
+
+        // Save assistant message to DB
+        if (assistantContent && convId && userId) {
+          try {
+            await supabase
+              .from("chat_messages")
+              .insert({
+                conversation_id: convId,
+                role: "assistant",
+                content: assistantContent,
+              } as any);
+            await supabase
+              .from("chat_conversations")
+              .update({ updated_at: new Date().toISOString() } as any)
+              .eq("id", convId);
+            loadConversations();
+          } catch (err) {
+            console.error("Error saving assistant message:", err);
+          }
+        }
       }
     },
-    [messages, isLoading]
+    [messages, isLoading, childContext, userId, loadConversations]
   );
 
   const clearMessages = useCallback(() => {
     setMessages([]);
+    setActiveConversationId(null);
   }, []);
 
   return {
@@ -198,5 +322,9 @@ export function useChatAssistant() {
     sendMessage,
     stopStreaming,
     clearMessages,
+    conversations,
+    activeConversationId,
+    loadConversation,
+    startNewConversation,
   };
 }

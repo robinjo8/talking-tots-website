@@ -1,4 +1,4 @@
-import { User, Users, CircleDollarSign, CreditCard, Shield, FileText, ClipboardCheck, Lock } from "lucide-react";
+import { User, Users, CircleDollarSign, CreditCard, Shield, FileText, ClipboardCheck, Lock, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
 import { useUserNotifications } from "@/hooks/useUserNotifications";
@@ -14,6 +14,7 @@ const menuItems = [
   { id: "myDocuments", label: "Moji dokumenti", icon: FileText },
   { id: "children", label: "Otroci", icon: Users, showCount: true },
   { id: "articulationTest", label: "Preverjanje izgovorjave", icon: ClipboardCheck, proOnly: true },
+  { id: "aiChat", label: "AI Klepet", icon: MessageCircle },
   { id: "subscription", label: "Naročnina", icon: CircleDollarSign },
   { id: "paymentMethods", label: "Plačilne metode", icon: CreditCard },
   { id: "passwordChange", label: "Spremeni geslo", icon: Shield },

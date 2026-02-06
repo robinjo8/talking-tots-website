@@ -8,8 +8,6 @@ import { TipSection } from "@/components/TipSection";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { FooterSection } from "@/components/FooterSection";
 import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
-import { MessageCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 
 const MojaStran = () => {
@@ -56,25 +54,6 @@ const MojaStran = () => {
               
               <TipSection childName={selectedChild.name} />
 
-              {/* AI Chat Assistant Card */}
-              <div className="mt-12 rounded-2xl border border-border bg-gradient-to-r from-app-orange/5 to-app-orange/10 p-6 flex flex-col sm:flex-row items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-app-orange/10 flex items-center justify-center flex-shrink-0">
-                  <MessageCircle className="w-6 h-6 text-app-orange" />
-                </div>
-                <div className="flex-1 text-center sm:text-left">
-                  <h3 className="font-semibold text-foreground">Imate vprašanja o govoru?</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Vprašajte Tomija, našega AI logopedskega pomočnika.
-                  </p>
-                </div>
-                <Button
-                  onClick={() => navigate("/pomoc-chat")}
-                  className="bg-app-orange hover:bg-app-orange/90 text-white rounded-xl"
-                >
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  Odpri chat
-                </Button>
-              </div>
             </>
           ) : (
             <div className="min-h-[400px] flex flex-col items-center justify-center">
