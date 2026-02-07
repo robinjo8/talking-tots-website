@@ -1,5 +1,5 @@
-import { useEffect, useRef, useMemo, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useCallback } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import Header from "@/components/Header";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,11 +9,13 @@ import {
   useStarsByDate,
   useCompleteActivity,
   checkNewProgress,
+  getActivityPlayCount,
   buildCompletionCountsByDay,
 } from "@/hooks/usePlanProgress";
 import { PlanDayCard } from "@/components/plan/PlanDayCard";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Loader2, Calendar, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Loader2, Calendar, Sparkles, History } from "lucide-react";
 import { motion } from "framer-motion";
 
 const PLAN_ACTIVITY_STORAGE_KEY = "plan-activity-tracking";
@@ -30,7 +32,6 @@ export default function MojiIzzivi() {
   const { selectedChild } = useAuth();
   const { data: plan, isLoading } = useMonthlyPlan(selectedChild?.id);
   const navigate = useNavigate();
-  const todayRef = useRef<HTMLDivElement>(null);
 
   const isGenerating = plan?.status === "generating";
   const isActive = plan?.status === "active";
@@ -39,7 +40,6 @@ export default function MojiIzzivi() {
   // Calculate date range for stars query from start_date/end_date
   const dateRange = useMemo(() => {
     if (!plan) return { start: "", end: "" };
-    // Use new start_date/end_date fields, fallback to first/last day in plan_data
     const start = plan.start_date || plan.plan_data?.days?.[0]?.date || "";
     const end = plan.end_date || plan.plan_data?.days?.[plan.plan_data?.days?.length - 1]?.date || "";
     return { start, end };
@@ -53,7 +53,6 @@ export default function MojiIzzivi() {
   );
   const completeActivity = useCompleteActivity();
 
-  // Build lookup maps - now with counts instead of sets
   const completionCountsByDay = useMemo(() => {
     return buildCompletionCountsByDay(completions);
   }, [completions]);
@@ -67,6 +66,7 @@ export default function MojiIzzivi() {
   }, [starsByDate]);
 
   // Check for returning from a game - verify actual play before marking complete
+  // Now supports multiple plays (e.g., user clicked "Nova igra" inside the game)
   useEffect(() => {
     const stored = localStorage.getItem(PLAN_ACTIVITY_STORAGE_KEY);
     if (stored && plan?.id && selectedChild?.id) {
@@ -76,32 +76,38 @@ export default function MojiIzzivi() {
         const tracking: StoredActivityTracking = JSON.parse(stored);
         if (tracking.planId !== plan.id) return;
 
-        // Check if the child actually played the game (new progress entries after leftAt)
-        checkNewProgress(selectedChild.id, tracking.leftAt).then(({ count }) => {
-          if (count > 0) {
-            // Child actually played - record one completion
-            completeActivity.mutate({
+        const processCompletions = async () => {
+          const { count } = await checkNewProgress(selectedChild!.id, tracking.leftAt);
+          if (count <= 0) return;
+
+          // Get how many completions already exist for this activity
+          const existingCount = await getActivityPlayCount(
+            tracking.planId,
+            selectedChild!.id,
+            tracking.dayDate,
+            tracking.activityIndex
+          );
+
+          const requiredPlays = tracking.activityType === "motorika" ? 1 : 2;
+          const maxNewPlays = Math.min(count, requiredPlays - existingCount);
+
+          // Insert each missing completion sequentially
+          for (let i = 0; i < maxNewPlays; i++) {
+            await completeActivity.mutateAsync({
               planId: tracking.planId,
-              childId: selectedChild.id,
+              childId: selectedChild!.id,
               dayDate: tracking.dayDate,
               activityIndex: tracking.activityIndex,
             });
           }
-        });
+        };
+
+        processCompletions().catch(console.error);
       } catch (e) {
         console.error("Failed to parse activity tracking:", e);
       }
     }
   }, [plan?.id, selectedChild?.id]);
-
-  // Scroll to today on mount
-  useEffect(() => {
-    if (isActive && todayRef.current) {
-      setTimeout(() => {
-        todayRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-      }, 300);
-    }
-  }, [isActive, planData]);
 
   const handleActivityPlay = useCallback(
     (dayDate: string, activityIndex: number, activityType: string, path: string) => {
@@ -127,7 +133,7 @@ export default function MojiIzzivi() {
   }, []);
 
   // Get days from plan (new format: flat days, legacy: weeks)
-  const days = useMemo(() => {
+  const allDays = useMemo(() => {
     if (!planData) return [];
     if (planData.days) return planData.days;
     // Legacy format conversion with actual dates
@@ -150,6 +156,22 @@ export default function MojiIzzivi() {
     return [];
   }, [planData, plan]);
 
+  // Find today's day card
+  const todayDay = useMemo(() => {
+    return allDays.find((d) => d.date === todayStr) || null;
+  }, [allDays, todayStr]);
+
+  // Check if there are past days to show archive button
+  const hasPastDays = useMemo(() => {
+    return allDays.some((d) => d.date < todayStr);
+  }, [allDays, todayStr]);
+
+  // Check if today is within the plan range
+  const isTodayInRange = useMemo(() => {
+    if (!dateRange.start || !dateRange.end) return false;
+    return todayStr >= dateRange.start && todayStr <= dateRange.end;
+  }, [todayStr, dateRange]);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -162,7 +184,7 @@ export default function MojiIzzivi() {
           <PlanSkeleton />
         ) : isGenerating ? (
           <GeneratingState />
-        ) : isActive && planData && days.length > 0 ? (
+        ) : isActive && planData && allDays.length > 0 ? (
           <div className="space-y-6">
             {/* Header */}
             <motion.div
@@ -170,44 +192,68 @@ export default function MojiIzzivi() {
               animate={{ opacity: 1, y: 0 }}
               className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-2xl p-6 border border-primary/20"
             >
-              <div className="flex items-center gap-3 mb-2">
-                <Sparkles className="h-6 w-6 text-primary" />
-                <h1 className="text-2xl font-bold">Moj osebni načrt</h1>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-3">
+                  <Sparkles className="h-6 w-6 text-primary" />
+                  <h1 className="text-2xl font-bold">Moj osebni načrt</h1>
+                </div>
+                {hasPastDays && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                    className="gap-2"
+                  >
+                    <Link to="/moji-izzivi/arhiv">
+                      <History className="h-4 w-4" />
+                      <span className="hidden sm:inline">Pretekli dnevi</span>
+                    </Link>
+                  </Button>
+                )}
               </div>
               {planData.summary && (
                 <p className="text-muted-foreground text-sm mt-1">{planData.summary}</p>
               )}
             </motion.div>
 
-            {/* Day cards */}
-            <div className="space-y-3">
-              {days.map((day) => {
-                const isToday = day.date === todayStr;
-                const isPast = day.date < todayStr;
-                const dayCompletionCounts = completionCountsByDay.get(day.date) || new Map<number, number>();
-                const dayStars = starsMap.get(day.date) || 0;
+            {/* Today's day card only */}
+            {todayDay ? (
+              <div>
+                {(() => {
+                  const dayCompletionCounts = completionCountsByDay.get(todayDay.date) || new Map<number, number>();
+                  const dayStars = starsMap.get(todayDay.date) || 0;
 
-                return (
-                  <div key={day.date} ref={isToday ? todayRef : undefined}>
+                  return (
                     <PlanDayCard
-                      date={day.date}
-                      dayName={day.dayName}
-                      activities={day.activities}
+                      date={todayDay.date}
+                      dayName={todayDay.dayName}
+                      activities={todayDay.activities}
                       starsForDay={dayStars}
                       completionCounts={dayCompletionCounts}
-                      isToday={isToday}
-                      isPast={isPast}
+                      isToday={true}
+                      isPast={false}
                       planId={plan!.id}
                       childId={selectedChild!.id}
                       childAvatarUrl={selectedChild?.avatarUrl}
                       onActivityPlay={(activityIndex, activityType, path) =>
-                        handleActivityPlay(day.date, activityIndex, activityType, path)
+                        handleActivityPlay(todayDay.date, activityIndex, activityType, path)
                       }
                     />
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })()}
+              </div>
+            ) : isTodayInRange ? (
+              <div className="text-center py-12 text-muted-foreground">
+                <p>Za danes ni predvidenih aktivnosti.</p>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <Calendar className="h-10 w-10 text-muted-foreground mb-4" />
+                <p className="text-muted-foreground max-w-md">
+                  Tvoj osebni načrt je zaključen ali se še ni začel. Počakaj na nov pregled pri logopedu za osvežen načrt.
+                </p>
+              </div>
+            )}
           </div>
         ) : (
           <EmptyState />
@@ -250,11 +296,7 @@ function PlanSkeleton() {
   return (
     <div className="space-y-6">
       <Skeleton className="h-24 w-full rounded-2xl" />
-      <div className="space-y-4">
-        {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-48 w-full rounded-2xl" />
-        ))}
-      </div>
+      <Skeleton className="h-48 w-full rounded-2xl" />
     </div>
   );
 }

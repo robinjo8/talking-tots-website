@@ -342,11 +342,14 @@ serve(async (req) => {
 
     console.log(`Generated ${days.length} days with ${combinations.length} game combinations`);
 
-    // 7. Build summary (template-based, no AI needed)
-    const monthNames = ["januar", "februar", "marec", "april", "maj", "junij", "julij", "avgust", "september", "oktober", "november", "december"];
-    const startMonthName = monthNames[startDate.getMonth()];
-    const endMonthName = monthNames[endDate.getMonth()];
-    const summary = `Osebni načrt vaj za ${child.name} (${childAge} let) za obdobje ${startDate.getDate()}. ${startMonthName} ${startDate.getFullYear()} – ${endDate.getDate()}. ${endMonthName} ${endDate.getFullYear()}. Ciljne črke: ${targetLetters.join(", ")}.`;
+    // 7. Build warm, child-friendly summary
+    const childNameCapitalized = child.name.charAt(0).toUpperCase() + child.name.slice(1);
+    const lettersFormatted = targetLetters.length === 1 
+      ? `črko ${targetLetters[0]}` 
+      : targetLetters.length === 2 
+        ? `črki ${targetLetters[0]} in ${targetLetters[1]}` 
+        : `črke ${targetLetters.slice(0, -1).join(", ")} in ${targetLetters[targetLetters.length - 1]}`;
+    const summary = `Hej ${childNameCapitalized}! 🎉 Pripravili smo ti zabaven načrt vaj in iger, s katerimi boš vadil ${lettersFormatted}. Vsak dan te čakajo nove pustolovščine – vaje za jezik in 4 igrice! Zbiraj zvezdice in postani pravi šampion! 🌟`;
 
     // 8. Archive existing active/generating plans
     await supabase

@@ -90,7 +90,7 @@ export async function checkNewProgress(
 /**
  * Get the current play count for a specific activity.
  */
-async function getActivityPlayCount(
+export async function getActivityPlayCount(
   planId: string,
   childId: string,
   dayDate: string,
