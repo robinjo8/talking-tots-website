@@ -5,8 +5,7 @@ import { getAgeGroup } from "@/utils/ageUtils";
 import useEmblaCarousel from "embla-carousel-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
-import { Progress } from "@/components/ui/progress";
-import { useDailyProgress } from "@/hooks/useDailyProgress";
+import { DailyStarsBar } from "@/components/DailyStarsBar";
 import { FooterSection } from "@/components/FooterSection";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -92,15 +91,11 @@ export default function SestavljankeGames() {
   const { user, selectedChild, signOut } = useAuth();
   const childName = selectedChild?.name;
   const isMobile = useIsMobile();
-  const { dailyActivities, isLoading } = useDailyProgress();
   const [emblaRef] = useEmblaCarousel({ 
     align: 'start',
     dragFree: true,
     containScroll: 'trimSnaps'
   });
-  
-  const targetActivities = 15;
-  const percentage = Math.min((dailyActivities / targetActivities) * 100, 100);
 
   const handleSignOut = async () => {
     try {
@@ -212,20 +207,7 @@ export default function SestavljankeGames() {
             </p>
           </div>
           
-          {selectedChild && (
-            <div className="max-w-md mx-auto">
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-white text-sm font-medium">Tvoj dnevni napredek</span>
-                  <span className="text-white font-bold text-sm">{dailyActivities}/{targetActivities} ⭐</span>
-                </div>
-                <Progress 
-                  value={percentage} 
-                  className="h-3 bg-white/20 [&>div]:bg-app-orange"
-                />
-              </div>
-            </div>
-          )}
+          <DailyStarsBar />
         </div>
       </section>
       

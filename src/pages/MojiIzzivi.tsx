@@ -15,7 +15,7 @@ import {
 import { PlanDayCard } from "@/components/plan/PlanDayCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Loader2, Calendar, Sparkles, History } from "lucide-react";
+import { Loader2, Calendar, History } from "lucide-react";
 import { motion } from "framer-motion";
 
 const PLAN_ACTIVITY_STORAGE_KEY = "plan-activity-tracking";
@@ -192,12 +192,12 @@ export default function MojiIzzivi() {
               animate={{ opacity: 1, y: 0 }}
               className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-2xl p-6 border border-primary/20"
             >
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-3">
-                  <Sparkles className="h-6 w-6 text-primary" />
-                  <h1 className="text-2xl font-bold">Moj osebni načrt</h1>
-                </div>
-                {hasPastDays && (
+              <h1 className="text-2xl font-bold text-center mb-2">Moj osebni načrt</h1>
+              {planData.summary && (
+                <p className="text-muted-foreground text-sm mt-1 text-justify">{planData.summary}</p>
+              )}
+              {hasPastDays && (
+                <div className="flex justify-center mt-3">
                   <Button
                     variant="outline"
                     size="sm"
@@ -206,13 +206,10 @@ export default function MojiIzzivi() {
                   >
                     <Link to="/moji-izzivi/arhiv">
                       <History className="h-4 w-4" />
-                      <span className="hidden sm:inline">Pretekli dnevi</span>
+                      <span>Pretekli dnevi</span>
                     </Link>
                   </Button>
-                )}
-              </div>
-              {planData.summary && (
-                <p className="text-muted-foreground text-sm mt-1">{planData.summary}</p>
+                </div>
               )}
             </motion.div>
 

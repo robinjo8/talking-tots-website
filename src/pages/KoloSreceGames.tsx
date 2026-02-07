@@ -4,8 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
-import { Progress } from "@/components/ui/progress";
-import { useDailyProgress } from "@/hooks/useDailyProgress";
+import { DailyStarsBar } from "@/components/DailyStarsBar";
 import { FooterSection } from "@/components/FooterSection";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -29,11 +28,7 @@ const wheelLetters = [
 export default function KoloSreceGames() {
   const { user, selectedChild, signOut, isLoading: isAuthLoading } = useAuth();
   const navigate = useNavigate();
-  const { dailyActivities, isLoading } = useDailyProgress();
   const isMobile = useIsMobile();
-  
-  const targetActivities = 15;
-  const percentage = Math.min((dailyActivities / targetActivities) * 100, 100);
 
   useEffect(() => {
     if (!isAuthLoading && !user) {
@@ -86,20 +81,7 @@ export default function KoloSreceGames() {
             </p>
           </div>
           
-          {selectedChild && (
-            <div className="max-w-md mx-auto">
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-white text-sm font-medium">Tvoj dnevni napredek</span>
-                  <span className="text-white font-bold text-sm">{dailyActivities}/{targetActivities} ⭐</span>
-                </div>
-                <Progress 
-                  value={percentage} 
-                  className="h-3 bg-white/20 [&>div]:bg-app-orange"
-                />
-              </div>
-            </div>
-          )}
+          <DailyStarsBar />
         </div>
       </section>
       
