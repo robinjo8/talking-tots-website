@@ -35,9 +35,12 @@ export function DailyStarsBar() {
   return (
     <div className="max-w-md mx-auto">
       <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3">
-        <div className="flex items-center justify-center gap-2">
-          <span className="text-white font-bold text-lg">{dailyStars}</span>
-          <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
+        <div className="flex items-center justify-between">
+          <span className="text-white/90 text-sm font-medium">Tvoj dnevni napredek</span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-white font-bold text-lg">{dailyStars}</span>
+            <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
+          </div>
         </div>
       </div>
     </div>
