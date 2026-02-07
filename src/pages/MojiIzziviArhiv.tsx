@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,9 +10,7 @@ import {
 } from "@/hooks/usePlanProgress";
 import { PlanDayCard } from "@/components/plan/PlanDayCard";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Calendar } from "lucide-react";
-import { motion } from "framer-motion";
+import { Calendar } from "lucide-react";
 
 export default function MojiIzziviArhiv() {
   const { selectedChild } = useAuth();
@@ -68,19 +65,6 @@ export default function MojiIzziviArhiv() {
           <BreadcrumbNavigation />
         </div>
 
-        {/* Header with back button */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-3 mb-6"
-        >
-          <Button variant="ghost" size="icon" asChild>
-            <Link to="/moji-izzivi">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
-          </Button>
-          <h1 className="text-2xl font-bold">Pretekli dnevi</h1>
-        </motion.div>
 
         {isLoading ? (
           <div className="space-y-4">
