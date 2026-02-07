@@ -84,6 +84,7 @@ const KoloSreceGames = lazy(() => import("@/pages/KoloSreceGames"));
 const BingoGames = lazy(() => import("@/pages/BingoGames"));
 const ArtikuacijskiTest = lazy(() => import("@/pages/ArtikuacijskiTest"));
 const MojiIzzivi = lazy(() => import("@/pages/MojiIzzivi"));
+const MojiIzziviArhiv = lazy(() => import("@/pages/MojiIzziviArhiv"));
 const VideoNavodila = lazy(() => import("@/pages/VideoNavodila"));
 const MetKockeGames = lazy(() => import("@/pages/MetKockeGames"));
 const PonoviPoved = lazy(() => import("@/pages/PonoviPoved"));
@@ -218,6 +219,7 @@ export function AppRoutes() {
 
       {/* Other protected routes */}
       <Route path="/moji-izzivi" element={<ProtectedLazyRoute><MojiIzzivi /></ProtectedLazyRoute>} />
+      <Route path="/moji-izzivi/arhiv" element={<ProtectedLazyRoute><MojiIzziviArhiv /></ProtectedLazyRoute>} />
       <Route path="/video-navodila" element={<ProtectedLazyRoute><VideoNavodila /></ProtectedLazyRoute>} />
       <Route path="/video-navodila/:letter" element={<ProtectedLazyRoute><VideoNavodilaRouter /></ProtectedLazyRoute>} />
       <Route path="/pomoc-chat" element={<ProtectedLazyRoute><PomocChat /></ProtectedLazyRoute>} />

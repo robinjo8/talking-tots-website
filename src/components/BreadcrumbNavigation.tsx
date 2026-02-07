@@ -23,6 +23,7 @@ const breadcrumbConfig: BreadcrumbConfig[] = [
   { path: "/moje-aplikacije", label: "Moje aplikacije", parent: "/" },
   { path: "/profile", label: "Nastavitve", parent: "/" },
   { path: "/moji-izzivi", label: "Moj osebni načrt", parent: "/" },
+  { path: "/moji-izzivi/arhiv", label: "Pretekli dnevi", parent: "/moji-izzivi" },
   { path: "/logopedski-koticek", label: "Logopedski nasveti", parent: "/" },
   { path: "/razvoj-govora", label: "Razvoj govora", parent: "/logopedski-koticek" },
   { path: "/clanki/razvoj-govora", label: "Razvoj govora", parent: "/logopedski-koticek" },
