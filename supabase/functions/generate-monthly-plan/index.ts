@@ -277,7 +277,7 @@ serve(async (req) => {
     // 3. Get child data
     const { data: child } = await supabase
       .from("children")
-      .select("id, birth_date, age, name")
+      .select("id, birth_date, age, name, gender")
       .eq("id", childId)
       .single();
 
@@ -342,14 +342,17 @@ serve(async (req) => {
 
     console.log(`Generated ${days.length} days with ${combinations.length} game combinations`);
 
-    // 7. Build warm, child-friendly summary
+    // 7. Build warm, child-friendly summary (gender-aware Slovenian)
     const childNameCapitalized = child.name.charAt(0).toUpperCase() + child.name.slice(1);
+    const isFemale = ["female", "F", "f"].includes(child.gender || "");
+    const vadil = isFemale ? "vadila" : "vadil";
+    const sampion = isFemale ? "prava šampionka" : "pravi šampion";
     const lettersFormatted = targetLetters.length === 1 
       ? `črko ${targetLetters[0]}` 
       : targetLetters.length === 2 
         ? `črki ${targetLetters[0]} in ${targetLetters[1]}` 
         : `črke ${targetLetters.slice(0, -1).join(", ")} in ${targetLetters[targetLetters.length - 1]}`;
-    const summary = `Hej ${childNameCapitalized}! 🎉 Pripravili smo ti zabaven načrt vaj in iger, s katerimi boš vadil ${lettersFormatted}. Vsak dan te čakajo nove pustolovščine – vaje za jezik in 4 igrice! Zbiraj zvezdice in postani pravi šampion! 🌟`;
+    const summary = `Hej ${childNameCapitalized}! Pripravili smo ti zabaven načrt vaj in iger, s katerimi boš ${vadil} ${lettersFormatted}. Vsak dan te čakajo nove pustolovščine – vaje za jezik in 4 igrice! Zbiraj zvezdice in postani ${sampion}!`;
 
     // 8. Archive existing active/generating plans
     await supabase
