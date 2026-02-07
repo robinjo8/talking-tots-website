@@ -24,11 +24,26 @@ const SUPPORTED_LETTERS = Object.keys(LETTER_URL_MAP);
 
 const DAY_NAMES = ["Nedelja", "Ponedeljek", "Torek", "Sreda", "Četrtek", "Petek", "Sobota"];
 
-// All available game IDs for uniqueness constraint
-const ALL_GAME_IDS = [
-  "kolo-srece", "bingo", "spomin", "sestavljanke", "zaporedja",
-  "drsna-sestavljanka", "igra-ujemanja", "labirint", "met-kocke", "ponovi-poved"
+const TOTAL_PLAN_DAYS = 90;
+
+// Game definitions
+const NO_AGE_GAMES = [
+  { name: "Kolo besed", gameId: "kolo-srece", pathTemplate: "/govorne-igre/kolo-srece/{urlKey}" },
+  { name: "Bingo", gameId: "bingo", pathTemplate: "/govorne-igre/bingo/{urlKey}" },
+  { name: "Spomin", gameId: "spomin", pathTemplate: "/govorne-igre/spomin/spomin-{urlKey}" },
+  { name: "Labirint", gameId: "labirint", pathTemplate: "/govorne-igre/labirint/{urlKey}" },
+  { name: "Smešne povedi", gameId: "met-kocke", pathTemplate: "/govorne-igre/met-kocke/{urlKey}" },
+  { name: "Ponovi poved", gameId: "ponovi-poved", pathTemplate: "/govorne-igre/ponovi-poved/{urlKey}" },
 ];
+
+const AGE_GAMES = [
+  { name: "Sestavljanke", gameId: "sestavljanke", pathTemplate: "/govorne-igre/sestavljanke/{urlKey}{ageKey}" },
+  { name: "Drsna igra", gameId: "drsna-sestavljanka", pathTemplate: "/govorne-igre/drsna-sestavljanka/{urlKey}{ageKey}" },
+  { name: "Zaporedja", gameId: "zaporedja", pathTemplate: "/govorne-igre/zaporedja/{urlKey}{ageKey}" },
+  { name: "Igra ujemanja", gameId: "igra-ujemanja", pathTemplate: "/govorne-igre/igra-ujemanja/{urlKey}{ageKey}" },
+];
+
+const ALL_GAMES = [...NO_AGE_GAMES, ...AGE_GAMES];
 
 function getAgeKey(ageGroup: string): string {
   switch (ageGroup) {
@@ -58,72 +73,133 @@ function calculateAge(birthDate: string): number {
   return age;
 }
 
-function getDaysInMonth(year: number, month: number): number {
-  return new Date(year, month, 0).getDate();
+function formatDate(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-function formatDate(year: number, month: number, day: number): string {
-  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+function addDays(date: Date, days: number): Date {
+  const result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
 }
 
-function getDayName(year: number, month: number, day: number): string {
-  const date = new Date(year, month - 1, day);
-  return DAY_NAMES[date.getDay()];
+interface GameCombination {
+  gameId: string;
+  gameName: string;
+  letter: string;
+  path: string;
 }
 
-function buildGameCatalog(targetLetters: string[], ageGroup: string): string {
+function buildGameCombinations(targetLetters: string[], ageGroup: string): GameCombination[] {
   const ageKey = getAgeKey(ageGroup);
-  const supportedTargets = targetLetters.filter((l) => SUPPORTED_LETTERS.includes(l));
+  const supportedLetters = targetLetters.filter((l) => SUPPORTED_LETTERS.includes(l));
 
-  let catalog = `RAZPOLOŽLJIVE IGRE IN VAJE:\n\n`;
-  catalog += `MOTORIKA GOVORIL (gameId: "motorika", brez črk, za vsakodnevno ogrevanje):\n`;
-  catalog += `  Pot: /govorno-jezikovne-vaje/vaje-motorike-govoril\n\n`;
+  if (supportedLetters.length === 0) return [];
 
-  if (supportedTargets.length === 0) {
-    catalog += `Za izbrane črke ni specifičnih iger. Uporabi samo motoriko govoril.\n`;
-    return catalog;
-  }
+  const combinations: GameCombination[] = [];
 
-  const urlKeys = supportedTargets.map((l) => ({
-    letter: l,
-    urlKey: LETTER_URL_MAP[l],
-  }));
+  for (const game of ALL_GAMES) {
+    for (const letter of supportedLetters) {
+      const urlKey = LETTER_URL_MAP[letter];
+      const isAgeGame = AGE_GAMES.some((g) => g.gameId === game.gameId);
+      const path = game.pathTemplate
+        .replace("{urlKey}", urlKey)
+        .replace("{ageKey}", isAgeGame ? ageKey : "");
 
-  const noAgeGames = [
-    { name: "KOLO BESED", gameId: "kolo-srece", pathTemplate: "/govorne-igre/kolo-srece/{urlKey}" },
-    { name: "BINGO", gameId: "bingo", pathTemplate: "/govorne-igre/bingo/{urlKey}" },
-    { name: "SPOMIN", gameId: "spomin", pathTemplate: "/govorne-igre/spomin/spomin-{urlKey}" },
-    { name: "LABIRINT", gameId: "labirint", pathTemplate: "/govorne-igre/labirint/{urlKey}" },
-    { name: "SMEŠNE POVEDI", gameId: "met-kocke", pathTemplate: "/govorne-igre/met-kocke/{urlKey}" },
-    { name: "PONOVI POVED", gameId: "ponovi-poved", pathTemplate: "/govorne-igre/ponovi-poved/{urlKey}" },
-  ];
-
-  const ageGames = [
-    { name: "SESTAVLJANKE", gameId: "sestavljanke", pathTemplate: `/govorne-igre/sestavljanke/{urlKey}${ageKey}` },
-    { name: "DRSNA IGRA", gameId: "drsna-sestavljanka", pathTemplate: `/govorne-igre/drsna-sestavljanka/{urlKey}${ageKey}` },
-    { name: "ZAPOREDJA", gameId: "zaporedja", pathTemplate: `/govorne-igre/zaporedja/{urlKey}${ageKey}` },
-    { name: "IGRA UJEMANJA", gameId: "igra-ujemanja", pathTemplate: `/govorne-igre/igra-ujemanja/{urlKey}${ageKey}` },
-  ];
-
-  for (const game of noAgeGames) {
-    catalog += `${game.name} (gameId: "${game.gameId}", brez starostnih variant):\n`;
-    for (const { letter, urlKey } of urlKeys) {
-      const path = game.pathTemplate.replace("{urlKey}", urlKey);
-      catalog += `  Črka ${letter}: ${path}\n`;
+      combinations.push({
+        gameId: game.gameId,
+        gameName: game.name,
+        letter,
+        path,
+      });
     }
-    catalog += `\n`;
   }
 
-  for (const game of ageGames) {
-    catalog += `${game.name} (gameId: "${game.gameId}", starostna skupina ${ageGroup}):\n`;
-    for (const { letter, urlKey } of urlKeys) {
-      const path = game.pathTemplate.replace("{urlKey}", urlKey);
-      catalog += `  Črka ${letter}: ${path}\n`;
+  return combinations;
+}
+
+interface PlanDay {
+  date: string;
+  dayName: string;
+  activities: {
+    type: "motorika" | "igra";
+    title: string;
+    path: string;
+    letter?: string;
+    gameId?: string;
+  }[];
+}
+
+function generateDeterministicPlan(
+  startDate: Date,
+  totalDays: number,
+  combinations: GameCombination[]
+): PlanDay[] {
+  const days: PlanDay[] = [];
+  let combinationIndex = 0;
+
+  for (let i = 0; i < totalDays; i++) {
+    const currentDate = addDays(startDate, i);
+    const dayName = DAY_NAMES[currentDate.getDay()];
+
+    // Always start with motorika
+    const activities: PlanDay["activities"] = [
+      {
+        type: "motorika",
+        title: "Vaje za motoriko govoril",
+        path: "/govorno-jezikovne-vaje/vaje-motorike-govoril",
+      },
+    ];
+
+    if (combinations.length > 0) {
+      // Pick 4 games with unique gameIds for this day
+      const usedGameIds = new Set<string>();
+      let attempts = 0;
+      const maxAttempts = combinations.length * 2;
+
+      while (activities.length < 5 && attempts < maxAttempts) {
+        const combo = combinations[combinationIndex % combinations.length];
+        combinationIndex++;
+        attempts++;
+
+        if (!usedGameIds.has(combo.gameId)) {
+          usedGameIds.add(combo.gameId);
+          activities.push({
+            type: "igra",
+            title: combo.gameName,
+            path: combo.path,
+            letter: combo.letter,
+            gameId: combo.gameId,
+          });
+        }
+      }
+
+      // If we couldn't fill 4 unique games (rare edge case), fill remaining
+      if (activities.length < 5) {
+        for (const combo of combinations) {
+          if (activities.length >= 5) break;
+          if (!usedGameIds.has(combo.gameId)) {
+            usedGameIds.add(combo.gameId);
+            activities.push({
+              type: "igra",
+              title: combo.gameName,
+              path: combo.path,
+              letter: combo.letter,
+              gameId: combo.gameId,
+            });
+          }
+        }
+      }
     }
-    catalog += `\n`;
+
+    days.push({
+      date: formatDate(currentDate),
+      dayName,
+      activities,
+    });
   }
 
-  return catalog;
+  return days;
 }
 
 serve(async (req) => {
@@ -142,14 +218,12 @@ serve(async (req) => {
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const openaiApiKey = Deno.env.get("OPENAI_API_KEY")!;
-
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    // 1. Fetch report
+    // 1. Fetch report (including created_at for start date)
     const { data: report, error: reportError } = await supabase
       .from("logopedist_reports")
-      .select("id, session_id, recommended_letters, pdf_url")
+      .select("id, session_id, recommended_letters, pdf_url, created_at")
       .eq("id", reportId)
       .single();
 
@@ -251,39 +325,58 @@ serve(async (req) => {
       });
     }
 
-    // 5. Calculate actual days in current month
-    const now = new Date();
-    const currentMonth = now.getMonth() + 1;
-    const currentYear = now.getFullYear();
-    const totalDays = getDaysInMonth(currentYear, currentMonth);
+    // 5. Calculate start and end dates from report creation date
+    const startDate = new Date(report.created_at);
+    // Reset to start of day in UTC
+    startDate.setUTCHours(0, 0, 0, 0);
+    
+    const endDate = addDays(startDate, TOTAL_PLAN_DAYS - 1);
+    const startDateStr = formatDate(startDate);
+    const endDateStr = formatDate(endDate);
 
-    // Build day list with actual dates and day names
-    const daysList: { date: string; dayName: string; dayNumber: number }[] = [];
-    for (let d = 1; d <= totalDays; d++) {
-      daysList.push({
-        date: formatDate(currentYear, currentMonth, d),
-        dayName: getDayName(currentYear, currentMonth, d),
-        dayNumber: d,
-      });
-    }
+    console.log(`Plan period: ${startDateStr} to ${endDateStr} (${TOTAL_PLAN_DAYS} days)`);
 
-    // Archive any existing active/generating plans
+    // 6. Build game combinations and generate plan deterministically
+    const combinations = buildGameCombinations(targetLetters, ageGroup);
+    const days = generateDeterministicPlan(startDate, TOTAL_PLAN_DAYS, combinations);
+
+    console.log(`Generated ${days.length} days with ${combinations.length} game combinations`);
+
+    // 7. Build summary (template-based, no AI needed)
+    const monthNames = ["januar", "februar", "marec", "april", "maj", "junij", "julij", "avgust", "september", "oktober", "november", "december"];
+    const startMonthName = monthNames[startDate.getMonth()];
+    const endMonthName = monthNames[endDate.getMonth()];
+    const summary = `Osebni načrt vaj za ${child.name} (${childAge} let) za obdobje ${startDate.getDate()}. ${startMonthName} ${startDate.getFullYear()} – ${endDate.getDate()}. ${endMonthName} ${endDate.getFullYear()}. Ciljne črke: ${targetLetters.join(", ")}.`;
+
+    // 8. Archive existing active/generating plans
     await supabase
       .from("child_monthly_plans")
       .update({ status: "archived" })
       .eq("child_id", childId)
       .in("status", ["active", "generating"]);
 
+    // 9. Insert new plan (instant, no "generating" status needed)
+    const planData = {
+      summary,
+      days,
+      targetLetters,
+      childAge,
+      ageGroup,
+      totalDays: TOTAL_PLAN_DAYS,
+    };
+
     const { data: planRecord, error: planInsertError } = await supabase
       .from("child_monthly_plans")
       .insert({
         child_id: childId,
         report_id: reportId,
-        month: currentMonth,
-        year: currentYear,
+        month: startDate.getMonth() + 1,
+        year: startDate.getFullYear(),
+        start_date: startDateStr,
+        end_date: endDateStr,
         focus_letters: targetLetters,
-        status: "generating",
-        plan_data: {},
+        status: "active",
+        plan_data: planData,
       })
       .select("id")
       .single();
@@ -296,293 +389,7 @@ serve(async (req) => {
       });
     }
 
-    // 6. Build prompt and call OpenAI
-    const gameCatalog = buildGameCatalog(targetLetters, ageGroup);
-    const supportedTargets = targetLetters.filter((l) => SUPPORTED_LETTERS.includes(l));
-    const unsupportedTargets = targetLetters.filter((l) => !SUPPORTED_LETTERS.includes(l));
-
-    const monthNames = ["januar", "februar", "marec", "april", "maj", "junij", "julij", "avgust", "september", "oktober", "november", "december"];
-    const monthName = monthNames[currentMonth - 1];
-
-    const daysListStr = daysList.map(d => `  ${d.date} (${d.dayName})`).join("\n");
-
-    const systemPrompt = `Si logopedski asistent, ki ustvarja mesečne načrte vaj za otroke z govornimi težavami. Ustvari načrt za ${monthName} ${currentYear} (${totalDays} dni).
-
-PRAVILA:
-- Načrt mora vsebovati TOČNO ${totalDays} dni z dejanskimi datumi
-- Vsak dan ima TOČNO 5 aktivnosti: 1x motorika + 4x različne igre
-- KRITIČNO: Na isti dan se NE SME ponoviti isti gameId! Npr. ne sme biti "bingo" za S in "bingo" za Z na isti dan.
-- Vsak dan mora imeti 4 RAZLIČNE gameId-je med igrami
-- Igre razporedi ENAKOMERNO med ciljnimi črkami
-- RAZLIKUJ igre med dnevi - ne ponavljaj istega vzorca vsak dan
-- POTI MORAJO BITI TOČNO IZ KATALOGA - ne izmišljuj poti!
-- Opisi niso potrebni, nastavi jih na prazen string
-- Polje "letter" je obvezno za igre in pomeni katero črko otrok vadi
-- Polje "gameId" je obvezno za igre - mora biti iz seznama: ${ALL_GAME_IDS.join(", ")}
-${unsupportedTargets.length > 0 ? `- Za črke ${unsupportedTargets.join(", ")} NI specifičnih iger - za te črke dodeli SAMO motoriko govoril` : ""}
-
-DNEVI ZA NAČRT:
-${daysListStr}
-
-${gameCatalog}`;
-
-    const userPrompt = `Ustvari mesečni načrt za ${monthName} ${currentYear} za otroka:
-- Ime: ${child.name}
-- Starost: ${childAge} let (starostna skupina: ${ageGroup})
-- Ciljne črke: ${targetLetters.join(", ")}
-${supportedTargets.length > 0 ? `- Črke s podporo iger: ${supportedTargets.join(", ")}` : ""}
-
-Ustvari raznolik načrt z ${totalDays} dnevi. Vsak dan ima motoriko + 4 razlicne igre (4 različni gameId-ji).`;
-
-    const toolDefinition = {
-      type: "function",
-      function: {
-        name: "create_monthly_plan",
-        description: "Ustvari strukturiran mesečni načrt vaj za otroka z dejanskimi koledarskimi dnevi",
-        parameters: {
-          type: "object",
-          properties: {
-            summary: {
-              type: "string",
-              description: "Kratek povzetek načrta v slovenščini (1-2 stavka)",
-            },
-            days: {
-              type: "array",
-              description: `Seznam vseh ${totalDays} dni v mesecu`,
-              items: {
-                type: "object",
-                properties: {
-                  date: { type: "string", description: "Datum v formatu YYYY-MM-DD" },
-                  dayName: {
-                    type: "string",
-                    enum: ["Ponedeljek", "Torek", "Sreda", "Četrtek", "Petek", "Sobota", "Nedelja"],
-                  },
-                  activities: {
-                    type: "array",
-                    description: "Točno 5 aktivnosti: 1 motorika + 4 različne igre",
-                    items: {
-                      type: "object",
-                      properties: {
-                        type: { type: "string", enum: ["motorika", "igra"] },
-                        title: { type: "string" },
-                        path: { type: "string" },
-                        letter: { type: "string", description: "Ciljna črka za igro" },
-                        gameId: { type: "string", description: "ID igre iz kataloga (npr. kolo-srece, bingo)" },
-                      },
-                      required: ["type", "title", "path"],
-                      additionalProperties: false,
-                    },
-                  },
-                },
-                required: ["date", "dayName", "activities"],
-                additionalProperties: false,
-              },
-            },
-          },
-          required: ["summary", "days"],
-          additionalProperties: false,
-        },
-      },
-    };
-
-    console.log(`Calling OpenAI for child ${child.name}, letters: ${targetLetters.join(",")}, age: ${childAge}, days: ${totalDays}`);
-
-    const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${openaiApiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "gpt-4.1",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        tools: [toolDefinition],
-        tool_choice: { type: "function", function: { name: "create_monthly_plan" } },
-        temperature: 0.7,
-      }),
-    });
-
-    if (!openaiResponse.ok) {
-      const errorText = await openaiResponse.text();
-      console.error("OpenAI API error:", openaiResponse.status, errorText);
-      await supabase
-        .from("child_monthly_plans")
-        .update({ status: "archived" })
-        .eq("id", planRecord.id);
-
-      return new Response(JSON.stringify({ error: "AI generation failed" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const aiResult = await openaiResponse.json();
-    const toolCall = aiResult.choices?.[0]?.message?.tool_calls?.[0];
-
-    if (!toolCall || toolCall.function.name !== "create_monthly_plan") {
-      console.error("Unexpected AI response format:", JSON.stringify(aiResult));
-      await supabase
-        .from("child_monthly_plans")
-        .update({ status: "archived" })
-        .eq("id", planRecord.id);
-
-      return new Response(JSON.stringify({ error: "Invalid AI response" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    let planData;
-    try {
-      planData = JSON.parse(toolCall.function.arguments);
-    } catch {
-      console.error("Failed to parse AI response arguments");
-      await supabase
-        .from("child_monthly_plans")
-        .update({ status: "archived" })
-        .eq("id", planRecord.id);
-
-      return new Response(JSON.stringify({ error: "Failed to parse AI response" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // POST-PROCESSING: Validate and fix AI output
-    const ageKey = getAgeKey(ageGroup);
-    const supportedTargetsForFix = targetLetters.filter((l: string) => SUPPORTED_LETTERS.includes(l));
-
-    if (planData.days && Array.isArray(planData.days)) {
-      for (const day of planData.days) {
-        if (!day.activities || !Array.isArray(day.activities)) continue;
-
-        // Ensure motorika is first
-        const hasMotor = day.activities.some((a: any) => a.type === "motorika");
-        if (!hasMotor) {
-          day.activities.unshift({
-            type: "motorika",
-            title: "Vaje za motoriko govoril",
-            path: "/govorno-jezikovne-vaje/vaje-motorike-govoril",
-          });
-        }
-
-        // Get game activities and check for duplicate gameIds
-        const games = day.activities.filter((a: any) => a.type === "igra");
-        const usedGameIds = new Set<string>();
-        const validGames: any[] = [];
-
-        for (const game of games) {
-          if (game.gameId && !usedGameIds.has(game.gameId)) {
-            usedGameIds.add(game.gameId);
-            validGames.push(game);
-          }
-          // Skip duplicates
-        }
-
-        // Fill up to 4 unique games if needed
-        if (validGames.length < 4 && supportedTargetsForFix.length > 0) {
-          const availableGameIds = ALL_GAME_IDS.filter((gid) => !usedGameIds.has(gid));
-          let letterIdx = 0;
-
-          while (validGames.length < 4 && availableGameIds.length > 0) {
-            const gid = availableGameIds.shift()!;
-            const letter = supportedTargetsForFix[letterIdx % supportedTargetsForFix.length];
-            const urlKey = LETTER_URL_MAP[letter];
-            letterIdx++;
-
-            // Build path based on game type
-            let path = "";
-            const noAgeIds = ["kolo-srece", "bingo", "spomin", "labirint", "met-kocke", "ponovi-poved"];
-            if (noAgeIds.includes(gid)) {
-              if (gid === "spomin") {
-                path = `/govorne-igre/spomin/spomin-${urlKey}`;
-              } else {
-                path = `/govorne-igre/${gid}/${urlKey}`;
-              }
-            } else {
-              path = `/govorne-igre/${gid}/${urlKey}${ageKey}`;
-            }
-
-            const GAME_TITLES: Record<string, string> = {
-              "kolo-srece": "Kolo besed",
-              "bingo": "Bingo",
-              "spomin": "Spomin",
-              "sestavljanke": "Sestavljanke",
-              "zaporedja": "Zaporedja",
-              "drsna-sestavljanka": "Drsna igra",
-              "igra-ujemanja": "Igra ujemanja",
-              "labirint": "Labirint",
-              "met-kocke": "Smešne povedi",
-              "ponovi-poved": "Ponovi poved",
-            };
-
-            validGames.push({
-              type: "igra",
-              title: GAME_TITLES[gid] || gid,
-              path,
-              letter,
-              gameId: gid,
-            });
-            usedGameIds.add(gid);
-          }
-        }
-
-        // Fix title/letter duplication: if title already contains the letter, clear the letter field display
-        for (const game of validGames) {
-          if (game.letter && game.title) {
-            // Remove letter from title if it's appended (e.g., "Kolo besed Š" -> "Kolo besed")
-            const letterSuffix = ` ${game.letter}`;
-            if (game.title.endsWith(letterSuffix)) {
-              game.title = game.title.slice(0, -letterSuffix.length);
-            }
-          }
-        }
-
-        // Reconstruct activities: motorika first, then exactly 4 games
-        const motorActivity = day.activities.find((a: any) => a.type === "motorika");
-        day.activities = [
-          motorActivity || {
-            type: "motorika",
-            title: "Vaje za motoriko govoril",
-            path: "/govorno-jezikovne-vaje/vaje-motorike-govoril",
-          },
-          ...validGames.slice(0, 4),
-        ];
-      }
-    }
-
-    console.log(`Post-processing complete. Validated ${planData.days?.length || 0} days.`);
-
-    // Enrich plan_data with metadata
-    const fullPlanData = {
-      ...planData,
-      targetLetters,
-      childAge,
-      ageGroup,
-      totalDays,
-    };
-
-    // Update plan record with generated data
-    const { error: updateError } = await supabase
-      .from("child_monthly_plans")
-      .update({
-        plan_data: fullPlanData,
-        status: "active",
-      })
-      .eq("id", planRecord.id);
-
-    if (updateError) {
-      console.error("Failed to update plan:", updateError);
-      return new Response(JSON.stringify({ error: "Failed to save plan" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    console.log(`Monthly plan generated successfully for child ${child.name} (${planRecord.id}), ${totalDays} days`);
+    console.log(`90-day plan generated for ${child.name} (${planRecord.id}): ${startDateStr} to ${endDateStr}`);
 
     return new Response(
       JSON.stringify({
@@ -590,7 +397,9 @@ Ustvari raznolik načrt z ${totalDays} dnevi. Vsak dan ima motoriko + 4 razlicne
         planId: planRecord.id,
         targetLetters,
         ageGroup,
-        totalDays,
+        totalDays: TOTAL_PLAN_DAYS,
+        startDate: startDateStr,
+        endDate: endDateStr,
       }),
       {
         status: 200,
