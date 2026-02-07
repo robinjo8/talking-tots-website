@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Check, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { DayStarDisplay } from "./DayStarDisplay";
@@ -91,7 +91,6 @@ export function PlanDayCard({
                       <h3 className="font-semibold text-sm uppercase tracking-wide text-foreground">
                         {formatDayHeader(date, dayName)}
                       </h3>
-                      {dayCompleted && <Check className="h-4 w-4 text-accent-foreground" />}
                       <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
                     </div>
                     <DayStarDisplay currentStars={starsForDay} />
@@ -102,7 +101,6 @@ export function PlanDayCard({
                       <h3 className="font-semibold text-sm uppercase tracking-wide text-foreground">
                         {formatDayHeader(date, dayName)}
                       </h3>
-                      {dayCompleted && <Check className="h-4 w-4 text-accent-foreground" />}
                       <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
                     </div>
                     <DayStarDisplay currentStars={starsForDay} />
@@ -115,7 +113,6 @@ export function PlanDayCard({
                     <h3 className="font-semibold text-sm uppercase tracking-wide text-foreground">
                       {formatDayHeader(date, dayName)}
                     </h3>
-                    {dayCompleted && <Check className="h-4 w-4 text-accent-foreground" />}
                     <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
                   </div>
                   <DayStarDisplay currentStars={starsForDay} />
@@ -179,9 +176,7 @@ export function PlanDayCard({
 
                         {/* Completed overlay */}
                         {isCompleted && (
-                          <div className="absolute inset-0 bg-green-200/40 dark:bg-green-800/40 flex items-center justify-center">
-                            <Check className="h-10 w-10 text-green-600 dark:text-green-400 drop-shadow" />
-                          </div>
+                          <div className="absolute inset-0 bg-green-200/40 dark:bg-green-800/40" />
                         )}
 
                         {/* Progress indicator for games (show 1/2 or 2/2) */}
