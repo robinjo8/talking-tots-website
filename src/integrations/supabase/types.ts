@@ -1493,6 +1493,7 @@ export type Database = {
           day_date: string
           id: string
           plan_id: string
+          play_number: number
         }
         Insert: {
           activity_index: number
@@ -1501,6 +1502,7 @@ export type Database = {
           day_date: string
           id?: string
           plan_id: string
+          play_number?: number
         }
         Update: {
           activity_index?: number
@@ -1509,6 +1511,7 @@ export type Database = {
           day_date?: string
           id?: string
           plan_id?: string
+          play_number?: number
         }
         Relationships: [
           {

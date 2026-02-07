@@ -4,13 +4,27 @@ import Header from "@/components/Header";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMonthlyPlan } from "@/hooks/useMonthlyPlan";
-import { usePlanCompletions, useStarsByDate, useCompleteActivity } from "@/hooks/usePlanProgress";
+import {
+  usePlanCompletions,
+  useStarsByDate,
+  useCompleteActivity,
+  checkNewProgress,
+  buildCompletionCountsByDay,
+} from "@/hooks/usePlanProgress";
 import { PlanDayCard } from "@/components/plan/PlanDayCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2, Calendar, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 
 const PLAN_ACTIVITY_STORAGE_KEY = "plan-activity-tracking";
+
+interface StoredActivityTracking {
+  planId: string;
+  dayDate: string;
+  activityIndex: number;
+  activityType: string; // "motorika" | "igra"
+  leftAt: string; // ISO timestamp
+}
 
 export default function MojiIzzivi() {
   const { selectedChild } = useAuth();
@@ -42,15 +56,9 @@ export default function MojiIzzivi() {
   );
   const completeActivity = useCompleteActivity();
 
-  // Build lookup maps
-  const completionsByDay = useMemo(() => {
-    const map = new Map<string, Set<number>>();
-    for (const c of completions) {
-      const key = c.day_date;
-      if (!map.has(key)) map.set(key, new Set());
-      map.get(key)!.add(c.activity_index);
-    }
-    return map;
+  // Build lookup maps - now with counts instead of sets
+  const completionCountsByDay = useMemo(() => {
+    return buildCompletionCountsByDay(completions);
   }, [completions]);
 
   const starsMap = useMemo(() => {
@@ -61,24 +69,31 @@ export default function MojiIzzivi() {
     return map;
   }, [starsByDate]);
 
-  // Check for returning from a game
+  // Check for returning from a game - verify actual play before marking complete
   useEffect(() => {
     const stored = localStorage.getItem(PLAN_ACTIVITY_STORAGE_KEY);
     if (stored && plan?.id && selectedChild?.id) {
+      localStorage.removeItem(PLAN_ACTIVITY_STORAGE_KEY);
+      
       try {
-        const { planId, dayDate, activityIndex } = JSON.parse(stored);
-        if (planId === plan.id) {
-          completeActivity.mutate({
-            planId,
-            childId: selectedChild.id,
-            dayDate,
-            activityIndex,
-          });
-        }
+        const tracking: StoredActivityTracking = JSON.parse(stored);
+        if (tracking.planId !== plan.id) return;
+
+        // Check if the child actually played the game (new progress entries after leftAt)
+        checkNewProgress(selectedChild.id, tracking.leftAt).then(({ count }) => {
+          if (count > 0) {
+            // Child actually played - record one completion
+            completeActivity.mutate({
+              planId: tracking.planId,
+              childId: selectedChild.id,
+              dayDate: tracking.dayDate,
+              activityIndex: tracking.activityIndex,
+            });
+          }
+        });
       } catch (e) {
         console.error("Failed to parse activity tracking:", e);
       }
-      localStorage.removeItem(PLAN_ACTIVITY_STORAGE_KEY);
     }
   }, [plan?.id, selectedChild?.id]);
 
@@ -91,15 +106,22 @@ export default function MojiIzzivi() {
     }
   }, [isActive, planData]);
 
-  const handleActivityPlay = useCallback((dayDate: string, activityIndex: number, path: string) => {
-    if (plan?.id) {
-      localStorage.setItem(
-        PLAN_ACTIVITY_STORAGE_KEY,
-        JSON.stringify({ planId: plan.id, dayDate, activityIndex })
-      );
-    }
-    navigate(path);
-  }, [plan?.id, navigate]);
+  const handleActivityPlay = useCallback(
+    (dayDate: string, activityIndex: number, activityType: string, path: string) => {
+      if (plan?.id) {
+        const tracking: StoredActivityTracking = {
+          planId: plan.id,
+          dayDate,
+          activityIndex,
+          activityType,
+          leftAt: new Date().toISOString(),
+        };
+        localStorage.setItem(PLAN_ACTIVITY_STORAGE_KEY, JSON.stringify(tracking));
+      }
+      navigate(path);
+    },
+    [plan?.id, navigate]
+  );
 
   // Get today's date string
   const todayStr = useMemo(() => {
@@ -165,7 +187,7 @@ export default function MojiIzzivi() {
               {days.map((day) => {
                 const isToday = day.date === todayStr;
                 const isPast = day.date < todayStr;
-                const dayCompletions = completionsByDay.get(day.date) || new Set<number>();
+                const dayCompletionCounts = completionCountsByDay.get(day.date) || new Map<number, number>();
                 const dayStars = starsMap.get(day.date) || 0;
 
                 return (
@@ -175,14 +197,14 @@ export default function MojiIzzivi() {
                       dayName={day.dayName}
                       activities={day.activities}
                       starsForDay={dayStars}
-                      completedIndices={dayCompletions}
+                      completionCounts={dayCompletionCounts}
                       isToday={isToday}
                       isPast={isPast}
                       planId={plan!.id}
                       childId={selectedChild!.id}
                       childAvatarUrl={selectedChild?.avatarUrl}
-                      onActivityPlay={(activityIndex, path) =>
-                        handleActivityPlay(day.date, activityIndex, path)
+                      onActivityPlay={(activityIndex, activityType, path) =>
+                        handleActivityPlay(day.date, activityIndex, activityType, path)
                       }
                     />
                   </div>
