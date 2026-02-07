@@ -36,16 +36,13 @@ export default function MojiIzzivi() {
   const isActive = plan?.status === "active";
   const planData = plan?.plan_data;
 
-  // Calculate date range for stars query
+  // Calculate date range for stars query from start_date/end_date
   const dateRange = useMemo(() => {
     if (!plan) return { start: "", end: "" };
-    const year = plan.year;
-    const month = plan.month;
-    const daysInMonth = new Date(year, month, 0).getDate();
-    return {
-      start: `${year}-${String(month).padStart(2, "0")}-01`,
-      end: `${year}-${String(month).padStart(2, "0")}-${String(daysInMonth).padStart(2, "0")}`,
-    };
+    // Use new start_date/end_date fields, fallback to first/last day in plan_data
+    const start = plan.start_date || plan.plan_data?.days?.[0]?.date || "";
+    const end = plan.end_date || plan.plan_data?.days?.[plan.plan_data?.days?.length - 1]?.date || "";
+    return { start, end };
   }, [plan]);
 
   const { data: completions = [] } = usePlanCompletions(plan?.id, selectedChild?.id);
@@ -243,8 +240,7 @@ function GeneratingState() {
       </div>
       <h2 className="text-2xl font-bold mb-3">Načrt se pripravlja...</h2>
       <p className="text-muted-foreground max-w-md">
-        Naš AI asistent pripravlja tvoj osebni mesečni načrt vaj.
-        To traja približno 15-20 sekund.
+        Tvoj osebni načrt vaj se pripravlja. Počakaj trenutek.
       </p>
     </div>
   );

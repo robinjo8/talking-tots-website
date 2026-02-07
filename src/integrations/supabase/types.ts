@@ -604,11 +604,13 @@ export type Database = {
         Row: {
           child_id: string
           created_at: string
+          end_date: string | null
           focus_letters: string[] | null
           id: string
           month: number
           plan_data: Json
           report_id: string | null
+          start_date: string | null
           status: string
           updated_at: string
           year: number
@@ -616,11 +618,13 @@ export type Database = {
         Insert: {
           child_id: string
           created_at?: string
+          end_date?: string | null
           focus_letters?: string[] | null
           id?: string
           month: number
           plan_data?: Json
           report_id?: string | null
+          start_date?: string | null
           status?: string
           updated_at?: string
           year: number
@@ -628,11 +632,13 @@ export type Database = {
         Update: {
           child_id?: string
           created_at?: string
+          end_date?: string | null
           focus_letters?: string[] | null
           id?: string
           month?: number
           plan_data?: Json
           report_id?: string | null
+          start_date?: string | null
           status?: string
           updated_at?: string
           year?: number

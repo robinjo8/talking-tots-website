@@ -46,6 +46,8 @@ export interface MonthlyPlan {
   focus_letters: string[];
   month: number;
   year: number;
+  start_date: string | null;
+  end_date: string | null;
   status: string;
   created_at: string;
   updated_at: string;
