@@ -8,20 +8,24 @@ import { toast } from 'sonner';
 import { Eye, EyeOff, LogIn, Home } from 'lucide-react';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { MfaVerification } from '@/components/admin/MfaVerification';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, user, isLogopedist, isLoading: authLoading, signOut } = useAdminAuth();
+  const [mfaStep, setMfaStep] = useState(false);
+  const [mfaUserId, setMfaUserId] = useState('');
+  const [mfaEmail, setMfaEmail] = useState('');
+  const { signIn, user, isLogopedist, isLoading: authLoading, signOut, mfaVerified, setMfaVerified } = useAdminAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!authLoading && user && isLogopedist) {
+    if (!authLoading && user && isLogopedist && mfaVerified) {
       navigate('/admin');
     }
-  }, [user, isLogopedist, authLoading, navigate]);
+  }, [user, isLogopedist, authLoading, mfaVerified, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,7 +67,6 @@ export default function AdminLogin() {
         .maybeSingle();
 
       if (!logopedistProfile) {
-        // Not a logopedist - sign out and show error
         console.log('AdminLogin: User is not a logopedist, signing out');
         await signOut();
         toast.error('Ta račun ni registriran kot logoped. Za prijavo uporabite glavno stran.');
@@ -71,7 +74,6 @@ export default function AdminLogin() {
         return;
       }
 
-      // Check if membership is verified
       if (!logopedistProfile.is_verified) {
         console.log('AdminLogin: Logopedist membership not verified yet');
         await signOut();
@@ -80,8 +82,23 @@ export default function AdminLogin() {
         return;
       }
 
-      toast.success('Uspešna prijava!');
-      navigate('/admin');
+      // Send MFA code
+      const { data: mfaData, error: mfaError } = await supabase.functions.invoke('send-mfa-code', {
+        body: { user_id: currentUser.id, email: currentUser.email },
+      });
+
+      if (mfaError || !mfaData?.success) {
+        console.error('MFA send error:', mfaError, mfaData);
+        toast.error(mfaData?.error || 'Napaka pri pošiljanju potrditvene kode');
+        setIsLoading(false);
+        return;
+      }
+
+      // Show MFA verification screen
+      setMfaUserId(currentUser.id);
+      setMfaEmail(currentUser.email || email);
+      setMfaStep(true);
+      toast.info('Potrditvena koda je bila poslana na vaš email');
     } catch (err) {
       toast.error('Napaka pri prijavi');
     } finally {
@@ -89,11 +106,35 @@ export default function AdminLogin() {
     }
   };
 
+  const handleMfaVerified = () => {
+    setMfaVerified(true);
+    navigate('/admin');
+  };
+
+  const handleMfaCancel = async () => {
+    setMfaStep(false);
+    setMfaUserId('');
+    setMfaEmail('');
+    await signOut();
+  };
+
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-app-blue/10 via-background to-app-blue/5">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-app-blue" />
       </div>
+    );
+  }
+
+  // Show MFA verification screen
+  if (mfaStep && mfaUserId) {
+    return (
+      <MfaVerification
+        userId={mfaUserId}
+        email={mfaEmail}
+        onVerified={handleMfaVerified}
+        onCancel={handleMfaCancel}
+      />
     );
   }
 

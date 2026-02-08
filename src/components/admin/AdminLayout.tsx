@@ -9,24 +9,27 @@ interface AdminLayoutProps {
 }
 
 export function AdminLayout({ children }: AdminLayoutProps) {
-  const { user, isLogopedist, isLoading } = useAdminAuth();
+  const { user, isLogopedist, isLoading, mfaVerified } = useAdminAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Čakaj da se loading konča
     if (isLoading) return;
     
-    // Če ni uporabnika, preusmeri na login
     if (!user) {
       navigate('/admin/login');
       return;
     }
     
-    // isLogopedist že vključuje metadata check v AdminAuthContext
     if (!isLogopedist) {
       navigate('/admin/login');
+      return;
     }
-  }, [user, isLogopedist, isLoading, navigate]);
+
+    // Redirect to login if MFA not verified
+    if (!mfaVerified) {
+      navigate('/admin/login');
+    }
+  }, [user, isLogopedist, isLoading, mfaVerified, navigate]);
 
   if (isLoading) {
     return (
@@ -36,7 +39,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     );
   }
 
-  if (!user || !isLogopedist) {
+  if (!user || !isLogopedist || !mfaVerified) {
     return null;
   }
 
