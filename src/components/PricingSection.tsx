@@ -141,7 +141,7 @@ export function PricingSection() {
                 <Check className="h-4 w-4 text-dragon-green" />
               )}
               <span className="bg-app-orange text-black text-xs px-1.5 py-0.5 rounded font-medium">
-                -41%
+                -55%
               </span>
             </TabsTrigger>
           </TabsList>

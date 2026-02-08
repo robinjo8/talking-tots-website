@@ -51,7 +51,7 @@ export const proExclusiveFeatures: ProFeature[] = [
 // Stripe tier mapping - maps product IDs to plan IDs
 export const stripeTiers: Record<string, PlanId> = {
   'prod_TuvCF2Vlvmvp3M': 'start',
-  'prod_TmbZ19RhCaSzrp': 'pro'
+  'prod_TwXXpvPhSYVzvN': 'pro'
 };
 
 // Glavni paketi
@@ -75,7 +75,7 @@ export const pricingPlans: PricingPlan[] = [
     id: 'pro',
     name: 'TomiTalk Pro',
     shortName: 'Pro',
-    price: 13,
+    price: 10,
     billingPeriod: 'yearly',
     billingLabel: 'zaračunano letno',
     tagline: '"Razširjena strokovna podpora in osebni pristop."',
@@ -83,8 +83,8 @@ export const pricingPlans: PricingPlan[] = [
     color: 'dragon-green',
     features: [], // Pro uporablja proExclusiveFeatures
     isPopular: true,
-    stripePriceId: 'price_1Sp2M6GncjlOci0k6WHpDzMv',
-    stripeProductId: 'prod_TmbZ19RhCaSzrp'
+    stripePriceId: 'price_1SyeRzGncjlOci0kuNWpfuxY',
+    stripeProductId: 'prod_TwXXpvPhSYVzvN'
   }
 ];
 
