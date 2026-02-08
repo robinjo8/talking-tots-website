@@ -1,120 +1,115 @@
 
 
-# Popolna zaostrite system prompta - odstranitev vseh dovoljil za splošno znanje
+# Popravek manjkajocih zvocnih posnetkov
 
-## Problem
+## Pregled stanja
 
-System prompt vsebuje notranji konflikt. Zgodnji del (vrstice 37-73) eksplicitno dovoli uporabo "established speech-language pathology principles", "developmental milestones" in splošnih logopedskih načel. Poznejša pravila (vrstice 75-100) to prepovedujejo, ampak model daje prednost zgodnejšim navodilom in generira odgovore iz splošnega znanja.
+Vsi posnetki, ki jih navajam spodaj, OBSTAJAJO na Supabase (uporabnik jih je nalozil). Treba je samo popraviti kodo in bazo, da jih pravilno povezuje.
 
-Rezultat: model pokliče file_search (ker je tool_choice required), ampak potem IGNORIRA rezultate in odgovori iz svojega treniranega znanja o logopediji.
+### Slike - stanje
+| Slika | Se uporablja? | Komentar |
+|-------|--------------|----------|
+| kokos_sadez | Da | V matchingGameData, metKockeConfig, puzzleImages |
+| miza | Da | V articulationTestData, bingoWordsZSredinaKonec, artikulacijaVajeConfig |
+| piskot | Da | V bingoWordsKSredinaKonec, bingoWordsSHSredinaKonec, artikulacijaVajeConfig, metKockeConfig |
+| moz | Ne | Nikjer v kodi |
+| fant | Ne | Nikjer v kodi |
 
-## Rešitev
+### Manjkajoci zvocni posnetki (NE obstajajo na Supabase)
+- **miza.m4a** - koda ze navaja ta posnetek (v bingoWordsZSredinaKonec, artikulacijaVajeConfig), ampak datoteka ne obstaja na Supabase. Zvok ne bo deloval dokler ga ne nalozite.
+- **piskot.m4a** - koda ze navaja ta posnetek (v bingoWordsKSredinaKonec, bingoWordsSHSredinaKonec, artikulacijaVajeConfig, metKockeConfig), ampak datoteka ne obstaja na Supabase. Zvok ne bo deloval dokler ga ne nalozite.
 
-Celoten system prompt je treba prepisati tako, da:
-1. Nikjer ne omenja "established speech-language pathology principles" ali "developmental milestones" kot vir odgovorov
-2. OD PRVEGA STAVKA jasno pove, da so edini vir dokumenti iz file_search
-3. Odstrani vse stavke, ki modelu "dovolijo" splošno znanje
-4. Doda eksplicitno pravilo: "Če file_search ne vrne relevantnih dokumentov, NE odgovarjaj iz svojega znanja"
+---
 
-## Spremembe
+## Spremembe v kodi
 
-### Datoteka: `supabase/functions/chat-assistant/index.ts`
+### 1. Datoteka: `src/data/bingoWordsR.ts`
+8 vnosov z `audio: null` zamenjam z ustreznimi imeni datotek:
 
-Prepiše se celoten `systemInstructions` blok. Ključne spremembe:
+| Vrstica | Beseda | Sprememba |
+|---------|--------|-----------|
+| 13 | DREVO | `null` -> `"drevo.m4a"` |
+| 14 | HRUSKA | `null` -> `"hruska.m4a"` |
+| 23 | OBRAZ | `null` -> `"obraz.m4a"` |
+| 24 | OMARA | `null` -> `"omara.m4a"` |
+| 30 | TORBA | `null` -> `"torba.m4a"` |
+| 31 | TROBENTA | `null` -> `"trobenta.m4a"` |
+| 32 | URA | `null` -> `"ura.m4a"` |
+| 33 | VETRNICA | `null` -> `"veternica.m4a"` |
 
-### 1. Odstrani konfliktne stavke iz uvodnega dela
+### 2. Datoteka: `src/data/artikulacijaVajeConfig.ts`
+4 vnosi z `audio: null` v bloku `bingoDataRSredinaKonec`:
 
-**Odstrani** (sedaj vrstica 43):
-```
-You base your responses exclusively on established speech-language pathology 
-principles, developmental milestones, evidence-based logopedic practice, and the 
-content of documents provided within the TomiTalk system.
-```
+| Vrstica | Beseda | Sprememba |
+|---------|--------|-----------|
+| 249 | DREVO | `null` -> `"drevo.m4a"` |
+| 250 | HRUSKA | `null` -> `"hruska.m4a"` |
+| 259 | OBRAZ | `null` -> `"obraz.m4a"` |
+| 260 | OMARA | `null` -> `"omara.m4a"` |
 
-**Zamenjaj z**:
-```
-You base your responses EXCLUSIVELY on the content of documents retrieved via 
-file_search. You do NOT use your general training knowledge about speech therapy, 
-exercises, or techniques.
-```
+### 3. Datoteka: `src/data/matchingGameData.ts`
+5 vnosov brez parametra `audio_url` - dodam ga:
 
-### 2. Odstrani stavke o razvojnih mejnikih iz splošnega znanja
+| Vrstica | Beseda | Dodano |
+|---------|--------|--------|
+| 36 | CAROVNIK | `audio_url: .../carovnik.m4a` |
+| 39 | CEBELAR | `audio_url: .../cebelar.m4a` |
+| 90 | LISICA | `audio_url: .../lisica.m4a` |
+| 95 | LOVEC | `audio_url: .../lovec.m4a` |
+| 131 | SOFER | `audio_url: .../sofer.m4a` |
 
-**Odstrani** (sedaj vrstica 65):
-```
-You understand that speech and language development is individual but follows 
-general developmental patterns. You explain what is developmentally typical for a 
-given age and what may represent increased risk, without making definitive 
-conclusions.
-```
+---
 
-**Zamenjaj z**:
-```
-If the documents contain information about developmental patterns or milestones, 
-you may reference that information. If documents do NOT contain this information, 
-you must NOT explain developmental milestones from your general knowledge. 
-Instead say: "Za informacije o razvojnih mejnikih priporočam posvet z logopedom."
-```
+## Spremembe v Supabase bazi
 
-### 3. Odstrani splošna navodila o pristopih
+22 vrstic v razlicnih tabelah ima `audio_url = NULL`. Za vse napisem SQL UPDATE stavke:
 
-**Odstrani** (sedaj vrstica 69):
-```
-You emphasize positive reinforcement, gradual progress, repetition, and play-based 
-learning. You avoid alarming language, absolute statements, and labels.
-```
+### Tabela `memory_cards_Č` (2 vrstici)
+- CAROVNIK -> carovnik.m4a
+- CEBELAR -> cebelar.m4a
 
-**Zamenjaj z**:
-```
-You avoid alarming language, absolute statements, and labels. Your tone is 
-supportive and encouraging.
-```
+### Tabela `memory_cards_K` (5 vrstic)
+- KOLAC -> kolac.m4a
+- KORUZA -> koruza.m4a
+- KOZA (skin) -> koza_skin.m4a
+- KOZAREC -> kozarec.m4a
+- KROZNIK -> kroznik.m4a
 
-### 4. Dodaj novo pravilo za prazen file_search rezultat
+### Tabela `memory_cards_l` (6 vrstic)
+- LASJE -> lasje.m4a
+- LES -> les.m4a
+- LESNIK -> lesnik.m4a
+- LISICA -> lisica.m4a
+- LOVEC -> lovec.m4a
+- LUZA -> luza.m4a
 
-Na konec pravil o virih informacij dodaj:
-```
-Če file_search vrne rezultate, ki NISO relevantni za vprašanje uporabnika, 
-obravnavaj to ENAKO kot da dokumentov ni. NE uporabi rezultatov kot "inspiracijo" 
-za generiranje lastnega odgovora.
+### Tabela `memory_cards_r` (5 vrstic)
+- Ribez -> ribez.m4a
+- Ribic -> ribic.m4a
+- Ris -> ris.m4a
+- Riz -> riz.m4a
+- Rokometas -> rokometas.m4a
 
-Tvoj odgovor MORA biti kratek (največ 3-4 stavke) če v dokumentih ni neposredno 
-relevantnih informacij. V tem primeru uporabnika usmeri na:
-1. Preverjanje neposredno v aplikaciji TomiTalk
-2. Posvet z logopedom
+### Tabela `memory_cards_S` (2 vrstici)
+- SLUZ -> sluz.m4a
+- SNEZINKA -> snezinka.m4a
 
-NE SMEŠ nikoli napisati seznama z več kot 2 točkama, če vsebina NI dobesedno iz 
-dokumentov.
-```
+### Tabela `memory_cards_Š_duplicate` (1 vrstica)
+- SOFER -> sofer.m4a
 
-### 5. Dodaj še en negativni primer (za točno ta scenarij)
+### Tabela `memory_cards_z` (1 vrstica)
+- ZVEZEK -> zvezek.m4a
 
-```
-PRIMER NAPAČNEGA ODGOVORA #2 (NE SMEŠ tako odgovoriti):
-"Za 9-letnika so primerne vaje, ki so prilagojene njegovi starosti... logopedi 
-uporabljajo igrive vaje in igre za spodbujanje govora, slikovne materiale, kartice 
-s podobami..."
-- To je NAPAČNO ker je seznam vaj iz splošnega znanja, ne iz dokumentov.
+---
 
-PRIMER PRAVILNEGA ODGOVORA #2:
-"V dokumentaciji TomiTalk sem poiskal informacije o vajah za starost 9 let. 
-[Če najde: naštej SAMO tisto kar piše v dokumentih]. 
-[Če ne najde: V dokumentaciji trenutno ne najdem specifičnih priporočil za to 
-starostno skupino. Priporočam, da preverite razpoložljive vaje neposredno v 
-aplikaciji TomiTalk ali se posvetujete z logopedom.]"
-```
+## Kaj se NE spreminja
+- Nobena druga datoteka razen zgornjih treh
+- Nobena logika predvajanja zvoka (ta ze deluje pravilno)
+- Slike (vse so ze pravilno povezane)
 
-## Kaj se NE spremeni
-- Frontend koda ostane enaka
-- API parametri (model, temperature, tool_choice) ostanejo enaki
-- Logika za child context ostane enaka
-- Logika za shranjevanje pogovorov ostane enaka
-- Logiranje file_search uporabe ostane enako
+## Opomba za uporabnika
+Na Supabase morate se naloziti 2 zvocna posnetka, da bodo VSE besede imele zvok:
+- **miza.m4a**
+- **piskot.m4a**
 
-## Pričakovani rezultat
-Po teh spremembah bo Tomi:
-- Odgovarjal IZKLJUČNO na podlagi dokumentov iz Vector Store
-- Ob odsotnosti relevantnih dokumentov dal KRATEK odgovor (3-4 stavke) in usmeril na logopeda ali aplikacijo
-- Ne bo več generiral dolgih seznamov vaj, tehnik ali metod iz splošnega znanja
-- Jasno povedal, če v dokumentih ni informacij, namesto da jih "izmisli"
-
+Koda ze navaja ta dva posnetka, torej ko ju nalozite, bo vse takoj delovalo brez dodatnih sprememb v kodi.
