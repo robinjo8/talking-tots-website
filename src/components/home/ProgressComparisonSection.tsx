@@ -122,7 +122,7 @@ const ProgressComparisonSection = () => {
                 <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4">
                   Neomejena vadba
                 </h3>
-                <p className="text-lg text-gray-600 leading-relaxed">Za ceno eno do dve samoplačniške ure prejmete neomejeno celoletno naročnino na TomiTalk.</p>
+                <p className="text-lg text-gray-600 leading-relaxed">Za ceno povprečno dveh samoplačniških ur prejmete neomejeno celoletno naročnino na TomiTalk.</p>
               </div>
 
               <div className="flex-grow flex flex-col">
@@ -131,7 +131,7 @@ const ProgressComparisonSection = () => {
                   {/* TomiTalk bar */}
                   <div className="flex flex-col items-center">
                     <div className="mb-2 text-center">
-                      <span className="text-sm font-semibold text-green-600">30× in več ceneje</span>
+                      <span className="text-sm font-semibold text-green-600">25× in več ceneje</span>
                     </div>
                     <div className="bg-green-500 w-16 rounded-t-lg transition-all duration-1000 ease-out relative" style={{
                     height: isVisible ? '40px' : '0px',
