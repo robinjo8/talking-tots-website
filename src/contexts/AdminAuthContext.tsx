@@ -22,11 +22,15 @@ interface AdminAuthContextType {
   isLoading: boolean;
   isLogopedist: boolean;
   isSuperAdmin: boolean;
+  mfaVerified: boolean;
+  setMfaVerified: (verified: boolean) => void;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, firstName: string, lastName: string, organizationId: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
+
+const MFA_SESSION_KEY = 'tomitalk_mfa_verified';
 
 const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined);
 
@@ -38,6 +42,18 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const [isProfileLoading, setIsProfileLoading] = useState(false);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [mfaVerified, setMfaVerifiedState] = useState<boolean>(() => {
+    return sessionStorage.getItem(MFA_SESSION_KEY) === 'true';
+  });
+
+  const setMfaVerified = (verified: boolean) => {
+    setMfaVerifiedState(verified);
+    if (verified) {
+      sessionStorage.setItem(MFA_SESSION_KEY, 'true');
+    } else {
+      sessionStorage.removeItem(MFA_SESSION_KEY);
+    }
+  };
 
   const fetchLogopedistProfile = async (userId: string) => {
     setIsProfileLoading(true);
@@ -94,10 +110,8 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        // Ignoriraj vse dogodke med odjavo
         if (isSigningOut) {
           console.log('AdminAuthContext: Ignoring auth event during signout:', event);
           return;
@@ -107,7 +121,6 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Profile loading will set isProfileLoading = true
           fetchLogopedistProfile(session.user.id);
         } else {
           setProfile(null);
@@ -117,7 +130,6 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       }
     );
 
-    // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -134,10 +146,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       return { error };
     } catch (err) {
       return { error: err as Error };
@@ -153,9 +162,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   ) => {
     try {
       const redirectUrl = `${window.location.origin}/auth/confirm`;
-      
-      // Sign up with metadata - the database trigger will create the profile
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -168,27 +175,20 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
           }
         }
       });
-
-      if (error) return { error };
-
-      return { error: null };
+      return { error: error || null };
     } catch (err) {
       return { error: err as Error };
     }
   };
 
-  // isLogopedist: SAMO na podlagi profila v bazi - zanesljivo in varno
   const isLogopedist = !!profile;
-  
-  // Združi auth loading IN profile loading
   const isLoading = isAuthLoading || isProfileLoading;
 
   const signOut = async () => {
-    // Nastavi zastavico, da onAuthStateChange ignorira dogodke
     setIsSigningOut(true);
-    
-    // VEDNO počisti localStorage žeton TAKOJ - preden kličemo Supabase
     localStorage.removeItem('sb-ecmtctwovkheohqwahvt-auth-token');
+    // Clear MFA state on sign out
+    setMfaVerified(false);
     
     try {
       await supabase.auth.signOut();
@@ -196,13 +196,11 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       console.warn('SignOut error (ignored):', error);
     }
     
-    // Počisti lokalno stanje
     setUser(null);
     setSession(null);
     setProfile(null);
     setIsSuperAdmin(false);
     setIsProfileLoading(false);
-    // NE resetiraj isSigningOut - window.location.href bo tako ali tako osvežil stran
   };
 
   return (
@@ -213,6 +211,8 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       isLoading,
       isLogopedist,
       isSuperAdmin,
+      mfaVerified,
+      setMfaVerified,
       signIn,
       signUp,
       signOut,
