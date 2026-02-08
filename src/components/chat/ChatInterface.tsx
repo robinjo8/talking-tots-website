@@ -68,7 +68,7 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
     return [
       "Kdaj naj bi otrok pravilno izgovarjal glasove?",
       `Katere vaje so primerne za ${ageLabel}?`,
-      "Kako razumeti rezultate artikulacijskega testa?",
+      "Kako razumeti rezultate preverjanja izgovorjave?",
       "Kako spodbujati govor pri otroku?",
     ];
   })();
@@ -179,16 +179,6 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
         </ScrollArea>
       </div>
 
-      {/* Disclaimer */}
-      <div className="px-4 pt-2 pb-0">
-        <p className="text-[11px] text-muted-foreground text-center leading-relaxed">
-          Vsebino je ustvaril AI model na podlagi strokovnih logopedskih smernic; kljub temu so možne napake ali odstopanja.{" "}
-          <Link to="/kontakt" className="underline hover:text-foreground transition-colors">
-            Sporočite nam svoje mnenje.
-          </Link>
-        </p>
-      </div>
-
       {/* Input area */}
       <div className="border-t border-border bg-background p-4">
         <form
@@ -231,6 +221,16 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
             </Button>
           )}
         </form>
+      </div>
+
+      {/* Disclaimer */}
+      <div className="px-4 pt-1 pb-2">
+        <p className="text-[11px] text-muted-foreground text-center leading-relaxed">
+          Vsebino je ustvaril AI model na podlagi strokovnih logopedskih smernic; kljub temu so možne napake ali odstopanja.{" "}
+          <Link to="/kontakt" className="underline hover:text-foreground transition-colors">
+            Sporočite nam svoje mnenje.
+          </Link>
+        </p>
       </div>
     </div>
   );
