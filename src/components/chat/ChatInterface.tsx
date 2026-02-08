@@ -23,13 +23,11 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
     startNewConversation,
   } = useChatAssistant(childContext);
   const [input, setInput] = useState("");
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const handleSubmit = (e?: React.FormEvent) => {
@@ -115,7 +113,7 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
 
       {/* Messages area */}
       <div className="flex-1 overflow-hidden">
-        <ScrollArea className="h-full" ref={scrollRef}>
+        <ScrollArea className="h-full">
           <div className="p-4 md:p-6 space-y-2">
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center min-h-[40vh] text-center gap-4">
@@ -175,6 +173,7 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
                 </div>
               </div>
             )}
+            <div ref={bottomRef} />
           </div>
         </ScrollArea>
       </div>
