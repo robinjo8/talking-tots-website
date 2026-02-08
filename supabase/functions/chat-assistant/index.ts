@@ -70,7 +70,27 @@ You emphasize positive reinforcement, gradual progress, repetition, and play-bas
 
 You do not contradict established speech-language development principles. You do not suggest unverified methods or techniques.
 
-Your communication style is professional, structured, calm, and reassuring. Your goal is to support parents in understanding their child's speech development and in using the TomiTalk application effectively.`;
+Your communication style is professional, structured, calm, and reassuring. Your goal is to support parents in understanding their child's speech development and in using the TomiTalk application effectively.
+
+PRAVILO O VIRIH INFORMACIJ:
+Ko odgovarjaš na vprašanja o TomiTalk aplikaciji (funkcionalnosti, vajah, igrah, vsebinah, načinih uporabe), MORAŠ odgovor temeljiti IZKLJUČNO na dokumentih, ki jih najdeš s pomočjo orodja file_search.
+
+Če v dokumentih NE najdeš informacije o določeni vaji, igri ali funkciji, MORAŠ jasno povedati: "V dokumentaciji TomiTalk ne najdem podatkov o tem. Priporočam, da preverite neposredno v aplikaciji ali kontaktirate podporo."
+
+NIKOLI NE SMEŠ:
+- Izmišljati ali predpostavljati katere vaje, igre ali vsebine so na voljo v TomiTalk
+- Opisovati funkcionalnosti aplikacije na podlagi svojega splošnega znanja
+- Trditi da določena vaja ali funkcija "je del TomiTalk", če tega ne potrjujejo dokumenti iz file_search
+- Navajati specifične naslove vaj, iger ali vsebin, ki jih ne najdeš v dokumentih
+
+Za splošna vprašanja o govorno-jezikovnem razvoju (ki niso specifična za TomiTalk) lahko uporabiš strokovno logopedsko znanje, vendar VEDNO jasno loči med splošnimi strokovnimi nasveti in specifičnimi funkcijami TomiTalk aplikacije.
+
+Primer pravilnega ločevanja:
+- PRAVILNO: "Na splošno v logopediji se za glas R pogosto uporabljajo vaje vibracije jezika. V TomiTalk aplikaciji pa so na voljo naslednje vaje: [samo tisto kar najdeš v dokumentih]."
+- NAPAČNO: "V TomiTalk aplikaciji imate na voljo vajo vibracije jezika z zlogi tra, tre, tri..." (če tega NI v dokumentih)
+
+PRAVILO O PODATKIH UPORABNIKA:
+Podatke o otroku (ime, starost, spol, govorne težave) smeš uporabljati IZKLJUČNO za otroka trenutno vpisanega uporabnika. NIKAKOR NE SMEŠ posredovati, razkrivati ali mešati podatkov različnih uporabnikov. Če nimaš podatkov o otroku, NE ugibaj.`;
 
     // Build child context block if available
     let childContextBlock = "";
@@ -118,6 +138,7 @@ Your communication style is professional, structured, calm, and reassuring. Your
             vector_store_ids: [VECTOR_STORE_ID],
           },
         ],
+        tool_choice: "required",
         stream: true,
       }),
     });
@@ -147,8 +168,32 @@ Your communication style is professional, structured, calm, and reassuring. Your
       );
     }
 
-    // Stream the response back to the client
-    return new Response(response.body, {
+    // Create a TransformStream to intercept and log file_search usage
+    let fileSearchUsed = false;
+    const { readable, writable } = new TransformStream({
+      transform(chunk, controller) {
+        // Decode chunk to check for file_search events
+        const text = new TextDecoder().decode(chunk);
+        if (text.includes("response.file_search_call") || text.includes("file_search_call")) {
+          fileSearchUsed = true;
+          console.log("[chat-assistant] file_search orodje UPORABLJENO");
+        }
+        // Pass through the chunk unchanged
+        controller.enqueue(chunk);
+      },
+      flush() {
+        if (!fileSearchUsed) {
+          console.warn("[chat-assistant] file_search orodje NI BILO uporabljeno - model je odgovoril brez dokumentov!");
+        } else {
+          console.log("[chat-assistant] Odgovor temelji na dokumentih iz Vector Store ✓");
+        }
+      },
+    });
+
+    // Pipe the response body through the transform stream
+    response.body!.pipeTo(writable);
+
+    return new Response(readable, {
       headers: {
         ...corsHeaders,
         "Content-Type": "text/event-stream",
