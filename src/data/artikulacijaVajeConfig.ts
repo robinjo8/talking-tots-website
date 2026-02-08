@@ -246,8 +246,8 @@ const bingoDataRSredinaKonec: BingoWordData[] = [
   { word: "CIRKUS", image: "cirkus1.webp", audio: "cirkus.m4a" },
   { word: "CISTERNA", image: "cisterna1.webp", audio: "cisterna.m4a" },
   { word: "ČRKE", image: "crke1.webp", audio: "crke.m4a" },
-  { word: "DREVO", image: "drevo1.webp", audio: null },
-  { word: "HRUŠKA", image: "hruska1.webp", audio: null },
+  { word: "DREVO", image: "drevo1.webp", audio: "drevo.m4a" },
+  { word: "HRUŠKA", image: "hruska1.webp", audio: "hruska.m4a" },
   { word: "KLAVIR", image: "klavir1.webp", audio: "klavir.m4a" },
   { word: "KOŠARA", image: "kosara1.webp", audio: "kosara.m4a" },
   { word: "KRAVA", image: "krava1.webp", audio: "krava.m4a" },
@@ -256,8 +256,8 @@ const bingoDataRSredinaKonec: BingoWordData[] = [
   { word: "KRUH", image: "kruh1.webp", audio: "kruh.m4a" },
   { word: "KUMARA", image: "kumara1.webp", audio: "kumara.m4a" },
   { word: "LOPAR", image: "lopar1.webp", audio: "lopar.m4a" },
-  { word: "OBRAZ", image: "obraz1.webp", audio: null },
-  { word: "OMARA", image: "omara1.webp", audio: null }
+  { word: "OBRAZ", image: "obraz1.webp", audio: "obraz.m4a" },
+  { word: "OMARA", image: "omara1.webp", audio: "omara.m4a" }
 ];
 
 const bingoDataSSredinaKonec: BingoWordData[] = [
