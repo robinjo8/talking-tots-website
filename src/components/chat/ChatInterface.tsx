@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Send, Square, Bot, Plus, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -176,6 +177,16 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
             )}
           </div>
         </ScrollArea>
+      </div>
+
+      {/* Disclaimer */}
+      <div className="px-4 pt-2 pb-0">
+        <p className="text-[11px] text-muted-foreground text-center leading-relaxed">
+          Vsebino je ustvaril AI model na podlagi strokovnih logopedskih smernic; kljub temu so možne napake ali odstopanja.{" "}
+          <Link to="/kontakt" className="underline hover:text-foreground transition-colors">
+            Sporočite nam svoje mnenje.
+          </Link>
+        </p>
       </div>
 
       {/* Input area */}
