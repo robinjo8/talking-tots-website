@@ -174,7 +174,7 @@ export function GenericMetKockeGame({
 
         {/* Instruction text above table - on green background */}
         <p className="text-center font-bold text-white text-sm mb-2 drop-shadow-lg">
-          3X VRŽI KOCKO IN PONOVI POVED
+          3X VRZI KOCKO IN PONOVI POVED
         </p>
 
         {/* Game grid - constrained height */}

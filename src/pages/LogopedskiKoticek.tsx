@@ -53,7 +53,7 @@ const LogopedskiKoticek = () => {
       icon: sectionIcons.faq,
       articleUrl: "/clanki/pogosta-vprasanja",
       available: true,
-      imageUrl: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/Stickman_FAQ_1.png",
+      imageUrl: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/Stickman_FAQ_1.webp",
       imagePosition: "object-top",
     },
   ];
