@@ -3,7 +3,7 @@ import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
-  apiVersion: "2025-12-15.clover",
+  apiVersion: "2025-01-27.basil",
 });
 
 // Safe timestamp conversion to handle potential invalid values
@@ -24,13 +24,36 @@ const supabase = createClient(
 // Map Stripe product IDs to plan IDs (2-tier model: Start + Pro)
 const productToPlan: Record<string, string> = {
   'prod_TuvCF2Vlvmvp3M': 'start',
-  'prod_TmbZ19RhCaSzrp': 'pro'
+  'prod_TmbZ19RhCaSzrp': 'pro',   // stari Pro produkt (za nazaj)
+  'prod_TwXXpvPhSYVzvN': 'pro'    // novi Pro produkt
 };
 
 const logStep = (step: string, details?: Record<string, unknown>) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[STRIPE-WEBHOOK] ${step}${detailsStr}`);
 };
+
+// Helper: find user_id by Stripe customer email
+async function findUserIdByCustomerId(customerId: string): Promise<string | null> {
+  try {
+    const customer = await stripe.customers.retrieve(customerId);
+    if (!customer || customer.deleted || !('email' in customer) || !customer.email) {
+      logStep("Customer not found or deleted", { customerId });
+      return null;
+    }
+    const { data: users } = await supabase.auth.admin.listUsers();
+    const user = users?.users?.find(u => u.email === customer.email);
+    if (user) {
+      logStep("Found user by email fallback", { email: customer.email, userId: user.id });
+      return user.id;
+    }
+    logStep("No user found for email", { email: customer.email });
+    return null;
+  } catch (err) {
+    logStep("Error in findUserIdByCustomerId", { error: String(err) });
+    return null;
+  }
+}
 
 serve(async (req) => {
   const signature = req.headers.get("stripe-signature");
@@ -106,21 +129,20 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     }
   }
 
-  // Only update stripe_customer_id, don't touch status
-  // subscription.created webhook handles status update
+  // Use upsert to ensure record exists (creates if missing, updates if exists)
   const { error } = await supabase
     .from("user_subscriptions")
-    .update({ 
+    .upsert({ 
+      user_id: targetUserId,
       stripe_customer_id: customerId,
+      status: 'inactive', // Will be overridden by subscription.created webhook
       updated_at: new Date().toISOString()
-    })
-    .eq("user_id", targetUserId);
+    }, { onConflict: "user_id" });
 
   if (error) {
-    logStep("Error updating customer ID", { error: error.message });
-    // Don't throw - this is not critical if subscription.created already ran
+    logStep("Error upserting customer ID", { error: error.message });
   } else {
-    logStep("Customer ID updated", { userId: targetUserId, customerId });
+    logStep("Customer ID upserted", { userId: targetUserId, customerId });
   }
 }
 
@@ -132,15 +154,23 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   
   const customerId = subscription.customer as string;
   
-  // Find user by stripe_customer_id
+  // 1. Try to find user by stripe_customer_id
   const { data: existingRecord } = await supabase
     .from("user_subscriptions")
     .select("user_id")
     .eq("stripe_customer_id", customerId)
     .maybeSingle();
 
-  if (!existingRecord) {
-    logStep("No subscription record found for customer", { customerId });
+  let targetUserId = existingRecord?.user_id;
+
+  // 2. Fallback: find user by Stripe customer email
+  if (!targetUserId) {
+    logStep("No record found by stripe_customer_id, trying email fallback", { customerId });
+    targetUserId = await findUserIdByCustomerId(customerId);
+  }
+
+  if (!targetUserId) {
+    logStep("Could not find user for subscription update", { customerId });
     return;
   }
 
@@ -151,7 +181,10 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   // If cancel_at_period_end is true, user has canceled but subscription is still active until period end
   const effectiveStatus = subscription.cancel_at_period_end ? 'canceled' : subscription.status;
 
-  const { error } = await supabase.from("user_subscriptions").update({
+  // Use upsert to handle both existing and missing records
+  const { error } = await supabase.from("user_subscriptions").upsert({
+    user_id: targetUserId,
+    stripe_customer_id: customerId,
     stripe_subscription_id: subscription.id,
     stripe_product_id: productId,
     plan_id: planId,
@@ -161,15 +194,15 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     trial_end: safeTimestamp(subscription.trial_end),
     cancel_at_period_end: subscription.cancel_at_period_end,
     updated_at: new Date().toISOString()
-  }).eq("user_id", existingRecord.user_id);
+  }, { onConflict: "user_id" });
 
   if (error) {
-    logStep("Error updating subscription", { error: error.message });
+    logStep("Error upserting subscription", { error: error.message });
     throw error;
   }
 
-  logStep("Subscription updated successfully", { 
-    userId: existingRecord.user_id, 
+  logStep("Subscription upserted successfully", { 
+    userId: targetUserId, 
     planId, 
     status: effectiveStatus 
   });
