@@ -1,115 +1,60 @@
 
 
-# Popravek manjkajocih zvocnih posnetkov
+## Problem
 
-## Pregled stanja
+Ko si izbrisal staro narocnino in kupil novo, so se Stripe webhooks sprozili v tem vrstnem redu:
 
-Vsi posnetki, ki jih navajam spodaj, OBSTAJAJO na Supabase (uporabnik jih je nalozil). Treba je samo popraviti kodo in bazo, da jih pravilno povezuje.
+1. `customer.subscription.deleted` -- status nastavljen na "inactive"
+2. `customer.subscription.created` -- webhook iskal zapis po `stripe_customer_id`, a ga NI NASEL (ker je `checkout.session.completed` prisel sele potem)
+3. `checkout.session.completed` -- posodobil `stripe_customer_id`, ampak NI posodobil statusa narocnine
 
-### Slike - stanje
-| Slika | Se uporablja? | Komentar |
-|-------|--------------|----------|
-| kokos_sadez | Da | V matchingGameData, metKockeConfig, puzzleImages |
-| miza | Da | V articulationTestData, bingoWordsZSredinaKonec, artikulacijaVajeConfig |
-| piskot | Da | V bingoWordsKSredinaKonec, bingoWordsSHSredinaKonec, artikulacijaVajeConfig, metKockeConfig |
-| moz | Ne | Nikjer v kodi |
-| fant | Ne | Nikjer v kodi |
+Rezultat: v bazi ostane `status: inactive`, `plan_id: null` -- aplikacija misli, da nimas narocnine.
 
-### Manjkajoci zvocni posnetki (NE obstajajo na Supabase)
-- **miza.m4a** - koda ze navaja ta posnetek (v bingoWordsZSredinaKonec, artikulacijaVajeConfig), ampak datoteka ne obstaja na Supabase. Zvok ne bo deloval dokler ga ne nalozite.
-- **piskot.m4a** - koda ze navaja ta posnetek (v bingoWordsKSredinaKonec, bingoWordsSHSredinaKonec, artikulacijaVajeConfig, metKockeConfig), ampak datoteka ne obstaja na Supabase. Zvok ne bo deloval dokler ga ne nalozite.
+Poleg tega webhook na vrstici 27 se vedno uporablja stari Pro produkt ID (`prod_TmbZ19RhCaSzrp`) namesto novega (`prod_TwXXpvPhSYVzvN`).
 
 ---
 
-## Spremembe v kodi
+## Nacrt popravkov
 
-### 1. Datoteka: `src/data/bingoWordsR.ts`
-8 vnosov z `audio: null` zamenjam z ustreznimi imeni datotek:
+### 1. Dodati novi Pro produkt ID v webhook
 
-| Vrstica | Beseda | Sprememba |
-|---------|--------|-----------|
-| 13 | DREVO | `null` -> `"drevo.m4a"` |
-| 14 | HRUSKA | `null` -> `"hruska.m4a"` |
-| 23 | OBRAZ | `null` -> `"obraz.m4a"` |
-| 24 | OMARA | `null` -> `"omara.m4a"` |
-| 30 | TORBA | `null` -> `"torba.m4a"` |
-| 31 | TROBENTA | `null` -> `"trobenta.m4a"` |
-| 32 | URA | `null` -> `"ura.m4a"` |
-| 33 | VETRNICA | `null` -> `"veternica.m4a"` |
+**Datoteka:** `supabase/functions/stripe-webhook/index.ts` (vrstica 25-28)
 
-### 2. Datoteka: `src/data/artikulacijaVajeConfig.ts`
-4 vnosi z `audio: null` v bloku `bingoDataRSredinaKonec`:
+Preslikava produktov se posodobi:
 
-| Vrstica | Beseda | Sprememba |
-|---------|--------|-----------|
-| 249 | DREVO | `null` -> `"drevo.m4a"` |
-| 250 | HRUSKA | `null` -> `"hruska.m4a"` |
-| 259 | OBRAZ | `null` -> `"obraz.m4a"` |
-| 260 | OMARA | `null` -> `"omara.m4a"` |
+```
+'prod_TuvCF2Vlvmvp3M' -> 'start'
+'prod_TmbZ19RhCaSzrp' -> 'pro'   (stari, ohranimo za nazaj)
+'prod_TwXXpvPhSYVzvN' -> 'pro'   (novi)
+```
 
-### 3. Datoteka: `src/data/matchingGameData.ts`
-5 vnosov brez parametra `audio_url` - dodam ga:
+### 2. Popraviti `handleSubscriptionUpdate` -- dodati fallback iskanje po emailu
 
-| Vrstica | Beseda | Dodano |
-|---------|--------|--------|
-| 36 | CAROVNIK | `audio_url: .../carovnik.m4a` |
-| 39 | CEBELAR | `audio_url: .../cebelar.m4a` |
-| 90 | LISICA | `audio_url: .../lisica.m4a` |
-| 95 | LOVEC | `audio_url: .../lovec.m4a` |
-| 131 | SOFER | `audio_url: .../sofer.m4a` |
+Trenutno, ce webhook ne najde zapisa po `stripe_customer_id`, se ustavi. Popravek: ce ne najde zapisa, poisce Stripe stranko, dobi email, najde uporabnika v Supabase in ustvari/posodobi zapis.
+
+```text
+1. Poisci zapis po stripe_customer_id
+2. Ce ne najdes -> poisci Stripe customer -> dobi email
+3. Poisci uporabnika po emailu v auth.users
+4. Ustvari ali posodobi zapis v user_subscriptions z upsert
+```
+
+### 3. Popraviti `handleCheckoutCompleted` -- uporabiti upsert namesto update
+
+Trenutno `checkout.session.completed` naredi samo `update` -- ce zapis se ne obstaja, se nic ne zgodi. Spremenimo v `upsert`, da se vedno ustvari zapis s `stripe_customer_id` in statusom `inactive` (ki ga nato `subscription.created` posodobi).
+
+### 4. Popraviti Stripe API verzijo
+
+Webhook trenutno uporablja `apiVersion: "2025-12-15.clover"`, kar je zastarelo. Posodobimo na `2025-08-27.basil`.
 
 ---
 
-## Spremembe v Supabase bazi
+## Povzetek sprememb
 
-22 vrstic v razlicnih tabelah ima `audio_url = NULL`. Za vse napisem SQL UPDATE stavke:
+| Datoteka | Sprememba |
+|---|---|
+| `supabase/functions/stripe-webhook/index.ts` | Dodati novi Pro produkt ID, dodati fallback iskanje po emailu v `handleSubscriptionUpdate`, spremeniti `handleCheckoutCompleted` v upsert, popraviti API verzijo |
 
-### Tabela `memory_cards_Č` (2 vrstici)
-- CAROVNIK -> carovnik.m4a
-- CEBELAR -> cebelar.m4a
+### Za takoj (po deployu)
 
-### Tabela `memory_cards_K` (5 vrstic)
-- KOLAC -> kolac.m4a
-- KORUZA -> koruza.m4a
-- KOZA (skin) -> koza_skin.m4a
-- KOZAREC -> kozarec.m4a
-- KROZNIK -> kroznik.m4a
-
-### Tabela `memory_cards_l` (6 vrstic)
-- LASJE -> lasje.m4a
-- LES -> les.m4a
-- LESNIK -> lesnik.m4a
-- LISICA -> lisica.m4a
-- LOVEC -> lovec.m4a
-- LUZA -> luza.m4a
-
-### Tabela `memory_cards_r` (5 vrstic)
-- Ribez -> ribez.m4a
-- Ribic -> ribic.m4a
-- Ris -> ris.m4a
-- Riz -> riz.m4a
-- Rokometas -> rokometas.m4a
-
-### Tabela `memory_cards_S` (2 vrstici)
-- SLUZ -> sluz.m4a
-- SNEZINKA -> snezinka.m4a
-
-### Tabela `memory_cards_Š_duplicate` (1 vrstica)
-- SOFER -> sofer.m4a
-
-### Tabela `memory_cards_z` (1 vrstica)
-- ZVEZEK -> zvezek.m4a
-
----
-
-## Kaj se NE spreminja
-- Nobena druga datoteka razen zgornjih treh
-- Nobena logika predvajanja zvoka (ta ze deluje pravilno)
-- Slike (vse so ze pravilno povezane)
-
-## Opomba za uporabnika
-Na Supabase morate se naloziti 2 zvocna posnetka, da bodo VSE besede imele zvok:
-- **miza.m4a**
-- **piskot.m4a**
-
-Koda ze navaja ta dva posnetka, torej ko ju nalozite, bo vse takoj delovalo brez dodatnih sprememb v kodi.
+Ko bo webhook popravljen, bo treba osveziti narocnino za uporabnika `qjavec@gmail.com`. To se naredi tako, da se v bazi rocno posodobi zapis ali pa se poklice `refreshSubscription` na frontendu. Lahko tudi dodam kodo v webhook, ki ob deployu takoj popravi obstojecega uporabnika, ali pa preprosto posodobim bazo neposredno z SQL ukazom.
