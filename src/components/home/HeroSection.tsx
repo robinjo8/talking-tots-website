@@ -29,7 +29,7 @@ export const HeroSection = () => {
     }
     
     if (!isSubscribed) {
-      setShowSubscriptionModal(true);
+      navigate("/cenik");
     } else {
       navigate("/moje-aplikacije");
     }
@@ -101,7 +101,7 @@ export const HeroSection = () => {
                 size="lg"
                 className="bg-dragon-green hover:bg-dragon-green/90 text-white font-semibold px-8 py-5 md:py-6 text-lg"
               >
-                {user ? "Začni zdaj" : "Začni brezplačno"}
+                {!user ? "Začni brezplačno" : (isSubscribed ? "Začni zdaj" : "Kupi TomiTalk")}
               </Button>
               
               <Button
