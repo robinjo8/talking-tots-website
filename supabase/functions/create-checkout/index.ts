@@ -2,8 +2,17 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+const allowedOrigins = [
+  "https://tomitalk.com",
+  "https://www.tomitalk.com",
+  "https://tomitalk.lovable.app",
+];
+
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get("Origin") || "";
+  const allowOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+  return {
+    "Access-Control-Allow-Origin": allowOrigin,
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
