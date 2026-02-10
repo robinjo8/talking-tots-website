@@ -13,8 +13,9 @@ function getCorsHeaders(req: Request) {
   const allowOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
   return {
     "Access-Control-Allow-Origin": allowOrigin,
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
-};
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  };
+}
 
 // Levenshtein distance for fuzzy matching
 function levenshteinDistance(a: string, b: string): number {
@@ -44,7 +45,6 @@ function levenshteinDistance(a: string, b: string): number {
   return matrix[b.length][a.length];
 }
 
-// Calculate similarity percentage
 function similarity(a: string, b: string): number {
   const maxLen = Math.max(a.length, b.length);
   if (maxLen === 0) return 1;
@@ -52,16 +52,14 @@ function similarity(a: string, b: string): number {
   return (maxLen - distance) / maxLen;
 }
 
-// Normalize text for comparison (uppercase, remove punctuation, trim)
 function normalizeText(text: string): string {
   return text
     .toUpperCase()
-    .replace(/[.,!?;:\-'"]/g, '')
+    .replace(/[.,!?;:\\-'"]/g, '')
     .replace(/\s+/g, ' ')
     .trim();
 }
 
-// Sanitize text for storage paths (remove special Slovenian characters)
 function sanitizeForStorage(text: string): string {
   const charMap: Record<string, string> = {
     'Č': 'C', 'č': 'c',
@@ -78,19 +76,16 @@ function sanitizeForStorage(text: string): string {
     .replace(/[^a-zA-Z0-9\-_]/g, '');
 }
 
-// Get dynamic threshold based on word length and difficulty
 function getThresholdForWord(wordLength: number, difficulty: string): number {
   const thresholds: Record<string, Record<number, number>> = {
     nizka:   { 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.0 },
     srednja: { 3: 0.33, 4: 0.50, 5: 0.50, 6: 0.50 },
     visoka:  { 3: 0.65, 4: 0.70, 5: 0.75, 6: 0.65 },
   };
-  // Clamp word length to supported range (3-6)
   const len = Math.min(Math.max(wordLength, 3), 6);
   return thresholds[difficulty]?.[len] ?? thresholds.srednja[len];
 }
 
-// Check if transcribed word matches target or variants
 function isWordAccepted(
   transcribed: string,
   targetWord: string,
@@ -101,25 +96,21 @@ function isWordAccepted(
   const normalizedTarget = normalizeText(targetWord);
   const similarityThreshold = getThresholdForWord(normalizedTarget.length, difficulty);
   
-  // Check exact match with target
   if (normalizedTranscribed === normalizedTarget) {
     return { accepted: true, matchType: 'exact', confidence: 1.0 };
   }
   
-  // Check exact match with variants
   for (const variant of acceptedVariants) {
     if (normalizedTranscribed === normalizeText(variant)) {
       return { accepted: true, matchType: 'variant', confidence: 1.0 };
     }
   }
   
-  // Check similarity with target
   const targetSimilarity = similarity(normalizedTranscribed, normalizedTarget);
   if (targetSimilarity >= similarityThreshold) {
     return { accepted: true, matchType: 'similar_target', confidence: targetSimilarity };
   }
   
-  // Check similarity with variants
   for (const variant of acceptedVariants) {
     const variantSimilarity = similarity(normalizedTranscribed, normalizeText(variant));
     if (variantSimilarity >= similarityThreshold) {
@@ -130,7 +121,6 @@ function isWordAccepted(
   return { accepted: false, matchType: 'no_match', confidence: targetSimilarity };
 }
 
-// Process base64 in chunks to prevent memory issues
 function processBase64Chunks(base64String: string, chunkSize = 32768): Uint8Array {
   const chunks: Uint8Array[] = [];
   let position = 0;
@@ -161,7 +151,8 @@ function processBase64Chunks(base64String: string, chunkSize = 32768): Uint8Arra
 }
 
 serve(async (req) => {
-  // Handle CORS preflight
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -179,7 +170,7 @@ serve(async (req) => {
     const supabaseAuth = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_ANON_KEY')!,
-      { global: { headers: { Authorization: authHeader } } }
+      { global: { headers: { Authorization: authHeader } }
     );
 
     const token = authHeader.replace('Bearer ', '');
@@ -203,7 +194,7 @@ serve(async (req) => {
       wordIndex,
       letter,
       difficulty = "srednja",
-      logopedistId  // For logopedist-managed children - different storage path
+      logopedistId
     } = await req.json();
 
     console.log(`Transcription request for word: ${targetWord}, letter: ${letter}, index: ${wordIndex}, session: ${sessionNumber}, difficulty: ${difficulty}, logopedistId: ${logopedistId || 'none'}`);
@@ -221,20 +212,17 @@ serve(async (req) => {
       throw new Error('OPENAI_API_KEY is not configured');
     }
 
-    // Process audio from base64
     const binaryAudio = processBase64Chunks(audio);
     console.log(`Audio size: ${binaryAudio.length} bytes`);
 
-    // Prepare form data for Whisper API
     const formData = new FormData();
     const blob = new Blob([binaryAudio], { type: 'audio/webm' });
     formData.append('file', blob, 'recording.webm');
     formData.append('model', 'whisper-1');
-    formData.append('language', 'sl'); // Slovenian
-    formData.append('prompt', targetWord); // Hint for Whisper to improve recognition
+    formData.append('language', 'sl');
+    formData.append('prompt', targetWord);
     console.log(`Whisper API call with prompt hint: "${targetWord}"`);
 
-    // Send to OpenAI Whisper API
     console.log('Sending to OpenAI Whisper API...');
     const whisperResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
       method: 'POST',
@@ -254,7 +242,6 @@ serve(async (req) => {
     const transcribedText = (whisperResult.text || '').trim();
     console.log(`Transcribed text: "${transcribedText}"`);
 
-    // Check for empty/silence transcription
     if (!transcribedText || transcribedText.length < 2) {
       console.log('Empty or too short transcription - likely silence');
       return new Response(
@@ -271,11 +258,9 @@ serve(async (req) => {
       );
     }
 
-    // Check if word is accepted (using dynamic threshold based on difficulty)
     const matchResult = isWordAccepted(transcribedText, targetWord, acceptedVariants, difficulty);
     console.log(`Match result:`, matchResult);
 
-    // Save recording to Supabase Storage ONLY if word was accepted (correct pronunciation)
     let storagePath = null;
     if (childId && userId && matchResult.accepted) {
       try {
@@ -284,15 +269,10 @@ serve(async (req) => {
         const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        // Sanitize letter and word for storage path (remove special characters)
         const safeLetter = sanitizeForStorage(letter || 'X');
         const safeWord = sanitizeForStorage(targetWord);
-        // Construct session folder from sessionNumber parameter
         const sessionFolder = `Seja-${sessionNumber || 1}`;
         
-        // Determine storage path based on whether this is a logopedist-managed child
-        // Logopedist children: logopedist-children/{logopedist_id}/{child_id}/Preverjanje-izgovorjave/Seja-X/
-        // Parent children: {parent_id}/{child_id}/Preverjanje-izgovorjave/Seja-X/
         if (logopedistId) {
           storagePath = `logopedist-children/${logopedistId}/${childId}/Preverjanje-izgovorjave/${sessionFolder}/${safeLetter}-${wordIndex}-${safeWord}-${timestamp}.webm`;
         } else {
@@ -310,7 +290,6 @@ serve(async (req) => {
 
         if (uploadError) {
           console.error('Storage upload error:', uploadError);
-          // Don't fail the whole request if storage fails
         } else {
           console.log(`Recording saved to: ${storagePath}`);
         }
@@ -344,7 +323,7 @@ serve(async (req) => {
       }),
       { 
         status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } 
       }
     );
   }

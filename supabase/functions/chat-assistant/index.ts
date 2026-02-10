@@ -18,6 +18,8 @@ function getCorsHeaders(req: Request) {
 }
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -231,13 +233,11 @@ Podatke o otroku (ime, starost, spol, govorne težave) smeš uporabljati IZKLJU�
     let fileSearchUsed = false;
     const { readable, writable } = new TransformStream({
       transform(chunk, controller) {
-        // Decode chunk to check for file_search events
         const text = new TextDecoder().decode(chunk);
         if (text.includes("response.file_search_call") || text.includes("file_search_call")) {
           fileSearchUsed = true;
           console.log("[chat-assistant] file_search orodje UPORABLJENO");
         }
-        // Pass through the chunk unchanged
         controller.enqueue(chunk);
       },
       flush() {
@@ -249,7 +249,6 @@ Podatke o otroku (ime, starost, spol, govorne težave) smeš uporabljati IZKLJU�
       },
     });
 
-    // Pipe the response body through the transform stream
     response.body!.pipeTo(writable);
 
     return new Response(readable, {

@@ -11,17 +11,18 @@ function getCorsHeaders(req: Request) {
   const allowOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
   return {
     "Access-Control-Allow-Origin": allowOrigin,
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  };
 }
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    // Verify authorization
     const authHeader = req.headers.get('Authorization')
     if (!authHeader?.startsWith('Bearer ')) {
       return new Response(
@@ -30,7 +31,6 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Create client with user's token to verify they're a super admin
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
@@ -39,7 +39,6 @@ Deno.serve(async (req) => {
       global: { headers: { Authorization: authHeader } }
     })
 
-    // Verify the caller's token
     const token = authHeader.replace('Bearer ', '')
     const { data: claims, error: claimsError } = await userClient.auth.getClaims(token)
     
@@ -52,7 +51,6 @@ Deno.serve(async (req) => {
 
     const callerId = claims.claims.sub
 
-    // Check if caller is super admin
     const { data: adminCheck, error: adminError } = await userClient
       .from('admin_permissions')
       .select('id')
@@ -68,7 +66,6 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Get the user_id to confirm from request body
     const { user_id } = await req.json()
 
     if (!user_id) {
@@ -78,7 +75,6 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Use admin client to update auth.users
     const adminClient = createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
@@ -86,7 +82,6 @@ Deno.serve(async (req) => {
       }
     })
 
-    // Update the user's email_confirmed_at using admin API
     const { data: userData, error: updateError } = await adminClient.auth.admin.updateUserById(
       user_id,
       { email_confirm: true }
@@ -111,7 +106,7 @@ Deno.serve(async (req) => {
     console.error('Unexpected error:', error)
     return new Response(
       JSON.stringify({ error: 'Nepričakovana napaka', details: error.message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
     )
   }
 })
