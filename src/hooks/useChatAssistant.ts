@@ -23,10 +23,7 @@ export type Conversation = {
   updated_at: string;
 };
 
-const CHAT_URL =
-  "https://ecmtctwovkheohqwahvt.supabase.co/functions/v1/chat-assistant";
-const SUPABASE_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjbXRjdHdvdmtoZW9ocXdhaHZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ2MzMyMjMsImV4cCI6MjA2MDIwOTIyM30.Re8dNeVSGlD461sR19MnNEKQr65euPUsNATJVg9UgZI";
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-assistant`;
 
 export function useChatAssistant(childContext?: ChildContext) {
   const { user } = useAuth();
@@ -137,12 +134,21 @@ export function useChatAssistant(childContext?: ChildContext) {
       let assistantContent = "";
 
       try {
+        // Get the user's session token for authenticated requests
+        const { data: sessionData } = await supabase.auth.getSession();
+        const accessToken = sessionData?.session?.access_token;
+        if (!accessToken) {
+          toast.error("Niste prijavljeni. Prijavite se za uporabo asistenta.");
+          setIsLoading(false);
+          return;
+        }
+
         const resp = await fetch(CHAT_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${accessToken}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           },
           body: JSON.stringify({
             messages: updatedMessages,
