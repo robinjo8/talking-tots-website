@@ -1,11 +1,20 @@
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+const allowedOrigins = [
+  "https://tomitalk.com",
+  "https://www.tomitalk.com",
+  "https://tomitalk.lovable.app",
+];
 
-// Recursive function to list all files in storage (including subdirectories)
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get("Origin") || "";
+  const allowOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+  return {
+    "Access-Control-Allow-Origin": allowOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  };
+}
+
 async function listAllFiles(
   client: SupabaseClient,
   bucket: string,
@@ -26,11 +35,9 @@ async function listAllFiles(
     const path = `${folder}/${item.name}`;
 
     if (item.id === null) {
-      // This is a folder - recurse into it
       const subFiles = await listAllFiles(client, bucket, path);
       files.push(...subFiles);
     } else {
-      // This is a file
       files.push(path);
     }
   }
@@ -39,7 +46,8 @@ async function listAllFiles(
 }
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -49,7 +57,6 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 
-    // Get authorization header
     const authHeader = req.headers.get("authorization");
     if (!authHeader) {
       console.error("No authorization header provided");
@@ -59,12 +66,10 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Create client with user's token to verify they are super admin
     const userClient = createClient(supabaseUrl, supabaseAnonKey, {
       global: { headers: { Authorization: authHeader } },
     });
 
-    // Get user from token
     const { data: { user }, error: userError } = await userClient.auth.getUser();
     if (userError || !user) {
       console.error("Failed to get user:", userError);
@@ -76,7 +81,6 @@ Deno.serve(async (req) => {
 
     console.log("Request from user:", user.id);
 
-    // Check if user is super admin
     const { data: adminData, error: adminError } = await userClient
       .from("admin_permissions")
       .select("role")
@@ -95,7 +99,6 @@ Deno.serve(async (req) => {
 
     console.log("Super admin verified:", user.id);
 
-    // Get user_id to archive from request body
     const { user_id: targetUserId, deletion_reason } = await req.json();
     if (!targetUserId) {
       console.error("No user_id provided in request body");
@@ -107,33 +110,27 @@ Deno.serve(async (req) => {
 
     console.log("Archiving user:", targetUserId);
 
-    // Create admin client for operations
     const adminClient = createClient(supabaseUrl, supabaseServiceKey);
 
-    // 1. Get user's profile data
     const { data: profile } = await adminClient
       .from("profiles")
       .select("*")
       .eq("id", targetUserId)
       .maybeSingle();
 
-    // 2. Get user's email from auth.users
     const { data: authUserData } = await adminClient.auth.admin.getUserById(targetUserId);
     const userEmail = authUserData?.user?.email || null;
 
-    // 3. Get all children for this user
     const { data: children } = await adminClient
       .from("children")
       .select("*")
       .eq("parent_id", targetUserId);
 
-    // 4. Get all test sessions for this user
     const { data: testSessions } = await adminClient
       .from("articulation_test_sessions")
       .select("*")
       .eq("parent_id", targetUserId);
 
-    // 5. Get word results for all sessions
     const sessionIds = testSessions?.map(s => s.id) || [];
     let wordResults: Record<string, any[]> = {};
     
@@ -143,7 +140,6 @@ Deno.serve(async (req) => {
         .select("*")
         .in("session_id", sessionIds);
       
-      // Group by session_id
       if (allWordResults) {
         for (const result of allWordResults) {
           if (!wordResults[result.session_id]) {
@@ -156,7 +152,6 @@ Deno.serve(async (req) => {
 
     console.log(`Found: ${children?.length || 0} children, ${testSessions?.length || 0} test sessions`);
 
-    // 6. Create archive entry
     const { data: archive, error: archiveError } = await adminClient
       .from("archived_users")
       .insert({
@@ -181,7 +176,6 @@ Deno.serve(async (req) => {
 
     console.log("Created archive entry:", archive.id);
 
-    // 7. Archive children
     if (children && children.length > 0) {
       const childArchives = children.map(child => ({
         archive_id: archive.id,
@@ -206,9 +200,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 8. Archive test sessions with word results as JSON
     if (testSessions && testSessions.length > 0) {
-      // Get child names for archived sessions
       const childIds = testSessions.map(s => s.child_id);
       const childNameMap = new Map<string, string>();
       
@@ -246,7 +238,6 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 9. Move storage files from uporabniski-profili to uporabniski-profili-arhiv (recursive)
     const allFiles = await listAllFiles(adminClient, "uporabniski-profili", targetUserId);
     let filesArchived = 0;
 
@@ -254,11 +245,9 @@ Deno.serve(async (req) => {
       console.log(`Found ${allFiles.length} storage files to archive`);
       
       for (const filePath of allFiles) {
-        // Preserve folder structure: userId/childId/Dokumenti/file.pdf -> archiveId/childId/Dokumenti/file.pdf
         const relativePath = filePath.replace(`${targetUserId}/`, '');
         const destPath = `${archive.id}/${relativePath}`;
         
-        // Download file
         const { data: fileData, error: downloadError } = await adminClient.storage
           .from("uporabniski-profili")
           .download(filePath);
@@ -268,7 +257,6 @@ Deno.serve(async (req) => {
           continue;
         }
 
-        // Upload to archive bucket
         const { error: uploadError } = await adminClient.storage
           .from("uporabniski-profili-arhiv")
           .upload(destPath, fileData, {
@@ -280,7 +268,6 @@ Deno.serve(async (req) => {
           continue;
         }
 
-        // Delete original
         const { error: deleteError } = await adminClient.storage
           .from("uporabniski-profili")
           .remove([filePath]);
@@ -298,7 +285,6 @@ Deno.serve(async (req) => {
       console.log("No storage files found for user");
     }
 
-    // 10. Delete word results first (no FK constraint but good practice)
     if (sessionIds.length > 0) {
       const { error: wordDeleteError } = await adminClient
         .from("articulation_word_results")
@@ -310,7 +296,6 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 11. Delete test sessions
     if (testSessions && testSessions.length > 0) {
       const { error: sessionDeleteError } = await adminClient
         .from("articulation_test_sessions")
@@ -322,7 +307,6 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 12. Delete user from auth.users (CASCADE will delete profiles, children)
     const { error: deleteError } = await adminClient.auth.admin.deleteUser(targetUserId);
 
     if (deleteError) {
@@ -335,7 +319,6 @@ Deno.serve(async (req) => {
 
     console.log("Successfully archived and deleted user:", targetUserId);
 
-    // 13. Log to audit_logs with proper await and error handling
     const { error: auditError } = await adminClient
       .from("audit_logs")
       .insert({
@@ -371,7 +354,7 @@ Deno.serve(async (req) => {
     console.error("Unexpected error:", error);
     return new Response(
       JSON.stringify({ error: "Internal server error", details: error.message }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...getCorsHeaders(req), "Content-Type": "application/json" } }
     );
   }
 });

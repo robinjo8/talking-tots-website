@@ -1,12 +1,23 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+const allowedOrigins = [
+  "https://tomitalk.com",
+  "https://www.tomitalk.com",
+  "https://tomitalk.lovable.app",
+];
+
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get("Origin") || "";
+  const allowOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+  return {
+    "Access-Control-Allow-Origin": allowOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  };
+}
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -16,7 +27,6 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 
-    // Get authorization header
     const authHeader = req.headers.get("authorization");
     if (!authHeader) {
       console.error("No authorization header provided");
@@ -26,12 +36,10 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Create client with user's token to verify they are super admin
     const userClient = createClient(supabaseUrl, supabaseAnonKey, {
       global: { headers: { Authorization: authHeader } },
     });
 
-    // Get user from token
     const { data: { user }, error: userError } = await userClient.auth.getUser();
     if (userError || !user) {
       console.error("Failed to get user:", userError);
@@ -43,7 +51,6 @@ Deno.serve(async (req) => {
 
     console.log("Request from user:", user.id);
 
-    // Check if user is super admin
     const { data: adminData, error: adminError } = await userClient
       .from("admin_permissions")
       .select("role")
@@ -62,7 +69,6 @@ Deno.serve(async (req) => {
 
     console.log("Super admin verified:", user.id);
 
-    // Get user_id to delete from request body
     const { user_id: targetUserId } = await req.json();
     if (!targetUserId) {
       console.error("No user_id provided in request body");
@@ -74,10 +80,8 @@ Deno.serve(async (req) => {
 
     console.log("Deleting user:", targetUserId);
 
-    // Create admin client to delete user
     const adminClient = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Delete user from auth.users (CASCADE will delete logopedist_profiles)
     const { error: deleteError } = await adminClient.auth.admin.deleteUser(targetUserId);
 
     if (deleteError) {
@@ -98,7 +102,7 @@ Deno.serve(async (req) => {
     console.error("Unexpected error:", error);
     return new Response(
       JSON.stringify({ error: "Internal server error", details: error.message }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...getCorsHeaders(req), "Content-Type": "application/json" } }
     );
   }
 });

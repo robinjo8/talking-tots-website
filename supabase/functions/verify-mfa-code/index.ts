@@ -1,11 +1,21 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+const allowedOrigins = [
+  "https://tomitalk.com",
+  "https://www.tomitalk.com",
+  "https://tomitalk.lovable.app",
+];
+
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get("Origin") || "";
+  const allowOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+  return {
+    "Access-Control-Allow-Origin": allowOrigin,
+    "Access-Control-Allow-Headers":
+      "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  };
+}
 
 async function hashCode(code: string): Promise<string> {
   const encoder = new TextEncoder();
@@ -16,6 +26,8 @@ async function hashCode(code: string): Promise<string> {
 }
 
 serve(async (req: Request) => {
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -30,7 +42,6 @@ serve(async (req: Request) => {
       );
     }
 
-    // Validate code format (6 digits)
     if (!/^\d{6}$/.test(code)) {
       return new Response(
         JSON.stringify({ error: "Neveljavna oblika kode" }),
@@ -42,7 +53,6 @@ serve(async (req: Request) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    // 1. Get the latest unused, non-expired code for this user
     const { data: mfaCode, error: fetchError } = await supabase
       .from("mfa_codes")
       .select("*")
@@ -71,9 +81,7 @@ serve(async (req: Request) => {
       );
     }
 
-    // 2. Check attempt limit (max 5)
     if (mfaCode.attempts >= 5) {
-      // Mark code as used (locked out)
       await supabase
         .from("mfa_codes")
         .update({ used: true })
@@ -88,11 +96,9 @@ serve(async (req: Request) => {
       );
     }
 
-    // 3. Hash the submitted code and compare
     const hashedSubmitted = await hashCode(code);
 
     if (hashedSubmitted !== mfaCode.code) {
-      // Increment attempts
       const newAttempts = mfaCode.attempts + 1;
       await supabase
         .from("mfa_codes")
@@ -109,7 +115,6 @@ serve(async (req: Request) => {
       );
     }
 
-    // 4. Code is correct! Mark as used
     await supabase
       .from("mfa_codes")
       .update({ used: true })
@@ -125,7 +130,7 @@ serve(async (req: Request) => {
     console.error("verify-mfa-code error:", err);
     return new Response(
       JSON.stringify({ error: "Nepričakovana napaka" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...getCorsHeaders(req), "Content-Type": "application/json" } }
     );
   }
 });

@@ -1,11 +1,23 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+const allowedOrigins = [
+  "https://tomitalk.com",
+  "https://www.tomitalk.com",
+  "https://tomitalk.lovable.app",
+];
+
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get("Origin") || "";
+  const allowOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+  return {
+    "Access-Control-Allow-Origin": allowOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  };
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -16,11 +28,9 @@ Deno.serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Find pending sessions older than 7 days that haven't had a reminder notification yet
     const sevenDaysAgo = new Date()
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
 
-    // Get pending unassigned sessions older than 7 days
     const { data: oldSessions, error: sessionsError } = await supabase
       .from('articulation_test_sessions')
       .select(`
@@ -47,7 +57,6 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Check which sessions already have a reminder notification (to avoid duplicates)
     const sessionIds = oldSessions.map(s => s.id)
     
     const { data: existingReminders, error: remindersError } = await supabase
@@ -63,7 +72,6 @@ Deno.serve(async (req) => {
 
     const existingReminderIds = new Set(existingReminders?.map(r => r.related_session_id) || [])
     
-    // Filter out sessions that already have reminders
     const sessionsNeedingReminder = oldSessions.filter(s => !existingReminderIds.has(s.id))
 
     if (sessionsNeedingReminder.length === 0) {
@@ -74,7 +82,6 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Get internal organizations to send notifications to
     const { data: internalOrgs, error: orgsError } = await supabase
       .from('organizations')
       .select('id')
@@ -94,10 +101,8 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Calculate days waiting for each session
     const now = new Date()
     
-    // Create reminder notifications for each session and each organization
     const notifications = sessionsNeedingReminder.flatMap(session => {
       const submittedAt = new Date(session.submitted_at)
       const daysWaiting = Math.floor((now.getTime() - submittedAt.getTime()) / (1000 * 60 * 60 * 24))
@@ -116,7 +121,6 @@ Deno.serve(async (req) => {
       }))
     })
 
-    // Insert notifications
     const { data: insertedNotifications, error: insertError } = await supabase
       .from('notifications')
       .insert(notifications)
@@ -142,7 +146,7 @@ Deno.serve(async (req) => {
     console.error('Error in check-old-pending-tests:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
     )
   }
 })

@@ -1,13 +1,22 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+const allowedOrigins = [
+  "https://tomitalk.com",
+  "https://www.tomitalk.com",
+  "https://tomitalk.lovable.app",
+];
 
-// Simple hash function using Web Crypto API
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get("Origin") || "";
+  const allowOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+  return {
+    "Access-Control-Allow-Origin": allowOrigin,
+    "Access-Control-Allow-Headers":
+      "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  };
+}
+
 async function hashCode(code: string): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(code);
@@ -23,6 +32,8 @@ function generateCode(): string {
 }
 
 serve(async (req: Request) => {
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -43,7 +54,6 @@ serve(async (req: Request) => {
 
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    // 1. Verify user is a logopedist
     const { data: profile, error: profileError } = await supabase
       .from("logopedist_profiles")
       .select("id, first_name, last_name, is_verified")
@@ -65,7 +75,6 @@ serve(async (req: Request) => {
       );
     }
 
-    // 2. Rate limit: check for recent codes (within 60 seconds)
     const sixtySecondsAgo = new Date(Date.now() - 60 * 1000).toISOString();
     const { data: recentCodes } = await supabase
       .from("mfa_codes")
@@ -87,19 +96,16 @@ serve(async (req: Request) => {
       );
     }
 
-    // 3. Invalidate all previous unused codes for this user
     await supabase
       .from("mfa_codes")
       .update({ used: true })
       .eq("user_id", user_id)
       .eq("used", false);
 
-    // 4. Generate new code and hash it
     const plainCode = generateCode();
     const hashedCode = await hashCode(plainCode);
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 minutes
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
 
-    // 5. Store hashed code in database
     const { error: insertError } = await supabase.from("mfa_codes").insert({
       user_id,
       code: hashedCode,
@@ -114,7 +120,6 @@ serve(async (req: Request) => {
       );
     }
 
-    // 6. Send email via Resend
     const firstName = profile.first_name || "Uporabnik";
     const emailResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -174,7 +179,7 @@ serve(async (req: Request) => {
     console.error("send-mfa-code error:", err);
     return new Response(
       JSON.stringify({ error: "Nepričakovana napaka" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...getCorsHeaders(req), "Content-Type": "application/json" } }
     );
   }
 });

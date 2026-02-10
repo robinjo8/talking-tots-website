@@ -1,13 +1,25 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+const allowedOrigins = [
+  "https://tomitalk.com",
+  "https://www.tomitalk.com",
+  "https://tomitalk.lovable.app",
+];
+
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get("Origin") || "";
+  const allowOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+  return {
+    "Access-Control-Allow-Origin": allowOrigin,
+    "Access-Control-Allow-Headers":
+      "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  };
+}
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -221,13 +233,11 @@ Podatke o otroku (ime, starost, spol, govorne težave) smeš uporabljati IZKLJU�
     let fileSearchUsed = false;
     const { readable, writable } = new TransformStream({
       transform(chunk, controller) {
-        // Decode chunk to check for file_search events
         const text = new TextDecoder().decode(chunk);
         if (text.includes("response.file_search_call") || text.includes("file_search_call")) {
           fileSearchUsed = true;
           console.log("[chat-assistant] file_search orodje UPORABLJENO");
         }
-        // Pass through the chunk unchanged
         controller.enqueue(chunk);
       },
       flush() {
@@ -239,7 +249,6 @@ Podatke o otroku (ime, starost, spol, govorne težave) smeš uporabljati IZKLJU�
       },
     });
 
-    // Pipe the response body through the transform stream
     response.body!.pipeTo(writable);
 
     return new Response(readable, {
