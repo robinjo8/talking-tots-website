@@ -134,12 +134,21 @@ export function useChatAssistant(childContext?: ChildContext) {
       let assistantContent = "";
 
       try {
+        // Get the user's session token for authenticated requests
+        const { data: sessionData } = await supabase.auth.getSession();
+        const accessToken = sessionData?.session?.access_token;
+        if (!accessToken) {
+          toast.error("Niste prijavljeni. Prijavite se za uporabo asistenta.");
+          setIsLoading(false);
+          return;
+        }
+
         const resp = await fetch(CHAT_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${accessToken}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           },
           body: JSON.stringify({
             messages: updatedMessages,
