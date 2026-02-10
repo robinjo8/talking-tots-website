@@ -23,10 +23,7 @@ export type Conversation = {
   updated_at: string;
 };
 
-const CHAT_URL =
-  "https://ecmtctwovkheohqwahvt.supabase.co/functions/v1/chat-assistant";
-const SUPABASE_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjbXRjdHdvdmtoZW9ocXdhaHZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ2MzMyMjMsImV4cCI6MjA2MDIwOTIyM30.Re8dNeVSGlD461sR19MnNEKQr65euPUsNATJVg9UgZI";
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-assistant`;
 
 export function useChatAssistant(childContext?: ChildContext) {
   const { user } = useAuth();
