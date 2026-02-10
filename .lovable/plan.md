@@ -1,34 +1,35 @@
 
+## Problem
 
-## Spremembe v `ChildCompletedView.tsx`
+Igra **Ponovi Poved** nikoli ne poklice `onGameComplete?.()`, kar pomeni, da se v brezplacnem nacinu ta igra **nikoli ne stejte** kot odigrana. Uporabnik lahko igra Ponovi Poved neomejeno, brez da se zmanjsa stevec preostalih iger (3 na dan).
 
-Tri sekcije (Osnovni podatki, Govorne tezave, Odgovori na vprasalnik) bodo ovite v `Collapsible` komponente, ki bodo privzeto **zaprte**. Uporabnik jih lahko razpre s klikom na naslov. Gumb na dnu bo preimenovan v "Zakljuci dodajanje otroka" in bo takoj viden brez potrebe po pomikanju.
+Vseh ostalih 8 iger pravilno klice `onGameComplete?.()` ob kliku na gumb "VZEMI ZVEZDICO".
 
-### Tehnicni detajli
+## Popravek
 
-**Datoteka:** `src/components/children/ChildCompletedView.tsx`
+**Datoteka:** `src/components/games/PonoviPovedGame.tsx` (vrstice 1079-1093)
 
-- Dodati import za `Collapsible`, `CollapsibleTrigger`, `CollapsibleContent` iz `@/components/ui/collapsible` in ikono `ChevronDown` iz `lucide-react`
-- Vsako od treh sekcij (Osnovni podatki, Govorne tezave, Odgovori na vprasalnik) oviti v `Collapsible` komponento z `open={false}` privzeto
-- Naslov vsake sekcije postane `CollapsibleTrigger` z ikono ChevronDown, ki se zavrti ob odprtju
-- Vsebina sekcije gre v `CollapsibleContent`
-- Gumb preimenovati iz "Zakljuci registracijo" v "Zakljuci dodajanje otroka" (privzeti `closeButtonText` prop)
-- Gumb premakniti takoj pod "Profil uspesno zakljucen" kartico, pred collapsible sekcije, da bo takoj viden
+V onClick handler gumba "VZEMI ZVEZDICO" je treba dodati klic `onGameComplete?.()` -- enako kot to pocnejo vse ostale igre.
 
-### Vizualna struktura
-
-```text
-+----------------------------------+
-| [checkmark] Profil uspesno       |
-|             zakljucen            |
-+----------------------------------+
-
-[ Zakljuci dodajanje otroka ]     <-- gumb takoj viden
-
-> Osnovni podatki          [v]    <-- zaprto, klikni za razpri
-> Govorne tezave           [v]    <-- zaprto
-> Odgovori na vprasalnik   [v]    <-- zaprto
+Trenutno:
+```typescript
+onClick={async () => {
+  recordExerciseCompletion(`ponovi-poved-${config.letter}`);
+  await new Promise(resolve => setTimeout(resolve, 500));
+  await checkForNewTrophy();
+  setShowSuccessDialog(false);
+}}
 ```
 
-Nobene druge datoteke niso spremenjene. Prop `closeButtonText` ohrani moznost, da klicoce komponente podajo drugo besedilo.
+Po popravku:
+```typescript
+onClick={async () => {
+  recordExerciseCompletion(`ponovi-poved-${config.letter}`);
+  onGameComplete?.();   // <-- DODANO: stejemo igro kot odigrano
+  await new Promise(resolve => setTimeout(resolve, 500));
+  await checkForNewTrophy();
+  setShowSuccessDialog(false);
+}}
+```
 
+To je ena vrstica kode. Nobene druge datoteke niso prizadete.
