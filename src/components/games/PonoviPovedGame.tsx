@@ -1079,6 +1079,7 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
               onClick={async () => {
                 // Shrani napredek s poenotenim sistemom
                 recordExerciseCompletion(`ponovi-poved-${config.letter}`);
+                onGameComplete?.();
                 
                 // Preveri za nov pokal
                 await new Promise(resolve => setTimeout(resolve, 500));
