@@ -13,8 +13,9 @@ function getCorsHeaders(req: Request) {
   const allowOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
   return {
     "Access-Control-Allow-Origin": allowOrigin,
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  };
+}
 
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
@@ -22,7 +23,8 @@ const logStep = (step: string, details?: any) => {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -40,11 +42,7 @@ serve(async (req) => {
     if (!authHeader) {
       logStep("No authorization header, returning unsubscribed");
       return new Response(JSON.stringify({ 
-        subscribed: false,
-        productId: null,
-        subscriptionEnd: null,
-        isTrialing: false,
-        trialEnd: null
+        subscribed: false, productId: null, subscriptionEnd: null, isTrialing: false, trialEnd: null
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -59,11 +57,7 @@ serve(async (req) => {
     if (userError || !userData.user?.email) {
       logStep("Auth failed, returning unsubscribed", { error: userError?.message });
       return new Response(JSON.stringify({ 
-        subscribed: false,
-        productId: null,
-        subscriptionEnd: null,
-        isTrialing: false,
-        trialEnd: null
+        subscribed: false, productId: null, subscriptionEnd: null, isTrialing: false, trialEnd: null
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -72,7 +66,6 @@ serve(async (req) => {
     const user = userData.user;
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    // PRIMARY: Check database first (synced by webhooks)
     const { data: sub, error: subError } = await supabaseClient
       .from('user_subscriptions')
       .select('*')
@@ -80,12 +73,8 @@ serve(async (req) => {
       .maybeSingle();
 
     if (sub && sub.status !== 'inactive') {
-      logStep("Found subscription in database", { 
-        status: sub.status, 
-        planId: sub.plan_id 
-      });
+      logStep("Found subscription in database", { status: sub.status, planId: sub.plan_id });
       
-      // Determine if still subscribed (active, trialing, or canceled but in period)
       const isActive = sub.status === 'active' || sub.status === 'trialing';
       const periodEnd = sub.current_period_end ? new Date(sub.current_period_end) : null;
       const isStillInPeriod = periodEnd && periodEnd > new Date();
@@ -103,18 +92,13 @@ serve(async (req) => {
       });
     }
 
-    // FALLBACK: Check Stripe directly (for users not yet in database)
     logStep("No subscription in database, checking Stripe as fallback");
     
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) {
       logStep("STRIPE_SECRET_KEY not set, returning unsubscribed");
       return new Response(JSON.stringify({ 
-        subscribed: false,
-        productId: null,
-        subscriptionEnd: null,
-        isTrialing: false,
-        trialEnd: null
+        subscribed: false, productId: null, subscriptionEnd: null, isTrialing: false, trialEnd: null
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -127,11 +111,7 @@ serve(async (req) => {
     if (customers.data.length === 0) {
       logStep("No Stripe customer found, returning unsubscribed");
       return new Response(JSON.stringify({ 
-        subscribed: false,
-        productId: null,
-        subscriptionEnd: null,
-        isTrialing: false,
-        trialEnd: null
+        subscribed: false, productId: null, subscriptionEnd: null, isTrialing: false, trialEnd: null
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -141,10 +121,7 @@ serve(async (req) => {
     const customerId = customers.data[0].id;
     logStep("Found Stripe customer", { customerId });
 
-    const subscriptions = await stripe.subscriptions.list({
-      customer: customerId,
-      limit: 10,
-    });
+    const subscriptions = await stripe.subscriptions.list({ customer: customerId, limit: 10 });
     
     const activeOrTrialingSub = subscriptions.data.find(
       sub => (sub.status === 'active' || sub.status === 'trialing') && !sub.cancel_at_period_end
@@ -174,7 +151,6 @@ serve(async (req) => {
         productId = typeof product === 'string' ? product : product?.id || null;
       }
 
-      // Sync to database for future lookups
       await supabaseClient.from("user_subscriptions").upsert({
         user_id: user.id,
         stripe_customer_id: customerId,
@@ -192,11 +168,7 @@ serve(async (req) => {
     }
 
     return new Response(JSON.stringify({
-      subscribed: hasActiveSub,
-      productId,
-      subscriptionEnd,
-      isTrialing,
-      trialEnd
+      subscribed: hasActiveSub, productId, subscriptionEnd, isTrialing, trialEnd
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
