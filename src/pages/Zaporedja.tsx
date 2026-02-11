@@ -100,7 +100,7 @@ export default function Zaporedja() {
   const handleSignOut = async () => {
     try {
       await signOut();
-      navigate("/login");
+      window.location.href = "/login";
     } catch (error) {
       console.error("Error in Zaporedja handleSignOut:", error);
       toast.error("Napaka pri odjavi");

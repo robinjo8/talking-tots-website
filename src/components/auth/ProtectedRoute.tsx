@@ -2,11 +2,11 @@
 import { ReactNode, useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user, isLoading } = useAuth();
   const location = useLocation();
-  
 
   // Show loading spinner while checking authentication
   if (isLoading) {
@@ -22,6 +22,12 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
 
   // Redirect to login if not authenticated
   if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // If email is not confirmed, sign out and redirect
+  if (!user.email_confirmed_at) {
+    supabase.auth.signOut();
     return <Navigate to="/login" replace />;
   }
 
