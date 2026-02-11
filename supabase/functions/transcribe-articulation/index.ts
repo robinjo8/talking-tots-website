@@ -10,7 +10,8 @@ const allowedOrigins = [
 
 function getCorsHeaders(req: Request) {
   const origin = req.headers.get("Origin") || "";
-  const allowOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+  const isAllowed = allowedOrigins.includes(origin) || (origin.startsWith("https://") && origin.endsWith(".lovable.app"));
+  const allowOrigin = isAllowed ? origin : allowedOrigins[0];
   return {
     "Access-Control-Allow-Origin": allowOrigin,
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
@@ -194,7 +195,9 @@ serve(async (req) => {
       wordIndex,
       letter,
       difficulty = "srednja",
-      logopedistId
+      logopedistId,
+      sessionId,
+      position
     } = await req.json();
 
     console.log(`Transcription request for word: ${targetWord}, letter: ${letter}, index: ${wordIndex}, session: ${sessionNumber}, difficulty: ${difficulty}, logopedistId: ${logopedistId || 'none'}`);
@@ -298,6 +301,37 @@ serve(async (req) => {
       }
     } else if (childId && userId && !matchResult.accepted) {
       console.log(`Recording not saved - word not accepted. Transcribed: "${transcribedText}", Target: "${targetWord}", Match type: ${matchResult.matchType}`);
+    }
+
+    // Insert word result into articulation_word_results table
+    if (sessionId) {
+      try {
+        const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+        const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+        const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
+        const { error: insertError } = await supabaseAdmin
+          .from('articulation_word_results')
+          .insert({
+            session_id: sessionId,
+            letter: letter || 'X',
+            position: position || 'začetek',
+            target_word: targetWord,
+            transcribed_text: transcribedText,
+            audio_url: storagePath || '',
+            ai_accepted: matchResult.accepted,
+            ai_confidence: matchResult.confidence,
+            ai_match_type: matchResult.matchType,
+          });
+
+        if (insertError) {
+          console.error('Error inserting word result:', insertError);
+        } else {
+          console.log('Word result saved to database for session:', sessionId);
+        }
+      } catch (dbError) {
+        console.error('Database error saving word result:', dbError);
+      }
     }
 
     return new Response(

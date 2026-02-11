@@ -141,31 +141,40 @@ export function SimpleChildForm({ onSuccess, onCancel }: SimpleChildFormProps) {
             </Popover>
           </div>
 
-          {/* Mobile: Dialog */}
+          {/* Mobile: Native date input for reliability on iOS */}
           <div className="md:hidden">
-            <Button
-              variant="outline"
-              onClick={() => setDialogOpen(true)}
-              className={cn(
-                "w-full justify-start text-left font-normal",
-                !birthDate && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {birthDate ? format(birthDate, "dd.MM.yyyy") : "Izberite datum rojstva"}
-            </Button>
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <DialogContent className="w-auto max-w-[320px] p-4">
-                <DialogHeader>
-                  <DialogTitle className="text-center text-lg">
-                    Izberite datum rojstva
-                  </DialogTitle>
-                </DialogHeader>
-                <div className="flex justify-center pt-2">
-                  {CalendarContent}
-                </div>
-              </DialogContent>
-            </Dialog>
+            <div className="relative">
+              <Button
+                variant="outline"
+                type="button"
+                className={cn(
+                  "w-full justify-start text-left font-normal",
+                  !birthDate && "text-muted-foreground"
+                )}
+                onClick={() => {
+                  const input = document.getElementById('mobile-birth-date') as HTMLInputElement;
+                  input?.showPicker?.();
+                  input?.focus();
+                }}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {birthDate ? format(birthDate, "dd.MM.yyyy") : "Izberite datum rojstva"}
+              </Button>
+              <input
+                id="mobile-birth-date"
+                type="date"
+                max={new Date().toISOString().split('T')[0]}
+                min="1950-01-01"
+                value={birthDate ? birthDate.toISOString().split('T')[0] : ''}
+                onChange={(e) => {
+                  if (e.target.value) {
+                    setBirthDate(new Date(e.target.value + 'T00:00:00'));
+                  }
+                }}
+                className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+                style={{ WebkitAppearance: 'none' }}
+              />
+            </div>
           </div>
         </div>
 
