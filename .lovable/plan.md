@@ -1,135 +1,115 @@
 
 
-# Celostna analiza: Lea Erzar + pregled funkcionalnosti
+# Analiza in popravki: Registracija, prijava z Google, odjava
 
 ---
 
-## 1. UPORABNICA LEA ERZAR (lea.erzar@gmail.com)
+## UGOTOVITVE
 
-### 1.1 Registracija in narocnina
-- **Registracija:** 10. feb 2026, 21:22 -- OK
-- **Profil:** Ime "Lea Erzar" -- OK
-- **Narocnina:** Pro plan, status `active`, Stripe subscription `sub_1SzORfGncjlOci0kDNHSENMM`
-- **Stripe produkt:** `prod_TwXXpvPhSYVzvN` -- pravilno ustreza TomiTalk Pro v `pricing.ts`
-- **Plan ID:** `pro` -- pravilno preneseno iz Stripe
+### 1. Google prijava -- napaka "origin_mismatch" (Error 400)
+**Vzrok:** V Google Cloud Console imas v "Authorized JavaScript origins" napacen URL. Dodal si `https://preview--tomitalk.lovable.app`, kar je NAPACEN format.
 
-**OPOZORILO:** `current_period_end` je `2026-02-10 21:26:11` (samo 1 minuto po zacetku). To je verjetno testna narocnina v Stripe. Kljub temu frontend v `useSubscription.ts` preverja `status === 'active'`, kar vrne `true`, zato dodajanje otroka deluje. Toda ta narocnina bo v Stripeu morda kmalu potekla in webhook bo spremenil status -- takrat bo uporabnica izgubila dostop.
+Pravilni URL-ji, ki morajo biti v Google Console:
+- `https://tomitalk.lovable.app` (produkcija)
+- `https://tomitalk.si` (custom domena, ce jo imas)
+- `https://id-preview--dc6f3012-b411-4c62-93c0-292d63747df0.lovable.app` (preview za razvoj)
 
-### 1.2 Dodajanje otroka
-- **Otrok:** "Namišljeno Dete" uspesno dodan 10. feb ob 21:28 -- OK
-- **Dokumenti:** Vprasalnik samodejno naložen v Storage -- OK
-- **Govorne tezave:** `["not_sure"]` -- OK
-- **Razvojni podatki:** Pravilno shranjeni (chewing_blowing, ear_infections, itd.) -- OK
+**To NI popravek v kodi** -- to moras sam dodati v Google Cloud Console > API Credentials > OAuth 2.0 Client ID > Authorized JavaScript origins.
 
-### 1.3 Zakaj ni delalo na telefonu?
-**Vzrok NI povezan z varnostnimi spremembami.** RLS politike na tabeli `children` za starše (`children_insert_own`, `children_select_own`) niso bile spremenjene -- spremenjena je bila samo `children_logopedist_view` politika, ki vpliva le na logopede.
+### 2. Google registracija -- pravilno delovanje
+Ko se uporabnik registrira z Google racunom, Supabase avtomatsko potrdi email (ker ga je Google ze verificiral). Uporabnik `qjavec@gmail.com` ima `email_confirmed_at` nastavljen na isti cas kot `created_at`. To je pravilno -- Google uporabniki NE potrebujejo potrditvenega emaila.
 
-**Najverjetnejsi vzrok je mobilni UI:** Komponenta `SimpleChildForm` uporablja `Dialog` za izbiro datuma na mobilnih napravah (`md:hidden`). Znani problemi:
-- Radix UI Dialog na iOS Safari ima obcasne tezave z dotiki in fokusom
-- Calendar komponenta znotraj Dialoga se lahko ne odziva pravilno na manjsih zaslonih
-- Gumb "Nadaljuj" je mogoc neaktiven, ker `birthDate` ni bil pravilno nastavljen
+Trenutna koda v `Register.tsx` po uspesni Google registraciji takoj preusmeri na `/` (domov). To je OK za Google uporabnike, ker je email ze potrjen.
 
-**Priporocilo:** Testirati mobilni tok dodajanja otroka na razlicnih napravah in preveriti, ali se datum pravilno nastavi v Dialog komponenti.
+### 3. Email registracija -- problem z Lea Erzar
+Lea se je registrirala z emailom in geslom (provider: `email`). Registracija je bila ob 21:22:49, potrditev ob 21:23:31 (42 sekund pozneje).
+
+**Problem v kodi** (`Register.tsx`, vrstice 97-101): Ce Supabase vrne `data.session` skupaj z `data.user`, koda preusmeri na `/` in uporabnik je takoj vpisan -- BREZ potrditve emaila. To se zgodi, ce Supabase vkljuci sejo pred potrditvijo.
+
+**Popravek:** Po email registraciji VEDNO preusmeriti na `/login` s sporocilom "Potrdite email" -- nikoli ne pustiti neposredne prijave. Sejo je treba uniciti, da se prepreci dostop brez potrditve.
+
+### 4. Gumb "Odjava" ne deluje na telefonu (PWA)
+Funkcija `signOut()` v `AuthContext.tsx` deluje pravilno na namizju. Na mobilni PWA je mozna tezava s tem, da se stanje ne pocisti pravilno v service workerju/cache-u. Gumb sam po sebi klice `signOut()` in nato `navigate("/login")` -- ce `signOut()` traja predolgo ali pa se PWA ne posodobi, uporabnik morda ne vidi spremembe, dokler ne zapre in znova odpre aplikacijo.
+
+**Popravek:** Dodati `window.location.href = "/login"` namesto `navigate("/login")` za polni page reload, ki pocisti tudi PWA cache.
+
+### 5. Dodajanje otroka -- napaka za Lea
+Lea je imela napako pri dodajanju otroka PRED potrditvijo emaila. To je verjetno posledica tega, da `handle_new_user` trigger v bazi ni uspesno ustvaril profila (ker email se ni bil potrjen), ali pa je bil `children` INSERT zavrnjen, ker profil se ni obstajal.
+
+Po potrditvi emaila je trigger ustvaril profil in dodajanje je delovalo. **Resitev:** Ce zagotovimo, da uporabnik ne more dostopati do aplikacije brez potrjenega emaila, se ta problem samodejno resi.
 
 ---
 
-## 2. VIDNOST OTROKA NA ADMIN PORTALU
+## PLAN POPRAVKOV
 
-### Trenutno stanje
-Admin politika `children_restricted_admin_access` (cmd: ALL) preverja:
+### Popravek 1: Register.tsx -- vedno zahtevaj potrditev emaila
+Po email registraciji vedno uniciti sejo in preusmeriti na `/login`:
+
+```text
+// Po signUp, ne glede na to ali je session vrnjen:
+if (data.user) {
+  // Ce je Supabase vrnil sejo, jo unicimo
+  await supabase.auth.signOut();
+  toast.success("Preverite e-postni nabiralnik za potrditev racuna.");
+  navigate("/login");
+}
 ```
-(auth.uid() = parent_id) OR has_admin_role('super_admin')
+
+Google registracija ostane nespremenjena -- takoj preusmeri na `/`.
+
+### Popravek 2: ProtectedRoute -- preveri potrditev emaila
+Dodati preverjanje `user.email_confirmed_at`:
+
+```text
+// Ce email ni potrjen, preusmeri na login
+if (user && !user.email_confirmed_at) {
+  await supabase.auth.signOut();
+  return <Navigate to="/login" replace />;
+}
 ```
-in `children_support_admin_view` (SELECT) preverja `has_admin_role('support_admin')`.
 
-**Rezultat:** Super admin in support admin lahko vidita Leinega otroka na admin portalu. To deluje pravilno.
+### Popravek 3: Odjava na mobilni PWA
+V vseh komponentah, ki klicejo `signOut()`, zamenjati `navigate("/login")` z `window.location.href = "/login"` za polni reload:
 
-### TomiTalk logopedinje (Robert, Ema, Spela)
-Popravljena politika `children_logopedist_view` zahteva, da ima otrok test sejo (`articulation_test_sessions`) z ustreznim statusom. **Lea se ni naredila testa**, zato logopedinje NE vidijo njenega otroka -- kar je pravilno vedenje. Ko bo Lea naredila test, bodo interni logopedi videli njenega otroka.
+Datoteke:
+- `src/pages/MojaStran.tsx`
+- `src/pages/DrsnaSestavljanka.tsx`
+- `src/pages/Zaporedja.tsx`
+- Vse ostale strani z `handleSignOut`
 
----
+### Popravek 4: Login.tsx -- dodati sporocilo za nepotrjen email
+Ce uporabnik poskusi prijavo z nepotrjenim emailom, Supabase vrne napako. Dodati jasno sporocilo:
 
-## 3. PREVERJANJE IZGOVORJAVE (Articulation Test)
-
-### 3.1 Tok delovanja
-1. Stars posname besedo (audio)
-2. `useTranscription` hook poslje audio na Edge funkcijo `transcribe-articulation`
-3. Funkcija poslje audio na OpenAI Whisper API za transkripcijo
-4. Funkcija primerja transkripcijo s ciljno besedo
-5. Ce je beseda sprejeta, se posnetek shrani v Supabase Storage
-6. Rezultat se vrne v frontend
-
-### 3.2 Shranjevanje rezultatov
-**OPAZKA:** Edge funkcija `transcribe-articulation` NE shranjuje rezultatov v tabelo `articulation_word_results`. Ta tabela se polni le iz seed podatkov. To pomeni:
-- **Logopedinje NE vidijo posameznih besednih rezultatov za realne uporabnike**
-- Avdio posnetki SE shranjujejo v Storage (ce je beseda sprejeta)
-- Seje se ustvarijo, ampak `current_word_index` ostane na 0
-
-**To je potencialna tezava** -- ce logopedinja odpre sejo za pregled, ne bo videla posameznih besed s posnetki v podatkovni bazi. Mora pregledovati posnetke neposredno v Storage.
-
-### 3.3 CORS
-Edge funkcija `transcribe-articulation` dopusca `tomitalk.com`, `www.tomitalk.com`, `tomitalk.lovable.app`. Za produkcijsko uporabo je to pravilno. **Za testiranje prek Lovable preview URL-ja pa ne bo delalo** -- to je treba upostevati pri razvoju.
-
----
-
-## 4. OŠ TEST -- LOGOPEDIST JANEZ NOVAK
-
-### 4.1 Stanje
-- **Profil:** Janez Novak, organizacija "OS Test" (tip: school), verificiran
-- **Otroci:** 7 otrok (1 aktiven: "Tian", 6 neaktivnih testnih)
-- **Licenca:** Aktivna organizacijska licenca za OS Test
-- **Test seje:** 1 seja (`d4bb9391`) -- status `in_review`, `is_completed: true`, `total_words: 3`
-- **Besedni rezultati:** 0 -- enako kot pri starsih, funkcija ne shranjuje v DB
-
-### 4.2 Dodajanje otrok
-RLS politika `Logopedists can insert own children` preverja:
+```text
+if (error.message.includes("Email not confirmed")) {
+  setError("Prosimo, najprej potrdite vas email.");
+}
 ```
-logopedist_id IN (SELECT id FROM logopedist_profiles WHERE user_id = auth.uid())
-```
-**To deluje pravilno.** Janez lahko dodaja, ureja in brise svoje otroke.
-
-### 4.3 Porocila
-Janez ima 1 porocilo (id: `6b179209`) s statusom `submitted`, brez `session_id`. To pomeni da je porocilo ustvarjeno rocno, ne vezano na sejo. **Porocila delujejo.**
-
-### 4.4 Progress tabela
-RLS politike za logopede na tabeli `progress` zahtevajo `logopedist_child_id IS NOT NULL`. To je pravilno in logopedisti lahko upravljajo napredek svojih otrok.
 
 ---
 
-## 5. KRITICNE UGOTOVITVE IN PRIPOROCILA
+## KAJ MORAS TI NAREDITI (v Google Cloud Console)
 
-### 5.1 VISOKA PRIORITETA: Manjka shranjevanje besednih rezultatov v DB
-`transcribe-articulation` funkcija ne zapisuje v `articulation_word_results`. Logopedinje zato ne morejo pregledovati posameznih besed prek admin portala. Potrebna je dopolnitev funkcije, da po transkripciji vstavi zapis v tabelo.
-
-### 5.2 SREDNJA PRIORITETA: Mobilni UI za dodajanje otroka
-Calendar Dialog na mobilnih napravah (iOS Safari) ima obcasne tezave. Resitev: testirati in po potrebi zamenjati z nativnim `<input type="date">` ali popraviti Dialog interakcijo.
-
-### 5.3 SREDNJA PRIORITETA: Preview URL ni v CORS allowlist
-Med razvojem Edge funkcije ne delujejo iz Lovable preview URL-ja. Dodati `id-preview--*.lovable.app` vzorec ali tocen preview URL v CORS seznam za razvoj.
-
-### 5.4 NIZKA PRIORITETA: Lea-ina narocnina s kratkim periodom
-`current_period_end` je le 1 minuto po zacetku. Preveriti v Stripe, ali je narocnina pravilno aktivna in ali bo webhook pravilno posodobil status ob obnovi.
+1. Pojdi na https://console.cloud.google.com/ > APIs & Services > Credentials
+2. Klikni na tvoj OAuth 2.0 Client ID (481391137719-...)
+3. V "Authorized JavaScript origins" dodaj:
+   - `https://tomitalk.lovable.app`
+   - `https://id-preview--dc6f3012-b411-4c62-93c0-292d63747df0.lovable.app`
+   - `https://tomitalk.si` (ce uporabljas custom domeno)
+4. ODSTRANI napacni URL `https://preview--tomitalk.lovable.app`
+5. Shrani in pocakaj 5-10 minut da se spremembe uveljavijo
 
 ---
 
-## 6. POVZETEK
+## POVZETEK SPREMEMB
 
-| Funkcionalnost | Status | Komentar |
-|----------------|--------|----------|
-| Registracija + narocnina Lea | OK | Stripe pravilno sinhroniziran |
-| Dodajanje otroka (desktop) | OK | Deluje pravilno |
-| Dodajanje otroka (mobil) | TEZAVA | UI tezava s Calendar Dialog |
-| Otrok viden na admin portalu | OK | Super admin vidi, logopedi po testu |
-| Preverjanje izgovorjave (snemanje) | DELNO | Audio se shrani, DB zapis manjka |
-| OŠ Test -- dodajanje otrok | OK | RLS pravilno nastavljene |
-| OŠ Test -- pregledi in porocila | OK | Deluje pravilno |
-| OŠ Test -- upravljanje napredka | OK | RLS pravilno omejene |
-| CORS za produkcijo | OK | Pravilne domene |
-| CORS za razvoj (preview) | NE DELUJE | Preview URL ni v allowlist |
-
-### Predlagani popravki (po prioriteti):
-1. **Dodati shranjevanje besednih rezultatov** v `articulation_word_results` znotraj `transcribe-articulation` funkcije
-2. **Popraviti mobilni Calendar Dialog** za zanesljivo delovanje na iOS
-3. **Dodati preview URL v CORS** za cas razvoja (z moznostjo odstranitve pred produkcijo)
-4. **Preveriti Lea-ino Stripe narocnino** za pravilnost periodov
+| Datoteka | Sprememba |
+|----------|-----------|
+| `src/pages/Register.tsx` | Po email registraciji vedno signOut + redirect na login |
+| `src/components/auth/ProtectedRoute.tsx` | Preveri email_confirmed_at |
+| `src/pages/Login.tsx` | Dodaj sporocilo za nepotrjen email |
+| `src/pages/MojaStran.tsx` | window.location.href namesto navigate za logout |
+| `src/pages/DrsnaSestavljanka.tsx` | Enako kot zgoraj |
+| `src/pages/Zaporedja.tsx` | Enako kot zgoraj |
+| Google Cloud Console (rocno) | Popraviti Authorized JavaScript origins |
 
