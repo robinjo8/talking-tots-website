@@ -110,9 +110,13 @@ export default function Login() {
       navigate("/");
     } catch (error: any) {
       console.error("Napaka pri prijavi:", error);
-      setError(error.message === "Invalid login credentials" 
-        ? "Napačna e-pošta ali geslo." 
-        : "Prišlo je do napake pri prijavi. Poskusite znova.");
+      if (error.message === "Invalid login credentials") {
+        setError("Napačna e-pošta ali geslo.");
+      } else if (error.message?.includes("Email not confirmed")) {
+        setError("Prosimo, najprej potrdite vaš e-poštni naslov. Preverite svoj e-poštni nabiralnik.");
+      } else {
+        setError("Prišlo je do napake pri prijavi. Poskusite znova.");
+      }
     } finally {
       setIsLoading(false);
     }

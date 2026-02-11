@@ -22,7 +22,7 @@ const GovornojezicovneVaje = () => {
   const handleSignOut = async () => {
     try {
       await signOut();
-      navigate("/login");
+      window.location.href = "/login";
     } catch (error) {
       console.error("Error in GovornojezicovneVaje handleSignOut:", error);
       toast.error("Napaka pri odjavi");

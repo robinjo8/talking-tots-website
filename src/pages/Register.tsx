@@ -94,14 +94,11 @@ export default function Register() {
         return;
       }
       
-      if (data.user && data.session) {
+      if (data.user) {
+        // Always sign out after email registration - user must confirm email first
+        await supabase.auth.signOut();
         toast.success("Registracija uspešna!", {
-          description: "Dobrodošli v TomiTalk!",
-        });
-        navigate("/");
-      } else if (data.user && !data.session) {
-        toast.success("Registracija uspešna!", {
-          description: "Preverite svoj e-poštni nabiralnik za potrditev.",
+          description: "Preverite svoj e-poštni nabiralnik za potrditev računa.",
         });
         navigate("/login");
       }

@@ -67,7 +67,7 @@ export default function Header() {
   };
   const handleSignOut = async () => {
     await signOut();
-    navigate("/login");
+    window.location.href = "/login";
   };
   
   return (

@@ -17,7 +17,7 @@ export function UserProfile() {
 
   const handleSignOut = async () => {
     await signOut();
-    navigate("/login");
+    window.location.href = "/login";
   };
 
 

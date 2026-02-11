@@ -103,7 +103,7 @@ export default function PonoviPoved() {
   const handleSignOut = async () => {
     try {
       await signOut();
-      navigate("/login");
+      window.location.href = "/login";
     } catch (error) {
       console.error("Error in PonoviPoved handleSignOut:", error);
       toast.error("Napaka pri odjavi");
