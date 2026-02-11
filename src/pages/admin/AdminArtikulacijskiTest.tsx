@@ -210,7 +210,8 @@ export default function AdminArtikulacijskiTest() {
     difficulty, 
     handleSaveProgress, 
     profile?.id, 
-    testMaxWords
+    testMaxWords,
+    sessionInfo?.sessionId
   );
 
   // Check for saved progress from database on mount

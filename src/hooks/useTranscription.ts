@@ -23,7 +23,9 @@ export const useTranscription = () => {
     wordIndex?: number,
     letter?: string,
     difficulty?: string,
-    logopedistId?: string  // For logopedist-managed children storage path
+    logopedistId?: string,
+    sessionId?: string,
+    position?: string
   ): Promise<TranscriptionResult | null> => {
     setIsTranscribing(true);
     setError(null);
@@ -47,7 +49,9 @@ export const useTranscription = () => {
             wordIndex,
             letter,
             difficulty,
-            logopedistId,  // Pass logopedist ID for new storage path
+            logopedistId,
+            sessionId,
+            position,
           },
         }
       );

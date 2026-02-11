@@ -204,7 +204,10 @@ const ArtikuacijskiTest = () => {
     sessionInfo?.sessionNumber, 
     effectiveStartIndex, 
     difficulty, 
-    handleSaveProgress
+    handleSaveProgress,
+    undefined,
+    undefined,
+    sessionInfo?.sessionId
   );
 
   // Check for existing session on mount (using database, not localStorage)
