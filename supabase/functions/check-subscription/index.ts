@@ -152,11 +152,20 @@ serve(async (req) => {
         productId = typeof product === 'string' ? product : product?.id || null;
       }
 
+      // Map product ID to plan ID
+      const productToPlan: Record<string, string> = {
+        'prod_TuvCF2Vlvmvp3M': 'start',
+        'prod_TmbZ19RhCaSzrp': 'pro',
+        'prod_TwXXpvPhSYVzvN': 'pro'
+      };
+      const planId = productId ? (productToPlan[productId] || null) : null;
+
       await supabaseClient.from("user_subscriptions").upsert({
         user_id: user.id,
         stripe_customer_id: customerId,
         stripe_subscription_id: subscription.id,
         stripe_product_id: productId,
+        plan_id: planId,
         status: subscription.status,
         current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
         current_period_end: subscriptionEnd,
@@ -164,6 +173,8 @@ serve(async (req) => {
         cancel_at_period_end: subscription.cancel_at_period_end,
         updated_at: new Date().toISOString()
       }, { onConflict: "user_id" });
+      
+      logStep("Synced with plan_id", { planId, productId });
       
       logStep("Synced Stripe subscription to database");
     }
