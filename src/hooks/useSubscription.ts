@@ -102,9 +102,53 @@ export function useSubscription() {
       // Mark as checked for this user
       lastCheckedUserIdRef.current = user.id;
 
-      // No subscription record or inactive/canceled
+      // No subscription record or inactive -- try Stripe fallback
       if (!sub || sub.status === 'inactive') {
-        console.log('No active subscription found in database');
+        console.log('No active subscription in DB, trying check-subscription fallback');
+        
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session?.access_token) {
+            const { data: checkData, error: checkError } = await supabase.functions.invoke('check-subscription', {
+              headers: { Authorization: `Bearer ${session.access_token}` },
+            });
+            
+            if (!checkError && checkData?.subscribed) {
+              console.log('Stripe fallback found active subscription, re-reading DB');
+              // check-subscription already synced to DB, re-read
+              const { data: refreshedSub } = await supabase
+                .from('user_subscriptions')
+                .select('*')
+                .eq('user_id', user.id)
+                .maybeSingle();
+              
+              if (refreshedSub && refreshedSub.status !== 'inactive') {
+                const isActive = refreshedSub.status === 'active' || refreshedSub.status === 'trialing';
+                const isCanceled = refreshedSub.status === 'canceled' || refreshedSub.cancel_at_period_end;
+                const periodEnd = refreshedSub.current_period_end ? new Date(refreshedSub.current_period_end) : null;
+                const isStillInPeriod = periodEnd && periodEnd > new Date();
+                
+                lastCheckedUserIdRef.current = user.id;
+                setSubscription({
+                  isSubscribed: isActive || (isCanceled && !!isStillInPeriod),
+                  planId: (refreshedSub.plan_id as PlanId) || null,
+                  productId: refreshedSub.stripe_product_id || null,
+                  subscriptionEnd: refreshedSub.current_period_end || null,
+                  isLoading: false,
+                  isTrialing: refreshedSub.status === 'trialing',
+                  trialEnd: refreshedSub.trial_end || null,
+                });
+                isCheckingRef.current = false;
+                return;
+              }
+            }
+          }
+        } catch (fallbackError) {
+          console.error('Stripe fallback check failed:', fallbackError);
+        }
+        
+        console.log('No active subscription found (DB + Stripe fallback)');
+        lastCheckedUserIdRef.current = user.id;
         setSubscription({ ...defaultState, isLoading: false });
         isCheckingRef.current = false;
         return;

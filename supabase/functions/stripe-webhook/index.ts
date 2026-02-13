@@ -154,14 +154,28 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   
   const customerId = subscription.customer as string;
   
-  // 1. Try to find user by stripe_customer_id
-  const { data: existingRecord } = await supabase
+  // 1. Try to find user by stripe_customer_id (use order+limit to handle duplicates)
+  const { data: existingRecords } = await supabase
     .from("user_subscriptions")
     .select("user_id")
     .eq("stripe_customer_id", customerId)
-    .maybeSingle();
+    .order("created_at", { ascending: false })
+    .limit(10);
 
-  let targetUserId = existingRecord?.user_id;
+  // Filter to only users that still exist in auth.users
+  let targetUserId: string | null = null;
+  if (existingRecords && existingRecords.length > 0) {
+    for (const record of existingRecords) {
+      const { data: authUser } = await supabase.auth.admin.getUserById(record.user_id);
+      if (authUser?.user) {
+        targetUserId = record.user_id;
+        logStep("Found valid user by stripe_customer_id", { userId: targetUserId });
+        break;
+      } else {
+        logStep("Skipping orphaned record", { userId: record.user_id });
+      }
+    }
+  }
 
   // 2. Fallback: find user by Stripe customer email
   if (!targetUserId) {

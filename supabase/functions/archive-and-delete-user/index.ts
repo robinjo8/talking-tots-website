@@ -308,6 +308,18 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Delete user_subscriptions record to prevent orphaned records
+    const { error: subDeleteError } = await adminClient
+      .from("user_subscriptions")
+      .delete()
+      .eq("user_id", targetUserId);
+
+    if (subDeleteError) {
+      console.error("Failed to delete user subscription:", subDeleteError);
+    } else {
+      console.log("Deleted user_subscriptions record for user:", targetUserId);
+    }
+
     const { error: deleteError } = await adminClient.auth.admin.deleteUser(targetUserId);
 
     if (deleteError) {
