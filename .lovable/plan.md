@@ -1,115 +1,105 @@
 
 
-# Analiza in popravki: Registracija, prijava z Google, odjava
+# Natancna analiza in plan popravkov: Narocnina qjavec@gmail.com
 
 ---
 
-## UGOTOVITVE
+## TOCEN VZROK NAPAKE
 
-### 1. Google prijava -- napaka "origin_mismatch" (Error 400)
-**Vzrok:** V Google Cloud Console imas v "Authorized JavaScript origins" napacen URL. Dodal si `https://preview--tomitalk.lovable.app`, kar je NAPACEN format.
-
-Pravilni URL-ji, ki morajo biti v Google Console:
-- `https://tomitalk.lovable.app` (produkcija)
-- `https://tomitalk.si` (custom domena, ce jo imas)
-- `https://id-preview--dc6f3012-b411-4c62-93c0-292d63747df0.lovable.app` (preview za razvoj)
-
-**To NI popravek v kodi** -- to moras sam dodati v Google Cloud Console > API Credentials > OAuth 2.0 Client ID > Authorized JavaScript origins.
-
-### 2. Google registracija -- pravilno delovanje
-Ko se uporabnik registrira z Google racunom, Supabase avtomatsko potrdi email (ker ga je Google ze verificiral). Uporabnik `qjavec@gmail.com` ima `email_confirmed_at` nastavljen na isti cas kot `created_at`. To je pravilno -- Google uporabniki NE potrebujejo potrditvenega emaila.
-
-Trenutna koda v `Register.tsx` po uspesni Google registraciji takoj preusmeri na `/` (domov). To je OK za Google uporabnike, ker je email ze potrjen.
-
-### 3. Email registracija -- problem z Lea Erzar
-Lea se je registrirala z emailom in geslom (provider: `email`). Registracija je bila ob 21:22:49, potrditev ob 21:23:31 (42 sekund pozneje).
-
-**Problem v kodi** (`Register.tsx`, vrstice 97-101): Ce Supabase vrne `data.session` skupaj z `data.user`, koda preusmeri na `/` in uporabnik je takoj vpisan -- BREZ potrditve emaila. To se zgodi, ce Supabase vkljuci sejo pred potrditvijo.
-
-**Popravek:** Po email registraciji VEDNO preusmeriti na `/login` s sporocilom "Potrdite email" -- nikoli ne pustiti neposredne prijave. Sejo je treba uniciti, da se prepreci dostop brez potrditve.
-
-### 4. Gumb "Odjava" ne deluje na telefonu (PWA)
-Funkcija `signOut()` v `AuthContext.tsx` deluje pravilno na namizju. Na mobilni PWA je mozna tezava s tem, da se stanje ne pocisti pravilno v service workerju/cache-u. Gumb sam po sebi klice `signOut()` in nato `navigate("/login")` -- ce `signOut()` traja predolgo ali pa se PWA ne posodobi, uporabnik morda ne vidi spremembe, dokler ne zapre in znova odpre aplikacijo.
-
-**Popravek:** Dodati `window.location.href = "/login"` namesto `navigate("/login")` za polni page reload, ki pocisti tudi PWA cache.
-
-### 5. Dodajanje otroka -- napaka za Lea
-Lea je imela napako pri dodajanju otroka PRED potrditvijo emaila. To je verjetno posledica tega, da `handle_new_user` trigger v bazi ni uspesno ustvaril profila (ker email se ni bil potrjen), ali pa je bil `children` INSERT zavrnjen, ker profil se ni obstajal.
-
-Po potrditvi emaila je trigger ustvaril profil in dodajanje je delovalo. **Resitev:** Ce zagotovimo, da uporabnik ne more dostopati do aplikacije brez potrjenega emaila, se ta problem samodejno resi.
-
----
-
-## PLAN POPRAVKOV
-
-### Popravek 1: Register.tsx -- vedno zahtevaj potrditev emaila
-Po email registraciji vedno uniciti sejo in preusmeriti na `/login`:
+V bazi so **3 zapisi** z istim `stripe_customer_id = cus_TrVP7tYQusDxUE`:
 
 ```text
-// Po signUp, ne glede na to ali je session vrnjen:
-if (data.user) {
-  // Ce je Supabase vrnil sejo, jo unicimo
-  await supabase.auth.signOut();
-  toast.success("Preverite e-postni nabiralnik za potrditev racuna.");
-  navigate("/login");
-}
+| user_id    | status   | updated_at          | Uporabnik          |
+|------------|----------|---------------------|--------------------|
+| 1c0fd1e1   | active   | 2026-02-12 09:19    | TRENUTNI (rocni fix)|
+| b204074c   | inactive | 2026-02-11 07:58    | IZBRISAN           |
+| 563aec50   | inactive | 2026-02-11 07:58    | IZBRISAN           |
 ```
 
-Google registracija ostane nespremenjena -- takoj preusmeri na `/`.
+Oba izbrisana uporabnika (`b204074c`, `563aec50`) NE obstajata vec v `auth.users` -- potrjeno s poizvedbo. Funkcija `archive-and-delete-user` NE brise zapisov iz `user_subscriptions`.
 
-### Popravek 2: ProtectedRoute -- preveri potrditev emaila
-Dodati preverjanje `user.email_confirmed_at`:
+### Kako to povzroci napako
 
+Ko Stripe poslje webhook `customer.subscription.created` po nakupu:
+
+1. `handleSubscriptionUpdate` poisce uporabnika po `stripe_customer_id`:
 ```text
-// Ce email ni potrjen, preusmeri na login
-if (user && !user.email_confirmed_at) {
-  await supabase.auth.signOut();
-  return <Navigate to="/login" replace />;
-}
+.eq("stripe_customer_id", customerId).maybeSingle()
 ```
+2. `stripe_customer_id` NIMA unique constrainta -- ima navaden indeks
+3. `.maybeSingle()` najde **3 vrstice** in vrne napako (PGRST116: "multiple rows returned")
+4. `data` je `null`, `targetUserId` je `null`
+5. Fallback `findUserIdByCustomerId` najde uporabnika po emailu
+6. Upsert se izvede po `user_id` -- to bi MORALO delovati...
 
-### Popravek 3: Odjava na mobilni PWA
-V vseh komponentah, ki klicejo `signOut()`, zamenjati `navigate("/login")` z `window.location.href = "/login"` za polni reload:
+**AMPAK**: ce je `.maybeSingle()` napaka povzrocila izjemo v Supabase klientu (odvisno od verzije), bi lahko celoten `handleSubscriptionUpdate` padel pred fallbackom. To razlozzi, zakaj `updated_at` za trenutnega uporabnika ostane na `2026-02-11 12:58` (cas `create-checkout`) in se NIKOLI ne posodobi na ~13:59 (cas nakupa).
 
-Datoteke:
-- `src/pages/MojaStran.tsx`
-- `src/pages/DrsnaSestavljanka.tsx`
-- `src/pages/Zaporedja.tsx`
-- Vse ostale strani z `handleSignOut`
+### Zakaj tudi PaymentSuccess ni popravil
 
-### Popravek 4: Login.tsx -- dodati sporocilo za nepotrjen email
-Ce uporabnik poskusi prijavo z nepotrjenim emailom, Supabase vrne napako. Dodati jasno sporocilo:
+`PaymentSuccess.tsx` poklice `check-subscription` po 1.5s zamiku. `check-subscription` najde v DB `status: inactive` za tega uporabnika, gre na Stripe fallback, najde aktivno narocnino, naredi upsert... **AMPAK**:
 
-```text
-if (error.message.includes("Email not confirmed")) {
-  setError("Prosimo, najprej potrdite vas email.");
-}
-```
+1. `check-subscription` v upsert NE nastavi `plan_id` -- nastavi samo `status`, `stripe_product_id` itd.
+2. `PaymentSuccess` NE poklice `refreshSubscription()` iz `SubscriptionContext`
+3. `useSubscription` hook ima cache (`lastCheckedUserIdRef`) -- ce je ze preveril za tega uporabnika, NE preveri znova
+4. Rezultat: tudi ce bi check-subscription posodobil bazo, useSubscription se vedno vraca staro stanje
 
 ---
 
-## KAJ MORAS TI NAREDITI (v Google Cloud Console)
+## PLAN POPRAVKOV (5 popravkov)
 
-1. Pojdi na https://console.cloud.google.com/ > APIs & Services > Credentials
-2. Klikni na tvoj OAuth 2.0 Client ID (481391137719-...)
-3. V "Authorized JavaScript origins" dodaj:
-   - `https://tomitalk.lovable.app`
-   - `https://id-preview--dc6f3012-b411-4c62-93c0-292d63747df0.lovable.app`
-   - `https://tomitalk.si` (ce uporabljas custom domeno)
-4. ODSTRANI napacni URL `https://preview--tomitalk.lovable.app`
-5. Shrani in pocakaj 5-10 minut da se spremembe uveljavijo
+### Popravek 1: Pocisti osirotele zapise v bazi (rocno, LIVE okolje)
+
+Zagnati v Supabase SQL Editor za LIVE okolje:
+```sql
+DELETE FROM user_subscriptions 
+WHERE user_id NOT IN (SELECT id FROM auth.users);
+```
+
+To bo izbrisalo 2 osirotela zapisa. Supabase ti bo pokazal opozorilo "destructive operation" -- to je normalno, potrdi izvajanje.
+
+### Popravek 2: archive-and-delete-user -- brisanje user_subscriptions
+
+Pred brisanjem auth uporabnika (vrstica 311) dodati brisanje zapisa iz `user_subscriptions`. To prepreci bodoce osirotele zapise.
+
+Datoteka: `supabase/functions/archive-and-delete-user/index.ts`
+
+### Popravek 3: stripe-webhook -- robustnejsa poizvedba
+
+Zamenjati `.maybeSingle()` z `.order('created_at', { ascending: false }).limit(1)` v `handleSubscriptionUpdate`. To vrne ZADNJI (najnovejsi) zapis namesto napake pri vec vrsticah. Dodatno: dodati preverjanje ali `user_id` obstaja v auth.users.
+
+Datoteka: `supabase/functions/stripe-webhook/index.ts`
+
+### Popravek 4: check-subscription -- dodati plan_id v upsert
+
+V Stripe fallback upsert (vrstica 155-166) dodati `plan_id` mapping iz `productId`. Uporabiti isto `productToPlan` mapo kot v webhook funkciji.
+
+Datoteka: `supabase/functions/check-subscription/index.ts`
+
+### Popravek 5: PaymentSuccess + useSubscription -- osvezevanje stanja
+
+**PaymentSuccess.tsx:**
+- Dodati `useSubscriptionContext()` in poklicati `refreshSubscription()` po uspesnem check-subscription
+- Dodati retry logiko (3 poskusi s 3s zamikom) ce check-subscription se ne najde narocnine
+
+**useSubscription.ts:**
+- Ko je DB status `inactive`, dodati fallback klic `check-subscription` Edge funkcije
+- Ce ta vrne `subscribed: true`, znova prebrati DB in posodobiti stanje
 
 ---
 
-## POVZETEK SPREMEMB
+## POVZETEK
 
 | Datoteka | Sprememba |
 |----------|-----------|
-| `src/pages/Register.tsx` | Po email registraciji vedno signOut + redirect na login |
-| `src/components/auth/ProtectedRoute.tsx` | Preveri email_confirmed_at |
-| `src/pages/Login.tsx` | Dodaj sporocilo za nepotrjen email |
-| `src/pages/MojaStran.tsx` | window.location.href namesto navigate za logout |
-| `src/pages/DrsnaSestavljanka.tsx` | Enako kot zgoraj |
-| `src/pages/Zaporedja.tsx` | Enako kot zgoraj |
-| Google Cloud Console (rocno) | Popraviti Authorized JavaScript origins |
+| SQL (rocno, LIVE) | Izbrisati osirotele zapise |
+| `supabase/functions/archive-and-delete-user/index.ts` | Dodati brisanje user_subscriptions |
+| `supabase/functions/stripe-webhook/index.ts` | .limit(1) namesto .maybeSingle() |
+| `supabase/functions/check-subscription/index.ts` | Dodati plan_id v Stripe fallback upsert |
+| `src/pages/PaymentSuccess.tsx` | refreshSubscription + retry |
+| `src/hooks/useSubscription.ts` | check-subscription fallback |
 
+Po teh popravkih:
+- Webhook bo deloval tudi ce so v bazi podvojeni customer ID-ji (robustnost)
+- Brisanje uporabnika ne bo vec pustilo osirotelih zapisov (preventiva)
+- Ce webhook odpove, bo frontend sam sinhroniziral stanje iz Stripe (varnostna mreza)
+- Po placilu se bo stanje takoj posodobilo (uporabniska izkusnja)
