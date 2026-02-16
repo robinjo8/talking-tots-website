@@ -1,80 +1,39 @@
 
-# Popravek: Neskoncna rekurzija v RLS politiki na logopedist_profiles
 
----
+# Plan: Izbris testnih uporabnikov iz baze
 
-## VZROK
+## Situacija
 
-Konzolni logi jasno kazejo napako:
+9 testnih uporabnikov (Nina Kovač, Eva Krajnc, Luka Zupan, Jan Potočnik, Nik Mlakar, Tim Kos, Zala Vidmar, Sara Golob, Ana Novak) obstaja samo v tabelah `profiles` in `children`. NE obstajajo v `auth.users` -- to so bili ročno vstavljeni testni podatki.
 
-```
-infinite recursion detected in policy for relation "logopedist_profiles"
-```
+Vsak ima enega otroka in 1 testno sejo v `articulation_test_sessions` (+ morebitne `articulation_word_results`).
 
-Ta napaka blokira **vse** operacije v aplikaciji za uporabnika kujavec.robert@gmail.com -- vkljucno z nalaganjem profila in dodajanjem otroka.
+## Kaj bo SQL migracija naredila
 
-### Problematicna RLS politika
+1. Izbrisala `articulation_word_results` za testne seje
+2. Izbrisala `articulation_test_sessions` za testne otroke
+3. Izbrisala `children` za testne starše
+4. Izbrisala `profiles` za testne starše
 
-Na tabeli `logopedist_profiles` obstaja politika "Org members can view org profiles":
+Vrstni red je pomemben zaradi tujih ključev (foreign keys).
 
-```sql
-organization_id IN (
-  SELECT lp.organization_id
-  FROM logopedist_profiles lp
-  WHERE lp.user_id = auth.uid()
-)
-```
+## Podatki za izbris
 
-Ta politika bere iz **iste tabele** (`logopedist_profiles`) znotraj RLS politike na `logopedist_profiles`. PostgreSQL mora za vsako vrstico preveriti RLS politike, kar povzroci neskoncno zanko.
+| Starš | ID | Otrok | Otrok ID |
+|-------|----|-------|----------|
+| Ana Novak | a1000000-...-000000000001 | Miha (4, M) | 8fd195da... |
+| Nina Kovač | a1000000-...-000000000003 | Žan (6, M) | 304c4a67... |
+| Eva Krajnc | a1000000-...-000000000004 | Tina (4, Ž) | 1be0ca99... |
+| Luka Zupan | a1000000-...-000000000005 | Filip (5, M) | 4930181c... |
+| Jan Potočnik | a1000000-...-000000000006 | Ema (6, Ž) | 0a9f5c8a... |
+| Nik Mlakar | a1000000-...-000000000007 | Jakob (4, M) | dfef9e48... |
+| Tim Kos | a1000000-...-000000000008 | Julija (5, Ž) | 689e79c1... |
+| Zala Vidmar | a1000000-...-000000000009 | Gašper (6, M) | 01fd5846... |
+| Sara Golob | a1000000-...-000000000010 | Pia (4, Ž) | 3df220d4... |
 
-### Zakaj vpliva na dodajanje otroka
+## Tehnični detajli
 
-`AuthContext.tsx` (vrstica 52-55) pri vsakem nalaganju profila naredi poizvedbo na `logopedist_profiles` da preveri ali je uporabnik logoped. Ce ta poizvedba odpove zaradi rekurzije, **celoten profil** ne nalozi -- brez profila pa aplikacija ne zazna narocnine in ne dovoli dodajanja otroka.
+Ena SQL migracija z DELETE stavki v pravilnem vrstnem redu (najprej word_results, nato sessions, children, profiles).
 
----
+Nobene spremembe v kodi -- samo brisanje testnih podatkov iz baze.
 
-## POPRAVEK
-
-### Korak 1: Zamenjaj rekurzivno politiko z varno verzijo
-
-Izbrisati problematicno politiko in jo zamenjati z novo, ki uporablja ze obstojeco `SECURITY DEFINER` funkcijo `get_user_organization_id()`. Ta funkcija obide RLS in prepreci rekurzijo.
-
-SQL migracija:
-
-```sql
--- Izbrisi problematicno politiko
-DROP POLICY IF EXISTS "Org members can view org profiles" 
-  ON public.logopedist_profiles;
-
--- Ustvari novo politiko z SECURITY DEFINER funkcijo
-CREATE POLICY "Org members can view org profiles" 
-  ON public.logopedist_profiles FOR SELECT
-  USING (
-    organization_id = get_user_organization_id(auth.uid())
-  );
-```
-
-Funkcija `get_user_organization_id` ze obstaja kot `SECURITY DEFINER` in naredi:
-```sql
-SELECT organization_id FROM public.logopedist_profiles 
-WHERE user_id = _user_id LIMIT 1
-```
-
-Ker je `SECURITY DEFINER`, obide RLS politike in ne povzroci rekurzije.
-
-### Kaj se spremeni v kodi
-
-Nicesar -- popravek je izkljucno v bazi podatkov (SQL migracija). Nobena datoteka v kodi se ne spreminja.
-
----
-
-## POVZETEK
-
-| Sprememba | Opis |
-|-----------|------|
-| SQL migracija | Zamenjava rekurzivne RLS politike z varno verzijo |
-
-Po tem popravku:
-- Profil se bo pravilno nalozil za vse uporabnike
-- Dodajanje otroka bo spet delovalo za kujavec.robert@gmail.com
-- Logopedi iz iste organizacije bodo se vedno videli profile drug drugega (enaka funkcionalnost, brez rekurzije)
