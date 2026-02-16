@@ -1,105 +1,80 @@
 
-
-# Natancna analiza in plan popravkov: Narocnina qjavec@gmail.com
-
----
-
-## TOCEN VZROK NAPAKE
-
-V bazi so **3 zapisi** z istim `stripe_customer_id = cus_TrVP7tYQusDxUE`:
-
-```text
-| user_id    | status   | updated_at          | Uporabnik          |
-|------------|----------|---------------------|--------------------|
-| 1c0fd1e1   | active   | 2026-02-12 09:19    | TRENUTNI (rocni fix)|
-| b204074c   | inactive | 2026-02-11 07:58    | IZBRISAN           |
-| 563aec50   | inactive | 2026-02-11 07:58    | IZBRISAN           |
-```
-
-Oba izbrisana uporabnika (`b204074c`, `563aec50`) NE obstajata vec v `auth.users` -- potrjeno s poizvedbo. Funkcija `archive-and-delete-user` NE brise zapisov iz `user_subscriptions`.
-
-### Kako to povzroci napako
-
-Ko Stripe poslje webhook `customer.subscription.created` po nakupu:
-
-1. `handleSubscriptionUpdate` poisce uporabnika po `stripe_customer_id`:
-```text
-.eq("stripe_customer_id", customerId).maybeSingle()
-```
-2. `stripe_customer_id` NIMA unique constrainta -- ima navaden indeks
-3. `.maybeSingle()` najde **3 vrstice** in vrne napako (PGRST116: "multiple rows returned")
-4. `data` je `null`, `targetUserId` je `null`
-5. Fallback `findUserIdByCustomerId` najde uporabnika po emailu
-6. Upsert se izvede po `user_id` -- to bi MORALO delovati...
-
-**AMPAK**: ce je `.maybeSingle()` napaka povzrocila izjemo v Supabase klientu (odvisno od verzije), bi lahko celoten `handleSubscriptionUpdate` padel pred fallbackom. To razlozzi, zakaj `updated_at` za trenutnega uporabnika ostane na `2026-02-11 12:58` (cas `create-checkout`) in se NIKOLI ne posodobi na ~13:59 (cas nakupa).
-
-### Zakaj tudi PaymentSuccess ni popravil
-
-`PaymentSuccess.tsx` poklice `check-subscription` po 1.5s zamiku. `check-subscription` najde v DB `status: inactive` za tega uporabnika, gre na Stripe fallback, najde aktivno narocnino, naredi upsert... **AMPAK**:
-
-1. `check-subscription` v upsert NE nastavi `plan_id` -- nastavi samo `status`, `stripe_product_id` itd.
-2. `PaymentSuccess` NE poklice `refreshSubscription()` iz `SubscriptionContext`
-3. `useSubscription` hook ima cache (`lastCheckedUserIdRef`) -- ce je ze preveril za tega uporabnika, NE preveri znova
-4. Rezultat: tudi ce bi check-subscription posodobil bazo, useSubscription se vedno vraca staro stanje
+# Popravek: Neskoncna rekurzija v RLS politiki na logopedist_profiles
 
 ---
 
-## PLAN POPRAVKOV (5 popravkov)
+## VZROK
 
-### Popravek 1: Pocisti osirotele zapise v bazi (rocno, LIVE okolje)
+Konzolni logi jasno kazejo napako:
 
-Zagnati v Supabase SQL Editor za LIVE okolje:
+```
+infinite recursion detected in policy for relation "logopedist_profiles"
+```
+
+Ta napaka blokira **vse** operacije v aplikaciji za uporabnika kujavec.robert@gmail.com -- vkljucno z nalaganjem profila in dodajanjem otroka.
+
+### Problematicna RLS politika
+
+Na tabeli `logopedist_profiles` obstaja politika "Org members can view org profiles":
+
 ```sql
-DELETE FROM user_subscriptions 
-WHERE user_id NOT IN (SELECT id FROM auth.users);
+organization_id IN (
+  SELECT lp.organization_id
+  FROM logopedist_profiles lp
+  WHERE lp.user_id = auth.uid()
+)
 ```
 
-To bo izbrisalo 2 osirotela zapisa. Supabase ti bo pokazal opozorilo "destructive operation" -- to je normalno, potrdi izvajanje.
+Ta politika bere iz **iste tabele** (`logopedist_profiles`) znotraj RLS politike na `logopedist_profiles`. PostgreSQL mora za vsako vrstico preveriti RLS politike, kar povzroci neskoncno zanko.
 
-### Popravek 2: archive-and-delete-user -- brisanje user_subscriptions
+### Zakaj vpliva na dodajanje otroka
 
-Pred brisanjem auth uporabnika (vrstica 311) dodati brisanje zapisa iz `user_subscriptions`. To prepreci bodoce osirotele zapise.
+`AuthContext.tsx` (vrstica 52-55) pri vsakem nalaganju profila naredi poizvedbo na `logopedist_profiles` da preveri ali je uporabnik logoped. Ce ta poizvedba odpove zaradi rekurzije, **celoten profil** ne nalozi -- brez profila pa aplikacija ne zazna narocnine in ne dovoli dodajanja otroka.
 
-Datoteka: `supabase/functions/archive-and-delete-user/index.ts`
+---
 
-### Popravek 3: stripe-webhook -- robustnejsa poizvedba
+## POPRAVEK
 
-Zamenjati `.maybeSingle()` z `.order('created_at', { ascending: false }).limit(1)` v `handleSubscriptionUpdate`. To vrne ZADNJI (najnovejsi) zapis namesto napake pri vec vrsticah. Dodatno: dodati preverjanje ali `user_id` obstaja v auth.users.
+### Korak 1: Zamenjaj rekurzivno politiko z varno verzijo
 
-Datoteka: `supabase/functions/stripe-webhook/index.ts`
+Izbrisati problematicno politiko in jo zamenjati z novo, ki uporablja ze obstojeco `SECURITY DEFINER` funkcijo `get_user_organization_id()`. Ta funkcija obide RLS in prepreci rekurzijo.
 
-### Popravek 4: check-subscription -- dodati plan_id v upsert
+SQL migracija:
 
-V Stripe fallback upsert (vrstica 155-166) dodati `plan_id` mapping iz `productId`. Uporabiti isto `productToPlan` mapo kot v webhook funkciji.
+```sql
+-- Izbrisi problematicno politiko
+DROP POLICY IF EXISTS "Org members can view org profiles" 
+  ON public.logopedist_profiles;
 
-Datoteka: `supabase/functions/check-subscription/index.ts`
+-- Ustvari novo politiko z SECURITY DEFINER funkcijo
+CREATE POLICY "Org members can view org profiles" 
+  ON public.logopedist_profiles FOR SELECT
+  USING (
+    organization_id = get_user_organization_id(auth.uid())
+  );
+```
 
-### Popravek 5: PaymentSuccess + useSubscription -- osvezevanje stanja
+Funkcija `get_user_organization_id` ze obstaja kot `SECURITY DEFINER` in naredi:
+```sql
+SELECT organization_id FROM public.logopedist_profiles 
+WHERE user_id = _user_id LIMIT 1
+```
 
-**PaymentSuccess.tsx:**
-- Dodati `useSubscriptionContext()` in poklicati `refreshSubscription()` po uspesnem check-subscription
-- Dodati retry logiko (3 poskusi s 3s zamikom) ce check-subscription se ne najde narocnine
+Ker je `SECURITY DEFINER`, obide RLS politike in ne povzroci rekurzije.
 
-**useSubscription.ts:**
-- Ko je DB status `inactive`, dodati fallback klic `check-subscription` Edge funkcije
-- Ce ta vrne `subscribed: true`, znova prebrati DB in posodobiti stanje
+### Kaj se spremeni v kodi
+
+Nicesar -- popravek je izkljucno v bazi podatkov (SQL migracija). Nobena datoteka v kodi se ne spreminja.
 
 ---
 
 ## POVZETEK
 
-| Datoteka | Sprememba |
-|----------|-----------|
-| SQL (rocno, LIVE) | Izbrisati osirotele zapise |
-| `supabase/functions/archive-and-delete-user/index.ts` | Dodati brisanje user_subscriptions |
-| `supabase/functions/stripe-webhook/index.ts` | .limit(1) namesto .maybeSingle() |
-| `supabase/functions/check-subscription/index.ts` | Dodati plan_id v Stripe fallback upsert |
-| `src/pages/PaymentSuccess.tsx` | refreshSubscription + retry |
-| `src/hooks/useSubscription.ts` | check-subscription fallback |
+| Sprememba | Opis |
+|-----------|------|
+| SQL migracija | Zamenjava rekurzivne RLS politike z varno verzijo |
 
-Po teh popravkih:
-- Webhook bo deloval tudi ce so v bazi podvojeni customer ID-ji (robustnost)
-- Brisanje uporabnika ne bo vec pustilo osirotelih zapisov (preventiva)
-- Ce webhook odpove, bo frontend sam sinhroniziral stanje iz Stripe (varnostna mreza)
-- Po placilu se bo stanje takoj posodobilo (uporabniska izkusnja)
+Po tem popravku:
+- Profil se bo pravilno nalozil za vse uporabnike
+- Dodajanje otroka bo spet delovalo za kujavec.robert@gmail.com
+- Logopedi iz iste organizacije bodo se vedno videli profile drug drugega (enaka funkcionalnost, brez rekurzije)
