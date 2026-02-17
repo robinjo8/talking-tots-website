@@ -13,12 +13,48 @@ import { ArrowLeft } from "lucide-react";
 // Use ASCII-safe URL keys for Slovenian diacritics (č→ch, š→sh, ž→zh)
 const labirintGames = [
   {
+    id: "s",
+    letter: "S",
+    gradient: "from-dragon-green/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
+    description: "Poišči pot skozi labirint s črko S",
+    path: "/govorne-igre/labirint/s",
+    available: true
+  },
+  {
+    id: "z",
+    letter: "Z",
+    gradient: "from-app-teal/20 to-dragon-green/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
+    description: "Poišči pot skozi labirint s črko Z",
+    path: "/govorne-igre/labirint/z",
+    available: true
+  },
+  {
     id: "c",
     letter: "C",
     gradient: "from-dragon-green/20 to-dragon-green/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
     description: "Poišči pot skozi labirint s črko C",
     path: "/govorne-igre/labirint/c",
+    available: true
+  },
+  {
+    id: "š",
+    letter: "Š",
+    gradient: "from-app-blue/20 to-app-purple/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
+    description: "Poišči pot skozi labirint s črko Š",
+    path: "/govorne-igre/labirint/sh",
+    available: true
+  },
+  {
+    id: "ž",
+    letter: "Ž",
+    gradient: "from-app-purple/20 to-app-blue/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
+    description: "Poišči pot skozi labirint s črko Ž",
+    path: "/govorne-igre/labirint/zh",
     available: true
   },
   {
@@ -55,42 +91,6 @@ const labirintGames = [
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
     description: "Poišči pot skozi labirint s črko R",
     path: "/govorne-igre/labirint/r",
-    available: true
-  },
-  {
-    id: "s",
-    letter: "S",
-    gradient: "from-dragon-green/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
-    description: "Poišči pot skozi labirint s črko S",
-    path: "/govorne-igre/labirint/s",
-    available: true
-  },
-  {
-    id: "š",
-    letter: "Š",
-    gradient: "from-app-blue/20 to-app-purple/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
-    description: "Poišči pot skozi labirint s črko Š",
-    path: "/govorne-igre/labirint/sh",
-    available: true
-  },
-  {
-    id: "z",
-    letter: "Z",
-    gradient: "from-app-teal/20 to-dragon-green/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
-    description: "Poišči pot skozi labirint s črko Z",
-    path: "/govorne-igre/labirint/z",
-    available: true
-  },
-  {
-    id: "ž",
-    letter: "Ž",
-    gradient: "from-app-purple/20 to-app-blue/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
-    description: "Poišči pot skozi labirint s črko Ž",
-    path: "/govorne-igre/labirint/zh",
     available: true
   }
 ];
