@@ -1,32 +1,35 @@
 
 
-# Sekcija "Kdo smo" na prvi strani
+## Spremembe v sekciji "Kdo smo" na prvi strani
 
-## Kaj se naredi
+### 1. Zelena podlaga za "Kdo smo"
+- Spremenimo `bg-background` v `bg-dragon-green` z valovitimi SVG ločilniki (zgoraj in spodaj), enako kot pri sekcijah Testimonials in FAQ
+- Besedilo (naslov, imena, opisi) spremenimo v belo barvo (`text-white`)
 
-Nova komponenta `TeamSection.tsx` s 4 clani ekipe v 2x2 mrezi (na mobilnih 1 stolpec). Vsak clan ima okroglo sliko (placeholder ikona), ime in kratek opis.
+### 2. FAQ sekcija dobi belo podlago
+- Ker je zdaj "Kdo smo" zelena, mora FAQ preiti na belo podlago (`bg-white` namesto `bg-dragon-green`)
+- Odstranimo valovite SVG ločilnike iz FAQ sekcije
+- Besedilo naslova spremenimo nazaj v temno barvo
 
-### Opisi clanov
+### 3. Popravki opisov
+- Spela: "Spela je logopedinja z vec kot desetletnimi izkusnjami..."
+- Ema: "Ema je logopedinja z vec kot desetletnimi izkusnjami..."
+- Robert: "Robert je pobudnik projekta TomiTalk..."
+- Jasna ostane enaka
 
-- **Spela Kastelic**: "je logopedinja z vec kot desetletnimi izkusnjami, ki dela z otroki z govorno-jezikovnimi motnjami in je clanica komisije za usmerjanje otrok s posebnimi potrebami."
-- **Ema Erzar Vidmar**: "Ema Erzar Vidmar je logopedinja z vec kot desetletnimi izkusnjami v solskem okolju, kjer s sodobnimi pristopi in lastnimi didakticnimi materiali podpira razvoj govorno-jezikovnih sposobnosti otrok."
-- **Jasna Kastigar Kujavec**: "Jasna je magistra varstvoslovja, specializirana za informacijsko in kibernetsko varnost, ki v projektu TomiTalk skrbi za varnostni in zakonodajni vidik razvoja ter skladnost z veljavnimi predpisi."
-- **Robert Kujavec**: "Robert Kujavec je pobudnik projekta TomiTalk z jasno vizijo omogociti otrokom hiter in ucinkovit dostop do podpore pri govorno-jezikovnih tezavah."
+### 4. Mobilni prikaz s slideom (carousel)
+- Na mobilnih napravah zamenjamo navpicno mrežo (grid-cols-1) s horizontalnim vrtiljakom (Embla Carousel), ki omogoca drsanje levo/desno
+- Na namizju ohranimo 2x2 mrežo
 
-### Razsiritev opisov
+### 5. Gumb "Vec o nas" namesto "Prikazi vec"
+- Odstranimo toggle logiko (useState, fullDescription)
+- Dodamo gumb "Vec o nas" s povezavo (Link) na `/kdo-smo`
 
-Gumb "Prikazi vec" razshiri prikaz in pokaze celoten opis iz strani /kdo-smo za vsakega clana. Gumb "Prikazi manj" ga skrije nazaj.
+---
 
-## Tehnicne spremembe
+### Tehnicne spremembe
 
 | Datoteka | Sprememba |
 |----------|-----------|
-| `src/components/home/TeamSection.tsx` | **Nova datoteka** -- 2x2 mreza clanov s kratkimi opisi in moznostjo razsiritve |
-| `src/pages/Index.tsx` | Dodamo `<TeamSection />` med `<FeaturesCardsSection />` in `<FAQSection />` |
-
-### Postavitev
-- Naslov: "Kdo smo"
-- Mreza: `grid grid-cols-1 md:grid-cols-2 gap-8`
-- Vsak clan: okrogla slika (User ikona), ime, kratek opis
-- Spodaj: gumb za prikaz celotnih opisov (iz KdoSmo strani)
-
+| `src/components/home/TeamSection.tsx` | Zelena podlaga z valovi, popravljeni opisi, carousel za mobilno, gumb "Vec o nas" -> /kdo-smo |
+| `src/components/home/FAQSection.tsx` | Bela podlaga, odstranitev valov, temno besedilo naslova |
