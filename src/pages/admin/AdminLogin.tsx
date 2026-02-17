@@ -22,10 +22,43 @@ export default function AdminLogin() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!authLoading && user && isLogopedist && mfaVerified) {
+    if (authLoading) return;
+    
+    if (user && isLogopedist && mfaVerified) {
       navigate('/admin');
+      return;
     }
-  }, [user, isLogopedist, authLoading, mfaVerified, navigate]);
+
+    // User is already logged in as logopedist but MFA not yet verified - auto-trigger MFA
+    if (user && isLogopedist && !mfaVerified && !mfaStep && !isLoading) {
+      const autoTriggerMfa = async () => {
+        setIsLoading(true);
+        try {
+          const { data: mfaData, error: mfaError } = await supabase.functions.invoke('send-mfa-code', {
+            body: { user_id: user.id, email: user.email },
+          });
+
+          if (mfaError || !mfaData?.success) {
+            console.error('Auto MFA send error:', mfaError, mfaData);
+            toast.error(mfaData?.error || 'Napaka pri pošiljanju potrditvene kode');
+            setIsLoading(false);
+            return;
+          }
+
+          setMfaUserId(user.id);
+          setMfaEmail(user.email || '');
+          setMfaStep(true);
+          toast.info('Potrditvena koda je bila poslana na vaš email');
+        } catch (err) {
+          console.error('Auto MFA trigger error:', err);
+          toast.error('Napaka pri pošiljanju potrditvene kode');
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      autoTriggerMfa();
+    }
+  }, [user, isLogopedist, authLoading, mfaVerified, mfaStep, isLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
