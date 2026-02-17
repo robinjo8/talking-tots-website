@@ -63,15 +63,15 @@ const ArticulationTestInstructionsDialog = ({ open, onClose }: ArticulationTestI
             <section>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Prikaz napredka med preverjanjem</h3>
               <ul className="list-disc list-inside text-sm space-y-1 ml-2">
-                <li>Na vrhu zaslona so prikazane vse črke soglasnikov, ki se preverjajo.</li>
-                <li>Vsaka črka ima tri korake (začetek, sredina, konec).</li>
-                <li>Ko otrok izgovori prvo besedo za določeno črko (npr. za črko B – BIK) in klikne naprej:
+                <li>Na vrhu zaslona so prikazani vsi glasovi soglasnikov, ki se preverjajo.</li>
+                <li>Vsak glas ima tri korake (začetek, sredina, konec).</li>
+                <li>Ko otrok izgovori prvo besedo za določen glas (npr. za glas B – BIK) in klikne naprej:
                   <ul className="list-disc list-inside ml-4 mt-1">
-                    <li>se polje črke delno obarva zeleno (1/3),</li>
-                    <li>to pomeni, da je otrok izgovoril 1 od 3 besed za to črko.</li>
+                    <li>se polje glasu delno obarva zeleno (1/3),</li>
+                    <li>to pomeni, da je otrok izgovoril 1 od 3 besed za ta glas.</li>
                   </ul>
                 </li>
-                <li>Ko je polje črke v celoti zeleno, pomeni, da je otrok izgovoril vse tri besede za določen soglasnik.</li>
+                <li>Ko je polje glasu v celoti zeleno, pomeni, da je otrok izgovoril vse tri besede za določen soglasnik.</li>
               </ul>
               <p className="text-sm leading-relaxed mt-2">
                 Ta prikaz omogoča jasen in pregleden vpogled v potek preverjanja.

@@ -3,15 +3,15 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
 
 const ponoviPovedLetters = [
-  { id: "s", letter: "S", description: "Ponovi povedi s črko S", image: "zmajcek_crka_S.png" },
-  { id: "z", letter: "Z", description: "Ponovi povedi s črko Z", image: "zmajcek_crka_Z.png" },
-  { id: "c", letter: "C", description: "Ponovi povedi s črko C", image: "zmajcek_crka_C.png" },
-  { id: "sh", letter: "Š", description: "Ponovi povedi s črko Š", image: "zmajcek_crka_SH.png" },
-  { id: "zh", letter: "Ž", description: "Ponovi povedi s črko Ž", image: "zmajcek_crka_ZH.png" },
-  { id: "ch", letter: "Č", description: "Ponovi povedi s črko Č", image: "zmajcek_crka_CH.png" },
-  { id: "k", letter: "K", description: "Ponovi povedi s črko K", image: "zmajcek_crka_K.png" },
-  { id: "l", letter: "L", description: "Ponovi povedi s črko L", image: "zmajcek_crka_L.png" },
-  { id: "r", letter: "R", description: "Ponovi povedi s črko R", image: "zmajcek_crka_R.png" },
+  { id: "s", letter: "S", description: "Ponovi povedi z glasom S", image: "zmajcek_crka_S.png" },
+  { id: "z", letter: "Z", description: "Ponovi povedi z glasom Z", image: "zmajcek_crka_Z.png" },
+  { id: "c", letter: "C", description: "Ponovi povedi z glasom C", image: "zmajcek_crka_C.png" },
+  { id: "sh", letter: "Š", description: "Ponovi povedi z glasom Š", image: "zmajcek_crka_SH.png" },
+  { id: "zh", letter: "Ž", description: "Ponovi povedi z glasom Ž", image: "zmajcek_crka_ZH.png" },
+  { id: "ch", letter: "Č", description: "Ponovi povedi z glasom Č", image: "zmajcek_crka_CH.png" },
+  { id: "k", letter: "K", description: "Ponovi povedi z glasom K", image: "zmajcek_crka_K.png" },
+  { id: "l", letter: "L", description: "Ponovi povedi z glasom L", image: "zmajcek_crka_L.png" },
+  { id: "r", letter: "R", description: "Ponovi povedi z glasom R", image: "zmajcek_crka_R.png" },
 ];
 
 export default function AdminPonoviPovedGames() {
@@ -25,7 +25,7 @@ export default function AdminPonoviPovedGames() {
 
   return (
     <AdminGameWrapper 
-      title="Ponovi poved - izberi črko"
+      title="Ponovi poved - izberi glas"
       backPath={`/admin/children/${childId}/games`}
     >
       <div className={isMobile ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"}>

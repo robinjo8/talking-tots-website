@@ -32,7 +32,7 @@ export const ProgressModal: React.FC<ProgressModalProps> = ({
       <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold text-dragon-green">
-            Napredek - Črka {letter}
+            Napredek - Glas {letter}
           </DialogTitle>
           <p className="text-center text-muted-foreground">
             Osvojenih besed: <span className="font-bold text-dragon-green">{completedCount}/{totalWords}</span>

@@ -17,7 +17,7 @@ const ponoviPovedLetters = [
     letter: "S",
     gradient: "from-dragon-green/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
-    description: "Ponovi povedi s črko S",
+    description: "Ponovi povedi z glasom S",
     path: "/govorne-igre/ponovi-poved/s",
     urlKey: "s"
   },
@@ -26,7 +26,7 @@ const ponoviPovedLetters = [
     letter: "Z",
     gradient: "from-app-teal/20 to-dragon-green/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
-    description: "Ponovi povedi s črko Z",
+    description: "Ponovi povedi z glasom Z",
     path: "/govorne-igre/ponovi-poved/z",
     urlKey: "z"
   },
@@ -35,7 +35,7 @@ const ponoviPovedLetters = [
     letter: "C",
     gradient: "from-dragon-green/20 to-dragon-green/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
-    description: "Ponovi povedi s črko C",
+    description: "Ponovi povedi z glasom C",
     path: "/govorne-igre/ponovi-poved/c",
     urlKey: "c"
   },
@@ -44,7 +44,7 @@ const ponoviPovedLetters = [
     letter: "Š",
     gradient: "from-app-blue/20 to-app-purple/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
-    description: "Ponovi povedi s črko Š",
+    description: "Ponovi povedi z glasom Š",
     path: "/govorne-igre/ponovi-poved/sh",
     urlKey: "sh"
   },
@@ -53,7 +53,7 @@ const ponoviPovedLetters = [
     letter: "Ž",
     gradient: "from-app-purple/20 to-app-blue/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
-    description: "Ponovi povedi s črko Ž",
+    description: "Ponovi povedi z glasom Ž",
     path: "/govorne-igre/ponovi-poved/zh",
     urlKey: "zh"
   },
@@ -62,7 +62,7 @@ const ponoviPovedLetters = [
     letter: "Č",
     gradient: "from-app-blue/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
-    description: "Ponovi povedi s črko Č",
+    description: "Ponovi povedi z glasom Č",
     path: "/govorne-igre/ponovi-poved/ch",
     urlKey: "ch"
   },
@@ -71,7 +71,7 @@ const ponoviPovedLetters = [
     letter: "K",
     gradient: "from-app-orange/20 to-app-yellow/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png",
-    description: "Ponovi povedi s črko K",
+    description: "Ponovi povedi z glasom K",
     path: "/govorne-igre/ponovi-poved/k",
     urlKey: "k"
   },
@@ -80,7 +80,7 @@ const ponoviPovedLetters = [
     letter: "L",
     gradient: "from-app-purple/20 to-app-blue/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png",
-    description: "Ponovi povedi s črko L",
+    description: "Ponovi povedi z glasom L",
     path: "/govorne-igre/ponovi-poved/l",
     urlKey: "l"
   },
@@ -89,7 +89,7 @@ const ponoviPovedLetters = [
     letter: "R",
     gradient: "from-app-purple/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Ponovi povedi s črko R",
+    description: "Ponovi povedi z glasom R",
     path: "/govorne-igre/ponovi-poved/r",
     urlKey: "r"
   }
@@ -113,7 +113,7 @@ export default function PonoviPoved() {
   const handleLetterClick = (letter: typeof ponoviPovedLetters[0]) => {
     // Check if configuration exists for this letter
     if (!hasPonoviPovedConfig(letter.urlKey)) {
-      toast.info("Ta črka bo kmalu na voljo!");
+      toast.info("Ta glas bo kmalu na voljo!");
       return;
     }
     navigate(letter.path);
@@ -185,7 +185,7 @@ export default function PonoviPoved() {
               Ponovi poved
             </h1>
             <p className="text-xl text-white/90">
-              Izberi črko in ponovi tri-besedne povedi
+              Izberi glas in ponovi tri-besedne povedi
             </p>
           </div>
           

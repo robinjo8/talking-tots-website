@@ -8,63 +8,63 @@ const memoryGames = [
     letter: "S",
     gradient: "from-dragon-green/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
-    description: "Poišči pare slik s črko S in nato ponovi besedo",
+    description: "Poišči pare slik z glasom S in nato ponovi besedo",
   },
   { 
     id: "spomin-z",
     letter: "Z",
     gradient: "from-app-teal/20 to-dragon-green/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
-    description: "Poišči pare slik s črko Z in nato ponovi besedo",
+    description: "Poišči pare slik z glasom Z in nato ponovi besedo",
   },
   { 
     id: "spomin-c",
     letter: "C",
     gradient: "from-dragon-green/20 to-dragon-green/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
-    description: "Poišči pare slik s črko C in nato ponovi besedo",
+    description: "Poišči pare slik z glasom C in nato ponovi besedo",
   },
   { 
     id: "spomin-sh",
     letter: "Š",
     gradient: "from-app-blue/20 to-app-purple/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
-    description: "Poišči pare slik s črko Š in nato ponovi besedo",
+    description: "Poišči pare slik z glasom Š in nato ponovi besedo",
   },
   { 
     id: "spomin-zh",
     letter: "Ž",
     gradient: "from-app-purple/20 to-app-blue/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
-    description: "Poišči pare slik s črko Ž in nato ponovi besedo",
+    description: "Poišči pare slik z glasom Ž in nato ponovi besedo",
   },
   { 
     id: "spomin-ch",
     letter: "Č",
     gradient: "from-app-blue/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
-    description: "Poišči pare slik s črko Č in nato ponovi besedo",
+    description: "Poišči pare slik z glasom Č in nato ponovi besedo",
   },
   { 
     id: "spomin-k",
     letter: "K",
     gradient: "from-app-orange/20 to-app-yellow/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png",
-    description: "Poišči pare slik s črko K in nato ponovi besedo",
+    description: "Poišči pare slik z glasom K in nato ponovi besedo",
   },
   { 
     id: "spomin-l",
     letter: "L",
     gradient: "from-app-purple/20 to-app-blue/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png",
-    description: "Poišči pare slik s črko L in nato ponovi besedo",
+    description: "Poišči pare slik z glasom L in nato ponovi besedo",
   },
   { 
     id: "spomin-r",
     letter: "R",
     gradient: "from-app-purple/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Poišči pare slik s črko R in nato ponovi besedo",
+    description: "Poišči pare slik z glasom R in nato ponovi besedo",
   },
 ];
 
@@ -79,7 +79,7 @@ export default function AdminSpominGames() {
 
   return (
     <AdminGameWrapper 
-      title="Spomin - izberi črko"
+      title="Spomin - izberi glas"
       backPath={`/admin/children/${childId}/games`}
     >
       <div className={isMobile ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"}>

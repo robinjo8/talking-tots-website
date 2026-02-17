@@ -56,10 +56,10 @@ export default function AdminVideoNavodilaRouter() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-foreground mb-2">
-                  Črka {config.displayLetter}
+                  Glas {config.displayLetter}
                 </h2>
                 <p className="text-muted-foreground">
-                  Video navodila za pravilno izgovorjavo črke {config.displayLetter}
+                  Video navodila za pravilno izgovorjavo glasu {config.displayLetter}
                 </p>
               </div>
               <Button

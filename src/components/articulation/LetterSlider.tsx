@@ -86,7 +86,7 @@ const LetterSlider = ({ letters, currentLetter, onLetterChange }: LetterSliderPr
                   ? "bg-app-blue scale-125 shadow-sm"
                   : "bg-app-blue/30 hover:bg-app-blue/50"
               )}
-              aria-label={`Pojdi na črko ${letters[index]}`}
+              aria-label={`Pojdi na glas ${letters[index]}`}
             />
           ))}
         </div>

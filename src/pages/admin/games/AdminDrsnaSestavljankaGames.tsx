@@ -3,15 +3,15 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
 
 const drsnaSestavljankaLetters = [
-  { id: "s", letter: "S", description: "Drsna sestavljanka s črko S", image: "zmajcek_crka_S.png" },
-  { id: "z", letter: "Z", description: "Drsna sestavljanka s črko Z", image: "zmajcek_crka_Z.png" },
-  { id: "c", letter: "C", description: "Drsna sestavljanka s črko C", image: "zmajcek_crka_C.png" },
-  { id: "sh", letter: "Š", description: "Drsna sestavljanka s črko Š", image: "zmajcek_crka_SH.png" },
-  { id: "zh", letter: "Ž", description: "Drsna sestavljanka s črko Ž", image: "zmajcek_crka_ZH.png" },
-  { id: "ch", letter: "Č", description: "Drsna sestavljanka s črko Č", image: "zmajcek_crka_CH.png" },
-  { id: "k", letter: "K", description: "Drsna sestavljanka s črko K", image: "zmajcek_crka_K.png" },
-  { id: "l", letter: "L", description: "Drsna sestavljanka s črko L", image: "zmajcek_crka_L.png" },
-  { id: "r", letter: "R", description: "Drsna sestavljanka s črko R", image: "zmajcek_crka_R.png" },
+  { id: "s", letter: "S", description: "Drsna sestavljanka z glasom S", image: "zmajcek_crka_S.png" },
+  { id: "z", letter: "Z", description: "Drsna sestavljanka z glasom Z", image: "zmajcek_crka_Z.png" },
+  { id: "c", letter: "C", description: "Drsna sestavljanka z glasom C", image: "zmajcek_crka_C.png" },
+  { id: "sh", letter: "Š", description: "Drsna sestavljanka z glasom Š", image: "zmajcek_crka_SH.png" },
+  { id: "zh", letter: "Ž", description: "Drsna sestavljanka z glasom Ž", image: "zmajcek_crka_ZH.png" },
+  { id: "ch", letter: "Č", description: "Drsna sestavljanka z glasom Č", image: "zmajcek_crka_CH.png" },
+  { id: "k", letter: "K", description: "Drsna sestavljanka z glasom K", image: "zmajcek_crka_K.png" },
+  { id: "l", letter: "L", description: "Drsna sestavljanka z glasom L", image: "zmajcek_crka_L.png" },
+  { id: "r", letter: "R", description: "Drsna sestavljanka z glasom R", image: "zmajcek_crka_R.png" },
 ];
 
 export default function AdminDrsnaSestavljankaGames() {
@@ -25,7 +25,7 @@ export default function AdminDrsnaSestavljankaGames() {
 
   return (
     <AdminGameWrapper 
-      title="Drsna igra - izberi črko"
+      title="Drsna igra - izberi glas"
       backPath={`/admin/children/${childId}/games`}
     >
       <div className={isMobile ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"}>

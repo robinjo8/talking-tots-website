@@ -17,7 +17,7 @@ const sequenceGames = [
     letter: "S",
     gradient: "from-dragon-green/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
-    description: "Uredi zaporedje besed s črko S",
+    description: "Uredi zaporedje besed z glasom S",
     available: true
   },
   {
@@ -25,7 +25,7 @@ const sequenceGames = [
     letter: "Z",
     gradient: "from-app-teal/20 to-dragon-green/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
-    description: "Uredi zaporedje besed s črko Z",
+    description: "Uredi zaporedje besed z glasom Z",
     available: true
   },
   {
@@ -33,7 +33,7 @@ const sequenceGames = [
     letter: "C",
     gradient: "from-dragon-green/20 to-dragon-green/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
-    description: "Uredi zaporedje besed s črko C",
+    description: "Uredi zaporedje besed z glasom C",
     available: true
   },
   {
@@ -41,7 +41,7 @@ const sequenceGames = [
     letter: "Š",
     gradient: "from-app-blue/20 to-app-purple/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
-    description: "Uredi zaporedje besed s črko Š",
+    description: "Uredi zaporedje besed z glasom Š",
     available: true
   },
   {
@@ -49,7 +49,7 @@ const sequenceGames = [
     letter: "Ž",
     gradient: "from-app-purple/20 to-app-blue/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
-    description: "Uredi zaporedje besed s črko Ž",
+    description: "Uredi zaporedje besed z glasom Ž",
     available: true
   },
   {
@@ -57,7 +57,7 @@ const sequenceGames = [
     letter: "Č",
     gradient: "from-app-blue/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
-    description: "Uredi zaporedje besed s črko Č",
+    description: "Uredi zaporedje besed z glasom Č",
     available: true
   },
   {
@@ -65,7 +65,7 @@ const sequenceGames = [
     letter: "K",
     gradient: "from-app-orange/20 to-app-yellow/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png",
-    description: "Uredi zaporedje besed s črko K",
+    description: "Uredi zaporedje besed z glasom K",
     available: true
   },
   {
@@ -73,7 +73,7 @@ const sequenceGames = [
     letter: "L",
     gradient: "from-app-purple/20 to-app-blue/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png",
-    description: "Uredi zaporedje besed s črko L",
+    description: "Uredi zaporedje besed z glasom L",
     available: true
   },
   {
@@ -81,7 +81,7 @@ const sequenceGames = [
     letter: "R",
     gradient: "from-app-purple/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Uredi zaporedje besed s črko R",
+    description: "Uredi zaporedje besed z glasom R",
     available: true
   }
 ];
@@ -197,7 +197,7 @@ export default function Zaporedja() {
               Zaporedja
             </h1>
             <p className="text-xl text-white/90">
-              Izberi črko in uredi zaporedje besed
+              Izberi glas in uredi zaporedje besed
             </p>
           </div>
           

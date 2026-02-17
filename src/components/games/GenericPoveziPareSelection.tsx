@@ -71,7 +71,7 @@ export function GenericPoveziPareSelection({ ageGroup }: Props) {
         <div className="w-full h-full flex items-center justify-center">
           <img 
             src={config.image}
-            alt={`Črka ${config.letter}`}
+            alt={`Glas ${config.letter}`}
             className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
             style={{ mixBlendMode: 'multiply' }}
           />
@@ -81,7 +81,7 @@ export function GenericPoveziPareSelection({ ageGroup }: Props) {
       {/* Card Content */}
       <div className="p-6">
         <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
-          Črka {config.letter}
+          Glas {config.letter}
         </h3>
         <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
           {config.description}
@@ -102,7 +102,7 @@ export function GenericPoveziPareSelection({ ageGroup }: Props) {
               Povezi pare
             </h1>
             <p className="text-xl text-white/90">
-              Izberi črko in poveži pare slik
+              Izberi glas in poveži pare slik
             </p>
           </div>
           
@@ -138,7 +138,7 @@ export function GenericPoveziPareSelection({ ageGroup }: Props) {
                 />
               </div>
               <div className="flex-1">
-                <p className="text-lg font-medium italic">IZBERI ČRKO IN POMAGAJ TOMIJU POVEZATI PARE. NA KONCU PA SKUPAJ GLASNO PONOVITA BESEDO!</p>
+                <p className="text-lg font-medium italic">IZBERI GLAS IN POMAGAJ TOMIJU POVEZATI PARE. NA KONCU PA SKUPAJ GLASNO PONOVITA BESEDO!</p>
                 <p className="text-sm text-muted-foreground mt-2">Z VAJAMI POSTAJAMO VEDNO BOLJŠI!</p>
               </div>
             </CardContent>

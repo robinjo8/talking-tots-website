@@ -15,7 +15,7 @@ export function DifficultiesPieChart() {
           <CardTitle className="flex items-center gap-2">
             🧠 Najpogostejši govorni izzivi
           </CardTitle>
-          <CardDescription>Razdelitev napak po črkah</CardDescription>
+          <CardDescription>Razdelitev napak po glasovih</CardDescription>
         </CardHeader>
         <CardContent className="h-[300px] flex items-center justify-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-app-blue" />
@@ -30,7 +30,7 @@ export function DifficultiesPieChart() {
         <CardTitle className="flex items-center gap-2">
           🧠 Najpogostejši govorni izzivi
         </CardTitle>
-        <CardDescription>Razdelitev napak po črkah</CardDescription>
+        <CardDescription>Razdelitev napak po glasovih</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="h-[300px]">

@@ -45,11 +45,11 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter }: Generic
         {/* Title Section */}
         <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
-            Črka {displayLetter}
+            Glas {displayLetter}
           </h1>
           <div className="w-24 h-1 bg-app-yellow mx-auto rounded-full mb-4"></div>
           <p className="text-muted-foreground text-lg">
-            Poglej video navodila za pravilno izgovorjavo črke {displayLetter}
+            Poglej video navodila za pravilno izgovorjavo glasu {displayLetter}
           </p>
         </div>
         

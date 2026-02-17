@@ -104,9 +104,9 @@ export default function AdminSessionReview() {
         newMap.set(letter, evaluation);
         return newMap;
       });
-      toast.success(`Ocena za črko ${letter} shranjena`);
+      toast.success(`Ocena za glas ${letter} shranjena`);
     } else {
-      toast.error(`Napaka pri shranjevanju ocene za črko ${letter}`);
+      toast.error(`Napaka pri shranjevanju ocene za glas ${letter}`);
     }
   };
 
@@ -132,7 +132,7 @@ export default function AdminSessionReview() {
         );
         if (!result.success) {
           hasError = true;
-          toast.error(`Napaka pri shranjevanju ocene za črko ${letter}`);
+          toast.error(`Napaka pri shranjevanju ocene za glas ${letter}`);
         } else {
           savedCount++;
           setSavedEvaluations(prev => {

@@ -5,7 +5,7 @@ const otherGames = [
   {
     id: "kolo-srece",
     title: "KOLO BESED",
-    description: "Zavrti kolo sreče in vadi izgovorjavo črk",
+    description: "Zavrti kolo sreče in vadi izgovorjavo glasov",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/kolo_srece_nova_2.webp",
     gradient: "from-app-orange/20 to-app-yellow/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
@@ -16,7 +16,7 @@ const otherGames = [
   {
     id: "bingo",
     title: "BINGO",
-    description: "Igraj bingo in vadi izgovorjavo črk",
+    description: "Igraj bingo in vadi izgovorjavo glasov",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/bingo_nova_2.webp",
     gradient: "from-dragon-green/20 to-app-teal/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",

@@ -78,7 +78,7 @@ export const SPEECH_DEVELOPMENT_QUESTIONS: SpeechDevelopmentQuestion[] = [
 export const SPEECH_DEVELOPMENT_TEXT_QUESTIONS: SpeechDevelopmentTextQuestion[] = [
   {
     id: "pronunciation_difficulties",
-    question: "Pri izgovorjavi katerega glasu/črke ima vaš otrok težave? Če opazite težave jih opišite, npr. R izgovarja kot L.",
+    question: "Pri izgovorjavi katerega glasu ima vaš otrok težave? Če opazite težave jih opišite, npr. R izgovarja kot L.",
     placeholder: "Opišite težave z izgovorjavo...",
     required: false
   },

@@ -31,7 +31,7 @@ const metKockeGames = metKockeLetters.map(item => ({
   letter: item.letter,
   gradient: item.gradient,
   image: `${SUPABASE_URL}/zmajcki/${letterToImage[item.id]}`,
-  description: `Vrzi kocko in sestavi smešne povedi s črko ${item.letter}`,
+  description: `Vrzi kocko in sestavi smešne povedi z glasom ${item.letter}`,
   path: item.path,
   available: true
 }));
@@ -118,7 +118,7 @@ export default function MetKockeGames() {
               Smešne povedi
             </h1>
             <p className="text-xl text-white/90">
-              Izberi črko in vrži kocko za smešne povedi
+              Izberi glas in vrži kocko za smešne povedi
             </p>
           </div>
           
