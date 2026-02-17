@@ -20,70 +20,6 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_MIME_TYPES = ['application/pdf', 'text/plain'];
 const PDF_MAGIC_BYTES = [0x25, 0x50, 0x44, 0x46]; // %PDF
 
-interface VirusTotalAnalysis {
-  data: {
-    id: string;
-    attributes: {
-      status: string;
-      stats: {
-        malicious: number;
-        suspicious: number;
-        harmless: number;
-        undetected: number;
-      };
-    };
-  };
-}
-
-async function uploadToVirusTotal(fileBytes: Uint8Array, apiKey: string): Promise<string> {
-  const formData = new FormData();
-  formData.append('file', new Blob([fileBytes]), 'document.pdf');
-
-  const response = await fetch('https://www.virustotal.com/api/v3/files', {
-    method: 'POST',
-    headers: { 'x-apikey': apiKey },
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    console.error('VirusTotal upload failed:', error);
-    throw new Error(`VirusTotal upload failed: ${response.status}`);
-  }
-
-  const result = await response.json();
-  console.log('VirusTotal upload result:', result);
-  return result.data.id;
-}
-
-async function getVirusTotalAnalysis(analysisId: string, apiKey: string): Promise<VirusTotalAnalysis> {
-  const response = await fetch(`https://www.virustotal.com/api/v3/analyses/${analysisId}`, {
-    method: 'GET',
-    headers: { 'x-apikey': apiKey },
-  });
-
-  if (!response.ok) {
-    throw new Error(`VirusTotal analysis fetch failed: ${response.status}`);
-  }
-
-  return response.json();
-}
-
-async function waitForVirusTotalResult(analysisId: string, apiKey: string, maxAttempts = 30): Promise<VirusTotalAnalysis> {
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    const analysis = await getVirusTotalAnalysis(analysisId, apiKey);
-    console.log(`VirusTotal analysis attempt ${attempt + 1}:`, analysis.data.attributes.status);
-    
-    if (analysis.data.attributes.status === 'completed') {
-      return analysis;
-    }
-    
-    await new Promise(resolve => setTimeout(resolve, 2000));
-  }
-  
-  throw new Error('VirusTotal analysis timeout');
-}
-
 function validateMagicBytes(bytes: Uint8Array, mimeType: string): boolean {
   if (mimeType === 'application/pdf') {
     if (bytes.length < 4) return false;
@@ -113,7 +49,6 @@ Deno.serve(async (req) => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const virusTotalApiKey = Deno.env.get('VIRUSTOTAL_API_KEY');
     
     const supabase = createClient(supabaseUrl, supabaseKey);
     
@@ -206,47 +141,6 @@ Deno.serve(async (req) => {
 
     console.log('Magic bytes validated');
 
-    let virusScanStatus = 'pending';
-    let virusScanResult: any = null;
-
-    if (file.type === 'text/plain') {
-      virusScanStatus = 'clean';
-      virusScanResult = { skippedReason: 'text_file', scannedAt: new Date().toISOString() };
-      console.log('Text file - skipping virus scan, marking as clean');
-    }
-    else if (virusTotalApiKey && file.type === 'application/pdf') {
-      try {
-        console.log('Starting VirusTotal scan...');
-        const analysisId = await uploadToVirusTotal(fileBytes, virusTotalApiKey);
-        console.log('VirusTotal analysis ID:', analysisId);
-        
-        const analysis = await waitForVirusTotalResult(analysisId, virusTotalApiKey);
-        const stats = analysis.data.attributes.stats;
-        
-        console.log('VirusTotal scan complete:', stats);
-        
-        virusScanResult = { analysisId, stats, scannedAt: new Date().toISOString() };
-
-        if (stats.malicious > 0 || stats.suspicious > 0) {
-          virusScanStatus = 'infected';
-          return new Response(
-            JSON.stringify({ error: 'Datoteka je bila označena kot potencialno nevarna in je bila zavrnjena.', virusScanResult }),
-            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
-        
-        virusScanStatus = 'clean';
-        console.log('File is clean');
-      } catch (virusError) {
-        console.error('VirusTotal scan error:', virusError);
-        virusScanStatus = 'error';
-        virusScanResult = { error: String(virusError), scannedAt: new Date().toISOString() };
-      }
-    } else if (!virusTotalApiKey) {
-      console.log('VirusTotal API key not configured, skipping scan');
-      virusScanStatus = 'pending';
-    }
-
     const timestamp = Date.now();
     const sanitizedFilename = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
     const storagePath = `${user.id}/${childId}/Dokumenti/${timestamp}_${sanitizedFilename}`;
@@ -276,8 +170,8 @@ Deno.serve(async (req) => {
         original_filename: fileName,
         storage_path: storagePath,
         file_size: file.size,
-        virus_scan_status: virusScanStatus,
-        virus_scan_result: virusScanResult,
+        virus_scan_status: 'skipped',
+        virus_scan_result: null,
       })
       .select()
       .single();
@@ -295,7 +189,7 @@ Deno.serve(async (req) => {
     console.log('Document record created:', documentData.id);
 
     return new Response(
-      JSON.stringify({ success: true, document: documentData, virusScanStatus }),
+      JSON.stringify({ success: true, document: documentData }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 

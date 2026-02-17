@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { FileUp, X, FileText, CheckCircle2, AlertCircle, Loader2, Shield } from "lucide-react";
+import { FileUp, X, FileText, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -121,8 +121,6 @@ export function PdfUploader({
     switch (uploadStatus) {
       case 'uploading':
         return <Loader2 className="h-4 w-4 animate-spin text-app-blue" />;
-      case 'scanning':
-        return <Shield className="h-4 w-4 animate-pulse text-amber-500" />;
       case 'success':
         return <CheckCircle2 className="h-4 w-4 text-dragon-green" />;
       case 'error':
@@ -136,10 +134,8 @@ export function PdfUploader({
     switch (uploadStatus) {
       case 'uploading':
         return 'Nalaganje...';
-      case 'scanning':
-        return 'Varnostno preverjanje...';
       case 'success':
-        return 'Naloženo in preverjeno';
+        return 'Naloženo';
       case 'error':
         return errorMessage || 'Napaka pri nalaganju';
       default:
@@ -211,7 +207,7 @@ export function PdfUploader({
             </p>
           </div>
           
-          {uploadStatus !== 'uploading' && uploadStatus !== 'scanning' && (
+          {uploadStatus !== 'uploading' && (
             <Button
               type="button"
               variant="ghost"
@@ -225,11 +221,6 @@ export function PdfUploader({
           )}
         </div>
       )}
-
-      <p className="text-xs text-gray-500 flex items-center gap-1">
-        <Shield className="h-3 w-3" />
-        Vse naložene datoteke so varnostno pregledane
-      </p>
     </div>
   );
 }

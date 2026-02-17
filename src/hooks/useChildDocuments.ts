@@ -57,9 +57,6 @@ export function useChildDocuments(): UseChildDocumentsResult {
       formData.append('documentType', documentType);
       formData.append('originalFilename', file.name);
 
-      // Update status to scanning
-      setUploadStatus('scanning');
-
       // Call edge function
       const response = await fetch(
         `https://ecmtctwovkheohqwahvt.supabase.co/functions/v1/upload-child-document`,
@@ -79,7 +76,7 @@ export function useChildDocuments(): UseChildDocumentsResult {
       }
 
       setUploadStatus('success');
-      toast.success('Dokument uspešno naložen in varnostno preverjen');
+      toast.success('Dokument uspešno naložen');
       
       return result.document as ChildDocument;
 
