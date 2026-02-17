@@ -1,77 +1,32 @@
 
-# Popravek besed s šumniki v bazi podatkov
 
-## Problem
-Besede v pop-up oknih iger (Spomin, Zaporedja) se prikazujejo brez šumnikov, ker so v bazi podatkov shranjene napačno. Težava ni v kodi (ta pravilno prikazuje, kar dobi iz baze), ampak v samih podatkih.
+# Sekcija "Kdo smo" na prvi strani
 
-## Prizadete tabele in besede
+## Kaj se naredi
 
-### 1. memory_cards_Š_duplicate (10 napak)
-Vse besede razen ŠOFER so brez šumnikov:
+Nova komponenta `TeamSection.tsx` s 4 clani ekipe v 2x2 mrezi (na mobilnih 1 stolpec). Vsak clan ima okroglo sliko (placeholder ikona), ime in kratek opis.
 
-| Trenutno v bazi | Pravilno |
-|----------------|----------|
-| sal | Šal |
-| sah | Šah |
-| scetka | Ščetka |
-| skarje | Škarje |
-| skatla | Škatla |
-| skoljka | Školjka |
-| sopek | Šopek |
-| sotor | Šotor |
-| stampiljka | Štampiljka |
-| storklja | Štorklja |
+### Opisi clanov
 
-### 2. memory_cards_S (2 napaki)
+- **Spela Kastelic**: "je logopedinja z vec kot desetletnimi izkusnjami, ki dela z otroki z govorno-jezikovnimi motnjami in je clanica komisije za usmerjanje otrok s posebnimi potrebami."
+- **Ema Erzar Vidmar**: "Ema Erzar Vidmar je logopedinja z vec kot desetletnimi izkusnjami v solskem okolju, kjer s sodobnimi pristopi in lastnimi didakticnimi materiali podpira razvoj govorno-jezikovnih sposobnosti otrok."
+- **Jasna Kastigar Kujavec**: "Jasna je magistra varstvoslovja, specializirana za informacijsko in kibernetsko varnost, ki v projektu TomiTalk skrbi za varnostni in zakonodajni vidik razvoja ter skladnost z veljavnimi predpisi."
+- **Robert Kujavec**: "Robert Kujavec je pobudnik projekta TomiTalk z jasno vizijo omogociti otrokom hiter in ucinkovit dostop do podpore pri govorno-jezikovnih tezavah."
 
-| Trenutno v bazi | Pravilno |
-|----------------|----------|
-| snezak | Snežak |
-| svincnik | Svinčnik |
+### Razsiritev opisov
 
-### 3. memory_cards_K (2 napaki)
+Gumb "Prikazi vec" razshiri prikaz in pokaze celoten opis iz strani /kdo-smo za vsakega clana. Gumb "Prikazi manj" ga skrije nazaj.
 
-| Trenutno v bazi | Pravilno |
-|----------------|----------|
-| kosara | Košara |
-| kuza | Kuža |
+## Tehnicne spremembe
 
-### 4. memory_cards (tabela za R) (1 napaka)
+| Datoteka | Sprememba |
+|----------|-----------|
+| `src/components/home/TeamSection.tsx` | **Nova datoteka** -- 2x2 mreza clanov s kratkimi opisi in moznostjo razsiritve |
+| `src/pages/Index.tsx` | Dodamo `<TeamSection />` med `<FeaturesCardsSection />` in `<FAQSection />` |
 
-| Trenutno v bazi | Pravilno |
-|----------------|----------|
-| roza | Roža |
+### Postavitev
+- Naslov: "Kdo smo"
+- Mreza: `grid grid-cols-1 md:grid-cols-2 gap-8`
+- Vsak clan: okrogla slika (User ikona), ime, kratek opis
+- Spodaj: gumb za prikaz celotnih opisov (iz KdoSmo strani)
 
-## Resitev -- SQL posodobitve
-
-Vseh 15 besed bo posodobljenih z enim SQL skriptom. Besede bodo zapisane tako, kot so na seznamu (z veliko zacetnico, ostalo male crke, npr. "Šal", "Snežak").
-
-```sql
--- Tabela: memory_cards_Š_duplicate
-UPDATE "memory_cards_Š_duplicate" SET word = 'Šal' WHERE word = 'sal';
-UPDATE "memory_cards_Š_duplicate" SET word = 'Šah' WHERE word = 'sah';
-UPDATE "memory_cards_Š_duplicate" SET word = 'Ščetka' WHERE word = 'scetka';
-UPDATE "memory_cards_Š_duplicate" SET word = 'Škarje' WHERE word = 'skarje';
-UPDATE "memory_cards_Š_duplicate" SET word = 'Škatla' WHERE word = 'skatla';
-UPDATE "memory_cards_Š_duplicate" SET word = 'Školjka' WHERE word = 'skoljka';
-UPDATE "memory_cards_Š_duplicate" SET word = 'Šopek' WHERE word = 'sopek';
-UPDATE "memory_cards_Š_duplicate" SET word = 'Šotor' WHERE word = 'sotor';
-UPDATE "memory_cards_Š_duplicate" SET word = 'Štampiljka' WHERE word = 'stampiljka';
-UPDATE "memory_cards_Š_duplicate" SET word = 'Štorklja' WHERE word = 'storklja';
-
--- Tabela: memory_cards_S
-UPDATE "memory_cards_S" SET word = 'Snežak' WHERE word = 'snezak';
-UPDATE "memory_cards_S" SET word = 'Svinčnik' WHERE word = 'svincnik';
-
--- Tabela: memory_cards_K
-UPDATE "memory_cards_K" SET word = 'Košara' WHERE word = 'kosara';
-UPDATE "memory_cards_K" SET word = 'Kuža' WHERE word = 'kuza';
-
--- Tabela: memory_cards (R)
-UPDATE "memory_cards" SET word = 'Roža' WHERE word = 'roza';
-```
-
-## Kaj ostane nespremenjeno
-- **Koda**: Nobenih sprememb -- koda ze pravilno prikazuje besedo iz baze z .toUpperCase()
-- **Slike in zvok**: Imena datotek v storage-u ostanejo enaka (brez sumnikov, kot je standard)
-- **Tabele brez napak**: memory_cards_c, memory_cards_l, memory_cards_z, memory_cards_Č, memory_cards_Ž, memory_cards_r -- te ze imajo pravilne sumnike
