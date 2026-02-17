@@ -1,69 +1,84 @@
 
 
-## Zamenjava besede "črka" z "glas" po celotni aplikaciji
+## Natančna analiza in plan popravka preverjanja izgovorjave
 
-Beseda "črka" se v uporabniškem vmesniku zamenja z besedo "glas" v ustreznem sklonu povsod, kjer se nanaša na govorne glasove (S, Z, C, Š, Ž, Č, K, L, R). Beseda "črka" ostane le tam, kjer se dejansko nanaša na pisno črko (npr. beseda "ČRKE" v bingo/puzzle podatkih).
+### Kaj je šlo narobe
 
-### Pravila sklanjanja
+Preverjanje izgovorjave ima **dva ločena buga**, ki skupaj povzročata obnašanje ki ga vidite.
 
-| Izvirno | Novo |
-|---------|------|
-| izgovorjavo **črke** S | izgovorjavo **glasu** S |
-| izgovorjavo **črk** | izgovorjavo **glasov** |
-| Izberi **črko** | Izberi **glas** |
-| s **črko** S | z **glasom** S |
-| za **črko** S | za **glas** S |
-| **Črka** S | **Glas** S |
-| po **črkah** | po **glasovih** |
-| na **črko** | na **glas** |
-| IZBERI **ČRKO** | IZBERI **GLAS** |
+---
 
-### Datoteke s spremembami (samo uporabniški vmesnik)
+### BUG 1: Edge funkcija `transcribe-articulation` crasha ob zagonu
 
-**Strani za izbiro glasov (hero podnaslov + opisi kartic):**
-1. `src/pages/KoloSreceGames.tsx` -- "izgovorjavo glasu X" x9, "Izberi glas"
-2. `src/pages/MetKockeGames.tsx` -- "z glasom X", "Izberi glas"
-3. `src/pages/BingoGames.tsx` -- "Izberi glas"
-4. `src/pages/SpominGames.tsx` -- "Izberi glas"
-5. `src/pages/SestavljankeGames.tsx` -- "Izberi glas"
-6. `src/pages/DrsnaSestavljanka.tsx` -- "Izberi glas"
-7. `src/pages/Labirint.tsx` -- "z glasom X" x9, "Izberi glas", "Glas X"
-8. `src/pages/IgraUjemanja.tsx` -- "z glasom X", "Izberi glas"
-9. `src/pages/Zaporedja.tsx` -- "Izberi glas"
-10. `src/pages/PonoviPoved.tsx` -- "Izberi glas"
-11. `src/pages/ArtikulacijaVaje.tsx` -- "Izberi glas"
-12. `src/pages/ArtIzgovorjavaPage.tsx` -- "Glas X"
+**Lokacija:** `supabase/functions/transcribe-articulation/index.ts`, vrstica 59
 
-**Komponente iger:**
-13. `src/components/games/GamesList.tsx` -- "izgovorjavo glasov"
-14. `src/components/games/GenericVideoNavodila.tsx` -- "Glas X", "izgovorjavo glasu"
-15. `src/components/games/GenericSpominGame.tsx` -- "Glas X"
-16. `src/components/games/GenericPoveziPareSelection.tsx` -- "Glas X", "Izberi glas", "IZBERI GLAS"
-17. `src/components/games/GenericPoveziPareGame.tsx` -- "za glas"
-18. `src/components/games/MemoryGameTestControls.tsx` -- "za glas"
-19. `src/components/wheel/ProgressModal.tsx` -- "Glas X"
-20. `src/components/articulation/LetterSlider.tsx` -- "na glas"
-21. `src/components/articulation/ArticulationTestInstructionsDialog.tsx` -- zamenjava vseh pojavitev
+**Vzrok:** Neveljavni regularni izraz `/[.,!?;:\\-'"]/g`. V Deno runtime-u se `\\-` znotraj oglatih oklepajev interpretira kot razpon znakov od `\` (ASCII 92) do `'` (ASCII 39). Ker je 92 vecje od 39, je to neveljaven razpon in Deno vrze napako `SyntaxError: Invalid regular expression` ob zagonu funkcije.
 
-**Testimoniali:**
-22. `src/components/TestimonialsCarousel.tsx` -- "izgovorjavo glasu R"
-23. `src/components/home/TestimonialsSection.tsx` -- "izgovorjavo glasu R"
+**Posledica:** Funkcija se sploh ne zazene (BootFailure). Ko posnamete besedo, se zvocni posnetek poslje na streznik, a streznik takoj odpove. Brez uspesne transkripcije se gumb ponastavi na "Izgovori besedo" brez kakrsnekoli povratne informacije.
 
-**Admin strani:**
-24. `src/components/admin/DifficultiesPieChart.tsx` -- "po glasovih"
-25. `src/components/admin/LetterSelector.tsx` -- "za glas"
-26. `src/pages/admin/AdminSessionReview.tsx` -- "za glas"
-27. `src/pages/admin/games/AdminKoloSreceGames.tsx` -- "izgovorjavo glasu"
-28. `src/pages/admin/games/AdminBingoGames.tsx` -- "izberi glas"
-29. `src/pages/admin/games/AdminSpominGames.tsx` -- "izberi glas"
-30. `src/pages/admin/games/AdminSestavljankeGames.tsx` -- "z glasom", "izberi glas"
-31. `src/pages/admin/games/AdminPonoviPovedGames.tsx` -- "izberi glas"
-32. `src/pages/admin/games/AdminDrsnaSestavljankaGames.tsx` -- "izberi glas"
-33. `src/pages/admin/games/AdminIgraUjemanjaGames.tsx` -- "izberi glas"
-34. `src/pages/admin/games/AdminLabirintGames.tsx` -- "izberi glas"
-35. `src/pages/admin/games/AdminZaporedjaGames.tsx` -- "izberi glas"
-36. `src/components/routing/admin/AdminVideoNavodilaRouter.tsx` -- "Glas X", "izgovorjavo glasu"
-37. `src/models/SpeechDevelopment.ts` -- "glasu" namesto "glasu/črke"
+**Logi streznika potrjujejo:**
+```
+worker boot error: Uncaught SyntaxError: Invalid regular expression:
+/[.,!?;:\\-'"]/g: Range out of order in character class
+```
 
-**Se NE spreminja** (komentarji v kodi, imena spremenljivk, dejanske besede "ČRKE" v bingo/puzzle podatkih).
+**Popravek:** Premik pomicaja na konec character class-a:
+```
+Vrstica 59: .replace(/[.,!?;:'"\-]/g, '')
+```
+
+---
+
+### BUG 2: Test se zacne pri KAPA (index 1) namesto PAJEK (index 0)
+
+**Lokacija:** `src/hooks/useUserSessionManager.ts`, vrstice 76-86
+
+**Vzrok:** Ko uporabnik prvic odpre test, se v bazi ustvari nova seja z `current_word_index = 0` in `is_completed = false`. Ker edge funkcija crasha (Bug 1), snemanje nikoli ne uspe in `current_word_index` ostane 0.
+
+Ko uporabnik znova odpre test, `useUserSessionManager` najde to nedokoncano sejo in izracuna:
+- `lastSpoken = current_word_index = 0`
+- `startIndex = lastSpoken + 1 = 1` (beseda KAPA)
+
+Problem je v formuli. Ko je `current_word_index = 0`, to pomeni "nobena beseda se ni bila uspesno izgovorjena", a formula vseeno nastavi `startIndex` na 1.
+
+**Popravek:** Dodan pogoj: ce je `current_word_index = 0`, naj `startIndex` ostane 0.
+
+```
+Vrstice 76-86 v useUserSessionManager.ts:
+const lastSpoken = existingSession.current_word_index ?? 0;
+const info: SessionInfo = {
+  sessionId: existingSession.id,
+  sessionNumber: existingSession.session_number ?? 1,
+  startIndex: lastSpoken > 0 ? lastSpoken + 1 : 0,  // POPRAVEK
+  lastSpokenIndex: lastSpoken,
+  isResume: lastSpoken > 0,
+  totalWords: existingSession.total_words ?? totalWords,
+};
+```
+
+Isti popravek je potreben v `src/hooks/useLogopedistSessionManager.ts` (admin portal), vrstica ~78:
+```
+startIndex: lastSpoken > 0 ? lastSpoken + 1 : 0,  // POPRAVEK
+```
+
+---
+
+### Kaj nisem jaz pokvaril
+
+Noben od mojih danasnjih sprememb (zamenjava "crka" z "glas") ni vplival na te datoteke. Edge funkcija ima ta regex bug ze od prej -- logi kazejo napako od 17. februarja, torej od danes. Mozno je da je bila funkcija pred kratkim na novo deployed in se je takrat pojavil ta bug v Deno runtime-u.
+
+### Povzetek sprememb
+
+| Datoteka | Sprememba |
+|----------|-----------|
+| `supabase/functions/transcribe-articulation/index.ts` | Vrstica 59: popravek regexa na `/[.,!?;:'"\-]/g` |
+| `src/hooks/useUserSessionManager.ts` | Vrstica 80: `startIndex: lastSpoken > 0 ? lastSpoken + 1 : 0` |
+| `src/hooks/useLogopedistSessionManager.ts` | Vrstica ~78: `startIndex: lastSpoken > 0 ? lastSpoken + 1 : 0` |
+
+### Po popravku
+
+Ko bosta oba buga popravljena:
+1. Edge funkcija se bo pravilno zagnala in transkripcija bo delovala
+2. Test se bo zacel pri PAJEK (index 0) kot je pravilno
+3. Po uspesnem snemanju se bo prikazal gumb "Naprej" ali sporocilo o napacni besedi
 
