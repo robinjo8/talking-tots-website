@@ -6,6 +6,7 @@ import { FeaturesSection } from "@/components/home/FeaturesSection";
 import NewProgressComparisonSection from "@/components/home/ProgressComparisonSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { FeaturesCardsSection } from "@/components/home/FeaturesCardsSection";
+import { TeamSection } from "@/components/home/TeamSection";
 import FAQSection from "@/components/home/FAQSection";
 import { CallToActionSection } from "@/components/home/CallToActionSection";
 import { FooterSection } from "@/components/home/FooterSection";
@@ -37,6 +38,9 @@ const Index = () => {
 
       {/* Features Cards Section (replacing Pricing) */}
       <FeaturesCardsSection />
+
+      {/* Team Section */}
+      <TeamSection />
 
       {/* FAQ Section */}
       <FAQSection />
