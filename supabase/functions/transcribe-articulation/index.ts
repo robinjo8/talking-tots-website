@@ -56,7 +56,7 @@ function similarity(a: string, b: string): number {
 function normalizeText(text: string): string {
   return text
     .toUpperCase()
-    .replace(/[.,!?;:\\-'"]/g, '')
+    .replace(/[.,!?;:'"\-]/g, '')
     .replace(/\s+/g, ' ')
     .trim();
 }
