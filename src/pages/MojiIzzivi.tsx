@@ -15,7 +15,7 @@ import {
 import { PlanDayCard } from "@/components/plan/PlanDayCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Loader2, Calendar, History } from "lucide-react";
+import { Loader2, Calendar, History, ClipboardCheck } from "lucide-react";
 import { motion } from "framer-motion";
 
 const PLAN_ACTIVITY_STORAGE_KEY = "plan-activity-tracking";
@@ -271,6 +271,12 @@ function EmptyState() {
         Tvoj osebni načrt vaj bo na voljo po prvem preverjanju izgovorjave pri logopedu.
         Ko logopedinja zaključi pregled, se bo načrt samodejno ustvaril.
       </p>
+      <Button asChild className="mt-6 gap-2">
+        <Link to="/artikulacijski-test">
+          <ClipboardCheck className="h-4 w-4" />
+          Preverjanje izgovorjave
+        </Link>
+      </Button>
     </div>
   );
 }
