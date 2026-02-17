@@ -19,7 +19,7 @@ const memoryGames = [
     letter: "S",
     gradient: "from-dragon-green/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
-    description: "Poišči pare slik s črko S in nato ponovi besedo",
+    description: "Poišči pare slik z glasom S in nato ponovi besedo",
     path: "/govorne-igre/spomin/spomin-s",
     available: true
   },
@@ -28,7 +28,7 @@ const memoryGames = [
     letter: "Z",
     gradient: "from-app-teal/20 to-dragon-green/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
-    description: "Poišči pare slik s črko Z in nato ponovi besedo",
+    description: "Poišči pare slik z glasom Z in nato ponovi besedo",
     path: "/govorne-igre/spomin/spomin-z",
     available: true
   },
@@ -37,7 +37,7 @@ const memoryGames = [
     letter: "C",
     gradient: "from-dragon-green/20 to-dragon-green/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
-    description: "Poišči pare slik s črko C in nato ponovi besedo",
+    description: "Poišči pare slik z glasom C in nato ponovi besedo",
     path: "/govorne-igre/spomin/spomin-c",
     available: true
   },
@@ -46,7 +46,7 @@ const memoryGames = [
     letter: "Š",
     gradient: "from-app-blue/20 to-app-purple/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
-    description: "Poišči pare slik s črko Š in nato ponovi besedo",
+    description: "Poišči pare slik z glasom Š in nato ponovi besedo",
     path: "/govorne-igre/spomin/spomin-sh",
     available: true
   },
@@ -55,7 +55,7 @@ const memoryGames = [
     letter: "Ž",
     gradient: "from-app-purple/20 to-app-blue/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
-    description: "Poišči pare slik s črko Ž in nato ponovi besedo",
+    description: "Poišči pare slik z glasom Ž in nato ponovi besedo",
     path: "/govorne-igre/spomin/spomin-zh",
     available: true
   },
@@ -64,7 +64,7 @@ const memoryGames = [
     letter: "Č",
     gradient: "from-app-blue/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
-    description: "Poišči pare slik s črko Č in nato ponovi besedo",
+    description: "Poišči pare slik z glasom Č in nato ponovi besedo",
     path: "/govorne-igre/spomin/spomin-ch",
     available: true
   },
@@ -73,7 +73,7 @@ const memoryGames = [
     letter: "K",
     gradient: "from-app-orange/20 to-app-yellow/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png",
-    description: "Poišči pare slik s črko K in nato ponovi besedo",
+    description: "Poišči pare slik z glasom K in nato ponovi besedo",
     path: "/govorne-igre/spomin/spomin-k",
     available: true
   },
@@ -82,7 +82,7 @@ const memoryGames = [
     letter: "L",
     gradient: "from-app-purple/20 to-app-blue/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png",
-    description: "Poišči pare slik s črko L in nato ponovi besedo",
+    description: "Poišči pare slik z glasom L in nato ponovi besedo",
     path: "/govorne-igre/spomin/spomin-l",
     available: true
   },
@@ -91,7 +91,7 @@ const memoryGames = [
     letter: "R",
     gradient: "from-app-purple/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Poišči pare slik s črko R in nato ponovi besedo",
+    description: "Poišči pare slik z glasom R in nato ponovi besedo",
     path: "/govorne-igre/spomin/spomin-r",
     available: true
   },
@@ -176,7 +176,7 @@ export default function SpominGames() {
               Spomin
             </h1>
             <p className="text-xl text-white/90">
-              Izberi črko za igro spomina
+              Izberi glas za igro spomina
             </p>
           </div>
           

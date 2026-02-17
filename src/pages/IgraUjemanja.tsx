@@ -18,7 +18,7 @@ const matchingGames = [
     letter: "S",
     gradient: "from-dragon-green/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
-    description: "Poveži besedo s črko S s pravo sliko",
+    description: "Poveži besedo z glasom S s pravo sliko",
     available: true
   },
   {
@@ -26,7 +26,7 @@ const matchingGames = [
     letter: "Z",
     gradient: "from-app-teal/20 to-dragon-green/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
-    description: "Poveži besedo s črko Z s pravo sliko",
+    description: "Poveži besedo z glasom Z s pravo sliko",
     available: true
   },
   {
@@ -34,7 +34,7 @@ const matchingGames = [
     letter: "C",
     gradient: "from-dragon-green/20 to-dragon-green/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
-    description: "Poveži besedo s črko C s pravo sliko",
+    description: "Poveži besedo z glasom C s pravo sliko",
     available: true
   },
   {
@@ -42,7 +42,7 @@ const matchingGames = [
     letter: "Š",
     gradient: "from-app-blue/20 to-app-purple/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
-    description: "Poveži besedo s črko Š s pravo sliko",
+    description: "Poveži besedo z glasom Š s pravo sliko",
     available: true
   },
   {
@@ -50,7 +50,7 @@ const matchingGames = [
     letter: "Ž",
     gradient: "from-app-purple/20 to-app-blue/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
-    description: "Poveži besedo s črko Ž s pravo sliko",
+    description: "Poveži besedo z glasom Ž s pravo sliko",
     available: true
   },
   {
@@ -58,7 +58,7 @@ const matchingGames = [
     letter: "Č",
     gradient: "from-app-blue/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
-    description: "Poveži besedo s črko Č s pravo sliko",
+    description: "Poveži besedo z glasom Č s pravo sliko",
     available: true
   },
   {
@@ -66,7 +66,7 @@ const matchingGames = [
     letter: "K",
     gradient: "from-app-orange/20 to-app-yellow/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png",
-    description: "Poveži besedo s črko K s pravo sliko",
+    description: "Poveži besedo z glasom K s pravo sliko",
     available: true
   },
   {
@@ -74,7 +74,7 @@ const matchingGames = [
     letter: "L",
     gradient: "from-app-purple/20 to-app-blue/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png",
-    description: "Poveži besedo s črko L s pravo sliko",
+    description: "Poveži besedo z glasom L s pravo sliko",
     available: true
   },
   {
@@ -82,7 +82,7 @@ const matchingGames = [
     letter: "R",
     gradient: "from-app-purple/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Poveži besedo s črko R s pravo sliko",
+    description: "Poveži besedo z glasom R s pravo sliko",
     available: true
   }
 ];
@@ -196,7 +196,7 @@ export default function IgraUjemanja() {
               Igra ujemanja
             </h1>
             <p className="text-xl text-white/90">
-              Izberi črko za igro ujemanja
+              Izberi glas za igro ujemanja
             </p>
           </div>
           

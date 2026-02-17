@@ -91,7 +91,7 @@ export default function ArtikulacijaVaje() {
               Artikulacija
             </h1>
             <p className="text-xl text-white/90">
-              Izberi črko za vajo izgovorjave
+              Izberi glas za vajo izgovorjave
             </p>
           </div>
           

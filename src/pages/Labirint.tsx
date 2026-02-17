@@ -17,7 +17,7 @@ const labirintGames = [
     letter: "S",
     gradient: "from-dragon-green/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
-    description: "Poišči pot skozi labirint s črko S",
+    description: "Poišči pot skozi labirint z glasom S",
     path: "/govorne-igre/labirint/s",
     available: true
   },
@@ -26,7 +26,7 @@ const labirintGames = [
     letter: "Z",
     gradient: "from-app-teal/20 to-dragon-green/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
-    description: "Poišči pot skozi labirint s črko Z",
+    description: "Poišči pot skozi labirint z glasom Z",
     path: "/govorne-igre/labirint/z",
     available: true
   },
@@ -35,7 +35,7 @@ const labirintGames = [
     letter: "C",
     gradient: "from-dragon-green/20 to-dragon-green/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
-    description: "Poišči pot skozi labirint s črko C",
+    description: "Poišči pot skozi labirint z glasom C",
     path: "/govorne-igre/labirint/c",
     available: true
   },
@@ -44,7 +44,7 @@ const labirintGames = [
     letter: "Š",
     gradient: "from-app-blue/20 to-app-purple/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
-    description: "Poišči pot skozi labirint s črko Š",
+    description: "Poišči pot skozi labirint z glasom Š",
     path: "/govorne-igre/labirint/sh",
     available: true
   },
@@ -53,7 +53,7 @@ const labirintGames = [
     letter: "Ž",
     gradient: "from-app-purple/20 to-app-blue/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
-    description: "Poišči pot skozi labirint s črko Ž",
+    description: "Poišči pot skozi labirint z glasom Ž",
     path: "/govorne-igre/labirint/zh",
     available: true
   },
@@ -62,7 +62,7 @@ const labirintGames = [
     letter: "Č",
     gradient: "from-app-blue/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
-    description: "Poišči pot skozi labirint s črko Č",
+    description: "Poišči pot skozi labirint z glasom Č",
     path: "/govorne-igre/labirint/ch",
     available: true
   },
@@ -71,7 +71,7 @@ const labirintGames = [
     letter: "K",
     gradient: "from-app-orange/20 to-app-yellow/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png",
-    description: "Poišči pot skozi labirint s črko K",
+    description: "Poišči pot skozi labirint z glasom K",
     path: "/govorne-igre/labirint/k",
     available: true
   },
@@ -80,7 +80,7 @@ const labirintGames = [
     letter: "L",
     gradient: "from-app-purple/20 to-app-blue/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png",
-    description: "Poišči pot skozi labirint s črko L",
+    description: "Poišči pot skozi labirint z glasom L",
     path: "/govorne-igre/labirint/l",
     available: true
   },
@@ -89,7 +89,7 @@ const labirintGames = [
     letter: "R",
     gradient: "from-app-purple/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Poišči pot skozi labirint s črko R",
+    description: "Poišči pot skozi labirint z glasom R",
     path: "/govorne-igre/labirint/r",
     available: true
   }
@@ -124,7 +124,7 @@ export default function Labirint() {
         <div className="w-full h-full flex items-center justify-center">
           <img 
             src={game.image}
-            alt={`Črka ${game.letter}`}
+            alt={`Glas ${game.letter}`}
             className={`object-contain group-hover:scale-110 transition-transform duration-300 ${isMobile ? 'w-[80%] h-[80%]' : 'w-full h-full'}`}
             style={{ mixBlendMode: 'multiply' }}
           />
@@ -134,7 +134,7 @@ export default function Labirint() {
       {/* Card Content */}
       <div className={`p-6 ${isMobile ? 'text-center' : ''}`}>
         <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
-          Črka {game.letter}
+          Glas {game.letter}
         </h3>
         {!isMobile && (
           <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
@@ -168,7 +168,7 @@ export default function Labirint() {
               Labirint
             </h1>
             <p className="text-xl text-white/90">
-              Izberi črko in poišči pot skozi labirint
+              Izberi glas in poišči pot skozi labirint
             </p>
           </div>
           

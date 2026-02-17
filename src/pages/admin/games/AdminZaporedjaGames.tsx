@@ -3,15 +3,15 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
 
 const zaporedjaLetters = [
-  { id: "s", letter: "S", description: "Uredi zaporedje besed s črko S", image: "zmajcek_crka_S.png" },
-  { id: "z", letter: "Z", description: "Uredi zaporedje besed s črko Z", image: "zmajcek_crka_Z.png" },
-  { id: "c", letter: "C", description: "Uredi zaporedje besed s črko C", image: "zmajcek_crka_C.png" },
-  { id: "sh", letter: "Š", description: "Uredi zaporedje besed s črko Š", image: "zmajcek_crka_SH.png" },
-  { id: "zh", letter: "Ž", description: "Uredi zaporedje besed s črko Ž", image: "zmajcek_crka_ZH.png" },
-  { id: "ch", letter: "Č", description: "Uredi zaporedje besed s črko Č", image: "zmajcek_crka_CH.png" },
-  { id: "k", letter: "K", description: "Uredi zaporedje besed s črko K", image: "zmajcek_crka_K.png" },
-  { id: "l", letter: "L", description: "Uredi zaporedje besed s črko L", image: "zmajcek_crka_L.png" },
-  { id: "r", letter: "R", description: "Uredi zaporedje besed s črko R", image: "zmajcek_crka_R.png" },
+  { id: "s", letter: "S", description: "Uredi zaporedje besed z glasom S", image: "zmajcek_crka_S.png" },
+  { id: "z", letter: "Z", description: "Uredi zaporedje besed z glasom Z", image: "zmajcek_crka_Z.png" },
+  { id: "c", letter: "C", description: "Uredi zaporedje besed z glasom C", image: "zmajcek_crka_C.png" },
+  { id: "sh", letter: "Š", description: "Uredi zaporedje besed z glasom Š", image: "zmajcek_crka_SH.png" },
+  { id: "zh", letter: "Ž", description: "Uredi zaporedje besed z glasom Ž", image: "zmajcek_crka_ZH.png" },
+  { id: "ch", letter: "Č", description: "Uredi zaporedje besed z glasom Č", image: "zmajcek_crka_CH.png" },
+  { id: "k", letter: "K", description: "Uredi zaporedje besed z glasom K", image: "zmajcek_crka_K.png" },
+  { id: "l", letter: "L", description: "Uredi zaporedje besed z glasom L", image: "zmajcek_crka_L.png" },
+  { id: "r", letter: "R", description: "Uredi zaporedje besed z glasom R", image: "zmajcek_crka_R.png" },
 ];
 
 export default function AdminZaporedjaGames() {
@@ -25,7 +25,7 @@ export default function AdminZaporedjaGames() {
 
   return (
     <AdminGameWrapper 
-      title="Zaporedja - izberi črko"
+      title="Zaporedja - izberi glas"
       backPath={`/admin/children/${childId}/games`}
     >
       <div className={isMobile ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"}>

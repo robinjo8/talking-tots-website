@@ -337,7 +337,7 @@ export function GenericSpominGame({ config, backPath, onGameComplete }: GenericS
         {/* Header with progress dots */}
         <div className="text-center pt-4">
           <h1 className="text-2xl font-bold text-white drop-shadow-lg">
-            Spomin - Črka {displayLetter}
+            Spomin - Glas {displayLetter}
           </h1>
           <MemoryProgressIndicator 
             matchedPairs={matchedPairs.length} 

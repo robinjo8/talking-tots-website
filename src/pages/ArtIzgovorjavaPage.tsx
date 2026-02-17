@@ -76,7 +76,7 @@ const ArtIzgovorjavaPage = () => {
         <div className={`flex justify-center ${isMobile ? 'px-4 mb-4' : 'mb-6'}`}>
           <div className="text-center">
             <p className="text-sm font-medium text-muted-foreground">
-              Črka {currentLetterIndex + 1} od {allLetters.length}
+              Glas {currentLetterIndex + 1} od {allLetters.length}
             </p>
           </div>
         </div>
@@ -91,13 +91,13 @@ const ArtIzgovorjavaPage = () => {
             
             {/* Letter name */}
             <h2 className="text-3xl font-bold text-foreground">
-              Črka {currentLetter}
+              Glas {currentLetter}
             </h2>
             
             {/* Placeholder content */}
             <div className="bg-background/80 backdrop-blur-sm rounded-xl p-6 shadow-md border max-w-md">
               <p className="text-muted-foreground text-center">
-                Vsebina za črko {currentLetter} bo dodana kmalu.
+                Vsebina za glas {currentLetter} bo dodana kmalu.
               </p>
             </div>
           </div>

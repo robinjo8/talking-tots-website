@@ -3,15 +3,15 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
 
 const bingoLetters = [
-  { id: "s", letter: "S", title: "Glas S", description: "Igraj bingo in vadi izgovorjavo črke S", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_S.png" },
-  { id: "z", letter: "Z", title: "Glas Z", description: "Igraj bingo in vadi izgovorjavo črke Z", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_Z.png" },
-  { id: "c", letter: "C", title: "Glas C", description: "Igraj bingo in vadi izgovorjavo črke C", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_C.png" },
-  { id: "sh", letter: "Š", title: "Glas Š", description: "Igraj bingo in vadi izgovorjavo črke Š", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_SH.png" },
-  { id: "zh", letter: "Ž", title: "Glas Ž", description: "Igraj bingo in vadi izgovorjavo črke Ž", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_ZH.png" },
-  { id: "ch", letter: "Č", title: "Glas Č", description: "Igraj bingo in vadi izgovorjavo črke Č", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_CH.png" },
-  { id: "k", letter: "K", title: "Glas K", description: "Igraj bingo in vadi izgovorjavo črke K", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_K.png" },
-  { id: "l", letter: "L", title: "Glas L", description: "Igraj bingo in vadi izgovorjavo črke L", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_L.png" },
-  { id: "r", letter: "R", title: "Glas R", description: "Igraj bingo in vadi izgovorjavo črke R", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_R.png" },
+  { id: "s", letter: "S", title: "Glas S", description: "Igraj bingo in vadi izgovorjavo glasu S", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_S.png" },
+  { id: "z", letter: "Z", title: "Glas Z", description: "Igraj bingo in vadi izgovorjavo glasu Z", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_Z.png" },
+  { id: "c", letter: "C", title: "Glas C", description: "Igraj bingo in vadi izgovorjavo glasu C", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_C.png" },
+  { id: "sh", letter: "Š", title: "Glas Š", description: "Igraj bingo in vadi izgovorjavo glasu Š", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_SH.png" },
+  { id: "zh", letter: "Ž", title: "Glas Ž", description: "Igraj bingo in vadi izgovorjavo glasu Ž", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_ZH.png" },
+  { id: "ch", letter: "Č", title: "Glas Č", description: "Igraj bingo in vadi izgovorjavo glasu Č", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_CH.png" },
+  { id: "k", letter: "K", title: "Glas K", description: "Igraj bingo in vadi izgovorjavo glasu K", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_K.png" },
+  { id: "l", letter: "L", title: "Glas L", description: "Igraj bingo in vadi izgovorjavo glasu L", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_L.png" },
+  { id: "r", letter: "R", title: "Glas R", description: "Igraj bingo in vadi izgovorjavo glasu R", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_R.png" },
 ];
 
 export default function AdminBingoGames() {
@@ -25,7 +25,7 @@ export default function AdminBingoGames() {
 
   return (
     <AdminGameWrapper 
-      title="Bingo - izberi črko"
+      title="Bingo - izberi glas"
       backPath={`/admin/children/${childId}/games`}
     >
       <div className={isMobile ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"}>

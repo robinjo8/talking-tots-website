@@ -21,14 +21,14 @@ interface LetterSelectorProps {
 
 export function formatRecommendedLettersText(letters: string[]): string {
   if (letters.length === 0) return '';
-  if (letters.length === 1) return `Priporočamo igre in vaje za črko ${letters[0]}.`;
-  if (letters.length === 2) return `Priporočamo igre in vaje za črko ${letters[0]} in za črko ${letters[1]}.`;
+  if (letters.length === 1) return `Priporočamo igre in vaje za glas ${letters[0]}.`;
+  if (letters.length === 2) return `Priporočamo igre in vaje za glas ${letters[0]} in za glas ${letters[1]}.`;
   
-  // 3+ letters: "za črko R, črko K in za črko L."
+  // 3+ letters: "za glas R, glas K in za glas L."
   const allButLast = letters.slice(0, -1);
   const last = letters[letters.length - 1];
-  const parts = allButLast.map((l, i) => i === 0 ? `črko ${l}` : `črko ${l}`);
-  return `Priporočamo igre in vaje za ${parts.join(', ')} in za črko ${last}.`;
+  const parts = allButLast.map((l, i) => i === 0 ? `glas ${l}` : `glas ${l}`);
+  return `Priporočamo igre in vaje za ${parts.join(', ')} in za glas ${last}.`;
 }
 
 export function LetterSelector({ selectedLetters, onLettersChange }: LetterSelectorProps) {
@@ -64,7 +64,7 @@ export function LetterSelector({ selectedLetters, onLettersChange }: LetterSelec
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="h-7 text-xs">
-              + Dodaj črko
+              + Dodaj glas
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-64 p-3" align="start">

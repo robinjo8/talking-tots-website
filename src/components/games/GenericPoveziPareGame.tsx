@@ -230,7 +230,7 @@ export function GenericPoveziPareGame({ config }: Props) {
         <div className="container max-w-5xl mx-auto pt-8 pb-20 px-4">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Napaka</h1>
-            <p className="text-muted-foreground">Ni bilo mogoče naložiti podatkov za črko {config.letter}.</p>
+            <p className="text-muted-foreground">Ni bilo mogoče naložiti podatkov za glas {config.letter}.</p>
             <button 
               onClick={() => navigate('/govorne-igre')}
               className="mt-4 px-4 py-2 bg-dragon-green text-white rounded-lg hover:bg-dragon-green/90"

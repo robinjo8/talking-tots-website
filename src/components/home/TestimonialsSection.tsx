@@ -3,7 +3,7 @@ import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
 export const TestimonialsSection = () => {
   const isMobile = useIsMobile();
   const testimonials = [{
-    quote: "Moj sin je imel težave z izgovorjavo črke R. Po enem mesecu vaj z zmajčkom Tomijem jo izgovarja brez težav! Toplo priporočam!",
+    quote: "Moj sin je imel težave z izgovorjavo glasu R. Po enem mesecu vaj z zmajčkom Tomijem jo izgovarja brez težav! Toplo priporočam!",
     author: "— Tanja, mama 6-letnika"
   }, {
     quote: "Končno nekaj, kar je narejeno za slovenske otroke! Govorne vaje so zabavne in hčerka komaj čaka, da jih dela vsak dan.",

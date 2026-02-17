@@ -22,7 +22,7 @@ export function MemoryGameTestControls({ gameSubtype, completionCount = 0 }: Mem
       }, i * 100); // Small delay between each record
     }
     
-    toast.success(`Dodanih ${testValue} dokončanih iger za črko ${gameSubtype}!`);
+    toast.success(`Dodanih ${testValue} dokončanih iger za glas ${gameSubtype}!`);
   };
 
   return (

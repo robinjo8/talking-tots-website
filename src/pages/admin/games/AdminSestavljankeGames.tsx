@@ -3,15 +3,15 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
 
 const sestavljankeLetters = [
-  { id: "s", letter: "S", description: "Sestavi sliko s črko S", image: "zmajcek_crka_S.png" },
-  { id: "z", letter: "Z", description: "Sestavi sliko s črko Z", image: "zmajcek_crka_Z.png" },
-  { id: "c", letter: "C", description: "Sestavi sliko s črko C", image: "zmajcek_crka_C.png" },
-  { id: "sh", letter: "Š", description: "Sestavi sliko s črko Š", image: "zmajcek_crka_SH.png" },
-  { id: "zh", letter: "Ž", description: "Sestavi sliko s črko Ž", image: "zmajcek_crka_ZH.png" },
-  { id: "ch", letter: "Č", description: "Sestavi sliko s črko Č", image: "zmajcek_crka_CH.png" },
-  { id: "k", letter: "K", description: "Sestavi sliko s črko K", image: "zmajcek_crka_K.png" },
-  { id: "l", letter: "L", description: "Sestavi sliko s črko L", image: "zmajcek_crka_L.png" },
-  { id: "r", letter: "R", description: "Sestavi sliko s črko R", image: "zmajcek_crka_R.png" },
+  { id: "s", letter: "S", description: "Sestavi sliko z glasom S", image: "zmajcek_crka_S.png" },
+  { id: "z", letter: "Z", description: "Sestavi sliko z glasom Z", image: "zmajcek_crka_Z.png" },
+  { id: "c", letter: "C", description: "Sestavi sliko z glasom C", image: "zmajcek_crka_C.png" },
+  { id: "sh", letter: "Š", description: "Sestavi sliko z glasom Š", image: "zmajcek_crka_SH.png" },
+  { id: "zh", letter: "Ž", description: "Sestavi sliko z glasom Ž", image: "zmajcek_crka_ZH.png" },
+  { id: "ch", letter: "Č", description: "Sestavi sliko z glasom Č", image: "zmajcek_crka_CH.png" },
+  { id: "k", letter: "K", description: "Sestavi sliko z glasom K", image: "zmajcek_crka_K.png" },
+  { id: "l", letter: "L", description: "Sestavi sliko z glasom L", image: "zmajcek_crka_L.png" },
+  { id: "r", letter: "R", description: "Sestavi sliko z glasom R", image: "zmajcek_crka_R.png" },
 ];
 
 export default function AdminSestavljankeGames() {
@@ -25,7 +25,7 @@ export default function AdminSestavljankeGames() {
 
   return (
     <AdminGameWrapper 
-      title="Sestavljanke - izberi črko"
+      title="Sestavljanke - izberi glas"
       backPath={`/admin/children/${childId}/games`}
     >
       <div className={isMobile ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"}>

@@ -18,7 +18,7 @@ const memoryGames = [
     letter: "S",
     gradient: "from-dragon-green/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
-    description: "Drsna igra s črko S in nato glasno ponovi besedo",
+    description: "Drsna igra z glasom S in nato glasno ponovi besedo",
     available: true
   },
   {
@@ -26,7 +26,7 @@ const memoryGames = [
     letter: "Z",
     gradient: "from-app-teal/20 to-dragon-green/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
-    description: "Drsna igra s črko Z in nato glasno ponovi besedo",
+    description: "Drsna igra z glasom Z in nato glasno ponovi besedo",
     available: true
   },
   {
@@ -34,7 +34,7 @@ const memoryGames = [
     letter: "C",
     gradient: "from-dragon-green/20 to-dragon-green/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
-    description: "Drsna igra s črko C in nato glasno ponovi besedo",
+    description: "Drsna igra z glasom C in nato glasno ponovi besedo",
     available: true
   },
   {
@@ -42,7 +42,7 @@ const memoryGames = [
     letter: "Š",
     gradient: "from-app-blue/20 to-app-purple/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
-    description: "Drsna igra s črko Š in nato glasno ponovi besedo",
+    description: "Drsna igra z glasom Š in nato glasno ponovi besedo",
     available: true
   },
   {
@@ -50,7 +50,7 @@ const memoryGames = [
     letter: "Ž",
     gradient: "from-app-purple/20 to-app-blue/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
-    description: "Drsna igra s črko Ž in nato glasno ponovi besedo",
+    description: "Drsna igra z glasom Ž in nato glasno ponovi besedo",
     available: true
   },
   {
@@ -58,7 +58,7 @@ const memoryGames = [
     letter: "Č",
     gradient: "from-app-blue/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
-    description: "Drsna igra s črko Č in nato glasno ponovi besedo",
+    description: "Drsna igra z glasom Č in nato glasno ponovi besedo",
     available: true
   },
   {
@@ -66,7 +66,7 @@ const memoryGames = [
     letter: "K",
     gradient: "from-app-orange/20 to-app-yellow/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png",
-    description: "Drsna igra s črko K in nato glasno ponovi besedo",
+    description: "Drsna igra z glasom K in nato glasno ponovi besedo",
     available: true
   },
   {
@@ -74,7 +74,7 @@ const memoryGames = [
     letter: "L",
     gradient: "from-app-purple/20 to-app-blue/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png",
-    description: "Drsna igra s črko L in nato glasno ponovi besedo",
+    description: "Drsna igra z glasom L in nato glasno ponovi besedo",
     available: true
   },
   {
@@ -82,7 +82,7 @@ const memoryGames = [
     letter: "R",
     gradient: "from-app-purple/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Drsna igra s črko R in nato glasno ponovi besedo",
+    description: "Drsna igra z glasom R in nato glasno ponovi besedo",
     available: true
   }
 ];
@@ -197,7 +197,7 @@ export default function DrsnaSestavljanka() {
               Drsne sestavljanke
             </h1>
             <p className="text-xl text-white/90">
-              Izberi črko za drsno sestavljanko
+              Izberi glas za drsno sestavljanko
             </p>
           </div>
           
