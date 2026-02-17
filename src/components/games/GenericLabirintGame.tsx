@@ -346,7 +346,7 @@ export function GenericLabirintGame({ config, backPath = '/govorne-igre/labirint
           isOpen={showCompletion}
           onOpenChange={setShowCompletion}
           completedImage={starImages[0] || enrichImageWithAudio(config.images[0])}
-          allImages={config.images.map(enrichImageWithAudio)}
+          allImages={starImages}
           onStarClaimed={handleStarClaimed}
         />
       </div>
@@ -411,7 +411,7 @@ export function GenericLabirintGame({ config, backPath = '/govorne-igre/labirint
         isOpen={showCompletion}
         onOpenChange={setShowCompletion}
         completedImage={starImages[0] || enrichImageWithAudio(config.images[0])}
-        allImages={config.images.map(enrichImageWithAudio)}
+        allImages={starImages}
         onStarClaimed={handleStarClaimed}
       />
     </div>
