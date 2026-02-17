@@ -58,7 +58,7 @@ export function ChildCompletedView({
 
       <Button
         onClick={onClose}
-        className="w-full bg-dragon-green hover:bg-dragon-green/90 text-base font-medium py-6"
+        className="w-full bg-orange-500 hover:bg-orange-600 text-base font-medium py-6"
       >
         {closeButtonText}
       </Button>
