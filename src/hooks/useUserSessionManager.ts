@@ -77,8 +77,8 @@ export const useUserSessionManager = (): UseUserSessionManagerResult => {
         const info: SessionInfo = {
           sessionId: existingSession.id,
           sessionNumber: existingSession.session_number ?? 1,
-          startIndex: lastSpoken + 1,  // Naslednja beseda za izgovorjavo
-          lastSpokenIndex: lastSpoken,  // Zadnja izgovorjena beseda (za dialog)
+          startIndex: lastSpoken > 0 ? lastSpoken + 1 : 0,
+          lastSpokenIndex: lastSpoken,
           isResume: lastSpoken > 0,
           totalWords: existingSession.total_words ?? totalWords,
         };
