@@ -111,8 +111,8 @@ const breadcrumbConfig: BreadcrumbConfig[] = [
   { path: "/govorne-igre/bingo/zh", label: "Ž", parent: "/govorne-igre/bingo" },
   
   // Govorno-jezikovne vaje hierarchy
-  { path: "/govornojezicovne-vaje", label: "Govorno-jezikovne vaje", parent: "/moje-aplikacije" },
-  { path: "/govorno-jezikovne-vaje", label: "Govorno-jezikovne vaje", parent: "/moje-aplikacije" },
+  { path: "/govornojezicovne-vaje", label: "Govorne vaje", parent: "/moje-aplikacije" },
+  { path: "/govorno-jezikovne-vaje", label: "Govorne vaje", parent: "/moje-aplikacije" },
   { path: "/vaje-motorike-govoril", label: "Vaje motorike govoril", parent: "/moje-aplikacije" },
   { path: "/govorno-jezikovne-vaje/vaje-motorike-govoril", label: "Vaje motorike govoril", parent: "/govorno-jezikovne-vaje" },
   
