@@ -1,35 +1,69 @@
 
 
-## Spremembe v sekciji "Kdo smo" na prvi strani
+## Zamenjava besede "črka" z "glas" po celotni aplikaciji
 
-### 1. Zelena podlaga za "Kdo smo"
-- Spremenimo `bg-background` v `bg-dragon-green` z valovitimi SVG ločilniki (zgoraj in spodaj), enako kot pri sekcijah Testimonials in FAQ
-- Besedilo (naslov, imena, opisi) spremenimo v belo barvo (`text-white`)
+Beseda "črka" se v uporabniškem vmesniku zamenja z besedo "glas" v ustreznem sklonu povsod, kjer se nanaša na govorne glasove (S, Z, C, Š, Ž, Č, K, L, R). Beseda "črka" ostane le tam, kjer se dejansko nanaša na pisno črko (npr. beseda "ČRKE" v bingo/puzzle podatkih).
 
-### 2. FAQ sekcija dobi belo podlago
-- Ker je zdaj "Kdo smo" zelena, mora FAQ preiti na belo podlago (`bg-white` namesto `bg-dragon-green`)
-- Odstranimo valovite SVG ločilnike iz FAQ sekcije
-- Besedilo naslova spremenimo nazaj v temno barvo
+### Pravila sklanjanja
 
-### 3. Popravki opisov
-- Spela: "Spela je logopedinja z vec kot desetletnimi izkusnjami..."
-- Ema: "Ema je logopedinja z vec kot desetletnimi izkusnjami..."
-- Robert: "Robert je pobudnik projekta TomiTalk..."
-- Jasna ostane enaka
+| Izvirno | Novo |
+|---------|------|
+| izgovorjavo **črke** S | izgovorjavo **glasu** S |
+| izgovorjavo **črk** | izgovorjavo **glasov** |
+| Izberi **črko** | Izberi **glas** |
+| s **črko** S | z **glasom** S |
+| za **črko** S | za **glas** S |
+| **Črka** S | **Glas** S |
+| po **črkah** | po **glasovih** |
+| na **črko** | na **glas** |
+| IZBERI **ČRKO** | IZBERI **GLAS** |
 
-### 4. Mobilni prikaz s slideom (carousel)
-- Na mobilnih napravah zamenjamo navpicno mrežo (grid-cols-1) s horizontalnim vrtiljakom (Embla Carousel), ki omogoca drsanje levo/desno
-- Na namizju ohranimo 2x2 mrežo
+### Datoteke s spremembami (samo uporabniški vmesnik)
 
-### 5. Gumb "Vec o nas" namesto "Prikazi vec"
-- Odstranimo toggle logiko (useState, fullDescription)
-- Dodamo gumb "Vec o nas" s povezavo (Link) na `/kdo-smo`
+**Strani za izbiro glasov (hero podnaslov + opisi kartic):**
+1. `src/pages/KoloSreceGames.tsx` -- "izgovorjavo glasu X" x9, "Izberi glas"
+2. `src/pages/MetKockeGames.tsx` -- "z glasom X", "Izberi glas"
+3. `src/pages/BingoGames.tsx` -- "Izberi glas"
+4. `src/pages/SpominGames.tsx` -- "Izberi glas"
+5. `src/pages/SestavljankeGames.tsx` -- "Izberi glas"
+6. `src/pages/DrsnaSestavljanka.tsx` -- "Izberi glas"
+7. `src/pages/Labirint.tsx` -- "z glasom X" x9, "Izberi glas", "Glas X"
+8. `src/pages/IgraUjemanja.tsx` -- "z glasom X", "Izberi glas"
+9. `src/pages/Zaporedja.tsx` -- "Izberi glas"
+10. `src/pages/PonoviPoved.tsx` -- "Izberi glas"
+11. `src/pages/ArtikulacijaVaje.tsx` -- "Izberi glas"
+12. `src/pages/ArtIzgovorjavaPage.tsx` -- "Glas X"
 
----
+**Komponente iger:**
+13. `src/components/games/GamesList.tsx` -- "izgovorjavo glasov"
+14. `src/components/games/GenericVideoNavodila.tsx` -- "Glas X", "izgovorjavo glasu"
+15. `src/components/games/GenericSpominGame.tsx` -- "Glas X"
+16. `src/components/games/GenericPoveziPareSelection.tsx` -- "Glas X", "Izberi glas", "IZBERI GLAS"
+17. `src/components/games/GenericPoveziPareGame.tsx` -- "za glas"
+18. `src/components/games/MemoryGameTestControls.tsx` -- "za glas"
+19. `src/components/wheel/ProgressModal.tsx` -- "Glas X"
+20. `src/components/articulation/LetterSlider.tsx` -- "na glas"
+21. `src/components/articulation/ArticulationTestInstructionsDialog.tsx` -- zamenjava vseh pojavitev
 
-### Tehnicne spremembe
+**Testimoniali:**
+22. `src/components/TestimonialsCarousel.tsx` -- "izgovorjavo glasu R"
+23. `src/components/home/TestimonialsSection.tsx` -- "izgovorjavo glasu R"
 
-| Datoteka | Sprememba |
-|----------|-----------|
-| `src/components/home/TeamSection.tsx` | Zelena podlaga z valovi, popravljeni opisi, carousel za mobilno, gumb "Vec o nas" -> /kdo-smo |
-| `src/components/home/FAQSection.tsx` | Bela podlaga, odstranitev valov, temno besedilo naslova |
+**Admin strani:**
+24. `src/components/admin/DifficultiesPieChart.tsx` -- "po glasovih"
+25. `src/components/admin/LetterSelector.tsx` -- "za glas"
+26. `src/pages/admin/AdminSessionReview.tsx` -- "za glas"
+27. `src/pages/admin/games/AdminKoloSreceGames.tsx` -- "izgovorjavo glasu"
+28. `src/pages/admin/games/AdminBingoGames.tsx` -- "izberi glas"
+29. `src/pages/admin/games/AdminSpominGames.tsx` -- "izberi glas"
+30. `src/pages/admin/games/AdminSestavljankeGames.tsx` -- "z glasom", "izberi glas"
+31. `src/pages/admin/games/AdminPonoviPovedGames.tsx` -- "izberi glas"
+32. `src/pages/admin/games/AdminDrsnaSestavljankaGames.tsx` -- "izberi glas"
+33. `src/pages/admin/games/AdminIgraUjemanjaGames.tsx` -- "izberi glas"
+34. `src/pages/admin/games/AdminLabirintGames.tsx` -- "izberi glas"
+35. `src/pages/admin/games/AdminZaporedjaGames.tsx` -- "izberi glas"
+36. `src/components/routing/admin/AdminVideoNavodilaRouter.tsx` -- "Glas X", "izgovorjavo glasu"
+37. `src/models/SpeechDevelopment.ts` -- "glasu" namesto "glasu/črke"
+
+**Se NE spreminja** (komentarji v kodi, imena spremenljivk, dejanske besede "ČRKE" v bingo/puzzle podatkih).
+
