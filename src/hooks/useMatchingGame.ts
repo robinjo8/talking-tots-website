@@ -107,15 +107,16 @@ export function useMatchingGame(images: MatchingGameImage[], numColumns: number 
         const newConnections = [...prev.connections, newConnection];
         const willBeComplete = newCompletedMatches.size === prev.originalImages.length;
 
-        // Play audio if available
+        // Play audio if available - reuse element for Safari
         if (matchedImage?.audio_url) {
-          if (audioRef.current) {
-            audioRef.current.pause();
-            audioRef.current.src = "";
+          if (!audioRef.current) {
+            audioRef.current = new Audio();
           }
-          audioRef.current = new Audio(matchedImage.audio_url);
+          audioRef.current.pause();
+          audioRef.current.currentTime = 0;
+          audioRef.current.src = matchedImage.audio_url;
+          audioRef.current.load();
           
-          // If this is the last match, wait for audio to finish before marking complete
           if (willBeComplete) {
             audioRef.current.onended = () => {
               setGameState(current => ({
@@ -127,7 +128,6 @@ export function useMatchingGame(images: MatchingGameImage[], numColumns: number 
           
           audioRef.current.play().catch(error => {
             console.error("Error playing match audio:", error);
-            // If audio fails, still mark as complete if needed
             if (willBeComplete) {
               setGameState(current => ({
                 ...current,

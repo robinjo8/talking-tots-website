@@ -62,25 +62,21 @@ export function useThreeColumnMatching(items: ThreeColumnMatchingItem[]) {
   const selectAudio = (itemId: string) => {
     if (gameState.completedItems.has(itemId)) return;
     
-    // Play audio IMMEDIATELY when audio tile is clicked
+    // Play audio - reuse audio element for Safari compatibility
     const item = items.find(i => i.id === itemId);
     if (item) {
       const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${item.audioFile}`;
       
       try {
-        console.log('Playing audio from URL:', audioUrl);
-        
-        // Stop any existing audio
-        if (audioRef.current) {
-          audioRef.current.pause();
-          audioRef.current.src = "";
+        if (!audioRef.current) {
+          audioRef.current = new Audio();
         }
-        
-        // Create a fresh audio element and play immediately
-        audioRef.current = new Audio(audioUrl);
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+        audioRef.current.src = audioUrl;
+        audioRef.current.load();
         audioRef.current.play().catch(error => {
           console.error("Error playing audio:", error);
-          console.error("Audio URL that failed:", audioUrl);
         });
       } catch (error) {
         console.error("Error setting up audio playback:", error);
