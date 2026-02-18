@@ -69,51 +69,24 @@ export function useFourColumnMatching(items: FourColumnMatchingItem[]) {
   const selectAudio = (itemId: string) => {
     if (gameState.completedItems.has(itemId)) return;
     
-    // Play audio BEFORE state update using same logic as useAudioPlayback
+    // Play audio - reuse audio element for Safari compatibility
     const item = items.find(i => i.id === itemId);
     if (item) {
       const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${item.audioFile}`;
       
       try {
-        console.log('Playing audio from URL:', audioUrl);
-        
-        // Stop any existing audio by clearing source instead of pausing
-        if (audioRef.current) {
-          audioRef.current.src = "";
-          audioRef.current.load(); // Reset the audio element
+        if (!audioRef.current) {
+          audioRef.current = new Audio();
         }
-        
-        // Create a fresh audio element
-        audioRef.current = new Audio();
-        
-        // Add event listeners for debugging
-        audioRef.current.addEventListener('loadstart', () => console.log('Audio load started'));
-        audioRef.current.addEventListener('canplay', () => console.log('Audio can play'));
-        audioRef.current.addEventListener('loadeddata', () => console.log('Audio data loaded'));
-        audioRef.current.addEventListener('error', (e) => {
-          console.error('Audio element error:', e);
-          const target = e.target as HTMLAudioElement;
-          console.error('Audio error details:', {
-            error: target.error,
-            networkState: target.networkState,
-            readyState: target.readyState,
-            src: target.src
-          });
-        });
-        
-        // Set new source and play
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
         audioRef.current.src = audioUrl;
-        audioRef.current.load(); // Force load to ensure fresh start
-        
-        audioRef.current.play().then(() => {
-          console.log('Audio started playing successfully');
-        }).catch(error => {
+        audioRef.current.load();
+        audioRef.current.play().catch(error => {
           console.error("Error playing audio:", error);
-          console.error("Audio URL that failed:", audioUrl);
         });
       } catch (error) {
         console.error("Error setting up audio playback:", error);
-        console.error("Audio URL that caused error:", audioUrl);
       }
     }
     
@@ -175,18 +148,22 @@ export function useFourColumnMatching(items: FourColumnMatchingItem[]) {
         newCompletedItems.add(selectedAudio);
         newScore += 1;
         
-        // Play audio for matched pair
+        // Play audio for matched pair - reuse element for Safari
         const matchedItem = prev.items.find(item => item.id === selectedAudio);
         if (matchedItem) {
           const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${matchedItem.audioFile}`;
-          const audio = new Audio(audioUrl);
+          if (!audioRef.current) {
+            audioRef.current = new Audio();
+          }
+          audioRef.current.pause();
+          audioRef.current.currentTime = 0;
+          audioRef.current.src = audioUrl;
+          audioRef.current.load();
           
-          // Check if this is the last match
           const willBeComplete = newCompletedItems.size === prev.items.length;
           
           if (willBeComplete) {
-            // Delay completion until audio finishes
-            audio.onended = () => {
+            audioRef.current.onended = () => {
               setGameState(current => ({
                 ...current,
                 isComplete: true
@@ -194,7 +171,7 @@ export function useFourColumnMatching(items: FourColumnMatchingItem[]) {
             };
           }
           
-          audio.play().catch(err => console.error('Error playing audio:', err));
+          audioRef.current.play().catch(err => console.error('Error playing audio:', err));
         }
       }
 

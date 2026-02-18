@@ -114,14 +114,18 @@ export function GenericPoveziPareGame({ config }: Props) {
     await checkForNewTrophy();
   };
 
-  // Fullscreen handling for mobile
+  // Fullscreen handling for mobile (iOS-safe)
   useEffect(() => {
     if (isMobile) {
-      document.documentElement.requestFullscreen?.();
+      const setup = async () => {
+        const { safeRequestFullscreen } = await import('@/utils/appleDetection');
+        await safeRequestFullscreen();
+      };
+      setup();
       return () => {
-        if (document.fullscreenElement) {
-          document.exitFullscreen?.();
-        }
+        import('@/utils/appleDetection').then(({ safeExitFullscreen }) => {
+          safeExitFullscreen();
+        });
       };
     }
   }, [isMobile]);

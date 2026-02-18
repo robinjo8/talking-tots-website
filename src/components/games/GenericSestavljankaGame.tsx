@@ -132,23 +132,18 @@ export function GenericSestavljankaGame({ config, backPath = '/govorne-igre/sest
     };
   }, [imageUrl]);
 
-  // Fullscreen effect for mobile
+  // Fullscreen effect for mobile (iOS-safe)
   useEffect(() => {
     if (effectiveFullscreen) {
-      const requestFullscreen = async () => {
-        try {
-          if (document.documentElement.requestFullscreen) {
-            await document.documentElement.requestFullscreen();
-          }
-        } catch (error) {
-          console.log('Fullscreen not supported:', error);
-        }
+      const setup = async () => {
+        const { safeRequestFullscreen } = await import('@/utils/appleDetection');
+        await safeRequestFullscreen();
       };
-      requestFullscreen();
+      setup();
       return () => {
-        if (document.fullscreenElement) {
-          document.exitFullscreen?.();
-        }
+        import('@/utils/appleDetection').then(({ safeExitFullscreen }) => {
+          safeExitFullscreen();
+        });
       };
     }
   }, [effectiveFullscreen]);

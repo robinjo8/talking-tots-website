@@ -103,47 +103,21 @@ export function GenericZaporedjaGame({ config, backPath = '/govorne-igre/zapored
     };
   }, []);
 
-  // Automatic fullscreen and landscape lock
+  // Automatic fullscreen and landscape lock (iOS-safe)
   useEffect(() => {
     if (effectiveFullscreen) {
-      const requestFullscreen = async () => {
-        try {
-          if (document.documentElement.requestFullscreen) {
-            await document.documentElement.requestFullscreen();
-          }
-        } catch (error) {
-          console.log('Fullscreen not supported:', error);
-        }
+      const setup = async () => {
+        const { safeRequestFullscreen, safeLockLandscape } = await import('@/utils/appleDetection');
+        await safeRequestFullscreen();
+        await safeLockLandscape();
       };
-
-      const lockLandscape = async () => {
-        try {
-          if (screen.orientation && 'lock' in screen.orientation) {
-            try {
-              await (screen.orientation as any).lock('landscape-primary');
-            } catch {
-              await (screen.orientation as any).lock('landscape');
-            }
-          }
-        } catch (error) {
-          console.log('Landscape lock not supported:', error);
-        }
-      };
-
-      requestFullscreen();
-      lockLandscape();
+      setup();
         
       return () => {
-        if (document.fullscreenElement) {
-          document.exitFullscreen?.();
-        }
-        try {
-          if (screen.orientation && 'unlock' in screen.orientation) {
-            (screen.orientation as any).unlock();
-          }
-        } catch (error) {
-          console.log('Portrait unlock not supported:', error);
-        }
+        import('@/utils/appleDetection').then(({ safeExitFullscreen, safeUnlockOrientation }) => {
+          safeExitFullscreen();
+          safeUnlockOrientation();
+        });
       };
     }
   }, [effectiveFullscreen]);

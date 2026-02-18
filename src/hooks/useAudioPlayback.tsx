@@ -8,43 +8,40 @@ export const useAudioPlayback = () => {
     try {
       console.log('Playing audio from URL:', audioUrl);
       
-      // Stop any existing audio by clearing source instead of pausing
-      if (audioRef.current) {
-        audioRef.current.src = "";
-        audioRef.current.load(); // Reset the audio element
+      // Reuse existing audio element instead of creating new one (Safari fix)
+      if (!audioRef.current) {
+        audioRef.current = new Audio();
       }
       
-      // Create a fresh audio element
-      audioRef.current = new Audio();
+      const audio = audioRef.current;
       
-      // Add event listeners for debugging
-      audioRef.current.addEventListener('loadstart', () => console.log('Audio load started'));
-      audioRef.current.addEventListener('canplay', () => console.log('Audio can play'));
-      audioRef.current.addEventListener('loadeddata', () => console.log('Audio data loaded'));
-      audioRef.current.addEventListener('error', (e) => {
-        console.error('Audio element error:', e);
-        const target = e.target as HTMLAudioElement;
-        console.error('Audio error details:', {
-          error: target.error,
-          networkState: target.networkState,
-          readyState: target.readyState,
-          src: target.src
-        });
-      });
+      // Stop current playback
+      audio.pause();
+      audio.currentTime = 0;
       
       // Set new source and play
-      audioRef.current.src = audioUrl;
-      audioRef.current.load(); // Force load to ensure fresh start
+      audio.src = audioUrl;
+      audio.load(); // Force load for Safari
       
-      audioRef.current.play().then(() => {
+      audio.play().then(() => {
         console.log('Audio started playing successfully');
       }).catch(error => {
         console.error("Error playing audio:", error);
-        console.error("Audio URL that failed:", audioUrl);
+        // Safari: try resuming AudioContext
+        try {
+          const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+          if (AudioContext) {
+            const ctx = new AudioContext();
+            ctx.resume().then(() => {
+              audio.play().catch(e => console.error("Retry play failed:", e));
+            });
+          }
+        } catch (e) {
+          console.error("AudioContext resume failed:", e);
+        }
       });
     } catch (error) {
       console.error("Error setting up audio playback:", error);
-      console.error("Audio URL that caused error:", audioUrl);
     }
   }, []);
 

@@ -74,8 +74,12 @@ export function VideoPlayer({
         onError={onError}
         controls={false}
         controlsList="nodownload"
-        preload="metadata"
+        preload="auto"
         playsInline
+        // @ts-ignore - webkit-playsinline for older Safari
+        webkit-playsinline=""
+        // @ts-ignore - AirPlay support
+        x-webkit-airplay="allow"
         muted={isMuted}
       >
         <source src={videoUrl} type="video/mp4" />
