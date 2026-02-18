@@ -19,7 +19,7 @@ export const wordsDataKSredinaKonec: BingoWord[] = [
   { word: "HRUŠKA", image: "hruska1.webp", audio: "hruska.m4a" },
   { word: "JABOLKO", image: "jabolko1.webp", audio: "jabolko.m4a" },
   { word: "JEZIK", image: "jezik1.webp", audio: "jezik.m4a" },
-  { word: "KOKOS", image: "kokos1.webp", audio: "kokos.m4a" },
+  { word: "KOKOŠ", image: "kokos1.webp", audio: "kokos.m4a" },
   { word: "LIZIKA", image: "lizika1.webp", audio: "lizika.m4a" },
   { word: "OBLAK", image: "oblak1.webp", audio: "oblak.m4a" },
   { word: "PAJEK", image: "pajek1.webp", audio: "pajek.m4a" },
