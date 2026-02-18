@@ -5,7 +5,7 @@ const otherGames = [
   {
     id: "kolo-srece",
     title: "KOLO BESED",
-    description: "Zavrti kolo sreče in vadi izgovorjavo glasov",
+    description: "Zavrti kolo sreče in vadi izgovorjavo glasov na začetku besed",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/kolo_srece_nova_2.webp",
     gradient: "from-app-orange/20 to-app-yellow/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
@@ -16,7 +16,7 @@ const otherGames = [
   {
     id: "bingo",
     title: "BINGO",
-    description: "Igraj bingo in vadi izgovorjavo glasov",
+    description: "Igraj bingo in vadi izgovorjavo glasov na sredini in koncu besed",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/bingo_nova_2.webp",
     gradient: "from-dragon-green/20 to-app-teal/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
@@ -27,7 +27,7 @@ const otherGames = [
   {
     id: "spomin",
     title: "SPOMIN",
-    description: "Igraj spomin in vadi izgovorjavo",
+    description: "Igraj spomin in vadi izgovorjavo glasov na začetku besed",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/spomin_nova_2.webp",
     gradient: "from-app-purple/20 to-app-blue/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
@@ -38,7 +38,7 @@ const otherGames = [
   {
     id: "sestavljanke",
     title: "SESTAVLJANKE",
-    description: "Igraj sestavljanke in vadi logično razmišljanje",
+    description: "Igraj sestavljanke in vadi izgovorjavo glasov na začetku besed",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/sestavljanka_nova_1.webp",
     gradient: "from-app-teal/20 to-dragon-green/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
@@ -49,7 +49,7 @@ const otherGames = [
   {
     id: "zaporedja",
     title: "ZAPOREDJA",
-    description: "Uredi zaporedje slik in vadi izgovorjavo",
+    description: "Uredi zaporedje slik in vadi izgovorjavo glasov na začetku besed",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/zaporedja_nova_2.webp",
     gradient: "from-app-purple/20 to-app-blue/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
@@ -60,7 +60,7 @@ const otherGames = [
   {
     id: "drsna-sestavljanka",
     title: "DRSNA IGRA",
-    description: "Drsne sestavljanke za vajo izgovorjave",
+    description: "Drsne sestavljanke za vajo izgovorjave glasov na začetku besed",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/drsna_sestavljanka_nova_2.webp",
     gradient: "from-app-orange/20 to-app-yellow/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
@@ -71,7 +71,7 @@ const otherGames = [
   {
     id: "povezi-pare-matching",
     title: "IGRA UJEMANJA",
-    description: "Poveži enake slike med stolpci",
+    description: "Poveži slike in vadi izgovorjavo glasov na začetku besed",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/igra_ujemanja_2.webp",
     gradient: "from-app-purple/20 to-app-blue/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
@@ -82,7 +82,7 @@ const otherGames = [
   {
     id: "labirint",
     title: "LABIRINT",
-    description: "Poišči pot skozi labirint in vadi izgovorjavo",
+    description: "Poišči pot skozi labirint in vadi izgovorjavo glasov na začetku besed",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/labirint_nova_2.webp",
     gradient: "from-app-orange/20 to-app-yellow/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
@@ -93,7 +93,7 @@ const otherGames = [
   {
     id: "met-kocke",
     title: "SMEŠNE POVEDI",
-    description: "Vrzi kocko in sestavi smešne povedi",
+    description: "Sestavi smešne povedi in vadi izgovorjavo z glasovi na začetku, sredini in koncu besed",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/Smesne_besede_21.webp",
     gradient: "from-app-purple/20 to-dragon-green/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
@@ -104,7 +104,7 @@ const otherGames = [
   {
     id: "ponovi-poved",
     title: "PONOVI POVED",
-    description: "Ponovi tri-besedne povedi in vadi izgovorjavo",
+    description: "Ponovi povedi in vadi izgovorjavo glasov na začetku besed",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_1.webp",
     gradient: "from-dragon-green/20 to-app-teal/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
