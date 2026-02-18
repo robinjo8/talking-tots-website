@@ -126,7 +126,7 @@ export const ponoviPovedR: PonoviPovedConfig = {
       words: [
         { word: "Riba", image: "riba1.webp", audio: "riba.m4a" },
         { word: "vidi", image: "Stickman_gledati.webp", audio: "vidi.m4a" },
-        { word: "raka", image: "rak1.webp", audio: "rak.m4a" }
+        { word: "raka", image: "rak1.webp", audio: "raka.m4a" }
       ],
       fullSentence: "Riba vidi raka.",
       audio: "riba_vidi_raka.m4a"
@@ -135,7 +135,7 @@ export const ponoviPovedR: PonoviPovedConfig = {
       words: [
         { word: "Raca", image: "raca1.webp", audio: "raca.m4a" },
         { word: "je", image: "Stickman_jesti.webp", audio: "je.m4a" },
-        { word: "repo", image: "repa1.webp", audio: "repa.m4a" }
+        { word: "repo", image: "repa1.webp", audio: "repo.m4a" }
       ],
       fullSentence: "Raca je repo.",
       audio: "raca_je_repo.m4a"
@@ -144,7 +144,7 @@ export const ponoviPovedR: PonoviPovedConfig = {
       words: [
         { word: "Ris", image: "ris1.webp", audio: "ris.m4a" },
         { word: "riše", image: "Stickman_risati.webp", audio: "rise.m4a" },
-        { word: "rožo", image: "roza1.webp", audio: "roza.m4a" }
+        { word: "rožo", image: "roza1.webp", audio: "rozo.m4a" }
       ],
       fullSentence: "Ris riše rožo.",
       audio: "ris_rise_rozo.m4a"
@@ -153,7 +153,7 @@ export const ponoviPovedR: PonoviPovedConfig = {
       words: [
         { word: "Robot", image: "robot1.webp", audio: "robot.m4a" },
         { word: "ima", image: "Stickman_imeti.webp", audio: "ima.m4a" },
-        { word: "rolko", image: "rolka1.webp", audio: "rolka.m4a" }
+        { word: "rolko", image: "rolka1.webp", audio: "rolko.m4a" }
       ],
       fullSentence: "Robot ima rolko.",
       audio: "robot_ima_rolko.m4a"
@@ -232,7 +232,7 @@ export const ponoviPovedZ: PonoviPovedConfig = {
       words: [
         { word: "Zebra", image: "zebra1.webp", audio: "zebra.m4a" },
         { word: "vidi", image: "Stickman_gledati.webp", audio: "vidi.m4a" },
-        { word: "zvezdo", image: "zvezda1.webp", audio: "zvezda.m4a" }
+        { word: "zvezdo", image: "zvezda1.webp", audio: "zvezdo.m4a" }
       ],
       fullSentence: "Zebra vidi zvezdo.",
       audio: "zebra_vidi_zvezdo.m4a"
@@ -311,7 +311,7 @@ export const ponoviPovedSH: PonoviPovedConfig = {
       words: [
         { word: "Štorklja", image: "storklja1.webp", audio: "storklja.m4a" },
         { word: "je", image: "Stickman_jesti.webp", audio: "je.m4a" },
-        { word: "školjko", image: "skoljka1.webp", audio: "skoljka.m4a" }
+        { word: "školjko", image: "skoljka1.webp", audio: "skoljko.m4a" }
       ],
       fullSentence: "Štorklja je školjko.",
       audio: "storklja_je_skoljko.m4a"
@@ -346,7 +346,7 @@ export const ponoviPovedZH: PonoviPovedConfig = {
       words: [
         { word: "Žaba", image: "zaba1.webp", audio: "zaba.m4a" },
         { word: "želi", image: "Stickman_zeleti.webp", audio: "zeli.m4a" },
-        { word: "žago", image: "zaga1.webp", audio: "zaga.m4a" }
+        { word: "žago", image: "zaga1.webp", audio: "zago.m4a" }
       ],
       fullSentence: "Žaba želi žago.",
       audio: "zaba_zeli_zago.m4a"
@@ -355,7 +355,7 @@ export const ponoviPovedZH: PonoviPovedConfig = {
       words: [
         { word: "Želva", image: "zelva1.webp", audio: "zelva.m4a" },
         { word: "nese", image: "Stickman_nesti.webp", audio: "nese.m4a" },
-        { word: "žogo", image: "zoga1.webp", audio: "zoga.m4a" }
+        { word: "žogo", image: "zoga1.webp", audio: "zogo.m4a" }
       ],
       fullSentence: "Želva nese žogo.",
       audio: "zelva_nese_zogo.m4a"
@@ -373,7 +373,7 @@ export const ponoviPovedZH: PonoviPovedConfig = {
       words: [
         { word: "Žolna", image: "zolna1.webp", audio: "zolna.m4a" },
         { word: "ima", image: "Stickman_imeti.webp", audio: "ima.m4a" },
-        { word: "žlico", image: "zlica1.webp", audio: "zlica.m4a" }
+        { word: "žlico", image: "zlica1.webp", audio: "zlico.m4a" }
       ],
       fullSentence: "Žolna ima žlico.",
       audio: "zolna_ima_zlico.m4a"
@@ -408,7 +408,7 @@ export const ponoviPovedCH: PonoviPovedConfig = {
       words: [
         { word: "Čebela", image: "cebela1.webp", audio: "cebela.m4a" },
         { word: "vidi", image: "Stickman_gledati.webp", audio: "vidi.m4a" },
-        { word: "čebulo", image: "cebula1.webp", audio: "cebula.m4a" }
+        { word: "čebulo", image: "cebula1.webp", audio: "cebulo.m4a" }
       ],
       fullSentence: "Čebela vidi čebulo.",
       audio: "cebela_vidi_cebulo.m4a"
@@ -417,7 +417,7 @@ export const ponoviPovedCH: PonoviPovedConfig = {
       words: [
         { word: "Kača", image: "kaca1.webp", audio: "kaca.m4a" },
         { word: "je", image: "Stickman_jesti.webp", audio: "je.m4a" },
-        { word: "čokolado", image: "cokolada1.webp", audio: "cokolada.m4a" }
+        { word: "čokolado", image: "cokolada1.webp", audio: "cokolado.m4a" }
       ],
       fullSentence: "Kača je čokolado.",
       audio: "kaca_je_cokolado.m4a"
