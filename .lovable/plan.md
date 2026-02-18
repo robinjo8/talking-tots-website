@@ -1,57 +1,63 @@
 
+## Popravek: CORS blokira transkripcijo v razvojnem okolju
 
-## Popravek: Manjkajoča RLS politika za posodabljanje sej
+### Ugotovljen vzrok
 
-### Ugotovljen korenski vzrok
+Edge funkcija `transcribe-articulation` ima v CORS konfiguraciji (vrstica 13) preverjanje dovoljenih izvorov (origins):
 
-Starši (uporabniki v uporabniškem portalu) **nimajo dovoljenja za posodabljanje** (`UPDATE`) svojih sej v tabeli `articulation_test_sessions`. Imajo samo dovoljenje za ustvarjanje (`INSERT`) in ogled (`SELECT`).
+```
+origin.endsWith(".lovable.app")
+```
 
-Ko uporabnik izgovori besedo in sistem poskusi posodobiti `current_word_index` v bazi, klic `updateProgress` **tiho odpove** (Supabase RLS ne vrne napake, samo ignorira operacijo). Zato:
+Vaš predogled/testno okolje pa teče na domeni:
+```
+*.lovableproject.com
+```
 
-- `current_word_index` ostane vedno 0
-- Ob vrnitvi v test ni resume dialoga
-- Test se vedno začne od začetka
+Brskalnik zato **blokira** zahtevo za transkripcijo (CORS napaka "Failed to fetch"). Posledica:
 
-To je verjetno posledica varnostnih popravkov ali sprememb RLS politik, ki so bile narejene v zadnjih dneh.
+1. Zvok se posname (mikrofon deluje)
+2. Zahteva za transkripcijo se poslje, a brskalnik jo blokira
+3. Nobena povratna informacija ne pride nazaj
+4. Slika posivi, gumb se vrne na "Izgovori besedo"
+5. Napredek se ne shrani (ker transkripcija ni uspela)
 
-### Trenutne RLS politike za starše
+### Zakaj prej delalo, zdaj pa ne
 
-| Operacija | Politika | Status |
-|-----------|----------|--------|
-| INSERT | "Parents can create sessions for their children" | Deluje |
-| SELECT | "Parents can view their children's sessions" | Deluje |
-| UPDATE | **Manjka!** | Ne deluje |
-| DELETE | Ni potrebna | / |
+Ta CORS pravilo je bilo dodano med varnostnimi popravki. Pred tem je edge funkcija dovoljevala vse izvore (`*`). Sedanji seznam dovoljenih izvorov ne vkljucuje `lovableproject.com`, ki je domena za razvojno okolje.
 
 ### Popravek
 
-Dodati je treba novo RLS politiko za UPDATE:
+**Datoteka:** `supabase/functions/transcribe-articulation/index.ts`, vrstica 13
 
-```sql
-CREATE POLICY "Parents can update their children sessions"
-  ON articulation_test_sessions
-  FOR UPDATE
-  USING (parent_id = auth.uid())
-  WITH CHECK (parent_id = auth.uid());
+Trenutna koda:
+```typescript
+const isAllowed = allowedOrigins.includes(origin) || 
+  (origin.startsWith("https://") && origin.endsWith(".lovable.app"));
 ```
 
-Ta politika dovoljuje staršem posodabljanje samo svojih lastnih sej (kjer je `parent_id` enak prijavljenemu uporabniku). To je varno, ker:
-- Starši ne morejo posodobiti tujih sej
-- Politika je enakega vzorca kot obstoječa INSERT/SELECT politika
+Popravljena koda:
+```typescript
+const isAllowed = allowedOrigins.includes(origin) || 
+  (origin.startsWith("https://") && 
+   (origin.endsWith(".lovable.app") || origin.endsWith(".lovableproject.com")));
+```
 
-### Kaj se bo zgodilo po popravku
+To doda domeno `lovableproject.com` (razvojno okolje) med dovoljene izvore, medtem ko ohranja varnostno omejitev samo na Lovable domene.
 
-1. Uporabnik izgovori besedo PAJEK (index 0)
-2. `updateProgress(1)` se uspešno shrani v bazo (`current_word_index = 1`)
-3. Uporabnik zapusti test in se vrne
-4. Sistem najde sejo z `current_word_index = 1`
-5. Resume dialog se prikaže: "Zadnja izgovorjena beseda: PAJEK"
-6. Uporabnik klikne "Nadaljuj" in test nadaljuje pri KAPA
+### Po popravku
+
+1. Brskalnik bo dovolil zahtevo za transkripcijo
+2. Whisper API bo prejel zvocni posnetek in vrnil transkripcijo
+3. Ce je beseda pravilna, se prikaze gumb "NAPREJ" in pozitivno sporocilo
+4. Ce je beseda napacna, se prikaze sporocilo s transkribirano besedo
+5. Napredek se shrani v bazo (`current_word_index = 1` po prvi besedi)
+6. Ob vrnitvi v test se prikaze dialog za nadaljevanje
 
 ### Spremembe
 
-| Datoteka/Vir | Sprememba |
-|--------------|-----------|
-| Supabase RLS (SQL migracija) | Dodana UPDATE politika za starše |
+| Datoteka | Sprememba |
+|----------|-----------|
+| `supabase/functions/transcribe-articulation/index.ts` | Vrstica 13: dodana domena `.lovableproject.com` v CORS preverjanje |
 
-Nobenih sprememb v kodi ni potrebnih -- vsa logika ze deluje pravilno, samo baza je blokirala posodobitve.
+Po spremembi je potreben ponovni deploy edge funkcije.
