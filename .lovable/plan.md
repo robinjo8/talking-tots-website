@@ -1,84 +1,71 @@
 
 
-## Natančna analiza in plan popravka preverjanja izgovorjave
+## Popravek nadaljevanja preverjanja izgovorjave
 
-### Kaj je šlo narobe
+### Ugotovljen korenski vzrok
 
-Preverjanje izgovorjave ima **dva ločena buga**, ki skupaj povzročata obnašanje ki ga vidite.
+Po uspesnem snemanju besede se v bazo shrani `current_word_index` kot indeks pravkar izgovorjene besede. Problem: ko je izgovorjena PRVA beseda (PAJEK, index 0), je shranjena vrednost `0`, ki je enaka zacetni vrednosti "nobena beseda izgovorjena". Sistem ne more lociti teh dveh stanj.
 
----
+Moj zadnji popravek (`startIndex: lastSpoken > 0 ? lastSpoken + 1 : 0`) je ta problem se poglobil -- zdaj se po izgovorjeni prvi besedi test NE nadalje in resume dialog se NE prikaze.
 
-### BUG 1: Edge funkcija `transcribe-articulation` crasha ob zagonu
+### Resitev
 
-**Lokacija:** `supabase/functions/transcribe-articulation/index.ts`, vrstica 59
+Sprememba pomena polja `current_word_index`: namesto "zadnja izgovorjena beseda" bo pomenilo **"naslednja beseda za izgovorjavo"** (tj. shrani se `wordIndex + 1`).
 
-**Vzrok:** Neveljavni regularni izraz `/[.,!?;:\\-'"]/g`. V Deno runtime-u se `\\-` znotraj oglatih oklepajev interpretira kot razpon znakov od `\` (ASCII 92) do `'` (ASCII 39). Ker je 92 vecje od 39, je to neveljaven razpon in Deno vrze napako `SyntaxError: Invalid regular expression` ob zagonu funkcije.
+S tem:
+- Zacetna vrednost `0` = "zacni pri besedi 0" (nobena beseda se ni izgovorjena)
+- Po izgovorjeni besedi 0 (PAJEK): shrani se `1` = "nadaljuj pri besedi 1 (KAPA)"
+- Po izgovorjeni besedi 5: shrani se `6`
+- Ni vec dvoumnosti
 
-**Posledica:** Funkcija se sploh ne zazene (BootFailure). Ko posnamete besedo, se zvocni posnetek poslje na streznik, a streznik takoj odpove. Brez uspesne transkripcije se gumb ponastavi na "Izgovori besedo" brez kakrsnekoli povratne informacije.
+### Spremembe po datotekah
 
-**Logi streznika potrjujejo:**
+**1. `src/pages/ArtikuacijskiTest.tsx`** (vrstica ~177)
+Sprememba `handleSaveProgress`: namesto `updateProgress(wordIndex)` klice `updateProgress(wordIndex + 1)`, da se shrani naslednji indeks.
+
+```typescript
+const handleSaveProgress = useCallback(async (
+  _childId: string | undefined, 
+  _sessionNumber: number, 
+  wordIndex: number
+) => {
+  await updateProgress(wordIndex + 1);  // Shrani NASLEDNJI indeks
+}, [updateProgress]);
 ```
-worker boot error: Uncaught SyntaxError: Invalid regular expression:
-/[.,!?;:\\-'"]/g: Range out of order in character class
+
+**2. `src/pages/admin/AdminArtikulacijskiTest.tsx`** (isti popravek)
+Enak popravek za admin portal:
+```typescript
+await updateProgress(wordIndex + 1);  // Shrani NASLEDNJI indeks
 ```
 
-**Popravek:** Premik pomicaja na konec character class-a:
-```
-Vrstica 59: .replace(/[.,!?;:'"\-]/g, '')
-```
+**3. `src/hooks/useUserSessionManager.ts`** (vrstice 76-84)
+Poenostavitev logike nadaljevanja -- `current_word_index` je zdaj ze "naslednja beseda":
 
----
-
-### BUG 2: Test se zacne pri KAPA (index 1) namesto PAJEK (index 0)
-
-**Lokacija:** `src/hooks/useUserSessionManager.ts`, vrstice 76-86
-
-**Vzrok:** Ko uporabnik prvic odpre test, se v bazi ustvari nova seja z `current_word_index = 0` in `is_completed = false`. Ker edge funkcija crasha (Bug 1), snemanje nikoli ne uspe in `current_word_index` ostane 0.
-
-Ko uporabnik znova odpre test, `useUserSessionManager` najde to nedokoncano sejo in izracuna:
-- `lastSpoken = current_word_index = 0`
-- `startIndex = lastSpoken + 1 = 1` (beseda KAPA)
-
-Problem je v formuli. Ko je `current_word_index = 0`, to pomeni "nobena beseda se ni bila uspesno izgovorjena", a formula vseeno nastavi `startIndex` na 1.
-
-**Popravek:** Dodan pogoj: ce je `current_word_index = 0`, naj `startIndex` ostane 0.
-
-```
-Vrstice 76-86 v useUserSessionManager.ts:
+```typescript
 const lastSpoken = existingSession.current_word_index ?? 0;
 const info: SessionInfo = {
   sessionId: existingSession.id,
   sessionNumber: existingSession.session_number ?? 1,
-  startIndex: lastSpoken > 0 ? lastSpoken + 1 : 0,  // POPRAVEK
-  lastSpokenIndex: lastSpoken,
+  startIndex: lastSpoken,                            // Direktno, brez +1
+  lastSpokenIndex: lastSpoken > 0 ? lastSpoken - 1 : -1,  // Za prikaz v dialogu
   isResume: lastSpoken > 0,
   totalWords: existingSession.total_words ?? totalWords,
 };
 ```
 
-Isti popravek je potreben v `src/hooks/useLogopedistSessionManager.ts` (admin portal), vrstica ~78:
-```
-startIndex: lastSpoken > 0 ? lastSpoken + 1 : 0,  // POPRAVEK
-```
+**4. `src/hooks/useLogopedistSessionManager.ts`** (vrstice 76-84)
+Isti popravek kot zgoraj za admin portal.
 
----
+### Kaj se bo zgodilo po popravku
 
-### Kaj nisem jaz pokvaril
+1. Ko izgovorite PAJEK (index 0), se v bazo shrani `current_word_index = 1`
+2. Ko se vrnete v test, sistem najde `current_word_index = 1`:
+   - `isResume = true` => prikaze se resume dialog z besedilom "Zadnja izgovorjena beseda: PAJEK"
+   - `startIndex = 1` => test nadaljuje pri KAPA
+3. Resume dialog deluje pravilno za vse besede, vkljucno s prvo
 
-Noben od mojih danasnjih sprememb (zamenjava "crka" z "glas") ni vplival na te datoteke. Edge funkcija ima ta regex bug ze od prej -- logi kazejo napako od 17. februarja, torej od danes. Mozno je da je bila funkcija pred kratkim na novo deployed in se je takrat pojavil ta bug v Deno runtime-u.
+### Obstojecih sej v bazi
 
-### Povzetek sprememb
-
-| Datoteka | Sprememba |
-|----------|-----------|
-| `supabase/functions/transcribe-articulation/index.ts` | Vrstica 59: popravek regexa na `/[.,!?;:'"\-]/g` |
-| `src/hooks/useUserSessionManager.ts` | Vrstica 80: `startIndex: lastSpoken > 0 ? lastSpoken + 1 : 0` |
-| `src/hooks/useLogopedistSessionManager.ts` | Vrstica ~78: `startIndex: lastSpoken > 0 ? lastSpoken + 1 : 0` |
-
-### Po popravku
-
-Ko bosta oba buga popravljena:
-1. Edge funkcija se bo pravilno zagnala in transkripcija bo delovala
-2. Test se bo zacel pri PAJEK (index 0) kot je pravilno
-3. Po uspesnem snemanju se bo prikazal gumb "Naprej" ali sporocilo o napacni besedi
+Obstojecega zapisa v bazi (`current_word_index = 0`, beseda PAJEK ze posneta) ni treba rocno popravljati. Sistem bo to obravnaval kot "zacni od zacetka" -- uporabnik bo preprosto se enkrat izgovoril PAJEK, kar ni problematicno.
 
