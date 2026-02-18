@@ -13,7 +13,7 @@ const bingoWordsK = [
   { word: "KLOP", image: "klop1.webp", audio: "klop.m4a" },
   { word: "KNJIGA", image: "knjiga1.webp", audio: "knjiga.m4a" },
   { word: "KOCKA", image: "kocka1.webp", audio: "kocka.m4a" },
-  { word: "KOKOS", image: "kokos1.webp", audio: "kokos.m4a" },
+  { word: "KOKOŠ", image: "kokos1.webp", audio: "kokos.m4a" },
   { word: "KOLAČ", image: "kolac1.webp", audio: "kolac.m4a" },
   { word: "KOLO", image: "kolo1.webp", audio: "kolo.m4a" },
   { word: "KOŠ", image: "kos1.webp", audio: "kos.m4a" },
