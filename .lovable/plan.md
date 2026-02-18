@@ -1,71 +1,57 @@
 
 
-## Popravek nadaljevanja preverjanja izgovorjave
+## Popravek: Manjkajoča RLS politika za posodabljanje sej
 
 ### Ugotovljen korenski vzrok
 
-Po uspesnem snemanju besede se v bazo shrani `current_word_index` kot indeks pravkar izgovorjene besede. Problem: ko je izgovorjena PRVA beseda (PAJEK, index 0), je shranjena vrednost `0`, ki je enaka zacetni vrednosti "nobena beseda izgovorjena". Sistem ne more lociti teh dveh stanj.
+Starši (uporabniki v uporabniškem portalu) **nimajo dovoljenja za posodabljanje** (`UPDATE`) svojih sej v tabeli `articulation_test_sessions`. Imajo samo dovoljenje za ustvarjanje (`INSERT`) in ogled (`SELECT`).
 
-Moj zadnji popravek (`startIndex: lastSpoken > 0 ? lastSpoken + 1 : 0`) je ta problem se poglobil -- zdaj se po izgovorjeni prvi besedi test NE nadalje in resume dialog se NE prikaze.
+Ko uporabnik izgovori besedo in sistem poskusi posodobiti `current_word_index` v bazi, klic `updateProgress` **tiho odpove** (Supabase RLS ne vrne napake, samo ignorira operacijo). Zato:
 
-### Resitev
+- `current_word_index` ostane vedno 0
+- Ob vrnitvi v test ni resume dialoga
+- Test se vedno začne od začetka
 
-Sprememba pomena polja `current_word_index`: namesto "zadnja izgovorjena beseda" bo pomenilo **"naslednja beseda za izgovorjavo"** (tj. shrani se `wordIndex + 1`).
+To je verjetno posledica varnostnih popravkov ali sprememb RLS politik, ki so bile narejene v zadnjih dneh.
 
-S tem:
-- Zacetna vrednost `0` = "zacni pri besedi 0" (nobena beseda se ni izgovorjena)
-- Po izgovorjeni besedi 0 (PAJEK): shrani se `1` = "nadaljuj pri besedi 1 (KAPA)"
-- Po izgovorjeni besedi 5: shrani se `6`
-- Ni vec dvoumnosti
+### Trenutne RLS politike za starše
 
-### Spremembe po datotekah
+| Operacija | Politika | Status |
+|-----------|----------|--------|
+| INSERT | "Parents can create sessions for their children" | Deluje |
+| SELECT | "Parents can view their children's sessions" | Deluje |
+| UPDATE | **Manjka!** | Ne deluje |
+| DELETE | Ni potrebna | / |
 
-**1. `src/pages/ArtikuacijskiTest.tsx`** (vrstica ~177)
-Sprememba `handleSaveProgress`: namesto `updateProgress(wordIndex)` klice `updateProgress(wordIndex + 1)`, da se shrani naslednji indeks.
+### Popravek
 
-```typescript
-const handleSaveProgress = useCallback(async (
-  _childId: string | undefined, 
-  _sessionNumber: number, 
-  wordIndex: number
-) => {
-  await updateProgress(wordIndex + 1);  // Shrani NASLEDNJI indeks
-}, [updateProgress]);
+Dodati je treba novo RLS politiko za UPDATE:
+
+```sql
+CREATE POLICY "Parents can update their children sessions"
+  ON articulation_test_sessions
+  FOR UPDATE
+  USING (parent_id = auth.uid())
+  WITH CHECK (parent_id = auth.uid());
 ```
 
-**2. `src/pages/admin/AdminArtikulacijskiTest.tsx`** (isti popravek)
-Enak popravek za admin portal:
-```typescript
-await updateProgress(wordIndex + 1);  // Shrani NASLEDNJI indeks
-```
-
-**3. `src/hooks/useUserSessionManager.ts`** (vrstice 76-84)
-Poenostavitev logike nadaljevanja -- `current_word_index` je zdaj ze "naslednja beseda":
-
-```typescript
-const lastSpoken = existingSession.current_word_index ?? 0;
-const info: SessionInfo = {
-  sessionId: existingSession.id,
-  sessionNumber: existingSession.session_number ?? 1,
-  startIndex: lastSpoken,                            // Direktno, brez +1
-  lastSpokenIndex: lastSpoken > 0 ? lastSpoken - 1 : -1,  // Za prikaz v dialogu
-  isResume: lastSpoken > 0,
-  totalWords: existingSession.total_words ?? totalWords,
-};
-```
-
-**4. `src/hooks/useLogopedistSessionManager.ts`** (vrstice 76-84)
-Isti popravek kot zgoraj za admin portal.
+Ta politika dovoljuje staršem posodabljanje samo svojih lastnih sej (kjer je `parent_id` enak prijavljenemu uporabniku). To je varno, ker:
+- Starši ne morejo posodobiti tujih sej
+- Politika je enakega vzorca kot obstoječa INSERT/SELECT politika
 
 ### Kaj se bo zgodilo po popravku
 
-1. Ko izgovorite PAJEK (index 0), se v bazo shrani `current_word_index = 1`
-2. Ko se vrnete v test, sistem najde `current_word_index = 1`:
-   - `isResume = true` => prikaze se resume dialog z besedilom "Zadnja izgovorjena beseda: PAJEK"
-   - `startIndex = 1` => test nadaljuje pri KAPA
-3. Resume dialog deluje pravilno za vse besede, vkljucno s prvo
+1. Uporabnik izgovori besedo PAJEK (index 0)
+2. `updateProgress(1)` se uspešno shrani v bazo (`current_word_index = 1`)
+3. Uporabnik zapusti test in se vrne
+4. Sistem najde sejo z `current_word_index = 1`
+5. Resume dialog se prikaže: "Zadnja izgovorjena beseda: PAJEK"
+6. Uporabnik klikne "Nadaljuj" in test nadaljuje pri KAPA
 
-### Obstojecih sej v bazi
+### Spremembe
 
-Obstojecega zapisa v bazi (`current_word_index = 0`, beseda PAJEK ze posneta) ni treba rocno popravljati. Sistem bo to obravnaval kot "zacni od zacetka" -- uporabnik bo preprosto se enkrat izgovoril PAJEK, kar ni problematicno.
+| Datoteka/Vir | Sprememba |
+|--------------|-----------|
+| Supabase RLS (SQL migracija) | Dodana UPDATE politika za starše |
 
+Nobenih sprememb v kodi ni potrebnih -- vsa logika ze deluje pravilno, samo baza je blokirala posodobitve.
