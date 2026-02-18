@@ -151,7 +151,7 @@ export default function AdminArtikulacijskiTest() {
   
   // Callback to save progress to database after each word
   const handleSaveProgress = useCallback(async (cId: string, sNum: number, wordIndex: number) => {
-    await updateSessionProgress(wordIndex);
+    await updateSessionProgress(wordIndex + 1);  // Shrani NASLEDNJI indeks
   }, [updateSessionProgress]);
   
   // Sort articulation data by phonetic order

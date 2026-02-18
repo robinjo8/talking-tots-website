@@ -77,8 +77,8 @@ export const useUserSessionManager = (): UseUserSessionManagerResult => {
         const info: SessionInfo = {
           sessionId: existingSession.id,
           sessionNumber: existingSession.session_number ?? 1,
-          startIndex: lastSpoken > 0 ? lastSpoken + 1 : 0,
-          lastSpokenIndex: lastSpoken,
+          startIndex: lastSpoken,                            // current_word_index je že "naslednja beseda"
+          lastSpokenIndex: lastSpoken > 0 ? lastSpoken - 1 : -1,  // Za prikaz v dialogu
           isResume: lastSpoken > 0,
           totalWords: existingSession.total_words ?? totalWords,
         };
