@@ -176,7 +176,7 @@ const ArtikuacijskiTest = () => {
     wordIndex: number
   ) => {
     // Save to database via session manager
-    await updateProgress(wordIndex);
+    await updateProgress(wordIndex + 1);  // Shrani NASLEDNJI indeks
   }, [updateProgress]);
 
   const {
