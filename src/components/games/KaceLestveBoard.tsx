@@ -51,11 +51,11 @@ function getPositionCenter(position: number) {
   return getCellCenter(row, col);
 }
 
-// Snake colors — modra, zelena, temnomodra (cartoon slog)
+// Snake colors — modra, zelena, rdeča (cartoon slog)
 const SNAKE_COLORS = [
-  { body: '#2196F3', outline: '#0D47A1' },   // 40→36: modra
+  { body: '#E53935', outline: '#7F0000' },   // 40→31: rdeča
   { body: '#43A047', outline: '#1B5E20' },   // 21→5: zelena
-  { body: '#1565C0', outline: '#0A237A' },   // 24→8: temnomodra
+  { body: '#1E88E5', outline: '#0D47A1' },   // 24→10: modra
 ];
 
 function SnakeSVG({ from, to, styleIdx }: { from: number; to: number; styleIdx: number }) {
@@ -63,13 +63,13 @@ function SnakeSVG({ from, to, styleIdx }: { from: number; to: number; styleIdx: 
   const tail = getPositionCenter(to);
   const color = SNAKE_COLORS[styleIdx] || SNAKE_COLORS[0];
 
-  const headR = 4.0;
+  const headR = 3.5;
 
-  // S-krivulja: dve kubični Bezier sekciji za naraven izgled
+  // S-krivulja: subtilna, naravna
   const dx = tail.x - head.x;
   const dy = tail.y - head.y;
-  const perpX = -dy * 0.38;
-  const perpY = dx * 0.38;
+  const perpX = -dy * 0.22;
+  const perpY = dx * 0.22;
   const midX = (head.x + tail.x) / 2;
   const midY = (head.y + tail.y) / 2;
 
@@ -90,21 +90,31 @@ function SnakeSVG({ from, to, styleIdx }: { from: number; to: number; styleIdx: 
   const tailLen = Math.sqrt(tailDirX * tailDirX + tailDirY * tailDirY) || 1;
   const tnx = tailDirX / tailLen;
   const tny = tailDirY / tailLen;
-  const tipX = tail.x + tnx * 1.5;
-  const tipY = tail.y + tny * 1.5;
-  const tipL = { x: tail.x - tny * 1.2, y: tail.y + tnx * 1.2 };
-  const tipR = { x: tail.x + tny * 1.2, y: tail.y - tnx * 1.2 };
+  const tipX = tail.x + tnx * 1.2;
+  const tipY = tail.y + tny * 1.2;
+  const tipL = { x: tail.x - tny * 0.9, y: tail.y + tnx * 0.9 };
+  const tipR = { x: tail.x + tny * 0.9, y: tail.y - tnx * 0.9 };
+
+  // Smer glave za oči
+  const headDirX = head.x - cp1x;
+  const headDirY = head.y - cp1y;
+  const headLen = Math.sqrt(headDirX * headDirX + headDirY * headDirY) || 1;
+  const hnx = headDirX / headLen;
+  const hny = headDirY / headLen;
+  // Perpendikularna smer za pozicioniranje oči
+  const epx = -hny;
+  const epy = hnx;
 
   return (
     <g>
       {/* Senca */}
-      <path d={spine} stroke="rgba(0,0,0,0.18)" strokeWidth="8.5" fill="none" strokeLinecap="round" transform="translate(0.4,0.4)" />
-      {/* Oris telesa (outline) */}
-      <path d={spine} stroke={color.outline} strokeWidth="8" fill="none" strokeLinecap="round" />
-      {/* Telo (fill) */}
-      <path d={spine} stroke={color.body} strokeWidth="6" fill="none" strokeLinecap="round" />
+      <path d={spine} stroke="rgba(0,0,0,0.10)" strokeWidth="5.5" fill="none" strokeLinecap="round" transform="translate(0.25,0.25)" />
+      {/* Oris telesa */}
+      <path d={spine} stroke={color.outline} strokeWidth="4.5" fill="none" strokeLinecap="round" />
+      {/* Telo */}
+      <path d={spine} stroke={color.body} strokeWidth="3.2" fill="none" strokeLinecap="round" />
       {/* Beli lesk */}
-      <path d={spine} stroke="rgba(255,255,255,0.22)" strokeWidth="2" fill="none" strokeLinecap="round" strokeDasharray="4,8" />
+      <path d={spine} stroke="rgba(255,255,255,0.18)" strokeWidth="1" fill="none" strokeLinecap="round" strokeDasharray="3,7" />
 
       {/* Rep koničast */}
       <polygon
@@ -113,27 +123,22 @@ function SnakeSVG({ from, to, styleIdx }: { from: number; to: number; styleIdx: 
       />
 
       {/* Glava — outline */}
-      <circle cx={head.x} cy={head.y} r={headR + 1} fill={color.outline} />
+      <circle cx={head.x} cy={head.y} r={headR + 1.2} fill={color.outline} />
       {/* Glava — fill */}
       <circle cx={head.x} cy={head.y} r={headR} fill={color.body} />
 
-      {/* Oči */}
-      <circle cx={head.x - 1.5} cy={head.y - 1.2} r="1.3" fill="white" />
-      <circle cx={head.x + 1.5} cy={head.y - 1.2} r="1.3" fill="white" />
-      <circle cx={head.x - 1.5} cy={head.y - 1.2} r="0.65" fill="#111" />
-      <circle cx={head.x + 1.5} cy={head.y - 1.2} r="0.65" fill="#111" />
-      {/* Bleščeče točke v očeh */}
-      <circle cx={head.x - 1.1} cy={head.y - 1.6} r="0.3" fill="white" />
-      <circle cx={head.x + 1.9} cy={head.y - 1.6} r="0.3" fill="white" />
+      {/* Oči — pozicionirane glede na smer glave */}
+      <circle cx={head.x + epx * 1.5} cy={head.y + epy * 1.5} r="1.5" fill="white" />
+      <circle cx={head.x - epx * 1.5} cy={head.y - epy * 1.5} r="1.5" fill="white" />
+      <circle cx={head.x + epx * 1.5} cy={head.y + epy * 1.5} r="0.8" fill="#111" />
+      <circle cx={head.x - epx * 1.5} cy={head.y - epy * 1.5} r="0.8" fill="#111" />
+      {/* Blesk v očeh */}
+      <circle cx={head.x + epx * 1.5 + 0.4} cy={head.y + epy * 1.5 - 0.4} r="0.3" fill="white" />
+      <circle cx={head.x - epx * 1.5 + 0.4} cy={head.y - epy * 1.5 - 0.4} r="0.3" fill="white" />
 
-      {/* Nasmešek */}
+      {/* Jezik (razcepljen) */}
       <path
-        d={`M ${head.x - 1.3} ${head.y + 0.9} Q ${head.x} ${head.y + 2.1} ${head.x + 1.3} ${head.y + 0.9}`}
-        stroke="white" strokeWidth="0.5" fill="none" strokeLinecap="round"
-      />
-      {/* Jezik */}
-      <path
-        d={`M ${head.x} ${head.y + headR} L ${head.x} ${head.y + headR + 1.5} M ${head.x} ${head.y + headR + 1.5} L ${head.x - 0.7} ${head.y + headR + 2.4} M ${head.x} ${head.y + headR + 1.5} L ${head.x + 0.7} ${head.y + headR + 2.4}`}
+        d={`M ${head.x - hnx * headR} ${head.y - hny * headR} L ${head.x - hnx * (headR + 1.8)} ${head.y - hny * (headR + 1.8)} M ${head.x - hnx * (headR + 1.8)} ${head.y - hny * (headR + 1.8)} L ${head.x - hnx * (headR + 2.8) + epx * 0.8} ${head.y - hny * (headR + 2.8) + epy * 0.8} M ${head.x - hnx * (headR + 1.8)} ${head.y - hny * (headR + 1.8)} L ${head.x - hnx * (headR + 2.8) - epx * 0.8} ${head.y - hny * (headR + 2.8) - epy * 0.8}`}
         stroke="#FF1744" strokeWidth="0.55" fill="none" strokeLinecap="round"
       />
     </g>
@@ -141,7 +146,7 @@ function SnakeSVG({ from, to, styleIdx }: { from: number; to: number; styleIdx: 
 }
 
 // Lestve — klasična rjavo-oranžna cartoon barva
-const LADDER_COLOR = { rail: '#8B4513', rung: '#C1440E', outline: '#5D2E0C' };
+const LADDER_COLOR = { rail: '#7B3F00', rung: '#C1440E', outline: '#4A2500' };
 
 function LadderSVG({ from, to, styleIdx: _styleIdx }: { from: number; to: number; styleIdx: number }) {
   const foot = getPositionCenter(from);
@@ -151,8 +156,8 @@ function LadderSVG({ from, to, styleIdx: _styleIdx }: { from: number; to: number
   const dy = top.y - foot.y;
   const len = Math.sqrt(dx * dx + dy * dy);
 
-  const perpX = (-dy / len) * 3.5;
-  const perpY = (dx / len) * 3.5;
+  const perpX = (-dy / len) * 2.8;
+  const perpY = (dx / len) * 2.8;
 
   const leftFoot = { x: foot.x + perpX, y: foot.y + perpY };
   const rightFoot = { x: foot.x - perpX, y: foot.y - perpY };
@@ -174,29 +179,29 @@ function LadderSVG({ from, to, styleIdx: _styleIdx }: { from: number; to: number
   return (
     <g>
       {/* Senca */}
-      <line x1={leftFoot.x + 0.4} y1={leftFoot.y + 0.4} x2={leftTop.x + 0.4} y2={leftTop.y + 0.4}
-        stroke="rgba(0,0,0,0.20)" strokeWidth="4" strokeLinecap="round" />
-      <line x1={rightFoot.x + 0.4} y1={rightFoot.y + 0.4} x2={rightTop.x + 0.4} y2={rightTop.y + 0.4}
-        stroke="rgba(0,0,0,0.20)" strokeWidth="4" strokeLinecap="round" />
+      <line x1={leftFoot.x + 0.25} y1={leftFoot.y + 0.25} x2={leftTop.x + 0.25} y2={leftTop.y + 0.25}
+        stroke="rgba(0,0,0,0.12)" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1={rightFoot.x + 0.25} y1={rightFoot.y + 0.25} x2={rightTop.x + 0.25} y2={rightTop.y + 0.25}
+        stroke="rgba(0,0,0,0.12)" strokeWidth="2.5" strokeLinecap="round" />
       {/* Oris tirnic */}
       <line x1={leftFoot.x} y1={leftFoot.y} x2={leftTop.x} y2={leftTop.y}
-        stroke={LADDER_COLOR.outline} strokeWidth="3.5" strokeLinecap="round" />
+        stroke={LADDER_COLOR.outline} strokeWidth="2.4" strokeLinecap="round" />
       <line x1={rightFoot.x} y1={rightFoot.y} x2={rightTop.x} y2={rightTop.y}
-        stroke={LADDER_COLOR.outline} strokeWidth="3.5" strokeLinecap="round" />
+        stroke={LADDER_COLOR.outline} strokeWidth="2.4" strokeLinecap="round" />
       {/* Tirnice */}
       <line x1={leftFoot.x} y1={leftFoot.y} x2={leftTop.x} y2={leftTop.y}
-        stroke={LADDER_COLOR.rail} strokeWidth="2.5" strokeLinecap="round" />
+        stroke={LADDER_COLOR.rail} strokeWidth="1.6" strokeLinecap="round" />
       <line x1={rightFoot.x} y1={rightFoot.y} x2={rightTop.x} y2={rightTop.y}
-        stroke={LADDER_COLOR.rail} strokeWidth="2.5" strokeLinecap="round" />
+        stroke={LADDER_COLOR.rail} strokeWidth="1.6" strokeLinecap="round" />
       {/* Prečke — oris */}
       {rungs.map((r, i) => (
         <line key={`out-${i}`} x1={r.lx} y1={r.ly} x2={r.rx} y2={r.ry}
-          stroke={LADDER_COLOR.outline} strokeWidth="2.8" strokeLinecap="round" />
+          stroke={LADDER_COLOR.outline} strokeWidth="2.0" strokeLinecap="round" />
       ))}
       {/* Prečke — fill */}
       {rungs.map((r, i) => (
         <line key={`rung-${i}`} x1={r.lx} y1={r.ly} x2={r.rx} y2={r.ry}
-          stroke={LADDER_COLOR.rung} strokeWidth="2" strokeLinecap="round" />
+          stroke={LADDER_COLOR.rung} strokeWidth="1.4" strokeLinecap="round" />
       ))}
     </g>
   );
@@ -322,9 +327,10 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
         })}
       </div>
 
-      {/* SVG overlay for snakes and ladders */}
+      {/* SVG overlay for snakes and ladders — z-index: 5, pod številkami */}
       <svg
         className="absolute inset-0 w-full h-full pointer-events-none"
+        style={{ zIndex: 5 }}
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
       >
@@ -337,6 +343,34 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
           <SnakeSVG key={`snake-${from}`} from={from} to={to} styleIdx={styleIdx} />
         ))}
       </svg>
+
+      {/* Overlay za številke — vedno nad kačami in lestvami */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(${COLS}, 1fr)`,
+          gridTemplateRows: `repeat(${ROWS}, 1fr)`,
+          zIndex: 10,
+        }}
+      >
+        {cells.map((cell) => (
+          <div key={`num-${cell.row}-${cell.col}`} className="relative flex items-start justify-start p-0.5">
+            {!cell.isStart && !cell.isEnd && (
+              <span
+                className="font-black leading-none select-none"
+                style={{
+                  fontSize: 'clamp(8px, 1.8vw, 16px)',
+                  color: cell.textColor,
+                  textShadow: '0 1px 3px rgba(0,0,0,0.6), 0 0 4px rgba(0,0,0,0.4)',
+                }}
+              >
+                {cell.pos}
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
 
       {/* Dragon avatars with framer-motion animation */}
       <AnimatePresence>
