@@ -8,6 +8,13 @@ export interface KaceLestveWord {
 export type KaceDifficulty = 'lahka' | 'srednja' | 'tezka';
 export type KacePlayers = 1 | 2;
 
+// Board dimensions
+export const COLS = 6;
+export const ROWS = 7;
+export const BOARD_SIZE = 42;
+export const SQUARES_NEAR_END = 6;
+export const MAX_FAILED_NEAR_END = 5;
+
 // Bonus moves for correct pronunciation by difficulty
 export const DIFFICULTY_BONUS: Record<KaceDifficulty, number> = {
   lahka: 2,
@@ -15,24 +22,19 @@ export const DIFFICULTY_BONUS: Record<KaceDifficulty, number> = {
   tezka: 0,
 };
 
-// Board configuration
-export const BOARD_SIZE = 64;
-export const SQUARES_NEAR_END = 6; // When to apply end-game rule
-export const MAX_FAILED_NEAR_END = 5; // After this many fails, force win
-
 // Ladders: key = foot (start), value = top (end)
 export const LADDERS: Record<number, number> = {
-  3: 16,
-  8: 23,
-  30: 41,
-  48: 64,
+  3: 12,
+  6: 18,
+  15: 30,
+  26: 37,
 };
 
 // Snakes: key = head (start - higher number), value = tail (end - lower number)
 export const SNAKES: Record<number, number> = {
-  35: 27,
-  51: 24,
-  59: 47,
+  40: 36,
+  21: 5,
+  24: 8,
 };
 
 // Words for sound C (middle/end position)
@@ -135,60 +137,64 @@ export const KACE_WORDS_C: KaceLestveWord[] = [
   },
 ];
 
-// Helper: get board position number from row/col (0-indexed from top-left)
-// Board goes: row 7 (bottom) = squares 1-8, row 6 = 9-16, ..., row 0 (top) = 57-64
-// Row 7 (bottom): L->R (1..8)
-// Row 6: R->L (16..9)
-// Row 5: L->R (17..24)
-// Row 4: R->L (32..25)
-// Row 3: L->R (33..40)
-// Row 2: R->L (48..41)
-// Row 1: L->R (49..56)
-// Row 0 (top): R->L (64..57)
+// Board layout (6 cols x 7 rows = 42 fields, boustrophedon)
+// Row 0 (bottom): fields 1-6 (L→R)
+// Row 1: fields 12-7 (R→L)
+// Row 2: fields 13-18 (L→R)
+// Row 3: fields 24-19 (R→L)
+// Row 4: fields 25-30 (L→R)
+// Row 5: fields 36-31 (R→L)
+// Row 6 (top): fields 37-42 (L→R)
+
 export function getBoardPosition(row: number, col: number): number {
-  const rowFromBottom = 7 - row; // 0 = bottom row
-  const baseNum = rowFromBottom * 8 + 1;
+  const rowFromBottom = (ROWS - 1) - row; // 0 = bottom row
+  const baseNum = rowFromBottom * COLS + 1;
   if (rowFromBottom % 2 === 0) {
     // Left to right
     return baseNum + col;
   } else {
     // Right to left
-    return baseNum + (7 - col);
+    return baseNum + (COLS - 1 - col);
   }
 }
 
-// Get the grid cell [row, col] for a given board position (1-64)
+// Get the grid cell [row, col] for a given board position (1-42)
 export function getGridCell(position: number): { row: number; col: number } {
   const pos = position - 1; // 0-indexed
-  const rowFromBottom = Math.floor(pos / 8);
-  const indexInRow = pos % 8;
-  const row = 7 - rowFromBottom;
-  const col = rowFromBottom % 2 === 0 ? indexInRow : 7 - indexInRow;
+  const rowFromBottom = Math.floor(pos / COLS);
+  const indexInRow = pos % COLS;
+  const row = (ROWS - 1) - rowFromBottom;
+  const col = rowFromBottom % 2 === 0 ? indexInRow : (COLS - 1 - indexInRow);
   return { row, col };
 }
 
-// Cell colors - pastel palette
-export const CELL_COLORS = [
-  '#FFD6D6', // rose
-  '#D6EAFF', // light blue
-  '#D6FFE8', // mint
-  '#E8D6FF', // lavender
-  '#FFF6D6', // yellow
-  '#FFE8D6', // peach
-  '#D6FFF6', // teal
-  '#E8FFD6', // green
-];
+// Cell colors - green theme
+export const GREEN_DARK = '#2D6A4F';
+export const GREEN_MID = '#52B788';
+export const GREEN_LIGHT = '#95D5B2';
+export const START_COLOR = '#FFD93D';
+export const END_COLOR = '#FF6B35';
 
 export function getCellColor(position: number): string {
-  // Special cells
-  if (position <= 2) return '#86EFAC'; // Start - green
-  if (position >= 63) return '#FDE68A'; // End - gold
-  if (LADDERS[position] !== undefined) return '#BBF7D0'; // Ladder bottom - light green
-  if (Object.values(LADDERS).includes(position)) return '#4ADE80'; // Ladder top - green
-  if (SNAKES[position] !== undefined) return '#FCA5A5'; // Snake head - light red
-  if (Object.values(SNAKES).includes(position)) return '#FDBA74'; // Snake tail - orange
-  
-  return CELL_COLORS[(position - 1) % CELL_COLORS.length];
+  // Start fields (1-2) = yellow
+  if (position <= 2) return START_COLOR;
+  // End fields (41-42) = orange
+  if (position >= 41) return END_COLOR;
+  // Three rotating shades of green
+  const shade = (position - 3) % 3;
+  if (shade === 0) return GREEN_DARK;
+  if (shade === 1) return GREEN_MID;
+  return GREEN_LIGHT;
+}
+
+// Text color for cell number based on background
+export function getCellTextColor(position: number): string {
+  if (position <= 2) return '#7C4A00';
+  if (position >= 41) return '#fff';
+  const shade = (position - 3) % 3;
+  if (shade === 0) return '#fff'; // dark green bg -> white text
+  if (shade === 1) return '#fff';
+  return '#1B4332'; // light green bg -> dark text
 }
 
 // Get a random word from the list (excluding recently used if possible)
@@ -201,3 +207,6 @@ export function getRandomWord(usedIndices: number[] = []): { word: KaceLestveWor
   const index = pool[Math.floor(Math.random() * pool.length)];
   return { word: KACE_WORDS_C[index], index };
 }
+
+// Dragon avatars
+export const DRAGON_AVATARS = Array.from({ length: 9 }, (_, i) => `Zmajcek_${i + 1}.webp`);
