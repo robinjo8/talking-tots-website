@@ -51,11 +51,11 @@ function getPositionCenter(position: number) {
   return getCellCenter(row, col);
 }
 
-// Snake colors per snake (head→tail)
+// Snake colors per snake — all blue shades
 const SNAKE_STYLES: { stroke1: string; stroke2: string; headFill: string }[] = [
-  { stroke1: '#4ECDC4', stroke2: '#2196F3', headFill: '#2196F3' },   // 40→36: teal/blue
-  { stroke1: '#FF6B6B', stroke2: '#FF8C00', headFill: '#FF6B6B' },   // 21→5: red/orange
-  { stroke1: '#66BB6A', stroke2: '#FFEE58', headFill: '#66BB6A' },   // 24→8: green/yellow
+  { stroke1: '#1565C0', stroke2: '#42A5F5', headFill: '#1565C0' },   // 40→36: dark/light blue
+  { stroke1: '#0D47A1', stroke2: '#64B5F6', headFill: '#0D47A1' },   // 21→5: royal/sky blue
+  { stroke1: '#1976D2', stroke2: '#90CAF9', headFill: '#1976D2' },   // 24→8: mid/ice blue
 ];
 
 function SnakeSVG({ from, to, styleIdx }: { from: number; to: number; styleIdx: number }) {
@@ -64,14 +64,38 @@ function SnakeSVG({ from, to, styleIdx }: { from: number; to: number; styleIdx: 
   const style = SNAKE_STYLES[styleIdx] || SNAKE_STYLES[0];
 
   const id = `snake-grad-${from}`;
-  // Wavy path
+  const headR = 2.8;
+
+  // S-curve: two cubic bezier segments for natural snake look
+  const dx = tail.x - head.x;
+  const dy = tail.y - head.y;
+  // Perpendicular offsets for S-shape
+  const perpX = -dy * 0.35;
+  const perpY = dx * 0.35;
   const midX = (head.x + tail.x) / 2;
   const midY = (head.y + tail.y) / 2;
-  const off1 = 10;
-  const off2 = -10;
-  const path = `M ${head.x} ${head.y} C ${head.x + off1} ${midY + off2}, ${tail.x - off1} ${midY + off1}, ${tail.x} ${tail.y}`;
 
-  const headR = 3.5;
+  const cp1x = head.x + dx * 0.25 + perpX;
+  const cp1y = head.y + dy * 0.25 + perpY;
+  const cp2x = midX - perpX * 0.5;
+  const cp2y = midY - perpY * 0.5;
+  const cp3x = midX + dx * 0.25 - perpX;
+  const cp3y = midY + dy * 0.25 - perpY;
+  const cp4x = tail.x - dx * 0.25 + perpX * 0.5;
+  const cp4y = tail.y - dy * 0.25 + perpY * 0.5;
+
+  const path = `M ${head.x} ${head.y} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${midX} ${midY} C ${cp3x} ${cp3y}, ${cp4x} ${cp4y}, ${tail.x} ${tail.y}`;
+
+  // Tail tip as small triangle point
+  const tailDirX = tail.x - cp4x;
+  const tailDirY = tail.y - cp4y;
+  const tailLen = Math.sqrt(tailDirX * tailDirX + tailDirY * tailDirY) || 1;
+  const tnx = tailDirX / tailLen;
+  const tny = tailDirY / tailLen;
+  const tipX = tail.x + tnx * 2;
+  const tipY = tail.y + tny * 2;
+  const tipL = { x: tail.x - tny * 0.8, y: tail.y + tnx * 0.8 };
+  const tipR = { x: tail.x + tny * 0.8, y: tail.y - tnx * 0.8 };
 
   return (
     <g>
@@ -81,45 +105,47 @@ function SnakeSVG({ from, to, styleIdx }: { from: number; to: number; styleIdx: 
           <stop offset="100%" stopColor={style.stroke2} />
         </linearGradient>
       </defs>
-      {/* Body shadow */}
-      <path d={path} stroke="rgba(0,0,0,0.15)" strokeWidth="5.5" fill="none" strokeLinecap="round" />
+      {/* Subtle shadow */}
+      <path d={path} stroke="rgba(0,0,0,0.10)" strokeWidth="3.3" fill="none" strokeLinecap="round" transform="translate(0.3,0.3)" />
       {/* Body */}
-      <path d={path} stroke={`url(#${id})`} strokeWidth="4.5" fill="none" strokeLinecap="round" />
-      {/* Scale pattern */}
-      <path d={path} stroke="rgba(255,255,255,0.25)" strokeWidth="1.5" fill="none" strokeDasharray="4,5" strokeLinecap="round" />
+      <path d={path} stroke={`url(#${id})`} strokeWidth="2.8" fill="none" strokeLinecap="round" />
+      {/* Subtle scale pattern */}
+      <path d={path} stroke="rgba(255,255,255,0.20)" strokeWidth="0.8" fill="none" strokeDasharray="3,6" strokeLinecap="round" />
 
       {/* Head */}
-      <circle cx={head.x} cy={head.y} r={headR + 0.5} fill="rgba(0,0,0,0.2)" />
+      <circle cx={head.x} cy={head.y} r={headR + 0.4} fill="rgba(0,0,0,0.15)" />
       <circle cx={head.x} cy={head.y} r={headR} fill={style.headFill} />
       {/* Eyes */}
-      <circle cx={head.x - 1.3} cy={head.y - 1.2} r="0.9" fill="white" />
-      <circle cx={head.x + 1.3} cy={head.y - 1.2} r="0.9" fill="white" />
-      <circle cx={head.x - 1.3} cy={head.y - 1.2} r="0.45" fill="#222" />
-      <circle cx={head.x + 1.3} cy={head.y - 1.2} r="0.45" fill="#222" />
+      <circle cx={head.x - 1.1} cy={head.y - 1.0} r="0.75" fill="white" />
+      <circle cx={head.x + 1.1} cy={head.y - 1.0} r="0.75" fill="white" />
+      <circle cx={head.x - 1.1} cy={head.y - 1.0} r="0.38" fill="#111" />
+      <circle cx={head.x + 1.1} cy={head.y - 1.0} r="0.38" fill="#111" />
       {/* Smile */}
       <path
-        d={`M ${head.x - 1.2} ${head.y + 0.8} Q ${head.x} ${head.y + 2} ${head.x + 1.2} ${head.y + 0.8}`}
-        stroke="white" strokeWidth="0.5" fill="none"
+        d={`M ${head.x - 1.0} ${head.y + 0.7} Q ${head.x} ${head.y + 1.7} ${head.x + 1.0} ${head.y + 0.7}`}
+        stroke="white" strokeWidth="0.45" fill="none"
       />
       {/* Tongue */}
       <path
-        d={`M ${head.x} ${head.y + headR} L ${head.x} ${head.y + headR + 1.5} M ${head.x} ${head.y + headR + 1.5} L ${head.x - 0.7} ${head.y + headR + 2.5} M ${head.x} ${head.y + headR + 1.5} L ${head.x + 0.7} ${head.y + headR + 2.5}`}
-        stroke="#FF1744" strokeWidth="0.6" fill="none" strokeLinecap="round"
+        d={`M ${head.x} ${head.y + headR} L ${head.x} ${head.y + headR + 1.2} M ${head.x} ${head.y + headR + 1.2} L ${head.x - 0.6} ${head.y + headR + 2.0} M ${head.x} ${head.y + headR + 1.2} L ${head.x + 0.6} ${head.y + headR + 2.0}`}
+        stroke="#FF1744" strokeWidth="0.5" fill="none" strokeLinecap="round"
       />
 
-      {/* Tail tip */}
-      <circle cx={tail.x} cy={tail.y} r="1.8" fill={style.stroke2} opacity="0.8" />
-      <circle cx={tail.x} cy={tail.y} r="1.1" fill={style.stroke1} opacity="0.9" />
+      {/* Tail tip (tapered triangle) */}
+      <polygon
+        points={`${tipX},${tipY} ${tipL.x},${tipL.y} ${tipR.x},${tipR.y}`}
+        fill={style.stroke2} opacity="0.85"
+      />
     </g>
   );
 }
 
-// Ladder colors
+// Ladder colors — all classic brown/gold Disney cartoon style
 const LADDER_STYLES: { rail: string; rung: string }[] = [
-  { rail: '#8B5E3C', rung: '#C8972B' },     // 3→12: brown/gold
-  { rail: '#9C27B0', rung: '#E91E8C' },     // 6→18: purple/pink
-  { rail: '#1976D2', rung: '#00BCD4' },     // 15→30: blue/cyan
-  { rail: '#2E7D32', rung: '#FF9800' },     // 26→37: green/orange
+  { rail: '#8B5E3C', rung: '#C8972B' },
+  { rail: '#8B5E3C', rung: '#C8972B' },
+  { rail: '#8B5E3C', rung: '#C8972B' },
+  { rail: '#8B5E3C', rung: '#C8972B' },
 ];
 
 function LadderSVG({ from, to, styleIdx }: { from: number; to: number; styleIdx: number }) {
@@ -131,15 +157,15 @@ function LadderSVG({ from, to, styleIdx }: { from: number; to: number; styleIdx:
   const dy = top.y - foot.y;
   const len = Math.sqrt(dx * dx + dy * dy);
 
-  const perpX = (-dy / len) * 2;
-  const perpY = (dx / len) * 2;
+  const perpX = (-dy / len) * 2.5;
+  const perpY = (dx / len) * 2.5;
 
   const leftFoot = { x: foot.x + perpX, y: foot.y + perpY };
   const rightFoot = { x: foot.x - perpX, y: foot.y - perpY };
   const leftTop = { x: top.x + perpX, y: top.y + perpY };
   const rightTop = { x: top.x - perpX, y: top.y - perpY };
 
-  const rungCount = Math.max(3, Math.round(len / 7));
+  const rungCount = Math.max(2, Math.round(len / 10));
   const rungs = [];
   for (let i = 0; i <= rungCount; i++) {
     const t = i / rungCount;
@@ -154,20 +180,30 @@ function LadderSVG({ from, to, styleIdx }: { from: number; to: number; styleIdx:
   return (
     <g>
       {/* Shadow */}
-      <line x1={leftFoot.x + 0.5} y1={leftFoot.y + 0.5} x2={leftTop.x + 0.5} y2={leftTop.y + 0.5}
-        stroke="rgba(0,0,0,0.15)" strokeWidth="3.5" strokeLinecap="round" />
-      <line x1={rightFoot.x + 0.5} y1={rightFoot.y + 0.5} x2={rightTop.x + 0.5} y2={rightTop.y + 0.5}
-        stroke="rgba(0,0,0,0.15)" strokeWidth="3.5" strokeLinecap="round" />
+      <line x1={leftFoot.x + 0.3} y1={leftFoot.y + 0.3} x2={leftTop.x + 0.3} y2={leftTop.y + 0.3}
+        stroke="rgba(0,0,0,0.12)" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1={rightFoot.x + 0.3} y1={rightFoot.y + 0.3} x2={rightTop.x + 0.3} y2={rightTop.y + 0.3}
+        stroke="rgba(0,0,0,0.12)" strokeWidth="2.5" strokeLinecap="round" />
       {/* Rails */}
       <line x1={leftFoot.x} y1={leftFoot.y} x2={leftTop.x} y2={leftTop.y}
-        stroke={style.rail} strokeWidth="3" strokeLinecap="round" />
+        stroke={style.rail} strokeWidth="2" strokeLinecap="round" />
       <line x1={rightFoot.x} y1={rightFoot.y} x2={rightTop.x} y2={rightTop.y}
-        stroke={style.rail} strokeWidth="3" strokeLinecap="round" />
+        stroke={style.rail} strokeWidth="2" strokeLinecap="round" />
+      {/* 3D highlight on rails */}
+      <line x1={leftFoot.x} y1={leftFoot.y} x2={leftTop.x} y2={leftTop.y}
+        stroke="rgba(255,255,255,0.35)" strokeWidth="0.5" strokeLinecap="round" />
+      <line x1={rightFoot.x} y1={rightFoot.y} x2={rightTop.x} y2={rightTop.y}
+        stroke="rgba(255,255,255,0.35)" strokeWidth="0.5" strokeLinecap="round" />
       {/* Rungs */}
       {rungs.map((r, i) => (
         <line key={i} x1={r.lx} y1={r.ly} x2={r.rx} y2={r.ry}
-          stroke={style.rung} strokeWidth="2.2" strokeLinecap="round" />
+          stroke={style.rung} strokeWidth="1.8" strokeLinecap="round" />
       ))}
+      {/* Rounded end caps on rails */}
+      <circle cx={leftFoot.x} cy={leftFoot.y} r="1.1" fill={style.rail} />
+      <circle cx={rightFoot.x} cy={rightFoot.y} r="1.1" fill={style.rail} />
+      <circle cx={leftTop.x} cy={leftTop.y} r="1.1" fill={style.rail} />
+      <circle cx={rightTop.x} cy={rightTop.y} r="1.1" fill={style.rail} />
     </g>
   );
 }
