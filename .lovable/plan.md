@@ -1,79 +1,138 @@
 
+## Posodobitev besed v Preverjanju izgovorjave
 
-## Popravek KOKOS / KOKOŠ -- vse igre
+### Vrstni red glasov
 
-### Pravilna specifikacija
+Vrstni red je že pravilno določen v `useArticulationTestNew.ts` (vrstica 7):
+```
+PHONETIC_ORDER = ['P', 'B', 'M', 'T', 'D', 'K', 'G', 'N', 'H', 'V', 'J', 'F', 'L', 'S', 'Z', 'C', 'Š', 'Ž', 'Č', 'R']
+```
+Podatki se samodejno preuredijo po tem vrstnem redu, ne glede na vrstni red v datoteki. Vrstni red v datoteki torej ni relevanten -- hook ga bo vedno uredil pravilno.
 
-| Beseda | Slika | Audio |
-|--------|-------|-------|
-| KOKOS (sadez) | kokos_sadez1.webp | kokos_sadez.m4a |
-| KOKOS (zival) | kokos1.webp | kokos.m4a |
+### Spremembe po glasovih
 
-### Najdene napake
+Spremembe v datoteki `src/data/articulationTestData.ts`:
 
-#### 1. KOKOS (sadez) -- napacen audio (3 datoteke)
+**P** -- 2. beseda se zamenja (KAPA → OPICA):
+- Novo: `OPICA`, slika `opica1.webp`, audio `opica.m4a`
 
-Povsod, kjer je KOKOS (sadez), je slika pravilna (`kokos_sadez1.webp`), ampak audio je napacen -- `kokos.m4a` namesto `kokos_sadez.m4a`:
+**B** -- 3. beseda se zamenja (ZOB → BOBER):
+- Novo: `BOBER`, slika `bober1.webp`, audio `bober.m4a`
 
-| Datoteka | Vrstica | Beseda | Trenutni audio | Pravilen audio |
-|----------|---------|--------|---------------|----------------|
-| artikulacijaVajeConfig.ts | 268 | KOKOS | kokos.m4a | kokos_sadez.m4a |
-| bingoWordsSSredinaKonec.ts | 14 | KOKOS | kokos.m4a | kokos_sadez.m4a |
-| metKockeConfig.ts | 237 | kokos | kokos.m4a | kokos_sadez.m4a |
+**M** -- brez sprememb (MIZA, GUMA, SEDEM)
 
-#### 2. KOKOS (zival) -- napacen audio v igri ujemanja (2 datoteki, 3 vnosi)
+**T** -- brez sprememb (TORBA, STOL, COPAT)
 
-V matching igrah je za KOKOS (zival) audio `kokos_1.m4a` namesto `kokos.m4a`:
+**D** -- vse 3 besede se zamenjajo (DUDA, VODA, MED → DEŽNIK, LADJA, CEDILO):
+- Novo: `DEŽNIK`, slika `deznik1.webp`, audio `deznik.m4a`
+- Novo: `LADJA`, slika `ladja1.webp`, audio `ladja.m4a`
+- Novo: `CEDILO`, slika `cedilo1.webp`, audio `cedilo.m4a`
 
-| Datoteka | Vrstica | Beseda | Trenutni audio | Pravilen audio |
-|----------|---------|--------|---------------|----------------|
-| matchingGameData.ts | 61 | KOKOS | kokos_1.m4a | kokos.m4a |
-| threeColumnMatchingData.ts | 59 | KOKOS | kokos_1.m4a | kokos.m4a |
-| threeColumnMatchingData.ts | 222 | kokos | kokos_1.m4a | kokos.m4a |
+**K** -- brez sprememb (KOLO, ROKA, RAK)
 
-#### 3. Drsna sestavljanka -- audio se generira iz besede, napacno za KOKOS (sadez)
+**G** -- vse 3 besede se zamenjajo (GOBA, ŽOGA, SNEG → GOL, ŽOGA, ŽAGA):
+- `GOL` -- slika `gol1.webp`, audio `gol.m4a` (obstaja v L, prenese se sem)
+- `ŽOGA` -- ostane (slika `zoga1.webp`, audio `zoga.m4a`)
+- Novo: `ŽAGA`, slika `zaga1.webp`, audio `zaga.m4a`
 
-V `puzzleImages.ts` ni polja `audio`. Ko se pri drsni sestavljanki prikaze zakljucni dialog, se audio URL generira iz besede. Ker obe besedi ("KOKOS" in "KOKOS") po normalizaciji (odstranitev sumnikov) postaneta "kokos", obe dobita `kokos.m4a` -- kar je napacno za sadez (mora biti `kokos_sadez.m4a`).
+**N** -- 1. beseda se zamenja (NOS → NOČ):
+- Novo: `NOČ`, slika `noc1.webp`, audio `noc.m4a`
 
-Resitev:
-- Dodati neobvezno polje `audio` v vmesnik `PuzzleImage` v `puzzleImages.ts`
-- Nastaviti `audio: 'kokos_sadez.m4a'` za vnos KOKOS (sadez)
-- Posodobiti `GenericDrsnaSestavljankaGame.tsx` da posreduje `audio_url` v zakljucni dialog
+**H** -- brez sprememb (HIŠA, JUHA, KRUH)
 
-#### 4. MatchingCompletionDialog -- problematicna logika
+**V** -- 2. in 3. beseda se zamenjata (KAVA, LEV → DREVO, SOVA):
+- Novo: `DREVO`, slika `drevo1.webp`, audio `drevo.m4a`
+- Novo: `SOVA`, slika `sova1.webp`, audio `sova.m4a`
 
-V `MatchingCompletionDialog.tsx` (vrstica 157) je logika `replace(/1\.m4a$/, '.m4a')` ki odstrani koncni "1" iz audio URL-jev. Ce posredujemo pravilne audio URL-je, ta logika ni potrebna in lahko povzroci napake. Treba jo je odstraniti.
+**J** -- brez sprememb (JOPA, VEJA, NOJ)
 
-#### 5. Pravilni vnosi (brez sprememb)
+**F** -- 1. beseda se zamenja (FEN → FANT):
+- Novo: `FANT`, slika `fant1.webp`, audio `fant.m4a`
 
-Naslednji vnosi so ze pravilni:
+**L** -- 3. beseda se zamenja (GOL → ŠAL):
+- `ŠAL`, slika `sal1.webp`, audio `sal.m4a`
 
-| Datoteka | Vrstica | Beseda | Slika | Audio |
-|----------|---------|--------|-------|-------|
-| artikulacijaVajeConfig.ts | 63 | KOKOS (zival) | kokos1.webp | kokos.m4a |
-| artikulacijaVajeConfig.ts | 219 | KOKOS (zival) | kokos1.webp | kokos.m4a |
-| artikulacijaVajeConfig.ts | 284 | KOKOS (zival) | kokos1.webp | kokos.m4a |
-| bingoWordsKSredinaKonec.ts | 22 | KOKOS (zival) | kokos1.webp | kokos.m4a |
-| bingoWordsSHSredinaKonec.ts | 11 | KOKOS (zival) | kokos1.webp | kokos.m4a |
-| FreeBingoGame.tsx | 16, 32 | KOKOS (zival) | kokos1.webp | kokos.m4a |
-| FreeMetKockeGame.tsx | 11 | kokos (zival) | kokos1.webp | kokos.m4a |
-| metKockeConfig.ts | 107, 227 | kokos (zival) | kokos1.webp | kokos.m4a |
-| ponoviPovedConfig.ts | 66, 321 | Kokos (zival) | kokos1.webp | kokos.m4a |
-| matchingGameData.ts | 60 | KOKOS (sadez) | kokos_sadez1.webp | kokos_sadez.m4a |
-| threeColumnMatchingData.ts | 58, 221 | KOKOS (sadez) | kokos_sadez1.webp | kokos_sadez.m4a |
-| puzzleImages.ts | 49 | KOKOS (sadez) | kokos_sadez1.webp | -- |
-| puzzleImages.ts | 50 | KOKOS (zival) | kokos1.webp | -- |
+**S** -- 3. beseda se zamenja (NOS → LOS):
+- Novo: `LOS`, slika `los1.webp`, audio `los.m4a`
 
-### Povzetek sprememb (9 popravkov v 7 datotekah)
+**Z** -- 1. in 3. beseda se zamenjata (ZOB, VOZ → ZMAJ, KOZA):
+- Novo: `ZMAJ`, slika `zmaj1.webp`, audio `zmaj.m4a`
+- Novo: `KOZA`, slika `koza1.webp`, audio `koza.m4a`
 
-| Datoteka | Sprememba |
-|----------|----------|
-| src/data/artikulacijaVajeConfig.ts | Vrstica 268: audio "kokos.m4a" → "kokos_sadez.m4a" |
-| src/data/bingoWordsSSredinaKonec.ts | Vrstica 14: audio "kokos.m4a" → "kokos_sadez.m4a" |
-| src/data/metKockeConfig.ts | Vrstica 237: audio "kokos.m4a" → "kokos_sadez.m4a" |
-| src/data/matchingGameData.ts | Vrstica 61: audio "kokos_1.m4a" → "kokos.m4a" |
-| src/data/threeColumnMatchingData.ts | Vrstica 59: audio "kokos_1.m4a" → "kokos.m4a"; Vrstica 222: audio "kokos_1.m4a" → "kokos.m4a" |
-| src/data/puzzleImages.ts | Dodati neobvezno polje `audio` v PuzzleImage; nastaviti `audio: 'kokos_sadez.m4a'` za KOKOS sadez |
-| src/components/games/GenericDrsnaSestavljankaGame.tsx | Posredovati audio_url v completionImages iz polja audio |
-| src/components/matching/MatchingCompletionDialog.tsx | Odstraniti logiko `replace(/1\.m4a$/, '.m4a')` v vrstici 157 |
+**C** -- 2. beseda se zamenja (PICA → RACA):
+- Novo: `RACA`, slika `raca1.webp`, audio `raca.m4a`
 
+**Š** -- vse 3 besede se zamenjajo (ŠAL, HIŠA, KOŠ → ŠOTOR, PIŠKOT, KOŠ):
+- Novo: `ŠOTOR`, slika `sotor1.webp`, audio `sotor.m4a`
+- Novo: `PIŠKOT`, slika `piskot1.webp`, audio `piskot.m4a`
+- `KOŠ` -- ostane (slika `kos1.webp`, audio `kos.m4a`)
+
+**Ž** -- vse 3 besede se zamenjajo (ŽOGA, ROŽA, JEŽ → ŽABA, ROŽA, LUŽA):
+- Novo: `ŽABA`, slika `zaba1.webp`, audio `zaba.m4a`
+- `ROŽA` -- ostane (slika `roza1.webp`, audio `roza.m4a`)
+- Novo: `LUŽA`, slika `luza1.webp`, audio `luza.m4a`
+
+**Č** -- 3. beseda se zamenja (LUČ → ČOPIČ):
+- Novo: `ČOPIČ`, slika `copic1.webp`, audio `copic.m4a`
+
+**R** -- vse 3 besede se zamenjajo (ROŽA, URA, SIR → RIBA, OMARA, SIR):
+- Novo: `RIBA`, slika `riba1.webp`, audio `riba.m4a`
+- Novo: `OMARA`, slika `omara1.webp`, audio `omara.m4a`
+- `SIR` -- ostane (slika `sir1.webp`, audio `sir.m4a`)
+
+### Sprejemljive variante za vse NOVE besede
+
+Za vsako novo besedo se ustvari seznam `acceptedVariants`, ki upošteva:
+- Tipične fonemske zamenjave pri otrocih (npr. R → L, Š → S)
+- Možne napake Whisper transkripcije za slovenščino
+- Različne slovnične oblike (imenovalnik, rodilnik, množina)
+
+| Nova beseda | Variante |
+|-------------|---------|
+| OPICA | OPICA, APICA, UPICA, OPIKA, OPISA, OPIČA, OPICE, OPICI, OPICO, OPICA!, EPIC, APIKA |
+| BOBER | BOBER, BOBAR, BOBR, BOVER, BOPER, BOBER!, BOBRA, BOBRI, BOBRU, DOBER, GOBER,OBER |
+| DEŽNIK | DEŽNIK, DEZNIK, DEŠNIK, TEŽNIK, BEŽNIK, DEŽNIKI, DEŽNIKU, DEŽNIKA, DEŽNK, DEŠNIKI |
+| LADJA | LADJA, LADIA, RADJA, NADJA, LADJO, LADJE, LADJI, LADJA!, LAJA, LADIJAA, BADIA |
+| CEDILO | CEDILO, SEDILO, ČEDILO, ŠEDILO, TEDILO, CEDILA, CEDILI, CEDILU, CEDILO!, EDILO |
+| NOČ | NOČ, NOC, NOŠ, MOČ, KOČ, NOČ!, NOČI, NOČA, NOČAA, TOČ, BOČ, NOJ |
+| ŽAGA | ŽAGA, ZAGA, ŠAGA, JAGA, TAGA, ŽAGE, ŽAGI, ŽAGO, ŽAGA!, AGA, SAGA |
+| DREVO | DREVO, TREVO, KREVO, BREVO, DEVO, DREVU, DREVA, DREVOO, DREVO!, LEVO, REVO |
+| SOVA | SOVA, ZOVA, ŠOVA, TOVA, BOVA, SOVE, SOVI, SOVO, SOVA!, SOVAA, SOFA |
+| FANT | FANT, VANT, SANT, HANT, TANT, DANT, FANTA, FANTI, FANTU, FANT!, ANT, FONT |
+| LOS | LOS, LOŠ, LOZ, LOT, KOS, MOS, LOSA, LOSI, LOSU, LOS!, OS, LOB |
+| ZMAJ | ZMAJ, SMAJ, ŠMAJ, ŽMAJ, MAJ, ZMAJA, ZMAJI, ZMAJU, ZMAJ!, ZMAI, ŠMAJI |
+| KOZA | KOZA, KOSA, KOŽA, KOŠA, BOZA, DOZA, KOZE, KOZI, KOZO, KOZA!, GOZA, TOZA |
+| RACA | RACA, RACE, RACI, RACO, RAZA, RAŠA, RASA, LACA, NACA, DACA, RACA!, ACA |
+| ŠOTOR | ŠOTOR, SOTOR, ŽOTOR, ŠOTAR, ŠOTOT, ŠOTORA, ŠOTORI, ŠOTORU, ŠOTOR!, OTOR, STOTOR |
+| PIŠKOT | PIŠKOT, PISKOT, PIŠČOT, PIŠKOC, PIŠKOTI, PIŠKOTU, PIŠKOTA, PIŠKT, ŠKOT, BISKOT, PIŠKOT! |
+| ŽABA | ŽABA, ZABA, ŠABA, JABA, TABA, ŽABE, ŽABI, ŽABO, ŽABA!, ABA, ŠABA |
+| LUŽA | LUŽA, LUZA, LUJA, LUŠA, BUŽA, DUŽA, LUŽE, LUŽI, LUŽO, LUŽA!, UŽA |
+| ČOPIČ | ČOPIČ, ČOPIC, ŠOPIČ, COPIČ, ČOPIŠ, ČOPIT, ČOPIČA, ČOPIČI, ČOPIČU, ČOPIČ!, OPIČ |
+| RIBA | RIBA, LIBA, JIBA, REBA, RIVA, RIBE, RIBI, RIBO, RIBA!, IBA, REBA |
+| OMARA | OMARA, OMARE, OMARI, OMARO, AMARA, UMARA, OMARA!, MARA, OMALA, OMARAA |
+
+### Besede ki ostanejo enake (brez sprememb)
+
+Naslednje besede ostanejo točno takšne kot so (besedilo, slika, audio, variante):
+- M: MIZA, GUMA, SEDEM
+- T: TORBA, STOL, COPAT
+- K: KOLO, ROKA, RAK
+- H: HIŠA, JUHA, KRUH
+- J: JOPA, VEJA, NOJ
+- G: ŽOGA (2. beseda)
+- Š: KOŠ (3. beseda)
+- Ž: ROŽA (2. beseda)
+- R: SIR (3. beseda)
+- L: LEV, MILO (1. in 2. beseda)
+- S: SOK, OSA (1. in 2. beseda)
+- C: CEV, ZAJEC (1. in 3. beseda)
+- Z: MIZA (2. beseda)
+- Č: ČAJ, OČI (1. in 2. beseda)
+
+### Tehnična izvedba
+
+Samo ena datoteka se spremeni: `src/data/articulationTestData.ts`
+
+- Vrstni red glasov v datoteki ni bistven (hook ga ureja po `PHONETIC_ORDER`)
+- Doda se polje `audio` pri vseh besedah
+- Posodobijo se `text`, `image`, `audio` in `acceptedVariants` za vsako zamenjano besedo
