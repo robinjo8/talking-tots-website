@@ -110,6 +110,8 @@ const KoloSreceRouter = lazy(() => import("@/components/routing/KoloSreceRouter"
 const BingoRouter = lazy(() => import("@/components/routing/BingoRouter"));
 const MetKockeRouter = lazy(() => import("@/components/routing/MetKockeRouter"));
 const PonoviPovedRouter = lazy(() => import("@/components/routing/PonoviPovedRouter"));
+const KaceLestveGames = lazy(() => import("@/pages/KaceLestveGames"));
+const KaceLestveRouter = lazy(() => import("@/components/routing/KaceLestveRouter"));
 const AdminRoutes = lazy(() => import("@/components/routing/AdminRoutes"));
 
 // Footer pages
@@ -204,6 +206,10 @@ export function AppRoutes() {
       {/* Ponovi poved routes */}
       <Route path="/govorne-igre/ponovi-poved" element={<ProtectedLazyRoute><PonoviPoved /></ProtectedLazyRoute>} />
       <Route path="/govorne-igre/ponovi-poved/:letter" element={<ProtectedLazyRoute><PonoviPovedRouter /></ProtectedLazyRoute>} />
+
+      {/* Kače in lestve routes */}
+      <Route path="/govorne-igre/kace" element={<ProtectedLazyRoute><KaceLestveGames /></ProtectedLazyRoute>} />
+      <Route path="/govorne-igre/kace/:letter" element={<ProtectedLazyRoute><KaceLestveRouter /></ProtectedLazyRoute>} />
       
       {/* Povezi pare routes */}
       <Route path="/govorne-igre/povezi-pare/:ageGroup" element={<ProtectedLazyRoute><PoveziPareRouter /></ProtectedLazyRoute>} />
