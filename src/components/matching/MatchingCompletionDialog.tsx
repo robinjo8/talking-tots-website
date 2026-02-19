@@ -153,8 +153,7 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
     let audioUrl: string;
     
     if (image.audio_url) {
-      // Remove trailing "1" before .m4a if present
-      audioUrl = image.audio_url.replace(/1\.m4a$/, '.m4a');
+      audioUrl = image.audio_url;
     } else {
       // Fallback: generiraj URL iz besede
       let normalizedWord = image.word

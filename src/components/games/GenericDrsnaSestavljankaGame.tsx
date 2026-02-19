@@ -52,7 +52,8 @@ export function GenericDrsnaSestavljankaGame({ config, backPath = '/govorne-igre
     return shuffled.slice(0, config.completionImageCount).map(img => ({
       word: img.word,
       url: getImageUrl(img.filename),
-      filename: img.filename
+      filename: img.filename,
+      audio_url: img.audio ? `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${img.audio}` : undefined
     }));
   }, [puzzleKey, config.images, config.completionImageCount]);
 

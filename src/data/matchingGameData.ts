@@ -58,7 +58,7 @@ export const matchingGameData: LetterData[] = [
       { word: "KNJIGA", filename: "knjiga1.webp", url: `${SUPABASE_STORAGE_URL}/knjiga1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/knjiga.m4a` },
       { word: "KOCKA", filename: "kocka1.webp", url: `${SUPABASE_STORAGE_URL}/kocka1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/kocka.m4a` },
       { word: "KOKOS", filename: "kokos_sadez1.webp", url: `${SUPABASE_STORAGE_URL}/kokos_sadez1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/kokos_sadez.m4a` },
-      { word: "KOKOŠ", filename: "kokos1.webp", url: `${SUPABASE_STORAGE_URL}/kokos1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/kokos_1.m4a` },
+      { word: "KOKOŠ", filename: "kokos1.webp", url: `${SUPABASE_STORAGE_URL}/kokos1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/kokos.m4a` },
       { word: "KOLAČ", filename: "kolac1.webp", url: `${SUPABASE_STORAGE_URL}/kolac1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/kolac.m4a` },
       { word: "KOLO", filename: "kolo1.webp", url: `${SUPABASE_STORAGE_URL}/kolo1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/kolo.m4a` },
       { word: "KORUZA", filename: "koruza1.webp", url: `${SUPABASE_STORAGE_URL}/koruza1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/koruza.m4a` },

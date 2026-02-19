@@ -4,6 +4,7 @@
 export interface PuzzleImage {
   filename: string;
   word: string;
+  audio?: string;
 }
 
 // C images (10 images)
@@ -46,7 +47,7 @@ export const kImages: PuzzleImage[] = [
   { filename: 'klop1.webp', word: 'KLOP' },
   { filename: 'knjiga1.webp', word: 'KNJIGA' },
   { filename: 'kocka1.webp', word: 'KOCKA' },
-  { filename: 'kokos_sadez1.webp', word: 'KOKOS' },
+  { filename: 'kokos_sadez1.webp', word: 'KOKOS', audio: 'kokos_sadez.m4a' },
   { filename: 'kokos1.webp', word: 'KOKOŠ' },
   { filename: 'kolac1.webp', word: 'KOLAČ' },
   { filename: 'kolo1.webp', word: 'KOLO' },
