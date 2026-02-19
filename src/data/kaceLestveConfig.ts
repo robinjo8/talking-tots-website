@@ -32,9 +32,9 @@ export const LADDERS: Record<number, number> = {
 
 // Snakes: key = head (start - higher number), value = tail (end - lower number)
 export const SNAKES: Record<number, number> = {
-  40: 36,
+  40: 31,
   21: 5,
-  24: 8,
+  24: 10,
 };
 
 // Words for sound C (middle/end position)
