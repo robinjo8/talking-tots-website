@@ -234,7 +234,7 @@ export const metKockeK: MetKockeLetterConfig = {
   predmet: [
     { word: "kapo", image: "kapa1.webp", audio: "kapo.m4a" },
     { word: "knjigo", image: "knjiga1.webp", audio: "knjigo.m4a" },
-    { word: "kokos", image: "kokos_sadez1.webp", audio: "kokos.m4a" },
+    { word: "kokos", image: "kokos_sadez1.webp", audio: "kokos_sadez.m4a" },
     { word: "koš", image: "kos1.webp", audio: "kos.m4a" },
     { word: "dežnik", image: "deznik1.webp", audio: "deznik.m4a" },
     { word: "jabolko", image: "jabolko1.webp", audio: "jabolko.m4a" },
