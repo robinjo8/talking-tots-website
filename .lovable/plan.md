@@ -1,84 +1,88 @@
 
-## Popravek kač in lestve — cartoon slog po referenčni sliki
+## Popravek kač, lestve in pozicij
 
-### Analiza referenčne slike
+### Spremembe pozicij kač (kaceLestveConfig.ts)
 
-Na priloženi sliki so kače in lestve narisane takole:
-
-**Kače:**
-- Telo je **zapolnjeno (filled SVG path)** — ni to stroke linija, ampak pravi zapolnjen pas z enakomerno širino
-- Enotna barva brez gradienta (zelena ali modra)
-- Velika okrogla glava z dvema velikima očema (bela pika z črno zenico)
-- Telo valovito, enakomerno debelo skozi celotno dolžino
-- Rep se zoži v konico
-
-**Lestve:**
-- Klasični rjavo-oranžni izgled
-- Debelejše ravne tirnice
-- Enakomerno razporejene debele prečke
-- Enostavne, jasne, vidne tudi na pisanem ozadju
-
-### Tehnični problem s trenutno implementacijo
-
-Trenutne kače so narisane samo kot **SVG stroke** (linija z debelino) — to izgleda tanko in ne-cartoon-ično. Referenčna slika kaže kače narisane kot **offset path** — pas z enako širino na obeh straneh, ki ustvari pravo debelo zapolnjeno telo kače.
-
-### Rešitev — SVG offset path tehnika
-
-Za vsako kačo bomo izračunali **dve vzporedni krivulji** (leva in desna stran telesa) ter jih zapolnili. To bo dalo isti učinek kot na referenčni sliki.
-
-Konkretno:
-1. Izračunamo S-krivuljo (hrbtenica kače)
-2. Izračunamo levo in desno offset krivuljo na razdalji ~3-4 SVG enote
-3. Zapolnimo območje med njima z enotno barvo
-4. Dorisamo glavo (velik polkrog/oval) z očmi
-5. Rep se zoži v trikotnik
-
-**Barve kač (po referenčni sliki):**
-- Kača 1 (40→36): `#2196F3` modra (kot na sliki)
-- Kača 2 (21→5): `#43A047` zelena (kot na sliki)
-- Kača 3 (24→8): `#1565C0` temnomodra
-
-**Alternativni pristop (enostavnejši, enako vizualno):**
-Namesto offset path bomo uporabili **dva stroke sloja**:
-- Debel exterior stroke (bela barva ali temnejša barva) — tloris telesa
-- Tanjši interior stroke (osnovna barva) — zapolni telo
-- S tem dobimo videz debelega, zapolnjenega telesa brez kompleksnih offset izračunov
-
-To je tehnika ki jo pogosto vidimo v cartoon igrah — in daje enak vizualni rezultat kot na referenčni sliki.
-
-### Parametri SVG kač
+Kača 24→8 se spremeni v **24→10**
+Kača 40→36 se spremeni v **40→31**
 
 ```
-Exterior stroke (oris): strokeWidth = 7, barva = temnejša varianta
-Interior stroke (telo): strokeWidth = 5.5, barva = osnovna
-Glava: polkrog r = 4.5, z ušesi (manjša kroga)
-Oči: r=1.2 bela + r=0.7 črna
+SNAKES = { 40: 31, 21: 5, 24: 10 }
 ```
 
-### Lestve — popravki
+---
 
-Lestve na referenčni sliki so:
-- Debelejše tirnice: `strokeWidth = 2.5`
-- Enaka barva rails + rungs: `#C1440E` (opečnato rdeča) ali `#8B4513` (temno rjava)
-- Šir spacing med tirnicama: perpendicular offset = 3.5
-- Manj prečk (vsaka 8-10 SVG enot)
-- Brez fancy 3D efektov — enostavno in jasno
+### Vzroki za vizualne probleme
 
-### Datoteka za spremembo
+**Problem 1 — predebele kače**: `strokeWidth="8"` na SVG viewBox 100×100 je enormno. Celica je wide 100/6 = ~16.7 SVG enot. Kača s strokeWidth 8 zasede skoraj polovico celice.
 
-**Samo `src/components/games/KaceLestveBoard.tsx`:**
+**Problem 2 — čudne krivine**: `perpX = -dy * 0.38` je prevelik faktor. Kača se preveč ukrivi in izgleda čudno zavita. Referenčna slika kaže bolj subtilne, naravne krivine (faktor ~0.20–0.25).
 
-| Komponenta | Sprememba |
-|-----------|-----------|
-| `SNAKE_STYLES` | Modra + zelena + temnomodra (kot referenčna slika) |
-| `SnakeSVG` | Dvojni stroke pristop za debelo zapolnjeno telo, večja glava (r=4.5), večje oči |
-| `LADDER_STYLES` | Opečnato rdeča/rjava barva za rails in rungs |
-| `LadderSVG` | Debelejše tirnice (2.5), večji spacing (3.5), enostavne prečke brez efektov |
+**Problem 3 — glava ni podobna kači**: Samo krog brez prave cartoon oblike. Na referenčni sliki imata kači veliko, okroglo glavo z markantnimi očmi in nasmehom.
 
-### Vizualni cilj
+**Problem 4 — prekrivanje številk**: SVG overlay z debelimi potezami pokriva celična polja s številkami.
 
-Kače bodo izgledale točno kot na referenčni sliki: debele, cartoon zapolnjene, z veliko glavo in jasno vidnimi očmi. Lestve bodo klasične rjave, preproste in jasne — takoj prepoznavne.
+---
 
-### Samo ena datoteka — `KaceLestveBoard.tsx`
+### Rešitve
 
-Spremembe se nanašajo le na `SnakeSVG` in `LadderSVG` funkciji ter njihove style konstante. Logika igre, grid, avatarji — vse ostane enako.
+#### Kače — nova implementacija
+
+Spremembe v `SnakeSVG`:
+
+1. **Debelina**: `strokeWidth` iz `8`/`6` na `4.5`/`3.2` — vitke, elegantne kače
+2. **Krivina**: perp faktor iz `0.38` na `0.22` — bolj naravna, manj dramatična S-krivulja
+3. **Glava**: povečamo na `headR = 3.5`, dodamo obrobo z barvo telesa + belo svetlobo, oči bodo večje in bolj cartoon (r=1.5 bela, r=0.8 črna)
+4. **Senca**: zmanjšamo opacity iz `0.18` na `0.10`, offset iz `0.4` na `0.25`
+5. **Rep**: ohranimo trikotnik, ampak ga zmanjšamo
+6. **Barve**: obdržimo modra + zelena + modra (kot referenčna slika)
+
+#### Lestve — nova implementacija
+
+Spremembe v `LadderSVG`:
+
+1. **Debelina tirnic**: `strokeWidth` iz `3.5`/`2.5` na `2.2`/`1.6`
+2. **Prečke**: iz `2.8`/`2.0` na `2.0`/`1.4`
+3. **Spacing**: perp offset iz `3.5` na `2.8`
+4. **Senca**: opacity iz `0.20` na `0.12`, strokeWidth iz `4` na `2.5`
+5. **Število prečk**: `len / 9` (obstoječe) — ostane, samo tanjše
+
+#### Številke vedno vidne
+
+Ker so SVG elementi tanjši, bodo številke bolj vidne. Poleg tega bomo v HTML celicah dodali `z-index` na `<span>` z številko, da bo vedno nad SVG overlayem.
+
+Trenutno je SVG overlay `absolute inset-0 z-index ni nastavljen` in celični `<span>` za številko nima z-indeksa. SVG overlay je v DOM-u **za** grid divom, torej je že vizualno nad njim. Rešitev: SVG overlay nastavimo na `opacity: 0.85` ali dodamo `mix-blend-mode: multiply` da številke prosevajo skozi.
+
+Boljša rešitev: **številko v celici premaknemo nad SVG overlay** z dodatnim absolutnim elementom, ki je v DOM-u za SVG overlajem. To pa je kompleksno. Enostavnejša rešitev: **tanjše kače in lestve** ki ne pokrivajo središča celic.
+
+Najboljša rešitev: **premaknemo številke v absolutno pozicioniran div** ki je v DOM-u po SVG overlayu — ali pa SVG overlay damo v `z-index: 5` in številke v `z-index: 10`. Ker pa so številke v grid celicah (normalen DOM flow) in SVG je absolute, bo SVG vedno nad njimi.
+
+**Implementacija**: Dodamo drugi overlay div za številke, ki je absolutno pozicioniran ZA SVG overlayem (višji z-index):
+
+```
+<div class="absolute inset-0 grid pointer-events-none z-10">
+  {/* samo številke, brez ozadja */}
+  {cells.map(cell => <div key={...} style={{position in grid}}>{cell.pos}</div>)}
+</div>
+```
+
+To zagotovi da so številke vedno vidne, ne glede na debelino kač.
+
+---
+
+### Datoteke za spremembo
+
+| Datoteka | Sprememba |
+|----------|-----------|
+| `src/data/kaceLestveConfig.ts` | Sprememba SNAKES: `40→31`, `24→10` |
+| `src/components/games/KaceLestveBoard.tsx` | Tanjše kače (strokeWidth 4.5/3.2), manjša krivina (0.22), tanjše lestve (2.2/1.6), dodamo absolutni overlay za številke z `z-index: 10` nad SVG |
+
+---
+
+### Povzetek vizualnih popravkov
+
+- Kače bodo vitke in elegantne kot na referenčni sliki
+- Lestve bodo tanjše in jasnejše
+- Številke bodo VEDNO vidne, ker jih prikažemo v ločenem absolutnem sloju nad SVG overlayem
+- Kačine krivine bodo bolj naravne (manj dramatične)
+- Poziciji kač sta posodobljeni: 24→10 in 40→31
