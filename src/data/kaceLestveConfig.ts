@@ -168,9 +168,10 @@ export function getGridCell(position: number): { row: number; col: number } {
   return { row, col };
 }
 
-// Cell colors - green theme
-export const GREEN_DARK = '#2D6A4F';
-export const GREEN_MID = '#52B788';
+// Cell colors - green theme (4 shades)
+export const GREEN_DARK = '#1B5E20';
+export const GREEN_MID = '#2D6A4F';
+export const GREEN_SEMI = '#52B788';
 export const GREEN_LIGHT = '#95D5B2';
 export const START_COLOR = '#FFD93D';
 export const END_COLOR = '#FF6B35';
@@ -180,10 +181,11 @@ export function getCellColor(position: number): string {
   if (position <= 2) return START_COLOR;
   // End fields (41-42) = orange
   if (position >= 41) return END_COLOR;
-  // Three rotating shades of green
-  const shade = (position - 3) % 3;
+  // Four rotating shades of green
+  const shade = (position - 3) % 4;
   if (shade === 0) return GREEN_DARK;
   if (shade === 1) return GREEN_MID;
+  if (shade === 2) return GREEN_SEMI;
   return GREEN_LIGHT;
 }
 
@@ -191,10 +193,11 @@ export function getCellColor(position: number): string {
 export function getCellTextColor(position: number): string {
   if (position <= 2) return '#7C4A00';
   if (position >= 41) return '#fff';
-  const shade = (position - 3) % 3;
-  if (shade === 0) return '#fff'; // dark green bg -> white text
-  if (shade === 1) return '#fff';
-  return '#1B4332'; // light green bg -> dark text
+  const shade = (position - 3) % 4;
+  if (shade === 0) return '#fff'; // darkest green -> white
+  if (shade === 1) return '#fff'; // dark green -> white
+  if (shade === 2) return '#fff'; // mid green -> white
+  return '#1B4332'; // lightest green -> dark text
 }
 
 // Get a random word from the list (excluding recently used if possible)

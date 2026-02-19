@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Home, Settings } from "lucide-react";
+import { Home, BookOpen, Settings } from "lucide-react";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { KaceLestveBoard } from "@/components/games/KaceLestveBoard";
@@ -8,6 +8,12 @@ import { KaceLestveWordDialog } from "@/components/games/KaceLestveWordDialog";
 import { KaceLestveSettingsModal } from "@/components/games/KaceLestveSettingsModal";
 import { KaceLestveSuccessDialog } from "@/components/games/KaceLestveSuccessDialog";
 import { DiceRoller } from "@/components/dice/DiceRoller";
+import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   KaceDifficulty,
   KacePlayers,
@@ -80,6 +86,7 @@ export function KaceLestveGame({
   const [showNewGameDialog, setShowNewGameDialog] = useState(false);
   // diceKey forces DiceRoller to remount each turn
   const [diceKey, setDiceKey] = useState(0);
+  const [showInstructions, setShowInstructions] = useState(false);
 
   const resetGame = useCallback(() => {
     setGameState({
@@ -282,38 +289,38 @@ export function KaceLestveGame({
         currentAvatars={playerAvatars}
       />
 
-      {/* Board area - full screen */}
-      <div className="h-full flex items-center justify-center p-2 pb-24">
+      {/* Board area - full screen, with player indicator below */}
+      <div className="h-full flex flex-col items-center justify-center p-2 pb-20">
         <div
           className="h-full"
           style={{
             aspectRatio: '6/7',
-            maxHeight: 'calc(100vh - 100px)',
+            maxHeight: 'calc(100vh - 120px)',
             maxWidth: 'calc(100vw - 16px)',
           }}
         >
           <KaceLestveBoard players={playerData} />
         </div>
-      </div>
 
-      {/* Current player info - top bar */}
-      {phase !== "settings" && (
-        <div className="fixed top-3 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 bg-black/40 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg">
-          <img
-            src={`${SUPABASE_URL}/zmajcki/${playerAvatars[gameState.currentPlayer] || DRAGON_AVATARS[0]}`}
-            alt={currentPlayerName}
-            className="w-8 h-8 object-contain"
-          />
-          <span className="text-white font-black text-sm drop-shadow">
-            {isPlaying ? `NA VRSTI: ${currentPlayerName}` : currentPlayerName}
-          </span>
-          {players === 2 && (
-            <span className="text-white/60 text-xs">
-              #{gameState.positions[gameState.currentPlayer] || 'START'}
+        {/* Current player indicator — below the board */}
+        {phase !== "settings" && (
+          <div className="flex items-center gap-2 bg-black/50 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg mt-2">
+            <img
+              src={`${SUPABASE_URL}/zmajcki/${playerAvatars[gameState.currentPlayer] || DRAGON_AVATARS[0]}`}
+              alt={currentPlayerName}
+              className="w-9 h-9 object-contain"
+            />
+            <span className="text-white font-black text-sm drop-shadow">
+              {isPlaying ? `NA VRSTI: ${currentPlayerName}` : currentPlayerName}
             </span>
-          )}
-        </div>
-      )}
+            {players === 2 && (
+              <span className="text-white/60 text-xs">
+                #{gameState.positions[gameState.currentPlayer] || 'START'}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Interactive 3D Dice in center of screen */}
       <DiceRoller
@@ -323,24 +330,45 @@ export function KaceLestveGame({
         onRollComplete={handleDiceRollComplete}
       />
 
-      {/* Bottom-left buttons: Home + Settings */}
-      <div className="fixed bottom-4 left-4 z-50 flex flex-col gap-3">
-        <button
-          onClick={() => setShowExitDialog(true)}
-          className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg border-2 border-white/50 hover:scale-105 transition-transform"
-          style={{ background: 'linear-gradient(135deg, #F59E0B, #EF4444)' }}
-        >
-          <Home className="w-7 h-7 text-white" />
-        </button>
-        {phase !== "settings" && (
-          <button
-            onClick={() => setShowSettingsInGame(true)}
-            className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg border-2 border-white/50 hover:scale-105 transition-transform"
-            style={{ background: 'linear-gradient(135deg, #3B82F6, #6366F1)' }}
+      {/* Bottom-left: unified Home dropdown menu */}
+      <div className="fixed bottom-4 left-4 z-50">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg border-2 border-white/50 hover:scale-105 transition-transform"
+              style={{ background: 'linear-gradient(135deg, #F59E0B, #EF4444)' }}
+            >
+              <Home className="w-7 h-7 text-white" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className="ml-4 w-56 p-2 bg-white border-2 border-orange-200 shadow-xl rounded-xl"
+            align="start"
+            side="top"
+            sideOffset={8}
           >
-            <Settings className="w-7 h-7 text-white" />
-          </button>
-        )}
+            <button
+              onClick={() => setShowExitDialog(true)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-orange-50 transition-colors text-left font-bold text-gray-800"
+            >
+              🏠 <span>NAZAJ</span>
+            </button>
+            <button
+              onClick={() => setShowInstructions(true)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-orange-50 transition-colors text-left font-bold text-gray-800"
+            >
+              <BookOpen className="w-5 h-5 text-blue-500" /> <span>NAVODILA</span>
+            </button>
+            {phase !== "settings" && (
+              <button
+                onClick={() => setShowSettingsInGame(true)}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-orange-50 transition-colors text-left font-bold text-gray-800"
+              >
+                <Settings className="w-5 h-5 text-indigo-500" /> <span>NASTAVITVE</span>
+              </button>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Word challenge dialog */}
@@ -375,6 +403,13 @@ export function KaceLestveGame({
         winnerName={gameState.winner !== null ? PLAYER_NAMES[gameState.winner] : ""}
         onClaimStar={handleClaimStar}
         onNewGame={resetGame}
+      />
+
+      {/* Instructions modal */}
+      <InstructionsModal
+        isOpen={showInstructions}
+        onClose={() => setShowInstructions(false)}
+        type="kaceLestve"
       />
 
       {/* Exit dialog */}
