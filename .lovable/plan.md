@@ -1,88 +1,144 @@
 
-## Popravek kač, lestve in pozicij
+## Vizualni popravki table + navigacija
 
-### Spremembe pozicij kač (kaceLestveConfig.ts)
-
-Kača 24→8 se spremeni v **24→10**
-Kača 40→36 se spremeni v **40→31**
-
-```
-SNAKES = { 40: 31, 21: 5, 24: 10 }
-```
+### Spremembe v 3 datotekah
 
 ---
 
-### Vzroki za vizualne probleme
+### 1. `src/components/games/KaceLestveBoard.tsx` — vizualni popravki
 
-**Problem 1 — predebele kače**: `strokeWidth="8"` na SVG viewBox 100×100 je enormno. Celica je wide 100/6 = ~16.7 SVG enot. Kača s strokeWidth 8 zasede skoraj polovico celice.
+#### A) Kače — tanjše, brez jezika, kačja glava z nosom in usti
 
-**Problem 2 — čudne krivine**: `perpX = -dy * 0.38` je prevelik faktor. Kača se preveč ukrivi in izgleda čudno zavita. Referenčna slika kaže bolj subtilne, naravne krivine (faktor ~0.20–0.25).
+**Problem iz referenčne slike**: špice (artefakti) nastanejo na prehodnih točkah Bezier krivulje, ker se krivulja "prelomi" (kontrolne točke niso gladke). To popravimo z `smooth cubic Bezier (S ukaz)` namesto dveh ločenih `C` ukazov.
 
-**Problem 3 — glava ni podobna kači**: Samo krog brez prave cartoon oblike. Na referenčni sliki imata kači veliko, okroglo glavo z markantnimi očmi in nasmehom.
+**Telo** — zmanjšamo `strokeWidth`:
+- Oris: `4.5` → `3.2`
+- Telo: `3.2` → `2.2`
 
-**Problem 4 — prekrivanje številk**: SVG overlay z debelimi potezami pokriva celična polja s številkami.
+**Glava** — kačja oblika (ne krog):
+- Namesto kroga narišemo **oval/ellipso** podolgovato v smeri glave
+- Headová elipsa: `rx = headR * 1.3` (daljša v smeri glave), `ry = headR`
+- Nos: majhna temna polkrožna oblika na konici glave
+- Usta: ukrivljena linija pod nosom (arc path)
+- Odstranim jezik (`<path d=...stroke="#FF1744".../>`)
 
----
-
-### Rešitve
-
-#### Kače — nova implementacija
-
-Spremembe v `SnakeSVG`:
-
-1. **Debelina**: `strokeWidth` iz `8`/`6` na `4.5`/`3.2` — vitke, elegantne kače
-2. **Krivina**: perp faktor iz `0.38` na `0.22` — bolj naravna, manj dramatična S-krivulja
-3. **Glava**: povečamo na `headR = 3.5`, dodamo obrobo z barvo telesa + belo svetlobo, oči bodo večje in bolj cartoon (r=1.5 bela, r=0.8 črna)
-4. **Senca**: zmanjšamo opacity iz `0.18` na `0.10`, offset iz `0.4` na `0.25`
-5. **Rep**: ohranimo trikotnik, ampak ga zmanjšamo
-6. **Barve**: obdržimo modra + zelena + modra (kot referenčna slika)
-
-#### Lestve — nova implementacija
-
-Spremembe v `LadderSVG`:
-
-1. **Debelina tirnic**: `strokeWidth` iz `3.5`/`2.5` na `2.2`/`1.6`
-2. **Prečke**: iz `2.8`/`2.0` na `2.0`/`1.4`
-3. **Spacing**: perp offset iz `3.5` na `2.8`
-4. **Senca**: opacity iz `0.20` na `0.12`, strokeWidth iz `4` na `2.5`
-5. **Število prečk**: `len / 9` (obstoječe) — ostane, samo tanjše
-
-#### Številke vedno vidne
-
-Ker so SVG elementi tanjši, bodo številke bolj vidne. Poleg tega bomo v HTML celicah dodali `z-index` na `<span>` z številko, da bo vedno nad SVG overlayem.
-
-Trenutno je SVG overlay `absolute inset-0 z-index ni nastavljen` in celični `<span>` za številko nima z-indeksa. SVG overlay je v DOM-u **za** grid divom, torej je že vizualno nad njim. Rešitev: SVG overlay nastavimo na `opacity: 0.85` ali dodamo `mix-blend-mode: multiply` da številke prosevajo skozi.
-
-Boljša rešitev: **številko v celici premaknemo nad SVG overlay** z dodatnim absolutnim elementom, ki je v DOM-u za SVG overlajem. To pa je kompleksno. Enostavnejša rešitev: **tanjše kače in lestve** ki ne pokrivajo središča celic.
-
-Najboljša rešitev: **premaknemo številke v absolutno pozicioniran div** ki je v DOM-u po SVG overlayu — ali pa SVG overlay damo v `z-index: 5` in številke v `z-index: 10`. Ker pa so številke v grid celicah (normalen DOM flow) in SVG je absolute, bo SVG vedno nad njimi.
-
-**Implementacija**: Dodamo drugi overlay div za številke, ki je absolutno pozicioniran ZA SVG overlayem (višji z-index):
-
+**Krivulja brez špic** — popravimo generiranje S-krivulje. Namesto:
 ```
-<div class="absolute inset-0 grid pointer-events-none z-10">
-  {/* samo številke, brez ozadja */}
-  {cells.map(cell => <div key={...} style={{position in grid}}>{cell.pos}</div>)}
+M head C cp1 cp2 mid C cp3 cp4 tail
+```
+Uporabimo bolj gladek pristop s `cubic-bezier` kjer kontrolne točke zagotavljajo C1 kontinuiteto:
+- `cp1` in `cp2` sta simetrični glede na `mid` točko → ni preloma
+
+#### B) Številke — odstranimo mali overlay, ohranimo velike
+
+Odstraniti moramo ta del (vrstice 347-373 v trenutnem KaceLestveBoard.tsx):
+```tsx
+{/* Overlay za številke — vedno nad kačami in lestvami */}
+<div className="absolute inset-0 pointer-events-none" style={{ display: 'grid', ... zIndex: 10 }}>
+  {cells.map(cell => <div key={`num-${cell.row}-${cell.col}`} ...>
+    <span style={{ fontSize: 'clamp(8px, 1.8vw, 16px)' }}>{cell.pos}</span>
+  </div>)}
 </div>
 ```
 
-To zagotovi da so številke vedno vidne, ne glede na debelino kač.
+Namesto tega **premaknemo SVG overlay za kače/lestve pod grid** — to pomeni da damo SVG overlay `zIndex: 1` in grid `zIndex: 2`:
+- Grid celice že vsebujejo velike `<span>` z numeričnimi vrednostmi v sredini celice
+- Ker je grid nad SVG, bodo te številke naravno vidne brez dodatnega overlaya
+- Emoji ikone kač/lestev (🐍🪜) v kotih celic odstranimo prav tako (ker so redundantne)
+
+**Struktura z-indexov po popravku:**
+```
+z-index: 1  → SVG overlay (kače + lestve)
+z-index: 2  → Board grid (celice z velikimi številkami v sredini)
+z-index: 30 → Player avatarji (obstoječe)
+```
+
+#### C) 4 odtenki zelene barve
+
+Trenutno sta 3 odtenki (za pozicije 3-40):
+```typescript
+const shade = (position - 3) % 3;
+```
+
+Spremenimo v 4 odtenke:
+```typescript
+const shade = (position - 3) % 4;
+```
+
+Barve — dodam 4. odtenek med `GREEN_MID` in `GREEN_LIGHT`:
+```typescript
+export const GREEN_DARK = '#1B5E20';   // Temno zelena
+export const GREEN_MID = '#2D6A4F';    // Srednja zelena
+export const GREEN_SEMI = '#52B788';   // Svetlejša zelena  
+export const GREEN_LIGHT = '#95D5B2';  // Najsvetlejša zelena
+```
+
+Sprememba `getCellColor` in `getCellTextColor` v `kaceLestveConfig.ts`.
+
+#### D) Zmajček "na vrsti" pod igro
+
+Dodamo indikator trenutnega igralca **pod tablo** (ne zgoraj). Trenutno je info v `fixed top-3` baru. Dodamo majhen prikaz pod tablo v `KaceLestveGame.tsx`:
+```tsx
+{/* Pod tablo: kdo je na vrsti */}
+<div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-black/50 rounded-full px-3 py-1">
+  <img src={avatarUrl} className="w-8 h-8" />
+  <span className="text-white font-black text-sm">NA VRSTI</span>
+</div>
+```
 
 ---
 
-### Datoteke za spremembo
+### 2. `src/data/kaceLestveConfig.ts` — 4 odtenki zelene
 
-| Datoteka | Sprememba |
+Spremembe:
+- Dodamo `GREEN_SEMI` konstanto
+- `getCellColor` → `% 4` s 4 barvami
+- `getCellTextColor` → `% 4` s pravilnimi tekstovnimi barvami
+
+---
+
+### 3. `src/components/games/KaceLestveGame.tsx` — Home gumb s dropdown menijem
+
+**Trenutno stanje**: Ločen Home gumb + ločen Settings gumb (dva ločena okrogla gumba).
+
+**Novo stanje**: En Home gumb (oranžen, kot na ostalih igrah), ki ob kliku odpre dropdown meni z možnostmi:
+- 🏠 Nazaj
+- 📖 Navodila
+- ⚙️ Nastavitve
+
+**Referenčni vzorec** (iz `GenericMetKockeGame.tsx`):
+```tsx
+<div className="fixed bottom-4 left-4 z-50">
+  <DropdownMenu>
+    <DropdownMenuTrigger asChild>
+      <button className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 ...">
+        <Home className="h-7 w-7 text-white" />
+      </button>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl" align="start" side="top" sideOffset={8}>
+      <button onClick={() => setShowExitDialog(true)}>🏠 Nazaj</button>
+      <button onClick={() => setShowInstructions(true)}>📖 Navodila</button>
+      <button onClick={() => setShowSettingsInGame(true)}>⚙️ Nastavitve</button>
+    </DropdownMenuContent>
+  </DropdownMenu>
+</div>
+```
+
+**Navodila (InstructionsModal)** — ker ta igra nima lastnega `InstructionsModal`, ga dodamo inline v `KaceLestveGame.tsx`. Vsebina navodil:
+
+> **PRAVILA IGRE**
+> MET KOCKE IN PREMIK FIGURICE. PRISTANI NA POLJU S LESTVIJO — VZPNEŠ SE SKRIJ! ODGOVORI PRAVILNO IN DOBI BONUS POLJE. PRISTANI NA GLAVI KAČE — PAZI! ODGOVORI PRAVILNO IN OSTANEŠ ZGORAJ. ZA ZMAGO POTREBUJEŠ TOČEN MET NA CILJ.
+
+Navodila prikažemo z obstoječim `InstructionsModal` komponentom.
+
+**Zmajček na vrsti pod tablo** — v `KaceLestveGame.tsx` premestimo info iz `fixed top-3` baru in ga prikažemo pod tablo (absolutno, v kontekstu flex containera).
+
+---
+
+### Povzetek sprememb po datotekah
+
+| Datoteka | Spremembe |
 |----------|-----------|
-| `src/data/kaceLestveConfig.ts` | Sprememba SNAKES: `40→31`, `24→10` |
-| `src/components/games/KaceLestveBoard.tsx` | Tanjše kače (strokeWidth 4.5/3.2), manjša krivina (0.22), tanjše lestve (2.2/1.6), dodamo absolutni overlay za številke z `z-index: 10` nad SVG |
-
----
-
-### Povzetek vizualnih popravkov
-
-- Kače bodo vitke in elegantne kot na referenčni sliki
-- Lestve bodo tanjše in jasnejše
-- Številke bodo VEDNO vidne, ker jih prikažemo v ločenem absolutnem sloju nad SVG overlayem
-- Kačine krivine bodo bolj naravne (manj dramatične)
-- Poziciji kač sta posodobljeni: 24→10 in 40→31
+| `src/data/kaceLestveConfig.ts` | Dodamo `GREEN_SEMI`, spremenimo `% 3` → `% 4`, posodobimo `getCellTextColor` |
+| `src/components/games/KaceLestveBoard.tsx` | (1) Odstranim mali corner overlay z z-index 10, (2) SVG z-index 1 pod gridom (z-index 2), (3) Tanjše kače (2.2/3.2), (4) Kačja glava z elipso + nosom + usti, (5) Gladka krivulja brez špic |
+| `src/components/games/KaceLestveGame.tsx` | (1) Home gumb → DropdownMenu z Nazaj/Navodila/Nastavitve, (2) Odstranim ločen Settings gumb, (3) Dodamo InstructionsModal, (4) Zmajček na vrsti prikazan pod tablo |
