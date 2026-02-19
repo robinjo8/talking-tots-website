@@ -41,6 +41,7 @@ const AdminDrsnaSestavljankaGames = lazy(() => import('@/pages/admin/games/Admin
 const AdminIgraUjemanjaGames = lazy(() => import('@/pages/admin/games/AdminIgraUjemanjaGames'));
 const AdminMetKockeGames = lazy(() => import('@/pages/admin/games/AdminMetKockeGames'));
 const AdminPonoviPovedGames = lazy(() => import('@/pages/admin/games/AdminPonoviPovedGames'));
+const AdminKaceLestveGames = lazy(() => import('@/pages/admin/games/AdminKaceLestveGames'));
 
 // Admin game routers
 const AdminSpominRouter = lazy(() => import('@/components/routing/admin/AdminSpominRouter'));
@@ -53,6 +54,7 @@ const AdminDrsnaSestavljankaRouter = lazy(() => import('@/components/routing/adm
 const AdminIgraUjemanjaRouter = lazy(() => import('@/components/routing/admin/AdminIgraUjemanjaRouter'));
 const AdminMetKockeRouter = lazy(() => import('@/components/routing/admin/AdminMetKockeRouter'));
 const AdminPonoviPovedRouter = lazy(() => import('@/components/routing/admin/AdminPonoviPovedRouter'));
+const AdminKaceLestveRouter = lazy(() => import('@/components/routing/admin/AdminKaceLestveRouter'));
 const AdminVideoNavodilaRouter = lazy(() => import('@/components/routing/admin/AdminVideoNavodilaRouter'));
 const AdminArtikulacijaVajeRouter = lazy(() => import('@/components/routing/admin/AdminArtikulacijaVajeRouter'));
 
@@ -381,6 +383,22 @@ export function AdminRoutes() {
           element={
             <AdminGameFullscreenRoute>
               <AdminPonoviPovedRouter />
+            </AdminGameFullscreenRoute>
+          } 
+        />
+        <Route 
+          path="children/:childId/games/kace" 
+          element={
+            <AdminLayoutWrapper>
+              <AdminKaceLestveGames />
+            </AdminLayoutWrapper>
+          } 
+        />
+        <Route 
+          path="children/:childId/games/kace/:letter" 
+          element={
+            <AdminGameFullscreenRoute>
+              <AdminKaceLestveRouter />
             </AdminGameFullscreenRoute>
           } 
         />
