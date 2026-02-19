@@ -5,7 +5,7 @@ import { CheckCircle, XCircle, AlertCircle } from "lucide-react";
 interface InstructionsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  type?: "jigsaw" | "sliding" | "articulation" | "maze" | "bingo" | "sequence" | "dice" | "wheel" | "spomin" | "ponoviPoved";
+  type?: "jigsaw" | "sliding" | "articulation" | "maze" | "bingo" | "sequence" | "dice" | "wheel" | "spomin" | "ponoviPoved" | "kaceLestve";
 }
 
 type InstructionItem = {
@@ -180,6 +180,19 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({
         { text: "Ko igralec ponovi vse štiri povedi, se prikaže zaključno okno z napisom ČESTITKE! in sliko zmajčka. S klikom na rumen gumb VZEMI ZVEZDICO se napredek shrani." },
         { text: "Nova igra / izhod", bold: true },
         { text: "Po osvojeni zvezdici se pojavi moder gumb za novo igro (levo spodaj). S klikom na gumb Hiška se vrnete v meni." }
+      ]
+    : type === "kaceLestve"
+    ? [
+        { text: "Pravila igre", bold: true },
+        { text: "MET KOCKE IN PREMIK FIGURICE PO POLJIH OD 1 DO 42." },
+        { text: "Lestve", bold: true },
+        { text: "PRISTANI NA SPODNJEM POLJU LESTVE — VZPNEŠ SE NAVZGOR! PRAVILNO ODGOVORI IN DOBI BONUS POLJE." },
+        { text: "Kače", bold: true },
+        { text: "PRISTANI NA GLAVI KAČE — POZOR! PRAVILNO ODGOVORI IN OSTANEŠ ZGORAJ. NAPAČEN ODGOVOR — ZDRSNIŠ NAVZDOL." },
+        { text: "Vsakič", bold: true },
+        { text: "PO VSAKEM METU KOCKE PONOVI BESEDO Z GLASOM C." },
+        { text: "Zmaga", bold: true },
+        { text: "ZA ZMAGO POTREBUJEŠ TOČEN MET NA POLJE 42. ČE V ZADNJIH 6 POLJIH 5-KRAT ZGREŠIŠ, TE IGRA SAMODEJNO PRESTAVI NA CILJ." },
       ]
     : [
         { text: "Osnovni koncept", bold: true },
