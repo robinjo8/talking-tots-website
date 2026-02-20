@@ -14,15 +14,15 @@ import { getAllWheelConfigs } from "@/data/artikulacijaVajeConfig";
 
 // Letter card data for Kolo sreče (wheel games - začetek)
 const wheelLetters = [
-  { id: "s", letter: "S", title: "Glas S", description: "Zavrti kolo sreče in vadi izgovorjavo glasu S na začetku besed", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_S.png", path: "/govorne-igre/kolo-srece/s" },
-  { id: "z", letter: "Z", title: "Glas Z", description: "Zavrti kolo sreče in vadi izgovorjavo glasu Z na začetku besed", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_Z.png", path: "/govorne-igre/kolo-srece/z" },
-  { id: "c", letter: "C", title: "Glas C", description: "Zavrti kolo sreče in vadi izgovorjavo glasu C na začetku besed", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_C.png", path: "/govorne-igre/kolo-srece/c" },
-  { id: "sh", letter: "Š", title: "Glas Š", description: "Zavrti kolo sreče in vadi izgovorjavo glasu Š na začetku besed", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_SH.png", path: "/govorne-igre/kolo-srece/sh" },
-  { id: "zh", letter: "Ž", title: "Glas Ž", description: "Zavrti kolo sreče in vadi izgovorjavo glasu Ž na začetku besed", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_ZH.png", path: "/govorne-igre/kolo-srece/zh" },
-  { id: "ch", letter: "Č", title: "Glas Č", description: "Zavrti kolo sreče in vadi izgovorjavo glasu Č na začetku besed", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_CH.png", path: "/govorne-igre/kolo-srece/ch" },
-  { id: "k", letter: "K", title: "Glas K", description: "Zavrti kolo sreče in vadi izgovorjavo glasu K na začetku besed", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_K.png", path: "/govorne-igre/kolo-srece/k" },
-  { id: "l", letter: "L", title: "Glas L", description: "Zavrti kolo sreče in vadi izgovorjavo glasu L na začetku besed", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_L.png", path: "/govorne-igre/kolo-srece/l" },
-  { id: "r", letter: "R", title: "Glas R", description: "Zavrti kolo sreče in vadi izgovorjavo glasu R na začetku besed", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_R.png", path: "/govorne-igre/kolo-srece/r" },
+  { id: "s", letter: "S", title: "Glas S", description: "Zavrti kolo besed in vadi izgovorjavo glasu S na začetku besed", gradient: "from-dragon-green/20 to-app-teal/20", image: "zmajcek_crka_S.png", path: "/govorne-igre/kolo-srece/s" },
+  { id: "z", letter: "Z", title: "Glas Z", description: "Zavrti kolo besed in vadi izgovorjavo glasu Z na začetku besed", gradient: "from-app-teal/20 to-dragon-green/20", image: "zmajcek_crka_Z.png", path: "/govorne-igre/kolo-srece/z" },
+  { id: "c", letter: "C", title: "Glas C", description: "Zavrti kolo besed in vadi izgovorjavo glasu C na začetku besed", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_C.png", path: "/govorne-igre/kolo-srece/c" },
+  { id: "sh", letter: "Š", title: "Glas Š", description: "Zavrti kolo besed in vadi izgovorjavo glasu Š na začetku besed", gradient: "from-app-blue/20 to-app-purple/20", image: "zmajcek_crka_SH.png", path: "/govorne-igre/kolo-srece/sh" },
+  { id: "zh", letter: "Ž", title: "Glas Ž", description: "Zavrti kolo besed in vadi izgovorjavo glasu Ž na začetku besed", gradient: "from-app-purple/20 to-app-blue/20", image: "zmajcek_crka_ZH.png", path: "/govorne-igre/kolo-srece/zh" },
+  { id: "ch", letter: "Č", title: "Glas Č", description: "Zavrti kolo besed in vadi izgovorjavo glasu Č na začetku besed", gradient: "from-app-blue/20 to-app-teal/20", image: "zmajcek_crka_CH.png", path: "/govorne-igre/kolo-srece/ch" },
+  { id: "k", letter: "K", title: "Glas K", description: "Zavrti kolo besed in vadi izgovorjavo glasu K na začetku besed", gradient: "from-app-orange/20 to-app-yellow/20", image: "zmajcek_crka_K.png", path: "/govorne-igre/kolo-srece/k" },
+  { id: "l", letter: "L", title: "Glas L", description: "Zavrti kolo besed in vadi izgovorjavo glasu L na začetku besed", gradient: "from-app-purple/20 to-app-blue/20", image: "zmajcek_crka_L.png", path: "/govorne-igre/kolo-srece/l" },
+  { id: "r", letter: "R", title: "Glas R", description: "Zavrti kolo besed in vadi izgovorjavo glasu R na začetku besed", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_R.png", path: "/govorne-igre/kolo-srece/r" },
 ];
 
 export default function KoloSreceGames() {
@@ -102,18 +102,12 @@ export default function KoloSreceGames() {
                   className="bg-white rounded-xl shadow-xl border border-gray-200 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group"
                 >
                   {/* Card Image */}
-                  <div className={isMobile ? "relative aspect-square overflow-hidden" : "relative aspect-video overflow-hidden"}>
-                    <div 
-                      className="absolute inset-0"
-                      style={{
-                        background: 'radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)'
-                      }}
-                    />
-                    <div className="relative w-full h-full flex items-center justify-center">
+                  <div className={`relative overflow-hidden bg-gradient-to-br ${item.gradient} ${isMobile ? 'aspect-square' : 'aspect-video'}`}>
+                    <div className="w-full h-full flex items-center justify-center">
                       <img 
                         src={`https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/${item.image}`}
                         alt={item.title}
-                        className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+                        className={`object-contain group-hover:scale-110 transition-transform duration-300 ${isMobile ? 'w-[80%] h-[80%]' : 'w-full h-full'}`}
                         style={{ mixBlendMode: 'multiply' }}
                       />
                     </div>

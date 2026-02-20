@@ -60,19 +60,13 @@ export default function MetKockeGames() {
       className="bg-white rounded-xl shadow-xl border border-gray-200 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group"
       onClick={() => handleLetterClick(game)}
     >
-      {/* Card Image - Orange gradient like Kolo besed */}
-      <div className={isMobile ? "relative aspect-square overflow-hidden" : "relative aspect-video overflow-hidden"}>
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: 'radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)'
-          }}
-        />
-        <div className="relative w-full h-full flex items-center justify-center">
+      {/* Card Image */}
+      <div className={`relative overflow-hidden bg-gradient-to-br ${game.gradient} ${isMobile ? 'aspect-square' : 'aspect-video'}`}>
+        <div className="w-full h-full flex items-center justify-center">
           <img 
             src={game.image}
             alt={`Glas ${game.letter}`}
-            className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+            className={`object-contain group-hover:scale-110 transition-transform duration-300 ${isMobile ? 'w-[80%] h-[80%]' : 'w-full h-full'}`}
             style={{ mixBlendMode: 'multiply' }}
           />
         </div>
