@@ -14,7 +14,7 @@ import {
 } from "@/data/kaceLestveConfig";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public";
-const HOP_INTERVAL_MS = 300; // ms per step (2x počasneje)
+const HOP_INTERVAL_MS = 180; // ms per step (enako hitro kot puščica)
 
 interface PlayerData {
   position: number;
@@ -473,7 +473,7 @@ export function KaceLestveBoard({ players, activePlayerIdx = 0, onAvatarLanded, 
               animate={{ left: x, top: y }}
               transition={
                 isHopping
-                  ? { type: 'tween', duration: 0.26, ease: 'easeInOut' }
+                  ? { type: 'tween', duration: 0.16, ease: 'easeInOut' }
                   : { type: 'tween', duration: 1.8, ease: [0.4, 0, 0.2, 1] }
               }
               onAnimationComplete={() => {
