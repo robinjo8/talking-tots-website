@@ -52,6 +52,9 @@ type GamePhase =
   | "snake_challenge"
   | "success";
 
+type AnimStep = 'idle' | 'moving_to_dice' | 'moving_to_final';
+
+
 interface KaceLestveGameProps {
   backPath?: string;
   childId?: string;
@@ -88,6 +91,11 @@ export function KaceLestveGame({
   // diceKey forces DiceRoller to remount each turn
   const [diceKey, setDiceKey] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
+
+  // Two-phase animation state
+  const [animStep, setAnimStep] = useState<AnimStep>('idle');
+  // pendingDialogPhase holds what to open after final animation completes
+  const [pendingDialogPhase, setPendingDialogPhase] = useState<GamePhase | null>(null);
 
   const resetGame = useCallback(() => {
     setGameState({
@@ -129,9 +137,18 @@ export function KaceLestveGame({
     setShowSettingsInGame(false);
   }, []);
 
+  const nextPlayer = useCallback(() => {
+    const next = players === 1 ? 0 : (gameState.currentPlayer + 1) % players;
+    setGameState(prev => ({ ...prev, currentPlayer: next }));
+    setPhase("playing");
+    setCurrentWord(null);
+    setPendingMove(null);
+    setDiceKey(k => k + 1);
+  }, [players, gameState.currentPlayer]);
+
   // Called when DiceRoller finishes animation
   const handleDiceRollComplete = useCallback((result: number) => {
-    setPhase("rolling"); // brief rolling phase (already in it visually)
+    setPhase("rolling");
 
     const currentPos = gameState.positions[gameState.currentPlayer];
     const squaresToEnd = BOARD_SIZE - currentPos;
@@ -146,7 +163,11 @@ export function KaceLestveGame({
         setGameState(prev => ({ ...prev, failedNearEndCount: newFailCount }));
 
         if (forcedWin) {
-          setTimeout(() => applyMove(BOARD_SIZE, result), 300);
+          const newPositions = [...gameState.positions];
+          newPositions[gameState.currentPlayer] = BOARD_SIZE;
+          setGameState(prev => ({ ...prev, positions: newPositions, gameOver: true, winner: gameState.currentPlayer }));
+          setAnimStep('moving_to_final');
+          setPendingDialogPhase('success');
         } else {
           setTimeout(() => nextPlayer(), 400);
         }
@@ -154,65 +175,77 @@ export function KaceLestveGame({
       }
     }
 
+    // Phase 1: Move avatar to the dice-result position and wait for landing
     const newPos = Math.min(currentPos + result, BOARD_SIZE);
-    setTimeout(() => applyMove(newPos, result), 300);
-  }, [gameState]);
-
-  const applyMove = useCallback((newPosition: number, _diceVal: number) => {
-    const { currentPlayer } = gameState;
     const newPositions = [...gameState.positions];
-    newPositions[currentPlayer] = newPosition;
+    newPositions[gameState.currentPlayer] = newPos;
+    setGameState(prev => ({ ...prev, positions: newPositions }));
+    setAnimStep('moving_to_dice');
+  }, [gameState, nextPlayer]);
 
-    if (newPosition >= BOARD_SIZE) {
-      setGameState(prev => ({ ...prev, positions: newPositions, gameOver: true, winner: currentPlayer }));
-      setPhase("success");
-      return;
-    }
+  // Called by KaceLestveBoard when active player's avatar finishes animating
+  const handleAvatarLanded = useCallback((_playerIdx: number) => {
+    if (animStep === 'moving_to_dice') {
+      const { currentPlayer, positions } = gameState;
+      const pos = positions[currentPlayer];
 
-    if (LADDERS[newPosition] !== undefined) {
-      const ladderTop = Math.min(LADDERS[newPosition], BOARD_SIZE);
-      newPositions[currentPlayer] = ladderTop;
-      setGameState(prev => ({ ...prev, positions: newPositions }));
-
-      if (ladderTop >= BOARD_SIZE) {
+      if (pos >= BOARD_SIZE) {
+        setAnimStep('idle');
         setGameState(prev => ({ ...prev, gameOver: true, winner: currentPlayer }));
-        setPhase("success");
+        setPhase('success');
         return;
       }
 
+      if (LADDERS[pos] !== undefined) {
+        const ladderTop = Math.min(LADDERS[pos], BOARD_SIZE);
+        const newPositions = [...positions];
+        newPositions[currentPlayer] = ladderTop;
+        setGameState(prev => ({ ...prev, positions: newPositions }));
+        setAnimStep('moving_to_final');
+
+        if (ladderTop >= BOARD_SIZE) {
+          setGameState(prev => ({ ...prev, gameOver: true, winner: currentPlayer }));
+          setPendingDialogPhase('success');
+        } else {
+          const { word, index } = getRandomWord(gameState.usedWordIndices);
+          setCurrentWord(word);
+          setGameState(prev => ({ ...prev, usedWordIndices: [...prev.usedWordIndices.slice(-8), index] }));
+          setPendingMove(ladderTop);
+          setPendingDialogPhase('word_challenge');
+        }
+        return;
+      }
+
+      if (SNAKES[pos] !== undefined) {
+        const { word, index } = getRandomWord(gameState.usedWordIndices);
+        setCurrentWord(word);
+        setGameState(prev => ({ ...prev, usedWordIndices: [...prev.usedWordIndices.slice(-8), index] }));
+        setPendingMove(pos);
+        setAnimStep('idle');
+        setPhase('snake_challenge');
+        return;
+      }
+
+      // Normal square: open word challenge
       const { word, index } = getRandomWord(gameState.usedWordIndices);
       setCurrentWord(word);
-      setGameState(prev => ({ ...prev, positions: newPositions, usedWordIndices: [...prev.usedWordIndices.slice(-8), index] }));
-      setPendingMove(ladderTop);
-      setPhase("word_challenge");
-      return;
+      setGameState(prev => ({ ...prev, usedWordIndices: [...prev.usedWordIndices.slice(-8), index] }));
+      setPendingMove(pos);
+      setAnimStep('idle');
+      setPhase('word_challenge');
+
+    } else if (animStep === 'moving_to_final') {
+      setAnimStep('idle');
+      if (pendingDialogPhase) {
+        setPhase(pendingDialogPhase);
+        setPendingDialogPhase(null);
+      } else {
+        // Snake tail animation done — proceed to next player
+        nextPlayer();
+      }
     }
+  }, [animStep, gameState, pendingDialogPhase, nextPlayer]);
 
-    if (SNAKES[newPosition] !== undefined) {
-      const { word, index } = getRandomWord(gameState.usedWordIndices);
-      setCurrentWord(word);
-      setGameState(prev => ({ ...prev, positions: newPositions, usedWordIndices: [...prev.usedWordIndices.slice(-8), index] }));
-      setPendingMove(newPosition);
-      setPhase("snake_challenge");
-      return;
-    }
-
-    setGameState(prev => ({ ...prev, positions: newPositions }));
-    const { word, index } = getRandomWord(gameState.usedWordIndices);
-    setCurrentWord(word);
-    setGameState(prev => ({ ...prev, usedWordIndices: [...prev.usedWordIndices.slice(-8), index] }));
-    setPendingMove(newPosition);
-    setPhase("word_challenge");
-  }, [gameState]);
-
-  const nextPlayer = useCallback(() => {
-    const next = players === 1 ? 0 : (gameState.currentPlayer + 1) % players;
-    setGameState(prev => ({ ...prev, currentPlayer: next }));
-    setPhase("playing");
-    setCurrentWord(null);
-    setPendingMove(null);
-    setDiceKey(k => k + 1);
-  }, [players, gameState.currentPlayer]);
 
   const handleWordResult = useCallback((accepted: boolean) => {
     const { currentPlayer } = gameState;
@@ -235,14 +268,22 @@ export function KaceLestveGame({
 
   const handleSnakeChallengeResult = useCallback((accepted: boolean) => {
     const { currentPlayer } = gameState;
-    const newPositions = [...gameState.positions];
 
     if (!accepted && pendingMove !== null) {
+      // Animate to snake tail, then nextPlayer via handleAvatarLanded
+      const newPositions = [...gameState.positions];
       newPositions[currentPlayer] = SNAKES[pendingMove]!;
       setGameState(prev => ({ ...prev, positions: newPositions }));
+      setAnimStep('moving_to_final');
+      setPendingDialogPhase(null); // signal: after final anim → nextPlayer
+      setPhase('rolling'); // close dialog while animating
+      // After animation we need nextPlayer — use a flag via pendingDialogPhase=null
+      // handled in handleAvatarLanded branch moving_to_final → nextPlayer
+      return;
     }
     nextPlayer();
   }, [gameState, pendingMove, nextPlayer]);
+
 
   const handleClaimStar = useCallback(async () => {
     recordExerciseCompletion("kace-lestve-c", 1, logopedistChildId);
@@ -302,7 +343,11 @@ export function KaceLestveGame({
             minHeight: 0,
           }}
         >
-          <KaceLestveBoard players={playerData} />
+          <KaceLestveBoard
+            players={playerData}
+            activePlayerIdx={gameState.currentPlayer}
+            onAvatarLanded={handleAvatarLanded}
+          />
         </div>
 
         {/* Bottom bar: player indicator left, dice right */}

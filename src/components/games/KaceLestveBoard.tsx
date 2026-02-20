@@ -22,6 +22,8 @@ interface PlayerData {
 
 interface KaceLestveBoard2DProps {
   players: PlayerData[];
+  activePlayerIdx?: number;
+  onAvatarLanded?: (playerIdx: number) => void;
 }
 
 // Get pixel center of a cell based on board dimensions
@@ -198,7 +200,7 @@ function CurvedArrow({
   );
 }
 
-export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
+export function KaceLestveBoard({ players, activePlayerIdx = 0, onAvatarLanded }: KaceLestveBoard2DProps) {
   const boardRef = useRef<HTMLDivElement>(null);
   const [boardRect, setBoardRect] = useState<DOMRect | null>(null);
 
@@ -399,6 +401,9 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
               style={{ zIndex: 30, width: size, height: size }}
               animate={{ left: x, top: y }}
               transition={{ type: 'spring', stiffness: 200, damping: 22, duration: 0.5 }}
+              onAnimationComplete={() => {
+                if (idx === activePlayerIdx) onAvatarLanded?.(idx);
+              }}
             >
               <img
                 src={`${SUPABASE_URL}/zmajcki/${idx === 0 ? 'Zmajcek_modra_figura_1.webp' : 'Zmajcek_rdeca_figura_1.webp'}`}
