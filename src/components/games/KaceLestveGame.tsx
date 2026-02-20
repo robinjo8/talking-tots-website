@@ -24,6 +24,7 @@ import {
   BOARD_SIZE,
   SQUARES_NEAR_END,
   MAX_FAILED_NEAR_END,
+  START_POSITION,
   getRandomWord,
 } from "@/data/kaceLestveConfig";
 import { useTrophyContext } from "@/contexts/TrophyContext";
@@ -76,7 +77,7 @@ export function KaceLestveGame({
   const [playerAvatars, setPlayerAvatars] = useState<string[]>(DEFAULT_AVATARS);
   const [showSettingsInGame, setShowSettingsInGame] = useState(false);
   const [gameState, setGameState] = useState<GameState>({
-    positions: [0, 0],
+    positions: [START_POSITION, START_POSITION],
     currentPlayer: 0,
     failedNearEndCount: [0, 0],
     gameOver: false,
@@ -92,6 +93,9 @@ export function KaceLestveGame({
   const [diceKey, setDiceKey] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
 
+  // Hop animation: array of positions to step through
+  const [hoppingPositions, setHoppingPositions] = useState<number[] | null>(null);
+
   // Two-phase animation state
   const [animStep, setAnimStep] = useState<AnimStep>('idle');
   // pendingDialogPhase holds what to open after final animation completes
@@ -99,7 +103,7 @@ export function KaceLestveGame({
 
   const resetGame = useCallback(() => {
     setGameState({
-      positions: [0, 0],
+      positions: [START_POSITION, START_POSITION],
       currentPlayer: 0,
       failedNearEndCount: [0, 0],
       gameOver: false,
@@ -109,6 +113,9 @@ export function KaceLestveGame({
     setPhase("settings");
     setCurrentWord(null);
     setPendingMove(null);
+    setHoppingPositions(null);
+    setAnimStep('idle');
+    setPendingDialogPhase(null);
     setDiceKey(k => k + 1);
   }, []);
 
@@ -121,7 +128,7 @@ export function KaceLestveGame({
     setDifficulty(diff);
     setPlayerAvatars(avatars);
     setGameState({
-      positions: [0, 0],
+      positions: [START_POSITION, START_POSITION],
       currentPlayer: 0,
       failedNearEndCount: [0, 0],
       gameOver: false,
@@ -129,6 +136,9 @@ export function KaceLestveGame({
       usedWordIndices: [],
     });
     setPhase("playing");
+    setHoppingPositions(null);
+    setAnimStep('idle');
+    setPendingDialogPhase(null);
     setDiceKey(k => k + 1);
   }, []);
 
@@ -143,6 +153,9 @@ export function KaceLestveGame({
     setPhase("playing");
     setCurrentWord(null);
     setPendingMove(null);
+    setHoppingPositions(null);
+    setAnimStep('idle');
+    setPendingDialogPhase(null);
     setDiceKey(k => k + 1);
   }, [players, gameState.currentPlayer]);
 
@@ -175,8 +188,15 @@ export function KaceLestveGame({
       }
     }
 
-    // Phase 1: Move avatar to the dice-result position and wait for landing
+    // Build hop path: [currentPos+1, currentPos+2, ..., newPos]
     const newPos = Math.min(currentPos + result, BOARD_SIZE);
+    const hops: number[] = [];
+    for (let p = currentPos + 1; p <= newPos; p++) {
+      hops.push(p);
+    }
+    setHoppingPositions(hops);
+    // The board will drive the animation and call onAvatarLanded when done
+    // We track the final position in gameState immediately so logic is correct
     const newPositions = [...gameState.positions];
     newPositions[gameState.currentPlayer] = newPos;
     setGameState(prev => ({ ...prev, positions: newPositions }));
@@ -186,13 +206,14 @@ export function KaceLestveGame({
   // Called by KaceLestveBoard when active player's avatar finishes animating
   const handleAvatarLanded = useCallback((_playerIdx: number) => {
     if (animStep === 'moving_to_dice') {
+      setHoppingPositions(null); // clear hop path
       const { currentPlayer, positions } = gameState;
       const pos = positions[currentPlayer];
 
       if (pos >= BOARD_SIZE) {
         setAnimStep('idle');
         setGameState(prev => ({ ...prev, gameOver: true, winner: currentPlayer }));
-        setPhase('success');
+        setTimeout(() => setPhase('success'), 1500);
         return;
       }
 
@@ -222,23 +243,26 @@ export function KaceLestveGame({
         setGameState(prev => ({ ...prev, usedWordIndices: [...prev.usedWordIndices.slice(-8), index] }));
         setPendingMove(pos);
         setAnimStep('idle');
-        setPhase('snake_challenge');
+        // 1.5s delay before snake challenge dialog
+        setTimeout(() => setPhase('snake_challenge'), 1500);
         return;
       }
 
-      // Normal square: open word challenge
+      // Normal square: open word challenge after 1.5s
       const { word, index } = getRandomWord(gameState.usedWordIndices);
       setCurrentWord(word);
       setGameState(prev => ({ ...prev, usedWordIndices: [...prev.usedWordIndices.slice(-8), index] }));
       setPendingMove(pos);
       setAnimStep('idle');
-      setPhase('word_challenge');
+      setTimeout(() => setPhase('word_challenge'), 1500);
 
     } else if (animStep === 'moving_to_final') {
       setAnimStep('idle');
       if (pendingDialogPhase) {
-        setPhase(pendingDialogPhase);
+        const dp = pendingDialogPhase;
         setPendingDialogPhase(null);
+        // 1.5s delay before dialog after ladder/snake jump
+        setTimeout(() => setPhase(dp), 1500);
       } else {
         // Snake tail animation done — proceed to next player
         nextPlayer();
@@ -347,6 +371,7 @@ export function KaceLestveGame({
             players={playerData}
             activePlayerIdx={gameState.currentPlayer}
             onAvatarLanded={handleAvatarLanded}
+            hoppingPositions={hoppingPositions}
           />
         </div>
 

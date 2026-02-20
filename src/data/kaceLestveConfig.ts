@@ -14,6 +14,8 @@ export const ROWS = 7;
 export const BOARD_SIZE = 42;
 export const SQUARES_NEAR_END = 6;
 export const MAX_FAILED_NEAR_END = 5;
+// Physical position of START (before first green square)
+export const START_POSITION = 2;
 
 // Bonus moves for correct pronunciation by difficulty
 export const DIFFICULTY_BONUS: Record<KaceDifficulty, number> = {
