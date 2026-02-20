@@ -66,12 +66,12 @@ interface ArrowOffsets {
 
 const ARROW_OFFSETS: Record<string, ArrowOffsets> = {
   // Ladders (blue, up)
-  "3-11":  { endX: 0.32 },    // end right of 11
-  "15-30": { startX: 0.32 },  // start right of 15
+  "3-11":  { endX: 0.32, endY: -0.33 },      // end right-center of 11
+  "15-29": { startX: 0.32 },                  // start right of 15
   // Snakes (red, down)
-  "24-14": { endX: -0.32 },   // end left of 14
-  "40-34": { endX: -0.32 },   // end left of 34
-  "34-28": { endX: -0.32 },   // end left of 28
+  "24-14": { endX: -0.32, endY: 0.33 },       // end left-center of 14
+  "34-28": { startX: 0.32, startY: -0.33 },   // start right-center of 34
+  "40-34": { startX: -0.32, startY: -0.33 },  // start left-center of 40
 };
 
 // Curved arrow in pixel space
@@ -264,7 +264,7 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
               color="#1E88E5"
               stripeColor="#82B1FF"
               outline="#0D47A1"
-              curveSide={(i % 2 === 0 ? 1 : -1) as 1 | -1}
+              curveSide={(from === 15 ? 1 : i % 2 === 0 ? 1 : -1) as 1 | -1}
               boardW={boardW}
               boardH={boardH}
               isLadder={true}
@@ -352,17 +352,17 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
                 <div className="absolute inset-0" style={{ backgroundColor: '#FFD93D' }} />
               )}
 
-              {/* END — Cilj.webp image centered */}
+              {/* END — Cilj.webp image top-right */}
               {isEndLabel && (
                 <div
-                  className="absolute inset-0 flex items-center justify-center"
+                  className="absolute inset-0 flex items-start justify-end"
                   style={{ zIndex: 10, backgroundColor: '#FF6B35' }}
                 >
                   <img
                     src={`${SUPABASE_URL}/slike-ostalo/Cilj.webp`}
                     alt="Cilj"
-                    className="w-full h-full object-contain"
-                    style={{ padding: '4px' }}
+                    className="w-3/4 h-3/4 object-contain"
+                    style={{ padding: '2px' }}
                   />
                 </div>
               )}

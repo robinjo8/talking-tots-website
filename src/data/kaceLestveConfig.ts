@@ -26,7 +26,7 @@ export const DIFFICULTY_BONUS: Record<KaceDifficulty, number> = {
 export const LADDERS: Record<number, number> = {
   3: 11,
   6: 18,
-  15: 30,
+  15: 29,
   26: 38,
 };
 
