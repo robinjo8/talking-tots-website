@@ -1,64 +1,48 @@
 
-## Popravki besed in upočasnitev animacije
+## Spremembe: "ZABAVNA POT", kartice za vse glasove, breadcrumb
 
-### 1. Popravki v `src/data/kaceLestveConfig.ts`
+### Kaj bo narejeno
 
-Primerjava tvojih zahtevanih besed z trenutnim stanjem:
+**1. `src/components/games/GamesList.tsx`** — preimenovanje kartice
+- `title`: `"KAČE IN LESTVE"` → `"ZABAVNA POT"`
+- `description`: posodobiti ustrezno
 
-| Zahtevano | Trenutno `text` | Napaka? |
-|---|---|---|
-| Borovnice | BOROVNICE | ✓ |
-| Kocka | KOCKA | ✓ |
-| Kozarec | KOZAREC | ✓ |
-| Lonec | LONEC | ✓ |
-| Lubenica | LUBENICA | ✓ |
-| Nogavice | NOGAVICE | ✓ |
-| Pica | PICA | ✓ |
-| Raca | RACA | ✓ |
-| Ropotuljica | ROPOTULJICA | ✓ |
-| Sonce | SONCE | ✓ |
-| Vetrnica | VETRNICA | ✓ |
-| **Vilica** | **VILICE** | ✗ → popraviti na VILICA |
-| Zajec | ZAJEC | ✓ |
-| Zobotrebec | ZOBOTREBEC | ✓ |
-| **Žarnica** | **ZARNICA** | ✗ → popraviti na ŽARNICA |
-| **Žlica** | **ZLICA** | ✗ → popraviti na ŽLICA |
+**2. `src/pages/KaceLestveGames.tsx`** — nova stran z vsemi 9 karticami zmajčkov
+Trenutno ima ta stran samo eno kartico (glas C). Dodat je treba še preostalih 8 kartic, ki bodo videti **popolnoma enako** kot na `/govorne-igre/labirint` (Labirint.tsx):
+- Enaka struktura kartic: zmajček slika z `mixBlendMode: multiply`, gradient ozadje, naslov `Glas X`
+- Enak vrstni red: **S, Z, C, Š, Ž, Č, K, L, R** (kot v memory specifikaciji)
+- Enake slike zmajčkov iz bucketa `zmajcki`: `zmajcek_crka_S.png`, `zmajcek_crka_Z.png`, `zmajcek_crka_C.png`, `zmajcek_crka_SH.png`, `zmajcek_crka_ZH.png`, `zmajcek_crka_CH.png`, `zmajcek_crka_K.png`, `zmajcek_crka_L.png`, `zmajcek_crka_R.png`
+- Enaka gradientna ozadja kot pri Labirint straneh
+- Poti: `/govorne-igre/kace/s`, `/govorne-igre/kace/z`, `/govorne-igre/kace/c`, itd.
+- Naslov strani: `"Zabavna pot"`, podnaslov: `"Izberi glas in igraj!"`
 
-Spremembe v config datoteki:
+**3. `src/components/BreadcrumbNavigation.tsx`** — breadcrumb popravki
+- Dodati vnos za `/govorne-igre/kace` z oznako `"Zabavna pot"` in parent `"/govorne-igre"`
+- Dodati vnose za posamezne glasove (npr. `/govorne-igre/kace/c` → `"C"`, parent `/govorne-igre/kace`)
 
-**VILICE → VILICA** (vrstica 115):
-- `text`: `"VILICE"` → `"VILICA"`
+**4. `src/pages/KaceLestveGames.tsx`** — popravek naslova strani
+- h1: `"Kače in lestve"` → `"Zabavna pot"`
 
-**ZARNICA → ŽARNICA** (vrstice 133-136):
-- `text`: `"ZARNICA"` → `"ŽARNICA"`
-- `image`: `"zarnica1.webp"` → `"žarnica1.webp"` (ali ostane z/brez strešice, odvisno od datoteke v Supabase — ker pa sta slika in avdio poimenovana brez strešice, ju pustimo kot sta: `zarnica1.webp` in `zarnica.m4a`)
+### Glasovi v KaceLestveGames.tsx
 
-Opomba za ŽARNICA: ker so datoteke v Supabase shranjene kot `zarnica1.webp` in `zarnica.m4a` (brez strešice), slika in zvok ostaneta enaka — samo prikazano besedilo `text` se popravi na `"ŽARNICA"`.
+| Glas | URL ključ | Slika zmajčka | Gradient |
+|---|---|---|---|
+| S | s | zmajcek_crka_S.png | dragon-green/20 → app-teal/20 |
+| Z | z | zmajcek_crka_Z.png | app-teal/20 → dragon-green/20 |
+| C | c | zmajcek_crka_C.png | dragon-green/20 → dragon-green/20 |
+| Š | sh | zmajcek_crka_SH.png | app-blue/20 → app-purple/20 |
+| Ž | zh | zmajcek_crka_ZH.png | app-purple/20 → app-blue/20 |
+| Č | ch | zmajcek_crka_CH.png | app-blue/20 → app-teal/20 |
+| K | k | zmajcek_crka_K.png | app-orange/20 → app-yellow/20 |
+| L | l | zmajcek_crka_L.png | app-purple/20 → app-blue/20 |
+| R | r | zmajcek_crka_R.png | app-purple/20 → app-teal/20 |
 
-**ZLICA → ŽLICA** (vrstice 139-142):
-- `text`: `"ZLICA"` → `"ŽLICA"`
+Opomba: Kartice za glasove S, Z, Š, Ž, Č, K, L, R bodo vidne na strani, ampak ker igra za te glasove še ne obstaja, bo klik za zdaj preusmerjen na `/govorne-igre/kace` (placeholders). Glas C je edini, ki ima pravo igro.
 
-Opomba za ŽLICA: enako kot pri ŽARNICA — datoteke ostanejo `zlica1.webp` in `zlica.m4a`, samo `text` se popravi.
-
----
-
-### 2. Upočasnitev animacije v `src/components/games/KaceLestveBoard.tsx`
-
-Trenutno:
-- `HOP_INTERVAL_MS = 500` ms
-- hop `duration = 0.42s`
-
-Novo — še bolj počasno, prijetno skakanje:
-- `HOP_INTERVAL_MS`: `500` → `700` ms med vsakim korakom
-- hop `duration`: `0.42s` → `0.60s`
-
-To pomeni, da bo zmajček pri 6 korakih porabil ~4.2s skupaj — vsak korak bo jasno in lepo viden.
-
----
-
-### Datoteki za spremembo
+### Datoteke za spremembo
 
 | Datoteka | Sprememba |
 |---|---|
-| `src/data/kaceLestveConfig.ts` | `text`: VILICE→VILICA, ZARNICA→ŽARNICA, ZLICA→ŽLICA |
-| `src/components/games/KaceLestveBoard.tsx` | `HOP_INTERVAL_MS: 500→700`, hop `duration: 0.42→0.60` |
+| `src/components/games/GamesList.tsx` | KAČE IN LESTVE → ZABAVNA POT |
+| `src/pages/KaceLestveGames.tsx` | Dodati 8 novih kartic, naslov ZABAVNA POT, posodobiti navigacijo |
+| `src/components/BreadcrumbNavigation.tsx` | Dodati breadcrumb vnose za /govorne-igre/kace in podstrani |
