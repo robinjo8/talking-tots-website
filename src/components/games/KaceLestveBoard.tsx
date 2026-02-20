@@ -67,7 +67,7 @@ interface ArrowOffsets {
 const ARROW_OFFSETS: Record<string, ArrowOffsets> = {
   // Ladders (blue, up)
   "3-11":  { endX: 0.32, endY: -0.33 },       // end right-center of 11
-  "15-27": { endX: 0, endY: 0.33 },           // end bottom-center of 27
+  "15-27": {},                                 // end bottom-center of 27 (default ladder end)
   // Snakes (red, down)
   "24-14": { endX: -0.32, endY: 0.33 },       // end left-center of 14
   "40-34": { startX: -0.32, startY: -0.33 },  // start left-center of 40
@@ -389,7 +389,7 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
           const offsetX = idx === 0 ? -cellW * 0.15 : cellW * 0.15;
           const x = targetCol * cellW + cellW / 2 + offsetX - cellW * 0.2;
           const y = targetRow * cellH + cellH / 2 - cellH * 0.2;
-          const size = Math.min(cellW, cellH) * 0.55;
+          const size = Math.min(cellW, cellH) * 0.63;
 
           return (
             <motion.div
@@ -400,7 +400,7 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
               transition={{ type: 'spring', stiffness: 200, damping: 22, duration: 0.5 }}
             >
               <img
-                src={`${SUPABASE_URL}/zmajcki/${idx === 0 ? 'Zmajcek_modra_figura.png' : 'Zmajcek_rdeca_figura.png'}`}
+                src={`${SUPABASE_URL}/zmajcki/${idx === 0 ? 'Zmajcek_modra_figura_1.webp' : 'Zmajcek_rdeca_figura_1.webp'}`}
                 alt={player.name}
                 className="w-full h-full object-contain"
                 style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }}
