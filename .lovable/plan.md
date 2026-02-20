@@ -1,75 +1,114 @@
 
-## Spremembe puščic, START polja in KONEC slike
+## Popravki postavitve puščic in slike Cilj
 
-### 1. `src/data/kaceLestveConfig.ts` — nova postavitev puščic
-
-**LADDERS** (modre):
-- `3: 12` → `3: 11`
-- `26: 37` → `26: 38`
-- `6: 18` in `15: 30` ostaneta
-
-**SNAKES** (rdeče):
-- `40: 31` → `40: 34`
-- `24: 10` → `24: 14`
-- `21: 5` ostane
-- Nova puščica: `34: 28` (rdeča kača)
+### Spremembe v 2 datotekah
 
 ---
 
-### 2. `src/components/games/KaceLestveBoard.tsx` — 4 popravki
+### 1. `src/data/kaceLestveConfig.ts`
 
-#### A) Posodobi `ARROW_OFFSETS` ključe
+Spremenimo lestev `15: 30` → `15: 29`:
 
-Ker se cilji puščic spremenijo, moramo posodobiti ključe v `ARROW_OFFSETS`:
+```typescript
+export const LADDERS: Record<number, number> = {
+  3: 11,
+  6: 18,
+  15: 29,   // <-- was 30
+  26: 38,
+};
+```
+
+---
+
+### 2. `src/components/games/KaceLestveBoard.tsx`
+
+#### A) Slika Cilj.webp — desni zgornji kot
+
+Trenutno je slika centrirana v polju (flex items-center justify-center). Spremenimo na desni zgornji kot:
+
+```tsx
+{isEndLabel && (
+  <div
+    className="absolute inset-0 flex items-start justify-end"
+    style={{ zIndex: 10, backgroundColor: '#FF6B35' }}
+  >
+    <img
+      src={`${SUPABASE_URL}/slike-ostalo/Cilj.webp`}
+      alt="Cilj"
+      className="w-3/4 h-3/4 object-contain"
+      style={{ padding: '2px' }}
+    />
+  </div>
+)}
+```
+
+#### B) Posodobitev `ARROW_OFFSETS` — vsi ključi in vrednosti
+
+Obstoječi sistem: `startY/endY` so frakcije `cellH`, ki se prištejejo **poleg** avtomatskega `edgeOffset = cellH * 0.33`. Da postavimo točko točno na vertikalno sredino celice (brez Y odmika), moramo `endY`/`startY` nastaviti na `±0.33` da se `edgeOffset` razveljavil.
+
+**Nova tabela odmikov po puščici:**
+
+| Puščica | Tip | Sprememba |
+|---------|-----|-----------|
+| `3-11` | modra | konec: desno od 11, na vertikalni sredini → `endX: +0.32, endY: -0.33` (razveljavimo edgeOffset ki bi šel pod center) |
+| `15-29` | modra | začetek: desno od 15 (kot prej) → `startX: +0.32` |
+| `24-14` | rdeča | konec: levo od 14, na vertikalni sredini → `endX: -0.32, endY: +0.33` (razveljavimo edgeOffset ki bi šel nad center) |
+| `34-28` | rdeča | začetek: desno od 34, na vertikalni sredini → `startX: +0.32, startY: -0.33`; konec: nad 28 (privzeto za kačo = dobro) |
+| `40-34` | rdeča | začetek: levo od 40, na vertikalni sredini → `startX: -0.32, startY: -0.33`; konec: nad 34 (privzeto za kačo = dobro) |
 
 ```typescript
 const ARROW_OFFSETS: Record<string, ArrowOffsets> = {
   // Ladders (blue, up)
-  "3-11":  { endX: 0.32 },    // end right of 11 (was 3-12)
-  "15-30": { startX: 0.32 },  // start right of 15 (nespremenjen)
+  "3-11":  { endX: 0.32, endY: -0.33 },   // end right-center of 11
+  "15-29": { startX: 0.32 },               // start right of 15 (no Y change)
   // Snakes (red, down)
-  "24-14": { endX: -0.32 },   // end left of 14 (was 24-10)
-  "40-34": { endX: -0.32 },   // end left of 34 (was 40-31)
-  "34-28": { endX: -0.32 },   // end left of 28 (nova)
+  "24-14": { endX: -0.32, endY: 0.33 },   // end left-center of 14
+  "34-28": { startX: 0.32, startY: -0.33 }, // start right-center of 34
+  "40-34": { startX: -0.32, startY: -0.33 }, // start left-center of 40
 };
 ```
 
-#### B) START polje — odstrani raketo in modro "1"
+#### C) curveSide za puščico 15→29
 
-V `isStartLabel` bloku:
-- Odstrani `🚀` emoji iz teksta
-- Številka 1 se prikaže samo za navadna polja (`!cell.isStart && !cell.isEnd`), torej je START polje že pokrito — razlog zakaj se vidi "1" je ker `isStartLabel` je samo za `pos === 1` ampak `isStartBlank` je za `pos === 2`. Številka se prikaže ker `!cell.isStart` je false za obe — torej se ne prikaže. 
-
-Preverim: blok za "Regular cell number" ima pogoj `{!cell.isStart && !cell.isEnd && ...}` — torej se `1` NE prikaže za START polje. 
-
-Toda v `isStartLabel` bloku je tekst `🚀 ZAČETEK` — samo to je vidno. Torej: **raketa 🚀 je v tekstu samem**. Enostavno odstranimo emoji:
+Puščica 15→30 je bila zadnja lestev (index 3 v LADDERS objektu, `i % 2 === 1 → curveSide = -1`). Po zamenjavi na 15→29 ostane na istem mestu v objektu, torej bo curveSide enak. Ker pa jo želi uporabnik v drugo smer, ji eksplicitno priredimo `curveSide = 1` v render logiki:
 
 ```tsx
-// Prej:
-🚀 ZAČETEK
-// Potem:
-ZAČETEK
+{ladderEntries.map(({ from, to }, i) => (
+  <CurvedArrow
+    key={`ladder-${from}`}
+    from={from}
+    to={to}
+    ...
+    curveSide={(from === 15 ? 1 : i % 2 === 0 ? 1 : -1) as 1 | -1}
+    ...
+  />
+))}
 ```
 
-#### C) KONEC slika — popravi bucket URL
+#### D) curveSide za kačo 40→34
 
-Trenutno: `${SUPABASE_URL}/slike/Cilj.webp`  
-Pravilno: `${SUPABASE_URL}/slike-ostalo/Cilj.webp`
+Ker puščica 40→34 zdaj začne levo od polja 40 (namesto desno), jo je smiselno zakriviti levo (stran od polja KONEC). Ohranimo `from === 40 ? 1 : ...` logiko.
 
-```tsx
-<img
-  src={`${SUPABASE_URL}/slike-ostalo/Cilj.webp`}
-  alt="Cilj"
-  className="w-full h-full object-contain"
-  style={{ padding: '4px' }}
-/>
+---
+
+### Tehnično ozadje sistema odmikov
+
+```text
+Dejanska pozicija točke:
+  x = center_celice_x + (offsetX ?? 0) * cellW
+  y = center_celice_y + (offsetY ?? 0) * cellH + edgeOffset_y
+
+kjer je edgeOffset_y:
+  - za start lestve: -cellH * 0.33  (nad centrom)
+  - za konec lestve: +cellH * 0.33  (pod centrom)
+  - za start kače:   +cellH * 0.33  (pod centrom)
+  - za konec kače:   -cellH * 0.33  (nad centrom)
+
+Da dobimo točko na VERTIKALNI SREDINI celice:
+  - za konec lestve: endY = -0.33  (razveljavimo +edgeOffset)
+  - za start kače:   startY = -0.33  (razveljavimo +edgeOffset)
+  - za konec kače:   endY = +0.33  (razveljavimo -edgeOffset)
 ```
-
-#### D) Dodaj novo rdečo puščico 34→28 v SVG render
-
-Nova kača `34: 28` bo samodejno prikazana ker se renderira iz `SNAKES` objekta prek `snakeEntries`. Ni potrebno posebej dodajati — samo posodobiti `SNAKES` v config datoteki zadošča.
-
-`curveSide` logika za kače: `from === 40 ? 1 : i % 2 === 0 ? -1 : 1` — nova puščica bo dobila `curveSide` glede na njen index v polju. Ker bo `34: 28` 4. kača (index 3), bo `i % 2 === 1 → curveSide = 1`.
 
 ---
 
@@ -77,5 +116,5 @@ Nova kača `34: 28` bo samodejno prikazana ker se renderira iz `SNAKES` objekta 
 
 | Datoteka | Sprememba |
 |----------|-----------|
-| `src/data/kaceLestveConfig.ts` | LADDERS: `3→11`, `26→38`. SNAKES: `40→34`, `24→14`, nova `34→28` |
-| `src/components/games/KaceLestveBoard.tsx` | (1) ARROW_OFFSETS ključi posodobljeni, (2) Odstrani 🚀 iz ZAČETEK, (3) URL slike Cilj: `/slike-ostalo/` |
+| `src/data/kaceLestveConfig.ts` | `LADDERS`: `15: 30` → `15: 29` |
+| `src/components/games/KaceLestveBoard.tsx` | (1) Slika Cilj: desni zgornji kot, (2) ARROW_OFFSETS: posodobljeni ključi z Y korekcijami, (3) curveSide: 15→29 premaknemo v nasprotno smer |
