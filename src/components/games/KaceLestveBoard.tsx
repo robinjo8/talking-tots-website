@@ -66,12 +66,12 @@ interface ArrowOffsets {
 
 const ARROW_OFFSETS: Record<string, ArrowOffsets> = {
   // Ladders (blue, up)
-  "3-11":  { endX: 0.32, endY: -0.33 },      // end right-center of 11
-  "15-29": { startX: 0.32 },                  // start right of 15
+  "3-11":  { endX: 0.32, endY: -0.33 },       // end right-center of 11
+  "15-29": { endX: -0.32, endY: -0.33 },      // start top-center 15, end left-center 29
   // Snakes (red, down)
   "24-14": { endX: -0.32, endY: 0.33 },       // end left-center of 14
+  "33-27": { endX: 0.32, endY: 0.33 },        // end right-center of 27
   "40-34": { startX: -0.32, startY: -0.33 },  // start left-center of 40
-  // "33-27" uses default offsets (bottom-center start, top-center end)
 };
 
 // Curved arrow in pixel space
@@ -334,34 +334,27 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
                 </span>
               )}
 
-              {/* START — centered label spanning both cells */}
+              {/* START — yellow background, no label */}
               {isStartLabel && (
                 <div
-                  className="absolute inset-0 flex items-center justify-center"
+                  className="absolute inset-0"
                   style={{ zIndex: 10, backgroundColor: '#FFD93D' }}
-                >
-                  <span
-                    className="font-black text-yellow-900 text-center leading-tight"
-                    style={{ fontSize: 'clamp(8px, 1.8vw, 15px)' }}
-                  >
-                    ZAČETEK
-                  </span>
-                </div>
+                />
               )}
               {isStartBlank && (
                 <div className="absolute inset-0" style={{ backgroundColor: '#FFD93D' }} />
               )}
 
-              {/* END — Cilj.webp image top-right */}
+              {/* END — Cilj.webp image right-center */}
               {isEndLabel && (
                 <div
-                  className="absolute inset-0 flex items-start justify-end"
+                  className="absolute inset-0 flex items-center justify-end"
                   style={{ zIndex: 10, backgroundColor: '#FF6B35' }}
                 >
                   <img
                     src={`${SUPABASE_URL}/slike-ostalo/Cilj.webp`}
                     alt="Cilj"
-                    className="w-3/4 h-3/4 object-contain"
+                    className="w-full h-full object-contain"
                     style={{ padding: '2px' }}
                   />
                 </div>
@@ -409,15 +402,6 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
                 className="w-full h-full object-contain"
                 style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }}
               />
-              <div
-                className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white flex items-center justify-center text-white font-black shadow-md"
-                style={{
-                  fontSize: 8,
-                  backgroundColor: idx === 0 ? '#3B82F6' : '#EF4444',
-                }}
-              >
-                {idx + 1}
-              </div>
             </motion.div>
           );
         })}
