@@ -1,100 +1,133 @@
 
-## Zamenjava kač in lestev s puščicami + barvni popravki
+## Popravek puščic: tanjše, ne prekrivajo številk, zavijejo mimo
 
-### Kaj se bo spremenilo
+### Problem
+SVG overlay je na `zIndex: 5`, board grid pa na `zIndex: 2` — puščice so NAD mrežo in prekrivajo številke. Poleg tega se puščice začnejo/končajo točno na sredini celice (kjer je številka).
 
-#### 1. `src/components/games/KaceLestveBoard.tsx` — puščice namesto kač in lestev
-
-**Lestve → modre puščice navzgor**
-
-Namesto `LadderSVG` komponente naredimo `UpArrowSVG`:
-- Barva: modra (`#1E88E5` telo, `#0D47A1` obroba)
-- Oblika: debela linija z rahlo S-krivuljo (perp faktor ~0.15 za subtilno zavinost)
-- Na koncu (vrhu) trikotna puščična konica — lepa, velika, jasna
-- Debelina: `strokeWidth` ~3.0 (vidna ampak ne prekriva številk)
-- Senca: rahla, opacity 0.10
-
-**Kače → rdeče puščice navzdol**
-
-Namesto `SnakeSVG` komponente naredimo `DownArrowSVG`:
-- Barva: rdeča (`#E53935` telo, `#7F0000` obroba)
-- Oblika: debela linija z rahlo S-krivuljo v nasprotno smer (za razlikovanje od modrih)
-- Na koncu (dnu) trikotna puščična konica navzdol
-- Enaka debelina kot modre puščice
-
-**Tehnika risanja puščice:**
-```
-- Začetek (from): center celice
-- Konec (to): center celice
-- Pot: cubic bezier z majhnim perpendicular offsetom (0.15) za zavinost
-- Konica: trikotnik na koncu, usmerjen v smeri potovanja
-- Debelina outlinea: 3.5, fill: 2.5
-```
-
-**Z-indexi ostanejo isti:**
-- SVG overlay: `z-index: 1`
-- Grid (z velikimi številkami): `z-index: 2`
-- Avatarji: `z-index: 30`
+### Rešitev v dveh delih
 
 ---
 
-#### 2. `src/data/kaceLestveConfig.ts` — 3 naključne odtenke zelene
+### Del 1: Premik start/end točke puščic stran od središča
 
-**Problem z zdajšnjim pristopom**: odtenki se ponavljajo v enakem vzorcu (0,1,2,3,0,1,2,3...) — videti so kot proge, ne naključno.
+**Modre puščice (lestve, navzgor):**
+- Začetek (nižje polje): točka se premakne **nad** center celice za `cellH * 0.3` (puščica se začne nad številko)
+- Konec (višje polje): točka se premakne **pod** center celice za `cellH * 0.3` (puščica se konča pod številko)
 
-**Rešitev**: Ustvarimo naključen (a deterministični) seznam barv za vsako polje ob inicializaciji. Uporabimo pseudo-naključni generator na podlagi pozicije:
+**Rdeče puščice (kače, navzdol):**
+- Začetek (višje polje): točka se premakne **pod** center celice za `cellH * 0.3`
+- Konec (nižje polje): točka se premakne **nad** center celice za `cellH * 0.3`
+
+Tako puščica vizualno "teče med" številkami, ne čez njih.
+
+```
+MODRA (navzgor):
+  [12] —— konec TUKAJ (pod številko 12)
+    ↑
+  [3]  —— začetek TUKAJ (nad številko 3)
+
+RDEČA (navzdol):
+  [40] —— začetek TUKAJ (pod številko 40)
+    ↓
+  [31] —— konec TUKAJ (nad številko 31)
+```
+
+---
+
+### Del 2: SVG pod gridom (zIndex) + grid z prozornim ozadjem
+
+**Ključna sprememba**: SVG gre na `zIndex: 1`, grid ostane na `zIndex: 2` — in celice postanejo **prozorne** (background-color ostane, ampak cell `<div>` nima background-color sam od sebe, samo colored children imajo).
+
+Pravzaprav — celice že imajo `backgroundColor: cell.color` na celotnem `<div>`. Ker je CSS `background-color` neprozoren, bo grid polje pokrilo puščice pod njim. To je **pravilno obnašanje** — puščice tečejo "za" celicami.
+
+**Ampak problem je bil**: puščice morajo biti vidne čez polja. Rešitev je:
+
+**SVG ostane nad gridom (zIndex: 5), toda celice dobijo `mix-blend-mode` ali pa puščice tečejo skozi "luknje"** — to je kompleksno.
+
+**Boljša rešitev**: Celice ostanejo na `zIndex: 2`. Puščice so na `zIndex: 3` (nad celicami). Številke dobijo `zIndex: 10` relativno znotraj celice (že imajo to). Ampak ker so celice `position: relative` in nimajo `isolation: isolate`, se `z-index: 10` na `<span>` ne more prebiti nad parent SVG.
+
+**Prava rešitev**: 
+- SVG puščice ostanejo nad gridom (`zIndex: 5`)
+- Puščice se ne začnejo/končajo na sredini celice (kjer je številka) → odmik `cellH * 0.35` od centra
+- Puščica ki gre čez polje KONECke (40→31): posebna pot ki se zaokroži ob robu table stran od polja KONEC
+
+---
+
+### Del 3: Posebna pot za rdečo puščico 40→31
+
+Polje 40 je polje tik ob KONEC (ki je 41+42). Puščica od 40 do 31 gre navzdol. Trenutno gre skozi področje KONEC polja.
+
+Rešitev: za to specifično puščico nastavimo `curveSide` tako da zavije **stran od KONEC polja** (v levo/desno stran), ali pa dodamo dodatno kontrolno točko ki jo usmeri mimo.
+
+Za puščico 40→31: polje 40 je v vrstici 5 (od dna: vrstica 1), desna stran. Polje 31 je v vrstici 4 (od dna: vrstica 2), desna stran. Torej gre navzdol na desni strani table. Puščica naj zavije v levo (stran od KONEC) — to se naredi z ustreznim `curveSide`.
+
+---
+
+### Del 4: Tanjše puščice — za polovico
+
+Trenutno: `strokeW = Math.min(boardW, boardH) * 0.022`
+
+Novo: `strokeW = Math.min(boardW, boardH) * 0.011` (polovica)
+
+Konika puščice (arrowSize): `Math.min(boardW, boardH) * 0.045` → `Math.min(boardW, boardH) * 0.03`
+
+---
+
+### Del 5: Zelena polja — samo 2 odtenka
+
+Spremenimo `getCellColor` v `kaceLestveConfig.ts` da vrne samo 2 odtenka:
 
 ```typescript
-// Namesto % 4 cikla, vsako polje dobi naključno barvo z seed-om
+export const GREEN_DARK = '#2D6A4F';   // Temnejša
+export const GREEN_LIGHT = '#52B788';  // Svetlejša
+
 export function getCellColor(position: number): string {
   if (position <= 2) return START_COLOR;
   if (position >= 41) return END_COLOR;
-  // Pseudo-naključno na podlagi pozicije — 3 odtenki
-  const hash = (position * 17 + 13) % 3;
-  if (hash === 0) return GREEN_DARK;
-  if (hash === 1) return GREEN_MID;
-  return GREEN_LIGHT;
+  const hash = ((position * 31 + 7) * 13 + position * 5) % 2;
+  return hash === 0 ? GREEN_DARK : GREEN_LIGHT;
 }
 ```
 
-S tem dobimo videz "naključnih" barv ki so vedno enake (deterministic), brez da moramo shranjevati state.
-
-**3 odtenki (kot zahtevano, ne 4):**
-- `GREEN_DARK = '#1B5E20'` — temno zelena
-- `GREEN_MID = '#2D6A4F'` — srednja zelena  
-- `GREEN_LIGHT = '#95D5B2'` — svetla zelena
-
-`GREEN_SEMI` odstranimo (ali ohranimo kot neuporabljeno konstanto).
-
-**Hash formula** `(position * 17 + 13) % 3` daje vizualno dobro distribucijo — ne proge, ampak res naključen videz. Vrednosti za pozicije 3-40 bodo vizualno "pomešane".
+Za 2 odtenka je potrebna `% 2` namesto `% 3`. Besedilo bo belo za oba odtenka.
 
 ---
 
-### Vizualizacija puščic
+### Tehnična implementacija `CurvedArrow`
 
-```text
-MODRA PUŠČICA (lestev/navzgor):
-  Polje 3 → Polje 12
-  
-  [12] ◄── konica puščice (trikotnik)
-    │ rahlo zavita pot (cubic bezier)
-  [3]  ── začetek puščice
+Nova signatura z `isLadder` parametrom (true = modra navzgor, false = rdeča navzdol):
 
-RDEČA PUŠČICA (kača/navzdol):
-  Polje 40 → Polje 31
+```typescript
+function CurvedArrow({ from, to, color, outline, curveSide, boardW, boardH, isLadder }) {
+  const cellH = boardH / ROWS;
   
-  [40] ── začetek puščice  
-    │ rahlo zavita pot (druga smer)
-  [31] ◄── konica puščice (trikotnik navzdol)
+  // Odmik start/end točke od centra celice
+  const edgeOffset = cellH * 0.32;
+  
+  let startRaw = getPositionCenterPx(from, boardW, boardH);
+  let endRaw = getPositionCenterPx(to, boardW, boardH);
+  
+  // Modra (lestev, navzgor): začne se nad centrom from, konča pod centrom to
+  // Rdeča (kača, navzdol): začne se pod centrom from, konča nad centrom to
+  const start = {
+    x: startRaw.x,
+    y: isLadder ? startRaw.y - edgeOffset : startRaw.y + edgeOffset
+  };
+  const end = {
+    x: endRaw.x,
+    y: isLadder ? endRaw.y + edgeOffset : endRaw.y - edgeOffset
+  };
+  
+  // ... Bezier krivulja ostane enaka
+}
 ```
 
 ---
 
-### Samo 2 datoteki za spremembo
+### Spremembe samo v 1 datoteki (+ opcijsko kaceLestveConfig.ts za barve)
 
 | Datoteka | Sprememba |
 |----------|-----------|
-| `src/components/games/KaceLestveBoard.tsx` | Zamenjamo `SnakeSVG` → `DownArrowSVG` (rdeča), `LadderSVG` → `UpArrowSVG` (modra) |
-| `src/data/kaceLestveConfig.ts` | `getCellColor` → pseudo-naključni hash za 3 odtenke zelene |
+| `src/components/games/KaceLestveBoard.tsx` | (1) Odmik start/end točk od centra, (2) Tanjše puščice (×0.5), (3) Manjša konica puščice, (4) `isLadder` prop za pravilno smer odmika |
+| `src/data/kaceLestveConfig.ts` | 2 odtenka zelene namesto 3 |
 
-Igra, logika, avatarji, meni — vse ostane nespremenjeno.
