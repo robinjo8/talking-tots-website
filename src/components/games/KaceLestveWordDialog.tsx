@@ -8,7 +8,7 @@ import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { cn } from "@/lib/utils";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public";
-const RECORDING_DURATION = 4;
+const RECORDING_DURATION = 3;
 
 interface KaceLestveWordDialogProps {
   isOpen: boolean;
@@ -139,23 +139,6 @@ export function KaceLestveWordDialog({
       );
     }
 
-    // Silence detected
-    if (isSilent && phase === "fail") {
-      return (
-        <div className="flex flex-col items-center gap-2 min-h-[100px] justify-center">
-          <div className="flex items-center justify-center h-[44px]">
-            <p className="text-red-600 font-medium text-sm">Zvok ni bil zaznan</p>
-          </div>
-          <button
-            onClick={handleRetry}
-            className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-full font-medium shadow-lg transition-all duration-300 hover:scale-105 w-[220px] h-14 text-lg flex items-center justify-center"
-          >
-            Poskusi znova
-          </button>
-        </div>
-      );
-    }
-
     // Error (mic permission)
     if (error) {
       return (
@@ -191,22 +174,26 @@ export function KaceLestveWordDialog({
       );
     }
 
-    // Fail — show what was heard + retry
+    // All fail states — silence, noise, or wrong word
     if (phase === "fail") {
+      let message = "";
+      if (isSilent) {
+        message = "Zvok ni bil zaznan";
+      } else if (!wrongWord) {
+        message = "Zaznan je bil šum, ne govor";
+      } else {
+        message = `Slišano: "${wrongWord}"`;
+      }
       return (
         <div className="flex flex-col items-center gap-2 min-h-[100px] justify-center">
           <div className="flex items-center justify-center h-[44px]">
-            {wrongWord ? (
-              <p className="text-red-600 font-medium text-sm">Slišano: "{wrongWord}"</p>
-            ) : (
-              <p className="text-red-600 font-medium text-sm">Napačna izgovorjava</p>
-            )}
+            <p className="text-red-600 font-medium text-sm">{message}</p>
           </div>
           <button
             onClick={handleRetry}
             className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-full font-medium shadow-lg transition-all duration-300 hover:scale-105 w-[220px] h-14 text-lg flex items-center justify-center"
           >
-            Poskusi znova
+            PONOVI
           </button>
         </div>
       );
@@ -245,9 +232,8 @@ export function KaceLestveWordDialog({
           {/* Header */}
           {isSnakeChallenge ? (
             <div className="text-center">
-              <p className="text-2xl mb-1">🐍</p>
               <h2 className="text-lg font-bold text-red-500">IZZIV NA KAČI!</h2>
-              <p className="text-sm text-muted-foreground">Pravilno izgovori in ostani na mestu!</p>
+              <p className="text-sm text-muted-foreground">Izgovori besedo</p>
             </div>
           ) : (
             <div className="text-center">

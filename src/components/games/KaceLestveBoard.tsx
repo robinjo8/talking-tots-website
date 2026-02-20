@@ -232,27 +232,45 @@ export function KaceLestveBoard({ players, activePlayerIdx = 0, onAvatarLanded, 
       return;
     }
 
-    hoppingPositions.forEach((pos, i) => {
+    // Immediately set first hop position (no timeout) to prevent "jump back" from newPos
+    setHopDisplayPositions(prev => {
+      const next = [...prev];
+      next[activePlayerIdx] = hoppingPositions[0];
+      return next;
+    });
+
+    if (hoppingPositions.length === 1) {
       const timer = setTimeout(() => {
         setHopDisplayPositions(prev => {
           const next = [...prev];
-          next[activePlayerIdx] = pos;
+          next[activePlayerIdx] = null;
           return next;
         });
-        // After the last hop, fire onAvatarLanded
-        if (i === hoppingPositions.length - 1) {
-          setTimeout(() => {
-            setHopDisplayPositions(prev => {
-              const next = [...prev];
-              next[activePlayerIdx] = null;
-              return next;
-            });
-            onAvatarLanded?.(activePlayerIdx);
-          }, HOP_INTERVAL_MS + 80);
-        }
-      }, i * HOP_INTERVAL_MS);
+        onAvatarLanded?.(activePlayerIdx);
+      }, HOP_INTERVAL_MS + 80);
       hopTimersRef.current.push(timer);
-    });
+    } else {
+      hoppingPositions.slice(1).forEach((pos, i) => {
+        const timer = setTimeout(() => {
+          setHopDisplayPositions(prev => {
+            const next = [...prev];
+            next[activePlayerIdx] = pos;
+            return next;
+          });
+          if (i === hoppingPositions.length - 2) {
+            setTimeout(() => {
+              setHopDisplayPositions(prev => {
+                const next = [...prev];
+                next[activePlayerIdx] = null;
+                return next;
+              });
+              onAvatarLanded?.(activePlayerIdx);
+            }, HOP_INTERVAL_MS + 80);
+          }
+        }, (i + 1) * HOP_INTERVAL_MS);
+        hopTimersRef.current.push(timer);
+      });
+    }
 
     return () => {
       hopTimersRef.current.forEach(t => clearTimeout(t));
