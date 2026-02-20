@@ -107,13 +107,13 @@ export const KACE_WORDS_C: KaceLestveWord[] = [
   },
   {
     text: "VETRNICA",
-    image: "vetrnica1.webp",
-    audio: "vetrnica.m4a",
+    image: "veternica1.webp",
+    audio: "veternica.m4a",
     acceptedVariants: ["VETRNICA", "VETRNICE", "VETRNICI", "VETRNICO", "VETRNICA!", "VETRCA", "VETRNICA?", "VETERNICA"],
   },
   {
     text: "VILICE",
-    image: "vilice1.webp",
+    image: "vilica1.webp",
     audio: "vilice.m4a",
     acceptedVariants: ["VILICE", "VILICA", "VILICI", "VILICO", "VILCE", "VILICE!", "BILICE", "VILIC"],
   },
