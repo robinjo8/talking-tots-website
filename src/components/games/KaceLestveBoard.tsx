@@ -1,4 +1,4 @@
-import { useMemo, useRef, useEffect, useState } from "react";
+import { useMemo, useRef, useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   COLS,
@@ -10,9 +10,11 @@ import {
   getGridCell,
   getCellColor,
   getCellTextColor,
+  START_POSITION,
 } from "@/data/kaceLestveConfig";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public";
+const HOP_INTERVAL_MS = 180; // ms per step
 
 interface PlayerData {
   position: number;
@@ -24,6 +26,7 @@ interface KaceLestveBoard2DProps {
   players: PlayerData[];
   activePlayerIdx?: number;
   onAvatarLanded?: (playerIdx: number) => void;
+  hoppingPositions?: number[] | null;
 }
 
 // Get pixel center of a cell based on board dimensions
@@ -200,9 +203,12 @@ function CurvedArrow({
   );
 }
 
-export function KaceLestveBoard({ players, activePlayerIdx = 0, onAvatarLanded }: KaceLestveBoard2DProps) {
+export function KaceLestveBoard({ players, activePlayerIdx = 0, onAvatarLanded, hoppingPositions }: KaceLestveBoard2DProps) {
   const boardRef = useRef<HTMLDivElement>(null);
   const [boardRect, setBoardRect] = useState<DOMRect | null>(null);
+  // Displayed position of each player during hop animation
+  const [hopDisplayPositions, setHopDisplayPositions] = useState<(number | null)[]>([null, null]);
+  const hopTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   useEffect(() => {
     const update = () => {
@@ -213,6 +219,45 @@ export function KaceLestveBoard({ players, activePlayerIdx = 0, onAvatarLanded }
     if (boardRef.current) ro.observe(boardRef.current);
     return () => ro.disconnect();
   }, []);
+
+  // Step-by-step hop animation for the active player
+  useEffect(() => {
+    // Clear any previous timers
+    hopTimersRef.current.forEach(t => clearTimeout(t));
+    hopTimersRef.current = [];
+
+    if (!hoppingPositions || hoppingPositions.length === 0) {
+      // No hopping — clear display overrides
+      setHopDisplayPositions([null, null]);
+      return;
+    }
+
+    hoppingPositions.forEach((pos, i) => {
+      const timer = setTimeout(() => {
+        setHopDisplayPositions(prev => {
+          const next = [...prev];
+          next[activePlayerIdx] = pos;
+          return next;
+        });
+        // After the last hop, fire onAvatarLanded
+        if (i === hoppingPositions.length - 1) {
+          setTimeout(() => {
+            setHopDisplayPositions(prev => {
+              const next = [...prev];
+              next[activePlayerIdx] = null;
+              return next;
+            });
+            onAvatarLanded?.(activePlayerIdx);
+          }, HOP_INTERVAL_MS + 80);
+        }
+      }, i * HOP_INTERVAL_MS);
+      hopTimersRef.current.push(timer);
+    });
+
+    return () => {
+      hopTimersRef.current.forEach(t => clearTimeout(t));
+    };
+  }, [hoppingPositions, activePlayerIdx, onAvatarLanded]);
 
   const boardW = boardRect ? boardRect.width : 0;
   const boardH = boardRect ? boardRect.height : 0;
@@ -376,15 +421,20 @@ export function KaceLestveBoard({ players, activePlayerIdx = 0, onAvatarLanded }
       {/* Dragon avatars — z-index: 30 */}
       <AnimatePresence>
         {boardRect && players.map((player, idx) => {
+          // Use hop display position if hopping (active player only), otherwise real position
+          const displayPos = (idx === activePlayerIdx && hopDisplayPositions[idx] !== null)
+            ? hopDisplayPositions[idx]!
+            : player.position;
+
           let targetRow: number, targetCol: number;
-          if (player.position <= 0) {
+          if (displayPos <= START_POSITION) {
             targetRow = ROWS - 1;
             targetCol = 0;
-          } else if (player.position >= BOARD_SIZE) {
+          } else if (displayPos >= BOARD_SIZE) {
             targetRow = 0;
             targetCol = COLS - 1;
           } else {
-            const cell = getGridCell(player.position);
+            const cell = getGridCell(displayPos);
             targetRow = cell.row;
             targetCol = cell.col;
           }
@@ -394,15 +444,25 @@ export function KaceLestveBoard({ players, activePlayerIdx = 0, onAvatarLanded }
           const x = targetCol * cellW + cellW / 2 + offsetX - size / 2;
           const y = targetRow * cellH + cellH / 2 - size / 2;
 
+          // Determine if this player is currently hopping (step animation) or doing a longer jump
+          const isHopping = idx === activePlayerIdx && hopDisplayPositions[idx] !== null;
+
           return (
             <motion.div
               key={`player-${idx}`}
               className="absolute pointer-events-none"
               style={{ zIndex: 30, width: size, height: size }}
               animate={{ left: x, top: y }}
-              transition={{ type: 'spring', stiffness: 200, damping: 22, duration: 0.5 }}
+              transition={
+                isHopping
+                  ? { type: 'spring', stiffness: 600, damping: 18, mass: 0.4 }
+                  : { type: 'spring', stiffness: 200, damping: 22, duration: 0.6 }
+              }
               onAnimationComplete={() => {
-                if (idx === activePlayerIdx) onAvatarLanded?.(idx);
+                // Only fire for non-hopping moves (ladder/snake jumps after hop ends)
+                if (idx === activePlayerIdx && !hoppingPositions?.length && hopDisplayPositions[idx] === null) {
+                  onAvatarLanded?.(idx);
+                }
               }}
             >
               <img
@@ -418,3 +478,4 @@ export function KaceLestveBoard({ players, activePlayerIdx = 0, onAvatarLanded }
     </div>
   );
 }
+
