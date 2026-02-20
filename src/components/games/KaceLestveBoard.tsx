@@ -14,7 +14,7 @@ import {
 } from "@/data/kaceLestveConfig";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public";
-const HOP_INTERVAL_MS = 150; // ms per step
+const HOP_INTERVAL_MS = 300; // ms per step (2x počasneje)
 
 interface PlayerData {
   position: number;
@@ -455,8 +455,8 @@ export function KaceLestveBoard({ players, activePlayerIdx = 0, onAvatarLanded, 
               animate={{ left: x, top: y }}
               transition={
                 isHopping
-                  ? { type: 'tween', duration: 0.13, ease: 'easeInOut' }
-                  : { type: 'tween', duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }
+                  ? { type: 'tween', duration: 0.26, ease: 'easeInOut' }
+                  : { type: 'tween', duration: 1.8, ease: [0.4, 0, 0.2, 1] }
               }
               onAnimationComplete={() => {
                 // Only fire for non-hopping moves (ladder/snake jumps after hop ends)

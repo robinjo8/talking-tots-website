@@ -99,6 +99,8 @@ export function KaceLestveGame({
   const [animStep, setAnimStep] = useState<AnimStep>('idle');
   // pendingDialogPhase holds what to open after final animation completes
   const [pendingDialogPhase, setPendingDialogPhase] = useState<GamePhase | null>(null);
+  // snakeTailPending: after landing on snake tail, open a new word_challenge
+  const [snakeTailPending, setSnakeTailPending] = useState(false);
 
   const resetGame = useCallback(() => {
     setGameState({
@@ -115,6 +117,7 @@ export function KaceLestveGame({
     setHoppingPositions(null);
     setAnimStep('idle');
     setPendingDialogPhase(null);
+    setSnakeTailPending(false);
     setDiceKey(k => k + 1);
   }, []);
 
@@ -138,6 +141,7 @@ export function KaceLestveGame({
     setHoppingPositions(null);
     setAnimStep('idle');
     setPendingDialogPhase(null);
+    setSnakeTailPending(false);
     setDiceKey(k => k + 1);
   }, []);
 
@@ -155,6 +159,7 @@ export function KaceLestveGame({
     setHoppingPositions(null);
     setAnimStep('idle');
     setPendingDialogPhase(null);
+    setSnakeTailPending(false);
     setDiceKey(k => k + 1);
   }, [players, gameState.currentPlayer]);
 
@@ -242,7 +247,7 @@ export function KaceLestveGame({
         setGameState(prev => ({ ...prev, usedWordIndices: [...prev.usedWordIndices.slice(-8), index] }));
         setPendingMove(pos);
         setAnimStep('idle');
-        // 1.5s delay before snake challenge dialog
+        // 1.5s delay before snake challenge dialog (on HEAD)
         setTimeout(() => setPhase('snake_challenge'), 1500);
         return;
       }
@@ -257,39 +262,45 @@ export function KaceLestveGame({
 
     } else if (animStep === 'moving_to_final') {
       setAnimStep('idle');
-      if (pendingDialogPhase) {
+      if (snakeTailPending) {
+        // Landed on snake TAIL — show a new word challenge here
+        setSnakeTailPending(false);
+        const { currentPlayer, positions } = gameState;
+        const { word, index } = getRandomWord(gameState.usedWordIndices);
+        setCurrentWord(word);
+        setGameState(prev => ({ ...prev, usedWordIndices: [...prev.usedWordIndices.slice(-8), index] }));
+        setPendingMove(positions[currentPlayer]);
+        setTimeout(() => setPhase('word_challenge'), 1500);
+      } else if (pendingDialogPhase) {
         const dp = pendingDialogPhase;
         setPendingDialogPhase(null);
-        // 1.5s delay before dialog after ladder/snake jump
+        // 1.5s delay before dialog after ladder jump
         setTimeout(() => setPhase(dp), 1500);
       } else {
-        // Snake tail animation done — proceed to next player
         nextPlayer();
       }
     }
-  }, [animStep, gameState, pendingDialogPhase, nextPlayer]);
+  }, [animStep, gameState, snakeTailPending, pendingDialogPhase, nextPlayer]);
 
 
   const handleWordResult = useCallback((_accepted: boolean) => {
     nextPlayer();
   }, [nextPlayer]);
 
-  const handleSnakeChallengeResult = useCallback((accepted: boolean) => {
-    const { currentPlayer } = gameState;
-
-    if (!accepted && pendingMove !== null) {
-      // Animate to snake tail, then nextPlayer via handleAvatarLanded
+  const handleSnakeChallengeResult = useCallback((_accepted: boolean) => {
+    // Always move to snake tail, regardless of result
+    if (pendingMove !== null && SNAKES[pendingMove] !== undefined) {
+      const tailPos = SNAKES[pendingMove]!;
       const newPositions = [...gameState.positions];
-      newPositions[currentPlayer] = SNAKES[pendingMove]!;
+      newPositions[gameState.currentPlayer] = tailPos;
       setGameState(prev => ({ ...prev, positions: newPositions }));
+      setSnakeTailPending(true);
       setAnimStep('moving_to_final');
-      setPendingDialogPhase(null); // signal: after final anim → nextPlayer
-      setPhase('rolling'); // close dialog while animating
-      // After animation we need nextPlayer — use a flag via pendingDialogPhase=null
-      // handled in handleAvatarLanded branch moving_to_final → nextPlayer
-      return;
+      setPendingDialogPhase(null);
+      setPhase('rolling'); // close dialog while animating to tail
+    } else {
+      nextPlayer();
     }
-    nextPlayer();
   }, [gameState, pendingMove, nextPlayer]);
 
 
