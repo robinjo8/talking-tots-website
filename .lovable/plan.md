@@ -1,118 +1,118 @@
 
-## Analiza in popravek igre Kače in Lestve
+## Popravek: Odstranitev bonus premika in gladka animacija
 
-### Ugotovljene težave
+### Težava 1: Bonus premik (DIFFICULTY_BONUS)
 
-#### Težava 1: Napačno pozicioniranje (koreninski vzrok)
+V `KaceLestveGame.tsx`, funkcija `handleWordResult` (vrstice 274–291):
 
-START pozicija v `gameState.positions` je `0`. Koda v `KaceLestveBoard.tsx` za position <= 0 postavi zmajčka na fizično polje `[row: ROWS-1, col: 0]` — to je fizično polje 1 (levo spodnji kot, rumeno).
+```tsx
+const handleWordResult = useCallback((accepted: boolean) => {
+  const bonus = accepted ? DIFFICULTY_BONUS[difficulty] : 0;
+  if (bonus > 0 && pendingMove !== null) {
+    // premakne zmajčka za bonus polj naprej
+    ...
+  }
+  nextPlayer();
+}, ...);
+```
 
-Ko igralec vrže 4: `0 + 4 = 4` (fizično), kar `getGridCell(4)` pretvori v display 2. Ampak pri LADDERS/SNAKES je `LADDERS[6] = 18` (display 4→16), torej fizična 4 nima lestve.
+`DIFFICULTY_BONUS` je definiran kot: `nizka: 2, srednja: 1, visoka: 0`. Torej pri nizki težavnosti zmajček skoči za 2 polji naprej, pri srednji za 1. To je potrebno popolnoma odstraniti.
 
-**Rešitev**: START pozicija mora biti `2` (fizično), kar pomeni "tik pred prvim zelenim poljem". Ko vrže 4, bo `2 + 4 = 6` (fizično = display 4), kar pravilno sproži lestev 4→16.
-
-Spremembe:
-- `gameState.positions` inicializacija: `[2, 2]` namesto `[0, 0]`  
-- `BOARD_SIZE`: ohrani 42 (fizično)  
-- `SQUARES_NEAR_END` logika: `BOARD_SIZE - currentPos <= SQUARES_NEAR_END` bo pravilna ko je max pos 40 (display 38)  
-- `KaceLestveBoard` za `position <= 2`: zmajček ostane na START poziciji (levo spodaj)
-
-Preveritev: START = fizično 2, vrže 4 → 2+4 = 6 (fizično) = display 4 → LADDERS[6] = 18 (fizično) = display 16 ✓
-
-#### Težava 2: Animacija — hop po poljih
-
-Trenutno framer-motion animira direktno od A do B. Potrebujemo zaporedje premikov polje za poljem z bounce efektom.
-
-**Rešitev**: Namesto enega motion animate klic, bomo dodali `intermediatePositions` array, ki vsebuje vsak korak posebej. Implementiramo sequence animacijo z `useAnimate` iz framer-motion ali z `setTimeout` zaporedjem setState za vsak korak.
-
-Konkretno: Pri metu 4 od pozicije 2, bo zmajček:
-1. Skok na 3 (50ms zamuda)
-2. Skok na 4 (100ms)
-3. Skok na 5 (150ms)
-4. Skok na 6 (200ms)
-5. Pristane → onAvatarLanded po zadnjem skoku
-
-Vsak "skok" bo imel kratek bounce transition v framer-motion.
-
-#### Težava 3: Zamuda 1,5 sekunde pred dialogom
-
-V `handleAvatarLanded` pred `setPhase('word_challenge')` dodamo `setTimeout(..., 1500)`.
-
-#### Težava 4: Dialog redesign po vzoru ArticulationRecordButton
-
-Popolnoma predelamo `KaceLestveWordDialog.tsx` da bo vizualno enak artikulacijskemu testu:
-- Teal gumb "Izgovori besedo" z mikrofonovo ikono (enak kot v ArticulationRecordButton)
-- Animirani progress bar med snemanjem (rdeč fill od leve proti desni)
-- "Zvok ni bil zaznan" + oranžen gumb "Poskusi znova" ob tišini
-- Zelena potrditev "BRAVO!" z gumbom "NADALJUJ" ob uspehu
-- Rdeča napaka z "Poskusi znova" ob neuspehu
+**Rešitev**: Poenostavimo `handleWordResult` — ignoriramo bonus, vedno samo pokličemo `nextPlayer()`.
 
 ---
 
-### Tehnični načrt sprememb
+### Težava 2: Animacija — "skakanje v loku"
 
-#### 1. `src/data/kaceLestveConfig.ts`
+Trenutna koda za hop animacijo v `KaceLestveBoard.tsx`:
 
-Izvozi konstanto `START_POSITION = 2` za jasnost.
-
-#### 2. `src/components/games/KaceLestveGame.tsx`
-
-- Inicializacija: `positions: [2, 2]` namesto `[0, 0]`
-- Po `handleSnakeChallengeResult(accepted=false)` premakni na rep
-- Zamuda 1,5s pred odprtjem kateregakoli dialoga (word_challenge, snake_challenge, success) v `handleAvatarLanded`
-- Doda state `hoppingPositions: number[] | null` — seznam vmesnih pozicij za hop animacijo
-- Ko kocka vrže X: izračuna array `[currentPos+1, currentPos+2, ..., newPos]` in shrani v `hoppingPositions`
-
-#### 3. `src/components/games/KaceLestveBoard.tsx`
-
-- Doda prop `hoppingPositions?: number[]` — seznam pozicij za sekvenčno animacijo
-- Ko `hoppingPositions` je nastavljen, useEffect zaporedoma nastavi lokalni `displayPosition` z `setTimeout` zamudami
-- Ko se zadnja hop animacija zaključi, pokliče `onAvatarLanded`
-- Vsak skok: `transition: { type: 'spring', stiffness: 400, damping: 15, mass: 0.5 }` za bounce efekt
-- Brez `hoppingPositions`: normalna animacija (za kačo/lestev premik ki ga ne kontroliramo korak za korakom)
-
-#### 4. `src/components/games/KaceLestveWordDialog.tsx`
-
-Popolnoma predelan po vzoru `ArticulationRecordButton`:
-
-```
-Faze:
-- idle: teal "Izgovori besedo" gumb (w-[220px] h-14, rounded-full)
-- recording: animirani rdeč progress bar z odštevanjem
-- transcribing: spinning loader
-- result (success): ✅ + "BRAVO!" + zelen "NADALJUJ" gumb  
-- result (fail + silence): "Zvok ni bil zaznan" + oranžen "Poskusi znova"
-- result (fail + wrong word): "Slišano: X" + oranžen "Poskusi znova"
-- result (fail): rdeč ❌ + "Poskusi znova" oranžen gumb
+```tsx
+transition={
+  isHopping
+    ? { type: 'spring', stiffness: 600, damping: 18, mass: 0.4 }  // ← preveč bounce
+    : { type: 'spring', stiffness: 200, damping: 22, duration: 0.6 }
+}
 ```
 
-Gumbi za rezultat:
-- Uspeh: zelen "NADALJUJ" → `onResult(true)`
-- Neuspeh po 2 poskusih ali klik "Nadaljuj": `onResult(false)` (ali pusti snemati znova)
+`spring` z nizkim `damping` povzroča, da se zmajček "odbija" na vsakem polju. Zamenjamo s `tween` za gladek premik:
 
-Logika: Dovoli neskončno ponavljanje dokler ni uspeh. Šele "NADALJUJ" gumb zaključi dialog.
+**Rešitev za hop korake** (med vsakim poljem):
+```tsx
+{ type: 'tween', duration: 0.12, ease: 'easeInOut' }
+```
+
+**Rešitev za lestev/kačo skok** (daljši skok):
+```tsx
+{ type: 'tween', duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }
+```
+
+Tudi `HOP_INTERVAL_MS` spremenimo iz `180` na `150` ms — hitrejši in bolj tekoč tok premika.
 
 ---
 
-### Sekvenca premikov (hop animacija)
+### Konkretne spremembe
 
+#### `src/components/games/KaceLestveGame.tsx`
+
+Vrstice 274–291 — poenostavitev `handleWordResult`:
+
+```tsx
+// PREJ:
+const handleWordResult = useCallback((accepted: boolean) => {
+  const { currentPlayer } = gameState;
+  const bonus = accepted ? DIFFICULTY_BONUS[difficulty] : 0;
+
+  if (bonus > 0 && pendingMove !== null) {
+    const bonusPos = Math.min(pendingMove + bonus, BOARD_SIZE);
+    const newPositions = [...gameState.positions];
+    newPositions[currentPlayer] = bonusPos;
+    if (bonusPos >= BOARD_SIZE) {
+      setGameState(prev => ({ ...prev, positions: newPositions, gameOver: true, winner: currentPlayer }));
+      setPhase("success");
+      return;
+    }
+    setGameState(prev => ({ ...prev, positions: newPositions }));
+  }
+  nextPlayer();
+}, [gameState, difficulty, pendingMove, nextPlayer]);
+
+// POTEM:
+const handleWordResult = useCallback((_accepted: boolean) => {
+  nextPlayer();
+}, [nextPlayer]);
 ```
-Met kocke: 4, pozicija: 2 (START)
-→ hoppingPositions = [3, 4, 5, 6]
-→ Board prikazuje: zmajček skoči na 3, nato 4, nato 5, nato 6
-→ Vsak skok: 180ms zamuda, spring bounce
-→ Ko pristane na 6 (display 4): onAvatarLanded
-→ LADDERS[6] = 18 → zmajček skoči na 18 (display 16)
-→ Po pristanku na 18: čakaj 1,5s → odpri word dialog
+
+Poleg tega odstranimo neuporabljene importe `DIFFICULTY_BONUS` iz `kaceLestveConfig`.
+
+#### `src/components/games/KaceLestveBoard.tsx`
+
+1. Spremenimo `HOP_INTERVAL_MS` iz `180` na `150` ms (vrstica 17).
+
+2. Zamenjamo `transition` za `motion.div` (vrstice 456–459):
+
+```tsx
+// PREJ:
+transition={
+  isHopping
+    ? { type: 'spring', stiffness: 600, damping: 18, mass: 0.4 }
+    : { type: 'spring', stiffness: 200, damping: 22, duration: 0.6 }
+}
+
+// POTEM:
+transition={
+  isHopping
+    ? { type: 'tween', duration: 0.13, ease: 'easeInOut' }
+    : { type: 'tween', duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }
+}
 ```
+
+`tween` z `easeInOut` da gladek, tekoč premik brez odbojev. Vsak korak traja 130ms, interval med koraki je 150ms — dovolj časa da se vsak korak vidi, a skupaj deluje kot tekoče drsenje po poljih.
 
 ---
 
-### Datoteke za spremembo
+### Povzetek sprememb
 
 | Datoteka | Sprememba |
 |----------|-----------|
-| `src/data/kaceLestveConfig.ts` | Dodaj `START_POSITION = 2` |
-| `src/components/games/KaceLestveGame.tsx` | Inicializacija positions na [2,2], hop animacija state, 1,5s zamuda pred dialogom |
-| `src/components/games/KaceLestveBoard.tsx` | Hop animacija: sekvenčni setState, bounce spring efekt |
-| `src/components/games/KaceLestveWordDialog.tsx` | Cel redesign po vzoru ArticulationRecordButton |
+| `src/components/games/KaceLestveGame.tsx` | Odstranitev bonus logike iz `handleWordResult`, odstranitev `difficulty` in `pendingMove` odvisnosti |
+| `src/components/games/KaceLestveBoard.tsx` | `HOP_INTERVAL_MS: 180 → 150`, `spring` → `tween` za oba tipa premikov |
