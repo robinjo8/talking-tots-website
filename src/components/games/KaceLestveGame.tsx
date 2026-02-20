@@ -25,14 +25,15 @@ import {
   SQUARES_NEAR_END,
   MAX_FAILED_NEAR_END,
   getRandomWord,
-  DRAGON_AVATARS,
 } from "@/data/kaceLestveConfig";
 import { useTrophyContext } from "@/contexts/TrophyContext";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public";
 const PLAYER_NAMES = ["ZMAJČEK 1", "ZMAJČEK 2"];
-const DEFAULT_AVATARS = [DRAGON_AVATARS[0], DRAGON_AVATARS[1]];
+const BLUE_AVATAR = "Zmajcek_modra_figura_1.webp";
+const RED_AVATAR = "Zmajcek_rdeca_figura_1.webp";
+const DEFAULT_AVATARS = [BLUE_AVATAR, RED_AVATAR];
 
 interface GameState {
   positions: number[];
@@ -253,7 +254,7 @@ export function KaceLestveGame({
 
   const playerData = Array.from({ length: players }, (_, i) => ({
     position: gameState.positions[i],
-    avatarUrl: playerAvatars[i] || DRAGON_AVATARS[i],
+    avatarUrl: playerAvatars[i] || (i === 0 ? BLUE_AVATAR : RED_AVATAR),
     name: PLAYER_NAMES[i],
   }));
 
@@ -277,6 +278,7 @@ export function KaceLestveGame({
         onUpdateSettings={handleSettingsUpdate}
         currentDifficulty={difficulty}
         currentAvatars={playerAvatars}
+        onBack={() => setShowExitDialog(true)}
       />
 
       {/* Settings modal (in-game: difficulty only) */}
@@ -312,7 +314,7 @@ export function KaceLestveGame({
             {/* Player indicator */}
             <div className="flex items-center gap-2 bg-black/50 backdrop-blur-sm rounded-full px-3 py-2 shadow-lg">
               <img
-                src={`${SUPABASE_URL}/zmajcki/${playerAvatars[gameState.currentPlayer] || DRAGON_AVATARS[0]}`}
+                src={`${SUPABASE_URL}/zmajcki/${playerAvatars[gameState.currentPlayer] || BLUE_AVATAR}`}
                 alt={currentPlayerName}
                 className="w-9 h-9 object-contain"
               />

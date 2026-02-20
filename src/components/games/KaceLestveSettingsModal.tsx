@@ -1,14 +1,21 @@
 import { useState } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { KaceDifficulty, KacePlayers, DRAGON_AVATARS } from "@/data/kaceLestveConfig";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Gamepad2 } from "lucide-react";
+import { KaceDifficulty, KacePlayers } from "@/data/kaceLestveConfig";
+import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public";
 
-const difficultyOptions: { value: KaceDifficulty; label: string; description: string; color: string }[] = [
-  { value: "lahka", label: "LAHKA", description: "+2 polji za pravilno besedo", color: "#22C55E" },
-  { value: "srednja", label: "SREDNJA", description: "+1 polje za pravilno besedo", color: "#3B82F6" },
-  { value: "tezka", label: "TEŽKA", description: "Brez bonusa", color: "#F97316" },
+const BLUE_AVATAR = "Zmajcek_modra_figura_1.webp";
+const RED_AVATAR = "Zmajcek_rdeca_figura_1.webp";
+
+const difficultyOptions: { value: KaceDifficulty; label: string; badge?: string; description: string }[] = [
+  { value: "lahka", label: "Lahka", description: "+2 polji za pravilno besedo" },
+  { value: "srednja", label: "Srednja", badge: "priporočeno", description: "+1 polje za pravilno besedo" },
+  { value: "tezka", label: "Težka", description: "Brez bonusa za pravilno besedo" },
 ];
 
 interface KaceLestveSettingsModalProps {
@@ -18,6 +25,7 @@ interface KaceLestveSettingsModalProps {
   onUpdateSettings: (difficulty: KaceDifficulty) => void;
   currentDifficulty: KaceDifficulty;
   currentAvatars: string[];
+  onBack?: () => void;
 }
 
 export function KaceLestveSettingsModal({
@@ -27,151 +35,195 @@ export function KaceLestveSettingsModal({
   onUpdateSettings,
   currentDifficulty,
   currentAvatars,
+  onBack,
 }: KaceLestveSettingsModalProps) {
   const [selectedPlayers, setSelectedPlayers] = useState<KacePlayers>(1);
   const [selectedDifficulty, setSelectedDifficulty] = useState<KaceDifficulty>(currentDifficulty);
-  const [avatars, setAvatars] = useState<string[]>([...currentAvatars]);
+  // Player 1 avatar choice (blue or red); player 2 gets the opposite
+  const [player1Avatar, setPlayer1Avatar] = useState<string>(currentAvatars[0] || BLUE_AVATAR);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
 
-  const handleAvatarSelect = (playerIdx: number, avatar: string) => {
-    const next = [...avatars];
-    next[playerIdx] = avatar;
-    setAvatars(next);
-  };
+  const player2Avatar = player1Avatar === BLUE_AVATAR ? RED_AVATAR : BLUE_AVATAR;
 
   const handleConfirm = () => {
     if (isInGame) {
       onUpdateSettings(selectedDifficulty);
     } else {
+      const avatars = selectedPlayers === 1
+        ? [player1Avatar, player2Avatar]
+        : [player1Avatar, player2Avatar];
       onStart(selectedPlayers, selectedDifficulty, avatars);
     }
   };
 
+  const handleBack = () => {
+    setShowExitConfirm(true);
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={() => {}}>
-      <DialogContent
-        className="sm:max-w-lg max-h-[90vh] overflow-y-auto"
-        onPointerDownOutside={(e) => e.preventDefault()}
-        onEscapeKeyDown={(e) => e.preventDefault()}
-      >
-        <div className="flex flex-col items-center gap-5 py-2">
-          <div className="text-center">
-            <h2 className="text-2xl font-black mb-1">🐍 KAČE IN LESTVE 🪜</h2>
-            <p className="text-muted-foreground text-sm">
-              {isInGame ? "Prilagodi nastavitve" : "Izberi nastavitve igre"}
-            </p>
-          </div>
+    <>
+      <Dialog open={isOpen} onOpenChange={() => {}}>
+        <DialogContent
+          className="sm:max-w-md max-h-[90vh] overflow-y-auto [&>button:first-child]:hidden"
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+        >
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl font-bold">
+              <Gamepad2 className="w-5 h-5 text-teal-600" />
+              {isInGame ? "Nastavitve igre" : "Nastavitve igre"}
+            </DialogTitle>
+            <DialogDescription>
+              {isInGame
+                ? "Prilagodite težavnost igre."
+                : "Izberite število igralcev, zmajčka in težavnost igre."}
+            </DialogDescription>
+          </DialogHeader>
 
-          {/* Number of players - only on start */}
-          {!isInGame && (
-            <div className="w-full">
-              <h3 className="font-bold text-center mb-3 text-sm text-muted-foreground uppercase tracking-wide">
-                ŠTEVILO IGRALCEV
-              </h3>
-              <div className="flex gap-3 justify-center">
-                {([1, 2] as KacePlayers[]).map((n) => (
-                  <button
-                    key={n}
-                    onClick={() => setSelectedPlayers(n)}
-                    className={`flex-1 py-3 rounded-xl font-black text-sm border-2 transition-all ${
-                      selectedPlayers === n
-                        ? "bg-dragon-green text-white border-dragon-green scale-105 shadow-md"
-                        : "bg-muted text-muted-foreground border-transparent hover:border-dragon-green/50"
-                    }`}
-                  >
-                    {n === 1 ? "1 IGRALEC" : "2 IGRALCA"}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+          <div className="flex flex-col gap-6 pt-2">
 
-          {/* Avatar selection - only on start */}
-          {!isInGame && (
-            <div className="w-full">
-              <h3 className="font-bold text-center mb-3 text-sm text-muted-foreground uppercase tracking-wide">
-                IZBERI ZMAJČKA
-              </h3>
-              {Array.from({ length: selectedPlayers }, (_, playerIdx) => (
-                <div key={playerIdx} className="mb-4">
-                  <p className="text-xs font-bold text-center mb-2 text-muted-foreground">
-                    {playerIdx === 0 ? "ZMAJČEK 1 (🔵)" : "ZMAJČEK 2 (🔴)"}
-                  </p>
-                  <div className="grid grid-cols-5 gap-2">
-                    {DRAGON_AVATARS.map((av) => (
-                      <button
-                        key={av}
-                        onClick={() => handleAvatarSelect(playerIdx, av)}
-                        className={`aspect-square rounded-xl overflow-hidden border-3 transition-all ${
-                          avatars[playerIdx] === av
-                            ? "border-dragon-green scale-110 shadow-lg"
-                            : "border-transparent hover:border-dragon-green/40"
-                        }`}
-                        style={{ borderWidth: avatars[playerIdx] === av ? 3 : 2 }}
-                      >
-                        <img
-                          src={`${SUPABASE_URL}/zmajcki/${av}`}
-                          alt={av}
-                          className="w-full h-full object-contain p-1"
-                        />
-                      </button>
-                    ))}
-                  </div>
+            {/* Number of players - only on start */}
+            {!isInGame && (
+              <div className="space-y-3">
+                <p className="font-medium text-sm uppercase tracking-wide text-muted-foreground">
+                  Število igralcev
+                </p>
+                <div className="flex gap-3">
+                  {([1, 2] as KacePlayers[]).map((n) => (
+                    <button
+                      key={n}
+                      onClick={() => setSelectedPlayers(n)}
+                      className={`flex-1 py-3 rounded-lg font-semibold text-sm border-2 transition-all ${
+                        selectedPlayers === n
+                          ? "bg-teal-50 text-teal-700 border-teal-500"
+                          : "bg-background text-muted-foreground border-border hover:border-gray-300"
+                      }`}
+                    >
+                      {n === 1 ? "1 Igralec" : "2 Igralca"}
+                    </button>
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
+              </div>
+            )}
 
-          {/* Difficulty */}
-          <div className="w-full">
-            <h3 className="font-bold text-center mb-3 text-sm text-muted-foreground uppercase tracking-wide">
-              TEŽAVNOST
-            </h3>
-            <div className="flex flex-col gap-2">
-              {difficultyOptions.map((d) => (
-                <button
-                  key={d.value}
-                  onClick={() => setSelectedDifficulty(d.value)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all text-left ${
-                    selectedDifficulty === d.value
-                      ? "border-current scale-[1.02] shadow-md"
-                      : "border-transparent bg-muted hover:bg-muted/80"
-                  }`}
-                  style={selectedDifficulty === d.value ? {
-                    backgroundColor: d.color + '20',
-                    borderColor: d.color,
-                    color: d.color,
-                  } : {}}
-                >
+            {/* Avatar selection - only on start */}
+            {!isInGame && (
+              <div className="space-y-3">
+                <p className="font-medium text-sm uppercase tracking-wide text-muted-foreground">
+                  {selectedPlayers === 1 ? "Izberi zmajčka" : "Izberi zmajčka (Igralec 1)"}
+                </p>
+                <div className="flex gap-3">
+                  {[BLUE_AVATAR, RED_AVATAR].map((av) => (
+                    <button
+                      key={av}
+                      onClick={() => setPlayer1Avatar(av)}
+                      className={`flex-1 flex flex-col items-center gap-2 py-3 rounded-lg border-2 transition-all ${
+                        player1Avatar === av
+                          ? "bg-teal-50 border-teal-500"
+                          : "bg-background border-border hover:border-gray-300"
+                      }`}
+                    >
+                      <img
+                        src={`${SUPABASE_URL}/zmajcki/${av}`}
+                        alt={av}
+                        className="w-14 h-14 object-contain"
+                      />
+                      <span className={`text-xs font-medium ${player1Avatar === av ? "text-teal-700" : "text-muted-foreground"}`}>
+                        {av === BLUE_AVATAR ? "Modri" : "Rdeči"}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                {selectedPlayers === 2 && (
+                  <div className="flex items-center gap-3 bg-muted/50 rounded-lg px-3 py-2">
+                    <img
+                      src={`${SUPABASE_URL}/zmajcki/${player2Avatar}`}
+                      alt="player2"
+                      className="w-8 h-8 object-contain"
+                    />
+                    <span className="text-sm text-muted-foreground">
+                      Igralec 2: <span className="font-medium text-foreground">{player2Avatar === BLUE_AVATAR ? "Modri" : "Rdeči"} zmajček</span>
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Difficulty */}
+            <div className="space-y-3">
+              <p className="font-medium text-sm uppercase tracking-wide text-muted-foreground">
+                Težavnost igre
+              </p>
+              <RadioGroup
+                value={selectedDifficulty}
+                onValueChange={(v) => setSelectedDifficulty(v as KaceDifficulty)}
+                className="space-y-2"
+              >
+                {difficultyOptions.map((d) => (
                   <div
-                    className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-black text-xs shrink-0"
-                    style={{ backgroundColor: d.color }}
+                    key={d.value}
+                    className={`flex items-center gap-3 border-2 rounded-lg p-3 cursor-pointer transition-all ${
+                      selectedDifficulty === d.value
+                        ? "border-teal-500 bg-teal-50"
+                        : "border-border hover:border-gray-300 bg-background"
+                    }`}
+                    onClick={() => setSelectedDifficulty(d.value)}
                   >
-                    {d.label.charAt(0)}
+                    <RadioGroupItem value={d.value} id={`diff-${d.value}`} className="text-teal-600 border-teal-400" />
+                    <Label htmlFor={`diff-${d.value}`} className="flex-1 cursor-pointer">
+                      <div className="flex items-center gap-2">
+                        <span className={`font-semibold text-sm ${selectedDifficulty === d.value ? "text-teal-700" : "text-foreground"}`}>
+                          {d.label}
+                        </span>
+                        {d.badge && (
+                          <span className="text-xs bg-teal-100 text-teal-700 px-2 py-0.5 rounded-full font-medium">
+                            {d.badge}
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-0.5">{d.description}</div>
+                    </Label>
                   </div>
-                  <div>
-                    <div className="font-black text-sm" style={{ color: selectedDifficulty === d.value ? d.color : undefined }}>
-                      {d.label}
-                    </div>
-                    <div className="text-xs text-muted-foreground">{d.description}</div>
-                  </div>
-                  {selectedDifficulty === d.value && (
-                    <div className="ml-auto text-lg">✓</div>
-                  )}
-                </button>
-              ))}
+                ))}
+              </RadioGroup>
             </div>
-          </div>
 
-          {/* Confirm button */}
-          <Button
-            onClick={handleConfirm}
-            className="w-full font-black text-base py-4 rounded-xl text-white shadow-lg"
-            style={{ backgroundColor: '#22C55E', fontSize: '16px' }}
-          >
-            {isInGame ? "✓ POTRDI" : "🎲 ZAČNI IGRO"}
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+            {/* Buttons */}
+            <div className="flex gap-3 pt-1">
+              {!isInGame && onBack && (
+                <Button
+                  variant="outline"
+                  onClick={handleBack}
+                  className="flex-1"
+                >
+                  ← Nazaj
+                </Button>
+              )}
+              <Button
+                onClick={handleConfirm}
+                className={`font-semibold bg-teal-600 hover:bg-teal-700 text-white ${!isInGame && onBack ? "flex-1" : "w-full"}`}
+              >
+                {isInGame ? "✓ Potrdi" : "🎲 Začni igro"}
+              </Button>
+            </div>
+
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Exit confirmation when NAZAJ is clicked */}
+      {!isInGame && onBack && (
+        <MemoryExitConfirmationDialog
+          open={showExitConfirm}
+          onOpenChange={setShowExitConfirm}
+          onConfirm={() => {
+            setShowExitConfirm(false);
+            onBack();
+          }}
+        >
+          <span />
+        </MemoryExitConfirmationDialog>
+      )}
+    </>
   );
 }

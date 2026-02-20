@@ -206,5 +206,8 @@ export function getRandomWord(usedIndices: number[] = []): { word: KaceLestveWor
   return { word: KACE_WORDS_C[index], index };
 }
 
-// Dragon avatars
-export const DRAGON_AVATARS = Array.from({ length: 9 }, (_, i) => `Zmajcek_${i + 1}.webp`);
+// Dragon avatars (only 2 choices: blue and red figure)
+export const DRAGON_AVATARS = [
+  "Zmajcek_modra_figura_1.webp",
+  "Zmajcek_rdeca_figura_1.webp",
+];
