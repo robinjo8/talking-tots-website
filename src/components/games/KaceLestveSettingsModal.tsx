@@ -12,10 +12,10 @@ const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object
 const BLUE_AVATAR = "Zmajcek_modra_figura_1.webp";
 const RED_AVATAR = "Zmajcek_rdeca_figura_1.webp";
 
-const difficultyOptions: { value: KaceDifficulty; label: string; badge?: string; description: string }[] = [
-  { value: "nizka", label: "Lahka", description: "Vsaka izgovorjena beseda je sprejeta" },
-  { value: "srednja", label: "Srednja", badge: "priporočeno", description: "Beseda mora biti 33–50 % podobna pravilni izgovorjavi" },
-  { value: "visoka", label: "Težka", description: "Beseda mora biti 65–75 % podobna pravilni izgovorjavi" },
+const difficultyOptions: { value: KaceDifficulty; label: string; badge?: string }[] = [
+  { value: "nizka", label: "Lahka" },
+  { value: "srednja", label: "Srednja", badge: "priporočeno" },
+  { value: "visoka", label: "Težka" },
 ];
 
 interface KaceLestveSettingsModalProps {
@@ -39,19 +39,17 @@ export function KaceLestveSettingsModal({
 }: KaceLestveSettingsModalProps) {
   const [selectedPlayers, setSelectedPlayers] = useState<KacePlayers>(1);
   const [selectedDifficulty, setSelectedDifficulty] = useState<KaceDifficulty>(currentDifficulty);
-  // Player 1 avatar choice (blue or red); player 2 gets the opposite
   const [player1Avatar, setPlayer1Avatar] = useState<string>(currentAvatars[0] || BLUE_AVATAR);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
 
+  // Player 2 always gets the opposite avatar
   const player2Avatar = player1Avatar === BLUE_AVATAR ? RED_AVATAR : BLUE_AVATAR;
 
   const handleConfirm = () => {
     if (isInGame) {
       onUpdateSettings(selectedDifficulty);
     } else {
-      const avatars = selectedPlayers === 2
-        ? [BLUE_AVATAR, RED_AVATAR]
-        : [player1Avatar, player2Avatar];
+      const avatars = [player1Avatar, player2Avatar];
       onStart(selectedPlayers, selectedDifficulty, avatars);
     }
   };
@@ -71,7 +69,7 @@ export function KaceLestveSettingsModal({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-xl font-bold">
               <Gamepad2 className="w-5 h-5 text-teal-600" />
-              {isInGame ? "Nastavitve igre" : "Nastavitve igre"}
+              Nastavitve igre
             </DialogTitle>
             <DialogDescription>
               {isInGame
@@ -106,33 +104,65 @@ export function KaceLestveSettingsModal({
               </div>
             )}
 
-            {/* Avatar selection - only for 1 player */}
-            {!isInGame && selectedPlayers === 1 && (
+            {/* Avatar selection - both rows always shown when not in game */}
+            {!isInGame && (
               <div className="space-y-3">
                 <p className="font-medium text-sm uppercase tracking-wide text-muted-foreground">
                   Izberi zmajčka
                 </p>
-                <div className="flex gap-3">
-                  {[BLUE_AVATAR, RED_AVATAR].map((av) => (
-                    <button
-                      key={av}
-                      onClick={() => setPlayer1Avatar(av)}
-                      className={`flex-1 flex flex-col items-center gap-2 py-3 rounded-lg border-2 transition-all ${
-                        player1Avatar === av
-                          ? "bg-teal-50 border-teal-500"
-                          : "bg-background border-border hover:border-gray-300"
-                      }`}
-                    >
-                      <img
-                        src={`${SUPABASE_URL}/zmajcki/${av}`}
-                        alt={av}
-                        className="w-14 h-14 object-contain"
-                      />
-                      <span className={`text-xs font-medium ${player1Avatar === av ? "text-teal-700" : "text-muted-foreground"}`}>
-                        {av === BLUE_AVATAR ? "Modri" : "Rdeči"}
-                      </span>
-                    </button>
-                  ))}
+
+                {/* Igralec 1 - always interactive */}
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-medium w-16 shrink-0">Igralec 1</span>
+                  <div className="flex gap-2 flex-1">
+                    {[BLUE_AVATAR, RED_AVATAR].map((av) => (
+                      <button
+                        key={av}
+                        onClick={() => setPlayer1Avatar(av)}
+                        className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-lg border-2 transition-all ${
+                          player1Avatar === av
+                            ? "bg-teal-50 border-teal-500"
+                            : "bg-background border-border hover:border-gray-300"
+                        }`}
+                      >
+                        <img
+                          src={`${SUPABASE_URL}/zmajcki/${av}`}
+                          alt={av === BLUE_AVATAR ? "Modri zmajček" : "Rdeči zmajček"}
+                          className="w-12 h-12 object-contain"
+                        />
+                        <span className={`text-xs font-medium ${player1Avatar === av ? "text-teal-700" : "text-muted-foreground"}`}>
+                          {av === BLUE_AVATAR ? "Modri" : "Rdeči"}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Igralec 2 - greyed out for 1 player, interactive for 2 players */}
+                <div className={`flex items-center gap-3 transition-opacity ${selectedPlayers === 1 ? "opacity-40 pointer-events-none" : ""}`}>
+                  <span className="text-sm font-medium w-16 shrink-0">Igralec 2</span>
+                  <div className="flex gap-2 flex-1">
+                    {[BLUE_AVATAR, RED_AVATAR].map((av) => (
+                      <button
+                        key={av}
+                        onClick={() => setPlayer1Avatar(av === BLUE_AVATAR ? RED_AVATAR : BLUE_AVATAR)}
+                        className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-lg border-2 transition-all ${
+                          player2Avatar === av
+                            ? "bg-teal-50 border-teal-500"
+                            : "bg-background border-border hover:border-gray-300"
+                        }`}
+                      >
+                        <img
+                          src={`${SUPABASE_URL}/zmajcki/${av}`}
+                          alt={av === BLUE_AVATAR ? "Modri zmajček" : "Rdeči zmajček"}
+                          className="w-12 h-12 object-contain"
+                        />
+                        <span className={`text-xs font-medium ${player2Avatar === av ? "text-teal-700" : "text-muted-foreground"}`}>
+                          {av === BLUE_AVATAR ? "Modri" : "Rdeči"}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
@@ -169,7 +199,6 @@ export function KaceLestveSettingsModal({
                           </span>
                         )}
                       </div>
-                      <div className="text-xs text-muted-foreground mt-0.5">{d.description}</div>
                     </Label>
                   </div>
                 ))}
@@ -184,14 +213,14 @@ export function KaceLestveSettingsModal({
                   onClick={handleBack}
                   className="flex-1"
                 >
-                  ← Nazaj
+                  Nazaj
                 </Button>
               )}
               <Button
                 onClick={handleConfirm}
                 className={`font-semibold bg-teal-600 hover:bg-teal-700 text-white ${!isInGame && onBack ? "flex-1" : "w-full"}`}
               >
-                {isInGame ? "✓ Potrdi" : "🎲 Začni igro"}
+                {isInGame ? "✓ Potrdi" : "Začni igro"}
               </Button>
             </div>
 
