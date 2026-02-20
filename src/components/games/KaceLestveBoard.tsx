@@ -49,173 +49,65 @@ function getPositionCenter(position: number) {
   return getCellCenter(row, col);
 }
 
-// Snake colors
-const SNAKE_COLORS = [
-  { body: '#E53935', outline: '#7F0000' },
-  { body: '#43A047', outline: '#1B5E20' },
-  { body: '#1E88E5', outline: '#0D47A1' },
-];
+// Elegant curved arrow helper
+function CurvedArrowSVG({
+  from, to, color, outline, curveSide,
+}: {
+  from: number; to: number; color: string; outline: string; curveSide: 1 | -1;
+}) {
+  const start = getPositionCenter(from);
+  const end = getPositionCenter(to);
 
-function SnakeSVG({ from, to, styleIdx }: { from: number; to: number; styleIdx: number }) {
-  const head = getPositionCenter(from);
-  const tail = getPositionCenter(to);
-  const color = SNAKE_COLORS[styleIdx] || SNAKE_COLORS[0];
-
-  const headR = 3.0;
-
-  const dx = tail.x - head.x;
-  const dy = tail.y - head.y;
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
   const len = Math.sqrt(dx * dx + dy * dy) || 1;
-  const perpX = (-dy / len) * len * 0.18;
-  const perpY = (dx / len) * len * 0.18;
 
-  const midX = (head.x + tail.x) / 2;
-  const midY = (head.y + tail.y) / 2;
+  // Perpendicular offset for gentle curve
+  const perpX = (-dy / len) * len * 0.22 * curveSide;
+  const perpY = (dx / len) * len * 0.22 * curveSide;
 
-  // Smooth S-curve using cubic bezier + smooth bezier (S command) — no spikes
-  const cp1x = head.x + dx * 0.33 + perpX;
-  const cp1y = head.y + dy * 0.33 + perpY;
-  const cp2x = tail.x - dx * 0.33 + perpX;
-  const cp2y = tail.y - dy * 0.33 + perpY;
-  const cp4x = tail.x - dx * 0.12 - perpX;
-  const cp4y = tail.y - dy * 0.12 - perpY;
+  // Single cubic bezier with two control points — smooth, no spikes
+  const cp1x = start.x + dx * 0.35 + perpX;
+  const cp1y = start.y + dy * 0.35 + perpY;
+  const cp2x = start.x + dx * 0.65 + perpX;
+  const cp2y = start.y + dy * 0.65 + perpY;
 
-  const spine = `M ${head.x} ${head.y} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${midX} ${midY} S ${cp4x} ${cp4y}, ${tail.x} ${tail.y}`;
+  const path = `M ${start.x} ${start.y} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${end.x} ${end.y}`;
 
-  // Tail tip direction
-  const tailDirX = tail.x - cp4x;
-  const tailDirY = tail.y - cp4y;
-  const tailLen = Math.sqrt(tailDirX * tailDirX + tailDirY * tailDirY) || 1;
-  const tnx = tailDirX / tailLen;
-  const tny = tailDirY / tailLen;
-  const tipX = tail.x + tnx * 1.0;
-  const tipY = tail.y + tny * 1.0;
-  const tipL = { x: tail.x - tny * 0.7, y: tail.y + tnx * 0.7 };
-  const tipR = { x: tail.x + tny * 0.7, y: tail.y - tnx * 0.7 };
+  // Arrow head direction: tangent at the end of the bezier
+  const tangentX = end.x - cp2x;
+  const tangentY = end.y - cp2y;
+  const tLen = Math.sqrt(tangentX * tangentX + tangentY * tangentY) || 1;
+  const nx = tangentX / tLen;
+  const ny = tangentY / tLen;
 
-  // Head direction
-  const headDirX = head.x - cp1x;
-  const headDirY = head.y - cp1y;
-  const headLen2 = Math.sqrt(headDirX * headDirX + headDirY * headDirY) || 1;
-  const hnx = headDirX / headLen2;
-  const hny = headDirY / headLen2;
-  const epx = -hny;
-  const epy = hnx;
-
-  const headAngleDeg = Math.atan2(hny, hnx) * (180 / Math.PI);
-  const noseX = head.x - hnx * (headR * 1.15);
-  const noseY = head.y - hny * (headR * 1.15);
+  // Arrow head triangle
+  const arrowSize = 3.5;
+  const baseX = end.x - nx * arrowSize;
+  const baseY = end.y - ny * arrowSize;
+  const perpNx = -ny;
+  const perpNy = nx;
+  const p1 = { x: end.x, y: end.y };
+  const p2 = { x: baseX + perpNx * arrowSize * 0.55, y: baseY + perpNy * arrowSize * 0.55 };
+  const p3 = { x: baseX - perpNx * arrowSize * 0.55, y: baseY - perpNy * arrowSize * 0.55 };
 
   return (
     <g>
       {/* Shadow */}
-      <path d={spine} stroke="rgba(0,0,0,0.08)" strokeWidth="3.8" fill="none" strokeLinecap="round" transform="translate(0.2,0.2)" />
-      {/* Body outline */}
-      <path d={spine} stroke={color.outline} strokeWidth="3.0" fill="none" strokeLinecap="round" />
-      {/* Body fill */}
-      <path d={spine} stroke={color.body} strokeWidth="1.9" fill="none" strokeLinecap="round" />
+      <path d={path} stroke="rgba(0,0,0,0.12)" strokeWidth="4.5" fill="none" strokeLinecap="round" transform="translate(0.3,0.3)" />
+      {/* Outline */}
+      <path d={path} stroke={outline} strokeWidth="4.0" fill="none" strokeLinecap="round" />
+      {/* Body */}
+      <path d={path} stroke={color} strokeWidth="2.5" fill="none" strokeLinecap="round" />
       {/* Shine */}
-      <path d={spine} stroke="rgba(255,255,255,0.15)" strokeWidth="0.6" fill="none" strokeLinecap="round" strokeDasharray="2,8" />
-
-      {/* Tail tip */}
+      <path d={path} stroke="rgba(255,255,255,0.25)" strokeWidth="0.8" fill="none" strokeLinecap="round" strokeDasharray="3,7" />
+      {/* Arrow head outline */}
+      <polygon points={`${p1.x},${p1.y} ${p2.x},${p2.y} ${p3.x},${p3.y}`} fill={outline} />
+      {/* Arrow head fill */}
       <polygon
-        points={`${tipX},${tipY} ${tipL.x},${tipL.y} ${tipR.x},${tipR.y}`}
-        fill={color.outline}
+        points={`${p1.x},${p1.y} ${p2.x + (p1.x - p2.x) * 0.15},${p2.y + (p1.y - p2.y) * 0.15} ${p3.x + (p1.x - p3.x) * 0.15},${p3.y + (p1.y - p3.y) * 0.15}`}
+        fill={color}
       />
-
-      {/* Head — ellipse oriented along body direction */}
-      <ellipse
-        cx={head.x} cy={head.y}
-        rx={headR * 1.35} ry={headR}
-        fill={color.outline}
-        transform={`rotate(${headAngleDeg}, ${head.x}, ${head.y})`}
-      />
-      <ellipse
-        cx={head.x} cy={head.y}
-        rx={headR * 1.2} ry={headR * 0.85}
-        fill={color.body}
-        transform={`rotate(${headAngleDeg}, ${head.x}, ${head.y})`}
-      />
-
-      {/* Eyes */}
-      <circle cx={head.x + epx * 1.3} cy={head.y + epy * 1.3} r="1.3" fill="white" />
-      <circle cx={head.x - epx * 1.3} cy={head.y - epy * 1.3} r="1.3" fill="white" />
-      <circle cx={head.x + epx * 1.3} cy={head.y + epy * 1.3} r="0.7" fill="#111" />
-      <circle cx={head.x - epx * 1.3} cy={head.y - epy * 1.3} r="0.7" fill="#111" />
-      <circle cx={head.x + epx * 1.3 + 0.3} cy={head.y + epy * 1.3 - 0.3} r="0.25" fill="white" />
-      <circle cx={head.x - epx * 1.3 + 0.3} cy={head.y - epy * 1.3 - 0.3} r="0.25" fill="white" />
-
-      {/* Nostrils */}
-      <circle cx={noseX + epx * 0.45} cy={noseY + epy * 0.45} r="0.35" fill={color.outline} />
-      <circle cx={noseX - epx * 0.45} cy={noseY - epy * 0.45} r="0.35" fill={color.outline} />
-
-      {/* Mouth — curved line */}
-      <path
-        d={`M ${head.x + epx * 0.9 - hnx * 0.3} ${head.y + epy * 0.9 - hny * 0.3} Q ${noseX} ${noseY + epy * 0.2} ${head.x - epx * 0.9 - hnx * 0.3} ${head.y - epy * 0.9 - hny * 0.3}`}
-        stroke={color.outline} strokeWidth="0.45" fill="none" strokeLinecap="round"
-      />
-    </g>
-  );
-}
-
-// Ladders — classic brown/orange cartoon style
-const LADDER_COLOR = { rail: '#7B3F00', rung: '#C1440E', outline: '#4A2500' };
-
-function LadderSVG({ from, to, styleIdx: _styleIdx }: { from: number; to: number; styleIdx: number }) {
-  const foot = getPositionCenter(from);
-  const top = getPositionCenter(to);
-
-  const dx = top.x - foot.x;
-  const dy = top.y - foot.y;
-  const len = Math.sqrt(dx * dx + dy * dy);
-
-  const perpX = (-dy / len) * 2.8;
-  const perpY = (dx / len) * 2.8;
-
-  const leftFoot = { x: foot.x + perpX, y: foot.y + perpY };
-  const rightFoot = { x: foot.x - perpX, y: foot.y - perpY };
-  const leftTop = { x: top.x + perpX, y: top.y + perpY };
-  const rightTop = { x: top.x - perpX, y: top.y - perpY };
-
-  const rungCount = Math.max(2, Math.round(len / 9));
-  const rungs = [];
-  for (let i = 0; i <= rungCount; i++) {
-    const t = i / rungCount;
-    rungs.push({
-      lx: leftFoot.x + (leftTop.x - leftFoot.x) * t,
-      ly: leftFoot.y + (leftTop.y - leftFoot.y) * t,
-      rx: rightFoot.x + (rightTop.x - rightFoot.x) * t,
-      ry: rightFoot.y + (rightTop.y - rightFoot.y) * t,
-    });
-  }
-
-  return (
-    <g>
-      {/* Shadow */}
-      <line x1={leftFoot.x + 0.25} y1={leftFoot.y + 0.25} x2={leftTop.x + 0.25} y2={leftTop.y + 0.25}
-        stroke="rgba(0,0,0,0.12)" strokeWidth="2.5" strokeLinecap="round" />
-      <line x1={rightFoot.x + 0.25} y1={rightFoot.y + 0.25} x2={rightTop.x + 0.25} y2={rightTop.y + 0.25}
-        stroke="rgba(0,0,0,0.12)" strokeWidth="2.5" strokeLinecap="round" />
-      {/* Rail outline */}
-      <line x1={leftFoot.x} y1={leftFoot.y} x2={leftTop.x} y2={leftTop.y}
-        stroke={LADDER_COLOR.outline} strokeWidth="2.4" strokeLinecap="round" />
-      <line x1={rightFoot.x} y1={rightFoot.y} x2={rightTop.x} y2={rightTop.y}
-        stroke={LADDER_COLOR.outline} strokeWidth="2.4" strokeLinecap="round" />
-      {/* Rails */}
-      <line x1={leftFoot.x} y1={leftFoot.y} x2={leftTop.x} y2={leftTop.y}
-        stroke={LADDER_COLOR.rail} strokeWidth="1.6" strokeLinecap="round" />
-      <line x1={rightFoot.x} y1={rightFoot.y} x2={rightTop.x} y2={rightTop.y}
-        stroke={LADDER_COLOR.rail} strokeWidth="1.6" strokeLinecap="round" />
-      {/* Rung outlines */}
-      {rungs.map((r, i) => (
-        <line key={`out-${i}`} x1={r.lx} y1={r.ly} x2={r.rx} y2={r.ry}
-          stroke={LADDER_COLOR.outline} strokeWidth="2.0" strokeLinecap="round" />
-      ))}
-      {/* Rungs */}
-      {rungs.map((r, i) => (
-        <line key={`rung-${i}`} x1={r.lx} y1={r.ly} x2={r.rx} y2={r.ry}
-          stroke={LADDER_COLOR.rung} strokeWidth="1.4" strokeLinecap="round" />
-      ))}
     </g>
   );
 }
@@ -275,11 +167,11 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
       >
-        {ladderEntries.map(({ from, to, styleIdx }) => (
-          <LadderSVG key={`ladder-${from}`} from={from} to={to} styleIdx={styleIdx} />
+        {ladderEntries.map(({ from, to }, i) => (
+          <CurvedArrowSVG key={`ladder-${from}`} from={from} to={to} color="#1E88E5" outline="#0D47A1" curveSide={(i % 2 === 0 ? 1 : -1) as 1 | -1} />
         ))}
-        {snakeEntries.map(({ from, to, styleIdx }) => (
-          <SnakeSVG key={`snake-${from}`} from={from} to={to} styleIdx={styleIdx} />
+        {snakeEntries.map(({ from, to }, i) => (
+          <CurvedArrowSVG key={`snake-${from}`} from={from} to={to} color="#E53935" outline="#7F0000" curveSide={(i % 2 === 0 ? -1 : 1) as 1 | -1} />
         ))}
       </svg>
 
