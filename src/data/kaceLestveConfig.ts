@@ -30,6 +30,7 @@ export const LADDERS: Record<number, number> = {
   6: 18,   // display 4 → 16
   15: 27,  // display 13 → 25
   26: 38,  // display 24 → 36
+  29: 33,  // display 27 → 31
 };
 
 // Snakes: key = head (physical pos), value = tail (physical pos)
