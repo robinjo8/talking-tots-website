@@ -13,9 +13,9 @@ const BLUE_AVATAR = "Zmajcek_modra_figura_1.webp";
 const RED_AVATAR = "Zmajcek_rdeca_figura_1.webp";
 
 const difficultyOptions: { value: KaceDifficulty; label: string; badge?: string; description: string }[] = [
-  { value: "lahka", label: "Lahka", description: "+2 polji za pravilno besedo" },
-  { value: "srednja", label: "Srednja", badge: "priporočeno", description: "+1 polje za pravilno besedo" },
-  { value: "tezka", label: "Težka", description: "Brez bonusa za pravilno besedo" },
+  { value: "nizka", label: "Lahka", description: "Vsaka izgovorjena beseda je sprejeta" },
+  { value: "srednja", label: "Srednja", badge: "priporočeno", description: "Beseda mora biti 33–50 % podobna pravilni izgovorjavi" },
+  { value: "visoka", label: "Težka", description: "Beseda mora biti 65–75 % podobna pravilni izgovorjavi" },
 ];
 
 interface KaceLestveSettingsModalProps {
@@ -49,8 +49,8 @@ export function KaceLestveSettingsModal({
     if (isInGame) {
       onUpdateSettings(selectedDifficulty);
     } else {
-      const avatars = selectedPlayers === 1
-        ? [player1Avatar, player2Avatar]
+      const avatars = selectedPlayers === 2
+        ? [BLUE_AVATAR, RED_AVATAR]
         : [player1Avatar, player2Avatar];
       onStart(selectedPlayers, selectedDifficulty, avatars);
     }
@@ -106,11 +106,11 @@ export function KaceLestveSettingsModal({
               </div>
             )}
 
-            {/* Avatar selection - only on start */}
-            {!isInGame && (
+            {/* Avatar selection - only for 1 player */}
+            {!isInGame && selectedPlayers === 1 && (
               <div className="space-y-3">
                 <p className="font-medium text-sm uppercase tracking-wide text-muted-foreground">
-                  {selectedPlayers === 1 ? "Izberi zmajčka" : "Izberi zmajčka (Igralec 1)"}
+                  Izberi zmajčka
                 </p>
                 <div className="flex gap-3">
                   {[BLUE_AVATAR, RED_AVATAR].map((av) => (
@@ -134,18 +134,6 @@ export function KaceLestveSettingsModal({
                     </button>
                   ))}
                 </div>
-                {selectedPlayers === 2 && (
-                  <div className="flex items-center gap-3 bg-muted/50 rounded-lg px-3 py-2">
-                    <img
-                      src={`${SUPABASE_URL}/zmajcki/${player2Avatar}`}
-                      alt="player2"
-                      className="w-8 h-8 object-contain"
-                    />
-                    <span className="text-sm text-muted-foreground">
-                      Igralec 2: <span className="font-medium text-foreground">{player2Avatar === BLUE_AVATAR ? "Modri" : "Rdeči"} zmajček</span>
-                    </span>
-                  </div>
-                )}
               </div>
             )}
 
