@@ -112,7 +112,7 @@ export const KACE_WORDS_C: KaceLestveWord[] = [
     acceptedVariants: ["VETRNICA", "VETRNICE", "VETRNICI", "VETRNICO", "VETRNICA!", "VETRCA", "VETRNICA?", "VETERNICA"],
   },
   {
-    text: "VILICE",
+    text: "VILICA",
     image: "vilica1.webp",
     audio: "vilice.m4a",
     acceptedVariants: ["VILICE", "VILICA", "VILICI", "VILICO", "VILCE", "VILICE!", "BILICE", "VILIC"],
@@ -130,13 +130,13 @@ export const KACE_WORDS_C: KaceLestveWord[] = [
     acceptedVariants: ["ZOBOTREBEC", "ZOBOTREBCA", "ZOBOTREBEC!", "ZOBOTREBC", "ZOTREBEC", "GOBOTREBEC", "ZOBOTREBCI"],
   },
   {
-    text: "ZARNICA",
+    text: "ŽARNICA",
     image: "zarnica1.webp",
     audio: "zarnica.m4a",
     acceptedVariants: ["ZARNICA", "ŽARNICA", "ZARNICE", "ZARNICI", "ZARNICO", "SARNICA", "ZARNICA!", "ŽARNICE"],
   },
   {
-    text: "ZLICA",
+    text: "ŽLICA",
     image: "zlica1.webp",
     audio: "zlica.m4a",
     acceptedVariants: ["ZLICA", "ŽLICA", "SLICA", "ZLICE", "ZLICI", "ZLICO", "ZLICA!", "ŠLICA", "ŽLICE"],
