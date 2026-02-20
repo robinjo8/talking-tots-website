@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Gamepad2 } from "lucide-react";
+
 import { KaceDifficulty, KacePlayers } from "@/data/kaceLestveConfig";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
 
@@ -66,12 +66,11 @@ export function KaceLestveSettingsModal({
           onPointerDownOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={(e) => e.preventDefault()}
         >
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-xl font-bold">
-              <Gamepad2 className="w-5 h-5 text-teal-600" />
+          <DialogHeader className="text-center">
+            <DialogTitle className="text-xl font-bold text-center">
               Nastavitve igre
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-center">
               {isInGame
                 ? "Prilagodite težavnost igre."
                 : "Izberite število igralcev, zmajčka in težavnost igre."}
@@ -130,26 +129,24 @@ export function KaceLestveSettingsModal({
                           alt={av === BLUE_AVATAR ? "Modri zmajček" : "Rdeči zmajček"}
                           className="w-12 h-12 object-contain"
                         />
-                        <span className={`text-xs font-medium ${player1Avatar === av ? "text-teal-700" : "text-muted-foreground"}`}>
-                          {av === BLUE_AVATAR ? "Modri" : "Rdeči"}
-                        </span>
                       </button>
                     ))}
                   </div>
                 </div>
 
                 {/* Igralec 2 - greyed out for 1 player, interactive for 2 players */}
-                <div className={`flex items-center gap-3 transition-opacity ${selectedPlayers === 1 ? "opacity-40 pointer-events-none" : ""}`}>
+                <div className={`flex items-center gap-3 transition-opacity ${selectedPlayers === 1 ? "opacity-40" : ""}`}>
                   <span className="text-sm font-medium w-16 shrink-0">Igralec 2</span>
                   <div className="flex gap-2 flex-1">
                     {[BLUE_AVATAR, RED_AVATAR].map((av) => (
                       <button
                         key={av}
+                        disabled={selectedPlayers === 1}
                         onClick={() => setPlayer1Avatar(av === BLUE_AVATAR ? RED_AVATAR : BLUE_AVATAR)}
                         className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-lg border-2 transition-all ${
-                          player2Avatar === av
+                          selectedPlayers === 2 && player2Avatar === av
                             ? "bg-teal-50 border-teal-500"
-                            : "bg-background border-border hover:border-gray-300"
+                            : "bg-background border-border"
                         }`}
                       >
                         <img
@@ -157,9 +154,6 @@ export function KaceLestveSettingsModal({
                           alt={av === BLUE_AVATAR ? "Modri zmajček" : "Rdeči zmajček"}
                           className="w-12 h-12 object-contain"
                         />
-                        <span className={`text-xs font-medium ${player2Avatar === av ? "text-teal-700" : "text-muted-foreground"}`}>
-                          {av === BLUE_AVATAR ? "Modri" : "Rdeči"}
-                        </span>
                       </button>
                     ))}
                   </div>
