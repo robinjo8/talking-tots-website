@@ -70,8 +70,8 @@ const ARROW_OFFSETS: Record<string, ArrowOffsets> = {
   "15-29": { startX: 0.32 },                  // start right of 15
   // Snakes (red, down)
   "24-14": { endX: -0.32, endY: 0.33 },       // end left-center of 14
-  "34-28": { startX: 0.32, startY: -0.33 },   // start right-center of 34
   "40-34": { startX: -0.32, startY: -0.33 },  // start left-center of 40
+  // "33-27" uses default offsets (bottom-center start, top-center end)
 };
 
 // Curved arrow in pixel space
@@ -264,7 +264,7 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
               color="#1E88E5"
               stripeColor="#82B1FF"
               outline="#0D47A1"
-              curveSide={(from === 15 ? 1 : i % 2 === 0 ? 1 : -1) as 1 | -1}
+              curveSide={(from === 15 ? -1 : i % 2 === 0 ? 1 : -1) as 1 | -1}
               boardW={boardW}
               boardH={boardH}
               isLadder={true}
