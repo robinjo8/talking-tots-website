@@ -73,6 +73,14 @@ export function KaceLestveWordDialog({
     error,
   } = useAudioRecording(RECORDING_DURATION, handleRecordingComplete);
 
+  // When recording stops due to silence, onRecordingComplete is NOT called,
+  // so we manually transition phase to "fail" to show the PONOVI button
+  useEffect(() => {
+    if (!isRecording && phase === "recording" && isSilent) {
+      setPhase("fail");
+    }
+  }, [isRecording, phase, isSilent]);
+
   const progressPercent = ((RECORDING_DURATION - countdown) / RECORDING_DURATION) * 100;
 
   // Auto-play audio when dialog opens
