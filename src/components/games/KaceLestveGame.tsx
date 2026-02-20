@@ -502,21 +502,21 @@ export function KaceLestveGame({
       {isPaused && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-3xl p-8 flex flex-col items-center gap-5 shadow-2xl min-w-[280px]">
-            <h2 className="text-3xl font-black text-gray-800 tracking-wide">PAVZA</h2>
+            <h2 className="text-3xl font-black text-gray-800 tracking-wide">POČITEK</h2>
             <p className="text-gray-500 text-sm text-center">
-              {pausedPhase === "snake_challenge" ? "Izziv na kači je na pavzi" : "Izziv besede je na pavzi"}
+              Igra je bila zaustavljena
             </p>
             <button
               onClick={handleResume}
               className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-full font-bold text-lg py-3 shadow-lg transition-all hover:scale-105"
             >
-              ▶ NADALJUJ
+              NADALJUJ
             </button>
             <button
               onClick={handleEndGame}
               className="w-full bg-gradient-to-r from-red-400 to-red-500 hover:from-red-500 hover:to-red-600 text-white rounded-full font-bold text-lg py-3 shadow-lg transition-all hover:scale-105"
             >
-              ✕ KONČAJ
+              KONČAJ
             </button>
           </div>
         </div>
