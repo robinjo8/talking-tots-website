@@ -1,129 +1,121 @@
 
-## Redesign: KaceLestveSettingsModal
+## Spremembe v KaceLestveSettingsModal
 
-### Summary of Changes
+### Kaj je treba popraviti
 
-Only **one file** needs to be changed for the full redesign: `src/components/games/KaceLestveSettingsModal.tsx`.  
-The `kaceLestveConfig.ts` also gets a minor update to remove the unused avatar array.
+#### 1. Avatar logika — 2 igralca brez izbire
 
----
+Trenutno: pri 2 igralcih se še vedno prikaže sekcija za izbiro avatarja za Igralca 1, spodaj pa se izpiše "Igralec 2: Modri/Rdeči zmajček".
 
-### What needs to change
+Novo:
+- **1 igralec**: prikazi oba gumba (modri/rdeči), uporabnik izbere. Naslov ostane "Izberi zmajčka".
+- **2 igralca**: sekcija za izbiro avatarja se **sploh ne prikaže**. Avtomatsko: Igralec 1 = modri, Igralec 2 = rdeči.
+- Vrstica "Igralec 2: ..." se **odstrani**.
 
-#### 1. Avatar logic — only 2 choices (modri / rdeči zmajček)
+```tsx
+{/* Avatar section — samo za 1 igralca */}
+{!isInGame && selectedPlayers === 1 && (
+  <div className="space-y-3">
+    <p className="font-medium text-sm uppercase tracking-wide text-muted-foreground">
+      Izberi zmajčka
+    </p>
+    <div className="flex gap-3">
+      {[BLUE_AVATAR, RED_AVATAR].map((av) => (
+        <button key={av} onClick={() => setPlayer1Avatar(av)} ...>
+          <img ... />
+          <span>{av === BLUE_AVATAR ? "Modri" : "Rdeči"}</span>
+        </button>
+      ))}
+    </div>
+    {/* BREZ "Igralec 2" vrstice */}
+  </div>
+)}
+```
 
-Currently: 9 avatars in a grid.  
-New: Only `Zmajcek_modra_figura_1.webp` (blue) and `Zmajcek_rdeca_figura_1.webp` (red).
-
-- **1 player**: Player picks blue or red. Default = blue. The choice appears right after the "1 IGRALEC / 2 IGRALCA" buttons.
-- **2 players**: Player 1 picks. Player 2 is automatically assigned the other color. No choice for Player 2.
-- `DRAGON_AVATARS` constant in `kaceLestveConfig.ts` updated to just these 2 avatars.
-- `DEFAULT_AVATARS` in `KaceLestveGame.tsx` updated accordingly.
-
-#### 2. Remove the X close button from the Dialog
-
-The `DialogContent` from Radix renders an X button by default. We need to suppress it.  
-Solution: pass `hideCloseButton` or use a custom `DialogContent` without the close icon (using `[&>button]:hidden` class).
-
-#### 3. Difficulty section redesign — matches ArticulationSettingsDialog style
-
-Currently: colored square badges + highlight with matching color.  
-New: radio-button style matching `/artikulacijski-test`:
-- `RadioGroup` + `RadioGroupItem` components
-- Each option: bordered card (`border-2 rounded-lg p-3`)
-- Selected: `border-teal-500 bg-teal-50`
-- Unselected: `border-gray-200 hover:border-gray-300`
-- Layout: vertical single column (no recording duration column needed)
-- Labels in normal case (not all-caps), descriptions in small muted text
-
-Difficulty options adapted for the game:
-- **Lahka** — Lažja igra (+2 polji za pravilno besedo)
-- **Srednja (priporočeno)** — Za večino otrok (+1 polje za pravilno besedo)
-- **Težka** — Strožje (+0 polj za pravilno besedo)
-
-Section heading style: `font-medium text-sm uppercase tracking-wide text-muted-foreground`
-
-#### 4. Overall modal header redesign
-
-Currently: centered emoji title.  
-New: matches `/artikulacijski-test` style:
-- `DialogHeader` with `DialogTitle` containing a game icon + "Nastavitve igre"
-- `DialogDescription`: "Izberite število igralcev, zmajčka in težavnost igre."
-- No X button visible
-
-#### 5. Buttons at bottom
-
-- **Primary button**: "🎲 ZAČNI IGRO" / "✓ POTRDI" — teal/green (`bg-teal-500 hover:bg-teal-600`) aligned right, matching the "Shrani" button in ArticulationSettingsDialog
-- **Secondary button**: "← NAZAJ" — shown only when NOT in-game (initial settings screen). Calls `navigate(-1)` or `navigate(backPath)`. Uses `useNavigate` — but this is a prop-less modal, so `backPath` needs to be passed as a prop.
-- The exit confirmation dialog (`MemoryExitConfirmationDialog`) triggers on "NAZAJ" click.
-
-#### 6. Props change for NAZAJ button
-
-`KaceLestveSettingsModal` needs two new props:
-- `onBack: () => void` — called when NAZAJ is clicked (shows exit confirmation)
-- Already handled by `KaceLestveGame.tsx` which controls `showExitDialog`
-
-In `KaceLestveGame.tsx`: when the settings modal (initial) calls `onBack`, we show the `MemoryExitConfirmationDialog`.
+In `handleConfirm`:
+```tsx
+const avatars = selectedPlayers === 2
+  ? [BLUE_AVATAR, RED_AVATAR]   // fiksno za 2 igralca
+  : [player1Avatar, player2Avatar];  // za 1 igralca
+```
 
 ---
 
-### Technical Details
+#### 2. Težavnost — enaka težavnostna lestvica kot Preverjanje izgovorjave
 
-**`src/data/kaceLestveConfig.ts`**:
+Trenutno: `KaceDifficulty = 'lahka' | 'srednja' | 'tezka'` se pošilja v edge function, ki pa pričakuje `'nizka' | 'srednja' | 'visoka'`. To pomeni da igra **nikoli ne pošlje pravilnih vrednosti** — vedno pade na default "srednja".
+
+Rešitev: preoblikuj `KaceDifficulty` da uporablja enake ključe kot preverjanje izgovorjave: `'nizka' | 'srednja' | 'visoka'`.
+
+**Spremembe v `kaceLestveConfig.ts`**:
 ```typescript
-// Change from 9 avatars to 2:
-export const DRAGON_AVATARS = [
-  "Zmajcek_modra_figura_1.webp",
-  "Zmajcek_rdeca_figura_1.webp",
+export type KaceDifficulty = 'nizka' | 'srednja' | 'visoka';
+
+export const DIFFICULTY_BONUS: Record<KaceDifficulty, number> = {
+  nizka: 2,
+  srednja: 1,
+  visoka: 0,
+};
+```
+
+**Opis v nastavitvah** — brez omembe bonusa, samo Levenshtein kriterij:
+
+Pragovi so enaki kot pri preverjanju izgovorjave:
+- **Nizka** (`nizka`): Vsaka beseda je sprejeta (prag = 0 %) — idealno za začetnike
+- **Srednja** (`srednja`): Beseda mora biti vsaj 33–50 % podobna glede na dolžino — za večino otrok
+- **Visoka** (`visoka`): Beseda mora biti 65–75 % podobna glede na dolžino — za naprednejše
+
+Opisi v modalnem oknu (brez bonusa, z opisom kriterija):
+
+```typescript
+const difficultyOptions = [
+  {
+    value: "nizka",
+    label: "Lahka",
+    description: "Vsaka izgovorjena beseda je sprejeta",
+  },
+  {
+    value: "srednja",
+    label: "Srednja",
+    badge: "priporočeno",
+    description: "Beseda mora biti 33–50 % podobna pravilni izgovorjavi",
+  },
+  {
+    value: "visoka",
+    label: "Težka",
+    description: "Beseda mora biti 65–75 % podobna pravilni izgovorjavi",
+  },
 ];
 ```
 
-**`src/components/games/KaceLestveSettingsModal.tsx`** — full redesign:
-- Import `RadioGroup`, `RadioGroupItem` from `@/components/ui/radio-group`
-- Import `Label` from `@/components/ui/label`  
-- Import `Settings` or a game icon from `lucide-react`
-- Import `DialogHeader`, `DialogTitle`, `DialogDescription`
-- Remove colored square badges
-- Replace difficulty buttons with RadioGroup cards (teal border when selected)
-- Avatar section: 2 buttons side-by-side (blue / red dragon images), selected = teal border
-- 2-player: show only Player 1 choice, Player 2 auto-assigned
-- Add `onBack` prop, render NAZAJ button below ZAČNI IGRO (only when `!isInGame`)
-- Hide dialog X button via `[&>button:first-child]:hidden` on `DialogContent`
-
-**`src/components/games/KaceLestveGame.tsx`**:
-- Pass `onBack={() => setShowExitDialog(true)}` to the initial `KaceLestveSettingsModal`
-- `MemoryExitConfirmationDialog` already handles the confirmation and navigates to `backPath`
+> Opomba: Kriterij je **enak** kot pri `/artikulacijski-test` — isti Levenshtein pragovi, isto pošiljanje v edge function.
 
 ---
 
-### Layout of the redesigned modal (initial)
+#### 3. Kateri % se prikaže v opisu?
 
-```text
-┌─────────────────────────────────────┐
-│  🎮  Nastavitve igre                 │
-│  Izberite igralce, zmajčka in       │
-│  težavnost igre.                    │
-│                                     │
-│  ŠTEVILO IGRALCEV                   │
-│  [  1 IGRALEC  ] [  2 IGRALCA  ]    │
-│                                     │
-│  IZBERI ZMAJČKA                     │
-│  [ 🔵 Modri ] [ 🔴 Rdeči ]          │
-│  (if 2 players: Player 2 auto)      │
-│                                     │
-│  TEŽAVNOST IGRE                     │
-│  ○ Lahka         +2 polji            │
-│  ● Srednja       +1 polje  ← teal   │
-│  ○ Težka         Brez bonusa        │
-│                                     │
-│  [  ← NAZAJ  ]  [  🎲 ZAČNI IGRO  ] │
-└─────────────────────────────────────┘
-```
+Ker se prag razlikuje glede na dolžino besede, bomo prikazali razpon:
 
-### Files to modify
+| Težavnost | Prag (3 črke) | Prag (4–6 črk) |
+|-----------|--------------|---------------|
+| Lahka     | 0 %          | 0 %           |
+| Srednja   | 33 %         | 50 %          |
+| Težka     | 65–75 %      | 65–75 %       |
 
-| File | Changes |
-|------|---------|
-| `src/data/kaceLestveConfig.ts` | DRAGON_AVATARS reduced to 2 entries |
-| `src/components/games/KaceLestveSettingsModal.tsx` | Full redesign: header, avatars, difficulty, buttons |
-| `src/components/games/KaceLestveGame.tsx` | Pass `onBack` prop, update DEFAULT_AVATARS |
+V opisu prikažemo **razpon** za vsako stopnjo.
+
+---
+
+### Datoteke za spremembo
+
+| Datoteka | Sprememba |
+|----------|-----------|
+| `src/data/kaceLestveConfig.ts` | `KaceDifficulty` preimenuj na `'nizka' \| 'srednja' \| 'visoka'`, posodobi `DIFFICULTY_BONUS` ključe |
+| `src/components/games/KaceLestveSettingsModal.tsx` | Odstrani "Igralec 2" vrstico, skrij avatar sekcijo za 2 igralca, posodobi opise težavnosti, posodobi vrednosti |
+| `src/components/games/KaceLestveGame.tsx` | Posodobi `difficulty` začetno vrednost iz `"srednja"` (ostane enako), avatarji za 2 igralca fiksirani |
+
+### Opomba glede bonusa
+
+Ker `DIFFICULTY_BONUS` zdaj uporablja ključe `nizka/srednja/visoka`, bonus logika v `KaceLestveGame.tsx` (`handleWordResult`) bo delovala pravilno — polja `nizka: 2`, `srednja: 1`, `visoka: 0`.
+
+Bonus za pomik po poljih se **ohrani** v igri (to je ločeno od Levenshtein kriterija) — samo opisa tega ne bomo prikazali v nastavitvah, ker to ni del tega zahtevka.
