@@ -35,7 +35,7 @@ export const SNAKES: Record<number, number> = {
   40: 34,
   21: 5,
   24: 14,
-  34: 28,
+  33: 27,
 };
 
 // Words for sound C (middle/end position)
