@@ -1,118 +1,116 @@
 
-## Popravek: Odstranitev bonus premika in gladka animacija
+## Spremembe: Kača vedno premakne + počasnejša elegantna animacija
 
-### Težava 1: Bonus premik (DIFFICULTY_BONUS)
+### Kaj se bo spremenilo
 
-V `KaceLestveGame.tsx`, funkcija `handleWordResult` (vrstice 274–291):
+#### 1. Logika kače — vedno premik na rep + nova beseda tam
 
+**Trenutno**: Dialog na glavi kače → pravilno = ostaneš, napačno = rep.
+
+**Novo**: 
+1. Zmajček pristane na glavi (npr. display 19 = fizična 21)
+2. Počakaš 1,5s → odpre se dialog: izgovori besedo
+3. Ko klikneš karkoli (ne glede na rezultat) → zapre se dialog, zmajček se elegantno premakne na rep (npr. display 7 = fizična 9)
+4. Po pristanku na repu počakaš 1,5s → odpre se NOV dialog z novo besedo
+5. Ko zaključiš → nextPlayer()
+
+Preslikava (display → display):
+- **19 → 7** (fizična 21 → 9)
+- **22 → 12** (fizična 24 → 14)
+- **29 → 17** (fizična 31 → 19)
+- **38 → 32** (fizična 40 → 34)
+
+**Implementacija v `KaceLestveGame.tsx`**:
+
+Dodamo nov boolean state `snakeTailPending`:
 ```tsx
-const handleWordResult = useCallback((accepted: boolean) => {
-  const bonus = accepted ? DIFFICULTY_BONUS[difficulty] : 0;
-  if (bonus > 0 && pendingMove !== null) {
-    // premakne zmajčka za bonus polj naprej
-    ...
-  }
-  nextPlayer();
-}, ...);
+const [snakeTailPending, setSnakeTailPending] = useState(false);
 ```
 
-`DIFFICULTY_BONUS` je definiran kot: `nizka: 2, srednja: 1, visoka: 0`. Torej pri nizki težavnosti zmajček skoči za 2 polji naprej, pri srednji za 1. To je potrebno popolnoma odstraniti.
-
-**Rešitev**: Poenostavimo `handleWordResult` — ignoriramo bonus, vedno samo pokličemo `nextPlayer()`.
-
----
-
-### Težava 2: Animacija — "skakanje v loku"
-
-Trenutna koda za hop animacijo v `KaceLestveBoard.tsx`:
-
+Spremenimo `handleSnakeChallengeResult` — vedno premakne na rep:
 ```tsx
-transition={
-  isHopping
-    ? { type: 'spring', stiffness: 600, damping: 18, mass: 0.4 }  // ← preveč bounce
-    : { type: 'spring', stiffness: 200, damping: 22, duration: 0.6 }
-}
-```
-
-`spring` z nizkim `damping` povzroča, da se zmajček "odbija" na vsakem polju. Zamenjamo s `tween` za gladek premik:
-
-**Rešitev za hop korake** (med vsakim poljem):
-```tsx
-{ type: 'tween', duration: 0.12, ease: 'easeInOut' }
-```
-
-**Rešitev za lestev/kačo skok** (daljši skok):
-```tsx
-{ type: 'tween', duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }
-```
-
-Tudi `HOP_INTERVAL_MS` spremenimo iz `180` na `150` ms — hitrejši in bolj tekoč tok premika.
-
----
-
-### Konkretne spremembe
-
-#### `src/components/games/KaceLestveGame.tsx`
-
-Vrstice 274–291 — poenostavitev `handleWordResult`:
-
-```tsx
-// PREJ:
-const handleWordResult = useCallback((accepted: boolean) => {
-  const { currentPlayer } = gameState;
-  const bonus = accepted ? DIFFICULTY_BONUS[difficulty] : 0;
-
-  if (bonus > 0 && pendingMove !== null) {
-    const bonusPos = Math.min(pendingMove + bonus, BOARD_SIZE);
+const handleSnakeChallengeResult = useCallback((_accepted: boolean) => {
+  if (pendingMove !== null && SNAKES[pendingMove] !== undefined) {
+    const tailPos = SNAKES[pendingMove]!;
     const newPositions = [...gameState.positions];
-    newPositions[currentPlayer] = bonusPos;
-    if (bonusPos >= BOARD_SIZE) {
-      setGameState(prev => ({ ...prev, positions: newPositions, gameOver: true, winner: currentPlayer }));
-      setPhase("success");
-      return;
-    }
+    newPositions[gameState.currentPlayer] = tailPos;
     setGameState(prev => ({ ...prev, positions: newPositions }));
+    setSnakeTailPending(true);
+    setAnimStep('moving_to_final');
+    setPendingDialogPhase(null);
+    setPhase('rolling'); // zapri dialog med animacijo
+  } else {
+    nextPlayer();
   }
-  nextPlayer();
-}, [gameState, difficulty, pendingMove, nextPlayer]);
-
-// POTEM:
-const handleWordResult = useCallback((_accepted: boolean) => {
-  nextPlayer();
-}, [nextPlayer]);
+}, [gameState, pendingMove, nextPlayer]);
 ```
 
-Poleg tega odstranimo neuporabljene importe `DIFFICULTY_BONUS` iz `kaceLestveConfig`.
-
-#### `src/components/games/KaceLestveBoard.tsx`
-
-1. Spremenimo `HOP_INTERVAL_MS` iz `180` na `150` ms (vrstica 17).
-
-2. Zamenjamo `transition` za `motion.div` (vrstice 456–459):
-
+Spremenimo `handleAvatarLanded` — ko `snakeTailPending` je true, odpri word_challenge:
 ```tsx
-// PREJ:
-transition={
-  isHopping
-    ? { type: 'spring', stiffness: 600, damping: 18, mass: 0.4 }
-    : { type: 'spring', stiffness: 200, damping: 22, duration: 0.6 }
+} else if (animStep === 'moving_to_final') {
+  setAnimStep('idle');
+  if (snakeTailPending) {
+    setSnakeTailPending(false);
+    const { word, index } = getRandomWord(gameState.usedWordIndices);
+    setCurrentWord(word);
+    setGameState(prev => ({ ...prev, usedWordIndices: [...prev.usedWordIndices.slice(-8), index] }));
+    setPendingMove(gameState.positions[gameState.currentPlayer]);
+    setTimeout(() => setPhase('word_challenge'), 1500);
+  } else if (pendingDialogPhase) {
+    ...
+  } else {
+    nextPlayer();
+  }
 }
+```
 
-// POTEM:
+Resetamo `snakeTailPending` tudi v `resetGame`, `handleStart`, `nextPlayer`.
+
+#### 2. Počasnejša, elegantnejša animacija premikov
+
+**Hop animacija** (premik po poljih po kocki): upočasnimo za polovico.
+- `HOP_INTERVAL_MS`: `150` → `300` ms
+- Trajanje posameznega koraka: `0.13s` → `0.26s`
+
+**Animacija lestve/kače** (daljši skok): eleganten, počasen premik.
+- Trajanje: `0.5s` → `1.8s`
+- Ease: `[0.4, 0, 0.2, 1]` (začne hitro, konča nežno)
+
+Sprememba v `KaceLestveBoard.tsx`:
+```tsx
+// Prej:
 transition={
   isHopping
     ? { type: 'tween', duration: 0.13, ease: 'easeInOut' }
     : { type: 'tween', duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }
 }
+
+// Potem:
+transition={
+  isHopping
+    ? { type: 'tween', duration: 0.26, ease: 'easeInOut' }
+    : { type: 'tween', duration: 1.8, ease: [0.4, 0, 0.2, 1] }
+}
 ```
 
-`tween` z `easeInOut` da gladek, tekoč premik brez odbojev. Vsak korak traja 130ms, interval med koraki je 150ms — dovolj časa da se vsak korak vidi, a skupaj deluje kot tekoče drsenje po poljih.
+#### 3. Sekvenca za kačo (po spremembi)
 
----
+```
+Met kocke: 6, pozicija: START
+→ Zmajček hopa polje za poljem do display 19 (fizična 21)
+→ Čaka 1,5s
+→ Dialog: "Izgovori besedo" (display 19 = glava kače)
+→ Klik kateregakoli gumba
+→ Dialog se zapre
+→ Zmajček elegantno drsi v 1,8s do display 7 (fizična 9 = rep kače)
+→ Po pristanku čaka 1,5s
+→ Nov dialog: "Izgovori novo besedo" (display 7 = rep kače)
+→ Ko zaključiš → naslednji igralec
+```
 
-### Povzetek sprememb
+### Datoteke za spremembo
 
 | Datoteka | Sprememba |
 |----------|-----------|
-| `src/components/games/KaceLestveGame.tsx` | Odstranitev bonus logike iz `handleWordResult`, odstranitev `difficulty` in `pendingMove` odvisnosti |
-| `src/components/games/KaceLestveBoard.tsx` | `HOP_INTERVAL_MS: 180 → 150`, `spring` → `tween` za oba tipa premikov |
+| `src/components/games/KaceLestveGame.tsx` | Nov `snakeTailPending` state, vedno premik na rep v `handleSnakeChallengeResult`, nova beseda na repu v `handleAvatarLanded` |
+| `src/components/games/KaceLestveBoard.tsx` | `HOP_INTERVAL_MS: 150→300`, hop duration `0.13→0.26s`, skok duration `0.5→1.8s` |
