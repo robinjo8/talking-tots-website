@@ -109,7 +109,7 @@ export function DiceRoller({ isVisible, currentStep, onRollComplete }: DiceRolle
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 z-40 flex flex-col items-center justify-center pointer-events-none">
+    <div className="fixed bottom-4 right-4 z-40 flex flex-col items-end pointer-events-none">
       
       <div 
         className="cursor-pointer pointer-events-auto"
