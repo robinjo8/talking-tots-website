@@ -168,10 +168,9 @@ export function getGridCell(position: number): { row: number; col: number } {
   return { row, col };
 }
 
-// Cell colors - green theme (3 shades, pseudo-random distribution)
-export const GREEN_DARK = '#1B5E20';
-export const GREEN_MID = '#2D6A4F';
-export const GREEN_LIGHT = '#95D5B2';
+// Cell colors - green theme (2 shades, pseudo-random distribution)
+export const GREEN_DARK = '#2D6A4F';
+export const GREEN_LIGHT = '#52B788';
 export const START_COLOR = '#FFD93D';
 export const END_COLOR = '#FF6B35';
 
@@ -180,22 +179,16 @@ export function getCellColor(position: number): string {
   if (position <= 2) return START_COLOR;
   // End fields (41-42) = orange
   if (position >= 41) return END_COLOR;
-  // Pseudo-random distribution of 3 green shades (deterministic by position)
-  // Using prime multiplier + offset for visually "random" non-striped distribution
-  const hash = ((position * 31 + 7) * 13 + position * 5) % 3;
-  if (hash === 0) return GREEN_DARK;
-  if (hash === 1) return GREEN_MID;
-  return GREEN_LIGHT;
+  // Pseudo-random distribution of 2 green shades (deterministic by position)
+  const hash = ((position * 31 + 7) * 13 + position * 5) % 2;
+  return hash === 0 ? GREEN_DARK : GREEN_LIGHT;
 }
 
 // Text color for cell number based on background
 export function getCellTextColor(position: number): string {
   if (position <= 2) return '#7C4A00';
   if (position >= 41) return '#fff';
-  const hash = ((position * 31 + 7) * 13 + position * 5) % 3;
-  if (hash === 0) return '#fff'; // darkest green -> white
-  if (hash === 1) return '#fff'; // dark green -> white
-  return '#1B4332'; // lightest green -> dark text
+  return '#fff'; // both green shades use white text
 }
 
 // Get a random word from the list (excluding recently used if possible)

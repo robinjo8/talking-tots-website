@@ -65,6 +65,7 @@ function CurvedArrow({
   curveSide,
   boardW,
   boardH,
+  isLadder,
 }: {
   from: number;
   to: number;
@@ -73,15 +74,31 @@ function CurvedArrow({
   curveSide: 1 | -1;
   boardW: number;
   boardH: number;
+  isLadder: boolean;
 }) {
-  const start = getPositionCenterPx(from, boardW, boardH);
-  const end = getPositionCenterPx(to, boardW, boardH);
+  const cellH = boardH / ROWS;
+  // Offset from cell center so arrows don't overlap the number
+  const edgeOffset = cellH * 0.33;
+
+  const startRaw = getPositionCenterPx(from, boardW, boardH);
+  const endRaw = getPositionCenterPx(to, boardW, boardH);
+
+  // Ladders (blue, up): start ABOVE center of from-cell, end BELOW center of to-cell
+  // Snakes (red, down): start BELOW center of from-cell, end ABOVE center of to-cell
+  const start = {
+    x: startRaw.x,
+    y: isLadder ? startRaw.y - edgeOffset : startRaw.y + edgeOffset,
+  };
+  const end = {
+    x: endRaw.x,
+    y: isLadder ? endRaw.y + edgeOffset : endRaw.y - edgeOffset,
+  };
 
   const dx = end.x - start.x;
   const dy = end.y - start.y;
   const len = Math.sqrt(dx * dx + dy * dy) || 1;
 
-  // Perpendicular offset for gentle curve
+  // Perpendicular offset for gentle S-curve
   const perpX = (-dy / len) * len * 0.28 * curveSide;
   const perpY = (dx / len) * len * 0.28 * curveSide;
 
@@ -99,8 +116,10 @@ function CurvedArrow({
   const nx = tangentX / tLen;
   const ny = tangentY / tLen;
 
-  // Arrow head triangle (pixel size)
-  const arrowSize = Math.min(boardW, boardH) * 0.045;
+  // Thinner arrows (half the original size)
+  const strokeW = Math.min(boardW, boardH) * 0.011;
+  const arrowSize = Math.min(boardW, boardH) * 0.03;
+
   const baseX = end.x - nx * arrowSize;
   const baseY = end.y - ny * arrowSize;
   const perpNx = -ny;
@@ -109,32 +128,21 @@ function CurvedArrow({
   const p2 = { x: baseX + perpNx * arrowSize * 0.55, y: baseY + perpNy * arrowSize * 0.55 };
   const p3 = { x: baseX - perpNx * arrowSize * 0.55, y: baseY - perpNy * arrowSize * 0.55 };
 
-  const strokeW = Math.min(boardW, boardH) * 0.022;
-
   return (
     <g>
       {/* Shadow */}
       <path
         d={path}
         stroke="rgba(0,0,0,0.18)"
-        strokeWidth={strokeW + 2}
+        strokeWidth={strokeW + 1}
         fill="none"
         strokeLinecap="round"
         transform="translate(1,1)"
       />
       {/* Outline */}
-      <path d={path} stroke={outline} strokeWidth={strokeW + 1.5} fill="none" strokeLinecap="round" />
+      <path d={path} stroke={outline} strokeWidth={strokeW + 0.8} fill="none" strokeLinecap="round" />
       {/* Body */}
       <path d={path} stroke={color} strokeWidth={strokeW} fill="none" strokeLinecap="round" />
-      {/* Shine */}
-      <path
-        d={path}
-        stroke="rgba(255,255,255,0.3)"
-        strokeWidth={strokeW * 0.3}
-        fill="none"
-        strokeLinecap="round"
-        strokeDasharray={`${strokeW * 1.5},${strokeW * 3}`}
-      />
       {/* Arrow head outline */}
       <polygon points={`${p1.x},${p1.y} ${p2.x},${p2.y} ${p3.x},${p3.y}`} fill={outline} />
       {/* Arrow head fill */}
@@ -215,6 +223,7 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
               curveSide={(i % 2 === 0 ? 1 : -1) as 1 | -1}
               boardW={boardW}
               boardH={boardH}
+              isLadder={true}
             />
           ))}
           {snakeEntries.map(({ from, to }, i) => (
@@ -224,9 +233,11 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
               to={to}
               color="#E53935"
               outline="#7F0000"
-              curveSide={(i % 2 === 0 ? -1 : 1) as 1 | -1}
+              // Snake 40→31 curves left (away from KONEC field on the right)
+              curveSide={(from === 40 ? 1 : i % 2 === 0 ? -1 : 1) as 1 | -1}
               boardW={boardW}
               boardH={boardH}
+              isLadder={false}
             />
           ))}
         </svg>
