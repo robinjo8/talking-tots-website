@@ -68,7 +68,7 @@ const ARROW_OFFSETS: Record<string, ArrowOffsets> = {
   // Ladders (blue, up)
   "3-11":  { endX: 0.32, endY: -0.33 },       // end right-center of field 11 (display 9)
   "15-27": {},                                  // end bottom-center of field 27 (display 25)
-  "29-33": { startY: -0.33, endX: 0.32, endY: -0.33 }, // start top-center of 29 (display 27), end right-center of 33 (display 31)
+  "29-33": { endX: 0.32, endY: -0.33 }, // start top-center of 29 (display 27, default ladder offset), end right-center of 33 (display 31)
   // Snakes (red, down)
   "24-14": { endX: -0.32, endY: 0.33 },        // end left-center of field 14 (display 12)
   "40-34": { startX: -0.32, startY: -0.33 },   // start left-center of field 40 (display 38)
