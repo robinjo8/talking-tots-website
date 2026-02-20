@@ -1,133 +1,152 @@
 
-## Popravek puščic: tanjše, ne prekrivajo številk, zavijejo mimo
+## Vizualni popravki: puščice, tabla, kocka, zmajček
 
-### Problem
-SVG overlay je na `zIndex: 5`, board grid pa na `zIndex: 2` — puščice so NAD mrežo in prekrivajo številke. Poleg tega se puščice začnejo/končajo točno na sredini celice (kjer je številka).
-
-### Rešitev v dveh delih
+### Spremembe v 3 datotekah
 
 ---
 
-### Del 1: Premik start/end točke puščic stran od središča
+### 1. `src/components/games/KaceLestveBoard.tsx`
 
-**Modre puščice (lestve, navzgor):**
-- Začetek (nižje polje): točka se premakne **nad** center celice za `cellH * 0.3` (puščica se začne nad številko)
-- Konec (višje polje): točka se premakne **pod** center celice za `cellH * 0.3` (puščica se konča pod številko)
+#### A) Elegantnejše puščice z belo/svetlo črtico po sredini
 
-**Rdeče puščice (kače, navzdol):**
-- Začetek (višje polje): točka se premakne **pod** center celice za `cellH * 0.3`
-- Konec (nižje polje): točka se premakne **nad** center celice za `cellH * 0.3`
+Trenutno puščica nima svetle črtice po sredini. Dodamo tretji `<path>` element — tanka svetla linija po sredini telesa puščice:
 
-Tako puščica vizualno "teče med" številkami, ne čez njih.
+- Rdeče puščice: svetlo rdeča sredinska linija (`#FF8A80`, opacity 0.8)
+- Modre puščice: svetlo modra sredinska linija (`#82B1FF`, opacity 0.8)
+- Debelina sredinske črtice: `strokeW * 0.35`
 
-```
-MODRA (navzgor):
-  [12] —— konec TUKAJ (pod številko 12)
-    ↑
-  [3]  —— začetek TUKAJ (nad številko 3)
+**Debelejše puščice** (×1.5 namesto ×0.5 od prejšnjega zmanjšanja):
+- `strokeW = Math.min(boardW, boardH) * 0.016` (namesto 0.011)
+- `arrowSize = Math.min(boardW, boardH) * 0.038`
 
-RDEČA (navzdol):
-  [40] —— začetek TUKAJ (pod številko 40)
-    ↓
-  [31] —— konec TUKAJ (nad številko 31)
+#### B) Odprava "pike" na konici puščice
+
+Problem: dva poligona (outline + fill) ustvarita videz pike ker sta oba narisana od točno iste točke. Rešitev: konico narišemo samo enkrat kot en poligon, brez dvojnega layeringa:
+
+```svg
+<!-- Outline poligon: malo večji -->
+<polygon points="..." fill={outline} />
+<!-- Fill poligon: malo manjši, od roba ne od vrha -->
+<polygon points="..." fill={color} />
 ```
 
----
+Pravi popravek: `p1` (konica) ostane enaka, ampak `p2` in `p3` (baza trikotnika) se premaknejo malce bližje konici, tako da outline dejansko obroblja fill namesto da se prekrivata na vrhu.
 
-### Del 2: SVG pod gridom (zIndex) + grid z prozornim ozadjem
+Konkretno: namesto `* 0.18` faktorja bomo odstranili fill polygon in pustili samo outline polygon z barvo fill + ločen outline. To eliminira pikico.
 
-**Ključna sprememba**: SVG gre na `zIndex: 1`, grid ostane na `zIndex: 2` — in celice postanejo **prozorne** (background-color ostane, ampak cell `<div>` nima background-color sam od sebe, samo colored children imajo).
+#### C) Specifični odmiki start/end točk po puščici
 
-Pravzaprav — celice že imajo `backgroundColor: cell.color` na celotnem `<div>`. Ker je CSS `background-color` neprozoren, bo grid polje pokrilo puščice pod njim. To je **pravilno obnašanje** — puščice tečejo "za" celicami.
+Sedaj vse puščice dobijo odmik samo v Y smeri (gor/dol od centra). Dodamo možnost za X odmik pri specifičnih puščicah:
 
-**Ampak problem je bil**: puščice morajo biti vidne čez polja. Rešitev je:
-
-**SVG ostane nad gridom (zIndex: 5), toda celice dobijo `mix-blend-mode` ali pa puščice tečejo skozi "luknje"** — to je kompleksno.
-
-**Boljša rešitev**: Celice ostanejo na `zIndex: 2`. Puščice so na `zIndex: 3` (nad celicami). Številke dobijo `zIndex: 10` relativno znotraj celice (že imajo to). Ampak ker so celice `position: relative` in nimajo `isolation: isolate`, se `z-index: 10` na `<span>` ne more prebiti nad parent SVG.
-
-**Prava rešitev**: 
-- SVG puščice ostanejo nad gridom (`zIndex: 5`)
-- Puščice se ne začnejo/končajo na sredini celice (kjer je številka) → odmik `cellH * 0.35` od centra
-- Puščica ki gre čez polje KONECke (40→31): posebna pot ki se zaokroži ob robu table stran od polja KONEC
-
----
-
-### Del 3: Posebna pot za rdečo puščico 40→31
-
-Polje 40 je polje tik ob KONEC (ki je 41+42). Puščica od 40 do 31 gre navzdol. Trenutno gre skozi področje KONEC polja.
-
-Rešitev: za to specifično puščico nastavimo `curveSide` tako da zavije **stran od KONEC polja** (v levo/desno stran), ali pa dodamo dodatno kontrolno točko ki jo usmeri mimo.
-
-Za puščico 40→31: polje 40 je v vrstici 5 (od dna: vrstica 1), desna stran. Polje 31 je v vrstici 4 (od dna: vrstica 2), desna stran. Torej gre navzdol na desni strani table. Puščica naj zavije v levo (stran od KONEC) — to se naredi z ustreznim `curveSide`.
-
----
-
-### Del 4: Tanjše puščice — za polovico
-
-Trenutno: `strokeW = Math.min(boardW, boardH) * 0.022`
-
-Novo: `strokeW = Math.min(boardW, boardH) * 0.011` (polovica)
-
-Konika puščice (arrowSize): `Math.min(boardW, boardH) * 0.045` → `Math.min(boardW, boardH) * 0.03`
-
----
-
-### Del 5: Zelena polja — samo 2 odtenka
-
-Spremenimo `getCellColor` v `kaceLestveConfig.ts` da vrne samo 2 odtenka:
+Spremenimo signaturo `CurvedArrow` da sprejme `startOffset` in `endOffset` (`{x, y}` v deležih celice):
 
 ```typescript
-export const GREEN_DARK = '#2D6A4F';   // Temnejša
-export const GREEN_LIGHT = '#52B788';  // Svetlejša
-
-export function getCellColor(position: number): string {
-  if (position <= 2) return START_COLOR;
-  if (position >= 41) return END_COLOR;
-  const hash = ((position * 31 + 7) * 13 + position * 5) % 2;
-  return hash === 0 ? GREEN_DARK : GREEN_LIGHT;
+interface ArrowOffsets {
+  startX?: number; // fraction of cellW, default 0
+  startY?: number; // fraction of cellH
+  endX?: number;
+  endY?: number;
 }
 ```
 
-Za 2 odtenka je potrebna `% 2` namesto `% 3`. Besedilo bo belo za oba odtenka.
+**Konkretni odmiki po zahtevi:**
+
+| Puščica | Začetek | Konec |
+|---------|---------|-------|
+| 3→12 (modra) | nad center (privzeto) | DESNO od 12 (endX: +0.3) |
+| 6→18 (modra) | v redu | v redu |
+| 15→30 (modra) | DESNO od 15 (startX: +0.3) | v redu |
+| 26→37 (modra) | v redu | v redu |
+| 24→10 (rdeča) | v redu | LEVO od 10 (endX: -0.3) |
+| 21→5 (rdeča) | v redu | v redu |
+| 40→31 (rdeča) | v redu | LEVO od 31 (endX: -0.3) |
+
+#### D) ZAČETEK polje — besedilo na sredini
+
+Trenutno je `🚀 ZAČETEK` poravnano levo-zgoraj. Spremenimo na center:
+
+```tsx
+{isStartLabel && (
+  <div className="absolute inset-0 flex items-center justify-center"
+       style={{ backgroundColor: '#FFD93D', zIndex: 10 }}>
+    <span className="font-black text-yellow-900 text-center"
+          style={{ fontSize: 'clamp(9px, 2vw, 16px)' }}>
+      🚀 ZAČETEK
+    </span>
+  </div>
+)}
+```
+
+#### E) KONEC polje — slika `Cilj.webp` na sredini
+
+Namesto besedila pokažemo sliko iz Supabase storage:
+
+```tsx
+{isEndLabel && (
+  <div className="absolute inset-0 flex items-center justify-center"
+       style={{ backgroundColor: '#FF6B35', zIndex: 10 }}>
+    <img
+      src={`${SUPABASE_URL}/slike/Cilj.webp`}
+      alt="Cilj"
+      className="w-full h-full object-contain p-1"
+    />
+  </div>
+)}
+```
+
+(Predpostavljamo da je `Cilj.webp` v mapi `slike/` v Supabase storage — pot je potrebno preveriti glede na obstoječe strukture URL-jev v projektu.)
 
 ---
 
-### Tehnična implementacija `CurvedArrow`
+### 2. `src/components/games/KaceLestveGame.tsx` — Kocka desno, zmajček levo
 
-Nova signatura z `isLadder` parametrom (true = modra navzgor, false = rdeča navzdol):
+**Kocka** se trenutno upodablja prek `DiceRoller` ki ima `fixed inset-0 flex items-center justify-center` — torej je vedno na sredini ekrana. 
 
-```typescript
-function CurvedArrow({ from, to, color, outline, curveSide, boardW, boardH, isLadder }) {
-  const cellH = boardH / ROWS;
-  
-  // Odmik start/end točke od centra celice
-  const edgeOffset = cellH * 0.32;
-  
-  let startRaw = getPositionCenterPx(from, boardW, boardH);
-  let endRaw = getPositionCenterPx(to, boardW, boardH);
-  
-  // Modra (lestev, navzgor): začne se nad centrom from, konča pod centrom to
-  // Rdeča (kača, navzdol): začne se pod centrom from, konča nad centrom to
-  const start = {
-    x: startRaw.x,
-    y: isLadder ? startRaw.y - edgeOffset : startRaw.y + edgeOffset
-  };
-  const end = {
-    x: endRaw.x,
-    y: isLadder ? endRaw.y + edgeOffset : endRaw.y - edgeOffset
-  };
-  
-  // ... Bezier krivulja ostane enaka
-}
+Za premik kocke na spodaj desno, moramo spremeniti pozicijo wrapping div-a v `DiceRoller.tsx` ali pa oviti `<DiceRoller>` v absolutno pozicioniran kontejner. Ker `DiceRoller` sam nadzira pozicioniranje (`fixed inset-0`), ga bomo morali spremeniti da sprejme prop za pozicijo, ali pa spremenimo wrapper.
+
+**Najlažja rešitev**: spremenimo CSS v `DiceRoller.tsx` iz `flex items-center justify-center` v `flex items-end justify-end pb-4 pr-4`:
+
+```tsx
+// DiceRoller.tsx — wrapper div
+<div className="fixed inset-0 z-40 flex items-end justify-end pb-6 pr-6 pointer-events-none">
+```
+
+**Zmajček na vrsti** — trenutno je `div` centered (`flex items-center justify-center`) pod tablo. Premaknemo ga na levo stran (`fixed bottom-6 left-24` oz. levo od kocke):
+
+V `KaceLestveGame.tsx` spremenimo `div` s player indikatorjem:
+
+```tsx
+{/* Player indicator — fixed bottom-left (next to home button) */}
+{phase !== "settings" && (
+  <div className="fixed bottom-4 left-24 z-40 flex items-center gap-2 
+                  bg-black/50 backdrop-blur-sm rounded-full px-3 py-2 shadow-lg">
+    <img src={...} className="w-9 h-9 object-contain" />
+    <span className="text-white font-black text-sm">...</span>
+  </div>
+)}
 ```
 
 ---
 
-### Spremembe samo v 1 datoteki (+ opcijsko kaceLestveConfig.ts za barve)
+### 3. `src/components/dice/DiceRoller.tsx` — Pozicija kocke
+
+Spremenimo wrapper `div` iz:
+```tsx
+<div className="fixed inset-0 z-40 flex flex-col items-center justify-center pointer-events-none">
+```
+v:
+```tsx
+<div className="fixed bottom-4 right-4 z-40 flex flex-col items-end pointer-events-none">
+```
+
+S tem bo kocka vedno v spodnjem desnem kotu.
+
+---
+
+### Povzetek datotek
 
 | Datoteka | Sprememba |
 |----------|-----------|
-| `src/components/games/KaceLestveBoard.tsx` | (1) Odmik start/end točk od centra, (2) Tanjše puščice (×0.5), (3) Manjša konica puščice, (4) `isLadder` prop za pravilno smer odmika |
-| `src/data/kaceLestveConfig.ts` | 2 odtenka zelene namesto 3 |
-
+| `src/components/games/KaceLestveBoard.tsx` | (1) Svetla sredinska črtica na puščicah, (2) Debelejše puščice, (3) Odprava pike na konici, (4) X/Y odmiki po puščici, (5) ZAČETEK na sredini, (6) KONEC = slika Cilj.webp |
+| `src/components/games/KaceLestveGame.tsx` | Zmajček na vrsti premakni na `fixed bottom-4 left-24` |
+| `src/components/dice/DiceRoller.tsx` | Kocka premakni na `fixed bottom-4 right-4` |
