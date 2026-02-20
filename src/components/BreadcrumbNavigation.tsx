@@ -48,6 +48,18 @@ const breadcrumbConfig: BreadcrumbConfig[] = [
   // Labirint
   { path: "/govorne-igre/labirint", label: "Labirint", parent: "/govorne-igre" },
   { path: "/govorne-igre/labirint/c", label: "C", parent: "/govorne-igre/labirint" },
+
+  // Zabavna pot (Kače in lestve)
+  { path: "/govorne-igre/kace", label: "Zabavna pot", parent: "/govorne-igre" },
+  { path: "/govorne-igre/kace/s", label: "S", parent: "/govorne-igre/kace" },
+  { path: "/govorne-igre/kace/z", label: "Z", parent: "/govorne-igre/kace" },
+  { path: "/govorne-igre/kace/c", label: "C", parent: "/govorne-igre/kace" },
+  { path: "/govorne-igre/kace/sh", label: "Š", parent: "/govorne-igre/kace" },
+  { path: "/govorne-igre/kace/zh", label: "Ž", parent: "/govorne-igre/kace" },
+  { path: "/govorne-igre/kace/ch", label: "Č", parent: "/govorne-igre/kace" },
+  { path: "/govorne-igre/kace/k", label: "K", parent: "/govorne-igre/kace" },
+  { path: "/govorne-igre/kace/l", label: "L", parent: "/govorne-igre/kace" },
+  { path: "/govorne-igre/kace/r", label: "R", parent: "/govorne-igre/kace" },
   
   // Sestavljanke
   { path: "/govorne-igre/sestavljanke", label: "Sestavljanke", parent: "/govorne-igre" },

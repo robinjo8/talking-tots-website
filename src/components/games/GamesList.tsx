@@ -114,8 +114,8 @@ const otherGames = [
   },
   {
     id: "kace",
-    title: "KAČE IN LESTVE",
-    description: "Igraj kače in lestve ter vadi izgovorjavo glasov na sredini in koncu besed",
+    title: "ZABAVNA POT",
+    description: "Igraj zabavno pot ter vadi izgovorjavo glasov na sredini in koncu besed",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/kace_lestve_nova_2.webp",
     gradient: "from-dragon-green/20 to-app-teal/20",
     customBackground: "radial-gradient(ellipse at center, hsl(120, 60%, 95%) 0%, hsl(120, 50%, 88%) 30%, hsl(120, 45%, 78%) 60%, hsl(120, 40%, 68%) 100%)",
