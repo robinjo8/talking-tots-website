@@ -20,7 +20,6 @@ import {
   KaceLestveWord,
   LADDERS,
   SNAKES,
-  DIFFICULTY_BONUS,
   BOARD_SIZE,
   SQUARES_NEAR_END,
   MAX_FAILED_NEAR_END,
@@ -271,24 +270,9 @@ export function KaceLestveGame({
   }, [animStep, gameState, pendingDialogPhase, nextPlayer]);
 
 
-  const handleWordResult = useCallback((accepted: boolean) => {
-    const { currentPlayer } = gameState;
-    const bonus = accepted ? DIFFICULTY_BONUS[difficulty] : 0;
-
-    if (bonus > 0 && pendingMove !== null) {
-      const bonusPos = Math.min(pendingMove + bonus, BOARD_SIZE);
-      const newPositions = [...gameState.positions];
-      newPositions[currentPlayer] = bonusPos;
-
-      if (bonusPos >= BOARD_SIZE) {
-        setGameState(prev => ({ ...prev, positions: newPositions, gameOver: true, winner: currentPlayer }));
-        setPhase("success");
-        return;
-      }
-      setGameState(prev => ({ ...prev, positions: newPositions }));
-    }
+  const handleWordResult = useCallback((_accepted: boolean) => {
     nextPlayer();
-  }, [gameState, difficulty, pendingMove, nextPlayer]);
+  }, [nextPlayer]);
 
   const handleSnakeChallengeResult = useCallback((accepted: boolean) => {
     const { currentPlayer } = gameState;
