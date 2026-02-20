@@ -26,16 +26,16 @@ export const DIFFICULTY_BONUS: Record<KaceDifficulty, number> = {
 export const LADDERS: Record<number, number> = {
   3: 11,
   6: 18,
-  15: 29,
+  15: 27,
   26: 38,
 };
 
 // Snakes: key = head (start - higher number), value = tail (end - lower number)
 export const SNAKES: Record<number, number> = {
   40: 34,
-  21: 5,
+  21: 9,
   24: 14,
-  33: 27,
+  31: 19,
 };
 
 // Words for sound C (middle/end position)
