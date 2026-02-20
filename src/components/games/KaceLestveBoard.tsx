@@ -67,11 +67,11 @@ interface ArrowOffsets {
 const ARROW_OFFSETS: Record<string, ArrowOffsets> = {
   // Ladders (blue, up)
   "3-11":  { endX: 0.32, endY: -0.33 },       // end right-center of 11
-  "15-29": { endX: -0.32, endY: -0.33 },      // start top-center 15, end left-center 29
+  "15-27": { endX: 0, endY: 0.33 },           // end bottom-center of 27
   // Snakes (red, down)
   "24-14": { endX: -0.32, endY: 0.33 },       // end left-center of 14
-  "33-27": { endX: 0.32, endY: 0.33 },        // end right-center of 27
   "40-34": { startX: -0.32, startY: -0.33 },  // start left-center of 40
+  // 21-9, 31-19: default center offsets
 };
 
 // Curved arrow in pixel space
@@ -345,11 +345,17 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
                 <div className="absolute inset-0" style={{ backgroundColor: '#FFD93D' }} />
               )}
 
-              {/* END — Cilj.webp image right-center */}
+              {/* END — pos 41: plain orange; pos 42: Cilj.webp image */}
               {isEndLabel && (
                 <div
-                  className="absolute inset-0 flex items-center justify-end"
+                  className="absolute inset-0"
                   style={{ zIndex: 10, backgroundColor: '#FF6B35' }}
+                />
+              )}
+              {isEndBlank && (
+                <div
+                  className="absolute inset-0 flex items-center justify-center"
+                  style={{ backgroundColor: '#FF6B35' }}
                 >
                   <img
                     src={`${SUPABASE_URL}/slike-ostalo/Cilj.webp`}
@@ -358,9 +364,6 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
                     style={{ padding: '2px' }}
                   />
                 </div>
-              )}
-              {isEndBlank && (
-                <div className="absolute inset-0" style={{ backgroundColor: '#FF6B35' }} />
               )}
             </div>
           );
@@ -397,7 +400,7 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
               transition={{ type: 'spring', stiffness: 200, damping: 22, duration: 0.5 }}
             >
               <img
-                src={`${SUPABASE_URL}/zmajcki/${player.avatarUrl}`}
+                src={`${SUPABASE_URL}/zmajcki/${idx === 0 ? 'Zmajcek_modra_figura.png' : 'Zmajcek_rdeca_figura.png'}`}
                 alt={player.name}
                 className="w-full h-full object-contain"
                 style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }}
