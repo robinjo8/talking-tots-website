@@ -1,27 +1,58 @@
 
-## Tri popravke: slike/zvoki + počasnejša hop animacija
+## Popravki besed in upočasnitev animacije
 
-### 1. Popravek v `src/data/kaceLestveConfig.ts`
+### 1. Popravki v `src/data/kaceLestveConfig.ts`
 
-**VILICE**:
-- `image`: `"vilice1.webp"` → `"vilica1.webp"`
-- `audio`: `"vilice.m4a"` → ostane `"vilice.m4a"` ✓
+Primerjava tvojih zahtevanih besed z trenutnim stanjem:
 
-**VETRNICA**:
-- `image`: `"vetrnica1.webp"` → `"veternica1.webp"`
-- `audio`: `"vetrnica.m4a"` → `"veternica.m4a"`
+| Zahtevano | Trenutno `text` | Napaka? |
+|---|---|---|
+| Borovnice | BOROVNICE | ✓ |
+| Kocka | KOCKA | ✓ |
+| Kozarec | KOZAREC | ✓ |
+| Lonec | LONEC | ✓ |
+| Lubenica | LUBENICA | ✓ |
+| Nogavice | NOGAVICE | ✓ |
+| Pica | PICA | ✓ |
+| Raca | RACA | ✓ |
+| Ropotuljica | ROPOTULJICA | ✓ |
+| Sonce | SONCE | ✓ |
+| Vetrnica | VETRNICA | ✓ |
+| **Vilica** | **VILICE** | ✗ → popraviti na VILICA |
+| Zajec | ZAJEC | ✓ |
+| Zobotrebec | ZOBOTREBEC | ✓ |
+| **Žarnica** | **ZARNICA** | ✗ → popraviti na ŽARNICA |
+| **Žlica** | **ZLICA** | ✗ → popraviti na ŽLICA |
+
+Spremembe v config datoteki:
+
+**VILICE → VILICA** (vrstica 115):
+- `text`: `"VILICE"` → `"VILICA"`
+
+**ZARNICA → ŽARNICA** (vrstice 133-136):
+- `text`: `"ZARNICA"` → `"ŽARNICA"`
+- `image`: `"zarnica1.webp"` → `"žarnica1.webp"` (ali ostane z/brez strešice, odvisno od datoteke v Supabase — ker pa sta slika in avdio poimenovana brez strešice, ju pustimo kot sta: `zarnica1.webp` in `zarnica.m4a`)
+
+Opomba za ŽARNICA: ker so datoteke v Supabase shranjene kot `zarnica1.webp` in `zarnica.m4a` (brez strešice), slika in zvok ostaneta enaka — samo prikazano besedilo `text` se popravi na `"ŽARNICA"`.
+
+**ZLICA → ŽLICA** (vrstice 139-142):
+- `text`: `"ZLICA"` → `"ŽLICA"`
+
+Opomba za ŽLICA: enako kot pri ŽARNICA — datoteke ostanejo `zlica1.webp` in `zlica.m4a`, samo `text` se popravi.
 
 ---
 
-### 2. Počasnejša hop animacija v `src/components/games/KaceLestveBoard.tsx`
+### 2. Upočasnitev animacije v `src/components/games/KaceLestveBoard.tsx`
 
-Trenutno je `HOP_INTERVAL_MS = 180` ms in hop duration `0.16s` — preveč hitro.
+Trenutno:
+- `HOP_INTERVAL_MS = 500` ms
+- hop `duration = 0.42s`
 
-Nova vrednost — lepo, počasno skakanje:
-- `HOP_INTERVAL_MS`: `180` → `500` ms med vsakim korakom
-- hop `duration`: `0.16s` → `0.42s` (animacija posameznega koraka)
+Novo — še bolj počasno, prijetno skakanje:
+- `HOP_INTERVAL_MS`: `500` → `700` ms med vsakim korakom
+- hop `duration`: `0.42s` → `0.60s`
 
-Za primer: zmajček pri 6 korakih porabi ~3s skupaj, kar je primerljivo s hitrostjo puščice (1.8s za skok), ampak vsak korak je jasno viden.
+To pomeni, da bo zmajček pri 6 korakih porabil ~4.2s skupaj — vsak korak bo jasno in lepo viden.
 
 ---
 
@@ -29,5 +60,5 @@ Za primer: zmajček pri 6 korakih porabi ~3s skupaj, kar je primerljivo s hitros
 
 | Datoteka | Sprememba |
 |---|---|
-| `src/data/kaceLestveConfig.ts` | VILICE: `vilica1.webp` + `vilice.m4a`; VETRNICA: `veternica1.webp` + `veternica.m4a` |
-| `src/components/games/KaceLestveBoard.tsx` | `HOP_INTERVAL_MS: 180 → 500`, hop `duration: 0.16 → 0.42` |
+| `src/data/kaceLestveConfig.ts` | `text`: VILICE→VILICA, ZARNICA→ŽARNICA, ZLICA→ŽLICA |
+| `src/components/games/KaceLestveBoard.tsx` | `HOP_INTERVAL_MS: 500→700`, hop `duration: 0.42→0.60` |
