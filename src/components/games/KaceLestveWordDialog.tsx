@@ -230,11 +230,10 @@ export function KaceLestveWordDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => {}}>
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
       <DialogContent
         className="sm:max-w-sm"
         onPointerDownOutside={(e) => e.preventDefault()}
-        onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <div className="flex flex-col items-center gap-4 py-2">
           {/* Header */}
