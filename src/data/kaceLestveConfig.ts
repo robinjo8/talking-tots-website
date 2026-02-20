@@ -5,7 +5,7 @@ export interface KaceLestveWord {
   acceptedVariants: string[];
 }
 
-export type KaceDifficulty = 'lahka' | 'srednja' | 'tezka';
+export type KaceDifficulty = 'nizka' | 'srednja' | 'visoka';
 export type KacePlayers = 1 | 2;
 
 // Board dimensions
@@ -17,9 +17,9 @@ export const MAX_FAILED_NEAR_END = 5;
 
 // Bonus moves for correct pronunciation by difficulty
 export const DIFFICULTY_BONUS: Record<KaceDifficulty, number> = {
-  lahka: 2,
+  nizka: 2,
   srednja: 1,
-  tezka: 0,
+  visoka: 0,
 };
 
 // Ladders: key = foot (physical pos), value = top (physical pos)

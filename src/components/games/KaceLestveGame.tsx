@@ -69,7 +69,7 @@ export function KaceLestveGame({
 
   const [phase, setPhase] = useState<GamePhase>("settings");
   const [players, setPlayers] = useState<KacePlayers>(1);
-  const [difficulty, setDifficulty] = useState<KaceDifficulty>("srednja");
+  const [difficulty, setDifficulty] = useState<KaceDifficulty>("srednja"); // nizka | srednja | visoka
   const [playerAvatars, setPlayerAvatars] = useState<string[]>(DEFAULT_AVATARS);
   const [showSettingsInGame, setShowSettingsInGame] = useState(false);
   const [gameState, setGameState] = useState<GameState>({
