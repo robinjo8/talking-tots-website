@@ -24,49 +24,67 @@ interface KaceLestveBoard2DProps {
   players: PlayerData[];
 }
 
-// Get SVG % center of a cell in the 6×7 grid
-function getCellCenter(row: number, col: number) {
-  const cellW = 100 / COLS;
-  const cellH = 100 / ROWS;
+// Get pixel center of a cell based on board dimensions
+function getCellCenterPx(
+  row: number,
+  col: number,
+  boardW: number,
+  boardH: number
+) {
+  const cellW = boardW / COLS;
+  const cellH = boardH / ROWS;
   return {
     x: col * cellW + cellW / 2,
     y: row * cellH + cellH / 2,
   };
 }
 
-function getPositionCenter(position: number) {
+function getPositionCenterPx(
+  position: number,
+  boardW: number,
+  boardH: number
+) {
+  const cellW = boardW / COLS;
+  const cellH = boardH / ROWS;
   if (position <= 0) {
-    const cellW = 100 / COLS;
-    const cellH = 100 / ROWS;
-    return { x: cellW, y: (ROWS - 1) * cellH + cellH / 2 };
+    return { x: cellW / 2, y: (ROWS - 1) * cellH + cellH / 2 };
   }
   if (position >= BOARD_SIZE) {
-    const cellW = 100 / COLS;
-    const cellH = 100 / ROWS;
-    return { x: (COLS - 1) * cellW, y: cellH / 2 };
+    return { x: (COLS - 1) * cellW + cellW / 2, y: cellH / 2 };
   }
   const { row, col } = getGridCell(position);
-  return getCellCenter(row, col);
+  return getCellCenterPx(row, col, boardW, boardH);
 }
 
-// Elegant curved arrow helper
-function CurvedArrowSVG({
-  from, to, color, outline, curveSide,
+// Curved arrow in pixel space
+function CurvedArrow({
+  from,
+  to,
+  color,
+  outline,
+  curveSide,
+  boardW,
+  boardH,
 }: {
-  from: number; to: number; color: string; outline: string; curveSide: 1 | -1;
+  from: number;
+  to: number;
+  color: string;
+  outline: string;
+  curveSide: 1 | -1;
+  boardW: number;
+  boardH: number;
 }) {
-  const start = getPositionCenter(from);
-  const end = getPositionCenter(to);
+  const start = getPositionCenterPx(from, boardW, boardH);
+  const end = getPositionCenterPx(to, boardW, boardH);
 
   const dx = end.x - start.x;
   const dy = end.y - start.y;
   const len = Math.sqrt(dx * dx + dy * dy) || 1;
 
   // Perpendicular offset for gentle curve
-  const perpX = (-dy / len) * len * 0.22 * curveSide;
-  const perpY = (dx / len) * len * 0.22 * curveSide;
+  const perpX = (-dy / len) * len * 0.28 * curveSide;
+  const perpY = (dx / len) * len * 0.28 * curveSide;
 
-  // Single cubic bezier with two control points — smooth, no spikes
   const cp1x = start.x + dx * 0.35 + perpX;
   const cp1y = start.y + dy * 0.35 + perpY;
   const cp2x = start.x + dx * 0.65 + perpX;
@@ -74,15 +92,15 @@ function CurvedArrowSVG({
 
   const path = `M ${start.x} ${start.y} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${end.x} ${end.y}`;
 
-  // Arrow head direction: tangent at the end of the bezier
+  // Arrow head direction: tangent at end of bezier
   const tangentX = end.x - cp2x;
   const tangentY = end.y - cp2y;
   const tLen = Math.sqrt(tangentX * tangentX + tangentY * tangentY) || 1;
   const nx = tangentX / tLen;
   const ny = tangentY / tLen;
 
-  // Arrow head triangle
-  const arrowSize = 3.5;
+  // Arrow head triangle (pixel size)
+  const arrowSize = Math.min(boardW, boardH) * 0.045;
   const baseX = end.x - nx * arrowSize;
   const baseY = end.y - ny * arrowSize;
   const perpNx = -ny;
@@ -91,21 +109,37 @@ function CurvedArrowSVG({
   const p2 = { x: baseX + perpNx * arrowSize * 0.55, y: baseY + perpNy * arrowSize * 0.55 };
   const p3 = { x: baseX - perpNx * arrowSize * 0.55, y: baseY - perpNy * arrowSize * 0.55 };
 
+  const strokeW = Math.min(boardW, boardH) * 0.022;
+
   return (
     <g>
       {/* Shadow */}
-      <path d={path} stroke="rgba(0,0,0,0.12)" strokeWidth="4.5" fill="none" strokeLinecap="round" transform="translate(0.3,0.3)" />
+      <path
+        d={path}
+        stroke="rgba(0,0,0,0.18)"
+        strokeWidth={strokeW + 2}
+        fill="none"
+        strokeLinecap="round"
+        transform="translate(1,1)"
+      />
       {/* Outline */}
-      <path d={path} stroke={outline} strokeWidth="4.0" fill="none" strokeLinecap="round" />
+      <path d={path} stroke={outline} strokeWidth={strokeW + 1.5} fill="none" strokeLinecap="round" />
       {/* Body */}
-      <path d={path} stroke={color} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+      <path d={path} stroke={color} strokeWidth={strokeW} fill="none" strokeLinecap="round" />
       {/* Shine */}
-      <path d={path} stroke="rgba(255,255,255,0.25)" strokeWidth="0.8" fill="none" strokeLinecap="round" strokeDasharray="3,7" />
+      <path
+        d={path}
+        stroke="rgba(255,255,255,0.3)"
+        strokeWidth={strokeW * 0.3}
+        fill="none"
+        strokeLinecap="round"
+        strokeDasharray={`${strokeW * 1.5},${strokeW * 3}`}
+      />
       {/* Arrow head outline */}
       <polygon points={`${p1.x},${p1.y} ${p2.x},${p2.y} ${p3.x},${p3.y}`} fill={outline} />
       {/* Arrow head fill */}
       <polygon
-        points={`${p1.x},${p1.y} ${p2.x + (p1.x - p2.x) * 0.15},${p2.y + (p1.y - p2.y) * 0.15} ${p3.x + (p1.x - p3.x) * 0.15},${p3.y + (p1.y - p3.y) * 0.15}`}
+        points={`${p1.x},${p1.y} ${p2.x + (p1.x - p2.x) * 0.18},${p2.y + (p1.y - p2.y) * 0.18} ${p3.x + (p1.x - p3.x) * 0.18},${p3.y + (p1.y - p3.y) * 0.18}`}
         fill={color}
       />
     </g>
@@ -126,9 +160,12 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
     return () => ro.disconnect();
   }, []);
 
-  const cellW = boardRect ? boardRect.width / COLS : 0;
-  const cellH = boardRect ? boardRect.height / ROWS : 0;
+  const boardW = boardRect ? boardRect.width : 0;
+  const boardH = boardRect ? boardRect.height : 0;
+  const cellW = boardW / COLS;
+  const cellH = boardH / ROWS;
 
+  // Build cells but merge START (1+2) and END (41+42) visually
   const cells = useMemo(() => {
     const result: Array<{
       pos: number; row: number; col: number; color: string; textColor: string;
@@ -160,22 +197,42 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
 
   return (
     <div className="relative w-full h-full" ref={boardRef}>
-      {/* SVG overlay for snakes and ladders — z-index: 1, BEHIND the board grid */}
-      <svg
-        className="absolute inset-0 w-full h-full pointer-events-none"
-        style={{ zIndex: 1 }}
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
-      >
-        {ladderEntries.map(({ from, to }, i) => (
-          <CurvedArrowSVG key={`ladder-${from}`} from={from} to={to} color="#1E88E5" outline="#0D47A1" curveSide={(i % 2 === 0 ? 1 : -1) as 1 | -1} />
-        ))}
-        {snakeEntries.map(({ from, to }, i) => (
-          <CurvedArrowSVG key={`snake-${from}`} from={from} to={to} color="#E53935" outline="#7F0000" curveSide={(i % 2 === 0 ? -1 : 1) as 1 | -1} />
-        ))}
-      </svg>
+      {/* SVG overlay for arrows — z-index: 1, BEHIND the board grid */}
+      {boardW > 0 && boardH > 0 && (
+        <svg
+          className="absolute inset-0 pointer-events-none"
+          style={{ zIndex: 5, width: boardW, height: boardH }}
+          width={boardW}
+          height={boardH}
+        >
+          {ladderEntries.map(({ from, to }, i) => (
+            <CurvedArrow
+              key={`ladder-${from}`}
+              from={from}
+              to={to}
+              color="#1E88E5"
+              outline="#0D47A1"
+              curveSide={(i % 2 === 0 ? 1 : -1) as 1 | -1}
+              boardW={boardW}
+              boardH={boardH}
+            />
+          ))}
+          {snakeEntries.map(({ from, to }, i) => (
+            <CurvedArrow
+              key={`snake-${from}`}
+              from={from}
+              to={to}
+              color="#E53935"
+              outline="#7F0000"
+              curveSide={(i % 2 === 0 ? -1 : 1) as 1 | -1}
+              boardW={boardW}
+              boardH={boardH}
+            />
+          ))}
+        </svg>
+      )}
 
-      {/* Board grid — z-index: 2, numbers appear above snakes/ladders */}
+      {/* Board grid — z-index: 2 */}
       <div
         className="absolute inset-0"
         style={{
@@ -189,9 +246,11 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
         }}
       >
         {cells.map((cell) => {
+          // START: pos 1 = left cell (shows label), pos 2 = right cell (blank same color)
+          // END: pos 41 = left cell (shows label), pos 42 = right cell (blank same color)
           const isStartLabel = cell.isStart && cell.pos === 1;
-          const isEndLabel = cell.isEnd && cell.pos === 41;
           const isStartBlank = cell.isStart && cell.pos === 2;
+          const isEndLabel = cell.isEnd && cell.pos === 41;
           const isEndBlank = cell.isEnd && cell.pos === 42;
 
           return (
@@ -200,11 +259,13 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
               className="relative flex items-center justify-center overflow-hidden"
               style={{
                 backgroundColor: cell.color,
-                borderRight: '1px solid rgba(0,0,0,0.15)',
+                // Remove border between START cells and between END cells
+                borderRight: isStartLabel || isEndLabel ? 'none' : '1px solid rgba(0,0,0,0.15)',
+                borderLeft: isStartBlank || isEndBlank ? 'none' : undefined,
                 borderBottom: '1px solid rgba(0,0,0,0.15)',
               }}
             >
-              {/* Large cell number — sits above SVG since grid is z-index 2 */}
+              {/* Regular cell number */}
               {!cell.isStart && !cell.isEnd && (
                 <span
                   className="font-black leading-none select-none"
@@ -213,30 +274,50 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
                     color: cell.textColor,
                     textShadow: '0 1px 3px rgba(0,0,0,0.5)',
                     position: 'relative',
-                    zIndex: 3,
+                    zIndex: 10,
                   }}
                 >
                   {cell.pos}
                 </span>
               )}
 
-              {/* START */}
+              {/* START label cell — text at top */}
               {isStartLabel && (
-                <div className="flex flex-col items-center justify-center w-full h-full" style={{ zIndex: 3, position: 'relative' }}>
-                  <span className="text-2xl">🚀</span>
-                  <span className="font-black text-yellow-900 leading-none" style={{ fontSize: 'clamp(7px, 1.5vw, 13px)' }}>START</span>
+                <div
+                  className="absolute inset-0 flex flex-col items-start justify-start"
+                  style={{ zIndex: 10, padding: '4px 6px', backgroundColor: '#FFD93D' }}
+                >
+                  <span
+                    className="font-black text-yellow-900 leading-none"
+                    style={{ fontSize: 'clamp(8px, 1.8vw, 15px)' }}
+                  >
+                    🚀 ZAČETEK
+                  </span>
                 </div>
               )}
-              {isStartBlank && <div className="w-full h-full" style={{ backgroundColor: '#FFD93D' }} />}
+              {/* START blank cell — same color, no border */}
+              {isStartBlank && (
+                <div className="absolute inset-0" style={{ backgroundColor: '#FFD93D' }} />
+              )}
 
-              {/* END */}
+              {/* END label cell — text at top */}
               {isEndLabel && (
-                <div className="flex flex-col items-center justify-center w-full h-full" style={{ zIndex: 3, position: 'relative' }}>
-                  <span className="text-2xl">⭐</span>
-                  <span className="font-black text-white leading-none" style={{ fontSize: 'clamp(7px, 1.5vw, 13px)' }}>KONEC</span>
+                <div
+                  className="absolute inset-0 flex flex-col items-start justify-start"
+                  style={{ zIndex: 10, padding: '4px 6px', backgroundColor: '#FF6B35' }}
+                >
+                  <span
+                    className="font-black text-white leading-none"
+                    style={{ fontSize: 'clamp(8px, 1.8vw, 15px)' }}
+                  >
+                    ⭐ KONEC
+                  </span>
                 </div>
               )}
-              {isEndBlank && <div className="w-full h-full" style={{ backgroundColor: '#FF6B35' }} />}
+              {/* END blank cell — same color, no border */}
+              {isEndBlank && (
+                <div className="absolute inset-0" style={{ backgroundColor: '#FF6B35' }} />
+              )}
             </div>
           );
         })}

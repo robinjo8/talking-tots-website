@@ -181,7 +181,8 @@ export function getCellColor(position: number): string {
   // End fields (41-42) = orange
   if (position >= 41) return END_COLOR;
   // Pseudo-random distribution of 3 green shades (deterministic by position)
-  const hash = (position * 17 + 13) % 3;
+  // Using prime multiplier + offset for visually "random" non-striped distribution
+  const hash = ((position * 31 + 7) * 13 + position * 5) % 3;
   if (hash === 0) return GREEN_DARK;
   if (hash === 1) return GREEN_MID;
   return GREEN_LIGHT;
@@ -191,7 +192,7 @@ export function getCellColor(position: number): string {
 export function getCellTextColor(position: number): string {
   if (position <= 2) return '#7C4A00';
   if (position >= 41) return '#fff';
-  const hash = (position * 17 + 13) % 3;
+  const hash = ((position * 31 + 7) * 13 + position * 5) % 3;
   if (hash === 0) return '#fff'; // darkest green -> white
   if (hash === 1) return '#fff'; // dark green -> white
   return '#1B4332'; // lightest green -> dark text
