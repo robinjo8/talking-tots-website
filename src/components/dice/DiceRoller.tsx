@@ -4,6 +4,7 @@ interface DiceRollerProps {
   isVisible: boolean;
   currentStep: number;
   onRollComplete: (result: number) => void;
+  inline?: boolean;
 }
 
 // Final rotations to show each number (matching the 3D cube faces)
@@ -54,7 +55,7 @@ function DiceDots({ count }: { count: number }) {
   );
 }
 
-export function DiceRoller({ isVisible, currentStep, onRollComplete }: DiceRollerProps) {
+export function DiceRoller({ isVisible, currentStep, onRollComplete, inline = false }: DiceRollerProps) {
   const [rotation, setRotation] = useState('rotateX(0deg) rotateY(0deg)');
   const [isSpinning, setIsSpinning] = useState(false);
   const [hasClicked, setHasClicked] = useState(false);
@@ -109,8 +110,8 @@ export function DiceRoller({ isVisible, currentStep, onRollComplete }: DiceRolle
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-40 flex flex-col items-end pointer-events-none">
-      
+    <div className={inline ? "flex flex-col items-end pointer-events-none" : "fixed bottom-4 right-4 z-40 flex flex-col items-end pointer-events-none"}>
+
       <div 
         className="cursor-pointer pointer-events-auto"
         onClick={handleDiceClick}

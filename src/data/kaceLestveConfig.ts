@@ -22,20 +22,22 @@ export const DIFFICULTY_BONUS: Record<KaceDifficulty, number> = {
   tezka: 0,
 };
 
-// Ladders: key = foot (start), value = top (end)
+// Ladders: key = foot (physical pos), value = top (physical pos)
+// Physical positions: 1-2=start(yellow,unnum), 3-40=green(display 1-38), 41-42=end(orange,unnum)
+// Display number = physical - 2  (so physical 3 shows as "1", physical 40 shows as "38")
 export const LADDERS: Record<number, number> = {
-  3: 11,
-  6: 18,
-  15: 27,
-  26: 38,
+  3: 11,   // display 1 → 9
+  6: 18,   // display 4 → 16
+  15: 27,  // display 13 → 25
+  26: 38,  // display 24 → 36
 };
 
-// Snakes: key = head (start - higher number), value = tail (end - lower number)
+// Snakes: key = head (physical pos), value = tail (physical pos)
 export const SNAKES: Record<number, number> = {
-  40: 34,
-  21: 9,
-  24: 14,
-  31: 19,
+  40: 34,  // display 38 → 32
+  21: 9,   // display 19 → 7
+  24: 14,  // display 22 → 12
+  31: 19,  // display 29 → 17
 };
 
 // Words for sound C (middle/end position)

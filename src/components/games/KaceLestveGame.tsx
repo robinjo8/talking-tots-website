@@ -1,8 +1,8 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Home, BookOpen, Settings } from "lucide-react";
+import { Home } from "lucide-react";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+
 import { KaceLestveBoard } from "@/components/games/KaceLestveBoard";
 import { KaceLestveWordDialog } from "@/components/games/KaceLestveWordDialog";
 import { KaceLestveSettingsModal } from "@/components/games/KaceLestveSettingsModal";
@@ -83,7 +83,7 @@ export function KaceLestveGame({
   const [pendingMove, setPendingMove] = useState<number | null>(null);
   const [currentWord, setCurrentWord] = useState<KaceLestveWord | null>(null);
   const [showExitDialog, setShowExitDialog] = useState(false);
-  const [showNewGameDialog, setShowNewGameDialog] = useState(false);
+  
   // diceKey forces DiceRoller to remount each turn
   const [diceKey, setDiceKey] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
@@ -289,84 +289,97 @@ export function KaceLestveGame({
         currentAvatars={playerAvatars}
       />
 
-      {/* Board area - full screen, with player indicator below */}
-      <div className="h-full flex flex-col items-center justify-center p-2">
+      {/* Board area + bottom bar */}
+      <div className="h-full flex flex-col items-center justify-center p-2 gap-2">
         <div
-          className="h-full"
           style={{
             aspectRatio: '6/7',
+            flex: '1 1 0',
             maxHeight: 'calc(100vh - 120px)',
             maxWidth: 'calc(100vw - 16px)',
+            minHeight: 0,
           }}
         >
           <KaceLestveBoard players={playerData} />
         </div>
 
-      
+        {/* Bottom bar: player indicator left, dice right */}
+        {phase !== "settings" && (
+          <div
+            className="flex items-center justify-between w-full px-2"
+            style={{ maxWidth: 'calc(min(100vw - 16px, calc((100vh - 120px) * 6 / 7)))' }}
+          >
+            {/* Player indicator */}
+            <div className="flex items-center gap-2 bg-black/50 backdrop-blur-sm rounded-full px-3 py-2 shadow-lg">
+              <img
+                src={`${SUPABASE_URL}/zmajcki/${playerAvatars[gameState.currentPlayer] || DRAGON_AVATARS[0]}`}
+                alt={currentPlayerName}
+                className="w-9 h-9 object-contain"
+              />
+              <span className="text-white font-black text-sm drop-shadow">
+                {isPlaying ? `NA VRSTI: ${currentPlayerName}` : currentPlayerName}
+              </span>
+              {players === 2 && (
+                <span className="text-white/60 text-xs">
+                  #{gameState.positions[gameState.currentPlayer] || 'START'}
+                </span>
+              )}
+            </div>
+
+            {/* Dice roller inline */}
+            <DiceRoller
+              key={diceKey}
+              isVisible={isPlaying}
+              currentStep={0}
+              onRollComplete={handleDiceRollComplete}
+              inline={true}
+            />
+          </div>
+        )}
       </div>
-
-      {/* Player indicator — fixed bottom-left, next to home button */}
-      {phase !== "settings" && (
-        <div className="fixed bottom-4 left-24 z-50 flex items-center gap-2 bg-black/50 backdrop-blur-sm rounded-full px-3 py-2 shadow-lg">
-          <img
-            src={`${SUPABASE_URL}/zmajcki/${playerAvatars[gameState.currentPlayer] || DRAGON_AVATARS[0]}`}
-            alt={currentPlayerName}
-            className="w-9 h-9 object-contain"
-          />
-          <span className="text-white font-black text-sm drop-shadow">
-            {isPlaying ? `NA VRSTI: ${currentPlayerName}` : currentPlayerName}
-          </span>
-          {players === 2 && (
-            <span className="text-white/60 text-xs">
-              #{gameState.positions[gameState.currentPlayer] || 'START'}
-            </span>
-          )}
-        </div>
-      )}
-
-      {/* Interactive 3D Dice — bottom right */}
-      <DiceRoller
-        key={diceKey}
-        isVisible={isPlaying}
-        currentStep={0}
-        onRollComplete={handleDiceRollComplete}
-      />
 
       {/* Bottom-left: unified Home dropdown menu */}
       <div className="fixed bottom-4 left-4 z-50">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg border-2 border-white/50 hover:scale-105 transition-transform"
-              style={{ background: 'linear-gradient(135deg, #F59E0B, #EF4444)' }}
+              className="w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
             >
-              <Home className="w-7 h-7 text-white" />
+              <Home className="w-8 h-8 text-white" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="ml-4 w-56 p-2 bg-white border-2 border-orange-200 shadow-xl rounded-xl"
+            className="ml-4 w-56 p-2 bg-white/95 border-2 border-orange-200 shadow-xl rounded-xl"
             align="start"
             side="top"
             sideOffset={8}
           >
             <button
               onClick={() => setShowExitDialog(true)}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-orange-50 transition-colors text-left font-bold text-gray-800"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-orange-50 transition-colors text-left text-gray-800"
             >
-              🏠 <span>NAZAJ</span>
+              <span className="text-xl">🏠</span><span className="font-medium">Nazaj</span>
             </button>
+            {phase !== "settings" && (
+              <button
+                onClick={() => resetGame()}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-orange-50 transition-colors text-left text-gray-800"
+              >
+                <span className="text-xl">🔄</span><span className="font-medium">Nova igra</span>
+              </button>
+            )}
             <button
               onClick={() => setShowInstructions(true)}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-orange-50 transition-colors text-left font-bold text-gray-800"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-orange-50 transition-colors text-left text-gray-800"
             >
-              <BookOpen className="w-5 h-5 text-blue-500" /> <span>NAVODILA</span>
+              <span className="text-xl">📖</span><span className="font-medium">Navodila</span>
             </button>
             {phase !== "settings" && (
               <button
                 onClick={() => setShowSettingsInGame(true)}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-orange-50 transition-colors text-left font-bold text-gray-800"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-orange-50 transition-colors text-left text-gray-800"
               >
-                <Settings className="w-5 h-5 text-indigo-500" /> <span>NASTAVITVE</span>
+                <span className="text-xl">⚙️</span><span className="font-medium">Nastavitve</span>
               </button>
             )}
           </DropdownMenuContent>
@@ -422,15 +435,6 @@ export function KaceLestveGame({
       >
         <span />
       </MemoryExitConfirmationDialog>
-
-      {/* New game dialog */}
-      <ConfirmDialog
-        open={showNewGameDialog}
-        onOpenChange={setShowNewGameDialog}
-        onConfirm={() => { setShowNewGameDialog(false); resetGame(); }}
-        title="Nova igra"
-        description="Ali res želiš začeti novo igro? Napredek bo izgubljen."
-      />
     </div>
   );
 }

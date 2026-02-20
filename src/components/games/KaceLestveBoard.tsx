@@ -66,11 +66,11 @@ interface ArrowOffsets {
 
 const ARROW_OFFSETS: Record<string, ArrowOffsets> = {
   // Ladders (blue, up)
-  "3-11":  { endX: 0.32, endY: -0.33 },       // end right-center of 11
-  "15-27": {},                                 // end bottom-center of 27 (default ladder end)
+  "3-11":  { endX: 0.32, endY: -0.33 },       // end right-center of field 11 (display 9)
+  "15-27": {},                                  // end bottom-center of field 27 (display 25)
   // Snakes (red, down)
-  "24-14": { endX: -0.32, endY: 0.33 },       // end left-center of 14
-  "40-34": { startX: -0.32, startY: -0.33 },  // start left-center of 40
+  "24-14": { endX: -0.32, endY: 0.33 },        // end left-center of field 14 (display 12)
+  "40-34": { startX: -0.32, startY: -0.33 },   // start left-center of field 40 (display 38)
   // 21-9, 31-19: default center offsets
 };
 
@@ -278,7 +278,7 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
               color="#E53935"
               stripeColor="#FF8A80"
               outline="#7F0000"
-              // Snake 40→31 curves left (away from KONEC field)
+              // Snake 40→34 curves left (away from KONEC field)
               curveSide={(from === 40 ? 1 : i % 2 === 0 ? -1 : 1) as 1 | -1}
               boardW={boardW}
               boardH={boardH}
@@ -330,7 +330,7 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
                     zIndex: 10,
                   }}
                 >
-                  {cell.pos}
+                  {cell.pos - 2}
                 </span>
               )}
 
@@ -386,10 +386,10 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
             targetCol = cell.col;
           }
 
-          const offsetX = idx === 0 ? -cellW * 0.15 : cellW * 0.15;
-          const x = targetCol * cellW + cellW / 2 + offsetX - cellW * 0.2;
-          const y = targetRow * cellH + cellH / 2 - cellH * 0.2;
           const size = Math.min(cellW, cellH) * 0.63;
+          const offsetX = idx === 0 ? -cellW * 0.15 : cellW * 0.15;
+          const x = targetCol * cellW + cellW / 2 + offsetX - size / 2;
+          const y = targetRow * cellH + cellH / 2 - size / 2;
 
           return (
             <motion.div
