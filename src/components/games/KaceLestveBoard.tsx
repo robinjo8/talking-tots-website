@@ -56,11 +56,29 @@ function getPositionCenterPx(
   return getCellCenterPx(row, col, boardW, boardH);
 }
 
+// Per-arrow custom offsets (in fractions of cell size)
+interface ArrowOffsets {
+  startX?: number;
+  startY?: number;
+  endX?: number;
+  endY?: number;
+}
+
+const ARROW_OFFSETS: Record<string, ArrowOffsets> = {
+  // Ladders (blue, up)
+  "3-12":  { endX: 0.32 },    // end right of 12
+  "15-30": { startX: 0.32 },  // start right of 15
+  // Snakes (red, down)
+  "24-10": { endX: -0.32 },   // end left of 10
+  "40-31": { endX: -0.32 },   // end left of 31
+};
+
 // Curved arrow in pixel space
 function CurvedArrow({
   from,
   to,
   color,
+  stripeColor,
   outline,
   curveSide,
   boardW,
@@ -70,12 +88,14 @@ function CurvedArrow({
   from: number;
   to: number;
   color: string;
+  stripeColor: string;
   outline: string;
   curveSide: 1 | -1;
   boardW: number;
   boardH: number;
   isLadder: boolean;
 }) {
+  const cellW = boardW / COLS;
   const cellH = boardH / ROWS;
   // Offset from cell center so arrows don't overlap the number
   const edgeOffset = cellH * 0.33;
@@ -83,15 +103,19 @@ function CurvedArrow({
   const startRaw = getPositionCenterPx(from, boardW, boardH);
   const endRaw = getPositionCenterPx(to, boardW, boardH);
 
+  // Custom per-arrow offsets
+  const key = `${from}-${to}`;
+  const offsets = ARROW_OFFSETS[key] || {};
+
   // Ladders (blue, up): start ABOVE center of from-cell, end BELOW center of to-cell
   // Snakes (red, down): start BELOW center of from-cell, end ABOVE center of to-cell
   const start = {
-    x: startRaw.x,
-    y: isLadder ? startRaw.y - edgeOffset : startRaw.y + edgeOffset,
+    x: startRaw.x + (offsets.startX ?? 0) * cellW,
+    y: (startRaw.y + (offsets.startY ?? 0) * cellH) + (isLadder ? -edgeOffset : edgeOffset),
   };
   const end = {
-    x: endRaw.x,
-    y: isLadder ? endRaw.y + edgeOffset : endRaw.y - edgeOffset,
+    x: endRaw.x + (offsets.endX ?? 0) * cellW,
+    y: (endRaw.y + (offsets.endY ?? 0) * cellH) + (isLadder ? edgeOffset : -edgeOffset),
   };
 
   const dx = end.x - start.x;
@@ -116,10 +140,11 @@ function CurvedArrow({
   const nx = tangentX / tLen;
   const ny = tangentY / tLen;
 
-  // Thinner arrows (half the original size)
-  const strokeW = Math.min(boardW, boardH) * 0.011;
-  const arrowSize = Math.min(boardW, boardH) * 0.03;
+  // Arrow dimensions (1.5x of the "half" size = 0.016)
+  const strokeW = Math.min(boardW, boardH) * 0.016;
+  const arrowSize = Math.min(boardW, boardH) * 0.038;
 
+  // Arrow head: single clean triangle (no double-polygon dot artifact)
   const baseX = end.x - nx * arrowSize;
   const baseY = end.y - ny * arrowSize;
   const perpNx = -ny;
@@ -128,27 +153,44 @@ function CurvedArrow({
   const p2 = { x: baseX + perpNx * arrowSize * 0.55, y: baseY + perpNy * arrowSize * 0.55 };
   const p3 = { x: baseX - perpNx * arrowSize * 0.55, y: baseY - perpNy * arrowSize * 0.55 };
 
+  // Shorten the path so the body doesn't overlap the arrowhead
+  const shortenedEnd = {
+    x: end.x - nx * arrowSize * 0.75,
+    y: end.y - ny * arrowSize * 0.75,
+  };
+  const shortenedPath = `M ${start.x} ${start.y} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${shortenedEnd.x} ${shortenedEnd.y}`;
+
   return (
     <g>
       {/* Shadow */}
       <path
-        d={path}
+        d={shortenedPath}
         stroke="rgba(0,0,0,0.18)"
-        strokeWidth={strokeW + 1}
+        strokeWidth={strokeW + 1.5}
         fill="none"
         strokeLinecap="round"
         transform="translate(1,1)"
       />
       {/* Outline */}
-      <path d={path} stroke={outline} strokeWidth={strokeW + 0.8} fill="none" strokeLinecap="round" />
+      <path d={shortenedPath} stroke={outline} strokeWidth={strokeW + 1.2} fill="none" strokeLinecap="round" />
       {/* Body */}
-      <path d={path} stroke={color} strokeWidth={strokeW} fill="none" strokeLinecap="round" />
-      {/* Arrow head outline */}
-      <polygon points={`${p1.x},${p1.y} ${p2.x},${p2.y} ${p3.x},${p3.y}`} fill={outline} />
-      {/* Arrow head fill */}
+      <path d={shortenedPath} stroke={color} strokeWidth={strokeW} fill="none" strokeLinecap="round" />
+      {/* Center stripe — elegant light line */}
+      <path
+        d={shortenedPath}
+        stroke={stripeColor}
+        strokeWidth={strokeW * 0.32}
+        fill="none"
+        strokeLinecap="round"
+        opacity={0.85}
+      />
+      {/* Arrow head — single polygon, no dot artifact */}
       <polygon
-        points={`${p1.x},${p1.y} ${p2.x + (p1.x - p2.x) * 0.18},${p2.y + (p1.y - p2.y) * 0.18} ${p3.x + (p1.x - p3.x) * 0.18},${p3.y + (p1.y - p3.y) * 0.18}`}
+        points={`${p1.x},${p1.y} ${p2.x},${p2.y} ${p3.x},${p3.y}`}
         fill={color}
+        stroke={outline}
+        strokeWidth={0.8}
+        strokeLinejoin="round"
       />
     </g>
   );
@@ -205,7 +247,7 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
 
   return (
     <div className="relative w-full h-full" ref={boardRef}>
-      {/* SVG overlay for arrows — z-index: 1, BEHIND the board grid */}
+      {/* SVG overlay for arrows */}
       {boardW > 0 && boardH > 0 && (
         <svg
           className="absolute inset-0 pointer-events-none"
@@ -219,6 +261,7 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
               from={from}
               to={to}
               color="#1E88E5"
+              stripeColor="#82B1FF"
               outline="#0D47A1"
               curveSide={(i % 2 === 0 ? 1 : -1) as 1 | -1}
               boardW={boardW}
@@ -232,8 +275,9 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
               from={from}
               to={to}
               color="#E53935"
+              stripeColor="#FF8A80"
               outline="#7F0000"
-              // Snake 40→31 curves left (away from KONEC field on the right)
+              // Snake 40→31 curves left (away from KONEC field)
               curveSide={(from === 40 ? 1 : i % 2 === 0 ? -1 : 1) as 1 | -1}
               boardW={boardW}
               boardH={boardH}
@@ -257,8 +301,6 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
         }}
       >
         {cells.map((cell) => {
-          // START: pos 1 = left cell (shows label), pos 2 = right cell (blank same color)
-          // END: pos 41 = left cell (shows label), pos 42 = right cell (blank same color)
           const isStartLabel = cell.isStart && cell.pos === 1;
           const isStartBlank = cell.isStart && cell.pos === 2;
           const isEndLabel = cell.isEnd && cell.pos === 41;
@@ -270,7 +312,6 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
               className="relative flex items-center justify-center overflow-hidden"
               style={{
                 backgroundColor: cell.color,
-                // Remove border between START cells and between END cells
                 borderRight: isStartLabel || isEndLabel ? 'none' : '1px solid rgba(0,0,0,0.15)',
                 borderLeft: isStartBlank || isEndBlank ? 'none' : undefined,
                 borderBottom: '1px solid rgba(0,0,0,0.15)',
@@ -292,40 +333,38 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
                 </span>
               )}
 
-              {/* START label cell — text at top */}
+              {/* START — centered label spanning both cells */}
               {isStartLabel && (
                 <div
-                  className="absolute inset-0 flex flex-col items-start justify-start"
-                  style={{ zIndex: 10, padding: '4px 6px', backgroundColor: '#FFD93D' }}
+                  className="absolute inset-0 flex items-center justify-center"
+                  style={{ zIndex: 10, backgroundColor: '#FFD93D' }}
                 >
                   <span
-                    className="font-black text-yellow-900 leading-none"
+                    className="font-black text-yellow-900 text-center leading-tight"
                     style={{ fontSize: 'clamp(8px, 1.8vw, 15px)' }}
                   >
                     🚀 ZAČETEK
                   </span>
                 </div>
               )}
-              {/* START blank cell — same color, no border */}
               {isStartBlank && (
                 <div className="absolute inset-0" style={{ backgroundColor: '#FFD93D' }} />
               )}
 
-              {/* END label cell — text at top */}
+              {/* END — Cilj.webp image centered */}
               {isEndLabel && (
                 <div
-                  className="absolute inset-0 flex flex-col items-start justify-start"
-                  style={{ zIndex: 10, padding: '4px 6px', backgroundColor: '#FF6B35' }}
+                  className="absolute inset-0 flex items-center justify-center"
+                  style={{ zIndex: 10, backgroundColor: '#FF6B35' }}
                 >
-                  <span
-                    className="font-black text-white leading-none"
-                    style={{ fontSize: 'clamp(8px, 1.8vw, 15px)' }}
-                  >
-                    ⭐ KONEC
-                  </span>
+                  <img
+                    src={`${SUPABASE_URL}/slike/Cilj.webp`}
+                    alt="Cilj"
+                    className="w-full h-full object-contain"
+                    style={{ padding: '4px' }}
+                  />
                 </div>
               )}
-              {/* END blank cell — same color, no border */}
               {isEndBlank && (
                 <div className="absolute inset-0" style={{ backgroundColor: '#FF6B35' }} />
               )}

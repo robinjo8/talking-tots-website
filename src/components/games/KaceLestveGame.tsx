@@ -290,7 +290,7 @@ export function KaceLestveGame({
       />
 
       {/* Board area - full screen, with player indicator below */}
-      <div className="h-full flex flex-col items-center justify-center p-2 pb-20">
+      <div className="h-full flex flex-col items-center justify-center p-2">
         <div
           className="h-full"
           style={{
@@ -302,27 +302,29 @@ export function KaceLestveGame({
           <KaceLestveBoard players={playerData} />
         </div>
 
-        {/* Current player indicator — below the board */}
-        {phase !== "settings" && (
-          <div className="flex items-center gap-2 bg-black/50 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg mt-2">
-            <img
-              src={`${SUPABASE_URL}/zmajcki/${playerAvatars[gameState.currentPlayer] || DRAGON_AVATARS[0]}`}
-              alt={currentPlayerName}
-              className="w-9 h-9 object-contain"
-            />
-            <span className="text-white font-black text-sm drop-shadow">
-              {isPlaying ? `NA VRSTI: ${currentPlayerName}` : currentPlayerName}
-            </span>
-            {players === 2 && (
-              <span className="text-white/60 text-xs">
-                #{gameState.positions[gameState.currentPlayer] || 'START'}
-              </span>
-            )}
-          </div>
-        )}
+      
       </div>
 
-      {/* Interactive 3D Dice in center of screen */}
+      {/* Player indicator — fixed bottom-left, next to home button */}
+      {phase !== "settings" && (
+        <div className="fixed bottom-4 left-24 z-50 flex items-center gap-2 bg-black/50 backdrop-blur-sm rounded-full px-3 py-2 shadow-lg">
+          <img
+            src={`${SUPABASE_URL}/zmajcki/${playerAvatars[gameState.currentPlayer] || DRAGON_AVATARS[0]}`}
+            alt={currentPlayerName}
+            className="w-9 h-9 object-contain"
+          />
+          <span className="text-white font-black text-sm drop-shadow">
+            {isPlaying ? `NA VRSTI: ${currentPlayerName}` : currentPlayerName}
+          </span>
+          {players === 2 && (
+            <span className="text-white/60 text-xs">
+              #{gameState.positions[gameState.currentPlayer] || 'START'}
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Interactive 3D Dice — bottom right */}
       <DiceRoller
         key={diceKey}
         isVisible={isPlaying}
