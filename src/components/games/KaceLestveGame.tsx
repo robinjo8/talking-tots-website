@@ -87,6 +87,8 @@ export function KaceLestveGame({
   const [pendingMove, setPendingMove] = useState<number | null>(null);
   const [currentWord, setCurrentWord] = useState<KaceLestveWord | null>(null);
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [pausedPhase, setPausedPhase] = useState<GamePhase | null>(null);
   
   // diceKey forces DiceRoller to remount each turn
   const [diceKey, setDiceKey] = useState(0);
@@ -310,6 +312,23 @@ export function KaceLestveGame({
     await checkForNewTrophy();
   }, [recordExerciseCompletion, logopedistChildId, checkForNewTrophy]);
 
+  const handleWordDialogClose = useCallback(() => {
+    setPausedPhase(phase as GamePhase);
+    setIsPaused(true);
+    setPhase('rolling');
+  }, [phase]);
+
+  const handleResume = useCallback(() => {
+    setIsPaused(false);
+    if (pausedPhase) setPhase(pausedPhase);
+  }, [pausedPhase]);
+
+  const handleEndGame = useCallback(() => {
+    setIsPaused(false);
+    setPausedPhase(null);
+    resetGame();
+  }, [resetGame]);
+
   const currentPlayerName = PLAYER_NAMES[gameState.currentPlayer];
 
   const playerData = Array.from({ length: players }, (_, i) => ({
@@ -463,7 +482,7 @@ export function KaceLestveGame({
         childId={childId}
         logopedistChildId={logopedistChildId}
         onResult={handleWordResult}
-        onClose={nextPlayer}
+        onClose={handleWordDialogClose}
       />
 
       {/* Snake challenge dialog */}
@@ -476,8 +495,32 @@ export function KaceLestveGame({
         childId={childId}
         logopedistChildId={logopedistChildId}
         onResult={handleSnakeChallengeResult}
-        onClose={() => handleSnakeChallengeResult(false)}
+        onClose={handleWordDialogClose}
       />
+
+      {/* Pause overlay */}
+      {isPaused && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl p-8 flex flex-col items-center gap-5 shadow-2xl min-w-[280px]">
+            <h2 className="text-3xl font-black text-gray-800 tracking-wide">PAVZA</h2>
+            <p className="text-gray-500 text-sm text-center">
+              {pausedPhase === "snake_challenge" ? "Izziv na kači je na pavzi" : "Izziv besede je na pavzi"}
+            </p>
+            <button
+              onClick={handleResume}
+              className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-full font-bold text-lg py-3 shadow-lg transition-all hover:scale-105"
+            >
+              ▶ NADALJUJ
+            </button>
+            <button
+              onClick={handleEndGame}
+              className="w-full bg-gradient-to-r from-red-400 to-red-500 hover:from-red-500 hover:to-red-600 text-white rounded-full font-bold text-lg py-3 shadow-lg transition-all hover:scale-105"
+            >
+              ✕ KONČAJ
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Success dialog */}
       <KaceLestveSuccessDialog
