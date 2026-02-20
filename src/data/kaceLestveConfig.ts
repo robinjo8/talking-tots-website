@@ -24,17 +24,18 @@ export const DIFFICULTY_BONUS: Record<KaceDifficulty, number> = {
 
 // Ladders: key = foot (start), value = top (end)
 export const LADDERS: Record<number, number> = {
-  3: 12,
+  3: 11,
   6: 18,
   15: 30,
-  26: 37,
+  26: 38,
 };
 
 // Snakes: key = head (start - higher number), value = tail (end - lower number)
 export const SNAKES: Record<number, number> = {
-  40: 31,
+  40: 34,
   21: 5,
-  24: 10,
+  24: 14,
+  34: 28,
 };
 
 // Words for sound C (middle/end position)

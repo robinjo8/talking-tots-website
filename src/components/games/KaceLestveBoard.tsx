@@ -66,11 +66,12 @@ interface ArrowOffsets {
 
 const ARROW_OFFSETS: Record<string, ArrowOffsets> = {
   // Ladders (blue, up)
-  "3-12":  { endX: 0.32 },    // end right of 12
+  "3-11":  { endX: 0.32 },    // end right of 11
   "15-30": { startX: 0.32 },  // start right of 15
   // Snakes (red, down)
-  "24-10": { endX: -0.32 },   // end left of 10
-  "40-31": { endX: -0.32 },   // end left of 31
+  "24-14": { endX: -0.32 },   // end left of 14
+  "40-34": { endX: -0.32 },   // end left of 34
+  "34-28": { endX: -0.32 },   // end left of 28
 };
 
 // Curved arrow in pixel space
@@ -343,7 +344,7 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
                     className="font-black text-yellow-900 text-center leading-tight"
                     style={{ fontSize: 'clamp(8px, 1.8vw, 15px)' }}
                   >
-                    🚀 ZAČETEK
+                    ZAČETEK
                   </span>
                 </div>
               )}
@@ -358,7 +359,7 @@ export function KaceLestveBoard({ players }: KaceLestveBoard2DProps) {
                   style={{ zIndex: 10, backgroundColor: '#FF6B35' }}
                 >
                   <img
-                    src={`${SUPABASE_URL}/slike/Cilj.webp`}
+                    src={`${SUPABASE_URL}/slike-ostalo/Cilj.webp`}
                     alt="Cilj"
                     className="w-full h-full object-contain"
                     style={{ padding: '4px' }}
