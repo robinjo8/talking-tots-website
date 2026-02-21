@@ -34,7 +34,7 @@ export const metKockeS: MetKockeLetterConfig = {
     { word: "slon", image: "slon1.webp", audio: "slon.m4a" },
     { word: "sova", image: "sova1.webp", audio: "sova.m4a" },
     { word: "snežak", image: "snezak1.webp", audio: "snezak.m4a" },
-    { word: "pes", image: "pes1.webp", audio: "pes.m4a" },
+    { word: "los", image: "los1.webp", audio: "los.m4a" },
     { word: "osa", image: "osa1.webp", audio: "osa.m4a" },
     { word: "ris", image: "ris1.webp", audio: "ris.m4a" },
   ],
