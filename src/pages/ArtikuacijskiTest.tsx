@@ -348,6 +348,7 @@ const ArtikuacijskiTest = () => {
             completedWords={completedWords}
             currentLetterIndex={currentLetterIndex}
             compact={dimensions?.isCompact}
+            wordsPerLetter={wordsPerLetter}
           />
         </div>
 

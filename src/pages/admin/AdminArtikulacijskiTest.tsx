@@ -366,6 +366,7 @@ export default function AdminArtikulacijskiTest() {
             completedWords={completedWords}
             currentLetterIndex={currentLetterIndex}
             compact={dimensions?.isCompact}
+            wordsPerLetter={wordsPerLetter}
           />
         </div>
 
