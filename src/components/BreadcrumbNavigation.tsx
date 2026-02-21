@@ -126,10 +126,11 @@ const breadcrumbConfig: BreadcrumbConfig[] = [
   { path: "/govornojezicovne-vaje", label: "Govorne vaje", parent: "/moje-aplikacije" },
   { path: "/govorno-jezikovne-vaje", label: "Govorne vaje", parent: "/moje-aplikacije" },
   { path: "/vaje-motorike-govoril", label: "Vaje motorike govoril", parent: "/moje-aplikacije" },
+  { path: "/govorno-jezikovne-vaje/artikulacija", label: "Moji prvi glasovi", parent: "/govorno-jezikovne-vaje" },
   { path: "/govorno-jezikovne-vaje/vaje-motorike-govoril", label: "Vaje motorike govoril", parent: "/govorno-jezikovne-vaje" },
   
   // Video navodila hierarchy
-  { path: "/video-navodila", label: "Video navodila", parent: "/moje-aplikacije" },
+  { path: "/video-navodila", label: "Video navodila", parent: "/govorno-jezikovne-vaje" },
   { path: "/video-navodila/c", label: "C", parent: "/video-navodila" },
   { path: "/video-navodila/ch", label: "Č", parent: "/video-navodila" },
   { path: "/video-navodila/k", label: "K", parent: "/video-navodila" },
