@@ -1,5 +1,5 @@
 // Generic Bingo game component for ArtikulacijaVaje (sredina/konec)
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Home, RefreshCw } from "lucide-react";
 import { useBingoGame } from "@/hooks/useBingoGame";
@@ -41,6 +41,7 @@ export function GenericBingoGame({ letter, displayLetter, title, wordsData, exer
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
   const { recordExerciseCompletion } = useEnhancedProgress();
   const { checkForNewTrophy } = useTrophyContext();
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Track window size for dynamic scaling
   useEffect(() => {
@@ -89,6 +90,25 @@ export function GenericBingoGame({ letter, displayLetter, title, wordsData, exer
       return () => clearTimeout(timer);
     }
   }, [gameComplete, winningLine, showCongratulations, showPopup, starClaimed]);
+
+  // Auto-play audio when reel stops on a word
+  useEffect(() => {
+    if (!isSpinning && drawnWord?.audio) {
+      const timer = setTimeout(() => {
+        const url = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${drawnWord.audio}`;
+        if (!audioRef.current) {
+          audioRef.current = new Audio();
+        }
+        const audio = audioRef.current;
+        audio.pause();
+        audio.currentTime = 0;
+        audio.src = url;
+        audio.load();
+        audio.play().catch(e => console.error("Bingo audio play failed:", e));
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isSpinning, drawnWord]);
 
   const handleBack = () => {
     setMenuOpen(false);
