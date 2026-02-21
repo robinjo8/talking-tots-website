@@ -1,5 +1,5 @@
 
-import { Activity, Award, Video, BookOpen, Home, Bell, CreditCard, User, Gamepad } from "lucide-react";
+import { Ear, Speech, Languages, BookOpen, Home, CreditCard, Settings } from "lucide-react";
 
 export interface NavigationLink {
   label: string;
@@ -18,15 +18,15 @@ export const navigationLinks: NavigationLink[] = [{
 }, {
   label: "Poslušanje",
   path: "/poslusanje",
-  icon: Bell
+  icon: Ear
 }, {
   label: "Govor",
   path: "/moje-aplikacije",
-  icon: Activity
+  icon: Speech
 }, {
   label: "Jezik",
   path: "/jezik",
-  icon: BookOpen
+  icon: Languages
 }, {
   label: "Moja stran",
   path: "/moja-stran",

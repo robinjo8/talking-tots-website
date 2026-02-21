@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Menu, LogOut, Home, Activity, BookOpen, Bell, CreditCard, User, Building2 } from "lucide-react";
+import { Menu, LogOut, Home, Speech, BookOpen, Ear, CreditCard, Settings, Building2, Languages } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ProfileSelector } from "./ProfileSelector";
 import { Profile } from "@/contexts/AuthContext";
@@ -183,7 +183,7 @@ export function MobileMenu({
                       className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/poslusanje') ? 'bg-accent' : ''}`} 
                       onClick={() => handleProtectedNavigate('/poslusanje')}
                     >
-                      <Bell className="h-4 w-4 mr-2" />
+                      <Ear className="h-4 w-4 mr-2" />
                       Poslušanje
                     </Button>
                     
@@ -193,7 +193,7 @@ export function MobileMenu({
                       className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/moje-aplikacije') ? 'bg-accent' : ''}`} 
                       onClick={() => handleProtectedNavigate('/moje-aplikacije')}
                     >
-                      <Activity className="h-4 w-4 mr-2" />
+                      <Speech className="h-4 w-4 mr-2" />
                       Govor
                     </Button>
 
@@ -203,7 +203,7 @@ export function MobileMenu({
                       className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/jezik') ? 'bg-accent' : ''}`} 
                       onClick={() => handleProtectedNavigate('/jezik')}
                     >
-                      <BookOpen className="h-4 w-4 mr-2" />
+                      <Languages className="h-4 w-4 mr-2" />
                       Jezik
                     </Button>
                     
@@ -224,7 +224,7 @@ export function MobileMenu({
                     
                     {/* Nastavitve */}
                     <Button variant="ghost" className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/profile') ? 'bg-accent' : ''}`} onClick={() => handleNavigate('/profile')}>
-                      <User className="h-4 w-4 mr-2" />
+                      <Settings className="h-4 w-4 mr-2" />
                       Nastavitve
                     </Button>
                     
