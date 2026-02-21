@@ -1,23 +1,29 @@
 
 
-## Zamenjava Drsne sestavljanke z Zabavno potjo v 90-dnevnem načrtu
+## Zamenjava ikon v navigaciji
 
-### Sprememba
+### Spremembe ikon
 
-**Datoteka: `supabase/functions/generate-monthly-plan/index.ts`**
+| Gumb | Trenutna ikona | Nova ikona |
+|------|---------------|------------|
+| Poslušanje | `Bell` (zvonček) | `Ear` (uho) |
+| Govor | `Activity` (graf) | `Speech` (govoreča glava) |
+| Jezik | `BookOpen` (knjiga) | `Languages` (jeziki) |
+| Nastavitve | `User` (oseba) | `Settings` (zobnik) |
 
-1. **Odstrani** igro "Drsna igra" iz seznama `AGE_GAMES` (vrstica 41)
-2. **Dodaj** igro "Zabavna pot" v seznam `NO_AGE_GAMES` (brez starostnega sufiksa):
-   ```
-   { name: "Zabavna pot", gameId: "kace", pathTemplate: "/govorne-igre/kace/{urlKey}" }
-   ```
+### Datoteke, ki se spremenijo
 
-Zabavna pot ne potrebuje starostnega ključa (`ageKey`), zato spada med `NO_AGE_GAMES` -- enako kot Labirint, Spomin itd.
+**1. `src/components/header/NavigationLinks.tsx`**
+- Zamenjaj `Bell` z `Ear` za Poslušanje
+- Zamenjaj `Activity` z `Speech` za Govor
+- Zamenjaj `BookOpen` z `Languages` za Jezik
 
-### Tehnični detajli
+**2. `src/components/header/MobileMenu.tsx`**
+- Zamenjaj `Bell` z `Ear` (vrstica 186)
+- Zamenjaj `Activity` z `Speech` (vrstica 196)
+- Zamenjaj `BookOpen` z `Languages` (vrstica 206)
+- Zamenjaj `User` z `Settings` za gumb Nastavitve (vrstica 227)
+- Posodobi import stavek
 
-- `AGE_GAMES` se zmanjša iz 4 na 3 igre (Sestavljanke, Zaporedja, Igra ujemanja)
-- `NO_AGE_GAMES` se poveča iz 6 na 7 iger
-- Skupno ostane 10 iger namesto prejšnjih 10 -- le zamenjava
-- Po spremembi je potreben deploy edge funkcije `generate-monthly-plan`
-- Obstoječi že generirani načrti se ne spremenijo; sprememba velja za nove načrte
+Vse ikone so del lucide-react knjiznice, zato ni potrebno namescati dodatnih paketov.
+
