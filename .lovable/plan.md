@@ -1,49 +1,55 @@
 
 
-## Popravek shranjevanja napredka pri preverjanju izgovorjave
+## Popravek: sessionNumber se ne sinhronizira pri nadaljevanju testa
 
 ### Problem
 
-V bazi je `current_word_index = 1` (po PAJEK), čeprav ste uspešno izgovorili tudi BIK in šli naprej na MIZO. To pomeni, da se shranjevanje napredka za BIK ni izvedlo, kljub temu da je bila transkripcija sprejeta.
+Ko uporabnik nadaljuje nedokončan test (klikne "Nadaljuj" v resume dialogu), se `sessionNumber` znotraj `useArticulationTestNew` hooka nikoli ne nastavi. To pomeni, da se napredek NE shranjuje v bazo, ker pogoj `if (childId && sessionNumber && onSaveProgress)` v `handleNext` vedno vrne `false`.
 
-Vzrok: shranjevanje napredka se izvede v `handleRecordingComplete` takoj po transkripciji, vendar to ne zagotavlja, da se je dejansko uspešno shranilo PREDEN uporabnik klikne "Naprej". Poleg tega se pri ponovnem snemanju iste besede (prvi poskus neuspešen, drugi uspešen) lahko pojavi težava s časovnim zaporedjem (race condition).
+Vzrok: `useState(fixedSessionNumber ?? null)` uporabi samo začetno vrednost. Na prvem renderju je `sessionInfo` še `null`, zato je `fixedSessionNumber` = `undefined` in `sessionNumber` ostane `null` za vedno.
 
-### Rešitev
+Pri novem testu to deluje, ker uporabnik zapre info dialog, kar pokliče `initializeSession()`, ki nastavi `sessionNumber`. Pri nadaljevanju pa se resume dialog zapre brez klica `initializeSession()`.
 
-Napredek se mora shraniti ob kliku na **"Naprej"** (v `handleNext`), ne pa ob koncu snemanja. To zagotavlja:
-1. Napredek se shrani šele ko uporabnik dejansko napreduje na naslednjo besedo
-2. Ni možnosti za izgubo napredka zaradi časovnih težav
-3. Deluje enako za 20-besedni (skupina 3-4) in 60-besedni test
+### Resitev
 
-### Spremembe
-
-**`src/hooks/useArticulationTestNew.ts`**:
-
-1. Odstrani shranjevanje iz `handleRecordingComplete` (vrstice 225-229)
-2. Dodaj shranjevanje v `handleNext` -- ko uporabnik klikne naprej, shrani trenutni indeks:
+Dodati `useEffect` v `useArticulationTestNew.ts` ki sinhronizira `sessionNumber` kadar se `fixedSessionNumber` prop spremeni:
 
 ```text
-// handleNext
-const handleNext = () => {
-  // Shrani napredek PRED premikom na naslednjo besedo
-  if (childId && sessionNumber && onSaveProgress) {
-    onSaveProgress(childId, sessionNumber, currentWordIndex);
+useEffect(() => {
+  if (fixedSessionNumber !== undefined && fixedSessionNumber !== null) {
+    setSessionNumber(fixedSessionNumber);
+    setSessionInitialized(true);
   }
-  
-  if (currentWordIndex < totalWords - 1) {
-    setCurrentWordIndex(currentWordIndex + 1);
-    // ...reset state
-  } else {
-    setIsTestComplete(true);
-  }
-};
+}, [fixedSessionNumber]);
 ```
 
-To pomeni: napredek se shrani vedno ko uporabnik klikne "Naprej", ne glede na to ali je bila transkripcija sprejeta ali ne (gumb "Naprej" je viden samo po snemanju). Velja za oba portala (uporabniški in admin), saj oba uporabljata isti hook.
+To se doda takoj za obstojecim `useEffect` za `startIndex` (vrstica 41-43).
+
+### Sprememba
+
+**`src/hooks/useArticulationTestNew.ts`** - dodaj useEffect za sinhronizacijo sessionNumber:
+
+Za obstojecim blokom:
+```text
+useEffect(() => {
+  setCurrentWordIndex(startIndex);
+}, [startIndex]);
+```
+
+Dodaj:
+```text
+useEffect(() => {
+  if (fixedSessionNumber !== undefined && fixedSessionNumber !== null) {
+    setSessionNumber(fixedSessionNumber);
+    setSessionInitialized(true);
+  }
+}, [fixedSessionNumber]);
+```
 
 ### Vpliv
 
-- Uporabniški portal: pravilno shranjevanje in nadaljevanje
-- Admin portal: ista logika, ista popravka
-- Dialog za nadaljevanje bo pravilno pokazal zadnjo izgovorjeno besedo
-- Nobena druga funkcionalnost se ne spremeni
+- Popravlja shranjevanje napredka pri nadaljevanju testa (resume)
+- Velja za 20-besedni test (skupina 3-4) in 60-besedni test
+- Ne vpliva na nove teste (tam ze deluje pravilno)
+- Ne vpliva na admin portal (uporablja drugacen flow)
+
