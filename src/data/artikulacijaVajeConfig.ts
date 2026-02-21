@@ -271,7 +271,7 @@ const bingoDataSSredinaKonec: BingoWordData[] = [
   { word: "NOS", image: "nos1.webp", audio: "nos.m4a" },
   { word: "OSA", image: "osa1.webp", audio: "osa.m4a" },
   { word: "PAS", image: "pas1.webp", audio: "pas.m4a" },
-  { word: "LOS", image: "los1.webp", audio: "los.m4a" },
+  { word: "LOS", image: "los.webp", audio: "los.m4a" },
   { word: "ZASLON", image: "zaslon1.webp", audio: "zaslon.m4a" },
   { word: "ZAVESA", image: "zavesa1.webp", audio: "zavesa.m4a" },
   { word: "LASJE", image: "lasje1.webp", audio: "lasje.m4a" },
