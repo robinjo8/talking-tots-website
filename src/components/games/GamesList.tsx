@@ -14,13 +14,24 @@ const otherGames = [
     imageScale: "90%"
   },
   {
-    id: "bingo",
-    title: "BINGO",
-    description: "Igraj bingo in vadi izgovorjavo glasov na sredini in koncu besed",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/bingo_nova_2.webp",
-    gradient: "from-dragon-green/20 to-app-teal/20",
+    id: "povezi-pare-matching",
+    title: "IGRA UJEMANJA",
+    description: "Poveži slike in vadi izgovorjavo glasov na začetku besed",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/igra_ujemanja_2.webp",
+    gradient: "from-app-purple/20 to-app-blue/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
-    path: "/govorne-igre/bingo",
+    path: "/govorne-igre/igra-ujemanja",
+    available: true,
+    imageScale: "90%"
+  },
+  {
+    id: "zaporedja",
+    title: "ZAPOREDJA",
+    description: "Uredi zaporedje slik in vadi izgovorjavo glasov na začetku besed",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/zaporedja_nova_2.webp",
+    gradient: "from-app-purple/20 to-app-blue/20",
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
+    path: "/govorne-igre/zaporedja",
     available: true,
     imageScale: "95%"
   },
@@ -36,28 +47,6 @@ const otherGames = [
     imageScale: "90%"
   },
   {
-    id: "sestavljanke",
-    title: "SESTAVLJANKE",
-    description: "Igraj sestavljanke in vadi izgovorjavo glasov na začetku besed",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/sestavljanka_nova_1.webp",
-    gradient: "from-app-teal/20 to-dragon-green/20",
-    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
-    path: "/govorne-igre/sestavljanke",
-    available: true,
-    imageScale: "85%"
-  },
-  {
-    id: "zaporedja",
-    title: "ZAPOREDJA",
-    description: "Uredi zaporedje slik in vadi izgovorjavo glasov na začetku besed",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/zaporedja_nova_2.webp",
-    gradient: "from-app-purple/20 to-app-blue/20",
-    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
-    path: "/govorne-igre/zaporedja",
-    available: true,
-    imageScale: "95%"
-  },
-  {
     id: "drsna-sestavljanka",
     title: "DRSNA IGRA",
     description: "Drsne sestavljanke za vajo izgovorjave glasov na začetku besed",
@@ -65,17 +54,6 @@ const otherGames = [
     gradient: "from-app-orange/20 to-app-yellow/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     path: "/govorne-igre/drsna-sestavljanka",
-    available: true,
-    imageScale: "90%"
-  },
-  {
-    id: "povezi-pare-matching",
-    title: "IGRA UJEMANJA",
-    description: "Poveži slike in vadi izgovorjavo glasov na začetku besed",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/igra_ujemanja_2.webp",
-    gradient: "from-app-purple/20 to-app-blue/20",
-    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
-    path: "/govorne-igre/igra-ujemanja",
     available: true,
     imageScale: "90%"
   },
@@ -91,15 +69,37 @@ const otherGames = [
     imageScale: "95%"
   },
   {
-    id: "met-kocke",
-    title: "SMEŠNE POVEDI",
-    description: "Sestavi smešne povedi in vadi izgovorjavo z glasovi na začetku, sredini in koncu besed",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/Smesne_besede_21.webp",
-    gradient: "from-app-purple/20 to-dragon-green/20",
+    id: "sestavljanke",
+    title: "SESTAVLJANKE",
+    description: "Igraj sestavljanke in vadi izgovorjavo glasov na začetku besed",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/sestavljanka_nova_1.webp",
+    gradient: "from-app-teal/20 to-dragon-green/20",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
-    path: "/govorne-igre/met-kocke",
+    path: "/govorne-igre/sestavljanke",
+    available: true,
+    imageScale: "85%"
+  },
+  {
+    id: "kace",
+    title: "ZABAVNA POT",
+    description: "Igraj zabavno pot ter vadi izgovorjavo glasov na sredini in koncu besed",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/kace_lestve_nova_2.webp",
+    gradient: "from-dragon-green/20 to-app-teal/20",
+    customBackground: "radial-gradient(ellipse at center, hsl(120, 60%, 95%) 0%, hsl(120, 50%, 88%) 30%, hsl(120, 45%, 78%) 60%, hsl(120, 40%, 68%) 100%)",
+    path: "/govorne-igre/kace",
     available: true,
     imageScale: "90%"
+  },
+  {
+    id: "bingo",
+    title: "BINGO",
+    description: "Igraj bingo in vadi izgovorjavo glasov na sredini in koncu besed",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/bingo_nova_2.webp",
+    gradient: "from-dragon-green/20 to-app-teal/20",
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
+    path: "/govorne-igre/bingo",
+    available: true,
+    imageScale: "95%"
   },
   {
     id: "ponovi-poved",
@@ -113,13 +113,13 @@ const otherGames = [
     imageScale: "85%"
   },
   {
-    id: "kace",
-    title: "ZABAVNA POT",
-    description: "Igraj zabavno pot ter vadi izgovorjavo glasov na sredini in koncu besed",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/kace_lestve_nova_2.webp",
-    gradient: "from-dragon-green/20 to-app-teal/20",
-    customBackground: "radial-gradient(ellipse at center, hsl(120, 60%, 95%) 0%, hsl(120, 50%, 88%) 30%, hsl(120, 45%, 78%) 60%, hsl(120, 40%, 68%) 100%)",
-    path: "/govorne-igre/kace",
+    id: "met-kocke",
+    title: "SMEŠNE POVEDI",
+    description: "Sestavi smešne povedi in vadi izgovorjavo z glasovi na začetku, sredini in koncu besed",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/Smesne_besede_21.webp",
+    gradient: "from-app-purple/20 to-dragon-green/20",
+    customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
+    path: "/govorne-igre/met-kocke",
     available: true,
     imageScale: "90%"
   },
