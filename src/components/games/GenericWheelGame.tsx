@@ -1,17 +1,18 @@
 // Generic Fortune Wheel game component for ArtikulacijaVaje
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Home, HelpCircle } from "lucide-react";
+import { Home } from "lucide-react";
 import { FortuneWheel } from "@/components/wheel/FortuneWheel";
 import { useFortuneWheel } from "@/hooks/useFortuneWheel";
-import { useWordProgress } from "@/hooks/useWordProgress";
 import { useTrophyContext } from "@/contexts/TrophyContext";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { WheelSuccessDialog } from "@/components/wheel/WheelSuccessDialog";
-import { ProgressModal } from "@/components/wheel/ProgressModal";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfirmationDialog";
+import { MemoryProgressIndicator } from "@/components/games/MemoryProgressIndicator";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,7 +33,10 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
   const [showInstructions, setShowInstructions] = useState(false);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
   const [showNewGameConfirmation, setShowNewGameConfirmation] = useState(false);
-  const [showProgressModal, setShowProgressModal] = useState(false);
+  const [showBravoDialog, setShowBravoDialog] = useState(false);
+  const [showBravoExitConfirm, setShowBravoExitConfirm] = useState(false);
+  const [starClaimed, setStarClaimed] = useState(false);
+  const [totalRepetitions, setTotalRepetitions] = useState(0);
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
 
   // Track window size for dynamic scaling
@@ -51,37 +55,53 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
   // Calculate dynamic scale factor based on viewport height
   const scaleFactor = useMemo(() => {
     if (windowSize.height === 0) return 1;
-    const baseHeight = 600; // wheel + title + padding
+    const baseHeight = 600;
     const availableHeight = windowSize.height - 120;
     const scale = Math.min(availableHeight / baseHeight, 1);
     return Math.max(0.7, scale);
   }, [windowSize.height]);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const wordsList = wordsData.map(w => w.word);
-  
   const { isSpinning, rotation, selectedWord, selectedIndex, showResult, spinWheel, resetWheel, closeResult } = useFortuneWheel({ wordsData });
-  const { progress, incrementProgress, getProgress, resetProgress, resetWordProgress } = useWordProgress(displayLetter, wordsList);
   const { checkForNewTrophy } = useTrophyContext();
   const { recordExerciseCompletion } = useEnhancedProgress();
 
   const handleBack = () => { setMenuOpen(false); setShowExitConfirmation(true); };
   const handleConfirmExit = () => { navigate(backPath); };
   const handleNewGame = () => { setMenuOpen(false); setShowNewGameConfirmation(true); };
-  const handleConfirmNewGame = () => { resetWheel(); resetProgress(); setShowNewGameConfirmation(false); };
+  const handleConfirmNewGame = () => { resetWheel(); setTotalRepetitions(0); setShowNewGameConfirmation(false); };
   const handleInstructions = () => { setMenuOpen(false); setShowInstructions(true); };
-  const handleRecordComplete = () => { if (selectedWord) incrementProgress(selectedWord.word); };
-  const handleStarClaimed = async () => { 
-    // Record star to Supabase
+  
+  const handleRecordComplete = () => {
+    const newCount = totalRepetitions + 1;
+    setTotalRepetitions(newCount);
+    if (newCount >= 10) {
+      // Small delay to let the success dialog close first
+      setTimeout(() => {
+        setShowBravoDialog(true);
+      }, 700);
+    }
+  };
+
+  const handleStarClaimed = async () => {
+    setStarClaimed(true);
     recordExerciseCompletion(`kolo-besed-${letter}`);
-    if (selectedWord) resetWordProgress(selectedWord.word); 
-    closeResult(); 
-    // Check for trophy after claiming star
+    setTimeout(() => {
+      setShowBravoDialog(false);
+      setStarClaimed(false);
+      setTotalRepetitions(0);
+    }, 1500);
     await new Promise(resolve => setTimeout(resolve, 500));
     await checkForNewTrophy();
   };
 
-  const currentWordProgress = selectedWord ? getProgress(selectedWord.word) : 0;
+  const handleBravoClose = () => {
+    if (!starClaimed) {
+      setShowBravoExitConfirm(true);
+    } else {
+      setShowBravoDialog(false);
+    }
+  };
 
   return (
     <div 
@@ -97,9 +117,10 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
         className="min-h-full flex flex-col items-center justify-center p-4 pb-24"
         style={{ transform: `scale(${scaleFactor})`, transformOrigin: 'center center' }}
       >
-        <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 md:mb-8 text-center drop-shadow-lg">
+        <h1 className="text-3xl md:text-5xl font-bold text-white mb-2 md:mb-4 text-center drop-shadow-lg">
           {title}
         </h1>
+        <MemoryProgressIndicator matchedPairs={totalRepetitions} totalPairs={10} className="mb-4" />
         <FortuneWheel
           segmentCount={wordsData.length} 
           rotation={rotation} 
@@ -128,31 +149,54 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
         </DropdownMenuContent>
       </DropdownMenu>
 
-
-      <button 
-        onClick={() => setShowProgressModal(true)} 
-        className="fixed bottom-4 right-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
-      >
-        <HelpCircle className="w-8 h-8 text-white" />
-      </button>
-
       {selectedWord && (
         <WheelSuccessDialog 
           isOpen={showResult} 
           onOpenChange={(open) => { if (!open) closeResult(); }} 
           completedImage={{ filename: selectedWord.image, word: selectedWord.word, audio: selectedWord.audio }} 
-          pronunciationCount={currentWordProgress} 
           onRecordComplete={handleRecordComplete} 
-          onStarClaimed={handleStarClaimed} 
         />
       )}
-      
-      <ProgressModal 
-        isOpen={showProgressModal} 
-        onClose={() => setShowProgressModal(false)} 
-        words={wordsData} 
-        progress={progress} 
-        letter={displayLetter} 
+
+      {/* BRAVO dialog */}
+      <Dialog open={showBravoDialog} onOpenChange={handleBravoClose}>
+        <DialogContent 
+          className="sm:max-w-md" 
+          onPointerDownOutside={(e) => e.preventDefault()}
+        >
+          <div className="space-y-6 py-6 flex flex-col items-center">
+            <h1 className="text-5xl font-bold text-dragon-green text-center">
+              BRAVO!
+            </h1>
+            <img
+              src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_11.webp"
+              alt="Zmajček"
+              className="w-48 h-48 object-contain"
+            />
+            <Button
+              onClick={handleStarClaimed}
+              disabled={starClaimed}
+              className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 px-8 text-lg"
+            >
+              ⭐ VZEMI ZVEZDICO
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <ConfirmDialog
+        open={showBravoExitConfirm}
+        onOpenChange={setShowBravoExitConfirm}
+        title="OPOZORILO"
+        description="ALI RES ŽELIŠ ZAPRETI OKNO? NE BOŠ PREJEL ZVEZDICE."
+        confirmText="DA"
+        cancelText="NE"
+        onConfirm={() => {
+          setShowBravoExitConfirm(false);
+          setShowBravoDialog(false);
+          setTotalRepetitions(0);
+        }}
+        onCancel={() => setShowBravoExitConfirm(false)}
       />
       
       <InstructionsModal 
