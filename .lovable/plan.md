@@ -1,58 +1,49 @@
 
 
-## Ponastavitev preverjanja izgovorjave za kujavec.robert@gmail.com
+## Popravek shranjevanja napredka pri preverjanju izgovorjave
 
-### Kaj bomo izbrisali
+### Problem
 
-Za otroka **Zak** (child_id: `20b69ea2-f58b-4ac5-8baf-d5c5fcefe3c8`) je treba ponastaviti vse podatke povezane s sejo `508fdcdd-1d1e-4478-bb1b-97a7cc6cb1f7`:
+V bazi je `current_word_index = 1` (po PAJEK), čeprav ste uspešno izgovorili tudi BIK in šli naprej na MIZO. To pomeni, da se shranjevanje napredka za BIK ni izvedlo, kljub temu da je bila transkripcija sprejeta.
 
-| Podatek | Stevilo zapisov |
-|---------|----------------|
-| articulation_word_results | 22 zapisov |
-| articulation_evaluations | 1 zapis |
-| notifications (za to sejo) | 1 zapis |
-| articulation_test_sessions | 1 seja |
-| Audio posnetki v Storage | mapa Seja-1 |
+Vzrok: shranjevanje napredka se izvede v `handleRecordingComplete` takoj po transkripciji, vendar to ne zagotavlja, da se je dejansko uspešno shranilo PREDEN uporabnik klikne "Naprej". Poleg tega se pri ponovnem snemanju iste besede (prvi poskus neuspešen, drugi uspešen) lahko pojavi težava s časovnim zaporedjem (race condition).
 
-### Koraki izvedbe
+### Rešitev
 
-**1. Brisanje word results** (22 zapisov)
+Napredek se mora shraniti ob kliku na **"Naprej"** (v `handleNext`), ne pa ob koncu snemanja. To zagotavlja:
+1. Napredek se shrani šele ko uporabnik dejansko napreduje na naslednjo besedo
+2. Ni možnosti za izgubo napredka zaradi časovnih težav
+3. Deluje enako za 20-besedni (skupina 3-4) in 60-besedni test
+
+### Spremembe
+
+**`src/hooks/useArticulationTestNew.ts`**:
+
+1. Odstrani shranjevanje iz `handleRecordingComplete` (vrstice 225-229)
+2. Dodaj shranjevanje v `handleNext` -- ko uporabnik klikne naprej, shrani trenutni indeks:
+
 ```text
-DELETE FROM articulation_word_results 
-WHERE session_id = '508fdcdd-...'
+// handleNext
+const handleNext = () => {
+  // Shrani napredek PRED premikom na naslednjo besedo
+  if (childId && sessionNumber && onSaveProgress) {
+    onSaveProgress(childId, sessionNumber, currentWordIndex);
+  }
+  
+  if (currentWordIndex < totalWords - 1) {
+    setCurrentWordIndex(currentWordIndex + 1);
+    // ...reset state
+  } else {
+    setIsTestComplete(true);
+  }
+};
 ```
 
-**2. Brisanje evaluations** (1 zapis)
-```text
-DELETE FROM articulation_evaluations 
-WHERE session_id = '508fdcdd-...'
-```
+To pomeni: napredek se shrani vedno ko uporabnik klikne "Naprej", ne glede na to ali je bila transkripcija sprejeta ali ne (gumb "Naprej" je viden samo po snemanju). Velja za oba portala (uporabniški in admin), saj oba uporabljata isti hook.
 
-**3. Brisanje notifications** (1 zapis)
-```text
-DELETE FROM notifications 
-WHERE related_session_id = '508fdcdd-...'
-```
+### Vpliv
 
-**4. Brisanje seje** (1 zapis)
-```text
-DELETE FROM articulation_test_sessions 
-WHERE id = '508fdcdd-...'
-```
-
-**5. Brisanje audio posnetkov iz Storage**
-- Bucket: `uporabniski-profili`
-- Pot: `629a649f-15fb-44f8-b6f1-6be93ceac221/20b69ea2-f58b-4ac5-8baf-d5c5fcefe3c8/Preverjanje-izgovorjave/Seja-1/`
-- Vse datoteke v tej mapi bodo izbrisane
-
-### Kaj to pomeni
-
-- Ko se uporabnik naslednjic prijavi in zacne preverjanje, se ustvari nova seja od zacetka (beseda 0)
-- Nobeden drug uporabnik ali otrok ni prizadet
-- Na admin portalu ne bo vec vidne te seje
-- Vse ostale funkcionalnosti ostanejo nespremenjene
-
-### Tehnicni detajli
-
-Brisanje se izvede z SQL ukazi prek insert orodja (za podatke) in s Supabase Storage API (za datoteke). Vrstni red brisanja je pomemben zaradi morebitnih odvisnosti med tabelami (najprej word_results in evaluations, nato seja).
-
+- Uporabniški portal: pravilno shranjevanje in nadaljevanje
+- Admin portal: ista logika, ista popravka
+- Dialog za nadaljevanje bo pravilno pokazal zadnjo izgovorjeno besedo
+- Nobena druga funkcionalnost se ne spremeni
