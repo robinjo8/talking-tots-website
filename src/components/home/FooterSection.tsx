@@ -36,7 +36,7 @@ export const FooterSection = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
           {/* MOJE APLIKACIJE */}
           <div>
-            <h4 className="font-bold text-foreground mb-4">MOJE APLIKACIJE</h4>
+            <h4 className="font-bold text-foreground mb-4">GOVOR</h4>
             <ul className="space-y-2">
               <li>
                 <button 

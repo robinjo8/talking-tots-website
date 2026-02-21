@@ -20,7 +20,9 @@ interface BreadcrumbConfig {
 const breadcrumbConfig: BreadcrumbConfig[] = [
   { path: "/", label: "Domov" },
   { path: "/moja-stran", label: "Moja stran", parent: "/" },
-  { path: "/moje-aplikacije", label: "Moje aplikacije", parent: "/" },
+  { path: "/moje-aplikacije", label: "Govor", parent: "/" },
+  { path: "/poslusanje", label: "Poslušanje", parent: "/" },
+  { path: "/jezik", label: "Jezik", parent: "/" },
   { path: "/profile", label: "Nastavitve", parent: "/" },
   { path: "/moji-izzivi", label: "Moj osebni načrt", parent: "/" },
   { path: "/moji-izzivi/arhiv", label: "Pretekli dnevi", parent: "/moji-izzivi" },
