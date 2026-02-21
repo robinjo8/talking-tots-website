@@ -42,6 +42,14 @@ export const useArticulationTestNew = (
     setCurrentWordIndex(startIndex);
   }, [startIndex]);
 
+  // Sync sessionNumber when fixedSessionNumber prop changes (e.g., on resume)
+  useEffect(() => {
+    if (fixedSessionNumber !== undefined && fixedSessionNumber !== null) {
+      setSessionNumber(fixedSessionNumber);
+      setSessionInitialized(true);
+    }
+  }, [fixedSessionNumber]);
+
   // Sort articulation data by phonetic order and filter words per letter
   const sortedArticulationData = useMemo(() => {
     return [...articulationData]
