@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Menu, LogOut, Home, Speech, BookOpen, Ear, CreditCard, Settings, Building2, Languages } from "lucide-react";
+import { Menu, LogOut, Home, Speech, BookOpen, Ear, CreditCard, Settings, Building2, ALargeSmall } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ProfileSelector } from "./ProfileSelector";
 import { Profile } from "@/contexts/AuthContext";
@@ -203,7 +203,7 @@ export function MobileMenu({
                       className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/jezik') ? 'bg-accent' : ''}`} 
                       onClick={() => handleProtectedNavigate('/jezik')}
                     >
-                      <Languages className="h-4 w-4 mr-2" />
+                      <ALargeSmall className="h-4 w-4 mr-2" />
                       Jezik
                     </Button>
                     

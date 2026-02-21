@@ -1,5 +1,5 @@
 
-import { Ear, Speech, Languages, BookOpen, Home, CreditCard, Settings } from "lucide-react";
+import { Ear, Speech, ALargeSmall, BookOpen, Home, CreditCard, Settings } from "lucide-react";
 
 export interface NavigationLink {
   label: string;
@@ -26,7 +26,7 @@ export const navigationLinks: NavigationLink[] = [{
 }, {
   label: "Jezik",
   path: "/jezik",
-  icon: Languages
+  icon: ALargeSmall
 }, {
   label: "Moja stran",
   path: "/moja-stran",
