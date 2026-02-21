@@ -123,7 +123,7 @@ export const articulationData: LetterGroup[] = [
     words: [
       { text: "SOK", image: "sok1.webp", audio: "sok.m4a", acceptedVariants: ["SOK", "ŠOK", "ZOK", "TOK", "SOK!", "SOK?", "SO", "SOK-", "SOKA", "SOKI", "SOT", "ŠOT", "OK"] },
       { text: "OSA", image: "osa1.webp", audio: "osa.m4a", acceptedVariants: ["OSA", "OZA", "OŠA", "OLA", "OSA!", "OSA?", "OSE", "OSa", "OSA-", "OSAA", "OTA"] },
-      { text: "LOS", image: "los1.webp", audio: "los.m4a", acceptedVariants: ["LOS", "LOŠ", "LOZ", "LOT", "KOS", "MOS", "LOSA", "LOSI", "LOSU", "LOS!", "OS", "LOB"] },
+      { text: "LOS", image: "los.webp", audio: "los.m4a", acceptedVariants: ["LOS", "LOŠ", "LOZ", "LOT", "KOS", "MOS", "LOSA", "LOSI", "LOSU", "LOS!", "OS", "LOB"] },
     ]
   },
   {
