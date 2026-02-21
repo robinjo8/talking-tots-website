@@ -54,15 +54,6 @@ export function ActivityOptions() {
       gradient: 'from-app-purple/20 to-app-teal/20',
       badge: '🎯',
       url: '/artikulacijski-test'
-    },
-    {
-      id: 'advice',
-      title: 'Logopedski nasveti',
-      description: 'Koristni nasveti in informacije o govornem razvoju.',
-      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_logoped_4.png',
-      gradient: 'from-app-purple/20 to-app-blue/20',
-      badge: '💡',
-      url: '/logopedski-koticek'
     }
   ];
 
