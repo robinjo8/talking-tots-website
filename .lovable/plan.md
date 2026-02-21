@@ -1,23 +1,17 @@
 
+## Samodejno predvajanje zvoka po ustavitvi koluta v igri Bingo
 
-## Popravek navigacijskih poti (breadcrumb) za kartice na strani /govorno-jezikovne-vaje
+### Kaj se spremeni
+Ko se kolut v igri Bingo ustavi na doloceni besedi, se njen zvocni posnetek samodejno predvaja. To velja za vse Bingo igre na poti `/govorne-igre/bingo/*`.
 
-### Problem
-Tri kartice na strani `/govorno-jezikovne-vaje` imajo napacne ali manjkajoce navigacijske poti:
+### Sprememba
 
-| Kartica | Pot | Trenutna navigacija | Pravilna navigacija |
-|---|---|---|---|
-| Video navodila | `/video-navodila` | Domov > Moje aplikacije > Video navodila | Domov > Moje aplikacije > Govorne vaje > Video navodila |
-| Moji prvi glasovi | `/govorno-jezikovne-vaje/artikulacija` | Ni definirano (breadcrumb se ne prikaze ali prikaze napacno) | Domov > Moje aplikacije > Govorne vaje > Moji prvi glasovi |
-| Vaje motorike govoril | `/govorno-jezikovne-vaje/vaje-motorike-govoril` | Pravilno (ze ima parent `/govorno-jezikovne-vaje`) | Brez sprememb |
+**Datoteka: `src/components/games/GenericBingoGame.tsx`**
 
-### Spremembe
+- Dodati `useEffect`, ki posluša spremembo `isSpinning` in `drawnWord`
+- Ko `isSpinning` postane `false` in `drawnWord` ni `null`, predvajati zvok iz URL-ja:
+  `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/{drawnWord.audio}`
+- Uporabiti `useRef<HTMLAudioElement>` za predvajanje (enostaven pristop, ki deluje tudi na mobilnih napravah)
+- Kratek zamik (~300ms) po ustavitvi koluta, da je prehod bolj naraven
 
-**Datoteka: `src/components/BreadcrumbNavigation.tsx`**
-
-1. Spremeniti parent pri `/video-navodila` iz `"/moje-aplikacije"` v `"/govorno-jezikovne-vaje"`
-2. Dodati nov vnos za `/govorno-jezikovne-vaje/artikulacija` z labelom `"Moji prvi glasovi"` in parentom `"/govorno-jezikovne-vaje"`
-
-Po popravku bodo vse tri kartice imele pravilno pot:
-- Domov > Moje aplikacije > Govorne vaje > [ime kartice]
-
+Nobena druga datoteka se ne spreminja -- `BingoWordData` ze vsebuje polje `audio` z imenom datoteke (npr. `"cesta.m4a"`).
