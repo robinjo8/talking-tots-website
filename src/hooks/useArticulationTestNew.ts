@@ -222,25 +222,25 @@ export const useArticulationTestNew = (
         matchType: result.matchType,
       });
 
-      // Če je transkripcija uspela, shrani napredek TAKOJ
-      // current_word_index = zadnja uspešno izgovorjena beseda
-      if (result.accepted && childId && sessionNumber && onSaveProgress) {
-        onSaveProgress(childId, sessionNumber, currentWordIndex);
-      }
+      // Napredek se NE shranjuje tukaj - shrani se v handleNext
     }
 
     setHasRecorded(true);
   };
 
-  // Handle next word - NE shranjuj napredka tukaj, shrani se ob uspešnem snemanju
+  // Handle next word - shrani napredek ob kliku na "Naprej"
   const handleNext = () => {
+    // Shrani napredek PRED premikom na naslednjo besedo
+    if (childId && sessionNumber && onSaveProgress) {
+      onSaveProgress(childId, sessionNumber, currentWordIndex);
+    }
+
     if (currentWordIndex < totalWords - 1) {
       const nextIndex = currentWordIndex + 1;
       setCurrentWordIndex(nextIndex);
       setHasRecorded(false);
       setTranscriptionResult(null);
       resetTranscription();
-      // Napredek se NE shranjuje tukaj - shrani se v handleRecordingComplete
     } else {
       // Test is complete
       setIsTestComplete(true);
