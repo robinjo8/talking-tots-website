@@ -39,80 +39,26 @@ const GovornojezicovneVaje = () => {
     color: "text-app-purple",
     gradient: "from-app-purple/10 to-app-blue/10",
     path: "/govorno-jezikovne-vaje/vaje-motorike-govoril",
-    example: "Primer: gibanje jezika gor, dol, lažkamo in razpiranje.",
+    example: "",
     available: true
   }, {
-    id: "motnja-izreke",
-    title: "VAJE ZA IZGOVORJAVO GLASOV",
-    description: "Otroci se spopadajo z napačno izreko posebnih glasov, ki jih v vsakjih osvojil samoli ali ob podporo.",
+    id: "moji-prvi-glasovi",
+    title: "MOJI PRVI GLASOVI",
+    description: "Zabavna animacija, ki otroke uči prepoznavati in posnemati glasove. Barviti liki in interaktivni prizori spodbujajo poslušanje, ponavljanje in igro z glasovi, kar krepi govor in fonološke sposobnosti.",
     color: "text-app-orange",
     gradient: "from-app-orange/10 to-app-yellow/10",
     path: "/govorno-jezikovne-vaje/artikulacija",
-    example: "Primer: \"hibe\" namesto \"ribi\", \"Šupe\" namesto \"žabe\".",
+    example: "",
     available: true
   }, {
-    id: "motnja-ritma-tempa",
-    title: "MOTNJA RITMA IN TEMPA GOVORA",
-    description: "Govorna hitkoživost ali prelepima \"Žadlč\" na ni matrial, \"neustralnih\" čaširi govornih rezi besedami.",
-    color: "text-dragon-green",
-    gradient: "from-dragon-green/10 to-app-teal/10",
-    path: "/govorno-jezikovne-vaje/motnja-ritma-tempa",
+    id: "video-navodila",
+    title: "VIDEO NAVODILA",
+    description: "Video navodila logopeda za pravilno izgovorjavo posameznih glasov. Kratki posnetki prikazujejo položaj govoril in tehniko izgovorjave.",
+    color: "text-app-teal",
+    gradient: "from-app-teal/10 to-dragon-green/10",
+    path: "/video-navodila",
     example: "",
-    available: false
-  }, {
-    id: "sibek-besedni-zaklad",
-    title: "ŠIBEK BESEDNI ZAKLAD",
-    description: "Otrok pozna premalo besed za svojo starost. Pogosto uporablja imate besede ali ne več poimenovane predmeinte, čustev, dejanj ipd.",
-    color: "text-app-blue",
-    gradient: "from-app-blue/10 to-app-purple/10",
-    path: "/govorno-jezikovne-vaje/sibek-besedni-zaklad",
-    example: "",
-    available: false
-  }, {
-    id: "neustrezna-dolzina-struktura",
-    title: "NEUSTREZNA DOLŽINA IN STRUKTURA STAVKA",
-    description: "Otrok tvori prekratke stavke ali neustrezno postavlja besede.",
-    color: "text-app-purple",
-    gradient: "from-app-purple/10 to-app-blue/10",
-    path: "/govorno-jezikovne-vaje/neustrezna-dolzina-struktura",
-    example: "Primer: \"za pač imarada\" namesto \"Jaz grem v park\".",
-    available: false
-  }, {
-    id: "slovnicno-neustrezni-stavki",
-    title: "SLOVNIČNO NEUSTREZNI ALI SKOPI STAVKI",
-    description: "Otrok ne uporablja stavčnih začetkov, napačno spregathe.",
-    color: "text-dragon-green",
-    gradient: "from-dragon-green/10 to-app-teal/10",
-    path: "/govorno-jezikovne-vaje/slovnicno-neustrezni-stavki",
-    example: "Primer: \"Jaz ni grem\"",
-    available: false
-  }, {
-    id: "napacna-raba-koncnic",
-    title: "NAPAČNA RABA BESEDNIH KONČNIC",
-    description: "Otrok nepravilno skli, imiento ali skipa.",
-    color: "text-app-orange",
-    gradient: "from-app-orange/10 to-app-yellow/10",
-    path: "/govorno-jezikovne-vaje/napacna-raba-koncnic",
-    example: "Primer: \"Mama reka\" namesto \"Mama je rekla\".",
-    available: false
-  }, {
-    id: "napacna-raba-besed",
-    title: "NAPAČNA RABA BESED PRI SPOROČANJU",
-    description: "Otrok uporablja napačne ali njasne besede.",
-    color: "text-app-blue",
-    gradient: "from-app-blue/10 to-app-purple/10",
-    path: "/govorno-jezikovne-vaje/napacna-raba-besed",
-    example: "Primer: \"Tisto tam je potrebe dol\" namesto \"Kozarec je pod j mizo\".",
-    available: false
-  }, {
-    id: "slaba-sposobnost-zavedanja",
-    title: "SLABA SPOSOBNOST ZAVEDANJA IN LOČEVANJA GLASOV",
-    description: "Otrok težje slišl razlike med podobnimi glasovi. Pogosto vidi v besede ena konni, glasovi za odistavci.",
-    color: "text-dragon-green",
-    gradient: "from-dragon-green/10 to-app-teal/10",
-    path: "/govorno-jezikovne-vaje/slaba-sposobnost-zavedanja",
-    example: "",
-    available: false
+    available: true
   }];
   return (
     <div className="min-h-screen bg-background">

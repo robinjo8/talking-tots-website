@@ -56,15 +56,6 @@ export function ActivityOptions() {
       url: '/artikulacijski-test'
     },
     {
-      id: 'video',
-      title: 'Video navodila',
-      description: 'Poglej kako logoped pravilno izgovori posamezne črke.',
-      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/Zmajcek_video_7.png',
-      gradient: 'from-app-teal/20 to-dragon-green/20',
-      badge: '🎥',
-      url: '/video-navodila'
-    },
-    {
       id: 'advice',
       title: 'Logopedski nasveti',
       description: 'Koristni nasveti in informacije o govornem razvoju.',
