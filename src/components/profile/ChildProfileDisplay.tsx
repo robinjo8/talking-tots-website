@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { UserRound, Pencil, Trash2, ChevronDown } from "lucide-react";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { SPEECH_DEVELOPMENT_QUESTIONS, SPEECH_DEVELOPMENT_TEXT_QUESTIONS } from "@/models/SpeechDevelopment";
 import { SPEECH_DIFFICULTIES } from "@/models/SpeechDifficulties";
@@ -104,7 +105,11 @@ export function ChildProfileDisplay({
               <Button 
                 variant="ghost" 
                 size="icon" 
-                onClick={onDelete}
+                onClick={() => {
+                  toast.info("Če želite odstraniti otroški profil, se za pomoč prosim obrnite na našo podporno ekipo prek e-pošte info@tomitalk.si", {
+                    duration: 8000,
+                  });
+                }}
                 className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
               >
                 <Trash2 className="h-4 w-4" />
