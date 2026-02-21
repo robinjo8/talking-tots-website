@@ -114,13 +114,13 @@ const KakoDeluje = () => {
             </ul>
           </section>
 
-          {/* 3. Stran »Moje aplikacije« */}
+          {/* 3. Stran »Govor« */}
           <section>
             <h2 className="text-2xl font-semibold text-foreground mb-4">
-              3. Stran »Moje aplikacije«
+              3. Stran »Govor«
             </h2>
             <p className="text-muted-foreground leading-relaxed">
-              Stran Moje aplikacije je osrednje mesto v aplikaciji TomiTalk, kjer ima uporabnik dostop do vseh glavnih vsebinskih sklopov, prilagojenih izbranemu otroškemu profilu.
+              Stran Govor je osrednje mesto v aplikaciji TomiTalk, kjer ima uporabnik dostop do vseh glavnih vsebinskih sklopov, prilagojenih izbranemu otroškemu profilu.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-4">
               Na tej strani se nahajajo naslednji razdelki:
@@ -134,7 +134,7 @@ const KakoDeluje = () => {
               <li><strong>Logopedski nasveti</strong> – Strokovni nasveti in usmeritve za starše, ki podpirajo govorni razvoj otroka doma.</li>
             </ul>
             <p className="text-muted-foreground leading-relaxed mt-4">
-              Vse vsebine na strani Moje aplikacije se samodejno prilagajajo izbranemu otroškemu profilu, kar omogoča ciljno, varno in razvojno ustrezno uporabo aplikacije.
+              Vse vsebine na strani Govor se samodejno prilagajajo izbranemu otroškemu profilu, kar omogoča ciljno, varno in razvojno ustrezno uporabo aplikacije.
             </p>
           </section>
 

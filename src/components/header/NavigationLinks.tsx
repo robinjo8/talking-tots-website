@@ -16,9 +16,17 @@ export const navigationLinks: NavigationLink[] = [{
   path: "/logopedski-koticek",
   icon: BookOpen
 }, {
-  label: "Moje aplikacije",
+  label: "Poslušanje",
+  path: "/poslusanje",
+  icon: Bell
+}, {
+  label: "Govor",
   path: "/moje-aplikacije",
   icon: Activity
+}, {
+  label: "Jezik",
+  path: "/jezik",
+  icon: BookOpen
 }, {
   label: "Moja stran",
   path: "/moja-stran",

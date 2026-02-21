@@ -61,10 +61,6 @@ export default function Header() {
     navigate("/moje-aplikacije");
   };
 
-  // Cenik navigation handler
-  const handleCenikNavigate = () => {
-    navigate("/cenik");
-  };
   const handleSignOut = async () => {
     await signOut();
     window.location.href = "/login";
@@ -74,7 +70,7 @@ export default function Header() {
     <div className="fixed top-0 left-0 right-0 z-50">
       <header className="py-4 px-4 md:px-10 w-full bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
         {/* Desktop layout - rendered as proper component */}
-        <DesktopNavigation user={user} onStartNow={handleStartNow} onCenikNavigate={handleCenikNavigate} />
+        <DesktopNavigation user={user} onStartNow={handleStartNow} />
 
         {/* Mobile layout - logo left, profile right */}
         <div className="lg:hidden flex items-center justify-between w-full">
@@ -96,7 +92,7 @@ export default function Header() {
           </Link>
           
           {/* Mobile menu and profile on far right */}
-          <MobileMenu user={user} profile={profile} selectedChild={selectedChild} onSignOut={handleSignOut} onStartNow={handleStartNow} onCenikNavigate={handleCenikNavigate} />
+          <MobileMenu user={user} profile={profile} selectedChild={selectedChild} onSignOut={handleSignOut} onStartNow={handleStartNow} />
         </div>
       </header>
       <MissingChildBanner />

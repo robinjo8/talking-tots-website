@@ -16,7 +16,6 @@ interface MobileMenuProps {
   selectedChild: any;
   onSignOut: () => void;
   onStartNow: () => void;
-  onCenikNavigate: () => void;
 }
 export function MobileMenu({
   user,
@@ -24,7 +23,6 @@ export function MobileMenu({
   selectedChild,
   onSignOut,
   onStartNow,
-  onCenikNavigate
 }: MobileMenuProps) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -116,11 +114,6 @@ export function MobileMenu({
   };
   // Note: isOpen state is declared at the top of the component
 
-  const handleCenikClick = () => {
-    setIsOpen(false);
-    onCenikNavigate();
-  };
-
   return <div className="lg:hidden flex items-center gap-2">
       {/* Notification bell - only for logged in users */}
       {user && <UserNotificationBell />}
@@ -178,6 +171,42 @@ export function MobileMenu({
                   <div className="space-y-3">
                     <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Navigacija</h3>
                     
+                    {/* Logopedski nasveti */}
+                    <Button variant="ghost" className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/logopedski-koticek') ? 'bg-accent' : ''}`} onClick={() => handleNavigate('/logopedski-koticek')}>
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      Logopedski nasveti
+                    </Button>
+
+                    {/* Poslušanje */}
+                    <Button 
+                      variant="ghost" 
+                      className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/poslusanje') ? 'bg-accent' : ''}`} 
+                      onClick={() => handleProtectedNavigate('/poslusanje')}
+                    >
+                      <Bell className="h-4 w-4 mr-2" />
+                      Poslušanje
+                    </Button>
+                    
+                    {/* Govor */}
+                    <Button 
+                      variant="ghost" 
+                      className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/moje-aplikacije') ? 'bg-accent' : ''}`} 
+                      onClick={() => handleProtectedNavigate('/moje-aplikacije')}
+                    >
+                      <Activity className="h-4 w-4 mr-2" />
+                      Govor
+                    </Button>
+
+                    {/* Jezik */}
+                    <Button 
+                      variant="ghost" 
+                      className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/jezik') ? 'bg-accent' : ''}`} 
+                      onClick={() => handleProtectedNavigate('/jezik')}
+                    >
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      Jezik
+                    </Button>
+                    
                     {/* Moja stran */}
                     <Button 
                       variant="ghost" 
@@ -186,22 +215,6 @@ export function MobileMenu({
                     >
                       <Home className="h-4 w-4 mr-2" />
                       Moja stran
-                    </Button>
-                    
-                    {/* Moje aplikacije */}
-                    <Button 
-                      variant="ghost" 
-                      className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/moje-aplikacije') ? 'bg-accent' : ''}`} 
-                      onClick={() => handleProtectedNavigate('/moje-aplikacije')}
-                    >
-                      <Activity className="h-4 w-4 mr-2" />
-                      Moje aplikacije
-                    </Button>
-                    
-                    {/* Logopedski nasveti */}
-                    <Button variant="ghost" className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/logopedski-koticek') ? 'bg-accent' : ''}`} onClick={() => handleNavigate('/logopedski-koticek')}>
-                      <BookOpen className="h-4 w-4 mr-2" />
-                      Logopedski nasveti
                     </Button>
                   </div>
                   
@@ -225,11 +238,6 @@ export function MobileMenu({
                     
                     {/* Obvestila - removed, now in header bell */}
                     
-                    {/* Cenik */}
-                    <Button variant="ghost" className="w-full justify-start text-left h-12 uppercase" onClick={handleCenikClick}>
-                      <CreditCard className="h-4 w-4 mr-2" />
-                      Cenik
-                    </Button>
                     
                     {/* Odjava */}
                     <Button variant="outline" onClick={onSignOut} className="w-full justify-start text-left h-12 mt-4 text-red-600 uppercase">
@@ -243,8 +251,9 @@ export function MobileMenu({
                   <Button className="w-full h-12 rounded-full text-base bg-dragon-green hover:bg-dragon-green/90 text-white font-semibold uppercase" onClick={() => navigate("/login")}>
                     Prijava
                   </Button>
-                  <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={handleCenikClick}>
-                    Cenik
+                  <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={() => navigate("/logopedski-koticek")}>
+                    <BookOpen className="h-4 w-4 mr-2" />
+                    Logopedski nasveti
                   </Button>
                   <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={() => navigate("/logopedski-koticek")}>
                     <BookOpen className="h-4 w-4 mr-2" />

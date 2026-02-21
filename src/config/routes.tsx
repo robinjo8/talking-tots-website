@@ -42,6 +42,8 @@ function ProtectedLazyRoute({ children }: { children: React.ReactNode }) {
 }
 
 // Lazy loaded pages - split into separate chunks
+const Jezik = lazy(() => import("@/pages/Jezik"));
+const Poslusanje = lazy(() => import("@/pages/Poslusanje"));
 const PaymentSuccess = lazy(() => import("@/pages/PaymentSuccess"));
 const PaymentCanceled = lazy(() => import("@/pages/PaymentCanceled"));
 
@@ -147,6 +149,8 @@ export function AppRoutes() {
       <Route path="/profile" element={<ProtectedLazyRoute><Profile /></ProtectedLazyRoute>} />
       <Route path="/moja-stran" element={<ProtectedLazyRoute><MojaStran /></ProtectedLazyRoute>} />
       <Route path="/moje-aplikacije" element={<ProtectedLazyRoute><MojeAplikacije /></ProtectedLazyRoute>} />
+      <Route path="/jezik" element={<ProtectedLazyRoute><Jezik /></ProtectedLazyRoute>} />
+      <Route path="/poslusanje" element={<ProtectedLazyRoute><Poslusanje /></ProtectedLazyRoute>} />
       
       {/* Brezplačne igre routes - for registered users without subscription */}
       <Route path="/brezplacne-igre" element={<ProtectedLazyRoute><BrezplacneIgre /></ProtectedLazyRoute>} />

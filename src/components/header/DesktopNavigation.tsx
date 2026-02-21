@@ -12,10 +12,9 @@ import { UserNotificationBell } from "./UserNotificationBell";
 interface DesktopNavigationProps {
   user: any;
   onStartNow: () => void;
-  onCenikNavigate: () => void;
 }
 
-export function DesktopNavigation({ user, onStartNow, onCenikNavigate }: DesktopNavigationProps) {
+export function DesktopNavigation({ user, onStartNow }: DesktopNavigationProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { profile } = useAuth();
@@ -103,16 +102,6 @@ export function DesktopNavigation({ user, onStartNow, onCenikNavigate }: Desktop
           
           {/* Navigation right next to logo */}
           <nav className="hidden lg:flex items-center gap-2">
-            {/* Always show Cenik */}
-            <Button
-              type="button"
-              variant="ghost"
-              className="font-semibold rounded-full h-10 text-base px-4 uppercase"
-              onClick={onCenikNavigate}
-            >
-              Cenik
-            </Button>
-            
             {/* Always show Logopedski nasveti - visible for everyone */}
             <Button 
               variant="ghost" 
@@ -125,9 +114,19 @@ export function DesktopNavigation({ user, onStartNow, onCenikNavigate }: Desktop
               Logopedski nasveti
             </Button>
             
-            {/* When LOGGED IN, show Moje aplikacije, Moja stran - with subscription check */}
+            {/* When LOGGED IN, show Poslušanje, Govor, Jezik, Moja stran - with subscription check */}
             {user && (
               <>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => handleProtectedNavigate("/poslusanje")} 
+                  className={
+                    "rounded-full h-10 text-base px-4 font-semibold uppercase " +
+                    (isActivePath("/poslusanje") ? 'bg-accent' : '')
+                  }
+                >
+                  Poslušanje
+                </Button>
                 <Button 
                   variant="ghost" 
                   onClick={() => handleProtectedNavigate("/moje-aplikacije")} 
@@ -136,7 +135,17 @@ export function DesktopNavigation({ user, onStartNow, onCenikNavigate }: Desktop
                     (isActivePath("/moje-aplikacije") ? 'bg-accent' : '')
                   }
                 >
-                  Moje aplikacije
+                  Govor
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => handleProtectedNavigate("/jezik")} 
+                  className={
+                    "rounded-full h-10 text-base px-4 font-semibold uppercase " +
+                    (isActivePath("/jezik") ? 'bg-accent' : '')
+                  }
+                >
+                  Jezik
                 </Button>
                 <Button 
                   variant="ghost" 
