@@ -113,7 +113,11 @@ const ArtikuacijskiTest = () => {
   }, [windowSize]);
 
   const childId = selectedChild?.id;
+  const childAge = selectedChild?.age;
   const userId = user?.id;
+  
+  // For age group 3-4, use only 1 word per letter (20 words total)
+  const wordsPerLetter = (childAge === 3 || childAge === 4) ? 1 : 3;
   
   // Settings hook
   const {
@@ -139,16 +143,21 @@ const ArtikuacijskiTest = () => {
     }
   }, [sessionInfo]);
   
-  // Sort articulation data by phonetic order (same as hook)
+  // Sort articulation data by phonetic order (same as hook) and filter by wordsPerLetter
   const sortedArticulationData = useMemo(() => {
-    return [...articulationData].sort((a, b) => {
-      const indexA = PHONETIC_ORDER.indexOf(a.letter.toUpperCase());
-      const indexB = PHONETIC_ORDER.indexOf(b.letter.toUpperCase());
-      const orderA = indexA === -1 ? 999 : indexA;
-      const orderB = indexB === -1 ? 999 : indexB;
-      return orderA - orderB;
-    });
-  }, []);
+    return [...articulationData]
+      .sort((a, b) => {
+        const indexA = PHONETIC_ORDER.indexOf(a.letter.toUpperCase());
+        const indexB = PHONETIC_ORDER.indexOf(b.letter.toUpperCase());
+        const orderA = indexA === -1 ? 999 : indexA;
+        const orderB = indexB === -1 ? 999 : indexB;
+        return orderA - orderB;
+      })
+      .map(group => ({
+        ...group,
+        words: group.words.slice(0, wordsPerLetter),
+      }));
+  }, [wordsPerLetter]);
 
   // Get word by index (for resume dialog display)
   const getWordByIndex = useCallback((index: number): string => {
@@ -207,7 +216,8 @@ const ArtikuacijskiTest = () => {
     handleSaveProgress,
     undefined,
     undefined,
-    sessionInfo?.sessionId
+    sessionInfo?.sessionId,
+    wordsPerLetter
   );
 
   // Check for existing session on mount (using database, not localStorage)
