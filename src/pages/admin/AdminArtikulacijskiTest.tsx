@@ -129,7 +129,11 @@ export default function AdminArtikulacijskiTest() {
   const sejaParam = searchParams.get('seja');
   const fixedSessionNumber = sejaParam ? parseInt(sejaParam, 10) : undefined;
   
-  // Test mode for "OŠ Test" organization - only test letter R (last 3 words: index 57, 58, 59)
+  // For age group 3-4, use only 1 word per letter (20 words total)
+  const childAge = child?.age;
+  const wordsPerLetter = (childAge === 3 || childAge === 4) ? 1 : 3;
+  
+  // Test mode for "OŠ Test" organization - only test letter R (last 3 words)
   const isTestOrganization = profile?.organization_name === "OŠ Test";
   const testMaxWords = isTestOrganization ? 3 : undefined;
   
@@ -154,16 +158,21 @@ export default function AdminArtikulacijskiTest() {
     await updateSessionProgress(wordIndex + 1);  // Shrani NASLEDNJI indeks
   }, [updateSessionProgress]);
   
-  // Sort articulation data by phonetic order
+  // Sort articulation data by phonetic order and filter by wordsPerLetter
   const sortedArticulationData = useMemo(() => {
-    return [...articulationData].sort((a, b) => {
-      const indexA = PHONETIC_ORDER.indexOf(a.letter.toUpperCase());
-      const indexB = PHONETIC_ORDER.indexOf(b.letter.toUpperCase());
-      const orderA = indexA === -1 ? 999 : indexA;
-      const orderB = indexB === -1 ? 999 : indexB;
-      return orderA - orderB;
-    });
-  }, []);
+    return [...articulationData]
+      .sort((a, b) => {
+        const indexA = PHONETIC_ORDER.indexOf(a.letter.toUpperCase());
+        const indexB = PHONETIC_ORDER.indexOf(b.letter.toUpperCase());
+        const orderA = indexA === -1 ? 999 : indexA;
+        const orderB = indexB === -1 ? 999 : indexB;
+        return orderA - orderB;
+      })
+      .map(group => ({
+        ...group,
+        words: group.words.slice(0, wordsPerLetter),
+      }));
+  }, [wordsPerLetter]);
 
   const getWordByIndex = useCallback((index: number): string => {
     let wordCount = 0;
@@ -211,14 +220,16 @@ export default function AdminArtikulacijskiTest() {
     handleSaveProgress, 
     profile?.id, 
     testMaxWords,
-    sessionInfo?.sessionId
+    sessionInfo?.sessionId,
+    wordsPerLetter
   );
 
   // Check for saved progress from database on mount
   useEffect(() => {
     const checkExistingSession = async () => {
       if (childId && !sessionInfo && !isInitializing) {
-        const existingSession = await initSessionManager(childId, testMaxWords ?? 60);
+        const effectiveTotalWords = testMaxWords ?? totalWordsCount;
+        const existingSession = await initSessionManager(childId, effectiveTotalWords);
         if (existingSession && existingSession.isResume && existingSession.lastSpokenIndex >= 0) {
           // Uporabi lastSpokenIndex za prikaz zadnje izgovorjene besede
           setResumeWordIndex(existingSession.lastSpokenIndex);
@@ -228,7 +239,7 @@ export default function AdminArtikulacijskiTest() {
       }
     };
     checkExistingSession();
-  }, [childId, sessionInfo, isInitializing, initSessionManager, testMaxWords]);
+  }, [childId, sessionInfo, isInitializing, initSessionManager, testMaxWords, totalWordsCount]);
 
   // Fetch background image
   useEffect(() => {

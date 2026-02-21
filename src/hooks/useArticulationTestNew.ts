@@ -18,7 +18,8 @@ export const useArticulationTestNew = (
   onSaveProgress?: (childId: string, sessionNumber: number, currentWordIndex: number) => void,
   logopedistId?: string,
   maxWords?: number,
-  sessionId?: string  // DB session UUID for word results
+  sessionId?: string,  // DB session UUID for word results
+  wordsPerLetter: number = 3  // 1 for age group 3-4, 3 for all others
 ) => {
   // Start from startIndex (default 0, or 57 for testing with Ž only)
   const [currentWordIndex, setCurrentWordIndex] = useState(startIndex);
@@ -41,16 +42,21 @@ export const useArticulationTestNew = (
     setCurrentWordIndex(startIndex);
   }, [startIndex]);
 
-  // Sort articulation data by phonetic order
+  // Sort articulation data by phonetic order and filter words per letter
   const sortedArticulationData = useMemo(() => {
-    return [...articulationData].sort((a, b) => {
-      const indexA = PHONETIC_ORDER.indexOf(a.letter.toUpperCase());
-      const indexB = PHONETIC_ORDER.indexOf(b.letter.toUpperCase());
-      const orderA = indexA === -1 ? 999 : indexA;
-      const orderB = indexB === -1 ? 999 : indexB;
-      return orderA - orderB;
-    });
-  }, []);
+    return [...articulationData]
+      .sort((a, b) => {
+        const indexA = PHONETIC_ORDER.indexOf(a.letter.toUpperCase());
+        const indexB = PHONETIC_ORDER.indexOf(b.letter.toUpperCase());
+        const orderA = indexA === -1 ? 999 : indexA;
+        const orderB = indexB === -1 ? 999 : indexB;
+        return orderA - orderB;
+      })
+      .map(group => ({
+        ...group,
+        words: group.words.slice(0, wordsPerLetter),
+      }));
+  }, [wordsPerLetter]);
 
   // Total words across all letters
   const totalWordsAll = sortedArticulationData.reduce(
