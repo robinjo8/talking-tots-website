@@ -1,29 +1,25 @@
 
 
-## Zamenjava ikon v navigaciji
+## Zamenjava ikone za "Jezik" z ikono ust
 
-### Spremembe ikon
+Ker lucide-react knjižnica nima ikone za usta (lips/mouth), bomo ustvarili lastno SVG komponento.
 
-| Gumb | Trenutna ikona | Nova ikona |
-|------|---------------|------------|
-| Poslušanje | `Bell` (zvonček) | `Ear` (uho) |
-| Govor | `Activity` (graf) | `Speech` (govoreča glava) |
-| Jezik | `BookOpen` (knjiga) | `Languages` (jeziki) |
-| Nastavitve | `User` (oseba) | `Settings` (zobnik) |
+### Spremembe
 
-### Datoteke, ki se spremenijo
+**1. Nova datoteka: `src/components/icons/LipsIcon.tsx`**
+- Ustvarimo React komponento z SVG ikono ust (lips)
+- Podpira enake propse kot lucide ikone (size, className, color)
 
-**1. `src/components/header/NavigationLinks.tsx`**
-- Zamenjaj `Bell` z `Ear` za Poslušanje
-- Zamenjaj `Activity` z `Speech` za Govor
-- Zamenjaj `BookOpen` z `Languages` za Jezik
+**2. `src/components/header/NavigationLinks.tsx`**
+- Zamenjaj `ALargeSmall` z novo `LipsIcon` komponento za "Jezik"
 
-**2. `src/components/header/MobileMenu.tsx`**
-- Zamenjaj `Bell` z `Ear` (vrstica 186)
-- Zamenjaj `Activity` z `Speech` (vrstica 196)
-- Zamenjaj `BookOpen` z `Languages` (vrstica 206)
-- Zamenjaj `User` z `Settings` za gumb Nastavitve (vrstica 227)
-- Posodobi import stavek
+**3. `src/components/header/MobileMenu.tsx`**
+- Zamenjaj `ALargeSmall` z `LipsIcon` v mobilnem meniju
 
-Vse ikone so del lucide-react knjiznice, zato ni potrebno namescati dodatnih paketov.
+**4. `src/components/header/DesktopNavigation.tsx`**
+- Zamenjaj `ALargeSmall` z `LipsIcon` v desktop navigaciji (ce se uporablja)
+
+### Tehnični detajli
+- SVG ikona bo oblikovana v slogu lucide ikon (outline, 24x24 viewBox, strokeWidth 2)
+- Komponenta bo sprejemala `className` in `size` propse za konsistentnost z ostalimi ikonami
 
