@@ -13,6 +13,7 @@ interface AdminArticulationCompletionDialogProps {
   onClose: () => void;
   childId: string;
   sessionNumber: number;
+  sessionId?: string;
   onComplete?: () => Promise<void>;
 }
 
@@ -26,6 +27,7 @@ const AdminArticulationCompletionDialog = ({
   onClose,
   childId,
   sessionNumber,
+  sessionId,
   onComplete,
 }: AdminArticulationCompletionDialogProps) => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -52,6 +54,11 @@ const AdminArticulationCompletionDialog = ({
         await onComplete();
       }
       toast.success("Preverjanje izgovorjave je bilo uspešno shranjeno!");
+      // Navigate to session review page if sessionId is available
+      if (sessionId) {
+        navigate(`/admin/tests/${sessionId}`);
+        return;
+      }
     } catch (error) {
       console.error("Error saving test result:", error);
       toast.error("Napaka pri shranjevanju preverjanja");

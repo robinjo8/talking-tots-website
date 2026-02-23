@@ -289,6 +289,7 @@ export default function AdminArtikulacijskiTest() {
           onClose={handleCloseCompletion}
           childId={childId}
           sessionNumber={sessionNumber ?? 1}
+          sessionId={sessionInfo?.sessionId}
           onComplete={completeSession}
         />
       )}

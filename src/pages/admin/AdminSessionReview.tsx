@@ -93,7 +93,8 @@ export default function AdminSessionReview() {
       letter,
       evaluation.selectedOptions,
       evaluation.comment,
-      evaluation.rating
+      evaluation.rating,
+      logopedistProfile?.id
     );
 
     setSavingLetter(null);
@@ -128,7 +129,8 @@ export default function AdminSessionReview() {
           letter,
           evaluation.selectedOptions,
           evaluation.comment,
-          evaluation.rating
+          evaluation.rating,
+          logopedistProfile?.id
         );
         if (!result.success) {
           hasError = true;
