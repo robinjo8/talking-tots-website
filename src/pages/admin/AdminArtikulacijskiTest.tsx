@@ -133,25 +133,17 @@ export default function AdminArtikulacijskiTest() {
   const childAge = child?.age;
   const wordsPerLetter = (childAge === 3 || childAge === 4) ? 1 : 3;
   
-  // Test mode for "OŠ Test" organization - only test letter R (last 3 words)
-  const isTestOrganization = profile?.organization_name === "OŠ Test";
-  const testMaxWords = isTestOrganization ? 3 : undefined;
-  
   // Dynamic start index - updates when session info loads
-  // Use session manager's startIndex if resuming, otherwise use test organization logic
-  const [effectiveStartIndex, setEffectiveStartIndex] = useState<number>(isTestOrganization ? 57 : 0);
+  const [effectiveStartIndex, setEffectiveStartIndex] = useState<number>(0);
   
   // Update start index when session info becomes available
   useEffect(() => {
     if (sessionInfo?.isResume) {
-      // startIndex is the NEXT word to speak (lastSpokenIndex + 1)
       setEffectiveStartIndex(sessionInfo.startIndex);
-    } else if (isTestOrganization) {
-      setEffectiveStartIndex(57);
     } else {
       setEffectiveStartIndex(0);
     }
-  }, [sessionInfo, isTestOrganization]);
+  }, [sessionInfo]);
   
   // Callback to save progress to database after each word
   const handleSaveProgress = useCallback(async (cId: string, sNum: number, wordIndex: number) => {
@@ -219,7 +211,7 @@ export default function AdminArtikulacijskiTest() {
     difficulty, 
     handleSaveProgress, 
     profile?.id, 
-    testMaxWords,
+    undefined,
     sessionInfo?.sessionId,
     wordsPerLetter
   );
@@ -228,8 +220,7 @@ export default function AdminArtikulacijskiTest() {
   useEffect(() => {
     const checkExistingSession = async () => {
       if (childId && !sessionInfo && !isInitializing) {
-        const effectiveTotalWords = testMaxWords ?? totalWordsCount;
-        const existingSession = await initSessionManager(childId, effectiveTotalWords);
+        const existingSession = await initSessionManager(childId, totalWordsCount);
         if (existingSession && existingSession.isResume && existingSession.lastSpokenIndex >= 0) {
           // Uporabi lastSpokenIndex za prikaz zadnje izgovorjene besede
           setResumeWordIndex(existingSession.lastSpokenIndex);
@@ -239,7 +230,7 @@ export default function AdminArtikulacijskiTest() {
       }
     };
     checkExistingSession();
-  }, [childId, sessionInfo, isInitializing, initSessionManager, testMaxWords, totalWordsCount]);
+  }, [childId, sessionInfo, isInitializing, initSessionManager, totalWordsCount]);
 
   // Fetch background image
   useEffect(() => {
