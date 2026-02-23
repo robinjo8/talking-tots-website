@@ -2,11 +2,10 @@
 export type AgeGroup = '3-4' | '5-6' | '7-8' | '9-10';
 
 export function getAgeGroup(age: number): AgeGroup {
-  if (age >= 3 && age <= 4) return '3-4';
-  if (age >= 5 && age <= 6) return '5-6'; 
-  if (age >= 7 && age <= 8) return '7-8';
-  if (age >= 9 && age <= 10) return '9-10';
-  return '3-4'; // Default fallback
+  if (age <= 4) return '3-4';
+  if (age <= 6) return '5-6';
+  if (age <= 8) return '7-8';
+  return '9-10';
 }
 
 export function getRouteForAgeGroup(ageGroup: AgeGroup): string {

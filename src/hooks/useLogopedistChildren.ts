@@ -179,8 +179,9 @@ export function useLogopedistChildren() {
       queryClient.invalidateQueries({ queryKey: ['logopedist-children'] });
       toast.success('Podatki otroka posodobljeni');
     },
-    onError: () => {
-      toast.error('Napaka pri posodabljanju');
+    onError: (error: Error) => {
+      console.error('Update child error:', error);
+      toast.error('Napaka pri posodabljanju otroka');
     },
   });
 
