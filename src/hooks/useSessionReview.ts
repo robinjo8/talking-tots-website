@@ -304,26 +304,31 @@ export async function saveEvaluation(
   letter: string,
   selectedOptions: string[],
   comment: string,
-  rating?: number
+  rating?: number,
+  evaluatedBy?: string
 ): Promise<{ success: boolean; error?: string }> {
+  const payload: Record<string, unknown> = {
+    session_id: sessionId,
+    letter: letter,
+    selected_options: selectedOptions,
+    comment: comment,
+    rating: rating ?? null,
+  };
+  if (evaluatedBy) {
+    payload.evaluated_by = evaluatedBy;
+  }
+  console.log('Saving evaluation:', { sessionId, letter, evaluatedBy });
+
   const { error } = await supabase
     .from('articulation_evaluations')
-    .upsert(
-      {
-        session_id: sessionId,
-        letter: letter,
-        selected_options: selectedOptions,
-        comment: comment,
-        rating: rating ?? null,
-      },
-      { onConflict: 'session_id,letter' }
-    );
+    .upsert(payload as any, { onConflict: 'session_id,letter' });
 
   if (error) {
-    console.error('Napaka pri shranjevanju ocene:', error);
+    console.error('Napaka pri shranjevanju ocene:', error, { sessionId, letter, evaluatedBy });
     return { success: false, error: error.message };
   }
 
+  console.log('Evaluation saved successfully:', { sessionId, letter });
   return { success: true };
 }
 
