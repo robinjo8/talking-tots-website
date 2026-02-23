@@ -1,39 +1,151 @@
 
 
-## Popravek: Odstranitev testnega nacina za "OS Test" organizacijo
+## Popravek: Shranjevanje ocen in navigacija po zakljucku testa
 
-### Problem
+### Prizadeti logopedi
 
-V datoteki `src/pages/admin/AdminArtikulacijskiTest.tsx` je bila za organizacijo "OS Test" vkljucena zacasna testna logika, ki:
-- Zacne test pri glasu R (indeks 57) namesto pri P (indeks 0)
-- Omeji test na samo 3 besede namesto celotnega testa
+| Logoped | Organizacija | Tip | Sej | Ocen | Status |
+|---------|-------------|-----|-----|------|--------|
+| Spela Kastelic | OS Test | school | 2 | 0 | NE DELUJE |
+| Janez Novak | OS Test | school | 1 | 0 | NE DELUJE |
+| Spela Kastelic | TomiTalk | internal | 1 | 20 | DELUJE |
+| Robert Kujavec | TomiTalk | super_admin | - | - | DELUJE |
+| Ema Erzar Vidmar | TomiTalk | internal | 0 | - | Bi imela tezavo pri INSERT/UPDATE za nesvoje seje |
 
-Ta logika je bila namenjena razvoju in testiranju, zdaj pa organizacija "OS Test" dejansko uporabljajo portal v produkciji. Logopedinja Spela zato vidi test, ki se zacne pri glasu R, kot da so vsi prejsnji glasovi ze opravljeni.
+### Vzrok
+
+RLS politike na tabeli `articulation_evaluations`:
+- **SELECT**: ima `is_internal_logopedist` politiko - zato interni logopedi VIDIJO ocene
+- **INSERT/UPDATE**: nimata `is_internal_logopedist` niti organizacijske politike - preverja SAMO `assigned_to` match + subquery na `articulation_test_sessions`
+
+Za OS Test logopede subquery na `articulation_test_sessions` verjetno ne vrne rezultatov, ker se RLS na tej tabeli aplicira rekurzivno.
+
+Robert deluje ker ima `is_super_admin()` bypass v vseh politikah.
 
 ### Resitev
 
-Odstraniti celotno `isTestOrganization` logiko iz `AdminArtikulacijskiTest.tsx`:
+#### 1. SQL migracija - nove RLS politike za `articulation_evaluations`
 
-1. **Odstrani spremenljivki** `isTestOrganization` in `testMaxWords` (vrstici 137-138)
-2. **Poenostavi `effectiveStartIndex`** - vedno zacni pri 0 (ali pri resume indeksu ce gre za nadaljevanje)
-3. **Odstrani `testMaxWords`** iz klica `useArticulationTestNew` - test vedno pokriva vse besede
+Tri nove politike za organizacijske logopede:
 
-### Spremembe
+```sql
+-- INSERT za organizacijske logopede
+CREATE POLICY "Org logopedists can create evaluations for org sessions"
+ON articulation_evaluations FOR INSERT
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM articulation_test_sessions s
+    JOIN logopedist_profiles lp ON lp.organization_id = s.organization_id
+    WHERE s.id = articulation_evaluations.session_id
+    AND lp.user_id = auth.uid()
+  )
+);
 
-**`src/pages/admin/AdminArtikulacijskiTest.tsx`**:
+-- UPDATE za organizacijske logopede
+CREATE POLICY "Org logopedists can update evaluations for org sessions"
+ON articulation_evaluations FOR UPDATE
+USING (
+  EXISTS (
+    SELECT 1 FROM articulation_test_sessions s
+    JOIN logopedist_profiles lp ON lp.organization_id = s.organization_id
+    WHERE s.id = articulation_evaluations.session_id
+    AND lp.user_id = auth.uid()
+  )
+);
 
-- Vrstica 137-138: Odstrani `isTestOrganization` in `testMaxWords`
-- Vrstica 142: `effectiveStartIndex` privzeto `0` namesto pogojnega `57`
-- Vrstice 149-150: Odstrani `else if (isTestOrganization)` vejo
-- Vsi ostali deli, ki referencirajo `isTestOrganization` ali `testMaxWords`, se posodobijo
+-- SELECT za organizacijske logopede
+CREATE POLICY "Org logopedists can view evaluations for org sessions"
+ON articulation_evaluations FOR SELECT
+USING (
+  EXISTS (
+    SELECT 1 FROM articulation_test_sessions s
+    JOIN logopedist_profiles lp ON lp.organization_id = s.organization_id
+    WHERE s.id = articulation_evaluations.session_id
+    AND lp.user_id = auth.uid()
+  )
+);
+```
+
+Dodatno, za interno logopedinje (Ema) ki nimajo `assigned_to` match:
+
+```sql
+-- INSERT za interne logopede
+CREATE POLICY "Internal logopedists can create all evaluations"
+ON articulation_evaluations FOR INSERT
+WITH CHECK (is_internal_logopedist(auth.uid()));
+
+-- UPDATE za interne logopede
+CREATE POLICY "Internal logopedists can update all evaluations"
+ON articulation_evaluations FOR UPDATE
+USING (is_internal_logopedist(auth.uid()));
+```
+
+#### 2. `src/hooks/useSessionReview.ts` - dodaj `evaluatedBy` in logiranje
+
+Funkcija `saveEvaluation` dobi nov parameter `evaluatedBy` (logopedist profile ID) in podrobno logiranje napak:
+
+```text
+// PREJ:
+export async function saveEvaluation(
+  sessionId, letter, selectedOptions, comment, rating?
+)
+
+// POTEM:
+export async function saveEvaluation(
+  sessionId, letter, selectedOptions, comment, rating?, evaluatedBy?
+)
+```
+
+Dodaj `evaluated_by` v upsert payload in `console.log`/`console.error` za diagnostiko.
+
+#### 3. `src/pages/admin/AdminSessionReview.tsx` - posreduj evaluatedBy
+
+V `handleSaveLetter` (vrstica 91-97) in `handleSaveAll` (vrstica 126-132) dodaj `logopedistProfile?.id` kot zadnji parameter klica `saveEvaluation`.
+
+#### 4. `src/components/admin/articulation/AdminArticulationCompletionDialog.tsx` - navigacija na pregled
+
+Po zakljucku testa preusmeri na stran pregleda seje (`/admin/tests/{sessionId}`) namesto na delovni prostor. Dodaj `sessionId` prop:
+
+```text
+// PREJ:
+interface AdminArticulationCompletionDialogProps {
+  open: boolean;
+  onClose: () => void;
+  childId: string;
+  sessionNumber: number;
+  onComplete?: () => Promise<void>;
+}
+
+// POTEM: dodaj sessionId prop
+interface AdminArticulationCompletionDialogProps {
+  open: boolean;
+  onClose: () => void;
+  childId: string;
+  sessionNumber: number;
+  sessionId?: string;
+  onComplete?: () => Promise<void>;
+}
+```
+
+V `handleClose` po uspesnem shranjevanju navigiraj na `/admin/tests/${sessionId}` ce je sessionId na voljo.
+
+#### 5. `src/pages/admin/AdminArtikulacijskiTest.tsx` - posreduj sessionId
+
+Na vrstici 287-293 dodaj `sessionId={sessionInfo?.sessionId}` prop v `AdminArticulationCompletionDialog`. Posodobi `handleCloseCompletion` da ne navigira na workspace ampak pusti dialog da navigira.
+
+### Datoteke za spremembo
+
+- **Nova SQL migracija** - 5 novih RLS politik za `articulation_evaluations`
+- **`src/hooks/useSessionReview.ts`** - `saveEvaluation` z `evaluatedBy` + logiranje
+- **`src/pages/admin/AdminSessionReview.tsx`** - posreduj `logopedistProfile.id`
+- **`src/components/admin/articulation/AdminArticulationCompletionDialog.tsx`** - navigacija na pregled
+- **`src/pages/admin/AdminArtikulacijskiTest.tsx`** - posreduj `sessionId`
 
 ### Kaj ostane nespremenjeno
 
-- Logika za starostno skupino 3-4 (20 besed, 1 beseda na glas) ostane nespremenjena
-- Logika za starostno skupino 5+ (60 besed, 3 besede na glas) ostane nespremenjena
-- Uporabniski portal (stran `/artikulacijski-test`) ni prizadet - ta nima `isTestOrganization` logike
-- Simulacija na profilu deluje neodvisno od tega popravka
+- Uporabniski portal (starsevski tok) - brez sprememb
+- Obstojece ocene (20 ocen za TomiTalk sejo) - nespremenjene
+- Generiranje PDF porocila - ostane rocno
+- Dodajanje/brisanje otrok - brez sprememb
+- Vse obstojece RLS politike ostanejo, dodajo se le nove
 
-### Rezultat
-
-Po popravku bo logopedinja Spela (in vsi logopedi v OS Test) videla preverjanje izgovorjave, ki se zacne pri glasu P (prva beseda) in pokriva celoten nabor besed glede na starost otroka.
