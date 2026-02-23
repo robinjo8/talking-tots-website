@@ -23,9 +23,8 @@ export function calculateAge(birthDate: Date | null): number {
   }
 
   // Ensure age is positive and reasonable
-  if (age < 0) {
-    console.warn('calculateAge: Negative age calculated, returning default age of 5');
-    return 5;
+  if (age < 1) {
+    return 1; // Minimum 1 leto (DB CHECK constraint)
   }
   
   if (age > 18) {
