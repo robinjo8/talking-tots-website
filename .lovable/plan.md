@@ -1,68 +1,104 @@
 
 
-## Popravek: Neujemanje stevila "V cakanju" med nadzorno plosco in stranjo
+## Popravek: Shranjevanje spola, starost < 1, in robne starostne skupine
 
-### Problem
+### Problem 1: Spol se ne shrani
 
-Nadzorna plosca (dashboard) prikazuje **7** v cakanju, stran "V cakanju" pa le **2** primera. Razlog je, da tri razlicne poizvedbe za stevilo cakajocih sej uporabljajo razlicne filtre:
+Ko Spela poskusa popraviti spol otroka "Nika Z." (rojena januar 2026), celotna posodobitev propade zaradi CHECK constraint-a na tabeli `logopedist_children`: `CHECK ((age >= 1) AND (age <= 18))`. Funkcija `calculateAge` vrne `0` za dojenčka, kar sproži napako in zato se ne shrani **nič** - niti spol.
 
-| Poizvedba | Datoteka | Filtri | Rezultat |
-|-----------|----------|--------|----------|
-| Dashboard stat | `useAdminStats.ts` | `status = 'pending'` | **7** |
-| Sidebar badge | `useAdminCounts.ts` | `status = 'pending'` + `is_completed = true` + `assigned_to IS NULL` | **2** |
-| Stran "V cakanju" | `usePendingTests.ts` | `status = 'pending'` + `is_completed = true` + `assigned_to IS NULL` + source_type filter | **2** |
+### Problem 2: Starost < 3 in > 10
 
-Dashboard ne filtrira po `is_completed` in `assigned_to`, zato steje tudi 5 nedokoncanih (se ne oddanih) sej.
-
-### Testni podatki v bazi
-
-V bazi obstaja testni uporabnik `a1000000-0000-0000-0000-000000000002` (NE obstaja v `auth.users`), ki ima:
-- Otroka "Lana" (`7bc1b016-...`) v tabeli `children`
-- 1 sejo v `articulation_test_sessions` (`0a855759-...`)
-
-Ti podatki so ostanki testnega seedanja in jih je treba pocistiti.
+Funkcija `getAgeGroup` v `src/utils/ageUtils.ts` pokriva samo starosti 3-10. Otroci stari 1-2 leti ali 11+ let dobijo privzeto `'3-4'` skupino, a brez eksplicitnega pokritja. Enako v edge function `generate-monthly-plan`. Uporabnik zeli:
+- Otroci stari **manj kot 3** --> skupina **3-4**
+- Otroci stari **vec kot 10** --> skupina **9-10**
 
 ### Resitev
 
-#### 1. Popravek `useAdminStats.ts` (vrstica 47-50)
+#### 1. `src/utils/childUtils.ts` - `calculateAge` minimum 1
 
-Poizvedba za `orgPendingTests` mora uporabljati enake filtre kot stran "V cakanju":
+Sprememba vrstice 26-29: namesto preverjanja `age < 0` preveriti `age < 1` in vrniti `1`.
 
 ```text
 // PREJ:
-.eq('status', 'pending')
+if (age < 0) {
+  console.warn('calculateAge: Negative age calculated, returning default age of 5');
+  return 5;
+}
 
 // POTEM:
-.eq('status', 'pending')
-.eq('is_completed', true)
-.is('assigned_to', null)
+if (age < 1) {
+  return 1; // Minimum 1 leto (DB CHECK constraint)
+}
 ```
 
-To zagotovi, da se stejejo samo dejansko oddane in neprevzete seje.
+To odpravi napako pri shranjevanju za dojenčke, kar omogoči tudi shranjevanje spola.
 
-#### 2. Brisanje testnih podatkov (SQL migracija)
+#### 2. `src/utils/ageUtils.ts` - eksplicitno pokritje robnih starosti
 
-Pocistiti podatke testnega uporabnika `a1000000-0000-0000-0000-000000000002`:
+Sprememba funkcije `getAgeGroup`:
 
 ```text
--- Izbrisi seje testnega uporabnika
-DELETE FROM articulation_test_sessions 
-WHERE parent_id = 'a1000000-0000-0000-0000-000000000002';
+// PREJ:
+export function getAgeGroup(age: number): AgeGroup {
+  if (age >= 3 && age <= 4) return '3-4';
+  if (age >= 5 && age <= 6) return '5-6';
+  if (age >= 7 && age <= 8) return '7-8';
+  if (age >= 9 && age <= 10) return '9-10';
+  return '3-4'; // Default fallback
+}
 
--- Izbrisi otroke testnega uporabnika
-DELETE FROM children 
-WHERE parent_id = 'a1000000-0000-0000-0000-000000000002';
+// POTEM:
+export function getAgeGroup(age: number): AgeGroup {
+  if (age <= 4) return '3-4';
+  if (age <= 6) return '5-6';
+  if (age <= 8) return '7-8';
+  return '9-10';
+}
+```
 
--- Izbrisi profil testnega uporabnika (ce obstaja)
-DELETE FROM profiles 
-WHERE id = 'a1000000-0000-0000-0000-000000000002';
+Logika: otroci do vkljucno 4 let dobijo skupino 3-4, otroci 11+ let dobijo skupino 9-10. Preprosto in brez robnih primerov.
+
+#### 3. `supabase/functions/generate-monthly-plan/index.ts` - enaka logika
+
+Funkcija `getAgeGroup` v edge function ima ze skoraj enako logiko, a jo je treba uskladiti:
+
+```text
+// PREJ:
+function getAgeGroup(age: number): string {
+  if (age <= 4) return "3-4";
+  if (age <= 6) return "5-6";
+  if (age <= 8) return "7-8";
+  return "9-10";
+}
+```
+
+Ta ze pravilno pokriva robne primere - ni spremembe potrebne.
+
+#### 4. `src/hooks/useLogopedistChildren.ts` - boljse logiranje napak
+
+```text
+// PREJ:
+onError: () => {
+  toast.error('Napaka pri posodabljanju');
+},
+
+// POTEM:
+onError: (error: Error) => {
+  console.error('Update child error:', error);
+  toast.error('Napaka pri posodabljanju otroka');
+},
 ```
 
 ### Datoteke za spremembo
 
-- **`src/hooks/useAdminStats.ts`** - dodaj `.eq('is_completed', true).is('assigned_to', null)` v poizvedbo za orgPendingTests
-- **Nova SQL migracija** - brisanje testnih podatkov
+- **`src/utils/childUtils.ts`** - `calculateAge` vrne min 1
+- **`src/utils/ageUtils.ts`** - `getAgeGroup` pokriva vse starosti
+- **`src/hooks/useLogopedistChildren.ts`** - boljse logiranje napak v `updateChild`
 
-### Rezultat po popravku
+### Kaj ostane nespremenjeno
 
-Po popravku bo dashboard prikazoval **2** v cakanju (enako kot stran "V cakanju" in sidebar badge), testni podatki pa bodo pocisceni.
+- `generate-monthly-plan` edge function ze pravilno pokriva robne starosti
+- `useFreeGameLimit.ts` ze ima `if (childAge <= 4) return '34'` - ni spremembe
+- Dodajanje, brisanje otrok, prikazovanje - vse ostane enako
+- RLS politike, tabele - brez sprememb
+
