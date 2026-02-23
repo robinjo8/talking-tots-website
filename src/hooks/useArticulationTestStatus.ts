@@ -127,13 +127,12 @@ export const useArticulationTestStatus = () => {
     if (!selectedChild?.id) return false;
 
     try {
-      const { error } = await supabase
-        .from('articulation_test_results')
-        .delete()
-        .eq('child_id', selectedChild.id);
+      const response = await supabase.functions.invoke("reset-articulation-test", {
+        body: { childId: selectedChild.id },
+      });
 
-      if (error) {
-        console.error('Error resetting articulation test:', error);
+      if (response.error) {
+        console.error('Error resetting articulation test:', response.error);
         return false;
       }
 

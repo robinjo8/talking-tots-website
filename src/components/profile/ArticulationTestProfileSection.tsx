@@ -193,17 +193,15 @@ export function ArticulationTestProfileSection() {
               )}
               {isSimulating ? "Simulacija poteka..." : "Izvedi test (simulacija)"}
             </Button>
-            {hasCompletedTest && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleReset}
-                className="w-full justify-start text-muted-foreground hover:text-destructive hover:border-destructive"
-              >
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Ponastavi test (za testiranje)
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleReset}
+              className="w-full justify-start text-muted-foreground hover:text-destructive hover:border-destructive"
+            >
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Ponastavi test (za testiranje)
+            </Button>
           </div>
         </div>
       </div>
