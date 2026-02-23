@@ -1,77 +1,82 @@
 
 
-## Popolna ponastavitev preverjanja izgovorjave
+## Popravek: Simulacija vedno ustvari Seja-1
 
 ### Problem
 
-Trenutni gumb "Ponastavi test" briše samo iz tabele `articulation_test_results`. Nedokoncane seje v `articulation_test_sessions` in rezultati besed v `articulation_word_results` ostanejo v bazi. Zato se ob ponovnem vstopu v test prikaze dialog za nadaljevanje z besedo MIZA, namesto da bi se test zacel od zacetka.
+Edge funkcija `simulate-articulation-test` na vrstici 133 poisce zadnjo sejo (tudi nedokoncano) in nastavi `sessionNumber = zadnja + 1`. Ce je pred resetom obstajala nedokoncana Seja-1 in reset ni bil pravilno izveden (ali pa je bil poklican stari client-side reset ki brise samo `articulation_test_results`), simulacija ustvari Seja-2 namesto Seja-1.
 
-Dodatno: RLS politike na tabelah `articulation_test_sessions` in `articulation_word_results` ne dovoljujejo operacije DELETE za starse, zato brisanje iz klienta ni mogoce.
+Na screenshotu je vidno:
+- V sekciji "Preverjanje izgovorjave" na admin portalu je prikazana **Seja-2** (60 posnetkov)
+- V dropdownu za porocilo pa je na voljo samo **Seja-1** (ker porocilo isce sejo po `session_number = 1`)
 
 ### Resitev
 
-Ustvariti Edge funkcijo `reset-articulation-test`, ki z uporabo service role kljuca izvede celovito brisanje vseh podatkov preverjanja za dolocenega otroka:
+Gumb "Izvedi test (simulacija)" na `/profile` je namenjen izključno **prvi seji (Seja-1)**. Funkcija mora:
 
-1. Izbrise vse zapise iz `articulation_word_results` (ki pripadajo sejam tega otroka)
-2. Izbrise vse zapise iz `articulation_test_sessions` za tega otroka
-3. Izbrise vse zapise iz `articulation_test_results` za tega otroka
-4. Izbrise audio posnetke iz storage bucketa `uporabniski-profili` (mapa `userId/childId/Preverjanje-izgovorjave/`)
+1. Pred ustvarjanjem nove seje **najprej poklicati reset** - izbrisati vse obstojece seje, word results in audio datoteke za tega otroka (enaka logika kot `reset-articulation-test`)
+2. Vedno ustvariti sejo s `session_number = 1`
 
 ### Spremembe
 
-#### 1. Nova Edge funkcija: `reset-articulation-test`
+#### `supabase/functions/simulate-articulation-test/index.ts`
 
-**`supabase/functions/reset-articulation-test/index.ts`**
+1. **Odstrani logiko za dolocanje session_number** (vrstice 125-133) in hardkodiraj `sessionNumber = 1`
 
-- Sprejme `childId` v body-ju
-- Preveri avtentikacijo uporabnika (Bearer token)
-- Preveri da je otrok res last tega starsa (preko tabele `children`)
-- Z uporabo service role kljuca:
-  - Poisci vse seje tega otroka (`articulation_test_sessions` WHERE `child_id = childId`)
-  - Za vsako sejo izbrise vse `articulation_word_results`
-  - Izbrise vse seje
-  - Izbrise vse `articulation_test_results`
-  - Izbrise mapo z audio posnetki iz storage
-- Vrne stevilo izbrisanih sej
+2. **Dodaj reset logiko pred ustvarjanjem seje** - pred vrstico 136 dodaj brisanje vseh obstojecih podatkov:
+   - Poisci vse obstojece seje za tega otroka (`articulation_test_sessions WHERE child_id = childId AND parent_id = userId`)
+   - Izbriši vse `articulation_word_results` za te seje
+   - Izbriši vse `articulation_test_sessions` za tega otroka
+   - Izbriši vse `articulation_test_results` za tega otroka
+   - Izbriši audio datoteke iz storage (`userId/childId/Preverjanje-izgovorjave/`)
 
-#### 2. Registracija v `supabase/config.toml`
+To zagotovi, da simulacija vedno zacne s cistim stanjem in ustvari Seja-1, ne glede na prejsnje stanje v bazi.
 
-Dodaj novo funkcijo z `verify_jwt = false` (validacija v kodi).
+#### Brez sprememb na frontendu
 
-#### 3. Posodobitev `useArticulationTestStatus.ts`
+Komponenta `ArticulationTestProfileSection.tsx` ze pravilno prikaze rezultat simulacije. Gumb "Ponastavi test" ostane locen za rocno ponastavitev.
 
-Spremeni `resetTest` funkcijo, da klice novo edge funkcijo namesto direktnega brisanja samo iz `articulation_test_results`.
+### Tehnicni detajl
+
+Vrstice 125-133 se zamenjajo z:
 
 ```text
-const resetTest = async (): Promise<boolean> => {
-  if (!selectedChild?.id) return false;
-  
-  const response = await supabase.functions.invoke("reset-articulation-test", {
-    body: { childId: selectedChild.id },
-  });
-  
-  if (response.error) return false;
-  await fetchTestStatus();
-  return true;
-};
-```
+const sessionNumber = 1;
 
-#### 4. Posodobitev `ArticulationTestProfileSection.tsx`
+// Clean up any existing data before simulation
+const { data: existingSessions } = await supabaseAdmin
+  .from("articulation_test_sessions")
+  .select("id")
+  .eq("child_id", childId)
+  .eq("parent_id", userId);
 
-Gumb "Ponastavi test" mora biti vedno viden (ne samo ko je test opravljen), ker mora delovati tudi za nedokoncane seje.
+const existingIds = (existingSessions || []).map(s => s.id);
 
-### Kaj se izbrise
+if (existingIds.length > 0) {
+  await supabaseAdmin.from("articulation_word_results").delete().in("session_id", existingIds);
+  await supabaseAdmin.from("articulation_test_sessions").delete().eq("child_id", childId).eq("parent_id", userId);
+}
 
-```text
-articulation_word_results  --> vsi zapisi za seje tega otroka
-articulation_test_sessions --> vse seje tega otroka (child_id)
-articulation_test_results  --> vsi rezultati tega otroka
-uporabniski-profili/       --> userId/childId/Preverjanje-izgovorjave/*
+await supabaseAdmin.from("articulation_test_results").delete().eq("child_id", childId);
+
+// Clean storage
+const storagePath = `${userId}/${childId}/Preverjanje-izgovorjave`;
+const { data: folders } = await supabaseAdmin.storage.from("uporabniski-profili").list(storagePath);
+if (folders && folders.length > 0) {
+  for (const folder of folders) {
+    const folderPath = `${storagePath}/${folder.name}`;
+    const { data: files } = await supabaseAdmin.storage.from("uporabniski-profili").list(folderPath);
+    if (files && files.length > 0) {
+      await supabaseAdmin.storage.from("uporabniski-profili").remove(files.map(f => `${folderPath}/${f.name}`));
+    }
+  }
+}
 ```
 
 ### Vpliv
 
-- Po kliku na "Ponastavi test" bo stanje identično kot da otrok nikoli ni opravljal preverjanja
-- Dialog za nadaljevanje se ne bo vec prikazal
-- Admin portal ne bo vec videl starih sej
-- Gumb bo viden tudi med nedokoncanim testom
+- Simulacija vedno ustvari Seja-1
+- Pred simulacijo se samodejno pocisti vse prejsnje podatke
+- Admin portal bo prikazal Seja-1 (ne vec Seja-2)
+- Dropdown za porocilo bo pravilno nasel sejo
+- Gumb "Ponastavi test" ostane nespremenjen za loceno uporabo
