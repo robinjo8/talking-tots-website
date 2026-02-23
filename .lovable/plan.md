@@ -1,55 +1,59 @@
 
 
-## Popravek: sessionNumber se ne sinhronizira pri nadaljevanju testa
+## Simulacija preverjanja izgovorjave - gumb "Izvedi test"
 
-### Problem
+### Kaj bo narejeno
 
-Ko uporabnik nadaljuje nedokončan test (klikne "Nadaljuj" v resume dialogu), se `sessionNumber` znotraj `useArticulationTestNew` hooka nikoli ne nastavi. To pomeni, da se napredek NE shranjuje v bazo, ker pogoj `if (childId && sessionNumber && onSaveProgress)` v `handleNext` vedno vrne `false`.
+Na strani `/profile` v sekciji "Preverjanje izgovorjave" bosta dodana dva gumba v obstojecem razdelku "Testne seje (za razvoj)":
 
-Vzrok: `useState(fixedSessionNumber ?? null)` uporabi samo začetno vrednost. Na prvem renderju je `sessionInfo` še `null`, zato je `fixedSessionNumber` = `undefined` in `sessionNumber` ostane `null` za vedno.
+1. **Izvedi test (simulacija)** - simulira celotno preverjanje izgovorjave (60 besed) z uporabo testnih posnetkov `test_1.m4a` do `test_60.m4a` iz bucketa `zvocni-posnetki`
+2. **Ponastavi test** - obstojecim gumb, ki ostane kjer je
 
-Pri novem testu to deluje, ker uporabnik zapre info dialog, kar pokliče `initializeSession()`, ki nastavi `sessionNumber`. Pri nadaljevanju pa se resume dialog zapre brez klica `initializeSession()`.
+### Kako deluje simulacija
 
-### Resitev
+Simulacija bo ustvarila realno sejo v bazi, kot da bi uporabnik dejansko govoril besedo po besedo:
 
-Dodati `useEffect` v `useArticulationTestNew.ts` ki sinhronizira `sessionNumber` kadar se `fixedSessionNumber` prop spremeni:
+1. Ustvari novo sejo v `articulation_test_sessions` (status: pending, is_completed: false)
+2. Za vsako od 60 besed:
+   - Kopira testni posnetek (`test_X.m4a`) iz bucketa `zvocni-posnetki` v bucket `uporabniski-profili` pod pravilno pot (`userId/childId/Preverjanje-izgovorjave/Seja-X/...`)
+   - Vstavi zapis v `articulation_word_results` z dejanskimi podatki (letter, position, target_word, audio_url, ai_accepted: true)
+   - Posodobi `current_word_index` na seji
+3. Oznaci sejo kot dokoncano (is_completed: true, status: pending)
+4. Shrani rezultat v `articulation_test_results`
 
-```text
-useEffect(() => {
-  if (fixedSessionNumber !== undefined && fixedSessionNumber !== null) {
-    setSessionNumber(fixedSessionNumber);
-    setSessionInitialized(true);
-  }
-}, [fixedSessionNumber]);
-```
+### Tehnicni nacrt
 
-To se doda takoj za obstojecim `useEffect` za `startIndex` (vrstica 41-43).
+#### 1. Nova Edge funkcija: `simulate-articulation-test`
 
-### Sprememba
+**`supabase/functions/simulate-articulation-test/index.ts`**
 
-**`src/hooks/useArticulationTestNew.ts`** - dodaj useEffect za sinhronizacijo sessionNumber:
+- Sprejme: `childId` v body-ju
+- Uporabi service role key za polni dostop
+- Preveri avtentikacijo uporabnika
+- Pridobi seznam 60 besed iz `articulationTestData` konfiguracije (hardcodirane v funkciji)
+- Za vsako besedo:
+  - Prebere testni posnetek `test_X.m4a` iz `zvocni-posnetki` (public bucket)
+  - Naloži posnetek v `uporabniski-profili` pod pravilno pot
+  - Vstavi word result v bazo
+- Oznaci sejo kot dokoncano
+- Vrne uspeh/napako
 
-Za obstojecim blokom:
-```text
-useEffect(() => {
-  setCurrentWordIndex(startIndex);
-}, [startIndex]);
-```
+#### 2. Posodobitev komponente: `ArticulationTestProfileSection.tsx`
 
-Dodaj:
-```text
-useEffect(() => {
-  if (fixedSessionNumber !== undefined && fixedSessionNumber !== null) {
-    setSessionNumber(fixedSessionNumber);
-    setSessionInitialized(true);
-  }
-}, [fixedSessionNumber]);
-```
+- Doda gumb "Izvedi test (simulacija)" z ikono `Zap` (lightning)
+- Gumb klice edge funkcijo `simulate-articulation-test`
+- Med izvajanjem prikaze loading stanje z napredkom
+- Po uspesnem zakljucku osvezi status testa
 
-### Vpliv
+#### 3. Podatki o besedah v edge funkciji
 
-- Popravlja shranjevanje napredka pri nadaljevanju testa (resume)
-- Velja za 20-besedni test (skupina 3-4) in 60-besedni test
-- Ne vpliva na nove teste (tam ze deluje pravilno)
-- Ne vpliva na admin portal (uporablja drugacen flow)
+Edge funkcija bo vsebovala hardcodiran seznam 60 besed v foneticnem vrstnem redu (P, B, M, T, D, K, G, N, H, V, J, F, L, S, Z, C, S, Z, C, R) z ustreznimi podatki (letter, position label, target_word), da pravilno zapolni `articulation_word_results`.
 
+### Pricakovani rezultat
+
+Po kliku na "Izvedi test (simulacija)":
+- V bazi bo nova seja z 60 word results
+- V storage-u bo 60 audio posnetkov pod pravilno strukturo map
+- Seja bo vidna v admin portalu za logopede
+- Status na profilu bo pokazal "Test je bil opravljen"
+- Celoten proces traja priblizno 30-60 sekund (kopiranje 60 datotek)
