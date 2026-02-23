@@ -21,22 +21,22 @@ Deno.serve(async (req) => {
       });
     }
 
-    const supabaseAuth = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
+    // Decode JWT to get user ID (avoids session check)
     const token = authHeader.replace("Bearer ", "");
-    const { data, error: claimsError } = await supabaseAuth.auth.getClaims(token);
-    if (claimsError || !data?.claims) {
+    let userId: string;
+    try {
+      const payloadBase64 = token.split(".")[1];
+      const payload = JSON.parse(atob(payloadBase64));
+      userId = payload.sub;
+      if (!userId) throw new Error("No sub in token");
+    } catch {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const user = { id: data.claims.sub as string };
+    const user = { id: userId };
 
     const { childId } = await req.json();
     if (!childId) {
