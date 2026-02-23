@@ -1,16 +1,22 @@
-import { ClipboardCheck, AlertCircle, RotateCcw, Info, CalendarCheck, CalendarClock, Play } from "lucide-react";
+import { useState } from "react";
+import { ClipboardCheck, AlertCircle, RotateCcw, Info, CalendarCheck, CalendarClock, Play, Zap, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { sl } from "date-fns/locale";
 import { useArticulationTestStatus } from "@/hooks/useArticulationTestStatus";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Loader2 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
 
 export function ArticulationTestProfileSection() {
-  const { lastCompletedAt, nextTestDate, isTestAvailable, isLoading, resetTest } = useArticulationTestStatus();
+  const { lastCompletedAt, nextTestDate, isTestAvailable, isLoading, resetTest, refetch } = useArticulationTestStatus();
+  const { selectedChild } = useAuth();
   const navigate = useNavigate();
+  const [isSimulating, setIsSimulating] = useState(false);
+  const [simulationProgress, setSimulationProgress] = useState(0);
 
   const handleReset = async () => {
     const success = await resetTest();
@@ -21,9 +27,50 @@ export function ArticulationTestProfileSection() {
     }
   };
 
-  const handleStartSession = (sessionNumber: number) => {
-    // Start at Ž (index 57) for testing - only 3 words
-    navigate(`/artikulacijski-test?seja=${sessionNumber}&start=57`);
+  const handleSimulate = async () => {
+    if (!selectedChild?.id) {
+      toast.error("Najprej izberite otroka.");
+      return;
+    }
+    setIsSimulating(true);
+    setSimulationProgress(5);
+
+    // Simulate progress updates
+    const progressInterval = setInterval(() => {
+      setSimulationProgress(prev => Math.min(prev + 1.5, 95));
+    }, 1000);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Niste prijavljeni.");
+        return;
+      }
+
+      const response = await supabase.functions.invoke("simulate-articulation-test", {
+        body: { childId: selectedChild.id },
+      });
+
+      clearInterval(progressInterval);
+
+      if (response.error) {
+        console.error("Simulation error:", response.error);
+        toast.error("Napaka pri simulaciji testa.");
+      } else {
+        setSimulationProgress(100);
+        toast.success(`Simulacija uspešna! Seja-${response.data.sessionNumber} ustvarjena.`);
+        await refetch();
+      }
+    } catch (err) {
+      console.error("Simulate error:", err);
+      toast.error("Napaka pri simulaciji testa.");
+    } finally {
+      clearInterval(progressInterval);
+      setTimeout(() => {
+        setIsSimulating(false);
+        setSimulationProgress(0);
+      }, 1000);
+    }
   };
 
   if (isLoading) {
@@ -118,50 +165,47 @@ export function ArticulationTestProfileSection() {
           </div>
         )}
 
-        {/* Test Sessions for Testing */}
+        {/* Simulation & Reset - for testing */}
         <div className="rounded-lg border border-dragon-green/30 overflow-hidden">
           <div className="bg-dragon-green/10 px-4 py-2 border-b border-dragon-green/20">
-            <p className="font-medium text-dragon-green text-sm">🧪 Testne seje (za razvoj)</p>
+            <p className="font-medium text-dragon-green text-sm">🧪 Orodja za testiranje</p>
           </div>
-          <div className="p-4 space-y-2">
-            {[1, 2, 3, 4, 5].map((sessionNum) => (
+          <div className="p-4 space-y-3">
+            {isSimulating && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <span>Simulacija poteka...</span>
+                  <span>{Math.round(simulationProgress)}%</span>
+                </div>
+                <Progress value={simulationProgress} className="h-2" />
+              </div>
+            )}
+            <Button
+              variant="outline"
+              className="w-full justify-start text-left hover:bg-dragon-green/10 hover:border-dragon-green"
+              onClick={handleSimulate}
+              disabled={isSimulating}
+            >
+              {isSimulating ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Zap className="h-4 w-4 mr-2 text-dragon-green" />
+              )}
+              {isSimulating ? "Simulacija poteka..." : "Izvedi test (simulacija)"}
+            </Button>
+            {hasCompletedTest && (
               <Button
-                key={sessionNum}
                 variant="outline"
-                className="w-full justify-start text-left hover:bg-dragon-green/10 hover:border-dragon-green"
-                onClick={() => handleStartSession(sessionNum)}
+                size="sm"
+                onClick={handleReset}
+                className="w-full justify-start text-muted-foreground hover:text-destructive hover:border-destructive"
               >
-                <Play className="h-4 w-4 mr-2 text-dragon-green" />
-                Preverjanje izgovorjave {sessionNum}
-                <span className="ml-auto text-xs text-muted-foreground">→ Seja-{sessionNum}</span>
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Ponastavi test (za testiranje)
               </Button>
-            ))}
+            )}
           </div>
         </div>
-
-        {/* Reset Button - for testing */}
-        {hasCompletedTest && (
-          <div className="pt-2 border-t border-border">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleReset}
-                    className="text-muted-foreground hover:text-destructive hover:border-destructive"
-                  >
-                    <RotateCcw className="h-4 w-4 mr-2" />
-                    Ponastavi test (za testiranje)
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Ponastavi vse podatke o opravljenem testu (samo za testiranje)</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-        )}
       </div>
     </div>
   );
