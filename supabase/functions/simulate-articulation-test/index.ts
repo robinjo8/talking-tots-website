@@ -121,16 +121,38 @@ serve(async (req) => {
 
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Determine session number by counting existing completed sessions
+    const sessionNumber = 1;
+
+    // Clean up any existing data before simulation
     const { data: existingSessions } = await supabaseAdmin
       .from("articulation_test_sessions")
-      .select("session_number")
+      .select("id")
       .eq("child_id", childId)
-      .eq("parent_id", userId)
-      .order("session_number", { ascending: false })
-      .limit(1);
+      .eq("parent_id", userId);
 
-    const sessionNumber = (existingSessions?.[0]?.session_number || 0) + 1;
+    const existingIds = (existingSessions || []).map((s: { id: string }) => s.id);
+
+    if (existingIds.length > 0) {
+      await supabaseAdmin.from("articulation_word_results").delete().in("session_id", existingIds);
+      await supabaseAdmin.from("articulation_test_sessions").delete().eq("child_id", childId).eq("parent_id", userId);
+    }
+
+    await supabaseAdmin.from("articulation_test_results").delete().eq("child_id", childId);
+
+    // Clean storage
+    const storagePath = `${userId}/${childId}/Preverjanje-izgovorjave`;
+    const { data: folders } = await supabaseAdmin.storage.from("uporabniski-profili").list(storagePath);
+    if (folders && folders.length > 0) {
+      for (const folder of folders) {
+        const folderPath = `${storagePath}/${folder.name}`;
+        const { data: files } = await supabaseAdmin.storage.from("uporabniski-profili").list(folderPath);
+        if (files && files.length > 0) {
+          await supabaseAdmin.storage.from("uporabniski-profili").remove(files.map((f: { name: string }) => `${folderPath}/${f.name}`));
+        }
+      }
+    }
+
+    console.log("Cleanup complete, creating Seja-1");
 
     // 1. Create session
     const { data: session, error: sessionError } = await supabaseAdmin
