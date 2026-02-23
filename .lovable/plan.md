@@ -1,76 +1,68 @@
 
 
-## Popravek: Ime in priimek starsa pri dodajanju otroka
+## Popravek: Neujemanje stevila "V cakanju" med nadzorno plosco in stranjo
 
 ### Problem
 
-Uporabniki, ki se registrirajo z Google racunom, nimajo izpolnjenega imena in priimka v tabeli `profiles`, ker Supabase trigger `handle_new_user()` bere podatke iz `raw_user_meta_data->>'first_name'` in `raw_user_meta_data->>'last_name'`, Google OAuth pa shrani ime pod kljucem `full_name` ali `name`. Zato je v zavihku "Moj profil" polje Ime in Priimek prazno.
+Nadzorna plosca (dashboard) prikazuje **7** v cakanju, stran "V cakanju" pa le **2** primera. Razlog je, da tri razlicne poizvedbe za stevilo cakajocih sej uporabljajo razlicne filtre:
+
+| Poizvedba | Datoteka | Filtri | Rezultat |
+|-----------|----------|--------|----------|
+| Dashboard stat | `useAdminStats.ts` | `status = 'pending'` | **7** |
+| Sidebar badge | `useAdminCounts.ts` | `status = 'pending'` + `is_completed = true` + `assigned_to IS NULL` | **2** |
+| Stran "V cakanju" | `usePendingTests.ts` | `status = 'pending'` + `is_completed = true` + `assigned_to IS NULL` + source_type filter | **2** |
+
+Dashboard ne filtrira po `is_completed` in `assigned_to`, zato steje tudi 5 nedokoncanih (se ne oddanih) sej.
+
+### Testni podatki v bazi
+
+V bazi obstaja testni uporabnik `a1000000-0000-0000-0000-000000000002` (NE obstaja v `auth.users`), ki ima:
+- Otroka "Lana" (`7bc1b016-...`) v tabeli `children`
+- 1 sejo v `articulation_test_sessions` (`0a855759-...`)
+
+Ti podatki so ostanki testnega seedanja in jih je treba pocistiti.
 
 ### Resitev
 
-#### 1. Posodobitev `SimpleChildForm.tsx`
+#### 1. Popravek `useAdminStats.ts` (vrstica 47-50)
 
-Dodaj polja za ime in priimek starsa **nad** poljem za ime otroka. Polja se prikazejo samo ce profil nima izpolnjenega imena (`first_name` je prazen v `profiles` tabeli).
-
-- Dodaj state: `parentFirstName`, `parentLastName`
-- Dodaj `useEffect` ki ob mount preveri ali ima uporabnik ze izpolnjeno ime v `profiles` tabeli
-- Ce ime ze obstaja, skrij polja za starsa
-- Ce ime ne obstaja, prikazi polja z naslovom "Podatki starsa" pred polji otroka
-- Validacija: ce so polja vidna, morata biti obe polji izpolnjeni za nadaljevanje (`canContinue` pogoj)
-
-#### 2. Posodobitev `AddChildForm.tsx` (ali `SimpleChildForm`)
-
-Ko se otrok shranjuje, najprej posodobi `profiles` tabelo z imenom in priimkom starsa (ce sta bila vnesena):
+Poizvedba za `orgPendingTests` mora uporabljati enake filtre kot stran "V cakanju":
 
 ```text
-// Pred shranjevanjem otroka (v handleContinue ali handleSubmit)
-if (parentFirstName && parentLastName) {
-  await supabase.from('profiles').update({
-    first_name: parentFirstName,
-    last_name: parentLastName
-  }).eq('id', user.id);
-}
+// PREJ:
+.eq('status', 'pending')
+
+// POTEM:
+.eq('status', 'pending')
+.eq('is_completed', true)
+.is('assigned_to', null)
 ```
 
-Podatke o starsevem imenu je potrebno posredovati iz `SimpleChildForm` v `AddChildForm` preko novih props ali pa shraniti ze v `SimpleChildForm` ob kliku "Nadaljuj".
+To zagotovi, da se stejejo samo dejansko oddane in neprevzete seje.
 
-#### 3. SQL posodobitev za obstojecega uporabnika
+#### 2. Brisanje testnih podatkov (SQL migracija)
 
-Za uporabnika `kujavec.robert@gmail.com` neposredno posodobiti `profiles` tabelo:
+Pocistiti podatke testnega uporabnika `a1000000-0000-0000-0000-000000000002`:
 
 ```text
-UPDATE profiles 
-SET first_name = 'Robert', last_name = 'Kujavec' 
-WHERE id = (SELECT id FROM auth.users WHERE email = 'kujavec.robert@gmail.com');
+-- Izbrisi seje testnega uporabnika
+DELETE FROM articulation_test_sessions 
+WHERE parent_id = 'a1000000-0000-0000-0000-000000000002';
+
+-- Izbrisi otroke testnega uporabnika
+DELETE FROM children 
+WHERE parent_id = 'a1000000-0000-0000-0000-000000000002';
+
+-- Izbrisi profil testnega uporabnika (ce obstaja)
+DELETE FROM profiles 
+WHERE id = 'a1000000-0000-0000-0000-000000000002';
 ```
 
-To se izvede z uporabo insert tool-a (data update, ne schema change).
+### Datoteke za spremembo
 
-### Spremembe datotek
+- **`src/hooks/useAdminStats.ts`** - dodaj `.eq('is_completed', true).is('assigned_to', null)` v poizvedbo za orgPendingTests
+- **Nova SQL migracija** - brisanje testnih podatkov
 
-- **`src/components/profile/SimpleChildForm.tsx`** - dodaj polja za ime/priimek starsa, preverjanje ali so podatki ze izpolnjeni, shranjevanje v profiles ob "Nadaljuj"
-- **Supabase data update** - posodobitev profila za `kujavec.robert@gmail.com`
+### Rezultat po popravku
 
-### Vizualni izgled forme
-
-```text
-+----------------------------------+
-| Dodaj otroka                     |
-+----------------------------------+
-| Podatki starsa                   |
-| [Ime starsa        ]            |
-| [Priimek starsa    ]            |
-|                                  |
-| Ime otroka ali vzdevek          |
-| [                   ]            |
-| Spol (neobvezno)               |
-| ( ) M  ( ) Z  ( ) Ne zelim      |
-| Datum rojstva otroka (obvezno)  |
-| [Izberite datum rojstva]         |
-|                                  |
-| [Nazaj]            [Nadaljuj]   |
-+----------------------------------+
-```
-
-Sekcija "Podatki starsa" se prikaze samo ce uporabnik nima izpolnjenega imena v profilu. Ko vnese podatke in klikne "Nadaljuj", se ime shrani v `profiles` tabelo in ob naslednjem dodajanju otroka se ta sekcija ne prikaze vec.
-
+Po popravku bo dashboard prikazoval **2** v cakanju (enako kot stran "V cakanju" in sidebar badge), testni podatki pa bodo pocisceni.
