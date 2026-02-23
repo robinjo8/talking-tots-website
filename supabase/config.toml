@@ -45,3 +45,6 @@ verify_jwt = false
 [functions.verify-mfa-code]
 verify_jwt = false
 
+[functions.simulate-articulation-test]
+verify_jwt = false
+
