@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +11,8 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { AddChildForm } from "@/components/AddChildForm";
 import { CalendarIcon, HelpCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SimpleChildFormProps {
   onSuccess?: () => void;
@@ -18,6 +20,7 @@ interface SimpleChildFormProps {
 }
 
 export function SimpleChildForm({ onSuccess, onCancel }: SimpleChildFormProps) {
+  const { user } = useAuth();
   const [showNameOnly, setShowNameOnly] = useState(true);
   const [childName, setChildName] = useState("");
   const [birthDate, setBirthDate] = useState<Date | null>(null);
@@ -25,9 +28,37 @@ export function SimpleChildForm({ onSuccess, onCancel }: SimpleChildFormProps) {
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [infoDialogOpen, setInfoDialogOpen] = useState(false);
+  const [parentFirstName, setParentFirstName] = useState("");
+  const [parentLastName, setParentLastName] = useState("");
+  const [showParentFields, setShowParentFields] = useState(false);
+  const [parentFieldsLoaded, setParentFieldsLoaded] = useState(false);
 
-  const handleContinue = () => {
+  useEffect(() => {
+    const checkParentName = async () => {
+      if (!user) return;
+      const { data } = await supabase
+        .from('profiles')
+        .select('first_name')
+        .eq('id', user.id)
+        .single();
+      setShowParentFields(!data?.first_name);
+      setParentFieldsLoaded(true);
+    };
+    checkParentName();
+  }, [user]);
+
+  const handleContinue = async () => {
     if (!childName.trim() || !birthDate) return;
+    if (showParentFields && (!parentFirstName.trim() || !parentLastName.trim())) return;
+    
+    // Save parent name to profiles if fields were shown
+    if (showParentFields && user && parentFirstName.trim() && parentLastName.trim()) {
+      await supabase.from('profiles').update({
+        first_name: parentFirstName.trim(),
+        last_name: parentLastName.trim()
+      }).eq('id', user.id);
+    }
+    
     setShowNameOnly(false);
   };
 
@@ -43,7 +74,8 @@ export function SimpleChildForm({ onSuccess, onCancel }: SimpleChildFormProps) {
     setDialogOpen(false);
   };
 
-  const canContinue = childName.trim().length > 0 && birthDate !== null;
+  const canContinue = childName.trim().length > 0 && birthDate !== null && 
+    (!showParentFields || (parentFirstName.trim().length > 0 && parentLastName.trim().length > 0));
 
   const handleBackFromAvatar = () => {
     setShowNameOnly(true);
@@ -68,6 +100,31 @@ export function SimpleChildForm({ onSuccess, onCancel }: SimpleChildFormProps) {
         <CardTitle>Dodaj otroka</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {showParentFields && parentFieldsLoaded && (
+          <>
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-muted-foreground">Podatki starša</p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="parentFirstName">Ime starša</Label>
+              <Input
+                id="parentFirstName"
+                value={parentFirstName}
+                onChange={(e) => setParentFirstName(e.target.value)}
+                placeholder="Vnesite ime starša"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="parentLastName">Priimek starša</Label>
+              <Input
+                id="parentLastName"
+                value={parentLastName}
+                onChange={(e) => setParentLastName(e.target.value)}
+                placeholder="Vnesite priimek starša"
+              />
+            </div>
+          </>
+        )}
         <div className="space-y-2">
           <Label htmlFor="childName">Ime otroka ali vzdevek</Label>
           <Input
