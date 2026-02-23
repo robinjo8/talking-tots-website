@@ -1,59 +1,77 @@
 
 
-## Simulacija preverjanja izgovorjave - gumb "Izvedi test"
+## Popolna ponastavitev preverjanja izgovorjave
 
-### Kaj bo narejeno
+### Problem
 
-Na strani `/profile` v sekciji "Preverjanje izgovorjave" bosta dodana dva gumba v obstojecem razdelku "Testne seje (za razvoj)":
+Trenutni gumb "Ponastavi test" briše samo iz tabele `articulation_test_results`. Nedokoncane seje v `articulation_test_sessions` in rezultati besed v `articulation_word_results` ostanejo v bazi. Zato se ob ponovnem vstopu v test prikaze dialog za nadaljevanje z besedo MIZA, namesto da bi se test zacel od zacetka.
 
-1. **Izvedi test (simulacija)** - simulira celotno preverjanje izgovorjave (60 besed) z uporabo testnih posnetkov `test_1.m4a` do `test_60.m4a` iz bucketa `zvocni-posnetki`
-2. **Ponastavi test** - obstojecim gumb, ki ostane kjer je
+Dodatno: RLS politike na tabelah `articulation_test_sessions` in `articulation_word_results` ne dovoljujejo operacije DELETE za starse, zato brisanje iz klienta ni mogoce.
 
-### Kako deluje simulacija
+### Resitev
 
-Simulacija bo ustvarila realno sejo v bazi, kot da bi uporabnik dejansko govoril besedo po besedo:
+Ustvariti Edge funkcijo `reset-articulation-test`, ki z uporabo service role kljuca izvede celovito brisanje vseh podatkov preverjanja za dolocenega otroka:
 
-1. Ustvari novo sejo v `articulation_test_sessions` (status: pending, is_completed: false)
-2. Za vsako od 60 besed:
-   - Kopira testni posnetek (`test_X.m4a`) iz bucketa `zvocni-posnetki` v bucket `uporabniski-profili` pod pravilno pot (`userId/childId/Preverjanje-izgovorjave/Seja-X/...`)
-   - Vstavi zapis v `articulation_word_results` z dejanskimi podatki (letter, position, target_word, audio_url, ai_accepted: true)
-   - Posodobi `current_word_index` na seji
-3. Oznaci sejo kot dokoncano (is_completed: true, status: pending)
-4. Shrani rezultat v `articulation_test_results`
+1. Izbrise vse zapise iz `articulation_word_results` (ki pripadajo sejam tega otroka)
+2. Izbrise vse zapise iz `articulation_test_sessions` za tega otroka
+3. Izbrise vse zapise iz `articulation_test_results` za tega otroka
+4. Izbrise audio posnetke iz storage bucketa `uporabniski-profili` (mapa `userId/childId/Preverjanje-izgovorjave/`)
 
-### Tehnicni nacrt
+### Spremembe
 
-#### 1. Nova Edge funkcija: `simulate-articulation-test`
+#### 1. Nova Edge funkcija: `reset-articulation-test`
 
-**`supabase/functions/simulate-articulation-test/index.ts`**
+**`supabase/functions/reset-articulation-test/index.ts`**
 
-- Sprejme: `childId` v body-ju
-- Uporabi service role key za polni dostop
-- Preveri avtentikacijo uporabnika
-- Pridobi seznam 60 besed iz `articulationTestData` konfiguracije (hardcodirane v funkciji)
-- Za vsako besedo:
-  - Prebere testni posnetek `test_X.m4a` iz `zvocni-posnetki` (public bucket)
-  - Naloži posnetek v `uporabniski-profili` pod pravilno pot
-  - Vstavi word result v bazo
-- Oznaci sejo kot dokoncano
-- Vrne uspeh/napako
+- Sprejme `childId` v body-ju
+- Preveri avtentikacijo uporabnika (Bearer token)
+- Preveri da je otrok res last tega starsa (preko tabele `children`)
+- Z uporabo service role kljuca:
+  - Poisci vse seje tega otroka (`articulation_test_sessions` WHERE `child_id = childId`)
+  - Za vsako sejo izbrise vse `articulation_word_results`
+  - Izbrise vse seje
+  - Izbrise vse `articulation_test_results`
+  - Izbrise mapo z audio posnetki iz storage
+- Vrne stevilo izbrisanih sej
 
-#### 2. Posodobitev komponente: `ArticulationTestProfileSection.tsx`
+#### 2. Registracija v `supabase/config.toml`
 
-- Doda gumb "Izvedi test (simulacija)" z ikono `Zap` (lightning)
-- Gumb klice edge funkcijo `simulate-articulation-test`
-- Med izvajanjem prikaze loading stanje z napredkom
-- Po uspesnem zakljucku osvezi status testa
+Dodaj novo funkcijo z `verify_jwt = false` (validacija v kodi).
 
-#### 3. Podatki o besedah v edge funkciji
+#### 3. Posodobitev `useArticulationTestStatus.ts`
 
-Edge funkcija bo vsebovala hardcodiran seznam 60 besed v foneticnem vrstnem redu (P, B, M, T, D, K, G, N, H, V, J, F, L, S, Z, C, S, Z, C, R) z ustreznimi podatki (letter, position label, target_word), da pravilno zapolni `articulation_word_results`.
+Spremeni `resetTest` funkcijo, da klice novo edge funkcijo namesto direktnega brisanja samo iz `articulation_test_results`.
 
-### Pricakovani rezultat
+```text
+const resetTest = async (): Promise<boolean> => {
+  if (!selectedChild?.id) return false;
+  
+  const response = await supabase.functions.invoke("reset-articulation-test", {
+    body: { childId: selectedChild.id },
+  });
+  
+  if (response.error) return false;
+  await fetchTestStatus();
+  return true;
+};
+```
 
-Po kliku na "Izvedi test (simulacija)":
-- V bazi bo nova seja z 60 word results
-- V storage-u bo 60 audio posnetkov pod pravilno strukturo map
-- Seja bo vidna v admin portalu za logopede
-- Status na profilu bo pokazal "Test je bil opravljen"
-- Celoten proces traja priblizno 30-60 sekund (kopiranje 60 datotek)
+#### 4. Posodobitev `ArticulationTestProfileSection.tsx`
+
+Gumb "Ponastavi test" mora biti vedno viden (ne samo ko je test opravljen), ker mora delovati tudi za nedokoncane seje.
+
+### Kaj se izbrise
+
+```text
+articulation_word_results  --> vsi zapisi za seje tega otroka
+articulation_test_sessions --> vse seje tega otroka (child_id)
+articulation_test_results  --> vsi rezultati tega otroka
+uporabniski-profili/       --> userId/childId/Preverjanje-izgovorjave/*
+```
+
+### Vpliv
+
+- Po kliku na "Ponastavi test" bo stanje identično kot da otrok nikoli ni opravljal preverjanja
+- Dialog za nadaljevanje se ne bo vec prikazal
+- Admin portal ne bo vec videl starih sej
+- Gumb bo viden tudi med nedokoncanim testom
