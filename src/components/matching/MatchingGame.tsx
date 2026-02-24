@@ -84,6 +84,7 @@ export function MatchingGame({
                     isMatched={isTileMatched(image.word)}
                     onClick={() => handleTileClick(image.word, columnIndex, index)}
                     style={{ width: tileSize, height: tileSize }}
+                    disableScaleEffects={isLandscape}
                     data-image-id={image.word}
                     data-column={columnIndex}
                     data-index={index}

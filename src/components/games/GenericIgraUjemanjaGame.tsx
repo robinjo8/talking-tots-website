@@ -262,7 +262,15 @@ export function GenericIgraUjemanjaGame({ config, backPath = '/govorne-igre/igra
         </div>
       ) : (
         <>
-          <div className="fixed inset-0 flex items-center justify-center z-10">
+          <div 
+            className="fixed inset-0 flex items-center justify-center z-10"
+            style={isTouchDevice ? {
+              paddingTop: 'max(8px, env(safe-area-inset-top, 0px))',
+              paddingBottom: 'max(8px, env(safe-area-inset-bottom, 0px))',
+              paddingLeft: 'max(80px, env(safe-area-inset-left, 80px))',
+              paddingRight: 'max(8px, env(safe-area-inset-right, 0px))',
+            } : undefined}
+          >
             {renderGame()}
           </div>
           
