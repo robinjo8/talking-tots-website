@@ -31,7 +31,8 @@ export function MatchingGame({
     isTileMatched
   } = useMatchingGame(images, numColumns);
 
-  const numRows = images.length > 0 ? Math.ceil(images.length / numColumns) : 3;
+  // Each column contains ALL images (not images/numColumns), so numRows = images.length
+  const numRows = gameState.shuffledColumns[0]?.length || images.length || 3;
   const tileSize = useDynamicTileSize({
     numColumns,
     numRows,
