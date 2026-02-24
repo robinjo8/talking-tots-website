@@ -9,11 +9,11 @@ const PogostaVprasanja = () => {
     },
     {
       question: "Katere govorne težave obravnava aplikacija?",
-      answer: "TomiTalk obravnava najpogostejše govorne težave otrok, kot so napačna izgovorjava določenih glasov (npr. R, L, S), težave z artikulacijo, govorno motoriko in druge razvojne govorne motnje."
+      answer: "TomiTalk obravnava najpogostejše govorne težave otrok, kot so napačna izgovorjava določenih glasov (npr. R, L, S), težave z artikulacijo, govorno motoriko in druge govorno-jezikovne motnje."
     },
     {
       question: "Kakšne vrste vaj in iger vključuje TomiTalk?",
-      answer: "Aplikacija vključuje interaktivne igre in vaje, kot so igre spomin, sestavljanke, ponavljanje besed s pomočjo zvočnih posnetkov, igre za vadbo artikulacije in motorike govoril ter igre za splošno krepitev govornega razvoja in samozavesti otrok."
+      answer: "Aplikacija vključuje interaktivne igre in vaje, kot so igre spomin, sestavljanke, ponavljanje besed s pomočjo zvočnih posnetkov, igre za vadbo artikulacije in motorike govoril ter igre za splošno krepitev govornega razvoja in s tem samozavesti otrok."
     },
     {
       question: "Kako TomiTalk spremlja otrokove rezultate in napredek?",
