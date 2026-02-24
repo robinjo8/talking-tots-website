@@ -51,12 +51,23 @@ function formatSource(session: TestSessionData): SourceDisplay {
 const StatusBadge = ({ 
   status, 
   reviewedAt, 
-  completedAt 
+  completedAt,
+  isCompleted 
 }: { 
   status: TestSessionData['status'];
   reviewedAt?: string | null;
   completedAt?: string | null;
+  isCompleted: boolean;
 }) => {
+  // Ni opravljeno
+  if (!isCompleted) {
+    return (
+      <Badge variant="outline" className="border-gray-400 text-gray-600 bg-gray-50 dark:bg-gray-900 dark:text-gray-400">
+        Ni opravljeno
+      </Badge>
+    );
+  }
+
   // V čakanju
   if (status === 'pending') {
     return (
@@ -128,7 +139,7 @@ const TestCard = ({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <StatusBadge status={session.status} reviewedAt={session.reviewed_at} completedAt={session.completed_at} />
+          <StatusBadge status={session.status} reviewedAt={session.reviewed_at} completedAt={session.completed_at} isCompleted={session.is_completed} />
           <ChevronDown 
             className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${
               isExpanded ? 'rotate-180' : ''
@@ -163,7 +174,7 @@ const TestCard = ({
           {/* Submitted date */}
           <div>
             <span className="text-xs text-muted-foreground">Oddano</span>
-            <p>{formatDate(session.submitted_at)}</p>
+            <p>{session.is_completed ? formatDate(session.submitted_at) : '-'}</p>
           </div>
           
           {/* Actions - read only */}
@@ -244,16 +255,16 @@ export default function AdminTests() {
       
       // Status filter
       if (statusFilter !== 'all') {
-        if (statusFilter === 'in_review') {
-          if (!['assigned', 'in_review'].includes(session.status)) return false;
+        if (statusFilter === 'not_completed') {
+          if (session.is_completed) return false;
+        } else if (statusFilter === 'pending') {
+          if (!session.is_completed || session.status !== 'pending') return false;
+        } else if (statusFilter === 'in_review') {
+          if (!session.is_completed || !['assigned', 'in_review'].includes(session.status)) return false;
         } else if (statusFilter === 'reviewed') {
-          // Pregledano = completed status BREZ completed_at
-          if (session.status !== 'completed' || session.completed_at) return false;
+          if (!session.is_completed || session.status !== 'completed' || session.completed_at) return false;
         } else if (statusFilter === 'completed') {
-          // Zaključeno = ima completed_at
           if (!session.completed_at) return false;
-        } else {
-          if (session.status !== statusFilter) return false;
         }
       }
       
@@ -425,6 +436,7 @@ export default function AdminTests() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Vsi statusi</SelectItem>
+                <SelectItem value="not_completed">Ni opravljeno</SelectItem>
                 <SelectItem value="pending">V čakanju</SelectItem>
                 <SelectItem value="in_review">V obdelavi</SelectItem>
                 <SelectItem value="reviewed">Pregledano</SelectItem>
@@ -521,10 +533,10 @@ export default function AdminTests() {
                             )}
                           </TableCell>
                           <TableCell>
-                            <StatusBadge status={session.status} reviewedAt={session.reviewed_at} completedAt={session.completed_at} />
+                            <StatusBadge status={session.status} reviewedAt={session.reviewed_at} completedAt={session.completed_at} isCompleted={session.is_completed} />
                           </TableCell>
                           <TableCell>
-                            {formatDate(session.submitted_at)}
+                            {session.is_completed ? formatDate(session.submitted_at) : '-'}
                           </TableCell>
                           <TableCell className="text-right">
                             <Button 
