@@ -1,106 +1,66 @@
 
 
-## Popravek: Igra ujemanja - prilagoditev zaslonu (kot Labirint)
+## Popravek: Igra ujemanja - prilagoditev na telefonu (brez scrollanja)
 
 ### Problem
 
-Na racunalniku se igra ujemanja prikaze samo v zgornjem delu zaslona s fiksno velikimi karticami, namesto da bi se raztegnila cez cel zaslon. Labirint to dela pravilno, ker dinamicno izracuna velikost celic glede na velikost okna.
+Ko je igra ujemanja na telefonu v landscape nacinu, hook `useDynamicTileSize` vrne **fiksno velikost 80px** za vse kartice, ne glede na velikost zaslona telefona. Na manjsih telefonih to pomeni, da se kartice ne prilegajo zaslonu in je potrebno scrollati.
 
-### Razlika med igrama
+Labirint tega problema nima, ker dinamicno izracuna velikost celic iz dejanskih dimenzij zaslona.
 
-**Labirint** (deluje pravilno):
-- Zunanji kontejner: `fixed inset-0` (zapolni cel zaslon)
-- Velikost celic: dinamicno izracunana iz `window.innerWidth` in `window.innerHeight`
-- Rezultat: igra se vedno prilagodi zaslonu
+### Koren problema
 
-**Igra ujemanja** (ne deluje):
-- Zunanji kontejner: `min-h-screen` z `h-full` (ni dejanske visine)
-- Velikost kartic: fiksna (`w-24 h-24` do `xl:w-44 xl:h-44`)
-- Rezultat: kartice ostanejo majhne, igra ne zapolni zaslona
+V `src/hooks/useDynamicTileSize.ts`, vrstica 23:
+```text
+if (isLandscape) return 80; // Fiksna vrednost - NE prilagaja se zaslonu!
+```
+
+In vrstica 28:
+```text
+if (isLandscape) return; // Ne posodablja velikosti ob spremembi zaslona
+```
 
 ### Resitev
 
-Namesto fiksnih Tailwind razredov za velikost kartic, bomo uvedli **dinamicno skaliranje** podobno kot Labirint - izracunamo velikost kartic glede na razpolozljivo visino in sirino okna brskalnika.
+Namesto fiksne velikosti 80px za mobilni landscape nacin, uporabimo **enako dinamicno logiko** kot za desktop, le z manjsim paddingom in manjsim gap-om, ker je na telefonu manj prostora.
 
-### Tehnicne spremembe
+### Tehnicna sprememba
 
-#### 1. `src/components/games/GenericIgraUjemanjaGame.tsx`
+**`src/hooks/useDynamicTileSize.ts`** - edina datoteka, ki jo je treba spremeniti:
 
-- Spremeniti zunanji kontejner iz `min-h-screen` v `fixed inset-0` (enako kot Labirint desktop)
-- Uporabiti `flex items-center justify-center` za centriranje igre na sredini zaslona
-
-Zamenjava (vrstice 244-267):
-```
-// PREJ:
-<div className="min-h-screen bg-background relative game-container">
-  <div className="fixed inset-0 z-0" style={{backgroundImage: ...}} />
-  ...
-  <div className="h-full flex items-center justify-center relative z-10">
-    {renderGame()}
-  </div>
-
-// POTEM:
-<div className="fixed inset-0 bg-background relative game-container">
-  <div className="fixed inset-0 z-0" style={{backgroundImage: ...}} />
-  ...
-  <div className="fixed inset-0 flex items-center justify-center z-10">
-    {renderGame()}
-  </div>
-```
-
-#### 2. `src/components/matching/MatchingGame.tsx`
-
-Zamenjati fiksne Tailwind velikosti kartic z dinamicnim izracunom:
-
-- Dodati `useState` za `windowSize` (width, height)
-- Dodati `useEffect` z resize listenerjem
-- Izracunati `tileSize` iz razpolozljivega prostora:
-  - Na voljo: `windowHeight - paddingZgornjSpodaj`
-  - `tileSize = Math.floor(razpolozljivaVisina / steviloVrstic) - razmik`
-  - Omejiti z `Math.min(tileSize, maxTileSize)` da na velikih zaslonih ne postanejo prevelike
-- Uporabiti inline `style={{ width: tileSize, height: tileSize }}` namesto fiksnih razredov
-
-#### 3. `src/components/matching/ThreeColumnGame.tsx`
-
-Enaka logika kot MatchingGame:
-
-- Dodati dinamicni izracun velikosti kartic na osnovi visine okna
-- 3 stolpci, 3 vrstice: `tileSize = Math.floor((viewportHeight - padding) / 3 - gap)`
-- Zamenjati fiksne razrede z inline stili
-
-#### 4. `src/components/matching/FourColumnGame.tsx`
-
-Enaka logika:
-
-- 4 stolpci, 4 vrstice: `tileSize = Math.floor((viewportHeight - padding) / 4 - gap)`
-- Zamenjati fiksne razrede z inline stili
-
-### Logika izracuna velikosti
+Odstranimo fiksno vrednost `80` za landscape in namesto tega izracunamo velikost kartic glede na dejanski zaslon:
 
 ```text
-// Pseudokoda za izracun
-viewportWidth = window.innerWidth
-viewportHeight = window.innerHeight
+// PREJ:
+if (isLandscape) return 80;
+...
+if (isLandscape) return; // ne resize-a
 
-// Koliko prostora imamo za kartice (odsejemo padding, progress bar)
-availableHeight = viewportHeight - 120  // 120px za padding + progress bar
-availableWidth = viewportWidth - 80     // 80px za stranski padding
-
-// Izracunamo maksimalno velikost kartice iz obeh dimenzij
-tileSizeByHeight = Math.floor(availableHeight / numRows) - gap
-tileSizeByWidth = Math.floor(availableWidth / numColumns) - gap
-
-// Vzamemo manjso (da ne gre cez rob)
-tileSize = Math.min(tileSizeByHeight, tileSizeByWidth)
-
-// Omejimo na max 180px (da na ogromnih zaslonih ni preveliko)
-tileSize = Math.min(tileSize, 180)
+// POTEM:
+if (isLandscape) {
+  return calculateTileSize(
+    window.innerWidth, window.innerHeight,
+    numColumns, numRows,
+    40,   // manj vertikalnega paddinga (namesto 120)
+    40,   // manj horizontalnega paddinga (namesto 80)
+    4,    // manjsi gap (namesto 16)
+    120   // manjsi max (namesto 180)
+  );
+}
 ```
+
+In v useEffect dodamo resize listener tudi za landscape, z istimi parametri.
+
+### Kaj ostane nespremenjeno
+
+- **Desktop** - brez sprememb (racunalnik ze deluje pravilno)
+- `GenericIgraUjemanjaGame.tsx` - brez sprememb
+- `MatchingGame.tsx`, `ThreeColumnGame.tsx`, `FourColumnGame.tsx` - brez sprememb (ze uporabljajo `useDynamicTileSize`)
+- `ImageTile.tsx` - brez sprememb
 
 ### Kaj to pomeni za uporabnike
 
-- **Na racunalniku**: Kartice se bodo povecale in zapolnile zaslon, tako kot Labirint
-- **Na tablici**: Igra se bo prilagodila velikosti zaslona
-- **Na telefonu (landscape)**: Brez sprememb - ze deluje s fiksnimi velikostmi za mobilne naprave (`isLandscape` logika ostane)
-- **Ko se spremeni velikost okna**: Kartice se dinamicno prilagodijo (resize listener)
+- Na **majhnem telefonu**: kartice bodo manjse, a vse vidne brez scrollanja
+- Na **vecjem telefonu/tablici**: kartice bodo vecje, ker je vec prostora
+- Na **racunalniku**: brez sprememb
 
