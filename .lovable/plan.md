@@ -1,58 +1,106 @@
 
 
-## Popravek: Zmanjsanje motece Safari vrstice na Apple napravah
+## Popravek: Igra ujemanja - prilagoditev zaslonu (kot Labirint)
 
-### Kaj je problem
+### Problem
 
-Na sliki vidimo, da se na iPadu/iPhonu v Safariju prikazuje crna vrstica z URL naslovom in zavihki. To je del Safari brskalnika - Apple ne dovoli, da bi spletne strani to vrstico skrile.
+Na racunalniku se igra ujemanja prikaze samo v zgornjem delu zaslona s fiksno velikimi karticami, namesto da bi se raztegnila cez cel zaslon. Labirint to dela pravilno, ker dinamicno izracuna velikost celic glede na velikost okna.
 
-**Edina resitev za popolno odstranitev** te vrstice je, da uporabnik aplikacijo **namesti na zacetni zaslon** (Add to Home Screen). Takrat se odpre v "standalone" nacinu brez Safari orodne vrstice.
+### Razlika med igrama
 
-Kljub temu pa lahko naredimo vec izboljsav, da bo izkusnja na Apple napravah boljsa.
+**Labirint** (deluje pravilno):
+- Zunanji kontejner: `fixed inset-0` (zapolni cel zaslon)
+- Velikost celic: dinamicno izracunana iz `window.innerWidth` in `window.innerHeight`
+- Rezultat: igra se vedno prilagodi zaslonu
 
-### Kaj bomo naredili
+**Igra ujemanja** (ne deluje):
+- Zunanji kontejner: `min-h-screen` z `h-full` (ni dejanske visine)
+- Velikost kartic: fiksna (`w-24 h-24` do `xl:w-44 xl:h-44`)
+- Rezultat: kartice ostanejo majhne, igra ne zapolni zaslona
 
-#### 1. Boljsa vrstica stanja (status bar) v PWA nacinu
+### Resitev
 
-Trenutno je `apple-mobile-web-app-status-bar-style` nastavljen na `default` (bel). Spremenimo na `black-translucent`, kar pomeni:
-- Ko je aplikacija nameščena kot PWA, se vsebina razteza pod vrstico stanja
-- Vrstica stanja postane prozorna namesto bele
-
-#### 2. CSS prilagoditev za "safe area" na Apple napravah
-
-Dodamo `viewport-fit=cover` v viewport meta tag in CSS pravila za `env(safe-area-inset-*)`. To zagotovi:
-- Vsebina se pravilno prilagodi okroglim robovom zaslona
-- Header se razteza do vrha zaslona v standalone nacinu
-
-#### 3. Samodejni poziv za namestitev na iOS
-
-Trenutno se iOS navodila pokazejo samo ob kliku na gumb "Prenesi aplikacijo". Dodamo tudi samodejni banner za iOS Safari uporabnike, ki se prikaze po nekaj sekundah - prijazno sporocilo, da bodo z namestitvijo dobili boljso izkusnjo brez Safari vrstice.
+Namesto fiksnih Tailwind razredov za velikost kartic, bomo uvedli **dinamicno skaliranje** podobno kot Labirint - izracunamo velikost kartic glede na razpolozljivo visino in sirino okna brskalnika.
 
 ### Tehnicne spremembe
 
-**`index.html`**:
-- Sprememba `viewport` meta taga: dodaj `viewport-fit=cover`
-- Sprememba `apple-mobile-web-app-status-bar-style` iz `default` v `black-translucent`
+#### 1. `src/components/games/GenericIgraUjemanjaGame.tsx`
 
-**`src/index.css`**:
-- Dodaj CSS za safe area padding na `body` in `#root`
-- Uporabi `env(safe-area-inset-top)` za header odmik
+- Spremeniti zunanji kontejner iz `min-h-screen` v `fixed inset-0` (enako kot Labirint desktop)
+- Uporabiti `flex items-center justify-center` za centriranje igre na sredini zaslona
 
-**`src/components/Header.tsx`**:
-- Dodaj padding-top za safe area, da header vsebina ne gre pod status bar v standalone nacinu
+Zamenjava (vrstice 244-267):
+```
+// PREJ:
+<div className="min-h-screen bg-background relative game-container">
+  <div className="fixed inset-0 z-0" style={{backgroundImage: ...}} />
+  ...
+  <div className="h-full flex items-center justify-center relative z-10">
+    {renderGame()}
+  </div>
 
-**`src/components/pwa/IOSInstallBanner.tsx`** (nova datoteka):
-- Samodejni banner za iOS Safari uporabnike
-- Prikaze se po 3 sekundah z navodili za namestitev
-- Moznost zaprtja (zapomni si za 7 dni)
-- Sporocilo: "Namesti TomiTalk za boljso izkusnjo brez naslovne vrstice"
+// POTEM:
+<div className="fixed inset-0 bg-background relative game-container">
+  <div className="fixed inset-0 z-0" style={{backgroundImage: ...}} />
+  ...
+  <div className="fixed inset-0 flex items-center justify-center z-10">
+    {renderGame()}
+  </div>
+```
 
-**`src/components/pwa/PWAProvider.tsx`**:
-- Vkljuci nov `IOSInstallBanner`
+#### 2. `src/components/matching/MatchingGame.tsx`
+
+Zamenjati fiksne Tailwind velikosti kartic z dinamicnim izracunom:
+
+- Dodati `useState` za `windowSize` (width, height)
+- Dodati `useEffect` z resize listenerjem
+- Izracunati `tileSize` iz razpolozljivega prostora:
+  - Na voljo: `windowHeight - paddingZgornjSpodaj`
+  - `tileSize = Math.floor(razpolozljivaVisina / steviloVrstic) - razmik`
+  - Omejiti z `Math.min(tileSize, maxTileSize)` da na velikih zaslonih ne postanejo prevelike
+- Uporabiti inline `style={{ width: tileSize, height: tileSize }}` namesto fiksnih razredov
+
+#### 3. `src/components/matching/ThreeColumnGame.tsx`
+
+Enaka logika kot MatchingGame:
+
+- Dodati dinamicni izracun velikosti kartic na osnovi visine okna
+- 3 stolpci, 3 vrstice: `tileSize = Math.floor((viewportHeight - padding) / 3 - gap)`
+- Zamenjati fiksne razrede z inline stili
+
+#### 4. `src/components/matching/FourColumnGame.tsx`
+
+Enaka logika:
+
+- 4 stolpci, 4 vrstice: `tileSize = Math.floor((viewportHeight - padding) / 4 - gap)`
+- Zamenjati fiksne razrede z inline stili
+
+### Logika izracuna velikosti
+
+```text
+// Pseudokoda za izracun
+viewportWidth = window.innerWidth
+viewportHeight = window.innerHeight
+
+// Koliko prostora imamo za kartice (odsejemo padding, progress bar)
+availableHeight = viewportHeight - 120  // 120px za padding + progress bar
+availableWidth = viewportWidth - 80     // 80px za stranski padding
+
+// Izracunamo maksimalno velikost kartice iz obeh dimenzij
+tileSizeByHeight = Math.floor(availableHeight / numRows) - gap
+tileSizeByWidth = Math.floor(availableWidth / numColumns) - gap
+
+// Vzamemo manjso (da ne gre cez rob)
+tileSize = Math.min(tileSizeByHeight, tileSizeByWidth)
+
+// Omejimo na max 180px (da na ogromnih zaslonih ni preveliko)
+tileSize = Math.min(tileSize, 180)
+```
 
 ### Kaj to pomeni za uporabnike
 
-- **Ce ze imajo nameščeno aplikacijo (PWA)**: Status bar bo prozoren, aplikacija bo izgledala bolj "nativno"
-- **Ce uporabljajo Safari**: Videli bodo prijazen poziv za namestitev. Ko namestijo, crna vrstica izgine
-- **Na Androidu**: Brez sprememb (tam ze deluje pravilno)
+- **Na racunalniku**: Kartice se bodo povecale in zapolnile zaslon, tako kot Labirint
+- **Na tablici**: Igra se bo prilagodila velikosti zaslona
+- **Na telefonu (landscape)**: Brez sprememb - ze deluje s fiksnimi velikostmi za mobilne naprave (`isLandscape` logika ostane)
+- **Ko se spremeni velikost okna**: Kartice se dinamicno prilagodijo (resize listener)
 
