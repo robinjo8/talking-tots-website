@@ -20,15 +20,19 @@ export function useDynamicTileSize({
   gap = 16,
 }: UseDynamicTileSizeOptions): number {
   const [tileSize, setTileSize] = useState(() => {
-    if (isLandscape) return 80; // Mobile landscape uses fixed small tiles
+    if (isLandscape) {
+      return calculateTileSize(window.innerWidth, window.innerHeight, numColumns, numRows, 40, 40, 4, 120);
+    }
     return calculateTileSize(window.innerWidth, window.innerHeight, numColumns, numRows, paddingVertical, paddingHorizontal, gap, maxTileSize);
   });
 
   useEffect(() => {
-    if (isLandscape) return; // Don't dynamically resize on mobile landscape
-
     const handleResize = () => {
-      setTileSize(calculateTileSize(window.innerWidth, window.innerHeight, numColumns, numRows, paddingVertical, paddingHorizontal, gap, maxTileSize));
+      if (isLandscape) {
+        setTileSize(calculateTileSize(window.innerWidth, window.innerHeight, numColumns, numRows, 40, 40, 4, 120));
+      } else {
+        setTileSize(calculateTileSize(window.innerWidth, window.innerHeight, numColumns, numRows, paddingVertical, paddingHorizontal, gap, maxTileSize));
+      }
     };
 
     handleResize();
