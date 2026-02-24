@@ -1,6 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { MatchingGameImage } from '@/data/matchingGameData';
 import { useMatchingGame } from '@/hooks/useMatchingGame';
+import { useDynamicTileSize } from '@/hooks/useDynamicTileSize';
 import { ImageTile } from './ImageTile';
 import { ConnectionLine } from './ConnectionLine';
 
@@ -30,6 +31,13 @@ export function MatchingGame({
     isTileMatched
   } = useMatchingGame(images, numColumns);
 
+  const numRows = images.length > 0 ? Math.ceil(images.length / numColumns) : 3;
+  const tileSize = useDynamicTileSize({
+    numColumns,
+    numRows,
+    isLandscape,
+  });
+
   // Handle game completion
   useEffect(() => {
     if (gameState.isComplete && onGameComplete) {
@@ -45,31 +53,29 @@ export function MatchingGame({
     );
   }
 
-  // Dynamic tile sizing based on landscape mode - larger tiles for mobile landscape
-  const tileClass = isLandscape 
-    ? "w-20 h-20 sm:w-24 sm:h-24" 
-    : "w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-40 lg:h-40 xl:w-44 xl:h-44";
+  const gapSize = isLandscape ? 4 : 16;
 
   return (
     <div className={cn("w-full h-full flex items-center justify-center", className)}>
-      {/* Game area */}
       <div 
         ref={containerRef}
         className={cn(
           "relative rounded-xl",
-          isLandscape ? "w-full max-w-4xl p-1" : "p-4 md:p-6 lg:p-8"
+          isLandscape ? "w-full max-w-4xl p-1" : "p-2"
         )}
       >
         <ConnectionLine connections={gameState.connections} containerRef={containerRef} />
         
         <div 
-          className={cn("grid justify-items-center", isLandscape ? "gap-1" : "gap-2 sm:gap-3 md:gap-6 lg:gap-8 xl:gap-10")} 
-          style={{ gridTemplateColumns: `repeat(${numColumns}, 1fr)` }}
+          className="grid justify-items-center"
+          style={{ 
+            gridTemplateColumns: `repeat(${numColumns}, 1fr)`,
+            gap: `${gapSize}px`
+          }}
         >
-          {/* All columns are now shuffled */}
           {gameState.shuffledColumns.map((column, columnIndex) => (
-            <div key={`column-${columnIndex}`} className={cn("flex flex-col", isLandscape ? "gap-1" : "gap-1 sm:gap-2 md:gap-4")}>
-              <div className={cn("flex flex-col", isLandscape ? "gap-2" : "gap-4")}>
+            <div key={`column-${columnIndex}`} className="flex flex-col" style={{ gap: `${gapSize}px` }}>
+              <div className="flex flex-col" style={{ gap: `${gapSize}px` }}>
                 {column.map((image, index) => (
                   <ImageTile
                     key={`column-${columnIndex}-${image.word}-${index}`}
@@ -77,7 +83,7 @@ export function MatchingGame({
                     isSelected={isTileSelected(image.word, columnIndex, index)}
                     isMatched={isTileMatched(image.word)}
                     onClick={() => handleTileClick(image.word, columnIndex, index)}
-                    className={tileClass}
+                    style={{ width: tileSize, height: tileSize }}
                     data-image-id={image.word}
                     data-column={columnIndex}
                     data-index={index}
@@ -88,10 +94,9 @@ export function MatchingGame({
           ))}
         </div>
 
-
         {/* Progress indicator */}
         {!gameState.isComplete && (
-          <div className="mt-6 text-center">
+          <div className="mt-4 text-center">
             <div className={`bg-white/80 rounded-full h-2 mx-auto ${isLandscape ? 'w-48' : 'w-full bg-muted'}`}>
               <div 
                 className="bg-dragon-green h-2 rounded-full transition-all duration-300"

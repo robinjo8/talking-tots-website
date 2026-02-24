@@ -242,7 +242,7 @@ export function GenericIgraUjemanjaGame({ config, backPath = '/govorne-igre/igra
   const showRotateMessage = isTouchDevice && isPortrait;
 
   return (
-    <div className="min-h-screen bg-background relative game-container">
+    <div className="fixed inset-0 bg-background game-container">
       <div 
         className="fixed inset-0 z-0"
         style={{
@@ -262,7 +262,7 @@ export function GenericIgraUjemanjaGame({ config, backPath = '/govorne-igre/igra
         </div>
       ) : (
         <>
-          <div className="h-full flex items-center justify-center relative z-10">
+          <div className="fixed inset-0 flex items-center justify-center z-10">
             {renderGame()}
           </div>
           
