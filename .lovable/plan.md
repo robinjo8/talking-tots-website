@@ -1,112 +1,94 @@
 
-Cilj popravka je, da bo **Igra ujemanja** na telefonu (landscape) vedno 100% vidna brez odrezanih kartic in brez scrollanja, ne glede na model telefona, pri tem pa **desktop ostane nespremenjen**.
+Cilj: odpraviti odrezovanje igre na telefonu (landscape), da je celotna igra vedno vidna brez scrollanja in brez izhoda iz zaslona, pri tem pa desktop ostane nespremenjen.
 
-### Kaj je trenutno narobe (na podlagi kode in screenshota)
+### Kaj sem preveril
 
-1. `useDynamicTileSize` računa velikost kartic iz `window.innerHeight`, kar na mobilnih brskalnikih ni vedno dejanska vidna višina (dinamični browser UI, notch/safe-area, različne vrstice).
-2. Izračun ne upošteva dovolj natančno celotnega vertikalnega “footprinta”:
-   - razmikov med vrsticami,
-   - progress bara + `mt-4`,
-   - notranjih paddingov kontejnerja,
-   - floating gumbov in safe-area.
-3. Kartice imajo scale efekte (`hover:scale-105`, `isSelected -> scale-105`), ki lahko na tesnih zaslonih povzročijo, da vsebina “uide” iz vidnega območja.
-4. Popravek z večjim `paddingVertical` (40 -> 70) je preveč “grob” in ne deluje konsistentno na vseh telefonih.
-
----
-
-### Načrt izvedbe (samo mobilni del, desktop brez sprememb)
-
-## 1) Natančen izračun tile size glede na realni vidni viewport
-**Datoteka:** `src/hooks/useDynamicTileSize.ts`
-
-- Dodam mobilno-landscape pot, ki uporablja `window.visualViewport?.height/width` (fallback na `window.innerHeight/innerWidth`).
-- Izračun preoblikujem tako, da direktno računa največji možni `tileSize` iz celotnega footprinta:
-
-```text
-tileByHeight = floor((usableHeight - reservedVertical - (numRows - 1) * gap) / numRows)
-tileByWidth  = floor((usableWidth  - reservedHorizontal - (numColumns - 1) * gap) / numColumns)
-tileSize = min(tileByHeight, tileByWidth, maxTileSize)
-tileSize = max(tileSize, minTileSize)
-```
-
-- `reservedVertical` bo vključeval:
-  - progress območje (tudi ko ni dokončano),
-  - padding kontejnerja,
-  - varnostni rob za safe-area / browser chrome variacije.
-- Dodam listenerje za:
-  - `resize`,
-  - `orientationchange`,
-  - `visualViewport.resize` in `visualViewport.scroll` (kjer podprto),
-  da se velikost osveži takoj ob spremembah UI brskalnika.
-
-## 2) Odstranitev “overflow” transform efektov na telefonu
-**Datoteke:**
-- `src/components/matching/ImageTile.tsx`
+Pregledal sem trenutno implementacijo:
+- `src/hooks/useDynamicTileSize.ts`
+- `src/components/games/GenericIgraUjemanjaGame.tsx`
 - `src/components/matching/MatchingGame.tsx`
+- `src/hooks/useMatchingGame.ts`
 - `src/components/matching/ThreeColumnGame.tsx`
 - `src/components/matching/FourColumnGame.tsx`
+- `src/components/matching/ImageTile.tsx`
 
-- Dodam flag (npr. `disableScaleEffects`) za mobilni landscape.
-- Na touch-landscape:
-  - izklopim `hover:scale-105`,
-  - izklopim `scale-105` pri selected tile.
-- Vizualni feedback ostane preko border/barve/overlay, brez povečanja elementa, da nič ne “potisne” mreže iz zaslona.
+Pregledal sem tudi referenco za Labirint (`GenericLabirintGame.tsx`, `MazeGame.tsx`) in preveril PWA/SW setup (`vite.config.ts`, service worker registracija).
 
-## 3) Rezerviran “safe” igralni prostor v `GenericIgraUjemanjaGame` (samo mobile)
-**Datoteka:** `src/components/games/GenericIgraUjemanjaGame.tsx`
+### Diagnoza (glavni vzrok)
 
-- Za `isTouchDevice` pustim fullscreen strukturo, ampak game območju dodam eksplicitne notranje odmike (top/bottom), ki upoštevajo:
-  - safe-area (`env(safe-area-inset-*)`),
-  - prostor za spodnje floating gumbe.
-- To prepreči, da bi se mreža centrirala čez prostor, kjer je UI prekrit z gumbi ali sistemsko vrstico.
-- **Desktop branch se ne spreminja.**
+**Do I know what the issue is?**  
+Da.
 
-## 4) Umeritev parametrov po tipih iger (2/3/4 stolpci)
-**Datoteke:**
-- `MatchingGame.tsx`
-- `ThreeColumnGame.tsx`
-- `FourColumnGame.tsx`
+Glavni problem ni cache, ampak napačen izračun števila vrstic v `MatchingGame.tsx` (2-stolpčna varianta, ruta `/govorne-igre/igra-ujemanja/s` za starost 3–4).
 
-- Hooku podam konsistentne mobilne parametre (gap, reserved space), prilagojene številu stolpcev/vrstic.
-- Ohranimo obstoječe vedenje za desktop (`isLandscape = false`) brez sprememb.
+Trenutno je:
+- `numRows = Math.ceil(images.length / numColumns)`
 
----
+Ampak igra dejansko renderira:
+- `numColumns` stolpcev, kjer ima **vsak stolpec vse slike** (`useMatchingGame` naredi `shuffledColumns.push(shuffleArray(images))` za vsak stolpec).
 
-### Zakaj bo ta pristop stabilen na “vsakem telefonu”
+To pomeni:
+- realno število vrstic = `images.length` (ne `images.length / 2`),
+- hook zato izračuna prevelik `tileSize`,
+- mreža postane previsoka in je odrezana zgoraj/spodaj.
 
-- Ne temelji na eni fiksni številki (`70`) ampak na dejanski vidni površini.
-- Upošteva celoten layout footprint (ne samo mreže).
-- Odstrani transform povečave, ki na majhnih zaslonih pogosto povzročijo odrezane robove.
-- Reagira na dinamične spremembe browser UI (kar je pogost vzrok “enkrat je OK, drugič ni”).
+To se popolnoma ujema s screenshotom (odrezan zgornji in spodnji del kartic).
 
----
+### Odgovor na tvoje vprašanje o cache
 
-### Tehnična sekcija (implementacijska zaporedja)
+Cache lahko včasih zadrži star build (ker je vključen service worker), **ampak v tem primeru je primarni problem v kodi** (napačen `numRows`), zato samo “clear cache” ne bo trajna rešitev.  
+Po popravku kode bomo vseeno dodali preverbo osvežitve PWA, da se nova verzija zagotovo naloži.
 
-1. Posodobitev `useDynamicTileSize`:
-   - helper `getViewportSize()`,
-   - helper `calculateLandscapeTileSize()` z reserved vrednostmi,
-   - robustni listenerji (`resize`, `orientationchange`, `visualViewport`).
-2. Posodobitev tile komponent:
-   - nov prop za on/off scale efektov,
-   - conditional className za mobile landscape.
-3. Posodobitev `GenericIgraUjemanjaGame` mobile wrapperja:
-   - varni paddings + rezerviran spodnji prostor.
-4. Parametri hooka v vseh treh matching variacijah.
-5. Verifikacija scenarijev:
-   - majhen Android (npr. 360x800 landscape),
-   - večji Android,
-   - iPhone Safari/Chrome landscape,
-   - preverba, da desktop ostane enak.
+### Predlagan popravek (minimalen, ciljan, brez sprememb desktop vedenja)
 
----
+## 1) Popravek izračuna vrstic v MatchingGame
+**Datoteka:** `src/components/matching/MatchingGame.tsx`
 
-### Kriteriji uspeha
+- Spremenim:
+  - iz `Math.ceil(images.length / numColumns)`
+  - v pravilno vrednost za ta game mode: `images.length` (fallback 3)
+- S tem bo `useDynamicTileSize` dobil realne dimenzije mreže in bo izračunal pravilno velikost kartic na vseh telefonih.
 
-- Na telefonu v landscape:
-  - ni scrollanja,
-  - nobena kartica ni odrezana (zgoraj/spodaj/levo/desno),
-  - progress bar je viden,
-  - floating gumbi ne prekrivajo igralnega območja.
-- Ob tapu na kartico se layout ne “razbije” in nič ne uide iz zaslona.
-- Desktop izgled/vedenje igre ujemanja ostane nespremenjen.
+## 2) Varnostni guard (da je robustno tudi med inicializacijo)
+**Datoteka:** `src/components/matching/MatchingGame.tsx`
+
+- Uporabim “effectiveRows” logiko, ki ne pade na napačno vrednost med prvim renderjem:
+  - prednostno `gameState.shuffledColumns[0]?.length` če je na voljo,
+  - sicer `images.length`.
+- To prepreči “skok” velikosti ob inicializaciji.
+
+## 3) Brez posega v desktop layout
+- Ne spreminjam desktop branch v `GenericIgraUjemanjaGame`.
+- Ne spreminjam logike `ThreeColumnGame` in `FourColumnGame` (tam je `numRows` že pravilen glede na render).
+
+## 4) PWA/cache preverba po deployu (operativni korak)
+- Po popravku preverimo še update tok:
+  - enkratni hard refresh na telefonu,
+  - če je app nameščen kot PWA: zapri/odpri app in potrdi update prompt.
+- To je samo za zagotovitev, da je nova verzija naložena; ne rešuje osnovnega buga brez code fixa.
+
+### Zakaj bo to delovalo na “vsakem telefonu”
+
+- `useDynamicTileSize` že uporablja `visualViewport` + `resize/orientation` listenerje.
+- Ko dobi **pravilen `numRows`**, formula začne pravilno skalirati višino mreže.
+- Ker je bug v trenutno prenizko ocenjenem številu vrstic, je popravek neposredno na vzrok in ne na simptom.
+
+### Verifikacija po implementaciji
+
+1. Odpri `/govorne-igre/igra-ujemanja/s` na telefonu v landscape.
+2. Potrdi:
+   - ni scrollanja,
+   - nič ni odrezano zgoraj/spodaj,
+   - progress bar je viden.
+3. Test na vsaj 2 različnih velikostih (manjši Android + večji telefon).
+4. Hitri regresijski test:
+   - `/s56`, `/s78`, `/s910` (da ostane vse OK),
+   - desktop pogled ostane nespremenjen.
+
+### Obseg sprememb
+
+Predvidoma 1 datoteka (največ 2, če dodam dodatni guard/helper):
+- `src/components/matching/MatchingGame.tsx`
+(opcijsko nič drugega)
+
+To je najkrajša in najvarnejša pot do stabilnega rezultata.
