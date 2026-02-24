@@ -21,7 +21,7 @@ export function useDynamicTileSize({
 }: UseDynamicTileSizeOptions): number {
   const [tileSize, setTileSize] = useState(() => {
     if (isLandscape) {
-      return calculateTileSize(window.innerWidth, window.innerHeight, numColumns, numRows, 40, 40, 4, 120);
+      return calculateTileSize(window.innerWidth, window.innerHeight, numColumns, numRows, 70, 40, 4, 120);
     }
     return calculateTileSize(window.innerWidth, window.innerHeight, numColumns, numRows, paddingVertical, paddingHorizontal, gap, maxTileSize);
   });
@@ -29,7 +29,7 @@ export function useDynamicTileSize({
   useEffect(() => {
     const handleResize = () => {
       if (isLandscape) {
-        setTileSize(calculateTileSize(window.innerWidth, window.innerHeight, numColumns, numRows, 40, 40, 4, 120));
+        setTileSize(calculateTileSize(window.innerWidth, window.innerHeight, numColumns, numRows, 70, 40, 4, 120));
       } else {
         setTileSize(calculateTileSize(window.innerWidth, window.innerHeight, numColumns, numRows, paddingVertical, paddingHorizontal, gap, maxTileSize));
       }
