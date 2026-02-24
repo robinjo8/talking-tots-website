@@ -129,20 +129,42 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     }
   }
 
-  // Use upsert to ensure record exists (creates if missing, updates if exists)
-  const { error } = await supabase
+  // Check if record already exists - don't overwrite status if it does
+  const { data: existing } = await supabase
     .from("user_subscriptions")
-    .upsert({ 
-      user_id: targetUserId,
-      stripe_customer_id: customerId,
-      status: 'inactive', // Will be overridden by subscription.created webhook
-      updated_at: new Date().toISOString()
-    }, { onConflict: "user_id" });
+    .select("user_id, status")
+    .eq("user_id", targetUserId)
+    .maybeSingle();
 
-  if (error) {
-    logStep("Error upserting customer ID", { error: error.message });
+  if (existing) {
+    // Record exists - only update stripe_customer_id, don't touch status
+    const { error } = await supabase
+      .from("user_subscriptions")
+      .update({ 
+        stripe_customer_id: customerId,
+        updated_at: new Date().toISOString()
+      })
+      .eq("user_id", targetUserId);
+    if (error) {
+      logStep("Error updating customer ID", { error: error.message });
+    } else {
+      logStep("Customer ID updated (existing record)", { userId: targetUserId, customerId, currentStatus: existing.status });
+    }
   } else {
-    logStep("Customer ID upserted", { userId: targetUserId, customerId });
+    // No record - create one, let subscription.created set the real status
+    const { error } = await supabase
+      .from("user_subscriptions")
+      .insert({ 
+        user_id: targetUserId,
+        stripe_customer_id: customerId,
+        status: 'inactive',
+        updated_at: new Date().toISOString()
+      });
+    if (error) {
+      logStep("Error inserting new subscription record", { error: error.message });
+    } else {
+      logStep("New subscription record created", { userId: targetUserId, customerId });
+    }
   }
 }
 
@@ -195,6 +217,13 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   // If cancel_at_period_end is true, user has canceled but subscription is still active until period end
   const effectiveStatus = subscription.cancel_at_period_end ? 'canceled' : subscription.status;
 
+  // Read period dates from subscription items (required for API versions 2025-01-27.basil+)
+  const item = subscription.items?.data?.[0];
+  const periodStart = safeTimestamp(item?.current_period_start) || safeTimestamp((subscription as any).current_period_start) || new Date().toISOString();
+  const periodEnd = safeTimestamp(item?.current_period_end) || safeTimestamp((subscription as any).current_period_end) || new Date().toISOString();
+
+  logStep("Period dates resolved", { periodStart, periodEnd, fromItem: !!item?.current_period_start });
+
   // Use upsert to handle both existing and missing records
   const { error } = await supabase.from("user_subscriptions").upsert({
     user_id: targetUserId,
@@ -203,8 +232,8 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     stripe_product_id: productId,
     plan_id: planId,
     status: effectiveStatus,
-    current_period_start: safeTimestamp(subscription.current_period_start) || new Date().toISOString(),
-    current_period_end: safeTimestamp(subscription.current_period_end) || new Date().toISOString(),
+    current_period_start: periodStart,
+    current_period_end: periodEnd,
     trial_end: safeTimestamp(subscription.trial_end),
     cancel_at_period_end: subscription.cancel_at_period_end,
     updated_at: new Date().toISOString()

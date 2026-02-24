@@ -138,17 +138,19 @@ serve(async (req) => {
       const subscription = activeOrTrialingSub;
       isTrialing = subscription.status === 'trialing';
       
-      if (subscription.current_period_end && typeof subscription.current_period_end === 'number') {
-        subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
+      // Read period dates from subscription items (required for API versions 2025-01-27.basil+)
+      const subItem = subscription.items?.data?.[0];
+      const rawPeriodEnd = subItem?.current_period_end || (subscription as any).current_period_end;
+      if (rawPeriodEnd && typeof rawPeriodEnd === 'number') {
+        subscriptionEnd = new Date(rawPeriodEnd * 1000).toISOString();
       }
       
       if (isTrialing && subscription.trial_end && typeof subscription.trial_end === 'number') {
         trialEnd = new Date(subscription.trial_end * 1000).toISOString();
       }
       
-      const subscriptionItem = subscription.items?.data?.[0];
-      if (subscriptionItem?.price?.product) {
-        const product = subscriptionItem.price.product;
+      if (subItem?.price?.product) {
+        const product = subItem.price.product;
         productId = typeof product === 'string' ? product : product?.id || null;
       }
 
@@ -160,6 +162,7 @@ serve(async (req) => {
       };
       const planId = productId ? (productToPlan[productId] || null) : null;
 
+      const rawPeriodStart = subItem?.current_period_start || (subscription as any).current_period_start;
       await supabaseClient.from("user_subscriptions").upsert({
         user_id: user.id,
         stripe_customer_id: customerId,
@@ -167,7 +170,7 @@ serve(async (req) => {
         stripe_product_id: productId,
         plan_id: planId,
         status: subscription.status,
-        current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+        current_period_start: rawPeriodStart ? new Date(rawPeriodStart * 1000).toISOString() : new Date().toISOString(),
         current_period_end: subscriptionEnd,
         trial_end: trialEnd,
         cancel_at_period_end: subscription.cancel_at_period_end,
