@@ -27,7 +27,7 @@ export function FourColumnGame({ items, onGameComplete, isLandscape = false }: F
 
   const baseTileStyle: React.CSSProperties = { width: tileSize, height: tileSize };
 
-  const baseTileClass = "flex items-center justify-center border-2 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden bg-white shadow-md";
+  const baseTileClass = `flex items-center justify-center border-2 rounded-xl cursor-pointer transition-all duration-200 overflow-hidden bg-white shadow-md ${isLandscape ? '' : 'hover:scale-105'}`;
 
   const getAudioTileClass = (itemId: string) => {
     if (isItemCompleted(itemId)) return `${baseTileClass} border-green-300 bg-green-100 opacity-60`;
