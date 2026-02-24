@@ -8,25 +8,24 @@ interface ImageTileProps {
   isMatched: boolean;
   onClick: () => void;
   className?: string;
+  style?: React.CSSProperties;
   'data-image-id'?: string;
   'data-column'?: string | number;
   'data-index'?: string | number;
 }
 
-export function ImageTile({ image, isSelected, isMatched, onClick, className, ...dataProps }: ImageTileProps) {
+export function ImageTile({ image, isSelected, isMatched, onClick, className, style, ...dataProps }: ImageTileProps) {
   return (
     <div
       onClick={onClick}
       className={cn(
-        // Base styles matching FourColumnGame
         "relative flex items-center justify-center border-2 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden bg-white shadow-md",
-        // Size classes come from className prop
         className,
-        // State-based styles
         isSelected && "border-app-purple shadow-lg scale-105 border-4",
         isMatched && "border-dragon-green bg-dragon-green/10",
         !isSelected && !isMatched && "border-gray-300 hover:border-app-purple/50"
       )}
+      style={style}
       {...dataProps}
     >
       <img
