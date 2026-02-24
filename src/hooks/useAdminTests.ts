@@ -23,6 +23,7 @@ export interface TestSessionData {
   organization_name: string | null;
   logopedist_first_name: string | null;
   logopedist_last_name: string | null;
+  is_completed: boolean;
 }
 
 export interface TestSessionStats {
@@ -39,7 +40,7 @@ export function useAdminTests() {
       // 1. Get all test sessions
       const { data: sessions, error: sessionsError } = await supabase
         .from('articulation_test_sessions')
-        .select('id, status, submitted_at, reviewed_at, completed_at, child_id, parent_id, assigned_to, source_type, logopedist_child_id, organization_id')
+        .select('id, status, submitted_at, reviewed_at, completed_at, child_id, parent_id, assigned_to, source_type, logopedist_child_id, organization_id, is_completed')
         .order('submitted_at', { ascending: false });
 
       if (sessionsError) {
@@ -159,6 +160,7 @@ export function useAdminTests() {
           organization_name: organization?.name || null,
           logopedist_first_name: logopedistProfile?.first_name || null,
           logopedist_last_name: logopedistProfile?.last_name || null,
+          is_completed: session.is_completed ?? false,
         };
       });
 
@@ -169,14 +171,17 @@ export function useAdminTests() {
 
 export interface TestSessionStatsExtended extends TestSessionStats {
   reviewed: number;
+  notCompleted: number;
 }
 
 export function calculateTestStats(sessions: TestSessionData[]): TestSessionStatsExtended {
+  const completedSessions = sessions.filter(s => s.is_completed);
   return {
     total: sessions.length,
-    pending: sessions.filter(s => s.status === 'pending').length,
-    inReview: sessions.filter(s => s.status === 'assigned' || s.status === 'in_review').length,
-    reviewed: sessions.filter(s => s.status === 'completed' && !s.completed_at).length,
-    completed: sessions.filter(s => !!s.completed_at).length,
+    notCompleted: sessions.filter(s => !s.is_completed).length,
+    pending: completedSessions.filter(s => s.status === 'pending').length,
+    inReview: completedSessions.filter(s => s.status === 'assigned' || s.status === 'in_review').length,
+    reviewed: completedSessions.filter(s => s.status === 'completed' && !s.completed_at).length,
+    completed: completedSessions.filter(s => !!s.completed_at).length,
   };
 }
