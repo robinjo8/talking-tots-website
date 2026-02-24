@@ -1,151 +1,88 @@
 
 
-## Popravek: Shranjevanje ocen in navigacija po zakljucku testa
+## Popravek: Status "Ni opravljeno" za nedokoncane teste na /admin/all-tests
 
-### Prizadeti logopedi
+### Problem
 
-| Logoped | Organizacija | Tip | Sej | Ocen | Status |
-|---------|-------------|-----|-----|------|--------|
-| Spela Kastelic | OS Test | school | 2 | 0 | NE DELUJE |
-| Janez Novak | OS Test | school | 1 | 0 | NE DELUJE |
-| Spela Kastelic | TomiTalk | internal | 1 | 20 | DELUJE |
-| Robert Kujavec | TomiTalk | super_admin | - | - | DELUJE |
-| Ema Erzar Vidmar | TomiTalk | internal | 0 | - | Bi imela tezavo pri INSERT/UPDATE za nesvoje seje |
+Ko logoped doda otroka, se ustvari seja (`articulation_test_sessions`) s `status: 'pending'` in `is_completed: false`. Na strani `/admin/all-tests` se ta seja prikaze kot "V cakanju" z datumom oddaje, kar je zavajajoce - "V cakanju" pomeni, da je otrok opravil test in caka na pregled logopeda.
+
+Stran "V cakanju" (`/admin/pending`) pravilno filtrira samo dokoncane teste (`is_completed = true`), zato tam otroka ni. Problem je samo na `/admin/all-tests`.
 
 ### Vzrok
 
-RLS politike na tabeli `articulation_evaluations`:
-- **SELECT**: ima `is_internal_logopedist` politiko - zato interni logopedi VIDIJO ocene
-- **INSERT/UPDATE**: nimata `is_internal_logopedist` niti organizacijske politike - preverja SAMO `assigned_to` match + subquery na `articulation_test_sessions`
-
-Za OS Test logopede subquery na `articulation_test_sessions` verjetno ne vrne rezultatov, ker se RLS na tej tabeli aplicira rekurzivno.
-
-Robert deluje ker ima `is_super_admin()` bypass v vseh politikah.
+1. `useAdminTests` hook ne pridobiva polja `is_completed` iz baze
+2. `StatusBadge` komponenta ne loci med nedokoncanim testom (`is_completed = false`) in dokoncanim testom v cakanju
+3. Stolpec "Oddano" prikazuje `submitted_at`, ki se nastavi ob ustvarjanju seje (privzeta vrednost `now()`), ne ob dejanskem zakljucku testa
 
 ### Resitev
 
-#### 1. SQL migracija - nove RLS politike za `articulation_evaluations`
+#### 1. `src/hooks/useAdminTests.ts` - dodaj `is_completed` polje
 
-Tri nove politike za organizacijske logopede:
+V SELECT dodat `is_completed` in ga vkljuciti v `TestSessionData` interface:
 
-```sql
--- INSERT za organizacijske logopede
-CREATE POLICY "Org logopedists can create evaluations for org sessions"
-ON articulation_evaluations FOR INSERT
-WITH CHECK (
-  EXISTS (
-    SELECT 1 FROM articulation_test_sessions s
-    JOIN logopedist_profiles lp ON lp.organization_id = s.organization_id
-    WHERE s.id = articulation_evaluations.session_id
-    AND lp.user_id = auth.uid()
-  )
-);
+```text
+// Interface:
+interface TestSessionData {
+  ...
+  is_completed: boolean;
+}
 
--- UPDATE za organizacijske logopede
-CREATE POLICY "Org logopedists can update evaluations for org sessions"
-ON articulation_evaluations FOR UPDATE
-USING (
-  EXISTS (
-    SELECT 1 FROM articulation_test_sessions s
-    JOIN logopedist_profiles lp ON lp.organization_id = s.organization_id
-    WHERE s.id = articulation_evaluations.session_id
-    AND lp.user_id = auth.uid()
-  )
-);
+// Query - dodaj is_completed:
+.select('id, status, submitted_at, reviewed_at, completed_at, child_id, parent_id, assigned_to, source_type, logopedist_child_id, organization_id, is_completed')
 
--- SELECT za organizacijske logopede
-CREATE POLICY "Org logopedists can view evaluations for org sessions"
-ON articulation_evaluations FOR SELECT
-USING (
-  EXISTS (
-    SELECT 1 FROM articulation_test_sessions s
-    JOIN logopedist_profiles lp ON lp.organization_id = s.organization_id
-    WHERE s.id = articulation_evaluations.session_id
-    AND lp.user_id = auth.uid()
-  )
-);
+// Mapping:
+is_completed: session.is_completed ?? false,
 ```
 
-Dodatno, za interno logopedinje (Ema) ki nimajo `assigned_to` match:
+#### 2. `src/pages/admin/AdminTests.tsx` - StatusBadge z novim statusom
 
-```sql
--- INSERT za interne logopede
-CREATE POLICY "Internal logopedists can create all evaluations"
-ON articulation_evaluations FOR INSERT
-WITH CHECK (is_internal_logopedist(auth.uid()));
-
--- UPDATE za interne logopede
-CREATE POLICY "Internal logopedists can update all evaluations"
-ON articulation_evaluations FOR UPDATE
-USING (is_internal_logopedist(auth.uid()));
-```
-
-#### 2. `src/hooks/useSessionReview.ts` - dodaj `evaluatedBy` in logiranje
-
-Funkcija `saveEvaluation` dobi nov parameter `evaluatedBy` (logopedist profile ID) in podrobno logiranje napak:
+Dodati preverjanje `is_completed` pred ostalimi statusi:
 
 ```text
 // PREJ:
-export async function saveEvaluation(
-  sessionId, letter, selectedOptions, comment, rating?
-)
+if (status === 'pending') {
+  return <Badge>V cakanju</Badge>;
+}
 
 // POTEM:
-export async function saveEvaluation(
-  sessionId, letter, selectedOptions, comment, rating?, evaluatedBy?
-)
+if (!isCompleted) {
+  return <Badge variant="outline" className="border-gray-400 text-gray-600 bg-gray-50">
+    Ni opravljeno
+  </Badge>;
+}
+if (status === 'pending') {
+  return <Badge>V cakanju</Badge>;
+}
 ```
 
-Dodaj `evaluated_by` v upsert payload in `console.log`/`console.error` za diagnostiko.
+#### 3. `src/pages/admin/AdminTests.tsx` - Oddano datum
 
-#### 3. `src/pages/admin/AdminSessionReview.tsx` - posreduj evaluatedBy
-
-V `handleSaveLetter` (vrstica 91-97) in `handleSaveAll` (vrstica 126-132) dodaj `logopedistProfile?.id` kot zadnji parameter klica `saveEvaluation`.
-
-#### 4. `src/components/admin/articulation/AdminArticulationCompletionDialog.tsx` - navigacija na pregled
-
-Po zakljucku testa preusmeri na stran pregleda seje (`/admin/tests/{sessionId}`) namesto na delovni prostor. Dodaj `sessionId` prop:
+Za nedokoncane teste prikazati "-" namesto datuma:
 
 ```text
 // PREJ:
-interface AdminArticulationCompletionDialogProps {
-  open: boolean;
-  onClose: () => void;
-  childId: string;
-  sessionNumber: number;
-  onComplete?: () => Promise<void>;
-}
+<TableCell>{formatDate(session.submitted_at)}</TableCell>
 
-// POTEM: dodaj sessionId prop
-interface AdminArticulationCompletionDialogProps {
-  open: boolean;
-  onClose: () => void;
-  childId: string;
-  sessionNumber: number;
-  sessionId?: string;
-  onComplete?: () => Promise<void>;
-}
+// POTEM:
+<TableCell>{session.is_completed ? formatDate(session.submitted_at) : '-'}</TableCell>
 ```
 
-V `handleClose` po uspesnem shranjevanju navigiraj na `/admin/tests/${sessionId}` ce je sessionId na voljo.
+#### 4. Filtri in statistika
 
-#### 5. `src/pages/admin/AdminArtikulacijskiTest.tsx` - posreduj sessionId
+Dodati nov status filter "Ni opravljeno" in posodobiti statistiko:
 
-Na vrstici 287-293 dodaj `sessionId={sessionInfo?.sessionId}` prop v `AdminArticulationCompletionDialog`. Posodobi `handleCloseCompletion` da ne navigira na workspace ampak pusti dialog da navigira.
+- V `calculateTestStats` dodati `notCompleted` stevec za seje z `is_completed = false`
+- V filter dropdown dodati opcijo "Ni opravljeno"
+- Stevec "V cakanju" v statistiki mora stejti samo dokoncane teste v cakanju
 
 ### Datoteke za spremembo
 
-- **Nova SQL migracija** - 5 novih RLS politik za `articulation_evaluations`
-- **`src/hooks/useSessionReview.ts`** - `saveEvaluation` z `evaluatedBy` + logiranje
-- **`src/pages/admin/AdminSessionReview.tsx`** - posreduj `logopedistProfile.id`
-- **`src/components/admin/articulation/AdminArticulationCompletionDialog.tsx`** - navigacija na pregled
-- **`src/pages/admin/AdminArtikulacijskiTest.tsx`** - posreduj `sessionId`
+- **`src/hooks/useAdminTests.ts`** - dodaj `is_completed` v interface, query in mapping; posodobi `calculateTestStats`
+- **`src/pages/admin/AdminTests.tsx`** - StatusBadge, datum prikaz, filtri
 
 ### Kaj ostane nespremenjeno
 
-- Uporabniski portal (starsevski tok) - brez sprememb
-- Obstojece ocene (20 ocen za TomiTalk sejo) - nespremenjene
-- Generiranje PDF porocila - ostane rocno
-- Dodajanje/brisanje otrok - brez sprememb
-- Vse obstojece RLS politike ostanejo, dodajo se le nove
+- Hook `usePendingTests` - ze pravilno filtrira z `is_completed = true`
+- Baza podatkov - brez sprememb (polje `is_completed` ze obstaja)
+- Vse ostale strani admin portala
 
