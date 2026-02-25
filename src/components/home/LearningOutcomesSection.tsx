@@ -3,19 +3,19 @@ import { WavyDivider } from "./WavyDivider";
 const outcomes = [{
   icon: Volume2,
   title: "Pravilna izgovorjava glasov in besed",
-  description: "Otroci se bodo naučili pravilno izgovarjati posamezne glasove skozi zabavne in ponavljajoče se vaje"
+  description: "Otroci se bodo naučili pravilno izgovarjati posamezne glasove skozi zabavne in ponavljajoče se vaje."
 }, {
   icon: BookOpen,
   title: "Bogatenje besednega zaklada",
-  description: "Spoznavanje novih besed ter jih povezovali z vsakodnevnimi situacijami"
+  description: "Spoznavanje novih besed in povezovanje s slikovnim ter zvočnim gradivom."
 }, {
   icon: Activity,
   title: "Razvoj govorne motorike",
-  description: "Otroci bodo krepili mišice ustnic, jezika in čeljusti, ki so ključne za jasno in tekoče govorjenje"
+  description: "Otroci bodo krepili mišice ustnic, jezika in čeljusti, ki so ključne za jasno in tekoče govorjenje."
 }, {
   icon: MessageSquare,
   title: "Sposobnost razumevanja in izražanja",
-  description: "Otroci bodo izboljšali razumevanje navodil, tvorbo stavkov in samozavest pri govornem izražanju"
+  description: "Otroci bodo izboljšali razumevanje navodil, tvorbo povedi in s tem krepili samozavesti pri govornem izražanju."
 }];
 export const LearningOutcomesSection = () => {
   return <section className="relative py-10 md:py-20 px-4 md:px-10 bg-dragon-green w-full">
