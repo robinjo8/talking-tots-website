@@ -15,7 +15,7 @@ export function TipSection({
             <img alt="Tomi the Dragon" className="w-full h-full object-contain" src="/lovable-uploads/3fd65e0b-3bbc-4a9e-a4e4-77fb47e6a0a5.png" />
           </div>
           <div className="text-left">
-            <p className="text-lg mb-2 uppercase font-semibold">"VSE VSEBINE SO PRILAGOJENE. ZA NAJBOLJŠE REZULTATE VADITE REDNO!"</p>
+            <p className="text-lg mb-2 uppercase font-semibold">"ZA NAJBOLJŠE REZULTATE VADITE REDNO."</p>
           </div>
         </div>
       </CardContent>

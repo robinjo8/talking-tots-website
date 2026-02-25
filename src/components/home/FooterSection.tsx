@@ -71,6 +71,14 @@ export const FooterSection = () => {
                 </button>
               </li>
               <li>
+                <button 
+                  onClick={() => handleProtectedNavigate("/video-navodila")}
+                  className="text-muted-foreground hover:text-dragon-green transition-colors text-left"
+                >
+                  Video navodila
+                </button>
+              </li>
+              <li>
                 <Link to="/logopedski-koticek" className="text-muted-foreground hover:text-dragon-green transition-colors">
                   Logopedski nasveti
                 </Link>
@@ -138,14 +146,6 @@ export const FooterSection = () => {
                 <Link to="/za-podjetja" className="text-muted-foreground hover:text-dragon-green transition-colors">
                   Za podjetja
                 </Link>
-              </li>
-              <li>
-                <button 
-                  onClick={() => handleProtectedNavigate("/video-navodila")}
-                  className="text-muted-foreground hover:text-dragon-green transition-colors text-left"
-                >
-                  Video navodila
-                </button>
               </li>
               <li>
                 <Link to="/pomoc-in-podpora" className="text-muted-foreground hover:text-dragon-green transition-colors">
