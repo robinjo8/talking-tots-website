@@ -1,41 +1,53 @@
 
 
-# Popravek: Pop-up okno se pojavi preden se končajo zvočni posnetki
+# Gumb za prikaz slike ust (Kolo besed - Glas S)
 
-## Problem
-Ko se igra zaključi, se `isComplete` nastavi na `true`. V istem renderju se zaženeta dva useEffect-a:
-1. Zaporedno predvajanje (ki asinhrono nastavi `isPlayingAudio = true`)
-2. Preverjanje za `onGameComplete` (ki vidi `isPlayingAudio = false` ker se še ni posodobil)
+## Povzetek
+Desno spodaj se doda nov rdeč okrogel gumb z ikono ust (LipsIcon). Ob kliku se odpre pop-up z sliko `Glas_SZC.png` iz bucketa `slike`. Pop-up se samodejno zapre po 3 sekundah ali pa ga uporabnik zapre z gumbom "ZAPRI".
 
-Rezultat: pop-up okno se prikaže takoj, posnetki pa se predvajajo v ozadju.
+## Spremembe
 
-## Rešitev
-V vseh treh tipih iger (3-4, 5-6, 7-10):
+### `src/components/games/GenericWheelGame.tsx`
 
-1. **Ko se `isComplete` nastavi na `true`, hkrati nastaviti `isPlayingAudio = true`** - to prepreči, da bi onGameComplete useEffect sprožil pop-up.
-2. **Klic `onGameComplete` prestaviti na konec `playSequential` funkcije** namesto v ločen useEffect (ali pa pustiti useEffect, ki bo zdaj pravilno čakal).
-3. **Zmanjšati zamik med posnetki s 500ms na 300ms** za hitrejše predvajanje.
+**Dodaj nov prop:** `lipsImage?: string` - opcijski, ime slike za prikaz (npr. `"Glas_SZC.png"`)
 
-## Spremembe po datotekah
+**Dodaj stanje:**
+- `showLipsImage: boolean` (privzeto `false`)
+- `useEffect` z `setTimeout(3000)` ki samodejno zapre pop-up ko je odprt (s cleanup)
 
-### 1. `src/hooks/useSequenceGame.ts`
-- V useEffect za detekcijo zaključka (vrstice 101-111): ko se nastavi `setIsComplete(true)`, hkrati nastaviti tudi `setIsPlayingAudio(true)`
-- V sequential playback useEffect (vrstice 113-138): zamik zmanjšati iz 500ms na 300ms
-- Na koncu `playSequential` ne spreminjati (pustiti `setIsPlayingAudio(false)`)
+**Dodaj v JSX:**
+1. Rdeč okrogel gumb desno spodaj (`fixed bottom-4 right-4`), enak stil kot hiška gumb ampak z rdečim gradientom (`from-red-500 to-red-600`). Ikona: `LipsIcon` (bela, w-8 h-8). Gumb se prikaže samo ko je `lipsImage` prop podan.
+2. `Dialog` za prikaz slike:
+   - Slika iz `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/{lipsImage}`
+   - Pod sliko gumb "ZAPRI" za ročno zapiranje
+   - Samodejno zapiranje po 3 sekundah
 
-### 2. `src/components/exercises/SequenceGameS.tsx` (in C, K, L, R, Z, Č, Š, Ž)
-- useEffect za `onGameComplete` (vrstica 23-28) ostane enak - zdaj bo pravilno čakal ker je `isPlayingAudio` nastavljen sočasno z `isComplete`
+### `src/components/routing/KoloSreceRouter.tsx`
 
-### 3. `src/components/exercises/SequenceGame56Base.tsx`
-- V useEffect za detekcijo zaključka (vrstice 147-155): ko se nastavi `setIsComplete(true)`, hkrati nastaviti `setIsPlayingAudio(true)`
-- Zamik v sequential playback zmanjšati iz 500ms na 300ms
+**Dodaj v konfiguracijo:** posreduj `lipsImage` prop za črko "s" kot `"Glas_SZC.png"`.
 
-### 4. `src/components/exercises/SequenceGameBase.tsx`
-- Enake spremembe kot SequenceGame56Base
+Ker se `GenericWheelGame` uporablja generično, bova prop dodala v router. Za zdaj samo za "s", ostale črke bodo dodane pozneje.
 
-## Povzetek sprememb
-- 3 vrstice spremenjene v `useSequenceGame.ts`
-- 2 vrstici spremenjeni v `SequenceGame56Base.tsx`
-- 2 vrstici spremenjeni v `SequenceGameBase.tsx`
-- Komponente za posamezne črke se NE spreminjajo
+### `src/components/routing/admin/AdminKoloSreceRouter.tsx`
 
+Enako - posreduj `lipsImage` za črko "s".
+
+### `src/data/artikulacijaVajeConfig.ts`
+
+Dodaj opcijsko polje `lipsImage?: string` v wheel config in nastavi `"Glas_SZC.png"` za glas S.
+
+## Vizualni stil gumba
+```text
+fixed bottom-4 right-4 z-50
+w-16 h-16 rounded-full
+bg-gradient-to-r from-red-500 to-red-600
+border-2 border-white/50
+shadow-lg backdrop-blur-sm
+hover:scale-105 transition-transform
+```
+
+## Pop-up okno
+- Dialog brez naslova, samo slika in gumb ZAPRI
+- Slika prikazana v polni velikosti znotraj dialoga
+- Gumb "ZAPRI" pod sliko, stil: outline variant
+- Auto-close po 3 sekundah z useEffect + setTimeout
