@@ -262,6 +262,19 @@ export function GenericIgraUjemanjaGame({ config, backPath = '/govorne-igre/igra
         </div>
       ) : (
         <>
+          {/* Instruction banner */}
+          <div className="fixed top-2 left-0 right-0 z-20 flex justify-center pointer-events-none">
+            <div className="bg-white/80 backdrop-blur-sm rounded-full px-6 py-2 shadow-md">
+              <p className="text-sm md:text-base font-bold text-gray-800">
+                {config.requiredAgeGroup === '3-4'
+                  ? 'POIŠČI ENAKI SLIKI.'
+                  : config.requiredAgeGroup === '5-6'
+                    ? 'POVEŽI POSNETEK Z USTREZNO SENCO IN SLIKO.'
+                    : 'POVEŽI POSNETEK Z USTREZNO BESEDO, SENCO IN SLIKO.'}
+              </p>
+            </div>
+          </div>
+
           <div 
             className="fixed inset-0 flex items-center justify-center z-10"
             style={isTouchDevice ? {

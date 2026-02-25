@@ -171,6 +171,13 @@ export function GenericBingoGame({ letter, displayLetter, title, wordsData, exer
       <div 
         className="h-full flex flex-col items-center justify-center p-2 md:p-4 gap-1 md:gap-2"
       >
+        {/* Instruction banner */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-full px-6 py-1.5 shadow-md">
+          <p className="text-sm md:text-base font-bold text-gray-800">
+            KLIKNI 'ZAVRTI' IN POIŠČI ENAKE SLIKE.
+          </p>
+        </div>
+
         {/* Reel */}
         <BingoReel
           words={wordsData}
