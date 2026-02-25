@@ -46,6 +46,17 @@ const LogopedskiKoticek = () => {
         "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/logopedski-koticek/Motorika%20govoril%20in%20artikulacija_razumevanje%20povezave_naslovna.webp",
     },
     {
+      id: "govorno-jezikovne-tezave",
+      title: "Kako govorno-jezikovne težave vplivajo na psihološko stanje otroka?",
+      description:
+        "Poznamo različne govorno-jezikovne motnje - govorne motnje zajemajo težave z artikulacijo in jasno izgovorjavo glasov, jezikovne motnje so težave z razumevanjem in strukturiranjem jezika.",
+      icon: sectionIcons.parent_tips,
+      articleUrl: "/clanki/govorno-jezikovne-tezave",
+      available: true,
+      imageUrl:
+        "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/logopedski-koticek/Kako%20gov-jez%20tezave%20vplivajo%20na%20psh%20Kako%20lahko%20pomagam.png",
+    },
+    {
       id: "faq",
       title: "Pogosta vprašanja in odgovori",
       description:
