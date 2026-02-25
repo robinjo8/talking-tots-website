@@ -1,97 +1,88 @@
 
-# Popravki igre Zaporedja - zeleno obarvanje, zvok in začetni razpored
+# Zaporedno predvajanje posnetkov ob zaključku igre (posodobljen plan)
 
-## Povzetek
-Tri spremembe za vse starostne skupine igre Zaporedja:
-1. Na začetku nobena slika v spodnji vrstici ne sme biti na pravem mestu
-2. Ko uporabnik postavi sliko na pravo mesto, se ta obarva zeleno in predvaja zvok besede
-3. Med predvajanjem zvoka uporabnik ne more premikati slik
+## Povzetek sprememb
+Ko uporabnik zaključi igro (vse slike v pravilnem vrstnem redu), se pred prikazom pop-up okna zaporedno predvajajo posnetki od leve proti desni. Trenutno predvajana slika dobi izrazit neon oranžen žareč rob. Med predvajanjem so interakcije onemogočene. Predvajanje posameznih posnetkov med igro (ko se posamezna slika postavi na pravo mesto) se odstrani.
 
-## Podrobnosti po starostnih skupinah
+## Spremembe po datotekah
 
-### A) Starost 3-4 (SequenceGameS, SequenceGameC, itd. + useSequenceGame + SequenceItem)
+### 1. `src/hooks/useSequenceGame.ts` (starost 3-4)
 
-**Zagotovitev napačnega začetnega reda:** Ze implementirano v `useSequenceGame.ts` s funkcijo `shuffleUntilDifferent` - nobena slika ne začne na pravem mestu.
+**Odstrani:**
+- `prevCorrectIndicesRef` (vrstica 18)
+- Celoten useEffect za predvajanje zvoka ob posamezni pravilni postavitvi (vrstice 86-125)
 
-**Zeleno obarvanje in zvok:**
-- V `SequenceGameS.tsx` (in vseh enakih komponentah za posamezne črke) dodati logiko za preverjanje, ali je slika na pravilnem mestu po vsakem premiku
-- Ko se slika znajde na pravilnem mestu: obrobo spremeniti v zeleno (border-emerald-500 z zelenim sijajem)
-- Predvajati audio_url te slike
-- Dodati stanje `isPlayingAudio` ki blokira nadaljnje premike (disable drag)
-- Ko se zvok konča (`audio.onended`), sprostiti interakcijo
+**Dodaj:**
+- `activePlayingIndex: number | null` stanje (katera slika trenutno žari)
+- `sequentialPlaybackRef` za preprečevanje dvojnega zagona
+- Nov useEffect na `isComplete`: ko postane `true`, zažene async zaporedno predvajanje:
+  ```text
+  for i = 0 to currentSequence.length - 1:
+    setActivePlayingIndex(i)
+    setIsPlayingAudio(true)
+    if currentSequence[i].audio_url:
+      await playAudio(currentSequence[i].audio_url)  // čaka onended
+    await delay(500)
+  setActivePlayingIndex(null)
+  setIsPlayingAudio(false)
+  ```
+- Hook vrne tudi `activePlayingIndex`
+- `correctIndices` ostane za zeleno obarvanje med igro (statično, brez zvoka)
+- `moveItem` blokira premike ko `isPlayingAudio === true` (to ostane)
 
-Alternativa (boljša): logiko prestaviti v `useSequenceGame.ts` hook, da vrača tudi `correctIndices` (seznam indeksov kjer je slika pravilna) in `isPlayingAudio` ter `playCorrectAudio` funkcijo. Tako bodo vse komponente za 3-4 avtomatsko podprle to funkcionalnost.
-
-**Spremembe datotek:**
-- `src/hooks/useSequenceGame.ts` - dodati `correctIndices`, audio playback logiko, `isPlayingAudio` stanje
-- `src/components/exercises/SequenceItem.tsx` - dodati prop `isCorrect` za zeleno obarvanje
-- `src/components/exercises/SequenceGameS.tsx` (in C, K, L, R, Z, Č, Š, Ž) - uporabiti nove lastnosti iz hooka, prenesti `isCorrect` in `isPlayingAudio`
-
-### B) Starost 5-6 (SequenceGame56Base)
-
-**Zagotovitev napačnega začetnega reda:**
-- Ko se igra premakne iz faze "select" v "arrange", potrebno premešati `placedImages` tako, da nobena slika ni na pravilnem mestu (dodati podobno `shuffleUntilDifferent` logiko)
-
-**Zeleno obarvanje:** Ze deluje (getSlotBorderClass vrača zeleno za status "correct").
-
-**Zvok ob pravilnem mestu:**
-- Dodati `useEffect` ki spremlja spremembe v `placedImages` med fazo "arrange"
-- Ko se status neke slike spremeni v "correct", predvajati njen `audio_url`
-- Dodati `isPlayingAudio` stanje ki onemogoci gumbe za premikanje (ArrowLeft/ArrowRight)
-- Po koncu predvajanja sprostiti interakcijo
-
-**Spremembe datoteke:**
-- `src/components/exercises/SequenceGame56Base.tsx`
-
-### C) Starost 7-10 (SequenceGameBase)
-
-Enake spremembe kot za 5-6 - ista koda, samo z drugačno konfiguracijo.
-
-**Spremembe datoteke:**
-- `src/components/exercises/SequenceGameBase.tsx`
-
----
-
-## Tehnične podrobnosti
-
-### useSequenceGame.ts (za starost 3-4)
+**Vrnjeni podatki:**
 ```text
-Novi vrnjeni podatki:
-- correctIndices: number[]  (indeksi kjer je currentSequence[i].id === targetSequence[i].id)
-- isPlayingAudio: boolean
-- (moveItem bo blokiral premike ko je isPlayingAudio true)
-
-Logika:
-1. Po vsakem moveItem preveriti nove correctIndices
-2. Ce se pojavi NOV correct indeks, predvajati audio_url te slike
-3. Nastaviti isPlayingAudio = true
-4. audio.onended -> isPlayingAudio = false
+{ targetSequence, currentSequence, isComplete, isLoading, moveItem, resetGame,
+  correctIndices, isPlayingAudio, activePlayingIndex }
 ```
 
-### SequenceItem.tsx (za starost 3-4)
-```text
-Nov prop: isCorrect?: boolean
-Ko je isCorrect=true:
-- border spremeniti v border-emerald-500
-- dodati zeleni sij (shadow-[0_0_12px_rgba(16,185,129,0.6)])
-- bg-emerald-50
-```
+### 2. `src/components/exercises/SequenceItem.tsx`
 
-### SequenceGame56Base.tsx in SequenceGameBase.tsx (za starost 5-6 in 7-10)
-```text
-1. Ob prehodu select -> arrange:
-   - Premešati placedImages tako da noben ni na pravem mestu
-   
-2. Nov state: isPlayingAudio, prevCorrectIds (Set)
-3. useEffect na placedImages v arrange fazi:
-   - Izracunaj nove correct IDs
-   - Ce je nov correct ID (ni v prevCorrectIds):
-     -> predvajaj audio
-     -> isPlayingAudio = true
-     -> audio.onended -> isPlayingAudio = false
-   - Posodobi prevCorrectIds
-4. Onemogoci ArrowLeft/ArrowRight gumbe ko isPlayingAudio === true
-```
+**Dodaj prop:** `isActivePlaying?: boolean`
 
-### Zvocni posnetki
-Vsaka slika iz baze ima polje `audio_url` ki ze vsebuje URL do zvocnega posnetka. Za predvajanje uporabiti `new Audio(url).play()` z `onended` callbackom.
+**Vizualni prikaz ko `isActivePlaying === true`:**
+- Prednost pred `isCorrect` in `isTarget`
+- Neon oranžen žareč rob: `border-4 border-orange-400 shadow-[0_0_24px_rgba(251,146,60,0.9)]`
+- Rahla povečava: `scale-105`
+- Animacija pulziranja sijaja (CSS animation ali Tailwind animate-pulse na shadow)
+
+### 3. `src/components/exercises/SequenceGameS.tsx` (in C, K, L, R, Z, Č, Š, Ž)
+
+**Spremembe:**
+- Iz hooka prebrati tudi `activePlayingIndex`
+- V SequenceItem dodati prop: `isActivePlaying={activePlayingIndex === index}`
+- Spremeniti `onGameComplete` logiko: namesto takojšnjega klica ob `isComplete`, počakati da se zaporedno predvajanje konča (`activePlayingIndex === null && isComplete && !isPlayingAudio`). Se pravi useEffect spremlja te tri pogoje in šele nato pokliče `onGameComplete`.
+
+### 4. `src/components/exercises/SequenceGame56Base.tsx` (starost 5-6)
+
+**Odstrani:**
+- `prevCorrectIdsRef` (vrstica 56)
+- Celoten useEffect za predvajanje zvoka ob posamezni pravilni postavitvi (vrstice 147-171)
+
+**Dodaj:**
+- `activePlayingIndex: number | null` stanje
+- `sequentialPlaybackRef` za preprečevanje dvojnega zagona
+- Nov useEffect na `isComplete`: ko postane `true`, zažene async zaporedno predvajanje po enakem vzorcu kot v useSequenceGame
+- `onGameComplete` se pokliče šele po koncu predvajanja (namesto setTimeout 500ms)
+- V renderju arrange faze: slika z `activePlayingIndex` dobi neon oranžen žareč rob (enak stil kot v SequenceItem)
+- `isPlayingAudio` ostane za blokado ArrowLeft/ArrowRight gumbov
+
+### 5. `src/components/exercises/SequenceGameBase.tsx` (starost 7-10)
+
+Enake spremembe kot za SequenceGame56Base (vrstice 168-191 za odstranitev, isti vzorec za dodajanje).
+
+## Vizualni stil neon oranžnega roba
+
+Na vseh treh tipih iger bo aktivno predvajana slika imela:
+```text
+border-4 border-orange-400
+shadow-[0_0_24px_rgba(251,146,60,0.9)]
+scale-105
+transition-all duration-300
+```
+To je izrazit, neon sijoč oranžen rob ki jasno pokaže otroku katera slika se trenutno predvaja.
+
+## Kaj se NE spreminja
+- Zeleno obarvanje (`correctIndices` / `getSlotBorderClass "correct"`) med igro ostane (statičen vizualni odziv brez zvoka)
+- Logika za začetno mešanje (`shuffleUntilDifferent`) ostane nespremenjena
+- `isPlayingAudio` blokada premikanja med igro ostane (zdaj se aktivira samo ob končnem zaporednem predvajanju)
