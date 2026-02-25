@@ -1,7 +1,7 @@
 // Centralized configuration for all Sestavljanke (Puzzle) games
 // This eliminates the need for 36 separate page components
 
-import { cImages, čImages, kImages, lImages, rImages, sImages, šImages, zImages, žImages, type PuzzleImage } from './puzzleImages';
+import { cImages, čImages, kImages, lImages, rImages, rZacetekImages, sImages, šImages, zImages, žImages, type PuzzleImage } from './puzzleImages';
 
 export interface SestavljankeGameConfig {
   letter: string;           // Display letter: "C", "Č", "Š", "Ž", etc.
@@ -41,6 +41,7 @@ const letterConfigs: { letter: string; urlKey: string; images: PuzzleImage[] }[]
   { letter: 'K', urlKey: 'k', images: kImages },
   { letter: 'L', urlKey: 'l', images: lImages },
   { letter: 'R', urlKey: 'r', images: rImages },
+  { letter: 'R-zacetek', urlKey: 'r-zacetek', images: rZacetekImages },
   { letter: 'S', urlKey: 's', images: sImages },
   { letter: 'Š', urlKey: 'sh', images: šImages },
   { letter: 'Z', urlKey: 'z', images: zImages },
@@ -134,8 +135,8 @@ export const findConfigByParam = (param: string): SestavljankeGameConfig | undef
 export const parseUrlParam = (param: string): { urlKey: string; ageGroup: string } | null => {
   const normalized = decodeURIComponent(param).toLowerCase();
   
-  // Match patterns like "ch910", "c56", "sh78", "z"
-  const match = normalized.match(/^([a-z]{1,2})(34|56|78|910)?$/);
+  // Match patterns like "ch910", "c56", "sh78", "z", "r-zacetek", "r-zacetek56"
+  const match = normalized.match(/^([a-z]{1,2}(?:-zacetek)?)(34|56|78|910)?$/);
   if (!match) return null;
   
   const urlKey = match[1];

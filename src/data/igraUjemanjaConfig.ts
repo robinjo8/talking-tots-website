@@ -36,6 +36,7 @@ const letterConfigs: { letter: string; urlKey: string }[] = [
   { letter: 'K', urlKey: 'k' },
   { letter: 'L', urlKey: 'l' },
   { letter: 'R', urlKey: 'r' },
+  { letter: 'R-zacetek', urlKey: 'r-zacetek' },
   { letter: 'S', urlKey: 's' },
   { letter: 'Š', urlKey: 'sh' },
   { letter: 'Z', urlKey: 'z' },
@@ -122,8 +123,8 @@ export const toAsciiUrl = (letter: string): string => {
 export const parseIgraUjemanjaUrlParam = (param: string): { urlKey: string; ageGroup: string } | null => {
   const normalized = decodeURIComponent(param).toLowerCase();
   
-  // Match patterns like "ch910", "c56", "sh78", "z"
-  const match = normalized.match(/^([a-z]{1,2})(34|56|78|910)?$/);
+  // Match patterns like "ch910", "c56", "sh78", "z", "r-zacetek", "r-zacetek56"
+  const match = normalized.match(/^([a-z]{1,2}(?:-zacetek)?)(34|56|78|910)?$/);
   if (!match) return null;
   
   const urlKey = match[1];

@@ -20,6 +20,7 @@ const letterTableMap: Record<string, string> = {
   'k': 'memory_cards_K',
   'l': 'memory_cards_l',
   'r': 'memory_cards',  // R uses base table
+  'r-zacetek': 'memory_cards_r_zacetek',
   's': 'memory_cards_S',
   'š': 'memory_cards_Š_duplicate',  // Š uses duplicate table
   'z': 'memory_cards_z',
@@ -44,6 +45,7 @@ const letterConfigs: { letter: string; urlKey: string }[] = [
   { letter: 'K', urlKey: 'k' },
   { letter: 'L', urlKey: 'l' },
   { letter: 'R', urlKey: 'r' },
+  { letter: 'R-zacetek', urlKey: 'r-zacetek' },
   { letter: 'S', urlKey: 's' },
   { letter: 'Š', urlKey: 'sh' },
   { letter: 'Z', urlKey: 'z' },
@@ -54,7 +56,7 @@ const letterConfigs: { letter: string; urlKey: string }[] = [
 export const zaporedjaConfigs: ZaporedjaGameConfig[] = [];
 
 letterConfigs.forEach(({ letter, urlKey }) => {
-  const tableKey = urlKey === 'ch' ? 'č' : urlKey === 'sh' ? 'š' : urlKey === 'zh' ? 'ž' : urlKey;
+  const tableKey = urlKey === 'ch' ? 'č' : urlKey === 'sh' ? 'š' : urlKey === 'zh' ? 'ž' : urlKey === 'r-zacetek' ? 'r-zacetek' : urlKey;
   const tableName = letterTableMap[tableKey];
   
   Object.entries(ageGroupSettings).forEach(([ageKey, settings]) => {
@@ -140,8 +142,8 @@ export const findZaporedjaConfig = (param: string): ZaporedjaGameConfig | undefi
 export const parseZaporedjaUrlParam = (param: string): { urlKey: string; ageGroup: string } | null => {
   const normalized = decodeURIComponent(param).toLowerCase();
   
-  // Match patterns like "ch910", "c56", "sh78", "z"
-  const match = normalized.match(/^([a-z]{1,2})(34|56|78|910)?$/);
+  // Match patterns like "ch910", "c56", "sh78", "z", "r-zacetek", "r-zacetek56"
+  const match = normalized.match(/^([a-z]{1,2}(?:-zacetek)?)(34|56|78|910)?$/);
   if (!match) return null;
   
   const urlKey = match[1];

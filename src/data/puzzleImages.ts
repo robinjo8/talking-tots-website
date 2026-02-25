@@ -108,6 +108,28 @@ export const rImages: PuzzleImage[] = [
   { filename: 'roza1.webp', word: 'ROŽA' }
 ];
 
+// R začetne vaje images (18 images - consonant clusters TR, BR, DR, PR)
+export const rZacetekImages: PuzzleImage[] = [
+  { filename: 'drevo1.webp', word: 'DREVO' },
+  { filename: 'trobenta1.webp', word: 'TROBENTA' },
+  { filename: 'tri1.webp', word: 'TRI' },
+  { filename: 'trikotnik1.webp', word: 'TRIKOTNIK' },
+  { filename: 'trava1.webp', word: 'TRAVA' },
+  { filename: 'trak1.webp', word: 'TRAK' },
+  { filename: 'brisaca1.webp', word: 'BRISAČA' },
+  { filename: 'briketi1.webp', word: 'BRIKETI' },
+  { filename: 'breskev1.webp', word: 'BRESKEV' },
+  { filename: 'brada1.webp', word: 'BRADA' },
+  { filename: 'brokoli1.webp', word: 'BROKOLI' },
+  { filename: 'brusnice1.webp', word: 'BRUSNICE' },
+  { filename: 'breza1.webp', word: 'BREZA' },
+  { filename: 'dres1.webp', word: 'DRES' },
+  { filename: 'dragulj1.webp', word: 'DRAGULJ' },
+  { filename: 'dron1.webp', word: 'DRON' },
+  { filename: 'princ1.webp', word: 'PRINC' },
+  { filename: 'presta1.webp', word: 'PRESTA' },
+];
+
 // S images (16 images)
 export const sImages: PuzzleImage[] = [
   { filename: 'sedem1.webp', word: 'SEDEM' },
@@ -185,6 +207,7 @@ export const imagesByLetter: Record<string, PuzzleImage[]> = {
   k: kImages,
   l: lImages,
   r: rImages,
+  'r-zacetek': rZacetekImages,
   s: sImages,
   š: šImages,
   z: zImages,

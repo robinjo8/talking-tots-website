@@ -241,6 +241,30 @@ export const metKockeK: MetKockeLetterConfig = {
   ],
 };
 
+// Konfiguracija za R začetne vaje
+export const metKockeRZacetek: MetKockeLetterConfig = {
+  letter: "r-zacetek",
+  displayLetter: "R",
+  title: "GLAS R - začetne vaje",
+  bitje: [
+    { word: "drevo", image: "drevo1.webp", audio: "drevo.m4a" },
+    { word: "breza", image: "breza1.webp", audio: "breza.m4a" },
+    { word: "trava", image: "trava1.webp", audio: "trava.m4a" },
+    { word: "princ", image: "princ1.webp", audio: "princ.m4a" },
+    { word: "dron", image: "dron1.webp", audio: "dron.m4a" },
+    { word: "brada", image: "brada1.webp", audio: "brada.m4a" },
+  ],
+  povedek: stickmanPovedek,
+  predmet: [
+    { word: "trobento", image: "trobenta1.webp", audio: "trobento.m4a" },
+    { word: "trikotnik", image: "trikotnik1.webp", audio: "trikotnik.m4a" },
+    { word: "brisačo", image: "brisaca1.webp", audio: "brisaco.m4a" },
+    { word: "breskev", image: "breskev1.webp", audio: "breskev.m4a" },
+    { word: "brokoli", image: "brokoli1.webp", audio: "brokoli.m4a" },
+    { word: "dragulj", image: "dragulj1.webp", audio: "dragulj.m4a" },
+  ],
+};
+
 // Mapa vseh konfiguracij
 export const metKockeConfigs: Record<string, MetKockeLetterConfig> = {
   s: metKockeS,
@@ -252,6 +276,7 @@ export const metKockeConfigs: Record<string, MetKockeLetterConfig> = {
   l: metKockeL,
   r: metKockeR,
   k: metKockeK,
+  'r-zacetek': metKockeRZacetek,
 };
 
 // Funkcija za pridobitev konfiguracije
@@ -271,4 +296,5 @@ export const metKockeLetters = [
   { id: "k", letter: "K", title: "Glas K", path: "/govorne-igre/met-kocke/k", gradient: "from-app-orange/20 to-app-yellow/20" },
   { id: "l", letter: "L", title: "Glas L", path: "/govorne-igre/met-kocke/l", gradient: "from-app-purple/20 to-app-blue/20" },
   { id: "r", letter: "R", title: "Glas R", path: "/govorne-igre/met-kocke/r", gradient: "from-app-purple/20 to-app-teal/20" },
+  { id: "r-zacetek", letter: "R", title: "Glas R - začetne vaje", path: "/govorne-igre/met-kocke/r-zacetek", gradient: "from-app-purple/20 to-app-teal/20" },
 ];

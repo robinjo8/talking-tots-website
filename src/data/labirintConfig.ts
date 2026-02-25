@@ -1,7 +1,7 @@
 // Centralized configuration for Labirint (Maze) games
 // Uses ASCII-safe URL keys for Slovenian diacritics (č→ch, š→sh, ž→zh)
 
-import { PuzzleImage, cImages, čImages, kImages, lImages, rImages, sImages, šImages, zImages, žImages } from './puzzleImages';
+import { PuzzleImage, cImages, čImages, kImages, lImages, rImages, rZacetekImages, sImages, šImages, zImages, žImages } from './puzzleImages';
 
 export interface LabirintConfig {
   letter: string;         // Original Slovenian letter
@@ -104,6 +104,16 @@ export const labirintConfigs: LabirintConfig[] = [
     description: 'Poišči pot skozi labirint s črko Ž',
     images: žImages,
     trackingId: 'labirint-zh'
+  },
+  {
+    letter: 'r-zacetek',
+    displayLetter: 'R',
+    urlKey: 'r-zacetek',
+    gradient: 'from-app-purple/20 to-app-teal/20',
+    image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png',
+    description: 'Poišči pot skozi labirint - R začetne vaje',
+    images: rZacetekImages,
+    trackingId: 'labirint-r-zacetek'
   }
 ];
 

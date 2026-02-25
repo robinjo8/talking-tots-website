@@ -335,6 +335,50 @@ const bingoDataZHSredinaKonec: BingoWordData[] = [
   { word: "VERIŽICA", image: "verizica1.webp", audio: "verizica.m4a" }
 ];
 
+// R začetne vaje - wheel data (18 words with consonant clusters)
+const wordsDataRZacetek: WordData[] = [
+  { word: "DREVO", image: "drevo1.webp", audio: "drevo.m4a" },
+  { word: "TROBENTA", image: "trobenta1.webp", audio: "trobenta.m4a" },
+  { word: "TRI", image: "tri1.webp", audio: "tri.m4a" },
+  { word: "TRIKOTNIK", image: "trikotnik1.webp", audio: "trikotnik.m4a" },
+  { word: "TRAVA", image: "trava1.webp", audio: "trava.m4a" },
+  { word: "TRAK", image: "trak1.webp", audio: "trak.m4a" },
+  { word: "BRISAČA", image: "brisaca1.webp", audio: "brisaca.m4a" },
+  { word: "BRIKETI", image: "briketi1.webp", audio: "briketi.m4a" },
+  { word: "BRESKEV", image: "breskev1.webp", audio: "breskev.m4a" },
+  { word: "BRADA", image: "brada1.webp", audio: "brada.m4a" },
+  { word: "BROKOLI", image: "brokoli1.webp", audio: "brokoli.m4a" },
+  { word: "BRUSNICE", image: "brusnice1.webp", audio: "brusnice.m4a" },
+  { word: "BREZA", image: "breza1.webp", audio: "breza.m4a" },
+  { word: "DRES", image: "dres1.webp", audio: "dres.m4a" },
+  { word: "DRAGULJ", image: "dragulj1.webp", audio: "dragulj.m4a" },
+  { word: "DRON", image: "dron1.webp", audio: "dron.m4a" },
+  { word: "PRINC", image: "princ1.webp", audio: "princ.m4a" },
+  { word: "PRESTA", image: "presta1.webp", audio: "presta.m4a" },
+];
+
+// R začetne vaje - bingo data (same 18 words)
+const bingoDataRZacetek: BingoWordData[] = [
+  { word: "DREVO", image: "drevo1.webp", audio: "drevo.m4a" },
+  { word: "TROBENTA", image: "trobenta1.webp", audio: "trobenta.m4a" },
+  { word: "TRI", image: "tri1.webp", audio: "tri.m4a" },
+  { word: "TRIKOTNIK", image: "trikotnik1.webp", audio: "trikotnik.m4a" },
+  { word: "TRAVA", image: "trava1.webp", audio: "trava.m4a" },
+  { word: "TRAK", image: "trak1.webp", audio: "trak.m4a" },
+  { word: "BRISAČA", image: "brisaca1.webp", audio: "brisaca.m4a" },
+  { word: "BRIKETI", image: "briketi1.webp", audio: "briketi.m4a" },
+  { word: "BRESKEV", image: "breskev1.webp", audio: "breskev.m4a" },
+  { word: "BRADA", image: "brada1.webp", audio: "brada.m4a" },
+  { word: "BROKOLI", image: "brokoli1.webp", audio: "brokoli.m4a" },
+  { word: "BRUSNICE", image: "brusnice1.webp", audio: "brusnice.m4a" },
+  { word: "BREZA", image: "breza1.webp", audio: "breza.m4a" },
+  { word: "DRES", image: "dres1.webp", audio: "dres.m4a" },
+  { word: "DRAGULJ", image: "dragulj1.webp", audio: "dragulj.m4a" },
+  { word: "DRON", image: "dron1.webp", audio: "dron.m4a" },
+  { word: "PRINC", image: "princ1.webp", audio: "princ.m4a" },
+  { word: "PRESTA", image: "presta1.webp", audio: "presta.m4a" },
+];
+
 // Configuration map - URL key -> config
 // Uses ASCII digraphs for diacritics: č->ch, š->sh, ž->zh
 export const artikulacijaConfigs: Record<string, ArtikulacijaConfig> = {
@@ -344,6 +388,7 @@ export const artikulacijaConfigs: Record<string, ArtikulacijaConfig> = {
   'k': { letter: 'K', displayLetter: 'K', gameType: 'wheel', title: 'KOLO BESED - K', wordsData: wordsDataK },
   'l': { letter: 'L', displayLetter: 'L', gameType: 'wheel', title: 'KOLO BESED - L', wordsData: wordsDataL },
   'r': { letter: 'R', displayLetter: 'R', gameType: 'wheel', title: 'KOLO BESED - R', wordsData: wordsDataR },
+  'r-zacetek': { letter: 'R', displayLetter: 'R', gameType: 'wheel', title: 'KOLO BESED - R začetne vaje', wordsData: wordsDataRZacetek },
   's': { letter: 'S', displayLetter: 'S', gameType: 'wheel', title: 'KOLO BESED - S', wordsData: wordsDataS },
   'sh': { letter: 'Š', displayLetter: 'Š', gameType: 'wheel', title: 'KOLO BESED - Š', wordsData: wordsDataSH },
   'z': { letter: 'Z', displayLetter: 'Z', gameType: 'wheel', title: 'KOLO BESED - Z', wordsData: wordsDataZ },
@@ -355,6 +400,7 @@ export const artikulacijaConfigs: Record<string, ArtikulacijaConfig> = {
   'k-sredina-konec': { letter: 'K', displayLetter: 'K', gameType: 'bingo', title: 'BINGO - K', wordsData: bingoDataKSredinaKonec, exerciseId: 'artikulacija_bingo_k' },
   'l-sredina-konec': { letter: 'L', displayLetter: 'L', gameType: 'bingo', title: 'BINGO - L', wordsData: bingoDataLSredinaKonec, exerciseId: 'artikulacija_bingo_l' },
   'r-sredina-konec': { letter: 'R', displayLetter: 'R', gameType: 'bingo', title: 'BINGO - R', wordsData: bingoDataRSredinaKonec, exerciseId: 'artikulacija_bingo_r' },
+  'r-zacetek-bingo': { letter: 'R', displayLetter: 'R', gameType: 'bingo', title: 'BINGO - R začetne vaje', wordsData: bingoDataRZacetek, exerciseId: 'artikulacija_bingo_r_zacetek' },
   's-sredina-konec': { letter: 'S', displayLetter: 'S', gameType: 'bingo', title: 'BINGO - S', wordsData: bingoDataSSredinaKonec, exerciseId: 'artikulacija_bingo_s' },
   'sh-sredina-konec': { letter: 'Š', displayLetter: 'Š', gameType: 'bingo', title: 'BINGO - Š', wordsData: bingoDataSHSredinaKonec, exerciseId: 'artikulacija_bingo_sh' },
   'z-sredina-konec': { letter: 'Z', displayLetter: 'Z', gameType: 'bingo', title: 'BINGO - Z', wordsData: bingoDataZSredinaKonec, exerciseId: 'artikulacija_bingo_z' },
@@ -387,6 +433,11 @@ export function getWheelConfig(letter: string): ArtikulacijaConfig | null {
 // Get bingo config by letter (for Bingo games under /govorne-igre)
 export function getBingoConfig(letter: string): ArtikulacijaConfig | null {
   const key = getConfigKey(letter);
+  // Special case: r-zacetek uses dedicated bingo key
+  if (key === 'r-zacetek') {
+    const config = artikulacijaConfigs['r-zacetek-bingo'];
+    return config?.gameType === 'bingo' ? config : null;
+  }
   // For bingo, the key needs '-sredina-konec' suffix
   const bingoKey = `${key}-sredina-konec`;
   const config = artikulacijaConfigs[bingoKey];
