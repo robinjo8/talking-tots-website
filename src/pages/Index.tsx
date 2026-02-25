@@ -10,6 +10,23 @@ import { TeamSection } from "@/components/home/TeamSection";
 import FAQSection from "@/components/home/FAQSection";
 import { CallToActionSection } from "@/components/home/CallToActionSection";
 import { FooterSection } from "@/components/home/FooterSection";
+import { Link } from "react-router-dom";
+
+const quickLinks = [
+  { to: "/kako-deluje", label: "Kako deluje" },
+  { to: "/kdo-smo", label: "Kdo smo" },
+  { to: "/cenik", label: "Cenik" },
+  { to: "/informacije", label: "Informacije" },
+  { to: "/kontakt", label: "Kontakt" },
+  { to: "/logopedski-koticek", label: "Logopedski kotički" },
+  { to: "/za-posameznike", label: "Za posameznike" },
+  { to: "/za-podjetja", label: "Za podjetja" },
+  { to: "/clanki/razvoj-govora", label: "Razvoj govora" },
+  { to: "/clanki/motorika-govoril", label: "Motorika govoril" },
+  { to: "/clanki/govorno-jezikovne-tezave", label: "Govorno-jezikovne težave" },
+  { to: "/clanki/pogosta-vprasanja", label: "Pogosta vprašanja" },
+  { to: "/pomoc-in-podpora", label: "Pomoč in podpora" },
+];
 
 const Index = () => {
   return (
@@ -47,6 +64,25 @@ const Index = () => {
       
       {/* Call to Action Section */}
       <CallToActionSection />
+
+      {/* Quick Links - SEO internal linking */}
+      <nav className="py-10 px-4 md:px-10 bg-muted/50" aria-label="Hitre povezave">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-lg font-semibold text-foreground mb-4">Raziščite TomiTalk</h2>
+          <ul className="flex flex-wrap gap-3">
+            {quickLinks.map((link) => (
+              <li key={link.to}>
+                <Link
+                  to={link.to}
+                  className="text-sm text-muted-foreground hover:text-primary underline-offset-4 hover:underline transition-colors"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </nav>
 
       {/* Footer */}
       <FooterSection />

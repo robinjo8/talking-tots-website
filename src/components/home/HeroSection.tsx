@@ -77,7 +77,7 @@ export const HeroSection = () => {
             </h1>
             
             <p className="text-base md:text-xl text-muted-foreground">
-              Razvito s strani logopedov, da pomaga vašemu otroku pri razvoju govora
+              Govorne igre, vaje za izgovorjavo in logopedska podpora – vse na enem mestu. Razvito s strani logopedov, da pomaga vašemu otroku pri razvoju govora.
             </p>
 
             {/* Dragon Image - Mobile Only */}
