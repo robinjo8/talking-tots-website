@@ -258,16 +258,15 @@ export function GenericSestavljankaGame({ config, backPath = '/govorne-igre/sest
   return (
     <AppLayout>
       <div 
-        className="w-full min-h-screen relative"
+        className="fixed inset-0 overflow-hidden"
         style={{
           backgroundImage: `url('${BACKGROUND_URL}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed'
+          backgroundRepeat: 'no-repeat'
         }}
       >
-        <div className="w-full flex justify-center items-center p-4 min-h-screen">
+        <div className="w-full h-full flex justify-center items-center p-4">
           <SimpleJigsaw 
             key={puzzleKey}
             imageUrl={imageUrl}

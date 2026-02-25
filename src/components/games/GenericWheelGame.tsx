@@ -52,14 +52,14 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
     return () => window.removeEventListener('resize', updateSize);
   }, []);
 
-  // Calculate dynamic scale factor based on viewport height
-  const scaleFactor = useMemo(() => {
-    if (windowSize.height === 0) return 1;
-    const baseHeight = 600;
-    const availableHeight = windowSize.height - 120;
-    const scale = Math.min(availableHeight / baseHeight, 1);
-    return Math.max(0.7, scale);
-  }, [windowSize.height]);
+  // Calculate max wheel size to physically fit viewport (like Labirint approach)
+  const wheelMaxSize = useMemo(() => {
+    if (windowSize.height === 0 || windowSize.width === 0) return 500;
+    const reservedVertical = 160; // title + progress bar + padding
+    const availableHeight = windowSize.height - reservedVertical;
+    const availableWidth = windowSize.width * 0.7;
+    return Math.max(200, Math.min(availableWidth, availableHeight, 500));
+  }, [windowSize.height, windowSize.width]);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const { isSpinning, rotation, selectedWord, selectedIndex, showResult, spinWheel, resetWheel, closeResult } = useFortuneWheel({ wordsData });
@@ -105,7 +105,7 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
 
   return (
     <div 
-      className="fixed inset-0 overflow-auto select-none game-container" 
+      className="fixed inset-0 overflow-hidden select-none game-container" 
       style={{ 
         backgroundImage: 'url(https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/zeleno_ozadje.webp)', 
         backgroundSize: 'cover', 
@@ -113,21 +113,20 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
         backgroundRepeat: 'no-repeat' 
       }}
     >
-      <div 
-        className="min-h-full flex flex-col items-center justify-center p-4 pb-24"
-        style={{ transform: `scale(${scaleFactor})`, transformOrigin: 'center center' }}
-      >
+      <div className="h-full flex flex-col items-center justify-center p-4">
         <h1 className="text-3xl md:text-5xl font-bold text-white mb-2 md:mb-4 text-center drop-shadow-lg">
           {title}
         </h1>
         <MemoryProgressIndicator matchedPairs={totalRepetitions} totalPairs={10} className="mb-4" />
-        <FortuneWheel
-          segmentCount={wordsData.length} 
-          rotation={rotation} 
-          isSpinning={isSpinning} 
-          onSpin={spinWheel} 
-          selectedIndex={selectedIndex} 
-        />
+        <div style={{ width: wheelMaxSize, maxWidth: '100%' }}>
+          <FortuneWheel
+            segmentCount={wordsData.length} 
+            rotation={rotation} 
+            isSpinning={isSpinning} 
+            onSpin={spinWheel} 
+            selectedIndex={selectedIndex} 
+          />
+        </div>
       </div>
 
       <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>

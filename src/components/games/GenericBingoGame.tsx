@@ -56,15 +56,21 @@ export function GenericBingoGame({ letter, displayLetter, title, wordsData, exer
     return () => window.removeEventListener('resize', updateSize);
   }, []);
 
-  // Calculate dynamic scale factor based on viewport height
-  const scaleFactor = useMemo(() => {
-    if (windowSize.height === 0) return 1;
-    // Reel: ~80px, Grid: ~400px, Label: ~40px, Gaps: ~40px = ~560px base
-    const baseHeight = 560;
-    const availableHeight = windowSize.height - 80; // padding
-    const scale = Math.min(availableHeight / baseHeight, 1.2);
-    return Math.max(0.7, scale); // minimum 0.7, maximum 1.2
-  }, [windowSize.height]);
+  // Calculate dynamic grid cell size to physically fit viewport (like Labirint approach)
+  const gridCellSize = useMemo(() => {
+    if (windowSize.height === 0 || windowSize.width === 0) return { mobile: 72, desktop: 90 };
+    const reservedVertical = 160; // reel + label + padding + gaps
+    const availableHeight = windowSize.height - reservedVertical;
+    const availableWidth = Math.min(windowSize.width * 0.8, 500);
+    // 4 columns + gaps
+    const maxByWidth = (availableWidth - 24) / 4; // 24px for gaps
+    const maxByHeight = (availableHeight - 24) / 4;
+    const cellSize = Math.floor(Math.min(maxByWidth, maxByHeight));
+    return {
+      mobile: Math.max(50, Math.min(cellSize, 72)),
+      desktop: Math.max(60, Math.min(cellSize, 90)),
+    };
+  }, [windowSize.height, windowSize.width]);
 
   const {
     grid,
@@ -161,10 +167,9 @@ export function GenericBingoGame({ letter, displayLetter, title, wordsData, exer
         backgroundRepeat: 'no-repeat'
       }}
     >
-      {/* Main content - flex layout to fit viewport with dynamic scaling */}
+      {/* Main content - flex layout to fit viewport */}
       <div 
         className="h-full flex flex-col items-center justify-center p-2 md:p-4 gap-1 md:gap-2"
-        style={{ transform: `scale(${scaleFactor})`, transformOrigin: 'center center' }}
       >
         {/* Reel */}
         <BingoReel
@@ -182,6 +187,7 @@ export function GenericBingoGame({ letter, displayLetter, title, wordsData, exer
           showHint={showHint}
           onCellClick={handleCellClick}
           winningLine={winningLine?.cells || null}
+          cellSize={gridCellSize}
         />
 
         {/* Drawn word label - below grid, fixed height to prevent layout shift */}

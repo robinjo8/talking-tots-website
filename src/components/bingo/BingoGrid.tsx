@@ -8,6 +8,7 @@ interface BingoGridProps {
   showHint: boolean;
   onCellClick: (index: number) => void;
   winningLine?: number[] | null;
+  cellSize?: { mobile: number; desktop: number };
 }
 
 export const BingoGrid: React.FC<BingoGridProps> = ({
@@ -15,7 +16,8 @@ export const BingoGrid: React.FC<BingoGridProps> = ({
   drawnWord,
   showHint,
   onCellClick,
-  winningLine = null
+  winningLine = null,
+  cellSize
 }) => {
   const shouldPulse = (cell: BingoCell) => {
     return showHint && 
@@ -30,14 +32,18 @@ export const BingoGrid: React.FC<BingoGridProps> = ({
   };
 
   return (
-    <div className="grid grid-cols-4 gap-1 md:gap-2 p-2 bg-white/20 rounded-xl backdrop-blur-sm max-w-[320px] md:max-w-[400px]">
+    <div className="grid grid-cols-4 gap-1 md:gap-2 p-2 bg-white/20 rounded-xl backdrop-blur-sm">
       {grid.map((cell, index) => (
         <button
           key={index}
           onClick={() => onCellClick(index)}
           disabled={cell.isCompleted}
+          style={{
+            width: cellSize ? cellSize.mobile : 72,
+            height: cellSize ? cellSize.mobile : 72,
+          }}
           className={`
-            relative w-[72px] h-[72px] md:w-[90px] md:h-[90px] rounded-lg overflow-hidden transition-all duration-300
+            relative rounded-lg overflow-hidden transition-all duration-300
             ${cell.isCompleted 
               ? 'opacity-60 cursor-not-allowed' 
               : 'hover:scale-105 cursor-pointer'
