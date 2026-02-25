@@ -128,6 +128,7 @@ const KakoDeluje = lazy(() => import("@/pages/KakoDeluje"));
 const Cenik = lazy(() => import("@/pages/Cenik"));
 const DelovanjeTest = lazy(() => import("@/pages/DelovanjeTest"));
 const KdoSmo = lazy(() => import("@/pages/KdoSmo"));
+const Informacije = lazy(() => import("@/pages/Informacije"));
 
 export function AppRoutes() {
   return (
@@ -256,6 +257,7 @@ export function AppRoutes() {
       <Route path="/cenik" element={<LazyRoute><Cenik /></LazyRoute>} />
       <Route path="/delovanje-testa" element={<LazyRoute><DelovanjeTest /></LazyRoute>} />
       <Route path="/kdo-smo" element={<LazyRoute><KdoSmo /></LazyRoute>} />
+      <Route path="/informacije" element={<LazyRoute><Informacije /></LazyRoute>} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>
