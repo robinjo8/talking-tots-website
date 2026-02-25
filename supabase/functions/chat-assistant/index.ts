@@ -151,7 +151,14 @@ PRIMER PRAVILNEGA ODGOVORA #2:
 "V dokumentaciji TomiTalk sem poiskal informacije o vajah za starost 9 let. [Če najde: naštej SAMO tisto kar piše v dokumentih]. [Če ne najde: V dokumentaciji trenutno ne najdem specifičnih priporočil za to starostno skupino. Priporočam, da preverite razpoložljive vaje neposredno v aplikaciji TomiTalk ali se posvetujete z logopedom.]"
 
 PRAVILO O PODATKIH UPORABNIKA:
-Podatke o otroku (ime, starost, spol, govorne težave) smeš uporabljati IZKLJUČNO za otroka trenutno vpisanega uporabnika. NIKAKOR NE SMEŠ posredovati, razkrivati ali mešati podatkov različnih uporabnikov. Če nimaš podatkov o otroku, NE ugibaj.`;
+Podatke o otroku (ime, starost, spol, govorne težave) smeš uporabljati IZKLJUČNO za otroka trenutno vpisanega uporabnika. NIKAKOR NE SMEŠ posredovati, razkrivati ali mešati podatkov različnih uporabnikov. Če nimaš podatkov o otroku, NE ugibaj.
+
+KRITIČNO PRAVILO – ZAMENJAVA GLASOV R ALI L Z GLASOM J:
+Če uporabnik omeni, da otrok glas R ali glas L zamenjuje z glasom J (npr. "izgovarja J namesto R", "reče J namesto L", "zamenjuje R z J", "govori J namesto R/L"), moraš v odgovor VEDNO vključiti naslednji stavek, NE GLEDE NA STAROST OTROKA:
+
+"Če otrok glas L ali glas R zamenjuje z glasom J, je potreben obisk logopeda, ne glede na starost otroka."
+
+To pravilo ima NAJVIŠJO PRIORITETO in velja tudi če v dokumentih ne najdeš neposrednega ujemanja. V tem primeru NE uporabi generičnega odgovora o vajah, ampak VEDNO vključi zgornji stavek.`;
 
     // Build child context block if available
     let childContextBlock = "";
@@ -177,11 +184,29 @@ Podatke o otroku (ime, starost, spol, govorne težave) smeš uporabljati IZKLJU�
 
     const finalInstructions = systemInstructions + childContextBlock;
 
+    // Semantic normalization: detect J↔R/L pattern and augment last user message
+    const lastUserMsg = messages[messages.length - 1];
+    const jReplacementPattern = /j\s*namesto\s*(r|l)|zamenjuje\s*(r|l)\s*(z|za)\s*j|(r|l)\s*(z|za)\s*j|izgovarja\s*j\s*namesto|(r|l)\s*namesto.*j|j\s*za\s*(r|l)/i;
+    const detectedJPattern = lastUserMsg?.role === "user" && jReplacementPattern.test(lastUserMsg.content);
+
+    if (detectedJPattern) {
+      console.log("[chat-assistant] ⚠️ Zaznan vzorec J↔R/L v vprašanju uporabnika");
+    }
+
     // Build input array for Responses API
-    const input = messages.map((m: { role: string; content: string }) => ({
-      role: m.role === "assistant" ? "assistant" : "user",
-      content: m.content,
-    }));
+    const input = messages.map((m: { role: string; content: string }, idx: number) => {
+      // Augment the last user message with semantic search hint if J↔R/L detected
+      if (detectedJPattern && idx === messages.length - 1 && m.role === "user") {
+        return {
+          role: "user",
+          content: m.content + "\n\n[Sistemska opomba za iskanje: zamenjava glasu R ali L z glasom J, obisk logopeda ne glede na starost otroka]",
+        };
+      }
+      return {
+        role: m.role === "assistant" ? "assistant" : "user",
+        content: m.content,
+      };
+    });
 
     const response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
@@ -230,14 +255,19 @@ Podatke o otroku (ime, starost, spol, govorne težave) smeš uporabljati IZKLJU�
       );
     }
 
-    // Create a TransformStream to intercept and log file_search usage
+    // Create a TransformStream to intercept and log file_search usage and fallback detection
     let fileSearchUsed = false;
+    let responseText = "";
     const { readable, writable } = new TransformStream({
       transform(chunk, controller) {
         const text = new TextDecoder().decode(chunk);
         if (text.includes("response.file_search_call") || text.includes("file_search_call")) {
           fileSearchUsed = true;
           console.log("[chat-assistant] file_search orodje UPORABLJENO");
+        }
+        // Accumulate response text for fallback detection
+        if (text.includes("output_text.delta")) {
+          responseText += text;
         }
         controller.enqueue(chunk);
       },
@@ -246,6 +276,15 @@ Podatke o otroku (ime, starost, spol, govorne težave) smeš uporabljati IZKLJU�
           console.warn("[chat-assistant] file_search orodje NI BILO uporabljeno - model je odgovoril brez dokumentov!");
         } else {
           console.log("[chat-assistant] Odgovor temelji na dokumentih iz Vector Store ✓");
+        }
+        // Log if J↔R/L was detected but model gave fallback
+        if (detectedJPattern) {
+          const isFallback = responseText.includes("ne najdem") || responseText.includes("ni navedenih") || responseText.includes("ni specifičnih");
+          if (isFallback) {
+            console.warn("[chat-assistant] ⚠️ J↔R/L vzorec zaznan, a model je vrnil FALLBACK odgovor!");
+          } else {
+            console.log("[chat-assistant] ✓ J↔R/L vzorec zaznan in model je podal usmeritev");
+          }
         }
       },
     });
