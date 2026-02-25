@@ -48,8 +48,8 @@ export function AgeSelectionDialog({ open, onAgeSelected, onClose, hasExistingAg
             BREZPLAČNE IGRE
           </DialogTitle>
           <DialogDescription className="text-center text-base pt-2">
-            Za najboljšo izkušnjo nam povej, koliko let ima tvoj otrok. 
-            Igre bodo prilagojene njegovi starosti.
+            Za najboljšo izkušnjo izberite starost vašega otroka. 
+            Igre bodo ustrezno prilagojene.
           </DialogDescription>
         </DialogHeader>
 
