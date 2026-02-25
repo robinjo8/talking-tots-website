@@ -66,6 +66,7 @@ export function KaceLestveGame({
   backPath = "/govorne-igre/kace",
   childId,
   logopedistChildId,
+  wordList,
 }: KaceLestveGameProps) {
   const navigate = useNavigate();
   const { checkForNewTrophy } = useTrophyContext();
@@ -235,7 +236,7 @@ export function KaceLestveGame({
           setGameState(prev => ({ ...prev, gameOver: true, winner: currentPlayer }));
           setPendingDialogPhase('success');
         } else {
-          const { word, index } = getRandomWord(gameState.usedWordIndices);
+          const { word, index } = getRandomWord(gameState.usedWordIndices, wordList);
           setCurrentWord(word);
           setGameState(prev => ({ ...prev, usedWordIndices: [...prev.usedWordIndices.slice(-8), index] }));
           setPendingMove(ladderTop);
@@ -245,7 +246,7 @@ export function KaceLestveGame({
       }
 
       if (SNAKES[pos] !== undefined) {
-        const { word, index } = getRandomWord(gameState.usedWordIndices);
+        const { word, index } = getRandomWord(gameState.usedWordIndices, wordList);
         setCurrentWord(word);
         setGameState(prev => ({ ...prev, usedWordIndices: [...prev.usedWordIndices.slice(-8), index] }));
         setPendingMove(pos);
@@ -256,7 +257,7 @@ export function KaceLestveGame({
       }
 
       // Normal square: open word challenge after 1.5s
-      const { word, index } = getRandomWord(gameState.usedWordIndices);
+      const { word, index } = getRandomWord(gameState.usedWordIndices, wordList);
       setCurrentWord(word);
       setGameState(prev => ({ ...prev, usedWordIndices: [...prev.usedWordIndices.slice(-8), index] }));
       setPendingMove(pos);
@@ -269,7 +270,7 @@ export function KaceLestveGame({
         // Landed on snake TAIL — show a new word challenge here
         setSnakeTailPending(false);
         const { currentPlayer, positions } = gameState;
-        const { word, index } = getRandomWord(gameState.usedWordIndices);
+        const { word, index } = getRandomWord(gameState.usedWordIndices, wordList);
         setCurrentWord(word);
         setGameState(prev => ({ ...prev, usedWordIndices: [...prev.usedWordIndices.slice(-8), index] }));
         setPendingMove(positions[currentPlayer]);

@@ -66,6 +66,13 @@ const memoryGames = [
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
     description: "Poišči pare slik z glasom R in nato ponovi besedo",
   },
+  { 
+    id: "spomin-r-zacetek",
+    letter: "R",
+    gradient: "from-app-purple/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
+    description: "Poišči pare slik z glasom R - začetne vaje",
+  },
 ];
 
 export default function AdminSpominGames() {
@@ -104,7 +111,7 @@ export default function AdminSpominGames() {
             {/* Card Content */}
             <div className={`p-4 ${isMobile ? 'text-center' : ''}`}>
               <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-app-blue transition-colors">
-                Glas {game.letter}
+                {game.id === 'spomin-r-zacetek' ? 'Glas R - začetne vaje' : `Glas ${game.letter}`}
               </h3>
               {!isMobile && (
                 <p className="text-sm text-muted-foreground line-clamp-2">

@@ -22,6 +22,7 @@ const bingoLetters = [
   { id: "k", letter: "K", title: "Glas K", description: "Igraj bingo in vadi izgovorjavo glasu K na sredini in koncu besed", gradient: "from-app-orange/20 to-app-yellow/20", image: "zmajcek_crka_K.png", path: "/govorne-igre/bingo/k" },
   { id: "l", letter: "L", title: "Glas L", description: "Igraj bingo in vadi izgovorjavo glasu L na sredini in koncu besed", gradient: "from-app-purple/20 to-app-blue/20", image: "zmajcek_crka_L.png", path: "/govorne-igre/bingo/l" },
   { id: "r", letter: "R", title: "Glas R", description: "Igraj bingo in vadi izgovorjavo glasu R na sredini in koncu besed", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_R.png", path: "/govorne-igre/bingo/r" },
+  { id: "r-zacetek", letter: "R", title: "Glas R - začetne vaje", description: "Igraj bingo in vadi izgovorjavo glasu R z začetnimi vajami", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_R.png", path: "/govorne-igre/bingo/r-zacetek" },
 ];
 
 export default function BingoGames() {

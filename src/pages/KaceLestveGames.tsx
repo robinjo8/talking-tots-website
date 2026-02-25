@@ -92,6 +92,15 @@ const gameLetters = [
     gradient: "radial-gradient(ellipse at center, hsl(271, 60%, 95%) 0%, hsl(271, 50%, 88%) 30%, hsl(174, 45%, 78%) 60%, hsl(174, 40%, 68%) 100%)",
     available: false,
   },
+  {
+    id: "r-zacetek",
+    title: "Glas R - začetne vaje",
+    description: "Igraj zabavno pot in vadi izgovorjavo glasu R z začetnimi vajami",
+    image: "zmajcek_crka_R.png",
+    path: "/govorne-igre/kace/r-zacetek",
+    gradient: "radial-gradient(ellipse at center, hsl(271, 60%, 95%) 0%, hsl(271, 50%, 88%) 30%, hsl(174, 45%, 78%) 60%, hsl(174, 40%, 68%) 100%)",
+    available: true,
+  },
 ];
 
 export default function KaceLestveGames() {

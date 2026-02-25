@@ -83,6 +83,14 @@ const sequenceGames = [
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
     description: "Uredi zaporedje besed z glasom R",
     available: true
+  },
+  {
+    id: "zaporedja-r-zacetek",
+    letter: "R-zacetek",
+    gradient: "from-app-purple/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
+    description: "Uredi zaporedje besed z glasom R - začetne vaje",
+    available: true
   }
 ];
 
@@ -130,6 +138,7 @@ export default function Zaporedja() {
       'K': '/govorne-igre/zaporedja/k',
       'L': '/govorne-igre/zaporedja/l',
       'R': '/govorne-igre/zaporedja/r',
+      'R-zacetek': '/govorne-igre/zaporedja/r-zacetek',
       'S': '/govorne-igre/zaporedja/s',
       'Š': '/govorne-igre/zaporedja/sh',
       'Z': '/govorne-igre/zaporedja/z',
@@ -163,7 +172,7 @@ export default function Zaporedja() {
       {/* Card Content */}
       <div className={`p-6 ${isMobile ? 'text-center' : ''}`}>
         <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
-          Glas {game.letter}
+          {game.letter === 'R-zacetek' ? 'Glas R - začetne vaje' : `Glas ${game.letter}`}
         </h3>
         {!isMobile && (
           <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
