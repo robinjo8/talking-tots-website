@@ -12,7 +12,7 @@ interface SequenceGameŠProps {
 }
 
 export const SequenceGameŠ = ({ onGameComplete, isLandscape = false }: SequenceGameŠProps) => {
-  const { targetSequence, currentSequence, isComplete, isLoading, moveItem, correctIndices, isPlayingAudio } = useSequenceGame("memory_cards_Š_duplicate", 4);
+  const { targetSequence, currentSequence, isComplete, isLoading, moveItem, correctIndices, isPlayingAudio, activePlayingIndex } = useSequenceGame("memory_cards_Š_duplicate", 4);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [gameCompletedTriggered, setGameCompletedTriggered] = useState(false);
   const [gamePhase, setGamePhase] = useState<GamePhase>("pre-countdown");
@@ -21,13 +21,11 @@ export const SequenceGameŠ = ({ onGameComplete, isLandscape = false }: Sequence
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
-    if (isComplete && !gameCompletedTriggered && targetSequence.length > 0) {
+    if (isComplete && !gameCompletedTriggered && targetSequence.length > 0 && !isPlayingAudio && activePlayingIndex === null) {
       setGameCompletedTriggered(true);
-      setTimeout(() => {
-        onGameComplete(targetSequence);
-      }, 500);
+      onGameComplete(targetSequence);
     }
-  }, [isComplete, targetSequence, onGameComplete, gameCompletedTriggered]);
+  }, [isComplete, targetSequence, onGameComplete, gameCompletedTriggered, isPlayingAudio, activePlayingIndex]);
 
   useEffect(() => {
     if (!isComplete) {
@@ -188,6 +186,7 @@ export const SequenceGameŠ = ({ onGameComplete, isLandscape = false }: Sequence
               isDraggable={!isComplete && !isPlayingAudio}
               isTarget={false}
               isCorrect={correctIndices.includes(index)}
+              isActivePlaying={activePlayingIndex === index}
               size={itemSize}
               onDragStart={handleDragStart}
               onDrop={handleDrop}

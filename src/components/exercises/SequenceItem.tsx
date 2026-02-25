@@ -7,7 +7,8 @@ interface SequenceItemProps {
   isDraggable: boolean;
   isTarget?: boolean;
   isCorrect?: boolean;
-  size?: number; // Optional fixed size in pixels for mobile
+  isActivePlaying?: boolean;
+  size?: number;
   onDragStart?: (index: number) => void;
   onDragOver?: (index: number) => void;
   onDrop?: (index: number) => void;
@@ -19,6 +20,7 @@ export const SequenceItem = ({
   isDraggable,
   isTarget = false,
   isCorrect = false,
+  isActivePlaying = false,
   size,
   onDragStart,
   onDragOver,
@@ -212,9 +214,15 @@ export const SequenceItem = ({
         ${isDraggable ? 'cursor-move touch-none' : 'cursor-default'}
         ${isDraggedOver && isDraggable ? 'ring-4 ring-primary scale-105 shadow-2xl' : ''}
         ${isDragging ? 'opacity-40 scale-95' : 'opacity-100 scale-100'}
-        ${isCorrect ? 'border-4 border-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.6)]' : isTarget ? 'border-4 border-primary shadow-lg' : 'border-2 border-border shadow-md'}
-        ${!isDragging && isDraggable && !isCorrect ? 'hover:scale-105 hover:shadow-xl' : ''}
-        transition-all duration-300 ease-out ${isCorrect ? 'bg-emerald-50' : 'bg-card'}
+        ${isActivePlaying 
+          ? 'border-4 border-orange-400 shadow-[0_0_24px_rgba(251,146,60,0.9)] scale-105 animate-pulse' 
+          : isCorrect 
+            ? 'border-4 border-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.6)]' 
+            : isTarget 
+              ? 'border-4 border-primary shadow-lg' 
+              : 'border-2 border-border shadow-md'}
+        ${!isDragging && isDraggable && !isCorrect && !isActivePlaying ? 'hover:scale-105 hover:shadow-xl' : ''}
+        transition-all duration-300 ease-out ${isActivePlaying ? 'bg-orange-50' : isCorrect ? 'bg-emerald-50' : 'bg-card'}
       `}
     >
       <img

@@ -12,7 +12,7 @@ interface SequenceGameCProps {
 }
 
 export const SequenceGameC = ({ onGameComplete, isLandscape = false }: SequenceGameCProps) => {
-  const { targetSequence, currentSequence, isComplete, isLoading, moveItem, correctIndices, isPlayingAudio } = useSequenceGame("memory_cards_c", 4);
+  const { targetSequence, currentSequence, isComplete, isLoading, moveItem, correctIndices, isPlayingAudio, activePlayingIndex } = useSequenceGame("memory_cards_c", 4);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [gameCompletedTriggered, setGameCompletedTriggered] = useState(false);
   const [gamePhase, setGamePhase] = useState<GamePhase>("pre-countdown");
@@ -22,13 +22,11 @@ export const SequenceGameC = ({ onGameComplete, isLandscape = false }: SequenceG
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
-    if (isComplete && !gameCompletedTriggered && targetSequence.length > 0) {
+    if (isComplete && !gameCompletedTriggered && targetSequence.length > 0 && !isPlayingAudio && activePlayingIndex === null) {
       setGameCompletedTriggered(true);
-      setTimeout(() => {
-        onGameComplete(targetSequence);
-      }, 500);
+      onGameComplete(targetSequence);
     }
-  }, [isComplete, targetSequence, onGameComplete, gameCompletedTriggered]);
+  }, [isComplete, targetSequence, onGameComplete, gameCompletedTriggered, isPlayingAudio, activePlayingIndex]);
 
   // Reset completion trigger when game resets
   useEffect(() => {
@@ -200,6 +198,7 @@ export const SequenceGameC = ({ onGameComplete, isLandscape = false }: SequenceG
               isDraggable={!isComplete && !isPlayingAudio}
               isTarget={false}
               isCorrect={correctIndices.includes(index)}
+              isActivePlaying={activePlayingIndex === index}
               size={itemSize}
               onDragStart={handleDragStart}
               onDrop={handleDrop}
