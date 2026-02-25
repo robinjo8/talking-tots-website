@@ -355,7 +355,7 @@ export function GenericZaporedjaGame({ config, backPath = '/govorne-igre/zapored
     >
       <div className="h-full flex flex-col items-center justify-center p-4">
         <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 md:mb-8 text-center drop-shadow-lg">
-          ZAPOREDJA - {config.letter}
+          ZAPOREDJA - {config.letter === 'R-zacetek' ? 'R - začetne vaje' : config.letter}
         </h1>
         
         {renderGame(false)}

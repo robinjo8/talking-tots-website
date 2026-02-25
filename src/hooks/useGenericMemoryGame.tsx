@@ -214,6 +214,7 @@ export const useGenericMemoryGame = (config: SpominConfig) => {
     handlePairDialogContinue,
     handlePairUnmatch,
     handleClaimStar,
-    displayLetter: config.displayLetter
+    displayLetter: config.displayLetter,
+    displayName: config.displayName
   };
 };

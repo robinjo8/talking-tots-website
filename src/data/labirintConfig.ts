@@ -107,7 +107,7 @@ export const labirintConfigs: LabirintConfig[] = [
   },
   {
     letter: 'r-zacetek',
-    displayLetter: 'R',
+    displayLetter: 'R - začetne vaje',
     urlKey: 'r-zacetek',
     gradient: 'from-app-purple/20 to-app-teal/20',
     image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png',
