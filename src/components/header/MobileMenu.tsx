@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Menu, LogOut, Home, Speech, BookOpen, Ear, CreditCard, Settings, Building2 } from "lucide-react";
+import { Menu, LogOut, Home, Speech, BookOpen, Ear, CreditCard, Settings, Building2, Info } from "lucide-react";
 import { LipsIcon } from "@/components/icons/LipsIcon";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ProfileSelector } from "./ProfileSelector";
@@ -217,6 +217,16 @@ export function MobileMenu({
                       <Home className="h-4 w-4 mr-2" />
                       Moja stran
                     </Button>
+
+                    {/* Informacije */}
+                    <Button 
+                      variant="ghost" 
+                      className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/informacije') ? 'bg-accent' : ''}`} 
+                      onClick={() => handleNavigate('/informacije')}
+                    >
+                      <Info className="h-4 w-4 mr-2" />
+                      Informacije
+                    </Button>
                   </div>
                   
                   {/* User menu items */}
@@ -252,13 +262,13 @@ export function MobileMenu({
                   <Button className="w-full h-12 rounded-full text-base bg-dragon-green hover:bg-dragon-green/90 text-white font-semibold uppercase" onClick={() => navigate("/login")}>
                     Prijava
                   </Button>
-                  <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={() => navigate("/logopedski-koticek")}>
+                  <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={() => handleNavigate("/logopedski-koticek")}>
                     <BookOpen className="h-4 w-4 mr-2" />
                     Logopedski nasveti
                   </Button>
-                  <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={() => navigate("/logopedski-koticek")}>
-                    <BookOpen className="h-4 w-4 mr-2" />
-                    Logopedski nasveti
+                  <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold uppercase" onClick={() => handleNavigate("/informacije")}>
+                    <Info className="h-4 w-4 mr-2" />
+                    Informacije
                   </Button>
                 </div>}
             </div>
