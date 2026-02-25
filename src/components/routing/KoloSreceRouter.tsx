@@ -24,6 +24,7 @@ export default function KoloSreceRouter() {
       title={config.title}
       wordsData={config.wordsData as WordData[]}
       backPath="/govorne-igre/kolo-srece"
+      lipsImage={config.lipsImage}
     />
   );
 }

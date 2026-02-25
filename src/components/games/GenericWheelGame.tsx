@@ -2,6 +2,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Home } from "lucide-react";
+import { LipsIcon } from "@/components/icons/LipsIcon";
 import { FortuneWheel } from "@/components/wheel/FortuneWheel";
 import { useFortuneWheel } from "@/hooks/useFortuneWheel";
 import { useTrophyContext } from "@/contexts/TrophyContext";
@@ -26,9 +27,10 @@ interface GenericWheelGameProps {
   title: string;
   wordsData: WordData[];
   backPath?: string;
+  lipsImage?: string;
 }
 
-export function GenericWheelGame({ letter, displayLetter, title, wordsData, backPath = '/govorno-jezikovne-vaje/artikulacija' }: GenericWheelGameProps) {
+export function GenericWheelGame({ letter, displayLetter, title, wordsData, backPath = '/govorno-jezikovne-vaje/artikulacija', lipsImage }: GenericWheelGameProps) {
   const navigate = useNavigate();
   const [showInstructions, setShowInstructions] = useState(false);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
@@ -61,6 +63,15 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
     return Math.max(200, Math.min(availableWidth, availableHeight, 500));
   }, [windowSize.height, windowSize.width]);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showLipsImage, setShowLipsImage] = useState(false);
+
+  // Auto-close lips image after 3 seconds
+  useEffect(() => {
+    if (showLipsImage) {
+      const timer = setTimeout(() => setShowLipsImage(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showLipsImage]);
 
   const { isSpinning, rotation, selectedWord, selectedIndex, showResult, spinWheel, resetWheel, closeResult } = useFortuneWheel({ wordsData });
   const { checkForNewTrophy } = useTrophyContext();
@@ -222,6 +233,32 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
         onConfirm={handleConfirmNewGame} 
         onCancel={() => setShowNewGameConfirmation(false)} 
       />
+
+      {/* Lips image button */}
+      {lipsImage && (
+        <button
+          onClick={() => setShowLipsImage(true)}
+          className="fixed bottom-4 right-4 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-red-500 to-red-600 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform"
+        >
+          <LipsIcon size={32} color="white" />
+        </button>
+      )}
+
+      {/* Lips image dialog */}
+      <Dialog open={showLipsImage} onOpenChange={setShowLipsImage}>
+        <DialogContent className="sm:max-w-md p-4">
+          <div className="flex flex-col items-center gap-4">
+            <img
+              src={`https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${lipsImage}`}
+              alt="Položaj ust"
+              className="w-full rounded-lg"
+            />
+            <Button variant="outline" onClick={() => setShowLipsImage(false)} className="w-full">
+              ZAPRI
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
