@@ -19,6 +19,7 @@ const letterToImage: Record<string, string> = {
   'k': 'zmajcek_crka_K.png',
   'l': 'zmajcek_crka_L.png',
   'r': 'zmajcek_crka_R.png',
+  'r-zacetek': 'zmajcek_crka_R.png',
   's': 'zmajcek_crka_S.png',
   'sh': 'zmajcek_crka_SH.png',
   'z': 'zmajcek_crka_Z.png',
@@ -29,6 +30,7 @@ const letterToImage: Record<string, string> = {
 const metKockeGames = metKockeLetters.map(item => ({
   id: item.id,
   letter: item.letter,
+  title: item.title,
   gradient: item.gradient,
   image: `${SUPABASE_URL}/zmajcki/${letterToImage[item.id]}`,
   description: `Vrzi kocko in sestavi smešne povedi z glasom ${item.letter}`,
@@ -78,7 +80,7 @@ export default function MetKockeGames() {
           ? "text-base font-bold text-foreground mb-1 group-hover:text-app-blue transition-colors leading-tight text-center" 
           : "text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors"
         }>
-          Glas {game.letter}
+          {game.title}
         </h3>
         {!isMobile && (
           <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">

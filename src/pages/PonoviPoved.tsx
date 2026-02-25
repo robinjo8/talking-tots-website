@@ -92,6 +92,15 @@ const ponoviPovedLetters = [
     description: "Ponovi povedi z glasom R",
     path: "/govorne-igre/ponovi-poved/r",
     urlKey: "r"
+  },
+  {
+    id: "r-zacetek",
+    letter: "R",
+    gradient: "from-app-purple/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
+    description: "Ponovi povedi z glasom R - začetne vaje",
+    path: "/govorne-igre/ponovi-poved/r-zacetek",
+    urlKey: "r-zacetek"
   }
 ];
 
@@ -150,7 +159,7 @@ export default function PonoviPoved() {
         {/* Card Content */}
         <div className={`p-6 ${isMobile ? 'text-center' : ''}`}>
           <h3 className={`text-xl font-bold mb-3 group-hover:text-app-blue transition-colors ${!isAvailable ? 'text-gray-500' : 'text-foreground'}`}>
-            Glas {letter.letter}
+            {letter.id === 'r-zacetek' ? 'Glas R - začetne vaje' : `Glas ${letter.letter}`}
           </h3>
           {!isMobile && (
             <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">

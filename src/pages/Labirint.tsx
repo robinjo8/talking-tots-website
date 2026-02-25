@@ -92,6 +92,15 @@ const labirintGames = [
     description: "Poišči pot skozi labirint z glasom R",
     path: "/govorne-igre/labirint/r",
     available: true
+  },
+  {
+    id: "r-zacetek",
+    letter: "R",
+    gradient: "from-app-purple/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
+    description: "Poišči pot skozi labirint z glasom R - začetne vaje",
+    path: "/govorne-igre/labirint/r-zacetek",
+    available: true
   }
 ];
 
@@ -134,7 +143,7 @@ export default function Labirint() {
       {/* Card Content */}
       <div className={`p-6 ${isMobile ? 'text-center' : ''}`}>
         <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
-          Glas {game.letter}
+          {game.id === 'r-zacetek' ? 'Glas R - začetne vaje' : `Glas ${game.letter}`}
         </h3>
         {!isMobile && (
           <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">

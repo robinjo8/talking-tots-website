@@ -4,6 +4,7 @@ import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
 
 const gameLetters = [
   { id: "c", title: "Glas C (sredina/konec)", description: "Igraj kače in lestve in vadi glas C", image: "zmajcek_crka_C.png" },
+  { id: "r-zacetek", title: "Glas R - začetne vaje", description: "Igraj kače in lestve in vadi glas R - začetne vaje", image: "zmajcek_crka_R.png" },
 ];
 
 export default function AdminKaceLestveGames() {

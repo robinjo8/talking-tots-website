@@ -84,6 +84,14 @@ const matchingGames = [
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
     description: "Poveži besedo z glasom R s pravo sliko",
     available: true
+  },
+  {
+    id: "igra-ujemanja-r-zacetek",
+    letter: "R-zacetek",
+    gradient: "from-app-purple/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
+    description: "Poveži besedo z glasom R s pravo sliko - začetne vaje",
+    available: true
   }
 ];
 
@@ -119,7 +127,8 @@ export default function IgraUjemanja() {
     const childAge = selectedChild.age;
     const ageGroup = getAgeGroup(childAge);
     
-    const urlKey = toAsciiUrl(game.letter);
+    // Special case for compound keys like "R-zacetek"
+    const urlKey = game.letter === 'R-zacetek' ? 'r-zacetek' : toAsciiUrl(game.letter);
     
     let targetRoute = '';
     switch (ageGroup) {
@@ -162,7 +171,7 @@ export default function IgraUjemanja() {
       {/* Card Content */}
       <div className={`p-6 ${isMobile ? 'text-center' : ''}`}>
         <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
-          Glas {game.letter}
+          {game.letter === 'R-zacetek' ? 'Glas R - začetne vaje' : `Glas ${game.letter}`}
         </h3>
         {!isMobile && (
           <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">

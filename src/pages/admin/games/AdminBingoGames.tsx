@@ -12,6 +12,7 @@ const bingoLetters = [
   { id: "k", letter: "K", title: "Glas K", description: "Igraj bingo in vadi izgovorjavo glasu K", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_K.png" },
   { id: "l", letter: "L", title: "Glas L", description: "Igraj bingo in vadi izgovorjavo glasu L", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_L.png" },
   { id: "r", letter: "R", title: "Glas R", description: "Igraj bingo in vadi izgovorjavo glasu R", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_R.png" },
+  { id: "r-zacetek", letter: "R", title: "Glas R - začetne vaje", description: "Igraj bingo in vadi izgovorjavo glasu R - začetne vaje", gradient: "from-app-yellow/20 to-app-yellow/20", image: "zmajcek_crka_R.png" },
 ];
 
 export default function AdminBingoGames() {
