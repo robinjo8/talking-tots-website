@@ -1,126 +1,95 @@
 
 
-## Popravek: Vse igre morajo biti vedno vidne v oknu brskalnika (brez scrollanja)
+## Popravek: Spomin in Zaporedja -- desktop prikaz brez scrollanja
 
-### Problem
+### Diagnoza
 
-Labirint deluje odlicno -- ne glede na velikost okna brskalnika se igra vedno prilagodi in je v celoti vidna. Ostale igre (Kolo besed, Bingo, Spomin, Sestavljanka) pa zahtevajo scrollanje, ker se ne prilagajajo velikosti okna.
+**Spomin (desktop) -- "katastrofa":**
+Moja prejsnja sprememba je pokvarila desktop prikaz. Problem je v `MemoryGrid.tsx` -- dinamicno racunanje velikosti kartic (vrstice 53-68) se izvaja SAMO ko je `isLandscape=true`. V desktop nacinu (`isLandscape=false`) se kartice velikostno dolocajo s CSS `1fr` stolpci in `maxHeight: calc((100vh - 120px) / rows)`, kar v kombinaciji z `overflow-hidden` na zunanjem kontejnerju povzroca premajhne ali nepravilno prikazane kartice.
 
-### Zakaj Labirint deluje
+**Zaporedja (desktop):**
+Desktop verzija (vrstice 346-443 v `GenericZaporedjaGame.tsx`) se nikoli ni spremenila -- se vedno uporablja `overflow-auto` + `min-h-full` + `pb-24`, kar povzroca scrollanje.
 
-Labirint uporablja `<canvas>` element in **direktno izracuna velikost celic** iz dejanske sirine in visine okna:
+### Kako deluje Labirint (referenca)
 
+Labirint racuna `CELL_SIZE` iz dejanskih dimenzij okna:
 ```text
 CELL_SIZE = min(
-  (window.innerWidth - padding) / steviloStolpcev,
-  (window.innerHeight - padding) / steviloVrstic
-)
+  (availableWidth - padding) / columns,
+  (availableHeight - padding) / rows
+) * 0.99
 ```
+Canvas se nastavi na tocne piksle -- nikoli ne preseze okna, ne glede na velikost brskalnika.
 
-Canvas se nato nastavi na tocno izracunano velikost -- nikoli ne preseze okna.
+### Popravki
 
-### Zakaj ostale igre NE delujejo
+## 1) MemoryGrid -- dinamicno racunanje kartic tudi za desktop
+**Datoteka:** `src/components/games/MemoryGrid.tsx`
 
-Ostale igre uporabljajo `transform: scale(scaleFactor)`, ki vizualno pomanjsa vsebino, a **ne spremeni njene layout velikosti**. Element se v dokumentu obnasa kot originalno velik, kar povzroci scrollbar. Poleg tega:
+Trenutno: `cardSize` se racuna samo ko `isLandscape=true` (vrstica 54). V desktop nacinu (`isLandscape=false`) se uporablja CSS `1fr` z `maxHeight`, kar ne deluje zanesljivo.
 
-- **Kolo besed**: `overflow-auto` + `min-h-full` + `pb-24` = vsebina preseze okno
-- **Bingo**: Bolje (`overflow-hidden`), a scale pristop je krhek
-- **Spomin (desktop)**: `min-h-screen` brez omejitve = lahko preseze
-- **Sestavljanka (desktop)**: `min-h-screen` v AppLayout = lahko preseze
+Popravek:
+- Odstranim pogoj `if (!isLandscape ...)` iz `cardSize` izracuna
+- Za desktop racunam enako kot za landscape, le z drugimi rezerviranimi prostori:
+  - Desktop: `reservedVertical = 120` (naslov + progress + padding), `reservedHorizontal = 100`
+  - Landscape: `reservedVertical = 8`, `reservedHorizontal = 8` (kot zdaj)
+- Grid vedno uporablja eksplicitne pikselske dimenzije (kot canvas v Labirintu)
+- Odstranim CSS fallback z `1fr` in `maxHeight: calc(...)` -- vse preko pikslov
 
-### Resitev
+## 2) GenericSpominGame -- desktop kontejner popravek
+**Datoteka:** `src/components/games/GenericSpominGame.tsx`
 
-Za vsako igro bom uporabil isti princip kot Labirint: **vsebina se mora fizicno prilagoditi oknu, ne samo vizualno pomanjsati**.
+Trenutna desktop verzija (vrstica 300-436) ima `fixed inset-0 overflow-hidden` kar je OK, ampak grid wrapper `max-w-4xl mx-auto` (vrstica 323) ne daje pravilnega konteksta za centriranje.
 
----
+Popravek:
+- Grid wrapper dobi `flex-1 flex items-center justify-center` za vertikalno centriranje (kot Labirint, ki ima `justify-start pt-8`)
+- Ohranim `fixed inset-0 overflow-hidden` (pravilno)
+- Naslov in progress ostanejo na vrhu, grid se centrira v preostalem prostoru
 
-## 1) Kolo besed (GenericWheelGame.tsx) -- GLAVNI POPRAVEK
+## 3) GenericZaporedjaGame -- desktop verzija brez scrollanja
+**Datoteka:** `src/components/games/GenericZaporedjaGame.tsx`
 
-Trenutno stanje (vrstica 108):
+Trenutna desktop verzija (vrstica 346-443):
 ```text
 <div className="fixed inset-0 overflow-auto ...">
-  <div className="min-h-full flex flex-col ... p-4 pb-24"
-       style={{ transform: scale(scaleFactor), transformOrigin: center }}>
+  <div className="min-h-full flex flex-col ... p-4 pb-24">
 ```
 
 Popravek:
 - Zamenjam `overflow-auto` z `overflow-hidden`
 - Zamenjam `min-h-full` z `h-full`
-- Odstranim `pb-24` (nepotrebno, ker so floating gumbi `fixed`)
-- Namesto `transform: scale()` uporabim **dejansko omejevanje velikosti kolesa**:
-  - Kolesu dodam dinamicno `max-width` in `max-height` na osnovi `windowSize`, da se fizicno prilega oknu
-  - Formula: `wheelMaxSize = min(windowSize.width * 0.7, windowSize.height - reservedVertical)`
-  - `reservedVertical` = naslov (~80px) + progress bar (~40px) + padding (~40px)
-- Odstranim `scaleFactor` logiko (vrstice 56-62)
+- Odstranim `pb-24` (floating gumbi so `fixed`, ne rabijo paddinga)
+- Dodam `justify-center` na flex kontejner, da se igra centrira vertikalno
 
-## 2) Bingo (GenericBingoGame.tsx) -- POPRAVEK
+## 4) SequenceGame komponente -- desktop velikost
+**Datoteke:** Vse `SequenceGame*.tsx` komponente (S, Z, C, SH, ZH, CH, K, L, R) in `SequenceGame56Base.tsx`
 
-Trenutno stanje (vrstica 165-167):
-```text
-<div className="h-full flex flex-col ... gap-1 md:gap-2"
-     style={{ transform: scale(scaleFactor), transformOrigin: center }}>
-```
+Trenutno: `itemSize` se racuna samo ko `isLandscape=true`. V desktop nacinu (`isLandscape=false`) se uporablja CSS `max-w-4xl` z `grid-cols-4`, kar lahko preseze okno.
 
 Popravek:
-- Odstranim `transform: scale()` pristop
-- BingoGrid in BingoReel morata biti omejena na dejansko velikost okna
-- Dodam dinamicno `max-height` za grid glede na razpolozljivo visino okna
-- BingoGrid ze uporablja fiksne velikosti -- dodam `max-height` wrapper, ki omejuje visino mreze
-
-## 3) Spomin - Desktop (GenericSpominGame.tsx) -- POPRAVEK
-
-Trenutno stanje (vrstica 300-310):
-```text
-<div className="min-h-screen">
-  <div className="relative z-10 min-h-screen p-4">
-```
-
-Popravek:
-- Zamenjam `min-h-screen` z `fixed inset-0 overflow-hidden`
-- Notranjost uporabi `h-full flex flex-col` namesto `min-h-screen`
-- MemoryGrid ze ima interno skaliranje -- samo omejem zunanji kontejner
-
-## 4) Sestavljanka - Desktop (GenericSestavljankaGame.tsx) -- POPRAVEK
-
-Trenutno stanje (vrstica 258-278):
-```text
-<AppLayout>
-  <div className="w-full min-h-screen relative" ...>
-    <div className="w-full flex justify-center items-center p-4 min-h-screen">
-```
-
-Popravek:
-- Zamenjam `min-h-screen` z omejenim kontejnerjem, ki uposteva visino okna
-- SimpleJigsaw ze interno izracuna velikost -- samo omejim wrapper na viewport
+- Dodam izracun `itemSize` tudi za desktop nastavitve (vecji `reservedVertical` za naslov)
+- Ko je `itemSize` definiran, grid uporablja eksplicitne pikselske dimenzije (kot v landscape)
+- Desktop bo imel vecje `maxTileSize` omejitve (npr. 180px) za primeren prikaz na vecjih zaslonih
 
 ---
 
-### Tehnicna sekcija
-
-**Vrstni red implementacije:**
-1. `GenericWheelGame.tsx` -- zamenjava scale pristopa z dejansko omejitvijo velikosti
-2. `GenericBingoGame.tsx` -- zamenjava scale pristopa
-3. `GenericSpominGame.tsx` -- desktop container fix
-4. `GenericSestavljankaGame.tsx` -- desktop container fix
-
-**Kljucni princip (enak kot Labirint):**
-```text
-razpolozljivaSirina = window.innerWidth
-razpolozljivaVisina = window.innerHeight - reservedSpace
-velikostVsebine = min(razpolozljivaSirina, razpolozljivaVisina)
-```
-
-Vsebina se fizicno prilega oknu, ne samo vizualno pomanjsa.
-
-**Kaj ostane nespremenjeno:**
-- Mobilni (touch) layout za vse igre -- ze deluje s fullscreen pristopom
+### Kaj ostane nespremenjeno
+- Mobilni (touch) layout za obe igri -- ze deluje s fullscreen pristopom
 - Labirint -- ze deluje odlicno
+- Bingo, Kolo besed, Sestavljanka -- ze popravljene v prejsnjem koraku
 - Igra ujemanja -- locen popravek ze narejen
-- Vsi dialogi, floating gumbi, navodila
+- Admin portal -- uporablja iste `Generic*Game` komponente, zato bodo popravki avtomatsko delovali tudi tam (npr. za OŠ Test)
 
-**Datoteke za spremembo:**
-- `src/components/games/GenericWheelGame.tsx`
-- `src/components/games/GenericBingoGame.tsx`
-- `src/components/games/GenericSpominGame.tsx`
-- `src/components/games/GenericSestavljankaGame.tsx`
+### Vrstni red implementacije
+1. `MemoryGrid.tsx` -- dinamicno racunanje za desktop
+2. `GenericSpominGame.tsx` -- desktop wrapper popravek
+3. `GenericZaporedjaGame.tsx` -- overflow-hidden + centriranje
+4. `SequenceGameS.tsx` (in ostale variante) -- desktop itemSize
+5. `SequenceGame56Base.tsx` -- desktop itemSize
 
+### Kriteriji uspeha
+- Na desktopu ob spremembi velikosti okna se igra sorazmerno povecuje/pomanjsuje (kot Labirint)
+- Ni scrollanja pri nobeni velikosti okna
+- Kartice/slike so jasno vidne in primerne velikosti
+- Na admin portalu deluje enako
+- Mobilni layout se ne spremeni
