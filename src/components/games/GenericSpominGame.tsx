@@ -49,7 +49,8 @@ export function GenericSpominGame({ config, backPath, onGameComplete }: GenericS
     handlePairDialogContinue,
     handlePairUnmatch,
     handleClaimStar,
-    displayLetter
+    displayLetter,
+    displayName
   } = useGenericMemoryGame(config);
 
   // Reliable touch device detection
@@ -311,7 +312,7 @@ export function GenericSpominGame({ config, backPath, onGameComplete }: GenericS
         {/* Header with progress dots */}
         <div className="text-center pt-4">
           <h1 className="text-2xl font-bold text-white drop-shadow-lg">
-            Spomin - Glas {displayLetter}
+            Spomin - Glas {displayName || displayLetter}
           </h1>
           <MemoryProgressIndicator 
             matchedPairs={matchedPairs.length} 

@@ -4,6 +4,7 @@
 export interface SpominConfig {
   urlKey: string;         // ASCII-safe URL key (e.g., 'c', 'ch', 'k')
   displayLetter: string;  // Display letter (e.g., 'C', 'Č', 'K')
+  displayName?: string;   // Optional full display name (e.g., 'R - začetne vaje')
   tableName: string;      // Supabase table name
   queryKey: string;       // React Query cache key
 }
@@ -66,6 +67,7 @@ export const spominConfig: Record<string, SpominConfig> = {
   'r-zacetek': {
     urlKey: 'r-zacetek',
     displayLetter: 'R',
+    displayName: 'R - začetne vaje',
     tableName: 'memory_cards_r_zacetek',
     queryKey: 'memoryCardsRZacetek',
   },
