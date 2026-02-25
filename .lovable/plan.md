@@ -1,94 +1,126 @@
 
-Cilj: odpraviti odrezovanje igre na telefonu (landscape), da je celotna igra vedno vidna brez scrollanja in brez izhoda iz zaslona, pri tem pa desktop ostane nespremenjen.
 
-### Kaj sem preveril
+## Popravek: Vse igre morajo biti vedno vidne v oknu brskalnika (brez scrollanja)
 
-Pregledal sem trenutno implementacijo:
-- `src/hooks/useDynamicTileSize.ts`
-- `src/components/games/GenericIgraUjemanjaGame.tsx`
-- `src/components/matching/MatchingGame.tsx`
-- `src/hooks/useMatchingGame.ts`
-- `src/components/matching/ThreeColumnGame.tsx`
-- `src/components/matching/FourColumnGame.tsx`
-- `src/components/matching/ImageTile.tsx`
+### Problem
 
-Pregledal sem tudi referenco za Labirint (`GenericLabirintGame.tsx`, `MazeGame.tsx`) in preveril PWA/SW setup (`vite.config.ts`, service worker registracija).
+Labirint deluje odlicno -- ne glede na velikost okna brskalnika se igra vedno prilagodi in je v celoti vidna. Ostale igre (Kolo besed, Bingo, Spomin, Sestavljanka) pa zahtevajo scrollanje, ker se ne prilagajajo velikosti okna.
 
-### Diagnoza (glavni vzrok)
+### Zakaj Labirint deluje
 
-**Do I know what the issue is?**  
-Da.
+Labirint uporablja `<canvas>` element in **direktno izracuna velikost celic** iz dejanske sirine in visine okna:
 
-Glavni problem ni cache, ampak napačen izračun števila vrstic v `MatchingGame.tsx` (2-stolpčna varianta, ruta `/govorne-igre/igra-ujemanja/s` za starost 3–4).
+```text
+CELL_SIZE = min(
+  (window.innerWidth - padding) / steviloStolpcev,
+  (window.innerHeight - padding) / steviloVrstic
+)
+```
 
-Trenutno je:
-- `numRows = Math.ceil(images.length / numColumns)`
+Canvas se nato nastavi na tocno izracunano velikost -- nikoli ne preseze okna.
 
-Ampak igra dejansko renderira:
-- `numColumns` stolpcev, kjer ima **vsak stolpec vse slike** (`useMatchingGame` naredi `shuffledColumns.push(shuffleArray(images))` za vsak stolpec).
+### Zakaj ostale igre NE delujejo
 
-To pomeni:
-- realno število vrstic = `images.length` (ne `images.length / 2`),
-- hook zato izračuna prevelik `tileSize`,
-- mreža postane previsoka in je odrezana zgoraj/spodaj.
+Ostale igre uporabljajo `transform: scale(scaleFactor)`, ki vizualno pomanjsa vsebino, a **ne spremeni njene layout velikosti**. Element se v dokumentu obnasa kot originalno velik, kar povzroci scrollbar. Poleg tega:
 
-To se popolnoma ujema s screenshotom (odrezan zgornji in spodnji del kartic).
+- **Kolo besed**: `overflow-auto` + `min-h-full` + `pb-24` = vsebina preseze okno
+- **Bingo**: Bolje (`overflow-hidden`), a scale pristop je krhek
+- **Spomin (desktop)**: `min-h-screen` brez omejitve = lahko preseze
+- **Sestavljanka (desktop)**: `min-h-screen` v AppLayout = lahko preseze
 
-### Odgovor na tvoje vprašanje o cache
+### Resitev
 
-Cache lahko včasih zadrži star build (ker je vključen service worker), **ampak v tem primeru je primarni problem v kodi** (napačen `numRows`), zato samo “clear cache” ne bo trajna rešitev.  
-Po popravku kode bomo vseeno dodali preverbo osvežitve PWA, da se nova verzija zagotovo naloži.
+Za vsako igro bom uporabil isti princip kot Labirint: **vsebina se mora fizicno prilagoditi oknu, ne samo vizualno pomanjsati**.
 
-### Predlagan popravek (minimalen, ciljan, brez sprememb desktop vedenja)
+---
 
-## 1) Popravek izračuna vrstic v MatchingGame
-**Datoteka:** `src/components/matching/MatchingGame.tsx`
+## 1) Kolo besed (GenericWheelGame.tsx) -- GLAVNI POPRAVEK
 
-- Spremenim:
-  - iz `Math.ceil(images.length / numColumns)`
-  - v pravilno vrednost za ta game mode: `images.length` (fallback 3)
-- S tem bo `useDynamicTileSize` dobil realne dimenzije mreže in bo izračunal pravilno velikost kartic na vseh telefonih.
+Trenutno stanje (vrstica 108):
+```text
+<div className="fixed inset-0 overflow-auto ...">
+  <div className="min-h-full flex flex-col ... p-4 pb-24"
+       style={{ transform: scale(scaleFactor), transformOrigin: center }}>
+```
 
-## 2) Varnostni guard (da je robustno tudi med inicializacijo)
-**Datoteka:** `src/components/matching/MatchingGame.tsx`
+Popravek:
+- Zamenjam `overflow-auto` z `overflow-hidden`
+- Zamenjam `min-h-full` z `h-full`
+- Odstranim `pb-24` (nepotrebno, ker so floating gumbi `fixed`)
+- Namesto `transform: scale()` uporabim **dejansko omejevanje velikosti kolesa**:
+  - Kolesu dodam dinamicno `max-width` in `max-height` na osnovi `windowSize`, da se fizicno prilega oknu
+  - Formula: `wheelMaxSize = min(windowSize.width * 0.7, windowSize.height - reservedVertical)`
+  - `reservedVertical` = naslov (~80px) + progress bar (~40px) + padding (~40px)
+- Odstranim `scaleFactor` logiko (vrstice 56-62)
 
-- Uporabim “effectiveRows” logiko, ki ne pade na napačno vrednost med prvim renderjem:
-  - prednostno `gameState.shuffledColumns[0]?.length` če je na voljo,
-  - sicer `images.length`.
-- To prepreči “skok” velikosti ob inicializaciji.
+## 2) Bingo (GenericBingoGame.tsx) -- POPRAVEK
 
-## 3) Brez posega v desktop layout
-- Ne spreminjam desktop branch v `GenericIgraUjemanjaGame`.
-- Ne spreminjam logike `ThreeColumnGame` in `FourColumnGame` (tam je `numRows` že pravilen glede na render).
+Trenutno stanje (vrstica 165-167):
+```text
+<div className="h-full flex flex-col ... gap-1 md:gap-2"
+     style={{ transform: scale(scaleFactor), transformOrigin: center }}>
+```
 
-## 4) PWA/cache preverba po deployu (operativni korak)
-- Po popravku preverimo še update tok:
-  - enkratni hard refresh na telefonu,
-  - če je app nameščen kot PWA: zapri/odpri app in potrdi update prompt.
-- To je samo za zagotovitev, da je nova verzija naložena; ne rešuje osnovnega buga brez code fixa.
+Popravek:
+- Odstranim `transform: scale()` pristop
+- BingoGrid in BingoReel morata biti omejena na dejansko velikost okna
+- Dodam dinamicno `max-height` za grid glede na razpolozljivo visino okna
+- BingoGrid ze uporablja fiksne velikosti -- dodam `max-height` wrapper, ki omejuje visino mreze
 
-### Zakaj bo to delovalo na “vsakem telefonu”
+## 3) Spomin - Desktop (GenericSpominGame.tsx) -- POPRAVEK
 
-- `useDynamicTileSize` že uporablja `visualViewport` + `resize/orientation` listenerje.
-- Ko dobi **pravilen `numRows`**, formula začne pravilno skalirati višino mreže.
-- Ker je bug v trenutno prenizko ocenjenem številu vrstic, je popravek neposredno na vzrok in ne na simptom.
+Trenutno stanje (vrstica 300-310):
+```text
+<div className="min-h-screen">
+  <div className="relative z-10 min-h-screen p-4">
+```
 
-### Verifikacija po implementaciji
+Popravek:
+- Zamenjam `min-h-screen` z `fixed inset-0 overflow-hidden`
+- Notranjost uporabi `h-full flex flex-col` namesto `min-h-screen`
+- MemoryGrid ze ima interno skaliranje -- samo omejem zunanji kontejner
 
-1. Odpri `/govorne-igre/igra-ujemanja/s` na telefonu v landscape.
-2. Potrdi:
-   - ni scrollanja,
-   - nič ni odrezano zgoraj/spodaj,
-   - progress bar je viden.
-3. Test na vsaj 2 različnih velikostih (manjši Android + večji telefon).
-4. Hitri regresijski test:
-   - `/s56`, `/s78`, `/s910` (da ostane vse OK),
-   - desktop pogled ostane nespremenjen.
+## 4) Sestavljanka - Desktop (GenericSestavljankaGame.tsx) -- POPRAVEK
 
-### Obseg sprememb
+Trenutno stanje (vrstica 258-278):
+```text
+<AppLayout>
+  <div className="w-full min-h-screen relative" ...>
+    <div className="w-full flex justify-center items-center p-4 min-h-screen">
+```
 
-Predvidoma 1 datoteka (največ 2, če dodam dodatni guard/helper):
-- `src/components/matching/MatchingGame.tsx`
-(opcijsko nič drugega)
+Popravek:
+- Zamenjam `min-h-screen` z omejenim kontejnerjem, ki uposteva visino okna
+- SimpleJigsaw ze interno izracuna velikost -- samo omejim wrapper na viewport
 
-To je najkrajša in najvarnejša pot do stabilnega rezultata.
+---
+
+### Tehnicna sekcija
+
+**Vrstni red implementacije:**
+1. `GenericWheelGame.tsx` -- zamenjava scale pristopa z dejansko omejitvijo velikosti
+2. `GenericBingoGame.tsx` -- zamenjava scale pristopa
+3. `GenericSpominGame.tsx` -- desktop container fix
+4. `GenericSestavljankaGame.tsx` -- desktop container fix
+
+**Kljucni princip (enak kot Labirint):**
+```text
+razpolozljivaSirina = window.innerWidth
+razpolozljivaVisina = window.innerHeight - reservedSpace
+velikostVsebine = min(razpolozljivaSirina, razpolozljivaVisina)
+```
+
+Vsebina se fizicno prilega oknu, ne samo vizualno pomanjsa.
+
+**Kaj ostane nespremenjeno:**
+- Mobilni (touch) layout za vse igre -- ze deluje s fullscreen pristopom
+- Labirint -- ze deluje odlicno
+- Igra ujemanja -- locen popravek ze narejen
+- Vsi dialogi, floating gumbi, navodila
+
+**Datoteke za spremembo:**
+- `src/components/games/GenericWheelGame.tsx`
+- `src/components/games/GenericBingoGame.tsx`
+- `src/components/games/GenericSpominGame.tsx`
+- `src/components/games/GenericSestavljankaGame.tsx`
+
