@@ -67,7 +67,8 @@ export const SequenceGameBase = ({
   const [helpUsesLeft, setHelpUsesLeft] = useState(helpAttempts);
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-  const prevCorrectIdsRef = useRef<Set<string>>(new Set());
+  const [activePlayingIndex, setActivePlayingIndex] = useState<number | null>(null);
+  const sequentialPlaybackRef = useRef(false);
 
   // Initialize empty slots based on imageCount
   useEffect(() => {
@@ -160,35 +161,9 @@ export const SequenceGameBase = ({
         }
         return shuffled;
       });
-      prevCorrectIdsRef.current = new Set();
       setGamePhase("arrange");
     }
   }, [allCorrectSelected, gamePhase, targetSequence]);
-
-  // Play audio when image is placed in correct position during arrange phase
-  useEffect(() => {
-    if (gamePhase !== "arrange" || isPlayingAudio) return;
-    const currentCorrectIds = new Set<string>();
-    placedImages.forEach((img, index) => {
-      if (img && img.id === targetSequence[index]?.id) {
-        currentCorrectIds.add(img.id);
-      }
-    });
-    const newlyCorrect: SequenceImage[] = [];
-    placedImages.forEach((img, index) => {
-      if (img && img.id === targetSequence[index]?.id && !prevCorrectIdsRef.current.has(img.id)) {
-        newlyCorrect.push(img);
-      }
-    });
-    if (newlyCorrect.length > 0 && newlyCorrect[0].audio_url) {
-      setIsPlayingAudio(true);
-      const audio = new Audio(newlyCorrect[0].audio_url);
-      audio.onended = () => setIsPlayingAudio(false);
-      audio.onerror = () => setIsPlayingAudio(false);
-      audio.play().catch(() => setIsPlayingAudio(false));
-    }
-    prevCorrectIdsRef.current = currentCorrectIds;
-  }, [placedImages, targetSequence, gamePhase, isPlayingAudio]);
 
   useEffect(() => {
     if (gamePhase !== "arrange" || placedImages.some(img => img === null)) return;
@@ -200,14 +175,39 @@ export const SequenceGameBase = ({
     }
   }, [placedImages, targetSequence, gamePhase, isComplete]);
 
+  // Sequential playback on completion
   useEffect(() => {
-    if (isComplete && !gameCompletedTriggered && targetSequence.length > 0) {
+    if (!isComplete || sequentialPlaybackRef.current) return;
+    sequentialPlaybackRef.current = true;
+
+    const playSequential = async () => {
+      setIsPlayingAudio(true);
+      const images = placedImages.filter(img => img !== null) as SequenceImage[];
+      for (let i = 0; i < images.length; i++) {
+        setActivePlayingIndex(i);
+        if (images[i]?.audio_url) {
+          await new Promise<void>((resolve) => {
+            const audio = new Audio(images[i].audio_url!);
+            audio.onended = () => resolve();
+            audio.onerror = () => resolve();
+            audio.play().catch(() => resolve());
+          });
+        }
+        await new Promise(r => setTimeout(r, 500));
+      }
+      setActivePlayingIndex(null);
+      setIsPlayingAudio(false);
+    };
+
+    playSequential();
+  }, [isComplete, placedImages]);
+
+  useEffect(() => {
+    if (isComplete && !gameCompletedTriggered && targetSequence.length > 0 && !isPlayingAudio && activePlayingIndex === null) {
       setGameCompletedTriggered(true);
-      setTimeout(() => {
-        onGameComplete(targetSequence);
-      }, 500);
+      onGameComplete(targetSequence);
     }
-  }, [isComplete, targetSequence, onGameComplete, gameCompletedTriggered]);
+  }, [isComplete, targetSequence, onGameComplete, gameCompletedTriggered, isPlayingAudio, activePlayingIndex]);
 
   const getSlotStatus = useCallback((image: SequenceImage | null, index: number): SlotStatus => {
     if (!image) return "empty";
@@ -458,9 +458,11 @@ export const SequenceGameBase = ({
                 {gamePhase === "arrange" ? (
                   <div 
                     className={cn(
-                      "relative rounded-lg overflow-hidden transition-all duration-200 border-3",
+                      "relative rounded-lg overflow-hidden transition-all duration-300 border-3",
                       isLandscape ? "" : "aspect-square",
-                      getSlotBorderClass(status)
+                      activePlayingIndex === index
+                        ? "border-4 border-orange-400 shadow-[0_0_24px_rgba(251,146,60,0.9)] scale-105 animate-pulse"
+                        : getSlotBorderClass(status)
                     )}
                     style={itemSize ? { width: itemSize, height: itemSize } : {}}
                   >

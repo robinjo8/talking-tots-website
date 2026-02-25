@@ -15,8 +15,8 @@ export const useSequenceGame = (tableName: string, count: number = 4) => {
   const [isComplete, setIsComplete] = useState(false);
   const [correctIndices, setCorrectIndices] = useState<number[]>([]);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-  const prevCorrectIndicesRef = useRef<Set<number>>(new Set());
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [activePlayingIndex, setActivePlayingIndex] = useState<number | null>(null);
+  const sequentialPlaybackRef = useRef(false);
 
   const { data: imagesData, isLoading } = useQuery({
     queryKey: ["sequenceImages", tableName],
@@ -74,7 +74,9 @@ export const useSequenceGame = (tableName: string, count: number = 4) => {
     setCurrentSequence(shuffleUntilDifferent(selected));
     setIsComplete(false);
     setCorrectIndices([]);
-    prevCorrectIndicesRef.current = new Set();
+    setActivePlayingIndex(null);
+    setIsPlayingAudio(false);
+    sequentialPlaybackRef.current = false;
   }, [imagesData, count]);
 
   useEffect(() => {
@@ -83,10 +85,9 @@ export const useSequenceGame = (tableName: string, count: number = 4) => {
     }
   }, [imagesData, initializeGame, count]);
 
-  // Check correct indices and play audio for newly correct items
+  // Check correct indices (visual only, no audio)
   useEffect(() => {
     if (targetSequence.length === 0 || currentSequence.length === 0) return;
-
     const newCorrect: number[] = [];
     currentSequence.forEach((item, index) => {
       if (item.id === targetSequence[index]?.id) {
@@ -94,34 +95,6 @@ export const useSequenceGame = (tableName: string, count: number = 4) => {
       }
     });
     setCorrectIndices(newCorrect);
-
-    // Find newly correct indices
-    const prevSet = prevCorrectIndicesRef.current;
-    const newlyCorrect = newCorrect.filter(i => !prevSet.has(i));
-
-    if (newlyCorrect.length > 0 && !isPlayingAudio) {
-      const firstNew = newlyCorrect[0];
-      const image = currentSequence[firstNew];
-      if (image?.audio_url) {
-        setIsPlayingAudio(true);
-        const audio = new Audio(image.audio_url);
-        audioRef.current = audio;
-        audio.onended = () => {
-          setIsPlayingAudio(false);
-          audioRef.current = null;
-        };
-        audio.onerror = () => {
-          setIsPlayingAudio(false);
-          audioRef.current = null;
-        };
-        audio.play().catch(() => {
-          setIsPlayingAudio(false);
-          audioRef.current = null;
-        });
-      }
-    }
-
-    prevCorrectIndicesRef.current = new Set(newCorrect);
   }, [currentSequence, targetSequence]);
 
   // Check completion
@@ -136,6 +109,33 @@ export const useSequenceGame = (tableName: string, count: number = 4) => {
       setIsComplete(true);
     }
   }, [targetSequence, currentSequence, isComplete]);
+
+  // Sequential playback on completion
+  useEffect(() => {
+    if (!isComplete || sequentialPlaybackRef.current) return;
+    sequentialPlaybackRef.current = true;
+
+    const playSequential = async () => {
+      setIsPlayingAudio(true);
+      for (let i = 0; i < currentSequence.length; i++) {
+        setActivePlayingIndex(i);
+        const img = currentSequence[i];
+        if (img?.audio_url) {
+          await new Promise<void>((resolve) => {
+            const audio = new Audio(img.audio_url!);
+            audio.onended = () => resolve();
+            audio.onerror = () => resolve();
+            audio.play().catch(() => resolve());
+          });
+        }
+        await new Promise(r => setTimeout(r, 500));
+      }
+      setActivePlayingIndex(null);
+      setIsPlayingAudio(false);
+    };
+
+    playSequential();
+  }, [isComplete, currentSequence]);
 
   const moveItem = useCallback((fromIndex: number, toIndex: number) => {
     if (isPlayingAudio) return;
@@ -159,6 +159,7 @@ export const useSequenceGame = (tableName: string, count: number = 4) => {
     moveItem,
     resetGame,
     correctIndices,
-    isPlayingAudio
+    isPlayingAudio,
+    activePlayingIndex
   };
 };
