@@ -297,7 +297,7 @@ export function GenericSpominGame({ config, backPath, onGameComplete }: GenericS
 
   // Desktop version
   return (
-    <div className="min-h-screen">
+    <div className="fixed inset-0 overflow-hidden">
       {/* Background - Green background like other games */}
       <div 
         className="fixed inset-0 bg-cover bg-center bg-no-repeat"
@@ -307,7 +307,7 @@ export function GenericSpominGame({ config, backPath, onGameComplete }: GenericS
       />
       
       {/* Game content */}
-      <div className="relative z-10 min-h-screen p-4">
+      <div className="relative z-10 h-full flex flex-col p-4">
         {/* Header with progress dots */}
         <div className="text-center pt-4">
           <h1 className="text-2xl font-bold text-white drop-shadow-lg">
