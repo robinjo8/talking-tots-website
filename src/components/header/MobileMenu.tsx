@@ -37,7 +37,7 @@ export function MobileMenu({
       <div className="lg:hidden flex items-center gap-2">
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="sm" className="flex items-center ml-auto">
+          <Button variant="ghost" size="sm" className="flex items-center ml-auto" aria-label="Odpri meni">
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
@@ -135,7 +135,7 @@ export function MobileMenu({
       {/* Hamburger menu on the right */}
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
-          <Button variant="ghost" size="sm" className="flex items-center ml-auto">
+          <Button variant="ghost" size="sm" className="flex items-center ml-auto" aria-label="Odpri meni">
             <Menu className="h-5 w-5" />
           </Button>
         </SheetTrigger>
