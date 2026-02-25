@@ -31,6 +31,7 @@ const breadcrumbConfig: BreadcrumbConfig[] = [
   { path: "/clanki/razvoj-govora", label: "Razvoj govora", parent: "/logopedski-koticek" },
   { path: "/clanki/motorika-govoril", label: "Motorika govoril", parent: "/logopedski-koticek" },
   { path: "/clanki/pogosta-vprasanja", label: "Pogosta vprašanja", parent: "/logopedski-koticek" },
+  { path: "/clanki/govorno-jezikovne-tezave", label: "Govorno-jezikovne težave", parent: "/logopedski-koticek" },
   
   // Govorne igre hierarchy
   { path: "/govorne-igre", label: "Govorne igre", parent: "/moje-aplikacije" },
