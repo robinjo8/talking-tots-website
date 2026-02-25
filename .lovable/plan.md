@@ -1,92 +1,51 @@
 
+Cilj: odpraviti primer, ko Tomi pri vprašanju “J namesto R” vrne generičen odgovor o vajah, namesto jasne usmeritve k logopedu ne glede na starost.
 
-## Dodajanje kratkih navodil nad igro za Ujemanje, Bingo in Labirint
+1) Kaj sem preveril (dejstva)
+- Edge logs za `chat-assistant` kažejo: `file_search orodje UPORABLJENO` pri zadnjih klicih.
+- To pomeni, da funkcija in povezava na Vector Store delujeta; težava ni v tem, da `file_search` sploh ne bi tekel.
+- V kodi (`supabase/functions/chat-assistant/index.ts`) je `tool_choice: "required"` in `vector_store_ids: [OPENAI_VECTOR_STORE_ID]`, torej model vedno kliče iskanje po dokumentih.
+- Secret `OPENAI_VECTOR_STORE_ID` obstaja v projektu.
 
-### Pregled
+2) Odgovor na tvoje vprašanje “Files ali Vector stores?”
+- Za AI odgovor je ključno: datoteka mora biti v Vector Store, ki je nastavljen v `OPENAI_VECTOR_STORE_ID`.
+- “Files” je samo skladišče datotek; samo upload v Files NI dovolj.
+- Pravilno zaporedje:
+  1. datoteko naložiš v Files
+  2. to datoteko dodaš (attach) v pravi Vector Store
+  3. počakaš, da je status “Ready”
+- Če imaš več datotek z istim imenom, je pomembno, da je v Vector Store pripeta točno nova verzija (staro odstraniš).
 
-Nad vsako igro se doda kratko navodilo (instrukcija) v obliki belega/polprosojnega traku z velikimi tiskanimi crkami. Navodila se prikazejo stalno med igro in ne vplivajo na logiko igre.
+3) Zakaj še vedno dobivaš napačen/generičen odgovor
+Najverjetnejši razlog ni “ni v vector store”, ampak retrieval-ujemanje:
+- Uporabniško vprašanje je formulirano kot “katere vaje”, model pa iz dokumentov morda ne dobi chunka z opozorilom “J namesto R/L -> logoped ne glede na starost”.
+- Zaradi obstoječih pravil v promptu potem model varno preklopi na generični fallback (“v dokumentaciji ni specifičnih vaj ... posvet z logopedom”).
 
-### Navodila po igrah
+4) Predlagan tehnični popravek (brez posega v UI, samo backend)
+A) V `supabase/functions/chat-assistant/index.ts` dodam “hard guardrail” v sistemska navodila:
+- Če uporabnik omenja, da otrok glas R ali L zamenjuje z J, mora odgovor vključiti:
+  “Če otrok glas L ali glas R zamenjuje z glasom J, je potreben obisk logopeda, ne glede na starost otroka.”
+- Ta stavek bo zapisan dobesedno in visoko prioriteten.
 
-**Igra ujemanja** (GenericIgraUjemanjaGame.tsx):
-- Starost 3-4: "POISCI ENAKI SLIKI."
-- Starost 5-6: "POVEZI POSNETEK Z USTREZNO SENCO IN SLIKO."
-- Starost 7-8 in 9-10: "POVEZI POSNETEK Z USTREZNO BESEDO, SENCO IN SLIKO."
+B) Dodam lahkotno semantično normalizacijo vprašanja pred klicem Responses API:
+- ob zaznavi vzorcev (`j namesto r`, `r z j`, `l z j`) se internemu poizvedovalnemu kontekstu doda še “zamenjuje z glasom J ne glede na starost logoped”.
+- S tem povečamo verjetnost, da retrieval vrne pravi odstavek.
 
-**Bingo** (GenericBingoGame.tsx):
-- "KLIKNI 'ZAVRTI' IN POISCI ENAKE SLIKE."
+C) Dodam diagnostično logiranje (varno, brez osebnih podatkov):
+- log, ali je bil zaznan “J↔R/L” vzorec
+- log, ali je model vrnil fallback
+- to omogoča hitro preverjanje, če se edge case ponovi.
 
-**Labirint** (GenericLabirintGame.tsx):
-- "POBERI VSE ZVEZDICE IN POJDI DO CILJA."
+5) Verifikacija po implementaciji
+- Test 1: “moj otrok izgovarja J namesto R. katere vaje naj delamo?”
+  - pričakovano: jasna usmeritev, da je potreben obisk logopeda ne glede na starost.
+- Test 2: “moj otrok izgovarja J namesto L”
+  - enako pričakovano vedenje.
+- Test 3: splošno vprašanje o vajah brez J↔R/L
+  - pričakovano: obstoječa logika ostane enaka (brez regresije).
+- Test 4: end-to-end test v aplikaciji (UI + stream) na `/chat` toku, da se potrdi, da nič ne vpliva na delovanje klepeta.
 
-### Tehnicne spremembe
-
-#### 1. GenericIgraUjemanjaGame.tsx
-
-Dodaj navodilo med ozadjem in igro (vrstica ~265, nad `renderGame()`). Navodilo se doloci glede na `config.requiredAgeGroup`:
-
-```text
-const instructionText = useMemo(() => {
-  switch (config.requiredAgeGroup) {
-    case '3-4': return 'POISCI ENAKI SLIKI.';
-    case '5-6': return 'POVEZI POSNETEK Z USTREZNO SENCO IN SLIKO.';
-    default: return 'POVEZI POSNETEK Z USTREZNO BESEDO, SENCO IN SLIKO.';
-  }
-}, [config.requiredAgeGroup]);
-```
-
-Prikaz: bel polprosojen trak na vrhu zaslona (`fixed top-2 left-0 right-0 z-20 text-center`):
-```text
-<div className="fixed top-2 left-0 right-0 z-20 flex justify-center pointer-events-none">
-  <div className="bg-white/80 backdrop-blur-sm rounded-full px-6 py-2 shadow-md">
-    <p className="text-sm md:text-base font-bold text-gray-800">
-      {instructionText}
-    </p>
-  </div>
-</div>
-```
-
-Postavi ga znotraj `<>` bloka (vrstica 264), pred `renderGame()` div. Uporabi `pointer-events-none` da ne blokira klikov na igro.
-
-#### 2. GenericBingoGame.tsx
-
-Dodaj navodilo nad reel komponento (vrstica ~173, pred `<BingoReel>`):
-
-```text
-<div className="bg-white/80 backdrop-blur-sm rounded-full px-6 py-1.5 shadow-md">
-  <p className="text-sm md:text-base font-bold text-gray-800">
-    KLIKNI 'ZAVRTI' IN POISCI ENAKE SLIKE.
-  </p>
-</div>
-```
-
-Postavi ga znotraj flex-col kontejnerja (vrstica 172), kot prvi element pred `<BingoReel>`.
-
-#### 3. GenericLabirintGame.tsx
-
-Dodaj navodilo pod naslov `<h1>` (vrstica ~344, pred `<MazeGame>`):
-
-```text
-<div className="bg-white/80 backdrop-blur-sm rounded-full px-6 py-1.5 shadow-md mb-2">
-  <p className="text-sm md:text-base font-bold text-gray-800">
-    POBERI VSE ZVEZDICE IN POJDI DO CILJA.
-  </p>
-</div>
-```
-
-Postavi ga med `</h1>` (vrstica 344) in `<MazeGame>` (vrstica 346).
-
-### Vizualni slog
-
-Vse tri igre uporabljajo enak slog navodila:
-- Belo polprosojno ozadje (`bg-white/80 backdrop-blur-sm`)
-- Zaobljen okvir (`rounded-full`)
-- Krepko besedilo (`font-bold`)
-- Senca (`shadow-md`)
-- Manjsa pisava na mobilnih napravah (`text-sm md:text-base`)
-
-### Skupaj: 3 datoteke
-- `src/components/games/GenericIgraUjemanjaGame.tsx`
-- `src/components/games/GenericBingoGame.tsx`
-- `src/components/games/GenericLabirintGame.tsx`
-
+6) Kaj to reši
+- Odpravi konkretni primer, ki ga poročaš.
+- Ohrani trenutno arhitekturo (Supabase Edge + file_search).
+- Ne posega v igre, UI ali obstoječe podatkovne tokove, zato je tveganje za regresije nizko.
