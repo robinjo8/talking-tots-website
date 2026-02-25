@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -13,6 +13,10 @@ export const useSequenceGame = (tableName: string, count: number = 4) => {
   const [targetSequence, setTargetSequence] = useState<SequenceImage[]>([]);
   const [currentSequence, setCurrentSequence] = useState<SequenceImage[]>([]);
   const [isComplete, setIsComplete] = useState(false);
+  const [correctIndices, setCorrectIndices] = useState<number[]>([]);
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const prevCorrectIndicesRef = useRef<Set<number>>(new Set());
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const { data: imagesData, isLoading } = useQuery({
     queryKey: ["sequenceImages", tableName],
@@ -44,7 +48,6 @@ export const useSequenceGame = (tableName: string, count: number = 4) => {
     let shuffled = shuffleArray([...target]);
     let attempts = 0;
     
-    // Keep shuffling until no item is in the same position
     while (attempts < maxAttempts) {
       const hasMatch = shuffled.some((item, index) => item.id === target[index]?.id);
       if (!hasMatch) {
@@ -54,7 +57,6 @@ export const useSequenceGame = (tableName: string, count: number = 4) => {
       attempts++;
     }
     
-    // Fallback: manually swap first two items if still matching after max attempts
     if (shuffled[0]?.id === target[0]?.id) {
       [shuffled[0], shuffled[1]] = [shuffled[1], shuffled[0]];
     }
@@ -65,13 +67,14 @@ export const useSequenceGame = (tableName: string, count: number = 4) => {
   const initializeGame = useCallback(() => {
     if (!imagesData || imagesData.length < count) return;
 
-    // Select random images
     const shuffled = shuffleArray(imagesData);
     const selected = shuffled.slice(0, count) as SequenceImage[];
 
     setTargetSequence(selected);
     setCurrentSequence(shuffleUntilDifferent(selected));
     setIsComplete(false);
+    setCorrectIndices([]);
+    prevCorrectIndicesRef.current = new Set();
   }, [imagesData, count]);
 
   useEffect(() => {
@@ -80,17 +83,50 @@ export const useSequenceGame = (tableName: string, count: number = 4) => {
     }
   }, [imagesData, initializeGame, count]);
 
-  const moveItem = useCallback((fromIndex: number, toIndex: number) => {
-    setCurrentSequence(prev => {
-      const newSequence = [...prev];
-      const [movedItem] = newSequence.splice(fromIndex, 1);
-      newSequence.splice(toIndex, 0, movedItem);
-      return newSequence;
-    });
-  }, []);
+  // Check correct indices and play audio for newly correct items
+  useEffect(() => {
+    if (targetSequence.length === 0 || currentSequence.length === 0) return;
 
-  const checkCompletion = useCallback(() => {
-    if (targetSequence.length === 0 || currentSequence.length === 0) return false;
+    const newCorrect: number[] = [];
+    currentSequence.forEach((item, index) => {
+      if (item.id === targetSequence[index]?.id) {
+        newCorrect.push(index);
+      }
+    });
+    setCorrectIndices(newCorrect);
+
+    // Find newly correct indices
+    const prevSet = prevCorrectIndicesRef.current;
+    const newlyCorrect = newCorrect.filter(i => !prevSet.has(i));
+
+    if (newlyCorrect.length > 0 && !isPlayingAudio) {
+      const firstNew = newlyCorrect[0];
+      const image = currentSequence[firstNew];
+      if (image?.audio_url) {
+        setIsPlayingAudio(true);
+        const audio = new Audio(image.audio_url);
+        audioRef.current = audio;
+        audio.onended = () => {
+          setIsPlayingAudio(false);
+          audioRef.current = null;
+        };
+        audio.onerror = () => {
+          setIsPlayingAudio(false);
+          audioRef.current = null;
+        };
+        audio.play().catch(() => {
+          setIsPlayingAudio(false);
+          audioRef.current = null;
+        });
+      }
+    }
+
+    prevCorrectIndicesRef.current = new Set(newCorrect);
+  }, [currentSequence, targetSequence]);
+
+  // Check completion
+  useEffect(() => {
+    if (targetSequence.length === 0 || currentSequence.length === 0) return;
     
     const isMatch = targetSequence.every((item, index) => 
       item.id === currentSequence[index]?.id
@@ -99,13 +135,17 @@ export const useSequenceGame = (tableName: string, count: number = 4) => {
     if (isMatch && !isComplete) {
       setIsComplete(true);
     }
-    
-    return isMatch;
   }, [targetSequence, currentSequence, isComplete]);
 
-  useEffect(() => {
-    checkCompletion();
-  }, [currentSequence, checkCompletion]);
+  const moveItem = useCallback((fromIndex: number, toIndex: number) => {
+    if (isPlayingAudio) return;
+    setCurrentSequence(prev => {
+      const newSequence = [...prev];
+      const [movedItem] = newSequence.splice(fromIndex, 1);
+      newSequence.splice(toIndex, 0, movedItem);
+      return newSequence;
+    });
+  }, [isPlayingAudio]);
 
   const resetGame = useCallback(() => {
     initializeGame();
@@ -117,6 +157,8 @@ export const useSequenceGame = (tableName: string, count: number = 4) => {
     isComplete,
     isLoading,
     moveItem,
-    resetGame
+    resetGame,
+    correctIndices,
+    isPlayingAudio
   };
 };
