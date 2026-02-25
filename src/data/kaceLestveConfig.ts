@@ -143,6 +143,28 @@ export const KACE_WORDS_C: KaceLestveWord[] = [
   },
 ];
 
+// Words for R beginning exercises (consonant clusters TR, BR, DR, PR)
+export const KACE_WORDS_R_ZACETEK: KaceLestveWord[] = [
+  { text: "DREVO", image: "drevo1.webp", audio: "drevo.m4a", acceptedVariants: ["DREVO", "DREVO!", "DREVÓ", "DREVO?", "DREVO.", "DERVO"] },
+  { text: "TROBENTA", image: "trobenta1.webp", audio: "trobenta.m4a", acceptedVariants: ["TROBENTA", "TROBENTA!", "TROMPETA", "TROBENTO", "TOBENTA"] },
+  { text: "TRI", image: "tri1.webp", audio: "tri.m4a", acceptedVariants: ["TRI", "TRI!", "TRI?", "3", "TI"] },
+  { text: "TRIKOTNIK", image: "trikotnik1.webp", audio: "trikotnik.m4a", acceptedVariants: ["TRIKOTNIK", "TRIKOTNIK!", "TRIKOTNIKA", "TIKOTNIK"] },
+  { text: "TRAVA", image: "trava1.webp", audio: "trava.m4a", acceptedVariants: ["TRAVA", "TRAVA!", "TRAVO", "TRAVE", "TAVA"] },
+  { text: "TRAK", image: "trak1.webp", audio: "trak.m4a", acceptedVariants: ["TRAK", "TRAK!", "TRAKU", "TRAKA", "TAK"] },
+  { text: "BRISAČA", image: "brisaca1.webp", audio: "brisaca.m4a", acceptedVariants: ["BRISAČA", "BRISACA", "BRISAČO", "BRISAČA!", "BISAČA"] },
+  { text: "BRIKETI", image: "briketi1.webp", audio: "briketi.m4a", acceptedVariants: ["BRIKETI", "BRIKETI!", "BRIKET", "BRIKETE", "BIKETI"] },
+  { text: "BRESKEV", image: "breskev1.webp", audio: "breskev.m4a", acceptedVariants: ["BRESKEV", "BRESKEV!", "BRESKVE", "BRESKVA", "BESKEV"] },
+  { text: "BRADA", image: "brada1.webp", audio: "brada.m4a", acceptedVariants: ["BRADA", "BRADA!", "BRADO", "BRADE", "BADA"] },
+  { text: "BROKOLI", image: "brokoli1.webp", audio: "brokoli.m4a", acceptedVariants: ["BROKOLI", "BROKOLI!", "BROKOLIJA", "BOKOLI"] },
+  { text: "BRUSNICE", image: "brusnice1.webp", audio: "brusnice.m4a", acceptedVariants: ["BRUSNICE", "BRUSNICE!", "BRUSNICA", "BUSNICE"] },
+  { text: "BREZA", image: "breza1.webp", audio: "breza.m4a", acceptedVariants: ["BREZA", "BREZA!", "BREZO", "BREZE", "BEZA"] },
+  { text: "DRES", image: "dres1.webp", audio: "dres.m4a", acceptedVariants: ["DRES", "DRES!", "DRESU", "DRESA", "DES"] },
+  { text: "DRAGULJ", image: "dragulj1.webp", audio: "dragulj.m4a", acceptedVariants: ["DRAGULJ", "DRAGULJ!", "DRAGULJA", "DAGULJA"] },
+  { text: "DRON", image: "dron1.webp", audio: "dron.m4a", acceptedVariants: ["DRON", "DRON!", "DRONA", "DRONU", "DON"] },
+  { text: "PRINC", image: "princ1.webp", audio: "princ.m4a", acceptedVariants: ["PRINC", "PRINC!", "PRINCA", "PRINCU", "PINC"] },
+  { text: "PRESTA", image: "presta1.webp", audio: "presta.m4a", acceptedVariants: ["PRESTA", "PRESTA!", "PRESTO", "PRESTE", "PESTA"] },
+];
+
 // Board layout (6 cols x 7 rows = 42 fields, boustrophedon)
 // Row 0 (bottom): fields 1-6 (L→R)
 // Row 1: fields 12-7 (R→L)
@@ -198,14 +220,14 @@ export function getCellTextColor(position: number): string {
 }
 
 // Get a random word from the list (excluding recently used if possible)
-export function getRandomWord(usedIndices: number[] = []): { word: KaceLestveWord; index: number } {
-  const available = KACE_WORDS_C
+export function getRandomWord(usedIndices: number[] = [], wordList: KaceLestveWord[] = KACE_WORDS_C): { word: KaceLestveWord; index: number } {
+  const available = wordList
     .map((w, i) => i)
     .filter(i => !usedIndices.includes(i));
   
-  const pool = available.length > 0 ? available : KACE_WORDS_C.map((_, i) => i);
+  const pool = available.length > 0 ? available : wordList.map((_, i) => i);
   const index = pool[Math.floor(Math.random() * pool.length)];
-  return { word: KACE_WORDS_C[index], index };
+  return { word: wordList[index], index };
 }
 
 // Dragon avatars (only 2 choices: blue and red figure)

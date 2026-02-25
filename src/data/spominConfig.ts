@@ -63,6 +63,12 @@ export const spominConfig: Record<string, SpominConfig> = {
     tableName: 'memory_cards_Ž',
     queryKey: 'memoryCardsZH',
   },
+  'r-zacetek': {
+    urlKey: 'r-zacetek',
+    displayLetter: 'R',
+    tableName: 'memory_cards_r_zacetek',
+    queryKey: 'memoryCardsRZacetek',
+  },
 };
 
 // Helper to get config from URL gameId (e.g., 'spomin-c' -> config for 'c')

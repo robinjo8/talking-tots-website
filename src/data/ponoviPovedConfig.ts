@@ -425,17 +425,62 @@ export const ponoviPovedCH: PonoviPovedConfig = {
   ]
 };
 
+// Configuration for R začetne vaje
+export const ponoviPovedRZacetek: PonoviPovedConfig = {
+  letter: "r-zacetek",
+  displayLetter: "R",
+  sentences: [
+    {
+      words: [
+        { word: "Princ", image: "princ1.webp", audio: "princ.m4a" },
+        { word: "vidi", image: "Stickman_gledati.webp", audio: "vidi.m4a" },
+        { word: "drevo", image: "drevo1.webp", audio: "drevo.m4a" }
+      ],
+      fullSentence: "Princ vidi drevo.",
+      audio: "princ_vidi_drevo.m4a"
+    },
+    {
+      words: [
+        { word: "Dron", image: "dron1.webp", audio: "dron.m4a" },
+        { word: "nese", image: "Stickman_nesti.webp", audio: "nese.m4a" },
+        { word: "breskev", image: "breskev1.webp", audio: "breskev.m4a" }
+      ],
+      fullSentence: "Dron nese breskev.",
+      audio: "dron_nese_breskev.m4a"
+    },
+    {
+      words: [
+        { word: "Breza", image: "breza1.webp", audio: "breza.m4a" },
+        { word: "ima", image: "Stickman_imeti.webp", audio: "ima.m4a" },
+        { word: "trak", image: "trak1.webp", audio: "trak.m4a" }
+      ],
+      fullSentence: "Breza ima trak.",
+      audio: "breza_ima_trak.m4a"
+    },
+    {
+      words: [
+        { word: "Trava", image: "trava1.webp", audio: "trava.m4a" },
+        { word: "je", image: "Stickman_jesti.webp", audio: "je.m4a" },
+        { word: "brokoli", image: "brokoli1.webp", audio: "brokoli.m4a" }
+      ],
+      fullSentence: "Trava je brokoli.",
+      audio: "trava_je_brokoli.m4a"
+    }
+  ]
+};
+
 // Map of all available configurations by letter
 const configMap: Record<string, PonoviPovedConfig> = {
   k: ponoviPovedK,
   l: ponoviPovedL,
   r: ponoviPovedR,
-  s: ponoviPovedS,
+  's': ponoviPovedS,
   z: ponoviPovedZ,
   c: ponoviPovedC,
   sh: ponoviPovedSH,
   zh: ponoviPovedZH,
   ch: ponoviPovedCH,
+  'r-zacetek': ponoviPovedRZacetek,
 };
 
 // Get configuration by letter (supports ASCII digraphs)
