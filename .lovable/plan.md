@@ -1,95 +1,128 @@
 
 
-## Popravek: Spomin in Zaporedja -- desktop prikaz brez scrollanja
+## Dodajanje "GLAS R - začetne vaje" za vseh 11 iger
 
-### Diagnoza
+### Pregled
 
-**Spomin (desktop) -- "katastrofa":**
-Moja prejsnja sprememba je pokvarila desktop prikaz. Problem je v `MemoryGrid.tsx` -- dinamicno racunanje velikosti kartic (vrstice 53-68) se izvaja SAMO ko je `isLandscape=true`. V desktop nacinu (`isLandscape=false`) se kartice velikostno dolocajo s CSS `1fr` stolpci in `maxHeight: calc((100vh - 120px) / rows)`, kar v kombinaciji z `overflow-hidden` na zunanjem kontejnerju povzroca premajhne ali nepravilno prikazane kartice.
+Za vseh 11 iger na strani `/govorne-igre` se doda nova kartica "Glas R - začetne vaje" z URL kljucem `r-zacetek`. Vsaka igra bo uporabljala istih 18 besed s soglasniškimi skupinami (TR, BR, DR, PR):
 
-**Zaporedja (desktop):**
-Desktop verzija (vrstice 346-443 v `GenericZaporedjaGame.tsx`) se nikoli ni spremenila -- se vedno uporablja `overflow-auto` + `min-h-full` + `pb-24`, kar povzroca scrollanje.
+**Besede:** DREVO, TROBENTA, TRI, TRIKOTNIK, TRAVA, TRAK, BRISAČA, BRIKETI, BRESKEV, BRADA, BROKOLI, BRUSNICE, BREZA, DRES, DRAGULJ, DRON, PRINC, PRESTA
 
-### Kako deluje Labirint (referenca)
-
-Labirint racuna `CELL_SIZE` iz dejanskih dimenzij okna:
-```text
-CELL_SIZE = min(
-  (availableWidth - padding) / columns,
-  (availableHeight - padding) / rows
-) * 0.99
-```
-Canvas se nastavi na tocne piksle -- nikoli ne preseze okna, ne glede na velikost brskalnika.
-
-### Popravki
-
-## 1) MemoryGrid -- dinamicno racunanje kartic tudi za desktop
-**Datoteka:** `src/components/games/MemoryGrid.tsx`
-
-Trenutno: `cardSize` se racuna samo ko `isLandscape=true` (vrstica 54). V desktop nacinu (`isLandscape=false`) se uporablja CSS `1fr` z `maxHeight`, kar ne deluje zanesljivo.
-
-Popravek:
-- Odstranim pogoj `if (!isLandscape ...)` iz `cardSize` izracuna
-- Za desktop racunam enako kot za landscape, le z drugimi rezerviranimi prostori:
-  - Desktop: `reservedVertical = 120` (naslov + progress + padding), `reservedHorizontal = 100`
-  - Landscape: `reservedVertical = 8`, `reservedHorizontal = 8` (kot zdaj)
-- Grid vedno uporablja eksplicitne pikselske dimenzije (kot canvas v Labirintu)
-- Odstranim CSS fallback z `1fr` in `maxHeight: calc(...)` -- vse preko pikslov
-
-## 2) GenericSpominGame -- desktop kontejner popravek
-**Datoteka:** `src/components/games/GenericSpominGame.tsx`
-
-Trenutna desktop verzija (vrstica 300-436) ima `fixed inset-0 overflow-hidden` kar je OK, ampak grid wrapper `max-w-4xl mx-auto` (vrstica 323) ne daje pravilnega konteksta za centriranje.
-
-Popravek:
-- Grid wrapper dobi `flex-1 flex items-center justify-center` za vertikalno centriranje (kot Labirint, ki ima `justify-start pt-8`)
-- Ohranim `fixed inset-0 overflow-hidden` (pravilno)
-- Naslov in progress ostanejo na vrhu, grid se centrira v preostalem prostoru
-
-## 3) GenericZaporedjaGame -- desktop verzija brez scrollanja
-**Datoteka:** `src/components/games/GenericZaporedjaGame.tsx`
-
-Trenutna desktop verzija (vrstica 346-443):
-```text
-<div className="fixed inset-0 overflow-auto ...">
-  <div className="min-h-full flex flex-col ... p-4 pb-24">
-```
-
-Popravek:
-- Zamenjam `overflow-auto` z `overflow-hidden`
-- Zamenjam `min-h-full` z `h-full`
-- Odstranim `pb-24` (floating gumbi so `fixed`, ne rabijo paddinga)
-- Dodam `justify-center` na flex kontejner, da se igra centrira vertikalno
-
-## 4) SequenceGame komponente -- desktop velikost
-**Datoteke:** Vse `SequenceGame*.tsx` komponente (S, Z, C, SH, ZH, CH, K, L, R) in `SequenceGame56Base.tsx`
-
-Trenutno: `itemSize` se racuna samo ko `isLandscape=true`. V desktop nacinu (`isLandscape=false`) se uporablja CSS `max-w-4xl` z `grid-cols-4`, kar lahko preseze okno.
-
-Popravek:
-- Dodam izracun `itemSize` tudi za desktop nastavitve (vecji `reservedVertical` za naslov)
-- Ko je `itemSize` definiran, grid uporablja eksplicitne pikselske dimenzije (kot v landscape)
-- Desktop bo imel vecje `maxTileSize` omejitve (npr. 180px) za primeren prikaz na vecjih zaslonih
+**Slike:** `[beseda]1.webp` v bucketu `slike`
+**Zvoki:** `[beseda].m4a` v bucketu `zvocni-posnetki`
 
 ---
 
-### Kaj ostane nespremenjeno
-- Mobilni (touch) layout za obe igri -- ze deluje s fullscreen pristopom
-- Labirint -- ze deluje odlicno
-- Bingo, Kolo besed, Sestavljanka -- ze popravljene v prejsnjem koraku
-- Igra ujemanja -- locen popravek ze narejen
-- Admin portal -- uporablja iste `Generic*Game` komponente, zato bodo popravki avtomatsko delovali tudi tam (npr. za OŠ Test)
+### Tehnicni nacrt sprememb
+
+#### 1. Podatkovne datoteke (config)
+
+**`src/data/puzzleImages.ts`** -- nova `rZacetekImages: PuzzleImage[]` z 18 besedami (za Labirint, Drsno sestavljanko, Sestavljanke)
+
+**`src/data/artikulacijaVajeConfig.ts`** -- dodaj:
+- `wordsDataRZacetek: WordData[]` (18 besed za Kolo besed)
+- `bingoDataRZacetek: BingoWordData[]` (18 besed za Bingo)
+- V `artikulacijaConfigs` dodaj kluca `'r-zacetek'` (wheel) in `'r-zacetek-zacetek'` (bingo)
+- Posodobi `getWheelConfig()` in `getBingoConfig()` da prepoznata `r-zacetek` brez dodajanja `-sredina-konec` sufiksa (poseben primer)
+
+**`src/data/labirintConfig.ts`** -- dodaj nov config za `r-zacetek` z `rZacetekImages`
+
+**`src/data/drsnaSestavljankaConfig.ts`** -- dodaj `{ letter: 'R-zacetek', urlKey: 'r-zacetek', images: rZacetekImages }` v `letterConfigs`
+
+**`src/data/sestavljankeGameConfig.ts`** -- enako kot zgoraj
+
+**`src/data/igraUjemanjaConfig.ts`** -- dodaj `r-zacetek` v `letterConfigs`
+
+**`src/data/zaporedjaConfig.ts`** -- dodaj `r-zacetek` v `letterConfigs` s `tableName: 'memory_cards_r_zacetek'`
+
+**`src/data/spominConfig.ts`** -- dodaj vnos `'r-zacetek'` s `tableName: 'memory_cards_r_zacetek'`
+
+**`src/data/kaceLestveConfig.ts`** -- dodaj `KACE_WORDS_R_ZACETEK: KaceLestveWord[]` z 18 besedami in `acceptedVariants`. Posodobi `getRandomWord()` da sprejme parameter za izbiro nabora besed.
+
+**`src/data/metKockeConfig.ts`** -- dodaj `metKockeRZacetek: MetKockeLetterConfig` s 6 bitji, povedki in predmeti iz nabora 18 besed. Dodaj v `metKockeConfigs` in `metKockeLetters`.
+
+**`src/data/ponoviPovedConfig.ts`** -- dodaj `ponoviPovedRZacetek: PonoviPovedConfig` s 4 povedmi (3 besede vsaka) iz nabora 18 besed. Dodaj v `configMap`.
+
+#### 2. Supabase migracija
+
+Ustvari tabelo `memory_cards_r_zacetek` z 18 vrsticami (za Spomin in Zaporedja):
+```text
+CREATE TABLE memory_cards_r_zacetek (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  word TEXT NOT NULL,
+  image_url TEXT NOT NULL,
+  audio_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+-- RLS: public read
+-- INSERT 18 vrstic
+```
+
+#### 3. Strani za izbiro crk (letter selection pages) -- dodaj kartico
+
+Vseh 11 strani dobi novo kartico "Glas R - začetne vaje":
+
+| Stran | Datoteka | URL igre |
+|-------|----------|----------|
+| Kolo besed | `src/pages/KoloSreceGames.tsx` | `/govorne-igre/kolo-srece/r-zacetek` |
+| Igra ujemanja | `src/pages/IgraUjemanja.tsx` | `/govorne-igre/igra-ujemanja/r-zacetek` |
+| Zaporedja | `src/pages/Zaporedja.tsx` | `/govorne-igre/zaporedja/r-zacetek[age]` |
+| Spomin | `src/pages/SpominGames.tsx` | `/govorne-igre/spomin/spomin-r-zacetek` |
+| Drsna igra | `src/pages/DrsnaSestavljanka.tsx` | `/govorne-igre/drsna-sestavljanka/r-zacetek[age]` |
+| Labirint | `src/pages/Labirint.tsx` | `/govorne-igre/labirint/r-zacetek` |
+| Sestavljanke | `src/pages/SestavljankeGames.tsx` | `/govorne-igre/sestavljanke/r-zacetek[age]` |
+| Zabavna pot | `src/pages/KaceLestveGames.tsx` | `/govorne-igre/kace/r-zacetek` |
+| Bingo | `src/pages/BingoGames.tsx` | `/govorne-igre/bingo/r-zacetek` |
+| Ponovi poved | `src/pages/PonoviPoved.tsx` | `/govorne-igre/ponovi-poved/r-zacetek` |
+| Smesne povedi | `src/pages/MetKockeGames.tsx` | `/govorne-igre/met-kocke/r-zacetek` |
+
+Kartica bo imela:
+- Naslov: "Glas R - začetne vaje"
+- Slika: `zmajcek_crka_R.png` (ista kot za Glas R)
+- Gradient: `from-app-purple/20 to-app-teal/20` (enak kot R)
+- Opis: prilagojen za vsako igro
+
+#### 4. Routerji
+
+Obstojecih routerjev ni treba spreminajti -- ze uporabljajo `:letter` dinamicni parameter in konfiguracije se resolvirajo po kljucu. Edini popravki:
+
+- `getBingoConfig()` v `artikulacijaVajeConfig.ts` -- mora prepoznati `r-zacetek` kot poseben primer (ne dodaja `-sredina-konec`)
+- `KaceLestveRouter.tsx` -- trenutno trdo preverja `letter !== "c"`, to je treba razsiriti na `["c", "s", "z", "r-zacetek"]` (oz. dinamicno preverjanje)
+- URL regex vzorci v `parseUrlParam` funkcijah morajo podpirati `r-zacetek` (trenutno ujemajo samo `[a-z]{1,2}`)
+
+#### 5. Admin portal
+
+Vseh 11 admin strani dobi novo kartico:
+
+| Datoteka | Nova kartica |
+|----------|-------------|
+| `src/pages/admin/games/AdminKoloSreceGames.tsx` | r-zacetek |
+| `src/pages/admin/games/AdminIgraUjemanjaGames.tsx` | r-zacetek |
+| `src/pages/admin/games/AdminZaporedjaGames.tsx` | r-zacetek |
+| `src/pages/admin/games/AdminSpominGames.tsx` | r-zacetek |
+| `src/pages/admin/games/AdminDrsnaSestavljankaGames.tsx` | r-zacetek |
+| `src/pages/admin/games/AdminLabirintGames.tsx` | r-zacetek |
+| `src/pages/admin/games/AdminSestavljankeGames.tsx` | r-zacetek |
+| `src/pages/admin/games/AdminKaceLestveGames.tsx` | r-zacetek |
+| `src/pages/admin/games/AdminBingoGames.tsx` | r-zacetek |
+| `src/pages/admin/games/AdminPonoviPovedGames.tsx` | r-zacetek |
+| `src/pages/admin/games/AdminMetKockeGames.tsx` | r-zacetek |
+
+#### 6. Popravki URL parsiranja
+
+Funkcije `parseUrlParam`, `parseZaporedjaUrlParam`, `parseDrsnaSestavljankaUrlParam`, `parseIgraUjemanjaUrlParam` trenutno uporabljajo regex `^([a-z]{1,2})(34|56|78|910)?$`. To ne ujema `r-zacetek`. Posodobim regex na `^([a-z]{1,2}(?:-zacetek)?)(34|56|78|910)?$`.
+
+Enako za `getConfigKey()` v artikulacijaVajeConfig -- mora prepustiti `r-zacetek` brez transformacije.
+
+---
 
 ### Vrstni red implementacije
-1. `MemoryGrid.tsx` -- dinamicno racunanje za desktop
-2. `GenericSpominGame.tsx` -- desktop wrapper popravek
-3. `GenericZaporedjaGame.tsx` -- overflow-hidden + centriranje
-4. `SequenceGameS.tsx` (in ostale variante) -- desktop itemSize
-5. `SequenceGame56Base.tsx` -- desktop itemSize
 
-### Kriteriji uspeha
-- Na desktopu ob spremembi velikosti okna se igra sorazmerno povecuje/pomanjsuje (kot Labirint)
-- Ni scrollanja pri nobeni velikosti okna
-- Kartice/slike so jasno vidne in primerne velikosti
-- Na admin portalu deluje enako
-- Mobilni layout se ne spremeni
+1. Supabase migracija -- ustvari tabelo `memory_cards_r_zacetek`
+2. Podatkovne datoteke -- vseh 10 config datotek + puzzleImages
+3. Routerji -- popravki parsiranja URL
+4. Strani za uporabnike -- 11 letter selection pages
+5. Admin strani -- 11 admin game pages
+
+### Skupaj: ~25 datotek + 1 DB migracija
+
