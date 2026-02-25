@@ -36,7 +36,7 @@ export const FooterSection = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
           {/* MOJE APLIKACIJE */}
           <div>
-            <h4 className="font-bold text-foreground mb-4">GOVOR</h4>
+            <h3 className="font-bold text-foreground mb-4 text-base">GOVOR</h3>
             <ul className="space-y-2">
               <li>
                 <button 
@@ -88,7 +88,7 @@ export const FooterSection = () => {
           
           {/* SLEDI NAM */}
           <div>
-            <h4 className="font-bold text-foreground mb-4">SLEDI NAM</h4>
+            <h3 className="font-bold text-foreground mb-4 text-base">SLEDI NAM</h3>
             <ul className="space-y-2">
               <li>
                 <a 
@@ -125,7 +125,7 @@ export const FooterSection = () => {
           
           {/* VEČ */}
           <div>
-            <h4 className="font-bold text-foreground mb-4">VEČ</h4>
+            <h3 className="font-bold text-foreground mb-4 text-base">VEČ</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/kdo-smo" className="text-muted-foreground hover:text-dragon-green transition-colors">
@@ -157,7 +157,7 @@ export const FooterSection = () => {
           
           {/* POGOJI IN ZASEBNOST */}
           <div>
-            <h4 className="font-bold text-foreground mb-4">POGOJI IN ZASEBNOST</h4>
+            <h3 className="font-bold text-foreground mb-4 text-base">POGOJI IN ZASEBNOST</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/kontakt" className="text-muted-foreground hover:text-dragon-green transition-colors">

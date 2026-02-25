@@ -7,8 +7,8 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   return (
-    <div className="min-h-screen w-full">
+    <main className="min-h-screen w-full">
       {children}
-    </div>
+    </main>
   );
 }

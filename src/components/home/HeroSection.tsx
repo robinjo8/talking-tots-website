@@ -86,9 +86,12 @@ export const HeroSection = () => {
                 <div className="relative w-full aspect-square max-w-xs mx-auto scale-[0.8]">
                 <img
                     src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_0.webp"
-                    alt="Zmajček maskota"
+                    alt="Zmajček maskota – TomiTalk govorne igre za otroke"
                     className="w-full h-full object-contain animate-float"
                     style={{ transform: 'scaleX(-1)' }}
+                    width={500}
+                    height={500}
+                    sizes="(max-width: 768px) 80vw, 500px"
                     fetchPriority="high"
                   />
                 </div>
@@ -148,9 +151,12 @@ export const HeroSection = () => {
               <div className="relative w-full aspect-square max-w-lg mx-auto">
               <img
                   src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_0.webp"
-                  alt="Zmajček maskota"
+                  alt="Zmajček maskota – TomiTalk govorne igre za otroke"
                   className="w-full h-full object-contain animate-float"
                   style={{ transform: 'scaleX(-1)' }}
+                  width={500}
+                  height={500}
+                  sizes="(max-width: 768px) 80vw, 500px"
                   fetchPriority="high"
                 />
               </div>
