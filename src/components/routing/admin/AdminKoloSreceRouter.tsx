@@ -25,6 +25,7 @@ export default function AdminKoloSreceRouter() {
       title={config.title}
       wordsData={config.wordsData as WordData[]}
       backPath={backPath}
+      lipsImage={config.lipsImage}
     />
   );
 }
