@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SequenceImage } from "@/hooks/useSequenceGame";
@@ -52,6 +52,8 @@ export const SequenceGame56Base = ({ onGameComplete, isLandscape = false, tableN
   const [helpCountdown, setHelpCountdown] = useState(5);
   const [helpUsesLeft, setHelpUsesLeft] = useState(HELP_USES);
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const prevCorrectIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     if (!allImages || allImages.length < 8) return;
@@ -117,11 +119,56 @@ export const SequenceGame56Base = ({ onGameComplete, isLandscape = false, tableN
     return targetIds.every(id => placedIds.includes(id));
   }, [placedImages, targetSequence]);
 
+  // Shuffle placed images when transitioning to arrange phase
   useEffect(() => {
     if (gamePhase === "select" && allCorrectSelected) {
+      // Shuffle placedImages so no image is in the correct position
+      setPlacedImages(prev => {
+        const filled = prev.filter(img => img !== null) as SequenceImage[];
+        let shuffled = [...filled].sort(() => Math.random() - 0.5);
+        let attempts = 0;
+        while (attempts < 100) {
+          const hasMatch = shuffled.some((item, index) => item.id === targetSequence[index]?.id);
+          if (!hasMatch) break;
+          shuffled = [...filled].sort(() => Math.random() - 0.5);
+          attempts++;
+        }
+        // Fallback swap
+        if (shuffled.some((item, index) => item.id === targetSequence[index]?.id) && shuffled.length >= 2) {
+          [shuffled[0], shuffled[1]] = [shuffled[1], shuffled[0]];
+        }
+        return shuffled;
+      });
+      prevCorrectIdsRef.current = new Set();
       setGamePhase("arrange");
     }
-  }, [allCorrectSelected, gamePhase]);
+  }, [allCorrectSelected, gamePhase, targetSequence]);
+
+  // Play audio when image is placed in correct position during arrange phase
+  useEffect(() => {
+    if (gamePhase !== "arrange" || isPlayingAudio) return;
+    const currentCorrectIds = new Set<string>();
+    placedImages.forEach((img, index) => {
+      if (img && img.id === targetSequence[index]?.id) {
+        currentCorrectIds.add(img.id);
+      }
+    });
+    // Find newly correct
+    const newlyCorrect: SequenceImage[] = [];
+    placedImages.forEach((img, index) => {
+      if (img && img.id === targetSequence[index]?.id && !prevCorrectIdsRef.current.has(img.id)) {
+        newlyCorrect.push(img);
+      }
+    });
+    if (newlyCorrect.length > 0 && newlyCorrect[0].audio_url) {
+      setIsPlayingAudio(true);
+      const audio = new Audio(newlyCorrect[0].audio_url);
+      audio.onended = () => setIsPlayingAudio(false);
+      audio.onerror = () => setIsPlayingAudio(false);
+      audio.play().catch(() => setIsPlayingAudio(false));
+    }
+    prevCorrectIdsRef.current = currentCorrectIds;
+  }, [placedImages, targetSequence, gamePhase, isPlayingAudio]);
 
   useEffect(() => {
     if (gamePhase !== "arrange" || placedImages.some(img => img === null)) return;
@@ -171,6 +218,7 @@ export const SequenceGame56Base = ({ onGameComplete, isLandscape = false, tableN
   }, [selectedSlot, placedImages]);
 
   const handleMoveImage = (fromIndex: number, direction: "left" | "right") => {
+    if (isPlayingAudio) return;
     const toIndex = direction === "left" ? fromIndex - 1 : fromIndex + 1;
     if (toIndex < 0 || toIndex > 3) return;
     setPlacedImages(prev => {
@@ -394,20 +442,20 @@ export const SequenceGame56Base = ({ onGameComplete, isLandscape = false, tableN
                         <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-2">
                           <button
                             onClick={() => handleMoveImage(index, "left")}
-                            disabled={index === 0 || isComplete}
+                            disabled={index === 0 || isComplete || isPlayingAudio}
                             className={cn(
                               "p-1 rounded-full bg-orange-500 text-white shadow-md transition-opacity",
-                              index === 0 ? "opacity-30" : "hover:bg-orange-600"
+                              (index === 0 || isPlayingAudio) ? "opacity-30" : "hover:bg-orange-600"
                             )}
                           >
                             <ArrowLeft className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleMoveImage(index, "right")}
-                            disabled={index === 3 || isComplete}
+                            disabled={index === 3 || isComplete || isPlayingAudio}
                             className={cn(
                               "p-1 rounded-full bg-orange-500 text-white shadow-md transition-opacity",
-                              index === 3 ? "opacity-30" : "hover:bg-orange-600"
+                              (index === 3 || isPlayingAudio) ? "opacity-30" : "hover:bg-orange-600"
                             )}
                           >
                             <ArrowRight className="w-4 h-4" />

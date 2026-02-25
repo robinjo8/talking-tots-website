@@ -12,7 +12,7 @@ interface SequenceGameZProps {
 }
 
 export const SequenceGameZ = ({ onGameComplete, isLandscape = false }: SequenceGameZProps) => {
-  const { targetSequence, currentSequence, isComplete, isLoading, moveItem } = useSequenceGame("memory_cards_z", 4);
+  const { targetSequence, currentSequence, isComplete, isLoading, moveItem, correctIndices, isPlayingAudio } = useSequenceGame("memory_cards_z", 4);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [gameCompletedTriggered, setGameCompletedTriggered] = useState(false);
   const [gamePhase, setGamePhase] = useState<GamePhase>("pre-countdown");
@@ -193,8 +193,9 @@ export const SequenceGameZ = ({ onGameComplete, isLandscape = false }: SequenceG
               key={`current-${image.id}-${index}`}
               image={image}
               index={index}
-              isDraggable={!isComplete}
+              isDraggable={!isComplete && !isPlayingAudio}
               isTarget={false}
+              isCorrect={correctIndices.includes(index)}
               size={itemSize}
               onDragStart={handleDragStart}
               onDrop={handleDrop}

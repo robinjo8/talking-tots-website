@@ -6,6 +6,7 @@ interface SequenceItemProps {
   index: number;
   isDraggable: boolean;
   isTarget?: boolean;
+  isCorrect?: boolean;
   size?: number; // Optional fixed size in pixels for mobile
   onDragStart?: (index: number) => void;
   onDragOver?: (index: number) => void;
@@ -17,6 +18,7 @@ export const SequenceItem = ({
   index,
   isDraggable,
   isTarget = false,
+  isCorrect = false,
   size,
   onDragStart,
   onDragOver,
@@ -210,9 +212,9 @@ export const SequenceItem = ({
         ${isDraggable ? 'cursor-move touch-none' : 'cursor-default'}
         ${isDraggedOver && isDraggable ? 'ring-4 ring-primary scale-105 shadow-2xl' : ''}
         ${isDragging ? 'opacity-40 scale-95' : 'opacity-100 scale-100'}
-        ${isTarget ? 'border-4 border-primary shadow-lg' : 'border-2 border-border shadow-md'}
-        ${!isDragging && isDraggable ? 'hover:scale-105 hover:shadow-xl' : ''}
-        transition-all duration-300 ease-out bg-card
+        ${isCorrect ? 'border-4 border-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.6)]' : isTarget ? 'border-4 border-primary shadow-lg' : 'border-2 border-border shadow-md'}
+        ${!isDragging && isDraggable && !isCorrect ? 'hover:scale-105 hover:shadow-xl' : ''}
+        transition-all duration-300 ease-out ${isCorrect ? 'bg-emerald-50' : 'bg-card'}
       `}
     >
       <img
