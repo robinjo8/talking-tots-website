@@ -1,53 +1,97 @@
 
 
-# Gumb za prikaz slike ust (Kolo besed - Glas S)
+# Stran "Informacije" -Hub stran z ikonskimi karticami
 
-## Povzetek
-Desno spodaj se doda nov rdeč okrogel gumb z ikono ust (LipsIcon). Ob kliku se odpre pop-up z sliko `Glas_SZC.png` iz bucketa `slike`. Pop-up se samodejno zapre po 3 sekundah ali pa ga uporabnik zapre z gumbom "ZAPRI".
+## Koncept
+Nova stran `/informacije` po vzoru Postojnske jame - centralna informacijska tocka z vizualnimi karticami (ikona + naslov), ki vodijo na podstrani. Dostopna preko ikone "i" v headerju (tako kot pri Postojnski jami).
 
-## Spremembe
+## Predlagane kartice (8 kartic, mrezha 2x4 na mobilnem, 4x2 na desktopu)
 
-### `src/components/games/GenericWheelGame.tsx`
-
-**Dodaj nov prop:** `lipsImage?: string` - opcijski, ime slike za prikaz (npr. `"Glas_SZC.png"`)
-
-**Dodaj stanje:**
-- `showLipsImage: boolean` (privzeto `false`)
-- `useEffect` z `setTimeout(3000)` ki samodejno zapre pop-up ko je odprt (s cleanup)
-
-**Dodaj v JSX:**
-1. Rdeč okrogel gumb desno spodaj (`fixed bottom-4 right-4`), enak stil kot hiška gumb ampak z rdečim gradientom (`from-red-500 to-red-600`). Ikona: `LipsIcon` (bela, w-8 h-8). Gumb se prikaže samo ko je `lipsImage` prop podan.
-2. `Dialog` za prikaz slike:
-   - Slika iz `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/{lipsImage}`
-   - Pod sliko gumb "ZAPRI" za ročno zapiranje
-   - Samodejno zapiranje po 3 sekundah
-
-### `src/components/routing/KoloSreceRouter.tsx`
-
-**Dodaj v konfiguracijo:** posreduj `lipsImage` prop za črko "s" kot `"Glas_SZC.png"`.
-
-Ker se `GenericWheelGame` uporablja generično, bova prop dodala v router. Za zdaj samo za "s", ostale črke bodo dodane pozneje.
-
-### `src/components/routing/admin/AdminKoloSreceRouter.tsx`
-
-Enako - posreduj `lipsImage` za črko "s".
-
-### `src/data/artikulacijaVajeConfig.ts`
-
-Dodaj opcijsko polje `lipsImage?: string` v wheel config in nastavi `"Glas_SZC.png"` za glas S.
-
-## Vizualni stil gumba
 ```text
-fixed bottom-4 right-4 z-50
-w-16 h-16 rounded-full
-bg-gradient-to-r from-red-500 to-red-600
-border-2 border-white/50
-shadow-lg backdrop-blur-sm
-hover:scale-105 transition-transform
++-------------------+-------------------+-------------------+-------------------+
+|                   |                   |                   |                   |
+|    [BookOpen]     |    [Users]        |    [Mail]         |    [Gamepad2]     |
+|                   |                   |                   |                   |
+|  KAKO DELUJE      |   KDO SMO        |   KONTAKT         | KAKO DELUJEJO     |
+|  TOMITALK         |                   |                   |   IGRE            |
++-------------------+-------------------+-------------------+-------------------+
+|                   |                   |                   |                   |
+|    [User]         |    [Building2]    |    [CreditCard]   |    [HelpCircle]   |
+|                   |                   |                   |                   |
+|  ZA STARSE        | ZA ORGANIZACIJE   |   CENIK           | POMOC IN          |
+|                   |                   |                   |   PODPORA         |
++-------------------+-------------------+-------------------+-------------------+
 ```
 
-## Pop-up okno
-- Dialog brez naslova, samo slika in gumb ZAPRI
-- Slika prikazana v polni velikosti znotraj dialoga
-- Gumb "ZAPRI" pod sliko, stil: outline variant
-- Auto-close po 3 sekundah z useEffect + setTimeout
+### Podrobnosti kartic:
+
+1. **KAKO DELUJE TOMITALK** (ikona: BookOpen, barva: dragon-green)
+   - Povezava: `/kako-deluje` (ze obstaja - obsezna stran z navodili)
+   - Opis: Navodila za uporabo aplikacije
+
+2. **KDO SMO** (ikona: Users, barva: app-blue)
+   - Povezava: `/kdo-smo` (ze obstaja - predstavitev ekipe)
+   - Opis: Spoznajte ekipo za TomiTalk
+
+3. **KONTAKT** (ikona: Mail, barva: app-teal)
+   - Povezava: `/kontakt` (ze obstaja)
+   - Opis: Pisite nam
+
+4. **KAKO DELUJEJO IGRE** (ikona: Gamepad2, barva: app-orange)
+   - Povezava: `/delovanje-testa` (ze obstaja - trenutno prazen placeholder, potrebna vsebina)
+   - Opis: Razlaga posameznih iger in vaj
+
+5. **ZA STARSE** (ikona: User, barva: app-purple)
+   - Povezava: `/za-posameznike` (ze obstaja - trenutno prazen placeholder, potrebna vsebina)
+   - Preimenuje se v "Za starse" ker je to bolj smiselno za TomiTalk
+
+6. **ZA ORGANIZACIJE** (ikona: Building2, barva: app-blue)
+   - Povezava: `/za-podjetja` (ze obstaja - trenutno prazen placeholder, potrebna vsebina)
+   - Preimenuje se v "Za organizacije"
+
+7. **CENIK** (ikona: CreditCard, barva: dragon-green)
+   - Povezava: `/cenik` (ze obstaja - delujoce)
+
+8. **POMOC IN PODPORA** (ikona: HelpCircle, barva: app-yellow)
+   - Povezava: `/pomoc-in-podpora` (ze obstaja - placeholder)
+
+## Vizualni stil
+- Belo ozadje, naslov "Informacije" na vrhu s podnaslovom
+- Kartice: brez obrobe, samo ikona (velika, ~64px, barvna z gradientom) + naslov pod njo (bold, uppercase)
+- Hover efekt: rahla povecava (scale-105) + senca
+- Mrezha: 2 stolpca mobilno, 4 stolpci desktop
+- Ikone so v slogu "line art" (Lucide ikone), barvne
+
+## Spremembe po datotekah
+
+### 1. Nova datoteka: `src/pages/Informacije.tsx`
+- Header + FooterSection
+- Naslov "Informacije" + podnaslov
+- Grid z 8 karticami, vsaka je klikljiva in vodi na ustrezno podstran
+- Vsaka kartica: ikona (Lucide), naslov
+
+### 2. `src/config/routes.tsx`
+- Dodaj import za Informacije stran
+- Dodaj Route: `<Route path="/informacije" element={<LazyRoute><Informacije /></LazyRoute>} />`
+
+### 3. `src/components/header/DesktopNavigation.tsx`
+- Dodaj ikono "i" (Info) desno zgoraj (pred UserProfile/login gumbi)
+- Klik na "i" navigira na `/informacije`
+- Stil: okrogel gumb z obrobo, ikona Info iz lucide-react
+
+### 4. `src/components/header/MobileMenu.tsx`
+- Dodaj "Informacije" povezavo v mobilni meni
+
+## Kaj NE potrebuje novih podstrani
+Vse kartice vodijo na ze obstojece strani. Nekatere (Za posameznike, Za podjetja, Pomoc in podpora, Delovanje testa) so trenutno prazni placeholderji - vsebino se lahko doda pozneje loceno.
+
+## Stanje obstojecih strani
+- `/kako-deluje` - POLNA VSEBINA (844 vrstic navodil)
+- `/kdo-smo` - POLNA VSEBINA (4 clani ekipe)
+- `/kontakt` - POLNA VSEBINA (email + naslov)
+- `/cenik` - POLNA VSEBINA (pricing section)
+- `/za-posameznike` - PLACEHOLDER (prazna)
+- `/za-podjetja` - PLACEHOLDER (prazna)
+- `/pomoc-in-podpora` - PLACEHOLDER (prazna)
+- `/delovanje-testa` - PLACEHOLDER (prazna)
+
