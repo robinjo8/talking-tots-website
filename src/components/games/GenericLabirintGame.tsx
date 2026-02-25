@@ -342,8 +342,15 @@ export function GenericLabirintGame({ config, backPath = '/govorne-igre/labirint
         <h1 className="text-3xl md:text-5xl font-bold text-white mb-4 text-center drop-shadow-lg">
           LABIRINT - {config.displayLetter}
         </h1>
+
+        {/* Instruction banner */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-full px-6 py-1.5 shadow-md mb-2">
+          <p className="text-sm md:text-base font-bold text-gray-800">
+            POBERI VSE ZVEZDICE IN POJDI DO CILJA.
+          </p>
+        </div>
         
-        <MazeGame 
+        <MazeGame
           key={gameKey}
           onComplete={handleComplete}
           onStarCollect={handleStarCollect}
