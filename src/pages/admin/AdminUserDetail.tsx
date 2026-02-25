@@ -211,8 +211,10 @@ export default function AdminUserDetail() {
 
   // Update reportData when fetched data changes
   useEffect(() => {
-    const logopedistName = logopedistProfile 
-      ? [logopedistProfile.first_name, logopedistProfile.last_name].filter(Boolean).join(' ')
+    const logopedistName = logopedistProfile
+      ? logopedistProfile.organization_type === 'internal'
+        ? 'TomiTalk logoped'
+        : [logopedistProfile.first_name, logopedistProfile.last_name].filter(Boolean).join(' ')
       : '';
 
     setReportData(prev => ({
