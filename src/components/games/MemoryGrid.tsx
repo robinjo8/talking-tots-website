@@ -51,19 +51,20 @@ export function MemoryGrid({
   
   // Calculate card size dynamically based on actual window dimensions (like MazeGame)
   const cardSize = useMemo(() => {
-    if (!isLandscape || containerSize.width === 0 || containerSize.height === 0) {
+    if (containerSize.width === 0 || containerSize.height === 0) {
       return null;
     }
     
-    const PADDING = 4; // minimal padding
+    // Different reserved space for landscape vs desktop
+    const reservedVertical = isLandscape ? 8 : 140; // desktop: title + progress + padding
+    const reservedHorizontal = isLandscape ? 8 : 100;
     
-    const availableWidth = containerSize.width - PADDING * 2;
-    const availableHeight = containerSize.height - PADDING * 2;
+    const availableWidth = containerSize.width - reservedHorizontal;
+    const availableHeight = containerSize.height - reservedVertical;
     
     const sizeByWidth = Math.floor((availableWidth - gap * (columns - 1)) / columns);
     const sizeByHeight = Math.floor((availableHeight - gap * (rows - 1)) / rows);
     
-    // Use the smaller dimension to ensure cards fit, with slight reduction for safety
     return Math.floor(Math.min(sizeByWidth, sizeByHeight) * 0.98);
   }, [containerSize, columns, rows, isLandscape, gap]);
   
@@ -71,47 +72,33 @@ export function MemoryGrid({
   const gridWidth = cardSize ? columns * cardSize + gap * (columns - 1) : 0;
   const gridHeight = cardSize ? rows * cardSize + gap * (rows - 1) : 0;
   
-  // Don't render until we have proper dimensions in landscape mode
-  if (isLandscape && !cardSize) {
+  // Don't render until we have proper dimensions
+  if (!cardSize) {
     return null;
   }
   
   return (
     <div 
-      className={cn(
-        isLandscape && "w-full h-full flex items-center justify-center"
-      )}
+      className="w-full h-full flex items-center justify-center"
       style={{ touchAction: 'none' }}
     >
       <div 
-        className={cn(
-          "grid gap-2",
-          !isLandscape && "mx-auto w-full md:gap-3"
-        )}
-        style={isLandscape && cardSize ? {
+        className="grid gap-2"
+        style={{
           gridTemplateColumns: `repeat(${columns}, ${cardSize}px)`,
           gridTemplateRows: `repeat(${rows}, ${cardSize}px)`,
           width: gridWidth,
           height: gridHeight,
           touchAction: 'none',
-        } : {
-          gridTemplateColumns: `repeat(${columns}, 1fr)`,
-          maxWidth: '900px',
         }}
       >
         {cards.map((card, index) => (
           <div 
             key={card.uniqueId || `${card.id}-${index}`} 
-            className={cn(
-              "transform transition-transform duration-200",
-              "hover:scale-[1.02]",
-              !isLandscape && "aspect-square"
-            )}
-            style={isLandscape && cardSize ? {
+            className="transform transition-transform duration-200 hover:scale-[1.02]"
+            style={{
               width: cardSize,
               height: cardSize,
-            } : {
-              maxHeight: `calc((100vh - 120px) / ${rows})`,
             }}
           >
             <MemoryCard

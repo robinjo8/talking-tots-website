@@ -69,23 +69,31 @@ export const SequenceGameR = ({ onGameComplete, isLandscape = false }: SequenceG
   }, []);
 
   const itemSize = useMemo(() => {
-    if (!isLandscape || windowSize.width === 0 || windowSize.height === 0) {
+    if (windowSize.width === 0 || windowSize.height === 0) {
       return undefined;
     }
 
     const columns = 4;
     const rows = 2;
     const gap = 8;
-    const PADDING = 8;
-    const TEXT_HEIGHT = 40;
     
-    const availableWidth = windowSize.width - PADDING * 2;
-    const availableHeight = windowSize.height - PADDING * 2 - TEXT_HEIGHT;
+    if (isLandscape) {
+      const PADDING = 8;
+      const TEXT_HEIGHT = 40;
+      const availableWidth = windowSize.width - PADDING * 2;
+      const availableHeight = windowSize.height - PADDING * 2 - TEXT_HEIGHT;
+      const sizeByWidth = Math.floor((availableWidth - gap * (columns - 1)) / columns);
+      const sizeByHeight = Math.floor((availableHeight - gap * (rows - 1)) / rows);
+      return Math.floor(Math.min(sizeByWidth, sizeByHeight) * 0.92);
+    }
     
+    const reservedVertical = 200;
+    const reservedHorizontal = 100;
+    const availableWidth = windowSize.width - reservedHorizontal;
+    const availableHeight = windowSize.height - reservedVertical;
     const sizeByWidth = Math.floor((availableWidth - gap * (columns - 1)) / columns);
     const sizeByHeight = Math.floor((availableHeight - gap * (rows - 1)) / rows);
-    
-    return Math.floor(Math.min(sizeByWidth, sizeByHeight) * 0.92);
+    return Math.min(Math.floor(Math.min(sizeByWidth, sizeByHeight) * 0.95), 180);
   }, [isLandscape, windowSize]);
 
   const gridWidth = itemSize ? 4 * itemSize + 8 * 3 : 0;
@@ -117,7 +125,7 @@ export const SequenceGameR = ({ onGameComplete, isLandscape = false }: SequenceG
     );
   }
 
-  if (isLandscape && !itemSize) {
+  if (!itemSize) {
     return null;
   }
 
@@ -137,7 +145,7 @@ export const SequenceGameR = ({ onGameComplete, isLandscape = false }: SequenceG
 
   return (
     <div 
-      className={`w-full mx-auto ${isLandscape ? 'h-full flex flex-col items-center justify-center' : 'max-w-4xl space-y-2 md:space-y-8 px-2 md:px-0'}`}
+      className={`w-full mx-auto ${isLandscape ? 'h-full flex flex-col items-center justify-center' : 'flex flex-col items-center justify-center space-y-2 md:space-y-8'}`}
       style={{ touchAction: 'none' }}
     >
       <div className="relative">
@@ -150,8 +158,8 @@ export const SequenceGameR = ({ onGameComplete, isLandscape = false }: SequenceG
           </div>
         </div>
         <div 
-          className={`bg-white/20 backdrop-blur-sm rounded-xl border-2 border-gray-400/50 ${isLandscape ? 'flex justify-center gap-2 p-2 mt-1' : 'grid grid-cols-4 gap-1.5 md:gap-4 p-2 md:p-6 mt-1 md:mt-2'}`}
-          style={isLandscape && itemSize ? { width: gridWidth } : {}}
+          className={`bg-white/20 backdrop-blur-sm rounded-xl border-2 border-gray-400/50 flex justify-center gap-2 p-2 mt-1`}
+          style={itemSize ? { width: gridWidth } : {}}
         >
           {targetSequence.map((image, index) => (
             <SequenceItem
@@ -177,8 +185,8 @@ export const SequenceGameR = ({ onGameComplete, isLandscape = false }: SequenceG
 
       <div className="relative">
         <div 
-          className={`bg-white/30 backdrop-blur-sm rounded-xl border-3 border-orange-400 animate-[pulse-border_2s_ease-in-out_infinite] ${isLandscape ? 'flex justify-center gap-2 p-2' : 'grid grid-cols-4 gap-1.5 md:gap-4 p-2 md:p-6'}`}
-          style={isLandscape && itemSize ? { width: gridWidth } : {}}
+          className={`bg-white/30 backdrop-blur-sm rounded-xl border-3 border-orange-400 animate-[pulse-border_2s_ease-in-out_infinite] flex justify-center gap-2 p-2`}
+          style={itemSize ? { width: gridWidth } : {}}
         >
           {currentSequence.map((image, index) => (
             <SequenceItem

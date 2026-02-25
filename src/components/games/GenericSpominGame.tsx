@@ -320,7 +320,7 @@ export function GenericSpominGame({ config, backPath, onGameComplete }: GenericS
         </div>
 
         {/* Memory grid */}
-        <div className="max-w-4xl mx-auto">
+        <div className="flex-1 flex items-center justify-center">
           <MemoryGrid
             cards={cards}
             onCardClick={flipCard}

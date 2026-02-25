@@ -345,7 +345,7 @@ export function GenericZaporedjaGame({ config, backPath = '/govorne-igre/zapored
   // Desktop version
   return (
     <div 
-      className="fixed inset-0 overflow-auto select-none game-container"
+      className="fixed inset-0 overflow-hidden select-none game-container"
       style={{
         backgroundImage: `url('${backgroundImageUrl}')`,
         backgroundSize: 'cover',
@@ -353,7 +353,7 @@ export function GenericZaporedjaGame({ config, backPath = '/govorne-igre/zapored
         backgroundRepeat: 'no-repeat'
       }}
     >
-      <div className="min-h-full flex flex-col items-center justify-center p-4 pb-24">
+      <div className="h-full flex flex-col items-center justify-center p-4">
         <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 md:mb-8 text-center drop-shadow-lg">
           ZAPOREDJA - {config.letter}
         </h1>
