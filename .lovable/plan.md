@@ -1,81 +1,92 @@
 
 
-## Popravki za "Glas R - začetne vaje" -- slike in naslovi
+## Dodajanje kratkih navodil nad igro za Ujemanje, Bingo in Labirint
 
-### Problem 1: Slike v Spomin in Zaporedja ne delujejo
+### Pregled
 
-Tabela `memory_cards_r_zacetek` vsebuje **relativna imena datotek** (npr. `drevo1.webp`, `drevo.m4a`), medtem ko vse ostale tabele (npr. `memory_cards_r`) vsebujejo **polne URL-je** (npr. `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/drevo1.webp`).
+Nad vsako igro se doda kratko navodilo (instrukcija) v obliki belega/polprosojnega traku z velikimi tiskanimi crkami. Navodila se prikazejo stalno med igro in ne vplivajo na logiko igre.
 
-**Popravek:** Supabase migracija, ki posodobi vseh 18 vrstic -- za `image_url` doda prefix `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/`, za `audio_url` pa `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/`.
+### Navodila po igrah
 
-### Problem 2: Napacni naslovi v igrah
+**Igra ujemanja** (GenericIgraUjemanjaGame.tsx):
+- Starost 3-4: "POISCI ENAKI SLIKI."
+- Starost 5-6: "POVEZI POSNETEK Z USTREZNO SENCO IN SLIKO."
+- Starost 7-8 in 9-10: "POVEZI POSNETEK Z USTREZNO BESEDO, SENCO IN SLIKO."
 
-Tri igre prikazujejo napacen naslov za r-zacetek:
+**Bingo** (GenericBingoGame.tsx):
+- "KLIKNI 'ZAVRTI' IN POISCI ENAKE SLIKE."
 
-| Igra | Trenutni naslov | Pravilen naslov |
-|------|----------------|-----------------|
-| Spomin | "Spomin - Glas R" | "Spomin - Glas R - začetne vaje" |
-| Labirint | "LABIRINT - R" | "LABIRINT - R - začetne vaje" |
-| Zaporedja | "ZAPOREDJA - R-zacetek" | "ZAPOREDJA - R - začetne vaje" |
-
-Ostale igre (Bingo, Kolo besed, Smesne povedi) ze uporabljajo `{title}` iz konfiguracije, kjer je naslov pravilno nastavljen.
+**Labirint** (GenericLabirintGame.tsx):
+- "POBERI VSE ZVEZDICE IN POJDI DO CILJA."
 
 ### Tehnicne spremembe
 
-#### 1. Supabase migracija
-Nova SQL migracija za popravek URL-jev:
+#### 1. GenericIgraUjemanjaGame.tsx
+
+Dodaj navodilo med ozadjem in igro (vrstica ~265, nad `renderGame()`). Navodilo se doloci glede na `config.requiredAgeGroup`:
+
 ```text
-UPDATE memory_cards_r_zacetek
-SET image_url = 'https://...supabase.co/.../slike/' || image_url,
-    audio_url = 'https://...supabase.co/.../zvocni-posnetki/' || audio_url;
+const instructionText = useMemo(() => {
+  switch (config.requiredAgeGroup) {
+    case '3-4': return 'POISCI ENAKI SLIKI.';
+    case '5-6': return 'POVEZI POSNETEK Z USTREZNO SENCO IN SLIKO.';
+    default: return 'POVEZI POSNETEK Z USTREZNO BESEDO, SENCO IN SLIKO.';
+  }
+}, [config.requiredAgeGroup]);
 ```
 
-#### 2. SpominConfig -- dodaj displayName
-**Datoteka:** `src/data/spominConfig.ts`
-
-Dodaj opcijsko polje `displayName` v `SpominConfig` interface. Za `r-zacetek` nastavi `displayName: 'R - začetne vaje'`. Ostali vnosi ga nimajo in se uporabi privzeti `displayLetter`.
-
-#### 3. GenericSpominGame.tsx -- uporabi displayName
-**Datoteka:** `src/components/games/GenericSpominGame.tsx` (vrstica 314)
-
-Spremeni iz:
+Prikaz: bel polprosojen trak na vrhu zaslona (`fixed top-2 left-0 right-0 z-20 text-center`):
 ```text
-Spomin - Glas {displayLetter}
-```
-v:
-```text
-Spomin - Glas {displayName || displayLetter}
-```
-Hook `useGenericMemoryGame` mora vrniti tudi `displayName` iz configu.
-
-#### 4. LabirintConfig -- dodaj displayName
-**Datoteka:** `src/data/labirintConfig.ts`
-
-Za `r-zacetek` vnos spremeni `displayLetter: 'R'` v `displayLetter: 'R - začetne vaje'` (ali dodaj loceno polje).
-
-#### 5. GenericLabirintGame.tsx -- pogojni naslov
-**Datoteka:** `src/components/games/GenericLabirintGame.tsx` (vrstica 343)
-
-Naslov ze uporablja `config.displayLetter`, zato popravek v configu zadostuje.
-
-#### 6. ZaporedjaConfig -- popravek letter polja
-**Datoteka:** `src/data/zaporedjaConfig.ts`
-
-Za `r-zacetek` configs spremeni `letter: 'R-zacetek'` v ustrezno obliko za prikaz.
-
-#### 7. GenericZaporedjaGame.tsx -- pogojni naslov
-**Datoteka:** `src/components/games/GenericZaporedjaGame.tsx` (vrstica 358)
-
-Spremeni iz:
-```text
-ZAPOREDJA - {config.letter}
-```
-v:
-```text
-ZAPOREDJA - {config.letter === 'R-zacetek' ? 'R - začetne vaje' : config.letter}
+<div className="fixed top-2 left-0 right-0 z-20 flex justify-center pointer-events-none">
+  <div className="bg-white/80 backdrop-blur-sm rounded-full px-6 py-2 shadow-md">
+    <p className="text-sm md:text-base font-bold text-gray-800">
+      {instructionText}
+    </p>
+  </div>
+</div>
 ```
 
-### Skupaj sprememb
-- 1 Supabase migracija (popravek URL-jev)
-- 5 datotek (spominConfig, GenericSpominGame, useGenericMemoryGame, labirintConfig/GenericLabirintGame, GenericZaporedjaGame)
+Postavi ga znotraj `<>` bloka (vrstica 264), pred `renderGame()` div. Uporabi `pointer-events-none` da ne blokira klikov na igro.
+
+#### 2. GenericBingoGame.tsx
+
+Dodaj navodilo nad reel komponento (vrstica ~173, pred `<BingoReel>`):
+
+```text
+<div className="bg-white/80 backdrop-blur-sm rounded-full px-6 py-1.5 shadow-md">
+  <p className="text-sm md:text-base font-bold text-gray-800">
+    KLIKNI 'ZAVRTI' IN POISCI ENAKE SLIKE.
+  </p>
+</div>
+```
+
+Postavi ga znotraj flex-col kontejnerja (vrstica 172), kot prvi element pred `<BingoReel>`.
+
+#### 3. GenericLabirintGame.tsx
+
+Dodaj navodilo pod naslov `<h1>` (vrstica ~344, pred `<MazeGame>`):
+
+```text
+<div className="bg-white/80 backdrop-blur-sm rounded-full px-6 py-1.5 shadow-md mb-2">
+  <p className="text-sm md:text-base font-bold text-gray-800">
+    POBERI VSE ZVEZDICE IN POJDI DO CILJA.
+  </p>
+</div>
+```
+
+Postavi ga med `</h1>` (vrstica 344) in `<MazeGame>` (vrstica 346).
+
+### Vizualni slog
+
+Vse tri igre uporabljajo enak slog navodila:
+- Belo polprosojno ozadje (`bg-white/80 backdrop-blur-sm`)
+- Zaobljen okvir (`rounded-full`)
+- Krepko besedilo (`font-bold`)
+- Senca (`shadow-md`)
+- Manjsa pisava na mobilnih napravah (`text-sm md:text-base`)
+
+### Skupaj: 3 datoteke
+- `src/components/games/GenericIgraUjemanjaGame.tsx`
+- `src/components/games/GenericBingoGame.tsx`
+- `src/components/games/GenericLabirintGame.tsx`
 
