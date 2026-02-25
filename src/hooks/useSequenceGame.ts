@@ -107,6 +107,7 @@ export const useSequenceGame = (tableName: string, count: number = 4) => {
     
     if (isMatch && !isComplete) {
       setIsComplete(true);
+      setIsPlayingAudio(true);
     }
   }, [targetSequence, currentSequence, isComplete]);
 
@@ -128,7 +129,7 @@ export const useSequenceGame = (tableName: string, count: number = 4) => {
             audio.play().catch(() => resolve());
           });
         }
-        await new Promise(r => setTimeout(r, 500));
+        await new Promise(r => setTimeout(r, 300));
       }
       setActivePlayingIndex(null);
       setIsPlayingAudio(false);

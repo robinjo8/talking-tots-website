@@ -151,6 +151,7 @@ export const SequenceGame56Base = ({ onGameComplete, isLandscape = false, tableN
     );
     if (allCorrect && !isComplete) {
       setIsComplete(true);
+      setIsPlayingAudio(true);
     }
   }, [placedImages, targetSequence, gamePhase, isComplete]);
 
@@ -172,7 +173,7 @@ export const SequenceGame56Base = ({ onGameComplete, isLandscape = false, tableN
             audio.play().catch(() => resolve());
           });
         }
-        await new Promise(r => setTimeout(r, 500));
+        await new Promise(r => setTimeout(r, 300));
       }
       setActivePlayingIndex(null);
       setIsPlayingAudio(false);
