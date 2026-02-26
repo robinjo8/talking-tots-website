@@ -170,7 +170,7 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
 
       {/* Disclaimer */}
       <div className="px-4 pt-1 pb-2">
-        <div className="text-[11px] text-muted-foreground text-justify sm:text-center leading-relaxed">
+        <div className="text-[11px] text-muted-foreground text-center leading-relaxed">
           <p>Vsebino je ustvaril AI model na podlagi strokovnih logopedskih smernic; kljub temu so možne napake ali odstopanja.</p>
           <Link to="/kontakt" className="underline hover:text-foreground transition-colors">
             Sporočite nam svoje mnenje.

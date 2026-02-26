@@ -1,28 +1,26 @@
 
-# Popravki klepeta -- mobilna verzija
+# Popravki klepeta -- zeleno polje, disclaimer, placeholder
 
-## Spremembe
+## 1. Zeleno polje tik pod headerjem na mobilni verziji
+Trenutno ima container `pt-24 md:pt-32` (ali `pt-36` z bannerjem), kar ustvari presledek med app headerjem in zelenim poljem. Na mobilni verziji odstranimo ta padding, da bo zeleno polje tik pod headerjem. Na desktop verziji ohranimo obstoječi padding.
 
-### 1. Skrij header na mobilni verziji (samo na strani /klepet)
-V `src/pages/Klepet.tsx`:
-- Ovij `<Header />` v div z `hidden md:block`, da se na mobilni verziji ne prikaže
-- Odstrani mobilni padding (`pt-0` ostane, desktop padding ostane)
+**Datoteka:** `src/pages/Klepet.tsx` (vrstica 69-71)
+- Spremenimo padding: na mobilni `pt-0`, na desktop ohranimo `md:pt-32` (oz. `md:pt-44` z bannerjem)
+- Prilagodimo: `bannerVisible ? 'md:pt-44' : 'md:pt-32'` (brez `pt-24`/`pt-36` za mobilno)
 
-### 2. Sredinsko poravnaj besedilo v zelenem polju
-V `src/pages/Klepet.tsx`:
-- Dodaj `text-center` na zeleni div s "Klepet - Tomi" in "Vas digitalni logopedski pomocnik"
+## 2. Disclaimer besedilo -- dve vrstici na desktop, poravnano na mobilni
+Trenutno je vse v enem `<p>` elementu. Spremenimo v dve ločeni vrstici:
+- Vrstica 1: "Vsebino je ustvaril AI model na podlagi strokovnih logopedskih smernic; kljub temu so možne napake ali odstopanja."
+- Vrstica 2: "Sporočite nam svoje mnenje." (kot link)
+- Na mobilni verziji obojestransko poravnano (`text-justify sm:text-center`)
 
-### 3. Gumb za nazaj v zelenem polju (samo mobilno)
-V `src/pages/Klepet.tsx`:
-- Spremeni zeleni div v `relative` layout
-- Dodaj gumb z `ArrowLeft` ikono (iz lucide-react) na levo stran, ki preusmeri na "/"
-- Gumb: zelena podlaga (`bg-dragon-green`), bel okrogel rob (`border-2 border-white rounded-full`), bela puscica
-- Prikazan samo na mobilni verziji (`md:hidden`)
+**Datoteka:** `src/components/chat/ChatInterface.tsx` (vrstice 172-179)
 
-### 4. Sredinsko poravnaj disclaimer na mobilni verziji
-V `src/components/chat/ChatInterface.tsx`:
-- Spremeni `text-justify` v `text-center` (sredinsko na obeh velikostih)
+## 3. Placeholder besedilo
+Zamenjaj `"Vprašajte o govorno-jezikovnem razvoju..."` z `"Vnesite sporočilo"`.
+
+**Datoteka:** `src/components/chat/ChatInterface.tsx` (vrstica 139)
 
 ## Datoteke za urejanje
-1. `src/pages/Klepet.tsx` -- skrij header na mobilni, sredinsko poravnaj zeleno polje, dodaj gumb nazaj
-2. `src/components/chat/ChatInterface.tsx` -- sredinsko poravnaj disclaimer na mobilni
+1. `src/pages/Klepet.tsx` -- odstrani mobilni padding za zeleno polje tik pod headerjem
+2. `src/components/chat/ChatInterface.tsx` -- disclaimer v dve vrstici + nov placeholder

@@ -4,6 +4,9 @@ import { ChatInterface } from "@/components/chat/ChatInterface";
 import { SPEECH_DIFFICULTIES } from "@/models/SpeechDifficulties";
 import { SPEECH_DEVELOPMENT_QUESTIONS, SPEECH_DEVELOPMENT_TEXT_QUESTIONS } from "@/models/SpeechDevelopment";
 import type { ChildContext } from "@/hooks/useChatAssistant";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import { useBannerVisible } from "@/components/MissingChildBanner";
 
@@ -51,6 +54,8 @@ export default function Klepet() {
   const { selectedChild } = useAuth();
   const bannerVisible = useBannerVisible();
 
+  const navigate = useNavigate();
+
   const childContext = useMemo<ChildContext | undefined>(() => {
     if (!selectedChild) return undefined;
     return {
@@ -65,12 +70,22 @@ export default function Klepet() {
 
   return (
     <div className="h-[100dvh] flex flex-col bg-background">
-      <Header />
+      <div className="hidden md:block">
+        <Header />
+      </div>
       <div className={`flex-1 flex flex-col overflow-hidden container max-w-3xl mx-auto px-0 sm:px-4 ${
         bannerVisible ? 'pt-0 md:pt-44' : 'pt-0 md:pt-32'
       } pb-0`}>
         <div className="flex-1 flex flex-col overflow-hidden sm:bg-white sm:rounded-lg sm:shadow-sm sm:border sm:border-border">
-          <div className="bg-dragon-green text-white p-4 flex-shrink-0">
+          <div className="bg-dragon-green text-white p-4 flex-shrink-0 relative text-center">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden absolute left-3 top-1/2 -translate-y-1/2 border-2 border-white rounded-full text-white hover:bg-white/10 h-9 w-9"
+              onClick={() => navigate("/")}
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
             <h1 className="text-lg font-semibold">Klepet - Tomi</h1>
             <p className="text-sm text-white/80">Vaš digitalni logopedski pomočnik</p>
           </div>
