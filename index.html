@@ -66,14 +66,21 @@
     <meta name="twitter:description" content="TomiTalk je interaktivna aplikacija za izboljšanje govora otrok. Govorne igre, vaje za izgovorjavo, artikulacijski test in logopedska podpora – vse na enem mestu." />
     <meta name="twitter:image" content="https://tomitalk.lovable.app/icons/icon-512x512.png" />
     
-    <!-- Google Identity Services SDK for One Tap - Deferred for better LCP -->
+    <!-- Google Identity Services SDK for One Tap - Deferred via requestIdleCallback -->
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        var script = document.createElement('script');
-        script.src = 'https://accounts.google.com/gsi/client';
-        script.async = true;
-        document.head.appendChild(script);
-      });
+      (function() {
+        function loadGSI() {
+          var script = document.createElement('script');
+          script.src = 'https://accounts.google.com/gsi/client';
+          script.async = true;
+          document.head.appendChild(script);
+        }
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(loadGSI);
+        } else {
+          setTimeout(loadGSI, 3000);
+        }
+      })();
     </script>
   </head>
 
