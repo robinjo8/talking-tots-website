@@ -91,7 +91,7 @@ export const HeroSection = () => {
                     style={{ transform: 'scaleX(-1)' }}
                     width={500}
                     height={500}
-                    sizes="(max-width: 768px) 80vw, 500px"
+                    sizes="256px"
                     fetchPriority="high"
                   />
                 </div>
@@ -156,7 +156,7 @@ export const HeroSection = () => {
                   style={{ transform: 'scaleX(-1)' }}
                   width={500}
                   height={500}
-                  sizes="(max-width: 768px) 80vw, 500px"
+                  sizes="500px"
                   fetchPriority="high"
                 />
               </div>
