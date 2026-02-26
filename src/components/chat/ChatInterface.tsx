@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Send, Square, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { ChatMessage } from "./ChatMessage";
 import { useChatAssistant, type ChildContext } from "@/hooks/useChatAssistant";
 
@@ -58,11 +58,10 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
   })();
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-hidden">
       {/* Messages area */}
-      <div className="flex-1 overflow-hidden">
-        <ScrollArea className="h-full">
-          <div className="p-4 md:p-6 space-y-2">
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-4 md:p-6 space-y-2">
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center min-h-[40vh] text-center gap-4">
                 <div className="w-16 h-16 rounded-full bg-app-orange/10 flex items-center justify-center">
@@ -123,7 +122,6 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
             )}
             <div ref={bottomRef} />
           </div>
-        </ScrollArea>
       </div>
 
       {/* Input area */}

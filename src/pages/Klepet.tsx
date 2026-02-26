@@ -64,19 +64,17 @@ export default function Klepet() {
   }, [selectedChild]);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-[100dvh] flex flex-col bg-background">
       <Header />
-      <div className={`flex-1 flex flex-col container max-w-3xl mx-auto px-0 sm:px-4 ${
+      <div className={`flex-1 flex flex-col overflow-hidden container max-w-3xl mx-auto px-0 sm:px-4 ${
         bannerVisible ? 'pt-36 md:pt-44' : 'pt-24 md:pt-32'
-      }`}>
-        <div className="flex-1 flex flex-col bg-white rounded-lg shadow-sm border border-border overflow-hidden">
-          <div className="bg-dragon-green text-white p-4">
+      } pb-0`}>
+        <div className="flex-1 flex flex-col overflow-hidden sm:bg-white sm:rounded-lg sm:shadow-sm sm:border sm:border-border">
+          <div className="bg-dragon-green text-white p-4 flex-shrink-0">
             <h1 className="text-lg font-semibold">Klepet - Tomi</h1>
             <p className="text-sm text-white/80">Vaš digitalni logopedski pomočnik</p>
           </div>
-          <div className="flex-1 min-h-[60vh]">
-            <ChatInterface childContext={childContext} />
-          </div>
+          <ChatInterface childContext={childContext} />
         </div>
       </div>
     </div>
