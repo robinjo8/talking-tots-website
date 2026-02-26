@@ -351,7 +351,7 @@ export function KaceLestveGame({
         onUpdateSettings={handleSettingsUpdate}
         currentDifficulty={difficulty}
         currentAvatars={playerAvatars}
-        onBack={() => setShowExitDialog(true)}
+        onBack={() => navigate(backPath)}
       />
 
       {/* Settings modal (in-game: difficulty only) */}
