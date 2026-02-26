@@ -413,6 +413,15 @@ export function KaceLestveGame({
               currentStep={0}
               onRollComplete={handleDiceRollComplete}
               inline={true}
+              forcedResult={
+                (() => {
+                  const currentPos = gameState.positions[gameState.currentPlayer];
+                  const squaresToEnd = GOAL_POSITION - currentPos;
+                  return (squaresToEnd <= SQUARES_NEAR_END && gameState.failedNearEndCount[gameState.currentPlayer] >= MAX_FAILED_NEAR_END - 1)
+                    ? squaresToEnd
+                    : undefined;
+                })()
+              }
             />
           </div>
         )}

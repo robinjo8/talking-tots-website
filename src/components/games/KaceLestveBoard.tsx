@@ -4,6 +4,7 @@ import {
   COLS,
   ROWS,
   BOARD_SIZE,
+  GOAL_POSITION,
   LADDERS,
   SNAKES,
   getBoardPosition,
