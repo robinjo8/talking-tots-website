@@ -4,6 +4,9 @@ import { ChatInterface } from "@/components/chat/ChatInterface";
 import { SPEECH_DIFFICULTIES } from "@/models/SpeechDifficulties";
 import { SPEECH_DEVELOPMENT_QUESTIONS, SPEECH_DEVELOPMENT_TEXT_QUESTIONS } from "@/models/SpeechDevelopment";
 import type { ChildContext } from "@/hooks/useChatAssistant";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import { useBannerVisible } from "@/components/MissingChildBanner";
 
