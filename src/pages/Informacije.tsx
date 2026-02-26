@@ -5,17 +5,17 @@ import { BookOpen, Users, Mail, Gamepad2, User, Building2, CreditCard, HelpCircl
 
 const infoCards = [
   { icon: BookOpen, title: "Kako deluje\nTomiTalk", path: "/kako-deluje", color: "text-dragon-green" },
-  { icon: Users, title: "Kdo smo", path: "/kdo-smo", color: "text-app-blue" },
-  { icon: Mail, title: "Kontakt", path: "/kontakt", color: "text-teal-500" },
   { icon: Gamepad2, title: "Preverjanje\nizgovorjave", path: "/delovanje-testa", color: "text-app-orange" },
-  { icon: User, title: "Za starše", path: "/za-posameznike", color: "text-purple-500" },
-  { icon: Building2, title: "Za organizacije", path: "/za-podjetja", color: "text-app-blue" },
-  { icon: CreditCard, title: "Cenik", path: "/cenik", color: "text-dragon-green" },
-  { icon: HelpCircle, title: "Pomoč in\npodpora", path: "/pomoc-in-podpora", color: "text-yellow-500" },
   { icon: Headphones, title: "Poslušanje", path: "/info-poslusanje", color: "text-rose-500" },
   { icon: Mic, title: "Govor", path: "/info-govor", color: "text-app-orange" },
   { icon: MessageSquare, title: "Jezik", path: "/info-jezik", color: "text-app-blue" },
   { icon: LayoutDashboard, title: "Moja stran", path: "/info-moja-stran", color: "text-dragon-green" },
+  { icon: User, title: "Za starše", path: "/za-posameznike", color: "text-purple-500" },
+  { icon: Building2, title: "Za organizacije", path: "/za-podjetja", color: "text-app-blue" },
+  { icon: CreditCard, title: "Cenik", path: "/cenik", color: "text-dragon-green" },
+  { icon: Users, title: "Kdo smo", path: "/kdo-smo", color: "text-app-blue" },
+  { icon: Mail, title: "Kontakt", path: "/kontakt", color: "text-teal-500" },
+  { icon: HelpCircle, title: "Pomoč in\npodpora", path: "/pomoc-in-podpora", color: "text-yellow-500" },
 ];
 
 const Informacije = () => {
