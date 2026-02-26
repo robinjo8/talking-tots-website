@@ -1,21 +1,51 @@
 
-# Popravek klepeta: CORS napaka + dodaj Klepet v desktop navigacijo
 
-## Problem 1: "Napaka pri komunikaciji z asistentom"
-Edge funkcija `chat-assistant` ima CORS preverjanje, ki dovoljuje samo domene, ki se končajo z `.lovable.app`. Preview URL pa uporablja domeno `.lovableproject.com`, ki ni dovoljena. Zato brskalnik zavrne zahtevo ("Failed to fetch").
+# Popravek postavitve strani Klepet -- fiksni elementi in scrollanje
 
-**Popravek:** V `supabase/functions/chat-assistant/index.ts` dodaj `.lovableproject.com` v CORS preverjanje:
-```typescript
-const isAllowed = allowedOrigins.includes(origin) 
-  || (origin.startsWith("https://") && origin.endsWith(".lovable.app"))
-  || (origin.startsWith("https://") && origin.endsWith(".lovableproject.com"));
+## Problem
+Trenutno se ob scrollanju premikajo vsi elementi (zeleni header, sporočila, vnosno polje). Uporabnik želi:
+- **Fiksen zeleni header** ("Klepet - Tomi") na vrhu
+- **Fiksno vnosno polje** na dnu
+- **Scrollanje samo sporočil** v sredini
+- Na mobilni verziji naj klepet zapolni celoten zaslon pod glavnim headerjem
+
+## Spremembe
+
+### 1. Klepet.tsx -- celozaslonska postavitev
+- Uporabi `h-screen` in `flex flex-col` za celotno stran
+- Header aplikacije ostane fiksen na vrhu
+- Klepet container zapolni preostali prostor z `flex-1 overflow-hidden`
+- Odstrani `min-h-[60vh]` in nepotrebne wrapper-je
+- Na mobilni verziji odstrani padding in border/shadow za pravi messenger občutek
+
+### 2. ChatInterface.tsx -- pravilna flex struktura
+- Messages area: `flex-1 overflow-y-auto` (samo ta del se scrolla)
+- Input area: ostane na dnu brez scrollanja (že ima `border-t`)
+- Disclaimer: ostane fiksen pod vnosnim poljem
+- Zamenjaj `ScrollArea` komponento z navadnim `overflow-y-auto` div-om za bolj zanesljivo scrollanje
+
+## Tehnicne podrobnosti
+
+### Klepet.tsx -- nova struktura:
+```text
+div (h-screen, flex flex-col)
+  Header (fiksni app header)
+  div (flex-1, overflow-hidden, flex flex-col)  <-- zapolni preostali prostor
+    div (zeleni header -- fiksen)
+    ChatInterface (flex-1, overflow-hidden)
 ```
 
-## Problem 2: Klepet manjka v desktop navigaciji
-Klepet je dodan samo v hamburger meni (mobilna verzija), manjka pa v desktop headerju.
+### ChatInterface.tsx -- nova struktura:
+```text
+div (flex flex-col, h-full)
+  div (flex-1, overflow-y-auto)  <-- SAMO ta del scrolla
+    sporočila...
+  div (border-t, bg-background)  <-- fiksno na dnu
+    input form
+  div (disclaimer)  <-- fiksno na dnu
+```
 
-**Popravek:** V `src/components/header/DesktopNavigation.tsx` dodaj gumb "Klepet" v desni del navigacije (poleg ikone za informacije), viden samo za prijavljene uporabnike. Uporabi ikono `MessageCircle`.
+### Datoteke za urejanje:
+1. `src/pages/Klepet.tsx` -- celozaslonska postavitev
+2. `src/components/chat/ChatInterface.tsx` -- zamenjaj ScrollArea z overflow-y-auto
 
-## Datoteke za urejanje
-1. `supabase/functions/chat-assistant/index.ts` -- dodaj `.lovableproject.com` v CORS
-2. `src/components/header/DesktopNavigation.tsx` -- dodaj Klepet gumb za desktop
