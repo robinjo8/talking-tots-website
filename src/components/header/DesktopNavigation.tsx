@@ -80,10 +80,9 @@ export function DesktopNavigation({ user, onStartNow }: DesktopNavigationProps) 
 
   return (
     <>
-      <div className="hidden lg:flex items-center justify-between w-full">
-        {/* Left side - Logo and Navigation together */}
-        <div className="flex items-center gap-4">
-          {/* Logo */}
+      <div className="hidden lg:flex items-center justify-between w-full relative">
+        {/* Left side - Logo */}
+        <div className="flex items-center">
           <Link 
             to="/" 
             className="flex items-center"
@@ -99,68 +98,66 @@ export function DesktopNavigation({ user, onStartNow }: DesktopNavigationProps) 
               <span className="text-2xl font-extrabold text-app-orange uppercase">Talk</span>
             </div>
           </Link>
-          
-          {/* Navigation right next to logo */}
-          <nav className="hidden lg:flex items-center gap-2">
-            {/* Always show Logopedski nasveti - visible for everyone */}
-            <Button 
-              variant="ghost" 
-              onClick={() => handleNavigate("/logopedski-koticek")} 
-              className={
-                "rounded-full h-10 text-base px-4 font-semibold uppercase " +
-                (isActivePath("/logopedski-koticek") ? 'bg-accent' : '')
-              }
-            >
-              Logopedski nasveti
-            </Button>
-            
-            {/* When LOGGED IN, show Poslušanje, Govor, Jezik, Moja stran - with subscription check */}
-            {user && (
-              <>
-                <Button 
-                  variant="ghost" 
-                  onClick={() => handleProtectedNavigate("/poslusanje")} 
-                  className={
-                    "rounded-full h-10 text-base px-4 font-semibold uppercase " +
-                    (isActivePath("/poslusanje") ? 'bg-accent' : '')
-                  }
-                >
-                  Poslušanje
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  onClick={() => handleProtectedNavigate("/moje-aplikacije")} 
-                  className={
-                    "rounded-full h-10 text-base px-4 font-semibold uppercase " +
-                    (isActivePath("/moje-aplikacije") ? 'bg-accent' : '')
-                  }
-                >
-                  Govor
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  onClick={() => handleProtectedNavigate("/jezik")} 
-                  className={
-                    "rounded-full h-10 text-base px-4 font-semibold uppercase " +
-                    (isActivePath("/jezik") ? 'bg-accent' : '')
-                  }
-                >
-                  Jezik
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  onClick={() => handleProtectedNavigate("/moja-stran")} 
-                  className={
-                    "rounded-full h-10 text-base px-4 font-semibold uppercase " +
-                    (isActivePath("/moja-stran") ? 'bg-accent' : '')
-                  }
-                >
-                  Moja stran
-                </Button>
-              </>
-            )}
-          </nav>
         </div>
+        
+        {/* Center - Navigation (absolutely centered) */}
+        <nav className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            onClick={() => handleNavigate("/logopedski-koticek")} 
+            className={
+              "rounded-full h-10 text-base px-4 font-semibold uppercase " +
+              (isActivePath("/logopedski-koticek") ? 'bg-accent' : '')
+            }
+          >
+            Logopedski nasveti
+          </Button>
+          
+          {user && (
+            <>
+              <Button 
+                variant="ghost" 
+                onClick={() => handleProtectedNavigate("/poslusanje")} 
+                className={
+                  "rounded-full h-10 text-base px-4 font-semibold uppercase " +
+                  (isActivePath("/poslusanje") ? 'bg-accent' : '')
+                }
+              >
+                Poslušanje
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={() => handleProtectedNavigate("/moje-aplikacije")} 
+                className={
+                  "rounded-full h-10 text-base px-4 font-semibold uppercase " +
+                  (isActivePath("/moje-aplikacije") ? 'bg-accent' : '')
+                }
+              >
+                Govor
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={() => handleProtectedNavigate("/jezik")} 
+                className={
+                  "rounded-full h-10 text-base px-4 font-semibold uppercase " +
+                  (isActivePath("/jezik") ? 'bg-accent' : '')
+                }
+              >
+                Jezik
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={() => handleProtectedNavigate("/moja-stran")} 
+                className={
+                  "rounded-full h-10 text-base px-4 font-semibold uppercase " +
+                  (isActivePath("/moja-stran") ? 'bg-accent' : '')
+                }
+              >
+                Moja stran
+              </Button>
+            </>
+          )}
+        </nav>
         
         {/* Right side - user profile or login buttons */}
         <div className="flex items-center gap-2">
