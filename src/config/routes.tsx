@@ -129,6 +129,10 @@ const Cenik = lazy(() => import("@/pages/Cenik"));
 const DelovanjeTest = lazy(() => import("@/pages/DelovanjeTest"));
 const KdoSmo = lazy(() => import("@/pages/KdoSmo"));
 const Informacije = lazy(() => import("@/pages/Informacije"));
+const InfoPoslusanje = lazy(() => import("@/pages/InfoPoslusanje"));
+const InfoGovor = lazy(() => import("@/pages/InfoGovor"));
+const InfoJezik = lazy(() => import("@/pages/InfoJezik"));
+const InfoMojaStran = lazy(() => import("@/pages/InfoMojaStran"));
 
 export function AppRoutes() {
   return (
@@ -258,6 +262,10 @@ export function AppRoutes() {
       <Route path="/delovanje-testa" element={<LazyRoute><DelovanjeTest /></LazyRoute>} />
       <Route path="/kdo-smo" element={<LazyRoute><KdoSmo /></LazyRoute>} />
       <Route path="/informacije" element={<LazyRoute><Informacije /></LazyRoute>} />
+      <Route path="/info-poslusanje" element={<LazyRoute><InfoPoslusanje /></LazyRoute>} />
+      <Route path="/info-govor" element={<LazyRoute><InfoGovor /></LazyRoute>} />
+      <Route path="/info-jezik" element={<LazyRoute><InfoJezik /></LazyRoute>} />
+      <Route path="/info-moja-stran" element={<LazyRoute><InfoMojaStran /></LazyRoute>} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>
