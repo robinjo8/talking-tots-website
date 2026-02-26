@@ -78,13 +78,15 @@ export function TeamSection() {
             {teamMembers.map((_, i) => (
               <button
                 key={i}
-                className={cn(
-                  "w-2.5 h-2.5 rounded-full transition-all duration-300",
-                  i === selectedIndex ? "bg-white scale-125" : "bg-white/40 hover:bg-white/60"
-                )}
+                className="w-6 h-6 rounded-full flex items-center justify-center p-0 bg-transparent transition-all duration-300"
                 onClick={() => emblaApi?.scrollTo(i)}
                 aria-label={`Pojdi na člana ${i + 1}`}
-              />
+              >
+                <span className={cn(
+                  "rounded-full transition-all duration-300",
+                  i === selectedIndex ? "w-3 h-3 bg-white shadow-sm" : "w-2.5 h-2.5 bg-white/40"
+                )} />
+              </button>
             ))}
           </div>
         </div>

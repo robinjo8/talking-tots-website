@@ -186,6 +186,7 @@ export function UserNotificationBell() {
           size="icon" 
           className="relative h-8 w-8"
           onClick={handleBellClick}
+          aria-label="Obvestila"
         >
           <Bell className="h-5 w-5 text-muted-foreground" />
           {unreadCount > 0 && (
@@ -202,6 +203,7 @@ export function UserNotificationBell() {
               variant="ghost" 
               size="icon" 
               className="relative h-8 w-8"
+              aria-label="Obvestila"
             >
               <Bell className="h-5 w-5 text-muted-foreground" />
               {unreadCount > 0 && (
