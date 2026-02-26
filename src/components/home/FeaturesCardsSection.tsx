@@ -122,15 +122,17 @@ function MobileFeatureCarousel({
         {Array.from({ length: count }).map((_, i) => (
           <button
             key={i}
-            className={cn(
-              "w-2.5 h-2.5 rounded-full transition-all duration-300",
-              i === current 
-                ? "bg-dragon-green scale-125 shadow-sm" 
-                : "bg-muted-foreground/40 hover:bg-muted-foreground/60"
-            )}
+            className="w-6 h-6 rounded-full flex items-center justify-center p-0 bg-transparent transition-all duration-300"
             onClick={() => api?.scrollTo(i)}
             aria-label={`Pojdi na kartico ${i + 1}`}
-          />
+          >
+            <span className={cn(
+              "rounded-full transition-all duration-300",
+              i === current 
+                ? "w-3 h-3 bg-dragon-green shadow-sm" 
+                : "w-2.5 h-2.5 bg-muted-foreground/40"
+            )} />
+          </button>
         ))}
       </div>
     </div>
