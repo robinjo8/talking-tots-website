@@ -45,7 +45,7 @@ const gameLetters = [
     image: "zmajcek_crka_SH.png",
     path: "/govorne-igre/kace/sh",
     gradient: "radial-gradient(ellipse at center, hsl(213, 60%, 95%) 0%, hsl(213, 50%, 88%) 30%, hsl(271, 45%, 78%) 60%, hsl(271, 40%, 68%) 100%)",
-    available: false,
+    available: true,
   },
   {
     id: "zh",
@@ -54,7 +54,7 @@ const gameLetters = [
     image: "zmajcek_crka_ZH.png",
     path: "/govorne-igre/kace/zh",
     gradient: "radial-gradient(ellipse at center, hsl(271, 60%, 95%) 0%, hsl(271, 50%, 88%) 30%, hsl(213, 45%, 78%) 60%, hsl(213, 40%, 68%) 100%)",
-    available: false,
+    available: true,
   },
   {
     id: "ch",
@@ -63,7 +63,7 @@ const gameLetters = [
     image: "zmajcek_crka_CH.png",
     path: "/govorne-igre/kace/ch",
     gradient: "radial-gradient(ellipse at center, hsl(213, 60%, 95%) 0%, hsl(213, 50%, 88%) 30%, hsl(174, 45%, 78%) 60%, hsl(174, 40%, 68%) 100%)",
-    available: false,
+    available: true,
   },
   {
     id: "k",
@@ -72,7 +72,7 @@ const gameLetters = [
     image: "zmajcek_crka_K.png",
     path: "/govorne-igre/kace/k",
     gradient: "radial-gradient(ellipse at center, hsl(38, 100%, 95%) 0%, hsl(38, 90%, 88%) 30%, hsl(45, 85%, 78%) 60%, hsl(45, 80%, 68%) 100%)",
-    available: false,
+    available: true,
   },
   {
     id: "l",
@@ -81,7 +81,7 @@ const gameLetters = [
     image: "zmajcek_crka_L.png",
     path: "/govorne-igre/kace/l",
     gradient: "radial-gradient(ellipse at center, hsl(271, 60%, 95%) 0%, hsl(271, 50%, 88%) 30%, hsl(213, 45%, 78%) 60%, hsl(213, 40%, 68%) 100%)",
-    available: false,
+    available: true,
   },
   {
     id: "r",
@@ -90,7 +90,7 @@ const gameLetters = [
     image: "zmajcek_crka_R.png",
     path: "/govorne-igre/kace/r",
     gradient: "radial-gradient(ellipse at center, hsl(271, 60%, 95%) 0%, hsl(271, 50%, 88%) 30%, hsl(174, 45%, 78%) 60%, hsl(174, 40%, 68%) 100%)",
-    available: false,
+    available: true,
   },
   {
     id: "r-zacetek",

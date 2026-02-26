@@ -6,6 +6,8 @@ export interface BingoWord {
 }
 
 export const wordsDataRSredinaKonec: BingoWord[] = [
+  { word: "BOBER", image: "bober1.webp", audio: "bober.m4a" },
+  { word: "BOROVNICE", image: "borovnice1.webp", audio: "borovnice.m4a" },
   { word: "CERKEV", image: "cerkev1.webp", audio: "cerkev.m4a" },
   { word: "CIRKUS", image: "cirkus1.webp", audio: "cirkus.m4a" },
   { word: "CISTERNA", image: "cisterna1.webp", audio: "cisterna.m4a" },
@@ -14,12 +16,15 @@ export const wordsDataRSredinaKonec: BingoWord[] = [
   { word: "HRUŠKA", image: "hruska1.webp", audio: "hruska.m4a" },
   { word: "KLAVIR", image: "klavir1.webp", audio: "klavir.m4a" },
   { word: "KOŠARA", image: "kosara1.webp", audio: "kosara.m4a" },
+  { word: "KOZAREC", image: "kozarec1.webp", audio: "kozarec.m4a" },
   { word: "KRAVA", image: "krava1.webp", audio: "krava.m4a" },
   { word: "KROF", image: "krof1.webp", audio: "krof.m4a" },
   { word: "KROG", image: "krog1.webp", audio: "krog.m4a" },
+  { word: "KROŽNIK", image: "kroznik1.webp", audio: "kroznik.m4a" },
   { word: "KRUH", image: "kruh1.webp", audio: "kruh.m4a" },
   { word: "KUMARA", image: "kumara1.webp", audio: "kumara.m4a" },
   { word: "LOPAR", image: "lopar1.webp", audio: "lopar.m4a" },
+  { word: "MROŽ", image: "mroz1.webp", audio: "mroz.m4a" },
   { word: "OBRAZ", image: "obraz1.webp", audio: "obraz.m4a" },
   { word: "OMARA", image: "omara1.webp", audio: "omara.m4a" },
   { word: "SIR", image: "sir1.webp", audio: "sir.m4a" },
