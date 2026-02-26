@@ -1,4 +1,4 @@
-import { FooterSection } from "@/components/home/FooterSection";
+
 import Header from "@/components/Header";
 import { User } from "lucide-react";
 
@@ -58,7 +58,7 @@ const KdoSmo = () => {
           ))}
         </div>
       </div>
-      <FooterSection />
+      
     </div>
   );
 };
