@@ -17,12 +17,6 @@ export type ChatMessage = {
   content: string;
 };
 
-export type Conversation = {
-  id: string;
-  title: string;
-  updated_at: string;
-};
-
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-assistant`;
 
 export function useChatAssistant(childContext?: ChildContext) {
@@ -31,55 +25,45 @@ export function useChatAssistant(childContext?: ChildContext) {
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
 
   const abortControllerRef = useRef<AbortController | null>(null);
-  const activeConvIdRef = useRef<string | null>(null);
+  const convIdRef = useRef<string | null>(null);
+  const initialLoadDone = useRef(false);
 
-  // Keep ref in sync
+  // Load single conversation on mount
   useEffect(() => {
-    activeConvIdRef.current = activeConversationId;
-  }, [activeConversationId]);
+    if (!userId || initialLoadDone.current) return;
+    initialLoadDone.current = true;
 
-  // Load last 5 conversations
-  const loadConversations = useCallback(async () => {
-    if (!userId) return;
-    const { data } = await supabase
-      .from("chat_conversations")
-      .select("id, title, updated_at")
-      .eq("user_id", userId)
-      .order("updated_at", { ascending: false })
-      .limit(5);
-    if (data) setConversations(data as unknown as Conversation[]);
+    (async () => {
+      const { data: convs } = await supabase
+        .from("chat_conversations")
+        .select("id")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: true })
+        .limit(1);
+
+      if (convs && convs.length > 0) {
+        const convId = (convs[0] as any).id;
+        convIdRef.current = convId;
+
+        const { data: msgs } = await supabase
+          .from("chat_messages")
+          .select("role, content")
+          .eq("conversation_id", convId)
+          .order("created_at", { ascending: true });
+
+        if (msgs) {
+          setMessages(
+            (msgs as unknown as { role: string; content: string }[]).map((m) => ({
+              role: m.role as "user" | "assistant",
+              content: m.content,
+            }))
+          );
+        }
+      }
+    })();
   }, [userId]);
-
-  useEffect(() => {
-    loadConversations();
-  }, [loadConversations]);
-
-  // Load a specific conversation's messages
-  const loadConversation = useCallback(async (conversationId: string) => {
-    const { data } = await supabase
-      .from("chat_messages")
-      .select("role, content")
-      .eq("conversation_id", conversationId)
-      .order("created_at", { ascending: true });
-    if (data) {
-      setMessages(
-        (data as unknown as { role: string; content: string }[]).map((m) => ({
-          role: m.role as "user" | "assistant",
-          content: m.content,
-        }))
-      );
-      setActiveConversationId(conversationId);
-    }
-  }, []);
-
-  const startNewConversation = useCallback(() => {
-    setMessages([]);
-    setActiveConversationId(null);
-  }, []);
 
   const stopStreaming = useCallback(() => {
     if (abortControllerRef.current) {
@@ -98,21 +82,18 @@ export function useChatAssistant(childContext?: ChildContext) {
       setMessages(updatedMessages);
       setIsLoading(true);
 
-      // Persist: create conversation if needed, save user message
-      let convId = activeConvIdRef.current;
+      let convId = convIdRef.current;
       if (userId) {
         try {
           if (!convId) {
-            const title = input.trim().substring(0, 50);
             const { data: conv } = await supabase
               .from("chat_conversations")
-              .insert({ user_id: userId, title } as any)
+              .insert({ user_id: userId, title: "Klepet" } as any)
               .select("id")
               .single();
             if (conv) {
               convId = (conv as any).id;
-              setActiveConversationId(convId);
-              activeConvIdRef.current = convId;
+              convIdRef.current = convId;
             }
           }
           if (convId) {
@@ -134,7 +115,6 @@ export function useChatAssistant(childContext?: ChildContext) {
       let assistantContent = "";
 
       try {
-        // Get the user's session token for authenticated requests
         const { data: sessionData } = await supabase.auth.getSession();
         const accessToken = sessionData?.session?.access_token;
         if (!accessToken) {
@@ -159,12 +139,9 @@ export function useChatAssistant(childContext?: ChildContext) {
 
         if (!resp.ok) {
           const errorData = await resp.json().catch(() => null);
-          const errorMsg =
-            errorData?.error || "Napaka pri komunikaciji z asistentom.";
+          const errorMsg = errorData?.error || "Napaka pri komunikaciji z asistentom.";
           if (resp.status === 429) {
-            toast.error(
-              "Preveč zahtev. Počakajte trenutek in poskusite znova."
-            );
+            toast.error("Preveč zahtev. Počakajte trenutek in poskusite znova.");
           } else {
             toast.error(errorMsg);
           }
@@ -232,11 +209,7 @@ export function useChatAssistant(childContext?: ChildContext) {
                   for (const item of output) {
                     if (item.type === "message" && item.content) {
                       for (const part of item.content) {
-                        if (
-                          part.type === "output_text" &&
-                          part.text &&
-                          !assistantContent
-                        ) {
+                        if (part.type === "output_text" && part.text && !assistantContent) {
                           assistantContent = part.text;
                           updateAssistant(assistantContent);
                         }
@@ -270,10 +243,7 @@ export function useChatAssistant(childContext?: ChildContext) {
             if (jsonStr === "[DONE]") continue;
             try {
               const parsed = JSON.parse(jsonStr);
-              if (
-                parsed.type === "response.output_text.delta" &&
-                parsed.delta
-              ) {
+              if (parsed.type === "response.output_text.delta" && parsed.delta) {
                 assistantContent += parsed.delta;
                 updateAssistant(assistantContent);
               }
@@ -293,7 +263,6 @@ export function useChatAssistant(childContext?: ChildContext) {
         setIsLoading(false);
         abortControllerRef.current = null;
 
-        // Save assistant message to DB
         if (assistantContent && convId && userId) {
           try {
             await supabase
@@ -307,30 +276,19 @@ export function useChatAssistant(childContext?: ChildContext) {
               .from("chat_conversations")
               .update({ updated_at: new Date().toISOString() } as any)
               .eq("id", convId);
-            loadConversations();
           } catch (err) {
             console.error("Error saving assistant message:", err);
           }
         }
       }
     },
-    [messages, isLoading, childContext, userId, loadConversations]
+    [messages, isLoading, childContext, userId]
   );
-
-  const clearMessages = useCallback(() => {
-    setMessages([]);
-    setActiveConversationId(null);
-  }, []);
 
   return {
     messages,
     isLoading,
     sendMessage,
     stopStreaming,
-    clearMessages,
-    conversations,
-    activeConversationId,
-    loadConversation,
-    startNewConversation,
   };
 }

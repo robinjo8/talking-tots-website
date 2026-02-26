@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Send, Square, Bot, Plus, MessageCircle } from "lucide-react";
+import { Send, Square, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -12,16 +12,8 @@ type ChatInterfaceProps = {
 };
 
 export function ChatInterface({ childContext }: ChatInterfaceProps) {
-  const {
-    messages,
-    isLoading,
-    sendMessage,
-    stopStreaming,
-    conversations,
-    activeConversationId,
-    loadConversation,
-    startNewConversation,
-  } = useChatAssistant(childContext);
+  const { messages, isLoading, sendMessage, stopStreaming } =
+    useChatAssistant(childContext);
   const [input, setInput] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -54,12 +46,6 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
     textarea.style.height = Math.min(textarea.scrollHeight, 120) + "px";
   };
 
-  const formatDate = (dateStr: string) => {
-    const d = new Date(dateStr);
-    return `${d.getDate()}. ${d.getMonth() + 1}.`;
-  };
-
-  // Dynamic suggested questions based on child age
   const suggestedQuestions = (() => {
     const age = childContext?.age;
     const ageLabel = age ? `${age}-letnika` : "mojega otroka";
@@ -73,44 +59,6 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Conversation history bar */}
-      {conversations.length > 0 && (
-        <div className="border-b border-border bg-muted/30 p-3">
-          <div className="flex items-center gap-2 flex-wrap">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={startNewConversation}
-              className="text-xs gap-1 shrink-0"
-            >
-              <Plus className="w-3 h-3" />
-              Nov pogovor
-            </Button>
-            <div className="h-4 w-px bg-border shrink-0 hidden sm:block" />
-            <div className="flex gap-1.5 flex-wrap overflow-hidden">
-              {conversations.map((conv) => (
-                <button
-                  key={conv.id}
-                  onClick={() => loadConversation(conv.id)}
-                  className={`text-xs px-2.5 py-1.5 rounded-lg transition-colors truncate max-w-[200px] flex items-center gap-1.5 ${
-                    activeConversationId === conv.id
-                      ? "bg-dragon-green text-white"
-                      : "bg-background border border-border hover:bg-muted text-muted-foreground"
-                  }`}
-                  title={conv.title}
-                >
-                  <MessageCircle className="w-3 h-3 shrink-0" />
-                  <span className="truncate">{conv.title || "Pogovor"}</span>
-                  <span className="text-[10px] opacity-70 shrink-0">
-                    {formatDate(conv.updated_at)}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Messages area */}
       <div className="flex-1 overflow-hidden">
         <ScrollArea className="h-full">
