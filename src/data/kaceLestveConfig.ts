@@ -12,6 +12,7 @@ export type KacePlayers = 1 | 2;
 export const COLS = 6;
 export const ROWS = 7;
 export const BOARD_SIZE = 42;
+export const GOAL_POSITION = 41; // First orange field (win target) — NOT 42 (Cilj image)
 export const SQUARES_NEAR_END = 6;
 export const MAX_FAILED_NEAR_END = 5;
 // Physical position of START (before first green square)

@@ -21,6 +21,7 @@ import {
   LADDERS,
   SNAKES,
   BOARD_SIZE,
+  GOAL_POSITION,
   SQUARES_NEAR_END,
   MAX_FAILED_NEAR_END,
   START_POSITION,
@@ -28,6 +29,7 @@ import {
 } from "@/data/kaceLestveConfig";
 import { useTrophyContext } from "@/contexts/TrophyContext";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
+import { toast } from "sonner";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public";
 const PLAYER_NAMES = ["ZMAJČEK 1", "ZMAJČEK 2"];
@@ -172,39 +174,29 @@ export function KaceLestveGame({
     setPhase("rolling");
 
     const currentPos = gameState.positions[gameState.currentPlayer];
-    const squaresToEnd = BOARD_SIZE - currentPos;
+    const squaresToEnd = GOAL_POSITION - currentPos;
 
+    // Near-end zone: check if roll overshoots
     if (squaresToEnd <= SQUARES_NEAR_END) {
-      const newFailCount = [...gameState.failedNearEndCount];
-      const isExact = result === squaresToEnd;
-
-      if (!isExact) {
+      if (result > squaresToEnd) {
+        // Rolled too much — show toast, count failure, skip turn
+        toast("Vrgel si preveč!", { duration: 2000 });
+        const newFailCount = [...gameState.failedNearEndCount];
         newFailCount[gameState.currentPlayer] += 1;
-        const forcedWin = newFailCount[gameState.currentPlayer] >= MAX_FAILED_NEAR_END;
         setGameState(prev => ({ ...prev, failedNearEndCount: newFailCount }));
-
-        if (forcedWin) {
-          const newPositions = [...gameState.positions];
-          newPositions[gameState.currentPlayer] = BOARD_SIZE;
-          setGameState(prev => ({ ...prev, positions: newPositions, gameOver: true, winner: gameState.currentPlayer }));
-          setAnimStep('moving_to_final');
-          setPendingDialogPhase('success');
-        } else {
-          setTimeout(() => nextPlayer(), 400);
-        }
+        setTimeout(() => nextPlayer(), 1200);
         return;
       }
+      // result <= squaresToEnd: allow move (including exact match = win)
     }
 
     // Build hop path: [currentPos+1, currentPos+2, ..., newPos]
-    const newPos = Math.min(currentPos + result, BOARD_SIZE);
+    const newPos = Math.min(currentPos + result, GOAL_POSITION);
     const hops: number[] = [];
     for (let p = currentPos + 1; p <= newPos; p++) {
       hops.push(p);
     }
     setHoppingPositions(hops);
-    // The board will drive the animation and call onAvatarLanded when done
-    // We track the final position in gameState immediately so logic is correct
     const newPositions = [...gameState.positions];
     newPositions[gameState.currentPlayer] = newPos;
     setGameState(prev => ({ ...prev, positions: newPositions }));
@@ -218,7 +210,7 @@ export function KaceLestveGame({
       const { currentPlayer, positions } = gameState;
       const pos = positions[currentPlayer];
 
-      if (pos >= BOARD_SIZE) {
+      if (pos >= GOAL_POSITION) {
         setAnimStep('idle');
         setGameState(prev => ({ ...prev, gameOver: true, winner: currentPlayer }));
         setTimeout(() => setPhase('success'), 1500);
@@ -226,13 +218,13 @@ export function KaceLestveGame({
       }
 
       if (LADDERS[pos] !== undefined) {
-        const ladderTop = Math.min(LADDERS[pos], BOARD_SIZE);
+        const ladderTop = Math.min(LADDERS[pos], GOAL_POSITION);
         const newPositions = [...positions];
         newPositions[currentPlayer] = ladderTop;
         setGameState(prev => ({ ...prev, positions: newPositions }));
         setAnimStep('moving_to_final');
 
-        if (ladderTop >= BOARD_SIZE) {
+        if (ladderTop >= GOAL_POSITION) {
           setGameState(prev => ({ ...prev, gameOver: true, winner: currentPlayer }));
           setPendingDialogPhase('success');
         } else {
@@ -421,6 +413,15 @@ export function KaceLestveGame({
               currentStep={0}
               onRollComplete={handleDiceRollComplete}
               inline={true}
+              forcedResult={
+                (() => {
+                  const currentPos = gameState.positions[gameState.currentPlayer];
+                  const squaresToEnd = GOAL_POSITION - currentPos;
+                  return (squaresToEnd <= SQUARES_NEAR_END && gameState.failedNearEndCount[gameState.currentPlayer] >= MAX_FAILED_NEAR_END - 1)
+                    ? squaresToEnd
+                    : undefined;
+                })()
+              }
             />
           </div>
         )}
