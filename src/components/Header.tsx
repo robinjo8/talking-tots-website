@@ -19,6 +19,7 @@ export default function Header() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { isSubscribed, isLoading } = useSubscriptionContext();
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   
   const handleStartNow = () => {
     // If not logged in, redirect to login page
