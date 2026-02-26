@@ -210,7 +210,7 @@ export function KaceLestveGame({
       const { currentPlayer, positions } = gameState;
       const pos = positions[currentPlayer];
 
-      if (pos >= BOARD_SIZE) {
+      if (pos >= GOAL_POSITION) {
         setAnimStep('idle');
         setGameState(prev => ({ ...prev, gameOver: true, winner: currentPlayer }));
         setTimeout(() => setPhase('success'), 1500);
@@ -218,13 +218,13 @@ export function KaceLestveGame({
       }
 
       if (LADDERS[pos] !== undefined) {
-        const ladderTop = Math.min(LADDERS[pos], BOARD_SIZE);
+        const ladderTop = Math.min(LADDERS[pos], GOAL_POSITION);
         const newPositions = [...positions];
         newPositions[currentPlayer] = ladderTop;
         setGameState(prev => ({ ...prev, positions: newPositions }));
         setAnimStep('moving_to_final');
 
-        if (ladderTop >= BOARD_SIZE) {
+        if (ladderTop >= GOAL_POSITION) {
           setGameState(prev => ({ ...prev, gameOver: true, winner: currentPlayer }));
           setPendingDialogPhase('success');
         } else {
