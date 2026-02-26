@@ -1,31 +1,49 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, Smartphone, Share, X, Menu } from 'lucide-react';
-import { usePWA, useIOSInstallInstructions } from '@/hooks/usePWA';
+import { usePWA } from '@/hooks/usePWA';
 import { Card, CardContent } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
 
 export function ManualInstallButton() {
-  const { promptInstall, isInstalled, isIOSDevice, isAndroidDevice, isInstallable } = usePWA();
-  const { isInSafari, canShowInstructions } = useIOSInstallInstructions();
+  const {
+    promptInstall, isInstalled, isStandalone, isIOSDevice, isAndroidDevice,
+    isInstallable, isIOSSafari, isIOSNonSafari, canInstall, dismissInstallPrompt
+  } = usePWA();
   const [showInstructions, setShowInstructions] = useState(false);
 
-  // Don't show if already installed, not on homepage, or on desktop
-  const isHomepage = window.location.pathname === '/' || window.location.pathname === '';
   const isGamePage = window.location.pathname.includes('/govorne-igre/');
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  
-  if (isInstalled || !isHomepage || isGamePage || !isMobile) return null;
+
+  // Hide if: installed, in game, desktop, or can't install
+  if (isInstalled || isStandalone || isGamePage || !isMobile || !canInstall) return null;
 
   const handleInstallClick = async () => {
-    if (isIOSDevice) {
-      setShowInstructions(true);
-    } else if (isInstallable) {
-      await promptInstall();
-    } else {
-      // Show Android instructions dialog if on Android, otherwise generic message
-      setShowInstructions(true);
+    // Android with native prompt available
+    if (isAndroidDevice && isInstallable) {
+      const success = await promptInstall();
+      if (!success) {
+        // User dismissed native prompt - don't show again for 7 days
+        dismissInstallPrompt();
+      }
+      return;
     }
+
+    // iOS but NOT Safari - must open in Safari
+    if (isIOSNonSafari) {
+      toast.info('Za namestitev aplikacije odpri stran v brskalniku Safari.', {
+        duration: 5000,
+      });
+      return;
+    }
+
+    // iOS Safari or Android without native prompt - show instructions
+    setShowInstructions(true);
+  };
+
+  const handleDismiss = () => {
+    dismissInstallPrompt();
   };
 
   return (
@@ -35,7 +53,7 @@ export function ManualInstallButton() {
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 1 }}
-        className="fixed bottom-20 right-4 z-40"
+        className="fixed bottom-20 right-4 z-40 flex items-center gap-2"
       >
         <Button
           onClick={handleInstallClick}
@@ -45,6 +63,13 @@ export function ManualInstallButton() {
           <Download className="h-5 w-5 mr-2" />
           <span className="font-semibold">Prenesi aplikacijo</span>
         </Button>
+        <button
+          onClick={handleDismiss}
+          className="w-8 h-8 rounded-full bg-muted/80 backdrop-blur-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shadow"
+          aria-label="Zapri"
+        >
+          <X className="w-4 h-4" />
+        </button>
       </motion.div>
 
       {/* Install Instructions Modal */}
@@ -90,69 +115,15 @@ export function ManualInstallButton() {
                   <div className="space-y-4">
                     {isIOSDevice ? (
                       <>
-                        <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
-                          <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <span className="text-sm font-medium">1</span>
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium mb-1">Pritisni gumb za deljenje</p>
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                              <Share className="h-4 w-4" />
-                              <span className="text-xs">(spodaj na sredini)</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
-                          <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <span className="text-sm font-medium">2</span>
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium">Izberi "Dodaj na začetni zaslon"</p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
-                          <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <span className="text-sm font-medium">3</span>
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium">Pritisni "Dodaj"</p>
-                          </div>
-                        </div>
+                        <InstructionStep step={1} title="Pritisni gumb za deljenje" icon={<Share className="h-4 w-4" />} subtitle="(spodaj na sredini)" />
+                        <InstructionStep step={2} title='Izberi "Dodaj na začetni zaslon"' />
+                        <InstructionStep step={3} title='Pritisni "Dodaj"' />
                       </>
                     ) : (
                       <>
-                        <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
-                          <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <span className="text-sm font-medium">1</span>
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium mb-1">Odpri meni brskalnika</p>
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                              <Menu className="h-4 w-4" />
-                              <span className="text-xs">(zgoraj desno, tri pike)</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
-                          <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <span className="text-sm font-medium">2</span>
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium">Izberi "Dodaj na začetni zaslon" ali "Namesti aplikacijo"</p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
-                          <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <span className="text-sm font-medium">3</span>
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium">Potrdi namestitev</p>
-                          </div>
-                        </div>
+                        <InstructionStep step={1} title="Odpri meni brskalnika" icon={<Menu className="h-4 w-4" />} subtitle="(zgoraj desno, tri pike)" />
+                        <InstructionStep step={2} title='Izberi "Namesti aplikacijo" ali "Dodaj na začetni zaslon"' />
+                        <InstructionStep step={3} title="Potrdi namestitev" />
                       </>
                     )}
                   </div>
@@ -170,5 +141,24 @@ export function ManualInstallButton() {
         )}
       </AnimatePresence>
     </>
+  );
+}
+
+function InstructionStep({ step, title, icon, subtitle }: { step: number; title: string; icon?: React.ReactNode; subtitle?: string }) {
+  return (
+    <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
+      <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+        <span className="text-sm font-medium">{step}</span>
+      </div>
+      <div>
+        <p className="text-sm font-medium mb-1">{title}</p>
+        {(icon || subtitle) && (
+          <div className="flex items-center gap-2 text-muted-foreground">
+            {icon}
+            {subtitle && <span className="text-xs">{subtitle}</span>}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

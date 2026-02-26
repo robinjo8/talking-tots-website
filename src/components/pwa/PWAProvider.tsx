@@ -1,7 +1,6 @@
 import { ReactNode } from 'react';
 import { UpdatePrompt, UpdateNotification } from './UpdatePrompt';
 import { ManualInstallButton } from './ManualInstallButton';
-import { IOSInstallBanner } from './IOSInstallBanner';
 
 interface PWAProviderProps {
   children: ReactNode;
@@ -12,11 +11,8 @@ export function PWAProvider({ children }: PWAProviderProps) {
     <>
       {children}
       
-      {/* PWA Install Prompts - Only ManualInstallButton for desktop */}
+      {/* Unified PWA Install Button */}
       <ManualInstallButton />
-      
-      {/* iOS Safari Install Banner */}
-      <IOSInstallBanner />
       
       {/* PWA Update Prompts */}
       <UpdatePrompt />
