@@ -3,7 +3,15 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
 
 const gameLetters = [
+  { id: "s", title: "Glas S (sredina/konec)", description: "Igraj kače in lestve in vadi glas S", image: "zmajcek_crka_S.png" },
+  { id: "z", title: "Glas Z (sredina/konec)", description: "Igraj kače in lestve in vadi glas Z", image: "zmajcek_crka_Z.png" },
   { id: "c", title: "Glas C (sredina/konec)", description: "Igraj kače in lestve in vadi glas C", image: "zmajcek_crka_C.png" },
+  { id: "sh", title: "Glas Š (sredina/konec)", description: "Igraj kače in lestve in vadi glas Š", image: "zmajcek_crka_SH.png" },
+  { id: "zh", title: "Glas Ž (sredina/konec)", description: "Igraj kače in lestve in vadi glas Ž", image: "zmajcek_crka_ZH.png" },
+  { id: "ch", title: "Glas Č (sredina/konec)", description: "Igraj kače in lestve in vadi glas Č", image: "zmajcek_crka_CH.png" },
+  { id: "k", title: "Glas K (sredina/konec)", description: "Igraj kače in lestve in vadi glas K", image: "zmajcek_crka_K.png" },
+  { id: "l", title: "Glas L (sredina/konec)", description: "Igraj kače in lestve in vadi glas L", image: "zmajcek_crka_L.png" },
+  { id: "r", title: "Glas R (sredina/konec)", description: "Igraj kače in lestve in vadi glas R", image: "zmajcek_crka_R.png" },
   { id: "r-zacetek", title: "Glas R - začetne vaje", description: "Igraj kače in lestve in vadi glas R - začetne vaje", image: "zmajcek_crka_R.png" },
 ];
 
