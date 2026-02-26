@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 
 import { useNavigate } from "react-router-dom";
-import { BookOpen, Users, Mail, Gamepad2, User, Building2, CreditCard, HelpCircle } from "lucide-react";
+import { BookOpen, Users, Mail, Gamepad2, User, Building2, CreditCard, HelpCircle, Headphones, Mic, MessageSquare, LayoutDashboard } from "lucide-react";
 
 const infoCards = [
   { icon: BookOpen, title: "Kako deluje\nTomiTalk", path: "/kako-deluje", color: "text-dragon-green" },
@@ -12,6 +12,10 @@ const infoCards = [
   { icon: Building2, title: "Za organizacije", path: "/za-podjetja", color: "text-app-blue" },
   { icon: CreditCard, title: "Cenik", path: "/cenik", color: "text-dragon-green" },
   { icon: HelpCircle, title: "Pomoč in\npodpora", path: "/pomoc-in-podpora", color: "text-yellow-500" },
+  { icon: Headphones, title: "Poslušanje", path: "/info-poslusanje", color: "text-rose-500" },
+  { icon: Mic, title: "Govor", path: "/info-govor", color: "text-app-orange" },
+  { icon: MessageSquare, title: "Jezik", path: "/info-jezik", color: "text-app-blue" },
+  { icon: LayoutDashboard, title: "Moja stran", path: "/info-moja-stran", color: "text-dragon-green" },
 ];
 
 const Informacije = () => {
