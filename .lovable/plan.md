@@ -1,46 +1,69 @@
 
 
-# Spremembe na informacijskih straneh
+# Premik AI Klepeta v hamburger meni in poenostavitev v "messenger" stil
 
-## 1. KakoDeluje.tsx -- Sprememba naslova tocke 1
-- Vrstica 19: "1. Uvod -- Kaj je TomiTalk in komu je namenjen" se spremeni v "1. Kaj je TomiTalk in komu je namenjen"
+## Povzetek
+Klepet (prej "AI Klepet") se odstrani iz strani /profile in se premakne pod hamburger meni kot poseben zavihek pod "NASTAVITVE". Poleg tega se klepet poenostavi tako, da ima uporabnik samo eno neprekinjeno zgodovino pogovorov (messenger stil) -- brez vec locenih pogovorov in brez gumba "+ Nov pogovor".
 
-## 2. KakoDeluje.tsx -- Odstranitev footerja
-- Odstranimo import `FooterSection` (vrstica 2)
-- Odstranimo `<FooterSection />` (vrstica 839)
+## Spremembe
 
-## 3. Informacije.tsx -- Odstranitev footerja
-- Odstranimo import `FooterSection` (vrstica 2)
-- Odstranimo `<FooterSection />` (vrstica 48)
+### 1. Dodaj "KLEPET" gumb v hamburger meni (MobileMenu.tsx)
+- V sekciji "Nastavitve" (pod "Moja narocnina") dodaj nov gumb **Klepet** z ikono `MessageCircle`
+- Ob kliku odpre novo stran `/klepet`
 
-## 4. Informacije.tsx -- Sprememba kartice /delovanje-testa
-- Vrstica 10: naslov se spremeni iz "Kako delujejo\nigre" v "Preverjanje\nizgovorjave"
-- Ikona ostane ali se zamenja v ustreznejso (npr. Mic ali ohranimo Gamepad2)
+### 2. Dodaj "KLEPET" gumb v desktop navigacijo (DesktopNavigation.tsx)
+- Dodaj gumb "Klepet" pod zavihek "Nastavitve" v desktop headerju (ali kot locen zavihek poleg nastavitev)
 
-## 5. Odstranitev footerja s podstrani
-Naslednje strani dobijo footer odstranjen:
-- **KdoSmo.tsx** (vrstica 61) -- odstranimo import in `<FooterSection />`
-- **Kontakt.tsx** (vrstica 27) -- odstranimo import in `<FooterSection />`
-- **DelovanjeTest.tsx** (vrstica 23) -- odstranimo import in `<FooterSection />`
-- **ZaPosameznike.tsx** -- nima footerja, ostane kot je
-- **ZaPodjetja.tsx** -- nima footerja, ostane kot je
-- **PomocInPodpora.tsx** -- nima footerja, ostane kot je
+### 3. Ustvari novo stran /klepet (src/pages/Klepet.tsx)
+- Samostojna stran s headerjem in ChatInterface komponento
+- Polna visina zaslona za messenger obcutek
 
-## 6. PomocInPodpora.tsx in ZaPodjetja.tsx -- "Stran v izdelavi" z zmajckom
-Obe strani dobita:
-- Sliko iz bucketa: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_stran_v_izdelavi.webp`
-- Obvestilo: "Stran je trenutno v izdelavi. Kmalu bo na voljo."
-- Odstranimo gumb "Nazaj" in zamenjamo z lepso postavitvijo (centriran zmajcek + besedilo)
+### 4. Registriraj novo pot v routes (src/config/routes.tsx)
+- Dodaj lazy-loaded route za `/klepet`
 
-### Tehnicni povzetek
-Skupno se ureja 7 datotek:
-1. `src/pages/KakoDeluje.tsx` -- naslov tocke 1 + odstranitev footerja
-2. `src/pages/Informacije.tsx` -- odstranitev footerja + sprememba kartice
-3. `src/pages/KdoSmo.tsx` -- odstranitev footerja
-4. `src/pages/Kontakt.tsx` -- odstranitev footerja
-5. `src/pages/DelovanjeTest.tsx` -- odstranitev footerja
-6. `src/pages/PomocInPodpora.tsx` -- "v izdelavi" dizajn z zmajckom
-7. `src/pages/ZaPodjetja.tsx` -- "v izdelavi" dizajn z zmajckom
+### 5. Poenostavi useChatAssistant hook
+- Namesto 5 locenih pogovorov: uporabnik ima samo **eno** conversation (messenger stil)
+- Ob prvem sporocilu se ustvari conversation (ce se ne obstaja), sicer se uporabi obstojecega
+- Ob nalaganju se avtomatsko nalozi vsa zgodovina sporocil
+- Odstrani: `conversations` seznam, `loadConversation`, `startNewConversation`, `activeConversationId`
+- Dodaj: avtomatsko nalaganje edine konverzacije ob inicializaciji
 
-Nobena igra ali canvas komponenta ni prizadeta.
+### 6. Poenostavi ChatInterface.tsx
+- Odstrani vrstico s preteklimi pogovori (conversation history bar) in gumb "+ Nov pogovor"
+- Ohrani vse ostalo: predlagana vprasanja, sporocila, input, disclaimer
+
+### 7. Odstrani klepet iz /profile
+- Iz ProfileSidebar.tsx odstrani "AI Klepet" vnos
+- Iz ProfileMobileTabs.tsx odstrani "AI Klepet" tab
+- Iz Profile.tsx odstrani prikaz AIChatSection
+- AIChatSection.tsx se lahko ohrani ali preoblikuje za uporabo na novi strani
+
+---
+
+## Tehnicni podrobnosti
+
+### useChatAssistant -- nova logika (messenger stil)
+```text
+1. Ob mount-u (useEffect):
+   - Poisci prvo (edino) chat_conversation za user_id
+   - Ce obstaja: nalozi vsa sporocila iz chat_messages
+   - Ce ne obstaja: ne naredi nicesar (ustvari ob prvem sporocilu)
+
+2. Ob posiljanju sporocila:
+   - Ce ni conversation: ustvari eno z naslovom "Klepet"
+   - Shrani user sporocilo
+   - Poklic edge function
+   - Shrani assistant odgovor
+```
+
+### Datoteke za urejanje:
+1. `src/hooks/useChatAssistant.ts` -- poenostavitev na 1 konverzacijo
+2. `src/components/chat/ChatInterface.tsx` -- odstranitev conversation bar
+3. `src/components/header/MobileMenu.tsx` -- dodaj Klepet gumb
+4. `src/components/header/DesktopNavigation.tsx` -- dodaj Klepet gumb
+5. `src/components/profile/ProfileSidebar.tsx` -- odstrani AI Klepet
+6. `src/components/profile/ProfileMobileTabs.tsx` -- odstrani AI Klepet tab
+7. `src/pages/Profile.tsx` -- odstrani AIChatSection
+8. `src/pages/Klepet.tsx` -- nova stran (ustvari)
+9. `src/config/routes.tsx` -- dodaj route
 
