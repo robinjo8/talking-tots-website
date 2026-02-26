@@ -136,7 +136,7 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
               value={input}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
-              placeholder="Vprašajte o govorno-jezikovnem razvoju..."
+              placeholder="Vnesite sporočilo"
               className="min-h-[44px] max-h-[120px] resize-none pr-12 rounded-xl"
               rows={1}
               disabled={isLoading}
@@ -170,12 +170,12 @@ export function ChatInterface({ childContext }: ChatInterfaceProps) {
 
       {/* Disclaimer */}
       <div className="px-4 pt-1 pb-2">
-        <p className="text-[11px] text-muted-foreground text-center leading-relaxed">
-          Vsebino je ustvaril AI model na podlagi strokovnih logopedskih smernic; kljub temu so možne napake ali odstopanja.{" "}
+        <div className="text-[11px] text-muted-foreground text-justify sm:text-center leading-relaxed">
+          <p>Vsebino je ustvaril AI model na podlagi strokovnih logopedskih smernic; kljub temu so možne napake ali odstopanja.</p>
           <Link to="/kontakt" className="underline hover:text-foreground transition-colors">
             Sporočite nam svoje mnenje.
           </Link>
-        </p>
+        </div>
       </div>
     </div>
   );
