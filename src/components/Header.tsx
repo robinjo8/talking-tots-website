@@ -18,24 +18,7 @@ export default function Header() {
   } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { canInstall, promptInstall, isIOSDevice, isStandalone, isInstalled } = usePWA();
-  const showInstall = (!isStandalone && !isInstalled) && (isIOSDevice || canInstall);
   const { isSubscribed, isLoading } = useSubscriptionContext();
-  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
-
-  const handleInstallClick = async () => {
-    try {
-      if (canInstall) {
-        await promptInstall();
-      } else if (isIOSDevice) {
-        toast.info("Za namestitev na iOS: Share → Add to Home Screen");
-      } else {
-        toast.message("Namestitev ni na voljo na tej napravi.");
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
   
   const handleStartNow = () => {
     // If not logged in, redirect to login page
