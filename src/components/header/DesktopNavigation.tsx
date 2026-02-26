@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Building2, Info } from "lucide-react";
+import { Building2, Info, MessageCircle } from "lucide-react";
 import { UserProfile } from "@/components/auth/UserProfile";
 import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
 import { SubscriptionRequiredModal } from "@/components/subscription/SubscriptionRequiredModal";
@@ -161,6 +161,15 @@ export function DesktopNavigation({ user, onStartNow }: DesktopNavigationProps) 
         
         {/* Right side - user profile or login buttons */}
         <div className="flex items-center gap-2">
+          {user && (
+            <button
+              onClick={() => navigate('/klepet')}
+              className="w-9 h-9 rounded-full border border-border flex items-center justify-center hover:bg-accent transition-colors"
+              aria-label="Klepet"
+            >
+              <MessageCircle className="w-5 h-5 text-muted-foreground" />
+            </button>
+          )}
           <button
             onClick={() => navigate('/informacije')}
             className="w-9 h-9 rounded-full border border-border flex items-center justify-center hover:bg-accent transition-colors"
