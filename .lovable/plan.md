@@ -1,51 +1,26 @@
 
+# Popravki klepeta -- zeleno polje, disclaimer, placeholder
 
-# Popravek postavitve strani Klepet -- fiksni elementi in scrollanje
+## 1. Zeleno polje tik pod headerjem na mobilni verziji
+Trenutno ima container `pt-24 md:pt-32` (ali `pt-36` z bannerjem), kar ustvari presledek med app headerjem in zelenim poljem. Na mobilni verziji odstranimo ta padding, da bo zeleno polje tik pod headerjem. Na desktop verziji ohranimo obstoječi padding.
 
-## Problem
-Trenutno se ob scrollanju premikajo vsi elementi (zeleni header, sporočila, vnosno polje). Uporabnik želi:
-- **Fiksen zeleni header** ("Klepet - Tomi") na vrhu
-- **Fiksno vnosno polje** na dnu
-- **Scrollanje samo sporočil** v sredini
-- Na mobilni verziji naj klepet zapolni celoten zaslon pod glavnim headerjem
+**Datoteka:** `src/pages/Klepet.tsx` (vrstica 69-71)
+- Spremenimo padding: na mobilni `pt-0`, na desktop ohranimo `md:pt-32` (oz. `md:pt-44` z bannerjem)
+- Prilagodimo: `bannerVisible ? 'md:pt-44' : 'md:pt-32'` (brez `pt-24`/`pt-36` za mobilno)
 
-## Spremembe
+## 2. Disclaimer besedilo -- dve vrstici na desktop, poravnano na mobilni
+Trenutno je vse v enem `<p>` elementu. Spremenimo v dve ločeni vrstici:
+- Vrstica 1: "Vsebino je ustvaril AI model na podlagi strokovnih logopedskih smernic; kljub temu so možne napake ali odstopanja."
+- Vrstica 2: "Sporočite nam svoje mnenje." (kot link)
+- Na mobilni verziji obojestransko poravnano (`text-justify sm:text-center`)
 
-### 1. Klepet.tsx -- celozaslonska postavitev
-- Uporabi `h-screen` in `flex flex-col` za celotno stran
-- Header aplikacije ostane fiksen na vrhu
-- Klepet container zapolni preostali prostor z `flex-1 overflow-hidden`
-- Odstrani `min-h-[60vh]` in nepotrebne wrapper-je
-- Na mobilni verziji odstrani padding in border/shadow za pravi messenger občutek
+**Datoteka:** `src/components/chat/ChatInterface.tsx` (vrstice 172-179)
 
-### 2. ChatInterface.tsx -- pravilna flex struktura
-- Messages area: `flex-1 overflow-y-auto` (samo ta del se scrolla)
-- Input area: ostane na dnu brez scrollanja (že ima `border-t`)
-- Disclaimer: ostane fiksen pod vnosnim poljem
-- Zamenjaj `ScrollArea` komponento z navadnim `overflow-y-auto` div-om za bolj zanesljivo scrollanje
+## 3. Placeholder besedilo
+Zamenjaj `"Vprašajte o govorno-jezikovnem razvoju..."` z `"Vnesite sporočilo"`.
 
-## Tehnicne podrobnosti
+**Datoteka:** `src/components/chat/ChatInterface.tsx` (vrstica 139)
 
-### Klepet.tsx -- nova struktura:
-```text
-div (h-screen, flex flex-col)
-  Header (fiksni app header)
-  div (flex-1, overflow-hidden, flex flex-col)  <-- zapolni preostali prostor
-    div (zeleni header -- fiksen)
-    ChatInterface (flex-1, overflow-hidden)
-```
-
-### ChatInterface.tsx -- nova struktura:
-```text
-div (flex flex-col, h-full)
-  div (flex-1, overflow-y-auto)  <-- SAMO ta del scrolla
-    sporočila...
-  div (border-t, bg-background)  <-- fiksno na dnu
-    input form
-  div (disclaimer)  <-- fiksno na dnu
-```
-
-### Datoteke za urejanje:
-1. `src/pages/Klepet.tsx` -- celozaslonska postavitev
-2. `src/components/chat/ChatInterface.tsx` -- zamenjaj ScrollArea z overflow-y-auto
-
+## Datoteke za urejanje
+1. `src/pages/Klepet.tsx` -- odstrani mobilni padding za zeleno polje tik pod headerjem
+2. `src/components/chat/ChatInterface.tsx` -- disclaimer v dve vrstici + nov placeholder
