@@ -5,6 +5,7 @@ interface DiceRollerProps {
   currentStep: number;
   onRollComplete: (result: number) => void;
   inline?: boolean;
+  forcedResult?: number;
 }
 
 // Final rotations to show each number (matching the 3D cube faces)
@@ -55,7 +56,7 @@ function DiceDots({ count }: { count: number }) {
   );
 }
 
-export function DiceRoller({ isVisible, currentStep, onRollComplete, inline = false }: DiceRollerProps) {
+export function DiceRoller({ isVisible, currentStep, onRollComplete, inline = false, forcedResult }: DiceRollerProps) {
   const [rotation, setRotation] = useState('rotateX(0deg) rotateY(0deg)');
   const [isSpinning, setIsSpinning] = useState(false);
   const [hasClicked, setHasClicked] = useState(false);
@@ -84,8 +85,10 @@ export function DiceRoller({ isVisible, currentStep, onRollComplete, inline = fa
         if (spinCount >= maxSpins) {
           clearInterval(spinInterval);
           
-          // Generate final result
-          const finalResult = Math.floor(Math.random() * 6) + 1;
+          // Generate final result (use forced if provided, else random)
+          const finalResult = (forcedResult && forcedResult >= 1 && forcedResult <= 6)
+            ? forcedResult
+            : Math.floor(Math.random() * 6) + 1;
           setRotation(finalRotations[finalResult]);
           setIsSpinning(false);
           
