@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Menu, LogOut, Home, Speech, BookOpen, Ear, CreditCard, Settings, Building2, Info } from "lucide-react";
+import { Menu, LogOut, Home, Speech, BookOpen, Ear, CreditCard, Settings, Building2, Info, MessageCircle } from "lucide-react";
 import { LipsIcon } from "@/components/icons/LipsIcon";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ProfileSelector } from "./ProfileSelector";
@@ -245,6 +245,16 @@ export function MobileMenu({
                 })}>
                       <CreditCard className="h-4 w-4 mr-2" />
                       Moja naročnina
+                    </Button>
+                    
+                    {/* Klepet */}
+                    <Button 
+                      variant="ghost" 
+                      className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/klepet') ? 'bg-accent' : ''}`} 
+                      onClick={() => handleNavigate('/klepet')}
+                    >
+                      <MessageCircle className="h-4 w-4 mr-2" />
+                      Klepet
                     </Button>
                     
                     {/* Obvestila - removed, now in header bell */}

@@ -133,6 +133,7 @@ const InfoPoslusanje = lazy(() => import("@/pages/InfoPoslusanje"));
 const InfoGovor = lazy(() => import("@/pages/InfoGovor"));
 const InfoJezik = lazy(() => import("@/pages/InfoJezik"));
 const InfoMojaStran = lazy(() => import("@/pages/InfoMojaStran"));
+const Klepet = lazy(() => import("@/pages/Klepet"));
 
 export function AppRoutes() {
   return (
@@ -239,6 +240,7 @@ export function AppRoutes() {
       <Route path="/video-navodila" element={<ProtectedLazyRoute><VideoNavodila /></ProtectedLazyRoute>} />
       <Route path="/video-navodila/:letter" element={<ProtectedLazyRoute><VideoNavodilaRouter /></ProtectedLazyRoute>} />
       <Route path="/pomoc-chat" element={<ProtectedLazyRoute><PomocChat /></ProtectedLazyRoute>} />
+      <Route path="/klepet" element={<ProtectedLazyRoute><Klepet /></ProtectedLazyRoute>} />
       
       {/* Informational pages - lazy */}
       <Route path="/logopedski-koticek" element={<LazyRoute><LogopedskiKoticek /></LazyRoute>} />
