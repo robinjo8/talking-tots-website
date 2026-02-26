@@ -449,7 +449,7 @@ export function KaceLestveBoard({ players, activePlayerIdx = 0, onAvatarLanded, 
           if (displayPos <= START_POSITION) {
             targetRow = ROWS - 1;
             targetCol = 0;
-          } else if (displayPos >= BOARD_SIZE) {
+          } else if (displayPos >= GOAL_POSITION) {
             targetRow = 0;
             targetCol = COLS - 1;
           } else {
