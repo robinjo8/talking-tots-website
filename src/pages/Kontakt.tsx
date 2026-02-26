@@ -1,5 +1,5 @@
 import Header from "@/components/Header";
-import { FooterSection } from "@/components/home/FooterSection";
+
 
 const Kontakt = () => {
   return (
@@ -24,7 +24,7 @@ const Kontakt = () => {
         </div>
       </div>
       
-      <FooterSection />
+      
     </div>
   );
 };

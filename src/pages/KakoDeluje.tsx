@@ -1,5 +1,5 @@
 import Header from "@/components/Header";
-import { FooterSection } from "@/components/home/FooterSection";
+
 
 const KakoDeluje = () => {
   return (
@@ -16,7 +16,7 @@ const KakoDeluje = () => {
           {/* 1. Uvod */}
           <section>
             <h2 className="text-2xl font-semibold text-foreground mb-4">
-              1. Uvod – Kaj je TomiTalk in komu je namenjen
+              1. Kaj je TomiTalk in komu je namenjen
             </h2>
             <p className="text-muted-foreground leading-relaxed">
               TomiTalk je slovenska digitalna aplikacija, razvita v sodelovanju z logopedi, namenjena otrokom od 3 do 10 let za podporo razvoju govora.
@@ -836,7 +836,6 @@ const KakoDeluje = () => {
         </div>
       </div>
 
-      <FooterSection />
     </div>
   );
 };

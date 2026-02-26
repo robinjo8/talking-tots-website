@@ -1,5 +1,5 @@
 import Header from "@/components/Header";
-import { FooterSection } from "@/components/home/FooterSection";
+
 
 const DelovanjeTest = () => {
   return (
@@ -20,7 +20,7 @@ const DelovanjeTest = () => {
         </div>
       </main>
 
-      <FooterSection />
+      
     </div>
   );
 };
