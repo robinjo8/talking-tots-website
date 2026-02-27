@@ -41,7 +41,7 @@ export const ponoviPovedK: PonoviPovedConfig = {
         { word: "kapo", image: "kapa1.webp", audio: "Kapo.mp3" }
       ],
       fullSentence: "Kača ima kapo.",
-      audio: "kaca_ima_kapo.m4a"
+      audio: "Kaca_ima_kapo.mp3"
     },
     {
       words: [
@@ -50,7 +50,7 @@ export const ponoviPovedK: PonoviPovedConfig = {
         { word: "kost", image: "kost1.webp", audio: "Kost.mp3" }
       ],
       fullSentence: "Kuža vidi kost.",
-      audio: "kuza_vidi_kost.m4a"
+      audio: "Kuza_vidi_kost.mp3"
     },
     {
       words: [
@@ -59,7 +59,7 @@ export const ponoviPovedK: PonoviPovedConfig = {
         { word: "krog", image: "krog1.webp", audio: "Krog.mp3" }
       ],
       fullSentence: "Koza riše krog.",
-      audio: "koza_rise_krog.m4a"
+      audio: "Koza_rise_krog.mp3"
     },
     {
       words: [
@@ -68,7 +68,7 @@ export const ponoviPovedK: PonoviPovedConfig = {
         { word: "koruzo", image: "koruza1.webp", audio: "Koruzo.mp3" }
       ],
       fullSentence: "Kokoš je koruzo.",
-      audio: "kokos_je_koruzo.m4a"
+      audio: "Kokos_je_koruzo.mp3"
     }
   ]
 };
@@ -85,7 +85,7 @@ export const ponoviPovedL: PonoviPovedConfig = {
         { word: "list", image: "list1.webp", audio: "List.mp3" }
       ],
       fullSentence: "Lisica je list.",
-      audio: "lisica_je_list.m4a"
+      audio: "Lisica_je_list.mp3"
     },
     {
       words: [
@@ -94,7 +94,7 @@ export const ponoviPovedL: PonoviPovedConfig = {
         { word: "led", image: "led1.webp", audio: "Led.mp3" }
       ],
       fullSentence: "Lev nese led.",
-      audio: "lev_nese_led.m4a"
+      audio: "Lev_nese_led.mp3"
     },
     {
       words: [
@@ -103,7 +103,7 @@ export const ponoviPovedL: PonoviPovedConfig = {
         { word: "letalo", image: "letalo1.webp", audio: "Letalo.mp3" }
       ],
       fullSentence: "Lovec vidi letalo.",
-      audio: "lovec_vidi_letalo.m4a"
+      audio: "Lovec_vidi_letalo.mp3"
     },
     {
       words: [
@@ -112,7 +112,7 @@ export const ponoviPovedL: PonoviPovedConfig = {
         { word: "liziko", image: "lizika1.webp", audio: "Liziko.mp3" }
       ],
       fullSentence: "Slon ima liziko.",
-      audio: "slon_ima_liziko.m4a"
+      audio: "Slon_ima_liziko.mp3"
     }
   ]
 };
@@ -129,7 +129,7 @@ export const ponoviPovedR: PonoviPovedConfig = {
         { word: "raka", image: "rak1.webp", audio: "Raka.mp3" }
       ],
       fullSentence: "Riba vidi raka.",
-      audio: "riba_vidi_raka.m4a"
+      audio: "Riba_vidi_raka.mp3"
     },
     {
       words: [
@@ -138,7 +138,7 @@ export const ponoviPovedR: PonoviPovedConfig = {
         { word: "repo", image: "repa1.webp", audio: "Repo.mp3" }
       ],
       fullSentence: "Raca je repo.",
-      audio: "raca_je_repo.m4a"
+      audio: "Raca_je_repo.mp3"
     },
     {
       words: [
@@ -147,7 +147,7 @@ export const ponoviPovedR: PonoviPovedConfig = {
         { word: "rožo", image: "roza1.webp", audio: "Rozo.mp3" }
       ],
       fullSentence: "Ris riše rožo.",
-      audio: "ris_rise_rozo.m4a"
+      audio: "Ris_rise_rozo.mp3"
     },
     {
       words: [
@@ -156,7 +156,7 @@ export const ponoviPovedR: PonoviPovedConfig = {
         { word: "rolko", image: "rolka1.webp", audio: "Rolko.mp3" }
       ],
       fullSentence: "Robot ima rolko.",
-      audio: "robot_ima_rolko.m4a"
+      audio: "Robot_ima_rolko.mp3"
     }
   ]
 };
@@ -173,7 +173,7 @@ export const ponoviPovedS: PonoviPovedConfig = {
         { word: "sir", image: "sir1.webp", audio: "Sir.mp3" }
       ],
       fullSentence: "Sova nese sir.",
-      audio: "sova_nese_sir.m4a"
+      audio: "Sova_nese_sir.mp3"
     },
     {
       words: [
@@ -182,7 +182,7 @@ export const ponoviPovedS: PonoviPovedConfig = {
         { word: "sladoled", image: "sladoled1.webp", audio: "Sladoled.mp3" }
       ],
       fullSentence: "Slon je sladoled.",
-      audio: "slon_je_sladoled.m4a"
+      audio: "Slon_je_sladoled.mp3"
     },
     {
       words: [
@@ -191,7 +191,7 @@ export const ponoviPovedS: PonoviPovedConfig = {
         { word: "sneg", image: "sneg1.webp", audio: "Sneg.mp3" }
       ],
       fullSentence: "Snežak vidi sneg.",
-      audio: "snezak_vidi_sneg.m4a"
+      audio: "Snezak_vidi_sneg.mp3"
     },
     {
       words: [
@@ -200,7 +200,7 @@ export const ponoviPovedS: PonoviPovedConfig = {
         { word: "sok", image: "sok1.webp", audio: "Sok.mp3" }
       ],
       fullSentence: "Osa ima sok.",
-      audio: "osa_ima_sok.m4a"
+      audio: "Osa_ima_sok.mp3"
     }
   ]
 };
@@ -217,7 +217,7 @@ export const ponoviPovedZ: PonoviPovedConfig = {
         { word: "zob", image: "zob1.webp", audio: "Zob.mp3" }
       ],
       fullSentence: "Zajec ima zob.",
-      audio: "zajec_ima_zob.m4a"
+      audio: "Zajec_ima_zob.mp3"
     },
     {
       words: [
@@ -226,7 +226,7 @@ export const ponoviPovedZ: PonoviPovedConfig = {
         { word: "zlato", image: "zlato1.webp", audio: "Zlato.mp3" }
       ],
       fullSentence: "Zmaj nese zlato.",
-      audio: "zmaj_nese_zlato.m4a"
+      audio: "Zmaj_nese_zlato.mp3"
     },
     {
       words: [
@@ -235,7 +235,7 @@ export const ponoviPovedZ: PonoviPovedConfig = {
         { word: "zvezdo", image: "zvezda1.webp", audio: "Zvezdo.mp3" }
       ],
       fullSentence: "Zebra vidi zvezdo.",
-      audio: "zebra_vidi_zvezdo.m4a"
+      audio: "Zebra_vidi_zvezdo.mp3"
     },
     {
       words: [
@@ -244,7 +244,7 @@ export const ponoviPovedZ: PonoviPovedConfig = {
         { word: "grozdje", image: "grozdje1.webp", audio: "Grozdje.mp3" }
       ],
       fullSentence: "Meduza je grozdje.",
-      audio: "meduza_je_grozdje.m4a"
+      audio: "Meduza_je_grozdje.mp3"
     }
   ]
 };
@@ -261,7 +261,7 @@ export const ponoviPovedC: PonoviPovedConfig = {
         { word: "cekin", image: "cekin1.webp", audio: "Cekin.mp3" }
       ],
       fullSentence: "Raca nese cekin.",
-      audio: "raca_nese_cekin.m4a"
+      audio: "Raca_nese_cekin.mp3"
     },
     {
       words: [
@@ -270,7 +270,7 @@ export const ponoviPovedC: PonoviPovedConfig = {
         { word: "cvet", image: "cvet1.webp", audio: "Cvet.mp3" }
       ],
       fullSentence: "Muca je cvet.",
-      audio: "muca_je_cvet.m4a"
+      audio: "Muca_je_cvet.mp3"
     },
     {
       words: [
@@ -279,7 +279,7 @@ export const ponoviPovedC: PonoviPovedConfig = {
         { word: "copat", image: "copat1.webp", audio: "Copat.mp3" }
       ],
       fullSentence: "Lovec ima copat.",
-      audio: "lovec_ima_copat.m4a"
+      audio: "Lovec_ima_copat.mp3"
     },
     {
       words: [
@@ -288,7 +288,7 @@ export const ponoviPovedC: PonoviPovedConfig = {
         { word: "cirkus", image: "cirkus1.webp", audio: "Cirkus.mp3" }
       ],
       fullSentence: "Opica vidi cirkus.",
-      audio: "opica_vidi_cirkus.m4a"
+      audio: "Opica_vidi_cirkus.mp3"
     }
   ]
 };
@@ -305,7 +305,7 @@ export const ponoviPovedSH: PonoviPovedConfig = {
         { word: "šopek", image: "sopek1.webp", audio: "Sopek.mp3" }
       ],
       fullSentence: "Šofer nese šopek.",
-      audio: "sofer_nese_sopek.m4a"
+      audio: "Sofer_nese_sopek.mp3"
     },
     {
       words: [
@@ -314,7 +314,7 @@ export const ponoviPovedSH: PonoviPovedConfig = {
         { word: "školjko", image: "skoljka1.webp", audio: "Skoljko.mp3" }
       ],
       fullSentence: "Štorklja je školjko.",
-      audio: "storklja_je_skoljko.m4a"
+      audio: "Storklja_je_skoljko.mp3"
     },
     {
       words: [
@@ -323,7 +323,7 @@ export const ponoviPovedSH: PonoviPovedConfig = {
         { word: "šal", image: "sal1.webp", audio: "Sal.mp3" }
       ],
       fullSentence: "Kokoš ima šal.",
-      audio: "kokos_ima_sal.m4a"
+      audio: "Kokos_ima_sal.mp3"
     },
     {
       words: [
@@ -332,7 +332,7 @@ export const ponoviPovedSH: PonoviPovedConfig = {
         { word: "šotor", image: "sotor1.webp", audio: "Sotor.mp3" }
       ],
       fullSentence: "Miš vidi šotor.",
-      audio: "mis_vidi_sotor.m4a"
+      audio: "Mis_vidi_sotor.mp3"
     }
   ]
 };
@@ -349,7 +349,7 @@ export const ponoviPovedZH: PonoviPovedConfig = {
         { word: "žago", image: "zaga1.webp", audio: "Zago.mp3" }
       ],
       fullSentence: "Žaba želi žago.",
-      audio: "zaba_zeli_zago.m4a"
+      audio: "Zaba_zeli_zago.mp3"
     },
     {
       words: [
@@ -358,7 +358,7 @@ export const ponoviPovedZH: PonoviPovedConfig = {
         { word: "žogo", image: "zoga1.webp", audio: "Zogo.mp3" }
       ],
       fullSentence: "Želva nese žogo.",
-      audio: "zelva_nese_zogo.m4a"
+      audio: "Zelva_nese_zogo.mp3"
     },
     {
       words: [
@@ -367,7 +367,7 @@ export const ponoviPovedZH: PonoviPovedConfig = {
         { word: "žerjav", image: "zerjav1.webp", audio: "Zerjav.mp3" }
       ],
       fullSentence: "Žirafa vidi žerjav.",
-      audio: "zirafa_vidi_zerjav.m4a"
+      audio: "Zirafa_vidi_zerjav.mp3"
     },
     {
       words: [
@@ -376,7 +376,7 @@ export const ponoviPovedZH: PonoviPovedConfig = {
         { word: "žlico", image: "zlica1.webp", audio: "Zlico.mp3" }
       ],
       fullSentence: "Žolna ima žlico.",
-      audio: "zolna_ima_zlico.m4a"
+      audio: "Zolna_ima_zlico.mp3"
     }
   ]
 };
@@ -393,7 +393,7 @@ export const ponoviPovedCH: PonoviPovedConfig = {
         { word: "čoln", image: "coln1.webp", audio: "Coln.mp3" }
       ],
       fullSentence: "Čuvaj ima čoln.",
-      audio: "cuvaj_ima_coln.m4a"
+      audio: "Cuvaj_ima_coln.mp3"
     },
     {
       words: [
@@ -402,7 +402,7 @@ export const ponoviPovedCH: PonoviPovedConfig = {
         { word: "čopič", image: "copic1.webp", audio: "Copic.mp3" }
       ],
       fullSentence: "Čarovnik nese čopič.",
-      audio: "carovnik_nese_copic.m4a"
+      audio: "Carovnik_nese_copic.mp3"
     },
     {
       words: [
@@ -411,7 +411,7 @@ export const ponoviPovedCH: PonoviPovedConfig = {
         { word: "čebulo", image: "cebula1.webp", audio: "Cebulo.mp3" }
       ],
       fullSentence: "Čebela vidi čebulo.",
-      audio: "cebela_vidi_cebulo.m4a"
+      audio: "Cebela_vidi_cebulo.mp3"
     },
     {
       words: [
@@ -420,7 +420,7 @@ export const ponoviPovedCH: PonoviPovedConfig = {
         { word: "čokolado", image: "cokolada1.webp", audio: "Cokolado.mp3" }
       ],
       fullSentence: "Kača je čokolado.",
-      audio: "kaca_je_cokolado.m4a"
+      audio: "Kaca_je_cokolado.mp3"
     }
   ]
 };
@@ -437,7 +437,7 @@ export const ponoviPovedRZacetek: PonoviPovedConfig = {
         { word: "drevo", image: "drevo1.webp", audio: "Drevo.mp3" }
       ],
       fullSentence: "Princ vidi drevo.",
-      audio: "princ_vidi_drevo.m4a"
+      audio: "Princ_vidi_drevo.mp3"
     },
     {
       words: [
@@ -446,7 +446,7 @@ export const ponoviPovedRZacetek: PonoviPovedConfig = {
         { word: "breskev", image: "breskev1.webp", audio: "Breskev.mp3" }
       ],
       fullSentence: "Dron nese breskev.",
-      audio: "dron_nese_breskev.m4a"
+      audio: "Dron_nese_breskev.mp3"
     },
     {
       words: [
@@ -455,7 +455,7 @@ export const ponoviPovedRZacetek: PonoviPovedConfig = {
         { word: "trak", image: "trak1.webp", audio: "Trak.mp3" }
       ],
       fullSentence: "Breza ima trak.",
-      audio: "breza_ima_trak.m4a"
+      audio: "Breza_ima_trak.mp3"
     },
     {
       words: [
@@ -464,7 +464,7 @@ export const ponoviPovedRZacetek: PonoviPovedConfig = {
         { word: "brokoli", image: "brokoli1.webp", audio: "Brokoli.mp3" }
       ],
       fullSentence: "Trava je brokoli.",
-      audio: "trava_je_brokoli.m4a"
+      audio: "Trava_je_brokoli.mp3"
     }
   ]
 };

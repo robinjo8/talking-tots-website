@@ -10,7 +10,7 @@ export function usePuzzleAudio() {
   const playRibaAudio = async () => {
     setIsAudioLoading(true);
     try {
-      const publicUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/riba.m4a";
+      const publicUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/Riba.mp3";
       
       playAudio(publicUrl);
       toast({
@@ -32,7 +32,7 @@ export function usePuzzleAudio() {
   const playRokaAudio = async () => {
     setIsAudioLoading(true);
     try {
-      const publicUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/roka.m4a";
+      const publicUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/Roka.mp3";
       
       playAudio(publicUrl);
       toast({
@@ -54,7 +54,7 @@ export function usePuzzleAudio() {
   const playRozaAudio = async () => {
     setIsAudioLoading(true);
     try {
-      const publicUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/roza.m4a";
+      const publicUrl = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/Roza.mp3";
       
       playAudio(publicUrl);
       toast({
