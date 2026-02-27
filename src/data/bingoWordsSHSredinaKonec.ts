@@ -6,20 +6,20 @@ export interface BingoWord {
 }
 
 export const wordsDataŠSredinaKonec: BingoWord[] = [
-  { word: "HIŠA", image: "hisa1.webp", audio: "hisa.m4a" },
-  { word: "HRUŠKA", image: "hruska1.webp", audio: "hruska.m4a" },
-  { word: "KOKOŠ", image: "kokos1.webp", audio: "kokos.m4a" },
-  { word: "KOŠ", image: "kos1.webp", audio: "kos.m4a" },
-  { word: "KOŠARA", image: "kosara1.webp", audio: "kosara.m4a" },
-  { word: "MIŠ", image: "mis1.webp", audio: "mis.m4a" },
-  { word: "PIŠKOT", image: "piskot1.webp", audio: "piskot.m4a" },
-  { word: "POŠTA", image: "posta1.webp", audio: "posta.m4a" },
-  { word: "TUŠ", image: "tus1.webp", audio: "tus.m4a" },
-  { word: "LEŠNIK", image: "lesnik1.webp", audio: "lesnik.m4a" },
-  { word: "MUŠNICA", image: "musnica1.webp", audio: "musnica.m4a" },
-  { word: "NOGOMETAŠ", image: "nogometas1.webp", audio: "nogometas.m4a" },
-  { word: "OBEŠALNIK", image: "obesalnik1.webp", audio: "obesalnik.m4a" },
-  { word: "PAŠTETA", image: "pasteta1.webp", audio: "pasteta.m4a" },
-  { word: "ROKOMETAŠ", image: "rokometas1.webp", audio: "rokometas.m4a" },
-  { word: "VIŠNJA", image: "visnja1.webp", audio: "visnja.m4a" }
+  { word: "HIŠA", image: "hisa1.webp", audio: "Hisa.mp3" },
+  { word: "HRUŠKA", image: "hruska1.webp", audio: "Hruska.mp3" },
+  { word: "KOKOŠ", image: "kokos1.webp", audio: "Kokos_zival.mp3" },
+  { word: "KOŠ", image: "kos1.webp", audio: "Kos_predmet.mp3" },
+  { word: "KOŠARA", image: "kosara1.webp", audio: "Kosara.mp3" },
+  { word: "MIŠ", image: "mis1.webp", audio: "Mis.mp3" },
+  { word: "PIŠKOT", image: "piskot1.webp", audio: "Piskot.mp3" },
+  { word: "POŠTA", image: "posta1.webp", audio: "Posta.mp3" },
+  { word: "TUŠ", image: "tus1.webp", audio: "Tus.mp3" },
+  { word: "LEŠNIK", image: "lesnik1.webp", audio: "Lesnik.mp3" },
+  { word: "MUŠNICA", image: "musnica1.webp", audio: "Musnica.mp3" },
+  { word: "NOGOMETAŠ", image: "nogometas1.webp", audio: "Nogometas.mp3" },
+  { word: "OBEŠALNIK", image: "obesalnik1.webp", audio: "Obesalnik.mp3" },
+  { word: "PAŠTETA", image: "pasteta1.webp", audio: "Pasteta.mp3" },
+  { word: "ROKOMETAŠ", image: "rokometas1.webp", audio: "Rokometas.mp3" },
+  { word: "VIŠNJA", image: "visnja1.webp", audio: "Visnja.mp3" }
 ];
