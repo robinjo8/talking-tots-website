@@ -5,30 +5,30 @@ import { GenericMetKockeGame } from "@/components/games/GenericMetKockeGame";
 
 // K letter met kocke data
 const bitjeK = [
-  { word: "kača", image: "kaca1.webp", audio: "kaca.m4a" },
-  { word: "kuža", image: "kuza1.webp", audio: "kuza.m4a" },
-  { word: "koza", image: "koza1.webp", audio: "koza.m4a" },
-  { word: "kokoš", image: "kokos1.webp", audio: "kokos.m4a" },
-  { word: "krava", image: "krava1.webp", audio: "krava.m4a" },
-  { word: "klop", image: "klop1.webp", audio: "klop.m4a" },
+  { word: "kača", image: "kaca1.webp", audio: "Kaca.mp3" },
+  { word: "kuža", image: "kuza1.webp", audio: "Kuza.mp3" },
+  { word: "koza", image: "koza1.webp", audio: "Koza_zival.mp3" },
+  { word: "kokoš", image: "kokos1.webp", audio: "Kokos_zival.mp3" },
+  { word: "krava", image: "krava1.webp", audio: "Krava.mp3" },
+  { word: "klop", image: "klop1.webp", audio: "Klop.mp3" },
 ];
 
 const povedekK = [
-  { word: "je", image: "Stickman_jesti.webp", audio: "je.m4a" },
-  { word: "vidi", image: "Stickman_gledati.webp", audio: "vidi.m4a" },
-  { word: "ima", image: "Stickman_imeti.webp", audio: "ima.m4a" },
-  { word: "riše", image: "Stickman_risati.webp", audio: "rise.m4a" },
-  { word: "nese", image: "Stickman_nesti.webp", audio: "nese.m4a" },
-  { word: "želi", image: "Stickman_zeleti.png.webp", audio: "zeli.m4a" },
+  { word: "je", image: "Stickman_jesti.webp", audio: "Je.mp3" },
+  { word: "vidi", image: "Stickman_gledati.webp", audio: "Vidi.mp3" },
+  { word: "ima", image: "Stickman_imeti.webp", audio: "Ima.mp3" },
+  { word: "riše", image: "Stickman_risati.webp", audio: "Rise.mp3" },
+  { word: "nese", image: "Stickman_nesti.webp", audio: "Nese.mp3" },
+  { word: "želi", image: "Stickman_zeleti.png.webp", audio: "Zeli.mp3" },
 ];
 
 const predmetK = [
-  { word: "kocko", image: "kocka1.webp", audio: "kocko.m4a" },
-  { word: "koruzo", image: "koruza1.webp", audio: "koruzo.m4a" },
-  { word: "kost", image: "kost1.webp", audio: "kost.m4a" },
-  { word: "krog", image: "krog1.webp", audio: "krog.m4a" },
-  { word: "knjigo", image: "knjiga1.webp", audio: "knjigo.m4a" },
-  { word: "kumaro", image: "kumara1.webp", audio: "kumaro.m4a" },
+  { word: "kocko", image: "kocka1.webp", audio: "Kocko.mp3" },
+  { word: "koruzo", image: "koruza1.webp", audio: "Koruzo.mp3" },
+  { word: "kost", image: "kost1.webp", audio: "Kost.mp3" },
+  { word: "krog", image: "krog1.webp", audio: "Krog.mp3" },
+  { word: "knjigo", image: "knjiga1.webp", audio: "Knjigo.mp3" },
+  { word: "kumaro", image: "kumara1.webp", audio: "Kumaro.mp3" },
 ];
 
 export default function FreeMetKockeGame() {
