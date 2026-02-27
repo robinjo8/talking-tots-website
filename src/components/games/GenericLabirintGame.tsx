@@ -36,9 +36,11 @@ const enrichImageWithAudio = (image: PuzzleImage): GameImage => {
   let baseName = image.filename.replace('.webp', '').replace('.png', '');
   // Remove trailing '1' suffix (e.g., "cokla1" → "cokla")
   baseName = baseName.replace(/1$/, '');
+  // Capitalize first letter and use .mp3
+  const audioName = baseName.charAt(0).toUpperCase() + baseName.slice(1) + '.mp3';
   return {
     ...image,
-    audio: `${baseName}.m4a`
+    audio: audioName
   };
 };
 

@@ -26,10 +26,10 @@ export function PuzzleCompletionDialog({
   const imageUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike/${completedImage.filename}`;
   const normalizedWord = completedImage.word
     .toLowerCase()
-    .replace(/č/g, 'c')
-    .replace(/š/g, 's')
-    .replace(/ž/g, 'z');
-  const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${normalizedWord}.m4a`;
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+  const capitalizedWord = normalizedWord.charAt(0).toUpperCase() + normalizedWord.slice(1);
+  const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${capitalizedWord}.mp3`;
 
   // Play audio automatically when dialog opens and reset recording state
   useEffect(() => {
