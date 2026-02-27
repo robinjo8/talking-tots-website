@@ -30,6 +30,9 @@ export function DailyStarsBar() {
     staleTime: 10000,
   });
 
+  const maxDaily = 10;
+  const clampedStars = Math.min(dailyStars, maxDaily);
+
   if (!selectedChild) return null;
 
   return (
@@ -38,7 +41,7 @@ export function DailyStarsBar() {
         <div className="flex items-center justify-between">
           <span className="text-white/90 text-sm font-medium">Tvoj dnevni napredek</span>
           <div className="flex items-center gap-1.5">
-            <span className="text-white font-bold text-lg">{dailyStars}</span>
+            <span className="text-white font-bold text-lg">{clampedStars}/{maxDaily}</span>
             <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
           </div>
         </div>
