@@ -65,7 +65,8 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
         .toLowerCase()
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '');
-      const audioFilename = completedImage.audio || `${normalizedWord}.m4a`;
+      const capitalizedWord = normalizedWord.charAt(0).toUpperCase() + normalizedWord.slice(1);
+      const audioFilename = completedImage.audio || `${capitalizedWord}.mp3`;
       const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
       playAudio(audioUrl);
 
@@ -111,8 +112,8 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '');
-    let audioFilename = completedImage.audio || `${normalizedWord}.m4a`;
-    audioFilename = audioFilename.replace(/1\.m4a$/, '.m4a');
+    const capitalizedWord = normalizedWord.charAt(0).toUpperCase() + normalizedWord.slice(1);
+    const audioFilename = completedImage.audio || `${capitalizedWord}.mp3`;
     const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
     playAudio(audioUrl);
   };

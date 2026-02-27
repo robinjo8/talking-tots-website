@@ -327,6 +327,87 @@ const bingoDataRSredinaKonec: BingoWordData[] = [
   { word: "ŽIRAFA", image: "zirafa1.webp", audio: "Zirafa.mp3" },
 ];
 
+const bingoDataSSredinaKonec: BingoWordData[] = [
+  { word: "CESTA", image: "cesta1.webp", audio: "Cesta.mp3" },
+  { word: "CIRKUS", image: "cirkus1.webp", audio: "Cirkus.mp3" },
+  { word: "CISTERNA", image: "cisterna1.webp", audio: "Cisterna.mp3" },
+  { word: "ČASOPIS", image: "casopis1.webp", audio: "Casopis.mp3" },
+  { word: "ČESEN", image: "cesen1.webp", audio: "Cesen.mp3" },
+  { word: "KOKOS", image: "kokos_sadez1.webp", audio: "Kokos_sadez.mp3" },
+  { word: "KOST", image: "kost1.webp", audio: "Kost.mp3" },
+  { word: "LIST", image: "list1.webp", audio: "List.mp3" },
+  { word: "NOS", image: "nos1.webp", audio: "Nos.mp3" },
+  { word: "OSA", image: "osa1.webp", audio: "Osa.mp3" },
+  { word: "PAS", image: "pas1.webp", audio: "Pas.mp3" },
+  { word: "LOS", image: "los1.webp", audio: "Los.mp3" },
+  { word: "ZASLON", image: "zaslon1.webp", audio: "Zaslon.mp3" },
+  { word: "ZAVESA", image: "zavesa1.webp", audio: "Zavesa.mp3" },
+  { word: "LASJE", image: "lasje1.webp", audio: "Lasje.mp3" },
+  { word: "RIS", image: "ris1.webp", audio: "Ris.mp3" },
+  { word: "PES", image: "pes1.webp", audio: "Pes.mp3" },
+];
+
+const bingoDataSHSredinaKonec: BingoWordData[] = [
+  { word: "HIŠA", image: "hisa1.webp", audio: "Hisa.mp3" },
+  { word: "HRUŠKA", image: "hruska1.webp", audio: "Hruska.mp3" },
+  { word: "KOKOŠ", image: "kokos1.webp", audio: "Kokos_zival.mp3" },
+  { word: "KOŠ", image: "kos1.webp", audio: "Kos_predmet.mp3" },
+  { word: "KOŠARA", image: "kosara1.webp", audio: "Kosara.mp3" },
+  { word: "MIŠ", image: "mis1.webp", audio: "Mis.mp3" },
+  { word: "PIŠKOT", image: "piskot1.webp", audio: "Piskot.mp3" },
+  { word: "POŠTA", image: "posta1.webp", audio: "Posta.mp3" },
+  { word: "TUŠ", image: "tus1.webp", audio: "Tus.mp3" },
+  { word: "LEŠNIK", image: "lesnik1.webp", audio: "Lesnik.mp3" },
+  { word: "MUŠNICA", image: "musnica1.webp", audio: "Musnica.mp3" },
+  { word: "NOGOMETAŠ", image: "nogometas1.webp", audio: "Nogometas.mp3" },
+  { word: "OBEŠALNIK", image: "obesalnik1.webp", audio: "Obesalnik.mp3" },
+  { word: "PAŠTETA", image: "pasteta1.webp", audio: "Pasteta.mp3" },
+  { word: "ROKOMETAŠ", image: "rokometas1.webp", audio: "Rokometas.mp3" },
+  { word: "VIŠNJA", image: "visnja1.webp", audio: "Visnja.mp3" },
+];
+
+const bingoDataZSredinaKonec: BingoWordData[] = [
+  { word: "JEZIK", image: "jezik1.webp", audio: "Jezik.mp3" },
+  { word: "KOZA", image: "koza1.webp", audio: "Koza_zival.mp3" },
+  { word: "KOZAREC", image: "kozarec1.webp", audio: "Kozarec.mp3" },
+  { word: "LIZIKA", image: "lizika1.webp", audio: "Lizika.mp3" },
+  { word: "MEDUZA", image: "meduza1.webp", audio: "Meduza.mp3" },
+  { word: "MIZA", image: "miza1.webp", audio: "Miza.mp3" },
+  { word: "SLUZ", image: "sluz1.webp", audio: "Sluz.mp3" },
+  { word: "VAZA", image: "vaza1.webp", audio: "Vaza.mp3" },
+  { word: "ZVEZEK", image: "zvezek1.webp", audio: "Zvezek.mp3" },
+  { word: "ZVEZDA", image: "zvezda.webp", audio: "Zvezda.mp3" },
+  { word: "DINOZAVER", image: "dinozaver1.webp", audio: "Dinozaver.mp3" },
+  { word: "GNEZDO", image: "gnezdo1.webp", audio: "Gnezdo.mp3" },
+  { word: "GROZDJE", image: "grozdje1.webp", audio: "Grozdje.mp3" },
+  { word: "KORUZA", image: "koruza1.webp", audio: "Koruza.mp3" },
+  { word: "TELEVIZIJA", image: "televizija1.webp", audio: "Televizija.mp3" },
+  { word: "VEZALKE", image: "vezalke1.webp", audio: "Vezalke.mp3" },
+  { word: "VOZ", image: "voz1.webp", audio: "Voz.mp3" },
+];
+
+const bingoDataZHSredinaKonec: BingoWordData[] = [
+  { word: "DEŽEVNIK", image: "dezevnik1.webp", audio: "Dezevnik.mp3" },
+  { word: "DEŽNIK", image: "deznik1.webp", audio: "Deznik.mp3" },
+  { word: "FIŽOL", image: "fizol1.webp", audio: "Fizol.mp3" },
+  { word: "KROŽNIK", image: "kroznik1.webp", audio: "Kroznik.mp3" },
+  { word: "KUŽA", image: "kuza1.webp", audio: "Kuza.mp3" },
+  { word: "ROŽA", image: "roza1.webp", audio: "Roza.mp3" },
+  { word: "SNEŽAK", image: "snezak1.webp", audio: "Snezak.mp3" },
+  { word: "GARAŽA", image: "garaza1.webp", audio: "Garaza.mp3" },
+  { word: "KOŽA", image: "koza_skin1.webp", audio: "Koza_cutilo.mp3" },
+  { word: "LUŽA", image: "luza1.webp", audio: "Luza.mp3" },
+  { word: "MOŽGANI", image: "mozgani1.webp", audio: "Mozgani.mp3" },
+  { word: "MREŽA", image: "mreza1.webp", audio: "Mreza.mp3" },
+  { word: "PARADIŽNIK", image: "paradiznik1.webp", audio: "Paradiznik.mp3" },
+  { word: "POŽAR", image: "pozar1.webp", audio: "Pozar.mp3" },
+  { word: "SNEŽINKA", image: "snezinka1.webp", audio: "Snezinka.mp3" },
+  { word: "VERIŽICA", image: "verizica1.webp", audio: "Verizica.mp3" },
+  { word: "JEŽ", image: "jez1.webp", audio: "Jez.mp3" },
+  { word: "MOŽ", image: "moz1.webp", audio: "Moz.mp3" },
+  { word: "POLŽ", image: "polz1.webp", audio: "Polz.mp3" },
+];
+
 // R začetne vaje - wheel data (18 words with consonant clusters)
 const wordsDataRZacetek: WordData[] = [
   { word: "DREVO", image: "drevo1.webp", audio: "Drevo.mp3" },

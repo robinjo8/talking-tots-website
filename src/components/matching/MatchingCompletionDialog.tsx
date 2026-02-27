@@ -80,7 +80,8 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
             .toLowerCase()
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '');
-          const audioFilename = `${normalizedWord}.m4a`;
+          const capitalizedWord = normalizedWord.charAt(0).toUpperCase() + normalizedWord.slice(1);
+          const audioFilename = `${capitalizedWord}.mp3`;
           const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
           
           const audio = new Audio(audioUrl);
@@ -162,7 +163,8 @@ export const MatchingCompletionDialog: React.FC<MatchingCompletionDialogProps> =
         .replace(/[\u0300-\u036f]/g, '');
       // Remove trailing "1" if present
       normalizedWord = normalizedWord.replace(/1$/, '');
-      audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${normalizedWord}.m4a`;
+      const capitalizedWord = normalizedWord.charAt(0).toUpperCase() + normalizedWord.slice(1);
+      audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${capitalizedWord}.mp3`;
     }
     
     playAudio(audioUrl);
