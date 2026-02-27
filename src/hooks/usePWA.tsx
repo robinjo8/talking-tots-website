@@ -37,6 +37,7 @@ export function usePWA(): PWAState & PWAActions {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
+  const [isInstalling, setIsInstalling] = useState(false);
   const [hasUpdate, setHasUpdate] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [swRegistration, setSwRegistration] = useState<ServiceWorkerRegistration | null>(null);
@@ -96,6 +97,7 @@ export function usePWA(): PWAState & PWAActions {
     const handleAppInstalled = () => {
       setIsInstalled(true);
       setIsInstallable(false);
+      setIsInstalling(false);
       setDeferredPrompt(null);
     };
     window.addEventListener('appinstalled', handleAppInstalled);
@@ -120,6 +122,7 @@ export function usePWA(): PWAState & PWAActions {
   const promptInstall = useCallback(async (): Promise<boolean> => {
     if (!deferredPrompt) return false;
     try {
+      setIsInstalling(true);
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       if (outcome === 'accepted') {
@@ -127,9 +130,11 @@ export function usePWA(): PWAState & PWAActions {
         setDeferredPrompt(null);
         return true;
       }
+      setIsInstalling(false);
       return false;
     } catch (error) {
       console.error('Install prompt failed:', error);
+      setIsInstalling(false);
       return false;
     }
   }, [deferredPrompt]);
@@ -178,6 +183,7 @@ export function usePWA(): PWAState & PWAActions {
   return {
     isInstallable,
     isInstalled,
+    isInstalling,
     isStandalone,
     hasUpdate,
     isOnline,
