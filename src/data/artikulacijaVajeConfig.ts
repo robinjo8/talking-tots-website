@@ -344,7 +344,6 @@ const bingoDataSSredinaKonec: BingoWordData[] = [
   { word: "ZAVESA", image: "zavesa1.webp", audio: "Zavesa.mp3" },
   { word: "LASJE", image: "lasje1.webp", audio: "Lasje.mp3" },
   { word: "RIS", image: "ris1.webp", audio: "Ris.mp3" },
-  { word: "PES", image: "pes1.webp", audio: "Pes.mp3" },
 ];
 
 const bingoDataSHSredinaKonec: BingoWordData[] = [
@@ -403,9 +402,6 @@ const bingoDataZHSredinaKonec: BingoWordData[] = [
   { word: "POŽAR", image: "pozar1.webp", audio: "Pozar.mp3" },
   { word: "SNEŽINKA", image: "snezinka1.webp", audio: "Snezinka.mp3" },
   { word: "VERIŽICA", image: "verizica1.webp", audio: "Verizica.mp3" },
-  { word: "JEŽ", image: "jez1.webp", audio: "Jez.mp3" },
-  { word: "MOŽ", image: "moz1.webp", audio: "Moz.mp3" },
-  { word: "POLŽ", image: "polz1.webp", audio: "Polz.mp3" },
 ];
 
 // R začetne vaje - wheel data (18 words with consonant clusters)
