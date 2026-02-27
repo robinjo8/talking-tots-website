@@ -151,9 +151,10 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '');
-    let audioFilename = image.audio || `${normalizedWord}.m4a`;
-    // Remove trailing "1" before .m4a if present (e.g., "cekin1.m4a" → "cekin.m4a")
-    audioFilename = audioFilename.replace(/1\.m4a$/, '.m4a');
+    const capitalizedWord = normalizedWord.charAt(0).toUpperCase() + normalizedWord.slice(1);
+    let audioFilename = image.audio || `${capitalizedWord}.mp3`;
+    // Remove trailing "1" before .mp3 if present (e.g., "Cekin1.mp3" → "Cekin.mp3")
+    audioFilename = audioFilename.replace(/1\.mp3$/, '.mp3');
     const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${audioFilename}`;
     playAudio(audioUrl);
   };
