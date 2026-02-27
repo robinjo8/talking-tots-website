@@ -1,26 +1,74 @@
 
-# Popravki klepeta -- zeleno polje, disclaimer, placeholder
 
-## 1. Zeleno polje tik pod headerjem na mobilni verziji
-Trenutno ima container `pt-24 md:pt-32` (ali `pt-36` z bannerjem), kar ustvari presledek med app headerjem in zelenim poljem. Na mobilni verziji odstranimo ta padding, da bo zeleno polje tik pod headerjem. Na desktop verziji ohranimo obstoječi padding.
+# Izboljšave PWA namestitve - boljša iOS izkušnja in vizualna povratna informacija
 
-**Datoteka:** `src/pages/Klepet.tsx` (vrstica 69-71)
-- Spremenimo padding: na mobilni `pt-0`, na desktop ohranimo `md:pt-32` (oz. `md:pt-44` z bannerjem)
-- Prilagodimo: `bannerVisible ? 'md:pt-44' : 'md:pt-32'` (brez `pt-24`/`pt-36` za mobilno)
+## Zakaj na iOS ni mogoce narediti enako kot na Android
 
-## 2. Disclaimer besedilo -- dve vrstici na desktop, poravnano na mobilni
-Trenutno je vse v enem `<p>` elementu. Spremenimo v dve ločeni vrstici:
-- Vrstica 1: "Vsebino je ustvaril AI model na podlagi strokovnih logopedskih smernic; kljub temu so možne napake ali odstopanja."
-- Vrstica 2: "Sporočite nam svoje mnenje." (kot link)
-- Na mobilni verziji obojestransko poravnano (`text-justify sm:text-center`)
+Apple ne podpira `beforeinstallprompt` API-ja. To je omejitev operacijskega sistema iOS -- nobena spletna aplikacija na svetu ne more ponuditi enoklicne namestitve na iPhone. Edini nacin je rocni postopek v brskalniku Safari (Deli > Dodaj na zacetni zaslon).
 
-**Datoteka:** `src/components/chat/ChatInterface.tsx` (vrstice 172-179)
+Kar PA lahko naredimo je izboljsati celotno izkusnjo:
 
-## 3. Placeholder besedilo
-Zamenjaj `"Vprašajte o govorno-jezikovnem razvoju..."` z `"Vnesite sporočilo"`.
+## Plan izboljsav
 
-**Datoteka:** `src/components/chat/ChatInterface.tsx` (vrstica 139)
+### 1. Boljsi iOS navodila modal z vizualnimi prikazi
+- Dodaj dejanske slike/ikone Safari gumbov (Share ikona, Plus ikona) namesto samo besedila
+- Dodaj animiran poudarek na vsakem koraku (korak 1, 2, 3) da je bolj jasno
+- Dodaj sliko TomiTalk ikone z besedilom "TomiTalk ikona se bo pojavila na tvojem zacetnem zaslonu"
+- Loci iOS 15+ (Share gumb spodaj) od starejsih verzij
+
+### 2. Android: loading indikator po potrditvi namestitve
+- Ko uporabnik na Androidu potrdi namestitev v nativnem dialogu, prikazi animiran loading toast: "TomiTalk se namesca... Ikona bo vidna na zacetnem zaslonu."
+- Po `appinstalled` eventu prikazi uspesno sporocilo: "TomiTalk je namescen! Odpri ga na zacetnem zaslonu."
+- Ce uporabnik zavrne namestitev, prikazi kratek toast: "Namestitev preklicana. Lahko namestis kadarkoli."
+
+### 3. iOS: potrditev po zaprtju navodil
+- Ko uporabnik zapre navodila (klikne "Razumem"), prikazi toast sporocilo: "Ko dokoncas korake, bo TomiTalk ikona vidna na tvojem zacetnem zaslonu."
+- Gumb v modalu naj se preimenuje iz "Razumem" v "Odpri navodila za deljenje" -- bolj akcijsko usmerjeno
+
+### 4. iOS ne-Safari: boljse obvestilo
+- Namesto kratkega toasta, prikazi modal z jasnim sporocilom in gumbom za kopiranje URL-ja, da ga lahko uporabnik prilepi v Safari
+
+## Tehnicne spremembe
+
+### `src/components/pwa/ManualInstallButton.tsx`
+- Dodaj stanje `isInstalling` za Android loading prikaz
+- Izboljsaj iOS navodila modal:
+  - Vecje, jasnejse ikone za Share in Plus gumba
+  - Prikaz TomiTalk ikone s sporocilom "Ikona se pojavi na zaslonu"
+  - Animirani koraki z barvnimi poudarki
+- Dodaj iOS ne-Safari modal (namesto toast) z gumbom "Kopiraj povezavo"
+- Po Android namestitvi prikazi loading toast in nato uspesno sporocilo
+
+### `src/hooks/usePWA.tsx`
+- Dodaj `isInstalling` stanje ki se nastavi med Android namestitvijo
+- Ob `appinstalled` eventu resetiraj `isInstalling` in sproži uspesno sporocilo
+
+### `src/components/pwa/ManualInstallButton.tsx` - iOS ne-Safari modal
+- Nov prikaz: namesto toast.info prikazi modal z:
+  - Sporocilom: "Za namestitev odpri TomiTalk v brskalniku Safari"
+  - Gumb: "Kopiraj povezavo" ki kopira URL v odlozisce
+  - Navodilo: "Prilepi povezavo v Safari in sledi navodilom"
+
+## Kaj se bo spremenilo za uporabnika
+
+**Android uporabnik:**
+1. Klikne "Prenesi aplikacijo"
+2. Pojavi se Chromov nativni dialog
+3. Potrdi -> vidi animirani loading "TomiTalk se namesca..."
+4. Po namestitvi vidi uspesno sporocilo z ikono
+
+**iOS Safari uporabnik:**
+1. Klikne "Prenesi aplikacijo"
+2. Odpre se lep modal z vizualnimi navodili in slikami
+3. Sledi korakom (Deli > Dodaj na zacetni zaslon)
+4. TomiTalk ikona se pojavi na zaslonu
+
+**iOS Chrome/Firefox uporabnik:**
+1. Klikne "Prenesi aplikacijo"
+2. Odpre se modal z razlago in gumbom "Kopiraj povezavo"
+3. Odpre Safari, prilepi povezavo, sledi navodilom
 
 ## Datoteke za urejanje
-1. `src/pages/Klepet.tsx` -- odstrani mobilni padding za zeleno polje tik pod headerjem
-2. `src/components/chat/ChatInterface.tsx` -- disclaimer v dve vrstici + nov placeholder
+- `src/components/pwa/ManualInstallButton.tsx` -- glavne vizualne izboljsave
+- `src/hooks/usePWA.tsx` -- dodaj isInstalling stanje
+
