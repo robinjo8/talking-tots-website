@@ -22,7 +22,4 @@ export const wordsDataŽSredinaKonec: BingoWord[] = [
   { word: "POŽAR", image: "pozar1.webp", audio: "Pozar.mp3" },
   { word: "SNEŽINKA", image: "snezinka1.webp", audio: "Snezinka.mp3" },
   { word: "VERIŽICA", image: "verizica1.webp", audio: "Verizica.mp3" },
-  { word: "JEŽ", image: "jez1.webp", audio: "Jez.mp3" },
-  { word: "MOŽ", image: "moz1.webp", audio: "Moz.mp3" },
-  { word: "POLŽ", image: "polz1.webp", audio: "Polz.mp3" },
 ];

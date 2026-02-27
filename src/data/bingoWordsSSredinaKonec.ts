@@ -22,5 +22,4 @@ export const wordsDataSSredinaKonec: BingoWord[] = [
   { word: "ZAVESA", image: "zavesa1.webp", audio: "Zavesa.mp3" },
   { word: "LASJE", image: "lasje1.webp", audio: "Lasje.mp3" },
   { word: "RIS", image: "ris1.webp", audio: "Ris.mp3" },
-  { word: "PES", image: "pes1.webp", audio: "Pes.mp3" },
 ];
