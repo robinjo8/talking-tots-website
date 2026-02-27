@@ -15,6 +15,7 @@ const DISMISS_DAYS = 7;
 interface PWAState {
   isInstallable: boolean;
   isInstalled: boolean;
+  isInstalling: boolean;
   isStandalone: boolean;
   hasUpdate: boolean;
   isOnline: boolean;
