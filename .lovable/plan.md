@@ -1,79 +1,26 @@
 
+# Popravki klepeta -- zeleno polje, disclaimer, placeholder
 
-# Prehod Spomin in Zaporedja na lokalne podatke (bucket "slike")
+## 1. Zeleno polje tik pod headerjem na mobilni verziji
+Trenutno ima container `pt-24 md:pt-32` (ali `pt-36` z bannerjem), kar ustvari presledek med app headerjem in zelenim poljem. Na mobilni verziji odstranimo ta padding, da bo zeleno polje tik pod headerjem. Na desktop verziji ohranimo obstoječi padding.
 
-## Problem
+**Datoteka:** `src/pages/Klepet.tsx` (vrstica 69-71)
+- Spremenimo padding: na mobilni `pt-0`, na desktop ohranimo `md:pt-32` (oz. `md:pt-44` z bannerjem)
+- Prilagodimo: `bannerVisible ? 'md:pt-44' : 'md:pt-32'` (brez `pt-24`/`pt-36` za mobilno)
 
-Igri **Spomin** in **Zaporedja** pridobivata slike in zvoke iz Supabase **tabel** (npr. `memory_cards_c`, `memory_cards_K`), medtem ko vse ostale igre (Kolo besed, Sestavljanka, Drsna igra, Labirint, Igra ujemanja) uporabljajo lokalne konfiguracijske datoteke z imeni datotek iz bucketa `slike`.
+## 2. Disclaimer besedilo -- dve vrstici na desktop, poravnano na mobilni
+Trenutno je vse v enem `<p>` elementu. Spremenimo v dve ločeni vrstici:
+- Vrstica 1: "Vsebino je ustvaril AI model na podlagi strokovnih logopedskih smernic; kljub temu so možne napake ali odstopanja."
+- Vrstica 2: "Sporočite nam svoje mnenje." (kot link)
+- Na mobilni verziji obojestransko poravnano (`text-justify sm:text-center`)
 
-To povzroca:
-- Dvojno vzdrzevanje podatkov (baza + lokalni config)
-- Neskladnosti med igrami (baza ima `.m4a` avdio, lokalni config `.mp3`)
-- Tezje dodajanje novih besed (treba posodobiti tako bazo kot config)
+**Datoteka:** `src/components/chat/ChatInterface.tsx` (vrstice 172-179)
 
-## Resitev
+## 3. Placeholder besedilo
+Zamenjaj `"Vprašajte o govorno-jezikovnem razvoju..."` z `"Vnesite sporočilo"`.
 
-Ustvariti en skupen lokalni podatkovni vir, ki ga Spomin in Zaporedja uporabljata namesto Supabase tabel. Podatki bodo izpeljani iz ze obstojecih seznamov besed v `artikulacijaVajeConfig.ts`.
+**Datoteka:** `src/components/chat/ChatInterface.tsx` (vrstica 139)
 
-## Tehnicni koraki
-
-### 1. Nova datoteka: `src/data/sharedWordData.ts`
-
-Centralni modul, ki:
-- Uvozi vse `wordsData*` sezname iz `artikulacijaVajeConfig.ts`
-- Pretvori vsak vnos v obliko `{ id, word, image_url, audio_url }` (ista oblika kot jo vracajo DB tabele)
-- Generira `id` z deterministicnim hash-em iz besede (npr. `crypto.randomUUID()` zamenjamo z `word-based-id`)
-- Gradi polne URL-je: `slike/{image}` za slike, `zvocni-posnetki/{audio}` za zvok
-- Izvozi funkcijo `getWordsForLetter(letter: string): SequenceImage[]`
-
-Primer pretvorbe:
-```text
-Vhod (artikulacijaVajeConfig):
-  { word: "CEDILO", image: "cedilo1.webp", audio: "Cedilo.mp3" }
-
-Izhod (sharedWordData):
-  { id: "cedilo-001", word: "CEDILO",
-    image_url: "https://.../slike/cedilo1.webp",
-    audio_url: "https://.../zvocni-posnetki/Cedilo.mp3" }
-```
-
-### 2. Posodobitev `useGenericMemoryGame.tsx` (Spomin)
-
-- Odstraniti Supabase poizvedbo (`supabase.from(tableName).select("*")`)
-- Uvoziti `getWordsForLetter` iz `sharedWordData.ts`
-- Podatke pridobiti sinhrono iz lokalnega vira namesto asinhrono iz baze
-- Ohraniti isto strukturo `MemoryCard` (id, word, image_url, audio_url, flipped, matched, pairId)
-
-### 3. Posodobitev `SequenceGame56Base.tsx` in `SequenceGameBase.tsx` (Zaporedja)
-
-- Odstraniti Supabase poizvedbo
-- Uvoziti `getWordsForLetter` iz `sharedWordData.ts`
-- Podatke pridobiti sinhrono namesto asinhrono
-- Ohraniti isto strukturo `SequenceImage`
-
-### 4. Posodobitev `useSequenceGame.ts`
-
-- Enaka sprememba: zamenjati DB poizvedbo z lokalnimi podatki
-
-### 5. Posodobitev `spominConfig.ts`
-
-- Odstraniti `tableName` in `queryKey` polja
-- Dodati `letterKey` polje, ki se uporablja za klic `getWordsForLetter(letterKey)`
-- Mapiranje: `c` -> `c`, `ch` -> `ch`, `k` -> `k`, `l` -> `l`, `r` -> `r`, `s` -> `s`, `sh` -> `sh`, `z` -> `z`, `zh` -> `zh`, `r-zacetek` -> `r-zacetek`
-
-### 6. Posodobitev `zaporedjaConfig.ts`
-
-- Odstraniti `letterTableMap` in `tableName` polja
-- Dodati `letterKey` polje za klic `getWordsForLetter()`
-
-### 7. Posodobitev vseh starejsih SequenceGame komponent
-
-Datoteke kot `SequenceGameC56.tsx`, `SequenceGameS910.tsx` itd., ki se prenasajo `tableName` prop, bodo namesto tega prenasale `letterKey`.
-
-## Prednosti
-
-- **En vir resnice**: vse igre uporabljajo iste besede iz istih datotek
-- **Brez odvisnosti od baze**: hitrejse nalaganje, ni omreznih napak
-- **Lazje vzdrzevanje**: za dodajanje nove besede popravis samo `artikulacijaVajeConfig.ts`
-- **Konsistenten avdio format**: vse igre uporabljajo `.mp3` iz bucketa `zvocni-posnetki`
-
+## Datoteke za urejanje
+1. `src/pages/Klepet.tsx` -- odstrani mobilni padding za zeleno polje tik pod headerjem
+2. `src/components/chat/ChatInterface.tsx` -- disclaimer v dve vrstici + nov placeholder
