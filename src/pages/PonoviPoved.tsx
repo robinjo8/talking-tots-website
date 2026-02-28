@@ -85,15 +85,6 @@ const ponoviPovedLetters = [
     urlKey: "l"
   },
   {
-    id: "r",
-    letter: "R",
-    gradient: "from-app-purple/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Ponovi povedi z glasom R",
-    path: "/govorne-igre/ponovi-poved/r",
-    urlKey: "r"
-  },
-  {
     id: "r-zacetek",
     letter: "R",
     gradient: "from-app-purple/20 to-app-teal/20",
@@ -101,6 +92,15 @@ const ponoviPovedLetters = [
     description: "Ponovi povedi z glasom R - začetne vaje",
     path: "/govorne-igre/ponovi-poved/r-zacetek",
     urlKey: "r-zacetek"
+  },
+  {
+    id: "r",
+    letter: "R",
+    gradient: "from-app-purple/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
+    description: "Ponovi povedi z glasom R",
+    path: "/govorne-igre/ponovi-poved/r",
+    urlKey: "r"
   }
 ];
 

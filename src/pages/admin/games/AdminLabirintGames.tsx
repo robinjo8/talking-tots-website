@@ -11,8 +11,8 @@ const labirintLetters = [
   { id: "ch", letter: "Č", description: "Poišči pot skozi labirint z glasom Č", image: "zmajcek_crka_CH.png" },
   { id: "k", letter: "K", description: "Poišči pot skozi labirint z glasom K", image: "zmajcek_crka_K.png" },
   { id: "l", letter: "L", description: "Poišči pot skozi labirint z glasom L", image: "zmajcek_crka_L.png" },
-  { id: "r", letter: "R", description: "Poišči pot skozi labirint z glasom R", image: "zmajcek_crka_R.png" },
   { id: "r-zacetek", letter: "R", description: "Poišči pot skozi labirint z glasom R - začetne vaje", image: "zmajcek_crka_R.png" },
+  { id: "r", letter: "R", description: "Poišči pot skozi labirint z glasom R", image: "zmajcek_crka_R.png" },
 ];
 
 export default function AdminLabirintGames() {

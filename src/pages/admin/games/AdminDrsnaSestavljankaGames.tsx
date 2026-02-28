@@ -11,8 +11,8 @@ const drsnaSestavljankaLetters = [
   { id: "ch", letter: "Č", description: "Drsna sestavljanka z glasom Č", image: "zmajcek_crka_CH.png" },
   { id: "k", letter: "K", description: "Drsna sestavljanka z glasom K", image: "zmajcek_crka_K.png" },
   { id: "l", letter: "L", description: "Drsna sestavljanka z glasom L", image: "zmajcek_crka_L.png" },
-  { id: "r", letter: "R", description: "Drsna sestavljanka z glasom R", image: "zmajcek_crka_R.png" },
   { id: "r-zacetek", letter: "R", description: "Drsna sestavljanka z glasom R - začetne vaje", image: "zmajcek_crka_R.png" },
+  { id: "r", letter: "R", description: "Drsna sestavljanka z glasom R", image: "zmajcek_crka_R.png" },
 ];
 
 export default function AdminDrsnaSestavljankaGames() {

@@ -11,8 +11,8 @@ const sestavljankeLetters = [
   { id: "ch", letter: "Č", description: "Sestavi sliko z glasom Č", image: "zmajcek_crka_CH.png" },
   { id: "k", letter: "K", description: "Sestavi sliko z glasom K", image: "zmajcek_crka_K.png" },
   { id: "l", letter: "L", description: "Sestavi sliko z glasom L", image: "zmajcek_crka_L.png" },
-  { id: "r", letter: "R", description: "Sestavi sliko z glasom R", image: "zmajcek_crka_R.png" },
   { id: "r-zacetek", letter: "R", description: "Sestavi sliko z glasom R - začetne vaje", image: "zmajcek_crka_R.png" },
+  { id: "r", letter: "R", description: "Sestavi sliko z glasom R", image: "zmajcek_crka_R.png" },
 ];
 
 export default function AdminSestavljankeGames() {

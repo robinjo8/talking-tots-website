@@ -77,19 +77,19 @@ const memoryGames = [
     available: true
   },
   {
-    id: "sestavljanke-r",
-    letter: "R",
-    gradient: "from-app-purple/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Sestavi sliko z glasom R in nato glasno ponovi besedo",
-    available: true
-  },
-  {
     id: "sestavljanke-r-zacetek",
     letter: "R-zacetek",
     gradient: "from-app-purple/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
     description: "Sestavi sliko z glasom R in nato glasno ponovi besedo - začetne vaje",
+    available: true
+  },
+  {
+    id: "sestavljanke-r",
+    letter: "R",
+    gradient: "from-app-purple/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
+    description: "Sestavi sliko z glasom R in nato glasno ponovi besedo",
     available: true
   }
 ];

@@ -11,8 +11,8 @@ const gameLetters = [
   { id: "ch", title: "Glas Č (sredina/konec)", description: "Igraj kače in lestve in vadi glas Č", image: "zmajcek_crka_CH.png" },
   { id: "k", title: "Glas K (sredina/konec)", description: "Igraj kače in lestve in vadi glas K", image: "zmajcek_crka_K.png" },
   { id: "l", title: "Glas L (sredina/konec)", description: "Igraj kače in lestve in vadi glas L", image: "zmajcek_crka_L.png" },
-  { id: "r", title: "Glas R (sredina/konec)", description: "Igraj kače in lestve in vadi glas R", image: "zmajcek_crka_R.png" },
   { id: "r-zacetek", title: "Glas R - začetne vaje", description: "Igraj kače in lestve in vadi glas R - začetne vaje", image: "zmajcek_crka_R.png" },
+  { id: "r", title: "Glas R (sredina/konec)", description: "Igraj kače in lestve in vadi glas R", image: "zmajcek_crka_R.png" },
 ];
 
 export default function AdminKaceLestveGames() {

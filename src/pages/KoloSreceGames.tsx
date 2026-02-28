@@ -22,8 +22,8 @@ const wheelLetters = [
   { id: "ch", letter: "Č", title: "Glas Č", description: "Zavrti kolo besed in vadi izgovorjavo glasu Č na začetku besed", gradient: "from-app-blue/20 to-app-teal/20", image: "zmajcek_crka_CH.png", path: "/govorne-igre/kolo-srece/ch" },
   { id: "k", letter: "K", title: "Glas K", description: "Zavrti kolo besed in vadi izgovorjavo glasu K na začetku besed", gradient: "from-app-orange/20 to-app-yellow/20", image: "zmajcek_crka_K.png", path: "/govorne-igre/kolo-srece/k" },
   { id: "l", letter: "L", title: "Glas L", description: "Zavrti kolo besed in vadi izgovorjavo glasu L na začetku besed", gradient: "from-app-purple/20 to-app-blue/20", image: "zmajcek_crka_L.png", path: "/govorne-igre/kolo-srece/l" },
-  { id: "r", letter: "R", title: "Glas R", description: "Zavrti kolo besed in vadi izgovorjavo glasu R na začetku besed", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_R.png", path: "/govorne-igre/kolo-srece/r" },
   { id: "r-zacetek", letter: "R", title: "Glas R - začetne vaje", description: "Zavrti kolo besed in vadi izgovorjavo glasu R z začetnimi vajami", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_R.png", path: "/govorne-igre/kolo-srece/r-zacetek" },
+  { id: "r", letter: "R", title: "Glas R", description: "Zavrti kolo besed in vadi izgovorjavo glasu R na začetku besed", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_R.png", path: "/govorne-igre/kolo-srece/r" },
 ];
 
 export default function KoloSreceGames() {

@@ -77,19 +77,19 @@ const sequenceGames = [
     available: true
   },
   {
-    id: "zaporedja-r",
-    letter: "R",
-    gradient: "from-app-purple/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Uredi zaporedje besed z glasom R",
-    available: true
-  },
-  {
     id: "zaporedja-r-zacetek",
     letter: "R-zacetek",
     gradient: "from-app-purple/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
     description: "Uredi zaporedje besed z glasom R - začetne vaje",
+    available: true
+  },
+  {
+    id: "zaporedja-r",
+    letter: "R",
+    gradient: "from-app-purple/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
+    description: "Uredi zaporedje besed z glasom R",
     available: true
   }
 ];
