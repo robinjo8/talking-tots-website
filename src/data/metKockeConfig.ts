@@ -295,6 +295,6 @@ export const metKockeLetters = [
   { id: "ch", letter: "Č", title: "Glas Č", path: "/govorne-igre/met-kocke/ch", gradient: "from-app-blue/20 to-app-teal/20" },
   { id: "k", letter: "K", title: "Glas K", path: "/govorne-igre/met-kocke/k", gradient: "from-app-orange/20 to-app-yellow/20" },
   { id: "l", letter: "L", title: "Glas L", path: "/govorne-igre/met-kocke/l", gradient: "from-app-purple/20 to-app-blue/20" },
-  { id: "r", letter: "R", title: "Glas R", path: "/govorne-igre/met-kocke/r", gradient: "from-app-purple/20 to-app-teal/20" },
   { id: "r-zacetek", letter: "R", title: "Glas R - začetne vaje", path: "/govorne-igre/met-kocke/r-zacetek", gradient: "from-app-purple/20 to-app-teal/20" },
+  { id: "r", letter: "R", title: "Glas R", path: "/govorne-igre/met-kocke/r", gradient: "from-app-purple/20 to-app-teal/20" },
 ];

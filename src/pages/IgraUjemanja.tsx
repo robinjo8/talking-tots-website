@@ -78,19 +78,19 @@ const matchingGames = [
     available: true
   },
   {
-    id: "igra-ujemanja-r",
-    letter: "R",
-    gradient: "from-app-purple/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Poveži besedo z glasom R s pravo sliko",
-    available: true
-  },
-  {
     id: "igra-ujemanja-r-zacetek",
     letter: "R-zacetek",
     gradient: "from-app-purple/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
     description: "Poveži besedo z glasom R s pravo sliko - začetne vaje",
+    available: true
+  },
+  {
+    id: "igra-ujemanja-r",
+    letter: "R",
+    gradient: "from-app-purple/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
+    description: "Poveži besedo z glasom R s pravo sliko",
     available: true
   }
 ];

@@ -85,21 +85,21 @@ const labirintGames = [
     available: true
   },
   {
-    id: "r",
-    letter: "R",
-    gradient: "from-app-purple/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Poišči pot skozi labirint z glasom R",
-    path: "/govorne-igre/labirint/r",
-    available: true
-  },
-  {
     id: "r-zacetek",
     letter: "R",
     gradient: "from-app-purple/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
     description: "Poišči pot skozi labirint z glasom R - začetne vaje",
     path: "/govorne-igre/labirint/r-zacetek",
+    available: true
+  },
+  {
+    id: "r",
+    letter: "R",
+    gradient: "from-app-purple/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
+    description: "Poišči pot skozi labirint z glasom R",
+    path: "/govorne-igre/labirint/r",
     available: true
   }
 ];

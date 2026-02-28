@@ -78,19 +78,19 @@ const memoryGames = [
     available: true
   },
   {
-    id: "drsna-sestavljanka-r",
-    letter: "R",
-    gradient: "from-app-purple/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Drsna igra z glasom R in nato glasno ponovi besedo",
-    available: true
-  },
-  {
     id: "drsna-sestavljanka-r-zacetek",
     letter: "R-zacetek",
     gradient: "from-app-purple/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
     description: "Drsna igra z glasom R in nato glasno ponovi besedo - začetne vaje",
+    available: true
+  },
+  {
+    id: "drsna-sestavljanka-r",
+    letter: "R",
+    gradient: "from-app-purple/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
+    description: "Drsna igra z glasom R in nato glasno ponovi besedo",
     available: true
   }
 ];
