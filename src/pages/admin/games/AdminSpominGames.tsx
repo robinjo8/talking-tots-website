@@ -60,18 +60,18 @@ const memoryGames = [
     description: "Poišči pare slik z glasom L in nato ponovi besedo",
   },
   { 
-    id: "spomin-r",
-    letter: "R",
-    gradient: "from-app-purple/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Poišči pare slik z glasom R in nato ponovi besedo",
-  },
-  { 
     id: "spomin-r-zacetek",
     letter: "R",
     gradient: "from-app-purple/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
     description: "Poišči pare slik z glasom R - začetne vaje",
+  },
+  { 
+    id: "spomin-r",
+    letter: "R",
+    gradient: "from-app-purple/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
+    description: "Poišči pare slik z glasom R in nato ponovi besedo",
   },
 ];
 

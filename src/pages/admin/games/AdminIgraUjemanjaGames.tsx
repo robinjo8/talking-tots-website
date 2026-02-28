@@ -11,8 +11,8 @@ const igraUjemanjaLetters = [
   { id: "ch", letter: "Č", description: "Poveži pare slik z glasom Č", image: "zmajcek_crka_CH.png" },
   { id: "k", letter: "K", description: "Poveži pare slik z glasom K", image: "zmajcek_crka_K.png" },
   { id: "l", letter: "L", description: "Poveži pare slik z glasom L", image: "zmajcek_crka_L.png" },
-  { id: "r", letter: "R", description: "Poveži pare slik z glasom R", image: "zmajcek_crka_R.png" },
   { id: "r-zacetek", letter: "R", description: "Poveži pare slik z glasom R - začetne vaje", image: "zmajcek_crka_R.png" },
+  { id: "r", letter: "R", description: "Poveži pare slik z glasom R", image: "zmajcek_crka_R.png" },
 ];
 
 export default function AdminIgraUjemanjaGames() {

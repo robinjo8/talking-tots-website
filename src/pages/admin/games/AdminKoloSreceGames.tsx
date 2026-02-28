@@ -11,8 +11,8 @@ const wheelLetters = [
   { id: "ch", letter: "Č", title: "Glas Č", description: "Zavrti kolo in vadi izgovorjavo glasu Č", image: "zmajcek_crka_CH.png" },
   { id: "k", letter: "K", title: "Glas K", description: "Zavrti kolo in vadi izgovorjavo glasu K", image: "zmajcek_crka_K.png" },
   { id: "l", letter: "L", title: "Glas L", description: "Zavrti kolo in vadi izgovorjavo glasu L", image: "zmajcek_crka_L.png" },
-  { id: "r", letter: "R", title: "Glas R", description: "Zavrti kolo in vadi izgovorjavo glasu R", image: "zmajcek_crka_R.png" },
   { id: "r-zacetek", letter: "R", title: "Glas R - začetne vaje", description: "Zavrti kolo in vadi izgovorjavo glasu R - začetne vaje", image: "zmajcek_crka_R.png" },
+  { id: "r", letter: "R", title: "Glas R", description: "Zavrti kolo in vadi izgovorjavo glasu R", image: "zmajcek_crka_R.png" },
 ];
 
 export default function AdminKoloSreceGames() {
