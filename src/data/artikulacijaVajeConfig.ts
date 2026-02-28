@@ -41,8 +41,10 @@ const wordsDataC: WordData[] = [
 
 const wordsDataCH: WordData[] = [
   { word: "ČAJ", image: "caj1.webp", audio: "Caj.mp3" },
+  { word: "ČAROVNIK", image: "carovnik1.webp", audio: "Carovnik.mp3" },
   { word: "ČASOPIS", image: "casopis1.webp", audio: "Casopis.mp3" },
   { word: "ČEBELA", image: "cebela1.webp", audio: "Cebela.mp3" },
+  { word: "ČEBELAR", image: "cebelar1.webp", audio: "Cebelar.mp3" },
   { word: "ČEBULA", image: "cebula1.webp", audio: "Cebula.mp3" },
   { word: "ČESEN", image: "cesen1.webp", audio: "Cesen.mp3" },
   { word: "ČEVLJI", image: "cevlji1.webp", audio: "Cevlji.mp3" },
@@ -61,14 +63,18 @@ const wordsDataK: WordData[] = [
   { word: "KLOP", image: "klop1.webp", audio: "Klop.mp3" },
   { word: "KNJIGA", image: "knjiga1.webp", audio: "Knjiga.mp3" },
   { word: "KOCKA", image: "kocka1.webp", audio: "Kocka.mp3" },
+  { word: "KOKOS", image: "kokos_sadez1.webp", audio: "Kokos_sadez.mp3" },
   { word: "KOKOŠ", image: "kokos1.webp", audio: "Kokos_zival.mp3" },
   { word: "KOLAČ", image: "kolac1.webp", audio: "Kolac.mp3" },
   { word: "KOLO", image: "kolo1.webp", audio: "Kolo.mp3" },
-  { word: "KOŠ", image: "kos1.webp", audio: "Kos_predmet.mp3" },
+  { word: "KORUZA", image: "koruza1.webp", audio: "Koruza.mp3" },
+  { word: "KOS", image: "kos_ptica1.webp", audio: "Kos_ptica.mp3" },
   { word: "KOST", image: "kost1.webp", audio: "Kost.mp3" },
+  { word: "KOŠ", image: "kos1.webp", audio: "Kos_predmet.mp3" },
   { word: "KOŠARA", image: "kosara1.webp", audio: "Kosara.mp3" },
   { word: "KOZA", image: "koza1.webp", audio: "Koza_zival.mp3" },
   { word: "KOZAREC", image: "kozarec1.webp", audio: "Kozarec.mp3" },
+  { word: "KOŽA", image: "koza_skin1.webp", audio: "Koza_cutilo.mp3" },
   { word: "KRAVA", image: "krava1.webp", audio: "Krava.mp3" },
   { word: "KROF", image: "krof1.webp", audio: "Krof.mp3" },
   { word: "KROG", image: "krog1.webp", audio: "Krog.mp3" },
@@ -80,15 +86,22 @@ const wordsDataK: WordData[] = [
 
 const wordsDataL: WordData[] = [
   { word: "LADJA", image: "ladja1.webp", audio: "Ladja.mp3" },
+  { word: "LASJE", image: "lasje1.webp", audio: "Lasje.mp3" },
   { word: "LED", image: "led1.webp", audio: "Led.mp3" },
+  { word: "LES", image: "les1.webp", audio: "Les.mp3" },
+  { word: "LEŠNIK", image: "lesnik1.webp", audio: "Lesnik.mp3" },
   { word: "LETALO", image: "letalo1.webp", audio: "Letalo.mp3" },
   { word: "LEV", image: "lev1.webp", audio: "Lev.mp3" },
+  { word: "LISICA", image: "lisica1.webp", audio: "Lisica.mp3" },
   { word: "LIST", image: "list1.webp", audio: "List.mp3" },
   { word: "LIZIKA", image: "lizika1.webp", audio: "Lizika.mp3" },
   { word: "LONEC", image: "lonec1.webp", audio: "Lonec.mp3" },
   { word: "LOPAR", image: "lopar1.webp", audio: "Lopar.mp3" },
+  { word: "LOS", image: "los1.webp", audio: "Los.mp3" },
+  { word: "LOVEC", image: "lovec1.webp", audio: "Lovec.mp3" },
   { word: "LUBENICA", image: "lubenica1.webp", audio: "Lubenica.mp3" },
-  { word: "LUČ", image: "luc1.webp", audio: "Luc.mp3" }
+  { word: "LUČ", image: "luc1.webp", audio: "Luc.mp3" },
+  { word: "LUŽA", image: "luza1.webp", audio: "Luza.mp3" }
 ];
 
 const wordsDataR: WordData[] = [
@@ -99,8 +112,13 @@ const wordsDataR: WordData[] = [
   { word: "REP", image: "rep1.webp", audio: "Rep.mp3" },
   { word: "REPA", image: "repa1.webp", audio: "Repa.mp3" },
   { word: "RIBA", image: "riba1.webp", audio: "Riba.mp3" },
+  { word: "RIBEZ", image: "ribez1.webp", audio: "Ribez.mp3" },
+  { word: "RIBIČ", image: "ribic1.webp", audio: "Ribic.mp3" },
+  { word: "RIS", image: "ris1.webp", audio: "Ris.mp3" },
+  { word: "RIŽ", image: "riz1.webp", audio: "Riz.mp3" },
   { word: "ROBOT", image: "robot1.webp", audio: "Robot.mp3" },
   { word: "ROKA", image: "roka1.webp", audio: "Roka.mp3" },
+  { word: "ROKOMETAŠ", image: "rokometas1.webp", audio: "Rokometas.mp3" },
   { word: "ROLKA", image: "rolka1.webp", audio: "Rolka.mp3" },
   { word: "ROPOTULJICA", image: "ropotuljica1.webp", audio: "Ropotuljica.mp3" },
   { word: "ROŽA", image: "roza1.webp", audio: "Roza.mp3" }
@@ -121,6 +139,7 @@ const wordsDataS: WordData[] = [
   { word: "SOVA", image: "sova1.webp", audio: "Sova.mp3" },
   { word: "STOL", image: "stol1.webp", audio: "Stol.mp3" },
   { word: "SVETILKA", image: "svetilka1.webp", audio: "Svetilka.mp3" },
+  { word: "SNEŽINKA", image: "snezinka1.webp", audio: "Snezinka.mp3" },
   { word: "SVINČNIK", image: "svincnik1.webp", audio: "Svincnik.mp3" }
 ];
 
@@ -131,6 +150,7 @@ const wordsDataSH: WordData[] = [
   { word: "ŠKARJE", image: "skarje1.webp", audio: "Skarje.mp3" },
   { word: "ŠKATLA", image: "skatla1.webp", audio: "Skatla.mp3" },
   { word: "ŠKOLJKA", image: "skoljka1.webp", audio: "Skoljka.mp3" },
+  { word: "ŠOFER", image: "sofer1.webp", audio: "Sofer.mp3" },
   { word: "ŠOPEK", image: "sopek1.webp", audio: "Sopek.mp3" },
   { word: "ŠOTOR", image: "sotor1.webp", audio: "Sotor.mp3" },
   { word: "ŠTAMPILJKA", image: "stampiljka1.webp", audio: "Stampiljka.mp3" },

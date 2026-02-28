@@ -41,8 +41,7 @@ export const SequenceGameBase = ({
     queryFn: async () => {
       const { data, error } = await supabase
         .from(tableName as any)
-        .select("*")
-        .limit(20);
+        .select("*");
       
       if (error) {
         console.error("Error fetching sequence images:", error);
