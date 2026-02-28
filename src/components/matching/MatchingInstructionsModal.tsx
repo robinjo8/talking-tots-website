@@ -22,7 +22,7 @@ const instructionContent = [
   },
   {
     title: "Izbiranje elementov",
-    text: "Igralec klikne na element v enem stolpcu, da ga izbere. Izbran element je označen z modro obrobo. Nato igralec klikne na ustrezne elemente v preostalih stolpcih. Ko so izbrani vsi elementi iste besede, se povežejo in obarvajo zeleno."
+    text: "Igralec klikne na element v enem stolpcu, da ga izbere. Izbran element je označen z modro obrobo. Nato igralec klikne na ustrezne elemente v preostalih stolpcih. Ko so izbrani vsi elementi iste besede, se obarvajo zeleno."
   },
   {
     title: "Pravila povezovanja",
