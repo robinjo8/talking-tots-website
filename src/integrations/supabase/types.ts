@@ -1963,6 +1963,13 @@ export type Database = {
         }[]
       }
       get_user_organization_id: { Args: { _user_id: string }; Returns: string }
+      get_users_last_sign_in: {
+        Args: { user_ids: string[] }
+        Returns: {
+          last_sign_in_at: string
+          user_id: string
+        }[]
+      }
       grant_admin_role: {
         Args: {
           p_expires_at?: string
