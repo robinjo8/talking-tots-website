@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SequenceImage } from "@/hooks/useSequenceGame";
 import { SequenceImageSelectionDialog } from "./SequenceImageSelectionDialog";
-import { Loader2, Eye, EyeOff, ArrowLeft, ArrowRight } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +14,7 @@ interface SequenceGame56BaseProps {
   queryKey: string;
 }
 
-type GamePhase = "pre-countdown" | "memorize" | "select" | "arrange";
+type GamePhase = "pre-countdown" | "memorize" | "select";
 type SlotStatus = "empty" | "correct" | "wrong-position" | "wrong";
 
 const PRE_COUNTDOWN_SECONDS = 5;
@@ -114,38 +114,9 @@ export const SequenceGame56Base = ({ onGameComplete, isLandscape = false, tableN
     return () => clearTimeout(timer);
   }, [helpCountdown, showHelp]);
 
-  const allCorrectSelected = useMemo(() => {
-    const placedIds = placedImages.filter(img => img !== null).map(img => img!.id);
-    const targetIds = targetSequence.map(img => img.id);
-    return targetIds.every(id => placedIds.includes(id));
-  }, [placedImages, targetSequence]);
-
-  // Shuffle placed images when transitioning to arrange phase
+  // Check completion in select phase: all images placed correctly
   useEffect(() => {
-    if (gamePhase === "select" && allCorrectSelected) {
-      // Shuffle placedImages so no image is in the correct position
-      setPlacedImages(prev => {
-        const filled = prev.filter(img => img !== null) as SequenceImage[];
-        let shuffled = [...filled].sort(() => Math.random() - 0.5);
-        let attempts = 0;
-        while (attempts < 100) {
-          const hasMatch = shuffled.some((item, index) => item.id === targetSequence[index]?.id);
-          if (!hasMatch) break;
-          shuffled = [...filled].sort(() => Math.random() - 0.5);
-          attempts++;
-        }
-        // Fallback swap
-        if (shuffled.some((item, index) => item.id === targetSequence[index]?.id) && shuffled.length >= 2) {
-          [shuffled[0], shuffled[1]] = [shuffled[1], shuffled[0]];
-        }
-        return shuffled;
-      });
-      setGamePhase("arrange");
-    }
-  }, [allCorrectSelected, gamePhase, targetSequence]);
-
-  useEffect(() => {
-    if (gamePhase !== "arrange" || placedImages.some(img => img === null)) return;
+    if (gamePhase !== "select" || placedImages.some(img => img === null)) return;
     const allCorrect = placedImages.every((img, index) => 
       img?.id === targetSequence[index]?.id
     );
@@ -199,7 +170,7 @@ export const SequenceGame56Base = ({ onGameComplete, isLandscape = false, tableN
   }, [targetSequence]);
 
   const handleSlotClick = (index: number) => {
-    if (gamePhase !== "select" || isComplete || showHelp) return;
+    if (gamePhase !== "select" || isComplete || showHelp || isPlayingAudio) return;
     setSelectedSlot(index);
   };
 
@@ -216,17 +187,6 @@ export const SequenceGame56Base = ({ onGameComplete, isLandscape = false, tableN
     });
     setSelectedSlot(null);
   }, [selectedSlot, placedImages]);
-
-  const handleMoveImage = (fromIndex: number, direction: "left" | "right") => {
-    if (isPlayingAudio) return;
-    const toIndex = direction === "left" ? fromIndex - 1 : fromIndex + 1;
-    if (toIndex < 0 || toIndex > 3) return;
-    setPlacedImages(prev => {
-      const newPlaced = [...prev];
-      [newPlaced[fromIndex], newPlaced[toIndex]] = [newPlaced[toIndex], newPlaced[fromIndex]];
-      return newPlaced;
-    });
-  };
 
   const handleHelp = () => {
     if (helpUsesLeft <= 0 || showHelp || gamePhase === "memorize") return;
@@ -381,18 +341,7 @@ export const SequenceGame56Base = ({ onGameComplete, isLandscape = false, tableN
               </div>
             )}
           </div>
-        ) : isComplete ? null : gamePhase === "arrange" ? (
-          <>
-            <h3 className={`font-bold text-white drop-shadow-lg uppercase ${isLandscape ? 'text-sm mb-0' : 'text-base md:text-2xl mb-0.5 md:mb-2'}`}>
-              UREDI SLIKE V PRAVILNI VRSTNI RED
-            </h3>
-            {!isLandscape && (
-              <p className="text-xs md:text-base text-white/90 drop-shadow uppercase">
-                PREMIKAJ SLIKE LEVO IN DESNO
-              </p>
-            )}
-          </>
-        ) : (
+        ) : isComplete ? null : (
           <>
             <h3 className={`font-bold text-white drop-shadow-lg uppercase ${isLandscape ? 'text-sm mb-0' : 'text-base md:text-2xl mb-0.5 md:mb-2'}`}>
               KLIKNI NA POLJE IN IZBERI PRAVILNO SLIKO
@@ -422,79 +371,35 @@ export const SequenceGame56Base = ({ onGameComplete, isLandscape = false, tableN
             
             return (
               <div key={`slot-${index}`} className="relative">
-                {gamePhase === "arrange" ? (
-                  <div 
-                    className={cn(
-                      "relative rounded-lg overflow-hidden transition-all duration-300 border-3",
-                      isLandscape ? "" : "aspect-square",
-                      activePlayingIndex === index
-                        ? "border-4 border-orange-400 shadow-[0_0_24px_rgba(251,146,60,0.9)] scale-105 animate-pulse"
-                        : getSlotBorderClass(status)
-                    )}
-                    style={itemSize ? { width: itemSize, height: itemSize } : {}}
-                  >
-                    {image && (
-                      <>
-                        <img
-                          src={image.image_url || ''}
-                          alt={image.word || ''}
-                          className="w-full h-full object-contain p-1"
-                          draggable={false}
-                        />
-                        <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-2">
-                          <button
-                            onClick={() => handleMoveImage(index, "left")}
-                            disabled={index === 0 || isComplete || isPlayingAudio}
-                            className={cn(
-                              "p-1 rounded-full bg-orange-500 text-white shadow-md transition-opacity",
-                              (index === 0 || isPlayingAudio) ? "opacity-30" : "hover:bg-orange-600"
-                            )}
-                          >
-                            <ArrowLeft className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleMoveImage(index, "right")}
-                            disabled={index === 3 || isComplete || isPlayingAudio}
-                            className={cn(
-                              "p-1 rounded-full bg-orange-500 text-white shadow-md transition-opacity",
-                              (index === 3 || isPlayingAudio) ? "opacity-30" : "hover:bg-orange-600"
-                            )}
-                          >
-                            <ArrowRight className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => handleSlotClick(index)}
-                    disabled={gamePhase === "memorize" || isComplete || showHelp}
-                    className={cn(
-                      "relative rounded-lg overflow-hidden transition-all duration-200 w-full border-3",
-                      isLandscape ? "" : "aspect-square",
-                      image === null 
+                <button
+                  onClick={() => handleSlotClick(index)}
+                  disabled={gamePhase === "memorize" || isComplete || showHelp || isPlayingAudio}
+                  className={cn(
+                    "relative rounded-lg overflow-hidden transition-all duration-200 w-full border-3",
+                    isLandscape ? "" : "aspect-square",
+                    activePlayingIndex === index
+                      ? "border-4 border-orange-400 shadow-[0_0_24px_rgba(251,146,60,0.9)] scale-105 animate-pulse"
+                      : image === null 
                         ? "bg-white/50 border-dashed border-orange-400 hover:bg-white/70 hover:border-orange-500 cursor-pointer"
                         : getSlotBorderClass(status)
-                    )}
-                    style={itemSize ? { width: itemSize, height: itemSize } : {}}
-                  >
-                    {image ? (
-                      <img
-                        src={image.image_url || ''}
-                        alt={image.word || ''}
-                        className="w-full h-full object-contain p-1"
-                        draggable={false}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className={`font-bold text-orange-400/70 ${isLandscape ? 'text-lg' : 'text-2xl md:text-4xl'}`}>
-                          {index + 1}
-                        </span>
-                      </div>
-                    )}
-                  </button>
-                )}
+                  )}
+                  style={itemSize ? { width: itemSize, height: itemSize } : {}}
+                >
+                  {image ? (
+                    <img
+                      src={image.image_url || ''}
+                      alt={image.word || ''}
+                      className="w-full h-full object-contain p-1"
+                      draggable={false}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className={`font-bold text-orange-400/70 ${isLandscape ? 'text-lg' : 'text-2xl md:text-4xl'}`}>
+                        {index + 1}
+                      </span>
+                    </div>
+                  )}
+                </button>
               </div>
             );
           })}
