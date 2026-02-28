@@ -37,7 +37,7 @@ export function useAdminTests() {
   return useQuery({
     queryKey: ['admin-tests'],
     queryFn: async (): Promise<TestSessionData[]> => {
-      // 1. Get all test sessions
+      // 1. Get all test sessions (RLS already filters by organization context)
       const { data: sessions, error: sessionsError } = await supabase
         .from('articulation_test_sessions')
         .select('id, status, submitted_at, reviewed_at, completed_at, child_id, parent_id, assigned_to, source_type, logopedist_child_id, organization_id, is_completed')
