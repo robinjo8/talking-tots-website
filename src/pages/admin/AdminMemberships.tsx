@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { CheckCircle, XCircle, Clock, Users, AlertTriangle, Loader2, Mail, Search, Filter } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 
@@ -152,19 +153,25 @@ function ActiveMembersSection({
   const [orgFilter, setOrgFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
 
+  const formatDate = (dateStr: string, withTime = false) => {
+    const opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
+    if (withTime) { opts.hour = '2-digit'; opts.minute = '2-digit'; }
+    return new Date(dateStr).toLocaleDateString('sl-SI', opts);
+  };
+
   const filtered = useMemo(() => {
     return active.filter(l => {
-      // Search filter
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
-        const match = 
-          `${l.first_name} ${l.last_name}`.toLowerCase().includes(q) ||
-          (l.email?.toLowerCase().includes(q));
+        const orgName = l.organizations?.name?.toLowerCase() || '';
+        const fullName = `${l.first_name} ${l.last_name}`.toLowerCase();
+        const email = l.email?.toLowerCase() || '';
+        const regDate = formatDate(l.created_at).toLowerCase();
+        const lastLogin = l.last_sign_in_at ? formatDate(l.last_sign_in_at, true).toLowerCase() : '';
+        const match = fullName.includes(q) || email.includes(q) || orgName.includes(q) || regDate.includes(q) || lastLogin.includes(q);
         if (!match) return false;
       }
-      // Org filter
       if (orgFilter !== 'all' && l.organizations?.name !== orgFilter) return false;
-      // Type filter
       if (typeFilter === 'internal' && l.organizations?.type !== 'internal') return false;
       if (typeFilter === 'external' && l.organizations?.type === 'internal') return false;
       return true;
@@ -189,7 +196,7 @@ function ActiveMembersSection({
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Iskanje po imenu ali emailu..."
+                placeholder="Iskanje po imenu, emailu, organizaciji..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9"
@@ -231,67 +238,83 @@ function ActiveMembersSection({
               </p>
             </div>
           ) : (
-            <div className="space-y-2">
-              {filtered.map((logopedist) => (
-                <div 
-                  key={logopedist.id} 
-                  className="flex items-center justify-between p-4 rounded-lg border bg-card"
-                >
-                  <div className="flex-1">
-                    <p className="font-medium text-foreground">
-                      {logopedist.first_name} {logopedist.last_name}
-                    </p>
-                    {logopedist.email && (
-                      <p className="text-sm text-muted-foreground flex items-center gap-1">
-                        <Mail className="h-3 w-3" />
-                        {logopedist.email}
-                      </p>
-                    )}
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
-                      <p className="text-sm text-muted-foreground">
-                        {logopedist.organizations?.name || 'Ni organizacije'}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Registriran: {new Date(logopedist.created_at).toLocaleDateString('sl-SI', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric',
-                        })}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Zadnja prijava: {logopedist.last_sign_in_at 
-                          ? new Date(logopedist.last_sign_in_at).toLocaleDateString('sl-SI', {
-                              day: 'numeric',
-                              month: 'short',
-                              year: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })
-                          : '—'}
-                      </p>
+            <>
+              {/* Desktop table */}
+              <div className="hidden md:block rounded-md border overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Organizacija</TableHead>
+                      <TableHead>Ime in priimek</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Registriran</TableHead>
+                      <TableHead>Zadnja prijava</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filtered.map((l) => (
+                      <TableRow key={l.id}>
+                        <TableCell className="font-medium">{l.organizations?.name || '—'}</TableCell>
+                        <TableCell>{l.first_name} {l.last_name}</TableCell>
+                        <TableCell className="text-muted-foreground">{l.email || '—'}</TableCell>
+                        <TableCell className="text-muted-foreground whitespace-nowrap">{formatDate(l.created_at)}</TableCell>
+                        <TableCell className="text-muted-foreground whitespace-nowrap">
+                          {l.last_sign_in_at ? formatDate(l.last_sign_in_at, true) : '—'}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1.5">
+                            <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                              <CheckCircle className="h-3 w-3 mr-1" />
+                              Aktiven
+                            </Badge>
+                            {l.organizations?.type === 'internal' && (
+                              <Badge variant="outline" className="text-xs border-blue-300 text-blue-700">
+                                Interni
+                              </Badge>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Mobile cards */}
+              <div className="md:hidden space-y-2">
+                {filtered.map((l) => (
+                  <div key={l.id} className="flex items-center justify-between p-4 rounded-lg border bg-card">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-foreground">{l.first_name} {l.last_name}</p>
+                      {l.email && (
+                        <p className="text-sm text-muted-foreground flex items-center gap-1 truncate">
+                          <Mail className="h-3 w-3 shrink-0" />
+                          {l.email}
+                        </p>
+                      )}
+                      <p className="text-sm text-muted-foreground">{l.organizations?.name || '—'}</p>
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs text-muted-foreground">
+                        <span>Reg: {formatDate(l.created_at)}</span>
+                        <span>Prijava: {l.last_sign_in_at ? formatDate(l.last_sign_in_at, true) : '—'}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 ml-3 shrink-0">
+                      <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Aktiven</Badge>
+                      {l.organizations?.type === 'internal' && (
+                        <Badge variant="outline" className="text-xs border-blue-300 text-blue-700">Interni</Badge>
+                      )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 ml-4">
-                    {logopedist.organizations?.type === 'internal' && (
-                      <Badge variant="outline" className="text-xs border-blue-300 text-blue-700">
-                        Interni
-                      </Badge>
-                    )}
-                    <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
-                      <CheckCircle className="h-3 w-3 mr-1" />
-                      Aktiven
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
     </section>
   );
 }
-
 // --- Main Component ---
 export default function AdminMemberships() {
   const { isSuperAdmin, isLoading: authLoading } = useAdminAuth();
