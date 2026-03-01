@@ -1,6 +1,4 @@
 import React from 'react';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -55,31 +53,23 @@ export function MotorikaFrequencySelector({
 }: MotorikaFrequencySelectorProps) {
   return (
     <div className="space-y-3">
-      <RadioGroup
+      <Select
         value={frequency || ''}
         onValueChange={(val) => onFrequencyChange(val as MotorikaFrequencyType)}
-        className="space-y-2"
       >
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="daily" id="motorika-daily" />
-          <Label htmlFor="motorika-daily" className="text-sm">Vsak dan</Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="weekly" id="motorika-weekly" />
-          <Label htmlFor="motorika-weekly" className="text-sm">Enkrat na teden</Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="monthly" id="motorika-monthly" />
-          <Label htmlFor="motorika-monthly" className="text-sm">Enkrat na mesec</Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="custom" id="motorika-custom" />
-          <Label htmlFor="motorika-custom" className="text-sm">Po meri</Label>
-        </div>
-      </RadioGroup>
+        <SelectTrigger className="w-[200px] h-8 text-sm">
+          <SelectValue placeholder="Izberi pogostost" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="daily">Vsak dan</SelectItem>
+          <SelectItem value="weekly">Enkrat na teden</SelectItem>
+          <SelectItem value="monthly">Enkrat na mesec</SelectItem>
+          <SelectItem value="custom">Po meri</SelectItem>
+        </SelectContent>
+      </Select>
 
       {frequency === 'custom' && (
-        <div className="flex items-center gap-2 pl-6">
+        <div className="flex items-center gap-2 pl-2">
           <Input
             type="number"
             min={1}
