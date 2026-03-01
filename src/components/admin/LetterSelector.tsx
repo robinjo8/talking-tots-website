@@ -8,40 +8,83 @@ import {
 } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const ALL_LETTERS = [
   'P', 'B', 'M', 'T', 'D', 'K', 'G', 'N', 'H', 'V',
   'J', 'F', 'L', 'S', 'Z', 'C', 'Š', 'Ž', 'Č', 'R'
 ];
 
-interface LetterSelectorProps {
-  selectedLetters: string[];
-  onLettersChange: (letters: string[]) => void;
+export interface RecommendedLetter {
+  letter: string;
+  position: 'start' | 'middle-end';
 }
 
-export function formatRecommendedLettersText(letters: string[]): string {
+interface LetterSelectorProps {
+  selectedLetters: RecommendedLetter[];
+  onLettersChange: (letters: RecommendedLetter[]) => void;
+}
+
+export function formatRecommendedLettersText(letters: RecommendedLetter[]): string {
+  if (letters.length === 0) return '';
+  
+  const parts = letters.map(l => {
+    const posText = l.position === 'start' ? 'na začetku besed' : 'na sredini/koncu besed';
+    return `glas ${l.letter} ${posText}`;
+  });
+  
+  if (parts.length === 1) return `Priporočamo igre in vaje za ${parts[0]}.`;
+  
+  const allButLast = parts.slice(0, -1);
+  const last = parts[parts.length - 1];
+  return `Priporočamo igre in vaje za ${allButLast.join(', ')} in za ${last}.`;
+}
+
+// Legacy support: convert string[] to RecommendedLetter[] for old reports
+export function convertLegacyLetters(letters: string[] | RecommendedLetter[]): RecommendedLetter[] {
+  if (letters.length === 0) return [];
+  if (typeof letters[0] === 'string') {
+    return (letters as string[]).map(l => ({ letter: l, position: 'start' as const }));
+  }
+  return letters as RecommendedLetter[];
+}
+
+// Legacy support: format text from string[] (used in old PDF generation)
+export function formatRecommendedLettersTextLegacy(letters: string[]): string {
   if (letters.length === 0) return '';
   if (letters.length === 1) return `Priporočamo igre in vaje za glas ${letters[0]}.`;
   if (letters.length === 2) return `Priporočamo igre in vaje za glas ${letters[0]} in za glas ${letters[1]}.`;
-  
-  // 3+ letters: "za glas R, glas K in za glas L."
   const allButLast = letters.slice(0, -1);
   const last = letters[letters.length - 1];
-  const parts = allButLast.map((l, i) => i === 0 ? `glas ${l}` : `glas ${l}`);
+  const parts = allButLast.map(l => `glas ${l}`);
   return `Priporočamo igre in vaje za ${parts.join(', ')} in za glas ${last}.`;
 }
 
 export function LetterSelector({ selectedLetters, onLettersChange }: LetterSelectorProps) {
   const toggleLetter = (letter: string) => {
-    if (selectedLetters.includes(letter)) {
-      onLettersChange(selectedLetters.filter(l => l !== letter));
+    const existing = selectedLetters.find(l => l.letter === letter);
+    if (existing) {
+      onLettersChange(selectedLetters.filter(l => l.letter !== letter));
     } else {
-      onLettersChange([...selectedLetters, letter]);
+      // Add with default position 'start'
+      onLettersChange([...selectedLetters, { letter, position: 'start' }]);
     }
   };
 
   const removeLetter = (letter: string) => {
-    onLettersChange(selectedLetters.filter(l => l !== letter));
+    onLettersChange(selectedLetters.filter(l => l.letter !== letter));
+  };
+
+  const changePosition = (letter: string, position: 'start' | 'middle-end') => {
+    onLettersChange(selectedLetters.map(l => 
+      l.letter === letter ? { ...l, position } : l
+    ));
   };
 
   return (
@@ -49,16 +92,29 @@ export function LetterSelector({ selectedLetters, onLettersChange }: LetterSelec
       <div className="flex items-center gap-2 flex-wrap">
         <span className="text-sm text-muted-foreground whitespace-nowrap">Priporočamo igre in vaje za</span>
         
-        {selectedLetters.map(letter => (
-          <Badge 
-            key={letter} 
-            variant="secondary" 
-            className="gap-1 cursor-pointer hover:bg-destructive/10"
-            onClick={() => removeLetter(letter)}
-          >
-            {letter}
-            <X className="h-3 w-3" />
-          </Badge>
+        {selectedLetters.map(item => (
+          <div key={item.letter} className="flex items-center gap-1">
+            <Badge 
+              variant="secondary" 
+              className="gap-1 cursor-pointer hover:bg-destructive/10"
+              onClick={() => removeLetter(item.letter)}
+            >
+              {item.letter}
+              <X className="h-3 w-3" />
+            </Badge>
+            <Select
+              value={item.position}
+              onValueChange={(val) => changePosition(item.letter, val as 'start' | 'middle-end')}
+            >
+              <SelectTrigger className="h-6 text-xs w-auto min-w-[100px] px-2">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="start">Začetek</SelectItem>
+                <SelectItem value="middle-end">Sredina/konec</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         ))}
 
         <Popover>
@@ -75,7 +131,7 @@ export function LetterSelector({ selectedLetters, onLettersChange }: LetterSelec
                   className="flex items-center gap-1.5 cursor-pointer text-sm"
                 >
                   <Checkbox
-                    checked={selectedLetters.includes(letter)}
+                    checked={selectedLetters.some(l => l.letter === letter)}
                     onCheckedChange={() => toggleLetter(letter)}
                   />
                   {letter}
