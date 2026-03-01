@@ -182,7 +182,8 @@ async function fetchSessionReviewData(sessionId: string): Promise<SessionReviewD
     const audioFiles = files.filter(file => 
       file.name.endsWith('.webm') || 
       file.name.endsWith('.mp3') || 
-      file.name.endsWith('.wav')
+      file.name.endsWith('.wav') ||
+      file.name.endsWith('.m4a')
     );
 
     const signedUrlPromises = audioFiles.map(async file => {
