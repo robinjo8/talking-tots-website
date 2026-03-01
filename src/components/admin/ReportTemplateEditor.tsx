@@ -9,7 +9,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { LetterSelector, formatRecommendedLettersText } from './LetterSelector';
+import { LetterSelector, formatRecommendedLettersText, RecommendedLetter } from './LetterSelector';
+import { MotorikaFrequencySelector, formatMotorikaFrequencyText, MotorikaFrequencyType, MotorikaCustomUnit } from './MotorikaFrequencySelector';
+import { VideoLetterSelector, formatVideoLettersText } from './VideoLetterSelector';
 
 export interface TestSession {
   id: string;
@@ -34,7 +36,13 @@ interface ReportData {
   ugotovitve: string;
   predlogVaj: string;
   opombe: string;
-  recommendedLetters: string[];
+  recommendedLetters: RecommendedLetter[];
+  
+  // New fields
+  motorikaFrequency: MotorikaFrequencyType;
+  motorikaCustomCount: number | null;
+  motorikaCustomUnit: MotorikaCustomUnit;
+  recommendedVideoLetters: string[];
 }
 
 interface ReportTemplateEditorProps {
@@ -43,10 +51,19 @@ interface ReportTemplateEditorProps {
   hideParentSection?: boolean;
   onFieldChange: (field: 'anamneza' | 'ugotovitve' | 'predlogVaj' | 'opombe', value: string) => void;
   onSessionChange: (sessionId: string) => void;
-  onRecommendedLettersChange: (letters: string[]) => void;
+  onRecommendedLettersChange: (letters: RecommendedLetter[]) => void;
+  onMotorikaFrequencyChange: (frequency: MotorikaFrequencyType) => void;
+  onMotorikaCustomCountChange: (count: number | null) => void;
+  onMotorikaCustomUnitChange: (unit: MotorikaCustomUnit) => void;
+  onRecommendedVideoLettersChange: (letters: string[]) => void;
 }
 
-export function ReportTemplateEditor({ data, testSessions, hideParentSection = false, onFieldChange, onSessionChange, onRecommendedLettersChange }: ReportTemplateEditorProps) {
+export function ReportTemplateEditor({ 
+  data, testSessions, hideParentSection = false, 
+  onFieldChange, onSessionChange, onRecommendedLettersChange,
+  onMotorikaFrequencyChange, onMotorikaCustomCountChange, onMotorikaCustomUnitChange,
+  onRecommendedVideoLettersChange,
+}: ReportTemplateEditorProps) {
   const formatGender = (gender: string | null) => {
     if (!gender) return 'Ni podatka';
     if (gender.toLowerCase() === 'm' || gender.toLowerCase() === 'male') return 'M';
@@ -79,7 +96,7 @@ export function ReportTemplateEditor({ data, testSessions, hideParentSection = f
         </h1>
       </div>
 
-      {/* Parent/Guardian Data - samo če ni skrita */}
+      {/* Parent/Guardian Data */}
       {!hideParentSection && (
         <div className="space-y-2">
           <h2 className="font-bold text-foreground uppercase text-xs tracking-wide border-b pb-1">
@@ -181,6 +198,32 @@ export function ReportTemplateEditor({ data, testSessions, hideParentSection = f
         />
       </div>
 
+      {/* Motorika govoril Section */}
+      <div className="space-y-2">
+        <h2 className="font-bold text-foreground uppercase text-xs tracking-wide">
+          PRIPOROČAMO VAJE ZA MOTORIKO GOVORIL: <span className="text-red-500">*</span>
+        </h2>
+        <MotorikaFrequencySelector
+          frequency={data.motorikaFrequency}
+          customCount={data.motorikaCustomCount}
+          customUnit={data.motorikaCustomUnit}
+          onFrequencyChange={onMotorikaFrequencyChange}
+          onCustomCountChange={onMotorikaCustomCountChange}
+          onCustomUnitChange={onMotorikaCustomUnitChange}
+        />
+      </div>
+
+      {/* Video navodila Section */}
+      <div className="space-y-2">
+        <h2 className="font-bold text-foreground uppercase text-xs tracking-wide">
+          PRIPOROČAMO OGLED VIDEO NAVODIL:
+        </h2>
+        <VideoLetterSelector
+          selectedLetters={data.recommendedVideoLetters}
+          onLettersChange={onRecommendedVideoLettersChange}
+        />
+      </div>
+
       {/* Opombe Section */}
       <div className="space-y-2">
         <h2 className="font-bold text-foreground uppercase text-xs tracking-wide">
@@ -237,7 +280,11 @@ export function generateReportText(data: ReportData): string {
   const recommendedText = data.recommendedLetters && data.recommendedLetters.length > 0
     ? formatRecommendedLettersText(data.recommendedLetters)
     : '';
-  const predlogContent = [recommendedText, data.predlogVaj].filter(Boolean).join('\n') || '(ni vnosa)';
+  const motorikaText = formatMotorikaFrequencyText(data.motorikaFrequency, data.motorikaCustomCount, data.motorikaCustomUnit);
+  const videoText = data.recommendedVideoLetters && data.recommendedVideoLetters.length > 0
+    ? formatVideoLettersText(data.recommendedVideoLetters)
+    : '';
+  const predlogContent = [recommendedText, motorikaText, videoText, data.predlogVaj].filter(Boolean).join('\n') || '(ni vnosa)';
 
   return `LOGOPEDSKO POROČILO – TomiTalk
 
