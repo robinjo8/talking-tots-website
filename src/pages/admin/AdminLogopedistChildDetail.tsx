@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useLogopedistChildStorageFiles, StorageFile, SessionRecordings } from '@/hooks/useLogopedistChildStorageFiles';
 import { useLogopedistChild } from '@/hooks/useLogopedistChildren';
+import { useLogopedistChildEvaluations, generateAutoUgotovitve } from '@/hooks/useChildEvaluations';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
@@ -167,13 +168,32 @@ export default function AdminLogopedistChildDetail() {
     }));
   }, [childData, logopedistProfile]);
 
+  // Pridobi ocene za tega otroka logopeda
+  const { data: childEvaluations } = useLogopedistChildEvaluations(childId);
+
+  // Auto-select latest session and populate ugotovitve on page load
+  useEffect(() => {
+    if (testSessions.length > 0 && childEvaluations && !reportData.selectedSessionId) {
+      const latestSession = testSessions[0];
+      const autoUgotovitve = generateAutoUgotovitve(childEvaluations, latestSession.id);
+      setReportData(prev => ({
+        ...prev,
+        selectedSessionId: latestSession.id,
+        testDate: latestSession.formattedDate,
+        ugotovitve: autoUgotovitve || prev.ugotovitve,
+      }));
+    }
+  }, [testSessions, childEvaluations]);
+
   // Handle session selection
   const handleSessionChange = (sessionId: string) => {
     const selectedSession = testSessions.find(s => s.id === sessionId);
+    const autoUgotovitve = generateAutoUgotovitve(childEvaluations, sessionId);
     setReportData(prev => ({
       ...prev,
       selectedSessionId: sessionId,
       testDate: selectedSession?.formattedDate || null,
+      ugotovitve: autoUgotovitve || prev.ugotovitve,
     }));
   };
 

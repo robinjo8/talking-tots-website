@@ -22,7 +22,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { useUserStorageFiles, StorageFile, SessionRecordings } from '@/hooks/useUserStorageFiles';
-import { useChildEvaluations } from '@/hooks/useChildEvaluations';
+import { useChildEvaluations, generateAutoUgotovitve } from '@/hooks/useChildEvaluations';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
@@ -235,32 +235,23 @@ export default function AdminUserDetail() {
   }, [childData, parentData, logopedistProfile]);
 
   // Handle session selection
+  // Auto-select latest session and populate ugotovitve on page load
+  useEffect(() => {
+    if (testSessions.length > 0 && childEvaluations && !reportData.selectedSessionId) {
+      const latestSession = testSessions[0];
+      const autoUgotovitve = generateAutoUgotovitve(childEvaluations, latestSession.id);
+      setReportData(prev => ({
+        ...prev,
+        selectedSessionId: latestSession.id,
+        testDate: latestSession.formattedDate,
+        ugotovitve: autoUgotovitve || prev.ugotovitve,
+      }));
+    }
+  }, [testSessions, childEvaluations]);
+
   const handleSessionChange = (sessionId: string) => {
     const selectedSession = testSessions.find(s => s.id === sessionId);
-    
-    // Auto-fill ugotovitve from evaluations
-    let autoUgotovitve = '';
-    if (childEvaluations) {
-      const sessionEval = childEvaluations.find(se => se.sessionId === sessionId);
-      if (sessionEval) {
-        const optionLabels: Record<string, string> = {
-          'not_automated': 'ni avtomatiziran',
-          'not_acquired': 'ni usvojen',
-          'distorted': 'je neustrezno usvojen (popačen)',
-          'omitted': 'je izpuščen',
-          'substituted': 'je zamenjan z drugim glasom',
-        };
-        const lines: string[] = [];
-        sessionEval.evaluations.forEach((evalData, letter) => {
-          evalData.selectedOptions.forEach(opt => {
-            if (opt !== 'acquired' && optionLabels[opt]) {
-              lines.push(`Glas ${letter} ${optionLabels[opt]}.`);
-            }
-          });
-        });
-        autoUgotovitve = lines.join('\n');
-      }
-    }
+    const autoUgotovitve = generateAutoUgotovitve(childEvaluations, sessionId);
     
     setReportData(prev => ({
       ...prev,
