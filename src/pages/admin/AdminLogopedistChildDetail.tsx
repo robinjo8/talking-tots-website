@@ -416,13 +416,21 @@ export default function AdminLogopedistChildDetail() {
 
     const findings = reportRecord.findings as { anamneza?: string; ugotovitve?: string } | null;
     const recLetters = (reportRecord as any).recommended_letters as string[] | null;
+    const reportDetails = (reportRecord as any).report_details as any;
+    const letters = reportDetails?.letters 
+      ? reportDetails.letters 
+      : convertLegacyLetters(recLetters || []);
     setReportData(prev => ({
       ...prev,
       anamneza: findings?.anamneza || '',
       ugotovitve: findings?.ugotovitve || reportRecord.summary || '',
       predlogVaj: reportRecord.recommendations || '',
       opombe: reportRecord.next_steps || '',
-      recommendedLetters: recLetters || [],
+      recommendedLetters: letters,
+      motorikaFrequency: reportDetails?.motorika?.type || null,
+      motorikaCustomCount: reportDetails?.motorika?.count || null,
+      motorikaCustomUnit: reportDetails?.motorika?.unit || null,
+      recommendedVideoLetters: reportDetails?.videoLetters || [],
     }));
     
     setEditingReportName(file.name);
@@ -816,6 +824,22 @@ export default function AdminLogopedistChildDetail() {
                   onSessionChange={handleSessionChange}
                   onRecommendedLettersChange={(letters) => {
                     setReportData(prev => ({ ...prev, recommendedLetters: letters }));
+                    setHasUnsavedChanges(true);
+                  }}
+                  onMotorikaFrequencyChange={(freq) => {
+                    setReportData(prev => ({ ...prev, motorikaFrequency: freq }));
+                    setHasUnsavedChanges(true);
+                  }}
+                  onMotorikaCustomCountChange={(count) => {
+                    setReportData(prev => ({ ...prev, motorikaCustomCount: count }));
+                    setHasUnsavedChanges(true);
+                  }}
+                  onMotorikaCustomUnitChange={(unit) => {
+                    setReportData(prev => ({ ...prev, motorikaCustomUnit: unit }));
+                    setHasUnsavedChanges(true);
+                  }}
+                  onRecommendedVideoLettersChange={(letters) => {
+                    setReportData(prev => ({ ...prev, recommendedVideoLetters: letters }));
                     setHasUnsavedChanges(true);
                   }}
                 />
