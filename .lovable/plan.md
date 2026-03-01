@@ -1,39 +1,20 @@
 
+# Izolacija podatkov med organizacijami in filtri za Članstva
 
-# Popravek: posnetki simulacije niso vidni v pregledu seje
+## Status: IMPLEMENTIRANO ✅
 
-## Vzrok problema
+### Izvedene spremembe:
 
-Simulacija (`simulate-articulation-test`) nalaga avdio datoteke s koncnico `.m4a` (vrstica 205):
-```
-${basePath}/${safeLetter}-${i}-${safeWord}-${timestamp}.m4a
-```
+1. **RLS migracija** — Posodobljene politike na 3 tabelah:
+   - `articulation_test_sessions`: interni logopedi vidijo samo `source_type='parent'` + njim dodeljene seje
+   - `articulation_evaluations`: 3 politike omejene na seje tipa 'parent' ali dodeljene
+   - `articulation_word_results`: enaka omejitev
 
-Hook `useSessionReview.ts` pa pri nalaganju posnetkov filtrira samo datoteke s koncnicami `.webm`, `.mp3` in `.wav` (vrstica 182-185):
-```typescript
-const audioFiles = files.filter(file => 
-  file.name.endsWith('.webm') || 
-  file.name.endsWith('.mp3') || 
-  file.name.endsWith('.wav')
-);
-```
+2. **Aplikacijska koda** — `useAdminCounts.ts` filtrira pending count po `source_type='parent'` za interne logopede
 
-Datoteke `.m4a` se torej nalagajo v Storage pravilno, a se pri prikazu v pregledu seje ignorirajo.
-
-## Popravek
-
-### Datoteka: `src/hooks/useSessionReview.ts`
-
-Dodati `.m4a` v filter avdio datotek:
-
-```typescript
-const audioFiles = files.filter(file => 
-  file.name.endsWith('.webm') || 
-  file.name.endsWith('.mp3') || 
-  file.name.endsWith('.wav') ||
-  file.name.endsWith('.m4a')
-);
-```
-
-To je edina sprememba, ki je potrebna. Vsa ostala logika (parsanje imen datotek, grupiranje po crkah, deduplikacija, signed URL-ji) ze pravilno deluje za `.m4a` datoteke.
-
+3. **AdminMemberships** — Refaktoriran v 3 komponente:
+   - Filter po organizaciji (dropdown)
+   - Filter po tipu (Interni/Zunanji)
+   - Iskalno polje po imenu/emailu
+   - Prikaz zadnje prijave (RPC `get_users_last_sign_in`)
+   - Prikaz datuma registracije
