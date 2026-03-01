@@ -88,59 +88,61 @@ export function LetterSelector({ selectedLetters, onLettersChange }: LetterSelec
   };
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-sm text-muted-foreground whitespace-nowrap">Priporočamo igre in vaje za</span>
-        
-        {selectedLetters.map(item => (
-          <div key={item.letter} className="flex items-center gap-1">
-            <Badge 
-              variant="secondary" 
-              className="gap-1 cursor-pointer hover:bg-destructive/10"
-              onClick={() => removeLetter(item.letter)}
-            >
-              {item.letter}
-              <X className="h-3 w-3" />
-            </Badge>
-            <Select
-              value={item.position}
-              onValueChange={(val) => changePosition(item.letter, val as 'start' | 'middle-end')}
-            >
-              <SelectTrigger className="h-6 text-xs w-auto min-w-[100px] px-2">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="start">Začetek</SelectItem>
-                <SelectItem value="middle-end">Sredina/konec</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        ))}
+    <div className="space-y-3">
+      <span className="text-sm font-medium text-foreground">Priporočamo igre in vaje za:</span>
 
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="h-7 text-xs">
-              + Dodaj glas
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-64 p-3" align="start">
-            <div className="grid grid-cols-5 gap-2">
-              {ALL_LETTERS.map(letter => (
-                <label
-                  key={letter}
-                  className="flex items-center gap-1.5 cursor-pointer text-sm"
-                >
-                  <Checkbox
-                    checked={selectedLetters.some(l => l.letter === letter)}
-                    onCheckedChange={() => toggleLetter(letter)}
-                  />
-                  {letter}
-                </label>
-              ))}
+      {selectedLetters.length > 0 && (
+        <div className="space-y-2 pl-2">
+          {selectedLetters.map(item => (
+            <div key={item.letter} className="flex items-center gap-2">
+              <Badge 
+                variant="secondary" 
+                className="gap-1 cursor-pointer hover:bg-destructive/10 min-w-[2.5rem] justify-center"
+                onClick={() => removeLetter(item.letter)}
+              >
+                {item.letter}
+                <X className="h-3 w-3" />
+              </Badge>
+              <Select
+                value={item.position}
+                onValueChange={(val) => changePosition(item.letter, val as 'start' | 'middle-end')}
+              >
+                <SelectTrigger className="h-7 text-xs w-[140px] px-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="start">Začetek</SelectItem>
+                  <SelectItem value="middle-end">Sredina/konec</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          </PopoverContent>
-        </Popover>
-      </div>
+          ))}
+        </div>
+      )}
+
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline" size="sm" className="h-7 text-xs">
+            + Dodaj glas
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-64 p-3" align="start">
+          <div className="grid grid-cols-5 gap-2">
+            {ALL_LETTERS.map(letter => (
+              <label
+                key={letter}
+                className="flex items-center gap-1.5 cursor-pointer text-sm"
+              >
+                <Checkbox
+                  checked={selectedLetters.some(l => l.letter === letter)}
+                  onCheckedChange={() => toggleLetter(letter)}
+                />
+                {letter}
+              </label>
+            ))}
+          </div>
+        </PopoverContent>
+      </Popover>
 
       {selectedLetters.length > 0 && (
         <p className="text-sm font-medium text-foreground bg-muted/50 rounded-md px-3 py-2">
