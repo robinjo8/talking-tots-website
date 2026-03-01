@@ -32,6 +32,8 @@ import {
 import { DocumentPreview } from '@/components/admin/DocumentPreview';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ReportTemplateEditor, generateReportText, ReportData } from '@/components/admin/ReportTemplateEditor';
+import { RecommendedLetter, convertLegacyLetters } from '@/components/admin/LetterSelector';
+import { MotorikaFrequencyType, MotorikaCustomUnit } from '@/components/admin/MotorikaFrequencySelector';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
@@ -68,6 +70,10 @@ export default function AdminLogopedistChildDetail() {
     predlogVaj: '',
     opombe: '',
     recommendedLetters: [],
+    motorikaFrequency: null,
+    motorikaCustomCount: null,
+    motorikaCustomUnit: null,
+    recommendedVideoLetters: [],
   });
 
   const { 
@@ -250,6 +256,10 @@ export default function AdminLogopedistChildDetail() {
         predlogVaj: '',
         opombe: '',
         recommendedLetters: [],
+        motorikaFrequency: null,
+        motorikaCustomCount: null,
+        motorikaCustomUnit: null,
+        recommendedVideoLetters: [],
       }));
       await refetchReports();
     } catch (err) {
@@ -275,7 +285,7 @@ export default function AdminLogopedistChildDetail() {
       return;
     }
     if (!reportData.recommendedLetters || reportData.recommendedLetters.length === 0) {
-      toast.error('Izberite vsaj eno črko v razdelku "Priporočamo igre in vaje za"');
+      toast.error('Izberite vsaj en glas v razdelku "Priporočamo igre in vaje za"');
       return;
     }
 
@@ -320,6 +330,15 @@ export default function AdminLogopedistChildDetail() {
       }
 
       // Insert record into logopedist_reports table
+      const reportDetails = {
+        letters: reportData.recommendedLetters,
+        motorika: {
+          type: reportData.motorikaFrequency,
+          count: reportData.motorikaCustomCount,
+          unit: reportData.motorikaCustomUnit,
+        },
+        videoLetters: reportData.recommendedVideoLetters,
+      };
       const { data: insertedReport, error: insertError } = await supabase
         .from('logopedist_reports')
         .insert({
@@ -328,11 +347,12 @@ export default function AdminLogopedistChildDetail() {
           summary: reportData.ugotovitve?.substring(0, 200) || '',
           findings: { anamneza: reportData.anamneza, ugotovitve: reportData.ugotovitve },
           recommendations: reportData.predlogVaj || '',
-          recommended_letters: reportData.recommendedLetters.length > 0 ? reportData.recommendedLetters : null,
+          recommended_letters: reportData.recommendedLetters.map(l => l.letter),
+          report_details: reportDetails,
           next_steps: reportData.opombe || '',
           pdf_url: filePath,
           status: 'submitted' as const,
-        })
+        } as any)
         .select('id')
         .single();
 
@@ -362,6 +382,10 @@ export default function AdminLogopedistChildDetail() {
         predlogVaj: '',
         opombe: '',
         recommendedLetters: [],
+        motorikaFrequency: null,
+        motorikaCustomCount: null,
+        motorikaCustomUnit: null,
+        recommendedVideoLetters: [],
       }));
       await refetchGeneratedReports();
     } catch (err) {
