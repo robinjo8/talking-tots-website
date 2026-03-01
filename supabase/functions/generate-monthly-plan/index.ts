@@ -18,7 +18,6 @@ function getCorsHeaders(req: Request) {
   };
 }
 
-// Letter to URL key mapping
 const LETTER_URL_MAP: Record<string, string> = {
   S: "s", Z: "z", C: "c", Š: "sh", Ž: "zh", Č: "ch", K: "k", L: "l", R: "r",
 };
@@ -27,23 +26,25 @@ const SUPPORTED_LETTERS = Object.keys(LETTER_URL_MAP);
 const DAY_NAMES = ["Nedelja", "Ponedeljek", "Torek", "Sreda", "Četrtek", "Petek", "Sobota"];
 const TOTAL_PLAN_DAYS = 90;
 
-const NO_AGE_GAMES = [
+// Games split by position
+const START_GAMES = [
   { name: "Kolo besed", gameId: "kolo-srece", pathTemplate: "/govorne-igre/kolo-srece/{urlKey}" },
-  { name: "Bingo", gameId: "bingo", pathTemplate: "/govorne-igre/bingo/{urlKey}" },
   { name: "Spomin", gameId: "spomin", pathTemplate: "/govorne-igre/spomin/spomin-{urlKey}" },
   { name: "Labirint", gameId: "labirint", pathTemplate: "/govorne-igre/labirint/{urlKey}" },
-  { name: "Smešne povedi", gameId: "met-kocke", pathTemplate: "/govorne-igre/met-kocke/{urlKey}" },
-  { name: "Ponovi poved", gameId: "ponovi-poved", pathTemplate: "/govorne-igre/ponovi-poved/{urlKey}" },
-  { name: "Zabavna pot", gameId: "kace", pathTemplate: "/govorne-igre/kace/{urlKey}" },
 ];
 
-const AGE_GAMES = [
+const START_AGE_GAMES = [
   { name: "Sestavljanke", gameId: "sestavljanke", pathTemplate: "/govorne-igre/sestavljanke/{urlKey}{ageKey}" },
   { name: "Zaporedja", gameId: "zaporedja", pathTemplate: "/govorne-igre/zaporedja/{urlKey}{ageKey}" },
   { name: "Igra ujemanja", gameId: "igra-ujemanja", pathTemplate: "/govorne-igre/igra-ujemanja/{urlKey}{ageKey}" },
 ];
 
-const ALL_GAMES = [...NO_AGE_GAMES, ...AGE_GAMES];
+const MIDDLE_END_GAMES = [
+  { name: "Zabavna pot", gameId: "kace", pathTemplate: "/govorne-igre/kace/{urlKey}" },
+  { name: "Bingo", gameId: "bingo", pathTemplate: "/govorne-igre/bingo/{urlKey}" },
+  { name: "Ponovi poved", gameId: "ponovi-poved", pathTemplate: "/govorne-igre/ponovi-poved/{urlKey}" },
+  { name: "Smešne povedi", gameId: "met-kocke", pathTemplate: "/govorne-igre/met-kocke/{urlKey}" },
+];
 
 function getAgeKey(ageGroup: string): string {
   switch (ageGroup) {
@@ -67,9 +68,7 @@ function calculateAge(birthDate: string): number {
   const now = new Date();
   let age = now.getFullYear() - birth.getFullYear();
   const monthDiff = now.getMonth() - birth.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) {
-    age--;
-  }
+  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) age--;
   return age;
 }
 
@@ -83,6 +82,17 @@ function addDays(date: Date, days: number): Date {
   return result;
 }
 
+interface LetterPosition {
+  letter: string;
+  position: "start" | "middle-end";
+}
+
+interface GameDef {
+  name: string;
+  gameId: string;
+  pathTemplate: string;
+}
+
 interface GameCombination {
   gameId: string;
   gameName: string;
@@ -90,23 +100,58 @@ interface GameCombination {
   path: string;
 }
 
-function buildGameCombinations(targetLetters: string[], ageGroup: string): GameCombination[] {
+function buildGameCombinations(letterPositions: LetterPosition[], ageGroup: string): GameCombination[] {
   const ageKey = getAgeKey(ageGroup);
-  const supportedLetters = targetLetters.filter((l) => SUPPORTED_LETTERS.includes(l));
-  if (supportedLetters.length === 0) return [];
-
   const combinations: GameCombination[] = [];
-  for (const game of ALL_GAMES) {
-    for (const letter of supportedLetters) {
-      const urlKey = LETTER_URL_MAP[letter];
-      const isAgeGame = AGE_GAMES.some((g) => g.gameId === game.gameId);
+
+  for (const lp of letterPositions) {
+    if (!SUPPORTED_LETTERS.includes(lp.letter)) continue;
+    const urlKey = LETTER_URL_MAP[lp.letter];
+
+    // Determine which games to include based on position
+    let games: GameDef[];
+    if (lp.position === "start") {
+      // Only start games
+      games = [...START_GAMES, ...START_AGE_GAMES];
+    } else {
+      // middle-end: ALL games (start + middle-end)
+      games = [...START_GAMES, ...START_AGE_GAMES, ...MIDDLE_END_GAMES];
+    }
+
+    for (const game of games) {
+      const isAgeGame = START_AGE_GAMES.some((g) => g.gameId === game.gameId);
       const path = game.pathTemplate
         .replace("{urlKey}", urlKey)
         .replace("{ageKey}", isAgeGame ? ageKey : "");
-      combinations.push({ gameId: game.gameId, gameName: game.name, letter, path });
+      combinations.push({ gameId: game.gameId, gameName: game.name, letter: lp.letter, path });
     }
   }
   return combinations;
+}
+
+interface MotorikaConfig {
+  type: "daily" | "weekly" | "monthly" | "custom" | null;
+  count?: number | null;
+  unit?: "day" | "week" | "month" | null;
+}
+
+function shouldIncludeMotorikaOnDay(dayIndex: number, totalDays: number, motorika: MotorikaConfig): boolean {
+  if (!motorika.type || motorika.type === "daily") return true;
+  if (motorika.type === "weekly") return dayIndex % 7 === 0;
+  if (motorika.type === "monthly") return dayIndex % 30 === 0;
+  if (motorika.type === "custom" && motorika.count && motorika.unit) {
+    if (motorika.unit === "day") return true; // X times per day = every day
+    if (motorika.unit === "week") {
+      // Spread X times across 7 days
+      const interval = Math.max(1, Math.floor(7 / motorika.count));
+      return dayIndex % interval === 0 && (dayIndex % 7) / interval < motorika.count;
+    }
+    if (motorika.unit === "month") {
+      const interval = Math.max(1, Math.floor(30 / motorika.count));
+      return dayIndex % interval === 0;
+    }
+  }
+  return true;
 }
 
 interface PlanDay {
@@ -121,37 +166,39 @@ interface PlanDay {
   }[];
 }
 
-function generateDeterministicPlan(startDate: Date, totalDays: number, combinations: GameCombination[]): PlanDay[] {
+function generateDeterministicPlan(startDate: Date, totalDays: number, combinations: GameCombination[], motorika: MotorikaConfig): PlanDay[] {
   const days: PlanDay[] = [];
   let combinationIndex = 0;
 
   for (let i = 0; i < totalDays; i++) {
     const currentDate = addDays(startDate, i);
     const dayName = DAY_NAMES[currentDate.getDay()];
+    const activities: PlanDay["activities"] = [];
 
-    const activities: PlanDay["activities"] = [
-      { type: "motorika", title: "Vaje za motoriko govoril", path: "/govorno-jezikovne-vaje/vaje-motorike-govoril" },
-    ];
+    // Add motorika based on frequency
+    if (shouldIncludeMotorikaOnDay(i, totalDays, motorika)) {
+      activities.push({ type: "motorika", title: "Vaje za motoriko govoril", path: "/govorno-jezikovne-vaje/vaje-motorike-govoril" });
+    }
 
     if (combinations.length > 0) {
       const usedGameIds = new Set<string>();
       let attempts = 0;
       const maxAttempts = combinations.length * 2;
+      const targetGames = 4;
 
-      while (activities.length < 5 && attempts < maxAttempts) {
+      while (activities.filter(a => a.type === "igra").length < targetGames && attempts < maxAttempts) {
         const combo = combinations[combinationIndex % combinations.length];
         combinationIndex++;
         attempts++;
-
         if (!usedGameIds.has(combo.gameId)) {
           usedGameIds.add(combo.gameId);
           activities.push({ type: "igra", title: combo.gameName, path: combo.path, letter: combo.letter, gameId: combo.gameId });
         }
       }
 
-      if (activities.length < 5) {
+      if (activities.filter(a => a.type === "igra").length < targetGames) {
         for (const combo of combinations) {
-          if (activities.length >= 5) break;
+          if (activities.filter(a => a.type === "igra").length >= targetGames) break;
           if (!usedGameIds.has(combo.gameId)) {
             usedGameIds.add(combo.gameId);
             activities.push({ type: "igra", title: combo.gameName, path: combo.path, letter: combo.letter, gameId: combo.gameId });
@@ -168,13 +215,9 @@ function generateDeterministicPlan(startDate: Date, totalDays: number, combinati
 
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
-
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    // JWT Authentication
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -186,7 +229,6 @@ serve(async (req) => {
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Verify JWT
     const authClient = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: authHeader } },
     });
@@ -209,7 +251,7 @@ serve(async (req) => {
 
     const { data: report, error: reportError } = await supabase
       .from("logopedist_reports")
-      .select("id, session_id, recommended_letters, pdf_url, created_at")
+      .select("id, session_id, recommended_letters, report_details, pdf_url, created_at")
       .eq("id", reportId)
       .single();
 
@@ -264,11 +306,24 @@ serve(async (req) => {
     const childAge = child.birth_date ? calculateAge(child.birth_date) : (child.age || 5);
     const ageGroup = getAgeGroup(childAge);
 
-    let targetLetters: string[] = [];
-    if (report.recommended_letters && Array.isArray(report.recommended_letters)) {
-      targetLetters = [...report.recommended_letters];
+    // Parse report_details for position-aware letters and motorika frequency
+    const reportDetails = report.report_details as any;
+    let letterPositions: LetterPosition[] = [];
+    let motorikaConfig: MotorikaConfig = { type: "daily" };
+
+    if (reportDetails?.letters && Array.isArray(reportDetails.letters)) {
+      // New format with positions
+      letterPositions = reportDetails.letters;
+    } else if (report.recommended_letters && Array.isArray(report.recommended_letters)) {
+      // Legacy format - default to 'start'
+      letterPositions = report.recommended_letters.map((l: string) => ({ letter: l, position: "start" as const }));
     }
 
+    if (reportDetails?.motorika) {
+      motorikaConfig = reportDetails.motorika;
+    }
+
+    // Also add non-acquired letters from evaluations
     if (report.session_id) {
       const { data: evaluations } = await supabase
         .from("articulation_evaluations")
@@ -279,14 +334,22 @@ serve(async (req) => {
         for (const eval_ of evaluations) {
           const options = eval_.selected_options || [];
           const isAcquired = options.includes("acquired") || options.includes("Usvojeno");
-          if (!isAcquired && !targetLetters.includes(eval_.letter)) {
-            targetLetters.push(eval_.letter);
+          if (!isAcquired && !letterPositions.some(lp => lp.letter === eval_.letter)) {
+            letterPositions.push({ letter: eval_.letter, position: "start" });
           }
         }
       }
     }
 
-    targetLetters = [...new Set(targetLetters)];
+    // Deduplicate
+    const seen = new Set<string>();
+    letterPositions = letterPositions.filter(lp => {
+      if (seen.has(lp.letter)) return false;
+      seen.add(lp.letter);
+      return true;
+    });
+
+    const targetLetters = letterPositions.map(lp => lp.letter);
 
     if (targetLetters.length === 0) {
       console.log("No target letters found, skipping plan generation");
@@ -303,8 +366,8 @@ serve(async (req) => {
 
     console.log(`Plan period: ${startDateStr} to ${endDateStr} (${TOTAL_PLAN_DAYS} days)`);
 
-    const combinations = buildGameCombinations(targetLetters, ageGroup);
-    const days = generateDeterministicPlan(startDate, TOTAL_PLAN_DAYS, combinations);
+    const combinations = buildGameCombinations(letterPositions, ageGroup);
+    const days = generateDeterministicPlan(startDate, TOTAL_PLAN_DAYS, combinations, motorikaConfig);
 
     console.log(`Generated ${days.length} days with ${combinations.length} game combinations`);
 
@@ -313,11 +376,11 @@ serve(async (req) => {
     const vadil = isFemale ? "vadila" : "vadil";
     const sampion = isFemale ? "prava šampionka" : "pravi šampion";
     const lettersFormatted = targetLetters.length === 1 
-      ? `črko ${targetLetters[0]}` 
+      ? `glas ${targetLetters[0]}` 
       : targetLetters.length === 2 
-        ? `črki ${targetLetters[0]} in ${targetLetters[1]}` 
-        : `črke ${targetLetters.slice(0, -1).join(", ")} in ${targetLetters[targetLetters.length - 1]}`;
-    const summary = `Hej ${childNameCapitalized}! Pripravili smo ti zabaven načrt vaj in iger, s katerimi boš ${vadil} ${lettersFormatted}. Vsak dan te čakajo nove pustolovščine – vaje za jezik in 4 igrice! Zbiraj zvezdice in postani ${sampion}!`;
+        ? `glasova ${targetLetters[0]} in ${targetLetters[1]}` 
+        : `glasove ${targetLetters.slice(0, -1).join(", ")} in ${targetLetters[targetLetters.length - 1]}`;
+    const summary = `Hej ${childNameCapitalized}! Pripravili smo ti zabaven načrt vaj in iger, s katerimi boš ${vadil} ${lettersFormatted}. Vsak dan te čakajo nove pustolovščine – vaje za jezik in igrice! Zbiraj zvezdice in postani ${sampion}!`;
 
     await supabase
       .from("child_monthly_plans")

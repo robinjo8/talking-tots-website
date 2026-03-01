@@ -45,6 +45,8 @@ import { DocumentPreview } from '@/components/admin/DocumentPreview';
 import { EvaluationSummary } from '@/components/admin/EvaluationSummary';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ReportTemplateEditor, generateReportText, ReportData } from '@/components/admin/ReportTemplateEditor';
+import { RecommendedLetter, convertLegacyLetters } from '@/components/admin/LetterSelector';
+import { MotorikaFrequencyType, MotorikaCustomUnit } from '@/components/admin/MotorikaFrequencySelector';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
@@ -83,6 +85,10 @@ export default function AdminUserDetail() {
     predlogVaj: '',
     opombe: '',
     recommendedLetters: [],
+    motorikaFrequency: null,
+    motorikaCustomCount: null,
+    motorikaCustomUnit: null,
+    recommendedVideoLetters: [],
   });
 
   const { 
@@ -231,10 +237,36 @@ export default function AdminUserDetail() {
   // Handle session selection
   const handleSessionChange = (sessionId: string) => {
     const selectedSession = testSessions.find(s => s.id === sessionId);
+    
+    // Auto-fill ugotovitve from evaluations
+    let autoUgotovitve = '';
+    if (childEvaluations) {
+      const sessionEval = childEvaluations.find(se => se.sessionId === sessionId);
+      if (sessionEval) {
+        const optionLabels: Record<string, string> = {
+          'not_automated': 'ni avtomatiziran',
+          'not_acquired': 'ni usvojen',
+          'distorted': 'je neustrezno usvojen (popačen)',
+          'omitted': 'je izpuščen',
+          'substituted': 'je zamenjan z drugim glasom',
+        };
+        const lines: string[] = [];
+        sessionEval.evaluations.forEach((evalData, letter) => {
+          evalData.selectedOptions.forEach(opt => {
+            if (opt !== 'acquired' && optionLabels[opt]) {
+              lines.push(`Glas ${letter} ${optionLabels[opt]}.`);
+            }
+          });
+        });
+        autoUgotovitve = lines.join('\n');
+      }
+    }
+    
     setReportData(prev => ({
       ...prev,
       selectedSessionId: sessionId,
       testDate: selectedSession?.formattedDate || null,
+      ugotovitve: autoUgotovitve || prev.ugotovitve,
     }));
   };
 
@@ -315,6 +347,10 @@ export default function AdminUserDetail() {
         predlogVaj: '',
         opombe: '',
         recommendedLetters: [],
+        motorikaFrequency: null,
+        motorikaCustomCount: null,
+        motorikaCustomUnit: null,
+        recommendedVideoLetters: [],
       }));
       await refetchReports();
     } catch (err) {
@@ -340,7 +376,7 @@ export default function AdminUserDetail() {
       return;
     }
     if (!reportData.recommendedLetters || reportData.recommendedLetters.length === 0) {
-      toast.error('Izberite vsaj eno črko v razdelku "Priporočamo igre in vaje za"');
+      toast.error('Izberite vsaj en glas v razdelku "Priporočamo igre in vaje za"');
       return;
     }
 
@@ -420,6 +456,15 @@ export default function AdminUserDetail() {
       }
 
       // Insert record into logopedist_reports table - vedno status 'submitted'
+      const reportDetails = {
+        letters: reportData.recommendedLetters,
+        motorika: {
+          type: reportData.motorikaFrequency,
+          count: reportData.motorikaCustomCount,
+          unit: reportData.motorikaCustomUnit,
+        },
+        videoLetters: reportData.recommendedVideoLetters,
+      };
       const { data: insertedReport, error: insertError } = await supabase
         .from('logopedist_reports')
         .insert({
@@ -428,11 +473,12 @@ export default function AdminUserDetail() {
           summary: reportData.ugotovitve?.substring(0, 200) || '',
           findings: { anamneza: reportData.anamneza, ugotovitve: reportData.ugotovitve },
           recommendations: reportData.predlogVaj || '',
-          recommended_letters: reportData.recommendedLetters.length > 0 ? reportData.recommendedLetters : null,
+          recommended_letters: reportData.recommendedLetters.map(l => l.letter),
+          report_details: reportDetails,
           next_steps: reportData.opombe || '',
           pdf_url: filePath,
           status: 'submitted' as const,
-        })
+        } as any)
         .select('id')
         .single();
 
@@ -463,6 +509,10 @@ export default function AdminUserDetail() {
         predlogVaj: '',
         opombe: '',
         recommendedLetters: [],
+        motorikaFrequency: null,
+        motorikaCustomCount: null,
+        motorikaCustomUnit: null,
+        recommendedVideoLetters: [],
       }));
       await refetchGeneratedReports();
     } catch (err) {
@@ -513,13 +563,24 @@ export default function AdminUserDetail() {
     // Load the report data from database into the editor
     const findings = reportRecord.findings as { anamneza?: string; ugotovitve?: string } | null;
     const recLetters = (reportRecord as any).recommended_letters as string[] | null;
+    const reportDetails = (reportRecord as any).report_details as any;
+    
+    // Use report_details if available, otherwise convert legacy letters
+    const letters = reportDetails?.letters 
+      ? reportDetails.letters 
+      : convertLegacyLetters(recLetters || []);
+    
     setReportData(prev => ({
       ...prev,
       anamneza: findings?.anamneza || '',
       ugotovitve: findings?.ugotovitve || reportRecord.summary || '',
       predlogVaj: reportRecord.recommendations || '',
       opombe: reportRecord.next_steps || '',
-      recommendedLetters: recLetters || [],
+      recommendedLetters: letters,
+      motorikaFrequency: reportDetails?.motorika?.type || null,
+      motorikaCustomCount: reportDetails?.motorika?.count || null,
+      motorikaCustomUnit: reportDetails?.motorika?.unit || null,
+      recommendedVideoLetters: reportDetails?.videoLetters || [],
     }));
     
     setEditingReportName(file.name);
@@ -938,6 +999,22 @@ export default function AdminUserDetail() {
                     onSessionChange={handleSessionChange}
                     onRecommendedLettersChange={(letters) => {
                       setReportData(prev => ({ ...prev, recommendedLetters: letters }));
+                      setHasUnsavedChanges(true);
+                    }}
+                    onMotorikaFrequencyChange={(freq) => {
+                      setReportData(prev => ({ ...prev, motorikaFrequency: freq }));
+                      setHasUnsavedChanges(true);
+                    }}
+                    onMotorikaCustomCountChange={(count) => {
+                      setReportData(prev => ({ ...prev, motorikaCustomCount: count }));
+                      setHasUnsavedChanges(true);
+                    }}
+                    onMotorikaCustomUnitChange={(unit) => {
+                      setReportData(prev => ({ ...prev, motorikaCustomUnit: unit }));
+                      setHasUnsavedChanges(true);
+                    }}
+                    onRecommendedVideoLettersChange={(letters) => {
+                      setReportData(prev => ({ ...prev, recommendedVideoLetters: letters }));
                       setHasUnsavedChanges(true);
                     }}
                   />
