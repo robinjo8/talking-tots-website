@@ -45,6 +45,8 @@ import { DocumentPreview } from '@/components/admin/DocumentPreview';
 import { EvaluationSummary } from '@/components/admin/EvaluationSummary';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ReportTemplateEditor, generateReportText, ReportData } from '@/components/admin/ReportTemplateEditor';
+import { RecommendedLetter, convertLegacyLetters } from '@/components/admin/LetterSelector';
+import { MotorikaFrequencyType, MotorikaCustomUnit } from '@/components/admin/MotorikaFrequencySelector';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
@@ -83,6 +85,10 @@ export default function AdminUserDetail() {
     predlogVaj: '',
     opombe: '',
     recommendedLetters: [],
+    motorikaFrequency: null,
+    motorikaCustomCount: null,
+    motorikaCustomUnit: null,
+    recommendedVideoLetters: [],
   });
 
   const { 
