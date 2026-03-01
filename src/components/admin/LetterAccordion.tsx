@@ -56,7 +56,7 @@ export function LetterAccordion({
           ) : (
             <VolumeX className="h-4 w-4 text-muted-foreground" />
           )}
-          <span className="font-semibold text-foreground">ČRKA {letter}</span>
+          <span className="font-semibold text-foreground">GLAS {letter}</span>
           {!hasRecordings && (
             <span className="text-xs text-muted-foreground">(ni posnetkov)</span>
           )}
