@@ -1,20 +1,38 @@
 
-# Izolacija podatkov med organizacijami in filtri za Članstva
 
-## Status: IMPLEMENTIRANO ✅
+# Vizualna prenova LetterSelector in MotorikaFrequencySelector
 
-### Izvedene spremembe:
+## 1. LetterSelector -- vertikalni prikaz izbranih glasov
 
-1. **RLS migracija** — Posodobljene politike na 3 tabelah:
-   - `articulation_test_sessions`: interni logopedi vidijo samo `source_type='parent'` + njim dodeljene seje
-   - `articulation_evaluations`: 3 politike omejene na seje tipa 'parent' ali dodeljene
-   - `articulation_word_results`: enaka omejitev
+Trenutno so izbrani glasovi prikazani v eni vrstici skupaj z besedilom "Priporocamo igre in vaje za". Sprememba:
 
-2. **Aplikacijska koda** — `useAdminCounts.ts` filtrira pending count po `source_type='parent'` za interne logopede
+- Zgoraj: besedilo "Priporocamo igre in vaje za:" kot naslov
+- Spodaj: vsak izbrani glas v svoji vrstici s pozicijo (npr. "P - Zacetek", "B - Sredina/konec"), z gumbom za odstranitev in dropdownom za pozicijo
+- Pod seznamom: gumb "+ Dodaj glas"
+- Na dnu: generirano besedilo (ostane nespremenjeno)
 
-3. **AdminMemberships** — Refaktoriran v 3 komponente:
-   - Filter po organizaciji (dropdown)
-   - Filter po tipu (Interni/Zunanji)
-   - Iskalno polje po imenu/emailu
-   - Prikaz zadnje prijave (RPC `get_users_last_sign_in`)
-   - Prikaz datuma registracije
+### Datoteka: `src/components/admin/LetterSelector.tsx`
+
+Sprememba renderja (vrstice 90-151):
+- Zamenjati `flex items-center gap-2 flex-wrap` z vertikalnim layoutom
+- Naslov "Priporocamo igre in vaje za:" kot `span`
+- Vsak glas v svoji vrstici: `flex items-center gap-2` z Badge, Select za pozicijo
+- Gumb "+ Dodaj glas" pod seznamom
+
+## 2. MotorikaFrequencySelector -- dropdown namesto radio gumbov
+
+Trenutno so opcije prikazane kot RadioGroup. Sprememba na Select (dropdown):
+
+- Zamenjati RadioGroup z enim Select dropdownom
+- Opcije: "Vsak dan", "Enkrat na teden", "Enkrat na mesec", "Po meri"
+- Ce je izbrano "Po meri", se pod dropdownom pojavi vnosno polje za stevilko + Select za enoto (kot zdaj)
+- Generirano besedilo ostane nespremenjeno
+
+### Datoteka: `src/components/admin/MotorikaFrequencySelector.tsx`
+
+Sprememba renderja (vrstice 56-115):
+- Zamenjati `RadioGroup` z `Select` komponento
+- Value mapping: `daily` -> "Vsak dan", `weekly` -> "Enkrat na teden", `monthly` -> "Enkrat na mesec", `custom` -> "Po meri"
+- Ohraniti pogojni prikaz za "Po meri" (stevilka + enota)
+- Ohraniti prikaz generiranega besedila
+
