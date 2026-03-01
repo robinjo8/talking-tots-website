@@ -1,0 +1,1 @@
+ALTER TABLE public.logopedist_reports ADD COLUMN IF NOT EXISTS report_details jsonb DEFAULT NULL;
