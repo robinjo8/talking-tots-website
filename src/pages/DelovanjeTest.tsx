@@ -165,13 +165,13 @@ const DelovanjeTest = () => {
             <div className="space-y-6">
               <div>
                 <p className="text-muted-foreground leading-relaxed">
-                  <strong>1.</strong> Otrok si najprej ogleda sliko. Priporočljivo je, da besedo najprej tiho ponovi pri sebi.
+                  <strong>7.1.</strong> Otrok si najprej ogleda sliko. Priporočljivo je, da besedo najprej tiho ponovi pri sebi.
                 </p>
               </div>
 
               <div>
                 <p className="text-muted-foreground leading-relaxed">
-                  <strong>2.</strong> Ko je otrok pripravljen na izgovorjavo, klikne gumb »Izgovori besedo«. S tem se začne odštevanje glede na izbran čas snemanja (3, 4 ali 5 sekund, privzeto 4 sekunde).
+                  <strong>7.2.</strong> Ko je otrok pripravljen na izgovorjavo, klikne gumb »Izgovori besedo«. S tem se začne odštevanje glede na izbran čas snemanja (3, 4 ali 5 sekund, privzeto 4 sekunde).
                 </p>
                 <div className="my-4 flex justify-center">
                   <img 
@@ -186,13 +186,13 @@ const DelovanjeTest = () => {
 
               <div>
                 <p className="text-muted-foreground leading-relaxed">
-                  <strong>3.</strong> V času odštevanja mora otrok naglas izgovoriti besedo. Izgovorjava se v tem času samodejno posname in shrani.
+                  <strong>7.3.</strong> V času odštevanja mora otrok naglas izgovoriti besedo. Izgovorjava se v tem času samodejno posname in shrani.
                 </p>
               </div>
 
               <div>
                 <p className="text-muted-foreground leading-relaxed">
-                  <strong>4.</strong> Med odštevanjem je prikazan časovnik.
+                  <strong>7.4.</strong> Med odštevanjem je prikazan časovnik.
                 </p>
                 <div className="my-4 flex justify-center">
                   <img 
@@ -207,7 +207,7 @@ const DelovanjeTest = () => {
 
               <div>
                 <p className="text-muted-foreground leading-relaxed">
-                  <strong>5.</strong> Ko se odštevanje zaključi, se namesto odštevalnika prikaže gumb »Naprej«.
+                  <strong>7.5.</strong> Ko se odštevanje zaključi, se namesto odštevalnika prikaže gumb »Naprej«.
                 </p>
                 <div className="my-4 flex justify-center">
                   <img 
@@ -222,7 +222,7 @@ const DelovanjeTest = () => {
 
               <div>
                 <p className="text-muted-foreground leading-relaxed">
-                  <strong>6.</strong> S klikom na gumb »Naprej« se otrok premakne na naslednjo besedo oziroma sliko.
+                  <strong>7.6.</strong> S klikom na gumb »Naprej« se otrok premakne na naslednjo besedo oziroma sliko.
                 </p>
               </div>
 
