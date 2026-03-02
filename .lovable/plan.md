@@ -1,41 +1,45 @@
 
-# Napolnitev strani /info-govor z informacijami o razdelku Govor
 
-Stran `/info-govor` je trenutno placeholder. Napolniti jo je treba z opisom vseh stirih aktivnosti, ki so na voljo na strani `/moje-aplikacije` (Govor): Moj osebni nacrt, Govorne igre, Govorne vaje in Preverjanje izgovorjave.
+# Posodobitev dveh dialogov na strani /artikulacijski-test
 
-## Spremembe
+Oba dialoga je treba posodobiti, da vkljucujeta informacije o prilagojeni razlicici (20 besed) in nastavljivih parametrih (zahtevnost, cas snemanja), skladno s posodobljenim besedilom na /kako-deluje.
 
-### Datoteka: `src/pages/InfoGovor.tsx`
+## 1. ArticulationTestInfoDialog.tsx (Obvestilo pred zacetkom)
 
-Celotna stran se nadomesti z informativno stranjo v enakem vizualnem stilu kot `DelovanjeTest.tsx` (prose, text-justify, sekcije z h2/h4, text-muted-foreground).
+**Kaj manjka:**
+- Omemba prilagojene razlicice za starost 3-4 let (20 besed)
+- Omemba nastavitev preverjanja (zahtevnost, cas snemanja)
 
-**Struktura vsebine:**
+**Spremembe:**
 
-1. **Uvod** -- kratka predstavitev razdelka Govor: kaj uporabnik najde na tej strani, namen (vadba izgovorjave, igre, vaje, preverjanje, osebni nacrt)
+- **Sekcija "Kaj se preverja?"** (vrstica 119): Dodati odstavek o prilagojeni razlicici:
+  > "Za otroke v starostni skupini 3-4 let je na voljo prilagojena razlicica s 20 besedami (1 beseda na glas), ki je krajsa in manj obremenjujoca."
 
-2. **Govorne igre** -- opis kaj so govorne igre, namen (zabavna vadba izgovorjave posameznih glasov), seznam vseh 11 iger s kratkim opisom:
-   - Kolo besed, Igra ujemanja, Zaporedja, Spomin, Drsna igra, Labirint, Sestavljanke (glasovi na zacetku besed)
-   - Zabavna pot, Bingo (glasovi na sredini in koncu besed)
-   - Ponovi poved, Smesne povedi (glasovi na zacetku, sredini in koncu)
-   - Pobarvanke, Povezi pike (kmalu na voljo)
-   - Opis, da igre pokrivajo razlicne polozaje glasov in razlicne starostne skupine
+- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Kako preverjanje poteka?"):
+  - Opis, da lahko uporabnik pred ali med preverjanjem prilagodi nastavitve
+  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka
+  - Cas snemanja: 3, 4 (privzeto) ali 5 sekund
 
-3. **Govorne vaje** -- opis treh vrst vaj:
-   - Vaje motorike govoril -- razgibavanje govoril (usta, ustnice, jezik)
-   - Moji prvi glasovi -- animacija za prepoznavanje in posnemanje glasov
-   - Video navodila -- video logopeda za pravilno izgovorjavo
+## 2. ArticulationTestInstructionsDialog.tsx (Kako deluje)
 
-4. **Preverjanje izgovorjave** -- kratek opis kaj je, kako deluje (sistematicno preverjanje 20 soglasnikov), standardna in prilagojena razlicica, s povezavo (Link) na `/delovanje-testa` za vec informacij
+**Kaj manjka:**
+- Omemba prilagojene razlicice (20 besed)
+- Omemba nastavitev (zahtevnost, cas snemanja)
+- Hardkodirano "5 sekund" in "60 besed" namesto nastavljive vrednosti
 
-5. **Moj osebni nacrt (TomiTalk Pro)** -- opis kaj je osebni nacrt, kako nastane (na podlagi rezultatov preverjanja), kaj vsebuje (90-dnevni nacrt vaj in iger, prilagojen otrokovim izzivom), da je na voljo v okviru narocnine TomiTalk Pro
+**Spremembe:**
 
-6. **Sistem nagrajevanja** -- kratka omemba zvezdic in dnevnega spremljanja napredka
+- **Sekcija "Struktura preverjanja"** (vrstica 52-60): Razdeliti na "Standardna razlicica" (60 besed) in "Prilagojena razlicica" (20 besed za 3-4 let), enako kot na /kako-deluje
 
-7. **Za koga je namenjeno** -- starostne skupine (3-4, 5-6, 7-8, 9-10 let)
+- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Struktura preverjanja"):
+  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka -- opis vpliva na strogost ocenjevanja
+  - Cas snemanja: 3, 4, 5 sekund z opisi
 
-**Vizualni stil:**
-- Header komponenta na vrhu
-- Naslov "Govor" z razredom text-dragon-green
-- max-w-4xl, prose prose-slate, text-justify
-- Sekcije z h2, h4, ul, p -- enako kot DelovanjeTest.tsx
-- Link komponenta iz react-router-dom za interno povezavo na /delovanje-testa
+- **Sekcija "Potek izgovorjave"** (vrstica 114): Popraviti "5 sekund" na "nastavljiv cas snemanja (3, 4 ali 5 sekund, privzeto 4 sekunde)"
+
+- **Zakljucna vrstica** (vrstica 170): Popraviti "60 besed" na "vseh besed (60 pri standardni oz. 20 pri prilagojeni razlicici)"
+
+### Datoteke za spremembo
+- `src/components/articulation/ArticulationTestInfoDialog.tsx`
+- `src/components/articulation/ArticulationTestInstructionsDialog.tsx`
+
