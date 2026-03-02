@@ -394,27 +394,87 @@ const KakoDeluje = () => {
             <p className="text-muted-foreground leading-relaxed">
               Funkcija Preverjanje izgovorjave omogoča sistematično oceno otrokovega govora in deluje podobno kot diagnostični pregled pri logopedu. Namenjena je ugotavljanju, kako otrok izgovarja posamezne soglasnike slovenskega jezika, še preden se začne ciljno vaditi.
             </p>
+            <p className="text-muted-foreground leading-relaxed mt-4">
+              Preverjanje omogoča objektiven vpogled v otrokovo artikulacijo ter predstavlja osnovo za oblikovanje osebnega načrta vaj in govorne podpore.
+            </p>
 
             <h4 className="text-lg font-medium text-foreground mb-2 mt-6">Potek preverjanja izgovorjave</h4>
             <p className="text-muted-foreground leading-relaxed">
-              Ko uporabnik odpre preverjanje izgovorjave, se otroku zaporedno prikazujejo besede s pripadajočimi slikami. Test je sestavljen iz:
+              Ob začetku preverjanja se otroku zaporedno prikazujejo besede s pripadajočimi slikami. Preverjanje poteka linearno, besedo za besedo, brez možnosti preskakovanja.
+            </p>
+
+            <h4 className="text-base font-medium text-foreground mb-2 mt-4">Standardna različica (za večino otrok)</h4>
+            <p className="text-muted-foreground leading-relaxed">
+              Preverjanje vsebuje:
             </p>
             <ul className="list-disc list-inside text-muted-foreground space-y-2 mt-4">
               <li>60 besed,</li>
               <li>ki pokrivajo 20 soglasnikov slovenskega jezika,</li>
-              <li>vsak glas se preverja na treh položajih: na začetku besede, v sredini besede in na koncu besede.</li>
+              <li>vsak glas se preverja na treh položajih:
+                <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
+                  <li>na začetku besede,</li>
+                  <li>v sredini besede,</li>
+                  <li>na koncu besede.</li>
+                </ul>
+              </li>
             </ul>
             <p className="text-muted-foreground leading-relaxed mt-4">
-              Test poteka linearno, besedo za besedo, brez možnosti preskakovanja.
+              Ta struktura omogoča natančno analizo artikulacije posameznega glasu glede na njegov položaj v besedi.
+            </p>
+
+            <h4 className="text-base font-medium text-foreground mb-2 mt-4">Prilagojena različica (starost 3–4 leta)</h4>
+            <p className="text-muted-foreground leading-relaxed">
+              Za mlajše otroke je na voljo poenostavljena različica preverjanja, ki vsebuje:
+            </p>
+            <ul className="list-disc list-inside text-muted-foreground space-y-2 mt-4">
+              <li>20 besed,</li>
+              <li>vsak glas se preverja z eno besedo (namesto treh).</li>
+            </ul>
+            <p className="text-muted-foreground leading-relaxed mt-4">
+              Prilagojena različica je krajša, manj obremenjujoča in primerna za otroke z nižjo koncentracijo ali začetno stopnjo govornega razvoja.
+            </p>
+
+            <h4 className="text-lg font-medium text-foreground mb-2 mt-6">Nastavitve preverjanja</h4>
+            <p className="text-muted-foreground leading-relaxed">
+              Pred začetkom ali med preverjanjem lahko uporabnik odpre Nastavitve preverjanja, kjer lahko prilagodi dva ključna parametra.
+            </p>
+
+            <h4 className="text-base font-medium text-foreground mb-2 mt-4">1. Stopnja zahtevnosti</h4>
+            <p className="text-muted-foreground leading-relaxed">
+              Uporabnik lahko izbere eno izmed treh stopenj:
+            </p>
+            <ul className="list-disc list-inside text-muted-foreground space-y-2 mt-4">
+              <li><strong>Nizka</strong> – bolj popustljivo ocenjevanje izgovorjave</li>
+              <li><strong>Srednja</strong> (privzeto, priporočeno) – uravnotežena nastavitev za večino otrok</li>
+              <li><strong>Visoka</strong> – strožje ocenjevanje izgovorjave</li>
+            </ul>
+            <p className="text-muted-foreground leading-relaxed mt-4">
+              Stopnja zahtevnosti vpliva na kriterije prepoznavanja in ocenjevanja pravilnosti izgovorjene besede.
+            </p>
+
+            <h4 className="text-base font-medium text-foreground mb-2 mt-4">2. Čas snemanja</h4>
+            <p className="text-muted-foreground leading-relaxed">
+              Čas snemanja je nastavljiv:
+            </p>
+            <ul className="list-disc list-inside text-muted-foreground space-y-2 mt-4">
+              <li><strong>3 sekunde</strong> – za hitrejše otroke</li>
+              <li><strong>4 sekunde</strong> (privzeto, priporočeno) – za večino otrok</li>
+              <li><strong>5 sekund</strong> – za otroke z večjimi težavami ali počasnejšim govorom</li>
+            </ul>
+            <p className="text-muted-foreground leading-relaxed mt-4">
+              Izbrani čas določa dolžino snemanja po zagonu izgovora.
             </p>
 
             <h4 className="text-lg font-medium text-foreground mb-2 mt-6">Snemanje in zaznavanje govora</h4>
             <p className="text-muted-foreground leading-relaxed">
-              Pri vsaki besedi otrok klikne gumb »Izgovori besedo«. Nato se prikaže 3–5 sekundno animirano odštevanje, med katerim aplikacija:
+              Pri vsaki besedi otrok klikne gumb »Izgovori besedo«. Nato se prikaže animirano odštevanje glede na izbran čas snemanja (3, 4 ali 5 sekund).
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-4">
+              Med snemanjem aplikacija:
             </p>
             <ul className="list-disc list-inside text-muted-foreground space-y-2 mt-4">
               <li>snema otrokov govor,</li>
-              <li>izvaja RMS analizo, s katero preveri, ali je bil zvok sploh zaznan.</li>
+              <li>izvaja RMS analizo, s katero preveri, ali je bil zvok dejansko zaznan.</li>
             </ul>
             <p className="text-muted-foreground leading-relaxed mt-4">
               Če sistem zazna tišino:
@@ -427,80 +487,94 @@ const KakoDeluje = () => {
               Če je zvok zaznan:
             </p>
             <ul className="list-disc list-inside text-muted-foreground space-y-2 mt-4">
-              <li>se posnetek samodejno pošlje v nadaljnjo obdelavo.</li>
+              <li>se posnetek samodejno pošlje v nadaljnjo obdelavo in ocenjevanje.</li>
             </ul>
 
             <h4 className="text-lg font-medium text-foreground mb-2 mt-6">Takojšnja povratna informacija</h4>
             <p className="text-muted-foreground leading-relaxed">
-              Otrok po vsaki besedi prejme takojšnjo vizualno povratno informacijo:
+              Po vsaki besedi otrok prejme takojšnjo vizualno in motivacijsko povratno informacijo.
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-4">
+              Ob uspešni izgovorjavi:
             </p>
             <ul className="list-disc list-inside text-muted-foreground space-y-2 mt-4">
-              <li>ob uspešni izgovorjavi se prikaže zeleno sporočilo »BRAVO«, slika se označi kot opravljena (sivinski učinek) in omogočen je gumb »Naprej«,</li>
-              <li>ob neuspešni izgovorjavi ali zaznani tišini se prikaže rdeče opozorilo z možnostjo ponovitve.</li>
+              <li>prikaže se zeleno sporočilo »BRAVO«,</li>
+              <li>slika se označi kot opravljena (sivinski učinek),</li>
+              <li>omogočen je gumb »Naprej«,</li>
+              <li>maskota otroka pohvali (npr. »Bravo, pravilno si povedal!«).</li>
             </ul>
             <p className="text-muted-foreground leading-relaxed mt-4">
-              Med testom aplikacija otroka tudi motivira:
+              Ob neuspešni izgovorjavi ali zaznani tišini:
             </p>
             <ul className="list-disc list-inside text-muted-foreground space-y-2 mt-4">
-              <li>ob pravilni izgovorjavi maskota pohvali: »Bravo, pravilno si povedal!«,</li>
-              <li>ob napaki pa spodbuja: »Skoraj, poskusiva še enkrat s to besedo.«</li>
+              <li>prikaže se rdeče opozorilo,</li>
+              <li>ponujen je ponovni poskus,</li>
+              <li>maskota spodbuja (npr. »Skoraj, poskusiva še enkrat s to besedo.«).</li>
             </ul>
             <p className="text-muted-foreground leading-relaxed mt-4">
-              Otrok tako vadi v varnem in spodbudnem okolju, podobno kot pri logopedu.
+              Otrok tako vadi v varnem, spodbudnem in motivacijskem okolju.
             </p>
 
             <h4 className="text-lg font-medium text-foreground mb-2 mt-6">Shranjevanje in analiza rezultatov</h4>
             <p className="text-muted-foreground leading-relaxed">
-              Vsi posnetki se sproti shranjujejo in so:
+              Vsi posnetki in rezultati se sproti shranjujejo:
             </p>
             <ul className="list-disc list-inside text-muted-foreground space-y-2 mt-4">
-              <li>povezani v enoten testni sklop,</li>
-              <li>na voljo za kasnejši pregled in analizo napredka.</li>
+              <li>povezani so v enoten testni sklop,</li>
+              <li>na voljo so za kasnejši pregled,</li>
+              <li>omogočajo analizo napredka skozi čas.</li>
             </ul>
             <p className="text-muted-foreground leading-relaxed mt-4">
               To omogoča:
             </p>
             <ul className="list-disc list-inside text-muted-foreground space-y-2 mt-4">
               <li>objektivno spremljanje govornega razvoja,</li>
-              <li>primerjavo rezultatov skozi čas.</li>
+              <li>primerjavo rezultatov med posameznimi preverjanji,</li>
+              <li>podporo strokovni logopedski obravnavi.</li>
             </ul>
 
             <h4 className="text-lg font-medium text-foreground mb-2 mt-6">Zaključek testa in ponovljivost</h4>
             <p className="text-muted-foreground leading-relaxed">
-              Ko otrok uspešno opravi vseh 60 besed:
+              Preverjanje se zaključi samodejno:
             </p>
             <ul className="list-disc list-inside text-muted-foreground space-y-2 mt-4">
-              <li>se samodejno prikaže zaključno pop-up okno,</li>
-              <li>preverjanje je zaključeno in pripravljeno za nadaljnjo analizo ali prihodnjo ponovitev.</li>
+              <li>po 60 besedah pri standardni različici,</li>
+              <li>po 20 besedah pri prilagojeni različici za starost 3–4 let.</li>
             </ul>
             <p className="text-muted-foreground leading-relaxed mt-4">
-              Preverjanje izgovorjave je ponovljivo:
+              Po zaključku se prikaže zaključno okno, preverjanje pa je pripravljeno za nadaljnjo analizo ali prihodnjo ponovitev.
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-4">
+              Preverjanje je ponovljivo:
             </p>
             <ul className="list-disc list-inside text-muted-foreground space-y-2 mt-4">
-              <li>prvo preverjanje se izvede na začetku uporabe,</li>
-              <li>nato je preverjanje možno vsake tri mesece (skupno 5-krat letno).</li>
+              <li>prvo preverjanje se izvede ob začetku uporabe,</li>
+              <li>nato je priporočeno ponavljanje vsakih tri mesece (do 5-krat letno).</li>
             </ul>
             <p className="text-muted-foreground leading-relaxed mt-4">
-              Ta ponovljivost omogoča jasen vpogled v to, ali je otrok posamezne glasove sčasoma izboljšal.
+              Takšna struktura omogoča jasen vpogled v napredek posameznih glasov skozi čas.
             </p>
 
             <h4 className="text-lg font-medium text-foreground mb-2 mt-6">Povezava z osebnim načrtom in vloga staršev</h4>
             <p className="text-muted-foreground leading-relaxed">
-              Preverjanje izgovorjave je dragoceno tudi za starše, saj:
+              Preverjanje izgovorjave predstavlja ključno diagnostično izhodišče za nadaljnje delo.
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-4">
+              Staršem omogoča:
             </p>
             <ul className="list-disc list-inside text-muted-foreground space-y-2 mt-4">
-              <li>jasno pokaže, kateri glasovi otroku povzročajo težave,</li>
-              <li>omogoča ciljno usmerjeno vadbo.</li>
+              <li>jasen vpogled v glasove, ki otroku povzročajo težave,</li>
+              <li>ciljno usmerjeno vadbo doma.</li>
             </ul>
             <p className="text-muted-foreground leading-relaxed mt-4">
-              Na podlagi rezultatov in logopedskega poročila aplikacija:
+              Na podlagi rezultatov preverjanja in morebitnega logopedskega poročila aplikacija:
             </p>
             <ul className="list-disc list-inside text-muted-foreground space-y-2 mt-4">
               <li>predlaga najprimernejše govorne igre in vaje,</li>
               <li>samodejno oblikuje Moj osebni načrt.</li>
             </ul>
             <p className="text-muted-foreground leading-relaxed mt-4">
-              Rezultate preverjanja lahko starši po potrebi:
+              Rezultate lahko starši po potrebi:
             </p>
             <ul className="list-disc list-inside text-muted-foreground space-y-2 mt-4">
               <li>delijo z logopedom,</li>
