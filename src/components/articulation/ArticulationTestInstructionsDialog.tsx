@@ -52,11 +52,47 @@ const ArticulationTestInstructionsDialog = ({ open, onClose }: ArticulationTestI
             {/* Struktura testa */}
             <section>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Struktura preverjanja</h3>
+              
+              <h4 className="text-base font-medium text-gray-900 mt-3 mb-1">Standardna različica (za večino otrok)</h4>
               <ul className="list-disc list-inside text-sm space-y-1 ml-2">
-                <li>Otrok izgovarja 60 besed, vsaka beseda je podprta s sliko.</li>
+                <li>60 besed, ki pokrivajo 20 soglasnikov slovenskega jezika.</li>
+                <li>Vsak glas se preverja na treh položajih: na začetku, v sredini in na koncu besede.</li>
                 <li>Slike in besede se prikazujejo v vnaprej določenem vrstnem redu, ki je enak za vse otroke.</li>
-                <li>Preverjanje se šteje kot uspešno zaključeno, ko je izgovorjenih vseh 60 besed.</li>
               </ul>
+
+              <h4 className="text-base font-medium text-gray-900 mt-3 mb-1">Prilagojena različica (starost 3–4 leta)</h4>
+              <ul className="list-disc list-inside text-sm space-y-1 ml-2">
+                <li>20 besed – vsak glas se preverja z eno besedo (namesto treh).</li>
+                <li>Krajša, manj obremenjujoča in primerna za otroke z nižjo koncentracijo ali začetno stopnjo govornega razvoja.</li>
+              </ul>
+            </section>
+
+            {/* Nastavitve preverjanja */}
+            <section>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Nastavitve preverjanja</h3>
+              <p className="text-sm leading-relaxed mb-2">
+                Pred začetkom ali med preverjanjem lahko uporabnik odpre Nastavitve preverjanja, kjer lahko prilagodi dva ključna parametra.
+              </p>
+
+              <h4 className="text-base font-medium text-gray-900 mt-3 mb-1">1. Stopnja zahtevnosti</h4>
+              <ul className="list-disc list-inside text-sm space-y-1 ml-2">
+                <li><strong>Nizka</strong> – bolj popustljivo ocenjevanje izgovorjave</li>
+                <li><strong>Srednja</strong> (privzeto, priporočeno) – uravnotežena nastavitev za večino otrok</li>
+                <li><strong>Visoka</strong> – strožje ocenjevanje izgovorjave</li>
+              </ul>
+              <p className="text-sm leading-relaxed mt-2">
+                Stopnja zahtevnosti vpliva na kriterije prepoznavanja in ocenjevanja pravilnosti izgovorjene besede.
+              </p>
+
+              <h4 className="text-base font-medium text-gray-900 mt-3 mb-1">2. Čas snemanja</h4>
+              <ul className="list-disc list-inside text-sm space-y-1 ml-2">
+                <li><strong>3 sekunde</strong> – za hitrejše otroke</li>
+                <li><strong>4 sekunde</strong> (privzeto, priporočeno) – za večino otrok</li>
+                <li><strong>5 sekund</strong> – za otroke z večjimi težavami ali počasnejšim govorom</li>
+              </ul>
+              <p className="text-sm leading-relaxed mt-2">
+                Izbrani čas določa dolžino snemanja po zagonu izgovora.
+              </p>
             </section>
 
             {/* Prikaz napredka */}
@@ -64,14 +100,14 @@ const ArticulationTestInstructionsDialog = ({ open, onClose }: ArticulationTestI
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Prikaz napredka med preverjanjem</h3>
               <ul className="list-disc list-inside text-sm space-y-1 ml-2">
                 <li>Na vrhu zaslona so prikazani vsi glasovi soglasnikov, ki se preverjajo.</li>
-                <li>Vsak glas ima tri korake (začetek, sredina, konec).</li>
+                <li>Vsak glas ima tri korake (začetek, sredina, konec) pri standardni različici oziroma enega pri prilagojeni.</li>
                 <li>Ko otrok izgovori prvo besedo za določen glas (npr. za glas B – BIK) in klikne naprej:
                   <ul className="list-disc list-inside ml-4 mt-1">
                     <li>se polje glasu delno obarva zeleno (1/3),</li>
                     <li>to pomeni, da je otrok izgovoril 1 od 3 besed za ta glas.</li>
                   </ul>
                 </li>
-                <li>Ko je polje glasu v celoti zeleno, pomeni, da je otrok izgovoril vse tri besede za določen soglasnik.</li>
+                <li>Ko je polje glasu v celoti zeleno, pomeni, da je otrok izgovoril vse besede za določen soglasnik.</li>
               </ul>
               <p className="text-sm leading-relaxed mt-2">
                 Ta prikaz omogoča jasen in pregleden vpogled v potek preverjanja.
@@ -111,7 +147,7 @@ const ArticulationTestInstructionsDialog = ({ open, onClose }: ArticulationTestI
 
                 <div>
                   <p className="text-sm leading-relaxed">
-                    <strong>2.</strong> Ko je otrok pripravljen na izgovorjavo, klikne gumb »Izgovori besedo«. S tem se začne odštevanje 5 sekund.
+                    <strong>2.</strong> Ko je otrok pripravljen na izgovorjavo, klikne gumb »Izgovori besedo«. S tem se začne odštevanje glede na izbran čas snemanja (3, 4 ali 5 sekund, privzeto 4 sekunde).
                   </p>
                   {/* Image 2 */}
                   <div className="my-3 flex justify-center">
@@ -167,7 +203,7 @@ const ArticulationTestInstructionsDialog = ({ open, onClose }: ArticulationTestI
                 </div>
 
                 <p className="text-sm leading-relaxed mt-4">
-                  Postopek se ponavlja, dokler otrok ne izgovori vseh 60 besed in s tem zaključi test.
+                  Postopek se ponavlja, dokler otrok ne izgovori vseh besed (60 pri standardni oz. 20 pri prilagojeni različici) in s tem zaključi preverjanje.
                 </p>
               </div>
             </section>

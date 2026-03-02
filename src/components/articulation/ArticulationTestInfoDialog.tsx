@@ -118,6 +118,9 @@ const ArticulationTestInfoDialog = ({
               <p className="text-muted-foreground mt-2">
                 Preverjanje izgovorjave vključuje 60 skrbno izbranih besed, razporejenih po soglasnikih (brez samoglasnikov), kar omogoča enakomerno in ciljno oceno otrokove izgovorjave.
               </p>
+              <p className="text-muted-foreground mt-2">
+                Za otroke v starostni skupini 3–4 let je na voljo prilagojena različica s 20 besedami (1 beseda na glas), ki je krajša in manj obremenjujoča.
+              </p>
             </section>
 
             <section>
@@ -133,6 +136,25 @@ const ArticulationTestInfoDialog = ({
               <p className="text-muted-foreground mt-2">
                 Preverjanje je zasnovano tako, da je za otroka kratko, enostavno in brez pritiska.
               </p>
+            </section>
+
+            <section>
+              <h3 className="font-bold text-base mb-2">Nastavitve preverjanja</h3>
+              <p className="text-muted-foreground mb-2">
+                Pred začetkom ali med preverjanjem lahko uporabnik odpre Nastavitve preverjanja, kjer lahko prilagodi dva ključna parametra:
+              </p>
+              <p className="text-muted-foreground font-medium mt-2">Stopnja zahtevnosti:</p>
+              <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-2">
+                <li><strong>Nizka</strong> – bolj popustljivo ocenjevanje izgovorjave</li>
+                <li><strong>Srednja</strong> (privzeto, priporočeno) – uravnotežena nastavitev za večino otrok</li>
+                <li><strong>Visoka</strong> – strožje ocenjevanje izgovorjave</li>
+              </ul>
+              <p className="text-muted-foreground font-medium mt-2">Čas snemanja:</p>
+              <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-2">
+                <li><strong>3 sekunde</strong> – za hitrejše otroke</li>
+                <li><strong>4 sekunde</strong> (privzeto, priporočeno) – za večino otrok</li>
+                <li><strong>5 sekund</strong> – za otroke z večjimi težavami ali počasnejšim govorom</li>
+              </ul>
             </section>
 
             <section>
