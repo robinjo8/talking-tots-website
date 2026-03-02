@@ -1,46 +1,45 @@
 
 
-# Napolnitev strani /delovanje-testa z vsebino o preverjanju izgovorjave
+# Posodobitev dveh dialogov na strani /artikulacijski-test
 
-Stran `/delovanje-testa` je trenutno prazna (samo placeholder "Vsebina strani bo kmalu na voljo"). Napolniti jo je treba s celotno vsebino o delovanju preverjanja izgovorjave -- kombinacija informacij iz obeh dialogov (Obvestilo pred zacetkom + Kako deluje) ter besedila s strani /kako-deluje.
+Oba dialoga je treba posodobiti, da vkljucujeta informacije o prilagojeni razlicici (20 besed) in nastavljivih parametrih (zahtevnost, cas snemanja), skladno s posodobljenim besedilom na /kako-deluje.
 
-## Spremembe
+## 1. ArticulationTestInfoDialog.tsx (Obvestilo pred zacetkom)
 
-### Datoteka: `src/pages/DelovanjeTest.tsx`
+**Kaj manjka:**
+- Omemba prilagojene razlicice za starost 3-4 let (20 besed)
+- Omemba nastavitev preverjanja (zahtevnost, cas snemanja)
 
-Celotna stran se nadomesti z bogato vsebinsko stranjo, ki vkljucuje:
+**Spremembe:**
 
-**Struktura vsebine (sekcije):**
+- **Sekcija "Kaj se preverja?"** (vrstica 119): Dodati odstavek o prilagojeni razlicici:
+  > "Za otroke v starostni skupini 3-4 let je na voljo prilagojena razlicica s 20 besedami (1 beseda na glas), ki je krajsa in manj obremenjujoca."
 
-1. **Uvod** -- kaj je preverjanje izgovorjave, namen, kratek povzetek
-2. **Kaj se preverja** -- 20 soglasnikov, trije polozaji (zacetek, sredina, konec)
-3. **Struktura preverjanja** -- Standardna razlicica (60 besed) in Prilagojena razlicica (20 besed, 3-4 let)
-4. **Nastavitve preverjanja** -- Stopnja zahtevnosti (Nizka/Srednja/Visoka) in Cas snemanja (3/4/5 sekund)
-5. **Prikaz napredka med preverjanjem** -- opis progress grida z glasovi + slika (`test_izgovorjave_1.png`)
-6. **Potek izgovorjave posamezne besede** -- 6 korakov s slikami:
-   - Korak 1: Ogled slike
-   - Korak 2: Klik na gumb "Izgovori besedo" + slika (`bik_1.png`)
-   - Korak 3: Izgovorjava med odstevanjem
-   - Korak 4: Casovnik + slika (`bik_2.png`)
-   - Korak 5: Gumb "Naprej" + slika (`bik_3.png`)
-   - Korak 6: Premik na naslednjo besedo
-7. **Snemanje in zaznavanje govora** -- RMS analiza, tisina vs. zaznan zvok
-8. **Takojsnja povratna informacija** -- uspesna/neuspesna izgovorjava, maskota
-9. **Shranjevanje in analiza rezultatov** -- testni sklop, kasnejsi pregled
-10. **Zakljucek testa in ponovljivost** -- samodejni zakljucek, periodika (vsake 3 mesece)
-11. **Kdaj se preverjanje izvaja** -- ob zacetku, periodicno
-12. **Povezava z osebnim nacrtom in vloga starsev**
-13. **Pomembno obvestilo za starse** -- ni diagnosticno orodje
-14. **Kako lahko otroku pomagate** -- mirno okolje, brez pritiska
+- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Kako preverjanje poteka?"):
+  - Opis, da lahko uporabnik pred ali med preverjanjem prilagodi nastavitve
+  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka
+  - Cas snemanja: 3, 4 (privzeto) ali 5 sekund
 
-**Vizualni stil:**
-- Enak stil kot KakoDeluje.tsx (h2, h4, ul, p z razredi text-muted-foreground, leading-relaxed)
-- Header komponenta na vrhu
-- Slike iz Supabase storage (`slike-ostalo` bucket) -- enake kot v InstructionsDialog
-- Responsive layout z max-w-4xl
+## 2. ArticulationTestInstructionsDialog.tsx (Kako deluje)
 
-**Slike ki se uporabijo:**
-- `test_izgovorjave_1.png` -- prikaz napredka (progress grid)
-- `bik_1.png` -- gumb "Izgovori besedo"
-- `bik_2.png` -- casovnik odstevanja
-- `bik_3.png` -- gumb "Naprej"
+**Kaj manjka:**
+- Omemba prilagojene razlicice (20 besed)
+- Omemba nastavitev (zahtevnost, cas snemanja)
+- Hardkodirano "5 sekund" in "60 besed" namesto nastavljive vrednosti
+
+**Spremembe:**
+
+- **Sekcija "Struktura preverjanja"** (vrstica 52-60): Razdeliti na "Standardna razlicica" (60 besed) in "Prilagojena razlicica" (20 besed za 3-4 let), enako kot na /kako-deluje
+
+- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Struktura preverjanja"):
+  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka -- opis vpliva na strogost ocenjevanja
+  - Cas snemanja: 3, 4, 5 sekund z opisi
+
+- **Sekcija "Potek izgovorjave"** (vrstica 114): Popraviti "5 sekund" na "nastavljiv cas snemanja (3, 4 ali 5 sekund, privzeto 4 sekunde)"
+
+- **Zakljucna vrstica** (vrstica 170): Popraviti "60 besed" na "vseh besed (60 pri standardni oz. 20 pri prilagojeni razlicici)"
+
+### Datoteke za spremembo
+- `src/components/articulation/ArticulationTestInfoDialog.tsx`
+- `src/components/articulation/ArticulationTestInstructionsDialog.tsx`
+
