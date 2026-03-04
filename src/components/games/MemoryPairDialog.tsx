@@ -189,31 +189,17 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
           </div>
 
           {/* Action buttons - always visible, disabled until recorded */}
-          <div className="flex justify-center gap-3">
-            <Button 
-              onClick={handleReset} 
-              variant="outline" 
-              className="gap-2 flex-1 max-w-28"
-              disabled={!hasRecorded}
-            >
-              PONOVI
-            </Button>
+          <div className="flex justify-center">
             <Button 
               onClick={handleContinue}
-              className={`gap-2 flex-1 ${
+              className={`gap-2 ${
                 isLastPair 
                   ? 'bg-yellow-500 hover:bg-yellow-600 text-white max-w-32' 
                   : 'bg-dragon-green hover:bg-dragon-green/90 text-white max-w-28'
               }`}
               disabled={!hasRecorded}
             >
-              {isLastPair ? (
-                <>
-                  VZEMI ZVEZDICO
-                </>
-              ) : (
-                'NADALJUJ'
-              )}
+              {isLastPair ? 'VZEMI ZVEZDICO' : 'NADALJUJ'}
             </Button>
           </div>
         </div>
