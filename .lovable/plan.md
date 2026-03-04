@@ -1,35 +1,45 @@
 
 
-# Plan: Ponovi Poved - iPhone orientacija + Yoga header
+# Posodobitev dveh dialogov na strani /artikulacijski-test
 
-## Problem 1: iPhone se obrne v ležeči položaj
-Igra Ponovi Poved nima nobene zaščite pred obračanjem zaslona na iOS. Na Androidu to deluje, ker druge igre zaklenejo orientacijo, ampak ta igra tega ne počne.
+Oba dialoga je treba posodobiti, da vkljucujeta informacije o prilagojeni razlicici (20 besed) in nastavljivih parametrih (zahtevnost, cas snemanja), skladno s posodobljenim besedilom na /kako-deluje.
 
-### Rešitev
-Dodati CSS overlay, ki se prikaže ko je telefon v landscape načinu in zahteva od uporabnika, da telefon obrne nazaj v pokončni položaj. Na iOS `screen.orientation.lock()` ne deluje, zato uporabimo CSS pristop (enako kot pri drugih igrah v projektu).
+## 1. ArticulationTestInfoDialog.tsx (Obvestilo pred zacetkom)
 
-**Datoteka:** `src/components/games/PonoviPovedGame.tsx`
-- Dodati detekcijo landscape orientacije na mobilnih napravah
-- Prikazati overlay z ikono rotacije in sporočilom "Obrni telefon v pokončni položaj" ko je naprava v landscape
+**Kaj manjka:**
+- Omemba prilagojene razlicice za starost 3-4 let (20 besed)
+- Omemba nastavitev preverjanja (zahtevnost, cas snemanja)
 
-## Problem 2: Lenovo Yoga - header gumbi se prekrivajo
-Trenutni breakpoint za prehod med desktop in mobilno navigacijo je `lg` (1024px). Lenovo Yoga in podobni manjši prenosniki imajo širino zaslona okrog 1024-1280px, kjer se absolutno centrirani navigacijski gumbi prekrivajo z desnimi ikonami.
+**Spremembe:**
 
-### Rešitev
-Povečati breakpoint iz `lg` (1024px) na `xl` (1280px), tako da bodo naprave kot Yoga dobile mobilno/tablično navigacijo s hamburger menijem namesto desktop navigacije.
+- **Sekcija "Kaj se preverja?"** (vrstica 119): Dodati odstavek o prilagojeni razlicici:
+  > "Za otroke v starostni skupini 3-4 let je na voljo prilagojena razlicica s 20 besedami (1 beseda na glas), ki je krajsa in manj obremenjujoca."
 
-**Datoteke za spremembo:**
-- `src/components/Header.tsx`: zamenjati `lg:hidden` → `xl:hidden` za mobilni layout
-- `src/components/header/DesktopNavigation.tsx`: zamenjati `hidden lg:flex` → `hidden xl:flex` za desktop nav (in morebitne druge `lg:` reference)
+- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Kako preverjanje poteka?"):
+  - Opis, da lahko uporabnik pred ali med preverjanjem prilagodi nastavitve
+  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka
+  - Cas snemanja: 3, 4 (privzeto) ali 5 sekund
 
-## Problem 3: Yoga - igra odreže zgornji del
-Na manjših zaslonih (Yoga ~1280x800) lahko desktop layout igre z `offsetY` -80 odreže vrh. Preveriti in prilagoditi `offsetY` izračun, da ne gre v negativno.
+## 2. ArticulationTestInstructionsDialog.tsx (Kako deluje)
 
-**Datoteka:** `src/components/games/PonoviPovedGame.tsx`
-- Prilagoditi `offsetY` izračun za desktop, da upošteva manjše zaslone (zmanjšati ali odstraniti -80 offset)
+**Kaj manjka:**
+- Omemba prilagojene razlicice (20 besed)
+- Omemba nastavitev (zahtevnost, cas snemanja)
+- Hardkodirano "5 sekund" in "60 besed" namesto nastavljive vrednosti
 
-## Povzetek sprememb
-1. `src/components/games/PonoviPovedGame.tsx` — landscape overlay za mobilne naprave + offsetY fix
-2. `src/components/Header.tsx` — breakpoint `lg` → `xl`
-3. `src/components/header/DesktopNavigation.tsx` — breakpoint `lg` → `xl`
+**Spremembe:**
+
+- **Sekcija "Struktura preverjanja"** (vrstica 52-60): Razdeliti na "Standardna razlicica" (60 besed) in "Prilagojena razlicica" (20 besed za 3-4 let), enako kot na /kako-deluje
+
+- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Struktura preverjanja"):
+  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka -- opis vpliva na strogost ocenjevanja
+  - Cas snemanja: 3, 4, 5 sekund z opisi
+
+- **Sekcija "Potek izgovorjave"** (vrstica 114): Popraviti "5 sekund" na "nastavljiv cas snemanja (3, 4 ali 5 sekund, privzeto 4 sekunde)"
+
+- **Zakljucna vrstica** (vrstica 170): Popraviti "60 besed" na "vseh besed (60 pri standardni oz. 20 pri prilagojeni razlicici)"
+
+### Datoteke za spremembo
+- `src/components/articulation/ArticulationTestInfoDialog.tsx`
+- `src/components/articulation/ArticulationTestInstructionsDialog.tsx`
 

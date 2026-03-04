@@ -24,7 +24,7 @@ export function DesktopNavigation({ user, onStartNow }: DesktopNavigationProps) 
   // If user is a logopedist, show simplified navigation with notification and organization button
   if (user && profile?.isLogopedist) {
     return (
-      <div className="hidden lg:flex items-center justify-between w-full">
+      <div className="hidden xl:flex items-center justify-between w-full">
         {/* Left side - Logo */}
         <Link 
           to="/" 
@@ -80,7 +80,7 @@ export function DesktopNavigation({ user, onStartNow }: DesktopNavigationProps) 
 
   return (
     <>
-      <div className="hidden lg:flex items-center justify-between w-full relative">
+      <div className="hidden xl:flex items-center justify-between w-full relative">
         {/* Left side - Logo */}
         <div className="flex items-center">
           <Link 
@@ -183,7 +183,7 @@ export function DesktopNavigation({ user, onStartNow }: DesktopNavigationProps) 
               <UserProfile />
             </>
           ) : (
-            <div className="hidden lg:flex items-center gap-2">
+            <div className="hidden xl:flex items-center gap-2">
               <Link to="/admin/login">
                 <Button
                   variant="outline"
