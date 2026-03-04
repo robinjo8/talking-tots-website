@@ -2,7 +2,8 @@ import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Home, Volume2, Mic, ArrowUp, RefreshCw } from "lucide-react";
+import { Home, Volume2, Mic, ArrowUp, RefreshCw, RotateCcw } from "lucide-react";
+import { isIOSDevice } from "@/utils/appleDetection";
 import { 
   PonoviPovedConfig, 
   SentenceWord,
@@ -237,6 +238,24 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
   const { checkForNewTrophy } = useTrophyContext();
   const audioRef = useRef<HTMLAudioElement>(null);
   const isMobile = useIsMobile();
+  const [isLandscape, setIsLandscape] = useState(false);
+  
+  // Detect landscape orientation on mobile (especially iOS where orientation lock doesn't work)
+  useEffect(() => {
+    const checkOrientation = () => {
+      const isLand = window.innerWidth > window.innerHeight;
+      setIsLandscape(isLand && isMobile);
+    };
+    
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', () => setTimeout(checkOrientation, 100));
+    
+    return () => {
+      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('orientationchange', checkOrientation);
+    };
+  }, [isMobile]);
   
   // Select positions based on device
   const STONE_POSITIONS = isMobile ? STONE_POSITIONS_MOBILE : STONE_POSITIONS_DESKTOP;
@@ -301,9 +320,10 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
       const scaledGridWidth = 6 * gapX + stoneWidth;
       const scaledGridHeight = 2 * gapY + stoneHeight;
       
-      // Center horizontally and push UP more (changed from -40 to -80)
+      // Center horizontally, push up but clamp to avoid clipping on small screens
       const offsetX = (containerSize.width - scaledGridWidth) / 2;
-      const offsetY = (containerSize.height - scaledGridHeight) / 2 - 80;
+      const rawOffsetY = (containerSize.height - scaledGridHeight) / 2 - 80;
+      const offsetY = Math.max(rawOffsetY, 20);
       
       return {
         stoneWidth,
@@ -713,6 +733,30 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
         }}
       >
         <div className="animate-pulse text-white text-xl font-bold">Nalaganje...</div>
+      </div>
+    );
+  }
+
+  // Show landscape warning overlay on mobile (especially iOS)
+  if (isLandscape) {
+    return (
+      <div 
+        className="min-h-screen w-full fixed inset-0 flex items-center justify-center z-[9999]"
+        style={{
+          backgroundImage: `url(${BACKGROUND_URL})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-8 flex flex-col items-center gap-4 mx-6 max-w-sm border-2 border-orange-200">
+          <RotateCcw className="w-16 h-16 text-orange-500 animate-spin" style={{ animationDuration: '3s' }} />
+          <p className="text-xl font-bold text-gray-800 text-center uppercase">
+            Obrni telefon v pokončni položaj
+          </p>
+          <p className="text-sm text-gray-500 text-center">
+            Ta igra deluje samo v pokončnem načinu
+          </p>
+        </div>
       </div>
     );
   }

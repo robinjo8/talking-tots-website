@@ -55,7 +55,7 @@ export default function Header() {
         <DesktopNavigation user={user} onStartNow={handleStartNow} />
 
         {/* Mobile layout - logo left, profile right */}
-        <div className="lg:hidden flex items-center justify-between w-full">
+        <div className="xl:hidden flex items-center justify-between w-full">
           {/* Logo on far left */}
           <Link 
             to="/" 
