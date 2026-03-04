@@ -22,7 +22,7 @@ const stickmanPovedek: MetKockeWord[] = [
   { word: "ima", image: "Stickman_imeti.webp", audio: "Ima.mp3" },
   { word: "riše", image: "Stickman_risati.webp", audio: "Rise.mp3" },
   { word: "nese", image: "Stickman_nesti.webp", audio: "Nese.mp3" },
-  { word: "želi", image: "Stickman_zeleti.png.webp", audio: "Zeli.mp3" },
+  { word: "želi", image: "Stickman_zeleti.webp", audio: "Zeli.mp3" },
 ];
 
 // Konfiguracija za črko S

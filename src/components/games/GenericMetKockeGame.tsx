@@ -214,17 +214,22 @@ export function GenericMetKockeGame({
                   {/* BITJE column */}
                   <div className="flex justify-center">
                     <div 
-                      className={`aspect-square rounded overflow-hidden bg-background transition-all duration-300 ${
+                      className={`rounded overflow-hidden bg-background transition-all duration-300 ${
                         isBitjeSelected 
                           ? 'ring-2 ring-app-orange scale-105' 
                           : ''
                       }`}
-                      style={{ maxHeight: 'calc((100vh - 200px) / 7)', maxWidth: 'calc((100vh - 200px) / 7)' }}
+                      style={{ 
+                        width: 'calc((100vh - 200px) / 7)', 
+                        height: 'calc((100vh - 200px) / 7)',
+                        maxWidth: '100%',
+                      }}
                     >
                       <img
                         src={`${SUPABASE_URL}/slike/${bitjeItem.image}`}
                         alt={bitjeItem.word}
                         className="w-full h-full object-contain"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                       />
                     </div>
                   </div>
@@ -232,17 +237,22 @@ export function GenericMetKockeGame({
                   {/* POVEDEK column */}
                   <div className="flex justify-center">
                     <div 
-                      className={`aspect-square rounded overflow-hidden bg-background transition-all duration-300 ${
+                      className={`rounded overflow-hidden bg-background transition-all duration-300 ${
                         isPovedekSelected 
                           ? 'ring-2 ring-app-blue scale-105' 
                           : ''
                       }`}
-                      style={{ maxHeight: 'calc((100vh - 200px) / 7)', maxWidth: 'calc((100vh - 200px) / 7)' }}
+                      style={{ 
+                        width: 'calc((100vh - 200px) / 7)', 
+                        height: 'calc((100vh - 200px) / 7)',
+                        maxWidth: '100%',
+                      }}
                     >
                       <img
                         src={`${SUPABASE_URL}/slike/${povedekItem.image}`}
                         alt={povedekItem.word}
                         className="w-full h-full object-contain"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                       />
                     </div>
                   </div>
@@ -250,17 +260,22 @@ export function GenericMetKockeGame({
                   {/* PREDMET column */}
                   <div className="flex justify-center">
                     <div 
-                      className={`aspect-square rounded overflow-hidden bg-background transition-all duration-300 ${
+                      className={`rounded overflow-hidden bg-background transition-all duration-300 ${
                         isPredmetSelected 
                           ? 'ring-2 ring-dragon-green scale-105' 
                           : ''
                       }`}
-                      style={{ maxHeight: 'calc((100vh - 200px) / 7)', maxWidth: 'calc((100vh - 200px) / 7)' }}
+                      style={{ 
+                        width: 'calc((100vh - 200px) / 7)', 
+                        height: 'calc((100vh - 200px) / 7)',
+                        maxWidth: '100%',
+                      }}
                     >
                       <img
                         src={`${SUPABASE_URL}/slike/${predmetItem.image}`}
                         alt={predmetItem.word}
                         className="w-full h-full object-contain"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                       />
                     </div>
                   </div>
