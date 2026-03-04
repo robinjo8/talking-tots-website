@@ -209,7 +209,6 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
             >
               {isLastPair ? (
                 <>
-                  <Star className="w-4 h-4" />
                   VZEMI ZVEZDICO
                 </>
               ) : (
