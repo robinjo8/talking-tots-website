@@ -280,7 +280,7 @@ export function GenericSpominGame({ config, backPath, onGameComplete }: GenericS
                 }}
                 className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-8 py-3 rounded-lg text-lg transition-colors"
               >
-                ⭐ VZEMI ZVEZDICO
+                VZEMI ZVEZDICO
               </button>
             </div>
           </div>
@@ -421,7 +421,7 @@ export function GenericSpominGame({ config, backPath, onGameComplete }: GenericS
                 }}
                 className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-8 py-3 rounded-lg text-lg transition-colors"
               >
-                ⭐ VZEMI ZVEZDICO
+                VZEMI ZVEZDICO
               </button>
             </div>
           </div>
