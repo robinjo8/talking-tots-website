@@ -1,45 +1,57 @@
 
+Cilj: odpraviti težavo, da se v igri **Smešne povedi (Met kocke)** na Apple napravah ne prikazujejo slike, in preveriti podobne napake še v drugih igrah.
 
-# Posodobitev dveh dialogov na strani /artikulacijski-test
+Kaj sem preveril:
+- Kodo igre `GenericMetKockeGame` in podatke `metKockeConfig` + `FreeMetKockeGame`.
+- Iskanje vseh sumljivih poti (`.png.webp`) po celotnem `src`.
+- Obstoj datotek direktno v Supabase Storage.
+- Buckete (`slike`, `slike-ostalo`, `zvocni-posnetki`, `ozadja`, `zmajcki`) in njihov `public=true`.
+- Poskus UI preverjanja v browser orodju (tam sem pristal na `/login`, zato E2E reprodukcije v seji nisem mogel dokončati brez prijave).
 
-Oba dialoga je treba posodobiti, da vkljucujeta informacije o prilagojeni razlicici (20 besed) in nastavljivih parametrih (zahtevnost, cas snemanja), skladno s posodobljenim besedilom na /kako-deluje.
+Ugotovitve (root cause):
+1) **Jasna podatkovna napaka (vse platforme):**
+- V dveh datotekah je napačno ime slike:
+  - `Stickman_zeleti.png.webp` (ne obstaja, 404)
+  - pravilno: `Stickman_zeleti.webp`
+- Datoteki:
+  - `src/data/metKockeConfig.ts`
+  - `src/components/free-games/FreeMetKockeGame.tsx`
 
-## 1. ArticulationTestInfoDialog.tsx (Obvestilo pred zacetkom)
+2) **Verjeten Safari/Apple layout problem (zakaj “vse slike” izgledajo prazne):**
+- V `GenericMetKockeGame` so celice slik narejene z `aspect-square` + samo `maxHeight/maxWidth` brez stabilne osnovne `width/height`.
+- To je tipičen primer, kjer Safari lahko izračuna praktično 0 višino (vizualno prazne celice / tanke črte), medtem ko Chromium to pogosto še prikaže.
+- To se ujema s tvojo fotografijo (viden grid brez vsebine, brez “broken image” ikon).
 
-**Kaj manjka:**
-- Omemba prilagojene razlicice za starost 3-4 let (20 besed)
-- Omemba nastavitev preverjanja (zahtevnost, cas snemanja)
+3) **Podobne napake v drugih igrah:**
+- Po celotni kodi sem našel `.png.webp` vzorec samo v teh 2 Met kocke datotekah (ni širše sistemske napake z dvojnimi končnicami).
+- Dodatno sem opazil še 1 ločeno težavo: v `GamesList` je kartica “Zabavna pot” vezana na `slike-ostalo/kace_lestve_nova_2.webp`, te datoteke v storage ni (to vpliva na thumbnail kartico, ne na Met kocke gameplay).
 
-**Spremembe:**
+Zakaj je “prej delalo”:
+- Gre za regresijo zaradi kombinacije:
+  - napačno preimenovane asset poti (`.png.webp`) v novejši konfiguraciji,
+  - in UI refaktorja velikosti celic v Met kocke, ki je bolj občutljiv v Safari renderingu.
+- Zato lahko na določenih napravah izgleda, kot da “nič ne dela”, čeprav je del težave podatkovni (ena datoteka), del pa layout-specifičen (Apple/Safari).
 
-- **Sekcija "Kaj se preverja?"** (vrstica 119): Dodati odstavek o prilagojeni razlicici:
-  > "Za otroke v starostni skupini 3-4 let je na voljo prilagojena razlicica s 20 besedami (1 beseda na glas), ki je krajsa in manj obremenjujoca."
+Implementacijski plan (ko preklopimo iz read-only):
+1) Popravek asset poti:
+- `src/data/metKockeConfig.ts`: `Stickman_zeleti.png.webp` -> `Stickman_zeleti.webp`
+- `src/components/free-games/FreeMetKockeGame.tsx`: enak popravek.
 
-- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Kako preverjanje poteka?"):
-  - Opis, da lahko uporabnik pred ali med preverjanjem prilagodi nastavitve
-  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka
-  - Cas snemanja: 3, 4 (privzeto) ali 5 sekund
+2) Stabilizacija prikaza slik za Safari:
+- `src/components/games/GenericMetKockeGame.tsx`:
+  - zamenjam trenutni “aspect-square + maxHeight/maxWidth” pattern z eksplicitno dimenzijo celice (npr. responsive `w/h` ali `clamp()`), da celica nikoli ne kolapsira;
+  - dodam varen `onError` fallback na `<img>` (da ob manjkajočem assetu ostane jasen prikaz in ne “prazna” celica).
 
-## 2. ArticulationTestInstructionsDialog.tsx (Kako deluje)
+3) Hiter cross-game hardening:
+- popravim manjkajoč thumbnail za “Zabavna pot” (ali path na obstoječ asset, ali dodam pravilno datoteko), da ne ostane skrit broken image drugje.
 
-**Kaj manjka:**
-- Omemba prilagojene razlicice (20 besed)
-- Omemba nastavitev (zahtevnost, cas snemanja)
-- Hardkodirano "5 sekund" in "60 besed" namesto nastavljive vrednosti
-
-**Spremembe:**
-
-- **Sekcija "Struktura preverjanja"** (vrstica 52-60): Razdeliti na "Standardna razlicica" (60 besed) in "Prilagojena razlicica" (20 besed za 3-4 let), enako kot na /kako-deluje
-
-- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Struktura preverjanja"):
-  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka -- opis vpliva na strogost ocenjevanja
-  - Cas snemanja: 3, 4, 5 sekund z opisi
-
-- **Sekcija "Potek izgovorjave"** (vrstica 114): Popraviti "5 sekund" na "nastavljiv cas snemanja (3, 4 ali 5 sekund, privzeto 4 sekunde)"
-
-- **Zakljucna vrstica** (vrstica 170): Popraviti "60 besed" na "vseh besed (60 pri standardni oz. 20 pri prilagojeni razlicici)"
-
-### Datoteke za spremembo
-- `src/components/articulation/ArticulationTestInfoDialog.tsx`
-- `src/components/articulation/ArticulationTestInstructionsDialog.tsx`
-
+4) Verifikacija po popravku:
+- test Met kocke:
+  - Apple Safari (iPhone/iPad),
+  - Android Chrome,
+  - Windows Chrome/Edge.
+- preverim:
+  - grid celice (vseh 6 vrstic) so vidne,
+  - rezultatni dialog kaže slike,
+  - “želi” se naloži pravilno,
+  - ni 404 za `Stickman_zeleti`.
