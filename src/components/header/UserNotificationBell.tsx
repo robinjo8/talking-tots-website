@@ -181,37 +181,33 @@ export function UserNotificationBell() {
       {/* Single bell button - no CSS breakpoint logic */}
       {isMobile ? (
         // Mobile: Just a button that opens the Dialog
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="relative h-8 w-8"
+        <button 
+          className="relative w-9 h-9 rounded-full border border-border flex items-center justify-center hover:bg-accent transition-colors"
           onClick={handleBellClick}
           aria-label="Obvestila"
         >
-          <Bell className="h-5 w-5 text-muted-foreground" />
+          <Bell className="w-5 h-5 text-muted-foreground" />
           {unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-app-orange text-[10px] font-medium text-white flex items-center justify-center">
               {unreadCount > 99 ? '99+' : unreadCount}
             </span>
           )}
-        </Button>
+        </button>
       ) : (
         // Desktop: Button wrapped in Popover
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="relative h-8 w-8"
+            <button 
+              className="relative w-9 h-9 rounded-full border border-border flex items-center justify-center hover:bg-accent transition-colors"
               aria-label="Obvestila"
             >
-              <Bell className="h-5 w-5 text-muted-foreground" />
+              <Bell className="w-5 h-5 text-muted-foreground" />
               {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-app-orange text-[10px] font-medium text-white flex items-center justify-center">
                   {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
               )}
-            </Button>
+            </button>
           </PopoverTrigger>
           <PopoverContent 
             className="w-80 p-0 z-50 bg-background border shadow-lg" 
