@@ -153,8 +153,8 @@ const VizualniPrikazUstnic = () => {
                       return (
                         <CarouselItem key={card.id} className="basis-full flex justify-center">
                           <div className="w-full max-w-sm p-1">
-                            <div
-                              className="flip-card cursor-pointer"
+                          <div
+                              className="flip-card cursor-pointer rounded-xl"
                               style={{ minHeight: '420px' }}
                               onClick={() => handleCardClick(card.id)}
                             >
@@ -209,7 +209,7 @@ const VizualniPrikazUstnic = () => {
                   return (
                     <div
                       key={card.id}
-                      className="flip-card cursor-pointer rounded-xl shadow-xl border border-border bg-white transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]"
+                      className="flip-card cursor-pointer rounded-xl shadow-lg border-0 bg-white transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
                       style={{ minHeight: '420px' }}
                       onClick={() => handleCardClick(card.id)}
                     >
