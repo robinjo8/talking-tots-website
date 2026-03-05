@@ -10,7 +10,7 @@ const infoCards = [
   { icon: Mic, title: "Govor", path: "/info-govor", color: "text-app-orange" },
   { icon: MessageSquare, title: "Jezik", path: "/info-jezik", color: "text-app-blue" },
   { icon: LayoutDashboard, title: "Moja stran", path: "/info-moja-stran", color: "text-dragon-green" },
-  { icon: User, title: "Za starše", path: "/za-posameznike", color: "text-purple-500" },
+  { icon: User, title: "Za družine", path: "/za-posameznike", color: "text-purple-500" },
   { icon: Building2, title: "Za organizacije", path: "/za-podjetja", color: "text-app-blue" },
   { icon: CreditCard, title: "Cenik", path: "/cenik", color: "text-dragon-green" },
   { icon: Users, title: "Kdo smo", path: "/kdo-smo", color: "text-app-blue" },
