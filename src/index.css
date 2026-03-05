@@ -168,10 +168,14 @@
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   border-radius: 12px;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.flip-card-back {
+  overflow-y: auto;
 }
 
 .flip-card-front {
