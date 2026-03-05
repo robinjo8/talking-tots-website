@@ -113,32 +113,29 @@ const VizualniPrikazUstnic = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-white">
       <Header />
 
-      <section className="bg-dragon-green py-12 md:py-16 pt-24 md:pt-28">
-        <div className="container max-w-6xl mx-auto px-4">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Vizualni prikaz ustnic
-            </h1>
-            <p className="text-xl text-white/90">
-              Poglej, kako pravilno postaviti ustnice pri izgovorjavi glasov
-            </p>
-          </div>
-          <DailyStarsBar />
-        </div>
-      </section>
-
-      <section className="py-12 bg-white min-h-screen" style={{ backgroundColor: 'white' }}>
+      <section className="pt-24 md:pt-28 pb-12 bg-white min-h-screen">
         <div className="container max-w-6xl mx-auto px-4">
           <div className="mb-8">
             <BreadcrumbNavigation />
           </div>
 
+          <div className="text-center mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+              Vizualni prikaz ustnic
+            </h1>
+            <p className="text-muted-foreground">
+              Poglej, kako pravilno postaviti ustnice pri izgovorjavi glasov
+            </p>
+          </div>
+
+          <DailyStarsBar />
+
           {selectedChild ? (
             isMobile ? (
-              <div className="w-full">
+              <div className="w-full mt-8">
                 <Carousel
                   setApi={setCarouselApi}
                   className="w-full"
@@ -153,7 +150,7 @@ const VizualniPrikazUstnic = () => {
                       return (
                         <CarouselItem key={card.id} className="basis-full flex justify-center">
                           <div className="w-full max-w-sm p-1">
-                          <div
+                            <div
                               className="flip-card cursor-pointer rounded-xl"
                               style={{ minHeight: '420px' }}
                               onClick={() => handleCardClick(card.id)}
@@ -203,7 +200,7 @@ const VizualniPrikazUstnic = () => {
                 </div>
               </div>
             ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto mt-8">
                 {soundCards.map((card) => {
                   const isFlipped = flippedCardId === card.id;
                   return (
@@ -239,7 +236,7 @@ const VizualniPrikazUstnic = () => {
             )
           ) : (
             <div className="min-h-[400px] flex flex-col items-center justify-center">
-              <p className="text-lg text-red-500">
+              <p className="text-lg text-destructive">
                 Prosimo, dodajte profil otroka v nastavitvah.
               </p>
             </div>
