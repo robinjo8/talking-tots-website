@@ -51,6 +51,15 @@ const GovornojezicovneVaje = () => {
     example: "",
     available: true
   }, {
+    id: "vizualni-prikaz-ustnic",
+    title: "VIZUALNI PRIKAZ USTNIC",
+    description: "Prikaz pravilnega položaja ustnic pri izgovorjavi določenega glasu. Otrok lahko s pomočjo slike lažje posnema gib ustnic pri glasovih C, Č, R, L, K, S, Š, Z in Ž.",
+    color: "text-app-teal",
+    gradient: "from-app-teal/10 to-app-blue/10",
+    path: "/govorno-jezikovne-vaje/vizualni-prikaz-ustnic",
+    example: "",
+    available: true
+  }, {
     id: "video-navodila",
     title: "VIDEO NAVODILA",
     description: "Video navodila logopeda za pravilno izgovorjavo posameznih glasov. Kratki posnetki prikazujejo položaj govoril in tehniko izgovorjave.",
