@@ -137,7 +137,7 @@ const VizualniPrikazUstnic = () => {
 
           {selectedChild ? (
             isMobile ? (
-              <div className="px-2">
+              <div className="px-2 max-w-sm mx-auto">
                 <Carousel setApi={setCarouselApi} className="w-full">
                   <CarouselContent>
                     {soundCards.map((card) => {
@@ -150,7 +150,7 @@ const VizualniPrikazUstnic = () => {
                             onClick={() => handleCardClick(card.id)}
                           >
                             <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: '420px' }}>
-                              <div className="flip-card-front flex-col p-0 overflow-hidden border-2 border-gray-100 shadow-lg" style={{ background: 'white' }}>
+                                <div className="flip-card-front flex-col p-0 overflow-hidden">
                                 <div className={`w-full flex-1 bg-gradient-to-br ${card.gradient} flex flex-col items-center justify-center gap-1`}>
                                   <span className={`text-sm font-bold ${card.textColor} opacity-80 uppercase tracking-widest`}>Glas</span>
                                   <span className={`text-5xl md:text-6xl font-black ${card.textColor} drop-shadow-sm`}>{card.sounds.join(", ")}</span>
@@ -192,7 +192,7 @@ const VizualniPrikazUstnic = () => {
                       onClick={() => handleCardClick(card.id)}
                     >
                       <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: '420px' }}>
-                        <div className="flip-card-front flex-col p-0 overflow-hidden border-2 border-gray-100 shadow-lg" style={{ background: 'white' }}>
+                        <div className="flip-card-front flex-col p-0 overflow-hidden">
                           <div className={`w-full flex-1 bg-gradient-to-br ${card.gradient} flex flex-col items-center justify-center gap-1`}>
                             <span className={`text-sm font-bold ${card.textColor} opacity-80 uppercase tracking-widest`}>Glas</span>
                             <span className={`text-5xl md:text-6xl font-black ${card.textColor} drop-shadow-sm`}>{card.sounds.join(", ")}</span>
