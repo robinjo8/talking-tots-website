@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
@@ -10,7 +11,7 @@ import { Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
-import { CarouselPagination } from "@/components/features/CarouselPagination";
+
 
 const STORAGE_BASE = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo";
 
@@ -137,35 +138,44 @@ const VizualniPrikazUstnic = () => {
 
           {selectedChild ? (
             isMobile ? (
-              <div className="px-2 max-w-sm mx-auto">
-                <Carousel setApi={setCarouselApi} className="w-full">
+              <div className="w-full">
+                <Carousel
+                  setApi={setCarouselApi}
+                  className="w-full"
+                  opts={{
+                    align: "center",
+                    loop: false,
+                  }}
+                >
                   <CarouselContent>
                     {soundCards.map((card) => {
                       const isFlipped = flippedCardId === card.id;
                       return (
-                        <CarouselItem key={card.id}>
-                          <div
-                            className="flip-card cursor-pointer"
-                            style={{ minHeight: '420px' }}
-                            onClick={() => handleCardClick(card.id)}
-                          >
-                            <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: '420px' }}>
+                        <CarouselItem key={card.id} className="basis-full flex justify-center">
+                          <div className="w-full max-w-sm p-1">
+                            <div
+                              className="flip-card cursor-pointer"
+                              style={{ minHeight: '420px' }}
+                              onClick={() => handleCardClick(card.id)}
+                            >
+                              <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: '420px' }}>
                                 <div className="flip-card-front flex-col p-0 overflow-hidden">
-                                <div className={`w-full flex-1 bg-gradient-to-br ${card.gradient} flex flex-col items-center justify-center gap-1`}>
-                                  <span className={`text-sm font-bold ${card.textColor} opacity-80 uppercase tracking-widest`}>Glas</span>
-                                  <span className={`text-5xl md:text-6xl font-black ${card.textColor} drop-shadow-sm`}>{card.sounds.join(", ")}</span>
+                                  <div className={`w-full flex-1 bg-gradient-to-br ${card.gradient} flex flex-col items-center justify-center gap-1`}>
+                                    <span className={`text-sm font-bold ${card.textColor} opacity-80 uppercase tracking-widest`}>Glas</span>
+                                    <span className={`text-5xl md:text-6xl font-black ${card.textColor} drop-shadow-sm`}>{card.sounds.join(", ")}</span>
+                                  </div>
+                                  <div className="w-full bg-white py-3 px-2 flex items-center justify-center border-t border-gray-100">
+                                    <span className={`text-base font-bold ${card.textColor} text-center leading-tight`}>Odpri</span>
+                                  </div>
                                 </div>
-                                <div className="w-full bg-white py-3 px-2 flex items-center justify-center border-t border-gray-100">
-                                  <span className={`text-base font-bold ${card.textColor} text-center leading-tight`}>Odpri</span>
+                                <div className="flip-card-back flex-col p-4 justify-between">
+                                  <h3 className={`text-lg font-bold ${card.color} text-center`}>{card.title}</h3>
+                                  <img src={card.image} alt={card.title} className="w-full max-h-[250px] object-contain rounded-lg" loading="lazy" />
+                                  <Button variant="outline" size="sm" className="w-full gap-2" disabled={!card.audioUrl} onClick={(e) => { e.stopPropagation(); }}>
+                                    <Volume2 className="w-4 h-4" />
+                                    {card.audioUrl ? "Zvočna navodila" : "Zvočna navodila – kmalu"}
+                                  </Button>
                                 </div>
-                              </div>
-                              <div className="flip-card-back flex-col p-4 justify-between">
-                                <h3 className={`text-lg font-bold ${card.color} text-center`}>{card.title}</h3>
-                                <img src={card.image} alt={card.title} className="w-full max-h-[250px] object-contain rounded-lg" loading="lazy" />
-                                <Button variant="outline" size="sm" className="w-full gap-2" disabled={!card.audioUrl} onClick={(e) => { e.stopPropagation(); }}>
-                                  <Volume2 className="w-4 h-4" />
-                                  {card.audioUrl ? "Zvočna navodila" : "Zvočna navodila – kmalu"}
-                                </Button>
                               </div>
                             </div>
                           </div>
@@ -174,11 +184,23 @@ const VizualniPrikazUstnic = () => {
                     })}
                   </CarouselContent>
                 </Carousel>
-                <CarouselPagination
-                  count={soundCards.length}
-                  current={currentSlide}
-                  onDotClick={(i) => carouselApi?.scrollTo(i)}
-                />
+                <div className="flex justify-center gap-2 mt-6">
+                  {soundCards.map((_, i) => (
+                    <button
+                      key={i}
+                      className="w-6 h-6 rounded-full flex items-center justify-center p-0 bg-transparent transition-all duration-300"
+                      onClick={() => carouselApi?.scrollTo(i)}
+                      aria-label={`Pojdi na kartico ${i + 1}`}
+                    >
+                      <span className={cn(
+                        "rounded-full transition-all duration-300",
+                        i === currentSlide
+                          ? "w-3 h-3 bg-dragon-green shadow-sm"
+                          : "w-2.5 h-2.5 bg-muted-foreground/40"
+                      )} />
+                    </button>
+                  ))}
+                </div>
               </div>
             ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
