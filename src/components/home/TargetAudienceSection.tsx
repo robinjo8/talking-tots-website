@@ -32,9 +32,8 @@ export const TargetAudienceSection = () => {
   const ReadMoreButton = ({ audience }: { audience: typeof audiences[0] }) => (
     <div className="text-center mt-6">
       <Button
-        variant="outline"
         onClick={() => navigate(audience.link)}
-        className={`${audience.titleColor} border-current hover:bg-current/10 px-6`}
+        className={`${audience.titleColor.replace('text-', 'bg-')} hover:opacity-90 text-white px-6`}
       >
         Preberi več
       </Button>
