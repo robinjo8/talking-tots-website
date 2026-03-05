@@ -1,26 +1,46 @@
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useNavigate } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+
 export const TargetAudienceSection = () => {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const audiences = [{
     title: "LOGOPEDOM",
     subtitle: "Prednosti za logopede:",
     benefits: ["Preverjanje izgovorjave glasov omogoča avtomatizirano analizo govora za učinkovito obravnavo.", "Personalizirane vaje in igre za individualno prilagojeno terapijo.", "Objektivno spremljanje napredka, kar poveča učinkovitost terapije.", "Uporabno kot motivacija med obravnavami.", "Več časa za neposredno delo z otrokom in učinkovitejše terapije."],
     bgColor: "bg-white",
-    titleColor: "text-app-blue"
+    titleColor: "text-app-blue",
+    link: "/za-podjetja"
   }, {
     title: "DRUŽINAM",
     subtitle: "Prednosti za družine:",
     benefits: ["Hitrejši in opaznejši napredek pri govornem razvoju.", "Otroci z veseljem izvajajo vaje v obliki zabavnih iger.", "Izboljša samopodobo in socialne veščine.", "Večja povezanost staršev in otrok preko skupnih aktivnosti.", "Konstantna strokovna podpora ter praktični nasveti za starše."],
     bgColor: "bg-white",
-    titleColor: "text-dragon-green"
+    titleColor: "text-dragon-green",
+    link: "/za-posameznike"
   }, {
     title: "VRTCEM in ŠOLAM",
     subtitle: "Prednosti za vrtce in šole:",
     benefits: ["Zgodnja in učinkovita identifikacija govornih težav pri otrocih.", "Enostavna vključitev govornih aktivnosti v vsakodnevne rutine vrtca.", "Izboljšanje komunikacije, socializacije in vključevanja otrok v vrstniške skupine.", "Manjša verjetnost psihosocialnih težav in boljša splošna klima v skupini.", "Bolj zadovoljni starši, ki cenijo kakovostno obravnavo otrok v vašem vrtcu."],
     bgColor: "bg-white",
-    titleColor: "text-app-orange"
+    titleColor: "text-app-orange",
+    link: "/za-podjetja"
   }];
+
+  const ReadMoreButton = ({ audience }: { audience: typeof audiences[0] }) => (
+    <div className="text-center mt-6">
+      <Button
+        variant="outline"
+        onClick={() => navigate(audience.link)}
+        className={`${audience.titleColor} border-current hover:bg-current/10 px-6`}
+      >
+        Preberi več
+      </Button>
+    </div>
+  );
+
   return <section className="py-8 md:py-14 px-4 md:px-10 bg-white w-full">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-6 md:mb-12">
@@ -28,7 +48,6 @@ export const TargetAudienceSection = () => {
         </div>
         
         {isMobile ?
-      // Mobile: Tab interface
       <Tabs defaultValue="DRUŽINAM" className="w-full">
             <TabsList className="grid w-full grid-cols-3 mb-8">
               {audiences.map(audience => <TabsTrigger key={audience.title} value={audience.title} className="text-xs sm:text-sm font-medium">
@@ -38,7 +57,6 @@ export const TargetAudienceSection = () => {
             
             {audiences.map(audience => <TabsContent key={audience.title} value={audience.title}>
                 <div className={`${audience.bgColor} rounded-xl shadow-xl p-6 border border-gray-300`}>
-                  {/* Title */}
                   <div className="text-center mb-6">
                     <h3 className={`text-base font-bold ${audience.titleColor} mb-2`}>
                       {audience.title}
@@ -48,7 +66,6 @@ export const TargetAudienceSection = () => {
                     </p>
                   </div>
                   
-                  {/* Benefits List */}
                   <div>
                     <ul className="space-y-3">
                       {audience.benefits.map((benefit, benefitIndex) => <li key={benefitIndex} className="flex items-start">
@@ -59,13 +76,13 @@ export const TargetAudienceSection = () => {
                         </li>)}
                     </ul>
                   </div>
+
+                  <ReadMoreButton audience={audience} />
                 </div>
               </TabsContent>)}
           </Tabs> :
-      // Desktop: Grid layout
       <div className="grid grid-cols-3 gap-6">
             {audiences.map((audience, index) => <div key={index} className={`${audience.bgColor} rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8 h-full flex flex-col border border-gray-300`}>
-                {/* Title */}
                 <div className="text-center mb-6">
                   <h3 className={`text-xl font-bold ${audience.titleColor} mb-2 whitespace-nowrap`}>
                     {audience.title}
@@ -75,7 +92,6 @@ export const TargetAudienceSection = () => {
                   </p>
                 </div>
                 
-                {/* Benefits List */}
                 <div className="flex-grow">
                   <ul className="space-y-3">
                     {audience.benefits.map((benefit, benefitIndex) => <li key={benefitIndex} className="flex items-start">
@@ -86,6 +102,8 @@ export const TargetAudienceSection = () => {
                       </li>)}
                   </ul>
                 </div>
+
+                <ReadMoreButton audience={audience} />
               </div>)}
           </div>}
       </div>
