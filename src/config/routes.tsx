@@ -72,6 +72,7 @@ const GovornojezicovneVaje = lazy(() => import("@/pages/GovornojezicovneVaje"));
 const VajeMotorikeGovoril = lazy(() => import("@/pages/VajeMotorikeGovoril"));
 const VajeZaJezik = lazy(() => import("@/pages/VajeZaJezik"));
 const ArtikulacijaVaje = lazy(() => import("@/pages/ArtikulacijaVaje"));
+const VizualniPrikazUstnic = lazy(() => import("@/pages/VizualniPrikazUstnic"));
 const ArtIzgovorjavaPage = lazy(() => import("@/pages/ArtIzgovorjavaPage"));
 
 // Game pages
@@ -176,6 +177,7 @@ export function AppRoutes() {
       <Route path="/govorno-jezikovne-vaje/vaje-motorike-govoril" element={<ProtectedLazyRoute><VajeMotorikeGovoril /></ProtectedLazyRoute>} />
       <Route path="/govorno-jezikovne-vaje/vaje-za-jezik" element={<ProtectedLazyRoute><VajeZaJezik /></ProtectedLazyRoute>} />
       <Route path="/govorno-jezikovne-vaje/artikulacija" element={<ProtectedLazyRoute><ArtikulacijaVaje /></ProtectedLazyRoute>} />
+      <Route path="/govorno-jezikovne-vaje/vizualni-prikaz-ustnic" element={<ProtectedLazyRoute><VizualniPrikazUstnic /></ProtectedLazyRoute>} />
       <Route path="/govorno-jezikovne-vaje/artikulacija/:gameId" element={<ProtectedLazyRoute><ArtikulacijaVajeRouter /></ProtectedLazyRoute>} />
       
       {/* Artikulacija routes */}
