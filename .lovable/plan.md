@@ -1,45 +1,36 @@
 
 
-# Posodobitev dveh dialogov na strani /artikulacijski-test
+# Plan: Flip kartice za Vizualni prikaz ustnic
 
-Oba dialoga je treba posodobiti, da vkljucujeta informacije o prilagojeni razlicici (20 besed) in nastavljivih parametrih (zahtevnost, cas snemanja), skladno s posodobljenim besedilom na /kako-deluje.
+## Kaj se spremeni
 
-## 1. ArticulationTestInfoDialog.tsx (Obvestilo pred zacetkom)
+Kartice na strani `/govorno-jezikovne-vaje/vizualni-prikaz-ustnic` bodo uporabljale 3D flip animacijo (CSS klase `flip-card` že obstajajo v `index.css`). Sprednja stran kartice bo zakrita (prikaže le naslov glasu), ob kliku se obrne in prikaže sliko + gumb za zvočna navodila. Hkrati bo lahko odprta le ena kartica. Hero sekcija bo oblikovana enako kot na strani artikulacije (`bg-dragon-green`).
 
-**Kaj manjka:**
-- Omemba prilagojene razlicice za starost 3-4 let (20 besed)
-- Omemba nastavitev preverjanja (zahtevnost, cas snemanja)
+## Datoteka: `src/pages/VizualniPrikazUstnic.tsx`
 
-**Spremembe:**
+### Spremembe:
+1. **Hero sekcija**: Zamenjaj `bg-app-teal` z `bg-dragon-green` (enako kot artikulacija).
 
-- **Sekcija "Kaj se preverja?"** (vrstica 119): Dodati odstavek o prilagojeni razlicici:
-  > "Za otroke v starostni skupini 3-4 let je na voljo prilagojena razlicica s 20 besedami (1 beseda na glas), ki je krajsa in manj obremenjujoca."
+2. **State**: Zamenjaj `selectedCard` (dialog) z `flippedCardId: string | null` — hrani ID obrnjene kartice.
 
-- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Kako preverjanje poteka?"):
-  - Opis, da lahko uporabnik pred ali med preverjanjem prilagodi nastavitve
-  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka
-  - Cas snemanja: 3, 4 (privzeto) ali 5 sekund
+3. **Kartice z flip animacijo**: Vsaka kartica uporabi obstoječe CSS razrede iz `index.css`:
+   - `flip-card` wrapper (ohrani trenutne dimenzije)
+   - `flip-card-inner` z `.flipped` ko je `flippedCardId === card.id`
+   - `flip-card-front`: Prikaže naslov glasu (gradient ozadje + naslov, npr. "Glas K")
+   - `flip-card-back`: Prikaže sliko artikulacije + gumb za zvočna navodila (disabled)
+   - Ob kliku na drugo kartico se prejšnja zapre
 
-## 2. ArticulationTestInstructionsDialog.tsx (Kako deluje)
+4. **Odstrani Dialog**: Ni več potreben, ker se vsebina prikaže na kartici sami.
 
-**Kaj manjka:**
-- Omemba prilagojene razlicice (20 besed)
-- Omemba nastavitev (zahtevnost, cas snemanja)
-- Hardkodirano "5 sekund" in "60 besed" namesto nastavljive vrednosti
+5. **Flip logika**: Klik na kartico togglea flip; klik na drugo kartico zapre prejšnjo in odpre novo.
 
-**Spremembe:**
+## Obstoječi CSS (ni sprememb potrebnih)
 
-- **Sekcija "Struktura preverjanja"** (vrstica 52-60): Razdeliti na "Standardna razlicica" (60 besed) in "Prilagojena razlicica" (20 besed za 3-4 let), enako kot na /kako-deluje
+Razredi `flip-card`, `flip-card-inner`, `flip-card-front`, `flip-card-back` že obstajajo v `index.css` s 3D transform animacijo.
 
-- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Struktura preverjanja"):
-  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka -- opis vpliva na strogost ocenjevanja
-  - Cas snemanja: 3, 4, 5 sekund z opisi
-
-- **Sekcija "Potek izgovorjave"** (vrstica 114): Popraviti "5 sekund" na "nastavljiv cas snemanja (3, 4 ali 5 sekund, privzeto 4 sekunde)"
-
-- **Zakljucna vrstica** (vrstica 170): Popraviti "60 besed" na "vseh besed (60 pri standardni oz. 20 pri prilagojeni razlicici)"
-
-### Datoteke za spremembo
-- `src/components/articulation/ArticulationTestInfoDialog.tsx`
-- `src/components/articulation/ArticulationTestInstructionsDialog.tsx`
+## Povzetek
+- 1 datoteka za urejanje: `src/pages/VizualniPrikazUstnic.tsx`
+- Flip kartice z obstoječimi CSS animacijami
+- Hero sekcija v `bg-dragon-green`
+- Brez dialoga — vsebina na zadnji strani kartice
 
