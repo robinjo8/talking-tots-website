@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
@@ -8,6 +8,9 @@ import { DailyStarsBar } from "@/components/DailyStarsBar";
 import { FooterSection } from "@/components/FooterSection";
 import { Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
+import { CarouselPagination } from "@/components/features/CarouselPagination";
 
 const STORAGE_BASE = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo";
 
@@ -67,7 +70,22 @@ const soundCards = [
 const VizualniPrikazUstnic = () => {
   const { user, selectedChild, signOut, isLoading: isAuthLoading } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [flippedCardId, setFlippedCardId] = useState<string | null>(null);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const onSelect = useCallback(() => {
+    if (!carouselApi) return;
+    setCurrentSlide(carouselApi.selectedScrollSnap());
+  }, [carouselApi]);
+
+  useEffect(() => {
+    if (!carouselApi) return;
+    onSelect();
+    carouselApi.on("select", onSelect);
+    return () => { carouselApi.off("select", onSelect); };
+  }, [carouselApi, onSelect]);
 
   useEffect(() => {
     if (!isAuthLoading && !user) {
@@ -118,68 +136,85 @@ const VizualniPrikazUstnic = () => {
           </div>
 
           {selectedChild ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {soundCards.map((card) => {
-                const isFlipped = flippedCardId === card.id;
-                return (
-                  <div
-                    key={card.id}
-                    className="flip-card cursor-pointer"
-                    style={{ minHeight: '420px' }}
-                    onClick={() => handleCardClick(card.id)}
-                  >
-                    <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: '420px' }}>
-                      {/* Front */}
-                      <div
-                        className="flip-card-front flex-col p-0 overflow-hidden border-2 border-gray-100 shadow-lg"
-                        style={{ background: 'white' }}
-                      >
-                        {/* Top gradient section */}
-                        <div className={`w-full flex-1 bg-gradient-to-br ${card.gradient} flex flex-col items-center justify-center gap-1`}>
-                          <span className={`text-sm font-bold ${card.textColor} opacity-80 uppercase tracking-widest`}>
-                            Glas
-                          </span>
-                          <span className={`text-5xl md:text-6xl font-black ${card.textColor} drop-shadow-sm`}>
-                            {card.sounds.join(", ")}
-                          </span>
+            isMobile ? (
+              <div className="px-2">
+                <Carousel setApi={setCarouselApi} className="w-full">
+                  <CarouselContent>
+                    {soundCards.map((card) => {
+                      const isFlipped = flippedCardId === card.id;
+                      return (
+                        <CarouselItem key={card.id}>
+                          <div
+                            className="flip-card cursor-pointer"
+                            style={{ minHeight: '420px' }}
+                            onClick={() => handleCardClick(card.id)}
+                          >
+                            <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: '420px' }}>
+                              <div className="flip-card-front flex-col p-0 overflow-hidden border-2 border-gray-100 shadow-lg" style={{ background: 'white' }}>
+                                <div className={`w-full flex-1 bg-gradient-to-br ${card.gradient} flex flex-col items-center justify-center gap-1`}>
+                                  <span className={`text-sm font-bold ${card.textColor} opacity-80 uppercase tracking-widest`}>Glas</span>
+                                  <span className={`text-5xl md:text-6xl font-black ${card.textColor} drop-shadow-sm`}>{card.sounds.join(", ")}</span>
+                                </div>
+                                <div className="w-full bg-white py-3 px-2 flex items-center justify-center border-t border-gray-100">
+                                  <span className={`text-base font-bold ${card.textColor} text-center leading-tight`}>Odpri</span>
+                                </div>
+                              </div>
+                              <div className="flip-card-back flex-col p-4 justify-between">
+                                <h3 className={`text-lg font-bold ${card.color} text-center`}>{card.title}</h3>
+                                <img src={card.image} alt={card.title} className="w-full max-h-[250px] object-contain rounded-lg" loading="lazy" />
+                                <Button variant="outline" size="sm" className="w-full gap-2" disabled={!card.audioUrl} onClick={(e) => { e.stopPropagation(); }}>
+                                  <Volume2 className="w-4 h-4" />
+                                  {card.audioUrl ? "Zvočna navodila" : "Zvočna navodila – kmalu"}
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </CarouselItem>
+                      );
+                    })}
+                  </CarouselContent>
+                </Carousel>
+                <CarouselPagination
+                  count={soundCards.length}
+                  current={currentSlide}
+                  onDotClick={(i) => carouselApi?.scrollTo(i)}
+                />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {soundCards.map((card) => {
+                  const isFlipped = flippedCardId === card.id;
+                  return (
+                    <div
+                      key={card.id}
+                      className="flip-card cursor-pointer"
+                      style={{ minHeight: '420px' }}
+                      onClick={() => handleCardClick(card.id)}
+                    >
+                      <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: '420px' }}>
+                        <div className="flip-card-front flex-col p-0 overflow-hidden border-2 border-gray-100 shadow-lg" style={{ background: 'white' }}>
+                          <div className={`w-full flex-1 bg-gradient-to-br ${card.gradient} flex flex-col items-center justify-center gap-1`}>
+                            <span className={`text-sm font-bold ${card.textColor} opacity-80 uppercase tracking-widest`}>Glas</span>
+                            <span className={`text-5xl md:text-6xl font-black ${card.textColor} drop-shadow-sm`}>{card.sounds.join(", ")}</span>
+                          </div>
+                          <div className="w-full bg-white py-3 px-2 flex items-center justify-center border-t border-gray-100">
+                            <span className={`text-base font-bold ${card.textColor} text-center leading-tight`}>Odpri</span>
+                          </div>
                         </div>
-                        {/* Bottom white section */}
-                        <div className="w-full bg-white py-3 px-2 flex items-center justify-center border-t border-gray-100">
-                          <span className={`text-base font-bold ${card.textColor} text-center leading-tight`}>
-                            Odpri
-                          </span>
+                        <div className="flip-card-back flex-col p-4 justify-between">
+                          <h3 className={`text-lg font-bold ${card.color} text-center`}>{card.title}</h3>
+                          <img src={card.image} alt={card.title} className="w-full max-h-[250px] object-contain rounded-lg" loading="lazy" />
+                          <Button variant="outline" size="sm" className="w-full gap-2" disabled={!card.audioUrl} onClick={(e) => { e.stopPropagation(); }}>
+                            <Volume2 className="w-4 h-4" />
+                            {card.audioUrl ? "Zvočna navodila" : "Zvočna navodila – kmalu"}
+                          </Button>
                         </div>
-                      </div>
-
-                      {/* Back */}
-                      <div className="flip-card-back flex-col p-4 justify-between">
-                        <h3 className={`text-lg font-bold ${card.color} text-center`}>
-                          {card.title}
-                        </h3>
-                        <img
-                          src={card.image}
-                          alt={card.title}
-                          className="w-full max-h-[250px] object-contain rounded-lg"
-                          loading="lazy"
-                        />
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="w-full gap-2"
-                          disabled={!card.audioUrl}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                          }}
-                        >
-                          <Volume2 className="w-4 h-4" />
-                          {card.audioUrl ? "Zvočna navodila" : "Zvočna navodila – kmalu"}
-                        </Button>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )
           ) : (
             <div className="min-h-[400px] flex flex-col items-center justify-center">
               <p className="text-lg text-red-500">
