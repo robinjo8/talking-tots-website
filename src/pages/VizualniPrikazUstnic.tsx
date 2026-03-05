@@ -112,18 +112,18 @@ const VizualniPrikazUstnic = () => {
   }
 
   return (
-    <div className={`bg-white ${isMobile ? 'h-[100dvh] overflow-hidden' : 'min-h-screen'}`}>
+    <div className="min-h-screen bg-white">
       <Header />
 
-      <section className={`bg-white ${isMobile ? 'h-[calc(100dvh-64px)] pt-[72px] pb-2 flex flex-col' : 'pt-28 pb-12 min-h-screen'}`}>
-        <div className={`container max-w-6xl mx-auto px-4 ${isMobile ? 'flex-1 flex flex-col' : ''}`}>
+      <section className="pt-24 md:pt-28 pb-12 bg-white min-h-screen">
+        <div className="container max-w-6xl mx-auto px-4">
 
           {selectedChild ? (
             isMobile ? (
-              <div className="w-full flex-1 flex flex-col mt-2">
+              <div className="w-full mt-8">
                 <Carousel
                   setApi={setCarouselApi}
-                  className="w-full flex-1"
+                  className="w-full"
                   opts={{
                     align: "center",
                     loop: false,
@@ -134,13 +134,13 @@ const VizualniPrikazUstnic = () => {
                       const isFlipped = flippedCardId === card.id;
                       return (
                         <CarouselItem key={card.id} className="basis-full flex justify-center">
-                          <div className="w-full max-w-sm p-1 flex-1">
+                          <div className="w-full max-w-sm p-1">
                             <div
                               className="flip-card cursor-pointer rounded-xl"
-                              style={{ height: '100%' }}
+                              style={{ minHeight: '420px' }}
                               onClick={() => handleCardClick(card.id)}
                             >
-                              <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ height: '100%' }}>
+                              <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: '420px' }}>
                                 <div className="flip-card-front flex-col p-0 overflow-hidden">
                                   <div className={`w-full flex-1 bg-gradient-to-br ${card.gradient} flex flex-col items-center justify-center gap-1`}>
                                     <span className={`text-sm font-bold ${card.textColor} opacity-80 uppercase tracking-widest`}>Glas</span>
@@ -166,7 +166,7 @@ const VizualniPrikazUstnic = () => {
                     })}
                   </CarouselContent>
                 </Carousel>
-                <div className="flex justify-center gap-2 mt-2 mb-2">
+                <div className="flex justify-center gap-2 mt-6">
                   {soundCards.map((_, i) => (
                     <button
                       key={i}
@@ -237,7 +237,7 @@ const VizualniPrikazUstnic = () => {
         <ArrowLeft className="w-7 h-7 text-white" />
       </button>
 
-      {!isMobile && <FooterSection handleSignOut={handleSignOut} />}
+      <FooterSection handleSignOut={handleSignOut} />
     </div>
   );
 };
