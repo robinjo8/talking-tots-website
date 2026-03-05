@@ -1,45 +1,48 @@
 
 
-# Posodobitev dveh dialogov na strani /artikulacijski-test
+# Plan: Vizualni prikaz ustnic — nova kartica + nova stran
 
-Oba dialoga je treba posodobiti, da vkljucujeta informacije o prilagojeni razlicici (20 besed) in nastavljivih parametrih (zahtevnost, cas snemanja), skladno s posodobljenim besedilom na /kako-deluje.
+## 1. Dodaj kartico na /govorno-jezikovne-vaje
 
-## 1. ArticulationTestInfoDialog.tsx (Obvestilo pred zacetkom)
+**Datoteka:** `src/pages/GovornojezicovneVaje.tsx`
 
-**Kaj manjka:**
-- Omemba prilagojene razlicice za starost 3-4 let (20 besed)
-- Omemba nastavitev preverjanja (zahtevnost, cas snemanja)
+Dodaj nov objekt v `exerciseTypes` array:
+- id: `"vizualni-prikaz-ustnic"`
+- title: `"VIZUALNI PRIKAZ USTNIC"`
+- description: (podano besedilo o glasovih C, Č, R, L, K, S, Š, Z, Ž)
+- path: `/govorno-jezikovne-vaje/vizualni-prikaz-ustnic`
+- Primeren gradient in barva (npr. `text-app-pink`, `from-pink-100 to-red-100` ali podobno)
 
-**Spremembe:**
+## 2. Ustvari novo stran VizualniPrikazUstnic
 
-- **Sekcija "Kaj se preverja?"** (vrstica 119): Dodati odstavek o prilagojeni razlicici:
-  > "Za otroke v starostni skupini 3-4 let je na voljo prilagojena razlicica s 20 besedami (1 beseda na glas), ki je krajsa in manj obremenjujoca."
+**Nova datoteka:** `src/pages/VizualniPrikazUstnic.tsx`
 
-- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Kako preverjanje poteka?"):
-  - Opis, da lahko uporabnik pred ali med preverjanjem prilagodi nastavitve
-  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka
-  - Cas snemanja: 3, 4 (privzeto) ali 5 sekund
+Stran s Header, BreadcrumbNavigation, naslovom in 5 karticami v gridu:
 
-## 2. ArticulationTestInstructionsDialog.tsx (Kako deluje)
+| Kartica | Glasovi | Slika (bucket `slike-ostalo`) |
+|---------|---------|-------------------------------|
+| Glas K | K | Glas_K.png |
+| Glas L | L | Glas_L.png |
+| Glas R | R | Glas_R.png |
+| Glasovi Č, Š, Ž | Č, Š, Ž | Glas_ShZhCh.png |
+| Glasovi C, S, Z | C, S, Z | Glas_SZC.png |
 
-**Kaj manjka:**
-- Omemba prilagojene razlicice (20 besed)
-- Omemba nastavitev (zahtevnost, cas snemanja)
-- Hardkodirano "5 sekund" in "60 besed" namesto nastavljive vrednosti
+Vsaka kartica:
+- Prikaže naslov glasu (npr. "Glas K" ali "Glasovi C, S, Z")
+- Ob kliku odpre Dialog/modal s povečano sliko
+- Vsebuje gumb za zvočna navodila (disabled/placeholder z napisom "Kmalu" ali ikono zvočnika, ki še ne dela) — pripravljen za kasnejšo implementacijo z audio URL-jem
+- Slika URL: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/{filename}`
 
-**Spremembe:**
+Oblikovanje enako kot ostale podobne strani (kartice z gradientom, shadow, hover efekt).
 
-- **Sekcija "Struktura preverjanja"** (vrstica 52-60): Razdeliti na "Standardna razlicica" (60 besed) in "Prilagojena razlicica" (20 besed za 3-4 let), enako kot na /kako-deluje
+## 3. Dodaj route
 
-- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Struktura preverjanja"):
-  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka -- opis vpliva na strogost ocenjevanja
-  - Cas snemanja: 3, 4, 5 sekund z opisi
+**Datoteka:** `src/config/routes.tsx`
+- Lazy import nove strani
+- Dodaj protected route: `/govorno-jezikovne-vaje/vizualni-prikaz-ustnic`
 
-- **Sekcija "Potek izgovorjave"** (vrstica 114): Popraviti "5 sekund" na "nastavljiv cas snemanja (3, 4 ali 5 sekund, privzeto 4 sekunde)"
-
-- **Zakljucna vrstica** (vrstica 170): Popraviti "60 besed" na "vseh besed (60 pri standardni oz. 20 pri prilagojeni razlicici)"
-
-### Datoteke za spremembo
-- `src/components/articulation/ArticulationTestInfoDialog.tsx`
-- `src/components/articulation/ArticulationTestInstructionsDialog.tsx`
+## Povzetek
+- 1 nova datoteka (`VizualniPrikazUstnic.tsx`)
+- 2 obstoječi datoteki za urejanje (`GovornojezicovneVaje.tsx`, `routes.tsx`)
+- Gumb za zvočna navodila bo pripravljen (disabled), audio se doda naknadno
 
