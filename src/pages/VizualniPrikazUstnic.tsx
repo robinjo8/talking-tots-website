@@ -112,10 +112,10 @@ const VizualniPrikazUstnic = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="h-screen overflow-hidden flex flex-col bg-white">
       <Header />
 
-      <section className="pt-24 md:pt-28 pb-12 bg-white min-h-screen">
+      <section className="flex-1 pt-20 md:pt-24 pb-4 flex items-center justify-center">
         <div className="container max-w-6xl mx-auto px-4">
 
           {selectedChild ? (
@@ -237,7 +237,7 @@ const VizualniPrikazUstnic = () => {
         <ArrowLeft className="w-7 h-7 text-white" />
       </button>
 
-      <FooterSection handleSignOut={handleSignOut} />
+      
     </div>
   );
 };
