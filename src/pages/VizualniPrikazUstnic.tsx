@@ -17,9 +17,9 @@ const soundCards = [
     title: "Glas K",
     sounds: ["K"],
     image: `${STORAGE_BASE}/Glas_K.png`,
-    color: "text-app-blue",
-    frontBg: "linear-gradient(145deg, hsl(207, 90%, 54%), hsl(207, 90%, 44%))",
-    frontBorder: "hsl(207, 90%, 54%)",
+    color: "text-app-orange",
+    gradient: "from-app-orange/20 to-app-yellow/20",
+    textColor: "text-app-orange",
     audioUrl: null as string | null,
   },
   {
@@ -28,8 +28,8 @@ const soundCards = [
     sounds: ["L"],
     image: `${STORAGE_BASE}/Glas_L.png`,
     color: "text-app-purple",
-    frontBg: "linear-gradient(145deg, hsl(291, 64%, 42%), hsl(291, 64%, 32%))",
-    frontBorder: "hsl(291, 64%, 42%)",
+    gradient: "from-app-purple/20 to-app-blue/20",
+    textColor: "text-app-purple",
     audioUrl: null as string | null,
   },
   {
@@ -37,9 +37,9 @@ const soundCards = [
     title: "Glas R",
     sounds: ["R"],
     image: `${STORAGE_BASE}/Glas_R.png`,
-    color: "text-app-orange",
-    frontBg: "linear-gradient(145deg, hsl(36, 100%, 50%), hsl(36, 100%, 40%))",
-    frontBorder: "hsl(36, 100%, 50%)",
+    color: "text-app-purple",
+    gradient: "from-app-purple/20 to-app-teal/20",
+    textColor: "text-app-purple",
     audioUrl: null as string | null,
   },
   {
@@ -48,8 +48,8 @@ const soundCards = [
     sounds: ["C", "S", "Z"],
     image: `${STORAGE_BASE}/Glas_SZC.png`,
     color: "text-dragon-green",
-    frontBg: "linear-gradient(145deg, hsl(122, 39%, 49%), hsl(122, 39%, 39%))",
-    frontBorder: "hsl(122, 39%, 49%)",
+    gradient: "from-dragon-green/20 to-app-teal/20",
+    textColor: "text-dragon-green",
     audioUrl: null as string | null,
   },
   {
@@ -57,9 +57,9 @@ const soundCards = [
     title: "Glasovi Č, Š, Ž",
     sounds: ["Č", "Š", "Ž"],
     image: `${STORAGE_BASE}/Glas_ShZhCh.png`,
-    color: "text-app-teal",
-    frontBg: "linear-gradient(145deg, hsl(174, 100%, 29%), hsl(174, 100%, 22%))",
-    frontBorder: "hsl(174, 100%, 29%)",
+    color: "text-app-blue",
+    gradient: "from-app-blue/20 to-app-purple/20",
+    textColor: "text-app-blue",
     audioUrl: null as string | null,
   },
 ];
@@ -131,17 +131,12 @@ const VizualniPrikazUstnic = () => {
                     <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: '320px' }}>
                       {/* Front */}
                       <div
-                        className="flip-card-front flex-col gap-3"
-                        style={{
-                          background: card.frontBg,
-                          borderColor: card.frontBorder,
-                          boxShadow: `0 4px 15px ${card.frontBorder}40`,
-                        }}
+                        className={`flip-card-front flex-col gap-3 bg-gradient-to-br ${card.gradient} border-gray-200 shadow-xl`}
                       >
-                        <span className="text-4xl font-bold text-white drop-shadow-md">
+                        <span className={`text-4xl font-bold ${card.textColor} drop-shadow-sm`}>
                           {card.sounds.join(", ")}
                         </span>
-                        <span className="text-lg font-semibold text-white/90">
+                        <span className={`text-lg font-semibold ${card.textColor}/80`}>
                           {card.title}
                         </span>
                       </div>
