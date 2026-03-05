@@ -1,45 +1,41 @@
 
 
-# Posodobitev dveh dialogov na strani /artikulacijski-test
+# Plan: Preoblikovanje sprednje strani kartic po vzoru slike
 
-Oba dialoga je treba posodobiti, da vkljucujeta informacije o prilagojeni razlicici (20 besed) in nastavljivih parametrih (zahtevnost, cas snemanja), skladno s posodobljenim besedilom na /kako-deluje.
+## Kaj se spremeni
 
-## 1. ArticulationTestInfoDialog.tsx (Obvestilo pred zacetkom)
+Sprednja stran flip kartic dobi dizajn kot na referenčni sliki (Kolo sreče kartice) — brez zmajčkov. Zgornja polovica kartice je pastelno gradient ozadje, spodnja polovica je bela s tekstom. Na zgornjem delu piše manjši napis "Glas", pod njim pa velika črka (npr. **K**). Vsaka kartica ima svojo barvo besedila.
 
-**Kaj manjka:**
-- Omemba prilagojene razlicice za starost 3-4 let (20 besed)
-- Omemba nastavitev preverjanja (zahtevnost, cas snemanja)
+## Struktura sprednje strani kartice
 
-**Spremembe:**
+```text
+┌──────────────────────┐
+│                      │
+│  bg-gradient pastel  │
+│                      │
+│      Glas            │  ← manjši tekst, barvni
+│       K              │  ← velik tekst (3xl-5xl), barvni
+│                      │
+├──────────────────────┤
+│   Glas K             │  ← bel spodnji del z naslovom (kot na sliki)
+└──────────────────────┘
+```
 
-- **Sekcija "Kaj se preverja?"** (vrstica 119): Dodati odstavek o prilagojeni razlicici:
-  > "Za otroke v starostni skupini 3-4 let je na voljo prilagojena razlicica s 20 besedami (1 beseda na glas), ki je krajsa in manj obremenjujoca."
+## Spremembe v `src/pages/VizualniPrikazUstnic.tsx`
 
-- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Kako preverjanje poteka?"):
-  - Opis, da lahko uporabnik pred ali med preverjanjem prilagodi nastavitve
-  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka
-  - Cas snemanja: 3, 4 (privzeto) ali 5 sekund
+### Sprednja stran kartice (`flip-card-front`)
+- Razdelim na dva dela: zgornji gradient del (aspect-square) in spodnji beli del s tekstom
+- Zgornji del: pastelni gradient ozadje, na sredini napis "Glas" (manjši) + velika črka pod njim
+- Spodnji del: belo ozadje, naslov kartice (npr. "Glas K", "Glasovi C, S, Z")
+- Besedilo v barvi kartice (`text-app-orange`, `text-app-purple`, itd.)
+- Za kartice z več glasovi (C,S,Z in Č,Š,Ž) prikazujem glasove ločeno ali skupaj
 
-## 2. ArticulationTestInstructionsDialog.tsx (Kako deluje)
+### Barve ostanejo enake kot zdaj
+- K: orange, L: purple, R: purple/teal, CSZ: green, ČŠŽ: blue
 
-**Kaj manjka:**
-- Omemba prilagojene razlicice (20 besed)
-- Omemba nastavitev (zahtevnost, cas snemanja)
-- Hardkodirano "5 sekund" in "60 besed" namesto nastavljive vrednosti
+### Zadnja stran ostane nespremenjena
+- Slika artikulacije + gumb za zvočna navodila
 
-**Spremembe:**
-
-- **Sekcija "Struktura preverjanja"** (vrstica 52-60): Razdeliti na "Standardna razlicica" (60 besed) in "Prilagojena razlicica" (20 besed za 3-4 let), enako kot na /kako-deluje
-
-- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Struktura preverjanja"):
-  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka -- opis vpliva na strogost ocenjevanja
-  - Cas snemanja: 3, 4, 5 sekund z opisi
-
-- **Sekcija "Potek izgovorjave"** (vrstica 114): Popraviti "5 sekund" na "nastavljiv cas snemanja (3, 4 ali 5 sekund, privzeto 4 sekunde)"
-
-- **Zakljucna vrstica** (vrstica 170): Popraviti "60 besed" na "vseh besed (60 pri standardni oz. 20 pri prilagojeni razlicici)"
-
-### Datoteke za spremembo
-- `src/components/articulation/ArticulationTestInfoDialog.tsx`
-- `src/components/articulation/ArticulationTestInstructionsDialog.tsx`
+## Datoteka
+- `src/pages/VizualniPrikazUstnic.tsx`
 
