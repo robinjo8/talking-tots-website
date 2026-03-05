@@ -39,7 +39,7 @@ const InfoMojaStran = () => {
           {/* 3. Zvezdice */}
           <section>
             <h2 className="text-2xl font-semibold text-foreground mb-4">
-              3. Zvezdice ⭐
+              3. Zvezdice
             </h2>
             <p className="text-muted-foreground leading-relaxed">
               Zvezdica je osnovna nagrada, ki jo otrok prejme za vsako opravljeno igro ali vajo. Zvezdice so temelj 
@@ -74,7 +74,7 @@ const InfoMojaStran = () => {
           {/* 4. Zmajčki */}
           <section>
             <h2 className="text-2xl font-semibold text-foreground mb-4">
-              4. Zmajčki 🐉
+              4. Zmajčki
             </h2>
             <p className="text-muted-foreground leading-relaxed">
               Zmajček je nagrada za vztrajnost. Ko otrok zbere <strong>10 zvezdic</strong>, avtomatično prejme enega zmajčka. 
@@ -102,7 +102,7 @@ const InfoMojaStran = () => {
           {/* 5. Pokali */}
           <section>
             <h2 className="text-2xl font-semibold text-foreground mb-4">
-              5. Pokali 🏆
+              5. Pokali
             </h2>
             <p className="text-muted-foreground leading-relaxed">
               Pokal je <strong>največja nagrada</strong> v sistemu TomiTalk. Otrok ga prejme, ko zbere 
