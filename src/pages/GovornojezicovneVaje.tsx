@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
@@ -8,10 +8,14 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { DailyStarsBar } from "@/components/DailyStarsBar";
 import { FooterSection } from "@/components/FooterSection";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { ChevronDown } from "lucide-react";
 
 const GovornojezicovneVaje = () => {
   const { user, selectedChild, signOut, isLoading: isAuthLoading } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAuthLoading && !user) {
@@ -127,13 +131,48 @@ const GovornojezicovneVaje = () => {
 
                     {/* Card Content */}
                     <div className="p-6 flex flex-col flex-grow">
-                      <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                        {exercise.description}
-                      </p>
-                      {exercise.example && (
-                        <p className="text-sm text-muted-foreground/80 italic">
-                          {exercise.example}
-                        </p>
+                      {isMobile ? (
+                        <>
+                          <div
+                            className={cn(
+                              "overflow-hidden transition-all duration-300",
+                              expandedId === exercise.id ? "max-h-[500px]" : "max-h-0"
+                            )}
+                          >
+                            <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                              {exercise.description}
+                            </p>
+                            {exercise.example && (
+                              <p className="text-sm text-muted-foreground/80 italic">
+                                {exercise.example}
+                              </p>
+                            )}
+                          </div>
+                          <button
+                            className="flex items-center justify-center gap-1 text-xs text-muted-foreground mt-1 py-1"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setExpandedId(prev => prev === exercise.id ? null : exercise.id);
+                            }}
+                          >
+                            {expandedId === exercise.id ? "Skrij" : "Več"}
+                            <ChevronDown className={cn(
+                              "h-3.5 w-3.5 transition-transform duration-300",
+                              expandedId === exercise.id && "rotate-180"
+                            )} />
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                            {exercise.description}
+                          </p>
+                          {exercise.example && (
+                            <p className="text-sm text-muted-foreground/80 italic">
+                              {exercise.example}
+                            </p>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
