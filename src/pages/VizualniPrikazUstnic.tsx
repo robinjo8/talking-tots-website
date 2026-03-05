@@ -7,7 +7,8 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { DailyStarsBar } from "@/components/DailyStarsBar";
 import { FooterSection } from "@/components/FooterSection";
-import { Volume2, Eye } from "lucide-react";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const STORAGE_BASE = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo";
@@ -20,7 +21,6 @@ const soundCards = [
     image: `${STORAGE_BASE}/Glas_K.png`,
     gradient: "from-app-blue/10 to-app-purple/10",
     color: "text-app-blue",
-    bgColor: "bg-app-blue",
     audioUrl: null as string | null,
   },
   {
@@ -30,7 +30,6 @@ const soundCards = [
     image: `${STORAGE_BASE}/Glas_L.png`,
     gradient: "from-app-purple/10 to-app-blue/10",
     color: "text-app-purple",
-    bgColor: "bg-app-purple",
     audioUrl: null as string | null,
   },
   {
@@ -40,7 +39,6 @@ const soundCards = [
     image: `${STORAGE_BASE}/Glas_R.png`,
     gradient: "from-app-orange/10 to-app-yellow/10",
     color: "text-app-orange",
-    bgColor: "bg-app-orange",
     audioUrl: null as string | null,
   },
   {
@@ -50,7 +48,6 @@ const soundCards = [
     image: `${STORAGE_BASE}/Glas_SZC.png`,
     gradient: "from-dragon-green/10 to-app-teal/10",
     color: "text-dragon-green",
-    bgColor: "bg-dragon-green",
     audioUrl: null as string | null,
   },
   {
@@ -60,7 +57,6 @@ const soundCards = [
     image: `${STORAGE_BASE}/Glas_ShZhCh.png`,
     gradient: "from-app-teal/10 to-dragon-green/10",
     color: "text-app-teal",
-    bgColor: "bg-app-teal",
     audioUrl: null as string | null,
   },
 ];
@@ -68,7 +64,7 @@ const soundCards = [
 const VizualniPrikazUstnic = () => {
   const { user, selectedChild, signOut, isLoading: isAuthLoading } = useAuth();
   const navigate = useNavigate();
-  const [flippedCardId, setFlippedCardId] = useState<string | null>(null);
+  const [selectedCard, setSelectedCard] = useState<typeof soundCards[0] | null>(null);
 
   useEffect(() => {
     if (!isAuthLoading && !user) {
@@ -84,10 +80,6 @@ const VizualniPrikazUstnic = () => {
       console.error("Error in VizualniPrikazUstnic handleSignOut:", error);
       toast.error("Napaka pri odjavi");
     }
-  };
-
-  const handleCardClick = (cardId: string) => {
-    setFlippedCardId(prev => prev === cardId ? null : cardId);
   };
 
   if (isAuthLoading || !user) {
@@ -122,94 +114,49 @@ const VizualniPrikazUstnic = () => {
 
           {selectedChild ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {soundCards.map((card) => {
-                const isFlipped = flippedCardId === card.id;
-                return (
-                  <div
-                    key={card.id}
-                    className="cursor-pointer"
-                    style={{ perspective: "1000px" }}
-                    onClick={() => handleCardClick(card.id)}
-                  >
-                    <div
-                      className="relative w-full transition-transform duration-700"
-                      style={{
-                        transformStyle: "preserve-3d",
-                        transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+              {soundCards.map((card) => (
+                <div
+                  key={card.id}
+                  className={cn(
+                    "bg-white rounded-xl shadow-xl border border-gray-200 transition-all duration-300 overflow-hidden group cursor-pointer hover:shadow-2xl hover:scale-[1.02]"
+                  )}
+                  onClick={() => setSelectedCard(card)}
+                >
+                  {/* Card Header */}
+                  <div className={`relative bg-gradient-to-br ${card.gradient} p-4 flex items-center justify-center min-h-[80px]`}>
+                    <h3 className={`text-lg font-bold text-center ${card.color}`}>
+                      {card.title}
+                    </h3>
+                  </div>
+
+                  {/* Card Image */}
+                  <div className="p-4">
+                    <img
+                      src={card.image}
+                      alt={card.title}
+                      className="w-full h-auto rounded-lg"
+                      loading="lazy"
+                    />
+                  </div>
+
+                  {/* Audio button */}
+                  <div className="px-4 pb-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full gap-2"
+                      disabled={!card.audioUrl}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Audio playback will be added later
                       }}
                     >
-                      {/* FRONT - zakrita kartica (drives height when visible) */}
-                      <div
-                        className={cn(
-                          "rounded-xl shadow-xl border border-gray-200 overflow-hidden",
-                          isFlipped && "invisible"
-                        )}
-                        style={{ backfaceVisibility: "hidden" }}
-                      >
-                        <div className={`bg-gradient-to-br ${card.gradient} flex flex-col items-center justify-center gap-4 p-8 min-h-[280px]`}>
-                          <div className={`w-20 h-20 rounded-full ${card.bgColor} flex items-center justify-center shadow-lg`}>
-                            <span className="text-3xl font-bold text-white">
-                              {card.sounds[0]}
-                            </span>
-                          </div>
-                          <h3 className={`text-xl font-bold text-center ${card.color}`}>
-                            {card.title}
-                          </h3>
-                          <div className="flex items-center gap-2 text-muted-foreground text-sm mt-2">
-                            <Eye className="w-4 h-4" />
-                            <span>Klikni za prikaz</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* BACK - slika (drives height when flipped) */}
-                      <div
-                        className={cn(
-                          "rounded-xl shadow-xl border border-gray-200 overflow-hidden bg-white",
-                          !isFlipped ? "invisible absolute inset-0" : "relative"
-                        )}
-                        style={{
-                          backfaceVisibility: "hidden",
-                          transform: "rotateY(180deg)",
-                        }}
-                      >
-                        {/* Card Header */}
-                        <div className={`bg-gradient-to-br ${card.gradient} p-4 flex items-center justify-center`}>
-                          <h3 className={`text-lg font-bold text-center ${card.color}`}>
-                            {card.title}
-                          </h3>
-                        </div>
-
-                        {/* Card Image */}
-                        <div className="p-4">
-                          <img
-                            src={card.image}
-                            alt={card.title}
-                            className="w-full h-auto rounded-lg"
-                            loading="lazy"
-                          />
-                        </div>
-
-                        {/* Audio button */}
-                        <div className="px-4 pb-4">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-full gap-2"
-                            disabled={!card.audioUrl}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                            }}
-                          >
-                            <Volume2 className="w-4 h-4" />
-                            {card.audioUrl ? "Zvočna navodila" : "Zvočna navodila – kmalu"}
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
+                      <Volume2 className="w-4 h-4" />
+                      {card.audioUrl ? "Zvočna navodila" : "Zvočna navodila – kmalu"}
+                    </Button>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           ) : (
             <div className="min-h-[400px] flex flex-col items-center justify-center">
@@ -220,6 +167,35 @@ const VizualniPrikazUstnic = () => {
           )}
         </div>
       </section>
+
+      {/* Dialog za povečano sliko */}
+      <Dialog open={!!selectedCard} onOpenChange={() => setSelectedCard(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogTitle className={`text-xl font-bold ${selectedCard?.color || ''}`}>
+            {selectedCard?.title}
+          </DialogTitle>
+          {selectedCard && (
+            <div className="space-y-4">
+              <img
+                src={selectedCard.image}
+                alt={selectedCard.title}
+                className="w-full h-auto rounded-lg"
+              />
+              <Button
+                variant="outline"
+                className="w-full gap-2"
+                disabled={!selectedCard.audioUrl}
+                onClick={() => {
+                  // Audio playback will be added later
+                }}
+              >
+                <Volume2 className="w-4 h-4" />
+                {selectedCard.audioUrl ? "Poslušaj zvočna navodila" : "Zvočna navodila – kmalu"}
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <FooterSection handleSignOut={handleSignOut} />
     </div>
