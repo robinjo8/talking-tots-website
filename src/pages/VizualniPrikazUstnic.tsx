@@ -125,10 +125,10 @@ const VizualniPrikazUstnic = () => {
                   <div
                     key={card.id}
                     className="flip-card cursor-pointer"
-                    style={{ aspectRatio: 'auto', minHeight: '320px' }}
+                    style={{ minHeight: '420px' }}
                     onClick={() => handleCardClick(card.id)}
                   >
-                    <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: '320px' }}>
+                    <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: '420px' }}>
                       {/* Front */}
                       <div
                         className="flip-card-front flex-col p-0 overflow-hidden border-2 border-gray-100 shadow-lg"
@@ -146,26 +146,26 @@ const VizualniPrikazUstnic = () => {
                         {/* Bottom white section */}
                         <div className="w-full bg-white py-3 px-2 flex items-center justify-center border-t border-gray-100">
                           <span className={`text-base font-bold ${card.textColor} text-center leading-tight`}>
-                            {card.title}
+                            Odpri
                           </span>
                         </div>
                       </div>
 
                       {/* Back */}
-                      <div className="flip-card-back flex-col p-3 gap-2">
-                        <h3 className={`text-lg font-bold ${card.color} pt-1`}>
+                      <div className="flip-card-back flex-col p-4 justify-between">
+                        <h3 className={`text-lg font-bold ${card.color} text-center`}>
                           {card.title}
                         </h3>
                         <img
                           src={card.image}
                           alt={card.title}
-                          className="w-full h-auto rounded-lg"
+                          className="w-full max-h-[250px] object-contain rounded-lg"
                           loading="lazy"
                         />
                         <Button
                           variant="outline"
                           size="sm"
-                          className="w-full gap-2 mt-1"
+                          className="w-full gap-2"
                           disabled={!card.audioUrl}
                           onClick={(e) => {
                             e.stopPropagation();
