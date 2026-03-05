@@ -181,27 +181,27 @@ const VizualniPrikazUstnic = () => {
                 />
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                 {soundCards.map((card) => {
                   const isFlipped = flippedCardId === card.id;
                   return (
                     <div
                       key={card.id}
-                      className="flip-card cursor-pointer"
+                      className="flip-card cursor-pointer rounded-xl shadow-xl border border-border bg-white transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]"
                       style={{ minHeight: '420px' }}
                       onClick={() => handleCardClick(card.id)}
                     >
                       <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: '420px' }}>
-                        <div className="flip-card-front flex-col p-0 overflow-hidden">
+                        <div className="flip-card-front flex-col p-0 overflow-hidden rounded-xl">
                           <div className={`w-full flex-1 bg-gradient-to-br ${card.gradient} flex flex-col items-center justify-center gap-1`}>
                             <span className={`text-sm font-bold ${card.textColor} opacity-80 uppercase tracking-widest`}>Glas</span>
                             <span className={`text-5xl md:text-6xl font-black ${card.textColor} drop-shadow-sm`}>{card.sounds.join(", ")}</span>
                           </div>
-                          <div className="w-full bg-white py-3 px-2 flex items-center justify-center border-t border-gray-100">
+                          <div className="w-full bg-white py-3 px-2 flex items-center justify-center border-t border-border">
                             <span className={`text-base font-bold ${card.textColor} text-center leading-tight`}>Odpri</span>
                           </div>
                         </div>
-                        <div className="flip-card-back flex-col p-4 justify-between">
+                        <div className="flip-card-back flex-col p-4 justify-between rounded-xl">
                           <h3 className={`text-lg font-bold ${card.color} text-center`}>{card.title}</h3>
                           <img src={card.image} alt={card.title} className="w-full max-h-[250px] object-contain rounded-lg" loading="lazy" />
                           <Button variant="outline" size="sm" className="w-full gap-2" disabled={!card.audioUrl} onClick={(e) => { e.stopPropagation(); }}>
