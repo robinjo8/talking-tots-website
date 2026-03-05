@@ -136,15 +136,17 @@ const VizualniPrikazUstnic = () => {
                       style={{
                         transformStyle: "preserve-3d",
                         transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
-                        minHeight: "320px",
                       }}
                     >
-                      {/* FRONT - zakrita kartica */}
+                      {/* FRONT - zakrita kartica (drives height when visible) */}
                       <div
-                        className="absolute inset-0 rounded-xl shadow-xl border border-gray-200 overflow-hidden"
+                        className={cn(
+                          "rounded-xl shadow-xl border border-gray-200 overflow-hidden",
+                          isFlipped && "invisible"
+                        )}
                         style={{ backfaceVisibility: "hidden" }}
                       >
-                        <div className={`h-full bg-gradient-to-br ${card.gradient} flex flex-col items-center justify-center gap-4 p-6`}>
+                        <div className={`bg-gradient-to-br ${card.gradient} flex flex-col items-center justify-center gap-4 p-8 min-h-[280px]`}>
                           <div className={`w-20 h-20 rounded-full ${card.bgColor} flex items-center justify-center shadow-lg`}>
                             <span className="text-3xl font-bold text-white">
                               {card.sounds[0]}
@@ -160,23 +162,26 @@ const VizualniPrikazUstnic = () => {
                         </div>
                       </div>
 
-                      {/* BACK - slika */}
+                      {/* BACK - slika (drives height when flipped) */}
                       <div
-                        className="absolute inset-0 rounded-xl shadow-xl border border-gray-200 overflow-hidden bg-white"
+                        className={cn(
+                          "rounded-xl shadow-xl border border-gray-200 overflow-hidden bg-white",
+                          !isFlipped ? "invisible absolute inset-0" : "relative"
+                        )}
                         style={{
                           backfaceVisibility: "hidden",
                           transform: "rotateY(180deg)",
                         }}
                       >
                         {/* Card Header */}
-                        <div className={`bg-gradient-to-br ${card.gradient} p-3 flex items-center justify-center`}>
+                        <div className={`bg-gradient-to-br ${card.gradient} p-4 flex items-center justify-center`}>
                           <h3 className={`text-lg font-bold text-center ${card.color}`}>
                             {card.title}
                           </h3>
                         </div>
 
                         {/* Card Image */}
-                        <div className="p-3">
+                        <div className="p-4">
                           <img
                             src={card.image}
                             alt={card.title}
@@ -186,7 +191,7 @@ const VizualniPrikazUstnic = () => {
                         </div>
 
                         {/* Audio button */}
-                        <div className="px-3 pb-3">
+                        <div className="px-4 pb-4">
                           <Button
                             variant="outline"
                             size="sm"
