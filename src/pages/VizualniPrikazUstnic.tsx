@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { DailyStarsBar } from "@/components/DailyStarsBar";
 import { FooterSection } from "@/components/FooterSection";
-import { Volume2, Home } from "lucide-react";
+import { Volume2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
@@ -117,17 +117,6 @@ const VizualniPrikazUstnic = () => {
 
       <section className="pt-24 md:pt-28 pb-12 bg-white min-h-screen">
         <div className="container max-w-6xl mx-auto px-4">
-
-          <div className="text-center mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-              Vizualni prikaz ustnic
-            </h1>
-            <p className="text-muted-foreground">
-              Poglej, kako pravilno postaviti ustnice pri izgovorjavi glasov
-            </p>
-          </div>
-
-          <DailyStarsBar />
 
           {selectedChild ? (
             isMobile ? (
@@ -245,7 +234,7 @@ const VizualniPrikazUstnic = () => {
         onClick={() => navigate("/govorno-jezikovne-vaje")}
         className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-r from-amber-400 to-orange-500 shadow-lg border-2 border-white/50 backdrop-blur-sm flex items-center justify-center transition-all"
       >
-        <Home className="w-7 h-7 text-white" />
+        <ArrowLeft className="w-7 h-7 text-white" />
       </button>
 
       <FooterSection handleSignOut={handleSignOut} />
